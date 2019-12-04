@@ -1,0 +1,17 @@
+[Desktop Entry]
+Categories=AudioVideo;
+Comment=Voice note book
+Exec=/usr/bin/deepin-voice-note %f
+GenericName[zh_CN]=语音记事本
+Icon=deepin-voice-note
+Name=Voice Notes
+Name[zh_CN]=语音记事本
+StartupNotify=true
+Terminal=false
+TryExec=/usr/bin/deepin-voice-note
+Type=Application
+X-Deepin-Vendor=deepin
+
+# Translations:
+# Do not manually modify!
+
