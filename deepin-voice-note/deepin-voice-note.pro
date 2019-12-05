@@ -19,7 +19,10 @@ SOURCES += \
     db/vnotefolderoper.cpp \
     db/vnoteitemoper.cpp \
     common/loadfolderworker.cpp \
-    common/loadnoteitemsworker.cpp
+    common/loadnoteitemsworker.cpp \
+    views/leftview.cpp \
+    views/leftviewsortfiltermodel.cpp \
+    views/leftviewdelegate.cpp
 
 RESOURCES += deepin-voice-note.qrc
 
@@ -36,7 +39,10 @@ HEADERS += \
     db/vnoteitemoper.h \
     common/datatypedef.h \
     common/loadfolderworker.h \
-    common/loadnoteitemsworker.h
+    common/loadnoteitemsworker.h \
+    views/leftview.h \
+    views/leftviewsortfiltermodel.h \
+    views/leftviewdelegate.h
 
 # Default rules for deployment.
 isEmpty(BINDIR):BINDIR=/usr/bin

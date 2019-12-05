@@ -1,5 +1,132 @@
 <RCC>
     <qresource prefix="/">
         <file>images/play-slider.svg</file>
+        <file>images/deepin-voice-note.svg</file>
+        <file>images/slider.svg</file>
+        <file>images/voice-note-32px 2.svg</file>
+        <file>images/icon/DefaultAvatar/1.svg</file>
+        <file>images/icon/DefaultAvatar/10.svg</file>
+        <file>images/icon/DefaultAvatar/2.svg</file>
+        <file>images/icon/DefaultAvatar/3.svg</file>
+        <file>images/icon/DefaultAvatar/4.svg</file>
+        <file>images/icon/DefaultAvatar/5.svg</file>
+        <file>images/icon/DefaultAvatar/6.svg</file>
+        <file>images/icon/DefaultAvatar/7.svg</file>
+        <file>images/icon/DefaultAvatar/8.svg</file>
+        <file>images/icon/DefaultAvatar/9.svg</file>
+        <file>images/icon/disabled/circlebutton_add_disabled.svg</file>
+        <file>images/icon/disabled/circlebutton_voice_disabled.svg</file>
+        <file>images/icon/disabled/more_disabled.svg</file>
+        <file>images/icon/disabled/play_disabled.svg</file>
+        <file>images/icon/focus/circlebutton_add 2.svg</file>
+        <file>images/icon/focus/circlebutton_add_focus.svg</file>
+        <file>images/icon/focus/circlebutton_voice_focus.svg</file>
+        <file>images/icon/focus/finish_focus.svg</file>
+        <file>images/icon/focus/more_focus.svg</file>
+        <file>images/icon/focus/pause_blue_focus.svg</file>
+        <file>images/icon/focus/pause_red_focus.svg</file>
+        <file>images/icon/focus/play_focus.svg</file>
+        <file>images/icon/focus/record_focus.svg</file>
+        <file>images/icon/hover/circlebutton_add _hover.svg</file>
+        <file>images/icon/hover/circlebutton_voice_hover.svg</file>
+        <file>images/icon/hover/detail-hover.svg</file>
+        <file>images/icon/hover/finish_hover.svg</file>
+        <file>images/icon/hover/more_hover.svg</file>
+        <file>images/icon/hover/pause_blue_hover.svg</file>
+        <file>images/icon/hover/pause_red_hover.svg</file>
+        <file>images/icon/hover/play_hover.svg</file>
+        <file>images/icon/hover/record_hover.svg</file>
+        <file>images/icon/normal/back_normal.svg</file>
+        <file>images/icon/normal/circlebutton_add .svg</file>
+        <file>images/icon/normal/circlebutton_add 2.svg</file>
+        <file>images/icon/normal/circlebutton_voice.svg</file>
+        <file>images/icon/normal/cursor .svg</file>
+        <file>images/icon/normal/cursor.svg</file>
+        <file>images/icon/normal/detail-normal.svg</file>
+        <file>images/icon/normal/finish_normal.svg</file>
+        <file>images/icon/normal/more_normal.svg</file>
+        <file>images/icon/normal/pause_blue_normal.svg</file>
+        <file>images/icon/normal/pause_red_normal.svg</file>
+        <file>images/icon/normal/play_normal.svg</file>
+        <file>images/icon/normal/record_normal.svg</file>
+        <file>images/icon/normal/record_small_normal.svg</file>
+        <file>images/icon/normal/slider.svg</file>
+        <file>images/icon/normal/warning .svg</file>
+        <file>images/icon/normal/编组.svg</file>
+        <file>images/icon/press/back_press.svg</file>
+        <file>images/icon/press/circlebutton_add_press.svg</file>
+        <file>images/icon/press/circlebutton_voice_press.svg</file>
+        <file>images/icon/press/detail-press.svg</file>
+        <file>images/icon/press/finish_press.svg</file>
+        <file>images/icon/press/more_press.svg</file>
+        <file>images/icon/press/pause_blue_press.svg</file>
+        <file>images/icon/press/pause_red_press.svg</file>
+        <file>images/icon/press/play_press.svg</file>
+        <file>images/icon/press/record_press.svg</file>
+        <file>images/icon/scrollbar/scrollbar_active.svg</file>
+        <file>images/icon/scrollbar/scrollbar_hover.svg</file>
+        <file>images/icon/icon_import_note.svg</file>
+        <file>images/icon/slider.svg</file>
+        <file>images/icon/voice-note-32px 2.svg</file>
+        <file>images/icon_dark/disabled/add_disabled_dark.svg</file>
+        <file>images/icon_dark/disabled/circlebutton_add_disabled.svg</file>
+        <file>images/icon_dark/disabled/circlebutton_voice_disabled.svg</file>
+        <file>images/icon_dark/disabled/more_disabled_dark.svg</file>
+        <file>images/icon_dark/disabled/play_disabled.svg</file>
+        <file>images/icon_dark/disabled/play_disabled_dark.svg</file>
+        <file>images/icon_dark/disabled/voice_disabled_dark.svg</file>
+        <file>images/icon_dark/focus/add_focus_dark.svg</file>
+        <file>images/icon_dark/focus/finish_focus_dark.svg</file>
+        <file>images/icon_dark/focus/more_focus_dark.svg</file>
+        <file>images/icon_dark/focus/pause_blue_focus_dark.svg</file>
+        <file>images/icon_dark/focus/pause_red_focus_dark.svg</file>
+        <file>images/icon_dark/focus/play_focus_dark.svg</file>
+        <file>images/icon_dark/focus/record_focus_dark.svg</file>
+        <file>images/icon_dark/focus/voice_focus_dark.svg</file>
+        <file>images/icon_dark/hover/add _hover_dark.svg</file>
+        <file>images/icon_dark/hover/detail-hover.svg</file>
+        <file>images/icon_dark/hover/finish_hover_dark.svg</file>
+        <file>images/icon_dark/hover/more_hover_dark.svg</file>
+        <file>images/icon_dark/hover/pause_blue_hover_dark.svg</file>
+        <file>images/icon_dark/hover/pause_red_hover_dark.svg</file>
+        <file>images/icon_dark/hover/play_hover_dark.svg</file>
+        <file>images/icon_dark/hover/record_hover_dark.svg</file>
+        <file>images/icon_dark/hover/voice_hover_dark.svg</file>
+        <file>images/icon_dark/normal/add_normal_dark.svg</file>
+        <file>images/icon_dark/normal/circlebutton_add .svg</file>
+        <file>images/icon_dark/normal/circlebutton_voice.svg</file>
+        <file>images/icon_dark/normal/cursor _dark.svg</file>
+        <file>images/icon_dark/normal/detail-normal.svg</file>
+        <file>images/icon_dark/normal/finish_normal.svg</file>
+        <file>images/icon_dark/normal/finish_normal_dark.svg</file>
+        <file>images/icon_dark/normal/more_normal_dark.svg</file>
+        <file>images/icon_dark/normal/pause_blue_normal.svg</file>
+        <file>images/icon_dark/normal/pause_blue_normal_dark.svg</file>
+        <file>images/icon_dark/normal/pause_red_normal_dark.svg</file>
+        <file>images/icon_dark/normal/play_normal.svg</file>
+        <file>images/icon_dark/normal/play_normal_dark.svg</file>
+        <file>images/icon_dark/normal/record_normal_dark.svg</file>
+        <file>images/icon_dark/normal/record_small_normal.svg</file>
+        <file>images/icon_dark/normal/slider_dark.svg</file>
+        <file>images/icon_dark/normal/voice_normal_dark.svg</file>
+        <file>images/icon_dark/press/add_press_dark.svg</file>
+        <file>images/icon_dark/press/circlebutton_add_press.svg</file>
+        <file>images/icon_dark/press/circlebutton_voice_press.svg</file>
+        <file>images/icon_dark/press/detail-press.svg</file>
+        <file>images/icon_dark/press/finish_press.svg</file>
+        <file>images/icon_dark/press/finish_press_dark.svg</file>
+        <file>images/icon_dark/press/more_press.svg</file>
+        <file>images/icon_dark/press/more_press_dark.svg</file>
+        <file>images/icon_dark/press/pause_blue_press.svg</file>
+        <file>images/icon_dark/press/pause_blue_press_dark.svg</file>
+        <file>images/icon_dark/press/pause_red_press_dark.svg</file>
+        <file>images/icon_dark/press/play_press.svg</file>
+        <file>images/icon_dark/press/play_press_dark.svg</file>
+        <file>images/icon_dark/press/record_press.svg</file>
+        <file>images/icon_dark/press/record_press_dark.svg</file>
+        <file>images/icon_dark/press/voice_press_dark.svg</file>
+        <file>images/icon_dark/cursor _dark.svg</file>
+        <file>images/icon_dark/icon_import_note.svg</file>
+        <file>images/icon_dark/slider_dark.svg</file>
     </qresource>
 </RCC>

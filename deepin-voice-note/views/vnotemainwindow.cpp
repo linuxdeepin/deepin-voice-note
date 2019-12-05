@@ -39,6 +39,7 @@ void VNoteMainWindow::initConnections()
 {
     connect(VNoteDataManager::instance(), &VNoteDataManager::onNoteFoldersLoaded
             , this, &VNoteMainWindow::onVNoteFoldersLoaded);
+    connect(m_btnAddFoler, &DPushButton::clicked, m_leftViewHolder, &LeftView::handleAddFolder);
 }
 
 void VNoteMainWindow::initShortcuts()
@@ -89,14 +90,17 @@ void VNoteMainWindow::initMainView()
 
 void VNoteMainWindow::initLeftView()
 {
-    m_leftViewHolder = new QWidget(m_mainWndSpliter);
+    m_leftViewHolder = new LeftView(m_mainWndSpliter);
     m_leftViewHolder->setObjectName("leftMainLayoutHolder");
     m_leftViewHolder->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     m_leftViewHolder->setFixedWidth(VNOTE_LEFTVIEW_W);
-    m_leftViewHolder->setContentsMargins(0, 0, 2, 0);
+    m_leftViewHolder->setContentsMargins(0, 0, 2, 5);
     m_leftViewHolder->setBackgroundRole(DPalette::Base);
     m_leftViewHolder->setAutoFillBackground(true);
+    m_leftViewHolder->setSpacing(5);
     // d->leftBarHolder->setAttribute(Qt::WA_TranslucentBackground, true);
+    m_btnAddFoler = new DPushButton (m_leftViewHolder);
+    m_btnAddFoler->setFixedSize(QSize(68, 68));
 
     QVBoxLayout *leftMainLayout = new QVBoxLayout();
     leftMainLayout->setContentsMargins(0, 0, 0, 0);
@@ -134,5 +138,12 @@ void VNoteMainWindow::initRightView()
 
 void VNoteMainWindow::onVNoteFoldersLoaded()
 {
-    qInfo() << "folderMaps:" << VNoteDataManager::instance()->getNoteFolders();
+    //qInfo() << "folderMaps:" << VNoteDataManager::instance()->getNoteFolders();
+    m_leftViewHolder->loadNoteFolder();
+}
+void VNoteMainWindow::resizeEvent(QResizeEvent *event)
+{
+    m_btnAddFoler->move((m_leftViewHolder->width() - m_btnAddFoler->width()) / 2,
+                        this->height() - m_btnAddFoler->height() - 60);
+    DMainWindow::resizeEvent(event);
 }

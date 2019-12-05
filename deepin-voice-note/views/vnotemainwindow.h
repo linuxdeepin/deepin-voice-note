@@ -2,10 +2,12 @@
 #define VNOTEMAINWINDOW_H
 
 #include "common/datatypedef.h"
+#include "leftview.h"
 
 #include <DMainWindow>
 #include <DSearchEdit>
 #include <DSplitter>
+#include <DPushButton>
 
 DWIDGET_USE_NAMESPACE
 
@@ -25,6 +27,7 @@ protected:
     void initMainView();
     void initLeftView();
     void initRightView();
+    void resizeEvent(QResizeEvent *event) override;
 
 signals:
 
@@ -34,8 +37,9 @@ private:
     DSearchEdit *m_noteSearchEdit {nullptr};
 
     DSplitter *m_mainWndSpliter {nullptr};
-    QWidget   *m_leftViewHolder {nullptr};
+    LeftView   *m_leftViewHolder {nullptr};
     QWidget   *m_rightViewHolder {nullptr};
+    DPushButton *m_btnAddFoler {nullptr};
 };
 
 #endif // VNOTEMAINWINDOW_H

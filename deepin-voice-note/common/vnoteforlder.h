@@ -5,7 +5,7 @@
 
 #include <QtGlobal>
 #include <QDateTime>
-
+#include <QImage>
 struct VNoteFolder
 {
 public:
@@ -25,6 +25,8 @@ public:
 
     QDateTime createTime;
     QDateTime modifyTime;
+
+    QImage icon;
 
     bool fIsloaded {false};
     VNOTE_ITEMS_MAP *notes{nullptr};

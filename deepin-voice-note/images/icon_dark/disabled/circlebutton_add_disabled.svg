@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="34px" height="34px" viewBox="0 0 34 34" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 58 (84663) - https://sketch.com -->
+    <title>circlebutton_add_disabled</title>
+    <desc>Created with Sketch.</desc>
+    <g id="浅色" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.4">
+        <g id="按钮状态备份" transform="translate(-194.000000, -579.000000)" fill="#FFFFFF">
+            <g id="circlebutton_add-2" transform="translate(194.000000, 579.000000)">
+                <g id="circlebutton_add" transform="translate(7.000000, 7.000000)">
+                    <g id="合并形状">
+                        <path d="M10,2.84217094e-14 L10,9 L19,9 L19,10 L10,10 L10,19 L9,19 L9,10 L0,10 L0,9 L9,9 L9,2.84217094e-14 L10,2.84217094e-14 Z"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
