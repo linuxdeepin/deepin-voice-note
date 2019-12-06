@@ -15,7 +15,7 @@ class LeftView : public DListView
     Q_OBJECT
 public:
     LeftView(QWidget *parent = nullptr);
-    int getFolderId(const QModelIndex &index);
+    qint64 getFolderId(const QModelIndex &index);
     void setFoderUpdateTime(const QDateTime &time, int id, bool sort = false);
     void sortView(LeftViewSortFilterModel::OperaType Type = LeftViewSortFilterModel::none,
                   int column = 0, Qt::SortOrder order = Qt::AscendingOrder);
@@ -35,6 +35,7 @@ signals:
     void sigFolderAdd(qint64 id);
     void sigFolderDel(qint64 id);
     void sigFolderUpdate(qint64 id);
+
 private:
     void initMenuAction();
     void initConnection();
@@ -43,7 +44,6 @@ private:
     void initFolderData();
 
     qint64 getNewFolderId();
-    QString getNewFolderName();
     QString getNewFolderIconPath();
 protected:
     void mousePressEvent(QMouseEvent *event);

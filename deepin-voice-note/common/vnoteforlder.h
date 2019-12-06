@@ -26,7 +26,9 @@ public:
     QDateTime createTime;
     QDateTime modifyTime;
 
-    QImage icon;
+    struct{
+        QImage icon;
+    }UI;
 
     bool fIsloaded {false};
     VNOTE_ITEMS_MAP *notes{nullptr};

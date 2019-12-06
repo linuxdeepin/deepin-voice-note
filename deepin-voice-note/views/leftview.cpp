@@ -79,10 +79,10 @@ void LeftView::handleAddFolder()
         VNoteFolder *itemData = new  VNoteFolder();
         itemData->id = getNewFolderId();
         itemData->iconPath = getNewFolderIconPath();
-        itemData->icon = QImage(itemData->iconPath);
+        itemData->UI.icon = QImage(itemData->iconPath);
         itemData->createTime = QDateTime::currentDateTime();
         itemData->modifyTime = itemData->createTime;
-        itemData->name = getNewFolderName();
+        itemData->name = QString(QObject::tr("NewFolder")) + QString::number(itemData->id);
         pItem->setData(QVariant::fromValue(static_cast<void *>(itemData)), Qt::UserRole + 1);
         m_pDataModel->insertRow(0, pItem);
         m_mapFolderData->insert(itemData->id, itemData);
@@ -96,40 +96,28 @@ void LeftView::sortView(LeftViewSortFilterModel::OperaType Type, int column, Qt:
 {
     m_pSortFilterModel->sortView(Type, column, order);
     QModelIndex index = m_pSortFilterModel->index(0, 0);
-    if (index.isValid()) {
+    if (index.isValid())
+    {
         this->setCurrentIndex(index);
     }
 }
 void LeftView::setCreateTimeFilter(const QDateTime &begin, const QDateTime &end)
 {
     m_pSortFilterModel->setCreateTimeFilter(begin, end);
-    QModelIndex index = m_pSortFilterModel->index(0, 0);
-    if (index.isValid())
-    {
-        this->setCurrentIndex(index);
-    }
 }
 void LeftView::setUpdateTimeFilter(const QDateTime &begin, const QDateTime &end)
 {
     m_pSortFilterModel->setModifyTimeFilter(begin, end);
-    QModelIndex index = m_pSortFilterModel->index(0, 0);
-    if (index.isValid())
-    {
-        this->setCurrentIndex(index);
-    }
 }
 void LeftView::setFolderNameFilter(QString key)
 {
     m_pSortFilterModel->setFolderNameFilter(key);
-    QModelIndex index = m_pSortFilterModel->index(0, 0);
-    if (index.isValid())
-    {
-        this->setCurrentIndex(index);
-    }
 }
 void LeftView::clearFilter()
 {
     m_pSortFilterModel->clearFilter();
+    QModelIndex index = m_pSortFilterModel->index(0, 0);
+    this->setCurrentIndex(index);
 }
 qint64 LeftView::getNewFolderId()
 {
@@ -149,25 +137,7 @@ qint64 LeftView::getNewFolderId()
     } while (find);
     return id;
 }
-QString LeftView::getNewFolderName()
-{
-    QStringList folderNameList;
-    for (auto &it : *m_mapFolderData)
-    {
-        folderNameList.push_back(it->name);
-    }
-    QString folderName = QString(QObject::tr("NewFolder"));
-    QString DefaultName = folderName;
-    int i = 1;
-    do {
-        if (!folderNameList.contains(folderName))
-        {
-            return folderName;
-        }
-        folderName = DefaultName + QString::number(i);
-        i++;
-    } while (true);
-}
+
 QString LeftView::getNewFolderIconPath()
 {
     QString ImgPath;
@@ -193,4 +163,14 @@ void LeftView::loadNoteFolder()
        QModelIndex index = m_pSortFilterModel->index(0, 0);
        this->setCurrentIndex(index);
     }
+}
+qint64 LeftView::getFolderId(const QModelIndex &index)
+{
+    if(index.isValid())
+    {
+        QVariant var = index.data(Qt::UserRole + 1);
+        VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
+        return data == nullptr ? -1 : data->id;
+    }
+    return  -1;
 }

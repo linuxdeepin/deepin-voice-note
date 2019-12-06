@@ -75,6 +75,7 @@ void LeftViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     if (index.isValid())
     {
         painter->save();
+        painter->setRenderHint(QPainter::Antialiasing, true);
 
         QVariant var = index.data(Qt::UserRole + 1);
         VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
@@ -126,7 +127,7 @@ void LeftViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
         QRect nameRect(paintRect.left() + 52, paintRect.top() + 12, 160, 20);
         QRect timeRect(paintRect.left() + 52, paintRect.top() + 34, 160, 18);
 
-        painter->drawImage(iconRect, data->icon);
+        painter->drawImage(iconRect, data->UI.icon);
         painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T6));
         painter->drawText(nameRect, data->name);
         painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));

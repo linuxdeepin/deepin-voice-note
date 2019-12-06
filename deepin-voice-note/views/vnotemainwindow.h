@@ -3,6 +3,7 @@
 
 #include "common/datatypedef.h"
 #include "leftview.h"
+#include "rightview.h"
 
 #include <DMainWindow>
 #include <DSearchEdit>
@@ -33,12 +34,14 @@ signals:
 
 public slots:
     void onVNoteFoldersLoaded();
+    void onVNoteFolderChange(const QModelIndex &previous);
+    void onVNoteSearch();
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
 
     DSplitter *m_mainWndSpliter {nullptr};
     LeftView   *m_leftViewHolder {nullptr};
-    QWidget   *m_rightViewHolder {nullptr};
+    RightView   *m_rightViewHolder {nullptr};
     DPushButton *m_btnAddFoler {nullptr};
 };
 

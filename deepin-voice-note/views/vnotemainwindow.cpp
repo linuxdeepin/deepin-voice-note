@@ -40,6 +40,10 @@ void VNoteMainWindow::initConnections()
     connect(VNoteDataManager::instance(), &VNoteDataManager::onNoteFoldersLoaded
             , this, &VNoteMainWindow::onVNoteFoldersLoaded);
     connect(m_btnAddFoler, &DPushButton::clicked, m_leftViewHolder, &LeftView::handleAddFolder);
+    connect(m_noteSearchEdit,&DSearchEdit::textChanged,this,&VNoteMainWindow::onVNoteSearch);
+    connect(m_leftViewHolder,SIGNAL(currentChanged(const QModelIndex &)),this,SLOT(onVNoteFolderChange(const QModelIndex &)));
+    connect(m_leftViewHolder,&LeftView::sigFolderAdd,m_rightViewHolder,&RightView::handleFolderAdd);
+    connect(m_leftViewHolder,&LeftView::sigFolderDel,m_rightViewHolder,&RightView::handleFolderDel);
 }
 
 void VNoteMainWindow::initShortcuts()
@@ -117,20 +121,11 @@ void VNoteMainWindow::initLeftView()
 
 void VNoteMainWindow::initRightView()
 {
-    m_rightViewHolder = new QWidget(m_mainWndSpliter);
+    m_rightViewHolder = new RightView(m_mainWndSpliter);
     m_rightViewHolder->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     m_rightViewHolder->setObjectName("rightMainLayoutHolder");
     m_rightViewHolder->setBackgroundRole(DPalette::Base);
     m_rightViewHolder->setAutoFillBackground(true);
-
-    QVBoxLayout *rightMainLayout = new QVBoxLayout();
-    rightMainLayout->setContentsMargins(0, 0, 0, 0);
-    rightMainLayout->setSpacing(0);
-
-    //TODO:
-    //    Add Right view code
-
-    m_rightViewHolder->setLayout(rightMainLayout);
 #ifdef VNOTE_LAYOUT_DEBUG
     m_rightViewHolder->setStyleSheet("background: red");
 #endif
@@ -138,7 +133,6 @@ void VNoteMainWindow::initRightView()
 
 void VNoteMainWindow::onVNoteFoldersLoaded()
 {
-    //qInfo() << "folderMaps:" << VNoteDataManager::instance()->getNoteFolders();
     m_leftViewHolder->loadNoteFolder();
 }
 void VNoteMainWindow::resizeEvent(QResizeEvent *event)
@@ -146,4 +140,26 @@ void VNoteMainWindow::resizeEvent(QResizeEvent *event)
     m_btnAddFoler->move((m_leftViewHolder->width() - m_btnAddFoler->width()) / 2,
                         this->height() - m_btnAddFoler->height() - 60);
     DMainWindow::resizeEvent(event);
+}
+void VNoteMainWindow::onVNoteSearch()
+{
+    QString strKey = m_noteSearchEdit->text();
+    if(!strKey.isEmpty())
+    {
+        m_leftViewHolder->setFolderNameFilter(strKey);
+    }
+    else
+    {
+        m_leftViewHolder->clearFilter();
+    }
+}
+void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &previous)
+{
+    Q_UNUSED(previous);
+    QModelIndex index = m_leftViewHolder->currentIndex();
+    if(index.isValid())
+    {
+        qint64 id = m_leftViewHolder->getFolderId(index);
+        m_rightViewHolder->handleFolderSwitch(id);
+    }
 }

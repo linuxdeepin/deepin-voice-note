@@ -22,7 +22,10 @@ SOURCES += \
     common/loadnoteitemsworker.cpp \
     views/leftview.cpp \
     views/leftviewsortfiltermodel.cpp \
-    views/leftviewdelegate.cpp
+    views/leftviewdelegate.cpp \
+    views/textnoteitem.cpp \
+    views/rightnotelist.cpp \
+    views/rightview.cpp
 
 RESOURCES += deepin-voice-note.qrc
 
@@ -42,7 +45,10 @@ HEADERS += \
     common/loadnoteitemsworker.h \
     views/leftview.h \
     views/leftviewsortfiltermodel.h \
-    views/leftviewdelegate.h
+    views/leftviewdelegate.h \
+    views/textnoteitem.h \
+    views/rightnotelist.h \
+    views/rightview.h
 
 # Default rules for deployment.
 isEmpty(BINDIR):BINDIR=/usr/bin
