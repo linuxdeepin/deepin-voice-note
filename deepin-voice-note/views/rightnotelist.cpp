@@ -51,6 +51,7 @@ void RightNoteList::addNodeItem(VNoteItem *item)
         this->insertItem(this->count(),item);
         this->setItemWidget(item,textItem);
         adjustWidgetItemWidth();
+        m_height += 170;
     }
 }
 void RightNoteList::adjustWidgetItemWidth()
@@ -70,4 +71,8 @@ void RightNoteList::resizeEvent(QResizeEvent *event)
 {
     DListWidget::resizeEvent(event);
     adjustWidgetItemWidth();
+}
+qint64 RightNoteList::getHeight()
+{
+    return  m_height;
 }

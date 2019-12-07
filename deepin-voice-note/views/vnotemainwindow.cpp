@@ -42,7 +42,6 @@ void VNoteMainWindow::initConnections()
     connect(m_btnAddFoler, &DPushButton::clicked, m_leftViewHolder, &LeftView::handleAddFolder);
     connect(m_noteSearchEdit,&DSearchEdit::textChanged,this,&VNoteMainWindow::onVNoteSearch);
     connect(m_leftViewHolder,SIGNAL(currentChanged(const QModelIndex &)),this,SLOT(onVNoteFolderChange(const QModelIndex &)));
-    connect(m_leftViewHolder,&LeftView::sigFolderAdd,m_rightViewHolder,&RightView::handleFolderAdd);
     connect(m_leftViewHolder,&LeftView::sigFolderDel,m_rightViewHolder,&RightView::handleFolderDel);
 }
 

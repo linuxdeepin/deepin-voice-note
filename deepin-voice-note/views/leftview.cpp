@@ -158,6 +158,7 @@ void LeftView::loadNoteFolder()
            QStandardItem *pItem = new QStandardItem;
            pItem->setData(QVariant::fromValue(static_cast<void *>(it)), Qt::UserRole + 1);
            data.push_back(pItem);
+           emit sigFolderAdd(it->id);
        }
        m_pDataModel->appendRow(data);
        QModelIndex index = m_pSortFilterModel->index(0, 0);

@@ -15,6 +15,7 @@ public:
     explicit RightNoteList(qint64 folderId,QWidget *parent = nullptr);
 
     qint64 getFolderId();
+    qint64  getHeight();
 
 
 signals:
@@ -36,6 +37,7 @@ private:
     qint64 m_folderId {-1};
     VNOTE_ITEMS_MAP *m_mapNoteData {nullptr};
     QList<QSharedPointer<VNoteItem>> data;
+    qint64 m_height {0};
 };
 
 #endif // RIGHTNOTELIST_H

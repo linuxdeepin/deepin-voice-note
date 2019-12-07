@@ -81,7 +81,7 @@ void  RightView::adjustaddTextBtn()
     int pos = 10;
     if(widget != nullptr)
     {
-        pos += widget->count() * 170;
+        pos += widget->getHeight();
         int maxPos = this->height() -  m_addTextBtn->height() - 68;
         if(pos > maxPos)
         {
