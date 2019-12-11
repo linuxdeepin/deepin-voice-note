@@ -1,5 +1,7 @@
 #include "loadfolderworker.h"
 #include "vnoteforlder.h"
+#include "db/vnotefolderoper.h"
+#include "globaldef.h"
 
 #include <DLog>
 
@@ -12,16 +14,22 @@ LoadFolderWorker::LoadFolderWorker(QObject *parent)
 
 void LoadFolderWorker::run()
 {
-    VNOTE_FOLDERS_MAP* foldersMap = new VNOTE_FOLDERS_MAP();
-    VNoteFolder* f1 = new VNoteFolder();
-    f1->id =1;
-    f1->name = "你好吗";
-    foldersMap->insert(f1->id, f1);
+    static struct timeval start,backups, end;
+
+    gettimeofday(&start, nullptr);
+    backups = start;
+
+    VNoteFolderOper folderOper;
+    VNOTE_FOLDERS_MAP* foldersMap = folderOper.loadVNoteFolders();
+
+    gettimeofday(&end, nullptr);
+
+    qDebug() << "LoadFolderWorker(ms):" << TM(start, end);
 
     //TODO:
     //    Add load folder code here
 
-    qDebug() << __FUNCTION__ << " load folders ok:" << foldersMap << " thread id:" << QThread::currentThreadId() << "f1:" << f1;
+    qDebug() << __FUNCTION__ << " load folders ok:" << foldersMap << " thread id:" << QThread::currentThreadId();
 
     emit onFoldersLoaded(foldersMap);
 }

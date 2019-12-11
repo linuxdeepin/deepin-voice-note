@@ -21,6 +21,7 @@ public:
     qint64  id {INVALID_ID};
     qint64  notesCount {0};
     QString name;
+    qint32  defaultIcon {0};
     QString iconPath;
 
     QDateTime createTime;
@@ -30,8 +31,12 @@ public:
         QImage icon;
     }UI;
 
-    bool fIsloaded {false};
+protected:
+    bool fIsDataLoaded {false};
+
     VNOTE_ITEMS_MAP *notes{nullptr};
+
+    friend class VNoteFolderOper;
 };
 
 #endif // VNOTEFORLDER_H

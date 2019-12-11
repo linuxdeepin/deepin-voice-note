@@ -1,6 +1,8 @@
-#include "common/vnotedatamanager.h"
+#include "vnotedatamanager.h"
 #include "db/vnotedbmanager.h"
-#include "common/loadfolderworker.h"
+#include "loadfolderworker.h"
+#include "loadiconsworker.h"
+#include "vnoteforlder.h"
 
 #include <QThreadPool>
 
@@ -30,6 +32,88 @@ VNOTE_FOLDERS_MAP *VNoteDataManager::getNoteFolders()
     return m_qspNoteFoldersMap.get();
 }
 
+VNoteFolder *VNoteDataManager::addFolder(VNoteFolder *folder)
+{
+    VNoteFolder* retFlder = nullptr;
+
+    if (nullptr != folder) {
+        m_qspNoteFoldersMap->lock.lockForWrite();
+
+        VNOTE_FOLDERS_DATA_MAP::iterator it = m_qspNoteFoldersMap->folders.find(folder->id);
+
+        if (it == m_qspNoteFoldersMap->folders.end()) {
+            m_qspNoteFoldersMap->folders.insert(folder->id, folder);
+        } else {
+            QScopedPointer<VNoteFolder> release(*it);
+            m_qspNoteFoldersMap->folders.remove(folder->id);
+            m_qspNoteFoldersMap->folders.insert(folder->id, folder);
+        }
+
+        m_qspNoteFoldersMap->lock.unlock();
+
+        retFlder = folder;
+    }
+
+    return retFlder;
+}
+
+VNoteFolder *VNoteDataManager::getFolder(qint64 folderId)
+{
+    VNoteFolder* retFlder = nullptr;
+
+    m_qspNoteFoldersMap->lock.lockForRead();
+
+    VNOTE_FOLDERS_DATA_MAP::iterator it = m_qspNoteFoldersMap->folders.find(folderId);
+
+    if (it != m_qspNoteFoldersMap->folders.end()) {
+        retFlder = *it;
+    }
+
+    m_qspNoteFoldersMap->lock.unlock();
+
+    return  retFlder;
+}
+
+VNoteFolder *VNoteDataManager::delFolder(qint64 folderId)
+{
+    VNoteFolder* retFlder = nullptr;
+
+    m_qspNoteFoldersMap->lock.lockForWrite();
+
+    VNOTE_FOLDERS_DATA_MAP::iterator it = m_qspNoteFoldersMap->folders.find(folderId);
+
+    if (it != m_qspNoteFoldersMap->folders.end()) {
+        retFlder = *it;
+        m_qspNoteFoldersMap->folders.remove(it.key());
+    }
+
+    m_qspNoteFoldersMap->lock.unlock();
+
+    return  retFlder;
+}
+
+QImage VNoteDataManager::getDefaultIcon(qint32 index)
+{
+    m_iconLock.lockForRead();
+    if (index < 1 || index > m_defaultIcons.size()) {
+        index = 0;
+    }
+
+    QImage icon = m_defaultIcons.at(index);
+
+    m_iconLock.unlock();
+
+    return icon;
+}
+
+void VNoteDataManager::reqNoteDefIcons()
+{
+    LoadIconsWorker *iconLoadWorker = new LoadIconsWorker();//
+    iconLoadWorker->setAutoDelete(true);
+
+    QThreadPool::globalInstance()->start(iconLoadWorker, QThread::TimeCriticalPriority);
+}
+
 void VNoteDataManager::reqNoteFolders()
 {
     m_pForldesLoadthread = new LoadFolderWorker();
@@ -39,18 +123,23 @@ void VNoteDataManager::reqNoteFolders()
         //Release old data
         if (m_qspNoteFoldersMap != nullptr) {
             qInfo() << "Release old foldersMap:" << m_qspNoteFoldersMap.get()
-                    << " size:" << m_qspNoteFoldersMap->size();
+                    << " size:" << m_qspNoteFoldersMap->folders.size();
 
-            for (auto it : (*m_qspNoteFoldersMap)){
+            m_qspNoteFoldersMap->lock.lockForWrite();
+
+            for (auto it : m_qspNoteFoldersMap->folders){
                 delete reinterpret_cast<VNOTE_FOLDERS_MAP*>(it);
             }
+
+            m_qspNoteFoldersMap->folders.clear();
+
+            m_qspNoteFoldersMap->lock.unlock();
         }
 
-        m_qspNoteFoldersMap->clear();
         m_qspNoteFoldersMap.reset(foldesMap);
 
         qInfo() << "Loaded new foldersMap:" << m_qspNoteFoldersMap.get()
-                << " size:" << m_qspNoteFoldersMap->size();
+                << " size:" << m_qspNoteFoldersMap->folders.size();
 
         //Object is already deleted
         m_pForldesLoadthread = nullptr;
@@ -63,9 +152,9 @@ void VNoteDataManager::reqNoteFolders()
 
 void VNoteDataManager::reqNoteItems(qint64 folder)
 {
-    VNOTE_FOLDERS_MAP::iterator it = m_qspNoteFoldersMap->find(folder);
+    VNOTE_FOLDERS_DATA_MAP::iterator it = m_qspNoteFoldersMap->folders.find(folder);
 
-    if (it != m_qspNoteFoldersMap->end()) {
+    if (it != m_qspNoteFoldersMap->folders.end()) {
 
     } else {
         //Data not loaded, start worker thread load data first

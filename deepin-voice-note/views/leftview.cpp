@@ -1,7 +1,11 @@
 #include "leftview.h"
 #include "common/vnotedatamanager.h"
+#include "common/utils.h"
+#include "db/vnotefolderoper.h"
 
 #include<QMouseEvent>
+
+#include <DLog>
 
 LeftView::LeftView(QWidget *parent)
  : DListView(parent)
@@ -73,23 +77,26 @@ void LeftView::handleDeleteItem(bool)
 }
 void LeftView::handleAddFolder()
 {
-    if(m_mapFolderData != nullptr)
-    {
+    VNoteFolderOper folderOper;
+
+    VNoteFolder itemData;
+    itemData.defaultIcon = folderOper.getDefaultIcon();
+    itemData.UI.icon = folderOper.getDefaultIcon(itemData.defaultIcon);
+    itemData.name = folderOper.getDefaultFolderName();
+
+    VNoteFolder* newFolder = folderOper.addFolder(itemData);
+
+    if (nullptr != newFolder) {
         QStandardItem *pItem = new QStandardItem;
-        VNoteFolder *itemData = new  VNoteFolder();
-        itemData->id = getNewFolderId();
-        itemData->iconPath = getNewFolderIconPath();
-        itemData->UI.icon = QImage(itemData->iconPath);
-        itemData->createTime = QDateTime::currentDateTime();
-        itemData->modifyTime = itemData->createTime;
-        itemData->name = QString(QObject::tr("NewFolder")) + QString::number(itemData->id);
-        pItem->setData(QVariant::fromValue(static_cast<void *>(itemData)), Qt::UserRole + 1);
+        pItem->setData(QVariant::fromValue(static_cast<void *>(newFolder)), Qt::UserRole + 1);
         m_pDataModel->insertRow(0, pItem);
-        m_mapFolderData->insert(itemData->id, itemData);
+
         QModelIndex index = m_pSortFilterModel->index(0, 0);
         this->setCurrentIndex(index);
         this->edit(index);
-        emit sigFolderAdd(itemData->id);
+        emit sigFolderAdd(newFolder->id);
+    } else {
+        qCritical() << __FUNCTION__ << "Add new folder failed:" << itemData.name;
     }
 }
 void LeftView::sortView(LeftViewSortFilterModel::OperaType Type, int column, Qt::SortOrder order)
@@ -125,15 +132,15 @@ qint64 LeftView::getNewFolderId()
     bool find = false;
     do {
         find = false;
-        for (auto &it : *m_mapFolderData)
-        {
-            if (id == it->id)
-            {
-                find = true;
-                id++;
-                break;
-            }
-        }
+//        for (auto &it : *m_mapFolderData)
+//        {
+//            if (id == it->id)
+//            {
+//                find = true;
+//                id++;
+//                break;
+//            }
+//        }
     } while (find);
     return id;
 }
@@ -149,20 +156,22 @@ QString LeftView::getNewFolderIconPath()
 }
 void LeftView::loadNoteFolder()
 {
-    m_mapFolderData = VNoteDataManager::instance()->getNoteFolders();
-    if(m_mapFolderData != nullptr && m_mapFolderData->size() > 0)
-    {
-       QList<QStandardItem*> data;
-       for(auto &it : *m_mapFolderData)
-       {
-           QStandardItem *pItem = new QStandardItem;
-           pItem->setData(QVariant::fromValue(static_cast<void *>(it)), Qt::UserRole + 1);
-           data.push_back(pItem);
-           emit sigFolderAdd(it->id);
-       }
-       m_pDataModel->appendRow(data);
-       QModelIndex index = m_pSortFilterModel->index(0, 0);
-       this->setCurrentIndex(index);
+    VNOTE_FOLDERS_MAP* folders = VNoteDataManager::instance()->getNoteFolders();
+    if(folders != nullptr) {
+
+        //Need lock readlock when read data
+        folders->lock.lockForRead();
+
+        for(auto &it : folders->folders) {
+            QStandardItem *pItem = new QStandardItem;
+            pItem->setData(QVariant::fromValue(static_cast<void *>(it)), Qt::UserRole + 1);
+            m_pDataModel->appendRow(pItem);
+        }
+
+        folders->lock.unlock();
+
+        QModelIndex index = m_pSortFilterModel->index(0, 0);
+        this->setCurrentIndex(index);
     }
 }
 qint64 LeftView::getFolderId(const QModelIndex &index)

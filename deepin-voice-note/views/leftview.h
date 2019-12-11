@@ -52,7 +52,6 @@ private:
     DMenu *m_contextMenu;
     QAction *m_renameAction;
     QAction *m_delAction;
-    VNOTE_FOLDERS_MAP* m_mapFolderData {nullptr};
 
     QStandardItemModel *m_pDataModel;
     LeftViewSortFilterModel *m_pSortFilterModel;

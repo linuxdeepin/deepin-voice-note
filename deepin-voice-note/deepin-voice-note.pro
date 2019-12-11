@@ -20,6 +20,7 @@ SOURCES += \
     db/vnoteitemoper.cpp \
     common/loadfolderworker.cpp \
     common/loadnoteitemsworker.cpp \
+    common/loadiconsworker.cpp \
     views/leftview.cpp \
     views/leftviewsortfiltermodel.cpp \
     views/leftviewdelegate.cpp \
@@ -43,6 +44,7 @@ HEADERS += \
     common/datatypedef.h \
     common/loadfolderworker.h \
     common/loadnoteitemsworker.h \
+    common/loadiconsworker.h \
     views/leftview.h \
     views/leftviewsortfiltermodel.h \
     views/leftviewdelegate.h \

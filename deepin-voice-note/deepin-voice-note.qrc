@@ -4,16 +4,6 @@
         <file>images/deepin-voice-note.svg</file>
         <file>images/slider.svg</file>
         <file>images/voice-note-32px 2.svg</file>
-        <file>images/icon/DefaultAvatar/1.svg</file>
-        <file>images/icon/DefaultAvatar/10.svg</file>
-        <file>images/icon/DefaultAvatar/2.svg</file>
-        <file>images/icon/DefaultAvatar/3.svg</file>
-        <file>images/icon/DefaultAvatar/4.svg</file>
-        <file>images/icon/DefaultAvatar/5.svg</file>
-        <file>images/icon/DefaultAvatar/6.svg</file>
-        <file>images/icon/DefaultAvatar/7.svg</file>
-        <file>images/icon/DefaultAvatar/8.svg</file>
-        <file>images/icon/DefaultAvatar/9.svg</file>
         <file>images/icon/disabled/circlebutton_add_disabled.svg</file>
         <file>images/icon/disabled/circlebutton_voice_disabled.svg</file>
         <file>images/icon/disabled/more_disabled.svg</file>
@@ -128,5 +118,15 @@
         <file>images/icon_dark/cursor _dark.svg</file>
         <file>images/icon_dark/icon_import_note.svg</file>
         <file>images/icon_dark/slider_dark.svg</file>
+        <file>icons/deepin/builtin/default_folder_icons/1.svg</file>
+        <file>icons/deepin/builtin/default_folder_icons/2.svg</file>
+        <file>icons/deepin/builtin/default_folder_icons/3.svg</file>
+        <file>icons/deepin/builtin/default_folder_icons/4.svg</file>
+        <file>icons/deepin/builtin/default_folder_icons/5.svg</file>
+        <file>icons/deepin/builtin/default_folder_icons/6.svg</file>
+        <file>icons/deepin/builtin/default_folder_icons/7.svg</file>
+        <file>icons/deepin/builtin/default_folder_icons/8.svg</file>
+        <file>icons/deepin/builtin/default_folder_icons/9.svg</file>
+        <file>icons/deepin/builtin/default_folder_icons/10.svg</file>
     </qresource>
 </RCC>

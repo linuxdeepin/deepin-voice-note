@@ -2,12 +2,23 @@
 #define DATATYPEDEF_H
 
 #include <QMap>
+#include <QReadWriteLock>
 
 struct VNoteFolder;
 struct VNoteItem;
 
-typedef QMap<qint64,VNoteFolder*> VNOTE_FOLDERS_MAP;
-typedef QMap<qint64,VNoteItem*>   VNOTE_ITEMS_MAP;
+typedef QMap<qint64,VNoteFolder*> VNOTE_FOLDERS_DATA_MAP;
+typedef QMap<qint64,VNoteItem*>   VNOTE_ITEMS_DATA_MAP;
+
+struct VNOTE_FOLDERS_MAP {
+    VNOTE_FOLDERS_DATA_MAP folders;
+    QReadWriteLock lock;
+};
+
+struct VNOTE_ITEMS_MAP {
+    VNOTE_ITEMS_DATA_MAP* notes;
+    QReadWriteLock lock;
+};
 
 static QStringList default_FolderData_imgpath =
 {

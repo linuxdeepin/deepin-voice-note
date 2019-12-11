@@ -17,7 +17,16 @@
 #define VNOTE_SEARCHBAR_H  36
 #define VNOTE_SEARCHBAR_W  350
 
+//Time format
+#define VNOTE_TIME_FMT "yyyy-MM-dd HH:mm:ss.zzz"
+
 // Uncomment follow line if need debug layout
 //#define VNOTE_LAYOUT_DEBUG
+
+#include <sys/time.h>
+
+#define TM(s,e) (\
+((e.tv_sec-s.tv_sec)*1000 + (e.tv_usec-s.tv_usec)/1000.0)\
+)
 
 #endif // GLOBALDEF_H
