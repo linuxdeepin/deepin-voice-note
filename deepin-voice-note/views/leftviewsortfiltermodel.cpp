@@ -1,64 +1,68 @@
 #include "leftviewsortfiltermodel.h"
 #include "common/vnoteforlder.h"
 
+#include<QDebug>
+
 LeftViewSortFilterModel::LeftViewSortFilterModel(QObject *parent)
     : QSortFilterProxyModel(parent)
 {
     ;
 }
-void LeftViewSortFilterModel::setCreateTimeFilter(const QDateTime &begin, const QDateTime &end)
-{
-    if (begin <= end)
-    {
-        m_beginTime = begin;
-        m_endTime = end;
-        m_filterType = createTime;
-        QRegExp::PatternSyntax syntax = QRegExp::PatternSyntax();
-        QRegExp regExp("", Qt::CaseInsensitive, syntax);
-        setFilterRegExp(regExp);
 
+void LeftViewSortFilterModel::setCreateTimeFilter(const QDateTime &begin, const QDateTime &end,
+                                                  QList<qint64> *whilteList)
+{
+    m_beginTime = begin;
+    m_endTime = end;
+    m_filterType = createTime;
+    if (whilteList != nullptr) {
+        m_whilteList = *whilteList;
     }
+    invalidateFilter();
 }
 
-void LeftViewSortFilterModel::setModifyTimeFilter(const QDateTime &begin, const QDateTime &end)
+void LeftViewSortFilterModel::setModifyTimeFilter(const QDateTime &begin, const QDateTime &end,
+                                                  QList<qint64> *whilteList)
 {
-    if (begin <= end)
-    {
-        m_beginTime = begin;
-        m_endTime = end;
-        m_filterType = modifyTime;
-        QRegExp::PatternSyntax syntax = QRegExp::PatternSyntax();
-        QRegExp regExp("", Qt::CaseInsensitive, syntax);
-        setFilterRegExp(regExp);
+    m_beginTime = begin;
+    m_endTime = end;
+    m_filterType = modifyTime;
+    if (whilteList != nullptr) {
+        m_whilteList = *whilteList;
     }
+    invalidateFilter();
 }
-void LeftViewSortFilterModel::setFolderNameFilter(QString key)
+
+void LeftViewSortFilterModel::setFolderNameFilter(QString key, QList<qint64> *whilteList)
 {
-    if (!key.isEmpty())
-    {
-        m_filterType = folderName;
-        QRegExp::PatternSyntax syntax = QRegExp::PatternSyntax();
-        QRegExp regExp(key, Qt::CaseInsensitive, syntax);
-        setFilterRegExp(regExp);
+    m_filterType = folderName;
+    if (whilteList != nullptr) {
+        m_whilteList = *whilteList;
     }
+    if(!key.isEmpty())
+    {
+        m_folderNameKey = key;
+    }
+    invalidateFilter();
 }
+
 void LeftViewSortFilterModel::clearFilter()
 {
     m_filterType = none;
-    QRegExp::PatternSyntax syntax = QRegExp::PatternSyntax();
-    QRegExp regExp("", Qt::CaseInsensitive, syntax);
-    setFilterRegExp(regExp);
-
+    m_whilteList.clear();
+    invalidateFilter();
 }
+
 void LeftViewSortFilterModel::sortView(OperaType Type, int column, Qt::SortOrder order)
 {
     m_sortType = Type;
     return sort(column, order);
 }
-bool LeftViewSortFilterModel::lessThan(const QModelIndex &source_left,const QModelIndex &source_right) const
+
+bool LeftViewSortFilterModel::lessThan(const QModelIndex &source_left,
+                                       const QModelIndex &source_right) const
 {
-    if(m_sortType != none)
-    {
+    if (m_sortType != none) {
         QVariant var_left = source_left.data(Qt::UserRole + 1);
         VNoteFolder *data_left = static_cast<VNoteFolder *>(var_left.value<void *>());
         QVariant var_right = source_right.data(Qt::UserRole + 1);
@@ -76,17 +80,25 @@ bool LeftViewSortFilterModel::lessThan(const QModelIndex &source_left,const QMod
     }
     return QSortFilterProxyModel::lessThan(source_left, source_right);
 }
-bool LeftViewSortFilterModel::filterAcceptsRow(int source_row,const QModelIndex &source_parent) const
+
+bool LeftViewSortFilterModel::filterAcceptsRow(int source_row,
+                                               const QModelIndex &source_parent) const
 {
-    if(m_filterType != none)
-    {
+    if (m_filterType != none) {
         QModelIndex index = sourceModel()->index(source_row, 0, source_parent);
         QVariant var = index.data(Qt::UserRole + 1);
         VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
-        switch (m_filterType)
-        {
+        if (!m_whilteList.isEmpty()) {
+            for (auto it : m_whilteList) {
+                if (it == data->id) {
+                    qDebug() << "id while:" << data->id;
+                    return true;
+                }
+            }
+        }
+        switch (m_filterType) {
             case folderName:
-                return data->name.contains(filterRegExp());
+                return data->name.contains(m_folderNameKey);
             case createTime:
                 return data->createTime >= m_beginTime && data->createTime <= m_endTime;
             case modifyTime:
@@ -95,5 +107,5 @@ bool LeftViewSortFilterModel::filterAcceptsRow(int source_row,const QModelIndex 
                 break;
         }
     }
-    return  true;
+    return true;
 }

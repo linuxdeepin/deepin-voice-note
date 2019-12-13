@@ -24,13 +24,18 @@ SOURCES += \
     views/leftview.cpp \
     views/leftviewsortfiltermodel.cpp \
     views/leftviewdelegate.cpp \
+    views/textnoteedit.cpp \
     views/textnoteitem.cpp \
+    views/myrecodebuttons.cpp \
     views/rightnotelist.cpp \
     views/rightview.cpp \
     db/dbvisitor.cpp \
-    common/datatypedef.cpp
+    common/datatypedef.cpp \
+    views/initemptypage.cpp
+    views/initemptypage.cpp
 
-RESOURCES += deepin-voice-note.qrc
+RESOURCES += \
+    images.qrc
 
 HEADERS += \
     views/vnotemainwindow.h \
@@ -50,10 +55,14 @@ HEADERS += \
     views/leftview.h \
     views/leftviewsortfiltermodel.h \
     views/leftviewdelegate.h \
+    views/textnoteedit.h \
     views/textnoteitem.h \
+    views/myrecodebuttons.h \
     views/rightnotelist.h \
     views/rightview.h \
-    db/dbvisitor.h
+    db/dbvisitor.h \
+    views/initemptypage.h
+    views/initemptypage.h
 
 # Default rules for deployment.
 isEmpty(BINDIR):BINDIR=/usr/bin

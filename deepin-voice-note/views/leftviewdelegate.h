@@ -22,7 +22,7 @@ public:
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,const QModelIndex &index) const override;
 
 signals:
-    void folderRename(const VNoteFolder *data) const;
+    void sigFolderRename(VNoteFolder *data) const;
 
 public:
     void handleChangeTheme();

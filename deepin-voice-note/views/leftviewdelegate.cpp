@@ -11,11 +11,13 @@ LeftViewDelegate::LeftViewDelegate(QAbstractItemView *parent)
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &LeftViewDelegate::handleChangeTheme);
 }
+
 QSize LeftViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     Q_UNUSED(index)
-    return QSize(option.rect.width(), 64);
+    return QSize(option.rect.width(), 69);
 }
+
 QWidget *LeftViewDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                                         const QModelIndex &index) const
 {
@@ -40,6 +42,7 @@ void LeftViewDelegate::setEditorData(QWidget *editor, const QModelIndex &index) 
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
     edit->setText(data->name);
 }
+
 void LeftViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                     const QModelIndex &index) const
 {
@@ -51,9 +54,7 @@ void LeftViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
     if (!text.isEmpty() && text != data->name)
     {
         data->name = text;
-        data->modifyTime = QDateTime::currentDateTime();
-        m_parentView->update(index);  //更新视图
-        emit folderRename(data);
+        emit sigFolderRename(data);
     }
 }
 
@@ -64,11 +65,13 @@ void LeftViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionV
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
     edit->move(option.rect.x() + 55, option.rect.y() + 12);
 }
+
 void LeftViewDelegate::handleChangeTheme()
 {
     m_parentPb = DApplicationHelper::instance()->palette(m_parentView);
     m_parentView->update(m_parentView->currentIndex());
 }
+
 void LeftViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                              const QModelIndex &index) const
 {

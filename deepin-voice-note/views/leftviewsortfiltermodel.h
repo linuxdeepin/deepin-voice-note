@@ -9,11 +9,12 @@ class LeftViewSortFilterModel : public QSortFilterProxyModel
 public:
     enum OperaType { none, folderName, createTime, modifyTime };
     LeftViewSortFilterModel(QObject *parent = nullptr);
-    void sortView(OperaType Type = none, int column = 0,
-                  Qt::SortOrder order = Qt::AscendingOrder);
-    void setCreateTimeFilter(const QDateTime &begin, const QDateTime &end);
-    void setModifyTimeFilter(const QDateTime &begin, const QDateTime &end);
-    void setFolderNameFilter(QString key = "");
+    void sortView(OperaType Type = none, int column = 0, Qt::SortOrder order = Qt::AscendingOrder);
+    void setCreateTimeFilter(const QDateTime &begin, const QDateTime &end,
+                             QList<qint64> *whilteList = nullptr);
+    void setModifyTimeFilter(const QDateTime &begin, const QDateTime &end,
+                             QList<qint64> *whilteList = nullptr);
+    void setFolderNameFilter(QString key, QList<qint64> *whilteList = nullptr);
     void clearFilter();
 
 protected:
@@ -25,6 +26,8 @@ private:
     OperaType m_filterType {none};
     QDateTime m_beginTime;
     QDateTime m_endTime;
+    QList<qint64> m_whilteList;
+    QString  m_folderNameKey {""};
 };
 
-#endif // LEFTVIEWSORTFILTERMODEL_H
+#endif  // LEFTVIEWSORTFILTERMODEL_H

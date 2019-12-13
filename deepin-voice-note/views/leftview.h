@@ -4,6 +4,7 @@
 #include "leftviewsortfiltermodel.h"
 
 #include "common/vnoteforlder.h"
+#include "db/vnotefolderoper.h"
 
 #include <DListView>
 #include <DMenu>
@@ -16,35 +17,32 @@ class LeftView : public DListView
 public:
     LeftView(QWidget *parent = nullptr);
     qint64 getFolderId(const QModelIndex &index);
-    void setFoderUpdateTime(const QDateTime &time, int id, bool sort = false);
-    void sortView(LeftViewSortFilterModel::OperaType Type = LeftViewSortFilterModel::none,
-                  int column = 0, Qt::SortOrder order = Qt::AscendingOrder);
-    void setCreateTimeFilter(const QDateTime &begin, const QDateTime &end);
-    void setUpdateTimeFilter(const QDateTime &begin, const QDateTime &end);
-    void setFolderNameFilter(QString key = "");
+
+    void sortView(LeftViewSortFilterModel::OperaType Type = LeftViewSortFilterModel::none,Qt::SortOrder order = Qt::AscendingOrder);
+    void setCreateTimeFilter(const QDateTime &begin, const QDateTime &end,QList<qint64> *whilteList = nullptr);
+    void setUpdateTimeFilter(const QDateTime &begin, const QDateTime &end,QList<qint64> *whilteList = nullptr);
+    void setFolderNameFilter(QString key,QList<qint64> *whilteList = nullptr);
     void clearFilter();
-    void loadNoteFolder();
+    int loadNoteFolder();
+    int getFolderCount();
 
 public slots:
     void handleAddFolder();
     void handleRenameItem(bool);
     void handleDeleteItem(bool);
-    void handleFolderRename(const VNoteFolder *data);
+    void handleFolderRename(VNoteFolder *data);
 
 signals:
-    void sigFolderAdd(qint64 id);
-    void sigFolderDel(qint64 id);
-    void sigFolderUpdate(qint64 id);
+    void sigFolderAdd(VNoteFolder *data);
+    void sigFolderDel(VNoteFolder *data);
+    void sigFolderUpdate(VNoteFolder *data);
 
 private:
     void initMenuAction();
     void initConnection();
     void initDelegate();
     void initModel();
-    void initFolderData();
 
-    qint64 getNewFolderId();
-    QString getNewFolderIconPath();
 protected:
     void mousePressEvent(QMouseEvent *event);
 

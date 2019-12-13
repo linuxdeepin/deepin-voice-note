@@ -2,9 +2,10 @@
 #define RIGHTNOTELIST_H
 #include "common/datatypedef.h"
 
-#include <DListWidget>
 #include <QSharedPointer>
 #include <QList>
+#include <DListWidget>
+#include <DPushButton>
 
 DWIDGET_USE_NAMESPACE
 
@@ -12,32 +13,28 @@ class RightNoteList : public DListWidget
 {
     Q_OBJECT
 public:
-    explicit RightNoteList(qint64 folderId,QWidget *parent = nullptr);
-
+    explicit RightNoteList(QWidget *parent = nullptr);
+    void initNoteItem(qint64 folderid,VNOTE_ITEMS_MAP *mapNoteData,QString serachKey = "");
+    void addNodeItem(VNoteItem *item,QString key = "");
+    void delNodeItem(VNoteItem *item);
+    int  getListHeight();
     qint64 getFolderId();
-    qint64  getHeight();
-
 
 signals:
+    void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit,const QString &searchKey);
+    void sigDelNote(VNoteItem *textNode);
+    void sigUpdateNote(VNoteItem *textNode);
+    void sigTextEditIsEmpty(VNoteItem *textNode,bool empty);
 
-public slots:
-    void loadNoteItem();
-    void addTextNodeItem();
-    void addNodeItem(VNoteItem *item);
 private:
     void initUI();
     void initConnection();
-    qint64 getNewNoteId();
     void adjustWidgetItemWidth();
-//protected:
-//    void paintEvent(QPaintEvent *event);
+
+protected:
       void resizeEvent(QResizeEvent * event);
-//    void wheelEvent(QWheelEvent *e);
-private:
-    qint64 m_folderId {-1};
-    VNOTE_ITEMS_MAP *m_mapNoteData {nullptr};
-    QList<QSharedPointer<VNoteItem>> data;
-    qint64 m_height {0};
+      int m_listHeight {0};
+      qint64 m_forlderId {-1};
 };
 
 #endif // RIGHTNOTELIST_H

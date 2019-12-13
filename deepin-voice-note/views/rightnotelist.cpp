@@ -1,78 +1,111 @@
 #include "rightnotelist.h"
-#include "textnoteitem.h"
 #include "common/vnoteitem.h"
+#include "textnoteitem.h"
 
-#include<QDebug>
-#include<QLabel>
 #include <DFontSizeManager>
+#include <QDebug>
+#include <QLabel>
 
-RightNoteList::RightNoteList(qint64 folderId,QWidget *parent)
+RightNoteList::RightNoteList(QWidget *parent)
     : DListWidget(parent)
-    ,m_folderId(folderId)
 {
     initUI();
     initConnection();
-    //loadNoteItem();
 }
-qint64 RightNoteList::getFolderId()
-{
-    return m_folderId;
-}
+
 void RightNoteList::initUI()
 {
-   ;
+    ;
 }
+
 void RightNoteList::initConnection()
 {
-   ;
+    ;
 }
-void RightNoteList::loadNoteItem()
+
+void RightNoteList::initNoteItem(qint64 folderid,VNOTE_ITEMS_MAP *mapNoteData,QString serachKey)
 {
-    m_mapNoteData = new VNOTE_ITEMS_MAP();
-}
-void RightNoteList::addTextNodeItem()
-{
-    QSharedPointer<VNoteItem> item (new  VNoteItem());
-    item->noteId = 0;
-    item->noteType = VNoteItem::VNOTE_TYPE::VNT_Text;
-    item->folderId = m_folderId;
-    item->createTime = QDateTime::currentDateTime();
-    addNodeItem(item.get());
-    data.push_back(item);
-}
-void RightNoteList::addNodeItem(VNoteItem *item)
-{
-    if(item->noteType == VNoteItem::VNOTE_TYPE::VNT_Text)
+    while (this->count())
     {
-        TextNoteItem *textItem = new TextNoteItem(item,this);
-        QListWidgetItem *item=new QListWidgetItem();
-        item->setFlags(Qt::NoItemFlags);
-        item->setSizeHint(QSize(this->width(),170));
-        this->insertItem(this->count(),item);
-        this->setItemWidget(item,textItem);
-        adjustWidgetItemWidth();
-        m_height += 170;
+        QListWidgetItem *item = this->takeItem(0);
+        DWidget *widgetTemp = static_cast<DWidget *>(this->itemWidget(item));
+        delete item;
+        item = nullptr;
+        widgetTemp->deleteLater();
     }
+    m_listHeight = 0;
+    m_forlderId = folderid;
+//    if (mapNoteData != nullptr) {
+//        for (auto &it : *mapNoteData->notes) {
+//            addNodeItem(it,serachKey);
+//        }
+//        adjustWidgetItemWidth();
+//    }
 }
+
+void RightNoteList::addNodeItem(VNoteItem *item,QString key)
+{
+    if (item->noteType == VNoteItem::VNOTE_TYPE::VNT_Text) {
+        TextNoteItem *textItem = new TextNoteItem(item, this);
+        textItem->highSearchText(key,Qt::red);
+        QListWidgetItem *item = new QListWidgetItem();
+        item->setFlags(Qt::NoItemFlags);
+        item->setSizeHint(QSize(this->width(), 170));
+        this->insertItem(this->count(), item);
+        this->setItemWidget(item, textItem);
+        connect(textItem, SIGNAL(sigDelNote(VNoteItem *)), this, SIGNAL(sigDelNote(VNoteItem *)));
+        connect(textItem, SIGNAL(sigUpdateNote(VNoteItem *)), this, SIGNAL(sigUpdateNote(VNoteItem *)));
+        connect(textItem, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *,const QString &)), this, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *,const QString &)));
+        connect(textItem, SIGNAL(sigTextEditIsEmpty(VNoteItem *,bool)), this, SIGNAL(sigTextEditIsEmpty(VNoteItem *,bool)));
+        m_listHeight += 170;
+        textItem->changeToEdit();
+    }
+    adjustWidgetItemWidth();
+}
+
 void RightNoteList::adjustWidgetItemWidth()
 {
     QListWidgetItem *ptmp = nullptr;
     int listWidth = this->width();
-    int newWidth = this->width() - 18;
-    for(int i = 0; i < this->count(); i++)
-    {
+    int newWidth = this->width() - 20;
+    for (int i = 0; i < this->count(); i++) {
         ptmp = this->item(i);
-        QWidget* ptmpWidget = this->itemWidget(ptmp);
-        ptmpWidget->setFixedSize(QSize(newWidth,ptmpWidget->height()));
-        this->item(i)->setSizeHint(QSize(listWidth,ptmpWidget->height()));
+        QWidget *ptmpWidget = this->itemWidget(ptmp);
+        ptmpWidget->setFixedSize(QSize(newWidth, ptmpWidget->height()));
+        this->item(i)->setSizeHint(QSize(listWidth, ptmpWidget->height()));
     }
 }
+
+void RightNoteList::delNodeItem(VNoteItem *item)
+{
+    for (int i = 0; i < this->count(); i++) {
+        if(item->noteType == VNoteItem::VNOTE_TYPE::VNT_Text)
+        {
+            TextNoteItem *itemWidget = static_cast<TextNoteItem *>(this->itemWidget(this->item(i)));
+            if(itemWidget->getNoteItem() == item)
+            {
+                QListWidgetItem *tmpItem = this->takeItem(i);
+                delete tmpItem;
+                itemWidget->deleteLater();
+                m_listHeight -= 170;
+                return;
+            }
+        }
+    }
+}
+
 void RightNoteList::resizeEvent(QResizeEvent *event)
 {
     DListWidget::resizeEvent(event);
     adjustWidgetItemWidth();
 }
-qint64 RightNoteList::getHeight()
+
+int RightNoteList::getListHeight()
 {
-    return  m_height;
+    return  m_listHeight;
+}
+
+qint64 RightNoteList::getFolderId()
+{
+    return m_forlderId;
 }

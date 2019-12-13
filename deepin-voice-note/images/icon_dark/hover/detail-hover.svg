@@ -1,12 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="15px" height="14px" viewBox="0 0 15 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="44px" height="44px" viewBox="0 0 44 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 58 (84663) - https://sketch.com -->
-    <title>detail-hover</title>
+    <title>detail hover</title>
     <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="95.6533653%" id="linearGradient-1">
+            <stop stop-color="#727272" offset="0%"></stop>
+            <stop stop-color="#535353" offset="100%"></stop>
+        </linearGradient>
+        <circle id="path-2" cx="22" cy="22" r="15"></circle>
+        <filter x="-23.3%" y="-16.7%" width="146.7%" height="146.7%" filterUnits="objectBoundingBox" id="filter-3">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feComposite in="shadowBlurOuter1" in2="SourceAlpha" operator="out" result="shadowBlurOuter1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.05 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
     <g id="深色" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="按钮状态" transform="translate(-842.000000, -309.000000)" fill="#FFFFFF">
-            <g id="detail" transform="translate(842.000000, 309.000000)">
-                <path d="M12.118741,10.8385938 L12.1856459,8.49249622 C12.1878546,8.16346303 12.3677289,7.86137108 12.6558125,7.70286965 C12.9438961,7.54436823 13.2951067,7.5542613 13.5738283,7.72872877 C13.8525499,7.90319624 14.0151653,8.21493562 13.9988825,8.54357236 L13.8718766,12.9860619 C13.8582396,13.4673628 13.4716312,13.8543271 12.9907729,13.8679766 L8.39928143,13.9996396 C8.07517535,14.0087634 7.77082593,13.8441265 7.60087865,13.567746 C7.43093137,13.2913655 7.42120526,12.9452301 7.57536406,12.6597257 C7.72952286,12.3742213 8.02414617,12.1927228 8.34825225,12.1835989 L10.826002,12.1132273 L7.26529985,8.55038251 C6.9111381,8.19526789 6.9116458,7.6200215 7.26643383,7.26553374 C7.62122187,6.91104597 8.19593923,6.91155414 8.55010098,7.26666876 L12.119875,10.8385938 L12.118741,10.8385938 Z M1.88058518,3.16184677 L1.81366595,5.50713181 C1.78921907,6.00050142 1.37523848,6.38383183 0.881874478,6.36993557 C0.388510477,6.35603931 -0.00327431931,5.95001342 2.06311554e-05,5.45604864 L0.12707463,1.01294813 C0.141273801,0.532449553 0.527139228,0.146258427 1.00723258,0.132047271 L5.60084042,0.000366220038 C6.10197218,-0.0137400017 6.51964544,0.381415102 6.53373978,0.882969852 C6.54783411,1.3845246 6.15301227,1.80255042 5.65188051,1.81665666 L3.17360072,1.88703791 L6.73506459,5.45037273 C7.0889889,5.8055362 7.08822719,6.38060759 6.73336325,6.73483064 C6.37849932,7.08905369 5.80391292,7.08829133 5.4499886,6.73312787 L1.88058518,3.16184677 Z" id="形状"></path>
+        <g id="按钮状态" transform="translate(-844.000000, -293.000000)">
+            <g id="编组-5" transform="translate(844.000000, 293.000000)">
+                <g id="Oval">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-3)" xlink:href="#path-2"></use>
+                    <use fill-opacity="0.08" fill="#000000" fill-rule="evenodd" xlink:href="#path-2"></use>
+                    <circle stroke-opacity="0.03" stroke="#FFFFFF" stroke-width="1" stroke-linejoin="square" fill="url(#linearGradient-1)" fill-rule="evenodd" cx="22" cy="22" r="14.5"></circle>
+                </g>
+                <g id="fullscreen备份" transform="translate(15.000018, 15.000000)" fill="#FFFFFF">
+                    <g id="形状-2">
+                        <path d="M1,7 L1,11.5020869 C1,12.3270426 1.67208268,13 2.4979131,13 L7,13 L7,14 L2.4979131,14 C1.11950656,14 0,12.8790364 0,11.5020869 L0,7 L1,7 Z M9.7888347,4.2016075 C9.9840968,4.3968697 9.9840968,4.7134522 9.7888347,4.9087143 L5.1083185,9.5892304 C4.9130564,9.7844926 4.5964739,9.7844926 4.4012118,9.5892304 C4.2059496,9.3939683 4.2059496,9.0773858 4.4012118,8.8821237 L9.0817279,4.2016075 C9.27699,4.0063454 9.5935725,4.0063454 9.7888347,4.2016075 Z M11.5020869,0 C12.8804934,0 14,1.12096359 14,2.4979131 L14,7 L13,7 L13,2.4979131 C13,1.67295739 12.3279173,1 11.5020869,1 L7,1 L7,0 L11.5020869,0 Z" id="形状"></path>
+                    </g>
+                </g>
             </g>
         </g>
     </g>
