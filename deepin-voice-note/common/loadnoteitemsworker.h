@@ -9,16 +9,16 @@
 
 class LoadNoteItemsWorker : public QObject, public QRunnable
 {
+    Q_OBJECT
 public:
-    LoadNoteItemsWorker(qint64 folderId, QObject *parent=nullptr);
+    LoadNoteItemsWorker(QObject *parent=nullptr);
 protected:
     virtual void run();
 signals:
-    void onNoteItemsLoaded(VNOTE_ITEMS_MAP* foldesMap);
+    void onAllNotesLoaded(VNOTE_ALL_NOTES_MAP* foldesMap);
 public slots:
 
 protected:
-    qint64 m_folderId;
 };
 
 #endif // LOADNOTEITEMSWORKER_H

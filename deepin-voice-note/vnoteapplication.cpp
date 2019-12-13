@@ -18,13 +18,15 @@ void VNoteApplication::activateWindow()
     if (nullptr == m_qspMainWnd.get()) {
         m_qspMainWnd.reset(new VNoteMainWindow());
         m_qspMainWnd->setMinimumSize(DEFAULT_WINDOWS_WIDTH, DEFAULT_WINDOWS_HEIGHT);
+
+        //Should be called befor show
+        Dtk::Widget::moveToCenter(m_qspMainWnd.get());
+
         m_qspMainWnd->show();
     } else {
         m_qspMainWnd->setWindowState(Qt::WindowActive);
         m_qspMainWnd->activateWindow();
     }
-
-    Dtk::Widget::moveToCenter(m_qspMainWnd.get());
 }
 
 void VNoteApplication::onNewProcessInstance(qint64 pid, const QStringList &arguments)

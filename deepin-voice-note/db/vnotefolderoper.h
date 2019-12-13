@@ -5,6 +5,9 @@
 
 #include <QImage>
 
+class DbVisitor;
+class VNoteItemOper;
+
 class VNoteFolderOper
 {
 public:
@@ -15,12 +18,14 @@ public:
 
     VNoteFolder* addFolder(VNoteFolder& folder);
     VNoteFolder* getFolder(qint64 folderId);
+    qint32 getFoldersCount();
 
     QString getDefaultFolderName();
     qint32 getDefaultIcon();
     QImage getDefaultIcon(qint32 index);
 
     bool deleteVNoteFolder(qint64 folderId);
+    bool deleteVNoteFolder(VNoteFolder* folder);
     bool renameVNoteFolder(QString folderName);
 
 protected:
@@ -37,6 +42,10 @@ protected:
         create_time,
         modify_time,
     };
+
+    friend class FolderQryDbVisitor;
+    friend class AddFolderDbVisitor;
+    friend class VNoteItemOper;  //Need folder feilds
 };
 
 #endif // VNOTEFOLDEROPER_H

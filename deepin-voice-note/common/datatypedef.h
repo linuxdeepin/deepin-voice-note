@@ -6,17 +6,30 @@
 
 struct VNoteFolder;
 struct VNoteItem;
+struct VNOTE_ITEMS_MAP;
 
 typedef QMap<qint64,VNoteFolder*> VNOTE_FOLDERS_DATA_MAP;
 typedef QMap<qint64,VNoteItem*>   VNOTE_ITEMS_DATA_MAP;
+typedef QMap<qint64, VNOTE_ITEMS_MAP*> VNOTE_ALL_NOTES_DATA_MAP;
 
 struct VNOTE_FOLDERS_MAP {
+    ~VNOTE_FOLDERS_MAP();
+
     VNOTE_FOLDERS_DATA_MAP folders;
     QReadWriteLock lock;
 };
 
 struct VNOTE_ITEMS_MAP {
-    VNOTE_ITEMS_DATA_MAP* notes;
+    ~VNOTE_ITEMS_MAP();
+
+    VNOTE_ITEMS_DATA_MAP folderNotes;
+    QReadWriteLock lock;
+};
+
+struct VNOTE_ALL_NOTES_MAP {
+    ~VNOTE_ALL_NOTES_MAP();
+
+    VNOTE_ALL_NOTES_DATA_MAP notes;
     QReadWriteLock lock;
 };
 

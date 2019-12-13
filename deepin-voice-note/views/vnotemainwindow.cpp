@@ -34,6 +34,7 @@ void VNoteMainWindow::initData()
 {
     VNoteDataManager::instance()->reqNoteDefIcons();
     VNoteDataManager::instance()->reqNoteFolders();
+    VNoteDataManager::instance()->reqNoteItems();
 }
 
 void VNoteMainWindow::initConnections()

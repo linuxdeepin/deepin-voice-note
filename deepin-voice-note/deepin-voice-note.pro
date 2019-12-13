@@ -26,7 +26,9 @@ SOURCES += \
     views/leftviewdelegate.cpp \
     views/textnoteitem.cpp \
     views/rightnotelist.cpp \
-    views/rightview.cpp
+    views/rightview.cpp \
+    db/dbvisitor.cpp \
+    common/datatypedef.cpp
 
 RESOURCES += deepin-voice-note.qrc
 
@@ -50,7 +52,8 @@ HEADERS += \
     views/leftviewdelegate.h \
     views/textnoteitem.h \
     views/rightnotelist.h \
-    views/rightview.h
+    views/rightview.h \
+    db/dbvisitor.h
 
 # Default rules for deployment.
 isEmpty(BINDIR):BINDIR=/usr/bin

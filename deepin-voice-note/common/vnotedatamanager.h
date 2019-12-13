@@ -6,8 +6,10 @@
 #include <QObject>
 
 class LoadFolderWorker;
+class LoadNoteItemsWorker;
 class VNoteFolderOper;
 class VNoteItemOper;
+class FolderQryDbVisitor;
 
 class VNoteDataManager : public QObject
 {
@@ -21,11 +23,11 @@ public:
     //
     VNOTE_FOLDERS_MAP* getNoteFolders();
 
-    VNOTE_ITEMS_MAP* getAllNotesInFolder(qint64 folder);
+    VNOTE_ALL_NOTES_MAP* getAllNotesInFolder();
 
     void reqNoteDefIcons();
     void reqNoteFolders();
-    void reqNoteItems(qint64 folder);
+    void reqNoteItems();
 signals:
     void onNoteFoldersLoaded();
     void onNoteItemsLoaded();
@@ -35,12 +37,24 @@ protected:
     VNoteFolder* addFolder(VNoteFolder* folder);
     VNoteFolder* getFolder(qint64 folderId);
     VNoteFolder* delFolder(qint64 folderId);
+    qint32       folderCount();
+
+    VNoteItem* addNote(VNoteItem* note);
+    VNoteItem* getNote(qint64 folderId, qint32 noteId);
+    VNoteItem* delNote(qint64 folderId, qint32 noteId);
+    /*
+     *Para:   folder Id
+     *Return: All nots in the folder
+     * */
+    VNOTE_ITEMS_MAP* getFolderNotes(qint64 folderId);
 
     QImage getDefaultIcon(qint32 index);
 private:
     QScopedPointer<VNOTE_FOLDERS_MAP> m_qspNoteFoldersMap;
+    QScopedPointer<VNOTE_ALL_NOTES_MAP> m_qspAllNotesMap;
 
-    LoadFolderWorker* m_pForldesLoadthread {nullptr};
+    LoadFolderWorker    *m_pForldesLoadThread {nullptr};
+    LoadNoteItemsWorker *m_pNotesLoadThread {nullptr};
 
     static VNoteDataManager* _instance;
 
@@ -50,6 +64,7 @@ private:
     friend class LoadIconsWorker;
     friend class VNoteFolderOper;
     friend class VNoteItemOper;
+    friend class FolderQryDbVisitor;
 };
 
 #endif // VNOTEDATAMANAGER_H

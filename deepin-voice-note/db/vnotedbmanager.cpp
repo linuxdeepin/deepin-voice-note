@@ -1,4 +1,5 @@
 #include "db/vnotedbmanager.h"
+#include "db/dbvisitor.h"
 #include "globaldef.h"
 
 #include <QStandardPaths>
@@ -8,6 +9,16 @@
 #include <QSqlError>
 
 #include <DLog>
+
+#define CRITICAL_SECTION_BEGIN() do { \
+    m_dbLock.lock(); \
+    m_vnoteDB.transaction(); \
+} while(0)
+
+#define CRITICAL_SECTION_END() do { \
+    m_vnoteDB.commit(); \
+    m_dbLock.unlock(); \
+} while(0)
 
 VNoteDbManager* VNoteDbManager::_instance = nullptr;
 
@@ -31,9 +42,14 @@ VNoteDbManager *VNoteDbManager::instance()
     return  _instance;
 }
 
+QSqlDatabase &VNoteDbManager::getVNoteDb()
+{
+    return m_vnoteDB;
+}
+
 bool VNoteDbManager::insertData(DB_TABLE table,
                                 QString insertSql,
-                                QVariantList& record )
+                                DbVisitor* visitor )
 {
     int colums = 0;
 
@@ -55,40 +71,33 @@ bool VNoteDbManager::insertData(DB_TABLE table,
         return false;
     }
 
-    m_rwDbLock.lockForWrite();
+    if (nullptr == visitor) {
+        qCritical() << "insertData invalid parameter: visitor is null";
+        return false;
+    }
 
-    //Begin Transaction
-    m_vnoteDB.transaction();
+    CRITICAL_SECTION_BEGIN();
 
     QStringList sqls = insertSql.split(";");
 
     for (auto it : sqls) {
         if (!it.trimmed().isEmpty()) {
-            if(!m_sqlQuery->exec(it)) {
-                qCritical() << "insert data failed:" << it <<" reason:" << m_sqlQuery->lastError().text();
+            if(!visitor->sqlQuery()->exec(it)) {
+                qCritical() << "insert data failed:" << it <<" reason:" << visitor->sqlQuery()->lastError().text();
                 insertOK = false;
             }
         }
     }
 
+    CRITICAL_SECTION_END();
+
     //Get new record data
-    while(m_sqlQuery->next()) {
-
-        for (int index=0; index<colums; index++) {
-            record.append(m_sqlQuery->value(index));
+    if (nullptr != visitor) {
+        if (!visitor->visitorData()) {
+            insertOK = false;
+            qCritical() << "Query new data failed: visitorData failed.";
         }
-        break;
     }
-
-    //If insert&query new record ok,commit
-    //db, else rollback
-    if (insertOK) {
-        m_vnoteDB.commit();
-    } else {
-        m_vnoteDB.rollback();
-    }
-
-    m_rwDbLock.unlock();
 
     return insertOK;
 }
@@ -99,28 +108,31 @@ bool VNoteDbManager::updateData(VNoteDbManager::DB_TABLE table, QString updateSq
 
     bool updateOK = true;
 
-    m_rwDbLock.lockForWrite();
+    CRITICAL_SECTION_BEGIN();
 
-    if(!m_sqlQuery->exec(updateSql)) {
-        qCritical() << "Update data failed:" << updateSql <<" reason:" << m_sqlQuery->lastError().text();
-        updateOK = false;
+    QScopedPointer<QSqlQuery> sqlQuery(new QSqlQuery(m_vnoteDB));
+
+    QStringList sqls = updateSql.split(";");
+
+    for (auto it : sqls) {
+        if (!it.trimmed().isEmpty()) {
+            if(!sqlQuery->exec(it)) {
+                qCritical() << "Update data failed:" << it <<" reason:" << sqlQuery->lastError().text();
+                updateOK = false;
+            }
+        }
     }
 
-    m_rwDbLock.unlock();
+    CRITICAL_SECTION_END();
 
     return updateOK;
 }
 
-bool VNoteDbManager::queryData(VNoteDbManager::DB_TABLE table, QString querySql, QList<QList<QVariant> > &result)
+bool VNoteDbManager::queryData(VNoteDbManager::DB_TABLE table, QString querySql, DbVisitor* visitor)
 {
     int colums = 0;
 
     bool queryOK = true;
-
-    m_rwDbLock.lockForWrite();
-
-    //Begin Transaction
-    m_vnoteDB.transaction();
 
     switch (table) {
     case VNOTE_FOLDER_TBL: {
@@ -138,25 +150,24 @@ bool VNoteDbManager::queryData(VNoteDbManager::DB_TABLE table, QString querySql,
         return false;
     }
 
-    if(!m_sqlQuery->exec(querySql)) {
-        qCritical() << "Query data failed:" << querySql <<" reason:" << m_sqlQuery->lastError().text();
+    if (nullptr == visitor) {
+        qCritical() << "Need DbVisitor parameter but is null";
+        return false;
+    }
+
+    CRITICAL_SECTION_BEGIN();
+
+    if(!visitor->sqlQuery()->exec(querySql)) {
+        qCritical() << "Query data failed:" << querySql <<" reason:" << visitor->sqlQuery()->lastError().text();
         queryOK = false;
     }
 
-    //Begin Transaction
-    m_vnoteDB.commit();
+    CRITICAL_SECTION_END();
 
-    while(m_sqlQuery->next()) {
-
-        QList<QVariant> record;
-        for (int index=0; index<colums; index++) {
-            record.append(m_sqlQuery->value(index));
-        }
-
-        result.append(record);
+    if (!visitor->visitorData()) {
+        qCritical() << "Query data failed: visitorData failed.";
+        queryOK = false;
     }
-
-    m_rwDbLock.unlock();
 
     return queryOK;
 }
@@ -167,14 +178,22 @@ bool VNoteDbManager::deleteData(VNoteDbManager::DB_TABLE table, QString delSql)
 
     bool deleteOK = true;
 
-    m_rwDbLock.lockForWrite();
+    CRITICAL_SECTION_BEGIN();
 
-    if(!m_sqlQuery->exec(delSql)) {
-        qCritical() << "Delete data failed:" << delSql <<" reason:" << m_sqlQuery->lastError().text();
-        deleteOK = false;
+    QScopedPointer<QSqlQuery> sqlQuery(new QSqlQuery(m_vnoteDB));
+
+    QStringList sqls = delSql.split(";");
+
+    for (auto it : sqls) {
+        if (!it.trimmed().isEmpty()) {
+            if(!sqlQuery->exec(it)) {
+                qCritical() << "Delete data failed:" << it <<" reason:" << sqlQuery->lastError().text();
+                deleteOK = false;
+            }
+        }
     }
 
-    m_rwDbLock.unlock();
+    CRITICAL_SECTION_END();
 
     return deleteOK;
 }
@@ -213,8 +232,6 @@ int VNoteDbManager::initVNoteDb()
         m_vnoteDB.setDatabaseName(vnoteDbFullPath);
     }
 
-
-
     if (!m_vnoteDB.open()) {
         qCritical() << "Open database failded:" << m_vnoteDB.lastError().text();
 
@@ -222,8 +239,6 @@ int VNoteDbManager::initVNoteDb()
     }
 
     qInfo() << "Database opened:" << vnoteDbFullPath;
-
-    m_sqlQuery.reset(new QSqlQuery(m_vnoteDB));
 
     createTablesIfNeed();
 
@@ -234,10 +249,12 @@ void VNoteDbManager::createTablesIfNeed()
 {
     QStringList createTableSqls = QString(CREATETABLE_FMT).split(";");
 
+    QScopedPointer<QSqlQuery> sqlQuery(new QSqlQuery(m_vnoteDB));
+
     for (auto it: createTableSqls) {
         if (!it.trimmed().isEmpty()) {
-            if(!m_sqlQuery->exec(it)) {
-                qCritical() << it << "init tables failed error: " << m_sqlQuery->lastError().text();
+            if(!sqlQuery->exec(it)) {
+                qCritical() << it << "init tables failed error: " << sqlQuery->lastError().text();
             }
         }
     }

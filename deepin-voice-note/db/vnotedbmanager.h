@@ -4,7 +4,9 @@
 #include <QObject>
 #include <QSqlDatabase>
 #include <QSqlQuery>
-#include <QReadWriteLock>
+#include <QMutex>
+
+class DbVisitor;
 
 class VNoteDbManager : public QObject
 {
@@ -47,11 +49,13 @@ public:
         VNOTE_MAX_TBL
     };
 
+    QSqlDatabase& getVNoteDb();
+
     bool insertData(DB_TABLE table,
                     QString insertSql,
-                    QVariantList& record /*out*/);
+                    DbVisitor* visitor /*out*/);
     bool updateData(DB_TABLE table, QString updateSql);
-    bool queryData(DB_TABLE table, QString querySql, QList<QList<QVariant>> & result);
+    bool queryData(DB_TABLE table, QString querySql, DbVisitor* visitor);
     bool deleteData(DB_TABLE table, QString delSql);
 signals:
 
@@ -63,9 +67,9 @@ protected:
 
 protected:
     QSqlDatabase m_vnoteDB;
-    QScopedPointer<QSqlQuery> m_sqlQuery;
+//    QScopedPointer<QSqlQuery> m_sqlQuery;
 
-    QReadWriteLock m_rwDbLock;
+    QMutex m_dbLock;
 
     static VNoteDbManager* _instance;
 };

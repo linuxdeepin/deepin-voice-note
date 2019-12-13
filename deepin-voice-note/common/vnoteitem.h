@@ -20,9 +20,9 @@ public:
         VNT_Voice,
     };
 
-    qint64 noteId {INVALID_ID};
+    qint32 noteId {INVALID_ID};
     qint64 folderId {INVALID_ID};
-    qint8  noteType {VNOTE_TYPE::VNT_Text};
+    qint32 noteType {VNOTE_TYPE::VNT_Text};
 
     QString noteText;
     QString voicePath;
