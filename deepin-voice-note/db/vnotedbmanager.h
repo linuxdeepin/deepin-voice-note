@@ -36,7 +36,7 @@ public:
             modify_time DATETEXT NOT NULL DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f','now','localtime'))); \
          CREATE TABLE IF NOT EXISTS vnote_items_tbl(\
             note_id INTEGER PRIMARY KEY AUTOINCREMENT, \
-            folder_id INTEGER UNIQUE, \
+            folder_id INTEGER, \
             note_type INT NOT NULL DEFAULT 0, \
             note_text TEXT, \
             voice_path TEXT, \

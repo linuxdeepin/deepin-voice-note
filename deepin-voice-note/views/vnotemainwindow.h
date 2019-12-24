@@ -13,6 +13,8 @@
 #include <DTextEdit>
 #include <DStackedWidget>
 #include <DLabel>
+#include <DFloatingButton>
+#include <DAnchors>
 
 DWIDGET_USE_NAMESPACE
 
@@ -55,10 +57,12 @@ private:
     DSearchEdit *m_noteSearchEdit {nullptr};
     DIconButton *m_returnBtn {nullptr};
 
+    DFloatingButton* m_floatingAddBtn {nullptr};
+    QWidget        * m_leftViewHolder{nullptr};
+
     DSplitter *m_mainWndSpliter {nullptr};
-    LeftView   *m_leftViewHolder {nullptr};
+    LeftView   *m_leftView {nullptr};
     RightView   *m_rightViewHolder {nullptr};
-    MyRecodeButtons *m_btnAddFoler {nullptr};
 
     MyRecodeButtons *m_btnHideTextEdit {nullptr};
     DTextEdit *m_textEditRightView {nullptr};

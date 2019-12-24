@@ -6,6 +6,7 @@
 #include <QList>
 #include <DListWidget>
 #include <DPushButton>
+#include <DTextEdit>
 
 DWIDGET_USE_NAMESPACE
 

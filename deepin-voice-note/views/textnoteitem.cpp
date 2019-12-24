@@ -18,8 +18,8 @@ TextNoteItem::TextNoteItem(VNoteItem *textNote, QWidget *parent)
     , m_textNode(textNote)
 {
     initUI();
-    initConnection();
     initData();
+    initConnection();
 }
 
 void TextNoteItem::initUI()

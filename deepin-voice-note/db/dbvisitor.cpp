@@ -93,6 +93,12 @@ bool NoteQryDbVisitor::visitorData()
             VNOTE_ALL_NOTES_DATA_MAP::iterator it =
                     results.notes->notes.find(note->folderId);
 
+            qDebug() << (note->noteText.isEmpty() ? "May errors" : "Normal:")
+                     << "noteId << " << note->noteId
+                     << "note->folderId" << note->folderId
+                     << "note->noteText" << note->noteText
+                     << "note->noteType" << note->noteType
+                     << "note->createTime" << note->createTime;
             //TODO
             //    If find the folder add note to it, or need create
             //folder items map first;
@@ -171,5 +177,28 @@ AddNoteDbVisitor::AddNoteDbVisitor(QSqlDatabase &db, void *result)
 
 bool AddNoteDbVisitor::visitorData()
 {
+    bool isOK = false;
 
+    if (nullptr != results.newNote) {
+        isOK = true;
+
+        while(m_sqlQuery->next()) {
+            VNoteItem* note = results.newNote;
+
+            note->noteId      = m_sqlQuery->value(VNoteItemOper::note_id).toInt();
+            note->folderId    = m_sqlQuery->value(VNoteItemOper::folder_id).toInt();
+            note->noteText    = m_sqlQuery->value(VNoteItemOper::note_text).toString();
+            note->noteType    = m_sqlQuery->value(VNoteItemOper::note_type).toInt();
+            note->voicePath   = m_sqlQuery->value(VNoteItemOper::voice_path).toString();
+
+            note->createTime  = QDateTime::fromString(
+                        m_sqlQuery->value(VNoteItemOper::create_time).toString(),VNOTE_TIME_FMT);
+            note->modifyTime  = QDateTime::fromString(
+                        m_sqlQuery->value(VNoteItemOper::modify_time).toString(),VNOTE_TIME_FMT);
+
+            break;
+        }
+    }
+
+    return isOK;
 }

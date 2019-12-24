@@ -42,7 +42,7 @@ private:
     QString m_searchKey {""};
     VNOTE_ITEMS_MAP m_searchNoteData;
     RightNoteList *m_searchNoteList{nullptr};
-    QMap<qint64,QSharedPointer<VNOTE_ITEMS_MAP>> m_data;
+    //QMap<qint64,QSharedPointer<VNOTE_ITEMS_MAP>> m_data;
     MyRecodeButtons *m_addVoiceBtn;
 };
 

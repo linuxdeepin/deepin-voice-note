@@ -25,7 +25,7 @@ VNoteItemOper::VNoteItemOper(VNoteItem* note)
 
 VNOTE_ALL_NOTES_MAP *VNoteItemOper::loadAllVNotes()
 {
-    static constexpr char const *QUERY_NOTES_FMT = "SELECT * FROM %s GROUP BY %s;";
+    static constexpr char const *QUERY_NOTES_FMT = "SELECT * FROM %s ORDER BY %s;";
 
     QString querySql;
     querySql.sprintf(QUERY_NOTES_FMT
@@ -106,7 +106,7 @@ bool VNoteItemOper::modifyNoteText(QString text)
 VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
 {
     static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s,%s) VALUES (%s, %s,'%s');";
-    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s WHERE %s=%s";
+    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s WHERE %s=%s;";
     static constexpr char const *NEWREC_FMT = "SELECT * FROM %s WHERE %s=%s ORDER BY %s DESC LIMIT 1;";
 
     QString insertSql;
@@ -128,13 +128,13 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
                       , VNoteDbManager::FOLDER_TABLE_NAME
                       , VNoteFolderOper::folderColumnsName[modify_time].toUtf8().data()
                       , sqlGetTime.toUtf8().data()
-                      , VNoteFolderOper::folderColumnsName[folder_id].toUtf8().data()
+                      , VNoteFolderOper::folderColumnsName[VNoteFolderOper::folder_id].toUtf8().data()
                       , QString("%1").arg(note.folderId).toUtf8().data()
                       );
 
     QString queryNewRec;
     queryNewRec.sprintf(NEWREC_FMT
-                      , VNoteDbManager::FOLDER_TABLE_NAME
+                      , VNoteDbManager::NOTES_TABLE_NAME
                       , noteColumnsName[folder_id].toUtf8().data()
                       , QString("%1").arg(note.folderId).toUtf8().data()
                       , noteColumnsName[note_id].toUtf8().data()

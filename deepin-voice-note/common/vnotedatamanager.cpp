@@ -158,9 +158,13 @@ VNoteItem *VNoteDataManager::addNote(VNoteItem *note)
             notesInFolder->lock.unlock();
         } else {
             qCritical() << "Add note faild: the folder don't exist:" << note->folderId;
+
+            VNOTE_ITEMS_MAP *folderNotes = new VNOTE_ITEMS_MAP();
+            folderNotes->folderNotes.insert(note->noteId, note);
+            m_qspAllNotesMap->notes.insert(note->folderId, folderNotes);
         }
 
-        m_qspNoteFoldersMap->lock.unlock();
+        m_qspAllNotesMap->lock.unlock();
 
         retNote = note;
     }
@@ -199,7 +203,7 @@ VNoteItem *VNoteDataManager::getNote(qint64 folderId, qint32 noteId)
         qCritical() << "Get note faild: the folder don't exist:" << folderId;
     }
 
-    m_qspNoteFoldersMap->lock.unlock();
+    m_qspAllNotesMap->lock.unlock();
 
     return retNote;
 }
@@ -236,7 +240,7 @@ VNoteItem *VNoteDataManager::delNote(qint64 folderId, qint32 noteId)
         qCritical() << "Delete note faild: the folder don't exist:" << folderId;
     }
 
-    m_qspNoteFoldersMap->lock.unlock();
+    m_qspAllNotesMap->lock.unlock();
 
     return retNote;
 }
@@ -253,10 +257,12 @@ VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
     if (it != m_qspAllNotesMap->notes.end()) {
         folderNotes = *it;
     } else {
-        qCritical() << "Get note faild: the folder don't exist:" << folderId;
+        qInfo() << "Get note faild: the folder don't exist:" << folderId;
+        folderNotes = new VNOTE_ITEMS_MAP();
+        m_qspAllNotesMap->notes.insert(folderId, folderNotes);
     }
 
-    m_qspNoteFoldersMap->lock.unlock();
+    m_qspAllNotesMap->lock.unlock();
 
     return folderNotes;
 }

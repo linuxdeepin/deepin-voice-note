@@ -41,11 +41,11 @@ void VNoteMainWindow::initConnections()
 {
     connect(VNoteDataManager::instance(), &VNoteDataManager::onNoteFoldersLoaded, this,
             &VNoteMainWindow::onVNoteFoldersLoaded);
-    connect(m_btnAddFoler, &DPushButton::clicked, m_leftViewHolder, &LeftView::handleAddFolder);
+    connect(m_floatingAddBtn, &DFloatingButton::clicked, m_leftView, &LeftView::handleAddFolder);
     connect(m_noteSearchEdit, &DSearchEdit::textChanged, this, &VNoteMainWindow::onVNoteSearch);
-    connect(m_leftViewHolder, SIGNAL(currentChanged(const QModelIndex &)), this,
+    connect(m_leftView, SIGNAL(currentChanged(const QModelIndex &)), this,
             SLOT(onVNoteFolderChange(const QModelIndex &)));
-    connect(m_leftViewHolder, &LeftView::sigFolderDel, this, &VNoteMainWindow::onVNoteFolderDel);
+    connect(m_leftView, &LeftView::sigFolderDel, this, &VNoteMainWindow::onVNoteFolderDel);
     connect(m_wndHomePage, &InitEmptyPage::sigAddFolderByInitPage, this,
             &VNoteMainWindow::onVNoteFolderAdd);
     connect(m_rightViewHolder, &RightView::sigTextEditDetail, this,
@@ -93,40 +93,39 @@ void VNoteMainWindow::initMainView()
 
 void VNoteMainWindow::initLeftView()
 {
-    m_leftViewHolder = new LeftView(m_mainWndSpliter);
+    m_leftViewHolder = new QWidget(m_mainWndSpliter);
     m_leftViewHolder->setObjectName("leftMainLayoutHolder");
-    m_leftViewHolder->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    m_leftViewHolder->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     m_leftViewHolder->setFixedWidth(VNOTE_LEFTVIEW_W);
-    m_leftViewHolder->setContentsMargins(0, 0, 2, 5);
-    m_leftViewHolder->setBackgroundRole(DPalette::Base);
-    m_leftViewHolder->setAutoFillBackground(true);
-    m_leftViewHolder->setSpacing(5);
-    // d->leftBarHolder->setAttribute(Qt::WA_TranslucentBackground, true);
-    DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
-    if (themeType == DGuiApplicationHelper::LightType) {
-        m_btnAddFoler = new MyRecodeButtons(":/images/icon/normal/circlebutton_add 2.svg",
-                                            ":/images/icon/press/circlebutton_add_press.svg",
-                                            ":/images/icon/hover/circlebutton_add _hover.svg",
-                                            ":/images/icon/disabled/circlebutton_add_disabled.svg",
-                                            ":/images/icon/focus/circlebutton_add_focus.svg",
-                                            QSize(68, 68), this);
-    } else {
-        m_btnAddFoler =
-            new MyRecodeButtons(":/images/icon_dark/normal/add_normal_dark.svg",
-                                ":/images/icon_dark/press/add_press_dark.svg",
-                                ":/images/icon_dark/hover/add _hover_dark.svg",
-                                ":/images/icon_dark/disabled/add_disabled_dark.svg",
-                                ":/images/icon_dark/focus/add_focus_dark.svg", QSize(68, 68), this);
-    }
-    QGridLayout *leftMainLayout = new QGridLayout();
-    leftMainLayout->setContentsMargins(0, 0, 0, 0);
-    leftMainLayout->setSpacing(0);
-    leftMainLayout->addWidget(m_btnAddFoler, 0, 0, Qt::AlignBottom);
+
+    QVBoxLayout* leftHolderLayout = new  QVBoxLayout();
+    leftHolderLayout->setSpacing(0);
+    leftHolderLayout->setContentsMargins(0,0,0,0);
+
+    m_leftView = new LeftView(this);
+
+    m_leftView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_leftView->setBackgroundRole(DPalette::Base);
+    m_leftView->setSpacing(5);
+    m_leftView->setAutoFillBackground(true);
+    m_leftView->setContentsMargins(0, 5, 0, 0);
+
+    m_floatingAddBtn = new DFloatingButton(DStyle::SP_IncreaseElement, m_leftView);
+    m_floatingAddBtn->setFixedSize(QSize(55,55));
+
+    DAnchorsBase buttonAnchor(m_floatingAddBtn);
+    buttonAnchor.setAnchor(Qt::AnchorLeft, m_leftView, Qt::AnchorLeft);
+    buttonAnchor.setAnchor(Qt::AnchorBottom, m_leftView, Qt::AnchorBottom);
+    buttonAnchor.setBottomMargin(11);
+    buttonAnchor.setLeftMargin(97);
 
     // ToDo:
     //    Add Left view widget here
 
-    m_leftViewHolder->setLayout(leftMainLayout);
+    leftHolderLayout->addWidget(m_leftView);
+
+    m_leftViewHolder->setLayout(leftHolderLayout);
+
 #ifdef VNOTE_LAYOUT_DEBUG
     m_leftViewHolder->setStyleSheet("background: green");
 #endif
@@ -146,7 +145,7 @@ void VNoteMainWindow::initRightView()
 
 void VNoteMainWindow::onVNoteFoldersLoaded()
 {
-    int count = m_leftViewHolder->loadNoteFolder(); //加载完成前都是显示主页
+    int count = m_leftView->loadNoteFolder(); //加载完成前都是显示主页
     if (count) {
         switchView(WndNoteShow);
     }
@@ -158,10 +157,10 @@ void VNoteMainWindow::onVNoteSearch()
     m_rightViewHolder->setSearchKey(strKey);
     if (!strKey.isEmpty()) {
         QList<qint64> folders = m_rightViewHolder->getNoteContainsKeyFolders(strKey);
-        m_leftViewHolder->setFolderNameFilter(strKey, &folders);
+        m_leftView->setFolderNameFilter(strKey, &folders);
         qDebug() << "id size:" << folders;
     } else {
-        m_leftViewHolder->clearFilter();
+        m_leftView->clearFilter();
         switchView(WndNoteShow);
     }
 }
@@ -169,9 +168,9 @@ void VNoteMainWindow::onVNoteSearch()
 void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &previous)
 {
     Q_UNUSED(previous);
-    QModelIndex index = m_leftViewHolder->currentIndex();
+    QModelIndex index = m_leftView->currentIndex();
     if (index.isValid()) {
-        qint64 id = m_leftViewHolder->getFolderId(index);
+        qint64 id = m_leftView->getFolderId(index);
         m_rightViewHolder->noteSwitchByFolder(id);
         switchView(WndNoteShow);
     } else {
@@ -184,7 +183,7 @@ void VNoteMainWindow::onVNoteFolderDel(VNoteFolder *data)
     m_rightViewHolder->noteDelByFolder(data->id);
     VNoteFolderOper folderOper(data);
     folderOper.deleteVNoteFolder(data->id);
-    if (m_leftViewHolder->getFolderCount() == 0) {
+    if (m_leftView->getFolderCount() == 0) {
         switchView(WndHomePage);
         m_noteSearchEdit->setEnabled(false);
     }
@@ -242,7 +241,7 @@ void VNoteMainWindow::switchView(WindowType type)
 void VNoteMainWindow::onVNoteFolderAdd()
 {
     switchView(WndNoteShow);
-    m_btnAddFoler->click();
+    m_floatingAddBtn->clicked();
 }
 
 void VNoteMainWindow::onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit,const QString &searchKey)

@@ -35,12 +35,14 @@ void RightNoteList::initNoteItem(qint64 folderid,VNOTE_ITEMS_MAP *mapNoteData,QS
     }
     m_listHeight = 0;
     m_forlderId = folderid;
-//    if (mapNoteData != nullptr) {
-//        for (auto &it : *mapNoteData->notes) {
-//            addNodeItem(it,serachKey);
-//        }
-//        adjustWidgetItemWidth();
-//    }
+    if (mapNoteData != nullptr) {
+        mapNoteData->lock.lockForRead();
+        for (auto &it : mapNoteData->folderNotes) {
+            addNodeItem(it,serachKey);
+        }
+        mapNoteData->lock.unlock();
+        adjustWidgetItemWidth();
+    }
 }
 
 void RightNoteList::addNodeItem(VNoteItem *item,QString key)

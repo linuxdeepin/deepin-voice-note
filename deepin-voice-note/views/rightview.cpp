@@ -2,6 +2,7 @@
 #include "common/vnoteitem.h"
 #include "rightnotelist.h"
 #include "common/vnotedatamanager.h"
+#include "db/vnoteitemoper.h"
 #include <QBoxLayout>
 #include <QDebug>
 
@@ -76,19 +77,22 @@ void RightView::initConnection()
 
 void RightView::addNewNoteList(qint64 id)
 {
-//    RightNoteList *listWidget = new RightNoteList(m_stackWidget);
-//    connect(listWidget,SIGNAL(sigDelNote(VNoteItem *)), this, SLOT(onDelNote(VNoteItem *)));
-//    connect(listWidget, SIGNAL(sigUpdateNote(VNoteItem *)), this, SLOT(onUpdateNote(VNoteItem *)));
-//    connect(listWidget, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *,const QString &)), this, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *,const QString &)));
-//    connect(listWidget, SIGNAL(sigTextEditIsEmpty(VNoteItem *,bool)), this, SLOT(onTextEditIsEmpty(VNoteItem *,bool)));
-//    QSharedPointer<VNOTE_ITEMS_MAP> listData(new VNOTE_ITEMS_MAP);
-//    listData->notes = new VNOTE_ITEMS_DATA_MAP;
-//    listWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//    listWidget->setLineWidth(0);
-//    listWidget->initNoteItem(id, listData.get());
-//    m_stackWidget->addWidget(listWidget);
-//    m_stackWidget->setCurrentWidget(listWidget);
-//    m_data.insert(id, listData);
+    RightNoteList *listWidget = new RightNoteList(m_stackWidget);
+    connect(listWidget,SIGNAL(sigDelNote(VNoteItem *)), this, SLOT(onDelNote(VNoteItem *)));
+    connect(listWidget, SIGNAL(sigUpdateNote(VNoteItem *)), this, SLOT(onUpdateNote(VNoteItem *)));
+    connect(listWidget, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *,const QString &)), this, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *,const QString &)));
+    connect(listWidget, SIGNAL(sigTextEditIsEmpty(VNoteItem *,bool)), this, SLOT(onTextEditIsEmpty(VNoteItem *,bool)));
+
+    //QSharedPointer<VNOTE_ITEMS_MAP> listData(new VNOTE_ITEMS_MAP);
+    //listData->notes = new VNOTE_ITEMS_DATA_MAP;
+    VNoteItemOper noteOper;
+    VNOTE_ITEMS_MAP* folderNotes = noteOper.getFolderNotes(id);
+    listWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    listWidget->setLineWidth(0);
+    listWidget->initNoteItem(id, folderNotes);
+    m_stackWidget->addWidget(listWidget);
+    m_stackWidget->setCurrentWidget(listWidget);
+    //m_data.insert(id, listData);
 }
 
 void RightView::noteDelByFolder(qint64 id)
@@ -116,22 +120,22 @@ void RightView::noteSwitchByFolder(qint64 id)
             }
         }
         if (find == false) {
-            //addNewNoteList(id);没加载创建新的
+            addNewNoteList(id);//没加载创建新的
         }
     }else { //搜索逻辑
 //         auto it1 = m_data.find(id);
 //         if(it1 != m_data.end())
 //         {
 //             VNOTE_ITEMS_MAP *data1 = it1->get();
-//             if (data1 && data1->notes)
+//             if (data1)
 //             {
-//                 m_searchNoteData.notes->clear();
-//                 for (auto it2 : *data1->notes) {
+//                 m_searchNoteData.folderNotes.clear();
+//                 for (auto it2 : data1->folderNotes) {
 //                     if (it2->noteText.contains(m_searchKey)) {
-//                         m_searchNoteData.notes->insert(it2->noteId,it2);
+//                         m_searchNoteData.folderNotes.insert(it2->noteId,it2);
 //                     }
 //                }
-//                if(m_searchNoteData.notes->size())
+//                if(m_searchNoteData.folderNotes.size())
 //                {
 //                    m_searchNoteList->initNoteItem(id,&m_searchNoteData, m_searchKey);
 //                    m_stackWidget->setCurrentWidget(m_searchNoteList);
@@ -165,16 +169,14 @@ void RightView::onDelNote(VNoteItem *item)
     if (widget == m_searchNoteList) {
         ;
     }
-    auto it = m_data.find(item->folderId); //删除接口
-//    if (it != m_data.end()) {
-//        VNOTE_ITEMS_MAP *mapNotes = it.value().get();
-//        if (mapNotes != nullptr && mapNotes->notes != nullptr) {
-//            auto itNote = mapNotes->notes->find(item->noteId);
-//            if (itNote != mapNotes->notes->end()) {
-//                mapNotes->notes->erase(itNote);
-//            }
-//        }
-//    }
+
+    qInfo() << "Delete VNoteItem:" << item
+            << "NoteID:" << item->noteId
+            << "NoteText:" << item->noteText;
+
+    VNoteItemOper noteOper;
+    noteOper.deleteNote(item->folderId, item->noteId);
+
     adjustaddTextBtn();
     m_addTextBtn->setEnabled(true);
 }
@@ -182,30 +184,37 @@ void RightView::onDelNote(VNoteItem *item)
 void RightView::onAddNote() //添加文字记录
 {
     RightNoteList *widget = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
-//    auto it = m_data.find(widget->getFolderId());
-//    if (it != m_data.end()) {
-//        VNOTE_ITEMS_MAP *mapNotes = it.value().get();
-//        if (mapNotes != nullptr) {
-//            VNOTE_ITEMS_DATA_MAP *noteData = mapNotes->notes;
-//            if (noteData == nullptr) {
-//                noteData = new VNOTE_ITEMS_DATA_MAP;
-//            }
-//            static int id = 0;
-//            VNoteItem *tmp = new VNoteItem;
-//            tmp->noteId = id++;
-//            tmp->folderId = widget->getFolderId();
-//            tmp->createTime = QDateTime::currentDateTime();
-//            noteData->insert(id, tmp);
-//            widget->addNodeItem(tmp);
-//        }
-//    }
-    m_addTextBtn->setEnabled(false);
-    adjustaddTextBtn();
+
+    VNoteItemOper noteOper;
+
+    VNoteItem tmpNote;
+    tmpNote.folderId = widget->getFolderId();
+    tmpNote.noteType = VNoteItem::VNT_Text;
+    tmpNote.noteText = QString("");
+
+    if (tmpNote.folderId != VNoteFolder::INVALID_ID) {
+        VNoteItem* newNote = noteOper.addNote(tmpNote);
+
+        if (nullptr != newNote) {
+            qInfo() << "onAddNote:" << newNote
+                    << "NoteId:" << newNote->noteId
+                    << "NoteText:" << newNote->noteText;
+
+            widget->addNodeItem(newNote);
+            m_addTextBtn->setEnabled(false);
+            adjustaddTextBtn();
+        }
+    }
 }
 
 void RightView::onUpdateNote(VNoteItem *item)
 {
-    qDebug() << "update:" << item->noteText;
+    qInfo() << "onUpdateNote:" << item
+            << "NoteId:" << item->noteId
+            << "NoteText:" << item->noteText;
+
+    VNoteItemOper noteOper(item);
+    noteOper.modifyNoteText(item->noteText);
 }
 
 void RightView::resizeEvent(QResizeEvent *event)

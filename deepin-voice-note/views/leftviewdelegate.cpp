@@ -1,7 +1,128 @@
 #include "leftviewdelegate.h"
 #include "common/utils.h"
 
-#include<QLineEdit>
+#include <QLineEdit>
+#include <QTextItem>
+#include <QDebug>
+
+#include <DPalette>
+
+//TODO:
+// VFolderNamePHelper is used to highlight the folder
+//name when search the notes
+struct VFolderNamePHelper {
+    VFolderNamePHelper(QPainter* painter, QFontMetrics fontMetrics, QRect nameRect)
+        :m_fontMetrics(fontMetrics)
+        , m_nameRect(nameRect)
+        , m_painter(painter)
+    {
+        if (nullptr != m_painter) {
+            m_pens[OldPen] = m_painter->pen();
+
+            DPalette pl;
+            QColor folderNamePenColor = pl.color(DPalette::Highlight);
+            m_pens[FolderPen] = folderNamePenColor;
+        }
+    }
+
+    struct Text {
+        QString text;
+        QRect   rect;
+        bool    isKeyword {false};
+    };
+
+    enum {
+        OldPen,
+        FolderPen,
+        PenCount
+    };
+
+    void spiltByKeyword(const QString &text, const QString &keyword);
+    void paintFolderName(bool isSelected = false);
+
+    QVector<Text> m_textsVector;
+    QFontMetrics m_fontMetrics;
+    QPen         m_pens[PenCount];
+    QRect        m_nameRect;
+    QPainter*    m_painter {nullptr};
+};
+
+void VFolderNamePHelper::spiltByKeyword(const QString &text, const QString &keyword)
+{
+    //Check if text exceed the name rect, elide the
+    //text first
+    QString elideText = m_fontMetrics.elidedText(text,Qt::ElideRight, m_nameRect.width());
+
+    int keyLen = keyword.length();
+    int textLen = text.length();
+    int startPos = 0;
+    int pos = 0;
+
+    m_textsVector.clear();
+
+    if (!keyword.isEmpty()) {
+        while ((pos=elideText.indexOf(keyword,startPos)) != -1) {
+            Text tb;
+
+            if (startPos != pos) {
+                int extraLen = pos-startPos;
+                tb.text = elideText.mid(startPos, extraLen);
+                startPos += extraLen;
+                tb.rect = m_fontMetrics.boundingRect(tb.text);
+                m_textsVector.push_back(tb);
+
+                tb.text = elideText.mid(pos, keyLen);
+                tb.rect = m_fontMetrics.boundingRect(tb.text);
+                tb.isKeyword = true;
+                m_textsVector.push_back(tb);
+            } else {
+                tb.text = elideText.mid(pos, keyLen);
+                tb.rect = m_fontMetrics.boundingRect(tb.text);
+                tb.isKeyword = true;
+                m_textsVector.push_back(tb);
+            }
+
+            startPos += keyLen;
+        }
+    }
+
+    if (startPos < elideText.length()) {
+        Text tb;
+
+        tb.text = elideText.mid(startPos, (textLen-startPos));
+        tb.rect = m_fontMetrics.boundingRect(tb.text);
+        m_textsVector.push_back(tb);
+    }
+}
+
+void VFolderNamePHelper::paintFolderName(bool isSelected)
+{
+    int currentX = m_nameRect.x();
+    int currentY = m_nameRect.y();
+
+    for(auto it : m_textsVector) {
+        int w = it.rect.width();
+        int h = m_nameRect.height();
+
+        it.rect.setX(currentX);
+        it.rect.setY(currentY);
+        it.rect.setSize(QSize(w, h));
+
+        if (it.isKeyword) {
+            //If the item is selected,don't need highlight keyword
+            m_painter->setPen((isSelected ? m_pens[OldPen] : m_pens[FolderPen]));
+        } else {
+            m_painter->setPen(m_pens[OldPen]);
+        }
+
+        m_painter->drawText(it.rect, it.text);
+
+        currentX += it.rect.width();
+    }
+
+    //Restore default pen
+    m_painter->setPen(m_pens[OldPen]);
+}
 
 LeftViewDelegate::LeftViewDelegate(QAbstractItemView *parent)
     : DStyledItemDelegate(parent)
@@ -72,11 +193,20 @@ void LeftViewDelegate::handleChangeTheme()
     m_parentView->update(m_parentView->currentIndex());
 }
 
+void LeftViewDelegate::updateSearchKeyword(const QString &keyword)
+{
+    m_searchKeyword = keyword;
+}
+
+void LeftViewDelegate::resetKeyword()
+{
+    m_searchKeyword.clear();
+}
+
 void LeftViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                              const QModelIndex &index) const
 {
-    if (index.isValid())
-    {
+    if (index.isValid()) {
         painter->save();
         painter->setRenderHint(QPainter::Antialiasing, true);
 
@@ -91,13 +221,16 @@ void LeftViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
         rect.setHeight(option.rect.height());
 
         painter->setRenderHints(QPainter::SmoothPixmapTransform);
+
         QRect paintRect = QRect(rect.left() + 5, rect.top(), rect.width() - 10, rect.height());
-        if (index.row() == 0)  //第一行头上加5px
-        {
+        if (index.row() == 0) {//第一行头上加5px
             paintRect.setY(rect.top() + 5);
         }
+
         QPainterPath path;
         const int radius = 8;
+
+        bool isSelected = false;
 
         path.moveTo(paintRect.bottomRight() - QPoint(0, radius));
         path.lineTo(paintRect.topRight() + QPoint(0, radius));
@@ -108,31 +241,36 @@ void LeftViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
         path.arcTo(QRect(QPoint(paintRect.bottomLeft() - QPoint(0, radius * 2)), QSize(radius * 2, radius * 2)), 180, 90);
         path.lineTo(paintRect.bottomLeft() + QPoint(radius, 0));
         path.arcTo(QRect(QPoint(paintRect.bottomRight() - QPoint(radius * 2, radius * 2)), QSize(radius * 2, radius * 2)), 270, 90);
-        if (option.state & QStyle::State_Selected)
-        {
+
+        if (option.state & QStyle::State_Selected) {
             QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
             painter->setBrush(QBrush(fillColor));
             painter->fillPath(path, painter->brush());
             painter->setPen(QPen(Qt::white));
-        }
-        else if (option.state & QStyle::State_MouseOver)
-        {
+
+            isSelected = true;
+        } else if (option.state & QStyle::State_MouseOver) {
             painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
             painter->fillPath(path, painter->brush());
-        }
-        else if (option.state & QStyle::State_Enabled)
-        {
+        } else if (option.state & QStyle::State_Enabled) {
             painter->setBrush(QBrush(m_parentPb.color(DPalette::ItemBackground)));
             painter->fillPath(path, painter->brush());
             painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
         }
+
         QRect iconRect(paintRect.left() + 6, paintRect.top() + 12, 40, 40);
         QRect nameRect(paintRect.left() + 52, paintRect.top() + 12, 160, 20);
         QRect timeRect(paintRect.left() + 52, paintRect.top() + 34, 160, 18);
 
         painter->drawImage(iconRect, data->UI.icon);
         painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T6));
-        painter->drawText(nameRect, data->name);
+
+        QFontMetrics fontMetrics = painter->fontMetrics();
+        VFolderNamePHelper vfnphelper(painter, fontMetrics, nameRect);
+
+        vfnphelper.spiltByKeyword(data->name, m_searchKeyword);
+        vfnphelper.paintFolderName(isSelected);
+
         painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
         painter->drawText(timeRect, Utils::convertDateTime(data->createTime));
         painter->restore();

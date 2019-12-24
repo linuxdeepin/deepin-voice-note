@@ -102,7 +102,7 @@ void LeftView::handleAddFolder()
         QModelIndex index = m_pSortFilterModel->index(0, 0);
         this->setCurrentIndex(index);
         this->edit(index);
-        emit sigFolderAdd(newFolder);
+//        emit sigFolderAdd(newFolder);
     } else {
         qCritical() << __FUNCTION__ << "Add new folder failed:" << itemData.name;
     }
@@ -138,6 +138,7 @@ void LeftView::setUpdateTimeFilter(const QDateTime &begin, const QDateTime &end,
 void LeftView::setFolderNameFilter(QString key, QList<qint64> *whilteList)
 {
     m_pSortFilterModel->setFolderNameFilter(key, whilteList);
+    m_pItemDelegate->updateSearchKeyword(key);
     QModelIndex nowIndex = m_pSortFilterModel->index(0, 0);
     this->reset();
     this->setCurrentIndex(nowIndex);
@@ -146,6 +147,7 @@ void LeftView::setFolderNameFilter(QString key, QList<qint64> *whilteList)
 void LeftView::clearFilter()
 {
     m_pSortFilterModel->clearFilter();
+    m_pItemDelegate->resetKeyword();
     QModelIndex index = m_pSortFilterModel->index(0, 0);
     this->setCurrentIndex(index);
 }
@@ -164,6 +166,8 @@ int LeftView::loadNoteFolder()
         }
         int count = folders->folders.size();
         folders->lock.unlock();
+
+        sortView(LeftViewSortFilterModel::OperaType::modifyTime, Qt::DescendingOrder);
 
         QModelIndex index = m_pSortFilterModel->index(0, 0);
         this->setCurrentIndex(index);

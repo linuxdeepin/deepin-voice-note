@@ -26,10 +26,15 @@ signals:
 
 public:
     void handleChangeTheme();
+    void updateSearchKeyword(const QString& keyword);
+    void resetKeyword();
 
 private:
     QAbstractItemView *m_parentView {nullptr};
     DPalette m_parentPb;
+
+    //Search keyword
+    QString m_searchKeyword;
 };
 
 #endif // LEFTVIEWDELEGATE_H
