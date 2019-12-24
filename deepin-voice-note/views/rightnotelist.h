@@ -15,27 +15,31 @@ class RightNoteList : public DListWidget
     Q_OBJECT
 public:
     explicit RightNoteList(QWidget *parent = nullptr);
-    void initNoteItem(qint64 folderid,VNOTE_ITEMS_MAP *mapNoteData,QString serachKey = "");
-    void addNodeItem(VNoteItem *item,QString key = "");
+    void initNoteItem(qint64 folderid, VNOTE_ITEMS_MAP *mapNoteData, QString serachKey = "");
+    void addNodeItem(VNoteItem *item, QString key = "", bool isBtnAdd = false);
     void delNodeItem(VNoteItem *item);
+    void updateNodeItem(VNoteItem *item);
+
     int  getListHeight();
     qint64 getFolderId();
 
 signals:
-    void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit,const QString &searchKey);
+    void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QString &searchKey);
     void sigDelNote(VNoteItem *textNode);
     void sigUpdateNote(VNoteItem *textNode);
-    void sigTextEditIsEmpty(VNoteItem *textNode,bool empty);
+    void sigTextEditIsEmpty(VNoteItem *textNode, bool empty);
+
+public slots:
+    void onAddHeight(int height);
 
 private:
     void initUI();
     void initConnection();
-    void adjustWidgetItemWidth();
+    void adjustWidgetItemWidth(int index);
 
 protected:
-      void resizeEvent(QResizeEvent * event);
-      int m_listHeight {0};
-      qint64 m_forlderId {-1};
+    void resizeEvent(QResizeEvent *event);
+    qint64 m_forlderId {-1};
 };
 
 #endif // RIGHTNOTELIST_H

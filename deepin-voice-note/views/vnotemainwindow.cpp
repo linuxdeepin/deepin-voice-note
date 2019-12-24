@@ -51,7 +51,7 @@ void VNoteMainWindow::initConnections()
     connect(m_rightViewHolder, &RightView::sigTextEditDetail, this,
             &VNoteMainWindow::onTextEditDetail);
     connect(m_returnBtn, &DIconButton::clicked, this, &VNoteMainWindow::onTextEditReturn);
-    connect(m_rightViewHolder,&RightView::sigSeachEditFocus,this,&VNoteMainWindow::onSearchEditFocus);
+    connect(m_rightViewHolder, &RightView::sigSeachEditFocus, this, &VNoteMainWindow::onSearchEditFocus);
 }
 
 void VNoteMainWindow::initShortcuts() {}
@@ -86,9 +86,9 @@ void VNoteMainWindow::initMainView()
     m_centerWidget->insertWidget(WndNoteShow, m_mainWndSpliter);
     m_centerWidget->insertWidget(WndSearchEmpty, m_labSearchEmpty);
     m_centerWidget->insertWidget(WndTextEdit, m_textEditMainWnd);
-    switchView(WndHomePage);
+    switchView(WndNoteShow);
     setCentralWidget(m_centerWidget);
-    setTitlebarShadowEnabled(false);
+    setTitlebarShadowEnabled(true);
 }
 
 void VNoteMainWindow::initLeftView()
@@ -98,9 +98,9 @@ void VNoteMainWindow::initLeftView()
     m_leftViewHolder->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     m_leftViewHolder->setFixedWidth(VNOTE_LEFTVIEW_W);
 
-    QVBoxLayout* leftHolderLayout = new  QVBoxLayout();
+    QVBoxLayout *leftHolderLayout = new  QVBoxLayout();
     leftHolderLayout->setSpacing(0);
-    leftHolderLayout->setContentsMargins(0,0,0,0);
+    leftHolderLayout->setContentsMargins(0, 0, 0, 0);
 
     m_leftView = new LeftView(this);
 
@@ -111,7 +111,7 @@ void VNoteMainWindow::initLeftView()
     m_leftView->setContentsMargins(0, 5, 0, 0);
 
     m_floatingAddBtn = new DFloatingButton(DStyle::SP_IncreaseElement, m_leftView);
-    m_floatingAddBtn->setFixedSize(QSize(55,55));
+    m_floatingAddBtn->setFixedSize(QSize(55, 55));
 
     DAnchorsBase buttonAnchor(m_floatingAddBtn);
     buttonAnchor.setAnchor(Qt::AnchorLeft, m_leftView, Qt::AnchorLeft);
@@ -146,8 +146,8 @@ void VNoteMainWindow::initRightView()
 void VNoteMainWindow::onVNoteFoldersLoaded()
 {
     int count = m_leftView->loadNoteFolder(); //加载完成前都是显示主页
-    if (count) {
-        switchView(WndNoteShow);
+    if (!count) {
+        switchView(WndHomePage);
     }
 }
 
@@ -244,15 +244,14 @@ void VNoteMainWindow::onVNoteFolderAdd()
     m_floatingAddBtn->clicked();
 }
 
-void VNoteMainWindow::onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit,const QString &searchKey)
+void VNoteMainWindow::onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QString &searchKey)
 {
     m_textNode = textNode;
     m_textEditRightView = preTextEdit;
     QTextCursor cursorSrc = preTextEdit->textCursor();
     m_textEditMainWnd->setText(textNode->noteText);
-    if(!searchKey.isEmpty())
-    {
-        Utils::highTextEdit(m_textEditMainWnd,&m_textEditFormat,searchKey,Qt::red);
+    if (!searchKey.isEmpty()) {
+        Utils::highTextEdit(m_textEditMainWnd, &m_textEditFormat, searchKey, Qt::red);
     }
     QTextCursor cursordst = m_textEditMainWnd->textCursor();
     cursordst.setPosition(cursorSrc.position());

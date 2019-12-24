@@ -24,7 +24,7 @@ class VNoteMainWindow : public DMainWindow
 public:
     VNoteMainWindow(QWidget *parent = nullptr);
     virtual ~VNoteMainWindow();
-    enum WindowType{WndHomePage,WndNoteShow,WndSearchEmpty,WndTextEdit};
+    enum WindowType {WndHomePage, WndNoteShow, WndSearchEmpty, WndTextEdit};
 protected:
     void initUI();
     void initData();
@@ -49,7 +49,7 @@ public slots:
     void onVNoteSearch();
     void onVNoteFolderDel(VNoteFolder *data);
     void onVNoteFolderAdd();
-    void onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit,const QString &searchKey);
+    void onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QString &searchKey);
     void onTextEditReturn();
     void onSearchEditFocus();
 
@@ -57,8 +57,8 @@ private:
     DSearchEdit *m_noteSearchEdit {nullptr};
     DIconButton *m_returnBtn {nullptr};
 
-    DFloatingButton* m_floatingAddBtn {nullptr};
-    QWidget        * m_leftViewHolder{nullptr};
+    DFloatingButton *m_floatingAddBtn {nullptr};
+    QWidget         *m_leftViewHolder{nullptr};
 
     DSplitter *m_mainWndSpliter {nullptr};
     LeftView   *m_leftView {nullptr};

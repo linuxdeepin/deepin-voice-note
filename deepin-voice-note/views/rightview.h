@@ -21,10 +21,10 @@ public:
     QList<qint64> getNoteContainsKeyFolders(QString key);
 
 signals :
-     void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit,const QString &searchKey);
-     void sigSeachEditFocus();
+    void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QString &searchKey);
+    void sigSeachEditFocus();
 protected:
-    void resizeEvent(QResizeEvent * event);
+    void resizeEvent(QResizeEvent *event);
 private:
     void initUi();
     void initConnection();
@@ -35,14 +35,12 @@ public slots:
     void onAddNote();
     void onDelNote(VNoteItem *item);
     void onUpdateNote(VNoteItem *item);
-    void onTextEditIsEmpty(VNoteItem *textNode,bool empty);
+    void onTextEditIsEmpty(VNoteItem *textNode, bool empty);
 private:
     DPushButton  *m_addTextBtn {nullptr};
     DStackedWidget *m_stackWidget {nullptr};
     QString m_searchKey {""};
-    VNOTE_ITEMS_MAP m_searchNoteData;
     RightNoteList *m_searchNoteList{nullptr};
-    //QMap<qint64,QSharedPointer<VNOTE_ITEMS_MAP>> m_data;
     MyRecodeButtons *m_addVoiceBtn;
 };
 

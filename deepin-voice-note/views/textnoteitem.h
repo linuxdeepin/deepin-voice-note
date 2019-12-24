@@ -22,14 +22,15 @@ class TextNoteItem : public DWidget
     Q_OBJECT
 public:
     explicit TextNoteItem(VNoteItem *textNote, QWidget *parent = nullptr);
-    void highSearchText(const QString &searchKey,const QColor &highColor);
+    void highSearchText(const QString &searchKey, const QColor &highColor);
     VNoteItem *getNoteItem();
     void changeToEdit();
+    void updateData();
 signals:
-    void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit,const QString &searchKey);
+    void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QString &searchKey);
     void sigDelNote(VNoteItem *textNode);
     void sigUpdateNote(VNoteItem *textNode);
-    void sigTextEditIsEmpty(VNoteItem *textNode,bool empty);
+    void sigTextEditIsEmpty(VNoteItem *textNode, bool empty);
 
 public slots:
     void onTextChanged();
@@ -43,13 +44,12 @@ public slots:
 
 private:
     void initUI();
-    void initData();
     void initConnection();
+    void adjustDocMargin();
 protected:
-    void resizeEvent(QResizeEvent * event);
+    void resizeEvent(QResizeEvent *event);
 private:
     DLabel *m_timeLabel {nullptr};
-    DFrame *m_bgWidget {nullptr};
 
     TextNoteEdit *m_textEdit {nullptr};
     VNoteItem *m_textNode {nullptr};

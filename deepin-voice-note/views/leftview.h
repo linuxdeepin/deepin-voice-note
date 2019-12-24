@@ -18,10 +18,10 @@ public:
     LeftView(QWidget *parent = nullptr);
     qint64 getFolderId(const QModelIndex &index);
 
-    void sortView(LeftViewSortFilterModel::OperaType Type = LeftViewSortFilterModel::none,Qt::SortOrder order = Qt::AscendingOrder);
-    void setCreateTimeFilter(const QDateTime &begin, const QDateTime &end,QList<qint64> *whilteList = nullptr);
-    void setUpdateTimeFilter(const QDateTime &begin, const QDateTime &end,QList<qint64> *whilteList = nullptr);
-    void setFolderNameFilter(QString key,QList<qint64> *whilteList = nullptr);
+    void sortView(LeftViewSortFilterModel::OperaType Type = LeftViewSortFilterModel::none, Qt::SortOrder order = Qt::AscendingOrder);
+    void setCreateTimeFilter(const QDateTime &begin, const QDateTime &end, QList<qint64> *whilteList = nullptr);
+    void setUpdateTimeFilter(const QDateTime &begin, const QDateTime &end, QList<qint64> *whilteList = nullptr);
+    void setFolderNameFilter(QString key, QList<qint64> *whilteList = nullptr);
     void clearFilter();
     int loadNoteFolder();
     int getFolderCount();

@@ -28,24 +28,25 @@ void InitEmptyPage::onChangeColor()
     }
     if (nullptr != m_Image) {
         switch (themeType) {
-            case DGuiApplicationHelper::LightType:
-                m_Image->setPixmap(Utils::renderSVG(":/images/icon/icon_import_note.svg",
-                                                    QSize(m_Image->width(), m_Image->height()),
-                                                    qApp));
-                break;
-            case DGuiApplicationHelper::DarkType:
-                m_Image->setPixmap(Utils::renderSVG(":/images/icon_dark/icon_import_note.svg",
-                                                    QSize(m_Image->width(), m_Image->height()),
-                                                    qApp));
-                break;
-            default:
-                break;
+        case DGuiApplicationHelper::LightType:
+            m_Image->setPixmap(Utils::renderSVG(":/images/icon/icon_import_note.svg",
+                                                QSize(m_Image->width(), m_Image->height()),
+                                                qApp));
+            break;
+        case DGuiApplicationHelper::DarkType:
+            m_Image->setPixmap(Utils::renderSVG(":/images/icon_dark/icon_import_note.svg",
+                                                QSize(m_Image->width(), m_Image->height()),
+                                                qApp));
+            break;
+        default:
+            break;
         }
     }
 }
 
 void InitEmptyPage::initUi()
 {
+    this->setLineWidth(0);
     m_PushButton = new DSuggestButton(QString(tr("Create Folder")), this);
     m_PushButton->setFixedSize(QSize(302, 36));
     DFontSizeManager::instance()->bind(m_PushButton, DFontSizeManager::T6);

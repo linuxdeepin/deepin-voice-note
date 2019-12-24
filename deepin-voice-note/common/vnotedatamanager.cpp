@@ -364,3 +364,8 @@ void VNoteDataManager::reqNoteItems()
 
     QThreadPool::globalInstance()->start(m_pNotesLoadThread);
 }
+
+VNOTE_ALL_NOTES_MAP* VNoteDataManager::getAllNotesInFolder()
+{
+    return m_qspAllNotesMap.get();
+}

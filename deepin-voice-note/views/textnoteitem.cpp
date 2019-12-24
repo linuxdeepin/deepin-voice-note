@@ -18,7 +18,7 @@ TextNoteItem::TextNoteItem(VNoteItem *textNote, QWidget *parent)
     , m_textNode(textNote)
 {
     initUI();
-    initData();
+    updateData();
     initConnection();
 }
 
@@ -27,24 +27,17 @@ void TextNoteItem::initUI()
     m_timeLabel = new DLabel(this);
     m_timeLabel->setFixedHeight(16);
     DFontSizeManager::instance()->bind(m_timeLabel, DFontSizeManager::T9);
-
-    m_bgWidget = new DFrame(this);
-    m_bgWidget->setFixedHeight(140);
-    DPalette pb = DApplicationHelper::instance()->palette(m_bgWidget);
-    pb.setBrush(DPalette::Base, pb.color(DPalette::ItemBackground));
-    m_bgWidget->setPalette(pb);
-
     m_textEdit = new TextNoteEdit(this);
     DFontSizeManager::instance()->bind(m_textEdit, DFontSizeManager::T8);
-    m_textEdit->setFixedHeight(133);
+    m_textEdit->setFixedHeight(140);
     m_textEdit->setLineWidth(0);
-    pb = DApplicationHelper::instance()->palette(m_textEdit);
-    pb.setBrush(DPalette::Base, QColor(0, 0, 0, 0));
+    DPalette pb = DApplicationHelper::instance()->palette(m_textEdit);
+    pb.setBrush(DPalette::Button, pb.color(DPalette::ItemBackground));
     m_textEdit->setPalette(pb);
     m_textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_textEdit->document()->setDocumentMargin(1);
+    m_textEdit->document()->setDocumentMargin(10);
     m_textEdit->setFrameShape(QFrame::NoFrame);
-    m_textEditFormat = m_textEdit->currentCharFormat();
+    m_textEditFormat =  m_textEdit->currentCharFormat();
 
     DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
     if (themeType == DGuiApplicationHelper::LightType) {
@@ -75,16 +68,16 @@ void TextNoteItem::initUI()
     m_contextMenu->addAction(m_delAction);
 
     QVBoxLayout *btnLayout = new QVBoxLayout;
-    btnLayout->setContentsMargins(0, 10, 10, 0);
+    btnLayout->setContentsMargins(0, 15, 10, 0);
+    btnLayout->setSpacing(0);
     btnLayout->setSizeConstraint(QLayout::SetNoConstraint);
     btnLayout->addWidget(m_menuBtn);
-    btnLayout->addSpacing(30);
+    btnLayout->addSpacing(23);
     btnLayout->addWidget(m_detailBtn);
 
     QGridLayout *bglayout = new QGridLayout;
     bglayout->addWidget(m_timeLabel, 0, 0);
-    bglayout->addWidget(m_bgWidget, 1, 0, 3, 3);
-    bglayout->addWidget(m_textEdit, 1, 0, 3, 2);
+    bglayout->addWidget(m_textEdit, 1, 0, 3, 3);
     bglayout->addLayout(btnLayout, 1, 2, 1, 1);
     bglayout->setRowStretch(0, 1);
     bglayout->setRowStretch(1, 1);
@@ -93,12 +86,12 @@ void TextNoteItem::initUI()
     bglayout->setColumnStretch(1, 1);
     bglayout->setColumnStretch(2, 0);
     bglayout->setMargin(0);
-
     bglayout->setSizeConstraint(QLayout::SetNoConstraint);
+    bglayout->setContentsMargins(0, 6, 0, 0);
     this->setLayout(bglayout);
 }
 
-void TextNoteItem::initData()
+void TextNoteItem::updateData()
 {
     if (m_textNode != nullptr) {
         m_timeLabel->setText("  " + Utils::convertDateTime(m_textNode->createTime));
@@ -121,17 +114,20 @@ void TextNoteItem::initConnection()
 
 void TextNoteItem::onTextChanged()
 {
-     QTimer::singleShot(0, this, [=]{
+    adjustDocMargin();
+    QTimer::singleShot(0, this, [ = ] {
         int textEditHeight = m_textEdit->height();
         QTextDocument *document = m_textEdit->document();
         int documentHeight = static_cast<int>(document->size().height());
-        if (textEditHeight < documentHeight - 3) {
+        if (textEditHeight < documentHeight - 3)
+        {
             m_detailBtn->setVisible(true);
-        } else {
+        } else
+        {
             m_detailBtn->setVisible(false);
         }
         emit sigTextEditIsEmpty(m_textNode, document->isEmpty());
-     });
+    });
 }
 
 void TextNoteItem::onshowDetail()
@@ -194,6 +190,7 @@ void TextNoteItem::onMenuPop()
     QPoint pos = QCursor::pos();
     pos.setX(pos.x() - 44);
     pos.setY(pos.y() + 20);
+
     m_contextMenu->exec(pos);
 }
 
@@ -220,9 +217,9 @@ void TextNoteItem::changeToEdit()
 }
 void TextNoteItem::onChangeTheme()
 {
-    DPalette pb = DApplicationHelper::instance()->palette(m_bgWidget);
-    pb.setBrush(DPalette::Base, pb.color(DPalette::ItemBackground));
-    m_bgWidget->setPalette(pb);
+    DPalette pb = DApplicationHelper::instance()->palette(m_textEdit);
+    pb.setBrush(DPalette::Button, pb.color(DPalette::ItemBackground));
+    m_textEdit->setPalette(pb);
 
     DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
 
@@ -259,4 +256,18 @@ void TextNoteItem::resizeEvent(QResizeEvent *event)
 {
     onTextChanged();
     DWidget::resizeEvent(event);
+}
+
+void TextNoteItem::adjustDocMargin()
+{
+    QTextDocument *document = m_textEdit->document();
+    for (QTextBlock it = document->begin(); it != document->end(); it = it.next()) {
+        QTextCursor textCursor(it);
+        QTextBlockFormat textBlockFormat = it.blockFormat();
+        int right = static_cast<int>(textBlockFormat.rightMargin());
+        if (right != 50) {
+            textBlockFormat.setRightMargin(50);
+            textCursor.setBlockFormat(textBlockFormat);
+        }
+    }
 }

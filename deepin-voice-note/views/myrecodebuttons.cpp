@@ -17,14 +17,14 @@ MyRecodeButtons::~MyRecodeButtons()
 
 }
 
-void MyRecodeButtons::setPicChange(QString normal,QString press,QString hover, QString disable, QString foucs)
+void MyRecodeButtons::setPicChange(QString normal, QString press, QString hover, QString disable, QString foucs)
 {
     //Intancer::get_Intancer()->getApp()
-    m_normal = Utils::renderSVG(normal, QSize(this->width(), this->height()),qApp);
-    m_press = Utils::renderSVG(press, QSize(this->width(), this->height()),qApp);
-    m_hover = Utils::renderSVG(hover, QSize(this->width(), this->height()),qApp);
-    m_disable = Utils::renderSVG(disable, QSize(this->width(), this->height()),qApp);
-    m_foucs = Utils::renderSVG(foucs, QSize(this->width(), this->height()),qApp);
+    m_normal = Utils::renderSVG(normal, QSize(this->width(), this->height()), qApp);
+    m_press = Utils::renderSVG(press, QSize(this->width(), this->height()), qApp);
+    m_hover = Utils::renderSVG(hover, QSize(this->width(), this->height()), qApp);
+    m_disable = Utils::renderSVG(disable, QSize(this->width(), this->height()), qApp);
+    m_foucs = Utils::renderSVG(foucs, QSize(this->width(), this->height()), qApp);
 }
 
 void MyRecodeButtons::DisableBtn()
@@ -51,25 +51,18 @@ void MyRecodeButtons::paintEvent(QPaintEvent *event)
     QPainter painter(this);
 
     painter.setRenderHints(QPainter::HighQualityAntialiasing |
-                            QPainter::SmoothPixmapTransform |
-                            QPainter::Antialiasing);
-    if(m_isDisabled)
-    {
+                           QPainter::SmoothPixmapTransform |
+                           QPainter::Antialiasing);
+    if (m_isDisabled) {
         //disable
         painter.drawPixmap(rect(), m_disable);
-    }
-    else if(!m_isIn && !m_isDisabled)
-    {
+    } else if (!m_isIn && !m_isDisabled) {
         //Normal
         painter.drawPixmap(rect(), m_normal);
-    }
-    else if(!m_isPressed && m_isIn)
-    {
+    } else if (!m_isPressed && m_isIn) {
         //hover
         painter.drawPixmap(rect(), m_hover);
-    }
-    else if(m_isPressed && m_isIn)
-    {
+    } else if (m_isPressed && m_isIn) {
         //press
         painter.drawPixmap(rect(), m_press);
     }
@@ -94,8 +87,7 @@ void MyRecodeButtons::enterEvent(QEvent *event)
 {
     DPushButton::enterEvent(event);
     m_isIn = true;
-    if(m_isDisabled)
-    {
+    if (m_isDisabled) {
         emit sigHoverd();
     }
 }

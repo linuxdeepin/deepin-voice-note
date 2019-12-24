@@ -148,6 +148,7 @@ void LeftView::clearFilter()
 {
     m_pSortFilterModel->clearFilter();
     m_pItemDelegate->resetKeyword();
+    this->reset();
     QModelIndex index = m_pSortFilterModel->index(0, 0);
     this->setCurrentIndex(index);
 }

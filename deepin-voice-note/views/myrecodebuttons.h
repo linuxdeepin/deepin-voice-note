@@ -5,7 +5,7 @@
 #include <DPushButton>
 
 DWIDGET_USE_NAMESPACE
-enum BUTTON_STATE {NORMAL=0, HOVER=1, PRESS=2, DISABLE=3, FOUCS=4};
+enum BUTTON_STATE {NORMAL = 0, HOVER = 1, PRESS = 2, DISABLE = 3, FOUCS = 4};
 
 class MyRecodeButtons : public DPushButton
 {

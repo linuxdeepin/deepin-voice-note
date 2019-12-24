@@ -39,8 +39,7 @@ void LeftViewSortFilterModel::setFolderNameFilter(QString key, QList<qint64> *wh
     if (whilteList != nullptr) {
         m_whilteList = *whilteList;
     }
-    if(!key.isEmpty())
-    {
+    if (!key.isEmpty()) {
         m_folderNameKey = key;
     }
     invalidateFilter();
@@ -68,14 +67,14 @@ bool LeftViewSortFilterModel::lessThan(const QModelIndex &source_left,
         QVariant var_right = source_right.data(Qt::UserRole + 1);
         VNoteFolder *data_right = static_cast<VNoteFolder *>(var_right.value<void *>());
         switch (m_sortType) {
-            case folderName:
-                return data_left->name < data_right->name;
-            case createTime:
-                return data_left->createTime < data_right->createTime;
-            case modifyTime:
-                return data_left->modifyTime < data_right->modifyTime;
-            default:
-                break;
+        case folderName:
+            return data_left->name < data_right->name;
+        case createTime:
+            return data_left->createTime < data_right->createTime;
+        case modifyTime:
+            return data_left->modifyTime < data_right->modifyTime;
+        default:
+            break;
         }
     }
     return QSortFilterProxyModel::lessThan(source_left, source_right);
@@ -97,14 +96,14 @@ bool LeftViewSortFilterModel::filterAcceptsRow(int source_row,
             }
         }
         switch (m_filterType) {
-            case folderName:
-                return data->name.contains(m_folderNameKey);
-            case createTime:
-                return data->createTime >= m_beginTime && data->createTime <= m_endTime;
-            case modifyTime:
-                return data->modifyTime >= m_beginTime && data->modifyTime <= m_endTime;
-            default:
-                break;
+        case folderName:
+            return data->name.contains(m_folderNameKey);
+        case createTime:
+            return data->createTime >= m_beginTime && data->createTime <= m_endTime;
+        case modifyTime:
+            return data->modifyTime >= m_beginTime && data->modifyTime <= m_endTime;
+        default:
+            break;
         }
     }
     return true;
