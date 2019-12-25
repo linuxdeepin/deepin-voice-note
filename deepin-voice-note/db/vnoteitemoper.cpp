@@ -35,6 +35,9 @@ VNOTE_ALL_NOTES_MAP *VNoteItemOper::loadAllVNotes()
 
     VNOTE_ALL_NOTES_MAP * notesMap = new VNOTE_ALL_NOTES_MAP();
 
+    //DataManager data should set autoRelease flag
+    notesMap->autoRelease = true;
+
     static struct timeval start,backups, end;
 
     gettimeofday(&start, nullptr);

@@ -17,6 +17,11 @@ struct VNOTE_FOLDERS_MAP {
 
     VNOTE_FOLDERS_DATA_MAP folders;
     QReadWriteLock lock;
+
+    //TODO:
+    //    Release data if true when destructor is called.
+    //Only can be set TRUE in data manager
+    bool autoRelease {false};
 };
 
 struct VNOTE_ITEMS_MAP {
@@ -24,6 +29,11 @@ struct VNOTE_ITEMS_MAP {
 
     VNOTE_ITEMS_DATA_MAP folderNotes;
     QReadWriteLock lock;
+
+    //TODO:
+    //    Release data if true when destructor is called.
+    //Only can be set TRUE in data manager
+    bool autoRelease {false};
 };
 
 struct VNOTE_ALL_NOTES_MAP {
@@ -31,6 +41,11 @@ struct VNOTE_ALL_NOTES_MAP {
 
     VNOTE_ALL_NOTES_DATA_MAP notes;
     QReadWriteLock lock;
+
+    //TODO:
+    //    Release data if true when destructor is called.
+    //Only can be set TRUE in data manager
+    bool autoRelease {false};
 };
 
 static QStringList default_FolderData_imgpath =

@@ -125,6 +125,9 @@ VNOTE_FOLDERS_MAP *VNoteFolderOper::loadVNoteFolders()
 
     VNOTE_FOLDERS_MAP * foldersMap = new VNOTE_FOLDERS_MAP();
 
+    //DataManager should set autoRelease flag
+    foldersMap->autoRelease = true;
+
     FolderQryDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), foldersMap);
 
     if (!VNoteDbManager::instance()->queryData(

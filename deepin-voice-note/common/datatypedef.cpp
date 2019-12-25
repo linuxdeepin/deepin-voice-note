@@ -2,29 +2,43 @@
 #include "common/vnoteforlder.h"
 #include "common/vnoteitem.h"
 
+#include <DLog>
+
 VNOTE_FOLDERS_MAP::~VNOTE_FOLDERS_MAP()
 {
-    for (auto it : folders) {
-        delete  reinterpret_cast<VNoteFolder*>(it);
-    }
+    if (autoRelease) {
+        qInfo() << __FUNCTION__ << "Auto release folders";
 
-    folders.clear();
+        for (auto it : folders) {
+            delete  reinterpret_cast<VNoteFolder*>(it);
+        }
+
+        folders.clear();
+    }
 }
 
 VNOTE_ITEMS_MAP::~VNOTE_ITEMS_MAP()
 {
-    for (auto it : folderNotes) {
-        delete  reinterpret_cast<VNoteItem*>(it);
-    }
+    if (autoRelease) {
+        qInfo() << __FUNCTION__ << "Auto release folder notes";
 
-    folderNotes.clear();
+        for (auto it : folderNotes) {
+            delete  reinterpret_cast<VNoteItem*>(it);
+        }
+
+        folderNotes.clear();
+    }
 }
 
 VNOTE_ALL_NOTES_MAP::~VNOTE_ALL_NOTES_MAP()
 {
-    for (auto it : notes) {
-        delete  reinterpret_cast<VNOTE_ITEMS_MAP*>(it);
-    }
+    if (autoRelease) {
+        qInfo() << __FUNCTION__ << "Auto release all notes in folders ";
 
-    notes.clear();
+        for (auto it : notes) {
+            delete  reinterpret_cast<VNOTE_ITEMS_MAP*>(it);
+        }
+
+        notes.clear();
+    }
 }

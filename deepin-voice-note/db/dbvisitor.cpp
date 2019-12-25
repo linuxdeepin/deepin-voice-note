@@ -107,6 +107,9 @@ bool NoteQryDbVisitor::visitorData()
             } else {
                 VNOTE_ITEMS_MAP* folderNotes = new VNOTE_ITEMS_MAP();
 
+                //DataManager data should set autoRelease flag
+                folderNotes->autoRelease = true;
+
                 folderNotes->folderNotes.insert(note->noteId, note);
                 results.notes->notes.insert(note->folderId, folderNotes);
             }

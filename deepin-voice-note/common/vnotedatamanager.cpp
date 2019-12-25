@@ -17,7 +17,7 @@ VNoteDataManager* VNoteDataManager::_instance = nullptr;
 VNoteDataManager::VNoteDataManager(QObject *parent)
     : QObject(parent)
 {
-    m_qspNoteFoldersMap.reset(new VNOTE_FOLDERS_MAP());
+
 }
 
 VNoteDataManager* VNoteDataManager::instance()
@@ -157,9 +157,13 @@ VNoteItem *VNoteDataManager::addNote(VNoteItem *note)
 
             notesInFolder->lock.unlock();
         } else {
-            qCritical() << "Add note faild: the folder don't exist:" << note->folderId;
+            qInfo() << __FUNCTION__ << "Add note faild: the folder don't exist:" << note->folderId;
 
             VNOTE_ITEMS_MAP *folderNotes = new VNOTE_ITEMS_MAP();
+
+            //Set release flag true in data manager
+            folderNotes->autoRelease = true;
+
             folderNotes->folderNotes.insert(note->noteId, note);
             m_qspAllNotesMap->notes.insert(note->folderId, folderNotes);
         }
@@ -200,7 +204,7 @@ VNoteItem *VNoteDataManager::getNote(qint64 folderId, qint32 noteId)
 
         notesInFolder->lock.unlock();
     } else {
-        qCritical() << "Get note faild: the folder don't exist:" << folderId;
+        qCritical() << __FUNCTION__ << "Get note faild: the folder don't exist:" << folderId;
     }
 
     m_qspAllNotesMap->lock.unlock();
@@ -237,7 +241,7 @@ VNoteItem *VNoteDataManager::delNote(qint64 folderId, qint32 noteId)
 
         notesInFolder->lock.unlock();
     } else {
-        qCritical() << "Delete note faild: the folder don't exist:" << folderId;
+        qCritical() << __FUNCTION__ << "Delete note faild: the folder don't exist:" << folderId;
     }
 
     m_qspAllNotesMap->lock.unlock();
@@ -257,9 +261,9 @@ VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
     if (it != m_qspAllNotesMap->notes.end()) {
         folderNotes = *it;
     } else {
-        qInfo() << "Get note faild: the folder don't exist:" << folderId;
-        folderNotes = new VNOTE_ITEMS_MAP();
-        m_qspAllNotesMap->notes.insert(folderId, folderNotes);
+        qInfo() << __FUNCTION__ << "Get note faild: the folder don't exist:" << folderId;
+//        folderNotes = new VNOTE_ITEMS_MAP();
+//        m_qspAllNotesMap->notes.insert(folderId, folderNotes);
     }
 
     m_qspAllNotesMap->lock.unlock();
