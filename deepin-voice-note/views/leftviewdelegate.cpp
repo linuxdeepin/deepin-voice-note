@@ -37,7 +37,7 @@ struct VFolderNamePHelper {
         PenCount
     };
 
-    void spiltByKeyword(const QString &text, const QString &keyword);
+    void spiltByKeyword(const QString &text, const QRegExp &keyword);
     void paintFolderName(bool isSelected = false);
 
     QVector<Text> m_textsVector;
@@ -47,13 +47,13 @@ struct VFolderNamePHelper {
     QPainter*    m_painter {nullptr};
 };
 
-void VFolderNamePHelper::spiltByKeyword(const QString &text, const QString &keyword)
+void VFolderNamePHelper::spiltByKeyword(const QString &text, const QRegExp &keyword)
 {
     //Check if text exceed the name rect, elide the
     //text first
     QString elideText = m_fontMetrics.elidedText(text,Qt::ElideRight, m_nameRect.width());
 
-    int keyLen = keyword.length();
+    int keyLen = keyword.pattern().length();
     int textLen = text.length();
     int startPos = 0;
     int pos = 0;
@@ -193,14 +193,14 @@ void LeftViewDelegate::handleChangeTheme()
     m_parentView->update(m_parentView->currentIndex());
 }
 
-void LeftViewDelegate::updateSearchKeyword(const QString &keyword)
+void LeftViewDelegate::updateSearchKeyword(const QRegExp &keyword)
 {
     m_searchKeyword = keyword;
 }
 
 void LeftViewDelegate::resetKeyword()
 {
-    m_searchKeyword.clear();
+    m_searchKeyword = QRegExp();
 }
 
 void LeftViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,

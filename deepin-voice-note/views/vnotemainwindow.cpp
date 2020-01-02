@@ -154,14 +154,18 @@ void VNoteMainWindow::onVNoteFoldersLoaded()
 void VNoteMainWindow::onVNoteSearch()
 {
     QString strKey = m_noteSearchEdit->text();
-    m_rightViewHolder->setSearchKey(strKey);
-    if (!strKey.isEmpty()) {
-        QList<qint64> folders = m_rightViewHolder->getNoteContainsKeyFolders(strKey);
-        m_leftView->setFolderNameFilter(strKey, &folders);
-        qDebug() << "id size:" << folders;
-    } else {
-        m_leftView->clearFilter();
-        switchView(WndNoteShow);
+    QRegExp regExp;
+    if(!strKey.isEmpty()){
+        regExp.setPattern(strKey);
+        regExp.setCaseSensitivity(Qt::CaseInsensitive);
+        m_rightViewHolder->setSearchKey(regExp);
+        QList<qint64> folders = m_rightViewHolder->getNoteContainsKeyFolders(regExp);
+        m_leftView->setFolderNameFilter(regExp, &folders);
+    }
+    else {
+         m_rightViewHolder->setSearchKey(regExp);
+         m_leftView->clearFilter();
+         switchView(WndNoteShow);
     }
 }
 
@@ -192,6 +196,7 @@ void VNoteMainWindow::onVNoteFolderDel(VNoteFolder *data)
 void VNoteMainWindow::initTextEditDetailView()
 {
     m_textEditMainWnd = new DTextEdit(this);
+    DStyle::setFocusRectVisible(m_textEditMainWnd, false);
     DFontSizeManager::instance()->bind(m_textEditMainWnd, DFontSizeManager::T8);
     m_textEditFormat = m_textEditMainWnd->currentCharFormat();
 }
@@ -244,14 +249,14 @@ void VNoteMainWindow::onVNoteFolderAdd()
     m_floatingAddBtn->clicked();
 }
 
-void VNoteMainWindow::onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QString &searchKey)
+void VNoteMainWindow::onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey)
 {
     m_textNode = textNode;
     m_textEditRightView = preTextEdit;
     QTextCursor cursorSrc = preTextEdit->textCursor();
     m_textEditMainWnd->setText(textNode->noteText);
     if (!searchKey.isEmpty()) {
-        Utils::highTextEdit(m_textEditMainWnd, &m_textEditFormat, searchKey, Qt::red);
+        Utils::highTextEdit(m_textEditMainWnd, m_textEditFormat, searchKey, QColor(0x349ae8));
     }
     QTextCursor cursordst = m_textEditMainWnd->textCursor();
     cursordst.setPosition(cursorSrc.position());

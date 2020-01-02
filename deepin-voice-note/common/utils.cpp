@@ -44,12 +44,12 @@ QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplicatio
 
     return pixmap;
 }
-int Utils::highTextEdit(DTextEdit *textEdit, const QTextCharFormat *oriFormat,const QString &searchKey,
+int Utils::highTextEdit(DTextEdit *textEdit, const QTextCharFormat &oriFormat,const QRegExp &searchKey,
                          const QColor &highColor)
 {
     int findCount = 0;
     QTextCursor find_cursor = textEdit->textCursor();
-    QTextCharFormat colorFormat = *oriFormat;
+    QTextCharFormat colorFormat = oriFormat;
     colorFormat.setForeground(highColor);
     while (textEdit->find(searchKey)) {
         find_cursor.movePosition(QTextCursor::WordRight,QTextCursor::KeepAnchor);
@@ -60,7 +60,7 @@ int Utils::highTextEdit(DTextEdit *textEdit, const QTextCharFormat *oriFormat,co
         find_cursor.clearSelection();
         find_cursor.movePosition(QTextCursor::EndOfWord);
         textEdit->setTextCursor(find_cursor);
-        textEdit->setCurrentCharFormat(*oriFormat);
+        textEdit->setCurrentCharFormat(oriFormat);
     }
     return  findCount;
 }

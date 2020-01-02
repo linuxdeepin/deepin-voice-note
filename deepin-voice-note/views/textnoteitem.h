@@ -22,12 +22,12 @@ class TextNoteItem : public DWidget
     Q_OBJECT
 public:
     explicit TextNoteItem(VNoteItem *textNote, QWidget *parent = nullptr);
-    void highSearchText(const QString &searchKey, const QColor &highColor);
+    void highSearchText(const QRegExp &searchKey, const QColor &highColor);
     VNoteItem *getNoteItem();
     void changeToEdit();
     void updateData();
 signals:
-    void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QString &searchKey);
+    void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
     void sigDelNote(VNoteItem *textNode);
     void sigUpdateNote(VNoteItem *textNode);
     void sigTextEditIsEmpty(VNoteItem *textNode, bool empty);
@@ -59,7 +59,7 @@ private:
     DMenu *m_contextMenu {nullptr};
     QAction *m_saveAsAction {nullptr};
     QAction *m_delAction{nullptr};
-    QString  m_searchKey {""};
+    QRegExp m_searchKey;
     QTextCharFormat m_textEditFormat;
 };
 

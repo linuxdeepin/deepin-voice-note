@@ -23,7 +23,7 @@ void RightNoteList::initConnection()
     ;
 }
 
-void RightNoteList::initNoteItem(qint64 folderid, VNOTE_ITEMS_MAP *mapNoteData, QString serachKey)
+void RightNoteList::initNoteItem(qint64 folderid, VNOTE_ITEMS_MAP *mapNoteData, const QRegExp &searchKey)
 {
     while (this->count()) {
         QListWidgetItem *item = this->takeItem(0);
@@ -36,17 +36,17 @@ void RightNoteList::initNoteItem(qint64 folderid, VNOTE_ITEMS_MAP *mapNoteData, 
     if (mapNoteData != nullptr) {
         mapNoteData->lock.lockForRead();
         for (auto &it : mapNoteData->folderNotes) {
-            addNodeItem(it, serachKey);
+            addNodeItem(it, searchKey);
         }
         mapNoteData->lock.unlock();
     }
 }
 
-void RightNoteList::addNodeItem(VNoteItem *item, QString key, bool isBtnAdd)
+void RightNoteList::addNodeItem(VNoteItem *item, const QRegExp &searchKey, bool isBtnAdd)
 {
     if (item->noteType == VNoteItem::VNOTE_TYPE::VNT_Text) {
         TextNoteItem *textItem = new TextNoteItem(item, this);
-        textItem->highSearchText(key, QColor(0x349ae8));
+        textItem->highSearchText(searchKey, QColor(0x349ae8));
         QListWidgetItem *item = new QListWidgetItem();
         item->setFlags(Qt::NoItemFlags);
         item->setSizeHint(QSize(this->width(),  textItem->height()));
@@ -54,7 +54,7 @@ void RightNoteList::addNodeItem(VNoteItem *item, QString key, bool isBtnAdd)
         this->setItemWidget(item, textItem);
         connect(textItem, SIGNAL(sigDelNote(VNoteItem *)), this, SIGNAL(sigDelNote(VNoteItem *)));
         connect(textItem, SIGNAL(sigUpdateNote(VNoteItem *)), this, SIGNAL(sigUpdateNote(VNoteItem *)));
-        connect(textItem, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *, const QString &)), this, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *, const QString &)));
+        connect(textItem, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *,const QRegExp &)), this, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *, const QRegExp &)));
         connect(textItem, SIGNAL(sigTextEditIsEmpty(VNoteItem *, bool)), this, SIGNAL(sigTextEditIsEmpty(VNoteItem *, bool)));
         if (isBtnAdd) {
             textItem->changeToEdit();

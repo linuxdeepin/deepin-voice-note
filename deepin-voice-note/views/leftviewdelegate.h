@@ -26,7 +26,7 @@ signals:
 
 public:
     void handleChangeTheme();
-    void updateSearchKeyword(const QString &keyword);
+    void updateSearchKeyword(const QRegExp &keyword);
     void resetKeyword();
 
 private:
@@ -34,7 +34,7 @@ private:
     DPalette m_parentPb;
 
     //Search keyword
-    QString m_searchKeyword;
+    QRegExp m_searchKeyword;
 };
 
 #endif // LEFTVIEWDELEGATE_H

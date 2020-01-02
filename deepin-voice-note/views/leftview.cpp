@@ -135,10 +135,10 @@ void LeftView::setUpdateTimeFilter(const QDateTime &begin, const QDateTime &end,
     this->setCurrentIndex(nowIndex);
 }
 
-void LeftView::setFolderNameFilter(QString key, QList<qint64> *whilteList)
+void LeftView::setFolderNameFilter(const QRegExp &searchKey, QList<qint64> *whilteList)
 {
-    m_pSortFilterModel->setFolderNameFilter(key, whilteList);
-    m_pItemDelegate->updateSearchKeyword(key);
+    m_pSortFilterModel->setFolderNameFilter(searchKey, whilteList);
+    m_pItemDelegate->updateSearchKeyword(searchKey);
     QModelIndex nowIndex = m_pSortFilterModel->index(0, 0);
     this->reset();
     this->setCurrentIndex(nowIndex);

@@ -49,7 +49,7 @@ public slots:
     void onVNoteSearch();
     void onVNoteFolderDel(VNoteFolder *data);
     void onVNoteFolderAdd();
-    void onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QString &searchKey);
+    void onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
     void onTextEditReturn();
     void onSearchEditFocus();
 

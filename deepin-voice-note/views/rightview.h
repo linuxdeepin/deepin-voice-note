@@ -8,6 +8,8 @@
 
 #include <DPushButton>
 #include <DStackedWidget>
+#include <DLabel>
+
 DWIDGET_USE_NAMESPACE
 
 class RightView : public DWidget
@@ -17,11 +19,11 @@ public:
     explicit RightView(QWidget *parent = nullptr);
     void noteSwitchByFolder(qint64 id);
     void noteDelByFolder(qint64 id);
-    void setSearchKey(QString key);
-    QList<qint64> getNoteContainsKeyFolders(QString key);
+    void setSearchKey(const QRegExp &searchKey);
+    QList<qint64> getNoteContainsKeyFolders(const QRegExp &searchKey);
 
 signals :
-    void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QString &searchKey);
+    void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
     void sigSeachEditFocus();
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -39,9 +41,10 @@ public slots:
 private:
     DPushButton  *m_addTextBtn {nullptr};
     DStackedWidget *m_stackWidget {nullptr};
-    QString m_searchKey {""};
+    QRegExp m_searchKey;
     RightNoteList *m_searchNoteList{nullptr};
     MyRecodeButtons *m_addVoiceBtn;
+    DLabel *m_noSearchResult {nullptr};
 };
 
 #endif // RIGHTVIEW_H

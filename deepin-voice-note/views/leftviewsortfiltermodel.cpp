@@ -33,14 +33,14 @@ void LeftViewSortFilterModel::setModifyTimeFilter(const QDateTime &begin, const 
     invalidateFilter();
 }
 
-void LeftViewSortFilterModel::setFolderNameFilter(QString key, QList<qint64> *whilteList)
+void LeftViewSortFilterModel::setFolderNameFilter(const QRegExp &searchKey, QList<qint64> *whilteList)
 {
     m_filterType = folderName;
     if (whilteList != nullptr) {
         m_whilteList = *whilteList;
     }
-    if (!key.isEmpty()) {
-        m_folderNameKey = key;
+    if (!searchKey.isEmpty()) {
+        m_folderNameKey = searchKey;
     }
     invalidateFilter();
 }

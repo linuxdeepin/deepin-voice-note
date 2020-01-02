@@ -16,8 +16,13 @@ signals:
 public slots:
 
 private:
+    void leaveEvent(QEvent *event) override;
+    void enterEvent(QEvent *event) override;
     void focusInEvent(QFocusEvent *e) override;
     void focusOutEvent(QFocusEvent *e) override;
+    void contextMenuEvent(QContextMenuEvent *e) override;//3699
+private:
+    bool m_menuPop {false};
 };
 
 #endif // TEXTNOTEEDIT_H

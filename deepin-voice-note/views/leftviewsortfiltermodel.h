@@ -14,7 +14,7 @@ public:
                              QList<qint64> *whilteList = nullptr);
     void setModifyTimeFilter(const QDateTime &begin, const QDateTime &end,
                              QList<qint64> *whilteList = nullptr);
-    void setFolderNameFilter(QString key, QList<qint64> *whilteList = nullptr);
+    void setFolderNameFilter(const QRegExp &searchKey, QList<qint64> *whilteList = nullptr);
     void clearFilter();
 
 protected:
@@ -27,7 +27,7 @@ private:
     QDateTime m_beginTime;
     QDateTime m_endTime;
     QList<qint64> m_whilteList;
-    QString  m_folderNameKey {""};
+    QRegExp  m_folderNameKey;
 };
 
 #endif  // LEFTVIEWSORTFILTERMODEL_H

@@ -15,8 +15,8 @@ class RightNoteList : public DListWidget
     Q_OBJECT
 public:
     explicit RightNoteList(QWidget *parent = nullptr);
-    void initNoteItem(qint64 folderid, VNOTE_ITEMS_MAP *mapNoteData, QString serachKey = "");
-    void addNodeItem(VNoteItem *item, QString key = "", bool isBtnAdd = false);
+    void initNoteItem(qint64 folderid, VNOTE_ITEMS_MAP *mapNoteData, const QRegExp &searchKey);
+    void addNodeItem(VNoteItem *item, const QRegExp &searchKey, bool isBtnAdd = false);
     void delNodeItem(VNoteItem *item);
     void updateNodeItem(VNoteItem *item);
 
@@ -24,7 +24,7 @@ public:
     qint64 getFolderId();
 
 signals:
-    void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QString &searchKey);
+    void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
     void sigDelNote(VNoteItem *textNode);
     void sigUpdateNote(VNoteItem *textNode);
     void sigTextEditIsEmpty(VNoteItem *textNode, bool empty);

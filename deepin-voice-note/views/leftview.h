@@ -21,7 +21,7 @@ public:
     void sortView(LeftViewSortFilterModel::OperaType Type = LeftViewSortFilterModel::none, Qt::SortOrder order = Qt::AscendingOrder);
     void setCreateTimeFilter(const QDateTime &begin, const QDateTime &end, QList<qint64> *whilteList = nullptr);
     void setUpdateTimeFilter(const QDateTime &begin, const QDateTime &end, QList<qint64> *whilteList = nullptr);
-    void setFolderNameFilter(QString key, QList<qint64> *whilteList = nullptr);
+    void setFolderNameFilter(const QRegExp &searchKey, QList<qint64> *whilteList = nullptr);
     void clearFilter();
     int loadNoteFolder();
     int getFolderCount();

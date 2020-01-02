@@ -31,9 +31,6 @@ void TextNoteItem::initUI()
     DFontSizeManager::instance()->bind(m_textEdit, DFontSizeManager::T8);
     m_textEdit->setFixedHeight(140);
     m_textEdit->setLineWidth(0);
-    DPalette pb = DApplicationHelper::instance()->palette(m_textEdit);
-    pb.setBrush(DPalette::Button, pb.color(DPalette::ItemBackground));
-    m_textEdit->setPalette(pb);
     m_textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_textEdit->document()->setDocumentMargin(10);
     m_textEdit->setFrameShape(QFrame::NoFrame);
@@ -119,7 +116,7 @@ void TextNoteItem::onTextChanged()
         int textEditHeight = m_textEdit->height();
         QTextDocument *document = m_textEdit->document();
         int documentHeight = static_cast<int>(document->size().height());
-        if (textEditHeight < documentHeight - 3)
+        if (textEditHeight < documentHeight - 10)
         {
             m_detailBtn->setVisible(true);
         } else
@@ -194,10 +191,10 @@ void TextNoteItem::onMenuPop()
     m_contextMenu->exec(pos);
 }
 
-void TextNoteItem::highSearchText(const QString &searchKey, const QColor &highColor)
+void TextNoteItem::highSearchText(const QRegExp &searchKey, const QColor &highColor)
 {
     if (!searchKey.isEmpty()) {
-        if (Utils::highTextEdit(m_textEdit, &m_textEditFormat, searchKey, highColor)) {
+        if (Utils::highTextEdit(m_textEdit, m_textEditFormat, searchKey, highColor)) {
             m_searchKey = searchKey;
         }
     }
@@ -219,6 +216,7 @@ void TextNoteItem::onChangeTheme()
 {
     DPalette pb = DApplicationHelper::instance()->palette(m_textEdit);
     pb.setBrush(DPalette::Button, pb.color(DPalette::ItemBackground));
+    pb.setBrush(DPalette::Text,pb.color(DPalette::Active,DPalette::WindowText));
     m_textEdit->setPalette(pb);
 
     DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
@@ -265,8 +263,10 @@ void TextNoteItem::adjustDocMargin()
         QTextCursor textCursor(it);
         QTextBlockFormat textBlockFormat = it.blockFormat();
         int right = static_cast<int>(textBlockFormat.rightMargin());
-        if (right != 50) {
+        int height = static_cast<int>(textBlockFormat.lineHeight());
+        if (right != 50 || height != 26) {
             textBlockFormat.setRightMargin(50);
+            textBlockFormat.setLineHeight(26, QTextBlockFormat::FixedHeight);
             textCursor.setBlockFormat(textBlockFormat);
         }
     }
