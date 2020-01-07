@@ -23,6 +23,7 @@ public:
     void setUpdateTimeFilter(const QDateTime &begin, const QDateTime &end, QList<qint64> *whilteList = nullptr);
     void setFolderNameFilter(const QRegExp &searchKey, QList<qint64> *whilteList = nullptr);
     void clearFilter();
+    void removeFromWhiteList(qint64 id);
     int loadNoteFolder();
     int getFolderCount();
 

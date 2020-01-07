@@ -52,6 +52,7 @@ void VNoteMainWindow::initConnections()
             &VNoteMainWindow::onTextEditDetail);
     connect(m_returnBtn, &DIconButton::clicked, this, &VNoteMainWindow::onTextEditReturn);
     connect(m_rightViewHolder, &RightView::sigSeachEditFocus, this, &VNoteMainWindow::onSearchEditFocus);
+    connect(m_rightViewHolder, &RightView::sigSearchNoteEmpty, this, &VNoteMainWindow::onSearchNoteEmpty);
 }
 
 void VNoteMainWindow::initShortcuts() {}
@@ -155,17 +156,24 @@ void VNoteMainWindow::onVNoteSearch()
 {
     QString strKey = m_noteSearchEdit->text();
     QRegExp regExp;
-    if(!strKey.isEmpty()){
+    WindowType type = static_cast<WindowType>(m_centerWidget->currentIndex());
+    if (!strKey.isEmpty()) {
         regExp.setPattern(strKey);
         regExp.setCaseSensitivity(Qt::CaseInsensitive);
-        m_rightViewHolder->setSearchKey(regExp);
-        QList<qint64> folders = m_rightViewHolder->getNoteContainsKeyFolders(regExp);
-        m_leftView->setFolderNameFilter(regExp, &folders);
     }
-    else {
-         m_rightViewHolder->setSearchKey(regExp);
-         m_leftView->clearFilter();
-         switchView(WndNoteShow);
+    if (type == WndTextEdit) { //详情页时只搜索详情页内容
+        QString text = m_textEditMainWnd->toPlainText();
+        m_textEditMainWnd->setCurrentCharFormat(m_textEditFormat);
+        m_textEditMainWnd->setText(text);
+        Utils::highTextEdit(m_textEditMainWnd, m_textEditFormat, regExp, QColor(0x349ae8));
+    } else {
+        m_rightViewHolder->setSearchKey(regExp);
+        if (regExp.isEmpty()) {
+            m_leftView->clearFilter();
+        } else {
+            QList<qint64> folders = m_rightViewHolder->getNoteContainsKeyFolders(regExp);
+            m_leftView->setFolderNameFilter(regExp, &folders);
+        }
     }
 }
 
@@ -239,7 +247,15 @@ void VNoteMainWindow::initEmptyFoldersView()
 
 void VNoteMainWindow::switchView(WindowType type)
 {
-    m_noteSearchEdit->setEnabled(type == WndNoteShow || type == WndSearchEmpty);
+    if (type != WndHomePage) {
+        if (type == WndTextEdit && m_textEditMainWnd->isReadOnly()) {
+            m_noteSearchEdit->setEnabled(false); //语音详情页禁止搜索
+        } else {
+            m_noteSearchEdit->setEnabled(true);
+        }
+    } else {
+        m_noteSearchEdit->setEnabled(false);
+    }
     m_centerWidget->setCurrentIndex(type);
 }
 
@@ -253,14 +269,13 @@ void VNoteMainWindow::onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEd
 {
     m_textNode = textNode;
     m_textEditRightView = preTextEdit;
-    QTextCursor cursorSrc = preTextEdit->textCursor();
+    m_textEditMainWnd->setCurrentCharFormat(m_textEditFormat);
     m_textEditMainWnd->setText(textNode->noteText);
+    m_textEditMainWnd->setReadOnly(preTextEdit->isReadOnly()); //文字项可读可写，语音项只读
     if (!searchKey.isEmpty()) {
         Utils::highTextEdit(m_textEditMainWnd, m_textEditFormat, searchKey, QColor(0x349ae8));
     }
-    QTextCursor cursordst = m_textEditMainWnd->textCursor();
-    cursordst.setPosition(cursorSrc.position());
-    m_textEditMainWnd->setTextCursor(cursordst);
+    m_textEditMainWnd->moveCursor(QTextCursor::End);
     switchView(WndTextEdit);
     m_returnBtn->setVisible(true);
 }
@@ -275,9 +290,15 @@ void VNoteMainWindow::onTextEditReturn()
     }
     switchView(WndNoteShow);
     m_returnBtn->setVisible(false);
+    onVNoteSearch();//详情页时只搜索详情页内容，返回时重新搜索
 }
 
 void VNoteMainWindow::onSearchEditFocus()
 {
     m_noteSearchEdit->lineEdit()->setFocus();
+}
+
+void VNoteMainWindow::onSearchNoteEmpty(qint64 id)
+{
+    m_leftView->removeFromWhiteList(id);
 }

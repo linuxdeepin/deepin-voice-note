@@ -90,7 +90,11 @@ void VFolderNamePHelper::spiltByKeyword(const QString &text, const QRegExp &keyw
         Text tb;
 
         tb.text = elideText.mid(startPos, (textLen-startPos));
-        tb.rect = m_fontMetrics.boundingRect(tb.text);
+        if(startPos != 0){
+            tb.rect = m_fontMetrics.boundingRect(tb.text);
+        }else {
+            tb.rect = m_nameRect;
+        }
         m_textsVector.push_back(tb);
     }
 }
@@ -107,7 +111,6 @@ void VFolderNamePHelper::paintFolderName(bool isSelected)
         it.rect.setX(currentX);
         it.rect.setY(currentY);
         it.rect.setSize(QSize(w, h));
-
         if (it.isKeyword) {
             //If the item is selected,don't need highlight keyword
             m_painter->setPen((isSelected ? m_pens[OldPen] : m_pens[FolderPen]));
@@ -252,20 +255,26 @@ void LeftViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
         } else if (option.state & QStyle::State_MouseOver) {
             painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
             painter->fillPath(path, painter->brush());
+            painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
         } else if (option.state & QStyle::State_Enabled) {
-            painter->setBrush(QBrush(m_parentPb.color(DPalette::ItemBackground)));
+            painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal,DPalette::ItemBackground)));
             painter->fillPath(path, painter->brush());
             painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
         }
+        else { //disable
+            painter->setBrush(QBrush(m_parentPb.color(DPalette::Disabled,DPalette::ItemBackground)));
+            painter->fillPath(path, painter->brush());
+        }
 
         QRect iconRect(paintRect.left() + 6, paintRect.top() + 12, 40, 40);
-        QRect nameRect(paintRect.left() + 52, paintRect.top() + 12, 160, 20);
-        QRect timeRect(paintRect.left() + 52, paintRect.top() + 34, 160, 18);
-
         painter->drawImage(iconRect, data->UI.icon);
         painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T6));
-
         QFontMetrics fontMetrics = painter->fontMetrics();
+        int space = (paintRect.height() - fontMetrics.height() * 2)/2 + paintRect.top();
+        QRect nameRect(paintRect.left() + 52, space, 170, fontMetrics.height());
+        space += fontMetrics.height();
+        QRect timeRect(paintRect.left() + 52, space, 170, fontMetrics.height());
+
         VFolderNamePHelper vfnphelper(painter, fontMetrics, nameRect);
 
         vfnphelper.spiltByKeyword(data->name, m_searchKeyword);

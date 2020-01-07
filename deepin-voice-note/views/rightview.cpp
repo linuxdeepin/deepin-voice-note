@@ -57,7 +57,7 @@ void RightView::initUi()
     m_noSearchResult = new DLabel(this);
     m_noSearchResult->setText(tr("No search results"));
     m_noSearchResult->setAlignment(Qt::AlignCenter);
-    DFontSizeManager::instance()->bind(m_noSearchResult,DFontSizeManager::T4);
+    DFontSizeManager::instance()->bind(m_noSearchResult, DFontSizeManager::T4);
     m_stackWidget->insertWidget(0, m_noSearchResult);
 
     m_searchNoteList = new RightNoteList(this);
@@ -95,7 +95,7 @@ void RightView::addNewNoteList(qint64 id)
     VNOTE_ITEMS_MAP *folderNotes = noteOper.getFolderNotes(id);
     listWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     listWidget->setLineWidth(0);
-    listWidget->initNoteItem(id, folderNotes,m_searchKey);
+    listWidget->initNoteItem(id, folderNotes, m_searchKey);
     m_stackWidget->addWidget(listWidget);
     m_stackWidget->setCurrentWidget(listWidget);
 
@@ -115,7 +115,6 @@ void RightView::noteDelByFolder(qint64 id)
 
 void RightView::noteSwitchByFolder(qint64 id)
 {
-    m_addTextBtn->setEnabled(true);
     if (m_searchKey.isEmpty()) {
         bool find = false;
 
@@ -145,21 +144,19 @@ void RightView::noteSwitchByFolder(qint64 id)
         if (searchNoteData.folderNotes.size()) {
             m_searchNoteList->initNoteItem(id, &searchNoteData, m_searchKey);
             m_stackWidget->setCurrentWidget(m_searchNoteList);
-        }
-        else {
+        } else {
             m_stackWidget->setCurrentWidget(m_noSearchResult);
-            m_addTextBtn->setEnabled(false);
         }
         emit sigSeachEditFocus();
     }
+    m_lastFolderId = id;
     adjustaddTextBtn();
 }
 
 void RightView::adjustaddTextBtn()
 {
     int pos = 10;
-    if(m_stackWidget->currentWidget() != m_noSearchResult)
-    {
+    if (m_stackWidget->currentWidget() != m_noSearchResult) {
         RightNoteList *widget = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
 
         if (widget != nullptr) {
@@ -186,6 +183,10 @@ void RightView::onDelNote(VNoteItem *item)
                 break;
             }
         }
+        if(m_searchNoteList->count() == 0) //搜索时全部删除通知记事本项更新
+        {
+            emit sigSearchNoteEmpty(m_searchNoteList->getFolderId());
+        }
     }
 
     qInfo() << "Delete VNoteItem:" << item
@@ -201,12 +202,10 @@ void RightView::onDelNote(VNoteItem *item)
 
 void RightView::onAddNote() //添加文字记录
 {
-    RightNoteList *widget = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
-
     VNoteItemOper noteOper;
 
     VNoteItem tmpNote;
-    tmpNote.folderId = widget->getFolderId();
+    tmpNote.folderId = m_lastFolderId;
     tmpNote.noteType = VNoteItem::VNT_Text;
     tmpNote.noteText = QString("");
 
@@ -217,19 +216,19 @@ void RightView::onAddNote() //添加文字记录
             qInfo() << "onAddNote:" << newNote
                     << "NoteId:" << newNote->noteId
                     << "NoteText:" << newNote->noteText;
-
-            widget->addNodeItem(newNote, QRegExp(), true);
+            int curWidgetIndex = m_stackWidget->currentIndex();
+            if (curWidgetIndex <  2) {
+                if (curWidgetIndex == 0) { //搜索无结果界面添加项切换到搜索列表界面
+                    m_searchNoteList->initNoteItem(m_lastFolderId, nullptr, m_searchKey);
+                    m_stackWidget->setCurrentWidget(m_searchNoteList);
+                }
+                m_searchNoteList->addNodeItem(newNote, QRegExp(), true);
+            } else {
+                RightNoteList *widget = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
+                widget->addNodeItem(newNote, QRegExp(), true);
+            }
             m_addTextBtn->setEnabled(false);
             adjustaddTextBtn();
-            if (widget == m_searchNoteList) {
-                for (int i = 2; i < m_stackWidget->count(); i++) {
-                    RightNoteList *widgetTmp = static_cast<RightNoteList *>(m_stackWidget->widget(i));
-                    if (widgetTmp->getFolderId() == tmpNote.folderId) {
-                        widgetTmp->addNodeItem(newNote,QRegExp());
-                        break;
-                    }
-                }
-            }
         }
     }
 }
@@ -249,6 +248,7 @@ void RightView::onUpdateNote(VNoteItem *item)
                 widgetTmp->updateNodeItem(item);
                 break;
             }
+
         }
     }
 }

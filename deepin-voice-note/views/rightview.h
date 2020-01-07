@@ -25,6 +25,7 @@ public:
 signals :
     void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
     void sigSeachEditFocus();
+    void sigSearchNoteEmpty(qint64 id);
 protected:
     void resizeEvent(QResizeEvent *event);
 private:
@@ -45,6 +46,7 @@ private:
     RightNoteList *m_searchNoteList{nullptr};
     MyRecodeButtons *m_addVoiceBtn;
     DLabel *m_noSearchResult {nullptr};
+    qint64 m_lastFolderId {-1};
 };
 
 #endif // RIGHTVIEW_H

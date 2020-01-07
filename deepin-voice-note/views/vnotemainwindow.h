@@ -52,6 +52,7 @@ public slots:
     void onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
     void onTextEditReturn();
     void onSearchEditFocus();
+    void onSearchNoteEmpty(qint64 id);
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};

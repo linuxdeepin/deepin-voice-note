@@ -198,3 +198,11 @@ int LeftView::getFolderCount()
     }
     return count;
 }
+
+void LeftView::removeFromWhiteList(qint64 id)
+{
+    m_pSortFilterModel->removeFromWhiteList(id);
+    QModelIndex nowIndex = m_pSortFilterModel->index(0, 0);
+    this->reset();
+    this->setCurrentIndex(nowIndex);
+}
