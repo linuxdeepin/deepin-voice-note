@@ -31,7 +31,11 @@ SOURCES += \
     views/rightview.cpp \
     db/dbvisitor.cpp \
     common/datatypedef.cpp \
-    views/initemptypage.cpp
+    views/initemptypage.cpp \
+    widgets/vnoteiconbutton.cpp \
+    dialog/vnotebasedialog.cpp \
+    widgets/vnwaveform.cpp \
+    common/vnoteaudiomanager.cpp
     views/initemptypage.cpp
 
 RESOURCES += \
@@ -61,7 +65,11 @@ HEADERS += \
     views/rightnotelist.h \
     views/rightview.h \
     db/dbvisitor.h \
-    views/initemptypage.h
+    views/initemptypage.h \
+    widgets/vnoteiconbutton.h \
+    dialog/vnotebasedialog.h \
+    widgets/vnwaveform.h \
+    common/vnoteaudiomanager.h
     views/initemptypage.h
 
 # Default rules for deployment.
