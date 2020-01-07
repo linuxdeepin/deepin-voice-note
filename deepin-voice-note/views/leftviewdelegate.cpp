@@ -68,16 +68,25 @@ void VFolderNamePHelper::spiltByKeyword(const QString &text, const QRegExp &keyw
                 int extraLen = pos-startPos;
                 tb.text = elideText.mid(startPos, extraLen);
                 startPos += extraLen;
-                tb.rect = m_fontMetrics.boundingRect(tb.text);
+                tb.rect = QRect(0, 0
+                                ,m_fontMetrics.width(tb.text)
+                                ,m_fontMetrics.height()
+                                );
                 m_textsVector.push_back(tb);
 
                 tb.text = elideText.mid(pos, keyLen);
-                tb.rect = m_fontMetrics.boundingRect(tb.text);
+                tb.rect = QRect(0, 0
+                                ,m_fontMetrics.width(tb.text)
+                                ,m_fontMetrics.height()
+                                );
                 tb.isKeyword = true;
                 m_textsVector.push_back(tb);
             } else {
                 tb.text = elideText.mid(pos, keyLen);
-                tb.rect = m_fontMetrics.boundingRect(tb.text);
+                tb.rect = QRect(0, 0
+                                ,m_fontMetrics.width(tb.text)
+                                ,m_fontMetrics.height()
+                                );
                 tb.isKeyword = true;
                 m_textsVector.push_back(tb);
             }
@@ -90,11 +99,11 @@ void VFolderNamePHelper::spiltByKeyword(const QString &text, const QRegExp &keyw
         Text tb;
 
         tb.text = elideText.mid(startPos, (textLen-startPos));
-        if(startPos != 0){
-            tb.rect = m_fontMetrics.boundingRect(tb.text);
-        }else {
-            tb.rect = m_nameRect;
-        }
+        tb.rect = QRect(0, 0
+                        ,m_fontMetrics.width(tb.text)
+                        ,m_fontMetrics.height()
+                        );
+
         m_textsVector.push_back(tb);
     }
 }

@@ -1,4 +1,4 @@
-#include "dialog/vnoteiconbutton.h"
+#include "widgets/vnoteiconbutton.h"
 
 #include <QImageReader>
 
