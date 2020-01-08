@@ -1,0 +1,16 @@
+[main]
+host = https://www.transifex.com
+minimum_perc = 80
+mode = developer
+
+[deepin-voice-notes.deepin-voice-notes]
+file_filter = deepin-voice-note/translations/deepin-voice_note_<lang>.ts
+source_file = deepin-voice-note/translations/deepin-voice-note.ts
+source_lang = en
+type = QT
+
+[deepin-voice-notes.desktop]
+file_filter = deepin-voice-note/translations/desktop/desktop_<lang>.ts
+source_file = deepin-voice-note/translations/desktop/desktop.ts
+source_lang = en
+type = QT
