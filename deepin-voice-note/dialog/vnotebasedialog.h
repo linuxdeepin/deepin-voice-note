@@ -18,6 +18,10 @@ public:
     void addContent(QWidget* content);
     void setIconPixmap(const QPixmap &iconPixmap);
 
+    static constexpr int DEFAULT_WINDOW_W = 380;
+    static constexpr int DEFAULT_WINDOW_H = 140;
+    static constexpr int TITLEBAR_H = 50;
+
 protected:
     void initUI();
     void InitConnections();

@@ -35,7 +35,9 @@ SOURCES += \
     widgets/vnoteiconbutton.cpp \
     dialog/vnotebasedialog.cpp \
     widgets/vnwaveform.cpp \
-    common/vnoteaudiomanager.cpp
+    common/vnoteaudiomanager.cpp \
+    dialog/vnotemessagedialog.cpp \
+    widgets/vnoterecordwidget.cpp
     views/initemptypage.cpp
 
 RESOURCES += \
@@ -69,8 +71,13 @@ HEADERS += \
     widgets/vnoteiconbutton.h \
     dialog/vnotebasedialog.h \
     widgets/vnwaveform.h \
-    common/vnoteaudiomanager.h
+    common/vnoteaudiomanager.h \
+    dialog/vnotemessagedialog.h \
+    widgets/vnoterecordwidget.h
     views/initemptypage.h
+
+TRANSLATIONS += \
+    translations/deepin-voice-note.ts
 
 # Default rules for deployment.
 isEmpty(BINDIR):BINDIR=/usr/bin

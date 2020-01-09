@@ -14,6 +14,8 @@ VNoteBaseDialog::VNoteBaseDialog(QWidget *parent)
 
 void VNoteBaseDialog::initUI()
 {
+    setFixedSize(DEFAULT_WINDOW_W, DEFAULT_WINDOW_H);
+
     QVBoxLayout* mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
@@ -23,7 +25,7 @@ void VNoteBaseDialog::initUI()
     titleLayout->setContentsMargins(10,0,0,0);
 
     m_titleBar = new QWidget(this);
-    m_titleBar->setFixedHeight(50);
+    m_titleBar->setFixedHeight(TITLEBAR_H);
     m_titleBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     m_titleBar->setLayout(titleLayout);

@@ -7,6 +7,8 @@
 #include <iostream>
 using namespace std;
 
+VNoteAudioManager* VNoteAudioManager::_instance = nullptr;
+
 VNoteAudioManager::VNoteAudioManager(QObject *parent)
     : QObject(parent)
     , m_pAudioPlayer(new QMediaPlayer(this))
@@ -14,7 +16,17 @@ VNoteAudioManager::VNoteAudioManager(QObject *parent)
     , m_pAudioRecord(new QAudioRecorder(this))
     , m_pAudioRecProbe(new QAudioProbe(this))
 {
+    initAudio();
+    initConnections();
+}
 
+VNoteAudioManager *VNoteAudioManager::instance()
+{
+    if (nullptr == _instance) {
+        _instance = new VNoteAudioManager();
+    }
+
+    return  _instance;
 }
 
 void VNoteAudioManager::initAudio()
@@ -58,6 +70,9 @@ void VNoteAudioManager::initAudio()
                                             , m_audioContainer);
     }
 
+    m_pAudioRecProbe->setSource(m_pAudioRecord.get());
+    m_pAudioPlayerProbe->setSource(m_pAudioPlayer.get());
+
     qInfo() << "audio settings: {\n"
             << " codec=" << audioSettings.codec()
             << ", "      << audioSettings.sampleRate()
@@ -65,6 +80,17 @@ void VNoteAudioManager::initAudio()
             << ", channelCount=" << audioSettings.channelCount()
             << ", container =" << m_audioContainer
             << " }";
+}
+
+void VNoteAudioManager::initConnections()
+{
+    connect(m_pAudioRecord.get(), &QAudioRecorder::durationChanged
+            ,this, &VNoteAudioManager::recordDurationChanged);
+    connect(m_pAudioRecProbe.get(), &QAudioProbe::audioBufferProbed
+            ,this, [this](const QAudioBuffer &buffer) {
+        emit recAudioBufferProbed(buffer);
+    });
+
 }
 
 void VNoteAudioManager::setPlayFileName(const QString &fileName)
@@ -134,5 +160,13 @@ void VNoteAudioManager::stopRecord()
     if (QMediaRecorder::StoppedState != m_pAudioRecord->state()) {
         m_pAudioRecord->stop();
         m_recordFileName.clear();
+    }
+}
+
+void VNoteAudioManager::recordDurationChanged(qint64 duration)
+{
+    if (duration >= MAX_REC_TIME_INMSEC) {
+        stopRecord();
+        emit recExceedLimit();
     }
 }

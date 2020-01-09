@@ -12,7 +12,13 @@ class VNoteAudioManager : public QObject
 public:
     explicit VNoteAudioManager(QObject *parent = nullptr);
 
+    static VNoteAudioManager* instance();
+    //The max record limit is 3 hours
+    static constexpr int MAX_REC_TIME_INMSEC = (3*60*60*1000);
+    static constexpr int REC_NOTFY_TIME = 500; //ms
+
     void initAudio();
+    void initConnections();
 
     //Audio player
     void setPlayFileName(const QString& fileName);
@@ -26,10 +32,14 @@ public:
     void pauseRecord();
     void stopRecord();
 signals:
-
+    void recExceedLimit();
+    void recAudioBufferProbed(const QAudioBuffer &buffer);
 public slots:
+    void recordDurationChanged(qint64 duration);
 
 protected:
+    static VNoteAudioManager * _instance;
+
     QString m_defaultAudioFmt {"audio/mpeg"};
     //Audio player
     QScopedPointer<QMediaPlayer> m_pAudioPlayer;

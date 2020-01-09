@@ -1,8 +1,10 @@
 #include "textnoteedit.h"
 
 #include <QScrollBar>
+#include <QWheelEvent>
 
 #include <DApplicationHelper>
+#include <DLog>
 
 TextNoteEdit::TextNoteEdit(QWidget *parent)
     : DTextEdit(parent)
@@ -26,6 +28,21 @@ void TextNoteEdit::focusOutEvent(QFocusEvent *e)
         QScrollBar *bar = this->verticalScrollBar();
         bar->setValue(bar->minimum());
         emit sigFocusOut();
+    }
+}
+
+void TextNoteEdit::wheelEvent(QWheelEvent *e)
+{
+    if (this->hasFocus()) {
+        QScrollBar *scrollbar = this->verticalScrollBar();
+        if (nullptr != scrollbar) {
+            int position = scrollbar->value();
+
+            position -= e->delta();
+            scrollbar->setValue(position);
+        }
+
+        e->accept();
     }
 }
 
