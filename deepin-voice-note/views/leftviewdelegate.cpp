@@ -163,7 +163,7 @@ QWidget *LeftViewDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
     pe.setBrush(DPalette::Base, pe.color(DPalette::Normal, DPalette::Highlight));
     editBox->autoFillBackground();
 
-    editBox->setFixedSize(170, 45);
+    editBox->setFixedSize(170, 48);
     editBox->setPalette(pe);
     return editBox;
 }

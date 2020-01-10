@@ -9,6 +9,7 @@
 #include <DPushButton>
 #include <DStackedWidget>
 #include <DLabel>
+#include <DMenu>
 
 DWIDGET_USE_NAMESPACE
 
@@ -30,23 +31,49 @@ protected:
     void resizeEvent(QResizeEvent *event);
 private:
     void initUi();
+    void initTextMenu();
+    void initVoiceMenu();
     void initConnection();
-    void adjustaddTextBtn();
     void addNewNoteList(qint64 id);
+    void delNoteFromList(VNoteItem *item,RightNoteList *list);
+
 
 public slots:
+    void adjustaddTextBtn();
     void onAddNote();
+    void onMenuPopup(VNoteItem *item);
     void onDelNote(VNoteItem *item);
     void onUpdateNote(VNoteItem *item);
     void onTextEditIsEmpty(VNoteItem *textNode, bool empty);
+
+    void onSaveTextAction();
+    void onDelTextAction();
+    void onSaveVoiceAction();
+    void onDelVoiceAction();
+    void onAsrVoiceAction();
+    void onVoicePlayBtnClicked(VoiceNoteItem *item);
+    void onVoicePauseBtnClicked(VoiceNoteItem *item);
+
 private:
     DPushButton  *m_addTextBtn {nullptr};
     DStackedWidget *m_stackWidget {nullptr};
     QRegExp m_searchKey;
     RightNoteList *m_searchNoteList{nullptr};
-    MyRecodeButtons *m_addVoiceBtn;
     DLabel *m_noSearchResult {nullptr};
     qint64 m_lastFolderId {-1};
+
+    DMenu   *m_textMenu {nullptr};
+    QAction *m_saveTextAction {nullptr};
+    QAction *m_delTextAction{nullptr};
+
+    DMenu   *m_voiceMenu {nullptr};
+    QAction *m_saveVoicetAction {nullptr};
+    QAction *m_delVoiceAction{nullptr};
+    QAction *m_asrVoiceAction{nullptr};
+
+    VNoteItem *m_curNoteItem{nullptr};
+
+    VoiceNoteItem *m_playVoiceItem {nullptr}; //操作的语音项
 };
 
 #endif // RIGHTVIEW_H

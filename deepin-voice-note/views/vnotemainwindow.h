@@ -4,7 +4,6 @@
 #include "common/datatypedef.h"
 #include "leftview.h"
 #include "rightview.h"
-#include "myrecodebuttons.h"
 #include "initemptypage.h"
 
 #include <DMainWindow>
@@ -65,7 +64,6 @@ private:
     LeftView   *m_leftView {nullptr};
     RightView   *m_rightViewHolder {nullptr};
 
-    MyRecodeButtons *m_btnHideTextEdit {nullptr};
     DTextEdit *m_textEditRightView {nullptr};
     DTextEdit *m_textEditMainWnd{nullptr};
     DLabel *m_labSearchEmpty {nullptr};

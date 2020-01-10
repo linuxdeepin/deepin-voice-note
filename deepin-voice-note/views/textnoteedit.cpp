@@ -9,10 +9,7 @@
 TextNoteEdit::TextNoteEdit(QWidget *parent)
     : DTextEdit(parent)
 {
-    DPalette pb = DApplicationHelper::instance()->palette(this);
-    pb.setBrush(DPalette::Text,pb.color(DPalette::Active,DPalette::WindowText));
-    pb.setBrush(DPalette::Button, pb.color(DPalette::ItemBackground));
-    this->setPalette(pb);
+   ;
 }
 
 void TextNoteEdit::focusInEvent(QFocusEvent *e)
@@ -44,24 +41,6 @@ void TextNoteEdit::wheelEvent(QWheelEvent *e)
 
         e->accept();
     }
-}
-
-void TextNoteEdit::enterEvent(QEvent *event)
-{
-    DTextEdit::enterEvent(event);
-    DPalette pb = DApplicationHelper::instance()->palette(this);
-    pb.setBrush(DPalette::Text,pb.color(DPalette::Active,DPalette::WindowText));
-    pb.setBrush(DPalette::Button, pb.color(DPalette::Light));
-    this->setPalette(pb);
-}
-
-void TextNoteEdit::leaveEvent(QEvent *event)
-{
-    DTextEdit::leaveEvent(event);
-    DPalette pb = DApplicationHelper::instance()->palette(this);
-    pb.setBrush(DPalette::Text,pb.color(DPalette::Active,DPalette::WindowText));
-    pb.setBrush(DPalette::Button, pb.color(DPalette::ItemBackground));
-    this->setPalette(pb);
 }
 
 void TextNoteEdit::contextMenuEvent(QContextMenuEvent *e)

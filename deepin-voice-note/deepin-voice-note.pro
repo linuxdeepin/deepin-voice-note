@@ -37,7 +37,9 @@ SOURCES += \
     widgets/vnwaveform.cpp \
     common/vnoteaudiomanager.cpp \
     dialog/vnotemessagedialog.cpp \
-    widgets/vnoterecordwidget.cpp
+    widgets/vnoterecordwidget.cpp \
+    views/voicenoteitem.cpp
+    views/voicenoteitem.cpp
     views/initemptypage.cpp
 
 RESOURCES += \
@@ -73,7 +75,9 @@ HEADERS += \
     widgets/vnwaveform.h \
     common/vnoteaudiomanager.h \
     dialog/vnotemessagedialog.h \
-    widgets/vnoterecordwidget.h
+    widgets/vnoterecordwidget.h \
+    views/voicenoteitem.h
+    views/voicenoteitem.h
     views/initemptypage.h
 
 TRANSLATIONS += \

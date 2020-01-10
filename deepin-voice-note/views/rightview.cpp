@@ -6,9 +6,12 @@
 
 #include <QBoxLayout>
 #include <QDebug>
+#include <QStandardPaths>
 
 #include <DFontSizeManager>
 #include <DGuiApplicationHelper>
+#include <DFileDialog>
+#include <DMessageBox>
 
 RightView::RightView(QWidget *parent)
     : QWidget(parent)
@@ -25,34 +28,8 @@ void RightView::initUi()
     QVBoxLayout *layoutList = new QVBoxLayout;
     layoutList->setContentsMargins(0, 0, 0, 0);
     layoutList->addWidget(m_stackWidget);
-    layoutList->addSpacing(80);
-
-    DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
-    if (themeType == DGuiApplicationHelper::LightType) {
-        m_addVoiceBtn = new MyRecodeButtons(
-            ":/images/icon/normal/circlebutton_voice.svg",
-            ":/images/icon/press/circlebutton_voice_press.svg",
-            ":/images/icon/hover/circlebutton_voice_hover.svg",
-            ":/images/icon/disabled/circlebutton_voice_disabled.svg",
-            ":/images/icon/focus/circlebutton_voice_focus.svg",
-            QSize(68, 68),
-            this);
-    } else {
-        m_addVoiceBtn = new MyRecodeButtons(
-            ":/images/icon_dark/normal/voice_normal_dark.svg",
-            ":/images/icon_dark/press/voice_press_dark.svg",
-            ":/images/icon_dark/hover/voice_hover_dark.svg",
-            ":/images/icon_dark/disabled/voice_disabled_dark.svg",
-            ":/images/icon_dark/focus/voice_focus_dark.svg",
-            QSize(68, 68),
-            this);
-    }
-    QGridLayout *layout = new QGridLayout;
-    layout->setSpacing(0);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addLayout(layoutList, 0, 0);
-    layout->addWidget(m_addVoiceBtn, 1, 0, Qt::AlignHCenter);
-    this->setLayout(layout);
+    layoutList->addSpacing(160);
+    this->setLayout(layoutList);
 
     m_noSearchResult = new DLabel(this);
     m_noSearchResult->setText(tr("No search results"));
@@ -70,26 +47,65 @@ void RightView::initUi()
     DFontSizeManager::instance()->bind(m_addTextBtn, DFontSizeManager::T5);
     m_addTextBtn->setText(tr("Click to Add TextNote"));
     m_addTextBtn->setFixedHeight(64);
+
+    initTextMenu();
+    initVoiceMenu();
 }
 
+void RightView::initTextMenu()
+{
+    m_textMenu = new DMenu(this);
+    m_saveTextAction = new QAction(tr("Save As TXT"), this);
+    m_delTextAction = new QAction(tr("Delete"), this);
+    m_textMenu->addAction(m_saveTextAction);
+    m_textMenu->addAction(m_delTextAction);
+}
+
+void RightView::initVoiceMenu()
+{
+    m_voiceMenu = new DMenu(this);
+    m_asrVoiceAction = new QAction(tr("Voice to Text"), this);
+    m_saveVoicetAction = new QAction(tr("Save As MP3"), this);
+    m_delVoiceAction = new QAction(tr("Delete"), this);
+    m_voiceMenu->addAction(m_asrVoiceAction);
+    m_voiceMenu->addAction(m_saveVoicetAction);
+    m_voiceMenu->addAction(m_delVoiceAction);
+}
 void RightView::initConnection()
 {
     connect(m_addTextBtn, &DPushButton::clicked, this, &RightView::onAddNote);
     connect(m_searchNoteList, SIGNAL(sigDelNote(VNoteItem *)), this, SLOT(onDelNote(VNoteItem *)));
+    connect(m_searchNoteList, SIGNAL(sigMenuPopup(VNoteItem *)), this, SLOT(onMenuPopup(VNoteItem *)));
     connect(m_searchNoteList, SIGNAL(sigUpdateNote(VNoteItem *)), this, SLOT(onUpdateNote(VNoteItem *)));
     connect(m_searchNoteList, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *, const QRegExp &)), this,
             SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *, const QRegExp &)));
-    connect(m_searchNoteList, SIGNAL(sigTextEditIsEmpty(VNoteItem *, bool)), this, SLOT(onTextEditIsEmpty(VNoteItem *, bool)));
+    connect(m_searchNoteList, SIGNAL(sigTextEditIsEmpty(VNoteItem *, bool)), this,
+            SLOT(onTextEditIsEmpty(VNoteItem *, bool)));
+
+    connect(m_delTextAction, &QAction::triggered, this, &RightView::onDelTextAction);
+    connect(m_saveTextAction, &QAction::triggered, this, &RightView::onSaveTextAction);
+    connect(m_delVoiceAction, &QAction::triggered, this, &RightView::onDelVoiceAction);
+    connect(m_asrVoiceAction, &QAction::triggered, this, &RightView::onAsrVoiceAction);
+    connect(m_saveVoicetAction, &QAction::triggered, this, &RightView::onSaveVoiceAction);
+
 }
 
 void RightView::addNewNoteList(qint64 id)
 {
     RightNoteList *listWidget = new RightNoteList(m_stackWidget);
     connect(listWidget, SIGNAL(sigDelNote(VNoteItem *)), this, SLOT(onDelNote(VNoteItem *)));
+    connect(listWidget, SIGNAL(sigMenuPopup(VNoteItem *)), this, SLOT(onMenuPopup(VNoteItem *)));
     connect(listWidget, SIGNAL(sigUpdateNote(VNoteItem *)), this, SLOT(onUpdateNote(VNoteItem *)));
     connect(listWidget, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *, const QRegExp &)), this,
             SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *, const QRegExp &)));
     connect(listWidget, SIGNAL(sigTextEditIsEmpty(VNoteItem *, bool)), this, SLOT(onTextEditIsEmpty(VNoteItem *, bool)));
+
+    connect(listWidget, SIGNAL(sigVoicePlayBtnClicked(VoiceNoteItem *)), this,
+            SLOT(onVoicePlayBtnClicked(VoiceNoteItem *)));
+    connect(listWidget, SIGNAL(sigVoicePauseBtnClicked(VoiceNoteItem *)), this,
+            SLOT(onVoicePauseBtnClicked(VoiceNoteItem *)));
+
+    connect(listWidget, &RightNoteList::sigListHeightChange, this, &RightView::adjustaddTextBtn);
 
     VNoteItemOper noteOper;
     VNOTE_ITEMS_MAP *folderNotes = noteOper.getFolderNotes(id);
@@ -109,6 +125,7 @@ void RightView::noteDelByFolder(qint64 id)
             m_stackWidget->removeWidget(widget);
             widget->deleteLater();
             adjustaddTextBtn();
+            break;
         }
     }
 }
@@ -174,29 +191,7 @@ void RightView::adjustaddTextBtn()
 void RightView::onDelNote(VNoteItem *item)
 {
     RightNoteList *widget = static_cast<RightNoteList *>(sender());
-    widget->delNodeItem(item);
-    if (widget == m_searchNoteList) {
-        for (int i = 2; i < m_stackWidget->count(); i++) {
-            RightNoteList *widgetTmp = static_cast<RightNoteList *>(m_stackWidget->widget(i));
-            if (widgetTmp->getFolderId() == widget->getFolderId()) {
-                widgetTmp->delNodeItem(item);
-                break;
-            }
-        }
-        if(m_searchNoteList->count() == 0) //搜索时全部删除通知记事本项更新
-        {
-            emit sigSearchNoteEmpty(m_searchNoteList->getFolderId());
-        }
-    }
-
-    qInfo() << "Delete VNoteItem:" << item
-            << "NoteID:" << item->noteId
-            << "NoteText:" << item->noteText;
-
-    VNoteItemOper noteOper;
-    noteOper.deleteNote(item->folderId, item->noteId);
-
-    adjustaddTextBtn();
+    delNoteFromList(item, widget);
     m_addTextBtn->setEnabled(true);
 }
 
@@ -206,7 +201,7 @@ void RightView::onAddNote() //添加文字记录
 
     VNoteItem tmpNote;
     tmpNote.folderId = m_lastFolderId;
-    tmpNote.noteType = VNoteItem::VNT_Text;
+    tmpNote.noteType = VNoteItem::VNT_Voice;
     tmpNote.noteText = QString("");
 
     if (tmpNote.folderId != VNoteFolder::INVALID_ID) {
@@ -248,7 +243,6 @@ void RightView::onUpdateNote(VNoteItem *item)
                 widgetTmp->updateNodeItem(item);
                 break;
             }
-
         }
     }
 }
@@ -267,7 +261,8 @@ QList<qint64> RightView::getNoteContainsKeyFolders(const QRegExp &searchKey) //�
         noteAll->lock.lockForRead();
         for (auto &it1 : noteAll->notes) {
             for (auto &it2 : it1->folderNotes) {
-                if (it2->noteText.contains(searchKey)) {
+                if (it2->noteType == VNoteItem::VNOTE_TYPE::VNT_Text
+                        && it2->noteText.contains(searchKey)) {
                     folderIds.push_back(it2->folderId);
                     break;
                 }
@@ -287,4 +282,119 @@ void RightView::onTextEditIsEmpty(VNoteItem *textNode, bool empty)
 void RightView::setSearchKey(const QRegExp &searchKey)
 {
     m_searchKey = searchKey;
+}
+
+void RightView::onMenuPopup(VNoteItem *item)
+{
+    m_curNoteItem = item;
+    if (m_curNoteItem != nullptr) {
+        QPoint pos = QCursor::pos();
+        pos.setX(pos.x() - 44);
+        pos.setY(pos.y() + 20);
+        if (m_curNoteItem->noteType == VNoteItem::VNOTE_TYPE::VNT_Text) {
+            m_textMenu->exec(pos);
+        } else {
+            m_voiceMenu->exec(pos);
+        }
+    }
+}
+
+void RightView::onSaveTextAction()
+{
+    DFileDialog fileDialog(this);
+    fileDialog.setWindowTitle(tr("Save as TXT"));
+    fileDialog.setDirectory(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
+    fileDialog.setFileMode(DFileDialog::Directory);
+    fileDialog.setAcceptMode(DFileDialog::AcceptSave);
+    fileDialog.setDefaultSuffix("txt");
+    fileDialog.setNameFilter("TXT(*.txt)");
+    fileDialog.selectFile(tr("TextNote"));
+    if (fileDialog.exec() == QDialog::Accepted) {
+        QString path = fileDialog.selectedFiles()[0];
+        QString fileName = QFileInfo(path).fileName();
+        QString filePath = path;
+        if (fileName.isEmpty()) {
+            DMessageBox::information(this, tr(""), tr("File name cannot be empty"));
+        }
+        QFile file(path);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream textStream(&file);
+            textStream << m_curNoteItem->noteText;
+            file.close();
+        }
+    }
+}
+
+void RightView::onDelTextAction()
+{
+    RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
+    delNoteFromList(m_curNoteItem, list);
+}
+
+void RightView::onAsrVoiceAction()
+{
+    RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
+    VoiceNoteItem *item = list->getVoiceItem(m_curNoteItem);
+    if (item) {
+        item->showAsrStartWindow();
+    }
+    qDebug() << "onAsrVoiceAction";
+}
+
+void RightView::onDelVoiceAction()
+{
+    RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
+    delNoteFromList(m_curNoteItem, list);
+}
+
+void RightView::onSaveVoiceAction()
+{
+    RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
+    VoiceNoteItem *item = list->getVoiceItem(m_curNoteItem);
+    Q_UNUSED(item);
+    qDebug() << "onSaveVoiceAction";
+}
+
+void RightView::delNoteFromList(VNoteItem *item, RightNoteList *list)
+{
+    list->delNodeItem(item);
+    if (list == m_searchNoteList) {
+        for (int i = 2; i < m_stackWidget->count(); i++) {
+            RightNoteList *widgetTmp = static_cast<RightNoteList *>(m_stackWidget->widget(i));
+            if (widgetTmp->getFolderId() == list->getFolderId()) {
+                widgetTmp->delNodeItem(item);
+                break;
+            }
+        }
+        if (m_searchNoteList->count() == 0) { //搜索时全部删除通知记事本项更新
+            emit sigSearchNoteEmpty(m_searchNoteList->getFolderId());
+        }
+    }
+
+    qInfo() << "Delete VNoteItem:" << item
+            << "NoteID:" << item->noteId
+            << "NoteText:" << item->noteText;
+
+    VNoteItemOper noteOper;
+    noteOper.deleteNote(item->folderId, item->noteId);
+
+    adjustaddTextBtn();
+}
+
+void RightView::onVoicePlayBtnClicked(VoiceNoteItem *item)
+{
+    if (m_playVoiceItem && m_playVoiceItem != item && m_playVoiceItem->isPlaying()) {
+        //有语音正在播放时停止播放
+        m_playVoiceItem->showPlayBtn();
+    }
+    //播放语音
+    item->showPauseBtn();
+    m_playVoiceItem = item;
+}
+
+void RightView::onVoicePauseBtnClicked(VoiceNoteItem *item)
+{
+    //暂停
+    item->showPlayBtn();
+    m_playVoiceItem = item;
 }

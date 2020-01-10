@@ -111,6 +111,7 @@ bool LeftViewSortFilterModel::filterAcceptsRow(int source_row,
 
 void LeftViewSortFilterModel::removeFromWhiteList(qint64 id)
 {
-    m_whilteList.removeOne(id);
-    invalidateFilter();
+    if (m_whilteList.removeOne(id)) {
+        invalidateFilter();
+    }
 }

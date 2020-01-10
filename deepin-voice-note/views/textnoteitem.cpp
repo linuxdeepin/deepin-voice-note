@@ -1,6 +1,5 @@
 #include "textnoteitem.h"
 #include "common/utils.h"
-#include "common/vnoteitem.h"
 
 #include <QDebug>
 #include <QGridLayout>
@@ -14,12 +13,12 @@
 #include <DMessageBox>
 
 TextNoteItem::TextNoteItem(VNoteItem *textNote, QWidget *parent)
-    : QWidget(parent)
+    : VNoteItemWidget(parent)
     , m_textNode(textNote)
 {
     initUI();
-    updateData();
     initConnection();
+    updateData();
 }
 
 void TextNoteItem::initUI()
@@ -27,6 +26,7 @@ void TextNoteItem::initUI()
     m_timeLabel = new DLabel(this);
     m_timeLabel->setFixedHeight(16);
     DFontSizeManager::instance()->bind(m_timeLabel, DFontSizeManager::T9);
+
     m_textEdit = new TextNoteEdit(this);
     DFontSizeManager::instance()->bind(m_textEdit, DFontSizeManager::T8);
     m_textEdit->setFixedHeight(140);
@@ -35,6 +35,10 @@ void TextNoteItem::initUI()
     m_textEdit->document()->setDocumentMargin(10);
     m_textEdit->setFrameShape(QFrame::NoFrame);
     m_textEditFormat =  m_textEdit->currentCharFormat();
+    DPalette pb = DApplicationHelper::instance()->palette(this);
+    pb.setBrush(DPalette::Text,pb.color(DPalette::Active,DPalette::WindowText));
+    pb.setBrush(DPalette::Button, pb.color(DPalette::ItemBackground));
+    this->setPalette(pb);
 
     DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
     if (themeType == DGuiApplicationHelper::LightType) {
@@ -58,11 +62,6 @@ void TextNoteItem::initUI()
                                           QSize(44, 44), this);
     }
     m_detailBtn->setVisible(false);
-    m_contextMenu = new DMenu(this);
-    m_saveAsAction = new QAction(tr("Save As TXT"), this);
-    m_delAction = new QAction(tr("Delete"), this);
-    m_contextMenu->addAction(m_saveAsAction);
-    m_contextMenu->addAction(m_delAction);
 
     QVBoxLayout *btnLayout = new QVBoxLayout;
     btnLayout->setContentsMargins(0, 15, 10, 0);
@@ -86,6 +85,7 @@ void TextNoteItem::initUI()
     bglayout->setSizeConstraint(QLayout::SetNoConstraint);
     bglayout->setContentsMargins(0, 6, 0, 0);
     this->setLayout(bglayout);
+
 }
 
 void TextNoteItem::updateData()
@@ -101,33 +101,20 @@ void TextNoteItem::initConnection()
     connect(m_textEdit, &TextNoteEdit::textChanged, this, &TextNoteItem::onTextChanged);
     connect(m_textEdit, &TextNoteEdit::sigFocusIn, this, &TextNoteItem::onEditFocusIn);
     connect(m_textEdit, &TextNoteEdit::sigFocusOut, this, &TextNoteItem::onEditFocusOut);
-    connect(m_detailBtn, &DPushButton::clicked, this, &TextNoteItem::onshowDetail);
-    connect(m_saveAsAction, &QAction::triggered, this, &TextNoteItem::onSaveText);
-    connect(m_delAction, &QAction::triggered, this, &TextNoteItem::onDelItem);
-    connect(m_menuBtn, &DPushButton::clicked, this, &TextNoteItem::onMenuPop);
+    connect(m_detailBtn, &DPushButton::clicked, this, &TextNoteItem::onShowDetail);
+    connect(m_menuBtn, &DPushButton::clicked, this, &TextNoteItem::onShowMenu);
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &TextNoteItem::onChangeTheme);
 }
 
 void TextNoteItem::onTextChanged()
 {
-    adjustDocMargin();
-    QTimer::singleShot(0, this, [ = ] {
-        int textEditHeight = m_textEdit->height();
-        QTextDocument *document = m_textEdit->document();
-        int documentHeight = static_cast<int>(document->size().height());
-        if (textEditHeight < documentHeight - 10)
-        {
-            m_detailBtn->setVisible(true);
-        } else
-        {
-            m_detailBtn->setVisible(false);
-        }
-        emit sigTextEditIsEmpty(m_textNode, document->isEmpty());
-    });
+    adjustTextEdit();
+    updateDetilBtn();
+    emit sigTextEditIsEmpty(m_textNode, m_textEdit->document()->isEmpty());
 }
 
-void TextNoteItem::onshowDetail()
+void TextNoteItem::onShowDetail()
 {
     emit sigTextEditDetail(m_textNode, m_textEdit, m_searchKey);
 }
@@ -141,7 +128,7 @@ void TextNoteItem::onEditFocusOut()
 {
     QString text = m_textEdit->toPlainText();
     if (text.isEmpty()) {
-        onDelItem();
+        emit sigDelNote(m_textNode);
     } else {
         if (text != m_textNode->noteText) {
             m_textNode->noteText = text;
@@ -151,44 +138,9 @@ void TextNoteItem::onEditFocusOut()
     qDebug() << "id:" << m_textNode->noteId << "fouce out";
 }
 
-void TextNoteItem::onDelItem()
+void TextNoteItem::onShowMenu()
 {
-    emit sigDelNote(m_textNode);
-}
-
-void TextNoteItem::onSaveText()
-{
-    DFileDialog fileDialog(this);
-    fileDialog.setWindowTitle(tr("Save as TXT"));
-    fileDialog.setDirectory(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
-    fileDialog.setFileMode(DFileDialog::Directory);
-    fileDialog.setAcceptMode(DFileDialog::AcceptSave);
-    fileDialog.setDefaultSuffix("txt");
-    fileDialog.setNameFilter("TXT(*.txt)");
-    fileDialog.selectFile(tr("TextNote"));
-    if (fileDialog.exec() == QDialog::Accepted) {
-        QString path = fileDialog.selectedFiles()[0];
-        QString fileName = QFileInfo(path).fileName();
-        QString filePath = path;
-        if (fileName.isEmpty()) {
-            DMessageBox::information(this, tr(""), tr("File name cannot be empty"));
-        }
-        QFile file(path);
-        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            QTextStream textStream(&file);
-            textStream << m_textNode->noteText;
-            file.close();
-        }
-    }
-}
-
-void TextNoteItem::onMenuPop()
-{
-    QPoint pos = QCursor::pos();
-    pos.setX(pos.x() - 44);
-    pos.setY(pos.y() + 20);
-
-    m_contextMenu->exec(pos);
+    emit sigMenuPopup(m_textNode);
 }
 
 void TextNoteItem::highSearchText(const QRegExp &searchKey, const QColor &highColor)
@@ -216,7 +168,7 @@ void TextNoteItem::onChangeTheme()
 {
     DPalette pb = DApplicationHelper::instance()->palette(m_textEdit);
     pb.setBrush(DPalette::Button, pb.color(DPalette::ItemBackground));
-    pb.setBrush(DPalette::Text,pb.color(DPalette::Active,DPalette::WindowText));
+    pb.setBrush(DPalette::Text, pb.color(DPalette::Active, DPalette::WindowText));
     m_textEdit->setPalette(pb);
 
     DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
@@ -252,11 +204,29 @@ void TextNoteItem::onChangeTheme()
 }
 void TextNoteItem::resizeEvent(QResizeEvent *event)
 {
-    onTextChanged();
-    DWidget::resizeEvent(event);
+    updateDetilBtn();
+    VNoteItemWidget::resizeEvent(event);
 }
 
-void TextNoteItem::adjustDocMargin()
+void TextNoteItem::leaveEvent(QEvent *event)
+{
+    VNoteItemWidget::leaveEvent(event);
+    DPalette pb = DApplicationHelper::instance()->palette(m_textEdit);
+    pb.setBrush(DPalette::Text,pb.color(DPalette::Active,DPalette::WindowText));
+    pb.setBrush(DPalette::Button, pb.color(DPalette::ItemBackground));
+    m_textEdit->setPalette(pb);
+}
+
+void TextNoteItem::enterEvent(QEvent *event)
+{
+    VNoteItemWidget::enterEvent(event);
+    DPalette pb = DApplicationHelper::instance()->palette(m_textEdit);
+    pb.setBrush(DPalette::Text,pb.color(DPalette::Active,DPalette::WindowText));
+    pb.setBrush(DPalette::Button, pb.color(DPalette::Light));
+    m_textEdit->setPalette(pb);
+}
+
+void TextNoteItem::adjustTextEdit()
 {
     QTextDocument *document = m_textEdit->document();
     for (QTextBlock it = document->begin(); it != document->end(); it = it.next()) {
@@ -270,4 +240,18 @@ void TextNoteItem::adjustDocMargin()
             textCursor.setBlockFormat(textBlockFormat);
         }
     }
+}
+
+void TextNoteItem::updateDetilBtn()
+{
+    QTimer::singleShot(0, this, [ = ] {
+        int textEditHeight = m_textEdit->height();
+        QTextDocument *document = m_textEdit->document();
+        int documentHeight = static_cast<int>(document->size().height());
+        if (textEditHeight < documentHeight - 10){
+            m_detailBtn->setVisible(true);
+        } else{
+            m_detailBtn->setVisible(false);
+        }
+    });
 }

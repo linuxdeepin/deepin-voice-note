@@ -1,6 +1,7 @@
 #ifndef RIGHTNOTELIST_H
 #define RIGHTNOTELIST_H
 #include "common/datatypedef.h"
+#include "voicenoteitem.h"
 
 #include <QSharedPointer>
 #include <QList>
@@ -19,6 +20,7 @@ public:
     void addNodeItem(VNoteItem *item, const QRegExp &searchKey, bool isBtnAdd = false);
     void delNodeItem(VNoteItem *item);
     void updateNodeItem(VNoteItem *item);
+    VoiceNoteItem *getVoiceItem(VNoteItem *item);
 
     int  getListHeight();
     qint64 getFolderId();
@@ -26,11 +28,16 @@ public:
 signals:
     void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
     void sigDelNote(VNoteItem *textNode);
+    void sigMenuPopup(VNoteItem *textNode);
     void sigUpdateNote(VNoteItem *textNode);
     void sigTextEditIsEmpty(VNoteItem *textNode, bool empty);
 
+    void sigVoicePlayBtnClicked(VoiceNoteItem *item);
+    void sigVoicePauseBtnClicked(VoiceNoteItem *item);
+    void sigListHeightChange();
+
 public slots:
-    void onAddHeight(int height);
+    void onItemAddHeight(int height);
 
 private:
     void initUI();

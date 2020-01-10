@@ -27,7 +27,7 @@ void RightNoteList::initNoteItem(qint64 folderid, VNOTE_ITEMS_MAP *mapNoteData, 
 {
     while (this->count()) {
         QListWidgetItem *item = this->takeItem(0);
-        DWidget *widgetTemp = static_cast<DWidget *>(this->itemWidget(item));
+        VNoteItemWidget *widgetTemp = static_cast<VNoteItemWidget *>(this->itemWidget(item));
         delete item;
         item = nullptr;
         widgetTemp->deleteLater();
@@ -52,13 +52,29 @@ void RightNoteList::addNodeItem(VNoteItem *item, const QRegExp &searchKey, bool 
         item->setSizeHint(QSize(this->width(),  textItem->height()));
         this->insertItem(this->count(), item);
         this->setItemWidget(item, textItem);
+        connect(textItem, SIGNAL(sigMenuPopup(VNoteItem *)), this, SIGNAL(sigMenuPopup(VNoteItem *)));
         connect(textItem, SIGNAL(sigDelNote(VNoteItem *)), this, SIGNAL(sigDelNote(VNoteItem *)));
         connect(textItem, SIGNAL(sigUpdateNote(VNoteItem *)), this, SIGNAL(sigUpdateNote(VNoteItem *)));
-        connect(textItem, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *,const QRegExp &)), this, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *, const QRegExp &)));
+        connect(textItem, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *, const QRegExp &)), this, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *, const QRegExp &)));
         connect(textItem, SIGNAL(sigTextEditIsEmpty(VNoteItem *, bool)), this, SIGNAL(sigTextEditIsEmpty(VNoteItem *, bool)));
         if (isBtnAdd) {
             textItem->changeToEdit();
         }
+    } else {
+        VoiceNoteItem *voiceItem = new VoiceNoteItem(item, this);
+        QListWidgetItem *item = new QListWidgetItem();
+        item->setFlags(Qt::NoItemFlags);
+        item->setSizeHint(QSize(this->width(),  voiceItem->height()));
+        this->insertItem(this->count(), item);
+        this->setItemWidget(item, voiceItem);
+        connect(voiceItem, SIGNAL(sigMenuPopup(VNoteItem *)), this, SIGNAL(sigMenuPopup(VNoteItem *)));
+        connect(voiceItem, SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *, const QRegExp &)), this,
+                SIGNAL(sigTextEditDetail(VNoteItem *, DTextEdit *, const QRegExp &)));
+        connect(voiceItem, SIGNAL(sigVoicePlayBtnClicked(VoiceNoteItem *)),
+                this, SIGNAL(sigVoicePlayBtnClicked(VoiceNoteItem *)));
+        connect(voiceItem, SIGNAL(sigVoicePauseBtnClicked(VoiceNoteItem *)),
+                this, SIGNAL(sigVoicePauseBtnClicked(VoiceNoteItem *)));
+        connect(voiceItem, SIGNAL(sigItemAddHeight(int)), this, SLOT(onItemAddHeight(int)));
     }
     adjustWidgetItemWidth(this->count() - 1);
     this->scrollToBottom();
@@ -71,7 +87,7 @@ void RightNoteList::adjustWidgetItemWidth(int index)
     int newWidth = this->width() - 20;
     for (int i = index; i < this->count(); i++) {
         ptmp = this->item(i);
-        QWidget *ptmpWidget = this->itemWidget(ptmp);
+        VNoteItemWidget *ptmpWidget = static_cast<VNoteItemWidget *>(this->itemWidget(ptmp));
         ptmpWidget->setFixedSize(QSize(newWidth, ptmpWidget->height()));
         this->item(i)->setSizeHint(QSize(listWidth, ptmpWidget->height()));
     }
@@ -80,14 +96,12 @@ void RightNoteList::adjustWidgetItemWidth(int index)
 void RightNoteList::delNodeItem(VNoteItem *item)
 {
     for (int i = 0; i < this->count(); i++) {
-        if (item->noteType == VNoteItem::VNOTE_TYPE::VNT_Text) {
-            TextNoteItem *itemWidget = static_cast<TextNoteItem *>(this->itemWidget(this->item(i)));
-            if (itemWidget->getNoteItem() == item) {
-                QListWidgetItem *tmpItem = this->takeItem(i);
-                delete tmpItem;
-                itemWidget->deleteLater();
-                return;
-            }
+        VNoteItemWidget *itemWidget = static_cast<VNoteItemWidget *>(this->itemWidget(this->item(i)));
+        if (itemWidget->getNoteItem() == item) {
+            QListWidgetItem *tmpItem = this->takeItem(i);
+            delete tmpItem;
+            itemWidget->deleteLater();
+            return;
         }
     }
 }
@@ -112,14 +126,16 @@ qint64 RightNoteList::getFolderId()
     return m_forlderId;
 }
 
-void RightNoteList::onAddHeight(int height)
+void RightNoteList::onItemAddHeight(int height)
 {
-    QWidget *senderWidget = static_cast<QWidget *>(sender());
+    VNoteItemWidget *senderWidget = static_cast<VNoteItemWidget *>(sender());
     for (int i = 0; i < this->count(); i++) {
         QListWidgetItem *pTmpItem = this->item(i);
-        QWidget *pTmpwidget = this->itemWidget(pTmpItem);
+        VNoteItemWidget *pTmpwidget = static_cast<VNoteItemWidget *>(this->itemWidget(pTmpItem));
         if (senderWidget == pTmpwidget) {
-            this->item(i)->setSizeHint(QSize(this->width(), pTmpwidget->height() + height));
+            pTmpwidget->setFixedHeight(pTmpwidget->height() + height);
+            this->item(i)->setSizeHint(QSize(this->width(), pTmpwidget->height()));
+            emit sigListHeightChange();
             return;
         }
     }
@@ -129,15 +145,29 @@ void RightNoteList::updateNodeItem(VNoteItem *item)
 {
     bool flag = false;
     for (int i = 0; i < this->count(); i++) {
-        TextNoteItem *itemWidget = static_cast<TextNoteItem *>(this->itemWidget(this->item(i)));
+        VNoteItemWidget *itemWidget = static_cast<VNoteItemWidget *>(this->itemWidget(this->item(i)));
         if (itemWidget->getNoteItem() == item) {
-            itemWidget->updateData();
+            TextNoteItem *item = static_cast<TextNoteItem *>(itemWidget);
+            item->updateData();
             flag = true;
             break;
         }
     }
-    if(flag == false) //没找到说明是搜索模式下添加的项，同步添加
-    {
-        this->addNodeItem(item,QRegExp());
+    if (flag == false) { //没找到说明是搜索模式下添加的项，同步添加
+        this->addNodeItem(item, QRegExp());
     }
+}
+
+VoiceNoteItem *RightNoteList::getVoiceItem(VNoteItem *item)
+{
+    if (item && item->noteType == VNoteItem::VNOTE_TYPE::VNT_Voice) {
+        for (int i = 0; i < this->count(); i++) {
+            VNoteItemWidget *itemWidget = static_cast<VNoteItemWidget *>(this->itemWidget(this->item(i)));
+            if (itemWidget->getNoteItem() == item) {
+                VoiceNoteItem *item = static_cast<VoiceNoteItem *>(itemWidget);
+                return  item;
+            }
+        }
+    }
+    return nullptr;
 }

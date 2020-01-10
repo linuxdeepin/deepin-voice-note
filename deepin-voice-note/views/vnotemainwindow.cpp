@@ -197,7 +197,6 @@ void VNoteMainWindow::onVNoteFolderDel(VNoteFolder *data)
     folderOper.deleteVNoteFolder(data->id);
     if (m_leftView->getFolderCount() == 0) {
         switchView(WndHomePage);
-        m_noteSearchEdit->setEnabled(false);
     }
 }
 
@@ -270,7 +269,7 @@ void VNoteMainWindow::onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEd
     m_textNode = textNode;
     m_textEditRightView = preTextEdit;
     m_textEditMainWnd->setCurrentCharFormat(m_textEditFormat);
-    m_textEditMainWnd->setText(textNode->noteText);
+    m_textEditMainWnd->setText(preTextEdit->toPlainText());
     m_textEditMainWnd->setReadOnly(preTextEdit->isReadOnly()); //文字项可读可写，语音项只读
     if (!searchKey.isEmpty()) {
         Utils::highTextEdit(m_textEditMainWnd, m_textEditFormat, searchKey, QColor(0x349ae8));
@@ -283,7 +282,8 @@ void VNoteMainWindow::onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEd
 void VNoteMainWindow::onTextEditReturn()
 {
     QString text = m_textEditMainWnd->toPlainText();
-    if (text != m_textNode->noteText) {
+    if (m_textNode->noteType == VNoteItem::VNOTE_TYPE::VNT_Text
+            && text != m_textNode->noteText) {
         m_textNode->noteText = text;
         m_textEditRightView->setText(text);
         m_rightViewHolder->onUpdateNote(m_textNode);

@@ -78,7 +78,7 @@ void LeftView::handleDeleteItem(bool)
     QVariant var = index.data(Qt::UserRole + 1);
     if (var.isValid()) {
         VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
-        m_pDataModel->removeRow(index.row());
+        m_pSortFilterModel->removeRow(index.row());
         emit sigFolderDel(data);
     }
 }
