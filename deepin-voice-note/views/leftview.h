@@ -55,6 +55,8 @@ private:
     QStandardItemModel *m_pDataModel;
     LeftViewSortFilterModel *m_pSortFilterModel;
     LeftViewDelegate *m_pItemDelegate;
+
+    QRegExp m_searchKey;
 };
 
 #endif // LEFTVIEW_H

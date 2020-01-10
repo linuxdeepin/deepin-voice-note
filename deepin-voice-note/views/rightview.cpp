@@ -28,7 +28,7 @@ void RightView::initUi()
     QVBoxLayout *layoutList = new QVBoxLayout;
     layoutList->setContentsMargins(0, 0, 0, 0);
     layoutList->addWidget(m_stackWidget);
-    layoutList->addSpacing(160);
+    layoutList->addSpacing(90);
     this->setLayout(layoutList);
 
     m_noSearchResult = new DLabel(this);
@@ -178,7 +178,7 @@ void RightView::adjustaddTextBtn()
 
         if (widget != nullptr) {
             pos += widget->getListHeight();
-            int maxPos = this->height() - m_addTextBtn->height() - 70;
+            int maxPos = this->height() - m_addTextBtn->height();
             if (pos > maxPos) {
                 pos = maxPos;
             }
@@ -201,7 +201,7 @@ void RightView::onAddNote() //添加文字记录
 
     VNoteItem tmpNote;
     tmpNote.folderId = m_lastFolderId;
-    tmpNote.noteType = VNoteItem::VNT_Voice;
+    tmpNote.noteType = VNoteItem::VNT_Text;
     tmpNote.noteText = QString("");
 
     if (tmpNote.folderId != VNoteFolder::INVALID_ID) {

@@ -16,7 +16,7 @@ public:
                              QList<qint64> *whilteList = nullptr);
     void setFolderNameFilter(const QRegExp &searchKey, QList<qint64> *whilteList = nullptr);
     void clearFilter();
-    void removeFromWhiteList(qint64 id);
+    bool removeFromWhiteList(qint64 id);
 
 protected:
     bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const;

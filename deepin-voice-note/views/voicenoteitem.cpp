@@ -172,7 +172,7 @@ void VoiceNoteItem::onshowMenu()
 
 void VoiceNoteItem::onShowDetail()
 {
-   emit sigTextEditDetail(m_textNode,m_asrText,QRegExp());
+    emit sigTextEditDetail(m_textNode, m_asrText, QRegExp());
 }
 
 void VoiceNoteItem::onPlayBtnClicked()

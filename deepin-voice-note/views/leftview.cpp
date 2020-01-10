@@ -137,20 +137,25 @@ void LeftView::setUpdateTimeFilter(const QDateTime &begin, const QDateTime &end,
 
 void LeftView::setFolderNameFilter(const QRegExp &searchKey, QList<qint64> *whilteList)
 {
-    m_pSortFilterModel->setFolderNameFilter(searchKey, whilteList);
-    m_pItemDelegate->updateSearchKeyword(searchKey);
-    QModelIndex nowIndex = m_pSortFilterModel->index(0, 0);
-    this->reset();
-    this->setCurrentIndex(nowIndex);
+    if(!searchKey.isEmpty() && m_searchKey != searchKey){
+        m_pSortFilterModel->setFolderNameFilter(searchKey, whilteList);
+        m_pItemDelegate->updateSearchKeyword(searchKey);
+        QModelIndex nowIndex = m_pSortFilterModel->index(0, 0);
+        this->reset();
+        this->setCurrentIndex(nowIndex);
+        m_searchKey = searchKey;
+    }
 }
 
 void LeftView::clearFilter()
 {
-    m_pSortFilterModel->clearFilter();
-    m_pItemDelegate->resetKeyword();
-    this->reset();
-    QModelIndex index = m_pSortFilterModel->index(0, 0);
-    this->setCurrentIndex(index);
+    if(!m_searchKey.isEmpty()){
+        m_pSortFilterModel->clearFilter();
+        m_pItemDelegate->resetKeyword();
+        this->reset();
+        QModelIndex index = m_pSortFilterModel->index(0, 0);
+        this->setCurrentIndex(index);
+    }
 }
 
 int LeftView::loadNoteFolder()
@@ -201,8 +206,9 @@ int LeftView::getFolderCount()
 
 void LeftView::removeFromWhiteList(qint64 id)
 {
-    m_pSortFilterModel->removeFromWhiteList(id);
-    QModelIndex nowIndex = m_pSortFilterModel->index(0, 0);
-    this->reset();
-    this->setCurrentIndex(nowIndex);
+    if(m_pSortFilterModel->removeFromWhiteList(id)){
+        QModelIndex nowIndex = m_pSortFilterModel->index(0, 0);
+        this->reset();
+        this->setCurrentIndex(nowIndex);
+    }
 }
