@@ -2,6 +2,7 @@
 #include "common/vnotedatamanager.h"
 #include "common/vnoteitem.h"
 #include "common/utils.h"
+#include "views/vnoterecordbar.h"
 
 #include "globaldef.h"
 
@@ -39,20 +40,32 @@ void VNoteMainWindow::initData()
 
 void VNoteMainWindow::initConnections()
 {
-    connect(VNoteDataManager::instance(), &VNoteDataManager::onNoteFoldersLoaded, this,
-            &VNoteMainWindow::onVNoteFoldersLoaded);
-    connect(m_floatingAddBtn, &DFloatingButton::clicked, m_leftView, &LeftView::handleAddFolder);
-    connect(m_noteSearchEdit, &DSearchEdit::textChanged, this, &VNoteMainWindow::onVNoteSearch);
-    connect(m_leftView, SIGNAL(currentChanged(const QModelIndex &)), this,
-            SLOT(onVNoteFolderChange(const QModelIndex &)));
-    connect(m_leftView, &LeftView::sigFolderDel, this, &VNoteMainWindow::onVNoteFolderDel);
-    connect(m_wndHomePage, &InitEmptyPage::sigAddFolderByInitPage, this,
-            &VNoteMainWindow::onVNoteFolderAdd);
-    connect(m_rightViewHolder, &RightView::sigTextEditDetail, this,
-            &VNoteMainWindow::onTextEditDetail);
-    connect(m_returnBtn, &DIconButton::clicked, this, &VNoteMainWindow::onTextEditReturn);
-    connect(m_rightViewHolder, &RightView::sigSeachEditFocus, this, &VNoteMainWindow::onSearchEditFocus);
-    connect(m_rightViewHolder, &RightView::sigSearchNoteEmpty, this, &VNoteMainWindow::onSearchNoteEmpty);
+    connect(VNoteDataManager::instance(), &VNoteDataManager::onNoteFoldersLoaded,
+            this, &VNoteMainWindow::onVNoteFoldersLoaded);
+
+    connect(m_floatingAddBtn, &DFloatingButton::clicked,
+            m_leftView, &LeftView::handleAddFolder);
+
+    connect(m_noteSearchEdit, &DSearchEdit::textChanged,
+            this, &VNoteMainWindow::onVNoteSearch);
+
+    connect(m_leftView, SIGNAL(currentChanged(const QModelIndex &)),
+            this, SLOT(onVNoteFolderChange(const QModelIndex &)));
+    connect(m_leftView, &LeftView::sigFolderDel,
+            this, &VNoteMainWindow::onVNoteFolderDel);
+
+    connect(m_wndHomePage, &InitEmptyPage::sigAddFolderByInitPage,
+            this, &VNoteMainWindow::onVNoteFolderAdd);
+
+    connect(m_returnBtn, &DIconButton::clicked,
+            this, &VNoteMainWindow::onTextEditReturn);
+
+    connect(m_rightView, &RightView::sigTextEditDetail,
+            this, &VNoteMainWindow::onTextEditDetail);
+    connect(m_rightView, &RightView::sigSeachEditFocus,
+            this, &VNoteMainWindow::onSearchEditFocus);
+    connect(m_rightView, &RightView::sigSearchNoteEmpty,
+            this, &VNoteMainWindow::onSearchNoteEmpty);
 }
 
 void VNoteMainWindow::initShortcuts() {}
@@ -134,13 +147,49 @@ void VNoteMainWindow::initLeftView()
 
 void VNoteMainWindow::initRightView()
 {
-    m_rightViewHolder = new RightView(m_mainWndSpliter);
-    m_rightViewHolder->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    m_rightViewHolder = new QWidget(m_mainWndSpliter);
     m_rightViewHolder->setObjectName("rightMainLayoutHolder");
-    m_rightViewHolder->setBackgroundRole(DPalette::Base);
-    m_rightViewHolder->setAutoFillBackground(true);
+    m_rightViewHolder->setSizePolicy(QSizePolicy::Expanding
+                                     , QSizePolicy::Expanding);
+
+    QVBoxLayout *rightHolderLayout = new QVBoxLayout(m_rightViewHolder);
+    rightHolderLayout->setSpacing(0);
+    rightHolderLayout->setContentsMargins(0, 0, 0, 0);
+
+    //TODO:
+    //    Add note area code here
+    m_rightNoteArea = new QWidget(m_rightViewHolder);
+    m_rightNoteArea->setBackgroundRole(DPalette::Base);
+    m_rightNoteArea->setAutoFillBackground(true);
+
+    QVBoxLayout *rightNoteAreaLayout = new QVBoxLayout(m_rightNoteArea);
+    rightNoteAreaLayout->setSpacing(0);
+    rightNoteAreaLayout->setContentsMargins(0, 0, 0, 0);
+
+    m_rightView = new RightView(m_rightViewHolder);
+    m_rightView->setSizePolicy(QSizePolicy::Preferred
+                               , QSizePolicy::Preferred);
+    //m_rightView->setBackgroundRole(DPalette::Base);
+    //m_rightView->setAutoFillBackground(true);
+
+    rightNoteAreaLayout->addWidget(m_rightView);
+
+    //TODO:
+    //    Add record area code here
+    m_recordBar = new VNoteRecordBar(m_rightViewHolder);
+    m_recordBar->setBackgroundRole(DPalette::Base);
+    m_recordBar->setAutoFillBackground(true);
+    m_recordBar->setFixedHeight(78);
+    m_recordBar->setSizePolicy(QSizePolicy::Expanding
+                                , QSizePolicy::Fixed);
+
+    rightHolderLayout->addWidget(m_rightNoteArea);
+    rightHolderLayout->addWidget(m_recordBar);
+
 #ifdef VNOTE_LAYOUT_DEBUG
     m_rightViewHolder->setStyleSheet("background: red");
+    m_rightNoteArea->setStyleSheet("background: blue");
+    m_recordBar->setStyleSheet("background: green");
 #endif
 }
 
@@ -167,11 +216,11 @@ void VNoteMainWindow::onVNoteSearch()
         m_textEditMainWnd->setText(text);
         Utils::highTextEdit(m_textEditMainWnd, m_textEditFormat, regExp, QColor(0x349ae8));
     } else {
-        m_rightViewHolder->setSearchKey(regExp);
+        m_rightView->setSearchKey(regExp);
         if (regExp.isEmpty()) {
             m_leftView->clearFilter();
         } else {
-            QList<qint64> folders = m_rightViewHolder->getNoteContainsKeyFolders(regExp);
+            QList<qint64> folders = m_rightView->getNoteContainsKeyFolders(regExp);
             m_leftView->setFolderNameFilter(regExp, &folders);
         }
     }
@@ -183,7 +232,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &previous)
     QModelIndex index = m_leftView->currentIndex();
     if (index.isValid()) {
         qint64 id = m_leftView->getFolderId(index);
-        m_rightViewHolder->noteSwitchByFolder(id);
+        m_rightView->noteSwitchByFolder(id);
         switchView(WndNoteShow);
     } else {
         switchView(WndSearchEmpty);
@@ -192,7 +241,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &previous)
 
 void VNoteMainWindow::onVNoteFolderDel(VNoteFolder *data)
 {
-    m_rightViewHolder->noteDelByFolder(data->id);
+    m_rightView->noteDelByFolder(data->id);
     VNoteFolderOper folderOper(data);
     folderOper.deleteVNoteFolder(data->id);
     if (m_leftView->getFolderCount() == 0) {
@@ -286,7 +335,7 @@ void VNoteMainWindow::onTextEditReturn()
             && text != m_textNode->noteText) {
         m_textNode->noteText = text;
         m_textEditRightView->setText(text);
-        m_rightViewHolder->onUpdateNote(m_textNode);
+        m_rightView->onUpdateNote(m_textNode);
     }
     switchView(WndNoteShow);
     m_returnBtn->setVisible(false);

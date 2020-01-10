@@ -38,9 +38,8 @@ SOURCES += \
     common/vnoteaudiomanager.cpp \
     dialog/vnotemessagedialog.cpp \
     widgets/vnoterecordwidget.cpp \
-    views/voicenoteitem.cpp
-    views/voicenoteitem.cpp
-    views/initemptypage.cpp
+    views/voicenoteitem.cpp \
+    views/vnoterecordbar.cpp
 
 RESOURCES += \
     images.qrc
@@ -76,9 +75,8 @@ HEADERS += \
     common/vnoteaudiomanager.h \
     dialog/vnotemessagedialog.h \
     widgets/vnoterecordwidget.h \
-    views/voicenoteitem.h
-    views/voicenoteitem.h
-    views/initemptypage.h
+    views/voicenoteitem.h \
+    views/vnoterecordbar.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts

@@ -17,6 +17,8 @@
 
 DWIDGET_USE_NAMESPACE
 
+class VNoteRecordBar;
+
 class VNoteMainWindow : public DMainWindow
 {
     Q_OBJECT
@@ -58,11 +60,15 @@ private:
     DIconButton *m_returnBtn {nullptr};
 
     DFloatingButton *m_floatingAddBtn {nullptr};
-    QWidget         *m_leftViewHolder{nullptr};
+    QWidget         *m_leftViewHolder {nullptr};
+    QWidget         *m_rightViewHolder {nullptr};
+    QWidget         *m_rightNoteArea {nullptr};
 
-    DSplitter *m_mainWndSpliter {nullptr};
-    LeftView   *m_leftView {nullptr};
-    RightView   *m_rightViewHolder {nullptr};
+    DSplitter   *m_mainWndSpliter {nullptr};
+    LeftView    *m_leftView {nullptr};
+    RightView   *m_rightView {nullptr};
+
+    VNoteRecordBar* m_recordBar {nullptr};
 
     DTextEdit *m_textEditRightView {nullptr};
     DTextEdit *m_textEditMainWnd{nullptr};
