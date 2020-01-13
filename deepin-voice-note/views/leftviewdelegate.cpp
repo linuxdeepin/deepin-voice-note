@@ -4,6 +4,7 @@
 #include <QLineEdit>
 #include <QTextItem>
 #include <QDebug>
+#include <QtGlobal>
 
 #include <DPalette>
 
@@ -68,15 +69,23 @@ void VFolderNamePHelper::spiltByKeyword(const QString &text, const QRegExp &keyw
                 int extraLen = pos-startPos;
                 tb.text = elideText.mid(startPos, extraLen);
                 startPos += extraLen;
+
                 tb.rect = QRect(0, 0
-                                ,m_fontMetrics.width(tb.text)
+                                ,qMax<int>(
+                                    m_fontMetrics.width(tb.text)
+                                   ,m_fontMetrics.boundingRect(tb.text).width()
+                                 )
                                 ,m_fontMetrics.height()
                                 );
+
                 m_textsVector.push_back(tb);
 
                 tb.text = elideText.mid(pos, keyLen);
                 tb.rect = QRect(0, 0
-                                ,m_fontMetrics.width(tb.text)
+                                ,qMax<int>(
+                                    m_fontMetrics.width(tb.text)
+                                   ,m_fontMetrics.boundingRect(tb.text).width()
+                                 )
                                 ,m_fontMetrics.height()
                                 );
                 tb.isKeyword = true;
@@ -84,7 +93,10 @@ void VFolderNamePHelper::spiltByKeyword(const QString &text, const QRegExp &keyw
             } else {
                 tb.text = elideText.mid(pos, keyLen);
                 tb.rect = QRect(0, 0
-                                ,m_fontMetrics.width(tb.text)
+                                ,qMax<int>(
+                                    m_fontMetrics.width(tb.text)
+                                   ,m_fontMetrics.boundingRect(tb.text).width()
+                                 )
                                 ,m_fontMetrics.height()
                                 );
                 tb.isKeyword = true;
@@ -100,7 +112,10 @@ void VFolderNamePHelper::spiltByKeyword(const QString &text, const QRegExp &keyw
 
         tb.text = elideText.mid(startPos, (textLen-startPos));
         tb.rect = QRect(0, 0
-                        ,m_fontMetrics.width(tb.text)
+                        ,qMax<int>(
+                            m_fontMetrics.width(tb.text)
+                           ,m_fontMetrics.boundingRect(tb.text).width()
+                         )
                         ,m_fontMetrics.height()
                         );
 

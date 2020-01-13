@@ -20,6 +20,12 @@
     m_dbLock.unlock(); \
 } while(0)
 
+#define CHECK_DB_INIT() do { \
+    if (!m_isDbInitOK) { \
+        return false; \
+    } \
+} while(0)
+
 VNoteDbManager* VNoteDbManager::_instance = nullptr;
 
 VNoteDbManager::VNoteDbManager(QObject *parent)
@@ -48,9 +54,11 @@ QSqlDatabase &VNoteDbManager::getVNoteDb()
 }
 
 bool VNoteDbManager::insertData(DB_TABLE table,
-                                QString insertSql,
+                                const QStringList& insertSql,
                                 DbVisitor* visitor )
 {
+    CHECK_DB_INIT();
+
     int colums = 0;
 
     bool insertOK = true;
@@ -78,9 +86,7 @@ bool VNoteDbManager::insertData(DB_TABLE table,
 
     CRITICAL_SECTION_BEGIN();
 
-    QStringList sqls = insertSql.split(";");
-
-    for (auto it : sqls) {
+    for (auto it : insertSql) {
         if (!it.trimmed().isEmpty()) {
             if(!visitor->sqlQuery()->exec(it)) {
                 qCritical() << "insert data failed:" << it <<" reason:" << visitor->sqlQuery()->lastError().text();
@@ -102,8 +108,10 @@ bool VNoteDbManager::insertData(DB_TABLE table,
     return insertOK;
 }
 
-bool VNoteDbManager::updateData(VNoteDbManager::DB_TABLE table, QString updateSql)
+bool VNoteDbManager::updateData(VNoteDbManager::DB_TABLE table, const QStringList& updateSql)
 {
+    CHECK_DB_INIT();
+
     Q_UNUSED(table);
 
     bool updateOK = true;
@@ -112,9 +120,7 @@ bool VNoteDbManager::updateData(VNoteDbManager::DB_TABLE table, QString updateSq
 
     QScopedPointer<QSqlQuery> sqlQuery(new QSqlQuery(m_vnoteDB));
 
-    QStringList sqls = updateSql.split(";");
-
-    for (auto it : sqls) {
+    for (auto it : updateSql) {
         if (!it.trimmed().isEmpty()) {
             if(!sqlQuery->exec(it)) {
                 qCritical() << "Update data failed:" << it <<" reason:" << sqlQuery->lastError().text();
@@ -130,6 +136,8 @@ bool VNoteDbManager::updateData(VNoteDbManager::DB_TABLE table, QString updateSq
 
 bool VNoteDbManager::queryData(VNoteDbManager::DB_TABLE table, QString querySql, DbVisitor* visitor)
 {
+    CHECK_DB_INIT();
+
     int colums = 0;
 
     bool queryOK = true;
@@ -172,8 +180,10 @@ bool VNoteDbManager::queryData(VNoteDbManager::DB_TABLE table, QString querySql,
     return queryOK;
 }
 
-bool VNoteDbManager::deleteData(VNoteDbManager::DB_TABLE table, QString delSql)
+bool VNoteDbManager::deleteData(VNoteDbManager::DB_TABLE table, const QStringList& delSql)
 {
+    CHECK_DB_INIT();
+
     Q_UNUSED(table);
 
     bool deleteOK = true;
@@ -182,9 +192,7 @@ bool VNoteDbManager::deleteData(VNoteDbManager::DB_TABLE table, QString delSql)
 
     QScopedPointer<QSqlQuery> sqlQuery(new QSqlQuery(m_vnoteDB));
 
-    QStringList sqls = delSql.split(";");
-
-    for (auto it : sqls) {
+    for (auto it : delSql) {
         if (!it.trimmed().isEmpty()) {
             if(!sqlQuery->exec(it)) {
                 qCritical() << "Delete data failed:" << it <<" reason:" << sqlQuery->lastError().text();
@@ -241,6 +249,8 @@ int VNoteDbManager::initVNoteDb()
     qInfo() << "Database opened:" << vnoteDbFullPath;
 
     createTablesIfNeed();
+
+    m_isDbInitOK = true;
 
     return 0;
 }

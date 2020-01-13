@@ -56,9 +56,9 @@ bool VNoteFolderOper::deleteVNoteFolder(qint64 folderId)
 
     bool delOK = false;
 
-    QString sqls;
-
-    sqls = deleteFolderSql+deleteNotesSql;
+    QStringList sqls;
+    sqls.append(deleteFolderSql);
+    sqls.append(deleteNotesSql);
 
     if (VNoteDbManager::instance()->deleteData(VNoteDbManager::DB_TABLE::VNOTE_FOLDER_TBL
                                                , sqls) ) {
@@ -85,6 +85,7 @@ bool VNoteFolderOper::renameVNoteFolder(QString folderName)
 
     bool isUpdateOK = false;
 
+    QStringList sqls;
     QString renameSql;
 
     if (nullptr != m_folder) {
@@ -100,9 +101,11 @@ bool VNoteFolderOper::renameVNoteFolder(QString folderName)
                           , QString("%1").arg(m_folder->id).toUtf8().data()
                           );
 
+        sqls.append(renameSql);
+
         if (VNoteDbManager::instance()->updateData(
                     VNoteDbManager::DB_TABLE::VNOTE_FOLDER_TBL
-                    ,renameSql)) {
+                    ,sqls)) {
             m_folder->name       = folderName;
             m_folder->modifyTime = modifyTime;
 
@@ -160,7 +163,9 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
                       , folderColumnsName[folder_id].toUtf8().data()
                       );
 
-    QString sqls = insertSql+queryNewRec;
+    QStringList sqls;
+    sqls.append(insertSql);
+    sqls.append(queryNewRec);
 
     QVariantList record;
 

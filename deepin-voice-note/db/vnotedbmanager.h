@@ -52,11 +52,11 @@ public:
     QSqlDatabase& getVNoteDb();
 
     bool insertData(DB_TABLE table,
-                    QString insertSql,
+                    const QStringList& insertSql,
                     DbVisitor* visitor /*out*/);
-    bool updateData(DB_TABLE table, QString updateSql);
+    bool updateData(DB_TABLE table, const QStringList& updateSql);
     bool queryData(DB_TABLE table, QString querySql, DbVisitor* visitor);
-    bool deleteData(DB_TABLE table, QString delSql);
+    bool deleteData(DB_TABLE table, const QStringList& delSql);
 signals:
 
 public slots:
@@ -70,6 +70,7 @@ protected:
 //    QScopedPointer<QSqlQuery> m_sqlQuery;
 
     QMutex m_dbLock;
+    bool   m_isDbInitOK {false};
 
     static VNoteDbManager* _instance;
 };

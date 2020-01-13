@@ -91,7 +91,9 @@ bool VNoteItemOper::modifyNoteText(QString text)
                           , QString("%1").arg(m_note->folderId).toUtf8().data()
                           );
 
-        QString sqls = modifyNoteTextSql+updateSql;
+        QStringList sqls;
+        sqls.append(modifyNoteTextSql);
+        sqls.append(updateSql);
 
         if (VNoteDbManager::instance()->updateData(
                     VNoteDbManager::DB_TABLE::VNOTE_FOLDER_TBL
@@ -143,7 +145,10 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
                       , noteColumnsName[note_id].toUtf8().data()
                       );
 
-    QString sqls = insertSql+updateSql+queryNewRec;
+    QStringList sqls;
+    sqls.append(insertSql);
+    sqls.append(updateSql);
+    sqls.append(queryNewRec);
 
     VNoteItem *newNote= new VNoteItem();
     AddNoteDbVisitor addNoteVisitor(VNoteDbManager::instance()->getVNoteDb(), newNote);
@@ -225,9 +230,9 @@ bool VNoteItemOper::deleteNote(qint64 folderId, qint32 noteId)
                       , QString("%1").arg(folderId).toUtf8().data()
                       );
 
-    QString sqls;
-
-    sqls = deleteSql+updateSql;
+    QStringList sqls;
+    sqls.append(deleteSql);
+    sqls.append(updateSql);
 
     bool delOK = false;
 
