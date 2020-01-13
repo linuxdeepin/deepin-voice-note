@@ -141,36 +141,6 @@
         <file>icons/deepin/builtin/light/audio_press.svg</file>
         <file>icons/deepin/builtin/light/audio_hover.svg</file>
         <file>icons/deepin/builtin/light/audio_normal.svg</file>
-        <file>common/datatypedef.cpp</file>
-        <file>common/datatypedef.h</file>
-        <file>common/loadfolderworker.cpp</file>
-        <file>common/loadfolderworker.h</file>
-        <file>common/loadiconsworker.cpp</file>
-        <file>common/loadiconsworker.h</file>
-        <file>common/loadnoteitemsworker.cpp</file>
-        <file>common/loadnoteitemsworker.h</file>
-        <file>common/utils.cpp</file>
-        <file>common/utils.h</file>
-        <file>common/vnoteaudiomanager.cpp</file>
-        <file>common/vnoteaudiomanager.h</file>
-        <file>common/vnotedatamanager.cpp</file>
-        <file>common/vnotedatamanager.h</file>
-        <file>common/vnoteforlder.cpp</file>
-        <file>common/vnoteforlder.h</file>
-        <file>common/vnoteitem.cpp</file>
-        <file>common/vnoteitem.h</file>
-        <file>db/dbvisitor.cpp</file>
-        <file>db/dbvisitor.h</file>
-        <file>db/vnotedbmanager.cpp</file>
-        <file>db/vnotedbmanager.h</file>
-        <file>db/vnotefolderoper.cpp</file>
-        <file>db/vnotefolderoper.h</file>
-        <file>db/vnoteitemoper.cpp</file>
-        <file>db/vnoteitemoper.h</file>
-        <file>dialog/vnotebasedialog.cpp</file>
-        <file>dialog/vnotebasedialog.h</file>
-        <file>dialog/vnotemessagedialog.cpp</file>
-        <file>dialog/vnotemessagedialog.h</file>
         <file>icons/deepin/builtin/dark/audio_disabled.svg</file>
         <file>icons/deepin/builtin/dark/detail_hover.svg</file>
         <file>icons/deepin/builtin/dark/detail_normal.svg</file>
@@ -217,40 +187,6 @@
         <file>icons/deepin/builtin/light/stop_rec_hover.svg</file>
         <file>icons/deepin/builtin/light/stop_rec_normal.svg</file>
         <file>icons/deepin/builtin/light/stop_rec_press.svg</file>
-        <file>views/initemptypage.cpp</file>
-        <file>views/initemptypage.h</file>
-        <file>views/leftview.cpp</file>
-        <file>views/leftview.h</file>
-        <file>views/leftviewdelegate.cpp</file>
-        <file>views/leftviewdelegate.h</file>
-        <file>views/leftviewsortfiltermodel.cpp</file>
-        <file>views/leftviewsortfiltermodel.h</file>
-        <file>views/myrecodebuttons.cpp</file>
-        <file>views/myrecodebuttons.h</file>
-        <file>views/rightnotelist.cpp</file>
-        <file>views/rightnotelist.h</file>
-        <file>views/rightview.cpp</file>
-        <file>views/rightview.h</file>
-        <file>views/textnoteedit.cpp</file>
-        <file>views/textnoteedit.h</file>
-        <file>views/textnoteitem.cpp</file>
-        <file>views/textnoteitem.h</file>
-        <file>views/vnotemainwindow.cpp</file>
-        <file>views/vnotemainwindow.h</file>
-        <file>views/vnoterecordbar.cpp</file>
-        <file>views/vnoterecordbar.h</file>
-        <file>views/voicenoteitem.cpp</file>
-        <file>views/voicenoteitem.h</file>
-        <file>widgets/vnoteiconbutton.cpp</file>
-        <file>widgets/vnoteiconbutton.h</file>
-        <file>widgets/vnoterecordwidget.cpp</file>
-        <file>widgets/vnoterecordwidget.h</file>
-        <file>widgets/vnwaveform.cpp</file>
-        <file>widgets/vnwaveform.h</file>
-        <file>globaldef.h</file>
-        <file>main.cpp</file>
-        <file>vnoteapplication.cpp</file>
-        <file>vnoteapplication.h</file>
         <file>icons/deepin/builtin/dark/home_page_logo.svg</file>
         <file>icons/deepin/builtin/light/home_page_logo.svg</file>
     </qresource>
