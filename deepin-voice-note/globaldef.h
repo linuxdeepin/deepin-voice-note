@@ -17,6 +17,9 @@
 #define VNOTE_SEARCHBAR_H  36
 #define VNOTE_SEARCHBAR_W  350
 
+//StandIcon path
+#define STAND_ICON_PAHT ":/icons/deepin/builtin/"
+
 //Time format
 #define VNOTE_TIME_FMT "yyyy-MM-dd HH:mm:ss.zzz"
 

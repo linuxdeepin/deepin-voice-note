@@ -11,10 +11,10 @@ class VNoteIconButton : public DIconButton
 {
     Q_OBJECT
 public:
-    explicit VNoteIconButton(QString normal = ""
-                             , QString hover = ""
-                             , QString press = ""
-                             , QWidget *parent = nullptr);
+    explicit VNoteIconButton(QWidget *parent = nullptr
+            , QString normal = ""
+            , QString hover  = ""
+            , QString press  = "");
 
     void enterEvent(QEvent *event) override;
     void leaveEvent(QEvent *event) override;
@@ -27,6 +27,7 @@ signals:
 public slots:
 private:
     QPixmap loadPixmap(const QString &path);
+    void    updateIcon();
 
     enum {
         Normal,

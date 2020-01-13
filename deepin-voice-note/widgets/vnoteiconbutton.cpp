@@ -1,15 +1,28 @@
 #include "widgets/vnoteiconbutton.h"
+#include "globaldef.h"
 
 #include <QImageReader>
 
-VNoteIconButton::VNoteIconButton(QString normal,QString hover, QString press,QWidget *parent)
+#include <DApplicationHelper>
+#include <DLog>
+
+VNoteIconButton::VNoteIconButton(QWidget *parent, QString normal,QString hover, QString press)
     : DIconButton(parent)
 {
     m_icons[Normal] = normal;
     m_icons[Hover] = hover;
     m_icons[Press] = press;
 
-    setIcon(loadPixmap(m_icons[m_state]));
+    updateIcon();
+
+    //TODO:
+    //    Need update when theme change
+    QObject::connect(DGuiApplicationHelper::instance(),
+                     &DGuiApplicationHelper::paletteTypeChanged,
+                     [this] (DGuiApplicationHelper::ColorType type) {
+        Q_UNUSED(type);
+        updateIcon();
+    });
 }
 
 void VNoteIconButton::enterEvent(QEvent *event)
@@ -18,7 +31,7 @@ void VNoteIconButton::enterEvent(QEvent *event)
 
     m_state = Hover;
 
-    setIcon(loadPixmap(m_icons[m_state]));
+    updateIcon();
 }
 
 void VNoteIconButton::leaveEvent(QEvent *event)
@@ -27,7 +40,7 @@ void VNoteIconButton::leaveEvent(QEvent *event)
 
     m_state = Normal;
 
-    setIcon(loadPixmap(m_icons[m_state]));
+    updateIcon();
 }
 
 void VNoteIconButton::mousePressEvent(QMouseEvent *event)
@@ -38,7 +51,7 @@ void VNoteIconButton::mousePressEvent(QMouseEvent *event)
 
     m_state = Press;
 
-    setIcon(loadPixmap(m_icons[m_state]));
+    updateIcon();
 
     event->accept();
 }
@@ -55,7 +68,7 @@ void VNoteIconButton::mouseReleaseEvent(QMouseEvent *event)
 
         m_state = Hover;
 
-        setIcon(loadPixmap(m_icons[m_state]));
+        updateIcon();
 
         Q_EMIT clicked();
     }
@@ -68,12 +81,26 @@ void VNoteIconButton::mouseMoveEvent(QMouseEvent *event)
     if (m_state != Hover) {
         m_state = Hover;
 
-        setIcon(loadPixmap(m_icons[m_state]));
+        updateIcon();
     }
 }
 
 QPixmap VNoteIconButton::loadPixmap(const QString &path)
 {
+    DGuiApplicationHelper::ColorType theme =
+            DGuiApplicationHelper::instance()->themeType();
+
+    QString iconPath(STAND_ICON_PAHT);
+
+    qDebug() << "theme:" << theme;
+    if (DGuiApplicationHelper::ColorType::LightType == theme) {
+        iconPath += QString("light/");
+    } else {
+        iconPath += QString("dark/");
+    }
+
+    iconPath += path;
+
     qreal ratio = 1.0;
 
     const qreal devicePixelRatio = devicePixelRatioF();
@@ -82,15 +109,22 @@ QPixmap VNoteIconButton::loadPixmap(const QString &path)
 
     if (!qFuzzyCompare(ratio, devicePixelRatio)) {
         QImageReader reader;
-        reader.setFileName(qt_findAtNxFile(path, devicePixelRatio, &ratio));
+        reader.setFileName(qt_findAtNxFile(iconPath, devicePixelRatio, &ratio));
         if (reader.canRead()) {
             reader.setScaledSize(reader.size() * (devicePixelRatio / ratio));
             pixmap = QPixmap::fromImage(reader.read());
             pixmap.setDevicePixelRatio(devicePixelRatio);
         }
     } else {
-        pixmap.load(path);
+        pixmap.load(iconPath);
     }
 
     return pixmap;
+}
+
+void VNoteIconButton::updateIcon()
+{
+    if (!m_icons[m_state].isEmpty()) {
+        setIcon(loadPixmap(m_icons[m_state]));
+    }
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128px" height="128px" viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 58 (84663) - https://sketch.com -->
+    <title>icon_import_music</title>
+    <desc>Created with Sketch.</desc>
+    <g id="浅色" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="语音记事本-空白页" transform="translate(-897.000000, -401.000000)">
+            <g id="编组-2" transform="translate(897.000000, 401.000000)">
+                <ellipse id="椭圆形" stroke="#E6E6E6" stroke-width="3" fill="#FFFFFF" cx="64" cy="37" rx="10" ry="8"></ellipse>
+                <rect id="矩形" stroke="#E6E6E6" stroke-width="3" fill="#FFFFFF" x="32" y="41" width="64" height="68" rx="8"></rect>
+                <rect id="矩形" stroke="#E6E6E6" stroke-width="3" fill="#FFFFFF" x="46" y="38" width="37" height="6" rx="3"></rect>
+                <g id="编组" transform="translate(45.000000, 59.000000)" fill="#E6E6E6">
+                    <rect id="矩形" x="0" y="0" width="5" height="5" rx="1"></rect>
+                    <rect id="矩形备份" x="9" y="1" width="29" height="3" rx="1"></rect>
+                </g>
+                <g id="编组备份" transform="translate(45.000000, 72.000000)" fill="#E6E6E6">
+                    <rect id="矩形" x="0" y="0" width="5" height="5" rx="1"></rect>
+                    <rect id="矩形备份" x="9" y="1" width="29" height="3" rx="1"></rect>
+                </g>
+                <g id="编组备份-2" transform="translate(45.000000, 85.000000)" fill="#E6E6E6">
+                    <rect id="矩形" x="0" y="0" width="5" height="5" rx="1"></rect>
+                    <rect id="矩形备份" x="9" y="1" width="29" height="3" rx="1"></rect>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

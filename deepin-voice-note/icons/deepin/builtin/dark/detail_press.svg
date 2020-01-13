@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="44px" height="44px" viewBox="0 0 44 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 58 (84663) - https://sketch.com -->
+    <title>detail press</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="95.6533653%" id="linearGradient-1">
+            <stop stop-color="#242424" offset="0%"></stop>
+            <stop stop-color="#282828" offset="100%"></stop>
+        </linearGradient>
+        <circle id="path-2" cx="22" cy="22" r="15"></circle>
+        <filter x="-23.3%" y="-16.7%" width="146.7%" height="146.7%" filterUnits="objectBoundingBox" id="filter-3">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feComposite in="shadowBlurOuter1" in2="SourceAlpha" operator="out" result="shadowBlurOuter1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.05 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="深色" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="按钮状态" transform="translate(-844.000000, -442.000000)">
+            <g id="编组-6" transform="translate(844.000000, 442.000000)">
+                <g id="Oval">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-3)" xlink:href="#path-2"></use>
+                    <use fill-opacity="0.08" fill="#000000" fill-rule="evenodd" xlink:href="#path-2"></use>
+                    <circle stroke-opacity="0.03" stroke="#FFFFFF" stroke-width="1" stroke-linejoin="square" fill="url(#linearGradient-1)" fill-rule="evenodd" cx="22" cy="22" r="14.5"></circle>
+                </g>
+                <g id="fullscreen备份-2" transform="translate(15.000018, 15.000000)" fill="#0081FF">
+                    <g id="形状-2">
+                        <path d="M1,7 L1,11.5020869 C1,12.3270426 1.67208268,13 2.4979131,13 L7,13 L7,14 L2.4979131,14 C1.11950656,14 0,12.8790364 0,11.5020869 L0,7 L1,7 Z M9.7888347,4.2016075 C9.9840968,4.3968697 9.9840968,4.7134522 9.7888347,4.9087143 L5.1083185,9.5892304 C4.9130564,9.7844926 4.5964739,9.7844926 4.4012118,9.5892304 C4.2059496,9.3939683 4.2059496,9.0773858 4.4012118,8.8821237 L9.0817279,4.2016075 C9.27699,4.0063454 9.5935725,4.0063454 9.7888347,4.2016075 Z M11.5020869,0 C12.8804934,0 14,1.12096359 14,2.4979131 L14,7 L13,7 L13,2.4979131 C13,1.67295739 12.3279173,1 11.5020869,1 L7,1 L7,0 L11.5020869,0 Z" id="形状"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
