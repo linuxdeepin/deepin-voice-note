@@ -21,6 +21,8 @@ public:
     void noteSwitchByFolder(qint64 id);
     void noteDelByFolder(qint64 id);
     void setSearchKey(const QRegExp &searchKey);
+    void addVoiceNoteItem(const QString &voicePath,qint64 voiceSize);
+
     QList<qint64> getNoteContainsKeyFolders(const QRegExp &searchKey);
 
 signals :
@@ -36,6 +38,7 @@ private:
     void initConnection();
     void addNewNoteList(qint64 id);
     void delNoteFromList(VNoteItem *item,RightNoteList *list);
+    RightNoteList *getNormalNoteList(qint64);
 
 
 public slots:

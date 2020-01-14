@@ -173,7 +173,7 @@ int LeftView::loadNoteFolder()
         int count = folders->folders.size();
         folders->lock.unlock();
 
-        sortView(LeftViewSortFilterModel::OperaType::modifyTime, Qt::DescendingOrder);
+        sortView(LeftViewSortFilterModel::OperaType::createTime, Qt::DescendingOrder);
 
         QModelIndex index = m_pSortFilterModel->index(0, 0);
         this->setCurrentIndex(index);

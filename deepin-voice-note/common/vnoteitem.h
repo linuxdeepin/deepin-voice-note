@@ -26,6 +26,7 @@ public:
     qint32 noteId {INVALID_ID};
     qint64 folderId {INVALID_ID};
     qint32 noteType {VNOTE_TYPE::VNT_Text};
+    qint64 voiceSize {0};
 
     QString noteText;
     QString voicePath;
@@ -39,7 +40,6 @@ class VNoteItemWidget :public DWidget //语音文字通用接口，在子类中�
     Q_OBJECT
 public:
     explicit VNoteItemWidget(QWidget *parent = nullptr);
-    ~VNoteItemWidget();
     virtual VNoteItem *getNoteItem();
 };
 

@@ -15,4 +15,5 @@ public:
     static QPixmap renderSVG(const QString &filePath, const QSize &size, DApplication *pApp);
     static int highTextEdit(DTextEdit *textEdit,const QTextCharFormat &oriFormat,const QRegExp &searchKey,
                             const QColor &highColor);
+    static QString formatMillisecond(qint64 millisecond);
 };

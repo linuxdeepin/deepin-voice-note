@@ -20,7 +20,6 @@ TextNoteItem::TextNoteItem(VNoteItem *textNote, QWidget *parent)
     initConnection();
     updateData();
 }
-
 void TextNoteItem::initUI()
 {
     m_timeLabel = new DLabel(this);
@@ -36,31 +35,23 @@ void TextNoteItem::initUI()
     m_textEdit->setFrameShape(QFrame::NoFrame);
     m_textEditFormat =  m_textEdit->currentCharFormat();
     DPalette pb = DApplicationHelper::instance()->palette(this);
-    pb.setBrush(DPalette::Text,pb.color(DPalette::Active,DPalette::WindowText));
+    pb.setBrush(DPalette::Text, pb.color(DPalette::Active, DPalette::WindowText));
     pb.setBrush(DPalette::Button, pb.color(DPalette::ItemBackground));
     this->setPalette(pb);
 
-    DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
-    if (themeType == DGuiApplicationHelper::LightType) {
-        m_menuBtn = new MyRecodeButtons(
-            ":/images/icon/normal/more_normal.svg", ":/images/icon/press/more_press.svg",
-            ":/images/icon/hover/more_hover.svg", ":/images/icon/disabled/more_disabled.svg",
-            ":/images/icon/focus/more_focus.svg", QSize(44, 44), this);
-        m_detailBtn = new MyRecodeButtons(
-            ":/images/icon/normal/detail-normal.svg", ":/images/icon/press/detail-press.svg",
-            ":/images/icon/hover/detail-hover.svg", "", "", QSize(44, 44), this);
-    } else if (themeType == DGuiApplicationHelper::DarkType) {
-        m_menuBtn = new MyRecodeButtons(":/images/icon_dark/normal/more_normal_dark.svg",
-                                        ":/images/icon_dark/press/more_press_dark.svg",
-                                        ":/images/icon_dark/hover/more_hover_dark.svg",
-                                        ":/images/icon_dark/disabled/more_disabled_dark.svg",
-                                        ":/images/icon_dark/focus/more_focus_dark.svg",
-                                        QSize(44, 44), this);
-        m_detailBtn = new MyRecodeButtons(":/images/icon_dark/normal/detail-normal.svg",
-                                          ":/images/icon_dark/press/detail-press.svg",
-                                          ":/images/icon_dark/hover/detail-hover.svg", "", "",
-                                          QSize(44, 44), this);
-    }
+    m_menuBtn = new VNoteIconButton(this
+                                    , "more_normal.svg"
+                                    , "more_hover.svg"
+                                    , "more_press.svg");
+    m_menuBtn->setIconSize(QSize(44, 44));
+    m_menuBtn->setFlat(true);
+
+    m_detailBtn = new VNoteIconButton(this
+                                      , "detail_normal.svg"
+                                      , "detail_press.svg"
+                                      , "detail_hover.svg");
+    m_detailBtn->setIconSize(QSize(44, 44));
+    m_detailBtn->setFlat(true);
     m_detailBtn->setVisible(false);
 
     QVBoxLayout *btnLayout = new QVBoxLayout;
@@ -101,8 +92,8 @@ void TextNoteItem::initConnection()
     connect(m_textEdit, &TextNoteEdit::textChanged, this, &TextNoteItem::onTextChanged);
     connect(m_textEdit, &TextNoteEdit::sigFocusIn, this, &TextNoteItem::onEditFocusIn);
     connect(m_textEdit, &TextNoteEdit::sigFocusOut, this, &TextNoteItem::onEditFocusOut);
-    connect(m_detailBtn, &DPushButton::clicked, this, &TextNoteItem::onShowDetail);
-    connect(m_menuBtn, &DPushButton::clicked, this, &TextNoteItem::onShowMenu);
+    connect(m_detailBtn, &VNoteIconButton::clicked, this, &TextNoteItem::onShowDetail);
+    connect(m_menuBtn, &VNoteIconButton::clicked, this, &TextNoteItem::onShowMenu);
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &TextNoteItem::onChangeTheme);
 }
@@ -170,37 +161,6 @@ void TextNoteItem::onChangeTheme()
     pb.setBrush(DPalette::Button, pb.color(DPalette::ItemBackground));
     pb.setBrush(DPalette::Text, pb.color(DPalette::Active, DPalette::WindowText));
     m_textEdit->setPalette(pb);
-
-    DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
-
-    if (themeType == DGuiApplicationHelper::LightType) {
-        if (nullptr != m_menuBtn) {
-            m_menuBtn->setPicChange(
-                ":/images/icon/normal/more_normal.svg", ":/images/icon/press/more_press.svg",
-                ":/images/icon/hover/more_hover.svg", ":/images/icon/disabled/more_disabled.svg",
-                ":/images/icon/focus/more_focus.svg");
-        }
-
-        if (nullptr != m_detailBtn) {
-            m_detailBtn->setPicChange(":/images/icon/normal/detail-normal.svg",
-                                      ":/images/icon/press/detail-press.svg",
-                                      ":/images/icon/hover/detail-hover.svg", "", "");
-        }
-
-    } else if (themeType == DGuiApplicationHelper::DarkType) {
-        if (nullptr != m_menuBtn) {
-            m_menuBtn->setPicChange(":/images/icon_dark/normal/more_normal_dark.svg",
-                                    ":/images/icon_dark/press/more_press_dark.svg",
-                                    ":/images/icon_dark/hover/more_hover_dark.svg",
-                                    ":/images/icon_dark/disabled/more_disabled_dark.svg",
-                                    ":/images/icon_dark/focus/more_focus_dark.svg");
-        }
-        if (nullptr != m_detailBtn) {
-            m_detailBtn->setPicChange(":/images/icon_dark/normal/detail-normal.svg",
-                                      ":/images/icon_dark/press/detail-press.svg",
-                                      ":/images/icon_dark/hover/detail-hover.svg", "", "");
-        }
-    }
 }
 void TextNoteItem::resizeEvent(QResizeEvent *event)
 {
@@ -212,7 +172,7 @@ void TextNoteItem::leaveEvent(QEvent *event)
 {
     VNoteItemWidget::leaveEvent(event);
     DPalette pb = DApplicationHelper::instance()->palette(m_textEdit);
-    pb.setBrush(DPalette::Text,pb.color(DPalette::Active,DPalette::WindowText));
+    pb.setBrush(DPalette::Text, pb.color(DPalette::Active, DPalette::WindowText));
     pb.setBrush(DPalette::Button, pb.color(DPalette::ItemBackground));
     m_textEdit->setPalette(pb);
 }
@@ -221,7 +181,7 @@ void TextNoteItem::enterEvent(QEvent *event)
 {
     VNoteItemWidget::enterEvent(event);
     DPalette pb = DApplicationHelper::instance()->palette(m_textEdit);
-    pb.setBrush(DPalette::Text,pb.color(DPalette::Active,DPalette::WindowText));
+    pb.setBrush(DPalette::Text, pb.color(DPalette::Active, DPalette::WindowText));
     pb.setBrush(DPalette::Button, pb.color(DPalette::Light));
     m_textEdit->setPalette(pb);
 }
@@ -248,9 +208,11 @@ void TextNoteItem::updateDetilBtn()
         int textEditHeight = m_textEdit->height();
         QTextDocument *document = m_textEdit->document();
         int documentHeight = static_cast<int>(document->size().height());
-        if (textEditHeight < documentHeight - 10){
+        if (textEditHeight < documentHeight - 10)
+        {
             m_detailBtn->setVisible(true);
-        } else{
+        } else
+        {
             m_detailBtn->setVisible(false);
         }
     });

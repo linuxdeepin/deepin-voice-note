@@ -66,6 +66,10 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onSearchEditFocus);
     connect(m_rightView, &RightView::sigSearchNoteEmpty,
             this, &VNoteMainWindow::onSearchNoteEmpty);
+
+    connect(m_recordBar, &VNoteRecordBar::sigStartRecord, this, &VNoteMainWindow::onStartRecord);
+    connect(m_recordBar, &VNoteRecordBar::sigFinshRecord, this, &VNoteMainWindow::onFinshRecord);
+
 }
 
 void VNoteMainWindow::initShortcuts() {}
@@ -181,7 +185,7 @@ void VNoteMainWindow::initRightView()
     m_recordBar->setAutoFillBackground(true);
     m_recordBar->setFixedHeight(78);
     m_recordBar->setSizePolicy(QSizePolicy::Expanding
-                                , QSizePolicy::Fixed);
+                               , QSizePolicy::Fixed);
 
     rightHolderLayout->addWidget(m_rightNoteArea);
     rightHolderLayout->addWidget(m_recordBar);
@@ -350,4 +354,17 @@ void VNoteMainWindow::onSearchEditFocus()
 void VNoteMainWindow::onSearchNoteEmpty(qint64 id)
 {
     m_leftView->removeFromWhiteList(id);
+}
+
+void VNoteMainWindow::onStartRecord()
+{
+    m_leftView->setEnabled(false);
+    m_noteSearchEdit->setEnabled(false);
+}
+
+void VNoteMainWindow::onFinshRecord(const QString &voicePath,qint64 voiceSize)
+{
+    m_leftView->setEnabled(true);
+    m_rightView->addVoiceNoteItem(voicePath,voiceSize);
+    m_noteSearchEdit->setEnabled(true);
 }

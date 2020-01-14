@@ -24,7 +24,6 @@ VNoteIconButton::VNoteIconButton(QWidget *parent, QString normal,QString hover, 
         updateIcon();
     });
 }
-
 void VNoteIconButton::enterEvent(QEvent *event)
 {
     Q_UNUSED(event);

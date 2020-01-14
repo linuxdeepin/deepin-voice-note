@@ -131,7 +131,7 @@ void VNoteAudioManager::stopPlay()
 
 void VNoteAudioManager::setRecordFileName(const QString &fileName)
 {
-    if (QMediaRecorder::StoppedState != m_pAudioRecord->state()) {
+    if (QMediaRecorder::StoppedState == m_pAudioRecord->state()) {
         if (m_recordFileName != fileName) {
             m_recordFileName = fileName;
             m_pAudioRecord->setOutputLocation(QUrl::fromLocalFile(m_recordFileName));

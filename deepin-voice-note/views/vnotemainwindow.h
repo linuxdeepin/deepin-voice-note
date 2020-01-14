@@ -54,6 +54,8 @@ public slots:
     void onTextEditReturn();
     void onSearchEditFocus();
     void onSearchNoteEmpty(qint64 id);
+    void onStartRecord();//开始录音
+    void onFinshRecord(const QString &voicePath,qint64 voiceSize); //结束录音
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};

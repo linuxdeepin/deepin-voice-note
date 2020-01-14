@@ -22,14 +22,21 @@ public:
     void initUI();
     void initConnections();
 signals:
+    void sigStartRecord();
+    void sigFinshRecord(const QString &voicePath,qint64 voiceSize);
 
 public slots:
+    void onStartRecord();
+    void onFinshRecord(const QString &voicePath,qint64 voiceSize);
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
 protected:
     VNoteRecordWidget *m_recordPanel {nullptr};
     VNoteIconButton   *m_recordBtn {nullptr};
     QScopedPointer<DAnchorsBase> m_recBtnAnchor;
+
+    QString          m_recordPath {""};
 };
 
 #endif // VNOTERECORDBAR_H

@@ -1,10 +1,13 @@
 #ifndef INITEMPTYPAGE_H
 #define INITEMPTYPAGE_H
 
+#include "widgets/vnoteiconbutton.h"
+
 #include <DFrame>
 #include <DLabel>
 #include <DPushButton>
 #include <DSuggestButton>
+
 DWIDGET_USE_NAMESPACE
 
 class InitEmptyPage : public DFrame
@@ -16,13 +19,11 @@ public:
 signals:
     void sigAddFolderByInitPage();
 
-public slots:
-    void onChangeColor();
 private:
     void initUi();
     void initConnection();
 
-    DLabel *m_Image;
+    VNoteIconButton *m_Image;
     DSuggestButton *m_PushButton;
     DLabel *m_Text;
 

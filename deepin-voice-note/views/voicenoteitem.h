@@ -1,8 +1,8 @@
 #ifndef VOICENOTEITEM_H
 #define VOICENOTEITEM_H
 #include "common/vnoteitem.h"
-#include "myrecodebuttons.h"
 #include "textnoteedit.h"
+#include "widgets/vnoteiconbutton.h"
 #include "widgets/vnwaveform.h"
 
 #include <DWidget>
@@ -58,6 +58,7 @@ private:
 
     int             m_lastHeight {0};
     bool            m_isBottomSpace {false};
+    bool            m_isVoiceAsring {false};
 
     DLabel          *m_createTimeLab {nullptr};
     DLabel          *m_voiceSizeLab {nullptr};
@@ -65,10 +66,10 @@ private:
     VNWaveform      *m_waveForm {nullptr};
     TextNoteEdit    *m_asrText {nullptr};
     VNoteItem       *m_textNode {nullptr};
-    MyRecodeButtons *m_pauseBtn {nullptr};
-    MyRecodeButtons *m_playBtn {nullptr};
-    MyRecodeButtons *m_detailBtn {nullptr};
-    MyRecodeButtons *m_menuBtn {nullptr};
+    VNoteIconButton *m_pauseBtn {nullptr};
+    VNoteIconButton *m_playBtn {nullptr};
+    VNoteIconButton *m_detailBtn {nullptr};
+    VNoteIconButton *m_menuBtn {nullptr};
 };
 
 #endif // VOICENOTEITEM_H

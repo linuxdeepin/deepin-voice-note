@@ -17,11 +17,6 @@ VNoteItemWidget::VNoteItemWidget(QWidget *parent)
     ;
 }
 
-VNoteItemWidget::~VNoteItemWidget()
-{
-    ;
-}
-
 VNoteItem *VNoteItemWidget::getNoteItem()
 {
     return  nullptr;

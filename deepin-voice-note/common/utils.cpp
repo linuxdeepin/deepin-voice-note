@@ -44,6 +44,7 @@ QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplicatio
 
     return pixmap;
 }
+
 int Utils::highTextEdit(DTextEdit *textEdit, const QTextCharFormat &oriFormat,const QRegExp &searchKey,
                          const QColor &highColor)
 {
@@ -63,4 +64,17 @@ int Utils::highTextEdit(DTextEdit *textEdit, const QTextCharFormat &oriFormat,co
         textEdit->setCurrentCharFormat(oriFormat);
     }
     return  findCount;
+}
+
+QString Utils::formatMillisecond(qint64 millisecond)
+{
+    uint minSecond = 1;
+    uint curSecond = static_cast<uint>(millisecond / 1000);
+    if(curSecond < minSecond){
+        curSecond = 1;
+    }
+    if(curSecond < 3600){
+        return QDateTime::fromTime_t(curSecond).toUTC().toString("mm:ss");
+    }
+    return QDateTime::fromTime_t(curSecond).toUTC().toString("hh:mm:ss");
 }

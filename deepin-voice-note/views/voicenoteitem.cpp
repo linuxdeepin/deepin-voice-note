@@ -39,7 +39,6 @@ void VoiceNoteItem::initUi()
 
     m_waveForm = new VNWaveform(this);
     m_waveForm->setFixedHeight(33);
-    //m_waveForm->setStyleSheet("background:red");
 
     m_asrText = new TextNoteEdit(this);
     DFontSizeManager::instance()->bind(m_asrText, DFontSizeManager::T8);
@@ -57,55 +56,34 @@ void VoiceNoteItem::initUi()
     m_voiceSizeLab->setFixedSize(66, 30);
     m_voiceSizeLab->setAlignment(Qt::AlignCenter);
 
-    DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
-    if (themeType == DGuiApplicationHelper::LightType) {
-        m_menuBtn = new MyRecodeButtons(
-            ":/images/icon/normal/more_normal.svg", ":/images/icon/press/more_press.svg",
-            ":/images/icon/hover/more_hover.svg", ":/images/icon/disabled/more_disabled.svg",
-            ":/images/icon/focus/more_focus.svg", QSize(44, 44), this);
-        m_pauseBtn = new MyRecodeButtons(
-            ":/images/icon/normal/pause_blue_normal.svg",
-            ":/images/icon/press/pause_blue_press.svg", ":/images/icon/hover/pause_blue_hover.svg",
-            "", ":/images/icon/focus/pause_blue_focus.svg", QSize(60, 60), this);
-        m_playBtn = new MyRecodeButtons(
-            ":/images/icon/normal/play_normal.svg", ":/images/icon/press/play_press.svg",
-            ":/images/icon/hover/play_hover.svg", ":/images/icon/disabled/play_disabled.svg",
-            ":/images/icon/focus/play_focus.svg", QSize(60, 60), this);
-        m_detailBtn = new MyRecodeButtons(
-            ":/images/icon/normal/detail-normal.svg",
-            ":/images/icon/press/detail-press.svg",
-            ":/images/icon/hover/detail-hover.svg",
-            "",
-            "",
-            QSize(44, 44),
-            this);
-    } else if (themeType == DGuiApplicationHelper::DarkType) {
-        m_menuBtn = new MyRecodeButtons(":/images/icon_dark/normal/more_normal_dark.svg",
-                                        ":/images/icon_dark/press/more_press_dark.svg",
-                                        ":/images/icon_dark/hover/more_hover_dark.svg",
-                                        ":/images/icon_dark/disabled/more_disabled_dark.svg",
-                                        ":/images/icon_dark/focus/more_focus_dark.svg",
-                                        QSize(44, 44), this);
-        m_pauseBtn = new MyRecodeButtons(":/images/icon_dark/normal/pause_blue_normal_dark.svg",
-                                         ":/images/icon_dark/press/pause_blue_press_dark.svg",
-                                         ":/images/icon_dark/hover/pause_blue_hover_dark.svg", "",
-                                         ":/images/icon_dark/focus/pause_blue_focus_dark.svg",
-                                         QSize(60, 60), this);
-        m_playBtn = new MyRecodeButtons(":/images/icon_dark/normal/play_normal_dark.svg",
-                                        ":/images/icon_dark/press/play_press_dark.svg",
-                                        ":/images/icon_dark/hover/play_hover_dark.svg",
-                                        ":/images/icon_dark/disabled/play_disabled_dark.svg",
-                                        ":/images/icon_dark/focus/play_focus_dark.svg",
-                                        QSize(60, 60), this);
-        m_detailBtn = new MyRecodeButtons(
-            ":/images/icon_dark/normal/detail-normal.svg",
-            ":/images/icon_dark/press/detail-press.svg",
-            ":/images/icon_dark/hover/detail-hover.svg",
-            "",
-            "",
-            QSize(44, 44),
-            this);
-    }
+    m_menuBtn = new VNoteIconButton(this
+                                    , "more_normal.svg"
+                                    , "more_hover.svg"
+                                    , "more_press.svg");
+    m_menuBtn->setIconSize(QSize(44, 44));
+    m_menuBtn->setFlat(true);
+
+    m_pauseBtn = new VNoteIconButton(this
+                                     , "pause_normal.svg"
+                                     , "pause_hover.svg"
+                                     , "pause_press.svg");
+    m_pauseBtn->setIconSize(QSize(60, 60));
+    m_pauseBtn->setFlat(true);
+
+    m_playBtn = new VNoteIconButton(this
+                                    , "play_normal.svg"
+                                    , "play_hover.svg"
+                                    , "play_press.svg");
+    m_playBtn->setIconSize(QSize(60, 60));
+    m_playBtn->setFlat(true);
+
+    m_detailBtn = new VNoteIconButton(this
+                                      , "detail_normal.svg"
+                                      , "detail_press.svg"
+                                      , "detail_hover.svg");
+    m_detailBtn->setIconSize(QSize(44, 44));
+    m_detailBtn->setFlat(true);
+
     QGridLayout *mainLayout = new QGridLayout;
     QVBoxLayout *createTimeLayout = new QVBoxLayout;
     createTimeLayout->addWidget(m_createTimeLab);
@@ -148,18 +126,20 @@ void VoiceNoteItem::initUi()
 void VoiceNoteItem::initData()
 {
     m_createTimeLab->setText(Utils::convertDateTime(m_textNode->createTime));
-    m_voiceSizeLab->setText("00'00\"");
+    m_voiceSizeLab->setText(Utils::formatMillisecond(m_textNode->voiceSize));
     if (!m_textNode->noteText.isEmpty()) {
         showAsrEndWindow(m_textNode->noteText);
     }
+    m_waveForm->setMinimum(0);
+    m_waveForm->setMaximum(static_cast<int>(m_textNode->voiceSize));
 }
 
 void VoiceNoteItem::initConnection()
 {
-    connect(m_menuBtn, &DPushButton::clicked, this, &VoiceNoteItem::onshowMenu);
-    connect(m_pauseBtn, &MyRecodeButtons::clicked, this, &VoiceNoteItem::onPauseBtnClicked);
-    connect(m_playBtn, &MyRecodeButtons::clicked, this, &VoiceNoteItem::onPlayBtnClicked);
-    connect(m_detailBtn, &MyRecodeButtons::clicked, this, &VoiceNoteItem::onShowDetail);
+    connect(m_menuBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onshowMenu);
+    connect(m_pauseBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onPauseBtnClicked);
+    connect(m_playBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onPlayBtnClicked);
+    connect(m_detailBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onShowDetail);
     connect(m_asrText, &DTextEdit::textChanged, this, &VoiceNoteItem::onTextChanged);
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &VoiceNoteItem::onChangeTheme);
@@ -210,10 +190,12 @@ void VoiceNoteItem::showAsrStartWindow()
     m_asrText->document()->setDefaultTextOption(option);
     m_asrText->setText(tr("Converting voice to text"));
     m_asrText->setVisible(true);
+    m_isVoiceAsring = true;
 }
 
 void VoiceNoteItem::showAsrEndWindow(const QString &strResult)
 {
+    m_isVoiceAsring = false;
     m_asrText->setText(strResult);
     if (strResult.isEmpty()) {
         m_asrText->setVisible(false);
@@ -233,20 +215,12 @@ void VoiceNoteItem::showAsrEndWindow(const QString &strResult)
 
 void VoiceNoteItem::enblePlayBtn(bool enable)
 {
-    if (enable) {
-        m_playBtn->EnAbleBtn();
-    } else {
-        m_playBtn->DisableBtn();
-    }
+    m_playBtn->setEnabled(enable);
 }
 
 void VoiceNoteItem::enblePauseBtn(bool enable)
 {
-    if (enable) {
-        m_pauseBtn->EnAbleBtn();
-    } else {
-        m_pauseBtn->DisableBtn();
-    }
+    m_pauseBtn->setEnabled(enable);
 }
 
 bool VoiceNoteItem::isPlaying()
@@ -256,14 +230,7 @@ bool VoiceNoteItem::isPlaying()
 
 bool VoiceNoteItem::isAsrStart()
 {
-    bool flag = false;
-    if (m_asrText->isVisible()) {
-        QString text = m_asrText->toPlainText();
-        if (text == tr("Converting voice to text")) {
-            flag = true;
-        }
-    }
-    return flag;
+    return m_isVoiceAsring;
 }
 void VoiceNoteItem::onTextChanged()
 {
@@ -334,35 +301,4 @@ void VoiceNoteItem::onChangeTheme()
     DPalette pb = DApplicationHelper::instance()->palette(m_bgWidget);
     pb.setBrush(DPalette::Base, pb.color(DPalette::ItemBackground));
     m_bgWidget->setPalette(pb);
-    DGuiApplicationHelper::ColorType themeType = DGuiApplicationHelper::instance()->themeType();
-
-    if (themeType == DGuiApplicationHelper::LightType) {
-        if (nullptr != m_menuBtn) {
-            m_menuBtn->setPicChange(
-                ":/images/icon/normal/more_normal.svg", ":/images/icon/press/more_press.svg",
-                ":/images/icon/hover/more_hover.svg", ":/images/icon/disabled/more_disabled.svg",
-                ":/images/icon/focus/more_focus.svg");
-        }
-
-        if (nullptr != m_detailBtn) {
-            m_detailBtn->setPicChange(":/images/icon/normal/detail-normal.svg",
-                                      ":/images/icon/press/detail-press.svg",
-                                      ":/images/icon/hover/detail-hover.svg", "", "");
-        }
-
-    } else if (themeType == DGuiApplicationHelper::DarkType) {
-        if (nullptr != m_menuBtn) {
-            m_menuBtn->setPicChange(":/images/icon_dark/normal/more_normal_dark.svg",
-                                    ":/images/icon_dark/press/more_press_dark.svg",
-                                    ":/images/icon_dark/hover/more_hover_dark.svg",
-                                    ":/images/icon_dark/disabled/more_disabled_dark.svg",
-                                    ":/images/icon_dark/focus/more_focus_dark.svg");
-        }
-        if (nullptr != m_detailBtn) {
-            m_detailBtn->setPicChange(":/images/icon_dark/normal/detail-normal.svg",
-                                      ":/images/icon_dark/press/detail-press.svg",
-                                      ":/images/icon_dark/hover/detail-hover.svg", "", "");
-        }
-    }
-
 }

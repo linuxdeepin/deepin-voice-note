@@ -3,7 +3,7 @@
 
 #include "common/vnoteitem.h"
 #include "textnoteedit.h"
-#include "myrecodebuttons.h"
+#include "widgets/vnoteiconbutton.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -13,7 +13,6 @@
 #include <DPushButton>
 #include <DTextEdit>
 #include <DWidget>
-#include <DIconButton>
 
 DWIDGET_USE_NAMESPACE
 class TextNoteItem : public VNoteItemWidget
@@ -54,8 +53,8 @@ private:
 
     TextNoteEdit *m_textEdit {nullptr};
     VNoteItem *m_textNode {nullptr};
-    MyRecodeButtons *m_detailBtn {nullptr};
-    MyRecodeButtons *m_menuBtn {nullptr};
+    VNoteIconButton *m_detailBtn {nullptr};
+    VNoteIconButton *m_menuBtn {nullptr};
     QRegExp m_searchKey;
     QTextCharFormat m_textEditFormat;
 };

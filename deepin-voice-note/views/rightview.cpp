@@ -119,14 +119,11 @@ void RightView::addNewNoteList(qint64 id)
 
 void RightView::noteDelByFolder(qint64 id)
 {
-    for (int i = 2; i < m_stackWidget->count(); i++) {
-        RightNoteList *widget = static_cast<RightNoteList *>(m_stackWidget->widget(i));
-        if (widget != nullptr && widget->getFolderId() == id) {
-            m_stackWidget->removeWidget(widget);
-            widget->deleteLater();
-            adjustaddTextBtn();
-            break;
-        }
+    RightNoteList *widget = getNormalNoteList(id);
+    if(widget != nullptr){
+         m_stackWidget->removeWidget(widget);
+         widget->deleteLater();
+         adjustaddTextBtn();
     }
 }
 
@@ -167,6 +164,7 @@ void RightView::noteSwitchByFolder(qint64 id)
         emit sigSeachEditFocus();
     }
     m_lastFolderId = id;
+    m_stackWidget->currentWidget()->setFocus();
     adjustaddTextBtn();
 }
 
@@ -237,12 +235,9 @@ void RightView::onUpdateNote(VNoteItem *item)
     noteOper.modifyNoteText(item->noteText);
     RightNoteList *widget = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
     if (widget == m_searchNoteList) {
-        for (int i = 2; i < m_stackWidget->count(); i++) {
-            RightNoteList *widgetTmp = static_cast<RightNoteList *>(m_stackWidget->widget(i));
-            if (widgetTmp->getFolderId() == widget->getFolderId()) {
-                widgetTmp->updateNodeItem(item);
-                break;
-            }
+        RightNoteList *widgetTmp = getNormalNoteList(widget->getFolderId());
+        if(widget != nullptr){
+             widgetTmp->updateNodeItem(item);
         }
     }
 }
@@ -359,12 +354,9 @@ void RightView::delNoteFromList(VNoteItem *item, RightNoteList *list)
 {
     list->delNodeItem(item);
     if (list == m_searchNoteList) {
-        for (int i = 2; i < m_stackWidget->count(); i++) {
-            RightNoteList *widgetTmp = static_cast<RightNoteList *>(m_stackWidget->widget(i));
-            if (widgetTmp->getFolderId() == list->getFolderId()) {
-                widgetTmp->delNodeItem(item);
-                break;
-            }
+        RightNoteList *widgetTmp = getNormalNoteList(list->getFolderId());
+        if (widgetTmp != nullptr) {
+            widgetTmp->delNodeItem(item);
         }
         if (m_searchNoteList->count() == 0) { //搜索时全部删除通知记事本项更新
             emit sigSearchNoteEmpty(m_searchNoteList->getFolderId());
@@ -397,4 +389,49 @@ void RightView::onVoicePauseBtnClicked(VoiceNoteItem *item)
     //暂停
     item->showPlayBtn();
     m_playVoiceItem = item;
+}
+
+void RightView::addVoiceNoteItem(const QString &voicePath,qint64 voiceSize)
+{
+    VNoteItemOper noteOper;
+
+    VNoteItem tmpNote;
+    tmpNote.folderId = m_lastFolderId;
+    tmpNote.noteType = VNoteItem::VNT_Voice;
+    tmpNote.noteText = QString("");
+    tmpNote.voicePath = voicePath;
+    tmpNote.voiceSize = voiceSize;
+    int index = m_stackWidget->currentIndex();
+    RightNoteList *list = nullptr;
+    if (index == 0) {
+        list = m_searchNoteList;
+        m_searchNoteList->initNoteItem(m_lastFolderId, nullptr, m_searchKey);
+        m_stackWidget->setCurrentWidget(m_searchNoteList);
+    } else {
+        list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
+    }
+    if (tmpNote.folderId != VNoteFolder::INVALID_ID) {
+        VNoteItem *newNote = noteOper.addNote(tmpNote);
+        if (newNote != nullptr) {
+            list->addNodeItem(newNote, QRegExp());
+            if (list == m_searchNoteList) {
+                list = getNormalNoteList(m_lastFolderId);
+                if (list != nullptr) {
+                    list->addNodeItem(newNote, QRegExp());
+                }
+            }
+        }
+    }
+    adjustaddTextBtn();
+}
+
+RightNoteList *RightView::getNormalNoteList(qint64 id)
+{
+    for (int i = 2; i < m_stackWidget->count(); i++) {
+        RightNoteList *tempList = static_cast<RightNoteList *>(m_stackWidget->widget(i));
+        if (tempList->getFolderId() == id) {
+            return  tempList;
+        }
+    }
+    return nullptr;
 }
