@@ -84,6 +84,7 @@ bool NoteQryDbVisitor::visitorData()
             note->noteText    = m_sqlQuery->value(VNoteItemOper::note_text).toString();
             note->noteType    = m_sqlQuery->value(VNoteItemOper::note_type).toInt();
             note->voicePath   = m_sqlQuery->value(VNoteItemOper::voice_path).toString();
+            note->voiceSize   = m_sqlQuery->value(VNoteItemOper::voice_len).toInt();
 
             note->createTime  = QDateTime::fromString(
                         m_sqlQuery->value(VNoteItemOper::create_time).toString(),VNOTE_TIME_FMT);
@@ -98,6 +99,7 @@ bool NoteQryDbVisitor::visitorData()
                      << "note->folderId" << note->folderId
                      << "note->noteText" << note->noteText
                      << "note->noteType" << note->noteType
+                     << "note->voiceSize" << note->voiceSize
                      << "note->createTime" << note->createTime;
             //TODO
             //    If find the folder add note to it, or need create
@@ -193,6 +195,7 @@ bool AddNoteDbVisitor::visitorData()
             note->noteText    = m_sqlQuery->value(VNoteItemOper::note_text).toString();
             note->noteType    = m_sqlQuery->value(VNoteItemOper::note_type).toInt();
             note->voicePath   = m_sqlQuery->value(VNoteItemOper::voice_path).toString();
+            note->voiceSize   = m_sqlQuery->value(VNoteItemOper::voice_len).toInt();
 
             note->createTime  = QDateTime::fromString(
                         m_sqlQuery->value(VNoteItemOper::create_time).toString(),VNOTE_TIME_FMT);

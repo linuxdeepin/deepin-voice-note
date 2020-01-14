@@ -14,6 +14,7 @@ const QStringList VNoteItemOper::noteColumnsName = {
     "note_type",
     "note_text",
     "voice_path",
+    "voice_len",
     "create_time",
     "modify_time",
 };
@@ -110,7 +111,7 @@ bool VNoteItemOper::modifyNoteText(QString text)
 
 VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
 {
-    static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s,%s) VALUES (%s, %s,'%s');";
+    static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s,%s,%s,%s) VALUES (%s,%s,'%s','%s',%s);";
     static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s WHERE %s=%s;";
     static constexpr char const *NEWREC_FMT = "SELECT * FROM %s WHERE %s=%s ORDER BY %s DESC LIMIT 1;";
 
@@ -121,9 +122,13 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
                       , noteColumnsName[folder_id].toUtf8().data()
                       , noteColumnsName[note_type].toUtf8().data()
                       , noteColumnsName[note_text].toUtf8().data()
+                      , noteColumnsName[voice_path].toUtf8().data()
+                      , noteColumnsName[voice_len].toUtf8().data()
                       , QString("%1").arg(note.folderId).toUtf8().data()
                       , QString("%1").arg(note.noteType).toUtf8().data()
                       , note.noteText.toUtf8().data()
+                      , note.voicePath.toUtf8().data()
+                      , QString("%1").arg(note.voiceSize).toUtf8().data()
                       );
 
     QString updateSql;
@@ -131,7 +136,7 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
 
     updateSql.sprintf(UPDATE_FOLDER_TIME
                       , VNoteDbManager::FOLDER_TABLE_NAME
-                      , VNoteFolderOper::folderColumnsName[modify_time].toUtf8().data()
+                      , VNoteFolderOper::folderColumnsName[VNoteFolderOper::modify_time].toUtf8().data()
                       , sqlGetTime.toUtf8().data()
                       , VNoteFolderOper::folderColumnsName[VNoteFolderOper::folder_id].toUtf8().data()
                       , QString("%1").arg(note.folderId).toUtf8().data()

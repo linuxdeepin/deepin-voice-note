@@ -33,6 +33,7 @@ protected:
         note_type,
         note_text,
         voice_path,
+        voice_len,
         create_time,
         modify_time,
     };

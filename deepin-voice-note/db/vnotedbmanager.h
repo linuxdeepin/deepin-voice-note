@@ -22,7 +22,7 @@ public:
     static constexpr int         FOLDER_COLUMS     = 7;
     static constexpr char const *NOTES_TABLE_NAME = "vnote_items_tbl";
     static constexpr char const *NOTES_KEY        = "note_id";
-    static constexpr int         NOTES_COLUMS     = 7;
+    static constexpr int         NOTES_COLUMS     = 8;
 
     //icon_path: Not used, maybe used in future
     static constexpr char const *CREATETABLE_FMT = "\
@@ -40,6 +40,7 @@ public:
             note_type INT NOT NULL DEFAULT 0, \
             note_text TEXT, \
             voice_path TEXT, \
+            voice_len INT DEFAULT 0, \
             create_time DATETIME NOT NULL DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f', 'now', 'localtime')), \
             modify_time DATETEXT NOT NULL DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f', 'now', 'localtime')));";
 

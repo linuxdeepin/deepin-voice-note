@@ -19,9 +19,12 @@ void InitEmptyPage::initUi()
     this->setLineWidth(0);
     m_PushButton = new DSuggestButton(QString(tr("Create Folder")), this);
     m_PushButton->setFixedSize(QSize(302, 36));
+    DStyle::setFocusRectVisible(m_PushButton, false);
     DFontSizeManager::instance()->bind(m_PushButton, DFontSizeManager::T6);
+
     m_Image = new VNoteIconButton(this,"home_page_logo.svg");
     m_Image->setIconSize(QSize(128, 128));
+    m_Image->setAttribute(Qt::WA_TransparentForMouseEvents);
     m_Image->setFlat(true);
 
     m_Text = new DLabel(this);
