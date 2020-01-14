@@ -12,11 +12,11 @@
 
 #define CRITICAL_SECTION_BEGIN() do { \
     m_dbLock.lock(); \
-    m_vnoteDB.transaction(); \
+    /*m_vnoteDB.transaction();*/ \
 } while(0)
 
 #define CRITICAL_SECTION_END() do { \
-    m_vnoteDB.commit(); \
+    /*m_vnoteDB.commit();*/ \
     m_dbLock.unlock(); \
 } while(0)
 

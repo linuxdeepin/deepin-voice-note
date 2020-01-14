@@ -3,6 +3,7 @@
 
 #include <QMouseEvent>
 
+#include <DApplicationHelper>
 #include <DIconButton>
 
 DWIDGET_USE_NAMESPACE
@@ -15,6 +16,8 @@ public:
             , QString normal = ""
             , QString hover  = ""
             , QString press  = "");
+    virtual ~VNoteIconButton();
+
     void enterEvent(QEvent *event) override;
     void leaveEvent(QEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
@@ -24,6 +27,7 @@ public:
 signals:
 
 public slots:
+    void onThemeChanged(DGuiApplicationHelper::ColorType type);
 private:
     QPixmap loadPixmap(const QString &path);
     void    updateIcon();

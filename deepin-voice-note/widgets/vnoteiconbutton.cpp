@@ -3,7 +3,6 @@
 
 #include <QImageReader>
 
-#include <DApplicationHelper>
 #include <DLog>
 
 VNoteIconButton::VNoteIconButton(QWidget *parent, QString normal,QString hover, QString press)
@@ -17,13 +16,15 @@ VNoteIconButton::VNoteIconButton(QWidget *parent, QString normal,QString hover, 
 
     //TODO:
     //    Need update when theme change
-    QObject::connect(DGuiApplicationHelper::instance(),
+    connect(DGuiApplicationHelper::instance(),
                      &DGuiApplicationHelper::paletteTypeChanged,
-                     [this] (DGuiApplicationHelper::ColorType type) {
-        Q_UNUSED(type);
-        updateIcon();
-    });
+            this, &VNoteIconButton::onThemeChanged);
 }
+
+VNoteIconButton::~VNoteIconButton()
+{
+}
+
 void VNoteIconButton::enterEvent(QEvent *event)
 {
     Q_UNUSED(event);
@@ -82,6 +83,13 @@ void VNoteIconButton::mouseMoveEvent(QMouseEvent *event)
 
         updateIcon();
     }
+}
+
+void VNoteIconButton::onThemeChanged(DGuiApplicationHelper::ColorType type)
+{
+    Q_UNUSED(type);
+
+    updateIcon();
 }
 
 QPixmap VNoteIconButton::loadPixmap(const QString &path)
