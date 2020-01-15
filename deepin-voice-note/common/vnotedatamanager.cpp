@@ -99,6 +99,11 @@ VNoteFolder *VNoteDataManager::delFolder(qint64 folderId)
         if (itNote != m_qspAllNotesMap->notes.end()) {
             m_qspAllNotesMap->notes.remove(itNote.key());
             QScopedPointer<VNOTE_ITEMS_MAP>foldersMap(*itNote);
+
+            //Remove voice files in the folder
+            for (auto it : foldersMap->folderNotes) {
+                it->delVoiceFile();
+            }
         }
 
         //All note released. unlock
@@ -237,6 +242,9 @@ VNoteItem *VNoteDataManager::delNote(qint64 folderId, qint32 noteId)
         if (noteIter != notesInFolder->folderNotes.end()) {
             retNote = *noteIter;
             notesInFolder->folderNotes.remove(noteIter.key());
+
+            //Remove voice file of voice note
+            retNote->delVoiceFile();
         }
 
         notesInFolder->lock.unlock();

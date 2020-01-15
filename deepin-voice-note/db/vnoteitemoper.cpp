@@ -86,9 +86,9 @@ bool VNoteItemOper::modifyNoteText(QString text)
 
         updateSql.sprintf(UPDATE_FOLDER_TIME
                           , VNoteDbManager::FOLDER_TABLE_NAME
-                          , VNoteFolderOper::folderColumnsName[modify_time].toUtf8().data()
+                          , VNoteFolderOper::folderColumnsName[VNoteFolderOper::modify_time].toUtf8().data()
                           , sqlGetTime.toUtf8().data()
-                          , VNoteFolderOper::folderColumnsName[folder_id].toUtf8().data()
+                          , VNoteFolderOper::folderColumnsName[VNoteFolderOper::folder_id].toUtf8().data()
                           , QString("%1").arg(m_note->folderId).toUtf8().data()
                           );
 
@@ -229,9 +229,9 @@ bool VNoteItemOper::deleteNote(qint64 folderId, qint32 noteId)
 
     updateSql.sprintf(UPDATE_FOLDER_TIME
                       , VNoteDbManager::FOLDER_TABLE_NAME
-                      , VNoteFolderOper::folderColumnsName[modify_time].toUtf8().data()
+                      , VNoteFolderOper::folderColumnsName[VNoteFolderOper::modify_time].toUtf8().data()
                       , sqlGetTime.toUtf8().data()
-                      , VNoteFolderOper::folderColumnsName[folder_id].toUtf8().data()
+                      , VNoteFolderOper::folderColumnsName[VNoteFolderOper::folder_id].toUtf8().data()
                       , QString("%1").arg(folderId).toUtf8().data()
                       );
 

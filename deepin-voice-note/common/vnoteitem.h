@@ -13,6 +13,7 @@ public:
     VNoteItem();
 
     bool isValid();
+    void delVoiceFile();
 
     enum {
         INVALID_ID = -1

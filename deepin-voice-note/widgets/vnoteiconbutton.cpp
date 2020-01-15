@@ -99,7 +99,6 @@ QPixmap VNoteIconButton::loadPixmap(const QString &path)
 
     QString iconPath(STAND_ICON_PAHT);
 
-    qDebug() << "theme:" << theme;
     if (DGuiApplicationHelper::ColorType::LightType == theme) {
         iconPath += QString("light/");
     } else {
