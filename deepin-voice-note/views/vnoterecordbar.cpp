@@ -4,6 +4,7 @@
 
 #include <QVBoxLayout>
 
+#include <DApplication>
 #include <DLog>
 
 VNoteRecordBar::VNoteRecordBar(QWidget *parent)
@@ -67,4 +68,19 @@ void VNoteRecordBar::onFinshRecord(const QString &voicePath,qint64 voiceSize)
     m_recordPanel->setVisible(false);
     m_recordBtn->setVisible(true);
     emit sigFinshRecord(voicePath,voiceSize);
+}
+
+void VNoteRecordBar::OnMicrophoneAvailableChanged(bool isAvailable)
+{
+    if (isAvailable) {
+        m_recordBtn->setEnabled(true);
+        m_recordBtn->setToolTip("");
+    } else {
+        m_recordBtn->setDisabled(true);
+        m_recordBtn->setToolTip(
+                    DApplication::translate(
+                        "VNoteRecordBar",
+                        "No recording device detected")
+                    );
+    }
 }

@@ -20,6 +20,9 @@
 //StandIcon path
 #define STAND_ICON_PAHT ":/icons/deepin/builtin/"
 
+//Audio device polling time in milliseconds
+#define AUDIO_DEV_CHECK_TIME 1000
+
 //Time format
 #define VNOTE_TIME_FMT "yyyy-MM-dd HH:mm:ss.zzz"
 

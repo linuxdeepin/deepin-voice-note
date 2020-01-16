@@ -1,5 +1,6 @@
 #include "views/vnotemainwindow.h"
 #include "common/vnotedatamanager.h"
+#include "common/vnoteaudiodevicewatcher.h"
 #include "common/vnoteitem.h"
 #include "common/utils.h"
 #include "views/vnoterecordbar.h"
@@ -21,9 +22,22 @@ VNoteMainWindow::VNoteMainWindow(QWidget *parent)
 
     // Request DataManager load  note folders
     initData();
+
+    //Start audio device watch thread
+    //& must be called after initUI
+    initAudioWatcher();
 }
 
-VNoteMainWindow::~VNoteMainWindow() {}
+VNoteMainWindow::~VNoteMainWindow() {
+    //TODO:
+    //    Nofiy audio watcher to exit & need
+    //wait at least AUDIO_DEV_CHECK_TIME ms
+    QScopedPointer<VNoteAudioDeviceWatcher> autoRelease(
+                m_audioDeviceWatcher
+                );
+    autoRelease->exitWatcher();
+    autoRelease->wait(AUDIO_DEV_CHECK_TIME);
+}
 
 void VNoteMainWindow::initUI()
 {
@@ -195,6 +209,18 @@ void VNoteMainWindow::initRightView()
     m_rightNoteArea->setStyleSheet("background: blue");
     m_recordBar->setStyleSheet("background: green");
 #endif
+}
+
+void VNoteMainWindow::initAudioWatcher()
+{
+    QTimer::singleShot(50, this, [this]() {
+        m_audioDeviceWatcher = new VNoteAudioDeviceWatcher(this);
+
+        connect(m_audioDeviceWatcher, &VNoteAudioDeviceWatcher::microphoneAvailableState,
+                m_recordBar, &VNoteRecordBar::OnMicrophoneAvailableChanged);
+
+        m_audioDeviceWatcher->start();
+    });
 }
 
 void VNoteMainWindow::onVNoteFoldersLoaded()

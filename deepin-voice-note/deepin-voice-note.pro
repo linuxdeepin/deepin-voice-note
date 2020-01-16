@@ -40,7 +40,9 @@ SOURCES += \
     widgets/vnoterecordwidget.cpp \
     views/voicenoteitem.cpp \
     views/vnoterecordbar.cpp \
-    common/vnotea2tmanager.cpp
+    common/vnotea2tmanager.cpp \
+    common/audio2textworker.cpp \
+    common/vnoteaudiodevicewatcher.cpp
 
 RESOURCES += \
     images.qrc
@@ -78,7 +80,9 @@ HEADERS += \
     widgets/vnoterecordwidget.h \
     views/voicenoteitem.h \
     views/vnoterecordbar.h \
-    common/vnotea2tmanager.h
+    common/vnotea2tmanager.h \
+    common/audio2textworker.h \
+    common/vnoteaudiodevicewatcher.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts

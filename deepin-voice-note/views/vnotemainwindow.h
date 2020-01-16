@@ -18,6 +18,7 @@
 DWIDGET_USE_NAMESPACE
 
 class VNoteRecordBar;
+class VNoteAudioDeviceWatcher;
 
 class VNoteMainWindow : public DMainWindow
 {
@@ -35,6 +36,7 @@ protected:
     void initMainView();
     void initLeftView();
     void initRightView();
+    void initAudioWatcher();
 
     void initSpliterView(); //正常主窗口
     void initEmptyFoldersView();//没有记事本的窗口
@@ -71,6 +73,8 @@ private:
     RightView   *m_rightView {nullptr};
 
     VNoteRecordBar* m_recordBar {nullptr};
+    //Audio device state watch thread
+    VNoteAudioDeviceWatcher *m_audioDeviceWatcher {nullptr};
 
     DTextEdit *m_textEditRightView {nullptr};
     DTextEdit *m_textEditMainWnd{nullptr};
