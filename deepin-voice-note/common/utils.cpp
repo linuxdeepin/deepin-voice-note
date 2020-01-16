@@ -66,12 +66,11 @@ int Utils::highTextEdit(DTextEdit *textEdit, const QTextCharFormat &oriFormat,co
     return  findCount;
 }
 
-QString Utils::formatMillisecond(qint64 millisecond)
+QString Utils::formatMillisecond(qint64 millisecond, bool minValue)
 {
-    uint minSecond = 1;
     uint curSecond = static_cast<uint>(millisecond / 1000);
-    if(curSecond < minSecond){
-        curSecond = 1;
+    if(curSecond < minValue){
+        curSecond = minValue;
     }
     if(curSecond < 3600){
         return QDateTime::fromTime_t(curSecond).toUTC().toString("mm:ss");

@@ -155,6 +155,7 @@ void LeftView::clearFilter()
         this->reset();
         QModelIndex index = m_pSortFilterModel->index(0, 0);
         this->setCurrentIndex(index);
+        m_searchKey = QRegExp();
     }
 }
 

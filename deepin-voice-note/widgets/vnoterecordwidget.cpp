@@ -67,10 +67,12 @@ void VNoteRecordWidget::initConnection()
 {
     connect(m_pauseBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onPauseRecord);
     connect(m_continueBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onContinueRecord);
-    connect(m_finshBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onFinshRecord);
+    connect(m_finshBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onSetMediaSource);
     connect(m_audioManager, SIGNAL(recAudioBufferProbed(const QAudioBuffer &)),
             this, SLOT(onAudioBufferProbed(const QAudioBuffer &)));
-    connect(m_audioManager, &VNoteAudioManager::recExceedLimit, this, &VNoteRecordWidget::onFinshRecord);
+    connect(m_audioManager, &VNoteAudioManager::recExceedLimit, this, &VNoteRecordWidget::onSetMediaSource);
+    connect(m_audioManager->getPlayerObject(),&QMediaPlayer::mediaStatusChanged,
+            this,&VNoteRecordWidget::onMediaStatusChange);
 }
 
 void VNoteRecordWidget::initRecordPath()
@@ -82,11 +84,11 @@ void VNoteRecordWidget::initRecordPath()
         dir.mkdir(m_recordDir);
     }
 }
-void VNoteRecordWidget::onFinshRecord()
+
+void VNoteRecordWidget::onSetMediaSource()
 {
-    m_audioManager->stopRecord();
-    emit sigFinshRecord(m_recordPath, m_recordMsec);
-    qDebug() << m_recordMsec;
+     m_audioManager->stopRecord();
+     m_audioManager->setPlayFileName(m_recordPath);
 }
 
 void VNoteRecordWidget::onPauseRecord()
@@ -118,7 +120,7 @@ void VNoteRecordWidget::startRecord()
 
 void VNoteRecordWidget::cancelRecord()
 {
-    onFinshRecord();
+    onSetMediaSource();
 }
 
 void VNoteRecordWidget::onAudioBufferProbed(const QAudioBuffer &buffer)
@@ -127,5 +129,16 @@ void VNoteRecordWidget::onAudioBufferProbed(const QAudioBuffer &buffer)
     QString strTime = Utils::formatMillisecond(m_recordMsec);
     if (m_timeLabel->text() != strTime) {
         m_timeLabel->setText(strTime);
+    }
+}
+
+void VNoteRecordWidget::onMediaStatusChange(QMediaPlayer::MediaStatus status)
+{
+    if(m_recordMsec && status == QMediaPlayer::MediaStatus::LoadedMedia){
+        QMediaPlayer *player = m_audioManager->getPlayerObject();
+        m_recordMsec = player->duration();
+        qDebug() << m_recordMsec;
+        emit sigFinshRecord(m_recordPath, m_recordMsec);
+        m_recordMsec = 0;
     }
 }

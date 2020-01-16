@@ -7,6 +7,7 @@
 #include <QBoxLayout>
 #include <QDebug>
 #include <QStandardPaths>
+#include <QTimer>
 
 #include <DFontSizeManager>
 #include <DGuiApplicationHelper>
@@ -50,6 +51,8 @@ void RightView::initUi()
 
     initTextMenu();
     initVoiceMenu();
+
+    m_player = new QMediaPlayer(this);
 }
 
 void RightView::initTextMenu()
@@ -87,7 +90,8 @@ void RightView::initConnection()
     connect(m_delVoiceAction, &QAction::triggered, this, &RightView::onDelVoiceAction);
     connect(m_asrVoiceAction, &QAction::triggered, this, &RightView::onAsrVoiceAction);
     connect(m_saveVoicetAction, &QAction::triggered, this, &RightView::onSaveVoiceAction);
-
+    connect(m_player, &QMediaPlayer::positionChanged,
+            this, &RightView::onVoicePlayPosChange);
 }
 
 void RightView::addNewNoteList(qint64 id)
@@ -106,6 +110,7 @@ void RightView::addNewNoteList(qint64 id)
             SLOT(onVoicePauseBtnClicked(VoiceNoteItem *)));
 
     connect(listWidget, &RightNoteList::sigListHeightChange, this, &RightView::adjustaddTextBtn);
+    connect(listWidget, &RightNoteList::sigVoicePlayPosChange, this, &RightView::onSetPlayerPos);
 
     VNoteItemOper noteOper;
     VNOTE_ITEMS_MAP *folderNotes = noteOper.getFolderNotes(id);
@@ -120,10 +125,10 @@ void RightView::addNewNoteList(qint64 id)
 void RightView::noteDelByFolder(qint64 id)
 {
     RightNoteList *widget = getNormalNoteList(id);
-    if(widget != nullptr){
-         m_stackWidget->removeWidget(widget);
-         widget->deleteLater();
-         adjustaddTextBtn();
+    if (widget != nullptr) {
+        m_stackWidget->removeWidget(widget);
+        widget->deleteLater();
+        adjustaddTextBtn();
     }
 }
 
@@ -142,6 +147,7 @@ void RightView::noteSwitchByFolder(qint64 id)
         if (find == false) {
             addNewNoteList(id);//没加载创建新的
         }
+        m_stackWidget->currentWidget()->setFocus();
     } else { //搜索逻辑
         VNoteItemOper noteOper;
         VNOTE_ITEMS_MAP *datafolderNotes = noteOper.getFolderNotes(id);
@@ -164,7 +170,6 @@ void RightView::noteSwitchByFolder(qint64 id)
         emit sigSeachEditFocus();
     }
     m_lastFolderId = id;
-    m_stackWidget->currentWidget()->setFocus();
     adjustaddTextBtn();
 }
 
@@ -236,8 +241,8 @@ void RightView::onUpdateNote(VNoteItem *item)
     RightNoteList *widget = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
     if (widget == m_searchNoteList) {
         RightNoteList *widgetTmp = getNormalNoteList(widget->getFolderId());
-        if(widget != nullptr){
-             widgetTmp->updateNodeItem(item);
+        if (widgetTmp != nullptr) {
+            widgetTmp->updateNodeItem(item);
         }
     }
 }
@@ -303,19 +308,19 @@ void RightView::onSaveTextAction()
     fileDialog.setAcceptMode(DFileDialog::AcceptSave);
     fileDialog.setDefaultSuffix("txt");
     fileDialog.setNameFilter("TXT(*.txt)");
-    fileDialog.selectFile(tr("TextNote"));
+    fileDialog.selectFile(tr("TextNote") + QString::number(m_curNoteItem->noteId));
     if (fileDialog.exec() == QDialog::Accepted) {
         QString path = fileDialog.selectedFiles()[0];
         QString fileName = QFileInfo(path).fileName();
-        QString filePath = path;
         if (fileName.isEmpty()) {
             DMessageBox::information(this, tr(""), tr("File name cannot be empty"));
-        }
-        QFile file(path);
-        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            QTextStream textStream(&file);
-            textStream << m_curNoteItem->noteText;
-            file.close();
+        }else {
+            QFile file(path);
+            if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                QTextStream textStream(&file);
+                textStream << m_curNoteItem->noteText;
+                file.close();
+            }
         }
     }
 }
@@ -339,15 +344,32 @@ void RightView::onAsrVoiceAction()
 void RightView::onDelVoiceAction()
 {
     RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
+    VoiceNoteItem *item = list->getVoiceItem(m_curNoteItem);
+    if (item == m_playVoiceItem) {
+        stopCurVoicePlaying();
+    }
     delNoteFromList(m_curNoteItem, list);
 }
 
 void RightView::onSaveVoiceAction()
 {
-    RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
-    VoiceNoteItem *item = list->getVoiceItem(m_curNoteItem);
-    Q_UNUSED(item);
-    qDebug() << "onSaveVoiceAction";
+    DFileDialog fileDialog(this);
+    fileDialog.setWindowTitle(tr("Save as MP3"));
+    fileDialog.setDirectory(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
+    fileDialog.setFileMode(DFileDialog::Directory);
+    fileDialog.setAcceptMode(DFileDialog::AcceptSave);
+    fileDialog.setDefaultSuffix("mp3");
+    fileDialog.setNameFilter("MP3(*.mp3)");
+    fileDialog.selectFile(tr("Voice note") + QString::number(m_curNoteItem->noteId));
+    if (fileDialog.exec() == QDialog::Accepted) {
+        QString path = fileDialog.selectedFiles()[0];
+        if (path.isEmpty()) {
+            DMessageBox::information(this, tr(""), tr("File name cannot be empty"));
+        }else{
+            bool ret = QFile::copy(m_curNoteItem->voicePath, path);
+            qDebug() << ret;
+        }
+    }
 }
 
 void RightView::delNoteFromList(VNoteItem *item, RightNoteList *list)
@@ -375,23 +397,25 @@ void RightView::delNoteFromList(VNoteItem *item, RightNoteList *list)
 
 void RightView::onVoicePlayBtnClicked(VoiceNoteItem *item)
 {
-    if (m_playVoiceItem && m_playVoiceItem != item && m_playVoiceItem->isPlaying()) {
-        //有语音正在播放时停止播放
-        m_playVoiceItem->showPlayBtn();
+    if (m_playVoiceItem != item) { //切换播放文件
+        stopCurVoicePlaying(0);
+        m_player->setMedia(QUrl::fromLocalFile(item->getNoteItem()->voicePath));
     }
-    //播放语音
-    item->showPauseBtn();
     m_playVoiceItem = item;
+    item->showPauseBtn();
+    m_playVoiceItem->setSliderEnable(true);
+    m_player->play();
 }
 
 void RightView::onVoicePauseBtnClicked(VoiceNoteItem *item)
 {
-    //暂停
-    item->showPlayBtn();
-    m_playVoiceItem = item;
+    if (m_playVoiceItem == item) {
+        m_playVoiceItem->showPlayBtn();
+        m_player->pause();
+    }
 }
 
-void RightView::addVoiceNoteItem(const QString &voicePath,qint64 voiceSize)
+void RightView::addVoiceNoteItem(const QString &voicePath, qint64 voiceSize)
 {
     VNoteItemOper noteOper;
 
@@ -434,4 +458,47 @@ RightNoteList *RightView::getNormalNoteList(qint64 id)
         }
     }
     return nullptr;
+}
+
+void RightView::onVoicePlayPosChange(qint64 pos)
+{
+    if (pos && m_playVoiceItem != nullptr) {
+        m_playVoiceItem->setPlayPos(static_cast<int>(pos));
+        qint64 duration = m_playVoiceItem->getNoteItem()->voiceSize;
+        qDebug() << pos << ";" << duration;
+        if (pos >= duration) {
+            stopCurVoicePlaying();
+        }
+    }
+}
+
+void RightView::onSetPlayerPos(int pos)
+{
+    qDebug() << "seek pos:" << pos;
+    m_player->setPosition(pos);
+}
+
+void RightView::setVoicePlayEnable(bool enable)
+{
+    int index = m_stackWidget->currentIndex();
+    if (index > 1) {
+        stopCurVoicePlaying(0);
+        RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
+        list->setVoicePlayEnable(enable);
+    }
+}
+
+void RightView::stopCurVoicePlaying(int pos)
+{
+    if (m_player->state() != QMediaPlayer::State::StoppedState) {
+        m_player->stop();
+        if (m_playVoiceItem != nullptr && m_playVoiceItem->isPlaying()) {
+            m_playVoiceItem->showPlayBtn();
+            if (pos >= 0) {
+                m_playVoiceItem->setPlayPos(pos);
+            }
+            m_playVoiceItem->setSliderEnable(false);
+            m_playVoiceItem = nullptr;
+        }
+    }
 }

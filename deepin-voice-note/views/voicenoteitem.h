@@ -18,10 +18,13 @@ class VoiceNoteItem : public VNoteItemWidget
 public:
 
     explicit VoiceNoteItem(VNoteItem *textNote, QWidget *parent = nullptr);
+
     void showPlayBtn();
     void showPauseBtn();
     void showAsrStartWindow();
     void showAsrEndWindow(const QString &strResult);
+    void setPlayPos(int pos);
+    void setSliderEnable(bool enable);
 
     void enblePlayBtn(bool enable);
     void enblePauseBtn(bool enable);
@@ -33,6 +36,8 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    void leaveEvent(QEvent *event) override;
+    void enterEvent(QEvent *event) override;
 
 signals:
     void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
@@ -40,6 +45,7 @@ signals:
     void sigVoicePlayBtnClicked(VoiceNoteItem *item);
     void sigVoicePauseBtnClicked(VoiceNoteItem *item);
     void sigItemAddHeight(int height);
+    void sigVoicePlayPosChange(int pos);
 
 public slots:
     void onPlayBtnClicked();
@@ -49,6 +55,8 @@ public slots:
 
     void onTextChanged();
     void onChangeTheme();
+    void onSliderReleased();
+    void onSliderPressed();
 private:
     void initUi();
     void initData();
@@ -59,9 +67,11 @@ private:
     int             m_lastHeight {0};
     bool            m_isBottomSpace {false};
     bool            m_isVoiceAsring {false};
+    bool            m_isSliderPressed {false};
 
     DLabel          *m_createTimeLab {nullptr};
     DLabel          *m_voiceSizeLab {nullptr};
+    DLabel          *m_curSizeLab {nullptr};
     DFrame          *m_bgWidget {nullptr};
     VNWaveform      *m_waveForm {nullptr};
     TextNoteEdit    *m_asrText {nullptr};

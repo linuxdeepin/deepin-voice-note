@@ -90,7 +90,6 @@ void VNoteAudioManager::initConnections()
             ,this, [this](const QAudioBuffer &buffer) {
         emit recAudioBufferProbed(buffer);
     });
-
 }
 
 void VNoteAudioManager::setPlayFileName(const QString &fileName)
@@ -106,9 +105,9 @@ void VNoteAudioManager::startPlay()
     int state = m_pAudioPlayer->state();
     if (QMediaPlayer::PlayingState != state) {
         //Restore the play position in pause state
-        if (QMediaPlayer::PausedState == state) {
-            m_pAudioPlayer->setPosition(m_playPosition);
-        }
+//        if (QMediaPlayer::PausedState == state) {
+//            m_pAudioPlayer->setPosition(m_playPosition);
+//        }
 
         m_pAudioPlayer->play();
     }
@@ -118,7 +117,7 @@ void VNoteAudioManager::pausePlay()
 {
     if (QMediaPlayer::PlayingState == m_pAudioPlayer->state()) {
         m_pAudioPlayer->pause();
-        m_playPosition = m_pAudioPlayer->position();
+        //m_playPosition = m_pAudioPlayer->position();
     }
 }
 
@@ -169,4 +168,9 @@ void VNoteAudioManager::recordDurationChanged(qint64 duration)
         stopRecord();
         emit recExceedLimit();
     }
+}
+
+QMediaPlayer* VNoteAudioManager::getPlayerObject()
+{
+    return m_pAudioPlayer.get();
 }

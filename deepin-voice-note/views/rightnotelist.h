@@ -25,6 +25,8 @@ public:
     int  getListHeight();
     qint64 getFolderId();
 
+    void setVoicePlayEnable(bool enable);
+
 signals:
     void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
     void sigDelNote(VNoteItem *textNode);
@@ -32,6 +34,7 @@ signals:
     void sigUpdateNote(VNoteItem *textNode);
     void sigTextEditIsEmpty(VNoteItem *textNode, bool empty);
 
+    void sigVoicePlayPosChange(int pos);
     void sigVoicePlayBtnClicked(VoiceNoteItem *item);
     void sigVoicePauseBtnClicked(VoiceNoteItem *item);
     void sigListHeightChange();

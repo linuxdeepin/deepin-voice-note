@@ -39,6 +39,7 @@ void VoiceNoteItem::initUi()
 
     m_waveForm = new VNWaveform(this);
     m_waveForm->setFixedHeight(33);
+    m_waveForm->setEnabled(false);
 
     m_asrText = new TextNoteEdit(this);
     DFontSizeManager::instance()->bind(m_asrText, DFontSizeManager::T8);
@@ -55,6 +56,10 @@ void VoiceNoteItem::initUi()
     m_voiceSizeLab = new DLabel(this);
     m_voiceSizeLab->setFixedSize(66, 30);
     m_voiceSizeLab->setAlignment(Qt::AlignCenter);
+
+    m_curSizeLab = new DLabel(this);
+    m_curSizeLab->setFixedSize(66, 30);
+    m_curSizeLab->setAlignment(Qt::AlignCenter);
 
     m_menuBtn = new VNoteIconButton(this
                                     , "more_normal.svg"
@@ -98,6 +103,7 @@ void VoiceNoteItem::initUi()
     mainLayout->addLayout(playBtnLayout, 1, 0);
 
     QHBoxLayout *layoutH = new QHBoxLayout;
+    layoutH->addWidget(m_curSizeLab);
     layoutH->addWidget(m_waveForm);
     layoutH->addWidget(m_voiceSizeLab);
     layoutH->addSpacing(6);
@@ -127,6 +133,7 @@ void VoiceNoteItem::initData()
 {
     m_createTimeLab->setText(Utils::convertDateTime(m_textNode->createTime));
     m_voiceSizeLab->setText(Utils::formatMillisecond(m_textNode->voiceSize));
+    m_curSizeLab->setText(Utils::formatMillisecond(0,0));
     if (!m_textNode->noteText.isEmpty()) {
         showAsrEndWindow(m_textNode->noteText);
     }
@@ -143,6 +150,8 @@ void VoiceNoteItem::initConnection()
     connect(m_asrText, &DTextEdit::textChanged, this, &VoiceNoteItem::onTextChanged);
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &VoiceNoteItem::onChangeTheme);
+    connect(m_waveForm,&VNWaveform::sliderReleased,this,&VoiceNoteItem::onSliderReleased);
+    connect(m_waveForm,&VNWaveform::sliderPressed,this,&VoiceNoteItem::onSliderPressed);
 }
 
 void VoiceNoteItem::onshowMenu()
@@ -301,4 +310,47 @@ void VoiceNoteItem::onChangeTheme()
     DPalette pb = DApplicationHelper::instance()->palette(m_bgWidget);
     pb.setBrush(DPalette::Base, pb.color(DPalette::ItemBackground));
     m_bgWidget->setPalette(pb);
+}
+
+void VoiceNoteItem::onSliderReleased()
+{
+    emit sigVoicePlayPosChange(m_waveForm->value());
+    m_isSliderPressed = false;
+}
+
+void VoiceNoteItem::onSliderPressed()
+{
+    m_isSliderPressed = true;
+}
+void VoiceNoteItem::setPlayPos(int pos)
+{
+    if(!m_isSliderPressed){
+        m_waveForm->setValue(pos);
+        if(m_waveForm->maximum() < 1000){
+            m_curSizeLab->setText(Utils::formatMillisecond(pos,1));
+        }else {
+            m_curSizeLab->setText(Utils::formatMillisecond(pos,0));
+        }
+    }
+}
+
+void VoiceNoteItem::setSliderEnable(bool enable)
+{
+    m_waveForm->setEnabled(enable);
+}
+
+void VoiceNoteItem::enterEvent(QEvent *event)
+{
+    DPalette pb = DApplicationHelper::instance()->palette(m_bgWidget);
+    pb.setBrush(DPalette::Base, pb.color(DPalette::Light));
+    m_bgWidget->setPalette(pb);
+    return VNoteItemWidget::enterEvent(event);
+}
+
+void VoiceNoteItem::leaveEvent(QEvent *event)
+{
+    DPalette pb = DApplicationHelper::instance()->palette(m_bgWidget);
+    pb.setBrush(DPalette::Base, pb.color(DPalette::ItemBackground));
+    m_bgWidget->setPalette(pb);
+    return VNoteItemWidget::leaveEvent(event);
 }

@@ -26,7 +26,8 @@ signals:
 public slots:
     void onPauseRecord();
     void onContinueRecord();
-    void onFinshRecord();
+    void onSetMediaSource();
+    void onMediaStatusChange(QMediaPlayer::MediaStatus status);
     void onAudioBufferProbed(const QAudioBuffer &buffer);
 
 private:

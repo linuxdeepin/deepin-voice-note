@@ -360,6 +360,7 @@ void VNoteMainWindow::onStartRecord()
 {
     m_leftView->setEnabled(false);
     m_noteSearchEdit->setEnabled(false);
+    m_rightView->setVoicePlayEnable(false);
 }
 
 void VNoteMainWindow::onFinshRecord(const QString &voicePath,qint64 voiceSize)
@@ -367,4 +368,5 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath,qint64 voiceSize)
     m_leftView->setEnabled(true);
     m_rightView->addVoiceNoteItem(voicePath,voiceSize);
     m_noteSearchEdit->setEnabled(true);
+    m_rightView->setVoicePlayEnable(true);
 }

@@ -26,6 +26,8 @@ public:
     void pausePlay();
     void stopPlay();
 
+    QMediaPlayer *getPlayerObject();
+
     //Audio record
     void setRecordFileName(const QString& fileName);
     void startRecord();

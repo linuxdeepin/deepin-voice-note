@@ -46,6 +46,7 @@ void RightNoteList::addNodeItem(VNoteItem *item, const QRegExp &searchKey, bool 
 {
     if (item->noteType == VNoteItem::VNOTE_TYPE::VNT_Text) {
         TextNoteItem *textItem = new TextNoteItem(item, this);
+        textItem->setFixedHeight(170);
         textItem->highSearchText(searchKey, QColor(0x349ae8));
         QListWidgetItem *item = new QListWidgetItem();
         item->setFlags(Qt::NoItemFlags);
@@ -62,6 +63,7 @@ void RightNoteList::addNodeItem(VNoteItem *item, const QRegExp &searchKey, bool 
         }
     } else {
         VoiceNoteItem *voiceItem = new VoiceNoteItem(item, this);
+        voiceItem->setFixedHeight(95);
         QListWidgetItem *item = new QListWidgetItem();
         item->setFlags(Qt::NoItemFlags);
         item->setSizeHint(QSize(this->width(),  voiceItem->height()));
@@ -75,6 +77,7 @@ void RightNoteList::addNodeItem(VNoteItem *item, const QRegExp &searchKey, bool 
         connect(voiceItem, SIGNAL(sigVoicePauseBtnClicked(VoiceNoteItem *)),
                 this, SIGNAL(sigVoicePauseBtnClicked(VoiceNoteItem *)));
         connect(voiceItem, SIGNAL(sigItemAddHeight(int)), this, SLOT(onItemAddHeight(int)));
+        connect(voiceItem, SIGNAL(sigVoicePlayPosChange(int)), this, SIGNAL(sigVoicePlayPosChange(int)));
     }
     adjustWidgetItemWidth(this->count() - 1);
     this->scrollToBottom();
@@ -170,4 +173,15 @@ VoiceNoteItem *RightNoteList::getVoiceItem(VNoteItem *item)
         }
     }
     return nullptr;
+}
+
+void RightNoteList::setVoicePlayEnable(bool enable)
+{
+    for (int i = 0; i < this->count(); i++) {
+        VNoteItemWidget *itemWidget = static_cast<VNoteItemWidget *>(this->itemWidget(this->item(i)));
+        if (itemWidget->getNoteItem()->noteType == VNoteItem::VNOTE_TYPE::VNT_Voice) {
+            VoiceNoteItem *item = static_cast<VoiceNoteItem *>(itemWidget);
+            item->enblePlayBtn(enable);
+        }
+    }
 }

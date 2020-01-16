@@ -34,10 +34,6 @@ void TextNoteItem::initUI()
     m_textEdit->document()->setDocumentMargin(10);
     m_textEdit->setFrameShape(QFrame::NoFrame);
     m_textEditFormat =  m_textEdit->currentCharFormat();
-    DPalette pb = DApplicationHelper::instance()->palette(this);
-    pb.setBrush(DPalette::Text, pb.color(DPalette::Active, DPalette::WindowText));
-    pb.setBrush(DPalette::Button, pb.color(DPalette::ItemBackground));
-    this->setPalette(pb);
 
     m_menuBtn = new VNoteIconButton(this
                                     , "more_normal.svg"
@@ -118,6 +114,7 @@ void TextNoteItem::onEditFocusIn()
 void TextNoteItem::onEditFocusOut()
 {
     QString text = m_textEdit->toPlainText();
+    qDebug() << "id:" << m_textNode->noteId << "fouce out";
     if (text.isEmpty()) {
         emit sigDelNote(m_textNode);
     } else {
@@ -126,7 +123,6 @@ void TextNoteItem::onEditFocusOut()
             emit sigUpdateNote(m_textNode);
         }
     }
-    qDebug() << "id:" << m_textNode->noteId << "fouce out";
 }
 
 void TextNoteItem::onShowMenu()

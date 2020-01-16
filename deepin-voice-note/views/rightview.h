@@ -5,6 +5,7 @@
 #include "myrecodebuttons.h"
 
 #include <QSharedPointer>
+#include <QMediaPlayer>
 
 #include <DPushButton>
 #include <DStackedWidget>
@@ -22,6 +23,7 @@ public:
     void noteDelByFolder(qint64 id);
     void setSearchKey(const QRegExp &searchKey);
     void addVoiceNoteItem(const QString &voicePath,qint64 voiceSize);
+    void setVoicePlayEnable(bool enable);
 
     QList<qint64> getNoteContainsKeyFolders(const QRegExp &searchKey);
 
@@ -38,6 +40,7 @@ private:
     void initConnection();
     void addNewNoteList(qint64 id);
     void delNoteFromList(VNoteItem *item,RightNoteList *list);
+    void stopCurVoicePlaying(int pos = -1);
     RightNoteList *getNormalNoteList(qint64);
 
 
@@ -56,7 +59,8 @@ public slots:
     void onAsrVoiceAction();
     void onVoicePlayBtnClicked(VoiceNoteItem *item);
     void onVoicePauseBtnClicked(VoiceNoteItem *item);
-
+    void onVoicePlayPosChange(qint64 pos);
+    void onSetPlayerPos(int pos);
 private:
     DPushButton  *m_addTextBtn {nullptr};
     DStackedWidget *m_stackWidget {nullptr};
@@ -77,6 +81,7 @@ private:
     VNoteItem *m_curNoteItem{nullptr};
 
     VoiceNoteItem *m_playVoiceItem {nullptr}; //操作的语音项
+    QMediaPlayer *m_player {nullptr};
 };
 
 #endif // RIGHTVIEW_H
