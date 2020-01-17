@@ -38,6 +38,7 @@ private:
     void initTextMenu();
     void initVoiceMenu();
     void initConnection();
+    void addNewNote(VNoteItem &data,bool isByBtn = false);
     void addNewNoteList(qint64 id);
     void delNoteFromList(VNoteItem *item,RightNoteList *list);
     void stopCurVoicePlaying(int pos = -1);

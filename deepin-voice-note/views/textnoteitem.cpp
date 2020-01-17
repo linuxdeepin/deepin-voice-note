@@ -79,7 +79,7 @@ void TextNoteItem::updateData()
 {
     if (m_textNode != nullptr) {
         m_timeLabel->setText("  " + Utils::convertDateTime(m_textNode->createTime));
-        m_textEdit->setText(m_textNode->noteText);
+        m_textEdit->setPlainText(m_textNode->noteText);
     }
 }
 

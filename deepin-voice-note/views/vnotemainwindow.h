@@ -42,7 +42,6 @@ protected:
     void initEmptyFoldersView();//没有记事本的窗口
     void initEmptySearchView(); //没有搜索到记事本窗口
     void initTextEditDetailView(); //文字记录满屏显示窗口
-    void switchView(WindowType type); //显示窗口
 
 signals:
 
@@ -58,6 +57,7 @@ public slots:
     void onSearchNoteEmpty(qint64 id);
     void onStartRecord();//开始录音
     void onFinshRecord(const QString &voicePath,qint64 voiceSize); //结束录音
+    void onChangeTheme();
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
@@ -83,6 +83,7 @@ private:
     VNoteItem *m_textNode {nullptr};
     DStackedWidget *m_centerWidget {nullptr};
     QTextCharFormat m_textEditFormat;
+    bool            m_isRecording {false};
 };
 
 #endif // VNOTEMAINWINDOW_H

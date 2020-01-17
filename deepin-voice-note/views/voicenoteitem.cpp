@@ -197,7 +197,7 @@ void VoiceNoteItem::showAsrStartWindow()
     QTextOption option = m_asrText->document()->defaultTextOption();
     option.setAlignment(Qt::AlignCenter);
     m_asrText->document()->setDefaultTextOption(option);
-    m_asrText->setText(tr("Converting voice to text"));
+    m_asrText->setPlainText(tr("Converting voice to text"));
     m_asrText->setVisible(true);
     m_isVoiceAsring = true;
 }
@@ -205,7 +205,7 @@ void VoiceNoteItem::showAsrStartWindow()
 void VoiceNoteItem::showAsrEndWindow(const QString &strResult)
 {
     m_isVoiceAsring = false;
-    m_asrText->setText(strResult);
+    m_asrText->setPlainText(strResult);
     if (strResult.isEmpty()) {
         m_asrText->setVisible(false);
         m_detailBtn->setVisible(false);

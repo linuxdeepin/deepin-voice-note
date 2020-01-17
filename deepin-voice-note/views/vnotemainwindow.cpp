@@ -84,6 +84,9 @@ void VNoteMainWindow::initConnections()
     connect(m_recordBar, &VNoteRecordBar::sigStartRecord, this, &VNoteMainWindow::onStartRecord);
     connect(m_recordBar, &VNoteRecordBar::sigFinshRecord, this, &VNoteMainWindow::onFinshRecord);
 
+    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
+            &VNoteMainWindow::onChangeTheme);
+
 }
 
 void VNoteMainWindow::initShortcuts() {}
@@ -98,7 +101,6 @@ void VNoteMainWindow::initTitleBar()
     DFontSizeManager::instance()->bind(m_noteSearchEdit, DFontSizeManager::T6);
     m_noteSearchEdit->setFixedSize(QSize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H));
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
-    m_noteSearchEdit->setEnabled(false);
     titlebar()->addWidget(m_noteSearchEdit);
     m_returnBtn = new DIconButton(DStyle::SP_ArrowLeave, this);
     m_returnBtn->setFixedSize(QSize(36, 36));
@@ -118,7 +120,7 @@ void VNoteMainWindow::initMainView()
     m_centerWidget->insertWidget(WndNoteShow, m_mainWndSpliter);
     m_centerWidget->insertWidget(WndSearchEmpty, m_labSearchEmpty);
     m_centerWidget->insertWidget(WndTextEdit, m_textEditMainWnd);
-    switchView(WndNoteShow);
+    m_centerWidget->setCurrentIndex(WndNoteShow);
     setCentralWidget(m_centerWidget);
     setTitlebarShadowEnabled(true);
 }
@@ -227,7 +229,8 @@ void VNoteMainWindow::onVNoteFoldersLoaded()
 {
     int count = m_leftView->loadNoteFolder(); //加载完成前都是显示主页
     if (!count) {
-        switchView(WndHomePage);
+        m_centerWidget->setCurrentIndex(WndHomePage);
+        m_noteSearchEdit->setEnabled(false);
     }
 }
 
@@ -263,9 +266,9 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &previous)
     if (index.isValid()) {
         qint64 id = m_leftView->getFolderId(index);
         m_rightView->noteSwitchByFolder(id);
-        switchView(WndNoteShow);
+        m_centerWidget->setCurrentIndex(WndNoteShow);
     } else {
-        switchView(WndSearchEmpty);
+        m_centerWidget->setCurrentIndex(WndSearchEmpty);
     }
 }
 
@@ -275,7 +278,8 @@ void VNoteMainWindow::onVNoteFolderDel(VNoteFolder *data)
     VNoteFolderOper folderOper(data);
     folderOper.deleteVNoteFolder(data->id);
     if (m_leftView->getFolderCount() == 0) {
-        switchView(WndHomePage);
+        m_centerWidget->setCurrentIndex(WndHomePage);
+        m_noteSearchEdit->setEnabled(false);
     }
 }
 
@@ -285,6 +289,7 @@ void VNoteMainWindow::initTextEditDetailView()
     DStyle::setFocusRectVisible(m_textEditMainWnd, false);
     DFontSizeManager::instance()->bind(m_textEditMainWnd, DFontSizeManager::T8);
     m_textEditFormat = m_textEditMainWnd->currentCharFormat();
+    onChangeTheme();
 }
 
 void VNoteMainWindow::initEmptySearchView()
@@ -323,23 +328,10 @@ void VNoteMainWindow::initEmptyFoldersView()
     m_wndHomePage = new InitEmptyPage(this);
 }
 
-void VNoteMainWindow::switchView(WindowType type)
-{
-    if (type != WndHomePage) {
-        if (type == WndTextEdit && m_textEditMainWnd->isReadOnly()) {
-            m_noteSearchEdit->setEnabled(false); //语音详情页禁止搜索
-        } else {
-            m_noteSearchEdit->setEnabled(true);
-        }
-    } else {
-        m_noteSearchEdit->setEnabled(false);
-    }
-    m_centerWidget->setCurrentIndex(type);
-}
-
 void VNoteMainWindow::onVNoteFolderAdd()
 {
-    switchView(WndNoteShow);
+    m_centerWidget->setCurrentIndex(WndNoteShow);
+    m_noteSearchEdit->setEnabled(true);
     m_floatingAddBtn->clicked();
 }
 
@@ -348,26 +340,36 @@ void VNoteMainWindow::onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEd
     m_textNode = textNode;
     m_textEditRightView = preTextEdit;
     m_textEditMainWnd->setCurrentCharFormat(m_textEditFormat);
-    m_textEditMainWnd->setText(preTextEdit->toPlainText());
-    m_textEditMainWnd->setReadOnly(preTextEdit->isReadOnly()); //文字项可读可写，语音项只读
+    m_textEditMainWnd->setPlainText(preTextEdit->toPlainText());
+    bool readOnly = false;
+    if (textNode->noteType == VNoteItem::VNT_Voice) { //语音项只读
+        readOnly = true;
+        m_noteSearchEdit->setEnabled(false);
+    }
+    m_textEditMainWnd->setReadOnly(readOnly);
     if (!searchKey.isEmpty()) {
         Utils::highTextEdit(m_textEditMainWnd, m_textEditFormat, searchKey, QColor(0x349ae8));
     }
     m_textEditMainWnd->moveCursor(QTextCursor::End);
-    switchView(WndTextEdit);
+    m_centerWidget->setCurrentIndex(WndTextEdit);
     m_returnBtn->setVisible(true);
 }
 
 void VNoteMainWindow::onTextEditReturn()
 {
     QString text = m_textEditMainWnd->toPlainText();
-    if (m_textNode->noteType == VNoteItem::VNOTE_TYPE::VNT_Text
-            && text != m_textNode->noteText) {
-        m_textNode->noteText = text;
-        m_textEditRightView->setText(text);
-        m_rightView->onUpdateNote(m_textNode);
+    if (m_textNode->noteType == VNoteItem::VNOTE_TYPE::VNT_Text) {
+        if (text != m_textNode->noteText) {
+            m_textNode->noteText = text;
+            m_textEditRightView->setPlainText(text);
+            m_rightView->onUpdateNote(m_textNode);
+        }
+    } else if (m_textNode->noteType == VNoteItem::VNT_Voice) {
+        if (m_isRecording == false) {
+            m_noteSearchEdit->setEnabled(true);
+        }
     }
-    switchView(WndNoteShow);
+    m_centerWidget->setCurrentIndex(WndNoteShow);
     m_returnBtn->setVisible(false);
     onVNoteSearch();//详情页时只搜索详情页内容，返回时重新搜索
 }
@@ -387,12 +389,22 @@ void VNoteMainWindow::onStartRecord()
     m_leftView->setEnabled(false);
     m_noteSearchEdit->setEnabled(false);
     m_rightView->setVoicePlayEnable(false);
+    m_isRecording = true;
 }
 
-void VNoteMainWindow::onFinshRecord(const QString &voicePath,qint64 voiceSize)
+void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 {
     m_leftView->setEnabled(true);
-    m_rightView->addVoiceNoteItem(voicePath,voiceSize);
+    m_rightView->addVoiceNoteItem(voicePath, voiceSize);
     m_noteSearchEdit->setEnabled(true);
     m_rightView->setVoicePlayEnable(true);
+    m_isRecording = false;
+}
+
+void VNoteMainWindow::onChangeTheme()
+{
+    DPalette pb = DApplicationHelper::instance()->palette(m_textEditMainWnd);
+    pb.setBrush(DPalette::Text, pb.color(DPalette::Active, DPalette::WindowText));
+    pb.setBrush(DPalette::Button, pb.color(DPalette::Base));
+    m_textEditMainWnd->setPalette(pb);
 }

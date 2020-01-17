@@ -146,18 +146,13 @@ void RightNoteList::onItemAddHeight(int height)
 
 void RightNoteList::updateNodeItem(VNoteItem *item)
 {
-    bool flag = false;
     for (int i = 0; i < this->count(); i++) {
         VNoteItemWidget *itemWidget = static_cast<VNoteItemWidget *>(this->itemWidget(this->item(i)));
         if (itemWidget->getNoteItem() == item) {
             TextNoteItem *item = static_cast<TextNoteItem *>(itemWidget);
             item->updateData();
-            flag = true;
             break;
         }
-    }
-    if (flag == false) { //没找到说明是搜索模式下添加的项，同步添加
-        this->addNodeItem(item, QRegExp());
     }
 }
 

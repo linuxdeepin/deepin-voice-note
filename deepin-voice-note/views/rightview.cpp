@@ -200,35 +200,12 @@ void RightView::onDelNote(VNoteItem *item)
 
 void RightView::onAddNote() //添加文字记录
 {
-    VNoteItemOper noteOper;
-
     VNoteItem tmpNote;
     tmpNote.folderId = m_lastFolderId;
     tmpNote.noteType = VNoteItem::VNT_Text;
     tmpNote.noteText = QString("");
-
-    if (tmpNote.folderId != VNoteFolder::INVALID_ID) {
-        VNoteItem *newNote = noteOper.addNote(tmpNote);
-
-        if (nullptr != newNote) {
-            qInfo() << "onAddNote:" << newNote
-                    << "NoteId:" << newNote->noteId
-                    << "NoteText:" << newNote->noteText;
-            int curWidgetIndex = m_stackWidget->currentIndex();
-            if (curWidgetIndex <  2) {
-                if (curWidgetIndex == 0) { //搜索无结果界面添加项切换到搜索列表界面
-                    m_searchNoteList->initNoteItem(m_lastFolderId, nullptr, m_searchKey);
-                    m_stackWidget->setCurrentWidget(m_searchNoteList);
-                }
-                m_searchNoteList->addNodeItem(newNote, QRegExp(), true);
-            } else {
-                RightNoteList *widget = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
-                widget->addNodeItem(newNote, QRegExp(), true);
-            }
-            m_addTextBtn->setEnabled(false);
-            adjustaddTextBtn();
-        }
-    }
+    addNewNote(tmpNote, true);
+    m_addTextBtn->setEnabled(false);
 }
 
 void RightView::onUpdateNote(VNoteItem *item)
@@ -314,7 +291,7 @@ void RightView::onSaveTextAction()
         QString fileName = QFileInfo(path).fileName();
         if (fileName.isEmpty()) {
             DMessageBox::information(this, tr(""), tr("File name cannot be empty"));
-        }else {
+        } else {
             QFile file(path);
             if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                 QTextStream textStream(&file);
@@ -365,7 +342,7 @@ void RightView::onSaveVoiceAction()
         QString path = fileDialog.selectedFiles()[0];
         if (path.isEmpty()) {
             DMessageBox::information(this, tr(""), tr("File name cannot be empty"));
-        }else{
+        } else {
             bool ret = QFile::copy(m_curNoteItem->voicePath, path);
             qDebug() << ret;
         }
@@ -417,36 +394,13 @@ void RightView::onVoicePauseBtnClicked(VoiceNoteItem *item)
 
 void RightView::addVoiceNoteItem(const QString &voicePath, qint64 voiceSize)
 {
-    VNoteItemOper noteOper;
-
     VNoteItem tmpNote;
     tmpNote.folderId = m_lastFolderId;
     tmpNote.noteType = VNoteItem::VNT_Voice;
     tmpNote.noteText = QString("");
     tmpNote.voicePath = voicePath;
     tmpNote.voiceSize = voiceSize;
-    int index = m_stackWidget->currentIndex();
-    RightNoteList *list = nullptr;
-    if (index == 0) {
-        list = m_searchNoteList;
-        m_searchNoteList->initNoteItem(m_lastFolderId, nullptr, m_searchKey);
-        m_stackWidget->setCurrentWidget(m_searchNoteList);
-    } else {
-        list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
-    }
-    if (tmpNote.folderId != VNoteFolder::INVALID_ID) {
-        VNoteItem *newNote = noteOper.addNote(tmpNote);
-        if (newNote != nullptr) {
-            list->addNodeItem(newNote, QRegExp());
-            if (list == m_searchNoteList) {
-                list = getNormalNoteList(m_lastFolderId);
-                if (list != nullptr) {
-                    list->addNodeItem(newNote, QRegExp());
-                }
-            }
-        }
-    }
-    adjustaddTextBtn();
+    addNewNote(tmpNote);
 }
 
 RightNoteList *RightView::getNormalNoteList(qint64 id)
@@ -499,6 +453,34 @@ void RightView::stopCurVoicePlaying(int pos)
             }
             m_playVoiceItem->setSliderEnable(false);
             m_playVoiceItem = nullptr;
+        }
+    }
+}
+
+void RightView::addNewNote(VNoteItem &data, bool isByBtn)
+{
+    if (data.folderId != VNoteFolder::INVALID_ID) {
+        VNoteItemOper noteOper;
+        VNoteItem *newNote = noteOper.addNote(data);
+        if (newNote != nullptr) {
+            int index = m_stackWidget->currentIndex();
+            RightNoteList *list = nullptr;
+            if (index == 0) {
+                list = m_searchNoteList;
+                m_searchNoteList->initNoteItem(m_lastFolderId, nullptr, m_searchKey);
+                m_stackWidget->setCurrentWidget(m_searchNoteList);
+            } else {
+                list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
+            }
+            list->addNodeItem(newNote, QRegExp(), isByBtn);
+            if (list == m_searchNoteList) {
+                list = getNormalNoteList(m_lastFolderId);
+                if (list != nullptr) {
+                    list->addNodeItem(newNote, QRegExp());
+                    list->adjustSize();
+                }
+            }
+            adjustaddTextBtn();
         }
     }
 }
