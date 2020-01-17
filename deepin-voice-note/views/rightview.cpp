@@ -315,7 +315,12 @@ void RightView::onAsrVoiceAction()
     if (item) {
         item->showAsrStartWindow();
     }
-    qDebug() << "onAsrVoiceAction";
+
+    QString file = item->getNoteItem()->voicePath;
+    qint64 durtation = item->getNoteItem()->voiceSize;
+
+    qDebug() << "onAsrVoiceAction: " << file << ", " << durtation;
+    Q_EMIT asrStart(file, durtation);
 }
 
 void RightView::onDelVoiceAction()

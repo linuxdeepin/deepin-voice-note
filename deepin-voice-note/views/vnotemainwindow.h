@@ -19,6 +19,7 @@ DWIDGET_USE_NAMESPACE
 
 class VNoteRecordBar;
 class VNoteAudioDeviceWatcher;
+class VNoteA2TManager;
 
 class VNoteMainWindow : public DMainWindow
 {
@@ -58,6 +59,10 @@ public slots:
     void onStartRecord();//开始录音
     void onFinshRecord(const QString &voicePath,qint64 voiceSize); //结束录音
     void onChangeTheme();
+    //Audio to text API
+    void onA2TStart(const QString& file, qint64 duration);
+    void onA2TError(int error);
+    void onA2TSuccess(const QString& text);
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
@@ -75,6 +80,7 @@ private:
     VNoteRecordBar* m_recordBar {nullptr};
     //Audio device state watch thread
     VNoteAudioDeviceWatcher *m_audioDeviceWatcher {nullptr};
+    VNoteA2TManager *m_a2tManager {nullptr};
 
     DTextEdit *m_textEditRightView {nullptr};
     DTextEdit *m_textEditMainWnd{nullptr};

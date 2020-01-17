@@ -6,7 +6,7 @@
 #include <com_iflytek_aiservice_session.h>
 #include <com_iflytek_aiservice_asr.h>
 struct asrMsg {
-    qint32  code;
+    QString  code;
     QString descInfo;
     qint32  failType;
     qint32  status;
@@ -19,7 +19,6 @@ class VNoteA2TManager : public QObject
 public:
     explicit VNoteA2TManager(QObject *parent = nullptr);
 
-    void initSession();
     /*
      * Reference AIService接口及错误码定义.doc for detail
      *
@@ -30,17 +29,59 @@ public:
      *
      * Eg: language=cn，targetLanguage=en
      * */
-    QString startAsr(QString filePath, int fileDuration,
+    void startAsr(QString filePath, qint64 fileDuration,
                      QString srcLanguage = "", QString targetLanguage = "");
 
     void stopAsr();
+
+    //Reference AIService接口及错误码定义.doc for detail
+    enum ErrorCode {
+        Success = 0,
+        UploadAudioFileFail,  //音频上传失败
+        AudioDecodeFail,      //音频转码失败
+        AudioRecognizeFail,   //音频识别失败
+        AudioExceedeLimit,    //音频时长超限
+        AudioVerifyFailed,    //音频校验失败
+        AudioMuteFile,        //静音文件
+        AudioOther,           //其他
+        NetworkError,         //网络错误
+        DontCareError,
+    };
+
 signals:
-    void asrError(const QString errorCode);
+    void asrError(ErrorCode errorCode);
+    void asrSuccess(const QString text);
 public slots:
     void onNotify(const QString &msg);
 protected:
     void asrJsonParser(const QString &msg, asrMsg& asrData);
+    ErrorCode getErrorCode(const asrMsg& asrData);
+    void initSession();
 protected:
+    //XunFei message code string
+    const QString CODE_SUCCESS {"000000"};
+    const QString CODE_NETWORK {"900003"};
+
+    //XunFei state code
+    enum State {
+        XF_fail = -1,
+        XF_Start = 0,
+        XF_Process=3,
+        XF_finish =4,
+    };
+
+    //XunFei failtype code
+    enum FailType {
+        XF_normal = 0,
+        XF_upload,
+        XF_decode,
+        XF_recognize,
+        XF_limit,
+        XF_verify,
+        XF_mute,
+        XF_other = 99,
+    };
+
     QScopedPointer<com::iflytek::aiservice::session> m_session;
     QScopedPointer<com::iflytek::aiservice::asr>     m_asrInterface;
 };

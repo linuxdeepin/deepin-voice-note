@@ -1,6 +1,7 @@
 #include "views/vnotemainwindow.h"
 #include "common/vnotedatamanager.h"
 #include "common/vnoteaudiodevicewatcher.h"
+#include "common/vnotea2tmanager.h"
 #include "common/vnoteitem.h"
 #include "common/utils.h"
 #include "views/vnoterecordbar.h"
@@ -37,6 +38,8 @@ VNoteMainWindow::~VNoteMainWindow() {
                 );
     autoRelease->exitWatcher();
     autoRelease->wait(AUDIO_DEV_CHECK_TIME);
+
+    QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
 }
 
 void VNoteMainWindow::initUI()
@@ -216,12 +219,20 @@ void VNoteMainWindow::initRightView()
 void VNoteMainWindow::initAudioWatcher()
 {
     QTimer::singleShot(50, this, [this]() {
-        m_audioDeviceWatcher = new VNoteAudioDeviceWatcher(this);
+        //Audio input device watchdog
+        m_audioDeviceWatcher = new VNoteAudioDeviceWatcher();
 
         connect(m_audioDeviceWatcher, &VNoteAudioDeviceWatcher::microphoneAvailableState,
                 m_recordBar, &VNoteRecordBar::OnMicrophoneAvailableChanged);
 
         m_audioDeviceWatcher->start();
+
+        //audio to text manager
+        m_a2tManager = new VNoteA2TManager();
+
+        connect(m_rightView, &RightView::asrStart, this, &VNoteMainWindow::onA2TStart);
+        connect(m_a2tManager, &VNoteA2TManager::asrError, this, &VNoteMainWindow::onA2TError);
+        connect(m_a2tManager, &VNoteA2TManager::asrSuccess, this, &VNoteMainWindow::onA2TSuccess);
     });
 }
 
@@ -407,4 +418,19 @@ void VNoteMainWindow::onChangeTheme()
     pb.setBrush(DPalette::Text, pb.color(DPalette::Active, DPalette::WindowText));
     pb.setBrush(DPalette::Button, pb.color(DPalette::Base));
     m_textEditMainWnd->setPalette(pb);
+}
+
+void VNoteMainWindow::onA2TStart(const QString &file, qint64 duration)
+{
+    m_a2tManager->startAsr(file, duration);
+}
+
+void VNoteMainWindow::onA2TError(int error)
+{
+    qInfo() << "Audo to text failed:" << error;
+}
+
+void VNoteMainWindow::onA2TSuccess(const QString &text)
+{
+    qInfo() << "Audo to text success:" << text;
 }

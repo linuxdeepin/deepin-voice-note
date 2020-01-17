@@ -31,6 +31,7 @@ signals :
     void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
     void sigSeachEditFocus();
     void sigSearchNoteEmpty(qint64 id);
+    void asrStart(const QString& file, qint64 duration);
 protected:
     void resizeEvent(QResizeEvent *event);
 private:
