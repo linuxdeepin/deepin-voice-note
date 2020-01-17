@@ -34,8 +34,3 @@ VNoteItemWidget::VNoteItemWidget(QWidget *parent)
 {
     ;
 }
-
-VNoteItem *VNoteItemWidget::getNoteItem()
-{
-    return  nullptr;
-}

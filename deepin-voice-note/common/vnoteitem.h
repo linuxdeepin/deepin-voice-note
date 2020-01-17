@@ -36,12 +36,13 @@ public:
     QDateTime modifyTime;
 };
 
-class VNoteItemWidget :public DWidget //语音文字通用接口，在子类中重写虚函数
+class VNoteItemWidget :public DWidget //语音文字通用接口
 {
     Q_OBJECT
 public:
     explicit VNoteItemWidget(QWidget *parent = nullptr);
-    virtual VNoteItem *getNoteItem();
+    virtual VNoteItem *getNoteItem() = 0;
+    virtual void updateData() = 0; //更新数据
 };
 
 #endif // VNOTEITEM_H

@@ -28,11 +28,10 @@ public:
 
     void enblePlayBtn(bool enable);
     void enblePauseBtn(bool enable);
-
-    bool isPlaying();
-    bool isAsrStart();
+    void enbleMenuBtn(bool enable);
 
     VNoteItem *getNoteItem() override;
+    void updateData() override;
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -66,7 +65,6 @@ private:
 
     int             m_lastHeight {0};
     bool            m_isBottomSpace {false};
-    bool            m_isVoiceAsring {false};
     bool            m_isSliderPressed {false};
 
     DLabel          *m_createTimeLab {nullptr};

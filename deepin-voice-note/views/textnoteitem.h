@@ -21,9 +21,9 @@ class TextNoteItem : public VNoteItemWidget
 public:
     explicit TextNoteItem(VNoteItem *textNote, QWidget *parent = nullptr);
     void highSearchText(const QRegExp &searchKey, const QColor &highColor);
-    VNoteItem *getNoteItem() override;
     void changeToEdit();
-    void updateData();
+    VNoteItem *getNoteItem() override;
+    void updateData() override;
 signals:
     void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
     void sigDelNote(VNoteItem *textNode);

@@ -26,10 +26,10 @@ public:
     void setVoicePlayEnable(bool enable);
 
     QList<qint64> getNoteContainsKeyFolders(const QRegExp &searchKey);
+    void setAsrResult(const QString &result);
 
 signals :
     void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
-    void sigSeachEditFocus();
     void sigSearchNoteEmpty(qint64 id);
     void asrStart(const QString& file, qint64 duration);
 protected:
@@ -44,7 +44,6 @@ private:
     void delNoteFromList(VNoteItem *item,RightNoteList *list);
     void stopCurVoicePlaying(int pos = -1);
     RightNoteList *getNormalNoteList(qint64);
-
 
 public slots:
     void adjustaddTextBtn();
@@ -82,7 +81,8 @@ private:
 
     VNoteItem *m_curNoteItem{nullptr};
 
-    VoiceNoteItem *m_playVoiceItem {nullptr}; //操作的语音项
+    VoiceNoteItem *m_playVoiceItem {nullptr}; //播放的语音项
+    VoiceNoteItem *m_asrVoiceItem {nullptr}; //语音转文字的语音项
     QMediaPlayer *m_player {nullptr};
 };
 

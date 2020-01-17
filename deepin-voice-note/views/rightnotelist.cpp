@@ -139,6 +139,9 @@ void RightNoteList::onItemAddHeight(int height)
             pTmpwidget->setFixedHeight(pTmpwidget->height() + height);
             this->item(i)->setSizeHint(QSize(this->width(), pTmpwidget->height()));
             emit sigListHeightChange();
+            if(i == this->count() - 1){
+                this->scrollToBottom();
+            }
             return;
         }
     }
@@ -149,8 +152,7 @@ void RightNoteList::updateNodeItem(VNoteItem *item)
     for (int i = 0; i < this->count(); i++) {
         VNoteItemWidget *itemWidget = static_cast<VNoteItemWidget *>(this->itemWidget(this->item(i)));
         if (itemWidget->getNoteItem() == item) {
-            TextNoteItem *item = static_cast<TextNoteItem *>(itemWidget);
-            item->updateData();
+            itemWidget->updateData();
             break;
         }
     }
@@ -162,8 +164,7 @@ VoiceNoteItem *RightNoteList::getVoiceItem(VNoteItem *item)
         for (int i = 0; i < this->count(); i++) {
             VNoteItemWidget *itemWidget = static_cast<VNoteItemWidget *>(this->itemWidget(this->item(i)));
             if (itemWidget->getNoteItem() == item) {
-                VoiceNoteItem *item = static_cast<VoiceNoteItem *>(itemWidget);
-                return  item;
+                return  static_cast<VoiceNoteItem *>(itemWidget);
             }
         }
     }

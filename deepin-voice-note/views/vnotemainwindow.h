@@ -54,7 +54,6 @@ public slots:
     void onVNoteFolderAdd();
     void onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
     void onTextEditReturn();
-    void onSearchEditFocus();
     void onSearchNoteEmpty(qint64 id);
     void onStartRecord();//开始录音
     void onFinshRecord(const QString &voicePath,qint64 voiceSize); //结束录音
@@ -90,6 +89,7 @@ private:
     DStackedWidget *m_centerWidget {nullptr};
     QTextCharFormat m_textEditFormat;
     bool            m_isRecording {false};
+    bool            m_isAsrVoiceing {false};
 };
 
 #endif // VNOTEMAINWINDOW_H

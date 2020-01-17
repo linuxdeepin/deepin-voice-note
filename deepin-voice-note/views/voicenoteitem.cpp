@@ -199,12 +199,10 @@ void VoiceNoteItem::showAsrStartWindow()
     m_asrText->document()->setDefaultTextOption(option);
     m_asrText->setPlainText(tr("Converting voice to text"));
     m_asrText->setVisible(true);
-    m_isVoiceAsring = true;
 }
 
 void VoiceNoteItem::showAsrEndWindow(const QString &strResult)
 {
-    m_isVoiceAsring = false;
     m_asrText->setPlainText(strResult);
     if (strResult.isEmpty()) {
         m_asrText->setVisible(false);
@@ -232,15 +230,6 @@ void VoiceNoteItem::enblePauseBtn(bool enable)
     m_pauseBtn->setEnabled(enable);
 }
 
-bool VoiceNoteItem::isPlaying()
-{
-    return  m_pauseBtn->isVisible();
-}
-
-bool VoiceNoteItem::isAsrStart()
-{
-    return m_isVoiceAsring;
-}
 void VoiceNoteItem::onTextChanged()
 {
     setTextLineHeight(27);
@@ -339,6 +328,10 @@ void VoiceNoteItem::setSliderEnable(bool enable)
     m_waveForm->setEnabled(enable);
 }
 
+void VoiceNoteItem::enbleMenuBtn(bool enable)
+{
+    m_menuBtn->setEnabled(enable);
+}
 void VoiceNoteItem::enterEvent(QEvent *event)
 {
     DPalette pb = DApplicationHelper::instance()->palette(m_bgWidget);
@@ -353,4 +346,9 @@ void VoiceNoteItem::leaveEvent(QEvent *event)
     pb.setBrush(DPalette::Base, pb.color(DPalette::ItemBackground));
     m_bgWidget->setPalette(pb);
     return VNoteItemWidget::leaveEvent(event);
+}
+
+void VoiceNoteItem::updateData()
+{
+    showAsrEndWindow(m_textNode->noteText);
 }

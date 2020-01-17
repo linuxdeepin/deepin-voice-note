@@ -79,8 +79,6 @@ void VNoteMainWindow::initConnections()
 
     connect(m_rightView, &RightView::sigTextEditDetail,
             this, &VNoteMainWindow::onTextEditDetail);
-    connect(m_rightView, &RightView::sigSeachEditFocus,
-            this, &VNoteMainWindow::onSearchEditFocus);
     connect(m_rightView, &RightView::sigSearchNoteEmpty,
             this, &VNoteMainWindow::onSearchNoteEmpty);
 
@@ -273,6 +271,7 @@ void VNoteMainWindow::onVNoteSearch()
 void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &previous)
 {
     Q_UNUSED(previous);
+    bool foucsFlag = m_noteSearchEdit->lineEdit()->hasFocus();
     QModelIndex index = m_leftView->currentIndex();
     if (index.isValid()) {
         qint64 id = m_leftView->getFolderId(index);
@@ -280,6 +279,9 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &previous)
         m_centerWidget->setCurrentIndex(WndNoteShow);
     } else {
         m_centerWidget->setCurrentIndex(WndSearchEmpty);
+    }
+    if(foucsFlag){
+       m_noteSearchEdit->lineEdit()->setFocus();
     }
 }
 
@@ -376,18 +378,13 @@ void VNoteMainWindow::onTextEditReturn()
             m_rightView->onUpdateNote(m_textNode);
         }
     } else if (m_textNode->noteType == VNoteItem::VNT_Voice) {
-        if (m_isRecording == false) {
+        if (m_isRecording == false && m_isAsrVoiceing == false) {
             m_noteSearchEdit->setEnabled(true);
         }
     }
     m_centerWidget->setCurrentIndex(WndNoteShow);
     m_returnBtn->setVisible(false);
     onVNoteSearch();//详情页时只搜索详情页内容，返回时重新搜索
-}
-
-void VNoteMainWindow::onSearchEditFocus()
-{
-    m_noteSearchEdit->lineEdit()->setFocus();
 }
 
 void VNoteMainWindow::onSearchNoteEmpty(qint64 id)
@@ -422,15 +419,26 @@ void VNoteMainWindow::onChangeTheme()
 
 void VNoteMainWindow::onA2TStart(const QString &file, qint64 duration)
 {
+    m_leftView->setEnabled(false);
+    m_noteSearchEdit->setEnabled(false);
     m_a2tManager->startAsr(file, duration);
+    m_isAsrVoiceing = true;
 }
 
 void VNoteMainWindow::onA2TError(int error)
 {
     qInfo() << "Audo to text failed:" << error;
+    m_leftView->setEnabled(true);
+    m_noteSearchEdit->setEnabled(true);
+    m_rightView->setAsrResult("");
+    m_isAsrVoiceing = false;
 }
 
 void VNoteMainWindow::onA2TSuccess(const QString &text)
 {
     qInfo() << "Audo to text success:" << text;
+    m_leftView->setEnabled(true);
+    m_noteSearchEdit->setEnabled(true);
+    m_rightView->setAsrResult(text);
+    m_isAsrVoiceing = false;
 }

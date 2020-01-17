@@ -85,6 +85,14 @@ void RightView::initConnection()
     connect(m_searchNoteList, SIGNAL(sigTextEditIsEmpty(VNoteItem *, bool)), this,
             SLOT(onTextEditIsEmpty(VNoteItem *, bool)));
 
+    connect(m_searchNoteList, SIGNAL(sigVoicePlayBtnClicked(VoiceNoteItem *)), this,
+            SLOT(onVoicePlayBtnClicked(VoiceNoteItem *)));
+    connect(m_searchNoteList, SIGNAL(sigVoicePauseBtnClicked(VoiceNoteItem *)), this,
+            SLOT(onVoicePauseBtnClicked(VoiceNoteItem *)));
+
+    connect(m_searchNoteList, &RightNoteList::sigListHeightChange, this, &RightView::adjustaddTextBtn);
+    connect(m_searchNoteList, &RightNoteList::sigVoicePlayPosChange, this, &RightView::onSetPlayerPos);
+
     connect(m_delTextAction, &QAction::triggered, this, &RightView::onDelTextAction);
     connect(m_saveTextAction, &QAction::triggered, this, &RightView::onSaveTextAction);
     connect(m_delVoiceAction, &QAction::triggered, this, &RightView::onDelVoiceAction);
@@ -167,7 +175,6 @@ void RightView::noteSwitchByFolder(qint64 id)
         } else {
             m_stackWidget->setCurrentWidget(m_noSearchResult);
         }
-        emit sigSeachEditFocus();
     }
     m_lastFolderId = id;
     adjustaddTextBtn();
@@ -259,6 +266,7 @@ void RightView::onTextEditIsEmpty(VNoteItem *textNode, bool empty)
 void RightView::setSearchKey(const QRegExp &searchKey)
 {
     m_searchKey = searchKey;
+    stopCurVoicePlaying(0);
 }
 
 void RightView::onMenuPopup(VNoteItem *item)
@@ -271,6 +279,10 @@ void RightView::onMenuPopup(VNoteItem *item)
         if (m_curNoteItem->noteType == VNoteItem::VNOTE_TYPE::VNT_Text) {
             m_textMenu->exec(pos);
         } else {
+            if(m_asrVoiceItem == nullptr){
+                bool textEmpty = m_curNoteItem->noteText.isEmpty();
+                m_asrVoiceAction->setEnabled(textEmpty); //已经转语音的文字不能再次转语音
+            }
             m_voiceMenu->exec(pos);
         }
     }
@@ -311,16 +323,16 @@ void RightView::onDelTextAction()
 void RightView::onAsrVoiceAction()
 {
     RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
-    VoiceNoteItem *item = list->getVoiceItem(m_curNoteItem);
-    if (item) {
-        item->showAsrStartWindow();
+    m_asrVoiceItem = list->getVoiceItem(m_curNoteItem);
+    if (m_asrVoiceItem != nullptr) {
+        m_asrVoiceItem->enbleMenuBtn(false);
+        m_asrVoiceAction->setEnabled(false);
+        m_asrVoiceItem->showAsrStartWindow();
+        QString file = m_curNoteItem->voicePath;
+        qint64 durtation = m_curNoteItem->voiceSize;
+        qDebug() << "onAsrVoiceAction: " << file << ", " << durtation;
+        Q_EMIT asrStart(file, durtation);
     }
-
-    QString file = item->getNoteItem()->voicePath;
-    qint64 durtation = item->getNoteItem()->voiceSize;
-
-    qDebug() << "onAsrVoiceAction: " << file << ", " << durtation;
-    Q_EMIT asrStart(file, durtation);
 }
 
 void RightView::onDelVoiceAction()
@@ -451,7 +463,7 @@ void RightView::stopCurVoicePlaying(int pos)
 {
     if (m_player->state() != QMediaPlayer::State::StoppedState) {
         m_player->stop();
-        if (m_playVoiceItem != nullptr && m_playVoiceItem->isPlaying()) {
+        if (m_playVoiceItem != nullptr) {
             m_playVoiceItem->showPlayBtn();
             if (pos >= 0) {
                 m_playVoiceItem->setPlayPos(pos);
@@ -487,5 +499,19 @@ void RightView::addNewNote(VNoteItem &data, bool isByBtn)
             }
             adjustaddTextBtn();
         }
+    }
+}
+
+void RightView::setAsrResult(const QString &result)
+{
+    if(m_asrVoiceItem != nullptr){
+        m_asrVoiceItem->showAsrEndWindow(result);
+        m_asrVoiceItem->enbleMenuBtn(true);
+        if(!result.isEmpty()){
+            VNoteItem *data = m_asrVoiceItem->getNoteItem();
+            data->noteText = result;
+            onUpdateNote(data);
+        }
+        m_asrVoiceItem = nullptr;
     }
 }

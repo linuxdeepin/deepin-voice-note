@@ -135,6 +135,7 @@ void TextNoteItem::highSearchText(const QRegExp &searchKey, const QColor &highCo
     if (!searchKey.isEmpty()) {
         if (Utils::highTextEdit(m_textEdit, m_textEditFormat, searchKey, highColor)) {
             m_searchKey = searchKey;
+            m_textEdit->moveCursor(QTextCursor::Start);
         }
     }
 }
