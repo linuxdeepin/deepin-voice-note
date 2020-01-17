@@ -6,8 +6,8 @@
 VNoteAudioDeviceWatcher::VNoteAudioDeviceWatcher(QObject *parent)
     : QThread(parent)
 {
-    initDeviceWatcher();
-    initConnections();
+//    initDeviceWatcher();
+//    initConnections();
 }
 
 VNoteAudioDeviceWatcher::~VNoteAudioDeviceWatcher()
@@ -64,7 +64,14 @@ void VNoteAudioDeviceWatcher::run()
 
     bool   currentState = false;
     double volume = 0;
+    //log volume one time per 5 minutes
+    const int logTime = 60*5;
+    int checkTimes = 0;
 
+    //TODO:
+    //    The server may be not stable now,so
+    //need connect it every time,this need to
+    //be optimized in future.
     do {
         //Quit watch thread
         if (m_quitWatcher) {
@@ -73,11 +80,30 @@ void VNoteAudioDeviceWatcher::run()
 
         volume = 0;
 
-        //Check audio meter
-        if (!m_defaultSourceMeter.isNull()) {
-            QVariant vol = m_defaultSourceMeter->property("Volume");
+        com::deepin::daemon::Audio audioInterface(
+                    m_serviceName,
+                    "/com/deepin/daemon/Audio",
+                    QDBusConnection::sessionBus() );
 
-            volume = vol.toDouble();
+        com::deepin::daemon::audio::Source defaultSource(
+                    m_serviceName,
+                    audioInterface.defaultSource().path(),
+                    QDBusConnection::sessionBus() );
+
+        QDBusPendingReply<QDBusObjectPath> reply = defaultSource.GetMeter();
+
+    //    qInfo() << "GetMeter have error:" << reply.isError()
+    //            << "error:" << reply.error();
+
+        if (!reply.isError()) {
+            QDBusObjectPath meterPath = reply.value();
+
+            com::deepin::daemon::audio::Meter defaultSourceMeter(
+                        m_serviceName,
+                        meterPath.path(),
+                        QDBusConnection::sessionBus() );
+
+            volume = defaultSourceMeter.volume();
 
             if (volume > DBL_EPSILON) {
                 currentState = true;
@@ -91,16 +117,55 @@ void VNoteAudioDeviceWatcher::run()
 
                 qInfo() << "Microphone aviable state change:" << m_microphoneAviable;
             }
-        } else {
-            initAudioMeter();
         }
 
-#ifdef QT_QML_DEBUG
-        qInfo() << "Volume:" << volume;
-#endif
+        checkTimes++;
+
+        if (0 == (checkTimes%logTime)) {
+            qInfo() << "Volume:" << volume;
+        }
+
         //polling audio state per seconds
         msleep(AUDIO_DEV_CHECK_TIME);
     } while (1);
+
+    //    do {
+    //        initDeviceWatcher();
+    //        //Quit watch thread
+    //        if (m_quitWatcher) {
+    //            break;
+    //        }
+
+    //        volume = 0;
+
+    //        //Check audio meter
+    //        if (!m_defaultSourceMeter.isNull()) {
+    //            QVariant vol = m_defaultSourceMeter->property("Volume");
+
+    //            volume = vol.toDouble();
+
+    //            if (volume > DBL_EPSILON) {
+    //                currentState = true;
+    //            } else {
+    //                currentState = false;
+    //            }
+
+    //            if (m_microphoneAviable != currentState) {
+    //                m_microphoneAviable = currentState;
+    //                emit microphoneAvailableState(m_microphoneAviable);
+
+    //                qInfo() << "Microphone aviable state change:" << m_microphoneAviable;
+    //            }
+    //        } else {
+    //            initAudioMeter();
+    //        }
+
+    //#ifdef QT_QML_DEBUG
+    //        qInfo() << "Volume:" << volume;
+    //#endif
+    //        //polling audio state per seconds
+    //        msleep(AUDIO_DEV_CHECK_TIME);
+    //    } while (1);
 }
 
 void VNoteAudioDeviceWatcher::initAudioMeter()

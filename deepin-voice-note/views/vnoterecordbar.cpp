@@ -36,6 +36,9 @@ void VNoteRecordBar::initUI()
     m_recBtnAnchor->setAnchor(Qt::AnchorLeft, this, Qt::AnchorLeft);
     m_recBtnAnchor->setAnchor(Qt::AnchorBottom, this, Qt::AnchorBottom);
 
+    //Default unavailable
+    OnMicrophoneAvailableChanged(false);
+
     rightNoteAreaLayout->addWidget(m_recordPanel);
 }
 
