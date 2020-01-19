@@ -5,6 +5,7 @@
 
 #include <DPushButton>
 #include <DWarningButton>
+#include <DVerticalLine>
 
 DWIDGET_USE_NAMESPACE;
 
@@ -25,6 +26,7 @@ protected:
     void initUI();
     void initConnections();
     void initMessage();
+    void setSingleButton(); //Need to be Optimzed
 signals:
 
 public slots:
@@ -33,6 +35,7 @@ protected:
     DLabel         *m_pMessage {nullptr};
     DPushButton    *m_cancelBtn {nullptr};
     DWarningButton *m_confirmBtn {nullptr};
+    DVerticalLine  *m_buttonSpliter {nullptr};
 
     MessageType    m_msgType;
 };

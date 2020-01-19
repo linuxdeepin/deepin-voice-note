@@ -175,8 +175,8 @@ void RightView::noteSwitchByFolder(qint64 id)
             datafolderNotes->lock.unlock();
         }
         if (searchNoteData.folderNotes.size()) {
-            m_searchNoteList->initNoteItem(id, &searchNoteData, m_searchKey);
             m_stackWidget->setCurrentWidget(m_searchNoteList);
+            m_searchNoteList->initNoteItem(id, &searchNoteData, m_searchKey);
         } else {
             m_stackWidget->setCurrentWidget(m_noSearchResult);
         }

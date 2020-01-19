@@ -16,6 +16,12 @@ VNoteMessageDialog::VNoteMessageDialog(int msgType, QWidget *parent)
     initMessage();
 }
 
+void VNoteMessageDialog::setSingleButton()
+{
+    m_buttonSpliter->setVisible(false);
+    m_cancelBtn->setVisible(false);
+}
+
 void VNoteMessageDialog::initUI()
 {
     QVBoxLayout *mainLayout = new QVBoxLayout();
@@ -41,24 +47,21 @@ void VNoteMessageDialog::initUI()
     m_cancelBtn  = new DPushButton(this);
     m_confirmBtn = new DWarningButton(this);
 
-    DVerticalLine *verticalSplite = new DVerticalLine(this);
-    DPalette pa = DApplicationHelper::instance()->palette(verticalSplite);
+    m_buttonSpliter = new DVerticalLine(this);
+    DPalette pa = DApplicationHelper::instance()->palette(m_buttonSpliter);
     QColor splitColor = pa.color(DPalette::ItemBackground);
     pa.setBrush(DPalette::Background, splitColor);
-    verticalSplite->setPalette(pa);
-    verticalSplite->setBackgroundRole(QPalette::Background);
-    verticalSplite->setAutoFillBackground(true);
-    verticalSplite->setFixedSize(3,28);
-    verticalSplite->setVisible(false);
+    m_buttonSpliter->setPalette(pa);
+    m_buttonSpliter->setBackgroundRole(QPalette::Background);
+    m_buttonSpliter->setAutoFillBackground(true);
+    m_buttonSpliter->setFixedSize(4,28);
 
     actionBarLayout->addWidget(m_cancelBtn);
-    actionBarLayout->addSpacing(8);
-    actionBarLayout->addWidget(verticalSplite);
-    actionBarLayout->addSpacing(8);
+    actionBarLayout->addWidget(m_buttonSpliter);
     actionBarLayout->addWidget(m_confirmBtn);
 
     mainLayout->addWidget(m_pMessage, 1, Qt::AlignTop|Qt::AlignCenter);
-    mainLayout->addStretch();
+    mainLayout->addSpacing(10);
     mainLayout->addLayout(actionBarLayout);
     mainFrame->setLayout(mainLayout);
 
@@ -103,7 +106,7 @@ void VNoteMessageDialog::initMessage()
     case AsrTimeLimit:{
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
             ,"Cannot convert this voice note, as notes over 20 minutes are not supported at present."));
-        m_cancelBtn->setVisible(false);
+        setSingleButton();
     }
     }
 }
