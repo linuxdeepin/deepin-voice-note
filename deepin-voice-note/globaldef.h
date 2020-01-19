@@ -23,6 +23,10 @@
 //Audio device polling time in milliseconds
 #define AUDIO_DEV_CHECK_TIME 1000
 
+//********App setting data key****************
+#define VNOTE_MAINWND_SZ_KEY "_app_main_wnd_sz_key_"
+//********************************************
+
 //Time format
 #define VNOTE_TIME_FMT "yyyy-MM-dd HH:mm:ss.zzz"
 

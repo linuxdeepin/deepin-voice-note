@@ -6,6 +6,9 @@
 #include "rightview.h"
 #include "initemptypage.h"
 
+#include <QShortcut>
+#include <QSettings>
+
 #include <DMainWindow>
 #include <DSearchEdit>
 #include <DSplitter>
@@ -27,10 +30,12 @@ class VNoteMainWindow : public DMainWindow
 public:
     VNoteMainWindow(QWidget *parent = nullptr);
     virtual ~VNoteMainWindow();
+    QSharedPointer<QSettings> appSetting() const ;
     enum WindowType {WndHomePage, WndNoteShow, WndSearchEmpty, WndTextEdit};
 protected:
     void initUI();
     void initData();
+    void initAppSetting();
     void initConnections();
     void initShortcuts();
     void initTitleBar();
@@ -62,6 +67,8 @@ public slots:
     void onA2TStart(const QString& file, qint64 duration);
     void onA2TError(int error);
     void onA2TSuccess(const QString& text);
+    //Shotcuts slots
+    void onPreviewShortcut();
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
@@ -90,6 +97,11 @@ private:
     QTextCharFormat m_textEditFormat;
     bool            m_isRecording {false};
     bool            m_isAsrVoiceing {false};
+
+    //App setting
+    QSharedPointer<QSettings> m_qspSetting {nullptr};
+    //Shortcuts key
+    QScopedPointer<QShortcut> m_stPreviewShortcuts;
 };
 
 #endif // VNOTEMAINWINDOW_H

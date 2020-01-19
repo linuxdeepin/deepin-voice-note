@@ -17,7 +17,15 @@ void VNoteApplication::activateWindow()
     //Init Normal window at first time
     if (nullptr == m_qspMainWnd.get()) {
         m_qspMainWnd.reset(new VNoteMainWindow());
+
         m_qspMainWnd->setMinimumSize(DEFAULT_WINDOWS_WIDTH, DEFAULT_WINDOWS_HEIGHT);
+
+        QByteArray mainWindowSize =
+                m_qspMainWnd.get()->appSetting()->value(VNOTE_MAINWND_SZ_KEY).toByteArray();
+
+        if (!mainWindowSize.isEmpty()) {
+            m_qspMainWnd->restoreGeometry(mainWindowSize);
+        }
 
         //Should be called befor show
         Dtk::Widget::moveToCenter(m_qspMainWnd.get());

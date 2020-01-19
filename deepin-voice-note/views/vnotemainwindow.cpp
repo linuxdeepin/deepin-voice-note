@@ -20,7 +20,7 @@ VNoteMainWindow::VNoteMainWindow(QWidget *parent)
 {
     initUI();
     initConnections();
-
+    initShortcuts();
     // Request DataManager load  note folders
     initData();
 
@@ -30,6 +30,10 @@ VNoteMainWindow::VNoteMainWindow(QWidget *parent)
 }
 
 VNoteMainWindow::~VNoteMainWindow() {
+    //Save main window size
+    if (!isMaximized()) {
+        m_qspSetting->setValue(VNOTE_MAINWND_SZ_KEY, saveGeometry());
+    }
     //TODO:
     //    Nofiy audio watcher to exit & need
     //wait at least AUDIO_DEV_CHECK_TIME ms
@@ -42,6 +46,11 @@ VNoteMainWindow::~VNoteMainWindow() {
     QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
 }
 
+QSharedPointer<QSettings> VNoteMainWindow::appSetting() const
+{
+    return m_qspSetting;
+}
+
 void VNoteMainWindow::initUI()
 {
     initTitleBar();
@@ -50,9 +59,41 @@ void VNoteMainWindow::initUI()
 
 void VNoteMainWindow::initData()
 {
+    //Init app data here
+    initAppSetting();
+
     VNoteDataManager::instance()->reqNoteDefIcons();
     VNoteDataManager::instance()->reqNoteFolders();
     VNoteDataManager::instance()->reqNoteItems();
+}
+
+void VNoteMainWindow::initAppSetting()
+{
+    QString vnoteConfigBasePath =
+            QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+
+    QFileInfo configDir(vnoteConfigBasePath);
+
+    //TODO:
+    //    Remove the old version database
+    //make a app owne directory
+    if (!configDir.isDir() && configDir.exists()) {
+        QFile oldDbFile(vnoteConfigBasePath);
+        if (!oldDbFile.remove()) {
+            qInfo() << oldDbFile.fileName() << ":" <<oldDbFile.errorString();
+        }
+    }
+
+    configDir.setFile(vnoteConfigBasePath+QDir::separator()+QString("config/"));
+
+    if (!configDir.exists()) {
+        QDir().mkpath(configDir.filePath());
+        qInfo() << "create config dir:" << configDir.filePath();
+    }
+
+    m_qspSetting.reset(new QSettings(configDir.filePath()+QString("config.conf")
+                                     ,QSettings::IniFormat));
+
 }
 
 void VNoteMainWindow::initConnections()
@@ -90,7 +131,15 @@ void VNoteMainWindow::initConnections()
 
 }
 
-void VNoteMainWindow::initShortcuts() {}
+void VNoteMainWindow::initShortcuts() {
+    m_stPreviewShortcuts.reset(new QShortcut(this));
+    m_stPreviewShortcuts->setKey(tr("Ctrl+Shift+/"));
+    m_stPreviewShortcuts->setContext(Qt::ApplicationShortcut);
+    m_stPreviewShortcuts->setAutoRepeat(false);
+
+    connect(m_stPreviewShortcuts.get(), &QShortcut::activated,
+            this, &VNoteMainWindow::onPreviewShortcut);
+}
 
 void VNoteMainWindow::initTitleBar()
 {
@@ -441,4 +490,59 @@ void VNoteMainWindow::onA2TSuccess(const QString &text)
     m_noteSearchEdit->setEnabled(true);
     m_rightView->setAsrResult(text);
     m_isAsrVoiceing = false;
+}
+
+void VNoteMainWindow::onPreviewShortcut()
+{
+    QRect rect = window()->geometry();
+    QPoint pos(rect.x() + rect.width() / 2,
+               rect.y() + rect.height() / 2);
+
+    QJsonObject shortcutObj;
+    QJsonArray jsonGroups;
+
+    QMap<QString, QString> shortcutKeymap = {
+        {"Help",                 "F1"},
+//        {"Close window",         "Alt+F4"},
+        {"Display shortcuts",    "Ctrl+Shift+?"},
+        {"New notebook",         "Ctrl+N"},
+        {"Delete notebook/note", "Delete"},
+//        {"Resize window",        "Ctrl+Alt+F"},
+//        {"Find",                 "Ctrl+F"},
+        {"Rename notebook",      "F2"},
+        {"Play/Pause",           "Space"},
+        {"Select all",           "Ctrl+A"},
+        {"Copy",                 "Ctrl+C"},
+        {"Cut",                  "Ctrl+X"},
+        {"Paste",                "Ctrl+V"},
+    };
+
+    QJsonObject fontMgrJsonGroup;
+    fontMgrJsonGroup.insert("groupName", DApplication::translate("AppMain", "Voice Notes"));
+    QJsonArray fontJsonItems;
+
+    for (QMap<QString, QString>::iterator it = shortcutKeymap.begin();
+         it != shortcutKeymap.end(); it++) {
+        QJsonObject jsonItem;
+        jsonItem.insert("name", DApplication::translate("Shortcuts", it.key().toUtf8()));
+        jsonItem.insert("value", it.value().replace("Meta", "Super"));
+        fontJsonItems.append(jsonItem);
+    }
+
+    fontMgrJsonGroup.insert("groupItems", fontJsonItems);
+    jsonGroups.append(fontMgrJsonGroup);
+
+    shortcutObj.insert("shortcut", jsonGroups);
+
+    QJsonDocument doc(shortcutObj);
+
+    QStringList shortcutString;
+    QString param1 = "-j=" + QString(doc.toJson().data());
+    QString param2 = "-p=" + QString::number(pos.x()) + "," + QString::number(pos.y());
+    shortcutString << param1 << param2;
+
+    QProcess *shortcutViewProcess = new QProcess();
+    shortcutViewProcess->startDetached("deepin-shortcut-viewer", shortcutString);
+
+    connect(shortcutViewProcess, SIGNAL(finished(int)), shortcutViewProcess, SLOT(deleteLater()));
 }

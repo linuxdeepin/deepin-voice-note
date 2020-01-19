@@ -19,7 +19,7 @@ public slots:
     void onNewProcessInstance(qint64 pid, const QStringList &arguments);
 
 protected:
-    QScopedPointer<DMainWindow> m_qspMainWnd {nullptr};
+    QScopedPointer<VNoteMainWindow> m_qspMainWnd {nullptr};
 };
 
 #endif // VNOTEAPPLICATION_H
