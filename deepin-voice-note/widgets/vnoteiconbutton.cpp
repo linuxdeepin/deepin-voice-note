@@ -25,22 +25,54 @@ VNoteIconButton::~VNoteIconButton()
 {
 }
 
+void VNoteIconButton::setSeparateThemIcons(bool separate)
+{
+    m_separateThemeIcon = separate;
+}
+
+void VNoteIconButton::SetDisableIcon(const QString &disableIcon)
+{
+    if (!disableIcon.isEmpty()) {
+        m_icons[Disabled] = disableIcon;
+    }
+}
+
+void VNoteIconButton::setBtnDisabled(bool disabled)
+{
+    //The disable icon should be supplied
+    if (!m_icons[Disabled].isEmpty()) {
+        m_isDisabled = disabled;
+
+        if (m_isDisabled) {
+            m_state = Disabled;
+        } else {
+            m_state = Normal;
+        }
+
+        updateIcon();
+    }
+}
+
 void VNoteIconButton::enterEvent(QEvent *event)
 {
     Q_UNUSED(event);
 
-    m_state = Hover;
+    if (!m_isDisabled) {
+        m_state = Hover;
 
-    updateIcon();
+        updateIcon();
+    }
 }
 
 void VNoteIconButton::leaveEvent(QEvent *event)
 {
     Q_UNUSED(event);
 
-    m_state = Normal;
+    if (!m_isDisabled) {
+        m_state = Normal;
 
-    updateIcon();
+        updateIcon();
+    }
 }
 
 void VNoteIconButton::mousePressEvent(QMouseEvent *event)
@@ -49,11 +81,13 @@ void VNoteIconButton::mousePressEvent(QMouseEvent *event)
         return;
     }
 
-    m_state = Press;
+    if (!m_isDisabled) {
+        m_state = Press;
 
-    updateIcon();
+        updateIcon();
 
-    event->accept();
+        event->accept();
+    }
 }
 
 void VNoteIconButton::mouseReleaseEvent(QMouseEvent *event)
@@ -64,13 +98,15 @@ void VNoteIconButton::mouseReleaseEvent(QMouseEvent *event)
         return;
     }
 
-    if (rect().contains(event->pos())) {
+    if (!m_isDisabled) {
+        if (rect().contains(event->pos())) {
 
-        m_state = Hover;
+            m_state = Hover;
 
-        updateIcon();
+            updateIcon();
 
-        Q_EMIT clicked();
+            Q_EMIT clicked();
+        }
     }
 }
 
@@ -78,10 +114,12 @@ void VNoteIconButton::mouseMoveEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
 
-    if (m_state != Hover) {
-        m_state = Hover;
+    if (!m_isDisabled) {
+        if (m_state != Hover) {
+            m_state = Hover;
 
-        updateIcon();
+            updateIcon();
+        }
     }
 }
 
@@ -99,10 +137,14 @@ QPixmap VNoteIconButton::loadPixmap(const QString &path)
 
     QString iconPath(STAND_ICON_PAHT);
 
-    if (DGuiApplicationHelper::ColorType::LightType == theme) {
-        iconPath += QString("light/");
-    } else {
-        iconPath += QString("dark/");
+    //Default use different icons under
+    //different themes
+    if (m_separateThemeIcon) {
+        if (DGuiApplicationHelper::ColorType::LightType == theme) {
+            iconPath += QString("light/");
+        } else {
+            iconPath += QString("dark/");
+        }
     }
 
     iconPath += path;

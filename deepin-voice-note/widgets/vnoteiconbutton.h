@@ -16,8 +16,11 @@ public:
             , QString normal = ""
             , QString hover  = ""
             , QString press  = "");
-    virtual ~VNoteIconButton();
-
+    virtual ~VNoteIconButton() override;
+    void setSeparateThemIcons(bool separate);
+    void SetDisableIcon(const QString& disableIcon);
+    void setBtnDisabled(bool disabled);
+protected:
     void enterEvent(QEvent *event) override;
     void leaveEvent(QEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
@@ -36,11 +39,18 @@ private:
         Normal,
         Hover,
         Press,
+        Disabled,
         MaxState
     };
 
     QString m_icons[MaxState];
     int     m_state {Normal};
+
+    //The Icon is different under different theme.
+    bool m_separateThemeIcon {true};
+
+    //Disable state
+    bool m_isDisabled {false};
 };
 
 #endif // VNOTEICONBUTTON_H
