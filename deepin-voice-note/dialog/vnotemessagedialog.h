@@ -17,6 +17,8 @@ public:
     enum MessageType {
         DeleteNote,
         AbortRecord,
+        DeleteFolder,
+        AsrTimeLimit
     };
 
 protected:

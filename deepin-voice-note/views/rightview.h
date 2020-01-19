@@ -3,6 +3,7 @@
 #include "common/vnoteforlder.h"
 #include "rightnotelist.h"
 #include "myrecodebuttons.h"
+#include "dialog/vnotemessagedialog.h"
 
 #include <QSharedPointer>
 #include <QMediaPlayer>
@@ -32,6 +33,7 @@ signals :
     void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
     void sigSearchNoteEmpty(qint64 id);
     void asrStart(const QString& file, qint64 duration);
+    void sigMenuNoteItemChange(); //弹出右菜单，通知主窗口
 protected:
     void resizeEvent(QResizeEvent *event);
 private:
@@ -79,11 +81,13 @@ private:
     QAction *m_delVoiceAction{nullptr};
     QAction *m_asrVoiceAction{nullptr};
 
-    VNoteItem *m_curNoteItem{nullptr};
+    VNoteItem *m_curMenuNoteItem{nullptr}; //当前弹出右菜单的记事本项
 
     VoiceNoteItem *m_playVoiceItem {nullptr}; //播放的语音项
     VoiceNoteItem *m_asrVoiceItem {nullptr}; //语音转文字的语音项
     QMediaPlayer *m_player {nullptr};
+    VNoteMessageDialog *m_delDialog {nullptr};
+    VNoteMessageDialog *m_asrlimitErrDialog {nullptr};
 };
 
 #endif // RIGHTVIEW_H

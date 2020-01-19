@@ -8,7 +8,7 @@
 #include <QDebug>
 #include <QStandardPaths>
 #include <QTimer>
-
+#include <QScrollBar>
 #include <DFontSizeManager>
 #include <DGuiApplicationHelper>
 #include <DFileDialog>
@@ -39,6 +39,7 @@ void RightView::initUi()
     m_stackWidget->insertWidget(0, m_noSearchResult);
 
     m_searchNoteList = new RightNoteList(this);
+    m_searchNoteList->verticalScrollBar()->setSingleStep(10);
     m_searchNoteList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_searchNoteList->setLineWidth(0);
     m_stackWidget->insertWidget(1, m_searchNoteList);
@@ -53,6 +54,9 @@ void RightView::initUi()
     initVoiceMenu();
 
     m_player = new QMediaPlayer(this);
+    m_delDialog = new VNoteMessageDialog(VNoteMessageDialog::DeleteNote, this);
+    m_asrlimitErrDialog = new VNoteMessageDialog(VNoteMessageDialog::AsrTimeLimit, this);
+    m_asrlimitErrDialog->setWindowFlags(m_asrlimitErrDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 }
 
 void RightView::initTextMenu()
@@ -105,6 +109,7 @@ void RightView::initConnection()
 void RightView::addNewNoteList(qint64 id)
 {
     RightNoteList *listWidget = new RightNoteList(m_stackWidget);
+    listWidget->verticalScrollBar()->setSingleStep(10);
     connect(listWidget, SIGNAL(sigDelNote(VNoteItem *)), this, SLOT(onDelNote(VNoteItem *)));
     connect(listWidget, SIGNAL(sigMenuPopup(VNoteItem *)), this, SLOT(onMenuPopup(VNoteItem *)));
     connect(listWidget, SIGNAL(sigUpdateNote(VNoteItem *)), this, SLOT(onUpdateNote(VNoteItem *)));
@@ -176,6 +181,7 @@ void RightView::noteSwitchByFolder(qint64 id)
             m_stackWidget->setCurrentWidget(m_noSearchResult);
         }
     }
+    stopCurVoicePlaying(0);
     m_lastFolderId = id;
     adjustaddTextBtn();
 }
@@ -266,21 +272,23 @@ void RightView::onTextEditIsEmpty(VNoteItem *textNode, bool empty)
 void RightView::setSearchKey(const QRegExp &searchKey)
 {
     m_searchKey = searchKey;
-    stopCurVoicePlaying(0);
 }
 
 void RightView::onMenuPopup(VNoteItem *item)
 {
-    m_curNoteItem = item;
-    if (m_curNoteItem != nullptr) {
+    if (m_curMenuNoteItem != item) {
+        m_curMenuNoteItem = item;
+        emit sigMenuNoteItemChange();
+    }
+    if (m_curMenuNoteItem != nullptr) {
         QPoint pos = QCursor::pos();
         pos.setX(pos.x() - 44);
         pos.setY(pos.y() + 20);
-        if (m_curNoteItem->noteType == VNoteItem::VNOTE_TYPE::VNT_Text) {
+        if (m_curMenuNoteItem->noteType == VNoteItem::VNOTE_TYPE::VNT_Text) {
             m_textMenu->exec(pos);
         } else {
-            if(m_asrVoiceItem == nullptr){
-                bool textEmpty = m_curNoteItem->noteText.isEmpty();
+            if (m_asrVoiceItem == nullptr) {
+                bool textEmpty = m_curMenuNoteItem->noteText.isEmpty();
                 m_asrVoiceAction->setEnabled(textEmpty); //已经转语音的文字不能再次转语音
             }
             m_voiceMenu->exec(pos);
@@ -297,7 +305,7 @@ void RightView::onSaveTextAction()
     fileDialog.setAcceptMode(DFileDialog::AcceptSave);
     fileDialog.setDefaultSuffix("txt");
     fileDialog.setNameFilter("TXT(*.txt)");
-    fileDialog.selectFile(tr("TextNote") + QString::number(m_curNoteItem->noteId));
+    fileDialog.selectFile(tr("TextNote") + QString::number(m_curMenuNoteItem->noteId));
     if (fileDialog.exec() == QDialog::Accepted) {
         QString path = fileDialog.selectedFiles()[0];
         QString fileName = QFileInfo(path).fileName();
@@ -307,7 +315,7 @@ void RightView::onSaveTextAction()
             QFile file(path);
             if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                 QTextStream textStream(&file);
-                textStream << m_curNoteItem->noteText;
+                textStream << m_curMenuNoteItem->noteText;
                 file.close();
             }
         }
@@ -316,20 +324,26 @@ void RightView::onSaveTextAction()
 
 void RightView::onDelTextAction()
 {
-    RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
-    delNoteFromList(m_curNoteItem, list);
+    if (m_delDialog->exec() == QDialog::Accepted) {
+        RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
+        delNoteFromList(m_curMenuNoteItem, list);
+    }
 }
 
 void RightView::onAsrVoiceAction()
 {
+    if (m_curMenuNoteItem->voiceSize > 20 * 60 * 1000) {
+        m_asrlimitErrDialog->exec();
+        return;
+    }
     RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
-    m_asrVoiceItem = list->getVoiceItem(m_curNoteItem);
+    m_asrVoiceItem = list->getVoiceItem(m_curMenuNoteItem);
     if (m_asrVoiceItem != nullptr) {
         m_asrVoiceItem->enbleMenuBtn(false);
         m_asrVoiceAction->setEnabled(false);
         m_asrVoiceItem->showAsrStartWindow();
-        QString file = m_curNoteItem->voicePath;
-        qint64 durtation = m_curNoteItem->voiceSize;
+        QString file = m_curMenuNoteItem->voicePath;
+        qint64 durtation = m_curMenuNoteItem->voiceSize;
         qDebug() << "onAsrVoiceAction: " << file << ", " << durtation;
         Q_EMIT asrStart(file, durtation);
     }
@@ -337,12 +351,14 @@ void RightView::onAsrVoiceAction()
 
 void RightView::onDelVoiceAction()
 {
-    RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
-    VoiceNoteItem *item = list->getVoiceItem(m_curNoteItem);
-    if (item == m_playVoiceItem) {
-        stopCurVoicePlaying();
+    if (m_delDialog->exec() == QDialog::Accepted) {
+        RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
+        VoiceNoteItem *item = list->getVoiceItem(m_curMenuNoteItem);
+        if (item == m_playVoiceItem) {
+            stopCurVoicePlaying();
+        }
+        delNoteFromList(m_curMenuNoteItem, list);
     }
-    delNoteFromList(m_curNoteItem, list);
 }
 
 void RightView::onSaveVoiceAction()
@@ -354,13 +370,13 @@ void RightView::onSaveVoiceAction()
     fileDialog.setAcceptMode(DFileDialog::AcceptSave);
     fileDialog.setDefaultSuffix("mp3");
     fileDialog.setNameFilter("MP3(*.mp3)");
-    fileDialog.selectFile(tr("Voice note") + QString::number(m_curNoteItem->noteId));
+    fileDialog.selectFile(tr("Voice note") + QString::number(m_curMenuNoteItem->noteId));
     if (fileDialog.exec() == QDialog::Accepted) {
         QString path = fileDialog.selectedFiles()[0];
         if (path.isEmpty()) {
             DMessageBox::information(this, tr(""), tr("File name cannot be empty"));
         } else {
-            bool ret = QFile::copy(m_curNoteItem->voicePath, path);
+            bool ret = QFile::copy(m_curMenuNoteItem->voicePath, path);
             qDebug() << ret;
         }
     }
@@ -504,10 +520,10 @@ void RightView::addNewNote(VNoteItem &data, bool isByBtn)
 
 void RightView::setAsrResult(const QString &result)
 {
-    if(m_asrVoiceItem != nullptr){
+    if (m_asrVoiceItem != nullptr) {
         m_asrVoiceItem->showAsrEndWindow(result);
         m_asrVoiceItem->enbleMenuBtn(true);
-        if(!result.isEmpty()){
+        if (!result.isEmpty()) {
             VNoteItem *data = m_asrVoiceItem->getNoteItem();
             data->noteText = result;
             onUpdateNote(data);

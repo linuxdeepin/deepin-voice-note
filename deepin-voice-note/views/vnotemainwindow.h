@@ -17,6 +17,7 @@
 #include <DLabel>
 #include <DFloatingButton>
 #include <DAnchors>
+#include <DFloatingMessage>
 
 DWIDGET_USE_NAMESPACE
 
@@ -48,6 +49,10 @@ protected:
     void initEmptyFoldersView();//没有记事本的窗口
     void initEmptySearchView(); //没有搜索到记事本窗口
     void initTextEditDetailView(); //文字记录满屏显示窗口
+    void initAsrErrMessage();
+    void showAsrErrMessage(const QString &strMessage);
+
+    void resizeEvent(QResizeEvent *event) override;
 
 signals:
 
@@ -69,6 +74,8 @@ public slots:
     void onA2TSuccess(const QString& text);
     //Shotcuts slots
     void onPreviewShortcut();
+    void onMenuNoteItemChange();
+    void onAsrAgain();
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
@@ -97,11 +104,12 @@ private:
     QTextCharFormat m_textEditFormat;
     bool            m_isRecording {false};
     bool            m_isAsrVoiceing {false};
-
     //App setting
     QSharedPointer<QSettings> m_qspSetting {nullptr};
     //Shortcuts key
     QScopedPointer<QShortcut> m_stPreviewShortcuts;
+    DFloatingMessage *m_asrErrMeassage {nullptr};
+    DPushButton     *m_asrAgainBtn {nullptr};
 };
 
 #endif // VNOTEMAINWINDOW_H

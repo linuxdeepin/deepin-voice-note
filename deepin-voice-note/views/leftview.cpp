@@ -22,6 +22,7 @@ void LeftView::initMenuAction()
     m_delAction = new QAction(tr("Delete"), this);
     m_contextMenu->addAction(m_renameAction);
     m_contextMenu->addAction(m_delAction);
+    m_delDialog = new VNoteMessageDialog(VNoteMessageDialog::DeleteFolder,this);
 }
 
 void LeftView::initModel()
@@ -74,12 +75,14 @@ void LeftView::handleFolderRename(VNoteFolder *data)
 
 void LeftView::handleDeleteItem(bool)
 {
-    QModelIndex index = this->currentIndex();
-    QVariant var = index.data(Qt::UserRole + 1);
-    if (var.isValid()) {
-        VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
-        m_pSortFilterModel->removeRow(index.row());
-        emit sigFolderDel(data);
+    if(m_delDialog->exec() == QDialog::Accepted){
+        QModelIndex index = this->currentIndex();
+        QVariant var = index.data(Qt::UserRole + 1);
+        if (var.isValid()) {
+            VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
+            m_pSortFilterModel->removeRow(index.row());
+            emit sigFolderDel(data);
+        }
     }
 }
 

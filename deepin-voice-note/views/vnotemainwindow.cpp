@@ -55,6 +55,7 @@ void VNoteMainWindow::initUI()
 {
     initTitleBar();
     initMainView();
+    initAsrErrMessage();
 }
 
 void VNoteMainWindow::initData()
@@ -122,12 +123,16 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onTextEditDetail);
     connect(m_rightView, &RightView::sigSearchNoteEmpty,
             this, &VNoteMainWindow::onSearchNoteEmpty);
+    connect(m_rightView, &RightView::sigMenuNoteItemChange,
+            this, &VNoteMainWindow::onMenuNoteItemChange);
 
     connect(m_recordBar, &VNoteRecordBar::sigStartRecord, this, &VNoteMainWindow::onStartRecord);
     connect(m_recordBar, &VNoteRecordBar::sigFinshRecord, this, &VNoteMainWindow::onFinshRecord);
 
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &VNoteMainWindow::onChangeTheme);
+
+    connect(m_asrAgainBtn, &DPushButton::clicked, this, &VNoteMainWindow::onAsrAgain);
 
 }
 
@@ -323,6 +328,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &previous)
     bool foucsFlag = m_noteSearchEdit->lineEdit()->hasFocus();
     QModelIndex index = m_leftView->currentIndex();
     if (index.isValid()) {
+        m_leftView->update();
         qint64 id = m_leftView->getFolderId(index);
         m_rightView->noteSwitchByFolder(id);
         m_centerWidget->setCurrentIndex(WndNoteShow);
@@ -331,6 +337,9 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &previous)
     }
     if(foucsFlag){
        m_noteSearchEdit->lineEdit()->setFocus();
+    }
+    if(m_asrErrMeassage && m_asrErrMeassage->isVisible()){
+        m_asrErrMeassage->setVisible(false);
     }
 }
 
@@ -481,6 +490,13 @@ void VNoteMainWindow::onA2TError(int error)
     m_noteSearchEdit->setEnabled(true);
     m_rightView->setAsrResult("");
     m_isAsrVoiceing = false;
+    QString message = "";
+    if(error == VNoteA2TManager::NetworkError){
+        message = tr("The voice conversion failed due to the poor network connection. Do you want to try again?");
+    }else {
+        message = tr("The voice conversion failed. Do you want to try again? ");
+    }
+    showAsrErrMessage(message);
 }
 
 void VNoteMainWindow::onA2TSuccess(const QString &text)
@@ -490,6 +506,24 @@ void VNoteMainWindow::onA2TSuccess(const QString &text)
     m_noteSearchEdit->setEnabled(true);
     m_rightView->setAsrResult(text);
     m_isAsrVoiceing = false;
+}
+
+void VNoteMainWindow::initAsrErrMessage()
+{
+    m_asrErrMeassage = new DFloatingMessage(DFloatingMessage::ResidentType,m_rightViewHolder);
+    m_asrErrMeassage->setIcon(QIcon(Utils::renderSVG(":/images/icon/normal/warning .svg", QSize(32,32),qApp)));
+    m_asrAgainBtn = new DPushButton(m_asrErrMeassage);
+    m_asrAgainBtn->setText(tr("Try Again"));
+    m_asrErrMeassage->setWidget(m_asrAgainBtn);
+    m_asrErrMeassage->setVisible(false);
+}
+
+void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
+{
+    m_asrErrMeassage->setMessage(strMessage);
+    m_asrErrMeassage->setFixedWidth(m_rightViewHolder->width());
+    m_asrErrMeassage->adjustSize();
+    m_asrErrMeassage->setVisible(true);
 }
 
 void VNoteMainWindow::onPreviewShortcut()
@@ -545,4 +579,27 @@ void VNoteMainWindow::onPreviewShortcut()
     shortcutViewProcess->startDetached("deepin-shortcut-viewer", shortcutString);
 
     connect(shortcutViewProcess, SIGNAL(finished(int)), shortcutViewProcess, SLOT(deleteLater()));
+}
+
+void VNoteMainWindow::resizeEvent(QResizeEvent *event)
+{
+    if(m_asrErrMeassage->isVisible()){
+        m_asrErrMeassage->setFixedWidth(m_rightViewHolder->width());
+    }
+    DMainWindow::resizeEvent(event);
+}
+
+void VNoteMainWindow::onMenuNoteItemChange()
+{
+    if(m_asrErrMeassage->isVisible()){
+        m_asrErrMeassage->setVisible(false);
+    }
+}
+
+void VNoteMainWindow::onAsrAgain()
+{
+    m_asrErrMeassage->setVisible(false);
+    QTimer::singleShot(0, this, [this]() {
+        m_rightView->onAsrVoiceAction();
+    });
 }

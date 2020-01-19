@@ -49,6 +49,7 @@ void VNoteMessageDialog::initUI()
     verticalSplite->setBackgroundRole(QPalette::Background);
     verticalSplite->setAutoFillBackground(true);
     verticalSplite->setFixedSize(3,28);
+    verticalSplite->setVisible(false);
 
     actionBarLayout->addWidget(m_cancelBtn);
     actionBarLayout->addSpacing(8);
@@ -84,9 +85,8 @@ void VNoteMessageDialog::initMessage()
     //In some case OK button text is need to change
     m_cancelBtn->setText(DApplication::translate("VNoteMessageDialog", "Cancel"));
     m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "OK"));
-
     switch (m_msgType) {
-    case DeleteNote: {
+    case DeleteFolder: {
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
             ,"Are you sure want to delete Folder?"));
         m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "Delete"));
@@ -95,5 +95,15 @@ void VNoteMessageDialog::initMessage()
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
             ,"Currently recording,is the recording terminated?"));
     } break;
+    case DeleteNote:{
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
+            ,"Are you sure you want to delete this note?"));
+        m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "Delete"));
+    } break;
+    case AsrTimeLimit:{
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
+            ,"Cannot convert this voice note, as notes over 20 minutes are not supported at present."));
+        m_cancelBtn->setVisible(false);
+    }
     }
 }

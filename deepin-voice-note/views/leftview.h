@@ -5,6 +5,7 @@
 
 #include "common/vnoteforlder.h"
 #include "db/vnotefolderoper.h"
+#include "dialog/vnotemessagedialog.h"
 
 #include <DListView>
 #include <DMenu>
@@ -57,6 +58,7 @@ private:
     LeftViewDelegate *m_pItemDelegate;
 
     QRegExp m_searchKey;
+    VNoteMessageDialog *m_delDialog {nullptr};
 };
 
 #endif // LEFTVIEW_H
