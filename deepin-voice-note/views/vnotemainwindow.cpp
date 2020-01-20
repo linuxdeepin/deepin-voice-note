@@ -5,6 +5,7 @@
 #include "common/vnoteitem.h"
 #include "common/utils.h"
 #include "views/vnoterecordbar.h"
+#include "widgets/vnoteiconbutton.h"
 
 #include "globaldef.h"
 
@@ -199,13 +200,19 @@ void VNoteMainWindow::initLeftView()
     m_leftView->setAutoFillBackground(true);
     m_leftView->setContentsMargins(0, 5, 0, 0);
 
-    m_floatingAddBtn = new DFloatingButton(DStyle::SP_IncreaseElement, m_leftView);
-    m_floatingAddBtn->setFixedSize(QSize(55, 55));
+    m_floatingAddBtn = new VNoteIconButton(
+                m_leftView,
+                "add_note_normal.svg",
+                "add_note_hover.svg",
+                "add_note_press.svg"
+                );
+    m_floatingAddBtn->setFlat(true);
+    m_floatingAddBtn->setIconSize(QSize(68, 68));
 
     DAnchorsBase buttonAnchor(m_floatingAddBtn);
     buttonAnchor.setAnchor(Qt::AnchorLeft, m_leftView, Qt::AnchorLeft);
     buttonAnchor.setAnchor(Qt::AnchorBottom, m_leftView, Qt::AnchorBottom);
-    buttonAnchor.setBottomMargin(11);
+    buttonAnchor.setBottomMargin(10);
     buttonAnchor.setLeftMargin(97);
 
     // ToDo:

@@ -28,6 +28,7 @@ void VNoteRecordBar::initUI()
                                       , "audio_normal.svg"
                                       , "audio_hover.svg"
                                       , "audio_press.svg");
+    m_recordBtn->SetDisableIcon("audio_disabled.svg");
     m_recordBtn->setFlat(true);
     m_recordBtn->setIconSize(QSize(REC_BTN_W, REC_BTN_H));
     //m_recordBtn->setFixedSize(QSize(55, 55));
@@ -94,10 +95,10 @@ void VNoteRecordBar::onFinshRecord(const QString &voicePath,qint64 voiceSize)
 void VNoteRecordBar::OnMicrophoneAvailableChanged(bool isAvailable)
 {
     if (isAvailable) {
-        m_recordBtn->setEnabled(true);
+        m_recordBtn->setBtnDisabled(false);
         m_recordBtn->setToolTip("");
     } else {
-        m_recordBtn->setDisabled(true);
+        m_recordBtn->setBtnDisabled(true);
         m_recordBtn->setToolTip(
                     DApplication::translate(
                         "VNoteRecordBar",

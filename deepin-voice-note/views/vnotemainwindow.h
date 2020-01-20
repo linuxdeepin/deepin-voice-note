@@ -22,6 +22,7 @@
 DWIDGET_USE_NAMESPACE
 
 class VNoteRecordBar;
+class VNoteIconButton;
 class VNoteAudioDeviceWatcher;
 class VNoteA2TManager;
 
@@ -81,7 +82,7 @@ private:
     DSearchEdit *m_noteSearchEdit {nullptr};
     DIconButton *m_returnBtn {nullptr};
 
-    DFloatingButton *m_floatingAddBtn {nullptr};
+    VNoteIconButton *m_floatingAddBtn {nullptr};
     QWidget         *m_leftViewHolder {nullptr};
     QWidget         *m_rightViewHolder {nullptr};
     QWidget         *m_rightNoteArea {nullptr};
