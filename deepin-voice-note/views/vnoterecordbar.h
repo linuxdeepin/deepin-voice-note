@@ -32,6 +32,7 @@ public slots:
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    bool eventFilter(QObject *o, QEvent *e) override;
 protected:
     VNoteRecordWidget *m_recordPanel {nullptr};
     VNoteIconButton   *m_recordBtn {nullptr};

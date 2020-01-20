@@ -246,6 +246,17 @@ void RightView::resizeEvent(QResizeEvent *event)
     DWidget::resizeEvent(event);
 }
 
+void RightView::mousePressEvent(QMouseEvent *event)
+{
+    //Let NoteItem lost focus when click
+    //outside of Note
+    if (nullptr != m_stackWidget) {
+        if (!m_stackWidget->rect().contains(event->pos())) {
+            setFocus(Qt::MouseFocusReason);
+        }
+    }
+}
+
 QList<qint64> RightView::getNoteContainsKeyFolders(const QRegExp &searchKey) //内容包含查找内容
 {
     QList<qint64> folderIds;

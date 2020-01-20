@@ -44,6 +44,11 @@ void VNoteRecordBar::initUI()
 
 void VNoteRecordBar::initConnections()
 {
+    //Install filter to filte MousePress
+    //event.
+    installEventFilter(this);
+    m_recordBtn->installEventFilter(this);
+
     connect(m_recordBtn, &VNoteIconButton::clicked, this, &VNoteRecordBar::onStartRecord);
     connect(m_recordPanel, SIGNAL(sigFinshRecord(const QString &,qint64)),
             this, SLOT(onFinshRecord(const QString &,qint64)));
@@ -56,6 +61,19 @@ void VNoteRecordBar::resizeEvent(QResizeEvent *event)
 
     m_recBtnAnchor->setBottomMargin(bottonMargin);
     m_recBtnAnchor->setLeftMargin(leftMargin);
+}
+
+bool VNoteRecordBar::eventFilter(QObject *o, QEvent *e)
+{
+    Q_UNUSED(o);
+    //Let NoteItem lost focus when click
+    //outside of Note
+
+    if (e->type() == QEvent::MouseButtonPress) {
+        setFocus(Qt::MouseFocusReason);
+    }
+
+    return false;
 }
 
 void VNoteRecordBar::onStartRecord()

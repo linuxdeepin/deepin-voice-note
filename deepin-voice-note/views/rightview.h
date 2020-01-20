@@ -35,7 +35,8 @@ signals :
     void asrStart(const QString& file, qint64 duration);
     void sigMenuNoteItemChange(); //弹出右菜单，通知主窗口
 protected:
-    void resizeEvent(QResizeEvent *event);
+    void resizeEvent(QResizeEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
 private:
     void initUi();
     void initTextMenu();
