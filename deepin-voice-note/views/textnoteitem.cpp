@@ -19,6 +19,7 @@ TextNoteItem::TextNoteItem(VNoteItem *textNote, QWidget *parent)
     initUI();
     initConnection();
     updateData();
+    onChangeTheme();
 }
 void TextNoteItem::initUI()
 {
@@ -72,7 +73,6 @@ void TextNoteItem::initUI()
     bglayout->setSizeConstraint(QLayout::SetNoConstraint);
     bglayout->setContentsMargins(0, 6, 0, 0);
     this->setLayout(bglayout);
-
 }
 
 void TextNoteItem::updateData()

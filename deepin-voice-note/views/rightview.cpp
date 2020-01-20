@@ -403,7 +403,7 @@ void RightView::delNoteFromList(VNoteItem *item, RightNoteList *list)
         if (widgetTmp != nullptr) {
             widgetTmp->delNodeItem(item);
         }
-        if (m_searchNoteList->count() == 0) { //搜索时全部删除通知记事本项更新
+        if (m_searchNoteList->hasSearchNote(m_searchKey) == false) { //搜索时全部删除通知记事本项更新
             emit sigSearchNoteEmpty(m_searchNoteList->getFolderId());
         }
     }
@@ -481,7 +481,7 @@ void RightView::onSetPlayerPos(int pos)
 void RightView::setVoicePlayEnable(bool enable)
 {
     int index = m_stackWidget->currentIndex();
-    if (index > 1) {
+    if (index > 0) {
         stopCurVoicePlaying(0);
         RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
         list->setVoicePlayEnable(enable);
@@ -542,5 +542,14 @@ void RightView::setAsrResult(const QString &result)
             onUpdateNote(data);
         }
         m_asrVoiceItem = nullptr;
+    }
+}
+
+void RightView::noteDelFromCurFolder(VNoteItem *item)
+{
+    int index = m_stackWidget->currentIndex();
+    if(index > 0){
+        RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
+        delNoteFromList(item,list);
     }
 }

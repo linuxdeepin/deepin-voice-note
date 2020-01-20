@@ -26,6 +26,7 @@ public:
     qint64 getFolderId();
 
     void setVoicePlayEnable(bool enable);
+    bool hasSearchNote(QRegExp &searchKey);
 
 signals:
     void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);

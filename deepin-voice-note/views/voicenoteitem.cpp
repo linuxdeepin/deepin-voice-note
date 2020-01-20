@@ -24,6 +24,7 @@ VoiceNoteItem::VoiceNoteItem(VNoteItem *textNote, QWidget *parent)
     initConnection();
     initData();
     onTextChanged();
+    onChangeTheme();
 }
 
 void VoiceNoteItem::initUi()

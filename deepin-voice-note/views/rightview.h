@@ -28,6 +28,7 @@ public:
 
     QList<qint64> getNoteContainsKeyFolders(const QRegExp &searchKey);
     void setAsrResult(const QString &result);
+    void noteDelFromCurFolder(VNoteItem *item);
 
 signals :
     void sigTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);

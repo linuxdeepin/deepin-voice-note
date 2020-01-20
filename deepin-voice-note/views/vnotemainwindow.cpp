@@ -104,7 +104,7 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onVNoteFoldersLoaded);
 
     connect(m_floatingAddBtn, &DFloatingButton::clicked,
-            m_leftView, &LeftView::handleAddFolder);
+            this, &VNoteMainWindow::onVNoteFolderAdd);
 
     connect(m_noteSearchEdit, &DSearchEdit::textChanged,
             this, &VNoteMainWindow::onVNoteSearch);
@@ -408,9 +408,15 @@ void VNoteMainWindow::initEmptyFoldersView()
 
 void VNoteMainWindow::onVNoteFolderAdd()
 {
+    if(!m_noteSearchEdit->text().isEmpty()){
+        m_noteSearchEdit->setText("");
+    }
+    if(m_centerWidget->currentIndex() == WndHomePage){
+        m_noteSearchEdit->setEnabled(true);
+    }
     m_centerWidget->setCurrentIndex(WndNoteShow);
-    m_noteSearchEdit->setEnabled(true);
-    m_floatingAddBtn->clicked();
+    m_leftView->handleAddFolder();
+
 }
 
 void VNoteMainWindow::onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey)
@@ -438,9 +444,13 @@ void VNoteMainWindow::onTextEditReturn()
     QString text = m_textEditMainWnd->toPlainText();
     if (m_textNode->noteType == VNoteItem::VNOTE_TYPE::VNT_Text) {
         if (text != m_textNode->noteText) {
-            m_textNode->noteText = text;
-            m_textEditRightView->setPlainText(text);
-            m_rightView->onUpdateNote(m_textNode);
+            if(!text.isEmpty()){
+                m_textNode->noteText = text;
+                m_textEditRightView->setPlainText(text);
+                m_rightView->onUpdateNote(m_textNode);
+            }else {
+                m_rightView->noteDelFromCurFolder(m_textNode);
+            }
         }
     } else if (m_textNode->noteType == VNoteItem::VNT_Voice) {
         if (m_isRecording == false && m_isAsrVoiceing == false) {
