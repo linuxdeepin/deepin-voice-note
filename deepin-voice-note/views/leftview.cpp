@@ -216,3 +216,9 @@ void LeftView::removeFromWhiteList(qint64 id)
         this->setCurrentIndex(nowIndex);
     }
 }
+
+void LeftView::setFolderEnable(bool enable)
+{
+    m_pItemDelegate->setItemEnable(enable);
+    this->setEnabled(enable);
+}

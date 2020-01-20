@@ -452,19 +452,24 @@ void VNoteMainWindow::onSearchNoteEmpty(qint64 id)
 
 void VNoteMainWindow::onStartRecord()
 {
-    m_leftView->setEnabled(false);
-    m_noteSearchEdit->setEnabled(false);
+    if(m_isAsrVoiceing == false){
+        m_leftView->setFolderEnable(false);
+        m_noteSearchEdit->setEnabled(false);
+    }
     m_rightView->setVoicePlayEnable(false);
     m_isRecording = true;
 }
 
 void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 {
-    m_leftView->setEnabled(true);
-    m_rightView->addVoiceNoteItem(voicePath, voiceSize);
-    m_noteSearchEdit->setEnabled(true);
-    m_rightView->setVoicePlayEnable(true);
     m_isRecording = false;
+    if(m_isAsrVoiceing == false){
+        m_leftView->setFolderEnable(true);
+        m_noteSearchEdit->setEnabled(true);
+    }
+    m_rightView->addVoiceNoteItem(voicePath, voiceSize);
+    m_rightView->setVoicePlayEnable(true);
+
 }
 
 void VNoteMainWindow::onChangeTheme()
@@ -477,19 +482,23 @@ void VNoteMainWindow::onChangeTheme()
 
 void VNoteMainWindow::onA2TStart(const QString &file, qint64 duration)
 {
-    m_leftView->setEnabled(false);
-    m_noteSearchEdit->setEnabled(false);
-    m_a2tManager->startAsr(file, duration);
     m_isAsrVoiceing = true;
+    if(m_isRecording == false){
+        m_leftView->setFolderEnable(false);
+        m_noteSearchEdit->setEnabled(false);
+    }
+    m_a2tManager->startAsr(file, duration);
 }
 
 void VNoteMainWindow::onA2TError(int error)
 {
     qInfo() << "Audo to text failed:" << error;
-    m_leftView->setEnabled(true);
-    m_noteSearchEdit->setEnabled(true);
-    m_rightView->setAsrResult("");
     m_isAsrVoiceing = false;
+    if(m_isRecording == false){
+        m_leftView->setFolderEnable(true);
+        m_noteSearchEdit->setEnabled(true);
+    }
+    m_rightView->setAsrResult("");
     QString message = "";
     if(error == VNoteA2TManager::NetworkError){
         message = tr("The voice conversion failed due to the poor network connection. Do you want to try again?");
@@ -502,10 +511,12 @@ void VNoteMainWindow::onA2TError(int error)
 void VNoteMainWindow::onA2TSuccess(const QString &text)
 {
     qInfo() << "Audo to text success:" << text;
-    m_leftView->setEnabled(true);
-    m_noteSearchEdit->setEnabled(true);
-    m_rightView->setAsrResult(text);
     m_isAsrVoiceing = false;
+    if(m_isRecording == false){
+        m_leftView->setFolderEnable(true);
+        m_noteSearchEdit->setEnabled(true);
+    }
+    m_rightView->setAsrResult(text);
 }
 
 void VNoteMainWindow::initAsrErrMessage()

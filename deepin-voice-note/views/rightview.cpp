@@ -288,8 +288,7 @@ void RightView::onMenuPopup(VNoteItem *item)
             m_textMenu->exec(pos);
         } else {
             if (m_asrVoiceItem == nullptr) {
-                bool textEmpty = m_curMenuNoteItem->noteText.isEmpty();
-                m_asrVoiceAction->setEnabled(textEmpty); //已经转语音的文字不能再次转语音
+                m_asrVoiceAction->setEnabled(true);
             }
             m_voiceMenu->exec(pos);
         }

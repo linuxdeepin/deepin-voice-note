@@ -25,6 +25,8 @@ public:
     void setFolderNameFilter(const QRegExp &searchKey, QList<qint64> *whilteList = nullptr);
     void clearFilter();
     void removeFromWhiteList(qint64 id);
+    void setFolderEnable(bool enable);
+
     int loadNoteFolder();
     int getFolderCount();
 

@@ -28,6 +28,7 @@ public:
     void handleChangeTheme();
     void updateSearchKeyword(const QRegExp &keyword);
     void resetKeyword();
+    void setItemEnable(bool enable);
 
 private:
     QAbstractItemView *m_parentView {nullptr};
@@ -35,6 +36,7 @@ private:
 
     //Search keyword
     QRegExp m_searchKeyword;
+    bool m_enaleItemFlag {true};
 };
 
 #endif // LEFTVIEWDELEGATE_H

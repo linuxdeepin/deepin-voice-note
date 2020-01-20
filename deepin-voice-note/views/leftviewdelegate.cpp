@@ -230,6 +230,10 @@ void LeftViewDelegate::resetKeyword()
     m_searchKeyword = QRegExp();
 }
 
+void LeftViewDelegate::setItemEnable(bool enable)
+{
+    m_enaleItemFlag = enable;
+}
 void LeftViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                              const QModelIndex &index) const
 {
@@ -276,18 +280,22 @@ void LeftViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
             painter->setPen(QPen(Qt::white));
 
             isSelected = true;
-        } else if (option.state & QStyle::State_MouseOver) {
-            painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
-            painter->fillPath(path, painter->brush());
-            painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
-        } else if (option.state & QStyle::State_Enabled) {
-            painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal,DPalette::ItemBackground)));
-            painter->fillPath(path, painter->brush());
-            painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
         }
-        else { //disable
-            painter->setBrush(QBrush(m_parentPb.color(DPalette::Disabled,DPalette::ItemBackground)));
-            painter->fillPath(path, painter->brush());
+        else {
+            if(m_enaleItemFlag == false){
+                painter->setBrush(QBrush(m_parentPb.color(DPalette::Disabled,DPalette::ItemBackground)));
+                painter->fillPath(path, painter->brush());
+            }else {
+                if (option.state & QStyle::State_MouseOver) {
+                    painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
+                    painter->fillPath(path, painter->brush());
+                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
+                } else if (option.state & QStyle::State_Enabled) {
+                    painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal,DPalette::ItemBackground)));
+                    painter->fillPath(path, painter->brush());
+                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
+                }
+            }
         }
 
         QRect iconRect(paintRect.left() + 6, paintRect.top() + 12, 40, 40);
