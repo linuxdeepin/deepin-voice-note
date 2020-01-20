@@ -223,10 +223,10 @@ QString VNoteFolderOper::getDefaultFolderName()
     querySql.sprintf(QUERY_DEFNAME_FMT
                      , VNoteDbManager::FOLDER_TABLE_NAME
                      , folderColumnsName[folder_name].toUtf8().data()
-                     , QObject::tr("NewFolder").toUtf8().data()
+                     , DApplication::translate("AppMain","NewFolder").toUtf8().data()
                      );
 
-    QString defaultFolderName = QObject::tr("NewFolder");
+    QString defaultFolderName = DApplication::translate("AppMain","NewFolder");
 
     int foldersCount = 0;
     CountDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), &foldersCount);

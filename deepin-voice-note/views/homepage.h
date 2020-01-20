@@ -3,18 +3,19 @@
 
 #include "widgets/vnoteiconbutton.h"
 
-#include <DFrame>
+#include <QWidget>
+
 #include <DLabel>
 #include <DPushButton>
 #include <DSuggestButton>
 
 DWIDGET_USE_NAMESPACE
 
-class InitEmptyPage : public DFrame
+class HomePage : public QWidget
 {
     Q_OBJECT
 public:
-    explicit InitEmptyPage(QWidget *parent = nullptr);
+    explicit HomePage(QWidget *parent = nullptr);
 
 signals:
     void sigAddFolderByInitPage();

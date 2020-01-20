@@ -9,10 +9,12 @@
 #include <QStandardPaths>
 #include <QTimer>
 #include <QScrollBar>
+
 #include <DFontSizeManager>
 #include <DGuiApplicationHelper>
 #include <DFileDialog>
 #include <DMessageBox>
+#include <DApplication>
 
 RightView::RightView(QWidget *parent)
     : QWidget(parent)
@@ -33,7 +35,7 @@ void RightView::initUi()
     this->setLayout(layoutList);
 
     m_noSearchResult = new DLabel(this);
-    m_noSearchResult->setText(tr("No search results"));
+    m_noSearchResult->setText(DApplication::translate("NoteSearch","No search results"));
     m_noSearchResult->setAlignment(Qt::AlignCenter);
     DFontSizeManager::instance()->bind(m_noSearchResult, DFontSizeManager::T4);
     m_stackWidget->insertWidget(0, m_noSearchResult);
@@ -47,7 +49,7 @@ void RightView::initUi()
 
     m_addTextBtn = new DPushButton(this);
     DFontSizeManager::instance()->bind(m_addTextBtn, DFontSizeManager::T5);
-    m_addTextBtn->setText(tr("Click to Add TextNote"));
+    m_addTextBtn->setText(DApplication::translate("RightView","Add Text Note"));
     m_addTextBtn->setFixedHeight(64);
 
     initTextMenu();
@@ -62,8 +64,8 @@ void RightView::initUi()
 void RightView::initTextMenu()
 {
     m_textMenu = new DMenu(this);
-    m_saveTextAction = new QAction(tr("Save As TXT"), this);
-    m_delTextAction = new QAction(tr("Delete"), this);
+    m_saveTextAction = new QAction(DApplication::translate("RightView","Save as TXT"), this);
+    m_delTextAction = new QAction(DApplication::translate("RightView","Delete"), this);
     m_textMenu->addAction(m_saveTextAction);
     m_textMenu->addAction(m_delTextAction);
 }
@@ -71,13 +73,14 @@ void RightView::initTextMenu()
 void RightView::initVoiceMenu()
 {
     m_voiceMenu = new DMenu(this);
-    m_asrVoiceAction = new QAction(tr("Voice to Text"), this);
-    m_saveVoicetAction = new QAction(tr("Save As MP3"), this);
-    m_delVoiceAction = new QAction(tr("Delete"), this);
+    m_asrVoiceAction = new QAction(DApplication::translate("RightView","Voice to Text"), this);
+    m_saveVoicetAction = new QAction(DApplication::translate("RightView","Save as MP3"), this);
+    m_delVoiceAction = new QAction(DApplication::translate("RightView","Delete"), this);
     m_voiceMenu->addAction(m_asrVoiceAction);
     m_voiceMenu->addAction(m_saveVoicetAction);
     m_voiceMenu->addAction(m_delVoiceAction);
 }
+
 void RightView::initConnection()
 {
     connect(m_addTextBtn, &DPushButton::clicked, this, &RightView::onAddNote);
@@ -298,18 +301,18 @@ void RightView::onMenuPopup(VNoteItem *item)
 void RightView::onSaveTextAction()
 {
     DFileDialog fileDialog(this);
-    fileDialog.setWindowTitle(tr("Save as TXT"));
+    fileDialog.setWindowTitle(DApplication::translate("RightView","Save as TXT"));
     fileDialog.setDirectory(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
     fileDialog.setFileMode(DFileDialog::Directory);
     fileDialog.setAcceptMode(DFileDialog::AcceptSave);
     fileDialog.setDefaultSuffix("txt");
     fileDialog.setNameFilter("TXT(*.txt)");
-    fileDialog.selectFile(tr("TextNote") + QString::number(m_curMenuNoteItem->noteId));
+    fileDialog.selectFile(DApplication::translate("RightView","Text note") + QString::number(m_curMenuNoteItem->noteId));
     if (fileDialog.exec() == QDialog::Accepted) {
         QString path = fileDialog.selectedFiles()[0];
         QString fileName = QFileInfo(path).fileName();
         if (fileName.isEmpty()) {
-            DMessageBox::information(this, tr(""), tr("File name cannot be empty"));
+            DMessageBox::information(this, "", DApplication::translate("RightView","File name cannot be empty"));
         } else {
             QFile file(path);
             if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -363,17 +366,17 @@ void RightView::onDelVoiceAction()
 void RightView::onSaveVoiceAction()
 {
     DFileDialog fileDialog(this);
-    fileDialog.setWindowTitle(tr("Save as MP3"));
+    fileDialog.setWindowTitle(DApplication::translate("RightView","Save as MP3"));
     fileDialog.setDirectory(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation));
     fileDialog.setFileMode(DFileDialog::Directory);
     fileDialog.setAcceptMode(DFileDialog::AcceptSave);
     fileDialog.setDefaultSuffix("mp3");
     fileDialog.setNameFilter("MP3(*.mp3)");
-    fileDialog.selectFile(tr("Voice note") + QString::number(m_curMenuNoteItem->noteId));
+    fileDialog.selectFile(DApplication::translate("RightView","Voice note") + QString::number(m_curMenuNoteItem->noteId));
     if (fileDialog.exec() == QDialog::Accepted) {
         QString path = fileDialog.selectedFiles()[0];
         if (path.isEmpty()) {
-            DMessageBox::information(this, tr(""), tr("File name cannot be empty"));
+            DMessageBox::information(this, "", DApplication::translate("RightView","File name cannot be empty"));
         } else {
             bool ret = QFile::copy(m_curMenuNoteItem->voicePath, path);
             qDebug() << ret;

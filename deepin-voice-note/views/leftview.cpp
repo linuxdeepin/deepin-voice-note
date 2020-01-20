@@ -18,8 +18,8 @@ LeftView::LeftView(QWidget *parent)
 void LeftView::initMenuAction()
 {
     m_contextMenu = new DMenu(this);
-    m_renameAction = new QAction(tr("Rename"), this);
-    m_delAction = new QAction(tr("Delete"), this);
+    m_renameAction = new QAction(DApplication::translate("LeftViewMenu","Rename"), this);
+    m_delAction = new QAction(DApplication::translate("LeftViewMenu","Delete"), this);
     m_contextMenu->addAction(m_renameAction);
     m_contextMenu->addAction(m_delAction);
     m_delDialog = new VNoteMessageDialog(VNoteMessageDialog::DeleteFolder,this);

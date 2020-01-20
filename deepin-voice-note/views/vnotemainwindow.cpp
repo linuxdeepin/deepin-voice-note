@@ -113,7 +113,7 @@ void VNoteMainWindow::initConnections()
     connect(m_leftView, &LeftView::sigFolderDel,
             this, &VNoteMainWindow::onVNoteFolderDel);
 
-    connect(m_wndHomePage, &InitEmptyPage::sigAddFolderByInitPage,
+    connect(m_wndHomePage, &HomePage::sigAddFolderByInitPage,
             this, &VNoteMainWindow::onVNoteFolderAdd);
 
     connect(m_returnBtn, &DIconButton::clicked,
@@ -138,7 +138,7 @@ void VNoteMainWindow::initConnections()
 
 void VNoteMainWindow::initShortcuts() {
     m_stPreviewShortcuts.reset(new QShortcut(this));
-    m_stPreviewShortcuts->setKey(tr("Ctrl+Shift+/"));
+    m_stPreviewShortcuts->setKey(QString("Ctrl+Shift+/"));
     m_stPreviewShortcuts->setContext(Qt::ApplicationShortcut);
     m_stPreviewShortcuts->setAutoRepeat(false);
 
@@ -366,7 +366,7 @@ void VNoteMainWindow::initTextEditDetailView()
 void VNoteMainWindow::initEmptySearchView()
 {
     m_labSearchEmpty = new DLabel(this);
-    m_labSearchEmpty->setText(QString(tr("No Result")));
+    m_labSearchEmpty->setText(DApplication::translate("NoteSearch","No search results"));
     DFontSizeManager::instance()->bind(m_labSearchEmpty, DFontSizeManager::T4);
     m_labSearchEmpty->setAlignment(Qt::AlignCenter);
     m_labSearchEmpty->setFocusPolicy(Qt::NoFocus);
@@ -396,7 +396,7 @@ void VNoteMainWindow::initSpliterView()
 
 void VNoteMainWindow::initEmptyFoldersView()
 {
-    m_wndHomePage = new InitEmptyPage(this);
+    m_wndHomePage = new HomePage(this);
 }
 
 void VNoteMainWindow::onVNoteFolderAdd()
@@ -501,9 +501,13 @@ void VNoteMainWindow::onA2TError(int error)
     m_rightView->setAsrResult("");
     QString message = "";
     if(error == VNoteA2TManager::NetworkError){
-        message = tr("The voice conversion failed due to the poor network connection. Do you want to try again?");
+        message = DApplication::translate(
+                    "VNoteErrorMessage",
+                    "Network disconnected and cannot convert voice notes. Do you want to try again? ");
     }else {
-        message = tr("The voice conversion failed. Do you want to try again? ");
+        message = DApplication::translate(
+                    "VNoteErrorMessage",
+                    "The voice conversion failed. Do you want to try again?");
     }
     showAsrErrMessage(message);
 }
@@ -547,19 +551,19 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray jsonGroups;
 
     QMap<QString, QString> shortcutKeymap = {
-        {"Help",                 "F1"},
+        {DApplication::translate("Shortcuts","Help"),                 "F1"},
 //        {"Close window",         "Alt+F4"},
-        {"Display shortcuts",    "Ctrl+Shift+?"},
-        {"New notebook",         "Ctrl+N"},
-        {"Delete notebook/note", "Delete"},
+        {DApplication::translate("Shortcuts","Display shortcuts"),    "Ctrl+Shift+?"},
+        {DApplication::translate("Shortcuts","New notebook"),         "Ctrl+N"},
+        {DApplication::translate("Shortcuts","Delete notebook/note"), "Delete"},
 //        {"Resize window",        "Ctrl+Alt+F"},
 //        {"Find",                 "Ctrl+F"},
-        {"Rename notebook",      "F2"},
-        {"Play/Pause",           "Space"},
-        {"Select all",           "Ctrl+A"},
-        {"Copy",                 "Ctrl+C"},
-        {"Cut",                  "Ctrl+X"},
-        {"Paste",                "Ctrl+V"},
+        {DApplication::translate("Shortcuts","Rename notebook"),      "F2"},
+        {DApplication::translate("Shortcuts","Play/Pause"),           "Space"},
+        {DApplication::translate("Shortcuts","Select all"),           "Ctrl+A"},
+        {DApplication::translate("Shortcuts","Copy"),                 "Ctrl+C"},
+        {DApplication::translate("Shortcuts","Cut"),                  "Ctrl+X"},
+        {DApplication::translate("Shortcuts","Paste"),                "Ctrl+V"},
     };
 
     QJsonObject fontMgrJsonGroup;
@@ -569,7 +573,7 @@ void VNoteMainWindow::onPreviewShortcut()
     for (QMap<QString, QString>::iterator it = shortcutKeymap.begin();
          it != shortcutKeymap.end(); it++) {
         QJsonObject jsonItem;
-        jsonItem.insert("name", DApplication::translate("Shortcuts", it.key().toUtf8()));
+        jsonItem.insert("name",  it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
         fontJsonItems.append(jsonItem);
     }

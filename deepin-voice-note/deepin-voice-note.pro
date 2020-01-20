@@ -31,7 +31,6 @@ SOURCES += \
     views/rightview.cpp \
     db/dbvisitor.cpp \
     common/datatypedef.cpp \
-    views/initemptypage.cpp \
     widgets/vnoteiconbutton.cpp \
     dialog/vnotebasedialog.cpp \
     widgets/vnwaveform.cpp \
@@ -41,7 +40,8 @@ SOURCES += \
     views/voicenoteitem.cpp \
     views/vnoterecordbar.cpp \
     common/vnotea2tmanager.cpp \
-    common/vnoteaudiodevicewatcher.cpp
+    common/vnoteaudiodevicewatcher.cpp \
+    views/homepage.cpp
 
 RESOURCES += \
     images.qrc
@@ -70,7 +70,6 @@ HEADERS += \
     views/rightnotelist.h \
     views/rightview.h \
     db/dbvisitor.h \
-    views/initemptypage.h \
     widgets/vnoteiconbutton.h \
     dialog/vnotebasedialog.h \
     widgets/vnwaveform.h \
@@ -80,7 +79,8 @@ HEADERS += \
     views/voicenoteitem.h \
     views/vnoterecordbar.h \
     common/vnotea2tmanager.h \
-    common/vnoteaudiodevicewatcher.h
+    common/vnoteaudiodevicewatcher.h \
+    views/homepage.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts

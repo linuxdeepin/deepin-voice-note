@@ -1,4 +1,4 @@
-#include "initemptypage.h"
+#include "homepage.h"
 #include "common/utils.h"
 
 #include <QGridLayout>
@@ -7,17 +7,17 @@
 #include <DApplicationHelper>
 #include <DFontSizeManager>
 
-InitEmptyPage::InitEmptyPage(QWidget *parent)
-    : DFrame(parent)
+HomePage::HomePage(QWidget *parent)
+    : QWidget(parent)
 {
     initUi();
     initConnection();
 }
 
-void InitEmptyPage::initUi()
+void HomePage::initUi()
 {
-    this->setLineWidth(0);
-    m_PushButton = new DSuggestButton(QString(tr("Create Folder")), this);
+    m_PushButton = new DSuggestButton(
+                QString(DApplication::translate("HomePage","Create Notebook")), this);
     m_PushButton->setFixedSize(QSize(302, 36));
     DStyle::setFocusRectVisible(m_PushButton, false);
     DFontSizeManager::instance()->bind(m_PushButton, DFontSizeManager::T6);
@@ -29,7 +29,9 @@ void InitEmptyPage::initUi()
 
     m_Text = new DLabel(this);
     m_Text->setFixedSize(QSize(500, 18));
-    m_Text->setText(QString(tr("After create a folder, you can start your note")));
+    m_Text->setText(QString(DApplication::translate(
+                            "HomePage", "Create a notebook to start recording voice and making notes")
+                        ));
     m_Text->setAlignment(Qt::AlignCenter);
     DFontSizeManager::instance()->bind(m_Text, DFontSizeManager::T8);
     DPalette pa = DApplicationHelper::instance()->palette(m_Text);
@@ -52,7 +54,7 @@ void InitEmptyPage::initUi()
     this->setLayout(layout);
 }
 
-void InitEmptyPage::initConnection()
+void HomePage::initConnection()
 {
     connect(m_PushButton, SIGNAL(clicked()), this, SIGNAL(sigAddFolderByInitPage()));
 }

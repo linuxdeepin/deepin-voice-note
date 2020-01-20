@@ -4,7 +4,7 @@
 #include "common/datatypedef.h"
 #include "leftview.h"
 #include "rightview.h"
-#include "initemptypage.h"
+#include "homepage.h"
 
 #include <QShortcut>
 #include <QSettings>
@@ -30,7 +30,7 @@ class VNoteMainWindow : public DMainWindow
     Q_OBJECT
 public:
     VNoteMainWindow(QWidget *parent = nullptr);
-    virtual ~VNoteMainWindow();
+    virtual ~VNoteMainWindow() override;
     QSharedPointer<QSettings> appSetting() const ;
     enum WindowType {WndHomePage, WndNoteShow, WndSearchEmpty, WndTextEdit};
 protected:
@@ -98,7 +98,7 @@ private:
     DTextEdit *m_textEditRightView {nullptr};
     DTextEdit *m_textEditMainWnd{nullptr};
     DLabel *m_labSearchEmpty {nullptr};
-    InitEmptyPage *m_wndHomePage {nullptr};
+    HomePage *m_wndHomePage {nullptr};
     VNoteItem *m_textNode {nullptr};
     DStackedWidget *m_centerWidget {nullptr};
     QTextCharFormat m_textEditFormat;

@@ -197,7 +197,7 @@ void VoiceNoteItem::showAsrStartWindow()
     QTextOption option = m_asrText->document()->defaultTextOption();
     option.setAlignment(Qt::AlignCenter);
     m_asrText->document()->setDefaultTextOption(option);
-    m_asrText->setPlainText(tr("Converting voice to text"));
+    m_asrText->setPlainText(DApplication::translate("VoiceNoteItem","Converting voice to text"));
     m_asrText->setVisible(true);
 }
 
