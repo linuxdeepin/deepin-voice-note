@@ -106,3 +106,8 @@ void VNoteRecordBar::OnMicrophoneAvailableChanged(bool isAvailable)
                     );
     }
 }
+
+void VNoteRecordBar::cancelRecord()
+{
+    m_recordPanel->cancelRecord();
+}

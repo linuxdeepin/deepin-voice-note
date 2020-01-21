@@ -21,6 +21,7 @@ public:
 
     void initUI();
     void initConnections();
+    void cancelRecord();
 signals:
     void sigStartRecord();
     void sigFinshRecord(const QString &voicePath,qint64 voiceSize);

@@ -439,7 +439,7 @@ void RightView::onVoicePauseBtnClicked(VoiceNoteItem *item)
     }
 }
 
-void RightView::addVoiceNoteItem(const QString &voicePath, qint64 voiceSize)
+void RightView::addVoiceNoteItem(const QString &voicePath, qint64 voiceSize,bool isExit)
 {
     VNoteItem tmpNote;
     tmpNote.folderId = m_lastFolderId;
@@ -447,7 +447,12 @@ void RightView::addVoiceNoteItem(const QString &voicePath, qint64 voiceSize)
     tmpNote.noteText = QString("");
     tmpNote.voicePath = voicePath;
     tmpNote.voiceSize = voiceSize;
-    addNewNote(tmpNote);
+    if(!isExit){
+        addNewNote(tmpNote);
+    }else {
+        VNoteItemOper noteOper;
+        noteOper.addNote(tmpNote);
+    }
 }
 
 RightNoteList *RightView::getNormalNoteList(qint64 id)

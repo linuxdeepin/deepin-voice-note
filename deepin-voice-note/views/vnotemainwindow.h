@@ -114,6 +114,7 @@ private:
     QTextCharFormat m_textEditFormat;
     bool            m_isRecording {false};
     bool            m_isAsrVoiceing {false};
+    bool            m_isExit {false};
     //App setting
     QSharedPointer<QSettings> m_qspSetting {nullptr};
     //Shortcuts key

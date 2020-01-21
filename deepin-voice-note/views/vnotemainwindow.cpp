@@ -492,8 +492,12 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
         m_leftView->setFolderEnable(true);
         m_noteSearchEdit->setEnabled(true);
     }
-    m_rightView->addVoiceNoteItem(voicePath, voiceSize);
+    m_rightView->addVoiceNoteItem(voicePath, voiceSize,m_isExit);
     m_rightView->setVoicePlayEnable(true);
+
+    if(m_isExit){
+        qApp->quit();
+    }
 
 }
 
@@ -635,7 +639,13 @@ void VNoteMainWindow::resizeEvent(QResizeEvent *event)
 void VNoteMainWindow::closeEvent(QCloseEvent *event)
 {
     if (checkIfNeedExit()) {
-        event->accept();
+        if(m_isRecording){
+            m_isExit = true;
+            m_recordBar->cancelRecord();
+            event->ignore();
+        }else {
+            event->accept();
+        }
     } else {
         event->ignore();
     }

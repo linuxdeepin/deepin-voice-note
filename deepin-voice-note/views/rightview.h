@@ -23,7 +23,7 @@ public:
     void noteSwitchByFolder(qint64 id);
     void noteDelByFolder(qint64 id);
     void setSearchKey(const QRegExp &searchKey);
-    void addVoiceNoteItem(const QString &voicePath,qint64 voiceSize);
+    void addVoiceNoteItem(const QString &voicePath,qint64 voiceSize,bool isExit = false);
     void setVoicePlayEnable(bool enable);
 
     QList<qint64> getNoteContainsKeyFolders(const QRegExp &searchKey);
