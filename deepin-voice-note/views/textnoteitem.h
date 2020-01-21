@@ -38,14 +38,12 @@ public slots:
     void onEditFocusOut();
     void onShowMenu();
     void onChangeTheme();
+    void onUpdateDetilBtn();
 private:
     void initUI();
     void initConnection();
-    void adjustTextEdit();
-    void updateDetilBtn();
 
 protected:
-    void resizeEvent(QResizeEvent *event) override;
     void leaveEvent(QEvent *event) override;
     void enterEvent(QEvent *event) override;
 private:

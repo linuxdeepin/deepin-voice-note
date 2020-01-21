@@ -52,16 +52,16 @@ public slots:
     void onshowMenu();
     void onShowDetail();
 
-    void onTextChanged();
     void onChangeTheme();
     void onSliderReleased();
     void onSliderPressed();
+    void onUpdateDetilBtn();
+
 private:
     void initUi();
     void initData();
     void initConnection();
     void setTextLineHeight(int value);
-    void updateDetilBtn();
 
     int             m_lastHeight {0};
     bool            m_isBottomSpace {false};

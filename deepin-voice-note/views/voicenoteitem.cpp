@@ -1,4 +1,4 @@
-#include "voicenoteitem.h"
+﻿#include "voicenoteitem.h"
 #include "common/vnoteitem.h"
 #include "common/utils.h"
 
@@ -6,7 +6,6 @@
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QTimer>
-#include <QTextBlock>
 
 #include <DApplicationHelper>
 #include <DFontSizeManager>
@@ -23,7 +22,6 @@ VoiceNoteItem::VoiceNoteItem(VNoteItem *textNote, QWidget *parent)
     initUi();
     initConnection();
     initData();
-    onTextChanged();
     onChangeTheme();
 }
 
@@ -53,6 +51,8 @@ void VoiceNoteItem::initUi()
     m_asrText->document()->setDocumentMargin(5);
     m_asrText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_asrText->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_asrText->setLineHeight(27);
+    m_asrText->document()->setDocumentMargin(5);
 
     m_voiceSizeLab = new DLabel(this);
     m_voiceSizeLab->setFixedSize(66, 30);
@@ -110,6 +110,7 @@ void VoiceNoteItem::initUi()
     layoutH->addWidget(m_voiceSizeLab);
     layoutH->addSpacing(6);
     layoutH->addWidget(m_menuBtn);
+    layoutH->addSpacing(7);
     layoutH->setSpacing(0);
     layoutH->setContentsMargins(0, 0, 0, 0);
     layoutH->setSizeConstraint(QLayout::SetNoConstraint);
@@ -135,7 +136,7 @@ void VoiceNoteItem::initData()
 {
     m_createTimeLab->setText(Utils::convertDateTime(m_textNode->createTime));
     m_voiceSizeLab->setText(Utils::formatMillisecond(m_textNode->voiceSize));
-    m_curSizeLab->setText(Utils::formatMillisecond(0,0));
+    m_curSizeLab->setText(Utils::formatMillisecond(0, 0));
     if (!m_textNode->noteText.isEmpty()) {
         showAsrEndWindow(m_textNode->noteText);
     }
@@ -149,11 +150,13 @@ void VoiceNoteItem::initConnection()
     connect(m_pauseBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onPauseBtnClicked);
     connect(m_playBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onPlayBtnClicked);
     connect(m_detailBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onShowDetail);
-    connect(m_asrText, &DTextEdit::textChanged, this, &VoiceNoteItem::onTextChanged);
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &VoiceNoteItem::onChangeTheme);
-    connect(m_waveForm,&VNWaveform::sliderReleased,this,&VoiceNoteItem::onSliderReleased);
-    connect(m_waveForm,&VNWaveform::sliderPressed,this,&VoiceNoteItem::onSliderPressed);
+    connect(m_waveForm, &VNWaveform::sliderReleased, this, &VoiceNoteItem::onSliderReleased);
+    connect(m_waveForm, &VNWaveform::sliderPressed, this, &VoiceNoteItem::onSliderPressed);
+
+    connect(m_asrText, &TextNoteEdit::sigDocumentSizeChange,
+            this, &VoiceNoteItem::onUpdateDetilBtn);
 }
 
 void VoiceNoteItem::onshowMenu()
@@ -199,7 +202,7 @@ void VoiceNoteItem::showAsrStartWindow()
     QTextOption option = m_asrText->document()->defaultTextOption();
     option.setAlignment(Qt::AlignCenter);
     m_asrText->document()->setDefaultTextOption(option);
-    m_asrText->setPlainText(DApplication::translate("VoiceNoteItem","Converting voice to text"));
+    m_asrText->setPlainText(DApplication::translate("VoiceNoteItem", "Converting voice to text"));
     m_asrText->setVisible(true);
 }
 
@@ -232,40 +235,19 @@ void VoiceNoteItem::enblePauseBtn(bool enable)
     m_pauseBtn->setEnabled(enable);
 }
 
-void VoiceNoteItem::onTextChanged()
-{
-    setTextLineHeight(27);
-    updateDetilBtn();
-}
-
 void VoiceNoteItem::resizeEvent(QResizeEvent *event)
 {
     VNoteItemWidget::resizeEvent(event);
     if (m_detailBtn->isVisible()) {
-        m_detailBtn->move(this->width() - 45, this->height() - 55);
+        m_detailBtn->move(this->width() - 51, this->height() - 56);
     }
     if (m_asrText->isVisible()) {
         m_asrText->setFixedSize(QSize(this->width() - 70, this->height() - 110));
         m_asrText->move(9, 90);
     }
-    updateDetilBtn();
 }
 
-void VoiceNoteItem::setTextLineHeight(int value)
-{
-    QTextDocument *document = m_asrText->document();
-    for (QTextBlock it = document->begin(); it != document->end(); it = it.next()) {
-        QTextCursor textCursor(it);
-        QTextBlockFormat textBlockFormat = it.blockFormat();
-        int height = static_cast<int>(textBlockFormat.lineHeight());
-        if (height != value) {
-            textBlockFormat.setLineHeight(value, QTextBlockFormat::FixedHeight);
-            textCursor.setBlockFormat(textBlockFormat);
-        }
-    }
-}
-
-void VoiceNoteItem::updateDetilBtn()
+void VoiceNoteItem::onUpdateDetilBtn()
 {
     QTimer::singleShot(0, this, [ = ] {
         QTextDocument *doc = m_asrText->document();
@@ -274,7 +256,7 @@ void VoiceNoteItem::updateDetilBtn()
         {
             documentHeight = static_cast<int>(doc->size().height());
         }
-        if (documentHeight >= MAXTEXTEDITHEIGHT)
+        if (documentHeight >= MAXTEXTEDITHEIGHT + 10)
         {
             documentHeight = MAXTEXTEDITHEIGHT;
             m_detailBtn->setVisible(true);
@@ -291,7 +273,6 @@ void VoiceNoteItem::updateDetilBtn()
             }
             emit sigItemAddHeight(value);
             m_lastHeight = documentHeight;
-            qDebug() << m_lastHeight;
         }
     });
 }
@@ -315,12 +296,12 @@ void VoiceNoteItem::onSliderPressed()
 }
 void VoiceNoteItem::setPlayPos(int pos)
 {
-    if(!m_isSliderPressed){
+    if (!m_isSliderPressed) {
         m_waveForm->setValue(pos);
-        if(m_waveForm->maximum() < 1000){
-            m_curSizeLab->setText(Utils::formatMillisecond(pos,1));
-        }else {
-            m_curSizeLab->setText(Utils::formatMillisecond(pos,0));
+        if (m_waveForm->maximum() < 1000) {
+            m_curSizeLab->setText(Utils::formatMillisecond(pos, 1));
+        } else {
+            m_curSizeLab->setText(Utils::formatMillisecond(pos, 0));
         }
     }
 }

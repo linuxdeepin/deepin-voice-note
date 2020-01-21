@@ -4,7 +4,6 @@
 #include <QDebug>
 #include <QGridLayout>
 #include <QStandardPaths>
-#include <QTextBlock>
 #include <QTimer>
 
 #include <DApplicationHelper>
@@ -32,9 +31,10 @@ void TextNoteItem::initUI()
     m_textEdit->setFixedHeight(140);
     m_textEdit->setLineWidth(0);
     m_textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_textEdit->document()->setDocumentMargin(10);
     m_textEdit->setFrameShape(QFrame::NoFrame);
     m_textEditFormat =  m_textEdit->currentCharFormat();
+    m_textEdit->setDocMargin(QMargins(0,2,50,0));
+    m_textEdit->setLineHeight(25);
 
     m_menuBtn = new VNoteIconButton(this
                                     , "more_normal.svg"
@@ -54,11 +54,11 @@ void TextNoteItem::initUI()
     m_detailBtn->setVisible(false);
 
     QVBoxLayout *btnLayout = new QVBoxLayout;
-    btnLayout->setContentsMargins(0, 15, 10, 0);
+    btnLayout->setContentsMargins(0, 13, 7, 0);
     btnLayout->setSpacing(0);
     btnLayout->setSizeConstraint(QLayout::SetNoConstraint);
     btnLayout->addWidget(m_menuBtn);
-    btnLayout->addSpacing(23);
+    btnLayout->addSpacing(28);
     btnLayout->addWidget(m_detailBtn);
 
     QGridLayout *bglayout = new QGridLayout;
@@ -90,6 +90,9 @@ void TextNoteItem::initConnection()
     connect(m_textEdit, &TextNoteEdit::textChanged, this, &TextNoteItem::onTextChanged);
     connect(m_textEdit, &TextNoteEdit::sigFocusIn, this, &TextNoteItem::onEditFocusIn);
     connect(m_textEdit, &TextNoteEdit::sigFocusOut, this, &TextNoteItem::onEditFocusOut);
+    connect(m_textEdit, &TextNoteEdit::sigDocumentSizeChange,
+            this, &TextNoteItem::onUpdateDetilBtn);
+
     connect(m_detailBtn, &VNoteIconButton::clicked, this, &TextNoteItem::onShowDetail);
     connect(m_menuBtn, &VNoteIconButton::clicked, this, &TextNoteItem::onShowMenu);
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
@@ -98,8 +101,6 @@ void TextNoteItem::initConnection()
 
 void TextNoteItem::onTextChanged()
 {
-    adjustTextEdit();
-    updateDetilBtn();
     bool empty = m_textEdit->document()->isEmpty();
     m_menuBtn->setDisabled(empty);
     emit sigTextEditIsEmpty(m_textNode, empty);
@@ -163,11 +164,6 @@ void TextNoteItem::onChangeTheme()
     pb.setBrush(DPalette::Text, pb.color(DPalette::Active, DPalette::WindowText));
     m_textEdit->setPalette(pb);
 }
-void TextNoteItem::resizeEvent(QResizeEvent *event)
-{
-    updateDetilBtn();
-    VNoteItemWidget::resizeEvent(event);
-}
 
 void TextNoteItem::leaveEvent(QEvent *event)
 {
@@ -187,23 +183,7 @@ void TextNoteItem::enterEvent(QEvent *event)
     m_textEdit->setPalette(pb);
 }
 
-void TextNoteItem::adjustTextEdit()
-{
-    QTextDocument *document = m_textEdit->document();
-    for (QTextBlock it = document->begin(); it != document->end(); it = it.next()) {
-        QTextCursor textCursor(it);
-        QTextBlockFormat textBlockFormat = it.blockFormat();
-        int right = static_cast<int>(textBlockFormat.rightMargin());
-        int height = static_cast<int>(textBlockFormat.lineHeight());
-        if (right != 50 || height != 26) {
-            textBlockFormat.setRightMargin(50);
-            textBlockFormat.setLineHeight(26, QTextBlockFormat::FixedHeight);
-            textCursor.setBlockFormat(textBlockFormat);
-        }
-    }
-}
-
-void TextNoteItem::updateDetilBtn()
+void TextNoteItem::onUpdateDetilBtn()
 {
     QTimer::singleShot(0, this, [ = ] {
         int textEditHeight = m_textEdit->height();
