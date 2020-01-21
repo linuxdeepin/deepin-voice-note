@@ -98,15 +98,19 @@ void VNoteMessageDialog::initMessage()
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
             ,"Currently recording,is the recording terminated?"));
     } break;
-    case DeleteNote:{
+    case DeleteNote: {
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
             ,"Are you sure you want to delete this note?"));
         m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "Delete"));
     } break;
-    case AsrTimeLimit:{
+    case AsrTimeLimit: {
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
             ,"Cannot convert this voice note, as notes over 20 minutes are not supported at present."));
         setSingleButton();
-    }
+    } break;
+    case AborteAsr: {
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
+            ,"Converting a voice note now. Do you want to stop it?"));
+    } break;
     }
 }

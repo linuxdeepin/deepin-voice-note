@@ -107,7 +107,7 @@ void VNoteBaseDialog::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
 
-    done(-1);
+    done(QDialog::Rejected);
 
     Q_EMIT closed();
 }

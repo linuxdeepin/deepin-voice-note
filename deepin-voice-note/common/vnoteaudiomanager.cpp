@@ -164,7 +164,7 @@ void VNoteAudioManager::stopRecord()
 
 void VNoteAudioManager::recordDurationChanged(qint64 duration)
 {
-    if (duration >= MAX_REC_TIME_INMSEC) {
+    if (duration >= (MAX_REC_TIME_INMSEC-500)) {
         stopRecord();
         emit recExceedLimit();
     }

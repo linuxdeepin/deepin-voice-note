@@ -33,7 +33,15 @@ public:
     VNoteMainWindow(QWidget *parent = nullptr);
     virtual ~VNoteMainWindow() override;
     QSharedPointer<QSettings> appSetting() const ;
-    enum WindowType {WndHomePage, WndNoteShow, WndSearchEmpty, WndTextEdit};
+    bool checkIfNeedExit();
+
+    enum WindowType {
+        WndHomePage,
+        WndNoteShow,
+        WndSearchEmpty,
+        WndTextEdit
+    };
+
 protected:
     void initUI();
     void initData();
@@ -54,6 +62,7 @@ protected:
     void showAsrErrMessage(const QString &strMessage);
 
     void resizeEvent(QResizeEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 
 signals:
 

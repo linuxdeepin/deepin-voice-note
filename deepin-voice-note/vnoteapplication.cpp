@@ -47,3 +47,11 @@ void VNoteApplication::onNewProcessInstance(qint64 pid, const QStringList &argum
 
     activateWindow();
 }
+
+void VNoteApplication::handleQuitAction()
+{
+    //Check if need exit app
+    if (m_qspMainWnd->checkIfNeedExit()) {
+        DApplication::handleQuitAction();
+    }
+}

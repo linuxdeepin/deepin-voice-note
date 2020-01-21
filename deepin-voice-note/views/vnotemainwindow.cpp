@@ -4,6 +4,7 @@
 #include "common/vnotea2tmanager.h"
 #include "common/vnoteitem.h"
 #include "common/utils.h"
+#include "dialog/vnotemessagedialog.h"
 #include "views/vnoterecordbar.h"
 #include "widgets/vnoteiconbutton.h"
 
@@ -45,6 +46,9 @@ VNoteMainWindow::~VNoteMainWindow() {
     autoRelease->wait(AUDIO_DEV_CHECK_TIME);
 
     QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
+    if (m_isAsrVoiceing) {
+        releaseA2TManger->stopAsr();
+    }
 }
 
 QSharedPointer<QSettings> VNoteMainWindow::appSetting() const
@@ -626,6 +630,42 @@ void VNoteMainWindow::resizeEvent(QResizeEvent *event)
         m_asrErrMeassage->setFixedWidth(m_rightViewHolder->width());
     }
     DMainWindow::resizeEvent(event);
+}
+
+void VNoteMainWindow::closeEvent(QCloseEvent *event)
+{
+    if (checkIfNeedExit()) {
+        event->accept();
+    } else {
+        event->ignore();
+    }
+}
+
+bool VNoteMainWindow::checkIfNeedExit()
+{
+    QScopedPointer<VNoteMessageDialog> pspMessageDialg;
+
+    bool bNeedExit = true;
+
+    //Is audio converting to text
+    if (m_isAsrVoiceing) {
+        pspMessageDialg.reset(new VNoteMessageDialog(
+                                  VNoteMessageDialog::AbortRecord,
+                                  this));
+    } else if (m_isRecording) { //Is recording
+        pspMessageDialg.reset(new VNoteMessageDialog(
+                                  VNoteMessageDialog::AborteAsr,
+                                  this));
+    }
+
+    if (!pspMessageDialg.isNull()) {
+        //Use cancel exit.
+        if (QDialog::Rejected == pspMessageDialg->exec()) {
+            bNeedExit = false;
+        }
+    }
+
+    return bNeedExit;
 }
 
 void VNoteMainWindow::onMenuNoteItemChange()

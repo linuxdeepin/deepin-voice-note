@@ -17,7 +17,8 @@ signals:
 
 public slots:
     void onNewProcessInstance(qint64 pid, const QStringList &arguments);
-
+protected:
+    virtual void handleQuitAction() override;
 protected:
     QScopedPointer<VNoteMainWindow> m_qspMainWnd {nullptr};
 };

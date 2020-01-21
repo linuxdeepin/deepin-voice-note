@@ -19,7 +19,8 @@ public:
         DeleteNote,
         AbortRecord,
         DeleteFolder,
-        AsrTimeLimit
+        AsrTimeLimit,
+        AborteAsr,
     };
 
 protected:
