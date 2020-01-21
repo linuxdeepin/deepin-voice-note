@@ -171,7 +171,8 @@ void RightView::noteSwitchByFolder(qint64 id)
         if (datafolderNotes != nullptr) {
             datafolderNotes->lock.lockForRead();
             for (auto it : datafolderNotes->folderNotes) {
-                if (it->noteText.contains(m_searchKey)) {
+                if (VNoteItem::VNOTE_TYPE::VNT_Text == it->noteType
+                        && it->noteText.contains(m_searchKey)) {
                     searchNoteData.folderNotes.insert(it->noteId, it);
                 }
             }

@@ -192,7 +192,7 @@ void VNoteMainWindow::initLeftView()
     leftHolderLayout->setSpacing(0);
     leftHolderLayout->setContentsMargins(0, 0, 0, 0);
 
-    m_leftView = new LeftView(this);
+    m_leftView = new LeftView(m_leftViewHolder);
 
     m_leftView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_leftView->setBackgroundRole(DPalette::Base);
@@ -201,13 +201,15 @@ void VNoteMainWindow::initLeftView()
     m_leftView->setContentsMargins(0, 5, 0, 0);
 
     m_floatingAddBtn = new VNoteIconButton(
-                m_leftView,
+                m_leftViewHolder,
                 "add_note_normal.svg",
                 "add_note_hover.svg",
                 "add_note_press.svg"
                 );
+    m_floatingAddBtn->SetDisableIcon("add_note_disabled.svg");
     m_floatingAddBtn->setFlat(true);
     m_floatingAddBtn->setIconSize(QSize(68, 68));
+    m_floatingAddBtn->raise();
 
     DAnchorsBase buttonAnchor(m_floatingAddBtn);
     buttonAnchor.setAnchor(Qt::AnchorLeft, m_leftView, Qt::AnchorLeft);
@@ -470,6 +472,7 @@ void VNoteMainWindow::onSearchNoteEmpty(qint64 id)
 void VNoteMainWindow::onStartRecord()
 {
     if(m_isAsrVoiceing == false){
+        m_floatingAddBtn->setBtnDisabled(true);
         m_leftView->setFolderEnable(false);
         m_noteSearchEdit->setEnabled(false);
     }
@@ -481,6 +484,7 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 {
     m_isRecording = false;
     if(m_isAsrVoiceing == false){
+        m_floatingAddBtn->setBtnDisabled(false);
         m_leftView->setFolderEnable(true);
         m_noteSearchEdit->setEnabled(true);
     }
@@ -501,6 +505,7 @@ void VNoteMainWindow::onA2TStart(const QString &file, qint64 duration)
 {
     m_isAsrVoiceing = true;
     if(m_isRecording == false){
+        m_floatingAddBtn->setBtnDisabled(true);
         m_leftView->setFolderEnable(false);
         m_noteSearchEdit->setEnabled(false);
     }
@@ -512,6 +517,7 @@ void VNoteMainWindow::onA2TError(int error)
     qInfo() << "Audo to text failed:" << error;
     m_isAsrVoiceing = false;
     if(m_isRecording == false){
+        m_floatingAddBtn->setBtnDisabled(false);
         m_leftView->setFolderEnable(true);
         m_noteSearchEdit->setEnabled(true);
     }
@@ -534,6 +540,7 @@ void VNoteMainWindow::onA2TSuccess(const QString &text)
     qInfo() << "Audo to text success:" << text;
     m_isAsrVoiceing = false;
     if(m_isRecording == false){
+        m_floatingAddBtn->setBtnDisabled(false);
         m_leftView->setFolderEnable(true);
         m_noteSearchEdit->setEnabled(true);
     }

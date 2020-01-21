@@ -82,6 +82,7 @@ void VoiceNoteItem::initUi()
                                     , "play_press.svg");
     m_playBtn->setIconSize(QSize(60, 60));
     m_playBtn->setFlat(true);
+    m_playBtn->SetDisableIcon("play_disabled.svg");
 
     m_detailBtn = new VNoteIconButton(this
                                       , "detail_normal.svg"
@@ -223,7 +224,7 @@ void VoiceNoteItem::showAsrEndWindow(const QString &strResult)
 
 void VoiceNoteItem::enblePlayBtn(bool enable)
 {
-    m_playBtn->setEnabled(enable);
+    m_playBtn->setBtnDisabled(!enable);
 }
 
 void VoiceNoteItem::enblePauseBtn(bool enable)

@@ -42,6 +42,8 @@ void TextNoteItem::initUI()
                                     , "more_press.svg");
     m_menuBtn->setIconSize(QSize(44, 44));
     m_menuBtn->setFlat(true);
+    m_menuBtn->SetDisableIcon("more_disabled.svg");
+    m_menuBtn->setDisabled(true);
 
     m_detailBtn = new VNoteIconButton(this
                                       , "detail_normal.svg"
@@ -98,7 +100,9 @@ void TextNoteItem::onTextChanged()
 {
     adjustTextEdit();
     updateDetilBtn();
-    emit sigTextEditIsEmpty(m_textNode, m_textEdit->document()->isEmpty());
+    bool empty = m_textEdit->document()->isEmpty();
+    m_menuBtn->setDisabled(empty);
+    emit sigTextEditIsEmpty(m_textNode, empty);
 }
 
 void TextNoteItem::onShowDetail()
