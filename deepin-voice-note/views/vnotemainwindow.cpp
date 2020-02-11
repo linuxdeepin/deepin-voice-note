@@ -415,7 +415,7 @@ void VNoteMainWindow::initEmptyFoldersView()
 void VNoteMainWindow::onVNoteFolderAdd()
 {
     if(!m_noteSearchEdit->text().isEmpty()){
-        m_noteSearchEdit->setText("");
+        m_noteSearchEdit->clearEdit();
     }
     if(m_centerWidget->currentIndex() == WndHomePage){
         m_noteSearchEdit->setEnabled(true);
