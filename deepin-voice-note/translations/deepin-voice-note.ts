@@ -11,14 +11,14 @@
     </message>
     <message>
         <location filename="../main.cpp" line="25"/>
-        <location filename="../views/vnotemainwindow.cpp" line="559"/>
+        <location filename="../views/vnotemainwindow.cpp" line="602"/>
         <source>Voice Notes</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../main.cpp" line="26"/>
-        <source>Voice Notepad is a lightweight voice tool that provides text notes and voice recordings.</source>
-        <translation></translation>
+        <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -51,7 +51,7 @@
     <name>NoteSearch</name>
     <message>
         <location filename="../views/rightview.cpp" line="38"/>
-        <location filename="../views/vnotemainwindow.cpp" line="369"/>
+        <location filename="../views/vnotemainwindow.cpp" line="382"/>
         <source>No search results</source>
         <translation></translation>
     </message>
@@ -65,7 +65,7 @@
     </message>
     <message>
         <location filename="../views/rightview.cpp" line="67"/>
-        <location filename="../views/rightview.cpp" line="305"/>
+        <location filename="../views/rightview.cpp" line="316"/>
         <source>Save as TXT</source>
         <translation></translation>
     </message>
@@ -82,23 +82,23 @@
     </message>
     <message>
         <location filename="../views/rightview.cpp" line="77"/>
-        <location filename="../views/rightview.cpp" line="370"/>
+        <location filename="../views/rightview.cpp" line="381"/>
         <source>Save as MP3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../views/rightview.cpp" line="311"/>
+        <location filename="../views/rightview.cpp" line="322"/>
         <source>Text note</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../views/rightview.cpp" line="316"/>
-        <location filename="../views/rightview.cpp" line="380"/>
+        <location filename="../views/rightview.cpp" line="327"/>
+        <location filename="../views/rightview.cpp" line="391"/>
         <source>File name cannot be empty</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../views/rightview.cpp" line="376"/>
+        <location filename="../views/rightview.cpp" line="387"/>
         <source>Voice note</source>
         <translation></translation>
     </message>
@@ -106,52 +106,52 @@
 <context>
     <name>Shortcuts</name>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="543"/>
+        <location filename="../views/vnotemainwindow.cpp" line="586"/>
         <source>Help</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="545"/>
+        <location filename="../views/vnotemainwindow.cpp" line="588"/>
         <source>Display shortcuts</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="546"/>
+        <location filename="../views/vnotemainwindow.cpp" line="589"/>
         <source>New notebook</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="547"/>
+        <location filename="../views/vnotemainwindow.cpp" line="590"/>
         <source>Delete notebook/note</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="550"/>
+        <location filename="../views/vnotemainwindow.cpp" line="593"/>
         <source>Rename notebook</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="551"/>
+        <location filename="../views/vnotemainwindow.cpp" line="594"/>
         <source>Play/Pause</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="552"/>
+        <location filename="../views/vnotemainwindow.cpp" line="595"/>
         <source>Select all</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="553"/>
+        <location filename="../views/vnotemainwindow.cpp" line="596"/>
         <source>Copy</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="554"/>
+        <location filename="../views/vnotemainwindow.cpp" line="597"/>
         <source>Cut</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="555"/>
+        <location filename="../views/vnotemainwindow.cpp" line="598"/>
         <source>Paste</source>
         <translation></translation>
     </message>
@@ -159,7 +159,7 @@
 <context>
     <name>TitleBar</name>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="158"/>
+        <location filename="../views/vnotemainwindow.cpp" line="163"/>
         <source>Search</source>
         <translation></translation>
     </message>
@@ -167,12 +167,12 @@
 <context>
     <name>VNoteErrorMessage</name>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="495"/>
+        <location filename="../views/vnotemainwindow.cpp" line="535"/>
         <source>Network disconnected and cannot convert voice notes. Do you want to try again? </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="499"/>
+        <location filename="../views/vnotemainwindow.cpp" line="539"/>
         <source>The voice conversion failed. Do you want to try again?</source>
         <translation></translation>
     </message>
@@ -180,7 +180,7 @@
 <context>
     <name>VNoteMainWindow</name>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="520"/>
+        <location filename="../views/vnotemainwindow.cpp" line="563"/>
         <source>Try Again</source>
         <translation></translation>
     </message>
@@ -223,11 +223,16 @@
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
         <translation></translation>
     </message>
+    <message>
+        <location filename="../dialog/vnotemessagedialog.cpp" line="112"/>
+        <source>Converting a voice note now. Do you want to stop it?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VNoteRecordBar</name>
     <message>
-        <location filename="../views/vnoterecordbar.cpp" line="84"/>
+        <location filename="../views/vnoterecordbar.cpp" line="103"/>
         <source>No recording device detected</source>
         <translation></translation>
     </message>
@@ -235,7 +240,7 @@
 <context>
     <name>VoiceNoteItem</name>
     <message>
-        <location filename="../views/voicenoteitem.cpp" line="200"/>
+        <location filename="../views/voicenoteitem.cpp" line="205"/>
         <source>Converting voice to text</source>
         <translation></translation>
     </message>

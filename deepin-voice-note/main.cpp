@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     app.setProductIcon(QIcon::fromTheme(DEEPIN_VOICE_NOTE));
     app.setProductName(DApplication::translate("AppMain", "Voice Notes"));
     app.setApplicationDescription(DApplication::translate("AppMain",
-        "Voice Notepad is a lightweight voice tool that provides text notes and voice recordings."));
+        "Voice Notes is a lightweight memo tool to make text notes and voice recordings."));
 
     qputenv("DTK_USE_SEMAPHORE_SINGLEINSTANCE", "1");
     if(!DGuiApplicationHelper::instance()->setSingleInstance(
