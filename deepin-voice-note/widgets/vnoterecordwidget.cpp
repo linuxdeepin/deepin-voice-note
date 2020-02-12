@@ -71,8 +71,8 @@ void VNoteRecordWidget::initConnection()
     connect(m_audioManager, SIGNAL(recAudioBufferProbed(const QAudioBuffer &)),
             this, SLOT(onAudioBufferProbed(const QAudioBuffer &)));
     connect(m_audioManager, &VNoteAudioManager::recExceedLimit, this, &VNoteRecordWidget::onSetMediaSource);
-    connect(m_audioManager->getPlayerObject(),&QMediaPlayer::mediaStatusChanged,
-            this,&VNoteRecordWidget::onMediaStatusChange);
+    connect(m_audioManager->getPlayerObject(),&QMediaPlayer::durationChanged,
+            this,&VNoteRecordWidget::onMediaDurationChange);
 }
 
 void VNoteRecordWidget::initRecordPath()
@@ -132,13 +132,10 @@ void VNoteRecordWidget::onAudioBufferProbed(const QAudioBuffer &buffer)
     }
 }
 
-void VNoteRecordWidget::onMediaStatusChange(QMediaPlayer::MediaStatus status)
+void VNoteRecordWidget::onMediaDurationChange(qint64 duration)
 {
-    if(m_recordMsec && status == QMediaPlayer::MediaStatus::LoadedMedia){
-        QMediaPlayer *player = m_audioManager->getPlayerObject();
-        m_recordMsec = player->duration();
-        qDebug() << m_recordMsec;
-        emit sigFinshRecord(m_recordPath, m_recordMsec);
-        m_recordMsec = 0;
+    if(duration >= m_recordMsec){
+      qDebug() << "duration 1:" << m_recordMsec << ";duration 2:" << duration;
+      emit sigFinshRecord(m_recordPath, duration);
     }
 }
