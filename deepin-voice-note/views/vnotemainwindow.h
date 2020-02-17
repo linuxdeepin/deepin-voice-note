@@ -2,9 +2,6 @@
 #define VNOTEMAINWINDOW_H
 
 #include "common/datatypedef.h"
-#include "leftview.h"
-#include "rightview.h"
-#include "homepage.h"
 
 #include <QShortcut>
 #include <QSettings>
@@ -25,6 +22,10 @@ class VNoteRecordBar;
 class VNoteIconButton;
 class VNoteAudioDeviceWatcher;
 class VNoteA2TManager;
+class LeftView;
+class MiddleView;
+class RightView;
+class HomePage;
 
 class VNoteMainWindow : public DMainWindow
 {
@@ -51,6 +52,7 @@ protected:
     void initTitleBar();
     void initMainView();
     void initLeftView();
+    void initMiddleView();
     void initRightView();
     void initAudioWatcher();
 
@@ -91,13 +93,20 @@ private:
     DSearchEdit *m_noteSearchEdit {nullptr};
     DIconButton *m_returnBtn {nullptr};
 
-    VNoteIconButton *m_floatingAddBtn {nullptr};
+    //titlebar actions
+    QWidget     *m_actionPanel {nullptr};
+    DIconButton *m_addNewNoteBtn {nullptr};
+
+    DPushButton     *m_floatingAddNotepadBtn {nullptr};
+    VNoteIconButton *m_floatingAddNoteBtn {nullptr};
     QWidget         *m_leftViewHolder {nullptr};
+    QWidget         *m_middleViewHolder {nullptr};
     QWidget         *m_rightViewHolder {nullptr};
     QWidget         *m_rightNoteArea {nullptr};
 
     DSplitter   *m_mainWndSpliter {nullptr};
     LeftView    *m_leftView {nullptr};
+    MiddleView  *m_middleView {nullptr};
     RightView   *m_rightView {nullptr};
 
     VNoteRecordBar* m_recordBar {nullptr};

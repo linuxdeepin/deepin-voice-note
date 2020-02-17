@@ -4,18 +4,21 @@
 #define DEEPIN_VOICE_NOTE "deepin-voice-note"
 
 //Default main window size
-#define DEFAULT_WINDOWS_WIDTH 820
+#define DEFAULT_WINDOWS_WIDTH 950
 #define DEFAULT_WINDOWS_HEIGHT 634
 
 //TitleBar height
 #define VNOTE_TITLEBAR_HEIGHT 50
 
 //LeftView width
-#define VNOTE_LEFTVIEW_W 250
+#define VNOTE_LEFTVIEW_W 200
+
+//MiddleView width
+#define VNOTE_MIDDLEVIEW_W 250
 
 //SearchEdit Size
 #define VNOTE_SEARCHBAR_H  36
-#define VNOTE_SEARCHBAR_W  350
+#define VNOTE_SEARCHBAR_W  250
 
 //StandIcon path
 #define STAND_ICON_PAHT ":/icons/deepin/builtin/"

@@ -12,11 +12,12 @@ const QStringList VNoteItemOper::noteColumnsName = {
     "note_id",
     "folder_id",
     "note_type",
-    "note_text",
-    "voice_path",
-    "voice_len",
+    "note_title",
+    "meta_data",
+    "note_state"
     "create_time",
     "modify_time",
+    "delete_time"
 };
 
 VNoteItemOper::VNoteItemOper(VNoteItem* note)
@@ -46,9 +47,7 @@ VNOTE_ALL_NOTES_MAP *VNoteItemOper::loadAllVNotes()
 
     NoteQryDbVisitor noteVisitor(VNoteDbManager::instance()->getVNoteDb(), notesMap);
 
-    if (VNoteDbManager::instance()->queryData(
-                VNoteDbManager::DB_TABLE::VNOTE_ITEM_TBL
-                , querySql, &noteVisitor) ) {
+    if (VNoteDbManager::instance()->queryData(querySql, &noteVisitor) ) {
         gettimeofday(&end, nullptr);
 
         qDebug() << "queryData(ms):" << TM(start, end);
@@ -71,7 +70,7 @@ bool VNoteItemOper::modifyNoteText(QString text)
 
         modifyNoteTextSql.sprintf(MODIFY_NOTETEXT_FMT
                           , VNoteDbManager::NOTES_TABLE_NAME
-                          , noteColumnsName[note_text].toUtf8().data()
+                          , noteColumnsName[meta_data].toUtf8().data()
                           , text.toUtf8().data()
                           , noteColumnsName[modify_time].toUtf8().data()
                           , modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data()
@@ -96,9 +95,7 @@ bool VNoteItemOper::modifyNoteText(QString text)
         sqls.append(modifyNoteTextSql);
         sqls.append(updateSql);
 
-        if (VNoteDbManager::instance()->updateData(
-                    VNoteDbManager::DB_TABLE::VNOTE_FOLDER_TBL
-                    ,sqls)) {
+        if (VNoteDbManager::instance()->updateData(sqls)) {
             m_note->noteText   = text;
             m_note->modifyTime = modifyTime;
 
@@ -111,7 +108,7 @@ bool VNoteItemOper::modifyNoteText(QString text)
 
 VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
 {
-    static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s,%s,%s,%s) VALUES (%s,%s,'%s','%s',%s);";
+    static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s,%s,%s) VALUES (%s,%s,'%s','%s');";
     static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s WHERE %s=%s;";
     static constexpr char const *NEWREC_FMT = "SELECT * FROM %s WHERE %s=%s ORDER BY %s DESC LIMIT 1;";
 
@@ -121,14 +118,12 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
                       , VNoteDbManager::NOTES_TABLE_NAME
                       , noteColumnsName[folder_id].toUtf8().data()
                       , noteColumnsName[note_type].toUtf8().data()
-                      , noteColumnsName[note_text].toUtf8().data()
-                      , noteColumnsName[voice_path].toUtf8().data()
-                      , noteColumnsName[voice_len].toUtf8().data()
+                      , noteColumnsName[note_title].toUtf8().data()
+                      , noteColumnsName[meta_data].toUtf8().data()
                       , QString("%1").arg(note.folderId).toUtf8().data()
                       , QString("%1").arg(note.noteType).toUtf8().data()
+                      , note.noteTitle.toUtf8().data()
                       , note.noteText.toUtf8().data()
-                      , note.voicePath.toUtf8().data()
-                      , QString("%1").arg(note.voiceSize).toUtf8().data()
                       );
 
     QString updateSql;
@@ -158,10 +153,7 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
     VNoteItem *newNote= new VNoteItem();
     AddNoteDbVisitor addNoteVisitor(VNoteDbManager::instance()->getVNoteDb(), newNote);
 
-    if (VNoteDbManager::instance()->insertData(
-                VNoteDbManager::DB_TABLE::VNOTE_FOLDER_TBL
-                , sqls
-                , &addNoteVisitor) ) {
+    if (VNoteDbManager::instance()->insertData(sqls, &addNoteVisitor) ) {
 
         if (Q_UNLIKELY(nullptr == VNoteDataManager::instance()->addNote(newNote))) {
             qInfo() << "Add to datamanager failed:"
@@ -241,8 +233,7 @@ bool VNoteItemOper::deleteNote(qint64 folderId, qint32 noteId)
 
     bool delOK = false;
 
-    if (VNoteDbManager::instance()->deleteData(VNoteDbManager::DB_TABLE::VNOTE_ITEM_TBL
-                                               , sqls) ) {
+    if (VNoteDbManager::instance()->deleteData(sqls) ) {
         //Release note Object
         QScopedPointer<VNoteItem>autoRelease(VNoteDataManager::instance()->delNote(folderId, noteId));
 

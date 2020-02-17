@@ -38,9 +38,10 @@ protected:
         folder_name,
         default_icon,
         icon_path,
-        note_count,
+        folder_state,
         create_time,
         modify_time,
+        delete_time,
     };
 
     friend class FolderQryDbVisitor;

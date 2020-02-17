@@ -21,9 +21,9 @@ SOURCES += \
     common/loadfolderworker.cpp \
     common/loadnoteitemsworker.cpp \
     common/loadiconsworker.cpp \
-    views/leftview.cpp \
-    views/leftviewsortfiltermodel.cpp \
-    views/leftviewdelegate.cpp \
+    views/middleview.cpp \
+    views/middleviewsortfiltermodel.cpp \
+    views/middleviewdelegate.cpp \
     views/textnoteedit.cpp \
     views/textnoteitem.cpp \
     views/myrecodebuttons.cpp \
@@ -41,7 +41,8 @@ SOURCES += \
     views/vnoterecordbar.cpp \
     common/vnotea2tmanager.cpp \
     common/vnoteaudiodevicewatcher.cpp \
-    views/homepage.cpp
+    views/homepage.cpp \
+    views/leftview.cpp
 
 RESOURCES += \
     images.qrc
@@ -61,9 +62,9 @@ HEADERS += \
     common/loadfolderworker.h \
     common/loadnoteitemsworker.h \
     common/loadiconsworker.h \
-    views/leftview.h \
-    views/leftviewsortfiltermodel.h \
-    views/leftviewdelegate.h \
+    views/middleview.h \
+    views/middleviewsortfiltermodel.h \
+    views/middleviewdelegate.h \
     views/textnoteedit.h \
     views/textnoteitem.h \
     views/myrecodebuttons.h \
@@ -80,7 +81,8 @@ HEADERS += \
     views/vnoterecordbar.h \
     common/vnotea2tmanager.h \
     common/vnoteaudiodevicewatcher.h \
-    views/homepage.h
+    views/homepage.h \
+    views/leftview.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts

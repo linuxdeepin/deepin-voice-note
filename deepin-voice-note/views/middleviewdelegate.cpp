@@ -1,4 +1,4 @@
-#include "leftviewdelegate.h"
+#include "middleviewdelegate.h"
 #include "common/utils.h"
 
 #include <QLineEdit>

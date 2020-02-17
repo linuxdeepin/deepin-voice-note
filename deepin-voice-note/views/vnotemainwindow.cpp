@@ -1,4 +1,8 @@
 #include "views/vnotemainwindow.h"
+#include "views/leftview.h"
+#include "views/middleview.h"
+#include "views/rightview.h"
+#include "views/homepage.h"
 #include "common/vnotedatamanager.h"
 #include "common/vnoteaudiodevicewatcher.h"
 #include "common/vnotea2tmanager.h"
@@ -107,15 +111,15 @@ void VNoteMainWindow::initConnections()
     connect(VNoteDataManager::instance(), &VNoteDataManager::onNoteFoldersLoaded,
             this, &VNoteMainWindow::onVNoteFoldersLoaded);
 
-    connect(m_floatingAddBtn, &DFloatingButton::clicked,
+    connect(m_floatingAddNoteBtn, &DFloatingButton::clicked,
             this, &VNoteMainWindow::onVNoteFolderAdd);
 
     connect(m_noteSearchEdit, &DSearchEdit::textChanged,
             this, &VNoteMainWindow::onVNoteSearch);
 
-    connect(m_leftView, SIGNAL(currentChanged(const QModelIndex &)),
+    connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
             this, SLOT(onVNoteFolderChange(const QModelIndex &)));
-    connect(m_leftView, &LeftView::sigFolderDel,
+    connect(m_middleView, &MiddleView::sigFolderDel,
             this, &VNoteMainWindow::onVNoteFolderDel);
 
     connect(m_wndHomePage, &HomePage::sigAddFolderByInitPage,
@@ -154,14 +158,30 @@ void VNoteMainWindow::initShortcuts() {
 void VNoteMainWindow::initTitleBar()
 {
     titlebar()->setFixedHeight(VNOTE_TITLEBAR_HEIGHT);
+    titlebar()->setTitle("");
     // Add logo
     titlebar()->setIcon(QIcon::fromTheme(DEEPIN_VOICE_NOTE));
+
+    //Add action buttons
+    m_actionPanel = new QWidget(this);
+
+    QHBoxLayout* actionPanelLayout = new QHBoxLayout(m_actionPanel);
+    actionPanelLayout->setSpacing(0);
+    actionPanelLayout->setContentsMargins(0, 0, 0, 0);
+
+    m_addNewNoteBtn = new DIconButton(m_actionPanel);
+    m_addNewNoteBtn->setFixedSize(QSize(36, 36));
+
+    actionPanelLayout->addSpacing(VNOTE_LEFTVIEW_W-45);
+    actionPanelLayout->addWidget(m_addNewNoteBtn, Qt::AlignLeft);
+
+    titlebar()->addWidget(m_actionPanel, Qt::AlignLeft);
     // Search note
     m_noteSearchEdit = new DSearchEdit(this);
     DFontSizeManager::instance()->bind(m_noteSearchEdit, DFontSizeManager::T6);
     m_noteSearchEdit->setFixedSize(QSize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H));
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
-    titlebar()->addWidget(m_noteSearchEdit);
+    titlebar()->addWidget(m_noteSearchEdit, Qt::AlignRight);
     m_returnBtn = new DIconButton(DStyle::SP_ArrowLeave, this);
     m_returnBtn->setFixedSize(QSize(36, 36));
     m_returnBtn->setVisible(false);
@@ -199,27 +219,24 @@ void VNoteMainWindow::initLeftView()
     m_leftView = new LeftView(m_leftViewHolder);
 
     m_leftView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_leftView->setFrameShape(QFrame::NoFrame);
     m_leftView->setBackgroundRole(DPalette::Base);
-    m_leftView->setSpacing(5);
     m_leftView->setAutoFillBackground(true);
     m_leftView->setContentsMargins(0, 5, 0, 0);
 
-    m_floatingAddBtn = new VNoteIconButton(
-                m_leftViewHolder,
-                "add_note_normal.svg",
-                "add_note_hover.svg",
-                "add_note_press.svg"
-                );
-    m_floatingAddBtn->SetDisableIcon("add_note_disabled.svg");
-    m_floatingAddBtn->setFlat(true);
-    m_floatingAddBtn->setIconSize(QSize(68, 68));
-    m_floatingAddBtn->raise();
+    m_floatingAddNotepadBtn = new DPushButton(
+                DApplication::translate("VNoteMainWindow", "Add Notepad"),
+                m_leftViewHolder);
+    m_floatingAddNotepadBtn->setFixedSize(VNOTE_LEFTVIEW_W -40, 42);
+//    m_floatingAddNotepadBtn->setFlat(true);
+//    m_floatingAddNotepadBtn->setIconSize(QSize(68, 68));
+    m_floatingAddNotepadBtn->raise();
 
-    DAnchorsBase buttonAnchor(m_floatingAddBtn);
+    DAnchorsBase buttonAnchor(m_floatingAddNotepadBtn);
     buttonAnchor.setAnchor(Qt::AnchorLeft, m_leftView, Qt::AnchorLeft);
     buttonAnchor.setAnchor(Qt::AnchorBottom, m_leftView, Qt::AnchorBottom);
-    buttonAnchor.setBottomMargin(10);
-    buttonAnchor.setLeftMargin(97);
+    buttonAnchor.setBottomMargin(20);
+    buttonAnchor.setLeftMargin(20);
 
     // ToDo:
     //    Add Left view widget here
@@ -230,6 +247,52 @@ void VNoteMainWindow::initLeftView()
 
 #ifdef VNOTE_LAYOUT_DEBUG
     m_leftViewHolder->setStyleSheet("background: green");
+#endif
+}
+
+void VNoteMainWindow::initMiddleView()
+{
+    m_middleViewHolder = new QWidget(m_mainWndSpliter);
+    m_middleViewHolder->setObjectName("middleMainLayoutHolder");
+    m_middleViewHolder->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    m_middleViewHolder->setFixedWidth(VNOTE_MIDDLEVIEW_W);
+
+    QVBoxLayout *middleHolderLayout = new  QVBoxLayout();
+    middleHolderLayout->setSpacing(0);
+    middleHolderLayout->setContentsMargins(0, 0, 0, 0);
+
+    m_middleView = new MiddleView(m_middleViewHolder);
+
+    m_middleView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_middleView->setBackgroundRole(DPalette::Base);
+    m_middleView->setSpacing(5);
+    m_middleView->setAutoFillBackground(true);
+    m_middleView->setContentsMargins(0, 5, 0, 0);
+
+    m_floatingAddNoteBtn = new VNoteIconButton(
+                m_middleViewHolder,
+                "add_note_normal.svg",
+                "add_note_hover.svg",
+                "add_note_press.svg"
+                );
+    m_floatingAddNoteBtn->SetDisableIcon("add_note_disabled.svg");
+    m_floatingAddNoteBtn->setFlat(true);
+    m_floatingAddNoteBtn->setIconSize(QSize(68, 68));
+    m_floatingAddNoteBtn->raise();
+
+    DAnchorsBase buttonAnchor(m_floatingAddNoteBtn);
+    buttonAnchor.setAnchor(Qt::AnchorLeft, m_middleView, Qt::AnchorLeft);
+    buttonAnchor.setAnchor(Qt::AnchorBottom, m_middleView, Qt::AnchorBottom);
+    buttonAnchor.setBottomMargin(10);
+    buttonAnchor.setLeftMargin(97);
+
+    // ToDo:
+    //    Add Left view widget here
+    middleHolderLayout->addWidget(m_middleView);
+
+    m_middleViewHolder->setLayout(middleHolderLayout);
+#ifdef VNOTE_LAYOUT_DEBUG
+    m_middleViewHolder->setStyleSheet("background: green");
 #endif
 }
 
@@ -257,8 +320,8 @@ void VNoteMainWindow::initRightView()
     m_rightView = new RightView(m_rightViewHolder);
     m_rightView->setSizePolicy(QSizePolicy::Preferred
                                , QSizePolicy::Preferred);
-    //m_rightView->setBackgroundRole(DPalette::Base);
-    //m_rightView->setAutoFillBackground(true);
+    m_rightView->setBackgroundRole(DPalette::Base);
+    m_rightView->setAutoFillBackground(true);
 
     rightNoteAreaLayout->addWidget(m_rightView);
 
@@ -303,7 +366,7 @@ void VNoteMainWindow::initAudioWatcher()
 
 void VNoteMainWindow::onVNoteFoldersLoaded()
 {
-    int count = m_leftView->loadNoteFolder(); //加载完成前都是显示主页
+    int count = m_middleView->loadNoteFolder(); //加载完成前都是显示主页
     if (!count) {
         m_centerWidget->setCurrentIndex(WndHomePage);
         m_noteSearchEdit->setEnabled(false);
@@ -327,10 +390,10 @@ void VNoteMainWindow::onVNoteSearch()
     } else {
         m_rightView->setSearchKey(regExp);
         if (regExp.isEmpty()) {
-            m_leftView->clearFilter();
+            m_middleView->clearFilter();
         } else {
             QList<qint64> folders = m_rightView->getNoteContainsKeyFolders(regExp);
-            m_leftView->setFolderNameFilter(regExp, &folders);
+            m_middleView->setFolderNameFilter(regExp, &folders);
         }
     }
 }
@@ -339,10 +402,10 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &previous)
 {
     Q_UNUSED(previous);
     bool foucsFlag = m_noteSearchEdit->lineEdit()->hasFocus();
-    QModelIndex index = m_leftView->currentIndex();
+    QModelIndex index = m_middleView->currentIndex();
     if (index.isValid()) {
-        m_leftView->update();
-        qint64 id = m_leftView->getFolderId(index);
+        m_middleView->update();
+        qint64 id = m_middleView->getFolderId(index);
         m_rightView->noteSwitchByFolder(id);
         m_centerWidget->setCurrentIndex(WndNoteShow);
     } else {
@@ -361,7 +424,7 @@ void VNoteMainWindow::onVNoteFolderDel(VNoteFolder *data)
     m_rightView->noteDelByFolder(data->id);
     VNoteFolderOper folderOper(data);
     folderOper.deleteVNoteFolder(data->id);
-    if (m_leftView->getFolderCount() == 0) {
+    if (m_middleView->getFolderCount() == 0) {
         m_centerWidget->setCurrentIndex(WndHomePage);
         m_noteSearchEdit->setEnabled(false);
     }
@@ -390,20 +453,25 @@ void VNoteMainWindow::initSpliterView()
     m_mainWndSpliter = new DSplitter(Qt::Horizontal, this);
 
     initLeftView();
+    initMiddleView();
     initRightView();
 
     // Disable spliter drag & resize
-    QSplitterHandle *handle = m_mainWndSpliter->handle(1);
-    if (handle) {
-        handle->setFixedWidth(2);
-        handle->setDisabled(true);
+    QList<QWidget*> Children {m_middleViewHolder, m_rightViewHolder};
 
-        DPalette pa = DApplicationHelper::instance()->palette(handle);
-        QBrush splitBrush = pa.brush(DPalette::ItemBackground);
-        pa.setBrush(DPalette::Background, splitBrush);
-        handle->setPalette(pa);
-        handle->setBackgroundRole(QPalette::Background);
-        handle->setAutoFillBackground(true);
+    for (auto it : Children) {
+        QSplitterHandle *handle = m_mainWndSpliter->handle(m_mainWndSpliter->indexOf(it));
+        if (handle) {
+            handle->setFixedWidth(2);
+            handle->setDisabled(true);
+
+            DPalette pa = DApplicationHelper::instance()->palette(handle);
+            QBrush splitBrush = pa.brush(DPalette::ItemBackground);
+            pa.setBrush(DPalette::Background, splitBrush);
+            handle->setPalette(pa);
+            handle->setBackgroundRole(QPalette::Background);
+            handle->setAutoFillBackground(true);
+        }
     }
 }
 
@@ -421,7 +489,7 @@ void VNoteMainWindow::onVNoteFolderAdd()
         m_noteSearchEdit->setEnabled(true);
     }
     m_centerWidget->setCurrentIndex(WndNoteShow);
-    m_leftView->handleAddFolder();
+    m_middleView->handleAddFolder();
 
 }
 
@@ -470,14 +538,14 @@ void VNoteMainWindow::onTextEditReturn()
 
 void VNoteMainWindow::onSearchNoteEmpty(qint64 id)
 {
-    m_leftView->removeFromWhiteList(id);
+    m_middleView->removeFromWhiteList(id);
 }
 
 void VNoteMainWindow::onStartRecord()
 {
     if(m_isAsrVoiceing == false){
-        m_floatingAddBtn->setBtnDisabled(true);
-        m_leftView->setFolderEnable(false);
+        m_floatingAddNoteBtn->setBtnDisabled(true);
+        m_middleView->setFolderEnable(false);
         m_noteSearchEdit->setEnabled(false);
     }
     m_rightView->setVoicePlayEnable(false);
@@ -488,8 +556,8 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 {
     m_isRecording = false;
     if(m_isAsrVoiceing == false){
-        m_floatingAddBtn->setBtnDisabled(false);
-        m_leftView->setFolderEnable(true);
+        m_floatingAddNoteBtn->setBtnDisabled(false);
+        m_middleView->setFolderEnable(true);
         m_noteSearchEdit->setEnabled(true);
     }
     m_rightView->addVoiceNoteItem(voicePath, voiceSize,m_isExit);
@@ -513,8 +581,8 @@ void VNoteMainWindow::onA2TStart(const QString &file, qint64 duration)
 {
     m_isAsrVoiceing = true;
     if(m_isRecording == false){
-        m_floatingAddBtn->setBtnDisabled(true);
-        m_leftView->setFolderEnable(false);
+        m_floatingAddNoteBtn->setBtnDisabled(true);
+        m_middleView->setFolderEnable(false);
         m_noteSearchEdit->setEnabled(false);
     }
     m_a2tManager->startAsr(file, duration);
@@ -525,8 +593,8 @@ void VNoteMainWindow::onA2TError(int error)
     qInfo() << "Audo to text failed:" << error;
     m_isAsrVoiceing = false;
     if(m_isRecording == false){
-        m_floatingAddBtn->setBtnDisabled(false);
-        m_leftView->setFolderEnable(true);
+        m_floatingAddNoteBtn->setBtnDisabled(false);
+        m_middleView->setFolderEnable(true);
         m_noteSearchEdit->setEnabled(true);
     }
     m_rightView->setAsrResult("");
@@ -548,8 +616,8 @@ void VNoteMainWindow::onA2TSuccess(const QString &text)
     qInfo() << "Audo to text success:" << text;
     m_isAsrVoiceing = false;
     if(m_isRecording == false){
-        m_floatingAddBtn->setBtnDisabled(false);
-        m_leftView->setFolderEnable(true);
+        m_floatingAddNoteBtn->setBtnDisabled(false);
+        m_middleView->setFolderEnable(true);
         m_noteSearchEdit->setEnabled(true);
     }
     m_rightView->setAsrResult(text);

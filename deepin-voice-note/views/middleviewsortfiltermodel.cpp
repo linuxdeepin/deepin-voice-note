@@ -1,4 +1,4 @@
-#include "leftviewsortfiltermodel.h"
+#include "middleviewsortfiltermodel.h"
 #include "common/vnoteforlder.h"
 
 #include<QDebug>

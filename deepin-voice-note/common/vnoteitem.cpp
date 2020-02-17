@@ -29,6 +29,25 @@ void VNoteItem::delVoiceFile()
     }
 }
 
+QDebug& operator << (QDebug &out, VNoteItem &noteItem)
+{
+    out << "\n{ "
+        << "noteId=" << noteItem.noteId << ","
+        << "folderId=" << noteItem.folderId << ","
+        << "noteType=" << noteItem.noteType << ","
+        << "voiceSize=" << noteItem.voiceSize << ","
+        << "noteState=" << noteItem.noteState << ","
+        << "noteTitle=" << noteItem.noteTitle << ","
+        << "noteText=" << noteItem.noteText << ","
+        << "voicePath=" << noteItem.voicePath << ","
+        << "createTime=" << noteItem.createTime << ","
+        << "modifyTime=" << noteItem.modifyTime << ","
+        << "deleteTime=" << noteItem.deleteTime
+        << " }\n";
+
+    return out;
+}
+
 VNoteItemWidget::VNoteItemWidget(QWidget *parent)
     : DWidget(parent)
 {

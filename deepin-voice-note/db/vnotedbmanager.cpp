@@ -53,31 +53,11 @@ QSqlDatabase &VNoteDbManager::getVNoteDb()
     return m_vnoteDB;
 }
 
-bool VNoteDbManager::insertData(DB_TABLE table,
-                                const QStringList& insertSql,
-                                DbVisitor* visitor )
+bool VNoteDbManager::insertData(const QStringList& insertSql, DbVisitor* visitor)
 {
     CHECK_DB_INIT();
 
-    int colums = 0;
-
     bool insertOK = true;
-
-    switch (table) {
-    case VNOTE_FOLDER_TBL: {
-        colums    = FOLDER_COLUMS;
-    } break;
-    case VNOTE_ITEM_TBL: {
-        colums    = NOTES_COLUMS;
-    } break;
-    default:
-        break;
-    };
-
-    if (colums == 0) {
-        qCritical() << "insertData invalid parameter table:" << table;
-        return false;
-    }
 
     if (nullptr == visitor) {
         qCritical() << "insertData invalid parameter: visitor is null";
@@ -108,11 +88,9 @@ bool VNoteDbManager::insertData(DB_TABLE table,
     return insertOK;
 }
 
-bool VNoteDbManager::updateData(VNoteDbManager::DB_TABLE table, const QStringList& updateSql)
+bool VNoteDbManager::updateData(const QStringList& updateSql)
 {
     CHECK_DB_INIT();
-
-    Q_UNUSED(table);
 
     bool updateOK = true;
 
@@ -134,29 +112,11 @@ bool VNoteDbManager::updateData(VNoteDbManager::DB_TABLE table, const QStringLis
     return updateOK;
 }
 
-bool VNoteDbManager::queryData(VNoteDbManager::DB_TABLE table, QString querySql, DbVisitor* visitor)
+bool VNoteDbManager::queryData(const QString querySql, DbVisitor* visitor)
 {
     CHECK_DB_INIT();
 
-    int colums = 0;
-
     bool queryOK = true;
-
-    switch (table) {
-    case VNOTE_FOLDER_TBL: {
-        colums    = FOLDER_COLUMS;
-    } break;
-    case VNOTE_ITEM_TBL: {
-        colums    = NOTES_COLUMS;
-    } break;
-    default:
-        break;
-    };
-
-    if (colums == 0) {
-        qCritical() << "InsertData invalid parameter table:" << table;
-        return false;
-    }
 
     if (nullptr == visitor) {
         qCritical() << "Need DbVisitor parameter but is null";
@@ -180,11 +140,9 @@ bool VNoteDbManager::queryData(VNoteDbManager::DB_TABLE table, QString querySql,
     return queryOK;
 }
 
-bool VNoteDbManager::deleteData(VNoteDbManager::DB_TABLE table, const QStringList& delSql)
+bool VNoteDbManager::deleteData(const QStringList& delSql)
 {
     CHECK_DB_INIT();
-
-    Q_UNUSED(table);
 
     bool deleteOK = true;
 

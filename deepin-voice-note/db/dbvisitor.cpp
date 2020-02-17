@@ -46,12 +46,20 @@ bool FolderQryDbVisitor::visitorData()
             folder->name        = m_sqlQuery->value(VNoteFolderOper::folder_name).toString();
             folder->defaultIcon = m_sqlQuery->value(VNoteFolderOper::default_icon).toInt();
             folder->iconPath    = m_sqlQuery->value(VNoteFolderOper::icon_path).toString();
-            folder->notesCount  = m_sqlQuery->value(VNoteFolderOper::note_count).toInt();
+            folder->folder_state= m_sqlQuery->value(VNoteFolderOper::folder_state).toInt();
 
             folder->createTime  = QDateTime::fromString(
                         m_sqlQuery->value(VNoteFolderOper::create_time).toString(),VNOTE_TIME_FMT);
             folder->modifyTime  = QDateTime::fromString(
                         m_sqlQuery->value(VNoteFolderOper::modify_time).toString(),VNOTE_TIME_FMT);
+            folder->deleteTime  = QDateTime::fromString(
+                        m_sqlQuery->value(VNoteFolderOper::delete_time).toString(),VNOTE_TIME_FMT);
+
+            //************Expand fileds begin**********
+            //TODO:
+            //    Add the expand fileds parse code here
+
+            //************Expand fileds end************
 
             //Get default icon image
             folder->UI.icon = VNoteDataManager::instance()->getDefaultIcon(folder->defaultIcon);
@@ -81,26 +89,29 @@ bool NoteQryDbVisitor::visitorData()
 
             note->noteId      = m_sqlQuery->value(VNoteItemOper::note_id).toInt();
             note->folderId    = m_sqlQuery->value(VNoteItemOper::folder_id).toInt();
-            note->noteText    = m_sqlQuery->value(VNoteItemOper::note_text).toString();
             note->noteType    = m_sqlQuery->value(VNoteItemOper::note_type).toInt();
-            note->voicePath   = m_sqlQuery->value(VNoteItemOper::voice_path).toString();
-            note->voiceSize   = m_sqlQuery->value(VNoteItemOper::voice_len).toInt();
+            note->noteTitle   = m_sqlQuery->value(VNoteItemOper::note_title).toString();
+            note->noteText    = m_sqlQuery->value(VNoteItemOper::meta_data).toString();
+            note->noteState  = m_sqlQuery->value(VNoteItemOper::note_state).toInt();
 
             note->createTime  = QDateTime::fromString(
                         m_sqlQuery->value(VNoteItemOper::create_time).toString(),VNOTE_TIME_FMT);
             note->modifyTime  = QDateTime::fromString(
                         m_sqlQuery->value(VNoteItemOper::modify_time).toString(),VNOTE_TIME_FMT);
+            note->deleteTime  = QDateTime::fromString(
+                        m_sqlQuery->value(VNoteItemOper::modify_time).toString(),VNOTE_TIME_FMT);
+
+            //************Expand fileds begin**********
+            //TODO:
+            //    Add the expand fileds parse code here
+
+            //************Expand fileds end************
 
             VNOTE_ALL_NOTES_DATA_MAP::iterator it =
                     results.notes->notes.find(note->folderId);
-
-            qDebug() << (note->noteText.isEmpty() ? "May errors" : "Normal:")
-                     << "noteId << " << note->noteId
-                     << "note->folderId" << note->folderId
-                     << "note->noteText" << note->noteText
-                     << "note->noteType" << note->noteType
-                     << "note->voiceSize" << note->voiceSize
-                     << "note->createTime" << note->createTime;
+#ifdef QT_QML_DEBUG
+            qInfo() << "" << (*note);
+#endif
             //TODO
             //    If find the folder add note to it, or need create
             //folder items map first;
@@ -161,12 +172,21 @@ bool AddFolderDbVisitor::visitorData()
             results.newFolder->name        = m_sqlQuery->value(VNoteFolderOper::folder_name).toString();
             results.newFolder->defaultIcon = m_sqlQuery->value(VNoteFolderOper::default_icon).toInt();
             results.newFolder->iconPath    = m_sqlQuery->value(VNoteFolderOper::icon_path).toString();
-            results.newFolder->notesCount  = m_sqlQuery->value(VNoteFolderOper::note_count).toInt();
+            results.newFolder->folder_state= m_sqlQuery->value(VNoteFolderOper::folder_state).toInt();
 
             results.newFolder->createTime  = QDateTime::fromString(
                         m_sqlQuery->value(VNoteFolderOper::create_time).toString(),VNOTE_TIME_FMT);
             results.newFolder->modifyTime  = QDateTime::fromString(
                         m_sqlQuery->value(VNoteFolderOper::modify_time).toString(),VNOTE_TIME_FMT);
+            results.newFolder->deleteTime  = QDateTime::fromString(
+                                    m_sqlQuery->value(VNoteFolderOper::delete_time).toString(),VNOTE_TIME_FMT);
+
+            //************Expand fileds begin**********
+            //TODO:
+            //    Add the expand fileds parse code here
+
+            //************Expand fileds end************
+
             break;
         }
     }
@@ -192,15 +212,23 @@ bool AddNoteDbVisitor::visitorData()
 
             note->noteId      = m_sqlQuery->value(VNoteItemOper::note_id).toInt();
             note->folderId    = m_sqlQuery->value(VNoteItemOper::folder_id).toInt();
-            note->noteText    = m_sqlQuery->value(VNoteItemOper::note_text).toString();
             note->noteType    = m_sqlQuery->value(VNoteItemOper::note_type).toInt();
-            note->voicePath   = m_sqlQuery->value(VNoteItemOper::voice_path).toString();
-            note->voiceSize   = m_sqlQuery->value(VNoteItemOper::voice_len).toInt();
+            note->noteTitle   = m_sqlQuery->value(VNoteItemOper::note_title).toString();
+            note->noteText    = m_sqlQuery->value(VNoteItemOper::meta_data).toString();
+            note->noteState  = m_sqlQuery->value(VNoteItemOper::note_state).toInt();
 
             note->createTime  = QDateTime::fromString(
                         m_sqlQuery->value(VNoteItemOper::create_time).toString(),VNOTE_TIME_FMT);
             note->modifyTime  = QDateTime::fromString(
                         m_sqlQuery->value(VNoteItemOper::modify_time).toString(),VNOTE_TIME_FMT);
+            note->deleteTime  = QDateTime::fromString(
+                        m_sqlQuery->value(VNoteItemOper::modify_time).toString(),VNOTE_TIME_FMT);
+
+            //************Expand fileds begin**********
+            //TODO:
+            //    Add the expand fileds parse code here
+
+            //************Expand fileds end************
 
             break;
         }

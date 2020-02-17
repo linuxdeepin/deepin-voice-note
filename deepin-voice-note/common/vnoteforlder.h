@@ -18,19 +18,28 @@ public:
         INVALID_ID = -1
     };
 
+    enum State {
+        Normal,
+        Deleted,
+    };
+
     qint64  id {INVALID_ID};
     qint64  notesCount {0};
-    QString name;
     qint32  defaultIcon {0};
+    qint32  folder_state {State::Normal};
+
+    QString name;
     QString iconPath;
 
     QDateTime createTime;
     QDateTime modifyTime;
+    QDateTime deleteTime;
 
-    struct{
+    struct {
         QImage icon;
-    }UI;
+    } UI;
 
+    friend QDebug & operator << (QDebug &out, VNoteFolder &noteItem);
 protected:
     bool fIsDataLoaded {false};
 

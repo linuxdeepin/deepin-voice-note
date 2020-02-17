@@ -19,30 +19,45 @@ public:
 
     static constexpr char const *FOLDER_TABLE_NAME = "vnote_folder_tbl";
     static constexpr char const *FOLDER_KEY        = "folder_id";
-    static constexpr int         FOLDER_COLUMS     = 7;
     static constexpr char const *NOTES_TABLE_NAME = "vnote_items_tbl";
     static constexpr char const *NOTES_KEY        = "note_id";
-    static constexpr int         NOTES_COLUMS     = 8;
 
     //icon_path: Not used, maybe used in future
+    //expand_fields are place holder, will be used in future
     static constexpr char const *CREATETABLE_FMT = "\
          CREATE TABLE IF NOT EXISTS vnote_folder_tbl(\
             folder_id INTEGER PRIMARY KEY AUTOINCREMENT , \
             folder_name TEXT NOT NULL, \
             default_icon INT DEFAULT 0, \
             icon_path TEXT,\
-            note_count INT DEFAULT 0, \
+            folder_state INT DEFAULT 0, \
             create_time DATETIME NOT NULL DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f','now','localtime')), \
-            modify_time DATETEXT NOT NULL DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f','now','localtime'))); \
+            modify_time DATETEXT NOT NULL DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f','now','localtime')), \
+            delete_time DATETEXT DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f','now','localtime')), \
+            expand_filed1 INT, \
+            expand_filed2 INT, \
+            expand_filed3 INT, \
+            expand_filed4 TEXT, \
+            expand_filed5 TEXT, \
+            expand_filed6 TEXT \
+         ); \
          CREATE TABLE IF NOT EXISTS vnote_items_tbl(\
             note_id INTEGER PRIMARY KEY AUTOINCREMENT, \
             folder_id INTEGER, \
             note_type INT NOT NULL DEFAULT 0, \
-            note_text TEXT, \
-            voice_path TEXT, \
-            voice_len INT DEFAULT 0, \
+            note_title TEXT NOT NULL, \
+            meta_data TEXT, \
+            note_state INT DEFAULT 0, \
             create_time DATETIME NOT NULL DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f', 'now', 'localtime')), \
-            modify_time DATETEXT NOT NULL DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f', 'now', 'localtime')));";
+            modify_time DATETEXT NOT NULL DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f', 'now', 'localtime')), \
+            delete_time DATETEXT DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f','now','localtime')), \
+            expand_filed1 INT, \
+            expand_filed2 INT, \
+            expand_filed3 INT, \
+            expand_filed4 TEXT, \
+            expand_filed5 TEXT, \
+            expand_filed6 TEXT \
+         );";
 
     enum DB_TABLE {
         VNOTE_FOLDER_TBL,
@@ -52,12 +67,10 @@ public:
 
     QSqlDatabase& getVNoteDb();
 
-    bool insertData(DB_TABLE table,
-                    const QStringList& insertSql,
-                    DbVisitor* visitor /*out*/);
-    bool updateData(DB_TABLE table, const QStringList& updateSql);
-    bool queryData(DB_TABLE table, QString querySql, DbVisitor* visitor);
-    bool deleteData(DB_TABLE table, const QStringList& delSql);
+    bool insertData(const QStringList& insertSql, DbVisitor* visitor /*out*/);
+    bool updateData(const QStringList& updateSql);
+    bool queryData(const QString querySql, DbVisitor* visitor);
+    bool deleteData(const QStringList& delSql);
 signals:
 
 public slots:

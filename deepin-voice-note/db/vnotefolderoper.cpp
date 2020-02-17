@@ -18,9 +18,10 @@ const QStringList VNoteFolderOper::folderColumnsName = {
     "folder_name",
     "default_icon",
     "icon_path",
-    "note_count",
+    "folder_state",
     "create_time",
     "modify_time",
+    "delete_time",
 };
 
 VNoteFolderOper::VNoteFolderOper(VNoteFolder* folder)
@@ -60,8 +61,7 @@ bool VNoteFolderOper::deleteVNoteFolder(qint64 folderId)
     sqls.append(deleteFolderSql);
     sqls.append(deleteNotesSql);
 
-    if (VNoteDbManager::instance()->deleteData(VNoteDbManager::DB_TABLE::VNOTE_FOLDER_TBL
-                                               , sqls) ) {
+    if (VNoteDbManager::instance()->deleteData(sqls) ) {
         delOK = true;
         QScopedPointer<VNoteFolder> release(VNoteDataManager::instance()->delFolder(folderId));
     }
@@ -103,9 +103,7 @@ bool VNoteFolderOper::renameVNoteFolder(QString folderName)
 
         sqls.append(renameSql);
 
-        if (VNoteDbManager::instance()->updateData(
-                    VNoteDbManager::DB_TABLE::VNOTE_FOLDER_TBL
-                    ,sqls)) {
+        if (VNoteDbManager::instance()->updateData(sqls)) {
             m_folder->name       = folderName;
             m_folder->modifyTime = modifyTime;
 
@@ -133,9 +131,7 @@ VNOTE_FOLDERS_MAP *VNoteFolderOper::loadVNoteFolders()
 
     FolderQryDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), foldersMap);
 
-    if (!VNoteDbManager::instance()->queryData(
-                VNoteDbManager::DB_TABLE::VNOTE_FOLDER_TBL
-                , querySql, &folderVisitor) ) {
+    if (!VNoteDbManager::instance()->queryData(querySql, &folderVisitor) ) {
       qCritical() << "Query faild!";
     }
 
@@ -173,10 +169,7 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
     AddFolderDbVisitor addFolderVisitor(VNoteDbManager::instance()->getVNoteDb(), newFolder);
 
 
-    if (VNoteDbManager::instance()->insertData(
-                VNoteDbManager::DB_TABLE::VNOTE_FOLDER_TBL
-                , sqls
-                , &addFolderVisitor) ) {
+    if (VNoteDbManager::instance()->insertData(sqls, &addFolderVisitor) ) {
 
         //TODO:
         //    DbVisitor can update any feilds here  db return all feilds
@@ -231,9 +224,7 @@ QString VNoteFolderOper::getDefaultFolderName()
     int foldersCount = 0;
     CountDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), &foldersCount);
 
-    if (VNoteDbManager::instance()->queryData(
-                VNoteDbManager::DB_TABLE::VNOTE_FOLDER_TBL
-                , querySql, &folderVisitor) ) {
+    if (VNoteDbManager::instance()->queryData(querySql, &folderVisitor) ) {
         if (foldersCount > 0) {
             defaultFolderName += QString("%1").arg(foldersCount+1);
         } else {

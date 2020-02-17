@@ -31,11 +31,12 @@ protected:
         note_id = 0,
         folder_id,
         note_type,
-        note_text,
-        voice_path,
-        voice_len,
+        note_title,
+        meta_data,
+        note_state,
         create_time,
         modify_time,
+        delete_time,
     };
 
     friend class NoteQryDbVisitor;
