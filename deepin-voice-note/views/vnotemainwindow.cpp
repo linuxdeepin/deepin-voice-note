@@ -162,6 +162,7 @@ void VNoteMainWindow::initTitleBar()
     // Add logo
     titlebar()->setIcon(QIcon::fromTheme(DEEPIN_VOICE_NOTE));
 
+#ifdef TITLE_ACITON_PANEL
     //Add action buttons
     m_actionPanel = new QWidget(this);
 
@@ -176,12 +177,13 @@ void VNoteMainWindow::initTitleBar()
     actionPanelLayout->addWidget(m_addNewNoteBtn, Qt::AlignLeft);
 
     titlebar()->addWidget(m_actionPanel, Qt::AlignLeft);
+#endif
     // Search note
     m_noteSearchEdit = new DSearchEdit(this);
     DFontSizeManager::instance()->bind(m_noteSearchEdit, DFontSizeManager::T6);
     m_noteSearchEdit->setFixedSize(QSize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H));
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
-    titlebar()->addWidget(m_noteSearchEdit, Qt::AlignRight);
+    titlebar()->addWidget(m_noteSearchEdit);
     m_returnBtn = new DIconButton(DStyle::SP_ArrowLeave, this);
     m_returnBtn->setFixedSize(QSize(36, 36));
     m_returnBtn->setVisible(false);
@@ -227,7 +229,7 @@ void VNoteMainWindow::initLeftView()
     m_floatingAddNotepadBtn = new DPushButton(
                 DApplication::translate("VNoteMainWindow", "Add Notepad"),
                 m_leftViewHolder);
-    m_floatingAddNotepadBtn->setFixedSize(VNOTE_LEFTVIEW_W -40, 42);
+    m_floatingAddNotepadBtn->setFixedSize(VNOTE_LEFTVIEW_W -20, 38);
 //    m_floatingAddNotepadBtn->setFlat(true);
 //    m_floatingAddNotepadBtn->setIconSize(QSize(68, 68));
     m_floatingAddNotepadBtn->raise();
@@ -235,8 +237,8 @@ void VNoteMainWindow::initLeftView()
     DAnchorsBase buttonAnchor(m_floatingAddNotepadBtn);
     buttonAnchor.setAnchor(Qt::AnchorLeft, m_leftView, Qt::AnchorLeft);
     buttonAnchor.setAnchor(Qt::AnchorBottom, m_leftView, Qt::AnchorBottom);
-    buttonAnchor.setBottomMargin(20);
-    buttonAnchor.setLeftMargin(20);
+    buttonAnchor.setBottomMargin(10);
+    buttonAnchor.setLeftMargin(10);
 
     // ToDo:
     //    Add Left view widget here
@@ -283,7 +285,7 @@ void VNoteMainWindow::initMiddleView()
     DAnchorsBase buttonAnchor(m_floatingAddNoteBtn);
     buttonAnchor.setAnchor(Qt::AnchorLeft, m_middleView, Qt::AnchorLeft);
     buttonAnchor.setAnchor(Qt::AnchorBottom, m_middleView, Qt::AnchorBottom);
-    buttonAnchor.setBottomMargin(10);
+    buttonAnchor.setBottomMargin(5);
     buttonAnchor.setLeftMargin(97);
 
     // ToDo:

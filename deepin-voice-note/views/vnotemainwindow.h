@@ -93,10 +93,11 @@ private:
     DSearchEdit *m_noteSearchEdit {nullptr};
     DIconButton *m_returnBtn {nullptr};
 
+#ifdef TITLE_ACITON_PANEL
     //titlebar actions
     QWidget     *m_actionPanel {nullptr};
     DIconButton *m_addNewNoteBtn {nullptr};
-
+#endif
     DPushButton     *m_floatingAddNotepadBtn {nullptr};
     VNoteIconButton *m_floatingAddNoteBtn {nullptr};
     QWidget         *m_leftViewHolder {nullptr};
