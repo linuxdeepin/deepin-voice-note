@@ -221,25 +221,9 @@ void VNoteMainWindow::initLeftView()
     m_leftView = new LeftView(m_leftViewHolder);
 
     m_leftView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    m_leftView->setFrameShape(QFrame::NoFrame);
     m_leftView->setBackgroundRole(DPalette::Base);
     m_leftView->setAutoFillBackground(true);
-    m_leftView->setContentsMargins(0, 5, 0, 0);
-
-    m_floatingAddNotepadBtn = new DPushButton(
-                DApplication::translate("VNoteMainWindow", "Add Notepad"),
-                m_leftViewHolder);
-    m_floatingAddNotepadBtn->setFixedSize(VNOTE_LEFTVIEW_W -20, 38);
-//    m_floatingAddNotepadBtn->setFlat(true);
-//    m_floatingAddNotepadBtn->setIconSize(QSize(68, 68));
-    m_floatingAddNotepadBtn->raise();
-
-    DAnchorsBase buttonAnchor(m_floatingAddNotepadBtn);
-    buttonAnchor.setAnchor(Qt::AnchorLeft, m_leftView, Qt::AnchorLeft);
-    buttonAnchor.setAnchor(Qt::AnchorBottom, m_leftView, Qt::AnchorBottom);
-    buttonAnchor.setBottomMargin(10);
-    buttonAnchor.setLeftMargin(10);
-
+    m_leftView->setContentsMargins(0, 0, 0, 0);
     // ToDo:
     //    Add Left view widget here
 

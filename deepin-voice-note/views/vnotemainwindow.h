@@ -98,7 +98,6 @@ private:
     QWidget     *m_actionPanel {nullptr};
     DIconButton *m_addNewNoteBtn {nullptr};
 #endif
-    DPushButton     *m_floatingAddNotepadBtn {nullptr};
     VNoteIconButton *m_floatingAddNoteBtn {nullptr};
     QWidget         *m_leftViewHolder {nullptr};
     QWidget         *m_middleViewHolder {nullptr};

@@ -42,7 +42,9 @@ SOURCES += \
     common/vnotea2tmanager.cpp \
     common/vnoteaudiodevicewatcher.cpp \
     views/homepage.cpp \
-    views/leftview.cpp
+    views/leftview.cpp \
+    views/folderdelegate.cpp \
+    views/foldertree.cpp
 
 RESOURCES += \
     images.qrc
@@ -82,7 +84,9 @@ HEADERS += \
     common/vnotea2tmanager.h \
     common/vnoteaudiodevicewatcher.h \
     views/homepage.h \
-    views/leftview.h
+    views/leftview.h \
+    views/folderdelegate.h \
+    views/foldertree.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts
