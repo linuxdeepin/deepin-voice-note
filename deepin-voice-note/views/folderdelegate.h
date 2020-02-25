@@ -1,9 +1,10 @@
 #ifndef FolderDelegate_H
 #define FolderDelegate_H
-#include <QImage>
 
 #include <DStyledItemDelegate>
 DWIDGET_USE_NAMESPACE
+
+class FolderTree;
 
 class FolderDelegate : public DStyledItemDelegate
 {
@@ -13,10 +14,10 @@ public:
         NOTEITEM, //记事本项
         ERRORTYPE
     };
-    FolderDelegate(QAbstractItemView *parent = nullptr);
-    ItemType getItemType(const QModelIndex &index) const;
+    FolderDelegate(FolderTree *parent = nullptr);
 public slots:
     void handleChangeTheme();
+
 protected:
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
                const QModelIndex &index) const Q_DECL_OVERRIDE;
@@ -31,12 +32,11 @@ protected:
                               const QModelIndex &index) const override;
 private:
     void init();
-    void initNoteRoot();
     void paintNoteRoot(QPainter *painter, const QStyleOptionViewItem &option,
                        const QModelIndex &index) const;
     void paintNoteItem(QPainter *painter, const QStyleOptionViewItem &option,
                        const QModelIndex &index) const;
-    QAbstractItemView *m_parentView {nullptr};
+    FolderTree *m_treeView {nullptr};
     DPalette m_parentPb;
 };
 

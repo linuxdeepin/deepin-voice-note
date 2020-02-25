@@ -1,37 +1,31 @@
 #include "folderdelegate.h"
+#include "foldertree.h"
+#include "common/vnoteforlder.h"
 
 #include <QPainter>
-#include <QDebug>
+#include <QLineEdit>
 
 #include <DApplication>
 #include <DApplicationHelper>
-#include <QLineEdit>
 
-static QImage textImage;
-
-FolderDelegate::FolderDelegate(QAbstractItemView *parent)
+FolderDelegate::FolderDelegate(FolderTree *parent)
     : DStyledItemDelegate(parent)
-    , m_parentView(parent)
+    , m_treeView(parent)
 {
     init();
-    textImage = QImage(":/icons/deepin/builtin/default_folder_icons/1.svg");
 }
 void FolderDelegate::init()
 {
-    m_parentPb = DApplicationHelper::instance()->palette(m_parentView);
+    m_parentPb = DApplicationHelper::instance()->palette(m_treeView);
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &FolderDelegate::handleChangeTheme);
-    initNoteRoot();
-}
-
-void FolderDelegate::initNoteRoot()
-{
-    ;
 }
 
 QWidget *FolderDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                                       const QModelIndex &index) const
 {
+    Q_UNUSED(index)
+    Q_UNUSED(option)
     QLineEdit *editBox = new QLineEdit(parent);
     editBox->setFixedSize(171, 30);
     return  editBox;
@@ -39,13 +33,19 @@ QWidget *FolderDelegate::createEditor(QWidget *parent, const QStyleOptionViewIte
 
 void FolderDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    return;
+    QVariant var = index.data(Qt::UserRole + 2);
+    VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
+    QLineEdit *edit = static_cast<QLineEdit *>(editor);
+    edit->setText(data->name);
 }
 
 void FolderDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                   const QModelIndex &index) const
 {
-    return;
+    Q_UNUSED(model);
+     QLineEdit *edit = static_cast<QLineEdit *>(editor);
+     QString text = edit->displayText();
+     m_treeView->itemEditFinsh(index,text);
 }
 
 void FolderDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
@@ -53,35 +53,23 @@ void FolderDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionVie
 {
     Q_UNUSED(index)
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
-    edit->move(option.rect.x() + 5, option.rect.y() + 13);
-}
-
-FolderDelegate::ItemType FolderDelegate::getItemType(const QModelIndex &index) const
-{
-    if (index.isValid()) {
-        QVariant var = index.data(Qt::UserRole + 1);
-        int value = var.toInt();
-        if (value < ERRORTYPE) {
-            return static_cast<FolderDelegate::ItemType>(value);
-        }
-    }
-    return ERRORTYPE;
+    edit->move(option.rect.x() + 15, option.rect.y() + 8);
 }
 
 void FolderDelegate::handleChangeTheme()
 {
-    m_parentPb = DApplicationHelper::instance()->palette(m_parentView);
-    m_parentView->update(m_parentView->currentIndex());
+    m_parentPb = DApplicationHelper::instance()->palette(m_treeView);
+    m_treeView->update(m_treeView->currentIndex());
 }
 
 QSize FolderDelegate::sizeHint(const QStyleOptionViewItem &option,
                                const QModelIndex &index) const
 {
-    FolderDelegate::ItemType type = getItemType(index);
+    FolderTree::ItemType type = m_treeView->getItemType(index);
     switch (type) {
-    case NOTEROOT:
+    case FolderTree::NOTEPADROOT:
         return  QSize(option.rect.width(), 1); //隐藏记事本一级目录
-    case NOTEITEM:
+    case FolderTree::NOTEPADITEM:
         return  QSize(option.rect.width(), 47);
     default:
         return DStyledItemDelegate::sizeHint(option, index);
@@ -91,11 +79,11 @@ QSize FolderDelegate::sizeHint(const QStyleOptionViewItem &option,
 void FolderDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                            const QModelIndex &index) const
 {
-    FolderDelegate::ItemType type = getItemType(index);
+    FolderTree::ItemType type = m_treeView->getItemType(index);
     switch (type) {
-    case NOTEROOT:
+    case FolderTree::NOTEPADROOT:
         return  paintNoteRoot(painter, option, index);
-    case NOTEITEM:
+    case FolderTree::NOTEPADITEM:
         return  paintNoteItem(painter, option, index);
     default:
         return DStyledItemDelegate::paint(painter, option, index);
@@ -105,21 +93,22 @@ void FolderDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
 void FolderDelegate::paintNoteRoot(QPainter *painter, const QStyleOptionViewItem &option,
                                    const QModelIndex &index) const
 {
-    return;
+    Q_UNUSED(painter)
+    Q_UNUSED(index)
+    Q_UNUSED(option)
 }
 
 void FolderDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewItem &option,
                                    const QModelIndex &index) const
 {
-    if(!index.isValid()){
+    if (!index.isValid()) {
         return;
     }
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing, true);
     painter->setRenderHints(QPainter::SmoothPixmapTransform);
-    QRect paintRect = option.rect;
-    paintRect.setTop(paintRect.top() + 10); //item间隔
-    paintRect.setRight(paintRect.right() - 10);
+    QRect paintRect(option.rect.x() + 10, option.rect.y() + 5,
+                    option.rect.width() - 20, option.rect.height() - 10);
     QPainterPath path;
     const int radius = 8;
     path.moveTo(paintRect.bottomRight() - QPoint(0, radius));
@@ -160,16 +149,22 @@ void FolderDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewItem
             }
         }
     }
-    QFontMetrics fontMetrics = painter->fontMetrics();
-    QString strNum = QString::number(20);
-    int numWidth = fontMetrics.width(strNum);
-    int iconSpace = (paintRect.height() - 24) / 2;
-    QRect iconRect(paintRect.left() + 11, paintRect.top() + iconSpace, 24, 24);
-    QRect numRect(paintRect.right() - numWidth - 7, paintRect.top(), numWidth, paintRect.height());
-    QRect nameRect(iconRect.right() + 12, paintRect.top(), numRect.left() - iconRect.right() - 12, paintRect.height());
-    painter->drawText(numRect, Qt::AlignRight | Qt::AlignVCenter, strNum);
-    painter->drawImage(iconRect, textImage);
-    painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, QString("记事本１"));
+    QVariant var = index.data(Qt::UserRole + 2);
+    VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
+    if (data != nullptr) {
+        QFontMetrics fontMetrics = painter->fontMetrics();
+        QString strNum = QString::number(data->notesCount);
+        int numWidth = fontMetrics.width(strNum);
+        int iconSpace = (paintRect.height() - 24) / 2;
+        QRect iconRect(paintRect.left() + 11, paintRect.top() + iconSpace, 24, 24);
+        QRect numRect(paintRect.right() - numWidth - 7, paintRect.top(), numWidth, paintRect.height());
+        QRect nameRect(iconRect.right() + 12, paintRect.top(),
+                       numRect.left() - iconRect.right() - 15, paintRect.height());
+        painter->drawText(numRect, Qt::AlignRight | Qt::AlignVCenter, strNum);
+        painter->drawImage(iconRect, data->UI.icon);
+        QString elideText = fontMetrics.elidedText(data->name,Qt::ElideRight, nameRect.width());
+        painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
+    }
     painter->restore();
 }
 

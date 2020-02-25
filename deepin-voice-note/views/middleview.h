@@ -1,66 +1,41 @@
 #ifndef MIDDLEVIEW_H
 #define MIDDLEVIEW_H
-#include "middleviewdelegate.h"
-#include "middleviewsortfiltermodel.h"
 
-#include "common/vnoteforlder.h"
-#include "db/vnotefolderoper.h"
-#include "dialog/vnotemessagedialog.h"
-
-#include <DListView>
-#include <DMenu>
-#include <DPushButton>
+#include <DWidget>
+#include <DLabel>
+#include <DStackedWidget>
 
 DWIDGET_USE_NAMESPACE
-class MiddleView : public DListView
+class VNoteIconButton;
+class NoteListView;
+struct VNoteFolder;
+struct VNoteItem;
+
+class MiddleView : public DWidget
 {
     Q_OBJECT
 public:
     MiddleView(QWidget *parent = nullptr);
-    qint64 getFolderId(const QModelIndex &index);
-
-    void sortView(LeftViewSortFilterModel::OperaType Type = LeftViewSortFilterModel::none, Qt::SortOrder order = Qt::AscendingOrder);
-    void setCreateTimeFilter(const QDateTime &begin, const QDateTime &end, QList<qint64> *whilteList = nullptr);
-    void setUpdateTimeFilter(const QDateTime &begin, const QDateTime &end, QList<qint64> *whilteList = nullptr);
-    void setFolderNameFilter(const QRegExp &searchKey, QList<qint64> *whilteList = nullptr);
-    void clearFilter();
-    void removeFromWhiteList(qint64 id);
-    void setFolderEnable(bool enable);
-
-    int loadNoteFolder();
-    int getFolderCount();
-
-public slots:
-    void handleAddFolder();
-    void handleRenameItem(bool);
-    void handleDeleteItem(bool);
-    void handleFolderRename(VNoteFolder *data);
-
+    void initNoteData(VNoteFolder * notepad,const QRegExp& searchKey);
+    void        clearNoteData();
+    VNoteItem*  getNoteData(const QModelIndex &index) const;
 signals:
-    void sigFolderAdd(VNoteFolder *data);
-    void sigFolderDel(VNoteFolder *data);
-    void sigFolderUpdate(VNoteFolder *data);
-
-private:
-    void initMenuAction();
-    void initConnection();
-    void initDelegate();
-    void initModel();
-
+    void sigNotepadItemChange(const QModelIndex &index);
+public slots:
+    void onAddNote();
+    void onRenameItem();
+    void onDeleteItem();
+    void onNoteChange(const QModelIndex &previous);
 protected:
     void mousePressEvent(QMouseEvent *event);
-
 private:
-    DMenu *m_contextMenu;
-    QAction *m_renameAction;
-    QAction *m_delAction;
-
-    QStandardItemModel *m_pDataModel;
-    LeftViewSortFilterModel *m_pSortFilterModel;
-    LeftViewDelegate *m_pItemDelegate;
-
-    QRegExp m_searchKey;
-    VNoteMessageDialog *m_delDialog {nullptr};
+    void initUi();
+    void initConnection();
+    NoteListView *m_noteListView {nullptr};
+    VNoteIconButton *m_addNoteBtn{nullptr};
+    VNoteFolder *m_notepad {nullptr};
+    DLabel *m_noSearchResultLab {nullptr};
+    DStackedWidget *m_centerWidget {nullptr};
 };
 
 #endif // MIDDLEVIEW_H

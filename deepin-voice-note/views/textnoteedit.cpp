@@ -4,7 +4,6 @@
 #include <QWheelEvent>
 #include <QTextBlock>
 #include <QAbstractTextDocumentLayout>
-
 #include <DApplicationHelper>
 #include <DLog>
 

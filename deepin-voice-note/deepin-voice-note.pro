@@ -44,7 +44,9 @@ SOURCES += \
     views/homepage.cpp \
     views/leftview.cpp \
     views/folderdelegate.cpp \
-    views/foldertree.cpp
+    views/foldertree.cpp \
+    views/noteitemdelegate.cpp \
+    views/notelistview.cpp
 
 RESOURCES += \
     images.qrc
@@ -86,7 +88,9 @@ HEADERS += \
     views/homepage.h \
     views/leftview.h \
     views/folderdelegate.h \
-    views/foldertree.h
+    views/foldertree.h \
+    views/noteitemdelegate.h \
+    views/notelistview.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts

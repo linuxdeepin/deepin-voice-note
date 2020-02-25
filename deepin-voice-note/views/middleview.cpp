@@ -1,224 +1,151 @@
 #include "middleview.h"
+#include "notelistview.h"
+#include "widgets/vnoteiconbutton.h"
+
 #include "common/utils.h"
 #include "common/vnotedatamanager.h"
+#include "common/vnoteitem.h"
+#include "common/vnoteforlder.h"
+#include "db/vnoteitemoper.h"
 
 #include <QMouseEvent>
+#include <QVBoxLayout>
 
 #include <DLog>
+#include <DMenu>
+#include <DAnchors>
 
 MiddleView::MiddleView(QWidget *parent)
-    : DListView(parent)
+    : DWidget(parent)
 {
-    initMenuAction();
-    initModel();
-    initDelegate();
+    initUi();
     initConnection();
-}
-
-void MiddleView::initMenuAction()
-{
-    m_contextMenu = new DMenu(this);
-    m_renameAction = new QAction(DApplication::translate("MiddleView","Rename"), this);
-    m_delAction = new QAction(DApplication::translate("MiddleView","Delete"), this);
-    m_contextMenu->addAction(m_renameAction);
-    m_contextMenu->addAction(m_delAction);
-    m_delDialog = new VNoteMessageDialog(VNoteMessageDialog::DeleteFolder,this);
-}
-
-void MiddleView::initModel()
-{
-    m_pDataModel = new QStandardItemModel(this);
-    m_pSortFilterModel = new LeftViewSortFilterModel(this);
-    m_pSortFilterModel->setSourceModel(m_pDataModel);
-    this->setModel(m_pSortFilterModel);
-}
-
-void MiddleView::initDelegate()
-{
-    m_pItemDelegate = new LeftViewDelegate(this);
-    this->setItemDelegate(m_pItemDelegate);
 }
 
 void MiddleView::initConnection()
 {
-    connect(m_renameAction, &QAction::triggered, this, &MiddleView::handleRenameItem);
-    connect(m_delAction, &QAction::triggered, this, &MiddleView::handleDeleteItem);
-    connect(m_pItemDelegate, &LeftViewDelegate::sigFolderRename, this,
-            &MiddleView::handleFolderRename);
+    connect(m_addNoteBtn, &VNoteIconButton::clicked, this, &MiddleView::onAddNote);
+    connect(m_noteListView, SIGNAL(currentChanged(const QModelIndex &)),
+            this,SLOT(onNoteChange(const QModelIndex &)));
 }
 
 void MiddleView::mousePressEvent(QMouseEvent *event)
 {
-    DListView::mouseMoveEvent(event);
-    if ((event->button() == Qt::RightButton) && (this->count() > 0)) {
-        QPoint pos = mapToParent(event->pos());
-        QModelIndex index = this->indexAt(pos);
-        if (index.isValid()) {
-            this->setCurrentIndex(index);
-            m_contextMenu->exec(event->globalPos());
+    DWidget::mouseMoveEvent(event);
+}
+
+void MiddleView::initUi()
+{
+    m_noteListView = new NoteListView(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout;;
+    m_noSearchResultLab = new DLabel(this);
+    m_noSearchResultLab->setText(DApplication::translate("MiddleView","No search results"));
+    m_noSearchResultLab->setAlignment(Qt::AlignCenter);
+    DFontSizeManager::instance()->bind(m_noSearchResultLab, DFontSizeManager::T4);
+    m_noSearchResultLab->setForegroundRole(DPalette::TextTips);
+    m_noSearchResultLab->setVisible(false);
+    m_centerWidget = new DStackedWidget(this);
+    m_centerWidget->addWidget(m_noteListView);
+    m_centerWidget->addWidget(m_noSearchResultLab);
+    m_centerWidget->setContentsMargins(0,0,0,0);
+    m_centerWidget->setCurrentWidget(m_noteListView);
+    mainLayout->setContentsMargins(0, 5, 0, 0);
+    mainLayout->addWidget(m_centerWidget);
+
+    m_addNoteBtn = new VNoteIconButton(
+        this,
+        "add_note_normal.svg",
+        "add_note_hover.svg",
+        "add_note_press.svg"
+    );
+    m_addNoteBtn->SetDisableIcon("add_note_disabled.svg");
+    m_addNoteBtn->setFlat(true);
+    m_addNoteBtn->setIconSize(QSize(68, 68));
+    m_addNoteBtn->raise();
+
+    DAnchorsBase buttonAnchor(m_addNoteBtn);
+    buttonAnchor.setAnchor(Qt::AnchorLeft, this, Qt::AnchorLeft);
+    buttonAnchor.setAnchor(Qt::AnchorBottom, this, Qt::AnchorBottom);
+    buttonAnchor.setBottomMargin(5);
+    buttonAnchor.setLeftMargin(97);
+    this->setLayout(mainLayout);
+}
+
+void MiddleView::onRenameItem()
+{
+    m_noteListView->edit(m_noteListView->currentIndex());
+}
+
+void MiddleView::onDeleteItem()
+{
+    m_noteListView->removeCurItem();
+}
+
+void MiddleView::onAddNote()
+{
+    if (m_notepad) {
+        VNoteItem tmpNote;
+        tmpNote.folderId = m_notepad->id;
+        tmpNote.noteType = VNoteItem::VNT_Text;
+        tmpNote.noteText = QString("");
+        tmpNote.noteTitle = "新笔记１";
+        VNoteItemOper noteOper;
+        VNoteItem *newNote = noteOper.addNote(tmpNote);
+        if(newNote){
+           const QStandardItem *item = m_noteListView->addNoteItem(newNote);
+           if(item){
+               m_noteListView->setCurrentIndex(item->index());
+           }
         }
     }
 }
 
-void MiddleView::handleRenameItem(bool)
+void MiddleView::initNoteData(VNoteFolder *notepad, const QRegExp &searchKey)
 {
-    this->edit(this->currentIndex());
-}
-
-void MiddleView::handleFolderRename(VNoteFolder *data)
-{
-    VNoteFolderOper folderOper(data);
-    folderOper.renameVNoteFolder(data->name);
-    this->update(this->currentIndex());
-    emit sigFolderUpdate(data);
-}
-
-void MiddleView::handleDeleteItem(bool)
-{
-    if(m_delDialog->exec() == QDialog::Accepted){
-        QModelIndex index = this->currentIndex();
-        QVariant var = index.data(Qt::UserRole + 1);
-        if (var.isValid()) {
-            VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
-            m_pSortFilterModel->removeRow(index.row());
-            emit sigFolderDel(data);
-        }
-    }
-}
-
-void MiddleView::handleAddFolder()
-{
-    VNoteFolderOper folderOper;
-
-    VNoteFolder itemData;
-    itemData.defaultIcon = folderOper.getDefaultIcon();
-    itemData.UI.icon = folderOper.getDefaultIcon(itemData.defaultIcon);
-    itemData.name = folderOper.getDefaultFolderName();
-
-    VNoteFolder *newFolder = folderOper.addFolder(itemData);
-
-    if (nullptr != newFolder) {
-        QStandardItem *pItem = new QStandardItem;
-        pItem->setData(QVariant::fromValue(static_cast<void *>(newFolder)), Qt::UserRole + 1);
-        m_pDataModel->insertRow(0, pItem);
-
-        QModelIndex index = m_pSortFilterModel->index(0, 0);
-        this->setCurrentIndex(index);
-        this->edit(index);
-//        emit sigFolderAdd(newFolder);
+    m_notepad = notepad;
+    VNoteItemOper noteOper;
+    if (searchKey.isEmpty()) {
+        VNOTE_ITEMS_MAP *datafolderNotes = noteOper.getFolderNotes(m_notepad->id);
+        m_noteListView->initNoteData(datafolderNotes, searchKey);
+        m_addNoteBtn->setVisible(true);
+        m_centerWidget->setCurrentWidget(m_noteListView);
     } else {
-        qCritical() << __FUNCTION__ << "Add new folder failed:" << itemData.name;
-    }
-}
-
-void MiddleView::sortView(LeftViewSortFilterModel::OperaType Type, Qt::SortOrder order)
-{
-    m_pSortFilterModel->sortView(Type, 0, order);
-    QModelIndex index = m_pSortFilterModel->index(0, 0);
-    if (index.isValid()) {
-        this->setCurrentIndex(index);
-    }
-}
-
-void MiddleView::setCreateTimeFilter(const QDateTime &begin, const QDateTime &end,
-                                   QList<qint64> *whilteList)
-{
-    m_pSortFilterModel->setCreateTimeFilter(begin, end, whilteList);
-    QModelIndex nowIndex = m_pSortFilterModel->index(0, 0);
-    this->reset();
-    this->setCurrentIndex(nowIndex);
-}
-
-void MiddleView::setUpdateTimeFilter(const QDateTime &begin, const QDateTime &end,
-                                   QList<qint64> *whilteList)
-{
-    m_pSortFilterModel->setModifyTimeFilter(begin, end, whilteList);
-    QModelIndex nowIndex = m_pSortFilterModel->index(0, 0);
-    this->reset();
-    this->setCurrentIndex(nowIndex);
-}
-
-void MiddleView::setFolderNameFilter(const QRegExp &searchKey, QList<qint64> *whilteList)
-{
-    if(!searchKey.isEmpty() && m_searchKey != searchKey){
-        m_pSortFilterModel->setFolderNameFilter(searchKey, whilteList);
-        m_pItemDelegate->updateSearchKeyword(searchKey);
-        QModelIndex nowIndex = m_pSortFilterModel->index(0, 0);
-        this->reset();
-        this->setCurrentIndex(nowIndex);
-        m_searchKey = searchKey;
-    }
-}
-
-void MiddleView::clearFilter()
-{
-    if(!m_searchKey.isEmpty()){
-        m_pSortFilterModel->clearFilter();
-        m_pItemDelegate->resetKeyword();
-        this->reset();
-        QModelIndex index = m_pSortFilterModel->index(0, 0);
-        this->setCurrentIndex(index);
-        m_searchKey = QRegExp();
-    }
-}
-
-int MiddleView::loadNoteFolder()
-{
-    VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
-    if (folders != nullptr) {
-        // Need lock readlock when read data
-        folders->lock.lockForRead();
-
-        for (auto &it : folders->folders) {
-            QStandardItem *pItem = new QStandardItem;
-            pItem->setData(QVariant::fromValue(static_cast<void *>(it)), Qt::UserRole + 1);
-            m_pDataModel->appendRow(pItem);
+        VNOTE_ALL_NOTES_MAP *noteAll = VNoteDataManager::instance()->getAllNotesInFolder();
+        if (noteAll) {
+            VNOTE_ITEMS_MAP searchNoteData;
+            noteAll->lock.lockForRead();
+            for (auto &it1 : noteAll->notes) {
+                for (auto &it2 : it1->folderNotes) {
+                    if (it2->noteTitle.contains(searchKey)
+                            || it2->noteText.contains(searchKey)) {
+                        searchNoteData.folderNotes.insert(it2->noteId, it2);
+                    }
+                }
+            }
+            noteAll->lock.unlock();
+            m_noteListView->initNoteData(&searchNoteData, searchKey);
+            m_addNoteBtn->setVisible(false);
+            if(searchNoteData.folderNotes.size()){
+                m_centerWidget->setCurrentWidget(m_noteListView);
+            }else {
+                m_centerWidget->setCurrentWidget(m_noSearchResultLab);
+            }
         }
-        int count = folders->folders.size();
-        folders->lock.unlock();
-
-        sortView(LeftViewSortFilterModel::OperaType::createTime, Qt::DescendingOrder);
-
-        QModelIndex index = m_pSortFilterModel->index(0, 0);
-        this->setCurrentIndex(index);
-        return count;
-    }
-    return 0;
-}
-
-qint64 MiddleView::getFolderId(const QModelIndex &index)
-{
-    if (index.isValid()) {
-        QVariant var = index.data(Qt::UserRole + 1);
-        VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
-        return data == nullptr ? -1 : data->id;
-    }
-    return -1;
-}
-
-int MiddleView::getFolderCount()
-{
-    int count = 0;
-    VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
-    if (folders) {
-        folders->lock.lockForRead();
-        count = folders->folders.size();
-        folders->lock.unlock();
-    }
-    return count;
-}
-
-void MiddleView::removeFromWhiteList(qint64 id)
-{
-    if(m_pSortFilterModel->removeFromWhiteList(id)){
-        QModelIndex nowIndex = m_pSortFilterModel->index(0, 0);
-        this->reset();
-        this->setCurrentIndex(nowIndex);
     }
 }
 
-void MiddleView::setFolderEnable(bool enable)
+void MiddleView::onNoteChange(const QModelIndex &previous)
 {
-    m_pItemDelegate->setItemEnable(enable);
-    this->setEnabled(enable);
+    Q_UNUSED(previous);
+    emit sigNotepadItemChange(m_noteListView->currentIndex());
 }
+
+ VNoteItem* MiddleView::getNoteData(const QModelIndex &index) const
+ {
+     return  m_noteListView->getItemData(index);
+ }
+
+ void MiddleView::clearNoteData()
+ {
+     return m_noteListView->clearAllItems();
+ }

@@ -70,7 +70,7 @@ signals:
 
 public slots:
     void onVNoteFoldersLoaded();
-    void onVNoteFolderChange(const QModelIndex &previous);
+    void onVNoteFolderChange(const QModelIndex &index);
     void onVNoteSearch();
     void onVNoteFolderDel(VNoteFolder *data);
     void onVNoteFolderAdd();
@@ -98,9 +98,7 @@ private:
     QWidget     *m_actionPanel {nullptr};
     DIconButton *m_addNewNoteBtn {nullptr};
 #endif
-    VNoteIconButton *m_floatingAddNoteBtn {nullptr};
-    QWidget         *m_leftViewHolder {nullptr};
-    QWidget         *m_middleViewHolder {nullptr};
+
     QWidget         *m_rightViewHolder {nullptr};
     QWidget         *m_rightNoteArea {nullptr};
 
@@ -130,6 +128,7 @@ private:
     QScopedPointer<QShortcut> m_stPreviewShortcuts;
     DFloatingMessage *m_asrErrMeassage {nullptr};
     DPushButton     *m_asrAgainBtn {nullptr};
+    QRegExp          m_searchKey;
 };
 
 #endif // VNOTEMAINWINDOW_H

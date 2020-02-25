@@ -13,10 +13,12 @@ class LeftView : public DWidget
 public:
     explicit LeftView(QWidget *parent = nullptr);
     void clearTreeSelection();
-
+    void updateCurFolder();
+    void selectDefaultItem();
+    int loadNoteFolder();
+    VNoteFolder *getNotepadItemData(const QModelIndex &index) const;
 signals:
-    void sigNotepadAdd();
-    void sigModeIndexChange(const QModelIndex &index, int type);
+    void sigFolderChange(const QModelIndex &index);
 
 public slots:
     void onAddNotepad();
