@@ -2,15 +2,18 @@
 #define DATATYPEDEF_H
 
 #include <QMap>
+#include <QVector>
 #include <QReadWriteLock>
 
 struct VNoteFolder;
 struct VNoteItem;
+struct VNoteBlock;
 struct VNOTE_ITEMS_MAP;
 
 typedef QMap<qint64,VNoteFolder*> VNOTE_FOLDERS_DATA_MAP;
 typedef QMap<qint64,VNoteItem*>   VNOTE_ITEMS_DATA_MAP;
 typedef QMap<qint64, VNOTE_ITEMS_MAP*> VNOTE_ALL_NOTES_DATA_MAP;
+typedef QVector<VNoteBlock*> VNoteDatas;
 
 struct VNOTE_FOLDERS_MAP {
     ~VNOTE_FOLDERS_MAP();

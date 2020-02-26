@@ -46,7 +46,8 @@ SOURCES += \
     views/folderdelegate.cpp \
     views/foldertree.cpp \
     views/noteitemdelegate.cpp \
-    views/notelistview.cpp
+    views/notelistview.cpp \
+    common/metadataparser.cpp
 
 RESOURCES += \
     images.qrc
@@ -90,7 +91,8 @@ HEADERS += \
     views/folderdelegate.h \
     views/foldertree.h \
     views/noteitemdelegate.h \
-    views/notelistview.h
+    views/notelistview.h \
+    common/metadataparser.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts

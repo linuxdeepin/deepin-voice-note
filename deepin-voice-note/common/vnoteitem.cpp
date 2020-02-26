@@ -29,6 +29,13 @@ void VNoteItem::delVoiceFile()
     }
 }
 
+bool VNoteItem::makeMetaData()
+{
+    bool isMetaDataOk = false;
+
+    return isMetaDataOk;
+}
+
 QDebug& operator << (QDebug &out, VNoteItem &noteItem)
 {
     out << "\n{ "
@@ -52,4 +59,26 @@ VNoteItemWidget::VNoteItemWidget(QWidget *parent)
     : DWidget(parent)
 {
     ;
+}
+
+VNoteBlock::VNoteBlock(qint32 type)
+    :blockType(type)
+{
+    ptrBlock = this;
+}
+
+qint32 VNoteBlock::getType()
+{
+    return blockType;
+}
+
+VNTextBlock::VNTextBlock()
+    :VNoteBlock(Text)
+{
+}
+
+VNVoiceBlock::VNVoiceBlock()
+    :VNoteBlock(Voice)
+{
+    blockType = Voice;
 }
