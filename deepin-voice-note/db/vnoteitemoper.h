@@ -13,7 +13,8 @@ public:
 
     VNOTE_ALL_NOTES_MAP* loadAllVNotes();
 
-    bool modifyNoteText(QString text);
+    bool modifyNoteTitle(QString title);
+    bool updateNote();
 
     VNoteItem* addNote(VNoteItem& note);
     VNoteItem* getNote(qint64 folderId, qint32 noteId);

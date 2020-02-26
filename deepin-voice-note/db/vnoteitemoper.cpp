@@ -2,6 +2,7 @@
 #include "vnotefolderoper.h"
 #include "vnotedbmanager.h"
 #include "globaldef.h"
+#include "common/metadataparser.h"
 #include "common/vnoteitem.h"
 #include "common/vnotedatamanager.h"
 #include "db/dbvisitor.h"
@@ -56,7 +57,7 @@ VNOTE_ALL_NOTES_MAP *VNoteItemOper::loadAllVNotes()
     return notesMap;
 }
 
-bool VNoteItemOper::modifyNoteText(QString text)
+bool VNoteItemOper::modifyNoteTitle(QString title)
 {
     static constexpr char const *MODIFY_NOTETEXT_FMT = "UPDATE %s SET %s='%s', %s='%s' WHERE %s=%s AND %s=%s;";
     static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s WHERE %s=%s;";
@@ -70,8 +71,8 @@ bool VNoteItemOper::modifyNoteText(QString text)
 
         modifyNoteTextSql.sprintf(MODIFY_NOTETEXT_FMT
                           , VNoteDbManager::NOTES_TABLE_NAME
-                          , noteColumnsName[meta_data].toUtf8().data()
-                          , text.toUtf8().data()
+                          , noteColumnsName[note_title].toUtf8().data()
+                          , title.toUtf8().data()
                           , noteColumnsName[modify_time].toUtf8().data()
                           , modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data()
                           , noteColumnsName[folder_id].toUtf8().data()
@@ -96,7 +97,62 @@ bool VNoteItemOper::modifyNoteText(QString text)
         sqls.append(updateSql);
 
         if (VNoteDbManager::instance()->updateData(sqls)) {
-            m_note->noteText   = text;
+            m_note->noteTitle  = title;
+            m_note->modifyTime = modifyTime;
+
+            isUpdateOK = true;
+        }
+    }
+
+    return isUpdateOK;
+}
+
+bool VNoteItemOper::updateNote()
+{
+    static constexpr char const *MODIFY_NOTETEXT_FMT = "UPDATE %s SET %s='%s', %s='%s' WHERE %s=%s AND %s=%s;";
+    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s WHERE %s=%s;";
+
+    bool isUpdateOK = false;
+
+    QString modifyNoteTextSql;
+
+    if (nullptr != m_note) {
+        //Prepare meta data
+        MetaDataParser metaParser;
+        QString metaData;
+        metaParser.makeMetaData(m_note->datas, metaData);
+
+        QDateTime modifyTime = QDateTime::currentDateTime();
+
+        modifyNoteTextSql.sprintf(MODIFY_NOTETEXT_FMT
+                          , VNoteDbManager::NOTES_TABLE_NAME
+                          , noteColumnsName[meta_data].toUtf8().data()
+                          , metaData.toUtf8().data()
+                          , noteColumnsName[modify_time].toUtf8().data()
+                          , modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data()
+                          , noteColumnsName[folder_id].toUtf8().data()
+                          , QString("%1").arg(m_note->folderId).toUtf8().data()
+                          , noteColumnsName[note_id].toUtf8().data()
+                          , QString("%1").arg(m_note->noteId).toUtf8().data()
+                          );
+
+        QString updateSql;
+        QString sqlGetTime("STRFTIME ('%Y-%m-%d %H:%M:%f', 'now', 'localtime')");
+
+        updateSql.sprintf(UPDATE_FOLDER_TIME
+                          , VNoteDbManager::FOLDER_TABLE_NAME
+                          , VNoteFolderOper::folderColumnsName[VNoteFolderOper::modify_time].toUtf8().data()
+                          , sqlGetTime.toUtf8().data()
+                          , VNoteFolderOper::folderColumnsName[VNoteFolderOper::folder_id].toUtf8().data()
+                          , QString("%1").arg(m_note->folderId).toUtf8().data()
+                          );
+
+        QStringList sqls;
+        sqls.append(modifyNoteTextSql);
+        sqls.append(updateSql);
+
+        if (VNoteDbManager::instance()->updateData(sqls)) {
+            m_note->setMetadata(metaData);
             m_note->modifyTime = modifyTime;
 
             isUpdateOK = true;
@@ -112,6 +168,11 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
     static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s WHERE %s=%s;";
     static constexpr char const *NEWREC_FMT = "SELECT * FROM %s WHERE %s=%s ORDER BY %s DESC LIMIT 1;";
 
+    //Prepare meta data
+    MetaDataParser metaParser;
+    QString metaData;
+    metaParser.makeMetaData(note.datas, metaData);
+
     QString insertSql;
 
     insertSql.sprintf(INSERT_FMT
@@ -123,7 +184,7 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
                       , QString("%1").arg(note.folderId).toUtf8().data()
                       , QString("%1").arg(note.noteType).toUtf8().data()
                       , note.noteTitle.toUtf8().data()
-                      , note.noteText.toUtf8().data()
+                      , metaData.toUtf8().data()
                       );
 
     QString updateSql;

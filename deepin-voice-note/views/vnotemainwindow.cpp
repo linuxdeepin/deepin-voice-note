@@ -407,21 +407,21 @@ void VNoteMainWindow::onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEd
 void VNoteMainWindow::onTextEditReturn()
 {
     QString text = m_textEditMainWnd->toPlainText();
-    if (m_textNode->noteType == VNoteItem::VNOTE_TYPE::VNT_Text) {
-        if (text != m_textNode->noteText) {
-            if (!text.isEmpty()) {
-                m_textNode->noteText = text;
-                m_textEditRightView->setPlainText(text);
-                m_rightView->onUpdateNote(m_textNode);
-            } else {
-                m_rightView->noteDelFromCurFolder(m_textNode);
-            }
-        }
-    } else if (m_textNode->noteType == VNoteItem::VNT_Voice) {
-        if (m_isRecording == false && m_isAsrVoiceing == false) {
-            m_noteSearchEdit->setEnabled(true);
-        }
-    }
+//    if (m_textNode->noteType == VNoteItem::VNOTE_TYPE::VNT_Text) {
+//        if (text != m_textNode->metaData) {
+//            if (!text.isEmpty()) {
+//                m_textNode->metaData = text;
+//                m_textEditRightView->setPlainText(text);
+//                m_rightView->onUpdateNote(m_textNode);
+//            } else {
+//                m_rightView->noteDelFromCurFolder(m_textNode);
+//            }
+//        }
+//    } else if (m_textNode->noteType == VNoteItem::VNT_Voice) {
+//        if (m_isRecording == false && m_isAsrVoiceing == false) {
+//            m_noteSearchEdit->setEnabled(true);
+//        }
+//    }
     m_centerWidget->setCurrentIndex(WndNoteShow);
     m_returnBtn->setVisible(false);
     onVNoteSearch();//详情页时只搜索详情页内容，返回时重新搜索

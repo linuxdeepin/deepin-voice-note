@@ -171,10 +171,10 @@ void RightView::noteSwitchByFolder(qint64 id)
         if (datafolderNotes != nullptr) {
             datafolderNotes->lock.lockForRead();
             for (auto it : datafolderNotes->folderNotes) {
-                if (VNoteItem::VNOTE_TYPE::VNT_Text == it->noteType
-                        && it->noteText.contains(m_searchKey)) {
-                    searchNoteData.folderNotes.insert(it->noteId, it);
-                }
+//                if (VNoteItem::VNOTE_TYPE::VNT_Text == it->noteType
+//                        && it->noteText.contains(m_searchKey)) {
+//                    searchNoteData.folderNotes.insert(it->noteId, it);
+//                }
             }
             datafolderNotes->lock.unlock();
         }
@@ -220,18 +220,18 @@ void RightView::onAddNote() //添加文字记录
     VNoteItem tmpNote;
     tmpNote.folderId = m_lastFolderId;
     tmpNote.noteType = VNoteItem::VNT_Text;
-    tmpNote.noteText = QString("");
+//    tmpNote.metaData = QString("");
     addNewNote(tmpNote, true);
     m_addTextBtn->setEnabled(false);
 }
 
 void RightView::onUpdateNote(VNoteItem *item)
 {
-    qInfo() << "onUpdateNote:" << item
-            << "NoteId:" << item->noteId
-            << "NoteText:" << item->noteText;
-    VNoteItemOper noteOper(item);
-    noteOper.modifyNoteText(item->noteText);
+//    qInfo() << "onUpdateNote:" << item
+//            << "NoteId:" << item->noteId
+//            << "NoteText:" << item->metaData;
+//    VNoteItemOper noteOper(item);
+//    noteOper.modifyNoteText(item->metaData);
     RightNoteList *widget = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
     if (widget == m_searchNoteList) {
         RightNoteList *widgetTmp = getNormalNoteList(widget->getFolderId());
@@ -267,7 +267,7 @@ QList<qint64> RightView::getNoteContainsKeyFolders(const QRegExp &searchKey) //�
         for (auto &it1 : noteAll->notes) {
             for (auto &it2 : it1->folderNotes) {
                 if (it2->noteType == VNoteItem::VNOTE_TYPE::VNT_Text
-                        && it2->noteText.contains(searchKey)) {
+                        /*&& it2->noteText.contains(searchKey)*/ ) {
                     folderIds.push_back(it2->folderId);
                     break;
                 }
@@ -329,7 +329,7 @@ void RightView::onSaveTextAction()
             QFile file(path);
             if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
                 QTextStream textStream(&file);
-                textStream << m_curMenuNoteItem->noteText;
+//                textStream << m_curMenuNoteItem->metaData;
                 file.close();
             }
         }
@@ -346,21 +346,21 @@ void RightView::onDelTextAction()
 
 void RightView::onAsrVoiceAction()
 {
-    if (m_curMenuNoteItem->voiceSize > 20 * 60 * 1000) {
-        m_asrlimitErrDialog->exec();
-        return;
-    }
-    RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
-    m_asrVoiceItem = list->getVoiceItem(m_curMenuNoteItem);
-    if (m_asrVoiceItem != nullptr) {
-        m_asrVoiceItem->enbleMenuBtn(false);
-        m_asrVoiceAction->setEnabled(false);
-        m_asrVoiceItem->showAsrStartWindow();
-        QString file = m_curMenuNoteItem->voicePath;
-        qint64 durtation = m_curMenuNoteItem->voiceSize;
-        qDebug() << "onAsrVoiceAction: " << file << ", " << durtation;
-        Q_EMIT asrStart(file, durtation);
-    }
+//    if (m_curMenuNoteItem->voiceSize > 20 * 60 * 1000) {
+//        m_asrlimitErrDialog->exec();
+//        return;
+//    }
+//    RightNoteList *list = static_cast<RightNoteList *>(m_stackWidget->currentWidget());
+//    m_asrVoiceItem = list->getVoiceItem(m_curMenuNoteItem);
+//    if (m_asrVoiceItem != nullptr) {
+//        m_asrVoiceItem->enbleMenuBtn(false);
+//        m_asrVoiceAction->setEnabled(false);
+//        m_asrVoiceItem->showAsrStartWindow();
+//        QString file = m_curMenuNoteItem->voicePath;
+//        qint64 durtation = m_curMenuNoteItem->voiceSize;
+//        qDebug() << "onAsrVoiceAction: " << file << ", " << durtation;
+//        Q_EMIT asrStart(file, durtation);
+//    }
 }
 
 void RightView::onDelVoiceAction()
@@ -390,8 +390,8 @@ void RightView::onSaveVoiceAction()
         if (path.isEmpty()) {
             DMessageBox::information(this, "", DApplication::translate("RightView","File name cannot be empty"));
         } else {
-            bool ret = QFile::copy(m_curMenuNoteItem->voicePath, path);
-            qDebug() << ret;
+//            bool ret = QFile::copy(m_curMenuNoteItem->voicePath, path);
+//            qDebug() << ret;
         }
     }
 }
@@ -411,7 +411,7 @@ void RightView::delNoteFromList(VNoteItem *item, RightNoteList *list)
 
     qInfo() << "Delete VNoteItem:" << item
             << "NoteID:" << item->noteId
-            << "NoteText:" << item->noteText;
+            << "NoteText:" << item->noteTitle;
 
     VNoteItemOper noteOper;
     noteOper.deleteNote(item->folderId, item->noteId);
@@ -421,10 +421,10 @@ void RightView::delNoteFromList(VNoteItem *item, RightNoteList *list)
 
 void RightView::onVoicePlayBtnClicked(VoiceNoteItem *item)
 {
-    if (m_playVoiceItem != item) { //切换播放文件
-        stopCurVoicePlaying(0);
-        m_player->setMedia(QUrl::fromLocalFile(item->getNoteItem()->voicePath));
-    }
+//    if (m_playVoiceItem != item) { //切换播放文件
+//        stopCurVoicePlaying(0);
+//        m_player->setMedia(QUrl::fromLocalFile(item->getNoteItem()->voicePath));
+//    }
     m_playVoiceItem = item;
     item->showPauseBtn();
     m_playVoiceItem->setSliderEnable(true);
@@ -444,9 +444,9 @@ void RightView::addVoiceNoteItem(const QString &voicePath, qint64 voiceSize,bool
     VNoteItem tmpNote;
     tmpNote.folderId = m_lastFolderId;
     tmpNote.noteType = VNoteItem::VNT_Voice;
-    tmpNote.noteText = QString("");
-    tmpNote.voicePath = voicePath;
-    tmpNote.voiceSize = voiceSize;
+//    tmpNote.metaData = QString("");
+//    tmpNote.voicePath = voicePath;
+//    tmpNote.voiceSize = voiceSize;
     if(!isExit){
         addNewNote(tmpNote);
     }else {
@@ -468,14 +468,14 @@ RightNoteList *RightView::getNormalNoteList(qint64 id)
 
 void RightView::onVoicePlayPosChange(qint64 pos)
 {
-    if (pos && m_playVoiceItem != nullptr) {
-        m_playVoiceItem->setPlayPos(static_cast<int>(pos));
-        qint64 duration = m_playVoiceItem->getNoteItem()->voiceSize;
-        qDebug() << pos << ";" << duration;
-        if (pos >= duration) {
-            stopCurVoicePlaying();
-        }
-    }
+//    if (pos && m_playVoiceItem != nullptr) {
+//        m_playVoiceItem->setPlayPos(static_cast<int>(pos));
+//        qint64 duration = m_playVoiceItem->getNoteItem()->voiceSize;
+//        qDebug() << pos << ";" << duration;
+//        if (pos >= duration) {
+//            stopCurVoicePlaying();
+//        }
+//    }
 }
 
 void RightView::onSetPlayerPos(int pos)
@@ -544,7 +544,7 @@ void RightView::setAsrResult(const QString &result)
         m_asrVoiceItem->enbleMenuBtn(true);
         if (!result.isEmpty()) {
             VNoteItem *data = m_asrVoiceItem->getNoteItem();
-            data->noteText = result;
+//            data->metaData = result;
             onUpdateNote(data);
         }
         m_asrVoiceItem = nullptr;

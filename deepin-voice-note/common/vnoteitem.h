@@ -17,8 +17,9 @@ public:
     VNoteItem();
 
     bool isValid();
-    void delVoiceFile();
-    bool makeMetaData();
+    void delNoteData();
+//    bool makeMetaData();
+    void setMetadata(const QString& meta);
 
     enum {
         INVALID_ID = -1
@@ -32,23 +33,21 @@ public:
     enum VNOTE_TYPE {
         VNT_Text = 0,
         VNT_Voice,
+        VNT_Mixed,
     };
 
     qint32 noteId {INVALID_ID};
     qint64 folderId {INVALID_ID};
     qint32 noteType {VNOTE_TYPE::VNT_Text};
-    qint64 voiceSize {0};
     qint32 noteState {State::Normal};
 
     QString noteTitle;
-    QString noteText;
-    QString voicePath;
 
     QDateTime createTime;
     QDateTime modifyTime;
     QDateTime deleteTime;
 
-    VNoteDatas datas;
+    VNOTE_DATAS datas;
 protected:
     QString metaData;
 
@@ -64,6 +63,10 @@ struct VNoteBlock {
         Text,
         Voice
     };
+
+    virtual ~VNoteBlock();
+
+    virtual void releaseSpecificData() = 0;
 
     qint32 getType();
 
@@ -82,12 +85,16 @@ protected:
 
 struct VNTextBlock  : public VNoteBlock {
     VNTextBlock();
+    virtual ~VNTextBlock() override;
+    virtual void releaseSpecificData() override;
 
     QString content;
 };
 
 struct VNVoiceBlock : public VNoteBlock {
     VNVoiceBlock();
+    virtual ~VNVoiceBlock() override;
+    virtual void releaseSpecificData() override;
 
     QString path;
     qint64  voiceSize;

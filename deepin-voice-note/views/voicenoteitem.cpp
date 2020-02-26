@@ -135,13 +135,13 @@ void VoiceNoteItem::initUi()
 void VoiceNoteItem::initData()
 {
     m_createTimeLab->setText(Utils::convertDateTime(m_textNode->createTime));
-    m_voiceSizeLab->setText(Utils::formatMillisecond(m_textNode->voiceSize));
-    m_curSizeLab->setText(Utils::formatMillisecond(0, 0));
-    if (!m_textNode->noteText.isEmpty()) {
-        showAsrEndWindow(m_textNode->noteText);
-    }
-    m_waveForm->setMinimum(0);
-    m_waveForm->setMaximum(static_cast<int>(m_textNode->voiceSize));
+//    m_voiceSizeLab->setText(Utils::formatMillisecond(m_textNode->voiceSize));
+//    m_curSizeLab->setText(Utils::formatMillisecond(0, 0));
+//    if (!m_textNode->metaData.isEmpty()) {
+//        showAsrEndWindow(m_textNode->metaData);
+//    }
+//    m_waveForm->setMinimum(0);
+//    m_waveForm->setMaximum(static_cast<int>(m_textNode->voiceSize));
 }
 
 void VoiceNoteItem::initConnection()
@@ -333,5 +333,5 @@ void VoiceNoteItem::leaveEvent(QEvent *event)
 
 void VoiceNoteItem::updateData()
 {
-    showAsrEndWindow(m_textNode->noteText);
+    //showAsrEndWindow(m_textNode->metaData);
 }

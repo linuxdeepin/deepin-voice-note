@@ -188,9 +188,9 @@ bool RightNoteList::hasSearchNote(QRegExp &searchKey)
         VNoteItemWidget *itemWidget = static_cast<VNoteItemWidget *>(this->itemWidget(this->item(i)));
         VNoteItem *itemdata = itemWidget->getNoteItem();
         if(itemdata && itemdata->noteType == VNoteItem::VNT_Text){
-            if(itemdata->noteText.contains(searchKey)){
-                return true;
-            }
+//            if(itemdata->metaData.contains(searchKey)){
+//                return true;
+//            }
         }
     }
     return false;

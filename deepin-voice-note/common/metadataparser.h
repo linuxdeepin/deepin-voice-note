@@ -41,8 +41,8 @@ public:
         NoteVoiceSizeNode,
     };
 
-    void parse(const QString &metaData, VNoteDatas &datas/*out*/);
-    void makeMetaData(const VNoteDatas &datas,QString &metaData /*out*/);
+    void parse(const QString &metaData, VNOTE_DATAS &datas/*out*/);
+    void makeMetaData(const VNOTE_DATAS &datas,QString &metaData /*out*/);
 
 protected:
     const QMap<int,QString> m_nodeNameMap = {
@@ -56,7 +56,7 @@ protected:
      };
 
     void parseRoot(QXmlStreamReader& xmlSRead, int& count);
-    void parseNoteItem(QXmlStreamReader& xmlSRead, VNoteDatas &datas/*out*/);
+    void parseNoteItem(QXmlStreamReader& xmlSRead, VNOTE_DATAS &datas/*out*/);
 };
 
 #endif // METADATAPARSER_H

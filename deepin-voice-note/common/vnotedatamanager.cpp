@@ -102,7 +102,7 @@ VNoteFolder *VNoteDataManager::delFolder(qint64 folderId)
 
             //Remove voice files in the folder
             for (auto it : foldersMap->folderNotes) {
-                it->delVoiceFile();
+                it->delNoteData();
             }
         }
 
@@ -244,7 +244,7 @@ VNoteItem *VNoteDataManager::delNote(qint64 folderId, qint32 noteId)
             notesInFolder->folderNotes.remove(noteIter.key());
 
             //Remove voice file of voice note
-            retNote->delVoiceFile();
+            retNote->delNoteData();
         }
 
         notesInFolder->lock.unlock();

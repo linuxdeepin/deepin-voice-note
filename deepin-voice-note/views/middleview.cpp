@@ -87,7 +87,6 @@ void MiddleView::onAddNote()
         VNoteItem tmpNote;
         tmpNote.folderId = m_notepad->id;
         tmpNote.noteType = VNoteItem::VNT_Text;
-        tmpNote.noteText = QString("");
         static int id = 0;
         tmpNote.noteTitle = DApplication::translate("MiddleView","Text") + QString::number(id);
         VNoteItemOper noteOper;
@@ -119,7 +118,7 @@ void MiddleView::initNoteData(VNoteFolder *notepad, const QRegExp &searchKey)
             for (auto &it1 : noteAll->notes) {
                 for (auto &it2 : it1->folderNotes) {
                     if (it2->noteTitle.contains(searchKey)
-                            || it2->noteText.contains(searchKey)) {
+                            /*|| it2->noteText.contains(searchKey)*/) {
                         searchNoteData.folderNotes.insert(it2->noteId, it2);
                     }
                 }

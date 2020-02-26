@@ -8,7 +8,7 @@ MetaDataParser::MetaDataParser()
 
 }
 
-void MetaDataParser::parse(const QString &metaData, VNoteDatas &datas)
+void MetaDataParser::parse(const QString &metaData, VNOTE_DATAS &datas)
 {
     QXmlStreamReader xmlStreamReader(metaData);
 
@@ -25,16 +25,16 @@ void MetaDataParser::parse(const QString &metaData, VNoteDatas &datas)
     }
 }
 
-void MetaDataParser::makeMetaData(const VNoteDatas &datas, QString &metaData)
+void MetaDataParser::makeMetaData(const VNOTE_DATAS &datas, QString &metaData)
 {
     QXmlStreamWriter xmlStreamWriter(&metaData);
 
     xmlStreamWriter.writeStartDocument();
     xmlStreamWriter.writeStartElement(m_nodeNameMap[NoteRootNode]);
-    xmlStreamWriter.writeAttribute(m_nodeNameMap[NoteItemCountAttr], QString("%1").arg(datas.length()));
+    xmlStreamWriter.writeAttribute(m_nodeNameMap[NoteItemCountAttr], QString("%1").arg(datas.datas.length()));
 
-    if (datas.length() > 0) {
-        for (auto it : datas) {
+    if (datas.datas.length() > 0) {
+        for (auto it : datas.datas) {
             if (VNoteBlock::Text == it->getType()) {
                 xmlStreamWriter.writeStartElement(m_nodeNameMap[NoteItemNode]);
                 xmlStreamWriter.writeAttribute(m_nodeNameMap[NoteItemTypeAttr],
@@ -71,10 +71,11 @@ void MetaDataParser::parseRoot(QXmlStreamReader &xmlSRead, int &count)
 
     if (noteItemCountAttr.hasAttribute(m_nodeNameMap[NoteItemCountAttr])) {
         count = noteItemCountAttr.value(m_nodeNameMap[NoteItemCountAttr]).toInt();
+//        qDebug() << "count:" << count;
     }
 }
 
-void MetaDataParser::parseNoteItem(QXmlStreamReader &xmlSRead, VNoteDatas &datas)
+void MetaDataParser::parseNoteItem(QXmlStreamReader &xmlSRead, VNOTE_DATAS &datas)
 {
     QXmlStreamAttributes noteItemTypeAttr = xmlSRead.attributes();
 
@@ -86,11 +87,9 @@ void MetaDataParser::parseNoteItem(QXmlStreamReader &xmlSRead, VNoteDatas &datas
 
     if (noteItemType != VNoteBlock::InValid) {
         VNoteBlock* ptrBlock = nullptr;
-        if (VNoteBlock::Text == noteItemType) {
-            ptrBlock = new VNTextBlock();
-        } else if (VNoteBlock::Voice == noteItemType) {
-            ptrBlock = new VNVoiceBlock();
-        }
+
+        //Allocate block
+        ptrBlock = datas.newBlock(noteItemType);
 
         while (xmlSRead.readNextStartElement()) {
 
@@ -110,6 +109,6 @@ void MetaDataParser::parseNoteItem(QXmlStreamReader &xmlSRead, VNoteDatas &datas
             }
         }
 
-        datas.push_back(ptrBlock);
+        datas.addBlock(ptrBlock);
     }
 }

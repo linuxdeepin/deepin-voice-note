@@ -16,24 +16,24 @@ bool VNoteItem::isValid()
             && folderId > INVALID_ID) ? true : false;
 }
 
-void VNoteItem::delVoiceFile()
+void VNoteItem::delNoteData()
 {
-    if (VNT_Voice == noteType) {
-        qInfo() << "Remove file:" << voicePath;
-
-        QFileInfo fileInfo(voicePath);
-
-        if (fileInfo.exists()) {
-            QFile::remove(voicePath);
-        }
+    //Clear note attachments
+    for (auto it : datas.datas) {
+        it->releaseSpecificData();
     }
 }
 
-bool VNoteItem::makeMetaData()
-{
-    bool isMetaDataOk = false;
+//bool VNoteItem::makeMetaData()
+//{
+//    bool isMetaDataOk = false;
 
-    return isMetaDataOk;
+//    return isMetaDataOk;
+//}
+
+void VNoteItem::setMetadata(const QString &meta)
+{
+    metaData = meta;
 }
 
 QDebug& operator << (QDebug &out, VNoteItem &noteItem)
@@ -42,11 +42,9 @@ QDebug& operator << (QDebug &out, VNoteItem &noteItem)
         << "noteId=" << noteItem.noteId << ","
         << "folderId=" << noteItem.folderId << ","
         << "noteType=" << noteItem.noteType << ","
-        << "voiceSize=" << noteItem.voiceSize << ","
         << "noteState=" << noteItem.noteState << ","
         << "noteTitle=" << noteItem.noteTitle << ","
-        << "noteText=" << noteItem.noteText << ","
-        << "voicePath=" << noteItem.voicePath << ","
+        << "metaData=" << noteItem.metaData << ","
         << "createTime=" << noteItem.createTime << ","
         << "modifyTime=" << noteItem.modifyTime << ","
         << "deleteTime=" << noteItem.deleteTime
@@ -67,6 +65,11 @@ VNoteBlock::VNoteBlock(qint32 type)
     ptrBlock = this;
 }
 
+VNoteBlock::~VNoteBlock()
+{
+
+}
+
 qint32 VNoteBlock::getType()
 {
     return blockType;
@@ -77,8 +80,39 @@ VNTextBlock::VNTextBlock()
 {
 }
 
+VNTextBlock::~VNTextBlock()
+{
+
+}
+
+void VNTextBlock::releaseSpecificData()
+{
+    //TODO:
+    //    Add text specific operation code here.
+    //
+    //Do nothing for text now.
+
+}
+
 VNVoiceBlock::VNVoiceBlock()
     :VNoteBlock(Voice)
 {
     blockType = Voice;
+}
+
+VNVoiceBlock::~VNVoiceBlock()
+{
+}
+
+void VNVoiceBlock::releaseSpecificData()
+{
+    //TODO:
+    //    Add voice specific operation code here:
+    qInfo() << "Remove file:" << path;
+
+    QFileInfo fileInfo(path);
+
+    if (fileInfo.exists()) {
+        QFile::remove(path);
+    }
 }

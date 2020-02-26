@@ -2,6 +2,7 @@
 #include "globaldef.h"
 #include "db/vnotefolderoper.h"
 #include "db/vnoteitemoper.h"
+#include "common/metadataparser.h"
 #include "common/vnotedatamanager.h"
 #include "common/vnoteforlder.h"
 #include "common/vnoteitem.h"
@@ -84,6 +85,8 @@ bool NoteQryDbVisitor::visitorData()
     if (nullptr != results.notes) {
         isOK = true;
 
+        MetaDataParser metaParser;
+
         while(m_sqlQuery->next()) {
             VNoteItem* note = new VNoteItem();
 
@@ -91,8 +94,13 @@ bool NoteQryDbVisitor::visitorData()
             note->folderId    = m_sqlQuery->value(VNoteItemOper::folder_id).toInt();
             note->noteType    = m_sqlQuery->value(VNoteItemOper::note_type).toInt();
             note->noteTitle   = m_sqlQuery->value(VNoteItemOper::note_title).toString();
-            note->noteText    = m_sqlQuery->value(VNoteItemOper::meta_data).toString();
-            note->noteState  = m_sqlQuery->value(VNoteItemOper::note_state).toInt();
+
+            //Parse meta data
+            QString metaData  = m_sqlQuery->value(VNoteItemOper::meta_data).toString();
+            note->setMetadata(metaData);
+            metaParser.parse(metaData, note->datas);
+
+            note->noteState   = m_sqlQuery->value(VNoteItemOper::note_state).toInt();
 
             note->createTime  = QDateTime::fromString(
                         m_sqlQuery->value(VNoteItemOper::create_time).toString(),VNOTE_TIME_FMT);
@@ -207,6 +215,8 @@ bool AddNoteDbVisitor::visitorData()
     if (nullptr != results.newNote) {
         isOK = true;
 
+        MetaDataParser metaParser;
+
         while(m_sqlQuery->next()) {
             VNoteItem* note = results.newNote;
 
@@ -214,7 +224,12 @@ bool AddNoteDbVisitor::visitorData()
             note->folderId    = m_sqlQuery->value(VNoteItemOper::folder_id).toInt();
             note->noteType    = m_sqlQuery->value(VNoteItemOper::note_type).toInt();
             note->noteTitle   = m_sqlQuery->value(VNoteItemOper::note_title).toString();
-            note->noteText    = m_sqlQuery->value(VNoteItemOper::meta_data).toString();
+
+            //Parse meta data
+            QString metaData  = m_sqlQuery->value(VNoteItemOper::meta_data).toString();
+            note->setMetadata(metaData);
+            metaParser.parse(metaData, note->datas);
+
             note->noteState  = m_sqlQuery->value(VNoteItemOper::note_state).toInt();
 
             note->createTime  = QDateTime::fromString(

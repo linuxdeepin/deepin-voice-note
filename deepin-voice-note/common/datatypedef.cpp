@@ -42,3 +42,39 @@ VNOTE_ALL_NOTES_MAP::~VNOTE_ALL_NOTES_MAP()
         notes.clear();
     }
 }
+
+VNOTE_DATAS::~VNOTE_DATAS()
+{
+    for (auto it : datas) {
+        delete it;
+    }
+}
+
+VNoteBlock* VNOTE_DATAS::newBlock(int type)
+{
+    VNoteBlock* ptrBlock = nullptr;
+
+    if (type == VNoteBlock::Text) {
+        ptrBlock = new VNTextBlock();
+    } else if (type == VNoteBlock::Voice) {
+        ptrBlock = new VNVoiceBlock();
+    }
+
+    return ptrBlock;
+}
+
+void VNOTE_DATAS::addBlock(VNoteBlock *block)
+{
+    datas.push_back(block);
+}
+
+void VNOTE_DATAS::delBlock(VNoteBlock *block)
+{
+    int index = datas.indexOf(block);
+
+    if (index != -1) {
+        datas.remove(index);
+    }
+
+    delete block;
+}

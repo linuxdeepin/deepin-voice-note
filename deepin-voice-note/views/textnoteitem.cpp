@@ -81,7 +81,7 @@ void TextNoteItem::updateData()
 {
     if (m_textNode != nullptr) {
         m_timeLabel->setText("  " + Utils::convertDateTime(m_textNode->createTime));
-        m_textEdit->setPlainText(m_textNode->noteText);
+//        m_textEdit->setPlainText(m_textNode->metaData);
     }
 }
 
@@ -123,10 +123,10 @@ void TextNoteItem::onEditFocusOut()
     if (text.isEmpty()) {
         emit sigDelNote(m_textNode);
     } else {
-        if (text != m_textNode->noteText) {
-            m_textNode->noteText = text;
-            emit sigUpdateNote(m_textNode);
-        }
+//        if (text != m_textNode->metaData) {
+//            m_textNode->metaData = text;
+//            emit sigUpdateNote(m_textNode);
+//        }
     }
 }
 
