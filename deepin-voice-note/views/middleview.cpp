@@ -88,7 +88,8 @@ void MiddleView::onAddNote()
         tmpNote.folderId = m_notepad->id;
         tmpNote.noteType = VNoteItem::VNT_Text;
         tmpNote.noteText = QString("");
-        tmpNote.noteTitle = "新笔记１";
+        static int id = 0;
+        tmpNote.noteTitle = DApplication::translate("MiddleView","Text") + QString::number(id);
         VNoteItemOper noteOper;
         VNoteItem *newNote = noteOper.addNote(tmpNote);
         if(newNote){
@@ -96,6 +97,7 @@ void MiddleView::onAddNote()
            if(item){
                m_noteListView->setCurrentIndex(item->index());
            }
+           id += 1;
         }
     }
 }

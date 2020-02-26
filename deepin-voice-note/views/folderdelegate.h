@@ -4,17 +4,10 @@
 #include <DStyledItemDelegate>
 DWIDGET_USE_NAMESPACE
 
-class FolderTree;
-
 class FolderDelegate : public DStyledItemDelegate
 {
 public:
-    enum ItemType {
-        NOTEROOT, //记事本一级目录
-        NOTEITEM, //记事本项
-        ERRORTYPE
-    };
-    FolderDelegate(FolderTree *parent = nullptr);
+    FolderDelegate(QAbstractItemView *parent = nullptr);
 public slots:
     void handleChangeTheme();
 
@@ -36,7 +29,7 @@ private:
                        const QModelIndex &index) const;
     void paintNoteItem(QPainter *painter, const QStyleOptionViewItem &option,
                        const QModelIndex &index) const;
-    FolderTree *m_treeView {nullptr};
+    QAbstractItemView *m_treeView {nullptr};
     DPalette m_parentPb;
 };
 

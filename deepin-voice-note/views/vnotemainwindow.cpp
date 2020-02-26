@@ -3,11 +3,16 @@
 #include "views/middleview.h"
 #include "views/rightview.h"
 #include "views/homepage.h"
+#include "views/foldertreecommon.h"
 #include "common/vnotedatamanager.h"
 #include "common/vnoteaudiodevicewatcher.h"
 #include "common/vnotea2tmanager.h"
 #include "common/vnoteitem.h"
 #include "common/utils.h"
+#include "common/actionmanager.h"
+
+#include "db/vnotefolderoper.h"
+
 #include "dialog/vnotemessagedialog.h"
 #include "views/vnoterecordbar.h"
 #include "widgets/vnoteiconbutton.h"
@@ -117,6 +122,8 @@ void VNoteMainWindow::initConnections()
 
     connect(m_leftView, &LeftView::sigFolderChange,
             this, &VNoteMainWindow::onVNoteFolderChange);
+    connect(m_leftView, &LeftView::sigFolderAction,
+            this, &VNoteMainWindow::onFolderAction);
 
     connect(m_wndHomePage, &HomePage::sigAddFolderByInitPage,
             this, &VNoteMainWindow::onVNoteFolderAdd);
@@ -219,10 +226,10 @@ void VNoteMainWindow::initLeftView()
 
 void VNoteMainWindow::initMiddleView()
 {
-   m_middleView = new MiddleView(m_mainWndSpliter);
-   m_middleView->setFixedWidth(VNOTE_MIDDLEVIEW_W);
-   m_middleView->setBackgroundRole(DPalette::Base);
-   m_middleView->setAutoFillBackground(true);
+    m_middleView = new MiddleView(m_mainWndSpliter);
+    m_middleView->setFixedWidth(VNOTE_MIDDLEVIEW_W);
+    m_middleView->setBackgroundRole(DPalette::Base);
+    m_middleView->setAutoFillBackground(true);
 
 #ifdef VNOTE_LAYOUT_DEBUG
     m_middleView->setStyleSheet("background: green");
@@ -312,10 +319,10 @@ void VNoteMainWindow::onVNoteSearch()
     if (!strKey.isEmpty()) {
         m_searchKey.setPattern(strKey);
         m_searchKey.setCaseSensitivity(Qt::CaseInsensitive);
-        m_leftView->clearTreeSelection();
-        m_middleView->initNoteData(nullptr,m_searchKey);
+        m_leftView->clearSelection();
+        m_middleView->initNoteData(nullptr, m_searchKey);
         m_leftView->setEnabled(false);
-    }else {
+    } else {
         m_searchKey = QRegExp();
         m_leftView->selectDefaultItem();
         m_leftView->setEnabled(true);
@@ -324,21 +331,12 @@ void VNoteMainWindow::onVNoteSearch()
 
 void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &index)
 {
-    VNoteFolder * data = m_leftView->getNotepadItemData(index);
-    if(data){
-        m_middleView->initNoteData(data,QRegExp());
+    VNoteFolder *data = static_cast<VNoteFolder *>(FolderTreeCommon::getStandardItemData(index));
+    if (data) {
+        m_middleView->initNoteData(data, QRegExp());
+    } else {
+        m_middleView->clearNoteData();
     }
-}
-
-void VNoteMainWindow::onVNoteFolderDel(VNoteFolder *data)
-{
-//    m_rightView->noteDelByFolder(data->id);
-//    VNoteFolderOper folderOper(data);
-//    folderOper.deleteVNoteFolder(data->id);
-//    if (m_middleView->getFolderCount() == 0) {
-//        m_centerWidget->setCurrentIndex(WndHomePage);
-//        m_noteSearchEdit->setEnabled(false);
-//    }
 }
 
 void VNoteMainWindow::initTextEditDetailView()
@@ -375,14 +373,14 @@ void VNoteMainWindow::initEmptyFoldersView()
 
 void VNoteMainWindow::onVNoteFolderAdd()
 {
-//    if (!m_noteSearchEdit->text().isEmpty()) {
-//        m_noteSearchEdit->clearEdit();
-//    }
-//    if (m_centerWidget->currentIndex() == WndHomePage) {
-//        m_noteSearchEdit->setEnabled(true);
-//    }
-//    m_centerWidget->setCurrentIndex(WndNoteShow);
-//    m_middleView->handleAddFolder();
+    if (!m_noteSearchEdit->text().isEmpty()) {
+        m_noteSearchEdit->clearEdit();
+    }
+    if (m_centerWidget->currentIndex() == WndHomePage) {
+        m_noteSearchEdit->setEnabled(true);
+    }
+    m_centerWidget->setCurrentIndex(WndNoteShow);
+    m_leftView->onAddNotepad();
 
 }
 
@@ -652,4 +650,25 @@ void VNoteMainWindow::onAsrAgain()
     QTimer::singleShot(0, this, [this]() {
         m_rightView->onAsrVoiceAction();
     });
+}
+
+void VNoteMainWindow::onFolderAction(const QModelIndex &index, QAction *action)
+{
+    ActionManager::ActionKind kind = ActionManager::getActionKind(action);
+    switch (kind) {
+    case ActionManager::NotepadDelete: {
+        VNoteFolder *data = static_cast<VNoteFolder *>(FolderTreeCommon::getStandardItemData(index));
+        if (data) {
+            m_leftView->delFolderItem(index);
+            VNoteFolderOper  folderOper(data);
+            folderOper.deleteVNoteFolder(data);
+        }
+    }
+    break;
+    case ActionManager::NotepadAddNew:
+        m_middleView->onAddNote();
+        break;
+    default:
+        break;
+    }
 }

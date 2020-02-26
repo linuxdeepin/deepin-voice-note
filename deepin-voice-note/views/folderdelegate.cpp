@@ -1,6 +1,7 @@
 #include "folderdelegate.h"
-#include "foldertree.h"
+#include "foldertreecommon.h"
 #include "common/vnoteforlder.h"
+#include "db/vnotefolderoper.h"
 
 #include <QPainter>
 #include <QLineEdit>
@@ -8,7 +9,7 @@
 #include <DApplication>
 #include <DApplicationHelper>
 
-FolderDelegate::FolderDelegate(FolderTree *parent)
+FolderDelegate::FolderDelegate(QAbstractItemView *parent)
     : DStyledItemDelegate(parent)
     , m_treeView(parent)
 {
@@ -43,9 +44,17 @@ void FolderDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                   const QModelIndex &index) const
 {
     Q_UNUSED(model);
-     QLineEdit *edit = static_cast<QLineEdit *>(editor);
-     QString text = edit->displayText();
-     m_treeView->itemEditFinsh(index,text);
+    QLineEdit *edit = static_cast<QLineEdit *>(editor);
+    QString text = edit->displayText();
+    if (!text.isEmpty()) {
+        if (FolderTreeCommon::getStandardItemType(index) == FolderTreeCommon::NOTEPADITEM) {
+            VNoteFolder *folderdata = static_cast<VNoteFolder *>(FolderTreeCommon::getStandardItemData(index));
+            if (folderdata && folderdata->name != text) {
+                VNoteFolderOper folderOper(folderdata);
+                folderOper.renameVNoteFolder(text);
+            }
+        }
+    }
 }
 
 void FolderDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
@@ -65,11 +74,11 @@ void FolderDelegate::handleChangeTheme()
 QSize FolderDelegate::sizeHint(const QStyleOptionViewItem &option,
                                const QModelIndex &index) const
 {
-    FolderTree::ItemType type = m_treeView->getItemType(index);
+    FolderTreeCommon::StandardItemType type = FolderTreeCommon::getStandardItemType(index);
     switch (type) {
-    case FolderTree::NOTEPADROOT:
+    case FolderTreeCommon::NOTEPADROOT:
         return  QSize(option.rect.width(), 1); //隐藏记事本一级目录
-    case FolderTree::NOTEPADITEM:
+    case FolderTreeCommon::NOTEPADITEM:
         return  QSize(option.rect.width(), 47);
     default:
         return DStyledItemDelegate::sizeHint(option, index);
@@ -79,11 +88,11 @@ QSize FolderDelegate::sizeHint(const QStyleOptionViewItem &option,
 void FolderDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                            const QModelIndex &index) const
 {
-    FolderTree::ItemType type = m_treeView->getItemType(index);
+    FolderTreeCommon::StandardItemType type = FolderTreeCommon::getStandardItemType(index);
     switch (type) {
-    case FolderTree::NOTEPADROOT:
+    case FolderTreeCommon::NOTEPADROOT:
         return  paintNoteRoot(painter, option, index);
-    case FolderTree::NOTEPADITEM:
+    case FolderTreeCommon::NOTEPADITEM:
         return  paintNoteItem(painter, option, index);
     default:
         return DStyledItemDelegate::paint(painter, option, index);
@@ -149,8 +158,7 @@ void FolderDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewItem
             }
         }
     }
-    QVariant var = index.data(Qt::UserRole + 2);
-    VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
+    VNoteFolder *data = static_cast<VNoteFolder *>(FolderTreeCommon::getStandardItemData(index));
     if (data != nullptr) {
         QFontMetrics fontMetrics = painter->fontMetrics();
         QString strNum = QString::number(data->notesCount);
@@ -162,7 +170,7 @@ void FolderDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewItem
                        numRect.left() - iconRect.right() - 15, paintRect.height());
         painter->drawText(numRect, Qt::AlignRight | Qt::AlignVCenter, strNum);
         painter->drawImage(iconRect, data->UI.icon);
-        QString elideText = fontMetrics.elidedText(data->name,Qt::ElideRight, nameRect.width());
+        QString elideText = fontMetrics.elidedText(data->name, Qt::ElideRight, nameRect.width());
         painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
     }
     painter->restore();

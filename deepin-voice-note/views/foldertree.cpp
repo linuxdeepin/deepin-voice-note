@@ -1,6 +1,10 @@
 #include "foldertree.h"
 #include "folderdelegate.h"
+#include "foldertreecommon.h"
+
 #include "common/vnoteforlder.h"
+#include "common/actionmanager.h"
+
 #include "db/vnotefolderoper.h"
 
 #include <QList>
@@ -30,99 +34,28 @@ void FolderTree::initNotepadRoot()
 {
     QStandardItem *pItem = m_pDataModel->item(0);
     if (pItem == nullptr) {
-        pItem = new QStandardItem;
-        setItemType(pItem, NOTEPADROOT);
-        pItem->setFlags(Qt::NoItemFlags);
+        pItem = FolderTreeCommon::createStandardItem(nullptr, FolderTreeCommon::NOTEPADROOT);
         m_pDataModel->insertRow(0, pItem);
     }
-}
-void FolderTree::addNotepad(VNoteFolder *notepad)
-{
-    if (notepad) {
-        QStandardItem *pItem = new QStandardItem;
-        setItemType(pItem, NOTEPADITEM);
-        setItemData(pItem, notepad);
-        QStandardItem *pItemRoot = getNotepadRoot();
-        if (pItemRoot) {
-            pItemRoot->insertRow(0, pItem);
-        }
-    }
+    m_notepadMenu = ActionManager::getNotepadRMenu(this);
+    connect(m_notepadMenu, SIGNAL(triggered(QAction *)),
+            this, SIGNAL(treeAction(QAction *)));
 }
 
-int FolderTree::addNotepads(VNOTE_FOLDERS_MAP *notepads)
-{
-    if (notepads != nullptr) {
-        QList<QStandardItem *> items;
-        notepads->lock.lockForRead();
-        for (auto it : notepads->folders) {
-            QStandardItem *pItem = new QStandardItem;
-            setItemType(pItem, NOTEPADITEM);
-            setItemData(pItem, it);
-            items.push_back(pItem);
-        }
-        notepads->lock.unlock();
-        QStandardItem *pItemRoot = getNotepadRoot();
-        if (pItemRoot) {
-            pItemRoot->appendRows(items);
-            return  items.size();
-        }
-    }
-    return  0;
-}
 QStandardItem *FolderTree::getNotepadRoot()
 {
     return m_pDataModel->item(0);
 }
 
-VNoteFolder *FolderTree::getNotepadItemData(const QModelIndex &index) const
+void FolderTree::mousePressEvent(QMouseEvent *event)
 {
-    VNoteFolder *data = nullptr;
-    if (index.isValid()) {
-        QVariant var = index.data(Qt::UserRole + 2);
-        if (var.isValid()) {
-            data = static_cast<VNoteFolder *>(var.value<void *>());
+    DTreeView::mouseMoveEvent(event);
+    if (event->button() == Qt::RightButton) {
+        QPoint pos = mapToParent(event->pos());
+        QModelIndex index = this->indexAt(pos);
+        if (FolderTreeCommon::getStandardItemType(index) == FolderTreeCommon::NOTEPADITEM) {
+            this->setCurrentIndex(index);
+            m_notepadMenu->exec(event->globalPos());
         }
     }
-    return  data;
-}
-
-FolderTree::ItemType FolderTree::getItemType(const QModelIndex &index) const
-{
-    if (index.isValid()) {
-        QVariant var = index.data(Qt::UserRole + 1);
-        int value = var.toInt();
-        if (value < ERRORTYPE) {
-            return static_cast<ItemType>(value);
-        }
-    }
-    return ERRORTYPE;
-}
-
-void FolderTree::setItemType(QStandardItem *pItem, ItemType type)
-{
-    if (pItem) {
-        pItem->setData(QVariant(type), Qt::UserRole + 1);
-    }
-}
-
-void FolderTree::setItemData(QStandardItem *pItem, void *data)
-{
-    if (pItem) {
-        pItem->setData(QVariant::fromValue(data), Qt::UserRole + 2);
-    }
-}
-
-void FolderTree::itemEditFinsh(const QModelIndex &index, const QString &newValue)
-{
-    FolderTree::ItemType type = getItemType(index);
-    if (type == NOTEPADITEM) {
-        VNoteFolder *data = getNotepadItemData(index);
-        if (!newValue.isEmpty() && data && data->name != newValue) {
-            VNoteFolderOper folderOper(data);
-            if (!folderOper.renameVNoteFolder(newValue)) {
-                qDebug() << "rename error";
-            }
-        }
-    }
-    this->update(this->currentIndex());
 }
