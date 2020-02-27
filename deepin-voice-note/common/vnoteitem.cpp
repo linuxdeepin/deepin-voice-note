@@ -31,7 +31,7 @@ void VNoteItem::delNoteData()
 //    return isMetaDataOk;
 //}
 
-void VNoteItem::setMetadata(const QString &meta)
+void VNoteItem::setMetadata(const QVariant &meta)
 {
     metaData = meta;
 }
@@ -108,11 +108,11 @@ void VNVoiceBlock::releaseSpecificData()
 {
     //TODO:
     //    Add voice specific operation code here:
-    qInfo() << "Remove file:" << path;
+    qInfo() << "Remove file:" << voicePath;
 
-    QFileInfo fileInfo(path);
+    QFileInfo fileInfo(voicePath);
 
     if (fileInfo.exists()) {
-        QFile::remove(path);
+        QFile::remove(voicePath);
     }
 }

@@ -36,6 +36,15 @@
 // Uncomment follow line if need debug layout
 //#define VNOTE_LAYOUT_DEBUG
 
+// Note meta-data parser config
+// Comment:Can't change this config when selected
+// Now support
+//      1.(xml version)  VN_XML_METADATA_PARSER
+//      2.(json version) VN_JSON_METADATA_PARSER
+// Default: json verson
+
+#define VN_JSON_METADATA_PARSER
+
 #include <sys/time.h>
 
 #define TM(s,e) (\

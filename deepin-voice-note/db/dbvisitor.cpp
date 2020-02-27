@@ -96,7 +96,7 @@ bool NoteQryDbVisitor::visitorData()
             note->noteTitle   = m_sqlQuery->value(VNoteItemOper::note_title).toString();
 
             //Parse meta data
-            QString metaData  = m_sqlQuery->value(VNoteItemOper::meta_data).toString();
+            QVariant metaData  = m_sqlQuery->value(VNoteItemOper::meta_data);
             note->setMetadata(metaData);
             metaParser.parse(metaData, note->datas);
 
@@ -226,7 +226,7 @@ bool AddNoteDbVisitor::visitorData()
             note->noteTitle   = m_sqlQuery->value(VNoteItemOper::note_title).toString();
 
             //Parse meta data
-            QString metaData  = m_sqlQuery->value(VNoteItemOper::meta_data).toString();
+            QVariant metaData  = m_sqlQuery->value(VNoteItemOper::meta_data);
             note->setMetadata(metaData);
             metaParser.parse(metaData, note->datas);
 

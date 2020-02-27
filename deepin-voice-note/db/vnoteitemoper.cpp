@@ -119,7 +119,7 @@ bool VNoteItemOper::updateNote()
     if (nullptr != m_note) {
         //Prepare meta data
         MetaDataParser metaParser;
-        QString metaData;
+        QVariant metaData;
         metaParser.makeMetaData(m_note->datas, metaData);
 
         QDateTime modifyTime = QDateTime::currentDateTime();
@@ -127,7 +127,7 @@ bool VNoteItemOper::updateNote()
         modifyNoteTextSql.sprintf(MODIFY_NOTETEXT_FMT
                           , VNoteDbManager::NOTES_TABLE_NAME
                           , noteColumnsName[meta_data].toUtf8().data()
-                          , metaData.toUtf8().data()
+                          , metaData.toString().toUtf8().data()
                           , noteColumnsName[modify_time].toUtf8().data()
                           , modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data()
                           , noteColumnsName[folder_id].toUtf8().data()
@@ -170,7 +170,7 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
 
     //Prepare meta data
     MetaDataParser metaParser;
-    QString metaData;
+    QVariant metaData;
     metaParser.makeMetaData(note.datas, metaData);
 
     QString insertSql;
@@ -184,7 +184,7 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
                       , QString("%1").arg(note.folderId).toUtf8().data()
                       , QString("%1").arg(note.noteType).toUtf8().data()
                       , note.noteTitle.toUtf8().data()
-                      , metaData.toUtf8().data()
+                      , metaData.toString().toUtf8().data()
                       );
 
     QString updateSql;

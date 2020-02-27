@@ -19,7 +19,7 @@ public:
     bool isValid();
     void delNoteData();
 //    bool makeMetaData();
-    void setMetadata(const QString& meta);
+    void setMetadata(const QVariant& meta);
 
     enum {
         INVALID_ID = -1
@@ -49,7 +49,7 @@ public:
 
     VNOTE_DATAS datas;
 protected:
-    QString metaData;
+    QVariant metaData;
 
     friend QDebug& operator << (QDebug& out, VNoteItem &noteItem);
 };
@@ -70,7 +70,13 @@ struct VNoteBlock {
 
     qint32 getType();
 
-    qint32 blockType {InValid};
+    qint32  blockType {InValid};
+    /*
+     * Comment:
+     *      For text block, store the content of the text,
+     * for voice block, store the result of audio to text.
+     * */
+    QString blockText;
 
     union {
         VNoteBlock*   ptrBlock;
@@ -87,8 +93,6 @@ struct VNTextBlock  : public VNoteBlock {
     VNTextBlock();
     virtual ~VNTextBlock() override;
     virtual void releaseSpecificData() override;
-
-    QString content;
 };
 
 struct VNVoiceBlock : public VNoteBlock {
@@ -96,11 +100,10 @@ struct VNVoiceBlock : public VNoteBlock {
     virtual ~VNVoiceBlock() override;
     virtual void releaseSpecificData() override;
 
-    QString path;
+    QString voicePath;
     qint64  voiceSize;
     QString voiceTitle;
-    QString voiceText;
-    bool    audo2TextDone {false};
+    bool    state {false};
     QDateTime createTime;
 
 };

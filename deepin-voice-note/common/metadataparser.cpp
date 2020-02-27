@@ -1,6 +1,5 @@
 #include "metadataparser.h"
 #include "vnoteitem.h"
-#include "globaldef.h"
 
 #include <DLog>
 
@@ -9,57 +8,78 @@ MetaDataParser::MetaDataParser()
 
 }
 
-void MetaDataParser::parse(const QString &metaData, VNOTE_DATAS &datas)
+void MetaDataParser::parse(const QVariant &metaData, VNOTE_DATAS &datas)
 {
-    QXmlStreamReader xmlStreamReader(metaData);
+#ifdef VN_XML_METADATA_PARSER
+    xmlParse(metaData, datas);
+#elif defined (VN_JSON_METADATA_PARSER)
+    jsonParse(metaData, datas);
+#endif
+}
+
+void MetaDataParser::makeMetaData(const VNOTE_DATAS &datas, QVariant &metaData)
+{
+#ifdef VN_XML_METADATA_PARSER
+    xmlMakeMetadata(datas, metaData);
+#elif defined (VN_JSON_METADATA_PARSER)
+    jsonMakeMetadata(datas, metaData);
+#endif
+}
+
+//*****************Implementation of xml meta-data parser***********************
+#ifdef VN_XML_METADATA_PARSER
+void MetaDataParser::xmlParse(const QVariant &metaData, VNOTE_DATAS &datas)
+{
+    QXmlStreamReader xmlStreamReader(metaData.toString());
 
     while (xmlStreamReader.readNextStartElement()) {
-        if (m_nodeNameMap[NRootNode] == xmlStreamReader.name()) {
+        if (m_xmlNodeNameMap[NRootNode] == xmlStreamReader.name()) {
             int dummyCount = -1;
-            parseRoot(xmlStreamReader, dummyCount);
+            xmlParseRoot(xmlStreamReader, dummyCount);
 
-        } else if (m_nodeNameMap[NItemNode] == xmlStreamReader.name()) {
-            parseNoteItem(xmlStreamReader, datas);
+        } else if (m_xmlNodeNameMap[NItemNode] == xmlStreamReader.name()) {
+            xmlParseNoteItem(xmlStreamReader, datas);
         } else {
             xmlStreamReader.skipCurrentElement();
         }
     }
 }
 
-void MetaDataParser::makeMetaData(const VNOTE_DATAS &datas, QString &metaData)
+void MetaDataParser::xmlMakeMetadata(const VNOTE_DATAS &datas, QVariant &metaData)
 {
-    QXmlStreamWriter xmlStreamWriter(&metaData);
+    QString strMetaData = metaData.toString();
+    QXmlStreamWriter xmlStreamWriter(&strMetaData);
 
     xmlStreamWriter.writeStartDocument();
-    xmlStreamWriter.writeStartElement(m_nodeNameMap[NRootNode]);
-    xmlStreamWriter.writeAttribute(m_nodeNameMap[NItemCountAttr], QString("%1").arg(datas.datas.length()));
+    xmlStreamWriter.writeStartElement(m_xmlNodeNameMap[NRootNode]);
+    xmlStreamWriter.writeAttribute(m_xmlNodeNameMap[NItemCountAttr], QString("%1").arg(datas.datas.length()));
 
     if (datas.datas.length() > 0) {
         for (auto it : datas.datas) {
             if (VNoteBlock::Text == it->getType()) {
-                xmlStreamWriter.writeStartElement(m_nodeNameMap[NItemNode]);
-                xmlStreamWriter.writeAttribute(m_nodeNameMap[NItemTypeAttr],
+                xmlStreamWriter.writeStartElement(m_xmlNodeNameMap[NItemNode]);
+                xmlStreamWriter.writeAttribute(m_xmlNodeNameMap[NItemTypeAttr],
                                                QString("%1").arg(VNoteBlock::Text));
 
-                xmlStreamWriter.writeTextElement(m_nodeNameMap[NTextNode],
-                                                 it->ptrText->content);
+                xmlStreamWriter.writeTextElement(m_xmlNodeNameMap[NTextNode],
+                                                 it->ptrText->blockText);
                 xmlStreamWriter.writeEndElement();
             } else if (VNoteBlock::Voice == it->getType()) {
-                xmlStreamWriter.writeStartElement(m_nodeNameMap[NItemNode]);
-                xmlStreamWriter.writeAttribute(m_nodeNameMap[NItemTypeAttr],
+                xmlStreamWriter.writeStartElement(m_xmlNodeNameMap[NItemNode]);
+                xmlStreamWriter.writeAttribute(m_xmlNodeNameMap[NItemTypeAttr],
                                                QString("%1").arg(VNoteBlock::Voice));
 
-                xmlStreamWriter.writeTextElement(m_nodeNameMap[NVoicePathNode],
-                                                 it->ptrVoice->path);
-                xmlStreamWriter.writeTextElement(m_nodeNameMap[NVoiceSizeNode],
+                xmlStreamWriter.writeTextElement(m_xmlNodeNameMap[NVoicePathNode],
+                                                 it->ptrVoice->voicePath);
+                xmlStreamWriter.writeTextElement(m_xmlNodeNameMap[NVoiceSizeNode],
                                                  QString("%1").arg(it->ptrVoice->voiceSize));
-                xmlStreamWriter.writeTextElement(m_nodeNameMap[NVoiceTitleNode],
+                xmlStreamWriter.writeTextElement(m_xmlNodeNameMap[NVoiceTitleNode],
                                                  it->ptrVoice->voiceTitle);
-                xmlStreamWriter.writeTextElement(m_nodeNameMap[NVoiceTextNode],
-                                                 it->ptrVoice->voiceText);
-                xmlStreamWriter.writeTextElement(m_nodeNameMap[NVoiceStateNode],
-                                                 QString("%1").arg(it->ptrVoice->audo2TextDone));
-                xmlStreamWriter.writeTextElement(m_nodeNameMap[NVoiceCreateTimeNode],
+                xmlStreamWriter.writeTextElement(m_xmlNodeNameMap[NVoiceTextNode],
+                                                 it->ptrVoice->blockText);
+                xmlStreamWriter.writeTextElement(m_xmlNodeNameMap[NVoiceStateNode],
+                                                 QString("%1").arg(it->ptrVoice->state));
+                xmlStreamWriter.writeTextElement(m_xmlNodeNameMap[NVoiceCreateTimeNode],
                                                  it->ptrVoice->createTime.toString(VNOTE_TIME_FMT));
 
                 xmlStreamWriter.writeEndElement();
@@ -72,27 +92,29 @@ void MetaDataParser::makeMetaData(const VNOTE_DATAS &datas, QString &metaData)
 
     xmlStreamWriter.writeEndElement();
     xmlStreamWriter.writeEndDocument();
+
+    metaData = strMetaData;
 }
 
-void MetaDataParser::parseRoot(QXmlStreamReader &xmlSRead, int &count)
+void MetaDataParser::xmlParseRoot(QXmlStreamReader &xmlSRead, int &count)
 {
 
     QXmlStreamAttributes noteItemCountAttr = xmlSRead.attributes();
 
-    if (noteItemCountAttr.hasAttribute(m_nodeNameMap[NItemCountAttr])) {
-        count = noteItemCountAttr.value(m_nodeNameMap[NItemCountAttr]).toInt();
-//        qDebug() << "count:" << count;
+    if (noteItemCountAttr.hasAttribute(m_xmlNodeNameMap[NItemCountAttr])) {
+        count = noteItemCountAttr.value(m_xmlNodeNameMap[NItemCountAttr]).toInt();
+//        qInfo() << "noteItemCountAttr:" << count;
     }
 }
 
-void MetaDataParser::parseNoteItem(QXmlStreamReader &xmlSRead, VNOTE_DATAS &datas)
+void MetaDataParser::xmlParseNoteItem(QXmlStreamReader &xmlSRead, VNOTE_DATAS &datas)
 {
     QXmlStreamAttributes noteItemTypeAttr = xmlSRead.attributes();
 
     int noteItemType = VNoteBlock::InValid;
 
-    if (noteItemTypeAttr.hasAttribute(m_nodeNameMap[NItemTypeAttr])) {
-        noteItemType = noteItemTypeAttr.value(m_nodeNameMap[NItemTypeAttr]).toInt();
+    if (noteItemTypeAttr.hasAttribute(m_xmlNodeNameMap[NItemTypeAttr])) {
+        noteItemType = noteItemTypeAttr.value(m_xmlNodeNameMap[NItemTypeAttr]).toInt();
     }
 
     if (noteItemType != VNoteBlock::InValid) {
@@ -104,23 +126,23 @@ void MetaDataParser::parseNoteItem(QXmlStreamReader &xmlSRead, VNOTE_DATAS &data
         while (xmlSRead.readNextStartElement()) {
 
             if (VNoteBlock::Text == noteItemType) {
-                if (xmlSRead.name() == m_nodeNameMap[NTextNode]) {
-                    ptrBlock->ptrText->content = xmlSRead.readElementText();
+                if (xmlSRead.name() == m_xmlNodeNameMap[NTextNode]) {
+                    ptrBlock->ptrText->blockText = xmlSRead.readElementText();
                 }
 
             } else if (VNoteBlock::Voice == noteItemType) {
-                if (xmlSRead.name() == m_nodeNameMap[NVoicePathNode]) {
-                    ptrBlock->ptrVoice->path = xmlSRead.readElementText();
-                } else if (xmlSRead.name() == m_nodeNameMap[NVoiceSizeNode]) {
+                if (xmlSRead.name() == m_xmlNodeNameMap[NVoicePathNode]) {
+                    ptrBlock->ptrVoice->voicePath = xmlSRead.readElementText();
+                } else if (xmlSRead.name() == m_xmlNodeNameMap[NVoiceSizeNode]) {
                     ptrBlock->ptrVoice->voiceSize = QString(xmlSRead.readElementText()).toLong();
-                } else if (xmlSRead.name() == m_nodeNameMap[NVoiceTitleNode]) {
+                } else if (xmlSRead.name() == m_xmlNodeNameMap[NVoiceTitleNode]) {
                     ptrBlock->ptrVoice->voiceTitle = xmlSRead.readElementText();
-                } else if (xmlSRead.name() == m_nodeNameMap[NVoiceTextNode]) {
-                    ptrBlock->ptrVoice->voiceText = xmlSRead.readElementText();
-                } else if (xmlSRead.name() == m_nodeNameMap[NVoiceStateNode]) {
-                    ptrBlock->ptrVoice->audo2TextDone
+                } else if (xmlSRead.name() == m_xmlNodeNameMap[NVoiceTextNode]) {
+                    ptrBlock->ptrVoice->blockText = xmlSRead.readElementText();
+                } else if (xmlSRead.name() == m_xmlNodeNameMap[NVoiceStateNode]) {
+                    ptrBlock->ptrVoice->state
                             = QString("%1").arg(xmlSRead.readElementText()).toInt();
-                } else if (xmlSRead.name() == m_nodeNameMap[NVoiceCreateTimeNode]) {
+                } else if (xmlSRead.name() == m_xmlNodeNameMap[NVoiceCreateTimeNode]) {
                     ptrBlock->ptrVoice->createTime
                             = QDateTime::fromString(xmlSRead.readElementText(), VNOTE_TIME_FMT);
                 }
@@ -133,3 +155,99 @@ void MetaDataParser::parseNoteItem(QXmlStreamReader &xmlSRead, VNOTE_DATAS &data
         datas.addBlock(ptrBlock);
     }
 }
+
+#elif defined (VN_JSON_METADATA_PARSER)
+//*****************Implementation of json meta-data parser**********************
+
+void MetaDataParser::jsonParse(const QVariant &metaData, VNOTE_DATAS &datas/*out*/)
+{
+    QJsonDocument noteDoc = QJsonDocument::fromJson(metaData.toByteArray());
+
+    QJsonObject note = noteDoc.object();
+    QJsonArray  noteDatas;
+    int         noteCount = -1;
+
+
+    //noteCount doesn't used now
+    if (note.contains(m_jsonNodeNameMap[NDataCount])) {
+        noteCount = note.value(m_jsonNodeNameMap[NDataCount]).toInt(0);
+    }
+
+    if (note.contains(m_jsonNodeNameMap[NDatas])) {
+        noteDatas = note.value(m_jsonNodeNameMap[NDatas]).toArray();
+    }
+
+    //Parse the note datas
+    for(auto it : noteDatas) {
+        VNoteBlock* ptrBlock = nullptr;
+
+        QJsonObject noteItem = it.toObject();
+
+        int noteType = noteItem.value(m_jsonNodeNameMap[NDataType]).toInt(VNoteBlock::InValid);
+
+        if (VNoteBlock::InValid != noteType) {
+            //Allocate block
+            ptrBlock = datas.newBlock(noteType);
+
+            if (VNoteBlock::Text == noteType) {
+                ptrBlock->ptrText->blockText = noteItem.value(m_jsonNodeNameMap[NText]).toString();
+            } else if (VNoteBlock::Voice == noteType) {
+                ptrBlock->ptrVoice->blockText = noteItem.value(m_jsonNodeNameMap[NText]).toString();
+                ptrBlock->ptrVoice->voiceTitle = noteItem.value(m_jsonNodeNameMap[NTitle]).toString();
+                ptrBlock->ptrVoice->state = noteItem.value(m_jsonNodeNameMap[NState]).toBool(false);
+                ptrBlock->ptrVoice->voicePath = noteItem.value(m_jsonNodeNameMap[NVoicePath]).toString();
+                ptrBlock->ptrVoice->voiceSize = noteItem.value(m_jsonNodeNameMap[NVoiceSize]).toInt(0);
+                ptrBlock->ptrVoice->createTime
+                        = QDateTime::fromString(
+                            noteItem.value(m_jsonNodeNameMap[NCreateTime]).toString()
+                            , VNOTE_TIME_FMT );
+            }
+
+            datas.addBlock(ptrBlock);
+        }
+    }
+}
+
+void MetaDataParser::jsonMakeMetadata(const VNOTE_DATAS &datas, QVariant &metaData)
+{
+    QJsonDocument noteDoc;
+
+    QJsonObject note;
+    QJsonArray  noteDatas;
+    int         noteCount = datas.datas.length();
+
+    for (auto it : datas.datas) {
+        int noteType = it->getType();
+
+        if (VNoteBlock::InValid != noteType) {
+            QJsonObject noteItem;
+
+            noteItem.insert(m_jsonNodeNameMap[NDataType], it->getType());
+
+            if (VNoteBlock::Text == noteType) {
+                 noteItem.insert(m_jsonNodeNameMap[NText], it->ptrText->blockText);
+            } else if (VNoteBlock::Voice == noteType) {
+                noteItem.insert(m_jsonNodeNameMap[NText], it->ptrVoice->blockText);
+                noteItem.insert(m_jsonNodeNameMap[NTitle], it->ptrVoice->voiceTitle);
+                noteItem.insert(m_jsonNodeNameMap[NState], it->ptrVoice->state);
+                noteItem.insert(m_jsonNodeNameMap[NVoicePath], it->ptrVoice->voicePath);
+                noteItem.insert(m_jsonNodeNameMap[NVoiceSize], it->ptrVoice->voiceSize);
+                noteItem.insert(m_jsonNodeNameMap[NCreateTime],
+                                it->ptrVoice->createTime.toString(VNOTE_TIME_FMT));
+            }
+
+            noteDatas.append(noteItem);
+        }
+    }
+
+    note.insert(m_jsonNodeNameMap[NDataCount], noteCount);
+    note.insert(m_jsonNodeNameMap[NDatas], noteDatas);
+
+    noteDoc.setObject(note);
+
+    qDebug() << noteDoc.toJson();
+
+    metaData = noteDoc.toJson(QJsonDocument::Compact);
+}
+
+#endif
