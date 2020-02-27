@@ -3,9 +3,7 @@
 
 #include <QObject>
 #include <QStandardItemModel>
-
-struct VNoteFolder;
-class FolderTreeCommon : public QObject
+class StandardItemCommon : public QObject
 {
     Q_OBJECT
 public:
@@ -13,9 +11,10 @@ public:
         Invalid = 0,
         NOTEPADROOT, //记事本一级目录
         NOTEPADITEM, //记事本项
+        NOTEITEM    //笔记项
     };
     Q_ENUM(StandardItemType)
-    FolderTreeCommon();
+    StandardItemCommon();
     static QStandardItem *createStandardItem(void *data, StandardItemType type);
     static StandardItemType getStandardItemType(const QModelIndex &index);
     static void * getStandardItemData(const QModelIndex &index);

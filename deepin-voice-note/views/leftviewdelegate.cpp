@@ -1,6 +1,7 @@
-#include "folderdelegate.h"
-#include "foldertreecommon.h"
+#include "leftviewdelegate.h"
 #include "common/vnoteforlder.h"
+#include "common/standarditemcommon.h"
+
 #include "db/vnotefolderoper.h"
 
 #include <QPainter>
@@ -9,20 +10,20 @@
 #include <DApplication>
 #include <DApplicationHelper>
 
-FolderDelegate::FolderDelegate(QAbstractItemView *parent)
+LeftViewDelegate::LeftViewDelegate(QAbstractItemView *parent)
     : DStyledItemDelegate(parent)
     , m_treeView(parent)
 {
     init();
 }
-void FolderDelegate::init()
+void LeftViewDelegate::init()
 {
     m_parentPb = DApplicationHelper::instance()->palette(m_treeView);
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
-            &FolderDelegate::handleChangeTheme);
+            &LeftViewDelegate::handleChangeTheme);
 }
 
-QWidget *FolderDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+QWidget *LeftViewDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                                       const QModelIndex &index) const
 {
     Q_UNUSED(index)
@@ -32,7 +33,7 @@ QWidget *FolderDelegate::createEditor(QWidget *parent, const QStyleOptionViewIte
     return  editBox;
 }
 
-void FolderDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+void LeftViewDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     QVariant var = index.data(Qt::UserRole + 2);
     VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
@@ -40,15 +41,15 @@ void FolderDelegate::setEditorData(QWidget *editor, const QModelIndex &index) co
     edit->setText(data->name);
 }
 
-void FolderDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+void LeftViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                   const QModelIndex &index) const
 {
     Q_UNUSED(model);
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
     QString text = edit->displayText();
     if (!text.isEmpty()) {
-        if (FolderTreeCommon::getStandardItemType(index) == FolderTreeCommon::NOTEPADITEM) {
-            VNoteFolder *folderdata = static_cast<VNoteFolder *>(FolderTreeCommon::getStandardItemData(index));
+        if (StandardItemCommon::getStandardItemType(index) == StandardItemCommon::NOTEPADITEM) {
+            VNoteFolder *folderdata = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(index));
             if (folderdata && folderdata->name != text) {
                 VNoteFolderOper folderOper(folderdata);
                 folderOper.renameVNoteFolder(text);
@@ -57,7 +58,7 @@ void FolderDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
     }
 }
 
-void FolderDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
+void LeftViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
                                           const QModelIndex &index) const
 {
     Q_UNUSED(index)
@@ -65,41 +66,41 @@ void FolderDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionVie
     edit->move(option.rect.x() + 15, option.rect.y() + 8);
 }
 
-void FolderDelegate::handleChangeTheme()
+void LeftViewDelegate::handleChangeTheme()
 {
     m_parentPb = DApplicationHelper::instance()->palette(m_treeView);
     m_treeView->update(m_treeView->currentIndex());
 }
 
-QSize FolderDelegate::sizeHint(const QStyleOptionViewItem &option,
+QSize LeftViewDelegate::sizeHint(const QStyleOptionViewItem &option,
                                const QModelIndex &index) const
 {
-    FolderTreeCommon::StandardItemType type = FolderTreeCommon::getStandardItemType(index);
+    StandardItemCommon::StandardItemType type = StandardItemCommon::getStandardItemType(index);
     switch (type) {
-    case FolderTreeCommon::NOTEPADROOT:
+    case StandardItemCommon::NOTEPADROOT:
         return  QSize(option.rect.width(), 1); //隐藏记事本一级目录
-    case FolderTreeCommon::NOTEPADITEM:
+    case StandardItemCommon::NOTEPADITEM:
         return  QSize(option.rect.width(), 47);
     default:
         return DStyledItemDelegate::sizeHint(option, index);
     }
 }
 
-void FolderDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
+void LeftViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                            const QModelIndex &index) const
 {
-    FolderTreeCommon::StandardItemType type = FolderTreeCommon::getStandardItemType(index);
+    StandardItemCommon::StandardItemType type = StandardItemCommon::getStandardItemType(index);
     switch (type) {
-    case FolderTreeCommon::NOTEPADROOT:
+    case StandardItemCommon::NOTEPADROOT:
         return  paintNoteRoot(painter, option, index);
-    case FolderTreeCommon::NOTEPADITEM:
+    case StandardItemCommon::NOTEPADITEM:
         return  paintNoteItem(painter, option, index);
     default:
         return DStyledItemDelegate::paint(painter, option, index);
     }
 }
 
-void FolderDelegate::paintNoteRoot(QPainter *painter, const QStyleOptionViewItem &option,
+void LeftViewDelegate::paintNoteRoot(QPainter *painter, const QStyleOptionViewItem &option,
                                    const QModelIndex &index) const
 {
     Q_UNUSED(painter)
@@ -107,7 +108,7 @@ void FolderDelegate::paintNoteRoot(QPainter *painter, const QStyleOptionViewItem
     Q_UNUSED(option)
 }
 
-void FolderDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewItem &option,
+void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewItem &option,
                                    const QModelIndex &index) const
 {
     if (!index.isValid()) {
@@ -158,7 +159,7 @@ void FolderDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewItem
             }
         }
     }
-    VNoteFolder *data = static_cast<VNoteFolder *>(FolderTreeCommon::getStandardItemData(index));
+    VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(index));
     if (data != nullptr) {
         QFontMetrics fontMetrics = painter->fontMetrics();
         QString strNum = QString::number(data->notesCount);

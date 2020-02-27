@@ -1,14 +1,13 @@
-#ifndef FolderDelegate_H
-#define FolderDelegate_H
+#ifndef LeftViewDelegate_H
+#define LeftViewDelegate_H
 
 #include <DStyledItemDelegate>
 DWIDGET_USE_NAMESPACE
 
-class FolderDelegate : public DStyledItemDelegate
+class LeftViewDelegate : public DStyledItemDelegate
 {
 public:
-    FolderDelegate(QAbstractItemView *parent = nullptr);
-public slots:
+    LeftViewDelegate(QAbstractItemView *parent = nullptr);
     void handleChangeTheme();
 
 protected:
@@ -33,4 +32,4 @@ private:
     DPalette m_parentPb;
 };
 
-#endif // FolderDelegate_H
+#endif // LeftViewDelegate_H

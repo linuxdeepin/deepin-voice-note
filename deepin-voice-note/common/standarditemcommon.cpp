@@ -1,10 +1,10 @@
-#include "foldertreecommon.h"
+#include "standarditemcommon.h"
 
-FolderTreeCommon::FolderTreeCommon()
+StandardItemCommon::StandardItemCommon()
 {
 
 }
-QStandardItem *FolderTreeCommon::createStandardItem(void *data, StandardItemType type)
+QStandardItem *StandardItemCommon::createStandardItem(void *data, StandardItemType type)
 {
     QStandardItem *pItem = new QStandardItem;
     pItem->setData(QVariant::fromValue(type), Qt::UserRole + 1);
@@ -12,7 +12,7 @@ QStandardItem *FolderTreeCommon::createStandardItem(void *data, StandardItemType
     return  pItem;
 }
 
-FolderTreeCommon::StandardItemType FolderTreeCommon::getStandardItemType(const QModelIndex &index)
+StandardItemCommon::StandardItemType StandardItemCommon::getStandardItemType(const QModelIndex &index)
 {
     StandardItemType type = Invalid;
     if (index.isValid()) {
@@ -24,7 +24,7 @@ FolderTreeCommon::StandardItemType FolderTreeCommon::getStandardItemType(const Q
     return  type;
 }
 
-void * FolderTreeCommon::getStandardItemData(const QModelIndex &index)
+void * StandardItemCommon::getStandardItemData(const QModelIndex &index)
 {
     if(index.isValid()){
         QVariant var = index.data(Qt::UserRole + 2);
