@@ -98,6 +98,11 @@ struct VNVoiceBlock : public VNoteBlock {
 
     QString path;
     qint64  voiceSize;
+    QString voiceTitle;
+    QString voiceText;
+    bool    audo2TextDone {false};
+    QDateTime createTime;
+
 };
 
 class VNoteItemWidget :public DWidget //语音文字通用接口

@@ -9,7 +9,7 @@
 #include <QXmlStreamWriter>
 
 /*
-Eg: xml format
+Eg: meta-data format
 
     <?xml version="1.0" encoding="UTF-8"?>
     <Note NoteElementsCount="3">
@@ -18,11 +18,11 @@ Eg: xml format
         </NoteItem>
         <NoteItem NoteItemType="2">;
             <NoteVoicePath>/home/archermind/1.mp3</NoteVoicePath>
-            <NoteVoiceSize>135555</NoteVoiceSize>
-        </NoteItem>
-        <NoteItem NoteItemType="2">
-            <NoteVoicePath>/home/archermind/2.mp3</NoteVoicePath>
-            <NoteVoiceSize>135555</NoteVoiceSize>
+            <NoteVoiceSize>1134556</NoteVoiceSize>
+            <NoteVoiceTitle>语音1</NoteVoiceTitle>
+            <NoteVoiceText></NoteVoiceText>
+            <NoteVoiceState>0</NoteVoiceState>
+            <NoteVoiceCreateTime>2020-02-27 10:21:55.528</NoteVoiceCreateTime>
         </NoteItem>
     </Note>
  */
@@ -32,13 +32,17 @@ public:
     MetaDataParser();
 
     enum {
-        NoteRootNode,
-        NoteItemCountAttr,
-        NoteItemNode,
-        NoteItemTypeAttr,
-        NoteTextNode,
-        NoteVoicePathNode,
-        NoteVoiceSizeNode,
+        NRootNode,
+        NItemCountAttr,
+        NItemNode,
+        NItemTypeAttr,
+        NTextNode,
+        NVoicePathNode,
+        NVoiceSizeNode,
+        NVoiceTitleNode,
+        NVoiceCreateTimeNode,
+        NVoiceStateNode,      // State: 1 for audio to text done, 0 for have not done
+        NVoiceTextNode,
     };
 
     void parse(const QString &metaData, VNOTE_DATAS &datas/*out*/);
@@ -46,14 +50,18 @@ public:
 
 protected:
     const QMap<int,QString> m_nodeNameMap = {
-         {NoteRootNode, "Note"},
-         {NoteItemCountAttr, "NoteElementsCount"},
-         {NoteItemNode, "NoteItem"},
-         {NoteItemTypeAttr, "NoteItemType"},
-         {NoteTextNode, "NoteText"},
-         {NoteVoicePathNode, "NoteVoicePath"},
-         {NoteVoiceSizeNode, "NoteVoiceSize"},
-     };
+        {NRootNode, "Note"},
+        {NItemCountAttr, "NoteElementsCount"},
+        {NItemNode, "NoteItem"},
+        {NItemTypeAttr, "NoteItemType"},
+        {NTextNode, "NoteText"},
+        {NVoicePathNode, "NoteVoicePath"},
+        {NVoiceSizeNode, "NoteVoiceSize"},
+        {NVoiceTitleNode, "NoteVoiceTitle"},
+        {NVoiceCreateTimeNode, "NoteVoiceCreateTime"},
+        {NVoiceStateNode, "NoteVoiceState"},
+        {NVoiceTextNode, "NoteVoiceText"},
+    };
 
     void parseRoot(QXmlStreamReader& xmlSRead, int& count);
     void parseNoteItem(QXmlStreamReader& xmlSRead, VNOTE_DATAS &datas/*out*/);
