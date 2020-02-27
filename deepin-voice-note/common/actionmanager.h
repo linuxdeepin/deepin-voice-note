@@ -22,6 +22,7 @@ public:
         NoteDelete,
         NoteSaveVoice,
         NoteSaveText,
+        NoteAddNew,
 
         //Voice
         VoiceDelete,

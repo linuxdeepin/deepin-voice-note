@@ -1,19 +1,21 @@
 #include "middleviewdelegate.h"
+#include "common/vnoteitem.h"
+#include "common/vnoteforlder.h"
 #include "common/utils.h"
+#include "common/standarditemcommon.h"
+
+#include "db/vnotefolderoper.h"
 
 #include <QLineEdit>
-#include <QTextItem>
-#include <QDebug>
-#include <QtGlobal>
+#include <QPainter>
 
-#include <DPalette>
+#include <DApplicationHelper>
 
-//TODO:
-// VFolderNamePHelper is used to highlight the folder
-//name when search the notes
-struct VFolderNamePHelper {
-    VFolderNamePHelper(QPainter* painter, QFontMetrics fontMetrics, QRect nameRect)
-        :m_fontMetrics(fontMetrics)
+static VNoteFolderOper FolderOper;
+
+struct VNoteTextPHelper {
+    VNoteTextPHelper(QPainter *painter, QFontMetrics fontMetrics, QRect nameRect)
+        : m_fontMetrics(fontMetrics)
         , m_nameRect(nameRect)
         , m_painter(painter)
     {
@@ -39,20 +41,20 @@ struct VFolderNamePHelper {
     };
 
     void spiltByKeyword(const QString &text, const QRegExp &keyword);
-    void paintFolderName(bool isSelected = false);
+    void paintText(bool isSelected = false);
 
     QVector<Text> m_textsVector;
     QFontMetrics m_fontMetrics;
     QPen         m_pens[PenCount];
     QRect        m_nameRect;
-    QPainter*    m_painter {nullptr};
+    QPainter    *m_painter {nullptr};
 };
 
-void VFolderNamePHelper::spiltByKeyword(const QString &text, const QRegExp &keyword)
+void VNoteTextPHelper::spiltByKeyword(const QString &text, const QRegExp &keyword)
 {
     //Check if text exceed the name rect, elide the
     //text first
-    QString elideText = m_fontMetrics.elidedText(text,Qt::ElideRight, m_nameRect.width());
+    QString elideText = m_fontMetrics.elidedText(text, Qt::ElideRight, m_nameRect.width());
 
     int keyLen = keyword.pattern().length();
     int textLen = text.length();
@@ -62,43 +64,43 @@ void VFolderNamePHelper::spiltByKeyword(const QString &text, const QRegExp &keyw
     m_textsVector.clear();
 
     if (!keyword.isEmpty()) {
-        while ((pos=elideText.indexOf(keyword,startPos)) != -1) {
+        while ((pos = elideText.indexOf(keyword, startPos)) != -1) {
             Text tb;
 
             if (startPos != pos) {
-                int extraLen = pos-startPos;
+                int extraLen = pos - startPos;
                 tb.text = elideText.mid(startPos, extraLen);
                 startPos += extraLen;
 
                 tb.rect = QRect(0, 0
-                                ,qMax<int>(
+                                , qMax<int>(
                                     m_fontMetrics.width(tb.text)
-                                   ,m_fontMetrics.boundingRect(tb.text).width()
-                                 )
-                                ,m_fontMetrics.height()
-                                );
+                                    , m_fontMetrics.boundingRect(tb.text).width()
+                                )
+                                , m_fontMetrics.height()
+                               );
 
                 m_textsVector.push_back(tb);
 
                 tb.text = elideText.mid(pos, keyLen);
                 tb.rect = QRect(0, 0
-                                ,qMax<int>(
+                                , qMax<int>(
                                     m_fontMetrics.width(tb.text)
-                                   ,m_fontMetrics.boundingRect(tb.text).width()
-                                 )
-                                ,m_fontMetrics.height()
-                                );
+                                    , m_fontMetrics.boundingRect(tb.text).width()
+                                )
+                                , m_fontMetrics.height()
+                               );
                 tb.isKeyword = true;
                 m_textsVector.push_back(tb);
             } else {
                 tb.text = elideText.mid(pos, keyLen);
                 tb.rect = QRect(0, 0
-                                ,qMax<int>(
+                                , qMax<int>(
                                     m_fontMetrics.width(tb.text)
-                                   ,m_fontMetrics.boundingRect(tb.text).width()
-                                 )
-                                ,m_fontMetrics.height()
-                                );
+                                    , m_fontMetrics.boundingRect(tb.text).width()
+                                )
+                                , m_fontMetrics.height()
+                               );
                 tb.isKeyword = true;
                 m_textsVector.push_back(tb);
             }
@@ -110,25 +112,25 @@ void VFolderNamePHelper::spiltByKeyword(const QString &text, const QRegExp &keyw
     if (startPos < elideText.length()) {
         Text tb;
 
-        tb.text = elideText.mid(startPos, (textLen-startPos));
+        tb.text = elideText.mid(startPos, (textLen - startPos));
         tb.rect = QRect(0, 0
-                        ,qMax<int>(
+                        , qMax<int>(
                             m_fontMetrics.width(tb.text)
-                           ,m_fontMetrics.boundingRect(tb.text).width()
-                         )
-                        ,m_fontMetrics.height()
-                        );
+                            , m_fontMetrics.boundingRect(tb.text).width()
+                        )
+                        , m_fontMetrics.height()
+                       );
 
         m_textsVector.push_back(tb);
     }
 }
 
-void VFolderNamePHelper::paintFolderName(bool isSelected)
+void VNoteTextPHelper::paintText(bool isSelected)
 {
     int currentX = m_nameRect.x();
     int currentY = m_nameRect.y();
 
-    for(auto it : m_textsVector) {
+    for (auto it : m_textsVector) {
         int w = it.rect.width();
         int h = m_nameRect.height();
 
@@ -150,170 +152,200 @@ void VFolderNamePHelper::paintFolderName(bool isSelected)
     //Restore default pen
     m_painter->setPen(m_pens[OldPen]);
 }
-
-LeftViewDelegate::LeftViewDelegate(QAbstractItemView *parent)
+MiddleViewDelegate::MiddleViewDelegate(QAbstractItemView *parent)
     : DStyledItemDelegate(parent)
     , m_parentView(parent)
 {
     m_parentPb = DApplicationHelper::instance()->palette(m_parentView);
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
-            &LeftViewDelegate::handleChangeTheme);
+            &MiddleViewDelegate::handleChangeTheme);
 }
 
-QSize LeftViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+void MiddleViewDelegate::setSearchKey(const QRegExp &key)
 {
-    Q_UNUSED(index)
-    return QSize(option.rect.width(), 69);
+    m_searchKey = key;
 }
 
-QWidget *LeftViewDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,
-                                        const QModelIndex &index) const
-{
-    Q_UNUSED(option)
-    Q_UNUSED(index)
-    QLineEdit *editBox = new QLineEdit(parent);
-    DPalette pe = DApplicationHelper::instance()->palette(m_parentView);
-    pe.setBrush(DPalette::Button, pe.color(DPalette::Inactive, DPalette::Highlight));
-    pe.setBrush(DPalette::Text, Qt::white);
-    pe.setBrush(DPalette::Base, pe.color(DPalette::Normal, DPalette::Highlight));
-    editBox->autoFillBackground();
-
-    editBox->setFixedSize(170, 48);
-    editBox->setPalette(pe);
-    return editBox;
-}
-
-void LeftViewDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
-{
-    QVariant var = index.data(Qt::UserRole + 1);
-    VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
-    QLineEdit *edit = static_cast<QLineEdit *>(editor);
-    edit->setText(data->name);
-}
-
-void LeftViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
-                                    const QModelIndex &index) const
-{
-    Q_UNUSED(model)
-    QLineEdit *edit = static_cast<QLineEdit *>(editor);
-    QVariant var = index.data(Qt::UserRole + 1);
-    VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
-    QString text = edit->displayText();
-    if (!text.isEmpty() && text != data->name)
-    {
-        data->name = text;
-        emit sigFolderRename(data);
-    }
-}
-
-void LeftViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
-                                            const QModelIndex &index) const
-{
-    Q_UNUSED(index)
-    QLineEdit *edit = static_cast<QLineEdit *>(editor);
-    edit->move(option.rect.x() + 55, option.rect.y() + 12);
-}
-
-void LeftViewDelegate::handleChangeTheme()
+void MiddleViewDelegate::handleChangeTheme()
 {
     m_parentPb = DApplicationHelper::instance()->palette(m_parentView);
     m_parentView->update(m_parentView->currentIndex());
 }
 
-void LeftViewDelegate::updateSearchKeyword(const QRegExp &keyword)
+QSize MiddleViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    m_searchKeyword = keyword;
+    Q_UNUSED(index);
+    if (m_searchKey.isEmpty()) {
+        return QSize(option.rect.width(), 74);
+    } else {
+        return QSize(option.rect.width(), 102);
+    }
 }
 
-void LeftViewDelegate::resetKeyword()
+QWidget *MiddleViewDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                                        const QModelIndex &index) const
 {
-    m_searchKeyword = QRegExp();
+    Q_UNUSED(option)
+    Q_UNUSED(index)
+    QLineEdit *editBox = new QLineEdit(parent);
+    editBox->setFixedSize(option.rect.width() - 60, option.rect.height() - 20);
+    return editBox;
 }
 
-void LeftViewDelegate::setItemEnable(bool enable)
+void MiddleViewDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    m_enaleItemFlag = enable;
+    QVariant var = index.data(Qt::UserRole + 1);
+    VNoteItem *data = static_cast<VNoteItem*>(StandardItemCommon::getStandardItemData(index));
+    if(data){
+        QLineEdit *edit = static_cast<QLineEdit *>(editor);
+        edit->setText(data->noteTitle);
+    }
 }
-void LeftViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
+
+void MiddleViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+                                    const QModelIndex &index) const
+{
+    Q_UNUSED(model);
+    QLineEdit *edit = static_cast<QLineEdit *>(editor);
+    QString text = edit->text();
+}
+
+void MiddleViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
+                                            const QModelIndex &index) const
+{
+    Q_UNUSED(index)
+    QLineEdit *edit = static_cast<QLineEdit *>(editor);
+    edit->move(option.rect.x() + 30, option.rect.y() + 10);
+}
+
+void MiddleViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                              const QModelIndex &index) const
 {
-    if (index.isValid()) {
-        painter->save();
-        painter->setRenderHint(QPainter::Antialiasing, true);
+    if (m_searchKey.isEmpty()) {
+        paintNormalItem(painter, option, index);
+    } else {
+        paintSearchItem(painter, option, index);
+    }
+}
 
-        QVariant var = index.data(Qt::UserRole + 1);
-        VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
-        QStyleOptionViewItem viewOption(option);
-
-        QRect rect;
-        rect.setX(option.rect.x());
-        rect.setY(option.rect.y());
-        rect.setWidth(option.rect.width());
-        rect.setHeight(option.rect.height());
-
-        painter->setRenderHints(QPainter::SmoothPixmapTransform);
-
-        QRect paintRect = QRect(rect.left() + 5, rect.top(), rect.width() - 10, rect.height());
-        if (index.row() == 0) {//第一行头上加5px
-            paintRect.setY(rect.top() + 5);
+void MiddleViewDelegate::paintItemBase(QPainter *painter, const QStyleOptionViewItem &option,
+                                     const QRect &rect, bool &isSelect) const
+{
+    QPainterPath path;
+    const int radius = 8;
+    path.moveTo(rect.bottomRight() - QPoint(0, radius));
+    path.lineTo(rect.topRight() + QPoint(0, radius));
+    path.arcTo(QRect(QPoint(rect.topRight() - QPoint(radius * 2, 0)), QSize(radius * 2, radius * 2)), 0, 90);
+    path.lineTo(rect.topLeft() + QPoint(radius, 0));
+    path.arcTo(QRect(QPoint(rect.topLeft()), QSize(radius * 2, radius * 2)), 90, 90);
+    path.lineTo(rect.bottomLeft() - QPoint(0, radius));
+    path.arcTo(QRect(QPoint(rect.bottomLeft() - QPoint(0, radius * 2)), QSize(radius * 2, radius * 2)), 180, 90);
+    path.lineTo(rect.bottomLeft() + QPoint(radius, 0));
+    path.arcTo(QRect(QPoint(rect.bottomRight() - QPoint(radius * 2, radius * 2)), QSize(radius * 2, radius * 2)), 270, 90);
+    bool enable = option.state & QStyle::State_Enabled;
+    if (option.state & QStyle::State_Selected) {
+        QColor fillColor;
+        if (enable) {
+            fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
+        } else {
+            fillColor = option.palette.color(DPalette::Disabled, DPalette::Highlight);
         }
-
-        QPainterPath path;
-        const int radius = 8;
-
-        bool isSelected = false;
-
-        path.moveTo(paintRect.bottomRight() - QPoint(0, radius));
-        path.lineTo(paintRect.topRight() + QPoint(0, radius));
-        path.arcTo(QRect(QPoint(paintRect.topRight() - QPoint(radius * 2, 0)),QSize(radius * 2, radius * 2)), 0, 90);
-        path.lineTo(paintRect.topLeft() + QPoint(radius, 0));
-        path.arcTo(QRect(QPoint(paintRect.topLeft()), QSize(radius * 2, radius * 2)), 90, 90);
-        path.lineTo(paintRect.bottomLeft() - QPoint(0, radius));
-        path.arcTo(QRect(QPoint(paintRect.bottomLeft() - QPoint(0, radius * 2)), QSize(radius * 2, radius * 2)), 180, 90);
-        path.lineTo(paintRect.bottomLeft() + QPoint(radius, 0));
-        path.arcTo(QRect(QPoint(paintRect.bottomRight() - QPoint(radius * 2, radius * 2)), QSize(radius * 2, radius * 2)), 270, 90);
-
-        if (option.state & QStyle::State_Selected) {
-            QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
-            painter->setBrush(QBrush(fillColor));
+        painter->setBrush(QBrush(fillColor));
+        painter->fillPath(path, painter->brush());
+        painter->setPen(QPen(Qt::white));
+        isSelect = true;
+    } else {
+        isSelect = false;
+        if (enable == false) {
+            painter->setBrush(QBrush(m_parentPb.color(DPalette::Disabled, DPalette::ItemBackground)));
             painter->fillPath(path, painter->brush());
-            painter->setPen(QPen(Qt::white));
-
-            isSelected = true;
-        }
-        else {
-            if(m_enaleItemFlag == false){
-                painter->setBrush(QBrush(m_parentPb.color(DPalette::Disabled,DPalette::ItemBackground)));
+            painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::WindowText)));
+        } else {
+            if (option.state & QStyle::State_MouseOver) {
+                painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
                 painter->fillPath(path, painter->brush());
-            }else {
-                if (option.state & QStyle::State_MouseOver) {
-                    painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
-                    painter->fillPath(path, painter->brush());
-                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
-                } else if (option.state & QStyle::State_Enabled) {
-                    painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal,DPalette::ItemBackground)));
-                    painter->fillPath(path, painter->brush());
-                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
-                }
+                painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
+            } else {
+                painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
+                painter->fillPath(path, painter->brush());
+                painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
             }
         }
-
-        QRect iconRect(paintRect.left() + 6, paintRect.top() + 12, 40, 40);
-        painter->drawImage(iconRect, data->UI.icon);
-        painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T6));
-        QFontMetrics fontMetrics = painter->fontMetrics();
-        int space = (paintRect.height() - fontMetrics.height() * 2)/2 + paintRect.top();
-        QRect nameRect(paintRect.left() + 52, space, 170, fontMetrics.height());
-        space += fontMetrics.height();
-        QRect timeRect(paintRect.left() + 52, space, 170, fontMetrics.height());
-
-        VFolderNamePHelper vfnphelper(painter, fontMetrics, nameRect);
-
-        vfnphelper.spiltByKeyword(data->name, m_searchKeyword);
-        vfnphelper.paintFolderName(isSelected);
-
-        painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
-        painter->drawText(timeRect, Utils::convertDateTime(data->createTime));
-        painter->restore();
     }
+}
+void MiddleViewDelegate::paintNormalItem(QPainter *painter, const QStyleOptionViewItem &option,
+                                       const QModelIndex &index) const
+{
+    VNoteItem *data = static_cast<VNoteItem*>(StandardItemCommon::getStandardItemData(index));
+    if(!data){
+        return;
+    }
+    painter->save();
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    painter->setRenderHints(QPainter::SmoothPixmapTransform);
+    QRect paintRect(option.rect.x() + 10, option.rect.y() + 5,
+                    option.rect.width() - 20, option.rect.height() - 10);
+    bool isSelect = false;
+    paintItemBase(painter, option, paintRect, isSelect);
+    painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T6));
+    QFontMetrics fontMetrics = painter->fontMetrics();
+    int space = (paintRect.height() - fontMetrics.height() * 2) / 2 + paintRect.top();
+    QRect nameRect(paintRect.left() + 20, space, paintRect.width() - 40, fontMetrics.height());
+    space += fontMetrics.height();
+    QRect timeRect(paintRect.left() + 20, space, paintRect.width() - 40, fontMetrics.height());
+    QString elideText = fontMetrics.elidedText(data->noteTitle, Qt::ElideRight, nameRect.width());
+    painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
+    if (!isSelect) {
+        painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
+    }
+    painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
+    painter->drawText(timeRect, Qt::AlignLeft | Qt::AlignVCenter, Utils::convertDateTime(data->modifyTime));
+    painter->restore();
+}
+
+void MiddleViewDelegate::paintSearchItem(QPainter *painter, const QStyleOptionViewItem &option,
+                                       const QModelIndex &index) const
+{
+    VNoteItem *noteData = static_cast<VNoteItem*>(StandardItemCommon::getStandardItemData(index));
+    if(!noteData){
+        return;
+    }
+    QRect paintRect(option.rect.x() + 10, option.rect.y() + 5,
+                    option.rect.width() - 20, option.rect.height() - 10);
+    bool isSelect = false;
+    painter->save();
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    painter->setRenderHints(QPainter::SmoothPixmapTransform);
+    painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T6));
+    paintItemBase(painter, option, paintRect, isSelect);
+
+    QRect itemRect = paintRect;
+    itemRect.setHeight(itemRect.height() - 34);
+    painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T6));
+    QFontMetrics fontMetrics = painter->fontMetrics();
+    int space = (itemRect.height() - fontMetrics.height() * 2) / 2 + itemRect.top();
+    QRect nameRect(itemRect.left() + 20, space, itemRect.width() - 40, fontMetrics.height());
+    space += fontMetrics.height();
+    QRect timeRect(itemRect.left() + 20, space, itemRect.width() - 40, fontMetrics.height());
+    VNoteTextPHelper vfnphelper(painter, fontMetrics, nameRect);
+    vfnphelper.spiltByKeyword(noteData->noteTitle, m_searchKey);
+    vfnphelper.paintText(isSelect);
+
+    if (!isSelect) {
+        painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
+    }
+    painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
+    painter->drawText(timeRect, Qt::AlignLeft | Qt::AlignVCenter, Utils::convertDateTime(noteData->modifyTime));
+    VNoteFolder *folderData = FolderOper.getFolder(noteData->folderId);
+    if (folderData) {
+        QRect folderRect = itemRect;
+        folderRect.setY(itemRect.bottom());
+        QRect iconRect(folderRect.left() + 20, folderRect.top(), 24, 24);
+        painter->drawImage(iconRect, folderData->UI.icon);
+        QRect folderNameRect(iconRect.right() + 12, folderRect.top(),
+                             paintRect.width() - iconRect.width() - 50, 24);
+        QString elideText = fontMetrics.elidedText(folderData->name, Qt::ElideRight, folderNameRect.width());
+        painter->drawText(folderNameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
+    }
+    painter->restore();
 }

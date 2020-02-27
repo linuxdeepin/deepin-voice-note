@@ -1,37 +1,34 @@
 #ifndef LEFTVIEW_H
 #define LEFTVIEW_H
 
-#include "foldertree.h"
+#include <QStandardItemModel>
 
-#include <DWidget>
-#include <DPushButton>
+#include <DTreeView>
+#include <DMenu>
+DWIDGET_USE_NAMESPACE
 
-class LeftView : public DWidget
+class LeftViewDelegate;
+
+class LeftView : public DTreeView
 {
     Q_OBJECT
 public:
     explicit LeftView(QWidget *parent = nullptr);
-    void clearSelection();
-    void updateCurFolder();
-    void selectDefaultItem();
-    void delFolderItem(const QModelIndex &index);
-    int  loadNoteFolder();
+    QStandardItem *getNotepadRoot();
+    QModelIndex setDefaultNotepadItem();
 signals:
-    void sigFolderChange(const QModelIndex &index);
-    void sigFolderAction(const QModelIndex &index , QAction *action);
-
-public slots:
-    void onAddNotepad();
-    void onTreeAction(QAction *action);
-    void onTreeSelectChange(const QModelIndex &current, const QModelIndex &previous);
+    void sigAction(QAction *action);
+protected:
+    void mousePressEvent(QMouseEvent *event);
 private:
-    void initFolderTree();
-    void initUI();
-    void initConnection();
-
-    DPushButton     *m_addNotepadBtn {nullptr};
-    FolderTree      *m_folderTree    {nullptr};
-    QModelIndex      m_folderLastIndex;
+    void initDelegate();
+    void initModel();
+    void initNotepadRoot();
+    void initMenu();
+    DMenu               *m_notepadMenu {nullptr};
+    QStandardItemModel  *m_pDataModel {nullptr};
+    LeftViewDelegate    *m_pItemDelegate {nullptr};
+    bool                 m_isEnable {true};
 };
 
 #endif // LEFTVIEW_H

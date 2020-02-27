@@ -3,7 +3,8 @@
 #include "views/middleview.h"
 #include "views/rightview.h"
 #include "views/homepage.h"
-#include "views/foldertreecommon.h"
+
+#include "common/standarditemcommon.h"
 #include "common/vnotedatamanager.h"
 #include "common/vnoteaudiodevicewatcher.h"
 #include "common/vnotea2tmanager.h"
@@ -12,6 +13,7 @@
 #include "common/actionmanager.h"
 
 #include "db/vnotefolderoper.h"
+#include "db/vnoteitemoper.h"
 
 #include "dialog/vnotemessagedialog.h"
 #include "views/vnoterecordbar.h"
@@ -120,13 +122,22 @@ void VNoteMainWindow::initConnections()
     connect(m_noteSearchEdit, &DSearchEdit::textChanged,
             this, &VNoteMainWindow::onVNoteSearch);
 
-    connect(m_leftView, &LeftView::sigFolderChange,
+    connect(m_leftView->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &VNoteMainWindow::onVNoteFolderChange);
-    connect(m_leftView, &LeftView::sigFolderAction,
-            this, &VNoteMainWindow::onFolderAction);
+    connect(m_leftView, &LeftView::sigAction,
+            this, &VNoteMainWindow::onAction);
+
+    connect(m_middleView, &MiddleView::sigAction,
+            this, &VNoteMainWindow::onAction);
+
+    connect(m_addNotepadBtn, &DPushButton::clicked,
+            this, &VNoteMainWindow::addNotepad);
+
+    connect(m_addNoteBtn, &VNoteIconButton::clicked,
+            this, &VNoteMainWindow::addNote);
 
     connect(m_wndHomePage, &HomePage::sigAddFolderByInitPage,
-            this, &VNoteMainWindow::onVNoteFolderAdd);
+            this, &VNoteMainWindow::addNotepad);
 
     connect(m_returnBtn, &DIconButton::clicked,
             this, &VNoteMainWindow::onTextEditReturn);
@@ -213,11 +224,35 @@ void VNoteMainWindow::initMainView()
 
 void VNoteMainWindow::initLeftView()
 {
-    m_leftView = new LeftView(m_mainWndSpliter);
-    m_leftView->setFixedWidth(VNOTE_LEFTVIEW_W);
-    m_leftView->setBackgroundRole(DPalette::Base);
-    m_leftView->setAutoFillBackground(true);
+    m_leftViewHolder = new QWidget(m_mainWndSpliter);
+    m_leftViewHolder->setObjectName("leftMainLayoutHolder");
+    m_leftViewHolder->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    m_leftViewHolder->setFixedWidth(VNOTE_LEFTVIEW_W);
+    m_leftViewHolder->setBackgroundRole(DPalette::Base);
+    m_leftViewHolder->setAutoFillBackground(true);
+
+    QVBoxLayout *leftHolderLayout = new  QVBoxLayout();
+    leftHolderLayout->setSpacing(0);
+    leftHolderLayout->setContentsMargins(0, 5, 0, 0);
+    m_leftView = new LeftView(m_leftViewHolder);
+
+    m_leftView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_leftView->setContentsMargins(0, 0, 0, 0);
+    m_leftView->setHeaderHidden(true);
+    m_leftView->setFrameShape(QFrame::NoFrame);
+    m_leftView->setItemsExpandable(false);
+    m_leftView->setIndentation(0);
+    QStandardItem *notepadRoot = m_leftView->getNotepadRoot();
+    m_leftView->expand(notepadRoot->index());
+    leftHolderLayout->addWidget(m_leftView);
+
+    m_addNotepadBtn = new DPushButton(DApplication::translate("VNoteMainWindow", "Add Notepad"),
+                                      m_leftViewHolder);
+    QVBoxLayout *btnLayout = new QVBoxLayout(this);
+    btnLayout->addWidget(m_addNotepadBtn);
+    btnLayout->setContentsMargins(10, 5, 10, 10);
+    leftHolderLayout->addLayout(btnLayout, Qt::AlignHCenter);
+    m_leftViewHolder->setLayout(leftHolderLayout);
 
 #ifdef VNOTE_LAYOUT_DEBUG
     m_leftView->setStyleSheet("background: green");
@@ -226,10 +261,41 @@ void VNoteMainWindow::initLeftView()
 
 void VNoteMainWindow::initMiddleView()
 {
-    m_middleView = new MiddleView(m_mainWndSpliter);
-    m_middleView->setFixedWidth(VNOTE_MIDDLEVIEW_W);
-    m_middleView->setBackgroundRole(DPalette::Base);
-    m_middleView->setAutoFillBackground(true);
+    m_middleViewHolder = new QWidget(m_mainWndSpliter);
+    m_middleViewHolder->setObjectName("middleMainLayoutHolder");
+    m_middleViewHolder->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    m_middleViewHolder->setFixedWidth(VNOTE_MIDDLEVIEW_W);
+    m_middleViewHolder->setBackgroundRole(DPalette::Base);
+    m_middleViewHolder->setAutoFillBackground(true);
+
+    QVBoxLayout *middleHolderLayout = new  QVBoxLayout();
+    middleHolderLayout->setSpacing(0);
+    middleHolderLayout->setContentsMargins(0, 5, 0, 5);
+
+    m_middleView = new MiddleView(m_middleViewHolder);
+    m_addNoteBtn = new VNoteIconButton(
+        m_middleViewHolder,
+        "add_note_normal.svg",
+        "add_note_hover.svg",
+        "add_note_press.svg"
+    );
+    m_addNoteBtn->SetDisableIcon("add_note_disabled.svg");
+    m_addNoteBtn->setFlat(true);
+    m_addNoteBtn->setIconSize(QSize(68, 68));
+    m_addNoteBtn->raise();
+
+    DAnchorsBase buttonAnchor(m_addNoteBtn);
+    buttonAnchor.setAnchor(Qt::AnchorLeft, m_middleView, Qt::AnchorLeft);
+    buttonAnchor.setAnchor(Qt::AnchorBottom, m_middleView, Qt::AnchorBottom);
+    buttonAnchor.setBottomMargin(0);
+    buttonAnchor.setLeftMargin(97);
+
+    // ToDo:
+    //    Add Left view widget here
+    middleHolderLayout->addWidget(m_middleView);
+
+    m_middleViewHolder->setLayout(middleHolderLayout);
+
 
 #ifdef VNOTE_LAYOUT_DEBUG
     m_middleView->setStyleSheet("background: green");
@@ -306,11 +372,7 @@ void VNoteMainWindow::initAudioWatcher()
 
 void VNoteMainWindow::onVNoteFoldersLoaded()
 {
-    int count = m_leftView->loadNoteFolder(); //加载完成前都是显示主页
-    if (!count) {
-        m_centerWidget->setCurrentIndex(WndHomePage);
-        m_noteSearchEdit->setEnabled(false);
-    }
+    loadNotepads();
 }
 
 void VNoteMainWindow::onVNoteSearch()
@@ -319,23 +381,30 @@ void VNoteMainWindow::onVNoteSearch()
     if (!strKey.isEmpty()) {
         m_searchKey.setPattern(strKey);
         m_searchKey.setCaseSensitivity(Qt::CaseInsensitive);
+        loadSearchNotes(m_searchKey);
         m_leftView->clearSelection();
-        m_middleView->initNoteData(nullptr, m_searchKey);
         m_leftView->setEnabled(false);
+        m_addNotepadBtn->setVisible(false);
+        m_addNoteBtn->setVisible(false);
     } else {
         m_searchKey = QRegExp();
-        m_leftView->selectDefaultItem();
+        m_middleView->setSearchKey(m_searchKey);
         m_leftView->setEnabled(true);
+        m_addNotepadBtn->setVisible(true);
+        m_addNoteBtn->setVisible(true);
+        QModelIndex index = m_leftView->setDefaultNotepadItem();
+        onVNoteFolderChange(index, QModelIndex());
     }
 }
 
-void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &index)
+void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QModelIndex &previous)
 {
-    VNoteFolder *data = static_cast<VNoteFolder *>(FolderTreeCommon::getStandardItemData(index));
+    Q_UNUSED(previous);
+    VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
     if (data) {
-        m_middleView->initNoteData(data, QRegExp());
+        loadNotes(data->id);
     } else {
-        m_middleView->clearNoteData();
+        loadNotes(-1);
     }
 }
 
@@ -360,7 +429,7 @@ void VNoteMainWindow::initEmptySearchView()
 void VNoteMainWindow::initSpliterView()
 {
     m_mainWndSpliter = new DSplitter(Qt::Horizontal, this);
-
+    m_mainWndSpliter->setHandleWidth(2);
     initLeftView();
     initMiddleView();
     initRightView();
@@ -369,19 +438,6 @@ void VNoteMainWindow::initSpliterView()
 void VNoteMainWindow::initEmptyFoldersView()
 {
     m_wndHomePage = new HomePage(this);
-}
-
-void VNoteMainWindow::onVNoteFolderAdd()
-{
-    if (!m_noteSearchEdit->text().isEmpty()) {
-        m_noteSearchEdit->clearEdit();
-    }
-    if (m_centerWidget->currentIndex() == WndHomePage) {
-        m_noteSearchEdit->setEnabled(true);
-    }
-    m_centerWidget->setCurrentIndex(WndNoteShow);
-    m_leftView->onAddNotepad();
-
 }
 
 void VNoteMainWindow::onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey)
@@ -652,23 +708,169 @@ void VNoteMainWindow::onAsrAgain()
     });
 }
 
-void VNoteMainWindow::onFolderAction(const QModelIndex &index, QAction *action)
+void VNoteMainWindow::onAction(QAction *action)
 {
     ActionManager::ActionKind kind = ActionManager::getActionKind(action);
     switch (kind) {
-    case ActionManager::NotepadDelete: {
-        VNoteFolder *data = static_cast<VNoteFolder *>(FolderTreeCommon::getStandardItemData(index));
-        if (data) {
-            m_leftView->delFolderItem(index);
-            VNoteFolderOper  folderOper(data);
-            folderOper.deleteVNoteFolder(data);
-        }
-    }
-    break;
+    case ActionManager::NotepadRename:
+        editNotepad();
+        break;
+    case ActionManager::NotepadDelete:
+        delNotepad();
+        break;
     case ActionManager::NotepadAddNew:
-        m_middleView->onAddNote();
+        addNote();
+        break;
+    case ActionManager::NoteDelete:
+        delNote();
+        break;
+    case ActionManager::NoteAddNew:
+        addNote();
+        break;
+    case ActionManager::NoteRename:
+        editNote();
         break;
     default:
         break;
+    }
+}
+
+int VNoteMainWindow::loadNotepads()
+{
+    VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
+    if (folders) {
+        QList<QStandardItem *> items;
+        folders->lock.lockForRead();
+        for (auto it : folders->folders) {
+            QStandardItem *pItem = StandardItemCommon::createStandardItem(it, StandardItemCommon::NOTEPADITEM);
+            items.push_back(pItem);
+        }
+        folders->lock.unlock();
+        if (items.size()) {
+            QStandardItem *pItemRoot = m_leftView ->getNotepadRoot();
+            if (pItemRoot) {
+                pItemRoot->appendRows(items);
+                QModelIndex index = m_leftView->setDefaultNotepadItem();
+                onVNoteFolderChange(index, QModelIndex());
+            }
+            return  items.size();
+        }
+    }
+    return 0;
+}
+
+void VNoteMainWindow::addNotepad()
+{
+    VNoteFolder itemData;
+    VNoteFolderOper  folderOper;
+    itemData.defaultIcon = folderOper.getDefaultIcon();
+    itemData.UI.icon = folderOper.getDefaultIcon(itemData.defaultIcon);
+    itemData.name = folderOper.getDefaultFolderName();
+    VNoteFolder *newFolder = folderOper.addFolder(itemData);
+    if (newFolder) {
+        QStandardItem *pItem = StandardItemCommon::createStandardItem(newFolder, StandardItemCommon::NOTEPADITEM);
+        QStandardItem *root = m_leftView->getNotepadRoot();
+        root->insertRow(0, pItem);
+        m_leftView->setCurrentIndex(pItem->index());
+    }
+}
+
+void VNoteMainWindow::delNotepad()
+{
+    QModelIndex index = m_leftView->currentIndex();
+    VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(index));
+    m_leftView->model()->removeRow(index.row(), index.parent());
+    VNoteFolderOper  folderOper(data);
+    folderOper.deleteVNoteFolder(data);
+}
+
+void VNoteMainWindow::editNotepad()
+{
+    QModelIndex index = m_leftView->currentIndex();
+    m_leftView->edit(index);
+}
+
+void VNoteMainWindow::addNote()
+{
+    qint64 id = m_middleView->getCurrentId();
+    if (id != -1) {
+        VNoteItem tmpNote;
+        tmpNote.folderId = id;
+        tmpNote.noteType = VNoteItem::VNT_Text;
+        static int id = 0;
+        tmpNote.noteTitle = DApplication::translate("VNoteMainWindow", "Text") + QString::number(id++);
+        VNoteItemOper noteOper;
+        VNoteItem *newNote = noteOper.addNote(tmpNote);
+        if (newNote) {
+            QStandardItem *item = StandardItemCommon::createStandardItem(newNote, StandardItemCommon::NOTEITEM);
+            m_middleView->getStandardItemModel()->insertRow(0, item);
+            m_middleView->setCurrentIndex(item->index());
+        }
+    }
+}
+
+void VNoteMainWindow::editNote()
+{
+    QModelIndex index = m_middleView->currentIndex();
+    m_middleView->edit(index);
+}
+
+void VNoteMainWindow::delNote()
+{
+    QModelIndex index = m_middleView->currentIndex();
+    VNoteItem *noteData = static_cast< VNoteItem *>(StandardItemCommon::getStandardItemData(index));
+    if (noteData) {
+        m_middleView->getStandardItemModel()->removeRow(index.row());
+        VNoteItemOper noteOper(noteData);
+        noteOper.deleteNote();
+    }
+}
+void VNoteMainWindow::loadNotes(qint64 id)
+{
+    QStandardItemModel *model = m_middleView->getStandardItemModel();
+    model->removeRows(0, model->rowCount());
+    m_middleView->setCurrentId(id);
+    m_middleView->setVisibleEmptySearch(false);
+    if (id != -1) {
+        VNoteItemOper noteOper;
+        VNOTE_ITEMS_MAP *notes = noteOper.getFolderNotes(id);
+        if (notes) {
+            notes->lock.lockForRead();
+            for (auto it : notes->folderNotes) {
+                QStandardItem *item = StandardItemCommon::createStandardItem(it, StandardItemCommon::NOTEITEM);
+                model->appendRow(item);
+            }
+            notes->lock.unlock();
+            QModelIndex index = model->index(0, 0);
+            m_middleView->setCurrentIndex(index);
+        }
+    }
+}
+
+void VNoteMainWindow::loadSearchNotes(const QRegExp &key)
+{
+    QStandardItemModel *model = m_middleView->getStandardItemModel();
+    model->removeRows(0, model->rowCount());
+    m_middleView->setSearchKey(key);
+    VNOTE_ALL_NOTES_MAP *noteAll = VNoteDataManager::instance()->getAllNotesInFolder();
+    if (noteAll) {
+        noteAll->lock.lockForRead();
+        for (auto &it1 : noteAll->notes) {
+            for (auto &it2 : it1->folderNotes) {
+                if (it2->noteTitle.contains(key)
+                        /*|| it2->noteText.contains(searchKey)*/) {
+                    QStandardItem *item = StandardItemCommon::createStandardItem(it2, StandardItemCommon::NOTEITEM);
+                    model->appendRow(item);
+                }
+            }
+        }
+        noteAll->lock.unlock();
+        if(model->rowCount() == 0){
+            m_middleView->setVisibleEmptySearch(true);
+        }else {
+            m_middleView->setVisibleEmptySearch(false);
+            QModelIndex index = model->index(0, 0);
+            m_middleView->setCurrentIndex(index);
+        }
     }
 }

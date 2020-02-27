@@ -5,6 +5,8 @@
 
 #include <QShortcut>
 #include <QSettings>
+#include <QStandardItem>
+#include <QList>
 
 #include <DMainWindow>
 #include <DSearchEdit>
@@ -65,15 +67,13 @@ protected:
 
     void resizeEvent(QResizeEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
-
 signals:
 
 public slots:
     void onVNoteFoldersLoaded();
-    void onVNoteFolderChange(const QModelIndex &index);
-    void onFolderAction(const QModelIndex &index , QAction *action);
+    void onVNoteFolderChange(const QModelIndex &current, const QModelIndex &previous);
+    void onAction(QAction *action);
     void onVNoteSearch();
-    void onVNoteFolderAdd();
     void onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
     void onTextEditReturn();
     void onSearchNoteEmpty(qint64 id);
@@ -88,6 +88,19 @@ public slots:
     void onPreviewShortcut();
     void onMenuNoteItemChange();
     void onAsrAgain();
+private:
+    //左侧列表视图操作相关
+    void addNotepad();
+    void editNotepad();
+    void delNotepad();
+    int loadNotepads();
+
+    //中间列表视图操作
+    void addNote();
+    void editNote();
+    void delNote();
+    void loadNotes(qint64 id);
+    void loadSearchNotes(const QRegExp &key);
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
@@ -101,11 +114,16 @@ private:
 
     QWidget         *m_rightViewHolder {nullptr};
     QWidget         *m_rightNoteArea {nullptr};
+    QWidget         *m_leftViewHolder {nullptr};
+    QWidget         *m_middleViewHolder {nullptr};
 
     DSplitter   *m_mainWndSpliter {nullptr};
-    LeftView    *m_leftView {nullptr};
+    LeftView  *m_leftView {nullptr};
     MiddleView  *m_middleView {nullptr};
     RightView   *m_rightView {nullptr};
+
+    DPushButton *m_addNotepadBtn {nullptr};
+    VNoteIconButton *m_addNoteBtn {nullptr};
 
     VNoteRecordBar* m_recordBar {nullptr};
     //Audio device state watch thread

@@ -43,13 +43,10 @@ SOURCES += \
     common/vnoteaudiodevicewatcher.cpp \
     views/homepage.cpp \
     views/leftview.cpp \
-    views/folderdelegate.cpp \
-    views/foldertree.cpp \
-    views/noteitemdelegate.cpp \
-    views/notelistview.cpp \
     common/metadataparser.cpp \
     common/actionmanager.cpp \
-    views/foldertreecommon.cpp
+    common/standarditemcommon.cpp \
+    views/leftviewdelegate.cpp
 
 RESOURCES += \
     images.qrc
@@ -90,13 +87,10 @@ HEADERS += \
     common/vnoteaudiodevicewatcher.h \
     views/homepage.h \
     views/leftview.h \
-    views/folderdelegate.h \
-    views/foldertree.h \
-    views/noteitemdelegate.h \
-    views/notelistview.h \
     common/metadataparser.h \
     common/actionmanager.h \
-    views/foldertreecommon.h
+    common/standarditemcommon.h \
+    views/leftviewdelegate.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts

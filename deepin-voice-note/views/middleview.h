@@ -1,41 +1,39 @@
 #ifndef MIDDLEVIEW_H
 #define MIDDLEVIEW_H
 
-#include <DWidget>
+#include <DListView>
+#include <DMenu>
 #include <DLabel>
-#include <DStackedWidget>
 
 DWIDGET_USE_NAMESPACE
-class VNoteIconButton;
-class NoteListView;
-struct VNoteFolder;
-struct VNoteItem;
+class MiddleViewDelegate;
 
-class MiddleView : public DWidget
+class MiddleView : public DListView
 {
     Q_OBJECT
 public:
     MiddleView(QWidget *parent = nullptr);
-    void initNoteData(VNoteFolder * notepad,const QRegExp& searchKey);
-    void        clearNoteData();
-    VNoteItem*  getNoteData(const QModelIndex &index) const;
+    void setSearchKey(const QRegExp &key);
+    void setCurrentId(qint64 id);
+    void setVisibleEmptySearch(bool visible);
+    qint64 getCurrentId();
+    QStandardItemModel *getStandardItemModel();
+
 signals:
-    void sigNotepadItemChange(const QModelIndex &index);
-public slots:
-    void onAddNote();
-    void onRenameItem();
-    void onDeleteItem();
-    void onNoteChange(const QModelIndex &previous);
+    void sigAction(QAction *action);
 protected:
     void mousePressEvent(QMouseEvent *event);
 private:
-    void initUi();
-    void initConnection();
-    NoteListView *m_noteListView {nullptr};
-    VNoteIconButton *m_addNoteBtn{nullptr};
-    VNoteFolder *m_notepad {nullptr};
-    DLabel *m_noSearchResultLab {nullptr};
-    DStackedWidget *m_centerWidget {nullptr};
+    void initDelegate();
+    void initModel();
+    void initMenu();
+    void initUI();
+    qint64              m_currentId {-1};
+    QRegExp             m_searchKey;
+    DLabel             *m_emptySearch {nullptr};
+    DMenu              *m_noteMenu {nullptr};
+    QStandardItemModel *m_pDataModel {nullptr};
+    MiddleViewDelegate *m_pItemDelegate {nullptr};
 };
 
 #endif // MIDDLEVIEW_H
