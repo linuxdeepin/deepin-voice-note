@@ -33,8 +33,6 @@ void TextNoteItem::initUI()
     m_textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_textEdit->setFrameShape(QFrame::NoFrame);
     m_textEditFormat =  m_textEdit->currentCharFormat();
-    m_textEdit->setDocMargin(QMargins(0,2,50,0));
-    m_textEdit->setLineHeight(25);
 
     m_menuBtn = new VNoteIconButton(this
                                     , "more_normal.svg"
@@ -90,8 +88,8 @@ void TextNoteItem::initConnection()
     connect(m_textEdit, &TextNoteEdit::textChanged, this, &TextNoteItem::onTextChanged);
     connect(m_textEdit, &TextNoteEdit::sigFocusIn, this, &TextNoteItem::onEditFocusIn);
     connect(m_textEdit, &TextNoteEdit::sigFocusOut, this, &TextNoteItem::onEditFocusOut);
-    connect(m_textEdit, &TextNoteEdit::sigDocumentSizeChange,
-            this, &TextNoteItem::onUpdateDetilBtn);
+//    connect(m_textEdit, &TextNoteEdit::sigDocumentSizeChange,
+//            this, &TextNoteItem::onUpdateDetilBtn);
 
     connect(m_detailBtn, &VNoteIconButton::clicked, this, &TextNoteItem::onShowDetail);
     connect(m_menuBtn, &VNoteIconButton::clicked, this, &TextNoteItem::onShowMenu);

@@ -79,9 +79,9 @@ bool VNoteRecordBar::eventFilter(QObject *o, QEvent *e)
 
 void VNoteRecordBar::onStartRecord()
 {
-    m_recordPanel->setVisible(true);
-    m_recordBtn->setVisible(false);
-    m_recordPanel->startRecord();
+//    m_recordPanel->setVisible(true);
+//    m_recordBtn->setVisible(false);
+//    m_recordPanel->startRecord();
     emit sigStartRecord();
 }
 
@@ -94,17 +94,17 @@ void VNoteRecordBar::onFinshRecord(const QString &voicePath,qint64 voiceSize)
 
 void VNoteRecordBar::OnMicrophoneAvailableChanged(bool isAvailable)
 {
-    if (isAvailable) {
-        m_recordBtn->setBtnDisabled(false);
-        m_recordBtn->setToolTip("");
-    } else {
-        m_recordBtn->setBtnDisabled(true);
-        m_recordBtn->setToolTip(
-                    DApplication::translate(
-                        "VNoteRecordBar",
-                        "No recording device detected")
-                    );
-    }
+//    if (isAvailable) {
+//        m_recordBtn->setBtnDisabled(false);
+//        m_recordBtn->setToolTip("");
+//    } else {
+//        m_recordBtn->setBtnDisabled(true);
+//        m_recordBtn->setToolTip(
+//                    DApplication::translate(
+//                        "VNoteRecordBar",
+//                        "No recording device detected")
+//                    );
+//    }
 }
 
 void VNoteRecordBar::cancelRecord()

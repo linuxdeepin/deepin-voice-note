@@ -76,8 +76,8 @@ void RightNoteList::addNodeItem(VNoteItem *item, const QRegExp &searchKey, bool 
                 this, SIGNAL(sigVoicePlayBtnClicked(VoiceNoteItem *)));
         connect(voiceItem, SIGNAL(sigVoicePauseBtnClicked(VoiceNoteItem *)),
                 this, SIGNAL(sigVoicePauseBtnClicked(VoiceNoteItem *)));
-        connect(voiceItem, SIGNAL(sigItemAddHeight(int)), this, SLOT(onItemAddHeight(int)));
-        connect(voiceItem, SIGNAL(sigVoicePlayPosChange(int)), this, SIGNAL(sigVoicePlayPosChange(int)));
+        //connect(voiceItem, SIGNAL(sigItemAddHeight(int)), this, SLOT(onItemAddHeight(int)));
+        //connect(voiceItem, SIGNAL(sigVoicePlayPosChange(int)), this, SIGNAL(sigVoicePlayPosChange(int)));
     }
     adjustWidgetItemWidth(this->count() - 1);
     this->scrollToBottom();
@@ -160,26 +160,12 @@ void RightNoteList::updateNodeItem(VNoteItem *item)
 
 VoiceNoteItem *RightNoteList::getVoiceItem(VNoteItem *item)
 {
-    if (item && item->noteType == VNoteItem::VNOTE_TYPE::VNT_Voice) {
-        for (int i = 0; i < this->count(); i++) {
-            VNoteItemWidget *itemWidget = static_cast<VNoteItemWidget *>(this->itemWidget(this->item(i)));
-            if (itemWidget->getNoteItem() == item) {
-                return  static_cast<VoiceNoteItem *>(itemWidget);
-            }
-        }
-    }
     return nullptr;
 }
 
 void RightNoteList::setVoicePlayEnable(bool enable)
 {
-    for (int i = 0; i < this->count(); i++) {
-        VNoteItemWidget *itemWidget = static_cast<VNoteItemWidget *>(this->itemWidget(this->item(i)));
-        if (itemWidget->getNoteItem()->noteType == VNoteItem::VNOTE_TYPE::VNT_Voice) {
-            VoiceNoteItem *item = static_cast<VoiceNoteItem *>(itemWidget);
-            item->enblePlayBtn(enable);
-        }
-    }
+
 }
 
 bool RightNoteList::hasSearchNote(QRegExp &searchKey)

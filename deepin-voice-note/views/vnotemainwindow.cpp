@@ -9,6 +9,8 @@
 #include "common/vnoteaudiodevicewatcher.h"
 #include "common/vnotea2tmanager.h"
 #include "common/vnoteitem.h"
+#include "common/vnoteforlder.h"
+
 #include "common/utils.h"
 #include "common/actionmanager.h"
 
@@ -129,6 +131,9 @@ void VNoteMainWindow::initConnections()
 
     connect(m_middleView, &MiddleView::sigAction,
             this, &VNoteMainWindow::onAction);
+    connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
+                this, SLOT(onVNoteChange(const QModelIndex &)));
+
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::addNotepad);
@@ -142,12 +147,12 @@ void VNoteMainWindow::initConnections()
     connect(m_returnBtn, &DIconButton::clicked,
             this, &VNoteMainWindow::onTextEditReturn);
 
-    connect(m_rightView, &RightView::sigTextEditDetail,
-            this, &VNoteMainWindow::onTextEditDetail);
-    connect(m_rightView, &RightView::sigSearchNoteEmpty,
-            this, &VNoteMainWindow::onSearchNoteEmpty);
-    connect(m_rightView, &RightView::sigMenuNoteItemChange,
-            this, &VNoteMainWindow::onMenuNoteItemChange);
+//    connect(m_rightView, &RightView::sigTextEditDetail,
+//            this, &VNoteMainWindow::onTextEditDetail);
+//    connect(m_rightView, &RightView::sigSearchNoteEmpty,
+//            this, &VNoteMainWindow::onSearchNoteEmpty);
+//    connect(m_rightView, &RightView::sigMenuNoteItemChange,
+//            this, &VNoteMainWindow::onMenuNoteItemChange);
 
     connect(m_recordBar, &VNoteRecordBar::sigStartRecord, this, &VNoteMainWindow::onStartRecord);
     connect(m_recordBar, &VNoteRecordBar::sigFinshRecord, this, &VNoteMainWindow::onFinshRecord);
@@ -308,28 +313,15 @@ void VNoteMainWindow::initRightView()
     m_rightViewHolder->setObjectName("rightMainLayoutHolder");
     m_rightViewHolder->setSizePolicy(QSizePolicy::Expanding
                                      , QSizePolicy::Expanding);
+    m_rightViewHolder->setBackgroundRole(DPalette::Base);
+    m_rightViewHolder->setAutoFillBackground(true);
 
-    QVBoxLayout *rightHolderLayout = new QVBoxLayout(m_rightViewHolder);
+    QVBoxLayout *rightHolderLayout = new QVBoxLayout;
     rightHolderLayout->setSpacing(0);
-    rightHolderLayout->setContentsMargins(0, 0, 0, 0);
-
-    //TODO:
-    //    Add note area code here
-    m_rightNoteArea = new QWidget(m_rightViewHolder);
-    m_rightNoteArea->setBackgroundRole(DPalette::Base);
-    m_rightNoteArea->setAutoFillBackground(true);
-
-    QVBoxLayout *rightNoteAreaLayout = new QVBoxLayout(m_rightNoteArea);
-    rightNoteAreaLayout->setSpacing(0);
-    rightNoteAreaLayout->setContentsMargins(0, 0, 0, 0);
+    rightHolderLayout->setContentsMargins(0, 10, 0, 0);
 
     m_rightView = new RightView(m_rightViewHolder);
-    m_rightView->setSizePolicy(QSizePolicy::Preferred
-                               , QSizePolicy::Preferred);
-    m_rightView->setBackgroundRole(DPalette::Base);
-    m_rightView->setAutoFillBackground(true);
-
-    rightNoteAreaLayout->addWidget(m_rightView);
+    rightHolderLayout->addWidget(m_rightView);
 
     //TODO:
     //    Add record area code here
@@ -339,9 +331,8 @@ void VNoteMainWindow::initRightView()
     m_recordBar->setFixedHeight(78);
     m_recordBar->setSizePolicy(QSizePolicy::Expanding
                                , QSizePolicy::Fixed);
-
-    rightHolderLayout->addWidget(m_rightNoteArea);
-    rightHolderLayout->addWidget(m_recordBar);
+    rightHolderLayout->addWidget(m_recordBar,Qt::AlignBottom);
+    m_rightViewHolder->setLayout(rightHolderLayout);
 
 #ifdef VNOTE_LAYOUT_DEBUG
     m_rightViewHolder->setStyleSheet("background: red");
@@ -364,7 +355,7 @@ void VNoteMainWindow::initAudioWatcher()
         //audio to text manager
         m_a2tManager = new VNoteA2TManager();
 
-        connect(m_rightView, &RightView::asrStart, this, &VNoteMainWindow::onA2TStart);
+        //connect(m_rightView, &RightView::asrStart, this, &VNoteMainWindow::onA2TStart);
         connect(m_a2tManager, &VNoteA2TManager::asrError, this, &VNoteMainWindow::onA2TError);
         connect(m_a2tManager, &VNoteA2TManager::asrSuccess, this, &VNoteMainWindow::onA2TSuccess);
     });
@@ -490,13 +481,7 @@ void VNoteMainWindow::onSearchNoteEmpty(qint64 id)
 
 void VNoteMainWindow::onStartRecord()
 {
-//    if (m_isAsrVoiceing == false) {
-//        m_floatingAddNoteBtn->setBtnDisabled(true);
-//        m_middleView->setFolderEnable(false);
-//        m_noteSearchEdit->setEnabled(false);
-//    }
-//    m_rightView->setVoicePlayEnable(false);
-//    m_isRecording = true;
+    m_rightView->insertVoiceItem();
 }
 
 void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
@@ -702,12 +687,19 @@ void VNoteMainWindow::onMenuNoteItemChange()
 
 void VNoteMainWindow::onAsrAgain()
 {
-    m_asrErrMeassage->setVisible(false);
-    QTimer::singleShot(0, this, [this]() {
-        m_rightView->onAsrVoiceAction();
-    });
+//    m_asrErrMeassage->setVisible(false);
+//    QTimer::singleShot(0, this, [this]() {
+//        m_rightView->onAsrVoiceAction();
+//    });
 }
 
+void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
+{
+    Q_UNUSED(previous);
+    QModelIndex index = m_middleView->currentIndex();
+    VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
+    m_rightView->initData(data);
+}
 void VNoteMainWindow::onAction(QAction *action)
 {
     ActionManager::ActionKind kind = ActionManager::getActionKind(action);

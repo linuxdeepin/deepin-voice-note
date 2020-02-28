@@ -72,6 +72,7 @@ signals:
 public slots:
     void onVNoteFoldersLoaded();
     void onVNoteFolderChange(const QModelIndex &current, const QModelIndex &previous);
+    void onVNoteChange(const QModelIndex &previous);
     void onAction(QAction *action);
     void onVNoteSearch();
     void onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);

@@ -1,22 +1,26 @@
 ﻿#include "voicenoteitem.h"
+#include "textnoteedit.h"
+
 #include "common/vnoteitem.h"
 #include "common/utils.h"
+
+#include "widgets/vnoteiconbutton.h"
 
 #include <QDebug>
 #include <QGridLayout>
 #include <QVBoxLayout>
-#include <QTimer>
+#include <QHBoxLayout>
+#include <QAbstractTextDocumentLayout>
 
 #include <DApplicationHelper>
 #include <DFontSizeManager>
 #include <DGuiApplicationHelper>
 #include <DStyle>
 
-#define ASRTEXTBOTTOMSPACE 15
-#define MAXTEXTEDITHEIGHT 140
+#define DefaultHeight 64
 
 VoiceNoteItem::VoiceNoteItem(VNoteItem *textNote, QWidget *parent)
-    : VNoteItemWidget(parent)
+    : DWidget(parent)
     , m_textNode(textNote)
 {
     initUi();
@@ -27,156 +31,100 @@ VoiceNoteItem::VoiceNoteItem(VNoteItem *textNote, QWidget *parent)
 
 void VoiceNoteItem::initUi()
 {
-    m_createTimeLab = new DLabel(this);
-    m_createTimeLab->setFixedHeight(16);
-    DFontSizeManager::instance()->bind(m_createTimeLab, DFontSizeManager::T9);
+    this->setFixedHeight(DefaultHeight);
     m_bgWidget = new DFrame(this);
-    m_bgWidget->setLineWidth(0);
-    DPalette pb = DApplicationHelper::instance()->palette(m_bgWidget);
-    pb.setBrush(DPalette::Base, pb.color(DPalette::ItemBackground));
-    m_bgWidget->setPalette(pb);
-
-    m_waveForm = new VNWaveform(this);
-    m_waveForm->setFixedHeight(33);
-    m_waveForm->setEnabled(false);
-
-    m_asrText = new TextNoteEdit(this);
+    m_createTimeLab = new DLabel(m_bgWidget);
+    DFontSizeManager::instance()->bind(m_createTimeLab, DFontSizeManager::T8);
+    m_createTimeLab->setText("2019-10-21 19:30");
+    m_asrText = new TextNoteEdit(m_bgWidget);
     DFontSizeManager::instance()->bind(m_asrText, DFontSizeManager::T8);
     m_asrText->setReadOnly(true);
     DStyle::setFocusRectVisible(m_asrText, false);
-    pb = DApplicationHelper::instance()->palette(m_asrText);
+    DPalette pb = DApplicationHelper::instance()->palette(m_asrText);
     pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));
     pb.setBrush(DPalette::Text, pb.color(DPalette::Highlight));
     m_asrText->setPalette(pb);
-    m_asrText->document()->setDocumentMargin(5);
     m_asrText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_asrText->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_asrText->setLineHeight(27);
-    m_asrText->document()->setDocumentMargin(5);
-
-    m_voiceSizeLab = new DLabel(this);
+    m_asrText->document()->setDocumentMargin(0);
+    m_asrText->setVisible(false);
+    m_voiceSizeLab = new DLabel(m_bgWidget);
     m_voiceSizeLab->setFixedSize(66, 30);
     m_voiceSizeLab->setAlignment(Qt::AlignCenter);
-
-    m_curSizeLab = new DLabel(this);
-    m_curSizeLab->setFixedSize(66, 30);
-    m_curSizeLab->setAlignment(Qt::AlignCenter);
-
-    m_menuBtn = new VNoteIconButton(this
-                                    , "more_normal.svg"
-                                    , "more_hover.svg"
-                                    , "more_press.svg");
-    m_menuBtn->setIconSize(QSize(44, 44));
-    m_menuBtn->setFlat(true);
-
-    m_pauseBtn = new VNoteIconButton(this
+    m_pauseBtn = new VNoteIconButton(m_bgWidget
                                      , "pause_normal.svg"
                                      , "pause_hover.svg"
                                      , "pause_press.svg");
     m_pauseBtn->setIconSize(QSize(60, 60));
     m_pauseBtn->setFlat(true);
 
-    m_playBtn = new VNoteIconButton(this
+    m_playBtn = new VNoteIconButton(m_bgWidget
                                     , "play_normal.svg"
                                     , "play_hover.svg"
                                     , "play_press.svg");
     m_playBtn->setIconSize(QSize(60, 60));
     m_playBtn->setFlat(true);
     m_playBtn->SetDisableIcon("play_disabled.svg");
-
-    m_detailBtn = new VNoteIconButton(this
-                                      , "detail_normal.svg"
-                                      , "detail_press.svg"
-                                      , "detail_hover.svg");
-    m_detailBtn->setIconSize(QSize(44, 44));
-    m_detailBtn->setFlat(true);
-
-    QGridLayout *mainLayout = new QGridLayout;
-    QVBoxLayout *createTimeLayout = new QVBoxLayout;
-    createTimeLayout->addWidget(m_createTimeLab);
-    createTimeLayout->setContentsMargins(0, 0, 0, 10);
-    mainLayout->addLayout(createTimeLayout, 0, 0, 1, 1);
-    mainLayout->addWidget(m_bgWidget, 1, 0, 3, 3);
+    DLabel *name = new DLabel(this);
+    DFontSizeManager::instance()->bind(name, DFontSizeManager::T6);
+    name->setText("语音");
 
     QGridLayout *playBtnLayout = new QGridLayout;
-    playBtnLayout->addWidget(m_pauseBtn, 0, 0);
-    playBtnLayout->addWidget(m_playBtn, 0, 0);
-    playBtnLayout->setContentsMargins(5, 2, 0, 2);
-    mainLayout->addLayout(playBtnLayout, 1, 0);
-
-    QHBoxLayout *layoutH = new QHBoxLayout;
-    layoutH->addWidget(m_curSizeLab);
-    layoutH->addWidget(m_waveForm);
-    layoutH->addWidget(m_voiceSizeLab);
-    layoutH->addSpacing(6);
-    layoutH->addWidget(m_menuBtn);
-    layoutH->addSpacing(7);
-    layoutH->setSpacing(0);
-    layoutH->setContentsMargins(0, 0, 0, 0);
-    layoutH->setSizeConstraint(QLayout::SetNoConstraint);
-    mainLayout->addLayout(layoutH, 1, 1, 1, 2);
-    mainLayout->setRowStretch(0, 0);
-    mainLayout->setRowStretch(1, 1);
-    mainLayout->setRowStretch(2, 0);
-
-    mainLayout->setColumnStretch(0, 0);
-    mainLayout->setColumnStretch(1, 1);
-    mainLayout->setColumnStretch(2, 0);
-
-    mainLayout->setSizeConstraint(QLayout::SetNoConstraint);
-    mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0, 5, 0, 0);
+    playBtnLayout->addWidget(m_pauseBtn,0,0);
+    playBtnLayout->addWidget(m_playBtn,0,0);
+    playBtnLayout->setSizeConstraint(QLayout::SetNoConstraint);
+    QVBoxLayout *nameLayout = new QVBoxLayout;
+    nameLayout->addWidget(name, Qt::AlignLeft);
+    nameLayout->addWidget(m_createTimeLab, Qt::AlignLeft);
+    nameLayout->setContentsMargins(0,0,0,0);
+    nameLayout->setSpacing(0);
+    m_voiceSizeLab->setText("50'00");
+    QHBoxLayout *itemLayout = new QHBoxLayout;
+    itemLayout->addLayout(playBtnLayout);
+    itemLayout->addLayout(nameLayout,1);
+    itemLayout->addWidget(m_voiceSizeLab);
+    itemLayout->setSizeConstraint(QLayout::SetNoConstraint);
+    itemLayout->setContentsMargins(0,0,0,0);
+    QVBoxLayout *bkLayout = new QVBoxLayout;
+    bkLayout->addLayout(itemLayout);
+    bkLayout->addWidget(m_asrText);
+    bkLayout->setContentsMargins(0,0,0,0);
+    m_bgWidget->setLayout(bkLayout);
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addWidget(m_bgWidget);
+    mainLayout->setContentsMargins(10,0,10,0);
+    showPlayBtn();
     this->setLayout(mainLayout);
-    m_detailBtn->setVisible(false);
-    m_asrText->setVisible(false);
-    m_pauseBtn->setVisible(false);
+
+
 }
 
 void VoiceNoteItem::initData()
 {
-    m_createTimeLab->setText(Utils::convertDateTime(m_textNode->createTime));
-//    m_voiceSizeLab->setText(Utils::formatMillisecond(m_textNode->voiceSize));
-//    m_curSizeLab->setText(Utils::formatMillisecond(0, 0));
-//    if (!m_textNode->metaData.isEmpty()) {
-//        showAsrEndWindow(m_textNode->metaData);
-//    }
-//    m_waveForm->setMinimum(0);
-//    m_waveForm->setMaximum(static_cast<int>(m_textNode->voiceSize));
+    //m_createTimeLab->setText(Utils::convertDateTime(m_textNode->createTime));
 }
 
 void VoiceNoteItem::initConnection()
 {
-    connect(m_menuBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onshowMenu);
     connect(m_pauseBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onPauseBtnClicked);
     connect(m_playBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onPlayBtnClicked);
-    connect(m_detailBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onShowDetail);
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &VoiceNoteItem::onChangeTheme);
-    connect(m_waveForm, &VNWaveform::sliderReleased, this, &VoiceNoteItem::onSliderReleased);
-    connect(m_waveForm, &VNWaveform::sliderPressed, this, &VoiceNoteItem::onSliderPressed);
-
-    connect(m_asrText, &TextNoteEdit::sigDocumentSizeChange,
-            this, &VoiceNoteItem::onUpdateDetilBtn);
-}
-
-void VoiceNoteItem::onshowMenu()
-{
-    emit sigMenuPopup(m_textNode);
-}
-
-void VoiceNoteItem::onShowDetail()
-{
-    emit sigTextEditDetail(m_textNode, m_asrText, QRegExp());
+    QTextDocument *document = m_asrText->document();
+    QAbstractTextDocumentLayout *documentLayout = document->documentLayout();
+    connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, &VoiceNoteItem::onAsrTextChange);
 }
 
 void VoiceNoteItem::onPlayBtnClicked()
 {
-    emit sigVoicePlayBtnClicked(this);
+    showPauseBtn();
+    emit sigPlayBtnClicked(this);
 }
 
 void VoiceNoteItem::onPauseBtnClicked()
 {
-    emit sigVoicePauseBtnClicked(this);
+    showPlayBtn();
+    emit sigPauseBtnClicked(this);
 }
 
 
@@ -209,16 +157,6 @@ void VoiceNoteItem::showAsrStartWindow()
 void VoiceNoteItem::showAsrEndWindow(const QString &strResult)
 {
     m_asrText->setPlainText(strResult);
-    if (strResult.isEmpty()) {
-        m_asrText->setVisible(false);
-        m_detailBtn->setVisible(false);
-        if (m_isBottomSpace == true) {
-            m_isBottomSpace = false;
-        }
-        m_lastHeight = 0;
-        emit sigItemAddHeight(95 - this->height());
-        return;
-    }
     QTextOption option = m_asrText->document()->defaultTextOption();
     option.setAlignment(Qt::AlignLeft);
     m_asrText->document()->setDefaultTextOption(option);
@@ -235,48 +173,6 @@ void VoiceNoteItem::enblePauseBtn(bool enable)
     m_pauseBtn->setEnabled(enable);
 }
 
-void VoiceNoteItem::resizeEvent(QResizeEvent *event)
-{
-    VNoteItemWidget::resizeEvent(event);
-    if (m_detailBtn->isVisible()) {
-        m_detailBtn->move(this->width() - 51, this->height() - 56);
-    }
-    if (m_asrText->isVisible()) {
-        m_asrText->setFixedSize(QSize(this->width() - 70, this->height() - 110));
-        m_asrText->move(9, 90);
-    }
-}
-
-void VoiceNoteItem::onUpdateDetilBtn()
-{
-    QTimer::singleShot(0, this, [ = ] {
-        QTextDocument *doc = m_asrText->document();
-        int documentHeight = 0;
-        if (!doc->isEmpty())
-        {
-            documentHeight = static_cast<int>(doc->size().height());
-        }
-        if (documentHeight >= MAXTEXTEDITHEIGHT + 10)
-        {
-            documentHeight = MAXTEXTEDITHEIGHT;
-            m_detailBtn->setVisible(true);
-        } else
-        {
-            m_detailBtn->setVisible(false);
-        }
-        if (documentHeight && m_lastHeight != documentHeight)
-        {
-            int value = documentHeight - m_lastHeight;
-            if (m_isBottomSpace == false) {
-                value += ASRTEXTBOTTOMSPACE;
-                m_isBottomSpace = true;
-            }
-            emit sigItemAddHeight(value);
-            m_lastHeight = documentHeight;
-        }
-    });
-}
-
 void VoiceNoteItem::onChangeTheme()
 {
     DPalette pb = DApplicationHelper::instance()->palette(m_bgWidget);
@@ -284,54 +180,14 @@ void VoiceNoteItem::onChangeTheme()
     m_bgWidget->setPalette(pb);
 }
 
-void VoiceNoteItem::onSliderReleased()
+void VoiceNoteItem::onAsrTextChange()
 {
-    emit sigVoicePlayPosChange(m_waveForm->value());
-    m_isSliderPressed = false;
-}
-
-void VoiceNoteItem::onSliderPressed()
-{
-    m_isSliderPressed = true;
-}
-void VoiceNoteItem::setPlayPos(int pos)
-{
-    if (!m_isSliderPressed) {
-        m_waveForm->setValue(pos);
-        if (m_waveForm->maximum() < 1000) {
-            m_curSizeLab->setText(Utils::formatMillisecond(pos, 1));
-        } else {
-            m_curSizeLab->setText(Utils::formatMillisecond(pos, 0));
-        }
+    int height = DefaultHeight;
+    QTextDocument *doc = m_asrText->document();
+    if(!doc->isEmpty()){
+        int docHeight = static_cast<int>(doc->size().height());
+        m_asrText->setFixedHeight(docHeight);
+        height += docHeight;
     }
-}
-
-void VoiceNoteItem::setSliderEnable(bool enable)
-{
-    m_waveForm->setEnabled(enable);
-}
-
-void VoiceNoteItem::enbleMenuBtn(bool enable)
-{
-    m_menuBtn->setEnabled(enable);
-}
-void VoiceNoteItem::enterEvent(QEvent *event)
-{
-    DPalette pb = DApplicationHelper::instance()->palette(m_bgWidget);
-    pb.setBrush(DPalette::Base, pb.color(DPalette::Light));
-    m_bgWidget->setPalette(pb);
-    return VNoteItemWidget::enterEvent(event);
-}
-
-void VoiceNoteItem::leaveEvent(QEvent *event)
-{
-    DPalette pb = DApplicationHelper::instance()->palette(m_bgWidget);
-    pb.setBrush(DPalette::Base, pb.color(DPalette::ItemBackground));
-    m_bgWidget->setPalette(pb);
-    return VNoteItemWidget::leaveEvent(event);
-}
-
-void VoiceNoteItem::updateData()
-{
-    //showAsrEndWindow(m_textNode->metaData);
+    this->setFixedHeight(height);
 }
