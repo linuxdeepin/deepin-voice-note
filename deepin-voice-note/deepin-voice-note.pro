@@ -46,7 +46,8 @@ SOURCES += \
     common/metadataparser.cpp \
     common/actionmanager.cpp \
     common/standarditemcommon.cpp \
-    views/leftviewdelegate.cpp
+    views/leftviewdelegate.cpp \
+    views/splashview.cpp
 
 RESOURCES += \
     images.qrc
@@ -90,7 +91,8 @@ HEADERS += \
     common/metadataparser.h \
     common/actionmanager.h \
     common/standarditemcommon.h \
-    views/leftviewdelegate.h
+    views/leftviewdelegate.h \
+    views/splashview.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts

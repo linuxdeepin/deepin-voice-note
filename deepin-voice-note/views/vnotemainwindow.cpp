@@ -481,7 +481,7 @@ void VNoteMainWindow::onSearchNoteEmpty(qint64 id)
 
 void VNoteMainWindow::onStartRecord()
 {
-    m_rightView->insertVoiceItem();
+    m_rightView->insertVoiceItem(nullptr);
 }
 
 void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
@@ -789,6 +789,14 @@ void VNoteMainWindow::addNote()
         VNoteItem tmpNote;
         tmpNote.folderId = id;
         tmpNote.noteType = VNoteItem::VNT_Text;
+
+        //Add default text block
+        //Comment:
+        //    ptrBlock will be released when the data set is destroyed,
+        //so don't need release it here.
+        VNoteBlock* ptrBlock = tmpNote.datas.newBlock(VNoteBlock::Text);
+        tmpNote.datas.addBlock(ptrBlock);
+
         static int id = 0;
         tmpNote.noteTitle = DApplication::translate("VNoteMainWindow", "Text") + QString::number(id++);
         VNoteItemOper noteOper;

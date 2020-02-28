@@ -6,6 +6,7 @@
 #include <DWidget>
 DWIDGET_USE_NAMESPACE
 struct VNoteItem;
+struct VNoteBlock;
 class VoiceNoteItem;
 
 class RightView : public DWidget
@@ -14,8 +15,8 @@ class RightView : public DWidget
 public:
     explicit RightView(QWidget *parent = nullptr);
     void initData(VNoteItem *data);
-    DWidget *insertVoiceItem();
-    DWidget *insertTextEdit(int preWidgetIndex,QString strText = "", bool focus = false);
+    DWidget *insertVoiceItem(VNoteBlock* data);
+    DWidget *insertTextEdit(int preWidgetIndex,VNoteBlock* data, bool focus = false);
 public slots:
     void onTextEditFocusIn();
     void onTextEditFocusOut();
@@ -23,6 +24,9 @@ public slots:
     void onTextEditTextChange();
     void onVoicePlay(VoiceNoteItem *item);
     void onVoicePause(VoiceNoteItem *item);
+protected:
+    void leaveEvent(QEvent *event) override;
+    void saveNote();
 private:
     void        initUi();
     VNoteItem   *m_noteItemData {nullptr};
@@ -31,6 +35,9 @@ private:
     DWidget     *m_placeholderWidget {nullptr};
     QVBoxLayout *m_viewportLayout {nullptr};
     QScrollArea *m_viewportScrollArea {nullptr};
+
+    //If note is modified
+    bool         m_fIsNoteModified {false};
 };
 
 #endif // RIGHTVIEW_H

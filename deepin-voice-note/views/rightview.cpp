@@ -53,7 +53,7 @@ void RightView::initUi()
     this->setLayout(mainLayout);
 }
 
-QWidget *RightView::insertTextEdit(int preWidgetIndex, QString strText, bool focus)
+QWidget *RightView::insertTextEdit(int preWidgetIndex,VNoteBlock* data, bool focus)
 {
     QLayoutItem *preItem = m_viewportLayout->itemAt(preWidgetIndex);
     if (preItem != nullptr) {
@@ -69,7 +69,7 @@ QWidget *RightView::insertTextEdit(int preWidgetIndex, QString strText, bool foc
     pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));
     editItem->setPalette(pb);
 
-    editItem->setPlainText(strText);
+    editItem->setPlainText(data->blockText);
     editItem->setObjectName(TextEditWidget);
     editItem->document()->setDocumentMargin(0);
     editItem->setFixedHeight(24);
@@ -92,7 +92,7 @@ QWidget *RightView::insertTextEdit(int preWidgetIndex, QString strText, bool foc
     return  editItem;
 }
 
-QWidget *RightView::insertVoiceItem()
+QWidget *RightView::insertVoiceItem(VNoteBlock* data)
 {
     if (m_curItemWidget != nullptr) {
         QString objName = m_curItemWidget->objectName();
@@ -116,7 +116,7 @@ QWidget *RightView::insertVoiceItem()
             m_viewportLayout->insertWidget(curIndex + 1, item);
             m_curItemWidget = item;
 
-            m_curItemWidget = insertTextEdit(m_viewportLayout->indexOf(item), cutStr, true);
+            //m_curItemWidget = insertTextEdit(m_viewportLayout->indexOf(item), cutStr, true);
             qDebug() << m_viewportLayout->count();
         }
     }
@@ -172,7 +172,16 @@ void RightView::initData(VNoteItem *data)
         widget->deleteLater();
     }
     m_noteItemData = data;
-    m_curItemWidget = insertTextEdit(-1, data->noteTitle, true);
+
+    //Init UI controls here.
+    for (auto it : m_noteItemData->datas.datas) {
+        if (VNoteBlock::Text == it->getType()) {
+            insertTextEdit(-1, it, true);
+        } else if (VNoteBlock::Voice == it->getType()) {
+
+        }
+    }
+    //m_curItemWidget = insertTextEdit(-1, data->noteTitle, true);
 }
 
 void RightView::onVoicePlay(VoiceNoteItem *item)
@@ -190,4 +199,26 @@ void RightView::onVoicePlay(VoiceNoteItem *item)
 void RightView::onVoicePause(VoiceNoteItem *item)
 {
     item->showPlayBtn();
+}
+
+void RightView::leaveEvent(QEvent *event)
+{
+    Q_UNUSED(event);
+    //TODO:
+    //    Add the note save code here.
+    saveNote();
+}
+
+void RightView::saveNote()
+{
+    qInfo() << __FUNCTION__ << "Is note changed:" << m_fIsNoteModified;
+
+    if (m_fIsNoteModified) {
+        VNoteItemOper noteOper(m_noteItemData);
+        if (!noteOper.updateNote()) {
+            qInfo() << "Save note error:" << *m_noteItemData;
+        } else {
+            m_fIsNoteModified = false;
+        }
+    }
 }
