@@ -50,6 +50,8 @@ void VNoteIconButton::setBtnDisabled(bool disabled)
         }
 
         updateIcon();
+
+        setDisabled(m_isDisabled);
     }
 }
 
