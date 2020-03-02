@@ -2,8 +2,10 @@
 
 #include <QWheelEvent>
 
-TextNoteEdit::TextNoteEdit(QWidget *parent)
+TextNoteEdit::TextNoteEdit(VNoteItem *textNote, VNTextBlock *noteBlock, QWidget *parent)
     : DTextEdit(parent)
+    , m_textNode(textNote)
+    , m_noteBlock (noteBlock)
 {
 
 }
@@ -42,4 +44,13 @@ void TextNoteEdit::keyPressEvent(QKeyEvent *e)
         }
     }
     DTextEdit::keyPressEvent(e);
+}
+
+VNoteItem *TextNoteEdit::getNoteItem()
+{
+    return  m_textNode;
+}
+VNTextBlock *TextNoteEdit::getNoteBlock()
+{
+    return  m_noteBlock;
 }

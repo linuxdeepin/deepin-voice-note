@@ -481,7 +481,7 @@ void VNoteMainWindow::onSearchNoteEmpty(qint64 id)
 
 void VNoteMainWindow::onStartRecord()
 {
-    m_rightView->insertVoiceItem(nullptr);
+    m_rightView->insertVoiceItem();
 }
 
 void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)

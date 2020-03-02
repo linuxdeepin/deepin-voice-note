@@ -26,7 +26,7 @@ void TextNoteItem::initUI()
     m_timeLabel->setFixedHeight(16);
     DFontSizeManager::instance()->bind(m_timeLabel, DFontSizeManager::T9);
 
-    m_textEdit = new TextNoteEdit(this);
+    m_textEdit = new TextNoteEdit(nullptr,nullptr,this);
     DFontSizeManager::instance()->bind(m_textEdit, DFontSizeManager::T8);
     m_textEdit->setFixedHeight(140);
     m_textEdit->setLineWidth(0);

@@ -3,6 +3,7 @@
 
 #include "common/vnoteitem.h"
 #include "common/utils.h"
+#include "common/actionmanager.h"
 
 #include "widgets/vnoteiconbutton.h"
 
@@ -19,9 +20,10 @@
 
 #define DefaultHeight 64
 
-VoiceNoteItem::VoiceNoteItem(VNoteItem *textNote, QWidget *parent)
+VoiceNoteItem::VoiceNoteItem(VNoteItem *textNote, VNVoiceBlock *noteBlock, QWidget *parent)
     : DWidget(parent)
     , m_textNode(textNote)
+    , m_noteBlock(noteBlock)
 {
     initUi();
     initConnection();
@@ -36,7 +38,7 @@ void VoiceNoteItem::initUi()
     m_createTimeLab = new DLabel(m_bgWidget);
     DFontSizeManager::instance()->bind(m_createTimeLab, DFontSizeManager::T8);
     m_createTimeLab->setText("2019-10-21 19:30");
-    m_asrText = new TextNoteEdit(m_bgWidget);
+    m_asrText = new TextNoteEdit(nullptr,nullptr,m_bgWidget);
     DFontSizeManager::instance()->bind(m_asrText, DFontSizeManager::T8);
     m_asrText->setReadOnly(true);
     DStyle::setFocusRectVisible(m_asrText, false);
@@ -65,16 +67,14 @@ void VoiceNoteItem::initUi()
     m_playBtn->setIconSize(QSize(60, 60));
     m_playBtn->setFlat(true);
     m_playBtn->SetDisableIcon("play_disabled.svg");
-    DLabel *name = new DLabel(this);
-    DFontSizeManager::instance()->bind(name, DFontSizeManager::T6);
-    name->setText("语音");
-
+    m_voiceNameLab = new DLabel(this);
+    DFontSizeManager::instance()->bind(m_voiceNameLab, DFontSizeManager::T6);
     QGridLayout *playBtnLayout = new QGridLayout;
     playBtnLayout->addWidget(m_pauseBtn,0,0);
     playBtnLayout->addWidget(m_playBtn,0,0);
     playBtnLayout->setSizeConstraint(QLayout::SetNoConstraint);
     QVBoxLayout *nameLayout = new QVBoxLayout;
-    nameLayout->addWidget(name, Qt::AlignLeft);
+    nameLayout->addWidget(m_voiceNameLab, Qt::AlignLeft);
     nameLayout->addWidget(m_createTimeLab, Qt::AlignLeft);
     nameLayout->setContentsMargins(0,0,0,0);
     nameLayout->setSpacing(0);
@@ -94,6 +94,7 @@ void VoiceNoteItem::initUi()
     mainLayout->addWidget(m_bgWidget);
     mainLayout->setContentsMargins(10,0,10,0);
     showPlayBtn();
+    m_voiceMenu = ActionManager::getVoiceRMenu(this);
     this->setLayout(mainLayout);
 
 
@@ -101,7 +102,11 @@ void VoiceNoteItem::initUi()
 
 void VoiceNoteItem::initData()
 {
-    //m_createTimeLab->setText(Utils::convertDateTime(m_textNode->createTime));
+    if(m_noteBlock != nullptr){
+        m_createTimeLab->setText(Utils::convertDateTime(m_noteBlock->createTime));
+        m_voiceNameLab->setText(m_noteBlock->voiceTitle);
+        m_voiceSizeLab->setText(Utils::formatMillisecond(m_noteBlock->voiceSize));
+    }
 }
 
 void VoiceNoteItem::initConnection()
@@ -113,6 +118,8 @@ void VoiceNoteItem::initConnection()
     QTextDocument *document = m_asrText->document();
     QAbstractTextDocumentLayout *documentLayout = document->documentLayout();
     connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, &VoiceNoteItem::onAsrTextChange);
+    connect(m_voiceMenu, SIGNAL(triggered(QAction *)),
+            this, SIGNAL(sigAction(QAction *)));
 }
 
 void VoiceNoteItem::onPlayBtnClicked()
@@ -131,6 +138,11 @@ void VoiceNoteItem::onPauseBtnClicked()
 VNoteItem *VoiceNoteItem::getNoteItem()
 {
     return m_textNode;
+}
+
+VNVoiceBlock *VoiceNoteItem::getNoteBlock()
+{
+    return  m_noteBlock;
 }
 
 void VoiceNoteItem::showPlayBtn()
@@ -190,4 +202,12 @@ void VoiceNoteItem::onAsrTextChange()
         height += docHeight;
     }
     this->setFixedHeight(height);
+}
+
+void VoiceNoteItem::mousePressEvent(QMouseEvent *event)
+{
+    DWidget::mousePressEvent(event);
+    if (event->button() == Qt::RightButton) {
+        m_voiceMenu->exec(event->globalPos());
+    }
 }

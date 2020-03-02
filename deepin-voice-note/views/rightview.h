@@ -15,8 +15,8 @@ class RightView : public DWidget
 public:
     explicit RightView(QWidget *parent = nullptr);
     void initData(VNoteItem *data);
-    DWidget *insertVoiceItem(VNoteBlock* data);
-    DWidget *insertTextEdit(int preWidgetIndex,VNoteBlock* data, bool focus = false);
+    DWidget *insertVoiceItem();
+    DWidget *insertTextEdit(VNoteBlock* data, bool focus = false);
 public slots:
     void onTextEditFocusIn();
     void onTextEditFocusOut();
@@ -24,11 +24,15 @@ public slots:
     void onTextEditTextChange();
     void onVoicePlay(VoiceNoteItem *item);
     void onVoicePause(VoiceNoteItem *item);
+    void onVoiceMenu(QAction *action);
 protected:
     void leaveEvent(QEvent *event) override;
     void saveNote();
 private:
     void        initUi();
+    void        delWidget(DWidget *widget);
+
+    VoiceNoteItem *m_menuVoice {nullptr};
     VNoteItem   *m_noteItemData {nullptr};
     DWidget     *m_curItemWidget{nullptr};
     DWidget     *m_viewportWidget {nullptr};

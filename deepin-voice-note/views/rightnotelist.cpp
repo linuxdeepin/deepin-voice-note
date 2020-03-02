@@ -62,7 +62,7 @@ void RightNoteList::addNodeItem(VNoteItem *item, const QRegExp &searchKey, bool 
             textItem->changeToEdit();
         }
     } else {
-        VoiceNoteItem *voiceItem = new VoiceNoteItem(item, this);
+        VoiceNoteItem *voiceItem = new VoiceNoteItem(item, nullptr, this);
         voiceItem->setFixedHeight(95);
         QListWidgetItem *item = new QListWidgetItem();
         item->setFlags(Qt::NoItemFlags);
