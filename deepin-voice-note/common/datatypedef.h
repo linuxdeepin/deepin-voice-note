@@ -56,6 +56,7 @@ struct VNOTE_DATAS {
 
     VNoteBlock* newBlock(int type);
     void addBlock(VNoteBlock* block);
+    void addBlock(VNoteBlock* before, VNoteBlock* block);
     void delBlock(VNoteBlock* block);
 
     VNOTE_DATA_VECTOR datas;

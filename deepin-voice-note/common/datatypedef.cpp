@@ -68,6 +68,27 @@ void VNOTE_DATAS::addBlock(VNoteBlock *block)
     datas.push_back(block);
 }
 
+void VNOTE_DATAS::addBlock(VNoteBlock *before, VNoteBlock *block)
+{
+    //If before is null, insert block at the head
+    if (nullptr != before) {
+        int index = datas.indexOf(before);
+
+        //If the before block is invalid,maybe some errors
+        //happened,just add at the end
+        if (index != -1) {
+            datas.insert(index+1, block);
+        } else {
+            datas.append(block);
+            qInfo() << "Block not in datas:" << before
+                    << " append at end:" << block;
+        }
+    } else {
+        datas.insert(0, block);
+    }
+
+}
+
 void VNOTE_DATAS::delBlock(VNoteBlock *block)
 {
     int index = datas.indexOf(block);
