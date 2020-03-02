@@ -40,7 +40,7 @@ void RightView::initUi()
     m_viewportScrollArea->setLineWidth(0);
     m_viewportLayout = new QVBoxLayout;
     m_viewportLayout->setSpacing(0);
-    m_viewportLayout->setContentsMargins(0, 0, 0, 0);
+    m_viewportLayout->setContentsMargins(20, 0, 20, 0);
     m_viewportWidget = new DWidget(this);
     m_viewportScrollArea->setWidgetResizable(true);
     m_viewportScrollArea->setWidget(m_viewportWidget);
@@ -51,7 +51,7 @@ void RightView::initUi()
     m_viewportLayout->addWidget(m_placeholderWidget, 1, Qt::AlignBottom);
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(m_viewportScrollArea);
-    mainLayout->setContentsMargins(20, 0, 20, 0);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     this->setLayout(mainLayout);
 }
 
@@ -166,13 +166,11 @@ void RightView::onTextEditFocusIn()
 void RightView::onTextEditFocusOut()
 {
     TextNoteEdit *widget = static_cast<TextNoteEdit *>(sender());
-    if (widget->document()->isEmpty()) {
-        QString editText = widget->toPlainText();
-        if (widget->getNoteBlock()->blockText != editText) {
-            widget->getNoteBlock()->blockText = editText;
-            m_fIsNoteModified = true;
-            saveNote();
-        }
+    QString editText = widget->toPlainText();
+    if (widget->getNoteBlock()->blockText != editText) {
+        widget->getNoteBlock()->blockText = editText;
+        m_fIsNoteModified = true;
+        saveNote();
     }
 }
 
@@ -195,6 +193,9 @@ void RightView::onTextEditTextChange()
 void RightView::initData(VNoteItem *data)
 {
     this->setFocus();
+    if (m_noteItemData == data) {
+        return;
+    }
     while (m_viewportLayout->indexOf(m_placeholderWidget) != 0) {
         QWidget *widget = m_viewportLayout->itemAt(0)->widget();
         m_viewportLayout->removeWidget(widget);
@@ -316,21 +317,34 @@ void RightView::delWidget(DWidget *widget)
         widget->deleteLater();
         int curIndex = m_viewportLayout->indexOf(m_curItemWidget);
         //两个文本块合为一个
-        if (curIndex > 0 && m_curItemWidget->objectName() == TextEditWidget) {
-            QWidget *preWidget = m_viewportLayout->itemAt(curIndex - 1)->widget();
-            if (preWidget->objectName() == TextEditWidget) {
-                TextNoteEdit *editPre = static_cast<TextNoteEdit *>(preWidget);
-                TextNoteEdit *editCur = static_cast<TextNoteEdit *>(m_curItemWidget);
-                editPre->getNoteBlock()->blockText = editPre->toPlainText() + editCur->toPlainText();
-                editPre->setPlainText(editPre->getNoteBlock()->blockText);
-                m_viewportLayout->removeWidget(editCur);
-                m_curItemWidget = editPre;
-                m_noteItemData->datas.delBlock(editCur->getNoteBlock());
-                editCur->deleteLater();
-                QTextCursor cursor = editPre->textCursor();
+        if (m_curItemWidget->objectName() == TextEditWidget) {
+            QWidget *siblingWidget = nullptr;
+            if (curIndex > 0) {
+                siblingWidget = m_viewportLayout->itemAt(curIndex - 1)->widget();
+            } else {
+                QLayoutItem *layoutItem = m_viewportLayout->itemAt(curIndex + 1);
+                if (layoutItem) {
+                    siblingWidget = layoutItem->widget();
+                }
+            }
+            if (siblingWidget && siblingWidget->objectName() == TextEditWidget) {
+                TextNoteEdit *editSibing = static_cast<TextNoteEdit *>(siblingWidget);
+                TextNoteEdit *editCurrent = static_cast<TextNoteEdit *>(m_curItemWidget);
+                VNTextBlock *textBlock = editSibing->getNoteBlock();
+                if (curIndex > 0) {
+                    textBlock->blockText = editSibing->toPlainText() + editCurrent->toPlainText();
+                } else {
+                    textBlock->blockText =  editCurrent->toPlainText() + editSibing->toPlainText();
+                }
+                editSibing->setPlainText(textBlock->blockText);
+                m_viewportLayout->removeWidget(editCurrent);
+                m_curItemWidget = editSibing;
+                m_noteItemData->datas.delBlock(editCurrent->getNoteBlock());
+                editCurrent->deleteLater();
+                QTextCursor cursor = editSibing->textCursor();
                 cursor.movePosition(QTextCursor::End);
-                editPre->setTextCursor(cursor);
-                editPre->setFocus();
+                editSibing->setTextCursor(cursor);
+                editSibing->setFocus();
             }
         }
         m_fIsNoteModified = true;

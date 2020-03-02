@@ -698,7 +698,12 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
     Q_UNUSED(previous);
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
-    m_rightView->initData(data);
+    if(data){
+        m_rightView->initData(data);
+    }
+    if(!m_searchKey.isEmpty() && m_noteSearchEdit->isEnabled()){
+        m_noteSearchEdit->lineEdit()->setFocus();
+    }
 }
 void VNoteMainWindow::onAction(QAction *action)
 {
