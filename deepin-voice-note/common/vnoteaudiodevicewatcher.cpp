@@ -60,9 +60,10 @@ void VNoteAudioDeviceWatcher::OnDefaultSourceChanaged(const QDBusObjectPath &val
 
 void VNoteAudioDeviceWatcher::run()
 {
-    static const double DBL_EPSILON = 0.0001;
+    static const double DBL_EPSILON = 0.000001;
+    static const double volumeLowMark = 0.2; //20% volume
 
-    bool   currentState = false;
+    MicrophoneState currentState = MicrophoneState::NotAvailable;
     double volume = 0;
     //log volume one time per 5 minutes
     const int logTime = 60*5;
@@ -106,23 +107,30 @@ void VNoteAudioDeviceWatcher::run()
             volume = defaultSourceMeter.volume();
 
             if (volume > DBL_EPSILON) {
-                currentState = true;
+
+                double currentMicrophoneVolume = defaultSource.volume();
+
+                if ((currentMicrophoneVolume-volumeLowMark) > DBL_EPSILON) {
+                    currentState = MicrophoneState::Normal;
+                } else {
+                    currentState = MicrophoneState::VolumeTooLow;
+                }
             } else {
-                currentState = false;
+                currentState = MicrophoneState::NotAvailable;
             }
 
-            if (m_microphoneAviable != currentState) {
-                m_microphoneAviable = currentState;
-                emit microphoneAvailableState(m_microphoneAviable);
+            if (m_microphoneState != currentState) {
+                m_microphoneState = currentState;
+                emit microphoneAvailableState(m_microphoneState);
 
-                qInfo() << "Microphone aviable state change:" << m_microphoneAviable;
+                qInfo() << "Microphone aviable state change:" << m_microphoneState;
             }
         }
 
         checkTimes++;
 
         if (0 == (checkTimes%logTime)) {
-            qInfo() << "Volume:" << volume;
+            qInfo() << "Volume:" << volume << "MicrophoneState:" << currentState;
         }
 
         //polling audio state per seconds

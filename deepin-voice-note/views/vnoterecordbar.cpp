@@ -92,8 +92,9 @@ void VNoteRecordBar::onFinshRecord(const QString &voicePath,qint64 voiceSize)
     emit sigFinshRecord(voicePath,voiceSize);
 }
 
-void VNoteRecordBar::OnMicrophoneAvailableChanged(bool isAvailable)
+void VNoteRecordBar::OnMicrophoneAvailableChanged(int availableState)
 {
+    qInfo() << __FUNCTION__ << " MicrophoneState:" << availableState;
 //    if (isAvailable) {
 //        m_recordBtn->setBtnDisabled(false);
 //        m_recordBtn->setToolTip("");

@@ -29,7 +29,7 @@ signals:
 public slots:
     void onStartRecord();
     void onFinshRecord(const QString &voicePath,qint64 voiceSize);
-    void OnMicrophoneAvailableChanged(bool isAvailable);
+    void OnMicrophoneAvailableChanged(int availableState);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

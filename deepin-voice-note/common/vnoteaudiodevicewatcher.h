@@ -17,8 +17,13 @@ public:
     void initDeviceWatcher();
     void exitWatcher();
 
+    enum MicrophoneState {
+        NotAvailable,
+        VolumeTooLow,   // volume lower than 20%
+        Normal,         // volume more than 20%
+    };
 signals:
-    void microphoneAvailableState(bool isAvailable);
+    void microphoneAvailableState(int isAvailable);
 public slots:
     void OnDefaultSourceChanaged(const QDBusObjectPath & value);
 protected:
@@ -34,7 +39,7 @@ private:
     QScopedPointer<com::deepin::daemon::audio::Source> m_defaultSource;
     QScopedPointer<com::deepin::daemon::audio::Meter> m_defaultSourceMeter;
 
-    bool m_microphoneAviable {false};
+    MicrophoneState m_microphoneState {NotAvailable};
     bool m_quitWatcher {false};
 };
 
