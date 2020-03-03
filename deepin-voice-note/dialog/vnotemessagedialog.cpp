@@ -112,5 +112,9 @@ void VNoteMessageDialog::initMessage()
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
             ,"Converting a voice note now. Do you want to stop it?"));
     } break;
+    case VolumeTooLow: {
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
+            ,"The low input volume may result in bad recordings. Do you want to continue?"));
+    } break;
     }
 }

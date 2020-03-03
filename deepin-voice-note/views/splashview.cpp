@@ -4,6 +4,7 @@
 
 #include <DLabel>
 #include <DWaterProgress>
+#include <DApplication>
 
 DWIDGET_USE_NAMESPACE
 
@@ -17,7 +18,7 @@ SplashView::SplashView(QWidget *parent)
     water->setTextVisible(false);
     water->start();
 
-    auto label = new DLabel(tr("Loading..."));
+    auto label = new DLabel(DApplication::translate("SplashView", "Loading..."));
     label->setObjectName("LoadWidgetLabel");
     label->setForegroundRole(DPalette::TextTitle);
 

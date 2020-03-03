@@ -9,6 +9,7 @@
 
 #include <DApplication>
 #include <DApplicationHelper>
+#include <DLog>
 
 LeftViewDelegate::LeftViewDelegate(QAbstractItemView *parent)
     : DStyledItemDelegate(parent)
@@ -161,8 +162,10 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
     }
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(index));
     if (data != nullptr) {
+        VNoteFolderOper folderOps(data);
+
         QFontMetrics fontMetrics = painter->fontMetrics();
-        QString strNum = QString::number(data->notesCount);
+        QString strNum = QString::number(folderOps.getNotesCount());
         int numWidth = fontMetrics.width(strNum);
         int iconSpace = (paintRect.height() - 24) / 2;
         QRect iconRect(paintRect.left() + 11, paintRect.top() + iconSpace, 24, 24);

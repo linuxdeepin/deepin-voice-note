@@ -21,6 +21,7 @@ public:
         DeleteFolder,
         AsrTimeLimit,
         AborteAsr,
+        VolumeTooLow,
     };
 
 protected:

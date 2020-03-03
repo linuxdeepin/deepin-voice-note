@@ -672,6 +672,10 @@ void VNoteMainWindow::addNote()
         tmpNote.noteTitle = DApplication::translate("VNoteMainWindow", "Text") + QString::number(id++);
         VNoteItemOper noteOper;
         VNoteItem *newNote = noteOper.addNote(tmpNote);
+
+        //Refresh the notes count of folder
+        m_leftView->update(m_leftView->currentIndex());
+
         if (newNote) {
             QStandardItem *item = StandardItemCommon::createStandardItem(newNote, StandardItemCommon::NOTEITEM);
             m_middleView->getStandardItemModel()->insertRow(0, item);
@@ -690,10 +694,15 @@ void VNoteMainWindow::delNote()
 {
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *noteData = static_cast< VNoteItem *>(StandardItemCommon::getStandardItemData(index));
+
     if (noteData) {
         m_middleView->getStandardItemModel()->removeRow(index.row());
+
         VNoteItemOper noteOper(noteData);
         noteOper.deleteNote();
+
+        //Refresh the notes count of folder
+        m_leftView->update(m_leftView->currentIndex());
     }
 }
 void VNoteMainWindow::loadNotes(VNoteFolder *folder)

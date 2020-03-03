@@ -19,6 +19,8 @@ public:
     VNoteFolder* addFolder(VNoteFolder& folder);
     VNoteFolder* getFolder(qint64 folderId);
     qint32 getFoldersCount();
+    qint32 getNotesCount(qint64 folderId);
+    qint32 getNotesCount();
 
     QString getDefaultFolderName();
     qint32 getDefaultIcon();

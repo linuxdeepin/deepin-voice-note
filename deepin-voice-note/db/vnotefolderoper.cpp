@@ -208,6 +208,30 @@ qint32 VNoteFolderOper::getFoldersCount()
     return VNoteDataManager::instance()->folderCount();
 }
 
+qint32 VNoteFolderOper::getNotesCount(qint64 folderId)
+{
+    VNOTE_ITEMS_MAP * notesInFollder = VNoteDataManager::instance()->getFolderNotes(folderId);
+
+    qint32 notesCount = 0;
+
+    if (nullptr != notesInFollder) {
+        notesCount = notesInFollder->folderNotes.size();
+    }
+
+    return  notesCount;
+}
+
+qint32 VNoteFolderOper::getNotesCount()
+{
+    qint32 notesCount = 0;
+
+    if (m_folder != nullptr) {
+        notesCount = getNotesCount(m_folder->id);
+    }
+
+    return notesCount;
+}
+
 QString VNoteFolderOper::getDefaultFolderName()
 {
     static constexpr char const *QUERY_DEFNAME_FMT = "SELECT COUNT(*) FROM %s WHERE %s LIKE '%s%%';";
