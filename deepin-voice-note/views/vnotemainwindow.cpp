@@ -75,7 +75,6 @@ void VNoteMainWindow::initUI()
 {
     initTitleBar();
     initMainView();
-    initAsrErrMessage();
 }
 
 void VNoteMainWindow::initData()
@@ -145,23 +144,11 @@ void VNoteMainWindow::initConnections()
     connect(m_wndHomePage, &HomePage::sigAddFolderByInitPage,
             this, &VNoteMainWindow::addNotepad);
 
-    connect(m_returnBtn, &DIconButton::clicked,
-            this, &VNoteMainWindow::onTextEditReturn);
-
-//    connect(m_rightView, &RightView::sigTextEditDetail,
-//            this, &VNoteMainWindow::onTextEditDetail);
-//    connect(m_rightView, &RightView::sigSearchNoteEmpty,
-//            this, &VNoteMainWindow::onSearchNoteEmpty);
-//    connect(m_rightView, &RightView::sigMenuNoteItemChange,
-//            this, &VNoteMainWindow::onMenuNoteItemChange);
-
     connect(m_recordBar, &VNoteRecordBar::sigStartRecord, this, &VNoteMainWindow::onStartRecord);
     connect(m_recordBar, &VNoteRecordBar::sigFinshRecord, this, &VNoteMainWindow::onFinshRecord);
 
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &VNoteMainWindow::onChangeTheme);
-
-    connect(m_asrAgainBtn, &DPushButton::clicked, this, &VNoteMainWindow::onAsrAgain);
 
 }
 
@@ -215,16 +202,12 @@ void VNoteMainWindow::initMainView()
 {
     initSpliterView();
     initSplashView();
-    initEmptySearchView();
     initEmptyFoldersView();
-    initTextEditDetailView();
     m_centerWidget = new DStackedWidget(this);
     m_centerWidget->setContentsMargins(0, 0, 0, 0);
     m_centerWidget->insertWidget(WndSplashAnim, m_splashView);
     m_centerWidget->insertWidget(WndHomePage, m_wndHomePage);
     m_centerWidget->insertWidget(WndNoteShow, m_mainWndSpliter);
-    m_centerWidget->insertWidget(WndSearchEmpty, m_labSearchEmpty);
-    m_centerWidget->insertWidget(WndTextEdit, m_textEditMainWnd);
     m_centerWidget->setCurrentIndex(WndSplashAnim);
     setCentralWidget(m_centerWidget);
     setTitlebarShadowEnabled(true);
@@ -401,32 +384,10 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
 {
     Q_UNUSED(previous);
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
-    if (data) {
-        loadNotes(data->id);
-    } else {
-        loadNotes(-1);
-
-        //Data cleared, switch to default view
+    loadNotes(data);
+    if(data == nullptr){
         m_centerWidget->setCurrentIndex(WndHomePage);
     }
-}
-
-void VNoteMainWindow::initTextEditDetailView()
-{
-    m_textEditMainWnd = new DTextEdit(this);
-    DStyle::setFocusRectVisible(m_textEditMainWnd, false);
-    DFontSizeManager::instance()->bind(m_textEditMainWnd, DFontSizeManager::T8);
-    m_textEditFormat = m_textEditMainWnd->currentCharFormat();
-    onChangeTheme();
-}
-
-void VNoteMainWindow::initEmptySearchView()
-{
-    m_labSearchEmpty = new DLabel(this);
-    m_labSearchEmpty->setText(DApplication::translate("NoteSearch", "No search results"));
-    DFontSizeManager::instance()->bind(m_labSearchEmpty, DFontSizeManager::T4);
-    m_labSearchEmpty->setAlignment(Qt::AlignCenter);
-    m_labSearchEmpty->setFocusPolicy(Qt::NoFocus);
 }
 
 void VNoteMainWindow::initSpliterView()
@@ -446,54 +407,6 @@ void VNoteMainWindow::initSplashView()
 void VNoteMainWindow::initEmptyFoldersView()
 {
     m_wndHomePage = new HomePage(this);
-}
-
-void VNoteMainWindow::onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey)
-{
-    m_textNode = textNode;
-    m_textEditRightView = preTextEdit;
-    m_textEditMainWnd->setCurrentCharFormat(m_textEditFormat);
-    m_textEditMainWnd->setPlainText(preTextEdit->toPlainText());
-    bool readOnly = false;
-    if (textNode->noteType == VNoteItem::VNT_Voice) { //语音项只读
-        readOnly = true;
-        m_noteSearchEdit->setEnabled(false);
-    }
-    m_textEditMainWnd->setReadOnly(readOnly);
-    if (!searchKey.isEmpty()) {
-        Utils::highTextEdit(m_textEditMainWnd, m_textEditFormat, searchKey, QColor(0x349ae8));
-    }
-    m_textEditMainWnd->moveCursor(QTextCursor::End);
-    m_centerWidget->setCurrentIndex(WndTextEdit);
-    m_returnBtn->setVisible(true);
-}
-
-void VNoteMainWindow::onTextEditReturn()
-{
-    QString text = m_textEditMainWnd->toPlainText();
-//    if (m_textNode->noteType == VNoteItem::VNOTE_TYPE::VNT_Text) {
-//        if (text != m_textNode->metaData) {
-//            if (!text.isEmpty()) {
-//                m_textNode->metaData = text;
-//                m_textEditRightView->setPlainText(text);
-//                m_rightView->onUpdateNote(m_textNode);
-//            } else {
-//                m_rightView->noteDelFromCurFolder(m_textNode);
-//            }
-//        }
-//    } else if (m_textNode->noteType == VNoteItem::VNT_Voice) {
-//        if (m_isRecording == false && m_isAsrVoiceing == false) {
-//            m_noteSearchEdit->setEnabled(true);
-//        }
-//    }
-    m_centerWidget->setCurrentIndex(WndNoteShow);
-    m_returnBtn->setVisible(false);
-    onVNoteSearch();//详情页时只搜索详情页内容，返回时重新搜索
-}
-
-void VNoteMainWindow::onSearchNoteEmpty(qint64 id)
-{
-    //m_middleView->removeFromWhiteList(id);
 }
 
 void VNoteMainWindow::onStartRecord()
@@ -520,74 +433,22 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 
 void VNoteMainWindow::onChangeTheme()
 {
-    DPalette pb = DApplicationHelper::instance()->palette(m_textEditMainWnd);
-    pb.setBrush(DPalette::Text, pb.color(DPalette::Active, DPalette::WindowText));
-    pb.setBrush(DPalette::Button, pb.color(DPalette::Base));
-    m_textEditMainWnd->setPalette(pb);
+   ;
 }
 
 void VNoteMainWindow::onA2TStart(const QString &file, qint64 duration)
 {
-//    m_isAsrVoiceing = true;
-//    if (m_isRecording == false) {
-//        m_floatingAddNoteBtn->setBtnDisabled(true);
-//        m_middleView->setFolderEnable(false);
-//        m_noteSearchEdit->setEnabled(false);
-//    }
-//    m_a2tManager->startAsr(file, duration);
+    ;
 }
 
 void VNoteMainWindow::onA2TError(int error)
 {
-//    qInfo() << "Audo to text failed:" << error;
-//    m_isAsrVoiceing = false;
-//    if (m_isRecording == false) {
-//        m_floatingAddNoteBtn->setBtnDisabled(false);
-//        m_middleView->setFolderEnable(true);
-//        m_noteSearchEdit->setEnabled(true);
-//    }
-//    m_rightView->setAsrResult("");
-//    QString message = "";
-//    if (error == VNoteA2TManager::NetworkError) {
-//        message = DApplication::translate(
-//                      "VNoteErrorMessage",
-//                      "Network disconnected and cannot convert voice notes. Do you want to try again? ");
-//    } else {
-//        message = DApplication::translate(
-//                      "VNoteErrorMessage",
-//                      "The voice conversion failed. Do you want to try again?");
-//    }
-//    showAsrErrMessage(message);
+    ;
 }
 
 void VNoteMainWindow::onA2TSuccess(const QString &text)
 {
-//    qInfo() << "Audo to text success:" << text;
-//    m_isAsrVoiceing = false;
-//    if (m_isRecording == false) {
-//        m_floatingAddNoteBtn->setBtnDisabled(false);
-//        m_middleView->setFolderEnable(true);
-//        m_noteSearchEdit->setEnabled(true);
-//    }
-//    m_rightView->setAsrResult(text);
-}
-
-void VNoteMainWindow::initAsrErrMessage()
-{
-    m_asrErrMeassage = new DFloatingMessage(DFloatingMessage::ResidentType, m_rightViewHolder);
-    m_asrErrMeassage->setIcon(QIcon(Utils::renderSVG(":/images/icon/normal/warning .svg", QSize(32, 32), qApp)));
-    m_asrAgainBtn = new DPushButton(m_asrErrMeassage);
-    m_asrAgainBtn->setText(tr("Try Again"));
-    m_asrErrMeassage->setWidget(m_asrAgainBtn);
-    m_asrErrMeassage->setVisible(false);
-}
-
-void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
-{
-    m_asrErrMeassage->setMessage(strMessage);
-    m_asrErrMeassage->setFixedWidth(m_rightViewHolder->width());
-    m_asrErrMeassage->adjustSize();
-    m_asrErrMeassage->setVisible(true);
+    ;
 }
 
 void VNoteMainWindow::onPreviewShortcut()
@@ -647,9 +508,6 @@ void VNoteMainWindow::onPreviewShortcut()
 
 void VNoteMainWindow::resizeEvent(QResizeEvent *event)
 {
-    if (m_asrErrMeassage->isVisible()) {
-        m_asrErrMeassage->setFixedWidth(m_rightViewHolder->width());
-    }
     DMainWindow::resizeEvent(event);
 }
 
@@ -695,19 +553,9 @@ bool VNoteMainWindow::checkIfNeedExit()
     return bNeedExit;
 }
 
-void VNoteMainWindow::onMenuNoteItemChange()
-{
-    if (m_asrErrMeassage->isVisible()) {
-        m_asrErrMeassage->setVisible(false);
-    }
-}
-
 void VNoteMainWindow::onAsrAgain()
 {
-//    m_asrErrMeassage->setVisible(false);
-//    QTimer::singleShot(0, this, [this]() {
-//        m_rightView->onAsrVoiceAction();
-//    });
+    ;
 }
 
 void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
@@ -715,9 +563,7 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
     Q_UNUSED(previous);
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
-    if(data){
-        m_rightView->initData(data);
-    }
+    m_rightView->initData(data);
     if(!m_searchKey.isEmpty() && m_noteSearchEdit->isEnabled()){
         m_noteSearchEdit->lineEdit()->setFocus();
     }
@@ -784,11 +630,11 @@ void VNoteMainWindow::addNotepad()
     if (newFolder) {
         //Switch to note view
         m_centerWidget->setCurrentIndex(WndNoteShow);
-
         QStandardItem *pItem = StandardItemCommon::createStandardItem(newFolder, StandardItemCommon::NOTEPADITEM);
         QStandardItem *root = m_leftView->getNotepadRoot();
         root->insertRow(0, pItem);
         m_leftView->setCurrentIndex(pItem->index());
+        addNote();
     }
 }
 
@@ -850,15 +696,15 @@ void VNoteMainWindow::delNote()
         noteOper.deleteNote();
     }
 }
-void VNoteMainWindow::loadNotes(qint64 id)
+void VNoteMainWindow::loadNotes(VNoteFolder *folder)
 {
     QStandardItemModel *model = m_middleView->getStandardItemModel();
     model->removeRows(0, model->rowCount());
-    m_middleView->setCurrentId(id);
     m_middleView->setVisibleEmptySearch(false);
-    if (id != -1) {
+    if (folder) {
+        m_middleView->setCurrentId(folder->id);
         VNoteItemOper noteOper;
-        VNOTE_ITEMS_MAP *notes = noteOper.getFolderNotes(id);
+        VNOTE_ITEMS_MAP *notes = noteOper.getFolderNotes(folder->id);
         if (notes) {
             notes->lock.lockForRead();
             for (auto it : notes->folderNotes) {
@@ -869,6 +715,8 @@ void VNoteMainWindow::loadNotes(qint64 id)
             QModelIndex index = model->index(0, 0);
             m_middleView->setCurrentIndex(index);
         }
+    }else {
+        m_middleView->setCurrentId(-1);
     }
 }
 

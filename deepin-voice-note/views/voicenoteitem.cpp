@@ -115,9 +115,9 @@ void VoiceNoteItem::initConnection()
     connect(m_playBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onPlayBtnClicked);
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &VoiceNoteItem::onChangeTheme);
-    QTextDocument *document = m_asrText->document();
-    QAbstractTextDocumentLayout *documentLayout = document->documentLayout();
-    connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, &VoiceNoteItem::onAsrTextChange);
+    //QTextDocument *document = m_asrText->document();
+    //QAbstractTextDocumentLayout *documentLayout = document->documentLayout();
+    //connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, &VoiceNoteItem::onAsrTextChange);
     connect(m_voiceMenu, SIGNAL(triggered(QAction *)),
             this, SIGNAL(sigAction(QAction *)));
 }
@@ -164,6 +164,7 @@ void VoiceNoteItem::showAsrStartWindow()
     m_asrText->document()->setDefaultTextOption(option);
     m_asrText->setPlainText(DApplication::translate("VoiceNoteItem", "Converting voice to text"));
     m_asrText->setVisible(true);
+    onAsrTextChange();
 }
 
 void VoiceNoteItem::showAsrEndWindow(const QString &strResult)
@@ -172,7 +173,12 @@ void VoiceNoteItem::showAsrEndWindow(const QString &strResult)
     QTextOption option = m_asrText->document()->defaultTextOption();
     option.setAlignment(Qt::AlignLeft);
     m_asrText->document()->setDefaultTextOption(option);
-    m_asrText->setVisible(true);
+    if(strResult.isEmpty()){
+        m_asrText->setVisible(false);
+    }else {
+        m_asrText->setVisible(true);
+    }
+    onAsrTextChange();
 }
 
 void VoiceNoteItem::enblePlayBtn(bool enable)
@@ -208,6 +214,8 @@ void VoiceNoteItem::mousePressEvent(QMouseEvent *event)
 {
     DWidget::mousePressEvent(event);
     if (event->button() == Qt::RightButton) {
-        m_voiceMenu->exec(event->globalPos());
+        if(!m_asrText->geometry().contains(event->pos())){
+           m_voiceMenu->exec(event->globalPos());
+        }
     }
 }

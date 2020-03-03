@@ -202,7 +202,9 @@ void RightView::initData(VNoteItem *data)
         widget->deleteLater();
     }
     m_noteItemData = data;
-    qDebug() << m_noteItemData;
+    if (m_noteItemData == nullptr) {
+        return;
+    }
     int size = m_noteItemData->datas.datas.size();
     if (size) {
         for (auto it : m_noteItemData->datas.datas) {
@@ -259,7 +261,7 @@ void RightView::saveNote()
 {
     qInfo() << __FUNCTION__ << "Is note changed:" << m_fIsNoteModified;
 
-    if (m_fIsNoteModified) {
+    if (m_noteItemData && m_fIsNoteModified) {
         for (int i = 0; i < m_viewportLayout->count(); i++) {
             QWidget *widget = m_viewportLayout->itemAt(i)->widget();
             if (widget->objectName() == TextEditWidget) {
@@ -289,6 +291,7 @@ void RightView::onVoiceMenu(QAction *action)
     case ActionManager::VoiceSave:
         break;
     case ActionManager::VoiceConversion:
+        m_menuVoice->showAsrStartWindow();
         break;
     default:
         break;
@@ -303,6 +306,7 @@ void RightView::delWidget(DWidget *widget)
             int curIndex = index > 0 ? index - 1 : index + 1;
             m_curItemWidget = m_viewportLayout->itemAt(curIndex)->widget();
         }
+        widget->disconnect();
         m_viewportLayout->removeWidget(widget);
         QString objName = widget->objectName();
         VNoteBlock *noteBlock = nullptr;
@@ -330,6 +334,7 @@ void RightView::delWidget(DWidget *widget)
             if (siblingWidget && siblingWidget->objectName() == TextEditWidget) {
                 TextNoteEdit *editSibing = static_cast<TextNoteEdit *>(siblingWidget);
                 TextNoteEdit *editCurrent = static_cast<TextNoteEdit *>(m_curItemWidget);
+                editCurrent->disconnect();
                 VNTextBlock *textBlock = editSibing->getNoteBlock();
                 if (curIndex > 0) {
                     textBlock->blockText = editSibing->toPlainText() + editCurrent->toPlainText();

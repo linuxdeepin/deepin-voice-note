@@ -42,9 +42,7 @@ public:
     enum WindowType {
         WndSplashAnim,
         WndHomePage,
-        WndNoteShow,
-        WndSearchEmpty,
-        WndTextEdit
+        WndNoteShow
     };
 
 protected:
@@ -62,11 +60,7 @@ protected:
 
     void initSpliterView(); //正常主窗口
     void initSplashView();  // Splash animation view
-    void initEmptyFoldersView();//没有记事本的窗口
-    void initEmptySearchView(); //没有搜索到记事本窗口
-    void initTextEditDetailView(); //文字记录满屏显示窗口
-    void initAsrErrMessage();
-    void showAsrErrMessage(const QString &strMessage);
+    void initEmptyFoldersView();
 
     void resizeEvent(QResizeEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
@@ -78,9 +72,6 @@ public slots:
     void onVNoteChange(const QModelIndex &previous);
     void onAction(QAction *action);
     void onVNoteSearch();
-    void onTextEditDetail(VNoteItem *textNode, DTextEdit *preTextEdit, const QRegExp &searchKey);
-    void onTextEditReturn();
-    void onSearchNoteEmpty(qint64 id);
     void onStartRecord();//开始录音
     void onFinshRecord(const QString &voicePath,qint64 voiceSize); //结束录音
     void onChangeTheme();
@@ -90,7 +81,6 @@ public slots:
     void onA2TSuccess(const QString& text);
     //Shotcuts slots
     void onPreviewShortcut();
-    void onMenuNoteItemChange();
     void onAsrAgain();
 private:
     //左侧列表视图操作相关
@@ -103,7 +93,7 @@ private:
     void addNote();
     void editNote();
     void delNote();
-    void loadNotes(qint64 id);
+    void loadNotes(VNoteFolder *folder);
     void loadSearchNotes(const QRegExp &key);
 
 private:
@@ -117,12 +107,11 @@ private:
 #endif
 
     QWidget         *m_rightViewHolder {nullptr};
-    QWidget         *m_rightNoteArea {nullptr};
     QWidget         *m_leftViewHolder {nullptr};
     QWidget         *m_middleViewHolder {nullptr};
 
     DSplitter   *m_mainWndSpliter {nullptr};
-    LeftView  *m_leftView {nullptr};
+    LeftView    *m_leftView {nullptr};
     MiddleView  *m_middleView {nullptr};
     RightView   *m_rightView {nullptr};
 
@@ -134,14 +123,9 @@ private:
     VNoteAudioDeviceWatcher *m_audioDeviceWatcher {nullptr};
     VNoteA2TManager *m_a2tManager {nullptr};
 
-    DTextEdit *m_textEditRightView {nullptr};
-    DTextEdit *m_textEditMainWnd{nullptr};
-    DLabel *m_labSearchEmpty {nullptr};
     SplashView *m_splashView {nullptr};
     HomePage *m_wndHomePage {nullptr};
-    VNoteItem *m_textNode {nullptr};
     DStackedWidget *m_centerWidget {nullptr};
-    QTextCharFormat m_textEditFormat;
     bool            m_isRecording {false};
     bool            m_isAsrVoiceing {false};
     bool            m_isExit {false};
@@ -149,8 +133,6 @@ private:
     QSharedPointer<QSettings> m_qspSetting {nullptr};
     //Shortcuts key
     QScopedPointer<QShortcut> m_stPreviewShortcuts;
-    DFloatingMessage *m_asrErrMeassage {nullptr};
-    DPushButton     *m_asrAgainBtn {nullptr};
     QRegExp          m_searchKey;
 };
 

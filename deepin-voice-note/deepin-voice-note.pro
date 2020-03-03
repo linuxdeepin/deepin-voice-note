@@ -22,12 +22,8 @@ SOURCES += \
     common/loadnoteitemsworker.cpp \
     common/loadiconsworker.cpp \
     views/middleview.cpp \
-    views/middleviewsortfiltermodel.cpp \
     views/middleviewdelegate.cpp \
     views/textnoteedit.cpp \
-    views/textnoteitem.cpp \
-    views/myrecodebuttons.cpp \
-    views/rightnotelist.cpp \
     views/rightview.cpp \
     db/dbvisitor.cpp \
     common/datatypedef.cpp \
@@ -68,12 +64,8 @@ HEADERS += \
     common/loadnoteitemsworker.h \
     common/loadiconsworker.h \
     views/middleview.h \
-    views/middleviewsortfiltermodel.h \
     views/middleviewdelegate.h \
     views/textnoteedit.h \
-    views/textnoteitem.h \
-    views/myrecodebuttons.h \
-    views/rightnotelist.h \
     views/rightview.h \
     db/dbvisitor.h \
     widgets/vnoteiconbutton.h \
