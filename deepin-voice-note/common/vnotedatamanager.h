@@ -31,6 +31,7 @@ public:
 signals:
     void onNoteFoldersLoaded();
     void onNoteItemsLoaded();
+    void onAllDatasReady();
 
 public slots:
 protected:
@@ -55,6 +56,18 @@ private:
 
     LoadFolderWorker    *m_pForldesLoadThread {nullptr};
     LoadNoteItemsWorker *m_pNotesLoadThread {nullptr};
+
+    //State used to check whether data have been loaded
+    // or not.
+    enum DataState {
+        DataNotLoaded = 0x0,
+        FolderDataReady = (0x1),
+        NotesDataReady = (0x1 << 1),
+    };
+
+    int m_fDataState = {DataNotLoaded};
+
+    bool isAllDatasReady() const;
 
     static VNoteDataManager* _instance;
 

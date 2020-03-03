@@ -28,6 +28,7 @@ class LeftView;
 class MiddleView;
 class RightView;
 class HomePage;
+class SplashView;
 
 class VNoteMainWindow : public DMainWindow
 {
@@ -39,6 +40,7 @@ public:
     bool checkIfNeedExit();
 
     enum WindowType {
+        WndSplashAnim,
         WndHomePage,
         WndNoteShow,
         WndSearchEmpty,
@@ -59,6 +61,7 @@ protected:
     void initAudioWatcher();
 
     void initSpliterView(); //正常主窗口
+    void initSplashView();  // Splash animation view
     void initEmptyFoldersView();//没有记事本的窗口
     void initEmptySearchView(); //没有搜索到记事本窗口
     void initTextEditDetailView(); //文字记录满屏显示窗口
@@ -134,6 +137,7 @@ private:
     DTextEdit *m_textEditRightView {nullptr};
     DTextEdit *m_textEditMainWnd{nullptr};
     DLabel *m_labSearchEmpty {nullptr};
+    SplashView *m_splashView {nullptr};
     HomePage *m_wndHomePage {nullptr};
     VNoteItem *m_textNode {nullptr};
     DStackedWidget *m_centerWidget {nullptr};

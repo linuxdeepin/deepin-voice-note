@@ -293,6 +293,18 @@ QImage VNoteDataManager::getDefaultIcon(qint32 index)
     return icon;
 }
 
+bool VNoteDataManager::isAllDatasReady() const
+{
+    qInfo() << "m_fDataState:" << m_fDataState;
+
+    if ((m_fDataState & DataState::FolderDataReady)
+            && (m_fDataState & DataState::NotesDataReady) ) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void VNoteDataManager::reqNoteDefIcons()
 {
     LoadIconsWorker *iconLoadWorker = new LoadIconsWorker();//
@@ -331,7 +343,15 @@ void VNoteDataManager::reqNoteFolders()
         //Object is already deleted
         m_pForldesLoadThread = nullptr;
 
+        //Set folder data ready flag
+        m_fDataState |= DataState::FolderDataReady;
+
         emit onNoteFoldersLoaded();
+
+        //Send data ready signal if data ready
+        if (isAllDatasReady()) {
+            emit onAllDatasReady();
+        }
     });
 
     QThreadPool::globalInstance()->start(m_pForldesLoadThread);
@@ -372,6 +392,16 @@ void VNoteDataManager::reqNoteItems()
 
         //Object is already deleted
         m_pNotesLoadThread = nullptr;
+
+        //Set folder data ready flag
+        m_fDataState |= DataState::NotesDataReady;
+
+        emit onNoteItemsLoaded();
+
+        //Send data ready signal if data ready
+        if (isAllDatasReady()) {
+            emit onAllDatasReady();
+        }
     });
 
     QThreadPool::globalInstance()->start(m_pNotesLoadThread);

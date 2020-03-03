@@ -3,6 +3,7 @@
 #include "views/middleview.h"
 #include "views/rightview.h"
 #include "views/homepage.h"
+#include "views/splashview.h"
 
 #include "common/standarditemcommon.h"
 #include "common/vnotedatamanager.h"
@@ -118,7 +119,7 @@ void VNoteMainWindow::initAppSetting()
 
 void VNoteMainWindow::initConnections()
 {
-    connect(VNoteDataManager::instance(), &VNoteDataManager::onNoteFoldersLoaded,
+    connect(VNoteDataManager::instance(), &VNoteDataManager::onAllDatasReady,
             this, &VNoteMainWindow::onVNoteFoldersLoaded);
 
     connect(m_noteSearchEdit, &DSearchEdit::textChanged,
@@ -213,16 +214,18 @@ void VNoteMainWindow::initTitleBar()
 void VNoteMainWindow::initMainView()
 {
     initSpliterView();
+    initSplashView();
     initEmptySearchView();
     initEmptyFoldersView();
     initTextEditDetailView();
     m_centerWidget = new DStackedWidget(this);
     m_centerWidget->setContentsMargins(0, 0, 0, 0);
+    m_centerWidget->insertWidget(WndSplashAnim, m_splashView);
     m_centerWidget->insertWidget(WndHomePage, m_wndHomePage);
     m_centerWidget->insertWidget(WndNoteShow, m_mainWndSpliter);
     m_centerWidget->insertWidget(WndSearchEmpty, m_labSearchEmpty);
     m_centerWidget->insertWidget(WndTextEdit, m_textEditMainWnd);
-    m_centerWidget->setCurrentIndex(WndNoteShow);
+    m_centerWidget->setCurrentIndex(WndSplashAnim);
     setCentralWidget(m_centerWidget);
     setTitlebarShadowEnabled(true);
 }
@@ -363,7 +366,13 @@ void VNoteMainWindow::initAudioWatcher()
 
 void VNoteMainWindow::onVNoteFoldersLoaded()
 {
-    loadNotepads();
+    //If have folders show note view,else show
+    //default home page
+    if (loadNotepads() > 0) {
+        m_centerWidget->setCurrentIndex(WndNoteShow);
+    } else {
+        m_centerWidget->setCurrentIndex(WndHomePage);
+    }
 }
 
 void VNoteMainWindow::onVNoteSearch()
@@ -396,6 +405,9 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
         loadNotes(data->id);
     } else {
         loadNotes(-1);
+
+        //Data cleared, switch to default view
+        m_centerWidget->setCurrentIndex(WndHomePage);
     }
 }
 
@@ -424,6 +436,11 @@ void VNoteMainWindow::initSpliterView()
     initLeftView();
     initMiddleView();
     initRightView();
+}
+
+void VNoteMainWindow::initSplashView()
+{
+    m_splashView = new SplashView(this);
 }
 
 void VNoteMainWindow::initEmptyFoldersView()
@@ -765,6 +782,9 @@ void VNoteMainWindow::addNotepad()
     itemData.name = folderOper.getDefaultFolderName();
     VNoteFolder *newFolder = folderOper.addFolder(itemData);
     if (newFolder) {
+        //Switch to note view
+        m_centerWidget->setCurrentIndex(WndNoteShow);
+
         QStandardItem *pItem = StandardItemCommon::createStandardItem(newFolder, StandardItemCommon::NOTEPADITEM);
         QStandardItem *root = m_leftView->getNotepadRoot();
         root->insertRow(0, pItem);
