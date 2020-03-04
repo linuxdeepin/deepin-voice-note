@@ -134,6 +134,8 @@ void VNoteMainWindow::initConnections()
     connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
                 this, SLOT(onVNoteChange(const QModelIndex &)));
 
+    connect(m_rightView, &RightView::sigVoicePlay,
+                this, &VNoteMainWindow::onRightViewVoicePlay);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::addNotepad);
@@ -304,7 +306,7 @@ void VNoteMainWindow::initRightView()
 
     QVBoxLayout *rightHolderLayout = new QVBoxLayout;
     rightHolderLayout->setSpacing(0);
-    rightHolderLayout->setContentsMargins(0, 10, 0, 0);
+    rightHolderLayout->setContentsMargins(10, 10, 10, 0);
 
     m_rightView = new RightView(m_rightViewHolder);
     rightHolderLayout->addWidget(m_rightView);
@@ -775,3 +777,9 @@ void VNoteMainWindow::loadSearchNotes(const QRegExp &key)
         }
     }
 }
+
+void VNoteMainWindow::onRightViewVoicePlay(VNVoiceBlock *voiceData)
+{
+    m_recordBar->playVoice(voiceData);
+}
+

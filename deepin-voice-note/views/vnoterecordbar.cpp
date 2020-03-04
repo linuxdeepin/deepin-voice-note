@@ -1,6 +1,7 @@
 #include "vnoterecordbar.h"
 #include "widgets/vnoterecordwidget.h"
 #include "widgets/vnoteiconbutton.h"
+#include "widgets/vnoteplaywidget.h"
 
 #include <QVBoxLayout>
 
@@ -38,6 +39,9 @@ void VNoteRecordBar::initUI()
     recordBtnHoverLayout->setColumnStretch(2,1);
     m_recordBtnHover->setLayout(recordBtnHoverLayout);
     m_mainLayout->addWidget(m_recordBtnHover);
+
+    m_playPanel = new VNotePlayWidget(this);
+    m_mainLayout->addWidget(m_playPanel);
     //Default unavailable
     OnMicrophoneAvailableChanged(false);
     m_mainLayout->setCurrentWidget(m_recordBtnHover);
@@ -53,6 +57,8 @@ void VNoteRecordBar::initConnections()
     connect(m_recordBtn, &VNoteIconButton::clicked, this, &VNoteRecordBar::onStartRecord);
     connect(m_recordPanel, SIGNAL(sigFinshRecord(const QString &,qint64)),
             this, SLOT(onFinshRecord(const QString &,qint64)));
+    connect(m_playPanel, &VNotePlayWidget::sigWidgetClose,
+            this, &VNoteRecordBar::onClosePlayWidget);
 }
 
 bool VNoteRecordBar::eventFilter(QObject *o, QEvent *e)
@@ -100,4 +106,15 @@ void VNoteRecordBar::OnMicrophoneAvailableChanged(int availableState)
 void VNoteRecordBar::cancelRecord()
 {
     m_recordPanel->cancelRecord();
+}
+
+void VNoteRecordBar::onClosePlayWidget()
+{
+    m_mainLayout->setCurrentWidget(m_recordBtnHover);
+}
+
+void VNoteRecordBar::playVoice(VNVoiceBlock *voiceData)
+{
+    m_mainLayout->setCurrentWidget(m_playPanel);
+    m_playPanel->setVoiceBlock(voiceData);
 }

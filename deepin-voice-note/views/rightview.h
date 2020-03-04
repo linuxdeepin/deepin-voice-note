@@ -7,6 +7,8 @@
 DWIDGET_USE_NAMESPACE
 struct VNoteItem;
 struct VNoteBlock;
+struct VNVoiceBlock;
+
 class VoiceNoteItem;
 
 class RightView : public DWidget
@@ -18,6 +20,9 @@ public:
     DWidget *insertVoiceItem(const QString &voicePath, qint64 voiceSize);
     DWidget *insertTextEdit(VNoteBlock* data, bool focus = false);
     void  setEnablePlayBtn(bool enable);
+signals:
+    void sigVoicePlay(VNVoiceBlock *voiceData);
+    void sigVoicePause(VNVoiceBlock *voiceData);
 public slots:
     void onTextEditFocusIn();
     void onTextEditFocusOut();

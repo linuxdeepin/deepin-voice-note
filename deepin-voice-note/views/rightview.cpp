@@ -40,7 +40,7 @@ void RightView::initUi()
     m_viewportScrollArea->setLineWidth(0);
     m_viewportLayout = new QVBoxLayout;
     m_viewportLayout->setSpacing(0);
-    m_viewportLayout->setContentsMargins(20, 0, 20, 0);
+    m_viewportLayout->setContentsMargins(10, 0, 10, 0);
     m_viewportWidget = new DWidget(this);
     m_viewportScrollArea->setWidgetResizable(true);
     m_viewportScrollArea->setWidget(m_viewportWidget);
@@ -243,11 +243,13 @@ void RightView::onVoicePlay(VoiceNoteItem *item)
         }
     }
     item->showPauseBtn();
+    emit sigVoicePlay(item->getNoteBlock());
 }
 
 void RightView::onVoicePause(VoiceNoteItem *item)
 {
     item->showPlayBtn();
+    emit sigVoicePause(item->getNoteBlock());
 }
 
 void RightView::leaveEvent(QEvent *event)

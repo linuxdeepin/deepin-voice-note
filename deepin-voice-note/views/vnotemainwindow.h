@@ -20,6 +20,7 @@
 
 DWIDGET_USE_NAMESPACE
 
+struct VNVoiceBlock;
 class VNoteRecordBar;
 class VNoteIconButton;
 class VNoteAudioDeviceWatcher;
@@ -74,6 +75,7 @@ public slots:
     void onVNoteSearch();
     void onStartRecord();//开始录音
     void onFinshRecord(const QString &voicePath,qint64 voiceSize); //结束录音
+    void onRightViewVoicePlay(VNVoiceBlock *voiceData);
     void onChangeTheme();
     //Audio to text API
     void onA2TStart(const QString& file, qint64 duration);
