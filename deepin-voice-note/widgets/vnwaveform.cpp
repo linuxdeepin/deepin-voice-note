@@ -9,7 +9,7 @@
 VNWaveform::VNWaveform(QWidget *parent)
     : DFrame(parent)
 {
-    ;
+    setFrameShape(QFrame::NoFrame);
 }
 
 void VNWaveform::onAudioBufferProbed(const QAudioBuffer &buffer)
@@ -20,42 +20,53 @@ void VNWaveform::onAudioBufferProbed(const QAudioBuffer &buffer)
 
 void VNWaveform::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event);
+
     QPainter painter(this);
-    //painter.setRenderHint(QPainter::Antialiasing, true);
-    // 设置画笔颜色、宽度
-    //painter.setPen(QPen(QColor(3, 208, 214)/*Qt::blue*/, 0));
-    // 设置画刷颜色
-    //painter.setBrush(QColor(3, 208, 214)/*Qt::blue*/);
-    static float xStep = 4.0f;//278 / 3 = 92
-    //static double hScale = height() / 10.0f;
-    float dr = 3.0f / m_maxShowedSamples;
-    float dg = 87.0f / m_maxShowedSamples;
-    float db = 41.0f / m_maxShowedSamples;
+    painter.save();
+    painter.setRenderHint(QPainter::Antialiasing, true);
 
-    for(int i = 0; (i < m_audioScaleSamples.size() && i < m_maxShowedSamples); i++)
-    {
+    //Support highquality
+    qreal waveWidth = WAVE_WIDTH * devicePixelRatioF();
+    qreal waveSpace = WAVE_SPACE * devicePixelRatioF();
 
-        int h = static_cast<int>(m_audioScaleSamples[i] * height());
-        int y = height() - h;
-        if(h == 0)
-        {
-            //QString infor =
-                    //QString("h: %1 in DVNRecordWavingWidget::paintEvent").arg(h);
-            //qDebug() << infor << "\n";
-            h = 1;
-            y = height() - 1;
-        }
-        painter.setPen(QPen(QColor(3 - static_cast<int>(i * dr)
-                                   , 208 - static_cast<int>(i * dg)
-                                   , 214 + static_cast<int>(i * db))));
+    qreal waveOffsetX = WAVE_OFFSET_X;
+    qreal waveOffsetY = WAVE_OFFSET_Y;
 
-        painter.drawRect(i * static_cast<int>(xStep), y, 1, h);
+    const qreal availableHeight = height() - (waveOffsetY *2);
+
+    const QColor startColor(3, 208, 214);
+    const QColor endColor(1, 121, 255);
+
+    for (int i = 0; (i < m_audioScaleSamples.size() && i < m_maxShowedSamples); i++) {
+
+        qreal waveHeight = static_cast<int>(m_audioScaleSamples[i] * height());
+
+        //Use default height when waveHeight less or equal to 0
+        waveHeight = (waveHeight > 0.0001) ? waveHeight : waveWidth;
+
+        qreal startX = waveOffsetX+i*(waveWidth+waveSpace);
+        qreal startY = (availableHeight-waveHeight ) / m_waveStyle;
+
+        QRectF waveRectF(startX, startY, waveWidth, waveHeight);
+
+        QLinearGradient waveGradient(waveRectF.topLeft(), waveRectF.bottomLeft());
+
+        waveGradient.setColorAt(0, startColor);
+        waveGradient.setColorAt(1, endColor);
+
+        painter.fillRect(waveRectF, waveGradient);
     }
+
+    painter.restore();
 }
 
 void VNWaveform::resizeEvent(QResizeEvent *event)
 {
-    m_maxShowedSamples = event->size().width() / (WAVE_WIDTH*2);
+    m_maxShowedSamples = static_cast<int> (
+                (event->size().width()-WAVE_OFFSET_X*2)
+                / ((WAVE_WIDTH+WAVE_SPACE) * devicePixelRatioF())
+                );
 
     qDebug() << __FUNCTION__ << "m_maxShowedSamples:" << m_maxShowedSamples
              << "width:" << event->size().width();
@@ -74,9 +85,8 @@ void VNWaveform::getBufferLevels(const QAudioBuffer &buffer, QVector<qreal> &sca
         return;
 
     int channelCount = buffer.format().channelCount();
-    scaleSamples.reserve(buffer.frameCount());
 
-    qDebug() << "scaleSamples:" << scaleSamples.size();
+    scaleSamples.reserve(buffer.frameCount());
     scaleSamples.fill(0, buffer.frameCount());
 
     qreal peak_value = VNWaveform::getPeakValue(buffer.format());
@@ -160,9 +170,4 @@ qreal VNWaveform::getPeakValue(const QAudioFormat &format)
     }
 
     return qreal(0);
-}
-
-void VNWaveform::setSliderVisable(bool isVisable)
-{
-    //slider()->hide();
 }

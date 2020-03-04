@@ -12,8 +12,17 @@ class VNWaveform : public DFrame
     Q_OBJECT
 public:
     explicit VNWaveform(QWidget *parent = nullptr);
-    const int WAVE_WIDTH = 2;
-    void setSliderVisable(bool isVisable);
+
+    const int WAVE_WIDTH = 3;
+    const int WAVE_SPACE = 1;
+
+    const int WAVE_OFFSET_X = 0; //Left/Right margin
+    const int WAVE_OFFSET_Y = 0; //top/Bottom margin
+
+    enum WaveStyle {
+        Columnar = 1,
+        Wave = 2,
+    };
 signals:
 
 public slots:
@@ -34,6 +43,7 @@ protected:
 protected:
     QVector<qreal> m_audioScaleSamples;
     int            m_maxShowedSamples;
+    int            m_waveStyle {WaveStyle::Columnar};
 };
 
 #endif // VNWAVEFORM_H

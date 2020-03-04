@@ -391,9 +391,28 @@ void VNoteMainWindow::initSpliterView()
 {
     m_mainWndSpliter = new DSplitter(Qt::Horizontal, this);
     m_mainWndSpliter->setHandleWidth(2);
+
     initLeftView();
     initMiddleView();
     initRightView();
+
+    // Disable spliter drag & resize
+    QList<QWidget*> Children {m_middleViewHolder, m_rightViewHolder};
+
+    for (auto it : Children) {
+        QSplitterHandle *handle = m_mainWndSpliter->handle(m_mainWndSpliter->indexOf(it));
+        if (handle) {
+            handle->setFixedWidth(2);
+            handle->setDisabled(true);
+
+//            DPalette pa = DApplicationHelper::instance()->palette(handle);
+//            QBrush splitBrush = pa.brush(DPalette::ItemBackground);
+//            pa.setBrush(DPalette::Background, splitBrush);
+//            handle->setPalette(pa);
+//            handle->setBackgroundRole(QPalette::Background);
+//            handle->setAutoFillBackground(true);
+        }
+    }
 }
 
 void VNoteMainWindow::initSplashView()
