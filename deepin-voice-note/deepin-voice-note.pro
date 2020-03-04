@@ -43,7 +43,8 @@ SOURCES += \
     common/actionmanager.cpp \
     common/standarditemcommon.cpp \
     views/leftviewdelegate.cpp \
-    views/splashview.cpp
+    views/splashview.cpp \
+    widgets/vnoteplaywidget.cpp
 
 RESOURCES += \
     images.qrc
@@ -84,7 +85,8 @@ HEADERS += \
     common/actionmanager.h \
     common/standarditemcommon.h \
     views/leftviewdelegate.h \
-    views/splashview.h
+    views/splashview.h \
+    widgets/vnoteplaywidget.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts
