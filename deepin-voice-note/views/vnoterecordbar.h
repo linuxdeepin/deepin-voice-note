@@ -2,6 +2,7 @@
 #define VNOTERECORDBAR_H
 
 #include <QWidget>
+#include <QStackedLayout>
 
 #include <DAnchors>
 
@@ -32,11 +33,12 @@ public slots:
     void OnMicrophoneAvailableChanged(int availableState);
 
 protected:
-    void resizeEvent(QResizeEvent *event) override;
     bool eventFilter(QObject *o, QEvent *e) override;
 protected:
+    QStackedLayout    *m_mainLayout {nullptr};
     VNoteRecordWidget *m_recordPanel {nullptr};
     VNoteIconButton   *m_recordBtn {nullptr};
+    QWidget           *m_recordBtnHover {nullptr};
     QScopedPointer<DAnchorsBase> m_recBtnAnchor;
 
     QString          m_recordPath {""};

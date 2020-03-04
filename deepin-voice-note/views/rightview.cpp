@@ -90,11 +90,12 @@ QWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus)
     return  editItem;
 }
 
-QWidget *RightView::insertVoiceItem()
+QWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
 {
     VNVoiceBlock *data = static_cast<VNVoiceBlock *>(m_noteItemData->datas.newBlock(VNoteBlock::Voice));
     static int i = 0;
-    data->voiceSize = i * 100;
+    data->voiceSize = voiceSize;
+    data->voicePath = voicePath;
     data->createTime = QDateTime::currentDateTime();
     data->voiceTitle = DApplication::translate("RightView", "NewVoice") + QString::number(i++);
     VoiceNoteItem *item = new VoiceNoteItem(m_noteItemData, static_cast<VNVoiceBlock *>(data), this);
@@ -354,5 +355,16 @@ void RightView::delWidget(DWidget *widget)
         }
         m_fIsNoteModified = true;
         saveNote();
+    }
+}
+
+void RightView::setEnablePlayBtn(bool enable)
+{
+    for (int i = 0; i < m_viewportLayout->count(); i++) {
+        QWidget *widget = m_viewportLayout->itemAt(i)->widget();
+        if (widget->objectName() == VoiceWidget) {
+            VoiceNoteItem *tmpWidget = static_cast< VoiceNoteItem *>(widget);
+            tmpWidget->enblePlayBtn(enable);
+        }
     }
 }

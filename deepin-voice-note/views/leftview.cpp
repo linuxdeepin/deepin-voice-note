@@ -61,14 +61,14 @@ QModelIndex LeftView::setDefaultNotepadItem()
     QItemSelectionModel *model = this->selectionModel();
     if (index.isValid() && StandardItemCommon::getStandardItemType(index) == StandardItemCommon::NOTEPADITEM) {
         if (!model->isSelected(index)) {
-            model->select(index, QItemSelectionModel::SelectCurrent);
+            this->setCurrentIndex(index);
         }
     } else {
         QStandardItem *item = getNotepadRoot();
         QStandardItem *itemChild = item->child(0);
         if (itemChild) {
             index = itemChild->index();
-            model->select(index, QItemSelectionModel::SelectCurrent);
+            this->setCurrentIndex(index);
         }
     }
     return index;

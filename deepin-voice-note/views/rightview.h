@@ -15,8 +15,9 @@ class RightView : public DWidget
 public:
     explicit RightView(QWidget *parent = nullptr);
     void initData(VNoteItem *data);
-    DWidget *insertVoiceItem();
+    DWidget *insertVoiceItem(const QString &voicePath, qint64 voiceSize);
     DWidget *insertTextEdit(VNoteBlock* data, bool focus = false);
+    void  setEnablePlayBtn(bool enable);
 public slots:
     void onTextEditFocusIn();
     void onTextEditFocusOut();

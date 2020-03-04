@@ -45,13 +45,17 @@ void VNoteRecordWidget::initUi()
     m_timeLabel->setFont(recordTimeFont);
     m_timeLabel->setText("00:00");
 
-    m_waveForm = new DWidget(this);
+    m_waveForm = new VNWaveform(this);
+    QVBoxLayout *waveLayout = new QVBoxLayout;
+    waveLayout->addWidget(m_waveForm);
+    waveLayout->setContentsMargins(0,15,10,15);
+
     QHBoxLayout *mainLayout = new QHBoxLayout;
     QGridLayout *btnLayout = new QGridLayout;
     btnLayout->addWidget(m_pauseBtn, 0, 0);
     btnLayout->addWidget(m_continueBtn, 0, 0);
     mainLayout->addLayout(btnLayout);
-    mainLayout->addWidget(m_waveForm, 1);
+    mainLayout->addLayout(waveLayout, 1);
     mainLayout->addWidget(m_timeLabel);
     mainLayout->addWidget(m_finshBtn);
     mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -130,6 +134,7 @@ void VNoteRecordWidget::onAudioBufferProbed(const QAudioBuffer &buffer)
     if (m_timeLabel->text() != strTime) {
         m_timeLabel->setText(strTime);
     }
+    m_waveForm->onAudioBufferProbed(buffer);
 }
 
 void VNoteRecordWidget::onMediaDurationChange(qint64 duration)

@@ -16,31 +16,31 @@ VNoteRecordBar::VNoteRecordBar(QWidget *parent)
 
 void VNoteRecordBar::initUI()
 {
-    QVBoxLayout *rightNoteAreaLayout = new QVBoxLayout(this);
-    rightNoteAreaLayout->setSpacing(0);
-    rightNoteAreaLayout->setContentsMargins(0, 0, 0, 0);
-
+    m_mainLayout = new QStackedLayout(this);
+    m_mainLayout->setContentsMargins(0, 0, 0, 0);
     m_recordPanel = new VNoteRecordWidget(this);
     m_recordPanel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    m_recordPanel->setVisible(false);
+    m_mainLayout->addWidget(m_recordPanel);
 
-    m_recordBtn = new VNoteIconButton(this
+    m_recordBtnHover = new DWidget(this);
+    m_recordBtn = new VNoteIconButton(m_recordBtnHover
                                       , "audio_normal.svg"
                                       , "audio_hover.svg"
                                       , "audio_press.svg");
     m_recordBtn->SetDisableIcon("audio_disabled.svg");
     m_recordBtn->setFlat(true);
     m_recordBtn->setIconSize(QSize(REC_BTN_W, REC_BTN_H));
-    //m_recordBtn->setFixedSize(QSize(55, 55));
-
-    m_recBtnAnchor.reset(new DAnchorsBase(m_recordBtn));
-    m_recBtnAnchor->setAnchor(Qt::AnchorLeft, this, Qt::AnchorLeft);
-    m_recBtnAnchor->setAnchor(Qt::AnchorBottom, this, Qt::AnchorBottom);
-
+    m_recordBtn->setFixedSize(QSize(REC_BTN_W, REC_BTN_H));
+    QGridLayout *recordBtnHoverLayout = new QGridLayout;
+    recordBtnHoverLayout->addWidget(m_recordBtn,0,1);
+    recordBtnHoverLayout->setColumnStretch(0,1);
+    recordBtnHoverLayout->setColumnStretch(1,0);
+    recordBtnHoverLayout->setColumnStretch(2,1);
+    m_recordBtnHover->setLayout(recordBtnHoverLayout);
+    m_mainLayout->addWidget(m_recordBtnHover);
     //Default unavailable
     OnMicrophoneAvailableChanged(false);
-
-    rightNoteAreaLayout->addWidget(m_recordPanel);
+    m_mainLayout->setCurrentWidget(m_recordBtnHover);
 }
 
 void VNoteRecordBar::initConnections()
@@ -53,15 +53,6 @@ void VNoteRecordBar::initConnections()
     connect(m_recordBtn, &VNoteIconButton::clicked, this, &VNoteRecordBar::onStartRecord);
     connect(m_recordPanel, SIGNAL(sigFinshRecord(const QString &,qint64)),
             this, SLOT(onFinshRecord(const QString &,qint64)));
-}
-
-void VNoteRecordBar::resizeEvent(QResizeEvent *event)
-{
-    int leftMargin   = (event->size().width() - REC_BTN_W) / 2;
-    int bottonMargin = (event->size().height() - REC_BTN_H) / 2;
-
-    m_recBtnAnchor->setBottomMargin(bottonMargin);
-    m_recBtnAnchor->setLeftMargin(leftMargin);
 }
 
 bool VNoteRecordBar::eventFilter(QObject *o, QEvent *e)
@@ -79,16 +70,14 @@ bool VNoteRecordBar::eventFilter(QObject *o, QEvent *e)
 
 void VNoteRecordBar::onStartRecord()
 {
-//    m_recordPanel->setVisible(true);
-//    m_recordBtn->setVisible(false);
-//    m_recordPanel->startRecord();
+    m_mainLayout->setCurrentWidget(m_recordPanel);
+    m_recordPanel->startRecord();
     emit sigStartRecord();
 }
 
 void VNoteRecordBar::onFinshRecord(const QString &voicePath,qint64 voiceSize)
 {
-    m_recordPanel->setVisible(false);
-    m_recordBtn->setVisible(true);
+    m_mainLayout->setCurrentWidget(m_recordBtnHover);
     emit sigFinshRecord(voicePath,voiceSize);
 }
 

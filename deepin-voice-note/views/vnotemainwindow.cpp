@@ -385,9 +385,6 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
     Q_UNUSED(previous);
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
     loadNotes(data);
-    if(data == nullptr){
-        m_centerWidget->setCurrentIndex(WndHomePage);
-    }
 }
 
 void VNoteMainWindow::initSpliterView()
@@ -411,19 +408,23 @@ void VNoteMainWindow::initEmptyFoldersView()
 
 void VNoteMainWindow::onStartRecord()
 {
-    m_rightView->insertVoiceItem();
+    m_isRecording = true;
+    m_leftView->setEnabled(false);
+    m_addNotepadBtn->setEnabled(false);
+    m_middleView->setEnabled(false);
+    m_rightView->setEnablePlayBtn(false);
+    m_addNoteBtn->setBtnDisabled(true);
 }
 
 void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 {
-//    m_isRecording = false;
-//    if (m_isAsrVoiceing == false) {
-//        m_floatingAddNoteBtn->setBtnDisabled(false);
-//        m_middleView->setFolderEnable(true);
-//        m_noteSearchEdit->setEnabled(true);
-//    }
-//    m_rightView->addVoiceNoteItem(voicePath, voiceSize, m_isExit);
-//    m_rightView->setVoicePlayEnable(true);
+     m_rightView->insertVoiceItem(voicePath, voiceSize);
+     m_rightView->setEnablePlayBtn(true);
+     m_isRecording = false;
+     m_leftView->setEnabled(true);
+     m_addNotepadBtn->setEnabled(true);
+     m_middleView->setEnabled(true);
+     m_addNoteBtn->setBtnDisabled(false);
 
 //    if (m_isExit) {
 //        qApp->quit();
@@ -610,8 +611,7 @@ int VNoteMainWindow::loadNotepads()
             QStandardItem *pItemRoot = m_leftView ->getNotepadRoot();
             if (pItemRoot) {
                 pItemRoot->appendRows(items);
-                QModelIndex index = m_leftView->setDefaultNotepadItem();
-                onVNoteFolderChange(index, QModelIndex());
+                m_leftView->setDefaultNotepadItem();
             }
             return  items.size();
         }

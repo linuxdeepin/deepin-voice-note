@@ -134,6 +134,7 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
 
     bool enable = option.state & QStyle::State_Enabled;
     if (option.state & QStyle::State_Selected) {
+        qDebug() << "paint ++++++++++++";
         QColor fillColor;
         if (enable) {
             fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);

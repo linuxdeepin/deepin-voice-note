@@ -29,7 +29,6 @@ public slots:
     void onSetMediaSource();
     void onMediaDurationChange(qint64 duration);
     void onAudioBufferProbed(const QAudioBuffer &buffer);
-
 private:
     void initUi();
     void initRecordPath();
@@ -40,7 +39,7 @@ private:
     VNoteIconButton *m_continueBtn {nullptr};
     VNoteIconButton *m_finshBtn {nullptr};
     DLabel          *m_timeLabel{nullptr};
-    DWidget         *m_waveForm {nullptr};
+    VNWaveform      *m_waveForm {nullptr};
     VNoteAudioManager *m_audioManager{nullptr};
     QString          m_recordDir {""};
     QString          m_recordPath {""};
