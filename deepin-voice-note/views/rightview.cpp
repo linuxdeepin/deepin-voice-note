@@ -286,19 +286,7 @@ void RightView::saveNote()
 void RightView::onVoiceMenu(QAction *action)
 {
     m_menuVoice = static_cast<VoiceNoteItem *>(sender());
-    ActionManager::ActionKind kind = ActionManager::getActionKind(action);
-    switch (kind) {
-    case ActionManager::VoiceDelete:
-        delWidget(m_menuVoice);
-        break;
-    case ActionManager::VoiceSave:
-        break;
-    case ActionManager::VoiceConversion:
-        m_menuVoice->showAsrStartWindow();
-        break;
-    default:
-        break;
-    }
+    emit sigAction(action);
 }
 
 void RightView::delWidget(DWidget *widget)
@@ -369,4 +357,23 @@ void RightView::setEnablePlayBtn(bool enable)
             tmpWidget->enblePlayBtn(enable);
         }
     }
+}
+
+VoiceNoteItem* RightView::getVoiceItem(VNoteBlock* data)
+{
+    for (int i = 0; i < m_viewportLayout->count(); i++) {
+        QWidget *widget = m_viewportLayout->itemAt(i)->widget();
+        if (widget->objectName() == VoiceWidget) {
+            VoiceNoteItem *tmpWidget = static_cast< VoiceNoteItem *>(widget);
+            if(tmpWidget->getNoteBlock() == data){
+                return  tmpWidget;
+            }
+        }
+    }
+    return nullptr;
+}
+
+VoiceNoteItem* RightView::getMenuVoiceItem()
+{
+    return m_menuVoice;
 }

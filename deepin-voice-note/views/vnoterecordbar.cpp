@@ -3,6 +3,8 @@
 #include "widgets/vnoteiconbutton.h"
 #include "widgets/vnoteplaywidget.h"
 
+#include "common/vnoteitem.h"
+
 #include <QVBoxLayout>
 
 #include <DApplication>
@@ -59,6 +61,11 @@ void VNoteRecordBar::initConnections()
             this, SLOT(onFinshRecord(const QString &,qint64)));
     connect(m_playPanel, &VNotePlayWidget::sigWidgetClose,
             this, &VNoteRecordBar::onClosePlayWidget);
+    connect(m_playPanel, SIGNAL(sigPlayVoice(VNVoiceBlock *)),
+            this, SIGNAL(sigPlayVoice(VNVoiceBlock *)));
+    connect(m_playPanel, SIGNAL(sigPauseVoice(VNVoiceBlock *)),
+            this, SIGNAL(sigPauseVoice(VNVoiceBlock *)));
+
 }
 
 bool VNoteRecordBar::eventFilter(QObject *o, QEvent *e)
@@ -108,9 +115,10 @@ void VNoteRecordBar::cancelRecord()
     m_recordPanel->cancelRecord();
 }
 
-void VNoteRecordBar::onClosePlayWidget()
+void VNoteRecordBar::onClosePlayWidget(VNVoiceBlock *voiceData)
 {
     m_mainLayout->setCurrentWidget(m_recordBtnHover);
+    emit sigWidgetClose(voiceData);
 }
 
 void VNoteRecordBar::playVoice(VNVoiceBlock *voiceData)
@@ -118,3 +126,29 @@ void VNoteRecordBar::playVoice(VNVoiceBlock *voiceData)
     m_mainLayout->setCurrentWidget(m_playPanel);
     m_playPanel->setVoiceBlock(voiceData);
 }
+
+void VNoteRecordBar::pauseVoice(VNVoiceBlock *voiceData)
+{
+    if(m_mainLayout->currentWidget() == m_playPanel
+            && m_playPanel->getVoiceData() == voiceData){
+        m_playPanel->onPauseBtnClicked();
+    }
+}
+bool VNoteRecordBar::stopVoice(VNVoiceBlock *voiceData)
+{
+    if(m_mainLayout->currentWidget() == m_playPanel
+            && m_playPanel->getVoiceData() == voiceData){
+        m_playPanel->stopVideo();
+        m_mainLayout->setCurrentWidget(m_recordBtnHover);
+        return true;
+    }
+    return false;
+}
+
+ VNVoiceBlock* VNoteRecordBar::getVoiceData()
+ {
+     if(m_mainLayout->currentWidget() == m_playPanel){
+         return  m_playPanel->getVoiceData();
+     }
+     return nullptr;
+ }

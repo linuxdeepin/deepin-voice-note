@@ -11,7 +11,7 @@ DWIDGET_USE_NAMESPACE
 class VNotePlayWidget;
 class VNoteRecordWidget;
 class VNoteIconButton;
-class VNVoiceBlock;
+struct VNVoiceBlock;
 
 class VNoteRecordBar : public QWidget
 {
@@ -26,16 +26,22 @@ public:
     void initConnections();
     void cancelRecord();
     void playVoice(VNVoiceBlock *voiceData);
+    void pauseVoice(VNVoiceBlock *voiceData);
+    bool stopVoice(VNVoiceBlock *voiceData);
+    VNVoiceBlock* getVoiceData();
 
 signals:
     void sigStartRecord();
     void sigFinshRecord(const QString &voicePath,qint64 voiceSize);
+    void sigPlayVoice(VNVoiceBlock * voiceData);
+    void sigPauseVoice(VNVoiceBlock * voiceData);
+    void sigWidgetClose(VNVoiceBlock * voiceData);
 
 public slots:
     void onStartRecord();
     void onFinshRecord(const QString &voicePath,qint64 voiceSize);
     void OnMicrophoneAvailableChanged(int availableState);
-    void onClosePlayWidget();
+    void onClosePlayWidget(VNVoiceBlock *voiceData);
 
 protected:
     bool eventFilter(QObject *o, QEvent *e) override;

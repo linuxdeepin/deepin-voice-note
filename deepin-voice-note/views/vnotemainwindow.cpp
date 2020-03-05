@@ -4,6 +4,7 @@
 #include "views/rightview.h"
 #include "views/homepage.h"
 #include "views/splashview.h"
+#include "views/voicenoteitem.h"
 
 #include "common/standarditemcommon.h"
 #include "common/vnotedatamanager.h"
@@ -132,10 +133,14 @@ void VNoteMainWindow::initConnections()
     connect(m_middleView, &MiddleView::sigAction,
             this, &VNoteMainWindow::onAction);
     connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
-                this, SLOT(onVNoteChange(const QModelIndex &)));
+            this, SLOT(onVNoteChange(const QModelIndex &)));
 
     connect(m_rightView, &RightView::sigVoicePlay,
-                this, &VNoteMainWindow::onRightViewVoicePlay);
+            this, &VNoteMainWindow::onRightViewVoicePlay);
+    connect(m_rightView, &RightView::sigVoicePause,
+            this, &VNoteMainWindow::onRightViewVoicePause);
+    connect(m_rightView, &RightView::sigAction,
+            this, &VNoteMainWindow::onAction);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::addNotepad);
@@ -146,8 +151,16 @@ void VNoteMainWindow::initConnections()
     connect(m_wndHomePage, &HomePage::sigAddFolderByInitPage,
             this, &VNoteMainWindow::addNotepad);
 
-    connect(m_recordBar, &VNoteRecordBar::sigStartRecord, this, &VNoteMainWindow::onStartRecord);
-    connect(m_recordBar, &VNoteRecordBar::sigFinshRecord, this, &VNoteMainWindow::onFinshRecord);
+    connect(m_recordBar, &VNoteRecordBar::sigStartRecord,
+            this, &VNoteMainWindow::onStartRecord);
+    connect(m_recordBar, &VNoteRecordBar::sigFinshRecord,
+            this, &VNoteMainWindow::onFinshRecord);
+    connect(m_recordBar, &VNoteRecordBar::sigPlayVoice,
+            this, &VNoteMainWindow::onPlayPlugVoicePlay);
+    connect(m_recordBar, &VNoteRecordBar::sigPauseVoice,
+            this, &VNoteMainWindow::onPlayPlugVoicePause);
+    connect(m_recordBar, &VNoteRecordBar::sigWidgetClose,
+            this, &VNoteMainWindow::onPlayPlugVoiceStop);
 
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &VNoteMainWindow::onChangeTheme);
@@ -319,7 +332,7 @@ void VNoteMainWindow::initRightView()
     m_recordBar->setFixedHeight(78);
     m_recordBar->setSizePolicy(QSizePolicy::Expanding
                                , QSizePolicy::Fixed);
-    rightHolderLayout->addWidget(m_recordBar,Qt::AlignBottom);
+    rightHolderLayout->addWidget(m_recordBar, Qt::AlignBottom);
     m_rightViewHolder->setLayout(rightHolderLayout);
 
 #ifdef VNOTE_LAYOUT_DEBUG
@@ -367,18 +380,9 @@ void VNoteMainWindow::onVNoteSearch()
         m_searchKey.setPattern(strKey);
         m_searchKey.setCaseSensitivity(Qt::CaseInsensitive);
         loadSearchNotes(m_searchKey);
-        m_leftView->clearSelection();
-        m_leftView->setEnabled(false);
-        m_addNotepadBtn->setVisible(false);
-        m_addNoteBtn->setVisible(false);
+        setSpecialStatus(SearchStart);
     } else {
-        m_searchKey = QRegExp();
-        m_middleView->setSearchKey(m_searchKey);
-        m_leftView->setEnabled(true);
-        m_addNotepadBtn->setVisible(true);
-        m_addNoteBtn->setVisible(true);
-        QModelIndex index = m_leftView->setDefaultNotepadItem();
-        onVNoteFolderChange(index, QModelIndex());
+        setSpecialStatus(SearchEnd);
     }
 }
 
@@ -399,7 +403,7 @@ void VNoteMainWindow::initSpliterView()
     initRightView();
 
     // Disable spliter drag & resize
-    QList<QWidget*> Children {m_middleViewHolder, m_rightViewHolder};
+    QList<QWidget *> Children {m_middleViewHolder, m_rightViewHolder};
 
     for (auto it : Children) {
         QSplitterHandle *handle = m_mainWndSpliter->handle(m_mainWndSpliter->indexOf(it));
@@ -429,23 +433,13 @@ void VNoteMainWindow::initEmptyFoldersView()
 
 void VNoteMainWindow::onStartRecord()
 {
-    m_isRecording = true;
-    m_leftView->setEnabled(false);
-    m_addNotepadBtn->setEnabled(false);
-    m_middleView->setEnabled(false);
-    m_rightView->setEnablePlayBtn(false);
-    m_addNoteBtn->setBtnDisabled(true);
+    setSpecialStatus(RecordStart);
 }
 
 void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 {
-     m_rightView->insertVoiceItem(voicePath, voiceSize);
-     m_rightView->setEnablePlayBtn(true);
-     m_isRecording = false;
-     m_leftView->setEnabled(true);
-     m_addNotepadBtn->setEnabled(true);
-     m_middleView->setEnabled(true);
-     m_addNoteBtn->setBtnDisabled(false);
+    m_rightView->insertVoiceItem(voicePath, voiceSize);
+    setSpecialStatus(RecordEnd);
 
 //    if (m_isExit) {
 //        qApp->quit();
@@ -455,7 +449,7 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 
 void VNoteMainWindow::onChangeTheme()
 {
-   ;
+    ;
 }
 
 void VNoteMainWindow::onA2TStart(const QString &file, qint64 duration)
@@ -586,7 +580,7 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
     m_rightView->initData(data);
-    if(!m_searchKey.isEmpty() && m_noteSearchEdit->isEnabled()){
+    if (!m_searchKey.isEmpty() && m_noteSearchEdit->isEnabled()) {
         m_noteSearchEdit->lineEdit()->setFocus();
     }
 }
@@ -621,6 +615,9 @@ void VNoteMainWindow::onAction(QAction *action)
         break;
     case ActionManager::NoteRename:
         editNote();
+        break;
+    case ActionManager::VoiceDelete:
+        delVoice();
         break;
     default:
         break;
@@ -696,7 +693,7 @@ void VNoteMainWindow::addNote()
         //Comment:
         //    ptrBlock will be released when the data set is destroyed,
         //so don't need release it here.
-        VNoteBlock* ptrBlock = tmpNote.datas.newBlock(VNoteBlock::Text);
+        VNoteBlock *ptrBlock = tmpNote.datas.newBlock(VNoteBlock::Text);
         tmpNote.datas.addBlock(ptrBlock);
 
         static int id = 0;
@@ -755,7 +752,7 @@ void VNoteMainWindow::loadNotes(VNoteFolder *folder)
             QModelIndex index = model->index(0, 0);
             m_middleView->setCurrentIndex(index);
         }
-    }else {
+    } else {
         m_middleView->setCurrentId(-1);
     }
 }
@@ -778,9 +775,9 @@ void VNoteMainWindow::loadSearchNotes(const QRegExp &key)
             }
         }
         noteAll->lock.unlock();
-        if(model->rowCount() == 0){
+        if (model->rowCount() == 0) {
             m_middleView->setVisibleEmptySearch(true);
-        }else {
+        } else {
             m_middleView->setVisibleEmptySearch(false);
             QModelIndex index = model->index(0, 0);
             m_middleView->setCurrentIndex(index);
@@ -790,6 +787,103 @@ void VNoteMainWindow::loadSearchNotes(const QRegExp &key)
 
 void VNoteMainWindow::onRightViewVoicePlay(VNVoiceBlock *voiceData)
 {
+    setSpecialStatus(PlayVoiceStart);
     m_recordBar->playVoice(voiceData);
 }
 
+void VNoteMainWindow::onRightViewVoicePause(VNVoiceBlock *voiceData)
+{
+    m_recordBar->pauseVoice(voiceData);
+}
+
+void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
+{
+    VoiceNoteItem *voiceItem = m_rightView->getVoiceItem(voiceData);
+    if (voiceItem) {
+        voiceItem->showPauseBtn();
+    }
+}
+
+void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
+{
+    VoiceNoteItem *voiceItem = m_rightView->getVoiceItem(voiceData);
+    if (voiceItem) {
+        voiceItem->showPlayBtn();
+    }
+}
+
+void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
+{
+    VoiceNoteItem *voiceItem = m_rightView->getVoiceItem(voiceData);
+    if (voiceItem) {
+        voiceItem->showPlayBtn();
+    }
+    setSpecialStatus(PlayVoiceEnd);
+}
+
+void VNoteMainWindow::delVoice()
+{
+    VoiceNoteItem *voiceItem = m_rightView->getMenuVoiceItem();
+    if (voiceItem) {
+        if (m_recordBar->stopVoice(voiceItem->getNoteBlock())) {
+            setSpecialStatus(PlayVoiceEnd);
+        }
+        m_rightView->delWidget(voiceItem);
+    }
+}
+
+void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
+{
+    switch (status) {
+    case SearchStart:
+        m_leftView->clearSelection();
+        m_leftView->setEnabled(false);
+        m_addNotepadBtn->setVisible(false);
+        m_addNoteBtn->setVisible(false);
+        break;
+    case SearchEnd:
+        m_searchKey = QRegExp();
+        m_middleView->setSearchKey(m_searchKey);
+        m_leftView->setEnabled(true);
+        m_addNotepadBtn->setVisible(true);
+        m_addNoteBtn->setVisible(true);
+        onVNoteFolderChange(m_leftView->setDefaultNotepadItem(), QModelIndex());
+        break;
+    case PlayVoiceStart:
+        m_isPlaying = true;
+        m_noteSearchEdit->setEnabled(false);
+        m_leftView->setEnabled(false);
+        m_addNotepadBtn->setEnabled(false);
+        m_middleView->setEnabled(false);
+        m_addNoteBtn->setBtnDisabled(true);
+        break;
+    case PlayVoiceEnd:
+        m_isPlaying = false;
+        m_noteSearchEdit->setEnabled(true);
+        m_leftView->setEnabled(true);
+        m_addNotepadBtn->setEnabled(true);
+        m_middleView->setEnabled(true);
+        m_addNoteBtn->setBtnDisabled(false);
+        break;
+    case RecordStart:
+        m_isRecording = true;
+        m_noteSearchEdit->setEnabled(false);
+        m_leftView->setEnabled(false);
+        m_addNotepadBtn->setEnabled(false);
+        m_middleView->setEnabled(false);
+        m_rightView->setEnablePlayBtn(false);
+        m_addNoteBtn->setBtnDisabled(true);
+        break;
+    case RecordEnd:
+        m_noteSearchEdit->setEnabled(true);
+        m_rightView->setEnablePlayBtn(true);
+        m_leftView->setEnabled(true);
+        m_addNotepadBtn->setEnabled(true);
+        m_middleView->setEnabled(true);
+        m_addNoteBtn->setBtnDisabled(false);
+        m_isRecording = false;
+        break;
+    default:
+        break;
+    }
+}

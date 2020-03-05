@@ -91,16 +91,18 @@ void VNotePlayWidget::onVoicePlayPosChange(qint64 pos)
 
 void VNotePlayWidget::setVoiceBlock(VNVoiceBlock *voiceData)
 {
-    if (voiceData && voiceData != m_voiceBlock) {
-        stopVideo();
-        m_voiceBlock = voiceData;
-        m_player->setMedia(QUrl::fromLocalFile(m_voiceBlock->voicePath));
-        m_slider->setMinimum(0);
-        m_slider->setMaximum(static_cast<int>(m_voiceBlock->voiceSize));
-        m_slider->setValue(0);
-        m_nameLab->setText(voiceData->voiceTitle);
-        m_timeLab->setText(Utils::formatMillisecond(0, 0) + "/" +
-                           Utils::formatMillisecond(voiceData->voiceSize));
+    if (voiceData) {
+        if (voiceData != m_voiceBlock) {
+            stopVideo();
+            m_voiceBlock = voiceData;
+            m_player->setMedia(QUrl::fromLocalFile(m_voiceBlock->voicePath));
+            m_slider->setMinimum(0);
+            m_slider->setMaximum(static_cast<int>(m_voiceBlock->voiceSize));
+            m_slider->setValue(0);
+            m_nameLab->setText(voiceData->voiceTitle);
+            m_timeLab->setText(Utils::formatMillisecond(0, 0) + "/" +
+                               Utils::formatMillisecond(voiceData->voiceSize));
+        }
         onPlayBtnClicked();
     }
 }
@@ -124,6 +126,7 @@ void VNotePlayWidget::onPlayBtnClicked()
     m_playBtn->setVisible(false);
     m_pauseBtn->setVisible(true);
     playVideo();
+    emit sigPlayVoice(m_voiceBlock);
 }
 
 void VNotePlayWidget::onPauseBtnClicked()
@@ -131,14 +134,14 @@ void VNotePlayWidget::onPauseBtnClicked()
     m_playBtn->setVisible(true);
     m_pauseBtn->setVisible(false);
     pauseVideo();
+    emit sigPauseVoice(m_voiceBlock);
 }
 
 void VNotePlayWidget::onCloseBtnClicked()
 {
-    m_player->stop();
     m_slider->setValue(0);
     stopVideo();
-    emit sigWidgetClose();
+    emit sigWidgetClose(m_voiceBlock);
 }
 
 void VNotePlayWidget::onSliderValueChange(int value)
@@ -155,4 +158,9 @@ bool VNotePlayWidget::eventFilter(QObject *o, QEvent *e)
         m_nameLab->setVisible(true);
     }
     return  false;
+}
+
+VNVoiceBlock* VNotePlayWidget::getVoiceData()
+{
+    return m_voiceBlock;
 }

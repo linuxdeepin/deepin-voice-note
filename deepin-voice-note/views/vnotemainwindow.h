@@ -45,6 +45,18 @@ public:
         WndHomePage,
         WndNoteShow
     };
+    enum SpecialStatus
+    {
+      InvalidStatus = 0,
+      SearchStart,
+      SearchEnd,
+      PlayVoiceStart,
+      PlayVoiceEnd,
+      RecordStart,
+      RecordEnd,
+      VoiceToTextStart,
+      VoiceToTextEnd
+    };
 
 protected:
     void initUI();
@@ -62,6 +74,7 @@ protected:
     void initSpliterView(); //正常主窗口
     void initSplashView();  // Splash animation view
     void initEmptyFoldersView();
+    void setSpecialStatus(SpecialStatus status);
 
     void resizeEvent(QResizeEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
@@ -76,6 +89,11 @@ public slots:
     void onStartRecord();//开始录音
     void onFinshRecord(const QString &voicePath,qint64 voiceSize); //结束录音
     void onRightViewVoicePlay(VNVoiceBlock *voiceData);
+    void onRightViewVoicePause(VNVoiceBlock *voiceData);
+    void onPlayPlugVoicePlay(VNVoiceBlock *voiceData);
+    void onPlayPlugVoicePause(VNVoiceBlock *voiceData);
+    void onPlayPlugVoiceStop(VNVoiceBlock *voiceData);
+
     void onChangeTheme();
     //Audio to text API
     void onA2TStart(const QString& file, qint64 duration);
@@ -97,6 +115,10 @@ private:
     void delNote();
     void loadNotes(VNoteFolder *folder);
     void loadSearchNotes(const QRegExp &key);
+
+    //详情页视图操作
+    void delVoice();
+    void voiceTotext();
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
@@ -130,6 +152,7 @@ private:
     DStackedWidget *m_centerWidget {nullptr};
     bool            m_isRecording {false};
     bool            m_isAsrVoiceing {false};
+    bool            m_isPlaying {false};
     bool            m_isExit {false};
     //App setting
     QSharedPointer<QSettings> m_qspSetting {nullptr};

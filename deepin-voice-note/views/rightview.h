@@ -20,7 +20,11 @@ public:
     DWidget *insertVoiceItem(const QString &voicePath, qint64 voiceSize);
     DWidget *insertTextEdit(VNoteBlock* data, bool focus = false);
     void  setEnablePlayBtn(bool enable);
+    void  delWidget(DWidget *widget);
+    VoiceNoteItem *getVoiceItem(VNoteBlock* data);
+    VoiceNoteItem *getMenuVoiceItem();
 signals:
+    void sigAction(QAction *action);
     void sigVoicePlay(VNVoiceBlock *voiceData);
     void sigVoicePause(VNVoiceBlock *voiceData);
 public slots:
@@ -36,8 +40,6 @@ protected:
     void saveNote();
 private:
     void        initUi();
-    void        delWidget(DWidget *widget);
-
     VoiceNoteItem *m_menuVoice {nullptr};
     VNoteItem   *m_noteItemData {nullptr};
     DWidget     *m_curItemWidget{nullptr};

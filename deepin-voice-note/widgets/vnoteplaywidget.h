@@ -24,8 +24,11 @@ public:
     void pauseVideo();
     void playVideo();
     void stopVideo();
+    VNVoiceBlock* getVoiceData();
 signals:
-    void sigWidgetClose();
+    void sigPlayVoice(VNVoiceBlock * voiceData);
+    void sigPauseVoice(VNVoiceBlock * voiceData);
+    void sigWidgetClose(VNVoiceBlock * voiceData);
 public slots:
     void onVoicePlayPosChange(qint64 pos);
     void onSliderValueChange(int value);
