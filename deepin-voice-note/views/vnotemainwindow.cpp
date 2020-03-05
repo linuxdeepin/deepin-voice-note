@@ -597,15 +597,25 @@ void VNoteMainWindow::onAction(QAction *action)
     case ActionManager::NotepadRename:
         editNotepad();
         break;
-    case ActionManager::NotepadDelete:
-        delNotepad();
-        break;
+    case ActionManager::NotepadDelete: {
+        VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteFolder);
+        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+            delNotepad();
+        });
+
+        confirmDialog.exec();
+    } break;
     case ActionManager::NotepadAddNew:
         addNote();
         break;
-    case ActionManager::NoteDelete:
-        delNote();
-        break;
+    case ActionManager::NoteDelete: {
+        VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
+        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+            delNote();
+        });
+
+        confirmDialog.exec();
+    } break;
     case ActionManager::NoteAddNew:
         addNote();
         break;

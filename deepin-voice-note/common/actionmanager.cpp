@@ -14,9 +14,9 @@ DMenu* ActionManager::getNotepadRMenu(QWidget *parent)
 {
     DMenu *menu = new DMenu(parent);
     QStringList menuTexts;
-    menuTexts << DApplication::translate("NotepadRMenu", "rename")
-              << DApplication::translate("NotepadRMenu", "delete")
-              << DApplication::translate("NotepadRMenu", "newNote");
+    menuTexts << DApplication::translate("NotepadRMenu", "Rename")
+              << DApplication::translate("NotepadRMenu", "Delete")
+              << DApplication::translate("NotepadRMenu", "New note");
     for(int i = 0; i < menuTexts.size(); i++)
     {
         QAction* pAction = new QAction(menuTexts[i], menu);
@@ -30,11 +30,11 @@ DMenu* ActionManager::getNotesRMenu(QWidget *parent)
 {
     DMenu *menu = new DMenu(parent);
     QStringList menuTexts;
-    menuTexts << DApplication::translate("NotesRMenu", "rename")
-              << DApplication::translate("NotesRMenu", "delete")
-              << DApplication::translate("NotesRMenu", "save as TXT")
-              << DApplication::translate("NotesRMenu", "save attachment")
-              << DApplication::translate("NotesRMenu", "new Note");
+    menuTexts << DApplication::translate("NotesRMenu", "Rename")
+              << DApplication::translate("NotesRMenu", "Delete")
+              << DApplication::translate("NotesRMenu", "Save as TXT")
+              << DApplication::translate("NotesRMenu", "Save voice recording")
+              << DApplication::translate("NotesRMenu", "New note");
     for(int i = 0; i < menuTexts.size(); i++)
     {
         QAction* pAction = new QAction(menuTexts[i], menu);
@@ -48,9 +48,9 @@ DMenu* ActionManager::getVoiceRMenu(QWidget *parent)
 {
     DMenu *menu = new DMenu(parent);
     QStringList menuTexts;
-    menuTexts << DApplication::translate("VoiceRMenu", "delete")
-              << DApplication::translate("VoiceRMenu", "save as mp3")
-              << DApplication::translate("VoiceRMenu", "voice turn words");
+    menuTexts << DApplication::translate("VoiceRMenu", "Delete")
+              << DApplication::translate("VoiceRMenu", "Save as MP3")
+              << DApplication::translate("VoiceRMenu", "Voice to Text");
     for(int i = 0; i < menuTexts.size(); i++)
     {
         QAction* pAction = new QAction(menuTexts[i], menu);

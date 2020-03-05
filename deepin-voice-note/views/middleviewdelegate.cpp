@@ -3,6 +3,7 @@
 #include "common/vnoteforlder.h"
 #include "common/utils.h"
 #include "common/standarditemcommon.h"
+#include "db/vnoteitemoper.h"
 
 #include "db/vnotefolderoper.h"
 
@@ -207,7 +208,16 @@ void MiddleViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
 {
     Q_UNUSED(model);
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
-    QString text = edit->text();
+    QString newTitle = edit->text();
+
+    //Update note title
+    VNoteItem *note = static_cast<VNoteItem*>(StandardItemCommon::getStandardItemData(index));
+    if(note){
+        if (!newTitle.isEmpty() && (note->noteTitle != newTitle)) {
+            VNoteItemOper noteOps(note);
+            noteOps.modifyNoteTitle(newTitle);
+        }
+    }
 }
 
 void MiddleViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,

@@ -33,6 +33,7 @@ void VNoteMessageDialog::initUI()
 
     m_pMessage = new DLabel(this);
     m_pMessage->setWordWrap(true);
+    m_pMessage->setAlignment(Qt::AlignCenter);
     DFontSizeManager::instance()->bind(m_pMessage, DFontSizeManager::T6);
 
     //Set Message color to TextTips
@@ -60,7 +61,7 @@ void VNoteMessageDialog::initUI()
     actionBarLayout->addWidget(m_buttonSpliter);
     actionBarLayout->addWidget(m_confirmBtn);
 
-    mainLayout->addWidget(m_pMessage, 1, Qt::AlignTop|Qt::AlignCenter);
+    mainLayout->addWidget(m_pMessage, 1);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(actionBarLayout);
     mainFrame->setLayout(mainLayout);
@@ -91,7 +92,7 @@ void VNoteMessageDialog::initMessage()
     switch (m_msgType) {
     case DeleteFolder: {
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
-            ,"Are you sure want to delete Folder?"));
+            ,"Are you sure you want to delete this notebook?\nAll notes in it will be deleted!"));
         m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "Delete"));
     } break;
     case AbortRecord: {
