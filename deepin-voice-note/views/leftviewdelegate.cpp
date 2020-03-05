@@ -48,6 +48,12 @@ void LeftViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
     Q_UNUSED(model);
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
     QString text = edit->displayText();
+
+    //Truncate the name if name length exceed 64 chars
+    if (text.length() > MAX_FOLDER_NAME_LEN) {
+        text = text.left(MAX_FOLDER_NAME_LEN);
+    }
+
     if (!text.isEmpty()) {
         if (StandardItemCommon::getStandardItemType(index) == StandardItemCommon::NOTEPADITEM) {
             VNoteFolder *folderdata = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(index));

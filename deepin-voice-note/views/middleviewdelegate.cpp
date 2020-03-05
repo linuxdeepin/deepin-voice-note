@@ -213,6 +213,11 @@ void MiddleViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     //Update note title
     VNoteItem *note = static_cast<VNoteItem*>(StandardItemCommon::getStandardItemData(index));
     if(note){
+        //Truncate the title name if exceed 64 chars
+        if (newTitle.length() > MAX_TITLE_LEN) {
+            newTitle = newTitle.left(MAX_TITLE_LEN);
+        }
+
         if (!newTitle.isEmpty() && (note->noteTitle != newTitle)) {
             VNoteItemOper noteOps(note);
             noteOps.modifyNoteTitle(newTitle);

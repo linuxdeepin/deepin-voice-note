@@ -2,8 +2,9 @@
 #include "widgets/vnoterecordwidget.h"
 #include "widgets/vnoteiconbutton.h"
 #include "widgets/vnoteplaywidget.h"
-
 #include "common/vnoteitem.h"
+#include "common/vnoteaudiodevicewatcher.h"
+#include "dialog/vnotemessagedialog.h"
 
 #include <QVBoxLayout>
 
@@ -81,11 +82,30 @@ bool VNoteRecordBar::eventFilter(QObject *o, QEvent *e)
     return false;
 }
 
-void VNoteRecordBar::onStartRecord()
+void VNoteRecordBar::startRecord()
 {
     m_mainLayout->setCurrentWidget(m_recordPanel);
+
     m_recordPanel->startRecord();
     emit sigStartRecord();
+}
+
+void VNoteRecordBar::onStartRecord()
+{
+    if (VNoteAudioDeviceWatcher::VolumeTooLow == m_microphoneState) {
+        VNoteMessageDialog volumeLowDialog(VNoteMessageDialog::VolumeTooLow);
+
+        connect(&volumeLowDialog, &VNoteMessageDialog::accepted, this, [this]() {
+            //User confirmed record when volume too low
+            //start recording anyway.
+            startRecord();
+        });
+
+        volumeLowDialog.exec();
+    } else {
+        //Volume normal
+        startRecord();
+    }
 }
 
 void VNoteRecordBar::onFinshRecord(const QString &voicePath,qint64 voiceSize)
@@ -97,17 +117,33 @@ void VNoteRecordBar::onFinshRecord(const QString &voicePath,qint64 voiceSize)
 void VNoteRecordBar::OnMicrophoneAvailableChanged(int availableState)
 {
     qInfo() << __FUNCTION__ << " MicrophoneState:" << availableState;
-//    if (isAvailable) {
-//        m_recordBtn->setBtnDisabled(false);
-//        m_recordBtn->setToolTip("");
-//    } else {
-//        m_recordBtn->setBtnDisabled(true);
-//        m_recordBtn->setToolTip(
-//                    DApplication::translate(
-//                        "VNoteRecordBar",
-//                        "No recording device detected")
-//                    );
-//    }
+
+    m_microphoneState = availableState;
+
+    if (VNoteAudioDeviceWatcher::NotAvailable == m_microphoneState) {
+        m_recordBtn->setBtnDisabled(true);
+        m_recordBtn->setToolTip(
+                    DApplication::translate(
+                        "VNoteRecordBar",
+                        "No recording device detected")
+                    );
+    } else {
+        m_recordBtn->setBtnDisabled(false);
+        m_recordBtn->setToolTip("");
+
+        //If volume is changed when recording,give message
+        if (VNoteAudioDeviceWatcher::VolumeTooLow == m_microphoneState
+                && m_recordPanel == m_mainLayout->currentWidget()) {
+            VNoteMessageDialog volumeLowDialog(VNoteMessageDialog::VolumeTooLow);
+
+            connect(&volumeLowDialog, &VNoteMessageDialog::rejected, this, [this]() {
+                //Canel record when volume too low
+                cancelRecord();
+            });
+
+            volumeLowDialog.exec();
+        }
+    }
 }
 
 void VNoteRecordBar::cancelRecord()

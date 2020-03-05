@@ -45,6 +45,7 @@ public slots:
 
 protected:
     bool eventFilter(QObject *o, QEvent *e) override;
+    void startRecord();
 protected:
     QStackedLayout    *m_mainLayout {nullptr};
     VNotePlayWidget   *m_playPanel {nullptr};
@@ -54,6 +55,9 @@ protected:
     QScopedPointer<DAnchorsBase> m_recBtnAnchor;
 
     QString          m_recordPath {""};
+
+    //MicrophoneState
+    int m_microphoneState {0};
 };
 
 #endif // VNOTERECORDBAR_H

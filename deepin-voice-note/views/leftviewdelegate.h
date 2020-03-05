@@ -10,6 +10,7 @@ public:
     LeftViewDelegate(QAbstractItemView *parent = nullptr);
     void handleChangeTheme();
 
+    const int MAX_FOLDER_NAME_LEN = 64;
 protected:
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
                const QModelIndex &index) const Q_DECL_OVERRIDE;
