@@ -15,7 +15,7 @@ Eg: meta-data format
     xml-format:
 
     <?xml version="1.0" encoding="UTF-8"?>
-    <Note NoteElementsCount="3">
+    <Note NoteElementsCount="3" VoiceMaxId="1">
         <NoteItem NoteItemType="1">
             <NoteText>I Love China</NoteText>
         </NoteItem>
@@ -34,6 +34,7 @@ Eg: meta-data format
 
     {
         "dataCount": 2,
+        "voiceMaxId":1,
         "noteDatas": [
             {
                 "text": "I Love China.",
@@ -60,6 +61,7 @@ public:
 #ifdef VN_XML_METADATA_PARSER
     enum {
         NRootNode,
+        NVoiceMaxIdAttr,
         NItemCountAttr,
         NItemNode,
         NItemTypeAttr,
@@ -74,6 +76,7 @@ public:
 #elif defined (VN_JSON_METADATA_PARSER)
     enum {
         NDataCount,
+        NVoiceMaxId,
         NDatas,
         NDataType,
         NText,
@@ -85,13 +88,14 @@ public:
     };
 #endif
 
-    void parse(const QVariant &metaData, VNOTE_DATAS &datas/*out*/);
-    void makeMetaData(const VNOTE_DATAS &datas, QVariant &metaData /*out*/);
+    void parse(const QVariant &metaData, VNoteItem *noteData/*out*/);
+    void makeMetaData(const VNoteItem *noteData, QVariant &metaData /*out*/);
 
 protected:
 #ifdef VN_XML_METADATA_PARSER
     const QMap<int,QString> m_xmlNodeNameMap = {
         {NRootNode, "Note"},
+        {NVoiceMaxIdAttr, "VoiceMaxId"},
         {NItemCountAttr, "NoteElementsCount"},
         {NItemNode, "NoteItem"},
         {NItemTypeAttr, "NoteItemType"},
@@ -104,14 +108,15 @@ protected:
         {NVoiceTextNode, "NoteVoiceText"},
     };
 
-    void xmlParse(const QVariant &metaData, VNOTE_DATAS &datas/*out*/);
-    void xmlMakeMetadata(const VNOTE_DATAS &datas, QVariant &metaData /*out*/);
-    void xmlParseRoot(QXmlStreamReader& xmlSRead, int& count);
-    void xmlParseNoteItem(QXmlStreamReader& xmlSRead, VNOTE_DATAS &datas/*out*/);
+    void xmlParse(const QVariant &metaData, VNoteItem *noteData/*out*/);
+    void xmlMakeMetadata(const VNoteItem *noteData, QVariant &metaData /*out*/);
+    void xmlParseRoot(QXmlStreamReader& xmlSRead, VNoteItem *noteData);
+    void xmlParseNoteItem(QXmlStreamReader& xmlSRead, VNoteItem *noteData/*out*/);
 
 #elif defined (VN_JSON_METADATA_PARSER)
     QMap<int,QString> m_jsonNodeNameMap = {
             {NDataCount, "dataCount"},
+            {NVoiceMaxId, "voiceMaxId"},
             {NDatas, "noteDatas"},
             {NDataType, "type"},
             {NText, "text"},
@@ -122,8 +127,8 @@ protected:
             {NCreateTime, "createTime"},
         };
 
-    void jsonParse(const QVariant &metaData, VNOTE_DATAS &datas/*out*/);
-    void jsonMakeMetadata(const VNOTE_DATAS &datas, QVariant &metaData /*out*/);
+    void jsonParse(const QVariant &metaData, VNoteItem *noteData/*out*/);
+    void jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaData /*out*/);
 #endif
 };
 

@@ -39,9 +39,15 @@ public:
         QImage icon;
     } UI;
 
-    friend QDebug & operator << (QDebug &out, VNoteFolder &noteItem);
+    qint32& maxNoteIdRef();
+
+    friend QDebug & operator << (QDebug &out, VNoteFolder &folder);
 protected:
     bool fIsDataLoaded {false};
+
+    //Current max note id in the folder,auto
+    //increament
+    qint32 maxNoteId {0};
 
     VNOTE_ITEMS_MAP *notes{nullptr};
 

@@ -31,6 +31,7 @@ public:
             default_icon INT DEFAULT 0, \
             icon_path TEXT,\
             folder_state INT DEFAULT 0, \
+            max_noteid INT DEFAULT 0, \
             create_time DATETIME NOT NULL DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f','now','localtime')), \
             modify_time DATETEXT NOT NULL DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f','now','localtime')), \
             delete_time DATETEXT DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f','now','localtime')), \

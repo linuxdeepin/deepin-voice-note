@@ -19,6 +19,7 @@ const QStringList VNoteFolderOper::folderColumnsName = {
     "default_icon",
     "icon_path",
     "folder_state",
+    "max_noteid",
     "create_time",
     "modify_time",
     "delete_time",
@@ -240,10 +241,10 @@ QString VNoteFolderOper::getDefaultFolderName()
     querySql.sprintf(QUERY_DEFNAME_FMT
                      , VNoteDbManager::FOLDER_TABLE_NAME
                      , folderColumnsName[folder_name].toUtf8().data()
-                     , DApplication::translate("AppMain","NewFolder").toUtf8().data()
+                     , DApplication::translate("DefaultName","NewFolder").toUtf8().data()
                      );
 
-    QString defaultFolderName = DApplication::translate("AppMain","NewFolder");
+    QString defaultFolderName = DApplication::translate("DefaultName","NewFolder");
 
     int foldersCount = 0;
     CountDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), &foldersCount);

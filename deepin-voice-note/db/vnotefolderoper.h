@@ -41,6 +41,7 @@ protected:
         default_icon,
         icon_path,
         folder_state,
+        max_noteid,
         create_time,
         modify_time,
         delete_time,

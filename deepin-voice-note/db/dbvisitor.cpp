@@ -49,6 +49,8 @@ bool FolderQryDbVisitor::visitorData()
             folder->iconPath    = m_sqlQuery->value(VNoteFolderOper::icon_path).toString();
             folder->folder_state= m_sqlQuery->value(VNoteFolderOper::folder_state).toInt();
 
+            folder->maxNoteIdRef()= m_sqlQuery->value(VNoteFolderOper::max_noteid).toInt();
+
             folder->createTime  = QDateTime::fromString(
                         m_sqlQuery->value(VNoteFolderOper::create_time).toString(),VNOTE_TIME_FMT);
             folder->modifyTime  = QDateTime::fromString(
@@ -98,7 +100,7 @@ bool NoteQryDbVisitor::visitorData()
             //Parse meta data
             QVariant metaData  = m_sqlQuery->value(VNoteItemOper::meta_data);
             note->setMetadata(metaData);
-            metaParser.parse(metaData, note->datas);
+            metaParser.parse(metaData, note);
 
             note->noteState   = m_sqlQuery->value(VNoteItemOper::note_state).toInt();
 
@@ -228,7 +230,7 @@ bool AddNoteDbVisitor::visitorData()
             //Parse meta data
             QVariant metaData  = m_sqlQuery->value(VNoteItemOper::meta_data);
             note->setMetadata(metaData);
-            metaParser.parse(metaData, note->datas);
+            metaParser.parse(metaData, note);
 
             note->noteState  = m_sqlQuery->value(VNoteItemOper::note_state).toInt();
 

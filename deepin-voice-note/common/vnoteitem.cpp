@@ -36,6 +36,44 @@ void VNoteItem::setMetadata(const QVariant &meta)
     metaData = meta;
 }
 
+qint32 &VNoteItem::maxVoiceIdRef()
+{
+    return maxVoiceId;
+}
+
+qint32 VNoteItem::voiceMaxId() const
+{
+    return maxVoiceId;
+}
+
+VNoteBlock *VNoteItem::newBlock(int type)
+{
+    return datas.newBlock(type);
+}
+
+void VNoteItem::addBlock(VNoteBlock *block)
+{
+    if (VNoteBlock::Voice ==block->getType()) {
+        maxVoiceId++;
+    }
+
+    datas.addBlock(block);
+}
+
+void VNoteItem::addBlock(VNoteBlock *before, VNoteBlock *block)
+{
+    if (VNoteBlock::Voice ==block->getType()) {
+        maxVoiceId++;
+    }
+
+    datas.addBlock(before, block);
+}
+
+void VNoteItem::delBlock(VNoteBlock *block)
+{
+    datas.delBlock(block);
+}
+
 QDebug& operator << (QDebug &out, VNoteItem &noteItem)
 {
     out << "\n{ "
@@ -47,7 +85,8 @@ QDebug& operator << (QDebug &out, VNoteItem &noteItem)
         << "metaData=" << noteItem.metaData << ","
         << "createTime=" << noteItem.createTime << ","
         << "modifyTime=" << noteItem.modifyTime << ","
-        << "deleteTime=" << noteItem.deleteTime
+        << "deleteTime=" << noteItem.deleteTime << ","
+        << "maxVoiceId=" << noteItem.maxVoiceId
         << " }\n";
 
     return out;

@@ -15,6 +15,11 @@ bool VNoteFolder::isValid()
     return (id > INVALID_ID) ? true : false;
 }
 
+qint32 &VNoteFolder::maxNoteIdRef()
+{
+    return maxNoteId;
+}
+
 QDebug & operator <<(QDebug &out, VNoteFolder &folder)
 {
     out << "\n{ "
@@ -24,6 +29,7 @@ QDebug & operator <<(QDebug &out, VNoteFolder &folder)
         << "iconPath=" << folder.iconPath << ","
         << "notesCount=" << folder.notesCount << ","
         << "folder_state=" << folder.folder_state << ","
+        << "maxNoteId=" << folder.maxNoteId << ","
         << "createTime=" << folder.createTime << ","
         << "modifyTime=" << folder.modifyTime << ","
         << "deleteTime=" << folder.deleteTime

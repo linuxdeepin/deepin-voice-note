@@ -730,12 +730,13 @@ void VNoteMainWindow::addNote()
         //Comment:
         //    ptrBlock will be released when the data set is destroyed,
         //so don't need release it here.
-        VNoteBlock *ptrBlock = tmpNote.datas.newBlock(VNoteBlock::Text);
-        tmpNote.datas.addBlock(ptrBlock);
+        VNoteBlock *ptrBlock = tmpNote.newBlock(VNoteBlock::Text);
+        tmpNote.addBlock(ptrBlock);
 
-        static int id = 0;
-        tmpNote.noteTitle = DApplication::translate("VNoteMainWindow", "Text") + QString::number(id++);
         VNoteItemOper noteOper;
+        //Get default note name in the folder
+        tmpNote.noteTitle = noteOper.getDefaultNoteName(tmpNote.folderId);
+
         VNoteItem *newNote = noteOper.addNote(tmpNote);
 
         //Refresh the notes count of folder

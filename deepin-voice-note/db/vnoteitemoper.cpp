@@ -4,10 +4,12 @@
 #include "globaldef.h"
 #include "common/metadataparser.h"
 #include "common/vnoteitem.h"
+#include "common/vnoteforlder.h"
 #include "common/vnotedatamanager.h"
 #include "db/dbvisitor.h"
 
 #include <DLog>
+#include <DApplication>
 
 const QStringList VNoteItemOper::noteColumnsName = {
     "note_id",
@@ -15,10 +17,10 @@ const QStringList VNoteItemOper::noteColumnsName = {
     "note_type",
     "note_title",
     "meta_data",
-    "note_state"
+    "note_state",
     "create_time",
     "modify_time",
-    "delete_time"
+    "delete_time",
 };
 
 VNoteItemOper::VNoteItemOper(VNoteItem* note)
@@ -120,7 +122,7 @@ bool VNoteItemOper::updateNote()
         //Prepare meta data
         MetaDataParser metaParser;
         QVariant metaData;
-        metaParser.makeMetaData(m_note->datas, metaData);
+        metaParser.makeMetaData(m_note, metaData);
 
         QDateTime modifyTime = QDateTime::currentDateTime();
 
@@ -165,13 +167,20 @@ bool VNoteItemOper::updateNote()
 VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
 {
     static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s,%s,%s) VALUES (%s,%s,'%s','%s');";
-    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s WHERE %s=%s;";
+    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s,%s=%s WHERE %s=%s;";
     static constexpr char const *NEWREC_FMT = "SELECT * FROM %s WHERE %s=%s ORDER BY %s DESC LIMIT 1;";
+
+    VNoteFolderOper folderOps;
+    VNoteFolder *folder = folderOps.getFolder(note.folderId);
+
+    Q_ASSERT(nullptr != folder);
+
+    folder->maxNoteIdRef()++;
 
     //Prepare meta data
     MetaDataParser metaParser;
     QVariant metaData;
-    metaParser.makeMetaData(note.datas, metaData);
+    metaParser.makeMetaData(&note, metaData);
 
     QString insertSql;
 
@@ -192,6 +201,8 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
 
     updateSql.sprintf(UPDATE_FOLDER_TIME
                       , VNoteDbManager::FOLDER_TABLE_NAME
+                      , VNoteFolderOper::folderColumnsName[VNoteFolderOper::max_noteid].toUtf8().data()
+                      , QString("%1").arg(folder->maxNoteIdRef()).toUtf8().data()
                       , VNoteFolderOper::folderColumnsName[VNoteFolderOper::modify_time].toUtf8().data()
                       , sqlGetTime.toUtf8().data()
                       , VNoteFolderOper::folderColumnsName[VNoteFolderOper::folder_id].toUtf8().data()
@@ -226,6 +237,11 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
             //Add to DataManager failed, release it
             QScopedPointer<VNoteItem> autoRelease(newNote);
             newNote = nullptr;
+
+            //We don't need rollback the maxnoteid here
+            //because data aready in the database.
+            //folder->maxNoteIdRef()--
+            //Should never reach here
         }
     } else {
         qCritical()  << "New Note:"  << newNote->noteId
@@ -236,6 +252,9 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
 
         QScopedPointer<VNoteItem> autoRelease(newNote);
         newNote = nullptr;
+
+        //Rollback the id if fiaa
+        folder->maxNoteIdRef()--;
     }
 
     return newNote;
@@ -250,6 +269,32 @@ VNOTE_ITEMS_MAP *VNoteItemOper::getFolderNotes(qint64 folderId)
 {
     return VNoteDataManager::instance()->getFolderNotes(folderId);
 }
+
+QString VNoteItemOper::getDefaultNoteName(qint64 folderId)
+{
+
+    VNoteFolder* folder = VNoteDataManager::instance()->getFolder(folderId);
+
+    QString defaultNoteName = DApplication::translate("DefaultName","Text");
+
+    if (nullptr != folder) {
+        defaultNoteName += QString("%1").arg(folder->maxNoteIdRef()+1);
+    }
+
+    return defaultNoteName;
+}
+
+QString VNoteItemOper::getDefaultVoiceName() const
+{
+    QString defaultVoiceName = DApplication::translate("DefaultName","Voice");
+
+    if (nullptr != m_note) {
+        defaultVoiceName += QString("%1").arg(m_note->maxVoiceIdRef()+1);
+    }
+
+    return defaultVoiceName;
+}
+
 
 bool VNoteItemOper::deleteNote()
 {

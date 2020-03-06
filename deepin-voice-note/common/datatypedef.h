@@ -54,12 +54,17 @@ struct VNOTE_ALL_NOTES_MAP {
 struct VNOTE_DATAS {
     ~VNOTE_DATAS();
 
+    const VNOTE_DATA_VECTOR& dataConstRef();
+protected:
     VNoteBlock* newBlock(int type);
     void addBlock(VNoteBlock* block);
     void addBlock(VNoteBlock* before, VNoteBlock* block);
     void delBlock(VNoteBlock* block);
 
     VNOTE_DATA_VECTOR datas;
+
+    friend struct VNoteItem;
+    friend class MetaDataParser;
 };
 
 static QStringList default_FolderData_imgpath =

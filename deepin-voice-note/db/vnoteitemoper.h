@@ -19,6 +19,8 @@ public:
     VNoteItem* addNote(VNoteItem& note);
     VNoteItem* getNote(qint64 folderId, qint32 noteId);
     VNOTE_ITEMS_MAP *getFolderNotes(qint64 folderId);
+    QString getDefaultNoteName(qint64 folderId);
+    QString getDefaultVoiceName() const;
 
     bool deleteNote();
     bool deleteNote(qint64 folderId, qint32 noteId);

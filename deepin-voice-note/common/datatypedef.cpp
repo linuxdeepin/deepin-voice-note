@@ -50,6 +50,11 @@ VNOTE_DATAS::~VNOTE_DATAS()
     }
 }
 
+const VNOTE_DATA_VECTOR &VNOTE_DATAS::dataConstRef()
+{
+    return datas;
+}
+
 VNoteBlock* VNOTE_DATAS::newBlock(int type)
 {
     VNoteBlock* ptrBlock = nullptr;

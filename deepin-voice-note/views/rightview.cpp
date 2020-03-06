@@ -57,7 +57,7 @@ void RightView::initUi()
 
 QWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus)
 {
-    TextNoteEdit *editItem = new TextNoteEdit(m_noteItemData, static_cast<VNTextBlock *>(data), m_viewportWidget);
+    TextNoteEdit *editItem = new TextNoteEdit(m_noteItemData, data->ptrText, m_viewportWidget);
     DStyle::setFocusRectVisible(editItem, false);
     DPalette pb = DApplicationHelper::instance()->palette(editItem);
     pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));
@@ -92,13 +92,16 @@ QWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus)
 
 QWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
 {
-    VNVoiceBlock *data = static_cast<VNVoiceBlock *>(m_noteItemData->datas.newBlock(VNoteBlock::Voice));
-    static int i = 0;
-    data->voiceSize = voiceSize;
-    data->voicePath = voicePath;
-    data->createTime = QDateTime::currentDateTime();
-    data->voiceTitle = DApplication::translate("RightView", "NewVoice") + QString::number(i++);
-    VoiceNoteItem *item = new VoiceNoteItem(m_noteItemData, static_cast<VNVoiceBlock *>(data), this);
+    VNoteItemOper noteOps(m_noteItemData);
+
+    VNoteBlock *data = m_noteItemData->newBlock(VNoteBlock::Voice);
+
+    data->ptrVoice->voiceSize = voiceSize;
+    data->ptrVoice->voicePath = voicePath;
+    data->ptrVoice->createTime = QDateTime::currentDateTime();
+    data->ptrVoice->voiceTitle = noteOps.getDefaultVoiceName();
+
+    VoiceNoteItem *item = new VoiceNoteItem(m_noteItemData, data->ptrVoice, this);
     item->setObjectName(VoiceWidget);
     connect(item, &VoiceNoteItem::sigPlayBtnClicked, this, &RightView::onVoicePlay);
     connect(item, &VoiceNoteItem::sigPauseBtnClicked, this, &RightView::onVoicePause);
@@ -107,10 +110,10 @@ QWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
     if (m_curItemWidget == nullptr) {
         m_viewportLayout->insertWidget(0, item);
         m_curItemWidget = item;
-        VNoteBlock *textBlock = m_noteItemData->datas.newBlock(VNoteBlock::Text);
+        VNoteBlock *textBlock = m_noteItemData->newBlock(VNoteBlock::Text);
         textBlock->blockText = "";
         m_curItemWidget = insertTextEdit(textBlock, true);
-        m_noteItemData->datas.addBlock(nullptr, textBlock);
+        m_noteItemData->addBlock(nullptr, textBlock);
         m_fIsNoteModified = true;
         saveNote();
     } else {
@@ -131,7 +134,7 @@ QWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
                         preData = static_cast<VoiceNoteItem *>(preWidget)->getNoteBlock();
                     }
                 }
-                m_noteItemData->datas.addBlock(preData, data);
+                m_noteItemData->addBlock(preData, data);
                 m_curItemWidget = itemWidget;
                 itemWidget->setFocus();
                 m_fIsNoteModified = true;
@@ -145,13 +148,13 @@ QWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
         }
         curIndex += 1;
         m_viewportLayout->insertWidget(curIndex, item);
-        m_noteItemData->datas.addBlock(data);
+        m_noteItemData->addBlock(data);
         m_curItemWidget = item;
         if (!cutStr.isEmpty() || curIndex + 1 == m_viewportLayout->indexOf(m_placeholderWidget)) {
-            VNoteBlock *textBlock = m_noteItemData->datas.newBlock(VNoteBlock::Text);
+            VNoteBlock *textBlock = m_noteItemData->newBlock(VNoteBlock::Text);
             textBlock->blockText = cutStr;
             m_curItemWidget = insertTextEdit(textBlock, true);
-            m_noteItemData->datas.addBlock(item->getNoteBlock(), textBlock);
+            m_noteItemData->addBlock(item->getNoteBlock(), textBlock);
         }
     }
     m_fIsNoteModified = true;
@@ -206,13 +209,13 @@ void RightView::initData(VNoteItem *data)
     if (m_noteItemData == nullptr) {
         return;
     }
-    int size = m_noteItemData->datas.datas.size();
+    int size = m_noteItemData->datas.dataConstRef().size();
     if (size) {
-        for (auto it : m_noteItemData->datas.datas) {
+        for (auto it : m_noteItemData->datas.dataConstRef()) {
             if (VNoteBlock::Text == it->getType()) {
                 m_curItemWidget = insertTextEdit(it, true);
             } else if (VNoteBlock::Voice == it->getType()) {
-                VoiceNoteItem *item = new VoiceNoteItem(m_noteItemData, static_cast<VNVoiceBlock *>(it), this);
+                VoiceNoteItem *item = new VoiceNoteItem(m_noteItemData, it->ptrVoice, this);
                 item->setObjectName(VoiceWidget);
                 int preIndex = -1;
                 if (m_curItemWidget != nullptr) {
@@ -226,10 +229,10 @@ void RightView::initData(VNoteItem *data)
             }
         }
     } else {
-        VNoteBlock *textBlock = m_noteItemData->datas.newBlock(VNoteBlock::Text);
+        VNoteBlock *textBlock = m_noteItemData->newBlock(VNoteBlock::Text);
         //textBlock->blockText = data->noteTitle;
         m_curItemWidget = insertTextEdit(textBlock, true);
-        m_noteItemData->datas.addBlock(nullptr, textBlock);
+        m_noteItemData->addBlock(nullptr, textBlock);
     }
 }
 
@@ -307,7 +310,7 @@ void RightView::delWidget(DWidget *widget)
             noteBlock =  static_cast<VoiceNoteItem *>(widget)->getNoteBlock();
         }
         if (noteBlock) {
-            m_noteItemData->datas.delBlock(noteBlock);
+            m_noteItemData->delBlock(noteBlock);
         }
         widget->deleteLater();
         int curIndex = m_viewportLayout->indexOf(m_curItemWidget);
@@ -335,7 +338,7 @@ void RightView::delWidget(DWidget *widget)
                 editSibing->setPlainText(textBlock->blockText);
                 m_viewportLayout->removeWidget(editCurrent);
                 m_curItemWidget = editSibing;
-                m_noteItemData->datas.delBlock(editCurrent->getNoteBlock());
+                m_noteItemData->delBlock(editCurrent->getNoteBlock());
                 editCurrent->deleteLater();
                 QTextCursor cursor = editSibing->textCursor();
                 cursor.movePosition(QTextCursor::End);

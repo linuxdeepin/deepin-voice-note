@@ -47,9 +47,21 @@ public:
     QDateTime modifyTime;
     QDateTime deleteTime;
 
+    qint32 & maxVoiceIdRef();
+    qint32 voiceMaxId() const;
+
     VNOTE_DATAS datas;
+
+    VNoteBlock* newBlock(int type);
+    void addBlock(VNoteBlock* block);
+    void addBlock(VNoteBlock* before, VNoteBlock* block);
+    void delBlock(VNoteBlock* block);
 protected:
     QVariant metaData;
+
+    //Use to make default voice name
+    //auto increment.
+    qint32 maxVoiceId {0};
 
     friend QDebug& operator << (QDebug& out, VNoteItem &noteItem);
 };
