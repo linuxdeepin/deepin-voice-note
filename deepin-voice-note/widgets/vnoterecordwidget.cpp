@@ -130,7 +130,7 @@ void VNoteRecordWidget::cancelRecord()
 void VNoteRecordWidget::onAudioBufferProbed(const QAudioBuffer &buffer)
 {
     m_recordMsec = buffer.startTime() / 1000;
-    QString strTime = Utils::formatMillisecond(m_recordMsec);
+    QString strTime = Utils::formatMillisecond(m_recordMsec, 0);
     if (m_timeLabel->text() != strTime) {
         m_timeLabel->setText(strTime);
     }
@@ -140,7 +140,6 @@ void VNoteRecordWidget::onAudioBufferProbed(const QAudioBuffer &buffer)
 void VNoteRecordWidget::onMediaDurationChange(qint64 duration)
 {
     if(duration >= m_recordMsec){
-      qDebug() << "duration 1:" << m_recordMsec << ";duration 2:" << duration;
       emit sigFinshRecord(m_recordPath, duration);
     }
 }

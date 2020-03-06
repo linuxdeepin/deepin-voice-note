@@ -162,6 +162,9 @@ void VNoteMainWindow::initConnections()
     connect(m_recordBar, &VNoteRecordBar::sigWidgetClose,
             this, &VNoteMainWindow::onPlayPlugVoiceStop);
 
+    connect(m_asrAgainBtn, &DPushButton::clicked,
+            this, &VNoteMainWindow::onA2TStart);
+
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &VNoteMainWindow::onChangeTheme);
 
@@ -207,10 +210,6 @@ void VNoteMainWindow::initTitleBar()
     m_noteSearchEdit->setFixedSize(QSize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H));
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
     titlebar()->addWidget(m_noteSearchEdit);
-    m_returnBtn = new DIconButton(DStyle::SP_ArrowLeave, this);
-    m_returnBtn->setFixedSize(QSize(36, 36));
-    m_returnBtn->setVisible(false);
-    this->titlebar()->addWidget(m_returnBtn, Qt::AlignLeft);
 }
 
 void VNoteMainWindow::initMainView()
@@ -218,6 +217,7 @@ void VNoteMainWindow::initMainView()
     initSpliterView();
     initSplashView();
     initEmptyFoldersView();
+    initAsrErrMessage();
     m_centerWidget = new DStackedWidget(this);
     m_centerWidget->setContentsMargins(0, 0, 0, 0);
     m_centerWidget->insertWidget(WndSplashAnim, m_splashView);
@@ -375,20 +375,23 @@ void VNoteMainWindow::onVNoteFoldersLoaded()
 
 void VNoteMainWindow::onVNoteSearch()
 {
-    QString strKey = m_noteSearchEdit->text();
-    if (!strKey.isEmpty()) {
-        m_searchKey.setPattern(strKey);
-        m_searchKey.setCaseSensitivity(Qt::CaseInsensitive);
-        loadSearchNotes(m_searchKey);
-        setSpecialStatus(SearchStart);
-    } else {
-        setSpecialStatus(SearchEnd);
+    if (m_centerWidget->currentIndex() == WndNoteShow) {
+        QString strKey = m_noteSearchEdit->text();
+        if (!strKey.isEmpty()) {
+            m_searchKey.setPattern(strKey);
+            m_searchKey.setCaseSensitivity(Qt::CaseInsensitive);
+            loadSearchNotes(m_searchKey);
+            setSpecialStatus(SearchStart);
+        } else {
+            setSpecialStatus(SearchEnd);
+        }
     }
 }
 
 void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QModelIndex &previous)
 {
     Q_UNUSED(previous);
+    m_asrErrMeassage->setVisible(false);
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
     loadNotes(data);
 }
@@ -438,13 +441,15 @@ void VNoteMainWindow::onStartRecord()
 
 void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 {
-    m_rightView->insertVoiceItem(voicePath, voiceSize);
+    if (voiceSize >= 1000) {
+        m_rightView->insertVoiceItem(voicePath, voiceSize);
+    } else {
+
+    }
     setSpecialStatus(RecordEnd);
-
-//    if (m_isExit) {
-//        qApp->quit();
-//    }
-
+    if (m_isExit) {
+        qApp->quit();
+    }
 }
 
 void VNoteMainWindow::onChangeTheme()
@@ -452,19 +457,48 @@ void VNoteMainWindow::onChangeTheme()
     ;
 }
 
-void VNoteMainWindow::onA2TStart(const QString &file, qint64 duration)
+void VNoteMainWindow::onA2TStart()
 {
-    ;
+    m_asrErrMeassage->setVisible(false);
+    m_currentAsrVoice = m_rightView->getMenuVoiceItem();
+    if (m_currentAsrVoice) {
+        setSpecialStatus(VoiceToTextStart);
+        m_currentAsrVoice->showAsrStartWindow();
+        QTimer::singleShot(0, this, [this]() {
+            VNVoiceBlock *data = m_currentAsrVoice->getNoteBlock();
+            m_a2tManager->startAsr(data->voicePath, data->voiceSize);
+        });
+    }
 }
 
 void VNoteMainWindow::onA2TError(int error)
 {
-    ;
+    if (m_currentAsrVoice) {
+        m_currentAsrVoice->showAsrEndWindow("");
+    }
+    QString message = "";
+    if (error == VNoteA2TManager::NetworkError) {
+        message = DApplication::translate(
+                      "VNoteErrorMessage",
+                      "The voice conversion failed due to the poor network connection. "
+                      "Do you want to try again?");
+    } else {
+        message = DApplication::translate(
+                      "VNoteErrorMessage",
+                      "The voice conversion failed. Do you want to try again?");
+    }
+    showAsrErrMessage(message);
+    setSpecialStatus(VoiceToTextEnd);
 }
 
 void VNoteMainWindow::onA2TSuccess(const QString &text)
 {
-    ;
+    if (m_currentAsrVoice) {
+        m_currentAsrVoice->getNoteBlock()->blockText = text;
+        m_currentAsrVoice->showAsrEndWindow(text);
+        m_rightView->updateData();
+    }
+    setSpecialStatus(VoiceToTextEnd);
 }
 
 void VNoteMainWindow::onPreviewShortcut()
@@ -569,14 +603,10 @@ bool VNoteMainWindow::checkIfNeedExit()
     return bNeedExit;
 }
 
-void VNoteMainWindow::onAsrAgain()
-{
-    ;
-}
-
 void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 {
     Q_UNUSED(previous);
+    m_asrErrMeassage->setVisible(false);
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
     m_rightView->initData(data);
@@ -619,6 +649,9 @@ void VNoteMainWindow::onAction(QAction *action)
     case ActionManager::VoiceDelete:
         delVoice();
         break;
+    case ActionManager::VoiceConversion:
+        onA2TStart();
+        break;
     default:
         break;
     }
@@ -657,6 +690,7 @@ void VNoteMainWindow::addNotepad()
     VNoteFolder *newFolder = folderOper.addFolder(itemData);
     if (newFolder) {
         //Switch to note view
+        m_noteSearchEdit->clearEdit();
         m_centerWidget->setCurrentIndex(WndNoteShow);
         QStandardItem *pItem = StandardItemCommon::createStandardItem(newFolder, StandardItemCommon::NOTEPADITEM);
         QStandardItem *root = m_leftView->getNotepadRoot();
@@ -673,6 +707,9 @@ void VNoteMainWindow::delNotepad()
     m_leftView->model()->removeRow(index.row(), index.parent());
     VNoteFolderOper  folderOper(data);
     folderOper.deleteVNoteFolder(data);
+    if (!m_leftView->getNotepadRoot()->hasChildren()) {
+        m_centerWidget->setCurrentIndex(WndHomePage);
+    }
 }
 
 void VNoteMainWindow::editNotepad()
@@ -825,6 +862,10 @@ void VNoteMainWindow::delVoice()
 {
     VoiceNoteItem *voiceItem = m_rightView->getMenuVoiceItem();
     if (voiceItem) {
+        if (m_asrErrMeassage->isVisible() && voiceItem == m_currentAsrVoice) {
+            m_asrErrMeassage->setVisible(false);
+            m_currentAsrVoice = nullptr;
+        }
         if (m_recordBar->stopVoice(voiceItem->getNoteBlock())) {
             setSpecialStatus(PlayVoiceEnd);
         }
@@ -883,7 +924,47 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNoteBtn->setBtnDisabled(false);
         m_isRecording = false;
         break;
+    case VoiceToTextStart:
+        m_isAsrVoiceing = true;
+        m_noteSearchEdit->setEnabled(false);
+        m_leftView->setEnabled(false);
+        m_addNotepadBtn->setEnabled(false);
+        m_middleView->setEnabled(false);
+        m_addNoteBtn->setBtnDisabled(true);
+        break;
+    case VoiceToTextEnd:
+        if (!m_isRecording && !m_isPlaying) {
+            m_noteSearchEdit->setEnabled(true);
+            m_leftView->setEnabled(true);
+            m_addNotepadBtn->setEnabled(true);
+            m_middleView->setEnabled(true);
+            m_addNoteBtn->setBtnDisabled(false);
+        }
+        m_isAsrVoiceing = false;
+        break;
     default:
         break;
     }
+}
+
+void VNoteMainWindow::initAsrErrMessage()
+{
+    m_asrErrMeassage = new DFloatingMessage(DFloatingMessage::ResidentType,
+                                            m_rightViewHolder);
+    m_asrErrMeassage->setIcon(QIcon(":/images/icon/normal/warning .svg"));
+    m_asrAgainBtn = new DPushButton(m_asrErrMeassage);
+
+    m_asrAgainBtn->setText(DApplication::translate(
+                               "VNoteErrorMessage",
+                               "Try Again"));
+    m_asrErrMeassage->setWidget(m_asrAgainBtn);
+    m_asrErrMeassage->setVisible(false);
+}
+
+void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
+{
+    m_asrErrMeassage->setMessage(strMessage);
+    m_asrErrMeassage->setVisible(true);
+    m_asrErrMeassage->setFixedWidth(m_rightViewHolder->width());
+    m_asrErrMeassage->adjustSize();
 }

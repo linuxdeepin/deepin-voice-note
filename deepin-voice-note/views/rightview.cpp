@@ -227,7 +227,7 @@ void RightView::initData(VNoteItem *data)
         }
     } else {
         VNoteBlock *textBlock = m_noteItemData->datas.newBlock(VNoteBlock::Text);
-        textBlock->blockText = data->noteTitle;
+        //textBlock->blockText = data->noteTitle;
         m_curItemWidget = insertTextEdit(textBlock, true);
         m_noteItemData->datas.addBlock(nullptr, textBlock);
     }
@@ -376,4 +376,10 @@ VoiceNoteItem* RightView::getVoiceItem(VNoteBlock* data)
 VoiceNoteItem* RightView::getMenuVoiceItem()
 {
     return m_menuVoice;
+}
+
+void RightView::updateData()
+{
+    m_fIsNoteModified = true;
+    saveNote();
 }

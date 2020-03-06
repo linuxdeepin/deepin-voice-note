@@ -30,6 +30,7 @@ class MiddleView;
 class RightView;
 class HomePage;
 class SplashView;
+class VoiceNoteItem;
 
 class VNoteMainWindow : public DMainWindow
 {
@@ -96,12 +97,13 @@ public slots:
 
     void onChangeTheme();
     //Audio to text API
-    void onA2TStart(const QString& file, qint64 duration);
+    void onA2TStart();
     void onA2TError(int error);
     void onA2TSuccess(const QString& text);
     //Shotcuts slots
     void onPreviewShortcut();
-    void onAsrAgain();
+    void initAsrErrMessage();
+    void showAsrErrMessage(const QString &strMessage);
 private:
     //左侧列表视图操作相关
     void addNotepad();
@@ -122,7 +124,6 @@ private:
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
-    DIconButton *m_returnBtn {nullptr};
 
 #ifdef TITLE_ACITON_PANEL
     //titlebar actions
@@ -159,6 +160,9 @@ private:
     //Shortcuts key
     QScopedPointer<QShortcut> m_stPreviewShortcuts;
     QRegExp          m_searchKey;
+    VoiceNoteItem    *m_currentAsrVoice {nullptr};
+    DFloatingMessage *m_asrErrMeassage {nullptr};
+    DPushButton      *m_asrAgainBtn {nullptr};
 };
 
 #endif // VNOTEMAINWINDOW_H

@@ -1,5 +1,7 @@
 #include "utils.h"
 #include <QImageReader>
+#include <QDebug>
+
 Utils::Utils() {}
 
 QString Utils::convertDateTime(const QDateTime &dateTime)
@@ -9,17 +11,24 @@ QString Utils::convertDateTime(const QDateTime &dateTime)
     QString disptime;
     qint64 offset = folerDate.daysTo(currDateTime);
     if (0 == offset) {
-        //今天：展示时间hh：mm ；
-        disptime = dateTime.toString("hh:mm");
+        qint64 offsetSec = dateTime.secsTo(QDateTime::currentDateTime());
+        if (offsetSec < 3600) {
+            disptime = QString::number(offsetSec / 60) + "分钟前";
+        } else {
+            disptime = dateTime.toString("hh:mm");
+        }
     } else if (1 == offset) {
-        //昨天
         disptime.append("昨天");
+        disptime.append(dateTime.toString("hh:mm"));
+    } else if (2 == offset) {
+        disptime.append("前天");
+        disptime.append(dateTime.toString("hh:mm"));
     } else if (folerDate.year() == currDateTime.year()) {
-        //不跨年 其他时间：MM-DD（例如：9⽉27日）；
-        disptime = dateTime.toString("MM月dd日");
+        //不跨年 其他时间：MM-DD（例如：9-27）；
+        disptime = dateTime.toString("MM-dd");
     } else {
-        //跨年:YYYY-MM-DD（例如2018年9月26日）；
-        disptime = dateTime.toString("yyyy年MM月dd日");
+        //跨年:YYYY-MM-DD（例如2018-9-26）；
+        disptime = dateTime.toString("yyyy-MM-dd");
     }
 
     return disptime;
@@ -45,15 +54,15 @@ QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplicatio
     return pixmap;
 }
 
-int Utils::highTextEdit(DTextEdit *textEdit, const QTextCharFormat &oriFormat,const QRegExp &searchKey,
-                         const QColor &highColor)
+int Utils::highTextEdit(DTextEdit *textEdit, const QTextCharFormat &oriFormat, const QRegExp &searchKey,
+                        const QColor &highColor)
 {
     int findCount = 0;
     QTextCursor find_cursor = textEdit->textCursor();
     QTextCharFormat colorFormat = oriFormat;
     colorFormat.setForeground(highColor);
     while (textEdit->find(searchKey)) {
-        find_cursor.movePosition(QTextCursor::WordRight,QTextCursor::KeepAnchor);
+        find_cursor.movePosition(QTextCursor::WordRight, QTextCursor::KeepAnchor);
         textEdit->mergeCurrentCharFormat(colorFormat);
         findCount ++;
     }
@@ -69,10 +78,10 @@ int Utils::highTextEdit(DTextEdit *textEdit, const QTextCharFormat &oriFormat,co
 QString Utils::formatMillisecond(qint64 millisecond, bool minValue)
 {
     uint curSecond = static_cast<uint>(millisecond / 1000);
-    if(curSecond < minValue){
+    if (curSecond < minValue) {
         curSecond = minValue;
     }
-    if(curSecond < 3600){
+    if (curSecond < 3600) {
         return QDateTime::fromTime_t(curSecond).toUTC().toString("mm:ss");
     }
     return QDateTime::fromTime_t(curSecond).toUTC().toString("hh:mm:ss");

@@ -21,6 +21,7 @@ public:
     DWidget *insertTextEdit(VNoteBlock* data, bool focus = false);
     void  setEnablePlayBtn(bool enable);
     void  delWidget(DWidget *widget);
+    void  updateData();
     VoiceNoteItem *getVoiceItem(VNoteBlock* data);
     VoiceNoteItem *getMenuVoiceItem();
 signals:
