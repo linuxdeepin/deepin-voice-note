@@ -85,7 +85,7 @@ public slots:
     void onVNoteFoldersLoaded();
     void onVNoteFolderChange(const QModelIndex &current, const QModelIndex &previous);
     void onVNoteChange(const QModelIndex &previous);
-    void onAction(QAction *action);
+    void onMenuAction(QAction *action);
      //Process all context menu states
     void onMenuAbout2Show();
     void onVNoteSearch();

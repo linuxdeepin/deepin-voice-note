@@ -17,7 +17,7 @@ public:
     QStandardItem *getNotepadRoot();
     QModelIndex setDefaultNotepadItem();
 signals:
-    void sigAction(QAction *action);
+
 protected:
     void mousePressEvent(QMouseEvent *event);
 private:

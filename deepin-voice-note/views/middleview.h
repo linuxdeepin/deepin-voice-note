@@ -20,7 +20,7 @@ public:
     QStandardItemModel *getStandardItemModel();
 
 signals:
-    void sigAction(QAction *action);
+
 protected:
     void mousePressEvent(QMouseEvent *event);
 private:

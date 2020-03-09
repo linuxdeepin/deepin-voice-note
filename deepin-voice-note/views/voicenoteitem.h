@@ -31,7 +31,7 @@ public:
     VNoteItem *getNoteItem();
     VNVoiceBlock *getNoteBlock();
 signals:
-    void sigAction(QAction *action);
+    void voiceMenuShow();
     void sigPlayBtnClicked(VoiceNoteItem *item);
     void sigPauseBtnClicked(VoiceNoteItem *item);
 
@@ -50,7 +50,6 @@ private:
     DLabel          *m_voiceSizeLab {nullptr};
     DLabel          *m_voiceNameLab {nullptr};
     DFrame          *m_bgWidget {nullptr};
-    DMenu           *m_voiceMenu {nullptr};
     TextNoteEdit    *m_asrText {nullptr};
     VNoteItem       *m_textNode {nullptr};
     VNVoiceBlock    *m_noteBlock {nullptr};

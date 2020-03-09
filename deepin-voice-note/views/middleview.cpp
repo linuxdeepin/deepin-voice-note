@@ -31,8 +31,6 @@ void MiddleView::initDelegate()
 void MiddleView::initMenu()
 {
     m_noteMenu = ActionManager::Instance()->noteContextMenu();
-    connect(m_noteMenu, SIGNAL(triggered(QAction *)),
-            this, SIGNAL(sigAction(QAction *)));
 }
 
 void MiddleView::setSearchKey(const QRegExp &key)

@@ -45,6 +45,10 @@
 
 #define VN_JSON_METADATA_PARSER
 
+//Audio to text file lenght limit
+//20 minutes
+#define MAX_A2T_AUDIO_LEN_MS (20*60*1000)
+
 #include <sys/time.h>
 
 #define TM(s,e) (\

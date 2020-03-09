@@ -32,6 +32,7 @@ RightView::RightView(QWidget *parent)
     : QWidget(parent)
 {
     initUi();
+    initMenu();
 }
 
 void RightView::initUi()
@@ -53,6 +54,12 @@ void RightView::initUi()
     mainLayout->addWidget(m_viewportScrollArea);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     this->setLayout(mainLayout);
+}
+
+void RightView::initMenu()
+{
+    //Init voice context Menu
+    m_voiceContextMenu = ActionManager::Instance()->voiceContextMenu();
 }
 
 QWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus)
@@ -105,7 +112,7 @@ QWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
     item->setObjectName(VoiceWidget);
     connect(item, &VoiceNoteItem::sigPlayBtnClicked, this, &RightView::onVoicePlay);
     connect(item, &VoiceNoteItem::sigPauseBtnClicked, this, &RightView::onVoicePause);
-    connect(item, &VoiceNoteItem::sigAction, this, &RightView::onVoiceMenu);
+    connect(item, &VoiceNoteItem::voiceMenuShow, this, &RightView::onVoiceMenuShow);
 
     if (m_curItemWidget == nullptr) {
         m_viewportLayout->insertWidget(0, item);
@@ -225,7 +232,7 @@ void RightView::initData(VNoteItem *data)
                 m_curItemWidget = item;
                 connect(item, &VoiceNoteItem::sigPlayBtnClicked, this, &RightView::onVoicePlay);
                 connect(item, &VoiceNoteItem::sigPauseBtnClicked, this, &RightView::onVoicePause);
-                connect(item, &VoiceNoteItem::sigAction, this, &RightView::onVoiceMenu);
+                connect(item, &VoiceNoteItem::voiceMenuShow, this, &RightView::onVoiceMenuShow);
             }
         }
     } else {
@@ -286,10 +293,10 @@ void RightView::saveNote()
     }
 }
 
-void RightView::onVoiceMenu(QAction *action)
+void RightView::onVoiceMenuShow()
 {
     m_menuVoice = static_cast<VoiceNoteItem *>(sender());
-    emit sigAction(action);
+    m_voiceContextMenu->exec(QCursor::pos());
 }
 
 void RightView::delWidget(DWidget *widget)

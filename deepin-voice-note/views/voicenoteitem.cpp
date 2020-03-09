@@ -94,7 +94,7 @@ void VoiceNoteItem::initUi()
     mainLayout->addWidget(m_bgWidget);
     mainLayout->setContentsMargins(10,0,10,0);
     showPlayBtn();
-    m_voiceMenu = ActionManager::Instance()->voiceContextMenu();
+
     this->setLayout(mainLayout);
 
 
@@ -115,11 +115,6 @@ void VoiceNoteItem::initConnection()
     connect(m_playBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onPlayBtnClicked);
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &VoiceNoteItem::onChangeTheme);
-    //QTextDocument *document = m_asrText->document();
-    //QAbstractTextDocumentLayout *documentLayout = document->documentLayout();
-    //connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, &VoiceNoteItem::onAsrTextChange);
-    connect(m_voiceMenu, SIGNAL(triggered(QAction *)),
-            this, SIGNAL(sigAction(QAction *)));
 }
 
 void VoiceNoteItem::onPlayBtnClicked()
@@ -215,7 +210,8 @@ void VoiceNoteItem::mousePressEvent(QMouseEvent *event)
     DWidget::mousePressEvent(event);
     if (event->button() == Qt::RightButton) {
         if(!m_asrText->geometry().contains(event->pos())){
-           m_voiceMenu->exec(event->globalPos());
+            //Request to show voice context menu
+            emit voiceMenuShow();
         }
     }
 }

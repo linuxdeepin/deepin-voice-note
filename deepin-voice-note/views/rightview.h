@@ -25,7 +25,6 @@ public:
     VoiceNoteItem *getVoiceItem(VNoteBlock* data);
     VoiceNoteItem *getMenuVoiceItem();
 signals:
-    void sigAction(QAction *action);
     void sigVoicePlay(VNVoiceBlock *voiceData);
     void sigVoicePause(VNVoiceBlock *voiceData);
 public slots:
@@ -35,12 +34,14 @@ public slots:
     void onTextEditTextChange();
     void onVoicePlay(VoiceNoteItem *item);
     void onVoicePause(VoiceNoteItem *item);
-    void onVoiceMenu(QAction *action);
+    void onVoiceMenuShow();
 protected:
     void leaveEvent(QEvent *event) override;
     void saveNote();
 private:
-    void        initUi();
+    void initUi();
+    void initMenu();
+
     VoiceNoteItem *m_menuVoice {nullptr};
     VNoteItem   *m_noteItemData {nullptr};
     DWidget     *m_curItemWidget{nullptr};
@@ -49,6 +50,8 @@ private:
     QVBoxLayout *m_viewportLayout {nullptr};
     QScrollArea *m_viewportScrollArea {nullptr};
 
+    //Voice control context menu
+    DMenu       *m_voiceContextMenu {nullptr};
     //If note is modified
     bool         m_fIsNoteModified {false};
 };

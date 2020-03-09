@@ -128,11 +128,7 @@ void VNoteMainWindow::initConnections()
 
     connect(m_leftView->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &VNoteMainWindow::onVNoteFolderChange);
-    connect(m_leftView, &LeftView::sigAction,
-            this, &VNoteMainWindow::onAction);
 
-    connect(m_middleView, &MiddleView::sigAction,
-            this, &VNoteMainWindow::onAction);
     connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
             this, SLOT(onVNoteChange(const QModelIndex &)));
 
@@ -140,8 +136,6 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onRightViewVoicePlay);
     connect(m_rightView, &RightView::sigVoicePause,
             this, &VNoteMainWindow::onRightViewVoicePause);
-    connect(m_rightView, &RightView::sigAction,
-            this, &VNoteMainWindow::onAction);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::addNotepad);
@@ -172,10 +166,16 @@ void VNoteMainWindow::initConnections()
     //Bind all context menu states handler
     connect(ActionManager::Instance()->notebookContextMenu(), &DMenu::aboutToShow,
             this, &VNoteMainWindow::onMenuAbout2Show);
+    connect(ActionManager::Instance()->notebookContextMenu(), &DMenu::triggered,
+            this, &VNoteMainWindow::onMenuAction);
     connect(ActionManager::Instance()->noteContextMenu(), &DMenu::aboutToShow,
             this, &VNoteMainWindow::onMenuAbout2Show);
+    connect(ActionManager::Instance()->noteContextMenu(), &DMenu::triggered,
+            this, &VNoteMainWindow::onMenuAction);
     connect(ActionManager::Instance()->voiceContextMenu(), &DMenu::aboutToShow,
             this, &VNoteMainWindow::onMenuAbout2Show);
+    connect(ActionManager::Instance()->voiceContextMenu(), &DMenu::triggered,
+            this, &VNoteMainWindow::onMenuAction);
 
 }
 
@@ -470,13 +470,25 @@ void VNoteMainWindow::onA2TStart()
 {
     m_asrErrMeassage->setVisible(false);
     m_currentAsrVoice = m_rightView->getMenuVoiceItem();
+
     if (m_currentAsrVoice) {
-        setSpecialStatus(VoiceToTextStart);
-        m_currentAsrVoice->showAsrStartWindow();
-        QTimer::singleShot(0, this, [this]() {
-            VNVoiceBlock *data = m_currentAsrVoice->getNoteBlock();
-            m_a2tManager->startAsr(data->voicePath, data->voiceSize);
-        });
+        VNVoiceBlock *data = m_currentAsrVoice->getNoteBlock();
+
+        if (nullptr != data) {
+            //Check whether the audio lenght out of 20 minutes
+            if (data->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
+                VNoteMessageDialog audioOutLimit(
+                            VNoteMessageDialog::AsrTimeLimit, this);
+
+                audioOutLimit.exec();
+            } else {
+                setSpecialStatus(VoiceToTextStart);
+                m_currentAsrVoice->showAsrStartWindow();
+                QTimer::singleShot(0, this, [this, data]() {
+                    m_a2tManager->startAsr(data->voicePath, data->voiceSize);
+                });
+            }
+        }
     }
 }
 
@@ -623,7 +635,7 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
         m_noteSearchEdit->lineEdit()->setFocus();
     }
 }
-void VNoteMainWindow::onAction(QAction *action)
+void VNoteMainWindow::onMenuAction(QAction *action)
 {
     ActionManager::ActionKind kind = ActionManager::Instance()->getActionKind(action);
     switch (kind) {
@@ -655,9 +667,14 @@ void VNoteMainWindow::onAction(QAction *action)
     case ActionManager::NoteRename:
         editNote();
         break;
-    case ActionManager::VoiceDelete:
-        delVoice();
-        break;
+    case ActionManager::VoiceDelete: {
+        VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
+        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+            delVoice();
+        });
+
+        confirmDialog.exec();
+    } break;
     case ActionManager::VoiceConversion:
         onA2TStart();
         break;
