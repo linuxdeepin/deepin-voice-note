@@ -76,7 +76,7 @@ QModelIndex LeftView::setDefaultNotepadItem()
 
 void  LeftView::initMenu()
 {
-    m_notepadMenu = ActionManager::getNotepadRMenu(this);
+    m_notepadMenu = ActionManager::Instance()->notebookContextMenu();
     connect(m_notepadMenu, SIGNAL(triggered(QAction *)),
             this, SIGNAL(sigAction(QAction *)));
 }

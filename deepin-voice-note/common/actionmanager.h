@@ -2,7 +2,10 @@
 #define ACTIONFACTORY_H
 
 #include <QObject>
+#include <QMap>
+
 #include <DMenu>
+
 DWIDGET_USE_NAMESPACE
 
 class ActionManager : public QObject
@@ -10,30 +13,51 @@ class ActionManager : public QObject
      Q_OBJECT
 public:
     ActionManager();
-    enum ActionKind{
+
+    static ActionManager* Instance();
+
+    enum ActionKind {
         Invalid = 0,
         //Notepad
-        NotepadRename,
-        NotepadDelete,
-        NotepadAddNew,
+        NotebookMenuBase,
+        NotebookRename = NotebookMenuBase,
+        NotebookDelete,
+        NotebookAddNew,
 
         //notes
-        NoteRename,
+        NoteMenuBase,
+        NoteRename = NoteMenuBase,
         NoteDelete,
         NoteSaveVoice,
         NoteSaveText,
         NoteAddNew,
 
         //Voice
-        VoiceDelete,
+        VoiceMenuBase,
+        VoiceDelete = VoiceMenuBase,
         VoiceSave,
-        VoiceConversion
+        VoiceConversion,
     };
+
     Q_ENUM(ActionKind)
-    static DMenu* getNotepadRMenu(QWidget *parent);
-    static DMenu* getNotesRMenu(QWidget *parent);
-    static DMenu* getVoiceRMenu(QWidget *parent);
-    static ActionKind getActionKind(QAction *action);
+
+
+    DMenu* notebookContextMenu();
+    DMenu* noteContextMenu();
+    DMenu* voiceContextMenu();
+    ActionKind getActionKind(QAction *action);
+    QAction* getActionById(ActionKind id);
+protected:
+
+    void initMenu();
+
+    static ActionManager * _instance;
+
+    QScopedPointer<DMenu>  m_notebookContextMenu;
+    QScopedPointer<DMenu>  m_noteContextMenu;
+    QScopedPointer<DMenu>  m_voiceContextMenu;
+
+    QMap<ActionKind, QAction*> m_actionsMap;
 };
 
 #endif // ACTIONFACTORY_H

@@ -86,6 +86,8 @@ public slots:
     void onVNoteFolderChange(const QModelIndex &current, const QModelIndex &previous);
     void onVNoteChange(const QModelIndex &previous);
     void onAction(QAction *action);
+     //Process all context menu states
+    void onMenuAbout2Show();
     void onVNoteSearch();
     void onStartRecord();//开始录音
     void onFinshRecord(const QString &voicePath,qint64 voiceSize); //结束录音

@@ -12,6 +12,7 @@
 #include "common/vnotea2tmanager.h"
 #include "common/vnoteitem.h"
 #include "common/vnoteforlder.h"
+#include "common/actionmanager.h"
 
 #include "common/utils.h"
 #include "common/actionmanager.h"
@@ -168,6 +169,14 @@ void VNoteMainWindow::initConnections()
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &VNoteMainWindow::onChangeTheme);
 
+    //Bind all context menu states handler
+    connect(ActionManager::Instance()->notebookContextMenu(), &DMenu::aboutToShow,
+            this, &VNoteMainWindow::onMenuAbout2Show);
+    connect(ActionManager::Instance()->noteContextMenu(), &DMenu::aboutToShow,
+            this, &VNoteMainWindow::onMenuAbout2Show);
+    connect(ActionManager::Instance()->voiceContextMenu(), &DMenu::aboutToShow,
+            this, &VNoteMainWindow::onMenuAbout2Show);
+
 }
 
 void VNoteMainWindow::initShortcuts()
@@ -252,9 +261,9 @@ void VNoteMainWindow::initLeftView()
     m_leftView->expand(notepadRoot->index());
     leftHolderLayout->addWidget(m_leftView);
 
-    m_addNotepadBtn = new DPushButton(DApplication::translate("VNoteMainWindow", "Add Notepad"),
+    m_addNotepadBtn = new DPushButton(DApplication::translate("VNoteMainWindow", "Create notebook"),
                                       m_leftViewHolder);
-    QVBoxLayout *btnLayout = new QVBoxLayout(this);
+    QVBoxLayout *btnLayout = new QVBoxLayout();
     btnLayout->addWidget(m_addNotepadBtn);
     btnLayout->setContentsMargins(10, 5, 10, 10);
     leftHolderLayout->addLayout(btnLayout, Qt::AlignHCenter);
@@ -616,12 +625,12 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 }
 void VNoteMainWindow::onAction(QAction *action)
 {
-    ActionManager::ActionKind kind = ActionManager::getActionKind(action);
+    ActionManager::ActionKind kind = ActionManager::Instance()->getActionKind(action);
     switch (kind) {
-    case ActionManager::NotepadRename:
+    case ActionManager::NotebookRename:
         editNotepad();
         break;
-    case ActionManager::NotepadDelete: {
+    case ActionManager::NotebookDelete: {
         VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteFolder);
         connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
             delNotepad();
@@ -629,7 +638,7 @@ void VNoteMainWindow::onAction(QAction *action)
 
         confirmDialog.exec();
     } break;
-    case ActionManager::NotepadAddNew:
+    case ActionManager::NotebookAddNew:
         addNote();
         break;
     case ActionManager::NoteDelete: {
@@ -655,6 +664,14 @@ void VNoteMainWindow::onAction(QAction *action)
     default:
         break;
     }
+}
+
+void VNoteMainWindow::onMenuAbout2Show()
+{
+    //TODO:
+    //    Add context menu item disable/enable code here
+    //Eg:
+    //ActionManager::Instance()->getActionById(ActionManager::NoteAddNew)->setDisabled(true);
 }
 
 int VNoteMainWindow::loadNotepads()

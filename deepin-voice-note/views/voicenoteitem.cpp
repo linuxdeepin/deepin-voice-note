@@ -94,7 +94,7 @@ void VoiceNoteItem::initUi()
     mainLayout->addWidget(m_bgWidget);
     mainLayout->setContentsMargins(10,0,10,0);
     showPlayBtn();
-    m_voiceMenu = ActionManager::getVoiceRMenu(this);
+    m_voiceMenu = ActionManager::Instance()->voiceContextMenu();
     this->setLayout(mainLayout);
 
 
