@@ -28,8 +28,8 @@ public:
         NoteMenuBase,
         NoteRename = NoteMenuBase,
         NoteDelete,
-        NoteSaveVoice,
         NoteSaveText,
+        NoteSaveVoice,
         NoteAddNew,
 
         //Voice

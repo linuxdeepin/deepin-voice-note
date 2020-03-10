@@ -478,7 +478,7 @@ void VNoteMainWindow::onA2TStart()
             //Check whether the audio lenght out of 20 minutes
             if (data->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
                 VNoteMessageDialog audioOutLimit(
-                            VNoteMessageDialog::AsrTimeLimit, this);
+                    VNoteMessageDialog::AsrTimeLimit, this);
 
                 audioOutLimit.exec();
             } else {
@@ -689,6 +689,46 @@ void VNoteMainWindow::onMenuAbout2Show()
     //    Add context menu item disable/enable code here
     //Eg:
     //ActionManager::Instance()->getActionById(ActionManager::NoteAddNew)->setDisabled(true);
+    DMenu *menu = static_cast<DMenu *>(sender());
+    if (menu == ActionManager::Instance()->noteContextMenu()) {
+        QAction *addAction = ActionManager::Instance()->getActionById(ActionManager::NoteAddNew);
+        QAction *delAction = ActionManager::Instance()->getActionById(ActionManager::NoteDelete);
+        QAction *saveAction = ActionManager::Instance()->getActionById(ActionManager::NoteSaveVoice);
+        if (m_isPlaying || m_isRecording || m_isAsrVoiceing) {
+            addAction->setEnabled(false);
+            delAction->setEnabled(false);
+            if (m_isRecording) {
+                saveAction->setEnabled(false);
+            } else {
+                saveAction->setEnabled(true);
+            }
+        } else {
+            if (m_searchKey.isEmpty()) {
+                addAction->setEnabled(true);
+            } else {
+                addAction->setEnabled(false);
+            }
+            delAction->setEnabled(true);
+            saveAction->setEnabled(true);
+        }
+    } else if (menu == ActionManager::Instance()->notebookContextMenu()) {
+        qDebug() << "notebookContextMenu";
+    } else if (menu == ActionManager::Instance()->voiceContextMenu()) {
+        QAction *asrAction = ActionManager::Instance()->getActionById(ActionManager::VoiceConversion);
+        QAction *delAction = ActionManager::Instance()->getActionById(ActionManager::VoiceDelete);
+        VoiceNoteItem *item = m_rightView->getMenuVoiceItem();
+        bool textEmpyt = item->getNoteBlock()->blockText.isEmpty();
+        if (!textEmpyt || m_isAsrVoiceing) {
+            asrAction->setEnabled(false);
+        } else {
+            asrAction->setEnabled(true);
+        }
+        if (m_isAsrVoiceing || m_isPlaying) {
+            delAction->setEnabled(false);
+        } else {
+            delAction->setEnabled(true);
+        }
+    }
 }
 
 int VNoteMainWindow::loadNotepads()
@@ -928,51 +968,49 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
     case PlayVoiceStart:
         m_isPlaying = true;
         m_noteSearchEdit->setEnabled(false);
-        m_leftView->setEnabled(false);
-        m_addNotepadBtn->setEnabled(false);
-        m_middleView->setEnabled(false);
+        m_leftViewHolder->setEnabled(false);
+        m_middleView->setOnlyCurItemMenuEnable(true);
         m_addNoteBtn->setBtnDisabled(true);
         break;
     case PlayVoiceEnd:
         m_isPlaying = false;
-        m_noteSearchEdit->setEnabled(true);
-        m_leftView->setEnabled(true);
-        m_addNotepadBtn->setEnabled(true);
-        m_middleView->setEnabled(true);
-        m_addNoteBtn->setBtnDisabled(false);
+        if (!m_isAsrVoiceing) {
+            m_noteSearchEdit->setEnabled(true);
+            m_leftViewHolder->setEnabled(true);
+            m_middleView->setOnlyCurItemMenuEnable(false);
+            m_addNoteBtn->setBtnDisabled(false);
+        }
         break;
     case RecordStart:
         m_isRecording = true;
         m_noteSearchEdit->setEnabled(false);
-        m_leftView->setEnabled(false);
-        m_addNotepadBtn->setEnabled(false);
-        m_middleView->setEnabled(false);
+        m_leftViewHolder->setEnabled(false);
+        m_middleView->setOnlyCurItemMenuEnable(true);
         m_rightView->setEnablePlayBtn(false);
         m_addNoteBtn->setBtnDisabled(true);
         break;
     case RecordEnd:
-        m_noteSearchEdit->setEnabled(true);
+        if (!m_isAsrVoiceing) {
+            m_noteSearchEdit->setEnabled(true);
+            m_leftViewHolder->setEnabled(true);
+            m_middleView->setOnlyCurItemMenuEnable(false);
+            m_addNoteBtn->setBtnDisabled(false);
+        }
         m_rightView->setEnablePlayBtn(true);
-        m_leftView->setEnabled(true);
-        m_addNotepadBtn->setEnabled(true);
-        m_middleView->setEnabled(true);
-        m_addNoteBtn->setBtnDisabled(false);
         m_isRecording = false;
         break;
     case VoiceToTextStart:
         m_isAsrVoiceing = true;
         m_noteSearchEdit->setEnabled(false);
-        m_leftView->setEnabled(false);
-        m_addNotepadBtn->setEnabled(false);
-        m_middleView->setEnabled(false);
+        m_leftViewHolder->setEnabled(false);
+        m_middleView->setOnlyCurItemMenuEnable(true);
         m_addNoteBtn->setBtnDisabled(true);
         break;
     case VoiceToTextEnd:
         if (!m_isRecording && !m_isPlaying) {
             m_noteSearchEdit->setEnabled(true);
-            m_leftView->setEnabled(true);
-            m_addNotepadBtn->setEnabled(true);
-            m_middleView->setEnabled(true);
+            m_leftViewHolder->setEnabled(true);
+            m_middleView->setOnlyCurItemMenuEnable(false);
             m_addNoteBtn->setBtnDisabled(false);
         }
         m_isAsrVoiceing = false;

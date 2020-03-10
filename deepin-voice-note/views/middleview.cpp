@@ -56,14 +56,37 @@ QStandardItemModel *MiddleView::getStandardItemModel()
 
 void MiddleView::mousePressEvent(QMouseEvent *event)
 {
-    DListView::mouseMoveEvent(event);
+    if (!m_onlyCurItemMenuEnable) {
+        DListView::mouseMoveEvent(event);
+    }
     if (event->button() == Qt::RightButton) {
-        QPoint pos = mapToParent(event->pos());
-        QModelIndex index = this->indexAt(pos);
-        if (index.isValid()) {
+        QModelIndex index = this->indexAt(event->pos());
+        if (index.isValid()
+                && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
             this->setCurrentIndex(index);
             m_noteMenu->exec(event->globalPos());
         }
+    }
+}
+
+void MiddleView::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (!m_onlyCurItemMenuEnable) {
+        DListView::mouseReleaseEvent(event);
+    }
+}
+
+void MiddleView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (!m_onlyCurItemMenuEnable) {
+        DListView::mouseDoubleClickEvent(event);
+    }
+}
+
+void MiddleView::mouseMoveEvent(QMouseEvent *event)
+{
+    if (!m_onlyCurItemMenuEnable) {
+        DListView::mouseMoveEvent(event);
     }
 }
 
@@ -76,7 +99,7 @@ void MiddleView::initUI()
     m_emptySearch->setForegroundRole(DPalette::TextTips);
     m_emptySearch->setVisible(false);
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setContentsMargins(0,0,0,0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_emptySearch);
     this->setLayout(layout);
 }
@@ -84,4 +107,11 @@ void MiddleView::initUI()
 void MiddleView::setVisibleEmptySearch(bool visible)
 {
     m_emptySearch->setVisible(visible);
+}
+
+void MiddleView::setOnlyCurItemMenuEnable(bool enable)
+{
+    m_onlyCurItemMenuEnable = enable;
+    m_pItemDelegate->setEnableItem(!enable);
+    this->update();
 }

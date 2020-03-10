@@ -140,12 +140,12 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
 
     bool enable = option.state & QStyle::State_Enabled;
     if (option.state & QStyle::State_Selected) {
-        QColor fillColor;
-        if (enable) {
-            fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
-        } else {
-            fillColor = option.palette.color(DPalette::Disabled, DPalette::Highlight);
-        }
+        QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
+//        if (enable) {
+//            fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
+//        } else {
+//            fillColor = option.palette.color(DPalette::Disabled, DPalette::Highlight);
+//        }
         painter->setBrush(QBrush(fillColor));
         painter->fillPath(path, painter->brush());
         painter->setPen(QPen(Qt::white));

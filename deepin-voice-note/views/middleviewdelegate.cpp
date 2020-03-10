@@ -173,6 +173,11 @@ void MiddleViewDelegate::handleChangeTheme()
     m_parentView->update(m_parentView->currentIndex());
 }
 
+void MiddleViewDelegate::setEnableItem(bool enable)
+{
+    m_enableItem = enable;
+}
+
 QSize MiddleViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     Q_UNUSED(index);
@@ -257,21 +262,20 @@ void MiddleViewDelegate::paintItemBase(QPainter *painter, const QStyleOptionView
     path.arcTo(QRect(QPoint(rect.bottomLeft() - QPoint(0, radius * 2)), QSize(radius * 2, radius * 2)), 180, 90);
     path.lineTo(rect.bottomLeft() + QPoint(radius, 0));
     path.arcTo(QRect(QPoint(rect.bottomRight() - QPoint(radius * 2, radius * 2)), QSize(radius * 2, radius * 2)), 270, 90);
-    bool enable = option.state & QStyle::State_Enabled;
     if (option.state & QStyle::State_Selected) {
-        QColor fillColor;
-        if (enable) {
-            fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
-        } else {
-            fillColor = option.palette.color(DPalette::Disabled, DPalette::Highlight);
-        }
+        QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
+//        if (enable) {
+//            fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
+//        } else {
+//            fillColor = option.palette.color(DPalette::Disabled, DPalette::Highlight);
+//        }
         painter->setBrush(QBrush(fillColor));
         painter->fillPath(path, painter->brush());
         painter->setPen(QPen(Qt::white));
         isSelect = true;
     } else {
         isSelect = false;
-        if (enable == false) {
+        if (m_enableItem == false) {
             painter->setBrush(QBrush(m_parentPb.color(DPalette::Disabled, DPalette::ItemBackground)));
             painter->fillPath(path, painter->brush());
             painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::WindowText)));
