@@ -263,7 +263,7 @@ void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaD
 
     noteDoc.setObject(note);
 
-    qDebug() << noteDoc.toJson();
+    //qDebug() << noteDoc.toJson();
 
     metaData = noteDoc.toJson(QJsonDocument::Compact);
 }

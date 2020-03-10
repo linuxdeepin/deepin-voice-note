@@ -104,7 +104,7 @@ void VNoteAudioDeviceWatcher::run()
                         meterPath.path(),
                         QDBusConnection::sessionBus() );
 
-            volume = defaultSourceMeter.volume();
+            volume = /*defaultSourceMeter.volume()*/ 0.1;
 
             if (volume > DBL_EPSILON) {
 

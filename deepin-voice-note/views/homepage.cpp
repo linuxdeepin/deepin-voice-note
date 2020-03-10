@@ -35,7 +35,7 @@ void HomePage::initUi()
     m_Text->setAlignment(Qt::AlignCenter);
     DFontSizeManager::instance()->bind(m_Text, DFontSizeManager::T8);
     DPalette pa = DApplicationHelper::instance()->palette(m_Text);
-    pa.setBrush(DPalette::Text, pa.color(DPalette::TextTips));
+    pa.setBrush(DPalette::WindowText, pa.color(DPalette::TextTips));
     m_Text->setPalette(pa);
 
     QGridLayout *layout = new QGridLayout;

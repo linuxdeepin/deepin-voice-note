@@ -4,6 +4,8 @@
 #include <QVBoxLayout>
 
 #include <DWidget>
+#include <DDialog>
+
 DWIDGET_USE_NAMESPACE
 struct VNoteItem;
 struct VNoteBlock;
@@ -38,10 +40,11 @@ public slots:
 protected:
     void leaveEvent(QEvent *event) override;
     void saveNote();
+    void adjustVerticalScrollBar(QWidget *widget, int defaultHeight);
 private:
     void initUi();
     void initMenu();
-
+    bool        checkFileExist(const QString & file);
     VoiceNoteItem *m_menuVoice {nullptr};
     VNoteItem   *m_noteItemData {nullptr};
     DWidget     *m_curItemWidget{nullptr};
@@ -49,10 +52,9 @@ private:
     DWidget     *m_placeholderWidget {nullptr};
     QVBoxLayout *m_viewportLayout {nullptr};
     QScrollArea *m_viewportScrollArea {nullptr};
-
     //Voice control context menu
     DMenu       *m_voiceContextMenu {nullptr};
-    //If note is modified
+    DDialog     *m_fileHasDelDialog {nullptr};
     bool         m_fIsNoteModified {false};
 };
 

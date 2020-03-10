@@ -41,7 +41,7 @@ void RightView::initUi()
     m_viewportScrollArea->setLineWidth(0);
     m_viewportLayout = new QVBoxLayout;
     m_viewportLayout->setSpacing(0);
-    m_viewportLayout->setContentsMargins(10, 0, 10, 0);
+    m_viewportLayout->setContentsMargins(20, 0, 20, 0);
     m_viewportWidget = new DWidget(this);
     m_viewportScrollArea->setWidgetResizable(true);
     m_viewportScrollArea->setWidget(m_viewportWidget);
@@ -54,6 +54,15 @@ void RightView::initUi()
     mainLayout->addWidget(m_viewportScrollArea);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     this->setLayout(mainLayout);
+    QString content = DApplication::translate(
+                          "RightView",
+                          "The voice note has been deleted");
+    m_fileHasDelDialog = new DDialog("", content, this);
+    m_fileHasDelDialog->setIcon(QIcon::fromTheme("dialog-warning"));
+    m_fileHasDelDialog->addButton(DApplication::translate(
+                                      "RightView",
+                                      "OK"), false, DDialog::ButtonNormal);
+    m_fileHasDelDialog->setVisible(false);
 }
 
 void RightView::initMenu()
@@ -74,15 +83,6 @@ QWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus)
     editItem->setObjectName(TextEditWidget);
     editItem->document()->setDocumentMargin(0);
     editItem->setFixedHeight(24);
-    QTextDocument *document = editItem->document();
-    QAbstractTextDocumentLayout *documentLayout = document->documentLayout();
-    connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, [ = ] {
-        editItem->setFixedHeight(static_cast<int>(document->size().height()));
-    });
-    connect(editItem, &TextNoteEdit::sigFocusIn, this, &RightView::onTextEditFocusIn);
-    connect(editItem, &TextNoteEdit::sigFocusOut, this, &RightView::onTextEditFocusOut);
-    connect(editItem, &TextNoteEdit::sigDelEmpty, this, &RightView::onTextEditDelEmpty);
-    connect(editItem, &TextNoteEdit::textChanged, this, &RightView::onTextEditTextChange);
     int index = 0;
     if (m_curItemWidget != nullptr) {
         index = m_viewportLayout->indexOf(m_curItemWidget) + 1;
@@ -94,6 +94,17 @@ QWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus)
         editItem->setTextCursor(cursor);
         editItem->setFocus();
     }
+    QTextDocument *document = editItem->document();
+    QAbstractTextDocumentLayout *documentLayout = document->documentLayout();
+    connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, [ = ] {
+        editItem->setFixedHeight(static_cast<int>(document->size().height()));
+        int height = editItem->cursorRect(editItem->textCursor()).bottom();
+        adjustVerticalScrollBar(editItem,height);
+    });
+    connect(editItem, &TextNoteEdit::sigFocusIn, this, &RightView::onTextEditFocusIn);
+    connect(editItem, &TextNoteEdit::sigFocusOut, this, &RightView::onTextEditFocusOut);
+    connect(editItem, &TextNoteEdit::sigDelEmpty, this, &RightView::onTextEditDelEmpty);
+    connect(editItem, &TextNoteEdit::textChanged, this, &RightView::onTextEditTextChange);
     return  editItem;
 }
 
@@ -144,6 +155,8 @@ QWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
                 m_noteItemData->addBlock(preData, data);
                 m_curItemWidget = itemWidget;
                 itemWidget->setFocus();
+                int height = itemWidget->cursorRect(itemWidget->textCursor()).bottom();
+                adjustVerticalScrollBar(itemWidget,height);
                 m_fIsNoteModified = true;
                 saveNote();
                 return m_curItemWidget;
@@ -237,7 +250,6 @@ void RightView::initData(VNoteItem *data)
         }
     } else {
         VNoteBlock *textBlock = m_noteItemData->newBlock(VNoteBlock::Text);
-        //textBlock->blockText = data->noteTitle;
         m_curItemWidget = insertTextEdit(textBlock, true);
         m_noteItemData->addBlock(nullptr, textBlock);
     }
@@ -245,6 +257,10 @@ void RightView::initData(VNoteItem *data)
 
 void RightView::onVoicePlay(VoiceNoteItem *item)
 {
+    if (!checkFileExist(item->getNoteBlock()->voicePath)) {
+        delWidget(item);
+        return;
+    }
     for (int i = 0; i < m_viewportLayout->count(); i++) {
         QWidget *widget = m_viewportLayout->itemAt(i)->widget();
         if (widget->objectName() == VoiceWidget) {
@@ -272,7 +288,7 @@ void RightView::leaveEvent(QEvent *event)
 
 void RightView::saveNote()
 {
-    qInfo() << __FUNCTION__ << "Is note changed:" << m_fIsNoteModified;
+    //qInfo() << __FUNCTION__ << "Is note changed:" << m_fIsNoteModified;
 
     if (m_noteItemData && m_fIsNoteModified) {
         for (int i = 0; i < m_viewportLayout->count(); i++) {
@@ -296,66 +312,71 @@ void RightView::saveNote()
 void RightView::onVoiceMenuShow()
 {
     m_menuVoice = static_cast<VoiceNoteItem *>(sender());
+    if (!checkFileExist(m_menuVoice->getNoteBlock()->voicePath)) {
+        delWidget(m_menuVoice);
+        return;
+    }
     m_voiceContextMenu->exec(QCursor::pos());
 }
 
 void RightView::delWidget(DWidget *widget)
 {
-    if (widget != nullptr) {
-        if (m_curItemWidget == widget) {
-            int index = m_viewportLayout->indexOf(widget);
-            int curIndex = index > 0 ? index - 1 : index + 1;
-            m_curItemWidget = m_viewportLayout->itemAt(curIndex)->widget();
-        }
-        widget->disconnect();
-        m_viewportLayout->removeWidget(widget);
-        QString objName = widget->objectName();
-        VNoteBlock *noteBlock = nullptr;
-        if (objName == TextEditWidget) {
-            noteBlock =  static_cast<TextNoteEdit *>(widget)->getNoteBlock();
-        } else if (objName == VoiceWidget) {
-            noteBlock =  static_cast<VoiceNoteItem *>(widget)->getNoteBlock();
-        }
-        if (noteBlock) {
-            m_noteItemData->delBlock(noteBlock);
-        }
-        widget->deleteLater();
-        int curIndex = m_viewportLayout->indexOf(m_curItemWidget);
-        //两个文本块合为一个
-        if (m_curItemWidget->objectName() == TextEditWidget) {
-            QWidget *siblingWidget = nullptr;
-            if (curIndex > 0) {
-                siblingWidget = m_viewportLayout->itemAt(curIndex - 1)->widget();
-            } else {
-                QLayoutItem *layoutItem = m_viewportLayout->itemAt(curIndex + 1);
-                if (layoutItem) {
-                    siblingWidget = layoutItem->widget();
-                }
-            }
-            if (siblingWidget && siblingWidget->objectName() == TextEditWidget) {
-                TextNoteEdit *editSibing = static_cast<TextNoteEdit *>(siblingWidget);
-                TextNoteEdit *editCurrent = static_cast<TextNoteEdit *>(m_curItemWidget);
-                editCurrent->disconnect();
-                VNTextBlock *textBlock = editSibing->getNoteBlock();
-                if (curIndex > 0) {
-                    textBlock->blockText = editSibing->toPlainText() + editCurrent->toPlainText();
-                } else {
-                    textBlock->blockText =  editCurrent->toPlainText() + editSibing->toPlainText();
-                }
-                editSibing->setPlainText(textBlock->blockText);
-                m_viewportLayout->removeWidget(editCurrent);
-                m_curItemWidget = editSibing;
-                m_noteItemData->delBlock(editCurrent->getNoteBlock());
-                editCurrent->deleteLater();
-                QTextCursor cursor = editSibing->textCursor();
-                cursor.movePosition(QTextCursor::End);
-                editSibing->setTextCursor(cursor);
-                editSibing->setFocus();
-            }
-        }
-        m_fIsNoteModified = true;
-        saveNote();
+    if(widget == nullptr){
+        return;
     }
+    widget->disconnect();
+    int index = m_viewportLayout->indexOf(widget);
+    QWidget *preWidget = nullptr;
+    if(index > 0){
+        preWidget = m_viewportLayout->itemAt(index - 1)->widget();
+    }
+    QWidget *nextWidget = m_viewportLayout->itemAt(index + 1)->widget();
+    if(m_curItemWidget == widget){
+        m_curItemWidget = nextWidget;
+    }
+    if(m_menuVoice == widget){
+        m_menuVoice = nullptr;
+    }
+    VNoteBlock *noteBlock = nullptr;
+    QString objName = widget->objectName();
+    if (objName == TextEditWidget) {
+        noteBlock =  static_cast<TextNoteEdit *>(widget)->getNoteBlock();
+    } else if (objName == VoiceWidget) {
+        noteBlock =  static_cast<VoiceNoteItem *>(widget)->getNoteBlock();
+    }
+    if (noteBlock) {
+        m_noteItemData->delBlock(noteBlock);
+    }
+    m_viewportLayout->removeWidget(widget);
+    widget->deleteLater();
+    if(preWidget && nextWidget //合并textedit窗口
+       && preWidget->objectName() == TextEditWidget
+       && nextWidget->objectName() == TextEditWidget)
+    {
+        TextNoteEdit *editPre = static_cast<TextNoteEdit *>(preWidget);
+        TextNoteEdit *editNext = static_cast<TextNoteEdit *>(nextWidget);
+        editPre->disconnect();
+        noteBlock = editNext->getNoteBlock();
+        noteBlock->blockText = editPre->toPlainText() + editNext->toPlainText();
+        editNext->setPlainText(noteBlock->blockText);
+        m_noteItemData->delBlock(editPre->getNoteBlock());
+        m_viewportLayout->removeWidget(editPre);
+        editPre->deleteLater();
+        QTextCursor cursor = editNext->textCursor();
+        cursor.movePosition(QTextCursor::End);
+        editNext->setTextCursor(cursor);
+        editNext->setFocus();
+    }
+    int height = 0;
+    if(m_curItemWidget->objectName() == TextEditWidget){
+       TextNoteEdit *editCur = static_cast<TextNoteEdit *>(m_curItemWidget);
+       QRect rc = editCur->cursorRect(editCur->textCursor());
+       height = rc.bottom();
+       editCur->setFocus();
+    }
+    adjustVerticalScrollBar(m_curItemWidget,height);
+    m_fIsNoteModified = true;
+    saveNote();
 }
 
 void RightView::setEnablePlayBtn(bool enable)
@@ -369,13 +390,13 @@ void RightView::setEnablePlayBtn(bool enable)
     }
 }
 
-VoiceNoteItem* RightView::getVoiceItem(VNoteBlock* data)
+VoiceNoteItem *RightView::getVoiceItem(VNoteBlock *data)
 {
     for (int i = 0; i < m_viewportLayout->count(); i++) {
         QWidget *widget = m_viewportLayout->itemAt(i)->widget();
         if (widget->objectName() == VoiceWidget) {
             VoiceNoteItem *tmpWidget = static_cast< VoiceNoteItem *>(widget);
-            if(tmpWidget->getNoteBlock() == data){
+            if (tmpWidget->getNoteBlock() == data) {
                 return  tmpWidget;
             }
         }
@@ -383,7 +404,7 @@ VoiceNoteItem* RightView::getVoiceItem(VNoteBlock* data)
     return nullptr;
 }
 
-VoiceNoteItem* RightView::getMenuVoiceItem()
+VoiceNoteItem *RightView::getMenuVoiceItem()
 {
     return m_menuVoice;
 }
@@ -392,4 +413,31 @@ void RightView::updateData()
 {
     m_fIsNoteModified = true;
     saveNote();
+}
+
+bool RightView::checkFileExist(const QString &file)
+{
+    QFileInfo fi(file);
+    if (!fi.exists()) {
+        m_fileHasDelDialog->exec();
+        return false;
+    }
+    return true;
+}
+
+void RightView::adjustVerticalScrollBar(QWidget *widget, int defaultHeight)
+{
+    QScrollBar *bar = m_viewportScrollArea->verticalScrollBar();
+    int tolHeight = defaultHeight;
+    int index = m_viewportLayout->indexOf(widget);
+    for (int i = 0; i < index; i++) {
+        tolHeight += m_viewportLayout->itemAt(i)->widget()->height();
+    }
+    if (tolHeight > bar->value() + m_viewportScrollArea->height()) {
+        int value = tolHeight - m_viewportScrollArea->height();
+        if(bar->maximum() < value){
+            bar->setMaximum(value);
+        }
+        bar->setValue(value);
+    }
 }

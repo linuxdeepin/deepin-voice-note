@@ -328,7 +328,7 @@ void VNoteMainWindow::initRightView()
 
     QVBoxLayout *rightHolderLayout = new QVBoxLayout;
     rightHolderLayout->setSpacing(0);
-    rightHolderLayout->setContentsMargins(10, 10, 10, 0);
+    rightHolderLayout->setContentsMargins(0, 0, 0, 0);
 
     m_rightView = new RightView(m_rightViewHolder);
     rightHolderLayout->addWidget(m_rightView);

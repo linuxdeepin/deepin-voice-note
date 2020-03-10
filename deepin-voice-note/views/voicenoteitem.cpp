@@ -106,6 +106,9 @@ void VoiceNoteItem::initData()
         m_createTimeLab->setText(Utils::convertDateTime(m_noteBlock->createTime));
         m_voiceNameLab->setText(m_noteBlock->voiceTitle);
         m_voiceSizeLab->setText(Utils::formatMillisecond(m_noteBlock->voiceSize));
+        if(!m_noteBlock->blockText.isEmpty()){
+            showAsrEndWindow(m_noteBlock->blockText);
+        }
     }
 }
 
@@ -119,13 +122,11 @@ void VoiceNoteItem::initConnection()
 
 void VoiceNoteItem::onPlayBtnClicked()
 {
-    showPauseBtn();
     emit sigPlayBtnClicked(this);
 }
 
 void VoiceNoteItem::onPauseBtnClicked()
 {
-    showPlayBtn();
     emit sigPauseBtnClicked(this);
 }
 
