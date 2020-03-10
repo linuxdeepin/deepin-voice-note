@@ -18,7 +18,7 @@ public:
 
     bool isValid();
     void delNoteData();
-//    bool makeMetaData();
+    bool search(const QRegExp &keyword);
     void setMetadata(const QVariant& meta);
 
     enum {

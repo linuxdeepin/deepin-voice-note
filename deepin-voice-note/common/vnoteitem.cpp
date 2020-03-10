@@ -24,6 +24,29 @@ void VNoteItem::delNoteData()
     }
 }
 
+bool VNoteItem::search(const QRegExp &keyword)
+{
+    bool fContainKeyword = false;
+
+    //If title contain keyword,don't
+    //need search data anymore.
+    if (noteTitle.contains(keyword)) {
+        fContainKeyword = true;
+    } else {
+        //Need search data blocks in note
+        for (auto it : datas.datas) {
+            if (VNoteBlock::Text == it->getType()) {
+                if (it->blockText.contains(keyword)) {
+                    fContainKeyword = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    return fContainKeyword;
+}
+
 //bool VNoteItem::makeMetaData()
 //{
 //    bool isMetaDataOk = false;

@@ -875,11 +875,10 @@ void VNoteMainWindow::loadSearchNotes(const QRegExp &key)
     VNOTE_ALL_NOTES_MAP *noteAll = VNoteDataManager::instance()->getAllNotesInFolder();
     if (noteAll) {
         noteAll->lock.lockForRead();
-        for (auto &it1 : noteAll->notes) {
-            for (auto &it2 : it1->folderNotes) {
-                if (it2->noteTitle.contains(key)
-                        /*|| it2->noteText.contains(searchKey)*/) {
-                    m_middleView->appendRow(it2);
+        for (auto &foldeNotes : noteAll->notes) {
+            for (auto note : foldeNotes->folderNotes) {
+                if (note->search(key)) {
+                    m_middleView->appendRow(note);
                 }
             }
         }
