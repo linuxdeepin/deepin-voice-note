@@ -305,6 +305,9 @@ void RightView::saveNote()
             qInfo() << "Save note error:" << *m_noteItemData;
         } else {
             m_fIsNoteModified = false;
+
+            //Notify middle view refresh.
+            emit contentChanged();
         }
     }
 }

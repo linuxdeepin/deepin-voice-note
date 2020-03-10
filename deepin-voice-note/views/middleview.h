@@ -7,6 +7,8 @@
 
 DWIDGET_USE_NAMESPACE
 class MiddleViewDelegate;
+class MiddleViewSortFilter;
+struct VNoteItem;
 
 class MiddleView : public DListView
 {
@@ -17,11 +19,19 @@ public:
     void setCurrentId(qint64 id);
     void setVisibleEmptySearch(bool visible);
     void setOnlyCurItemMenuEnable(bool enable);
+    void addRowAtHead(VNoteItem* note);
+    void appendRow(VNoteItem* note);
+    void clearAll();
+    void setCurrentIndex(int index);
+
     qint64 getCurrentId();
-    QStandardItemModel *getStandardItemModel();
+    qint32 rowCount() const;
+
+    VNoteItem* deleteCurrentRow();
 
 signals:
-
+public slots:
+    void onNoteChanged();
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
@@ -40,6 +50,7 @@ private:
     DMenu              *m_noteMenu {nullptr};
     QStandardItemModel *m_pDataModel {nullptr};
     MiddleViewDelegate *m_pItemDelegate {nullptr};
+    MiddleViewSortFilter *m_pSortViewFilter {nullptr};
 };
 
 #endif // MIDDLEVIEW_H

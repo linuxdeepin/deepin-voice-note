@@ -29,6 +29,7 @@ public:
 signals:
     void sigVoicePlay(VNVoiceBlock *voiceData);
     void sigVoicePause(VNVoiceBlock *voiceData);
+    void contentChanged();
 public slots:
     void onTextEditFocusIn();
     void onTextEditFocusOut();

@@ -44,7 +44,8 @@ SOURCES += \
     common/standarditemcommon.cpp \
     views/leftviewdelegate.cpp \
     views/splashview.cpp \
-    widgets/vnoteplaywidget.cpp
+    widgets/vnoteplaywidget.cpp \
+    views/middleviewsortfilter.cpp
 
 RESOURCES += \
     images.qrc
@@ -86,7 +87,8 @@ HEADERS += \
     common/standarditemcommon.h \
     views/leftviewdelegate.h \
     views/splashview.h \
-    widgets/vnoteplaywidget.h
+    widgets/vnoteplaywidget.h \
+    views/middleviewsortfilter.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts

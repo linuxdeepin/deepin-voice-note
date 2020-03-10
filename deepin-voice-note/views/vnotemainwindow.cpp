@@ -5,6 +5,7 @@
 #include "views/homepage.h"
 #include "views/splashview.h"
 #include "views/voicenoteitem.h"
+#include "views/middleviewsortfilter.h"
 
 #include "common/standarditemcommon.h"
 #include "common/vnotedatamanager.h"
@@ -131,6 +132,9 @@ void VNoteMainWindow::initConnections()
 
     connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
             this, SLOT(onVNoteChange(const QModelIndex &)));
+
+    connect(m_rightView, &RightView::contentChanged,
+                m_middleView, &MiddleView::onNoteChanged);
 
     connect(m_rightView, &RightView::sigVoicePlay,
             this, &VNoteMainWindow::onRightViewVoicePlay);
@@ -816,11 +820,7 @@ void VNoteMainWindow::addNote()
         //Refresh the notes count of folder
         m_leftView->update(m_leftView->currentIndex());
 
-        if (newNote) {
-            QStandardItem *item = StandardItemCommon::createStandardItem(newNote, StandardItemCommon::NOTEITEM);
-            m_middleView->getStandardItemModel()->insertRow(0, item);
-            m_middleView->setCurrentIndex(item->index());
-        }
+        m_middleView->addRowAtHead(newNote);
     }
 }
 
@@ -832,12 +832,9 @@ void VNoteMainWindow::editNote()
 
 void VNoteMainWindow::delNote()
 {
-    QModelIndex index = m_middleView->currentIndex();
-    VNoteItem *noteData = static_cast< VNoteItem *>(StandardItemCommon::getStandardItemData(index));
+    VNoteItem *noteData = m_middleView->deleteCurrentRow();
 
     if (noteData) {
-        m_middleView->getStandardItemModel()->removeRow(index.row());
-
         VNoteItemOper noteOper(noteData);
         noteOper.deleteNote();
 
@@ -847,9 +844,9 @@ void VNoteMainWindow::delNote()
 }
 void VNoteMainWindow::loadNotes(VNoteFolder *folder)
 {
-    QStandardItemModel *model = m_middleView->getStandardItemModel();
-    model->removeRows(0, model->rowCount());
+    m_middleView->clearAll();
     m_middleView->setVisibleEmptySearch(false);
+
     if (folder) {
         m_middleView->setCurrentId(folder->id);
         VNoteItemOper noteOper;
@@ -857,12 +854,13 @@ void VNoteMainWindow::loadNotes(VNoteFolder *folder)
         if (notes) {
             notes->lock.lockForRead();
             for (auto it : notes->folderNotes) {
-                QStandardItem *item = StandardItemCommon::createStandardItem(it, StandardItemCommon::NOTEITEM);
-                model->appendRow(item);
+                m_middleView->appendRow(it);
             }
             notes->lock.unlock();
-            QModelIndex index = model->index(0, 0);
-            m_middleView->setCurrentIndex(index);
+
+            //Sort the view & set focus on first item
+            m_middleView->onNoteChanged();
+            m_middleView->setCurrentIndex(0);
         }
     } else {
         m_middleView->setCurrentId(-1);
@@ -871,9 +869,9 @@ void VNoteMainWindow::loadNotes(VNoteFolder *folder)
 
 void VNoteMainWindow::loadSearchNotes(const QRegExp &key)
 {
-    QStandardItemModel *model = m_middleView->getStandardItemModel();
-    model->removeRows(0, model->rowCount());
+    m_middleView->clearAll();
     m_middleView->setSearchKey(key);
+
     VNOTE_ALL_NOTES_MAP *noteAll = VNoteDataManager::instance()->getAllNotesInFolder();
     if (noteAll) {
         noteAll->lock.lockForRead();
@@ -881,18 +879,17 @@ void VNoteMainWindow::loadSearchNotes(const QRegExp &key)
             for (auto &it2 : it1->folderNotes) {
                 if (it2->noteTitle.contains(key)
                         /*|| it2->noteText.contains(searchKey)*/) {
-                    QStandardItem *item = StandardItemCommon::createStandardItem(it2, StandardItemCommon::NOTEITEM);
-                    model->appendRow(item);
+                    m_middleView->appendRow(it2);
                 }
             }
         }
         noteAll->lock.unlock();
-        if (model->rowCount() == 0) {
+
+        if (m_middleView->rowCount() == 0) {
             m_middleView->setVisibleEmptySearch(true);
         } else {
             m_middleView->setVisibleEmptySearch(false);
-            QModelIndex index = model->index(0, 0);
-            m_middleView->setCurrentIndex(index);
+            m_middleView->setCurrentIndex(0);
         }
     }
 }
