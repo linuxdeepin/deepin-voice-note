@@ -738,24 +738,24 @@ void VNoteMainWindow::onMenuAbout2Show()
 int VNoteMainWindow::loadNotepads()
 {
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
+
+    int folderCount = 0;
+
     if (folders) {
-        QList<QStandardItem *> items;
         folders->lock.lockForRead();
+
+        folderCount = folders->folders.size();
+
         for (auto it : folders->folders) {
-            QStandardItem *pItem = StandardItemCommon::createStandardItem(it, StandardItemCommon::NOTEPADITEM);
-            items.push_back(pItem);
+            m_leftView->appendFolder(it);
         }
+
         folders->lock.unlock();
-        if (items.size()) {
-            QStandardItem *pItemRoot = m_leftView ->getNotepadRoot();
-            if (pItemRoot) {
-                pItemRoot->appendRows(items);
-                m_leftView->setDefaultNotepadItem();
-            }
-            return  items.size();
-        }
+
+        m_leftView->setDefaultNotepadItem();
     }
-    return 0;
+
+    return folderCount;
 }
 
 void VNoteMainWindow::addNotepad()
@@ -765,35 +765,34 @@ void VNoteMainWindow::addNotepad()
     itemData.defaultIcon = folderOper.getDefaultIcon();
     itemData.UI.icon = folderOper.getDefaultIcon(itemData.defaultIcon);
     itemData.name = folderOper.getDefaultFolderName();
+
     VNoteFolder *newFolder = folderOper.addFolder(itemData);
+
     if (newFolder) {
         //Switch to note view
         m_noteSearchEdit->clearEdit();
         m_centerWidget->setCurrentIndex(WndNoteShow);
-        QStandardItem *pItem = StandardItemCommon::createStandardItem(newFolder, StandardItemCommon::NOTEPADITEM);
-        QStandardItem *root = m_leftView->getNotepadRoot();
-        root->insertRow(0, pItem);
-        m_leftView->setCurrentIndex(pItem->index());
+
+        m_leftView->addFolder(newFolder);
         addNote();
     }
 }
 
 void VNoteMainWindow::delNotepad()
 {
-    QModelIndex index = m_leftView->currentIndex();
-    VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(index));
-    m_leftView->model()->removeRow(index.row(), index.parent());
+    VNoteFolder *data = m_leftView->removeFolder();
     VNoteFolderOper  folderOper(data);
+
     folderOper.deleteVNoteFolder(data);
-    if (!m_leftView->getNotepadRoot()->hasChildren()) {
+
+    if (m_leftView->folderCount() == 0) {
         m_centerWidget->setCurrentIndex(WndHomePage);
     }
 }
 
 void VNoteMainWindow::editNotepad()
 {
-    QModelIndex index = m_leftView->currentIndex();
-    m_leftView->edit(index);
+    m_leftView->editFolder();
 }
 
 void VNoteMainWindow::addNote()
@@ -826,8 +825,7 @@ void VNoteMainWindow::addNote()
 
 void VNoteMainWindow::editNote()
 {
-    QModelIndex index = m_middleView->currentIndex();
-    m_middleView->edit(index);
+    m_middleView->editNote();
 }
 
 void VNoteMainWindow::delNote()

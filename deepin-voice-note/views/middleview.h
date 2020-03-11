@@ -23,6 +23,7 @@ public:
     void appendRow(VNoteItem* note);
     void clearAll();
     void setCurrentIndex(int index);
+    void editNote();
 
     qint64 getCurrentId();
     qint32 rowCount() const;

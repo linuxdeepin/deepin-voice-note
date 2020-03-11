@@ -104,7 +104,12 @@ qint32 MiddleView::rowCount() const
 
 void MiddleView::setCurrentIndex(int index)
 {
-     DListView::setCurrentIndex(m_pSortViewFilter->index(index, 0));
+    DListView::setCurrentIndex(m_pSortViewFilter->index(index, 0));
+}
+
+void MiddleView::editNote()
+{
+    edit(currentIndex());
 }
 
 void MiddleView::mousePressEvent(QMouseEvent *event)

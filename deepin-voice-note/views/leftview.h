@@ -8,6 +8,7 @@
 DWIDGET_USE_NAMESPACE
 
 class LeftViewDelegate;
+class VNoteFolder;
 
 class LeftView : public DTreeView
 {
@@ -16,6 +17,14 @@ public:
     explicit LeftView(QWidget *parent = nullptr);
     QStandardItem *getNotepadRoot();
     QModelIndex setDefaultNotepadItem();
+
+    void addFolder(VNoteFolder* folder);
+    void appendFolder(VNoteFolder* folder);
+    void editFolder();
+    int  folderCount();
+
+    VNoteFolder* removeFolder();
+
 signals:
 
 protected:

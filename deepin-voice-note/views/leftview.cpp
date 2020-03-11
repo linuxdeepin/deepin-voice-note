@@ -2,6 +2,7 @@
 #include "leftviewdelegate.h"
 #include "common/actionmanager.h"
 #include "common/standarditemcommon.h"
+#include "common/vnoteforlder.h"
 
 #include <QMouseEvent>
 
@@ -72,6 +73,63 @@ QModelIndex LeftView::setDefaultNotepadItem()
         }
     }
     return index;
+}
+
+void LeftView::addFolder(VNoteFolder *folder)
+{
+    if (nullptr != folder) {
+        QStandardItem *pItem = StandardItemCommon::createStandardItem(
+                    folder, StandardItemCommon::NOTEPADITEM);
+
+        QStandardItem *root = getNotepadRoot();
+        root->insertRow(0, pItem);
+        setCurrentIndex(pItem->index());
+    }
+}
+
+void LeftView::appendFolder(VNoteFolder *folder)
+{
+    if (nullptr != folder) {
+        QStandardItem *pItem = StandardItemCommon::createStandardItem(
+                    folder, StandardItemCommon::NOTEPADITEM);
+
+        QStandardItem *root = getNotepadRoot();
+
+        if (nullptr != root) {
+            root->appendRow(pItem);
+        }
+    }
+}
+
+void LeftView::editFolder()
+{
+    edit(currentIndex());
+}
+
+VNoteFolder* LeftView::removeFolder()
+{
+
+    QModelIndex index = currentIndex();
+
+    VNoteFolder *data = reinterpret_cast<VNoteFolder*>(
+                StandardItemCommon::getStandardItemData(index));
+
+    m_pDataModel->removeRow(index.row(), index.parent());
+
+    return data;
+}
+
+int LeftView::folderCount()
+{
+    int count = 0;
+
+    QStandardItem *root = getNotepadRoot();
+
+    if (nullptr != root) {
+        count = root->rowCount();
+    }
+
+    return count;
 }
 
 void  LeftView::initMenu()
