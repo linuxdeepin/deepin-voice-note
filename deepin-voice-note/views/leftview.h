@@ -8,7 +8,7 @@
 DWIDGET_USE_NAMESPACE
 
 class LeftViewDelegate;
-class VNoteFolder;
+struct VNoteFolder;
 
 class LeftView : public DTreeView
 {

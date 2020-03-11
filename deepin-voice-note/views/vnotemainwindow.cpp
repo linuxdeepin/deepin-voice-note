@@ -1,4 +1,4 @@
-#include "views/vnotemainwindow.h"
+﻿#include "views/vnotemainwindow.h"
 #include "views/leftview.h"
 #include "views/middleview.h"
 #include "views/rightview.h"
@@ -26,6 +26,8 @@
 #include "widgets/vnoteiconbutton.h"
 
 #include "globaldef.h"
+
+#include <QScrollBar>
 
 #include <DApplication>
 #include <DApplicationHelper>
@@ -140,6 +142,8 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onRightViewVoicePlay);
     connect(m_rightView, &RightView::sigVoicePause,
             this, &VNoteMainWindow::onRightViewVoicePause);
+    connect(m_rightView, &RightView::sigCursorChange,
+            this, &VNoteMainWindow::onCursorChange);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::addNotepad);
@@ -332,10 +336,14 @@ void VNoteMainWindow::initRightView()
 
     QVBoxLayout *rightHolderLayout = new QVBoxLayout;
     rightHolderLayout->setSpacing(0);
-    rightHolderLayout->setContentsMargins(0, 0, 0, 0);
+    rightHolderLayout->setContentsMargins(0, 20, 0, 0);
 
-    m_rightView = new RightView(m_rightViewHolder);
-    rightHolderLayout->addWidget(m_rightView);
+    m_rightViewScrollArea = new DScrollArea(m_rightViewHolder);
+    m_rightView = new RightView(m_rightViewScrollArea);
+    m_rightViewScrollArea->setLineWidth(0);
+    m_rightViewScrollArea->setWidgetResizable(true);
+    m_rightViewScrollArea->setWidget(m_rightView);
+    rightHolderLayout->addWidget(m_rightViewScrollArea);
 
     //TODO:
     //    Add record area code here
@@ -1034,4 +1042,22 @@ void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
     m_asrErrMeassage->setVisible(true);
     m_asrErrMeassage->setFixedWidth(m_rightViewHolder->width());
     m_asrErrMeassage->adjustSize();
+}
+
+void VNoteMainWindow::onCursorChange(int height, bool mouseMove)
+{
+    QScrollBar *bar = m_rightViewScrollArea->verticalScrollBar();
+    if (height > bar->value() + m_rightViewScrollArea->height()) {
+        int value = height - m_rightViewScrollArea->height();
+        if(!mouseMove){
+            if(value > bar->maximum()){
+                bar->setMaximum(value);
+            }
+        }
+        bar->setValue(value);
+    }
+    int value = bar->value();
+    if(value > height){
+        bar->setValue(height );
+    }
 }

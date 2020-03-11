@@ -12,6 +12,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QAbstractTextDocumentLayout>
+#include <QTimer>
 
 #include <DApplicationHelper>
 #include <DFontSizeManager>
@@ -50,6 +51,7 @@ void VoiceNoteItem::initUi()
     m_asrText->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_asrText->document()->setDocumentMargin(0);
     m_asrText->setVisible(false);
+    m_asrText->setContextMenuPolicy(Qt::NoContextMenu);
     m_voiceSizeLab = new DLabel(m_bgWidget);
     m_voiceSizeLab->setFixedSize(66, 30);
     m_voiceSizeLab->setAlignment(Qt::AlignCenter);
@@ -196,14 +198,17 @@ void VoiceNoteItem::onChangeTheme()
 
 void VoiceNoteItem::onAsrTextChange()
 {
-    int height = DefaultHeight;
-    QTextDocument *doc = m_asrText->document();
-    if(!doc->isEmpty()){
-        int docHeight = static_cast<int>(doc->size().height());
-        m_asrText->setFixedHeight(docHeight);
-        height += docHeight;
-    }
-    this->setFixedHeight(height);
+    QTimer::singleShot(0, this, [this]() {
+        int height = DefaultHeight;
+        QTextDocument *doc = m_asrText->document();
+        if(!doc->isEmpty()){
+            int docHeight = static_cast<int>(doc->size().height());
+            m_asrText->setFixedHeight(docHeight);
+            height += docHeight;
+        }
+        this->setFixedHeight(height);
+    });
+
 }
 
 void VoiceNoteItem::mousePressEvent(QMouseEvent *event)
@@ -215,4 +220,9 @@ void VoiceNoteItem::mousePressEvent(QMouseEvent *event)
             emit voiceMenuShow();
         }
     }
+}
+
+TextNoteEdit *VoiceNoteItem::getAsrTextEdit()
+{
+    return m_asrText;
 }

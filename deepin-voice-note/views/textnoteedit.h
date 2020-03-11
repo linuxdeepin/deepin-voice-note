@@ -14,6 +14,8 @@ public:
      explicit TextNoteEdit(VNoteItem *textNote, VNTextBlock *noteBlock,QWidget *parent = nullptr);
      VNoteItem *getNoteItem();
      VNTextBlock *getNoteBlock();
+     void selectText(const QPoint &globalPos,QTextCursor::MoveOperation op);
+     void clearSelection();
 signals:
     void sigFocusIn();
     void sigFocusOut();
@@ -28,6 +30,10 @@ protected:
     void wheelEvent(QWheelEvent *e) override;
     void contextMenuEvent(QContextMenuEvent *e) override;
     void keyPressEvent(QKeyEvent *e) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 };
 
 #endif // TEXTEDITITEM_H

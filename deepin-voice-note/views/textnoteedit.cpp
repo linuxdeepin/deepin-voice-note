@@ -54,3 +54,46 @@ VNTextBlock *TextNoteEdit::getNoteBlock()
 {
     return  m_noteBlock;
 }
+
+void TextNoteEdit::mousePressEvent(QMouseEvent *event)
+{
+    DTextEdit::mousePressEvent(event);
+    event->ignore();
+}
+
+void TextNoteEdit::mouseReleaseEvent(QMouseEvent *event)
+{
+    DTextEdit::mouseReleaseEvent(event);
+    event->ignore();
+}
+
+void TextNoteEdit::mouseMoveEvent(QMouseEvent *event)
+{
+    //DTextEdit::mouseMoveEvent(event);
+    event->ignore();
+}
+
+void TextNoteEdit::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    event->ignore();
+}
+
+void TextNoteEdit::selectText(const QPoint &globalPos,QTextCursor::MoveOperation op)
+{
+    QPoint pos = this->mapFromGlobal(globalPos);
+    QTextCursor cursor = this->cursorForPosition(pos);
+    int curPos = cursor.position();
+    this->moveCursor(op);
+    cursor = this->textCursor();
+    cursor.setPosition(curPos, QTextCursor::KeepAnchor);
+    this->setTextCursor(cursor);
+}
+
+void TextNoteEdit::clearSelection()
+{
+    QTextCursor textCursor = this->textCursor();
+    if (textCursor.hasSelection()) {
+        textCursor.clearSelection();
+        this->setTextCursor(textCursor);
+    }
+}

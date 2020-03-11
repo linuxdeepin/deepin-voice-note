@@ -30,6 +30,7 @@ public:
     void enblePauseBtn(bool enable);
     VNoteItem *getNoteItem();
     VNVoiceBlock *getNoteBlock();
+    TextNoteEdit *getAsrTextEdit();
 signals:
     void voiceMenuShow();
     void sigPlayBtnClicked(VoiceNoteItem *item);

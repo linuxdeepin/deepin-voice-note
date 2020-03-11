@@ -37,23 +37,15 @@ RightView::RightView(QWidget *parent)
 
 void RightView::initUi()
 {
-    m_viewportScrollArea = new QScrollArea(this);
-    m_viewportScrollArea->setLineWidth(0);
+    setContextMenuPolicy(Qt::CustomContextMenu);
     m_viewportLayout = new QVBoxLayout;
     m_viewportLayout->setSpacing(0);
     m_viewportLayout->setContentsMargins(20, 0, 20, 0);
-    m_viewportWidget = new DWidget(this);
-    m_viewportScrollArea->setWidgetResizable(true);
-    m_viewportScrollArea->setWidget(m_viewportWidget);
-    m_viewportWidget->setLayout(m_viewportLayout);
-    m_placeholderWidget = new DWidget(m_viewportWidget); //占位的
+    this->setLayout(m_viewportLayout);
+    m_placeholderWidget = new DWidget(this); //占位的
     m_placeholderWidget->setObjectName(PlaceholderWidget);
     m_placeholderWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_viewportLayout->addWidget(m_placeholderWidget, 1, Qt::AlignBottom);
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(m_viewportScrollArea);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-    this->setLayout(mainLayout);
     QString content = DApplication::translate(
                           "RightView",
                           "The voice note has been deleted");
@@ -73,7 +65,8 @@ void RightView::initMenu()
 
 QWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus)
 {
-    TextNoteEdit *editItem = new TextNoteEdit(m_noteItemData, data->ptrText, m_viewportWidget);
+    TextNoteEdit *editItem = new TextNoteEdit(m_noteItemData, data->ptrText, this);
+    editItem->setContextMenuPolicy(Qt::NoContextMenu);
     DStyle::setFocusRectVisible(editItem, false);
     DPalette pb = DApplicationHelper::instance()->palette(editItem);
     pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));
@@ -99,7 +92,7 @@ QWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus)
     connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, [ = ] {
         editItem->setFixedHeight(static_cast<int>(document->size().height()));
         int height = editItem->cursorRect(editItem->textCursor()).bottom();
-        adjustVerticalScrollBar(editItem,height);
+        adjustVerticalScrollBar(editItem, height);
     });
     connect(editItem, &TextNoteEdit::sigFocusIn, this, &RightView::onTextEditFocusIn);
     connect(editItem, &TextNoteEdit::sigFocusOut, this, &RightView::onTextEditFocusOut);
@@ -156,7 +149,7 @@ QWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
                 m_curItemWidget = itemWidget;
                 itemWidget->setFocus();
                 int height = itemWidget->cursorRect(itemWidget->textCursor()).bottom();
-                adjustVerticalScrollBar(itemWidget,height);
+                adjustVerticalScrollBar(itemWidget, height);
                 m_fIsNoteModified = true;
                 saveNote();
                 return m_curItemWidget;
@@ -324,20 +317,20 @@ void RightView::onVoiceMenuShow()
 
 void RightView::delWidget(DWidget *widget)
 {
-    if(widget == nullptr){
+    if (widget == nullptr) {
         return;
     }
     widget->disconnect();
     int index = m_viewportLayout->indexOf(widget);
     QWidget *preWidget = nullptr;
-    if(index > 0){
+    if (index > 0) {
         preWidget = m_viewportLayout->itemAt(index - 1)->widget();
     }
     QWidget *nextWidget = m_viewportLayout->itemAt(index + 1)->widget();
-    if(m_curItemWidget == widget){
+    if (m_curItemWidget == widget) {
         m_curItemWidget = nextWidget;
     }
-    if(m_menuVoice == widget){
+    if (m_menuVoice == widget) {
         m_menuVoice = nullptr;
     }
     VNoteBlock *noteBlock = nullptr;
@@ -352,10 +345,9 @@ void RightView::delWidget(DWidget *widget)
     }
     m_viewportLayout->removeWidget(widget);
     widget->deleteLater();
-    if(preWidget && nextWidget //合并textedit窗口
-       && preWidget->objectName() == TextEditWidget
-       && nextWidget->objectName() == TextEditWidget)
-    {
+    if (preWidget && nextWidget //合并textedit窗口
+            && preWidget->objectName() == TextEditWidget
+            && nextWidget->objectName() == TextEditWidget) {
         TextNoteEdit *editPre = static_cast<TextNoteEdit *>(preWidget);
         TextNoteEdit *editNext = static_cast<TextNoteEdit *>(nextWidget);
         editPre->disconnect();
@@ -371,13 +363,13 @@ void RightView::delWidget(DWidget *widget)
         editNext->setFocus();
     }
     int height = 0;
-    if(m_curItemWidget->objectName() == TextEditWidget){
-       TextNoteEdit *editCur = static_cast<TextNoteEdit *>(m_curItemWidget);
-       QRect rc = editCur->cursorRect(editCur->textCursor());
-       height = rc.bottom();
-       editCur->setFocus();
+    if (m_curItemWidget->objectName() == TextEditWidget) {
+        TextNoteEdit *editCur = static_cast<TextNoteEdit *>(m_curItemWidget);
+        QRect rc = editCur->cursorRect(editCur->textCursor());
+        height = rc.bottom();
+        editCur->setFocus();
     }
-    adjustVerticalScrollBar(m_curItemWidget,height);
+    adjustVerticalScrollBar(m_curItemWidget, height);
     m_fIsNoteModified = true;
     saveNote();
 }
@@ -430,17 +422,153 @@ bool RightView::checkFileExist(const QString &file)
 
 void RightView::adjustVerticalScrollBar(QWidget *widget, int defaultHeight)
 {
-    QScrollBar *bar = m_viewportScrollArea->verticalScrollBar();
     int tolHeight = defaultHeight;
     int index = m_viewportLayout->indexOf(widget);
     for (int i = 0; i < index; i++) {
         tolHeight += m_viewportLayout->itemAt(i)->widget()->height();
     }
-    if (tolHeight > bar->value() + m_viewportScrollArea->height()) {
-        int value = tolHeight - m_viewportScrollArea->height();
-        if(bar->maximum() < value){
-            bar->setMaximum(value);
+    emit sigCursorChange(tolHeight, false);
+}
+
+void RightView::mouseMoveEvent(QMouseEvent *event)
+{
+    emit sigCursorChange(event->pos().y(), true);
+    mouseMoveSelect(event);
+}
+
+void RightView::mousePressEvent(QMouseEvent *event)
+{
+    DWidget::mousePressEvent(event);
+    Qt::MouseButton btn = event->button();
+    if (btn == Qt::RightButton) {
+        qDebug() << getSelectText();
+    } else if (btn == Qt::LeftButton) {
+        clearAllSelection();
+        m_curItemWidget = getWidgetByPos(event->pos());
+    }
+}
+
+QWidget *RightView::getWidgetByPos(const QPoint &pos)
+{
+    for (int i = 0; i < m_viewportLayout->count() - 1 ; i++) {
+        QWidget *widget = m_viewportLayout->itemAt(i)->widget();
+        if (widget->geometry().contains(pos)) {
+            return  widget;
         }
-        bar->setValue(value);
+    }
+    return  nullptr;
+}
+
+void RightView::mouseMoveSelect(QMouseEvent *event)
+{
+    QWidget *widget = getWidgetByPos(event->pos());
+    if (widget) {
+        int widgetIndex = m_viewportLayout->indexOf(widget);
+        int curIndex = m_viewportLayout->indexOf(m_curItemWidget);
+        QTextCursor::MoveOperation op = QTextCursor::NoMove;
+        QLayoutItem *tmpItem = nullptr;
+        if (widget != m_curItemWidget) {
+            if (widgetIndex < curIndex) {
+                op = QTextCursor::End;
+                tmpItem = m_viewportLayout->itemAt(widgetIndex + 1);
+            } else {
+                op = QTextCursor::Start;
+                tmpItem = m_viewportLayout->itemAt(widgetIndex - 1);
+            }
+        }
+        if (widget->objectName() == TextEditWidget) {
+            TextNoteEdit *editItem = static_cast<TextNoteEdit *>(widget);
+            editItem->selectText(event->globalPos(), op);
+        } else if (widget->objectName() == VoiceWidget) {
+            VoiceNoteItem *voiceItem = static_cast<VoiceNoteItem *>(widget);
+            if (!voiceItem->getNoteBlock()->blockText.isEmpty()) {
+                TextNoteEdit *asrTextEdit = voiceItem->getAsrTextEdit();
+                asrTextEdit->selectText(event->globalPos(), op);
+            }
+        }
+        if (tmpItem != nullptr) {
+            op = op == QTextCursor::Start ? QTextCursor::End : QTextCursor::Start;
+            widget = tmpItem->widget();
+            if (widget->objectName() == TextEditWidget) {
+                TextNoteEdit *editItem = static_cast<TextNoteEdit *>(widget);
+                if (widget != m_curItemWidget) {
+                    QTextCursor cursor = editItem->textCursor();
+                    editItem->selectAll();
+                } else {
+                    editItem->moveCursor(op, QTextCursor::KeepAnchor);
+                }
+            } else if (widget->objectName() == VoiceWidget) {
+                VoiceNoteItem *voiceItem = static_cast<VoiceNoteItem *>(widget);
+                if (!voiceItem->getNoteBlock()->blockText.isEmpty()) {
+                    TextNoteEdit *asrTextEdit = voiceItem->getAsrTextEdit();
+                    if (widget != m_curItemWidget) {
+                        QTextCursor cursor = asrTextEdit->textCursor();
+                        asrTextEdit->selectAll();
+                    } else {
+                        asrTextEdit->moveCursor(op, QTextCursor::KeepAnchor);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void RightView::clearAllSelection()
+{
+    for (int i = 0; i < m_viewportLayout->count() - 1 ; i++) {
+        QWidget *widget = m_viewportLayout->itemAt(i)->widget();
+        if (widget->objectName() == TextEditWidget) {
+            TextNoteEdit *editItem = static_cast<TextNoteEdit *>(widget);
+            editItem->clearSelection();
+        } else if (widget->objectName() == VoiceWidget) {
+            VoiceNoteItem *voiceItem = static_cast<VoiceNoteItem *>(widget);
+            if (!voiceItem->getNoteBlock()->blockText.isEmpty()) {
+                TextNoteEdit *asrTextEdit = voiceItem->getAsrTextEdit();
+                asrTextEdit->clearSelection();
+            }
+        }
+    }
+}
+
+QString RightView::getSelectText()
+{
+    QString text = "";
+    QTextCursor textCursor;
+    for (int i = 0; i < m_viewportLayout->count() - 1 ; i++) {
+        QWidget *widget = m_viewportLayout->itemAt(i)->widget();
+        if (widget->objectName() == TextEditWidget) {
+            TextNoteEdit *editItem = static_cast<TextNoteEdit *>(widget);
+            textCursor = editItem->textCursor();
+            if (textCursor.hasSelection()) {
+                text.append(textCursor.selectedText());
+            }
+        } else if (widget->objectName() == VoiceWidget) {
+            VoiceNoteItem *voiceItem = static_cast<VoiceNoteItem *>(widget);
+            if (!voiceItem->getNoteBlock()->blockText.isEmpty()) {
+                TextNoteEdit *asrTextEdit = voiceItem->getAsrTextEdit();
+                textCursor = asrTextEdit->textCursor();
+                if (textCursor.hasSelection()) {
+                    text.append(textCursor.selectedText());
+                }
+            }
+        }
+    }
+    return text;
+}
+
+void RightView::selectAllItem()
+{
+    for (int i = 0; i < m_viewportLayout->count() - 1 ; i++) {
+        QWidget *widget = m_viewportLayout->itemAt(i)->widget();
+        if (widget->objectName() == TextEditWidget) {
+            TextNoteEdit *editItem = static_cast<TextNoteEdit *>(widget);
+            editItem->selectAll();
+        } else if (widget->objectName() == VoiceWidget) {
+            VoiceNoteItem *voiceItem = static_cast<VoiceNoteItem *>(widget);
+            if (!voiceItem->getNoteBlock()->blockText.isEmpty()) {
+                TextNoteEdit *asrTextEdit = voiceItem->getAsrTextEdit();
+                asrTextEdit->selectAll();
+            }
+        }
     }
 }

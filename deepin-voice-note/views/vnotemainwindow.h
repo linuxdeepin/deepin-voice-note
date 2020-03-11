@@ -17,6 +17,7 @@
 #include <DFloatingButton>
 #include <DAnchors>
 #include <DFloatingMessage>
+#include <DScrollArea>
 
 DWIDGET_USE_NAMESPACE
 
@@ -89,6 +90,7 @@ public slots:
      //Process all context menu states
     void onMenuAbout2Show();
     void onVNoteSearch();
+    void onCursorChange(int height, bool mouseMove); //调整详情页滚动条
     void onStartRecord();//开始录音
     void onFinshRecord(const QString &voicePath,qint64 voiceSize); //结束录音
     void onRightViewVoicePlay(VNVoiceBlock *voiceData);
@@ -133,6 +135,7 @@ private:
     DIconButton *m_addNewNoteBtn {nullptr};
 #endif
 
+    DScrollArea     *m_rightViewScrollArea {nullptr};
     QWidget         *m_rightViewHolder {nullptr};
     QWidget         *m_leftViewHolder {nullptr};
     QWidget         *m_middleViewHolder {nullptr};
