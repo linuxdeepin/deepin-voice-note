@@ -47,17 +47,16 @@ public:
         WndHomePage,
         WndNoteShow
     };
-    enum SpecialStatus
-    {
-      InvalidStatus = 0,
-      SearchStart,
-      SearchEnd,
-      PlayVoiceStart,
-      PlayVoiceEnd,
-      RecordStart,
-      RecordEnd,
-      VoiceToTextStart,
-      VoiceToTextEnd
+    enum SpecialStatus {
+        InvalidStatus = 0,
+        SearchStart,
+        SearchEnd,
+        PlayVoiceStart,
+        PlayVoiceEnd,
+        RecordStart,
+        RecordEnd,
+        VoiceToTextStart,
+        VoiceToTextEnd
     };
 
 protected:
@@ -80,6 +79,7 @@ protected:
 
     void resizeEvent(QResizeEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 signals:
 
 public slots:
@@ -87,12 +87,12 @@ public slots:
     void onVNoteFolderChange(const QModelIndex &current, const QModelIndex &previous);
     void onVNoteChange(const QModelIndex &previous);
     void onMenuAction(QAction *action);
-     //Process all context menu states
+    //Process all context menu states
     void onMenuAbout2Show();
     void onVNoteSearch();
     void onCursorChange(int height, bool mouseMove); //调整详情页滚动条
     void onStartRecord();//开始录音
-    void onFinshRecord(const QString &voicePath,qint64 voiceSize); //结束录音
+    void onFinshRecord(const QString &voicePath, qint64 voiceSize); //结束录音
     void onRightViewVoicePlay(VNVoiceBlock *voiceData);
     void onRightViewVoicePause(VNVoiceBlock *voiceData);
     void onPlayPlugVoicePlay(VNVoiceBlock *voiceData);
@@ -103,7 +103,7 @@ public slots:
     //Audio to text API
     void onA2TStart();
     void onA2TError(int error);
-    void onA2TSuccess(const QString& text);
+    void onA2TSuccess(const QString &text);
     //Shotcuts slots
     void onPreviewShortcut();
     void initAsrErrMessage();
@@ -148,7 +148,7 @@ private:
     DPushButton *m_addNotepadBtn {nullptr};
     VNoteIconButton *m_addNoteBtn {nullptr};
 
-    VNoteRecordBar* m_recordBar {nullptr};
+    VNoteRecordBar *m_recordBar {nullptr};
     //Audio device state watch thread
     VNoteAudioDeviceWatcher *m_audioDeviceWatcher {nullptr};
     VNoteA2TManager *m_a2tManager {nullptr};
@@ -169,5 +169,6 @@ private:
     DFloatingMessage *m_asrErrMeassage {nullptr};
     DPushButton      *m_asrAgainBtn {nullptr};
 };
+
 
 #endif // VNOTEMAINWINDOW_H

@@ -136,7 +136,7 @@ void VNoteMainWindow::initConnections()
             this, SLOT(onVNoteChange(const QModelIndex &)));
 
     connect(m_rightView, &RightView::contentChanged,
-                m_middleView, &MiddleView::onNoteChanged);
+            m_middleView, &MiddleView::onNoteChanged);
 
     connect(m_rightView, &RightView::sigVoicePlay,
             this, &VNoteMainWindow::onRightViewVoicePlay);
@@ -609,6 +609,18 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
     }
 }
 
+void VNoteMainWindow::keyPressEvent(QKeyEvent *event)
+{
+    DMainWindow::keyPressEvent(event);
+    qInfo() << "        VNoteMainWindow::keyPressEvent   ......   ";
+    if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_C)) {
+        if (m_rightView) {
+            m_rightView->selectText2Clipboard();
+        }
+    }
+    event->ignore();
+}
+
 bool VNoteMainWindow::checkIfNeedExit()
 {
     QScopedPointer<VNoteMessageDialog> pspMessageDialg;
@@ -1049,15 +1061,15 @@ void VNoteMainWindow::onCursorChange(int height, bool mouseMove)
     QScrollBar *bar = m_rightViewScrollArea->verticalScrollBar();
     if (height > bar->value() + m_rightViewScrollArea->height()) {
         int value = height - m_rightViewScrollArea->height();
-        if(!mouseMove){
-            if(value > bar->maximum()){
+        if (!mouseMove) {
+            if (value > bar->maximum()) {
                 bar->setMaximum(value);
             }
         }
         bar->setValue(value);
     }
     int value = bar->value();
-    if(value > height){
-        bar->setValue(height );
+    if (value > height) {
+        bar->setValue(height);
     }
 }

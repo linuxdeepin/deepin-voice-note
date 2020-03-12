@@ -9,21 +9,21 @@ struct VNTextBlock;
 
 class TextNoteEdit : public DTextEdit
 {
-     Q_OBJECT
+    Q_OBJECT
 public:
-     explicit TextNoteEdit(VNoteItem *textNote, VNTextBlock *noteBlock,QWidget *parent = nullptr);
-     VNoteItem *getNoteItem();
-     VNTextBlock *getNoteBlock();
-     void selectText(const QPoint &globalPos,QTextCursor::MoveOperation op);
-     void clearSelection();
+    explicit TextNoteEdit(VNoteItem *textNote, VNTextBlock *noteBlock, QWidget *parent = nullptr);
+    VNoteItem *getNoteItem();
+    VNTextBlock *getNoteBlock();
+    void selectText(const QPoint &globalPos, QTextCursor::MoveOperation op);
+    void clearSelection();
 signals:
     void sigFocusIn();
     void sigFocusOut();
     void sigDelEmpty(); //已经删完了内容还是按删除键
 private:
-     bool m_menuPop {false};
-     VNoteItem       *m_textNode {nullptr};
-     VNTextBlock     *m_noteBlock {nullptr};
+    bool m_menuPop {false};
+    VNoteItem       *m_textNode {nullptr};
+    VNTextBlock     *m_noteBlock {nullptr};
 protected:
     void focusInEvent(QFocusEvent *e) override;
     void focusOutEvent(QFocusEvent *e) override;

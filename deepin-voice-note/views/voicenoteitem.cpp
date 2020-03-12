@@ -39,7 +39,7 @@ void VoiceNoteItem::initUi()
     m_createTimeLab = new DLabel(m_bgWidget);
     DFontSizeManager::instance()->bind(m_createTimeLab, DFontSizeManager::T8);
     m_createTimeLab->setText("2019-10-21 19:30");
-    m_asrText = new TextNoteEdit(nullptr,nullptr,m_bgWidget);
+    m_asrText = new TextNoteEdit(nullptr, nullptr, m_bgWidget);
     DFontSizeManager::instance()->bind(m_asrText, DFontSizeManager::T8);
     m_asrText->setReadOnly(true);
     DStyle::setFocusRectVisible(m_asrText, false);
@@ -72,29 +72,29 @@ void VoiceNoteItem::initUi()
     m_voiceNameLab = new DLabel(this);
     DFontSizeManager::instance()->bind(m_voiceNameLab, DFontSizeManager::T6);
     QGridLayout *playBtnLayout = new QGridLayout;
-    playBtnLayout->addWidget(m_pauseBtn,0,0);
-    playBtnLayout->addWidget(m_playBtn,0,0);
+    playBtnLayout->addWidget(m_pauseBtn, 0, 0);
+    playBtnLayout->addWidget(m_playBtn, 0, 0);
     playBtnLayout->setSizeConstraint(QLayout::SetNoConstraint);
     QVBoxLayout *nameLayout = new QVBoxLayout;
     nameLayout->addWidget(m_voiceNameLab, Qt::AlignLeft);
     nameLayout->addWidget(m_createTimeLab, Qt::AlignLeft);
-    nameLayout->setContentsMargins(0,0,0,0);
+    nameLayout->setContentsMargins(0, 0, 0, 0);
     nameLayout->setSpacing(0);
     m_voiceSizeLab->setText("50'00");
     QHBoxLayout *itemLayout = new QHBoxLayout;
     itemLayout->addLayout(playBtnLayout);
-    itemLayout->addLayout(nameLayout,1);
+    itemLayout->addLayout(nameLayout, 1);
     itemLayout->addWidget(m_voiceSizeLab);
     itemLayout->setSizeConstraint(QLayout::SetNoConstraint);
-    itemLayout->setContentsMargins(0,0,0,0);
+    itemLayout->setContentsMargins(0, 0, 0, 0);
     QVBoxLayout *bkLayout = new QVBoxLayout;
     bkLayout->addLayout(itemLayout);
     bkLayout->addWidget(m_asrText);
-    bkLayout->setContentsMargins(0,0,0,0);
+    bkLayout->setContentsMargins(0, 0, 0, 0);
     m_bgWidget->setLayout(bkLayout);
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(m_bgWidget);
-    mainLayout->setContentsMargins(10,0,10,0);
+    mainLayout->setContentsMargins(10, 0, 10, 0);
     showPlayBtn();
 
     this->setLayout(mainLayout);
@@ -104,11 +104,11 @@ void VoiceNoteItem::initUi()
 
 void VoiceNoteItem::initData()
 {
-    if(m_noteBlock != nullptr){
+    if (m_noteBlock != nullptr) {
         m_createTimeLab->setText(Utils::convertDateTime(m_noteBlock->createTime));
         m_voiceNameLab->setText(m_noteBlock->voiceTitle);
         m_voiceSizeLab->setText(Utils::formatMillisecond(m_noteBlock->voiceSize));
-        if(!m_noteBlock->blockText.isEmpty()){
+        if (!m_noteBlock->blockText.isEmpty()) {
             showAsrEndWindow(m_noteBlock->blockText);
         }
     }
@@ -171,9 +171,9 @@ void VoiceNoteItem::showAsrEndWindow(const QString &strResult)
     QTextOption option = m_asrText->document()->defaultTextOption();
     option.setAlignment(Qt::AlignLeft);
     m_asrText->document()->setDefaultTextOption(option);
-    if(strResult.isEmpty()){
+    if (strResult.isEmpty()) {
         m_asrText->setVisible(false);
-    }else {
+    } else {
         m_asrText->setVisible(true);
     }
     onAsrTextChange();
@@ -201,7 +201,7 @@ void VoiceNoteItem::onAsrTextChange()
     QTimer::singleShot(0, this, [this]() {
         int height = DefaultHeight;
         QTextDocument *doc = m_asrText->document();
-        if(!doc->isEmpty()){
+        if (!doc->isEmpty()) {
             int docHeight = static_cast<int>(doc->size().height());
             m_asrText->setFixedHeight(docHeight);
             height += docHeight;
@@ -215,7 +215,7 @@ void VoiceNoteItem::mousePressEvent(QMouseEvent *event)
 {
     DWidget::mousePressEvent(event);
     if (event->button() == Qt::RightButton) {
-        if(!m_asrText->geometry().contains(event->pos())){
+        if (!m_asrText->geometry().contains(event->pos())) {
             //Request to show voice context menu
             emit voiceMenuShow();
         }

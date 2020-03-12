@@ -1,5 +1,5 @@
 #include "rightview.h"
-#include "textnoteedit.h"
+//#include "textnoteedit.h"
 #include "voicenoteitem.h"
 
 #include "common/vnoteitem.h"
@@ -16,6 +16,7 @@
 #include <QScrollArea>
 #include <QAbstractTextDocumentLayout>
 #include <QList>
+#include <QClipboard>
 
 #include <DFontSizeManager>
 #include <DApplicationHelper>
@@ -448,6 +449,11 @@ void RightView::mousePressEvent(QMouseEvent *event)
     }
 }
 
+void RightView::mouseReleaseEvent(QMouseEvent *event)
+{
+    DWidget::mouseReleaseEvent(event);
+}
+
 QWidget *RightView::getWidgetByPos(const QPoint &pos)
 {
     for (int i = 0; i < m_viewportLayout->count() - 1 ; i++) {
@@ -457,6 +463,26 @@ QWidget *RightView::getWidgetByPos(const QPoint &pos)
         }
     }
     return  nullptr;
+}
+
+/**
+ * @brief RightView::selectText2Clipboard
+ * 将选择的text添加到系统剪切板
+ */
+void RightView::selectText2Clipboard()
+{
+    QString strSelect = "";
+
+    strSelect = getSelectText();
+    if (strSelect != "") {
+        qInfo() << "    select text:" << strSelect;
+        QClipboard *board = QApplication::clipboard();
+        if (board) {
+            board->clear();
+            board->setText(strSelect);
+            qInfo() << "    copy text:"  << board->text();
+        }
+    }
 }
 
 void RightView::mouseMoveSelect(QMouseEvent *event)

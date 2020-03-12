@@ -1,13 +1,20 @@
 #include "textnoteedit.h"
 
 #include <QWheelEvent>
+#include <DFontSizeManager>
 
 TextNoteEdit::TextNoteEdit(VNoteItem *textNote, VNTextBlock *noteBlock, QWidget *parent)
     : DTextEdit(parent)
     , m_textNode(textNote)
-    , m_noteBlock (noteBlock)
+    , m_noteBlock(noteBlock)
 {
-
+    setAlignment(Qt::AlignTop);//设置顶部对其
+    setFrameShape(QFrame::NoFrame);//设置无边框
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//隐藏纵滚动条
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//隐藏横滚动条
+    DFontSizeManager::instance()->bind(this, DFontSizeManager::T8);//DTK设置字体大小
+    setContextMenuPolicy(Qt::NoContextMenu);
+    setMouseTracking(true);
 }
 
 void TextNoteEdit::focusInEvent(QFocusEvent *e)
@@ -38,12 +45,13 @@ void TextNoteEdit::contextMenuEvent(QContextMenuEvent *e)
 
 void TextNoteEdit::keyPressEvent(QKeyEvent *e)
 {
+    DTextEdit::keyPressEvent(e);
     if (e->key() == Qt::Key_Backspace) {
         if (this->document()->isEmpty()) {
             emit sigDelEmpty();
         }
     }
-    DTextEdit::keyPressEvent(e);
+    e->ignore();
 }
 
 VNoteItem *TextNoteEdit::getNoteItem()
@@ -78,7 +86,7 @@ void TextNoteEdit::mouseDoubleClickEvent(QMouseEvent *event)
     event->ignore();
 }
 
-void TextNoteEdit::selectText(const QPoint &globalPos,QTextCursor::MoveOperation op)
+void TextNoteEdit::selectText(const QPoint &globalPos, QTextCursor::MoveOperation op)
 {
     QPoint pos = this->mapFromGlobal(globalPos);
     QTextCursor cursor = this->cursorForPosition(pos);
