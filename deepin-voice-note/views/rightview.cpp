@@ -543,7 +543,7 @@ void RightView::selectText2Clipboard()
         if (board) {
             board->clear();
             board->setText(m_strSelectText);
-            qInfo() << " Clip board text:" << board->text();
+//            qInfo() << " Clip board text:" << board->text();
         }
     }
 }
