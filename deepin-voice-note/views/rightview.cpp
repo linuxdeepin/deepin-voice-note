@@ -538,16 +538,11 @@ QWidget *RightView::getWidgetByPos(const QPoint &pos)
  */
 void RightView::selectText2Clipboard()
 {
-//    QString strSelect = "";
-
-//    m_strSelectText = getSelectText();
     if (m_strSelectText != "") {
-        qInfo() << "    select text:" << m_strSelectText;
         QClipboard *board = QApplication::clipboard();
         if (board) {
             board->clear();
             board->setText(m_strSelectText);
-            qInfo() << "    copy text:"  << board->text();
         }
     }
 }

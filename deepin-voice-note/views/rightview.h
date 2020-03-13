@@ -55,7 +55,6 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-//    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
     void saveNote();
     void adjustVerticalScrollBar(QWidget *widget, int defaultHeight);
 private:
