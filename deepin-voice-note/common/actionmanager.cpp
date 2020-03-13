@@ -33,9 +33,9 @@ DMenu* ActionManager::noteContextMenu()
     return m_noteContextMenu.get();
 }
 
-DMenu* ActionManager::voiceContextMenu()
+DMenu* ActionManager::detialContextMenu()
 {
-    return m_voiceContextMenu.get();
+    return m_detialContextMenu.get();
 }
 
 ActionManager::ActionKind ActionManager::getActionKind(QAction *action)
@@ -101,22 +101,26 @@ void ActionManager::initMenu()
     }
 
     //Voice context menu
-    QStringList voiceMenuTexts;
-    voiceMenuTexts << DApplication::translate("VoiceContextMenu", "Delete")
-                   << DApplication::translate("VoiceContextMenu", "Save as MP3")
-                   << DApplication::translate("VoiceContextMenu", "Voice to Text");
+    QStringList noteDetailMenuTexts;
+    noteDetailMenuTexts << DApplication::translate("NoteDetailContextMenu", "Save as MP3")
+                        << DApplication::translate("NoteDetailContextMenu", "Voice to Text")
+                        << DApplication::translate("NoteDetailContextMenu", "Delete")
+                        << DApplication::translate("NoteDetailContextMenu", "Select all")
+                        << DApplication::translate("NoteDetailContextMenu", "Copy")
+                        << DApplication::translate("NoteDetailContextMenu", "Cut")
+                        << DApplication::translate("NoteDetailContextMenu", "Paste");
 
-    m_voiceContextMenu.reset(new DMenu());
+    m_detialContextMenu.reset(new DMenu());
 
-    int voiceMenuIdStart = ActionKind::VoiceMenuBase;
+    int detailMenuIdStart = ActionKind::NoteDetailMenuBase;
 
-    for (auto it : voiceMenuTexts) {
-        QAction* pAction = new QAction(it, m_voiceContextMenu.get());
-        pAction->setProperty(MenuId, voiceMenuIdStart);
+    for (auto it : noteDetailMenuTexts) {
+        QAction* pAction = new QAction(it, m_detialContextMenu.get());
+        pAction->setProperty(MenuId, detailMenuIdStart);
 
-        m_voiceContextMenu->addAction(pAction);
-        m_actionsMap.insert(static_cast<ActionKind>(voiceMenuIdStart), pAction);
+        m_detialContextMenu->addAction(pAction);
+        m_actionsMap.insert(static_cast<ActionKind>(detailMenuIdStart), pAction);
 
-        voiceMenuIdStart++;
+        detailMenuIdStart++;
     }
 }

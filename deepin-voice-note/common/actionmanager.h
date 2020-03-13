@@ -32,11 +32,15 @@ public:
         NoteSaveVoice,
         NoteAddNew,
 
-        //Voice
-        VoiceMenuBase,
-        VoiceDelete = VoiceMenuBase,
-        VoiceSave,
-        VoiceConversion,
+        //NoteDetail
+        NoteDetailMenuBase,
+        DetailVoiceSave = NoteDetailMenuBase,
+        DetailVoice2Text,
+        DetailDelete,
+        DetailSelectAll,
+        DetailCopy,
+        DetailCut,
+        DetailPaste,
     };
 
     Q_ENUM(ActionKind)
@@ -44,7 +48,7 @@ public:
 
     DMenu* notebookContextMenu();
     DMenu* noteContextMenu();
-    DMenu* voiceContextMenu();
+    DMenu* detialContextMenu();
     ActionKind getActionKind(QAction *action);
     QAction* getActionById(ActionKind id);
 protected:
@@ -55,7 +59,7 @@ protected:
 
     QScopedPointer<DMenu>  m_notebookContextMenu;
     QScopedPointer<DMenu>  m_noteContextMenu;
-    QScopedPointer<DMenu>  m_voiceContextMenu;
+    QScopedPointer<DMenu>  m_detialContextMenu;
 
     QMap<ActionKind, QAction*> m_actionsMap;
 };

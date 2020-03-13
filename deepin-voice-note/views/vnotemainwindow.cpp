@@ -182,9 +182,9 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onMenuAbout2Show);
     connect(ActionManager::Instance()->noteContextMenu(), &DMenu::triggered,
             this, &VNoteMainWindow::onMenuAction);
-    connect(ActionManager::Instance()->voiceContextMenu(), &DMenu::aboutToShow,
+    connect(ActionManager::Instance()->detialContextMenu(), &DMenu::aboutToShow,
             this, &VNoteMainWindow::onMenuAbout2Show);
-    connect(ActionManager::Instance()->voiceContextMenu(), &DMenu::triggered,
+    connect(ActionManager::Instance()->detialContextMenu(), &DMenu::triggered,
             this, &VNoteMainWindow::onMenuAction);
 
 }
@@ -696,7 +696,7 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::NoteRename:
         editNote();
         break;
-    case ActionManager::VoiceDelete: {
+    case ActionManager::DetailDelete: {
         VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
         connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
             delVoice();
@@ -704,7 +704,7 @@ void VNoteMainWindow::onMenuAction(QAction *action)
 
         confirmDialog.exec();
     } break;
-    case ActionManager::VoiceConversion:
+    case ActionManager::DetailVoice2Text:
         onA2TStart();
         break;
     default:
@@ -742,9 +742,9 @@ void VNoteMainWindow::onMenuAbout2Show()
         }
     } else if (menu == ActionManager::Instance()->notebookContextMenu()) {
         qDebug() << "notebookContextMenu";
-    } else if (menu == ActionManager::Instance()->voiceContextMenu()) {
-        QAction *asrAction = ActionManager::Instance()->getActionById(ActionManager::VoiceConversion);
-        QAction *delAction = ActionManager::Instance()->getActionById(ActionManager::VoiceDelete);
+    } else if (menu == ActionManager::Instance()->detialContextMenu()) {
+        QAction *asrAction = ActionManager::Instance()->getActionById(ActionManager::DetailVoice2Text);
+        QAction *delAction = ActionManager::Instance()->getActionById(ActionManager::DetailDelete);
         VoiceNoteItem *item = m_rightView->getMenuVoiceItem();
         bool textEmpyt = item->getNoteBlock()->blockText.isEmpty();
         if (!textEmpyt || m_isAsrVoiceing) {

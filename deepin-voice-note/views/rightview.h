@@ -69,7 +69,7 @@ private:
     DWidget     *m_placeholderWidget {nullptr};
     QVBoxLayout *m_viewportLayout {nullptr};
     //Voice control context menu
-    DMenu       *m_voiceContextMenu {nullptr};
+    DMenu       *m_noteDetailContextMenu {nullptr};
     DDialog     *m_fileHasDelDialog {nullptr};
     bool         m_fIsNoteModified {false};
     QString m_strSelectText{""};//当前选择的文本内容

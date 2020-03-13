@@ -61,7 +61,7 @@ void RightView::initUi()
 void RightView::initMenu()
 {
     //Init voice context Menu
-    m_voiceContextMenu = ActionManager::Instance()->voiceContextMenu();
+    m_noteDetailContextMenu = ActionManager::Instance()->detialContextMenu();
 }
 
 QWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus)
@@ -313,7 +313,7 @@ void RightView::onVoiceMenuShow()
         delWidget(m_menuVoice);
         return;
     }
-    m_voiceContextMenu->exec(QCursor::pos());
+    m_noteDetailContextMenu->exec(QCursor::pos());
 }
 
 /**
