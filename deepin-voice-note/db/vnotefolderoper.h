@@ -37,6 +37,7 @@ protected:
 
     enum {
         folder_id = 0,
+        category_id,
         folder_name,
         default_icon,
         icon_path,

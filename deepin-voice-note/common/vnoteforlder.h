@@ -24,6 +24,7 @@ public:
     };
 
     qint64  id {INVALID_ID};
+    qint32  category {0};
     qint64  notesCount {0};
     qint32  defaultIcon {0};
     qint32  folder_state {State::Normal};

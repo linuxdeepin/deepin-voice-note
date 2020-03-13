@@ -15,6 +15,7 @@
 
 const QStringList VNoteFolderOper::folderColumnsName = {
     "folder_id",
+    "category_id",
     "folder_name",
     "default_icon",
     "icon_path",

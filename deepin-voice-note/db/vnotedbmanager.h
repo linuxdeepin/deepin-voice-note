@@ -27,6 +27,7 @@ public:
     static constexpr char const *CREATETABLE_FMT = "\
          CREATE TABLE IF NOT EXISTS vnote_folder_tbl(\
             folder_id INTEGER PRIMARY KEY AUTOINCREMENT , \
+            category_id INT DEFAULT 0, \
             folder_name TEXT NOT NULL, \
             default_icon INT DEFAULT 0, \
             icon_path TEXT,\
@@ -58,7 +59,24 @@ public:
             expand_filed4 TEXT, \
             expand_filed5 TEXT, \
             expand_filed6 TEXT \
-         );";
+         ); \
+         CREATE TABLE IF NOT EXISTS vnote_category_tbl(\
+            id        INT DEFAULT 0, \
+            name      TEXT NOT NULL, \
+            icon      INT DEFAULT 0, \
+            state     INT DEFAULT 0, \
+            max_id    INT DEFAULT 0, \
+            meta_data TEXT, \
+            create_time DATETIME NOT NULL DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f','now','localtime')), \
+            modify_time DATETEXT NOT NULL DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f','now','localtime')), \
+            delete_time DATETEXT DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f','now','localtime')), \
+            expand_filed1 INT, \
+            expand_filed2 INT, \
+            expand_filed3 INT, \
+            expand_filed4 TEXT, \
+            expand_filed5 TEXT, \
+            expand_filed6 TEXT \
+      );";
 
     enum DB_TABLE {
         VNOTE_FOLDER_TBL,

@@ -44,6 +44,7 @@ bool FolderQryDbVisitor::visitorData()
             VNoteFolder* folder = new VNoteFolder();
 
             folder->id          = m_sqlQuery->value(VNoteFolderOper::folder_id).toInt();
+            folder->category    = m_sqlQuery->value(VNoteFolderOper::category_id).toInt();
             folder->name        = m_sqlQuery->value(VNoteFolderOper::folder_name).toString();
             folder->defaultIcon = m_sqlQuery->value(VNoteFolderOper::default_icon).toInt();
             folder->iconPath    = m_sqlQuery->value(VNoteFolderOper::icon_path).toString();
@@ -179,6 +180,7 @@ bool AddFolderDbVisitor::visitorData()
 
         while(m_sqlQuery->next()) {
             results.newFolder->id          = m_sqlQuery->value(VNoteFolderOper::folder_id).toInt();
+            results.newFolder->category    = m_sqlQuery->value(VNoteFolderOper::category_id).toInt();
             results.newFolder->name        = m_sqlQuery->value(VNoteFolderOper::folder_name).toString();
             results.newFolder->defaultIcon = m_sqlQuery->value(VNoteFolderOper::default_icon).toInt();
             results.newFolder->iconPath    = m_sqlQuery->value(VNoteFolderOper::icon_path).toString();
