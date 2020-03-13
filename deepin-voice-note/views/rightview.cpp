@@ -316,6 +316,70 @@ void RightView::onVoiceMenuShow()
     m_voiceContextMenu->exec(QCursor::pos());
 }
 
+/**
+ * @brief RightView::onDltSelectContant
+ * 删除选择的文本内容及textEdit控件
+ */
+void RightView::onDltSelectContant()
+{
+    if (m_selectTextItem.count() > 0) {
+        foreach (auto textedit, m_selectTextItem) {
+            if (textedit) {
+                QTextCursor cursor = textedit->textCursor();
+                if (cursor.hasSelection()) {
+                    cursor.removeSelectedText();
+                    cursor.clearSelection();
+                    if (textedit->toPlainText() == "") {
+                        textedit->deleteLater();
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @brief RightView::onPaste
+ * 粘贴文本内容到editItem中
+ */
+void RightView::onPaste()
+{
+    if (m_curItemWidget) {
+        if (m_curItemWidget->objectName() == TextEditWidget) {
+            auto editItem = static_cast<TextNoteEdit *>(m_curItemWidget);
+            auto textCursor = editItem->textCursor();
+            QClipboard *board = QApplication::clipboard();
+            if (board) {
+                QString clipBoardText = board->text();
+                textCursor.insertText(clipBoardText);
+            }
+        }
+    }
+}
+
+/**
+ * @brief RightView::onCut
+ * 剪切选择内容
+ */
+void RightView::onCut()
+{
+    m_strSelectText = "";
+    m_strSelectText = getSelectText();
+    selectText2Clipboard();
+    onDltSelectContant();
+}
+
+/**
+ * @brief RightView::onSelectAll
+ * 全选文本内容
+ */
+void RightView::onSelectAll()
+{
+    m_strSelectText = "";
+    m_selectTextItem.clear();
+    selectAllItem();
+}
+
 void RightView::delWidget(DWidget *widget)
 {
     if (widget == nullptr) {
@@ -445,6 +509,7 @@ void RightView::mousePressEvent(QMouseEvent *event)
         qDebug() << getSelectText();
     } else if (btn == Qt::LeftButton) {
         clearAllSelection();
+        m_strSelectText = "";
         m_curItemWidget = getWidgetByPos(event->pos());
     }
 }
@@ -452,6 +517,8 @@ void RightView::mousePressEvent(QMouseEvent *event)
 void RightView::mouseReleaseEvent(QMouseEvent *event)
 {
     DWidget::mouseReleaseEvent(event);
+
+    m_strSelectText = getSelectText();
 }
 
 QWidget *RightView::getWidgetByPos(const QPoint &pos)
@@ -471,15 +538,15 @@ QWidget *RightView::getWidgetByPos(const QPoint &pos)
  */
 void RightView::selectText2Clipboard()
 {
-    QString strSelect = "";
+//    QString strSelect = "";
 
-    strSelect = getSelectText();
-    if (strSelect != "") {
-        qInfo() << "    select text:" << strSelect;
+//    m_strSelectText = getSelectText();
+    if (m_strSelectText != "") {
+        qInfo() << "    select text:" << m_strSelectText;
         QClipboard *board = QApplication::clipboard();
         if (board) {
             board->clear();
-            board->setText(strSelect);
+            board->setText(m_strSelectText);
             qInfo() << "    copy text:"  << board->text();
         }
     }
@@ -567,6 +634,7 @@ QString RightView::getSelectText()
             textCursor = editItem->textCursor();
             if (textCursor.hasSelection()) {
                 text.append(textCursor.selectedText());
+                m_selectTextItem.append(editItem);
             }
         } else if (widget->objectName() == VoiceWidget) {
             VoiceNoteItem *voiceItem = static_cast<VoiceNoteItem *>(widget);
@@ -575,6 +643,7 @@ QString RightView::getSelectText()
                 textCursor = asrTextEdit->textCursor();
                 if (textCursor.hasSelection()) {
                     text.append(textCursor.selectedText());
+                    m_selectTextItem.append(asrTextEdit);
                 }
             }
         }
@@ -589,11 +658,15 @@ void RightView::selectAllItem()
         if (widget->objectName() == TextEditWidget) {
             TextNoteEdit *editItem = static_cast<TextNoteEdit *>(widget);
             editItem->selectAll();
+            m_strSelectText += editItem->toPlainText();
+            m_selectTextItem.append(editItem);
         } else if (widget->objectName() == VoiceWidget) {
             VoiceNoteItem *voiceItem = static_cast<VoiceNoteItem *>(widget);
             if (!voiceItem->getNoteBlock()->blockText.isEmpty()) {
                 TextNoteEdit *asrTextEdit = voiceItem->getAsrTextEdit();
                 asrTextEdit->selectAll();
+                m_strSelectText += asrTextEdit->toPlainText();
+                m_selectTextItem.append(asrTextEdit);
             }
         }
     }

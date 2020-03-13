@@ -144,6 +144,8 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onRightViewVoicePause);
     connect(m_rightView, &RightView::sigCursorChange,
             this, &VNoteMainWindow::onCursorChange);
+    connect(this, &VNoteMainWindow::sigDltSelectContant,
+            m_rightView, &RightView::onDltSelectContant);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::addNotepad);
@@ -618,7 +620,10 @@ void VNoteMainWindow::keyPressEvent(QKeyEvent *event)
             m_rightView->selectText2Clipboard();
         }
     }
-    event->ignore();
+    if (event->key() == Qt::Key_Backspace) {
+        qDebug() << "           DetailWidget::keyPressEvent    Qt::Key_Backspace      1111111111111";
+        emit sigDltSelectContant();
+    }
 }
 
 bool VNoteMainWindow::checkIfNeedExit()

@@ -46,6 +46,10 @@ public slots:
     void onVoicePlay(VoiceNoteItem *item);
     void onVoicePause(VoiceNoteItem *item);
     void onVoiceMenuShow();
+    void onDltSelectContant();
+    void onPaste();
+    void onCut();
+    void onSelectAll();
 protected:
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -69,7 +73,7 @@ private:
     DMenu       *m_voiceContextMenu {nullptr};
     DDialog     *m_fileHasDelDialog {nullptr};
     bool         m_fIsNoteModified {false};
-//    QString m_strSelectText{""};//当前选择的文本内容
+    QString m_strSelectText{""};//当前选择的文本内容
     QList<TextNoteEdit *> m_selectTextItem{nullptr};  //当前选中的包含的textItem
 };
 
