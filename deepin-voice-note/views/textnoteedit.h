@@ -3,9 +3,13 @@
 
 #include<DTextEdit>
 
+//#include "./controller/textnoteeditprivate.h"
+
 DWIDGET_USE_NAMESPACE
 struct VNoteItem;
 struct VNTextBlock;
+
+class TextNoteEditPrivate;
 
 class TextNoteEdit : public DTextEdit
 {
@@ -34,6 +38,10 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
+
+protected:
+    TextNoteEditPrivate *d_ptr{nullptr};
+    Q_DECLARE_PRIVATE_D(qGetPtrHelper(d_ptr), TextNoteEdit)
 };
 
 #endif // TEXTEDITITEM_H

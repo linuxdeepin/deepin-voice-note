@@ -45,7 +45,10 @@ SOURCES += \
     views/leftviewdelegate.cpp \
     views/splashview.cpp \
     widgets/vnoteplaywidget.cpp \
-    views/middleviewsortfilter.cpp
+    views/middleviewsortfilter.cpp \
+    views/controller/textnoteeditprivate.cpp \
+    views/controller/voicenoteitemprivate.cpp \
+    views/controller/rightviewprivate.cpp
 
 RESOURCES += \
     images.qrc
@@ -88,7 +91,10 @@ HEADERS += \
     views/leftviewdelegate.h \
     views/splashview.h \
     widgets/vnoteplaywidget.h \
-    views/middleviewsortfilter.h
+    views/middleviewsortfilter.h \
+    views/controller/textnoteeditprivate.h \
+    views/controller/voicenoteitemprivate.h \
+    views/controller/rightviewprivate.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts

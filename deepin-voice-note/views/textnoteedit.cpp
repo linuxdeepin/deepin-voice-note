@@ -3,6 +3,8 @@
 #include <QWheelEvent>
 #include <DFontSizeManager>
 
+#include "controller/textnoteeditprivate.h"
+
 TextNoteEdit::TextNoteEdit(VNoteItem *textNote, VNTextBlock *noteBlock, QWidget *parent)
     : DTextEdit(parent)
     , m_textNode(textNote)
@@ -15,6 +17,10 @@ TextNoteEdit::TextNoteEdit(VNoteItem *textNote, VNTextBlock *noteBlock, QWidget 
     DFontSizeManager::instance()->bind(this, DFontSizeManager::T8);//DTK设置字体大小
     setContextMenuPolicy(Qt::NoContextMenu);
     setMouseTracking(true);
+
+    if (d_ptr == nullptr) {
+        d_ptr = new TextNoteEditPrivate(this);
+    }
 }
 
 void TextNoteEdit::focusInEvent(QFocusEvent *e)
@@ -58,6 +64,7 @@ VNoteItem *TextNoteEdit::getNoteItem()
 {
     return  m_textNode;
 }
+
 VNTextBlock *TextNoteEdit::getNoteBlock()
 {
     return  m_noteBlock;
