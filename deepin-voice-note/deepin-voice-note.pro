@@ -48,7 +48,9 @@ SOURCES += \
     views/middleviewsortfilter.cpp \
     views/controller/textnoteeditprivate.cpp \
     views/controller/voicenoteitemprivate.cpp \
-    views/controller/rightviewprivate.cpp
+    views/controller/rightviewprivate.cpp \
+    dbus/dbusvariant.cpp \
+    dbus/dbuslogin1manager.cpp
 
 RESOURCES += \
     images.qrc
@@ -94,7 +96,9 @@ HEADERS += \
     views/middleviewsortfilter.h \
     views/controller/textnoteeditprivate.h \
     views/controller/voicenoteitemprivate.h \
-    views/controller/rightviewprivate.h
+    views/controller/rightviewprivate.h \
+    dbus/dbuslogin1manager.h \
+    dbus/dbusvariant.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts

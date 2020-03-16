@@ -7,6 +7,7 @@
 #include <QSettings>
 #include <QStandardItem>
 #include <QList>
+#include <QDBusPendingReply>
 
 #include <DMainWindow>
 #include <DSearchEdit>
@@ -32,6 +33,7 @@ class RightView;
 class HomePage;
 class SplashView;
 class VoiceNoteItem;
+class DBusLogin1Manager;
 
 class VNoteMainWindow : public DMainWindow
 {
@@ -71,6 +73,9 @@ protected:
     void initMiddleView();
     void initRightView();
     void initAudioWatcher();
+    void initLogin1Manager();
+    void holdHaltLock();
+    void releaseHaltLock();
 
     void initSpliterView(); //正常主窗口
     void initSplashView();  // Splash animation view
@@ -109,6 +114,8 @@ public slots:
     void onPreviewShortcut();
     void initAsrErrMessage();
     void showAsrErrMessage(const QString &strMessage);
+    //System shutdon
+    void onSystemDown(bool active);
 private:
     //左侧列表视图操作相关
     void addNotepad();
@@ -169,6 +176,9 @@ private:
     VoiceNoteItem    *m_currentAsrVoice {nullptr};
     DFloatingMessage *m_asrErrMeassage {nullptr};
     DPushButton      *m_asrAgainBtn {nullptr};
+    //Login session manager
+    DBusLogin1Manager* m_pLogin1Manager {nullptr};
+    QDBusPendingReply<QDBusUnixFileDescriptor> m_lockFd;
 };
 
 

@@ -20,6 +20,7 @@
 
 #include "db/vnotefolderoper.h"
 #include "db/vnoteitemoper.h"
+#include "dbus/dbuslogin1manager.h"
 
 #include "dialog/vnotemessagedialog.h"
 #include "views/vnoterecordbar.h"
@@ -48,6 +49,8 @@ VNoteMainWindow::VNoteMainWindow(QWidget *parent)
     //Start audio device watch thread
     //& must be called after initUI
     initAudioWatcher();
+    //Init the login manager
+    initLogin1Manager();
 }
 
 VNoteMainWindow::~VNoteMainWindow()
@@ -385,6 +388,38 @@ void VNoteMainWindow::initAudioWatcher()
     });
 }
 
+void VNoteMainWindow::initLogin1Manager()
+{
+    m_pLogin1Manager = new DBusLogin1Manager(
+                "org.freedesktop.login1",
+                "/org/freedesktop/login1",
+                QDBusConnection::systemBus(), this);
+
+    connect(m_pLogin1Manager, &DBusLogin1Manager::PrepareForSleep,
+            this, &VNoteMainWindow::onSystemDown);
+    connect(m_pLogin1Manager, &DBusLogin1Manager::PrepareForShutdown,
+            this, &VNoteMainWindow::onSystemDown);
+}
+
+void VNoteMainWindow::holdHaltLock()
+{
+    m_lockFd = m_pLogin1Manager->Inhibit(
+                "shutdown:sleep",
+                qApp->applicationName(),
+                DApplication::translate("AppMain","Save app data!"),
+                "delay");
+
+    if (m_lockFd.isError()) {
+        qCritical() << "Init login manager error:" << m_lockFd.error();
+    }
+}
+
+void VNoteMainWindow::releaseHaltLock()
+{
+    QDBusPendingReply<QDBusUnixFileDescriptor> releaseLock = m_lockFd;
+    m_lockFd = QDBusPendingReply<QDBusUnixFileDescriptor>();
+}
+
 void VNoteMainWindow::onVNoteFoldersLoaded()
 {
     //If have folders show note view,else show
@@ -460,6 +495,9 @@ void VNoteMainWindow::initEmptyFoldersView()
 void VNoteMainWindow::onStartRecord()
 {
     setSpecialStatus(RecordStart);
+
+    //Hold shutdown locker
+    holdHaltLock();
 }
 
 void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
@@ -473,6 +511,9 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
     if (m_isExit) {
         qApp->quit();
     }
+
+    //Release shutdonw locker
+    releaseHaltLock();
 }
 
 void VNoteMainWindow::onChangeTheme()
@@ -1059,6 +1100,21 @@ void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
     m_asrErrMeassage->setVisible(true);
     m_asrErrMeassage->setFixedWidth(m_rightViewHolder->width());
     m_asrErrMeassage->adjustSize();
+}
+
+void VNoteMainWindow::onSystemDown(bool active)
+{
+    qInfo() << "System going down...";
+
+    if (active) {
+        if (m_isRecording) {
+            m_recordBar->cancelRecord();
+
+            qInfo() << "System going down when recording, cancel it.";
+        }
+
+        releaseHaltLock();
+    }
 }
 
 void VNoteMainWindow::onCursorChange(int height, bool mouseMove)
