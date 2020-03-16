@@ -15,6 +15,7 @@ public:
     virtual ~VNoteAudioDeviceWatcher() override;
 
     void initDeviceWatcher();
+    void initWatcherCofing();
     void exitWatcher();
 
     enum MicrophoneState {
@@ -41,6 +42,8 @@ private:
 
     MicrophoneState m_microphoneState {NotAvailable};
     bool m_quitWatcher {false};
+
+    bool m_fNeedDeviceChecker {true};
 };
 
 #endif // VNOTEAUDIODEVICEWATCHER_H

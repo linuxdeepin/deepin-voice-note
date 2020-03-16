@@ -1,6 +1,8 @@
 #include "vnoteaudiodevicewatcher.h"
 #include "globaldef.h"
 
+#include <QSettings>
+
 #include <DLog>
 
 VNoteAudioDeviceWatcher::VNoteAudioDeviceWatcher(QObject *parent)
@@ -8,6 +10,7 @@ VNoteAudioDeviceWatcher::VNoteAudioDeviceWatcher(QObject *parent)
 {
 //    initDeviceWatcher();
 //    initConnections();
+    initWatcherCofing();
 }
 
 VNoteAudioDeviceWatcher::~VNoteAudioDeviceWatcher()
@@ -33,6 +36,24 @@ void VNoteAudioDeviceWatcher::initDeviceWatcher()
                 );
 
     initAudioMeter();
+}
+
+void VNoteAudioDeviceWatcher::initWatcherCofing()
+{
+    QString watcherConfigFilePath = QString("/etc/")
+            + QString(DEEPIN_VOICE_NOTE)+QString("/")
+            + QString(DEEPIN_VOICE_NOTE)+QString(".conf");
+
+    QFileInfo watcherConfig(watcherConfigFilePath);
+
+    if (watcherConfig.exists()) {
+        QSettings  watcherSettings(watcherConfigFilePath, QSettings::Format::IniFormat);
+
+        //Default need device watcher
+        m_fNeedDeviceChecker = watcherSettings.value("Audio/CheckInputDevice", true).toBool();
+
+        qInfo() << "Device watcher config: CheckInputDevice->" << m_fNeedDeviceChecker;
+    }
 }
 
 void VNoteAudioDeviceWatcher::exitWatcher()
@@ -104,7 +125,11 @@ void VNoteAudioDeviceWatcher::run()
                         meterPath.path(),
                         QDBusConnection::sessionBus() );
 
-            volume = /*defaultSourceMeter.volume()*/ 0.1;
+            if (m_fNeedDeviceChecker) {
+                volume = defaultSourceMeter.volume();
+            } else {
+                volume = 0.1;
+            }
 
             if (volume > DBL_EPSILON) {
 
