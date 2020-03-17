@@ -43,6 +43,8 @@ QStandardItem *LeftView::getNotepadRoot()
 
 void LeftView::mousePressEvent(QMouseEvent *event)
 {
+    this->setFocus();
+
     if (m_isEnable) {
         DTreeView::mouseMoveEvent(event);
         if (event->button() == Qt::RightButton) {

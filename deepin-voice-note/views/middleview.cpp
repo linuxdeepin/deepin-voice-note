@@ -87,7 +87,7 @@ VNoteItem *MiddleView::deleteCurrentRow()
                 StandardItemCommon::getStandardItemData(index)
                 );
 
-    m_pDataModel->removeRow(index.row());
+    m_pSortViewFilter->removeRow(index.row());
 
     return noteData;
 }
@@ -114,6 +114,8 @@ void MiddleView::editNote()
 
 void MiddleView::mousePressEvent(QMouseEvent *event)
 {
+    this->setFocus();
+
     if (!m_onlyCurItemMenuEnable) {
         DListView::mouseMoveEvent(event);
     }

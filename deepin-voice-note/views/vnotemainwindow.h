@@ -171,7 +171,29 @@ private:
     //App setting
     QSharedPointer<QSettings> m_qspSetting {nullptr};
     //Shortcuts key
+    //*****************Shortcut key begin*********************
+    QScopedPointer<QShortcut> m_stNewNotebook;   //Ctrl+N
+    QScopedPointer<QShortcut> m_stRemNotebook;   //F2
+
+    QScopedPointer<QShortcut> m_stNewNote;       //Ctrl+B
+    QScopedPointer<QShortcut> m_stRemNote;       //F3
+
+    QScopedPointer<QShortcut> m_stPlayorPause;   //Space
+    QScopedPointer<QShortcut> m_stRecording;     //Ctrl+R
+    QScopedPointer<QShortcut> m_stVoice2Text;    //Ctrl+W
+    QScopedPointer<QShortcut> m_stSaveAsMp3;     //Ctrl+P
+    QScopedPointer<QShortcut> m_stSaveAsText;    //Ctrl+S
+    QScopedPointer<QShortcut> m_stSaveVoices;    //Ctrl+Y
+    QScopedPointer<QShortcut> m_stSelectAll; //Ctrl+A
+    QScopedPointer<QShortcut> m_stCopy;      //Ctrl+C
+    QScopedPointer<QShortcut> m_stCut;       //Ctrl+X
+    QScopedPointer<QShortcut> m_stPaste;     //Ctrl+V
+    QScopedPointer<QShortcut> m_stDelete;    //Delete
+
     QScopedPointer<QShortcut> m_stPreviewShortcuts;
+    //     Help                               //F1 DTK Implementaion
+    //*****************Shortcut keys end**********************
+
     QRegExp          m_searchKey;
     VoiceNoteItem    *m_currentAsrVoice {nullptr};
     DFloatingMessage *m_asrErrMeassage {nullptr};

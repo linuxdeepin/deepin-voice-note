@@ -194,6 +194,192 @@ void VNoteMainWindow::initConnections()
 
 void VNoteMainWindow::initShortcuts()
 {
+    //*******************LeftView Shortcuts****************************
+    //Add notebook
+    m_stNewNotebook.reset(new QShortcut(this));
+    m_stNewNotebook->setKey(Qt::CTRL + Qt::Key_N);
+    m_stNewNotebook->setContext(Qt::ApplicationShortcut);
+    m_stNewNotebook->setAutoRepeat(false);
+
+    connect(m_stNewNotebook.get(), &QShortcut::activated, this, [this]{
+        addNotepad();
+    });
+
+    //Rename notebook
+    m_stRemNotebook.reset(new QShortcut(this));
+    m_stRemNotebook->setKey(Qt::Key_F2);
+    m_stRemNotebook->setContext(Qt::ApplicationShortcut);
+    m_stRemNotebook->setAutoRepeat(false);
+
+    connect(m_stRemNotebook.get(), &QShortcut::activated, this, [this]{
+        editNotepad();
+    });
+
+    //*******************MiddleView Shortcuts***************************
+    //Add note
+    m_stNewNote.reset(new QShortcut(this));
+    m_stNewNote->setKey(Qt::CTRL + Qt::Key_B);
+    m_stNewNote->setContext(Qt::ApplicationShortcut);
+    m_stNewNote->setAutoRepeat(false);
+
+    connect(m_stNewNote.get(), &QShortcut::activated, this, [this]{
+        addNote();
+    });
+
+    //Rename note
+    m_stRemNote.reset(new QShortcut(this));
+    m_stRemNote->setKey(Qt::Key_F3);
+    m_stRemNote->setContext(Qt::ApplicationShortcut);
+    m_stRemNote->setAutoRepeat(false);
+
+    connect(m_stRemNote.get(), &QShortcut::activated, this, [this]{
+        editNote();
+    });
+
+    //*******************RightView Shortcuts*****************************
+    //Play/Pause
+    m_stPlayorPause.reset(new QShortcut(this));
+    m_stPlayorPause->setKey(Qt::Key_Space);
+    m_stPlayorPause->setContext(Qt::ApplicationShortcut);
+    m_stPlayorPause->setAutoRepeat(false);
+
+    connect(m_stPlayorPause.get(), &QShortcut::activated, this, [this]{
+        if (!m_isPlaying) {
+        }
+    });
+
+    //Add new recording
+    m_stRecording.reset(new QShortcut(this));
+    m_stRecording->setKey(Qt::CTRL + Qt::Key_R);
+    m_stRecording->setContext(Qt::ApplicationShortcut);
+    m_stRecording->setAutoRepeat(false);
+
+    connect(m_stRecording.get(), &QShortcut::activated, this, [this]{
+        if (!m_isRecording) {
+            m_recordBar->onStartRecord();
+        }
+    });
+
+    //Voice to Text
+    m_stVoice2Text.reset(new QShortcut(this));
+    m_stVoice2Text->setKey(Qt::CTRL + Qt::Key_W);
+    m_stVoice2Text->setContext(Qt::ApplicationShortcut);
+    m_stVoice2Text->setAutoRepeat(false);
+
+    connect(m_stVoice2Text.get(), &QShortcut::activated, this, [this]{
+        //Call method in rightview
+        this->onA2TStart();
+    });
+
+    //Save as Mp3
+    m_stSaveAsMp3.reset(new QShortcut(this));
+    m_stSaveAsMp3->setKey(Qt::CTRL + Qt::Key_P);
+    m_stSaveAsMp3->setContext(Qt::ApplicationShortcut);
+    m_stSaveAsMp3->setAutoRepeat(false);
+
+    connect(m_stSaveAsMp3.get(), &QShortcut::activated, this, [this]{
+        //Call method in rightview
+        Q_UNUSED(this);
+    });
+
+    //Save as Text
+    m_stSaveAsText.reset(new QShortcut(this));
+    m_stSaveAsText->setKey(Qt::CTRL + Qt::Key_S);
+    m_stSaveAsText->setContext(Qt::ApplicationShortcut);
+    m_stSaveAsText->setAutoRepeat(false);
+
+    connect(m_stSaveAsText.get(), &QShortcut::activated, this, [this]{
+        //Call method in rightview
+        Q_UNUSED(this);
+    });
+
+    //Save recordings
+    m_stSaveVoices.reset(new QShortcut(this));
+    m_stSaveVoices->setKey(Qt::CTRL + Qt::Key_Y);
+    m_stSaveVoices->setContext(Qt::ApplicationShortcut);
+    m_stSaveVoices->setAutoRepeat(false);
+
+    connect(m_stSaveVoices.get(), &QShortcut::activated, this, [this]{
+        //Call method in rightview
+        Q_UNUSED(this);
+    });
+
+    //Select All
+    m_stSelectAll.reset(new QShortcut(this));
+    m_stSelectAll->setKey(Qt::CTRL + Qt::Key_A);
+    m_stSelectAll->setContext(Qt::ApplicationShortcut);
+    m_stSelectAll->setAutoRepeat(false);
+
+    connect(m_stSelectAll.get(), &QShortcut::activated, this, [this]{
+        //Call method in rightview
+        m_rightView->selectAllItem();
+    });
+
+    //Copy
+    m_stCopy.reset(new QShortcut(this));
+    m_stCopy->setKey(Qt::CTRL + Qt::Key_C);
+    m_stCopy->setContext(Qt::ApplicationShortcut);
+    m_stCopy->setAutoRepeat(false);
+
+    connect(m_stCopy.get(), &QShortcut::activated, this, [this]{
+        //Call method in rightview
+        m_rightView->copySelectText();
+    });
+
+    //Cut
+    m_stCut.reset(new QShortcut(this));
+    m_stCut->setKey(Qt::CTRL + Qt::Key_X);
+    m_stCut->setContext(Qt::ApplicationShortcut);
+    m_stCut->setAutoRepeat(false);
+
+    connect(m_stCut.get(), &QShortcut::activated, this, [this]{
+        //Call method in rightview
+        m_rightView->cutSelectText();
+    });
+
+    //Paste
+    m_stPaste.reset(new QShortcut(this));
+    m_stPaste->setKey(Qt::CTRL + Qt::Key_V);
+    m_stPaste->setContext(Qt::ApplicationShortcut);
+    m_stPaste->setAutoRepeat(false);
+
+    connect(m_stPaste.get(), &QShortcut::activated, this, [this]{
+        //Call method in rightview
+        m_rightView->pasteText();
+    });
+
+    //Notebook/Note/Detial delete key
+    m_stDelete.reset(new QShortcut(this));
+    m_stDelete->setKey(tr("Delete"));
+    m_stDelete->setContext(Qt::ApplicationShortcut);
+    m_stDelete->setAutoRepeat(false);
+
+    connect(m_stDelete.get(), &QShortcut::activated, this, [this]{
+        QAction *deleteAct = nullptr;
+
+        /*
+         * TODO:
+         *     We check focus here to choice what action we will
+         * take. Focus in leftview for delete notebook, in midlle
+         * view for delete note, in Rightview for delete note content.
+         * or do nothing.
+         * */
+        if (m_leftView->hasFocus()) {
+            deleteAct = ActionManager::Instance()->getActionById(
+                        ActionManager::NotebookDelete);
+        } else if (m_middleView->hasFocus()) {
+            deleteAct = ActionManager::Instance()->getActionById(
+                        ActionManager::NoteDelete);
+        } else if (m_rightView->hasFocus()) {
+
+        }
+
+        //Triggle action if necessary
+        if (nullptr != deleteAct) {
+            deleteAct->triggered();
+        }
+    });
+
     m_stPreviewShortcuts.reset(new QShortcut(this));
     m_stPreviewShortcuts->setKey(QString("Ctrl+Shift+/"));
     m_stPreviewShortcuts->setContext(Qt::ApplicationShortcut);
@@ -593,36 +779,102 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonObject shortcutObj;
     QJsonArray jsonGroups;
 
-    QMap<QString, QString> shortcutKeymap = {
-        {DApplication::translate("Shortcuts", "Help"),                 "F1"},
-//        {"Close window",         "Alt+F4"},
-        {DApplication::translate("Shortcuts", "Display shortcuts"),    "Ctrl+Shift+?"},
+    //******************************Notebooks**************************************************
+    QMap<QString, QString> shortcutNotebookKeymap = {
+        //Notebook
         {DApplication::translate("Shortcuts", "New notebook"),         "Ctrl+N"},
-        {DApplication::translate("Shortcuts", "Delete notebook/note"), "Delete"},
-//        {"Resize window",        "Ctrl+Alt+F"},
-//        {"Find",                 "Ctrl+F"},
         {DApplication::translate("Shortcuts", "Rename notebook"),      "F2"},
+        {DApplication::translate("Shortcuts", "Delete notebook"),      "Delete"},
+    };
+
+    QJsonObject notebookJsonGroup;
+    notebookJsonGroup.insert("groupName", DApplication::translate("ShortcutsGroups", "Notebooks"));
+    QJsonArray notebookJsonItems;
+
+    for (QMap<QString, QString>::iterator it = shortcutNotebookKeymap.begin();
+            it != shortcutNotebookKeymap.end(); it++) {
+        QJsonObject jsonItem;
+        jsonItem.insert("name",  it.key());
+        jsonItem.insert("value", it.value().replace("Meta", "Super"));
+        notebookJsonItems.append(jsonItem);
+    }
+
+    notebookJsonGroup.insert("groupItems", notebookJsonItems);
+    jsonGroups.append(notebookJsonGroup);
+
+    //******************************Notes**************************************************
+
+    QMap<QString, QString> shortcutNoteKeymap = {
+        //Note
+        {DApplication::translate("Shortcuts", "New note"),             "Ctrl+M"},
+        {DApplication::translate("Shortcuts", "Rename note"),          "F3"},
+        {DApplication::translate("Shortcuts", "Delete note"),          "Delete"},
+    };
+
+    QJsonObject noteJsonGroup;
+    noteJsonGroup.insert("groupName", DApplication::translate("ShortcutsGroups", "Notes"));
+    QJsonArray noteJsonItems;
+
+    for (QMap<QString, QString>::iterator it = shortcutNoteKeymap.begin();
+            it != shortcutNoteKeymap.end(); it++) {
+        QJsonObject jsonItem;
+        jsonItem.insert("name",  it.key());
+        jsonItem.insert("value", it.value().replace("Meta", "Super"));
+        noteJsonItems.append(jsonItem);
+    }
+
+    noteJsonGroup.insert("groupItems", noteJsonItems);
+    jsonGroups.append(noteJsonGroup);
+    //******************************Edit***************************************************
+    QMap<QString, QString> shortcutEditKeymap = {
+        //Edit
+        {DApplication::translate("Shortcuts", "Record voice"),         "Ctrl+R"},
         {DApplication::translate("Shortcuts", "Play/Pause"),           "Space"},
         {DApplication::translate("Shortcuts", "Select all"),           "Ctrl+A"},
         {DApplication::translate("Shortcuts", "Copy"),                 "Ctrl+C"},
         {DApplication::translate("Shortcuts", "Cut"),                  "Ctrl+X"},
         {DApplication::translate("Shortcuts", "Paste"),                "Ctrl+V"},
+        {DApplication::translate("Shortcuts", "Delete"),               "Delete"},
     };
 
-    QJsonObject fontMgrJsonGroup;
-    fontMgrJsonGroup.insert("groupName", DApplication::translate("AppMain", "Voice Notes"));
-    QJsonArray fontJsonItems;
+    QJsonObject editJsonGroup;
+    editJsonGroup.insert("groupName", DApplication::translate("ShortcutsGroups", "Edit"));
+    QJsonArray editJsonItems;
 
-    for (QMap<QString, QString>::iterator it = shortcutKeymap.begin();
-            it != shortcutKeymap.end(); it++) {
+    for (QMap<QString, QString>::iterator it = shortcutEditKeymap.begin();
+         it != shortcutEditKeymap.end(); it++) {
         QJsonObject jsonItem;
         jsonItem.insert("name",  it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
-        fontJsonItems.append(jsonItem);
+        editJsonItems.append(jsonItem);
     }
 
-    fontMgrJsonGroup.insert("groupItems", fontJsonItems);
-    jsonGroups.append(fontMgrJsonGroup);
+    editJsonGroup.insert("groupItems", editJsonItems);
+    jsonGroups.append(editJsonGroup);
+    //******************************Setting************************************************
+    QMap<QString, QString> shortcutSettingKeymap = {
+        //Setting
+//        {DApplication::translate("Shortcuts","Close window"),         "Alt+F4"},
+//        {DApplication::translate("Shortcuts","Resize window"),        "Ctrl+Alt+F"},
+//        {DApplication::translate("Shortcuts","Find"),                 "Ctrl+F"},
+        {DApplication::translate("Shortcuts", "Help"),                 "F1"},
+        {DApplication::translate("Shortcuts", "Display shortcuts"),    "Ctrl+Shift+?"},
+    };
+
+    QJsonObject settingJsonGroup;
+    settingJsonGroup.insert("groupName", DApplication::translate("ShortcutsGroups", "Settings"));
+    QJsonArray settingJsonItems;
+
+    for (QMap<QString, QString>::iterator it = shortcutSettingKeymap.begin();
+         it != shortcutSettingKeymap.end(); it++) {
+        QJsonObject jsonItem;
+        jsonItem.insert("name",  it.key());
+        jsonItem.insert("value", it.value().replace("Meta", "Super"));
+        settingJsonItems.append(jsonItem);
+    }
+
+    settingJsonGroup.insert("groupItems", settingJsonItems);
+    jsonGroups.append(settingJsonGroup);
 
     shortcutObj.insert("shortcut", jsonGroups);
 
