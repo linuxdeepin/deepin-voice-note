@@ -577,9 +577,9 @@ void VNoteMainWindow::initAudioWatcher()
 void VNoteMainWindow::initLogin1Manager()
 {
     m_pLogin1Manager = new DBusLogin1Manager(
-                "org.freedesktop.login1",
-                "/org/freedesktop/login1",
-                QDBusConnection::systemBus(), this);
+        "org.freedesktop.login1",
+        "/org/freedesktop/login1",
+        QDBusConnection::systemBus(), this);
 
     connect(m_pLogin1Manager, &DBusLogin1Manager::PrepareForSleep,
             this, &VNoteMainWindow::onSystemDown);
@@ -590,10 +590,10 @@ void VNoteMainWindow::initLogin1Manager()
 void VNoteMainWindow::holdHaltLock()
 {
     m_lockFd = m_pLogin1Manager->Inhibit(
-                "shutdown:sleep",
-                qApp->applicationName(),
-                DApplication::translate("AppMain","Save app data!"),
-                "delay");
+                   "shutdown:sleep",
+                   qApp->applicationName(),
+                   DApplication::translate("AppMain", "Save app data!"),
+                   "delay");
 
     if (m_lockFd.isError()) {
         qCritical() << "Init login manager error:" << m_lockFd.error();
@@ -637,7 +637,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
     Q_UNUSED(previous);
     m_asrErrMeassage->setVisible(false);
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
-    if(!loadNotes(data)){
+    if (!loadNotes(data)) {
         m_rightView->initData(nullptr, m_searchKey);
     }
 }
@@ -713,9 +713,9 @@ void VNoteMainWindow::onA2TStart()
 {
     m_asrErrMeassage->setVisible(false);
     DetailItemWidget *widget = m_rightView->getMenuItem();
-    if(widget && widget->getNoteBlock()->blockType == VNoteBlock::Voice){
-         m_currentAsrVoice = static_cast<VoiceNoteItem *>(widget);
-    }else {
+    if (widget && widget->getNoteBlock()->blockType == VNoteBlock::Voice) {
+        m_currentAsrVoice = static_cast<VoiceNoteItem *>(widget);
+    } else {
         return;
     }
 
@@ -913,7 +913,7 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
 
 void VNoteMainWindow::keyPressEvent(QKeyEvent *event)
 {
-    DMainWindow::keyPressEvent(event);
+   DMainWindow::keyPressEvent(event);
 }
 
 bool VNoteMainWindow::checkIfNeedExit()
@@ -949,6 +949,7 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
     m_asrErrMeassage->setVisible(false);
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
+    qDebug() << m_leftView->hasFocus() << m_rightView->hasFocus();
     m_rightView->initData(data, m_searchKey);
     if (!m_searchKey.isEmpty() && m_noteSearchEdit->isEnabled()) {
         m_noteSearchEdit->lineEdit()->setFocus();
@@ -1049,7 +1050,7 @@ void VNoteMainWindow::onMenuAbout2Show()
         QAction *delAction = ActionManager::Instance()->getActionById(ActionManager::DetailDelete);
         QAction *cutAction = ActionManager::Instance()->getActionById(ActionManager::DetailCut);
         DetailItemWidget *item = m_rightView->getMenuItem();
-        if(item != nullptr){
+        if (item != nullptr) {
             bool textEmpyt = item->getNoteBlock()->blockText.isEmpty();
             if (!textEmpyt || m_isAsrVoiceing) {
                 asrAction->setEnabled(false);
@@ -1057,8 +1058,23 @@ void VNoteMainWindow::onMenuAbout2Show()
                 asrAction->setEnabled(true);
             }
             if (m_isAsrVoiceing || m_isPlaying) {
-                delAction->setEnabled(false);
-                cutAction->setEnabled(false);
+                bool enable = true;
+                if (m_isAsrVoiceing && m_currentAsrVoice) {
+                    if (item == m_currentAsrVoice || m_currentAsrVoice->hasSelection()) {
+                        enable = false;
+                    }
+                }
+                if (m_isPlaying) {
+                    VNoteBlock *block = m_recordBar->getVoiceData();
+                    VoiceNoteItem *voiceItem = m_rightView->getVoiceItem(block);
+                    if (voiceItem) {
+                        if (voiceItem == item || voiceItem->hasSelection()) {
+                            enable = false;
+                        }
+                    }
+                }
+                delAction->setEnabled(enable);
+                cutAction->setEnabled(enable);
             } else {
                 delAction->setEnabled(true);
                 cutAction->setEnabled(true);

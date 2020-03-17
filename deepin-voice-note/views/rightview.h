@@ -3,6 +3,7 @@
 
 #include <QVBoxLayout>
 #include <QList>
+#include <QShortcut>
 
 #include <DWidget>
 #include <DDialog>
@@ -52,6 +53,7 @@ protected:
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void keyPressEvent(QKeyEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void saveNote();
     void adjustVerticalScrollBar(QWidget *widget, int defaultHeight);

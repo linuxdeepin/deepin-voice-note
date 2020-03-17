@@ -192,7 +192,6 @@ void RightView::onTextEditTextChange()
 
 void RightView::initData(VNoteItem *data, QRegExp reg)
 {
-    this->setFocus();
     while (m_viewportLayout->indexOf(m_placeholderWidget) != 0) {
         QWidget *widget = m_viewportLayout->itemAt(0)->widget();
         m_viewportLayout->removeWidget(widget);
@@ -200,6 +199,7 @@ void RightView::initData(VNoteItem *data, QRegExp reg)
     }
     m_noteItemData = data;
     if (m_noteItemData == nullptr) {
+        m_curItemWidget = nullptr;
         return;
     }
     int size = m_noteItemData->datas.dataConstRef().size();
@@ -501,13 +501,15 @@ void RightView::mousePressEvent(QMouseEvent *event)
         if (widget != nullptr) {
             m_curItemWidget = widget;
         }
+        if(m_curItemWidget != nullptr){
+            m_curItemWidget->setFocus();
+        }
     }
 }
 
 void RightView::mouseReleaseEvent(QMouseEvent *event)
 {
     DWidget::mouseReleaseEvent(event);
-
 }
 
 DetailItemWidget *RightView::getWidgetByPos(const QPoint &pos)
@@ -678,6 +680,30 @@ void RightView::pasteText()
         if (board) {
             QString clipBoardText = board->text();
             textCursor.insertText(clipBoardText);
+        }
+    }
+}
+
+void RightView::keyPressEvent(QKeyEvent *e)
+{
+    DWidget::keyPressEvent(e);
+    if(e->modifiers() == Qt::ControlModifier){
+        switch (e->key()) {
+        case Qt::Key_C:
+            copySelectText();
+            break;
+        case Qt::Key_A:
+            selectAllItem();
+            break;
+        case Qt::Key_X:
+            cutSelectText();
+            break;
+        case Qt::Key_V:
+            m_menuWidget = m_curItemWidget;
+            pasteText();
+            break;
+        default:
+            break;
         }
     }
 }

@@ -3,8 +3,6 @@
 #include <QWheelEvent>
 #include <DFontSizeManager>
 
-#include "controller/textnoteeditprivate.h"
-
 TextNoteEdit::TextNoteEdit(QWidget *parent)
     : DTextEdit(parent)
 {
@@ -45,12 +43,16 @@ void TextNoteEdit::contextMenuEvent(QContextMenuEvent *e)
 
 void TextNoteEdit::keyPressEvent(QKeyEvent *e)
 {
-    DTextEdit::keyPressEvent(e);
+    if(e->modifiers() != Qt::ControlModifier){
+       DTextEdit::keyPressEvent(e);
+    }
+
     if (e->key() == Qt::Key_Backspace) {
         if (this->document()->isEmpty()) {
             emit sigDelEmpty();
         }
     }
+
     e->ignore();
 }
 
@@ -114,3 +116,4 @@ void TextNoteEdit::removeSelectText()
     QTextCursor textCursor = this->textCursor();
     textCursor.removeSelectedText();
 }
+

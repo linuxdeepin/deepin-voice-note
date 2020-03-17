@@ -13,7 +13,11 @@ QString Utils::convertDateTime(const QDateTime &dateTime)
     if (0 == offset) {
         qint64 offsetSec = dateTime.secsTo(QDateTime::currentDateTime());
         if (offsetSec < 3600) {
-            disptime = QString::number(offsetSec / 60) + "分钟前";
+            offsetSec /= 60;
+            if(offsetSec == 0){
+                offsetSec = 1;
+            }
+            disptime = QString::number(offsetSec) + "分钟前";
         } else {
             disptime = dateTime.toString("hh:mm");
         }
