@@ -115,8 +115,8 @@ QDebug& operator << (QDebug &out, VNoteItem &noteItem)
     return out;
 }
 
-VNoteItemWidget::VNoteItemWidget(QWidget *parent)
-    : DWidget(parent)
+DetailItemWidget::DetailItemWidget(QWidget *parent)
+    : QWidget(parent)
 {
     ;
 }

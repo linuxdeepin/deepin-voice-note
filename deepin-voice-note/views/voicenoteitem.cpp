@@ -12,7 +12,6 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QAbstractTextDocumentLayout>
-#include <QTimer>
 
 #include <DApplicationHelper>
 #include <DFontSizeManager>
@@ -21,14 +20,13 @@
 
 #define DefaultHeight 64
 
-VoiceNoteItem::VoiceNoteItem(VNoteItem *textNote, VNVoiceBlock *noteBlock, QWidget *parent)
-    : DWidget(parent)
-    , m_textNode(textNote)
+VoiceNoteItem::VoiceNoteItem(VNoteBlock *noteBlock, QWidget *parent)
+    : DetailItemWidget(parent)
     , m_noteBlock(noteBlock)
 {
     initUi();
     initConnection();
-    initData();
+    updateData();
     onChangeTheme();
 }
 
@@ -38,8 +36,7 @@ void VoiceNoteItem::initUi()
     m_bgWidget = new DFrame(this);
     m_createTimeLab = new DLabel(m_bgWidget);
     DFontSizeManager::instance()->bind(m_createTimeLab, DFontSizeManager::T8);
-    m_createTimeLab->setText("2019-10-21 19:30");
-    m_asrText = new TextNoteEdit(nullptr, nullptr, m_bgWidget);
+    m_asrText = new TextNoteEdit(m_bgWidget);
     DFontSizeManager::instance()->bind(m_asrText, DFontSizeManager::T8);
     m_asrText->setReadOnly(true);
     DStyle::setFocusRectVisible(m_asrText, false);
@@ -80,7 +77,6 @@ void VoiceNoteItem::initUi()
     nameLayout->addWidget(m_createTimeLab, Qt::AlignLeft);
     nameLayout->setContentsMargins(0, 0, 0, 0);
     nameLayout->setSpacing(0);
-    m_voiceSizeLab->setText("50'00");
     QHBoxLayout *itemLayout = new QHBoxLayout;
     itemLayout->addLayout(playBtnLayout);
     itemLayout->addLayout(nameLayout, 1);
@@ -102,14 +98,18 @@ void VoiceNoteItem::initUi()
 
 }
 
-void VoiceNoteItem::initData()
+void VoiceNoteItem::updateData()
 {
     if (m_noteBlock != nullptr) {
-        m_createTimeLab->setText(Utils::convertDateTime(m_noteBlock->createTime));
-        m_voiceNameLab->setText(m_noteBlock->voiceTitle);
-        m_voiceSizeLab->setText(Utils::formatMillisecond(m_noteBlock->voiceSize));
-        if (!m_noteBlock->blockText.isEmpty()) {
-            showAsrEndWindow(m_noteBlock->blockText);
+        VNVoiceBlock *voiceBlock = m_noteBlock->ptrVoice;
+        if (voiceBlock) {
+            m_createTimeLab->setText(Utils::convertDateTime(voiceBlock->createTime));
+            m_voiceNameLab->setText(voiceBlock->voiceTitle);
+            m_voiceSizeLab->setText(Utils::formatMillisecond(voiceBlock->voiceSize));
+            m_noteBlock->blockText = "11\n22\n33\n44\n55";
+            if (!m_noteBlock->blockText.isEmpty()) {
+                showAsrEndWindow(m_noteBlock->blockText);
+            }
         }
     }
 }
@@ -120,6 +120,12 @@ void VoiceNoteItem::initConnection()
     connect(m_playBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onPlayBtnClicked);
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &VoiceNoteItem::onChangeTheme);
+    connect(m_asrText, &TextNoteEdit::textChanged, this, &VoiceNoteItem::onAsrTextChange);
+    QTextDocument *document = m_asrText->document();
+    QAbstractTextDocumentLayout *documentLayout = document->documentLayout();
+    connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, [ = ] {
+        onAsrTextChange();
+    });
 }
 
 void VoiceNoteItem::onPlayBtnClicked()
@@ -132,13 +138,7 @@ void VoiceNoteItem::onPauseBtnClicked()
     emit sigPauseBtnClicked(this);
 }
 
-
-VNoteItem *VoiceNoteItem::getNoteItem()
-{
-    return m_textNode;
-}
-
-VNVoiceBlock *VoiceNoteItem::getNoteBlock()
+VNoteBlock *VoiceNoteItem::getNoteBlock()
 {
     return  m_noteBlock;
 }
@@ -198,31 +198,129 @@ void VoiceNoteItem::onChangeTheme()
 
 void VoiceNoteItem::onAsrTextChange()
 {
-    QTimer::singleShot(0, this, [this]() {
-        int height = DefaultHeight;
-        QTextDocument *doc = m_asrText->document();
-        if (!doc->isEmpty()) {
-            int docHeight = static_cast<int>(doc->size().height());
-            m_asrText->setFixedHeight(docHeight);
-            height += docHeight;
-        }
-        this->setFixedHeight(height);
-    });
-
+    int height = DefaultHeight;
+    QTextDocument *doc = m_asrText->document();
+    if (!doc->isEmpty()) {
+        int docHeight = static_cast<int>(doc->size().height());
+        m_asrText->setFixedHeight(docHeight);
+        height += docHeight;
+    }
+    this->setFixedHeight(height);
 }
 
-void VoiceNoteItem::mousePressEvent(QMouseEvent *event)
+bool VoiceNoteItem::asrTextNotEmpty()
 {
-    DWidget::mousePressEvent(event);
-    if (event->button() == Qt::RightButton) {
-        if (!m_asrText->geometry().contains(event->pos())) {
-            //Request to show voice context menu
-            emit voiceMenuShow();
-        }
+    return m_noteBlock && !m_noteBlock->blockText.isEmpty();
+}
+
+void VoiceNoteItem::selectText(const QPoint &globalPos, QTextCursor::MoveOperation op)
+{
+    if(asrTextNotEmpty()){
+       m_asrText->selectText(globalPos,op);
     }
 }
 
-TextNoteEdit *VoiceNoteItem::getAsrTextEdit()
+void VoiceNoteItem::selectText(QTextCursor::MoveOperation op)
 {
-    return m_asrText;
+    if(asrTextNotEmpty()){
+      m_asrText->moveCursor(op,QTextCursor::KeepAnchor);
+    }
+}
+
+void VoiceNoteItem::selectAllText()
+{
+    if(asrTextNotEmpty()){
+        m_asrText->selectAll();
+    }
+    m_select = true;
+}
+
+void VoiceNoteItem::clearSelection()
+{
+    if(asrTextNotEmpty()){
+       m_asrText->clearSelection();
+    }
+    m_select = false;
+}
+
+QString VoiceNoteItem::getSelectText()
+{
+    QString ret = "";
+    if(asrTextNotEmpty()){
+        ret = m_asrText->getSelectText();
+    }
+    return  ret;
+}
+
+QString VoiceNoteItem::getAllText()
+{
+    QString ret = "";
+    if(asrTextNotEmpty()){
+        ret = m_asrText->toPlainText();
+    }
+    return  ret;
+}
+
+bool VoiceNoteItem::hasSelection()
+{
+    return  m_select || (asrTextNotEmpty() && m_asrText->hasSelection());
+}
+
+void VoiceNoteItem::removeSelectText()
+{
+    if(asrTextNotEmpty()){
+        m_asrText->removeSelectText();
+    }
+}
+
+QTextCursor VoiceNoteItem::getTextCursor()
+{
+    QTextCursor cursor;
+    if(asrTextNotEmpty()){
+        cursor = m_asrText->textCursor();
+    }
+    return  cursor;
+}
+
+void VoiceNoteItem::setTextCursor(const QTextCursor &cursor)
+{
+    if(asrTextNotEmpty()){
+        m_asrText->setTextCursor(cursor);
+    }
+}
+
+bool VoiceNoteItem::textIsEmpty()
+{
+    return  asrTextNotEmpty();
+}
+
+QRect VoiceNoteItem::getCursorRect()
+{
+    QRect rc;
+    if(asrTextNotEmpty()){
+        rc = m_asrText->cursorRect(m_asrText->textCursor());
+    }
+    return rc;
+}
+
+bool VoiceNoteItem::isAsrTextPos(const QPoint &globalPos)
+{
+    bool ret = false;
+    if(asrTextNotEmpty()){
+        QPoint pos = m_asrText->mapFromGlobal(globalPos);
+        if(m_asrText->rect().contains(pos)){
+            ret = true;
+        }
+    }
+    return ret;
+}
+
+void VoiceNoteItem::setFocus()
+{
+    return QWidget::setFocus();
+}
+
+bool VoiceNoteItem::hasFocus()
+{
+    return  QWidget::hasFocus();
 }

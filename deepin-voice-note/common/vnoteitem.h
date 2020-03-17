@@ -4,6 +4,7 @@
 #include "common/datatypedef.h"
 
 #include <QDateTime>
+#include <QTextCursor>
 
 #include <DWidget>
 
@@ -120,13 +121,28 @@ struct VNVoiceBlock : public VNoteBlock {
 
 };
 
-class VNoteItemWidget :public DWidget //语音文字通用接口
+class DetailItemWidget :public QWidget
 {
     Q_OBJECT
 public:
-    explicit VNoteItemWidget(QWidget *parent = nullptr);
-    virtual VNoteItem *getNoteItem() = 0;
-    virtual void updateData() = 0; //更新数据
+    explicit DetailItemWidget(QWidget *parent = nullptr);
+    virtual VNoteBlock *getNoteBlock() = 0;
+    virtual QTextCursor getTextCursor() = 0;
+    virtual void        setTextCursor(const QTextCursor& cursor) = 0;
+    virtual void        updateData() = 0;
+    virtual bool        textIsEmpty() = 0;
+    virtual QRect       getCursorRect() = 0;
+    virtual void        setFocus() = 0;
+    virtual bool        hasFocus() = 0;
+    //选中相关
+    virtual void selectText(const QPoint &globalPos,QTextCursor::MoveOperation op) = 0;
+    virtual void selectText(QTextCursor::MoveOperation op) = 0;
+    virtual void removeSelectText() = 0;
+    virtual void selectAllText() = 0;
+    virtual void clearSelection() = 0;
+    virtual bool hasSelection() = 0;
+    virtual QString getAllText() = 0;
+    virtual QString getSelectText() = 0;
 };
 
 #endif // VNOTEITEM_H

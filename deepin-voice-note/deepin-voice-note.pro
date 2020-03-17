@@ -50,7 +50,8 @@ SOURCES += \
     views/controller/voicenoteitemprivate.cpp \
     views/controller/rightviewprivate.cpp \
     dbus/dbusvariant.cpp \
-    dbus/dbuslogin1manager.cpp
+    dbus/dbuslogin1manager.cpp \
+    views/textnoteitem.cpp
 
 RESOURCES += \
     images.qrc
@@ -98,7 +99,8 @@ HEADERS += \
     views/controller/voicenoteitemprivate.h \
     views/controller/rightviewprivate.h \
     dbus/dbuslogin1manager.h \
-    dbus/dbusvariant.h
+    dbus/dbusvariant.h \
+    views/textnoteitem.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts

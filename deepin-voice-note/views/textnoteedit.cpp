@@ -5,10 +5,8 @@
 
 #include "controller/textnoteeditprivate.h"
 
-TextNoteEdit::TextNoteEdit(VNoteItem *textNote, VNTextBlock *noteBlock, QWidget *parent)
+TextNoteEdit::TextNoteEdit(QWidget *parent)
     : DTextEdit(parent)
-    , m_textNode(textNote)
-    , m_noteBlock(noteBlock)
 {
     setAlignment(Qt::AlignTop);//设置顶部对其
     setFrameShape(QFrame::NoFrame);//设置无边框
@@ -17,10 +15,6 @@ TextNoteEdit::TextNoteEdit(VNoteItem *textNote, VNTextBlock *noteBlock, QWidget 
     DFontSizeManager::instance()->bind(this, DFontSizeManager::T8);//DTK设置字体大小
     setContextMenuPolicy(Qt::NoContextMenu);
     setMouseTracking(true);
-
-    if (d_ptr == nullptr) {
-        d_ptr = new TextNoteEditPrivate(this);
-    }
 }
 
 void TextNoteEdit::focusInEvent(QFocusEvent *e)
@@ -58,16 +52,6 @@ void TextNoteEdit::keyPressEvent(QKeyEvent *e)
         }
     }
     e->ignore();
-}
-
-VNoteItem *TextNoteEdit::getNoteItem()
-{
-    return  m_textNode;
-}
-
-VNTextBlock *TextNoteEdit::getNoteBlock()
-{
-    return  m_noteBlock;
 }
 
 void TextNoteEdit::mousePressEvent(QMouseEvent *event)
@@ -111,4 +95,22 @@ void TextNoteEdit::clearSelection()
         textCursor.clearSelection();
         this->setTextCursor(textCursor);
     }
+}
+
+QString TextNoteEdit::getSelectText()
+{
+    QTextCursor textCursor = this->textCursor();
+    return textCursor.selectedText();
+}
+
+bool TextNoteEdit::hasSelection()
+{
+    QTextCursor textCursor = this->textCursor();
+    return  textCursor.hasSelection();
+}
+
+void TextNoteEdit::removeSelectText()
+{
+    QTextCursor textCursor = this->textCursor();
+    textCursor.removeSelectedText();
 }

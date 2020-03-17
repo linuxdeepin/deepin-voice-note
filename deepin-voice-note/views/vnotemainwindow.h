@@ -127,8 +127,8 @@ private:
     void addNote();
     void editNote();
     void delNote();
-    void loadNotes(VNoteFolder *folder);
-    void loadSearchNotes(const QRegExp &key);
+    int loadNotes(VNoteFolder *folder);
+    int loadSearchNotes(const QRegExp &key);
 
     //详情页视图操作
     void delVoice();

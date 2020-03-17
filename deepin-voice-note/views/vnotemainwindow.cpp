@@ -147,8 +147,8 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onRightViewVoicePause);
     connect(m_rightView, &RightView::sigCursorChange,
             this, &VNoteMainWindow::onCursorChange);
-    connect(this, &VNoteMainWindow::sigDltSelectContant,
-            m_rightView, &RightView::onDltSelectContant);
+//    connect(this, &VNoteMainWindow::sigDltSelectContant,
+//            m_rightView, &RightView::onDltSelectContant);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::addNotepad);
@@ -451,7 +451,9 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
     Q_UNUSED(previous);
     m_asrErrMeassage->setVisible(false);
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
-    loadNotes(data);
+    if(!loadNotes(data)){
+        m_rightView->initData(nullptr, m_searchKey);
+    }
 }
 
 void VNoteMainWindow::initSpliterView()
@@ -524,10 +526,15 @@ void VNoteMainWindow::onChangeTheme()
 void VNoteMainWindow::onA2TStart()
 {
     m_asrErrMeassage->setVisible(false);
-    m_currentAsrVoice = m_rightView->getMenuVoiceItem();
+    DetailItemWidget *widget = m_rightView->getMenuItem();
+    if(widget && widget->getNoteBlock()->blockType == VNoteBlock::Voice){
+         m_currentAsrVoice = static_cast<VoiceNoteItem *>(widget);
+    }else {
+        return;
+    }
 
     if (m_currentAsrVoice) {
-        VNVoiceBlock *data = m_currentAsrVoice->getNoteBlock();
+        VNVoiceBlock *data = m_currentAsrVoice->getNoteBlock()->ptrVoice;
 
         if (nullptr != data) {
             //Check whether the audio lenght out of 20 minutes
@@ -655,16 +662,6 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
 void VNoteMainWindow::keyPressEvent(QKeyEvent *event)
 {
     DMainWindow::keyPressEvent(event);
-    qInfo() << "        VNoteMainWindow::keyPressEvent   ......   ";
-    if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_C)) {
-        if (m_rightView) {
-            m_rightView->selectText2Clipboard();
-        }
-    }
-    if (event->key() == Qt::Key_Backspace) {
-        qDebug() << "           DetailWidget::keyPressEvent    Qt::Key_Backspace      1111111111111";
-        emit sigDltSelectContant();
-    }
 }
 
 bool VNoteMainWindow::checkIfNeedExit()
@@ -700,7 +697,7 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
     m_asrErrMeassage->setVisible(false);
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
-    m_rightView->initData(data);
+    m_rightView->initData(data, m_searchKey);
     if (!m_searchKey.isEmpty() && m_noteSearchEdit->isEnabled()) {
         m_noteSearchEdit->lineEdit()->setFocus();
     }
@@ -748,6 +745,18 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::DetailVoice2Text:
         onA2TStart();
         break;
+    case ActionManager::DetailSelectAll:
+        m_rightView->selectAllItem();
+        break;
+    case ActionManager::DetailCopy:
+        m_rightView->copySelectText();
+        break;
+    case ActionManager::DetailPaste:
+        m_rightView->pasteText();
+        break;
+    case ActionManager::DetailCut:
+        m_rightView->cutSelectText();
+        break;
     default:
         break;
     }
@@ -786,17 +795,22 @@ void VNoteMainWindow::onMenuAbout2Show()
     } else if (menu == ActionManager::Instance()->detialContextMenu()) {
         QAction *asrAction = ActionManager::Instance()->getActionById(ActionManager::DetailVoice2Text);
         QAction *delAction = ActionManager::Instance()->getActionById(ActionManager::DetailDelete);
-        VoiceNoteItem *item = m_rightView->getMenuVoiceItem();
-        bool textEmpyt = item->getNoteBlock()->blockText.isEmpty();
-        if (!textEmpyt || m_isAsrVoiceing) {
-            asrAction->setEnabled(false);
-        } else {
-            asrAction->setEnabled(true);
-        }
-        if (m_isAsrVoiceing || m_isPlaying) {
-            delAction->setEnabled(false);
-        } else {
-            delAction->setEnabled(true);
+        QAction *cutAction = ActionManager::Instance()->getActionById(ActionManager::DetailCut);
+        DetailItemWidget *item = m_rightView->getMenuItem();
+        if(item != nullptr){
+            bool textEmpyt = item->getNoteBlock()->blockText.isEmpty();
+            if (!textEmpyt || m_isAsrVoiceing) {
+                asrAction->setEnabled(false);
+            } else {
+                asrAction->setEnabled(true);
+            }
+            if (m_isAsrVoiceing || m_isPlaying) {
+                delAction->setEnabled(false);
+                cutAction->setEnabled(false);
+            } else {
+                delAction->setEnabled(true);
+                cutAction->setEnabled(true);
+            }
         }
     }
 }
@@ -906,11 +920,10 @@ void VNoteMainWindow::delNote()
         m_leftView->update(m_leftView->currentIndex());
     }
 }
-void VNoteMainWindow::loadNotes(VNoteFolder *folder)
+int VNoteMainWindow::loadNotes(VNoteFolder *folder)
 {
     m_middleView->clearAll();
     m_middleView->setVisibleEmptySearch(false);
-
     if (folder) {
         m_middleView->setCurrentId(folder->id);
         VNoteItemOper noteOper;
@@ -929,13 +942,13 @@ void VNoteMainWindow::loadNotes(VNoteFolder *folder)
     } else {
         m_middleView->setCurrentId(-1);
     }
+    return m_middleView->rowCount();
 }
 
-void VNoteMainWindow::loadSearchNotes(const QRegExp &key)
+int VNoteMainWindow::loadSearchNotes(const QRegExp &key)
 {
     m_middleView->clearAll();
     m_middleView->setSearchKey(key);
-
     VNOTE_ALL_NOTES_MAP *noteAll = VNoteDataManager::instance()->getAllNotesInFolder();
     if (noteAll) {
         noteAll->lock.lockForRead();
@@ -947,7 +960,6 @@ void VNoteMainWindow::loadSearchNotes(const QRegExp &key)
             }
         }
         noteAll->lock.unlock();
-
         if (m_middleView->rowCount() == 0) {
             m_middleView->setVisibleEmptySearch(true);
         } else {
@@ -955,6 +967,7 @@ void VNoteMainWindow::loadSearchNotes(const QRegExp &key)
             m_middleView->setCurrentIndex(0);
         }
     }
+    return m_middleView->rowCount();
 }
 
 void VNoteMainWindow::onRightViewVoicePlay(VNVoiceBlock *voiceData)
@@ -995,16 +1008,17 @@ void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
 
 void VNoteMainWindow::delVoice()
 {
-    VoiceNoteItem *voiceItem = m_rightView->getMenuVoiceItem();
+    DetailItemWidget *voiceItem = m_rightView->getMenuItem();
     if (voiceItem) {
         if (m_asrErrMeassage->isVisible() && voiceItem == m_currentAsrVoice) {
             m_asrErrMeassage->setVisible(false);
             m_currentAsrVoice = nullptr;
         }
-        if (m_recordBar->stopVoice(voiceItem->getNoteBlock())) {
+        if (m_recordBar->stopVoice(voiceItem->getNoteBlock()->ptrVoice)) {
             setSpecialStatus(PlayVoiceEnd);
         }
         m_rightView->delWidget(voiceItem);
+        m_rightView->updateData();
     }
 }
 
@@ -1024,6 +1038,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNotepadBtn->setVisible(true);
         m_addNoteBtn->setVisible(true);
         onVNoteFolderChange(m_leftView->setDefaultNotepadItem(), QModelIndex());
+        m_noteSearchEdit->lineEdit()->setFocus();
         break;
     case PlayVoiceStart:
         m_isPlaying = true;
