@@ -77,6 +77,11 @@ QSharedPointer<QSettings> VNoteApplication::appSetting() const
     return m_qspSetting;
 }
 
+VNoteMainWindow *VNoteApplication::mainWindow() const
+{
+    return m_qspMainWnd.get();
+}
+
 void VNoteApplication::onNewProcessInstance(qint64 pid, const QStringList &arguments)
 {
     Q_UNUSED(pid);

@@ -70,7 +70,7 @@ VNoteMainWindow::~VNoteMainWindow()
     autoRelease->wait(AUDIO_DEV_CHECK_TIME);
 
     QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
-    if (m_isAsrVoiceing) {
+    if (isVoice2Text()) {
         releaseA2TManger->stopAsr();
     }
 }
@@ -230,7 +230,7 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stPlayorPause.get(), &QShortcut::activated, this, [this] {
         if (canDoShortcutAction()) {
-            if (!m_isPlaying)
+            if (!isPlaying())
             {
             }
         }
@@ -244,8 +244,7 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stRecording.get(), &QShortcut::activated, this, [this] {
         if (canDoShortcutAction()) {
-            if (!m_isRecording)
-            {
+            if (!isRecording()) {
                 m_recordBar->onStartRecord();
             }
         }
@@ -706,7 +705,7 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 
     }
     setSpecialStatus(RecordEnd);
-    if (m_isExit) {
+    if (isAppQuit()) {
         qApp->quit();
     }
 
@@ -909,8 +908,8 @@ void VNoteMainWindow::resizeEvent(QResizeEvent *event)
 void VNoteMainWindow::closeEvent(QCloseEvent *event)
 {
     if (checkIfNeedExit()) {
-        if (m_isRecording) {
-            m_isExit = true;
+        if (isRecording()) {
+            operState(OpsStateInterface::StateAppQuit, true);
             m_recordBar->cancelRecord();
             event->ignore();
         } else {
@@ -947,11 +946,11 @@ bool VNoteMainWindow::checkIfNeedExit()
     bool bNeedExit = true;
 
     //Is audio converting to text
-    if (m_isAsrVoiceing) {
+    if (isVoice2Text()) {
         pspMessageDialg.reset(new VNoteMessageDialog(
                                   VNoteMessageDialog::AbortRecord,
                                   this));
-    } else if (m_isRecording) { //Is recording
+    } else if (isRecording()) { //Is recording
         pspMessageDialg.reset(new VNoteMessageDialog(
                                   VNoteMessageDialog::AborteAsr,
                                   this));
@@ -1056,10 +1055,10 @@ void VNoteMainWindow::onMenuAbout2Show()
         QAction *addAction = ActionManager::Instance()->getActionById(ActionManager::NoteAddNew);
         QAction *delAction = ActionManager::Instance()->getActionById(ActionManager::NoteDelete);
         QAction *saveAction = ActionManager::Instance()->getActionById(ActionManager::NoteSaveVoice);
-        if (m_isPlaying || m_isRecording || m_isAsrVoiceing) {
+        if (isPlaying() || isRecording() || isVoice2Text()) {
             addAction->setEnabled(false);
             delAction->setEnabled(false);
-            if (m_isRecording) {
+            if (isRecording()) {
                 saveAction->setEnabled(false);
             } else {
                 saveAction->setEnabled(true);
@@ -1082,19 +1081,19 @@ void VNoteMainWindow::onMenuAbout2Show()
         DetailItemWidget *item = m_rightView->getMenuItem();
         if (item != nullptr) {
             bool textEmpyt = item->getNoteBlock()->blockText.isEmpty();
-            if (!textEmpyt || m_isAsrVoiceing) {
+            if (!textEmpyt || isVoice2Text()) {
                 asrAction->setEnabled(false);
             } else {
                 asrAction->setEnabled(true);
             }
-            if (m_isAsrVoiceing || m_isPlaying) {
+            if (isVoice2Text() || isPlaying()) {
                 bool enable = true;
-                if (m_isAsrVoiceing && m_currentAsrVoice) {
+                if (isVoice2Text() && m_currentAsrVoice) {
                     if (item == m_currentAsrVoice || m_currentAsrVoice->hasSelection()) {
                         enable = false;
                     }
                 }
-                if (m_isPlaying) {
+                if (isPlaying()) {
                     VNoteBlock *block = m_recordBar->getVoiceData();
                     VoiceNoteItem *voiceItem = m_rightView->getVoiceItem(block);
                     if (voiceItem) {
@@ -1344,15 +1343,15 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_noteSearchEdit->lineEdit()->setFocus();
         break;
     case PlayVoiceStart:
-        m_isPlaying = true;
+        operState(StatePlaying, true);
         m_noteSearchEdit->setEnabled(false);
         m_leftViewHolder->setEnabled(false);
         m_middleView->setOnlyCurItemMenuEnable(true);
         m_addNoteBtn->setBtnDisabled(true);
         break;
     case PlayVoiceEnd:
-        m_isPlaying = false;
-        if (!m_isAsrVoiceing) {
+        operState(StatePlaying, false);
+        if (!isVoice2Text()) {
             m_noteSearchEdit->setEnabled(true);
             m_leftViewHolder->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
@@ -1360,7 +1359,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         }
         break;
     case RecordStart:
-        m_isRecording = true;
+        operState(StateRecording, true);
         m_noteSearchEdit->setEnabled(false);
         m_leftViewHolder->setEnabled(false);
         m_middleView->setOnlyCurItemMenuEnable(true);
@@ -1368,30 +1367,30 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNoteBtn->setBtnDisabled(true);
         break;
     case RecordEnd:
-        if (!m_isAsrVoiceing) {
+        if (!isVoice2Text()) {
             m_noteSearchEdit->setEnabled(true);
             m_leftViewHolder->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
             m_addNoteBtn->setBtnDisabled(false);
         }
         m_rightView->setEnablePlayBtn(true);
-        m_isRecording = false;
+        operState(StateRecording, false);
         break;
     case VoiceToTextStart:
-        m_isAsrVoiceing = true;
+        operState(StateVoice2Text, true);
         m_noteSearchEdit->setEnabled(false);
         m_leftViewHolder->setEnabled(false);
         m_middleView->setOnlyCurItemMenuEnable(true);
         m_addNoteBtn->setBtnDisabled(true);
         break;
     case VoiceToTextEnd:
-        if (!m_isRecording && !m_isPlaying) {
+        if (!isRecording() && !isPlaying()) {
             m_noteSearchEdit->setEnabled(true);
             m_leftViewHolder->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
             m_addNoteBtn->setBtnDisabled(false);
         }
-        m_isAsrVoiceing = false;
+        operState(StateVoice2Text, false);
         break;
     default:
         break;
@@ -1425,7 +1424,7 @@ void VNoteMainWindow::onSystemDown(bool active)
     qInfo() << "System going down...";
 
     if (active) {
-        if (m_isRecording) {
+        if (isRecording()) {
             m_recordBar->cancelRecord();
 
             qInfo() << "System going down when recording, cancel it.";

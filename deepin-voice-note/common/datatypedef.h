@@ -1,6 +1,8 @@
 #ifndef DATATYPEDEF_H
 #define DATATYPEDEF_H
 
+#include "common/opsstateinterface.h"
+
 #include <QMap>
 #include <QVector>
 #include <QReadWriteLock>
@@ -68,12 +70,4 @@ protected:
     friend class ExportNoteWorker;
 };
 
-static QStringList default_FolderData_imgpath =
-{
-    ":/images/icon/DefaultAvatar/1.svg", ":/images/icon/DefaultAvatar/2.svg",
-    ":/images/icon/DefaultAvatar/3.svg", ":/images/icon/DefaultAvatar/4.svg",
-    ":/images/icon/DefaultAvatar/5.svg", ":/images/icon/DefaultAvatar/6.svg",
-    ":/images/icon/DefaultAvatar/7.svg", ":/images/icon/DefaultAvatar/8.svg",
-    ":/images/icon/DefaultAvatar/9.svg", ":/images/icon/DefaultAvatar/10.svg"
-};
 #endif // DATATYPEDEF_H

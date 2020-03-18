@@ -35,7 +35,7 @@ class SplashView;
 class VoiceNoteItem;
 class DBusLogin1Manager;
 
-class VNoteMainWindow : public DMainWindow
+class VNoteMainWindow : public DMainWindow, public OpsStateInterface
 {
     Q_OBJECT
 public:
@@ -167,10 +167,6 @@ private:
     SplashView *m_splashView {nullptr};
     HomePage *m_wndHomePage {nullptr};
     DStackedWidget *m_centerWidget {nullptr};
-    bool            m_isRecording {false};
-    bool            m_isAsrVoiceing {false};
-    bool            m_isPlaying {false};
-    bool            m_isExit {false};
 
     //App setting, reference to VNoteApplication's setting
     QSharedPointer<QSettings> m_qspSetting {nullptr};

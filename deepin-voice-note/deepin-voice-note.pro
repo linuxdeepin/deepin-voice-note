@@ -52,7 +52,8 @@ SOURCES += \
     dbus/dbusvariant.cpp \
     dbus/dbuslogin1manager.cpp \
     views/textnoteitem.cpp \
-    common/exportnoteworker.cpp
+    common/exportnoteworker.cpp \
+    common/opsstateinterface.cpp
 
 RESOURCES += \
     images.qrc
@@ -102,7 +103,8 @@ HEADERS += \
     dbus/dbuslogin1manager.h \
     dbus/dbusvariant.h \
     views/textnoteitem.h \
-    common/exportnoteworker.h
+    common/exportnoteworker.h \
+    common/opsstateinterface.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts

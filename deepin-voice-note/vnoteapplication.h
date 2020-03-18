@@ -17,6 +17,7 @@ public:
     void activateWindow();
     void initAppSetting();
     QSharedPointer<QSettings> appSetting() const;
+    VNoteMainWindow* mainWindow() const;
 signals:
 
 public slots:
