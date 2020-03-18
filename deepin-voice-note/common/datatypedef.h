@@ -65,6 +65,7 @@ protected:
 
     friend struct VNoteItem;
     friend class MetaDataParser;
+    friend class ExportNoteWorker;
 };
 
 static QStringList default_FolderData_imgpath =

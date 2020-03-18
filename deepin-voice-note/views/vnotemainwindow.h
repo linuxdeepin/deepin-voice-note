@@ -168,7 +168,8 @@ private:
     bool            m_isAsrVoiceing {false};
     bool            m_isPlaying {false};
     bool            m_isExit {false};
-    //App setting
+
+    //App setting, reference to VNoteApplication's setting
     QSharedPointer<QSettings> m_qspSetting {nullptr};
     //Shortcuts key
     //*****************Shortcut key begin*********************

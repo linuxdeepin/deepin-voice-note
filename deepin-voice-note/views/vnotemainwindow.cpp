@@ -27,6 +27,7 @@
 #include "widgets/vnoteiconbutton.h"
 
 #include "globaldef.h"
+#include "vnoteapplication.h"
 
 #include <QScrollBar>
 
@@ -97,31 +98,7 @@ void VNoteMainWindow::initData()
 
 void VNoteMainWindow::initAppSetting()
 {
-    QString vnoteConfigBasePath =
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-
-    QFileInfo configDir(vnoteConfigBasePath);
-
-    //TODO:
-    //    Remove the old version database
-    //make a app owne directory
-    if (!configDir.isDir() && configDir.exists()) {
-        QFile oldDbFile(vnoteConfigBasePath);
-        if (!oldDbFile.remove()) {
-            qInfo() << oldDbFile.fileName() << ":" << oldDbFile.errorString();
-        }
-    }
-
-    configDir.setFile(vnoteConfigBasePath + QDir::separator() + QString("config/"));
-
-    if (!configDir.exists()) {
-        QDir().mkpath(configDir.filePath());
-        qInfo() << "create config dir:" << configDir.filePath();
-    }
-
-    m_qspSetting.reset(new QSettings(configDir.filePath() + QString("config.conf")
-                                     , QSettings::IniFormat));
-
+    m_qspSetting = reinterpret_cast<VNoteApplication*>(qApp)->appSetting();
 }
 
 void VNoteMainWindow::initConnections()
@@ -292,7 +269,7 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stSaveAsText.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        Q_UNUSED(this);
+        m_middleView->saveAsText();
     });
 
     //Save recordings
@@ -303,7 +280,7 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stSaveVoices.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        Q_UNUSED(this);
+        m_middleView->saveRecords();
     });
 
     //Select All
@@ -1014,6 +991,12 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         });
 
         confirmDialog.exec();
+    } break;
+    case ActionManager::NoteSaveText: {
+        m_middleView->saveAsText();
+    } break;
+    case ActionManager::NoteSaveVoice: {
+        m_middleView->saveRecords();
     } break;
     case ActionManager::DetailVoice2Text:
         onA2TStart();

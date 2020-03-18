@@ -1,6 +1,8 @@
 #ifndef MIDDLEVIEW_H
 #define MIDDLEVIEW_H
 
+#include <QSettings>
+
 #include <DListView>
 #include <DMenu>
 #include <DLabel>
@@ -24,6 +26,8 @@ public:
     void clearAll();
     void setCurrentIndex(int index);
     void editNote();
+    void saveAsText();
+    void saveRecords();
 
     qint64 getCurrentId();
     qint32 rowCount() const;
@@ -44,6 +48,8 @@ private:
     void initModel();
     void initMenu();
     void initUI();
+    void initAppSetting();
+
     bool                m_onlyCurItemMenuEnable {false};
     qint64              m_currentId {-1};
     QRegExp             m_searchKey;
@@ -52,6 +58,9 @@ private:
     QStandardItemModel *m_pDataModel {nullptr};
     MiddleViewDelegate *m_pItemDelegate {nullptr};
     MiddleViewSortFilter *m_pSortViewFilter {nullptr};
+
+    //App setting, reference to VNoteApplication's setting
+    QSharedPointer<QSettings> m_qspSetting {nullptr};
 };
 
 #endif // MIDDLEVIEW_H

@@ -1,13 +1,17 @@
 #include "middleview.h"
+#include "vnoteapplication.h"
+#include "globaldef.h"
 #include "middleviewdelegate.h"
 #include "middleviewsortfilter.h"
 #include "common/actionmanager.h"
 #include "common/standarditemcommon.h"
+#include "common/exportnoteworker.h"
 
 #include <QMouseEvent>
 #include <QVBoxLayout>
 
 #include <DApplication>
+#include <DFileDialog>
 #include <DLog>
 
 MiddleView::MiddleView(QWidget *parent)
@@ -17,6 +21,7 @@ MiddleView::MiddleView(QWidget *parent)
     initDelegate();
     initMenu();
     initUI();
+    initAppSetting();
 }
 
 void MiddleView::initModel()
@@ -112,6 +117,74 @@ void MiddleView::editNote()
     edit(currentIndex());
 }
 
+void MiddleView::saveAsText()
+{
+    QModelIndex index = currentIndex();
+    VNoteItem *noteData = reinterpret_cast< VNoteItem*>(
+                StandardItemCommon::getStandardItemData(index)
+                );
+    if (nullptr != noteData) {
+        //TODO:
+        //    Should check if this note is doing save action
+
+        DFileDialog dialog;
+        dialog.setFileMode(DFileDialog::DirectoryOnly);
+
+        QString historyDir = m_qspSetting->value(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
+        if (historyDir.isEmpty()) {
+            historyDir = QDir::homePath();
+        }
+        dialog.setDirectory(historyDir);
+
+        if (QDialog::Accepted == dialog.exec()) {
+            // save the directory string to config file.
+            m_qspSetting->setValue(VNOTE_EXPORT_TEXT_PATH_KEY, dialog.directoryUrl().toLocalFile());
+
+            QString exportDir = dialog.selectedFiles().at(0);
+
+            ExportNoteWorker* exportWorker = new ExportNoteWorker(
+                        exportDir,ExportNoteWorker::ExportText, noteData);
+            exportWorker->setAutoDelete(true);
+
+            QThreadPool::globalInstance()->start(exportWorker);
+        }
+    }
+}
+
+void MiddleView::saveRecords()
+{
+    QModelIndex index = currentIndex();
+    VNoteItem *noteData = reinterpret_cast< VNoteItem*>(
+                StandardItemCommon::getStandardItemData(index)
+                );
+    if (nullptr != noteData) {
+        //TODO:
+        //    Should check if this note is doing save action
+
+        DFileDialog dialog;
+        dialog.setFileMode(DFileDialog::DirectoryOnly);
+
+        QString historyDir = m_qspSetting->value(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
+        if (historyDir.isEmpty()) {
+            historyDir = QDir::homePath();
+        }
+        dialog.setDirectory(historyDir);
+
+        if (QDialog::Accepted == dialog.exec()) {
+            // save the directory string to config file.
+            m_qspSetting->setValue(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
+
+            QString exportDir = dialog.selectedFiles().at(0);
+
+            ExportNoteWorker* exportWorker = new ExportNoteWorker(
+                        exportDir,ExportNoteWorker::ExportVoice, noteData);
+            exportWorker->setAutoDelete(true);
+
+            QThreadPool::globalInstance()->start(exportWorker);
+        }
+    }
+}
+
 void MiddleView::mousePressEvent(QMouseEvent *event)
 {
     this->setFocus();
@@ -163,6 +236,11 @@ void MiddleView::initUI()
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_emptySearch);
     this->setLayout(layout);
+}
+
+void MiddleView::initAppSetting()
+{
+    m_qspSetting = reinterpret_cast<VNoteApplication*>(qApp)->appSetting();
 }
 
 void MiddleView::setVisibleEmptySearch(bool visible)
