@@ -498,12 +498,18 @@ void RightView::mousePressEvent(QMouseEvent *event)
         onMenuShow(widget);
     } else if (btn == Qt::LeftButton) {
         clearAllSelection();
+//<<<<<<< Updated upstream
         if (widget != nullptr) {
             m_curItemWidget = widget;
         }
-        if(m_curItemWidget != nullptr){
+        if (m_curItemWidget != nullptr) {
             m_curItemWidget->setFocus();
         }
+//=======
+//        m_strSelectText = "";
+//        m_pointStart = event->pos();
+//        m_curItemWidget = getWidgetByPos(m_pointStart);
+//>>>>>>> Stashed changes
     }
 }
 
@@ -523,12 +529,77 @@ DetailItemWidget *RightView::getWidgetByPos(const QPoint &pos)
     return  nullptr;
 }
 
+//<<< <<< < Updated upstream
 void RightView::mouseMoveSelect(QMouseEvent *event)
 {
     DetailItemWidget *widget = getWidgetByPos(event->pos());
 
     if (widget && m_curItemWidget) {
 
+#if 0
+//        == == == =
+        /**
+         * @brief RightView::clearBeforeSelect
+         * 清除上次选择未清除部分
+         */
+//        void RightView::clearBeforeSelect(const QPoint & curPos) {
+//            int widgetIndex = 0;
+//            int startIndex = 0;
+//            int endIndex = 0;
+
+//            QWidget *swidget = getWidgetByPos(m_pointStart);
+//            QWidget *ewidget = getWidgetByPos(curPos);
+
+//            if (swidget && ewidget && swidget != ewidget) {
+//                widgetIndex = m_viewportLayout->indexOf(ewidget);
+
+//                //向下选择
+//                if (curPos.y() > m_pointStart.y()) {
+//                    startIndex = widgetIndex + 1;
+//                    endIndex = m_viewportLayout->count() - 1;
+//                } else if (curPos.y() < m_pointStart.y()) {
+//                    //向上选择
+//                    startIndex = 0;
+//                    endIndex = widgetIndex;
+//                }
+
+//                for (int i = startIndex; i < endIndex; i++) {
+//                    QWidget *widget = m_viewportLayout->itemAt(i)->widget();
+//                    if (widget && (widget->objectName() == TextEditWidget)) {
+//                        TextNoteEdit *editItem = static_cast<TextNoteEdit *>(widget);
+//                        if (editItem) {
+//                            QTextCursor cursor = editItem->textCursor();
+//                            cursor.clearSelection();
+//                            editItem->setTextCursor(cursor);
+////                    qInfo() << "select text:" << editItem->textCursor().selectedText();
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+//        /**
+//         * @brief RightView::selectText2Clipboard
+//         * 将选择的text添加到系统剪切板
+//         */
+//        void RightView::selectText2Clipboard() {
+//            if (m_strSelectText != "") {
+//                QClipboard *board = QApplication::clipboard();
+//                if (board) {
+//                    board->clear();
+//                    board->setText(m_strSelectText);
+//                    qInfo() << " Clip board text:" << board->text();
+//                }
+//            }
+//        }
+
+//        void RightView::mouseMoveSelect(QMouseEvent * event) {
+//            QWidget *widget = getWidgetByPos(event->pos());
+//            if (widget) {
+
+//                clearBeforeSelect(event->pos());
+//                >>> >>> > Stashed changes
+#endif
         int widgetIndex = m_viewportLayout->indexOf(widget);
         int curIndex = m_viewportLayout->indexOf(m_curItemWidget);
         QTextCursor::MoveOperation op = QTextCursor::NoMove;
@@ -687,7 +758,7 @@ void RightView::pasteText()
 void RightView::keyPressEvent(QKeyEvent *e)
 {
     DWidget::keyPressEvent(e);
-    if(e->modifiers() == Qt::ControlModifier){
+    if (e->modifiers() == Qt::ControlModifier) {
         switch (e->key()) {
         case Qt::Key_C:
             copySelectText();

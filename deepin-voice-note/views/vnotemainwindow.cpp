@@ -201,7 +201,7 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNotebook->setContext(Qt::ApplicationShortcut);
     m_stNewNotebook->setAutoRepeat(false);
 
-    connect(m_stNewNotebook.get(), &QShortcut::activated, this, [this]{
+    connect(m_stNewNotebook.get(), &QShortcut::activated, this, [this] {
         addNotepad();
     });
 
@@ -211,7 +211,7 @@ void VNoteMainWindow::initShortcuts()
     m_stRemNotebook->setContext(Qt::ApplicationShortcut);
     m_stRemNotebook->setAutoRepeat(false);
 
-    connect(m_stRemNotebook.get(), &QShortcut::activated, this, [this]{
+    connect(m_stRemNotebook.get(), &QShortcut::activated, this, [this] {
         editNotepad();
     });
 
@@ -222,7 +222,7 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNote->setContext(Qt::ApplicationShortcut);
     m_stNewNote->setAutoRepeat(false);
 
-    connect(m_stNewNote.get(), &QShortcut::activated, this, [this]{
+    connect(m_stNewNote.get(), &QShortcut::activated, this, [this] {
         addNote();
     });
 
@@ -232,7 +232,7 @@ void VNoteMainWindow::initShortcuts()
     m_stRemNote->setContext(Qt::ApplicationShortcut);
     m_stRemNote->setAutoRepeat(false);
 
-    connect(m_stRemNote.get(), &QShortcut::activated, this, [this]{
+    connect(m_stRemNote.get(), &QShortcut::activated, this, [this] {
         editNote();
     });
 
@@ -243,8 +243,9 @@ void VNoteMainWindow::initShortcuts()
     m_stPlayorPause->setContext(Qt::ApplicationShortcut);
     m_stPlayorPause->setAutoRepeat(false);
 
-    connect(m_stPlayorPause.get(), &QShortcut::activated, this, [this]{
-        if (!m_isPlaying) {
+    connect(m_stPlayorPause.get(), &QShortcut::activated, this, [this] {
+        if (!m_isPlaying)
+        {
         }
     });
 
@@ -254,8 +255,9 @@ void VNoteMainWindow::initShortcuts()
     m_stRecording->setContext(Qt::ApplicationShortcut);
     m_stRecording->setAutoRepeat(false);
 
-    connect(m_stRecording.get(), &QShortcut::activated, this, [this]{
-        if (!m_isRecording) {
+    connect(m_stRecording.get(), &QShortcut::activated, this, [this] {
+        if (!m_isRecording)
+        {
             m_recordBar->onStartRecord();
         }
     });
@@ -266,7 +268,7 @@ void VNoteMainWindow::initShortcuts()
     m_stVoice2Text->setContext(Qt::ApplicationShortcut);
     m_stVoice2Text->setAutoRepeat(false);
 
-    connect(m_stVoice2Text.get(), &QShortcut::activated, this, [this]{
+    connect(m_stVoice2Text.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         this->onA2TStart();
     });
@@ -277,7 +279,7 @@ void VNoteMainWindow::initShortcuts()
     m_stSaveAsMp3->setContext(Qt::ApplicationShortcut);
     m_stSaveAsMp3->setAutoRepeat(false);
 
-    connect(m_stSaveAsMp3.get(), &QShortcut::activated, this, [this]{
+    connect(m_stSaveAsMp3.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         Q_UNUSED(this);
     });
@@ -288,7 +290,7 @@ void VNoteMainWindow::initShortcuts()
     m_stSaveAsText->setContext(Qt::ApplicationShortcut);
     m_stSaveAsText->setAutoRepeat(false);
 
-    connect(m_stSaveAsText.get(), &QShortcut::activated, this, [this]{
+    connect(m_stSaveAsText.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         Q_UNUSED(this);
     });
@@ -299,7 +301,7 @@ void VNoteMainWindow::initShortcuts()
     m_stSaveVoices->setContext(Qt::ApplicationShortcut);
     m_stSaveVoices->setAutoRepeat(false);
 
-    connect(m_stSaveVoices.get(), &QShortcut::activated, this, [this]{
+    connect(m_stSaveVoices.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         Q_UNUSED(this);
     });
@@ -310,7 +312,7 @@ void VNoteMainWindow::initShortcuts()
     m_stSelectAll->setContext(Qt::ApplicationShortcut);
     m_stSelectAll->setAutoRepeat(false);
 
-    connect(m_stSelectAll.get(), &QShortcut::activated, this, [this]{
+    connect(m_stSelectAll.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         m_rightView->selectAllItem();
     });
@@ -321,7 +323,7 @@ void VNoteMainWindow::initShortcuts()
     m_stCopy->setContext(Qt::ApplicationShortcut);
     m_stCopy->setAutoRepeat(false);
 
-    connect(m_stCopy.get(), &QShortcut::activated, this, [this]{
+    connect(m_stCopy.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         m_rightView->copySelectText();
     });
@@ -332,7 +334,7 @@ void VNoteMainWindow::initShortcuts()
     m_stCut->setContext(Qt::ApplicationShortcut);
     m_stCut->setAutoRepeat(false);
 
-    connect(m_stCut.get(), &QShortcut::activated, this, [this]{
+    connect(m_stCut.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         m_rightView->cutSelectText();
     });
@@ -343,7 +345,7 @@ void VNoteMainWindow::initShortcuts()
     m_stPaste->setContext(Qt::ApplicationShortcut);
     m_stPaste->setAutoRepeat(false);
 
-    connect(m_stPaste.get(), &QShortcut::activated, this, [this]{
+    connect(m_stPaste.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         m_rightView->pasteText();
     });
@@ -354,7 +356,7 @@ void VNoteMainWindow::initShortcuts()
     m_stDelete->setContext(Qt::ApplicationShortcut);
     m_stDelete->setAutoRepeat(false);
 
-    connect(m_stDelete.get(), &QShortcut::activated, this, [this]{
+    connect(m_stDelete.get(), &QShortcut::activated, this, [this] {
         QAction *deleteAct = nullptr;
 
         /*
@@ -364,18 +366,22 @@ void VNoteMainWindow::initShortcuts()
          * view for delete note, in Rightview for delete note content.
          * or do nothing.
          * */
-        if (m_leftView->hasFocus()) {
+        if (m_leftView->hasFocus())
+        {
             deleteAct = ActionManager::Instance()->getActionById(
-                        ActionManager::NotebookDelete);
-        } else if (m_middleView->hasFocus()) {
+                ActionManager::NotebookDelete);
+        } else if (m_middleView->hasFocus())
+        {
             deleteAct = ActionManager::Instance()->getActionById(
-                        ActionManager::NoteDelete);
-        } else if (m_rightView->hasFocus()) {
+                ActionManager::NoteDelete);
+        } else if (m_rightView->hasFocus())
+        {
 
         }
 
         //Triggle action if necessary
-        if (nullptr != deleteAct) {
+        if (nullptr != deleteAct)
+        {
             deleteAct->triggered();
         }
     });
@@ -842,7 +848,7 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray editJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutEditKeymap.begin();
-         it != shortcutEditKeymap.end(); it++) {
+            it != shortcutEditKeymap.end(); it++) {
         QJsonObject jsonItem;
         jsonItem.insert("name",  it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
@@ -866,7 +872,7 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray settingJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutSettingKeymap.begin();
-         it != shortcutSettingKeymap.end(); it++) {
+            it != shortcutSettingKeymap.end(); it++) {
         QJsonObject jsonItem;
         jsonItem.insert("name",  it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
@@ -913,7 +919,21 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
 
 void VNoteMainWindow::keyPressEvent(QKeyEvent *event)
 {
-   DMainWindow::keyPressEvent(event);
+//<<<<<<< Updated upstream
+    DMainWindow::keyPressEvent(event);
+//=======
+//    DMainWindow::keyPressEvent(event);
+////    qInfo() << "        VNoteMainWindow::keyPressEvent   ......   ";
+//    if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_C)) {
+//        if (m_rightView) {
+//            m_rightView->selectText2Clipboard();
+//        }
+//    }
+//    if (event->key() == Qt::Key_Backspace) {
+////        qDebug() << "           DetailWidget::keyPressEvent    Qt::Key_Backspace      1111111111111";
+//        emit sigDltSelectContant();
+//    }
+//>>>>>>> Stashed changes
 }
 
 bool VNoteMainWindow::checkIfNeedExit()
