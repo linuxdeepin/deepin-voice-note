@@ -434,6 +434,7 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
     }
 
     for (auto i : noteBlockList) {
+        i->releaseSpecificData();
         m_noteItemData->delBlock(i);
     }
 

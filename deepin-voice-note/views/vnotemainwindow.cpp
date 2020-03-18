@@ -179,7 +179,9 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNotebook->setAutoRepeat(false);
 
     connect(m_stNewNotebook.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction() &&
+                !(isRecording() || isPlaying() || isVoice2Text() || isSearching())
+                ) {
             addNotepad();
         }
     });
@@ -204,7 +206,9 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNote->setAutoRepeat(false);
 
     connect(m_stNewNote.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction() &&
+                !(isRecording() || isPlaying() || isVoice2Text() || isSearching())
+                ) {
             addNote();
         }
     });
@@ -1299,6 +1303,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
 {
     switch (status) {
     case SearchStart:
+        operState(StateSearching, true);
         m_leftView->clearSelection();
         m_leftView->setEnabled(false);
         m_addNotepadBtn->setVisible(false);
@@ -1312,6 +1317,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNoteBtn->setVisible(true);
         onVNoteFolderChange(m_leftView->setDefaultNotepadItem(), QModelIndex());
         m_noteSearchEdit->lineEdit()->setFocus();
+        operState(StateSearching, false);
         break;
     case PlayVoiceStart:
         operState(StatePlaying, true);
@@ -1321,13 +1327,13 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNoteBtn->setBtnDisabled(true);
         break;
     case PlayVoiceEnd:
-        operState(StatePlaying, false);
         if (!isVoice2Text()) {
             m_noteSearchEdit->setEnabled(true);
             m_leftViewHolder->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
             m_addNoteBtn->setBtnDisabled(false);
         }
+        operState(StatePlaying, false);
         break;
     case RecordStart:
         operState(StateRecording, true);
