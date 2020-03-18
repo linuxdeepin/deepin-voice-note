@@ -731,7 +731,7 @@ void VNoteMainWindow::onA2TStart(bool first)
         asrVoiceItem = m_rightView->getCurVoiceAsr();
     }
 
-    if (asrVoiceItem) {
+    if (asrVoiceItem && asrVoiceItem->getNoteBlock()->blockText.isEmpty()) {
         VNVoiceBlock *data = asrVoiceItem->getNoteBlock()->ptrVoice;
 
         if (nullptr != data) {
@@ -1228,6 +1228,7 @@ int VNoteMainWindow::loadSearchNotes(const QRegExp &key)
         noteAll->lock.unlock();
         if (m_middleView->rowCount() == 0) {
             m_middleView->setVisibleEmptySearch(true);
+            m_rightView->initData(nullptr, m_searchKey);
         } else {
             m_middleView->setVisibleEmptySearch(false);
             m_middleView->setCurrentIndex(0);

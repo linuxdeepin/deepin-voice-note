@@ -310,6 +310,11 @@ void RightView::initAction(DetailItemWidget *widget)
 
             if (!tolCount) {
                 voiceSaveAction->setEnabled(true);
+
+                if(blockData->ptrVoice->blockText.isEmpty()){
+                   voice2TextAction->setEnabled(true);
+                }
+
             }
 
             VoiceNoteItem *item = static_cast<VoiceNoteItem *>(widget);
