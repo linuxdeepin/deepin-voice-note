@@ -134,6 +134,9 @@ private:
     void delVoice();
     void voiceTotext();
 
+    //Check if wen can do shortcuts
+    bool canDoShortcutAction() const;
+
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
 

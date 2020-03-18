@@ -179,7 +179,9 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNotebook->setAutoRepeat(false);
 
     connect(m_stNewNotebook.get(), &QShortcut::activated, this, [this] {
-        addNotepad();
+        if (canDoShortcutAction()) {
+            addNotepad();
+        }
     });
 
     //Rename notebook
@@ -189,7 +191,9 @@ void VNoteMainWindow::initShortcuts()
     m_stRemNotebook->setAutoRepeat(false);
 
     connect(m_stRemNotebook.get(), &QShortcut::activated, this, [this] {
-        editNotepad();
+        if (canDoShortcutAction()) {
+            editNotepad();
+        }
     });
 
     //*******************MiddleView Shortcuts***************************
@@ -200,7 +204,9 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNote->setAutoRepeat(false);
 
     connect(m_stNewNote.get(), &QShortcut::activated, this, [this] {
-        addNote();
+        if (canDoShortcutAction()) {
+            addNote();
+        }
     });
 
     //Rename note
@@ -210,7 +216,9 @@ void VNoteMainWindow::initShortcuts()
     m_stRemNote->setAutoRepeat(false);
 
     connect(m_stRemNote.get(), &QShortcut::activated, this, [this] {
-        editNote();
+        if (canDoShortcutAction()) {
+            editNote();
+        }
     });
 
     //*******************RightView Shortcuts*****************************
@@ -221,8 +229,10 @@ void VNoteMainWindow::initShortcuts()
     m_stPlayorPause->setAutoRepeat(false);
 
     connect(m_stPlayorPause.get(), &QShortcut::activated, this, [this] {
-        if (!m_isPlaying)
-        {
+        if (canDoShortcutAction()) {
+            if (!m_isPlaying)
+            {
+            }
         }
     });
 
@@ -233,9 +243,11 @@ void VNoteMainWindow::initShortcuts()
     m_stRecording->setAutoRepeat(false);
 
     connect(m_stRecording.get(), &QShortcut::activated, this, [this] {
-        if (!m_isRecording)
-        {
-            m_recordBar->onStartRecord();
+        if (canDoShortcutAction()) {
+            if (!m_isRecording)
+            {
+                m_recordBar->onStartRecord();
+            }
         }
     });
 
@@ -247,7 +259,9 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stVoice2Text.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        this->onA2TStart();
+        if (canDoShortcutAction()) {
+            this->onA2TStart();
+        }
     });
 
     //Save as Mp3
@@ -259,6 +273,9 @@ void VNoteMainWindow::initShortcuts()
     connect(m_stSaveAsMp3.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         Q_UNUSED(this);
+        if (canDoShortcutAction()) {
+
+        }
     });
 
     //Save as Text
@@ -269,7 +286,9 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stSaveAsText.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        m_middleView->saveAsText();
+        if (canDoShortcutAction()) {
+            m_middleView->saveAsText();
+        }
     });
 
     //Save recordings
@@ -280,7 +299,9 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stSaveVoices.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        m_middleView->saveRecords();
+        if (canDoShortcutAction()) {
+            m_middleView->saveRecords();
+        }
     });
 
     //Select All
@@ -291,7 +312,9 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stSelectAll.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        m_rightView->selectAllItem();
+        if (canDoShortcutAction()) {
+            m_rightView->selectAllItem();
+        }
     });
 
     //Copy
@@ -302,7 +325,9 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stCopy.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        m_rightView->copySelectText();
+        if (canDoShortcutAction()) {
+            m_rightView->copySelectText();
+        }
     });
 
     //Cut
@@ -313,7 +338,9 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stCut.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        m_rightView->cutSelectText();
+        if (canDoShortcutAction()) {
+            m_rightView->cutSelectText();
+        }
     });
 
     //Paste
@@ -324,7 +351,9 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stPaste.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        m_rightView->pasteText();
+        if (canDoShortcutAction()) {
+            m_rightView->pasteText();
+        }
     });
 
     //Notebook/Note/Detial delete key
@@ -334,32 +363,30 @@ void VNoteMainWindow::initShortcuts()
     m_stDelete->setAutoRepeat(false);
 
     connect(m_stDelete.get(), &QShortcut::activated, this, [this] {
-        QAction *deleteAct = nullptr;
+        if (canDoShortcutAction()) {
+            QAction *deleteAct = nullptr;
 
-        /*
-         * TODO:
-         *     We check focus here to choice what action we will
-         * take. Focus in leftview for delete notebook, in midlle
-         * view for delete note, in Rightview for delete note content.
-         * or do nothing.
-         * */
-        if (m_leftView->hasFocus())
-        {
-            deleteAct = ActionManager::Instance()->getActionById(
-                ActionManager::NotebookDelete);
-        } else if (m_middleView->hasFocus())
-        {
-            deleteAct = ActionManager::Instance()->getActionById(
-                ActionManager::NoteDelete);
-        } else if (m_rightView->hasFocus())
-        {
+            /*
+             * TODO:
+             *     We check focus here to choice what action we will
+             * take. Focus in leftview for delete notebook, in midlle
+             * view for delete note, in Rightview for delete note content.
+             * or do nothing.
+             * */
+            if (m_leftView->hasFocus()) {
+                deleteAct = ActionManager::Instance()->getActionById(
+                            ActionManager::NotebookDelete);
+            } else if (m_middleView->hasFocus()) {
+                deleteAct = ActionManager::Instance()->getActionById(
+                            ActionManager::NoteDelete);
+            } else if (m_rightView->hasFocus()) {
 
-        }
+            }
 
-        //Triggle action if necessary
-        if (nullptr != deleteAct)
-        {
-            deleteAct->triggered();
+            //Triggle action if necessary
+            if (nullptr != deleteAct) {
+                deleteAct->triggered();
+            }
         }
     });
 
@@ -789,7 +816,7 @@ void VNoteMainWindow::onPreviewShortcut()
 
     QMap<QString, QString> shortcutNoteKeymap = {
         //Note
-        {DApplication::translate("Shortcuts", "New note"),             "Ctrl+M"},
+        {DApplication::translate("Shortcuts", "New note"),             "Ctrl+B"},
         {DApplication::translate("Shortcuts", "Rename note"),          "F3"},
         {DApplication::translate("Shortcuts", "Delete note"),          "Delete"},
     };
@@ -1291,6 +1318,11 @@ void VNoteMainWindow::delVoice()
         m_rightView->delWidget(voiceItem);
         m_rightView->updateData();
     }
+}
+
+bool VNoteMainWindow::canDoShortcutAction() const
+{
+    return (m_centerWidget->currentIndex() == WndNoteShow);
 }
 
 void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
