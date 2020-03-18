@@ -93,7 +93,11 @@ void TextNoteItem::selectText(const QPoint &globalPos, QTextCursor::MoveOperatio
 
 void TextNoteItem::selectAllText()
 {
-    return m_textEdit->selectAll();
+    if(textIsEmpty()){
+        m_select = true;
+    }else {
+        m_textEdit->selectAll();
+    }
 }
 
 void TextNoteItem::selectText(QTextCursor::MoveOperation op)
@@ -108,12 +112,13 @@ void TextNoteItem::removeSelectText()
 
 void TextNoteItem::clearSelection()
 {
+    m_select = false;
     return m_textEdit->clearSelection();
 }
 
 bool TextNoteItem::hasSelection()
 {
-    return m_textEdit->hasSelection();
+    return m_select || m_textEdit->hasSelection();
 }
 
 QString TextNoteItem::getAllText()

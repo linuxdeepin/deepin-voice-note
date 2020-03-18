@@ -29,6 +29,7 @@ public:
     void enblePauseBtn(bool enable);
     bool asrTextNotEmpty();
     bool isAsrTextPos(const QPoint &globalPos);
+    bool isAsring();
 
     VNoteBlock *getNoteBlock();
     QTextCursor getTextCursor();

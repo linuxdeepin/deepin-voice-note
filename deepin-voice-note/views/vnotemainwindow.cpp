@@ -148,7 +148,7 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onPlayPlugVoiceStop);
 
     connect(m_asrAgainBtn, &DPushButton::clicked,
-            this, &VNoteMainWindow::onA2TStart);
+            this, &VNoteMainWindow::onA2TStartAgain);
 
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &VNoteMainWindow::onChangeTheme);
@@ -230,9 +230,7 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stPlayorPause.get(), &QShortcut::activated, this, [this] {
         if (canDoShortcutAction()) {
-            if (!isPlaying())
-            {
-            }
+            m_recordBar->playOrPauseVoice();
         }
     });
 
@@ -303,57 +301,58 @@ void VNoteMainWindow::initShortcuts()
         }
     });
 
-    //Select All
-    m_stSelectAll.reset(new QShortcut(this));
-    m_stSelectAll->setKey(Qt::CTRL + Qt::Key_A);
-    m_stSelectAll->setContext(Qt::ApplicationShortcut);
-    m_stSelectAll->setAutoRepeat(false);
 
-    connect(m_stSelectAll.get(), &QShortcut::activated, this, [this] {
-        //Call method in rightview
-        if (canDoShortcutAction()) {
-            m_rightView->selectAllItem();
-        }
-    });
+//    //Select All
+//    m_stSelectAll.reset(new QShortcut(this));
+//    m_stSelectAll->setKey(Qt::CTRL + Qt::Key_A);
+//    m_stSelectAll->setContext(Qt::ApplicationShortcut);
+//    m_stSelectAll->setAutoRepeat(false);
 
-    //Copy
-    m_stCopy.reset(new QShortcut(this));
-    m_stCopy->setKey(Qt::CTRL + Qt::Key_C);
-    m_stCopy->setContext(Qt::ApplicationShortcut);
-    m_stCopy->setAutoRepeat(false);
+//    connect(m_stSelectAll.get(), &QShortcut::activated, this, [this] {
+//        //Call method in rightview
+//        if (canDoShortcutAction()) {
+//            m_rightView->selectAllItem();
+//        }
+//    });
 
-    connect(m_stCopy.get(), &QShortcut::activated, this, [this] {
-        //Call method in rightview
-        if (canDoShortcutAction()) {
-            m_rightView->copySelectText();
-        }
-    });
+//    //Copy
+//    m_stCopy.reset(new QShortcut(this));
+//    m_stCopy->setKey(Qt::CTRL + Qt::Key_C);
+//    m_stCopy->setContext(Qt::ApplicationShortcut);
+//    m_stCopy->setAutoRepeat(false);
 
-    //Cut
-    m_stCut.reset(new QShortcut(this));
-    m_stCut->setKey(Qt::CTRL + Qt::Key_X);
-    m_stCut->setContext(Qt::ApplicationShortcut);
-    m_stCut->setAutoRepeat(false);
+//    connect(m_stCopy.get(), &QShortcut::activated, this, [this] {
+//        //Call method in rightview
+//        if (canDoShortcutAction()) {
+//            m_rightView->copySelectText();
+//        }
+//    });
 
-    connect(m_stCut.get(), &QShortcut::activated, this, [this] {
-        //Call method in rightview
-        if (canDoShortcutAction()) {
-            m_rightView->cutSelectText();
-        }
-    });
+//    //Cut
+//    m_stCut.reset(new QShortcut(this));
+//    m_stCut->setKey(Qt::CTRL + Qt::Key_X);
+//    m_stCut->setContext(Qt::ApplicationShortcut);
+//    m_stCut->setAutoRepeat(false);
 
-    //Paste
-    m_stPaste.reset(new QShortcut(this));
-    m_stPaste->setKey(Qt::CTRL + Qt::Key_V);
-    m_stPaste->setContext(Qt::ApplicationShortcut);
-    m_stPaste->setAutoRepeat(false);
+//    connect(m_stCut.get(), &QShortcut::activated, this, [this] {
+//        //Call method in rightview
+//        if (canDoShortcutAction()) {
+//            m_rightView->cutSelectText();
+//        }
+//    });
 
-    connect(m_stPaste.get(), &QShortcut::activated, this, [this] {
-        //Call method in rightview
-        if (canDoShortcutAction()) {
-            m_rightView->pasteText();
-        }
-    });
+//    //Paste
+//    m_stPaste.reset(new QShortcut(this));
+//    m_stPaste->setKey(Qt::CTRL + Qt::Key_V);
+//    m_stPaste->setContext(Qt::ApplicationShortcut);
+//    m_stPaste->setAutoRepeat(false);
+
+//    connect(m_stPaste.get(), &QShortcut::activated, this, [this] {
+//        //Call method in rightview
+//        if (canDoShortcutAction()) {
+//            m_rightView->pasteText();
+//        }
+//    });
 
     //Notebook/Note/Detial delete key
     m_stDelete.reset(new QShortcut(this));
@@ -363,31 +362,27 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stDelete.get(), &QShortcut::activated, this, [this] {
         if (canDoShortcutAction()) {
-            QAction *deleteAct = nullptr;
+                QAction *deleteAct = nullptr;
 
-            /*
-             * TODO:
-             *     We check focus here to choice what action we will
-             * take. Focus in leftview for delete notebook, in midlle
-             * view for delete note, in Rightview for delete note content.
-             * or do nothing.
-             * */
-            if (m_leftView->hasFocus()) {
-                deleteAct = ActionManager::Instance()->getActionById(
-                            ActionManager::NotebookDelete);
-            } else if (m_middleView->hasFocus()) {
-                deleteAct = ActionManager::Instance()->getActionById(
-                            ActionManager::NoteDelete);
-            } else if (m_rightView->hasFocus()) {
-
+                /*
+                 * TODO:
+                 *     We check focus here to choice what action we will
+                 * take. Focus in leftview for delete notebook, in midlle
+                 * view for delete note, in Rightview for delete note content.
+                 * or do nothing.
+                 * */
+                if (m_leftView->hasFocus()) {
+                    deleteAct = ActionManager::Instance()->getActionById(
+                                ActionManager::NotebookDelete);
+                } else if (m_middleView->hasFocus()) {
+                    deleteAct = ActionManager::Instance()->getActionById(
+                                ActionManager::NoteDelete);
+                }
+                if (nullptr != deleteAct) {
+                    deleteAct->triggered();
+                }
             }
-
-            //Triggle action if necessary
-            if (nullptr != deleteAct) {
-                deleteAct->triggered();
-            }
-        }
-    });
+        });
 
     m_stPreviewShortcuts.reset(new QShortcut(this));
     m_stPreviewShortcuts->setKey(QString("Ctrl+Shift+/"));
@@ -647,7 +642,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
     m_asrErrMeassage->setVisible(false);
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
     if (!loadNotes(data)) {
-        m_rightView->initData(nullptr, m_searchKey);
+        m_rightView->initData(nullptr, m_searchKey, false);
     }
 }
 
@@ -717,19 +712,27 @@ void VNoteMainWindow::onChangeTheme()
 {
     ;
 }
-
-void VNoteMainWindow::onA2TStart()
+void VNoteMainWindow ::onA2TStartAgain()
+{
+    onA2TStart(false);
+}
+void VNoteMainWindow::onA2TStart(bool first)
 {
     m_asrErrMeassage->setVisible(false);
-    DetailItemWidget *widget = m_rightView->getMenuItem();
-    if (widget && widget->getNoteBlock()->blockType == VNoteBlock::Voice) {
-        m_currentAsrVoice = static_cast<VoiceNoteItem *>(widget);
-    } else {
-        return;
+    VoiceNoteItem    *asrVoiceItem = nullptr;
+
+    if(first){
+        DetailItemWidget *widget = m_rightView->getMenuItem();
+        if(widget->getNoteBlock()->blockType == VNoteBlock::Voice){
+            asrVoiceItem = static_cast<VoiceNoteItem *>(widget);
+            m_rightView->setCurVoiceAsr(asrVoiceItem);
+        }
+    }else {
+        asrVoiceItem = m_rightView->getCurVoiceAsr();
     }
 
-    if (m_currentAsrVoice) {
-        VNVoiceBlock *data = m_currentAsrVoice->getNoteBlock()->ptrVoice;
+    if (asrVoiceItem) {
+        VNVoiceBlock *data = asrVoiceItem->getNoteBlock()->ptrVoice;
 
         if (nullptr != data) {
             //Check whether the audio lenght out of 20 minutes
@@ -740,7 +743,7 @@ void VNoteMainWindow::onA2TStart()
                 audioOutLimit.exec();
             } else {
                 setSpecialStatus(VoiceToTextStart);
-                m_currentAsrVoice->showAsrStartWindow();
+                asrVoiceItem->showAsrStartWindow();
                 QTimer::singleShot(0, this, [this, data]() {
                     m_a2tManager->startAsr(data->voicePath, data->voiceSize);
                 });
@@ -751,8 +754,9 @@ void VNoteMainWindow::onA2TStart()
 
 void VNoteMainWindow::onA2TError(int error)
 {
-    if (m_currentAsrVoice) {
-        m_currentAsrVoice->showAsrEndWindow("");
+    VoiceNoteItem    *asrVoiceItem = m_rightView->getCurVoiceAsr();
+    if (asrVoiceItem) {
+        asrVoiceItem->showAsrEndWindow("");
     }
     QString message = "";
     if (error == VNoteA2TManager::NetworkError) {
@@ -771,12 +775,14 @@ void VNoteMainWindow::onA2TError(int error)
 
 void VNoteMainWindow::onA2TSuccess(const QString &text)
 {
-    if (m_currentAsrVoice) {
-        m_currentAsrVoice->getNoteBlock()->blockText = text;
-        m_currentAsrVoice->showAsrEndWindow(text);
+    VoiceNoteItem    *asrVoiceItem = m_rightView->getCurVoiceAsr();
+    if (asrVoiceItem) {
+        asrVoiceItem->getNoteBlock()->blockText = text;
+        asrVoiceItem->showAsrEndWindow(text);
         m_rightView->updateData();
     }
     setSpecialStatus(VoiceToTextEnd);
+    m_rightView->setCurVoiceAsr(nullptr);
 }
 
 void VNoteMainWindow::onPreviewShortcut()
@@ -922,21 +928,7 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
 
 void VNoteMainWindow::keyPressEvent(QKeyEvent *event)
 {
-//<<<<<<< Updated upstream
     DMainWindow::keyPressEvent(event);
-//=======
-//    DMainWindow::keyPressEvent(event);
-////    qInfo() << "        VNoteMainWindow::keyPressEvent   ......   ";
-//    if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_C)) {
-//        if (m_rightView) {
-//            m_rightView->selectText2Clipboard();
-//        }
-//    }
-//    if (event->key() == Qt::Key_Backspace) {
-////        qDebug() << "           DetailWidget::keyPressEvent    Qt::Key_Backspace      1111111111111";
-//        emit sigDltSelectContant();
-//    }
-//>>>>>>> Stashed changes
 }
 
 bool VNoteMainWindow::checkIfNeedExit()
@@ -973,7 +965,8 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
     qDebug() << m_leftView->hasFocus() << m_rightView->hasFocus();
-    m_rightView->initData(data, m_searchKey);
+    m_rightView->initData(data, m_searchKey, m_rightViewHasFouse);
+    m_rightViewHasFouse = false;
     if (!m_searchKey.isEmpty() && m_noteSearchEdit->isEnabled()) {
         m_noteSearchEdit->lineEdit()->setFocus();
     }
@@ -1011,12 +1004,20 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         editNote();
         break;
     case ActionManager::DetailDelete: {
-        VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
-        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
-            delVoice();
-        });
+        int voiceCount,textCount;
+        m_rightView->getSelectionCount(voiceCount, textCount);
 
-        confirmDialog.exec();
+        if((!voiceCount && !textCount) || voiceCount){
+            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
+            connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+                m_rightView->doDelAction();
+            });
+
+            confirmDialog.exec();
+        } else {
+            m_rightView->doDelAction();
+        }
+
     } break;
     case ActionManager::NoteSaveText: {
         m_middleView->saveAsText();
@@ -1075,40 +1076,7 @@ void VNoteMainWindow::onMenuAbout2Show()
     } else if (menu == ActionManager::Instance()->notebookContextMenu()) {
         qDebug() << "notebookContextMenu";
     } else if (menu == ActionManager::Instance()->detialContextMenu()) {
-        QAction *asrAction = ActionManager::Instance()->getActionById(ActionManager::DetailVoice2Text);
-        QAction *delAction = ActionManager::Instance()->getActionById(ActionManager::DetailDelete);
-        QAction *cutAction = ActionManager::Instance()->getActionById(ActionManager::DetailCut);
-        DetailItemWidget *item = m_rightView->getMenuItem();
-        if (item != nullptr) {
-            bool textEmpyt = item->getNoteBlock()->blockText.isEmpty();
-            if (!textEmpyt || isVoice2Text()) {
-                asrAction->setEnabled(false);
-            } else {
-                asrAction->setEnabled(true);
-            }
-            if (isVoice2Text() || isPlaying()) {
-                bool enable = true;
-                if (isVoice2Text() && m_currentAsrVoice) {
-                    if (item == m_currentAsrVoice || m_currentAsrVoice->hasSelection()) {
-                        enable = false;
-                    }
-                }
-                if (isPlaying()) {
-                    VNoteBlock *block = m_recordBar->getVoiceData();
-                    VoiceNoteItem *voiceItem = m_rightView->getVoiceItem(block);
-                    if (voiceItem) {
-                        if (voiceItem == item || voiceItem->hasSelection()) {
-                            enable = false;
-                        }
-                    }
-                }
-                delAction->setEnabled(enable);
-                cutAction->setEnabled(enable);
-            } else {
-                delAction->setEnabled(true);
-                cutAction->setEnabled(true);
-            }
-        }
+        qDebug() << "detialContextMenu";
     }
 }
 
@@ -1176,6 +1144,7 @@ void VNoteMainWindow::addNote()
 {
     qint64 id = m_middleView->getCurrentId();
     if (id != -1) {
+        m_rightViewHasFouse = true;
         VNoteItem tmpNote;
         tmpNote.folderId = id;
         tmpNote.noteType = VNoteItem::VNT_Text;
@@ -1280,43 +1249,44 @@ void VNoteMainWindow::onRightViewVoicePause(VNVoiceBlock *voiceData)
 
 void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
 {
-    VoiceNoteItem *voiceItem = m_rightView->getVoiceItem(voiceData);
-    if (voiceItem) {
+    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
+    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
         voiceItem->showPauseBtn();
     }
 }
 
 void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
 {
-    VoiceNoteItem *voiceItem = m_rightView->getVoiceItem(voiceData);
-    if (voiceItem) {
+    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
+    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
         voiceItem->showPlayBtn();
     }
 }
 
 void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
 {
-    VoiceNoteItem *voiceItem = m_rightView->getVoiceItem(voiceData);
-    if (voiceItem) {
+    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
+    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
         voiceItem->showPlayBtn();
     }
     setSpecialStatus(PlayVoiceEnd);
+    m_rightView->setCurVoicePlay(nullptr);
 }
 
 void VNoteMainWindow::delVoice()
 {
-    DetailItemWidget *voiceItem = m_rightView->getMenuItem();
-    if (voiceItem) {
-        if (m_asrErrMeassage->isVisible() && voiceItem == m_currentAsrVoice) {
-            m_asrErrMeassage->setVisible(false);
-            m_currentAsrVoice = nullptr;
-        }
-        if (m_recordBar->stopVoice(voiceItem->getNoteBlock()->ptrVoice)) {
-            setSpecialStatus(PlayVoiceEnd);
-        }
-        m_rightView->delWidget(voiceItem);
-        m_rightView->updateData();
-    }
+//    DetailItemWidget *voiceItem = m_rightView->getMenuItem();
+//    if (voiceItem) {
+//        if (m_asrErrMeassage->isVisible() && voiceItem == m_currentAsrVoice) {
+//            m_asrErrMeassage->setVisible(false);
+//            m_currentAsrVoice = nullptr;
+//        }
+//        if (m_recordBar->stopVoice() {
+//            setSpecialStatus(PlayVoiceEnd);
+//        }
+//        m_rightView->delWidget(voiceItem);
+//        m_rightView->updateData();
+//    }
 }
 
 bool VNoteMainWindow::canDoShortcutAction() const

@@ -24,6 +24,7 @@ public:
     void pauseVideo();
     void playVideo();
     void stopVideo();
+    QMediaPlayer::State getPlayerStatus();
     VNVoiceBlock* getVoiceData();
 signals:
     void sigPlayVoice(VNVoiceBlock * voiceData);

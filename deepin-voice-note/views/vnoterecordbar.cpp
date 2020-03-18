@@ -188,3 +188,15 @@ bool VNoteRecordBar::stopVoice(VNVoiceBlock *voiceData)
      }
      return nullptr;
  }
+
+ void VNoteRecordBar::playOrPauseVoice()
+ {
+     if(m_mainLayout->currentWidget() == m_playPanel){
+         QMediaPlayer::State status = m_playPanel->getPlayerStatus();
+         if(status == QMediaPlayer::PlayingState){
+             m_playPanel->onPauseBtnClicked();
+         }else if (status == QMediaPlayer::PausedState) {
+            m_playPanel->onPlayBtnClicked();
+        }
+     }
+ }

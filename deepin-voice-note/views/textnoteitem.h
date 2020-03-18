@@ -35,6 +35,7 @@ signals:
 private:
     void         initUi();
     void         initConnection();
+    bool m_select   {false};
     VNoteBlock   *m_noteBlock {nullptr};
     TextNoteEdit *m_textEdit {nullptr};
     QRegExp       m_serchKey ;

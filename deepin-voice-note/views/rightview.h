@@ -23,7 +23,7 @@ class RightView : public DWidget
     Q_OBJECT
 public:
     explicit RightView(QWidget *parent = nullptr);
-    void initData(VNoteItem *data, QRegExp reg = QRegExp());
+    void initData(VNoteItem *data, QRegExp reg = QRegExp(), bool fouse = false);
     DetailItemWidget *insertVoiceItem(const QString &voicePath, qint64 voiceSize);
     DetailItemWidget *insertTextEdit(VNoteBlock *data, bool focus = false, QRegExp reg = QRegExp());
     void  setEnablePlayBtn(bool enable);
@@ -33,11 +33,23 @@ public:
     void  selectAllItem();
     void  clearAllSelection();
     void  pasteText();
-    void  initAction(DetailItemWidget *widget);
-    QString copySelectText(int *start = nullptr, int *end = nullptr); //复制文本
-    void cutSelectText(); //剪切文本
-    VoiceNoteItem *getVoiceItem(VNoteBlock *data);
+
+    void  initAction(DetailItemWidget * widget);
+    void  getSelectionCount(int &voiceCount, int &textCount);
+    QString copySelectText(); //复制文本
+    void cutSelectText(bool isByAction = true); //剪切文本
+    void delSelectText();
+    void doDelAction(bool isByAction = true);
+
+    void setCurVoicePlay(VoiceNoteItem* item);
+    void setCurVoiceAsr(VoiceNoteItem* item);
+
+    VoiceNoteItem *getCurVoicePlay();
+    VoiceNoteItem *getCurVoiceAsr();
+
     DetailItemWidget *getMenuItem();
+    bool        hasSelection();
+
 signals:
     void sigVoicePlay(VNVoiceBlock *voiceData);
     void sigVoicePause(VNVoiceBlock *voiceData);
@@ -60,19 +72,13 @@ protected:
 private:
     void initUi();
     void initMenu();
-    void getSelectionCount(int &voiceCount, int &textCount);
-    void onMenuShow(DetailItemWidget *widget);
+    void onMenuShow(DetailItemWidget * widget);
 
     bool        checkFileExist(const QString &file);
-//    <<< <<< < Updated upstream
     DetailItemWidget *getWidgetByPos(const QPoint &pos);
-    DetailItemWidget *m_menuWidget {nullptr};
-//=======
-//    QWidget     *getWidgetByPos(const QPoint &pos);
-//    void clearBeforeSelect(const QPoint &);
-//private:
-//    VoiceNoteItem *m_menuVoice {nullptr};
-//>>>>>>> Stashed changes
+    VoiceNoteItem    *m_curPlayItem {nullptr};
+    VoiceNoteItem    *m_curAsrItem {nullptr};
+
     VNoteItem   *m_noteItemData {nullptr};
     DetailItemWidget *m_curItemWidget{nullptr};
     DWidget     *m_placeholderWidget {nullptr};
@@ -81,12 +87,7 @@ private:
     DMenu       *m_noteDetailContextMenu {nullptr};
     DDialog     *m_fileHasDelDialog {nullptr};
     bool         m_fIsNoteModified {false};
-//    <<< <<< < Updated upstream
-//    == == == =
-//    QString m_strSelectText{""};//当前选择的文本内容
-//    QList<TextNoteEdit *> m_selectTextItem{nullptr};  //当前选中的包含的textItem
-//    QPoint m_pointStart{0, 0}; //选择文本的起始点
-//    >>> >>> > Stashed changes
+    bool         m_isFristTextChange {false};
 };
 
 #endif // RIGHTVIEW_H

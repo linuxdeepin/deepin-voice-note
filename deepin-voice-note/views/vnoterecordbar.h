@@ -25,6 +25,7 @@ public:
     void initUI();
     void initConnections();
     void cancelRecord();
+    void playOrPauseVoice();
     void playVoice(VNVoiceBlock *voiceData);
     void pauseVoice(VNVoiceBlock *voiceData);
     bool stopVoice(VNVoiceBlock *voiceData);

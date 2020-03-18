@@ -164,3 +164,8 @@ VNVoiceBlock* VNotePlayWidget::getVoiceData()
 {
     return m_voiceBlock;
 }
+
+QMediaPlayer::State VNotePlayWidget::getPlayerStatus()
+{
+    return m_player->state();
+}

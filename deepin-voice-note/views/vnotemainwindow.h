@@ -107,7 +107,8 @@ public slots:
 
     void onChangeTheme();
     //Audio to text API
-    void onA2TStart();
+    void onA2TStart(bool first = true);
+    void onA2TStartAgain();
     void onA2TError(int error);
     void onA2TSuccess(const QString &text);
     //Shotcuts slots
@@ -167,6 +168,7 @@ private:
     SplashView *m_splashView {nullptr};
     HomePage *m_wndHomePage {nullptr};
     DStackedWidget *m_centerWidget {nullptr};
+    bool            m_rightViewHasFouse {true};
 
     //App setting, reference to VNoteApplication's setting
     QSharedPointer<QSettings> m_qspSetting {nullptr};
@@ -195,7 +197,7 @@ private:
     //*****************Shortcut keys end**********************
 
     QRegExp          m_searchKey;
-    VoiceNoteItem    *m_currentAsrVoice {nullptr};
+    //VoiceNoteItem    *m_currentAsrVoice {nullptr};
     DFloatingMessage *m_asrErrMeassage {nullptr};
     DPushButton      *m_asrAgainBtn {nullptr};
     //Login session manager

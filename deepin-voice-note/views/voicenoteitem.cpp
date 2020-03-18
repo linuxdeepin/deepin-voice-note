@@ -106,7 +106,6 @@ void VoiceNoteItem::updateData()
             m_createTimeLab->setText(Utils::convertDateTime(voiceBlock->createTime));
             m_voiceNameLab->setText(voiceBlock->voiceTitle);
             m_voiceSizeLab->setText(Utils::formatMillisecond(voiceBlock->voiceSize));
-            m_noteBlock->blockText = "11\n22\n33\n44\n55";
             if (!m_noteBlock->blockText.isEmpty()) {
                 showAsrEndWindow(m_noteBlock->blockText);
             }
@@ -323,4 +322,9 @@ void VoiceNoteItem::setFocus()
 bool VoiceNoteItem::hasFocus()
 {
     return  QWidget::hasFocus();
+}
+
+bool VoiceNoteItem::isAsring()
+{
+    return  m_asrText->isVisible() && m_noteBlock->blockText.isEmpty();
 }
