@@ -27,7 +27,7 @@ void TextNoteItem::initUi()
     DStyle::setFocusRectVisible(m_textEdit, false);
     DPalette pb = DApplicationHelper::instance()->palette(m_textEdit);
     pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));
-    //m_textEdit->setPalette(pb);
+    m_textEdit->setPalette(pb);
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_textEdit);

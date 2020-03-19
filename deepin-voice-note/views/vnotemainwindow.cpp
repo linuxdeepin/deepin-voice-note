@@ -1388,7 +1388,9 @@ void VNoteMainWindow::initAsrErrMessage()
 {
     m_asrErrMeassage = new DFloatingMessage(DFloatingMessage::ResidentType,
                                             m_rightViewHolder);
-    m_asrErrMeassage->setIcon(QIcon(":/images/icon/normal/warning .svg"));
+    QString iconPath = STAND_ICON_PAHT;
+    iconPath.append("warning.svg");
+    m_asrErrMeassage->setIcon(QIcon(iconPath));
     m_asrAgainBtn = new DPushButton(m_asrErrMeassage);
 
     m_asrAgainBtn->setText(DApplication::translate(
