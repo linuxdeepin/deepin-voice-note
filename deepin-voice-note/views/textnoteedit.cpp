@@ -47,14 +47,14 @@ void TextNoteEdit::keyPressEvent(QKeyEvent *e)
        DTextEdit::keyPressEvent(e);
     }
 
-    if (e->key() == Qt::Key_Backspace) {
-        static bool preEmpty = false;
-        bool isEmpty = this->document()->isEmpty();
-        if (isEmpty && !preEmpty ) {
-            emit sigDelEmpty();
-        }
-        preEmpty = isEmpty;
-    }
+//    if (e->key() == Qt::Key_Backspace) {
+//        static bool preEmpty = false;
+//        bool isEmpty = this->document()->isEmpty();
+//        if (isEmpty && !preEmpty ) {
+//            emit sigDelEmpty();
+//        }
+//        preEmpty = isEmpty;
+//    }
 
     e->ignore();
 }

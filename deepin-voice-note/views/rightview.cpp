@@ -1,12 +1,15 @@
 #include "rightview.h"
 #include "textnoteitem.h"
 #include "voicenoteitem.h"
+#include "globaldef.h"
 
 #include "common/vnoteitem.h"
 #include "common/vnotedatamanager.h"
 #include "common/actionmanager.h"
 
 #include "db/vnoteitemoper.h"
+
+#include "dialog/vnotemessagedialog.h"
 
 #include <QBoxLayout>
 #include <QDebug>
@@ -34,6 +37,8 @@ RightView::RightView(QWidget *parent)
 {
     initUi();
     initMenu();
+    initConnection();
+    onChangeTheme();
 }
 
 void RightView::initUi()
@@ -56,6 +61,8 @@ void RightView::initUi()
                                       "RightView",
                                       "OK"), false, DDialog::ButtonNormal);
     m_fileHasDelDialog->setEnabled(false);
+    m_hornGif = new QMovie(this);
+    m_hornGif->setScaledSize(QSize(16,14));
 }
 
 void RightView::initMenu()
@@ -80,13 +87,25 @@ DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QRegEx
     }
     connect(editItem, &TextNoteItem::sigCursorHeightChange, this, &RightView::adjustVerticalScrollBar);
     connect(editItem, &TextNoteItem::sigFocusOut, this, &RightView::onTextEditFocusOut);
-    connect(editItem, &TextNoteItem::sigDelEmpty, this, &RightView::onTextEditDelEmpty);
+    //connect(editItem, &TextNoteItem::sigDelEmpty, this, &RightView::onTextEditDelEmpty);
     connect(editItem, &TextNoteItem::sigTextChanged, this, &RightView::onTextEditTextChange);
     return  editItem;
 }
 
 DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
 {
+
+    if (m_curItemWidget == nullptr || m_noteItemData == nullptr) {
+        qDebug() << "can not insert";
+        return  nullptr;
+    }
+
+    if (m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Voice) {
+        VNoteBlock *textBlock = m_noteItemData->newBlock(VNoteBlock::Text);
+        m_noteItemData->addBlock(m_curItemWidget->getNoteBlock(), textBlock);
+        m_curItemWidget = insertTextEdit(textBlock, false);
+    }
+
     VNoteItemOper noteOps(m_noteItemData);
 
     VNoteBlock *data = m_noteItemData->newBlock(VNoteBlock::Voice);
@@ -97,6 +116,7 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
     data->ptrVoice->voiceTitle = noteOps.getDefaultVoiceName();
 
     VoiceNoteItem *item = new VoiceNoteItem(data, this);
+    item->setHornGif(m_hornGif);
 
     connect(item, &VoiceNoteItem::sigPlayBtnClicked, this, &RightView::onVoicePlay);
     connect(item, &VoiceNoteItem::sigPauseBtnClicked, this, &RightView::onVoicePause);
@@ -122,11 +142,22 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
 
     m_noteItemData->addBlock(preBlock, data);
     m_curItemWidget = item;
+
     if (!cutStr.isEmpty() || curIndex + 1 == m_viewportLayout->indexOf(m_placeholderWidget)) {
         VNoteBlock *textBlock = m_noteItemData->newBlock(VNoteBlock::Text);
         textBlock->blockText = cutStr;
         m_curItemWidget = insertTextEdit(textBlock, true);
         m_noteItemData->addBlock(item->getNoteBlock(), textBlock);
+    } else {
+        int index = m_viewportLayout->indexOf(m_curItemWidget);
+        QLayoutItem *layoutItem = m_viewportLayout->itemAt(index + 1);
+        if (layoutItem) {
+            DetailItemWidget *nextWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
+            if (nextWidget && nextWidget != m_placeholderWidget) {
+                m_curItemWidget = nextWidget;
+                m_curItemWidget->setFocus();
+            }
+        }
     }
     int height = 0;
     QRect rc =  m_curItemWidget->getCursorRect();
@@ -188,6 +219,7 @@ void RightView::initData(VNoteItem *data, QRegExp reg, bool fouse)
                 m_curItemWidget = insertTextEdit(it, fouse, reg);
             } else if (VNoteBlock::Voice == it->getType()) {
                 VoiceNoteItem *item = new VoiceNoteItem(it, this);
+                item->setHornGif(m_hornGif);
                 int preIndex = -1;
                 if (m_curItemWidget != nullptr) {
                     preIndex = m_viewportLayout->indexOf(m_curItemWidget);
@@ -311,8 +343,8 @@ void RightView::initAction(DetailItemWidget *widget)
             if (!tolCount) {
                 voiceSaveAction->setEnabled(true);
 
-                if(blockData->ptrVoice->blockText.isEmpty()){
-                   voice2TextAction->setEnabled(true);
+                if (blockData->ptrVoice->blockText.isEmpty()) {
+                    voice2TextAction->setEnabled(true);
                 }
 
             }
@@ -602,17 +634,19 @@ QString RightView::copySelectText()
 
 void RightView::cutSelectText(bool isByAction)
 {
-    if (!isByAction) {
-        initAction(m_curItemWidget);
-        QAction *cutAction = ActionManager::Instance()->getActionById(ActionManager::DetailCut);
-        if (!cutAction->isEnabled()) {
-            qDebug() << "can not cut";
-            return;
+    if (m_curItemWidget) {
+        if (!isByAction) {
+            initAction(m_curItemWidget);
+            QAction *cutAction = ActionManager::Instance()->getActionById(ActionManager::DetailCut);
+            if (!cutAction->isEnabled()) {
+                qDebug() << "can not cut";
+                return;
+            }
         }
-    }
 
-    copySelectText();
-    delSelectText();
+        copySelectText();
+        delSelectText();
+    }
 }
 
 void RightView::delSelectText()
@@ -703,7 +737,15 @@ void RightView::keyPressEvent(QKeyEvent *e)
             selectAllItem();
             break;
         case Qt::Key_X:
-            cutSelectText(false);
+            if(showDelDialog()){
+                VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
+                connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this](){
+                    cutSelectText(false);
+                });
+                confirmDialog.exec();
+            }else {
+               cutSelectText(false);
+            }
             break;
         case Qt::Key_V:
             pasteText();
@@ -711,8 +753,16 @@ void RightView::keyPressEvent(QKeyEvent *e)
         default:
             break;
         }
-    }else if (e->key() == Qt::Key_Delete) {
-        doDelAction(false);
+    } else if (e->key() == Qt::Key_Delete) {
+        if(showDelDialog()){
+            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
+            connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this](){
+                doDelAction(false);
+            });
+            confirmDialog.exec();
+        }else {
+           doDelAction(false);
+        }
     }
 }
 
@@ -750,21 +800,71 @@ bool RightView::hasSelection()
 
 void RightView::doDelAction(bool isByAction)
 {
-    if (!isByAction) {
-        initAction(m_curItemWidget);
-        QAction *delAction = ActionManager::Instance()->getActionById(ActionManager::DetailDelete);
-        if (!delAction->isEnabled()) {
-            qDebug() << "can not del";
-            return;
+    if (m_curItemWidget) {
+        if (!isByAction) {
+            initAction(m_curItemWidget);
+            QAction *delAction = ActionManager::Instance()->getActionById(ActionManager::DetailDelete);
+            if (!delAction->isEnabled()) {
+                qDebug() << "can not del";
+                return;
+            }
+        }
+
+        if (hasSelection()) {
+            delSelectText();
+        } else if (m_curItemWidget) {
+            VNoteBlock *block = m_curItemWidget->getNoteBlock();
+            if (block->blockType == VNoteBlock::Voice) {
+                delWidget(m_curItemWidget);
+                updateData();
+            }
         }
     }
-    if (hasSelection()) {
-        delSelectText();
+}
+
+bool RightView::showDelDialog()
+{
+    bool showDialog = false;
+    int voiceCount, textCount;
+    getSelectionCount(voiceCount, textCount);
+    if (voiceCount) {
+        showDialog = true;
     } else if (m_curItemWidget) {
-        VNoteBlock *block = m_curItemWidget->getNoteBlock();
-        if (block->blockType == VNoteBlock::Voice) {
-            delWidget(m_curItemWidget);
-            updateData();
+        if (!textCount && m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Voice) {
+            showDialog = true;
+        }
+    }
+    return showDialog;
+}
+
+void RightView::initConnection()
+{
+    connect(DGuiApplicationHelper::instance(),
+                     &DGuiApplicationHelper::themeTypeChanged,
+            this, &RightView::onChangeTheme);
+}
+
+void RightView::onChangeTheme()
+{
+    if(m_hornGif){
+        QMovie::MovieState status = m_hornGif->state();
+        if(status == QMovie::Running){ //运行时无法切换图片，先停止
+            m_hornGif->stop();
+        }
+
+        QString iconPath(STAND_ICON_PAHT);
+        DGuiApplicationHelper::ColorType theme =
+                DGuiApplicationHelper::instance()->themeType();
+        if(theme == DGuiApplicationHelper::DarkType){
+            iconPath += "dark/voice.gif";
+        }else if (theme == DGuiApplicationHelper::LightType) {
+            iconPath += "light/voice.gif";
+        }
+
+        m_hornGif->setFileName(iconPath);
+
+        if(status == QMovie::Running){ //重新启动
+            m_hornGif->start();
         }
     }
 }

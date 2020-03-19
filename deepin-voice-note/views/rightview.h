@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QList>
 #include <QShortcut>
+#include <QMovie>
 
 #include <DWidget>
 #include <DDialog>
@@ -49,6 +50,7 @@ public:
 
     DetailItemWidget *getMenuItem();
     bool        hasSelection();
+    bool        showDelDialog();
 
 signals:
     void sigVoicePlay(VNVoiceBlock *voiceData);
@@ -61,6 +63,7 @@ public slots:
     void onTextEditTextChange();
     void onVoicePlay(VoiceNoteItem *item);
     void onVoicePause(VoiceNoteItem *item);
+    void onChangeTheme();
 protected:
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -71,6 +74,7 @@ protected:
     void adjustVerticalScrollBar(QWidget *widget, int defaultHeight);
 private:
     void initUi();
+    void initConnection();
     void initMenu();
     void onMenuShow(DetailItemWidget * widget);
 
@@ -88,6 +92,7 @@ private:
     DDialog     *m_fileHasDelDialog {nullptr};
     bool         m_fIsNoteModified {false};
     bool         m_isFristTextChange {false};
+    QMovie          *m_hornGif {nullptr};
 };
 
 #endif // RIGHTVIEW_H

@@ -17,6 +17,7 @@
 #include <DFontSizeManager>
 #include <DGuiApplicationHelper>
 #include <DStyle>
+#include <DAnchors>
 
 #define DefaultHeight 64
 
@@ -36,11 +37,15 @@ void VoiceNoteItem::initUi()
     m_bgWidget = new DFrame(this);
     m_createTimeLab = new DLabel(m_bgWidget);
     DFontSizeManager::instance()->bind(m_createTimeLab, DFontSizeManager::T8);
+    DPalette pb = DApplicationHelper::instance()->palette(m_createTimeLab);
+    pb.setBrush(DPalette::Text, pb.color(DPalette::TextTips));
+    m_createTimeLab->setPalette(pb);
+
     m_asrText = new TextNoteEdit(m_bgWidget);
     DFontSizeManager::instance()->bind(m_asrText, DFontSizeManager::T8);
     m_asrText->setReadOnly(true);
     DStyle::setFocusRectVisible(m_asrText, false);
-    DPalette pb = DApplicationHelper::instance()->palette(m_asrText);
+    pb = DApplicationHelper::instance()->palette(m_asrText);
     pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));
     pb.setBrush(DPalette::Text, pb.color(DPalette::Highlight));
     m_asrText->setPalette(pb);
@@ -49,45 +54,66 @@ void VoiceNoteItem::initUi()
     m_asrText->document()->setDocumentMargin(0);
     m_asrText->setVisible(false);
     m_asrText->setContextMenuPolicy(Qt::NoContextMenu);
+
     m_voiceSizeLab = new DLabel(m_bgWidget);
-    m_voiceSizeLab->setFixedSize(66, 30);
-    m_voiceSizeLab->setAlignment(Qt::AlignCenter);
+    DFontSizeManager::instance()->bind(m_voiceSizeLab, DFontSizeManager::T8);
+
     m_pauseBtn = new VNoteIconButton(m_bgWidget
                                      , "pause_normal.svg"
                                      , "pause_hover.svg"
                                      , "pause_press.svg");
     m_pauseBtn->setIconSize(QSize(60, 60));
     m_pauseBtn->setFlat(true);
-
     m_playBtn = new VNoteIconButton(m_bgWidget
                                     , "play_normal.svg"
                                     , "play_hover.svg"
                                     , "play_press.svg");
+
     m_playBtn->setIconSize(QSize(60, 60));
     m_playBtn->setFlat(true);
     m_playBtn->SetDisableIcon("play_disabled.svg");
-    m_voiceNameLab = new DLabel(this);
+
+    m_voiceNameLab = new DLabel(m_bgWidget);
     DFontSizeManager::instance()->bind(m_voiceNameLab, DFontSizeManager::T6);
+
+    m_hornLab = new DLabel(m_bgWidget);
+    m_hornLab->setAlignment(Qt::AlignRight);
+    DAnchorsBase buttonAnchor(m_hornLab);
+    buttonAnchor.setAnchor(Qt::AnchorRight, m_bgWidget, Qt::AnchorRight);
+    buttonAnchor.setAnchor(Qt::AnchorTop, m_bgWidget, Qt::AnchorTop);
+    buttonAnchor.setTopMargin(10);
+    buttonAnchor.setRightMargin(25);
+
+
     QGridLayout *playBtnLayout = new QGridLayout;
     playBtnLayout->addWidget(m_pauseBtn, 0, 0);
     playBtnLayout->addWidget(m_playBtn, 0, 0);
     playBtnLayout->setSizeConstraint(QLayout::SetNoConstraint);
+
     QVBoxLayout *nameLayout = new QVBoxLayout;
     nameLayout->addWidget(m_voiceNameLab, Qt::AlignLeft);
     nameLayout->addWidget(m_createTimeLab, Qt::AlignLeft);
     nameLayout->setContentsMargins(0, 0, 0, 0);
     nameLayout->setSpacing(0);
+
+    QVBoxLayout *rightLayout = new QVBoxLayout;
+    rightLayout->addSpacing(35);
+    rightLayout->addWidget(m_voiceSizeLab);
+    rightLayout->setSizeConstraint(QLayout::SetNoConstraint);
+
     QHBoxLayout *itemLayout = new QHBoxLayout;
     itemLayout->addLayout(playBtnLayout);
     itemLayout->addLayout(nameLayout, 1);
-    itemLayout->addWidget(m_voiceSizeLab);
+    itemLayout->addLayout(rightLayout);
     itemLayout->setSizeConstraint(QLayout::SetNoConstraint);
     itemLayout->setContentsMargins(0, 0, 0, 0);
+
     QVBoxLayout *bkLayout = new QVBoxLayout;
     bkLayout->addLayout(itemLayout);
     bkLayout->addWidget(m_asrText);
-    bkLayout->setContentsMargins(0, 0, 0, 0);
+    bkLayout->setContentsMargins(0, 0, 20, 0);
     m_bgWidget->setLayout(bkLayout);
+
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(m_bgWidget);
     mainLayout->setContentsMargins(10, 0, 10, 0);
@@ -146,12 +172,20 @@ void VoiceNoteItem::showPlayBtn()
 {
     m_pauseBtn->setVisible(false);
     m_playBtn->setVisible(true);
+    m_hornLab->setVisible(false);
+    if(m_hornGif){
+        m_hornGif->stop();
+    }
 }
 
 void VoiceNoteItem::showPauseBtn()
 {
     m_pauseBtn->setVisible(true);
     m_playBtn->setVisible(false);
+    m_hornLab->setVisible(true);
+    if(m_hornGif){
+         m_hornGif->start();
+    }
 }
 
 void VoiceNoteItem::showAsrStartWindow()
@@ -316,15 +350,30 @@ bool VoiceNoteItem::isAsrTextPos(const QPoint &globalPos)
 
 void VoiceNoteItem::setFocus()
 {
-    return QWidget::setFocus();
+    QWidget *parent = static_cast<QWidget*>(this->parent());
+    if(parent){
+        parent->setFocus();
+    }
 }
 
 bool VoiceNoteItem::hasFocus()
 {
-    return  QWidget::hasFocus();
+    QWidget *parent = static_cast<QWidget*>(this->parent());
+    if(parent){
+        return parent->hasFocus();
+    }
+    return false;
 }
 
 bool VoiceNoteItem::isAsring()
 {
     return  m_asrText->isVisible() && m_noteBlock->blockText.isEmpty();
+}
+
+void VoiceNoteItem::setHornGif(QMovie *gif)
+{
+    if(gif){
+        m_hornGif = gif;
+        m_hornLab->setMovie(m_hornGif);
+    }
 }

@@ -62,8 +62,8 @@ VNoteMainWindow::~VNoteMainWindow()
     }
 
     //Check deviceWacherThread exit time.
-    struct timeval start, end;
-    gettimeofday(&start, nullptr);
+    //struct timeval start, end;
+    //gettimeofday(&start, nullptr);
 
     //Notify device watch thread to exit.
     m_audioDeviceWatcher->exitWatcher();
@@ -76,8 +76,8 @@ VNoteMainWindow::~VNoteMainWindow()
     //thread,OS will clear it.
     //m_audioDeviceWatcher->wait(AUDIO_DEV_CHECK_TIME);
 
-    gettimeofday(&end, nullptr);
-    qInfo() << "wait audioDeviceWatcher for:" << TM(start,end);
+    //gettimeofday(&end, nullptr);
+    //qInfo() << "wait audioDeviceWatcher for:" << TM(start,end);
 
     QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
     if (isVoice2Text()) {
@@ -391,6 +391,9 @@ void VNoteMainWindow::initShortcuts()
                 } else if (m_middleView->hasFocus()) {
                     deleteAct = ActionManager::Instance()->getActionById(
                                 ActionManager::NoteDelete);
+                }else if (m_rightView->hasFocus()) {
+                    deleteAct = ActionManager::Instance()->getActionById(
+                                ActionManager::DetailDelete);
                 }
                 if (nullptr != deleteAct) {
                     deleteAct->triggered();
@@ -1018,17 +1021,14 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         editNote();
         break;
     case ActionManager::DetailDelete: {
-        int voiceCount,textCount;
-        m_rightView->getSelectionCount(voiceCount, textCount);
+         if(m_rightView->showDelDialog()){
+             VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
+             connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+                 m_rightView->doDelAction();
+             });
 
-        if((!voiceCount && !textCount) || voiceCount){
-            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
-            connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
-                m_rightView->doDelAction();
-            });
-
-            confirmDialog.exec();
-        } else {
+             confirmDialog.exec();
+         }else {
             m_rightView->doDelAction();
         }
 

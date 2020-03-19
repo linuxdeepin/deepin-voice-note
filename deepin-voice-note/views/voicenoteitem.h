@@ -2,6 +2,8 @@
 #define VOICENOTEITEM_H
 #include "common/vnoteitem.h"
 
+#include <QMovie>
+
 #include <DWidget>
 #include <DFrame>
 #include <DLabel>
@@ -21,6 +23,7 @@ public:
 
     explicit VoiceNoteItem(VNoteBlock *noteBlock, QWidget *parent = nullptr);
 
+    void setHornGif(QMovie *gif);
     void showPlayBtn();
     void showPauseBtn();
     void showAsrStartWindow();
@@ -57,10 +60,13 @@ public slots:
     void onPauseBtnClicked();
     void onAsrTextChange();
     void onChangeTheme();
+
 private:
     void initUi();
     void initConnection();
     bool m_select   {false};
+    QMovie          *m_hornGif {nullptr};
+    DLabel          *m_hornLab {nullptr};
     DLabel          *m_createTimeLab {nullptr};
     DLabel          *m_voiceSizeLab {nullptr};
     DLabel          *m_voiceNameLab {nullptr};
