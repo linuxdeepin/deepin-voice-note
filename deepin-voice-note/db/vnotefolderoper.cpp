@@ -53,7 +53,7 @@ bool VNoteFolderOper::deleteVNoteFolder(qint64 folderId)
 
     deleteNotesSql.sprintf(DEL_FNOTE_FMT
                       , VNoteDbManager::NOTES_TABLE_NAME
-                      , VNoteItemOper::noteColumnsName[folder_id].toUtf8().data()
+                      , VNoteItemOper::noteColumnsName[VNoteItemOper::folder_id].toUtf8().data()
                       , QString("%1").arg(folderId).toUtf8().data()
                       );
 
