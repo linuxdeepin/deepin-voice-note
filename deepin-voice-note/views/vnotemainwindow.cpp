@@ -60,14 +60,18 @@ VNoteMainWindow::~VNoteMainWindow()
     if (!isMaximized()) {
         m_qspSetting->setValue(VNOTE_MAINWND_SZ_KEY, saveGeometry());
     }
+
+    //Check deviceWacherThread exit time.
+    struct timeval start, end;
+    gettimeofday(&start, nullptr);
+
     //TODO:
     //    Nofiy audio watcher to exit & need
     //wait at least AUDIO_DEV_CHECK_TIME ms
-    QScopedPointer<VNoteAudioDeviceWatcher> autoRelease(
-        m_audioDeviceWatcher
-    );
-    autoRelease->exitWatcher();
-    autoRelease->wait(AUDIO_DEV_CHECK_TIME);
+    m_audioDeviceWatcher->wait(AUDIO_DEV_CHECK_TIME);
+
+    gettimeofday(&end, nullptr);
+    qInfo() << "wait audioDeviceWatcher for:" << TM(start,end);
 
     QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
     if (isVoice2Text()) {
@@ -957,6 +961,15 @@ bool VNoteMainWindow::checkIfNeedExit()
         if (QDialog::Rejected == pspMessageDialg->exec()) {
             bNeedExit = false;
         }
+    }
+
+    //Notify device watch thread to exit.
+    //TODO:
+    //    Set exit flag,then force thread exit
+    //set flag may be not necessary.
+    if (bNeedExit) {
+        m_audioDeviceWatcher->exitWatcher();
+        m_audioDeviceWatcher->terminate();
     }
 
     return bNeedExit;

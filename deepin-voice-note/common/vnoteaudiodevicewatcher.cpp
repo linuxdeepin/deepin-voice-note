@@ -97,6 +97,7 @@ void VNoteAudioDeviceWatcher::run()
     do {
         //Quit watch thread
         if (m_quitWatcher) {
+            qInfo() << "AudioDeviceWatcher ready to exit.";
             break;
         }
 

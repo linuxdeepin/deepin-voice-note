@@ -41,7 +41,7 @@ private:
     QScopedPointer<com::deepin::daemon::audio::Meter> m_defaultSourceMeter;
 
     MicrophoneState m_microphoneState {NotAvailable};
-    bool m_quitWatcher {false};
+    volatile bool m_quitWatcher {false};
 
     bool m_fNeedDeviceChecker {true};
 };
