@@ -65,10 +65,16 @@ VNoteMainWindow::~VNoteMainWindow()
     struct timeval start, end;
     gettimeofday(&start, nullptr);
 
+    //Notify device watch thread to exit.
+    m_audioDeviceWatcher->exitWatcher();
+
     //TODO:
     //    Nofiy audio watcher to exit & need
     //wait at least AUDIO_DEV_CHECK_TIME ms
-    m_audioDeviceWatcher->wait(AUDIO_DEV_CHECK_TIME);
+    //Reversion:2020-3-19
+    //     Only set the exit flag,don't wait the watch
+    //thread,OS will clear it.
+    //m_audioDeviceWatcher->wait(AUDIO_DEV_CHECK_TIME);
 
     gettimeofday(&end, nullptr);
     qInfo() << "wait audioDeviceWatcher for:" << TM(start,end);
@@ -961,15 +967,6 @@ bool VNoteMainWindow::checkIfNeedExit()
         if (QDialog::Rejected == pspMessageDialg->exec()) {
             bNeedExit = false;
         }
-    }
-
-    //Notify device watch thread to exit.
-    //TODO:
-    //    Set exit flag,then force thread exit
-    //set flag may be not necessary.
-    if (bNeedExit) {
-        m_audioDeviceWatcher->exitWatcher();
-        m_audioDeviceWatcher->terminate();
     }
 
     return bNeedExit;
