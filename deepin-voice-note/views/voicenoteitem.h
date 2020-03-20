@@ -59,7 +59,6 @@ public slots:
     void onPlayBtnClicked();
     void onPauseBtnClicked();
     void onAsrTextChange();
-    void onChangeTheme();
 
 private:
     void initUi();

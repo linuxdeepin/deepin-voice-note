@@ -186,10 +186,6 @@ private:
     QScopedPointer<QShortcut> m_stSaveAsMp3;     //Ctrl+P
     QScopedPointer<QShortcut> m_stSaveAsText;    //Ctrl+S
     QScopedPointer<QShortcut> m_stSaveVoices;    //Ctrl+Y
-    QScopedPointer<QShortcut> m_stSelectAll; //Ctrl+A
-    QScopedPointer<QShortcut> m_stCopy;      //Ctrl+C
-    QScopedPointer<QShortcut> m_stCut;       //Ctrl+X
-    QScopedPointer<QShortcut> m_stPaste;     //Ctrl+V
     QScopedPointer<QShortcut> m_stDelete;    //Delete
 
     QScopedPointer<QShortcut> m_stPreviewShortcuts;

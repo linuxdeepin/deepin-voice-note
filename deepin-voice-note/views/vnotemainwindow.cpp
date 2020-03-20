@@ -329,59 +329,6 @@ void VNoteMainWindow::initShortcuts()
         }
     });
 
-
-//    //Select All
-//    m_stSelectAll.reset(new QShortcut(this));
-//    m_stSelectAll->setKey(Qt::CTRL + Qt::Key_A);
-//    m_stSelectAll->setContext(Qt::ApplicationShortcut);
-//    m_stSelectAll->setAutoRepeat(false);
-
-//    connect(m_stSelectAll.get(), &QShortcut::activated, this, [this] {
-//        //Call method in rightview
-//        if (canDoShortcutAction()) {
-//            m_rightView->selectAllItem();
-//        }
-//    });
-
-//    //Copy
-//    m_stCopy.reset(new QShortcut(this));
-//    m_stCopy->setKey(Qt::CTRL + Qt::Key_C);
-//    m_stCopy->setContext(Qt::ApplicationShortcut);
-//    m_stCopy->setAutoRepeat(false);
-
-//    connect(m_stCopy.get(), &QShortcut::activated, this, [this] {
-//        //Call method in rightview
-//        if (canDoShortcutAction()) {
-//            m_rightView->copySelectText();
-//        }
-//    });
-
-//    //Cut
-//    m_stCut.reset(new QShortcut(this));
-//    m_stCut->setKey(Qt::CTRL + Qt::Key_X);
-//    m_stCut->setContext(Qt::ApplicationShortcut);
-//    m_stCut->setAutoRepeat(false);
-
-//    connect(m_stCut.get(), &QShortcut::activated, this, [this] {
-//        //Call method in rightview
-//        if (canDoShortcutAction()) {
-//            m_rightView->cutSelectText();
-//        }
-//    });
-
-//    //Paste
-//    m_stPaste.reset(new QShortcut(this));
-//    m_stPaste->setKey(Qt::CTRL + Qt::Key_V);
-//    m_stPaste->setContext(Qt::ApplicationShortcut);
-//    m_stPaste->setAutoRepeat(false);
-
-//    connect(m_stPaste.get(), &QShortcut::activated, this, [this] {
-//        //Call method in rightview
-//        if (canDoShortcutAction()) {
-//            m_rightView->pasteText();
-//        }
-//    });
-
     //Notebook/Note/Detial delete key
     m_stDelete.reset(new QShortcut(this));
     m_stDelete->setKey(tr("Delete"));

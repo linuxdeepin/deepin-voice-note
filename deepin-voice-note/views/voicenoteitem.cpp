@@ -13,9 +13,7 @@
 #include <QHBoxLayout>
 #include <QAbstractTextDocumentLayout>
 
-#include <DApplicationHelper>
 #include <DFontSizeManager>
-#include <DGuiApplicationHelper>
 #include <DStyle>
 #include <DAnchors>
 
@@ -28,13 +26,14 @@ VoiceNoteItem::VoiceNoteItem(VNoteBlock *noteBlock, QWidget *parent)
     initUi();
     initConnection();
     updateData();
-    onChangeTheme();
 }
 
 void VoiceNoteItem::initUi()
 {
     this->setFixedHeight(DefaultHeight);
     m_bgWidget = new DFrame(this);
+    m_bgWidget->setBackgroundRole(DPalette::ItemBackground);
+
     m_createTimeLab = new DLabel(m_bgWidget);
     DFontSizeManager::instance()->bind(m_createTimeLab, DFontSizeManager::T8);
     m_createTimeLab->setForegroundRole(DPalette::TextTips);
@@ -142,8 +141,6 @@ void VoiceNoteItem::initConnection()
 {
     connect(m_pauseBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onPauseBtnClicked);
     connect(m_playBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onPlayBtnClicked);
-    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
-            &VoiceNoteItem::onChangeTheme);
     connect(m_asrText, &TextNoteEdit::textChanged, this, &VoiceNoteItem::onAsrTextChange);
     QTextDocument *document = m_asrText->document();
     QAbstractTextDocumentLayout *documentLayout = document->documentLayout();
@@ -219,13 +216,6 @@ void VoiceNoteItem::enblePlayBtn(bool enable)
 void VoiceNoteItem::enblePauseBtn(bool enable)
 {
     m_pauseBtn->setEnabled(enable);
-}
-
-void VoiceNoteItem::onChangeTheme()
-{
-    DPalette pb = DApplicationHelper::instance()->palette(m_bgWidget);
-    pb.setBrush(DPalette::Base, pb.color(DPalette::ItemBackground));
-    m_bgWidget->setPalette(pb);
 }
 
 void VoiceNoteItem::onAsrTextChange()

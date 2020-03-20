@@ -31,10 +31,6 @@
 #include <DApplication>
 #include <DStyle>
 
-//#define PlaceholderWidget "placeholder"
-//#define VoiceWidget       "voiceitem"
-//#define TextEditWidget    "textedititem"
-
 RightView::RightView(QWidget *parent)
     : QWidget(parent)
 {
@@ -53,7 +49,6 @@ void RightView::initUi()
     m_viewportLayout->setContentsMargins(20, 0, 20, 0);
     this->setLayout(m_viewportLayout);
     m_placeholderWidget = new DWidget(this); //占位的
-    //m_placeholderWidget->setObjectName(PlaceholderWidget);
     m_placeholderWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_viewportLayout->addWidget(m_placeholderWidget, 1, Qt::AlignBottom);
     QString content = DApplication::translate(
@@ -152,7 +147,26 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
     m_noteItemData->addBlock(preBlock, data);
     m_curItemWidget = item;
 
-    if (!cutStr.isEmpty() || curIndex + 1 == m_viewportLayout->indexOf(m_placeholderWidget)) {
+    bool needTextEdit = false;
+    QLayoutItem *nextlayoutItem = m_viewportLayout->itemAt(curIndex + 1);
+    DetailItemWidget *nextWidget = static_cast<DetailItemWidget *>(nextlayoutItem->widget());
+    VNoteBlock *nextBlock = nullptr;
+
+    if(nextWidget == m_placeholderWidget){ //最后要加个编辑框
+        needTextEdit = true;
+    }else {
+        nextBlock = nextWidget->getNoteBlock();
+        if(nextBlock->blockType == VNoteBlock::Voice){ //下一个还是语音项要加编辑框
+            needTextEdit = true;
+        }else if (nextBlock->blockType == VNoteBlock::Text) {
+            if(!cutStr.isEmpty()){
+                nextBlock->blockText = cutStr + nextWidget->getAllText();
+                nextWidget->updateData();
+            }
+        }
+    }
+
+    if (needTextEdit) {
         VNoteBlock *textBlock = m_noteItemData->newBlock(VNoteBlock::Text);
         textBlock->blockText = cutStr;
         m_curItemWidget = insertTextEdit(textBlock, true);
@@ -168,13 +182,16 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
             }
         }
     }
+
     int height = 0;
     QRect rc =  m_curItemWidget->getCursorRect();
     if (!rc.isEmpty()) {
         height = rc.bottom();
     }
     adjustVerticalScrollBar(m_curItemWidget, height);
+
     updateData();
+
     return m_curItemWidget;
 }
 

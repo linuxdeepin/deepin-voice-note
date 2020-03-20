@@ -36,6 +36,7 @@ void VNotePlayWidget::initUI()
     m_nameLab = new DLabel(m_sliderHover);
     m_slider = new DSlider(Qt::Horizontal, m_sliderHover);
     m_slider->setMinimum(0);
+    m_slider->setValue(0);
 
     m_closeBtn = new DIconButton(DStyle::SP_CloseButton, this);
     m_closeBtn->setIconSize(QSize(26, 26));
@@ -59,7 +60,7 @@ void VNotePlayWidget::initUI()
     mainLayout->setSizeConstraint(QLayout::SetNoConstraint);
     this->setLayout(mainLayout);
     m_sliderHover->installEventFilter(this);
-    m_slider->installEventFilter(this);
+    //m_slider->installEventFilter(this);
 }
 
 void VNotePlayWidget::initPlayer()
@@ -71,7 +72,6 @@ void VNotePlayWidget::initConnection()
 {
     connect(m_player, &QMediaPlayer::positionChanged,
             this, &VNotePlayWidget::onVoicePlayPosChange);
-
     connect(m_player,&QMediaPlayer::durationChanged,
             this,&VNotePlayWidget::onDurationChanged);
 
@@ -87,12 +87,17 @@ void VNotePlayWidget::initConnection()
 
 void VNotePlayWidget::onVoicePlayPosChange(qint64 pos)
 {
+
+    qint64 tmpPos = pos > m_voiceBlock->voiceSize ? m_voiceBlock->voiceSize : pos;
+    m_timeLab->setText(Utils::formatMillisecond(tmpPos, 0) + "/" +
+                       Utils::formatMillisecond(m_voiceBlock->voiceSize));
+
     m_slider->setValue(static_cast<int>(pos));
-    if (m_voiceBlock && pos >= m_slider->maximum()) {
+
+    if (m_voiceBlock && pos >=  m_slider->maximum()) {
         onCloseBtnClicked();
     }
-    m_timeLab->setText(Utils::formatMillisecond(pos, 0) + "/" +
-                       Utils::formatMillisecond(m_voiceBlock->voiceSize));
+
 }
 
 void VNotePlayWidget::setVoiceBlock(VNVoiceBlock *voiceData)
@@ -102,7 +107,6 @@ void VNotePlayWidget::setVoiceBlock(VNVoiceBlock *voiceData)
             stopVideo();
             m_voiceBlock = voiceData;
             m_player->setMedia(QUrl::fromLocalFile(m_voiceBlock->voicePath));
-            m_slider->setValue(0);
             m_nameLab->setText(voiceData->voiceTitle);
             m_timeLab->setText(Utils::formatMillisecond(0, 0) + "/" +
                                Utils::formatMillisecond(voiceData->voiceSize));
