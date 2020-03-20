@@ -66,7 +66,7 @@ void RightView::initUi()
                                       "OK"), false, DDialog::ButtonNormal);
     m_fileHasDelDialog->setEnabled(false);
     m_hornGif = new QMovie(this);
-    m_hornGif->setScaledSize(QSize(16,14));
+    m_hornGif->setScaledSize(QSize(19,17)*(devicePixelRatioF()/1.0));
 }
 
 void RightView::initMenu()
