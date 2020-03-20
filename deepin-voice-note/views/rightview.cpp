@@ -331,7 +331,6 @@ void RightView::initAction(DetailItemWidget *widget)
     if (widget != nullptr) {
         blockData = widget->getNoteBlock();
     }
-
     if (tolCount) {
         copyAction->setEnabled(true);
         if (textCount != 0) {
@@ -551,7 +550,7 @@ void RightView::mousePressEvent(QMouseEvent *event)
     }
 
     if (btn == Qt::RightButton) {
-        onMenuShow(widget);
+        onMenuShow(m_curItemWidget);
     } else if (btn == Qt::LeftButton) {
         clearAllSelection();
         if (m_curItemWidget != nullptr) {
@@ -731,6 +730,7 @@ void RightView::pasteText()
             QString clipBoardText = board->text();
             textCursor.insertText(clipBoardText);
         }
+        m_curItemWidget->setFocus();
     }
 }
 
@@ -740,20 +740,24 @@ void RightView::keyPressEvent(QKeyEvent *e)
     if (e->modifiers() == Qt::ControlModifier) {
         switch (e->key()) {
         case Qt::Key_C:
-            copySelectText();
+            if(hasSelection()){
+               copySelectText();
+            }
             break;
         case Qt::Key_A:
             selectAllItem();
             break;
         case Qt::Key_X:
-            if(showDelDialog()){
-                VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
-                connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this](){
-                    cutSelectText(false);
-                });
-                confirmDialog.exec();
-            }else {
-               cutSelectText(false);
+            if(hasSelection()){
+                if(showDelDialog()){
+                    VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
+                    connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this](){
+                        cutSelectText(false);
+                    });
+                    confirmDialog.exec();
+                }else {
+                   cutSelectText(false);
+                }
             }
             break;
         case Qt::Key_V:

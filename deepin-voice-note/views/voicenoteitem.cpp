@@ -49,7 +49,7 @@ void VoiceNoteItem::initUi()
     m_asrText->setPalette(pb);
     m_asrText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_asrText->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_asrText->document()->setDocumentMargin(0);
+    m_asrText->document()->setDocumentMargin(15);
     m_asrText->setVisible(false);
     m_asrText->setContextMenuPolicy(Qt::NoContextMenu);
 

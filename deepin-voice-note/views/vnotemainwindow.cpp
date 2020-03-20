@@ -1422,7 +1422,7 @@ void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
 {
     m_asrErrMeassage->setMessage(strMessage);
     m_asrErrMeassage->setVisible(true);
-    m_asrErrMeassage->setFixedWidth(m_rightViewHolder->width());
+    m_asrErrMeassage->setFixedWidth(520);
     m_asrErrMeassage->adjustSize();
 }
 

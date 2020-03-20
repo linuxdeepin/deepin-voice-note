@@ -27,6 +27,7 @@ public slots:
     void onPauseRecord();
     void onContinueRecord();
     void onSetMediaSource();
+    void onRecordDurationChange(qint64 duration);
     void onMediaDurationChange(qint64 duration);
     void onAudioBufferProbed(const QAudioBuffer &buffer);
 private:
@@ -43,7 +44,6 @@ private:
     VNoteAudioManager *m_audioManager{nullptr};
     QString          m_recordDir {""};
     QString          m_recordPath {""};
-    qint64           m_recordMsec {0};
 };
 
 #endif // VNOTERECORDWIDGET_H

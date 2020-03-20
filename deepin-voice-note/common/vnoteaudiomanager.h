@@ -35,6 +35,7 @@ public:
     void stopRecord();
 signals:
     void recExceedLimit();
+    void recDurationChange(qint64 duration);
     void recAudioBufferProbed(const QAudioBuffer &buffer);
 public slots:
     void recordDurationChanged(qint64 duration);
