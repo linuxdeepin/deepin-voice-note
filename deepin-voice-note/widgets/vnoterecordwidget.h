@@ -26,9 +26,8 @@ signals:
 public slots:
     void onPauseRecord();
     void onContinueRecord();
-    void onSetMediaSource();
+    void onFinshRecord();
     void onRecordDurationChange(qint64 duration);
-    void onMediaDurationChange(qint64 duration);
     void onAudioBufferProbed(const QAudioBuffer &buffer);
 private:
     void initUi();
@@ -44,6 +43,7 @@ private:
     VNoteAudioManager *m_audioManager{nullptr};
     QString          m_recordDir {""};
     QString          m_recordPath {""};
+    qint64           m_recordMsec {0};
 };
 
 #endif // VNOTERECORDWIDGET_H

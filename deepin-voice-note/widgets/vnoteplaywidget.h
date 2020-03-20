@@ -36,6 +36,7 @@ public slots:
     void onPlayBtnClicked();
     void onPauseBtnClicked();
     void onCloseBtnClicked();
+    void onDurationChanged(qint64 duration);
 
 protected:
      bool eventFilter(QObject *o, QEvent *e) override;

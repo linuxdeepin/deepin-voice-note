@@ -35,6 +35,8 @@ void VNotePlayWidget::initUI()
     m_sliderHover = new DWidget(this);
     m_nameLab = new DLabel(m_sliderHover);
     m_slider = new DSlider(Qt::Horizontal, m_sliderHover);
+    m_slider->setMinimum(0);
+
     m_closeBtn = new DIconButton(DStyle::SP_CloseButton, this);
     m_closeBtn->setIconSize(QSize(26, 26));
     m_closeBtn->setFlat(true);
@@ -69,6 +71,10 @@ void VNotePlayWidget::initConnection()
 {
     connect(m_player, &QMediaPlayer::positionChanged,
             this, &VNotePlayWidget::onVoicePlayPosChange);
+
+    connect(m_player,&QMediaPlayer::durationChanged,
+            this,&VNotePlayWidget::onDurationChanged);
+
     connect(m_playBtn, &VNoteIconButton::clicked,
             this, &VNotePlayWidget::onPlayBtnClicked);
     connect(m_pauseBtn, &VNoteIconButton::clicked,
@@ -82,7 +88,7 @@ void VNotePlayWidget::initConnection()
 void VNotePlayWidget::onVoicePlayPosChange(qint64 pos)
 {
     m_slider->setValue(static_cast<int>(pos));
-    if (m_voiceBlock && pos >= m_voiceBlock->voiceSize) {
+    if (m_voiceBlock && pos >= m_slider->maximum()) {
         onCloseBtnClicked();
     }
     m_timeLab->setText(Utils::formatMillisecond(pos, 0) + "/" +
@@ -96,8 +102,6 @@ void VNotePlayWidget::setVoiceBlock(VNVoiceBlock *voiceData)
             stopVideo();
             m_voiceBlock = voiceData;
             m_player->setMedia(QUrl::fromLocalFile(m_voiceBlock->voicePath));
-            m_slider->setMinimum(0);
-            m_slider->setMaximum(static_cast<int>(m_voiceBlock->voiceSize));
             m_slider->setValue(0);
             m_nameLab->setText(voiceData->voiceTitle);
             m_timeLab->setText(Utils::formatMillisecond(0, 0) + "/" +
@@ -168,4 +172,11 @@ VNVoiceBlock* VNotePlayWidget::getVoiceData()
 QMediaPlayer::State VNotePlayWidget::getPlayerStatus()
 {
     return m_player->state();
+}
+
+void VNotePlayWidget::onDurationChanged(qint64 duration)
+{
+    if(m_slider->maximum() != duration){
+        m_slider->setMaximum(static_cast<int>(duration));
+    }
 }

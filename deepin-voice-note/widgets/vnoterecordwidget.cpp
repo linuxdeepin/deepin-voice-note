@@ -71,12 +71,10 @@ void VNoteRecordWidget::initConnection()
 {
     connect(m_pauseBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onPauseRecord);
     connect(m_continueBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onContinueRecord);
-    connect(m_finshBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onSetMediaSource);
+    connect(m_finshBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onFinshRecord);
     connect(m_audioManager, SIGNAL(recAudioBufferProbed(const QAudioBuffer &)),
             this, SLOT(onAudioBufferProbed(const QAudioBuffer &)));
-    connect(m_audioManager, &VNoteAudioManager::recExceedLimit, this, &VNoteRecordWidget::onSetMediaSource);
-    connect(m_audioManager->getPlayerObject(),&QMediaPlayer::durationChanged,
-            this,&VNoteRecordWidget::onMediaDurationChange);
+    connect(m_audioManager, &VNoteAudioManager::recExceedLimit, this, &VNoteRecordWidget::onFinshRecord);
     connect(m_audioManager,  &VNoteAudioManager::recDurationChange,
             this, &VNoteRecordWidget::onRecordDurationChange);
 }
@@ -91,10 +89,10 @@ void VNoteRecordWidget::initRecordPath()
     }
 }
 
-void VNoteRecordWidget::onSetMediaSource()
+void VNoteRecordWidget::onFinshRecord()
 {
      m_audioManager->stopRecord();
-     m_audioManager->setPlayFileName(m_recordPath);
+     emit sigFinshRecord(m_recordPath, m_recordMsec);
 }
 
 void VNoteRecordWidget::onPauseRecord()
@@ -116,6 +114,7 @@ void VNoteRecordWidget::startRecord()
     QString fileName = QDateTime::currentDateTime()
                       .toString("yyyyMMddhhmmss") + ".mp3";
 
+    m_recordMsec = 0;
     m_recordPath = m_recordDir + fileName;
     m_audioManager->setRecordFileName(m_recordPath);
     m_timeLabel->setText("00:00");
@@ -124,7 +123,7 @@ void VNoteRecordWidget::startRecord()
 
 void VNoteRecordWidget::cancelRecord()
 {
-    onSetMediaSource();
+    onFinshRecord();
 }
 
 void VNoteRecordWidget::onAudioBufferProbed(const QAudioBuffer &buffer)
@@ -134,11 +133,7 @@ void VNoteRecordWidget::onAudioBufferProbed(const QAudioBuffer &buffer)
 
 void VNoteRecordWidget::onRecordDurationChange(qint64 duration)
 {
+    m_recordMsec = duration;
     QString strTime = Utils::formatMillisecond(duration, 0);
     m_timeLabel->setText(strTime);
-}
-
-void VNoteRecordWidget::onMediaDurationChange(qint64 duration)
-{
-    emit sigFinshRecord(m_recordPath, duration);
 }
