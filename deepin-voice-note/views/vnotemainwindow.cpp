@@ -285,7 +285,7 @@ void VNoteMainWindow::initShortcuts()
         //Call method in rightview
         Q_UNUSED(this);
         if (canDoShortcutAction()) {
-
+            m_rightView->saveMp3();
         }
     });
 
@@ -1053,6 +1053,9 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         break;
     case ActionManager::DetailCut:
         m_rightView->cutSelectText();
+        break;
+    case ActionManager::DetailVoiceSave:
+        m_rightView->saveMp3();
         break;
     default:
         break;

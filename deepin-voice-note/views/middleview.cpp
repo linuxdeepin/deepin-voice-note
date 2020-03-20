@@ -177,7 +177,7 @@ void MiddleView::saveRecords()
             QString exportDir = dialog.selectedFiles().at(0);
 
             ExportNoteWorker* exportWorker = new ExportNoteWorker(
-                        exportDir,ExportNoteWorker::ExportVoice, noteData);
+                        exportDir,ExportNoteWorker::ExportAllVoice, noteData);
             exportWorker->setAutoDelete(true);
 
             QThreadPool::globalInstance()->start(exportWorker);

@@ -2,10 +2,12 @@
 #include "textnoteitem.h"
 #include "voicenoteitem.h"
 #include "globaldef.h"
+#include "vnoteapplication.h"
 
 #include "common/vnoteitem.h"
 #include "common/vnotedatamanager.h"
 #include "common/actionmanager.h"
+#include "common/exportnoteworker.h"
 
 #include "db/vnoteitemoper.h"
 
@@ -20,6 +22,7 @@
 #include <QAbstractTextDocumentLayout>
 #include <QList>
 #include <QClipboard>
+#include <QThreadPool>
 
 #include <DFontSizeManager>
 #include <DApplicationHelper>
@@ -37,6 +40,7 @@ RightView::RightView(QWidget *parent)
 {
     initUi();
     initMenu();
+    initAppSetting();
     initConnection();
     onChangeTheme();
 }
@@ -69,6 +73,11 @@ void RightView::initMenu()
 {
     //Init voice context Menu
     m_noteDetailContextMenu = ActionManager::Instance()->detialContextMenu();
+}
+
+void RightView::initAppSetting()
+{
+    m_qspSetting = reinterpret_cast<VNoteApplication*>(qApp)->appSetting();
 }
 
 DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QRegExp reg)
@@ -865,6 +874,35 @@ void RightView::onChangeTheme()
 
         if(status == QMovie::Running){ //重新启动
             m_hornGif->start();
+        }
+    }
+}
+
+void RightView::saveMp3()
+{
+    if(m_curItemWidget){
+        VNoteBlock *block = m_curItemWidget->getNoteBlock();
+        if(block->blockType == VNoteBlock::Voice){
+            DFileDialog dialog;
+            dialog.setFileMode(DFileDialog::DirectoryOnly);
+
+            QString historyDir = m_qspSetting->value(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
+            if (historyDir.isEmpty()) {
+                historyDir = QDir::homePath();
+            }
+            dialog.setDirectory(historyDir);
+            if (QDialog::Accepted == dialog.exec()) {
+                // save the directory string to config file.
+                m_qspSetting->setValue(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
+
+                QString exportDir = dialog.selectedFiles().at(0);
+
+                ExportNoteWorker* exportWorker = new ExportNoteWorker(
+                            exportDir,ExportNoteWorker::ExportOneVoice, m_noteItemData, block);
+                exportWorker->setAutoDelete(true);
+
+                QThreadPool::globalInstance()->start(exportWorker);
+            }
         }
     }
 }

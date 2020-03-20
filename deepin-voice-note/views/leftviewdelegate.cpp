@@ -153,16 +153,16 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
         if (enable == false) {
             painter->setBrush(QBrush(m_parentPb.color(DPalette::Disabled, DPalette::ItemBackground)));
             painter->fillPath(path, painter->brush());
-            painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::WindowText)));
+            painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::TextTitle)));
         } else {
             if (option.state & QStyle::State_MouseOver) {
                 painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
                 painter->fillPath(path, painter->brush());
-                painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
+                painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
             } else {
                 painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
                 painter->fillPath(path, painter->brush());
-                painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
+                painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
             }
         }
     }

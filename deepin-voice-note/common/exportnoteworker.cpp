@@ -10,12 +10,13 @@
 #include <DLog>
 
 ExportNoteWorker::ExportNoteWorker(QString dirPath, int exportType,
-                                   VNoteItem* note, QObject *parent)
+                                   VNoteItem* note, VNoteBlock* block, QObject *parent)
     : QObject(parent)
     ,QRunnable ()
     ,m_exportType(exportType)
     ,m_exportPath(dirPath)
     ,m_note(note)
+    ,m_noteblock(block)
 {
 
 }
@@ -27,10 +28,12 @@ void ExportNoteWorker::run()
     if (ExportOK == error) {
         if (ExportText == m_exportType) {
             exportText();
-        } else if (ExportVoice == m_exportType) {
-            exportVoice();
+        } else if (ExportAllVoice == m_exportType) {
+            exportAllVoice();
         } else if (ExportAll == m_exportType) {
             exportAll();
+        } else if (ExportOneVoice == m_exportType) {
+            exportOneVoice(m_noteblock);
         }
     } else {
         qCritical() << "Export note error: m_exportType=" << m_exportType
@@ -92,20 +95,32 @@ int ExportNoteWorker::exportText()
     return  error;
 }
 
-int ExportNoteWorker::exportVoice()
+int ExportNoteWorker::exportAllVoice()
 {
     ExportError error = ExportOK;
 
     if (nullptr != m_note) {
         for (auto it : m_note->datas.datas) {
-            if (VNoteBlock::Voice == it->getType()) {
-                QFileInfo targetFile(it->ptrVoice->voicePath);
-
-                QString destFileName = m_exportPath + "/" +targetFile.fileName();
-                QFile::copy(it->ptrVoice->voicePath, destFileName);
-            }
+            exportOneVoice(it);
         }
     } else {
+        error = NoteInvalid;
+    }
+
+    return  error;
+}
+
+int ExportNoteWorker::exportOneVoice(VNoteBlock *noteblock)
+{
+    ExportError error = ExportOK;
+
+    if(noteblock &&
+       noteblock->blockType == VNoteBlock::Voice){
+       QFileInfo targetFile(m_noteblock->ptrVoice->voicePath);
+       QString destFileName = m_exportPath + "/" +
+               m_noteblock->ptrVoice->voiceTitle + "-" + targetFile.fileName();
+       QFile::copy(noteblock->ptrVoice->voicePath, destFileName);
+    }else {
         error = NoteInvalid;
     }
 

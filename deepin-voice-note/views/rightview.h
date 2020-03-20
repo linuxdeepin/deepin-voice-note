@@ -5,6 +5,7 @@
 #include <QList>
 #include <QShortcut>
 #include <QMovie>
+#include <QSettings>
 
 #include <DWidget>
 #include <DDialog>
@@ -44,6 +45,7 @@ public:
 
     void setCurVoicePlay(VoiceNoteItem* item);
     void setCurVoiceAsr(VoiceNoteItem* item);
+    void saveMp3();
 
     VoiceNoteItem *getCurVoicePlay();
     VoiceNoteItem *getCurVoiceAsr();
@@ -77,6 +79,7 @@ private:
     void initConnection();
     void initMenu();
     void onMenuShow(DetailItemWidget * widget);
+    void initAppSetting();
 
     bool        checkFileExist(const QString &file);
     DetailItemWidget *getWidgetByPos(const QPoint &pos);
@@ -93,6 +96,8 @@ private:
     bool         m_fIsNoteModified {false};
     bool         m_isFristTextChange {false};
     QMovie          *m_hornGif {nullptr};
+    //App setting, reference to VNoteApplication's setting
+    QSharedPointer<QSettings> m_qspSetting {nullptr};
 };
 
 #endif // RIGHTVIEW_H

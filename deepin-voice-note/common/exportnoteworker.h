@@ -13,12 +13,14 @@ public:
     explicit ExportNoteWorker(QString dirPath,
                               int exportType,
                               VNoteItem* note,
+                              VNoteBlock* block = nullptr,
                               QObject *parent = nullptr);
     enum {
         ExportNothing,
         ExportText,
-        ExportVoice,
+        ExportAllVoice,
         ExportAll,
+        ExportOneVoice
     };
 
     enum ExportError {
@@ -36,12 +38,14 @@ protected:
 
     int checkPath();
     int exportText();
-    int exportVoice();
+    int exportAllVoice();
     int exportAll();
+    int exportOneVoice(VNoteBlock* block);
 
     int        m_exportType {ExportNothing};
     QString    m_exportPath;
     VNoteItem* m_note {nullptr};
+    VNoteBlock* m_noteblock {nullptr};
 };
 
 #endif // EXPORTNOTEWORKER_H

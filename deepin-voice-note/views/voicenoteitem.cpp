@@ -37,15 +37,13 @@ void VoiceNoteItem::initUi()
     m_bgWidget = new DFrame(this);
     m_createTimeLab = new DLabel(m_bgWidget);
     DFontSizeManager::instance()->bind(m_createTimeLab, DFontSizeManager::T8);
-    DPalette pb = DApplicationHelper::instance()->palette(m_createTimeLab);
-    pb.setBrush(DPalette::Text, pb.color(DPalette::TextTips));
-    m_createTimeLab->setPalette(pb);
+    m_createTimeLab->setForegroundRole(DPalette::TextTips);
 
     m_asrText = new TextNoteEdit(m_bgWidget);
     DFontSizeManager::instance()->bind(m_asrText, DFontSizeManager::T8);
     m_asrText->setReadOnly(true);
     DStyle::setFocusRectVisible(m_asrText, false);
-    pb = DApplicationHelper::instance()->palette(m_asrText);
+    DPalette pb = DApplicationHelper::instance()->palette(m_asrText);
     pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));
     pb.setBrush(DPalette::Text, pb.color(DPalette::Highlight));
     m_asrText->setPalette(pb);
@@ -75,6 +73,7 @@ void VoiceNoteItem::initUi()
 
     m_voiceNameLab = new DLabel(m_bgWidget);
     DFontSizeManager::instance()->bind(m_voiceNameLab, DFontSizeManager::T6);
+    m_voiceNameLab->setForegroundRole(DPalette::TextTitle);
 
     m_hornLab = new DLabel(m_bgWidget);
     m_hornLab->setAlignment(Qt::AlignRight);
