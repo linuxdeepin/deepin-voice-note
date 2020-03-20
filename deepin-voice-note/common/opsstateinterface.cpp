@@ -48,6 +48,11 @@ bool OpsStateInterface::isAppQuit() const
     return (m_states & (1<<StateAppQuit));
 }
 
+bool OpsStateInterface::isAiSrvExist() const
+{
+    return (m_states & (1<<StateAISrvAvailable));
+}
+
 OpsStateInterface *gVNoteOpsStates()
 {
     return reinterpret_cast<VNoteApplication*>(qApp)->mainWindow();

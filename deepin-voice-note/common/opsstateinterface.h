@@ -18,6 +18,7 @@ public:
         StatePlaying,
         StateVoice2Text,
         StateAppQuit,
+        StateAISrvAvailable,
         //Add other state at here
         StateMax,
     };
@@ -29,6 +30,7 @@ public:
     bool isPlaying()    const;
     bool isVoice2Text() const;
     bool isAppQuit()    const;
+    bool isAiSrvExist() const;
 protected:
     quint64 m_states {StateNone};
 };

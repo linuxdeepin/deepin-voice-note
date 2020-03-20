@@ -592,6 +592,21 @@ void VNoteMainWindow::initAudioWatcher()
         //connect(m_rightView, &RightView::asrStart, this, &VNoteMainWindow::onA2TStart);
         connect(m_a2tManager, &VNoteA2TManager::asrError, this, &VNoteMainWindow::onA2TError);
         connect(m_a2tManager, &VNoteA2TManager::asrSuccess, this, &VNoteMainWindow::onA2TSuccess);
+
+        //Check aiservice state
+        bool fExist = m_a2tManager->checkAiService();
+        operState(OpsStateInterface::StateAISrvAvailable, fExist);
+
+        //TODO:
+        //    If Aiservice don't exist, hide the voice2text menuitem.
+        //Community verson don't have aiservice.
+        if (!isAiSrvExist()) {
+            QAction *a2tAction = ActionManager::Instance()->getActionById(
+                        ActionManager::DetailVoice2Text);
+            if (nullptr != a2tAction) {
+                a2tAction->setVisible(false);
+            }
+        }
     });
 }
 
