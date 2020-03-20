@@ -627,9 +627,9 @@ void VNoteMainWindow::holdHaltLock()
 {
     m_lockFd = m_pLogin1Manager->Inhibit(
                    "shutdown:sleep",
-                   qApp->applicationName(),
-                   DApplication::translate("AppMain", "Save app data!"),
-                   "delay");
+                   DApplication::translate("AppMain", "Voice Notes"),
+                   DApplication::translate("AppMain", "Recordings not saved!"),
+                   "block");
 
     if (m_lockFd.isError()) {
         qCritical() << "Init login manager error:" << m_lockFd.error();
