@@ -1,4 +1,5 @@
 #include "vnwaveform.h"
+#include "globaldef.h"
 
 #include <QMouseEvent>
 #include <QPen>
@@ -14,8 +15,18 @@ VNWaveform::VNWaveform(QWidget *parent)
 
 void VNWaveform::onAudioBufferProbed(const QAudioBuffer &buffer)
 {
-    getBufferLevels(buffer, m_audioScaleSamples);
-    update();
+    static struct timeval curret = {0,0};
+    static struct timeval lastUpdate = {0,0};
+
+    gettimeofday(&curret, nullptr);
+
+    if (TM(lastUpdate, curret) > WAVE_REFRESH_FREQ) {
+        getBufferLevels(buffer, m_audioScaleSamples);
+        update();
+
+        //last update time.
+        lastUpdate=curret;
+    }
 }
 
 void VNWaveform::paintEvent(QPaintEvent *event)

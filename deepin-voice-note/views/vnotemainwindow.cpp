@@ -189,10 +189,17 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNotebook->setAutoRepeat(false);
 
     connect(m_stNewNotebook.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction() &&
-                !(isRecording() || isPlaying() || isVoice2Text() || isSearching())
-                ) {
-            addNotepad();
+        static struct timeval curret = {0,0};
+        static struct timeval lastPress = {0,0};
+
+        gettimeofday(&curret, nullptr);
+
+        if (TM(lastPress, curret) > MIN_STKEY_RESP_TIME) {
+            if (canDoShortcutAction() &&
+                    !(isRecording() || isPlaying() || isVoice2Text() || isSearching())
+                    ) {
+                addNotepad();
+            }
         }
     });
 
@@ -216,10 +223,17 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNote->setAutoRepeat(false);
 
     connect(m_stNewNote.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction() &&
-                !(isRecording() || isPlaying() || isVoice2Text() || isSearching())
-                ) {
-            addNote();
+        static struct timeval curret = {0,0};
+        static struct timeval lastPress = {0,0};
+
+        gettimeofday(&curret, nullptr);
+
+        if (TM(lastPress, curret) > MIN_STKEY_RESP_TIME) {
+            if (canDoShortcutAction() &&
+                    !(isRecording() || isPlaying() || isVoice2Text() || isSearching())
+                    ) {
+                addNote();
+            }
         }
     });
 

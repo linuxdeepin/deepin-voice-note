@@ -19,6 +19,8 @@ public:
     const int WAVE_OFFSET_X = 0; //Left/Right margin
     const int WAVE_OFFSET_Y = 0; //top/Bottom margin
 
+    const int WAVE_REFRESH_FREQ = 100; //100ms
+
     enum WaveStyle {
         Columnar = 1,
         Wave = 2,
