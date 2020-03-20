@@ -294,16 +294,16 @@ void RightView::saveNote()
             if (widget->hasFocus()) {
                 widget->getNoteBlock()->blockText = widget->getAllText();
             }
+        }
 
-            VNoteItemOper noteOper(m_noteItemData);
-            if (!noteOper.updateNote()) {
-                qInfo() << "Save note error:" << *m_noteItemData;
-            } else {
-                m_fIsNoteModified = false;
+        VNoteItemOper noteOper(m_noteItemData);
+        if (!noteOper.updateNote()) {
+            qInfo() << "Save note error:" << *m_noteItemData;
+        } else {
+            m_fIsNoteModified = false;
 
-                //Notify middle view refresh.
-                emit contentChanged();
-            }
+            //Notify middle view refresh.
+            emit contentChanged();
         }
     }
 }
