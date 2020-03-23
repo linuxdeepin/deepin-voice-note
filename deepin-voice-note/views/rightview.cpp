@@ -258,7 +258,7 @@ void RightView::initData(VNoteItem *data, QRegExp reg, bool fouse)
         }
     } else {
         VNoteBlock *textBlock = m_noteItemData->newBlock(VNoteBlock::Text);
-        m_curItemWidget = insertTextEdit(textBlock, false, reg);
+        m_curItemWidget = insertTextEdit(textBlock, fouse, reg);
         m_noteItemData->addBlock(nullptr, textBlock);
     }
 }
