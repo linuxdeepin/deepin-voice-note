@@ -31,19 +31,24 @@ public slots:
     void onAudioBufferProbed(const QAudioBuffer &buffer);
 protected:
     static qreal getPeakValue(const QAudioFormat &format);
-    static void getBufferLevels(const QAudioBuffer &buffer, QVector<qreal> &scaleSamples);
+    static void getBufferLevels(const QAudioBuffer &buffer, QVector<qreal> &scaleSamples, qreal &frameGain);
 
     template <class T>
     static void getBufferLevels(const T *buffer,
                                 int frames,
                                 int channels,
                                 qreal peakValue,
-                                QVector<qreal> &samples);
+                                QVector<qreal> &samples,
+                                qreal &frameGain);
 
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 protected:
     QVector<qreal> m_audioScaleSamples;
+
+    qreal          m_frameGain {0};
+    const qreal    m_defaultGain = 3;
+
     int            m_maxShowedSamples;
     int            m_waveStyle {WaveStyle::Columnar};
 };
