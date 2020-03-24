@@ -95,10 +95,6 @@ void VNoteApplication::onNewProcessInstance(qint64 pid, const QStringList &argum
 
 void VNoteApplication::handleQuitAction()
 {
-    //Check if need exit app
-//    if (m_qspMainWnd->checkIfNeedExit()) {
-//        DApplication::handleQuitAction();
-
-//    }
-    //DApplication::sendEvent(m_qspMainWnd.get() , QEvent::Close)
+    QEvent event(QEvent::Close);
+    DApplication::sendEvent(mainWindow(), &event);
 }

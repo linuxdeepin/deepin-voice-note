@@ -912,7 +912,7 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
             m_recordBar->cancelRecord();
             event->ignore();
         } else {
-            event->accept();
+            qApp->quit();
         }
     } else {
         event->ignore();
