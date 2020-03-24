@@ -612,25 +612,22 @@ void RightView::mouseMoveSelect(QMouseEvent *event)
         if (widgetIndex != curIndex) {
             if (widgetIndex < curIndex) {
                 op = QTextCursor::End;
-                minIndex = widgetIndex + 1;
-                maxIndex = curIndex - 1;
+                minIndex = widgetIndex;
+                maxIndex = curIndex;
             } else {
                 op = QTextCursor::Start;
-                minIndex = curIndex + 1;
-                maxIndex = widgetIndex - 1;
+                minIndex = curIndex;
+                maxIndex = widgetIndex;
             }
         }
 
         widget->selectText(event->globalPos(), op);
-        op = op == QTextCursor::Start ? QTextCursor::End : QTextCursor::Start;
-
-        if (minIndex > maxIndex) {
-            m_curItemWidget->selectText(op);
-        } else if (minIndex && maxIndex) {
+        if (minIndex != maxIndex) {
+            op = op == QTextCursor::Start ? QTextCursor::End : QTextCursor::Start;
             for (int i = 0 ; i < m_viewportLayout->count() - 1; i++) {
                 QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
                 DetailItemWidget *tmpWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
-                if (i < minIndex || i > maxIndex) {
+                if (i <= minIndex || i >= maxIndex) {
                     if (i == curIndex) {
                         tmpWidget->selectText(op);
                     } else if (i != widgetIndex) {
@@ -856,6 +853,7 @@ void RightView::doDelAction(bool isByAction)
                 updateData();
             }
         }
+
     }
 }
 
