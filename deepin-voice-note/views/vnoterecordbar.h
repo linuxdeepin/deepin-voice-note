@@ -5,6 +5,7 @@
 #include <QStackedLayout>
 
 #include <DAnchors>
+#include <DFloatingMessage>
 
 DWIDGET_USE_NAMESPACE
 
@@ -56,6 +57,8 @@ protected:
     QScopedPointer<DAnchorsBase> m_recBtnAnchor;
 
     QString          m_recordPath {""};
+
+    DFloatingMessage* m_pDeviceExceptionMsg {nullptr};
 
     //MicrophoneState
     int m_microphoneState {0};

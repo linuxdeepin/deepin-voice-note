@@ -149,6 +149,7 @@ private:
 
     DScrollArea     *m_rightViewScrollArea {nullptr};
     QWidget         *m_rightViewHolder {nullptr};
+    QWidget         *m_recordBarHolder {nullptr};
     QWidget         *m_leftViewHolder {nullptr};
     QWidget         *m_middleViewHolder {nullptr};
 

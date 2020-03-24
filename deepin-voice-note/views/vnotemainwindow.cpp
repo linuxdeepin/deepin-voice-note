@@ -520,19 +520,29 @@ void VNoteMainWindow::initRightView()
 
     //TODO:
     //    Add record area code here
-    m_recordBar = new VNoteRecordBar(m_rightViewHolder);
+    m_recordBarHolder = new QWidget(m_rightViewHolder);
+    m_recordBarHolder->setFixedHeight(78);
+    QVBoxLayout *recordBarHolderLayout = new QVBoxLayout(m_recordBarHolder);
+    recordBarHolderLayout->setSpacing(0);
+    recordBarHolderLayout->setContentsMargins(0,0,0,0);
+
+    m_recordBar = new VNoteRecordBar(m_recordBarHolder);
     m_recordBar->setBackgroundRole(DPalette::Base);
     m_recordBar->setAutoFillBackground(true);
-    m_recordBar->setFixedHeight(78);
     m_recordBar->setSizePolicy(QSizePolicy::Expanding
-                               , QSizePolicy::Fixed);
-    rightHolderLayout->addWidget(m_recordBar, Qt::AlignBottom);
+                               , QSizePolicy::Expanding);
+
+    recordBarHolderLayout->addWidget(m_recordBar);
+
+    rightHolderLayout->addWidget(m_recordBarHolder);
+
     m_rightViewHolder->setLayout(rightHolderLayout);
 
 #ifdef VNOTE_LAYOUT_DEBUG
     m_rightViewHolder->setStyleSheet("background: red");
-    m_rightNoteArea->setStyleSheet("background: blue");
-    m_recordBar->setStyleSheet("background: green");
+    m_rightViewScrollArea->setStyleSheet("background: blue");
+    m_recordBarHolder->setStyleSheet("background: yellow");
+    m_recordBar->setStyleSheet("background: yellow");
 #endif
 }
 

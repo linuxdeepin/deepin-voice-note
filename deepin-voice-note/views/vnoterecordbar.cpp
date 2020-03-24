@@ -1,4 +1,5 @@
 #include "vnoterecordbar.h"
+#include "globaldef.h"
 #include "widgets/vnoterecordwidget.h"
 #include "widgets/vnoteiconbutton.h"
 #include "widgets/vnoteplaywidget.h"
@@ -45,9 +46,27 @@ void VNoteRecordBar::initUI()
 
     m_playPanel = new VNotePlayWidget(this);
     m_mainLayout->addWidget(m_playPanel);
+
+    m_mainLayout->setCurrentWidget(m_recordBtnHover);
+
+    //Init device exception message
+    m_pDeviceExceptionMsg = new DFloatingMessage(
+                DFloatingMessage::ResidentType,
+                reinterpret_cast<QWidget*>(parent()));
+
+    m_pDeviceExceptionMsg->setVisible(false);
+
+    QString iconPath = STAND_ICON_PAHT;
+    iconPath.append("warning.svg");
+    m_pDeviceExceptionMsg->setIcon(QIcon(iconPath));
+    m_pDeviceExceptionMsg->setMessage(
+                DApplication::translate(
+                    "VNoteRecordBar",
+                    "Your audio recording device does not work.")
+                );
+
     //Default unavailable
     OnMicrophoneAvailableChanged(false);
-    m_mainLayout->setCurrentWidget(m_recordBtnHover);
 }
 
 void VNoteRecordBar::initConnections()
@@ -66,7 +85,6 @@ void VNoteRecordBar::initConnections()
             this, SIGNAL(sigPlayVoice(VNVoiceBlock *)));
     connect(m_playPanel, SIGNAL(sigPauseVoice(VNVoiceBlock *)),
             this, SIGNAL(sigPauseVoice(VNVoiceBlock *)));
-
 }
 
 bool VNoteRecordBar::eventFilter(QObject *o, QEvent *e)
@@ -127,7 +145,23 @@ void VNoteRecordBar::OnMicrophoneAvailableChanged(int availableState)
                         "VNoteRecordBar",
                         "No recording device detected")
                     );
+        //If device don't available during recording,
+        //stop recording,and give device exception message.
+        if (m_mainLayout->currentWidget() == m_recordPanel) {
+            cancelRecord();
+
+            if (!m_pDeviceExceptionMsg->isVisible()) {
+                m_pDeviceExceptionMsg->show();
+                m_pDeviceExceptionMsg->adjustSize();
+            }
+        }
     } else {
+        //When device available,should hide the exception
+        //message
+        if (m_pDeviceExceptionMsg->isVisible()) {
+            m_pDeviceExceptionMsg->close();
+        }
+
         m_recordBtn->setBtnDisabled(false);
         m_recordBtn->setToolTip("");
 
