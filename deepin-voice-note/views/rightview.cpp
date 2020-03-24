@@ -60,7 +60,6 @@ void RightView::initUi()
     m_fileHasDelDialog->addButton(DApplication::translate(
                                       "RightView",
                                       "OK"), false, DDialog::ButtonNormal);
-    m_fileHasDelDialog->setEnabled(false);
     m_playAnimTimer = new QTimer(this);
     m_playAnimTimer->setInterval(300);
 }
