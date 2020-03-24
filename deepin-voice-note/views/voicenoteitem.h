@@ -15,15 +15,34 @@ DWIDGET_USE_NAMESPACE
 class TextNoteEdit;
 class VNoteIconButton;
 
+//Playing animation interface
+class PlayAnimInferface {
+public:
+    virtual ~PlayAnimInferface();
 
-class VoiceNoteItem : public DetailItemWidget
+    virtual void startAnim();
+    virtual void stopAnim();
+    void setAnimTimer(QTimer *timer);
+    virtual void updateAnim() = 0;
+protected:
+    qint32  m_animPicIndex {0};
+    QTimer *m_refreshTimer {nullptr};
+
+    const QVector<QString> m_playBitmap = {
+        "play_voice1.svg",
+        "play_voice2.svg",
+        "play_voice3.svg",
+        "play_voice4.svg",
+    };
+};
+
+class VoiceNoteItem : public DetailItemWidget, public PlayAnimInferface
 {
     Q_OBJECT
 public:
 
     explicit VoiceNoteItem(VNoteBlock *noteBlock, QWidget *parent = nullptr);
 
-    void setHornGif(QMovie *gif);
     void showPlayBtn();
     void showPauseBtn();
     void showAsrStartWindow();
@@ -34,23 +53,26 @@ public:
     bool isAsrTextPos(const QPoint &globalPos);
     bool isAsring();
 
-    VNoteBlock *getNoteBlock();
-    QTextCursor getTextCursor();
-    void        setTextCursor(const QTextCursor &cursor);
-    void        updateData();
-    bool        textIsEmpty();
-    QRect       getCursorRect();
+    void updateAnim() override;
+    void stopAnim() override;
+
+    VNoteBlock *getNoteBlock() override;
+    QTextCursor getTextCursor() override;
+    void        setTextCursor(const QTextCursor &cursor) override;
+    void        updateData() override;
+    bool        textIsEmpty() override;
+    QRect       getCursorRect() override;
     //选中操作相关
-    void selectText(const QPoint &globalPos,QTextCursor::MoveOperation op);
-    void selectText(QTextCursor::MoveOperation op);
-    void removeSelectText();
-    void selectAllText();
-    void clearSelection();
-    void setFocus();
-    bool hasFocus();
-    bool hasSelection();
-    QString getAllText();
-    QString getSelectText();
+    void selectText(const QPoint &globalPos,QTextCursor::MoveOperation op) override;
+    void selectText(QTextCursor::MoveOperation op) override;
+    void removeSelectText() override;
+    void selectAllText() override;
+    void clearSelection() override;
+    void setFocus() override;
+    bool hasFocus() override;
+    bool hasSelection() override;
+    QString getAllText() override;
+    QString getSelectText() override;
 signals:
     void sigPlayBtnClicked(VoiceNoteItem *item);
     void sigPauseBtnClicked(VoiceNoteItem *item);
@@ -64,7 +86,6 @@ private:
     void initUi();
     void initConnection();
     bool m_select   {false};
-    QMovie          *m_hornGif {nullptr};
     DLabel          *m_hornLab {nullptr};
     DLabel          *m_createTimeLab {nullptr};
     DLabel          *m_voiceSizeLab {nullptr};

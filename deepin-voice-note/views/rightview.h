@@ -65,6 +65,7 @@ public slots:
     void onTextEditTextChange();
     void onVoicePlay(VoiceNoteItem *item);
     void onVoicePause(VoiceNoteItem *item);
+    void onPlayUpdate();
     void onChangeTheme();
 protected:
     void leaveEvent(QEvent *event) override;
@@ -95,7 +96,9 @@ private:
     DDialog     *m_fileHasDelDialog {nullptr};
     bool         m_fIsNoteModified {false};
     bool         m_isFristTextChange {false};
-    QMovie          *m_hornGif {nullptr};
+
+    QTimer       *m_playAnimTimer {nullptr};
+
     //App setting, reference to VNoteApplication's setting
     QSharedPointer<QSettings> m_qspSetting {nullptr};
 };

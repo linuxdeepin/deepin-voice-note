@@ -3,6 +3,7 @@
 #include "voicenoteitem.h"
 #include "globaldef.h"
 #include "vnoteapplication.h"
+#include "common/utils.h"
 
 #include "common/vnoteitem.h"
 #include "common/vnotedatamanager.h"
@@ -60,8 +61,8 @@ void RightView::initUi()
                                       "RightView",
                                       "OK"), false, DDialog::ButtonNormal);
     m_fileHasDelDialog->setEnabled(false);
-    m_hornGif = new QMovie(this);
-    m_hornGif->setScaledSize(QSize(19,17)*(devicePixelRatioF()/1.0));
+    m_playAnimTimer = new QTimer(this);
+    m_playAnimTimer->setInterval(300);
 }
 
 void RightView::initMenu()
@@ -120,7 +121,7 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
     data->ptrVoice->voiceTitle = noteOps.getDefaultVoiceName();
 
     VoiceNoteItem *item = new VoiceNoteItem(data, this);
-    item->setHornGif(m_hornGif);
+    item->setAnimTimer(m_playAnimTimer);
 
     connect(item, &VoiceNoteItem::sigPlayBtnClicked, this, &RightView::onVoicePlay);
     connect(item, &VoiceNoteItem::sigPauseBtnClicked, this, &RightView::onVoicePause);
@@ -245,7 +246,7 @@ void RightView::initData(VNoteItem *data, QRegExp reg, bool fouse)
                 m_curItemWidget = insertTextEdit(it, fouse, reg);
             } else if (VNoteBlock::Voice == it->getType()) {
                 VoiceNoteItem *item = new VoiceNoteItem(it, this);
-                item->setHornGif(m_hornGif);
+                item->setAnimTimer(m_playAnimTimer);
                 int preIndex = -1;
                 if (m_curItemWidget != nullptr) {
                     preIndex = m_viewportLayout->indexOf(m_curItemWidget);
@@ -290,6 +291,13 @@ void RightView::onVoicePause(VoiceNoteItem *item)
 {
     item->showPlayBtn();
     emit sigVoicePause(item->getNoteBlock()->ptrVoice);
+}
+
+void RightView::onPlayUpdate()
+{
+    if (nullptr != m_curPlayItem) {
+        m_curPlayItem->updateAnim();
+    }
 }
 
 void RightView::leaveEvent(QEvent *event)
@@ -872,31 +880,12 @@ void RightView::initConnection()
     connect(DGuiApplicationHelper::instance(),
                      &DGuiApplicationHelper::themeTypeChanged,
             this, &RightView::onChangeTheme);
+
+    connect(m_playAnimTimer, &QTimer::timeout, this, &RightView::onPlayUpdate);
 }
 
 void RightView::onChangeTheme()
 {
-    if(m_hornGif){
-        QMovie::MovieState status = m_hornGif->state();
-        if(status == QMovie::Running){ //运行时无法切换图片，先停止
-            m_hornGif->stop();
-        }
-
-        QString iconPath(STAND_ICON_PAHT);
-        DGuiApplicationHelper::ColorType theme =
-                DGuiApplicationHelper::instance()->themeType();
-        if(theme == DGuiApplicationHelper::DarkType){
-            iconPath += "dark/voice.gif";
-        }else if (theme == DGuiApplicationHelper::LightType) {
-            iconPath += "light/voice.gif";
-        }
-
-        m_hornGif->setFileName(iconPath);
-
-        if(status == QMovie::Running){ //重新启动
-            m_hornGif->start();
-        }
-    }
 }
 
 void RightView::saveMp3()

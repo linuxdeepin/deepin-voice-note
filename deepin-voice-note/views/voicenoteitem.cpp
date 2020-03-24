@@ -12,6 +12,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QAbstractTextDocumentLayout>
+#include <QTimer>
 
 #include <DFontSizeManager>
 #include <DStyle>
@@ -75,6 +76,8 @@ void VoiceNoteItem::initUi()
     m_voiceNameLab->setForegroundRole(DPalette::TextTitle);
 
     m_hornLab = new DLabel(m_bgWidget);
+    m_hornLab->setMinimumSize(28,25);
+
     m_hornLab->setAlignment(Qt::AlignRight);
     DAnchorsBase buttonAnchor(m_hornLab);
     buttonAnchor.setAnchor(Qt::AnchorRight, m_bgWidget, Qt::AnchorRight);
@@ -166,22 +169,24 @@ VNoteBlock *VoiceNoteItem::getNoteBlock()
 
 void VoiceNoteItem::showPlayBtn()
 {
+    if(m_pauseBtn->isVisible()){
+        stopAnim();
+    }
+
     m_pauseBtn->setVisible(false);
     m_playBtn->setVisible(true);
     m_hornLab->setVisible(false);
-    if(m_hornGif){
-        m_hornGif->stop();
-    }
 }
 
 void VoiceNoteItem::showPauseBtn()
 {
+    if(!m_pauseBtn->isVisible()){
+         startAnim();
+    }
+
     m_pauseBtn->setVisible(true);
     m_playBtn->setVisible(false);
     m_hornLab->setVisible(true);
-    if(m_hornGif){
-         m_hornGif->start();
-    }
 }
 
 void VoiceNoteItem::showAsrStartWindow()
@@ -359,10 +364,60 @@ bool VoiceNoteItem::isAsring()
     return  m_asrText->isVisible() && m_noteBlock->blockText.isEmpty();
 }
 
-void VoiceNoteItem::setHornGif(QMovie *gif)
+void VoiceNoteItem::updateAnim()
 {
-    if(gif){
-        m_hornGif = gif;
-        m_hornLab->setMovie(m_hornGif);
+    QPixmap playAnimPic = Utils::loadSVG(m_playBitmap[m_animPicIndex]);
+
+    ++m_animPicIndex;
+    m_animPicIndex = m_animPicIndex % m_playBitmap.size();
+
+    if (nullptr != m_hornLab) {
+        m_hornLab->setPixmap(playAnimPic);
     }
+}
+
+void VoiceNoteItem::stopAnim()
+{
+    PlayAnimInferface::stopAnim();
+
+    //Reset null
+    if (nullptr != m_hornLab) {
+        m_hornLab->setPixmap(QPixmap());
+    }
+}
+
+PlayAnimInferface::~PlayAnimInferface()
+{
+
+}
+
+void PlayAnimInferface::startAnim()
+{
+    if (nullptr != m_refreshTimer) {
+        if (!m_refreshTimer->isActive()) {
+            m_refreshTimer->start();
+        }
+        //Reset index at start;
+        m_animPicIndex = 0;
+    }
+}
+
+void PlayAnimInferface::stopAnim()
+{
+    if (nullptr != m_refreshTimer) {
+        if (m_refreshTimer->isActive()) {
+            m_refreshTimer->stop();
+        }
+    }
+}
+
+void PlayAnimInferface::setAnimTimer(QTimer *timer)
+{
+    if (nullptr != timer) {
+        m_refreshTimer = timer;
+    }
+}
+
+void PlayAnimInferface::updateAnim()
+{
 }

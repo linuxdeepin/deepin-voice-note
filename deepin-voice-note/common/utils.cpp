@@ -1,6 +1,11 @@
 #include "utils.h"
+#include "globaldef.h"
+
 #include <QImageReader>
+#include <QIcon>
 #include <QDebug>
+
+#include <DGuiApplicationHelper>
 
 Utils::Utils() {}
 
@@ -53,6 +58,44 @@ QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplicatio
         pixmap.setDevicePixelRatio(ratio);
     } else {
         pixmap.load(filePath);
+    }
+
+    return pixmap;
+}
+
+QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
+{
+    DGuiApplicationHelper::ColorType theme =
+            DGuiApplicationHelper::instance()->themeType();
+
+    QString iconPath(STAND_ICON_PAHT);
+
+    if (!fCommon) {
+        if (DGuiApplicationHelper::ColorType::LightType == theme) {
+            iconPath += QString("light/");
+        } else {
+            iconPath += QString("dark/");
+        }
+    }
+
+    iconPath += fileName;
+
+    qreal ratio = 1.0;
+
+    const qreal devicePixelRatio = qApp->devicePixelRatio();
+
+    QPixmap pixmap;
+
+    if (!qFuzzyCompare(ratio, devicePixelRatio)) {
+        QImageReader reader;
+        reader.setFileName(qt_findAtNxFile(iconPath, devicePixelRatio, &ratio));
+        if (reader.canRead()) {
+            reader.setScaledSize(reader.size() * (devicePixelRatio / ratio));
+            pixmap = QPixmap::fromImage(reader.read());
+            pixmap.setDevicePixelRatio(devicePixelRatio);
+        }
+    } else {
+        pixmap.load(iconPath);
     }
 
     return pixmap;

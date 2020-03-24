@@ -74,8 +74,14 @@
         <file>icons/deepin/builtin/dark/add_note_normal.svg</file>
         <file>icons/deepin/builtin/dark/add_note_press.svg</file>
         <file>icons/deepin/builtin/dark/more_disabled.svg</file>
-        <file>icons/deepin/builtin/dark/voice.gif</file>
-        <file>icons/deepin/builtin/light/voice.gif</file>
         <file>icons/deepin/builtin/warning.svg</file>
+        <file>icons/deepin/builtin/dark/play_voice1.svg</file>
+        <file>icons/deepin/builtin/dark/play_voice2.svg</file>
+        <file>icons/deepin/builtin/dark/play_voice4.svg</file>
+        <file>icons/deepin/builtin/dark/play_voice3.svg</file>
+        <file>icons/deepin/builtin/light/play_voice1.svg</file>
+        <file>icons/deepin/builtin/light/play_voice2.svg</file>
+        <file>icons/deepin/builtin/light/play_voice3.svg</file>
+        <file>icons/deepin/builtin/light/play_voice4.svg</file>
     </qresource>
 </RCC>
