@@ -1193,6 +1193,11 @@ void VNoteMainWindow::delNote()
         VNoteItemOper noteOper(noteData);
         noteOper.deleteNote();
 
+        //Refresh the middle view
+        if(m_middleView->rowCount() <= 0 && isSearching() ) {
+            m_middleView->setVisibleEmptySearch(true);
+        }
+
         //Refresh the notes count of folder
         m_leftView->update(m_leftView->currentIndex());
     }
