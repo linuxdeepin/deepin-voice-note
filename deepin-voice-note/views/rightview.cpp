@@ -466,6 +466,14 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
             }
         }
 
+        if(m_curPlayItem == widget){
+            m_curPlayItem = nullptr;
+        }
+
+        if(m_curAsrItem == widget){
+            m_curAsrItem = nullptr;
+        }
+
         widget->disconnect();
         noteBlockList.push_back(noteBlock);
         m_viewportLayout->removeWidget(widget);
@@ -493,6 +501,14 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
 
             if (m_curItemWidget == preWidget) {
                 m_curItemWidget = nextWidget;
+            }
+
+            if(m_curPlayItem == preWidget){
+                m_curPlayItem = nullptr;
+            }
+
+            if(m_curAsrItem == preWidget){
+                m_curAsrItem = nullptr;
             }
         }
     }
