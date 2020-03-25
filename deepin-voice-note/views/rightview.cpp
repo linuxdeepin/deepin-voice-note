@@ -721,6 +721,7 @@ void RightView::delSelectText()
             delWidget(delListWidget[i], merge);
         }
         updateData();
+        clearAllSelection();
     }
 }
 
