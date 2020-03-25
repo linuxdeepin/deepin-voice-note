@@ -195,10 +195,18 @@ void VNoteMainWindow::initShortcuts()
         gettimeofday(&curret, nullptr);
 
         if (TM(lastPress, curret) > MIN_STKEY_RESP_TIME) {
-            if (canDoShortcutAction() &&
-                    !(isRecording() || isPlaying() || isVoice2Text() || isSearching())
+            if (!(isRecording()
+                  || isPlaying()
+                  || isVoice2Text()
+                  || isSearching() )
                     ) {
                 addNotepad();
+
+                //If do shortcut in home page,need switch to note
+                //page after add new notebook.
+                if (!canDoShortcutAction()) {
+                    m_centerWidget->setCurrentIndex(WndNoteShow);
+                }
             }
         }
     });
