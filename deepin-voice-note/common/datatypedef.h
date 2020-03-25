@@ -63,7 +63,14 @@ protected:
     void addBlock(VNoteBlock* before, VNoteBlock* block);
     void delBlock(VNoteBlock* block);
 
+    void classifyAddBlk(VNoteBlock* block);
+    void classifyDelBlk(VNoteBlock* block);
+    //Ordered data set
     VNOTE_DATA_VECTOR datas;
+
+    //Classify data
+    VNOTE_DATA_VECTOR textBlocks;
+    VNOTE_DATA_VECTOR voiceBlocks;
 
     friend struct VNoteItem;
     friend class MetaDataParser;

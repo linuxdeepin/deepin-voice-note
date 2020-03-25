@@ -56,6 +56,15 @@ QAction *ActionManager::getActionById(ActionManager::ActionKind id)
     return menuAction;
 }
 
+void ActionManager::enableAction(ActionManager::ActionKind actionId, bool enable)
+{
+    QMap<ActionKind, QAction*>::iterator it = m_actionsMap.find(actionId);
+
+    if (it != m_actionsMap.end()) {
+        (*it)->setEnabled(enable);
+    }
+}
+
 void ActionManager::initMenu()
 {
     //Notebook context menu

@@ -97,6 +97,31 @@ void VNoteItem::delBlock(VNoteBlock *block)
     datas.delBlock(block);
 }
 
+bool VNoteItem::haveVoice() const
+{
+    bool fHaveVoice = false;
+
+    if (datas.voiceBlocks.size() > 0) {
+        fHaveVoice = true;
+    }
+
+    return fHaveVoice;
+}
+
+bool VNoteItem::haveText() const
+{
+    bool fHaveText = false;
+
+    for (auto it : datas.textBlocks) {
+        if (!it->blockText.isEmpty()) {
+            fHaveText = true;
+            break;
+        }
+    }
+
+    return fHaveText;
+}
+
 QDebug& operator << (QDebug &out, VNoteItem &noteItem)
 {
     out << "\n{ "

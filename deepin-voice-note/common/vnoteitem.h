@@ -57,6 +57,9 @@ public:
     void addBlock(VNoteBlock* block);
     void addBlock(VNoteBlock* before, VNoteBlock* block);
     void delBlock(VNoteBlock* block);
+
+    bool haveVoice() const;
+    bool haveText() const;
 protected:
     QVariant metaData;
 

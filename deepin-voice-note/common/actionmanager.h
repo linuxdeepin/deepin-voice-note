@@ -51,6 +51,8 @@ public:
     DMenu* detialContextMenu();
     ActionKind getActionKind(QAction *action);
     QAction* getActionById(ActionKind id);
+
+    void enableAction(ActionKind actionId, bool enable);
 protected:
 
     void initMenu();
