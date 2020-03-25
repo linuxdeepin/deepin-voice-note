@@ -2,10 +2,9 @@
 Categories=AudioVideo;
 Comment=Voice note book
 Exec=/usr/bin/deepin-voice-note %f
-GenericName[zh_CN]=语音记事本
+GenericName=Voice Notes
 Icon=deepin-voice-note
 Name=Voice Notes
-Name[zh_CN]=语音记事本
 StartupNotify=true
 Terminal=false
 TryExec=/usr/bin/deepin-voice-note
