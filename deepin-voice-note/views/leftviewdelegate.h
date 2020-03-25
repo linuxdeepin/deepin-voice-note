@@ -9,6 +9,7 @@ class LeftViewDelegate : public DStyledItemDelegate
 public:
     LeftViewDelegate(QAbstractItemView *parent = nullptr);
     void handleChangeTheme();
+    void setEnableItem(bool enable);
 
     const int MAX_FOLDER_NAME_LEN = 64;
 protected:
@@ -31,6 +32,7 @@ private:
                        const QModelIndex &index) const;
     QAbstractItemView *m_treeView {nullptr};
     DPalette m_parentPb;
+    bool     m_enableItem {true};
 };
 
 #endif // LeftViewDelegate_H

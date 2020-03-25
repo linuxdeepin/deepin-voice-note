@@ -45,16 +45,37 @@ void LeftView::mousePressEvent(QMouseEvent *event)
 {
     this->setFocus();
 
-    if (m_isEnable) {
+    if (!m_onlyCurItemMenuEnable) {
         DTreeView::mouseMoveEvent(event);
-        if (event->button() == Qt::RightButton) {
-            QPoint pos = mapToParent(event->pos());
-            QModelIndex index = this->indexAt(pos);
-            if (StandardItemCommon::getStandardItemType(index) == StandardItemCommon::NOTEPADITEM) {
-                this->setCurrentIndex(index);
-                m_notepadMenu->exec(event->globalPos());
-            }
+    }
+
+    if (event->button() == Qt::RightButton) {
+        QModelIndex index = this->indexAt(event->pos());
+        if (StandardItemCommon::getStandardItemType(index) == StandardItemCommon::NOTEPADITEM
+                && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
+            this->setCurrentIndex(index);
+            m_notepadMenu->exec(event->globalPos());
         }
+    }
+}
+void LeftView::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (!m_onlyCurItemMenuEnable) {
+        DTreeView::mouseReleaseEvent(event);
+    }
+}
+
+void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (!m_onlyCurItemMenuEnable) {
+        DTreeView::mouseDoubleClickEvent(event);
+    }
+}
+
+void LeftView::mouseMoveEvent(QMouseEvent *event)
+{
+    if (!m_onlyCurItemMenuEnable) {
+        DTreeView::mouseMoveEvent(event);
     }
 }
 
@@ -137,4 +158,11 @@ int LeftView::folderCount()
 void  LeftView::initMenu()
 {
     m_notepadMenu = ActionManager::Instance()->notebookContextMenu();
+}
+
+void LeftView::setOnlyCurItemMenuEnable(bool enable)
+{
+    m_onlyCurItemMenuEnable = enable;
+    m_pItemDelegate->setEnableItem(!enable);
+    m_pDataModel->layoutChanged();
 }

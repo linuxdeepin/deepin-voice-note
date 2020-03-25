@@ -138,19 +138,13 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
     path.lineTo(paintRect.bottomLeft() + QPoint(radius, 0));
     path.arcTo(QRect(QPoint(paintRect.bottomRight() - QPoint(radius * 2, radius * 2)), QSize(radius * 2, radius * 2)), 270, 90);
 
-    bool enable = option.state & QStyle::State_Enabled;
     if (option.state & QStyle::State_Selected) {
         QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
-//        if (enable) {
-//            fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
-//        } else {
-//            fillColor = option.palette.color(DPalette::Disabled, DPalette::Highlight);
-//        }
         painter->setBrush(QBrush(fillColor));
         painter->fillPath(path, painter->brush());
         painter->setPen(QPen(Qt::white));
     } else {
-        if (enable == false) {
+        if (m_enableItem == false) {
             painter->setBrush(QBrush(m_parentPb.color(DPalette::Disabled, DPalette::ItemBackground)));
             painter->fillPath(path, painter->brush());
             painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::TextTitle)));
@@ -186,4 +180,8 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
     painter->restore();
 }
 
+void LeftViewDelegate::setEnableItem(bool enable)
+{
+    m_enableItem = enable;
+}
 

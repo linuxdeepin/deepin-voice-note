@@ -18,6 +18,7 @@ public:
     QStandardItem *getNotepadRoot();
     QModelIndex setDefaultNotepadItem();
 
+    void setOnlyCurItemMenuEnable(bool enable);
     void addFolder(VNoteFolder* folder);
     void appendFolder(VNoteFolder* folder);
     void editFolder();
@@ -28,7 +29,10 @@ public:
 signals:
 
 protected:
-    void mousePressEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 private:
     void initDelegate();
     void initModel();
@@ -37,7 +41,7 @@ private:
     DMenu               *m_notepadMenu {nullptr};
     QStandardItemModel  *m_pDataModel {nullptr};
     LeftViewDelegate    *m_pItemDelegate {nullptr};
-    bool                 m_isEnable {true};
+    bool                m_onlyCurItemMenuEnable {false};
 };
 
 #endif // LEFTVIEW_H
