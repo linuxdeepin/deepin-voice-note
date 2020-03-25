@@ -546,6 +546,8 @@ void VNoteMainWindow::initRightView()
 
     m_rightViewHolder->setLayout(rightHolderLayout);
 
+    m_recordBar->setVisible(false);
+
 #ifdef VNOTE_LAYOUT_DEBUG
     m_rightViewHolder->setStyleSheet("background: red");
     m_rightViewScrollArea->setStyleSheet("background: blue");
@@ -637,10 +639,10 @@ void VNoteMainWindow::onVNoteSearch()
     if (m_centerWidget->currentIndex() == WndNoteShow) {
         QString strKey = m_noteSearchEdit->text();
         if (!strKey.isEmpty()) {
+            setSpecialStatus(SearchStart);
             m_searchKey.setPattern(strKey);
             m_searchKey.setCaseSensitivity(Qt::CaseInsensitive);
             loadSearchNotes(m_searchKey);
-            setSpecialStatus(SearchStart);
         } else {
             setSpecialStatus(SearchEnd);
         }
@@ -654,6 +656,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
     if (!loadNotes(data)) {
         m_rightView->initData(nullptr, m_searchKey, false);
+        m_recordBar->setVisible(false);
     }
 }
 
@@ -975,7 +978,13 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
     m_asrErrMeassage->setVisible(false);
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
-    qDebug() << m_leftView->hasFocus() << m_rightView->hasFocus();
+
+    if(data == nullptr || isSearching()){
+        m_recordBar->setVisible(false);
+    }else{
+        m_recordBar->setVisible(true);
+    }
+
     m_rightView->initData(data, m_searchKey, m_rightViewHasFouse);
     m_rightViewHasFouse = false;
     if (!m_searchKey.isEmpty() && m_noteSearchEdit->isEnabled()) {
@@ -1245,6 +1254,7 @@ int VNoteMainWindow::loadSearchNotes(const QRegExp &key)
         if (m_middleView->rowCount() == 0) {
             m_middleView->setVisibleEmptySearch(true);
             m_rightView->initData(nullptr, m_searchKey);
+            m_recordBar->setVisible(false);
         } else {
             m_middleView->setVisibleEmptySearch(false);
             m_middleView->setCurrentIndex(0);
@@ -1327,9 +1337,9 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_leftView->setEnabled(true);
         m_addNotepadBtn->setVisible(true);
         m_addNoteBtn->setVisible(true);
-        onVNoteFolderChange(m_leftView->setDefaultNotepadItem(), QModelIndex());
         m_noteSearchEdit->lineEdit()->setFocus();
         operState(StateSearching, false);
+        onVNoteFolderChange(m_leftView->setDefaultNotepadItem(), QModelIndex());
         break;
     case PlayVoiceStart:
         operState(StatePlaying, true);
