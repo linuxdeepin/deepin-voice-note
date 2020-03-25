@@ -93,7 +93,7 @@ isEmpty(DSRDIR):DSRDIR=/usr/share/deepin-voice-note
 target.path = $$INSTROOT$$BINDIR
 
 desktop.path = $$INSTROOT$$APPDIR
-desktop.files =  deepin-voice-note.desktop
+desktop.files =  deepin-voice-notes.desktop
 
 # Automating generation .qm files from .ts files
 !system($$PWD/translate_generation.sh): error("Failed to generate translation")
@@ -101,7 +101,7 @@ desktop.files =  deepin-voice-note.desktop
 translations.path = /usr/share/deepin-voice-note/translations
 translations.files = $$PWD/translations/*.qm
 
-icon_files.path = /usr/share/icons/hicolor/scalable/apps
-icon_files.files = $$PWD/image/deepin-voice-note.svg
+#icon_files.path = /usr/share/icons/hicolor/scalable/apps
+#icon_files.files = $$PWD/image/deepin-voice-note.svg
 
 INSTALLS += target desktop translations icon_files
