@@ -187,7 +187,8 @@ int VNoteDbManager::initVNoteDb()
         qInfo() << "Create vnote db directory:" << vnoteDatabasePath;
     }
 
-    QString vnoteDBName = DEEPIN_VOICE_NOTE + QString(".db");
+    QString vnoteDBName = DEEPIN_VOICE_NOTE
+            + QString(VNoteDbManager::DBVERSION) + QString(".db");
 
     QString vnoteDbFullPath = dbDir.filePath() + vnoteDBName;
 

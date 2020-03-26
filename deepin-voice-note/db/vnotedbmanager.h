@@ -17,6 +17,8 @@ public:
 
     static VNoteDbManager* instance();
 
+    static constexpr char const *DBVERSION = "1.0";
+
     static constexpr char const *FOLDER_TABLE_NAME = "vnote_folder_tbl";
     static constexpr char const *FOLDER_KEY        = "folder_id";
     static constexpr char const *NOTES_TABLE_NAME = "vnote_items_tbl";
