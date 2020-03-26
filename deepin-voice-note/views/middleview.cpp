@@ -139,6 +139,7 @@ void MiddleView::saveAsText()
 
         DFileDialog dialog;
         dialog.setFileMode(DFileDialog::DirectoryOnly);
+        dialog.setLabelText(DFileDialog::Accept,DApplication::translate("RightView","Save"));
 
         QString historyDir = m_qspSetting->value(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
         if (historyDir.isEmpty()) {
@@ -173,6 +174,7 @@ void MiddleView::saveRecords()
 
         DFileDialog dialog;
         dialog.setFileMode(DFileDialog::DirectoryOnly);
+        dialog.setLabelText(DFileDialog::Accept,DApplication::translate("RightView","Save"));
 
         QString historyDir = m_qspSetting->value(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
         if (historyDir.isEmpty()) {
