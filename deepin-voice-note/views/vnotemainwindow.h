@@ -131,10 +131,6 @@ private:
     int loadNotes(VNoteFolder *folder);
     int loadSearchNotes(const QRegExp &key);
 
-    //详情页视图操作
-    void delVoice();
-    void voiceTotext();
-
     //Check if wen can do shortcuts
     bool canDoShortcutAction() const;
 

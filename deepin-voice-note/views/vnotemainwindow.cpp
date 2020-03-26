@@ -1300,22 +1300,6 @@ void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
     m_rightView->setCurVoicePlay(nullptr);
 }
 
-void VNoteMainWindow::delVoice()
-{
-//    DetailItemWidget *voiceItem = m_rightView->getMenuItem();
-//    if (voiceItem) {
-//        if (m_asrErrMeassage->isVisible() && voiceItem == m_currentAsrVoice) {
-//            m_asrErrMeassage->setVisible(false);
-//            m_currentAsrVoice = nullptr;
-//        }
-//        if (m_recordBar->stopVoice() {
-//            setSpecialStatus(PlayVoiceEnd);
-//        }
-//        m_rightView->delWidget(voiceItem);
-//        m_rightView->updateData();
-//    }
-}
-
 bool VNoteMainWindow::canDoShortcutAction() const
 {
     return (m_centerWidget->currentIndex() == WndNoteShow);
