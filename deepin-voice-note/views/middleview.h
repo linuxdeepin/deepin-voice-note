@@ -33,6 +33,7 @@ public:
     qint32 rowCount() const;
 
     VNoteItem* deleteCurrentRow();
+    VNoteItem* getCurrVNotedata() const;
 
 signals:
 public slots:

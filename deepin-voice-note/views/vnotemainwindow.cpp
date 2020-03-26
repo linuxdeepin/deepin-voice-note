@@ -1070,31 +1070,43 @@ void VNoteMainWindow::onMenuAbout2Show()
     //TODO:
     //    Add context menu item disable/enable code here
     //Eg:
-    //ActionManager::Instance()->getActionById(ActionManager::NoteAddNew)->setDisabled(true);
+    //ActionManager::Instance()->enableAction(ActionManager::NoteAddNew, false);
     DMenu *menu = static_cast<DMenu *>(sender());
+
     if (menu == ActionManager::Instance()->noteContextMenu()) {
-        QAction *addAction = ActionManager::Instance()->getActionById(ActionManager::NoteAddNew);
-        QAction *delAction = ActionManager::Instance()->getActionById(ActionManager::NoteDelete);
-        QAction *saveAction = ActionManager::Instance()->getActionById(ActionManager::NoteSaveVoice);
+        ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteCtxMenu);
+
         if (isPlaying() || isRecording() || isVoice2Text()) {
-            addAction->setEnabled(false);
-            delAction->setEnabled(false);
+            ActionManager::Instance()->enableAction(ActionManager::NoteAddNew, false);
+            ActionManager::Instance()->enableAction(ActionManager::NoteDelete, false);
+
             if (isRecording()) {
-                saveAction->setEnabled(false);
-            } else {
-                saveAction->setEnabled(true);
+                ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
             }
-        } else {
-            if (m_searchKey.isEmpty()) {
-                addAction->setEnabled(true);
-            } else {
-                addAction->setEnabled(false);
+        } else if (isSearching()) {
+            ActionManager::Instance()->enableAction(ActionManager::NoteAddNew, false);
+        }
+
+        //Disable SaveText if note have no text
+        //Disable SaveVoice if note have no voice.
+        VNoteItem *currNoteData = m_middleView->getCurrVNotedata();
+
+        if (nullptr != currNoteData) {
+            if (!currNoteData->haveText()) {
+                ActionManager::Instance()->enableAction(ActionManager::NoteSaveText, false);
             }
-            delAction->setEnabled(true);
-            saveAction->setEnabled(true);
+
+            if (!currNoteData->haveVoice()) {
+                ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
+            }
         }
     } else if (menu == ActionManager::Instance()->notebookContextMenu()) {
-        qDebug() << "notebookContextMenu";
+        ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NotebookCtxMenu);
+
+        if (isPlaying() || isRecording() || isVoice2Text()) {
+            ActionManager::Instance()->enableAction(ActionManager::NotebookAddNew, false);
+            ActionManager::Instance()->enableAction(ActionManager::NotebookDelete, false);
+        }
     } else if (menu == ActionManager::Instance()->detialContextMenu()) {
         qDebug() << "detialContextMenu";
     }

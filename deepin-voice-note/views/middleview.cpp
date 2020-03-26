@@ -97,6 +97,16 @@ VNoteItem *MiddleView::deleteCurrentRow()
     return noteData;
 }
 
+VNoteItem *MiddleView::getCurrVNotedata() const
+{
+    QModelIndex index = currentIndex();
+    VNoteItem *noteData = reinterpret_cast< VNoteItem*>(
+                StandardItemCommon::getStandardItemData(index)
+                );
+
+    return noteData;
+}
+
 void MiddleView::onNoteChanged()
 {
     m_pSortViewFilter->sortView();
