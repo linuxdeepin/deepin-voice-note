@@ -956,11 +956,11 @@ bool VNoteMainWindow::checkIfNeedExit()
     //Is audio converting to text
     if (isVoice2Text()) {
         pspMessageDialg.reset(new VNoteMessageDialog(
-                                  VNoteMessageDialog::AbortRecord,
+                                  VNoteMessageDialog::AborteAsr,
                                   this));
     } else if (isRecording()) { //Is recording
         pspMessageDialg.reset(new VNoteMessageDialog(
-                                  VNoteMessageDialog::AborteAsr,
+                                  VNoteMessageDialog::AbortRecord,
                                   this));
     }
 
