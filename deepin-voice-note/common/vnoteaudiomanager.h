@@ -14,7 +14,7 @@ public:
 
     static VNoteAudioManager* instance();
     //The max record limit is 3 hours
-    static constexpr int MAX_REC_TIME_INMSEC = (3*60*60*1000);
+    static constexpr int MAX_REC_TIME_INMSEC = (60*60*1000);
     static constexpr int REC_NOTFY_TIME = 500; //ms
 
     void initAudio();

@@ -131,10 +131,6 @@ QString Utils::formatMillisecond(qint64 millisecond, bool minValue)
     if (curSecond < 3600) {
         return QDateTime::fromTime_t(curSecond).toUTC().toString("mm:ss");
     }
-    static const uint maxSecond = 3600 * 3;
-    if(curSecond > maxSecond){
-        curSecond = maxSecond;
-    }
 
-    return QDateTime::fromTime_t(curSecond).toUTC().toString("hh:mm:ss");
+    return QString("60:00");
 }
