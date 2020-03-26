@@ -275,7 +275,7 @@ void MiddleViewDelegate::paintItemBase(QPainter *painter, const QStyleOptionView
         isSelect = true;
     } else {
         isSelect = false;
-        if (m_enableItem == false) {
+        if (m_enableItem == false || !(option.state & QStyle::State_Enabled)) {
             painter->setBrush(QBrush(m_parentPb.color(DPalette::Disabled, DPalette::ItemBackground)));
             painter->fillPath(path, painter->brush());
             painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::WindowText)));

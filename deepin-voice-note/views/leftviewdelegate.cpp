@@ -144,7 +144,7 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
         painter->fillPath(path, painter->brush());
         painter->setPen(QPen(Qt::white));
     } else {
-        if (m_enableItem == false) {
+        if (m_enableItem == false || !(option.state & QStyle::State_Enabled)) {
             painter->setBrush(QBrush(m_parentPb.color(DPalette::Disabled, DPalette::ItemBackground)));
             painter->fillPath(path, painter->brush());
             painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::TextTitle)));
