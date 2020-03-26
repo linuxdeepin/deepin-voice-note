@@ -23,6 +23,10 @@ public:
         NotebookRename = NotebookMenuBase,
         NotebookDelete,
         NotebookAddNew,
+        //Add notebook menu item begin {
+
+        //Add notebook menu item end }
+        NotebookMenuMax,
 
         //notes
         NoteMenuBase,
@@ -31,6 +35,10 @@ public:
         NoteSaveText,
         NoteSaveVoice,
         NoteAddNew,
+        //Add note menu item begin {
+
+        //Add note menu item end }
+        NoteMenuMax,
 
         //NoteDetail
         NoteDetailMenuBase,
@@ -41,10 +49,24 @@ public:
         DetailCopy,
         DetailCut,
         DetailPaste,
+        //Add NoteDetail menu item begin {
+
+        //Add NoteDetail menu item end }
+        NoteDetailMenuMax,
+
+        MenuMaxId
     };
 
     Q_ENUM(ActionKind)
 
+
+    //Menu types
+    enum MenuType {
+        NotebookCtxMenu,
+        NoteCtxMenu,
+        NoteDetailCtxMenu,
+    };
+    Q_ENUM(MenuType)
 
     DMenu* notebookContextMenu();
     DMenu* noteContextMenu();
@@ -53,6 +75,8 @@ public:
     QAction* getActionById(ActionKind id);
 
     void enableAction(ActionKind actionId, bool enable);
+
+    void resetCtxMenu(MenuType type, bool enable = true);
 protected:
 
     void initMenu();

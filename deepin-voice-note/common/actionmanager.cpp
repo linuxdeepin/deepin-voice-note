@@ -65,6 +65,33 @@ void ActionManager::enableAction(ActionManager::ActionKind actionId, bool enable
     }
 }
 
+void ActionManager::resetCtxMenu(ActionManager::MenuType type, bool enable)
+{
+    int startMenuId = MenuMaxId;
+    int endMenuId = MenuMaxId;
+
+    if (MenuType::NotebookCtxMenu == type) {
+        startMenuId = NotebookMenuBase;
+        endMenuId   = NotebookMenuMax;
+    } else if (MenuType::NoteCtxMenu == type) {
+        startMenuId = NoteMenuBase;
+        endMenuId   = NoteMenuMax;
+    } else if (MenuType::NoteDetailCtxMenu == type) {
+        startMenuId = NoteDetailMenuBase;
+        endMenuId   = NoteDetailMenuMax;
+    }
+
+    QAction *pAction = nullptr;
+
+    for (;startMenuId < endMenuId; startMenuId++) {
+        pAction = m_actionsMap[static_cast<ActionKind>(startMenuId)];
+
+        if (nullptr != pAction) {
+            pAction->setEnabled(enable);
+        }
+    }
+}
+
 void ActionManager::initMenu()
 {
     //Notebook context menu
