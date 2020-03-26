@@ -334,37 +334,29 @@ void RightView::saveNote()
 
 void RightView::initAction(DetailItemWidget *widget)
 {
-    QAction *voiceSaveAction = ActionManager::Instance()->getActionById(ActionManager::DetailVoiceSave);
-    QAction *voice2TextAction = ActionManager::Instance()->getActionById(ActionManager::DetailVoice2Text);
-    QAction *delAction = ActionManager::Instance()->getActionById(ActionManager::DetailDelete);
-    QAction *copyAction = ActionManager::Instance()->getActionById(ActionManager::DetailCopy);
-    QAction *cutAction = ActionManager::Instance()->getActionById(ActionManager::DetailCut);
-    QAction *pasteAction = ActionManager::Instance()->getActionById(ActionManager::DetailPaste);
-
-    voiceSaveAction->setEnabled(false);
-    voice2TextAction->setEnabled(false);
-    delAction->setEnabled(false);
-    copyAction->setEnabled(false);
-    cutAction->setEnabled(false);
-    pasteAction->setEnabled(false);
+    ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteDetailCtxMenu, false);
+    ActionManager::Instance()->enableAction(ActionManager::DetailSelectAll, true);
 
     int voiceCount, textCount, tolCount;
     getSelectionCount(voiceCount, textCount);
     tolCount = voiceCount + textCount;
+
     VNoteBlock *blockData = nullptr;
     OpsStateInterface * stateInterface = gVNoteOpsStates();
+
     if (widget != nullptr) {
         blockData = widget->getNoteBlock();
     }
+
     if (tolCount) {
-        copyAction->setEnabled(true);
         if (textCount != 0) {
             if (!blockData || blockData->blockType == VNoteBlock::Text) {
-                cutAction->setEnabled(true);
-                delAction->setEnabled(true);
+                ActionManager::Instance()->enableAction(ActionManager::DetailCut, true);
+                ActionManager::Instance()->enableAction(ActionManager::DetailDelete, true);
             }
         }
     }
+
     if (blockData != nullptr) {
         if (blockData->blockType == VNoteBlock::Voice) {
             if (!checkFileExist(blockData->ptrVoice->voicePath)) {
@@ -374,12 +366,10 @@ void RightView::initAction(DetailItemWidget *widget)
             }
 
             if (!tolCount) {
-                voiceSaveAction->setEnabled(true);
-
+                ActionManager::Instance()->enableAction(ActionManager::DetailVoiceSave, true);
                 if (blockData->ptrVoice->blockText.isEmpty() && !stateInterface->isVoice2Text()) {
-                    voice2TextAction->setEnabled(true);
+                     ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, true);
                 }
-
             }
 
             VoiceNoteItem *item = static_cast<VoiceNoteItem *>(widget);
@@ -399,14 +389,15 @@ void RightView::initAction(DetailItemWidget *widget)
                     enable = false;
                 }
             }
-            delAction->setEnabled(enable);
+
+            ActionManager::Instance()->enableAction(ActionManager::DetailDelete, enable);
             if (tolCount && enable) {
-                cutAction->setEnabled(enable);
+                ActionManager::Instance()->enableAction(ActionManager::DetailCut, enable);
             }
 
         } else if (blockData->blockType == VNoteBlock::Text) {
             if (!tolCount) {
-                pasteAction->setEnabled(true);
+                ActionManager::Instance()->enableAction(ActionManager::DetailPaste, true);
             }
         }
     }
