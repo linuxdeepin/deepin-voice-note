@@ -9,7 +9,7 @@
 #include "common/vnotedatamanager.h"
 #include "common/actionmanager.h"
 #include "common/exportnoteworker.h"
-
+#include "common/opsstateinterface.h"
 #include "db/vnoteitemoper.h"
 
 #include "dialog/vnotemessagedialog.h"
@@ -352,6 +352,7 @@ void RightView::initAction(DetailItemWidget *widget)
     getSelectionCount(voiceCount, textCount);
     tolCount = voiceCount + textCount;
     VNoteBlock *blockData = nullptr;
+    OpsStateInterface * stateInterface = gVNoteOpsStates();
     if (widget != nullptr) {
         blockData = widget->getNoteBlock();
     }
@@ -375,7 +376,7 @@ void RightView::initAction(DetailItemWidget *widget)
             if (!tolCount) {
                 voiceSaveAction->setEnabled(true);
 
-                if (blockData->ptrVoice->blockText.isEmpty()) {
+                if (blockData->ptrVoice->blockText.isEmpty() && !stateInterface->isVoice2Text()) {
                     voice2TextAction->setEnabled(true);
                 }
 
@@ -384,7 +385,7 @@ void RightView::initAction(DetailItemWidget *widget)
             VoiceNoteItem *item = static_cast<VoiceNoteItem *>(widget);
             bool enable = true;
 
-            if (m_curAsrItem && m_curAsrItem->isAsring() &&
+            if (stateInterface->isVoice2Text() &&
                     (m_curAsrItem == item || m_curAsrItem->hasSelection())) {
                 enable = false;
             }
