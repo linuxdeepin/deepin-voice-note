@@ -208,7 +208,7 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
         if (index.isValid()
                 && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
             DListView::setCurrentIndex(index);
-            m_noteMenu->exec(event->globalPos());
+            m_noteMenu->popup(event->globalPos());
         }
     }
 }

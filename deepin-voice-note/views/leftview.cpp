@@ -54,7 +54,7 @@ void LeftView::mousePressEvent(QMouseEvent *event)
         if (StandardItemCommon::getStandardItemType(index) == StandardItemCommon::NOTEPADITEM
                 && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
             this->setCurrentIndex(index);
-            m_notepadMenu->exec(event->globalPos());
+            m_notepadMenu->popup(event->globalPos());
         }
     }
 }
