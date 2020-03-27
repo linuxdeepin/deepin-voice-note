@@ -11,7 +11,7 @@ VNoteIconButton::VNoteIconButton(QWidget *parent, QString normal,QString hover, 
     m_icons[Normal] = normal;
     m_icons[Hover] = hover;
     m_icons[Press] = press;
-
+    setFocusPolicy(Qt::ClickFocus);
     updateIcon();
 
     //TODO:

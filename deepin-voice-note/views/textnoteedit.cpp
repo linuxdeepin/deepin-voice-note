@@ -45,6 +45,8 @@ void TextNoteEdit::keyPressEvent(QKeyEvent *e)
 {
     if(e->modifiers() != Qt::ControlModifier && e->key() != Qt::Key_Delete){
        DTextEdit::keyPressEvent(e);
+    }else {
+        e->ignore();
     }
 
 //    if (e->key() == Qt::Key_Backspace) {
@@ -56,7 +58,7 @@ void TextNoteEdit::keyPressEvent(QKeyEvent *e)
 //        preEmpty = isEmpty;
 //    }
 
-    e->ignore();
+
 }
 
 void TextNoteEdit::mousePressEvent(QMouseEvent *event)
