@@ -73,6 +73,10 @@ public:
     bool hasSelection() override;
     QString getAllText() override;
     QString getSelectText() override;
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 signals:
     void sigPlayBtnClicked(VoiceNoteItem *item);
     void sigPauseBtnClicked(VoiceNoteItem *item);
@@ -81,6 +85,7 @@ public slots:
     void onPlayBtnClicked();
     void onPauseBtnClicked();
     void onAsrTextChange();
+    void onChangeTheme();
 
 private:
     void initUi();
@@ -95,6 +100,7 @@ private:
     VNoteBlock      *m_noteBlock {nullptr};
     VNoteIconButton *m_pauseBtn {nullptr};
     VNoteIconButton *m_playBtn {nullptr};
+    DFrame          *m_coverWidget{nullptr};
 };
 
 #endif // VOICENOTEITEM_H

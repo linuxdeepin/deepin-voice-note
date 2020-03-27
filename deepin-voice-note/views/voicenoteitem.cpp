@@ -122,7 +122,14 @@ void VoiceNoteItem::initUi()
 
     this->setLayout(mainLayout);
 
-
+    m_coverWidget = new DFrame(this);
+    m_coverWidget->setAttribute(Qt::WA_TransparentForMouseEvents,true);
+    DPalette pbCover = DApplicationHelper::instance()->palette(m_coverWidget);
+    QColor coverColor = pbCover.color(DPalette::Active, DPalette::Highlight);
+    coverColor.setAlphaF(0.7);
+    pbCover.setBrush(DPalette::Base, coverColor);
+    m_coverWidget->setPalette(pbCover);
+    m_coverWidget->setVisible(false);
 }
 
 void VoiceNoteItem::updateData()
@@ -150,6 +157,7 @@ void VoiceNoteItem::initConnection()
     connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, [ = ] {
         onAsrTextChange();
     });
+    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this, &VoiceNoteItem::onChangeTheme);
 }
 
 void VoiceNoteItem::onPlayBtnClicked()
@@ -235,6 +243,15 @@ void VoiceNoteItem::onAsrTextChange()
     this->setFixedHeight(height);
 }
 
+void VoiceNoteItem::onChangeTheme()
+{
+    DPalette pbCover = DApplicationHelper::instance()->palette(m_coverWidget);
+    QColor coverColor = pbCover.color(DPalette::Active, DPalette::Highlight);
+    coverColor.setAlphaF(0.7);
+    pbCover.setBrush(DPalette::Base, coverColor);
+    m_coverWidget->setPalette(pbCover);
+}
+
 bool VoiceNoteItem::asrTextNotEmpty()
 {
     return m_noteBlock && !m_noteBlock->blockText.isEmpty();
@@ -242,20 +259,28 @@ bool VoiceNoteItem::asrTextNotEmpty()
 
 void VoiceNoteItem::selectText(const QPoint &globalPos, QTextCursor::MoveOperation op)
 {
+    m_coverWidget->setVisible(true);
+
     if(asrTextNotEmpty()){
        m_asrText->selectText(globalPos,op);
     }
+    m_select = true;
 }
 
 void VoiceNoteItem::selectText(QTextCursor::MoveOperation op)
 {
+    m_coverWidget->setVisible(true);
+
     if(asrTextNotEmpty()){
       m_asrText->moveCursor(op,QTextCursor::KeepAnchor);
     }
+    m_select = true;
 }
 
 void VoiceNoteItem::selectAllText()
 {
+    m_coverWidget->setVisible(true);
+
     if(asrTextNotEmpty()){
         m_asrText->selectAll();
     }
@@ -264,6 +289,7 @@ void VoiceNoteItem::selectAllText()
 
 void VoiceNoteItem::clearSelection()
 {
+    m_coverWidget->setVisible(false);
     if(asrTextNotEmpty()){
        m_asrText->clearSelection();
     }
@@ -277,6 +303,13 @@ QString VoiceNoteItem::getSelectText()
         ret = m_asrText->getSelectText();
     }
     return  ret;
+}
+
+void VoiceNoteItem::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event)
+    m_coverWidget->resize(m_bgWidget->size());
+    m_coverWidget->move(10,0);
 }
 
 QString VoiceNoteItem::getAllText()
