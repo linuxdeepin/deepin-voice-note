@@ -349,6 +349,8 @@ void RightView::initAction(DetailItemWidget *widget)
     }
 
     if (tolCount) {
+        ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
+
         if (textCount != 0) {
             if (!blockData || blockData->blockType == VNoteBlock::Text) {
                 ActionManager::Instance()->enableAction(ActionManager::DetailCut, true);
