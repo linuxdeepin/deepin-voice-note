@@ -13,6 +13,9 @@ TextNoteEdit::TextNoteEdit(QWidget *parent)
     DFontSizeManager::instance()->bind(this, DFontSizeManager::T8);//DTK设置字体大小
     setContextMenuPolicy(Qt::NoContextMenu);
     setMouseTracking(true);
+
+    //Edit get focus only by click
+    setFocusPolicy(Qt::ClickFocus);
 }
 
 void TextNoteEdit::focusInEvent(QFocusEvent *e)
