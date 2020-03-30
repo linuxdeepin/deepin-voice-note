@@ -83,5 +83,7 @@
         <file>icons/deepin/builtin/light/play_voice2.svg</file>
         <file>icons/deepin/builtin/light/play_voice3.svg</file>
         <file>icons/deepin/builtin/light/play_voice4.svg</file>
+        <file>icons/deepin/builtin/play.svg</file>
+        <file>icons/deepin/builtin/pause.svg</file>
     </qresource>
 </RCC>
