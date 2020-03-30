@@ -43,7 +43,8 @@ private:
     MicrophoneState m_microphoneState {NotAvailable};
     volatile bool m_quitWatcher {false};
 
-    bool m_fNeedDeviceChecker {true};
+    //Don't check device by default now
+    bool m_fNeedDeviceChecker {false};
 };
 
 #endif // VNOTEAUDIODEVICEWATCHER_H

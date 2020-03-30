@@ -40,20 +40,44 @@ void VNoteAudioDeviceWatcher::initDeviceWatcher()
 
 void VNoteAudioDeviceWatcher::initWatcherCofing()
 {
-    QString watcherConfigFilePath = QString("/etc/")
-            + QString(DEEPIN_VOICE_NOTE)+QString("/")
+    //TODO:
+    //    Both App & Backend may be integrate the
+    //config file,and /etc's priority is higher than
+    //app's configuration.
+    QStringList watcherConfigFilePaths = {
+        "/etc/",
+        "/usr/share/",
+    };
+
+    QString configFileBasePath = QString(DEEPIN_VOICE_NOTE)+QString("/")
             + QString(DEEPIN_VOICE_NOTE)+QString(".conf");
 
-    QFileInfo watcherConfig(watcherConfigFilePath);
+    for (auto it : watcherConfigFilePaths) {
+        QString configFileName(it+configFileBasePath);
 
-    if (watcherConfig.exists()) {
-        QSettings  watcherSettings(watcherConfigFilePath, QSettings::Format::IniFormat);
+        QFileInfo watcherConfig(configFileName);
 
-        //Default need device watcher
-        m_fNeedDeviceChecker = watcherSettings.value("Audio/CheckInputDevice", true).toBool();
+        if (watcherConfig.exists()) {
+            QSettings  watcherSettings(configFileName, QSettings::Format::IniFormat);
 
-        qInfo() << "Device watcher config: CheckInputDevice->" << m_fNeedDeviceChecker;
+            //Default need device watcher
+            QVariant varValue = watcherSettings.value("Audio/CheckInputDevice");
+
+            if (!varValue.isNull()) {
+                m_fNeedDeviceChecker = varValue.toBool();
+                qInfo() << "Device watcher config:Path=" << configFileName
+                        << " CheckInputDevice->" << m_fNeedDeviceChecker;
+                break;
+            } else {
+                qInfo() << "Device watcher config:Path=" << configFileName
+                        << " [Audio/CheckInputDevice] doesn't exist.";
+            }
+        } else {
+            qInfo() << "Device watcher config don't exist:" << configFileName;
+        }
     }
+
+    qInfo() << "Device watcher config:CheckInputDevice->" << m_fNeedDeviceChecker;
 }
 
 void VNoteAudioDeviceWatcher::exitWatcher()
