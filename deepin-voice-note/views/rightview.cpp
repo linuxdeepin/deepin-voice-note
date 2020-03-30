@@ -643,7 +643,9 @@ void RightView::mouseMoveSelect(QMouseEvent *event)
             QLayoutItem *layoutItem = m_viewportLayout->itemAt(1);
             if (layoutItem) {
                 DetailItemWidget *tmpWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
-                tmpWidget->clearSelection();
+                if(tmpWidget && tmpWidget != m_placeholderWidget){
+                    tmpWidget->clearSelection();
+                }
             }
         }
     }
