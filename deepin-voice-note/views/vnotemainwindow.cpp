@@ -850,6 +850,10 @@ void VNoteMainWindow::onPreviewShortcut()
         {DApplication::translate("Shortcuts", "New note"),             "Ctrl+B"},
         {DApplication::translate("Shortcuts", "Rename note"),          "F3"},
         {DApplication::translate("Shortcuts", "Delete note"),          "Delete"},
+        {DApplication::translate("Shortcuts", "Play/Pause"),           "Space"},
+        {DApplication::translate("Shortcuts", "Record voice"),         "Ctrl+R"},
+        {DApplication::translate("Shortcuts", "Voice to Text"),        "Ctrl+W"},
+        {DApplication::translate("Shortcuts", "Save as MP3"),          "Ctrl+P"},
     };
 
     QJsonObject noteJsonGroup;
