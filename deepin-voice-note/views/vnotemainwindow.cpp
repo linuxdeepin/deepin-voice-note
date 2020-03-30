@@ -293,7 +293,9 @@ void VNoteMainWindow::initShortcuts()
     connect(m_stVoice2Text.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         if (canDoShortcutAction()) {
-            this->onA2TStart();
+            if (!isVoice2Text()) {
+                this->onA2TStart();
+            }
         }
     });
 
