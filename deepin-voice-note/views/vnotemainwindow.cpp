@@ -309,7 +309,11 @@ void VNoteMainWindow::initShortcuts()
         //Call method in rightview
         Q_UNUSED(this);
         if (canDoShortcutAction()) {
-            m_rightView->saveMp3();
+            if (nullptr != m_middleView->getCurrVNotedata()) {
+                if (m_middleView->getCurrVNotedata()->haveVoice()) {
+                    m_rightView->saveMp3();
+                }
+            }
         }
     });
 
@@ -322,7 +326,11 @@ void VNoteMainWindow::initShortcuts()
     connect(m_stSaveAsText.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         if (canDoShortcutAction()) {
-            m_middleView->saveAsText();
+            if (nullptr != m_middleView->getCurrVNotedata()) {
+                if (m_middleView->getCurrVNotedata()->haveText()) {
+                    m_middleView->saveAsText();
+                }
+            }
         }
     });
 
