@@ -345,7 +345,10 @@ void VNoteMainWindow::initShortcuts()
     connect(m_stSaveVoices.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         if (canDoShortcutAction()) {
-            m_middleView->saveRecords();
+            //Can't save recording when do recording.
+            if (!isRecording()) {
+                m_middleView->saveRecords();
+            }
         }
     });
 
