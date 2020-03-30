@@ -16,7 +16,16 @@ public:
             ,const QString press
             ,QWidget *parent = nullptr);
 
+    enum {
+        Invalid = -1,
+        Normal,
+        Press,
+//        Disabled, //Not support this state now
+        MaxState
+    };
+
     bool isPressed() const;
+    void setState(int state);
 signals:
 
 public slots:
@@ -24,13 +33,6 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void updateIcon();
     void setCommonIcon(bool isCommon);
-
-    enum {
-        Normal,
-        Press,
-        Disabled,
-        MaxState
-    };
 
     QString m_icons[MaxState];
     int     m_state {Normal};

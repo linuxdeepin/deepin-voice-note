@@ -16,6 +16,15 @@ bool VNote2SIconButton::isPressed() const
     return (Press == m_state);
 }
 
+void VNote2SIconButton::setState(int state)
+{
+    if (m_state> Invalid && state < MaxState) {
+        m_state = state;
+
+        updateIcon();
+    }
+}
+
 void VNote2SIconButton::mouseReleaseEvent(QMouseEvent *event)
 {
     if (rect().contains(event->pos()) && isEnabled()) {
