@@ -118,7 +118,7 @@ void VNoteRecordWidget::startRecord()
     m_recordPath = m_recordDir + fileName;
     m_audioManager->setRecordFileName(m_recordPath);
     m_timeLabel->setText("00:00");
-    m_audioManager->startRecord();
+    onContinueRecord();
 }
 
 void VNoteRecordWidget::cancelRecord()

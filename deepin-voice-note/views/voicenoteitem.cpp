@@ -27,6 +27,7 @@ VoiceNoteItem::VoiceNoteItem(VNoteBlock *noteBlock, QWidget *parent)
     initUi();
     initConnection();
     updateData();
+    onChangeTheme();
 }
 
 void VoiceNoteItem::initUi()
@@ -124,11 +125,6 @@ void VoiceNoteItem::initUi()
 
     m_coverWidget = new DFrame(this);
     m_coverWidget->setAttribute(Qt::WA_TransparentForMouseEvents,true);
-    DPalette pbCover = DApplicationHelper::instance()->palette(m_coverWidget);
-    QColor coverColor = pbCover.color(DPalette::Active, DPalette::Highlight);
-    coverColor.setAlphaF(0.7);
-    pbCover.setBrush(DPalette::Base, coverColor);
-    m_coverWidget->setPalette(pbCover);
     m_coverWidget->setVisible(false);
 }
 
