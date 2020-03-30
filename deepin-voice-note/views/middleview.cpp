@@ -110,6 +110,7 @@ VNoteItem *MiddleView::getCurrVNotedata() const
 void MiddleView::onNoteChanged()
 {
     m_pSortViewFilter->sortView();
+    this->scrollToTop();
 }
 
 qint32 MiddleView::rowCount() const
