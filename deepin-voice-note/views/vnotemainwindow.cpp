@@ -278,7 +278,7 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stRecording.get(), &QShortcut::activated, this, [this] {
         if (canDoShortcutAction()) {
-            if (!isRecording()) {
+            if (!isRecording() && !isSearching()) {
                 m_recordBar->onStartRecord();
             }
         }
