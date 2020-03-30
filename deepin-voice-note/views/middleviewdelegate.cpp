@@ -194,6 +194,7 @@ QWidget *MiddleViewDelegate::createEditor(QWidget *parent, const QStyleOptionVie
     Q_UNUSED(option)
     Q_UNUSED(index)
     QLineEdit *editBox = new QLineEdit(parent);
+    editBox->setMaxLength(MAX_TITLE_LEN);
     editBox->setFixedSize(option.rect.width() - 60, option.rect.height() - 20);
     return editBox;
 }
