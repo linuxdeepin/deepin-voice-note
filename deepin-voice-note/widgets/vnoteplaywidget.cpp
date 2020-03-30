@@ -41,7 +41,7 @@ void VNotePlayWidget::initUI()
     m_closeBtn = new DIconButton(DStyle::SP_CloseButton, this);
     m_closeBtn->setIconSize(QSize(26, 26));
     m_closeBtn->setFlat(true);
-    m_closeBtn->setFocusPolicy(Qt::ClickFocus);
+    DStyle::setFocusRectVisible(m_closeBtn, false);
     QGridLayout *playBtnLayout = new QGridLayout;
     playBtnLayout->addWidget(m_pauseBtn, 0, 0);
     playBtnLayout->addWidget(m_playBtn, 0, 0);
