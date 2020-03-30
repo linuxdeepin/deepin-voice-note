@@ -219,7 +219,9 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stRemNotebook.get(), &QShortcut::activated, this, [this] {
         if (canDoShortcutAction()) {
-            editNotepad();
+            if (!isSearching()) {
+                editNotepad();
+            }
         }
     });
 
