@@ -155,7 +155,7 @@ private:
     RightView   *m_rightView {nullptr};
 
     DPushButton *m_addNotepadBtn {nullptr};
-    VNoteIconButton *m_addNoteBtn {nullptr};
+    DFloatingButton *m_addNoteBtn {nullptr};
 
     VNoteRecordBar *m_recordBar {nullptr};
     //Audio device state watch thread

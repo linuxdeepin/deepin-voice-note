@@ -481,21 +481,14 @@ void VNoteMainWindow::initMiddleView()
     middleHolderLayout->setContentsMargins(0, 5, 0, 5);
 
     m_middleView = new MiddleView(m_middleViewHolder);
-    m_addNoteBtn = new VNoteIconButton(
-        m_middleViewHolder,
-        "add_note_normal.svg",
-        "add_note_hover.svg",
-        "add_note_press.svg"
-    );
-    m_addNoteBtn->SetDisableIcon("add_note_disabled.svg");
-    m_addNoteBtn->setFlat(true);
-    m_addNoteBtn->setIconSize(QSize(68, 68));
+    m_addNoteBtn = new DFloatingButton(DStyle::StandardPixmap::SP_IncreaseElement, m_middleViewHolder);
+    m_addNoteBtn->setFixedSize(QSize(55, 55));
     m_addNoteBtn->raise();
 
     DAnchorsBase buttonAnchor(m_addNoteBtn);
     buttonAnchor.setAnchor(Qt::AnchorLeft, m_middleView, Qt::AnchorLeft);
     buttonAnchor.setAnchor(Qt::AnchorBottom, m_middleView, Qt::AnchorBottom);
-    buttonAnchor.setBottomMargin(0);
+    buttonAnchor.setBottomMargin(5);
     buttonAnchor.setLeftMargin(97);
 
     // ToDo:
@@ -1347,7 +1340,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_leftView->setOnlyCurItemMenuEnable(true);
         m_addNotepadBtn->setEnabled(false);
         m_middleView->setOnlyCurItemMenuEnable(true);
-        m_addNoteBtn->setBtnDisabled(true);
+        m_addNoteBtn->setDisabled(true);
         break;
     case PlayVoiceEnd:
         if (!isVoice2Text()) {
@@ -1355,7 +1348,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_leftView->setOnlyCurItemMenuEnable(false);
             m_addNotepadBtn->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
-            m_addNoteBtn->setBtnDisabled(false);
+            m_addNoteBtn->setDisabled(false);
         }
         operState(StatePlaying, false);
         break;
@@ -1366,7 +1359,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNotepadBtn->setEnabled(false);
         m_middleView->setOnlyCurItemMenuEnable(true);
         m_rightView->setEnablePlayBtn(false);
-        m_addNoteBtn->setBtnDisabled(true);
+        m_addNoteBtn->setDisabled(true);
         break;
     case RecordEnd:
         if (!isVoice2Text()) {
@@ -1374,7 +1367,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_leftView->setOnlyCurItemMenuEnable(false);
             m_addNotepadBtn->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
-            m_addNoteBtn->setBtnDisabled(false);
+            m_addNoteBtn->setDisabled(false);
         }
         m_rightView->setEnablePlayBtn(true);
         operState(StateRecording, false);
@@ -1385,7 +1378,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_leftView->setOnlyCurItemMenuEnable(true);
         m_addNotepadBtn->setEnabled(false);
         m_middleView->setOnlyCurItemMenuEnable(true);
-        m_addNoteBtn->setBtnDisabled(true);
+        m_addNoteBtn->setDisabled(true);
         break;
     case VoiceToTextEnd:
         if (!isRecording() && !isPlaying()) {
@@ -1393,7 +1386,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_leftView->setOnlyCurItemMenuEnable(false);
             m_addNotepadBtn->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
-            m_addNoteBtn->setBtnDisabled(false);
+            m_addNoteBtn->setDisabled(false);
         }
         operState(StateVoice2Text, false);
         break;
