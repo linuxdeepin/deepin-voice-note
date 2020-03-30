@@ -53,7 +53,8 @@ SOURCES += \
     dbus/dbuslogin1manager.cpp \
     views/textnoteitem.cpp \
     common/exportnoteworker.cpp \
-    common/opsstateinterface.cpp
+    common/opsstateinterface.cpp \
+    widgets/vnote2siconbutton.cpp
 
 RESOURCES += \
     images.qrc
@@ -104,7 +105,8 @@ HEADERS += \
     dbus/dbusvariant.h \
     views/textnoteitem.h \
     common/exportnoteworker.h \
-    common/opsstateinterface.h
+    common/opsstateinterface.h \
+    widgets/vnote2siconbutton.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts
