@@ -13,7 +13,7 @@
 DWIDGET_USE_NAMESPACE
 
 class TextNoteEdit;
-class VNoteIconButton;
+class VNote2SIconButton;
 
 //Playing animation interface
 class PlayAnimInferface {
@@ -48,7 +48,6 @@ public:
     void showAsrStartWindow();
     void showAsrEndWindow(const QString &strResult);
     void enblePlayBtn(bool enable);
-    void enblePauseBtn(bool enable);
     bool asrTextNotEmpty();
     bool isAsrTextPos(const QPoint &globalPos);
     bool isAsring();
@@ -83,7 +82,6 @@ signals:
 
 public slots:
     void onPlayBtnClicked();
-    void onPauseBtnClicked();
     void onAsrTextChange();
     void onChangeTheme();
 
@@ -98,8 +96,7 @@ private:
     DFrame          *m_bgWidget {nullptr};
     TextNoteEdit    *m_asrText {nullptr};
     VNoteBlock      *m_noteBlock {nullptr};
-    VNoteIconButton *m_pauseBtn {nullptr};
-    VNoteIconButton *m_playBtn {nullptr};
+    VNote2SIconButton *m_playBtn {nullptr};
     DFrame          *m_coverWidget{nullptr};
 };
 

@@ -5,7 +5,7 @@
 #include "common/utils.h"
 #include "common/actionmanager.h"
 
-#include "widgets/vnoteiconbutton.h"
+#include "widgets/vnote2siconbutton.h"
 
 #include <QDebug>
 #include <QGridLayout>
@@ -57,20 +57,9 @@ void VoiceNoteItem::initUi()
     m_voiceSizeLab = new DLabel(m_bgWidget);
     DFontSizeManager::instance()->bind(m_voiceSizeLab, DFontSizeManager::T8);
 
-    m_pauseBtn = new VNoteIconButton(m_bgWidget
-                                     , "pause_normal.svg"
-                                     , "pause_hover.svg"
-                                     , "pause_press.svg");
-    m_pauseBtn->setIconSize(QSize(60, 60));
-    m_pauseBtn->setFlat(true);
-    m_playBtn = new VNoteIconButton(m_bgWidget
-                                    , "play_normal.svg"
-                                    , "play_hover.svg"
-                                    , "play_press.svg");
-
-    m_playBtn->setIconSize(QSize(60, 60));
-    m_playBtn->setFlat(true);
-    m_playBtn->SetDisableIcon("play_disabled.svg");
+    m_playBtn = new VNote2SIconButton("play.svg", "pause.svg", m_bgWidget);
+    m_playBtn->setIconSize(QSize(40, 40));
+    m_playBtn->setFixedSize(QSize(48, 48));
 
     m_voiceNameLab = new DLabel(m_bgWidget);
     DFontSizeManager::instance()->bind(m_voiceNameLab, DFontSizeManager::T6);
@@ -87,10 +76,9 @@ void VoiceNoteItem::initUi()
     buttonAnchor.setRightMargin(25);
 
 
-    QGridLayout *playBtnLayout = new QGridLayout;
-    playBtnLayout->addWidget(m_pauseBtn, 0, 0);
-    playBtnLayout->addWidget(m_playBtn, 0, 0);
-    playBtnLayout->setSizeConstraint(QLayout::SetNoConstraint);
+    QVBoxLayout *playBtnLayout = new QVBoxLayout;
+    playBtnLayout->addWidget(m_playBtn);
+    playBtnLayout->setContentsMargins(10,5,5,5);
 
     QVBoxLayout *nameLayout = new QVBoxLayout;
     nameLayout->addWidget(m_voiceNameLab, Qt::AlignLeft);
@@ -145,8 +133,7 @@ void VoiceNoteItem::updateData()
 
 void VoiceNoteItem::initConnection()
 {
-    connect(m_pauseBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onPauseBtnClicked);
-    connect(m_playBtn, &VNoteIconButton::clicked, this, &VoiceNoteItem::onPlayBtnClicked);
+    connect(m_playBtn, &VNote2SIconButton::clicked, this, &VoiceNoteItem::onPlayBtnClicked);
     connect(m_asrText, &TextNoteEdit::textChanged, this, &VoiceNoteItem::onAsrTextChange);
     QTextDocument *document = m_asrText->document();
     QAbstractTextDocumentLayout *documentLayout = document->documentLayout();
@@ -158,12 +145,12 @@ void VoiceNoteItem::initConnection()
 
 void VoiceNoteItem::onPlayBtnClicked()
 {
-    emit sigPlayBtnClicked(this);
-}
-
-void VoiceNoteItem::onPauseBtnClicked()
-{
-    emit sigPauseBtnClicked(this);
+    bool isPress = m_playBtn->isPressed();
+    if(isPress){
+        emit sigPlayBtnClicked(this);
+    }else {
+        emit sigPauseBtnClicked(this);
+    }
 }
 
 VNoteBlock *VoiceNoteItem::getNoteBlock()
@@ -173,24 +160,18 @@ VNoteBlock *VoiceNoteItem::getNoteBlock()
 
 void VoiceNoteItem::showPlayBtn()
 {
-    if(m_pauseBtn->isVisible()){
+    if(m_playBtn->isPressed()){
         stopAnim();
+        m_playBtn->setState(VNote2SIconButton::Normal);
     }
-
-    m_pauseBtn->setVisible(false);
-    m_playBtn->setVisible(true);
-    m_hornLab->setVisible(false);
 }
 
 void VoiceNoteItem::showPauseBtn()
 {
-    if(!m_pauseBtn->isVisible()){
+    if(!m_playBtn->isPressed()){
          startAnim();
+         m_playBtn->setState(VNote2SIconButton::Press);
     }
-
-    m_pauseBtn->setVisible(true);
-    m_playBtn->setVisible(false);
-    m_hornLab->setVisible(true);
 }
 
 void VoiceNoteItem::showAsrStartWindow()
@@ -219,12 +200,7 @@ void VoiceNoteItem::showAsrEndWindow(const QString &strResult)
 
 void VoiceNoteItem::enblePlayBtn(bool enable)
 {
-    m_playBtn->setBtnDisabled(!enable);
-}
-
-void VoiceNoteItem::enblePauseBtn(bool enable)
-{
-    m_pauseBtn->setEnabled(enable);
+    m_playBtn->setEnabled(enable);
 }
 
 void VoiceNoteItem::onAsrTextChange()
