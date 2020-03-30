@@ -362,7 +362,7 @@ void VNoteMainWindow::initShortcuts()
                                     ActionManager::NotebookDelete);
                     }
                 } else if (m_middleView->hasFocus()) {
-                    if(!isRecording() && !isVoice2Text() && !isPlaying()){
+                    if(!isRecording() && !isVoice2Text() && !isPlaying() && m_middleView->count() > 0){
                         deleteAct = ActionManager::Instance()->getActionById(
                                     ActionManager::NoteDelete);
                     }
