@@ -114,20 +114,28 @@ TRANSLATIONS += \
 # Default rules for deployment.
 isEmpty(BINDIR):BINDIR=/usr/bin
 isEmpty(APPDIR):APPDIR=/usr/share/applications
-isEmpty(DSRDIR):DSRDIR=/usr/share/deepin-voice-note
+isEmpty(DSRDIR):DSRDIR=/usr/share/$$TARGET/
+isEmpty(APPCONFIGDIR):APPCONFIGDIR=/usr/share/$$TARGET/
 
 target.path = $$INSTROOT$$BINDIR
 
 desktop.path = $$INSTROOT$$APPDIR
-desktop.files =  deepin-voice-notes.desktop
+desktop.files = deepin-voice-notes.desktop
+
+#TODO:
+#    Integrate the config file to the app package.
+#Now only have audio device check configuration.The
+#audio check config may be override by /etc/<app>/xx.conf
+app_config.path = $$INSTROOT$$APPCONFIGDIR
+app_config.files = deepin-voice-note.conf
 
 # Automating generation .qm files from .ts files
 !system($$PWD/translate_generation.sh): error("Failed to generate translation")
 
-translations.path = /usr/share/deepin-voice-note/translations
+translations.path = $$DSRDIR/translations
 translations.files = $$PWD/translations/*.qm
 
 #icon_files.path = /usr/share/icons/hicolor/scalable/apps
 #icon_files.files = $$PWD/image/deepin-voice-note.svg
 
-INSTALLS += target desktop translations icon_files
+INSTALLS += target desktop translations icon_files app_config
