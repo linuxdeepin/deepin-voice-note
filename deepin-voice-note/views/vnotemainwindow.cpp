@@ -208,6 +208,8 @@ void VNoteMainWindow::initShortcuts()
                     m_centerWidget->setCurrentIndex(WndNoteShow);
                 }
             }
+
+            UPT(lastPress, curret);
         }
     });
 
@@ -244,6 +246,8 @@ void VNoteMainWindow::initShortcuts()
                     ) {
                 addNote();
             }
+
+            UPT(lastPress, curret);
         }
     });
 
@@ -861,6 +865,8 @@ void VNoteMainWindow::onPreviewShortcut()
         {DApplication::translate("Shortcuts", "Record voice"),         "Ctrl+R"},
         {DApplication::translate("Shortcuts", "Voice to Text"),        "Ctrl+W"},
         {DApplication::translate("Shortcuts", "Save as MP3"),          "Ctrl+P"},
+        {DApplication::translate("Shortcuts", "Save as TXT"),          "Ctrl+S"},
+        {DApplication::translate("Shortcuts", "Save recordings"),      "Ctrl+Y"},
     };
 
     QJsonObject noteJsonGroup;
