@@ -338,7 +338,16 @@ void RightView::saveNote()
 void RightView::initAction(DetailItemWidget *widget)
 {
     ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteDetailCtxMenu, false);
-    ActionManager::Instance()->enableAction(ActionManager::DetailSelectAll, true);
+
+    if(m_viewportLayout->count() == 2){
+        QLayoutItem *layoutItem = m_viewportLayout->itemAt(0);
+        DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
+        if(widget && !widget->textIsEmpty()){
+            ActionManager::Instance()->enableAction(ActionManager::DetailSelectAll, true);
+        }
+    }else {
+         ActionManager::Instance()->enableAction(ActionManager::DetailSelectAll, true);
+    }
 
     int voiceCount, textCount, tolCount;
     getSelectionCount(voiceCount, textCount);
