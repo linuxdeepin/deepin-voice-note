@@ -234,6 +234,9 @@ void RightView::initData(VNoteItem *data, QRegExp reg, bool fouse)
     }
     m_isFristTextChange = false;
     m_noteItemData = data;
+    m_curAsrItem = nullptr;
+    m_curPlayItem = nullptr;
+
     if (m_noteItemData == nullptr) {
         m_curItemWidget = nullptr;
         return;
