@@ -1354,6 +1354,9 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         onVNoteFolderChange(m_leftView->setDefaultNotepadItem(), QModelIndex());
         break;
     case PlayVoiceStart:
+        if(isSearching()){
+            m_recordBar->setVisible(true);
+        }
         operState(StatePlaying, true);
         m_noteSearchEdit->setEnabled(false);
         m_leftView->setOnlyCurItemMenuEnable(true);
@@ -1362,6 +1365,9 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNoteBtn->setDisabled(true);
         break;
     case PlayVoiceEnd:
+        if(isSearching()){
+            m_recordBar->setVisible(false);
+        }
         if (!isVoice2Text()) {
             m_noteSearchEdit->setEnabled(true);
             m_leftView->setOnlyCurItemMenuEnable(false);
