@@ -19,6 +19,7 @@ void VNotePlayWidget::initUI()
     m_playerBtn = new VNote2SIconButton("play.svg", "pause.svg", this);
     m_playerBtn->setIconSize(QSize(40, 40));
     m_playerBtn->setFixedSize(QSize(48, 48));
+    m_playerBtn->setFocusPolicy(Qt::NoFocus);
 
     m_timeLab = new DLabel(this);
     m_timeLab->setText("00:00/00:00");

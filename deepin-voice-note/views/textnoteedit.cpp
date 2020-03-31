@@ -16,7 +16,7 @@ TextNoteEdit::TextNoteEdit(QWidget *parent)
     setMouseTracking(true);
 
     //Edit get focus only by click
-    setFocusPolicy(Qt::ClickFocus);
+    //setFocusPolicy(Qt::ClickFocus);
 
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged,
                this, &TextNoteEdit::onChangeTheme);

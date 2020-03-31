@@ -60,6 +60,7 @@ void VoiceNoteItem::initUi()
     m_playBtn = new VNote2SIconButton("play.svg", "pause.svg", m_bgWidget);
     m_playBtn->setIconSize(QSize(40, 40));
     m_playBtn->setFixedSize(QSize(48, 48));
+    m_playBtn->setFocusPolicy(Qt::NoFocus);
 
     m_voiceNameLab = new DLabel(m_bgWidget);
     DFontSizeManager::instance()->bind(m_voiceNameLab, DFontSizeManager::T6);
