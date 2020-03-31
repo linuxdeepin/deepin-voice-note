@@ -160,18 +160,14 @@ VNoteBlock *VoiceNoteItem::getNoteBlock()
 
 void VoiceNoteItem::showPlayBtn()
 {
-    if(m_playBtn->isPressed()){
-        stopAnim();
-        m_playBtn->setState(VNote2SIconButton::Normal);
-    }
+    stopAnim();
+    m_playBtn->setState(VNote2SIconButton::Normal);
 }
 
 void VoiceNoteItem::showPauseBtn()
 {
-    if(!m_playBtn->isPressed()){
-         startAnim();
-         m_playBtn->setState(VNote2SIconButton::Press);
-    }
+    startAnim();
+    m_playBtn->setState(VNote2SIconButton::Press);
 }
 
 void VoiceNoteItem::showAsrStartWindow()

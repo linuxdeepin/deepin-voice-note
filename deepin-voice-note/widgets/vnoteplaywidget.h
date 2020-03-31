@@ -13,6 +13,8 @@ DWIDGET_USE_NAMESPACE
 
 struct VNVoiceBlock;
 class VNoteIconButton;
+class VNote2SIconButton;
+
 class QPainter;
 class QWidget;
 class VNotePlayWidget : public DFloatingWidget
@@ -35,6 +37,7 @@ public slots:
     void onSliderValueChange(int value);
     void onPlayBtnClicked();
     void onPauseBtnClicked();
+    void onPlayerBtnClicked();
     void onCloseBtnClicked();
     void onDurationChanged(qint64 duration);
 
@@ -48,11 +51,10 @@ private:
     DLabel          *m_nameLab  {nullptr};
     DSlider         *m_slider   {nullptr};
     DWidget         *m_sliderHover {nullptr};
-    VNoteIconButton *m_pauseBtn {nullptr};
-    VNoteIconButton *m_playBtn {nullptr};
     DIconButton     *m_closeBtn {nullptr};
     VNVoiceBlock    *m_voiceBlock {nullptr};
     QMediaPlayer    *m_player {nullptr};
+    VNote2SIconButton *m_playerBtn {nullptr};
 };
 
 #endif // VNOTEPLAYWIDGET_H

@@ -1,5 +1,6 @@
 #include "vnoteplaywidget.h"
-#include "vnoteiconbutton.h"
+#include "vnote2siconbutton.h"
+
 #include "common/vnoteitem.h"
 #include "common/utils.h"
 
@@ -15,19 +16,9 @@ VNotePlayWidget::VNotePlayWidget(QWidget *parent)
 
 void VNotePlayWidget::initUI()
 {
-    m_pauseBtn = new VNoteIconButton(this
-                                     , "pause_normal.svg"
-                                     , "pause_hover.svg"
-                                     , "pause_press.svg");
-    m_pauseBtn->setIconSize(QSize(60, 60));
-    m_pauseBtn->setFlat(true);
-    m_playBtn = new VNoteIconButton(this
-                                    , "play_normal.svg"
-                                    , "play_hover.svg"
-                                    , "play_press.svg");
-    m_playBtn->setIconSize(QSize(60, 60));
-    m_playBtn->setFlat(true);
-    m_playBtn->SetDisableIcon("play_disabled.svg");
+    m_playerBtn = new VNote2SIconButton("play.svg", "pause.svg", this);
+    m_playerBtn->setIconSize(QSize(40, 40));
+    m_playerBtn->setFixedSize(QSize(48, 48));
 
     m_timeLab = new DLabel(this);
     m_timeLab->setText("00:00/00:00");
@@ -42,10 +33,6 @@ void VNotePlayWidget::initUI()
     m_closeBtn->setIconSize(QSize(26, 26));
     m_closeBtn->setFlat(true);
     DStyle::setFocusRectVisible(m_closeBtn, false);
-    QGridLayout *playBtnLayout = new QGridLayout;
-    playBtnLayout->addWidget(m_pauseBtn, 0, 0);
-    playBtnLayout->addWidget(m_playBtn, 0, 0);
-    m_playBtn->setContentsMargins(0, 0, 0, 0);
 
     QVBoxLayout *sliderLayout = new QVBoxLayout;
     sliderLayout->addWidget(m_nameLab, Qt::AlignLeft);
@@ -53,11 +40,11 @@ void VNotePlayWidget::initUI()
     m_sliderHover->setLayout(sliderLayout);
     sliderLayout->setContentsMargins(0, 5, 0, 5);
     QHBoxLayout *mainLayout = new QHBoxLayout;
-    mainLayout->addLayout(playBtnLayout);
+    mainLayout->addWidget(m_playerBtn);
     mainLayout->addWidget(m_sliderHover);
     mainLayout->addWidget(m_timeLab, 0, Qt::AlignLeft);
     mainLayout->addWidget(m_closeBtn);
-    mainLayout->setContentsMargins(5, 0, 10, 0);
+    mainLayout->setContentsMargins(15, 0, 10, 0);
     mainLayout->setSizeConstraint(QLayout::SetNoConstraint);
     this->setLayout(mainLayout);
     m_sliderHover->installEventFilter(this);
@@ -76,10 +63,9 @@ void VNotePlayWidget::initConnection()
     connect(m_player,&QMediaPlayer::durationChanged,
             this,&VNotePlayWidget::onDurationChanged);
 
-    connect(m_playBtn, &VNoteIconButton::clicked,
-            this, &VNotePlayWidget::onPlayBtnClicked);
-    connect(m_pauseBtn, &VNoteIconButton::clicked,
-            this, &VNotePlayWidget::onPauseBtnClicked);
+    connect(m_playerBtn, &VNote2SIconButton::clicked,
+             this, &VNotePlayWidget::onPlayerBtnClicked);
+
     connect(m_closeBtn, &DIconButton::clicked,
             this, &VNotePlayWidget::onCloseBtnClicked);
     connect(m_slider, &DSlider::valueChanged,
@@ -132,18 +118,14 @@ void VNotePlayWidget::pauseVideo()
 
 void VNotePlayWidget::onPlayBtnClicked()
 {
-    m_playBtn->setVisible(false);
-    m_pauseBtn->setVisible(true);
-    playVideo();
-    emit sigPlayVoice(m_voiceBlock);
+    m_playerBtn->setState(VNote2SIconButton::Press);
+    onPlayerBtnClicked();
 }
 
 void VNotePlayWidget::onPauseBtnClicked()
 {
-    m_playBtn->setVisible(true);
-    m_pauseBtn->setVisible(false);
-    pauseVideo();
-    emit sigPauseVoice(m_voiceBlock);
+    m_playerBtn->setState(VNote2SIconButton::Normal);
+    onPlayerBtnClicked();
 }
 
 void VNotePlayWidget::onCloseBtnClicked()
@@ -183,5 +165,17 @@ void VNotePlayWidget::onDurationChanged(qint64 duration)
 {
     if(m_slider->maximum() != duration){
         m_slider->setMaximum(static_cast<int>(duration));
+    }
+}
+
+void VNotePlayWidget::onPlayerBtnClicked()
+{
+    bool isPress = m_playerBtn->isPressed();
+    if(isPress){
+        playVideo();
+        emit sigPlayVoice(m_voiceBlock);
+    }else {
+        pauseVideo();
+        emit sigPauseVoice(m_voiceBlock);
     }
 }
