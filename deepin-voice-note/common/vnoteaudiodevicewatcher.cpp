@@ -8,8 +8,8 @@
 VNoteAudioDeviceWatcher::VNoteAudioDeviceWatcher(QObject *parent)
     : QThread(parent)
 {
-//    initDeviceWatcher();
-//    initConnections();
+    initDeviceWatcher();
+    initConnections();
     initWatcherCofing();
 }
 
@@ -34,8 +34,6 @@ void VNoteAudioDeviceWatcher::initDeviceWatcher()
                     QDBusConnection::sessionBus(),
                     this )
                 );
-
-    initAudioMeter();
 }
 
 void VNoteAudioDeviceWatcher::initWatcherCofing()
@@ -89,8 +87,9 @@ void VNoteAudioDeviceWatcher::OnDefaultSourceChanaged(const QDBusObjectPath &val
 {
     //TODO:
     //    When default source changed, need recreate
-    // the source Object and the audio meter
-    qInfo() << "source change:" << value.path();
+    // the source Object
+    qInfo() << "Source change-->from:" << m_defaultSource->path()
+            << " name:" << m_defaultSource->name();
 
     m_defaultSource.reset(
                 new com::deepin::daemon::audio::Source (
@@ -100,7 +99,8 @@ void VNoteAudioDeviceWatcher::OnDefaultSourceChanaged(const QDBusObjectPath &val
                     this )
                 );
 
-    initAudioMeter();
+    qInfo() << "Source change:-->" << value.path()
+            << " name:" << m_defaultSource->name();;
 }
 
 void VNoteAudioDeviceWatcher::run()
@@ -109,141 +109,59 @@ void VNoteAudioDeviceWatcher::run()
     static const double volumeLowMark = 0.2; //20% volume
 
     MicrophoneState currentState = MicrophoneState::NotAvailable;
-    double volume = 0;
-    //log volume one time per 5 minutes
-    const int logTime = 60*5;
-    int checkTimes = 0;
 
-    //TODO:
-    //    The server may be not stable now,so
-    //need connect it every time,this need to
-    //be optimized in future.
+    //log microphone state one time per 1 minutes
+    const int LOG_FREQ = 1*60*1000;
+
+    static struct timeval curret = {0,0};
+    static struct timeval lastPrint = {0,0};
+
     do {
         //Quit watch thread
         if (m_quitWatcher) {
             break;
         }
 
-        volume = 0;
+        gettimeofday(&curret, nullptr);
 
-        com::deepin::daemon::Audio audioInterface(
-                    m_serviceName,
-                    "/com/deepin/daemon/Audio",
-                    QDBusConnection::sessionBus() );
+        double currentMicrophoneVolume = 0;
 
-        com::deepin::daemon::audio::Source defaultSource(
-                    m_serviceName,
-                    audioInterface.defaultSource().path(),
-                    QDBusConnection::sessionBus() );
+        AudioPort activePort = m_defaultSource->activePort();
 
-        QDBusPendingReply<QDBusObjectPath> reply = defaultSource.GetMeter();
+        if (activePort.availability == PortState::Available || (!m_fNeedDeviceChecker)) {
+            currentMicrophoneVolume = m_defaultSource->volume();
 
-    //    qInfo() << "GetMeter have error:" << reply.isError()
-    //            << "error:" << reply.error();
-
-        if (!reply.isError()) {
-            QDBusObjectPath meterPath = reply.value();
-
-            com::deepin::daemon::audio::Meter defaultSourceMeter(
-                        m_serviceName,
-                        meterPath.path(),
-                        QDBusConnection::sessionBus() );
-
-            if (m_fNeedDeviceChecker) {
-                volume = defaultSourceMeter.volume();
+            if ((currentMicrophoneVolume-volumeLowMark) > DBL_EPSILON) {
+                currentState = MicrophoneState::Normal;
             } else {
-                volume = 0.1;
+                currentState = MicrophoneState::VolumeTooLow;
             }
-
-            if (volume > DBL_EPSILON) {
-
-                double currentMicrophoneVolume = defaultSource.volume();
-
-                if ((currentMicrophoneVolume-volumeLowMark) > DBL_EPSILON) {
-                    currentState = MicrophoneState::Normal;
-                } else {
-                    currentState = MicrophoneState::VolumeTooLow;
-                }
-            } else {
-                currentState = MicrophoneState::NotAvailable;
-            }
-
-            if (m_microphoneState != currentState) {
-                m_microphoneState = currentState;
-                emit microphoneAvailableState(m_microphoneState);
-
-                qInfo() << "Microphone aviable state change:" << m_microphoneState;
-            }
+        } else {
+            currentState = MicrophoneState::NotAvailable;
         }
 
-        checkTimes++;
+        if (m_microphoneState != currentState) {
+            m_microphoneState = currentState;
+            emit microphoneAvailableState(m_microphoneState);
 
-        if (0 == (checkTimes%logTime)) {
-            qInfo() << "Volume:" << volume << "MicrophoneState:" << currentState;
+            qInfo() << "Microphone aviable state change:" << m_microphoneState;
+        }
+
+        if (TM(lastPrint, curret) > LOG_FREQ) {
+            qInfo() << "Volume:" << currentMicrophoneVolume
+                    << "MicrophoneState:" << currentState
+                    << "activePort {"
+                    << activePort.name << ", "
+                    << activePort.description << ", "
+                    << activePort.availability << " }";
+
+            //Update the log time
+            lastPrint = curret;
         }
 
         //polling audio state per seconds
         msleep(AUDIO_DEV_CHECK_TIME);
     } while (1);
-
-    //    do {
-    //        initDeviceWatcher();
-    //        //Quit watch thread
-    //        if (m_quitWatcher) {
-    //            break;
-    //        }
-
-    //        volume = 0;
-
-    //        //Check audio meter
-    //        if (!m_defaultSourceMeter.isNull()) {
-    //            QVariant vol = m_defaultSourceMeter->property("Volume");
-
-    //            volume = vol.toDouble();
-
-    //            if (volume > DBL_EPSILON) {
-    //                currentState = true;
-    //            } else {
-    //                currentState = false;
-    //            }
-
-    //            if (m_microphoneAviable != currentState) {
-    //                m_microphoneAviable = currentState;
-    //                emit microphoneAvailableState(m_microphoneAviable);
-
-    //                qInfo() << "Microphone aviable state change:" << m_microphoneAviable;
-    //            }
-    //        } else {
-    //            initAudioMeter();
-    //        }
-
-    //#ifdef QT_QML_DEBUG
-    //        qInfo() << "Volume:" << volume;
-    //#endif
-    //        //polling audio state per seconds
-    //        msleep(AUDIO_DEV_CHECK_TIME);
-    //    } while (1);
-}
-
-void VNoteAudioDeviceWatcher::initAudioMeter()
-{
-    QDBusPendingReply<QDBusObjectPath> reply = m_defaultSource->GetMeter();
-
-    if (!reply.isError()) {
-        QDBusObjectPath meterPath = reply.value();
-
-        qInfo() << "GetMeter have error:" << reply.isError()
-                << "error:" << reply.error()
-                << "Meter:" << meterPath.path();
-
-        m_defaultSourceMeter.reset(
-                    new com::deepin::daemon::audio::Meter (
-                        m_serviceName,
-                        meterPath.path(),
-                        QDBusConnection::sessionBus(),
-                        this )
-                    );
-    }
 }
 
 void VNoteAudioDeviceWatcher::initConnections()

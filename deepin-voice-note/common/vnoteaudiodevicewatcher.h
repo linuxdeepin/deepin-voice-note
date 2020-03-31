@@ -3,7 +3,6 @@
 
 #include <com_deepin_daemon_audio.h>
 #include <com_deepin_daemon_audio_source.h>
-#include <com_deepin_daemon_audio_meter.h>
 
 #include <QThread>
 
@@ -38,13 +37,18 @@ private:
 
     QScopedPointer<com::deepin::daemon::Audio> m_audioInterface;
     QScopedPointer<com::deepin::daemon::audio::Source> m_defaultSource;
-    QScopedPointer<com::deepin::daemon::audio::Meter> m_defaultSourceMeter;
+
+    //Reference the state to AudioPort
+    enum PortState {
+        Unkown = 0,
+        UnAvailable,
+        Available,
+    };
 
     MicrophoneState m_microphoneState {NotAvailable};
     volatile bool m_quitWatcher {false};
 
-    //Don't check device by default now
-    bool m_fNeedDeviceChecker {false};
+    bool m_fNeedDeviceChecker {true};
 };
 
 #endif // VNOTEAUDIODEVICEWATCHER_H
