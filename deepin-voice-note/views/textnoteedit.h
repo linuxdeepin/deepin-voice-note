@@ -18,6 +18,10 @@ public:
      void removeSelectText();
      QString getSelectText();
      bool hasSelection();
+
+public slots:
+     void onChangeTheme();
+
 signals:
     void sigFocusIn();
     void sigFocusOut();
