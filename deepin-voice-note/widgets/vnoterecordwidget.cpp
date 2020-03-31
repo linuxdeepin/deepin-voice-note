@@ -74,7 +74,6 @@ void VNoteRecordWidget::initConnection()
     connect(m_finshBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onFinshRecord);
     connect(m_audioManager, SIGNAL(recAudioBufferProbed(const QAudioBuffer &)),
             this, SLOT(onAudioBufferProbed(const QAudioBuffer &)));
-    connect(m_audioManager, &VNoteAudioManager::recExceedLimit, this, &VNoteRecordWidget::onFinshRecord);
     connect(m_audioManager,  &VNoteAudioManager::recDurationChange,
             this, &VNoteRecordWidget::onRecordDurationChange);
 }
@@ -136,4 +135,8 @@ void VNoteRecordWidget::onRecordDurationChange(qint64 duration)
     m_recordMsec = duration;
     QString strTime = Utils::formatMillisecond(duration, 0);
     m_timeLabel->setText(strTime);
+
+    if(duration >= VNoteAudioManager::MAX_REC_TIME_INMSEC){
+        onFinshRecord();
+    }
 }
