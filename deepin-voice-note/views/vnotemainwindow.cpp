@@ -1016,9 +1016,6 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 
     m_rightView->initData(data, m_searchKey, m_rightViewHasFouse);
     m_rightViewHasFouse = false;
-    if (!m_searchKey.isEmpty() && m_noteSearchEdit->isEnabled()) {
-        m_noteSearchEdit->lineEdit()->setFocus();
-    }
 }
 void VNoteMainWindow::onMenuAction(QAction *action)
 {
