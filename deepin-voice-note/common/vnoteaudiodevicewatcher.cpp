@@ -34,6 +34,9 @@ void VNoteAudioDeviceWatcher::initDeviceWatcher()
                     QDBusConnection::sessionBus(),
                     this )
                 );
+
+    //Initialze the cards
+    onCardsChanged(m_audioInterface->cards());
 }
 
 void VNoteAudioDeviceWatcher::initWatcherCofing()
@@ -83,7 +86,7 @@ void VNoteAudioDeviceWatcher::exitWatcher()
     m_quitWatcher = true;
 }
 
-void VNoteAudioDeviceWatcher::OnDefaultSourceChanaged(const QDBusObjectPath &value)
+void VNoteAudioDeviceWatcher::onDefaultSourceChanaged(const QDBusObjectPath &value)
 {
     //TODO:
     //    When default source changed, need recreate
@@ -99,8 +102,16 @@ void VNoteAudioDeviceWatcher::OnDefaultSourceChanaged(const QDBusObjectPath &val
                     this )
                 );
 
-    qInfo() << "Source change:-->" << value.path()
-            << " name:" << m_defaultSource->name();;
+    qInfo() << "Source change:-->to:" << value.path()
+            << " name:" << m_defaultSource->name();
+
+}
+
+void VNoteAudioDeviceWatcher::onCardsChanged(const QString &value)
+{
+    qInfo() << "Cards changed:" << value;
+
+    initAvailInputPorts(value);
 }
 
 void VNoteAudioDeviceWatcher::run()
@@ -116,6 +127,9 @@ void VNoteAudioDeviceWatcher::run()
     static struct timeval curret = {0,0};
     static struct timeval lastPrint = {0,0};
 
+    //
+    bool fHighPriorityLog = false;
+
     do {
         //Quit watch thread
         if (m_quitWatcher) {
@@ -128,7 +142,7 @@ void VNoteAudioDeviceWatcher::run()
 
         AudioPort activePort = m_defaultSource->activePort();
 
-        if (activePort.availability == PortState::Available || (!m_fNeedDeviceChecker)) {
+        if (isMicrophoneAvail(activePort.name) || (!m_fNeedDeviceChecker)) {
             currentMicrophoneVolume = m_defaultSource->volume();
 
             if ((currentMicrophoneVolume-volumeLowMark) > DBL_EPSILON) {
@@ -145,18 +159,27 @@ void VNoteAudioDeviceWatcher::run()
             emit microphoneAvailableState(m_microphoneState);
 
             qInfo() << "Microphone aviable state change:" << m_microphoneState;
+
+            //We need log the state change log.
+            fHighPriorityLog = true;
         }
 
-        if (TM(lastPrint, curret) > LOG_FREQ) {
+        if (TM(lastPrint, curret) > LOG_FREQ || fHighPriorityLog) {
             qInfo() << "Volume:" << currentMicrophoneVolume
-                    << "MicrophoneState:" << currentState
-                    << "activePort {"
+                    << ", MicrophoneState:" << currentState
+                    << ", FHighPriorityLog:" << fHighPriorityLog
+                    << ", ActivePort {"
                     << activePort.name << ", "
                     << activePort.description << ", "
                     << activePort.availability << " }";
 
             //Update the log time
-            lastPrint = curret;
+            UPT(lastPrint, curret);
+
+            //Clear important log flag
+            if (fHighPriorityLog) {
+                fHighPriorityLog = false;
+            }
         }
 
         //polling audio state per seconds
@@ -168,5 +191,88 @@ void VNoteAudioDeviceWatcher::initConnections()
 {
     //Default source change event
     connect(m_audioInterface.get(), &com::deepin::daemon::Audio::DefaultSourceChanged,
-            this, &VNoteAudioDeviceWatcher::OnDefaultSourceChanaged);
+            this, &VNoteAudioDeviceWatcher::onDefaultSourceChanaged);
+
+    connect(m_audioInterface.get(), &com::deepin::daemon::Audio::CardsChanged
+            ,this, &VNoteAudioDeviceWatcher::onCardsChanged);
+}
+
+void VNoteAudioDeviceWatcher::initAvailInputPorts(const QString &cards)
+{
+    m_availableInputPorts.clear();
+
+    QJsonDocument doc = QJsonDocument::fromJson(cards.toUtf8());
+    QJsonArray jCards = doc.array();
+
+    for (QJsonValue cardVar : jCards) {
+        QJsonObject jCard = cardVar.toObject();
+        const QString cardName = jCard["Name"].toString();
+        const int     cardId   = jCard["Id"].toInt();
+
+        QJsonArray jPorts = jCard["Ports"].toArray();
+
+        for (QJsonValue portVar : jPorts) {
+            Port port;
+
+            QJsonObject jPort = portVar.toObject();
+            port.available = jPort["Available"].toInt();
+
+            // 0 Unknow 1 Not available 2 Available
+            if (port.available == PortState::Available || port.available == PortState::Unkown) {
+                port.portId   = jPort["Name"].toString();
+                port.portName = jPort["Description"].toString();
+                port.cardId   = cardId;
+                port.cardName = cardName;
+
+                if (port.isInputPort()) {
+                    m_availableInputPorts.insert(port.portId, port);
+
+                    qDebug() << " " << port;
+                }
+            }
+        }
+    }
+}
+
+bool VNoteAudioDeviceWatcher::isMicrophoneAvail(const QString &activePort) const
+{
+    bool fAvailable = false;
+
+    QMap<PortID, Port>::const_iterator iter = m_availableInputPorts.find(activePort);
+
+    if (iter != m_availableInputPorts.end()) {
+        if (!iter->isLoopback()) {
+            fAvailable = true;
+        }
+    }
+
+    return fAvailable;
+}
+
+bool VNoteAudioDeviceWatcher::Port::isInputPort() const
+{
+    const QString inputPortFingerprint("input");
+
+    return portId.contains(inputPortFingerprint, Qt::CaseInsensitive);
+}
+
+bool VNoteAudioDeviceWatcher::Port::isLoopback() const
+{
+    const QString loopbackFingerprint("Loopback");
+
+    return cardName.contains(loopbackFingerprint,  Qt::CaseInsensitive);
+}
+
+QDebug & operator <<(QDebug &out, const VNoteAudioDeviceWatcher::Port &port)
+{
+    out << "\n Port { "
+        << "portId=" << port.portId << ","
+        << "portName=" << port.portName << ","
+        << "available=" << port.available << ","
+        << "isActive=" << port.isActive << ","
+        << "cardName=" << port.cardName << ","
+        << "cardId=" << port.cardId << ","
+        << " }\n";
+
+    return out;
 }

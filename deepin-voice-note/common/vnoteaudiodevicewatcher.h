@@ -25,12 +25,15 @@ public:
 signals:
     void microphoneAvailableState(int isAvailable);
 public slots:
-    void OnDefaultSourceChanaged(const QDBusObjectPath & value);
+    void onDefaultSourceChanaged(const QDBusObjectPath & value);
+    void onCardsChanged(const QString & value);
 protected:
     virtual void run() override;
 
     void initAudioMeter();
     void initConnections();
+    void initAvailInputPorts(const QString& cards);
+    bool isMicrophoneAvail(const QString& activePort) const;
 
 private:
     const QString m_serviceName {"com.deepin.daemon.Audio"};
@@ -45,8 +48,27 @@ private:
         Available,
     };
 
+    typedef QString PortID;
+
+    struct Port {
+        PortID  portId;
+        QString portName;
+        QString cardName;
+        int     available {UnAvailable};
+        int     cardId;
+        bool    isActive {false};
+
+        bool isInputPort() const;
+        bool isLoopback() const;
+    };
+
+    friend QDebug& operator << (QDebug& out, const Port &port);
+
     MicrophoneState m_microphoneState {NotAvailable};
     volatile bool m_quitWatcher {false};
+
+    //All available input ports.except loopback port.
+    QMap<PortID, Port> m_availableInputPorts;
 
     bool m_fNeedDeviceChecker {true};
 };
