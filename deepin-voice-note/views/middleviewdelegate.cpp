@@ -1,4 +1,6 @@
 #include "middleviewdelegate.h"
+#include "middleview.h"
+
 #include "common/vnoteitem.h"
 #include "common/vnoteforlder.h"
 #include "common/utils.h"
@@ -227,6 +229,9 @@ void MiddleViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
         if (!newTitle.isEmpty() && (note->noteTitle != newTitle)) {
             VNoteItemOper noteOps(note);
             noteOps.modifyNoteTitle(newTitle);
+
+            MiddleView *view = static_cast<MiddleView *>(m_parentView);
+            view->onNoteChanged();
         }
     }
 }
