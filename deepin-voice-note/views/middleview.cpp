@@ -152,8 +152,7 @@ void MiddleView::saveAsText()
             // save the directory string to config file.
             m_qspSetting->setValue(VNOTE_EXPORT_TEXT_PATH_KEY, dialog.directoryUrl().toLocalFile());
 
-            QString exportDir = dialog.selectedFiles().at(0);
-
+            QString exportDir = dialog.directoryUrl().toLocalFile();
             ExportNoteWorker* exportWorker = new ExportNoteWorker(
                         exportDir,ExportNoteWorker::ExportText, noteData);
             exportWorker->setAutoDelete(true);
@@ -187,7 +186,7 @@ void MiddleView::saveRecords()
             // save the directory string to config file.
             m_qspSetting->setValue(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
 
-            QString exportDir = dialog.selectedFiles().at(0);
+            QString exportDir = dialog.directoryUrl().toLocalFile();
 
             ExportNoteWorker* exportWorker = new ExportNoteWorker(
                         exportDir,ExportNoteWorker::ExportAllVoice, noteData);

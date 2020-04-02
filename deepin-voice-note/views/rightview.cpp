@@ -926,7 +926,7 @@ void RightView::saveMp3()
                 // save the directory string to config file.
                 m_qspSetting->setValue(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
 
-                QString exportDir = dialog.selectedFiles().at(0);
+                QString exportDir = dialog.directoryUrl().toLocalFile();
 
                 ExportNoteWorker* exportWorker = new ExportNoteWorker(
                             exportDir,ExportNoteWorker::ExportOneVoice, m_noteItemData, block);
