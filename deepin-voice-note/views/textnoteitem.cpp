@@ -42,7 +42,9 @@ void TextNoteItem::initConnection()
         m_textEdit->setFixedHeight(static_cast<int>(document->size().height()));
         int height = m_textEdit->cursorRect(m_textEdit->textCursor()).bottom();
         this->setFixedHeight(m_textEdit->height());
-        emit sigCursorHeightChange(this, height);
+        if(this->hasFocus()){
+            emit sigCursorHeightChange(this, height);
+        }
     });
     connect(m_textEdit, SIGNAL(textChanged()), this, SIGNAL(sigTextChanged()));
     connect(m_textEdit, SIGNAL(sigFocusIn()), this, SIGNAL(sigFocusIn()));

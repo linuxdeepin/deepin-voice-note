@@ -1014,6 +1014,9 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
         m_recordBar->setVisible(true);
     }
 
+    QScrollBar *bar = m_rightViewScrollArea->verticalScrollBar();
+    bar->setValue(bar->minimum());
+
     m_rightView->initData(data, m_searchKey, m_rightViewHasFouse);
     m_rightViewHasFouse = false;
 }
