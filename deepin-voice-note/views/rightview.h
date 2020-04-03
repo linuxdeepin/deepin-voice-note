@@ -27,7 +27,10 @@ public:
     explicit RightView(QWidget *parent = nullptr);
     void initData(VNoteItem *data, QRegExp reg = QRegExp(), bool fouse = false);
     DetailItemWidget *insertVoiceItem(const QString &voicePath, qint64 voiceSize);
-    DetailItemWidget *insertTextEdit(VNoteBlock *data, bool focus = false, QRegExp reg = QRegExp());
+    DetailItemWidget *insertTextEdit(VNoteBlock *data, bool focus = false,
+                                     QTextCursor::MoveOperation op =QTextCursor::NoMove,
+                                     QRegExp reg = QRegExp());
+
     void  setEnablePlayBtn(bool enable);
     void  delWidget(DetailItemWidget *widget, bool merge = true);
     void  updateData();

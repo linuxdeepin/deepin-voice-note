@@ -75,7 +75,7 @@ void RightView::initAppSetting()
     m_qspSetting = reinterpret_cast<VNoteApplication*>(qApp)->appSetting();
 }
 
-DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QRegExp reg)
+DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextCursor::MoveOperation op, QRegExp reg)
 {
     TextNoteItem *editItem = new TextNoteItem(data, this, reg);
     int index = 0;
@@ -83,12 +83,17 @@ DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QRegEx
         index = m_viewportLayout->indexOf(m_curItemWidget) + 1;
     }
     m_viewportLayout->insertWidget(index, editItem);
+
     if (focus) {
-        QTextCursor cursor = editItem->getTextCursor();
-        cursor.movePosition(QTextCursor::End);
-        editItem->setTextCursor(cursor);
         editItem->setFocus();
     }
+
+    if(op != QTextCursor::NoMove){
+        QTextCursor cursor = editItem->getTextCursor();
+        cursor.movePosition(op);
+        editItem->setTextCursor(cursor);
+    }
+
     connect(editItem, &TextNoteItem::sigCursorHeightChange, this, &RightView::adjustVerticalScrollBar);
     connect(editItem, &TextNoteItem::sigFocusOut, this, &RightView::onTextEditFocusOut);
     //connect(editItem, &TextNoteItem::sigDelEmpty, this, &RightView::onTextEditDelEmpty);
@@ -126,12 +131,17 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
     connect(item, &VoiceNoteItem::sigPauseBtnClicked, this, &RightView::onVoicePause);
     QString cutStr = "";
     int curIndex = m_viewportLayout->indexOf(m_curItemWidget);
-    DetailItemWidget *itemWidget = static_cast<DetailItemWidget *>(m_curItemWidget);
-    if (itemWidget->getNoteBlock()->blockType == VNoteBlock::Text) {
-        QTextCursor cursor = itemWidget->getTextCursor();
+    VNoteBlock *curBlock = m_curItemWidget->getNoteBlock();
+
+    if (curBlock->blockType == VNoteBlock::Text) {
+        QTextCursor cursor = m_curItemWidget->getTextCursor();
         cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
         cutStr = cursor.selectedText();
         cursor.removeSelectedText();
+
+        if(!cutStr.isEmpty()){
+            curBlock->blockText = m_curItemWidget->getAllText();
+        }
     }
 
     curIndex += 1;
@@ -242,10 +252,12 @@ void RightView::initData(VNoteItem *data, QRegExp reg, bool fouse)
         return;
     }
     int size = m_noteItemData->datas.dataConstRef().size();
+    QTextCursor::MoveOperation op = fouse ? QTextCursor::End : QTextCursor::NoMove;
+
     if (size) {
         for (auto it : m_noteItemData->datas.dataConstRef()) {
             if (VNoteBlock::Text == it->getType()) {
-                m_curItemWidget = insertTextEdit(it, fouse, reg);
+                m_curItemWidget = insertTextEdit(it, fouse, op, reg);
             } else if (VNoteBlock::Voice == it->getType()) {
                 VoiceNoteItem *item = new VoiceNoteItem(it, this);
                 item->setAnimTimer(m_playAnimTimer);
@@ -261,8 +273,13 @@ void RightView::initData(VNoteItem *data, QRegExp reg, bool fouse)
         }
     } else {
         VNoteBlock *textBlock = m_noteItemData->newBlock(VNoteBlock::Text);
-        m_curItemWidget = insertTextEdit(textBlock, fouse, reg);
+        m_curItemWidget = insertTextEdit(textBlock, fouse, op, reg);
         m_noteItemData->addBlock(nullptr, textBlock);
+    }
+
+    if(fouse == false){
+        QLayoutItem *layoutItem = m_viewportLayout->itemAt(0);
+        m_curItemWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
     }
 }
 
@@ -673,6 +690,7 @@ QString RightView::copySelectText()
         bool hasSelection = widget->hasSelection();
         if (hasSelection) {
             text.append(widget->getSelectText());
+            text.append('\n');
         }
         if (!text.endsWith("\n")) {
             text.append('\n');
