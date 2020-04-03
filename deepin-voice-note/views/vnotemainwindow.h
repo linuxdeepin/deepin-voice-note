@@ -34,6 +34,7 @@ class HomePage;
 class SplashView;
 class VoiceNoteItem;
 class DBusLogin1Manager;
+class VNMainWndDelayInitTask;
 
 class VNoteMainWindow : public DMainWindow, public OpsStateInterface
 {
@@ -76,6 +77,7 @@ protected:
     void initLogin1Manager();
     void holdHaltLock();
     void releaseHaltLock();
+    void delayInitTasks();
 
     void initSpliterView(); //正常主窗口
     void initSplashView();  // Splash animation view
@@ -97,7 +99,7 @@ public slots:
     void onMenuAbout2Show();
     void onVNoteSearch();
     void onCursorChange(int height, bool mouseMove); //调整详情页滚动条
-    void onStartRecord();//开始录音
+    void onStartRecord(const QString& path);//开始录音
     void onFinshRecord(const QString &voicePath, qint64 voiceSize); //结束录音
     void onRightViewVoicePlay(VNVoiceBlock *voiceData);
     void onRightViewVoicePause(VNVoiceBlock *voiceData);
@@ -196,6 +198,8 @@ private:
     //Login session manager
     DBusLogin1Manager* m_pLogin1Manager {nullptr};
     QDBusPendingReply<QDBusUnixFileDescriptor> m_lockFd;
+
+    friend class VNMainWndDelayInitTask;
 };
 
 

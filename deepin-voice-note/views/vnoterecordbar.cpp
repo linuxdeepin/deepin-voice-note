@@ -105,7 +105,7 @@ void VNoteRecordBar::startRecord()
     m_mainLayout->setCurrentWidget(m_recordPanel);
 
     m_recordPanel->startRecord();
-    emit sigStartRecord();
+    emit sigStartRecord(m_recordPanel->getRecordPath());
 }
 
 void VNoteRecordBar::onStartRecord()

@@ -14,6 +14,7 @@
 #include "common/vnoteitem.h"
 #include "common/vnoteforlder.h"
 #include "common/actionmanager.h"
+#include "common/vnotedatasafefymanager.h"
 
 #include "common/utils.h"
 #include "common/actionmanager.h"
@@ -25,6 +26,7 @@
 #include "dialog/vnotemessagedialog.h"
 #include "views/vnoterecordbar.h"
 #include "widgets/vnoteiconbutton.h"
+#include "task/vnmainwnddelayinittask.h"
 
 #include "globaldef.h"
 #include "vnoteapplication.h"
@@ -47,11 +49,13 @@ VNoteMainWindow::VNoteMainWindow(QWidget *parent)
     // Request DataManager load  note folders
     initData();
 
-    //Start audio device watch thread
-    //& must be called after initUI
-    initAudioWatcher();
-    //Init the login manager
-    initLogin1Manager();
+//    //Start audio device watch thread
+//    //& must be called after initUI
+//    initAudioWatcher();
+//    //Init the login manager
+//    initLogin1Manager();
+    //Init delay task
+    delayInitTasks();
 }
 
 VNoteMainWindow::~VNoteMainWindow()
@@ -581,37 +585,35 @@ void VNoteMainWindow::initRightView()
 
 void VNoteMainWindow::initAudioWatcher()
 {
-    QTimer::singleShot(50, this, [this]() {
-        //Audio input device watchdog
-        m_audioDeviceWatcher = new VNoteAudioDeviceWatcher();
+    //Audio input device watchdog
+    m_audioDeviceWatcher = new VNoteAudioDeviceWatcher();
 
-        connect(m_audioDeviceWatcher, &VNoteAudioDeviceWatcher::microphoneAvailableState,
-                m_recordBar, &VNoteRecordBar::OnMicrophoneAvailableChanged);
+    connect(m_audioDeviceWatcher, &VNoteAudioDeviceWatcher::microphoneAvailableState,
+            m_recordBar, &VNoteRecordBar::OnMicrophoneAvailableChanged);
 
-        m_audioDeviceWatcher->start();
+    m_audioDeviceWatcher->start();
 
-        //audio to text manager
-        m_a2tManager = new VNoteA2TManager();
+    //audio to text manager
+    m_a2tManager = new VNoteA2TManager();
 
-        //connect(m_rightView, &RightView::asrStart, this, &VNoteMainWindow::onA2TStart);
-        connect(m_a2tManager, &VNoteA2TManager::asrError, this, &VNoteMainWindow::onA2TError);
-        connect(m_a2tManager, &VNoteA2TManager::asrSuccess, this, &VNoteMainWindow::onA2TSuccess);
+    //connect(m_rightView, &RightView::asrStart, this, &VNoteMainWindow::onA2TStart);
+    connect(m_a2tManager, &VNoteA2TManager::asrError, this, &VNoteMainWindow::onA2TError);
+    connect(m_a2tManager, &VNoteA2TManager::asrSuccess, this, &VNoteMainWindow::onA2TSuccess);
 
-        //Check aiservice state
-        bool fExist = m_a2tManager->checkAiService();
-        operState(OpsStateInterface::StateAISrvAvailable, fExist);
+    //Check aiservice state
+    bool fExist = m_a2tManager->checkAiService();
+    operState(OpsStateInterface::StateAISrvAvailable, fExist);
 
-        //TODO:
-        //    If Aiservice don't exist, hide the voice2text menuitem.
-        //Community verson don't have aiservice.
-        if (!isAiSrvExist()) {
-            QAction *a2tAction = ActionManager::Instance()->getActionById(
-                        ActionManager::DetailVoice2Text);
-            if (nullptr != a2tAction) {
-                a2tAction->setVisible(false);
-            }
+    //TODO:
+    //    If Aiservice don't exist, hide the voice2text menuitem.
+    //Community verson don't have aiservice.
+    if (!isAiSrvExist()) {
+        QAction *a2tAction = ActionManager::Instance()->getActionById(
+                    ActionManager::DetailVoice2Text);
+        if (nullptr != a2tAction) {
+            a2tAction->setVisible(false);
         }
-    });
+    }
 }
 
 void VNoteMainWindow::initLogin1Manager()
@@ -644,6 +646,15 @@ void VNoteMainWindow::releaseHaltLock()
 {
     QDBusPendingReply<QDBusUnixFileDescriptor> releaseLock = m_lockFd;
     m_lockFd = QDBusPendingReply<QDBusUnixFileDescriptor>();
+}
+
+void VNoteMainWindow::delayInitTasks()
+{
+    VNMainWndDelayInitTask* pMainWndDelayTask = new VNMainWndDelayInitTask(this);
+    pMainWndDelayTask->setAutoDelete(true);
+    pMainWndDelayTask->setObjectName("MainWindowDelayTask");
+
+    QThreadPool::globalInstance()->start(pMainWndDelayTask);
 }
 
 void VNoteMainWindow::onVNoteFoldersLoaded()
@@ -721,9 +732,25 @@ void VNoteMainWindow::initEmptyFoldersView()
     m_wndHomePage = new HomePage(this);
 }
 
-void VNoteMainWindow::onStartRecord()
+void VNoteMainWindow::onStartRecord(const QString& path)
 {
     setSpecialStatus(RecordStart);
+
+    //Add recording data safer.
+    VNoteItem* currentNote = m_middleView->getCurrVNotedata();
+
+    if (nullptr != currentNote && !path.isEmpty()) {
+        VDataSafer safer;
+        safer.setSaferType(VDataSafer::Safe);
+
+        safer.folder_id = currentNote->folderId;
+        safer.note_id   = currentNote->noteId;
+        safer.path      = path;
+
+        VNoteDataSafefyManager::instance()->doSafer(safer);
+    } else {
+        qCritical() << "UnSafe get currentNote data is null! Dangerous!!!" << path;
+    }
 
     //Hold shutdown locker
     holdHaltLock();
@@ -733,10 +760,27 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 {
     if (voiceSize >= 1000) {
         m_rightView->insertVoiceItem(voicePath, voiceSize);
+
+        //Recording normal,remove the data safer.
+        VNoteItem* currentNote = m_middleView->getCurrVNotedata();
+
+        if (nullptr != currentNote && !voicePath.isEmpty()) {
+            VDataSafer safer;
+            safer.setSaferType(VDataSafer::Unsafe);
+
+            safer.folder_id = currentNote->folderId;
+            safer.note_id   = currentNote->noteId;
+            safer.path      = voicePath;
+
+            VNoteDataSafefyManager::instance()->doSafer(safer);
+        } else {
+            qCritical() << "UnSafe get currentNote data is null! Dangerous!!!";
+        }
     } else {
 
     }
     setSpecialStatus(RecordEnd);
+
     if (isAppQuit()) {
         qApp->quit();
     }

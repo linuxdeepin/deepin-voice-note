@@ -125,6 +125,11 @@ void VNoteRecordWidget::cancelRecord()
     onFinshRecord();
 }
 
+QString VNoteRecordWidget::getRecordPath() const
+{
+    return m_recordPath;
+}
+
 void VNoteRecordWidget::onAudioBufferProbed(const QAudioBuffer &buffer)
 {
     m_waveForm->onAudioBufferProbed(buffer);

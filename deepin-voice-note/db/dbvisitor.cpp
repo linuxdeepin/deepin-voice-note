@@ -2,6 +2,8 @@
 #include "globaldef.h"
 #include "db/vnotefolderoper.h"
 #include "db/vnoteitemoper.h"
+#include "db/vnotesaferoper.h"
+#include "common/datatypedef.h"
 #include "common/metadataparser.h"
 #include "common/vnotedatamanager.h"
 #include "common/vnoteforlder.h"
@@ -254,4 +256,61 @@ bool AddNoteDbVisitor::visitorData()
     }
 
     return isOK;
+}
+
+SaferQryDbVisitor::SaferQryDbVisitor(QSqlDatabase &db, void *result)
+    :DbVisitor (db, result)
+{
+
+}
+
+bool SaferQryDbVisitor::visitorData()
+{
+    bool isOK = false;
+
+    if (nullptr != results.safetyDatas) {
+        isOK = true;
+
+        while(m_sqlQuery->next()) {
+            VDataSafer dataSafer;
+            dataSafer.setSaferType(VDataSafer::Unsafe);
+
+            dataSafer.id      = m_sqlQuery->value(VNoteSaferOper::id).toInt();
+            dataSafer.folder_id = m_sqlQuery->value(VNoteSaferOper::folder_id).toInt();
+            dataSafer.note_id = m_sqlQuery->value(VNoteSaferOper::note_id).toInt();
+            dataSafer.path    = m_sqlQuery->value(VNoteSaferOper::path).toString();
+            dataSafer.state   = m_sqlQuery->value(VNoteSaferOper::state).toInt();
+
+            //Parse meta data
+            QVariant metaData = m_sqlQuery->value(VNoteSaferOper::meta_data);
+            dataSafer.meta_data = metaData.toString();
+
+            dataSafer.createTime  = QDateTime::fromString(
+                        m_sqlQuery->value(VNoteSaferOper::create_time).toString(),VNOTE_TIME_FMT);
+
+            //************Expand fileds begin**********
+            //TODO:
+            //    Add the expand fileds parse code here
+
+            //************Expand fileds end************
+
+            results.safetyDatas->push_back(dataSafer);
+        }
+    }
+
+    return isOK;
+}
+
+AddSaferDbVisitor::AddSaferDbVisitor(QSqlDatabase &db, void *result)
+    :DbVisitor (db, result)
+{
+
+}
+
+bool AddSaferDbVisitor::visitorData()
+{
+    //TODO:
+    //    Do nothing for safer visitor
+
+    return true;
 }

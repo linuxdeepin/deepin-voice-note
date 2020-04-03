@@ -19,6 +19,7 @@ public:
 
     void startRecord();
     void cancelRecord();
+    QString getRecordPath() const;
 
 signals:
     void sigFinshRecord(const QString &voicePath,qint64 voiceSize);

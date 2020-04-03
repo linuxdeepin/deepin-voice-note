@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QVector>
 #include <QReadWriteLock>
+#include <QDateTime>
 
 struct VNoteFolder;
 struct VNoteItem;
@@ -76,5 +77,33 @@ protected:
     friend class MetaDataParser;
     friend class ExportNoteWorker;
 };
+
+struct VDataSafer {
+    enum {
+        INVALID_ID = -1
+    };
+
+    enum SaferType {
+        Safe,
+        Unsafe,
+    };
+
+    bool isValid() const;
+    void setSaferType(SaferType type);
+
+    SaferType safeType {Safe};
+
+    qint32  id {INVALID_ID};
+    qint64  folder_id {INVALID_ID};
+    qint32  note_id {INVALID_ID};
+    qint32  state {0};
+    QString path;
+    QString meta_data;
+    QDateTime createTime;
+
+    friend QDebug& operator << (QDebug& out, const VDataSafer &safer);
+};
+
+typedef  QVector<VDataSafer> SafetyDatas;
 
 #endif // DATATYPEDEF_H

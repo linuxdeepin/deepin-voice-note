@@ -23,6 +23,8 @@ public:
     static constexpr char const *FOLDER_KEY        = "folder_id";
     static constexpr char const *NOTES_TABLE_NAME = "vnote_items_tbl";
     static constexpr char const *NOTES_KEY        = "note_id";
+    static constexpr char const *CATEGORY_TABLE_NAME = "vnote_category_tbl";
+    static constexpr char const *SAFER_TABLE_NAME = "vnote_data_safer_tbl";
 
     //icon_path: Not used, maybe used in future
     //expand_fields are place holder, will be used in future
@@ -78,7 +80,16 @@ public:
             expand_filed4 TEXT, \
             expand_filed5 TEXT, \
             expand_filed6 TEXT \
-      );";
+         ); \
+         CREATE TABLE IF NOT EXISTS vnote_data_safer_tbl(\
+            id        INTEGER PRIMARY KEY AUTOINCREMENT, \
+            folder_id INT DEFAULT 0, \
+            note_id   INT DEFAULT 0, \
+            path      INT DEFAULT 0, \
+            state     INT DEFAULT 0, \
+            meta_data TEXT, \
+            create_time DATETIME NOT NULL DEFAULT (STRFTIME ('%Y-%m-%d %H:%M:%f','now','localtime')) \
+         );";
 
     enum DB_TABLE {
         VNOTE_FOLDER_TBL,

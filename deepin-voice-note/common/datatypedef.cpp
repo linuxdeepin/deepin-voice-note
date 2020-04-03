@@ -1,6 +1,7 @@
 #include "datatypedef.h"
 #include "common/vnoteforlder.h"
 #include "common/vnoteitem.h"
+#include "globaldef.h"
 
 #include <DLog>
 
@@ -144,4 +145,36 @@ void VNOTE_DATAS::classifyDelBlk(VNoteBlock *block)
 
     //Don't need delete the block anymore,
     //becuase it's already released.
+}
+
+bool VDataSafer::isValid() const
+{
+    //TODO:
+    //    Now path field is uique.Other may
+    // be empty.So only check it for validation.
+    return !(path.isEmpty() || folder_id==INVALID_ID || note_id== INVALID_ID);
+}
+
+void VDataSafer::setSaferType(VDataSafer::SaferType type)
+{
+    safeType = type;
+}
+
+QDebug & operator <<(QDebug &out, const VDataSafer &safer)
+{
+    QString safeType = (VDataSafer::Safe==safer.safeType)
+            ? QString("Safe") : QString("UnSafe");
+
+    out << "VDataSafer { "
+        << "saferType="<< safeType << ","
+        << "Id=" << safer.id << ","
+        << "folder_id=" << safer.folder_id << ","
+        << "note_id=" << safer.note_id << ","
+        << "path=" << safer.path << ","
+        << "state=" << safer.state << ","
+        << "meta_data=" << safer.meta_data << ","
+        << "createTime=" << safer.createTime.toString(VNOTE_TIME_FMT)
+        << " }\n";
+
+    return out;
 }

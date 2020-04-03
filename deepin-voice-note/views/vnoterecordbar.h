@@ -33,7 +33,7 @@ public:
     VNVoiceBlock* getVoiceData();
 
 signals:
-    void sigStartRecord();
+    void sigStartRecord(const QString& recordPath);
     void sigFinshRecord(const QString &voicePath,qint64 voiceSize);
     void sigPlayVoice(VNVoiceBlock * voiceData);
     void sigPauseVoice(VNVoiceBlock * voiceData);

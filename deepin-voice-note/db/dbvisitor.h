@@ -21,6 +21,7 @@ protected:
         VNOTE_ALL_NOTES_MAP *notes;
         VNoteFolder         *newFolder;
         VNoteItem           *newNote;
+        SafetyDatas         *safetyDatas;
         qint32              *count;
         void                *ptr;
     } results;
@@ -59,6 +60,20 @@ public:
 class AddNoteDbVisitor : public DbVisitor {
 public:
     explicit AddNoteDbVisitor(QSqlDatabase& db, void* result);
+
+    virtual bool visitorData() override;
+};
+
+class SaferQryDbVisitor : public DbVisitor {
+public:
+    explicit SaferQryDbVisitor(QSqlDatabase& db, void* result);
+
+    virtual bool visitorData() override;
+};
+
+class AddSaferDbVisitor : public DbVisitor {
+public:
+    explicit AddSaferDbVisitor(QSqlDatabase& db, void* result);
 
     virtual bool visitorData() override;
 };

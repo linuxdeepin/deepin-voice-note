@@ -54,7 +54,14 @@ SOURCES += \
     views/textnoteitem.cpp \
     common/exportnoteworker.cpp \
     common/opsstateinterface.cpp \
-    widgets/vnote2siconbutton.cpp
+    widgets/vnote2siconbutton.cpp \
+    common/vnotedatasafefymanager.cpp \
+    task/vntask.cpp \
+    common/vntaskworker.cpp \
+    common/loadsafeteydataworker.cpp \
+    db/vnotesaferoper.cpp \
+    task/vnmainwnddelayinittask.cpp \
+    task/vndatasafertask.cpp
 
 RESOURCES += \
     images.qrc
@@ -106,7 +113,14 @@ HEADERS += \
     views/textnoteitem.h \
     common/exportnoteworker.h \
     common/opsstateinterface.h \
-    widgets/vnote2siconbutton.h
+    widgets/vnote2siconbutton.h \
+    common/vnotedatasafefymanager.h \
+    task/vntask.h \
+    common/vntaskworker.h \
+    common/loadsafeteydataworker.h \
+    db/vnotesaferoper.h \
+    task/vnmainwnddelayinittask.h \
+    task/vndatasafertask.h
 
 TRANSLATIONS += \
     translations/deepin-voice-note.ts
