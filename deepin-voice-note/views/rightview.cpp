@@ -914,9 +914,9 @@ void RightView::saveMp3()
         VNoteBlock *block = m_curItemWidget->getNoteBlock();
         if(block->blockType == VNoteBlock::Voice){
             DFileDialog dialog;
-            dialog.setFileMode(DFileDialog::DirectoryOnly);
+            dialog.setFileMode(DFileDialog::DirectoryOnly);           
             dialog.setLabelText(DFileDialog::Accept,DApplication::translate("RightView","Save"));
-
+            dialog.setNameFilter("MP3(*.mp3)");
             QString historyDir = m_qspSetting->value(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
             if (historyDir.isEmpty()) {
                 historyDir = QDir::homePath();
