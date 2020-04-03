@@ -689,11 +689,11 @@ QString RightView::copySelectText()
 
         bool hasSelection = widget->hasSelection();
         if (hasSelection) {
-            text.append(widget->getSelectText());
-            text.append('\n');
-        }
-        if (!text.endsWith("\n")) {
-            text.append('\n');
+            QString selectText = widget->getSelectText();
+            if(!selectText.isEmpty()){
+                selectText.append('\n');
+                text.append(selectText);
+            }
         }
     }
     QClipboard *board = QApplication::clipboard();
