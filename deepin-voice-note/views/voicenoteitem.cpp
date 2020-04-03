@@ -67,7 +67,7 @@ void VoiceNoteItem::initUi()
     m_voiceNameLab->setForegroundRole(DPalette::TextTitle);
 
     m_hornLab = new DLabel(m_bgWidget);
-    m_hornLab->setMinimumSize(28,25);
+    m_hornLab->setFixedSize(28,25);
 
     m_hornLab->setAlignment(Qt::AlignRight);
     DAnchorsBase buttonAnchor(m_hornLab);
