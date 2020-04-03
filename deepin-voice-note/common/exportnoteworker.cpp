@@ -81,6 +81,7 @@ int ExportNoteWorker::exportText()
             for (auto it : m_note->datas.datas) {
                 if (VNoteBlock::Text == it->getType()) {
                     stream << it->blockText;
+                    stream << '\n';
                 }
             }
 
