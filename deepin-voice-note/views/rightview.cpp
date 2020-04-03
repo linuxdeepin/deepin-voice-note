@@ -46,7 +46,7 @@ void RightView::initUi()
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
     m_viewportLayout = new QVBoxLayout;
-    m_viewportLayout->setSpacing(0);
+    m_viewportLayout->setSpacing(10);
     m_viewportLayout->setContentsMargins(20, 0, 20, 0);
     this->setLayout(m_viewportLayout);
     m_placeholderWidget = new DWidget(this); //占位的
@@ -914,7 +914,8 @@ void RightView::saveMp3()
         VNoteBlock *block = m_curItemWidget->getNoteBlock();
         if(block->blockType == VNoteBlock::Voice){
             DFileDialog dialog;
-            dialog.setFileMode(DFileDialog::DirectoryOnly);           
+            dialog.setFileMode(DFileDialog::DirectoryOnly);
+
             dialog.setLabelText(DFileDialog::Accept,DApplication::translate("RightView","Save"));
             dialog.setNameFilter("MP3(*.mp3)");
             QString historyDir = m_qspSetting->value(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
