@@ -20,6 +20,7 @@ void VNoteMessageDialog::setSingleButton()
 {
     m_buttonSpliter->setVisible(false);
     m_cancelBtn->setVisible(false);
+    m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "OK"));
 }
 
 void VNoteMessageDialog::initUI()
@@ -85,24 +86,23 @@ void VNoteMessageDialog::initConnections()
 void VNoteMessageDialog::initMessage()
 {
     //TODO:
-    //   The default button text is Cancel & OK
+    //   The default button text is Cancel & Confirm
     //In some case OK button text is need to change
     m_cancelBtn->setText(DApplication::translate("VNoteMessageDialog", "Cancel"));
-    m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "OK"));
+    m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "Confirm"));
     switch (m_msgType) {
     case DeleteFolder: {
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
             ,"Are you sure you want to delete this notebook?\nAll notes in it will be deleted!"));
-        m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "Delete"));
     } break;
     case AbortRecord: {
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
-            ,"Currently recording,is the recording terminated?"));
+            ,"Do you want to stop the current recording?"));
     } break;
     case DeleteNote: {
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
             ,"Are you sure you want to delete this note?"));
-        m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "Delete"));
+
     } break;
     case AsrTimeLimit: {
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
