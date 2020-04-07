@@ -26,6 +26,7 @@ void VNotePlayWidget::initUI()
     m_timeLab->setFixedWidth(124);
     m_sliderHover = new DWidget(this);
     m_nameLab = new DLabel(m_sliderHover);
+    m_nameLab->setContentsMargins(8,0,0,0);
     m_slider = new DSlider(Qt::Horizontal, m_sliderHover);
     m_slider->setMinimum(0);
     m_slider->setValue(0);
