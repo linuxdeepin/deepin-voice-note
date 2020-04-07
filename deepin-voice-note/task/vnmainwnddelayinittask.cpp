@@ -16,7 +16,5 @@ void VNMainWndDelayInitTask::run()
     if (nullptr != m_pMainWnd) {
         //Delay initialize work
         m_pMainWnd->initDelayWork();
-        //Init the login manager
-        m_pMainWnd->initLogin1Manager();
     }
 }

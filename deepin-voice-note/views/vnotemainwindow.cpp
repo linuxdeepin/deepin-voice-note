@@ -45,17 +45,16 @@ VNoteMainWindow::VNoteMainWindow(QWidget *parent)
 {
     initUI();
     initConnections();
-    initShortcuts();
-//    //Start audio device watch thread
-//    //& must be called after initUI
-    initAudioWatcher();
-//    //Init the login manager
-//    initLogin1Manager();
-    //Init delay task
-    delayInitTasks();
-
     // Request DataManager load  note folders
     initData();
+    initShortcuts();
+    //Start audio device watch thread
+    //& must be called after initUI
+    initAudioWatcher();
+    //Init the login manager
+    initLogin1Manager();
+    //Init delay task
+    delayInitTasks();
 }
 
 VNoteMainWindow::~VNoteMainWindow()
