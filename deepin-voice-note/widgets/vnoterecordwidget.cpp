@@ -58,7 +58,7 @@ void VNoteRecordWidget::initUi()
     mainLayout->addLayout(waveLayout, 1);
     mainLayout->addWidget(m_timeLabel);
     mainLayout->addWidget(m_finshBtn);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setContentsMargins(6, 0, 6, 3);
     this->setLayout(mainLayout);
     m_continueBtn->setVisible(false);
 }

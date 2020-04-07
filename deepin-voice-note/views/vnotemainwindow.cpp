@@ -565,7 +565,7 @@ void VNoteMainWindow::initRightView()
     m_recordBarHolder->setFixedHeight(78);
     QVBoxLayout *recordBarHolderLayout = new QVBoxLayout(m_recordBarHolder);
     recordBarHolderLayout->setSpacing(0);
-    recordBarHolderLayout->setContentsMargins(0,0,0,0);
+    recordBarHolderLayout->setContentsMargins(4,0,4,4);
 
     m_recordBar = new VNoteRecordBar(m_recordBarHolder);
     m_recordBar->setBackgroundRole(DPalette::Base);

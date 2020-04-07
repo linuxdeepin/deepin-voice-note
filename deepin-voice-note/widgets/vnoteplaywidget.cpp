@@ -46,7 +46,7 @@ void VNotePlayWidget::initUI()
     mainLayout->addWidget(m_sliderHover);
     mainLayout->addWidget(m_timeLab, 0, Qt::AlignLeft);
     mainLayout->addWidget(m_closeBtn);
-    mainLayout->setContentsMargins(15, 0, 10, 0);
+    mainLayout->setContentsMargins(13, 0, 13, 0);
     mainLayout->setSizeConstraint(QLayout::SetNoConstraint);
     this->setLayout(mainLayout);
     m_sliderHover->installEventFilter(this);
