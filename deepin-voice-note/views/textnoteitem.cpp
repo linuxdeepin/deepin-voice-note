@@ -29,7 +29,7 @@ void TextNoteItem::initUi()
     pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));
     m_textEdit->setPalette(pb);
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(0, 10, 0, 10);
     layout->addWidget(m_textEdit);
     this->setLayout(layout);
 }
@@ -40,8 +40,8 @@ void TextNoteItem::initConnection()
     QAbstractTextDocumentLayout *documentLayout = document->documentLayout();
     connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, [ = ] {
         m_textEdit->setFixedHeight(static_cast<int>(document->size().height()));
-        int height = m_textEdit->cursorRect(m_textEdit->textCursor()).bottom();
-        this->setFixedHeight(m_textEdit->height());
+        int height = m_textEdit->cursorRect(m_textEdit->textCursor()).bottom() + 10;
+        this->setFixedHeight(m_textEdit->height() + 20);
         if(this->hasFocus()){
             emit sigCursorHeightChange(this, height);
         }
