@@ -669,12 +669,23 @@ void RightView::mouseMoveSelect(QMouseEvent *event)
                 }
             }
         } else if (minIndex == 0 && maxIndex == 0) {
-            QLayoutItem *layoutItem = m_viewportLayout->itemAt(1);
+            QLayoutItem *layoutItem = m_viewportLayout->itemAt(curIndex + 1);
+            DetailItemWidget *preWidget = nullptr, *nextWidget = nullptr;
             if (layoutItem) {
-                DetailItemWidget *tmpWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
-                if(tmpWidget && tmpWidget != m_placeholderWidget){
-                    tmpWidget->clearSelection();
-                }
+                nextWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
+            }
+
+            if(curIndex > 0){
+                layoutItem = m_viewportLayout->itemAt(curIndex - 1);
+                preWidget  = static_cast<DetailItemWidget *>(layoutItem->widget());
+            }
+
+            if(nextWidget && nextWidget != m_placeholderWidget){
+                nextWidget->clearSelection();
+            }
+
+            if(preWidget){
+                preWidget->clearSelection();
             }
         }
     }
