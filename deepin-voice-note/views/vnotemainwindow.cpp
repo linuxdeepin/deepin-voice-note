@@ -550,7 +550,7 @@ void VNoteMainWindow::initRightView()
 
     QVBoxLayout *rightHolderLayout = new QVBoxLayout;
     rightHolderLayout->setSpacing(0);
-    rightHolderLayout->setContentsMargins(0, 5, 0, 0);
+    rightHolderLayout->setContentsMargins(0, 15, 0, 0);
 
     m_rightViewScrollArea = new DScrollArea(m_rightViewHolder);
     m_rightView = new RightView(m_rightViewScrollArea);
