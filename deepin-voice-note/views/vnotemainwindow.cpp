@@ -954,8 +954,6 @@ void VNoteMainWindow::onPreviewShortcut()
     //******************************Edit***************************************************
     QMap<QString, QString> shortcutEditKeymap = {
         //Edit
-        {DApplication::translate("Shortcuts", "Record voice"),         "Ctrl+R"},
-        {DApplication::translate("Shortcuts", "Play/Pause"),           "Space"},
         {DApplication::translate("Shortcuts", "Select all"),           "Ctrl+A"},
         {DApplication::translate("Shortcuts", "Copy"),                 "Ctrl+C"},
         {DApplication::translate("Shortcuts", "Cut"),                  "Ctrl+X"},

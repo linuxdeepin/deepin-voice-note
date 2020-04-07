@@ -28,7 +28,7 @@ void HomePage::initUi()
     m_Image->setFlat(true);
 
     m_Text = new DLabel(this);
-    m_Text->setFixedSize(QSize(500, 18));
+    m_Text->setMinimumSize(QSize(500, 18));
     m_Text->setText(QString(DApplication::translate(
                             "HomePage", "Create a notebook to start recording voice and making notes")
                         ));
