@@ -318,8 +318,9 @@ void VNoteMainWindow::initShortcuts()
         //Call method in rightview
         Q_UNUSED(this);
         if (canDoShortcutAction()) {
-            if (nullptr != m_middleView->getCurrVNotedata()) {
-                if (m_middleView->getCurrVNotedata()->haveVoice()) {
+            VNoteItem* currNote = m_middleView->getCurrVNotedata();
+            if (nullptr != currNote) {
+                if (currNote->haveVoice()) {
                     m_rightView->saveMp3();
                 }
             }
@@ -335,8 +336,9 @@ void VNoteMainWindow::initShortcuts()
     connect(m_stSaveAsText.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         if (canDoShortcutAction()) {
-            if (nullptr != m_middleView->getCurrVNotedata()) {
-                if (m_middleView->getCurrVNotedata()->haveText()) {
+            VNoteItem* currNote = m_middleView->getCurrVNotedata();
+            if (nullptr != currNote) {
+                if (currNote->haveText()) {
                     m_middleView->saveAsText();
                 }
             }
@@ -354,7 +356,12 @@ void VNoteMainWindow::initShortcuts()
         if (canDoShortcutAction()) {
             //Can't save recording when do recording.
             if (!isRecording()) {
-                m_middleView->saveRecords();
+                VNoteItem* currNote = m_middleView->getCurrVNotedata();
+                if (nullptr != currNote) {
+                    if (currNote->haveVoice()) {
+                        m_middleView->saveRecords();
+                    }
+                }
             }
         }
     });
