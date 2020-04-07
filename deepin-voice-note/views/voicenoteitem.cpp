@@ -216,7 +216,7 @@ void VoiceNoteItem::onChangeTheme()
 {
     DPalette pbCover = DApplicationHelper::instance()->palette(m_coverWidget);
     QColor coverColor = pbCover.color(DPalette::Active, DPalette::Highlight);
-    coverColor.setAlphaF(0.7);
+    coverColor.setAlphaF(0.5);
     pbCover.setBrush(DPalette::Base, coverColor);
     m_coverWidget->setPalette(pbCover);
 }
