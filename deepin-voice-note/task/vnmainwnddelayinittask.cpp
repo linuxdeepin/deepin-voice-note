@@ -14,9 +14,8 @@ void VNMainWndDelayInitTask::run()
     VNoteDataSafefyManager::instance()->reqSafers();
 
     if (nullptr != m_pMainWnd) {
-        //Start audio device watch thread
-        //& must be called after initUI
-        m_pMainWnd->initAudioWatcher();
+        //Delay initialize work
+        m_pMainWnd->initDelayWork();
         //Init the login manager
         m_pMainWnd->initLogin1Manager();
     }

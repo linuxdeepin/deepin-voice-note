@@ -13,8 +13,8 @@ class VNWaveform : public DFrame
 public:
     explicit VNWaveform(QWidget *parent = nullptr);
 
-    const int WAVE_WIDTH = 3;
-    const int WAVE_SPACE = 1;
+    const int WAVE_WIDTH = 2;
+    const int WAVE_SPACE = 2;
 
     const int WAVE_OFFSET_X = 0; //Left/Right margin
     const int WAVE_OFFSET_Y = 0; //top/Bottom margin

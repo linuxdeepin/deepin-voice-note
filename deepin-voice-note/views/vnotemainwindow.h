@@ -77,6 +77,7 @@ protected:
     void initLogin1Manager();
     void holdHaltLock();
     void releaseHaltLock();
+    void initDelayWork();
     void delayInitTasks();
 
     void initSpliterView(); //正常主窗口

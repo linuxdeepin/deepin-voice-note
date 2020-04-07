@@ -46,16 +46,16 @@ VNoteMainWindow::VNoteMainWindow(QWidget *parent)
     initUI();
     initConnections();
     initShortcuts();
-    // Request DataManager load  note folders
-    initData();
-
 //    //Start audio device watch thread
 //    //& must be called after initUI
-//    initAudioWatcher();
+    initAudioWatcher();
 //    //Init the login manager
 //    initLogin1Manager();
     //Init delay task
     delayInitTasks();
+
+    // Request DataManager load  note folders
+    initData();
 }
 
 VNoteMainWindow::~VNoteMainWindow()
@@ -600,20 +600,20 @@ void VNoteMainWindow::initAudioWatcher()
     connect(m_a2tManager, &VNoteA2TManager::asrError, this, &VNoteMainWindow::onA2TError);
     connect(m_a2tManager, &VNoteA2TManager::asrSuccess, this, &VNoteMainWindow::onA2TSuccess);
 
-    //Check aiservice state
-    bool fExist = m_a2tManager->checkAiService();
-    operState(OpsStateInterface::StateAISrvAvailable, fExist);
+//    //Check aiservice state
+//    bool fExist = m_a2tManager->checkAiService();
+//    operState(OpsStateInterface::StateAISrvAvailable, fExist);
 
-    //TODO:
-    //    If Aiservice don't exist, hide the voice2text menuitem.
-    //Community verson don't have aiservice.
-    if (!isAiSrvExist()) {
-        QAction *a2tAction = ActionManager::Instance()->getActionById(
-                    ActionManager::DetailVoice2Text);
-        if (nullptr != a2tAction) {
-            a2tAction->setVisible(false);
-        }
-    }
+//    //TODO:
+//    //    If Aiservice don't exist, hide the voice2text menuitem.
+//    //Community verson don't have aiservice.
+//    if (!isAiSrvExist()) {
+//        QAction *a2tAction = ActionManager::Instance()->getActionById(
+//                    ActionManager::DetailVoice2Text);
+//        if (nullptr != a2tAction) {
+//            a2tAction->setVisible(false);
+//        }
+//    }
 }
 
 void VNoteMainWindow::initLogin1Manager()
@@ -646,6 +646,24 @@ void VNoteMainWindow::releaseHaltLock()
 {
     QDBusPendingReply<QDBusUnixFileDescriptor> releaseLock = m_lockFd;
     m_lockFd = QDBusPendingReply<QDBusUnixFileDescriptor>();
+}
+
+void VNoteMainWindow::initDelayWork()
+{
+    //Check aiservice state
+    bool fExist = m_a2tManager->checkAiService();
+    operState(OpsStateInterface::StateAISrvAvailable, fExist);
+
+    //TODO:
+    //    If Aiservice don't exist, hide the voice2text menuitem.
+    //Community verson don't have aiservice.
+    if (!isAiSrvExist()) {
+        QAction *a2tAction = ActionManager::Instance()->getActionById(
+                    ActionManager::DetailVoice2Text);
+        if (nullptr != a2tAction) {
+            a2tAction->setVisible(false);
+        }
+    }
 }
 
 void VNoteMainWindow::delayInitTasks()

@@ -86,12 +86,13 @@ struct VDataSafer {
     enum SaferType {
         Safe,
         Unsafe,
+        ExceptionSafer,
     };
 
     bool isValid() const;
     void setSaferType(SaferType type);
 
-    SaferType safeType {Safe};
+    SaferType saferType {ExceptionSafer};
 
     qint32  id {INVALID_ID};
     qint64  folder_id {INVALID_ID};

@@ -157,16 +157,19 @@ bool VDataSafer::isValid() const
 
 void VDataSafer::setSaferType(VDataSafer::SaferType type)
 {
-    safeType = type;
+    saferType = type;
 }
 
 QDebug & operator <<(QDebug &out, const VDataSafer &safer)
 {
-    QString safeType = (VDataSafer::Safe==safer.safeType)
-            ? QString("Safe") : QString("UnSafe");
+    const QStringList saferTypes = {
+        "Safe",
+        "UnSafe",
+        "ExceptionSafer",
+    };
 
     out << "VDataSafer { "
-        << "saferType="<< safeType << ","
+        << "saferType="<< saferTypes[safer.saferType] << ","
         << "Id=" << safer.id << ","
         << "folder_id=" << safer.folder_id << ","
         << "note_id=" << safer.note_id << ","

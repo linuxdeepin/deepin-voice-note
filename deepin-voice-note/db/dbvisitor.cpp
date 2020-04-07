@@ -273,7 +273,9 @@ bool SaferQryDbVisitor::visitorData()
 
         while(m_sqlQuery->next()) {
             VDataSafer dataSafer;
-            dataSafer.setSaferType(VDataSafer::Unsafe);
+            //All data at the start moment are all exception safers.
+            //Default safer type is ExceptionSafer.
+            //dataSafer.setSaferType(VDataSafer::ExceptionSafer);
 
             dataSafer.id      = m_sqlQuery->value(VNoteSaferOper::id).toInt();
             dataSafer.folder_id = m_sqlQuery->value(VNoteSaferOper::folder_id).toInt();

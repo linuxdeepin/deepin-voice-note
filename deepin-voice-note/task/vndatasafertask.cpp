@@ -15,9 +15,13 @@ void VNDataSaferTask::run()
 {
     VNoteSaferOper saferOper;
 
-    if (VDataSafer::Safe == m_dataSafer.safeType) {
+    if (VDataSafer::Safe == m_dataSafer.saferType) {
         saferOper.addSafer(m_dataSafer);
-    } else {
+    } else if(VDataSafer::Unsafe == m_dataSafer.saferType) {
+        //Normal operation,just remove the safer.
+        saferOper.rmSafer(m_dataSafer);
+    } else if (VDataSafer::ExceptionSafer == m_dataSafer.saferType) {
+        //Exception operation happened ,need clear the data.
         QFileInfo fileInfo(m_dataSafer.path);
 
         if (fileInfo.exists()) {
