@@ -3,7 +3,7 @@
 
 #include "common/datatypedef.h"
 
-#include <QImage>
+#include <QPixmap>
 
 class DbVisitor;
 class VNoteItemOper;
@@ -24,7 +24,7 @@ public:
 
     QString getDefaultFolderName();
     qint32 getDefaultIcon();
-    QImage getDefaultIcon(qint32 index);
+    QPixmap getDefaultIcon(qint32 index, IconsType type);
 
     bool deleteVNoteFolder(qint64 folderId);
     bool deleteVNoteFolder(VNoteFolder* folder);

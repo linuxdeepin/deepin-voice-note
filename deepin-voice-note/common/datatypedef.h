@@ -107,4 +107,10 @@ struct VDataSafer {
 
 typedef  QVector<VDataSafer> SafetyDatas;
 
+enum IconsType{
+   DefaultIcon = 0x0,
+   DefaultGrayIcon,
+   MaxIconsType
+};
+
 #endif // DATATYPEDEF_H

@@ -5,7 +5,7 @@
 
 #include <QtGlobal>
 #include <QDateTime>
-#include <QImage>
+#include <QPixmap>
 struct VNoteFolder
 {
 public:
@@ -37,7 +37,8 @@ public:
     QDateTime deleteTime;
 
     struct {
-        QImage icon;
+        QPixmap icon;
+        QPixmap grayIcon;
     } UI;
 
     qint32& maxNoteIdRef();

@@ -49,7 +49,7 @@ protected:
      * */
     VNOTE_ITEMS_MAP* getFolderNotes(qint64 folderId);
 
-    QImage getDefaultIcon(qint32 index);
+    QPixmap getDefaultIcon(qint32 index, IconsType type);
 private:
     QScopedPointer<VNOTE_FOLDERS_MAP> m_qspNoteFoldersMap;
     QScopedPointer<VNOTE_ALL_NOTES_MAP> m_qspAllNotesMap;
@@ -71,7 +71,7 @@ private:
 
     static VNoteDataManager* _instance;
 
-    static QVector<QImage> m_defaultIcons;
+    static QVector<QPixmap> m_defaultIcons[IconsType::MaxIconsType];
     static QReadWriteLock m_iconLock;
 
     friend class LoadIconsWorker;

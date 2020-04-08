@@ -279,14 +279,14 @@ VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
     return folderNotes;
 }
 
-QImage VNoteDataManager::getDefaultIcon(qint32 index)
+QPixmap VNoteDataManager::getDefaultIcon(qint32 index, IconsType type)
 {
     m_iconLock.lockForRead();
-    if (index < 1 || index > m_defaultIcons.size()) {
+    if (index < 1 || index > m_defaultIcons[type].size()) {
         index = 0;
     }
 
-    QImage icon = m_defaultIcons.at(index);
+    QPixmap icon = m_defaultIcons[type].at(index);
 
     m_iconLock.unlock();
 

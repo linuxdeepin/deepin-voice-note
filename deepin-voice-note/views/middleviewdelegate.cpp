@@ -366,7 +366,7 @@ void MiddleViewDelegate::paintSearchItem(QPainter *painter, const QStyleOptionVi
         QRect folderRect = itemRect;
         folderRect.setY(itemRect.bottom());
         QRect iconRect(folderRect.left() + 20, folderRect.top(), 24, 24);
-        painter->drawImage(iconRect, folderData->UI.icon);
+        painter->drawPixmap(iconRect, folderData->UI.icon);
         QRect folderNameRect(iconRect.right() + 12, folderRect.top(),
                              paintRect.width() - iconRect.width() - 50, 24);
         QString elideText = fontMetrics.elidedText(folderData->name, Qt::ElideRight, folderNameRect.width());

@@ -9,6 +9,7 @@ class LoadIconsWorker : public QObject, public QRunnable
     Q_OBJECT
 public:
     explicit LoadIconsWorker(QObject *parent = nullptr);
+    QPixmap greyPix(QPixmap pix);
 
     const int DEFAULTICONS_COUNT = 10;
 protected:

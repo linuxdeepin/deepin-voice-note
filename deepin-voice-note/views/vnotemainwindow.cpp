@@ -1237,8 +1237,6 @@ void VNoteMainWindow::addNotepad()
 {
     VNoteFolder itemData;
     VNoteFolderOper  folderOper;
-    itemData.defaultIcon = folderOper.getDefaultIcon();
-    itemData.UI.icon = folderOper.getDefaultIcon(itemData.defaultIcon);
     itemData.name = folderOper.getDefaultFolderName();
 
     VNoteFolder *newFolder = folderOper.addFolder(itemData);

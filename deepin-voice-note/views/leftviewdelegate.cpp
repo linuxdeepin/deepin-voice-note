@@ -139,6 +139,7 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
     path.lineTo(paintRect.bottomLeft() + QPoint(radius, 0));
     path.arcTo(QRect(QPoint(paintRect.bottomRight() - QPoint(radius * 2, radius * 2)), QSize(radius * 2, radius * 2)), 270, 90);
 
+    bool enable = true;
     if (option.state & QStyle::State_Selected) {
         QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
         painter->setBrush(QBrush(fillColor));
@@ -149,6 +150,7 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
             painter->setBrush(QBrush(m_parentPb.color(DPalette::Disabled, DPalette::ItemBackground)));
             painter->fillPath(path, painter->brush());
             painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::TextTitle)));
+            enable = false;
         } else {
             if (option.state & QStyle::State_MouseOver) {
                 painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
@@ -174,7 +176,13 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
         QRect nameRect(iconRect.right() + 12, paintRect.top(),
                        numRect.left() - iconRect.right() - 15, paintRect.height());
         painter->drawText(numRect, Qt::AlignRight | Qt::AlignVCenter, strNum);
-        painter->drawImage(iconRect, data->UI.icon);
+
+        if(enable == false){
+           painter->drawPixmap(iconRect, data->UI.grayIcon);
+        }else {
+           painter->drawPixmap(iconRect, data->UI.icon);
+        }
+
         QString elideText = fontMetrics.elidedText(data->name, Qt::ElideRight, nameRect.width());
         painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
     }

@@ -68,7 +68,9 @@ bool FolderQryDbVisitor::visitorData()
             //************Expand fileds end************
 
             //Get default icon image
-            folder->UI.icon = VNoteDataManager::instance()->getDefaultIcon(folder->defaultIcon);
+            folder->UI.icon = VNoteDataManager::instance()->getDefaultIcon(folder->defaultIcon, IconsType::DefaultIcon);
+            folder->UI.grayIcon = VNoteDataManager::instance()->getDefaultIcon(folder->defaultIcon, IconsType::DefaultGrayIcon);
+
 
             results.folders->folders.insert(folder->id, folder);
         }
