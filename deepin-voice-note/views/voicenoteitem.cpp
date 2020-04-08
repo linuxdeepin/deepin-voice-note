@@ -34,8 +34,6 @@ void VoiceNoteItem::initUi()
 {
     this->setFixedHeight(DefaultHeight);
     m_bgWidget = new DFrame(this);
-    m_bgWidget->setBackgroundRole(DPalette::ItemBackground);
-
     m_createTimeLab = new DLabel(m_bgWidget);
     DFontSizeManager::instance()->bind(m_createTimeLab, DFontSizeManager::T8);
     m_createTimeLab->setForegroundRole(DPalette::TextTips);
@@ -219,6 +217,10 @@ void VoiceNoteItem::onChangeTheme()
     coverColor.setAlphaF(0.5);
     pbCover.setBrush(DPalette::Base, coverColor);
     m_coverWidget->setPalette(pbCover);
+
+    pbCover = DApplicationHelper::instance()->palette(m_bgWidget);
+    pbCover.setBrush(DPalette::Base, pbCover.color(DPalette::Active,DPalette::ItemBackground));
+    m_bgWidget->setPalette(pbCover);
 }
 
 bool VoiceNoteItem::asrTextNotEmpty()
