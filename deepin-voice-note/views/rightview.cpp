@@ -370,67 +370,58 @@ void RightView::initAction(DetailItemWidget *widget)
     getSelectionCount(voiceCount, textCount);
     tolCount = voiceCount + textCount;
 
-    VNoteBlock *blockData = nullptr;
     OpsStateInterface * stateInterface = gVNoteOpsStates();
-
-    if (widget != nullptr) {
-        blockData = widget->getNoteBlock();
-    }
 
     if (tolCount) {
         ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
-
-        if (textCount != 0) {
-            if (!blockData || blockData->blockType == VNoteBlock::Text) {
-                ActionManager::Instance()->enableAction(ActionManager::DetailCut, true);
-                ActionManager::Instance()->enableAction(ActionManager::DetailDelete, true);
-            }
+        bool enable = true;
+        if(m_curPlayItem && m_curPlayItem->hasSelection()){
+            enable = false;
         }
-    }
 
-    if (blockData != nullptr) {
-        if (blockData->blockType == VNoteBlock::Voice) {
-            if (!checkFileExist(blockData->ptrVoice->voicePath)) {
-                delWidget(widget);
-                updateData();
-                return;
-            }
+        if(stateInterface->isVoice2Text() && m_curAsrItem && m_curAsrItem->hasSelection()){
+            enable = false;
+        }
 
-            if (!tolCount) {
-                ActionManager::Instance()->enableAction(ActionManager::DetailVoiceSave, true);
-                if (blockData->ptrVoice->blockText.isEmpty() && !stateInterface->isVoice2Text()) {
-                     ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, true);
-                }
-            }
-
-            VoiceNoteItem *item = static_cast<VoiceNoteItem *>(widget);
-            bool enable = true;
-
-            if (stateInterface->isVoice2Text() &&
-                    (m_curAsrItem == item || m_curAsrItem->hasSelection())) {
-                enable = false;
-            }
-
-            if ((m_curPlayItem == item) || (m_curPlayItem && m_curPlayItem->hasSelection())) {
-                enable = false;
-            }
-
-            if (tolCount && textCount == 0) {
-                if (tolCount != 1 || !item->hasSelection()) {
-                    enable = false;
-                }
-            }
-
+        if (enable) {
+            ActionManager::Instance()->enableAction(ActionManager::DetailCut, enable);
             ActionManager::Instance()->enableAction(ActionManager::DetailDelete, enable);
-            if (tolCount && enable) {
-                ActionManager::Instance()->enableAction(ActionManager::DetailCut, enable);
-            }
-
-        } else if (blockData->blockType == VNoteBlock::Text) {
-            if (!tolCount) {
-                ActionManager::Instance()->enableAction(ActionManager::DetailPaste, true);
-            }
         }
+    }else {
+         VNoteBlock *blockData = nullptr;
+         if (widget != nullptr) {
+             blockData = widget->getNoteBlock();
+             if(blockData != nullptr){
+                 if (blockData->blockType == VNoteBlock::Voice){
+                     if (!checkFileExist(blockData->ptrVoice->voicePath)) {
+                         delWidget(widget);
+                         updateData();
+                         return;
+                     }
+
+                     ActionManager::Instance()->enableAction(ActionManager::DetailVoiceSave, true);
+                     if (blockData->ptrVoice->blockText.isEmpty() && !stateInterface->isVoice2Text()) {
+                          ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, true);
+                     }
+
+                     bool enable = true;
+                     if(m_curPlayItem && m_curPlayItem == widget){
+                         enable = false;
+                     }
+
+                     if(stateInterface->isVoice2Text() && m_curAsrItem == widget){
+                         enable = false;
+                     }
+
+                     if(enable){
+                         ActionManager::Instance()->enableAction(ActionManager::DetailDelete, enable);
+                     }
+
+                 }else if (blockData->blockType == VNoteBlock::Text) {
+                     ActionManager::Instance()->enableAction(ActionManager::DetailPaste, true);
+                }
+             }
+         }
     }
 }
 
