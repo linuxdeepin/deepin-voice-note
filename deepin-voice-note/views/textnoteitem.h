@@ -26,6 +26,8 @@ public:
     QString getSelectText();
     void setFocus();
     bool hasFocus();
+    bool isSelectAll();
+
 signals:
     void        sigCursorHeightChange(QWidget*widget, int height);
     void        sigTextChanged();
@@ -35,7 +37,7 @@ signals:
 private:
     void         initUi();
     void         initConnection();
-    bool m_select   {false};
+    bool m_selectAll   {false};
     VNoteBlock   *m_noteBlock {nullptr};
     TextNoteEdit *m_textEdit {nullptr};
     QRegExp       m_serchKey ;

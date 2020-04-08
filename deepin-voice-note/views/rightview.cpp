@@ -731,8 +731,8 @@ void RightView::delSelectText()
         DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
         if (widget->hasSelection()) {
             VNoteBlock *block = widget->getNoteBlock();
-            if (block->blockType == VNoteBlock::Text) {
-                if (widget->getAllText() != widget->getSelectText()) {
+            if(widget->isSelectAll() == false){
+                if (block->blockType == VNoteBlock::Text) {
                     widget->removeSelectText();
                     widget->getNoteBlock()->blockText =  widget->getAllText();
                     continue;
@@ -747,9 +747,9 @@ void RightView::delSelectText()
             bool merge = i == delListWidget.size() - 1 ? true : false;
             delWidget(delListWidget[i], merge);
         }
-        updateData();
-        clearAllSelection();
     }
+    updateData();
+    clearAllSelection();
 }
 
 void RightView::clearAllSelection()

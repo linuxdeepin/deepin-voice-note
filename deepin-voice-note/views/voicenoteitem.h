@@ -50,7 +50,6 @@ public:
     void enblePlayBtn(bool enable);
     bool asrTextNotEmpty();
     bool isAsrTextPos(const QPoint &globalPos);
-    bool isAsring();
 
     void updateAnim() override;
     void stopAnim() override;
@@ -70,6 +69,7 @@ public:
     void setFocus() override;
     bool hasFocus() override;
     bool hasSelection() override;
+    bool isSelectAll() override;
     QString getAllText() override;
     QString getSelectText() override;
 
@@ -88,7 +88,7 @@ public slots:
 private:
     void initUi();
     void initConnection();
-    bool m_select   {false};
+    bool m_selectAll   {false};
     DLabel          *m_hornLab {nullptr};
     DLabel          *m_createTimeLab {nullptr};
     DLabel          *m_voiceSizeLab {nullptr};

@@ -144,6 +144,7 @@ public:
     virtual void selectAllText() = 0;
     virtual void clearSelection() = 0;
     virtual bool hasSelection() = 0;
+    virtual bool isSelectAll() = 0;
     virtual QString getAllText() = 0;
     virtual QString getSelectText() = 0;
 };

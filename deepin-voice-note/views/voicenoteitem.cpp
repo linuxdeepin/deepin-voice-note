@@ -233,7 +233,7 @@ void VoiceNoteItem::selectText(const QPoint &globalPos, QTextCursor::MoveOperati
     if(asrTextNotEmpty()){
        m_asrText->selectText(globalPos,op);
     }
-    m_select = true;
+    m_selectAll = true;
 }
 
 void VoiceNoteItem::selectText(QTextCursor::MoveOperation op)
@@ -243,7 +243,7 @@ void VoiceNoteItem::selectText(QTextCursor::MoveOperation op)
     if(asrTextNotEmpty()){
       m_asrText->moveCursor(op,QTextCursor::KeepAnchor);
     }
-    m_select = true;
+    m_selectAll = true;
 }
 
 void VoiceNoteItem::selectAllText()
@@ -253,7 +253,7 @@ void VoiceNoteItem::selectAllText()
     if(asrTextNotEmpty()){
         m_asrText->selectAll();
     }
-    m_select = true;
+    m_selectAll = true;
 }
 
 void VoiceNoteItem::clearSelection()
@@ -262,7 +262,7 @@ void VoiceNoteItem::clearSelection()
     if(asrTextNotEmpty()){
        m_asrText->clearSelection();
     }
-    m_select = false;
+    m_selectAll = false;
 }
 
 QString VoiceNoteItem::getSelectText()
@@ -292,7 +292,7 @@ QString VoiceNoteItem::getAllText()
 
 bool VoiceNoteItem::hasSelection()
 {
-    return  m_select || (asrTextNotEmpty() && m_asrText->hasSelection());
+    return  m_selectAll || (asrTextNotEmpty() && m_asrText->hasSelection());
 }
 
 void VoiceNoteItem::removeSelectText()
@@ -361,9 +361,9 @@ bool VoiceNoteItem::hasFocus()
     return false;
 }
 
-bool VoiceNoteItem::isAsring()
+bool VoiceNoteItem::isSelectAll()
 {
-    return  m_asrText->isVisible() && m_noteBlock->blockText.isEmpty();
+    return  m_selectAll;
 }
 
 void VoiceNoteItem::updateAnim()
@@ -423,3 +423,4 @@ void PlayAnimInferface::setAnimTimer(QTimer *timer)
 void PlayAnimInferface::updateAnim()
 {
 }
+
