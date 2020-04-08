@@ -240,6 +240,14 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
 
 void MiddleView::initUI()
 {
+    //TODO:
+    //    HQ & scaler > 1 have one line at
+    //the footer of DListView,so add footer
+    //to solve this bug
+    QWidget* footer = new QWidget(this);
+    footer->setFixedHeight(1);
+    addFooterWidget(footer);
+
     m_emptySearch = new DLabel(this);
     m_emptySearch->setText(DApplication::translate("MiddleView", "No search results"));
     m_emptySearch->setAlignment(Qt::AlignCenter);
