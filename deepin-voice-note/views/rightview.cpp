@@ -730,14 +730,12 @@ void RightView::delSelectText()
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
         DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
         if (widget->hasSelection()) {
-            if (i == 0 || i == m_viewportLayout->count() - 2) {
-                VNoteBlock *block = widget->getNoteBlock();
-                if (block->blockType == VNoteBlock::Text) {
-                    if (widget->getAllText() != widget->getSelectText()) {
-                        widget->removeSelectText();
-                        widget->getNoteBlock()->blockText =  widget->getAllText();
-                        continue;
-                    }
+            VNoteBlock *block = widget->getNoteBlock();
+            if (block->blockType == VNoteBlock::Text) {
+                if (widget->getAllText() != widget->getSelectText()) {
+                    widget->removeSelectText();
+                    widget->getNoteBlock()->blockText =  widget->getAllText();
+                    continue;
                 }
             }
             delListWidget.push_back(widget);
