@@ -19,19 +19,16 @@ QString Utils::convertDateTime(const QDateTime &dateTime)
         qint64 offsetSec = dateTime.secsTo(QDateTime::currentDateTime());
         if (offsetSec < 3600) {
             offsetSec /= 60;
-            if (offsetSec == 0) {
-                offsetSec = 1;
+            if(offsetSec <= 1){
+                disptime = DApplication::translate("Utils","1 min ago");
+            }else {
+                disptime = DApplication::translate("Utils","%1 mins ago").arg(offsetSec);
             }
-            disptime = QString::number(offsetSec) + "分钟前";
         } else {
             disptime = dateTime.toString("hh:mm");
         }
     } else if (1 == offset) {
-        disptime.append("昨天");
-        disptime.append(dateTime.toString("hh:mm"));
-    } else if (2 == offset) {
-        disptime.append("前天");
-        disptime.append(dateTime.toString("hh:mm"));
+        disptime = DApplication::translate("Utils","Yesterday") + dateTime.toString("hh:mm");
     } else if (folerDate.year() == currDateTime.year()) {
         //不跨年 其他时间：MM-DD（例如：9-27）；
         disptime = dateTime.toString("MM-dd");
