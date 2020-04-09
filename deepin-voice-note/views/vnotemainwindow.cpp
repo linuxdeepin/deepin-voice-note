@@ -1119,14 +1119,15 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         editNote();
         break;
     case ActionManager::DetailDelete: {
-         if(m_rightView->showDelDialog()){
+        int ret = m_rightView->showDelDialog();
+         if(ret == 1){
              VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
              connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
                  m_rightView->doDelAction();
              });
 
              confirmDialog.exec();
-         }else {
+         }else if(ret == 0){
             m_rightView->doDelAction();
         }
 
@@ -1406,6 +1407,7 @@ void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
     }
     setSpecialStatus(PlayVoiceEnd);
     m_rightView->setCurVoicePlay(nullptr);
+    m_rightView->setFocus();
 }
 
 bool VNoteMainWindow::canDoShortcutAction() const

@@ -706,21 +706,10 @@ QString RightView::copySelectText()
     return text;
 }
 
-void RightView::cutSelectText(bool isByAction)
+void RightView::cutSelectText()
 {
-    if (m_curItemWidget) {
-        if (!isByAction) {
-            initAction(m_curItemWidget);
-            QAction *cutAction = ActionManager::Instance()->getActionById(ActionManager::DetailCut);
-            if (!cutAction->isEnabled()) {
-                qDebug() << "can not cut";
-                return;
-            }
-        }
-
-        copySelectText();
-        delSelectText();
-    }
+    copySelectText();
+    delSelectText();
 }
 
 void RightView::delSelectText()
@@ -806,25 +795,24 @@ void RightView::keyPressEvent(QKeyEvent *e)
         switch (e->key()) {
         case Qt::Key_C:
             if(hasSelection()){
-               copySelectText();
+                copySelectText();
             }
             break;
         case Qt::Key_A:
             selectAllItem();
             break;
-        case Qt::Key_X:
-            if(hasSelection()){
-                if(showDelDialog()){
-                    VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
-                    connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this](){
-                        cutSelectText(false);
-                    });
-                    confirmDialog.exec();
-                }else {
-                   cutSelectText(false);
-                }
+        case Qt::Key_X:{
+            int ret = showDelDialog();
+            if(ret == 1){
+                VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
+                connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this](){
+                    cutSelectText();
+                });
+                confirmDialog.exec();
+            }else if(ret == 0){
+                cutSelectText();
             }
-            break;
+        } break;
         case Qt::Key_V:
             pasteText();
             break;
@@ -832,14 +820,15 @@ void RightView::keyPressEvent(QKeyEvent *e)
             break;
         }
     } else if (e->key() == Qt::Key_Delete) {
-        if(showDelDialog()){
+        int ret = showDelDialog();
+        if(ret == 1){
             VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
             connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this](){
-                doDelAction(false);
+                doDelAction();
             });
             confirmDialog.exec();
-        }else {
-           doDelAction(false);
+        }else if(ret == 0){
+            doDelAction();
         }
     }
 }
@@ -876,44 +865,49 @@ bool RightView::hasSelection()
     return false;
 }
 
-void RightView::doDelAction(bool isByAction)
+void RightView::doDelAction()
 {
-    if (m_curItemWidget) {
-        if (!isByAction) {
-            initAction(m_curItemWidget);
-            QAction *delAction = ActionManager::Instance()->getActionById(ActionManager::DetailDelete);
-            if (!delAction->isEnabled()) {
-                qDebug() << "can not del";
-                return;
-            }
+    if (hasSelection()) {
+        delSelectText();
+    } else if (m_curItemWidget) {
+        VNoteBlock *block = m_curItemWidget->getNoteBlock();
+        if (block->blockType == VNoteBlock::Voice) {
+            delWidget(m_curItemWidget);
+            updateData();
         }
-
-        if (hasSelection()) {
-            delSelectText();
-        } else if (m_curItemWidget) {
-            VNoteBlock *block = m_curItemWidget->getNoteBlock();
-            if (block->blockType == VNoteBlock::Voice) {
-                delWidget(m_curItemWidget);
-                updateData();
-            }
-        }
-
     }
 }
 
-bool RightView::showDelDialog()
+int RightView::showDelDialog()
 {
-    bool showDialog = false;
     int voiceCount, textCount;
     getSelectionCount(voiceCount, textCount);
+    OpsStateInterface * stateInterface = gVNoteOpsStates();
+
     if (voiceCount) {
-        showDialog = true;
+        if(m_curPlayItem && m_curPlayItem->hasSelection()){
+            return -1;
+        }
+
+        if(stateInterface->isVoice2Text() && m_curAsrItem && m_curAsrItem->hasSelection()){
+            return -1;
+        }
+
+        return 1;
     } else if (m_curItemWidget) {
         if (!textCount && m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Voice) {
-            showDialog = true;
+            if(m_curItemWidget == m_curPlayItem){
+                return  -1;
+            }
+
+            if(stateInterface->isVoice2Text() && m_curAsrItem == m_curItemWidget){
+                return -1;
+            }
+
+            return 1;
         }
     }
-    return showDialog;
+    return 0;
 }
 
 void RightView::initConnection()

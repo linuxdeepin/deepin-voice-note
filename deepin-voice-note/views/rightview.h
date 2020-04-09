@@ -42,9 +42,9 @@ public:
     void  initAction(DetailItemWidget * widget);
     void  getSelectionCount(int &voiceCount, int &textCount);
     QString copySelectText(); //复制文本
-    void cutSelectText(bool isByAction = true); //剪切文本
+    void cutSelectText(); //剪切文本
     void delSelectText();
-    void doDelAction(bool isByAction = true);
+    void doDelAction();
 
     void setCurVoicePlay(VoiceNoteItem* item);
     void setCurVoiceAsr(VoiceNoteItem* item);
@@ -55,7 +55,7 @@ public:
 
     DetailItemWidget *getMenuItem();
     bool        hasSelection();
-    bool        showDelDialog();
+    int         showDelDialog();
 
 signals:
     void sigVoicePlay(VNVoiceBlock *voiceData);
