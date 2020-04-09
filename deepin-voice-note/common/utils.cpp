@@ -19,7 +19,7 @@ QString Utils::convertDateTime(const QDateTime &dateTime)
         qint64 offsetSec = dateTime.secsTo(QDateTime::currentDateTime());
         if (offsetSec < 3600) {
             offsetSec /= 60;
-            if(offsetSec == 0){
+            if (offsetSec == 0) {
                 offsetSec = 1;
             }
             disptime = QString::number(offsetSec) + "分钟前";
@@ -66,7 +66,7 @@ QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplicatio
 QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
 {
     DGuiApplicationHelper::ColorType theme =
-            DGuiApplicationHelper::instance()->themeType();
+        DGuiApplicationHelper::instance()->themeType();
 
     QString iconPath(STAND_ICON_PAHT);
 
@@ -101,7 +101,7 @@ QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
     return pixmap;
 }
 
-int Utils::highTextEdit(DTextEdit *textEdit, const QTextCharFormat &oriFormat, const QRegExp &searchKey,
+int Utils::highTextEdit(DTextEdit *textEdit, const QTextCharFormat &oriFormat, const QString &searchKey,
                         const QColor &highColor)
 {
     int findCount = 0;

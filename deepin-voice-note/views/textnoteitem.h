@@ -9,14 +9,14 @@ class TextNoteItem : public DetailItemWidget
 {
     Q_OBJECT
 public:
-    explicit TextNoteItem(VNoteBlock *noteBlock, QWidget *parent = nullptr , QRegExp reg = QRegExp());
+    explicit TextNoteItem(VNoteBlock *noteBlock, QWidget *parent = nullptr, QString reg = "");
     VNoteBlock *getNoteBlock();
     QTextCursor getTextCursor();
     void        setTextCursor(const QTextCursor &cursor);
     void        updateData();
     bool        textIsEmpty();
     QRect       getCursorRect();
-    void selectText(const QPoint &globalPos,QTextCursor::MoveOperation op);
+    void selectText(const QPoint &globalPos, QTextCursor::MoveOperation op);
     void selectText(QTextCursor::MoveOperation op);
     void removeSelectText();
     void selectAllText();
@@ -29,7 +29,7 @@ public:
     bool isSelectAll();
 
 signals:
-    void        sigCursorHeightChange(QWidget*widget, int height);
+    void        sigCursorHeightChange(QWidget *widget, int height);
     void        sigTextChanged();
     void        sigFocusIn();
     void        sigFocusOut();
@@ -40,7 +40,7 @@ private:
     bool m_selectAll   {false};
     VNoteBlock   *m_noteBlock {nullptr};
     TextNoteEdit *m_textEdit {nullptr};
-    QRegExp       m_serchKey ;
+    QString       m_serchKey ;
     QTextCharFormat m_textCharFormat;
 
 };

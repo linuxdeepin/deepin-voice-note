@@ -111,7 +111,7 @@ void VNoteMainWindow::initData()
 
 void VNoteMainWindow::initAppSetting()
 {
-    m_qspSetting = reinterpret_cast<VNoteApplication*>(qApp)->appSetting();
+    m_qspSetting = reinterpret_cast<VNoteApplication *>(qApp)->appSetting();
 }
 
 void VNoteMainWindow::initConnections()
@@ -192,17 +192,18 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNotebook->setAutoRepeat(false);
 
     connect(m_stNewNotebook.get(), &QShortcut::activated, this, [this] {
-        static struct timeval curret = {0,0};
-        static struct timeval lastPress = {0,0};
+        static struct timeval curret = {0, 0};
+        static struct timeval lastPress = {0, 0};
 
         gettimeofday(&curret, nullptr);
 
-        if (TM(lastPress, curret) > MIN_STKEY_RESP_TIME) {
+        if (TM(lastPress, curret) > MIN_STKEY_RESP_TIME)
+        {
             if (!(isRecording()
-                  || isPlaying()
-                  || isVoice2Text()
-                  || isSearching() )
-                    ) {
+                    || isPlaying()
+                    || isVoice2Text()
+                    || isSearching())
+               ) {
                 addNotepad();
 
                 //If do shortcut in home page,need switch to note
@@ -223,7 +224,8 @@ void VNoteMainWindow::initShortcuts()
     m_stRemNotebook->setAutoRepeat(false);
 
     connect(m_stRemNotebook.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction())
+        {
             if (!isSearching()) {
                 editNotepad();
             }
@@ -238,15 +240,16 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNote->setAutoRepeat(false);
 
     connect(m_stNewNote.get(), &QShortcut::activated, this, [this] {
-        static struct timeval curret = {0,0};
-        static struct timeval lastPress = {0,0};
+        static struct timeval curret = {0, 0};
+        static struct timeval lastPress = {0, 0};
 
         gettimeofday(&curret, nullptr);
 
-        if (TM(lastPress, curret) > MIN_STKEY_RESP_TIME) {
+        if (TM(lastPress, curret) > MIN_STKEY_RESP_TIME)
+        {
             if (canDoShortcutAction() &&
                     !(isRecording() || isPlaying() || isVoice2Text() || isSearching())
-                    ) {
+               ) {
                 addNote();
             }
 
@@ -261,7 +264,8 @@ void VNoteMainWindow::initShortcuts()
     m_stRemNote->setAutoRepeat(false);
 
     connect(m_stRemNote.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction())
+        {
             editNote();
         }
     });
@@ -274,7 +278,8 @@ void VNoteMainWindow::initShortcuts()
     m_stPlayorPause->setAutoRepeat(false);
 
     connect(m_stPlayorPause.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction())
+        {
             m_recordBar->playOrPauseVoice();
         }
     });
@@ -286,7 +291,8 @@ void VNoteMainWindow::initShortcuts()
     m_stRecording->setAutoRepeat(false);
 
     connect(m_stRecording.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction())
+        {
             if (!isRecording() && !isSearching() && !isPlaying()) {
                 m_recordBar->onStartRecord();
             }
@@ -301,7 +307,8 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stVoice2Text.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction())
+        {
             if (!isVoice2Text()) {
                 this->onA2TStart();
             }
@@ -317,8 +324,9 @@ void VNoteMainWindow::initShortcuts()
     connect(m_stSaveAsMp3.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         Q_UNUSED(this);
-        if (canDoShortcutAction()) {
-            VNoteItem* currNote = m_middleView->getCurrVNotedata();
+        if (canDoShortcutAction())
+        {
+            VNoteItem *currNote = m_middleView->getCurrVNotedata();
             if (nullptr != currNote) {
                 if (currNote->haveVoice()) {
                     m_rightView->saveMp3();
@@ -335,8 +343,9 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stSaveAsText.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        if (canDoShortcutAction()) {
-            VNoteItem* currNote = m_middleView->getCurrVNotedata();
+        if (canDoShortcutAction())
+        {
+            VNoteItem *currNote = m_middleView->getCurrVNotedata();
             if (nullptr != currNote) {
                 if (currNote->haveText()) {
                     m_middleView->saveAsText();
@@ -353,10 +362,11 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stSaveVoices.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction())
+        {
             //Can't save recording when do recording.
             if (!isRecording()) {
-                VNoteItem* currNote = m_middleView->getCurrVNotedata();
+                VNoteItem *currNote = m_middleView->getCurrVNotedata();
                 if (nullptr != currNote) {
                     if (currNote->haveVoice()) {
                         m_middleView->saveRecords();
@@ -373,42 +383,43 @@ void VNoteMainWindow::initShortcuts()
     m_stDelete->setAutoRepeat(false);
 
     connect(m_stDelete.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
-                QAction *deleteAct = nullptr;
+        if (canDoShortcutAction())
+        {
+            QAction *deleteAct = nullptr;
 
-                /*
-                 * TODO:
-                 *     We check focus here to choice what action we will
-                 * take. Focus in leftview for delete notebook, in midlle
-                 * view for delete note, in Rightview for delete note content.
-                 * or do nothing.
-                 * */
-                if (m_leftView->hasFocus()) {
-                    if(!isRecording() && !isVoice2Text() && !isPlaying()){
-                        deleteAct = ActionManager::Instance()->getActionById(
-                                    ActionManager::NotebookDelete);
-                    }
-                } else if (m_middleView->hasFocus()) {
-                    if(!isRecording() && !isVoice2Text() && !isPlaying() && m_middleView->count() > 0){
-                        deleteAct = ActionManager::Instance()->getActionById(
-                                    ActionManager::NoteDelete);
-                    }
-                }else if (m_rightView->hasFocus()) {
-
-                    DetailItemWidget *menuItem = m_rightView->getMenuItem();
-                    VoiceNoteItem  *playItem = m_rightView->getCurVoicePlay();
-                    VoiceNoteItem  *asrItem = m_rightView->getCurVoiceAsr();
-
-                    if(menuItem != playItem && menuItem != asrItem){
-                        deleteAct = ActionManager::Instance()->getActionById(
-                                    ActionManager::DetailDelete);
-                    }
+            /*
+             * TODO:
+             *     We check focus here to choice what action we will
+             * take. Focus in leftview for delete notebook, in midlle
+             * view for delete note, in Rightview for delete note content.
+             * or do nothing.
+             * */
+            if (m_leftView->hasFocus()) {
+                if (!isRecording() && !isVoice2Text() && !isPlaying()) {
+                    deleteAct = ActionManager::Instance()->getActionById(
+                        ActionManager::NotebookDelete);
                 }
-                if (nullptr != deleteAct) {
-                    deleteAct->triggered();
+            } else if (m_middleView->hasFocus()) {
+                if (!isRecording() && !isVoice2Text() && !isPlaying() && m_middleView->count() > 0) {
+                    deleteAct = ActionManager::Instance()->getActionById(
+                                    ActionManager::NoteDelete);
+                }
+            } else if (m_rightView->hasFocus()) {
+
+                DetailItemWidget *menuItem = m_rightView->getMenuItem();
+                VoiceNoteItem  *playItem = m_rightView->getCurVoicePlay();
+                VoiceNoteItem  *asrItem = m_rightView->getCurVoiceAsr();
+
+                if (menuItem != playItem && menuItem != asrItem) {
+                    deleteAct = ActionManager::Instance()->getActionById(
+                                    ActionManager::DetailDelete);
                 }
             }
-        });
+            if (nullptr != deleteAct) {
+                deleteAct->triggered();
+            }
+        }
+    });
 
     m_stPreviewShortcuts.reset(new QShortcut(this));
     m_stPreviewShortcuts->setKey(QString("Ctrl+Shift+/"));
@@ -565,7 +576,7 @@ void VNoteMainWindow::initRightView()
     m_recordBarHolder->setFixedHeight(78);
     QVBoxLayout *recordBarHolderLayout = new QVBoxLayout(m_recordBarHolder);
     recordBarHolderLayout->setSpacing(0);
-    recordBarHolderLayout->setContentsMargins(4,0,4,4);
+    recordBarHolderLayout->setContentsMargins(4, 0, 4, 4);
 
     m_recordBar = new VNoteRecordBar(m_recordBarHolder);
     m_recordBar->setBackgroundRole(DPalette::Base);
@@ -665,7 +676,7 @@ void VNoteMainWindow::initDelayWork()
     //Community verson don't have aiservice.
     if (!isAiSrvExist()) {
         QAction *a2tAction = ActionManager::Instance()->getActionById(
-                    ActionManager::DetailVoice2Text);
+                                 ActionManager::DetailVoice2Text);
         if (nullptr != a2tAction) {
             a2tAction->setVisible(false);
         }
@@ -674,7 +685,7 @@ void VNoteMainWindow::initDelayWork()
 
 void VNoteMainWindow::delayInitTasks()
 {
-    VNMainWndDelayInitTask* pMainWndDelayTask = new VNMainWndDelayInitTask(this);
+    VNMainWndDelayInitTask *pMainWndDelayTask = new VNMainWndDelayInitTask(this);
     pMainWndDelayTask->setAutoDelete(true);
     pMainWndDelayTask->setObjectName("MainWindowDelayTask");
 
@@ -698,8 +709,9 @@ void VNoteMainWindow::onVNoteSearch()
         QString strKey = m_noteSearchEdit->text();
         if (!strKey.isEmpty()) {
             setSpecialStatus(SearchStart);
-            m_searchKey.setPattern(strKey);
-            m_searchKey.setCaseSensitivity(Qt::CaseInsensitive);
+            m_searchKey = strKey;
+//            m_searchKey.setPattern(strKey);
+//            m_searchKey.setCaseSensitivity(Qt::CaseInsensitive);
             loadSearchNotes(m_searchKey);
         } else {
             setSpecialStatus(SearchEnd);
@@ -756,12 +768,12 @@ void VNoteMainWindow::initEmptyFoldersView()
     m_wndHomePage = new HomePage(this);
 }
 
-void VNoteMainWindow::onStartRecord(const QString& path)
+void VNoteMainWindow::onStartRecord(const QString &path)
 {
     setSpecialStatus(RecordStart);
 
     //Add recording data safer.
-    VNoteItem* currentNote = m_middleView->getCurrVNotedata();
+    VNoteItem *currentNote = m_middleView->getCurrVNotedata();
 
     if (nullptr != currentNote && !path.isEmpty()) {
         VDataSafer safer;
@@ -786,7 +798,7 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
         m_rightView->insertVoiceItem(voicePath, voiceSize);
 
         //Recording normal,remove the data safer.
-        VNoteItem* currentNote = m_middleView->getCurrVNotedata();
+        VNoteItem *currentNote = m_middleView->getCurrVNotedata();
 
         if (nullptr != currentNote && !voicePath.isEmpty()) {
             VDataSafer safer;
@@ -826,13 +838,13 @@ void VNoteMainWindow::onA2TStart(bool first)
     m_asrErrMeassage->setVisible(false);
     VoiceNoteItem    *asrVoiceItem = nullptr;
 
-    if(first){
+    if (first) {
         DetailItemWidget *widget = m_rightView->getMenuItem();
-        if(widget && widget->getNoteBlock()->blockType == VNoteBlock::Voice){
+        if (widget && widget->getNoteBlock()->blockType == VNoteBlock::Voice) {
             asrVoiceItem = static_cast<VoiceNoteItem *>(widget);
             m_rightView->setCurVoiceAsr(asrVoiceItem);
         }
-    }else {
+    } else {
         asrVoiceItem = m_rightView->getCurVoiceAsr();
     }
 
@@ -1074,9 +1086,9 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
 
-    if(data == nullptr || isSearching()){
+    if (data == nullptr || isSearching()) {
         m_recordBar->setVisible(false);
-    }else{
+    } else {
         m_recordBar->setVisible(true);
     }
 
@@ -1120,14 +1132,14 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         break;
     case ActionManager::DetailDelete: {
         int ret = m_rightView->showDelDialog();
-         if(ret == 1){
-             VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
-             connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
-                 m_rightView->doDelAction();
-             });
+        if (ret == 1) {
+            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
+            connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+                m_rightView->doDelAction();
+            });
 
-             confirmDialog.exec();
-         }else if(ret == 0){
+            confirmDialog.exec();
+        } else if (ret == 0) {
             m_rightView->doDelAction();
         }
 
@@ -1312,7 +1324,7 @@ void VNoteMainWindow::delNote()
         noteOper.deleteNote();
 
         //Refresh the middle view
-        if(m_middleView->rowCount() <= 0 && isSearching() ) {
+        if (m_middleView->rowCount() <= 0 && isSearching()) {
             m_middleView->setVisibleEmptySearch(true);
         }
 
@@ -1345,7 +1357,7 @@ int VNoteMainWindow::loadNotes(VNoteFolder *folder)
     return m_middleView->rowCount();
 }
 
-int VNoteMainWindow::loadSearchNotes(const QRegExp &key)
+int VNoteMainWindow::loadSearchNotes(const QString &key)
 {
     m_middleView->clearAll();
     m_middleView->setSearchKey(key);
@@ -1426,7 +1438,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNoteBtn->setVisible(false);
         break;
     case SearchEnd:
-        m_searchKey = QRegExp();
+        m_searchKey = "";
         m_middleView->setSearchKey(m_searchKey);
         m_leftView->setEnabled(true);
         m_addNotepadBtn->setVisible(true);
@@ -1436,7 +1448,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         onVNoteFolderChange(m_leftView->setDefaultNotepadItem(), QModelIndex());
         break;
     case PlayVoiceStart:
-        if(isSearching()){
+        if (isSearching()) {
             m_recordBar->setVisible(true);
         }
         operState(StatePlaying, true);
@@ -1447,7 +1459,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNoteBtn->setDisabled(true);
         break;
     case PlayVoiceEnd:
-        if(isSearching()){
+        if (isSearching()) {
             m_recordBar->setVisible(false);
         }
         if (!isVoice2Text()) {

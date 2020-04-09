@@ -24,19 +24,19 @@ void VNoteItem::delNoteData()
     }
 }
 
-bool VNoteItem::search(const QRegExp &keyword)
+bool VNoteItem::search(const QString &keyword)
 {
     bool fContainKeyword = false;
 
     //If title contain keyword,don't
     //need search data anymore.
-    if (noteTitle.contains(keyword)) {
+    if (noteTitle.contains(keyword, Qt::CaseInsensitive)) {
         fContainKeyword = true;
     } else {
         //Need search data blocks in note
         for (auto it : datas.datas) {
             if (VNoteBlock::Text == it->getType()) {
-                if (it->blockText.contains(keyword)) {
+                if (it->blockText.contains(keyword, Qt::CaseInsensitive)) {
                     fContainKeyword = true;
                     break;
                 }
@@ -76,7 +76,7 @@ VNoteBlock *VNoteItem::newBlock(int type)
 
 void VNoteItem::addBlock(VNoteBlock *block)
 {
-    if (VNoteBlock::Voice ==block->getType()) {
+    if (VNoteBlock::Voice == block->getType()) {
         maxVoiceId++;
     }
 
@@ -85,7 +85,7 @@ void VNoteItem::addBlock(VNoteBlock *block)
 
 void VNoteItem::addBlock(VNoteBlock *before, VNoteBlock *block)
 {
-    if (VNoteBlock::Voice ==block->getType()) {
+    if (VNoteBlock::Voice == block->getType()) {
         maxVoiceId++;
     }
 
@@ -122,7 +122,7 @@ bool VNoteItem::haveText() const
     return fHaveText;
 }
 
-QDebug& operator << (QDebug &out, VNoteItem &noteItem)
+QDebug &operator << (QDebug &out, VNoteItem &noteItem)
 {
     out << "\n{ "
         << "noteId=" << noteItem.noteId << ","
@@ -147,7 +147,7 @@ DetailItemWidget::DetailItemWidget(QWidget *parent)
 }
 
 VNoteBlock::VNoteBlock(qint32 type)
-    :blockType(type)
+    : blockType(type)
 {
     ptrBlock = this;
 }
@@ -163,7 +163,7 @@ qint32 VNoteBlock::getType()
 }
 
 VNTextBlock::VNTextBlock()
-    :VNoteBlock(Text)
+    : VNoteBlock(Text)
 {
 }
 
@@ -182,7 +182,7 @@ void VNTextBlock::releaseSpecificData()
 }
 
 VNVoiceBlock::VNVoiceBlock()
-    :VNoteBlock(Voice)
+    : VNoteBlock(Voice)
 {
     blockType = Voice;
 }

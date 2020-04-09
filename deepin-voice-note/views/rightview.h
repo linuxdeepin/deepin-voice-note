@@ -25,11 +25,11 @@ class RightView : public DWidget
     Q_OBJECT
 public:
     explicit RightView(QWidget *parent = nullptr);
-    void initData(VNoteItem *data, QRegExp reg = QRegExp(), bool fouse = false);
+    void initData(VNoteItem *data, QString reg, bool fouse = false);
     DetailItemWidget *insertVoiceItem(const QString &voicePath, qint64 voiceSize);
     DetailItemWidget *insertTextEdit(VNoteBlock *data, bool focus = false,
-                                     QTextCursor::MoveOperation op =QTextCursor::NoMove,
-                                     QRegExp reg = QRegExp());
+                                     QTextCursor::MoveOperation op = QTextCursor::NoMove,
+                                     QString reg = "");
 
     void  setEnablePlayBtn(bool enable);
     void  delWidget(DetailItemWidget *widget, bool merge = true);
@@ -39,15 +39,15 @@ public:
     void  clearAllSelection();
     void  pasteText();
 
-    void  initAction(DetailItemWidget * widget);
+    void  initAction(DetailItemWidget *widget);
     void  getSelectionCount(int &voiceCount, int &textCount);
     QString copySelectText(); //复制文本
     void cutSelectText(); //剪切文本
     void delSelectText();
     void doDelAction();
 
-    void setCurVoicePlay(VoiceNoteItem* item);
-    void setCurVoiceAsr(VoiceNoteItem* item);
+    void setCurVoicePlay(VoiceNoteItem *item);
+    void setCurVoiceAsr(VoiceNoteItem *item);
     void saveMp3();
 
     VoiceNoteItem *getCurVoicePlay();
@@ -82,7 +82,7 @@ private:
     void initUi();
     void initConnection();
     void initMenu();
-    void onMenuShow(DetailItemWidget * widget);
+    void onMenuShow(DetailItemWidget *widget);
     void initAppSetting();
 
     bool        checkFileExist(const QString &file);

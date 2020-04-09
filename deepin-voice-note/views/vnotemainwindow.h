@@ -100,7 +100,7 @@ public slots:
     void onMenuAbout2Show();
     void onVNoteSearch();
     void onCursorChange(int height, bool mouseMove); //调整详情页滚动条
-    void onStartRecord(const QString& path);//开始录音
+    void onStartRecord(const QString &path);//开始录音
     void onFinshRecord(const QString &voicePath, qint64 voiceSize); //结束录音
     void onRightViewVoicePlay(VNVoiceBlock *voiceData);
     void onRightViewVoicePause(VNVoiceBlock *voiceData);
@@ -132,7 +132,7 @@ private:
     void editNote();
     void delNote();
     int loadNotes(VNoteFolder *folder);
-    int loadSearchNotes(const QRegExp &key);
+    int loadSearchNotes(const QString &key);
 
     //Check if wen can do shortcuts
     bool canDoShortcutAction() const;
@@ -192,12 +192,12 @@ private:
     //     Help                               //F1 DTK Implementaion
     //*****************Shortcut keys end**********************
 
-    QRegExp          m_searchKey;
+    QString          m_searchKey;
     //VoiceNoteItem    *m_currentAsrVoice {nullptr};
     DFloatingMessage *m_asrErrMeassage {nullptr};
     DPushButton      *m_asrAgainBtn {nullptr};
     //Login session manager
-    DBusLogin1Manager* m_pLogin1Manager {nullptr};
+    DBusLogin1Manager *m_pLogin1Manager {nullptr};
     QDBusPendingReply<QDBusUnixFileDescriptor> m_lockFd;
 
     friend class VNMainWndDelayInitTask;

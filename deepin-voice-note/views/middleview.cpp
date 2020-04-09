@@ -46,7 +46,7 @@ void MiddleView::initMenu()
     m_noteMenu = ActionManager::Instance()->noteContextMenu();
 }
 
-void MiddleView::setSearchKey(const QRegExp &key)
+void MiddleView::setSearchKey(const QString &key)
 {
     m_searchKey = key;
     m_pItemDelegate->setSearchKey(key);
@@ -68,7 +68,7 @@ void MiddleView::addRowAtHead(VNoteItem *note)
         QStandardItem *item = StandardItemCommon::createStandardItem(note, StandardItemCommon::NOTEITEM);
         m_pDataModel->insertRow(0, item);
 
-        DListView::setCurrentIndex( m_pSortViewFilter->index(0, 0));
+        DListView::setCurrentIndex(m_pSortViewFilter->index(0, 0));
     }
 }
 
@@ -88,9 +88,9 @@ void MiddleView::clearAll()
 VNoteItem *MiddleView::deleteCurrentRow()
 {
     QModelIndex index = currentIndex();
-    VNoteItem *noteData = reinterpret_cast< VNoteItem*>(
-                StandardItemCommon::getStandardItemData(index)
-                );
+    VNoteItem *noteData = reinterpret_cast< VNoteItem *>(
+                              StandardItemCommon::getStandardItemData(index)
+                          );
 
     m_pSortViewFilter->removeRow(index.row());
 
@@ -100,9 +100,9 @@ VNoteItem *MiddleView::deleteCurrentRow()
 VNoteItem *MiddleView::getCurrVNotedata() const
 {
     QModelIndex index = currentIndex();
-    VNoteItem *noteData = reinterpret_cast< VNoteItem*>(
-                StandardItemCommon::getStandardItemData(index)
-                );
+    VNoteItem *noteData = reinterpret_cast< VNoteItem *>(
+                              StandardItemCommon::getStandardItemData(index)
+                          );
 
     return noteData;
 }
@@ -131,16 +131,16 @@ void MiddleView::editNote()
 void MiddleView::saveAsText()
 {
     QModelIndex index = currentIndex();
-    VNoteItem *noteData = reinterpret_cast< VNoteItem*>(
-                StandardItemCommon::getStandardItemData(index)
-                );
+    VNoteItem *noteData = reinterpret_cast< VNoteItem *>(
+                              StandardItemCommon::getStandardItemData(index)
+                          );
     if (nullptr != noteData) {
         //TODO:
         //    Should check if this note is doing save action
 
         DFileDialog dialog;
         dialog.setFileMode(DFileDialog::DirectoryOnly);
-        dialog.setLabelText(DFileDialog::Accept,DApplication::translate("MiddleView","Save"));
+        dialog.setLabelText(DFileDialog::Accept, DApplication::translate("MiddleView", "Save"));
         dialog.setNameFilter("TXT(*.txt)");
 
         QString historyDir = m_qspSetting->value(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
@@ -154,8 +154,8 @@ void MiddleView::saveAsText()
             m_qspSetting->setValue(VNOTE_EXPORT_TEXT_PATH_KEY, dialog.directoryUrl().toLocalFile());
 
             QString exportDir = dialog.directoryUrl().toLocalFile();
-            ExportNoteWorker* exportWorker = new ExportNoteWorker(
-                        exportDir,ExportNoteWorker::ExportText, noteData);
+            ExportNoteWorker *exportWorker = new ExportNoteWorker(
+                exportDir, ExportNoteWorker::ExportText, noteData);
             exportWorker->setAutoDelete(true);
 
             QThreadPool::globalInstance()->start(exportWorker);
@@ -166,16 +166,16 @@ void MiddleView::saveAsText()
 void MiddleView::saveRecords()
 {
     QModelIndex index = currentIndex();
-    VNoteItem *noteData = reinterpret_cast< VNoteItem*>(
-                StandardItemCommon::getStandardItemData(index)
-                );
+    VNoteItem *noteData = reinterpret_cast< VNoteItem *>(
+                              StandardItemCommon::getStandardItemData(index)
+                          );
     if (nullptr != noteData) {
         //TODO:
         //    Should check if this note is doing save action
 
         DFileDialog dialog;
         dialog.setFileMode(DFileDialog::DirectoryOnly);
-        dialog.setLabelText(DFileDialog::Accept,DApplication::translate("MiddleView","Save"));
+        dialog.setLabelText(DFileDialog::Accept, DApplication::translate("MiddleView", "Save"));
         dialog.setNameFilter("MP3(*.mp3)");
 
         QString historyDir = m_qspSetting->value(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
@@ -190,8 +190,8 @@ void MiddleView::saveRecords()
 
             QString exportDir = dialog.directoryUrl().toLocalFile();
 
-            ExportNoteWorker* exportWorker = new ExportNoteWorker(
-                        exportDir,ExportNoteWorker::ExportAllVoice, noteData);
+            ExportNoteWorker *exportWorker = new ExportNoteWorker(
+                exportDir, ExportNoteWorker::ExportAllVoice, noteData);
             exportWorker->setAutoDelete(true);
 
             QThreadPool::globalInstance()->start(exportWorker);
@@ -244,7 +244,7 @@ void MiddleView::initUI()
     //    HQ & scaler > 1 have one line at
     //the footer of DListView,so add footer
     //to solve this bug
-    QWidget* footer = new QWidget(this);
+    QWidget *footer = new QWidget(this);
     footer->setFixedHeight(1);
     addFooterWidget(footer);
 
@@ -262,7 +262,7 @@ void MiddleView::initUI()
 
 void MiddleView::initAppSetting()
 {
-    m_qspSetting = reinterpret_cast<VNoteApplication*>(qApp)->appSetting();
+    m_qspSetting = reinterpret_cast<VNoteApplication *>(qApp)->appSetting();
 }
 
 void MiddleView::setVisibleEmptySearch(bool visible)

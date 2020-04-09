@@ -12,15 +12,14 @@ DWIDGET_USE_NAMESPACE
 
 struct VNoteBlock;
 
-struct VNoteItem
-{
+struct VNoteItem {
 public:
     VNoteItem();
 
     bool isValid();
     void delNoteData();
-    bool search(const QRegExp &keyword);
-    void setMetadata(const QVariant& meta);
+    bool search(const QString &keyword);
+    void setMetadata(const QVariant &meta);
 
     enum {
         INVALID_ID = -1
@@ -48,15 +47,15 @@ public:
     QDateTime modifyTime;
     QDateTime deleteTime;
 
-    qint32 & maxVoiceIdRef();
+    qint32 &maxVoiceIdRef();
     qint32 voiceMaxId() const;
 
     VNOTE_DATAS datas;
 
-    VNoteBlock* newBlock(int type);
-    void addBlock(VNoteBlock* block);
-    void addBlock(VNoteBlock* before, VNoteBlock* block);
-    void delBlock(VNoteBlock* block);
+    VNoteBlock *newBlock(int type);
+    void addBlock(VNoteBlock *block);
+    void addBlock(VNoteBlock *before, VNoteBlock *block);
+    void delBlock(VNoteBlock *block);
 
     bool haveVoice() const;
     bool haveText() const;
@@ -67,7 +66,7 @@ protected:
     //auto increment.
     qint32 maxVoiceId {0};
 
-    friend QDebug& operator << (QDebug& out, VNoteItem &noteItem);
+    friend QDebug &operator << (QDebug &out, VNoteItem &noteItem);
 };
 
 struct VNTextBlock;
@@ -95,14 +94,14 @@ struct VNoteBlock {
     QString blockText;
 
     union {
-        VNoteBlock*   ptrBlock;
-        VNTextBlock*  ptrText;
-        VNVoiceBlock* ptrVoice;
+        VNoteBlock   *ptrBlock;
+        VNTextBlock  *ptrText;
+        VNVoiceBlock *ptrVoice;
     };
 protected:
     VNoteBlock(qint32 type = InValid);
-    VNoteBlock( const VNoteBlock& );
-    const VNoteBlock& operator=( const VNoteBlock& );
+    VNoteBlock(const VNoteBlock &);
+    const VNoteBlock &operator=(const VNoteBlock &);
 };
 
 struct VNTextBlock  : public VNoteBlock {
@@ -124,21 +123,21 @@ struct VNVoiceBlock : public VNoteBlock {
 
 };
 
-class DetailItemWidget :public QWidget
+class DetailItemWidget : public QWidget
 {
     Q_OBJECT
 public:
     explicit DetailItemWidget(QWidget *parent = nullptr);
     virtual VNoteBlock *getNoteBlock() = 0;
     virtual QTextCursor getTextCursor() = 0;
-    virtual void        setTextCursor(const QTextCursor& cursor) = 0;
+    virtual void        setTextCursor(const QTextCursor &cursor) = 0;
     virtual void        updateData() = 0;
     virtual bool        textIsEmpty() = 0;
     virtual QRect       getCursorRect() = 0;
     virtual void        setFocus() = 0;
     virtual bool        hasFocus() = 0;
     //选中相关
-    virtual void selectText(const QPoint &globalPos,QTextCursor::MoveOperation op) = 0;
+    virtual void selectText(const QPoint &globalPos, QTextCursor::MoveOperation op) = 0;
     virtual void selectText(QTextCursor::MoveOperation op) = 0;
     virtual void removeSelectText() = 0;
     virtual void selectAllText() = 0;

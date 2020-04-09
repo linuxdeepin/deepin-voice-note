@@ -72,10 +72,10 @@ void RightView::initMenu()
 
 void RightView::initAppSetting()
 {
-    m_qspSetting = reinterpret_cast<VNoteApplication*>(qApp)->appSetting();
+    m_qspSetting = reinterpret_cast<VNoteApplication *>(qApp)->appSetting();
 }
 
-DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextCursor::MoveOperation op, QRegExp reg)
+DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextCursor::MoveOperation op, QString reg)
 {
     TextNoteItem *editItem = new TextNoteItem(data, this, reg);
     int index = 0;
@@ -88,7 +88,7 @@ DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextC
         editItem->setFocus();
     }
 
-    if(op != QTextCursor::NoMove){
+    if (op != QTextCursor::NoMove) {
         QTextCursor cursor = editItem->getTextCursor();
         cursor.movePosition(op);
         editItem->setTextCursor(cursor);
@@ -139,7 +139,7 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
         cutStr = cursor.selectedText();
         cursor.removeSelectedText();
 
-        if(!cutStr.isEmpty()){
+        if (!cutStr.isEmpty()) {
             curBlock->blockText = m_curItemWidget->getAllText();
         }
     }
@@ -162,14 +162,14 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
     DetailItemWidget *nextWidget = static_cast<DetailItemWidget *>(nextlayoutItem->widget());
     VNoteBlock *nextBlock = nullptr;
 
-    if(nextWidget == m_placeholderWidget){ //最后要加个编辑框
+    if (nextWidget == m_placeholderWidget) { //最后要加个编辑框
         needTextEdit = true;
-    }else {
+    } else {
         nextBlock = nextWidget->getNoteBlock();
-        if(nextBlock->blockType == VNoteBlock::Voice){ //下一个还是语音项要加编辑框
+        if (nextBlock->blockType == VNoteBlock::Voice) { //下一个还是语音项要加编辑框
             needTextEdit = true;
-        }else if (nextBlock->blockType == VNoteBlock::Text) {
-            if(!cutStr.isEmpty()){
+        } else if (nextBlock->blockType == VNoteBlock::Text) {
+            if (!cutStr.isEmpty()) {
                 nextBlock->blockText = cutStr + nextWidget->getAllText();
                 nextWidget->updateData();
             }
@@ -232,7 +232,7 @@ void RightView::onTextEditTextChange()
     }
 }
 
-void RightView::initData(VNoteItem *data, QRegExp reg, bool fouse)
+void RightView::initData(VNoteItem *data, QString reg, bool fouse)
 {
     while (m_viewportLayout->indexOf(m_placeholderWidget) != 0) {
         QWidget *widget = m_viewportLayout->itemAt(0)->widget();
@@ -277,7 +277,7 @@ void RightView::initData(VNoteItem *data, QRegExp reg, bool fouse)
         m_noteItemData->addBlock(nullptr, textBlock);
     }
 
-    if(fouse == false){
+    if (fouse == false) {
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(0);
         m_curItemWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
     }
@@ -356,30 +356,30 @@ void RightView::initAction(DetailItemWidget *widget)
 {
     ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteDetailCtxMenu, false);
 
-    if(m_viewportLayout->count() == 2){
+    if (m_viewportLayout->count() == 2) {
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(0);
         DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
-        if(widget && !widget->textIsEmpty()){
+        if (widget && !widget->textIsEmpty()) {
             ActionManager::Instance()->enableAction(ActionManager::DetailSelectAll, true);
         }
-    }else {
-         ActionManager::Instance()->enableAction(ActionManager::DetailSelectAll, true);
+    } else {
+        ActionManager::Instance()->enableAction(ActionManager::DetailSelectAll, true);
     }
 
     int voiceCount, textCount, tolCount;
     getSelectionCount(voiceCount, textCount);
     tolCount = voiceCount + textCount;
 
-    OpsStateInterface * stateInterface = gVNoteOpsStates();
+    OpsStateInterface *stateInterface = gVNoteOpsStates();
 
     if (tolCount) {
         ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
         bool enable = true;
-        if(m_curPlayItem && m_curPlayItem->hasSelection()){
+        if (m_curPlayItem && m_curPlayItem->hasSelection()) {
             enable = false;
         }
 
-        if(stateInterface->isVoice2Text() && m_curAsrItem && m_curAsrItem->hasSelection()){
+        if (stateInterface->isVoice2Text() && m_curAsrItem && m_curAsrItem->hasSelection()) {
             enable = false;
         }
 
@@ -387,41 +387,41 @@ void RightView::initAction(DetailItemWidget *widget)
             ActionManager::Instance()->enableAction(ActionManager::DetailCut, enable);
             ActionManager::Instance()->enableAction(ActionManager::DetailDelete, enable);
         }
-    }else {
-         VNoteBlock *blockData = nullptr;
-         if (widget != nullptr) {
-             blockData = widget->getNoteBlock();
-             if(blockData != nullptr){
-                 if (blockData->blockType == VNoteBlock::Voice){
-                     if (!checkFileExist(blockData->ptrVoice->voicePath)) {
-                         delWidget(widget);
-                         updateData();
-                         return;
-                     }
+    } else {
+        VNoteBlock *blockData = nullptr;
+        if (widget != nullptr) {
+            blockData = widget->getNoteBlock();
+            if (blockData != nullptr) {
+                if (blockData->blockType == VNoteBlock::Voice) {
+                    if (!checkFileExist(blockData->ptrVoice->voicePath)) {
+                        delWidget(widget);
+                        updateData();
+                        return;
+                    }
 
-                     ActionManager::Instance()->enableAction(ActionManager::DetailVoiceSave, true);
-                     if (blockData->ptrVoice->blockText.isEmpty() && !stateInterface->isVoice2Text()) {
-                          ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, true);
-                     }
+                    ActionManager::Instance()->enableAction(ActionManager::DetailVoiceSave, true);
+                    if (blockData->ptrVoice->blockText.isEmpty() && !stateInterface->isVoice2Text()) {
+                        ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, true);
+                    }
 
-                     bool enable = true;
-                     if(m_curPlayItem && m_curPlayItem == widget){
-                         enable = false;
-                     }
+                    bool enable = true;
+                    if (m_curPlayItem && m_curPlayItem == widget) {
+                        enable = false;
+                    }
 
-                     if(stateInterface->isVoice2Text() && m_curAsrItem == widget){
-                         enable = false;
-                     }
+                    if (stateInterface->isVoice2Text() && m_curAsrItem == widget) {
+                        enable = false;
+                    }
 
-                     if(enable){
-                         ActionManager::Instance()->enableAction(ActionManager::DetailDelete, enable);
-                     }
+                    if (enable) {
+                        ActionManager::Instance()->enableAction(ActionManager::DetailDelete, enable);
+                    }
 
-                 }else if (blockData->blockType == VNoteBlock::Text) {
-                     ActionManager::Instance()->enableAction(ActionManager::DetailPaste, true);
+                } else if (blockData->blockType == VNoteBlock::Text) {
+                    ActionManager::Instance()->enableAction(ActionManager::DetailPaste, true);
                 }
-             }
-         }
+            }
+        }
     }
 }
 
@@ -480,11 +480,11 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
             }
         }
 
-        if(m_curPlayItem == widget){
+        if (m_curPlayItem == widget) {
             m_curPlayItem = nullptr;
         }
 
-        if(m_curAsrItem == widget){
+        if (m_curAsrItem == widget) {
             m_curAsrItem = nullptr;
         }
 
@@ -666,16 +666,16 @@ void RightView::mouseMoveSelect(QMouseEvent *event)
                 nextWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
             }
 
-            if(curIndex > 0){
+            if (curIndex > 0) {
                 layoutItem = m_viewportLayout->itemAt(curIndex - 1);
                 preWidget  = static_cast<DetailItemWidget *>(layoutItem->widget());
             }
 
-            if(nextWidget && nextWidget != m_placeholderWidget){
+            if (nextWidget && nextWidget != m_placeholderWidget) {
                 nextWidget->clearSelection();
             }
 
-            if(preWidget){
+            if (preWidget) {
                 preWidget->clearSelection();
             }
         }
@@ -692,7 +692,7 @@ QString RightView::copySelectText()
         bool hasSelection = widget->hasSelection();
         if (hasSelection) {
             QString selectText = widget->getSelectText();
-            if(!selectText.isEmpty()){
+            if (!selectText.isEmpty()) {
                 selectText.append('\n');
                 text.append(selectText);
             }
@@ -720,7 +720,7 @@ void RightView::delSelectText()
         DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
         if (widget->hasSelection()) {
             VNoteBlock *block = widget->getNoteBlock();
-            if(widget->isSelectAll() == false){
+            if (widget->isSelectAll() == false) {
                 if (block->blockType == VNoteBlock::Text) {
                     widget->removeSelectText();
                     widget->getNoteBlock()->blockText =  widget->getAllText();
@@ -794,22 +794,22 @@ void RightView::keyPressEvent(QKeyEvent *e)
     if (e->modifiers() == Qt::ControlModifier) {
         switch (e->key()) {
         case Qt::Key_C:
-            if(hasSelection()){
+            if (hasSelection()) {
                 copySelectText();
             }
             break;
         case Qt::Key_A:
             selectAllItem();
             break;
-        case Qt::Key_X:{
+        case Qt::Key_X: {
             int ret = showDelDialog();
-            if(ret == 1){
+            if (ret == 1) {
                 VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
-                connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this](){
+                connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
                     cutSelectText();
                 });
                 confirmDialog.exec();
-            }else if(ret == 0){
+            } else if (ret == 0) {
                 cutSelectText();
             }
         } break;
@@ -821,13 +821,13 @@ void RightView::keyPressEvent(QKeyEvent *e)
         }
     } else if (e->key() == Qt::Key_Delete) {
         int ret = showDelDialog();
-        if(ret == 1){
+        if (ret == 1) {
             VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
-            connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this](){
+            connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
                 doDelAction();
             });
             confirmDialog.exec();
-        }else if(ret == 0){
+        } else if (ret == 0) {
             doDelAction();
         }
     }
@@ -882,25 +882,25 @@ int RightView::showDelDialog()
 {
     int voiceCount, textCount;
     getSelectionCount(voiceCount, textCount);
-    OpsStateInterface * stateInterface = gVNoteOpsStates();
+    OpsStateInterface *stateInterface = gVNoteOpsStates();
 
     if (voiceCount) {
-        if(m_curPlayItem && m_curPlayItem->hasSelection()){
+        if (m_curPlayItem && m_curPlayItem->hasSelection()) {
             return -1;
         }
 
-        if(stateInterface->isVoice2Text() && m_curAsrItem && m_curAsrItem->hasSelection()){
+        if (stateInterface->isVoice2Text() && m_curAsrItem && m_curAsrItem->hasSelection()) {
             return -1;
         }
 
         return 1;
     } else if (m_curItemWidget) {
         if (!textCount && m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Voice) {
-            if(m_curItemWidget == m_curPlayItem){
+            if (m_curItemWidget == m_curPlayItem) {
                 return  -1;
             }
 
-            if(stateInterface->isVoice2Text() && m_curAsrItem == m_curItemWidget){
+            if (stateInterface->isVoice2Text() && m_curAsrItem == m_curItemWidget) {
                 return -1;
             }
 
@@ -913,7 +913,7 @@ int RightView::showDelDialog()
 void RightView::initConnection()
 {
     connect(DGuiApplicationHelper::instance(),
-                     &DGuiApplicationHelper::themeTypeChanged,
+            &DGuiApplicationHelper::themeTypeChanged,
             this, &RightView::onChangeTheme);
 
     connect(m_playAnimTimer, &QTimer::timeout, this, &RightView::onPlayUpdate);
@@ -925,13 +925,13 @@ void RightView::onChangeTheme()
 
 void RightView::saveMp3()
 {
-    if(m_curItemWidget){
+    if (m_curItemWidget) {
         VNoteBlock *block = m_curItemWidget->getNoteBlock();
-        if(block->blockType == VNoteBlock::Voice){
+        if (block->blockType == VNoteBlock::Voice) {
             DFileDialog dialog;
             dialog.setFileMode(DFileDialog::DirectoryOnly);
 
-            dialog.setLabelText(DFileDialog::Accept,DApplication::translate("RightView","Save"));
+            dialog.setLabelText(DFileDialog::Accept, DApplication::translate("RightView", "Save"));
             dialog.setNameFilter("MP3(*.mp3)");
             QString historyDir = m_qspSetting->value(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
             if (historyDir.isEmpty()) {
@@ -944,8 +944,8 @@ void RightView::saveMp3()
 
                 QString exportDir = dialog.directoryUrl().toLocalFile();
 
-                ExportNoteWorker* exportWorker = new ExportNoteWorker(
-                            exportDir,ExportNoteWorker::ExportOneVoice, m_noteItemData, block);
+                ExportNoteWorker *exportWorker = new ExportNoteWorker(
+                    exportDir, ExportNoteWorker::ExportOneVoice, m_noteItemData, block);
                 exportWorker->setAutoDelete(true);
 
                 QThreadPool::globalInstance()->start(exportWorker);

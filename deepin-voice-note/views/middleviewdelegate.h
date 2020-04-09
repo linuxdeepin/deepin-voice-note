@@ -10,7 +10,7 @@ class MiddleViewDelegate : public DStyledItemDelegate
 public:
     MiddleViewDelegate(QAbstractItemView *parent = nullptr);
     void handleChangeTheme();
-    void setSearchKey(const QRegExp &key);
+    void setSearchKey(const QString &key);
     void setEnableItem(bool enable);
     const int MAX_TITLE_LEN = 64;
 protected:
@@ -30,7 +30,7 @@ private:
                          const QModelIndex &index) const;
 
     QAbstractItemView *m_parentView {nullptr};
-    QRegExp m_searchKey;
+    QString m_searchKey;
     DPalette m_parentPb;
     bool     m_enableItem {true};
 };

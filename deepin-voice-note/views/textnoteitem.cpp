@@ -8,7 +8,7 @@
 #include <DStyle>
 #include <DApplicationHelper>
 
-TextNoteItem::TextNoteItem(VNoteBlock *noteBlock, QWidget *parent, QRegExp reg)
+TextNoteItem::TextNoteItem(VNoteBlock *noteBlock, QWidget *parent, QString reg)
     : DetailItemWidget(parent)
     , m_noteBlock(noteBlock)
     , m_serchKey(reg)
@@ -42,7 +42,8 @@ void TextNoteItem::initConnection()
         m_textEdit->setFixedHeight(static_cast<int>(document->size().height()));
         int height = m_textEdit->cursorRect(m_textEdit->textCursor()).bottom() + 5;
         this->setFixedHeight(m_textEdit->height() + 10);
-        if(this->hasFocus()){
+        if (this->hasFocus())
+        {
             emit sigCursorHeightChange(this, height);
         }
     });
@@ -95,9 +96,9 @@ void TextNoteItem::selectText(const QPoint &globalPos, QTextCursor::MoveOperatio
 
 void TextNoteItem::selectAllText()
 {
-    if(textIsEmpty()){
+    if (textIsEmpty()) {
         m_selectAll = true;
-    }else {
+    } else {
         m_textEdit->selectAll();
     }
 }
@@ -145,7 +146,7 @@ bool TextNoteItem::hasFocus()
 
 bool TextNoteItem::isSelectAll()
 {
-    if(m_selectAll == false){
+    if (m_selectAll == false) {
         QTextCursor cursor = getTextCursor();
         m_selectAll = getAllText() == getSelectText();
     }

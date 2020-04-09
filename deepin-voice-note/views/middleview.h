@@ -17,12 +17,12 @@ class MiddleView : public DListView
     Q_OBJECT
 public:
     MiddleView(QWidget *parent = nullptr);
-    void setSearchKey(const QRegExp &key);
+    void setSearchKey(const QString &key);
     void setCurrentId(qint64 id);
     void setVisibleEmptySearch(bool visible);
     void setOnlyCurItemMenuEnable(bool enable);
-    void addRowAtHead(VNoteItem* note);
-    void appendRow(VNoteItem* note);
+    void addRowAtHead(VNoteItem *note);
+    void appendRow(VNoteItem *note);
     void clearAll();
     void setCurrentIndex(int index);
     void editNote();
@@ -32,8 +32,8 @@ public:
     qint64 getCurrentId();
     qint32 rowCount() const;
 
-    VNoteItem* deleteCurrentRow();
-    VNoteItem* getCurrVNotedata() const;
+    VNoteItem *deleteCurrentRow();
+    VNoteItem *getCurrVNotedata() const;
 
 signals:
 public slots:
@@ -53,7 +53,7 @@ private:
 
     bool                m_onlyCurItemMenuEnable {false};
     qint64              m_currentId {-1};
-    QRegExp             m_searchKey;
+    QString             m_searchKey;
     DLabel             *m_emptySearch {nullptr};
     DMenu              *m_noteMenu {nullptr};
     QStandardItemModel *m_pDataModel {nullptr};

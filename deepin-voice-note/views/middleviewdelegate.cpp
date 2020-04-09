@@ -43,7 +43,7 @@ struct VNoteTextPHelper {
         PenCount
     };
 
-    void spiltByKeyword(const QString &text, const QRegExp &keyword);
+    void spiltByKeyword(const QString &text, const QString &keyword);
     void paintText(bool isSelected = false);
 
     QVector<Text> m_textsVector;
@@ -53,13 +53,13 @@ struct VNoteTextPHelper {
     QPainter    *m_painter {nullptr};
 };
 
-void VNoteTextPHelper::spiltByKeyword(const QString &text, const QRegExp &keyword)
+void VNoteTextPHelper::spiltByKeyword(const QString &text, const QString &keyword)
 {
     //Check if text exceed the name rect, elide the
     //text first
     QString elideText = m_fontMetrics.elidedText(text, Qt::ElideRight, m_nameRect.width());
 
-    int keyLen = keyword.pattern().length();
+    int keyLen = keyword.length();
     int textLen = text.length();
     int startPos = 0;
     int pos = 0;
@@ -67,7 +67,7 @@ void VNoteTextPHelper::spiltByKeyword(const QString &text, const QRegExp &keywor
     m_textsVector.clear();
 
     if (!keyword.isEmpty()) {
-        while ((pos = elideText.indexOf(keyword, startPos)) != -1) {
+        while ((pos = elideText.indexOf(keyword, startPos, Qt::CaseInsensitive)) != -1) {
             Text tb;
 
             if (startPos != pos) {
@@ -164,7 +164,7 @@ MiddleViewDelegate::MiddleViewDelegate(QAbstractItemView *parent)
             &MiddleViewDelegate::handleChangeTheme);
 }
 
-void MiddleViewDelegate::setSearchKey(const QRegExp &key)
+void MiddleViewDelegate::setSearchKey(const QString &key)
 {
     m_searchKey = key;
 }
@@ -191,7 +191,7 @@ QSize MiddleViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QMo
 }
 
 QWidget *MiddleViewDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,
-                                        const QModelIndex &index) const
+                                          const QModelIndex &index) const
 {
     Q_UNUSED(option)
     Q_UNUSED(index)
@@ -204,23 +204,23 @@ QWidget *MiddleViewDelegate::createEditor(QWidget *parent, const QStyleOptionVie
 void MiddleViewDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     QVariant var = index.data(Qt::UserRole + 1);
-    VNoteItem *data = static_cast<VNoteItem*>(StandardItemCommon::getStandardItemData(index));
-    if(data){
+    VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
+    if (data) {
         QLineEdit *edit = static_cast<QLineEdit *>(editor);
         edit->setText(data->noteTitle);
     }
 }
 
 void MiddleViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
-                                    const QModelIndex &index) const
+                                      const QModelIndex &index) const
 {
     Q_UNUSED(model);
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
     QString newTitle = edit->text();
 
     //Update note title
-    VNoteItem *note = static_cast<VNoteItem*>(StandardItemCommon::getStandardItemData(index));
-    if(note){
+    VNoteItem *note = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
+    if (note) {
         //Truncate the title name if exceed 64 chars
         if (newTitle.length() > MAX_TITLE_LEN) {
             newTitle = newTitle.left(MAX_TITLE_LEN);
@@ -237,7 +237,7 @@ void MiddleViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
 }
 
 void MiddleViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
-                                            const QModelIndex &index) const
+                                              const QModelIndex &index) const
 {
     Q_UNUSED(index)
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
@@ -245,7 +245,7 @@ void MiddleViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptio
 }
 
 void MiddleViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
-                             const QModelIndex &index) const
+                               const QModelIndex &index) const
 {
     if (m_searchKey.isEmpty()) {
         paintNormalItem(painter, option, index);
@@ -255,7 +255,7 @@ void MiddleViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 }
 
 void MiddleViewDelegate::paintItemBase(QPainter *painter, const QStyleOptionViewItem &option,
-                                     const QRect &rect, bool &isSelect) const
+                                       const QRect &rect, bool &isSelect) const
 {
     QPainterPath path;
     const int radius = 8;
@@ -299,10 +299,10 @@ void MiddleViewDelegate::paintItemBase(QPainter *painter, const QStyleOptionView
     }
 }
 void MiddleViewDelegate::paintNormalItem(QPainter *painter, const QStyleOptionViewItem &option,
-                                       const QModelIndex &index) const
+                                         const QModelIndex &index) const
 {
-    VNoteItem *data = static_cast<VNoteItem*>(StandardItemCommon::getStandardItemData(index));
-    if(!data){
+    VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
+    if (!data) {
         return;
     }
     painter->save();
@@ -329,10 +329,10 @@ void MiddleViewDelegate::paintNormalItem(QPainter *painter, const QStyleOptionVi
 }
 
 void MiddleViewDelegate::paintSearchItem(QPainter *painter, const QStyleOptionViewItem &option,
-                                       const QModelIndex &index) const
+                                         const QModelIndex &index) const
 {
-    VNoteItem *noteData = static_cast<VNoteItem*>(StandardItemCommon::getStandardItemData(index));
-    if(!noteData){
+    VNoteItem *noteData = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
+    if (!noteData) {
         return;
     }
     QRect paintRect(option.rect.x() + 10, option.rect.y() + 5,
