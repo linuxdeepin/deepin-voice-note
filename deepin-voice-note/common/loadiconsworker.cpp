@@ -19,12 +19,12 @@ QPixmap LoadIconsWorker::greyPix(QPixmap pix)
     QPixmap temp(pix.size());
     temp.fill(Qt::transparent);
 
-    QPainter p1(&temp);
-    p1.setCompositionMode(QPainter::CompositionMode_Source);
-    p1.drawPixmap(0, 0, pix);
-    p1.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-    p1.fillRect(temp.rect(), QColor(0, 0, 0, 64));
-    p1.end();
+    QPainter iconPainer(&temp);
+    iconPainer.setCompositionMode(QPainter::CompositionMode_Source);
+    iconPainer.drawPixmap(0, 0, pix);
+    iconPainer.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+    iconPainer.fillRect(temp.rect(), QColor(0, 0, 0, 64));
+    iconPainer.end();
 
     return temp;
 }

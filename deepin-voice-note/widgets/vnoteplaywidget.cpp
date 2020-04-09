@@ -6,6 +6,8 @@
 
 #include <QGridLayout>
 
+#include <DDialogCloseButton>
+
 VNotePlayWidget::VNotePlayWidget(QWidget *parent)
     : DFloatingWidget(parent)
 {
@@ -31,9 +33,7 @@ void VNotePlayWidget::initUI()
     m_slider->setMinimum(0);
     m_slider->setValue(0);
 
-    m_closeBtn = new DIconButton(DStyle::SP_CloseButton, this);
-    m_closeBtn->setIconSize(QSize(26, 26));
-    m_closeBtn->setFlat(true);
+    m_closeBtn = new DDialogCloseButton(this);
     DStyle::setFocusRectVisible(m_closeBtn, false);
 
     QVBoxLayout *sliderLayout = new QVBoxLayout;

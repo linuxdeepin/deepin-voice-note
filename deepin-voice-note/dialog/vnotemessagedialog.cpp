@@ -59,7 +59,9 @@ void VNoteMessageDialog::initUI()
     m_buttonSpliter->setFixedSize(4,28);
 
     actionBarLayout->addWidget(m_cancelBtn);
+    actionBarLayout->addSpacing(8);
     actionBarLayout->addWidget(m_buttonSpliter);
+    actionBarLayout->addSpacing(8);
     actionBarLayout->addWidget(m_confirmBtn);
 
     mainLayout->addWidget(m_pMessage, 1);

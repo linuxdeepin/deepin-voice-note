@@ -176,8 +176,11 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
         //TODO:
         //    DbVisitor can update any feilds here  db return all feilds
         //of new record. Just load icon here
-        newFolder->UI.icon = VNoteDataManager::instance()->getDefaultIcon(newFolder->defaultIcon, IconsType::DefaultIcon);
-        newFolder->UI.grayIcon = VNoteDataManager::instance()->getDefaultIcon(newFolder->defaultIcon, IconsType::DefaultGrayIcon);
+        newFolder->defaultIcon = getDefaultIcon();
+        newFolder->UI.icon = VNoteDataManager::instance()->getDefaultIcon(
+                    newFolder->defaultIcon, IconsType::DefaultIcon);
+        newFolder->UI.grayIcon = VNoteDataManager::instance()->getDefaultIcon(
+                    newFolder->defaultIcon, IconsType::DefaultGrayIcon);
 
         VNoteDataManager::instance()->addFolder(newFolder);
 
