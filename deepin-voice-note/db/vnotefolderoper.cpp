@@ -152,7 +152,7 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
                       , folderColumnsName[folder_name].toUtf8().data()
                       , folderColumnsName[default_icon].toUtf8().data()
                       , folder.name.toUtf8().data()
-                      , QString("%1").arg(folder.defaultIcon).toUtf8().data()
+                      , QString("%1").arg(getDefaultIcon()).toUtf8().data()
                       );
 
     QString queryNewRec;
@@ -176,7 +176,6 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
         //TODO:
         //    DbVisitor can update any feilds here  db return all feilds
         //of new record. Just load icon here
-        newFolder->defaultIcon = getDefaultIcon();
         newFolder->UI.icon = VNoteDataManager::instance()->getDefaultIcon(
                     newFolder->defaultIcon, IconsType::DefaultIcon);
         newFolder->UI.grayIcon = VNoteDataManager::instance()->getDefaultIcon(

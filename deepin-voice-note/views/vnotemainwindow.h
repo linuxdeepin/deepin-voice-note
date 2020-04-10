@@ -107,6 +107,8 @@ public slots:
     void onPlayPlugVoicePlay(VNVoiceBlock *voiceData);
     void onPlayPlugVoicePause(VNVoiceBlock *voiceData);
     void onPlayPlugVoiceStop(VNVoiceBlock *voiceData);
+    void onNewNotebook();
+    void onNewNote();
 
     void onChangeTheme();
     //Audio to text API

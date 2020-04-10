@@ -146,10 +146,10 @@ void VNoteMainWindow::initConnections()
 //            m_rightView, &RightView::onDltSelectContant);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
-            this, &VNoteMainWindow::addNotepad);
+            this, &VNoteMainWindow::onNewNotebook);
 
     connect(m_addNoteBtn, &VNoteIconButton::clicked,
-            this, &VNoteMainWindow::addNote);
+            this, &VNoteMainWindow::onNewNote);
 
     connect(m_wndHomePage, &HomePage::sigAddFolderByInitPage,
             this, &VNoteMainWindow::addNotepad);
@@ -197,28 +197,18 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNotebook->setAutoRepeat(false);
 
     connect(m_stNewNotebook.get(), &QShortcut::activated, this, [this] {
-        static struct timeval curret = {0, 0};
-        static struct timeval lastPress = {0, 0};
+        if (!(isRecording()
+              || isPlaying()
+              || isVoice2Text()
+              || isSearching())
+                ) {
+            onNewNotebook();
 
-        gettimeofday(&curret, nullptr);
-
-        if (TM(lastPress, curret) > MIN_STKEY_RESP_TIME)
-        {
-            if (!(isRecording()
-                    || isPlaying()
-                    || isVoice2Text()
-                    || isSearching())
-               ) {
-                addNotepad();
-
-                //If do shortcut in home page,need switch to note
-                //page after add new notebook.
-                if (!canDoShortcutAction()) {
-                    m_centerWidget->setCurrentIndex(WndNoteShow);
-                }
+            //If do shortcut in home page,need switch to note
+            //page after add new notebook.
+            if (!canDoShortcutAction()) {
+                m_centerWidget->setCurrentIndex(WndNoteShow);
             }
-
-            UPT(lastPress, curret);
         }
     });
 
@@ -245,20 +235,14 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNote->setAutoRepeat(false);
 
     connect(m_stNewNote.get(), &QShortcut::activated, this, [this] {
-        static struct timeval curret = {0, 0};
-        static struct timeval lastPress = {0, 0};
-
-        gettimeofday(&curret, nullptr);
-
-        if (TM(lastPress, curret) > MIN_STKEY_RESP_TIME)
-        {
-            if (canDoShortcutAction() &&
-                    !(isRecording() || isPlaying() || isVoice2Text() || isSearching())
-               ) {
-                addNote();
-            }
-
-            UPT(lastPress, curret);
+        if (canDoShortcutAction()
+                && !( isRecording()
+                      || isPlaying()
+                      || isVoice2Text()
+                      || isSearching()
+                      )
+                ) {
+            onNewNote();
         }
     });
 
@@ -1425,6 +1409,34 @@ void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
     setSpecialStatus(PlayVoiceEnd);
     m_rightView->setCurVoicePlay(nullptr);
     m_rightView->setFocus();
+}
+
+void VNoteMainWindow::onNewNotebook()
+{
+    static struct timeval curret = {0, 0};
+    static struct timeval lastPress = {0, 0};
+
+    gettimeofday(&curret, nullptr);
+
+    if (TM(lastPress, curret) > MIN_STKEY_RESP_TIME) {
+        addNotepad();
+
+        UPT(lastPress, curret);
+    }
+}
+
+void VNoteMainWindow::onNewNote()
+{
+    static struct timeval curret = {0, 0};
+    static struct timeval lastPress = {0, 0};
+
+    gettimeofday(&curret, nullptr);
+
+    if (TM(lastPress, curret) > MIN_STKEY_RESP_TIME) {
+        addNote();
+
+        UPT(lastPress, curret);
+    }
 }
 
 bool VNoteMainWindow::canDoShortcutAction() const

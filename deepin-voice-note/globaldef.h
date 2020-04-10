@@ -52,8 +52,8 @@
 #define MAX_A2T_AUDIO_LEN_MS (20*60*1000)
 
 //Limit shortcut key response time
-//to 500ms
-#define MIN_STKEY_RESP_TIME 500
+//to 300ms
+#define MIN_STKEY_RESP_TIME 300
 
 #include <sys/time.h>
 
