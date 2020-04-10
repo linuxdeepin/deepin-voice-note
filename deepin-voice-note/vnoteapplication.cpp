@@ -11,9 +11,6 @@
 VNoteApplication::VNoteApplication(int &argc, char **argv)
     : DApplication(argc, argv)
 {
-    //Init app settings
-    initAppSetting();
-
     connect(DGuiApplicationHelper::instance()
             ,&DGuiApplicationHelper::newProcessInstance, this
             ,&VNoteApplication::onNewProcessInstance);
@@ -47,25 +44,15 @@ void VNoteApplication::activateWindow()
 void VNoteApplication::initAppSetting()
 {
     QString vnoteConfigBasePath =
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
 
-    QFileInfo configDir(vnoteConfigBasePath);
+    QFileInfo configDir(vnoteConfigBasePath+QDir::separator());
 
     //TODO:
-    //    Remove the old version database
-    //make a app owne directory
-    if (!configDir.isDir() && configDir.exists()) {
-        QFile oldDbFile(vnoteConfigBasePath);
-        if (!oldDbFile.remove()) {
-            qInfo() << oldDbFile.fileName() << ":" << oldDbFile.errorString();
-        }
-    }
-
-    configDir.setFile(vnoteConfigBasePath + QDir::separator() + QString("config/"));
-
+    //    Create app's config dir.
     if (!configDir.exists()) {
         QDir().mkpath(configDir.filePath());
-        qInfo() << "create config dir:" << configDir.filePath();
+        qInfo() << "Create config dir:" << configDir.filePath();
     }
 
     m_qspSetting.reset(new QSettings(configDir.filePath() + QString("config.conf")

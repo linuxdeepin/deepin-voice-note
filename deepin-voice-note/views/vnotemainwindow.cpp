@@ -43,6 +43,8 @@
 VNoteMainWindow::VNoteMainWindow(QWidget *parent)
     : DMainWindow(parent)
 {
+    //Init app data here
+    initAppSetting();
     initUI();
     initConnections();
     // Request DataManager load  note folders
@@ -101,9 +103,6 @@ void VNoteMainWindow::initUI()
 
 void VNoteMainWindow::initData()
 {
-    //Init app data here
-    initAppSetting();
-
     VNoteDataManager::instance()->reqNoteDefIcons();
     VNoteDataManager::instance()->reqNoteFolders();
     VNoteDataManager::instance()->reqNoteItems();
@@ -111,7 +110,13 @@ void VNoteMainWindow::initData()
 
 void VNoteMainWindow::initAppSetting()
 {
-    m_qspSetting = reinterpret_cast<VNoteApplication *>(qApp)->appSetting();
+    //TODO:
+    //    Call app init in main window,so we can
+    //put our config file to deepin's own dir.
+    VNoteApplication* app = reinterpret_cast<VNoteApplication *>(qApp);
+    app->initAppSetting();
+
+    m_qspSetting = app->appSetting();
 }
 
 void VNoteMainWindow::initConnections()

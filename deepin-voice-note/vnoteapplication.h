@@ -15,6 +15,12 @@ public:
     explicit VNoteApplication(int &argc, char **argv);
 
     void activateWindow();
+    /*
+     * Comment:
+     *     In order put our config file to deepin's config
+     * dir,we should call the this function in main window.
+     * We can't get correct path when app's consturctor.
+     * */
     void initAppSetting();
     QSharedPointer<QSettings> appSetting() const;
     VNoteMainWindow* mainWindow() const;
