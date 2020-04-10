@@ -52,10 +52,17 @@ void RightView::initUi()
     m_placeholderWidget = new DWidget(this); //占位的
     m_placeholderWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_viewportLayout->addWidget(m_placeholderWidget, 1, Qt::AlignBottom);
-    QString content = DApplication::translate(
-                          "RightView",
-                          "The voice note has been deleted");
-    m_fileHasDelDialog = new DDialog("", content, this);
+
+    DLabel *m_pMessage = new DLabel(this);
+    m_pMessage->setText(DApplication::translate("RightView"
+        ,"The voice note has been deleted"));
+    DFontSizeManager::instance()->bind(m_pMessage, DFontSizeManager::T6);
+    DPalette paMsg = DApplicationHelper::instance()->palette(m_pMessage);
+    paMsg.setBrush(DPalette::BrightText, paMsg.color(DPalette::BrightText));
+    m_pMessage->setPalette(paMsg);
+
+    m_fileHasDelDialog = new DDialog(this);
+    m_fileHasDelDialog->addContent(m_pMessage,Qt::AlignCenter);
     m_fileHasDelDialog->setIcon(QIcon::fromTheme("dialog-warning"));
     m_fileHasDelDialog->addButton(DApplication::translate(
                                       "RightView",
