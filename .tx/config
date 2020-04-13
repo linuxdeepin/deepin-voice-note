@@ -4,7 +4,7 @@ minimum_perc = 80
 mode = developer
 
 [deepin-voice-notes.deepin-voice-notes]
-file_filter = deepin-voice-note/translations/deepin-voice_note_<lang>.ts
+file_filter = deepin-voice-note/translations/deepin-voice-note_<lang>.ts
 source_file = deepin-voice-note/translations/deepin-voice-note.ts
 source_lang = en
 type = QT

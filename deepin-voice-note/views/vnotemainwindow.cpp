@@ -488,7 +488,7 @@ void VNoteMainWindow::initLeftView()
     m_leftView->expand(notepadRoot->index());
     leftHolderLayout->addWidget(m_leftView);
 
-    m_addNotepadBtn = new DPushButton(DApplication::translate("VNoteMainWindow", "Create notebook"),
+    m_addNotepadBtn = new DPushButton(DApplication::translate("VNoteMainWindow", "Create Notebook"),
                                       m_leftViewHolder);
     QVBoxLayout *btnLayout = new QVBoxLayout();
     btnLayout->addWidget(m_addNotepadBtn);
@@ -638,7 +638,7 @@ void VNoteMainWindow::holdHaltLock()
     m_lockFd = m_pLogin1Manager->Inhibit(
                    "shutdown:sleep",
                    DApplication::translate("AppMain", "Voice Notes"),
-                   DApplication::translate("AppMain", "Recordings not saved!"),
+                   DApplication::translate("AppMain", "Recordings not saved"),
                    "block");
 
     if (m_lockFd.isError()) {

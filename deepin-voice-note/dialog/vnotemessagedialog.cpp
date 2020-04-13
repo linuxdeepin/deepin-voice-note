@@ -95,7 +95,7 @@ void VNoteMessageDialog::initMessage()
     switch (m_msgType) {
     case DeleteFolder: {
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
-            ,"Are you sure you want to delete this notebook?\nAll notes in it will be deleted!"));
+            ,"Are you sure you want to delete this notebook?\nAll notes in it will be deleted"));
     } break;
     case AbortRecord: {
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
