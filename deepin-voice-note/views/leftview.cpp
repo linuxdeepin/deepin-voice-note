@@ -165,4 +165,5 @@ void LeftView::setOnlyCurItemMenuEnable(bool enable)
     m_onlyCurItemMenuEnable = enable;
     m_pItemDelegate->setEnableItem(!enable);
     m_pDataModel->layoutChanged();
+    //this->setStyleSheet("background:red");
 }

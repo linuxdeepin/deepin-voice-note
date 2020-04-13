@@ -6,6 +6,8 @@
 #include <QShortcut>
 #include <QMovie>
 #include <QSettings>
+#include <QMultiMap>
+#include <QList>
 
 #include <DWidget>
 #include <DDialog>
@@ -19,6 +21,10 @@ struct VNVoiceBlock;
 
 class VoiceNoteItem;
 class DetailItemWidget;
+
+
+enum ItemWidgetType{VoicePlugin,TextEditPlugin};
+typedef  QMultiMap<ItemWidgetType,DetailItemWidget*> MultiMapWidget;
 
 class RightView : public DWidget
 {
@@ -39,9 +45,12 @@ public:
     void  clearAllSelection();
     void  pasteText();
 
-    void  initAction(DetailItemWidget *widget);
-    void  getSelectionCount(int &voiceCount, int &textCount);
-    QString copySelectText(); //复制文本
+    int   initAction(DetailItemWidget *widget);
+
+    bool isAllWidgetEmpty(const QList<DetailItemWidget*> &widget);
+    bool isAllWidgetSelectAll (const QList<DetailItemWidget*> &widget);
+
+    QString copySelectText(bool voiceText = true);
     void cutSelectText(); //剪切文本
     void delSelectText();
     void doDelAction();
@@ -54,8 +63,7 @@ public:
     VoiceNoteItem *getCurVoiceAsr();
 
     DetailItemWidget *getMenuItem();
-    bool        hasSelection();
-    int         showDelDialog();
+    int         showWarningDialog();
 
 signals:
     void sigVoicePlay(VNVoiceBlock *voiceData);
@@ -104,6 +112,8 @@ private:
 
     //App setting, reference to VNoteApplication's setting
     QSharedPointer<QSettings> m_qspSetting {nullptr};
+
+    MultiMapWidget m_selectWidget;
 };
 
 #endif // RIGHTVIEW_H

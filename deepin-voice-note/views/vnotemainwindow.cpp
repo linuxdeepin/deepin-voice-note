@@ -315,12 +315,7 @@ void VNoteMainWindow::initShortcuts()
         Q_UNUSED(this);
         if (canDoShortcutAction())
         {
-            VNoteItem *currNote = m_middleView->getCurrVNotedata();
-            if (nullptr != currNote) {
-                if (currNote->haveVoice()) {
-                    m_rightView->saveMp3();
-                }
-            }
+            m_rightView->saveMp3();
         }
     });
 
@@ -1120,7 +1115,7 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         editNote();
         break;
     case ActionManager::DetailDelete: {
-        int ret = m_rightView->showDelDialog();
+        int ret = m_rightView->showWarningDialog();
         if (ret == 1) {
             VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
             connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {

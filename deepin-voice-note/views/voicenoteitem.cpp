@@ -214,7 +214,7 @@ void VoiceNoteItem::onChangeTheme()
 {
     DPalette pbCover = DApplicationHelper::instance()->palette(m_coverWidget);
     QColor coverColor = pbCover.color(DPalette::Active, DPalette::Highlight);
-    coverColor.setAlphaF(0.5);
+    coverColor.setAlphaF(0.7);
     pbCover.setBrush(DPalette::Base, coverColor);
     m_coverWidget->setPalette(pbCover);
 
@@ -230,22 +230,17 @@ bool VoiceNoteItem::asrTextNotEmpty()
 
 void VoiceNoteItem::selectText(const QPoint &globalPos, QTextCursor::MoveOperation op)
 {
-    m_coverWidget->setVisible(true);
-
-    if(asrTextNotEmpty()){
+    if(!isSelectAll() && asrTextNotEmpty()){
        m_asrText->selectText(globalPos,op);
     }
-    m_selectAll = true;
 }
 
 void VoiceNoteItem::selectText(QTextCursor::MoveOperation op)
 {
-    m_coverWidget->setVisible(true);
 
-    if(asrTextNotEmpty()){
+    if(!isSelectAll() && asrTextNotEmpty()){
       m_asrText->moveCursor(op,QTextCursor::KeepAnchor);
     }
-    m_selectAll = true;
 }
 
 void VoiceNoteItem::selectAllText()
@@ -253,7 +248,7 @@ void VoiceNoteItem::selectAllText()
     m_coverWidget->setVisible(true);
 
     if(asrTextNotEmpty()){
-        m_asrText->selectAll();
+        m_asrText->clearSelection();
     }
     m_selectAll = true;
 }
@@ -271,7 +266,11 @@ QString VoiceNoteItem::getSelectText()
 {
     QString ret = "";
     if(asrTextNotEmpty()){
-        ret = m_asrText->getSelectText();
+        if(m_selectAll){
+            ret = getAllText();
+        }else {
+            ret = m_asrText->getSelectText();
+        }
     }
     return  ret;
 }
@@ -365,7 +364,7 @@ bool VoiceNoteItem::hasFocus()
 
 bool VoiceNoteItem::isSelectAll()
 {
-    return  m_selectAll;
+    return m_selectAll;
 }
 
 void VoiceNoteItem::updateAnim()

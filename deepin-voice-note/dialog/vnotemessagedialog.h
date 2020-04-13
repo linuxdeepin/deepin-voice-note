@@ -22,6 +22,7 @@ public:
         AsrTimeLimit,
         AborteAsr,
         VolumeTooLow,
+        CutNote,
     };
 
 protected:

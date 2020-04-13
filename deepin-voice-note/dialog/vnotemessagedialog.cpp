@@ -119,5 +119,9 @@ void VNoteMessageDialog::initMessage()
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
             ,"The low input volume may result in bad recordings. Do you want to continue?"));
     } break;
+    case CutNote:{
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
+            ,"The clipped recordings and converted text will not be pasted. Do you want to continue?"));
+    }
     }
 }

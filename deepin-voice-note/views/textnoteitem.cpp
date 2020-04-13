@@ -147,7 +147,6 @@ bool TextNoteItem::hasFocus()
 bool TextNoteItem::isSelectAll()
 {
     if (m_selectAll == false) {
-        QTextCursor cursor = getTextCursor();
         m_selectAll = getAllText() == getSelectText();
     }
     return m_selectAll;
