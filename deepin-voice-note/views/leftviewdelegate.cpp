@@ -31,7 +31,7 @@ QWidget *LeftViewDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
     Q_UNUSED(option)
     QLineEdit *editBox = new QLineEdit(parent);
     editBox->setMaxLength(MAX_FOLDER_NAME_LEN);
-    editBox->setFixedSize(171, 30);
+    editBox->setFixedSize(132, 30);
     return  editBox;
 }
 
@@ -71,7 +71,7 @@ void LeftViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionV
 {
     Q_UNUSED(index)
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
-    edit->move(option.rect.x() + 15, option.rect.y() + 8);
+    edit->move(option.rect.x() + 50, option.rect.y() + 8);
 }
 
 void LeftViewDelegate::handleChangeTheme()

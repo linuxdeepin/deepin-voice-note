@@ -15,6 +15,7 @@
 #include <DApplicationHelper>
 
 static VNoteFolderOper FolderOper;
+static bool     isShowEdit = false;
 
 struct VNoteTextPHelper {
     VNoteTextPHelper(QPainter *painter, QFontMetrics fontMetrics, QRect nameRect)
@@ -197,7 +198,7 @@ QWidget *MiddleViewDelegate::createEditor(QWidget *parent, const QStyleOptionVie
     Q_UNUSED(index)
     QLineEdit *editBox = new QLineEdit(parent);
     editBox->setMaxLength(MAX_TITLE_LEN);
-    editBox->setFixedSize(option.rect.width() - 60, option.rect.height() - 20);
+    editBox->setFixedSize(204, 38);
     return editBox;
 }
 
@@ -209,6 +210,7 @@ void MiddleViewDelegate::setEditorData(QWidget *editor, const QModelIndex &index
         QLineEdit *edit = static_cast<QLineEdit *>(editor);
         edit->setText(data->noteTitle);
     }
+    isShowEdit = true;
 }
 
 void MiddleViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
@@ -217,7 +219,7 @@ void MiddleViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     Q_UNUSED(model);
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
     QString newTitle = edit->text();
-
+    MiddleView *view = static_cast<MiddleView *>(m_parentView);
     //Update note title
     VNoteItem *note = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
     if (note) {
@@ -229,11 +231,12 @@ void MiddleViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
         if (!newTitle.isEmpty() && (note->noteTitle != newTitle)) {
             VNoteItemOper noteOps(note);
             noteOps.modifyNoteTitle(newTitle);
-
-            MiddleView *view = static_cast<MiddleView *>(m_parentView);
             view->onNoteChanged();
         }
     }
+
+    isShowEdit = false;
+    view->update(index);
 }
 
 void MiddleViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
@@ -241,7 +244,7 @@ void MiddleViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptio
 {
     Q_UNUSED(index)
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
-    edit->move(option.rect.x() + 30, option.rect.y() + 10);
+    edit->move(option.rect.x() + 28, option.rect.y() + 17);
 }
 
 void MiddleViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
@@ -312,19 +315,23 @@ void MiddleViewDelegate::paintNormalItem(QPainter *painter, const QStyleOptionVi
                     option.rect.width() - 20, option.rect.height() - 10);
     bool isSelect = false;
     paintItemBase(painter, option, paintRect, isSelect);
-    painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T6));
-    QFontMetrics fontMetrics = painter->fontMetrics();
-    int space = (paintRect.height() - fontMetrics.height() * 2) / 2 + paintRect.top();
-    QRect nameRect(paintRect.left() + 20, space, paintRect.width() - 40, fontMetrics.height());
-    space += fontMetrics.height();
-    QRect timeRect(paintRect.left() + 20, space, paintRect.width() - 40, fontMetrics.height());
-    QString elideText = fontMetrics.elidedText(data->noteTitle, Qt::ElideRight, nameRect.width());
-    painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
-    if (!isSelect) {
-        painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
+
+    if(isShowEdit == false || isSelect == false){
+        painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T6));
+        QFontMetrics fontMetrics = painter->fontMetrics();
+        int space = (paintRect.height() - fontMetrics.height() * 2) / 2 + paintRect.top();
+        QRect nameRect(paintRect.left() + 20, space, paintRect.width() - 40, fontMetrics.height());
+        space += fontMetrics.height();
+        QRect timeRect(paintRect.left() + 20, space, paintRect.width() - 40, fontMetrics.height());
+        QString elideText = fontMetrics.elidedText(data->noteTitle, Qt::ElideRight, nameRect.width());
+        painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
+        if (!isSelect) {
+            painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
+        }
+        painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
+        painter->drawText(timeRect, Qt::AlignLeft | Qt::AlignVCenter, Utils::convertDateTime(data->modifyTime));
     }
-    painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
-    painter->drawText(timeRect, Qt::AlignLeft | Qt::AlignVCenter, Utils::convertDateTime(data->modifyTime));
+
     painter->restore();
 }
 
@@ -348,19 +355,23 @@ void MiddleViewDelegate::paintSearchItem(QPainter *painter, const QStyleOptionVi
     itemRect.setHeight(itemRect.height() - 34);
     painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T6));
     QFontMetrics fontMetrics = painter->fontMetrics();
-    int space = (itemRect.height() - fontMetrics.height() * 2) / 2 + itemRect.top();
-    QRect nameRect(itemRect.left() + 20, space, itemRect.width() - 40, fontMetrics.height());
-    space += fontMetrics.height();
-    QRect timeRect(itemRect.left() + 20, space, itemRect.width() - 40, fontMetrics.height());
-    VNoteTextPHelper vfnphelper(painter, fontMetrics, nameRect);
-    vfnphelper.spiltByKeyword(noteData->noteTitle, m_searchKey);
-    vfnphelper.paintText(isSelect);
 
-    if (!isSelect) {
-        painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
+    if(isShowEdit == false || isSelect == false){
+        int space = (itemRect.height() - fontMetrics.height() * 2) / 2 + itemRect.top();
+        QRect nameRect(itemRect.left() + 20, space, itemRect.width() - 40, fontMetrics.height());
+        space += fontMetrics.height();
+        QRect timeRect(itemRect.left() + 20, space, itemRect.width() - 40, fontMetrics.height());
+        VNoteTextPHelper vfnphelper(painter, fontMetrics, nameRect);
+        vfnphelper.spiltByKeyword(noteData->noteTitle, m_searchKey);
+        vfnphelper.paintText(isSelect);
+
+        if (!isSelect) {
+            painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
+        }
+        painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
+        painter->drawText(timeRect, Qt::AlignLeft | Qt::AlignVCenter, Utils::convertDateTime(noteData->modifyTime));
     }
-    painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
-    painter->drawText(timeRect, Qt::AlignLeft | Qt::AlignVCenter, Utils::convertDateTime(noteData->modifyTime));
+
     VNoteFolder *folderData = FolderOper.getFolder(noteData->folderId);
     if (folderData) {
         QRect folderRect = itemRect;
