@@ -834,7 +834,7 @@ void VNoteMainWindow::onA2TStart(bool first)
     } else {
         asrVoiceItem = m_rightView->getCurVoiceAsr();
         if(asrVoiceItem){
-            if(!asrVoiceItem->hasSelection() || m_rightView->getOnlyOneSelectVoice() != nullptr){
+            if(m_rightView->getOnlyOneSelectVoice() != asrVoiceItem){
                 m_rightView->setCurVoiceAsr(nullptr);
                 return;
             }
