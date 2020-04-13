@@ -827,7 +827,7 @@ void VNoteMainWindow::onA2TStart(bool first)
 
     if (first) {
         DetailItemWidget *widget = m_rightView->getMenuItem();
-        if (widget && widget->getNoteBlock()->blockType == VNoteBlock::Voice) {
+        if (widget && widget->getNoteBlock()->blockType == VNoteBlock::Voice && m_rightView->getOnlyOneSelectVoice() == widget) {
             asrVoiceItem = static_cast<VoiceNoteItem *>(widget);
             m_rightView->setCurVoiceAsr(asrVoiceItem);
         }
