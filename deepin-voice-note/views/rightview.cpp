@@ -980,6 +980,11 @@ int RightView::showWarningDialog()
         return  1;
     }
 
+    auto textWidget = m_selectWidget.values(TextEditPlugin);
+    if(isAllWidgetEmpty(textWidget)){
+        return  -1;
+    }
+
     return 0;
 }
 
