@@ -28,7 +28,7 @@ QString Utils::convertDateTime(const QDateTime &dateTime)
             disptime = dateTime.toString("hh:mm");
         }
     } else if (1 == offset) {
-        disptime = DApplication::translate("Utils","Yesterday") + dateTime.toString("hh:mm");
+        disptime = DApplication::translate("Utils","Yesterday") + " " + dateTime.toString("hh:mm");
     } else if (folerDate.year() == currDateTime.year()) {
         //不跨年 其他时间：MM-DD（例如：9-27）；
         disptime = dateTime.toString("MM-dd");
