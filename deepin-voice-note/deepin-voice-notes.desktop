@@ -1,6 +1,6 @@
 [Desktop Entry]
 Categories=AudioVideo;
-Comment=Voice note book
+Comment=Voice Notes is a lightweight memo tool to make text notes and voice recordings.
 Exec=/usr/bin/deepin-voice-note %f
 GenericName=Voice Notes
 Icon=deepin-voice-note
