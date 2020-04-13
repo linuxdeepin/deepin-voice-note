@@ -253,6 +253,7 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
     m_noteItemData = data;
     m_curAsrItem = nullptr;
     m_curPlayItem = nullptr;
+    m_selectWidget.clear();
 
     if (m_noteItemData == nullptr) {
         m_curItemWidget = nullptr;
@@ -875,14 +876,17 @@ void RightView::selectAllItem()
 
 void RightView::pasteText()
 {
+
     if (m_curItemWidget && m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Text) {
-        auto textCursor = m_curItemWidget->getTextCursor();
-        QClipboard *board = QApplication::clipboard();
-        if (board) {
-            QString clipBoardText = board->text();
-            textCursor.insertText(clipBoardText);
+        if(!m_selectWidget.size()){ //没有选中才可以粘贴
+            auto textCursor = m_curItemWidget->getTextCursor();
+            QClipboard *board = QApplication::clipboard();
+            if (board) {
+                QString clipBoardText = board->text();
+                textCursor.insertText(clipBoardText);
+            }
+            m_curItemWidget->setFocus();
         }
-        m_curItemWidget->setFocus();
     }
 }
 

@@ -1208,11 +1208,6 @@ void VNoteMainWindow::onMenuAbout2Show()
             ActionManager::Instance()->enableAction(ActionManager::NotebookAddNew, false);
             ActionManager::Instance()->enableAction(ActionManager::NotebookDelete, false);
         }
-    } else if (menu == ActionManager::Instance()->detialContextMenu()) {
-        if (isPlaying()) {
-            ActionManager::Instance()->enableAction(ActionManager::DetailCut, false);
-            ActionManager::Instance()->enableAction(ActionManager::DetailDelete, false);
-        }
     }
 }
 
