@@ -362,13 +362,12 @@ void VNoteMainWindow::initShortcuts()
 
     //Notebook/Note/Detial delete key
     m_stDelete.reset(new QShortcut(this));
-    m_stDelete->setKey(tr("Delete"));
+    m_stDelete->setKey(Qt::Key_Delete);
     m_stDelete->setContext(Qt::ApplicationShortcut);
     m_stDelete->setAutoRepeat(false);
 
     connect(m_stDelete.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction())
-        {
+        if (canDoShortcutAction()) {
             QAction *deleteAct = nullptr;
 
             /*
@@ -381,12 +380,15 @@ void VNoteMainWindow::initShortcuts()
             if (m_leftView->hasFocus()) {
                 if (!isRecording() && !isVoice2Text() && !isPlaying()) {
                     deleteAct = ActionManager::Instance()->getActionById(
-                        ActionManager::NotebookDelete);
+                                ActionManager::NotebookDelete);
                 }
             } else if (m_middleView->hasFocus()) {
-                if (!isRecording() && !isVoice2Text() && !isPlaying() && m_middleView->count() > 0) {
+                if (!isRecording()
+                        && !isVoice2Text()
+                        && !isPlaying()
+                        && m_middleView->count() > 0) {
                     deleteAct = ActionManager::Instance()->getActionById(
-                                    ActionManager::NoteDelete);
+                                ActionManager::NoteDelete);
                 }
             } else if (m_rightView->hasFocus()) {
 
@@ -396,9 +398,10 @@ void VNoteMainWindow::initShortcuts()
 
                 if (menuItem != playItem && menuItem != asrItem) {
                     deleteAct = ActionManager::Instance()->getActionById(
-                                    ActionManager::DetailDelete);
+                                ActionManager::DetailDelete);
                 }
             }
+
             if (nullptr != deleteAct) {
                 deleteAct->triggered();
             }
