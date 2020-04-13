@@ -389,6 +389,16 @@ void VoiceNoteItem::stopAnim()
     }
 }
 
+bool VoiceNoteItem::isTextContainsPos(const QPoint &globalPos)
+{
+    if(asrTextNotEmpty()){
+        QPoint pos = m_asrText->mapFromGlobal(globalPos);
+        return m_asrText->rect().contains(pos);
+    }
+
+    return false;
+}
+
 PlayAnimInferface::~PlayAnimInferface()
 {
 
@@ -424,4 +434,3 @@ void PlayAnimInferface::setAnimTimer(QTimer *timer)
 void PlayAnimInferface::updateAnim()
 {
 }
-

@@ -70,6 +70,7 @@ public:
     bool hasFocus() override;
     bool hasSelection() override;
     bool isSelectAll() override;
+    bool isTextContainsPos(const QPoint &globalPos) override;
     QString getAllText() override;
     QString getSelectText() override;
 

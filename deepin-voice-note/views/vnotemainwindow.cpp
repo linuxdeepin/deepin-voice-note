@@ -833,9 +833,15 @@ void VNoteMainWindow::onA2TStart(bool first)
         }
     } else {
         asrVoiceItem = m_rightView->getCurVoiceAsr();
+        if(asrVoiceItem){
+            if(!asrVoiceItem->hasSelection() || m_rightView->getOnlyOneSelectVoice() != nullptr){
+                m_rightView->setCurVoiceAsr(nullptr);
+                return;
+            }
+        }
     }
 
-    if (asrVoiceItem && asrVoiceItem->getNoteBlock()->blockText.isEmpty()) {
+    if (asrVoiceItem  && asrVoiceItem->getNoteBlock()->blockText.isEmpty()) {
         VNVoiceBlock *data = asrVoiceItem->getNoteBlock()->ptrVoice;
 
         if (nullptr != data) {

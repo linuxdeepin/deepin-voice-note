@@ -660,8 +660,10 @@ void RightView::mousePressEvent(QMouseEvent *event)
             m_curItemWidget->setFocus();
         }
         if(m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Voice){
-            m_curItemWidget->selectAllText();
-            m_selectWidget.insert(VoicePlugin, m_curItemWidget);
+            if(widget && !m_curItemWidget->isTextContainsPos(event->globalPos())){
+                m_curItemWidget->selectAllText();
+                m_selectWidget.insert(VoicePlugin, m_curItemWidget);
+            }
         }
     }
 }
@@ -936,16 +938,6 @@ VoiceNoteItem *RightView::getCurVoicePlay()
 
 VoiceNoteItem *RightView::getCurVoiceAsr()
 {
-    if(m_curAsrItem){
-        auto voiceWidget = m_selectWidget.values(VoicePlugin);
-        auto textWidget = m_selectWidget.values(TextEditPlugin);
-        if(voiceWidget.size() == 1 && isAllWidgetEmpty(textWidget)){
-            OpsStateInterface *stateInterface = gVNoteOpsStates();
-            if(!stateInterface->isVoice2Text()){
-                  m_curAsrItem = nullptr;
-            }
-        }
-    }
     return  m_curAsrItem;
 }
 
@@ -988,21 +980,11 @@ int RightView::showWarningDialog()
         if (stateInterface->isVoice2Text() && m_curAsrItem && m_curAsrItem->hasSelection()) {
             return -1;
         }
-        return  1;
-    }
 
-    auto textWidget = m_selectWidget.values(VoicePlugin);
-
-    if(textWidget.size() == 0 &&  m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Voice){
-        if (m_curItemWidget == m_curPlayItem) {
-            return  -1;
-        }
-
-        if (stateInterface->isVoice2Text() && m_curAsrItem == m_curItemWidget) {
+        if(voiceWidget.size() == 1 && !voiceWidget[0]->isSelectAll()){
             return -1;
         }
-
-        return 1;
+        return  1;
     }
 
     return 0;
@@ -1023,14 +1005,13 @@ void RightView::onChangeTheme()
 
 void RightView::saveMp3()
 {
-    auto voiceWidget = m_selectWidget.values(VoicePlugin);
-    auto textWidget = m_selectWidget.values(TextEditPlugin);
+    DetailItemWidget *widget = getOnlyOneSelectVoice();
 
-    if(voiceWidget.size() == 1 && isAllWidgetEmpty(textWidget)){
-        m_curItemWidget = voiceWidget[0];
-        m_curItemWidget->setFocus();
-    }else if (voiceWidget.size() != 0 || !isAllWidgetEmpty(textWidget)) {
+    if(widget == nullptr){
         return;
+    }
+    if(widget != m_curItemWidget){
+        m_curItemWidget = widget;
     }
 
     if (m_curItemWidget) {
@@ -1083,4 +1064,18 @@ bool RightView::isAllWidgetSelectAll(const QList<DetailItemWidget *> &widget)
     }
 
     return true;
+}
+
+DetailItemWidget* RightView::getOnlyOneSelectVoice()
+{
+    auto voiceWidget = m_selectWidget.values(VoicePlugin);
+    auto textWidget = m_selectWidget.values(TextEditPlugin);
+
+    if(voiceWidget.size() == 1 && isAllWidgetEmpty(textWidget)){
+        if(voiceWidget[0]->isSelectAll()){
+            return voiceWidget[0];
+        }
+    }
+
+    return  nullptr;
 }

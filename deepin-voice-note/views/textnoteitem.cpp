@@ -151,3 +151,9 @@ bool TextNoteItem::isSelectAll()
     }
     return m_selectAll;
 }
+
+bool TextNoteItem::isTextContainsPos(const QPoint &globalPos)
+{
+    Q_UNUSED(globalPos);
+    return true;
+}

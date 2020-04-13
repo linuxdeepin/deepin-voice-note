@@ -49,6 +49,7 @@ public:
 
     bool isAllWidgetEmpty(const QList<DetailItemWidget*> &widget);
     bool isAllWidgetSelectAll (const QList<DetailItemWidget*> &widget);
+    DetailItemWidget *getOnlyOneSelectVoice();
 
     QString copySelectText(bool voiceText = true);
     void cutSelectText(); //剪切文本

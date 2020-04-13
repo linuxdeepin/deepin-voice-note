@@ -27,6 +27,7 @@ public:
     void setFocus();
     bool hasFocus();
     bool isSelectAll();
+    bool isTextContainsPos(const QPoint &globalPos);
 
 signals:
     void        sigCursorHeightChange(QWidget *widget, int height);
