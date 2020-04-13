@@ -390,23 +390,7 @@ int RightView::initAction(DetailItemWidget *widget)
                 updateData();
                 return -1;
             }
-
-            ActionManager::Instance()->enableAction(ActionManager::DetailVoiceSave, true);
-            if (blockData->ptrVoice->blockText.isEmpty() && !stateInterface->isVoice2Text()) {
-                ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, true);
-            }
-
-            if (m_curPlayItem && m_curPlayItem == widget) {
-                return 0;
-            }
-
-            if (stateInterface->isVoice2Text() && m_curAsrItem == widget) {
-                return 0;
-            }
-
-            ActionManager::Instance()->enableAction(ActionManager::DetailDelete, true);
-
-        } else if (blockData->blockType == VNoteBlock::Text) {
+        } else if (widget->hasFocus() && blockData->blockType == VNoteBlock::Text) {
             ActionManager::Instance()->enableAction(ActionManager::DetailPaste, true);
         }
         return 0;
@@ -435,7 +419,7 @@ int RightView::initAction(DetailItemWidget *widget)
                     if (stateInterface->isVoice2Text() && m_curAsrItem && m_curAsrItem->hasSelection()) {
                         return 0;
                     }
-
+                    ActionManager::Instance()->enableAction(ActionManager::DetailCut, true);
                     ActionManager::Instance()->enableAction(ActionManager::DetailDelete, true);
                     return 0;
                 }
@@ -653,8 +637,8 @@ void RightView::mousePressEvent(QMouseEvent *event)
                 m_curItemWidget->selectAllText();
                 m_selectWidget.insert(VoicePlugin, m_curItemWidget);
             }
-        }else{
-
+        }
+        if(widget == nullptr || m_curItemWidget->getNoteBlock()->blockType != VNoteBlock::Voice){
             if(getOnlyOneSelectVoice() != nullptr){
                 clearAllSelection();
             }
