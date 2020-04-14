@@ -34,6 +34,7 @@ void VNotePlayWidget::initUI()
     m_slider->setValue(0);
 
     m_closeBtn = new DDialogCloseButton(this);
+    m_closeBtn->setIconSize(QSize(26,26));
     DStyle::setFocusRectVisible(m_closeBtn, false);
 
     QVBoxLayout *sliderLayout = new QVBoxLayout;
