@@ -58,7 +58,7 @@ void RightView::initUi()
         ,"The voice note has been deleted"));
     DFontSizeManager::instance()->bind(m_pMessage, DFontSizeManager::T6);
     DPalette paMsg = DApplicationHelper::instance()->palette(m_pMessage);
-    paMsg.setBrush(DPalette::BrightText, paMsg.color(DPalette::BrightText));
+    paMsg.setBrush(DPalette::WindowText, paMsg.color(DPalette::BrightText));
     m_pMessage->setPalette(paMsg);
 
     m_fileHasDelDialog = new DDialog(this);

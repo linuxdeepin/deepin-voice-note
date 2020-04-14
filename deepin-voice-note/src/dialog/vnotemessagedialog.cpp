@@ -39,7 +39,7 @@ void VNoteMessageDialog::initUI()
 
     //Set Message color to TextTips
     DPalette paMsg = DApplicationHelper::instance()->palette(m_pMessage);
-    paMsg.setBrush(DPalette::BrightText, paMsg.color(DPalette::BrightText));
+    paMsg.setBrush(DPalette::WindowText, paMsg.color(DPalette::BrightText));
     m_pMessage->setPalette(paMsg);
 
     QHBoxLayout *actionBarLayout = new QHBoxLayout();
