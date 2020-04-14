@@ -390,16 +390,9 @@ void VNoteMainWindow::initShortcuts()
                     deleteAct = ActionManager::Instance()->getActionById(
                                 ActionManager::NoteDelete);
                 }
-            } else if (m_rightView->hasFocus()) {
-
-                DetailItemWidget *menuItem = m_rightView->getMenuItem();
-                VoiceNoteItem  *playItem = m_rightView->getCurVoicePlay();
-                VoiceNoteItem  *asrItem = m_rightView->getCurVoiceAsr();
-
-                if (menuItem != playItem && menuItem != asrItem) {
-                    deleteAct = ActionManager::Instance()->getActionById(
-                                ActionManager::DetailDelete);
-                }
+            } else if (m_rightView->hasFocus() || m_rightView->getOnlyOneSelectVoice() != nullptr) {
+                deleteAct = ActionManager::Instance()->getActionById(
+                            ActionManager::DetailDelete);
             }
 
             if (nullptr != deleteAct) {
