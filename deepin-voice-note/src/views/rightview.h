@@ -54,7 +54,6 @@ public:
     QString copySelectText(bool voiceText = true);
     void cutSelectText(); //剪切文本
     void delSelectText();
-    void doDelAction();
 
     void setCurVoicePlay(VoiceNoteItem *item);
     void setCurVoiceAsr(VoiceNoteItem *item);

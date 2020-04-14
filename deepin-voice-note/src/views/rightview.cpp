@@ -911,11 +911,11 @@ void RightView::keyPressEvent(QKeyEvent *e)
         if (ret == 1) {
             VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
             connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
-                doDelAction();
+                delSelectText();
             });
             confirmDialog.exec();
         } else if (ret == 0) {
-            doDelAction();
+            delSelectText();
         }
     }
 }
@@ -938,32 +938,6 @@ VoiceNoteItem *RightView::getCurVoicePlay()
 VoiceNoteItem *RightView::getCurVoiceAsr()
 {
     return  m_curAsrItem;
-}
-
-void RightView::doDelAction()
-{
-    auto voiceWidget = m_selectWidget.values(VoicePlugin);
-    auto textWidget = m_selectWidget.values(TextEditPlugin);
-
-    if(voiceWidget.isEmpty()){
-        if(textWidget.isEmpty()){
-            VNoteBlock *block = m_curItemWidget->getNoteBlock();
-            if (block->blockType == VNoteBlock::Voice) {
-                delWidget(m_curItemWidget);
-                updateData();
-            }
-        }else if (!isAllWidgetEmpty(textWidget)) {
-            delSelectText();
-        }
-    }else {
-        if(voiceWidget.size() == 1 && voiceWidget[0]->isSelectAll()){
-            delWidget(voiceWidget[0]);
-            clearAllSelection();
-            updateData();
-        }else {
-            delSelectText();
-        }
-    }
 }
 
 int RightView::showWarningDialog()

@@ -1121,12 +1121,12 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         if (ret == 1) {
             VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
             connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
-                m_rightView->doDelAction();
+                m_rightView->delSelectText();
             });
 
             confirmDialog.exec();
         } else if (ret == 0) {
-            m_rightView->doDelAction();
+            m_rightView->delSelectText();
         }
 
     } break;
