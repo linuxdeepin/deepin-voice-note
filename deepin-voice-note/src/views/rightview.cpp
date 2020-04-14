@@ -399,18 +399,22 @@ int RightView::initAction(DetailItemWidget *widget)
     if(voiceCount){
         if(isAllWidgetEmpty(textWidget)){
             if(voiceCount == 1){
-                if(widget->isSelectAll()){
-                    VNoteBlock *blockData = widget->getNoteBlock();
+                if(voiceWidget[0]->isSelectAll()){
+                    VNoteBlock *blockData = voiceWidget[0]->getNoteBlock();
                     if (!checkFileExist(blockData->ptrVoice->voicePath)) {
-                        delWidget(widget);
+                        delWidget(voiceWidget[0]);
                         updateData();
                         return -1;
                     }
 
-                    ActionManager::Instance()->enableAction(ActionManager::DetailVoiceSave, true);
-                    if (blockData->ptrVoice->blockText.isEmpty() && !stateInterface->isVoice2Text()) {
-                        ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, true);
+                    if(!blockData->ptrVoice->blockText.isEmpty()){
+                        ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
+                        if(!stateInterface->isVoice2Text()){
+                            ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, true);
+                        }
                     }
+
+                    ActionManager::Instance()->enableAction(ActionManager::DetailVoiceSave, true);
 
                     if (m_curPlayItem && m_curPlayItem->hasSelection()) {
                         return 0;
@@ -765,13 +769,6 @@ void RightView::mouseMoveSelect(QMouseEvent *event)
 QString RightView::copySelectText(bool voiceText)
 {
     QString text = "";
-    auto voiceWidget = m_selectWidget.values(VoicePlugin);
-    auto textWidget = m_selectWidget.values(TextEditPlugin);
-
-    if(voiceWidget.size() && voiceWidget[0]->isSelectAll() && isAllWidgetEmpty(textWidget)){ //只有语音插件不能复制
-        return text;
-    }
-
     for (int i = 0; i < m_viewportLayout->count() - 1 ; i++) {
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
         DetailItemWidget *widget = static_cast< DetailItemWidget *>(layoutItem->widget());
