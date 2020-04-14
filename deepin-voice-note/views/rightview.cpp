@@ -873,8 +873,10 @@ void RightView::selectAllItem()
 void RightView::pasteText()
 {
 
-    if (m_curItemWidget && m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Text) {
-        if(!m_selectWidget.size()){ //没有选中才可以粘贴
+    if (m_curItemWidget && m_curItemWidget->hasFocus() && m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Text) {
+        auto voiceWidget = m_selectWidget.values(VoicePlugin);
+        auto textWidget = m_selectWidget.values(TextEditPlugin);
+        if(!voiceWidget.size() && isAllWidgetEmpty(textWidget)){ //没有选中才可以粘贴
             auto textCursor = m_curItemWidget->getTextCursor();
             QClipboard *board = QApplication::clipboard();
             if (board) {
