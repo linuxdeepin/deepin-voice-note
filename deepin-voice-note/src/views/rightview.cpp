@@ -413,6 +413,7 @@ int RightView::initAction(DetailItemWidget *widget)
 
                     if(!blockData->ptrVoice->blockText.isEmpty()){
                         ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
+                    }else {
                         if(!stateInterface->isVoice2Text()){
                             ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, true);
                         }
@@ -581,14 +582,6 @@ void RightView::setEnablePlayBtn(bool enable)
 
 DetailItemWidget *RightView::getMenuItem()
 {
-    auto voiceWidget = m_selectWidget.values(VoicePlugin);
-    auto textWidget = m_selectWidget.values(TextEditPlugin);
-
-    if(voiceWidget.size() == 1 && isAllWidgetEmpty(textWidget)){
-        m_curItemWidget = voiceWidget[0];
-        m_curItemWidget->setFocus();
-    }
-
     return m_curItemWidget;
 }
 
@@ -1021,17 +1014,6 @@ bool RightView::isAllWidgetEmpty(const QList<DetailItemWidget *> &widget)
 
     for(auto it: widget){
         if(!it->textIsEmpty()){
-            return false;
-        }
-    }
-
-    return true;
-}
-
-bool RightView::isAllWidgetSelectAll(const QList<DetailItemWidget *> &widget)
-{
-    for(auto it: widget){
-        if(!it->isSelectAll()){
             return false;
         }
     }

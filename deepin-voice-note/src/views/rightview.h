@@ -48,7 +48,6 @@ public:
     int   initAction(DetailItemWidget *widget);
 
     bool isAllWidgetEmpty(const QList<DetailItemWidget*> &widget);
-    bool isAllWidgetSelectAll (const QList<DetailItemWidget*> &widget);
     DetailItemWidget *getOnlyOneSelectVoice();
 
     QString copySelectText(bool voiceText = true);
