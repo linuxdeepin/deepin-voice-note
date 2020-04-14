@@ -768,7 +768,7 @@ QString RightView::copySelectText(bool voiceText)
     auto voiceWidget = m_selectWidget.values(VoicePlugin);
     auto textWidget = m_selectWidget.values(TextEditPlugin);
 
-    if(voiceWidget.size() && isAllWidgetEmpty(textWidget)){ //只有语音插件不能复制
+    if(voiceWidget.size() && voiceWidget[0]->isSelectAll() && isAllWidgetEmpty(textWidget)){ //只有语音插件不能复制
         return text;
     }
 
