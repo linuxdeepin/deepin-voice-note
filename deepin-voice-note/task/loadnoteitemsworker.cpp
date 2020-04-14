@@ -5,8 +5,7 @@
 #include <DLog>
 
 LoadNoteItemsWorker::LoadNoteItemsWorker(QObject *parent)
-    :QObject(parent)
-    ,QRunnable ()
+    :VNTask(parent)
 {
 
 }

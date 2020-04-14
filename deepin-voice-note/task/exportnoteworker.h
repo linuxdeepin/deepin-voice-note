@@ -1,12 +1,13 @@
 #ifndef EXPORTNOTEWORKER_H
 #define EXPORTNOTEWORKER_H
 
-#include "datatypedef.h"
+#include "common/datatypedef.h"
+#include "vntask.h"
 
 #include <QObject>
 #include <QRunnable>
 
-class ExportNoteWorker : public QObject, public QRunnable
+class ExportNoteWorker : public VNTask
 {
     Q_OBJECT
 public:

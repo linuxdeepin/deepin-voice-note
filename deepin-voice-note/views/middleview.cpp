@@ -5,7 +5,7 @@
 #include "middleviewsortfilter.h"
 #include "common/actionmanager.h"
 #include "common/standarditemcommon.h"
-#include "common/exportnoteworker.h"
+#include "task/exportnoteworker.h"
 
 #include <QMouseEvent>
 #include <QVBoxLayout>

@@ -1,10 +1,12 @@
 #ifndef LOADICONSWORKER_H
 #define LOADICONSWORKER_H
 
+#include "vntask.h"
+
 #include <QObject>
 #include <QRunnable>
 
-class LoadIconsWorker : public QObject, public QRunnable
+class LoadIconsWorker : public VNTask
 {
     Q_OBJECT
 public:

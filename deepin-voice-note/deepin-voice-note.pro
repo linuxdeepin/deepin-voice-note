@@ -18,9 +18,9 @@ SOURCES += \
     common/vnoteitem.cpp \
     db/vnotefolderoper.cpp \
     db/vnoteitemoper.cpp \
-    common/loadfolderworker.cpp \
-    common/loadnoteitemsworker.cpp \
-    common/loadiconsworker.cpp \
+    task/loadfolderworker.cpp \
+    task/loadnoteitemsworker.cpp \
+    task/loadiconsworker.cpp \
     views/middleview.cpp \
     views/middleviewdelegate.cpp \
     views/textnoteedit.cpp \
@@ -52,13 +52,13 @@ SOURCES += \
     dbus/dbusvariant.cpp \
     dbus/dbuslogin1manager.cpp \
     views/textnoteitem.cpp \
-    common/exportnoteworker.cpp \
+    task/exportnoteworker.cpp \
     common/opsstateinterface.cpp \
     widgets/vnote2siconbutton.cpp \
     common/vnotedatasafefymanager.cpp \
     task/vntask.cpp \
     common/vntaskworker.cpp \
-    common/loadsafeteydataworker.cpp \
+    task/loadsafeteydataworker.cpp \
     db/vnotesaferoper.cpp \
     task/vnmainwnddelayinittask.cpp \
     task/vndatasafertask.cpp
@@ -78,9 +78,9 @@ HEADERS += \
     db/vnotefolderoper.h \
     db/vnoteitemoper.h \
     common/datatypedef.h \
-    common/loadfolderworker.h \
-    common/loadnoteitemsworker.h \
-    common/loadiconsworker.h \
+    task/loadfolderworker.h \
+    task/loadnoteitemsworker.h \
+    task/loadiconsworker.h \
     views/middleview.h \
     views/middleviewdelegate.h \
     views/textnoteedit.h \
@@ -111,13 +111,13 @@ HEADERS += \
     dbus/dbuslogin1manager.h \
     dbus/dbusvariant.h \
     views/textnoteitem.h \
-    common/exportnoteworker.h \
+    task/exportnoteworker.h \
     common/opsstateinterface.h \
     widgets/vnote2siconbutton.h \
     common/vnotedatasafefymanager.h \
     task/vntask.h \
     common/vntaskworker.h \
-    common/loadsafeteydataworker.h \
+    task/loadsafeteydataworker.h \
     db/vnotesaferoper.h \
     task/vnmainwnddelayinittask.h \
     task/vndatasafertask.h

@@ -1,12 +1,13 @@
 #ifndef LOADFOLDERWORKER_H
 #define LOADFOLDERWORKER_H
 
-#include "datatypedef.h"
+#include "common/datatypedef.h"
+#include "vntask.h"
 
 #include <QObject>
 #include <QRunnable>
 
-class LoadFolderWorker : public QObject, public QRunnable
+class LoadFolderWorker : public VNTask
 {
     Q_OBJECT
 public:

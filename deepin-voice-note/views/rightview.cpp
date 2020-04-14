@@ -8,7 +8,7 @@
 #include "common/vnoteitem.h"
 #include "common/vnotedatamanager.h"
 #include "common/actionmanager.h"
-#include "common/exportnoteworker.h"
+#include "task/exportnoteworker.h"
 #include "common/opsstateinterface.h"
 #include "db/vnoteitemoper.h"
 

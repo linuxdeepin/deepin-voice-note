@@ -1,6 +1,6 @@
 #include "vnotedatasafefymanager.h"
 #include "vntaskworker.h"
-#include "loadsafeteydataworker.h"
+#include "task/loadsafeteydataworker.h"
 #include "task/vndatasafertask.h"
 
 #include <QThreadPool>

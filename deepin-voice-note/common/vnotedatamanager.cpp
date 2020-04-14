@@ -1,8 +1,8 @@
 #include "vnotedatamanager.h"
 #include "db/vnotedbmanager.h"
-#include "loadfolderworker.h"
-#include "loadnoteitemsworker.h"
-#include "loadiconsworker.h"
+#include "task/loadfolderworker.h"
+#include "task/loadnoteitemsworker.h"
+#include "task/loadiconsworker.h"
 #include "vnoteforlder.h"
 #include "vnoteitem.h"
 

@@ -11,8 +11,7 @@
 
 ExportNoteWorker::ExportNoteWorker(QString dirPath, int exportType,
                                    VNoteItem* note, VNoteBlock* block, QObject *parent)
-    : QObject(parent)
-    ,QRunnable ()
+    :VNTask(parent)
     ,m_exportType(exportType)
     ,m_exportPath(dirPath)
     ,m_note(note)

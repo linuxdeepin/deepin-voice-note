@@ -1,13 +1,12 @@
 #include "loadfolderworker.h"
-#include "vnoteforlder.h"
+#include "common/vnoteforlder.h"
 #include "db/vnotefolderoper.h"
 #include "globaldef.h"
 
 #include <DLog>
 
 LoadFolderWorker::LoadFolderWorker(QObject *parent)
-    : QObject(parent)
-    ,QRunnable ()
+    : VNTask(parent)
 {
 
 }

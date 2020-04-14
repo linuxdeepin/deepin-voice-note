@@ -1,13 +1,14 @@
 #ifndef LOADNOTEITEMSWORKER_H
 #define LOADNOTEITEMSWORKER_H
 
-#include "datatypedef.h"
+#include "common/datatypedef.h"
+#include "vntask.h"
 
 #include <QObject>
 #include <QRunnable>
 #include <QtGlobal>
 
-class LoadNoteItemsWorker : public QObject, public QRunnable
+class LoadNoteItemsWorker : public VNTask
 {
     Q_OBJECT
 public:

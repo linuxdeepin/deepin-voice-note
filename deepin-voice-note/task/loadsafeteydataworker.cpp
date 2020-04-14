@@ -5,7 +5,7 @@
 #include <DLog>
 
 LoadSafeteyDataWorker::LoadSafeteyDataWorker(QObject *parent)
-    : VNTask(parent)
+    :VNTask(parent)
 {
 
 }

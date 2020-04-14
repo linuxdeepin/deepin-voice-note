@@ -8,8 +8,7 @@ QVector<QPixmap> VNoteDataManager::m_defaultIcons[IconsType::MaxIconsType];
 QReadWriteLock VNoteDataManager::m_iconLock;
 
 LoadIconsWorker::LoadIconsWorker(QObject *parent)
-    : QObject(parent)
-    , QRunnable ()
+    : VNTask(parent)
 {
     //Hold the lock at constructor, this can void
     //other thread acess the icons before that being
