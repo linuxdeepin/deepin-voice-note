@@ -642,11 +642,6 @@ void RightView::mousePressEvent(QMouseEvent *event)
                 m_selectWidget.insert(VoicePlugin, m_curItemWidget);
             }
         }
-        if(widget == nullptr || m_curItemWidget->getNoteBlock()->blockType != VNoteBlock::Voice){
-            if(getOnlyOneSelectVoice() != nullptr){
-                clearAllSelection();
-            }
-        }
         onMenuShow(m_curItemWidget);
     } else if (btn == Qt::LeftButton) {
         clearAllSelection();
