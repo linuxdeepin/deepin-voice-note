@@ -765,6 +765,13 @@ void RightView::mouseMoveSelect(QMouseEvent *event)
 QString RightView::copySelectText(bool voiceText)
 {
     QString text = "";
+    auto voiceWidget = m_selectWidget.values(VoicePlugin);
+    auto textWidget = m_selectWidget.values(TextEditPlugin);
+
+    if(voiceWidget.size() && isAllWidgetEmpty(textWidget)){ //只有语音插件不能复制
+        return text;
+    }
+
     for (int i = 0; i < m_viewportLayout->count() - 1 ; i++) {
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
         DetailItemWidget *widget = static_cast< DetailItemWidget *>(layoutItem->widget());
