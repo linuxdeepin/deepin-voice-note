@@ -384,16 +384,20 @@ int RightView::initAction(DetailItemWidget *widget)
 
     if(!voiceCount && !textCount && widget){
         VNoteBlock *blockData = widget->getNoteBlock();
-        if (blockData->blockType == VNoteBlock::Voice) {
-            if (!checkFileExist(blockData->ptrVoice->voicePath)) {
-                delWidget(widget);
-                updateData();
-                return -1;
-            }
-        } else if (widget->hasFocus() && blockData->blockType == VNoteBlock::Text) {
+        if (widget->hasFocus() && blockData->blockType == VNoteBlock::Text) {
             ActionManager::Instance()->enableAction(ActionManager::DetailPaste, true);
         }
         return 0;
+    }
+
+    bool canCutDel = true;
+
+    if (m_curPlayItem && m_curPlayItem->hasSelection()) {
+        canCutDel = false;
+    }
+
+    if (stateInterface->isVoice2Text() && m_curAsrItem && m_curAsrItem->hasSelection()) {
+        canCutDel = false;
     }
 
     if(voiceCount){
@@ -416,42 +420,38 @@ int RightView::initAction(DetailItemWidget *widget)
 
                     ActionManager::Instance()->enableAction(ActionManager::DetailVoiceSave, true);
 
-                    if (m_curPlayItem && m_curPlayItem->hasSelection()) {
-                        return 0;
+                    if(canCutDel){
+                        ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
+                        ActionManager::Instance()->enableAction(ActionManager::DetailDelete, canCutDel);
                     }
 
-                    if (stateInterface->isVoice2Text() && m_curAsrItem && m_curAsrItem->hasSelection()) {
-                        return 0;
-                    }
-                    ActionManager::Instance()->enableAction(ActionManager::DetailCut, true);
-                    ActionManager::Instance()->enableAction(ActionManager::DetailDelete, true);
                     return 0;
                 }
                 ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
                 return 0;
             }
 
-            if (m_curPlayItem && m_curPlayItem->hasSelection()) {
-                return 0;
+            if(canCutDel){
+                ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
+                ActionManager::Instance()->enableAction(ActionManager::DetailDelete, canCutDel);
             }
-
-            if (stateInterface->isVoice2Text() && m_curAsrItem && m_curAsrItem->hasSelection()) {
-                return 0;
-            }
-
-            ActionManager::Instance()->enableAction(ActionManager::DetailCut, true);
-            ActionManager::Instance()->enableAction(ActionManager::DetailDelete, true);
         }else if(textCount){
             ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
-            ActionManager::Instance()->enableAction(ActionManager::DetailCut, true);
-            ActionManager::Instance()->enableAction(ActionManager::DetailDelete, true);
+
+            if(canCutDel){
+                ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
+                ActionManager::Instance()->enableAction(ActionManager::DetailDelete, canCutDel);
+            }
         }
         return 0;
     }
 
     ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
-    ActionManager::Instance()->enableAction(ActionManager::DetailCut, true);
-    ActionManager::Instance()->enableAction(ActionManager::DetailDelete, true);
+
+    if(canCutDel){
+        ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
+        ActionManager::Instance()->enableAction(ActionManager::DetailDelete, canCutDel);
+    }
     return 0;
 }
 
