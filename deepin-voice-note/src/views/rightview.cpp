@@ -778,10 +778,10 @@ QString RightView::copySelectText(bool voiceText)
         if (hasSelection) {
             QString selectText = widget->getSelectText();
             if (!selectText.isEmpty()) {
-                text.append(selectText);
-                if(!firstSelect && !text.endsWith('\n')){
+                if(!firstSelect && !selectText.startsWith('\n')){
                      text.append("\n");
                 }
+                text.append(selectText);
             }
             firstSelect = false;
         }
