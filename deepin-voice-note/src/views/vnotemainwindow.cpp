@@ -1534,11 +1534,17 @@ void VNoteMainWindow::initAsrErrMessage()
     iconPath.append("warning.svg");
     m_asrErrMeassage->setIcon(QIcon(iconPath));
     m_asrAgainBtn = new DPushButton(m_asrErrMeassage);
-
     m_asrAgainBtn->setText(DApplication::translate(
                                "VNoteErrorMessage",
                                "Try Again"));
-    m_asrErrMeassage->setWidget(m_asrAgainBtn);
+    m_asrAgainBtn->adjustSize();
+
+    DWidget *m_widget = new DWidget(m_asrErrMeassage);
+    QHBoxLayout *m_layout = new QHBoxLayout();
+    m_layout->addStretch();
+    m_layout->addWidget(m_asrAgainBtn);
+    m_widget->setLayout(m_layout);
+    m_asrErrMeassage->setWidget(m_widget);
     m_asrErrMeassage->setVisible(false);
 }
 
@@ -1546,7 +1552,8 @@ void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
 {
     m_asrErrMeassage->setMessage(strMessage);
     m_asrErrMeassage->setVisible(true);
-    m_asrErrMeassage->setFixedWidth(520);
+    m_asrErrMeassage->setMinimumWidth(520);
+    m_asrErrMeassage->setMaximumWidth(m_rightViewHolder->width());
     m_asrErrMeassage->adjustSize();
 }
 
