@@ -393,6 +393,12 @@ void VNoteMainWindow::initShortcuts()
             } else if (m_rightView->hasFocus()) {
                 deleteAct = ActionManager::Instance()->getActionById(
                             ActionManager::DetailDelete);
+            }else{
+                QPoint pos = m_rightViewHolder->mapFromGlobal(QCursor::pos());
+                if(m_rightViewHolder->rect().contains(pos)){
+                    deleteAct = ActionManager::Instance()->getActionById(
+                                ActionManager::DetailDelete);
+                }
             }
 
             if (nullptr != deleteAct) {

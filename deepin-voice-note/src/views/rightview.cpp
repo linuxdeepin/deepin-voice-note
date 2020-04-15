@@ -109,7 +109,6 @@ DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextC
 
 DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
 {
-
     if (m_curItemWidget == nullptr || m_noteItemData == nullptr) {
         qDebug() << "can not insert";
         return  nullptr;
@@ -666,12 +665,6 @@ void RightView::mouseReleaseEvent(QMouseEvent *event)
                     m_selectWidget.insert(VoicePlugin,widget);
                 }
             }
-        }
-
-        DetailItemWidget *widget = getOnlyOneSelectVoice();
-        if(widget != nullptr){
-            m_curItemWidget = widget;
-            widget->setFocus();
         }
     }
     DWidget::mouseReleaseEvent(event);
