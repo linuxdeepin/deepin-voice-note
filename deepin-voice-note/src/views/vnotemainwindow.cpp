@@ -471,6 +471,11 @@ void VNoteMainWindow::initLeftView()
     leftHolderLayout->setContentsMargins(0, 5, 0, 0);
     m_leftView = new LeftView(m_leftViewHolder);
 
+    //背景色透明，隐藏disable时的背景色
+    DPalette pb = DApplicationHelper::instance()->palette(m_leftView);
+    pb.setBrush(DPalette::Base, QColor(0,0,0,0));
+    m_leftView->setPalette(pb);
+
     m_leftView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_leftView->setContentsMargins(0, 0, 0, 0);
     m_leftView->setHeaderHidden(true);
