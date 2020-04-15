@@ -1,21 +1,21 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="zh_TW" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="da" version="2.1">
 <context>
     <name>AppMain</name>
     <message>
         <location filename="../main.cpp" line="25"/>
         <location filename="../views/vnotemainwindow.cpp" line="640"/>
         <source>Voice Notes</source>
-        <translation>語音記事本</translation>
+        <translation>Stemmenoter</translation>
     </message>
     <message>
         <location filename="../main.cpp" line="26"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation>語音記事本是一款提供文字記事、語音錄音記錄的輕量級記事工具。</translation>
+        <translation>Stemmenoter er et letvægts memoværktøj til at oprette tekstnoter og stemmeoptagelser.</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="641"/>
         <source>Recordings not saved</source>
-        <translation>錄音未儲存</translation>
+        <translation>Optagelserne blev ikke gemt</translation>
     </message>
 </context>
 <context>
@@ -24,17 +24,17 @@
         <location filename="../db/vnotefolderoper.cpp" line="248"/>
         <location filename="../db/vnotefolderoper.cpp" line="251"/>
         <source>Notebook</source>
-        <translation>記事本</translation>
+        <translation>Notesblok</translation>
     </message>
     <message>
         <location filename="../db/vnoteitemoper.cpp" line="278"/>
         <source>Text</source>
-        <translation>文字</translation>
+        <translation>Tekst</translation>
     </message>
     <message>
         <location filename="../db/vnoteitemoper.cpp" line="289"/>
         <source>Voice</source>
-        <translation>語音</translation>
+        <translation>Stemme</translation>
     </message>
 </context>
 <context>
@@ -42,12 +42,12 @@
     <message>
         <location filename="../views/homepage.cpp" line="20"/>
         <source>Create Notebook</source>
-        <translation>建立記事本</translation>
+        <translation>Opret notesblok</translation>
     </message>
     <message>
         <location filename="../views/homepage.cpp" line="32"/>
         <source>Create a notebook to start recording voice and making notes</source>
-        <translation>建立一個記事本後，可以開始記錄語音及文字</translation>
+        <translation>Opret en notesblok for at optage stemme og tage noter</translation>
     </message>
 </context>
 <context>
@@ -56,12 +56,12 @@
         <location filename="../views/middleview.cpp" line="143"/>
         <location filename="../views/middleview.cpp" line="178"/>
         <source>Save</source>
-        <translation>儲存</translation>
+        <translation>Gem</translation>
     </message>
     <message>
         <location filename="../views/middleview.cpp" line="252"/>
         <source>No search results</source>
-        <translation>無搜尋結果</translation>
+        <translation>Ingen søgeresultater</translation>
     </message>
 </context>
 <context>
@@ -69,37 +69,37 @@
     <message>
         <location filename="../common/actionmanager.cpp" line="141"/>
         <source>Save as MP3</source>
-        <translation>儲存為MP3</translation>
+        <translation>Gem som MP3</translation>
     </message>
     <message>
         <location filename="../common/actionmanager.cpp" line="142"/>
         <source>Voice to Text</source>
-        <translation>語音轉文字</translation>
+        <translation>Stemme til tekst</translation>
     </message>
     <message>
         <location filename="../common/actionmanager.cpp" line="143"/>
         <source>Delete</source>
-        <translation>刪除</translation>
+        <translation>Slet</translation>
     </message>
     <message>
         <location filename="../common/actionmanager.cpp" line="144"/>
         <source>Select all</source>
-        <translation>全選</translation>
+        <translation>Vælg alle</translation>
     </message>
     <message>
         <location filename="../common/actionmanager.cpp" line="145"/>
         <source>Copy</source>
-        <translation>複製</translation>
+        <translation>Kopiér</translation>
     </message>
     <message>
         <location filename="../common/actionmanager.cpp" line="146"/>
         <source>Cut</source>
-        <translation>剪下</translation>
+        <translation>Klip</translation>
     </message>
     <message>
         <location filename="../common/actionmanager.cpp" line="147"/>
         <source>Paste</source>
-        <translation>貼上</translation>
+        <translation>Indsæt</translation>
     </message>
 </context>
 <context>
@@ -107,17 +107,17 @@
     <message>
         <location filename="../common/actionmanager.cpp" line="99"/>
         <source>Rename</source>
-        <translation>重新命名</translation>
+        <translation>Omdøb</translation>
     </message>
     <message>
         <location filename="../common/actionmanager.cpp" line="100"/>
         <source>Delete</source>
-        <translation>刪除</translation>
+        <translation>Slet</translation>
     </message>
     <message>
         <location filename="../common/actionmanager.cpp" line="101"/>
         <source>New note</source>
-        <translation>建立筆記</translation>
+        <translation>Ny note</translation>
     </message>
 </context>
 <context>
@@ -125,27 +125,27 @@
     <message>
         <location filename="../common/actionmanager.cpp" line="119"/>
         <source>Rename</source>
-        <translation>重新命名</translation>
+        <translation>Omdøb</translation>
     </message>
     <message>
         <location filename="../common/actionmanager.cpp" line="120"/>
         <source>Delete</source>
-        <translation>刪除</translation>
+        <translation>Slet</translation>
     </message>
     <message>
         <location filename="../common/actionmanager.cpp" line="121"/>
         <source>Save as TXT</source>
-        <translation>儲存為TXT</translation>
+        <translation>Gem som TXT</translation>
     </message>
     <message>
         <location filename="../common/actionmanager.cpp" line="122"/>
         <source>Save voice recording</source>
-        <translation>儲存語音</translation>
+        <translation>Gem stemmeoptagelse</translation>
     </message>
     <message>
         <location filename="../common/actionmanager.cpp" line="123"/>
         <source>New note</source>
-        <translation>建立筆記</translation>
+        <translation>Ny note</translation>
     </message>
 </context>
 <context>
@@ -153,17 +153,17 @@
     <message>
         <location filename="../views/rightview.cpp" line="57"/>
         <source>The voice note has been deleted</source>
-        <translation>該語音筆記已被刪除</translation>
+        <translation>Stemmenoten er blevet slettet</translation>
     </message>
     <message>
         <location filename="../views/rightview.cpp" line="67"/>
         <source>OK</source>
-        <translation>確定</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../views/rightview.cpp" line="1023"/>
         <source>Save</source>
-        <translation>儲存</translation>
+        <translation>Gem</translation>
     </message>
 </context>
 <context>
@@ -171,97 +171,97 @@
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="910"/>
         <source>New notebook</source>
-        <translation>建立記事本</translation>
+        <translation>Ny notesblok</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="911"/>
         <source>Rename notebook</source>
-        <translation>重新命名記事本</translation>
+        <translation>Omdøb notesblok</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="912"/>
         <source>Delete notebook</source>
-        <translation>刪除記事本</translation>
+        <translation>Slet notesblok</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="934"/>
         <source>New note</source>
-        <translation>建立筆記</translation>
+        <translation>Ny note</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="935"/>
         <source>Rename note</source>
-        <translation>重新命名筆記</translation>
+        <translation>Omdøb note</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="936"/>
         <source>Delete note</source>
-        <translation>刪除筆記</translation>
+        <translation>Slet note</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="937"/>
         <source>Play/Pause</source>
-        <translation>播放/暫停</translation>
+        <translation>Afspil/pause</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="938"/>
         <source>Record voice</source>
-        <translation>錄音</translation>
+        <translation>Optag stemme</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="939"/>
         <source>Voice to Text</source>
-        <translation>語音轉文字</translation>
+        <translation>Stemme til tekst</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="940"/>
         <source>Save as MP3</source>
-        <translation>儲存為MP3</translation>
+        <translation>Gem som MP3</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="941"/>
         <source>Save as TXT</source>
-        <translation>儲存為TXT</translation>
+        <translation>Gem som TXT</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="942"/>
         <source>Save recordings</source>
-        <translation>儲存語音</translation>
+        <translation>Gem optagelser</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="962"/>
         <source>Select all</source>
-        <translation>全選</translation>
+        <translation>Vælg alle</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="963"/>
         <source>Copy</source>
-        <translation>複製</translation>
+        <translation>Kopiér</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="964"/>
         <source>Cut</source>
-        <translation>剪下</translation>
+        <translation>Klip</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="965"/>
         <source>Paste</source>
-        <translation>貼上</translation>
+        <translation>Indsæt</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="966"/>
         <source>Delete</source>
-        <translation>刪除</translation>
+        <translation>Slet</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="989"/>
         <source>Help</source>
-        <translation>幫助</translation>
+        <translation>Hjælp</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="990"/>
         <source>Display shortcuts</source>
-        <translation>顯示快捷鍵</translation>
+        <translation>Vis genveje</translation>
     </message>
 </context>
 <context>
@@ -269,22 +269,22 @@
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="916"/>
         <source>Notebooks</source>
-        <translation>記事本</translation>
+        <translation>Notesblokke</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="946"/>
         <source>Notes</source>
-        <translation>筆記</translation>
+        <translation>Noter</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="970"/>
         <source>Edit</source>
-        <translation>編輯</translation>
+        <translation>Rediger</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="994"/>
         <source>Settings</source>
-        <translation>設定</translation>
+        <translation>Indstillinger</translation>
     </message>
 </context>
 <context>
@@ -292,7 +292,7 @@
     <message>
         <location filename="../views/splashview.cpp" line="21"/>
         <source>Loading...</source>
-        <translation>正在載入...</translation>
+        <translation>Indlæser ...</translation>
     </message>
 </context>
 <context>
@@ -300,7 +300,7 @@
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="447"/>
         <source>Search</source>
-        <translation>搜尋</translation>
+        <translation>Søg</translation>
     </message>
 </context>
 <context>
@@ -308,17 +308,17 @@
     <message>
         <location filename="../common/utils.cpp" line="23"/>
         <source>1 min ago</source>
-        <translation>1分鐘前</translation>
+        <translation>1 minut siden</translation>
     </message>
     <message>
         <location filename="../common/utils.cpp" line="25"/>
         <source>%1 mins ago</source>
-        <translation>%1分鐘前</translation>
+        <translation>%1 minutter siden</translation>
     </message>
     <message>
         <location filename="../common/utils.cpp" line="31"/>
         <source>Yesterday</source>
-        <translation>昨天</translation>
+        <translation>I går</translation>
     </message>
 </context>
 <context>
@@ -326,17 +326,17 @@
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="873"/>
         <source>The voice conversion failed due to the poor network connection. Do you want to try again?</source>
-        <translation>目前網路狀態差，語音轉寫失敗，是否重新轉寫？</translation>
+        <translation>Stemmekonverteringen mislykkedes pga. dårlig netværksforbindelse. Vil du prøve igen?</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="878"/>
         <source>The voice conversion failed. Do you want to try again?</source>
-        <translation>目前語音轉寫文字失敗，是否重新轉寫？</translation>
+        <translation>Stemmekonverteringen mislykkedes. Vil du prøve igen?</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="1547"/>
         <source>Try Again</source>
-        <translation>重新轉寫</translation>
+        <translation>Prøv igen</translation>
     </message>
 </context>
 <context>
@@ -344,7 +344,7 @@
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="491"/>
         <source>Create Notebook</source>
-        <translation>建立記事本</translation>
+        <translation>Opret notesblok</translation>
     </message>
 </context>
 <context>
@@ -352,54 +352,54 @@
     <message>
         <location filename="../dialog/vnotemessagedialog.cpp" line="23"/>
         <source>OK</source>
-        <translation>確定</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../dialog/vnotemessagedialog.cpp" line="93"/>
         <source>Cancel</source>
-        <translation>取消</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../dialog/vnotemessagedialog.cpp" line="94"/>
         <source>Confirm</source>
-        <translation>確定</translation>
+        <translation>Bekræft</translation>
     </message>
     <message>
         <location filename="../dialog/vnotemessagedialog.cpp" line="97"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
-        <translation>您確定要刪除這個記事本嗎？
-包含的所有筆記將被刪除</translation>
+        <translation>Er du sikker på, at du vil slette notesbogen?
+Alle noterne i den vil blive slettet</translation>
     </message>
     <message>
         <location filename="../dialog/vnotemessagedialog.cpp" line="101"/>
         <source>Do you want to stop the current recording?</source>
-        <translation>目前錄音中，是否停止錄音？</translation>
+        <translation>Vil du stoppe den nuværende optagelse?</translation>
     </message>
     <message>
         <location filename="../dialog/vnotemessagedialog.cpp" line="105"/>
         <source>Are you sure you want to delete this note?</source>
-        <translation>您確定要刪除這條筆記嗎？</translation>
+        <translation>Er du sikker på, at du vil slette noten?</translation>
     </message>
     <message>
         <location filename="../dialog/vnotemessagedialog.cpp" line="110"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
-        <translation>無法轉寫此條語音筆記，暫僅支援20分鐘內的語音筆記。</translation>
+        <translation>Kan ikke konvertere stemmenoten da noter over 20 minutter ikke understøttes i øjeblikket.</translation>
     </message>
     <message>
         <location filename="../dialog/vnotemessagedialog.cpp" line="115"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
-        <translation>目前有語音筆記正在轉寫中，是否確定關閉？</translation>
+        <translation>Konverterer en stemmenote nu. Vil du stoppe den.</translation>
     </message>
     <message>
         <location filename="../dialog/vnotemessagedialog.cpp" line="119"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
-        <translation>目前系統輸入音量低，可能影響錄音效果。是否繼續錄音？</translation>
+        <translation>Den lave optagelydstyrke kan resultere i en dårlig optagelse. Vil du fortsætte?</translation>
     </message>
     <message>
         <location filename="../dialog/vnotemessagedialog.cpp" line="123"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
-        <translation>語音筆記以及轉寫文字剪下後不能貼上，是否繼續？</translation>
+        <translation>De klippede optagelser og konverterede tekst indsættes ikke. Vil du fortsætte?</translation>
     </message>
 </context>
 <context>
@@ -407,12 +407,12 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../views/vnoterecordbar.cpp" line="63"/>
         <source>Your audio recording device does not work.</source>
-        <translation>您的錄音裝置異常，無法錄製語音。</translation>
+        <translation>Lydoptagelsesenheden virker ikke.</translation>
     </message>
     <message>
         <location filename="../views/vnoterecordbar.cpp" line="144"/>
         <source>No recording device detected</source>
-        <translation>未檢測到錄音裝置</translation>
+        <translation>Ingen optagelsesenhed registreret</translation>
     </message>
 </context>
 <context>
@@ -420,7 +420,7 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../views/voicenoteitem.cpp" line="177"/>
         <source>Converting voice to text</source>
-        <translation>正在轉為文字...</translation>
+        <translation>Konverterer stemme til tekst</translation>
     </message>
 </context>
 </TS>

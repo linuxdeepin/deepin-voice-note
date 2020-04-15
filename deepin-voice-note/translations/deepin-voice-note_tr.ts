@@ -368,7 +368,8 @@
         <location filename="../dialog/vnotemessagedialog.cpp" line="97"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
-        <translation type="unfinished"/>
+        <translation>Bu not defterini silmek istediğinizden emin misiniz?
+İçindeki tüm notlar silinecek</translation>
     </message>
     <message>
         <location filename="../dialog/vnotemessagedialog.cpp" line="101"/>

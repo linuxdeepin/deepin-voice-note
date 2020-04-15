@@ -274,7 +274,7 @@
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="946"/>
         <source>Notes</source>
-        <translation>记事项</translation>
+        <translation>笔记</translation>
     </message>
     <message>
         <location filename="../views/vnotemainwindow.cpp" line="970"/>

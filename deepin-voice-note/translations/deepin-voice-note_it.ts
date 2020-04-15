@@ -369,7 +369,8 @@ Localizzazione italiana a cura di Massimo A. Carofano.</translation>
         <location filename="../dialog/vnotemessagedialog.cpp" line="97"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
-        <translation type="unfinished"/>
+        <translation>Sicuro di voler eliminare questo taccuino?
+Tutte le note contenute saranno eliminate</translation>
     </message>
     <message>
         <location filename="../dialog/vnotemessagedialog.cpp" line="101"/>
