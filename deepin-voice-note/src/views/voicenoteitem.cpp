@@ -321,7 +321,7 @@ void VoiceNoteItem::setTextCursor(const QTextCursor &cursor)
 
 bool VoiceNoteItem::textIsEmpty()
 {
-    return  asrTextNotEmpty();
+    return  !asrTextNotEmpty();
 }
 
 QRect VoiceNoteItem::getCursorRect()

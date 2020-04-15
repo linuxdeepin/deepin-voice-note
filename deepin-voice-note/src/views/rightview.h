@@ -60,8 +60,6 @@ public:
 
     VoiceNoteItem *getCurVoicePlay();
     VoiceNoteItem *getCurVoiceAsr();
-
-    DetailItemWidget *getMenuItem();
     int         showWarningDialog();
 
 signals:
@@ -76,7 +74,6 @@ public slots:
     void onVoicePlay(VoiceNoteItem *item);
     void onVoicePause(VoiceNoteItem *item);
     void onPlayUpdate();
-    void onChangeTheme();
 protected:
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

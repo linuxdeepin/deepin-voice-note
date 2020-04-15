@@ -39,7 +39,6 @@ RightView::RightView(QWidget *parent)
     initMenu();
     initAppSetting();
     initConnection();
-    onChangeTheme();
 }
 
 void RightView::initUi()
@@ -432,13 +431,16 @@ int RightView::initAction(DetailItemWidget *widget)
                 return 0;
             }
 
+            if(!isAllWidgetEmpty(voiceWidget)){
+               ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
+            }
+
             if(canCutDel){
                 ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
                 ActionManager::Instance()->enableAction(ActionManager::DetailDelete, canCutDel);
             }
         }else if(textCount){
             ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
-
             if(canCutDel){
                 ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
                 ActionManager::Instance()->enableAction(ActionManager::DetailDelete, canCutDel);
@@ -580,11 +582,6 @@ void RightView::setEnablePlayBtn(bool enable)
     }
 }
 
-DetailItemWidget *RightView::getMenuItem()
-{
-    return m_curItemWidget;
-}
-
 void RightView::updateData()
 {
     m_fIsNoteModified = true;
@@ -623,24 +620,28 @@ void RightView::mousePressEvent(QMouseEvent *event)
     Qt::MouseButton btn = event->button();
     DetailItemWidget *widget = getWidgetByPos(event->pos());
 
-    if (widget != nullptr) {
-        m_curItemWidget = widget;
-    }
-
     if (btn == Qt::RightButton) {
-        if(m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Voice){
-            if(!m_curItemWidget->hasSelection()){
+        if(widget && widget->getNoteBlock()->blockType == VNoteBlock::Voice){
+            if(!widget->hasSelection()){
                 clearAllSelection();
-                m_curItemWidget->selectAllText();
-                m_selectWidget.insert(VoicePlugin, m_curItemWidget);
+                widget->selectAllText();
+                m_selectWidget.insert(VoicePlugin, widget);
+                m_curItemWidget = widget;
+                m_curItemWidget->setFocus();
             }
         }
         onMenuShow(m_curItemWidget);
     } else if (btn == Qt::LeftButton) {
         clearAllSelection();
+
+        if (widget != nullptr) {
+            m_curItemWidget = widget;
+        }
+
         if (m_curItemWidget != nullptr) {
             m_curItemWidget->setFocus();
         }
+
         if(m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Voice){
             if(widget && !m_curItemWidget->isTextContainsPos(event->globalPos())){
                 m_curItemWidget->selectAllText();
@@ -665,6 +666,12 @@ void RightView::mouseReleaseEvent(QMouseEvent *event)
                     m_selectWidget.insert(VoicePlugin,widget);
                 }
             }
+        }
+
+        DetailItemWidget *widget = getOnlyOneSelectVoice();
+        if(widget != nullptr){
+            m_curItemWidget = widget;
+            widget->setFocus();
         }
     }
     DWidget::mouseReleaseEvent(event);
@@ -757,6 +764,8 @@ void RightView::mouseMoveSelect(QMouseEvent *event)
 QString RightView::copySelectText(bool voiceText)
 {
     QString text = "";
+    bool firstSelect = true;
+
     for (int i = 0; i < m_viewportLayout->count() - 1 ; i++) {
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
         DetailItemWidget *widget = static_cast< DetailItemWidget *>(layoutItem->widget());
@@ -770,10 +779,11 @@ QString RightView::copySelectText(bool voiceText)
             QString selectText = widget->getSelectText();
             if (!selectText.isEmpty()) {
                 text.append(selectText);
-                if(i != 0 && !text.endsWith('\n')){
+                if(!firstSelect && !text.endsWith('\n')){
                      text.append("\n");
                 }
             }
+            firstSelect = false;
         }
     }
 
@@ -958,15 +968,7 @@ int RightView::showWarningDialog()
 
 void RightView::initConnection()
 {
-    connect(DGuiApplicationHelper::instance(),
-            &DGuiApplicationHelper::themeTypeChanged,
-            this, &RightView::onChangeTheme);
-
     connect(m_playAnimTimer, &QTimer::timeout, this, &RightView::onPlayUpdate);
-}
-
-void RightView::onChangeTheme()
-{
 }
 
 void RightView::saveMp3()
