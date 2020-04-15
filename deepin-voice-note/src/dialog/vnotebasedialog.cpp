@@ -14,7 +14,7 @@ VNoteBaseDialog::VNoteBaseDialog(QWidget *parent)
 
 void VNoteBaseDialog::initUI()
 {
-    setMinimumSize(DEFAULT_WINDOW_W, DEFAULT_WINDOW_H);
+    resize(DEFAULT_WINDOW_W, DEFAULT_WINDOW_H);
 
     QVBoxLayout* mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(0);
