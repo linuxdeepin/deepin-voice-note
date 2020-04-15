@@ -15,7 +15,6 @@
 #include <DApplicationHelper>
 
 static VNoteFolderOper FolderOper;
-static bool     isShowEdit = false;
 
 struct VNoteTextPHelper {
     VNoteTextPHelper(QPainter *painter, QFontMetrics fontMetrics, QRect nameRect)
@@ -181,6 +180,11 @@ void MiddleViewDelegate::setEnableItem(bool enable)
     m_enableItem = enable;
 }
 
+void MiddleViewDelegate::setEditIsVisible(bool isVisible)
+{
+    m_editVisible = isVisible;
+}
+
 QSize MiddleViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     Q_UNUSED(index);
@@ -199,6 +203,7 @@ QWidget *MiddleViewDelegate::createEditor(QWidget *parent, const QStyleOptionVie
     QLineEdit *editBox = new QLineEdit(parent);
     editBox->setMaxLength(MAX_TITLE_LEN);
     editBox->setFixedSize(204, 38);
+    editBox->installEventFilter(m_parentView);
     return editBox;
 }
 
@@ -210,7 +215,6 @@ void MiddleViewDelegate::setEditorData(QWidget *editor, const QModelIndex &index
         QLineEdit *edit = static_cast<QLineEdit *>(editor);
         edit->setText(data->noteTitle);
     }
-    isShowEdit = true;
 }
 
 void MiddleViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
@@ -234,9 +238,6 @@ void MiddleViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
             view->onNoteChanged();
         }
     }
-
-    isShowEdit = false;
-    view->update(index);
 }
 
 void MiddleViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
@@ -316,7 +317,7 @@ void MiddleViewDelegate::paintNormalItem(QPainter *painter, const QStyleOptionVi
     bool isSelect = false;
     paintItemBase(painter, option, paintRect, isSelect);
 
-    if(isShowEdit == false || isSelect == false){
+    if(isSelect == false || m_editVisible == false){
         painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T6));
         QFontMetrics fontMetrics = painter->fontMetrics();
         int space = (paintRect.height() - fontMetrics.height() * 2) / 2 + paintRect.top();
@@ -356,7 +357,7 @@ void MiddleViewDelegate::paintSearchItem(QPainter *painter, const QStyleOptionVi
     painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T6));
     QFontMetrics fontMetrics = painter->fontMetrics();
 
-    if(isShowEdit == false || isSelect == false){
+    if(isSelect == false || m_editVisible == false){
         int space = (itemRect.height() - fontMetrics.height() * 2) / 2 + itemRect.top();
         QRect nameRect(itemRect.left() + 20, space, itemRect.width() - 40, fontMetrics.height());
         space += fontMetrics.height();

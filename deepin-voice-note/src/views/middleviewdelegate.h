@@ -12,6 +12,7 @@ public:
     void handleChangeTheme();
     void setSearchKey(const QString &key);
     void setEnableItem(bool enable);
+    void setEditIsVisible(bool isVisible);
     const int MAX_TITLE_LEN = 64;
 protected:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
@@ -33,6 +34,7 @@ private:
     QString m_searchKey;
     DPalette m_parentPb;
     bool     m_enableItem {true};
+    bool     m_editVisible {false};
 };
 
 #endif // LEFTVIEWDELEGATE_H

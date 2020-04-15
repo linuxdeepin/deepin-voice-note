@@ -238,6 +238,17 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
+bool MiddleView::eventFilter(QObject *o, QEvent *e)
+{
+    Q_UNUSED(o);
+    if(e->type() == QEvent::FocusIn){
+        m_pItemDelegate->setEditIsVisible(true);
+    }else if (e->type() == QEvent::FocusOut) {
+        m_pItemDelegate->setEditIsVisible(false);
+    }
+    return  false;
+}
+
 void MiddleView::initUI()
 {
     //TODO:
