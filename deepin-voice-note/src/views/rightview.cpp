@@ -609,13 +609,20 @@ void RightView::adjustVerticalScrollBar(QWidget *widget, int defaultHeight)
 
 void RightView::mouseMoveEvent(QMouseEvent *event)
 {
-    emit sigCursorChange(event->pos().y(), true);
-    mouseMoveSelect(event);
+    if(m_noteItemData != nullptr){
+        emit sigCursorChange(event->pos().y(), true);
+        mouseMoveSelect(event);
+    }
 }
 
 void RightView::mousePressEvent(QMouseEvent *event)
 {
     DWidget::mousePressEvent(event);
+
+    if(m_noteItemData == nullptr){
+        return;
+    }
+
     Qt::MouseButton btn = event->button();
     DetailItemWidget *widget = getWidgetByPos(event->pos());
 
@@ -652,6 +659,12 @@ void RightView::mousePressEvent(QMouseEvent *event)
 
 void RightView::mouseReleaseEvent(QMouseEvent *event)
 {
+    DWidget::mouseReleaseEvent(event);
+
+    if(m_noteItemData == nullptr){
+        return;
+    }
+
     Qt::MouseButton btn = event->button();
     if(btn == Qt::LeftButton){
         m_selectWidget.clear();
@@ -667,7 +680,7 @@ void RightView::mouseReleaseEvent(QMouseEvent *event)
             }
         }
     }
-    DWidget::mouseReleaseEvent(event);
+
 }
 
 DetailItemWidget *RightView::getWidgetByPos(const QPoint &pos)
