@@ -488,8 +488,8 @@ void VNoteMainWindow::initLeftView()
     m_leftView->setFrameShape(QFrame::NoFrame);
     m_leftView->setItemsExpandable(false);
     m_leftView->setIndentation(0);
-    QStandardItem *notepadRoot = m_leftView->getNotepadRoot();
-    m_leftView->expand(notepadRoot->index());
+    QModelIndex notepadRootIndex = m_leftView->getNotepadRootIndex();
+    m_leftView->expand(notepadRootIndex);
     leftHolderLayout->addWidget(m_leftView);
 
     m_addNotepadBtn = new DPushButton(DApplication::translate("VNoteMainWindow", "Create Notebook"),
@@ -688,6 +688,7 @@ void VNoteMainWindow::onVNoteFoldersLoaded()
     //If have folders show note view,else show
     //default home page
     if (loadNotepads() > 0) {
+        m_leftView->setDefaultNotepadItem();
         m_centerWidget->setCurrentIndex(WndNoteShow);
     } else {
         m_centerWidget->setCurrentIndex(WndHomePage);
@@ -1229,8 +1230,6 @@ int VNoteMainWindow::loadNotepads()
         }
 
         folders->lock.unlock();
-
-        m_leftView->setDefaultNotepadItem();
     }
 
     return folderCount;
@@ -1463,7 +1462,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNoteBtn->setVisible(true);
         m_noteSearchEdit->lineEdit()->setFocus();
         operState(StateSearching, false);
-        onVNoteFolderChange(m_leftView->setDefaultNotepadItem(), QModelIndex());
+        onVNoteFolderChange(m_leftView->restoreNotepadItem(), QModelIndex());
         break;
     case PlayVoiceStart:
         if (isSearching()) {

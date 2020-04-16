@@ -61,7 +61,8 @@ SOURCES += \
     src/task/loadsafeteydataworker.cpp \
     src/db/vnotesaferoper.cpp \
     src/task/vnmainwnddelayinittask.cpp \
-    src/task/vndatasafertask.cpp
+    src/task/vndatasafertask.cpp \
+    src/views/leftviewsortfilter.cpp
 
 RESOURCES += \
     images.qrc
@@ -120,7 +121,8 @@ HEADERS += \
     src/task/loadsafeteydataworker.h \
     src/db/vnotesaferoper.h \
     src/task/vnmainwnddelayinittask.h \
-    src/task/vndatasafertask.h
+    src/task/vndatasafertask.h \
+    src/views/leftviewsortfilter.h
 
 INCLUDEPATH += \
     src/

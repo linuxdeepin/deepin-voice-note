@@ -8,6 +8,8 @@
 DWIDGET_USE_NAMESPACE
 
 class LeftViewDelegate;
+class LeftViewSortFilter;
+
 struct VNoteFolder;
 
 class LeftView : public DTreeView
@@ -16,12 +18,16 @@ class LeftView : public DTreeView
 public:
     explicit LeftView(QWidget *parent = nullptr);
     QStandardItem *getNotepadRoot();
+
+    QModelIndex getNotepadRootIndex();
     QModelIndex setDefaultNotepadItem();
+    QModelIndex restoreNotepadItem();
 
     void setOnlyCurItemMenuEnable(bool enable);
     void addFolder(VNoteFolder* folder);
     void appendFolder(VNoteFolder* folder);
     void editFolder();
+    void sort();
     int  folderCount();
 
     VNoteFolder* removeFolder();
@@ -41,6 +47,7 @@ private:
     DMenu               *m_notepadMenu {nullptr};
     QStandardItemModel  *m_pDataModel {nullptr};
     LeftViewDelegate    *m_pItemDelegate {nullptr};
+    LeftViewSortFilter  *m_pSortViewFilter {nullptr};
     bool                m_onlyCurItemMenuEnable {false};
 };
 

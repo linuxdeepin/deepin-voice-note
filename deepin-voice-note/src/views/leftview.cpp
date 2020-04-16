@@ -1,5 +1,7 @@
 #include "leftview.h"
 #include "leftviewdelegate.h"
+#include "leftviewsortfilter.h"
+
 #include "common/actionmanager.h"
 #include "common/standarditemcommon.h"
 #include "common/vnoteforlder.h"
@@ -18,7 +20,9 @@ LeftView::LeftView(QWidget *parent)
 void LeftView::initModel()
 {
     m_pDataModel = new QStandardItemModel(this);
-    this->setModel(m_pDataModel);
+    m_pSortViewFilter = new LeftViewSortFilter(this);
+    m_pSortViewFilter->setSourceModel(m_pDataModel);
+    this->setModel(m_pSortViewFilter);
 }
 
 void LeftView::initDelegate()
@@ -39,6 +43,11 @@ void LeftView::initNotepadRoot()
 QStandardItem *LeftView::getNotepadRoot()
 {
     return m_pDataModel->item(0);
+}
+
+QModelIndex LeftView::getNotepadRootIndex()
+{
+    return  m_pSortViewFilter->mapFromSource(getNotepadRoot()->index());
 }
 
 void LeftView::mousePressEvent(QMouseEvent *event)
@@ -78,23 +87,27 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
         DTreeView::mouseMoveEvent(event);
     }
 }
-
-QModelIndex LeftView::setDefaultNotepadItem()
+QModelIndex LeftView::restoreNotepadItem()
 {
     QModelIndex index = this->currentIndex();
     QItemSelectionModel *model = this->selectionModel();
+
     if (index.isValid() && StandardItemCommon::getStandardItemType(index) == StandardItemCommon::NOTEPADITEM) {
         if (!model->isSelected(index)) {
             this->setCurrentIndex(index);
         }
-    } else {
-        QStandardItem *item = getNotepadRoot();
-        QStandardItem *itemChild = item->child(0);
-        if (itemChild) {
-            index = itemChild->index();
-            this->setCurrentIndex(index);
-        }
+    }else {
+        index = setDefaultNotepadItem();
     }
+
+    return index;
+}
+
+QModelIndex LeftView::setDefaultNotepadItem()
+{
+    sort();
+    QModelIndex index = m_pSortViewFilter->index(0,0, getNotepadRootIndex());
+    this->setCurrentIndex(index);
     return index;
 }
 
@@ -105,8 +118,9 @@ void LeftView::addFolder(VNoteFolder *folder)
                     folder, StandardItemCommon::NOTEPADITEM);
 
         QStandardItem *root = getNotepadRoot();
-        root->insertRow(0, pItem);
-        setCurrentIndex(pItem->index());
+        root->appendRow(pItem);
+        QModelIndex index = m_pSortViewFilter->mapFromSource(pItem->index());
+        setCurrentIndex(index);
     }
 }
 
@@ -137,7 +151,7 @@ VNoteFolder* LeftView::removeFolder()
     VNoteFolder *data = reinterpret_cast<VNoteFolder*>(
                 StandardItemCommon::getStandardItemData(index));
 
-    m_pDataModel->removeRow(index.row(), index.parent());
+    m_pSortViewFilter->removeRow(index.row(), index.parent());
 
     return data;
 }
@@ -164,6 +178,10 @@ void LeftView::setOnlyCurItemMenuEnable(bool enable)
 {
     m_onlyCurItemMenuEnable = enable;
     m_pItemDelegate->setEnableItem(!enable);
-    m_pDataModel->layoutChanged();
-    //this->setStyleSheet("background:red");
+    this->update();
+}
+
+void LeftView::sort()
+{
+    return m_pSortViewFilter->sort(0,Qt::DescendingOrder);
 }
