@@ -71,20 +71,22 @@ void VNotePlayWidget::initConnection()
 
     connect(m_closeBtn, &DIconButton::clicked,
             this, &VNotePlayWidget::onCloseBtnClicked);
-    connect(m_slider, &DSlider::valueChanged,
-            this, &VNotePlayWidget::onSliderValueChange);
+
+    connect(m_slider, &DSlider::sliderPressed,
+            this, &VNotePlayWidget::onSliderPressed);
+    connect(m_slider, &DSlider::sliderReleased,
+            this, &VNotePlayWidget::onSliderReleased);
+    connect(m_slider, &DSlider::sliderMoved,
+            this, &VNotePlayWidget::onSliderMove);
 }
 
 void VNotePlayWidget::onVoicePlayPosChange(qint64 pos)
 {
+    if(m_sliderReleased == true){
+        onSliderMove(static_cast<int>(pos));
+    }
 
-    qint64 tmpPos = pos > m_voiceBlock->voiceSize ? m_voiceBlock->voiceSize : pos;
-    m_timeLab->setText(Utils::formatMillisecond(tmpPos, 0) + "/" +
-                       Utils::formatMillisecond(m_voiceBlock->voiceSize));
-
-    m_slider->setValue(static_cast<int>(pos));
-
-    if (m_voiceBlock && pos >=  m_slider->maximum()) {
+    if (pos >=  m_slider->maximum()) {
         onCloseBtnClicked();
     }
 
@@ -135,12 +137,39 @@ void VNotePlayWidget::onCloseBtnClicked()
 {
     m_slider->setValue(0);
     stopVideo();
+    m_sliderReleased = true;
     emit sigWidgetClose(m_voiceBlock);
 }
 
-void VNotePlayWidget::onSliderValueChange(int value)
+void VNotePlayWidget::onSliderPressed()
 {
-    m_player->setPosition(value);
+    m_sliderReleased = false;
+}
+
+void VNotePlayWidget::onSliderReleased()
+{
+     m_sliderReleased = true;
+     if(m_player->state() != QMediaPlayer::StoppedState){
+         int pos = m_slider->value();
+         if (pos >=  m_slider->maximum()) {
+             onCloseBtnClicked();
+         }else {
+            m_player->setPosition(pos);
+         }
+     }
+}
+
+void VNotePlayWidget::onSliderMove(int pos)
+{
+    if(m_voiceBlock){
+        qint64 tmpPos = pos > m_voiceBlock->voiceSize ? m_voiceBlock->voiceSize : pos;
+        m_timeLab->setText(Utils::formatMillisecond(tmpPos, 0) + "/" +
+                           Utils::formatMillisecond(m_voiceBlock->voiceSize));
+    }
+
+    if(m_sliderReleased == true){
+       m_slider->setValue(pos);
+    }
 }
 
 bool VNotePlayWidget::eventFilter(QObject *o, QEvent *e)

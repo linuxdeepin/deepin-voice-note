@@ -34,7 +34,9 @@ signals:
     void sigWidgetClose(VNVoiceBlock * voiceData);
 public slots:
     void onVoicePlayPosChange(qint64 pos);
-    void onSliderValueChange(int value);
+    void onSliderPressed();
+    void onSliderReleased();
+    void onSliderMove(int pos);
     void onPlayBtnClicked();
     void onPauseBtnClicked();
     void onPlayerBtnClicked();
@@ -47,6 +49,7 @@ private:
     void            initUI();
     void            initConnection();
     void            initPlayer();
+    bool            m_sliderReleased {true};
     DLabel          *m_timeLab  {nullptr};
     DLabel          *m_nameLab  {nullptr};
     DSlider         *m_slider   {nullptr};
