@@ -19,8 +19,8 @@ VNoteMessageDialog::VNoteMessageDialog(int msgType, QWidget *parent)
 void VNoteMessageDialog::setSingleButton()
 {
     m_buttonSpliter->setVisible(false);
-    m_cancelBtn->setVisible(false);
-    m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "OK"));
+    m_confirmBtn->setVisible(false);
+    m_cancelBtn->setText(DApplication::translate("VNoteMessageDialog", "OK"));
 }
 
 void VNoteMessageDialog::initUI()
@@ -43,7 +43,7 @@ void VNoteMessageDialog::initUI()
     m_pMessage->setPalette(paMsg);
 
     QHBoxLayout *actionBarLayout = new QHBoxLayout();
-    actionBarLayout->setSpacing(0);
+    actionBarLayout->setSpacing(10);
     actionBarLayout->setContentsMargins(0, 0, 0, 0);
 
     m_cancelBtn  = new DPushButton(this);
@@ -59,9 +59,9 @@ void VNoteMessageDialog::initUI()
     m_buttonSpliter->setFixedSize(4,28);
 
     actionBarLayout->addWidget(m_cancelBtn);
-    actionBarLayout->addSpacing(8);
+   //actionBarLayout->addSpacing(8);
     actionBarLayout->addWidget(m_buttonSpliter);
-    actionBarLayout->addSpacing(8);
+   // actionBarLayout->addSpacing(8);
     actionBarLayout->addWidget(m_confirmBtn);
 
     mainLayout->addWidget(m_pMessage, 1);
