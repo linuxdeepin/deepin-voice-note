@@ -18,9 +18,9 @@ public:
     void addContent(QWidget* content);
     void setIconPixmap(const QPixmap &iconPixmap);
 
-    static constexpr int DEFAULT_WINDOW_W = 380;
-    static constexpr int DEFAULT_WINDOW_H = 140;
-    static constexpr int TITLEBAR_H = 50;
+    const int DEFAULT_WINDOW_W = 380;
+    const int DEFAULT_WINDOW_H = 140;
+    const int TITLEBAR_H = 50;
 
 protected:
     void initUI();
@@ -31,6 +31,7 @@ protected:
 
     //Overrides
     void closeEvent(QCloseEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 signals:
     void closed();
 public slots:

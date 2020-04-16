@@ -2,6 +2,7 @@
 #include "globaldef.h"
 
 #include <QVBoxLayout>
+#include <QShowEvent>
 
 #include <DFontSizeManager>
 
@@ -14,8 +15,6 @@ VNoteBaseDialog::VNoteBaseDialog(QWidget *parent)
 
 void VNoteBaseDialog::initUI()
 {
-    resize(DEFAULT_WINDOW_W, DEFAULT_WINDOW_H);
-
     QVBoxLayout* mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
@@ -110,4 +109,21 @@ void VNoteBaseDialog::closeEvent(QCloseEvent *event)
     done(QDialog::Rejected);
 
     Q_EMIT closed();
+}
+
+void VNoteBaseDialog::showEvent(QShowEvent *event)
+{
+    DAbstractDialog::showEvent(event);
+
+    setAttribute(Qt::WA_Resized, false);
+
+    if (!testAttribute(Qt::WA_Resized)) {
+        QSize size = sizeHint();
+
+        size.setWidth(qMax(size.width(), DEFAULT_WINDOW_W));
+        size.setHeight(qMax(size.height(), DEFAULT_WINDOW_H));
+
+        resize(size);
+        setAttribute(Qt::WA_Resized, false);
+    }
 }
