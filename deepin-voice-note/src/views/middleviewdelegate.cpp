@@ -327,7 +327,11 @@ void MiddleViewDelegate::paintNormalItem(QPainter *painter, const QStyleOptionVi
         QString elideText = fontMetrics.elidedText(data->noteTitle, Qt::ElideRight, nameRect.width());
         painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
         if (!isSelect) {
-            painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
+            if(m_enableItem == false || !(option.state & QStyle::State_Enabled)){
+               painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::TextTips)));
+            }else {
+               painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
+            }
         }
         painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
         painter->drawText(timeRect, Qt::AlignLeft | Qt::AlignVCenter, Utils::convertDateTime(data->modifyTime));
@@ -367,7 +371,11 @@ void MiddleViewDelegate::paintSearchItem(QPainter *painter, const QStyleOptionVi
         vfnphelper.paintText(isSelect);
 
         if (!isSelect) {
-            painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
+            if(m_enableItem == false || !(option.state & QStyle::State_Enabled)){
+               painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::TextTips)));
+            }else {
+               painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
+            }
         }
         painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
         painter->drawText(timeRect, Qt::AlignLeft | Qt::AlignVCenter, Utils::convertDateTime(noteData->modifyTime));
