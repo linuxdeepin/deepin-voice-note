@@ -633,8 +633,10 @@ void RightView::mousePressEvent(QMouseEvent *event)
                 widget->selectAllText();
                 m_selectWidget.insert(VoicePlugin, widget);
                 m_curItemWidget = widget;
-                m_curItemWidget->setFocus();
             }
+        }
+        if(m_curItemWidget){
+           m_curItemWidget->setFocus();
         }
         onMenuShow(m_curItemWidget);
     } else if (btn == Qt::LeftButton) {
