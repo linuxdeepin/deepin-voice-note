@@ -34,10 +34,9 @@ void VoiceNoteItem::initUi()
 {
     this->setFixedHeight(DefaultHeight);
     m_bgWidget = new DFrame(this);
+    m_bgWidget->setLineWidth(0);//隐藏边框
     m_createTimeLab = new DLabel(m_bgWidget);
     DFontSizeManager::instance()->bind(m_createTimeLab, DFontSizeManager::T8);
-    m_createTimeLab->setForegroundRole(DPalette::TextTips);
-
     m_asrText = new TextNoteEdit(m_bgWidget);
     DFontSizeManager::instance()->bind(m_asrText, DFontSizeManager::T8);
     m_asrText->setReadOnly(true);
@@ -62,7 +61,6 @@ void VoiceNoteItem::initUi()
 
     m_voiceNameLab = new DLabel(m_bgWidget);
     DFontSizeManager::instance()->bind(m_voiceNameLab, DFontSizeManager::T6);
-    m_voiceNameLab->setForegroundRole(DPalette::TextTitle);
 
     m_hornLab = new DLabel(m_bgWidget);
     m_hornLab->setFixedSize(28,25);
@@ -212,15 +210,25 @@ void VoiceNoteItem::onAsrTextChange()
 
 void VoiceNoteItem::onChangeTheme()
 {
+    DPalette appDp = DApplicationHelper::instance()->applicationPalette();
+
     DPalette pbCover = DApplicationHelper::instance()->palette(m_coverWidget);
-    QColor coverColor = pbCover.color(DPalette::Active, DPalette::Highlight);
+    QColor coverColor = appDp.color(DPalette::Active, DPalette::Highlight);
     coverColor.setAlphaF(0.7);
     pbCover.setBrush(DPalette::Base, coverColor);
     m_coverWidget->setPalette(pbCover);
 
     pbCover = DApplicationHelper::instance()->palette(m_bgWidget);
-    pbCover.setBrush(DPalette::Base, pbCover.color(DPalette::Active,DPalette::ItemBackground));
+    pbCover.setBrush(DPalette::Base, appDp.color(DPalette::Active,DPalette::ItemBackground));
     m_bgWidget->setPalette(pbCover);
+
+    pbCover = DApplicationHelper::instance()->palette(m_createTimeLab);
+    pbCover.setBrush(DPalette::Text, appDp.color(DPalette::TextTips));
+    m_createTimeLab->setPalette(pbCover);
+
+    pbCover = DApplicationHelper::instance()->palette(m_voiceNameLab);
+    pbCover.setBrush(DPalette::Text, appDp.color(DPalette::TextTitle));
+    m_voiceNameLab->setPalette(pbCover);
 }
 
 bool VoiceNoteItem::asrTextNotEmpty()
