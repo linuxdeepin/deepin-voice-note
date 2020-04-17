@@ -253,12 +253,14 @@ void VoiceNoteItem::selectText(QTextCursor::MoveOperation op)
 
 void VoiceNoteItem::selectAllText()
 {
-    m_coverWidget->setVisible(true);
+    if(m_selectAll == false){
+        m_coverWidget->setVisible(true);
 
-    if(asrTextNotEmpty()){
-        m_asrText->clearSelection();
+        if(asrTextNotEmpty()){
+            m_asrText->clearSelection();
+        }
+        m_selectAll = true;
     }
-    m_selectAll = true;
 }
 
 void VoiceNoteItem::clearSelection()
