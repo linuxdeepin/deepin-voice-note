@@ -39,7 +39,8 @@ void VNotePlayWidget::initUI()
 
     QVBoxLayout *sliderLayout = new QVBoxLayout;
     sliderLayout->addWidget(m_nameLab, Qt::AlignLeft);
-    sliderLayout->addWidget(m_slider);
+    sliderLayout->addWidget(m_slider, Qt::AlignTop);
+    sliderLayout->setSpacing(0);
     m_sliderHover->setLayout(sliderLayout);
     sliderLayout->setContentsMargins(0, 5, 0, 5);
     QHBoxLayout *mainLayout = new QHBoxLayout;
