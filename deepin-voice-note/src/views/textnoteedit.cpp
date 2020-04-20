@@ -53,7 +53,12 @@ void TextNoteEdit::contextMenuEvent(QContextMenuEvent *e)
 void TextNoteEdit::keyPressEvent(QKeyEvent *e)
 {
     if(e->modifiers() != Qt::ControlModifier && e->key() != Qt::Key_Delete){
-       DTextEdit::keyPressEvent(e);
+        if(e->key() == Qt::Key_Backspace && this->hasSelection()){
+             e->ignore();
+        }else{
+             DTextEdit::keyPressEvent(e);
+        }
+
     }else {
         e->ignore();
     }
