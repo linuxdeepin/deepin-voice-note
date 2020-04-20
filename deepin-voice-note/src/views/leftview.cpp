@@ -23,6 +23,7 @@ void LeftView::initModel()
     m_pSortViewFilter = new LeftViewSortFilter(this);
     m_pSortViewFilter->setSourceModel(m_pDataModel);
     this->setModel(m_pSortViewFilter);
+    sort();
 }
 
 void LeftView::initDelegate()
@@ -105,7 +106,6 @@ QModelIndex LeftView::restoreNotepadItem()
 
 QModelIndex LeftView::setDefaultNotepadItem()
 {
-    sort();
     QModelIndex index = m_pSortViewFilter->index(0,0, getNotepadRootIndex());
     this->setCurrentIndex(index);
     return index;
