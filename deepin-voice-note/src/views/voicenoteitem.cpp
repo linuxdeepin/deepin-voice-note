@@ -78,8 +78,10 @@ void VoiceNoteItem::initUi()
     playBtnLayout->setContentsMargins(10,5,5,5);
 
     QVBoxLayout *nameLayout = new QVBoxLayout;
-    nameLayout->addWidget(m_voiceNameLab, Qt::AlignLeft);
-    nameLayout->addWidget(m_createTimeLab, Qt::AlignLeft);
+    nameLayout->addStretch();
+    nameLayout->addWidget(m_voiceNameLab);
+    nameLayout->addWidget(m_createTimeLab);
+    nameLayout->addStretch();
     nameLayout->setContentsMargins(0, 0, 0, 0);
     nameLayout->setSpacing(0);
 
