@@ -239,13 +239,18 @@ qint32 VNoteFolderOper::getNotesCount()
 
 QString VNoteFolderOper::getDefaultFolderName()
 {
-    static constexpr char const *QUERY_DEFNAME_FMT = "SELECT COUNT(*) FROM %s WHERE %s LIKE '%s%%';";
+    //TODO:
+    //    The default folder is auto-increment, and
+    //may be separate data for different category in future.
+    //We query the max id every time now, need optimize when
+    //category feature is added.
+    static constexpr char const *QUERY_DEFNAME_FMT = "SELECT %s FROM %s ORDER BY %s DESC LIMIT 1;";
 
     QString querySql; //
     querySql.sprintf(QUERY_DEFNAME_FMT
+                     , folderColumnsName[folder_id].toUtf8().data()
                      , VNoteDbManager::FOLDER_TABLE_NAME
-                     , folderColumnsName[folder_name].toUtf8().data()
-                     , DApplication::translate("DefaultName","Notebook").toUtf8().data()
+                     , folderColumnsName[folder_id].toUtf8().data()
                      );
 
     QString defaultFolderName = DApplication::translate("DefaultName","Notebook");
