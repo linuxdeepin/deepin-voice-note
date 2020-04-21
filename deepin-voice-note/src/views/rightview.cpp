@@ -379,8 +379,8 @@ int RightView::initAction(DetailItemWidget *widget)
     int textCount = textWidget.size();
 
     OpsStateInterface *stateInterface = gVNoteOpsStates();
-
-    if(!voiceCount && !textCount && widget){
+    bool allTextEmpty = isAllWidgetEmpty(textWidget);
+    if(!voiceCount && allTextEmpty && widget){
         VNoteBlock *blockData = widget->getNoteBlock();
         if (widget->hasFocus() && blockData->blockType == VNoteBlock::Text) {
             ActionManager::Instance()->enableAction(ActionManager::DetailPaste, true);
@@ -399,7 +399,7 @@ int RightView::initAction(DetailItemWidget *widget)
     }
 
     if(voiceCount){
-        if(isAllWidgetEmpty(textWidget)){
+        if(allTextEmpty){
             if(voiceCount == 1){
                 if(voiceWidget[0]->isSelectAll()){
                     VNoteBlock *blockData = voiceWidget[0]->getNoteBlock();
