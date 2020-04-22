@@ -102,9 +102,13 @@ void VNoteAudioDeviceWatcher::onDefaultSourceChanaged(const QDBusObjectPath &val
                     this )
                 );
 
-    qInfo() << "Source change:-->to:" << value.path()
-            << " name:" << m_defaultSource->name();
+    AudioPort activePort = m_defaultSource->activePort();
 
+    qInfo() << "Source change:-->to:" << value.path()
+            << " name:" << m_defaultSource->name()
+            << " activePort:" << activePort.name;
+
+    emit inputSourceChanged(activePort.description);
 }
 
 void VNoteAudioDeviceWatcher::onCardsChanged(const QString &value)

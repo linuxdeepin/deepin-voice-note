@@ -24,6 +24,7 @@ public:
     };
 signals:
     void microphoneAvailableState(int isAvailable);
+    void inputSourceChanged(const QString &name);
 public slots:
     void onDefaultSourceChanaged(const QDBusObjectPath & value);
     void onCardsChanged(const QString & value);

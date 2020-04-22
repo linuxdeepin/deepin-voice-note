@@ -15,6 +15,7 @@
 #include "common/vnoteforlder.h"
 #include "common/actionmanager.h"
 #include "common/vnotedatasafefymanager.h"
+#include "common/vnoteaudiomanager.h"
 
 #include "common/utils.h"
 #include "common/actionmanager.h"
@@ -598,6 +599,9 @@ void VNoteMainWindow::initAudioWatcher()
 
     connect(m_audioDeviceWatcher, &VNoteAudioDeviceWatcher::microphoneAvailableState,
             m_recordBar, &VNoteRecordBar::OnMicrophoneAvailableChanged);
+    //Notify audio manager source changed
+    connect(m_audioDeviceWatcher, &VNoteAudioDeviceWatcher::inputSourceChanged,
+            VNoteAudioManager::instance(), &VNoteAudioManager::onDefaultInputChanged);
 
     m_audioDeviceWatcher->start();
 

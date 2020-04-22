@@ -65,7 +65,7 @@ void VNoteRecordWidget::initUi()
 
 void VNoteRecordWidget::initRecord()
 {
-    m_audioManager = new VNoteAudioManager(this);
+    m_audioManager = VNoteAudioManager::instance();
 }
 void VNoteRecordWidget::initConnection()
 {

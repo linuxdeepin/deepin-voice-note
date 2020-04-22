@@ -18,6 +18,7 @@ public:
     static constexpr int REC_NOTFY_TIME = 500; //ms
 
     void initAudio();
+    void updateAudioInputParam();
     void initConnections();
 
     //Audio player
@@ -38,6 +39,8 @@ signals:
     void recAudioBufferProbed(const QAudioBuffer &buffer);
 public slots:
     void recordDurationChanged(qint64 duration);
+    void onDefaultInputChanged(const QString& name);
+    void onRecordError(QMediaRecorder::Error error);
 
 protected:
     static VNoteAudioManager * _instance;
@@ -51,9 +54,16 @@ protected:
     //Audio record
     QScopedPointer<QAudioRecorder> m_pAudioRecord;
     QScopedPointer<QAudioProbe> m_pAudioRecProbe;
+
+    enum AudioParam {
+        MaxChannelCount = 2,   //Limit the channel count
+        MaxSampleRate = 44100, //Limit sample rate to 44.1kz
+    };
+
     QString m_audioCodec;
     QString m_audioContainer;
-    int     m_channelCount {2};
+
+    QAudioEncoderSettings m_audioEncoderSetting;
 
     QString m_recordFileName;
 };

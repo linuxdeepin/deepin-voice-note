@@ -32,7 +32,24 @@ VNoteAudioManager *VNoteAudioManager::instance()
 void VNoteAudioManager::initAudio()
 {
     QAudioDeviceInfo defaultDeviceInfo = QAudioDeviceInfo::defaultInputDevice();
-    QAudioFormat perfAudioFmt = defaultDeviceInfo.preferredFormat();
+
+    QAudioFormat useAudioFmt = defaultDeviceInfo.preferredFormat();
+
+    if (useAudioFmt.sampleRate() > MaxSampleRate) {
+        useAudioFmt.setSampleRate(MaxSampleRate);
+    }
+
+    if (useAudioFmt.channelCount() > MaxChannelCount) {
+        useAudioFmt.setChannelCount(MaxChannelCount);
+    }
+
+    if (!defaultDeviceInfo.isFormatSupported(useAudioFmt)) {
+        qWarning() << "Audio format:" << useAudioFmt
+                   << " don't support by device:" << defaultDeviceInfo.deviceName();
+        useAudioFmt = defaultDeviceInfo.nearestFormat(useAudioFmt);
+    }
+
+    qInfo() << "Actually used audio format:" << useAudioFmt;
 
     QStringList supportCodecs = m_pAudioRecord->supportedAudioCodecs();
     QStringList supportContainers = m_pAudioRecord->supportedContainers();
@@ -53,39 +70,58 @@ void VNoteAudioManager::initAudio()
     }
 
     //Set Audio parameter
-    QAudioEncoderSettings audioSettings;
-    audioSettings.setCodec(m_audioCodec);
+    m_audioEncoderSetting.setCodec(m_audioCodec);
 
-    audioSettings.setQuality(QMultimedia::HighQuality);
-    audioSettings.setEncodingMode(QMultimedia::ConstantQualityEncoding);
-    audioSettings.setChannelCount(perfAudioFmt.channelCount());
-    audioSettings.setSampleRate(perfAudioFmt.sampleRate());
-    audioSettings.setBitRate(perfAudioFmt.sampleSize());
-
-    //Set Audio Input
-    if (m_pAudioRecord->state() == QMediaRecorder::StoppedState) {
-        m_pAudioRecord->setAudioInput(m_pAudioRecord->defaultAudioInput());
-        m_pAudioRecord->setEncodingSettings(audioSettings
-                                            , QVideoEncoderSettings()
-                                            , m_audioContainer);
-    }
+    m_audioEncoderSetting.setQuality(QMultimedia::HighQuality);
+    m_audioEncoderSetting.setEncodingMode(QMultimedia::ConstantQualityEncoding);
+    m_audioEncoderSetting.setChannelCount(useAudioFmt.channelCount());
+    m_audioEncoderSetting.setSampleRate(useAudioFmt.sampleRate());
+    m_audioEncoderSetting.setBitRate(useAudioFmt.sampleSize());
 
     m_pAudioRecProbe->setSource(m_pAudioRecord.get());
     m_pAudioPlayerProbe->setSource(m_pAudioPlayer.get());
 
     qInfo() << "audio settings: {\n"
-            << " codec=" << audioSettings.codec()
-            << ", "      << audioSettings.sampleRate()
-            << ", "      << audioSettings.bitRate()
-            << ", channelCount=" << audioSettings.channelCount()
+            << " codec=" << m_audioEncoderSetting.codec()
+            << ", "      << m_audioEncoderSetting.sampleRate()
+            << ", "      << m_audioEncoderSetting.bitRate()
+            << ", channelCount=" << m_audioEncoderSetting.channelCount()
             << ", container =" << m_audioContainer
             << " }";
+}
+
+void VNoteAudioManager::updateAudioInputParam()
+{
+    //Set Audio Input
+    if (m_pAudioRecord->state() == QMediaRecorder::StoppedState) {
+        m_pAudioRecord->setAudioInput(m_pAudioRecord->defaultAudioInput());
+
+        //Only need update settting when setting be changed.
+        if (m_pAudioRecord->audioSettings() != m_audioEncoderSetting) {
+            m_pAudioRecord->setEncodingSettings(m_audioEncoderSetting
+                                                , QVideoEncoderSettings()
+                                                , m_audioContainer);
+            qInfo() << "Update recording settings: {\n"
+                    << " codec=" << m_audioEncoderSetting.codec()
+                    << ", "      << m_audioEncoderSetting.sampleRate()
+                    << ", "      << m_audioEncoderSetting.bitRate()
+                    << ", channelCount=" << m_audioEncoderSetting.channelCount()
+                    << ", container =" << m_audioContainer
+                    << " }";
+        }
+    } else {
+        qInfo() << "Update audioInput encode setting failed. RecordState:"
+                << m_pAudioRecord->state();
+    }
 }
 
 void VNoteAudioManager::initConnections()
 {
     connect(m_pAudioRecord.get(), &QAudioRecorder::durationChanged
             ,this, &VNoteAudioManager::recordDurationChanged);
+    //Detect the recording error
+    connect(m_pAudioRecord.get(), QOverload<QMediaRecorder::Error>::of(&QMediaRecorder::error),
+            this, &VNoteAudioManager::onRecordError);
     connect(m_pAudioRecProbe.get(), &QAudioProbe::audioBufferProbed
             ,this, [this](const QAudioBuffer &buffer) {
         emit recAudioBufferProbed(buffer);
@@ -143,6 +179,7 @@ void VNoteAudioManager::setRecordFileName(const QString &fileName)
 void VNoteAudioManager::startRecord()
 {
     if (QMediaRecorder::RecordingState != m_pAudioRecord->state()) {
+        updateAudioInputParam();
         m_pAudioRecord->record();
     }
 }
@@ -165,6 +202,18 @@ void VNoteAudioManager::stopRecord()
 void VNoteAudioManager::recordDurationChanged(qint64 duration)
 {
     emit recDurationChange(duration);
+}
+
+void VNoteAudioManager::onDefaultInputChanged(const QString &name)
+{
+    qInfo() << "Default input source changed to:" << name;
+
+    initAudio();
+}
+
+void VNoteAudioManager::onRecordError(QMediaRecorder::Error error)
+{
+    qCritical() << "Recording error happed:******" << error;
 }
 
 QMediaPlayer* VNoteAudioManager::getPlayerObject()
