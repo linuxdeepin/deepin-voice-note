@@ -890,6 +890,7 @@ void VNoteMainWindow::onA2TSuccess(const QString &text)
 {
     VoiceNoteItem    *asrVoiceItem = m_rightView->getCurVoiceAsr();
     if (asrVoiceItem) {
+        m_rightView->clearAllSelection();
         asrVoiceItem->getNoteBlock()->blockText = text;
         asrVoiceItem->showAsrEndWindow(text);
         m_rightView->updateData();
