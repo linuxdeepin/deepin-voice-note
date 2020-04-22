@@ -221,13 +221,6 @@ void RightView::onTextEditFocusOut()
     }
 }
 
-void RightView::onTextEditDelEmpty()
-{
-    DetailItemWidget *widget = static_cast<DetailItemWidget *>(sender());
-    delWidget(widget);
-    updateData();
-}
-
 void RightView::onTextEditTextChange()
 {
     m_fIsNoteModified = true;
@@ -294,6 +287,7 @@ void RightView::onVoicePlay(VoiceNoteItem *item)
     VNVoiceBlock *data = item->getNoteBlock()->ptrVoice;
     if (data) {
         if (!checkFileExist(data->voicePath)) {
+            removeSelectWidget(item);
             delWidget(item);
             updateData();
             return;
@@ -404,6 +398,7 @@ int RightView::initAction(DetailItemWidget *widget)
                 if(voiceWidget[0]->isSelectAll()){
                     VNoteBlock *blockData = voiceWidget[0]->getNoteBlock();
                     if (!checkFileExist(blockData->ptrVoice->voicePath)) {
+                        removeSelectWidget(voiceWidget[0]);
                         delWidget(voiceWidget[0]);
                         updateData();
                         return -1;
@@ -1043,4 +1038,15 @@ DetailItemWidget* RightView::getOnlyOneSelectVoice()
     }
 
     return  nullptr;
+}
+
+void  RightView::removeSelectWidget(DetailItemWidget *widget)
+{
+    QMutableMapIterator<ItemWidgetType,DetailItemWidget*> it(m_selectWidget);
+    while (it.hasNext()) {
+        if(widget == it.next().value()){
+            it.remove();
+            break;
+        }
+    }
 }

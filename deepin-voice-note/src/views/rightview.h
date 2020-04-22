@@ -44,6 +44,7 @@ public:
     void  selectAllItem();
     void  clearAllSelection();
     void  pasteText();
+    void  removeSelectWidget(DetailItemWidget *widget);
 
     int   initAction(DetailItemWidget *widget);
 
@@ -69,7 +70,6 @@ signals:
     void sigCursorChange(int height, bool mouseMove);
 public slots:
     void onTextEditFocusOut();
-    void onTextEditDelEmpty();
     void onTextEditTextChange();
     void onVoicePlay(VoiceNoteItem *item);
     void onVoicePause(VoiceNoteItem *item);
