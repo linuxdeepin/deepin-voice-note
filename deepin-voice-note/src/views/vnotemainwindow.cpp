@@ -1108,10 +1108,10 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         break;
     case ActionManager::NotebookDelete: {
         VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteFolder);
-        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this,&confirmDialog]() {
+            confirmDialog.setEnabled(false);
             delNotepad();
         });
-
         confirmDialog.exec();
     } break;
     case ActionManager::NotebookAddNew:

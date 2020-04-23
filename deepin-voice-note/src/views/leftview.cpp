@@ -148,6 +148,10 @@ VNoteFolder* LeftView::removeFolder()
 
     QModelIndex index = currentIndex();
 
+    if(StandardItemCommon::getStandardItemType(index) != StandardItemCommon::NOTEPADITEM){
+        return nullptr;
+    }
+
     VNoteFolder *data = reinterpret_cast<VNoteFolder*>(
                 StandardItemCommon::getStandardItemData(index));
 
