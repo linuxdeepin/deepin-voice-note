@@ -1453,21 +1453,25 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
 {
     switch (status) {
     case SearchStart:
-        operState(StateSearching, true);
-        m_leftView->clearSelection();
-        m_leftView->setEnabled(false);
-        m_addNotepadBtn->setVisible(false);
-        m_addNoteBtn->setVisible(false);
+        if(!isSearching()){
+            operState(StateSearching, true);
+            m_leftView->clearSelection();
+            m_leftView->setEnabled(false);
+            m_addNotepadBtn->setVisible(false);
+            m_addNoteBtn->setVisible(false);
+        }
         break;
     case SearchEnd:
-        m_searchKey = "";
-        m_middleView->setSearchKey(m_searchKey);
-        m_leftView->setEnabled(true);
-        m_addNotepadBtn->setVisible(true);
-        m_addNoteBtn->setVisible(true);
-        m_noteSearchEdit->lineEdit()->setFocus();
-        operState(StateSearching, false);
-        onVNoteFolderChange(m_leftView->restoreNotepadItem(), QModelIndex());
+        if(isSearching()){
+            m_searchKey = "";
+            m_middleView->setSearchKey(m_searchKey);
+            m_leftView->setEnabled(true);
+            m_addNotepadBtn->setVisible(true);
+            m_addNoteBtn->setVisible(true);
+            m_noteSearchEdit->lineEdit()->setFocus();
+            operState(StateSearching, false);
+            onVNoteFolderChange(m_leftView->restoreNotepadItem(), QModelIndex());
+        }
         break;
     case PlayVoiceStart:
         if (isSearching()) {
