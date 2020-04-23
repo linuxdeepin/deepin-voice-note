@@ -1033,6 +1033,13 @@ DetailItemWidget* RightView::getOnlyOneSelectVoice()
 
     if(voiceWidget.size() == 1 && isAllWidgetEmpty(textWidget)){
         if(voiceWidget[0]->isSelectAll()){
+            VNoteBlock *blockData = voiceWidget[0]->getNoteBlock();
+            if (!checkFileExist(blockData->ptrVoice->voicePath)) {
+                removeSelectWidget(voiceWidget[0]);
+                delWidget(voiceWidget[0]);
+                updateData();
+                return nullptr;
+            }
             return voiceWidget[0];
         }
     }
