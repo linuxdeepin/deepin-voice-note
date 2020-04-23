@@ -77,11 +77,13 @@ void VNoteMessageDialog::initConnections()
     connect(m_cancelBtn, &DPushButton::clicked
             , this, [=]() {
         this->reject();
+        this->setEnabled(false);
     });
 
     connect(m_confirmBtn, &DPushButton::clicked
             , this, [=]() {
         this->accept();
+        this->setEnabled(false);
     });
 }
 
