@@ -11,7 +11,6 @@ VNoteRecordWidget::VNoteRecordWidget(QWidget *parent)
     : DFloatingWidget(parent)
 {
     initUi();
-    initRecordPath();
     initRecord();
     initConnection();
 }
@@ -112,7 +111,7 @@ void VNoteRecordWidget::startRecord()
 {
     QString fileName = QDateTime::currentDateTime()
                       .toString("yyyyMMddhhmmss") + ".mp3";
-
+    initRecordPath();
     m_recordMsec = 0;
     m_recordPath = m_recordDir + fileName;
     m_audioManager->setRecordFileName(m_recordPath);
