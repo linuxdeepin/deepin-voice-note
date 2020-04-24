@@ -243,6 +243,7 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
                    widget->updateData(m_searchKey);
                }
             }
+            clearAllSelection();
         }
         this->setVisible(true);
         return;
