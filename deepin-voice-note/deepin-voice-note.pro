@@ -139,7 +139,7 @@ isEmpty(APPCONFIGDIR):APPCONFIGDIR=/usr/share/$$TARGET/
 target.path = $$INSTROOT$$BINDIR
 
 desktop.path = $$INSTROOT$$APPDIR
-desktop.files = deepin-voice-notes.desktop
+desktop.files = deepin-voice-note.desktop
 
 #TODO:
 #    Integrate the config file to the app package.
