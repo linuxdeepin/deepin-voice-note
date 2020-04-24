@@ -15,7 +15,7 @@ TextNoteItem::TextNoteItem(VNoteBlock *noteBlock, QWidget *parent, QString reg)
 {
     initUi();
     initConnection();
-    updateData();
+    updateData(m_serchKey);
 }
 
 void TextNoteItem::initUi()
@@ -53,9 +53,10 @@ void TextNoteItem::initConnection()
     connect(m_textEdit, SIGNAL(sigDelEmpty()), this, SIGNAL(sigDelEmpty()));
 }
 
-void TextNoteItem::updateData()
+void TextNoteItem::updateData(QString searchKey)
 {
     if (m_noteBlock) {
+        m_serchKey = searchKey;
         m_textEdit->setPlainText(m_noteBlock->blockText);
         if (!m_serchKey.isEmpty()) {
             DPalette pb;

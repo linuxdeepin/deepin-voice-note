@@ -57,7 +57,7 @@ public:
     VNoteBlock *getNoteBlock() override;
     QTextCursor getTextCursor() override;
     void        setTextCursor(const QTextCursor &cursor) override;
-    void        updateData() override;
+    void        updateData(QString searchKey) override;
     bool        textIsEmpty() override;
     QRect       getCursorRect() override;
     //选中操作相关

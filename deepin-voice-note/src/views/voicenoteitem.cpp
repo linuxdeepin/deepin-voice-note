@@ -26,7 +26,7 @@ VoiceNoteItem::VoiceNoteItem(VNoteBlock *noteBlock, QWidget *parent)
 {
     initUi();
     initConnection();
-    updateData();
+    updateData("");
     onChangeTheme();
 }
 
@@ -115,8 +115,9 @@ void VoiceNoteItem::initUi()
     m_coverWidget->setVisible(false);
 }
 
-void VoiceNoteItem::updateData()
+void VoiceNoteItem::updateData(QString searchKey)
 {
+    Q_UNUSED(searchKey);
     if (m_noteBlock != nullptr) {
         VNVoiceBlock *voiceBlock = m_noteBlock->ptrVoice;
         if (voiceBlock) {

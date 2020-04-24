@@ -13,7 +13,7 @@ public:
     VNoteBlock *getNoteBlock();
     QTextCursor getTextCursor();
     void        setTextCursor(const QTextCursor &cursor);
-    void        updateData();
+    void        updateData(QString searchKey);
     bool        textIsEmpty();
     QRect       getCursorRect();
     void selectText(const QPoint &globalPos, QTextCursor::MoveOperation op);

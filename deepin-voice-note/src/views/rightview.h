@@ -110,6 +110,7 @@ private:
     QSharedPointer<QSettings> m_qspSetting {nullptr};
 
     MultiMapWidget m_selectWidget;
+    QString        m_searchKey {""};
 };
 
 #endif // RIGHTVIEW_H

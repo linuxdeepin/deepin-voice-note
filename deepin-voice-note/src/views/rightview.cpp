@@ -176,7 +176,7 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
         } else if (nextBlock->blockType == VNoteBlock::Text) {
             if (!cutStr.isEmpty()) {
                 nextBlock->blockText = cutStr + nextWidget->getAllText();
-                nextWidget->updateData();
+                nextWidget->updateData(m_searchKey);
             }
         }
     }
@@ -233,14 +233,35 @@ void RightView::onTextEditTextChange()
 void RightView::initData(VNoteItem *data, QString reg, bool fouse)
 {
     this->setVisible(false);
+    if(m_noteItemData == data){
+        if(m_searchKey != reg){
+            m_searchKey = reg;
+            for (int i = 0; i < m_viewportLayout->count() - 1 ; i++){
+               QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
+               DetailItemWidget *widget = static_cast< DetailItemWidget *>(layoutItem->widget());
+               if(widget->getNoteBlock()->blockType == VNoteBlock::Text && !widget->textIsEmpty()){
+                   widget->updateData(m_searchKey);
+               }
+            }
+        }
+        this->setVisible(true);
+        return;
+    }
+
     while (m_viewportLayout->indexOf(m_placeholderWidget) != 0) {
         QWidget *widget = m_viewportLayout->itemAt(0)->widget();
         m_viewportLayout->removeWidget(widget);
-        widget->deleteLater();
+        widget->setVisible(false);
+        widget->setParent(nullptr);
+        delete  widget;
+        widget = nullptr;
     }
+
     if (fouse) {
         this->setFocus();
     }
+
+    m_searchKey = reg;
     m_isFristTextChange = false;
     m_noteItemData = data;
     m_curAsrItem = nullptr;
@@ -251,6 +272,7 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
         m_curItemWidget = nullptr;
         return;
     }
+
     int size = m_noteItemData->datas.dataConstRef().size();
     QTextCursor::MoveOperation op = fouse ? QTextCursor::End : QTextCursor::NoMove;
 
@@ -470,7 +492,7 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
         if (noteBlock->blockType == VNoteBlock::Text) {
             if (index == 0 || (index == m_viewportLayout->count() - 2 && index != 1)) { //第一个和最后一个编辑框不删，只清空内容
                 widget->getNoteBlock()->blockText = "";
-                widget->updateData();
+                widget->updateData(m_searchKey);
                 return;
             }
         }
@@ -495,7 +517,7 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
                     preWidget->getNoteBlock()->blockType == VNoteBlock::Voice &&
                     nextWidget->getNoteBlock()->blockType == VNoteBlock::Voice) {
                 widget->getNoteBlock()->blockText = "";
-                widget->updateData();
+                widget->updateData(m_searchKey);
                 return;
             }
         }
@@ -531,7 +553,7 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
 
             noteBlock = nextWidget->getNoteBlock();
             noteBlock->blockText = preWidget->getAllText() + nextWidget->getAllText();
-            nextWidget->updateData();
+            nextWidget->updateData(m_searchKey);
 
             preWidget->disconnect();
             noteBlockList.push_back(preWidget->getNoteBlock());

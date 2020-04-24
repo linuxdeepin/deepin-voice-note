@@ -131,7 +131,7 @@ public:
     virtual VNoteBlock *getNoteBlock() = 0;
     virtual QTextCursor getTextCursor() = 0;
     virtual void        setTextCursor(const QTextCursor &cursor) = 0;
-    virtual void        updateData() = 0;
+    virtual void        updateData(QString searchKey) = 0;
     virtual bool        textIsEmpty() = 0;
     virtual QRect       getCursorRect() = 0;
     virtual void        setFocus() = 0;
