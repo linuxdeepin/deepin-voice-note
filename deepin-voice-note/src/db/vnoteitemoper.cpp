@@ -69,12 +69,15 @@ bool VNoteItemOper::modifyNoteTitle(QString title)
     QString modifyNoteTextSql;
 
     if (nullptr != m_note) {
+        QString sqlTitle = title;
+        sqlTitle.replace("'", "''");
+
         QDateTime modifyTime = QDateTime::currentDateTime();
 
         modifyNoteTextSql.sprintf(MODIFY_NOTETEXT_FMT
                           , VNoteDbManager::NOTES_TABLE_NAME
                           , noteColumnsName[note_title].toUtf8().data()
-                          , title.toUtf8().data()
+                          , sqlTitle.toUtf8().data()
                           , noteColumnsName[modify_time].toUtf8().data()
                           , modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data()
                           , noteColumnsName[folder_id].toUtf8().data()
@@ -124,12 +127,15 @@ bool VNoteItemOper::updateNote()
         QVariant metaData;
         metaParser.makeMetaData(m_note, metaData);
 
+        QString metaDataStr = metaData.toString();
+        metaDataStr.replace("'", "''");
+
         QDateTime modifyTime = QDateTime::currentDateTime();
 
         modifyNoteTextSql.sprintf(MODIFY_NOTETEXT_FMT
                           , VNoteDbManager::NOTES_TABLE_NAME
                           , noteColumnsName[meta_data].toUtf8().data()
-                          , metaData.toString().toUtf8().data()
+                          , metaDataStr.toUtf8().data()
                           , noteColumnsName[modify_time].toUtf8().data()
                           , modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data()
                           , noteColumnsName[folder_id].toUtf8().data()

@@ -87,6 +87,9 @@ bool VNoteFolderOper::renameVNoteFolder(QString folderName)
 
     bool isUpdateOK = false;
 
+    QString sqlFolderName = folderName;
+    sqlFolderName.replace("'", "''");
+
     QStringList sqls;
     QString renameSql;
 
@@ -96,7 +99,7 @@ bool VNoteFolderOper::renameVNoteFolder(QString folderName)
         renameSql.sprintf(RENAME_FOLDERS_FMT
                           , VNoteDbManager::FOLDER_TABLE_NAME
                           , folderColumnsName[folder_name].toUtf8().data()
-                          , folderName.toUtf8().data()
+                          , sqlFolderName.toUtf8().data()
                           , folderColumnsName[modify_time].toUtf8().data()
                           , modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data()
                           , folderColumnsName[folder_id].toUtf8().data()
