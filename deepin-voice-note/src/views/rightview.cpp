@@ -232,6 +232,7 @@ void RightView::onTextEditTextChange()
 
 void RightView::initData(VNoteItem *data, QString reg, bool fouse)
 {
+    this->setVisible(false);
     while (m_viewportLayout->indexOf(m_placeholderWidget) != 0) {
         QWidget *widget = m_viewportLayout->itemAt(0)->widget();
         m_viewportLayout->removeWidget(widget);
@@ -280,6 +281,7 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(0);
         m_curItemWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
     }
+    this->setVisible(true);
 }
 
 void RightView::onVoicePlay(VoiceNoteItem *item)
@@ -604,20 +606,13 @@ void RightView::adjustVerticalScrollBar(QWidget *widget, int defaultHeight)
 
 void RightView::mouseMoveEvent(QMouseEvent *event)
 {
-    if(m_noteItemData != nullptr){
-        emit sigCursorChange(event->pos().y(), true);
-        mouseMoveSelect(event);
-    }
+    emit sigCursorChange(event->pos().y(), true);
+    mouseMoveSelect(event);
 }
 
 void RightView::mousePressEvent(QMouseEvent *event)
 {
     DWidget::mousePressEvent(event);
-
-    if(m_noteItemData == nullptr){
-        return;
-    }
-
     Qt::MouseButton btn = event->button();
     DetailItemWidget *widget = getWidgetByPos(event->pos());
 
@@ -657,11 +652,6 @@ void RightView::mousePressEvent(QMouseEvent *event)
 void RightView::mouseReleaseEvent(QMouseEvent *event)
 {
     DWidget::mouseReleaseEvent(event);
-
-    if(m_noteItemData == nullptr){
-        return;
-    }
-
     Qt::MouseButton btn = event->button();
     if(btn == Qt::LeftButton){
         m_selectWidget.clear();
