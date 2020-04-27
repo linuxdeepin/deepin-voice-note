@@ -8,7 +8,7 @@ Homepage: <insert the upstream URL, if relevant>
 #Vcs-Browser: https://salsa.debian.org/debian/voice-note
 #Vcs-Git: https://salsa.debian.org/debian/voice-note.git
 
-Package: voice-notes
+Package: deepin-voice-note
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Voice Notes
