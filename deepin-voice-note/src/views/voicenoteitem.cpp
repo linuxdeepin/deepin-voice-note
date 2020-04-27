@@ -52,6 +52,7 @@ void VoiceNoteItem::initUi()
     m_asrText->setContextMenuPolicy(Qt::NoContextMenu);
 
     m_voiceSizeLab = new DLabel(m_bgWidget);
+    m_voiceSizeLab->setAlignment(Qt::AlignTop);
     DFontSizeManager::instance()->bind(m_voiceSizeLab, DFontSizeManager::T8);
 
     m_playBtn = new VNote2SIconButton("play.svg", "pause.svg", m_bgWidget);
@@ -72,21 +73,21 @@ void VoiceNoteItem::initUi()
     buttonAnchor.setTopMargin(10);
     buttonAnchor.setRightMargin(25);
 
-
     QVBoxLayout *playBtnLayout = new QVBoxLayout;
     playBtnLayout->addWidget(m_playBtn);
     playBtnLayout->setContentsMargins(10,5,5,5);
-
+    m_voiceNameLab->setAlignment(Qt::AlignBottom);
+    m_createTimeLab->setAlignment(Qt::AlignTop);
     QVBoxLayout *nameLayout = new QVBoxLayout;
-    nameLayout->addStretch();
+    nameLayout->addSpacing(2);
     nameLayout->addWidget(m_voiceNameLab);
+    nameLayout->addSpacing(4);
     nameLayout->addWidget(m_createTimeLab);
-    nameLayout->addStretch();
     nameLayout->setContentsMargins(0, 0, 0, 0);
     nameLayout->setSpacing(0);
 
     QVBoxLayout *rightLayout = new QVBoxLayout;
-    rightLayout->addSpacing(35);
+    rightLayout->addSpacing(34);
     rightLayout->addWidget(m_voiceSizeLab);
     rightLayout->setSizeConstraint(QLayout::SetNoConstraint);
 
@@ -109,7 +110,6 @@ void VoiceNoteItem::initUi()
     showPlayBtn();
 
     this->setLayout(mainLayout);
-
     m_coverWidget = new DFrame(this);
     m_coverWidget->setAttribute(Qt::WA_TransparentForMouseEvents,true);
     m_coverWidget->setVisible(false);
