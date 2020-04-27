@@ -245,7 +245,11 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
             }
             clearAllSelection();
         }
-        this->setVisible(true);
+
+        if(m_noteItemData != nullptr){
+            this->setVisible(true);
+        }
+
         return;
     }
 
