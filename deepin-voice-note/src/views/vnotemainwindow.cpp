@@ -283,9 +283,7 @@ void VNoteMainWindow::initShortcuts()
     connect(m_stRecording.get(), &QShortcut::activated, this, [this] {
         if (canDoShortcutAction())
         {
-            if (!isRecording() && !isSearching() && !isPlaying()) {
-                m_recordBar->onStartRecord();
-            }
+             m_recordBar->onStartRecord();
         }
     });
 
