@@ -257,9 +257,10 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
         QWidget *widget = m_viewportLayout->itemAt(0)->widget();
         m_viewportLayout->removeWidget(widget);
         widget->setVisible(false);
-        widget->setParent(nullptr);
-        delete  widget;
-        widget = nullptr;
+//        widget->setParent(nullptr);
+//        delete  widget;
+//        widget = nullptr;
+        widget->deleteLater();
     }
 
     if (fouse) {
