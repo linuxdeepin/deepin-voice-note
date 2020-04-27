@@ -251,6 +251,15 @@ bool MiddleView::eventFilter(QObject *o, QEvent *e)
     return  false;
 }
 
+void MiddleView::keyPressEvent(QKeyEvent *e)
+{
+    if (m_onlyCurItemMenuEnable || e->key() == Qt::Key_PageUp || e->key() == Qt::Key_PageDown) {
+        e->ignore();
+    }else {
+        DListView::keyPressEvent(e);
+    }
+}
+
 void MiddleView::initUI()
 {
     //TODO:
@@ -271,6 +280,7 @@ void MiddleView::initUI()
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_emptySearch);
     this->setLayout(layout);
+//    this->installEventFilter(this);
 }
 
 void MiddleView::initAppSetting()

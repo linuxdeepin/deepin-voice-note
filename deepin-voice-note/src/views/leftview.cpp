@@ -88,6 +88,21 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
         DTreeView::mouseMoveEvent(event);
     }
 }
+
+void LeftView::keyPressEvent(QKeyEvent *e)
+{
+    if (m_onlyCurItemMenuEnable || e->key() == Qt::Key_PageUp || e->key() == Qt::Key_PageDown) {
+        e->ignore();
+    }else {
+        if (0 == this->currentIndex().row() && e->key() == Qt::Key_Up) {
+            e->ignore();
+        }
+        else {
+            DTreeView::keyPressEvent(e);
+        }
+    }
+}
+
 QModelIndex LeftView::restoreNotepadItem()
 {
     QModelIndex index = this->currentIndex();
