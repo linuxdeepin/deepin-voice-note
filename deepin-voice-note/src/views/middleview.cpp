@@ -244,7 +244,7 @@ bool MiddleView::eventFilter(QObject *o, QEvent *e)
     if(e->type() == QEvent::FocusIn){
         m_pItemDelegate->setEditIsVisible(true);
         this->update(currentIndex());
-    }else if (e->type() == QEvent::FocusOut) {
+    }else if (e->type() == QEvent::Destroy) {
         m_pItemDelegate->setEditIsVisible(false);
         this->update(currentIndex());
     }

@@ -44,7 +44,7 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     bool eventFilter(QObject *o, QEvent *e) override;
-    void keyPressEvent(QKeyEvent* e);
+    void keyPressEvent(QKeyEvent* e) override;
 
 private:
     void initDelegate();
