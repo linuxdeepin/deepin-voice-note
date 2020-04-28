@@ -35,6 +35,7 @@ class SplashView;
 class VoiceNoteItem;
 class DBusLogin1Manager;
 class VNMainWndDelayInitTask;
+class UpgradeView;
 
 class VNoteMainWindow : public DMainWindow, public OpsStateInterface
 {
@@ -48,7 +49,8 @@ public:
     enum WindowType {
         WndSplashAnim,
         WndHomePage,
-        WndNoteShow
+        WndNoteShow,
+        WndUpgrade
     };
     enum SpecialStatus {
         InvalidStatus = 0,
@@ -80,6 +82,7 @@ protected:
     void initDelayWork();
     void delayInitTasks();
 
+    void initUpgradeView();
     void initSpliterView(); //正常主窗口
     void initSplashView();  // Splash animation view
     void initEmptyFoldersView();
@@ -167,6 +170,7 @@ private:
     VNoteAudioDeviceWatcher *m_audioDeviceWatcher {nullptr};
     VNoteA2TManager *m_a2tManager {nullptr};
 
+    UpgradeView *m_upgradeView {nullptr};
     SplashView *m_splashView {nullptr};
     HomePage *m_wndHomePage {nullptr};
     DStackedWidget *m_centerWidget {nullptr};

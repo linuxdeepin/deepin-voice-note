@@ -65,7 +65,8 @@ SOURCES += \
     src/views/leftviewsortfilter.cpp \
     src/importolddata/olddbvisistors.cpp \
     src/importolddata/vnoteolddatamanager.cpp \
-    src/importolddata/olddataloadwokers.cpp
+    src/importolddata/olddataloadwokers.cpp \
+    src/importolddata/upgradeview.cpp
 
 RESOURCES += \
     images.qrc
@@ -128,7 +129,8 @@ HEADERS += \
     src/views/leftviewsortfilter.h \
     src/importolddata/olddbvisistors.h \
     src/importolddata/vnoteolddatamanager.h \
-    src/importolddata/olddataloadwokers.h
+    src/importolddata/olddataloadwokers.h \
+    src/importolddata/upgradeview.h
 
 INCLUDEPATH += \
     src/

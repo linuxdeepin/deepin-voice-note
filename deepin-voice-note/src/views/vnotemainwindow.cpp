@@ -28,6 +28,7 @@
 #include "views/vnoterecordbar.h"
 #include "widgets/vnoteiconbutton.h"
 #include "task/vnmainwnddelayinittask.h"
+#include "importolddata/upgradeview.h"
 
 #include "globaldef.h"
 #include "vnoteapplication.h"
@@ -452,11 +453,13 @@ void VNoteMainWindow::initMainView()
     initSplashView();
     initEmptyFoldersView();
     initAsrErrMessage();
+    initUpgradeView();
     m_centerWidget = new DStackedWidget(this);
     m_centerWidget->setContentsMargins(0, 0, 0, 0);
     m_centerWidget->insertWidget(WndSplashAnim, m_splashView);
     m_centerWidget->insertWidget(WndHomePage, m_wndHomePage);
     m_centerWidget->insertWidget(WndNoteShow, m_mainWndSpliter);
+    m_centerWidget->insertWidget(WndUpgrade, m_upgradeView);
     m_centerWidget->setCurrentIndex(WndSplashAnim);
     setCentralWidget(m_centerWidget);
     setTitlebarShadowEnabled(true);
@@ -704,8 +707,6 @@ void VNoteMainWindow::onVNoteSearch()
         if (!strKey.isEmpty()) {
             setSpecialStatus(SearchStart);
             m_searchKey = strKey;
-//            m_searchKey.setPattern(strKey);
-//            m_searchKey.setCaseSensitivity(Qt::CaseInsensitive);
             loadSearchNotes(m_searchKey);
         } else {
             setSpecialStatus(SearchEnd);
@@ -750,6 +751,11 @@ void VNoteMainWindow::initSpliterView()
 //            handle->setAutoFillBackground(true);
         }
     }
+}
+
+void VNoteMainWindow::initUpgradeView()
+{
+    m_upgradeView = new UpgradeView(this);
 }
 
 void VNoteMainWindow::initSplashView()
