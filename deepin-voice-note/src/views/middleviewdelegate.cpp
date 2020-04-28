@@ -13,6 +13,7 @@
 #include <QPainter>
 
 #include <DApplicationHelper>
+#include <QDebug>
 
 static VNoteFolderOper FolderOper;
 
@@ -76,7 +77,7 @@ void VNoteTextPHelper::spiltByKeyword(const QString &text, const QString &keywor
                 startPos += extraLen;
 
                 tb.rect = QRect(0, 0
-                                , qMax<int>(
+                                , qMin<int>(
                                     m_fontMetrics.width(tb.text)
                                     , m_fontMetrics.boundingRect(tb.text).width()
                                 )
@@ -87,7 +88,7 @@ void VNoteTextPHelper::spiltByKeyword(const QString &text, const QString &keywor
 
                 tb.text = elideText.mid(pos, keyLen);
                 tb.rect = QRect(0, 0
-                                , qMax<int>(
+                                , qMin<int>(
                                     m_fontMetrics.width(tb.text)
                                     , m_fontMetrics.boundingRect(tb.text).width()
                                 )
@@ -98,7 +99,7 @@ void VNoteTextPHelper::spiltByKeyword(const QString &text, const QString &keywor
             } else {
                 tb.text = elideText.mid(pos, keyLen);
                 tb.rect = QRect(0, 0
-                                , qMax<int>(
+                                , qMin<int>(
                                     m_fontMetrics.width(tb.text)
                                     , m_fontMetrics.boundingRect(tb.text).width()
                                 )
@@ -117,7 +118,7 @@ void VNoteTextPHelper::spiltByKeyword(const QString &text, const QString &keywor
 
         tb.text = elideText.mid(startPos, (textLen - startPos));
         tb.rect = QRect(0, 0
-                        , qMax<int>(
+                        , qMin<int>(
                             m_fontMetrics.width(tb.text)
                             , m_fontMetrics.boundingRect(tb.text).width()
                         )
@@ -147,7 +148,7 @@ void VNoteTextPHelper::paintText(bool isSelected)
             m_painter->setPen(m_pens[OldPen]);
         }
 
-        m_painter->drawText(it.rect, it.text);
+        m_painter->drawText(it.rect, Qt::AlignJustify,it.text);
 
         currentX += it.rect.width();
     }
