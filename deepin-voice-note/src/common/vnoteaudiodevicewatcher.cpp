@@ -120,7 +120,7 @@ void VNoteAudioDeviceWatcher::onCardsChanged(const QString &value)
 
 void VNoteAudioDeviceWatcher::run()
 {
-    static const double DBL_EPSILON = 0.000001;
+    static const double DBL_EPSILON = 0.0;
     static const double volumeLowMark = 0.2; //20% volume
 
     MicrophoneState currentState = MicrophoneState::NotAvailable;
@@ -149,7 +149,7 @@ void VNoteAudioDeviceWatcher::run()
         if (isMicrophoneAvail(activePort.name) || (!m_fNeedDeviceChecker)) {
             currentMicrophoneVolume = m_defaultSource->volume();
 
-            if ((currentMicrophoneVolume-volumeLowMark) > DBL_EPSILON) {
+            if ((currentMicrophoneVolume-volumeLowMark) >= DBL_EPSILON ) {
                 currentState = MicrophoneState::Normal;
             } else {
                 currentState = MicrophoneState::VolumeTooLow;
