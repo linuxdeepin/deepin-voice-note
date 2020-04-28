@@ -297,7 +297,7 @@ void VNoteMainWindow::initShortcuts()
         //Call method in rightview
         if (canDoShortcutAction())
         {
-            if (!isVoice2Text()) {
+            if (!isVoice2Text() && isAiSrvExist()) {
                 this->onA2TStart();
             }
         }
