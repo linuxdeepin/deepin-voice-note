@@ -28,19 +28,11 @@ VNoteSaferOper::VNoteSaferOper(const VDataSafer &safer)
 
 SafetyDatas *VNoteSaferOper::loadSafers()
 {
-    static constexpr char const *QUERY_FOLDERS_FMT = "SELECT * FROM %s ORDER BY %s DESC ;";
-
-    QString querySql;
-    querySql.sprintf(QUERY_FOLDERS_FMT
-                     , VNoteDbManager::SAFER_TABLE_NAME
-                     , saferColumnsName[create_time].toUtf8().data()
-                     );
-
     SafetyDatas* safers = new SafetyDatas();
 
-    SaferQryDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), safers);
+    SaferQryDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), nullptr, safers);
 
-    if (!VNoteDbManager::instance()->queryData(querySql, &folderVisitor) ) {
+    if (!VNoteDbManager::instance()->queryData(&folderVisitor) ) {
       qCritical() << "Query faild!";
     }
 
@@ -49,26 +41,10 @@ SafetyDatas *VNoteSaferOper::loadSafers()
 
 void VNoteSaferOper::addSafer(const VDataSafer &safer)
 {
-    static constexpr char const *INSERT_SAFER_FMT = "INSERT INTO %s (%s,%s,%s) VALUES (%s,%s,'%s');";
-
     if (safer.isValid()) {
-        QString addSaferSql;
-        addSaferSql.sprintf(INSERT_SAFER_FMT
-                            , VNoteDbManager::SAFER_TABLE_NAME
-                            , saferColumnsName[folder_id].toUtf8().data()
-                            , saferColumnsName[note_id].toUtf8().data()
-                            , saferColumnsName[path].toUtf8().data()
-                            , QString("%1").arg(safer.folder_id).toUtf8().data()
-                            , QString("%1").arg(safer.note_id).toUtf8().data()
-                            , safer.path.toUtf8().data()
-                            );
+        AddSaferDbVisitor addSaferVisitor(VNoteDbManager::instance()->getVNoteDb(), &safer, nullptr);
 
-        QStringList sqls;
-        sqls.append(addSaferSql);
-
-        AddSaferDbVisitor addSaferVisitor(VNoteDbManager::instance()->getVNoteDb(), nullptr);
-
-        if (Q_UNLIKELY(!VNoteDbManager::instance()->insertData(sqls, &addSaferVisitor))) {
+        if (Q_UNLIKELY(!VNoteDbManager::instance()->insertData(&addSaferVisitor))) {
             qInfo() << "Add safer failed:" << safer;
         }
     } else {
@@ -78,24 +54,10 @@ void VNoteSaferOper::addSafer(const VDataSafer &safer)
 
 void VNoteSaferOper::rmSafer(const VDataSafer &safer)
 {
-    static constexpr char const *DEL_SAFER_FMT = "DELETE FROM %s WHERE %s=%s AND %s=%s AND %s='%s';";
-
     if (safer.isValid()) {
-        QString delSaferSql;
-        delSaferSql.sprintf(DEL_SAFER_FMT
-                            , VNoteDbManager::SAFER_TABLE_NAME
-                            , saferColumnsName[folder_id].toUtf8().data()
-                            , QString("%1").arg(safer.folder_id).toUtf8().data()
-                            , saferColumnsName[note_id].toUtf8().data()
-                            , QString("%1").arg(safer.note_id).toUtf8().data()
-                            , saferColumnsName[path].toUtf8().data()
-                            , safer.path.toUtf8().data()
-                            );
+        DelSaferDbVisitor delSaferVisitor(VNoteDbManager::instance()->getVNoteDb(), &safer, nullptr);
 
-        QStringList sqls;
-        sqls.append(delSaferSql);
-
-        if (Q_UNLIKELY(!VNoteDbManager::instance()->deleteData(sqls))) {
+        if (Q_UNLIKELY(!VNoteDbManager::instance()->deleteData(&delSaferVisitor))) {
             qInfo() << "Delete safer failed:" << safer;
         }
     } else {

@@ -12,7 +12,7 @@ class VNoteDbManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit VNoteDbManager(QObject *parent = nullptr);
+    explicit VNoteDbManager(bool fOldDb = false, QObject *parent = nullptr);
     virtual ~VNoteDbManager();
 
     static VNoteDbManager* instance();
@@ -99,16 +99,18 @@ public:
 
     QSqlDatabase& getVNoteDb();
 
-    bool insertData(const QStringList& insertSql, DbVisitor* visitor /*out*/);
-    bool updateData(const QStringList& updateSql);
-    bool queryData(const QString querySql, DbVisitor* visitor);
-    bool deleteData(const QStringList& delSql);
+    bool insertData(DbVisitor* visitor /*in/out*/);
+    bool updateData(DbVisitor* visitor /*in/out*/);
+    bool queryData(DbVisitor* visitor /*in/out*/);
+    bool deleteData(DbVisitor* visitor /*in/out*/);
+
+    static bool hasOldDataBase();
 signals:
 
 public slots:
 
 protected:
-        int initVNoteDb();
+        int initVNoteDb(bool fOldDB = false);
         void createTablesIfNeed();
 
 protected:

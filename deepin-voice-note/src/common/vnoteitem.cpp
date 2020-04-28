@@ -59,6 +59,26 @@ void VNoteItem::setMetadata(const QVariant &meta)
     metaData = meta;
 }
 
+void VNoteItem::setFolder(VNoteFolder *folder)
+{
+    ownFolder = folder;
+}
+
+VNoteFolder *VNoteItem::folder() const
+{
+    return ownFolder;
+}
+
+QVariant &VNoteItem::metaDataRef()
+{
+    return metaData;
+}
+
+const QVariant &VNoteItem::metaDataConstRef() const
+{
+    return metaData;
+}
+
 qint32 &VNoteItem::maxVoiceIdRef()
 {
     return maxVoiceId;
@@ -120,6 +140,11 @@ bool VNoteItem::haveText() const
     }
 
     return fHaveText;
+}
+
+qint32 VNoteItem::voiceCount() const
+{
+    return datas.voiceBlocks.size();
 }
 
 QDebug &operator << (QDebug &out, VNoteItem &noteItem)

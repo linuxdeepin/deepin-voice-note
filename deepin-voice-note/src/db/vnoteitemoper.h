@@ -23,7 +23,6 @@ public:
     QString getDefaultVoiceName() const;
 
     bool deleteNote();
-    bool deleteNote(qint64 folderId, qint32 noteId);
 
 protected:
     VNoteItem* m_note {nullptr};

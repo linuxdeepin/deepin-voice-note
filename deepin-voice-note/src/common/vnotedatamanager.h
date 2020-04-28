@@ -10,6 +10,7 @@ class LoadNoteItemsWorker;
 class VNoteFolderOper;
 class VNoteItemOper;
 class FolderQryDbVisitor;
+struct VNoteFolder;
 
 class VNoteDataManager : public QObject
 {
@@ -43,6 +44,7 @@ protected:
     VNoteItem* addNote(VNoteItem* note);
     VNoteItem* getNote(qint64 folderId, qint32 noteId);
     VNoteItem* delNote(qint64 folderId, qint32 noteId);
+    qint32     folderNotesCount(qint64 folderId);
     /*
      *Para:   folder Id
      *Return: All nots in the folder
@@ -78,6 +80,7 @@ private:
     friend class VNoteFolderOper;
     friend class VNoteItemOper;
     friend class FolderQryDbVisitor;
+    friend struct VNoteFolder;
 };
 
 #endif // VNOTEDATAMANAGER_H

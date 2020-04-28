@@ -257,6 +257,21 @@ VNoteItem *VNoteDataManager::delNote(qint64 folderId, qint32 noteId)
     return retNote;
 }
 
+qint32 VNoteDataManager::folderNotesCount(qint64 folderId)
+{
+    qint32 notesCount = 0;
+
+    VNOTE_ITEMS_MAP *folderNotes = getFolderNotes(folderId);
+
+    if (nullptr != folderNotes) {
+        folderNotes->lock.lockForRead();
+        notesCount = folderNotes->folderNotes.count();
+        folderNotes->lock.unlock();
+    }
+
+    return notesCount;
+}
+
 VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
 {
     VNOTE_ITEMS_MAP* folderNotes = nullptr;

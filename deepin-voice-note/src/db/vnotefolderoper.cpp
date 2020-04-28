@@ -38,32 +38,13 @@ bool VNoteFolderOper::isNoteItemLoaded()
 
 bool VNoteFolderOper::deleteVNoteFolder(qint64 folderId)
 {
-    static constexpr char const *DEL_FOLDER_FMT = "DELETE FROM %s WHERE %s=%s;";
-    static constexpr char const *DEL_FNOTE_FMT  = "DELETE FROM %s WHERE %s=%s;";
-
-    QString deleteFolderSql;
-
-    deleteFolderSql.sprintf(DEL_FOLDER_FMT
-                      , VNoteDbManager::FOLDER_TABLE_NAME
-                      , folderColumnsName[folder_id].toUtf8().data()
-                      , QString("%1").arg(folderId).toUtf8().data()
-                      );
-
-    QString deleteNotesSql;
-
-    deleteNotesSql.sprintf(DEL_FNOTE_FMT
-                      , VNoteDbManager::NOTES_TABLE_NAME
-                      , VNoteItemOper::noteColumnsName[VNoteItemOper::folder_id].toUtf8().data()
-                      , QString("%1").arg(folderId).toUtf8().data()
-                      );
-
     bool delOK = false;
 
-    QStringList sqls;
-    sqls.append(deleteFolderSql);
-    sqls.append(deleteNotesSql);
+    DelFolderDbVisitor delFolderVisitor(
+                VNoteDbManager::instance()->getVNoteDb(), &folderId, nullptr
+                );
 
-    if (VNoteDbManager::instance()->deleteData(sqls) ) {
+    if (VNoteDbManager::instance()->deleteData(&delFolderVisitor) ) {
         delOK = true;
         QScopedPointer<VNoteFolder> release(VNoteDataManager::instance()->delFolder(folderId));
     }
@@ -83,36 +64,22 @@ bool VNoteFolderOper::deleteVNoteFolder(VNoteFolder *folder)
 
 bool VNoteFolderOper::renameVNoteFolder(QString folderName)
 {
-    static constexpr char const *RENAME_FOLDERS_FMT = "UPDATE %s SET %s='%s', %s='%s' WHERE %s=%s;";
-
-    bool isUpdateOK = false;
-
-    QString sqlFolderName = folderName;
-    sqlFolderName.replace("'", "''");
-
-    QStringList sqls;
-    QString renameSql;
+    bool isUpdateOK = true;
 
     if (nullptr != m_folder) {
-        QDateTime modifyTime = QDateTime::currentDateTime();
+        QString oldFolderName = m_folder->name;
+        QDateTime oldModifyTime = m_folder->modifyTime;
 
-        renameSql.sprintf(RENAME_FOLDERS_FMT
-                          , VNoteDbManager::FOLDER_TABLE_NAME
-                          , folderColumnsName[folder_name].toUtf8().data()
-                          , sqlFolderName.toUtf8().data()
-                          , folderColumnsName[modify_time].toUtf8().data()
-                          , modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data()
-                          , folderColumnsName[folder_id].toUtf8().data()
-                          , QString("%1").arg(m_folder->id).toUtf8().data()
-                          );
+        m_folder->name = folderName;
+        m_folder->modifyTime = QDateTime::currentDateTime();
 
-        sqls.append(renameSql);
+        RenameFolderDbVisitor renameFolderVisitor(VNoteDbManager::instance()->getVNoteDb(), m_folder, nullptr);
 
-        if (VNoteDbManager::instance()->updateData(sqls)) {
-            m_folder->name       = folderName;
-            m_folder->modifyTime = modifyTime;
+        if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameFolderVisitor))) {
+            m_folder->name       = oldFolderName;
+            m_folder->modifyTime = oldModifyTime;
 
-            isUpdateOK = true;
+            isUpdateOK = false;
         }
     }
 
@@ -121,22 +88,14 @@ bool VNoteFolderOper::renameVNoteFolder(QString folderName)
 
 VNOTE_FOLDERS_MAP *VNoteFolderOper::loadVNoteFolders()
 {
-    static constexpr char const *QUERY_FOLDERS_FMT = "SELECT * FROM %s  ORDER BY %s DESC ;";
-
-    QString querySql;
-    querySql.sprintf(QUERY_FOLDERS_FMT
-                     , VNoteDbManager::FOLDER_TABLE_NAME
-                     , folderColumnsName[create_time].toUtf8().data()
-                     );
-
     VNOTE_FOLDERS_MAP * foldersMap = new VNOTE_FOLDERS_MAP();
 
     //DataManager should set autoRelease flag
     foldersMap->autoRelease = true;
 
-    FolderQryDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), foldersMap);
+    FolderQryDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), nullptr, foldersMap);
 
-    if (!VNoteDbManager::instance()->queryData(querySql, &folderVisitor) ) {
+    if (!VNoteDbManager::instance()->queryData(&folderVisitor) ) {
       qCritical() << "Query faild!";
     }
 
@@ -145,36 +104,14 @@ VNOTE_FOLDERS_MAP *VNoteFolderOper::loadVNoteFolders()
 
 VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
 {
-    static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s) VALUES ('%s', %s);";
-    static constexpr char const *NEWREC_FMT = "SELECT * FROM %s ORDER BY %s DESC LIMIT 1;";
-
-    QString insertSql;
-
-    insertSql.sprintf(INSERT_FMT
-                      , VNoteDbManager::FOLDER_TABLE_NAME
-                      , folderColumnsName[folder_name].toUtf8().data()
-                      , folderColumnsName[default_icon].toUtf8().data()
-                      , folder.name.toUtf8().data()
-                      , QString("%1").arg(getDefaultIcon()).toUtf8().data()
-                      );
-
-    QString queryNewRec;
-    queryNewRec.sprintf(NEWREC_FMT
-                      , VNoteDbManager::FOLDER_TABLE_NAME
-                      , folderColumnsName[folder_id].toUtf8().data()
-                      );
-
-    QStringList sqls;
-    sqls.append(insertSql);
-    sqls.append(queryNewRec);
-
-    QVariantList record;
+    //Initialize
+    folder.defaultIcon = getDefaultIcon();
 
     VNoteFolder *newFolder = new VNoteFolder();
-    AddFolderDbVisitor addFolderVisitor(VNoteDbManager::instance()->getVNoteDb(), newFolder);
 
+    AddFolderDbVisitor addFolderVisitor(VNoteDbManager::instance()->getVNoteDb(), &folder, newFolder);
 
-    if (VNoteDbManager::instance()->insertData(sqls, &addFolderVisitor) ) {
+    if (VNoteDbManager::instance()->insertData(&addFolderVisitor) ) {
 
         //TODO:
         //    DbVisitor can update any feilds here  db return all feilds
@@ -247,26 +184,18 @@ QString VNoteFolderOper::getDefaultFolderName()
     //may be separate data for different category in future.
     //We query the max id every time now, need optimize when
     //category feature is added.
-    static constexpr char const *QUERY_DEFNAME_FMT = "SELECT %s FROM %s ORDER BY %s DESC LIMIT 1;";
-
-    QString querySql; //
-    querySql.sprintf(QUERY_DEFNAME_FMT
-                     , folderColumnsName[folder_id].toUtf8().data()
-                     , VNoteDbManager::FOLDER_TABLE_NAME
-                     , folderColumnsName[folder_id].toUtf8().data()
-                     );
-
     QString defaultFolderName = DApplication::translate("DefaultName","Notebook");
 
-    int foldersCount = 0;
-    CountDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), &foldersCount);
+    qint64 foldersCount = VNoteDataManager::instance()->folderCount();
+    MaxIdFolderDbVisitor folderIdVisitor(VNoteDbManager::instance()->getVNoteDb(), nullptr, &foldersCount);
 
-    if (VNoteDbManager::instance()->queryData(querySql, &folderVisitor) ) {
-        if (foldersCount > 0) {
-            defaultFolderName += QString("%1").arg(foldersCount+1);
-        } else {
-            defaultFolderName += QString("%1").arg(1);
-        }
+    //Need reset the folder table id if data are empty.
+    if (foldersCount == 0) {
+        folderIdVisitor.extraData().data.flag = true;
+    }
+
+    if (VNoteDbManager::instance()->queryData(&folderIdVisitor) ) {
+        defaultFolderName += QString("%1").arg(foldersCount+1);
     }
 
     return defaultFolderName;

@@ -11,6 +11,7 @@
 DWIDGET_USE_NAMESPACE
 
 struct VNoteBlock;
+struct VNoteFolder;
 
 struct VNoteItem {
 public:
@@ -20,6 +21,8 @@ public:
     void delNoteData();
     bool search(const QString &keyword);
     void setMetadata(const QVariant &meta);
+    void setFolder(VNoteFolder* folder);
+    VNoteFolder* folder() const;
 
     enum {
         INVALID_ID = -1
@@ -47,6 +50,9 @@ public:
     QDateTime modifyTime;
     QDateTime deleteTime;
 
+    QVariant& metaDataRef();
+    const QVariant& metaDataConstRef() const;
+
     qint32 &maxVoiceIdRef();
     qint32 voiceMaxId() const;
 
@@ -59,12 +65,18 @@ public:
 
     bool haveVoice() const;
     bool haveText() const;
+
+    qint32 voiceCount() const;
 protected:
     QVariant metaData;
 
     //Use to make default voice name
     //auto increment.
     qint32 maxVoiceId {0};
+
+    //TODO:
+    //    Don't used now ,Used for quick lookup.
+    VNoteFolder* ownFolder {nullptr};
 
     friend QDebug &operator << (QDebug &out, VNoteItem &noteItem);
 };

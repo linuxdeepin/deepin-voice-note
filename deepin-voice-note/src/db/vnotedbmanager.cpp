@@ -28,10 +28,10 @@
 
 VNoteDbManager* VNoteDbManager::_instance = nullptr;
 
-VNoteDbManager::VNoteDbManager(QObject *parent)
+VNoteDbManager::VNoteDbManager(bool fOldDb, QObject *parent)
     : QObject(parent)
 {
-    initVNoteDb();
+    initVNoteDb(fOldDb);
 }
 
 VNoteDbManager::~VNoteDbManager()
@@ -53,7 +53,7 @@ QSqlDatabase &VNoteDbManager::getVNoteDb()
     return m_vnoteDB;
 }
 
-bool VNoteDbManager::insertData(const QStringList& insertSql, DbVisitor* visitor)
+bool VNoteDbManager::insertData(DbVisitor* visitor /*in/out*/)
 {
     CHECK_DB_INIT();
 
@@ -64,12 +64,18 @@ bool VNoteDbManager::insertData(const QStringList& insertSql, DbVisitor* visitor
         return false;
     }
 
+    if (Q_UNLIKELY(!visitor->prepareSqls())) {
+        qCritical() << "prepare sqls faild!";
+        return false;
+    }
+
     CRITICAL_SECTION_BEGIN();
 
-    for (auto it : insertSql) {
+    for (auto it : visitor->dbvSqls()) {
         if (!it.trimmed().isEmpty()) {
             if(!visitor->sqlQuery()->exec(it)) {
-                qCritical() << "insert data failed:" << it <<" reason:" << visitor->sqlQuery()->lastError().text();
+                qCritical() << "insert data failed:" << it
+                            <<" reason:" << visitor->sqlQuery()->lastError().text();
                 insertOK = false;
             }
         }
@@ -88,20 +94,29 @@ bool VNoteDbManager::insertData(const QStringList& insertSql, DbVisitor* visitor
     return insertOK;
 }
 
-bool VNoteDbManager::updateData(const QStringList& updateSql)
+bool VNoteDbManager::updateData(DbVisitor* visitor /*in/out*/)
 {
     CHECK_DB_INIT();
 
     bool updateOK = true;
 
+    if (nullptr == visitor) {
+        qCritical() << "updateData invalid parameter: visitor is null";
+        return false;
+    }
+
+    if (Q_UNLIKELY(!visitor->prepareSqls())) {
+        qCritical() << "prepare sqls faild!";
+        return false;
+    }
+
     CRITICAL_SECTION_BEGIN();
 
-    QScopedPointer<QSqlQuery> sqlQuery(new QSqlQuery(m_vnoteDB));
-
-    for (auto it : updateSql) {
+    for (auto it : visitor->dbvSqls()) {
         if (!it.trimmed().isEmpty()) {
-            if(!sqlQuery->exec(it)) {
-                qCritical() << "Update data failed:" << it <<" reason:" << sqlQuery->lastError().text();
+            if(!visitor->sqlQuery()->exec(it)) {
+                qCritical() << "Update data failed:" << it
+                            <<" reason:" << visitor->sqlQuery()->lastError().text();
                 updateOK = false;
             }
         }
@@ -112,22 +127,32 @@ bool VNoteDbManager::updateData(const QStringList& updateSql)
     return updateOK;
 }
 
-bool VNoteDbManager::queryData(const QString querySql, DbVisitor* visitor)
+bool VNoteDbManager::queryData(DbVisitor* visitor /*in/out*/)
 {
     CHECK_DB_INIT();
 
     bool queryOK = true;
 
     if (nullptr == visitor) {
-        qCritical() << "Need DbVisitor parameter but is null";
+        qCritical() << "queryData invalid parameter: visitor is null";
+        return false;
+    }
+
+    if (Q_UNLIKELY(!visitor->prepareSqls())) {
+        qCritical() << "prepare sqls faild!";
         return false;
     }
 
     CRITICAL_SECTION_BEGIN();
 
-    if(!visitor->sqlQuery()->exec(querySql)) {
-        qCritical() << "Query data failed:" << querySql <<" reason:" << visitor->sqlQuery()->lastError().text();
-        queryOK = false;
+    for (auto it : visitor->dbvSqls()) {
+        if (!it.trimmed().isEmpty()) {
+            if (!visitor->sqlQuery()->exec(it)) {
+                qCritical() << "Query data failed:" << it
+                            <<" reason:" << visitor->sqlQuery()->lastError().text();
+                queryOK = false;
+            }
+        }
     }
 
     CRITICAL_SECTION_END();
@@ -140,20 +165,29 @@ bool VNoteDbManager::queryData(const QString querySql, DbVisitor* visitor)
     return queryOK;
 }
 
-bool VNoteDbManager::deleteData(const QStringList& delSql)
+bool VNoteDbManager::deleteData(DbVisitor* visitor /*in/out*/)
 {
     CHECK_DB_INIT();
 
     bool deleteOK = true;
 
+    if (nullptr == visitor) {
+        qCritical() << "deleteData invalid parameter: visitor is null";
+        return false;
+    }
+
+    if (Q_UNLIKELY(!visitor->prepareSqls())) {
+        qCritical() << "prepare sqls faild!";
+        return false;
+    }
+
     CRITICAL_SECTION_BEGIN();
 
-    QScopedPointer<QSqlQuery> sqlQuery(new QSqlQuery(m_vnoteDB));
-
-    for (auto it : delSql) {
+    for (auto it : visitor->dbvSqls()) {
         if (!it.trimmed().isEmpty()) {
-            if(!sqlQuery->exec(it)) {
-                qCritical() << "Delete data failed:" << it <<" reason:" << sqlQuery->lastError().text();
+            if(!visitor->sqlQuery()->exec(it)) {
+                qCritical() << "Delete data failed:" << it
+                            <<" reason:" << visitor->sqlQuery()->lastError().text();
                 deleteOK = false;
             }
         }
@@ -164,22 +198,27 @@ bool VNoteDbManager::deleteData(const QStringList& delSql)
     return deleteOK;
 }
 
-int VNoteDbManager::initVNoteDb()
+bool VNoteDbManager::hasOldDataBase()
 {
     QString vnoteDatabasePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
     QFileInfo dbDir(vnoteDatabasePath);
+    dbDir.setFile(vnoteDatabasePath+QDir::separator());
 
-    //TODO:
-    //    Remove the old version database
-    //make a app owne directory
-    if (!dbDir.isDir() && dbDir.exists()) {
-        QFile oldDbFile(vnoteDatabasePath);
-        if (!oldDbFile.remove()) {
-            qInfo() << oldDbFile.fileName() << ":" <<oldDbFile.errorString();
-        }
-    }
+    QString vnoteDatebaseName  = DEEPIN_VOICE_NOTE + QString(".db");
 
+    QString vnoteDbFullPath = dbDir.filePath() + vnoteDatebaseName;
+
+    QFileInfo dbFile(vnoteDbFullPath);
+
+    return dbFile.exists();
+}
+
+int VNoteDbManager::initVNoteDb(bool fOldDB)
+{
+    QString vnoteDatabasePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+
+    QFileInfo dbDir(vnoteDatabasePath);
     dbDir.setFile(vnoteDatabasePath+QDir::separator());
 
     if (!dbDir.exists()) {
@@ -187,15 +226,19 @@ int VNoteDbManager::initVNoteDb()
         qInfo() << "Create vnote db directory:" << vnoteDatabasePath;
     }
 
-    QString vnoteDBName = DEEPIN_VOICE_NOTE
+    QString vnoteDatebaseName  = DEEPIN_VOICE_NOTE
             + QString(VNoteDbManager::DBVERSION) + QString(".db");
 
-    QString vnoteDbFullPath = dbDir.filePath() + vnoteDBName;
+    if (fOldDB) {
+        vnoteDatebaseName =  DEEPIN_VOICE_NOTE + QString(".db");
+    }
 
-    if (QSqlDatabase::contains(DEEPIN_VOICE_NOTE)) {
-        m_vnoteDB = QSqlDatabase::database(DEEPIN_VOICE_NOTE);
+    QString vnoteDbFullPath = dbDir.filePath() + vnoteDatebaseName;
+
+    if (QSqlDatabase::contains(vnoteDatebaseName)) {
+        m_vnoteDB = QSqlDatabase::database(vnoteDatebaseName);
     } else {
-        m_vnoteDB = QSqlDatabase::addDatabase("QSQLITE", DEEPIN_VOICE_NOTE);
+        m_vnoteDB = QSqlDatabase::addDatabase("QSQLITE", vnoteDatebaseName);
         m_vnoteDB.setDatabaseName(vnoteDbFullPath);
     }
 
@@ -207,7 +250,9 @@ int VNoteDbManager::initVNoteDb()
 
     qInfo() << "Database opened:" << vnoteDbFullPath;
 
-    createTablesIfNeed();
+    if (!fOldDB) {
+        createTablesIfNeed();
+    }
 
     m_isDbInitOK = true;
 

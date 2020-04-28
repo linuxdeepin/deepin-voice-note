@@ -1,4 +1,5 @@
 #include "vnoteforlder.h"
+#include "common/vnotedatamanager.h"
 
 #include <DLog>
 
@@ -18,6 +19,31 @@ bool VNoteFolder::isValid()
 qint32 &VNoteFolder::maxNoteIdRef()
 {
     return maxNoteId;
+}
+
+qint32 VNoteFolder::getNotesCount()
+{
+    int nCount =  0;
+
+    VNOTE_ITEMS_MAP * folderNotes = getNotes();
+
+    if (Q_LIKELY(nullptr != folderNotes)) {
+        folderNotes->lock.lockForRead();
+        nCount = folderNotes->folderNotes.count();
+        folderNotes->lock.unlock();
+    }
+
+    return nCount;
+}
+
+VNOTE_ITEMS_MAP * VNoteFolder::getNotes()
+{
+    if (Q_UNLIKELY(nullptr == notes)) {
+        VNOTE_ITEMS_MAP * folderNotes =VNoteDataManager::instance()->getFolderNotes(id);
+        notes = folderNotes;
+    }
+
+    return notes;
 }
 
 QDebug & operator <<(QDebug &out, VNoteFolder &folder)

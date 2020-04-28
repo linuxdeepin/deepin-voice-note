@@ -43,6 +43,9 @@ public:
 
     qint32& maxNoteIdRef();
 
+    qint32  getNotesCount();
+    VNOTE_ITEMS_MAP * getNotes();
+
     friend QDebug & operator << (QDebug &out, VNoteFolder &folder);
 protected:
     bool fIsDataLoaded {false};
