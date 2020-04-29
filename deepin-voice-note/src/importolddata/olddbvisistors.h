@@ -15,6 +15,11 @@ class OldNoteQryDbVisitor : public DbVisitor {
 public:
     explicit OldNoteQryDbVisitor(QSqlDatabase& db, const void *inParam, void* result);
 
+    enum OldNoteType {
+        Voice = 0,
+        Text,
+    };
+
     virtual bool visitorData() override;
     virtual bool prepareSqls() override;
 };

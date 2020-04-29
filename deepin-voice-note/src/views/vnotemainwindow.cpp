@@ -28,9 +28,12 @@
 #include "views/vnoterecordbar.h"
 #include "widgets/vnoteiconbutton.h"
 #include "task/vnmainwnddelayinittask.h"
-#include "importolddata/upgradeview.h"
 
-#include "globaldef.h"
+#ifdef IMPORT_OLD_VERSION_DATA
+#include "importolddata/upgradeview.h"
+#include "importolddata/upgradedbutil.h"
+#endif
+
 #include "vnoteapplication.h"
 
 #include <QScrollBar>
@@ -453,14 +456,35 @@ void VNoteMainWindow::initMainView()
     initSplashView();
     initEmptyFoldersView();
     initAsrErrMessage();
-    initUpgradeView();
     m_centerWidget = new DStackedWidget(this);
     m_centerWidget->setContentsMargins(0, 0, 0, 0);
     m_centerWidget->insertWidget(WndSplashAnim, m_splashView);
     m_centerWidget->insertWidget(WndHomePage, m_wndHomePage);
     m_centerWidget->insertWidget(WndNoteShow, m_mainWndSpliter);
+
+    WindowType defaultWnd = WndSplashAnim;
+
+#ifdef IMPORT_OLD_VERSION_DATA
+    //*******Upgrade old Db code here only********
+    initUpgradeView();
     m_centerWidget->insertWidget(WndUpgrade, m_upgradeView);
-    m_centerWidget->setCurrentIndex(WndSplashAnim);
+
+    int upgradeState = UpgradeDbUtil::readUpgradeState(*m_qspSetting.get());
+
+    UpgradeDbUtil::checkUpdateState(upgradeState);
+
+    m_fNeedUpgradeOldDb = UpgradeDbUtil::needUpdateOldDb(upgradeState);
+
+    qInfo() << "Check if need upgrade old version:" << upgradeState
+            << " isNeed:" << m_fNeedUpgradeOldDb;
+
+    if (m_fNeedUpgradeOldDb) {
+        defaultWnd = WndUpgrade;
+        m_noteSearchEdit->setEnabled(false);
+    }
+#endif
+
+    m_centerWidget->setCurrentIndex(defaultWnd);
     setCentralWidget(m_centerWidget);
     setTitlebarShadowEnabled(true);
 }
@@ -690,6 +714,14 @@ void VNoteMainWindow::delayInitTasks()
 
 void VNoteMainWindow::onVNoteFoldersLoaded()
 {
+#ifdef IMPORT_OLD_VERSION_DATA
+    if (m_fNeedUpgradeOldDb) {
+        //Start upgrade if all components are ready.
+        m_upgradeView->startUpgrade();
+        return;
+    }
+#endif
+
     //If have folders show note view,else show
     //default home page
     if (loadNotepads() > 0) {
@@ -753,10 +785,37 @@ void VNoteMainWindow::initSpliterView()
     }
 }
 
+#ifdef IMPORT_OLD_VERSION_DATA
+//*******Upgrade old Db code here only********
+
 void VNoteMainWindow::initUpgradeView()
 {
     m_upgradeView = new UpgradeView(this);
+
+    connect(m_upgradeView, &UpgradeView::upgradeDone,
+            this, [this]() {
+        WindowType switchToWnd;
+
+        VNoteFolderOper folderOper;
+        if (folderOper.getFoldersCount() > 0) {
+            switchToWnd = WindowType::WndNoteShow;
+        } else {
+            switchToWnd = WindowType::WndHomePage;
+        }
+
+        //Clear the flag after upgrade & and call
+        //the data loaded slot to refresh.
+        m_fNeedUpgradeOldDb = false;
+
+        onVNoteFoldersLoaded();
+
+        m_centerWidget->setCurrentIndex(switchToWnd);
+
+        qInfo() << "After upgrade old db switch to:" << switchToWnd;
+    });
 }
+
+#endif
 
 void VNoteMainWindow::initSplashView()
 {

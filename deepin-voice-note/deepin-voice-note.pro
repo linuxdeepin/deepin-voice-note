@@ -66,7 +66,8 @@ SOURCES += \
     src/importolddata/olddbvisistors.cpp \
     src/importolddata/vnoteolddatamanager.cpp \
     src/importolddata/olddataloadwokers.cpp \
-    src/importolddata/upgradeview.cpp
+    src/importolddata/upgradeview.cpp \
+    src/importolddata/upgradedbutil.cpp
 
 RESOURCES += \
     images.qrc
@@ -130,7 +131,8 @@ HEADERS += \
     src/importolddata/olddbvisistors.h \
     src/importolddata/vnoteolddatamanager.h \
     src/importolddata/olddataloadwokers.h \
-    src/importolddata/upgradeview.h
+    src/importolddata/upgradeview.h \
+    src/importolddata/upgradedbutil.h
 
 INCLUDEPATH += \
     src/

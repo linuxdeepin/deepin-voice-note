@@ -55,6 +55,9 @@
 //to 300ms
 #define MIN_STKEY_RESP_TIME 300
 
+//Enable/Disable import old data
+//#define IMPORT_OLD_VERSION_DATA
+
 #include <sys/time.h>
 
 #define TM(s,e) (\

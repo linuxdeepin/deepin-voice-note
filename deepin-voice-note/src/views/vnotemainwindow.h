@@ -2,6 +2,7 @@
 #define VNOTEMAINWINDOW_H
 
 #include "common/datatypedef.h"
+#include "globaldef.h"
 
 #include <QShortcut>
 #include <QSettings>
@@ -50,7 +51,11 @@ public:
         WndSplashAnim,
         WndHomePage,
         WndNoteShow,
-        WndUpgrade
+#ifdef IMPORT_OLD_VERSION_DATA
+        //*******Upgrade old Db code here only********
+        WndUpgrade,
+#endif
+        //Add other type at here.
     };
     enum SpecialStatus {
         InvalidStatus = 0,
@@ -82,7 +87,11 @@ protected:
     void initDelayWork();
     void delayInitTasks();
 
+#ifdef IMPORT_OLD_VERSION_DATA
+    //*******Upgrade old Db code here only********
     void initUpgradeView();
+#endif
+
     void initSpliterView(); //正常主窗口
     void initSplashView();  // Splash animation view
     void initEmptyFoldersView();
@@ -149,6 +158,11 @@ private:
     //titlebar actions
     QWidget     *m_actionPanel {nullptr};
     DIconButton *m_addNewNoteBtn {nullptr};
+#endif
+
+#ifdef IMPORT_OLD_VERSION_DATA
+    //*******Upgrade old Db code here only********
+    bool        m_fNeedUpgradeOldDb = false;
 #endif
 
     DScrollArea     *m_rightViewScrollArea {nullptr};
