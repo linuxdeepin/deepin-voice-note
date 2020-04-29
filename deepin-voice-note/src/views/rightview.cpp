@@ -868,7 +868,8 @@ void RightView::clearAllSelection()
         DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
         widget->clearSelection();
     }
-    ActionManager::Instance()->detialContextMenu()->close();
+
+    m_noteDetailContextMenu->close();
     m_selectWidget.clear();
 }
 
