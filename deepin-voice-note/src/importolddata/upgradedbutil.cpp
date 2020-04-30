@@ -97,6 +97,22 @@ void UpgradeDbUtil::backUpOldDb()
     }
 }
 
+void UpgradeDbUtil::clearVoices()
+{
+    QDir oldVoiceDir(QStandardPaths::standardLocations(
+                         QStandardPaths::DocumentsLocation
+                         ).first()
+                     + QDir::separator() + "voicenote/");
+
+    if (oldVoiceDir.exists()) {
+        if (!oldVoiceDir.removeRecursively()) {
+            qInfo() << "Clear old voices failded!";
+        } else {
+            qInfo() << "Clear old voices done!";
+        }
+    }
+}
+
 void UpgradeDbUtil::doFolderUpgrade(VNoteFolder *folder)
 {
     qInfo() << "" << folder;
@@ -136,17 +152,27 @@ void UpgradeDbUtil::doFolderNoteUpgrade(qint64 newFolderId, qint64 oldFolderId)
                 note->noteTitle = noteOper.getDefaultNoteName(newFolderId);
 
                 if (note->haveVoice()) {
-                    VNoteBlock* ptrBlock = note->datas.dataConstRef().at(0);
+                    VNoteBlock* ptrBlock = nullptr;
 
-                    if (!ptrBlock->ptrVoice->voicePath.isEmpty()) {
+                    for(auto it : note->datas.dataConstRef()) {
+                        if (it->getType() == VNoteBlock::Voice) {
+                            ptrBlock = it;
+                            break;
+                        }
+                    }
+
+                    if (nullptr != ptrBlock && !ptrBlock->ptrVoice->voicePath.isEmpty()) {
                         QFileInfo oldFileInfo(ptrBlock->ptrVoice->voicePath);
 
-                        QString targetPath = appAudioPath+oldFileInfo.fileName();
+                        QString newVoiceName =
+                                ptrBlock->ptrVoice->createTime.toString("yyyyMMddhhmmss")+QString(".mp3");
+
+                        QString targetPath = appAudioPath+newVoiceName;
 
                         QFile oldFile(ptrBlock->ptrVoice->voicePath);
 
                         if (!oldFile.copy(targetPath)) {
-                            qInfo() << "Copy file failed:" << ptrBlock->ptrVoice->voicePath
+                            qInfo() << "Copy file failed:" << targetPath
                                     << " error:" << oldFile.errorString();
                         }
                     }

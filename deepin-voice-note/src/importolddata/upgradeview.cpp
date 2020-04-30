@@ -87,6 +87,9 @@ void UpgradeView::onUpgradeFinish()
     //Backup old database.
     UpgradeDbUtil::backUpOldDb();
 
+    //Clear old voice directory.
+    UpgradeDbUtil::clearVoices();
+
     emit upgradeDone();
 }
 

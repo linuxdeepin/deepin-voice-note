@@ -104,18 +104,27 @@ bool OldNoteQryDbVisitor::visitorData()
             VNoteBlock* ptrBlock = nullptr;
 
             if (note->noteType == Voice) {
+                //Voice note need two TextBlock at voice
+                //sides
+                ptrBlock = new VNTextBlock();
+                note->addBlock(ptrBlock);
+
                 QString defaultVoiceName = DApplication::translate("DefaultName","Voice");
-                        ptrBlock = new VNVoiceBlock();
+                ptrBlock = new VNVoiceBlock();
                 ptrBlock->ptrVoice->voicePath = voicePath;
                 ptrBlock->ptrVoice->voiceSize = voiceSize;
                 ptrBlock->ptrVoice->voiceTitle = defaultVoiceName+"1";
                 ptrBlock->ptrVoice->createTime = note->createTime;
+                note->addBlock(ptrBlock);
+
+                ptrBlock = new VNTextBlock();
+                note->addBlock(ptrBlock);
             } else {
                 ptrBlock = new VNTextBlock();
                 ptrBlock->blockText = text;
-            }
 
-            note->addBlock(ptrBlock);
+                note->addBlock(ptrBlock);
+            }
 
             note->noteTitle   = "";
             note->noteState   = 0;
