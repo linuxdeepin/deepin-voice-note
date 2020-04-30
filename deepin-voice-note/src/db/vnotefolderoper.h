@@ -5,9 +5,6 @@
 
 #include <QPixmap>
 
-class DbVisitor;
-class VNoteItemOper;
-
 class VNoteFolderOper
 {
 public:
@@ -32,25 +29,6 @@ public:
 
 protected:
     VNoteFolder* m_folder {nullptr};
-
-    static const QStringList folderColumnsName;
-
-    enum {
-        folder_id = 0,
-        category_id,
-        folder_name,
-        default_icon,
-        icon_path,
-        folder_state,
-        max_noteid,
-        create_time,
-        modify_time,
-        delete_time,
-    };
-
-    friend class FolderQryDbVisitor;
-    friend class AddFolderDbVisitor;
-    friend class VNoteItemOper;  //Need folder feilds
 };
 
 #endif // VNOTEFOLDEROPER_H

@@ -3,9 +3,6 @@
 
 #include "common/datatypedef.h"
 
-class DbVisitor;
-class VNoteFolderOper;
-
 class VNoteItemOper
 {
 public:
@@ -26,24 +23,6 @@ public:
 
 protected:
     VNoteItem* m_note {nullptr};
-
-    static const QStringList noteColumnsName;
-
-    enum {
-        note_id = 0,
-        folder_id,
-        note_type,
-        note_title,
-        meta_data,
-        note_state,
-        create_time,
-        modify_time,
-        delete_time,
-    };
-
-    friend class NoteQryDbVisitor;
-    friend class AddNoteDbVisitor;
-    friend class VNoteFolderOper;   //Need folder table feilds name
 };
 
 #endif // VNOTEITEMOPER_H

@@ -11,18 +11,6 @@
 #include <DLog>
 #include <DApplication>
 
-const QStringList VNoteItemOper::noteColumnsName = {
-    "note_id",
-    "folder_id",
-    "note_type",
-    "note_title",
-    "meta_data",
-    "note_state",
-    "create_time",
-    "modify_time",
-    "delete_time",
-};
-
 VNoteItemOper::VNoteItemOper(VNoteItem* note)
     :m_note(note)
 {

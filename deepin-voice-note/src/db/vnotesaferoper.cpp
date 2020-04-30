@@ -5,15 +5,15 @@
 
 #include <DLog>
 
-const QStringList VNoteSaferOper::saferColumnsName = {
-    "id",
-    "folder_id",
-    "note_id",
-    "path",
-    "state",
-    "meta_data",
-    "create_time",
-};
+//const QStringList VNoteSaferOper::saferColumnsName = {
+//    "id",
+//    "folder_id",
+//    "note_id",
+//    "path",
+//    "state",
+//    "meta_data",
+//    "create_time",
+//};
 
 VNoteSaferOper::VNoteSaferOper()
 {

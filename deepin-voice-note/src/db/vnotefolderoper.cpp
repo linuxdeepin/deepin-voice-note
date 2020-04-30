@@ -1,5 +1,4 @@
 #include "vnotefolderoper.h"
-#include "vnoteitemoper.h"
 #include "common/utils.h"
 #include "common/vnoteforlder.h"
 #include "common/vnotedatamanager.h"
@@ -12,19 +11,6 @@
 #include <QDateTime>
 
 #include <DLog>
-
-const QStringList VNoteFolderOper::folderColumnsName = {
-    "folder_id",
-    "category_id",
-    "folder_name",
-    "default_icon",
-    "icon_path",
-    "folder_state",
-    "max_noteid",
-    "create_time",
-    "modify_time",
-    "delete_time",
-};
 
 VNoteFolderOper::VNoteFolderOper(VNoteFolder* folder)
     :m_folder(folder)

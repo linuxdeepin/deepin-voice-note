@@ -103,21 +103,18 @@ bool FolderQryDbVisitor::visitorData()
         while(m_sqlQuery->next()) {
             VNoteFolder* folder = new VNoteFolder();
 
-            folder->id          = m_sqlQuery->value(VNoteFolderOper::folder_id).toInt();
-            folder->category    = m_sqlQuery->value(VNoteFolderOper::category_id).toInt();
-            folder->name        = m_sqlQuery->value(VNoteFolderOper::folder_name).toString();
-            folder->defaultIcon = m_sqlQuery->value(VNoteFolderOper::default_icon).toInt();
-            folder->iconPath    = m_sqlQuery->value(VNoteFolderOper::icon_path).toString();
-            folder->folder_state= m_sqlQuery->value(VNoteFolderOper::folder_state).toInt();
+            folder->id          = m_sqlQuery->value(DBFolder::folder_id).toInt();
+            folder->category    = m_sqlQuery->value(DBFolder::category_id).toInt();
+            folder->name        = m_sqlQuery->value(DBFolder::folder_name).toString();
+            folder->defaultIcon = m_sqlQuery->value(DBFolder::default_icon).toInt();
+            folder->iconPath    = m_sqlQuery->value(DBFolder::icon_path).toString();
+            folder->folder_state= m_sqlQuery->value(DBFolder::folder_state).toInt();
 
-            folder->maxNoteIdRef()= m_sqlQuery->value(VNoteFolderOper::max_noteid).toInt();
+            folder->maxNoteIdRef()= m_sqlQuery->value(DBFolder::max_noteid).toInt();
 
-            folder->createTime  = QDateTime::fromString(
-                        m_sqlQuery->value(VNoteFolderOper::create_time).toString(),VNOTE_TIME_FMT);
-            folder->modifyTime  = QDateTime::fromString(
-                        m_sqlQuery->value(VNoteFolderOper::modify_time).toString(),VNOTE_TIME_FMT);
-            folder->deleteTime  = QDateTime::fromString(
-                        m_sqlQuery->value(VNoteFolderOper::delete_time).toString(),VNOTE_TIME_FMT);
+            folder->createTime  = m_sqlQuery->value(DBFolder::create_time).toDateTime();
+            folder->modifyTime  = m_sqlQuery->value(DBFolder::modify_time).toDateTime();
+            folder->deleteTime  = m_sqlQuery->value(DBFolder::delete_time).toDateTime();
 
             //************Expand fileds begin**********
             //TODO:
@@ -170,24 +167,21 @@ bool NoteQryDbVisitor::visitorData()
         while(m_sqlQuery->next()) {
             VNoteItem* note = new VNoteItem();
 
-            note->noteId      = m_sqlQuery->value(VNoteItemOper::note_id).toInt();
-            note->folderId    = m_sqlQuery->value(VNoteItemOper::folder_id).toInt();
-            note->noteType    = m_sqlQuery->value(VNoteItemOper::note_type).toInt();
-            note->noteTitle   = m_sqlQuery->value(VNoteItemOper::note_title).toString();
+            note->noteId      = m_sqlQuery->value(DBNote::note_id).toInt();
+            note->folderId    = m_sqlQuery->value(DBNote::folder_id).toInt();
+            note->noteType    = m_sqlQuery->value(DBNote::note_type).toInt();
+            note->noteTitle   = m_sqlQuery->value(DBNote::note_title).toString();
 
             //Parse meta data
-            QVariant metaData  = m_sqlQuery->value(VNoteItemOper::meta_data);
+            QVariant metaData  = m_sqlQuery->value(DBNote::meta_data);
             note->setMetadata(metaData);
             metaParser.parse(metaData, note);
 
-            note->noteState   = m_sqlQuery->value(VNoteItemOper::note_state).toInt();
+            note->noteState   = m_sqlQuery->value(DBNote::note_state).toInt();
 
-            note->createTime  = QDateTime::fromString(
-                        m_sqlQuery->value(VNoteItemOper::create_time).toString(),VNOTE_TIME_FMT);
-            note->modifyTime  = QDateTime::fromString(
-                        m_sqlQuery->value(VNoteItemOper::modify_time).toString(),VNOTE_TIME_FMT);
-            note->deleteTime  = QDateTime::fromString(
-                        m_sqlQuery->value(VNoteItemOper::modify_time).toString(),VNOTE_TIME_FMT);
+            note->createTime  = m_sqlQuery->value(DBNote::create_time).toDateTime();
+            note->modifyTime  = m_sqlQuery->value(DBNote::modify_time).toDateTime();
+            note->deleteTime  = m_sqlQuery->value(DBNote::modify_time).toDateTime();
 
             //************Expand fileds begin**********
             //TODO:
@@ -304,19 +298,16 @@ bool AddFolderDbVisitor::visitorData()
         isOK = true;
 
         while(m_sqlQuery->next()) {
-            results.newFolder->id          = m_sqlQuery->value(VNoteFolderOper::folder_id).toInt();
-            results.newFolder->category    = m_sqlQuery->value(VNoteFolderOper::category_id).toInt();
-            results.newFolder->name        = m_sqlQuery->value(VNoteFolderOper::folder_name).toString();
-            results.newFolder->defaultIcon = m_sqlQuery->value(VNoteFolderOper::default_icon).toInt();
-            results.newFolder->iconPath    = m_sqlQuery->value(VNoteFolderOper::icon_path).toString();
-            results.newFolder->folder_state= m_sqlQuery->value(VNoteFolderOper::folder_state).toInt();
+            results.newFolder->id          = m_sqlQuery->value(DBFolder::folder_id).toInt();
+            results.newFolder->category    = m_sqlQuery->value(DBFolder::category_id).toInt();
+            results.newFolder->name        = m_sqlQuery->value(DBFolder::folder_name).toString();
+            results.newFolder->defaultIcon = m_sqlQuery->value(DBFolder::default_icon).toInt();
+            results.newFolder->iconPath    = m_sqlQuery->value(DBFolder::icon_path).toString();
+            results.newFolder->folder_state= m_sqlQuery->value(DBFolder::folder_state).toInt();
 
-            results.newFolder->createTime  = QDateTime::fromString(
-                        m_sqlQuery->value(VNoteFolderOper::create_time).toString(),VNOTE_TIME_FMT);
-            results.newFolder->modifyTime  = QDateTime::fromString(
-                        m_sqlQuery->value(VNoteFolderOper::modify_time).toString(),VNOTE_TIME_FMT);
-            results.newFolder->deleteTime  = QDateTime::fromString(
-                        m_sqlQuery->value(VNoteFolderOper::delete_time).toString(),VNOTE_TIME_FMT);
+            results.newFolder->createTime  = m_sqlQuery->value(DBFolder::create_time).toDateTime();
+            results.newFolder->modifyTime  = m_sqlQuery->value(DBFolder::modify_time).toDateTime();
+            results.newFolder->deleteTime  = m_sqlQuery->value(DBFolder::delete_time).toDateTime();
 
             //************Expand fileds begin**********
             //TODO:
@@ -335,18 +326,31 @@ bool AddFolderDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
 
-    static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s) VALUES ('%s', %s);";
+    static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s,%s,%s,%s) VALUES ('%s', %s, '%s', '%s', '%s');";
     static constexpr char const *NEWREC_FMT = "SELECT * FROM %s ORDER BY %s DESC LIMIT 1;";
 
     if (nullptr != param.newFolder) {
+        //Check&Init the create time parameter
+        //create/modify/delete time are same for new folder
+        QDateTime createTime = param.newFolder->createTime;
+        if (createTime.isNull()) {
+            createTime = QDateTime::currentDateTime();
+        }
+
         QString insertSql;
 
         insertSql.sprintf(INSERT_FMT
                 , VNoteDbManager::FOLDER_TABLE_NAME
                 , DBFolder::folderColumnsName[DBFolder::folder_name].toUtf8().data()
                 , DBFolder::folderColumnsName[DBFolder::default_icon].toUtf8().data()
+                , DBFolder::folderColumnsName[DBFolder::create_time].toUtf8().data()
+                , DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data()
+                , DBFolder::folderColumnsName[DBFolder::delete_time].toUtf8().data()
                 , param.newFolder->name.toUtf8().data()
                 , QString("%1").arg(param.newFolder->defaultIcon).toUtf8().data()
+                , createTime.toString(VNOTE_TIME_FMT).toUtf8().data()
+                , createTime.toString(VNOTE_TIME_FMT).toUtf8().data()
+                , createTime.toString(VNOTE_TIME_FMT).toUtf8().data()
                 );
 
         QString queryNewRec;
@@ -461,24 +465,21 @@ bool AddNoteDbVisitor::visitorData()
         while(m_sqlQuery->next()) {
             VNoteItem* note = results.newNote;
 
-            note->noteId      = m_sqlQuery->value(VNoteItemOper::note_id).toInt();
-            note->folderId    = m_sqlQuery->value(VNoteItemOper::folder_id).toInt();
-            note->noteType    = m_sqlQuery->value(VNoteItemOper::note_type).toInt();
-            note->noteTitle   = m_sqlQuery->value(VNoteItemOper::note_title).toString();
+            note->noteId      = m_sqlQuery->value(DBNote::note_id).toInt();
+            note->folderId    = m_sqlQuery->value(DBNote::folder_id).toInt();
+            note->noteType    = m_sqlQuery->value(DBNote::note_type).toInt();
+            note->noteTitle   = m_sqlQuery->value(DBNote::note_title).toString();
 
             //Parse meta data
-            QVariant metaData  = m_sqlQuery->value(VNoteItemOper::meta_data);
+            QVariant metaData  = m_sqlQuery->value(DBNote::meta_data);
             note->setMetadata(metaData);
             metaParser.parse(metaData, note);
 
-            note->noteState  = m_sqlQuery->value(VNoteItemOper::note_state).toInt();
+            note->noteState  = m_sqlQuery->value(DBNote::note_state).toInt();
 
-            note->createTime  = QDateTime::fromString(
-                        m_sqlQuery->value(VNoteItemOper::create_time).toString(),VNOTE_TIME_FMT);
-            note->modifyTime  = QDateTime::fromString(
-                        m_sqlQuery->value(VNoteItemOper::modify_time).toString(),VNOTE_TIME_FMT);
-            note->deleteTime  = QDateTime::fromString(
-                        m_sqlQuery->value(VNoteItemOper::modify_time).toString(),VNOTE_TIME_FMT);
+            note->createTime  = m_sqlQuery->value(DBNote::create_time).toDateTime();
+            note->modifyTime  = m_sqlQuery->value(DBNote::modify_time).toDateTime();
+            note->deleteTime  = m_sqlQuery->value(DBNote::modify_time).toDateTime();
 
             //************Expand fileds begin**********
             //TODO:
@@ -497,14 +498,21 @@ bool AddNoteDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
 
-    static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s,%s,%s) VALUES (%s,%s,'%s','%s');";
-    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s,%s=%s WHERE %s=%s;";
+    static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s) VALUES (%s,%s,'%s','%s','%s','%s','%s');";
+    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s,%s='%s' WHERE %s=%s;";
     static constexpr char const *NEWREC_FMT = "SELECT * FROM %s WHERE %s=%s ORDER BY %s DESC LIMIT 1;";
 
     const VNoteFolder *folder = param.newNote->folder();
     const VNoteItem *note = param.newNote;
 
     if ((nullptr != note) && (nullptr != folder)) {
+        //Check&Init the create time parameter
+        //create/modify/delete time are same for new note
+        QDateTime createTime = param.newNote->createTime;
+        if (createTime.isNull()) {
+            createTime = QDateTime::currentDateTime();
+        }
+
         QString insertSql;
 
         insertSql.sprintf(INSERT_FMT
@@ -513,21 +521,26 @@ bool AddNoteDbVisitor::prepareSqls()
                 , DBNote::noteColumnsName[DBNote::note_type].toUtf8().data()
                 , DBNote::noteColumnsName[DBNote::note_title].toUtf8().data()
                 , DBNote::noteColumnsName[DBNote::meta_data].toUtf8().data()
+                , DBNote::noteColumnsName[DBNote::create_time].toUtf8().data()
+                , DBNote::noteColumnsName[DBNote::modify_time].toUtf8().data()
+                , DBNote::noteColumnsName[DBNote::delete_time].toUtf8().data()
                 , QString("%1").arg(note->folderId).toUtf8().data()
                 , QString("%1").arg(note->noteType).toUtf8().data()
                 , note->noteTitle.toUtf8().data()
                 , note->metaDataConstRef().toString().toUtf8().data()
+                , createTime.toString(VNOTE_TIME_FMT).toUtf8().data()
+                , createTime.toString(VNOTE_TIME_FMT).toUtf8().data()
+                , createTime.toString(VNOTE_TIME_FMT).toUtf8().data()
                 );
 
         QString updateSql;
-        QString sqlGetTime("STRFTIME ('%Y-%m-%d %H:%M:%f', 'now', 'localtime')");
 
         updateSql.sprintf(UPDATE_FOLDER_TIME
                 , VNoteDbManager::FOLDER_TABLE_NAME
                 , DBFolder::folderColumnsName[DBFolder::max_noteid].toUtf8().data()
                 , QString("%1").arg(param.newNote->folder()->maxNoteIdRef()).toUtf8().data()
                 , DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data()
-                , sqlGetTime.toUtf8().data()
+                , createTime.toString(VNOTE_TIME_FMT).toUtf8().data()
                 , DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data()
                 , QString("%1").arg(note->folderId).toUtf8().data()
                 );
@@ -561,7 +574,7 @@ bool RenameNoteDbVisitor::prepareSqls()
     bool fPrepareOK = true;
 
     static constexpr char const *MODIFY_NOTETEXT_FMT = "UPDATE %s SET %s='%s', %s='%s' WHERE %s=%s AND %s=%s;";
-    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s WHERE %s=%s;";
+    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s='%s' WHERE %s=%s;";
 
     const VNoteItem *note = param.newNote;
 
@@ -583,12 +596,12 @@ bool RenameNoteDbVisitor::prepareSqls()
                 );
 
         QString updateSql;
-        QString sqlGetTime("STRFTIME ('%Y-%m-%d %H:%M:%f', 'now', 'localtime')");
+        QDateTime modifyTime = QDateTime::currentDateTime();
 
         updateSql.sprintf(UPDATE_FOLDER_TIME
                 , VNoteDbManager::FOLDER_TABLE_NAME
                 , DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data()
-                , sqlGetTime.toUtf8().data()
+                , modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data()
                 , DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data()
                 , QString("%1").arg(note->folderId).toUtf8().data()
                 );
@@ -614,7 +627,7 @@ bool UpdateNoteDbVisitor::prepareSqls()
     bool fPrepareOK = true;
 
     static constexpr char const *MODIFY_NOTETEXT_FMT = "UPDATE %s SET %s='%s', %s='%s' WHERE %s=%s AND %s=%s;";
-    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s WHERE %s=%s;";
+    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s='%s' WHERE %s=%s;";
 
     const VNoteItem *note = param.newNote;
 
@@ -636,12 +649,12 @@ bool UpdateNoteDbVisitor::prepareSqls()
                 );
 
         QString updateSql;
-        QString sqlGetTime("STRFTIME ('%Y-%m-%d %H:%M:%f', 'now', 'localtime')");
+        QDateTime modifyTime = QDateTime::currentDateTime();
 
         updateSql.sprintf(UPDATE_FOLDER_TIME
                 , VNoteDbManager::FOLDER_TABLE_NAME
                 , DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data()
-                , sqlGetTime.toUtf8().data()
+                , modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data()
                 , DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data()
                 , QString("%1").arg(note->folderId).toUtf8().data()
                 );
@@ -666,7 +679,7 @@ bool DelNoteDbVisitor::prepareSqls()
     bool fPrepareOK = true;
 
     static constexpr char const *DEL_NOTE_FMT = "DELETE FROM %s WHERE %s=%s AND %s=%s;";
-    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s, %s=%s WHERE %s=%s;";
+    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s, %s='%s' WHERE %s=%s;";
 
     const VNoteItem *note = param.newNote;
 
@@ -682,14 +695,14 @@ bool DelNoteDbVisitor::prepareSqls()
                 );
 
         QString updateSql;
-        QString sqlGetTime("STRFTIME ('%Y-%m-%d %H:%M:%f', 'now', 'localtime')");
+        QDateTime modifyTime = QDateTime::currentDateTime();
 
         updateSql.sprintf(UPDATE_FOLDER_TIME
                 , VNoteDbManager::FOLDER_TABLE_NAME
                 , DBFolder::folderColumnsName[DBFolder::max_noteid].toUtf8().data()
                 , QString("%1").arg(note->folder()->maxNoteIdRef()).toUtf8().data()
                 , DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data()
-                , sqlGetTime.toUtf8().data()
+                , modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data()
                 , DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data()
                 , QString("%1").arg(note->folderId).toUtf8().data()
                 );
@@ -722,18 +735,17 @@ bool SaferQryDbVisitor::visitorData()
             //Default safer type is ExceptionSafer.
             //dataSafer.setSaferType(VDataSafer::ExceptionSafer);
 
-            dataSafer.id      = m_sqlQuery->value(VNoteSaferOper::id).toInt();
-            dataSafer.folder_id = m_sqlQuery->value(VNoteSaferOper::folder_id).toInt();
-            dataSafer.note_id = m_sqlQuery->value(VNoteSaferOper::note_id).toInt();
-            dataSafer.path    = m_sqlQuery->value(VNoteSaferOper::path).toString();
-            dataSafer.state   = m_sqlQuery->value(VNoteSaferOper::state).toInt();
+            dataSafer.id      = m_sqlQuery->value(DBSafer::id).toInt();
+            dataSafer.folder_id = m_sqlQuery->value(DBSafer::folder_id).toInt();
+            dataSafer.note_id = m_sqlQuery->value(DBSafer::note_id).toInt();
+            dataSafer.path    = m_sqlQuery->value(DBSafer::path).toString();
+            dataSafer.state   = m_sqlQuery->value(DBSafer::state).toInt();
 
             //Parse meta data
-            QVariant metaData = m_sqlQuery->value(VNoteSaferOper::meta_data);
+            QVariant metaData = m_sqlQuery->value(DBSafer::meta_data);
             dataSafer.meta_data = metaData.toString();
 
-            dataSafer.createTime  = QDateTime::fromString(
-                        m_sqlQuery->value(VNoteSaferOper::create_time).toString(),VNOTE_TIME_FMT);
+            dataSafer.createTime  = m_sqlQuery->value(DBSafer::create_time).toDateTime();
 
             //************Expand fileds begin**********
             //TODO:
