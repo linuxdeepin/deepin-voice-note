@@ -2,18 +2,18 @@
 <context>
     <name>AppMain</name>
     <message>
-        <location filename="../main.cpp" line="25"/>
-        <location filename="../views/vnotemainwindow.cpp" line="640"/>
+        <location filename="../src/main.cpp" line="25"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="673"/>
         <source>Voice Notes</source>
         <translation>Notes vocales</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="26"/>
+        <location filename="../src/main.cpp" line="26"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation>Notes vocales est un outil mémo léger pour créer des notes de texte et des enregistrements vocaux.</translation>
+        <translation>Notes vocales est un outil pour créer des notes de texte et des enregistrements vocaux.</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="641"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="674"/>
         <source>Recordings not saved</source>
         <translation>Enregistrements non sauvegardés</translation>
     </message>
@@ -21,18 +21,18 @@
 <context>
     <name>DefaultName</name>
     <message>
-        <location filename="../db/vnotefolderoper.cpp" line="248"/>
-        <location filename="../db/vnotefolderoper.cpp" line="251"/>
+        <location filename="../src/db/vnotefolderoper.cpp" line="173"/>
         <source>Notebook</source>
         <translation>Carnet de notes</translation>
     </message>
     <message>
-        <location filename="../db/vnoteitemoper.cpp" line="278"/>
+        <location filename="../src/db/vnoteitemoper.cpp" line="174"/>
         <source>Text</source>
         <translation>Texte</translation>
     </message>
     <message>
-        <location filename="../db/vnoteitemoper.cpp" line="289"/>
+        <location filename="../src/db/vnoteitemoper.cpp" line="185"/>
+        <location filename="../src/importolddata/olddbvisistors.cpp" line="112"/>
         <source>Voice</source>
         <translation>Voix</translation>
     </message>
@@ -40,12 +40,12 @@
 <context>
     <name>HomePage</name>
     <message>
-        <location filename="../views/homepage.cpp" line="20"/>
+        <location filename="../src/views/homepage.cpp" line="20"/>
         <source>Create Notebook</source>
         <translation>Créer un carnet de notes</translation>
     </message>
     <message>
-        <location filename="../views/homepage.cpp" line="32"/>
+        <location filename="../src/views/homepage.cpp" line="32"/>
         <source>Create a notebook to start recording voice and making notes</source>
         <translation>Créez un carnet de notes pour commencer à enregistrer la voix et à prendre des notes</translation>
     </message>
@@ -53,51 +53,51 @@
 <context>
     <name>MiddleView</name>
     <message>
-        <location filename="../views/middleview.cpp" line="143"/>
-        <location filename="../views/middleview.cpp" line="178"/>
+        <location filename="../src/views/middleview.cpp" line="143"/>
+        <location filename="../src/views/middleview.cpp" line="178"/>
         <source>Save</source>
         <translation>Sauvegarder</translation>
     </message>
     <message>
-        <location filename="../views/middleview.cpp" line="252"/>
+        <location filename="../src/views/middleview.cpp" line="274"/>
         <source>No search results</source>
-        <translation>Aucun résultat</translation>
+        <translation>Aucun résultat trouvé</translation>
     </message>
 </context>
 <context>
     <name>NoteDetailContextMenu</name>
     <message>
-        <location filename="../common/actionmanager.cpp" line="141"/>
+        <location filename="../src/common/actionmanager.cpp" line="141"/>
         <source>Save as MP3</source>
         <translation>Enregistrer au format MP3</translation>
     </message>
     <message>
-        <location filename="../common/actionmanager.cpp" line="142"/>
+        <location filename="../src/common/actionmanager.cpp" line="142"/>
         <source>Voice to Text</source>
-        <translation>Vocale à texte</translation>
+        <translation>Vocal vers texte</translation>
     </message>
     <message>
-        <location filename="../common/actionmanager.cpp" line="143"/>
+        <location filename="../src/common/actionmanager.cpp" line="143"/>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <location filename="../common/actionmanager.cpp" line="144"/>
+        <location filename="../src/common/actionmanager.cpp" line="144"/>
         <source>Select all</source>
         <translation>Tout sélectionner</translation>
     </message>
     <message>
-        <location filename="../common/actionmanager.cpp" line="145"/>
+        <location filename="../src/common/actionmanager.cpp" line="145"/>
         <source>Copy</source>
         <translation>Copier</translation>
     </message>
     <message>
-        <location filename="../common/actionmanager.cpp" line="146"/>
+        <location filename="../src/common/actionmanager.cpp" line="146"/>
         <source>Cut</source>
         <translation>Couper</translation>
     </message>
     <message>
-        <location filename="../common/actionmanager.cpp" line="147"/>
+        <location filename="../src/common/actionmanager.cpp" line="147"/>
         <source>Paste</source>
         <translation>Coller</translation>
     </message>
@@ -105,17 +105,17 @@
 <context>
     <name>NotebookContextMenu</name>
     <message>
-        <location filename="../common/actionmanager.cpp" line="99"/>
+        <location filename="../src/common/actionmanager.cpp" line="99"/>
         <source>Rename</source>
         <translation>Renommer</translation>
     </message>
     <message>
-        <location filename="../common/actionmanager.cpp" line="100"/>
+        <location filename="../src/common/actionmanager.cpp" line="100"/>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <location filename="../common/actionmanager.cpp" line="101"/>
+        <location filename="../src/common/actionmanager.cpp" line="101"/>
         <source>New note</source>
         <translation>Nouvelle note</translation>
     </message>
@@ -123,27 +123,27 @@
 <context>
     <name>NotesContextMenu</name>
     <message>
-        <location filename="../common/actionmanager.cpp" line="119"/>
+        <location filename="../src/common/actionmanager.cpp" line="119"/>
         <source>Rename</source>
         <translation>Renommer</translation>
     </message>
     <message>
-        <location filename="../common/actionmanager.cpp" line="120"/>
+        <location filename="../src/common/actionmanager.cpp" line="120"/>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <location filename="../common/actionmanager.cpp" line="121"/>
+        <location filename="../src/common/actionmanager.cpp" line="121"/>
         <source>Save as TXT</source>
         <translation>Enregistrer sous TXT</translation>
     </message>
     <message>
-        <location filename="../common/actionmanager.cpp" line="122"/>
+        <location filename="../src/common/actionmanager.cpp" line="122"/>
         <source>Save voice recording</source>
         <translation>Sauvegarder l&apos;enregistrement vocal</translation>
     </message>
     <message>
-        <location filename="../common/actionmanager.cpp" line="123"/>
+        <location filename="../src/common/actionmanager.cpp" line="123"/>
         <source>New note</source>
         <translation>Nouvelle note</translation>
     </message>
@@ -151,17 +151,17 @@
 <context>
     <name>RightView</name>
     <message>
-        <location filename="../views/rightview.cpp" line="57"/>
+        <location filename="../src/views/rightview.cpp" line="56"/>
         <source>The voice note has been deleted</source>
-        <translation>La note vocale a été supprimée</translation>
+        <translation>Le mémo vocal a été supprimé</translation>
     </message>
     <message>
-        <location filename="../views/rightview.cpp" line="67"/>
+        <location filename="../src/views/rightview.cpp" line="66"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../views/rightview.cpp" line="1023"/>
+        <location filename="../src/views/rightview.cpp" line="1014"/>
         <source>Save</source>
         <translation>Sauvegarder</translation>
     </message>
@@ -169,97 +169,97 @@
 <context>
     <name>Shortcuts</name>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="910"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="981"/>
         <source>New notebook</source>
         <translation>Nouveau cahier</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="911"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="982"/>
         <source>Rename notebook</source>
         <translation>Renommer le carnet de notes</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="912"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="983"/>
         <source>Delete notebook</source>
         <translation>Supprimer le carnet</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="934"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1005"/>
         <source>New note</source>
         <translation>Nouvelle note</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="935"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1006"/>
         <source>Rename note</source>
         <translation>Renommer la note</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="936"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1007"/>
         <source>Delete note</source>
         <translation>Supprimer la note</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="937"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1008"/>
         <source>Play/Pause</source>
         <translation>Lecture/Pause</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="938"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1009"/>
         <source>Record voice</source>
         <translation>Enregistrer la voix</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="939"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1010"/>
         <source>Voice to Text</source>
         <translation>Vocale à texte</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="940"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1011"/>
         <source>Save as MP3</source>
         <translation>Enregistrer au format MP3</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="941"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1012"/>
         <source>Save as TXT</source>
         <translation>Enregistrer sous TXT</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="942"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1013"/>
         <source>Save recordings</source>
         <translation>Sauvegarder les enregistrements</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="962"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1033"/>
         <source>Select all</source>
         <translation>Tout sélectionner</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="963"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1034"/>
         <source>Copy</source>
         <translation>Copier</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="964"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1035"/>
         <source>Cut</source>
         <translation>Couper</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="965"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1036"/>
         <source>Paste</source>
         <translation>Coller</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="966"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1037"/>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="989"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1060"/>
         <source>Help</source>
         <translation>Aide</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="990"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1061"/>
         <source>Display shortcuts</source>
         <translation>Afficher les raccourcis</translation>
     </message>
@@ -267,22 +267,22 @@
 <context>
     <name>ShortcutsGroups</name>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="916"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="987"/>
         <source>Notebooks</source>
         <translation>Carnets de notes</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="946"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1017"/>
         <source>Notes</source>
         <translation>Notes</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="970"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1041"/>
         <source>Edit</source>
         <translation>Éditer</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="994"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1065"/>
         <source>Settings</source>
         <translation>Paramètres</translation>
     </message>
@@ -290,7 +290,7 @@
 <context>
     <name>SplashView</name>
     <message>
-        <location filename="../views/splashview.cpp" line="21"/>
+        <location filename="../src/views/splashview.cpp" line="21"/>
         <source>Loading...</source>
         <translation>Chargement...</translation>
     </message>
@@ -298,25 +298,33 @@
 <context>
     <name>TitleBar</name>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="447"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="449"/>
         <source>Search</source>
         <translation>Rechercher</translation>
     </message>
 </context>
 <context>
+    <name>UpgradeView</name>
+    <message>
+        <location filename="../src/importolddata/upgradeview.cpp" line="23"/>
+        <source>Importing notes from the old version, please wait...</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
     <name>Utils</name>
     <message>
-        <location filename="../common/utils.cpp" line="23"/>
+        <location filename="../src/common/utils.cpp" line="23"/>
         <source>1 min ago</source>
         <translation>Il y a 1 minute</translation>
     </message>
     <message>
-        <location filename="../common/utils.cpp" line="25"/>
+        <location filename="../src/common/utils.cpp" line="25"/>
         <source>%1 mins ago</source>
         <translation>Il y a %1 minute</translation>
     </message>
     <message>
-        <location filename="../common/utils.cpp" line="31"/>
+        <location filename="../src/common/utils.cpp" line="31"/>
         <source>Yesterday</source>
         <translation>Hier</translation>
     </message>
@@ -324,17 +332,17 @@
 <context>
     <name>VNoteErrorMessage</name>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="873"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="943"/>
         <source>The voice conversion failed due to the poor network connection. Do you want to try again?</source>
         <translation>La conversion vocale a échoué en raison de la mauvaise connexion réseau. Voulez-vous réessayer ?</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="878"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="948"/>
         <source>The voice conversion failed. Do you want to try again?</source>
         <translation>La conversion vocale a échoué. Voulez-vous réessayer ?</translation>
     </message>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="1547"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1614"/>
         <source>Try Again</source>
         <translation>Réessayez</translation>
     </message>
@@ -342,7 +350,7 @@
 <context>
     <name>VNoteMainWindow</name>
     <message>
-        <location filename="../views/vnotemainwindow.cpp" line="491"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="521"/>
         <source>Create Notebook</source>
         <translation>Créer un carnet de notes</translation>
     </message>
@@ -350,54 +358,54 @@
 <context>
     <name>VNoteMessageDialog</name>
     <message>
-        <location filename="../dialog/vnotemessagedialog.cpp" line="23"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="23"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../dialog/vnotemessagedialog.cpp" line="93"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="95"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../dialog/vnotemessagedialog.cpp" line="94"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="96"/>
         <source>Confirm</source>
         <translation>Confirmer</translation>
     </message>
     <message>
-        <location filename="../dialog/vnotemessagedialog.cpp" line="97"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="99"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
         <translation>Voulez-vous vraiment supprimer ce bloc-notes ?
 Toutes les notes qu&apos;il contient seront supprimées</translation>
     </message>
     <message>
-        <location filename="../dialog/vnotemessagedialog.cpp" line="101"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="103"/>
         <source>Do you want to stop the current recording?</source>
         <translation>Voulez-vous arrêter l&apos;enregistrement en cours ?</translation>
     </message>
     <message>
-        <location filename="../dialog/vnotemessagedialog.cpp" line="105"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="107"/>
         <source>Are you sure you want to delete this note?</source>
         <translation>Voulez-vous vraiment supprimer cette note ?</translation>
     </message>
     <message>
-        <location filename="../dialog/vnotemessagedialog.cpp" line="110"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="112"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
         <translation>Impossible de convertir cette note vocale, car les notes de plus de 20 minutes ne sont pas prises en charge pour le moment.</translation>
     </message>
     <message>
-        <location filename="../dialog/vnotemessagedialog.cpp" line="115"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="117"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
         <translation>Conversion d&apos;une note vocale. Voulez-vous l&apos;arrêter ?</translation>
     </message>
     <message>
-        <location filename="../dialog/vnotemessagedialog.cpp" line="119"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="121"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
         <translation>Le faible volume d&apos;entrée peut entraîner de mauvais enregistrements. Voulez-vous continuer ?</translation>
     </message>
     <message>
-        <location filename="../dialog/vnotemessagedialog.cpp" line="123"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="125"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
         <translation>Les enregistrements coupés et le texte converti ne seront pas collés. Voulez-vous continuer ? </translation>
     </message>
@@ -405,12 +413,12 @@ Toutes les notes qu&apos;il contient seront supprimées</translation>
 <context>
     <name>VNoteRecordBar</name>
     <message>
-        <location filename="../views/vnoterecordbar.cpp" line="63"/>
+        <location filename="../src/views/vnoterecordbar.cpp" line="63"/>
         <source>Your audio recording device does not work.</source>
         <translation>Votre appareil d&apos;enregistrement audio ne fonctionne pas.</translation>
     </message>
     <message>
-        <location filename="../views/vnoterecordbar.cpp" line="144"/>
+        <location filename="../src/views/vnoterecordbar.cpp" line="146"/>
         <source>No recording device detected</source>
         <translation>Aucun appareil d&apos;enregistrement détecté</translation>
     </message>
@@ -418,7 +426,7 @@ Toutes les notes qu&apos;il contient seront supprimées</translation>
 <context>
     <name>VoiceNoteItem</name>
     <message>
-        <location filename="../views/voicenoteitem.cpp" line="177"/>
+        <location filename="../src/views/voicenoteitem.cpp" line="178"/>
         <source>Converting voice to text</source>
         <translation>Conversion de la voix en texte</translation>
     </message>

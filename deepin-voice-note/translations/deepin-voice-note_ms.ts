@@ -1,21 +1,21 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="cs" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="ms" version="2.1">
 <context>
     <name>AppMain</name>
     <message>
         <location filename="../src/main.cpp" line="25"/>
         <location filename="../src/views/vnotemainwindow.cpp" line="673"/>
         <source>Voice Notes</source>
-        <translation>Hlasové poznámky</translation>
+        <translation>Nota Suara</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="26"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation>Hlasové poznámky jsou nástrojem pro pořizování textových poznámek a hlasových nahrávek.</translation>
+        <translation>Nota Suara ialah sebuah alat memo ringkas dan pantas yang dapat membuat nota teks dan rakaman suara.</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="674"/>
         <source>Recordings not saved</source>
-        <translation>Nahrávky neuloženy</translation>
+        <translation>Rakaman tidak disimpan</translation>
     </message>
 </context>
 <context>
@@ -23,18 +23,18 @@
     <message>
         <location filename="../src/db/vnotefolderoper.cpp" line="173"/>
         <source>Notebook</source>
-        <translation>Zápisník</translation>
+        <translation>Buku nota</translation>
     </message>
     <message>
         <location filename="../src/db/vnoteitemoper.cpp" line="174"/>
         <source>Text</source>
-        <translation>Text</translation>
+        <translation>Teks</translation>
     </message>
     <message>
         <location filename="../src/db/vnoteitemoper.cpp" line="185"/>
         <location filename="../src/importolddata/olddbvisistors.cpp" line="112"/>
         <source>Voice</source>
-        <translation>Hlas</translation>
+        <translation>Suara</translation>
     </message>
 </context>
 <context>
@@ -42,12 +42,12 @@
     <message>
         <location filename="../src/views/homepage.cpp" line="20"/>
         <source>Create Notebook</source>
-        <translation>Vytvořit zápisník</translation>
+        <translation>Cipta Buku Nota</translation>
     </message>
     <message>
         <location filename="../src/views/homepage.cpp" line="32"/>
         <source>Create a notebook to start recording voice and making notes</source>
-        <translation>Vytvořit zápisník pro zahájení nahrávání hlasu a dělání poznámek</translation>
+        <translation>Cipta satu buku nota untuk memulakan rakaman suara dan membuat nota</translation>
     </message>
 </context>
 <context>
@@ -56,12 +56,12 @@
         <location filename="../src/views/middleview.cpp" line="143"/>
         <location filename="../src/views/middleview.cpp" line="178"/>
         <source>Save</source>
-        <translation>Uložit</translation>
+        <translation>Simpan</translation>
     </message>
     <message>
         <location filename="../src/views/middleview.cpp" line="274"/>
         <source>No search results</source>
-        <translation>Nic nenalezeno</translation>
+        <translation>Tiada keputusan gelintar</translation>
     </message>
 </context>
 <context>
@@ -69,37 +69,37 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="141"/>
         <source>Save as MP3</source>
-        <translation>Uložit jako MP3</translation>
+        <translation>Simpan Sebagai MP3</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="142"/>
         <source>Voice to Text</source>
-        <translation>Hlas na text</translation>
+        <translation>Suara ke Teks</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="143"/>
         <source>Delete</source>
-        <translation>Smazat</translation>
+        <translation>Padam</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="144"/>
         <source>Select all</source>
-        <translation>Vybrat vše</translation>
+        <translation>Pilih semua</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="145"/>
         <source>Copy</source>
-        <translation>Kopírovat</translation>
+        <translation>Salin</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="146"/>
         <source>Cut</source>
-        <translation>Vyjmout</translation>
+        <translation>Potong</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="147"/>
         <source>Paste</source>
-        <translation>Vložit</translation>
+        <translation>Tampal</translation>
     </message>
 </context>
 <context>
@@ -107,17 +107,17 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="99"/>
         <source>Rename</source>
-        <translation>Přejmenovat</translation>
+        <translation>Nama Semula</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="100"/>
         <source>Delete</source>
-        <translation>Smazat</translation>
+        <translation>Padam</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="101"/>
         <source>New note</source>
-        <translation>Nová poznámka</translation>
+        <translation>Nota baharu</translation>
     </message>
 </context>
 <context>
@@ -125,27 +125,27 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="119"/>
         <source>Rename</source>
-        <translation>Přejmenovat</translation>
+        <translation>Nama Semula</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="120"/>
         <source>Delete</source>
-        <translation>Smazat</translation>
+        <translation>Padam</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="121"/>
         <source>Save as TXT</source>
-        <translation>Uložit jako TXT</translation>
+        <translation>Simpan sebagai TXT</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="122"/>
         <source>Save voice recording</source>
-        <translation>Uložit hlasovou nahrávku</translation>
+        <translation>Simpan rakaman suara</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="123"/>
         <source>New note</source>
-        <translation>Nová poznámka</translation>
+        <translation>Nota baharu</translation>
     </message>
 </context>
 <context>
@@ -153,7 +153,7 @@
     <message>
         <location filename="../src/views/rightview.cpp" line="56"/>
         <source>The voice note has been deleted</source>
-        <translation>Hlasová poznámka byla smazána</translation>
+        <translation>Nota suara telah dipadamkan</translation>
     </message>
     <message>
         <location filename="../src/views/rightview.cpp" line="66"/>
@@ -163,7 +163,7 @@
     <message>
         <location filename="../src/views/rightview.cpp" line="1014"/>
         <source>Save</source>
-        <translation>Uložit</translation>
+        <translation>Simpan</translation>
     </message>
 </context>
 <context>
@@ -171,97 +171,97 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="981"/>
         <source>New notebook</source>
-        <translation>Nový zápisník</translation>
+        <translation>Buku nota baharu</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="982"/>
         <source>Rename notebook</source>
-        <translation>Přejmenovat zápisník</translation>
+        <translation>Nama semula buku nota</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="983"/>
         <source>Delete notebook</source>
-        <translation>Smazat zápisník</translation>
+        <translation>Padam buku nota</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1005"/>
         <source>New note</source>
-        <translation>Nová poznámka</translation>
+        <translation>Nota baharu</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1006"/>
         <source>Rename note</source>
-        <translation>Přejmenovat poznámku</translation>
+        <translation>Nama semula nota</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1007"/>
         <source>Delete note</source>
-        <translation>Smazat poznámku</translation>
+        <translation>Padam nota</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1008"/>
         <source>Play/Pause</source>
-        <translation>Přehrát/pozastavit</translation>
+        <translation>Main/Jeda</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1009"/>
         <source>Record voice</source>
-        <translation>Nahrát hlas</translation>
+        <translation>Rakam suara</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1010"/>
         <source>Voice to Text</source>
-        <translation>Hlas na text</translation>
+        <translation>Suara ke Teks</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1011"/>
         <source>Save as MP3</source>
-        <translation>Uložit jako MP3</translation>
+        <translation>Simpan Sebagai MP3</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1012"/>
         <source>Save as TXT</source>
-        <translation>Uložit jako TXT</translation>
+        <translation>Simpan sebagai TXT</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1013"/>
         <source>Save recordings</source>
-        <translation>Uložit nahrávky</translation>
+        <translation>Simpan rakaman</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1033"/>
         <source>Select all</source>
-        <translation>Vybrat vše</translation>
+        <translation>Pilih semua</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1034"/>
         <source>Copy</source>
-        <translation>Zkopírovat</translation>
+        <translation>Salin</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1035"/>
         <source>Cut</source>
-        <translation>Vyjmout</translation>
+        <translation>Potong</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1036"/>
         <source>Paste</source>
-        <translation>Vložit</translation>
+        <translation>Tampal</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1037"/>
         <source>Delete</source>
-        <translation>Smazat</translation>
+        <translation>Padam</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1060"/>
         <source>Help</source>
-        <translation>Nápověda</translation>
+        <translation>Bantuan</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1061"/>
         <source>Display shortcuts</source>
-        <translation>Zobrazit zkratky</translation>
+        <translation>Papar pintasan</translation>
     </message>
 </context>
 <context>
@@ -269,22 +269,22 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="987"/>
         <source>Notebooks</source>
-        <translation>Zápisníky</translation>
+        <translation>Buku nota</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1017"/>
         <source>Notes</source>
-        <translation>Poznámky</translation>
+        <translation>Nota</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1041"/>
         <source>Edit</source>
-        <translation>Upravit</translation>
+        <translation>Sunting</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1065"/>
         <source>Settings</source>
-        <translation>Nastavení</translation>
+        <translation>Tetapan</translation>
     </message>
 </context>
 <context>
@@ -292,7 +292,7 @@
     <message>
         <location filename="../src/views/splashview.cpp" line="21"/>
         <source>Loading...</source>
-        <translation>Načítání…</translation>
+        <translation>Memuatkan...</translation>
     </message>
 </context>
 <context>
@@ -300,7 +300,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="449"/>
         <source>Search</source>
-        <translation>Hledat</translation>
+        <translation>Gelintar</translation>
     </message>
 </context>
 <context>
@@ -308,7 +308,7 @@
     <message>
         <location filename="../src/importolddata/upgradeview.cpp" line="23"/>
         <source>Importing notes from the old version, please wait...</source>
-        <translation>Import poznámek ze staré verze – čekejte prosím…</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -316,17 +316,17 @@
     <message>
         <location filename="../src/common/utils.cpp" line="23"/>
         <source>1 min ago</source>
-        <translation>Před 1 minutou</translation>
+        <translation>1 min yang lalu</translation>
     </message>
     <message>
         <location filename="../src/common/utils.cpp" line="25"/>
         <source>%1 mins ago</source>
-        <translation>Před %1 minutami</translation>
+        <translation>%1 min yang lalu</translation>
     </message>
     <message>
         <location filename="../src/common/utils.cpp" line="31"/>
         <source>Yesterday</source>
-        <translation>Včera</translation>
+        <translation>Semalam</translation>
     </message>
 </context>
 <context>
@@ -334,17 +334,17 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="943"/>
         <source>The voice conversion failed due to the poor network connection. Do you want to try again?</source>
-        <translation>Hlas se nepodařilo převést kvůli špatnému síťovému spojení. Chcete to zkusit znovu?</translation>
+        <translation>Penukaran format suara gagal disebabkan sambungan rangkaian yang lemah. Anda mahu mencubanya sekali lagi?</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="948"/>
         <source>The voice conversion failed. Do you want to try again?</source>
-        <translation>Hlas se nepodařilo převést. Chcete to zkusit znovu?</translation>
+        <translation>Gagal menukar format suara. Anda mahu mencubanya sekali lagi?</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1614"/>
         <source>Try Again</source>
-        <translation>Zkusit znovu</translation>
+        <translation>Cuba Lagi</translation>
     </message>
 </context>
 <context>
@@ -352,7 +352,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="521"/>
         <source>Create Notebook</source>
-        <translation>Vytvořit zápisník</translation>
+        <translation>Cipta Buku Nota</translation>
     </message>
 </context>
 <context>
@@ -365,49 +365,49 @@
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="95"/>
         <source>Cancel</source>
-        <translation>Storno</translation>
+        <translation>Batal</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="96"/>
         <source>Confirm</source>
-        <translation>Potvrdit</translation>
+        <translation>Sahkan</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="99"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
-        <translation>Opravdu chcete tento zápisník smazat?
-Veškeré poznámky v něm budou smazány</translation>
+        <translation>Anda pasti mahu memadam buku nota ini?
+Semua nota di dalamnya akan terpadam</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="103"/>
         <source>Do you want to stop the current recording?</source>
-        <translation>Chcete právě probíhající nahrávání zastavit?</translation>
+        <translation>Anda pasti mahu menghentikan rakaman semasa?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="107"/>
         <source>Are you sure you want to delete this note?</source>
-        <translation>Opravdu chcete tuto poznámku smazat?</translation>
+        <translation>Anda pasti mahu memadam nota ini?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="112"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
-        <translation>Tuto hlasovou poznámku nelze převést, protože poznámky delší než 20 minut nejsou v současnosti podporovány.</translation>
+        <translation>Tidak dapat menukar format nota suara ini, kerana nota melebihi 20 minit tidak disokong buat masa ini.</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="117"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
-        <translation>Nyní se probíhá převod hlasové poznámky. Chcete ho zastavit?</translation>
+        <translation>Menukar format satu nota suara sekarang. Anda mahu hentikannya?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="121"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
-        <translation>Příliš tichá vstupní hlasitost může mít za následek špatné nahrávky. Chcete pokračovat?</translation>
+        <translation>Volum input rendah boleh mengakibatkan rakaman menjadi bermasalah. Anda mahu teruskan?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="125"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
-        <translation>Sestříhané nahrávky a převedený text nebudou vloženy. Chcete pokračovat?</translation>
+        <translation>Rakaman terklip dan teks yang ditukarkan tidak akan ditampal. Anda pasti mahu teruskan?</translation>
     </message>
 </context>
 <context>
@@ -415,12 +415,12 @@ Veškeré poznámky v něm budou smazány</translation>
     <message>
         <location filename="../src/views/vnoterecordbar.cpp" line="63"/>
         <source>Your audio recording device does not work.</source>
-        <translation>Zařízení pro nahrávání zvuku nefunguje.</translation>
+        <translation>Peranti rakaman audio anda tidak berfungsi</translation>
     </message>
     <message>
         <location filename="../src/views/vnoterecordbar.cpp" line="146"/>
         <source>No recording device detected</source>
-        <translation>Nezjištěno žádné zařízení pro nahrávání zvuku</translation>
+        <translation>Tiada peranti rakaman dikesan</translation>
     </message>
 </context>
 <context>
@@ -428,7 +428,7 @@ Veškeré poznámky v něm budou smazány</translation>
     <message>
         <location filename="../src/views/voicenoteitem.cpp" line="178"/>
         <source>Converting voice to text</source>
-        <translation>Převádění hlasu na text</translation>
+        <translation>Menukar format suara ke teks</translation>
     </message>
 </context>
 </TS>
