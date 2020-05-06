@@ -104,6 +104,7 @@ int Utils::highTextEdit(DTextEdit *textEdit, const QTextCharFormat &oriFormat, c
                         const QColor &highColor)
 {
     int findCount = 0;
+    textEdit->moveCursor(QTextCursor::Start);
     QTextCursor find_cursor = textEdit->textCursor();
     QTextCharFormat colorFormat = oriFormat;
     colorFormat.setForeground(highColor);
