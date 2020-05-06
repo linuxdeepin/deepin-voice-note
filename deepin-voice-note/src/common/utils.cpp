@@ -1,9 +1,11 @@
 #include "utils.h"
 #include "globaldef.h"
+#include "vnoteitem.h"
 
 #include <QImageReader>
 #include <QIcon>
 #include <QDebug>
+#include <QTextBlock>
 
 #include <DGuiApplicationHelper>
 
@@ -130,4 +132,43 @@ QString Utils::formatMillisecond(qint64 millisecond, bool minValue)
     }
 
     return QString("60:00");
+}
+
+void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
+{
+    if(block != nullptr){
+       block->blockText = "";
+    }
+
+    if(doc != nullptr){
+        QTextBlock currentBlock = doc->begin();
+        QTextBlock::iterator it;
+        while(true){
+            for (it = currentBlock.begin(); !(it.atEnd()); ){
+                QTextFragment currentFragment = it.fragment();
+//                QTextImageFormat newImageFormat = currentFragment.charFormat().toImageFormat();
+//                if (newImageFormat.isValid()) {
+//                    int pos = currentFragment.position();
+//                    qDebug() << "image block:" << pos <<"url;" << newImageFormat.name();
+//                    ++it;
+//                    continue;
+//                }
+                if (currentFragment.isValid()){
+                    ++it;
+                    block->blockText.append(currentFragment.text());
+                }
+
+            }
+            currentBlock = currentBlock.next();
+            if(!currentBlock.isValid())
+                break;
+        }
+    }
+}
+
+void Utils::blockToDocument(const VNoteBlock *block, QTextDocument *doc)
+{
+    if(block && doc){
+        doc->setPlainText(block->blockText);
+    }
 }

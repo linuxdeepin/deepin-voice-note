@@ -71,8 +71,8 @@ public:
     bool hasSelection() override;
     bool isSelectAll() override;
     bool isTextContainsPos(const QPoint &globalPos) override;
-    QString getAllText() override;
-    QString getSelectText() override;
+    QTextDocumentFragment getSelectFragment() override;
+    QTextDocument* getTextDocument() override;
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

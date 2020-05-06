@@ -118,7 +118,7 @@ void TextNoteEdit::clearSelection()
     }
 }
 
-QString TextNoteEdit::getSelectText()
+QString TextNoteEdit::getSelectFragment()
 {
     QTextCursor textCursor = this->textCursor();
     return textCursor.selectedText();

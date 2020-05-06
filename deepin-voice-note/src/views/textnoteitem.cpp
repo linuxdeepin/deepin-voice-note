@@ -57,7 +57,7 @@ void TextNoteItem::updateData(QString searchKey)
 {
     if (m_noteBlock) {
         m_serchKey = searchKey;
-        m_textEdit->setPlainText(m_noteBlock->blockText);
+        Utils::blockToDocument(m_noteBlock,m_textEdit->document());
         if (!m_serchKey.isEmpty()) {
             DPalette pb;
             Utils::highTextEdit(m_textEdit, m_textCharFormat, m_serchKey, pb.color(DPalette::Highlight));
@@ -127,14 +127,9 @@ bool TextNoteItem::hasSelection()
     return m_selectAll || m_textEdit->hasSelection();
 }
 
-QString TextNoteItem::getAllText()
+QTextDocumentFragment TextNoteItem::getSelectFragment()
 {
-    return  m_textEdit->toPlainText();
-}
-
-QString TextNoteItem::getSelectText()
-{
-    return  m_textEdit->getSelectText();
+    return  getTextCursor().selection();
 }
 
 void TextNoteItem::setFocus()
@@ -157,3 +152,8 @@ bool TextNoteItem::isTextContainsPos(const QPoint &globalPos)
     Q_UNUSED(globalPos);
     return true;
 }
+
+ QTextDocument* TextNoteItem::getTextDocument()
+ {
+     return m_textEdit->document();
+ }

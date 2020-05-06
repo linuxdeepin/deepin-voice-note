@@ -275,14 +275,14 @@ void VoiceNoteItem::clearSelection()
     m_selectAll = false;
 }
 
-QString VoiceNoteItem::getSelectText()
+QTextDocumentFragment VoiceNoteItem::getSelectFragment()
 {
-    QString ret = "";
+    QTextDocumentFragment ret;
     if(asrTextNotEmpty()){
         if(m_selectAll){
-            ret = getAllText();
+            ret = QTextDocumentFragment(m_asrText->document());
         }else {
-            ret = m_asrText->getSelectText();
+            ret = getTextCursor().selection();
         }
     }
     return  ret;
@@ -295,13 +295,13 @@ void VoiceNoteItem::resizeEvent(QResizeEvent *event)
     m_coverWidget->move(10,0);
 }
 
-QString VoiceNoteItem::getAllText()
+QTextDocument* VoiceNoteItem::getTextDocument()
 {
-    QString ret = "";
+    QTextDocument *doc = nullptr;
     if(asrTextNotEmpty()){
-        ret = m_asrText->toPlainText();
+        doc = m_asrText->document();
     }
-    return  ret;
+    return doc;
 }
 
 bool VoiceNoteItem::hasSelection()

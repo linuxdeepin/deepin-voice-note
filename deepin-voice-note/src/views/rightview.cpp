@@ -134,18 +134,18 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
 
     connect(item, &VoiceNoteItem::sigPlayBtnClicked, this, &RightView::onVoicePlay);
     connect(item, &VoiceNoteItem::sigPauseBtnClicked, this, &RightView::onVoicePause);
-    QString cutStr = "";
+    QTextDocumentFragment cutStr;
     int curIndex = m_viewportLayout->indexOf(m_curItemWidget);
     VNoteBlock *curBlock = m_curItemWidget->getNoteBlock();
 
     if (curBlock->blockType == VNoteBlock::Text) {
         QTextCursor cursor = m_curItemWidget->getTextCursor();
         cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
-        cutStr = cursor.selectedText();
+        m_curItemWidget->setTextCursor(cursor);
+        cutStr = m_curItemWidget->getSelectFragment();
         cursor.removeSelectedText();
-
         if (!cutStr.isEmpty()) {
-            curBlock->blockText = m_curItemWidget->getAllText();
+            Utils::documentToBlock(curBlock,m_curItemWidget->getTextDocument());
         }
     }
 
@@ -162,41 +162,26 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
     m_noteItemData->addBlock(preBlock, data);
     m_curItemWidget = item;
 
-    bool needTextEdit = false;
     QLayoutItem *nextlayoutItem = m_viewportLayout->itemAt(curIndex + 1);
     DetailItemWidget *nextWidget = static_cast<DetailItemWidget *>(nextlayoutItem->widget());
-    VNoteBlock *nextBlock = nullptr;
 
-    if (nextWidget == m_placeholderWidget) { //最后要加个编辑框
-        needTextEdit = true;
-    } else {
-        nextBlock = nextWidget->getNoteBlock();
-        if (nextBlock->blockType == VNoteBlock::Voice) { //下一个还是语音项要加编辑框
-            needTextEdit = true;
-        } else if (nextBlock->blockType == VNoteBlock::Text) {
-            if (!cutStr.isEmpty()) {
-                nextBlock->blockText = cutStr + nextWidget->getAllText();
-                nextWidget->updateData(m_searchKey);
-            }
-        }
-    }
-
-    if (needTextEdit) {
+    if (nextWidget == m_placeholderWidget ||
+        nextWidget->getNoteBlock()->blockType ==  VNoteBlock::Voice) {
         VNoteBlock *textBlock = m_noteItemData->newBlock(VNoteBlock::Text);
-        textBlock->blockText = cutStr;
-        m_curItemWidget = insertTextEdit(textBlock, true);
-        m_noteItemData->addBlock(item->getNoteBlock(), textBlock);
-    } else {
-        int index = m_viewportLayout->indexOf(m_curItemWidget);
-        QLayoutItem *layoutItem = m_viewportLayout->itemAt(index + 1);
-        if (layoutItem) {
-            DetailItemWidget *nextWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
-            if (nextWidget && nextWidget != m_placeholderWidget) {
-                m_curItemWidget = nextWidget;
-                m_curItemWidget->setFocus();
-            }
-        }
+        m_noteItemData->addBlock(m_curItemWidget->getNoteBlock(), textBlock);
+        m_curItemWidget = insertTextEdit(textBlock, false);
+    }else {
+        m_curItemWidget = nextWidget;
     }
+
+    if(!cutStr.isEmpty()){
+       QTextCursor cursor = m_curItemWidget->getTextCursor();
+       cursor.movePosition(QTextCursor::Start);
+       cursor.insertFragment(cutStr);
+       Utils::documentToBlock(m_curItemWidget->getNoteBlock(),m_curItemWidget->getTextDocument());
+    }
+
+    m_curItemWidget->setFocus();
 
     int height = 0;
     QRect rc =  m_curItemWidget->getCursorRect();
@@ -212,13 +197,7 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
 
 void RightView::onTextEditFocusOut()
 {
-    DetailItemWidget *widget = static_cast<DetailItemWidget *>(sender());
-    QString text = widget->getAllText();
-    VNoteBlock *block =  widget->getNoteBlock();
-    if (text != block->blockText) {
-        block->blockText = text;
-        updateData();
-    }
+    saveNote();
 }
 
 void RightView::onTextEditTextChange()
@@ -366,7 +345,7 @@ void RightView::saveNote()
             QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
             DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
             if (widget->hasFocus()) {
-                widget->getNoteBlock()->blockText = widget->getAllText();
+                Utils::documentToBlock(widget->getNoteBlock(),widget->getTextDocument());
             }
         }
 
@@ -558,15 +537,19 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
                 nextWidget->getNoteBlock()->blockType == VNoteBlock::Text) {
 
             noteBlock = nextWidget->getNoteBlock();
-            noteBlock->blockText = preWidget->getAllText() + nextWidget->getAllText();
-            nextWidget->updateData(m_searchKey);
+
+            QTextCursor cursor = nextWidget->getTextCursor();
+            cursor.movePosition(QTextCursor::Start);
+
+            cursor.insertFragment(QTextDocumentFragment(preWidget->getTextDocument()));
+            Utils::documentToBlock(noteBlock,nextWidget->getTextDocument());
 
             preWidget->disconnect();
             noteBlockList.push_back(preWidget->getNoteBlock());
             m_viewportLayout->removeWidget(preWidget);
             preWidget->deleteLater();
 
-            QTextCursor cursor = nextWidget->getTextCursor();
+            cursor = nextWidget->getTextCursor();
             cursor.movePosition(QTextCursor::End);
             nextWidget->setTextCursor(cursor);
             nextWidget->setFocus();
@@ -797,7 +780,7 @@ QString RightView::copySelectText(bool voiceText)
         }
 
         if (hasSelection) {
-            QString selectText = widget->getSelectText();
+            QString selectText = widget->getSelectFragment().toPlainText();
             if (!selectText.isEmpty()) {
                 if(!firstSelect && !selectText.startsWith('\n')){
                      text.append("\n");
@@ -843,7 +826,7 @@ void RightView::delSelectText()
         if (widget->hasSelection()) {
             if (widget->isSelectAll() == false) {
                 widget->removeSelectText();
-                widget->getNoteBlock()->blockText =  widget->getAllText();
+                Utils::documentToBlock(widget->getNoteBlock(), widget->getTextDocument());
                 continue;
             }
             delListWidget.push_back(widget);
@@ -890,7 +873,6 @@ void RightView::selectAllItem()
 
 void RightView::pasteText()
 {
-
     if (m_curItemWidget && m_curItemWidget->hasFocus() && m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Text) {
         auto voiceWidget = m_selectWidget.values(VoicePlugin);
         auto textWidget = m_selectWidget.values(TextEditPlugin);

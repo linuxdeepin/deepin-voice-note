@@ -22,8 +22,9 @@ public:
     void selectAllText();
     void clearSelection();
     bool hasSelection();
-    QString getAllText();
-    QString getSelectText();
+    QTextDocumentFragment getSelectFragment();
+    QTextDocument* getTextDocument();
+
     void setFocus();
     bool hasFocus();
     bool isSelectAll();

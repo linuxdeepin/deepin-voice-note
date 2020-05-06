@@ -16,7 +16,7 @@ public:
      void selectText(const QPoint &globalPos,QTextCursor::MoveOperation op);
      void clearSelection();
      void removeSelectText();
-     QString getSelectText();
+     QString getSelectFragment();
      bool hasSelection();
 
 public slots:

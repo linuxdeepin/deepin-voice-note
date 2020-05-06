@@ -1,11 +1,15 @@
 #include <QString>
 #include <QDateTime>
 #include <QPixmap>
+#include <QTextDocumentFragment>
+#include <QTextDocument>
 
 #include <DApplication>
 #include <DTextEdit>
 
 DWIDGET_USE_NAMESPACE
+
+class VNoteBlock;
 
 class Utils
 {
@@ -17,4 +21,7 @@ public:
     static int highTextEdit(DTextEdit *textEdit, const QTextCharFormat &oriFormat, const QString &searchKey,
                             const QColor &highColor);
     static QString formatMillisecond(qint64 millisecond, bool minValue = 1);
+
+    static void documentToBlock(VNoteBlock *block, const QTextDocument *doc);
+    static void blockToDocument(const VNoteBlock *block, QTextDocument *doc);
 };
