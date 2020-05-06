@@ -160,9 +160,12 @@ void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
                 }
 
             }
+
             currentBlock = currentBlock.next();
             if(!currentBlock.isValid())
                 break;
+
+            block->blockText.append('\n');
         }
     }
 }
@@ -172,4 +175,14 @@ void Utils::blockToDocument(const VNoteBlock *block, QTextDocument *doc)
     if(block && doc){
         doc->setPlainText(block->blockText);
     }
+}
+
+void Utils::setDefaultColor(QTextDocument *srcDoc, const QColor &color)
+{
+    QTextCursor cursor(srcDoc);
+    cursor.movePosition(QTextCursor::Start);
+    cursor.movePosition(QTextCursor::End,QTextCursor::KeepAnchor);
+    QTextCharFormat newFormat = cursor.charFormat();
+    newFormat.setForeground(color);
+    cursor.mergeCharFormat(newFormat);
 }

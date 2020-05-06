@@ -4,6 +4,7 @@
 
 #include <QVBoxLayout>
 #include <QAbstractTextDocumentLayout>
+#include <QClipboard>
 
 #include <DStyle>
 #include <DApplicationHelper>
@@ -15,7 +16,9 @@ TextNoteItem::TextNoteItem(VNoteBlock *noteBlock, QWidget *parent, QString reg)
 {
     initUi();
     initConnection();
-    updateData(m_serchKey);
+    Utils::blockToDocument(m_noteBlock,m_textEdit->document());
+    updateSearchKey(m_serchKey);
+    m_textEdit->moveCursor(QTextCursor::Start);
 }
 
 void TextNoteItem::initUi()
@@ -53,14 +56,18 @@ void TextNoteItem::initConnection()
     connect(m_textEdit, SIGNAL(sigDelEmpty()), this, SIGNAL(sigDelEmpty()));
 }
 
-void TextNoteItem::updateData(QString searchKey)
+void TextNoteItem::updateSearchKey(QString searchKey)
 {
     if (m_noteBlock) {
         m_serchKey = searchKey;
-        Utils::blockToDocument(m_noteBlock,m_textEdit->document());
+        if(m_searchCount != 0){
+            Utils::setDefaultColor(m_textEdit->document(), m_textCharFormat.foreground().color());
+        }
         if (!m_serchKey.isEmpty()) {
             DPalette pb;
-            Utils::highTextEdit(m_textEdit, m_textCharFormat, m_serchKey, pb.color(DPalette::Highlight));
+            m_searchCount = Utils::highTextEdit(m_textEdit, m_textCharFormat, m_serchKey, pb.color(DPalette::Highlight));
+        }else {
+            m_searchCount = 0;
         }
     }
 }
@@ -147,13 +154,16 @@ bool TextNoteItem::isSelectAll()
     return m_selectAll;
 }
 
-bool TextNoteItem::isTextContainsPos(const QPoint &globalPos)
+QTextDocument* TextNoteItem::getTextDocument()
 {
-    Q_UNUSED(globalPos);
-    return true;
+    return m_textEdit->document();
 }
 
- QTextDocument* TextNoteItem::getTextDocument()
- {
-     return m_textEdit->document();
- }
+void TextNoteItem::pasteText()
+{
+    QClipboard *board = QApplication::clipboard();
+    if (board) {
+        QString clipBoardText = board->text();
+        m_textEdit->insertPlainText(clipBoardText);
+    }
+}

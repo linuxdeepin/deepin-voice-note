@@ -142,10 +142,13 @@ class DetailItemWidget : public QWidget
     Q_OBJECT
 public:
     explicit DetailItemWidget(QWidget *parent = nullptr);
+    virtual void        updateSearchKey(QString searchKey);
+    virtual void        pasteText();
+    virtual bool        isTextContainsPos(const QPoint &globalPos);
+
     virtual VNoteBlock *getNoteBlock() = 0;
     virtual QTextCursor getTextCursor() = 0;
     virtual void        setTextCursor(const QTextCursor &cursor) = 0;
-    virtual void        updateData(QString searchKey) = 0;
     virtual bool        textIsEmpty() = 0;
     virtual QRect       getCursorRect() = 0;
     virtual void        setFocus() = 0;
@@ -158,7 +161,6 @@ public:
     virtual void clearSelection() = 0;
     virtual bool hasSelection() = 0;
     virtual bool isSelectAll() = 0;
-    virtual bool isTextContainsPos(const QPoint &globalPos) = 0;
     virtual QTextDocumentFragment getSelectFragment() = 0;
     virtual QTextDocument* getTextDocument() = 0;
 };

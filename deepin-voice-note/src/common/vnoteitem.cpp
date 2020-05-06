@@ -171,6 +171,22 @@ DetailItemWidget::DetailItemWidget(QWidget *parent)
     ;
 }
 
+void DetailItemWidget::updateSearchKey(QString searchKey)
+{
+    Q_UNUSED(searchKey);
+}
+
+void DetailItemWidget::pasteText()
+{
+    ;
+}
+
+bool DetailItemWidget::isTextContainsPos(const QPoint &globalPos)
+{
+    Q_UNUSED(globalPos);
+    return true;
+}
+
 VNoteBlock::VNoteBlock(qint32 type)
     : blockType(type)
 {

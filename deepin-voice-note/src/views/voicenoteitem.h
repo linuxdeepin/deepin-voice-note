@@ -43,6 +43,7 @@ public:
 
     explicit VoiceNoteItem(VNoteBlock *noteBlock, QWidget *parent = nullptr);
 
+    void initData();
     void showPlayBtn();
     void showPauseBtn();
     void showAsrStartWindow();
@@ -57,7 +58,6 @@ public:
     VNoteBlock *getNoteBlock() override;
     QTextCursor getTextCursor() override;
     void        setTextCursor(const QTextCursor &cursor) override;
-    void        updateData(QString searchKey) override;
     bool        textIsEmpty() override;
     QRect       getCursorRect() override;
     //选中操作相关

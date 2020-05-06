@@ -24,4 +24,5 @@ public:
 
     static void documentToBlock(VNoteBlock *block, const QTextDocument *doc);
     static void blockToDocument(const VNoteBlock *block, QTextDocument *doc);
+    static void setDefaultColor(QTextDocument *srcDoc, const QColor &color);
 };

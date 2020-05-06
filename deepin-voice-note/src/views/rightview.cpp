@@ -218,8 +218,8 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
             for (int i = 0; i < m_viewportLayout->count() - 1 ; i++){
                QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
                DetailItemWidget *widget = static_cast< DetailItemWidget *>(layoutItem->widget());
-               if(widget->getNoteBlock()->blockType == VNoteBlock::Text && !widget->textIsEmpty()){
-                   widget->updateData(m_searchKey);
+               if(widget->getNoteBlock()->blockType == VNoteBlock::Text){
+                   widget->updateSearchKey(m_searchKey);
                }
             }
             clearAllSelection();
@@ -476,8 +476,11 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
         VNoteBlock *noteBlock = widget->getNoteBlock();
         if (noteBlock->blockType == VNoteBlock::Text) {
             if (index == 0 || (index == m_viewportLayout->count() - 2 && index != 1)) { //第一个和最后一个编辑框不删，只清空内容
-                widget->getNoteBlock()->blockText = "";
-                widget->updateData(m_searchKey);
+                QTextDocument *doc = widget->getTextDocument();
+                if(doc != nullptr){
+                    doc->clear();
+                }
+                noteBlock->blockText = "";
                 return;
             }
         }
@@ -501,8 +504,12 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
             if (noteBlock->blockType == VNoteBlock::Text &&
                     preWidget->getNoteBlock()->blockType == VNoteBlock::Voice &&
                     nextWidget->getNoteBlock()->blockType == VNoteBlock::Voice) {
+
+                QTextDocument * doc = widget->getTextDocument();
+                if(doc){
+                    doc->clear();
+                }
                 widget->getNoteBlock()->blockText = "";
-                widget->updateData(m_searchKey);
                 return;
             }
         }
@@ -877,12 +884,7 @@ void RightView::pasteText()
         auto voiceWidget = m_selectWidget.values(VoicePlugin);
         auto textWidget = m_selectWidget.values(TextEditPlugin);
         if(!voiceWidget.size() && isAllWidgetEmpty(textWidget)){ //没有选中才可以粘贴
-            auto textCursor = m_curItemWidget->getTextCursor();
-            QClipboard *board = QApplication::clipboard();
-            if (board) {
-                QString clipBoardText = board->text();
-                textCursor.insertText(clipBoardText);
-            }
+            m_curItemWidget->pasteText();
             m_curItemWidget->setFocus();
         }
     }

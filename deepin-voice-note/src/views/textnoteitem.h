@@ -13,7 +13,7 @@ public:
     VNoteBlock *getNoteBlock();
     QTextCursor getTextCursor();
     void        setTextCursor(const QTextCursor &cursor);
-    void        updateData(QString searchKey);
+    void        updateSearchKey(QString searchKey);
     bool        textIsEmpty();
     QRect       getCursorRect();
     void selectText(const QPoint &globalPos, QTextCursor::MoveOperation op);
@@ -25,10 +25,10 @@ public:
     QTextDocumentFragment getSelectFragment();
     QTextDocument* getTextDocument();
 
+    void pasteText();
     void setFocus();
     bool hasFocus();
     bool isSelectAll();
-    bool isTextContainsPos(const QPoint &globalPos);
 
 signals:
     void        sigCursorHeightChange(QWidget *widget, int height);
@@ -40,6 +40,7 @@ private:
     void         initUi();
     void         initConnection();
     bool m_selectAll   {false};
+    int           m_searchCount {0};
     VNoteBlock   *m_noteBlock {nullptr};
     TextNoteEdit *m_textEdit {nullptr};
     QString       m_serchKey ;
