@@ -97,7 +97,6 @@ protected:
     void initEmptyFoldersView();
     void setSpecialStatus(SpecialStatus status);
 
-    void resizeEvent(QResizeEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 signals:

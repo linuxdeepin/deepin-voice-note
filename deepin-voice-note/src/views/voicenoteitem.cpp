@@ -13,7 +13,7 @@
 #include <QHBoxLayout>
 #include <QAbstractTextDocumentLayout>
 #include <QTimer>
-
+#include <QGridLayout>
 #include <DFontSizeManager>
 #include <DStyle>
 #include <DAnchors>
@@ -104,15 +104,17 @@ void VoiceNoteItem::initUi()
     bkLayout->setContentsMargins(0, 0, 20, 0);
     m_bgWidget->setLayout(bkLayout);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(m_bgWidget);
-    mainLayout->setContentsMargins(10, 0, 10, 0);
-    showPlayBtn();
-
-    this->setLayout(mainLayout);
     m_coverWidget = new DFrame(this);
     m_coverWidget->setAttribute(Qt::WA_TransparentForMouseEvents,true);
     m_coverWidget->setVisible(false);
+
+    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout->addWidget(m_bgWidget,0,0,1,1);
+    mainLayout->addWidget(m_coverWidget,0,0,1,1);
+    mainLayout->setContentsMargins(10, 0, 10, 0);
+
+    this->setLayout(mainLayout);
+
 }
 
 void VoiceNoteItem::initData()
@@ -285,13 +287,6 @@ QTextDocumentFragment VoiceNoteItem::getSelectFragment()
         }
     }
     return  ret;
-}
-
-void VoiceNoteItem::resizeEvent(QResizeEvent *event)
-{
-    Q_UNUSED(event)
-    m_coverWidget->resize(m_bgWidget->size());
-    m_coverWidget->move(10,0);
 }
 
 QTextDocument* VoiceNoteItem::getTextDocument()

@@ -1091,11 +1091,6 @@ void VNoteMainWindow::onPreviewShortcut()
     connect(shortcutViewProcess, SIGNAL(finished(int)), shortcutViewProcess, SLOT(deleteLater()));
 }
 
-void VNoteMainWindow::resizeEvent(QResizeEvent *event)
-{
-    DMainWindow::resizeEvent(event);
-}
-
 void VNoteMainWindow::closeEvent(QCloseEvent *event)
 {
     if (checkIfNeedExit()) {

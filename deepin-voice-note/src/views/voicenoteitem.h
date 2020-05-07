@@ -74,9 +74,6 @@ public:
     QTextDocumentFragment getSelectFragment() override;
     QTextDocument* getTextDocument() override;
 
-protected:
-    void resizeEvent(QResizeEvent *event) override;
-
 signals:
     void sigPlayBtnClicked(VoiceNoteItem *item);
     void sigPauseBtnClicked(VoiceNoteItem *item);
