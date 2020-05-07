@@ -772,7 +772,19 @@ void RightView::mouseMoveSelect(QMouseEvent *event)
 
 }
 
-QString RightView::copySelectText(bool voiceText)
+void RightView::copySelectText(bool voiceText)
+{
+    QString text = getSelectText(voiceText);
+    if(!text.isEmpty()){
+        QClipboard *board = QApplication::clipboard();
+        if (board) {
+            board->clear();
+            board->setText(text);
+        }
+    }
+}
+
+QString RightView::getSelectText(bool voiceText)
 {
     QString text = "";
     bool firstSelect = true;
@@ -798,13 +810,6 @@ QString RightView::copySelectText(bool voiceText)
         }
     }
 
-    if(!text.isEmpty()){
-        QClipboard *board = QApplication::clipboard();
-        if (board) {
-            board->clear();
-            board->setText(text);
-        }
-    }
     return text;
 }
 
