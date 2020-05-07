@@ -46,9 +46,6 @@ SOURCES += \
     src/views/splashview.cpp \
     src/widgets/vnoteplaywidget.cpp \
     src/views/middleviewsortfilter.cpp \
-    src/views/controller/textnoteeditprivate.cpp \
-    src/views/controller/voicenoteitemprivate.cpp \
-    src/views/controller/rightviewprivate.cpp \
     src/dbus/dbusvariant.cpp \
     src/dbus/dbuslogin1manager.cpp \
     src/views/textnoteitem.cpp \
@@ -111,9 +108,6 @@ HEADERS += \
     src/views/splashview.h \
     src/widgets/vnoteplaywidget.h \
     src/views/middleviewsortfilter.h \
-    src/views/controller/textnoteeditprivate.h \
-    src/views/controller/voicenoteitemprivate.h \
-    src/views/controller/rightviewprivate.h \
     src/dbus/dbuslogin1manager.h \
     src/dbus/dbusvariant.h \
     src/views/textnoteitem.h \
