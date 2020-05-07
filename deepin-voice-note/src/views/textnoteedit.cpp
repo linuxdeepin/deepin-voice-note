@@ -52,27 +52,18 @@ void TextNoteEdit::contextMenuEvent(QContextMenuEvent *e)
 
 void TextNoteEdit::keyPressEvent(QKeyEvent *e)
 {
-    if(e->modifiers() != Qt::ControlModifier && e->key() != Qt::Key_Delete){
-        if(e->key() == Qt::Key_Backspace && this->hasSelection()){
-             e->ignore();
-        }else{
-             DTextEdit::keyPressEvent(e);
-        }
+    int key = e->key();
 
-    }else {
+    if(e->modifiers() == Qt::ControlModifier || key == Qt::Key_Delete){
         e->ignore();
+        return;
     }
 
-//    if (e->key() == Qt::Key_Backspace) {
-//        static bool preEmpty = false;
-//        bool isEmpty = this->document()->isEmpty();
-//        if (isEmpty && !preEmpty ) {
-//            emit sigDelEmpty();
-//        }
-//        preEmpty = isEmpty;
-//    }
+    if((key == Qt::Key_Backspace || key == Qt::Key_Tab) && hasSelection()){
+        return;
+    }
 
-
+    DTextEdit::keyPressEvent(e);
 }
 
 void TextNoteEdit::mousePressEvent(QMouseEvent *event)
