@@ -233,12 +233,11 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
     }
 
     while (m_viewportLayout->indexOf(m_placeholderWidget) != 0) {
-        QWidget *widget = m_viewportLayout->itemAt(0)->widget();
-        m_viewportLayout->removeWidget(widget);
+        QLayoutItem *layoutItem = m_viewportLayout->takeAt(0);
+        QWidget *widget = layoutItem->widget();
         widget->setVisible(false);
-//        widget->setParent(nullptr);
-//        delete  widget;
-//        widget = nullptr;
+        delete  layoutItem;
+        layoutItem = nullptr;
         widget->deleteLater();
     }
 
@@ -533,10 +532,12 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
             m_curAsrItem = nullptr;
         }
 
-        widget->disconnect();
+        widget->setVisible(false);
         noteBlockList.push_back(noteBlock);
-        m_viewportLayout->removeWidget(widget);
+        layoutItem = m_viewportLayout->takeAt(index);
         widget->deleteLater();
+        delete  layoutItem;
+        layoutItem = nullptr;
 
         if (merge && preWidget && nextWidget && //合并编辑框
                 preWidget != m_placeholderWidget &&
@@ -552,10 +553,12 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
             cursor.insertFragment(QTextDocumentFragment(preWidget->getTextDocument()));
             Utils::documentToBlock(noteBlock,nextWidget->getTextDocument());
 
-            preWidget->disconnect();
+            preWidget->setVisible(false);
             noteBlockList.push_back(preWidget->getNoteBlock());
-            m_viewportLayout->removeWidget(preWidget);
+            layoutItem = m_viewportLayout->takeAt(index - 1);
             preWidget->deleteLater();
+            delete  layoutItem;
+            layoutItem = nullptr;
 
             cursor = nextWidget->getTextCursor();
             cursor.movePosition(QTextCursor::End);
