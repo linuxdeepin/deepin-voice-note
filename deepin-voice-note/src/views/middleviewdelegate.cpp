@@ -379,16 +379,17 @@ void MiddleViewDelegate::paintSearchItem(QPainter *painter, const QStyleOptionVi
             }
         }
         painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
-        painter->drawText(timeRect, Qt::AlignLeft | Qt::AlignVCenter, Utils::convertDateTime(noteData->modifyTime));
+        painter->drawText(timeRect, Qt::AlignLeft | Qt::AlignTop, Utils::convertDateTime(noteData->modifyTime));
     }else {
         painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
     }
 
     VNoteFolder *folderData = FolderOper.getFolder(noteData->folderId);
     if (folderData) {
+        fontMetrics = painter->fontMetrics();
         QRect folderRect = itemRect;
         folderRect.setY(itemRect.bottom());
-        QRect iconRect(folderRect.left() + 20, folderRect.top(), 24, 24);
+        QRect iconRect(folderRect.left() + 20, folderRect.top() + (fontMetrics.height() - 24) / 2 , 24, 24);
         painter->drawPixmap(iconRect, folderData->UI.icon);
         QRect folderNameRect(iconRect.right() + 12, folderRect.top(),
                              paintRect.width() - iconRect.width() - 50, fontMetrics.height());
