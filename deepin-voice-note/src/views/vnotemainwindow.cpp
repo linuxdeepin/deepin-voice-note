@@ -810,7 +810,7 @@ void VNoteMainWindow::initUpgradeView()
         onVNoteFoldersLoaded();
 
         m_centerWidget->setCurrentIndex(switchToWnd);
-
+        m_noteSearchEdit->setVisible(true);
         qInfo() << "After upgrade old db switch to:" << switchToWnd;
     });
 }
