@@ -131,7 +131,7 @@ void UpgradeDbUtil::doFolderNoteUpgrade(qint64 newFolderId, qint64 oldFolderId)
 {
     VNOTE_ALL_NOTES_MAP* allNotes = VNoteOldDataManager::instance()->allNotes();
 
-    QString appAudioPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+ QDir::separator()+"/voicenote/";
+    QString appAudioPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+ QDir::separator()+"voicenote/";
 
     //Create audio dir if doesn't exist.
     if (!QFileInfo(appAudioPath).exists()) {
@@ -174,6 +174,8 @@ void UpgradeDbUtil::doFolderNoteUpgrade(qint64 newFolderId, qint64 oldFolderId)
                         if (!oldFile.copy(targetPath)) {
                             qInfo() << "Copy file failed:" << targetPath
                                     << " error:" << oldFile.errorString();
+                        } else {
+                            ptrBlock->ptrVoice->voicePath = targetPath;
                         }
                     }
                 }
