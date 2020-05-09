@@ -25,7 +25,7 @@ public slots:
 signals:
     void sigFocusIn();
     void sigFocusOut();
-    void sigDelEmpty(); //已经删完了内容还是按删除键
+
 private:
      bool m_menuPop {false};
 protected:

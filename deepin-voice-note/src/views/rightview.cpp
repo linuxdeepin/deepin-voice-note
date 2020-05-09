@@ -207,6 +207,9 @@ void RightView::onTextEditTextChange()
         m_isFristTextChange = true;
         saveNote();
     }
+
+    TextNoteItem *editItem = static_cast<TextNoteItem *>(sender());
+    removeSelectWidget(editItem);
 }
 
 void RightView::initData(VNoteItem *data, QString reg, bool fouse)

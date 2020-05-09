@@ -59,10 +59,6 @@ void TextNoteEdit::keyPressEvent(QKeyEvent *e)
         return;
     }
 
-    if((key == Qt::Key_Backspace || key == Qt::Key_Tab) && hasSelection()){
-        return;
-    }
-
     DTextEdit::keyPressEvent(e);
 }
 
