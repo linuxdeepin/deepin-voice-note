@@ -61,7 +61,7 @@ void TextNoteItem::updateSearchKey(QString searchKey)
     if (m_noteBlock) {
         m_serchKey = searchKey;
         if(m_searchCount != 0){
-            Utils::setDefaultColor(m_textEdit->document(), m_textCharFormat.foreground().color());
+           Utils::blockToDocument(m_noteBlock,m_textEdit->document());
         }
         if (!m_serchKey.isEmpty()) {
             DPalette pb;
