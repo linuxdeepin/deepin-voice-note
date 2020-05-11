@@ -53,7 +53,7 @@ void TextNoteItem::initConnection()
     connect(m_textEdit, SIGNAL(textChanged()), this, SIGNAL(sigTextChanged()));
     connect(m_textEdit, SIGNAL(sigFocusIn()), this, SIGNAL(sigFocusIn()));
     connect(m_textEdit, SIGNAL(sigFocusOut()), this, SIGNAL(sigFocusOut()));
-    connect(m_textEdit, SIGNAL(sigDelEmpty()), this, SIGNAL(sigDelEmpty()));
+    connect(m_textEdit, SIGNAL(selectionChanged()), this, SIGNAL(sigSelectionChanged()));
 }
 
 void TextNoteItem::updateSearchKey(QString searchKey)

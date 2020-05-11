@@ -73,6 +73,7 @@ signals:
 public slots:
     void onTextEditFocusOut();
     void onTextEditTextChange();
+    void onTextEditSelectChange();
     void onVoicePlay(VoiceNoteItem *item);
     void onVoicePause(VoiceNoteItem *item);
     void onPlayUpdate();

@@ -102,7 +102,7 @@ DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextC
 
     connect(editItem, &TextNoteItem::sigCursorHeightChange, this, &RightView::adjustVerticalScrollBar);
     connect(editItem, &TextNoteItem::sigFocusOut, this, &RightView::onTextEditFocusOut);
-    //connect(editItem, &TextNoteItem::sigDelEmpty, this, &RightView::onTextEditDelEmpty);
+    connect(editItem, &TextNoteItem::sigSelectionChanged, this, &RightView::onTextEditSelectChange);
     connect(editItem, &TextNoteItem::sigTextChanged, this, &RightView::onTextEditTextChange);
     return  editItem;
 }
@@ -207,9 +207,6 @@ void RightView::onTextEditTextChange()
         m_isFristTextChange = true;
         saveNote();
     }
-
-    TextNoteItem *editItem = static_cast<TextNoteItem *>(sender());
-    removeSelectWidget(editItem);
 }
 
 void RightView::initData(VNoteItem *data, QString reg, bool fouse)
@@ -1071,5 +1068,13 @@ void  RightView::removeSelectWidget(DetailItemWidget *widget)
             it.remove();
             break;
         }
+    }
+}
+
+void RightView::onTextEditSelectChange()
+{
+    TextNoteItem *editItem = static_cast<TextNoteItem *>(sender());
+    if(!editItem->hasSelection()){
+        removeSelectWidget(editItem);
     }
 }

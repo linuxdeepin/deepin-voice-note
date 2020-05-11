@@ -35,7 +35,7 @@ signals:
     void        sigTextChanged();
     void        sigFocusIn();
     void        sigFocusOut();
-    void        sigDelEmpty(); //已经删完了内容还是按删除键
+    void        sigSelectionChanged();
 private:
     void         initUi();
     void         initConnection();
