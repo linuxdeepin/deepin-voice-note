@@ -647,19 +647,17 @@ void RightView::mousePressEvent(QMouseEvent *event)
                 m_curItemWidget = widget;
             }
         }
+
         if(m_curItemWidget){
            m_curItemWidget->setFocus();
         }
+
         onMenuShow(m_curItemWidget);
     } else if (btn == Qt::LeftButton) {
         clearAllSelection();
 
         if (widget != nullptr) {
             m_curItemWidget = widget;
-        }
-
-        if (m_curItemWidget != nullptr) {
-            m_curItemWidget->setFocus();
         }
 
         if(m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Voice){
@@ -690,6 +688,9 @@ void RightView::mouseReleaseEvent(QMouseEvent *event)
         }
     }
 
+    if(m_curItemWidget){
+       m_curItemWidget->setFocus();
+    }
 }
 
 DetailItemWidget *RightView::getWidgetByPos(const QPoint &pos)
