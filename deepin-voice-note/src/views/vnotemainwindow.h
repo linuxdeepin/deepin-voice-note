@@ -96,6 +96,7 @@ protected:
     void initSplashView();  // Splash animation view
     void initEmptyFoldersView();
     void setSpecialStatus(SpecialStatus status);
+    void switchWidget(WindowType type);
 
     void closeEvent(QCloseEvent *event) override;
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;

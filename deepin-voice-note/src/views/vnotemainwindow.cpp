@@ -212,7 +212,7 @@ void VNoteMainWindow::initShortcuts()
             //If do shortcut in home page,need switch to note
             //page after add new notebook.
             if (!canDoShortcutAction()) {
-                m_centerWidget->setCurrentIndex(WndNoteShow);
+                switchWidget(WndNoteShow);
             }
         }
     });
@@ -480,11 +480,10 @@ void VNoteMainWindow::initMainView()
 
     if (m_fNeedUpgradeOldDb) {
         defaultWnd = WndUpgrade;
-        m_noteSearchEdit->setEnabled(false);
     }
 #endif
 
-    m_centerWidget->setCurrentIndex(defaultWnd);
+    switchWidget(defaultWnd);
     setCentralWidget(m_centerWidget);
     setTitlebarShadowEnabled(true);
 }
@@ -726,23 +725,21 @@ void VNoteMainWindow::onVNoteFoldersLoaded()
     //default home page
     if (loadNotepads() > 0) {
         m_leftView->setDefaultNotepadItem();
-        m_centerWidget->setCurrentIndex(WndNoteShow);
+        switchWidget(WndNoteShow);
     } else {
-        m_centerWidget->setCurrentIndex(WndHomePage);
+        switchWidget(WndHomePage);
     }
 }
 
 void VNoteMainWindow::onVNoteSearch()
 {
-    if (m_centerWidget->currentIndex() == WndNoteShow) {
-        QString strKey = m_noteSearchEdit->text();
-        if (!strKey.isEmpty()) {
-            setSpecialStatus(SearchStart);
-            m_searchKey = strKey;
-            loadSearchNotes(m_searchKey);
-        } else {
-            setSpecialStatus(SearchEnd);
-        }
+    QString strKey = m_noteSearchEdit->text();
+    if (!strKey.isEmpty()) {
+        setSpecialStatus(SearchStart);
+        m_searchKey = strKey;
+        loadSearchNotes(m_searchKey);
+    } else {
+        setSpecialStatus(SearchEnd);
     }
 }
 
@@ -809,8 +806,7 @@ void VNoteMainWindow::initUpgradeView()
 
         onVNoteFoldersLoaded();
 
-        m_centerWidget->setCurrentIndex(switchToWnd);
-        m_noteSearchEdit->setVisible(true);
+        switchWidget(switchToWnd);
         qInfo() << "After upgrade old db switch to:" << switchToWnd;
     });
 }
@@ -1308,9 +1304,7 @@ void VNoteMainWindow::addNotepad()
 
     if (newFolder) {
         //Switch to note view
-        m_noteSearchEdit->clearEdit();
-        m_centerWidget->setCurrentIndex(WndNoteShow);
-
+        switchWidget(WndNoteShow);
         m_leftView->addFolder(newFolder);
         addNote();
     }
@@ -1324,7 +1318,7 @@ void VNoteMainWindow::delNotepad()
     folderOper.deleteVNoteFolder(data);
 
     if (m_leftView->folderCount() == 0) {
-        m_centerWidget->setCurrentIndex(WndHomePage);
+        switchWidget(WndHomePage);
     }
 }
 
@@ -1660,4 +1654,11 @@ void VNoteMainWindow::onCursorChange(int height, bool mouseMove)
     if (value > height) {
         bar->setValue(height);
     }
+}
+
+void VNoteMainWindow::switchWidget(WindowType type)
+{
+    bool searchEnable = type == WndNoteShow ? true : false;
+    m_noteSearchEdit->setEnabled(searchEnable);
+    m_centerWidget->setCurrentIndex(type);
 }
