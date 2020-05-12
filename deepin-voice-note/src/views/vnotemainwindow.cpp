@@ -791,14 +791,6 @@ void VNoteMainWindow::initUpgradeView()
 
     connect(m_upgradeView, &UpgradeView::upgradeDone,
             this, [this]() {
-        WindowType switchToWnd;
-
-        VNoteFolderOper folderOper;
-        if (folderOper.getFoldersCount() > 0) {
-            switchToWnd = WindowType::WndNoteShow;
-        } else {
-            switchToWnd = WindowType::WndHomePage;
-        }
 
         //Clear the flag after upgrade & and call
         //the data loaded slot to refresh.
@@ -806,8 +798,7 @@ void VNoteMainWindow::initUpgradeView()
 
         onVNoteFoldersLoaded();
 
-        switchWidget(switchToWnd);
-        qInfo() << "After upgrade old db switch to:" << switchToWnd;
+        qInfo() << "upgrade success.";
     });
 }
 
