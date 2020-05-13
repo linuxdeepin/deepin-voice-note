@@ -41,10 +41,6 @@ void VoiceNoteItem::initUi()
     DFontSizeManager::instance()->bind(m_asrText, DFontSizeManager::T8);
     m_asrText->setReadOnly(true);
     DStyle::setFocusRectVisible(m_asrText, false);
-    DPalette pb = DApplicationHelper::instance()->palette(m_asrText);
-    pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));
-    pb.setBrush(DPalette::Text, pb.color(DPalette::Highlight));
-    m_asrText->setPalette(pb);
     m_asrText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_asrText->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_asrText->document()->setDocumentMargin(15);
@@ -233,6 +229,11 @@ void VoiceNoteItem::onChangeTheme()
     pbCover = DApplicationHelper::instance()->palette(m_voiceNameLab);
     pbCover.setBrush(DPalette::Text, appDp.color(DPalette::TextTitle));
     m_voiceNameLab->setPalette(pbCover);
+
+    DPalette pb = DApplicationHelper::instance()->palette(m_asrText);
+    pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));
+    pb.setBrush(DPalette::Text, pb.color(DPalette::Highlight));
+    m_asrText->setPalette(pb);
 }
 
 bool VoiceNoteItem::asrTextNotEmpty()
