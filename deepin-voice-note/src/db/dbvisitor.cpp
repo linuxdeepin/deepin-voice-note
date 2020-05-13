@@ -513,6 +513,11 @@ bool AddNoteDbVisitor::prepareSqls()
             createTime = QDateTime::currentDateTime();
         }
 
+        QString metaDataStr = note->metaDataConstRef().toString();
+        checkSqlStr(metaDataStr);
+        QString noteTitle = note->noteTitle;
+        checkSqlStr(noteTitle);
+
         QString insertSql;
 
         insertSql.sprintf(INSERT_FMT
@@ -526,8 +531,8 @@ bool AddNoteDbVisitor::prepareSqls()
                 , DBNote::noteColumnsName[DBNote::delete_time].toUtf8().data()
                 , QString("%1").arg(note->folderId).toUtf8().data()
                 , QString("%1").arg(note->noteType).toUtf8().data()
-                , note->noteTitle.toUtf8().data()
-                , note->metaDataConstRef().toString().toUtf8().data()
+                , noteTitle.toUtf8().data()
+                , metaDataStr.toUtf8().data()
                 , createTime.toString(VNOTE_TIME_FMT).toUtf8().data()
                 , createTime.toString(VNOTE_TIME_FMT).toUtf8().data()
                 , createTime.toString(VNOTE_TIME_FMT).toUtf8().data()
