@@ -188,6 +188,8 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
        cursor.movePosition(QTextCursor::Start);
        cursor.insertFragment(cutStr);
        Utils::documentToBlock(m_curItemWidget->getNoteBlock(),m_curItemWidget->getTextDocument());
+       cursor.movePosition(QTextCursor::Start);
+       m_curItemWidget->setTextCursor(cursor);
     }
 
     m_curItemWidget->setFocus();
