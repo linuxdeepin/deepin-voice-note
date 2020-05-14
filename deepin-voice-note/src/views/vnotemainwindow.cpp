@@ -799,7 +799,7 @@ void VNoteMainWindow::initUpgradeView()
         onVNoteFoldersLoaded();
 
         qInfo() << "upgrade success.";
-    });
+    }, Qt::QueuedConnection);
 }
 
 #endif

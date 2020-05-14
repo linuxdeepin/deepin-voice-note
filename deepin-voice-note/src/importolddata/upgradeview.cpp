@@ -19,6 +19,8 @@ UpgradeView::UpgradeView(QWidget *parent)
     m_waterProgress->start();
     m_waterProgress->setFixedSize(QSize(80,80));
 
+    setProgress(1);
+
     m_tooltipTextLabel = new DLabel(
                 DApplication::translate(
                     "UpgradeView",
@@ -90,6 +92,8 @@ void UpgradeView::onUpgradeFinish()
     //Clear old voice directory.
     UpgradeDbUtil::clearVoices();
 
+    setProgress(100);
+
     emit upgradeDone();
 }
 
@@ -98,9 +102,9 @@ void UpgradeView::initConnections()
     connect(VNoteOldDataManager::instance(), &VNoteOldDataManager::dataReady
             , this, &UpgradeView::onDataReady);
     connect(VNoteOldDataManager::instance(), &VNoteOldDataManager::progressValue
-            , this, &UpgradeView::setProgress);
+            , this, &UpgradeView::setProgress, Qt::QueuedConnection);
     connect(VNoteOldDataManager::instance(), &VNoteOldDataManager::upgradeFinish
-            , this, &UpgradeView::onUpgradeFinish);
+            , this, &UpgradeView::onUpgradeFinish, Qt::QueuedConnection);
 }
 
 void UpgradeView::initAppSetting()
