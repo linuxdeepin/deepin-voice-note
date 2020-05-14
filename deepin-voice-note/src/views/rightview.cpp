@@ -56,9 +56,7 @@ void RightView::initUi()
     m_pMessage->setText(DApplication::translate("RightView"
         ,"The voice note has been deleted"));
     DFontSizeManager::instance()->bind(m_pMessage, DFontSizeManager::T6);
-    DPalette paMsg = DApplicationHelper::instance()->palette(m_pMessage);
-    paMsg.setBrush(DPalette::WindowText, paMsg.color(DPalette::BrightText));
-    m_pMessage->setPalette(paMsg);
+    m_pMessage->setForegroundRole(DPalette::BrightText);
 
     m_fileHasDelDialog = new DDialog(this);
     m_fileHasDelDialog->addContent(m_pMessage,Qt::AlignCenter);
