@@ -822,7 +822,7 @@ void RightView::cutSelectText()
 {
     int ret = showWarningDialog();
     if (ret == 1) {
-        VNoteMessageDialog confirmDialog(VNoteMessageDialog::CutNote);
+        VNoteMessageDialog confirmDialog(VNoteMessageDialog::CutNote, this);
         connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
             copySelectText(false);
             delSelectText();
@@ -924,7 +924,7 @@ void RightView::keyPressEvent(QKeyEvent *e)
     } else if (e->key() == Qt::Key_Delete) {
         int ret = showWarningDialog();
         if (ret == 1) {
-            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote);
+            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this);
             connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
                 delSelectText();
             });
