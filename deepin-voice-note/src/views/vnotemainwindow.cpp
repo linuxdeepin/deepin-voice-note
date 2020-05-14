@@ -1304,6 +1304,9 @@ void VNoteMainWindow::addNotepad()
 void VNoteMainWindow::delNotepad()
 {
     VNoteFolder *data = m_leftView->removeFolder();
+
+    m_rightView->removeCacheWidget(data);
+
     VNoteFolderOper  folderOper(data);
 
     folderOper.deleteVNoteFolder(data);
@@ -1357,6 +1360,7 @@ void VNoteMainWindow::delNote()
     VNoteItem *noteData = m_middleView->deleteCurrentRow();
 
     if (noteData) {
+        m_rightView->removeCacheWidget(noteData);
         VNoteItemOper noteOper(noteData);
         noteOper.deleteNote();
 

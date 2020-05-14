@@ -5,6 +5,7 @@
 #include "vnoteapplication.h"
 #include "common/utils.h"
 
+#include "common/vnoteforlder.h"
 #include "common/vnoteitem.h"
 #include "common/vnotedatamanager.h"
 #include "common/actionmanager.h"
@@ -81,22 +82,31 @@ void RightView::initAppSetting()
 
 DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextCursor::MoveOperation op, QString reg)
 {
-    TextNoteItem *editItem = new TextNoteItem(data, this, reg);
+    TextNoteItem *editItem = nullptr;
     int index = 0;
     if (m_curItemWidget != nullptr) {
         index = m_viewportLayout->indexOf(m_curItemWidget) + 1;
     }
+
+    auto it = m_mapWidgetCache.find(data);
+    if(it != m_mapWidgetCache.end()){
+        editItem = static_cast<TextNoteItem*>(it.value());
+        editItem->setVisible(true);
+        editItem->updateSearchKey(reg);
+    }else {
+        editItem  = new TextNoteItem(data, this, reg);
+        m_mapWidgetCache.insert(data,editItem);
+    }
+
     m_viewportLayout->insertWidget(index, editItem);
 
     if (focus) {
         editItem->setFocus();
     }
 
-    if (op != QTextCursor::NoMove) {
-        QTextCursor cursor = editItem->getTextCursor();
-        cursor.movePosition(op);
-        editItem->setTextCursor(cursor);
-    }
+    QTextCursor cursor = editItem->getTextCursor();
+    cursor.movePosition(op);
+    editItem->setTextCursor(cursor);
 
     connect(editItem, &TextNoteItem::sigCursorHeightChange, this, &RightView::adjustVerticalScrollBar);
     connect(editItem, &TextNoteItem::sigFocusOut, this, &RightView::onTextEditFocusOut);
@@ -129,6 +139,7 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
 
     VoiceNoteItem *item = new VoiceNoteItem(data, this);
     item->setAnimTimer(m_playAnimTimer);
+    m_mapWidgetCache.insert(data, item);
 
     connect(item, &VoiceNoteItem::sigPlayBtnClicked, this, &RightView::onVoicePlay);
     connect(item, &VoiceNoteItem::sigPauseBtnClicked, this, &RightView::onVoicePause);
@@ -210,6 +221,8 @@ void RightView::onTextEditTextChange()
 void RightView::initData(VNoteItem *data, QString reg, bool fouse)
 {
     this->setVisible(false);
+    clearAllSelection();
+
     if(m_noteItemData == data){
         if(m_searchKey != reg){
             m_searchKey = reg;
@@ -220,23 +233,20 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
                    widget->updateSearchKey(m_searchKey);
                }
             }
-            clearAllSelection();
         }
-
         if(m_noteItemData != nullptr){
             this->setVisible(true);
         }
-
         return;
     }
 
     while (m_viewportLayout->indexOf(m_placeholderWidget) != 0) {
         QLayoutItem *layoutItem = m_viewportLayout->takeAt(0);
         QWidget *widget = layoutItem->widget();
+        widget->disconnect();
         widget->setVisible(false);
         delete  layoutItem;
         layoutItem = nullptr;
-        widget->deleteLater();
     }
 
     if (fouse) {
@@ -248,7 +258,6 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
     m_noteItemData = data;
     m_curAsrItem = nullptr;
     m_curPlayItem = nullptr;
-    m_selectWidget.clear();
 
     if (m_noteItemData == nullptr) {
         m_curItemWidget = nullptr;
@@ -256,15 +265,25 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
     }
 
     int size = m_noteItemData->datas.dataConstRef().size();
-    QTextCursor::MoveOperation op = fouse ? QTextCursor::End : QTextCursor::NoMove;
+    QTextCursor::MoveOperation op = fouse ? QTextCursor::End : QTextCursor::Start;
 
     if (size) {
         for (auto it : m_noteItemData->datas.dataConstRef()) {
             if (VNoteBlock::Text == it->getType()) {
                 m_curItemWidget = insertTextEdit(it, fouse, op, reg);
             } else if (VNoteBlock::Voice == it->getType()) {
-                VoiceNoteItem *item = new VoiceNoteItem(it, this);
-                item->setAnimTimer(m_playAnimTimer);
+                VoiceNoteItem *item = nullptr;
+
+                auto itWidget = m_mapWidgetCache.find(it);
+                if(itWidget != m_mapWidgetCache.end()){
+                    item = static_cast<VoiceNoteItem*>(itWidget.value());
+                    item->setVisible(true);
+                }else {
+                    item = new VoiceNoteItem(it, this);
+                    item->setAnimTimer(m_playAnimTimer);
+                    m_mapWidgetCache.insert(it, item);
+                }
+
                 int preIndex = -1;
                 if (m_curItemWidget != nullptr) {
                     preIndex = m_viewportLayout->indexOf(m_curItemWidget);
@@ -570,6 +589,10 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
     }
 
     for (auto i : noteBlockList) {
+        auto it = m_mapWidgetCache.find(i);
+        if(it != m_mapWidgetCache.end()){
+            m_mapWidgetCache.erase(it);
+        }
         i->releaseSpecificData();
         m_noteItemData->delBlock(i);
     }
@@ -1076,4 +1099,34 @@ void RightView::onTextEditSelectChange()
     if(!editItem->hasSelection()){
         removeSelectWidget(editItem);
     }
+}
+
+void RightView::removeCacheWidget(VNoteItem *data)
+{
+    if(data != nullptr && !m_mapWidgetCache.isEmpty()){
+        for (auto it : data->datas.dataConstRef()) {
+            auto itWidget = m_mapWidgetCache.find(it);
+            if(itWidget != m_mapWidgetCache.end()){
+                DetailItemWidget *widget = itWidget.value();
+                widget ->deleteLater();
+                m_mapWidgetCache.erase(itWidget);
+            }
+        }
+    }
+}
+
+void RightView::removeCacheWidget(const VNoteFolder *data)
+{
+    if(data != nullptr && !m_mapWidgetCache.isEmpty()){
+        VNoteItemOper noteOper;
+        VNOTE_ITEMS_MAP *notes = noteOper.getFolderNotes(data->id);
+        if (notes) {
+            notes->lock.lockForRead();
+            for (auto it : notes->folderNotes) {
+                removeCacheWidget(it);
+            }
+            notes->lock.unlock();
+        }
+    }
+
 }

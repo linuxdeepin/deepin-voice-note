@@ -58,12 +58,12 @@ void TextNoteItem::initConnection()
 
 void TextNoteItem::updateSearchKey(QString searchKey)
 {
-    if (m_noteBlock) {
+    if (m_noteBlock && m_serchKey != searchKey) {
         m_serchKey = searchKey;
         if(m_searchCount != 0){
            Utils::blockToDocument(m_noteBlock,m_textEdit->document());
         }
-        if (!m_serchKey.isEmpty()) {
+        if (!m_serchKey.isEmpty() && !textIsEmpty()) {
             DPalette pb;
             m_searchCount = Utils::highTextEdit(m_textEdit, m_textCharFormat, m_serchKey, pb.color(DPalette::Highlight));
         }else {

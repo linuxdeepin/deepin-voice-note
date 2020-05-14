@@ -15,6 +15,7 @@
 #include "textnoteedit.h"
 
 DWIDGET_USE_NAMESPACE
+struct VNoteFolder;
 struct VNoteItem;
 struct VNoteBlock;
 struct VNVoiceBlock;
@@ -60,6 +61,8 @@ public:
     void setCurVoicePlay(VoiceNoteItem *item);
     void setCurVoiceAsr(VoiceNoteItem *item);
     void saveMp3();
+    void removeCacheWidget(VNoteItem *data);
+    void removeCacheWidget(const VNoteFolder *data);
 
     VoiceNoteItem *getCurVoicePlay();
     VoiceNoteItem *getCurVoiceAsr();
@@ -114,6 +117,8 @@ private:
 
     MultiMapWidget m_selectWidget;
     QString        m_searchKey {""};
+
+    QMap<VNoteBlock*, DetailItemWidget*> m_mapWidgetCache;
 };
 
 #endif // RIGHTVIEW_H
