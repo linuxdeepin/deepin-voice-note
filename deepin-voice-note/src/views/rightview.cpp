@@ -568,6 +568,7 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
 
             QTextCursor cursor = nextWidget->getTextCursor();
             cursor.movePosition(QTextCursor::Start);
+            nextWidget->setTextCursor(cursor);
 
             cursor.insertFragment(QTextDocumentFragment(preWidget->getTextDocument()));
             Utils::documentToBlock(noteBlock,nextWidget->getTextDocument());
@@ -579,9 +580,6 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
             delete  layoutItem;
             layoutItem = nullptr;
 
-            cursor = nextWidget->getTextCursor();
-            cursor.movePosition(QTextCursor::End);
-            nextWidget->setTextCursor(cursor);
             nextWidget->setFocus();
 
             if (m_curItemWidget == preWidget) {
