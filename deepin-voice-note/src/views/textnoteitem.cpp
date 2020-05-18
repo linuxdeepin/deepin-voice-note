@@ -25,7 +25,6 @@ void TextNoteItem::initUi()
     m_textEdit = new TextNoteEdit(this);
     m_textEdit->setContextMenuPolicy(Qt::NoContextMenu);
     m_textEdit->document()->setDocumentMargin(0);
-    m_textCharFormat = m_textEdit->currentCharFormat();
     DStyle::setFocusRectVisible(m_textEdit, false);
     DPalette pb = DApplicationHelper::instance()->palette(m_textEdit);
     pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));

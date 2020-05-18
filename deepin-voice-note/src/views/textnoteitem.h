@@ -48,7 +48,6 @@ private:
     VNoteBlock   *m_noteBlock {nullptr};
     TextNoteEdit *m_textEdit {nullptr};
     QString       m_serchKey ;
-    QTextCharFormat m_textCharFormat;
 
 };
 
