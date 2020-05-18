@@ -16,6 +16,7 @@ TextNoteItem::TextNoteItem(VNoteBlock *noteBlock, QWidget *parent, QString reg)
 {
     initUi();
     initConnection();
+    Utils::blockToDocument(m_noteBlock,m_textEdit->document());
     updateSearchKey(m_serchKey);
     m_textEdit->moveCursor(QTextCursor::Start);
 }
@@ -58,7 +59,7 @@ void TextNoteItem::updateSearchKey(QString searchKey)
 {
     if (m_noteBlock) {
         m_serchKey = searchKey;
-        if(m_textDocumentUndo == false){
+        if(m_textDocumentUndo == false && m_searchCount){
            Utils::blockToDocument(m_noteBlock,m_textEdit->document());
         }
 
