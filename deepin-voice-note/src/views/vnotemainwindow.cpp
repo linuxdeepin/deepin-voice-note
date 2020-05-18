@@ -731,12 +731,11 @@ void VNoteMainWindow::onVNoteFoldersLoaded()
     }
 }
 
-void VNoteMainWindow::onVNoteSearch()
+void VNoteMainWindow::onVNoteSearch(const QString &text)
 {
-    QString strKey = m_noteSearchEdit->text();
-    if (!strKey.isEmpty()) {
+    if (!text.isEmpty()) {
         setSpecialStatus(SearchStart);
-        m_searchKey = strKey;
+        m_searchKey = text;
         loadSearchNotes(m_searchKey);
     } else {
         setSpecialStatus(SearchEnd);
