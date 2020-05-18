@@ -36,10 +36,14 @@ signals:
     void        sigFocusIn();
     void        sigFocusOut();
     void        sigSelectionChanged();
+public slots:
+    void        onTextChange();
+
 private:
     void         initUi();
     void         initConnection();
     bool m_selectAll   {false};
+    bool m_textDocumentUndo  {false};
     int           m_searchCount {0};
     VNoteBlock   *m_noteBlock {nullptr};
     TextNoteEdit *m_textEdit {nullptr};

@@ -100,25 +100,38 @@ QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
     return pixmap;
 }
 
-int Utils::highTextEdit(DTextEdit *textEdit, const QTextCharFormat &oriFormat, const QString &searchKey,
-                        const QColor &highColor)
+int Utils::highTextEdit(QTextDocument *textDoc,const QString &searchKey,
+                        const QColor &highColor, bool undo)
 {
     int findCount = 0;
-    textEdit->moveCursor(QTextCursor::Start);
-    QTextCursor find_cursor = textEdit->textCursor();
-    QTextCharFormat colorFormat = oriFormat;
-    colorFormat.setForeground(highColor);
-    while (textEdit->find(searchKey)) {
-        find_cursor.movePosition(QTextCursor::WordRight, QTextCursor::KeepAnchor);
-        textEdit->mergeCurrentCharFormat(colorFormat);
-        findCount ++;
+    int len = searchKey.length();
+    if(undo == true){
+        textDoc->undo();
     }
-    if (findCount) {
-        find_cursor.clearSelection();
-        find_cursor.movePosition(QTextCursor::EndOfWord);
-        textEdit->setTextCursor(find_cursor);
-        textEdit->setCurrentCharFormat(oriFormat);
+    if(len != 0){
+        QTextCursor highlightCursor(textDoc);
+        QTextCursor cursor(textDoc);
+
+        cursor.beginEditBlock();
+        QTextCharFormat plainFormat(highlightCursor.charFormat());
+        QTextCharFormat colorFormat = plainFormat;
+        colorFormat.setForeground(highColor);
+
+        while (!highlightCursor.isNull() && !highlightCursor.atEnd()) {
+            highlightCursor = textDoc->find(searchKey, highlightCursor,
+                                             QTextDocument::FindFlags());
+
+            if (!highlightCursor.isNull()) {
+                int pos = highlightCursor.position();
+                highlightCursor.setPosition(pos - len);
+                highlightCursor.setPosition(pos, QTextCursor::KeepAnchor);
+                highlightCursor.mergeCharFormat(colorFormat);
+                findCount ++;
+            }
+        }
+        cursor.endEditBlock();
     }
+
     return  findCount;
 }
 

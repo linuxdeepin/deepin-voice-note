@@ -50,7 +50,7 @@ void TextNoteItem::initConnection()
             emit sigCursorHeightChange(this, height);
         }
     });
-    connect(m_textEdit, SIGNAL(textChanged()), this, SIGNAL(sigTextChanged()));
+    connect(m_textEdit, SIGNAL(textChanged()), this, SLOT(onTextChange()));
     connect(m_textEdit, SIGNAL(sigFocusIn()), this, SIGNAL(sigFocusIn()));
     connect(m_textEdit, SIGNAL(sigFocusOut()), this, SIGNAL(sigFocusOut()));
     connect(m_textEdit, SIGNAL(selectionChanged()), this, SIGNAL(sigSelectionChanged()));
@@ -59,17 +59,15 @@ void TextNoteItem::initConnection()
 void TextNoteItem::updateSearchKey(QString searchKey)
 {
     if (m_noteBlock) {
-        if(m_searchCount != 0 && m_serchKey != searchKey){
+        m_serchKey = searchKey;
+        if(m_textDocumentUndo == false){
            Utils::blockToDocument(m_noteBlock,m_textEdit->document());
         }
 
-        m_serchKey = searchKey;
-
-        if (!m_serchKey.isEmpty() && !textIsEmpty()) {
-            DPalette pb;
-            m_searchCount = Utils::highTextEdit(m_textEdit, m_textCharFormat, m_serchKey, pb.color(DPalette::Highlight));
-        }else {
-            m_searchCount = 0;
+        DPalette pb;
+        m_searchCount = Utils::highTextEdit(m_textEdit->document(), m_serchKey, pb.color(DPalette::Highlight),m_textDocumentUndo);
+        if(m_searchCount){
+            m_textDocumentUndo = true;
         }
     }
 }
@@ -168,4 +166,12 @@ void TextNoteItem::pasteText()
         QString clipBoardText = board->text();
         m_textEdit->insertPlainText(clipBoardText);
     }
+}
+
+void TextNoteItem::onTextChange()
+{
+    if(m_searchCount){
+        m_textDocumentUndo = false;
+    }
+    emit sigTextChanged();
 }
