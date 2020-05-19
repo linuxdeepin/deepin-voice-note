@@ -9,7 +9,7 @@ class TextNoteItem : public DetailItemWidget
 {
     Q_OBJECT
 public:
-    explicit TextNoteItem(VNoteBlock *noteBlock, QWidget *parent = nullptr, QString reg = "");
+    explicit TextNoteItem(VNoteBlock *noteBlock, QWidget *parent = nullptr);
     VNoteBlock *getNoteBlock();
     QTextCursor getTextCursor();
     void        setTextCursor(const QTextCursor &cursor);

@@ -10,16 +10,13 @@
 #include <DStyle>
 #include <DApplicationHelper>
 
-TextNoteItem::TextNoteItem(VNoteBlock *noteBlock, QWidget *parent, QString reg)
+TextNoteItem::TextNoteItem(VNoteBlock *noteBlock, QWidget *parent)
     : DetailItemWidget(parent)
     , m_noteBlock(noteBlock)
-    , m_serchKey(reg)
 {
     initUi();
     initConnection();
     Utils::blockToDocument(m_noteBlock,m_textEdit->document());
-    updateSearchKey(m_serchKey);
-    m_textEdit->moveCursor(QTextCursor::Start);
 }
 
 void TextNoteItem::initUi()
@@ -59,6 +56,9 @@ void TextNoteItem::initConnection()
 void TextNoteItem::updateSearchKey(QString searchKey)
 {
     if (m_noteBlock) {
+        if(m_textDocumentUndo == true && m_serchKey == searchKey){
+            return;
+        }
         m_serchKey = searchKey;
         m_isSearching = true;
         if(m_textDocumentUndo == false && m_searchCount){

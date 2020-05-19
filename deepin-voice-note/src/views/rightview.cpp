@@ -92,9 +92,8 @@ DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextC
     if(it != m_mapWidgetCache.end()){
         editItem = static_cast<TextNoteItem*>(it.value());
         editItem->setVisible(true);
-        editItem->updateSearchKey(reg);
     }else {
-        editItem  = new TextNoteItem(data, this, reg);
+        editItem  = new TextNoteItem(data, this);
         m_mapWidgetCache.insert(data,editItem);
     }
 
@@ -103,6 +102,8 @@ DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextC
     if (focus) {
         editItem->setFocus();
     }
+
+    editItem->updateSearchKey(reg);
 
     QTextCursor cursor = editItem->getTextCursor();
     cursor.movePosition(op);
