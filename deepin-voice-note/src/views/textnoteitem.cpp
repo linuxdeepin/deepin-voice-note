@@ -5,6 +5,7 @@
 #include <QVBoxLayout>
 #include <QAbstractTextDocumentLayout>
 #include <QClipboard>
+#include <QDebug>
 
 #include <DStyle>
 #include <DApplicationHelper>
@@ -59,15 +60,14 @@ void TextNoteItem::updateSearchKey(QString searchKey)
 {
     if (m_noteBlock) {
         m_serchKey = searchKey;
+        m_isSearching = true;
         if(m_textDocumentUndo == false && m_searchCount){
            Utils::blockToDocument(m_noteBlock,m_textEdit->document());
         }
-
         DPalette pb;
         m_searchCount = Utils::highTextEdit(m_textEdit->document(), m_serchKey, pb.color(DPalette::Highlight),m_textDocumentUndo);
-        if(m_searchCount){
-            m_textDocumentUndo = true;
-        }
+        m_textDocumentUndo = m_searchCount == 0 ? false : true;
+        m_isSearching = false;
     }
 }
 
@@ -169,8 +169,10 @@ void TextNoteItem::pasteText()
 
 void TextNoteItem::onTextChange()
 {
-    if(m_searchCount){
-        m_textDocumentUndo = false;
+    if(m_isSearching == false){
+        if(m_searchCount){
+            m_textDocumentUndo = false;
+        }
+        emit sigTextChanged();
     }
-    emit sigTextChanged();
 }

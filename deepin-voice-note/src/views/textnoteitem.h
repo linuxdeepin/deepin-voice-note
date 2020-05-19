@@ -42,6 +42,7 @@ public slots:
 private:
     void         initUi();
     void         initConnection();
+    bool m_isSearching {false};
     bool m_selectAll   {false};
     bool m_textDocumentUndo  {false};
     int           m_searchCount {0};
