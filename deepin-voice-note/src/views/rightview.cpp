@@ -268,8 +268,6 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
 
     int size = m_noteItemData->datas.dataConstRef().size();
     QTextCursor::MoveOperation op = fouse ? QTextCursor::End : QTextCursor::Start;
-    this->setVisible(true);
-
     if (size) {
         for (auto it : m_noteItemData->datas.dataConstRef()) {
             if (VNoteBlock::Text == it->getType()) {
@@ -307,6 +305,7 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(0);
         m_curItemWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
     }
+    this->setVisible(true);
 }
 
 void RightView::onVoicePlay(VoiceNoteItem *item)
