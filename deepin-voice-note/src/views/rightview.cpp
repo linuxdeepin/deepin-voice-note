@@ -271,7 +271,7 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
     if (size) {
         for (auto it : m_noteItemData->datas.dataConstRef()) {
             if (VNoteBlock::Text == it->getType()) {
-                m_curItemWidget = insertTextEdit(it, fouse, op, reg);
+                m_curItemWidget = insertTextEdit(it, false, op, reg);
             } else if (VNoteBlock::Voice == it->getType()) {
                 VoiceNoteItem *item = nullptr;
 
@@ -304,6 +304,9 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
     if (fouse == false) {
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(0);
         m_curItemWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
+    }else {
+        m_curItemWidget->setFocus();
+        adjustVerticalScrollBar(m_curItemWidget,m_curItemWidget->height());
     }
     this->setVisible(true);
 }
