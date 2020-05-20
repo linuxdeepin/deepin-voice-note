@@ -1347,6 +1347,7 @@ void VNoteMainWindow::addNote()
         m_leftView->update(m_leftView->currentIndex());
 
         m_middleView->addRowAtHead(newNote);
+        m_middleView->onNoteChanged();
     }
 }
 
