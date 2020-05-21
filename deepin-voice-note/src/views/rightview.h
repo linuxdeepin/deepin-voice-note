@@ -40,6 +40,7 @@ public:
 
     void  setEnablePlayBtn(bool enable);
     void  delWidget(DetailItemWidget *widget, bool merge = true);
+    void  saveNote();
     void  updateData();
     void  mouseMoveSelect(QMouseEvent *event);
     void  selectAllItem();
@@ -86,7 +87,6 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    void saveNote();
     void adjustVerticalScrollBar(QWidget *widget, int defaultHeight);
 private:
     void initUi();

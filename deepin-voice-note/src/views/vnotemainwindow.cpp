@@ -1322,9 +1322,8 @@ void VNoteMainWindow::addNote()
 
         //Refresh the notes count of folder
         m_leftView->update(m_leftView->currentIndex());
-
+        m_rightView->saveNote();
         m_middleView->addRowAtHead(newNote);
-        m_middleView->onNoteChanged();
     }
 }
 
