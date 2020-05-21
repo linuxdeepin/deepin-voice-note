@@ -3,7 +3,7 @@
 #include <QWheelEvent>
 #include <DFontSizeManager>
 #include <DApplicationHelper>
-
+#include <QDebug>
 TextNoteEdit::TextNoteEdit(QWidget *parent)
     : DTextEdit(parent)
 {
@@ -20,6 +20,8 @@ TextNoteEdit::TextNoteEdit(QWidget *parent)
 
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged,
                this, &TextNoteEdit::onChangeTheme);
+
+    this->installEventFilter(this);
 
     onChangeTheme();
 }
@@ -130,4 +132,14 @@ void TextNoteEdit::onChangeTheme()
     dp.setBrush(DPalette::Highlight, appDp.color(DPalette::Normal,DPalette::Highlight));
     dp.setBrush(DPalette::HighlightedText, appDp.color(DPalette::Normal,DPalette::HighlightedText));
     this->setPalette(dp);
+}
+
+bool TextNoteEdit::eventFilter(QObject *o, QEvent *e)
+{
+    Q_UNUSED(o);
+    if(e->type() == QEvent::FontChange){
+        QFontMetrics metrics(this->font());
+        this->setTabStopWidth(4 * metrics.width(' '));
+    }
+    return  false;
 }
