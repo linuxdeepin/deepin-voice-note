@@ -22,6 +22,8 @@
 
 #include "db/vnotefolderoper.h"
 #include "db/vnoteitemoper.h"
+#include "db/vnotedbmanager.h"
+
 #include "dbus/dbuslogin1manager.h"
 
 #include "dialog/vnotemessagedialog.h"
@@ -66,33 +68,7 @@ VNoteMainWindow::VNoteMainWindow(QWidget *parent)
 
 VNoteMainWindow::~VNoteMainWindow()
 {
-    //Save main window size
-    if (!isMaximized()) {
-        m_qspSetting->setValue(VNOTE_MAINWND_SZ_KEY, saveGeometry());
-    }
-
-    //Check deviceWacherThread exit time.
-    //struct timeval start, end;
-    //gettimeofday(&start, nullptr);
-
-    //Notify device watch thread to exit.
-    m_audioDeviceWatcher->exitWatcher();
-
-    //TODO:
-    //    Nofiy audio watcher to exit & need
-    //wait at least AUDIO_DEV_CHECK_TIME ms
-    //Reversion:2020-3-19
-    //     Only set the exit flag,don't wait the watch
-    //thread,OS will clear it.
-    //m_audioDeviceWatcher->wait(AUDIO_DEV_CHECK_TIME);
-
-    //gettimeofday(&end, nullptr);
-    //qInfo() << "wait audioDeviceWatcher for:" << TM(start,end);
-
-    QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
-    if (isVoice2Text()) {
-        releaseA2TManger->stopAsr();
-    }
+    release();
 }
 
 QSharedPointer<QSettings> VNoteMainWindow::appSetting() const
@@ -862,12 +838,13 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
     }
     setSpecialStatus(RecordEnd);
 
-    if (isAppQuit()) {
-        qApp->quit();
-    }
-
     //Release shutdonw locker
     releaseHaltLock();
+
+    if (isAppQuit()) {
+        release();
+        exit(0);
+    }
 }
 
 void VNoteMainWindow::onChangeTheme()
@@ -1085,7 +1062,7 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
             m_recordBar->cancelRecord();
             event->ignore();
         } else {
-            //qApp->quit();
+            release();
             exit(0);
         }
     } else {
@@ -1657,4 +1634,38 @@ void VNoteMainWindow::switchWidget(WindowType type)
     bool searchEnable = type == WndNoteShow ? true : false;
     m_noteSearchEdit->setEnabled(searchEnable);
     m_centerWidget->setCurrentIndex(type);
+}
+
+void VNoteMainWindow::release()
+{
+    //Save main window size
+    if (!isMaximized()) {
+        m_qspSetting->setValue(VNOTE_MAINWND_SZ_KEY, saveGeometry());
+        m_qspSetting->sync();
+    }
+
+    //Check deviceWacherThread exit time.
+    //struct timeval start, end;
+    //gettimeofday(&start, nullptr);
+
+    //Notify device watch thread to exit.
+    m_audioDeviceWatcher->exitWatcher();
+
+    //TODO:
+    //    Nofiy audio watcher to exit & need
+    //wait at least AUDIO_DEV_CHECK_TIME ms
+    //Reversion:2020-3-19
+    //     Only set the exit flag,don't wait the watch
+    //thread,OS will clear it.
+    //m_audioDeviceWatcher->wait(AUDIO_DEV_CHECK_TIME);
+
+    //gettimeofday(&end, nullptr);
+    //qInfo() << "wait audioDeviceWatcher for:" << TM(start,end);
+
+    QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
+    if (isVoice2Text()) {
+        releaseA2TManger->stopAsr();
+    }
+
+    VNoteDbManager::instance()->getVNoteDb().close();
 }

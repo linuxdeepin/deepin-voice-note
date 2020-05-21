@@ -150,6 +150,7 @@ private:
 
     //Check if wen can do shortcuts
     bool canDoShortcutAction() const;
+    void release();
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
