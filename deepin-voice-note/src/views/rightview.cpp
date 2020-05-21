@@ -92,6 +92,7 @@ DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextC
     if(it != m_mapWidgetCache.end()){
         editItem = static_cast<TextNoteItem*>(it.value());
         editItem->setVisible(true);
+        editItem->setLastCursorHeight(0);
     }else {
         editItem  = new TextNoteItem(data, this);
         m_mapWidgetCache.insert(data,editItem);

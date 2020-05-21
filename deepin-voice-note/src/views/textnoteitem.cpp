@@ -40,17 +40,15 @@ void TextNoteItem::initConnection()
     QAbstractTextDocumentLayout *documentLayout = document->documentLayout();
     connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, [ = ] {
         m_textEdit->setFixedHeight(static_cast<int>(document->size().height()));
-        int height = m_textEdit->cursorRect(m_textEdit->textCursor()).bottom() + 5;
         this->setFixedHeight(m_textEdit->height() + 10);
-        if (this->hasFocus())
-        {
-            emit sigCursorHeightChange(this, height);
-        }
+        onTextCursorChange();
     });
     connect(m_textEdit, SIGNAL(textChanged()), this, SLOT(onTextChange()));
     connect(m_textEdit, SIGNAL(sigFocusIn()), this, SIGNAL(sigFocusIn()));
     connect(m_textEdit, SIGNAL(sigFocusOut()), this, SIGNAL(sigFocusOut()));
     connect(m_textEdit, SIGNAL(selectionChanged()), this, SIGNAL(sigSelectionChanged()));
+    connect(m_textEdit, SIGNAL(cursorPositionChanged()), this, SLOT(onTextCursorChange()));
+
 }
 
 void TextNoteItem::updateSearchKey(QString searchKey)
@@ -175,4 +173,20 @@ void TextNoteItem::onTextChange()
         }
         emit sigTextChanged();
     }
+}
+
+void TextNoteItem::onTextCursorChange()
+{
+    if (this->hasFocus()){
+        int height = m_textEdit->cursorRect().bottom() + 5;
+        if(m_lastCursorHeight != height){
+           m_lastCursorHeight = height;
+           emit sigCursorHeightChange(this, height);
+        }
+    }
+}
+
+void TextNoteItem::setLastCursorHeight(int height)
+{
+    m_lastCursorHeight = height;
 }

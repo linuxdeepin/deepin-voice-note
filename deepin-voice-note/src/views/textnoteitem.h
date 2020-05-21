@@ -29,6 +29,7 @@ public:
     void setFocus();
     bool hasFocus();
     bool isSelectAll();
+    void setLastCursorHeight(int height);
 
 signals:
     void        sigCursorHeightChange(QWidget *widget, int height);
@@ -38,6 +39,7 @@ signals:
     void        sigSelectionChanged();
 public slots:
     void        onTextChange();
+    void        onTextCursorChange();
 
 private:
     void         initUi();
@@ -46,6 +48,7 @@ private:
     bool m_selectAll   {false};
     bool m_textDocumentUndo  {false};
     int           m_searchCount {0};
+    int           m_lastCursorHeight {0};
     VNoteBlock   *m_noteBlock {nullptr};
     TextNoteEdit *m_textEdit {nullptr};
     QString       m_serchKey ;
