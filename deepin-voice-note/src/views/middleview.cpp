@@ -299,3 +299,9 @@ void MiddleView::setOnlyCurItemMenuEnable(bool enable)
     m_pItemDelegate->setEnableItem(!enable);
     this->update();
 }
+
+void MiddleView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)
+{
+    Q_UNUSED(hint);
+    DListView::closeEditor(editor,QAbstractItemDelegate::NoHint);
+}

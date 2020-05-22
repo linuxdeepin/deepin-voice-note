@@ -204,3 +204,9 @@ void LeftView::sort()
 {
     return m_pSortViewFilter->sort(0,Qt::DescendingOrder);
 }
+
+void LeftView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)
+{
+    Q_UNUSED(hint);
+    DTreeView::closeEditor(editor,QAbstractItemDelegate::NoHint);
+}

@@ -45,6 +45,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     bool eventFilter(QObject *o, QEvent *e) override;
     void keyPressEvent(QKeyEvent* e) override;
+    void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
 
 private:
     void initDelegate();
