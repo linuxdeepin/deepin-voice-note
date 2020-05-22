@@ -434,19 +434,22 @@ void VNoteMainWindow::initMainView()
     initSpliterView();
     initSplashView();
     initEmptyFoldersView();
+    m_centerWidget = new QWidget(this);
+
+    m_stackedWidget = new DStackedWidget(m_centerWidget);
+    m_stackedWidget->setContentsMargins(0, 0, 0, 0);
+    m_stackedWidget->insertWidget(WndSplashAnim, m_splashView);
+    m_stackedWidget->insertWidget(WndHomePage, m_wndHomePage);
+    m_stackedWidget->insertWidget(WndNoteShow, m_mainWndSpliter);
+
     initAsrErrMessage();
-    m_centerWidget = new DStackedWidget(this);
-    m_centerWidget->setContentsMargins(0, 0, 0, 0);
-    m_centerWidget->insertWidget(WndSplashAnim, m_splashView);
-    m_centerWidget->insertWidget(WndHomePage, m_wndHomePage);
-    m_centerWidget->insertWidget(WndNoteShow, m_mainWndSpliter);
 
     WindowType defaultWnd = WndSplashAnim;
 
 #ifdef IMPORT_OLD_VERSION_DATA
     //*******Upgrade old Db code here only********
     initUpgradeView();
-    m_centerWidget->insertWidget(WndUpgrade, m_upgradeView);
+    m_stackedWidget->insertWidget(WndUpgrade, m_upgradeView);
 
     int upgradeState = UpgradeDbUtil::readUpgradeState(*m_qspSetting.get());
 
@@ -461,6 +464,10 @@ void VNoteMainWindow::initMainView()
         defaultWnd = WndUpgrade;
     }
 #endif
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(m_stackedWidget);
+    m_centerWidget->setLayout(layout);
 
     switchWidget(defaultWnd);
     setCentralWidget(m_centerWidget);
@@ -1083,6 +1090,17 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
     }
 }
 
+void VNoteMainWindow::resizeEvent(QResizeEvent *event)
+{
+    if(m_asrErrMeassage->isVisible()){
+        int xPos = (m_centerWidget->width() - m_asrErrMeassage->width()) / 2;
+        int yPos = m_centerWidget->height() - m_asrErrMeassage->height() - 5;
+        m_asrErrMeassage->move(xPos, yPos);
+    }
+
+    DMainWindow::resizeEvent(event);
+}
+
 void VNoteMainWindow::keyPressEvent(QKeyEvent *event)
 {
     DMainWindow::keyPressEvent(event);
@@ -1483,7 +1501,7 @@ void VNoteMainWindow::onNewNote()
 
 bool VNoteMainWindow::canDoShortcutAction() const
 {
-    return (m_centerWidget->currentIndex() == WndNoteShow);
+    return (m_stackedWidget->currentIndex() == WndNoteShow);
 }
 
 void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
@@ -1580,7 +1598,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
 void VNoteMainWindow::initAsrErrMessage()
 {
     m_asrErrMeassage = new DFloatingMessage(DFloatingMessage::ResidentType,
-                                            m_rightViewHolder);
+                                            m_centerWidget);
     QString iconPath = STAND_ICON_PAHT;
     iconPath.append("warning.svg");
     m_asrErrMeassage->setIcon(QIcon(iconPath));
@@ -1592,6 +1610,7 @@ void VNoteMainWindow::initAsrErrMessage()
 
     DWidget *m_widget = new DWidget(m_asrErrMeassage);
     QHBoxLayout *m_layout = new QHBoxLayout();
+    m_layout->setContentsMargins(0,0,0,0);
     m_layout->addStretch();
     m_layout->addWidget(m_asrAgainBtn);
     m_widget->setLayout(m_layout);
@@ -1604,8 +1623,13 @@ void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
     m_asrErrMeassage->setMessage(strMessage);
     m_asrErrMeassage->setVisible(true);
     m_asrErrMeassage->setMinimumWidth(520);
-    m_asrErrMeassage->setMaximumWidth(m_rightViewHolder->width());
+    m_asrErrMeassage->setMinimumHeight(75);
     m_asrErrMeassage->adjustSize();
+
+    int xPos = (m_centerWidget->width() - m_asrErrMeassage->width()) / 2;
+    int yPos = m_centerWidget->height() - m_asrErrMeassage->height() - 5;
+
+    m_asrErrMeassage->move(xPos, yPos);
 }
 
 void VNoteMainWindow::onSystemDown(bool active)
@@ -1645,7 +1669,7 @@ void VNoteMainWindow::switchWidget(WindowType type)
 {
     bool searchEnable = type == WndNoteShow ? true : false;
     m_noteSearchEdit->setEnabled(searchEnable);
-    m_centerWidget->setCurrentIndex(type);
+    m_stackedWidget->setCurrentIndex(type);
 }
 
 void VNoteMainWindow::release()

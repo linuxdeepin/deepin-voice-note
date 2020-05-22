@@ -98,6 +98,7 @@ protected:
     void setSpecialStatus(SpecialStatus status);
     void switchWidget(WindowType type);
 
+    void resizeEvent(QResizeEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 signals:
@@ -172,6 +173,7 @@ private:
     QWidget         *m_recordBarHolder {nullptr};
     QWidget         *m_leftViewHolder {nullptr};
     QWidget         *m_middleViewHolder {nullptr};
+    QWidget         *m_centerWidget {nullptr};
 
     DSplitter   *m_mainWndSpliter {nullptr};
     LeftView    *m_leftView {nullptr};
@@ -189,7 +191,7 @@ private:
     UpgradeView *m_upgradeView {nullptr};
     SplashView *m_splashView {nullptr};
     HomePage *m_wndHomePage {nullptr};
-    DStackedWidget *m_centerWidget {nullptr};
+    DStackedWidget *m_stackedWidget {nullptr};
     bool            m_rightViewHasFouse {true};
 
     //App setting, reference to VNoteApplication's setting
