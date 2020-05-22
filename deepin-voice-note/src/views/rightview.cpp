@@ -228,14 +228,12 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
     clearAllSelection();
 
     if(m_noteItemData == data){
-        if(m_searchKey != reg){
-            m_searchKey = reg;
-            for (int i = 0; i < m_viewportLayout->count() - 1 ; i++){
-               QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
-               DetailItemWidget *widget = static_cast< DetailItemWidget *>(layoutItem->widget());
-               if(widget->getNoteBlock()->blockType == VNoteBlock::Text){
-                   widget->updateSearchKey(m_searchKey);
-               }
+        m_searchKey = reg;
+        for (int i = 0; i < m_viewportLayout->count() - 1 ; i++){
+            QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
+            DetailItemWidget *widget = static_cast< DetailItemWidget *>(layoutItem->widget());
+            if(widget->getNoteBlock()->blockType == VNoteBlock::Text){
+                widget->updateSearchKey(m_searchKey);
             }
         }
         this->setVisible(true);

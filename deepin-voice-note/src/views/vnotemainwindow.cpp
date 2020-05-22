@@ -105,8 +105,11 @@ void VNoteMainWindow::initConnections()
     connect(VNoteDataManager::instance(), &VNoteDataManager::onAllDatasReady,
             this, &VNoteMainWindow::onVNoteFoldersLoaded);
 
-    connect(m_noteSearchEdit, &DSearchEdit::textChanged,
+    connect(m_noteSearchEdit, &DSearchEdit::editingFinished,
             this, &VNoteMainWindow::onVNoteSearch);
+
+    connect(m_noteSearchEdit, &DSearchEdit::textChanged,
+            this, &VNoteMainWindow::onVNoteSearchTextChange);
 
     connect(m_leftView->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &VNoteMainWindow::onVNoteFolderChange);
@@ -707,14 +710,24 @@ void VNoteMainWindow::onVNoteFoldersLoaded()
     }
 }
 
-void VNoteMainWindow::onVNoteSearch(const QString &text)
+void VNoteMainWindow::onVNoteSearch()
 {
-    if (!text.isEmpty()) {
-        setSpecialStatus(SearchStart);
-        m_searchKey = text;
-        loadSearchNotes(m_searchKey);
-    } else {
-        setSpecialStatus(SearchEnd);
+    if(m_noteSearchEdit->lineEdit()->hasFocus()){
+        QString text = m_noteSearchEdit->text();
+        if (!text.isEmpty()) {
+            setSpecialStatus(SearchStart);
+            m_searchKey = text;
+            loadSearchNotes(m_searchKey);
+        } else {
+            setSpecialStatus(SearchEnd);
+        }
+    }
+}
+
+void VNoteMainWindow::onVNoteSearchTextChange(const QString &text)
+{
+    if(text.isEmpty()){
+       setSpecialStatus(SearchEnd);
     }
 }
 

@@ -110,7 +110,8 @@ public slots:
     void onMenuAction(QAction *action);
     //Process all context menu states
     void onMenuAbout2Show();
-    void onVNoteSearch(const QString &text);
+    void onVNoteSearch();
+    void onVNoteSearchTextChange(const QString &text);
     void onCursorChange(int height, bool mouseMove); //调整详情页滚动条
     void onStartRecord(const QString &path);//开始录音
     void onFinshRecord(const QString &voicePath, qint64 voiceSize); //结束录音
