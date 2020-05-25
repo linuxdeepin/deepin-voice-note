@@ -23,7 +23,7 @@ bool VNoteA2TManager::checkAiService() const
                        );
 
     const QString ability("asr");
-    const QString appName = qApp->applicationName();
+    const QString appName = qApp->applicationName()+QString("-CheckAiService");
     int errorCode = -1;
 
     QString systemInfo = QString("[%1-%2]")
@@ -35,11 +35,14 @@ bool VNoteA2TManager::checkAiService() const
     if (!qdPath.isValid()) {
         if (QDBusError::ServiceUnknown == qdPath.error().type()) {
             fAiServiceExist = false;
-            qInfo() << "Aiservice don't exist in system:" << systemInfo;
+            qInfo() << "Aiservice don't exist in system:" << systemInfo << " errorCode=" << errorCode;
         }
     } else {
-        qInfo() << "Aiservice exist in system:" << systemInfo;
+        qInfo() << "Aiservice exist in system:" << systemInfo << " errorCode=" << errorCode;
     }
+
+    //Free the test session
+    session.freeSession(appName, ability);
 
     return fAiServiceExist;
 }
@@ -57,6 +60,8 @@ void VNoteA2TManager::initSession()
     int errorCode = -1;
 
     QDBusObjectPath qdPath = m_session->createSession(appName, ability, errorCode);
+
+    qInfo() << "createSession->errorCode=" << errorCode;
 
     m_asrInterface.reset(new com::iflytek::aiservice::asr(
                              "com.iflytek.aiservice",
