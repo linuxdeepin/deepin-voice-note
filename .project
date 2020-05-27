@@ -1,0 +1,6 @@
+{
+    "type": "opensource",
+    "3rdparty: [],
+    "ignore": ["./debian", "./.tx", "./icons", "./translations", "README.md", "*.conf", "CMakeLists.txt", "*.user", "*.o", "*.qrc", "*.svg", "*.png", "*.qm", "*.ts"],
+    "license": ["LICENSE"]
+}

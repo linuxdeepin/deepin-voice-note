@@ -67,7 +67,7 @@ SOURCES += \
     src/importolddata/upgradedbutil.cpp
 
 RESOURCES += \
-    images.qrc
+    assets/images.qrc
 
 HEADERS += \
     src/views/vnotemainwindow.h \
@@ -143,17 +143,17 @@ isEmpty(APPCONFIGDIR):APPCONFIGDIR=/usr/share/$$TARGET/
 target.path = $$INSTROOT$$BINDIR
 
 desktop.path = $$INSTROOT$$APPDIR
-desktop.files = deepin-voice-note.desktop
+desktop.files = assets/deepin-voice-note.desktop
 
 #TODO:
 #    Integrate the config file to the app package.
 #Now only have audio device check configuration.The
 #audio check config may be override by /etc/<app>/xx.conf
 app_config.path = $$INSTROOT$$APPCONFIGDIR
-app_config.files = deepin-voice-note.conf
+app_config.files = assets/deepin-voice-note.conf
 
 # Automating generation .qm files from .ts files
-!system($$PWD/translate_generation.sh): error("Failed to generate translation")
+!system($$PWD/assets/translate_generation.sh): error("Failed to generate translation")
 
 translations.path = $$DSRDIR/translations
 translations.files = $$PWD/translations/*.qm
@@ -161,4 +161,4 @@ translations.files = $$PWD/translations/*.qm
 #icon_files.path = /usr/share/icons/hicolor/scalable/apps
 #icon_files.files = $$PWD/image/deepin-voice-note.svg
 
-INSTALLS += target desktop translations icon_files app_config
+INSTALLS += target desktop translations app_config
