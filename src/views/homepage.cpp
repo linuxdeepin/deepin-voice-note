@@ -28,7 +28,7 @@ void HomePage::initUi()
     m_Image->setFlat(true);
 
     m_Text = new DLabel(this);
-    m_Text->setMinimumSize(QSize(500, 18));
+    m_Text->setMinimumSize(QSize(500, 40));
     m_Text->setText(QString(DApplication::translate(
                             "HomePage", "Create a notebook to start recording voice and making notes")
                         ));
@@ -39,7 +39,6 @@ void HomePage::initUi()
     m_Text->setPalette(pa);
 
     QGridLayout *layout = new QGridLayout;
-    layout->setSpacing(15);
     layout->addWidget(m_Image, 1, 1, Qt::AlignCenter);
     layout->addWidget(m_PushButton, 2, 1, Qt::AlignCenter);
     layout->addWidget(m_Text, 3, 1, Qt::AlignCenter);
@@ -51,7 +50,10 @@ void HomePage::initUi()
     layout->setRowStretch(2, 0);
     layout->setRowStretch(3, 0);
     layout->setRowStretch(4, 1);
+    layout->setContentsMargins(0, 0, 0, 70);
+
     this->setLayout(layout);
+
 }
 
 void HomePage::initConnection()
