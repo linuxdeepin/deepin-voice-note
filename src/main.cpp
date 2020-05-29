@@ -1,3 +1,5 @@
+#define VERSION "1.0.0"
+
 #include "vnoteapplication.h"
 #include "views/vnotemainwindow.h"
 #include "globaldef.h"
@@ -20,7 +22,7 @@ int main(int argc, char *argv[])
     app.loadTranslator();
     app.setOrganizationName("deepin");
     app.setApplicationName(DEEPIN_VOICE_NOTE);
-    app.setApplicationVersion(DApplication::buildVersion("1.0"));
+    app.setApplicationVersion(VERSION);
     app.setProductIcon(QIcon::fromTheme(DEEPIN_VOICE_NOTE));
     app.setProductName(DApplication::translate("AppMain", "Voice Notes"));
     app.setApplicationDescription(DApplication::translate("AppMain",
