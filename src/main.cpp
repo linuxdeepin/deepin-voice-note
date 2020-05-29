@@ -1,5 +1,4 @@
-#define VERSION "1.0.0"
-
+#include "environments.h"
 #include "vnoteapplication.h"
 #include "views/vnotemainwindow.h"
 #include "globaldef.h"

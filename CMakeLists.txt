@@ -25,14 +25,26 @@ if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "sw_64")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mieee")
 endif ()
 
-#Generate qm files.
-if (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug"))
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+#compile flags
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -Wall -Wextra")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra")
 
-    # generate qm files
-    execute_process(COMMAND bash ${APP_TRANS_SCRIPT}
+  # Enable Qt builtin debug mode
+  add_definitions("-DQT_MESSAGELOGCONTEXT")
+else()
+  # -Wl, -O2 Enable linker optimizations
+  # -Wl, --gc-sections Remove unused code resulting from -fdsta-sections and
+  # -ffunction-sections
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O2 -Wl,-O1 -Wl,--gc-sections")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -Wl,-O1 -Wl,--gc-sections")
+endif()
+
+#Generate the qm file
+execute_process(COMMAND bash ${APP_TRANS_SCRIPT}
                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/")
-endif ()
+
+configure_file(src/environments.h.in environments.h @ONLY)
 
 macro(SUBDIRLIST result curdir)
     file(GLOB children RELATIVE ${curdir} ${curdir}/*)
