@@ -69,8 +69,8 @@ void VNWaveform::paintEvent(QPaintEvent *event)
     painter.setRenderHint(QPainter::Antialiasing, true);
 
     //Support highquality
-    qreal waveWidth = WAVE_WIDTH * devicePixelRatioF();
-    qreal waveSpace = WAVE_SPACE * devicePixelRatioF();
+    qreal waveWidth = WAVE_WIDTH;
+    qreal waveSpace = WAVE_SPACE;
 
     qreal waveOffsetX = WAVE_OFFSET_X;
     qreal waveOffsetY = WAVE_OFFSET_Y;
@@ -109,7 +109,7 @@ void VNWaveform::resizeEvent(QResizeEvent *event)
 {
     m_maxShowedSamples = static_cast<int> (
                 (event->size().width()-WAVE_OFFSET_X*2)
-                / ((WAVE_WIDTH+WAVE_SPACE) * devicePixelRatioF())
+                / ((WAVE_WIDTH+WAVE_SPACE))
                 );
 
     qDebug() << __FUNCTION__ << "m_maxShowedSamples:" << m_maxShowedSamples
