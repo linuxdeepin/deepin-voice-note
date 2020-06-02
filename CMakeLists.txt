@@ -1,4 +1,4 @@
-# Copyright (C) 2019 ~ 2019 UnionTech Software Technology Co.,Ltd.
+# Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
 #
 # Author:     V4fr3e <V4fr3e@deepin.io>
 #
