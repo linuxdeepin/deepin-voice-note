@@ -78,7 +78,7 @@ public slots:
 protected:
     void asrJsonParser(const QString &msg, asrMsg& asrData);
     ErrorCode getErrorCode(const asrMsg& asrData);
-    void initSession();
+    int initSession();
 protected:
     //XunFei message code string
     const QString CODE_SUCCESS {"000000"};

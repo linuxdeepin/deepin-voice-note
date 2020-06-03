@@ -34,6 +34,7 @@ VNoteA2TManager::VNoteA2TManager(QObject *parent)
 
 bool VNoteA2TManager::checkAiService() const
 {
+
     bool fAiServiceExist = true;
 
     com::iflytek::aiservice::session session(
@@ -67,7 +68,7 @@ bool VNoteA2TManager::checkAiService() const
     return fAiServiceExist;
 }
 
-void VNoteA2TManager::initSession()
+int VNoteA2TManager::initSession()
 {
     m_session.reset(new com::iflytek::aiservice::session(
                         "com.iflytek.aiservice",
@@ -81,8 +82,6 @@ void VNoteA2TManager::initSession()
 
     QDBusObjectPath qdPath = m_session->createSession(appName, ability, errorCode);
 
-    qInfo() << "createSession->errorCode=" << errorCode;
-
     m_asrInterface.reset(new com::iflytek::aiservice::asr(
                              "com.iflytek.aiservice",
                              qdPath.path(),
@@ -92,6 +91,8 @@ void VNoteA2TManager::initSession()
     connect(m_asrInterface.get(), &com::iflytek::aiservice::asr::onNotify,
             this, &VNoteA2TManager::onNotify);
 
+    return errorCode;
+
 }
 
 void VNoteA2TManager::startAsr(QString filePath,
@@ -99,7 +100,12 @@ void VNoteA2TManager::startAsr(QString filePath,
                                   QString srcLanguage,
                                   QString targetLanguage)
 {
-    initSession();
+    int ret = initSession();
+    if(ret != 0){
+        emit asrError(AudioOther);
+        qInfo() << "createSession->errorCode=" << ret;
+        return;
+    }
 
     QVariantMap param;
 
