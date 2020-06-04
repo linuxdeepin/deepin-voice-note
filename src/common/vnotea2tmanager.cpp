@@ -34,36 +34,24 @@ VNoteA2TManager::VNoteA2TManager(QObject *parent)
 
 bool VNoteA2TManager::checkAiService() const
 {
+    bool fAiServiceExist = false;
 
-    bool fAiServiceExist = true;
-
-    com::iflytek::aiservice::session session(
-                           "com.iflytek.aiservice",
-                           "/",
-                           QDBusConnection::sessionBus()
-                       );
-
-    const QString ability("asr");
-    const QString appName = qApp->applicationName()+QString("-CheckAiService");
-    int errorCode = -1;
-
-    QString systemInfo = QString("[%1-%2]")
-            .arg(DSysInfo::operatingSystemName())
-            .arg(DSysInfo::deepinTypeDisplayName());
-
-    QDBusReply<QDBusObjectPath> qdPath = session.createSession(appName, ability, errorCode);
-
-    if (!qdPath.isValid()) {
-        if (QDBusError::ServiceUnknown == qdPath.error().type()) {
-            fAiServiceExist = false;
-            qInfo() << "Aiservice don't exist in system:" << systemInfo << " errorCode=" << errorCode;
-        }
-    } else {
-        qInfo() << "Aiservice exist in system:" << systemInfo << " errorCode=" << errorCode;
+    DSysInfo::DeepinType deepinType = DSysInfo::deepinType();
+    switch (deepinType) {
+    case DSysInfo::DeepinProfessional:
+    case DSysInfo::DeepinPersonal:
+        fAiServiceExist = true;
+        break;
+    default:
+        break;
     }
 
-    //Free the test session
-    session.freeSession(appName, ability);
+
+    QString systemInfo = QString("[%1-%2]")
+               .arg(DSysInfo::operatingSystemName())
+               .arg(DSysInfo::deepinTypeDisplayName());
+
+    qInfo() << systemInfo << " IsAvailable use voice to text:" << fAiServiceExist;
 
     return fAiServiceExist;
 }
