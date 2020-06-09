@@ -1645,6 +1645,7 @@ void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
     m_asrErrMeassage->setVisible(true);
     m_asrErrMeassage->setMinimumWidth(520);
     m_asrErrMeassage->setMinimumHeight(60);
+    m_asrErrMeassage->setMaximumWidth(m_centerWidget->width());
     m_asrErrMeassage->adjustSize();
 
     int xPos = (m_centerWidget->width() - m_asrErrMeassage->width()) / 2;
