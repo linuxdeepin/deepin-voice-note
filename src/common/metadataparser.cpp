@@ -195,13 +195,13 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData/*ou
 
     QJsonObject note = noteDoc.object();
     QJsonArray  noteDatas;
-    int         noteCount = -1;
+//    int         noteCount = -1;
 
 
-    //noteCount doesn't used now
-    if (note.contains(m_jsonNodeNameMap[NDataCount])) {
-        noteCount = note.value(m_jsonNodeNameMap[NDataCount]).toInt(0);
-    }
+//    //noteCount doesn't used now
+//    if (note.contains(m_jsonNodeNameMap[NDataCount])) {
+//        noteCount = note.value(m_jsonNodeNameMap[NDataCount]).toInt(0);
+//    }
 
     //Get default voice max id
     if (note.contains(m_jsonNodeNameMap[NVoiceMaxId])) {
