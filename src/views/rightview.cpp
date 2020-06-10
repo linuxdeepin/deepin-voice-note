@@ -731,6 +731,7 @@ void RightView::mouseReleaseEvent(QMouseEvent *event)
     Qt::MouseButton btn = event->button();
     if(btn == Qt::LeftButton){
         m_selectWidget.clear();
+        QString selecText = "";
         for (int i = 0; i < m_viewportLayout->count() - 1 ; i++) {
             QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
             DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
@@ -740,7 +741,12 @@ void RightView::mouseReleaseEvent(QMouseEvent *event)
                 } else {
                     m_selectWidget.insert(VoicePlugin,widget);
                 }
-            }
+                selecText.append(widget->getSelectFragment().toPlainText());
+            }  
+        }
+        QClipboard *board = QApplication::clipboard();
+        if(board){
+            board->setText(selecText,QClipboard::Selection);
         }
     }
 
@@ -863,7 +869,7 @@ QString RightView::getSelectText(bool voiceText)
             QString selectText = widget->getSelectFragment().toPlainText();
             if (!selectText.isEmpty()) {
                 if(!firstSelect && !selectText.startsWith('\n')){
-                     text.append("\n");
+                    text.append("\n");
                 }
                 text.append(selectText);
             }
@@ -932,6 +938,8 @@ void RightView::clearAllSelection()
 void RightView::selectAllItem()
 {
     m_selectWidget.clear();
+    QString selecText = "";
+
     for (int i = 0; i < m_viewportLayout->count() - 1 ; i++) {
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
         DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
@@ -941,6 +949,12 @@ void RightView::selectAllItem()
         } else {
             m_selectWidget.insert(VoicePlugin,widget);
         }
+        selecText.append(widget->getSelectFragment().toPlainText());
+    }
+
+    QClipboard *board = QApplication::clipboard();
+    if(board){
+        board->setText(selecText,QClipboard::Selection);
     }
 }
 
