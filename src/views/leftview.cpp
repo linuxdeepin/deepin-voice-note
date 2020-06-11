@@ -231,3 +231,8 @@ void LeftView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint h
     Q_UNUSED(hint);
     DTreeView::closeEditor(editor,QAbstractItemDelegate::NoHint);
 }
+
+void LeftView::closeMenu()
+{
+    m_notepadMenu->close();
+}

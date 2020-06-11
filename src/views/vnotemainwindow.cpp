@@ -1577,6 +1577,8 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         operState(StateRecording, true);
         m_noteSearchEdit->setEnabled(false);
         m_leftView->setOnlyCurItemMenuEnable(true);
+        m_leftView->closeMenu();
+        m_middleView->closeMenu();
         m_addNotepadBtn->setEnabled(false);
         m_middleView->setOnlyCurItemMenuEnable(true);
         m_rightView->setEnablePlayBtn(false);
@@ -1600,6 +1602,9 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNotepadBtn->setEnabled(false);
         m_middleView->setOnlyCurItemMenuEnable(true);
         m_addNoteBtn->setDisabled(true);
+        m_leftView->closeMenu();
+        m_middleView->closeMenu();
+        m_rightView->closeMenu();
         break;
     case VoiceToTextEnd:
         if (!isRecording() && !isPlaying()) {

@@ -931,7 +931,7 @@ void RightView::clearAllSelection()
         widget->clearSelection();
     }
 
-    m_noteDetailContextMenu->close();
+    closeMenu();
     m_selectWidget.clear();
 }
 
@@ -1178,4 +1178,9 @@ void RightView::removeCacheWidget(const VNoteFolder *data)
         }
     }
 
+}
+
+void RightView::closeMenu()
+{
+    m_noteDetailContextMenu->close();
 }

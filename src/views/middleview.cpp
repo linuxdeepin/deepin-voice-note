@@ -326,3 +326,8 @@ void MiddleView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint
     Q_UNUSED(hint);
     DListView::closeEditor(editor,QAbstractItemDelegate::NoHint);
 }
+
+void MiddleView::closeMenu()
+{
+    m_noteMenu->close();
+}

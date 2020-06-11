@@ -49,6 +49,7 @@ public:
     void appendFolder(VNoteFolder* folder);
     void editFolder();
     void sort();
+    void closeMenu();
     int  folderCount();
 
     VNoteFolder* removeFolder();

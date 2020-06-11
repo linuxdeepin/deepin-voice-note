@@ -49,7 +49,7 @@ public:
     void editNote();
     void saveAsText();
     void saveRecords();
-
+    void closeMenu();
     qint64 getCurrentId();
     qint32 rowCount() const;
 

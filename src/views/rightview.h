@@ -83,6 +83,7 @@ public:
     void setCurVoicePlay(VoiceNoteItem *item);
     void setCurVoiceAsr(VoiceNoteItem *item);
     void saveMp3();
+    void closeMenu();
     void removeCacheWidget(VNoteItem *data);
     void removeCacheWidget(const VNoteFolder *data);
 
