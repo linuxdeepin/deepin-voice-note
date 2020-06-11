@@ -1079,7 +1079,7 @@ void RightView::saveMp3()
             dialog.setNameFilter("MP3(*.mp3)");
             QString historyDir = m_qspSetting->value(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
             if (historyDir.isEmpty()) {
-                historyDir = QDir::homePath();
+                historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
             }
             dialog.setDirectory(historyDir);
             if (QDialog::Accepted == dialog.exec()) {

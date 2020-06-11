@@ -166,7 +166,7 @@ void MiddleView::saveAsText()
 
         QString historyDir = m_qspSetting->value(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
         if (historyDir.isEmpty()) {
-            historyDir = QDir::homePath();
+            historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
         }
         dialog.setDirectory(historyDir);
 
@@ -201,7 +201,7 @@ void MiddleView::saveRecords()
 
         QString historyDir = m_qspSetting->value(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
         if (historyDir.isEmpty()) {
-            historyDir = QDir::homePath();
+            historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
         }
         dialog.setDirectory(historyDir);
 
