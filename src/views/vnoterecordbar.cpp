@@ -70,22 +70,6 @@ void VNoteRecordBar::initUI()
 
     m_mainLayout->setCurrentWidget(m_recordBtnHover);
 
-    //Init device exception message
-    m_pDeviceExceptionMsg = new DFloatingMessage(
-                DFloatingMessage::ResidentType,
-                reinterpret_cast<QWidget*>(parent()));
-
-    m_pDeviceExceptionMsg->setVisible(false);
-
-    QString iconPath = STAND_ICON_PAHT;
-    iconPath.append("warning.svg");
-    m_pDeviceExceptionMsg->setIcon(QIcon(iconPath));
-    m_pDeviceExceptionMsg->setMessage(
-                DApplication::translate(
-                    "VNoteRecordBar",
-                    "Your audio recording device does not work.")
-                );
-
     //Default unavailable
     OnMicrophoneAvailableChanged(false);
 }
@@ -172,18 +156,12 @@ void VNoteRecordBar::OnMicrophoneAvailableChanged(int availableState)
         //stop recording,and give device exception message.
         if (m_mainLayout->currentWidget() == m_recordPanel) {
             cancelRecord();
-
-            if (!m_pDeviceExceptionMsg->isVisible()) {
-                m_pDeviceExceptionMsg->show();
-                m_pDeviceExceptionMsg->adjustSize();
-            }
+            emit sigDeviceExceptionMsgShow();
         }
     } else {
         //When device available,should hide the exception
         //message
-        if (m_pDeviceExceptionMsg->isVisible()) {
-            m_pDeviceExceptionMsg->close();
-        }
+        emit sigDeviceExceptionMsgClose();
 
         m_recordBtn->setBtnDisabled(false);
         m_recordBtn->setToolTip("");

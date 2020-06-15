@@ -154,7 +154,10 @@ public slots:
     //Shotcuts slots
     void onPreviewShortcut();
     void initAsrErrMessage();
+    void initDeviceExceptionErrMessage();
     void showAsrErrMessage(const QString &strMessage);
+    void showDeviceExceptionErrMessage();
+    void closeDeviceExceptionErrMessage();
     //System shutdon
     void onSystemDown(bool active);
 private:
@@ -240,6 +243,7 @@ private:
     QString          m_searchKey;
     //VoiceNoteItem    *m_currentAsrVoice {nullptr};
     DFloatingMessage *m_asrErrMeassage {nullptr};
+    DFloatingMessage *m_pDeviceExceptionMsg {nullptr};
     DPushButton      *m_asrAgainBtn {nullptr};
     //Login session manager
     DBusLogin1Manager *m_pLogin1Manager {nullptr};

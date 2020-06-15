@@ -59,6 +59,8 @@ signals:
     void sigPlayVoice(VNVoiceBlock * voiceData);
     void sigPauseVoice(VNVoiceBlock * voiceData);
     void sigWidgetClose(VNVoiceBlock * voiceData);
+    void sigDeviceExceptionMsgShow();
+    void sigDeviceExceptionMsgClose();
 
 public slots:
     void onStartRecord();

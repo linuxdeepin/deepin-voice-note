@@ -169,6 +169,10 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onPlayPlugVoicePause);
     connect(m_recordBar, &VNoteRecordBar::sigWidgetClose,
             this, &VNoteMainWindow::onPlayPlugVoiceStop);
+    connect(m_recordBar, &VNoteRecordBar::sigDeviceExceptionMsgShow,
+            this, &VNoteMainWindow::showDeviceExceptionErrMessage);
+    connect(m_recordBar, &VNoteRecordBar::sigDeviceExceptionMsgClose,
+            this, &VNoteMainWindow::closeDeviceExceptionErrMessage);
 
     connect(m_asrAgainBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::onA2TStartAgain);
@@ -464,6 +468,8 @@ void VNoteMainWindow::initMainView()
     m_stackedWidget->insertWidget(WndNoteShow, m_mainWndSpliter);
 
     initAsrErrMessage();
+    initDeviceExceptionErrMessage();
+    //showDeviceExceptionErrMessage();
 
     WindowType defaultWnd = WndSplashAnim;
 
@@ -1119,6 +1125,12 @@ void VNoteMainWindow::resizeEvent(QResizeEvent *event)
         m_asrErrMeassage->move(xPos, yPos);
     }
 
+    if(m_pDeviceExceptionMsg->isVisible()){
+        int xPos = (m_centerWidget->width() - m_pDeviceExceptionMsg->width()) / 2;
+        int yPos = m_centerWidget->height() - m_pDeviceExceptionMsg->height() - 5;
+        m_pDeviceExceptionMsg->move(xPos, yPos);
+    }
+
     DMainWindow::resizeEvent(event);
 }
 
@@ -1644,6 +1656,21 @@ void VNoteMainWindow::initAsrErrMessage()
     m_asrErrMeassage->setVisible(false);
 }
 
+void VNoteMainWindow::initDeviceExceptionErrMessage()
+{
+    m_pDeviceExceptionMsg = new DFloatingMessage(DFloatingMessage::ResidentType,
+                                            m_centerWidget);
+    QString iconPath = STAND_ICON_PAHT;
+    iconPath.append("warning.svg");
+    m_pDeviceExceptionMsg->setIcon(QIcon(iconPath));
+    m_pDeviceExceptionMsg->setMessage(
+                DApplication::translate(
+                    "VNoteRecordBar",
+                    "Your audio recording device does not work.")
+                );
+    m_pDeviceExceptionMsg->setVisible(false);
+}
+
 void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
 {
     m_asrErrMeassage->setMessage(strMessage);
@@ -1657,6 +1684,25 @@ void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
     int yPos = m_centerWidget->height() - m_asrErrMeassage->height() - 5;
 
     m_asrErrMeassage->move(xPos, yPos);
+}
+
+void VNoteMainWindow::showDeviceExceptionErrMessage()
+{
+    m_pDeviceExceptionMsg->setVisible(true);
+    m_pDeviceExceptionMsg->setMinimumWidth(520);
+    m_pDeviceExceptionMsg->setMinimumHeight(65);
+    m_pDeviceExceptionMsg->setMaximumWidth(m_centerWidget->width());
+    m_pDeviceExceptionMsg->adjustSize();
+
+    int xPos = (m_centerWidget->width() - m_pDeviceExceptionMsg->width()) / 2;
+    int yPos = m_centerWidget->height() - m_pDeviceExceptionMsg->height() - 5;
+
+    m_pDeviceExceptionMsg->move(xPos, yPos);
+}
+
+void VNoteMainWindow::closeDeviceExceptionErrMessage()
+{
+    m_pDeviceExceptionMsg->setVisible(false);
 }
 
 void VNoteMainWindow::onSystemDown(bool active)
