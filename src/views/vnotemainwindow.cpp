@@ -558,13 +558,13 @@ void VNoteMainWindow::initMiddleView()
 
     m_middleView = new MiddleView(m_middleViewHolder);
     m_addNoteBtn = new DFloatingButton(DStyle::StandardPixmap::SP_IncreaseElement, m_middleViewHolder);
-    m_addNoteBtn->setFixedSize(QSize(55, 55));
+    m_addNoteBtn->setFixedSize(QSize(54, 54));
     m_addNoteBtn->raise();
 
     DAnchorsBase buttonAnchor(m_addNoteBtn);
     buttonAnchor.setAnchor(Qt::AnchorLeft, m_middleView, Qt::AnchorLeft);
     buttonAnchor.setAnchor(Qt::AnchorBottom, m_middleView, Qt::AnchorBottom);
-    buttonAnchor.setBottomMargin(5);
+    buttonAnchor.setBottomMargin(6);
     buttonAnchor.setLeftMargin(97);
 
     // ToDo:
@@ -590,7 +590,7 @@ void VNoteMainWindow::initRightView()
 
     QVBoxLayout *rightHolderLayout = new QVBoxLayout;
     rightHolderLayout->setSpacing(0);
-    rightHolderLayout->setContentsMargins(0, 15, 0, 0);
+    rightHolderLayout->setContentsMargins(0, 15, 0, 3);
 
     m_rightViewScrollArea = new DScrollArea(m_rightViewHolder);
     m_rightView = new RightView(m_rightViewScrollArea);
@@ -605,7 +605,7 @@ void VNoteMainWindow::initRightView()
     m_recordBarHolder->setFixedHeight(78);
     QVBoxLayout *recordBarHolderLayout = new QVBoxLayout(m_recordBarHolder);
     recordBarHolderLayout->setSpacing(0);
-    recordBarHolderLayout->setContentsMargins(4, 0, 4, 4);
+    recordBarHolderLayout->setContentsMargins(4, 1, 4, 0);
 
     m_recordBar = new VNoteRecordBar(m_recordBarHolder);
     m_recordBar->setBackgroundRole(DPalette::Base);
