@@ -81,8 +81,6 @@ protected:
 
     QString          m_recordPath {""};
 
-    DFloatingMessage* m_pDeviceExceptionMsg {nullptr};
-
     //MicrophoneState
     int m_microphoneState {0};
 };

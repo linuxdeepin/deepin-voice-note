@@ -469,7 +469,6 @@ void VNoteMainWindow::initMainView()
 
     initAsrErrMessage();
     initDeviceExceptionErrMessage();
-    //showDeviceExceptionErrMessage();
 
     WindowType defaultWnd = WndSplashAnim;
 
