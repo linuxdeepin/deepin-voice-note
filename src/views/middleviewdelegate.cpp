@@ -53,11 +53,14 @@ struct VNoteTextPHelper {
         }
     }
 
+#pragma pack(push)  /* push current alignment to stack */
+#pragma pack(1)     /* set alignment to 1 byte boundary */
     struct Text {
         QString text;
         QRect   rect;
         bool    isKeyword {false};
     };
+#pragma pack(pop)   /* restore original alignment from stack */
 
     enum {
         OldPen,
