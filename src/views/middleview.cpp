@@ -294,7 +294,7 @@ void MiddleView::initUI()
     m_emptySearch = new DLabel(this);
     m_emptySearch->setText(DApplication::translate("MiddleView", "No search results"));
     m_emptySearch->setAlignment(Qt::AlignCenter);
-    DFontSizeManager::instance()->bind(m_emptySearch, DFontSizeManager::T4);
+    DFontSizeManager::instance()->bind(m_emptySearch, DFontSizeManager::T6);
     m_emptySearch->setForegroundRole(DPalette::PlaceholderText);
     m_emptySearch->setVisible(false);
     QVBoxLayout *layout = new QVBoxLayout;
