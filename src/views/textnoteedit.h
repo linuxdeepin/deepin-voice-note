@@ -40,9 +40,6 @@ public:
      QString getSelectFragment();
      bool hasSelection();
 
-public slots:
-     void onChangeTheme();
-
 signals:
     void sigFocusIn();
     void sigFocusOut();

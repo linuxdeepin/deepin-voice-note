@@ -38,6 +38,7 @@ TextNoteItem::TextNoteItem(VNoteBlock *noteBlock, QWidget *parent)
     initUi();
     initConnection();
     Utils::blockToDocument(m_noteBlock,m_textEdit->document());
+    onChangeTheme();
 }
 
 void TextNoteItem::initUi()
@@ -70,6 +71,9 @@ void TextNoteItem::initConnection()
     connect(m_textEdit, SIGNAL(selectionChanged()), this, SIGNAL(sigSelectionChanged()));
     connect(m_textEdit, SIGNAL(cursorPositionChanged()), this, SLOT(onTextCursorChange()));
 
+    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged,
+               this, &TextNoteItem::onChangeTheme);
+
 }
 
 void TextNoteItem::updateSearchKey(QString searchKey)
@@ -81,7 +85,7 @@ void TextNoteItem::updateSearchKey(QString searchKey)
         m_serchKey = searchKey;
         m_isSearching = true;
         if(m_textDocumentUndo == false && m_searchCount){
-           Utils::blockToDocument(m_noteBlock,m_textEdit->document());
+           Utils::setDefaultColor(m_textEdit->document(), m_textEdit->palette().text().color());
         }
         DPalette pb;
         m_searchCount = Utils::highTextEdit(m_textEdit->document(), m_serchKey, pb.color(DPalette::Highlight),m_textDocumentUndo);
@@ -210,4 +214,17 @@ void TextNoteItem::onTextCursorChange()
 void TextNoteItem::setLastCursorHeight(int height)
 {
     m_lastCursorHeight = height;
+}
+
+void TextNoteItem::onChangeTheme()
+{
+    DPalette appDp = DApplicationHelper::instance()->applicationPalette();
+    DPalette dp = DApplicationHelper::instance()->palette(m_textEdit);
+    dp.setBrush(DPalette::Highlight, appDp.color(DPalette::Normal,DPalette::Highlight));
+    dp.setBrush(DPalette::HighlightedText, appDp.color(DPalette::Normal,DPalette::HighlightedText));
+    m_textEdit->setPalette(dp);
+
+    m_searchCount = 1;
+    m_textDocumentUndo = false;
+    updateSearchKey(m_serchKey);
 }

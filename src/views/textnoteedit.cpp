@@ -20,7 +20,6 @@
 */
 
 #include "textnoteedit.h"
-
 #include <QWheelEvent>
 #include <DFontSizeManager>
 #include <DApplicationHelper>
@@ -39,12 +38,8 @@ TextNoteEdit::TextNoteEdit(QWidget *parent)
     //Edit get focus only by click
     //setFocusPolicy(Qt::ClickFocus);
 
-    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged,
-               this, &TextNoteEdit::onChangeTheme);
-
     this->installEventFilter(this);
 
-    onChangeTheme();
 }
 
 void TextNoteEdit::focusInEvent(QFocusEvent *e)
@@ -144,15 +139,6 @@ void TextNoteEdit::removeSelectText()
 {
     QTextCursor textCursor = this->textCursor();
     textCursor.removeSelectedText();
-}
-
-void TextNoteEdit::onChangeTheme()
-{
-    DPalette appDp = DApplicationHelper::instance()->applicationPalette();
-    DPalette dp = DApplicationHelper::instance()->palette(this);
-    dp.setBrush(DPalette::Highlight, appDp.color(DPalette::Normal,DPalette::Highlight));
-    dp.setBrush(DPalette::HighlightedText, appDp.color(DPalette::Normal,DPalette::HighlightedText));
-    this->setPalette(dp);
 }
 
 bool TextNoteEdit::eventFilter(QObject *o, QEvent *e)

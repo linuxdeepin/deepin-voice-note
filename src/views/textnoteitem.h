@@ -59,6 +59,7 @@ signals:
     void        sigFocusOut();
     void        sigSelectionChanged();
 public slots:
+    void        onChangeTheme();
     void        onTextChange();
     void        onTextCursorChange();
 
