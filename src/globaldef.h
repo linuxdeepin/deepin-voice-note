@@ -79,10 +79,11 @@
 #define IMPORT_OLD_VERSION_DATA
 
 #include <sys/time.h>
-
+#include <QtMath>
 #define TM(s,e) (\
-((e.tv_sec-s.tv_sec)*1000 + (e.tv_usec-s.tv_usec)/1000.0)\
+(qAbs((e.tv_sec-s.tv_sec)*1000 + (e.tv_usec-s.tv_usec)/1000))\
 )
+
 #define UPT(s,e) ((s)=(e))
 
 #endif // GLOBALDEF_H
