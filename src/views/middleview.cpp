@@ -254,9 +254,7 @@ void MiddleView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void MiddleView::mouseMoveEvent(QMouseEvent *event)
 {
-    if (!m_onlyCurItemMenuEnable) {
-        DListView::mouseMoveEvent(event);
-    }
+    Q_UNUSED(event);
 }
 
 bool MiddleView::eventFilter(QObject *o, QEvent *e)

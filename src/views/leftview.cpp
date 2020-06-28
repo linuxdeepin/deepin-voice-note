@@ -105,9 +105,7 @@ void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void LeftView::mouseMoveEvent(QMouseEvent *event)
 {
-    if (!m_onlyCurItemMenuEnable) {
-        DTreeView::mouseMoveEvent(event);
-    }
+   Q_UNUSED(event);
 }
 
 void LeftView::keyPressEvent(QKeyEvent *e)
