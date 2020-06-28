@@ -117,7 +117,7 @@ void VNoteRecordBar::onStartRecord()
 {
     if(this->isVisible() && m_mainLayout->currentWidget() == m_recordBtnHover && m_recordBtn->isEnabled() ){
         if (VNoteAudioDeviceWatcher::VolumeTooLow == m_microphoneState) {
-            VNoteMessageDialog volumeLowDialog(VNoteMessageDialog::VolumeTooLow);
+            VNoteMessageDialog volumeLowDialog(VNoteMessageDialog::VolumeTooLow, this);
 
             connect(&volumeLowDialog, &VNoteMessageDialog::accepted, this, [this]() {
                 //User confirmed record when volume too low
