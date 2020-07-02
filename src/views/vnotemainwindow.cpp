@@ -1752,6 +1752,8 @@ void VNoteMainWindow::release()
         m_qspSetting->sync();
     }
 
+    m_rightView->saveNote();
+
     //Check deviceWacherThread exit time.
     //struct timeval start, end;
     //gettimeofday(&start, nullptr);
