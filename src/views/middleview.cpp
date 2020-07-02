@@ -225,6 +225,7 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
     this->setFocus();
 
     if (!m_onlyCurItemMenuEnable) {
+        event->setModifiers(Qt::NoModifier);
         DListView::mouseMoveEvent(event);
     }
 
