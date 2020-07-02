@@ -101,7 +101,7 @@ void VNoteTextPHelper::spiltByKeyword(const QString &text, const QString &keywor
                 startPos += extraLen;
 
                 tb.rect = QRect(0, 0
-                                , qMin<int>(
+                                , qMax<int>(
                                     m_fontMetrics.width(tb.text)
                                     , m_fontMetrics.boundingRect(tb.text).width()
                                 )
@@ -112,7 +112,7 @@ void VNoteTextPHelper::spiltByKeyword(const QString &text, const QString &keywor
 
                 tb.text = elideText.mid(pos, keyLen);
                 tb.rect = QRect(0, 0
-                                , qMin<int>(
+                                , qMax<int>(
                                     m_fontMetrics.width(tb.text)
                                     , m_fontMetrics.boundingRect(tb.text).width()
                                 )
@@ -123,7 +123,7 @@ void VNoteTextPHelper::spiltByKeyword(const QString &text, const QString &keywor
             } else {
                 tb.text = elideText.mid(pos, keyLen);
                 tb.rect = QRect(0, 0
-                                , qMin<int>(
+                                , qMax<int>(
                                     m_fontMetrics.width(tb.text)
                                     , m_fontMetrics.boundingRect(tb.text).width()
                                 )
@@ -142,7 +142,7 @@ void VNoteTextPHelper::spiltByKeyword(const QString &text, const QString &keywor
 
         tb.text = elideText.mid(startPos, (textLen - startPos));
         tb.rect = QRect(0, 0
-                        , qMin<int>(
+                        , qMax<int>(
                             m_fontMetrics.width(tb.text)
                             , m_fontMetrics.boundingRect(tb.text).width()
                         )
