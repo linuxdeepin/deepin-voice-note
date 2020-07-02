@@ -231,6 +231,10 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
 
 void RightView::onTextEditFocusOut()
 {
+    if(m_fIsNoteModified){
+        TextNoteItem *widget = static_cast<TextNoteItem*>(sender());
+        Utils::documentToBlock(widget->getNoteBlock(),widget->getTextDocument());
+    }
     saveNote();
 }
 
