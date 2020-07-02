@@ -141,10 +141,10 @@ bool OldNoteQryDbVisitor::visitorData()
                 note->addBlock(ptrBlock);
             } else {
                 ptrBlock = new VNTextBlock();
-                ptrBlock->blockText = text;
-
                 note->addBlock(ptrBlock);
             }
+
+            ptrBlock->blockText = text;
 
             note->noteTitle   = "";
             note->noteState   = 0;
