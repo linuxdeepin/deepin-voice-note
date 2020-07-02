@@ -94,8 +94,8 @@ void VNoteRecordWidget::initConnection()
     connect(m_finshBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onFinshRecord);
     connect(m_audioManager, SIGNAL(recAudioBufferProbed(const QAudioBuffer &)),
             this, SLOT(onAudioBufferProbed(const QAudioBuffer &)));
-    connect(m_audioManager,  &VNoteAudioManager::recDurationChange,
-            this, &VNoteRecordWidget::onRecordDurationChange);
+//    connect(m_audioManager,  &VNoteAudioManager::recDurationChange,
+//            this, &VNoteRecordWidget::onRecordDurationChange);
 }
 
 void VNoteRecordWidget::initRecordPath()
@@ -152,6 +152,10 @@ QString VNoteRecordWidget::getRecordPath() const
 
 void VNoteRecordWidget::onAudioBufferProbed(const QAudioBuffer &buffer)
 {
+    qint64 msec = buffer.startTime() / 1000;
+    if(msec != m_recordMsec){
+        onRecordDurationChange(msec);
+    }
     m_waveForm->onAudioBufferProbed(buffer);
 }
 
