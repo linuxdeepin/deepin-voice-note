@@ -30,6 +30,7 @@ set(APP_TRANS_SCRIPT "${APP_RES_DIR}/translate_generation.sh")
 set(APP_DESKTOP "${APP_RES_DIR}/deepin-voice-note.desktop")
 set(APP_QRC "${APP_RES_DIR}/images.qrc")
 set(APP_CONFIG "${APP_RES_DIR}/deepin-voice-note.conf")
+set(APP_LOGO "${APP_RES_DIR}/icons/deepin/builtin/deepin-voice-note.svg")
 
 project(${APP_BIN_NAME})
 
@@ -126,3 +127,4 @@ file(GLOB APP_QM_FILES "translations/*.qm")
 install(FILES ${APP_QM_FILES} DESTINATION share/deepin-voice-note/translations)
 install(FILES ${APP_DESKTOP} DESTINATION share/applications)
 install(FILES ${APP_CONFIG} DESTINATION share/deepin-voice-note)
+install(FILES ${APP_LOGO} DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps/)
