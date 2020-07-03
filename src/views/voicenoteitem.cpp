@@ -64,10 +64,9 @@ void VoiceNoteItem::initUi()
     DStyle::setFocusRectVisible(m_asrText, false);
     m_asrText->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_asrText->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_asrText->document()->setDocumentMargin(15);
+    m_asrText->document()->setDocumentMargin(10);
     m_asrText->setVisible(false);
     m_asrText->setContextMenuPolicy(Qt::NoContextMenu);
-
     m_voiceSizeLab = new DLabel(m_bgWidget);
     m_voiceSizeLab->setAlignment(Qt::AlignTop);
     DFontSizeManager::instance()->bind(m_voiceSizeLab, DFontSizeManager::T8);
@@ -105,6 +104,7 @@ void VoiceNoteItem::initUi()
 
     QVBoxLayout *rightLayout = new QVBoxLayout;
     rightLayout->addSpacing(34);
+    rightLayout->setContentsMargins(5, 5, 20, 5);
     rightLayout->addWidget(m_voiceSizeLab);
     rightLayout->setSizeConstraint(QLayout::SetNoConstraint);
 
@@ -118,7 +118,7 @@ void VoiceNoteItem::initUi()
     QVBoxLayout *bkLayout = new QVBoxLayout;
     bkLayout->addLayout(itemLayout);
     bkLayout->addWidget(m_asrText);
-    bkLayout->setContentsMargins(0, 0, 20, 0);
+    bkLayout->setContentsMargins(0, 0, 0, 0);
     m_bgWidget->setLayout(bkLayout);
 
     m_coverWidget = new DFrame(this);
@@ -224,7 +224,7 @@ void VoiceNoteItem::onAsrTextChange()
     if (!doc->isEmpty()) {
         int docHeight = static_cast<int>(doc->size().height());
         m_asrText->setFixedHeight(docHeight);
-        height += docHeight;
+        height += docHeight + 10;
     }
     this->setFixedHeight(height);
 }
