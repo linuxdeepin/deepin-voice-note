@@ -135,16 +135,16 @@ bool OldNoteQryDbVisitor::visitorData()
                 ptrBlock->ptrVoice->voiceSize = voiceSize;
                 ptrBlock->ptrVoice->voiceTitle = defaultVoiceName+"1";
                 ptrBlock->ptrVoice->createTime = note->createTime;
+                ptrBlock->ptrVoice->blockText = text;
                 note->addBlock(ptrBlock);
 
                 ptrBlock = new VNTextBlock();
                 note->addBlock(ptrBlock);
             } else {
                 ptrBlock = new VNTextBlock();
-                note->addBlock(ptrBlock);
+                ptrBlock->blockText = text;
+                note->addBlock(ptrBlock);   
             }
-
-            ptrBlock->blockText = text;
 
             note->noteTitle   = "";
             note->noteState   = 0;
