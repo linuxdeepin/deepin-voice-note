@@ -85,6 +85,15 @@ void ActionManager::enableAction(ActionManager::ActionKind actionId, bool enable
     }
 }
 
+void ActionManager::visibleAction(ActionManager::ActionKind actionId, bool enable)
+{
+    QMap<ActionKind, QAction*>::iterator it = m_actionsMap.find(actionId);
+
+    if (it != m_actionsMap.end()) {
+        (*it)->setVisible(enable);
+    }
+}
+
 void ActionManager::resetCtxMenu(ActionManager::MenuType type, bool enable)
 {
     int startMenuId = MenuMaxId;
@@ -164,7 +173,12 @@ void ActionManager::initMenu()
                         << DApplication::translate("NoteDetailContextMenu", "Select all")
                         << DApplication::translate("NoteDetailContextMenu", "Copy")
                         << DApplication::translate("NoteDetailContextMenu", "Cut")
-                        << DApplication::translate("NoteDetailContextMenu", "Paste");
+                        << DApplication::translate("NoteDetailContextMenu", "Paste")
+                        << DApplication::translate("NoteDetailContextMenu", "Text to Speech")
+                        << DApplication::translate("NoteDetailContextMenu", "Stop reading")
+                        << DApplication::translate("NoteDetailContextMenu", "Speech to Text")
+                        << DApplication::translate("NoteDetailContextMenu", "Translate");
+
 
     m_detialContextMenu.reset(new DMenu());
 

@@ -69,6 +69,11 @@ public:
         DetailCopy,
         DetailCut,
         DetailPaste,
+
+        DetailText2Speech,
+        DetailStopreading,
+        DetailSpeech2Text,
+        DetailTranslate,
         //Add NoteDetail menu item begin {
 
         //Add NoteDetail menu item end }
@@ -95,6 +100,8 @@ public:
     QAction* getActionById(ActionKind id);
 
     void enableAction(ActionKind actionId, bool enable);
+
+    void visibleAction(ActionKind actionId, bool enable);
 
     void resetCtxMenu(MenuType type, bool enable = true);
 protected:

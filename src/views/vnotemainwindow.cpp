@@ -1254,6 +1254,18 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::DetailVoiceSave:
         m_rightView->saveMp3();
         break;
+    case ActionManager::DetailText2Speech:
+        VTextSpeechAndTrManager::onTextToSpeech();
+        break;
+    case ActionManager::DetailStopreading:
+        VTextSpeechAndTrManager::onStopTextToSpeech();
+        break;
+    case ActionManager::DetailSpeech2Text:
+        VTextSpeechAndTrManager::onSpeechToText();
+        break;
+    case ActionManager::DetailTranslate:
+        VTextSpeechAndTrManager::onTextTranslate();
+        break;
     default:
         break;
     }
@@ -1751,7 +1763,7 @@ void VNoteMainWindow::release()
         m_qspSetting->setValue(VNOTE_MAINWND_SZ_KEY, saveGeometry());
         m_qspSetting->sync();
     }
-
+    VTextSpeechAndTrManager::onStopTextToSpeech();
     m_rightView->saveNote();
 
     //Check deviceWacherThread exit time.

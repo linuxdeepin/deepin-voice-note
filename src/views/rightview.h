@@ -34,6 +34,7 @@
 #include <DDialog>
 
 #include "textnoteedit.h"
+#include "vtextspeechandtrmanager.h"
 
 DWIDGET_USE_NAMESPACE
 struct VNoteFolder;
