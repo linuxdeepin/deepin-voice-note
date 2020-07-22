@@ -23,6 +23,7 @@
 #include <QDBusConnection>
 #include <QProcess>
 
+static bool isSpeeching = false;
 
 // 检测是否在朗读文本
 bool VTextSpeechAndTrManager::isTextToSpeechInWorking()
@@ -34,10 +35,11 @@ bool VTextSpeechAndTrManager::isTextToSpeechInWorking()
 
     QDBusReply<bool> stopReadingStateRet = QDBusConnection::sessionBus().call(stopReadingMsg, QDBus::BlockWithGui);
     if (stopReadingStateRet.isValid()) {
-        return stopReadingStateRet.value();
+        isSpeeching = stopReadingStateRet.value();
     } else {
-        return false;
+        isSpeeching = false;
     }
+    return isSpeeching;
 }
 
 // 检测语音朗读开关是否打开
@@ -92,12 +94,16 @@ bool VTextSpeechAndTrManager::getTransEnable()
 void VTextSpeechAndTrManager::onTextToSpeech()
 {
     QProcess::startDetached("dbus-send  --print-reply --dest=com.iflytek.aiassistant /aiassistant/deepinmain com.iflytek.aiassistant.mainWindow.TextToSpeech");
+    isSpeeching = true;
 }
 
 // 停止语音朗读
 void VTextSpeechAndTrManager::onStopTextToSpeech()
 {
-    QProcess::startDetached("dbus-send  --print-reply --dest=com.iflytek.aiassistant /aiassistant/tts com.iflytek.aiassistant.tts.stopTTSDirectly");
+    if(isSpeeching){
+        QProcess::startDetached("dbus-send  --print-reply --dest=com.iflytek.aiassistant /aiassistant/tts com.iflytek.aiassistant.tts.stopTTSDirectly");
+        isSpeeching = false;
+    }
 }
 
 // 语音听写
