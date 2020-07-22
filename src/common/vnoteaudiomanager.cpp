@@ -116,7 +116,7 @@ void VNoteAudioManager::updateAudioInputParam()
     if (m_pAudioRecord->state() == QMediaRecorder::StoppedState) {
         m_pAudioRecord->setAudioInput(m_pAudioRecord->defaultAudioInput());
 
-        //Only need update settting when setting be changed.
+        //Only need update setting when setting be changed.
         if (m_pAudioRecord->audioSettings() != m_audioEncoderSetting) {
             m_pAudioRecord->setEncodingSettings(m_audioEncoderSetting
                                                 , QVideoEncoderSettings()
