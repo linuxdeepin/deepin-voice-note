@@ -28,17 +28,20 @@ static bool isSpeeching = false;
 // 检测是否在朗读文本
 bool VTextSpeechAndTrManager::isTextToSpeechInWorking()
 {
-    QDBusMessage stopReadingMsg = QDBusMessage::createMethodCall("com.iflytek.aiassistant",
-                                                      "/aiassistant/tts",
-                                                      "com.iflytek.aiassistant.tts",
-                                                      "isTTSInWorking");
+    if(isSpeeching){
+        QDBusMessage stopReadingMsg = QDBusMessage::createMethodCall("com.iflytek.aiassistant",
+                                                          "/aiassistant/tts",
+                                                          "com.iflytek.aiassistant.tts",
+                                                          "isTTSInWorking");
 
-    QDBusReply<bool> stopReadingStateRet = QDBusConnection::sessionBus().call(stopReadingMsg, QDBus::BlockWithGui);
-    if (stopReadingStateRet.isValid()) {
-        isSpeeching = stopReadingStateRet.value();
-    } else {
-        isSpeeching = false;
+        QDBusReply<bool> stopReadingStateRet = QDBusConnection::sessionBus().call(stopReadingMsg, QDBus::BlockWithGui);
+        if (stopReadingStateRet.isValid()) {
+            isSpeeching = stopReadingStateRet.value();
+        } else {
+            isSpeeching = false;
+        }
     }
+
     return isSpeeching;
 }
 
