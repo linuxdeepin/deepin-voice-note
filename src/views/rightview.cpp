@@ -973,14 +973,16 @@ void RightView::delSelectText()
 
 void RightView::clearAllSelection()
 {
-    for (int i = 0; i < m_viewportLayout->count() - 1 ; i++) {
-        QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
-        DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
-        widget->clearSelection();
+    if(m_selectWidget.size()){
+        QMutableMapIterator<ItemWidgetType,
+                DetailItemWidget*> it(m_selectWidget);
+        while (it.hasNext()) {
+            it.next();
+            it.value()->clearSelection();
+        }
+        closeMenu();
+        m_selectWidget.clear();
     }
-
-    closeMenu();
-    m_selectWidget.clear();
 }
 
 void RightView::selectAllItem()
