@@ -191,6 +191,10 @@ void ActionManager::initMenu()
         m_detialContextMenu->addAction(pAction);
         m_actionsMap.insert(static_cast<ActionKind>(detailMenuIdStart), pAction);
 
+        if(detailMenuIdStart == DetailPaste){
+             m_detialContextMenu->addSeparator();
+        }
+
         detailMenuIdStart++;
     }
 }
