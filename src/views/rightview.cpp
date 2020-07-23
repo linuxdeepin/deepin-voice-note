@@ -744,6 +744,13 @@ void RightView::mousePressEvent(QMouseEvent *event)
                 widget->selectAllText();
                 m_selectWidget.insert(VoicePlugin, widget);
                 m_curItemWidget = widget;
+                QString selecText = m_curItemWidget->getSelectFragment().toPlainText();
+                if(!selecText.isEmpty()){
+                    QClipboard *board = QApplication::clipboard();
+                    if(board){
+                        board->setText(selecText,QClipboard::Selection);
+                    }
+                }
             }
         }
 
@@ -762,7 +769,6 @@ void RightView::mousePressEvent(QMouseEvent *event)
         if(m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Voice){
             if(widget && !m_curItemWidget->isTextContainsPos(event->globalPos())){
                 m_curItemWidget->selectAllText();
-                m_selectWidget.insert(VoicePlugin, m_curItemWidget);
             }
         }
     }
@@ -792,10 +798,14 @@ void RightView::mouseReleaseEvent(QMouseEvent *event)
                 selecText.append(widget->getSelectFragment().toPlainText());
             }  
         }
-        QClipboard *board = QApplication::clipboard();
-        if(board){
-            board->setText(selecText,QClipboard::Selection);
+
+        if(!selecText.isEmpty()){
+            QClipboard *board = QApplication::clipboard();
+            if(board){
+                board->setText(selecText,QClipboard::Selection);
+            }
         }
+
     }
 
     if(m_curItemWidget){
@@ -982,6 +992,11 @@ void RightView::clearAllSelection()
         }
         closeMenu();
         m_selectWidget.clear();
+        QClipboard *board = QApplication::clipboard();
+        if(board){
+            board->clear(QClipboard::Selection);
+            board->clear(QClipboard::Clipboard);
+        }
     }
 }
 
