@@ -265,7 +265,6 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
         return;
     }
 
-    VTextSpeechAndTrManager::onStopTextToSpeech();
     while (m_viewportLayout->indexOf(m_placeholderWidget) != 0) {
         QLayoutItem *layoutItem = m_viewportLayout->takeAt(0);
         QWidget *widget = layoutItem->widget();
@@ -991,12 +990,15 @@ void RightView::clearAllSelection()
             it.value()->clearSelection();
         }
         closeMenu();
+        VTextSpeechAndTrManager::onStopTextToSpeech();
+
         m_selectWidget.clear();
         QClipboard *board = QApplication::clipboard();
         if(board){
             board->clear(QClipboard::Selection);
             board->clear(QClipboard::Clipboard);
         }
+
     }
 }
 
