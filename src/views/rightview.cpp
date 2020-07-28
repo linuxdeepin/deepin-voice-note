@@ -996,9 +996,7 @@ void RightView::clearAllSelection()
         QClipboard *board = QApplication::clipboard();
         if(board){
             board->clear(QClipboard::Selection);
-            board->clear(QClipboard::Clipboard);
         }
-
     }
 }
 
