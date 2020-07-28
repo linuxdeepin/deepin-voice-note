@@ -968,6 +968,9 @@ void RightView::delSelectText()
             delListWidget.push_back(widget);
         }
     }
+
+    clearAllSelection();
+
     int size = delListWidget.size();
     if (size) {
         for (int i = 0; i < size; i++) {
@@ -975,9 +978,7 @@ void RightView::delSelectText()
             delWidget(delListWidget[i], merge);
         }
     }
-
     updateData();
-    clearAllSelection();
 }
 
 void RightView::clearAllSelection()
