@@ -40,6 +40,7 @@
 
 #include "common/utils.h"
 #include "common/actionmanager.h"
+#include "common/setting.h"
 
 #include "db/vnotefolderoper.h"
 #include "db/vnoteitemoper.h"
@@ -92,11 +93,6 @@ VNoteMainWindow::~VNoteMainWindow()
     release();
 }
 
-QSharedPointer<QSettings> VNoteMainWindow::appSetting() const
-{
-    return m_qspSetting;
-}
-
 void VNoteMainWindow::initUI()
 {
     initTitleBar();
@@ -115,10 +111,10 @@ void VNoteMainWindow::initAppSetting()
     //TODO:
     //    Call app init in main window,so we can
     //put our config file to deepin's own dir.
-    VNoteApplication* app = reinterpret_cast<VNoteApplication *>(qApp);
-    app->initAppSetting();
+//    VNoteApplication* app = reinterpret_cast<VNoteApplication *>(qApp);
+//    app->initAppSetting();
 
-    m_qspSetting = app->appSetting();
+//    m_qspSetting = app->appSetting();
 }
 
 void VNoteMainWindow::initConnections()
@@ -477,7 +473,7 @@ void VNoteMainWindow::initMainView()
     initUpgradeView();
     m_stackedWidget->insertWidget(WndUpgrade, m_upgradeView);
 
-    int upgradeState = UpgradeDbUtil::readUpgradeState(*m_qspSetting.get());
+    int upgradeState = UpgradeDbUtil::readUpgradeState();
 
     UpgradeDbUtil::checkUpdateState(upgradeState);
 
@@ -1760,8 +1756,7 @@ void VNoteMainWindow::release()
 {
     //Save main window size
     if (!isMaximized()) {
-        m_qspSetting->setValue(VNOTE_MAINWND_SZ_KEY, saveGeometry());
-        m_qspSetting->sync();
+       setting::instance()->setOption(VNOTE_MAINWND_SZ_KEY, saveGeometry());
     }
     VTextSpeechAndTrManager::onStopTextToSpeech();
     m_rightView->saveNote();

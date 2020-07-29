@@ -23,7 +23,6 @@
 
 #include <QShowEvent>
 #include <QWidget>
-#include <QSettings>
 
 #include <DLabel>
 #include <DWaterProgress>
@@ -45,13 +44,9 @@ public slots:
     void onUpgradeFinish();
 protected:
     void initConnections();
-    void initAppSetting();
 private:
     DWaterProgress *m_waterProgress {nullptr};
     DLabel         *m_tooltipTextLabel {nullptr};
-
-    //App setting
-    QSharedPointer<QSettings> m_qspSetting {nullptr};
 };
 
 #endif // UPGRADEVIEW_H

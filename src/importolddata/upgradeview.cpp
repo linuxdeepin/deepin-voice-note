@@ -23,6 +23,7 @@
 #include "importolddata/olddataloadwokers.h"
 #include "importolddata/upgradedbutil.h"
 #include "vnoteapplication.h"
+#include "setting.h"
 
 #include <QVBoxLayout>
 
@@ -58,14 +59,12 @@ UpgradeView::UpgradeView(QWidget *parent)
     vbox->addStretch();
 
     initConnections();
-
-    initAppSetting();
 }
 
 void UpgradeView::startUpgrade()
 {
     //Update the upgrade state to loading data
-    UpgradeDbUtil::saveUpgradeState(*m_qspSetting.get(), UpgradeDbUtil::Loading);
+    UpgradeDbUtil::saveUpgradeState(UpgradeDbUtil::Loading);
 
     VNoteOldDataManager::instance()->reqDatas();
 }
@@ -84,13 +83,13 @@ void UpgradeView::onDataReady()
 
     if (foldersCount > 0) {
         //Update the upgrade state to Processing.
-        UpgradeDbUtil::saveUpgradeState(*m_qspSetting.get(), UpgradeDbUtil::Processing);
+        UpgradeDbUtil::saveUpgradeState(UpgradeDbUtil::Processing);
 
         VNoteOldDataManager::instance()->doUpgrade();
     } else {
         qInfo() << "There is no data in old database...stop upgrade.";
         //Update the upgrade state to UpdateDone if no data available.
-        UpgradeDbUtil::saveUpgradeState(*m_qspSetting.get(), UpgradeDbUtil::UpdateDone);
+        UpgradeDbUtil::saveUpgradeState(UpgradeDbUtil::UpdateDone);
 
         VNoteOldDataManager::instance()->upgradeFinish();
     }
@@ -101,7 +100,7 @@ void UpgradeView::onUpgradeFinish()
     qInfo() << "End upgrade old data to new version.";
 
     //Update the upgrade state
-    UpgradeDbUtil::saveUpgradeState(*m_qspSetting.get(), UpgradeDbUtil::UpdateDone);
+    UpgradeDbUtil::saveUpgradeState(UpgradeDbUtil::UpdateDone);
 
     //We don't need Data manager anymore, release it.
     VNoteOldDataManager::releaseInstance();
@@ -125,11 +124,4 @@ void UpgradeView::initConnections()
             , this, &UpgradeView::setProgress, Qt::QueuedConnection);
     connect(VNoteOldDataManager::instance(), &VNoteOldDataManager::upgradeFinish
             , this, &UpgradeView::onUpgradeFinish, Qt::QueuedConnection);
-}
-
-void UpgradeView::initAppSetting()
-{
-    VNoteApplication* app = reinterpret_cast<VNoteApplication *>(qApp);
-
-    m_qspSetting = app->appSetting();
 }

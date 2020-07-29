@@ -38,8 +38,8 @@ public:
         UpdateDone,
     };
 
-    static void saveUpgradeState(QSettings& setting, int state);
-    static int  readUpgradeState(QSettings& setting);
+    static void saveUpgradeState(int state);
+    static int  readUpgradeState();
 
     static bool needUpdateOldDb(int state);
     static void checkUpdateState(int state);

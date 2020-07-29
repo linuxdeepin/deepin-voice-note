@@ -25,8 +25,6 @@
 #include <QVBoxLayout>
 #include <QList>
 #include <QShortcut>
-#include <QMovie>
-#include <QSettings>
 #include <QMultiMap>
 #include <QList>
 
@@ -116,7 +114,6 @@ private:
     void initConnection();
     void initMenu();
     void onMenuShow(DetailItemWidget *widget);
-    void initAppSetting();
 
     bool        checkFileExist(const QString &file);
     DetailItemWidget *getWidgetByPos(const QPoint &pos);
@@ -134,9 +131,6 @@ private:
     bool         m_isFristTextChange {false};
 
     QTimer       *m_playAnimTimer {nullptr};
-
-    //App setting, reference to VNoteApplication's setting
-    QSharedPointer<QSettings> m_qspSetting {nullptr};
 
     MultiMapWidget m_selectWidget;
     QString        m_searchKey {""};

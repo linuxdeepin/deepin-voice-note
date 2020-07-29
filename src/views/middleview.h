@@ -22,8 +22,6 @@
 #ifndef MIDDLEVIEW_H
 #define MIDDLEVIEW_H
 
-#include <QSettings>
-
 #include <DListView>
 #include <DMenu>
 #include <DLabel>
@@ -73,7 +71,6 @@ private:
     void initModel();
     void initMenu();
     void initUI();
-    void initAppSetting();
 
     bool                m_onlyCurItemMenuEnable {false};
     qint64              m_currentId {-1};
@@ -83,9 +80,6 @@ private:
     QStandardItemModel *m_pDataModel {nullptr};
     MiddleViewDelegate *m_pItemDelegate {nullptr};
     MiddleViewSortFilter *m_pSortViewFilter {nullptr};
-
-    //App setting, reference to VNoteApplication's setting
-    QSharedPointer<QSettings> m_qspSetting {nullptr};
 };
 
 #endif // MIDDLEVIEW_H

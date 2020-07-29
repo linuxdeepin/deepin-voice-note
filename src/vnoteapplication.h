@@ -22,8 +22,6 @@
 #define VNOTEAPPLICATION_H
 #include "views/vnotemainwindow.h"
 
-#include <QSettings>
-
 #include <DApplication>
 
 DWIDGET_USE_NAMESPACE
@@ -41,8 +39,6 @@ public:
      * dir,we should call the this function in main window.
      * We can't get correct path when app's consturctor.
      * */
-    void initAppSetting();
-    QSharedPointer<QSettings> appSetting() const;
     VNoteMainWindow* mainWindow() const;
 signals:
 
@@ -52,9 +48,6 @@ protected:
     virtual void handleQuitAction() override;
 protected:
     QScopedPointer<VNoteMainWindow> m_qspMainWnd {nullptr};
-
-    //App setting
-    QSharedPointer<QSettings> m_qspSetting {nullptr};
 };
 
 #endif // VNOTEAPPLICATION_H

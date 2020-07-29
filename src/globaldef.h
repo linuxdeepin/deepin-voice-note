@@ -47,9 +47,9 @@
 #define AUDIO_DEV_CHECK_TIME 1000
 
 //********App setting data key****************
-#define VNOTE_MAINWND_SZ_KEY "_app_main_wnd_sz_key_"
-#define VNOTE_EXPORT_TEXT_PATH_KEY "_app_export_text_path_key"
-#define VNOTE_EXPORT_VOICE_PATH_KEY "_app_export_voice_path_key"
+#define VNOTE_MAINWND_SZ_KEY "old._app_main_wnd_sz_key_"
+#define VNOTE_EXPORT_TEXT_PATH_KEY "old._app_export_text_path_key"
+#define VNOTE_EXPORT_VOICE_PATH_KEY "old._app_export_voice_path_key"
 //********************************************
 
 //Time format

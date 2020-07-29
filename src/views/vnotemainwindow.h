@@ -26,7 +26,6 @@
 #include "globaldef.h"
 
 #include <QShortcut>
-#include <QSettings>
 #include <QStandardItem>
 #include <QList>
 #include <QDBusPendingReply>
@@ -65,7 +64,6 @@ class VNoteMainWindow : public DMainWindow, public OpsStateInterface
 public:
     VNoteMainWindow(QWidget *parent = nullptr);
     virtual ~VNoteMainWindow() override;
-    QSharedPointer<QSettings> appSetting() const ;
     bool checkIfNeedExit();
 
     enum WindowType {
@@ -218,8 +216,6 @@ private:
     DStackedWidget *m_stackedWidget {nullptr};
     bool            m_rightViewHasFouse {true};
 
-    //App setting, reference to VNoteApplication's setting
-    QSharedPointer<QSettings> m_qspSetting {nullptr};
     //Shortcuts key
     //*****************Shortcut key begin*********************
     QScopedPointer<QShortcut> m_stNewNotebook;   //Ctrl+N

@@ -27,6 +27,7 @@
 #include "common/actionmanager.h"
 #include "common/standarditemcommon.h"
 #include "task/exportnoteworker.h"
+#include "common/setting.h"
 
 #include <QMouseEvent>
 #include <QVBoxLayout>
@@ -42,7 +43,6 @@ MiddleView::MiddleView(QWidget *parent)
     initDelegate();
     initMenu();
     initUI();
-    initAppSetting();
 }
 
 void MiddleView::initModel()
@@ -164,7 +164,7 @@ void MiddleView::saveAsText()
         dialog.setLabelText(DFileDialog::Accept, DApplication::translate("MiddleView", "Save"));
         dialog.setNameFilter("TXT(*.txt)");
 
-        QString historyDir = m_qspSetting->value(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
+        QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
         if (historyDir.isEmpty()) {
             historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
         }
@@ -172,7 +172,7 @@ void MiddleView::saveAsText()
 
         if (QDialog::Accepted == dialog.exec()) {
             // save the directory string to config file.
-            m_qspSetting->setValue(VNOTE_EXPORT_TEXT_PATH_KEY, dialog.directoryUrl().toLocalFile());
+            setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, dialog.directoryUrl().toLocalFile());
 
             QString exportDir = dialog.directoryUrl().toLocalFile();
             ExportNoteWorker *exportWorker = new ExportNoteWorker(
@@ -199,7 +199,7 @@ void MiddleView::saveRecords()
         dialog.setLabelText(DFileDialog::Accept, DApplication::translate("MiddleView", "Save"));
         dialog.setNameFilter("MP3(*.mp3)");
 
-        QString historyDir = m_qspSetting->value(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
+        QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
         if (historyDir.isEmpty()) {
             historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
         }
@@ -207,7 +207,7 @@ void MiddleView::saveRecords()
 
         if (QDialog::Accepted == dialog.exec()) {
             // save the directory string to config file.
-            m_qspSetting->setValue(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
+            setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
 
             QString exportDir = dialog.directoryUrl().toLocalFile();
 
@@ -301,11 +301,6 @@ void MiddleView::initUI()
     layout->addWidget(m_emptySearch);
     this->setLayout(layout);
 //    this->installEventFilter(this);
-}
-
-void MiddleView::initAppSetting()
-{
-    m_qspSetting = reinterpret_cast<VNoteApplication *>(qApp)->appSetting();
 }
 
 void MiddleView::setVisibleEmptySearch(bool visible)

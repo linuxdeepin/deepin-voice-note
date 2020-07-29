@@ -33,6 +33,7 @@
 #include "task/exportnoteworker.h"
 #include "common/opsstateinterface.h"
 #include "db/vnoteitemoper.h"
+#include "common/setting.h"
 
 #include "dialog/vnotemessagedialog.h"
 
@@ -59,7 +60,6 @@ RightView::RightView(QWidget *parent)
 {
     initUi();
     initMenu();
-    initAppSetting();
     initConnection();
 }
 
@@ -94,11 +94,6 @@ void RightView::initMenu()
 {
     //Init voice context Menu
     m_noteDetailContextMenu = ActionManager::Instance()->detialContextMenu();
-}
-
-void RightView::initAppSetting()
-{
-    m_qspSetting = reinterpret_cast<VNoteApplication *>(qApp)->appSetting();
 }
 
 DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextCursor::MoveOperation op, QString reg)
@@ -1143,14 +1138,14 @@ void RightView::saveMp3()
 
             dialog.setLabelText(DFileDialog::Accept, DApplication::translate("RightView", "Save"));
             dialog.setNameFilter("MP3(*.mp3)");
-            QString historyDir = m_qspSetting->value(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
+            QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
             if (historyDir.isEmpty()) {
                 historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
             }
             dialog.setDirectory(historyDir);
             if (QDialog::Accepted == dialog.exec()) {
                 // save the directory string to config file.
-                m_qspSetting->setValue(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
+                setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
 
                 QString exportDir = dialog.directoryUrl().toLocalFile();
 

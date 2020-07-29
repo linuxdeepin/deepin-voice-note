@@ -26,25 +26,26 @@
 #include "common/vnoteforlder.h"
 #include "common/vnoteitem.h"
 #include "globaldef.h"
+#include "setting.h"
 
 #include <DLog>
 
-const QString UpgradeDbUtil::UPGRADE_STATE = "UpgradeDb/importOldDbState";
+const QString UpgradeDbUtil::UPGRADE_STATE = "old.UpgradeDb/importOldDbState";
 
 UpgradeDbUtil::UpgradeDbUtil()
 {
 }
 
-void UpgradeDbUtil::saveUpgradeState(QSettings &setting, int state)
+void UpgradeDbUtil::saveUpgradeState(int state)
 {
-    setting.setValue(UPGRADE_STATE, state);
+    setting::instance()->setOption(UPGRADE_STATE, state);
 }
 
-int UpgradeDbUtil::readUpgradeState(QSettings &setting)
+int UpgradeDbUtil::readUpgradeState()
 {
     int state = Invalid;
 
-    state = setting.value(UPGRADE_STATE, state).toInt();
+    state = setting::instance()->getOption(UPGRADE_STATE).toInt();
 
     return state;
 }
