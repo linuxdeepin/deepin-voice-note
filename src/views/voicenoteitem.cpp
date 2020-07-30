@@ -227,6 +227,7 @@ void VoiceNoteItem::onAsrTextChange()
         height += docHeight + 10;
     }
     this->setFixedHeight(height);
+    emit sigCursorHeightChange(this, height);
 }
 
 void VoiceNoteItem::onChangeTheme()

@@ -98,6 +98,7 @@ public:
 signals:
     void sigPlayBtnClicked(VoiceNoteItem *item);
     void sigPauseBtnClicked(VoiceNoteItem *item);
+    void sigCursorHeightChange(QWidget *widget, int height);
 
 public slots:
     void onPlayBtnClicked();

@@ -161,6 +161,8 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
 
     connect(item, &VoiceNoteItem::sigPlayBtnClicked, this, &RightView::onVoicePlay);
     connect(item, &VoiceNoteItem::sigPauseBtnClicked, this, &RightView::onVoicePause);
+    connect(item, &VoiceNoteItem::sigCursorHeightChange, this, &RightView::adjustVerticalScrollBar);
+
     QTextDocumentFragment cutStr;
     int curIndex = m_viewportLayout->indexOf(m_curItemWidget);
     VNoteBlock *curBlock = m_curItemWidget->getNoteBlock();
@@ -312,6 +314,7 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
                 m_curItemWidget = item;
                 connect(item, &VoiceNoteItem::sigPlayBtnClicked, this, &RightView::onVoicePlay);
                 connect(item, &VoiceNoteItem::sigPauseBtnClicked, this, &RightView::onVoicePause);
+                connect(item, &VoiceNoteItem::sigCursorHeightChange, this, &RightView::adjustVerticalScrollBar);
             }
         }
     } else {
