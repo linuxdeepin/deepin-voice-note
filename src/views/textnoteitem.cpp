@@ -186,6 +186,7 @@ void TextNoteItem::pasteText()
     QClipboard *board = QApplication::clipboard();
     if (board) {
         QString clipBoardText = board->text();
+        clipBoardText.replace('\t', ' ');
         m_textEdit->insertPlainText(clipBoardText);
     }
 }

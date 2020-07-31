@@ -21,6 +21,7 @@
 
 #include "textnoteedit.h"
 #include <QWheelEvent>
+#include <QTextBlock>
 #include <DFontSizeManager>
 #include <DApplicationHelper>
 #include <QDebug>
@@ -74,6 +75,11 @@ void TextNoteEdit::keyPressEvent(QKeyEvent *e)
 
     if(e->modifiers() == Qt::ControlModifier || key == Qt::Key_Delete){
         e->ignore();
+        return;
+    }
+
+    if(key == Qt::Key_Tab && e->modifiers() == Qt::NoModifier){
+        indentText();
         return;
     }
 
@@ -141,12 +147,12 @@ void TextNoteEdit::removeSelectText()
     textCursor.removeSelectedText();
 }
 
-bool TextNoteEdit::eventFilter(QObject *o, QEvent *e)
+void TextNoteEdit::indentText()
 {
-    Q_UNUSED(o);
-    if(e->type() == QEvent::FontChange){
-        QFontMetrics metrics(this->font());
-        this->setTabStopWidth(4 * metrics.width(' '));
-    }
-    return  false;
+    QTextCursor cursor = textCursor();
+    cursor.beginEditBlock();
+    int indent = 4 - (cursor.positionInBlock() % 4);
+    QString spaces(indent, ' ');
+    cursor.insertText(spaces);
+    cursor.endEditBlock();
 }

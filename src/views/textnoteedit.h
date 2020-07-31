@@ -46,6 +46,7 @@ signals:
 
 private:
      bool m_menuPop {false};
+     void indentText();
 protected:
     void focusInEvent(QFocusEvent *e) override;
     void focusOutEvent(QFocusEvent *e) override;
@@ -56,7 +57,6 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
-    bool eventFilter(QObject *o, QEvent *e) override;
 };
 
 #endif // TEXTEDITITEM_H
