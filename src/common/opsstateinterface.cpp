@@ -19,12 +19,31 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "opsstateinterface.h"
-#include "vnoteapplication.h"
-
+#include <DSysInfo>
 #include <DLog>
+
+DCORE_USE_NAMESPACE
+
+static OpsStateInterface* objectInstance = nullptr;
 
 OpsStateInterface::OpsStateInterface()
 {
+    bool fAiServiceExist = false;
+    DSysInfo::DeepinType deepinType = DSysInfo::deepinType();
+    switch (deepinType) {
+    case DSysInfo::DeepinProfessional:
+    case DSysInfo::DeepinPersonal:
+        fAiServiceExist = true;
+        break;
+    default:
+        break;
+    }
+    QString systemInfo = QString("[%1-%2]")
+               .arg(DSysInfo::operatingSystemName())
+               .arg(DSysInfo::deepinTypeDisplayName());
+
+    qInfo() << systemInfo << " IsAvailable use voice to text:" << fAiServiceExist;
+    operState(StateAISrvAvailable,fAiServiceExist);
 
 }
 
@@ -73,7 +92,10 @@ bool OpsStateInterface::isAiSrvExist() const
     return (m_states & (1<<StateAISrvAvailable));
 }
 
-OpsStateInterface *gVNoteOpsStates()
+OpsStateInterface* OpsStateInterface:: instance()
 {
-    return reinterpret_cast<VNoteApplication*>(qApp)->mainWindow();
+    if(objectInstance == nullptr){
+        objectInstance = new OpsStateInterface;
+    }
+    return  objectInstance;
 }

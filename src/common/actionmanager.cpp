@@ -19,6 +19,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "actionmanager.h"
+#include "common/opsstateinterface.h"
 
 #include <DApplication>
 #include <QSignalMapper>
@@ -123,6 +124,7 @@ void ActionManager::resetCtxMenu(ActionManager::MenuType type, bool enable)
 
 void ActionManager::initMenu()
 {
+    bool isAISrvAvailable = OpsStateInterface::instance()->isAiSrvExist();
     //Notebook context menu
     QStringList notebookMenuTexts;
     notebookMenuTexts << DApplication::translate("NotebookContextMenu", "Rename")
@@ -179,7 +181,6 @@ void ActionManager::initMenu()
                         << DApplication::translate("NoteDetailContextMenu", "Speech to Text")
                         << DApplication::translate("NoteDetailContextMenu", "Translate");
 
-
     m_detialContextMenu.reset(new DMenu());
 
     int detailMenuIdStart = ActionKind::NoteDetailMenuBase;
@@ -190,11 +191,14 @@ void ActionManager::initMenu()
 
         m_detialContextMenu->addAction(pAction);
         m_actionsMap.insert(static_cast<ActionKind>(detailMenuIdStart), pAction);
-
-        if(detailMenuIdStart == DetailPaste){
-             m_detialContextMenu->addSeparator();
+        if(!isAISrvAvailable){
+            if(detailMenuIdStart == DetailVoice2Text
+                    || detailMenuIdStart > DetailPaste){
+                pAction->setVisible(false);
+            }
+        }else if (detailMenuIdStart == DetailPaste) {
+            m_detialContextMenu->addSeparator();
         }
-
         detailMenuIdStart++;
     }
 }

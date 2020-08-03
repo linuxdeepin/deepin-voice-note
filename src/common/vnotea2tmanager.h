@@ -38,9 +38,6 @@ class VNoteA2TManager : public QObject
     Q_OBJECT
 public:
     explicit VNoteA2TManager(QObject *parent = nullptr);
-
-    //Check whether the aiservice exist or not
-    bool checkAiService() const;
     /*
      * Reference AIService接口及错误码定义.doc for detail
      *

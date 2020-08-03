@@ -32,30 +32,6 @@ VNoteA2TManager::VNoteA2TManager(QObject *parent)
 
 }
 
-bool VNoteA2TManager::checkAiService() const
-{
-    bool fAiServiceExist = false;
-
-    DSysInfo::DeepinType deepinType = DSysInfo::deepinType();
-    switch (deepinType) {
-    case DSysInfo::DeepinProfessional:
-    case DSysInfo::DeepinPersonal:
-        fAiServiceExist = true;
-        break;
-    default:
-        break;
-    }
-
-
-    QString systemInfo = QString("[%1-%2]")
-               .arg(DSysInfo::operatingSystemName())
-               .arg(DSysInfo::deepinTypeDisplayName());
-
-    qInfo() << systemInfo << " IsAvailable use voice to text:" << fAiServiceExist;
-
-    return fAiServiceExist;
-}
-
 int VNoteA2TManager::initSession()
 {
     m_session.reset(new com::iflytek::aiservice::session(

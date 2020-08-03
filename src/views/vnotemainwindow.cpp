@@ -69,6 +69,8 @@
 #include <DStatusBar>
 #include <DTitlebar>
 
+static OpsStateInterface *stateOperation = nullptr;
+
 VNoteMainWindow::VNoteMainWindow(QWidget *parent)
     : DMainWindow(parent)
 {
@@ -108,13 +110,7 @@ void VNoteMainWindow::initData()
 
 void VNoteMainWindow::initAppSetting()
 {
-    //TODO:
-    //    Call app init in main window,so we can
-    //put our config file to deepin's own dir.
-//    VNoteApplication* app = reinterpret_cast<VNoteApplication *>(qApp);
-//    app->initAppSetting();
-
-//    m_qspSetting = app->appSetting();
+    stateOperation = OpsStateInterface::instance();
 }
 
 void VNoteMainWindow::initConnections()
@@ -202,10 +198,10 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNotebook->setAutoRepeat(false);
 
     connect(m_stNewNotebook.get(), &QShortcut::activated, this, [this] {
-        if (!(isRecording()
-              || isPlaying()
-              || isVoice2Text()
-              || isSearching())
+        if (!(stateOperation->isRecording()
+              || stateOperation->isPlaying()
+              || stateOperation->isVoice2Text()
+              || stateOperation->isSearching())
                 ) {
             onNewNotebook();
 
@@ -226,7 +222,7 @@ void VNoteMainWindow::initShortcuts()
     connect(m_stRemNotebook.get(), &QShortcut::activated, this, [this] {
         if (canDoShortcutAction())
         {
-            if (!isSearching()) {
+            if (!stateOperation->isSearching()) {
                 editNotepad();
             }
         }
@@ -241,10 +237,10 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stNewNote.get(), &QShortcut::activated, this, [this] {
         if (canDoShortcutAction()
-                && !( isRecording()
-                      || isPlaying()
-                      || isVoice2Text()
-                      || isSearching()
+                && !( stateOperation->isRecording()
+                      || stateOperation->isPlaying()
+                      || stateOperation->isVoice2Text()
+                      || stateOperation->isSearching()
                       )
                 ) {
             onNewNote();
@@ -301,7 +297,7 @@ void VNoteMainWindow::initShortcuts()
         //Call method in rightview
         if (canDoShortcutAction())
         {
-            if (!isVoice2Text() && isAiSrvExist()) {
+            if (!stateOperation->isVoice2Text() && stateOperation->isAiSrvExist()) {
                 this->onA2TStart();
             }
         }
@@ -352,7 +348,7 @@ void VNoteMainWindow::initShortcuts()
         if (canDoShortcutAction())
         {
             //Can't save recording when do recording.
-            if (!isRecording()) {
+            if (!stateOperation->isRecording()) {
                 VNoteItem *currNote = m_middleView->getCurrVNotedata();
                 if (nullptr != currNote) {
                     if (currNote->haveVoice()) {
@@ -381,14 +377,16 @@ void VNoteMainWindow::initShortcuts()
              * or do nothing.
              * */
             if (m_leftView->hasFocus()) {
-                if (!isRecording() && !isVoice2Text() && !isPlaying()) {
+                if (!stateOperation->isRecording()
+                        && !stateOperation->isVoice2Text()
+                        && !stateOperation->isPlaying()) {
                     deleteAct = ActionManager::Instance()->getActionById(
                                 ActionManager::NotebookDelete);
                 }
             } else if (m_middleView->hasFocus()) {
-                if (!isRecording()
-                        && !isVoice2Text()
-                        && !isPlaying()
+                if (!stateOperation->isRecording()
+                        && !stateOperation->isVoice2Text()
+                        && !stateOperation->isPlaying()
                         && m_middleView->count() > 0) {
                     deleteAct = ActionManager::Instance()->getActionById(
                                 ActionManager::NoteDelete);
@@ -694,20 +692,7 @@ void VNoteMainWindow::releaseHaltLock()
 
 void VNoteMainWindow::initDelayWork()
 {
-    //Check aiservice state
-    bool fExist = m_a2tManager->checkAiService();
-    operState(OpsStateInterface::StateAISrvAvailable, fExist);
-
-    //TODO:
-    //    If Aiservice don't exist, hide the voice2text menuitem.
-    //Community verson don't have aiservice.
-    if (!isAiSrvExist()) {
-        QAction *a2tAction = ActionManager::Instance()->getActionById(
-                                 ActionManager::DetailVoice2Text);
-        if (nullptr != a2tAction) {
-            a2tAction->setVisible(false);
-        }
-    }
+   ;
 }
 
 void VNoteMainWindow::delayInitTasks()
@@ -883,7 +868,7 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
     //Release shutdonw locker
     releaseHaltLock();
 
-    if (isAppQuit()) {
+    if (stateOperation->isAppQuit()) {
         release();
         exit(0);
     }
@@ -1099,8 +1084,8 @@ void VNoteMainWindow::onPreviewShortcut()
 void VNoteMainWindow::closeEvent(QCloseEvent *event)
 {
     if (checkIfNeedExit()) {
-        if (isRecording()) {
-            operState(OpsStateInterface::StateAppQuit, true);
+        if (stateOperation->isRecording()) {
+            stateOperation->operState(OpsStateInterface::StateAppQuit, true);
             m_recordBar->cancelRecord();
             event->ignore();
         } else {
@@ -1141,11 +1126,11 @@ bool VNoteMainWindow::checkIfNeedExit()
     bool bNeedExit = true;
 
     //Is audio converting to text
-    if (isVoice2Text()) {
+    if (stateOperation->isVoice2Text()) {
         pspMessageDialg.reset(new VNoteMessageDialog(
                                   VNoteMessageDialog::AborteAsr,
                                   this));
-    } else if (isRecording()) { //Is recording
+    } else if (stateOperation->isRecording()) { //Is recording
         pspMessageDialg.reset(new VNoteMessageDialog(
                                   VNoteMessageDialog::AbortRecord,
                                   this));
@@ -1168,7 +1153,7 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
 
-    if (data == nullptr || isSearching()) {
+    if (data == nullptr || stateOperation->isSearching()) {
         m_recordBar->setVisible(false);
     } else {
         m_recordBar->setVisible(true);
@@ -1278,14 +1263,16 @@ void VNoteMainWindow::onMenuAbout2Show()
     if (menu == ActionManager::Instance()->noteContextMenu()) {
         ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteCtxMenu);
 
-        if (isPlaying() || isRecording() || isVoice2Text()) {
+        if (stateOperation->isPlaying()
+                || stateOperation->isRecording()
+                || stateOperation->isVoice2Text()) {
             ActionManager::Instance()->enableAction(ActionManager::NoteAddNew, false);
             ActionManager::Instance()->enableAction(ActionManager::NoteDelete, false);
 
-            if (isRecording()) {
+            if (stateOperation->isRecording()) {
                 ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
             }
-        } else if (isSearching()) {
+        } else if (stateOperation->isSearching()) {
             ActionManager::Instance()->enableAction(ActionManager::NoteAddNew, false);
         }
 
@@ -1305,7 +1292,9 @@ void VNoteMainWindow::onMenuAbout2Show()
     } else if (menu == ActionManager::Instance()->notebookContextMenu()) {
         ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NotebookCtxMenu);
 
-        if (isPlaying() || isRecording() || isVoice2Text()) {
+        if (stateOperation->isPlaying()
+                || stateOperation->isRecording()
+                || stateOperation->isVoice2Text()) {
             ActionManager::Instance()->enableAction(ActionManager::NotebookAddNew, false);
             ActionManager::Instance()->enableAction(ActionManager::NotebookDelete, false);
         }
@@ -1413,7 +1402,7 @@ void VNoteMainWindow::delNote()
         noteOper.deleteNote();
 
         //Refresh the middle view
-        if (m_middleView->rowCount() <= 0 && isSearching()) {
+        if (m_middleView->rowCount() <= 0 && stateOperation->isSearching()) {
             m_middleView->setVisibleEmptySearch(true);
         }
 
@@ -1548,8 +1537,8 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
 {
     switch (status) {
     case SearchStart:
-        if(!isSearching()){
-            operState(StateSearching, true);
+        if(!stateOperation->isSearching()){
+            stateOperation->operState(OpsStateInterface::StateSearching, true);
             m_leftView->clearSelection();
             m_leftView->setEnabled(false);
             m_addNotepadBtn->setVisible(false);
@@ -1557,22 +1546,22 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         }
         break;
     case SearchEnd:
-        if(isSearching()){
+        if(stateOperation->isSearching()){
             m_searchKey = "";
             m_middleView->setSearchKey(m_searchKey);
             m_leftView->setEnabled(true);
             m_addNotepadBtn->setVisible(true);
             m_addNoteBtn->setVisible(true);
             m_noteSearchEdit->lineEdit()->setFocus();
-            operState(StateSearching, false);
+            stateOperation->operState(OpsStateInterface::StateSearching, false);
             onVNoteFolderChange(m_leftView->restoreNotepadItem(), QModelIndex());
         }
         break;
     case PlayVoiceStart:
-        if (isSearching()) {
+        if (stateOperation->isSearching()) {
             m_recordBar->setVisible(true);
         }
-        operState(StatePlaying, true);
+        stateOperation->operState(OpsStateInterface::StatePlaying, true);
         m_noteSearchEdit->setEnabled(false);
         m_leftView->setOnlyCurItemMenuEnable(true);
         m_addNotepadBtn->setEnabled(false);
@@ -1580,20 +1569,20 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNoteBtn->setDisabled(true);
         break;
     case PlayVoiceEnd:
-        if (isSearching()) {
+        if (stateOperation->isSearching()) {
             m_recordBar->setVisible(false);
         }
-        if (!isVoice2Text()) {
+        if (!stateOperation->isVoice2Text()) {
             m_noteSearchEdit->setEnabled(true);
             m_leftView->setOnlyCurItemMenuEnable(false);
             m_addNotepadBtn->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
             m_addNoteBtn->setDisabled(false);
         }
-        operState(StatePlaying, false);
+        stateOperation->operState(OpsStateInterface::StatePlaying, false);
         break;
     case RecordStart:
-        operState(StateRecording, true);
+        stateOperation->operState(OpsStateInterface::StateRecording, true);
         m_noteSearchEdit->setEnabled(false);
         m_leftView->setOnlyCurItemMenuEnable(true);
         m_leftView->closeMenu();
@@ -1604,7 +1593,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNoteBtn->setDisabled(true);
         break;
     case RecordEnd:
-        if (!isVoice2Text()) {
+        if (!stateOperation->isVoice2Text()) {
             m_noteSearchEdit->setEnabled(true);
             m_leftView->setOnlyCurItemMenuEnable(false);
             m_addNotepadBtn->setEnabled(true);
@@ -1612,10 +1601,10 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_addNoteBtn->setDisabled(false);
         }
         m_rightView->setEnablePlayBtn(true);
-        operState(StateRecording, false);
+        stateOperation->operState(OpsStateInterface::StateRecording, false);
         break;
     case VoiceToTextStart:
-        operState(StateVoice2Text, true);
+        stateOperation->operState(OpsStateInterface::StateVoice2Text, true);
         m_noteSearchEdit->setEnabled(false);
         m_leftView->setOnlyCurItemMenuEnable(true);
         m_addNotepadBtn->setEnabled(false);
@@ -1626,14 +1615,14 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_rightView->closeMenu();
         break;
     case VoiceToTextEnd:
-        if (!isRecording() && !isPlaying()) {
+        if (!stateOperation->isRecording() && !stateOperation->isPlaying()) {
             m_noteSearchEdit->setEnabled(true);
             m_leftView->setOnlyCurItemMenuEnable(false);
             m_addNotepadBtn->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
             m_addNoteBtn->setDisabled(false);
         }
-        operState(StateVoice2Text, false);
+        stateOperation->operState(OpsStateInterface::StateVoice2Text, false);
         break;
     default:
         break;
@@ -1717,7 +1706,7 @@ void VNoteMainWindow::onSystemDown(bool active)
     qInfo() << "System going down...";
 
     if (active) {
-        if (isRecording()) {
+        if (stateOperation->isRecording()) {
             m_recordBar->cancelRecord();
 
             qInfo() << "System going down when recording, cancel it.";
@@ -1780,7 +1769,7 @@ void VNoteMainWindow::release()
     //qInfo() << "wait audioDeviceWatcher for:" << TM(start,end);
 
     QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
-    if (isVoice2Text()) {
+    if (stateOperation->isVoice2Text()) {
         releaseA2TManger->stopAsr();
     }
 

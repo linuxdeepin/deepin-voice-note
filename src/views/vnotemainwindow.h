@@ -58,7 +58,7 @@ class DBusLogin1Manager;
 class VNMainWndDelayInitTask;
 class UpgradeView;
 
-class VNoteMainWindow : public DMainWindow, public OpsStateInterface
+class VNoteMainWindow : public DMainWindow
 {
     Q_OBJECT
 public:

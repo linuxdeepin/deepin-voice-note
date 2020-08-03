@@ -22,9 +22,6 @@
 #define OPSSTATEINTERFACE_H
 
 #include <QtGlobal>
-class OpsStateInterface;
-
-OpsStateInterface* gVNoteOpsStates();
 
 class OpsStateInterface
 {
@@ -42,6 +39,8 @@ public:
         //Add other state at here
         StateMax,
     };
+
+    static OpsStateInterface* instance();
 
     void operState(int type, bool isSet);
 

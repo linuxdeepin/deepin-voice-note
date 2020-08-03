@@ -406,17 +406,22 @@ void RightView::saveNote()
 
 int RightView::initAction(DetailItemWidget *widget)
 {
-    bool TTSisWorking=false;
-    TTSisWorking = VTextSpeechAndTrManager::isTextToSpeechInWorking();
+    bool TTSisWorking =false;
+    OpsStateInterface *stateInterface = OpsStateInterface::instance();
+    bool isAISrvAvailable = stateInterface->isAiSrvExist();
     ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteDetailCtxMenu, false);
-    if(TTSisWorking){
-        ActionManager::Instance()->visibleAction(ActionManager::DetailStopreading, true);
-        ActionManager::Instance()->visibleAction(ActionManager::DetailText2Speech, false);
-        ActionManager::Instance()->enableAction(ActionManager::DetailStopreading, true);
-    }else {
-        ActionManager::Instance()->visibleAction(ActionManager::DetailStopreading, false);
-        ActionManager::Instance()->visibleAction(ActionManager::DetailText2Speech, true);
+    if(isAISrvAvailable){
+        TTSisWorking = VTextSpeechAndTrManager::isTextToSpeechInWorking();
+        if(TTSisWorking){
+            ActionManager::Instance()->visibleAction(ActionManager::DetailStopreading, true);
+            ActionManager::Instance()->visibleAction(ActionManager::DetailText2Speech, false);
+            ActionManager::Instance()->enableAction(ActionManager::DetailStopreading, true);
+        }else {
+            ActionManager::Instance()->visibleAction(ActionManager::DetailStopreading, false);
+            ActionManager::Instance()->visibleAction(ActionManager::DetailText2Speech, true);
+        }
     }
+
     if (m_viewportLayout->count() == 2) {
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(0);
         DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
@@ -433,13 +438,12 @@ int RightView::initAction(DetailItemWidget *widget)
     int voiceCount = voiceWidget.size();
     int textCount = textWidget.size();
 
-    OpsStateInterface *stateInterface = gVNoteOpsStates();
     bool allTextEmpty = isAllWidgetEmpty(textWidget);
     if(!voiceCount && allTextEmpty && widget){
         VNoteBlock *blockData = widget->getNoteBlock();
         if (widget->hasFocus() && blockData->blockType == VNoteBlock::Text) {
             ActionManager::Instance()->enableAction(ActionManager::DetailPaste, true);
-            if(VTextSpeechAndTrManager::getSpeechToTextEnable()){
+            if(isAISrvAvailable && VTextSpeechAndTrManager::getSpeechToTextEnable()){
                 ActionManager::Instance()->enableAction(ActionManager::DetailSpeech2Text, true);
             }
         }
@@ -470,15 +474,16 @@ int RightView::initAction(DetailItemWidget *widget)
 
                     if(!blockData->ptrVoice->blockText.isEmpty()){
                         ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
-                        if(VTextSpeechAndTrManager::getTransEnable()){
-                            ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
-                        }
-                        if(!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()){
-
-                            ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
+                        if(isAISrvAvailable){
+                            if(VTextSpeechAndTrManager::getTransEnable()){
+                                ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
+                            }
+                            if(!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()){
+                                ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
+                            }
                         }
                     }else {
-                        if(!stateInterface->isVoice2Text()){
+                        if(isAISrvAvailable && !stateInterface->isVoice2Text()){
                             ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, true);
                         }
                     }
@@ -493,22 +498,26 @@ int RightView::initAction(DetailItemWidget *widget)
                     return 0;
                 }
                 ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
-                if(VTextSpeechAndTrManager::getTransEnable()){
-                    ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
-                }
-                if(!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()){
-                    ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
+                if(isAISrvAvailable){
+                    if(VTextSpeechAndTrManager::getTransEnable()){
+                        ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
+                    }
+                    if(!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()){
+                        ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
+                    }
                 }
                 return 0;
             }
 
             if(!isAllWidgetEmpty(voiceWidget)){
                ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
-               if(VTextSpeechAndTrManager::getTransEnable()){
-                   ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
-               }
-               if(!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()){
-                   ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
+               if(isAISrvAvailable){
+                   if(VTextSpeechAndTrManager::getTransEnable()){
+                       ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
+                   }
+                   if(!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()){
+                       ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
+                   }
                }
             }
 
@@ -518,11 +527,13 @@ int RightView::initAction(DetailItemWidget *widget)
             }
         }else if(textCount){
             ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
-            if(VTextSpeechAndTrManager::getTransEnable()){
-                ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
-            }
-            if(!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()){
-                ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
+            if(isAISrvAvailable){
+                if(VTextSpeechAndTrManager::getTransEnable()){
+                    ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
+                }
+                if(!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()){
+                    ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
+                }
             }
             if(canCutDel){
                 ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
@@ -533,11 +544,13 @@ int RightView::initAction(DetailItemWidget *widget)
     }
 
     ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
-    if(VTextSpeechAndTrManager::getTransEnable()){
-        ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
-    }
-    if(!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()){
-        ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
+    if(isAISrvAvailable){
+        if(VTextSpeechAndTrManager::getTransEnable()){
+            ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
+        }
+        if(!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()){
+            ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
+        }
     }
 
     if(canCutDel){
@@ -1092,14 +1105,12 @@ VoiceNoteItem *RightView::getCurVoiceAsr()
 int RightView::showWarningDialog()
 {
     auto voiceWidget = m_selectWidget.values(VoicePlugin);
-    OpsStateInterface *stateInterface = gVNoteOpsStates();
-
     if(voiceWidget.size()){
         if (m_curPlayItem && m_curPlayItem->hasSelection()) {
             return -1;
         }
 
-        if (stateInterface->isVoice2Text() && m_curAsrItem && m_curAsrItem->hasSelection()) {
+        if (OpsStateInterface::instance()->isVoice2Text() && m_curAsrItem && m_curAsrItem->hasSelection()) {
             return -1;
         }
 
