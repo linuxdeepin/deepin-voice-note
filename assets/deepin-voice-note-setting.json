@@ -43,7 +43,7 @@
                     "reset":false
                 },
                 {
-                    "key":"_app_export_text_path_key",
+                    "key":"_app_export_voice_path_key",
                     "hide":true,
                     "reset":false
                 }
