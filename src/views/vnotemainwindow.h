@@ -40,6 +40,7 @@
 #include <DAnchors>
 #include <DFloatingMessage>
 #include <DScrollArea>
+#include <DMenu>
 
 DWIDGET_USE_NAMESPACE
 
@@ -158,6 +159,8 @@ public slots:
     void closeDeviceExceptionErrMessage();
     //System shutdon
     void onSystemDown(bool active);
+    //打开隐私政策
+    void onShowPrivacy();
 private:
     //左侧列表视图操作相关
     void addNotepad();
@@ -175,6 +178,7 @@ private:
     //Check if wen can do shortcuts
     bool canDoShortcutAction() const;
     void release();
+    void initMenuExtension();
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
@@ -241,6 +245,7 @@ private:
     DFloatingMessage *m_asrErrMeassage {nullptr};
     DFloatingMessage *m_pDeviceExceptionMsg {nullptr};
     DPushButton      *m_asrAgainBtn {nullptr};
+    DMenu            *m_menuExtension {nullptr};
     //Login session manager
     DBusLogin1Manager *m_pLogin1Manager {nullptr};
     QDBusPendingReply<QDBusUnixFileDescriptor> m_lockFd;

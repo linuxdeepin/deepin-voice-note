@@ -61,6 +61,8 @@
 #include "vnoteapplication.h"
 
 #include <QScrollBar>
+#include <QLocale>
+#include <QDesktopServices>
 
 #include <DApplication>
 #include <DApplicationHelper>
@@ -440,6 +442,8 @@ void VNoteMainWindow::initTitleBar()
 
     titlebar()->addWidget(m_actionPanel, Qt::AlignLeft);
 #endif
+    initMenuExtension();
+    titlebar()->setMenu(m_menuExtension);
     // Search note
     m_noteSearchEdit = new DSearchEdit(this);
     DFontSizeManager::instance()->bind(m_noteSearchEdit, DFontSizeManager::T6);
@@ -1774,4 +1778,27 @@ void VNoteMainWindow::release()
     }
 
     VNoteDbManager::instance()->getVNoteDb().close();
+}
+
+void VNoteMainWindow::onShowPrivacy()
+{
+    QString url = "";
+    QLocale locale;
+    QLocale::Country country = locale.country();
+    if(country == QLocale::China){
+       url = "https://www.uniontech.com/agreement/privacy-cn";
+    }else {
+       url = "https://www.uniontech.com/agreement/privacy-en";
+    }
+    QDesktopServices::openUrl(url);
+}
+
+void VNoteMainWindow::initMenuExtension()
+{
+    m_menuExtension = new DMenu(this);
+    QAction *privacy = new QAction(DApplication::translate("TitleBar", "Privacy Policy")
+                                   ,m_menuExtension);
+    m_menuExtension->addAction(privacy);
+    m_menuExtension->addSeparator();
+    connect(privacy, &QAction::triggered, this, &VNoteMainWindow::onShowPrivacy);
 }
