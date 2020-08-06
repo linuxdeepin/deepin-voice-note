@@ -217,7 +217,7 @@ QMediaPlayer::State VNotePlayWidget::getPlayerStatus()
 
 void VNotePlayWidget::onDurationChanged(qint64 duration)
 {
-    if(m_slider->maximum() != duration){
+    if(duration && m_slider->maximum() != duration){
         m_slider->setMaximum(static_cast<int>(duration));
     }
 }
