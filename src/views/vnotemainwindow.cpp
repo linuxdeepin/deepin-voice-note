@@ -30,7 +30,6 @@
 
 #include "common/standarditemcommon.h"
 #include "common/vnotedatamanager.h"
-#include "common/vnoteaudiodevicewatcher.h"
 #include "common/vnotea2tmanager.h"
 #include "common/vnoteitem.h"
 #include "common/vnoteforlder.h"
@@ -70,6 +69,7 @@
 #include <DLog>
 #include <DStatusBar>
 #include <DTitlebar>
+#include <DSettingsDialog>
 
 static OpsStateInterface *stateOperation = nullptr;
 
@@ -83,9 +83,7 @@ VNoteMainWindow::VNoteMainWindow(QWidget *parent)
     // Request DataManager load  note folders
     initData();
     initShortcuts();
-    //Start audio device watch thread
-    //& must be called after initUI
-    initAudioWatcher();
+    initA2TManager();
     //Init the login manager
     initLogin1Manager();
     //Init delay task
@@ -626,40 +624,14 @@ void VNoteMainWindow::initRightView()
 #endif
 }
 
-void VNoteMainWindow::initAudioWatcher()
+void VNoteMainWindow::initA2TManager()
 {
-    //Audio input device watchdog
-    m_audioDeviceWatcher = new VNoteAudioDeviceWatcher();
-
-    connect(m_audioDeviceWatcher, &VNoteAudioDeviceWatcher::microphoneAvailableState,
-            m_recordBar, &VNoteRecordBar::OnMicrophoneAvailableChanged);
-    //Notify audio manager source changed
-    connect(m_audioDeviceWatcher, &VNoteAudioDeviceWatcher::inputSourceChanged,
-            VNoteAudioManager::instance(), &VNoteAudioManager::onDefaultInputChanged);
-
-    m_audioDeviceWatcher->start();
-
     //audio to text manager
     m_a2tManager = new VNoteA2TManager();
 
     //connect(m_rightView, &RightView::asrStart, this, &VNoteMainWindow::onA2TStart);
     connect(m_a2tManager, &VNoteA2TManager::asrError, this, &VNoteMainWindow::onA2TError);
     connect(m_a2tManager, &VNoteA2TManager::asrSuccess, this, &VNoteMainWindow::onA2TSuccess);
-
-//    //Check aiservice state
-//    bool fExist = m_a2tManager->checkAiService();
-//    operState(OpsStateInterface::StateAISrvAvailable, fExist);
-
-//    //TODO:
-//    //    If Aiservice don't exist, hide the voice2text menuitem.
-//    //Community verson don't have aiservice.
-//    if (!isAiSrvExist()) {
-//        QAction *a2tAction = ActionManager::Instance()->getActionById(
-//                    ActionManager::DetailVoice2Text);
-//        if (nullptr != a2tAction) {
-//            a2tAction->setVisible(false);
-//        }
-//    }
 }
 
 void VNoteMainWindow::initLogin1Manager()
@@ -1751,26 +1723,9 @@ void VNoteMainWindow::release()
     if (!isMaximized()) {
        setting::instance()->setOption(VNOTE_MAINWND_SZ_KEY, saveGeometry());
     }
+
     VTextSpeechAndTrManager::onStopTextToSpeech();
     m_rightView->saveNote();
-
-    //Check deviceWacherThread exit time.
-    //struct timeval start, end;
-    //gettimeofday(&start, nullptr);
-
-    //Notify device watch thread to exit.
-    m_audioDeviceWatcher->exitWatcher();
-
-    //TODO:
-    //    Nofiy audio watcher to exit & need
-    //wait at least AUDIO_DEV_CHECK_TIME ms
-    //Reversion:2020-3-19
-    //     Only set the exit flag,don't wait the watch
-    //thread,OS will clear it.
-    //m_audioDeviceWatcher->wait(AUDIO_DEV_CHECK_TIME);
-
-    //gettimeofday(&end, nullptr);
-    //qInfo() << "wait audioDeviceWatcher for:" << TM(start,end);
 
     QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
     if (stateOperation->isVoice2Text()) {
@@ -1793,12 +1748,24 @@ void VNoteMainWindow::onShowPrivacy()
     QDesktopServices::openUrl(url);
 }
 
+void VNoteMainWindow::onShowSettingDialog()
+{
+     DSettingsDialog dialog(this);
+     dialog.updateSettings(setting::instance()->getSetting());
+     dialog.setResetVisible(false);
+     dialog.exec();
+}
+
 void VNoteMainWindow::initMenuExtension()
 {
     m_menuExtension = new DMenu(this);
+    QAction *setting = new QAction(DApplication::translate("TitleBar", "Settings")
+                                   ,m_menuExtension);
     QAction *privacy = new QAction(DApplication::translate("TitleBar", "Privacy Policy")
                                    ,m_menuExtension);
+    m_menuExtension->addAction(setting);
     m_menuExtension->addAction(privacy);
     m_menuExtension->addSeparator();
     connect(privacy, &QAction::triggered, this, &VNoteMainWindow::onShowPrivacy);
+    connect(setting, &QAction::triggered, this, &VNoteMainWindow::onShowSettingDialog);
 }

@@ -47,7 +47,6 @@ DWIDGET_USE_NAMESPACE
 struct VNVoiceBlock;
 class VNoteRecordBar;
 class VNoteIconButton;
-class VNoteAudioDeviceWatcher;
 class VNoteA2TManager;
 class LeftView;
 class MiddleView;
@@ -100,7 +99,7 @@ protected:
     void initLeftView();
     void initMiddleView();
     void initRightView();
-    void initAudioWatcher();
+    void initA2TManager();
     void initLogin1Manager();
     void holdHaltLock();
     void releaseHaltLock();
@@ -161,6 +160,8 @@ public slots:
     void onSystemDown(bool active);
     //打开隐私政策
     void onShowPrivacy();
+    //参数设置
+    void onShowSettingDialog();
 private:
     //左侧列表视图操作相关
     void addNotepad();
@@ -210,8 +211,6 @@ private:
     DFloatingButton *m_addNoteBtn {nullptr};
 
     VNoteRecordBar *m_recordBar {nullptr};
-    //Audio device state watch thread
-    VNoteAudioDeviceWatcher *m_audioDeviceWatcher {nullptr};
     VNoteA2TManager *m_a2tManager {nullptr};
 
     UpgradeView *m_upgradeView {nullptr};

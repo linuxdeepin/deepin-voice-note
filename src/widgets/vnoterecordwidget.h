@@ -24,7 +24,7 @@
 
 #include "widgets/vnoteiconbutton.h"
 #include "widgets/vnwaveform.h"
-#include "common/vnoteaudiomanager.h"
+#include "common/gstreamrecorder.h"
 
 #include <DFloatingWidget>
 #include <DLabel>
@@ -37,8 +37,8 @@ class VNoteRecordWidget : public DFloatingWidget
     Q_OBJECT
 public:
     explicit VNoteRecordWidget(QWidget *parent = nullptr);
-
-    void startRecord();
+    bool startRecord();
+    void setAudioDevice(QString device);
     void cancelRecord();
     QString getRecordPath() const;
 
@@ -47,7 +47,7 @@ signals:
 
 public slots:
     void onPauseRecord();
-    void onContinueRecord();
+    bool onContinueRecord();
     void onFinshRecord();
     void onRecordDurationChange(qint64 duration);
     void onAudioBufferProbed(const QAudioBuffer &buffer);
@@ -62,7 +62,7 @@ private:
     VNoteIconButton *m_finshBtn {nullptr};
     DLabel          *m_timeLabel{nullptr};
     VNWaveform      *m_waveForm {nullptr};
-    VNoteAudioManager *m_audioManager{nullptr};
+    GstreamRecorder *m_audioRecoder{nullptr};
     QString          m_recordDir {""};
     QString          m_recordPath {""};
     qint64           m_recordMsec {0};

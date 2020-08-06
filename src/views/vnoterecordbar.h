@@ -29,7 +29,7 @@
 #include <DFloatingMessage>
 
 DWIDGET_USE_NAMESPACE
-
+class AudioWatcher;
 class VNotePlayWidget;
 class VNoteRecordWidget;
 class VNoteIconButton;
@@ -43,15 +43,19 @@ public:
 
     static constexpr int REC_BTN_W = 68;
     static constexpr int REC_BTN_H = 68;
-
-    void initUI();
-    void initConnections();
     void cancelRecord();
     void playOrPauseVoice();
     void playVoice(VNVoiceBlock *voiceData);
     void pauseVoice(VNVoiceBlock *voiceData);
     bool stopVoice(VNVoiceBlock *voiceData);
     VNVoiceBlock* getVoiceData();
+
+private:
+    void initAudioWatcher();
+    void initSetting();
+    void initUI();
+    void initConnections();
+    bool volumeToolow(const double& volume);
 
 signals:
     void sigStartRecord(const QString& recordPath);
@@ -65,9 +69,10 @@ signals:
 public slots:
     void onStartRecord();
     void onFinshRecord(const QString &voicePath,qint64 voiceSize);
-    void OnMicrophoneAvailableChanged(int availableState);
     void onClosePlayWidget(VNVoiceBlock *voiceData);
-
+    void onAudioVolumeChange(int mode);
+    void onAudioDeviceChange(int mode);
+    void onAudioSelectChange(QVariant value);
 protected:
     bool eventFilter(QObject *o, QEvent *e) override;
     void startRecord();
@@ -80,9 +85,9 @@ protected:
     QScopedPointer<DAnchorsBase> m_recBtnAnchor;
 
     QString          m_recordPath {""};
-
-    //MicrophoneState
-    int m_microphoneState {0};
+    int              m_currentMode {0};
+    AudioWatcher     *m_audioWatcher{nullptr};
+    bool             m_showVolumeWanning{false};
 };
 
 #endif // VNOTERECORDBAR_H
