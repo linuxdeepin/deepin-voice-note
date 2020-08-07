@@ -38,6 +38,8 @@ signals:
     void sigDeviceChange(AudioMode mode);
     void sigMuteChanged(AudioMode mode);
 protected slots:
+    void onDefaultSourceActivePortChanged(AudioPort  value);
+    void onDefaultSinkActivePortChanged(AudioPort  value);
     void onDefaultSourceChanaged(const QDBusObjectPath &value);
     void onDefaultSinkChanaged(const QDBusObjectPath &value);
     void onSourceVolumeChanged(double d);

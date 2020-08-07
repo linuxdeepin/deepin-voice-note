@@ -54,6 +54,13 @@ void AudioWatcher::initDeviceWacther()
     m_outAudioPortVolume = m_pDefaultSink->volume();
     m_outAudioPort = m_pDefaultSink->activePort();
     m_outAudioMute = m_pDefaultSink->mute();
+
+    qDebug() << "current input active port name:" << m_inAudioPort.name
+             << "\ncurrent input active port availability:" << m_inAudioPort.availability
+             << "\ncurrent input device name:" << m_pDefaultSource->name()
+             << "\ncurrent output active port name:" << m_outAudioPort.name
+             << "\ncurrent output active port availability:" << m_outAudioPort.availability
+             << "\ncurrent output device name:" << m_pDefaultSink->name();
 }
 
 void AudioWatcher::initConnections()
@@ -66,9 +73,13 @@ void AudioWatcher::initConnections()
 
     connect(m_pDefaultSource.get(), SIGNAL(VolumeChanged(double)),this, SLOT(onSourceVolumeChanged(double)));
     connect(m_pDefaultSource.get(), SIGNAL(MuteChanged(bool)),this, SLOT(onSourceMuteChanged(bool)));
+    connect(m_pDefaultSource.get(), SIGNAL(ActivePortChanged(AudioPort)),
+            this, SLOT(onDefaultSourceActivePortChanged(AudioPort)));
 
     connect(m_pDefaultSink.get(), SIGNAL(VolumeChanged(double)),this, SLOT(onSinkVolumeChanged(double)));
     connect(m_pDefaultSink.get(), SIGNAL(MuteChanged(bool)),this, SLOT(onSinkMuteChanged(bool)));
+    connect(m_pDefaultSink.get(), SIGNAL(ActivePortChanged(AudioPort)),
+            this, SLOT(onDefaultSinkActivePortChanged(AudioPort)));
 }
 
 void AudioWatcher::onSourceVolumeChanged(double value)
@@ -100,8 +111,9 @@ void AudioWatcher::onSinkVolumeChanged(double value)
 
 void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &value)
 {
-    qDebug() << "last input active port:" << m_inAudioPort.name;
-    qDebug() << "last input:" << m_pDefaultSource->name();
+    qDebug() << "Input device change from:"
+             << "\nactive port:" << m_inAudioPort.name
+             << "\ndevice name:" << m_pDefaultSource->name();
 
     m_pDefaultSource.reset(new com::deepin::daemon::audio::Source (
                                m_serviceName,
@@ -110,19 +122,24 @@ void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &value)
                            );
     connect(m_pDefaultSource.get(), SIGNAL(VolumeChanged(double)),this, SLOT(onSourceVolumeChanged(double)));
     connect(m_pDefaultSource.get(), SIGNAL(MuteChanged(bool)),this, SLOT(onSourceMuteChanged(bool)));
+    connect(m_pDefaultSource.get(), SIGNAL(ActivePortChanged(AudioPort)),
+            this, SLOT(onDefaultSourceActivePortChanged(AudioPort)));
     m_inAudioPortVolume = m_pDefaultSource->volume();
     m_inAudioPort = m_pDefaultSource->activePort();
     m_inAudioMute = m_pDefaultSource->mute();
-    emit sigDeviceChange(Micphone);
 
-    qDebug() << "current input active port:" << m_inAudioPort.name;
-    qDebug() << "current input:" << m_pDefaultSource->name();
+    qDebug() << "\nTo:"
+             << "\nactive port:" << m_inAudioPort.name << ";" << m_inAudioPort.availability
+             << "\ndevice name:" << m_pDefaultSource->name();
+
+    emit sigDeviceChange(Micphone);
 }
 
 void AudioWatcher::onDefaultSinkChanaged(const QDBusObjectPath &value)
 {
-    qDebug() << "last output active port:" << m_outAudioPort.name;
-    qDebug() << "last output:" << m_pDefaultSink->name();
+    qDebug() << "Output device change from:"
+             << "\nactive port:" << m_outAudioPort.name << ";" << m_outAudioPort.availability
+             << "\ndevice name:" << m_pDefaultSink->name();
 
     m_pDefaultSink.reset(new com::deepin::daemon::audio::Sink (
                              m_serviceName,
@@ -131,13 +148,42 @@ void AudioWatcher::onDefaultSinkChanaged(const QDBusObjectPath &value)
                          );
     connect(m_pDefaultSink.get(), SIGNAL(VolumeChanged(double)),this, SLOT(onSinkVolumeChanged(double)));
     connect(m_pDefaultSink.get(), SIGNAL(MuteChanged(bool)),this, SLOT(onSinkMuteChanged(bool)));
+    connect(m_pDefaultSink.get(), SIGNAL(ActivePortChanged(AudioPort)),
+            this, SLOT(onDefaultSinkActivePortChanged(AudioPort)));
     m_outAudioPortVolume = m_pDefaultSink->volume();
     m_outAudioPort = m_pDefaultSink->activePort();
     m_outAudioMute = m_pDefaultSink->mute();
+
+    qDebug()<< "\nTo:"
+            << "\nactive port:" << m_outAudioPort.name << ";" << m_outAudioPort.availability
+            << "\ndevice name:" << m_pDefaultSink->name();
+
     emit sigDeviceChange(Internal);
 
-    qDebug() << "current output active port:" << m_outAudioPort.name;
-    qDebug() << "current output:" << m_pDefaultSink->name();
+}
+
+void AudioWatcher::onDefaultSinkActivePortChanged(AudioPort  value)
+{
+    qDebug() << "output active port change from:"
+             << "\nPort Name:" << m_outAudioPort.name
+             << "\nPort Availability:" << m_outAudioPort.availability
+             << "\nto:"
+             << "\nPort Name:" << value.name
+             << "\nPort Availability:" << value.availability;
+    m_outAudioPort = value;
+    emit sigDeviceChange(Internal);
+}
+
+void AudioWatcher::onDefaultSourceActivePortChanged(AudioPort  value)
+{
+    qDebug() << "input active port change from:"
+             << "\nPort Name:" << m_inAudioPort.name
+             << "\nPort Availability:" << m_inAudioPort.availability
+             << "\nto:"
+             << "\nPort Name:" << value.name
+             << "\nPort Availability:" << value.availability;
+    m_inAudioPort = value;
+    emit sigDeviceChange(Micphone);
 }
 
 void AudioWatcher::onSinkMuteChanged(bool value)
@@ -156,14 +202,22 @@ QString AudioWatcher::getDeviceName(AudioMode mode)
 {
     QString device = "";
     if(mode == Internal){
-        device = m_pDefaultSink->name();
-        if(!device.isEmpty()){
-            device += ".monitor";
+        //如果判断availability，则有可能会出现控制中心已选择输出设备，但录音按钮不可用的情况
+        //暂时不判断availability，结果录音可能有异常，用第三方软件录音（支持系统音））也是相同的结果
+        /*if(m_outAudioPort.availability != 1 || !m_fNeedDeviceChecker)*/{
+            device = m_pDefaultSink->name();
+            if(!device.isEmpty() && !device.endsWith(".monitor")){
+                device += ".monitor";
+            }
         }
-    }else {
-        device = m_pDefaultSource->name();
-        if(device.endsWith(".monitor") && m_fNeedDeviceChecker){
-            device.clear();
+    }else{
+        //如果判断availability，则有可能会出现控制中心已选择输入设备，但录音按钮不可用的情况
+        //暂时不判断availability，结果录音可能有异常，用第三方软件录音也是相同的结果
+        /*if(m_inAudioPort.availability != 1 || !m_fNeedDeviceChecker)*/{
+            device = m_pDefaultSource->name();
+            if(device.endsWith(".monitor") && m_fNeedDeviceChecker){
+                device.clear();
+            }
         }
     }
     return  device;
