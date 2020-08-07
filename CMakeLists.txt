@@ -32,6 +32,16 @@ set(APP_QRC "${APP_RES_DIR}/images.qrc")
 set(APP_CONFIG "${APP_RES_DIR}/deepin-voice-note.conf")
 set(APP_LOGO "${APP_RES_DIR}/icons/deepin/builtin/deepin-voice-note.svg")
 
+#Check if APP_TS_UPDATE var isn't set, don't need update ts file
+if (NOT DEFINED APP_TS_UPDATE)
+   set(APP_TS_UPDATE false)
+endif()
+
+#Only update ts file when APP_TS_UPDATE=true
+if (${APP_TS_UPDATE} STREQUAL "true")
+    set(APP_TS_UPDATE true)
+endif()
+
 project(${APP_BIN_NAME})
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -61,7 +71,18 @@ else()
 endif()
 
 #Generate the qm file
-execute_process(COMMAND bash ${APP_TRANS_SCRIPT}
+#bash translate.sh
+#       transdir
+#       needupdatets  <Only -DUPDATE_TS when need update ts file>
+#       sourcedir
+#       <projectname>.ts
+
+execute_process(COMMAND bash
+                    ${APP_TRANS_SCRIPT}
+                    translations
+                    ${APP_TS_UPDATE}
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src
+                    ${APP_BIN_NAME}
                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/")
 
 configure_file(src/environments.h.in environments.h @ONLY)
