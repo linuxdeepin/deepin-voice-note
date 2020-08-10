@@ -21,7 +21,7 @@
 #include "gstreamrecorder.h"
 #include <QDebug>
 
-static const QString mp3Encoder = "capsfilter caps=audio/x-raw,rate=44100,channels=2 ! lamemp3enc name=enc target=bitrate cbr=true bitrate=192 ! xingmux ! id3mux";
+static const QString mp3Encoder = "capsfilter caps=audio/x-raw,rate=44100,channels=2 ! lamemp3enc name=enc target=0 quality=2 ! xingmux ! id3mux";
 
 GstPadProbeReturn bufferProbe(GstPad *pad, GstPadProbeInfo *info, gpointer user_data)
 {
@@ -199,19 +199,12 @@ bool GstreamRecorder::startRecord()
 
 void GstreamRecorder::stopRecord()
 {
-    if(m_pipeline != nullptr){
-//        gst_element_send_event(m_pipeline, gst_event_new_eos());
-//        g_usleep(50);
-//        setStateToNull();
-//        objectUnref(m_pipeline);
-        int state = -1;
-        int pending = -1;
-        GetGstState(&state, &pending);
-        if(state == GST_STATE_NULL) return;
-        gst_element_send_event(m_pipeline, gst_event_new_eos());
-        g_usleep(50);
-        gst_element_set_state(m_pipeline, GST_STATE_NULL);
-    }
+     if (m_pipeline == nullptr) return;
+     gst_element_send_event(m_pipeline, gst_event_new_eos());
+     gst_element_send_event(m_pipeline, gst_event_new_eos());
+     g_usleep(5000);
+     setStateToNull();
+     gst_element_set_state(m_pipeline, GST_STATE_NULL);
 }
 
 void GstreamRecorder::pauseRecord()
@@ -332,7 +325,7 @@ void  GstreamRecorder::setStateToNull()
     GstMessage *msg;
     GstBus *bus;
     gst_element_set_state(m_pipeline, GST_STATE_READY);
-    gst_element_get_state(m_pipeline, nullptr, nullptr, 10);
+    gst_element_get_state(m_pipeline, nullptr, nullptr, 5000000000); //timeout 5s
 
     bus = gst_element_get_bus(m_pipeline);
     if (bus) {
