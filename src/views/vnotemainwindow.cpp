@@ -1751,7 +1751,7 @@ void VNoteMainWindow::onShowPrivacy()
 void VNoteMainWindow::onShowSettingDialog()
 {
      DSettingsDialog dialog(this);
-     dialog.updateSettings(setting::instance()->getSetting());
+     dialog.updateSettings("Setting", setting::instance()->getSetting());
      dialog.setResetVisible(false);
      dialog.exec();
 }
