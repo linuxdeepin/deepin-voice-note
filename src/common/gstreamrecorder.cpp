@@ -322,21 +322,8 @@ void  GstreamRecorder::setStateToNull()
         return;
     }
 
-    GstMessage *msg;
-    GstBus *bus;
     gst_element_set_state(m_pipeline, GST_STATE_READY);
     gst_element_get_state(m_pipeline, nullptr, nullptr, 5000000000); //timeout 5s
-
-    bus = gst_element_get_bus(m_pipeline);
-    if (bus) {
-        while ((msg = gst_bus_pop(bus))) {
-            gst_bus_async_signal_func(bus, msg, nullptr);
-            if (msg) {
-                gst_message_unref(msg);
-            }
-        }
-        gst_object_unref(bus);
-    }
     gst_element_set_state(m_pipeline, GST_STATE_NULL);
 }
 
