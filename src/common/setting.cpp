@@ -26,8 +26,19 @@
 #include <QDebug>
 
 #include <DSettingsOption>
+#include <DApplication>
+DWIDGET_USE_NAMESPACE
 
 static setting*  settinginstance = nullptr;
+
+
+void GenerateSettingTranslate()
+{
+    auto basic = DApplication::translate("Setting","Basic");
+    auto audio_source = DApplication::translate("Setting","Audio Source");
+    auto audio_internal = DApplication::translate("Setting","Internal");
+    auto audio_micphone = DApplication::translate("Setting","Micphone");
+}
 
 CustemBackend::CustemBackend(const QString &filepath, QObject *parent)
     :DSettingsBackend(parent)
