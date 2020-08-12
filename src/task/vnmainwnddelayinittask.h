@@ -32,8 +32,7 @@ class VNMainWndDelayInitTask : public VNTask
 {
     Q_OBJECT
 public:
-    explicit VNMainWndDelayInitTask(VNoteMainWindow *pMainWnd
-                                    ,QObject *parent = nullptr);
+    explicit VNMainWndDelayInitTask(VNoteMainWindow *pMainWnd, QObject *parent = nullptr);
 
 signals:
 
@@ -41,8 +40,9 @@ public slots:
 
 protected:
     virtual void run();
+
 protected:
-    VNoteMainWindow* m_pMainWnd {nullptr};
+    VNoteMainWindow *m_pMainWnd {nullptr};
 };
 
 #endif // VNMAINWNDDELAYINITTASK_H

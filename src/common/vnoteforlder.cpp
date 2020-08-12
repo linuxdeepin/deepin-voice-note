@@ -43,9 +43,9 @@ qint32 &VNoteFolder::maxNoteIdRef()
 
 qint32 VNoteFolder::getNotesCount()
 {
-    int nCount =  0;
+    int nCount = 0;
 
-    VNOTE_ITEMS_MAP * folderNotes = getNotes();
+    VNOTE_ITEMS_MAP *folderNotes = getNotes();
 
     if (Q_LIKELY(nullptr != folderNotes)) {
         folderNotes->lock.lockForRead();
@@ -56,17 +56,17 @@ qint32 VNoteFolder::getNotesCount()
     return nCount;
 }
 
-VNOTE_ITEMS_MAP * VNoteFolder::getNotes()
+VNOTE_ITEMS_MAP *VNoteFolder::getNotes()
 {
     if (Q_UNLIKELY(nullptr == notes)) {
-        VNOTE_ITEMS_MAP * folderNotes =VNoteDataManager::instance()->getFolderNotes(id);
+        VNOTE_ITEMS_MAP *folderNotes = VNoteDataManager::instance()->getFolderNotes(id);
         notes = folderNotes;
     }
 
     return notes;
 }
 
-QDebug & operator <<(QDebug &out, VNoteFolder &folder)
+QDebug &operator<<(QDebug &out, VNoteFolder &folder)
 {
     out << "\n{ "
         << "id=" << folder.id << ","

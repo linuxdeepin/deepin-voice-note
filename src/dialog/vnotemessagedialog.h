@@ -56,12 +56,12 @@ signals:
 public slots:
 
 protected:
-    DLabel         *m_pMessage {nullptr};
-    DPushButton    *m_cancelBtn {nullptr};
+    DLabel *m_pMessage {nullptr};
+    DPushButton *m_cancelBtn {nullptr};
     DWarningButton *m_confirmBtn {nullptr};
-    DVerticalLine  *m_buttonSpliter {nullptr};
+    DVerticalLine *m_buttonSpliter {nullptr};
 
-    MessageType    m_msgType;
+    MessageType m_msgType;
 };
 
 #endif // VNOTEMESSAGEDIALOG_H

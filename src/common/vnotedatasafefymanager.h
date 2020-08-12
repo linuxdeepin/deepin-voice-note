@@ -36,17 +36,19 @@ public:
 
     ~VNoteDataSafefyManager();
 
-    static VNoteDataSafefyManager* instance();
+    static VNoteDataSafefyManager *instance();
 
     void reqSafers();
 
-    void doSafer(const VDataSafer& safer);
+    void doSafer(const VDataSafer &safer);
 signals:
 
 public slots:
-    void onSafersLoaded(SafetyDatas* safers);
+    void onSafersLoaded(SafetyDatas *safers);
+
 protected:
     void initTaskWoker();
+
 protected:
     QScopedPointer<SafetyDatas> m_qsSafetyDatas;
 
@@ -54,7 +56,7 @@ protected:
 
     LoadSafeteyDataWorker *m_pSaferLoadWorker {nullptr};
 
-    static VNoteDataSafefyManager* _instance;
+    static VNoteDataSafefyManager *_instance;
 };
 
 #endif // VNOTEDATASAFEFYMANAGER_H

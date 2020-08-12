@@ -30,7 +30,8 @@
 #include <QtDBus>
 #include <QtDBus/QDBusArgument>
 
-class Inhibit {
+class Inhibit
+{
 public:
     QString what;
     QString who;
@@ -47,7 +48,8 @@ public:
     static void registerMetaType();
 };
 
-class UserInfo {
+class UserInfo
+{
 public:
     qlonglong pid;
     QString id;
@@ -61,7 +63,8 @@ public:
     static void registerMetaType();
 };
 
-class SeatInfo {
+class SeatInfo
+{
 public:
     QString id;
     QString seat;
@@ -74,7 +77,8 @@ public:
     static void registerMetaType();
 };
 
-class SessionInfo {
+class SessionInfo
+{
 public:
     QString session;
     qlonglong pid;
@@ -90,11 +94,9 @@ public:
     static void registerMetaType();
 };
 
-
 typedef QList<Inhibit> InhibitorsList;
 Q_DECLARE_METATYPE(Inhibit)
 Q_DECLARE_METATYPE(InhibitorsList)
-
 
 typedef QList<UserInfo> UserList;
 Q_DECLARE_METATYPE(UserInfo)
@@ -108,4 +110,3 @@ typedef QList<SessionInfo> SessionList;
 Q_DECLARE_METATYPE(SessionInfo)
 Q_DECLARE_METATYPE(SessionList)
 #endif // DBUSVARIANT
-

@@ -26,7 +26,6 @@ VNMainWndDelayInitTask::VNMainWndDelayInitTask(VNoteMainWindow *pMainWnd, QObjec
     : VNTask(parent)
     , m_pMainWnd(pMainWnd)
 {
-
 }
 
 void VNMainWndDelayInitTask::run()

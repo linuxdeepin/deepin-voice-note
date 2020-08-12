@@ -28,11 +28,11 @@
 TextNoteEdit::TextNoteEdit(QWidget *parent)
     : DTextEdit(parent)
 {
-    setAlignment(Qt::AlignTop);//设置顶部对其
-    setFrameShape(QFrame::NoFrame);//设置无边框
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//隐藏纵滚动条
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);//隐藏横滚动条
-    DFontSizeManager::instance()->bind(this, DFontSizeManager::T8);//DTK设置字体大小
+    setAlignment(Qt::AlignTop); //设置顶部对其
+    setFrameShape(QFrame::NoFrame); //设置无边框
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); //隐藏纵滚动条
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); //隐藏横滚动条
+    DFontSizeManager::instance()->bind(this, DFontSizeManager::T8); //DTK设置字体大小
     setContextMenuPolicy(Qt::NoContextMenu);
     setMouseTracking(true);
 
@@ -40,7 +40,6 @@ TextNoteEdit::TextNoteEdit(QWidget *parent)
     //setFocusPolicy(Qt::ClickFocus);
 
     this->installEventFilter(this);
-
 }
 
 void TextNoteEdit::focusInEvent(QFocusEvent *e)
@@ -73,12 +72,12 @@ void TextNoteEdit::keyPressEvent(QKeyEvent *e)
 {
     int key = e->key();
 
-    if(e->modifiers() == Qt::ControlModifier || key == Qt::Key_Delete){
+    if (e->modifiers() == Qt::ControlModifier || key == Qt::Key_Delete) {
         e->ignore();
         return;
     }
 
-    if(key == Qt::Key_Tab && e->modifiers() == Qt::NoModifier){
+    if (key == Qt::Key_Tab && e->modifiers() == Qt::NoModifier) {
         indentText();
         return;
     }
@@ -138,7 +137,7 @@ QString TextNoteEdit::getSelectFragment()
 bool TextNoteEdit::hasSelection()
 {
     QTextCursor textCursor = this->textCursor();
-    return  textCursor.hasSelection();
+    return textCursor.hasSelection();
 }
 
 void TextNoteEdit::removeSelectText()

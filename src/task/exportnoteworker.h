@@ -33,8 +33,8 @@ class ExportNoteWorker : public VNTask
 public:
     explicit ExportNoteWorker(QString dirPath,
                               int exportType,
-                              VNoteItem* note,
-                              VNoteBlock* block = nullptr,
+                              VNoteItem *note,
+                              VNoteBlock *block = nullptr,
                               QObject *parent = nullptr);
     enum {
         ExportNothing,
@@ -61,12 +61,12 @@ protected:
     int exportText();
     int exportAllVoice();
     int exportAll();
-    int exportOneVoice(VNoteBlock* block);
+    int exportOneVoice(VNoteBlock *block);
 
-    int        m_exportType {ExportNothing};
-    QString    m_exportPath;
-    VNoteItem* m_note {nullptr};
-    VNoteBlock* m_noteblock {nullptr};
+    int m_exportType {ExportNothing};
+    QString m_exportPath;
+    VNoteItem *m_note {nullptr};
+    VNoteBlock *m_noteblock {nullptr};
 };
 
 #endif // EXPORTNOTEWORKER_H

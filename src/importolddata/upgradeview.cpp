@@ -38,15 +38,15 @@ UpgradeView::UpgradeView(QWidget *parent)
 
     m_waterProgress = new DWaterProgress(this);
     m_waterProgress->start();
-    m_waterProgress->setFixedSize(QSize(80,80));
+    m_waterProgress->setFixedSize(QSize(80, 80));
 
     setProgress(1);
 
     m_tooltipTextLabel = new DLabel(
-                DApplication::translate(
-                    "UpgradeView",
-                    "Importing notes from the old version, please wait..."),
-                this);
+        DApplication::translate(
+            "UpgradeView",
+            "Importing notes from the old version, please wait..."),
+        this);
 
     m_tooltipTextLabel->setForegroundRole(DPalette::TextTitle);
     DFontSizeManager::instance()->bind(m_tooltipTextLabel, DFontSizeManager::T4);
@@ -118,10 +118,7 @@ void UpgradeView::onUpgradeFinish()
 
 void UpgradeView::initConnections()
 {
-    connect(VNoteOldDataManager::instance(), &VNoteOldDataManager::dataReady
-            , this, &UpgradeView::onDataReady);
-    connect(VNoteOldDataManager::instance(), &VNoteOldDataManager::progressValue
-            , this, &UpgradeView::setProgress, Qt::QueuedConnection);
-    connect(VNoteOldDataManager::instance(), &VNoteOldDataManager::upgradeFinish
-            , this, &UpgradeView::onUpgradeFinish, Qt::QueuedConnection);
+    connect(VNoteOldDataManager::instance(), &VNoteOldDataManager::dataReady, this, &UpgradeView::onDataReady);
+    connect(VNoteOldDataManager::instance(), &VNoteOldDataManager::progressValue, this, &UpgradeView::setProgress, Qt::QueuedConnection);
+    connect(VNoteOldDataManager::instance(), &VNoteOldDataManager::upgradeFinish, this, &UpgradeView::onUpgradeFinish, Qt::QueuedConnection);
 }

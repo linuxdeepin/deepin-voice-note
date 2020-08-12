@@ -40,16 +40,17 @@ public:
         StateMax,
     };
 
-    static OpsStateInterface* instance();
+    static OpsStateInterface *instance();
 
     void operState(int type, bool isSet);
 
-    bool isSearching()  const;
-    bool isRecording()  const;
-    bool isPlaying()    const;
+    bool isSearching() const;
+    bool isRecording() const;
+    bool isPlaying() const;
     bool isVoice2Text() const;
-    bool isAppQuit()    const;
+    bool isAppQuit() const;
     bool isAiSrvExist() const;
+
 protected:
     quint64 m_states {StateNone};
 };

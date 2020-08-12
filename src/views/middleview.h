@@ -57,13 +57,14 @@ public:
 signals:
 public slots:
     void onNoteChanged();
+
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     bool eventFilter(QObject *o, QEvent *e) override;
-    void keyPressEvent(QKeyEvent* e) override;
+    void keyPressEvent(QKeyEvent *e) override;
     void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
 
 private:
@@ -72,11 +73,11 @@ private:
     void initMenu();
     void initUI();
 
-    bool                m_onlyCurItemMenuEnable {false};
-    qint64              m_currentId {-1};
-    QString             m_searchKey;
-    DLabel             *m_emptySearch {nullptr};
-    DMenu              *m_noteMenu {nullptr};
+    bool m_onlyCurItemMenuEnable {false};
+    qint64 m_currentId {-1};
+    QString m_searchKey;
+    DLabel *m_emptySearch {nullptr};
+    DMenu *m_noteMenu {nullptr};
     QStandardItemModel *m_pDataModel {nullptr};
     MiddleViewDelegate *m_pItemDelegate {nullptr};
     MiddleViewSortFilter *m_pSortViewFilter {nullptr};

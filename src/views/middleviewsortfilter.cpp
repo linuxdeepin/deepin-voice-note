@@ -24,9 +24,8 @@
 #include "common/standarditemcommon.h"
 
 MiddleViewSortFilter::MiddleViewSortFilter(QObject *parent)
-    :QSortFilterProxyModel (parent)
+    : QSortFilterProxyModel(parent)
 {
-
 }
 
 void MiddleViewSortFilter::sortView(MiddleViewSortFilter::sortFeild feild,
@@ -39,17 +38,14 @@ void MiddleViewSortFilter::sortView(MiddleViewSortFilter::sortFeild feild,
 }
 
 bool MiddleViewSortFilter::lessThan(
-        const QModelIndex &source_left,
-        const QModelIndex &source_right) const
+    const QModelIndex &source_left,
+    const QModelIndex &source_right) const
 {
+    VNoteItem *leftNote = reinterpret_cast<VNoteItem *>(
+        StandardItemCommon::getStandardItemData(source_left));
 
-    VNoteItem *leftNote = reinterpret_cast<VNoteItem*>(
-                StandardItemCommon::getStandardItemData(source_left)
-                );
-
-    VNoteItem *rightNote = reinterpret_cast<VNoteItem*>(
-                StandardItemCommon::getStandardItemData(source_right)
-                );
+    VNoteItem *rightNote = reinterpret_cast<VNoteItem *>(
+        StandardItemCommon::getStandardItemData(source_right));
 
     if (nullptr != leftNote && nullptr != rightNote) {
         switch (m_sortFeild) {
@@ -63,5 +59,4 @@ bool MiddleViewSortFilter::lessThan(
     }
 
     return QSortFilterProxyModel::lessThan(source_left, source_right);
-
 }

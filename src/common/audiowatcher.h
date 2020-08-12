@@ -27,7 +27,8 @@ class AudioWatcher : public QObject
 {
     Q_OBJECT
 public:
-    enum AudioMode{Internal,Micphone};
+    enum AudioMode { Internal,
+                     Micphone };
     Q_ENUM(AudioMode)
     explicit AudioWatcher(QObject *parent = nullptr);
     QString getDeviceName(AudioMode mode);
@@ -38,26 +39,27 @@ signals:
     void sigDeviceChange(AudioMode mode);
     void sigMuteChanged(AudioMode mode);
 protected slots:
-    void onDefaultSourceActivePortChanged(AudioPort  value);
-    void onDefaultSinkActivePortChanged(AudioPort  value);
+    void onDefaultSourceActivePortChanged(AudioPort value);
+    void onDefaultSinkActivePortChanged(AudioPort value);
     void onDefaultSourceChanaged(const QDBusObjectPath &value);
     void onDefaultSinkChanaged(const QDBusObjectPath &value);
     void onSourceVolumeChanged(double d);
     void onSinkVolumeChanged(double d);
-    void onSourceMuteChanged(bool  value);
-    void onSinkMuteChanged(bool  value);
+    void onSourceMuteChanged(bool value);
+    void onSinkMuteChanged(bool value);
 
 private:
     void initWatcherCofing();
     void initDeviceWacther();
     void initConnections();
+
 private:
     const QString m_serviceName {"com.deepin.daemon.Audio"};
     QScopedPointer<com::deepin::daemon::Audio> m_pAudioInterface;
     QScopedPointer<com::deepin::daemon::audio::Source> m_pDefaultSource;
     QScopedPointer<com::deepin::daemon::audio::Sink> m_pDefaultSink;
-    AudioPort   m_outAudioPort;
-    AudioPort   m_inAudioPort;
+    AudioPort m_outAudioPort;
+    AudioPort m_inAudioPort;
     double m_outAudioPortVolume = 0.0;
     double m_inAudioPortVolume = 0.0;
     bool m_fNeedDeviceChecker {true};

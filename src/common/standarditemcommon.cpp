@@ -22,14 +22,13 @@
 
 StandardItemCommon::StandardItemCommon()
 {
-
 }
 QStandardItem *StandardItemCommon::createStandardItem(void *data, StandardItemType type)
 {
     QStandardItem *pItem = new QStandardItem;
     pItem->setData(QVariant::fromValue(type), Qt::UserRole + 1);
     pItem->setData(QVariant::fromValue(data), Qt::UserRole + 2);
-    return  pItem;
+    return pItem;
 }
 
 StandardItemCommon::StandardItemType StandardItemCommon::getStandardItemType(const QModelIndex &index)
@@ -38,18 +37,18 @@ StandardItemCommon::StandardItemType StandardItemCommon::getStandardItemType(con
     if (index.isValid()) {
         QVariant var = index.data(Qt::UserRole + 1);
         if (var.isValid()) {
-            return  var.value<StandardItemType>();
+            return var.value<StandardItemType>();
         }
     }
-    return  type;
+    return type;
 }
 
-void * StandardItemCommon::getStandardItemData(const QModelIndex &index)
+void *StandardItemCommon::getStandardItemData(const QModelIndex &index)
 {
-    if(index.isValid()){
+    if (index.isValid()) {
         QVariant var = index.data(Qt::UserRole + 2);
         if (var.isValid()) {
-            return  var.value<void *>();
+            return var.value<void *>();
         }
     }
     return nullptr;

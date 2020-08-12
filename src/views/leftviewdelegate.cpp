@@ -46,14 +46,14 @@ void LeftViewDelegate::init()
 }
 
 QWidget *LeftViewDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,
-                                      const QModelIndex &index) const
+                                        const QModelIndex &index) const
 {
     Q_UNUSED(index)
     Q_UNUSED(option)
     QLineEdit *editBox = new QLineEdit(parent);
     editBox->setMaxLength(MAX_FOLDER_NAME_LEN);
     editBox->setFixedSize(132, 30);
-    return  editBox;
+    return editBox;
 }
 
 void LeftViewDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
@@ -65,7 +65,7 @@ void LeftViewDelegate::setEditorData(QWidget *editor, const QModelIndex &index) 
 }
 
 void LeftViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
-                                  const QModelIndex &index) const
+                                    const QModelIndex &index) const
 {
     Q_UNUSED(model);
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
@@ -88,7 +88,7 @@ void LeftViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 }
 
 void LeftViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
-                                          const QModelIndex &index) const
+                                            const QModelIndex &index) const
 {
     Q_UNUSED(index)
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
@@ -102,35 +102,35 @@ void LeftViewDelegate::handleChangeTheme()
 }
 
 QSize LeftViewDelegate::sizeHint(const QStyleOptionViewItem &option,
-                               const QModelIndex &index) const
+                                 const QModelIndex &index) const
 {
     StandardItemCommon::StandardItemType type = StandardItemCommon::getStandardItemType(index);
     switch (type) {
     case StandardItemCommon::NOTEPADROOT:
-        return  QSize(option.rect.width(), 1); //隐藏记事本一级目录
+        return QSize(option.rect.width(), 1); //隐藏记事本一级目录
     case StandardItemCommon::NOTEPADITEM:
-        return  QSize(option.rect.width(), 47);
+        return QSize(option.rect.width(), 47);
     default:
         return DStyledItemDelegate::sizeHint(option, index);
     }
 }
 
 void LeftViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
-                           const QModelIndex &index) const
+                             const QModelIndex &index) const
 {
     StandardItemCommon::StandardItemType type = StandardItemCommon::getStandardItemType(index);
     switch (type) {
     case StandardItemCommon::NOTEPADROOT:
-        return  paintNoteRoot(painter, option, index);
+        return paintNoteRoot(painter, option, index);
     case StandardItemCommon::NOTEPADITEM:
-        return  paintNoteItem(painter, option, index);
+        return paintNoteItem(painter, option, index);
     default:
         return DStyledItemDelegate::paint(painter, option, index);
     }
 }
 
 void LeftViewDelegate::paintNoteRoot(QPainter *painter, const QStyleOptionViewItem &option,
-                                   const QModelIndex &index) const
+                                     const QModelIndex &index) const
 {
     Q_UNUSED(painter)
     Q_UNUSED(index)
@@ -138,7 +138,7 @@ void LeftViewDelegate::paintNoteRoot(QPainter *painter, const QStyleOptionViewIt
 }
 
 void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewItem &option,
-                                   const QModelIndex &index) const
+                                     const QModelIndex &index) const
 {
     if (!index.isValid()) {
         return;
@@ -198,10 +198,10 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
                        numRect.left() - iconRect.right() - 15, paintRect.height());
         painter->drawText(numRect, Qt::AlignRight | Qt::AlignVCenter, strNum);
 
-        if(enable == false){
-           painter->drawPixmap(iconRect, data->UI.grayIcon);
-        }else {
-           painter->drawPixmap(iconRect, data->UI.icon);
+        if (enable == false) {
+            painter->drawPixmap(iconRect, data->UI.grayIcon);
+        } else {
+            painter->drawPixmap(iconRect, data->UI.icon);
         }
 
         QString elideText = fontMetrics.elidedText(data->name, Qt::ElideRight, nameRect.width());
@@ -214,4 +214,3 @@ void LeftViewDelegate::setEnableItem(bool enable)
 {
     m_enableItem = enable;
 }
-

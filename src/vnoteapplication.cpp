@@ -32,9 +32,7 @@
 VNoteApplication::VNoteApplication(int &argc, char **argv)
     : DApplication(argc, argv)
 {
-    connect(DGuiApplicationHelper::instance()
-            ,&DGuiApplicationHelper::newProcessInstance, this
-            ,&VNoteApplication::onNewProcessInstance);
+    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::newProcessInstance, this, &VNoteApplication::onNewProcessInstance);
 }
 
 void VNoteApplication::activateWindow()

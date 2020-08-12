@@ -39,13 +39,15 @@ public:
      * dir,we should call the this function in main window.
      * We can't get correct path when app's consturctor.
      * */
-    VNoteMainWindow* mainWindow() const;
+    VNoteMainWindow *mainWindow() const;
 signals:
 
 public slots:
     void onNewProcessInstance(qint64 pid, const QStringList &arguments);
+
 protected:
     virtual void handleQuitAction() override;
+
 protected:
     QScopedPointer<VNoteMainWindow> m_qspMainWnd {nullptr};
 };

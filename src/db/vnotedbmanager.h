@@ -35,14 +35,14 @@ public:
     explicit VNoteDbManager(bool fOldDb = false, QObject *parent = nullptr);
     virtual ~VNoteDbManager();
 
-    static VNoteDbManager* instance();
+    static VNoteDbManager *instance();
 
     static constexpr char const *DBVERSION = "1.0";
 
     static constexpr char const *FOLDER_TABLE_NAME = "vnote_folder_tbl";
-    static constexpr char const *FOLDER_KEY        = "folder_id";
+    static constexpr char const *FOLDER_KEY = "folder_id";
     static constexpr char const *NOTES_TABLE_NAME = "vnote_items_tbl";
-    static constexpr char const *NOTES_KEY        = "note_id";
+    static constexpr char const *NOTES_KEY = "note_id";
     static constexpr char const *CATEGORY_TABLE_NAME = "vnote_category_tbl";
     static constexpr char const *SAFER_TABLE_NAME = "vnote_data_safer_tbl";
 
@@ -117,12 +117,12 @@ public:
         VNOTE_MAX_TBL
     };
 
-    QSqlDatabase& getVNoteDb();
+    QSqlDatabase &getVNoteDb();
 
-    bool insertData(DbVisitor* visitor /*in/out*/);
-    bool updateData(DbVisitor* visitor /*in/out*/);
-    bool queryData(DbVisitor* visitor /*in/out*/);
-    bool deleteData(DbVisitor* visitor /*in/out*/);
+    bool insertData(DbVisitor *visitor /*in/out*/);
+    bool updateData(DbVisitor *visitor /*in/out*/);
+    bool queryData(DbVisitor *visitor /*in/out*/);
+    bool deleteData(DbVisitor *visitor /*in/out*/);
 
     static bool hasOldDataBase();
 signals:
@@ -130,17 +130,17 @@ signals:
 public slots:
 
 protected:
-        int initVNoteDb(bool fOldDB = false);
-        void createTablesIfNeed();
+    int initVNoteDb(bool fOldDB = false);
+    void createTablesIfNeed();
 
 protected:
     QSqlDatabase m_vnoteDB;
-//    QScopedPointer<QSqlQuery> m_sqlQuery;
+    //    QScopedPointer<QSqlQuery> m_sqlQuery;
 
     QMutex m_dbLock;
-    bool   m_isDbInitOK {false};
+    bool m_isDbInitOK {false};
 
-    static VNoteDbManager* _instance;
+    static VNoteDbManager *_instance;
 };
 
 #endif // VNOTEDBMANAGER_H

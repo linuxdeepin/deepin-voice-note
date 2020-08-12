@@ -36,8 +36,8 @@ VNWaveform::VNWaveform(QWidget *parent)
 
 void VNWaveform::onAudioBufferProbed(const QAudioBuffer &buffer)
 {
-    static struct timeval curret = {0,0};
-    static struct timeval lastUpdate = {0,0};
+    static struct timeval curret = {0, 0};
+    static struct timeval lastUpdate = {0, 0};
 
     gettimeofday(&curret, nullptr);
 
@@ -50,13 +50,13 @@ void VNWaveform::onAudioBufferProbed(const QAudioBuffer &buffer)
         //If the volume too low, use the
         //defaultGain * 2 as max sample value
         if (m_frameGain < m_defaultGain) {
-            m_frameGain = m_defaultGain*2;
+            m_frameGain = m_defaultGain * 2;
         }
 
         update();
 
         //last update time.
-        lastUpdate=curret;
+        lastUpdate = curret;
     }
 }
 
@@ -75,22 +75,21 @@ void VNWaveform::paintEvent(QPaintEvent *event)
     qreal waveOffsetX = WAVE_OFFSET_X;
     qreal waveOffsetY = WAVE_OFFSET_Y;
 
-    const qreal availableHeight = height() - (waveOffsetY *2);
+    const qreal availableHeight = height() - (waveOffsetY * 2);
 
     const QColor startColor(3, 208, 214);
     const QColor endColor(1, 121, 255);
 
     for (int i = 0; (i < m_audioScaleSamples.size() && i < m_maxShowedSamples); i++) {
-
-        qreal scaler =  qSqrt(m_audioScaleSamples[i])/m_frameGain;
+        qreal scaler = qSqrt(m_audioScaleSamples[i]) / m_frameGain;
 
         qreal waveHeight = scaler * height();
 
         //Use default height when waveHeight less or equal to 0
         waveHeight = (waveHeight > waveWidth) ? waveHeight : waveWidth;
 
-        qreal startX = waveOffsetX+i*(waveWidth+waveSpace);
-        qreal startY = (availableHeight-waveHeight ) / m_waveStyle;
+        qreal startX = waveOffsetX + i * (waveWidth + waveSpace);
+        qreal startY = (availableHeight - waveHeight) / m_waveStyle;
 
         QRectF waveRectF(startX, startY, waveWidth, waveHeight);
 
@@ -107,10 +106,9 @@ void VNWaveform::paintEvent(QPaintEvent *event)
 
 void VNWaveform::resizeEvent(QResizeEvent *event)
 {
-    m_maxShowedSamples = static_cast<int> (
-                (event->size().width()-WAVE_OFFSET_X*2)
-                / ((WAVE_WIDTH+WAVE_SPACE))
-                );
+    m_maxShowedSamples = static_cast<int>(
+        (event->size().width() - WAVE_OFFSET_X * 2)
+        / ((WAVE_WIDTH + WAVE_SPACE)));
 
     qDebug() << __FUNCTION__ << "m_maxShowedSamples:" << m_maxShowedSamples
              << "width:" << event->size().width();
@@ -119,9 +117,9 @@ void VNWaveform::resizeEvent(QResizeEvent *event)
 
 // returns the audio level for each channel
 void VNWaveform::getBufferLevels(
-        const QAudioBuffer &buffer,
-        QVector<qreal> &scaleSamples,
-        qreal &frameGain)
+    const QAudioBuffer &buffer,
+    QVector<qreal> &scaleSamples,
+    qreal &frameGain)
 {
     QVector<qreal> values;
 
@@ -147,52 +145,52 @@ void VNWaveform::getBufferLevels(
     case QAudioFormat::UnSignedInt:
         if (buffer.format().sampleSize() == 32)
             VNWaveform::getBufferLevels(
-                        buffer.constData<quint32>(),
-                        buffer.frameCount(),
-                        channelCount, peak_value, scaleSamples, frameGain);
+                buffer.constData<quint32>(),
+                buffer.frameCount(),
+                channelCount, peak_value, scaleSamples, frameGain);
         if (buffer.format().sampleSize() == 16)
             VNWaveform::getBufferLevels(
-                        buffer.constData<quint16>(),
-                        buffer.frameCount(),
-                        channelCount, peak_value, scaleSamples, frameGain);
+                buffer.constData<quint16>(),
+                buffer.frameCount(),
+                channelCount, peak_value, scaleSamples, frameGain);
         if (buffer.format().sampleSize() == 8)
             VNWaveform::getBufferLevels(
-                        buffer.constData<quint8>(),
-                        buffer.frameCount(),
-                        channelCount, peak_value, scaleSamples, frameGain);
+                buffer.constData<quint8>(),
+                buffer.frameCount(),
+                channelCount, peak_value, scaleSamples, frameGain);
         break;
     case QAudioFormat::Float:
         if (buffer.format().sampleSize() == 32) {
             VNWaveform::getBufferLevels(
-                        buffer.constData<float>(),
-                        buffer.frameCount(),
-                        channelCount, peak_value, scaleSamples, frameGain);
+                buffer.constData<float>(),
+                buffer.frameCount(),
+                channelCount, peak_value, scaleSamples, frameGain);
         }
         break;
     case QAudioFormat::SignedInt:
         if (buffer.format().sampleSize() == 32)
             VNWaveform::getBufferLevels(
-                        buffer.constData<qint32>(),
-                        buffer.frameCount(),
-                        channelCount, peak_value, scaleSamples, frameGain);
+                buffer.constData<qint32>(),
+                buffer.frameCount(),
+                channelCount, peak_value, scaleSamples, frameGain);
         if (buffer.format().sampleSize() == 16)
             VNWaveform::getBufferLevels(
-                        buffer.constData<qint16>(),
-                        buffer.frameCount(),
-                        channelCount, peak_value, scaleSamples, frameGain);
+                buffer.constData<qint16>(),
+                buffer.frameCount(),
+                channelCount, peak_value, scaleSamples, frameGain);
         if (buffer.format().sampleSize() == 8)
             VNWaveform::getBufferLevels(
-                        buffer.constData<qint8>(),
-                        buffer.frameCount(),
-                        channelCount, peak_value, scaleSamples, frameGain);
+                buffer.constData<qint8>(),
+                buffer.frameCount(),
+                channelCount, peak_value, scaleSamples, frameGain);
         break;
     }
 }
 
-template <class T>
+template<class T>
 void VNWaveform::getBufferLevels(
-        const T *buffer, int frames, int channels,
-        qreal peakValue, QVector<qreal> &samples, qreal &frameGain)
+    const T *buffer, int frames, int channels,
+    qreal peakValue, QVector<qreal> &samples, qreal &frameGain)
 {
     Q_UNUSED(peakValue);
 

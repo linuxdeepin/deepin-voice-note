@@ -112,7 +112,7 @@ protected:
 #endif
 
     void initSpliterView(); //正常主窗口
-    void initSplashView();  // Splash animation view
+    void initSplashView(); // Splash animation view
     void initEmptyFoldersView();
     void setSpecialStatus(SpecialStatus status);
     void switchWidget(WindowType type);
@@ -133,7 +133,7 @@ public slots:
     void onVNoteSearch();
     void onVNoteSearchTextChange(const QString &text);
     void onCursorChange(int height, bool mouseMove); //调整详情页滚动条
-    void onStartRecord(const QString &path);//开始录音
+    void onStartRecord(const QString &path); //开始录音
     void onFinshRecord(const QString &voicePath, qint64 voiceSize); //结束录音
     void onRightViewVoicePlay(VNVoiceBlock *voiceData);
     void onRightViewVoicePause(VNVoiceBlock *voiceData);
@@ -162,6 +162,7 @@ public slots:
     void onShowPrivacy();
     //参数设置
     void onShowSettingDialog();
+
 private:
     //左侧列表视图操作相关
     void addNotepad();
@@ -186,26 +187,26 @@ private:
 
 #ifdef TITLE_ACITON_PANEL
     //titlebar actions
-    QWidget     *m_actionPanel {nullptr};
+    QWidget *m_actionPanel {nullptr};
     DIconButton *m_addNewNoteBtn {nullptr};
 #endif
 
 #ifdef IMPORT_OLD_VERSION_DATA
     //*******Upgrade old Db code here only********
-    bool        m_fNeedUpgradeOldDb = false;
+    bool m_fNeedUpgradeOldDb = false;
 #endif
 
-    DScrollArea     *m_rightViewScrollArea {nullptr};
-    QWidget         *m_rightViewHolder {nullptr};
-    QWidget         *m_recordBarHolder {nullptr};
-    QWidget         *m_leftViewHolder {nullptr};
-    QWidget         *m_middleViewHolder {nullptr};
-    QWidget         *m_centerWidget {nullptr};
+    DScrollArea *m_rightViewScrollArea {nullptr};
+    QWidget *m_rightViewHolder {nullptr};
+    QWidget *m_recordBarHolder {nullptr};
+    QWidget *m_leftViewHolder {nullptr};
+    QWidget *m_middleViewHolder {nullptr};
+    QWidget *m_centerWidget {nullptr};
 
-    DSplitter   *m_mainWndSpliter {nullptr};
-    LeftView    *m_leftView {nullptr};
-    MiddleView  *m_middleView {nullptr};
-    RightView   *m_rightView {nullptr};
+    DSplitter *m_mainWndSpliter {nullptr};
+    LeftView *m_leftView {nullptr};
+    MiddleView *m_middleView {nullptr};
+    RightView *m_rightView {nullptr};
 
     DPushButton *m_addNotepadBtn {nullptr};
     DFloatingButton *m_addNoteBtn {nullptr};
@@ -217,40 +218,39 @@ private:
     SplashView *m_splashView {nullptr};
     HomePage *m_wndHomePage {nullptr};
     DStackedWidget *m_stackedWidget {nullptr};
-    bool            m_rightViewHasFouse {true};
+    bool m_rightViewHasFouse {true};
 
     //Shortcuts key
     //*****************Shortcut key begin*********************
-    QScopedPointer<QShortcut> m_stNewNotebook;   //Ctrl+N
-    QScopedPointer<QShortcut> m_stRemNotebook;   //F2
+    QScopedPointer<QShortcut> m_stNewNotebook; //Ctrl+N
+    QScopedPointer<QShortcut> m_stRemNotebook; //F2
 
-    QScopedPointer<QShortcut> m_stNewNote;       //Ctrl+B
-    QScopedPointer<QShortcut> m_stRemNote;       //F3
+    QScopedPointer<QShortcut> m_stNewNote; //Ctrl+B
+    QScopedPointer<QShortcut> m_stRemNote; //F3
 
-    QScopedPointer<QShortcut> m_stPlayorPause;   //Space
-    QScopedPointer<QShortcut> m_stRecording;     //Ctrl+R
-    QScopedPointer<QShortcut> m_stVoice2Text;    //Ctrl+W
-    QScopedPointer<QShortcut> m_stSaveAsMp3;     //Ctrl+P
-    QScopedPointer<QShortcut> m_stSaveAsText;    //Ctrl+S
-    QScopedPointer<QShortcut> m_stSaveVoices;    //Ctrl+Y
-    QScopedPointer<QShortcut> m_stDelete;    //Delete
+    QScopedPointer<QShortcut> m_stPlayorPause; //Space
+    QScopedPointer<QShortcut> m_stRecording; //Ctrl+R
+    QScopedPointer<QShortcut> m_stVoice2Text; //Ctrl+W
+    QScopedPointer<QShortcut> m_stSaveAsMp3; //Ctrl+P
+    QScopedPointer<QShortcut> m_stSaveAsText; //Ctrl+S
+    QScopedPointer<QShortcut> m_stSaveVoices; //Ctrl+Y
+    QScopedPointer<QShortcut> m_stDelete; //Delete
 
     QScopedPointer<QShortcut> m_stPreviewShortcuts;
     //     Help                               //F1 DTK Implementaion
     //*****************Shortcut keys end**********************
 
-    QString          m_searchKey;
+    QString m_searchKey;
     //VoiceNoteItem    *m_currentAsrVoice {nullptr};
     DFloatingMessage *m_asrErrMeassage {nullptr};
     DFloatingMessage *m_pDeviceExceptionMsg {nullptr};
-    DPushButton      *m_asrAgainBtn {nullptr};
-    DMenu            *m_menuExtension {nullptr};
+    DPushButton *m_asrAgainBtn {nullptr};
+    DMenu *m_menuExtension {nullptr};
     //Login session manager
     DBusLogin1Manager *m_pLogin1Manager {nullptr};
     QDBusPendingReply<QDBusUnixFileDescriptor> m_lockFd;
 
     friend class VNMainWndDelayInitTask;
 };
-
 
 #endif // VNOTEMAINWINDOW_H

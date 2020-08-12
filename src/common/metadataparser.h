@@ -90,10 +90,10 @@ public:
         NVoiceSizeNode,
         NVoiceTitleNode,
         NVoiceCreateTimeNode,
-        NVoiceStateNode,      // State: 1 for audio to text done, 0 for have not done
+        NVoiceStateNode, // State: 1 for audio to text done, 0 for have not done
         NVoiceTextNode,
     };
-#elif defined (VN_JSON_METADATA_PARSER)
+#elif defined(VN_JSON_METADATA_PARSER)
     enum {
         NDataCount,
         NVoiceMaxId,
@@ -108,12 +108,12 @@ public:
     };
 #endif
 
-    void parse(const QVariant &metaData, VNoteItem *noteData/*out*/);
+    void parse(const QVariant &metaData, VNoteItem *noteData /*out*/);
     void makeMetaData(const VNoteItem *noteData, QVariant &metaData /*out*/);
 
 protected:
 #ifdef VN_XML_METADATA_PARSER
-    const QMap<int,QString> m_xmlNodeNameMap = {
+    const QMap<int, QString> m_xmlNodeNameMap = {
         {NRootNode, "Note"},
         {NVoiceMaxIdAttr, "VoiceMaxId"},
         {NItemCountAttr, "NoteElementsCount"},
@@ -128,26 +128,26 @@ protected:
         {NVoiceTextNode, "NoteVoiceText"},
     };
 
-    void xmlParse(const QVariant &metaData, VNoteItem *noteData/*out*/);
+    void xmlParse(const QVariant &metaData, VNoteItem *noteData /*out*/);
     void xmlMakeMetadata(const VNoteItem *noteData, QVariant &metaData /*out*/);
-    void xmlParseRoot(QXmlStreamReader& xmlSRead, VNoteItem *noteData);
-    void xmlParseNoteItem(QXmlStreamReader& xmlSRead, VNoteItem *noteData/*out*/);
+    void xmlParseRoot(QXmlStreamReader &xmlSRead, VNoteItem *noteData);
+    void xmlParseNoteItem(QXmlStreamReader &xmlSRead, VNoteItem *noteData /*out*/);
 
-#elif defined (VN_JSON_METADATA_PARSER)
-    QMap<int,QString> m_jsonNodeNameMap = {
-            {NDataCount, "dataCount"},
-            {NVoiceMaxId, "voiceMaxId"},
-            {NDatas, "noteDatas"},
-            {NDataType, "type"},
-            {NText, "text"},
-            {NTitle, "title"},
-            {NState, "state"},          // State: 1 for audio to text done, 0 for have not done
-            {NVoicePath, "voicePath"},
-            {NVoiceSize, "voiceSize"},
-            {NCreateTime, "createTime"},
-        };
+#elif defined(VN_JSON_METADATA_PARSER)
+    QMap<int, QString> m_jsonNodeNameMap = {
+        {NDataCount, "dataCount"},
+        {NVoiceMaxId, "voiceMaxId"},
+        {NDatas, "noteDatas"},
+        {NDataType, "type"},
+        {NText, "text"},
+        {NTitle, "title"},
+        {NState, "state"}, // State: 1 for audio to text done, 0 for have not done
+        {NVoicePath, "voicePath"},
+        {NVoiceSize, "voiceSize"},
+        {NCreateTime, "createTime"},
+    };
 
-    void jsonParse(const QVariant &metaData, VNoteItem *noteData/*out*/);
+    void jsonParse(const QVariant &metaData, VNoteItem *noteData /*out*/);
     void jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaData /*out*/);
 #endif
 };

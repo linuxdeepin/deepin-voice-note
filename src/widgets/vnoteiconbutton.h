@@ -33,14 +33,12 @@ class VNoteIconButton : public DIconButton
 {
     Q_OBJECT
 public:
-    explicit VNoteIconButton(QWidget *parent = nullptr
-            , QString normal = ""
-            , QString hover  = ""
-            , QString press  = "");
+    explicit VNoteIconButton(QWidget *parent = nullptr, QString normal = "", QString hover = "", QString press = "");
     virtual ~VNoteIconButton() override;
     void setSeparateThemIcons(bool separate);
-    void SetDisableIcon(const QString& disableIcon);
+    void SetDisableIcon(const QString &disableIcon);
     void setBtnDisabled(bool disabled);
+
 protected:
     void enterEvent(QEvent *event) override;
     void leaveEvent(QEvent *event) override;
@@ -52,9 +50,10 @@ signals:
 
 public slots:
     void onThemeChanged(DGuiApplicationHelper::ColorType type);
+
 private:
     QPixmap loadPixmap(const QString &path);
-    void    updateIcon();
+    void updateIcon();
 
     enum {
         Normal,
@@ -65,7 +64,7 @@ private:
     };
 
     QString m_icons[MaxState];
-    int     m_state {Normal};
+    int m_state {Normal};
 
     //The Icon is different under different theme.
     bool m_separateThemeIcon {true};

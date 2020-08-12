@@ -29,21 +29,20 @@
 #include <DApplication>
 DWIDGET_USE_NAMESPACE
 
-static setting*  settinginstance = nullptr;
-
+static setting *settinginstance = nullptr;
 
 void GenerateSettingTranslate()
 {
-    auto basic = DApplication::translate("Setting","Basic");
-    auto audio_source = DApplication::translate("Setting","Audio Source");
-    auto audio_internal = DApplication::translate("Setting","Internal");
-    auto audio_micphone = DApplication::translate("Setting","Micphone");
+    auto basic = DApplication::translate("Setting", "Basic");
+    auto audio_source = DApplication::translate("Setting", "Audio Source");
+    auto audio_internal = DApplication::translate("Setting", "Internal");
+    auto audio_micphone = DApplication::translate("Setting", "Micphone");
 }
 
 CustemBackend::CustemBackend(const QString &filepath, QObject *parent)
-    :DSettingsBackend(parent)
+    : DSettingsBackend(parent)
 {
-   m_settings = new QSettings(filepath,QSettings::IniFormat);
+    m_settings = new QSettings(filepath, QSettings::IniFormat);
 }
 
 CustemBackend::~CustemBackend()
@@ -54,9 +53,9 @@ CustemBackend::~CustemBackend()
 QStringList CustemBackend::keys() const
 {
     QStringList keyList = m_settings->allKeys();
-    for(auto &it : keyList){
-        if(it.indexOf('.') == -1){
-            it.insert(0,"old.");
+    for (auto &it : keyList) {
+        if (it.indexOf('.') == -1) {
+            it.insert(0, "old.");
         }
     }
     return keyList;
@@ -64,8 +63,8 @@ QStringList CustemBackend::keys() const
 
 QVariant CustemBackend::getOption(const QString &key) const
 {
-    if(key.startsWith("old.")){
-        return  m_settings->value(key.right(key.length() - 4));
+    if (key.startsWith("old.")) {
+        return m_settings->value(key.right(key.length() - 4));
     }
     return m_settings->value(key);
 }
@@ -78,26 +77,27 @@ void CustemBackend::doSync()
 void CustemBackend::doSetOption(const QString &key, const QVariant &value)
 {
     m_writeLock.lock();
-    if(key.startsWith("old.")){
-         m_settings->setValue(key.right(key.length() - 4),value);
-    }else {
+    if (key.startsWith("old.")) {
+        m_settings->setValue(key.right(key.length() - 4), value);
+    } else {
         m_settings->setValue(key, value);
     }
     m_settings->sync();
     m_writeLock.unlock();
 }
 
-setting::setting(QObject *parent) : QObject(parent)
+setting::setting(QObject *parent)
+    : QObject(parent)
 {
     QString vnoteConfigBasePath =
-            QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+        QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
 
-    QFileInfo configDir(vnoteConfigBasePath+QDir::separator());
+    QFileInfo configDir(vnoteConfigBasePath + QDir::separator());
 
     if (!configDir.exists()) {
         QDir().mkpath(configDir.filePath());
     }
-    
+
     m_backend = new CustemBackend(configDir.filePath() + QString("config.conf"), this);
     m_setting = DSettings::fromJsonFile(":/deepin-voice-note-setting.json");
     m_setting->setBackend(m_backend);
@@ -105,7 +105,7 @@ setting::setting(QObject *parent) : QObject(parent)
 
 void setting::setOption(const QString &key, const QVariant &value)
 {
-    if(getOption(key) != value){
+    if (getOption(key) != value) {
         m_setting->setOption(key, value);
         m_backend->doSetOption(key, value);
     }
@@ -116,7 +116,7 @@ QVariant setting::getOption(const QString &key)
     return m_setting->getOption(key);
 }
 
-DSettings* setting::getSetting()
+DSettings *setting::getSetting()
 {
     return m_setting;
 }
@@ -128,4 +128,3 @@ setting *setting::instance()
     }
     return settinginstance;
 }
-

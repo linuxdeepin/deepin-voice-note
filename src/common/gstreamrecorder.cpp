@@ -36,120 +36,119 @@ gboolean GstBusMessageCb(GstBus *bus, GstMessage *msg, void *userdata)
 {
     Q_UNUSED(bus);
     GstreamRecorder *recorder = reinterpret_cast<GstreamRecorder *>(userdata);
-    return  recorder->doBusMessage(msg);
+    return recorder->doBusMessage(msg);
 }
 
-
 GstreamRecorder::GstreamRecorder(QObject *parent)
-    :QObject(parent)
+    : QObject(parent)
 {
-     gst_init(nullptr, nullptr);
+    gst_init(nullptr, nullptr);
 }
 
 bool GstreamRecorder::createPipe()
 {
-   GstElement *audioSrc = nullptr; //声音采集设备
-   GstElement *audioResample = nullptr; //重采样
-   GstElement *audioConvert = nullptr; //格式转换
-   GstElement *audioQueue = nullptr; //数据缓存
-   GstElement *audioEncoder = nullptr; //编码器
-   GstElement *audioOutput = nullptr; //输出文件
-//   回音消除与噪声抑制
-//   GstElement *audiowebrtcdsp = nullptr;
-//   GstElement *audiowebrtcechoprobe = nullptr;
+    GstElement *audioSrc = nullptr; //声音采集设备
+    GstElement *audioResample = nullptr; //重采样
+    GstElement *audioConvert = nullptr; //格式转换
+    GstElement *audioQueue = nullptr; //数据缓存
+    GstElement *audioEncoder = nullptr; //编码器
+    GstElement *audioOutput = nullptr; //输出文件
+    //   回音消除与噪声抑制
+    //   GstElement *audiowebrtcdsp = nullptr;
+    //   GstElement *audiowebrtcechoprobe = nullptr;
 
-   bool success = false;
-   do {
-       audioSrc =  gst_element_factory_make("pulsesrc","audioSrc");
-       if(audioSrc == nullptr){
-           qDebug() << "audioSrc make error";
-           break;
-       }
-       if(!m_currentDevice.isEmpty()){
-           g_object_set(reinterpret_cast<gpointer*>(audioSrc), "device", m_currentDevice.toLatin1().data(), nullptr);
-       }
+    bool success = false;
+    do {
+        audioSrc = gst_element_factory_make("pulsesrc", "audioSrc");
+        if (audioSrc == nullptr) {
+            qDebug() << "audioSrc make error";
+            break;
+        }
+        if (!m_currentDevice.isEmpty()) {
+            g_object_set(reinterpret_cast<gpointer *>(audioSrc), "device", m_currentDevice.toLatin1().data(), nullptr);
+        }
 
-//       audiowebrtcdsp= gst_element_factory_make("webrtcdsp","audiowebrtcdsp");
-//       if(audiowebrtcdsp == nullptr){
-//           qDebug() << "audiowebrtcdsp make error";
-//           break;
-//       }
-//       audiowebrtcechoprobe = gst_element_factory_make("webrtcechoprobe","webrtcechoprobe");
-//       if(audiowebrtcechoprobe == nullptr){
-//           qDebug() << "audiowebrtcechoprobe make error";
-//           break;
-//       }
-//       g_object_set(audiowebrtcdsp, "probe", "webrtcechoprobe", nullptr);
+        //       audiowebrtcdsp= gst_element_factory_make("webrtcdsp","audiowebrtcdsp");
+        //       if(audiowebrtcdsp == nullptr){
+        //           qDebug() << "audiowebrtcdsp make error";
+        //           break;
+        //       }
+        //       audiowebrtcechoprobe = gst_element_factory_make("webrtcechoprobe","webrtcechoprobe");
+        //       if(audiowebrtcechoprobe == nullptr){
+        //           qDebug() << "audiowebrtcechoprobe make error";
+        //           break;
+        //       }
+        //       g_object_set(audiowebrtcdsp, "probe", "webrtcechoprobe", nullptr);
 
-       audioResample = gst_element_factory_make("audioresample", nullptr);
-       if(audioResample == nullptr){
-           qDebug() << "audioResample make error";
-           break;
-       }
-       audioConvert = gst_element_factory_make("audioconvert", "audioconvert");
-       if(audioConvert == nullptr){
-           qDebug() << "audioConvert make error";
-           break;
-       }
-       audioQueue = gst_element_factory_make("queue", "audioqueue");
-       if(audioQueue == nullptr){
-           qDebug() << "audioQueue make error";
-           break;
-       }
-       audioEncoder = gst_parse_bin_from_description(mp3Encoder.toLatin1().constData(),
-                                                                         true, nullptr);
-       if(audioEncoder == nullptr){
-           qDebug() << "audioEncoder make error";
-           break;
-       }
-       GstPad *pad = gst_element_get_static_pad(audioEncoder, "sink");
-       if(pad){
-           gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, bufferProbe, this, nullptr);
-           gst_object_unref(pad);
-       }else {
-           qDebug() << "sink pad make error";
-           break;
-       }
-       audioOutput = gst_element_factory_make("filesink", "filesink");
-       if(audioOutput == nullptr){
-           qDebug() << "audioOutput make error";
-           break;
-       }
-       if(!m_outputFile.isEmpty()){
-           g_object_set(reinterpret_cast<gpointer*>(audioOutput), "location",m_outputFile.toLatin1().constData(), nullptr);
-       }
-       m_pipeline =  gst_pipeline_new("deepin-voice-note");
-       GstBus *bus = gst_pipeline_get_bus(reinterpret_cast<GstPipeline*>(m_pipeline));
-       gst_bus_add_watch(bus,GstBusMessageCb,this);
-       gst_object_unref(bus);
+        audioResample = gst_element_factory_make("audioresample", nullptr);
+        if (audioResample == nullptr) {
+            qDebug() << "audioResample make error";
+            break;
+        }
+        audioConvert = gst_element_factory_make("audioconvert", "audioconvert");
+        if (audioConvert == nullptr) {
+            qDebug() << "audioConvert make error";
+            break;
+        }
+        audioQueue = gst_element_factory_make("queue", "audioqueue");
+        if (audioQueue == nullptr) {
+            qDebug() << "audioQueue make error";
+            break;
+        }
+        audioEncoder = gst_parse_bin_from_description(mp3Encoder.toLatin1().constData(),
+                                                      true, nullptr);
+        if (audioEncoder == nullptr) {
+            qDebug() << "audioEncoder make error";
+            break;
+        }
+        GstPad *pad = gst_element_get_static_pad(audioEncoder, "sink");
+        if (pad) {
+            gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, bufferProbe, this, nullptr);
+            gst_object_unref(pad);
+        } else {
+            qDebug() << "sink pad make error";
+            break;
+        }
+        audioOutput = gst_element_factory_make("filesink", "filesink");
+        if (audioOutput == nullptr) {
+            qDebug() << "audioOutput make error";
+            break;
+        }
+        if (!m_outputFile.isEmpty()) {
+            g_object_set(reinterpret_cast<gpointer *>(audioOutput), "location", m_outputFile.toLatin1().constData(), nullptr);
+        }
+        m_pipeline = gst_pipeline_new("deepin-voice-note");
+        GstBus *bus = gst_pipeline_get_bus(reinterpret_cast<GstPipeline *>(m_pipeline));
+        gst_bus_add_watch(bus, GstBusMessageCb, this);
+        gst_object_unref(bus);
 
-       gst_bin_add_many(reinterpret_cast<GstBin *>(m_pipeline),audioSrc,
-                        /*audiowebrtcdsp,audiowebrtcechoprobe,*/
-                        audioResample, audioConvert, audioQueue,
-                        audioEncoder, audioOutput, nullptr);
-       if(!gst_element_link_many(audioSrc,
-                                 /*audiowebrtcdsp,audiowebrtcechoprobe,*/
-                                 audioResample,audioConvert,
-                                 audioQueue,audioEncoder,
-                                 audioOutput,nullptr)){
+        gst_bin_add_many(reinterpret_cast<GstBin *>(m_pipeline), audioSrc,
+                         /*audiowebrtcdsp,audiowebrtcechoprobe,*/
+                         audioResample, audioConvert, audioQueue,
+                         audioEncoder, audioOutput, nullptr);
+        if (!gst_element_link_many(audioSrc,
+                                   /*audiowebrtcdsp,audiowebrtcechoprobe,*/
+                                   audioResample, audioConvert,
+                                   audioQueue, audioEncoder,
+                                   audioOutput, nullptr)) {
             objectUnref(m_pipeline);
             m_pipeline = nullptr;
             qDebug() << "gst_element_link_many error";
             return success;
-       }
-       success = true;
-   }while (!success);
-   if(!success){
-       objectUnref(audioSrc);
-       objectUnref(audioResample);
-       objectUnref(audioConvert);
-       objectUnref(audioQueue);
-       objectUnref(audioEncoder);
-       objectUnref(audioOutput);
-//       objectUnref(audiowebrtcdsp);
-//       objectUnref(audiowebrtcechoprobe);
-   }
-   return  success;
+        }
+        success = true;
+    } while (!success);
+    if (!success) {
+        objectUnref(audioSrc);
+        objectUnref(audioResample);
+        objectUnref(audioConvert);
+        objectUnref(audioQueue);
+        objectUnref(audioEncoder);
+        objectUnref(audioOutput);
+        //       objectUnref(audiowebrtcdsp);
+        //       objectUnref(audiowebrtcechoprobe);
+    }
+    return success;
 }
 
 void GstreamRecorder::deinit()
@@ -168,16 +167,18 @@ void GstreamRecorder::GetGstState(int *state, int *pending)
 {
     *state = GST_STATE_NULL;
     *pending = GST_STATE_NULL;
-    if (m_pipeline == nullptr) return;
-    gst_element_get_state(m_pipeline, reinterpret_cast<GstState*>(state),
-                          reinterpret_cast<GstState*>(pending), 0);
+    if (m_pipeline == nullptr)
+        return;
+    gst_element_get_state(m_pipeline, reinterpret_cast<GstState *>(state),
+                          reinterpret_cast<GstState *>(pending), 0);
 }
 
 bool GstreamRecorder::startRecord()
 {
-    if(m_pipeline == nullptr && !createPipe()) return false;
+    if (m_pipeline == nullptr && !createPipe())
+        return false;
 
-    if(!m_format.isValid()){
+    if (!m_format.isValid()) {
         initFormat();
     }
 
@@ -199,35 +200,35 @@ bool GstreamRecorder::startRecord()
 
 void GstreamRecorder::stopRecord()
 {
-     if (m_pipeline == nullptr) return;
-     gst_element_send_event(m_pipeline, gst_event_new_eos());
-     gst_element_send_event(m_pipeline, gst_event_new_eos());
-     g_usleep(5000);
-     setStateToNull();
-     gst_element_set_state(m_pipeline, GST_STATE_NULL);
+    if (m_pipeline == nullptr)
+        return;
+    gst_element_send_event(m_pipeline, gst_event_new_eos());
+    gst_element_send_event(m_pipeline, gst_event_new_eos());
+    g_usleep(5000);
+    setStateToNull();
+    gst_element_set_state(m_pipeline, GST_STATE_NULL);
 }
 
 void GstreamRecorder::pauseRecord()
 {
-    if(m_pipeline != nullptr){
+    if (m_pipeline != nullptr) {
         int state = -1;
         int pending = -1;
         GetGstState(&state, &pending);
 
-        if(state == GST_STATE_PLAYING){
+        if (state == GST_STATE_PLAYING) {
             gst_element_set_state(m_pipeline, GST_STATE_PAUSED);
         }
     }
-
 }
 
 void GstreamRecorder::setDevice(QString device)
 {
-    if(device != m_currentDevice){
+    if (device != m_currentDevice) {
         m_currentDevice = device;
-        if(m_pipeline != nullptr){
-            GstElement *audioSrc = gst_bin_get_by_name(reinterpret_cast<GstBin*>(m_pipeline), "audioSrc");
-            g_object_set(reinterpret_cast<gpointer*>(audioSrc), "device", device.toLatin1().data(), nullptr);
+        if (m_pipeline != nullptr) {
+            GstElement *audioSrc = gst_bin_get_by_name(reinterpret_cast<GstBin *>(m_pipeline), "audioSrc");
+            g_object_set(reinterpret_cast<gpointer *>(audioSrc), "device", device.toLatin1().data(), nullptr);
         }
         qDebug() << device;
     }
@@ -236,35 +237,36 @@ void GstreamRecorder::setDevice(QString device)
 void GstreamRecorder::setOutputFile(QString path)
 {
     m_outputFile = path;
-    if(m_pipeline != nullptr){
-        GstElement *audioSink = gst_bin_get_by_name(reinterpret_cast<GstBin*>(m_pipeline), "filesink");
-        g_object_set(reinterpret_cast<gpointer*>(audioSink), "location",m_outputFile.toLatin1().constData(), nullptr);
+    if (m_pipeline != nullptr) {
+        GstElement *audioSink = gst_bin_get_by_name(reinterpret_cast<GstBin *>(m_pipeline), "filesink");
+        g_object_set(reinterpret_cast<gpointer *>(audioSink), "location", m_outputFile.toLatin1().constData(), nullptr);
     }
 }
 
 bool GstreamRecorder::doBusMessage(GstMessage *message)
 {
-    if (!message) return true;
-    switch (message->type){
-    case GST_MESSAGE_ERROR:{
-         GError *error = nullptr;
-         gchar *dbg = nullptr;
+    if (!message)
+        return true;
+    switch (message->type) {
+    case GST_MESSAGE_ERROR: {
+        GError *error = nullptr;
+        gchar *dbg = nullptr;
 
-         gst_message_parse_error(message, &error, &dbg);
+        gst_message_parse_error(message, &error, &dbg);
 
-         QString errMsg = error->message;
-         emit errorMsg(errMsg);
+        QString errMsg = error->message;
+        emit errorMsg(errMsg);
 
-         qDebug() << "Got pipeline error:"<< errMsg;
+        qDebug() << "Got pipeline error:" << errMsg;
 
-         if (dbg) {
-             g_free(dbg);
-         }
+        if (dbg) {
+            g_free(dbg);
+        }
 
-         if (error) {
-             g_error_free(error);
-         }
-         break;
+        if (error) {
+            g_error_free(error);
+        }
+        break;
     }
     default:
         break;
@@ -274,11 +276,11 @@ bool GstreamRecorder::doBusMessage(GstMessage *message)
 
 bool GstreamRecorder::doBufferProbe(GstBuffer *buffer)
 {
-    if(buffer){
+    if (buffer) {
         qint64 position = static_cast<qint64>(buffer->pts);
         position = position >= 0
-                ? position / (1000 * 1000) // 毫秒
-                : -1;
+                       ? position / (1000 * 1000) // 毫秒
+                       : -1;
         QByteArray data;
         GstMapInfo info;
         if (gst_buffer_map(buffer, &info, GST_MAP_READ)) {
@@ -310,7 +312,7 @@ void GstreamRecorder::bufferProbed()
     emit audioBufferProbed(audioBuffer);
 }
 
-void  GstreamRecorder::setStateToNull()
+void GstreamRecorder::setStateToNull()
 {
     GstState cur_state, pending;
     gst_element_get_state(m_pipeline, &cur_state, &pending, 0);
@@ -318,7 +320,7 @@ void  GstreamRecorder::setStateToNull()
         return;
 
     if (cur_state == GST_STATE_NULL && pending != GST_STATE_VOID_PENDING) {
-        gst_element_set_state (m_pipeline, GST_STATE_NULL);
+        gst_element_set_state(m_pipeline, GST_STATE_NULL);
         return;
     }
 
@@ -342,7 +344,7 @@ void GstreamRecorder::initFormat()
 
 void GstreamRecorder::objectUnref(gpointer object)
 {
-    if(object != nullptr){
+    if (object != nullptr) {
         gst_object_unref(object);
         object = nullptr;
     }

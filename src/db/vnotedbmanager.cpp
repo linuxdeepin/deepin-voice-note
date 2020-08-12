@@ -30,23 +30,26 @@
 
 #include <DLog>
 
-#define CRITICAL_SECTION_BEGIN() do { \
-    m_dbLock.lock(); \
-    /*m_vnoteDB.transaction();*/ \
-} while(0)
+#define CRITICAL_SECTION_BEGIN() \
+    do { \
+        m_dbLock.lock(); \
+        /*m_vnoteDB.transaction();*/ \
+    } while (0)
 
-#define CRITICAL_SECTION_END() do { \
-    /*m_vnoteDB.commit();*/ \
-    m_dbLock.unlock(); \
-} while(0)
+#define CRITICAL_SECTION_END() \
+    do { \
+        /*m_vnoteDB.commit();*/ \
+        m_dbLock.unlock(); \
+    } while (0)
 
-#define CHECK_DB_INIT() do { \
-    if (!m_isDbInitOK) { \
-        return false; \
-    } \
-} while(0)
+#define CHECK_DB_INIT() \
+    do { \
+        if (!m_isDbInitOK) { \
+            return false; \
+        } \
+    } while (0)
 
-VNoteDbManager* VNoteDbManager::_instance = nullptr;
+VNoteDbManager *VNoteDbManager::_instance = nullptr;
 
 VNoteDbManager::VNoteDbManager(bool fOldDb, QObject *parent)
     : QObject(parent)
@@ -65,7 +68,7 @@ VNoteDbManager *VNoteDbManager::instance()
         _instance = new VNoteDbManager();
     }
 
-    return  _instance;
+    return _instance;
 }
 
 QSqlDatabase &VNoteDbManager::getVNoteDb()
@@ -73,7 +76,7 @@ QSqlDatabase &VNoteDbManager::getVNoteDb()
     return m_vnoteDB;
 }
 
-bool VNoteDbManager::insertData(DbVisitor* visitor /*in/out*/)
+bool VNoteDbManager::insertData(DbVisitor *visitor /*in/out*/)
 {
     CHECK_DB_INIT();
 
@@ -93,9 +96,9 @@ bool VNoteDbManager::insertData(DbVisitor* visitor /*in/out*/)
 
     for (auto it : visitor->dbvSqls()) {
         if (!it.trimmed().isEmpty()) {
-            if(!visitor->sqlQuery()->exec(it)) {
+            if (!visitor->sqlQuery()->exec(it)) {
                 qCritical() << "insert data failed:" << it
-                            <<" reason:" << visitor->sqlQuery()->lastError().text();
+                            << " reason:" << visitor->sqlQuery()->lastError().text();
                 insertOK = false;
             }
         }
@@ -114,7 +117,7 @@ bool VNoteDbManager::insertData(DbVisitor* visitor /*in/out*/)
     return insertOK;
 }
 
-bool VNoteDbManager::updateData(DbVisitor* visitor /*in/out*/)
+bool VNoteDbManager::updateData(DbVisitor *visitor /*in/out*/)
 {
     CHECK_DB_INIT();
 
@@ -134,9 +137,9 @@ bool VNoteDbManager::updateData(DbVisitor* visitor /*in/out*/)
 
     for (auto it : visitor->dbvSqls()) {
         if (!it.trimmed().isEmpty()) {
-            if(!visitor->sqlQuery()->exec(it)) {
+            if (!visitor->sqlQuery()->exec(it)) {
                 qCritical() << "Update data failed:" << it
-                            <<" reason:" << visitor->sqlQuery()->lastError().text();
+                            << " reason:" << visitor->sqlQuery()->lastError().text();
                 updateOK = false;
             }
         }
@@ -147,7 +150,7 @@ bool VNoteDbManager::updateData(DbVisitor* visitor /*in/out*/)
     return updateOK;
 }
 
-bool VNoteDbManager::queryData(DbVisitor* visitor /*in/out*/)
+bool VNoteDbManager::queryData(DbVisitor *visitor /*in/out*/)
 {
     CHECK_DB_INIT();
 
@@ -169,7 +172,7 @@ bool VNoteDbManager::queryData(DbVisitor* visitor /*in/out*/)
         if (!it.trimmed().isEmpty()) {
             if (!visitor->sqlQuery()->exec(it)) {
                 qCritical() << "Query data failed:" << it
-                            <<" reason:" << visitor->sqlQuery()->lastError().text();
+                            << " reason:" << visitor->sqlQuery()->lastError().text();
                 queryOK = false;
             }
         }
@@ -185,7 +188,7 @@ bool VNoteDbManager::queryData(DbVisitor* visitor /*in/out*/)
     return queryOK;
 }
 
-bool VNoteDbManager::deleteData(DbVisitor* visitor /*in/out*/)
+bool VNoteDbManager::deleteData(DbVisitor *visitor /*in/out*/)
 {
     CHECK_DB_INIT();
 
@@ -205,9 +208,9 @@ bool VNoteDbManager::deleteData(DbVisitor* visitor /*in/out*/)
 
     for (auto it : visitor->dbvSqls()) {
         if (!it.trimmed().isEmpty()) {
-            if(!visitor->sqlQuery()->exec(it)) {
+            if (!visitor->sqlQuery()->exec(it)) {
                 qCritical() << "Delete data failed:" << it
-                            <<" reason:" << visitor->sqlQuery()->lastError().text();
+                            << " reason:" << visitor->sqlQuery()->lastError().text();
                 deleteOK = false;
             }
         }
@@ -223,9 +226,9 @@ bool VNoteDbManager::hasOldDataBase()
     QString vnoteDatabasePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
     QFileInfo dbDir(vnoteDatabasePath);
-    dbDir.setFile(vnoteDatabasePath+QDir::separator());
+    dbDir.setFile(vnoteDatabasePath + QDir::separator());
 
-    QString vnoteDatebaseName  = DEEPIN_VOICE_NOTE + QString(".db");
+    QString vnoteDatebaseName = DEEPIN_VOICE_NOTE + QString(".db");
 
     QString vnoteDbFullPath = dbDir.filePath() + vnoteDatebaseName;
 
@@ -239,18 +242,18 @@ int VNoteDbManager::initVNoteDb(bool fOldDB)
     QString vnoteDatabasePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
     QFileInfo dbDir(vnoteDatabasePath);
-    dbDir.setFile(vnoteDatabasePath+QDir::separator());
+    dbDir.setFile(vnoteDatabasePath + QDir::separator());
 
     if (!dbDir.exists()) {
         QDir(dbDir.filePath()).mkdir(dbDir.filePath());
         qInfo() << "Create vnote db directory:" << vnoteDatabasePath;
     }
 
-    QString vnoteDatebaseName  = DEEPIN_VOICE_NOTE
-            + QString(VNoteDbManager::DBVERSION) + QString(".db");
+    QString vnoteDatebaseName = DEEPIN_VOICE_NOTE
+                                + QString(VNoteDbManager::DBVERSION) + QString(".db");
 
     if (fOldDB) {
-        vnoteDatebaseName =  DEEPIN_VOICE_NOTE + QString(".db");
+        vnoteDatebaseName = DEEPIN_VOICE_NOTE + QString(".db");
     }
 
     QString vnoteDbFullPath = dbDir.filePath() + vnoteDatebaseName;
@@ -285,9 +288,9 @@ void VNoteDbManager::createTablesIfNeed()
 
     QScopedPointer<QSqlQuery> sqlQuery(new QSqlQuery(m_vnoteDB));
 
-    for (auto it: createTableSqls) {
+    for (auto it : createTableSqls) {
         if (!it.trimmed().isEmpty()) {
-            if(!sqlQuery->exec(it)) {
+            if (!sqlQuery->exec(it)) {
                 qCritical() << it << "init tables failed error: " << sqlQuery->lastError().text();
             }
         }

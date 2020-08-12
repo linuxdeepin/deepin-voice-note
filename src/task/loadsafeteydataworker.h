@@ -33,7 +33,7 @@ public:
     explicit LoadSafeteyDataWorker(QObject *parent = nullptr);
 
 signals:
-    void saferLoaded(SafetyDatas* safers);
+    void saferLoaded(SafetyDatas *safers);
 public slots:
 protected:
     virtual void run();

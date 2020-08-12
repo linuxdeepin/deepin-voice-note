@@ -37,7 +37,8 @@ class TextNoteEdit;
 class VNote2SIconButton;
 
 //Playing animation interface
-class PlayAnimInferface {
+class PlayAnimInferface
+{
 public:
     virtual ~PlayAnimInferface();
 
@@ -45,8 +46,9 @@ public:
     virtual void stopAnim();
     void setAnimTimer(QTimer *timer);
     virtual void updateAnim() = 0;
+
 protected:
-    qint32  m_animPicIndex {0};
+    qint32 m_animPicIndex {0};
     QTimer *m_refreshTimer {nullptr};
 
     const QVector<QString> m_playBitmap = {
@@ -57,11 +59,11 @@ protected:
     };
 };
 
-class VoiceNoteItem : public DetailItemWidget, public PlayAnimInferface
+class VoiceNoteItem : public DetailItemWidget
+    , public PlayAnimInferface
 {
     Q_OBJECT
 public:
-
     explicit VoiceNoteItem(VNoteBlock *noteBlock, QWidget *parent = nullptr);
 
     void initData();
@@ -78,11 +80,11 @@ public:
 
     VNoteBlock *getNoteBlock() override;
     QTextCursor getTextCursor() override;
-    void        setTextCursor(const QTextCursor &cursor) override;
-    bool        textIsEmpty() override;
-    QRect       getCursorRect() override;
+    void setTextCursor(const QTextCursor &cursor) override;
+    bool textIsEmpty() override;
+    QRect getCursorRect() override;
     //选中操作相关
-    void selectText(const QPoint &globalPos,QTextCursor::MoveOperation op) override;
+    void selectText(const QPoint &globalPos, QTextCursor::MoveOperation op) override;
     void selectText(QTextCursor::MoveOperation op) override;
     void removeSelectText() override;
     void selectAllText() override;
@@ -93,7 +95,7 @@ public:
     bool isSelectAll() override;
     bool isTextContainsPos(const QPoint &globalPos) override;
     QTextDocumentFragment getSelectFragment() override;
-    QTextDocument* getTextDocument() override;
+    QTextDocument *getTextDocument() override;
 
 signals:
     void sigPlayBtnClicked(VoiceNoteItem *item);
@@ -108,16 +110,16 @@ public slots:
 private:
     void initUi();
     void initConnection();
-    bool m_selectAll   {false};
-    DLabel          *m_hornLab {nullptr};
-    DLabel          *m_createTimeLab {nullptr};
-    DLabel          *m_voiceSizeLab {nullptr};
-    DLabel          *m_voiceNameLab {nullptr};
-    DFrame          *m_bgWidget {nullptr};
-    TextNoteEdit    *m_asrText {nullptr};
-    VNoteBlock      *m_noteBlock {nullptr};
+    bool m_selectAll {false};
+    DLabel *m_hornLab {nullptr};
+    DLabel *m_createTimeLab {nullptr};
+    DLabel *m_voiceSizeLab {nullptr};
+    DLabel *m_voiceNameLab {nullptr};
+    DFrame *m_bgWidget {nullptr};
+    TextNoteEdit *m_asrText {nullptr};
+    VNoteBlock *m_noteBlock {nullptr};
     VNote2SIconButton *m_playBtn {nullptr};
-    DFrame          *m_coverWidget{nullptr};
+    DFrame *m_coverWidget {nullptr};
 };
 
 #endif // VOICENOTEITEM_H

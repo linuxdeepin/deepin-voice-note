@@ -26,13 +26,12 @@
 class LeftViewSortFilter : public QSortFilterProxyModel
 {
 public:
-    LeftViewSortFilter(QObject *parent=nullptr);
+    LeftViewSortFilter(QObject *parent = nullptr);
 
 protected:
     virtual bool lessThan(
-            const QModelIndex &source_left,
-            const QModelIndex &source_right ) const override;
-
+        const QModelIndex &source_left,
+        const QModelIndex &source_right) const override;
 };
 
 #endif // LEFTVIEWSORTFILTER_H

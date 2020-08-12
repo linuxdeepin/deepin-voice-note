@@ -37,23 +37,21 @@
 
 VNoteSaferOper::VNoteSaferOper()
 {
-
 }
 
 VNoteSaferOper::VNoteSaferOper(const VDataSafer &safer)
-    :m_dataSafer(safer)
+    : m_dataSafer(safer)
 {
-
 }
 
 SafetyDatas *VNoteSaferOper::loadSafers()
 {
-    SafetyDatas* safers = new SafetyDatas();
+    SafetyDatas *safers = new SafetyDatas();
 
     SaferQryDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), nullptr, safers);
 
-    if (!VNoteDbManager::instance()->queryData(&folderVisitor) ) {
-      qCritical() << "Query faild!";
+    if (!VNoteDbManager::instance()->queryData(&folderVisitor)) {
+        qCritical() << "Query faild!";
     }
 
     return safers;

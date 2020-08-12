@@ -48,7 +48,6 @@ private:
     VNoteIconButton *m_Image;
     DSuggestButton *m_PushButton;
     DLabel *m_Text;
-
 };
 
 #endif // INITEMPTYPAGE_H

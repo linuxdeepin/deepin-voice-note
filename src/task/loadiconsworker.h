@@ -34,6 +34,7 @@ public:
     QPixmap greyPix(QPixmap pix);
 
     const int DEFAULTICONS_COUNT = 10;
+
 protected:
     virtual void run();
 

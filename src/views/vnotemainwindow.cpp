@@ -139,8 +139,8 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onRightViewVoicePause);
     connect(m_rightView, &RightView::sigCursorChange,
             this, &VNoteMainWindow::onCursorChange);
-//    connect(this, &VNoteMainWindow::sigDltSelectContant,
-//            m_rightView, &RightView::onDltSelectContant);
+    //    connect(this, &VNoteMainWindow::sigDltSelectContant,
+    //            m_rightView, &RightView::onDltSelectContant);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::onNewNotebook);
@@ -185,7 +185,6 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onMenuAbout2Show);
     connect(ActionManager::Instance()->detialContextMenu(), &DMenu::triggered,
             this, &VNoteMainWindow::onMenuAction);
-
 }
 
 void VNoteMainWindow::initShortcuts()
@@ -201,8 +200,7 @@ void VNoteMainWindow::initShortcuts()
         if (!(stateOperation->isRecording()
               || stateOperation->isPlaying()
               || stateOperation->isVoice2Text()
-              || stateOperation->isSearching())
-                ) {
+              || stateOperation->isSearching())) {
             onNewNotebook();
 
             //If do shortcut in home page,need switch to note
@@ -220,8 +218,7 @@ void VNoteMainWindow::initShortcuts()
     m_stRemNotebook->setAutoRepeat(false);
 
     connect(m_stRemNotebook.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction())
-        {
+        if (canDoShortcutAction()) {
             if (!stateOperation->isSearching()) {
                 editNotepad();
             }
@@ -237,12 +234,10 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stNewNote.get(), &QShortcut::activated, this, [this] {
         if (canDoShortcutAction()
-                && !( stateOperation->isRecording()
-                      || stateOperation->isPlaying()
-                      || stateOperation->isVoice2Text()
-                      || stateOperation->isSearching()
-                      )
-                ) {
+            && !(stateOperation->isRecording()
+                 || stateOperation->isPlaying()
+                 || stateOperation->isVoice2Text()
+                 || stateOperation->isSearching())) {
             onNewNote();
         }
     });
@@ -254,8 +249,7 @@ void VNoteMainWindow::initShortcuts()
     m_stRemNote->setAutoRepeat(false);
 
     connect(m_stRemNote.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction())
-        {
+        if (canDoShortcutAction()) {
             editNote();
         }
     });
@@ -268,8 +262,7 @@ void VNoteMainWindow::initShortcuts()
     m_stPlayorPause->setAutoRepeat(false);
 
     connect(m_stPlayorPause.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction())
-        {
+        if (canDoShortcutAction()) {
             m_recordBar->playOrPauseVoice();
         }
     });
@@ -281,9 +274,8 @@ void VNoteMainWindow::initShortcuts()
     m_stRecording->setAutoRepeat(false);
 
     connect(m_stRecording.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction())
-        {
-             m_recordBar->onStartRecord();
+        if (canDoShortcutAction()) {
+            m_recordBar->onStartRecord();
         }
     });
 
@@ -295,8 +287,7 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stVoice2Text.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        if (canDoShortcutAction())
-        {
+        if (canDoShortcutAction()) {
             if (!stateOperation->isVoice2Text() && stateOperation->isAiSrvExist()) {
                 this->onA2TStart();
             }
@@ -312,8 +303,7 @@ void VNoteMainWindow::initShortcuts()
     connect(m_stSaveAsMp3.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         Q_UNUSED(this);
-        if (canDoShortcutAction())
-        {
+        if (canDoShortcutAction()) {
             m_rightView->saveMp3();
         }
     });
@@ -326,8 +316,7 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stSaveAsText.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        if (canDoShortcutAction())
-        {
+        if (canDoShortcutAction()) {
             VNoteItem *currNote = m_middleView->getCurrVNotedata();
             if (nullptr != currNote) {
                 if (currNote->haveText()) {
@@ -345,8 +334,7 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stSaveVoices.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        if (canDoShortcutAction())
-        {
+        if (canDoShortcutAction()) {
             //Can't save recording when do recording.
             if (!stateOperation->isRecording()) {
                 VNoteItem *currNote = m_middleView->getCurrVNotedata();
@@ -378,27 +366,27 @@ void VNoteMainWindow::initShortcuts()
              * */
             if (m_leftView->hasFocus()) {
                 if (!stateOperation->isRecording()
-                        && !stateOperation->isVoice2Text()
-                        && !stateOperation->isPlaying()) {
+                    && !stateOperation->isVoice2Text()
+                    && !stateOperation->isPlaying()) {
                     deleteAct = ActionManager::Instance()->getActionById(
-                                ActionManager::NotebookDelete);
+                        ActionManager::NotebookDelete);
                 }
             } else if (m_middleView->hasFocus()) {
                 if (!stateOperation->isRecording()
-                        && !stateOperation->isVoice2Text()
-                        && !stateOperation->isPlaying()
-                        && m_middleView->count() > 0) {
+                    && !stateOperation->isVoice2Text()
+                    && !stateOperation->isPlaying()
+                    && m_middleView->count() > 0) {
                     deleteAct = ActionManager::Instance()->getActionById(
-                                ActionManager::NoteDelete);
+                        ActionManager::NoteDelete);
                 }
             } else if (m_rightView->hasFocus()) {
                 deleteAct = ActionManager::Instance()->getActionById(
-                            ActionManager::DetailDelete);
-            }else{
+                    ActionManager::DetailDelete);
+            } else {
                 QPoint pos = m_rightViewHolder->mapFromGlobal(QCursor::pos());
-                if(m_rightViewHolder->rect().contains(pos)){
+                if (m_rightViewHolder->rect().contains(pos)) {
                     deleteAct = ActionManager::Instance()->getActionById(
-                                ActionManager::DetailDelete);
+                        ActionManager::DetailDelete);
                 }
             }
 
@@ -487,7 +475,7 @@ void VNoteMainWindow::initMainView()
     }
 #endif
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setContentsMargins(0,0,0,0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_stackedWidget);
     m_centerWidget->setLayout(layout);
 
@@ -505,14 +493,14 @@ void VNoteMainWindow::initLeftView()
     m_leftViewHolder->setBackgroundRole(DPalette::Base);
     m_leftViewHolder->setAutoFillBackground(true);
 
-    QVBoxLayout *leftHolderLayout = new  QVBoxLayout();
+    QVBoxLayout *leftHolderLayout = new QVBoxLayout();
     leftHolderLayout->setSpacing(0);
     leftHolderLayout->setContentsMargins(0, 5, 0, 0);
     m_leftView = new LeftView(m_leftViewHolder);
 
     //背景色透明，隐藏disable时的背景色
     DPalette pb = DApplicationHelper::instance()->palette(m_leftView);
-    pb.setBrush(DPalette::Base, QColor(0,0,0,0));
+    pb.setBrush(DPalette::Base, QColor(0, 0, 0, 0));
     m_leftView->setPalette(pb);
 
     m_leftView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -547,7 +535,7 @@ void VNoteMainWindow::initMiddleView()
     m_middleViewHolder->setBackgroundRole(DPalette::Base);
     m_middleViewHolder->setAutoFillBackground(true);
 
-    QVBoxLayout *middleHolderLayout = new  QVBoxLayout();
+    QVBoxLayout *middleHolderLayout = new QVBoxLayout();
     middleHolderLayout->setSpacing(0);
     middleHolderLayout->setContentsMargins(0, 5, 0, 5);
 
@@ -568,7 +556,6 @@ void VNoteMainWindow::initMiddleView()
 
     m_middleViewHolder->setLayout(middleHolderLayout);
 
-
 #ifdef VNOTE_LAYOUT_DEBUG
     m_middleView->setStyleSheet("background: green");
 #endif
@@ -578,8 +565,7 @@ void VNoteMainWindow::initRightView()
 {
     m_rightViewHolder = new QWidget(m_mainWndSpliter);
     m_rightViewHolder->setObjectName("rightMainLayoutHolder");
-    m_rightViewHolder->setSizePolicy(QSizePolicy::Expanding
-                                     , QSizePolicy::Expanding);
+    m_rightViewHolder->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_rightViewHolder->setBackgroundRole(DPalette::Base);
     m_rightViewHolder->setAutoFillBackground(true);
 
@@ -605,8 +591,7 @@ void VNoteMainWindow::initRightView()
     m_recordBar = new VNoteRecordBar(m_recordBarHolder);
     m_recordBar->setBackgroundRole(DPalette::Base);
     m_recordBar->setAutoFillBackground(true);
-    m_recordBar->setSizePolicy(QSizePolicy::Expanding
-                               , QSizePolicy::Expanding);
+    m_recordBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     recordBarHolderLayout->addWidget(m_recordBar);
 
@@ -650,10 +635,10 @@ void VNoteMainWindow::initLogin1Manager()
 void VNoteMainWindow::holdHaltLock()
 {
     m_lockFd = m_pLogin1Manager->Inhibit(
-                   "shutdown:sleep",
-                   DApplication::translate("AppMain", "Voice Notes"),
-                   DApplication::translate("AppMain", "Recordings not saved"),
-                   "block");
+        "shutdown:sleep",
+        DApplication::translate("AppMain", "Voice Notes"),
+        DApplication::translate("AppMain", "Recordings not saved"),
+        "block");
 
     if (m_lockFd.isError()) {
         qCritical() << "Init login manager error:" << m_lockFd.error();
@@ -668,7 +653,7 @@ void VNoteMainWindow::releaseHaltLock()
 
 void VNoteMainWindow::initDelayWork()
 {
-   ;
+    ;
 }
 
 void VNoteMainWindow::delayInitTasks()
@@ -702,7 +687,7 @@ void VNoteMainWindow::onVNoteFoldersLoaded()
 
 void VNoteMainWindow::onVNoteSearch()
 {
-    if(m_noteSearchEdit->lineEdit()->hasFocus()){
+    if (m_noteSearchEdit->lineEdit()->hasFocus()) {
         QString text = m_noteSearchEdit->text();
         if (!text.isEmpty()) {
             setSpecialStatus(SearchStart);
@@ -716,8 +701,8 @@ void VNoteMainWindow::onVNoteSearch()
 
 void VNoteMainWindow::onVNoteSearchTextChange(const QString &text)
 {
-    if(text.isEmpty()){
-       setSpecialStatus(SearchEnd);
+    if (text.isEmpty()) {
+        setSpecialStatus(SearchEnd);
     }
 }
 
@@ -750,12 +735,12 @@ void VNoteMainWindow::initSpliterView()
             handle->setFixedWidth(2);
             handle->setDisabled(true);
 
-//            DPalette pa = DApplicationHelper::instance()->palette(handle);
-//            QBrush splitBrush = pa.brush(DPalette::ItemBackground);
-//            pa.setBrush(DPalette::Background, splitBrush);
-//            handle->setPalette(pa);
-//            handle->setBackgroundRole(QPalette::Background);
-//            handle->setAutoFillBackground(true);
+            //            DPalette pa = DApplicationHelper::instance()->palette(handle);
+            //            QBrush splitBrush = pa.brush(DPalette::ItemBackground);
+            //            pa.setBrush(DPalette::Background, splitBrush);
+            //            handle->setPalette(pa);
+            //            handle->setBackgroundRole(QPalette::Background);
+            //            handle->setAutoFillBackground(true);
         }
     }
 }
@@ -769,15 +754,15 @@ void VNoteMainWindow::initUpgradeView()
 
     connect(m_upgradeView, &UpgradeView::upgradeDone,
             this, [this]() {
+                //Clear the flag after upgrade & and call
+                //the data loaded slot to refresh.
+                m_fNeedUpgradeOldDb = false;
 
-        //Clear the flag after upgrade & and call
-        //the data loaded slot to refresh.
-        m_fNeedUpgradeOldDb = false;
+                onVNoteFoldersLoaded();
 
-        onVNoteFoldersLoaded();
-
-        qInfo() << "upgrade success.";
-    }, Qt::QueuedConnection);
+                qInfo() << "upgrade success.";
+            },
+            Qt::QueuedConnection);
 }
 
 #endif
@@ -804,8 +789,8 @@ void VNoteMainWindow::onStartRecord(const QString &path)
         safer.setSaferType(VDataSafer::Safe);
 
         safer.folder_id = currentNote->folderId;
-        safer.note_id   = currentNote->noteId;
-        safer.path      = path;
+        safer.note_id = currentNote->noteId;
+        safer.path = path;
 
         VNoteDataSafefyManager::instance()->doSafer(safer);
     } else {
@@ -829,15 +814,14 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
             safer.setSaferType(VDataSafer::Unsafe);
 
             safer.folder_id = currentNote->folderId;
-            safer.note_id   = currentNote->noteId;
-            safer.path      = voicePath;
+            safer.note_id = currentNote->noteId;
+            safer.path = voicePath;
 
             VNoteDataSafefyManager::instance()->doSafer(safer);
         } else {
             qCritical() << "UnSafe get currentNote data is null! Dangerous!!!";
         }
     } else {
-
     }
     setSpecialStatus(RecordEnd);
 
@@ -861,7 +845,7 @@ void VNoteMainWindow ::onA2TStartAgain()
 void VNoteMainWindow::onA2TStart(bool first)
 {
     m_asrErrMeassage->setVisible(false);
-    VoiceNoteItem    *asrVoiceItem = nullptr;
+    VoiceNoteItem *asrVoiceItem = nullptr;
 
     if (first) {
         DetailItemWidget *widget = m_rightView->getOnlyOneSelectVoice();
@@ -869,15 +853,15 @@ void VNoteMainWindow::onA2TStart(bool first)
         m_rightView->setCurVoiceAsr(asrVoiceItem);
     } else {
         asrVoiceItem = m_rightView->getCurVoiceAsr();
-        if(asrVoiceItem){
-            if(m_rightView->getOnlyOneSelectVoice() != asrVoiceItem){
+        if (asrVoiceItem) {
+            if (m_rightView->getOnlyOneSelectVoice() != asrVoiceItem) {
                 m_rightView->setCurVoiceAsr(nullptr);
                 return;
             }
         }
     }
 
-    if (asrVoiceItem  && asrVoiceItem->getNoteBlock()->blockText.isEmpty()) {
+    if (asrVoiceItem && asrVoiceItem->getNoteBlock()->blockText.isEmpty()) {
         VNVoiceBlock *data = asrVoiceItem->getNoteBlock()->ptrVoice;
 
         if (nullptr != data) {
@@ -900,20 +884,20 @@ void VNoteMainWindow::onA2TStart(bool first)
 
 void VNoteMainWindow::onA2TError(int error)
 {
-    VoiceNoteItem    *asrVoiceItem = m_rightView->getCurVoiceAsr();
+    VoiceNoteItem *asrVoiceItem = m_rightView->getCurVoiceAsr();
     if (asrVoiceItem) {
         asrVoiceItem->showAsrEndWindow("");
     }
     QString message = "";
     if (error == VNoteA2TManager::NetworkError) {
         message = DApplication::translate(
-                      "VNoteErrorMessage",
-                      "The voice conversion failed due to the poor network connection. "
-                      "Do you want to try again?");
+            "VNoteErrorMessage",
+            "The voice conversion failed due to the poor network connection. "
+            "Do you want to try again?");
     } else {
         message = DApplication::translate(
-                      "VNoteErrorMessage",
-                      "The voice conversion failed. Do you want to try again?");
+            "VNoteErrorMessage",
+            "The voice conversion failed. Do you want to try again?");
     }
     showAsrErrMessage(message);
     setSpecialStatus(VoiceToTextEnd);
@@ -921,7 +905,7 @@ void VNoteMainWindow::onA2TError(int error)
 
 void VNoteMainWindow::onA2TSuccess(const QString &text)
 {
-    VoiceNoteItem    *asrVoiceItem = m_rightView->getCurVoiceAsr();
+    VoiceNoteItem *asrVoiceItem = m_rightView->getCurVoiceAsr();
     if (asrVoiceItem) {
         m_rightView->clearAllSelection();
         asrVoiceItem->getNoteBlock()->blockText = text;
@@ -944,9 +928,9 @@ void VNoteMainWindow::onPreviewShortcut()
     //******************************Notebooks**************************************************
     QMap<QString, QString> shortcutNotebookKeymap = {
         //Notebook
-        {DApplication::translate("Shortcuts", "New notebook"),         "Ctrl+N"},
-        {DApplication::translate("Shortcuts", "Rename notebook"),      "F2"},
-        {DApplication::translate("Shortcuts", "Delete notebook"),      "Delete"},
+        {DApplication::translate("Shortcuts", "New notebook"), "Ctrl+N"},
+        {DApplication::translate("Shortcuts", "Rename notebook"), "F2"},
+        {DApplication::translate("Shortcuts", "Delete notebook"), "Delete"},
     };
 
     QJsonObject notebookJsonGroup;
@@ -954,9 +938,9 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray notebookJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutNotebookKeymap.begin();
-            it != shortcutNotebookKeymap.end(); it++) {
+         it != shortcutNotebookKeymap.end(); it++) {
         QJsonObject jsonItem;
-        jsonItem.insert("name",  it.key());
+        jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
         notebookJsonItems.append(jsonItem);
     }
@@ -968,15 +952,15 @@ void VNoteMainWindow::onPreviewShortcut()
 
     QMap<QString, QString> shortcutNoteKeymap = {
         //Note
-        {DApplication::translate("Shortcuts", "New note"),             "Ctrl+B"},
-        {DApplication::translate("Shortcuts", "Rename note"),          "F3"},
-        {DApplication::translate("Shortcuts", "Delete note"),          "Delete"},
-        {DApplication::translate("Shortcuts", "Play/Pause"),           "Space"},
-        {DApplication::translate("Shortcuts", "Record voice"),         "Ctrl+R"},
-        {DApplication::translate("Shortcuts", "Voice to Text"),        "Ctrl+W"},
-        {DApplication::translate("Shortcuts", "Save as MP3"),          "Ctrl+P"},
-        {DApplication::translate("Shortcuts", "Save as TXT"),          "Ctrl+S"},
-        {DApplication::translate("Shortcuts", "Save recordings"),      "Ctrl+Y"},
+        {DApplication::translate("Shortcuts", "New note"), "Ctrl+B"},
+        {DApplication::translate("Shortcuts", "Rename note"), "F3"},
+        {DApplication::translate("Shortcuts", "Delete note"), "Delete"},
+        {DApplication::translate("Shortcuts", "Play/Pause"), "Space"},
+        {DApplication::translate("Shortcuts", "Record voice"), "Ctrl+R"},
+        {DApplication::translate("Shortcuts", "Voice to Text"), "Ctrl+W"},
+        {DApplication::translate("Shortcuts", "Save as MP3"), "Ctrl+P"},
+        {DApplication::translate("Shortcuts", "Save as TXT"), "Ctrl+S"},
+        {DApplication::translate("Shortcuts", "Save recordings"), "Ctrl+Y"},
     };
 
     QJsonObject noteJsonGroup;
@@ -984,9 +968,9 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray noteJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutNoteKeymap.begin();
-            it != shortcutNoteKeymap.end(); it++) {
+         it != shortcutNoteKeymap.end(); it++) {
         QJsonObject jsonItem;
-        jsonItem.insert("name",  it.key());
+        jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
         noteJsonItems.append(jsonItem);
     }
@@ -996,11 +980,11 @@ void VNoteMainWindow::onPreviewShortcut()
     //******************************Edit***************************************************
     QMap<QString, QString> shortcutEditKeymap = {
         //Edit
-        {DApplication::translate("Shortcuts", "Select all"),           "Ctrl+A"},
-        {DApplication::translate("Shortcuts", "Copy"),                 "Ctrl+C"},
-        {DApplication::translate("Shortcuts", "Cut"),                  "Ctrl+X"},
-        {DApplication::translate("Shortcuts", "Paste"),                "Ctrl+V"},
-        {DApplication::translate("Shortcuts", "Delete"),               "Delete"},
+        {DApplication::translate("Shortcuts", "Select all"), "Ctrl+A"},
+        {DApplication::translate("Shortcuts", "Copy"), "Ctrl+C"},
+        {DApplication::translate("Shortcuts", "Cut"), "Ctrl+X"},
+        {DApplication::translate("Shortcuts", "Paste"), "Ctrl+V"},
+        {DApplication::translate("Shortcuts", "Delete"), "Delete"},
     };
 
     QJsonObject editJsonGroup;
@@ -1008,9 +992,9 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray editJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutEditKeymap.begin();
-            it != shortcutEditKeymap.end(); it++) {
+         it != shortcutEditKeymap.end(); it++) {
         QJsonObject jsonItem;
-        jsonItem.insert("name",  it.key());
+        jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
         editJsonItems.append(jsonItem);
     }
@@ -1020,11 +1004,11 @@ void VNoteMainWindow::onPreviewShortcut()
     //******************************Setting************************************************
     QMap<QString, QString> shortcutSettingKeymap = {
         //Setting
-//        {DApplication::translate("Shortcuts","Close window"),         "Alt+F4"},
-//        {DApplication::translate("Shortcuts","Resize window"),        "Ctrl+Alt+F"},
-//        {DApplication::translate("Shortcuts","Find"),                 "Ctrl+F"},
-        {DApplication::translate("Shortcuts", "Help"),                 "F1"},
-        {DApplication::translate("Shortcuts", "Display shortcuts"),    "Ctrl+Shift+?"},
+        //        {DApplication::translate("Shortcuts","Close window"),         "Alt+F4"},
+        //        {DApplication::translate("Shortcuts","Resize window"),        "Ctrl+Alt+F"},
+        //        {DApplication::translate("Shortcuts","Find"),                 "Ctrl+F"},
+        {DApplication::translate("Shortcuts", "Help"), "F1"},
+        {DApplication::translate("Shortcuts", "Display shortcuts"), "Ctrl+Shift+?"},
     };
 
     QJsonObject settingJsonGroup;
@@ -1032,9 +1016,9 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray settingJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutSettingKeymap.begin();
-            it != shortcutSettingKeymap.end(); it++) {
+         it != shortcutSettingKeymap.end(); it++) {
         QJsonObject jsonItem;
-        jsonItem.insert("name",  it.key());
+        jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
         settingJsonItems.append(jsonItem);
     }
@@ -1075,13 +1059,13 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
 
 void VNoteMainWindow::resizeEvent(QResizeEvent *event)
 {
-    if(m_asrErrMeassage->isVisible()){
+    if (m_asrErrMeassage->isVisible()) {
         int xPos = (m_centerWidget->width() - m_asrErrMeassage->width()) / 2;
         int yPos = m_centerWidget->height() - m_asrErrMeassage->height() - 5;
         m_asrErrMeassage->move(xPos, yPos);
     }
 
-    if(m_pDeviceExceptionMsg->isVisible()){
+    if (m_pDeviceExceptionMsg->isVisible()) {
         int xPos = (m_centerWidget->width() - m_pDeviceExceptionMsg->width()) / 2;
         int yPos = m_centerWidget->height() - m_pDeviceExceptionMsg->height() - 5;
         m_pDeviceExceptionMsg->move(xPos, yPos);
@@ -1104,12 +1088,12 @@ bool VNoteMainWindow::checkIfNeedExit()
     //Is audio converting to text
     if (stateOperation->isVoice2Text()) {
         pspMessageDialg.reset(new VNoteMessageDialog(
-                                  VNoteMessageDialog::AborteAsr,
-                                  this));
+            VNoteMessageDialog::AborteAsr,
+            this));
     } else if (stateOperation->isRecording()) { //Is recording
         pspMessageDialg.reset(new VNoteMessageDialog(
-                                  VNoteMessageDialog::AbortRecord,
-                                  this));
+            VNoteMessageDialog::AbortRecord,
+            this));
     }
 
     if (!pspMessageDialg.isNull()) {
@@ -1240,8 +1224,8 @@ void VNoteMainWindow::onMenuAbout2Show()
         ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteCtxMenu);
 
         if (stateOperation->isPlaying()
-                || stateOperation->isRecording()
-                || stateOperation->isVoice2Text()) {
+            || stateOperation->isRecording()
+            || stateOperation->isVoice2Text()) {
             ActionManager::Instance()->enableAction(ActionManager::NoteAddNew, false);
             ActionManager::Instance()->enableAction(ActionManager::NoteDelete, false);
 
@@ -1269,8 +1253,8 @@ void VNoteMainWindow::onMenuAbout2Show()
         ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NotebookCtxMenu);
 
         if (stateOperation->isPlaying()
-                || stateOperation->isRecording()
-                || stateOperation->isVoice2Text()) {
+            || stateOperation->isRecording()
+            || stateOperation->isVoice2Text()) {
             ActionManager::Instance()->enableAction(ActionManager::NotebookAddNew, false);
             ActionManager::Instance()->enableAction(ActionManager::NotebookDelete, false);
         }
@@ -1301,7 +1285,7 @@ int VNoteMainWindow::loadNotepads()
 void VNoteMainWindow::addNotepad()
 {
     VNoteFolder itemData;
-    VNoteFolderOper  folderOper;
+    VNoteFolderOper folderOper;
     itemData.name = folderOper.getDefaultFolderName();
 
     VNoteFolder *newFolder = folderOper.addFolder(itemData);
@@ -1320,7 +1304,7 @@ void VNoteMainWindow::delNotepad()
 
     m_rightView->removeCacheWidget(data);
 
-    VNoteFolderOper  folderOper(data);
+    VNoteFolderOper folderOper(data);
 
     folderOper.deleteVNoteFolder(data);
 
@@ -1513,7 +1497,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
 {
     switch (status) {
     case SearchStart:
-        if(!stateOperation->isSearching()){
+        if (!stateOperation->isSearching()) {
             stateOperation->operState(OpsStateInterface::StateSearching, true);
             m_leftView->clearSelection();
             m_leftView->setEnabled(false);
@@ -1522,7 +1506,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         }
         break;
     case SearchEnd:
-        if(stateOperation->isSearching()){
+        if (stateOperation->isSearching()) {
             m_searchKey = "";
             m_middleView->setSearchKey(m_searchKey);
             m_leftView->setEnabled(true);
@@ -1614,13 +1598,13 @@ void VNoteMainWindow::initAsrErrMessage()
     m_asrErrMeassage->setIcon(QIcon(iconPath));
     m_asrAgainBtn = new DPushButton(m_asrErrMeassage);
     m_asrAgainBtn->setText(DApplication::translate(
-                               "VNoteErrorMessage",
-                               "Try Again"));
+        "VNoteErrorMessage",
+        "Try Again"));
     m_asrAgainBtn->adjustSize();
 
     DWidget *m_widget = new DWidget(m_asrErrMeassage);
     QHBoxLayout *m_layout = new QHBoxLayout();
-    m_layout->setContentsMargins(0,0,0,0);
+    m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->addStretch();
     m_layout->addWidget(m_asrAgainBtn);
     m_widget->setLayout(m_layout);
@@ -1631,15 +1615,14 @@ void VNoteMainWindow::initAsrErrMessage()
 void VNoteMainWindow::initDeviceExceptionErrMessage()
 {
     m_pDeviceExceptionMsg = new DFloatingMessage(DFloatingMessage::ResidentType,
-                                            m_centerWidget);
+                                                 m_centerWidget);
     QString iconPath = STAND_ICON_PAHT;
     iconPath.append("warning.svg");
     m_pDeviceExceptionMsg->setIcon(QIcon(iconPath));
     m_pDeviceExceptionMsg->setMessage(
-                DApplication::translate(
-                    "VNoteRecordBar",
-                    "Your audio recording device does not work.")
-                );
+        DApplication::translate(
+            "VNoteRecordBar",
+            "Your audio recording device does not work."));
     m_pDeviceExceptionMsg->setVisible(false);
 }
 
@@ -1721,7 +1704,7 @@ void VNoteMainWindow::release()
 {
     //Save main window size
     if (!isMaximized()) {
-       setting::instance()->setOption(VNOTE_MAINWND_SZ_KEY, saveGeometry());
+        setting::instance()->setOption(VNOTE_MAINWND_SZ_KEY, saveGeometry());
     }
 
     VTextSpeechAndTrManager::onStopTextToSpeech();
@@ -1740,29 +1723,27 @@ void VNoteMainWindow::onShowPrivacy()
     QString url = "";
     QLocale locale;
     QLocale::Country country = locale.country();
-    if(country == QLocale::China){
-       url = "https://www.uniontech.com/agreement/privacy-cn";
-    }else {
-       url = "https://www.uniontech.com/agreement/privacy-en";
+    if (country == QLocale::China) {
+        url = "https://www.uniontech.com/agreement/privacy-cn";
+    } else {
+        url = "https://www.uniontech.com/agreement/privacy-en";
     }
     QDesktopServices::openUrl(url);
 }
 
 void VNoteMainWindow::onShowSettingDialog()
 {
-     DSettingsDialog dialog(this);
-     dialog.updateSettings("Setting", setting::instance()->getSetting());
-     dialog.setResetVisible(false);
-     dialog.exec();
+    DSettingsDialog dialog(this);
+    dialog.updateSettings("Setting", setting::instance()->getSetting());
+    dialog.setResetVisible(false);
+    dialog.exec();
 }
 
 void VNoteMainWindow::initMenuExtension()
 {
     m_menuExtension = new DMenu(this);
-    QAction *setting = new QAction(DApplication::translate("TitleBar", "Settings")
-                                   ,m_menuExtension);
-    QAction *privacy = new QAction(DApplication::translate("TitleBar", "Privacy Policy")
-                                   ,m_menuExtension);
+    QAction *setting = new QAction(DApplication::translate("TitleBar", "Settings"), m_menuExtension);
+    QAction *privacy = new QAction(DApplication::translate("TitleBar", "Privacy Policy"), m_menuExtension);
     m_menuExtension->addAction(setting);
     m_menuExtension->addAction(privacy);
     m_menuExtension->addSeparator();

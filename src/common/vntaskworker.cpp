@@ -26,7 +26,6 @@
 VNTaskWorker::VNTaskWorker(QObject *parent)
     : QThread(parent)
 {
-
 }
 
 void VNTaskWorker::addTask(VNTask *task)
@@ -51,7 +50,7 @@ void VNTaskWorker::quitWorker()
 void VNTaskWorker::run()
 {
     do {
-        VNTask* task = nullptr;
+        VNTask *task = nullptr;
 
         m_taskLock.lock();
 
@@ -78,5 +77,5 @@ void VNTaskWorker::run()
                 task->deleteLater();
             }
         }
-    } while(1);
+    } while (1);
 }

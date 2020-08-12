@@ -109,9 +109,8 @@ void MiddleView::clearAll()
 VNoteItem *MiddleView::deleteCurrentRow()
 {
     QModelIndex index = currentIndex();
-    VNoteItem *noteData = reinterpret_cast< VNoteItem *>(
-                              StandardItemCommon::getStandardItemData(index)
-                          );
+    VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
+        StandardItemCommon::getStandardItemData(index));
 
     m_pSortViewFilter->removeRow(index.row());
 
@@ -121,9 +120,8 @@ VNoteItem *MiddleView::deleteCurrentRow()
 VNoteItem *MiddleView::getCurrVNotedata() const
 {
     QModelIndex index = currentIndex();
-    VNoteItem *noteData = reinterpret_cast< VNoteItem *>(
-                              StandardItemCommon::getStandardItemData(index)
-                          );
+    VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
+        StandardItemCommon::getStandardItemData(index));
 
     return noteData;
 }
@@ -152,9 +150,8 @@ void MiddleView::editNote()
 void MiddleView::saveAsText()
 {
     QModelIndex index = currentIndex();
-    VNoteItem *noteData = reinterpret_cast< VNoteItem *>(
-                              StandardItemCommon::getStandardItemData(index)
-                          );
+    VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
+        StandardItemCommon::getStandardItemData(index));
     if (nullptr != noteData) {
         //TODO:
         //    Should check if this note is doing save action
@@ -187,9 +184,8 @@ void MiddleView::saveAsText()
 void MiddleView::saveRecords()
 {
     QModelIndex index = currentIndex();
-    VNoteItem *noteData = reinterpret_cast< VNoteItem *>(
-                              StandardItemCommon::getStandardItemData(index)
-                          );
+    VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
+        StandardItemCommon::getStandardItemData(index));
     if (nullptr != noteData) {
         //TODO:
         //    Should check if this note is doing save action
@@ -232,7 +228,7 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::RightButton) {
         QModelIndex index = this->indexAt(event->pos());
         if (index.isValid()
-                && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
+            && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
             DListView::setCurrentIndex(index);
             m_noteMenu->popup(event->globalPos());
         }
@@ -261,21 +257,21 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
 bool MiddleView::eventFilter(QObject *o, QEvent *e)
 {
     Q_UNUSED(o);
-    if(e->type() == QEvent::FocusIn){
+    if (e->type() == QEvent::FocusIn) {
         m_pItemDelegate->setEditIsVisible(true);
         this->update(currentIndex());
-    }else if (e->type() == QEvent::Destroy) {
+    } else if (e->type() == QEvent::Destroy) {
         m_pItemDelegate->setEditIsVisible(false);
         this->update(currentIndex());
     }
-    return  false;
+    return false;
 }
 
 void MiddleView::keyPressEvent(QKeyEvent *e)
 {
     if (m_onlyCurItemMenuEnable || e->key() == Qt::Key_PageUp || e->key() == Qt::Key_PageDown) {
         e->ignore();
-    }else {
+    } else {
         DListView::keyPressEvent(e);
     }
 }
@@ -300,7 +296,7 @@ void MiddleView::initUI()
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_emptySearch);
     this->setLayout(layout);
-//    this->installEventFilter(this);
+    //    this->installEventFilter(this);
 }
 
 void MiddleView::setVisibleEmptySearch(bool visible)
@@ -318,7 +314,7 @@ void MiddleView::setOnlyCurItemMenuEnable(bool enable)
 void MiddleView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)
 {
     Q_UNUSED(hint);
-    DListView::closeEditor(editor,QAbstractItemDelegate::NoHint);
+    DListView::closeEditor(editor, QAbstractItemDelegate::NoHint);
 }
 
 void MiddleView::closeMenu()

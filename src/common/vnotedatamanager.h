@@ -38,13 +38,12 @@ class VNoteDataManager : public QObject
 public:
     explicit VNoteDataManager(QObject *parent = nullptr);
 
-    static VNoteDataManager* instance();
-
+    static VNoteDataManager *instance();
 
     //
-    VNOTE_FOLDERS_MAP* getNoteFolders();
+    VNOTE_FOLDERS_MAP *getNoteFolders();
 
-    VNOTE_ALL_NOTES_MAP* getAllNotesInFolder();
+    VNOTE_ALL_NOTES_MAP *getAllNotesInFolder();
 
     void reqNoteDefIcons();
     void reqNoteFolders();
@@ -56,27 +55,28 @@ signals:
 
 public slots:
 protected:
-    VNoteFolder* addFolder(VNoteFolder* folder);
-    VNoteFolder* getFolder(qint64 folderId);
-    VNoteFolder* delFolder(qint64 folderId);
-    qint32       folderCount();
+    VNoteFolder *addFolder(VNoteFolder *folder);
+    VNoteFolder *getFolder(qint64 folderId);
+    VNoteFolder *delFolder(qint64 folderId);
+    qint32 folderCount();
 
-    VNoteItem* addNote(VNoteItem* note);
-    VNoteItem* getNote(qint64 folderId, qint32 noteId);
-    VNoteItem* delNote(qint64 folderId, qint32 noteId);
-    qint32     folderNotesCount(qint64 folderId);
+    VNoteItem *addNote(VNoteItem *note);
+    VNoteItem *getNote(qint64 folderId, qint32 noteId);
+    VNoteItem *delNote(qint64 folderId, qint32 noteId);
+    qint32 folderNotesCount(qint64 folderId);
     /*
      *Para:   folder Id
      *Return: All nots in the folder
      * */
-    VNOTE_ITEMS_MAP* getFolderNotes(qint64 folderId);
+    VNOTE_ITEMS_MAP *getFolderNotes(qint64 folderId);
 
     QPixmap getDefaultIcon(qint32 index, IconsType type);
+
 private:
     QScopedPointer<VNOTE_FOLDERS_MAP> m_qspNoteFoldersMap;
     QScopedPointer<VNOTE_ALL_NOTES_MAP> m_qspAllNotesMap;
 
-    LoadFolderWorker    *m_pForldesLoadThread {nullptr};
+    LoadFolderWorker *m_pForldesLoadThread {nullptr};
     LoadNoteItemsWorker *m_pNotesLoadThread {nullptr};
 
     //State used to check whether data have been loaded
@@ -91,7 +91,7 @@ private:
 
     bool isAllDatasReady() const;
 
-    static VNoteDataManager* _instance;
+    static VNoteDataManager *_instance;
 
     static QVector<QPixmap> m_defaultIcons[IconsType::MaxIconsType];
     static QReadWriteLock m_iconLock;

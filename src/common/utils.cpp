@@ -29,7 +29,9 @@
 
 #include <DGuiApplicationHelper>
 
-Utils::Utils() {}
+Utils::Utils()
+{
+}
 
 QString Utils::convertDateTime(const QDateTime &dateTime)
 {
@@ -41,16 +43,16 @@ QString Utils::convertDateTime(const QDateTime &dateTime)
         qint64 offsetSec = dateTime.secsTo(QDateTime::currentDateTime());
         if (offsetSec < 3600) {
             offsetSec /= 60;
-            if(offsetSec <= 1){
-                disptime = DApplication::translate("Utils","1 min ago");
-            }else {
-                disptime = DApplication::translate("Utils","%1 mins ago").arg(offsetSec);
+            if (offsetSec <= 1) {
+                disptime = DApplication::translate("Utils", "1 min ago");
+            } else {
+                disptime = DApplication::translate("Utils", "%1 mins ago").arg(offsetSec);
             }
         } else {
             disptime = dateTime.toString("hh:mm");
         }
     } else if (1 == offset) {
-        disptime = DApplication::translate("Utils","Yesterday") + " " + dateTime.toString("hh:mm");
+        disptime = DApplication::translate("Utils", "Yesterday") + " " + dateTime.toString("hh:mm");
     } else if (folerDate.year() == currDateTime.year()) {
         //不跨年 其他时间：MM-DD（例如：9-27）；
         disptime = dateTime.toString("MM-dd");
@@ -120,15 +122,15 @@ QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
     return pixmap;
 }
 
-int Utils::highTextEdit(QTextDocument *textDoc,const QString &searchKey,
+int Utils::highTextEdit(QTextDocument *textDoc, const QString &searchKey,
                         const QColor &highColor, bool undo)
 {
     int findCount = 0;
     int len = searchKey.length();
-    if(undo == true){
+    if (undo == true) {
         textDoc->undo();
     }
-    if(len != 0){
+    if (len != 0) {
         QTextCursor highlightCursor(textDoc);
         QTextCursor cursor(textDoc);
 
@@ -139,20 +141,20 @@ int Utils::highTextEdit(QTextDocument *textDoc,const QString &searchKey,
 
         while (!highlightCursor.isNull() && !highlightCursor.atEnd()) {
             highlightCursor = textDoc->find(searchKey, highlightCursor,
-                                             QTextDocument::FindFlags());
+                                            QTextDocument::FindFlags());
 
             if (!highlightCursor.isNull()) {
                 int pos = highlightCursor.position();
                 highlightCursor.setPosition(pos - len);
                 highlightCursor.setPosition(pos, QTextCursor::KeepAnchor);
                 highlightCursor.mergeCharFormat(colorFormat);
-                findCount ++;
+                findCount++;
             }
         }
         cursor.endEditBlock();
     }
 
-    return  findCount;
+    return findCount;
 }
 
 QString Utils::formatMillisecond(qint64 millisecond, bool minValue)
@@ -170,32 +172,31 @@ QString Utils::formatMillisecond(qint64 millisecond, bool minValue)
 
 void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
 {
-    if(block != nullptr){
-       block->blockText = "";
+    if (block != nullptr) {
+        block->blockText = "";
     }
 
-    if(doc != nullptr){
+    if (doc != nullptr) {
         QTextBlock currentBlock = doc->begin();
         QTextBlock::iterator it;
-        while(true){
-            for (it = currentBlock.begin(); !(it.atEnd()); ){
+        while (true) {
+            for (it = currentBlock.begin(); !(it.atEnd());) {
                 QTextFragment currentFragment = it.fragment();
-//                QTextImageFormat newImageFormat = currentFragment.charFormat().toImageFormat();
-//                if (newImageFormat.isValid()) {
-//                    int pos = currentFragment.position();
-//                    qDebug() << "image block:" << pos <<"url;" << newImageFormat.name();
-//                    ++it;
-//                    continue;
-//                }
-                if (currentFragment.isValid()){
+                //                QTextImageFormat newImageFormat = currentFragment.charFormat().toImageFormat();
+                //                if (newImageFormat.isValid()) {
+                //                    int pos = currentFragment.position();
+                //                    qDebug() << "image block:" << pos <<"url;" << newImageFormat.name();
+                //                    ++it;
+                //                    continue;
+                //                }
+                if (currentFragment.isValid()) {
                     ++it;
                     block->blockText.append(currentFragment.text());
                 }
-
             }
 
             currentBlock = currentBlock.next();
-            if(!currentBlock.isValid())
+            if (!currentBlock.isValid())
                 break;
 
             block->blockText.append('\n');
@@ -205,7 +206,7 @@ void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
 
 void Utils::blockToDocument(const VNoteBlock *block, QTextDocument *doc)
 {
-    if(block && doc){
+    if (block && doc) {
         doc->setPlainText(block->blockText);
     }
 }
@@ -214,7 +215,7 @@ void Utils::setDefaultColor(QTextDocument *srcDoc, const QColor &color)
 {
     QTextCursor cursor(srcDoc);
     cursor.movePosition(QTextCursor::Start);
-    cursor.movePosition(QTextCursor::End,QTextCursor::KeepAnchor);
+    cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
     QTextCharFormat newFormat = cursor.charFormat();
     newFormat.setForeground(color);
     cursor.mergeCharFormat(newFormat);

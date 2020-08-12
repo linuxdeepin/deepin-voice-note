@@ -28,11 +28,11 @@ static bool isSpeeching = false;
 // 检测是否在朗读文本
 bool VTextSpeechAndTrManager::isTextToSpeechInWorking()
 {
-    if(isSpeeching){
+    if (isSpeeching) {
         QDBusMessage stopReadingMsg = QDBusMessage::createMethodCall("com.iflytek.aiassistant",
-                                                          "/aiassistant/tts",
-                                                          "com.iflytek.aiassistant.tts",
-                                                          "isTTSInWorking");
+                                                                     "/aiassistant/tts",
+                                                                     "com.iflytek.aiassistant.tts",
+                                                                     "isTTSInWorking");
 
         QDBusReply<bool> stopReadingStateRet = QDBusConnection::sessionBus().call(stopReadingMsg, QDBus::BlockWithGui);
         if (stopReadingStateRet.isValid()) {
@@ -49,9 +49,9 @@ bool VTextSpeechAndTrManager::isTextToSpeechInWorking()
 bool VTextSpeechAndTrManager::getTextToSpeechEnable()
 {
     QDBusMessage voiceReadingMsg = QDBusMessage::createMethodCall("com.iflytek.aiassistant",
-                                                      "/aiassistant/tts",
-                                                      "com.iflytek.aiassistant.tts",
-                                                      "getTTSEnable");
+                                                                  "/aiassistant/tts",
+                                                                  "com.iflytek.aiassistant.tts",
+                                                                  "getTTSEnable");
 
     QDBusReply<bool> voiceReadingStateRet = QDBusConnection::sessionBus().call(voiceReadingMsg, QDBus::BlockWithGui);
     if (voiceReadingStateRet.isValid()) {
@@ -65,9 +65,9 @@ bool VTextSpeechAndTrManager::getTextToSpeechEnable()
 bool VTextSpeechAndTrManager::getSpeechToTextEnable()
 {
     QDBusMessage dictationMsg = QDBusMessage::createMethodCall("com.iflytek.aiassistant",
-                                                      "/aiassistant/iat",
-                                                      "com.iflytek.aiassistant.iat",
-                                                      "getIatEnable");
+                                                               "/aiassistant/iat",
+                                                               "com.iflytek.aiassistant.iat",
+                                                               "getIatEnable");
 
     QDBusReply<bool> dictationStateRet = QDBusConnection::sessionBus().call(dictationMsg, QDBus::BlockWithGui);
     if (dictationStateRet.isValid()) {
@@ -81,9 +81,9 @@ bool VTextSpeechAndTrManager::getSpeechToTextEnable()
 bool VTextSpeechAndTrManager::getTransEnable()
 {
     QDBusMessage translateReadingMsg = QDBusMessage::createMethodCall("com.iflytek.aiassistant",
-                                                      "/aiassistant/trans",
-                                                      "com.iflytek.aiassistant.trans",
-                                                      "getTransEnable");
+                                                                      "/aiassistant/trans",
+                                                                      "com.iflytek.aiassistant.trans",
+                                                                      "getTransEnable");
 
     QDBusReply<bool> translateStateRet = QDBusConnection::sessionBus().call(translateReadingMsg, QDBus::BlockWithGui);
     if (translateStateRet.isValid()) {
@@ -103,7 +103,7 @@ void VTextSpeechAndTrManager::onTextToSpeech()
 // 停止语音朗读
 void VTextSpeechAndTrManager::onStopTextToSpeech()
 {
-    if(isSpeeching){
+    if (isSpeeching) {
         QProcess::startDetached("dbus-send  --print-reply --dest=com.iflytek.aiassistant /aiassistant/tts com.iflytek.aiassistant.tts.stopTTSDirectly");
         isSpeeching = false;
     }

@@ -24,7 +24,8 @@
 #include <QObject>
 #include <QRunnable>
 
-class VNTask : public QObject, public QRunnable
+class VNTask : public QObject
+    , public QRunnable
 {
     Q_OBJECT
 public:

@@ -69,7 +69,7 @@ QStandardItem *LeftView::getNotepadRoot()
 
 QModelIndex LeftView::getNotepadRootIndex()
 {
-    return  m_pSortViewFilter->mapFromSource(getNotepadRoot()->index());
+    return m_pSortViewFilter->mapFromSource(getNotepadRoot()->index());
 }
 
 void LeftView::mousePressEvent(QMouseEvent *event)
@@ -84,7 +84,7 @@ void LeftView::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::RightButton) {
         QModelIndex index = this->indexAt(event->pos());
         if (StandardItemCommon::getStandardItemType(index) == StandardItemCommon::NOTEPADITEM
-                && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
+            && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
             this->setCurrentIndex(index);
             m_notepadMenu->popup(event->globalPos());
         }
@@ -106,18 +106,17 @@ void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void LeftView::mouseMoveEvent(QMouseEvent *event)
 {
-   Q_UNUSED(event);
+    Q_UNUSED(event);
 }
 
 void LeftView::keyPressEvent(QKeyEvent *e)
 {
     if (m_onlyCurItemMenuEnable || e->key() == Qt::Key_PageUp || e->key() == Qt::Key_PageDown) {
         e->ignore();
-    }else {
+    } else {
         if (0 == this->currentIndex().row() && e->key() == Qt::Key_Up) {
             e->ignore();
-        }
-        else {
+        } else {
             DTreeView::keyPressEvent(e);
         }
     }
@@ -132,7 +131,7 @@ QModelIndex LeftView::restoreNotepadItem()
         if (!model->isSelected(index)) {
             this->setCurrentIndex(index);
         }
-    }else {
+    } else {
         index = setDefaultNotepadItem();
     }
 
@@ -141,7 +140,7 @@ QModelIndex LeftView::restoreNotepadItem()
 
 QModelIndex LeftView::setDefaultNotepadItem()
 {
-    QModelIndex index = m_pSortViewFilter->index(0,0, getNotepadRootIndex());
+    QModelIndex index = m_pSortViewFilter->index(0, 0, getNotepadRootIndex());
     this->setCurrentIndex(index);
     return index;
 }
@@ -150,7 +149,7 @@ void LeftView::addFolder(VNoteFolder *folder)
 {
     if (nullptr != folder) {
         QStandardItem *pItem = StandardItemCommon::createStandardItem(
-                    folder, StandardItemCommon::NOTEPADITEM);
+            folder, StandardItemCommon::NOTEPADITEM);
 
         QStandardItem *root = getNotepadRoot();
         root->appendRow(pItem);
@@ -163,7 +162,7 @@ void LeftView::appendFolder(VNoteFolder *folder)
 {
     if (nullptr != folder) {
         QStandardItem *pItem = StandardItemCommon::createStandardItem(
-                    folder, StandardItemCommon::NOTEPADITEM);
+            folder, StandardItemCommon::NOTEPADITEM);
 
         QStandardItem *root = getNotepadRoot();
 
@@ -178,17 +177,16 @@ void LeftView::editFolder()
     edit(currentIndex());
 }
 
-VNoteFolder* LeftView::removeFolder()
+VNoteFolder *LeftView::removeFolder()
 {
-
     QModelIndex index = currentIndex();
 
-    if(StandardItemCommon::getStandardItemType(index) != StandardItemCommon::NOTEPADITEM){
+    if (StandardItemCommon::getStandardItemType(index) != StandardItemCommon::NOTEPADITEM) {
         return nullptr;
     }
 
-    VNoteFolder *data = reinterpret_cast<VNoteFolder*>(
-                StandardItemCommon::getStandardItemData(index));
+    VNoteFolder *data = reinterpret_cast<VNoteFolder *>(
+        StandardItemCommon::getStandardItemData(index));
 
     m_pSortViewFilter->removeRow(index.row(), index.parent());
 
@@ -208,7 +206,7 @@ int LeftView::folderCount()
     return count;
 }
 
-void  LeftView::initMenu()
+void LeftView::initMenu()
 {
     m_notepadMenu = ActionManager::Instance()->notebookContextMenu();
 }
@@ -222,13 +220,13 @@ void LeftView::setOnlyCurItemMenuEnable(bool enable)
 
 void LeftView::sort()
 {
-    return m_pSortViewFilter->sort(0,Qt::DescendingOrder);
+    return m_pSortViewFilter->sort(0, Qt::DescendingOrder);
 }
 
 void LeftView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)
 {
     Q_UNUSED(hint);
-    DTreeView::closeEditor(editor,QAbstractItemDelegate::NoHint);
+    DTreeView::closeEditor(editor, QAbstractItemDelegate::NoHint);
 }
 
 void LeftView::closeMenu()

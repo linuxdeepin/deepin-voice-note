@@ -29,16 +29,14 @@ DCORE_USE_NAMESPACE
 VNoteA2TManager::VNoteA2TManager(QObject *parent)
     : QObject(parent)
 {
-
 }
 
 int VNoteA2TManager::initSession()
 {
     m_session.reset(new com::iflytek::aiservice::session(
-                        "com.iflytek.aiservice",
-                        "/",
-                        QDBusConnection::sessionBus() )
-                    );
+        "com.iflytek.aiservice",
+        "/",
+        QDBusConnection::sessionBus()));
 
     const QString ability("asr");
     const QString appName = qApp->applicationName();
@@ -47,25 +45,23 @@ int VNoteA2TManager::initSession()
     QDBusObjectPath qdPath = m_session->createSession(appName, ability, errorCode);
 
     m_asrInterface.reset(new com::iflytek::aiservice::asr(
-                             "com.iflytek.aiservice",
-                             qdPath.path(),
-                             QDBusConnection::sessionBus() )
-                         );
+        "com.iflytek.aiservice",
+        qdPath.path(),
+        QDBusConnection::sessionBus()));
 
     connect(m_asrInterface.get(), &com::iflytek::aiservice::asr::onNotify,
             this, &VNoteA2TManager::onNotify);
 
     return errorCode;
-
 }
 
 void VNoteA2TManager::startAsr(QString filePath,
-                                  qint64 fileDuration,
-                                  QString srcLanguage,
-                                  QString targetLanguage)
+                               qint64 fileDuration,
+                               QString srcLanguage,
+                               QString targetLanguage)
 {
     int ret = initSession();
-    if(ret != 0){
+    if (ret != 0) {
         emit asrError(AudioOther);
         qInfo() << "createSession->errorCode=" << ret;
         return;
@@ -73,8 +69,8 @@ void VNoteA2TManager::startAsr(QString filePath,
 
     QVariantMap param;
 
-    param.insert("filePath",filePath);
-    param.insert("fileDuration",fileDuration);
+    param.insert("filePath", filePath);
+    param.insert("fileDuration", fileDuration);
 
     if (!srcLanguage.isEmpty()) {
         param.insert("language", srcLanguage);
@@ -181,7 +177,7 @@ VNoteA2TManager::ErrorCode VNoteA2TManager::getErrorCode(const asrMsg &asrData)
         } break;
 
         } //End switch failType
-    } else if (CODE_NETWORK ==asrData.code) {
+    } else if (CODE_NETWORK == asrData.code) {
         error = NetworkError;
     } else {
         //TODO:

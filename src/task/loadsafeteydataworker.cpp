@@ -25,9 +25,8 @@
 #include <DLog>
 
 LoadSafeteyDataWorker::LoadSafeteyDataWorker(QObject *parent)
-    :VNTask(parent)
+    : VNTask(parent)
 {
-
 }
 
 void LoadSafeteyDataWorker::run()
@@ -39,7 +38,6 @@ void LoadSafeteyDataWorker::run()
     //    Add load folder code here
     VNoteSaferOper saferOper;
     SafetyDatas *safers = saferOper.loadSafers();
-
 
     gettimeofday(&end, nullptr);
 

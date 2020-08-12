@@ -67,7 +67,7 @@ void VNoteMessageDialog::initUI()
     actionBarLayout->setSpacing(10);
     actionBarLayout->setContentsMargins(0, 0, 0, 0);
 
-    m_cancelBtn  = new DPushButton(this);
+    m_cancelBtn = new DPushButton(this);
     m_confirmBtn = new DWarningButton(this);
 
     m_buttonSpliter = new DVerticalLine(this);
@@ -77,12 +77,12 @@ void VNoteMessageDialog::initUI()
     m_buttonSpliter->setPalette(pa);
     m_buttonSpliter->setBackgroundRole(QPalette::Background);
     m_buttonSpliter->setAutoFillBackground(true);
-    m_buttonSpliter->setFixedSize(4,28);
+    m_buttonSpliter->setFixedSize(4, 28);
 
     actionBarLayout->addWidget(m_cancelBtn);
-   //actionBarLayout->addSpacing(8);
+    //actionBarLayout->addSpacing(8);
     actionBarLayout->addWidget(m_buttonSpliter);
-   // actionBarLayout->addSpacing(8);
+    // actionBarLayout->addSpacing(8);
     actionBarLayout->addWidget(m_confirmBtn);
 
     mainLayout->addWidget(m_pMessage, 1);
@@ -95,14 +95,12 @@ void VNoteMessageDialog::initUI()
 
 void VNoteMessageDialog::initConnections()
 {
-    connect(m_cancelBtn, &DPushButton::clicked
-            , this, [=]() {
+    connect(m_cancelBtn, &DPushButton::clicked, this, [=]() {
         this->reject();
         this->setEnabled(false);
     });
 
-    connect(m_confirmBtn, &DPushButton::clicked
-            , this, [=]() {
+    connect(m_confirmBtn, &DPushButton::clicked, this, [=]() {
         this->accept();
         this->setEnabled(false);
     });
@@ -117,34 +115,27 @@ void VNoteMessageDialog::initMessage()
     m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "Confirm"));
     switch (m_msgType) {
     case DeleteFolder: {
-        m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
-            ,"Are you sure you want to delete this notebook?\nAll notes in it will be deleted"));
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "Are you sure you want to delete this notebook?\nAll notes in it will be deleted"));
     } break;
     case AbortRecord: {
-        m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
-            ,"Do you want to stop the current recording?"));
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "Do you want to stop the current recording?"));
     } break;
     case DeleteNote: {
-        m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
-            ,"Are you sure you want to delete this note?"));
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "Are you sure you want to delete this note?"));
 
     } break;
     case AsrTimeLimit: {
-        m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
-            ,"Cannot convert this voice note, as notes over 20 minutes are not supported at present."));
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "Cannot convert this voice note, as notes over 20 minutes are not supported at present."));
         setSingleButton();
     } break;
     case AborteAsr: {
-        m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
-            ,"Converting a voice note now. Do you want to stop it?"));
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "Converting a voice note now. Do you want to stop it?"));
     } break;
     case VolumeTooLow: {
-        m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
-            ,"The low input volume may result in bad recordings. Do you want to continue?"));
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "The low input volume may result in bad recordings. Do you want to continue?"));
     } break;
-    case CutNote:{
-        m_pMessage->setText(DApplication::translate("VNoteMessageDialog"
-            ,"The clipped recordings and converted text will not be pasted. Do you want to continue?"));
+    case CutNote: {
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "The clipped recordings and converted text will not be pasted. Do you want to continue?"));
     }
     }
 }

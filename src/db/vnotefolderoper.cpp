@@ -32,8 +32,8 @@
 
 #include <DLog>
 
-VNoteFolderOper::VNoteFolderOper(VNoteFolder* folder)
-    :m_folder(folder)
+VNoteFolderOper::VNoteFolderOper(VNoteFolder *folder)
+    : m_folder(folder)
 {
 }
 
@@ -47,10 +47,9 @@ bool VNoteFolderOper::deleteVNoteFolder(qint64 folderId)
     bool delOK = false;
 
     DelFolderDbVisitor delFolderVisitor(
-                VNoteDbManager::instance()->getVNoteDb(), &folderId, nullptr
-                );
+        VNoteDbManager::instance()->getVNoteDb(), &folderId, nullptr);
 
-    if (VNoteDbManager::instance()->deleteData(&delFolderVisitor) ) {
+    if (VNoteDbManager::instance()->deleteData(&delFolderVisitor)) {
         delOK = true;
         QScopedPointer<VNoteFolder> release(VNoteDataManager::instance()->delFolder(folderId));
     }
@@ -82,7 +81,7 @@ bool VNoteFolderOper::renameVNoteFolder(QString folderName)
         RenameFolderDbVisitor renameFolderVisitor(VNoteDbManager::instance()->getVNoteDb(), m_folder, nullptr);
 
         if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameFolderVisitor))) {
-            m_folder->name       = oldFolderName;
+            m_folder->name = oldFolderName;
             m_folder->modifyTime = oldModifyTime;
 
             isUpdateOK = false;
@@ -94,15 +93,15 @@ bool VNoteFolderOper::renameVNoteFolder(QString folderName)
 
 VNOTE_FOLDERS_MAP *VNoteFolderOper::loadVNoteFolders()
 {
-    VNOTE_FOLDERS_MAP * foldersMap = new VNOTE_FOLDERS_MAP();
+    VNOTE_FOLDERS_MAP *foldersMap = new VNOTE_FOLDERS_MAP();
 
     //DataManager should set autoRelease flag
     foldersMap->autoRelease = true;
 
     FolderQryDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), nullptr, foldersMap);
 
-    if (!VNoteDbManager::instance()->queryData(&folderVisitor) ) {
-      qCritical() << "Query faild!";
+    if (!VNoteDbManager::instance()->queryData(&folderVisitor)) {
+        qCritical() << "Query faild!";
     }
 
     return foldersMap;
@@ -117,28 +116,27 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
 
     AddFolderDbVisitor addFolderVisitor(VNoteDbManager::instance()->getVNoteDb(), &folder, newFolder);
 
-    if (VNoteDbManager::instance()->insertData(&addFolderVisitor) ) {
-
+    if (VNoteDbManager::instance()->insertData(&addFolderVisitor)) {
         //TODO:
         //    DbVisitor can update any feilds here  db return all feilds
         //of new record. Just load icon here
         newFolder->UI.icon = VNoteDataManager::instance()->getDefaultIcon(
-                    newFolder->defaultIcon, IconsType::DefaultIcon);
+            newFolder->defaultIcon, IconsType::DefaultIcon);
         newFolder->UI.grayIcon = VNoteDataManager::instance()->getDefaultIcon(
-                    newFolder->defaultIcon, IconsType::DefaultGrayIcon);
+            newFolder->defaultIcon, IconsType::DefaultGrayIcon);
 
         VNoteDataManager::instance()->addFolder(newFolder);
 
         qInfo() << "New folder:" << newFolder->id
-                << "Name:"       << newFolder->name
+                << "Name:" << newFolder->name
                 << "Create time:" << newFolder->createTime
                 << "Modify time:" << newFolder->modifyTime;
     } else {
         qCritical() << "Add folder failded:"
-                << "New folder:" << newFolder->id
-                << "Name:"       << newFolder->name
-                << "Create time:" << newFolder->createTime
-                << "Modify time:" << newFolder->modifyTime;
+                    << "New folder:" << newFolder->id
+                    << "Name:" << newFolder->name
+                    << "Create time:" << newFolder->createTime
+                    << "Modify time:" << newFolder->modifyTime;
 
         QScopedPointer<VNoteFolder> autoRelease(newFolder);
         newFolder = nullptr;
@@ -149,7 +147,7 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
 
 VNoteFolder *VNoteFolderOper::getFolder(qint64 folderId)
 {
-    VNoteFolder* folder = VNoteDataManager::instance()->getFolder(folderId);
+    VNoteFolder *folder = VNoteDataManager::instance()->getFolder(folderId);
 
     return folder;
 }
@@ -161,7 +159,7 @@ qint32 VNoteFolderOper::getFoldersCount()
 
 qint32 VNoteFolderOper::getNotesCount(qint64 folderId)
 {
-    VNOTE_ITEMS_MAP * notesInFollder = VNoteDataManager::instance()->getFolderNotes(folderId);
+    VNOTE_ITEMS_MAP *notesInFollder = VNoteDataManager::instance()->getFolderNotes(folderId);
 
     qint32 notesCount = 0;
 
@@ -169,7 +167,7 @@ qint32 VNoteFolderOper::getNotesCount(qint64 folderId)
         notesCount = notesInFollder->folderNotes.size();
     }
 
-    return  notesCount;
+    return notesCount;
 }
 
 qint32 VNoteFolderOper::getNotesCount()
@@ -190,7 +188,7 @@ QString VNoteFolderOper::getDefaultFolderName()
     //may be separate data for different category in future.
     //We query the max id every time now, need optimize when
     //category feature is added.
-    QString defaultFolderName = DApplication::translate("DefaultName","Notebook");
+    QString defaultFolderName = DApplication::translate("DefaultName", "Notebook");
 
     qint64 foldersCount = VNoteDataManager::instance()->folderCount();
     MaxIdFolderDbVisitor folderIdVisitor(VNoteDbManager::instance()->getVNoteDb(), nullptr, &foldersCount);
@@ -200,8 +198,8 @@ QString VNoteFolderOper::getDefaultFolderName()
         folderIdVisitor.extraData().data.flag = true;
     }
 
-    if (VNoteDbManager::instance()->queryData(&folderIdVisitor) ) {
-        defaultFolderName += QString("%1").arg(foldersCount+1);
+    if (VNoteDbManager::instance()->queryData(&folderIdVisitor)) {
+        defaultFolderName += QString("%1").arg(foldersCount + 1);
     }
 
     return defaultFolderName;
@@ -212,9 +210,9 @@ qint32 VNoteFolderOper::getDefaultIcon()
     const int defalutIconCnt = 10;
 
     QTime time = QTime::currentTime();
-    qsrand(static_cast<uint>(time.msec()+time.second()*1000));
+    qsrand(static_cast<uint>(time.msec() + time.second() * 1000));
 
-    return (qrand()%defalutIconCnt);
+    return (qrand() % defalutIconCnt);
 }
 
 QPixmap VNoteFolderOper::getDefaultIcon(qint32 index, IconsType type)

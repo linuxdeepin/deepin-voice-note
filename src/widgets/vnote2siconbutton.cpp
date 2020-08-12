@@ -23,7 +23,7 @@
 #include "common/utils.h"
 
 VNote2SIconButton::VNote2SIconButton(
-        const QString normal, const QString press, QWidget *parent)
+    const QString normal, const QString press, QWidget *parent)
     : DFloatingButton(parent)
 {
     m_icons[Normal] = normal;
@@ -39,7 +39,7 @@ bool VNote2SIconButton::isPressed() const
 
 void VNote2SIconButton::setState(int state)
 {
-    if (m_state> Invalid && state < MaxState) {
+    if (m_state > Invalid && state < MaxState) {
         m_state = state;
 
         updateIcon();

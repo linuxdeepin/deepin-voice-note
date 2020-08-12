@@ -28,13 +28,13 @@
 class VNoteFolderOper
 {
 public:
-    explicit VNoteFolderOper(VNoteFolder* folder = nullptr);
+    explicit VNoteFolderOper(VNoteFolder *folder = nullptr);
 
-    inline bool        isNoteItemLoaded();
-    VNOTE_FOLDERS_MAP* loadVNoteFolders();
+    inline bool isNoteItemLoaded();
+    VNOTE_FOLDERS_MAP *loadVNoteFolders();
 
-    VNoteFolder* addFolder(VNoteFolder& folder);
-    VNoteFolder* getFolder(qint64 folderId);
+    VNoteFolder *addFolder(VNoteFolder &folder);
+    VNoteFolder *getFolder(qint64 folderId);
     qint32 getFoldersCount();
     qint32 getNotesCount(qint64 folderId);
     qint32 getNotesCount();
@@ -44,11 +44,11 @@ public:
     QPixmap getDefaultIcon(qint32 index, IconsType type);
 
     bool deleteVNoteFolder(qint64 folderId);
-    bool deleteVNoteFolder(VNoteFolder* folder);
+    bool deleteVNoteFolder(VNoteFolder *folder);
     bool renameVNoteFolder(QString folderName);
 
 protected:
-    VNoteFolder* m_folder {nullptr};
+    VNoteFolder *m_folder {nullptr};
 };
 
 #endif // VNOTEFOLDEROPER_H

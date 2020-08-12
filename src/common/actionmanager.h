@@ -30,11 +30,11 @@ DWIDGET_USE_NAMESPACE
 
 class ActionManager : public QObject
 {
-     Q_OBJECT
+    Q_OBJECT
 public:
     ActionManager();
 
-    static ActionManager* Instance();
+    static ActionManager *Instance();
 
     enum ActionKind {
         Invalid = 0,
@@ -84,7 +84,6 @@ public:
 
     Q_ENUM(ActionKind)
 
-
     //Menu types
     enum MenuType {
         NotebookCtxMenu,
@@ -93,28 +92,28 @@ public:
     };
     Q_ENUM(MenuType)
 
-    DMenu* notebookContextMenu();
-    DMenu* noteContextMenu();
-    DMenu* detialContextMenu();
+    DMenu *notebookContextMenu();
+    DMenu *noteContextMenu();
+    DMenu *detialContextMenu();
     ActionKind getActionKind(QAction *action);
-    QAction* getActionById(ActionKind id);
+    QAction *getActionById(ActionKind id);
 
     void enableAction(ActionKind actionId, bool enable);
 
     void visibleAction(ActionKind actionId, bool enable);
 
     void resetCtxMenu(MenuType type, bool enable = true);
-protected:
 
+protected:
     void initMenu();
 
-    static ActionManager * _instance;
+    static ActionManager *_instance;
 
-    QScopedPointer<DMenu>  m_notebookContextMenu;
-    QScopedPointer<DMenu>  m_noteContextMenu;
-    QScopedPointer<DMenu>  m_detialContextMenu;
+    QScopedPointer<DMenu> m_notebookContextMenu;
+    QScopedPointer<DMenu> m_noteContextMenu;
+    QScopedPointer<DMenu> m_detialContextMenu;
 
-    QMap<ActionKind, QAction*> m_actionsMap;
+    QMap<ActionKind, QAction *> m_actionsMap;
 };
 
 #endif // ACTIONFACTORY_H

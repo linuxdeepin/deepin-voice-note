@@ -28,18 +28,17 @@
 LoadFolderWorker::LoadFolderWorker(QObject *parent)
     : VNTask(parent)
 {
-
 }
 
 void LoadFolderWorker::run()
 {
-    static struct timeval start,backups, end;
+    static struct timeval start, backups, end;
 
     gettimeofday(&start, nullptr);
     backups = start;
 
     VNoteFolderOper folderOper;
-    VNOTE_FOLDERS_MAP* foldersMap = folderOper.loadVNoteFolders();
+    VNOTE_FOLDERS_MAP *foldersMap = folderOper.loadVNoteFolders();
 
     gettimeofday(&end, nullptr);
 

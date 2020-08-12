@@ -27,7 +27,7 @@
 
 #include <DLog>
 
-VNoteDataSafefyManager* VNoteDataSafefyManager::_instance = nullptr;
+VNoteDataSafefyManager *VNoteDataSafefyManager::_instance = nullptr;
 
 VNoteDataSafefyManager::VNoteDataSafefyManager(QObject *parent)
     : QObject(parent)
@@ -64,7 +64,7 @@ void VNoteDataSafefyManager::reqSafers()
 void VNoteDataSafefyManager::doSafer(const VDataSafer &safer)
 {
     if (safer.isValid()) {
-        VNDataSaferTask* pSafeTask = new VNDataSaferTask(safer);
+        VNDataSaferTask *pSafeTask = new VNDataSaferTask(safer);
 
         Q_ASSERT(nullptr != m_safetyTaskWoker);
 

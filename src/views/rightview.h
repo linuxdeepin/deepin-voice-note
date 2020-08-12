@@ -43,9 +43,9 @@ struct VNVoiceBlock;
 class VoiceNoteItem;
 class DetailItemWidget;
 
-
-enum ItemWidgetType{VoicePlugin,TextEditPlugin};
-typedef  QMultiMap<ItemWidgetType,DetailItemWidget*> MultiMapWidget;
+enum ItemWidgetType { VoicePlugin,
+                      TextEditPlugin };
+typedef QMultiMap<ItemWidgetType, DetailItemWidget *> MultiMapWidget;
 
 class RightView : public DWidget
 {
@@ -58,19 +58,19 @@ public:
                                      QTextCursor::MoveOperation op = QTextCursor::NoMove,
                                      QString reg = "");
 
-    void  setEnablePlayBtn(bool enable);
-    void  delWidget(DetailItemWidget *widget, bool merge = true);
-    void  saveNote();
-    void  updateData();
-    void  mouseMoveSelect(QMouseEvent *event);
-    void  selectAllItem();
-    void  clearAllSelection();
-    void  pasteText();
-    void  removeSelectWidget(DetailItemWidget *widget);
+    void setEnablePlayBtn(bool enable);
+    void delWidget(DetailItemWidget *widget, bool merge = true);
+    void saveNote();
+    void updateData();
+    void mouseMoveSelect(QMouseEvent *event);
+    void selectAllItem();
+    void clearAllSelection();
+    void pasteText();
+    void removeSelectWidget(DetailItemWidget *widget);
 
-    int   initAction(DetailItemWidget *widget);
+    int initAction(DetailItemWidget *widget);
 
-    bool isAllWidgetEmpty(const QList<DetailItemWidget*> &widget);
+    bool isAllWidgetEmpty(const QList<DetailItemWidget *> &widget);
     DetailItemWidget *getOnlyOneSelectVoice();
 
     QString getSelectText(bool voiceText = true);
@@ -88,7 +88,7 @@ public:
 
     VoiceNoteItem *getCurVoicePlay();
     VoiceNoteItem *getCurVoiceAsr();
-    int         showWarningDialog();
+    int showWarningDialog();
 
 signals:
     void sigVoicePlay(VNVoiceBlock *voiceData);
@@ -102,6 +102,7 @@ public slots:
     void onVoicePlay(VoiceNoteItem *item);
     void onVoicePause(VoiceNoteItem *item);
     void onPlayUpdate();
+
 protected:
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -109,33 +110,34 @@ protected:
     void keyPressEvent(QKeyEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void adjustVerticalScrollBar(QWidget *widget, int defaultHeight);
+
 private:
     void initUi();
     void initConnection();
     void initMenu();
     void onMenuShow(DetailItemWidget *widget);
 
-    bool        checkFileExist(const QString &file);
+    bool checkFileExist(const QString &file);
     DetailItemWidget *getWidgetByPos(const QPoint &pos);
-    VoiceNoteItem    *m_curPlayItem {nullptr};
-    VoiceNoteItem    *m_curAsrItem {nullptr};
+    VoiceNoteItem *m_curPlayItem {nullptr};
+    VoiceNoteItem *m_curAsrItem {nullptr};
 
-    VNoteItem   *m_noteItemData {nullptr};
-    DetailItemWidget *m_curItemWidget{nullptr};
-    DWidget     *m_placeholderWidget {nullptr};
+    VNoteItem *m_noteItemData {nullptr};
+    DetailItemWidget *m_curItemWidget {nullptr};
+    DWidget *m_placeholderWidget {nullptr};
     QVBoxLayout *m_viewportLayout {nullptr};
     //Voice control context menu
-    DMenu       *m_noteDetailContextMenu {nullptr};
-    DDialog     *m_fileHasDelDialog {nullptr};
-    bool         m_fIsNoteModified {false};
-    bool         m_isFristTextChange {false};
+    DMenu *m_noteDetailContextMenu {nullptr};
+    DDialog *m_fileHasDelDialog {nullptr};
+    bool m_fIsNoteModified {false};
+    bool m_isFristTextChange {false};
 
-    QTimer       *m_playAnimTimer {nullptr};
+    QTimer *m_playAnimTimer {nullptr};
 
     MultiMapWidget m_selectWidget;
-    QString        m_searchKey {""};
+    QString m_searchKey {""};
 
-    QMap<VNoteBlock*, DetailItemWidget*> m_mapWidgetCache;
+    QMap<VNoteBlock *, DetailItemWidget *> m_mapWidgetCache;
 };
 
 #endif // RIGHTVIEW_H

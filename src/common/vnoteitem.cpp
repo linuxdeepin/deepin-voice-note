@@ -27,13 +27,14 @@
 
 VNoteItem::VNoteItem()
 {
-
 }
 
 bool VNoteItem::isValid()
 {
     return (noteId > INVALID_ID
-            && folderId > INVALID_ID) ? true : false;
+            && folderId > INVALID_ID)
+               ? true
+               : false;
 }
 
 void VNoteItem::delNoteData()
@@ -167,7 +168,7 @@ qint32 VNoteItem::voiceCount() const
     return datas.voiceBlocks.size();
 }
 
-QDebug &operator << (QDebug &out, VNoteItem &noteItem)
+QDebug &operator<<(QDebug &out, VNoteItem &noteItem)
 {
     out << "\n{ "
         << "noteId=" << noteItem.noteId << ","
@@ -215,7 +216,6 @@ VNoteBlock::VNoteBlock(qint32 type)
 
 VNoteBlock::~VNoteBlock()
 {
-
 }
 
 qint32 VNoteBlock::getType()
@@ -230,7 +230,6 @@ VNTextBlock::VNTextBlock()
 
 VNTextBlock::~VNTextBlock()
 {
-
 }
 
 void VNTextBlock::releaseSpecificData()
@@ -239,7 +238,6 @@ void VNTextBlock::releaseSpecificData()
     //    Add text specific operation code here.
     //
     //Do nothing for text now.
-
 }
 
 VNVoiceBlock::VNVoiceBlock()

@@ -39,22 +39,23 @@ public:
 
     enum MicrophoneState {
         NotAvailable,
-        VolumeTooLow,   // volume lower than 20%
-        Normal,         // volume more than 20%
+        VolumeTooLow, // volume lower than 20%
+        Normal, // volume more than 20%
     };
 signals:
     void microphoneAvailableState(int isAvailable);
     void inputSourceChanged(const QString &name);
 public slots:
-    void onDefaultSourceChanaged(const QDBusObjectPath & value);
-    void onCardsChanged(const QString & value);
+    void onDefaultSourceChanaged(const QDBusObjectPath &value);
+    void onCardsChanged(const QString &value);
+
 protected:
     virtual void run() override;
 
     void initAudioMeter();
     void initConnections();
-    void initAvailInputPorts(const QString& cards);
-    bool isMicrophoneAvail(const QString& activePort) const;
+    void initAvailInputPorts(const QString &cards);
+    bool isMicrophoneAvail(const QString &activePort) const;
 
 private:
     const QString m_serviceName {"com.deepin.daemon.Audio"};
@@ -72,18 +73,18 @@ private:
     typedef QString PortID;
 
     struct Port {
-        PortID  portId;
+        PortID portId;
         QString portName;
         QString cardName;
-        int     available {UnAvailable};
-        int     cardId;
-        bool    isActive {false};
+        int available {UnAvailable};
+        int cardId;
+        bool isActive {false};
 
         bool isInputPort() const;
         bool isLoopback() const;
     };
 
-    friend QDebug& operator << (QDebug& out, const Port &port);
+    friend QDebug &operator<<(QDebug &out, const Port &port);
 
     MicrophoneState m_microphoneState {NotAvailable};
     volatile bool m_quitWatcher {false};

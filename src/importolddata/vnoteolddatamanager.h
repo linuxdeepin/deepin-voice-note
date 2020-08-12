@@ -34,11 +34,11 @@ class VNoteOldDataManager : public QObject
 public:
     explicit VNoteOldDataManager(QObject *parent = nullptr);
 
-    static VNoteOldDataManager* instance();
+    static VNoteOldDataManager *instance();
     static void releaseInstance();
 
-    VNOTE_FOLDERS_MAP*   folders();
-    VNOTE_ALL_NOTES_MAP* allNotes();
+    VNOTE_FOLDERS_MAP *folders();
+    VNOTE_ALL_NOTES_MAP *allNotes();
 
     //Should be called before reqDatas
     void initOldDb();
@@ -52,9 +52,10 @@ public slots:
     void onFinishLoad();
     void onFinishUpgrade();
     void onProgress(int value);
+
 protected:
-    static VNoteOldDataManager* _instance;
-    static VNoteDbManager*      m_oldDbManger;
+    static VNoteOldDataManager *_instance;
+    static VNoteDbManager *m_oldDbManger;
 
     QScopedPointer<VNOTE_FOLDERS_MAP> m_qspNoteFoldersMap;
     QScopedPointer<VNOTE_ALL_NOTES_MAP> m_qspAllNotes;

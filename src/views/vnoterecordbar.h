@@ -48,46 +48,48 @@ public:
     void playVoice(VNVoiceBlock *voiceData);
     void pauseVoice(VNVoiceBlock *voiceData);
     bool stopVoice(VNVoiceBlock *voiceData);
-    VNVoiceBlock* getVoiceData();
+    VNVoiceBlock *getVoiceData();
 
 private:
     void initAudioWatcher();
     void initSetting();
     void initUI();
     void initConnections();
-    bool volumeToolow(const double& volume);
+    bool volumeToolow(const double &volume);
 
 signals:
-    void sigStartRecord(const QString& recordPath);
-    void sigFinshRecord(const QString &voicePath,qint64 voiceSize);
-    void sigPlayVoice(VNVoiceBlock * voiceData);
-    void sigPauseVoice(VNVoiceBlock * voiceData);
-    void sigWidgetClose(VNVoiceBlock * voiceData);
+    void sigStartRecord(const QString &recordPath);
+    void sigFinshRecord(const QString &voicePath, qint64 voiceSize);
+    void sigPlayVoice(VNVoiceBlock *voiceData);
+    void sigPauseVoice(VNVoiceBlock *voiceData);
+    void sigWidgetClose(VNVoiceBlock *voiceData);
     void sigDeviceExceptionMsgShow();
     void sigDeviceExceptionMsgClose();
 
 public slots:
     void onStartRecord();
-    void onFinshRecord(const QString &voicePath,qint64 voiceSize);
+    void onFinshRecord(const QString &voicePath, qint64 voiceSize);
     void onClosePlayWidget(VNVoiceBlock *voiceData);
     void onAudioVolumeChange(int mode);
     void onAudioDeviceChange(int mode);
     void onAudioSelectChange(QVariant value);
+
 protected:
     bool eventFilter(QObject *o, QEvent *e) override;
     void startRecord();
+
 protected:
-    QStackedLayout    *m_mainLayout {nullptr};
-    VNotePlayWidget   *m_playPanel {nullptr};
+    QStackedLayout *m_mainLayout {nullptr};
+    VNotePlayWidget *m_playPanel {nullptr};
     VNoteRecordWidget *m_recordPanel {nullptr};
-    VNoteIconButton   *m_recordBtn {nullptr};
-    QWidget           *m_recordBtnHover {nullptr};
+    VNoteIconButton *m_recordBtn {nullptr};
+    QWidget *m_recordBtnHover {nullptr};
     QScopedPointer<DAnchorsBase> m_recBtnAnchor;
 
-    QString          m_recordPath {""};
-    int              m_currentMode {0};
-    AudioWatcher     *m_audioWatcher{nullptr};
-    bool             m_showVolumeWanning{false};
+    QString m_recordPath {""};
+    int m_currentMode {0};
+    AudioWatcher *m_audioWatcher {nullptr};
+    bool m_showVolumeWanning {false};
 };
 
 #endif // VNOTERECORDBAR_H

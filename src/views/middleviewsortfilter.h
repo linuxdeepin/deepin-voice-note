@@ -27,7 +27,7 @@
 class MiddleViewSortFilter : public QSortFilterProxyModel
 {
 public:
-    MiddleViewSortFilter(QObject *parent=nullptr);
+    MiddleViewSortFilter(QObject *parent = nullptr);
 
     enum sortFeild {
         title,
@@ -36,14 +36,14 @@ public:
     };
 
     void sortView(
-            sortFeild feild=modifyTime,
-            int column=0,
-            Qt::SortOrder order=Qt::DescendingOrder);
+        sortFeild feild = modifyTime,
+        int column = 0,
+        Qt::SortOrder order = Qt::DescendingOrder);
 
 protected:
     virtual bool lessThan(
-            const QModelIndex &source_left,
-            const QModelIndex &source_right ) const override;
+        const QModelIndex &source_left,
+        const QModelIndex &source_right) const override;
 
     sortFeild m_sortFeild {modifyTime};
 };

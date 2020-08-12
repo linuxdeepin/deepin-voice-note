@@ -24,7 +24,7 @@
 
 DCORE_USE_NAMESPACE
 
-static OpsStateInterface* objectInstance = nullptr;
+static OpsStateInterface *objectInstance = nullptr;
 
 OpsStateInterface::OpsStateInterface()
 {
@@ -39,12 +39,11 @@ OpsStateInterface::OpsStateInterface()
         break;
     }
     QString systemInfo = QString("[%1-%2]")
-               .arg(DSysInfo::operatingSystemName())
-               .arg(DSysInfo::deepinTypeDisplayName());
+                             .arg(DSysInfo::operatingSystemName())
+                             .arg(DSysInfo::deepinTypeDisplayName());
 
     qInfo() << systemInfo << " IsAvailable use voice to text:" << fAiServiceExist;
-    operState(StateAISrvAvailable,fAiServiceExist);
-
+    operState(StateAISrvAvailable, fAiServiceExist);
 }
 
 void OpsStateInterface::operState(int type, bool isSet)
@@ -53,9 +52,9 @@ void OpsStateInterface::operState(int type, bool isSet)
 
     if (shift > StateNone && shift < StateMax) {
         if (isSet) {
-            m_states |= (1<<shift);
+            m_states |= (1 << shift);
         } else {
-            m_states &= (~(1<<shift));
+            m_states &= (~(1 << shift));
         }
     } else {
         qCritical() << "Operation error:Invalid opsType =" << type;
@@ -64,38 +63,38 @@ void OpsStateInterface::operState(int type, bool isSet)
 
 bool OpsStateInterface::isSearching() const
 {
-    return (m_states & (1<<StateSearching));
+    return (m_states & (1 << StateSearching));
 }
 
 bool OpsStateInterface::isRecording() const
 {
-    return (m_states & (1<<StateRecording));
+    return (m_states & (1 << StateRecording));
 }
 
 bool OpsStateInterface::isPlaying() const
 {
-    return (m_states & (1<<StatePlaying));
+    return (m_states & (1 << StatePlaying));
 }
 
 bool OpsStateInterface::isVoice2Text() const
 {
-    return (m_states & (1<<StateVoice2Text));
+    return (m_states & (1 << StateVoice2Text));
 }
 
 bool OpsStateInterface::isAppQuit() const
 {
-    return (m_states & (1<<StateAppQuit));
+    return (m_states & (1 << StateAppQuit));
 }
 
 bool OpsStateInterface::isAiSrvExist() const
 {
-    return (m_states & (1<<StateAISrvAvailable));
+    return (m_states & (1 << StateAISrvAvailable));
 }
 
-OpsStateInterface* OpsStateInterface:: instance()
+OpsStateInterface *OpsStateInterface::instance()
 {
-    if(objectInstance == nullptr){
+    if (objectInstance == nullptr) {
         objectInstance = new OpsStateInterface;
     }
-    return  objectInstance;
+    return objectInstance;
 }

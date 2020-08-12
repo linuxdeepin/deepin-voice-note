@@ -24,5 +24,4 @@ VNTask::VNTask(QObject *parent)
     : QObject(parent)
     , QRunnable()
 {
-
 }

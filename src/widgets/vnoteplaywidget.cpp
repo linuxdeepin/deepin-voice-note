@@ -49,13 +49,13 @@ void VNotePlayWidget::initUI()
     m_timeLab->setFixedWidth(124);
     m_sliderHover = new DWidget(this);
     m_nameLab = new DLabel(m_sliderHover);
-    m_nameLab->setContentsMargins(8,0,0,0);
+    m_nameLab->setContentsMargins(8, 0, 0, 0);
     m_slider = new DSlider(Qt::Horizontal, m_sliderHover);
     m_slider->setMinimum(0);
     m_slider->setValue(0);
 
     m_closeBtn = new DDialogCloseButton(this);
-    m_closeBtn->setIconSize(QSize(26,26));
+    m_closeBtn->setIconSize(QSize(26, 26));
     DStyle::setFocusRectVisible(m_closeBtn, false);
 
     QVBoxLayout *sliderLayout = new QVBoxLayout;
@@ -85,11 +85,11 @@ void VNotePlayWidget::initConnection()
 {
     connect(m_player, &QMediaPlayer::positionChanged,
             this, &VNotePlayWidget::onVoicePlayPosChange);
-    connect(m_player,&QMediaPlayer::durationChanged,
-            this,&VNotePlayWidget::onDurationChanged);
+    connect(m_player, &QMediaPlayer::durationChanged,
+            this, &VNotePlayWidget::onDurationChanged);
 
     connect(m_playerBtn, &VNote2SIconButton::clicked,
-             this, &VNotePlayWidget::onPlayerBtnClicked);
+            this, &VNotePlayWidget::onPlayerBtnClicked);
 
     connect(m_closeBtn, &DIconButton::clicked,
             this, &VNotePlayWidget::onCloseBtnClicked);
@@ -104,14 +104,13 @@ void VNotePlayWidget::initConnection()
 
 void VNotePlayWidget::onVoicePlayPosChange(qint64 pos)
 {
-    if(m_sliderReleased == true){
+    if (m_sliderReleased == true) {
         onSliderMove(static_cast<int>(pos));
     }
 
-    if (pos >=  m_slider->maximum()) {
+    if (pos >= m_slider->maximum()) {
         onCloseBtnClicked();
     }
-
 }
 
 void VNotePlayWidget::setVoiceBlock(VNVoiceBlock *voiceData)
@@ -122,8 +121,7 @@ void VNotePlayWidget::setVoiceBlock(VNVoiceBlock *voiceData)
             m_voiceBlock = voiceData;
             m_player->setMedia(QUrl::fromLocalFile(m_voiceBlock->voicePath));
             m_nameLab->setText(voiceData->voiceTitle);
-            m_timeLab->setText(Utils::formatMillisecond(0, 0) + "/" +
-                               Utils::formatMillisecond(voiceData->voiceSize));
+            m_timeLab->setText(Utils::formatMillisecond(0, 0) + "/" + Utils::formatMillisecond(voiceData->voiceSize));
         }
         onPlayBtnClicked();
     }
@@ -170,27 +168,26 @@ void VNotePlayWidget::onSliderPressed()
 
 void VNotePlayWidget::onSliderReleased()
 {
-     m_sliderReleased = true;
-     if(m_player->state() != QMediaPlayer::StoppedState){
-         int pos = m_slider->value();
-         if (pos >=  m_slider->maximum()) {
-             onCloseBtnClicked();
-         }else {
+    m_sliderReleased = true;
+    if (m_player->state() != QMediaPlayer::StoppedState) {
+        int pos = m_slider->value();
+        if (pos >= m_slider->maximum()) {
+            onCloseBtnClicked();
+        } else {
             m_player->setPosition(pos);
-         }
-     }
+        }
+    }
 }
 
 void VNotePlayWidget::onSliderMove(int pos)
 {
-    if(m_voiceBlock){
+    if (m_voiceBlock) {
         qint64 tmpPos = pos > m_voiceBlock->voiceSize ? m_voiceBlock->voiceSize : pos;
-        m_timeLab->setText(Utils::formatMillisecond(tmpPos, 0) + "/" +
-                           Utils::formatMillisecond(m_voiceBlock->voiceSize));
+        m_timeLab->setText(Utils::formatMillisecond(tmpPos, 0) + "/" + Utils::formatMillisecond(m_voiceBlock->voiceSize));
     }
 
-    if(m_sliderReleased == true){
-       m_slider->setValue(pos);
+    if (m_sliderReleased == true) {
+        m_slider->setValue(pos);
     }
 }
 
@@ -202,10 +199,10 @@ bool VNotePlayWidget::eventFilter(QObject *o, QEvent *e)
     } else if (e->type() == QEvent::Leave) {
         m_nameLab->setVisible(true);
     }
-    return  false;
+    return false;
 }
 
-VNVoiceBlock* VNotePlayWidget::getVoiceData()
+VNVoiceBlock *VNotePlayWidget::getVoiceData()
 {
     return m_voiceBlock;
 }
@@ -217,7 +214,7 @@ QMediaPlayer::State VNotePlayWidget::getPlayerStatus()
 
 void VNotePlayWidget::onDurationChanged(qint64 duration)
 {
-    if(duration && m_slider->maximum() != duration){
+    if (duration && m_slider->maximum() != duration) {
         m_slider->setMaximum(static_cast<int>(duration));
     }
 }
@@ -225,10 +222,10 @@ void VNotePlayWidget::onDurationChanged(qint64 duration)
 void VNotePlayWidget::onPlayerBtnClicked()
 {
     bool isPress = m_playerBtn->isPressed();
-    if(isPress){
+    if (isPress) {
         playVideo();
         emit sigPlayVoice(m_voiceBlock);
-    }else {
+    } else {
         pauseVideo();
         emit sigPauseVoice(m_voiceBlock);
     }

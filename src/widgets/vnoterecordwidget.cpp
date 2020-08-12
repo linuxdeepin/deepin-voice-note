@@ -39,24 +39,15 @@ VNoteRecordWidget::VNoteRecordWidget(QWidget *parent)
 
 void VNoteRecordWidget::initUi()
 {
-    m_pauseBtn = new VNoteIconButton(this
-                                     , "pause_rec_normal.svg"
-                                     , "pause_rec_hover.svg"
-                                     , "pause_rec_press.svg");
+    m_pauseBtn = new VNoteIconButton(this, "pause_rec_normal.svg", "pause_rec_hover.svg", "pause_rec_press.svg");
     m_pauseBtn->setIconSize(QSize(60, 60));
     m_pauseBtn->setFlat(true);
 
-    m_continueBtn = new VNoteIconButton(this
-                                        , "record_normal.svg"
-                                        , "record_hover.svg"
-                                        , "record_press.svg");
+    m_continueBtn = new VNoteIconButton(this, "record_normal.svg", "record_hover.svg", "record_press.svg");
     m_continueBtn->setIconSize(QSize(60, 60));
     m_continueBtn->setFlat(true);
 
-    m_finshBtn = new VNoteIconButton(this
-                                     , "stop_rec_normal.svg"
-                                     , "stop_rec_hover.svg"
-                                     , "stop_rec_press.svg");
+    m_finshBtn = new VNoteIconButton(this, "stop_rec_normal.svg", "stop_rec_hover.svg", "stop_rec_press.svg");
     m_finshBtn->setIconSize(QSize(60, 60));
     m_finshBtn->setFlat(true);
 
@@ -69,7 +60,7 @@ void VNoteRecordWidget::initUi()
     m_waveForm = new VNWaveform(this);
     QVBoxLayout *waveLayout = new QVBoxLayout;
     waveLayout->addWidget(m_waveForm);
-    waveLayout->setContentsMargins(0,15,10,15);
+    waveLayout->setContentsMargins(0, 15, 10, 15);
 
     QHBoxLayout *mainLayout = new QHBoxLayout;
     QGridLayout *btnLayout = new QGridLayout;
@@ -110,8 +101,8 @@ void VNoteRecordWidget::initRecordPath()
 
 void VNoteRecordWidget::onFinshRecord()
 {
-     m_audioRecoder->stopRecord();
-     emit sigFinshRecord(m_recordPath, m_recordMsec);
+    m_audioRecoder->stopRecord();
+    emit sigFinshRecord(m_recordPath, m_recordMsec);
 }
 
 void VNoteRecordWidget::onPauseRecord()
@@ -125,7 +116,7 @@ bool VNoteRecordWidget::onContinueRecord()
 {
     m_pauseBtn->setVisible(true);
     m_continueBtn->setVisible(false);
-    if(!m_audioRecoder->startRecord()){
+    if (!m_audioRecoder->startRecord()) {
         onFinshRecord();
         return false;
     }
@@ -135,7 +126,8 @@ bool VNoteRecordWidget::onContinueRecord()
 bool VNoteRecordWidget::startRecord()
 {
     QString fileName = QDateTime::currentDateTime()
-                      .toString("yyyyMMddhhmmss") + ".mp3";
+                           .toString("yyyyMMddhhmmss")
+                       + ".mp3";
     initRecordPath();
     m_recordMsec = 0;
     m_recordPath = m_recordDir + fileName;
@@ -157,7 +149,7 @@ QString VNoteRecordWidget::getRecordPath() const
 void VNoteRecordWidget::onAudioBufferProbed(const QAudioBuffer &buffer)
 {
     qint64 msec = buffer.startTime();
-    if(msec != m_recordMsec){
+    if (msec != m_recordMsec) {
         onRecordDurationChange(msec);
     }
     m_waveForm->onAudioBufferProbed(buffer);
@@ -169,7 +161,7 @@ void VNoteRecordWidget::onRecordDurationChange(qint64 duration)
     QString strTime = Utils::formatMillisecond(duration, 0);
     m_timeLabel->setText(strTime);
 
-    if(duration >= (60*60*1000)){
+    if (duration >= (60 * 60 * 1000)) {
         onFinshRecord();
     }
 }

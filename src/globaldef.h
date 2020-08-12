@@ -37,8 +37,8 @@
 #define VNOTE_MIDDLEVIEW_W 260
 
 //SearchEdit Size
-#define VNOTE_SEARCHBAR_H  36
-#define VNOTE_SEARCHBAR_W  350
+#define VNOTE_SEARCHBAR_H 36
+#define VNOTE_SEARCHBAR_W 350
 
 //StandIcon path
 #define STAND_ICON_PAHT ":/icons/deepin/builtin/"
@@ -70,7 +70,7 @@
 
 //Audio to text file lenght limit
 //20 minutes
-#define MAX_A2T_AUDIO_LEN_MS (20*60*1000)
+#define MAX_A2T_AUDIO_LEN_MS (20 * 60 * 1000)
 
 //Limit shortcut key response time
 //to 300ms
@@ -81,10 +81,9 @@
 
 #include <sys/time.h>
 #include <QtMath>
-#define TM(s,e) (\
-(qAbs((e.tv_sec-s.tv_sec)*1000 + (e.tv_usec-s.tv_usec)/1000))\
-)
+#define TM(s, e) ( \
+    (qAbs((e.tv_sec - s.tv_sec) * 1000 + (e.tv_usec - s.tv_usec) / 1000)))
 
-#define UPT(s,e) ((s)=(e))
+#define UPT(s, e) ((s) = (e))
 
 #endif // GLOBALDEF_H

@@ -25,8 +25,12 @@
 
 #include "dbusvariant.h"
 
-Inhibit::Inhibit() {}
-Inhibit::~Inhibit() {}
+Inhibit::Inhibit()
+{
+}
+Inhibit::~Inhibit()
+{
+}
 
 void Inhibit::registerMetaType()
 {
@@ -36,15 +40,13 @@ void Inhibit::registerMetaType()
     qDBusRegisterMetaType<InhibitorsList>();
 }
 
-
 QDBusArgument &operator<<(QDBusArgument &argument, const Inhibit &obj)
 {
     argument.beginStructure();
-    argument << obj.what << obj.who << obj.why << obj.mode<< obj.uid << obj.pid;
+    argument << obj.what << obj.who << obj.why << obj.mode << obj.uid << obj.pid;
     argument.endStructure();
     return argument;
 }
-
 
 const QDBusArgument &operator>>(const QDBusArgument &argument, Inhibit &obj)
 {
@@ -54,8 +56,12 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, Inhibit &obj)
     return argument;
 }
 
-UserInfo::UserInfo() {}
-UserInfo::~UserInfo() {}
+UserInfo::UserInfo()
+{
+}
+UserInfo::~UserInfo()
+{
+}
 
 void UserInfo::registerMetaType()
 {
@@ -81,10 +87,15 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, UserInfo &obj)
     return argument;
 }
 
-SeatInfo::SeatInfo() {}
-SeatInfo::~SeatInfo() {}
+SeatInfo::SeatInfo()
+{
+}
+SeatInfo::~SeatInfo()
+{
+}
 
-void SeatInfo::registerMetaType() {
+void SeatInfo::registerMetaType()
+{
     qRegisterMetaType<SeatInfo>("SeatInfo");
     qDBusRegisterMetaType<SeatInfo>();
     qRegisterMetaType<SeatList>("SeatList");
@@ -107,10 +118,15 @@ const QDBusArgument &operator>>(const QDBusArgument &argument, SeatInfo &obj)
     return argument;
 }
 
-SessionInfo::SessionInfo() {}
-SessionInfo::~SessionInfo() {}
+SessionInfo::SessionInfo()
+{
+}
+SessionInfo::~SessionInfo()
+{
+}
 
-void SessionInfo::registerMetaType() {
+void SessionInfo::registerMetaType()
+{
     qRegisterMetaType<SessionInfo>("SessionInfo");
     qDBusRegisterMetaType<SessionInfo>();
     qRegisterMetaType<SessionList>("SessionList");

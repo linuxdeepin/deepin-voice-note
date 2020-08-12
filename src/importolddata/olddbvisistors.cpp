@@ -27,9 +27,8 @@
 #include <DApplication>
 
 OldFolderQryDbVisitor::OldFolderQryDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
-    :DbVisitor (db, inParam, result)
+    : DbVisitor(db, inParam, result)
 {
-
 }
 
 bool OldFolderQryDbVisitor::visitorData()
@@ -45,23 +44,23 @@ bool OldFolderQryDbVisitor::visitorData()
             create_time,
         };
 
-        while(m_sqlQuery->next()) {
-            VNoteFolder* folder = new VNoteFolder();
+        while (m_sqlQuery->next()) {
+            VNoteFolder *folder = new VNoteFolder();
 
             //Only three fields available in old db.
-            folder->id          = m_sqlQuery->value(OldFolder::id).toInt();
-            folder->name        = m_sqlQuery->value(OldFolder::name).toString();
-            folder->createTime  =
-                        m_sqlQuery->value(OldFolder::create_time).toDateTime();
+            folder->id = m_sqlQuery->value(OldFolder::id).toInt();
+            folder->name = m_sqlQuery->value(OldFolder::name).toString();
+            folder->createTime =
+                m_sqlQuery->value(OldFolder::create_time).toDateTime();
 
             //Need init other fields by ourself
-            folder->category    = 0;
+            folder->category = 0;
             folder->defaultIcon = 0;
-            folder->iconPath    = "";
-            folder->folder_state= 0;
-            folder->maxNoteIdRef()= 0;
-            folder->modifyTime  = folder->createTime;
-            folder->deleteTime  = folder->createTime;
+            folder->iconPath = "";
+            folder->folder_state = 0;
+            folder->maxNoteIdRef() = 0;
+            folder->modifyTime = folder->createTime;
+            folder->deleteTime = folder->createTime;
 
 #ifdef QT_QML_DEBUG
             qInfo() << "" << (*folder);
@@ -85,9 +84,8 @@ bool OldFolderQryDbVisitor::prepareSqls()
 }
 
 OldNoteQryDbVisitor::OldNoteQryDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
-    :DbVisitor (db, inParam, result)
+    : DbVisitor(db, inParam, result)
 {
-
 }
 
 bool OldNoteQryDbVisitor::visitorData()
@@ -107,21 +105,21 @@ bool OldNoteQryDbVisitor::visitorData()
             create_time,
         };
 
-        while(m_sqlQuery->next()) {
-            VNoteItem* note = new VNoteItem();
+        while (m_sqlQuery->next()) {
+            VNoteItem *note = new VNoteItem();
 
-            note->noteId      = m_sqlQuery->value(OldNote::id).toInt();
-            note->folderId    = m_sqlQuery->value(OldNote::folder_id).toInt();
-            note->noteType    = m_sqlQuery->value(OldNote::note_type).toInt();
+            note->noteId = m_sqlQuery->value(OldNote::id).toInt();
+            note->folderId = m_sqlQuery->value(OldNote::folder_id).toInt();
+            note->noteType = m_sqlQuery->value(OldNote::note_type).toInt();
 
-            QString text      = m_sqlQuery->value(OldNote::content_text).toString();
+            QString text = m_sqlQuery->value(OldNote::content_text).toString();
             QString voicePath = m_sqlQuery->value(OldNote::content_path).toString();
-            qint64  voiceSize = m_sqlQuery->value(OldNote::voice_time).toLongLong();
+            qint64 voiceSize = m_sqlQuery->value(OldNote::voice_time).toLongLong();
 
-            note->createTime  =
-                        m_sqlQuery->value(OldNote::create_time).toDateTime();
+            note->createTime =
+                m_sqlQuery->value(OldNote::create_time).toDateTime();
 
-            VNoteBlock* ptrBlock = nullptr;
+            VNoteBlock *ptrBlock = nullptr;
 
             if (note->noteType == Voice) {
                 //Voice note need two TextBlock at voice
@@ -129,11 +127,11 @@ bool OldNoteQryDbVisitor::visitorData()
                 ptrBlock = new VNTextBlock();
                 note->addBlock(ptrBlock);
 
-                QString defaultVoiceName = DApplication::translate("DefaultName","Voice");
+                QString defaultVoiceName = DApplication::translate("DefaultName", "Voice");
                 ptrBlock = new VNVoiceBlock();
                 ptrBlock->ptrVoice->voicePath = voicePath;
                 ptrBlock->ptrVoice->voiceSize = voiceSize;
-                ptrBlock->ptrVoice->voiceTitle = defaultVoiceName+"1";
+                ptrBlock->ptrVoice->voiceTitle = defaultVoiceName + "1";
                 ptrBlock->ptrVoice->createTime = note->createTime;
                 ptrBlock->ptrVoice->blockText = text;
                 note->addBlock(ptrBlock);
@@ -143,18 +141,17 @@ bool OldNoteQryDbVisitor::visitorData()
             } else {
                 ptrBlock = new VNTextBlock();
                 ptrBlock->blockText = text;
-                note->addBlock(ptrBlock);   
+                note->addBlock(ptrBlock);
             }
 
-            note->noteTitle   = "";
-            note->noteState   = 0;
+            note->noteTitle = "";
+            note->noteState = 0;
 
-            note->modifyTime  = note->createTime;
-            note->deleteTime  = note->createTime;
-
+            note->modifyTime = note->createTime;
+            note->deleteTime = note->createTime;
 
             VNOTE_ALL_NOTES_DATA_MAP::iterator it =
-                    results.notes->notes.find(note->folderId);
+                results.notes->notes.find(note->folderId);
 #ifdef QT_QML_DEBUG
             qInfo() << "" << (*note);
 #endif
@@ -164,7 +161,7 @@ bool OldNoteQryDbVisitor::visitorData()
             if (it != results.notes->notes.end()) {
                 (*it)->folderNotes.insert(note->noteId, note);
             } else {
-                VNOTE_ITEMS_MAP* folderNotes = new VNOTE_ITEMS_MAP();
+                VNOTE_ITEMS_MAP *folderNotes = new VNOTE_ITEMS_MAP();
 
                 //DataManager data should set autoRelease flag
                 folderNotes->autoRelease = true;

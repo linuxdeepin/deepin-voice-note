@@ -55,8 +55,8 @@ void LoadIconsWorker::run()
 {
     QString defaultIconPathFmt(":/icons/deepin/builtin/default_folder_icons/%1.svg");
 
-    for (int i=0; i<DEFAULTICONS_COUNT; i++) {
-        QString iconPath = defaultIconPathFmt.arg(i+1);
+    for (int i = 0; i < DEFAULTICONS_COUNT; i++) {
+        QString iconPath = defaultIconPathFmt.arg(i + 1);
         QPixmap bitmap(iconPath);
         VNoteDataManager::m_defaultIcons[IconsType::DefaultIcon].push_back(bitmap);
         VNoteDataManager::m_defaultIcons[IconsType::DefaultGrayIcon].push_back(greyPix(bitmap));

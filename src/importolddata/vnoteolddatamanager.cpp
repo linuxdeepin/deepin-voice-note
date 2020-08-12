@@ -23,16 +23,15 @@
 
 #include <DLog>
 
-VNoteOldDataManager* VNoteOldDataManager::_instance = nullptr;
-VNoteDbManager*      VNoteOldDataManager::m_oldDbManger = nullptr;
+VNoteOldDataManager *VNoteOldDataManager::_instance = nullptr;
+VNoteDbManager *VNoteOldDataManager::m_oldDbManger = nullptr;
 
 VNoteOldDataManager::VNoteOldDataManager(QObject *parent)
     : QObject(parent)
 {
-
 }
 
-VNoteOldDataManager* VNoteOldDataManager::instance()
+VNoteOldDataManager *VNoteOldDataManager::instance()
 {
     if (nullptr == _instance) {
         _instance = new VNoteOldDataManager();
@@ -74,8 +73,7 @@ void VNoteOldDataManager::reqDatas()
     OldDataLoadTask *pOldDataLoadTask = new OldDataLoadTask();
     pOldDataLoadTask->setAutoDelete(true);
 
-    connect(pOldDataLoadTask,&OldDataLoadTask::finishLoad
-            , this, &VNoteOldDataManager::onFinishLoad);
+    connect(pOldDataLoadTask, &OldDataLoadTask::finishLoad, this, &VNoteOldDataManager::onFinishLoad);
 
     QThreadPool::globalInstance()->start(pOldDataLoadTask);
 }
@@ -85,10 +83,8 @@ void VNoteOldDataManager::doUpgrade()
     OldDataUpgradeTask *pOldDataUpgradeTask = new OldDataUpgradeTask();
     pOldDataUpgradeTask->setAutoDelete(true);
 
-    connect(pOldDataUpgradeTask,&OldDataUpgradeTask::finishUpgrade
-            , this, &VNoteOldDataManager::onFinishUpgrade);
-    connect(pOldDataUpgradeTask, &OldDataUpgradeTask::progressValue
-            , this, &VNoteOldDataManager::onProgress);
+    connect(pOldDataUpgradeTask, &OldDataUpgradeTask::finishUpgrade, this, &VNoteOldDataManager::onFinishUpgrade);
+    connect(pOldDataUpgradeTask, &OldDataUpgradeTask::progressValue, this, &VNoteOldDataManager::onProgress);
 
     QThreadPool::globalInstance()->start(pOldDataUpgradeTask);
 }

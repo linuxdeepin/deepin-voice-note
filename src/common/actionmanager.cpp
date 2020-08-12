@@ -44,17 +44,17 @@ ActionManager *ActionManager::Instance()
     return _instance;
 }
 
-DMenu* ActionManager::notebookContextMenu()
+DMenu *ActionManager::notebookContextMenu()
 {
     return m_notebookContextMenu.get();
 }
 
-DMenu* ActionManager::noteContextMenu()
+DMenu *ActionManager::noteContextMenu()
 {
     return m_noteContextMenu.get();
 }
 
-DMenu* ActionManager::detialContextMenu()
+DMenu *ActionManager::detialContextMenu()
 {
     return m_detialContextMenu.get();
 }
@@ -66,9 +66,9 @@ ActionManager::ActionKind ActionManager::getActionKind(QAction *action)
 
 QAction *ActionManager::getActionById(ActionManager::ActionKind id)
 {
-    QAction* menuAction = nullptr;
+    QAction *menuAction = nullptr;
 
-    QMap<ActionKind, QAction*>::iterator it = m_actionsMap.find(id);
+    QMap<ActionKind, QAction *>::iterator it = m_actionsMap.find(id);
 
     if (it != m_actionsMap.end()) {
         menuAction = *it;
@@ -79,7 +79,7 @@ QAction *ActionManager::getActionById(ActionManager::ActionKind id)
 
 void ActionManager::enableAction(ActionManager::ActionKind actionId, bool enable)
 {
-    QMap<ActionKind, QAction*>::iterator it = m_actionsMap.find(actionId);
+    QMap<ActionKind, QAction *>::iterator it = m_actionsMap.find(actionId);
 
     if (it != m_actionsMap.end()) {
         (*it)->setEnabled(enable);
@@ -88,7 +88,7 @@ void ActionManager::enableAction(ActionManager::ActionKind actionId, bool enable
 
 void ActionManager::visibleAction(ActionManager::ActionKind actionId, bool enable)
 {
-    QMap<ActionKind, QAction*>::iterator it = m_actionsMap.find(actionId);
+    QMap<ActionKind, QAction *>::iterator it = m_actionsMap.find(actionId);
 
     if (it != m_actionsMap.end()) {
         (*it)->setVisible(enable);
@@ -102,18 +102,18 @@ void ActionManager::resetCtxMenu(ActionManager::MenuType type, bool enable)
 
     if (MenuType::NotebookCtxMenu == type) {
         startMenuId = NotebookMenuBase;
-        endMenuId   = NotebookMenuMax;
+        endMenuId = NotebookMenuMax;
     } else if (MenuType::NoteCtxMenu == type) {
         startMenuId = NoteMenuBase;
-        endMenuId   = NoteMenuMax;
+        endMenuId = NoteMenuMax;
     } else if (MenuType::NoteDetailCtxMenu == type) {
         startMenuId = NoteDetailMenuBase;
-        endMenuId   = NoteDetailMenuMax;
+        endMenuId = NoteDetailMenuMax;
     }
 
     QAction *pAction = nullptr;
 
-    for (;startMenuId < endMenuId; startMenuId++) {
+    for (; startMenuId < endMenuId; startMenuId++) {
         pAction = m_actionsMap[static_cast<ActionKind>(startMenuId)];
 
         if (nullptr != pAction) {
@@ -136,7 +136,7 @@ void ActionManager::initMenu()
     int notebookMenuIdStart = ActionKind::NotebookMenuBase;
 
     for (auto it : notebookMenuTexts) {
-        QAction* pAction = new QAction(it, m_notebookContextMenu.get());
+        QAction *pAction = new QAction(it, m_notebookContextMenu.get());
         pAction->setProperty(MenuId, notebookMenuIdStart);
 
         m_notebookContextMenu->addAction(pAction);
@@ -158,7 +158,7 @@ void ActionManager::initMenu()
     int noteMenuIdStart = ActionKind::NoteMenuBase;
 
     for (auto it : noteMenuTexts) {
-        QAction* pAction = new QAction(it, m_noteContextMenu.get());
+        QAction *pAction = new QAction(it, m_noteContextMenu.get());
         pAction->setProperty(MenuId, noteMenuIdStart);
 
         m_noteContextMenu->addAction(pAction);
@@ -186,17 +186,17 @@ void ActionManager::initMenu()
     int detailMenuIdStart = ActionKind::NoteDetailMenuBase;
 
     for (auto it : noteDetailMenuTexts) {
-        QAction* pAction = new QAction(it, m_detialContextMenu.get());
+        QAction *pAction = new QAction(it, m_detialContextMenu.get());
         pAction->setProperty(MenuId, detailMenuIdStart);
 
         m_detialContextMenu->addAction(pAction);
         m_actionsMap.insert(static_cast<ActionKind>(detailMenuIdStart), pAction);
-        if(!isAISrvAvailable){
-            if(detailMenuIdStart == DetailVoice2Text
-                    || detailMenuIdStart > DetailPaste){
+        if (!isAISrvAvailable) {
+            if (detailMenuIdStart == DetailVoice2Text
+                || detailMenuIdStart > DetailPaste) {
                 pAction->setVisible(false);
             }
-        }else if (detailMenuIdStart == DetailPaste) {
+        } else if (detailMenuIdStart == DetailPaste) {
             m_detialContextMenu->addSeparator();
         }
         detailMenuIdStart++;

@@ -22,7 +22,7 @@
 #ifndef TEXTEDIT_H
 #define TEXTEDIT_H
 
-#include<DTextEdit>
+#include <DTextEdit>
 DWIDGET_USE_NAMESPACE
 struct VNoteItem;
 struct VNoteBlock;
@@ -33,20 +33,21 @@ class TextNoteEdit : public DTextEdit
 {
     Q_OBJECT
 public:
-     explicit TextNoteEdit(QWidget *parent = nullptr);
-     void selectText(const QPoint &globalPos,QTextCursor::MoveOperation op);
-     void clearSelection();
-     void removeSelectText();
-     QString getSelectFragment();
-     bool hasSelection();
+    explicit TextNoteEdit(QWidget *parent = nullptr);
+    void selectText(const QPoint &globalPos, QTextCursor::MoveOperation op);
+    void clearSelection();
+    void removeSelectText();
+    QString getSelectFragment();
+    bool hasSelection();
 
 signals:
     void sigFocusIn();
     void sigFocusOut();
 
 private:
-     bool m_menuPop {false};
-     void indentText();
+    bool m_menuPop {false};
+    void indentText();
+
 protected:
     void focusInEvent(QFocusEvent *e) override;
     void focusOutEvent(QFocusEvent *e) override;

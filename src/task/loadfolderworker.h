@@ -31,12 +31,12 @@ class LoadFolderWorker : public VNTask
 {
     Q_OBJECT
 public:
-    explicit LoadFolderWorker(QObject *parent=nullptr);
+    explicit LoadFolderWorker(QObject *parent = nullptr);
 
 protected:
     virtual void run();
 signals:
-    void onFoldersLoaded(VNOTE_FOLDERS_MAP* foldesMap);
+    void onFoldersLoaded(VNOTE_FOLDERS_MAP *foldesMap);
 public slots:
 };
 

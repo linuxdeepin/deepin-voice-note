@@ -43,8 +43,8 @@ public:
     void delNoteData();
     bool search(const QString &keyword);
     void setMetadata(const QVariant &meta);
-    void setFolder(VNoteFolder* folder);
-    VNoteFolder* folder() const;
+    void setFolder(VNoteFolder *folder);
+    VNoteFolder *folder() const;
 
     enum {
         INVALID_ID = -1
@@ -72,8 +72,8 @@ public:
     QDateTime modifyTime;
     QDateTime deleteTime;
 
-    QVariant& metaDataRef();
-    const QVariant& metaDataConstRef() const;
+    QVariant &metaDataRef();
+    const QVariant &metaDataConstRef() const;
 
     qint32 &maxVoiceIdRef();
     qint32 voiceMaxId() const;
@@ -89,6 +89,7 @@ public:
     bool haveText() const;
 
     qint32 voiceCount() const;
+
 protected:
     QVariant metaData;
 
@@ -98,9 +99,9 @@ protected:
 
     //TODO:
     //    Don't used now ,Used for quick lookup.
-    VNoteFolder* ownFolder {nullptr};
+    VNoteFolder *ownFolder {nullptr};
 
-    friend QDebug &operator << (QDebug &out, VNoteItem &noteItem);
+    friend QDebug &operator<<(QDebug &out, VNoteItem &noteItem);
 };
 
 struct VNTextBlock;
@@ -119,7 +120,7 @@ struct VNoteBlock {
 
     qint32 getType();
 
-    qint32  blockType {InValid};
+    qint32 blockType {InValid};
     /*
      * Comment:
      *      For text block, store the content of the text,
@@ -128,17 +129,18 @@ struct VNoteBlock {
     QString blockText;
 
     union {
-        VNoteBlock   *ptrBlock;
-        VNTextBlock  *ptrText;
+        VNoteBlock *ptrBlock;
+        VNTextBlock *ptrText;
         VNVoiceBlock *ptrVoice;
     };
+
 protected:
     VNoteBlock(qint32 type = InValid);
     VNoteBlock(const VNoteBlock &);
     const VNoteBlock &operator=(const VNoteBlock &);
 };
 
-struct VNTextBlock  : public VNoteBlock {
+struct VNTextBlock : public VNoteBlock {
     VNTextBlock();
     virtual ~VNTextBlock() override;
     virtual void releaseSpecificData() override;
@@ -150,11 +152,10 @@ struct VNVoiceBlock : public VNoteBlock {
     virtual void releaseSpecificData() override;
 
     QString voicePath;
-    qint64  voiceSize;
+    qint64 voiceSize;
     QString voiceTitle;
-    bool    state {false};
+    bool state {false};
     QDateTime createTime;
-
 };
 
 class DetailItemWidget : public QWidget
@@ -162,17 +163,17 @@ class DetailItemWidget : public QWidget
     Q_OBJECT
 public:
     explicit DetailItemWidget(QWidget *parent = nullptr);
-    virtual void        updateSearchKey(QString searchKey);
-    virtual void        pasteText();
-    virtual bool        isTextContainsPos(const QPoint &globalPos);
+    virtual void updateSearchKey(QString searchKey);
+    virtual void pasteText();
+    virtual bool isTextContainsPos(const QPoint &globalPos);
 
     virtual VNoteBlock *getNoteBlock() = 0;
     virtual QTextCursor getTextCursor() = 0;
-    virtual void        setTextCursor(const QTextCursor &cursor) = 0;
-    virtual bool        textIsEmpty() = 0;
-    virtual QRect       getCursorRect() = 0;
-    virtual void        setFocus() = 0;
-    virtual bool        hasFocus() = 0;
+    virtual void setTextCursor(const QTextCursor &cursor) = 0;
+    virtual bool textIsEmpty() = 0;
+    virtual QRect getCursorRect() = 0;
+    virtual void setFocus() = 0;
+    virtual bool hasFocus() = 0;
     //选中相关
     virtual void selectText(const QPoint &globalPos, QTextCursor::MoveOperation op) = 0;
     virtual void selectText(QTextCursor::MoveOperation op) = 0;
@@ -182,7 +183,7 @@ public:
     virtual bool hasSelection() = 0;
     virtual bool isSelectAll() = 0;
     virtual QTextDocumentFragment getSelectFragment() = 0;
-    virtual QTextDocument* getTextDocument() = 0;
+    virtual QTextDocument *getTextDocument() = 0;
 };
 
 #endif // VNOTEITEM_H

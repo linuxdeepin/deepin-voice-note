@@ -33,15 +33,13 @@ class VNote2SIconButton : public DFloatingButton
 {
     Q_OBJECT
 public:
-    explicit VNote2SIconButton(const QString normal
-            ,const QString press
-            ,QWidget *parent = nullptr);
+    explicit VNote2SIconButton(const QString normal, const QString press, QWidget *parent = nullptr);
 
     enum {
         Invalid = -1,
         Normal,
         Press,
-//        Disabled, //Not support this state now
+        //        Disabled, //Not support this state now
         MaxState
     };
 
@@ -56,9 +54,9 @@ protected:
     void setCommonIcon(bool isCommon);
 
     QString m_icons[MaxState];
-    int     m_state {Normal};
+    int m_state {Normal};
 
-    bool    m_useCommonIcons {true};
+    bool m_useCommonIcons {true};
 };
 
 #endif // VNOTE2SICONBUTTON_H

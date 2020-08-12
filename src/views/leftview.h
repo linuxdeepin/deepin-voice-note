@@ -45,14 +45,14 @@ public:
     QModelIndex restoreNotepadItem();
 
     void setOnlyCurItemMenuEnable(bool enable);
-    void addFolder(VNoteFolder* folder);
-    void appendFolder(VNoteFolder* folder);
+    void addFolder(VNoteFolder *folder);
+    void appendFolder(VNoteFolder *folder);
     void editFolder();
     void sort();
     void closeMenu();
-    int  folderCount();
+    int folderCount();
 
-    VNoteFolder* removeFolder();
+    VNoteFolder *removeFolder();
 
 signals:
 
@@ -61,18 +61,19 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
-    void keyPressEvent(QKeyEvent* e) override;
+    void keyPressEvent(QKeyEvent *e) override;
     void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
+
 private:
     void initDelegate();
     void initModel();
     void initNotepadRoot();
     void initMenu();
-    DMenu               *m_notepadMenu {nullptr};
-    QStandardItemModel  *m_pDataModel {nullptr};
-    LeftViewDelegate    *m_pItemDelegate {nullptr};
-    LeftViewSortFilter  *m_pSortViewFilter {nullptr};
-    bool                m_onlyCurItemMenuEnable {false};
+    DMenu *m_notepadMenu {nullptr};
+    QStandardItemModel *m_pDataModel {nullptr};
+    LeftViewDelegate *m_pItemDelegate {nullptr};
+    LeftViewSortFilter *m_pSortViewFilter {nullptr};
+    bool m_onlyCurItemMenuEnable {false};
 };
 
 #endif // LEFTVIEW_H

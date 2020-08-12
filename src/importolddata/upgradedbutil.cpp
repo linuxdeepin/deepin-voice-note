@@ -58,13 +58,13 @@ bool UpgradeDbUtil::needUpdateOldDb(int state)
      are arrived
     */
     bool fNeedUpdate = false;
-    bool fHaveOldDb  = VNoteDbManager::hasOldDataBase();
+    bool fHaveOldDb = VNoteDbManager::hasOldDataBase();
 
     if (fHaveOldDb) {
         VNoteOldDataManager::instance()->initOldDb();
     }
 
-    if (fHaveOldDb && (state !=UpdateDone)) {
+    if (fHaveOldDb && (state != UpdateDone)) {
         fNeedUpdate = true;
     }
 
@@ -77,8 +77,8 @@ void UpgradeDbUtil::checkUpdateState(int state)
         qInfo() << "Upgrade old database exception dectected.";
 
         QString vnoteDatabasePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
-                + QDir::separator()
-                + DEEPIN_VOICE_NOTE + QString(VNoteDbManager::DBVERSION) + QString(".db");
+                                    + QDir::separator()
+                                    + DEEPIN_VOICE_NOTE + QString(VNoteDbManager::DBVERSION) + QString(".db");
 
         QFileInfo dbFileInfo(vnoteDatabasePath);
 
@@ -95,24 +95,24 @@ void UpgradeDbUtil::checkUpdateState(int state)
 void UpgradeDbUtil::backUpOldDb()
 {
     QString vnoteDatabasePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
-            + QDir::separator();
+                                + QDir::separator();
 
     QString oldDbName = DEEPIN_VOICE_NOTE + QString(".db");
 
-    QFileInfo backupDir(vnoteDatabasePath+".backup/");
+    QFileInfo backupDir(vnoteDatabasePath + ".backup/");
 
     if (!backupDir.exists()) {
         QDir().mkdir(backupDir.filePath());
     }
 
-    QFileInfo dbFileInfo(vnoteDatabasePath+oldDbName);
+    QFileInfo dbFileInfo(vnoteDatabasePath + oldDbName);
 
     if (dbFileInfo.exists()) {
-        QDir(backupDir.filePath()).remove(backupDir.filePath()+QDir::separator()+oldDbName);
+        QDir(backupDir.filePath()).remove(backupDir.filePath() + QDir::separator() + oldDbName);
 
         QFile oldDBFile(dbFileInfo.filePath());
 
-        if (!oldDBFile.rename(backupDir.filePath()+QDir::separator()+oldDbName)) {
+        if (!oldDBFile.rename(backupDir.filePath() + QDir::separator() + oldDbName)) {
             qInfo() << "Backup old database failded." << oldDBFile.errorString();
         }
     }
@@ -121,8 +121,8 @@ void UpgradeDbUtil::backUpOldDb()
 void UpgradeDbUtil::clearVoices()
 {
     QDir oldVoiceDir(QStandardPaths::standardLocations(
-                         QStandardPaths::DocumentsLocation
-                         ).first()
+                         QStandardPaths::DocumentsLocation)
+                         .first()
                      + QDir::separator() + "voicenote/");
 
     if (oldVoiceDir.exists()) {
@@ -138,7 +138,7 @@ void UpgradeDbUtil::doFolderUpgrade(VNoteFolder *folder)
 {
     qInfo() << "" << folder;
 
-    if (nullptr !=folder) {
+    if (nullptr != folder) {
         VNoteFolderOper folderOper;
         VNoteFolder *newVersionFolder = folderOper.addFolder(*folder);
 
@@ -150,9 +150,9 @@ void UpgradeDbUtil::doFolderUpgrade(VNoteFolder *folder)
 
 void UpgradeDbUtil::doFolderNoteUpgrade(qint64 newFolderId, qint64 oldFolderId)
 {
-    VNOTE_ALL_NOTES_MAP* allNotes = VNoteOldDataManager::instance()->allNotes();
+    VNOTE_ALL_NOTES_MAP *allNotes = VNoteOldDataManager::instance()->allNotes();
 
-    QString appAudioPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+ QDir::separator()+"voicenote/";
+    QString appAudioPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QDir::separator() + "voicenote/";
 
     //Create audio dir if doesn't exist.
     if (!QFileInfo(appAudioPath).exists()) {
@@ -160,22 +160,20 @@ void UpgradeDbUtil::doFolderNoteUpgrade(qint64 newFolderId, qint64 oldFolderId)
     }
 
     if (nullptr != allNotes) {
-
         auto folderNotes = allNotes->notes.find(oldFolderId);
 
         if (folderNotes != allNotes->notes.end()) {
-
             VNoteItemOper noteOper;
 
             for (auto note : folderNotes.value()->folderNotes) {
                 //Change the old folder id to new folder id
-                note->folderId  = newFolderId;
+                note->folderId = newFolderId;
                 note->noteTitle = noteOper.getDefaultNoteName(newFolderId);
 
                 if (note->haveVoice()) {
-                    VNoteBlock* ptrBlock = nullptr;
+                    VNoteBlock *ptrBlock = nullptr;
 
-                    for(auto it : note->datas.dataConstRef()) {
+                    for (auto it : note->datas.dataConstRef()) {
                         if (it->getType() == VNoteBlock::Voice) {
                             ptrBlock = it;
                             break;
@@ -186,9 +184,9 @@ void UpgradeDbUtil::doFolderNoteUpgrade(qint64 newFolderId, qint64 oldFolderId)
                         QFileInfo oldFileInfo(ptrBlock->ptrVoice->voicePath);
 
                         QString newVoiceName =
-                                ptrBlock->ptrVoice->createTime.toString("yyyyMMddhhmmss")+QString(".mp3");
+                            ptrBlock->ptrVoice->createTime.toString("yyyyMMddhhmmss") + QString(".mp3");
 
-                        QString targetPath = appAudioPath+newVoiceName;
+                        QString targetPath = appAudioPath + newVoiceName;
 
                         QFile oldFile(ptrBlock->ptrVoice->voicePath);
 
@@ -204,6 +202,5 @@ void UpgradeDbUtil::doFolderNoteUpgrade(qint64 newFolderId, qint64 oldFolderId)
                 noteOper.addNote(*note);
             }
         }
-
     }
 }

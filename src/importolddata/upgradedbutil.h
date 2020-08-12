@@ -39,14 +39,14 @@ public:
     };
 
     static void saveUpgradeState(int state);
-    static int  readUpgradeState();
+    static int readUpgradeState();
 
     static bool needUpdateOldDb(int state);
     static void checkUpdateState(int state);
     static void backUpOldDb();
     static void clearVoices();
 
-    static void doFolderUpgrade(VNoteFolder* folder);
+    static void doFolderUpgrade(VNoteFolder *folder);
     static void doFolderNoteUpgrade(qint64 newFolderId, qint64 oldFolderId);
 };
 

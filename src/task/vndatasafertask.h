@@ -30,13 +30,13 @@ class VNDataSaferTask : public VNTask
 {
     Q_OBJECT
 public:
-    explicit VNDataSaferTask(const VDataSafer& safer
-                             ,QObject *parent = nullptr);
+    explicit VNDataSaferTask(const VDataSafer &safer, QObject *parent = nullptr);
 signals:
 
 public slots:
 protected:
     virtual void run();
+
 protected:
     VDataSafer m_dataSafer;
 };

@@ -32,15 +32,14 @@
 
 DCORE_USE_NAMESPACE
 
-VNoteDataManager* VNoteDataManager::_instance = nullptr;
+VNoteDataManager *VNoteDataManager::_instance = nullptr;
 
 VNoteDataManager::VNoteDataManager(QObject *parent)
     : QObject(parent)
 {
-
 }
 
-VNoteDataManager* VNoteDataManager::instance()
+VNoteDataManager *VNoteDataManager::instance()
 {
     if (nullptr == _instance) {
         _instance = new VNoteDataManager();
@@ -60,7 +59,7 @@ VNOTE_FOLDERS_MAP *VNoteDataManager::getNoteFolders()
 
 VNoteFolder *VNoteDataManager::addFolder(VNoteFolder *folder)
 {
-    VNoteFolder* retFlder = nullptr;
+    VNoteFolder *retFlder = nullptr;
 
     if (nullptr != folder) {
         m_qspNoteFoldersMap->lock.lockForWrite();
@@ -86,7 +85,7 @@ VNoteFolder *VNoteDataManager::addFolder(VNoteFolder *folder)
 
 VNoteFolder *VNoteDataManager::getFolder(qint64 folderId)
 {
-    VNoteFolder* retFlder = nullptr;
+    VNoteFolder *retFlder = nullptr;
 
     m_qspNoteFoldersMap->lock.lockForRead();
 
@@ -98,12 +97,12 @@ VNoteFolder *VNoteDataManager::getFolder(qint64 folderId)
 
     m_qspNoteFoldersMap->lock.unlock();
 
-    return  retFlder;
+    return retFlder;
 }
 
 VNoteFolder *VNoteDataManager::delFolder(qint64 folderId)
 {
-    VNoteFolder* retFlder = nullptr;
+    VNoteFolder *retFlder = nullptr;
 
     m_qspNoteFoldersMap->lock.lockForWrite();
 
@@ -118,7 +117,7 @@ VNoteFolder *VNoteDataManager::delFolder(qint64 folderId)
 
         if (itNote != m_qspAllNotesMap->notes.end()) {
             m_qspAllNotesMap->notes.remove(itNote.key());
-            QScopedPointer<VNOTE_ITEMS_MAP>foldersMap(*itNote);
+            QScopedPointer<VNOTE_ITEMS_MAP> foldersMap(*itNote);
 
             //Remove voice files in the folder
             for (auto it : foldersMap->folderNotes) {
@@ -135,7 +134,7 @@ VNoteFolder *VNoteDataManager::delFolder(qint64 folderId)
 
     m_qspNoteFoldersMap->lock.unlock();
 
-    return  retFlder;
+    return retFlder;
 }
 
 qint32 VNoteDataManager::folderCount()
@@ -149,7 +148,7 @@ qint32 VNoteDataManager::folderCount()
 
 VNoteItem *VNoteDataManager::addNote(VNoteItem *note)
 {
-    VNoteItem* retNote = nullptr;
+    VNoteItem *retNote = nullptr;
 
     if (nullptr != note) {
         m_qspAllNotesMap->lock.lockForWrite();
@@ -158,7 +157,7 @@ VNoteItem *VNoteDataManager::addNote(VNoteItem *note)
         VNOTE_ALL_NOTES_DATA_MAP::iterator it = m_qspAllNotesMap->notes.find(note->folderId);
 
         if (it != m_qspAllNotesMap->notes.end()) {
-            VNOTE_ITEMS_MAP* notesInFolder = *it;
+            VNOTE_ITEMS_MAP *notesInFolder = *it;
 
             Q_ASSERT(nullptr != notesInFolder);
 
@@ -203,7 +202,7 @@ VNoteItem *VNoteDataManager::addNote(VNoteItem *note)
 
 VNoteItem *VNoteDataManager::getNote(qint64 folderId, qint32 noteId)
 {
-    VNoteItem* retNote = nullptr;
+    VNoteItem *retNote = nullptr;
 
     m_qspAllNotesMap->lock.lockForRead();
 
@@ -211,7 +210,7 @@ VNoteItem *VNoteDataManager::getNote(qint64 folderId, qint32 noteId)
     VNOTE_ALL_NOTES_DATA_MAP::iterator it = m_qspAllNotesMap->notes.find(folderId);
 
     if (it != m_qspAllNotesMap->notes.end()) {
-        VNOTE_ITEMS_MAP* notesInFolder = *it;
+        VNOTE_ITEMS_MAP *notesInFolder = *it;
 
         Q_ASSERT(nullptr != notesInFolder);
 
@@ -239,7 +238,7 @@ VNoteItem *VNoteDataManager::getNote(qint64 folderId, qint32 noteId)
 
 VNoteItem *VNoteDataManager::delNote(qint64 folderId, qint32 noteId)
 {
-    VNoteItem* retNote = nullptr;
+    VNoteItem *retNote = nullptr;
 
     m_qspAllNotesMap->lock.lockForWrite();
 
@@ -247,7 +246,7 @@ VNoteItem *VNoteDataManager::delNote(qint64 folderId, qint32 noteId)
     VNOTE_ALL_NOTES_DATA_MAP::iterator it = m_qspAllNotesMap->notes.find(folderId);
 
     if (it != m_qspAllNotesMap->notes.end()) {
-        VNOTE_ITEMS_MAP* notesInFolder = *it;
+        VNOTE_ITEMS_MAP *notesInFolder = *it;
 
         Q_ASSERT(nullptr != notesInFolder);
 
@@ -294,7 +293,7 @@ qint32 VNoteDataManager::folderNotesCount(qint64 folderId)
 
 VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
 {
-    VNOTE_ITEMS_MAP* folderNotes = nullptr;
+    VNOTE_ITEMS_MAP *folderNotes = nullptr;
 
     m_qspAllNotesMap->lock.lockForRead();
 
@@ -304,9 +303,9 @@ VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
     if (it != m_qspAllNotesMap->notes.end()) {
         folderNotes = *it;
     } else {
-//       qInfo() << __FUNCTION__ << "Get note faild: the folder don't exist:" << folderId;
-//        folderNotes = new VNOTE_ITEMS_MAP();
-//        m_qspAllNotesMap->notes.insert(folderId, folderNotes);
+        //       qInfo() << __FUNCTION__ << "Get note faild: the folder don't exist:" << folderId;
+        //        folderNotes = new VNOTE_ITEMS_MAP();
+        //        m_qspAllNotesMap->notes.insert(folderId, folderNotes);
     }
 
     m_qspAllNotesMap->lock.unlock();
@@ -333,7 +332,7 @@ bool VNoteDataManager::isAllDatasReady() const
     qInfo() << "m_fDataState:" << m_fDataState;
 
     if ((m_fDataState & DataState::FolderDataReady)
-            && (m_fDataState & DataState::NotesDataReady) ) {
+        && (m_fDataState & DataState::NotesDataReady)) {
         return true;
     } else {
         return false;
@@ -342,7 +341,7 @@ bool VNoteDataManager::isAllDatasReady() const
 
 void VNoteDataManager::reqNoteDefIcons()
 {
-    LoadIconsWorker *iconLoadWorker = new LoadIconsWorker();//
+    LoadIconsWorker *iconLoadWorker = new LoadIconsWorker(); //
     iconLoadWorker->setAutoDelete(true);
 
     QThreadPool::globalInstance()->start(iconLoadWorker, QThread::TimeCriticalPriority);
@@ -353,41 +352,41 @@ void VNoteDataManager::reqNoteFolders()
     m_pForldesLoadThread = new LoadFolderWorker();
     m_pForldesLoadThread->setAutoDelete(true);
     connect(m_pForldesLoadThread, &LoadFolderWorker::onFoldersLoaded,
-            this, [this](VNOTE_FOLDERS_MAP* foldesMap) {
-        //Release old data
-        if (m_qspNoteFoldersMap != nullptr) {
-            qInfo() << "Release old foldersMap:" << m_qspNoteFoldersMap.get()
-                    << " size:" << m_qspNoteFoldersMap->folders.size();
+            this, [this](VNOTE_FOLDERS_MAP *foldesMap) {
+                //Release old data
+                if (m_qspNoteFoldersMap != nullptr) {
+                    qInfo() << "Release old foldersMap:" << m_qspNoteFoldersMap.get()
+                            << " size:" << m_qspNoteFoldersMap->folders.size();
 
-            m_qspNoteFoldersMap->lock.lockForWrite();
+                    m_qspNoteFoldersMap->lock.lockForWrite();
 
-            for (auto it : m_qspNoteFoldersMap->folders){
-                delete reinterpret_cast<VNOTE_FOLDERS_MAP*>(it);
-            }
+                    for (auto it : m_qspNoteFoldersMap->folders) {
+                        delete reinterpret_cast<VNOTE_FOLDERS_MAP *>(it);
+                    }
 
-            m_qspNoteFoldersMap->folders.clear();
+                    m_qspNoteFoldersMap->folders.clear();
 
-            m_qspNoteFoldersMap->lock.unlock();
-        }
+                    m_qspNoteFoldersMap->lock.unlock();
+                }
 
-        m_qspNoteFoldersMap.reset(foldesMap);
+                m_qspNoteFoldersMap.reset(foldesMap);
 
-        qInfo() << "Loaded new foldersMap:" << m_qspNoteFoldersMap.get()
-                << " size:" << m_qspNoteFoldersMap->folders.size();
+                qInfo() << "Loaded new foldersMap:" << m_qspNoteFoldersMap.get()
+                        << " size:" << m_qspNoteFoldersMap->folders.size();
 
-        //Object is already deleted
-        m_pForldesLoadThread = nullptr;
+                //Object is already deleted
+                m_pForldesLoadThread = nullptr;
 
-        //Set folder data ready flag
-        m_fDataState |= DataState::FolderDataReady;
+                //Set folder data ready flag
+                m_fDataState |= DataState::FolderDataReady;
 
-        emit onNoteFoldersLoaded();
+                emit onNoteFoldersLoaded();
 
-        //Send data ready signal if data ready
-        if (isAllDatasReady()) {
-            emit onAllDatasReady();
-        }
-    });
+                //Send data ready signal if data ready
+                if (isAllDatasReady()) {
+                    emit onAllDatasReady();
+                }
+            });
 
     QThreadPool::globalInstance()->start(m_pForldesLoadThread);
 }
@@ -398,51 +397,51 @@ void VNoteDataManager::reqNoteItems()
     m_pNotesLoadThread->setAutoDelete(true);
 
     connect(m_pNotesLoadThread, &LoadNoteItemsWorker::onAllNotesLoaded,
-            this, [this](VNOTE_ALL_NOTES_MAP* notesMap){
-        //Release old data
-        if (m_qspAllNotesMap != nullptr) {
-            qInfo() << "Release old notesMap:" << m_qspAllNotesMap.get()
-                    << "All notes in folders:" << m_qspAllNotesMap->notes.size();
+            this, [this](VNOTE_ALL_NOTES_MAP *notesMap) {
+                //Release old data
+                if (m_qspAllNotesMap != nullptr) {
+                    qInfo() << "Release old notesMap:" << m_qspAllNotesMap.get()
+                            << "All notes in folders:" << m_qspAllNotesMap->notes.size();
 
-            m_qspAllNotesMap->lock.lockForWrite();
+                    m_qspAllNotesMap->lock.lockForWrite();
 
-            for (auto folderNotes : m_qspAllNotesMap->notes){
-                for (auto note : folderNotes->folderNotes) {
-                    delete reinterpret_cast<VNoteItem*>(note);
+                    for (auto folderNotes : m_qspAllNotesMap->notes) {
+                        for (auto note : folderNotes->folderNotes) {
+                            delete reinterpret_cast<VNoteItem *>(note);
+                        }
+
+                        folderNotes->folderNotes.clear();
+                        delete reinterpret_cast<VNOTE_ITEMS_MAP *>(folderNotes);
+                    }
+
+                    m_qspAllNotesMap->notes.clear();
+
+                    m_qspAllNotesMap->lock.unlock();
                 }
 
-                folderNotes->folderNotes.clear();
-                delete reinterpret_cast<VNOTE_ITEMS_MAP*>(folderNotes);
-            }
+                m_qspAllNotesMap.reset(notesMap);
 
-            m_qspAllNotesMap->notes.clear();
+                qInfo() << "Release old notesMap:" << m_qspAllNotesMap.get()
+                        << "All notes in folders:" << m_qspAllNotesMap->notes.size();
 
-            m_qspAllNotesMap->lock.unlock();
-        }
+                //Object is already deleted
+                m_pNotesLoadThread = nullptr;
 
-        m_qspAllNotesMap.reset(notesMap);
+                //Set folder data ready flag
+                m_fDataState |= DataState::NotesDataReady;
 
-        qInfo() << "Release old notesMap:" << m_qspAllNotesMap.get()
-                << "All notes in folders:" << m_qspAllNotesMap->notes.size();
+                emit onNoteItemsLoaded();
 
-        //Object is already deleted
-        m_pNotesLoadThread = nullptr;
-
-        //Set folder data ready flag
-        m_fDataState |= DataState::NotesDataReady;
-
-        emit onNoteItemsLoaded();
-
-        //Send data ready signal if data ready
-        if (isAllDatasReady()) {
-            emit onAllDatasReady();
-        }
-    });
+                //Send data ready signal if data ready
+                if (isAllDatasReady()) {
+                    emit onAllDatasReady();
+                }
+            });
 
     QThreadPool::globalInstance()->start(m_pNotesLoadThread);
 }
 
-VNOTE_ALL_NOTES_MAP* VNoteDataManager::getAllNotesInFolder()
+VNOTE_ALL_NOTES_MAP *VNoteDataManager::getAllNotesInFolder()
 {
     return m_qspAllNotesMap.get();
 }

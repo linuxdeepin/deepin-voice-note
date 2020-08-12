@@ -31,7 +31,7 @@ DCORE_USE_NAMESPACE
 
 class CustemBackend : public DSettingsBackend
 {
-   Q_OBJECT
+    Q_OBJECT
 public:
     explicit CustemBackend(const QString &filepath, QObject *parent = nullptr);
     ~CustemBackend() override;
@@ -39,9 +39,10 @@ public:
     QVariant getOption(const QString &key) const override;
     void doSync() override;
     void doSetOption(const QString &key, const QVariant &value) override;
+
 private:
     QSettings *m_settings {nullptr};
-    QMutex       m_writeLock;
+    QMutex m_writeLock;
 };
 
 class setting : public QObject
@@ -49,13 +50,14 @@ class setting : public QObject
     Q_OBJECT
 public:
     explicit setting(QObject *parent = nullptr);
-    void     setOption(const QString &key, const QVariant &value);
+    void setOption(const QString &key, const QVariant &value);
     QVariant getOption(const QString &key);
-    DSettings  *getSetting();
-    static setting* instance();
+    DSettings *getSetting();
+    static setting *instance();
+
 private:
     CustemBackend *m_backend {nullptr};
-    DSettings       *m_setting {nullptr};
+    DSettings *m_setting {nullptr};
 };
 
 #endif // SETTING_H

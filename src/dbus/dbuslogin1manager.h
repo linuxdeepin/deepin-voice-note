@@ -36,7 +36,7 @@
 #ifndef DBUSLOGIN1MANAGER_H_1447400884
 #define DBUSLOGIN1MANAGER_H_1447400884
 
-#include"dbusvariant.h"
+#include "dbusvariant.h"
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
@@ -49,32 +49,35 @@
 /*
  * Proxy class for interface org.freedesktop.login1.Manager
  */
-class DBusLogin1Manager: public QDBusAbstractInterface
+class DBusLogin1Manager : public QDBusAbstractInterface
 {
     Q_OBJECT
-    Q_SLOT void __propertyChanged__(const QDBusMessage& msg)
+    Q_SLOT void __propertyChanged__(const QDBusMessage &msg)
     {
         QList<QVariant> arguments = msg.arguments();
         if (3 != arguments.count())
             return;
         QString interfaceName = msg.arguments().at(0).toString();
-        if (interfaceName !="org.freedesktop.login1.Manager")
+        if (interfaceName != "org.freedesktop.login1.Manager")
             return;
         QVariantMap changedProps = qdbus_cast<QVariantMap>(arguments.at(1).value<QDBusArgument>());
         QStringList keys = changedProps.keys();
-        foreach(const QString &prop, keys) {
-        const QMetaObject* self = metaObject();
-            for (int i=self->propertyOffset(); i < self->propertyCount(); ++i) {
+        foreach (const QString &prop, keys) {
+            const QMetaObject *self = metaObject();
+            for (int i = self->propertyOffset(); i < self->propertyCount(); ++i) {
                 QMetaProperty p = self->property(i);
                 if (p.name() == prop) {
-                Q_EMIT p.notifySignal().invoke(this);
+                    Q_EMIT p.notifySignal().invoke(this);
                 }
             }
         }
-   }
+    }
+
 public:
     static inline const char *staticInterfaceName()
-    { return "org.freedesktop.login1.Manager"; }
+    {
+        return "org.freedesktop.login1.Manager";
+    }
 
 public:
     DBusLogin1Manager(const QString &service, const QString &path, const QDBusConnection &connection, QObject *parent = nullptr);
@@ -83,87 +86,129 @@ public:
 
     Q_PROPERTY(QString BlockInhibited READ blockInhibited NOTIFY BlockInhibitedChanged)
     inline QString blockInhibited() const
-    { return qvariant_cast< QString >(property("BlockInhibited")); }
+    {
+        return qvariant_cast<QString>(property("BlockInhibited"));
+    }
 
     Q_PROPERTY(QString ControlGroupHierarchy READ controlGroupHierarchy)
     inline QString controlGroupHierarchy() const
-    { return qvariant_cast< QString >(property("ControlGroupHierarchy")); }
+    {
+        return qvariant_cast<QString>(property("ControlGroupHierarchy"));
+    }
 
     Q_PROPERTY(QStringList Controllers READ controllers)
     inline QStringList controllers() const
-    { return qvariant_cast< QStringList >(property("Controllers")); }
+    {
+        return qvariant_cast<QStringList>(property("Controllers"));
+    }
 
     Q_PROPERTY(QString DelayInhibited READ delayInhibited)
     inline QString delayInhibited() const
-    { return qvariant_cast< QString >(property("DelayInhibited")); }
+    {
+        return qvariant_cast<QString>(property("DelayInhibited"));
+    }
 
     Q_PROPERTY(QString HandleHibernateKey READ handleHibernateKey)
     inline QString handleHibernateKey() const
-    { return qvariant_cast< QString >(property("HandleHibernateKey")); }
+    {
+        return qvariant_cast<QString>(property("HandleHibernateKey"));
+    }
 
     Q_PROPERTY(QString HandleLidSwitch READ handleLidSwitch)
     inline QString handleLidSwitch() const
-    { return qvariant_cast< QString >(property("HandleLidSwitch")); }
+    {
+        return qvariant_cast<QString>(property("HandleLidSwitch"));
+    }
 
     Q_PROPERTY(QString HandlePowerKey READ handlePowerKey)
     inline QString handlePowerKey() const
-    { return qvariant_cast< QString >(property("HandlePowerKey")); }
+    {
+        return qvariant_cast<QString>(property("HandlePowerKey"));
+    }
 
     Q_PROPERTY(QString HandleSuspendKey READ handleSuspendKey)
     inline QString handleSuspendKey() const
-    { return qvariant_cast< QString >(property("HandleSuspendKey")); }
+    {
+        return qvariant_cast<QString>(property("HandleSuspendKey"));
+    }
 
     Q_PROPERTY(QString IdleAction READ idleAction)
     inline QString idleAction() const
-    { return qvariant_cast< QString >(property("IdleAction")); }
+    {
+        return qvariant_cast<QString>(property("IdleAction"));
+    }
 
     Q_PROPERTY(qulonglong IdleActionUSec READ idleActionUSec)
     inline qulonglong idleActionUSec() const
-    { return qvariant_cast< qulonglong >(property("IdleActionUSec")); }
+    {
+        return qvariant_cast<qulonglong>(property("IdleActionUSec"));
+    }
 
     Q_PROPERTY(bool IdleHint READ idleHint)
     inline bool idleHint() const
-    { return qvariant_cast< bool >(property("IdleHint")); }
+    {
+        return qvariant_cast<bool>(property("IdleHint"));
+    }
 
     Q_PROPERTY(qulonglong IdleSinceHint READ idleSinceHint)
     inline qulonglong idleSinceHint() const
-    { return qvariant_cast< qulonglong >(property("IdleSinceHint")); }
+    {
+        return qvariant_cast<qulonglong>(property("IdleSinceHint"));
+    }
 
     Q_PROPERTY(qulonglong IdleSinceHintMonotonic READ idleSinceHintMonotonic)
     inline qulonglong idleSinceHintMonotonic() const
-    { return qvariant_cast< qulonglong >(property("IdleSinceHintMonotonic")); }
+    {
+        return qvariant_cast<qulonglong>(property("IdleSinceHintMonotonic"));
+    }
 
     Q_PROPERTY(qulonglong InhibitDelayMaxUSec READ inhibitDelayMaxUSec)
     inline qulonglong inhibitDelayMaxUSec() const
-    { return qvariant_cast< qulonglong >(property("InhibitDelayMaxUSec")); }
+    {
+        return qvariant_cast<qulonglong>(property("InhibitDelayMaxUSec"));
+    }
 
     Q_PROPERTY(QStringList KillExcludeUsers READ killExcludeUsers)
     inline QStringList killExcludeUsers() const
-    { return qvariant_cast< QStringList >(property("KillExcludeUsers")); }
+    {
+        return qvariant_cast<QStringList>(property("KillExcludeUsers"));
+    }
 
     Q_PROPERTY(QStringList KillOnlyUsers READ killOnlyUsers)
     inline QStringList killOnlyUsers() const
-    { return qvariant_cast< QStringList >(property("KillOnlyUsers")); }
+    {
+        return qvariant_cast<QStringList>(property("KillOnlyUsers"));
+    }
 
     Q_PROPERTY(bool KillUserProcesses READ killUserProcesses)
     inline bool killUserProcesses() const
-    { return qvariant_cast< bool >(property("KillUserProcesses")); }
+    {
+        return qvariant_cast<bool>(property("KillUserProcesses"));
+    }
 
     Q_PROPERTY(uint NAutoVTs READ nAutoVTs)
     inline uint nAutoVTs() const
-    { return qvariant_cast< uint >(property("NAutoVTs")); }
+    {
+        return qvariant_cast<uint>(property("NAutoVTs"));
+    }
 
     Q_PROPERTY(bool PreparingForShutdown READ preparingForShutdown)
     inline bool preparingForShutdown() const
-    { return qvariant_cast< bool >(property("PreparingForShutdown")); }
+    {
+        return qvariant_cast<bool>(property("PreparingForShutdown"));
+    }
 
     Q_PROPERTY(bool PreparingForSleep READ preparingForSleep)
     inline bool preparingForSleep() const
-    { return qvariant_cast< bool >(property("PreparingForSleep")); }
+    {
+        return qvariant_cast<bool>(property("PreparingForSleep"));
+    }
 
     Q_PROPERTY(QStringList ResetControllers READ resetControllers)
     inline QStringList resetControllers() const
-    { return qvariant_cast< QStringList >(property("ResetControllers")); }
+    {
+        return qvariant_cast<QStringList>(property("ResetControllers"));
+    }
 
 public Q_SLOTS: // METHODS
     inline QDBusPendingReply<> ActivateSession(const QString &id)
@@ -217,27 +262,27 @@ public Q_SLOTS: // METHODS
         return asyncCallWithArgumentList(QLatin1String("CanSuspend"), argumentList);
     }
 
-//    inline QDBusPendingReply<QString, QDBusObjectPath, QDBusObjectPath, QDBusUnixFileDescriptor, QString, uint, bool> CreateSession(uint uid, uint leader, const QString &service, const QString &type, const QString &class, const QString &seat, uint vtnr, const QString &tty, const QString &display, bool remote, const QString &remote_user, const QString &remote_host, const QStringList &controllers, const QStringList &reset_controllers, bool kill_processes)
-//    {
-//        QList<QVariant> argumentList;
-//        argumentList << QVariant::fromValue(uid) << QVariant::fromValue(leader) << QVariant::fromValue(service) << QVariant::fromValue(type) << QVariant::fromValue(class) << QVariant::fromValue(seat) << QVariant::fromValue(vtnr) << QVariant::fromValue(tty) << QVariant::fromValue(display) << QVariant::fromValue(remote) << QVariant::fromValue(remote_user) << QVariant::fromValue(remote_host) << QVariant::fromValue(controllers) << QVariant::fromValue(reset_controllers) << QVariant::fromValue(kill_processes);
-//        return asyncCallWithArgumentList(QLatin1String("CreateSession"), argumentList);
-//    }
-//    inline QDBusReply<QString> CreateSession(uint uid, uint leader, const QString &service, const QString &type, const QString &class, const QString &seat, uint vtnr, const QString &tty, const QString &display, bool remote, const QString &remote_user, const QString &remote_host, const QStringList &controllers, const QStringList &reset_controllers, bool kill_processes, QDBusObjectPath &path, QDBusObjectPath &runtime_path, QDBusUnixFileDescriptor &fd, QString &seat_, uint &vtnr_, bool &existing)
-//    {
-//        QList<QVariant> argumentList;
-//        argumentList << QVariant::fromValue(uid) << QVariant::fromValue(leader) << QVariant::fromValue(service) << QVariant::fromValue(type) << QVariant::fromValue(class) << QVariant::fromValue(seat) << QVariant::fromValue(vtnr) << QVariant::fromValue(tty) << QVariant::fromValue(display) << QVariant::fromValue(remote) << QVariant::fromValue(remote_user) << QVariant::fromValue(remote_host) << QVariant::fromValue(controllers) << QVariant::fromValue(reset_controllers) << QVariant::fromValue(kill_processes);
-//        QDBusMessage reply = callWithArgumentList(QDBus::Block, QLatin1String("CreateSession"), argumentList);
-//        if (reply.type() == QDBusMessage::ReplyMessage && reply.arguments().count() == 7) {
-//            path = qdbus_cast<QDBusObjectPath>(reply.arguments().at(1));
-//            runtime_path = qdbus_cast<QDBusObjectPath>(reply.arguments().at(2));
-//            fd = qdbus_cast<QDBusUnixFileDescriptor>(reply.arguments().at(3));
-//            seat_ = qdbus_cast<QString>(reply.arguments().at(4));
-//            vtnr_ = qdbus_cast<uint>(reply.arguments().at(5));
-//            existing = qdbus_cast<bool>(reply.arguments().at(6));
-//        }
-//        return reply;
-//    }
+    //    inline QDBusPendingReply<QString, QDBusObjectPath, QDBusObjectPath, QDBusUnixFileDescriptor, QString, uint, bool> CreateSession(uint uid, uint leader, const QString &service, const QString &type, const QString &class, const QString &seat, uint vtnr, const QString &tty, const QString &display, bool remote, const QString &remote_user, const QString &remote_host, const QStringList &controllers, const QStringList &reset_controllers, bool kill_processes)
+    //    {
+    //        QList<QVariant> argumentList;
+    //        argumentList << QVariant::fromValue(uid) << QVariant::fromValue(leader) << QVariant::fromValue(service) << QVariant::fromValue(type) << QVariant::fromValue(class) << QVariant::fromValue(seat) << QVariant::fromValue(vtnr) << QVariant::fromValue(tty) << QVariant::fromValue(display) << QVariant::fromValue(remote) << QVariant::fromValue(remote_user) << QVariant::fromValue(remote_host) << QVariant::fromValue(controllers) << QVariant::fromValue(reset_controllers) << QVariant::fromValue(kill_processes);
+    //        return asyncCallWithArgumentList(QLatin1String("CreateSession"), argumentList);
+    //    }
+    //    inline QDBusReply<QString> CreateSession(uint uid, uint leader, const QString &service, const QString &type, const QString &class, const QString &seat, uint vtnr, const QString &tty, const QString &display, bool remote, const QString &remote_user, const QString &remote_host, const QStringList &controllers, const QStringList &reset_controllers, bool kill_processes, QDBusObjectPath &path, QDBusObjectPath &runtime_path, QDBusUnixFileDescriptor &fd, QString &seat_, uint &vtnr_, bool &existing)
+    //    {
+    //        QList<QVariant> argumentList;
+    //        argumentList << QVariant::fromValue(uid) << QVariant::fromValue(leader) << QVariant::fromValue(service) << QVariant::fromValue(type) << QVariant::fromValue(class) << QVariant::fromValue(seat) << QVariant::fromValue(vtnr) << QVariant::fromValue(tty) << QVariant::fromValue(display) << QVariant::fromValue(remote) << QVariant::fromValue(remote_user) << QVariant::fromValue(remote_host) << QVariant::fromValue(controllers) << QVariant::fromValue(reset_controllers) << QVariant::fromValue(kill_processes);
+    //        QDBusMessage reply = callWithArgumentList(QDBus::Block, QLatin1String("CreateSession"), argumentList);
+    //        if (reply.type() == QDBusMessage::ReplyMessage && reply.arguments().count() == 7) {
+    //            path = qdbus_cast<QDBusObjectPath>(reply.arguments().at(1));
+    //            runtime_path = qdbus_cast<QDBusObjectPath>(reply.arguments().at(2));
+    //            fd = qdbus_cast<QDBusUnixFileDescriptor>(reply.arguments().at(3));
+    //            seat_ = qdbus_cast<QString>(reply.arguments().at(4));
+    //            vtnr_ = qdbus_cast<uint>(reply.arguments().at(5));
+    //            existing = qdbus_cast<bool>(reply.arguments().at(6));
+    //        }
+    //        return reply;
+    //    }
 
     inline QDBusPendingReply<> FlushDevices(bool interactive)
     {
@@ -429,10 +474,10 @@ Q_SIGNALS: // SIGNALS
 };
 
 namespace org {
-  namespace freedesktop {
-    namespace login1 {
-      typedef ::DBusLogin1Manager Manager;
-    }
-  }
+namespace freedesktop {
+namespace login1 {
+typedef ::DBusLogin1Manager Manager;
 }
+} // namespace freedesktop
+} // namespace org
 #endif

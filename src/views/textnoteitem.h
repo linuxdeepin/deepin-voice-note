@@ -33,10 +33,10 @@ public:
     explicit TextNoteItem(VNoteBlock *noteBlock, QWidget *parent = nullptr);
     VNoteBlock *getNoteBlock();
     QTextCursor getTextCursor();
-    void        setTextCursor(const QTextCursor &cursor);
-    void        updateSearchKey(QString searchKey);
-    bool        textIsEmpty();
-    QRect       getCursorRect();
+    void setTextCursor(const QTextCursor &cursor);
+    void updateSearchKey(QString searchKey);
+    bool textIsEmpty();
+    QRect getCursorRect();
     void selectText(const QPoint &globalPos, QTextCursor::MoveOperation op);
     void selectText(QTextCursor::MoveOperation op);
     void removeSelectText();
@@ -44,7 +44,7 @@ public:
     void clearSelection();
     bool hasSelection();
     QTextDocumentFragment getSelectFragment();
-    QTextDocument* getTextDocument();
+    QTextDocument *getTextDocument();
 
     void pasteText();
     void setFocus();
@@ -53,28 +53,27 @@ public:
     void setLastCursorHeight(int height);
 
 signals:
-    void        sigCursorHeightChange(QWidget *widget, int height);
-    void        sigTextChanged();
-    void        sigFocusIn();
-    void        sigFocusOut();
-    void        sigSelectionChanged();
+    void sigCursorHeightChange(QWidget *widget, int height);
+    void sigTextChanged();
+    void sigFocusIn();
+    void sigFocusOut();
+    void sigSelectionChanged();
 public slots:
-    void        onChangeTheme();
-    void        onTextChange();
-    void        onTextCursorChange();
+    void onChangeTheme();
+    void onTextChange();
+    void onTextCursorChange();
 
 private:
-    void         initUi();
-    void         initConnection();
+    void initUi();
+    void initConnection();
     bool m_isSearching {false};
-    bool m_selectAll   {false};
-    bool m_textDocumentUndo  {false};
-    int           m_searchCount {0};
-    int           m_lastCursorHeight {0};
-    VNoteBlock   *m_noteBlock {nullptr};
+    bool m_selectAll {false};
+    bool m_textDocumentUndo {false};
+    int m_searchCount {0};
+    int m_lastCursorHeight {0};
+    VNoteBlock *m_noteBlock {nullptr};
     TextNoteEdit *m_textEdit {nullptr};
-    QString       m_serchKey ;
-
+    QString m_serchKey;
 };
 
 #endif // TEXTNOTEITEM_H

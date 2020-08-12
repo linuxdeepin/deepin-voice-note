@@ -25,20 +25,19 @@
 #include <DLog>
 
 LoadNoteItemsWorker::LoadNoteItemsWorker(QObject *parent)
-    :VNTask(parent)
+    : VNTask(parent)
 {
-
 }
 
 void LoadNoteItemsWorker::run()
 {
-    static struct timeval start,backups, end;
+    static struct timeval start, backups, end;
 
     gettimeofday(&start, nullptr);
     backups = start;
 
     VNoteItemOper notesOper;
-    VNOTE_ALL_NOTES_MAP* notesMap = notesOper.loadAllVNotes();
+    VNOTE_ALL_NOTES_MAP *notesMap = notesOper.loadAllVNotes();
 
     gettimeofday(&end, nullptr);
 

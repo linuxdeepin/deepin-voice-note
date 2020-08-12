@@ -23,12 +23,10 @@
 
 #include <DLog>
 
-VNDataSaferTask::VNDataSaferTask(const VDataSafer& safer
-                                 ,QObject *parent)
+VNDataSaferTask::VNDataSaferTask(const VDataSafer &safer, QObject *parent)
     : VNTask(parent)
     , m_dataSafer(safer)
 {
-
 }
 
 void VNDataSaferTask::run()
@@ -37,7 +35,7 @@ void VNDataSaferTask::run()
 
     if (VDataSafer::Safe == m_dataSafer.saferType) {
         saferOper.addSafer(m_dataSafer);
-    } else if(VDataSafer::Unsafe == m_dataSafer.saferType) {
+    } else if (VDataSafer::Unsafe == m_dataSafer.saferType) {
         //Normal operation,just remove the safer.
         saferOper.rmSafer(m_dataSafer);
     } else if (VDataSafer::ExceptionSafer == m_dataSafer.saferType) {
@@ -51,6 +49,6 @@ void VNDataSaferTask::run()
         saferOper.rmSafer(m_dataSafer);
     }
 
-    qInfo() << "Safer task done:"<< this
+    qInfo() << "Safer task done:" << this
             << " " << m_dataSafer;
 }

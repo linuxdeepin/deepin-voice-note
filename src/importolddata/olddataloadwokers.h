@@ -28,7 +28,7 @@ class OldDataLoadTask : public VNTask
 {
     Q_OBJECT
 public:
-    OldDataLoadTask(QObject *parent=nullptr);
+    OldDataLoadTask(QObject *parent = nullptr);
 
 protected:
     virtual void run();
@@ -40,7 +40,7 @@ class OldDataUpgradeTask : public VNTask
 {
     Q_OBJECT
 public:
-    OldDataUpgradeTask(QObject *parent=nullptr);
+    OldDataUpgradeTask(QObject *parent = nullptr);
 
 protected:
     virtual void run();

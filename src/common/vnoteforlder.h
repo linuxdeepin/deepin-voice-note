@@ -26,8 +26,7 @@
 #include <QtGlobal>
 #include <QDateTime>
 #include <QPixmap>
-struct VNoteFolder
-{
+struct VNoteFolder {
 public:
     VNoteFolder();
     ~VNoteFolder();
@@ -43,11 +42,11 @@ public:
         Deleted,
     };
 
-    qint64  id {INVALID_ID};
-    qint32  category {0};
-    qint64  notesCount {0};
-    qint32  defaultIcon {0};
-    qint32  folder_state {State::Normal};
+    qint64 id {INVALID_ID};
+    qint32 category {0};
+    qint64 notesCount {0};
+    qint32 defaultIcon {0};
+    qint32 folder_state {State::Normal};
 
     QString name;
     QString iconPath;
@@ -61,12 +60,13 @@ public:
         QPixmap grayIcon;
     } UI;
 
-    qint32& maxNoteIdRef();
+    qint32 &maxNoteIdRef();
 
-    qint32  getNotesCount();
-    VNOTE_ITEMS_MAP * getNotes();
+    qint32 getNotesCount();
+    VNOTE_ITEMS_MAP *getNotes();
 
-    friend QDebug & operator << (QDebug &out, VNoteFolder &folder);
+    friend QDebug &operator<<(QDebug &out, VNoteFolder &folder);
+
 protected:
     bool fIsDataLoaded {false};
 
@@ -74,7 +74,7 @@ protected:
     //increament
     qint32 maxNoteId {0};
 
-    VNOTE_ITEMS_MAP *notes{nullptr};
+    VNOTE_ITEMS_MAP *notes {nullptr};
 
     friend class VNoteFolderOper;
 };

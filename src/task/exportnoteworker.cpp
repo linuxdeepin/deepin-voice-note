@@ -30,14 +30,13 @@
 #include <DLog>
 
 ExportNoteWorker::ExportNoteWorker(QString dirPath, int exportType,
-                                   VNoteItem* note, VNoteBlock* block, QObject *parent)
-    :VNTask(parent)
-    ,m_exportType(exportType)
-    ,m_exportPath(dirPath)
-    ,m_note(note)
-    ,m_noteblock(block)
+                                   VNoteItem *note, VNoteBlock *block, QObject *parent)
+    : VNTask(parent)
+    , m_exportType(exportType)
+    , m_exportPath(dirPath)
+    , m_note(note)
+    , m_noteblock(block)
 {
-
 }
 
 void ExportNoteWorker::run()
@@ -89,13 +88,12 @@ int ExportNoteWorker::exportText()
     ExportError error = ExportOK;
 
     if (nullptr != m_note) {
-        QString fileName = QString("%1-%2.txt").arg(m_note->noteTitle)
-                .arg(QDateTime::currentDateTime().toLocalTime().toString(VNOTE_TIME_FMT));
+        QString fileName = QString("%1-%2.txt").arg(m_note->noteTitle).arg(QDateTime::currentDateTime().toLocalTime().toString(VNOTE_TIME_FMT));
 
-        QFile exportFile(m_exportPath+"/"+fileName);
+        QFile exportFile(m_exportPath + "/" + fileName);
 
         if (exportFile.open(QIODevice::ReadWrite)) {
-            QTextStream stream( &exportFile);
+            QTextStream stream(&exportFile);
 
             for (auto it : m_note->datas.datas) {
                 if (VNoteBlock::Text == it->getType()) {
@@ -112,7 +110,7 @@ int ExportNoteWorker::exportText()
         error = NoteInvalid;
     }
 
-    return  error;
+    return error;
 }
 
 int ExportNoteWorker::exportAllVoice()
@@ -127,29 +125,27 @@ int ExportNoteWorker::exportAllVoice()
         error = NoteInvalid;
     }
 
-    return  error;
+    return error;
 }
 
 int ExportNoteWorker::exportOneVoice(VNoteBlock *noteblock)
 {
     ExportError error = ExportOK;
 
-    if(noteblock &&
-       noteblock->blockType == VNoteBlock::Voice){
-       QFileInfo targetFile(noteblock->ptrVoice->voicePath);
-       QString destFileName = m_exportPath + "/" +
-               noteblock->ptrVoice->voiceTitle + "-" + targetFile.fileName();
-       QFile::copy(noteblock->ptrVoice->voicePath, destFileName);
-    }else {
+    if (noteblock && noteblock->blockType == VNoteBlock::Voice) {
+        QFileInfo targetFile(noteblock->ptrVoice->voicePath);
+        QString destFileName = m_exportPath + "/" + noteblock->ptrVoice->voiceTitle + "-" + targetFile.fileName();
+        QFile::copy(noteblock->ptrVoice->voicePath, destFileName);
+    } else {
         error = NoteInvalid;
     }
 
-    return  error;
+    return error;
 }
 
 int ExportNoteWorker::exportAll()
 {
     ExportError error = ExportOK;
 
-    return  error;
+    return error;
 }

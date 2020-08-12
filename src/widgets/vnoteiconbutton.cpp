@@ -26,7 +26,7 @@
 
 #include <DLog>
 
-VNoteIconButton::VNoteIconButton(QWidget *parent, QString normal,QString hover, QString press)
+VNoteIconButton::VNoteIconButton(QWidget *parent, QString normal, QString hover, QString press)
     : DIconButton(parent)
 {
     m_icons[Normal] = normal;
@@ -38,7 +38,7 @@ VNoteIconButton::VNoteIconButton(QWidget *parent, QString normal,QString hover, 
     //TODO:x
     //    Need update when theme change
     connect(DGuiApplicationHelper::instance(),
-                     &DGuiApplicationHelper::paletteTypeChanged,
+            &DGuiApplicationHelper::paletteTypeChanged,
             this, &VNoteIconButton::onThemeChanged);
 }
 
@@ -123,7 +123,6 @@ void VNoteIconButton::mouseReleaseEvent(QMouseEvent *event)
 
     if (!m_isDisabled) {
         if (rect().contains(event->pos())) {
-
             m_state = Hover;
 
             updateIcon();
@@ -156,7 +155,7 @@ void VNoteIconButton::onThemeChanged(DGuiApplicationHelper::ColorType type)
 QPixmap VNoteIconButton::loadPixmap(const QString &path)
 {
     DGuiApplicationHelper::ColorType theme =
-            DGuiApplicationHelper::instance()->themeType();
+        DGuiApplicationHelper::instance()->themeType();
 
     QString iconPath(STAND_ICON_PAHT);
 

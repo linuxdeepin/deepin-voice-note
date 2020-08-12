@@ -55,7 +55,7 @@ void VoiceNoteItem::initUi()
 {
     this->setFixedHeight(DefaultHeight);
     m_bgWidget = new DFrame(this);
-    m_bgWidget->setLineWidth(0);//隐藏边框
+    m_bgWidget->setLineWidth(0); //隐藏边框
     m_createTimeLab = new DLabel(m_bgWidget);
     DFontSizeManager::instance()->bind(m_createTimeLab, DFontSizeManager::T8);
     m_asrText = new TextNoteEdit(m_bgWidget);
@@ -80,7 +80,7 @@ void VoiceNoteItem::initUi()
     DFontSizeManager::instance()->bind(m_voiceNameLab, DFontSizeManager::T6);
 
     m_hornLab = new DLabel(m_bgWidget);
-    m_hornLab->setFixedSize(28,25);
+    m_hornLab->setFixedSize(28, 25);
 
     m_hornLab->setAlignment(Qt::AlignRight);
     DAnchorsBase buttonAnchor(m_hornLab);
@@ -91,7 +91,7 @@ void VoiceNoteItem::initUi()
 
     QVBoxLayout *playBtnLayout = new QVBoxLayout;
     playBtnLayout->addWidget(m_playBtn);
-    playBtnLayout->setContentsMargins(10,5,5,5);
+    playBtnLayout->setContentsMargins(10, 5, 5, 5);
     m_voiceNameLab->setAlignment(Qt::AlignBottom);
     m_createTimeLab->setAlignment(Qt::AlignTop);
     QVBoxLayout *nameLayout = new QVBoxLayout;
@@ -122,16 +122,15 @@ void VoiceNoteItem::initUi()
     m_bgWidget->setLayout(bkLayout);
 
     m_coverWidget = new DFrame(this);
-    m_coverWidget->setAttribute(Qt::WA_TransparentForMouseEvents,true);
+    m_coverWidget->setAttribute(Qt::WA_TransparentForMouseEvents, true);
     m_coverWidget->setVisible(false);
 
     QGridLayout *mainLayout = new QGridLayout;
-    mainLayout->addWidget(m_bgWidget,0,0,1,1);
-    mainLayout->addWidget(m_coverWidget,0,0,1,1);
+    mainLayout->addWidget(m_bgWidget, 0, 0, 1, 1);
+    mainLayout->addWidget(m_coverWidget, 0, 0, 1, 1);
     mainLayout->setContentsMargins(10, 0, 10, 0);
 
     this->setLayout(mainLayout);
-
 }
 
 void VoiceNoteItem::initData()
@@ -155,7 +154,7 @@ void VoiceNoteItem::initConnection()
     connect(m_asrText, &TextNoteEdit::textChanged, this, &VoiceNoteItem::onAsrTextChange);
     QTextDocument *document = m_asrText->document();
     QAbstractTextDocumentLayout *documentLayout = document->documentLayout();
-    connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, [ = ] {
+    connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, [=] {
         onAsrTextChange();
     });
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this, &VoiceNoteItem::onChangeTheme);
@@ -164,16 +163,16 @@ void VoiceNoteItem::initConnection()
 void VoiceNoteItem::onPlayBtnClicked()
 {
     bool isPress = m_playBtn->isPressed();
-    if(isPress){
+    if (isPress) {
         emit sigPlayBtnClicked(this);
-    }else {
+    } else {
         emit sigPauseBtnClicked(this);
     }
 }
 
 VNoteBlock *VoiceNoteItem::getNoteBlock()
 {
-    return  m_noteBlock;
+    return m_noteBlock;
 }
 
 void VoiceNoteItem::showPlayBtn()
@@ -241,7 +240,7 @@ void VoiceNoteItem::onChangeTheme()
     m_coverWidget->setPalette(pbCover);
 
     pbCover = DApplicationHelper::instance()->palette(m_bgWidget);
-    pbCover.setBrush(DPalette::Base, appDp.color(DPalette::Active,DPalette::ItemBackground));
+    pbCover.setBrush(DPalette::Base, appDp.color(DPalette::Active, DPalette::ItemBackground));
     m_bgWidget->setPalette(pbCover);
 
     pbCover = DApplicationHelper::instance()->palette(m_createTimeLab);
@@ -265,25 +264,24 @@ bool VoiceNoteItem::asrTextNotEmpty()
 
 void VoiceNoteItem::selectText(const QPoint &globalPos, QTextCursor::MoveOperation op)
 {
-    if(!isSelectAll() && asrTextNotEmpty()){
-       m_asrText->selectText(globalPos,op);
+    if (!isSelectAll() && asrTextNotEmpty()) {
+        m_asrText->selectText(globalPos, op);
     }
 }
 
 void VoiceNoteItem::selectText(QTextCursor::MoveOperation op)
 {
-
-    if(!isSelectAll() && asrTextNotEmpty()){
-      m_asrText->moveCursor(op,QTextCursor::KeepAnchor);
+    if (!isSelectAll() && asrTextNotEmpty()) {
+        m_asrText->moveCursor(op, QTextCursor::KeepAnchor);
     }
 }
 
 void VoiceNoteItem::selectAllText()
 {
-    if(m_selectAll == false){
+    if (m_selectAll == false) {
         m_coverWidget->setVisible(true);
 
-        if(asrTextNotEmpty()){
+        if (asrTextNotEmpty()) {
             m_asrText->clearSelection();
         }
         m_selectAll = true;
@@ -293,8 +291,8 @@ void VoiceNoteItem::selectAllText()
 void VoiceNoteItem::clearSelection()
 {
     m_coverWidget->setVisible(false);
-    if(asrTextNotEmpty()){
-       m_asrText->clearSelection();
+    if (asrTextNotEmpty()) {
+        m_asrText->clearSelection();
     }
     m_selectAll = false;
 }
@@ -302,20 +300,20 @@ void VoiceNoteItem::clearSelection()
 QTextDocumentFragment VoiceNoteItem::getSelectFragment()
 {
     QTextDocumentFragment ret;
-    if(asrTextNotEmpty()){
-        if(m_selectAll){
+    if (asrTextNotEmpty()) {
+        if (m_selectAll) {
             ret = QTextDocumentFragment(m_asrText->document());
-        }else {
+        } else {
             ret = getTextCursor().selection();
         }
     }
-    return  ret;
+    return ret;
 }
 
-QTextDocument* VoiceNoteItem::getTextDocument()
+QTextDocument *VoiceNoteItem::getTextDocument()
 {
     QTextDocument *doc = nullptr;
-    if(asrTextNotEmpty()){
+    if (asrTextNotEmpty()) {
         doc = m_asrText->document();
     }
     return doc;
@@ -323,12 +321,12 @@ QTextDocument* VoiceNoteItem::getTextDocument()
 
 bool VoiceNoteItem::hasSelection()
 {
-    return  m_selectAll || (asrTextNotEmpty() && m_asrText->hasSelection());
+    return m_selectAll || (asrTextNotEmpty() && m_asrText->hasSelection());
 }
 
 void VoiceNoteItem::removeSelectText()
 {
-    if(asrTextNotEmpty()){
+    if (asrTextNotEmpty()) {
         m_asrText->removeSelectText();
     }
 }
@@ -336,28 +334,28 @@ void VoiceNoteItem::removeSelectText()
 QTextCursor VoiceNoteItem::getTextCursor()
 {
     QTextCursor cursor;
-    if(asrTextNotEmpty()){
+    if (asrTextNotEmpty()) {
         cursor = m_asrText->textCursor();
     }
-    return  cursor;
+    return cursor;
 }
 
 void VoiceNoteItem::setTextCursor(const QTextCursor &cursor)
 {
-    if(asrTextNotEmpty()){
+    if (asrTextNotEmpty()) {
         m_asrText->setTextCursor(cursor);
     }
 }
 
 bool VoiceNoteItem::textIsEmpty()
 {
-    return  !asrTextNotEmpty();
+    return !asrTextNotEmpty();
 }
 
 QRect VoiceNoteItem::getCursorRect()
 {
     QRect rc;
-    if(asrTextNotEmpty()){
+    if (asrTextNotEmpty()) {
         rc = m_asrText->cursorRect(m_asrText->textCursor());
     }
     return rc;
@@ -366,9 +364,9 @@ QRect VoiceNoteItem::getCursorRect()
 bool VoiceNoteItem::isAsrTextPos(const QPoint &globalPos)
 {
     bool ret = false;
-    if(asrTextNotEmpty()){
+    if (asrTextNotEmpty()) {
         QPoint pos = m_asrText->mapFromGlobal(globalPos);
-        if(m_asrText->rect().contains(pos)){
+        if (m_asrText->rect().contains(pos)) {
             ret = true;
         }
     }
@@ -377,16 +375,16 @@ bool VoiceNoteItem::isAsrTextPos(const QPoint &globalPos)
 
 void VoiceNoteItem::setFocus()
 {
-    QWidget *parent = static_cast<QWidget*>(this->parent());
-    if(parent){
+    QWidget *parent = static_cast<QWidget *>(this->parent());
+    if (parent) {
         parent->setFocus();
     }
 }
 
 bool VoiceNoteItem::hasFocus()
 {
-    QWidget *parent = static_cast<QWidget*>(this->parent());
-    if(parent){
+    QWidget *parent = static_cast<QWidget *>(this->parent());
+    if (parent) {
         return parent->hasFocus();
     }
     return false;
@@ -421,7 +419,7 @@ void VoiceNoteItem::stopAnim()
 
 bool VoiceNoteItem::isTextContainsPos(const QPoint &globalPos)
 {
-    if(asrTextNotEmpty()){
+    if (asrTextNotEmpty()) {
         QPoint pos = m_asrText->mapFromGlobal(globalPos);
         return m_asrText->rect().contains(pos);
     }
@@ -431,7 +429,6 @@ bool VoiceNoteItem::isTextContainsPos(const QPoint &globalPos)
 
 PlayAnimInferface::~PlayAnimInferface()
 {
-
 }
 
 void PlayAnimInferface::startAnim()

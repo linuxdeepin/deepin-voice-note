@@ -37,7 +37,7 @@ TextNoteItem::TextNoteItem(VNoteBlock *noteBlock, QWidget *parent)
 {
     initUi();
     initConnection();
-    Utils::blockToDocument(m_noteBlock,m_textEdit->document());
+    Utils::blockToDocument(m_noteBlock, m_textEdit->document());
     onChangeTheme();
 }
 
@@ -60,7 +60,7 @@ void TextNoteItem::initConnection()
 {
     QTextDocument *document = m_textEdit->document();
     QAbstractTextDocumentLayout *documentLayout = document->documentLayout();
-    connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, [ = ] {
+    connect(documentLayout, &QAbstractTextDocumentLayout::documentSizeChanged, this, [=] {
         m_textEdit->setFixedHeight(static_cast<int>(document->size().height()));
         this->setFixedHeight(m_textEdit->height() + 10);
         onTextCursorChange();
@@ -72,23 +72,22 @@ void TextNoteItem::initConnection()
     connect(m_textEdit, SIGNAL(cursorPositionChanged()), this, SLOT(onTextCursorChange()));
 
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged,
-               this, &TextNoteItem::onChangeTheme);
-
+            this, &TextNoteItem::onChangeTheme);
 }
 
 void TextNoteItem::updateSearchKey(QString searchKey)
 {
     if (m_noteBlock) {
-        if(m_textDocumentUndo == true && m_serchKey == searchKey){
+        if (m_textDocumentUndo == true && m_serchKey == searchKey) {
             return;
         }
         m_serchKey = searchKey;
         m_isSearching = true;
-        if(m_textDocumentUndo == false && m_searchCount){
-           Utils::setDefaultColor(m_textEdit->document(), m_textEdit->palette().text().color());
+        if (m_textDocumentUndo == false && m_searchCount) {
+            Utils::setDefaultColor(m_textEdit->document(), m_textEdit->palette().text().color());
         }
         DPalette pb;
-        m_searchCount = Utils::highTextEdit(m_textEdit->document(), m_serchKey, pb.color(DPalette::Highlight),m_textDocumentUndo);
+        m_searchCount = Utils::highTextEdit(m_textEdit->document(), m_serchKey, pb.color(DPalette::Highlight), m_textDocumentUndo);
         m_textDocumentUndo = m_searchCount == 0 ? false : true;
         m_isSearching = false;
     }
@@ -101,17 +100,17 @@ void TextNoteItem::setTextCursor(const QTextCursor &cursor)
 
 QTextCursor TextNoteItem::getTextCursor()
 {
-    return  m_textEdit->textCursor();
+    return m_textEdit->textCursor();
 }
 
 VNoteBlock *TextNoteItem::getNoteBlock()
 {
-    return  m_noteBlock;
+    return m_noteBlock;
 }
 
 bool TextNoteItem::textIsEmpty()
 {
-    return  m_textEdit->document()->isEmpty();
+    return m_textEdit->document()->isEmpty();
 }
 
 QRect TextNoteItem::getCursorRect()
@@ -126,13 +125,12 @@ void TextNoteItem::selectText(const QPoint &globalPos, QTextCursor::MoveOperatio
 
 void TextNoteItem::selectAllText()
 {
-    if(m_selectAll == false){
+    if (m_selectAll == false) {
         if (!textIsEmpty()) {
             m_textEdit->selectAll();
         }
         m_selectAll = true;
     }
-
 }
 
 void TextNoteItem::selectText(QTextCursor::MoveOperation op)
@@ -158,7 +156,7 @@ bool TextNoteItem::hasSelection()
 
 QTextDocumentFragment TextNoteItem::getSelectFragment()
 {
-    return  getTextCursor().selection();
+    return getTextCursor().selection();
 }
 
 void TextNoteItem::setFocus()
@@ -168,7 +166,7 @@ void TextNoteItem::setFocus()
 
 bool TextNoteItem::hasFocus()
 {
-    return  m_textEdit->hasFocus();
+    return m_textEdit->hasFocus();
 }
 
 bool TextNoteItem::isSelectAll()
@@ -176,7 +174,7 @@ bool TextNoteItem::isSelectAll()
     return m_selectAll;
 }
 
-QTextDocument* TextNoteItem::getTextDocument()
+QTextDocument *TextNoteItem::getTextDocument()
 {
     return m_textEdit->document();
 }
@@ -193,8 +191,8 @@ void TextNoteItem::pasteText()
 
 void TextNoteItem::onTextChange()
 {
-    if(m_isSearching == false){
-        if(m_searchCount){
+    if (m_isSearching == false) {
+        if (m_searchCount) {
             m_textDocumentUndo = false;
         }
         emit sigTextChanged();
@@ -203,11 +201,11 @@ void TextNoteItem::onTextChange()
 
 void TextNoteItem::onTextCursorChange()
 {
-    if (this->hasFocus()){
+    if (this->hasFocus()) {
         int height = m_textEdit->cursorRect().bottom() + 5;
-        if(m_lastCursorHeight != height){
-           m_lastCursorHeight = height;
-           emit sigCursorHeightChange(this, height);
+        if (m_lastCursorHeight != height) {
+            m_lastCursorHeight = height;
+            emit sigCursorHeightChange(this, height);
         }
     }
 }
@@ -221,8 +219,8 @@ void TextNoteItem::onChangeTheme()
 {
     DPalette appDp = DApplicationHelper::instance()->applicationPalette();
     DPalette dp = DApplicationHelper::instance()->palette(m_textEdit);
-    dp.setBrush(DPalette::Highlight, appDp.color(DPalette::Normal,DPalette::Highlight));
-    dp.setBrush(DPalette::HighlightedText, appDp.color(DPalette::Normal,DPalette::HighlightedText));
+    dp.setBrush(DPalette::Highlight, appDp.color(DPalette::Normal, DPalette::Highlight));
+    dp.setBrush(DPalette::HighlightedText, appDp.color(DPalette::Normal, DPalette::HighlightedText));
     m_textEdit->setPalette(dp);
 
     m_searchCount = 1;

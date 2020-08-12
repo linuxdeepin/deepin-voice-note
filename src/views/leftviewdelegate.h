@@ -33,6 +33,7 @@ public:
     void setEnableItem(bool enable);
 
     const int MAX_FOLDER_NAME_LEN = 64;
+
 protected:
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
                const QModelIndex &index) const Q_DECL_OVERRIDE;
@@ -45,6 +46,7 @@ protected:
                       const QModelIndex &index) const override;
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
                               const QModelIndex &index) const override;
+
 private:
     void init();
     void paintNoteRoot(QPainter *painter, const QStyleOptionViewItem &option,
@@ -53,7 +55,7 @@ private:
                        const QModelIndex &index) const;
     QAbstractItemView *m_treeView {nullptr};
     DPalette m_parentPb;
-    bool     m_enableItem {true};
+    bool m_enableItem {true};
 };
 
 #endif // LeftViewDelegate_H

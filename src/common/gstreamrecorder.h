@@ -28,7 +28,7 @@
 
 #include <gst/gst.h>
 
-class GstreamRecorder: public QObject
+class GstreamRecorder : public QObject
 {
     Q_OBJECT
 public:
@@ -50,13 +50,14 @@ private slots:
 Q_SIGNALS:
     void errorMsg(QString msg);
     void audioBufferProbed(const QAudioBuffer &buffer);
+
 private:
-    bool  createPipe();
-    void  objectUnref(gpointer object);
-    void  setStateToNull();
-    void  initFormat();
-    void  deinit();
-    void  GetGstState(int *state, int *pending);
+    bool createPipe();
+    void objectUnref(gpointer object);
+    void setStateToNull();
+    void initFormat();
+    void deinit();
+    void GetGstState(int *state, int *pending);
 
     GstElement *m_pipeline {nullptr};
     QString m_outputFile {""};

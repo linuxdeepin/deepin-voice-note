@@ -33,10 +33,10 @@ struct VNoteItem;
 struct VNoteBlock;
 struct VNOTE_ITEMS_MAP;
 
-typedef QMap<qint64,VNoteFolder*> VNOTE_FOLDERS_DATA_MAP;
-typedef QMap<qint64,VNoteItem*>   VNOTE_ITEMS_DATA_MAP;
-typedef QMap<qint64, VNOTE_ITEMS_MAP*> VNOTE_ALL_NOTES_DATA_MAP;
-typedef QVector<VNoteBlock*> VNOTE_DATA_VECTOR;
+typedef QMap<qint64, VNoteFolder *> VNOTE_FOLDERS_DATA_MAP;
+typedef QMap<qint64, VNoteItem *> VNOTE_ITEMS_DATA_MAP;
+typedef QMap<qint64, VNOTE_ITEMS_MAP *> VNOTE_ALL_NOTES_DATA_MAP;
+typedef QVector<VNoteBlock *> VNOTE_DATA_VECTOR;
 
 struct VNOTE_FOLDERS_MAP {
     ~VNOTE_FOLDERS_MAP();
@@ -77,15 +77,16 @@ struct VNOTE_ALL_NOTES_MAP {
 struct VNOTE_DATAS {
     ~VNOTE_DATAS();
 
-    const VNOTE_DATA_VECTOR& dataConstRef();
-protected:
-    VNoteBlock* newBlock(int type);
-    void addBlock(VNoteBlock* block);
-    void addBlock(VNoteBlock* before, VNoteBlock* block);
-    void delBlock(VNoteBlock* block);
+    const VNOTE_DATA_VECTOR &dataConstRef();
 
-    void classifyAddBlk(VNoteBlock* block);
-    void classifyDelBlk(VNoteBlock* block);
+protected:
+    VNoteBlock *newBlock(int type);
+    void addBlock(VNoteBlock *block);
+    void addBlock(VNoteBlock *before, VNoteBlock *block);
+    void delBlock(VNoteBlock *block);
+
+    void classifyAddBlk(VNoteBlock *block);
+    void classifyDelBlk(VNoteBlock *block);
     //Ordered data set
     VNOTE_DATA_VECTOR datas;
 
@@ -114,23 +115,23 @@ struct VDataSafer {
 
     SaferType saferType {ExceptionSafer};
 
-    qint32  id {INVALID_ID};
-    qint64  folder_id {INVALID_ID};
-    qint32  note_id {INVALID_ID};
-    qint32  state {0};
+    qint32 id {INVALID_ID};
+    qint64 folder_id {INVALID_ID};
+    qint32 note_id {INVALID_ID};
+    qint32 state {0};
     QString path;
     QString meta_data;
     QDateTime createTime;
 
-    friend QDebug& operator << (QDebug& out, const VDataSafer &safer);
+    friend QDebug &operator<<(QDebug &out, const VDataSafer &safer);
 };
 
-typedef  QVector<VDataSafer> SafetyDatas;
+typedef QVector<VDataSafer> SafetyDatas;
 
-enum IconsType{
-   DefaultIcon = 0x0,
-   DefaultGrayIcon,
-   MaxIconsType
+enum IconsType {
+    DefaultIcon = 0x0,
+    DefaultGrayIcon,
+    MaxIconsType
 };
 
 #endif // DATATYPEDEF_H

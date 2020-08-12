@@ -42,11 +42,13 @@ public slots:
     void setProgress(int progress);
     void onDataReady();
     void onUpgradeFinish();
+
 protected:
     void initConnections();
+
 private:
     DWaterProgress *m_waterProgress {nullptr};
-    DLabel         *m_tooltipTextLabel {nullptr};
+    DLabel *m_tooltipTextLabel {nullptr};
 };
 
 #endif // UPGRADEVIEW_H

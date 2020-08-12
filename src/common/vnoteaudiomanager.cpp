@@ -27,7 +27,7 @@
 #include <iostream>
 using namespace std;
 
-VNoteAudioManager* VNoteAudioManager::_instance = nullptr;
+VNoteAudioManager *VNoteAudioManager::_instance = nullptr;
 
 VNoteAudioManager::VNoteAudioManager(QObject *parent)
     : QObject(parent)
@@ -46,7 +46,7 @@ VNoteAudioManager *VNoteAudioManager::instance()
         _instance = new VNoteAudioManager();
     }
 
-    return  _instance;
+    return _instance;
 }
 
 void VNoteAudioManager::initAudio()
@@ -103,8 +103,8 @@ void VNoteAudioManager::initAudio()
 
     qInfo() << "audio settings: {\n"
             << " codec=" << m_audioEncoderSetting.codec()
-            << ", "      << m_audioEncoderSetting.sampleRate()
-            << ", "      << m_audioEncoderSetting.bitRate()
+            << ", " << m_audioEncoderSetting.sampleRate()
+            << ", " << m_audioEncoderSetting.bitRate()
             << ", channelCount=" << m_audioEncoderSetting.channelCount()
             << ", container =" << m_audioContainer
             << " }";
@@ -118,13 +118,11 @@ void VNoteAudioManager::updateAudioInputParam()
 
         //Only need update settting when setting be changed.
         if (m_pAudioRecord->audioSettings() != m_audioEncoderSetting) {
-            m_pAudioRecord->setEncodingSettings(m_audioEncoderSetting
-                                                , QVideoEncoderSettings()
-                                                , m_audioContainer);
+            m_pAudioRecord->setEncodingSettings(m_audioEncoderSetting, QVideoEncoderSettings(), m_audioContainer);
             qInfo() << "Update recording settings: {\n"
                     << " codec=" << m_audioEncoderSetting.codec()
-                    << ", "      << m_audioEncoderSetting.sampleRate()
-                    << ", "      << m_audioEncoderSetting.bitRate()
+                    << ", " << m_audioEncoderSetting.sampleRate()
+                    << ", " << m_audioEncoderSetting.bitRate()
                     << ", channelCount=" << m_audioEncoderSetting.channelCount()
                     << ", container =" << m_audioContainer
                     << " }";
@@ -137,13 +135,11 @@ void VNoteAudioManager::updateAudioInputParam()
 
 void VNoteAudioManager::initConnections()
 {
-    connect(m_pAudioRecord.get(), &QAudioRecorder::durationChanged
-            ,this, &VNoteAudioManager::recordDurationChanged);
+    connect(m_pAudioRecord.get(), &QAudioRecorder::durationChanged, this, &VNoteAudioManager::recordDurationChanged);
     //Detect the recording error
     connect(m_pAudioRecord.get(), QOverload<QMediaRecorder::Error>::of(&QMediaRecorder::error),
             this, &VNoteAudioManager::onRecordError);
-    connect(m_pAudioRecProbe.get(), &QAudioProbe::audioBufferProbed
-            ,this, [this](const QAudioBuffer &buffer) {
+    connect(m_pAudioRecProbe.get(), &QAudioProbe::audioBufferProbed, this, [this](const QAudioBuffer &buffer) {
         emit recAudioBufferProbed(buffer);
     });
 }
@@ -161,9 +157,9 @@ void VNoteAudioManager::startPlay()
     int state = m_pAudioPlayer->state();
     if (QMediaPlayer::PlayingState != state) {
         //Restore the play position in pause state
-//        if (QMediaPlayer::PausedState == state) {
-//            m_pAudioPlayer->setPosition(m_playPosition);
-//        }
+        //        if (QMediaPlayer::PausedState == state) {
+        //            m_pAudioPlayer->setPosition(m_playPosition);
+        //        }
 
         m_pAudioPlayer->play();
     }
@@ -236,7 +232,7 @@ void VNoteAudioManager::onRecordError(QMediaRecorder::Error error)
     qCritical() << "Recording error happed:******" << error;
 }
 
-QMediaPlayer* VNoteAudioManager::getPlayerObject()
+QMediaPlayer *VNoteAudioManager::getPlayerObject()
 {
     return m_pAudioPlayer.get();
 }

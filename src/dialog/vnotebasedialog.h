@@ -36,7 +36,7 @@ class VNoteBaseDialog : public DAbstractDialog
 public:
     explicit VNoteBaseDialog(QWidget *parent = nullptr);
 
-    void addContent(QWidget* content);
+    void addContent(QWidget *content);
     void setIconPixmap(const QPixmap &iconPixmap);
 
     const int DEFAULT_WINDOW_W = 380;
@@ -46,9 +46,9 @@ public:
 protected:
     void initUI();
     void InitConnections();
-    void setLogoVisable(bool visible=true);
-    void setTitle(const QString& title);
-    QLayout* getContentLayout();
+    void setLogoVisable(bool visible = true);
+    void setTitle(const QString &title);
+    QLayout *getContentLayout();
 
     //Overrides
     void closeEvent(QCloseEvent *event) override;
@@ -58,9 +58,9 @@ signals:
 public slots:
 private:
     QWidget *m_titleBar {nullptr};
-    DLabel  *m_logoIcon {nullptr};
-    DLabel  *m_tileText {nullptr};
-    DWindowCloseButton* m_closeButton {nullptr};
+    DLabel *m_logoIcon {nullptr};
+    DLabel *m_tileText {nullptr};
+    DWindowCloseButton *m_closeButton {nullptr};
 
     QWidget *m_content {nullptr};
     QVBoxLayout *m_contentLayout {nullptr};

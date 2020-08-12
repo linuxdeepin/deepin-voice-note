@@ -32,11 +32,12 @@ class LoadNoteItemsWorker : public VNTask
 {
     Q_OBJECT
 public:
-    LoadNoteItemsWorker(QObject *parent=nullptr);
+    LoadNoteItemsWorker(QObject *parent = nullptr);
+
 protected:
     virtual void run();
 signals:
-    void onAllNotesLoaded(VNOTE_ALL_NOTES_MAP* foldesMap);
+    void onAllNotesLoaded(VNOTE_ALL_NOTES_MAP *foldesMap);
 public slots:
 
 protected:

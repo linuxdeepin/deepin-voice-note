@@ -27,12 +27,13 @@ class VNoteSaferOper
 {
 public:
     VNoteSaferOper();
-    VNoteSaferOper(const VDataSafer& safer);
+    VNoteSaferOper(const VDataSafer &safer);
 
-    SafetyDatas* loadSafers();
+    SafetyDatas *loadSafers();
 
-    void addSafer(const VDataSafer& safer);
-    void rmSafer(const VDataSafer& safer);
+    void addSafer(const VDataSafer &safer);
+    void rmSafer(const VDataSafer &safer);
+
 protected:
     VDataSafer m_dataSafer;
 };
