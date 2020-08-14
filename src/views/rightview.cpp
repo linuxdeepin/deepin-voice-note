@@ -127,6 +127,7 @@ DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextC
     editItem->setTextCursor(cursor);
 
     connect(editItem, &TextNoteItem::sigCursorHeightChange, this, &RightView::adjustVerticalScrollBar);
+    connect(editItem, &TextNoteItem::sigFocusIn, this, &RightView::onTextEditFocusIn);
     connect(editItem, &TextNoteItem::sigFocusOut, this, &RightView::onTextEditFocusOut);
     connect(editItem, &TextNoteItem::sigSelectionChanged, this, &RightView::onTextEditSelectChange);
     connect(editItem, &TextNoteItem::sigTextChanged, this, &RightView::onTextEditTextChange);
@@ -223,6 +224,19 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
     updateData();
 
     return m_curItemWidget;
+}
+
+void RightView::onTextEditFocusIn()
+{
+    if(m_curAsrItem){
+       TextNoteItem *widget = static_cast<TextNoteItem *>(sender());
+       int height = 0;
+       QRect rc = widget->getCursorRect();
+       if (!rc.isEmpty()) {
+           height = rc.bottom();
+       }
+       adjustVerticalScrollBar(widget, height);
+    }
 }
 
 void RightView::onTextEditFocusOut()

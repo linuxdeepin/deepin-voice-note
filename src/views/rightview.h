@@ -96,6 +96,7 @@ signals:
     void contentChanged();
     void sigCursorChange(int height, bool mouseMove);
 public slots:
+    void onTextEditFocusIn();
     void onTextEditFocusOut();
     void onTextEditTextChange();
     void onTextEditSelectChange();
