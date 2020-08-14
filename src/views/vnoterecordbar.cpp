@@ -202,17 +202,23 @@ void VNoteRecordBar::playOrPauseVoice()
 void VNoteRecordBar::onAudioVolumeChange(int mode)
 {
     if (m_mainLayout->currentWidget() == m_recordPanel
-        && m_currentMode == mode && !m_showVolumeWanning) {
+        && m_currentMode == mode) {
         double volume = m_audioWatcher->getVolume(
             static_cast<AudioWatcher::AudioMode>(mode));
-        m_showVolumeWanning = volumeToolow(volume);
-        if (m_showVolumeWanning) {
-            VNoteMessageDialog volumeLowDialog(VNoteMessageDialog::VolumeTooLow, this);
-            connect(&volumeLowDialog, &VNoteMessageDialog::rejected, this, [this]() {
-                cancelRecord();
-            });
+        if(!m_showVolumeWanning){
+            m_showVolumeWanning = volumeToolow(volume);
+            if (m_showVolumeWanning) {
+                VNoteMessageDialog volumeLowDialog(VNoteMessageDialog::VolumeTooLow, this);
+                connect(&volumeLowDialog, &VNoteMessageDialog::rejected, this, [this]() {
+                    cancelRecord();
+                });
 
-            volumeLowDialog.exec();
+                volumeLowDialog.exec();
+            }
+        }else {
+            if(!volumeToolow(volume)){
+                m_showVolumeWanning = false;
+            }
         }
     }
 }
