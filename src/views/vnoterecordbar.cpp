@@ -275,5 +275,5 @@ void VNoteRecordBar::initAudioWatcher()
 
 bool VNoteRecordBar::volumeToolow(const double &volume)
 {
-    return (volume - 0.2 <= 0.00001) ? true : false;
+    return (volume - 0.2 < 0.0) ? true : false;
 }
