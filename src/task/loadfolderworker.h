@@ -27,6 +27,7 @@
 #include <QObject>
 #include <QRunnable>
 
+//加载记事本数据线程
 class LoadFolderWorker : public VNTask
 {
     Q_OBJECT
@@ -34,8 +35,10 @@ public:
     explicit LoadFolderWorker(QObject *parent = nullptr);
 
 protected:
+    //加载数据
     virtual void run();
 signals:
+    //完成加载
     void onFoldersLoaded(VNOTE_FOLDERS_MAP *foldesMap);
 public slots:
 };

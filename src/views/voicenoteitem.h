@@ -66,18 +66,25 @@ class VoiceNoteItem : public DetailItemWidget
 public:
     explicit VoiceNoteItem(VNoteBlock *noteBlock, QWidget *parent = nullptr);
 
+    //UI同步数据
     void initData();
+    //显示播放按钮
     void showPlayBtn();
+    //显示暂停按钮
     void showPauseBtn();
+    //显示转文字开始提示内容
     void showAsrStartWindow();
+    //显示转文字结果
     void showAsrEndWindow(const QString &strResult);
+    //设置播放按钮是否可用
     void enblePlayBtn(bool enable);
+    //转文字内容是否为空
     bool asrTextNotEmpty();
-    bool isAsrTextPos(const QPoint &globalPos);
-
+    //开始播放动画
     void updateAnim() override;
+    //停止播放动画
     void stopAnim() override;
-
+    //重写基类函数
     VNoteBlock *getNoteBlock() override;
     QTextCursor getTextCursor() override;
     void setTextCursor(const QTextCursor &cursor) override;
@@ -98,13 +105,18 @@ public:
     QTextDocument *getTextDocument() override;
 
 signals:
+    //播放相关信号
     void sigPlayBtnClicked(VoiceNoteItem *item);
     void sigPauseBtnClicked(VoiceNoteItem *item);
+    //光标坐标改变
     void sigCursorHeightChange(QWidget *widget, int height);
 
 public slots:
+    //播放/暂停
     void onPlayBtnClicked();
+    //转文字内容改变
     void onAsrTextChange();
+    //主题切换
     void onChangeTheme();
 
 private:

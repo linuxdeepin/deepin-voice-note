@@ -33,6 +33,11 @@ Utils::Utils()
 {
 }
 
+/**
+ * @brief Utils::convertDateTime
+ * @param dateTime 时间
+ * @return 格式化后的字符串
+ */
 QString Utils::convertDateTime(const QDateTime &dateTime)
 {
     QDate currDateTime = QDate::currentDate();
@@ -64,6 +69,13 @@ QString Utils::convertDateTime(const QDateTime &dateTime)
     return disptime;
 }
 
+/**
+ * @brief Utils::renderSVG
+ * @param filePath
+ * @param size
+ * @param pApp
+ * @return 加载的图标
+ */
 QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplication *pApp)
 {
     QImageReader reader;
@@ -84,6 +96,12 @@ QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplicatio
     return pixmap;
 }
 
+/**
+ * @brief Utils::loadSVG
+ * @param fileName
+ * @param fCommon 图标是否区分主题，true 不区分
+ * @return 加载的图标
+ */
 QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
 {
     DGuiApplicationHelper::ColorType theme =
@@ -122,6 +140,14 @@ QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
     return pixmap;
 }
 
+/**
+ * @brief Utils::highTextEdit
+ * @param textDoc 编辑器的文档
+ * @param searchKey 搜索关键字
+ * @param highColor 高亮颜色
+ * @param undo 是否取消文档上一步操作，true 取消
+ * @return 搜索结果个数
+ */
 int Utils::highTextEdit(QTextDocument *textDoc, const QString &searchKey,
                         const QColor &highColor, bool undo)
 {
@@ -157,6 +183,12 @@ int Utils::highTextEdit(QTextDocument *textDoc, const QString &searchKey,
     return findCount;
 }
 
+/**
+ * @brief Utils::formatMillisecond
+ * @param millisecond 毫秒
+ * @param minValue 最小显示的时间
+ * @return 格式化后的字符串
+ */
 QString Utils::formatMillisecond(qint64 millisecond, bool minValue)
 {
     uint curSecond = static_cast<uint>(millisecond / 1000);
@@ -170,6 +202,11 @@ QString Utils::formatMillisecond(qint64 millisecond, bool minValue)
     return QString("60:00");
 }
 
+/**
+ * @brief Utils::documentToBlock
+ * @param block 绑定的数据
+ * @param doc 编辑器的文档
+ */
 void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
 {
     if (block != nullptr) {
@@ -204,6 +241,11 @@ void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
     }
 }
 
+/**
+ * @brief Utils::blockToDocument
+ * @param block 绑定的数据
+ * @param doc 编辑器文档
+ */
 void Utils::blockToDocument(const VNoteBlock *block, QTextDocument *doc)
 {
     if (block && doc) {
@@ -211,6 +253,11 @@ void Utils::blockToDocument(const VNoteBlock *block, QTextDocument *doc)
     }
 }
 
+/**
+ * @brief Utils::setDefaultColor
+ * @param srcDoc 编辑器文档
+ * @param color 字体颜色
+ */
 void Utils::setDefaultColor(QTextDocument *srcDoc, const QColor &color)
 {
     QTextCursor cursor(srcDoc);

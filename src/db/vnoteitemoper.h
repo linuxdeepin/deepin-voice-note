@@ -23,22 +23,28 @@
 
 #include "common/datatypedef.h"
 
+//记事项表操作
 class VNoteItemOper
 {
 public:
     VNoteItemOper(VNoteItem *note = nullptr);
-
+    //获取所有记事项数据
     VNOTE_ALL_NOTES_MAP *loadAllVNotes();
-
+    //修改名称
     bool modifyNoteTitle(QString title);
+    //更新数据
     bool updateNote();
-
+    //添加记事项
     VNoteItem *addNote(VNoteItem &note);
+    //获取记事项
     VNoteItem *getNote(qint64 folderId, qint32 noteId);
+    //获取一个记事本所有记事项
     VNOTE_ITEMS_MAP *getFolderNotes(qint64 folderId);
+    //生成默认名称
     QString getDefaultNoteName(qint64 folderId);
+    //生成默认语音名称
     QString getDefaultVoiceName() const;
-
+    //删除记事项
     bool deleteNote();
 
 protected:

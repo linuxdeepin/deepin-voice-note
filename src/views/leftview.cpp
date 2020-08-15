@@ -29,6 +29,10 @@
 
 #include <QMouseEvent>
 
+/**
+ * @brief LeftView::LeftView
+ * @param parent
+ */
 LeftView::LeftView(QWidget *parent)
     : DTreeView(parent)
 {
@@ -38,6 +42,9 @@ LeftView::LeftView(QWidget *parent)
     initMenu();
 }
 
+/**
+ * @brief LeftView::initModel
+ */
 void LeftView::initModel()
 {
     m_pDataModel = new QStandardItemModel(this);
@@ -47,12 +54,18 @@ void LeftView::initModel()
     sort();
 }
 
+/**
+ * @brief LeftView::initDelegate
+ */
 void LeftView::initDelegate()
 {
     m_pItemDelegate = new LeftViewDelegate(this);
     this->setItemDelegate(m_pItemDelegate);
 }
 
+/**
+ * @brief LeftView::initNotepadRoot
+ */
 void LeftView::initNotepadRoot()
 {
     QStandardItem *pItem = m_pDataModel->item(0);
@@ -62,16 +75,28 @@ void LeftView::initNotepadRoot()
     }
 }
 
+/**
+ * @brief LeftView::getNotepadRoot
+ * @return 记事本项父节点
+ */
 QStandardItem *LeftView::getNotepadRoot()
 {
     return m_pDataModel->item(0);
 }
 
+/**
+ * @brief LeftView::getNotepadRootIndex
+ * @return 记事本父节点索引
+ */
 QModelIndex LeftView::getNotepadRootIndex()
 {
     return m_pSortViewFilter->mapFromSource(getNotepadRoot()->index());
 }
 
+/**
+ * @brief LeftView::mousePressEvent
+ * @param event
+ */
 void LeftView::mousePressEvent(QMouseEvent *event)
 {
     this->setFocus();
@@ -90,6 +115,11 @@ void LeftView::mousePressEvent(QMouseEvent *event)
         }
     }
 }
+
+/**
+ * @brief LeftView::mouseReleaseEvent
+ * @param event
+ */
 void LeftView::mouseReleaseEvent(QMouseEvent *event)
 {
     if (!m_onlyCurItemMenuEnable) {
@@ -97,6 +127,10 @@ void LeftView::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief LeftView::mouseDoubleClickEvent
+ * @param event
+ */
 void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (!m_onlyCurItemMenuEnable) {
@@ -104,11 +138,19 @@ void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief LeftView::mouseMoveEvent
+ * @param event
+ */
 void LeftView::mouseMoveEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
 }
 
+/**
+ * @brief LeftView::keyPressEvent
+ * @param e
+ */
 void LeftView::keyPressEvent(QKeyEvent *e)
 {
     if (m_onlyCurItemMenuEnable || e->key() == Qt::Key_PageUp || e->key() == Qt::Key_PageDown) {
@@ -122,6 +164,10 @@ void LeftView::keyPressEvent(QKeyEvent *e)
     }
 }
 
+/**
+ * @brief LeftView::restoreNotepadItem
+ * @return 当前选中项
+ */
 QModelIndex LeftView::restoreNotepadItem()
 {
     QModelIndex index = this->currentIndex();
@@ -138,6 +184,10 @@ QModelIndex LeftView::restoreNotepadItem()
     return index;
 }
 
+/**
+ * @brief LeftView::setDefaultNotepadItem
+ * @return 当前选中项
+ */
 QModelIndex LeftView::setDefaultNotepadItem()
 {
     QModelIndex index = m_pSortViewFilter->index(0, 0, getNotepadRootIndex());
@@ -145,6 +195,10 @@ QModelIndex LeftView::setDefaultNotepadItem()
     return index;
 }
 
+/**
+ * @brief LeftView::addFolder
+ * @param folder
+ */
 void LeftView::addFolder(VNoteFolder *folder)
 {
     if (nullptr != folder) {
@@ -158,6 +212,10 @@ void LeftView::addFolder(VNoteFolder *folder)
     }
 }
 
+/**
+ * @brief LeftView::appendFolder
+ * @param folder
+ */
 void LeftView::appendFolder(VNoteFolder *folder)
 {
     if (nullptr != folder) {
@@ -172,11 +230,18 @@ void LeftView::appendFolder(VNoteFolder *folder)
     }
 }
 
+/**
+ * @brief LeftView::editFolder
+ */
 void LeftView::editFolder()
 {
     edit(currentIndex());
 }
 
+/**
+ * @brief LeftView::removeFolder
+ * @return 删除项绑定的数据
+ */
 VNoteFolder *LeftView::removeFolder()
 {
     QModelIndex index = currentIndex();
@@ -193,6 +258,10 @@ VNoteFolder *LeftView::removeFolder()
     return data;
 }
 
+/**
+ * @brief LeftView::folderCount
+ * @return 记事本个数
+ */
 int LeftView::folderCount()
 {
     int count = 0;
@@ -206,11 +275,18 @@ int LeftView::folderCount()
     return count;
 }
 
+/**
+ * @brief LeftView::initMenu
+ */
 void LeftView::initMenu()
 {
     m_notepadMenu = ActionManager::Instance()->notebookContextMenu();
 }
 
+/**
+ * @brief LeftView::setOnlyCurItemMenuEnable
+ * @param enable
+ */
 void LeftView::setOnlyCurItemMenuEnable(bool enable)
 {
     m_onlyCurItemMenuEnable = enable;
@@ -218,17 +294,28 @@ void LeftView::setOnlyCurItemMenuEnable(bool enable)
     this->update();
 }
 
+/**
+ * @brief LeftView::sort
+ */
 void LeftView::sort()
 {
     return m_pSortViewFilter->sort(0, Qt::DescendingOrder);
 }
 
+/**
+ * @brief LeftView::closeEditor
+ * @param editor
+ * @param hint
+ */
 void LeftView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)
 {
     Q_UNUSED(hint);
     DTreeView::closeEditor(editor, QAbstractItemDelegate::NoHint);
 }
 
+/**
+ * @brief LeftView::closeMenu
+ */
 void LeftView::closeMenu()
 {
     m_notepadMenu->close();

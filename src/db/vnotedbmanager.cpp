@@ -51,17 +51,29 @@
 
 VNoteDbManager *VNoteDbManager::_instance = nullptr;
 
+/**
+ * @brief VNoteDbManager::VNoteDbManager
+ * @param fOldDb true 老数据库
+ * @param parent
+ */
 VNoteDbManager::VNoteDbManager(bool fOldDb, QObject *parent)
     : QObject(parent)
 {
     initVNoteDb(fOldDb);
 }
 
+/**
+ * @brief VNoteDbManager::~VNoteDbManager
+ */
 VNoteDbManager::~VNoteDbManager()
 {
     m_vnoteDB.close();
 }
 
+/**
+ * @brief VNoteDbManager::instance
+ * @return 单例对象
+ */
 VNoteDbManager *VNoteDbManager::instance()
 {
     if (nullptr == _instance) {
@@ -71,11 +83,20 @@ VNoteDbManager *VNoteDbManager::instance()
     return _instance;
 }
 
+/**
+ * @brief VNoteDbManager::getVNoteDb
+ * @return 数据库对象
+ */
 QSqlDatabase &VNoteDbManager::getVNoteDb()
 {
     return m_vnoteDB;
 }
 
+/**
+ * @brief VNoteDbManager::insertData
+ * @param visitor
+ * @return true 成功
+ */
 bool VNoteDbManager::insertData(DbVisitor *visitor /*in/out*/)
 {
     CHECK_DB_INIT();
@@ -117,6 +138,11 @@ bool VNoteDbManager::insertData(DbVisitor *visitor /*in/out*/)
     return insertOK;
 }
 
+/**
+ * @brief VNoteDbManager::updateData
+ * @param visitor
+ * @return true 成功
+ */
 bool VNoteDbManager::updateData(DbVisitor *visitor /*in/out*/)
 {
     CHECK_DB_INIT();
@@ -150,6 +176,11 @@ bool VNoteDbManager::updateData(DbVisitor *visitor /*in/out*/)
     return updateOK;
 }
 
+/**
+ * @brief VNoteDbManager::queryData
+ * @param visitor
+ * @return true 成功
+ */
 bool VNoteDbManager::queryData(DbVisitor *visitor /*in/out*/)
 {
     CHECK_DB_INIT();
@@ -188,6 +219,11 @@ bool VNoteDbManager::queryData(DbVisitor *visitor /*in/out*/)
     return queryOK;
 }
 
+/**
+ * @brief VNoteDbManager::deleteData
+ * @param visitor
+ * @return true 成功
+ */
 bool VNoteDbManager::deleteData(DbVisitor *visitor /*in/out*/)
 {
     CHECK_DB_INIT();
@@ -221,6 +257,10 @@ bool VNoteDbManager::deleteData(DbVisitor *visitor /*in/out*/)
     return deleteOK;
 }
 
+/**
+ * @brief VNoteDbManager::hasOldDataBase
+ * @return true 存在老数据库
+ */
 bool VNoteDbManager::hasOldDataBase()
 {
     QString vnoteDatabasePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -237,6 +277,11 @@ bool VNoteDbManager::hasOldDataBase()
     return dbFile.exists();
 }
 
+/**
+ * @brief VNoteDbManager::initVNoteDb
+ * @param fOldDB
+ * @return 0 成功，-1失败
+ */
 int VNoteDbManager::initVNoteDb(bool fOldDB)
 {
     QString vnoteDatabasePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -282,6 +327,9 @@ int VNoteDbManager::initVNoteDb(bool fOldDB)
     return 0;
 }
 
+/**
+ * @brief VNoteDbManager::createTablesIfNeed
+ */
 void VNoteDbManager::createTablesIfNeed()
 {
     QStringList createTableSqls = QString(CREATETABLE_FMT).split(";");

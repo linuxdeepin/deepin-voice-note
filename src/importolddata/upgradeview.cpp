@@ -31,6 +31,10 @@
 #include <DFontSizeManager>
 #include <DLog>
 
+/**
+ * @brief UpgradeView::UpgradeView
+ * @param parent
+ */
 UpgradeView::UpgradeView(QWidget *parent)
     : QWidget(parent)
 {
@@ -61,6 +65,9 @@ UpgradeView::UpgradeView(QWidget *parent)
     initConnections();
 }
 
+/**
+ * @brief UpgradeView::startUpgrade
+ */
 void UpgradeView::startUpgrade()
 {
     //Update the upgrade state to loading data
@@ -69,11 +76,18 @@ void UpgradeView::startUpgrade()
     VNoteOldDataManager::instance()->reqDatas();
 }
 
+/**
+ * @brief UpgradeView::setProgress
+ * @param progress
+ */
 void UpgradeView::setProgress(int progress)
 {
     m_waterProgress->setValue(progress);
 }
 
+/**
+ * @brief UpgradeView::onDataReady
+ */
 void UpgradeView::onDataReady()
 {
     int foldersCount = VNoteOldDataManager::instance()->folders()->folders.count();
@@ -95,6 +109,9 @@ void UpgradeView::onDataReady()
     }
 }
 
+/**
+ * @brief UpgradeView::onUpgradeFinish
+ */
 void UpgradeView::onUpgradeFinish()
 {
     qInfo() << "End upgrade old data to new version.";
@@ -116,6 +133,9 @@ void UpgradeView::onUpgradeFinish()
     emit upgradeDone();
 }
 
+/**
+ * @brief UpgradeView::initConnections
+ */
 void UpgradeView::initConnections()
 {
     connect(VNoteOldDataManager::instance(), &VNoteOldDataManager::dataReady, this, &UpgradeView::onDataReady);

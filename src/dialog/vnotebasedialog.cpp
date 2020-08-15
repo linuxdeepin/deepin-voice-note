@@ -27,6 +27,10 @@
 
 #include <DFontSizeManager>
 
+/**
+ * @brief VNoteBaseDialog::VNoteBaseDialog
+ * @param parent
+ */
 VNoteBaseDialog::VNoteBaseDialog(QWidget *parent)
     : DAbstractDialog(parent)
 {
@@ -34,6 +38,9 @@ VNoteBaseDialog::VNoteBaseDialog(QWidget *parent)
     InitConnections();
 }
 
+/**
+ * @brief VNoteBaseDialog::initUI
+ */
 void VNoteBaseDialog::initUI()
 {
     QVBoxLayout *mainLayout = new QVBoxLayout();
@@ -83,6 +90,9 @@ void VNoteBaseDialog::initUI()
     setLayout(mainLayout);
 }
 
+/**
+ * @brief VNoteBaseDialog::InitConnections
+ */
 void VNoteBaseDialog::InitConnections()
 {
     connect(m_closeButton, &DWindowCloseButton::clicked, this, [this]() {
@@ -90,6 +100,10 @@ void VNoteBaseDialog::InitConnections()
     });
 }
 
+/**
+ * @brief VNoteBaseDialog::setLogoVisable
+ * @param visible true logo 可见
+ */
 void VNoteBaseDialog::setLogoVisable(bool visible)
 {
     if (nullptr != m_logoIcon) {
@@ -97,6 +111,10 @@ void VNoteBaseDialog::setLogoVisable(bool visible)
     }
 }
 
+/**
+ * @brief VNoteBaseDialog::setTitle
+ * @param title 标题
+ */
 void VNoteBaseDialog::setTitle(const QString &title)
 {
     if (nullptr != m_tileText) {
@@ -104,11 +122,19 @@ void VNoteBaseDialog::setTitle(const QString &title)
     }
 }
 
+/**
+ * @brief VNoteBaseDialog::getContentLayout
+ * @return 窗口布局
+ */
 QLayout *VNoteBaseDialog::getContentLayout()
 {
     return m_contentLayout;
 }
 
+/**
+ * @brief VNoteBaseDialog::addContent
+ * @param content 添加窗口
+ */
 void VNoteBaseDialog::addContent(QWidget *content)
 {
     Q_ASSERT(nullptr != getContentLayout());
@@ -116,6 +142,10 @@ void VNoteBaseDialog::addContent(QWidget *content)
     getContentLayout()->addWidget(content);
 }
 
+/**
+ * @brief VNoteBaseDialog::setIconPixmap
+ * @param iconPixmap
+ */
 void VNoteBaseDialog::setIconPixmap(const QPixmap &iconPixmap)
 {
     if (nullptr != m_logoIcon) {
@@ -123,6 +153,10 @@ void VNoteBaseDialog::setIconPixmap(const QPixmap &iconPixmap)
     }
 }
 
+/**
+ * @brief VNoteBaseDialog::closeEvent
+ * @param event
+ */
 void VNoteBaseDialog::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
@@ -132,6 +166,10 @@ void VNoteBaseDialog::closeEvent(QCloseEvent *event)
     Q_EMIT closed();
 }
 
+/**
+ * @brief VNoteBaseDialog::showEvent
+ * @param event
+ */
 void VNoteBaseDialog::showEvent(QShowEvent *event)
 {
     DAbstractDialog::showEvent(event);

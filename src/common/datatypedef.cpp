@@ -25,6 +25,9 @@
 
 #include <DLog>
 
+/**
+ * @brief VNOTE_FOLDERS_MAP::~VNOTE_FOLDERS_MAP
+ */
 VNOTE_FOLDERS_MAP::~VNOTE_FOLDERS_MAP()
 {
     if (autoRelease) {
@@ -38,6 +41,9 @@ VNOTE_FOLDERS_MAP::~VNOTE_FOLDERS_MAP()
     }
 }
 
+/**
+ * @brief VNOTE_ITEMS_MAP::~VNOTE_ITEMS_MAP
+ */
 VNOTE_ITEMS_MAP::~VNOTE_ITEMS_MAP()
 {
     if (autoRelease) {
@@ -51,6 +57,9 @@ VNOTE_ITEMS_MAP::~VNOTE_ITEMS_MAP()
     }
 }
 
+/**
+ * @brief VNOTE_ALL_NOTES_MAP::~VNOTE_ALL_NOTES_MAP
+ */
 VNOTE_ALL_NOTES_MAP::~VNOTE_ALL_NOTES_MAP()
 {
     if (autoRelease) {
@@ -64,6 +73,9 @@ VNOTE_ALL_NOTES_MAP::~VNOTE_ALL_NOTES_MAP()
     }
 }
 
+/**
+ * @brief VNOTE_DATAS::~VNOTE_DATAS
+ */
 VNOTE_DATAS::~VNOTE_DATAS()
 {
     for (auto it : datas) {
@@ -71,11 +83,20 @@ VNOTE_DATAS::~VNOTE_DATAS()
     }
 }
 
+/**
+ * @brief VNOTE_DATAS::dataConstRef
+ * @return 记事项数据
+ */
 const VNOTE_DATA_VECTOR &VNOTE_DATAS::dataConstRef()
 {
     return datas;
 }
 
+/**
+ * @brief VNOTE_DATAS::newBlock
+ * @param type
+ * @return 新建数据块
+ */
 VNoteBlock *VNOTE_DATAS::newBlock(int type)
 {
     VNoteBlock *ptrBlock = nullptr;
@@ -89,6 +110,10 @@ VNoteBlock *VNOTE_DATAS::newBlock(int type)
     return ptrBlock;
 }
 
+/**
+ * @brief VNOTE_DATAS::addBlock
+ * @param block
+ */
 void VNOTE_DATAS::addBlock(VNoteBlock *block)
 {
     datas.push_back(block);
@@ -97,6 +122,11 @@ void VNOTE_DATAS::addBlock(VNoteBlock *block)
     classifyAddBlk(block);
 }
 
+/**
+ * @brief VNOTE_DATAS::addBlock
+ * @param before
+ * @param block
+ */
 void VNOTE_DATAS::addBlock(VNoteBlock *before, VNoteBlock *block)
 {
     //If before is null, insert block at the head
@@ -120,6 +150,10 @@ void VNOTE_DATAS::addBlock(VNoteBlock *before, VNoteBlock *block)
     classifyAddBlk(block);
 }
 
+/**
+ * @brief VNOTE_DATAS::delBlock
+ * @param block
+ */
 void VNOTE_DATAS::delBlock(VNoteBlock *block)
 {
     int index = datas.indexOf(block);
@@ -134,6 +168,10 @@ void VNOTE_DATAS::delBlock(VNoteBlock *block)
     delete block;
 }
 
+/**
+ * @brief VNOTE_DATAS::classifyAddBlk
+ * @param block
+ */
 void VNOTE_DATAS::classifyAddBlk(VNoteBlock *block)
 {
     if (VNoteBlock::Text == block->getType()) {
@@ -145,6 +183,10 @@ void VNOTE_DATAS::classifyAddBlk(VNoteBlock *block)
     }
 }
 
+/**
+ * @brief VNOTE_DATAS::classifyDelBlk
+ * @param block
+ */
 void VNOTE_DATAS::classifyDelBlk(VNoteBlock *block)
 {
     if (VNoteBlock::Text == block->getType()) {
@@ -167,6 +209,10 @@ void VNOTE_DATAS::classifyDelBlk(VNoteBlock *block)
     //becuase it's already released.
 }
 
+/**
+ * @brief VDataSafer::isValid
+ * @return true可用
+ */
 bool VDataSafer::isValid() const
 {
     //TODO:
@@ -175,6 +221,10 @@ bool VDataSafer::isValid() const
     return !(path.isEmpty() || folder_id == INVALID_ID || note_id == INVALID_ID);
 }
 
+/**
+ * @brief VDataSafer::setSaferType
+ * @param type
+ */
 void VDataSafer::setSaferType(VDataSafer::SaferType type)
 {
     saferType = type;

@@ -32,15 +32,26 @@
 
 const QString UpgradeDbUtil::UPGRADE_STATE = "old.UpgradeDb/importOldDbState";
 
+/**
+ * @brief UpgradeDbUtil::UpgradeDbUtil
+ */
 UpgradeDbUtil::UpgradeDbUtil()
 {
 }
 
+/**
+ * @brief UpgradeDbUtil::saveUpgradeState
+ * @param state 升级标志
+ */
 void UpgradeDbUtil::saveUpgradeState(int state)
 {
     setting::instance()->setOption(UPGRADE_STATE, state);
 }
 
+/**
+ * @brief UpgradeDbUtil::readUpgradeState
+ * @return 升级标志
+ */
 int UpgradeDbUtil::readUpgradeState()
 {
     int state = Invalid;
@@ -50,6 +61,11 @@ int UpgradeDbUtil::readUpgradeState()
     return state;
 }
 
+/**
+ * @brief UpgradeDbUtil::needUpdateOldDb
+ * @param state
+ * @return true 需要升级
+ */
 bool UpgradeDbUtil::needUpdateOldDb(int state)
 {
     /*
@@ -71,6 +87,10 @@ bool UpgradeDbUtil::needUpdateOldDb(int state)
     return fNeedUpdate;
 }
 
+/**
+ * @brief UpgradeDbUtil::checkUpdateState
+ * @param state
+ */
 void UpgradeDbUtil::checkUpdateState(int state)
 {
     if (state == Processing) {
@@ -92,6 +112,9 @@ void UpgradeDbUtil::checkUpdateState(int state)
     }
 }
 
+/**
+ * @brief UpgradeDbUtil::backUpOldDb
+ */
 void UpgradeDbUtil::backUpOldDb()
 {
     QString vnoteDatabasePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
@@ -118,6 +141,9 @@ void UpgradeDbUtil::backUpOldDb()
     }
 }
 
+/**
+ * @brief UpgradeDbUtil::clearVoices
+ */
 void UpgradeDbUtil::clearVoices()
 {
     QDir oldVoiceDir(QStandardPaths::standardLocations(
@@ -134,6 +160,10 @@ void UpgradeDbUtil::clearVoices()
     }
 }
 
+/**
+ * @brief UpgradeDbUtil::doFolderUpgrade
+ * @param folder
+ */
 void UpgradeDbUtil::doFolderUpgrade(VNoteFolder *folder)
 {
     qInfo() << "" << folder;
@@ -148,6 +178,11 @@ void UpgradeDbUtil::doFolderUpgrade(VNoteFolder *folder)
     }
 }
 
+/**
+ * @brief UpgradeDbUtil::doFolderNoteUpgrade
+ * @param newFolderId
+ * @param oldFolderId
+ */
 void UpgradeDbUtil::doFolderNoteUpgrade(qint64 newFolderId, qint64 oldFolderId)
 {
     VNOTE_ALL_NOTES_MAP *allNotes = VNoteOldDataManager::instance()->allNotes();

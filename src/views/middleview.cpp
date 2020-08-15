@@ -36,6 +36,10 @@
 #include <DFileDialog>
 #include <DLog>
 
+/**
+ * @brief MiddleView::MiddleView
+ * @param parent
+ */
 MiddleView::MiddleView(QWidget *parent)
     : DListView(parent)
 {
@@ -45,6 +49,9 @@ MiddleView::MiddleView(QWidget *parent)
     initUI();
 }
 
+/**
+ * @brief MiddleView::initModel
+ */
 void MiddleView::initModel()
 {
     m_pDataModel = new QStandardItemModel(this);
@@ -56,33 +63,55 @@ void MiddleView::initModel()
     this->setModel(m_pSortViewFilter);
 }
 
+/**
+ * @brief MiddleView::initDelegate
+ */
 void MiddleView::initDelegate()
 {
     m_pItemDelegate = new MiddleViewDelegate(this);
     this->setItemDelegate(m_pItemDelegate);
 }
 
+/**
+ * @brief MiddleView::initMenu
+ */
 void MiddleView::initMenu()
 {
     m_noteMenu = ActionManager::Instance()->noteContextMenu();
 }
 
+/**
+ * @brief MiddleView::setSearchKey
+ * @param key 搜索关键字
+ */
 void MiddleView::setSearchKey(const QString &key)
 {
     m_searchKey = key;
     m_pItemDelegate->setSearchKey(key);
 }
 
+/**
+ * @brief MiddleView::setCurrentId
+ * @param id
+ */
 void MiddleView::setCurrentId(qint64 id)
 {
     m_currentId = id;
 }
 
+/**
+ * @brief MiddleView::getCurrentId
+ * @return 绑定的id
+ */
 qint64 MiddleView::getCurrentId()
 {
     return m_currentId;
 }
 
+/**
+ * @brief MiddleView::addRowAtHead
+ * @param note
+ */
 void MiddleView::addRowAtHead(VNoteItem *note)
 {
     if (nullptr != note) {
@@ -93,6 +122,10 @@ void MiddleView::addRowAtHead(VNoteItem *note)
     }
 }
 
+/**
+ * @brief MiddleView::appendRow
+ * @param note
+ */
 void MiddleView::appendRow(VNoteItem *note)
 {
     if (nullptr != note) {
@@ -101,11 +134,18 @@ void MiddleView::appendRow(VNoteItem *note)
     }
 }
 
+/**
+ * @brief MiddleView::clearAll
+ */
 void MiddleView::clearAll()
 {
     m_pDataModel->clear();
 }
 
+/**
+ * @brief MiddleView::deleteCurrentRow
+ * @return 移除的记事项绑定的数据
+ */
 VNoteItem *MiddleView::deleteCurrentRow()
 {
     QModelIndex index = currentIndex();
@@ -117,6 +157,10 @@ VNoteItem *MiddleView::deleteCurrentRow()
     return noteData;
 }
 
+/**
+ * @brief MiddleView::getCurrVNotedata
+ * @return 当前选中的记事项数据
+ */
 VNoteItem *MiddleView::getCurrVNotedata() const
 {
     QModelIndex index = currentIndex();
@@ -126,27 +170,44 @@ VNoteItem *MiddleView::getCurrVNotedata() const
     return noteData;
 }
 
+/**
+ * @brief MiddleView::onNoteChanged
+ */
 void MiddleView::onNoteChanged()
 {
     m_pSortViewFilter->sortView();
     this->scrollToTop();
 }
 
+/**
+ * @brief MiddleView::rowCount
+ * @return 记事项数目
+ */
 qint32 MiddleView::rowCount() const
 {
     return m_pDataModel->rowCount();
 }
 
+/**
+ * @brief MiddleView::setCurrentIndex
+ * @param index
+ */
 void MiddleView::setCurrentIndex(int index)
 {
     DListView::setCurrentIndex(m_pSortViewFilter->index(index, 0));
 }
 
+/**
+ * @brief MiddleView::editNote
+ */
 void MiddleView::editNote()
 {
     edit(currentIndex());
 }
 
+/**
+ * @brief MiddleView::saveAsText
+ */
 void MiddleView::saveAsText()
 {
     QModelIndex index = currentIndex();
@@ -181,6 +242,9 @@ void MiddleView::saveAsText()
     }
 }
 
+/**
+ * @brief MiddleView::saveRecords
+ */
 void MiddleView::saveRecords()
 {
     QModelIndex index = currentIndex();
@@ -216,6 +280,10 @@ void MiddleView::saveRecords()
     }
 }
 
+/**
+ * @brief MiddleView::mousePressEvent
+ * @param event
+ */
 void MiddleView::mousePressEvent(QMouseEvent *event)
 {
     this->setFocus();
@@ -235,6 +303,10 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief MiddleView::mouseReleaseEvent
+ * @param event
+ */
 void MiddleView::mouseReleaseEvent(QMouseEvent *event)
 {
     if (!m_onlyCurItemMenuEnable) {
@@ -242,6 +314,10 @@ void MiddleView::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief MiddleView::mouseDoubleClickEvent
+ * @param event
+ */
 void MiddleView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (!m_onlyCurItemMenuEnable) {
@@ -249,11 +325,21 @@ void MiddleView::mouseDoubleClickEvent(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief MiddleView::mouseMoveEvent
+ * @param event
+ */
 void MiddleView::mouseMoveEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
 }
 
+/**
+ * @brief MiddleView::eventFilter
+ * @param o
+ * @param e
+ * @return false 不过滤，事件正常处理
+ */
 bool MiddleView::eventFilter(QObject *o, QEvent *e)
 {
     Q_UNUSED(o);
@@ -267,6 +353,10 @@ bool MiddleView::eventFilter(QObject *o, QEvent *e)
     return false;
 }
 
+/**
+ * @brief MiddleView::keyPressEvent
+ * @param e
+ */
 void MiddleView::keyPressEvent(QKeyEvent *e)
 {
     if (m_onlyCurItemMenuEnable || e->key() == Qt::Key_PageUp || e->key() == Qt::Key_PageDown) {
@@ -276,6 +366,9 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
     }
 }
 
+/**
+ * @brief MiddleView::initUI
+ */
 void MiddleView::initUI()
 {
     //TODO:
@@ -299,11 +392,19 @@ void MiddleView::initUI()
     //    this->installEventFilter(this);
 }
 
+/**
+ * @brief MiddleView::setVisibleEmptySearch
+ * @param visible true 显示搜索无结果界面
+ */
 void MiddleView::setVisibleEmptySearch(bool visible)
 {
     m_emptySearch->setVisible(visible);
 }
 
+/**
+ * @brief MiddleView::setOnlyCurItemMenuEnable
+ * @param enable true 只有选中项右键菜单可弹出
+ */
 void MiddleView::setOnlyCurItemMenuEnable(bool enable)
 {
     m_onlyCurItemMenuEnable = enable;
@@ -311,12 +412,20 @@ void MiddleView::setOnlyCurItemMenuEnable(bool enable)
     this->update();
 }
 
+/**
+ * @brief MiddleView::closeEditor
+ * @param editor
+ * @param hint
+ */
 void MiddleView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)
 {
     Q_UNUSED(hint);
     DListView::closeEditor(editor, QAbstractItemDelegate::NoHint);
 }
 
+/**
+ * @brief MiddleView::closeMenu
+ */
 void MiddleView::closeMenu()
 {
     m_noteMenu->close();

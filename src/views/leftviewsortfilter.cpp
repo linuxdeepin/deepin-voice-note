@@ -23,11 +23,21 @@
 #include "common/vnoteforlder.h"
 #include "common/standarditemcommon.h"
 
+/**
+ * @brief LeftViewSortFilter::LeftViewSortFilter
+ * @param parent
+ */
 LeftViewSortFilter::LeftViewSortFilter(QObject *parent)
     : QSortFilterProxyModel(parent)
 {
 }
 
+/**
+ * @brief LeftViewSortFilter::lessThan
+ * @param source_left
+ * @param source_right
+ * @return true source_left小于source_right
+ */
 bool LeftViewSortFilter::lessThan(
     const QModelIndex &source_left,
     const QModelIndex &source_right) const

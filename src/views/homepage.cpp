@@ -28,6 +28,10 @@
 #include <DApplicationHelper>
 #include <DFontSizeManager>
 
+/**
+ * @brief HomePage::HomePage
+ * @param parent
+ */
 HomePage::HomePage(QWidget *parent)
     : QWidget(parent)
 {
@@ -35,6 +39,9 @@ HomePage::HomePage(QWidget *parent)
     initConnection();
 }
 
+/**
+ * @brief HomePage::initUi
+ */
 void HomePage::initUi()
 {
     m_PushButton = new DSuggestButton(
@@ -75,6 +82,9 @@ void HomePage::initUi()
     this->setLayout(layout);
 }
 
+/**
+ * @brief HomePage::initConnection
+ */
 void HomePage::initConnection()
 {
     connect(m_PushButton, SIGNAL(clicked()), this, SIGNAL(sigAddFolderByInitPage()));

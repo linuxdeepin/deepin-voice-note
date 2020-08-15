@@ -31,6 +31,11 @@
 #include <DStyle>
 #include <DApplicationHelper>
 
+/**
+ * @brief TextNoteItem::TextNoteItem
+ * @param noteBlock 绑定的数据
+ * @param parent
+ */
 TextNoteItem::TextNoteItem(VNoteBlock *noteBlock, QWidget *parent)
     : DetailItemWidget(parent)
     , m_noteBlock(noteBlock)
@@ -41,6 +46,9 @@ TextNoteItem::TextNoteItem(VNoteBlock *noteBlock, QWidget *parent)
     onChangeTheme();
 }
 
+/**
+ * @brief TextNoteItem::initUi
+ */
 void TextNoteItem::initUi()
 {
     m_textEdit = new TextNoteEdit(this);
@@ -56,6 +64,9 @@ void TextNoteItem::initUi()
     this->setLayout(layout);
 }
 
+/**
+ * @brief TextNoteItem::initConnection
+ */
 void TextNoteItem::initConnection()
 {
     QTextDocument *document = m_textEdit->document();
@@ -75,6 +86,10 @@ void TextNoteItem::initConnection()
             this, &TextNoteItem::onChangeTheme);
 }
 
+/**
+ * @brief TextNoteItem::updateSearchKey
+ * @param searchKey 搜索关键字
+ */
 void TextNoteItem::updateSearchKey(QString searchKey)
 {
     if (m_noteBlock) {
@@ -93,36 +108,64 @@ void TextNoteItem::updateSearchKey(QString searchKey)
     }
 }
 
+/**
+ * @brief TextNoteItem::setTextCursor
+ * @param cursor
+ */
 void TextNoteItem::setTextCursor(const QTextCursor &cursor)
 {
     m_textEdit->setTextCursor(cursor);
 }
 
+/**
+ * @brief TextNoteItem::getTextCursor
+ * @return 编辑器光标
+ */
 QTextCursor TextNoteItem::getTextCursor()
 {
     return m_textEdit->textCursor();
 }
 
+/**
+ * @brief TextNoteItem::getNoteBlock
+ * @return 绑定数据
+ */
 VNoteBlock *TextNoteItem::getNoteBlock()
 {
     return m_noteBlock;
 }
 
+/**
+ * @brief TextNoteItem::textIsEmpty
+ * @return true 没有内容
+ */
 bool TextNoteItem::textIsEmpty()
 {
     return m_textEdit->document()->isEmpty();
 }
 
+/**
+ * @brief TextNoteItem::getCursorRect
+ * @return 光标区域
+ */
 QRect TextNoteItem::getCursorRect()
 {
     return m_textEdit->cursorRect(m_textEdit->textCursor());
 }
 
+/**
+ * @brief TextNoteItem::selectText
+ * @param globalPos
+ * @param op
+ */
 void TextNoteItem::selectText(const QPoint &globalPos, QTextCursor::MoveOperation op)
 {
     return m_textEdit->selectText(globalPos, op);
 }
 
+/**
+ * @brief TextNoteItem::selectAllText
+ */
 void TextNoteItem::selectAllText()
 {
     if (m_selectAll == false) {
@@ -133,52 +176,88 @@ void TextNoteItem::selectAllText()
     }
 }
 
+/**
+ * @brief TextNoteItem::selectText
+ * @param op
+ */
 void TextNoteItem::selectText(QTextCursor::MoveOperation op)
 {
     return m_textEdit->moveCursor(op, QTextCursor::KeepAnchor);
 }
 
+/**
+ * @brief TextNoteItem::removeSelectText
+ */
 void TextNoteItem::removeSelectText()
 {
     return m_textEdit->removeSelectText();
 }
 
+/**
+ * @brief TextNoteItem::clearSelection
+ */
 void TextNoteItem::clearSelection()
 {
     m_selectAll = false;
     return m_textEdit->clearSelection();
 }
 
+/**
+ * @brief TextNoteItem::hasSelection
+ * @return true 有选中内容
+ */
 bool TextNoteItem::hasSelection()
 {
     return m_selectAll || m_textEdit->hasSelection();
 }
 
+/**
+ * @brief TextNoteItem::getSelectFragment
+ * @return 选中片段
+ */
 QTextDocumentFragment TextNoteItem::getSelectFragment()
 {
     return getTextCursor().selection();
 }
 
+/**
+ * @brief TextNoteItem::setFocus
+ */
 void TextNoteItem::setFocus()
 {
     return m_textEdit->setFocus();
 }
 
+/**
+ * @brief TextNoteItem::hasFocus
+ * @return true 有焦点
+ */
 bool TextNoteItem::hasFocus()
 {
     return m_textEdit->hasFocus();
 }
 
+/**
+ * @brief TextNoteItem::isSelectAll
+ * @return true 全选
+ */
 bool TextNoteItem::isSelectAll()
 {
     return m_selectAll;
 }
 
+/**
+ * @brief TextNoteItem::getTextDocument
+ * @return 整个文档管理对象
+ */
 QTextDocument *TextNoteItem::getTextDocument()
 {
     return m_textEdit->document();
 }
 
+/**
+ * @brief TextNoteItem::pasteText
+ */
 void TextNoteItem::pasteText()
 {
     QClipboard *board = QApplication::clipboard();
@@ -189,6 +268,9 @@ void TextNoteItem::pasteText()
     }
 }
 
+/**
+ * @brief TextNoteItem::onTextChange
+ */
 void TextNoteItem::onTextChange()
 {
     if (m_isSearching == false) {
@@ -199,6 +281,9 @@ void TextNoteItem::onTextChange()
     }
 }
 
+/**
+ * @brief TextNoteItem::onTextCursorChange
+ */
 void TextNoteItem::onTextCursorChange()
 {
     if (this->hasFocus()) {
@@ -210,11 +295,18 @@ void TextNoteItem::onTextCursorChange()
     }
 }
 
+/**
+ * @brief TextNoteItem::setLastCursorHeight
+ * @param height
+ */
 void TextNoteItem::setLastCursorHeight(int height)
 {
     m_lastCursorHeight = height;
 }
 
+/**
+ * @brief TextNoteItem::onChangeTheme
+ */
 void TextNoteItem::onChangeTheme()
 {
     DPalette appDp = DApplicationHelper::instance()->applicationPalette();

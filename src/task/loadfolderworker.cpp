@@ -25,11 +25,18 @@
 
 #include <DLog>
 
+/**
+ * @brief LoadFolderWorker::LoadFolderWorker
+ * @param parent
+ */
 LoadFolderWorker::LoadFolderWorker(QObject *parent)
     : VNTask(parent)
 {
 }
 
+/**
+ * @brief LoadFolderWorker::run
+ */
 void LoadFolderWorker::run()
 {
     static struct timeval start, backups, end;

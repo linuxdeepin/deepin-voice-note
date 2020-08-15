@@ -55,6 +55,10 @@
 #include <DApplication>
 #include <DStyle>
 
+/**
+ * @brief RightView::RightView
+ * @param parent
+ */
 RightView::RightView(QWidget *parent)
     : QWidget(parent)
 {
@@ -63,6 +67,9 @@ RightView::RightView(QWidget *parent)
     initConnection();
 }
 
+/**
+ * @brief RightView::initUi
+ */
 void RightView::initUi()
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -90,12 +97,23 @@ void RightView::initUi()
     m_playAnimTimer->setInterval(300);
 }
 
+/**
+ * @brief RightView::initMenu
+ */
 void RightView::initMenu()
 {
     //Init voice context Menu
     m_noteDetailContextMenu = ActionManager::Instance()->detialContextMenu();
 }
 
+/**
+ * @brief RightView::insertTextEdit
+ * @param data
+ * @param focus
+ * @param op
+ * @param reg
+ * @return 插入的编辑器窗口
+ */
 DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextCursor::MoveOperation op, QString reg)
 {
     TextNoteItem *editItem = nullptr;
@@ -134,6 +152,12 @@ DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextC
     return editItem;
 }
 
+/**
+ * @brief RightView::insertVoiceItem
+ * @param voicePath
+ * @param voiceSize
+ * @return 插入的语音窗口
+ */
 DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
 {
     if (m_curItemWidget == nullptr || m_noteItemData == nullptr) {
@@ -226,6 +250,9 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
     return m_curItemWidget;
 }
 
+/**
+ * @brief RightView::onTextEditFocusIn
+ */
 void RightView::onTextEditFocusIn()
 {
     if(m_curAsrItem){
@@ -239,6 +266,9 @@ void RightView::onTextEditFocusIn()
     }
 }
 
+/**
+ * @brief RightView::onTextEditFocusOut
+ */
 void RightView::onTextEditFocusOut()
 {
     if (m_fIsNoteModified) {
@@ -248,6 +278,9 @@ void RightView::onTextEditFocusOut()
     saveNote();
 }
 
+/**
+ * @brief RightView::onTextEditTextChange
+ */
 void RightView::onTextEditTextChange()
 {
     m_fIsNoteModified = true;
@@ -257,6 +290,12 @@ void RightView::onTextEditTextChange()
     }
 }
 
+/**
+ * @brief RightView::initData
+ * @param data
+ * @param reg 搜索关键字
+ * @param fouse true 设置焦点
+ */
 void RightView::initData(VNoteItem *data, QString reg, bool fouse)
 {
     this->setVisible(false);
@@ -346,6 +385,10 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
     this->setVisible(true);
 }
 
+/**
+ * @brief RightView::onVoicePlay
+ * @param item
+ */
 void RightView::onVoicePlay(VoiceNoteItem *item)
 {
     VNVoiceBlock *data = item->getNoteBlock()->ptrVoice;
@@ -370,12 +413,19 @@ void RightView::onVoicePlay(VoiceNoteItem *item)
     }
 }
 
+/**
+ * @brief RightView::onVoicePause
+ * @param item
+ */
 void RightView::onVoicePause(VoiceNoteItem *item)
 {
     item->showPlayBtn();
     emit sigVoicePause(item->getNoteBlock()->ptrVoice);
 }
 
+/**
+ * @brief RightView::onPlayUpdate
+ */
 void RightView::onPlayUpdate()
 {
     if (nullptr != m_curPlayItem) {
@@ -383,6 +433,10 @@ void RightView::onPlayUpdate()
     }
 }
 
+/**
+ * @brief RightView::leaveEvent
+ * @param event
+ */
 void RightView::leaveEvent(QEvent *event)
 {
     Q_UNUSED(event);
@@ -391,6 +445,9 @@ void RightView::leaveEvent(QEvent *event)
     saveNote();
 }
 
+/**
+ * @brief RightView::saveNote
+ */
 void RightView::saveNote()
 {
     //qInfo() << __FUNCTION__ << "Is note changed:" << m_fIsNoteModified;
@@ -417,6 +474,11 @@ void RightView::saveNote()
     }
 }
 
+/**
+ * @brief RightView::initAction
+ * @param widget
+ * @return -1,不弹出右键菜单
+ */
 int RightView::initAction(DetailItemWidget *widget)
 {
     bool TTSisWorking = false;
@@ -573,6 +635,10 @@ int RightView::initAction(DetailItemWidget *widget)
     return 0;
 }
 
+/**
+ * @brief RightView::onMenuShow
+ * @param widget
+ */
 void RightView::onMenuShow(DetailItemWidget *widget)
 {
     if (initAction(widget) != -1) {
@@ -580,6 +646,11 @@ void RightView::onMenuShow(DetailItemWidget *widget)
     }
 }
 
+/**
+ * @brief RightView::delWidget
+ * @param widget
+ * @param merge true 合并编辑窗口
+ */
 void RightView::delWidget(DetailItemWidget *widget, bool merge)
 {
     QList<VNoteBlock *> noteBlockList;
@@ -694,6 +765,10 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
     }
 }
 
+/**
+ * @brief RightView::setEnablePlayBtn
+ * @param enable
+ */
 void RightView::setEnablePlayBtn(bool enable)
 {
     for (int i = 0; i < m_viewportLayout->count() - 1; i++) {
@@ -707,12 +782,20 @@ void RightView::setEnablePlayBtn(bool enable)
     }
 }
 
+/**
+ * @brief RightView::updateData
+ */
 void RightView::updateData()
 {
     m_fIsNoteModified = true;
     saveNote();
 }
 
+/**
+ * @brief RightView::checkFileExist
+ * @param file
+ * @return true 文件存在
+ */
 bool RightView::checkFileExist(const QString &file)
 {
     QFileInfo fi(file);
@@ -723,6 +806,11 @@ bool RightView::checkFileExist(const QString &file)
     return true;
 }
 
+/**
+ * @brief RightView::adjustVerticalScrollBar
+ * @param widget
+ * @param defaultHeight
+ */
 void RightView::adjustVerticalScrollBar(QWidget *widget, int defaultHeight)
 {
     int tolHeight = defaultHeight + 20;
@@ -733,6 +821,10 @@ void RightView::adjustVerticalScrollBar(QWidget *widget, int defaultHeight)
     emit sigCursorChange(tolHeight, false);
 }
 
+/**
+ * @brief RightView::mouseMoveEvent
+ * @param event
+ */
 void RightView::mouseMoveEvent(QMouseEvent *event)
 {
     if (m_noteItemData == nullptr) {
@@ -742,6 +834,10 @@ void RightView::mouseMoveEvent(QMouseEvent *event)
     mouseMoveSelect(event);
 }
 
+/**
+ * @brief RightView::mousePressEvent
+ * @param event
+ */
 void RightView::mousePressEvent(QMouseEvent *event)
 {
     DWidget::mousePressEvent(event);
@@ -790,6 +886,10 @@ void RightView::mousePressEvent(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief RightView::mouseReleaseEvent
+ * @param event
+ */
 void RightView::mouseReleaseEvent(QMouseEvent *event)
 {
     DWidget::mouseReleaseEvent(event);
@@ -828,6 +928,11 @@ void RightView::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief RightView::getWidgetByPos
+ * @param pos
+ * @return 窗口
+ */
 DetailItemWidget *RightView::getWidgetByPos(const QPoint &pos)
 {
     for (int i = 0; i < m_viewportLayout->count() - 1; i++) {
@@ -839,6 +944,10 @@ DetailItemWidget *RightView::getWidgetByPos(const QPoint &pos)
     return nullptr;
 }
 
+/**
+ * @brief RightView::mouseMoveSelect
+ * @param event
+ */
 void RightView::mouseMoveSelect(QMouseEvent *event)
 {
     DetailItemWidget *widget = getWidgetByPos(event->pos());
@@ -911,6 +1020,10 @@ void RightView::mouseMoveSelect(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief RightView::copySelectText
+ * @param voiceText
+ */
 void RightView::copySelectText(bool voiceText)
 {
     QString text = getSelectText(voiceText);
@@ -923,6 +1036,11 @@ void RightView::copySelectText(bool voiceText)
     }
 }
 
+/**
+ * @brief RightView::getSelectText
+ * @param voiceText
+ * @return 选中的文本
+ */
 QString RightView::getSelectText(bool voiceText)
 {
     QString text = "";
@@ -952,6 +1070,9 @@ QString RightView::getSelectText(bool voiceText)
     return text;
 }
 
+/**
+ * @brief RightView::cutSelectText
+ */
 void RightView::cutSelectText()
 {
     int ret = showWarningDialog();
@@ -968,6 +1089,9 @@ void RightView::cutSelectText()
     }
 }
 
+/**
+ * @brief RightView::delSelectText
+ */
 void RightView::delSelectText()
 {
     QList<DetailItemWidget *> delListWidget;
@@ -996,6 +1120,9 @@ void RightView::delSelectText()
     updateData();
 }
 
+/**
+ * @brief RightView::clearAllSelection
+ */
 void RightView::clearAllSelection()
 {
     if (m_selectWidget.size()) {
@@ -1017,6 +1144,9 @@ void RightView::clearAllSelection()
     }
 }
 
+/**
+ * @brief RightView::selectAllItem
+ */
 void RightView::selectAllItem()
 {
     m_selectWidget.clear();
@@ -1040,6 +1170,9 @@ void RightView::selectAllItem()
     }
 }
 
+/**
+ * @brief RightView::pasteText
+ */
 void RightView::pasteText()
 {
     if (m_curItemWidget && m_curItemWidget->hasFocus() && m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Text) {
@@ -1052,6 +1185,10 @@ void RightView::pasteText()
     }
 }
 
+/**
+ * @brief RightView::keyPressEvent
+ * @param e
+ */
 void RightView::keyPressEvent(QKeyEvent *e)
 {
     DWidget::keyPressEvent(e);
@@ -1087,26 +1224,46 @@ void RightView::keyPressEvent(QKeyEvent *e)
     }
 }
 
+/**
+ * @brief RightView::setCurVoicePlay
+ * @param item
+ */
 void RightView::setCurVoicePlay(VoiceNoteItem *item)
 {
     m_curPlayItem = item;
 }
 
+/**
+ * @brief RightView::setCurVoiceAsr
+ * @param item
+ */
 void RightView::setCurVoiceAsr(VoiceNoteItem *item)
 {
     m_curAsrItem = item;
 }
 
+/**
+ * @brief RightView::getCurVoicePlay
+ * @return 当前播放语音窗口
+ */
 VoiceNoteItem *RightView::getCurVoicePlay()
 {
     return m_curPlayItem;
 }
 
+/**
+ * @brief RightView::getCurVoiceAsr
+ * @return 当前语音转文字窗口
+ */
 VoiceNoteItem *RightView::getCurVoiceAsr()
 {
     return m_curAsrItem;
 }
 
+/**
+ * @brief RightView::showWarningDialog
+ * @return 0不显示，1显示，-1错误
+ */
 int RightView::showWarningDialog()
 {
     auto voiceWidget = m_selectWidget.values(VoicePlugin);
@@ -1133,11 +1290,17 @@ int RightView::showWarningDialog()
     return 0;
 }
 
+/**
+ * @brief RightView::initConnection
+ */
 void RightView::initConnection()
 {
     connect(m_playAnimTimer, &QTimer::timeout, this, &RightView::onPlayUpdate);
 }
 
+/**
+ * @brief RightView::saveMp3
+ */
 void RightView::saveMp3()
 {
     DetailItemWidget *widget = getOnlyOneSelectVoice();
@@ -1178,6 +1341,11 @@ void RightView::saveMp3()
     }
 }
 
+/**
+ * @brief RightView::isAllWidgetEmpty
+ * @param widget
+ * @return true 窗口没有文本内容
+ */
 bool RightView::isAllWidgetEmpty(const QList<DetailItemWidget *> &widget)
 {
     for (auto it : widget) {
@@ -1189,6 +1357,10 @@ bool RightView::isAllWidgetEmpty(const QList<DetailItemWidget *> &widget)
     return true;
 }
 
+/**
+ * @brief RightView::getOnlyOneSelectVoice
+ * @return 选中的语音窗口
+ */
 DetailItemWidget *RightView::getOnlyOneSelectVoice()
 {
     auto voiceWidget = m_selectWidget.values(VoicePlugin);
@@ -1210,6 +1382,10 @@ DetailItemWidget *RightView::getOnlyOneSelectVoice()
     return nullptr;
 }
 
+/**
+ * @brief RightView::removeSelectWidget
+ * @param widget
+ */
 void RightView::removeSelectWidget(DetailItemWidget *widget)
 {
     QMutableMapIterator<ItemWidgetType, DetailItemWidget *> it(m_selectWidget);
@@ -1221,6 +1397,9 @@ void RightView::removeSelectWidget(DetailItemWidget *widget)
     }
 }
 
+/**
+ * @brief RightView::onTextEditSelectChange
+ */
 void RightView::onTextEditSelectChange()
 {
     TextNoteItem *editItem = static_cast<TextNoteItem *>(sender());
@@ -1229,6 +1408,10 @@ void RightView::onTextEditSelectChange()
     }
 }
 
+/**
+ * @brief RightView::removeCacheWidget
+ * @param data
+ */
 void RightView::removeCacheWidget(VNoteItem *data)
 {
     if (data != nullptr && !m_mapWidgetCache.isEmpty()) {
@@ -1243,6 +1426,10 @@ void RightView::removeCacheWidget(VNoteItem *data)
     }
 }
 
+/**
+ * @brief RightView::removeCacheWidget
+ * @param data
+ */
 void RightView::removeCacheWidget(const VNoteFolder *data)
 {
     if (data != nullptr && !m_mapWidgetCache.isEmpty()) {
@@ -1258,6 +1445,9 @@ void RightView::removeCacheWidget(const VNoteFolder *data)
     }
 }
 
+/**
+ * @brief RightView::closeMenu
+ */
 void RightView::closeMenu()
 {
     m_noteDetailContextMenu->close();

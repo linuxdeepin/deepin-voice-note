@@ -42,15 +42,18 @@ public:
         //        Disabled, //Not support this state now
         MaxState
     };
-
     bool isPressed() const;
+    //设置按钮状态
     void setState(int state);
 signals:
 
 public slots:
 protected:
+    //鼠标释放
     void mouseReleaseEvent(QMouseEvent *event) override;
+    //更新图标
     void updateIcon();
+    //设置图标是否区分主题
     void setCommonIcon(bool isCommon);
 
     QString m_icons[MaxState];

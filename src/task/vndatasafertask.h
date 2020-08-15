@@ -25,7 +25,7 @@
 #include "common/datatypedef.h"
 
 #include <QObject>
-
+//语音缓存记录执行线程
 class VNDataSaferTask : public VNTask
 {
     Q_OBJECT
@@ -35,6 +35,7 @@ signals:
 
 public slots:
 protected:
+    //缓存数据同步
     virtual void run();
 
 protected:

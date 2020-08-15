@@ -26,6 +26,13 @@
 
 #include <DLog>
 
+/**
+ * @brief VNoteIconButton::VNoteIconButton
+ * @param parent
+ * @param normal
+ * @param hover
+ * @param press
+ */
 VNoteIconButton::VNoteIconButton(QWidget *parent, QString normal, QString hover, QString press)
     : DIconButton(parent)
 {
@@ -42,15 +49,26 @@ VNoteIconButton::VNoteIconButton(QWidget *parent, QString normal, QString hover,
             this, &VNoteIconButton::onThemeChanged);
 }
 
+/**
+ * @brief VNoteIconButton::~VNoteIconButton
+ */
 VNoteIconButton::~VNoteIconButton()
 {
 }
 
+/**
+ * @brief VNoteIconButton::setSeparateThemIcons
+ * @param separate
+ */
 void VNoteIconButton::setSeparateThemIcons(bool separate)
 {
     m_separateThemeIcon = separate;
 }
 
+/**
+ * @brief VNoteIconButton::SetDisableIcon
+ * @param disableIcon
+ */
 void VNoteIconButton::SetDisableIcon(const QString &disableIcon)
 {
     if (!disableIcon.isEmpty()) {
@@ -58,6 +76,10 @@ void VNoteIconButton::SetDisableIcon(const QString &disableIcon)
     }
 }
 
+/**
+ * @brief VNoteIconButton::setBtnDisabled
+ * @param disabled
+ */
 void VNoteIconButton::setBtnDisabled(bool disabled)
 {
     //The disable icon should be supplied
@@ -76,6 +98,10 @@ void VNoteIconButton::setBtnDisabled(bool disabled)
     }
 }
 
+/**
+ * @brief VNoteIconButton::enterEvent
+ * @param event
+ */
 void VNoteIconButton::enterEvent(QEvent *event)
 {
     Q_UNUSED(event);
@@ -87,6 +113,10 @@ void VNoteIconButton::enterEvent(QEvent *event)
     }
 }
 
+/**
+ * @brief VNoteIconButton::leaveEvent
+ * @param event
+ */
 void VNoteIconButton::leaveEvent(QEvent *event)
 {
     Q_UNUSED(event);
@@ -98,6 +128,10 @@ void VNoteIconButton::leaveEvent(QEvent *event)
     }
 }
 
+/**
+ * @brief VNoteIconButton::mousePressEvent
+ * @param event
+ */
 void VNoteIconButton::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() != Qt::LeftButton) {
@@ -113,6 +147,10 @@ void VNoteIconButton::mousePressEvent(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief VNoteIconButton::mouseReleaseEvent
+ * @param event
+ */
 void VNoteIconButton::mouseReleaseEvent(QMouseEvent *event)
 {
     event->accept();
@@ -132,6 +170,10 @@ void VNoteIconButton::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief VNoteIconButton::mouseMoveEvent
+ * @param event
+ */
 void VNoteIconButton::mouseMoveEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
@@ -145,6 +187,10 @@ void VNoteIconButton::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief VNoteIconButton::onThemeChanged
+ * @param type
+ */
 void VNoteIconButton::onThemeChanged(DGuiApplicationHelper::ColorType type)
 {
     Q_UNUSED(type);
@@ -152,6 +198,11 @@ void VNoteIconButton::onThemeChanged(DGuiApplicationHelper::ColorType type)
     updateIcon();
 }
 
+/**
+ * @brief VNoteIconButton::loadPixmap
+ * @param path
+ * @return 加载图标
+ */
 QPixmap VNoteIconButton::loadPixmap(const QString &path)
 {
     DGuiApplicationHelper::ColorType theme =
@@ -192,6 +243,9 @@ QPixmap VNoteIconButton::loadPixmap(const QString &path)
     return pixmap;
 }
 
+/**
+ * @brief VNoteIconButton::updateIcon
+ */
 void VNoteIconButton::updateIcon()
 {
     if (!m_icons[m_state].isEmpty()) {

@@ -27,6 +27,7 @@
 #include <QObject>
 #include <QRunnable>
 
+//一个记事项文本，语音导出线程
 class ExportNoteWorker : public VNTask
 {
     Q_OBJECT
@@ -52,15 +53,20 @@ public:
     };
 
 signals:
+    //导出完成信号
     void exportFinished(int state);
 public slots:
 protected:
     virtual void run() override;
-
+    //检查路径
     int checkPath();
+    //导出文本
     int exportText();
+    //导出所有语音
     int exportAllVoice();
+    //导出所有文本和语音
     int exportAll();
+    //导出一个语音
     int exportOneVoice(VNoteBlock *block);
 
     int m_exportType {ExportNothing};

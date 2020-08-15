@@ -25,7 +25,7 @@
 #include "common/datatypedef.h"
 
 #include <QObject>
-
+//加载语音缓存线程
 class LoadSafeteyDataWorker : public VNTask
 {
     Q_OBJECT
@@ -33,9 +33,11 @@ public:
     explicit LoadSafeteyDataWorker(QObject *parent = nullptr);
 
 signals:
+    //加载完成
     void saferLoaded(SafetyDatas *safers);
 public slots:
 protected:
+    //加载数据
     virtual void run();
 };
 

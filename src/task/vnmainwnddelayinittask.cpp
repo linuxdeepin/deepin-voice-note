@@ -22,12 +22,20 @@
 #include "common/vnotedatasafefymanager.h"
 #include "views/vnotemainwindow.h"
 
+/**
+ * @brief VNMainWndDelayInitTask::VNMainWndDelayInitTask
+ * @param pMainWnd 主窗口
+ * @param parent
+ */
 VNMainWndDelayInitTask::VNMainWndDelayInitTask(VNoteMainWindow *pMainWnd, QObject *parent)
     : VNTask(parent)
     , m_pMainWnd(pMainWnd)
 {
 }
 
+/**
+ * @brief VNMainWndDelayInitTask::run
+ */
 void VNMainWndDelayInitTask::run()
 {
     VNoteDataSafefyManager::instance()->reqSafers();

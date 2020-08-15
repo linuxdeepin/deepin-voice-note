@@ -41,16 +41,25 @@ public:
     VNOTE_ALL_NOTES_MAP *allNotes();
 
     //Should be called before reqDatas
+    //初始化老数据库
     void initOldDb();
+    //启动老数据库数据加载线程
     void reqDatas();
+    //启动升级线程
     void doUpgrade();
 signals:
+    //数据加载完成信号
     void dataReady();
+    //升级结束信号
     void upgradeFinish();
+    //进度改变信号
     void progressValue(int value);
 public slots:
+    //加载完成
     void onFinishLoad();
+    //升级结束
     void onFinishUpgrade();
+    //进度改变
     void onProgress(int value);
 
 protected:

@@ -64,6 +64,7 @@ class VNoteMainWindow : public DMainWindow
 public:
     VNoteMainWindow(QWidget *parent = nullptr);
     virtual ~VNoteMainWindow() override;
+    //提示框选择是否关闭应用
     bool checkIfNeedExit();
 
     enum WindowType {
@@ -89,72 +90,117 @@ public:
     };
 
 protected:
+    //初始化UI布局
     void initUI();
+    //加载数据
     void initData();
+    //初始化配置参数
     void initAppSetting();
+    //连接槽函数
     void initConnections();
+    //初始化快捷键
     void initShortcuts();
+    //初始化标题栏
     void initTitleBar();
+    //初始化主窗口
     void initMainView();
+    //初始化记事本列表
     void initLeftView();
+    //初始化记事项列表
     void initMiddleView();
+    //初始化详情页
     void initRightView();
+    //初始化语音转文字模块
     void initA2TManager();
+    //初始化系统注销关机提示模块
     void initLogin1Manager();
+    //阻塞关机/注销
     void holdHaltLock();
+    //取消阻塞关机/注销
     void releaseHaltLock();
+    //初始化延时任务
     void initDelayWork();
+    //延时任务
     void delayInitTasks();
 
 #ifdef IMPORT_OLD_VERSION_DATA
     //*******Upgrade old Db code here only********
     void initUpgradeView();
 #endif
-
-    void initSpliterView(); //正常主窗口
-    void initSplashView(); // Splash animation view
+    //初始化有数据的窗口
+    void initSpliterView();
+    //初始化加载动画
+    void initSplashView();
+    //初始化无数据窗口
     void initEmptyFoldersView();
+    //设置一些操作状态
     void setSpecialStatus(SpecialStatus status);
+    //窗口切换
     void switchWidget(WindowType type);
-
+    //重写窗口事件
+    //大小改变
     void resizeEvent(QResizeEvent *event) override;
+    //窗口关闭
     void closeEvent(QCloseEvent *event) override;
+    //按键处理
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
-signals:
-    void sigDltSelectContant();
 
 public slots:
+    //记事本数据加载完成
     void onVNoteFoldersLoaded();
+    //当前记事本改变
     void onVNoteFolderChange(const QModelIndex &current, const QModelIndex &previous);
+    //当前记事项改变
     void onVNoteChange(const QModelIndex &previous);
+    //处理右键菜单
     void onMenuAction(QAction *action);
-    //Process all context menu states
+    //右键菜单弹出显示处理
     void onMenuAbout2Show();
+    //搜索
     void onVNoteSearch();
+    //搜索关键字改变
     void onVNoteSearchTextChange(const QString &text);
-    void onCursorChange(int height, bool mouseMove); //调整详情页滚动条
-    void onStartRecord(const QString &path); //开始录音
-    void onFinshRecord(const QString &voicePath, qint64 voiceSize); //结束录音
+    //调整详情页滚动条
+    void onCursorChange(int height, bool mouseMove);
+    //开始录音
+    void onStartRecord(const QString &path);
+    //结束录音
+    void onFinshRecord(const QString &voicePath, qint64 voiceSize);
+    //详情页播放事件处理
     void onRightViewVoicePlay(VNVoiceBlock *voiceData);
+    //详情页暂停播放事件处理
     void onRightViewVoicePause(VNVoiceBlock *voiceData);
+    //播放窗口播放事件处理
     void onPlayPlugVoicePlay(VNVoiceBlock *voiceData);
+    //播放窗口暂停播放事件处理
     void onPlayPlugVoicePause(VNVoiceBlock *voiceData);
+    //播放窗口停止播放
     void onPlayPlugVoiceStop(VNVoiceBlock *voiceData);
+    //新建记事本
     void onNewNotebook();
+    //新建记事项
     void onNewNote();
-
+    //主题改变
     void onChangeTheme();
-    //Audio to text API
+    //开始转文字
     void onA2TStart(bool first = true);
+    //转写失败，重新转文字
     void onA2TStartAgain();
+    //转写错误
     void onA2TError(int error);
+    //转写成功
     void onA2TSuccess(const QString &text);
-    //Shotcuts slots
+    //快捷键帮助
     void onPreviewShortcut();
+    //初始化转写错误提示窗口
     void initAsrErrMessage();
+    //初始化设备异常提示窗口
     void initDeviceExceptionErrMessage();
+    //显示转写失败提示框
     void showAsrErrMessage(const QString &strMessage);
+    //显示设备异常提示框
     void showDeviceExceptionErrMessage();
+    //关闭设备异常提示框
     void closeDeviceExceptionErrMessage();
     //System shutdon
     void onSystemDown(bool active);
@@ -165,21 +211,32 @@ public slots:
 
 private:
     //左侧列表视图操作相关
+    //添加记事本
     void addNotepad();
+    //记事本重命名
     void editNotepad();
+    //记事本删除
     void delNotepad();
+    //初始化数据
     int loadNotepads();
 
     //中间列表视图操作
+    //添加记事项
     void addNote();
+    //记事项重命名
     void editNote();
+    //删除记事项
     void delNote();
+    //初始化数据
     int loadNotes(VNoteFolder *folder);
+    //根据搜索关键字加载数据
     int loadSearchNotes(const QString &key);
 
     //Check if wen can do shortcuts
     bool canDoShortcutAction() const;
+    //资源释放
     void release();
+    //标题栏菜单项功能扩展
     void initMenuExtension();
 
 private:

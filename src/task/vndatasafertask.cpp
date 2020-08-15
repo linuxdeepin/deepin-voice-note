@@ -23,12 +23,20 @@
 
 #include <DLog>
 
+/**
+ * @brief VNDataSaferTask::VNDataSaferTask
+ * @param safer 数据对象
+ * @param parent
+ */
 VNDataSaferTask::VNDataSaferTask(const VDataSafer &safer, QObject *parent)
     : VNTask(parent)
     , m_dataSafer(safer)
 {
 }
 
+/**
+ * @brief VNDataSaferTask::run
+ */
 void VNDataSaferTask::run()
 {
     VNoteSaferOper saferOper;

@@ -20,6 +20,10 @@
 */
 #include "vntask.h"
 
+/**
+ * @brief VNTask::VNTask
+ * @param parent
+ */
 VNTask::VNTask(QObject *parent)
     : QObject(parent)
     , QRunnable()

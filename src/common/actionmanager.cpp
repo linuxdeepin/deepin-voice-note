@@ -30,11 +30,18 @@
 
 ActionManager *ActionManager::_instance = nullptr;
 
+/**
+ * @brief ActionManager::ActionManager
+ */
 ActionManager::ActionManager()
 {
     initMenu();
 }
 
+/**
+ * @brief ActionManager::Instance
+ * @return 单例对象
+ */
 ActionManager *ActionManager::Instance()
 {
     if (nullptr == _instance) {
@@ -44,26 +51,48 @@ ActionManager *ActionManager::Instance()
     return _instance;
 }
 
+/**
+ * @brief ActionManager::notebookContextMenu
+ * @return 记事本右键菜单
+ */
 DMenu *ActionManager::notebookContextMenu()
 {
     return m_notebookContextMenu.get();
 }
 
+/**
+ * @brief ActionManager::noteContextMenu
+ * @return 记事项右键菜单
+ */
 DMenu *ActionManager::noteContextMenu()
 {
     return m_noteContextMenu.get();
 }
 
+/**
+ * @brief ActionManager::detialContextMenu
+ * @return 详情页右键菜单
+ */
 DMenu *ActionManager::detialContextMenu()
 {
     return m_detialContextMenu.get();
 }
 
+/**
+ * @brief ActionManager::getActionKind
+ * @param action 菜单项
+ * @return id
+ */
 ActionManager::ActionKind ActionManager::getActionKind(QAction *action)
 {
     return action->property(MenuId).value<ActionKind>();
 }
 
+/**
+ * @brief ActionManager::getActionById
+ * @param id
+ * @return 菜单项
+ */
 QAction *ActionManager::getActionById(ActionManager::ActionKind id)
 {
     QAction *menuAction = nullptr;
@@ -77,6 +106,11 @@ QAction *ActionManager::getActionById(ActionManager::ActionKind id)
     return menuAction;
 }
 
+/**
+ * @brief ActionManager::enableAction
+ * @param actionId
+ * @param enable true 可用
+ */
 void ActionManager::enableAction(ActionManager::ActionKind actionId, bool enable)
 {
     QMap<ActionKind, QAction *>::iterator it = m_actionsMap.find(actionId);
@@ -86,6 +120,11 @@ void ActionManager::enableAction(ActionManager::ActionKind actionId, bool enable
     }
 }
 
+/**
+ * @brief ActionManager::visibleAction
+ * @param actionId
+ * @param enable true显示
+ */
 void ActionManager::visibleAction(ActionManager::ActionKind actionId, bool enable)
 {
     QMap<ActionKind, QAction *>::iterator it = m_actionsMap.find(actionId);
@@ -95,6 +134,11 @@ void ActionManager::visibleAction(ActionManager::ActionKind actionId, bool enabl
     }
 }
 
+/**
+ * @brief ActionManager::resetCtxMenu
+ * @param type 右键菜单类型
+ * @param enable true可用
+ */
 void ActionManager::resetCtxMenu(ActionManager::MenuType type, bool enable)
 {
     int startMenuId = MenuMaxId;
@@ -121,7 +165,9 @@ void ActionManager::resetCtxMenu(ActionManager::MenuType type, bool enable)
         }
     }
 }
-
+/**
+ * @brief ActionManager::initMenu
+ */
 void ActionManager::initMenu()
 {
     bool isAISrvAvailable = OpsStateInterface::instance()->isAiSrvExist();

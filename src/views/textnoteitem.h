@@ -31,6 +31,7 @@ class TextNoteItem : public DetailItemWidget
     Q_OBJECT
 public:
     explicit TextNoteItem(VNoteBlock *noteBlock, QWidget *parent = nullptr);
+    //重写基类函数
     VNoteBlock *getNoteBlock();
     QTextCursor getTextCursor();
     void setTextCursor(const QTextCursor &cursor);
@@ -50,21 +51,32 @@ public:
     void setFocus();
     bool hasFocus();
     bool isSelectAll();
+    //最后光标y坐标
     void setLastCursorHeight(int height);
 
 signals:
+    //光标位置改变
     void sigCursorHeightChange(QWidget *widget, int height);
+    //内容改变
     void sigTextChanged();
+    //获取焦点
     void sigFocusIn();
+    //失去焦点
     void sigFocusOut();
+    //选中改变
     void sigSelectionChanged();
 public slots:
+    //主题改变
     void onChangeTheme();
+    //内容改变
     void onTextChange();
+    //光标位置改变
     void onTextCursorChange();
 
 private:
+    //初始化布局
     void initUi();
+    //连接槽函数
     void initConnection();
     bool m_isSearching {false};
     bool m_selectAll {false};

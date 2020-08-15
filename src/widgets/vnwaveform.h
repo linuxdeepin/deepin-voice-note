@@ -49,9 +49,11 @@ public:
 signals:
 
 public slots:
+    //数据更新
     void onAudioBufferProbed(const QAudioBuffer &buffer);
 
 protected:
+    //波形数据转换
     static qreal getPeakValue(const QAudioFormat &format);
     static void getBufferLevels(const QAudioBuffer &buffer, QVector<qreal> &scaleSamples, qreal &frameGain);
 
@@ -62,8 +64,9 @@ protected:
                                 qreal peakValue,
                                 QVector<qreal> &samples,
                                 qreal &frameGain);
-
+    //绘制波形
     void paintEvent(QPaintEvent *event) override;
+    //窗口大小改变
     void resizeEvent(QResizeEvent *event) override;
 
 protected:

@@ -31,26 +31,44 @@ public:
                      Micphone };
     Q_ENUM(AudioMode)
     explicit AudioWatcher(QObject *parent = nullptr);
+    //获取设备名称
     QString getDeviceName(AudioMode mode);
+    //获取设备音量
     double getVolume(AudioMode mode);
+    //判断设备是否静音
     bool getMute(AudioMode mode);
 signals:
+    //音量改变信号
     void sigVolumeChange(AudioMode mode);
+    //设备改变信号
     void sigDeviceChange(AudioMode mode);
+    //静音状态改变信号
     void sigMuteChanged(AudioMode mode);
 protected slots:
+    //输入设备默认端口改变
     void onDefaultSourceActivePortChanged(AudioPort value);
+    //输出设备默认端口改变
     void onDefaultSinkActivePortChanged(AudioPort value);
+    //默认输入设备改变
     void onDefaultSourceChanaged(const QDBusObjectPath &value);
+    //默认输出设备改变
     void onDefaultSinkChanaged(const QDBusObjectPath &value);
+    //默认输入设备音量改变
     void onSourceVolumeChanged(double d);
+    //默认输出设备音量改变
     void onSinkVolumeChanged(double d);
+    //默认输入设备静音状态改变
     void onSourceMuteChanged(bool value);
+    //默认输出设备静音状态改变
     void onSinkMuteChanged(bool value);
 
 private:
+    //从参数文件中读取设备检测开启标志，无配置文件，默认开启
+    //CheckInputDevice=false,关闭检测
     void initWatcherCofing();
+    //初始化获取默认输入/输出设备信息
     void initDeviceWacther();
+    //连接相关槽函数
     void initConnections();
 
 private:

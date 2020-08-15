@@ -33,9 +33,11 @@ class VNTaskWorker : public QThread
     Q_OBJECT
 public:
     explicit VNTaskWorker(QObject *parent = nullptr);
-
+    //添加任务
     void addTask(VNTask *task);
+    //设置任务名称
     void setWorkerName(const QString &worker);
+    //退出，结束线程
     void quitWorker();
 signals:
 

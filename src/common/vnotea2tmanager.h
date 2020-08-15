@@ -68,14 +68,20 @@ public:
     };
 
 signals:
+    //转文字失败
     void asrError(ErrorCode errorCode);
+    //转文字成功
     void asrSuccess(const QString text);
 public slots:
+    //转写过程中，信息处理
     void onNotify(const QString &msg);
 
 protected:
+    //转写信息解析
     void asrJsonParser(const QString &msg, asrMsg &asrData);
+    //获取错误类型
     ErrorCode getErrorCode(const asrMsg &asrData);
+    //初始化语音转写模块，初始化相关dbus连接
     int initSession();
 
 protected:

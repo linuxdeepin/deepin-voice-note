@@ -25,7 +25,10 @@
 
 static bool isSpeeching = false;
 
-// 检测是否在朗读文本
+/**
+ * @brief VTextSpeechAndTrManager::isTextToSpeechInWorking
+ * @return true 正在朗读
+ */
 bool VTextSpeechAndTrManager::isTextToSpeechInWorking()
 {
     if (isSpeeching) {
@@ -45,7 +48,10 @@ bool VTextSpeechAndTrManager::isTextToSpeechInWorking()
     return isSpeeching;
 }
 
-// 检测语音朗读开关是否打开
+/**
+ * @brief VTextSpeechAndTrManager::getTextToSpeechEnable
+ * @return true 朗读功能可用
+ */
 bool VTextSpeechAndTrManager::getTextToSpeechEnable()
 {
     QDBusMessage voiceReadingMsg = QDBusMessage::createMethodCall("com.iflytek.aiassistant",
@@ -61,7 +67,10 @@ bool VTextSpeechAndTrManager::getTextToSpeechEnable()
     }
 }
 
-// 检测语音听写开关是否打开
+/**
+ * @brief VTextSpeechAndTrManager::getSpeechToTextEnable
+ * @return true 听写功能可用
+ */
 bool VTextSpeechAndTrManager::getSpeechToTextEnable()
 {
     QDBusMessage dictationMsg = QDBusMessage::createMethodCall("com.iflytek.aiassistant",
@@ -77,7 +86,10 @@ bool VTextSpeechAndTrManager::getSpeechToTextEnable()
     }
 }
 
-// 检测文本翻译开关是否打开
+/**
+ * @brief VTextSpeechAndTrManager::getTransEnable
+ * @return true 翻译功能可用
+ */
 bool VTextSpeechAndTrManager::getTransEnable()
 {
     QDBusMessage translateReadingMsg = QDBusMessage::createMethodCall("com.iflytek.aiassistant",
@@ -93,14 +105,18 @@ bool VTextSpeechAndTrManager::getTransEnable()
     }
 }
 
-// 语音朗读
+/**
+ * @brief VTextSpeechAndTrManager::onTextToSpeech
+ */
 void VTextSpeechAndTrManager::onTextToSpeech()
 {
     QProcess::startDetached("dbus-send  --print-reply --dest=com.iflytek.aiassistant /aiassistant/deepinmain com.iflytek.aiassistant.mainWindow.TextToSpeech");
     isSpeeching = true;
 }
 
-// 停止语音朗读
+/**
+ * @brief VTextSpeechAndTrManager::onStopTextToSpeech
+ */
 void VTextSpeechAndTrManager::onStopTextToSpeech()
 {
     if (isSpeeching) {
@@ -109,13 +125,17 @@ void VTextSpeechAndTrManager::onStopTextToSpeech()
     }
 }
 
-// 语音听写
+/**
+ * @brief VTextSpeechAndTrManager::onSpeechToText
+ */
 void VTextSpeechAndTrManager::onSpeechToText()
 {
     QProcess::startDetached("dbus-send  --print-reply --dest=com.iflytek.aiassistant /aiassistant/deepinmain com.iflytek.aiassistant.mainWindow.SpeechToText");
 }
 
-// 文本翻译
+/**
+ * @brief VTextSpeechAndTrManager::onTextTranslate
+ */
 void VTextSpeechAndTrManager::onTextTranslate()
 {
     QProcess::startDetached("dbus-send  --print-reply --dest=com.iflytek.aiassistant /aiassistant/deepinmain com.iflytek.aiassistant.mainWindow.TextToTranslate");

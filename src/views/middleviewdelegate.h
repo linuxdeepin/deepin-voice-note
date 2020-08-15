@@ -30,26 +30,39 @@ class MiddleViewDelegate : public DStyledItemDelegate
     Q_OBJECT
 public:
     MiddleViewDelegate(QAbstractItemView *parent = nullptr);
+    //主题改变处理
     void handleChangeTheme();
+    //设置搜索关键字
     void setSearchKey(const QString &key);
+    //设置列表项是否可用
     void setEnableItem(bool enable);
+    //设置编辑状态
     void setEditIsVisible(bool isVisible);
     const int MAX_TITLE_LEN = 64;
 
 protected:
+    //绘制列表项
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
+    //返回列表项大小
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
+    //创建编辑器
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    //编辑框设置初始内容
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    //编辑完成
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    //调整编辑框位置
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
                               const QModelIndex &index) const override;
 
 private:
+    //绘制列表项背景
     void paintItemBase(QPainter *painter, const QStyleOptionViewItem &option,
                        const QRect &rect, bool &isSelect) const;
+    //绘制常规项
     void paintNormalItem(QPainter *painter, const QStyleOptionViewItem &option,
                          const QModelIndex &index) const;
+    //绘制搜索项
     void paintSearchItem(QPainter *painter, const QStyleOptionViewItem &option,
                          const QModelIndex &index) const;
 

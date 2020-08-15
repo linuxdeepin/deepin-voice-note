@@ -35,6 +35,10 @@
 #include <DApplication>
 #include <DLog>
 
+/**
+ * @brief VNoteRecordBar::VNoteRecordBar
+ * @param parent
+ */
 VNoteRecordBar::VNoteRecordBar(QWidget *parent)
     : QWidget(parent)
 {
@@ -45,6 +49,9 @@ VNoteRecordBar::VNoteRecordBar(QWidget *parent)
     onAudioDeviceChange(m_currentMode);
 }
 
+/**
+ * @brief VNoteRecordBar::initUI
+ */
 void VNoteRecordBar::initUI()
 {
     m_mainLayout = new QStackedLayout(this);
@@ -73,6 +80,9 @@ void VNoteRecordBar::initUI()
     m_mainLayout->setCurrentWidget(m_recordBtnHover);
 }
 
+/**
+ * @brief VNoteRecordBar::initConnections
+ */
 void VNoteRecordBar::initConnections()
 {
     //Install filter to filte MousePress
@@ -91,6 +101,12 @@ void VNoteRecordBar::initConnections()
             this, SIGNAL(sigPauseVoice(VNVoiceBlock *)));
 }
 
+/**
+ * @brief VNoteRecordBar::eventFilter
+ * @param o
+ * @param e
+ * @return false 不过滤事件
+ */
 bool VNoteRecordBar::eventFilter(QObject *o, QEvent *e)
 {
     Q_UNUSED(o);
@@ -104,6 +120,9 @@ bool VNoteRecordBar::eventFilter(QObject *o, QEvent *e)
     return false;
 }
 
+/**
+ * @brief VNoteRecordBar::startRecord
+ */
 void VNoteRecordBar::startRecord()
 {
     m_mainLayout->setCurrentWidget(m_recordPanel);
@@ -112,6 +131,9 @@ void VNoteRecordBar::startRecord()
     }
 }
 
+/**
+ * @brief VNoteRecordBar::onStartRecord
+ */
 void VNoteRecordBar::onStartRecord()
 {
     if (this->isVisible()
@@ -138,29 +160,49 @@ void VNoteRecordBar::onStartRecord()
     }
 }
 
+/**
+ * @brief VNoteRecordBar::onFinshRecord
+ * @param voicePath
+ * @param voiceSize
+ */
 void VNoteRecordBar::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 {
     m_mainLayout->setCurrentWidget(m_recordBtnHover);
     emit sigFinshRecord(voicePath, voiceSize);
 }
 
+/**
+ * @brief VNoteRecordBar::cancelRecord
+ */
 void VNoteRecordBar::cancelRecord()
 {
     m_recordPanel->cancelRecord();
 }
 
+/**
+ * @brief VNoteRecordBar::onClosePlayWidget
+ * @param voiceData
+ */
 void VNoteRecordBar::onClosePlayWidget(VNVoiceBlock *voiceData)
 {
     m_mainLayout->setCurrentWidget(m_recordBtnHover);
     emit sigWidgetClose(voiceData);
 }
 
+/**
+ * @brief VNoteRecordBar::playVoice
+ * @param voiceData
+ */
 void VNoteRecordBar::playVoice(VNVoiceBlock *voiceData)
 {
     m_mainLayout->setCurrentWidget(m_playPanel);
     m_playPanel->setVoiceBlock(voiceData);
 }
 
+/**
+ * @brief VNoteRecordBar::pauseVoice
+ * @param voiceData
+ */
 void VNoteRecordBar::pauseVoice(VNVoiceBlock *voiceData)
 {
     if (m_mainLayout->currentWidget() == m_playPanel
@@ -168,6 +210,12 @@ void VNoteRecordBar::pauseVoice(VNVoiceBlock *voiceData)
         m_playPanel->onPauseBtnClicked();
     }
 }
+
+/**
+ * @brief VNoteRecordBar::stopVoice
+ * @param voiceData
+ * @return true 成功
+ */
 bool VNoteRecordBar::stopVoice(VNVoiceBlock *voiceData)
 {
     if (m_mainLayout->currentWidget() == m_playPanel
@@ -179,6 +227,10 @@ bool VNoteRecordBar::stopVoice(VNVoiceBlock *voiceData)
     return false;
 }
 
+/**
+ * @brief VNoteRecordBar::getVoiceData
+ * @return 绑定的播放语音数据
+ */
 VNVoiceBlock *VNoteRecordBar::getVoiceData()
 {
     if (m_mainLayout->currentWidget() == m_playPanel) {
@@ -187,6 +239,9 @@ VNVoiceBlock *VNoteRecordBar::getVoiceData()
     return nullptr;
 }
 
+/**
+ * @brief VNoteRecordBar::playOrPauseVoice
+ */
 void VNoteRecordBar::playOrPauseVoice()
 {
     if (m_mainLayout->currentWidget() == m_playPanel) {
@@ -199,6 +254,10 @@ void VNoteRecordBar::playOrPauseVoice()
     }
 }
 
+/**
+ * @brief VNoteRecordBar::onAudioVolumeChange
+ * @param mode
+ */
 void VNoteRecordBar::onAudioVolumeChange(int mode)
 {
     if (m_mainLayout->currentWidget() == m_recordPanel
@@ -223,6 +282,10 @@ void VNoteRecordBar::onAudioVolumeChange(int mode)
     }
 }
 
+/**
+ * @brief VNoteRecordBar::onAudioDeviceChange
+ * @param mode
+ */
 void VNoteRecordBar::onAudioDeviceChange(int mode)
 {
     if (m_currentMode == mode) {
@@ -256,12 +319,19 @@ void VNoteRecordBar::onAudioDeviceChange(int mode)
     }
 }
 
+/**
+ * @brief VNoteRecordBar::onAudioSelectChange
+ * @param value
+ */
 void VNoteRecordBar::onAudioSelectChange(QVariant value)
 {
     m_currentMode = value.toInt();
     onAudioDeviceChange(m_currentMode);
 }
 
+/**
+ * @brief VNoteRecordBar::initSetting
+ */
 void VNoteRecordBar::initSetting()
 {
     m_currentMode = setting::instance()->getOption(VNOTE_AUDIO_SELECT).toInt();
@@ -270,6 +340,9 @@ void VNoteRecordBar::initSetting()
             this, &VNoteRecordBar::onAudioSelectChange);
 }
 
+/**
+ * @brief VNoteRecordBar::initAudioWatcher
+ */
 void VNoteRecordBar::initAudioWatcher()
 {
     m_audioWatcher = new AudioWatcher(this);
@@ -279,6 +352,11 @@ void VNoteRecordBar::initAudioWatcher()
             this, &VNoteRecordBar::onAudioVolumeChange);
 }
 
+/**
+ * @brief VNoteRecordBar::volumeToolow
+ * @param volume
+ * @return true 录音音量低
+ */
 bool VNoteRecordBar::volumeToolow(const double &volume)
 {
     return (volume - 0.2 < 0.0) ? true : false;

@@ -20,9 +20,19 @@
 */
 #include "standarditemcommon.h"
 
+/**
+ * @brief StandardItemCommon::StandardItemCommon
+ */
 StandardItemCommon::StandardItemCommon()
 {
 }
+
+/**
+ * @brief StandardItemCommon::createStandardItem
+ * @param data 绑定的数据
+ * @param type
+ * @return 生成数据项
+ */
 QStandardItem *StandardItemCommon::createStandardItem(void *data, StandardItemType type)
 {
     QStandardItem *pItem = new QStandardItem;
@@ -31,6 +41,11 @@ QStandardItem *StandardItemCommon::createStandardItem(void *data, StandardItemTy
     return pItem;
 }
 
+/**
+ * @brief StandardItemCommon::getStandardItemType
+ * @param index 索引
+ * @return 数据项类型
+ */
 StandardItemCommon::StandardItemType StandardItemCommon::getStandardItemType(const QModelIndex &index)
 {
     StandardItemType type = Invalid;
@@ -43,6 +58,11 @@ StandardItemCommon::StandardItemType StandardItemCommon::getStandardItemType(con
     return type;
 }
 
+/**
+ * @brief StandardItemCommon::getStandardItemData
+ * @param index
+ * @return 数据项绑定的数据
+ */
 void *StandardItemCommon::getStandardItemData(const QModelIndex &index)
 {
     if (index.isValid()) {

@@ -23,10 +23,18 @@
 
 #include <DLog>
 
+/**
+ * @brief MetaDataParser::MetaDataParser
+ */
 MetaDataParser::MetaDataParser()
 {
 }
 
+/**
+ * @brief MetaDataParser::parse
+ * @param metaData 数据源
+ * @param noteData 解析后的数据
+ */
 void MetaDataParser::parse(const QVariant &metaData, VNoteItem *noteData)
 {
 #ifdef VN_XML_METADATA_PARSER
@@ -36,6 +44,11 @@ void MetaDataParser::parse(const QVariant &metaData, VNoteItem *noteData)
 #endif
 }
 
+/**
+ * @brief MetaDataParser::makeMetaData
+ * @param noteData 数据源
+ * @param metaData 生成的数据
+ */
 void MetaDataParser::makeMetaData(const VNoteItem *noteData, QVariant &metaData)
 {
 #ifdef VN_XML_METADATA_PARSER
@@ -182,6 +195,11 @@ void MetaDataParser::xmlParseNoteItem(QXmlStreamReader &xmlSRead, VNoteItem *not
 #elif defined(VN_JSON_METADATA_PARSER)
 //*****************Implementation of json meta-data parser**********************
 
+/**
+ * @brief MetaDataParser::jsonParse
+ * @param metaData 数据源
+ * @param noteData 解析的数据
+ */
 void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*out*/)
 {
     Q_ASSERT(nullptr != noteData);
@@ -235,6 +253,11 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*o
     }
 }
 
+/**
+ * @brief MetaDataParser::jsonMakeMetadata
+ * @param noteData 数据源
+ * @param metaData 生成的数据
+ */
 void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaData)
 {
     Q_ASSERT(nullptr != noteData);

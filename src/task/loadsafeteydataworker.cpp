@@ -24,11 +24,18 @@
 
 #include <DLog>
 
+/**
+ * @brief LoadSafeteyDataWorker::LoadSafeteyDataWorker
+ * @param parent
+ */
 LoadSafeteyDataWorker::LoadSafeteyDataWorker(QObject *parent)
     : VNTask(parent)
 {
 }
 
+/**
+ * @brief LoadSafeteyDataWorker::run
+ */
 void LoadSafeteyDataWorker::run()
 {
     struct timeval start, end;

@@ -28,12 +28,20 @@
 
 #include <DLog>
 
+/**
+ * @brief VNWaveform::VNWaveform
+ * @param parent
+ */
 VNWaveform::VNWaveform(QWidget *parent)
     : DFrame(parent)
 {
     setFrameShape(QFrame::NoFrame);
 }
 
+/**
+ * @brief VNWaveform::onAudioBufferProbed
+ * @param buffer
+ */
 void VNWaveform::onAudioBufferProbed(const QAudioBuffer &buffer)
 {
     static struct timeval curret = {0, 0};
@@ -60,6 +68,10 @@ void VNWaveform::onAudioBufferProbed(const QAudioBuffer &buffer)
     }
 }
 
+/**
+ * @brief VNWaveform::paintEvent
+ * @param event
+ */
 void VNWaveform::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
@@ -104,6 +116,10 @@ void VNWaveform::paintEvent(QPaintEvent *event)
     painter.restore();
 }
 
+/**
+ * @brief VNWaveform::resizeEvent
+ * @param event
+ */
 void VNWaveform::resizeEvent(QResizeEvent *event)
 {
     m_maxShowedSamples = static_cast<int>(
@@ -115,7 +131,12 @@ void VNWaveform::resizeEvent(QResizeEvent *event)
     DFrame::resizeEvent(event);
 }
 
-// returns the audio level for each channel
+/**
+ * @brief VNWaveform::getBufferLevels
+ * @param buffer
+ * @param scaleSamples
+ * @param frameGain
+ */
 void VNWaveform::getBufferLevels(
     const QAudioBuffer &buffer,
     QVector<qreal> &scaleSamples,
@@ -188,6 +209,15 @@ void VNWaveform::getBufferLevels(
 }
 
 template<class T>
+/**
+ * @brief VNWaveform::getBufferLevels
+ * @param buffer
+ * @param frames
+ * @param channels
+ * @param peakValue
+ * @param samples
+ * @param frameGain
+ */
 void VNWaveform::getBufferLevels(
     const T *buffer, int frames, int channels,
     qreal peakValue, QVector<qreal> &samples, qreal &frameGain)
@@ -212,7 +242,11 @@ void VNWaveform::getBufferLevels(
     }
 }
 
-// This function returns the maximum possible sample value for a given audio format
+/**
+ * @brief VNWaveform::getPeakValue
+ * @param format
+ * @return
+ */
 qreal VNWaveform::getPeakValue(const QAudioFormat &format)
 {
     // Note: Only the most common sample formats are supported

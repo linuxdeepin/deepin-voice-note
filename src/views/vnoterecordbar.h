@@ -43,39 +43,61 @@ public:
 
     static constexpr int REC_BTN_W = 68;
     static constexpr int REC_BTN_H = 68;
+    //取消录音
     void cancelRecord();
+    //快捷键暂停/继续语音播放
     void playOrPauseVoice();
+    //播放语音
     void playVoice(VNVoiceBlock *voiceData);
+    //暂停播放
     void pauseVoice(VNVoiceBlock *voiceData);
+    //停止播放
     bool stopVoice(VNVoiceBlock *voiceData);
+    //获取当前播放语音数据
     VNVoiceBlock *getVoiceData();
 
 private:
+    //初始化设备检测
     void initAudioWatcher();
+    //初始化参数配置
     void initSetting();
+    //初始化UI布局
     void initUI();
+    //连接槽函数
     void initConnections();
+    //判断录音音量是否过低
     bool volumeToolow(const double &volume);
 
 signals:
+    //录音信号
     void sigStartRecord(const QString &recordPath);
     void sigFinshRecord(const QString &voicePath, qint64 voiceSize);
+    //播放信号
     void sigPlayVoice(VNVoiceBlock *voiceData);
     void sigPauseVoice(VNVoiceBlock *voiceData);
     void sigWidgetClose(VNVoiceBlock *voiceData);
+    //设备异常提示
     void sigDeviceExceptionMsgShow();
     void sigDeviceExceptionMsgClose();
 
 public slots:
+    //开始录音
     void onStartRecord();
+    //结束录音
     void onFinshRecord(const QString &voicePath, qint64 voiceSize);
+    //播放窗口关闭
     void onClosePlayWidget(VNVoiceBlock *voiceData);
+    //设备音量改变
     void onAudioVolumeChange(int mode);
+    //设备改变
     void onAudioDeviceChange(int mode);
+    //输入/输出设备切换
     void onAudioSelectChange(QVariant value);
 
 protected:
+    //事件过滤器
     bool eventFilter(QObject *o, QEvent *e) override;
+    //开始录音
     void startRecord();
 
 protected:

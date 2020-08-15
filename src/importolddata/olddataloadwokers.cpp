@@ -25,11 +25,18 @@
 
 #include <DLog>
 
+/**
+ * @brief OldDataLoadTask::OldDataLoadTask
+ * @param parent
+ */
 OldDataLoadTask::OldDataLoadTask(QObject *parent)
     : VNTask(parent)
 {
 }
 
+/**
+ * @brief OldDataLoadTask::run
+ */
 void OldDataLoadTask::run()
 {
     VNOTE_FOLDERS_MAP *foldersMap = new VNOTE_FOLDERS_MAP();
@@ -59,11 +66,18 @@ void OldDataLoadTask::run()
     emit finishLoad();
 }
 
+/**
+ * @brief OldDataUpgradeTask::OldDataUpgradeTask
+ * @param parent
+ */
 OldDataUpgradeTask::OldDataUpgradeTask(QObject *parent)
     : VNTask(parent)
 {
 }
 
+/**
+ * @brief OldDataUpgradeTask::run
+ */
 void OldDataUpgradeTask::run()
 {
     int folderCount = VNoteOldDataManager::instance()->folders()->folders.count();

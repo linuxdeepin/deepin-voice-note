@@ -23,15 +23,18 @@
 
 #include "db/dbvisitor.h"
 
+//加载老记事本数据
 class OldFolderQryDbVisitor : public DbVisitor
 {
 public:
     explicit OldFolderQryDbVisitor(QSqlDatabase &db, const void *inParam, void *result);
-
+    //处理结果
     virtual bool visitorData() override;
+    //生成sql
     virtual bool prepareSqls() override;
 };
 
+//加载老数据库记事项数据
 class OldNoteQryDbVisitor : public DbVisitor
 {
 public:
@@ -41,8 +44,9 @@ public:
         Voice = 0,
         Text,
     };
-
+    //处理结果
     virtual bool visitorData() override;
+    //生成sql
     virtual bool prepareSqls() override;
 };
 

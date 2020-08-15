@@ -22,16 +22,17 @@
 #define VNOTESAFEROPER_H
 
 #include "common/datatypedef.h"
-
+//录音的缓存表操作
 class VNoteSaferOper
 {
 public:
     VNoteSaferOper();
     VNoteSaferOper(const VDataSafer &safer);
-
+    //加载表数据
     SafetyDatas *loadSafers();
-
+    //添加记录
     void addSafer(const VDataSafer &safer);
+    //删除记录
     void rmSafer(const VDataSafer &safer);
 
 protected:

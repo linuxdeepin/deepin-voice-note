@@ -30,7 +30,7 @@ struct VNoteFolder {
 public:
     VNoteFolder();
     ~VNoteFolder();
-
+    //是否可用
     bool isValid();
 
     enum {
@@ -41,28 +41,38 @@ public:
         Normal,
         Deleted,
     };
-
+    //id
     qint64 id {INVALID_ID};
+    //类别，保留字段，暂时未用
     qint32 category {0};
+    //记事项个数
     qint64 notesCount {0};
+    //图标索引
     qint32 defaultIcon {0};
+    //状态
     qint32 folder_state {State::Normal};
-
+    //记事本名称
     QString name;
+    //图标路径
     QString iconPath;
-
+    //创建时间
     QDateTime createTime;
+    //修改时间
     QDateTime modifyTime;
+    //删除时间
     QDateTime deleteTime;
 
     struct {
+        //正常图标
         QPixmap icon;
+        //置灰图标
         QPixmap grayIcon;
     } UI;
-
+    //获取记事项最大id
     qint32 &maxNoteIdRef();
-
+    //获取记事项个数
     qint32 getNotesCount();
+    //获取记事项数据
     VNOTE_ITEMS_MAP *getNotes();
 
     friend QDebug &operator<<(QDebug &out, VNoteFolder &folder);

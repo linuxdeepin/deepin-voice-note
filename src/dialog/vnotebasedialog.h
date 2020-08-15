@@ -35,8 +35,9 @@ class VNoteBaseDialog : public DAbstractDialog
     Q_OBJECT
 public:
     explicit VNoteBaseDialog(QWidget *parent = nullptr);
-
+    //添加文本窗口
     void addContent(QWidget *content);
+    //设置logo图标
     void setIconPixmap(const QPixmap &iconPixmap);
 
     const int DEFAULT_WINDOW_W = 380;
@@ -44,16 +45,22 @@ public:
     const int TITLEBAR_H = 50;
 
 protected:
+    //初始化界面
     void initUI();
+    //连接槽函数
     void InitConnections();
+    //设置logo是否可见
     void setLogoVisable(bool visible = true);
+    //设置标题
     void setTitle(const QString &title);
+    //获取窗口布局
     QLayout *getContentLayout();
 
-    //Overrides
+    //重写窗口事件
     void closeEvent(QCloseEvent *event) override;
     void showEvent(QShowEvent *event) override;
 signals:
+    //窗口关闭信号
     void closed();
 public slots:
 private:

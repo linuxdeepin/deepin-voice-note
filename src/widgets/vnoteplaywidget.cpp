@@ -29,6 +29,10 @@
 
 #include <DDialogCloseButton>
 
+/**
+ * @brief VNotePlayWidget::VNotePlayWidget
+ * @param parent
+ */
 VNotePlayWidget::VNotePlayWidget(QWidget *parent)
     : DFloatingWidget(parent)
 {
@@ -37,6 +41,9 @@ VNotePlayWidget::VNotePlayWidget(QWidget *parent)
     initConnection();
 }
 
+/**
+ * @brief VNotePlayWidget::initUI
+ */
 void VNotePlayWidget::initUI()
 {
     m_playerBtn = new VNote2SIconButton("play.svg", "pause.svg", this);
@@ -76,11 +83,17 @@ void VNotePlayWidget::initUI()
     //m_slider->installEventFilter(this);
 }
 
+/**
+ * @brief VNotePlayWidget::initPlayer
+ */
 void VNotePlayWidget::initPlayer()
 {
     m_player = new QMediaPlayer(this);
 }
 
+/**
+ * @brief VNotePlayWidget::initConnection
+ */
 void VNotePlayWidget::initConnection()
 {
     connect(m_player, &QMediaPlayer::positionChanged,
@@ -102,6 +115,10 @@ void VNotePlayWidget::initConnection()
             this, &VNotePlayWidget::onSliderMove);
 }
 
+/**
+ * @brief VNotePlayWidget::onVoicePlayPosChange
+ * @param pos
+ */
 void VNotePlayWidget::onVoicePlayPosChange(qint64 pos)
 {
     if (m_sliderReleased == true) {
@@ -113,6 +130,10 @@ void VNotePlayWidget::onVoicePlayPosChange(qint64 pos)
     }
 }
 
+/**
+ * @brief VNotePlayWidget::setVoiceBlock
+ * @param voiceData
+ */
 void VNotePlayWidget::setVoiceBlock(VNVoiceBlock *voiceData)
 {
     if (voiceData) {
@@ -127,32 +148,51 @@ void VNotePlayWidget::setVoiceBlock(VNVoiceBlock *voiceData)
     }
 }
 
+/**
+ * @brief VNotePlayWidget::stopVideo
+ */
 void VNotePlayWidget::stopVideo()
 {
     m_player->stop();
 }
+
+/**
+ * @brief VNotePlayWidget::playVideo
+ */
 void VNotePlayWidget::playVideo()
 {
     m_player->play();
 }
 
+/**
+ * @brief VNotePlayWidget::pauseVideo
+ */
 void VNotePlayWidget::pauseVideo()
 {
     m_player->pause();
 }
 
+/**
+ * @brief VNotePlayWidget::onPlayBtnClicked
+ */
 void VNotePlayWidget::onPlayBtnClicked()
 {
     m_playerBtn->setState(VNote2SIconButton::Press);
     onPlayerBtnClicked();
 }
 
+/**
+ * @brief VNotePlayWidget::onPauseBtnClicked
+ */
 void VNotePlayWidget::onPauseBtnClicked()
 {
     m_playerBtn->setState(VNote2SIconButton::Normal);
     onPlayerBtnClicked();
 }
 
+/**
+ * @brief VNotePlayWidget::onCloseBtnClicked
+ */
 void VNotePlayWidget::onCloseBtnClicked()
 {
     m_slider->setValue(0);
@@ -161,11 +201,17 @@ void VNotePlayWidget::onCloseBtnClicked()
     emit sigWidgetClose(m_voiceBlock);
 }
 
+/**
+ * @brief VNotePlayWidget::onSliderPressed
+ */
 void VNotePlayWidget::onSliderPressed()
 {
     m_sliderReleased = false;
 }
 
+/**
+ * @brief VNotePlayWidget::onSliderReleased
+ */
 void VNotePlayWidget::onSliderReleased()
 {
     m_sliderReleased = true;
@@ -179,6 +225,10 @@ void VNotePlayWidget::onSliderReleased()
     }
 }
 
+/**
+ * @brief VNotePlayWidget::onSliderMove
+ * @param pos
+ */
 void VNotePlayWidget::onSliderMove(int pos)
 {
     if (m_voiceBlock) {
@@ -191,6 +241,12 @@ void VNotePlayWidget::onSliderMove(int pos)
     }
 }
 
+/**
+ * @brief VNotePlayWidget::eventFilter
+ * @param o
+ * @param e
+ * @return false 不过滤
+ */
 bool VNotePlayWidget::eventFilter(QObject *o, QEvent *e)
 {
     Q_UNUSED(o)
@@ -202,16 +258,28 @@ bool VNotePlayWidget::eventFilter(QObject *o, QEvent *e)
     return false;
 }
 
+/**
+ * @brief VNotePlayWidget::getVoiceData
+ * @return 绑定数据
+ */
 VNVoiceBlock *VNotePlayWidget::getVoiceData()
 {
     return m_voiceBlock;
 }
 
+/**
+ * @brief VNotePlayWidget::getPlayerStatus
+ * @return 播放状态
+ */
 QMediaPlayer::State VNotePlayWidget::getPlayerStatus()
 {
     return m_player->state();
 }
 
+/**
+ * @brief VNotePlayWidget::onDurationChanged
+ * @param duration
+ */
 void VNotePlayWidget::onDurationChanged(qint64 duration)
 {
     if (duration && m_slider->maximum() != duration) {
@@ -219,6 +287,9 @@ void VNotePlayWidget::onDurationChanged(qint64 duration)
     }
 }
 
+/**
+ * @brief VNotePlayWidget::onPlayerBtnClicked
+ */
 void VNotePlayWidget::onPlayerBtnClicked()
 {
     bool isPress = m_playerBtn->isPressed();

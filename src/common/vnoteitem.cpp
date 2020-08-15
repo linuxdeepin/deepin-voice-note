@@ -25,10 +25,17 @@
 
 #include <DLog>
 
+/**
+ * @brief VNoteItem::VNoteItem
+ */
 VNoteItem::VNoteItem()
 {
 }
 
+/**
+ * @brief VNoteItem::isValid
+ * @return true 可用
+ */
 bool VNoteItem::isValid()
 {
     return (noteId > INVALID_ID
@@ -37,6 +44,9 @@ bool VNoteItem::isValid()
                : false;
 }
 
+/**
+ * @brief VNoteItem::delNoteData
+ */
 void VNoteItem::delNoteData()
 {
     //Clear note attachments
@@ -45,6 +55,11 @@ void VNoteItem::delNoteData()
     }
 }
 
+/**
+ * @brief VNoteItem::search
+ * @param keyword 搜索关键字
+ * @return true 记事项内容包含关键字
+ */
 bool VNoteItem::search(const QString &keyword)
 {
     bool fContainKeyword = false;
@@ -75,46 +90,83 @@ bool VNoteItem::search(const QString &keyword)
 //    return isMetaDataOk;
 //}
 
+/**
+ * @brief VNoteItem::setMetadata
+ * @param meta 源数据
+ */
 void VNoteItem::setMetadata(const QVariant &meta)
 {
     metaData = meta;
 }
 
+/**
+ * @brief VNoteItem::setFolder
+ * @param folder
+ */
 void VNoteItem::setFolder(VNoteFolder *folder)
 {
     ownFolder = folder;
 }
 
+/**
+ * @brief VNoteItem::folder
+ * @return 记事本数据
+ */
 VNoteFolder *VNoteItem::folder() const
 {
     return ownFolder;
 }
 
+/**
+ * @brief VNoteItem::metaDataRef
+ * @return 源数据
+ */
 QVariant &VNoteItem::metaDataRef()
 {
     return metaData;
 }
 
+/**
+ * @brief VNoteItem::metaDataConstRef
+ * @return 源数据
+ */
 const QVariant &VNoteItem::metaDataConstRef() const
 {
     return metaData;
 }
 
+/**
+ * @brief VNoteItem::maxVoiceIdRef
+ * @return 语音项最大id
+ */
 qint32 &VNoteItem::maxVoiceIdRef()
 {
     return maxVoiceId;
 }
 
+/**
+ * @brief VNoteItem::voiceMaxId
+ * @return 语音项最大的id
+ */
 qint32 VNoteItem::voiceMaxId() const
 {
     return maxVoiceId;
 }
 
+/**
+ * @brief VNoteItem::newBlock
+ * @param type
+ * @return 生成的数据块
+ */
 VNoteBlock *VNoteItem::newBlock(int type)
 {
     return datas.newBlock(type);
 }
 
+/**
+ * @brief VNoteItem::addBlock
+ * @param block
+ */
 void VNoteItem::addBlock(VNoteBlock *block)
 {
     if (VNoteBlock::Voice == block->getType()) {
@@ -124,6 +176,11 @@ void VNoteItem::addBlock(VNoteBlock *block)
     datas.addBlock(block);
 }
 
+/**
+ * @brief VNoteItem::addBlock
+ * @param before
+ * @param block
+ */
 void VNoteItem::addBlock(VNoteBlock *before, VNoteBlock *block)
 {
     if (VNoteBlock::Voice == block->getType()) {
@@ -133,11 +190,19 @@ void VNoteItem::addBlock(VNoteBlock *before, VNoteBlock *block)
     datas.addBlock(before, block);
 }
 
+/**
+ * @brief VNoteItem::delBlock
+ * @param block
+ */
 void VNoteItem::delBlock(VNoteBlock *block)
 {
     datas.delBlock(block);
 }
 
+/**
+ * @brief VNoteItem::haveVoice
+ * @return true 有语音
+ */
 bool VNoteItem::haveVoice() const
 {
     bool fHaveVoice = false;
@@ -149,6 +214,10 @@ bool VNoteItem::haveVoice() const
     return fHaveVoice;
 }
 
+/**
+ * @brief VNoteItem::haveText
+ * @return true 有文本
+ */
 bool VNoteItem::haveText() const
 {
     bool fHaveText = false;
@@ -163,6 +232,10 @@ bool VNoteItem::haveText() const
     return fHaveText;
 }
 
+/**
+ * @brief VNoteItem::voiceCount
+ * @return 语音数量
+ */
 qint32 VNoteItem::voiceCount() const
 {
     return datas.voiceBlocks.size();
@@ -186,43 +259,73 @@ QDebug &operator<<(QDebug &out, VNoteItem &noteItem)
     return out;
 }
 
+/**
+ * @brief DetailItemWidget::DetailItemWidget
+ * @param parent
+ */
 DetailItemWidget::DetailItemWidget(QWidget *parent)
     : QWidget(parent)
 {
     ;
 }
 
+/**
+ * @brief DetailItemWidget::updateSearchKey
+ * @param searchKey 搜索关键字
+ */
 void DetailItemWidget::updateSearchKey(QString searchKey)
 {
     Q_UNUSED(searchKey);
 }
 
+/**
+ * @brief DetailItemWidget::pasteText
+ */
 void DetailItemWidget::pasteText()
 {
     ;
 }
 
+/**
+ * @brief DetailItemWidget::isTextContainsPos
+ * @param globalPos 全局坐标点
+ * @return true 坐标点在文本区域内
+ */
 bool DetailItemWidget::isTextContainsPos(const QPoint &globalPos)
 {
     Q_UNUSED(globalPos);
     return true;
 }
 
+/**
+ * @brief VNoteBlock::VNoteBlock
+ * @param type
+ */
 VNoteBlock::VNoteBlock(qint32 type)
     : blockType(type)
 {
     ptrBlock = this;
 }
 
+/**
+ * @brief VNoteBlock::~VNoteBlock
+ */
 VNoteBlock::~VNoteBlock()
 {
 }
 
+/**
+ * @brief VNoteBlock::getType
+ * @return 数据类型
+ */
 qint32 VNoteBlock::getType()
 {
     return blockType;
 }
 
+/**
+ * @brief VNTextBlock::VNTextBlock
+ */
 VNTextBlock::VNTextBlock()
     : VNoteBlock(Text)
 {
@@ -232,6 +335,9 @@ VNTextBlock::~VNTextBlock()
 {
 }
 
+/**
+ * @brief VNTextBlock::releaseSpecificData
+ */
 void VNTextBlock::releaseSpecificData()
 {
     //TODO:
@@ -240,6 +346,9 @@ void VNTextBlock::releaseSpecificData()
     //Do nothing for text now.
 }
 
+/**
+ * @brief VNVoiceBlock::VNVoiceBlock
+ */
 VNVoiceBlock::VNVoiceBlock()
     : VNoteBlock(Voice)
 {
@@ -250,6 +359,9 @@ VNVoiceBlock::~VNVoiceBlock()
 {
 }
 
+/**
+ * @brief VNVoiceBlock::releaseSpecificData
+ */
 void VNVoiceBlock::releaseSpecificData()
 {
     //TODO:

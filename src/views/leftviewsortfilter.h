@@ -22,13 +22,14 @@
 #ifndef LEFTVIEWSORTFILTER_H
 #define LEFTVIEWSORTFILTER_H
 #include <QSortFilterProxyModel>
-
+//记事本排序过滤
 class LeftViewSortFilter : public QSortFilterProxyModel
 {
 public:
     LeftViewSortFilter(QObject *parent = nullptr);
 
 protected:
+    //处理排序
     virtual bool lessThan(
         const QModelIndex &source_left,
         const QModelIndex &source_right) const override;

@@ -35,24 +35,36 @@ class VNoteIconButton : public DIconButton
 public:
     explicit VNoteIconButton(QWidget *parent = nullptr, QString normal = "", QString hover = "", QString press = "");
     virtual ~VNoteIconButton() override;
+    //是否区分主题
     void setSeparateThemIcons(bool separate);
+    //设置按钮不可用的图标
     void SetDisableIcon(const QString &disableIcon);
+    //设置按钮是否可用
     void setBtnDisabled(bool disabled);
 
 protected:
+    //重写鼠标事件
+    //进入
     void enterEvent(QEvent *event) override;
+    //离开
     void leaveEvent(QEvent *event) override;
+    //单击
     void mousePressEvent(QMouseEvent *event) override;
+    //释放
     void mouseReleaseEvent(QMouseEvent *event) override;
+    //移动
     void mouseMoveEvent(QMouseEvent *event) override;
 
 signals:
 
 public slots:
+    //主题切换
     void onThemeChanged(DGuiApplicationHelper::ColorType type);
 
 private:
+    //加载图片
     QPixmap loadPixmap(const QString &path);
+    //更新图片
     void updateIcon();
 
     enum {

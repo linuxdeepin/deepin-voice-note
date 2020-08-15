@@ -24,33 +24,44 @@
 
 #include <DStyledItemDelegate>
 DWIDGET_USE_NAMESPACE
-
+//记事本列表代理
 class LeftViewDelegate : public DStyledItemDelegate
 {
 public:
     LeftViewDelegate(QAbstractItemView *parent = nullptr);
+    //主题切换处理
     void handleChangeTheme();
+    //设置所有列表项是否可用
     void setEnableItem(bool enable);
 
     const int MAX_FOLDER_NAME_LEN = 64;
 
 protected:
+    //绘制列表项
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
                const QModelIndex &index) const Q_DECL_OVERRIDE;
+    //返回列表项大小
     QSize sizeHint(const QStyleOptionViewItem &option,
                    const QModelIndex &index) const Q_DECL_OVERRIDE;
+    //创建编辑框，用于重命名
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                           const QModelIndex &index) const override;
+    //编辑框设置初始内容
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    //编辑完成，数据同步
     void setModelData(QWidget *editor, QAbstractItemModel *model,
                       const QModelIndex &index) const override;
+    //调整编辑框位置
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
                               const QModelIndex &index) const override;
 
 private:
+    //初始化
     void init();
+    //绘制记事本父节点
     void paintNoteRoot(QPainter *painter, const QStyleOptionViewItem &option,
                        const QModelIndex &index) const;
+    //绘制记事本项
     void paintNoteItem(QPainter *painter, const QStyleOptionViewItem &option,
                        const QModelIndex &index) const;
     QAbstractItemView *m_treeView {nullptr};

@@ -23,7 +23,7 @@
 #define MIDDLEVIEWSORTFILTER_H
 
 #include <QSortFilterProxyModel>
-
+//列表项排序
 class MiddleViewSortFilter : public QSortFilterProxyModel
 {
 public:
@@ -34,13 +34,14 @@ public:
         createTime,
         modifyTime,
     };
-
+    //执行排序
     void sortView(
         sortFeild feild = modifyTime,
         int column = 0,
         Qt::SortOrder order = Qt::DescendingOrder);
 
 protected:
+    //处理排序
     virtual bool lessThan(
         const QModelIndex &source_left,
         const QModelIndex &source_right) const override;

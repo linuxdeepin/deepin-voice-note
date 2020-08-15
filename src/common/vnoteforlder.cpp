@@ -23,24 +23,42 @@
 
 #include <DLog>
 
+/**
+ * @brief VNoteFolder::VNoteFolder
+ */
 VNoteFolder::VNoteFolder()
 {
 }
 
+/**
+ * @brief VNoteFolder::~VNoteFolder
+ */
 VNoteFolder::~VNoteFolder()
 {
 }
 
+/**
+ * @brief VNoteFolder::isValid
+ * @return true 可用
+ */
 bool VNoteFolder::isValid()
 {
     return (id > INVALID_ID) ? true : false;
 }
 
+/**
+ * @brief VNoteFolder::maxNoteIdRef
+ * @return 最大记事项id
+ */
 qint32 &VNoteFolder::maxNoteIdRef()
 {
     return maxNoteId;
 }
 
+/**
+ * @brief VNoteFolder::getNotesCount
+ * @return 记事项数目
+ */
 qint32 VNoteFolder::getNotesCount()
 {
     int nCount = 0;
@@ -56,6 +74,10 @@ qint32 VNoteFolder::getNotesCount()
     return nCount;
 }
 
+/**
+ * @brief VNoteFolder::getNotes
+ * @return 记事项数据
+ */
 VNOTE_ITEMS_MAP *VNoteFolder::getNotes()
 {
     if (Q_UNLIKELY(nullptr == notes)) {

@@ -26,11 +26,19 @@
 VNoteOldDataManager *VNoteOldDataManager::_instance = nullptr;
 VNoteDbManager *VNoteOldDataManager::m_oldDbManger = nullptr;
 
+/**
+ * @brief VNoteOldDataManager::VNoteOldDataManager
+ * @param parent
+ */
 VNoteOldDataManager::VNoteOldDataManager(QObject *parent)
     : QObject(parent)
 {
 }
 
+/**
+ * @brief VNoteOldDataManager::instance
+ * @return 单例对象
+ */
 VNoteOldDataManager *VNoteOldDataManager::instance()
 {
     if (nullptr == _instance) {
@@ -40,6 +48,9 @@ VNoteOldDataManager *VNoteOldDataManager::instance()
     return _instance;
 }
 
+/**
+ * @brief VNoteOldDataManager::releaseInstance
+ */
 void VNoteOldDataManager::releaseInstance()
 {
     if (nullptr != _instance) {
@@ -51,16 +62,27 @@ void VNoteOldDataManager::releaseInstance()
     }
 }
 
+/**
+ * @brief VNoteOldDataManager::folders
+ * @return 记事本数据
+ */
 VNOTE_FOLDERS_MAP *VNoteOldDataManager::folders()
 {
     return m_qspNoteFoldersMap.get();
 }
 
+/**
+ * @brief VNoteOldDataManager::allNotes
+ * @return 记事项数据
+ */
 VNOTE_ALL_NOTES_MAP *VNoteOldDataManager::allNotes()
 {
     return m_qspAllNotes.get();
 }
 
+/**
+ * @brief VNoteOldDataManager::initOldDb
+ */
 void VNoteOldDataManager::initOldDb()
 {
     //Init old database when create data manager
@@ -68,6 +90,9 @@ void VNoteOldDataManager::initOldDb()
     m_oldDbManger = new VNoteDbManager(true);
 }
 
+/**
+ * @brief VNoteOldDataManager::reqDatas
+ */
 void VNoteOldDataManager::reqDatas()
 {
     OldDataLoadTask *pOldDataLoadTask = new OldDataLoadTask();
@@ -78,6 +103,9 @@ void VNoteOldDataManager::reqDatas()
     QThreadPool::globalInstance()->start(pOldDataLoadTask);
 }
 
+/**
+ * @brief VNoteOldDataManager::doUpgrade
+ */
 void VNoteOldDataManager::doUpgrade()
 {
     OldDataUpgradeTask *pOldDataUpgradeTask = new OldDataUpgradeTask();
@@ -89,17 +117,27 @@ void VNoteOldDataManager::doUpgrade()
     QThreadPool::globalInstance()->start(pOldDataUpgradeTask);
 }
 
+/**
+ * @brief VNoteOldDataManager::onFinishLoad
+ */
 void VNoteOldDataManager::onFinishLoad()
 {
     //Just notify data ready.
     emit dataReady();
 }
 
+/**
+ * @brief VNoteOldDataManager::onFinishUpgrade
+ */
 void VNoteOldDataManager::onFinishUpgrade()
 {
     emit upgradeFinish();
 }
 
+/**
+ * @brief VNoteOldDataManager::onProgress
+ * @param value
+ */
 void VNoteOldDataManager::onProgress(int value)
 {
     emit progressValue(value);

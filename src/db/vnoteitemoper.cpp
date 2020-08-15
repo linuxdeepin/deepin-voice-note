@@ -31,11 +31,19 @@
 #include <DLog>
 #include <DApplication>
 
+/**
+ * @brief VNoteItemOper::VNoteItemOper
+ * @param note 操作对象
+ */
 VNoteItemOper::VNoteItemOper(VNoteItem *note)
     : m_note(note)
 {
 }
 
+/**
+ * @brief VNoteItemOper::loadAllVNotes
+ * @return 加载的所有数据
+ */
 VNOTE_ALL_NOTES_MAP *VNoteItemOper::loadAllVNotes()
 {
     VNOTE_ALL_NOTES_MAP *notesMap = new VNOTE_ALL_NOTES_MAP();
@@ -59,6 +67,11 @@ VNOTE_ALL_NOTES_MAP *VNoteItemOper::loadAllVNotes()
     return notesMap;
 }
 
+/**
+ * @brief VNoteItemOper::modifyNoteTitle
+ * @param title
+ * @return true 成功
+ */
 bool VNoteItemOper::modifyNoteTitle(QString title)
 {
     bool isUpdateOK = true;
@@ -85,6 +98,10 @@ bool VNoteItemOper::modifyNoteTitle(QString title)
     return isUpdateOK;
 }
 
+/**
+ * @brief VNoteItemOper::updateNote
+ * @return true 成功
+ */
 bool VNoteItemOper::updateNote()
 {
     bool isUpdateOK = true;
@@ -120,6 +137,11 @@ bool VNoteItemOper::updateNote()
     return isUpdateOK;
 }
 
+/**
+ * @brief VNoteItemOper::addNote
+ * @param note
+ * @return 记事项数据
+ */
 VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
 {
     VNoteFolderOper folderOps;
@@ -173,16 +195,32 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
     return newNote;
 }
 
+/**
+ * @brief VNoteItemOper::getNote
+ * @param folderId
+ * @param noteId
+ * @return 记事项数据
+ */
 VNoteItem *VNoteItemOper::getNote(qint64 folderId, qint32 noteId)
 {
     return VNoteDataManager::instance()->getNote(folderId, noteId);
 }
 
+/**
+ * @brief VNoteItemOper::getFolderNotes
+ * @param folderId
+ * @return 记事项数据
+ */
 VNOTE_ITEMS_MAP *VNoteItemOper::getFolderNotes(qint64 folderId)
 {
     return VNoteDataManager::instance()->getFolderNotes(folderId);
 }
 
+/**
+ * @brief VNoteItemOper::getDefaultNoteName
+ * @param folderId
+ * @return 记事项名称
+ */
 QString VNoteItemOper::getDefaultNoteName(qint64 folderId)
 {
     VNoteFolder *folder = VNoteDataManager::instance()->getFolder(folderId);
@@ -196,6 +234,10 @@ QString VNoteItemOper::getDefaultNoteName(qint64 folderId)
     return defaultNoteName;
 }
 
+/**
+ * @brief VNoteItemOper::getDefaultVoiceName
+ * @return 语音项名称
+ */
 QString VNoteItemOper::getDefaultVoiceName() const
 {
     QString defaultVoiceName = DApplication::translate("DefaultName", "Voice");
@@ -207,6 +249,10 @@ QString VNoteItemOper::getDefaultVoiceName() const
     return defaultVoiceName;
 }
 
+/**
+ * @brief VNoteItemOper::deleteNote
+ * @return true 成功
+ */
 bool VNoteItemOper::deleteNote()
 {
     bool delOK = false;

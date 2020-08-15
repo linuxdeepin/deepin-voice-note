@@ -23,6 +23,13 @@
 
 static const QString mp3Encoder = "capsfilter caps=audio/x-raw,rate=44100,channels=2 ! lamemp3enc name=enc target=0 quality=2 ! xingmux ! id3mux";
 
+/**
+ * @brief bufferProbe
+ * @param pad
+ * @param info
+ * @param user_data 用户数据
+ * @return 处理结果
+ */
 GstPadProbeReturn bufferProbe(GstPad *pad, GstPadProbeInfo *info, gpointer user_data)
 {
     Q_UNUSED(pad);
@@ -32,6 +39,13 @@ GstPadProbeReturn bufferProbe(GstPad *pad, GstPadProbeInfo *info, gpointer user_
     return GST_PAD_PROBE_OK;
 }
 
+/**
+ * @brief GstBusMessageCb
+ * @param bus 总线
+ * @param msg 信息
+ * @param userdata 用户数据
+ * @return true 成功
+ */
 gboolean GstBusMessageCb(GstBus *bus, GstMessage *msg, void *userdata)
 {
     Q_UNUSED(bus);
@@ -39,12 +53,20 @@ gboolean GstBusMessageCb(GstBus *bus, GstMessage *msg, void *userdata)
     return recorder->doBusMessage(msg);
 }
 
+/**
+ * @brief GstreamRecorder::GstreamRecorder
+ * @param parent
+ */
 GstreamRecorder::GstreamRecorder(QObject *parent)
     : QObject(parent)
 {
     gst_init(nullptr, nullptr);
 }
 
+/**
+ * @brief GstreamRecorder::createPipe
+ * @return true成功
+ */
 bool GstreamRecorder::createPipe()
 {
     GstElement *audioSrc = nullptr; //声音采集设备
@@ -151,6 +173,9 @@ bool GstreamRecorder::createPipe()
     return success;
 }
 
+/**
+ * @brief GstreamRecorder::deinit
+ */
 void GstreamRecorder::deinit()
 {
     stopRecord();
@@ -158,11 +183,19 @@ void GstreamRecorder::deinit()
     gst_deinit();
 }
 
+/**
+ * @brief GstreamRecorder::~GstreamRecorder
+ */
 GstreamRecorder::~GstreamRecorder()
 {
     deinit();
 }
 
+/**
+ * @brief GstreamRecorder::GetGstState
+ * @param state 状态
+ * @param pending
+ */
 void GstreamRecorder::GetGstState(int *state, int *pending)
 {
     *state = GST_STATE_NULL;
@@ -173,6 +206,10 @@ void GstreamRecorder::GetGstState(int *state, int *pending)
                           reinterpret_cast<GstState *>(pending), 0);
 }
 
+/**
+ * @brief GstreamRecorder::startRecord
+ * @return  true成功
+ */
 bool GstreamRecorder::startRecord()
 {
     if (m_pipeline == nullptr && !createPipe())
@@ -198,6 +235,9 @@ bool GstreamRecorder::startRecord()
     return true;
 }
 
+/**
+ * @brief GstreamRecorder::stopRecord
+ */
 void GstreamRecorder::stopRecord()
 {
     if (m_pipeline == nullptr)
@@ -209,6 +249,9 @@ void GstreamRecorder::stopRecord()
     gst_element_set_state(m_pipeline, GST_STATE_NULL);
 }
 
+/**
+ * @brief GstreamRecorder::pauseRecord
+ */
 void GstreamRecorder::pauseRecord()
 {
     if (m_pipeline != nullptr) {
@@ -222,6 +265,10 @@ void GstreamRecorder::pauseRecord()
     }
 }
 
+/**
+ * @brief GstreamRecorder::setDevice
+ * @param device 设备名称
+ */
 void GstreamRecorder::setDevice(QString device)
 {
     if (device != m_currentDevice) {
@@ -234,6 +281,10 @@ void GstreamRecorder::setDevice(QString device)
     }
 }
 
+/**
+ * @brief GstreamRecorder::setOutputFile
+ * @param path 录音文件路径
+ */
 void GstreamRecorder::setOutputFile(QString path)
 {
     m_outputFile = path;
@@ -243,6 +294,11 @@ void GstreamRecorder::setOutputFile(QString path)
     }
 }
 
+/**
+ * @brief GstreamRecorder::doBusMessage
+ * @param message 消息
+ * @return true 成功
+ */
 bool GstreamRecorder::doBusMessage(GstMessage *message)
 {
     if (!message)
@@ -274,6 +330,11 @@ bool GstreamRecorder::doBusMessage(GstMessage *message)
     return true;
 }
 
+/**
+ * @brief GstreamRecorder::doBufferProbe
+ * @param buffer 录音数据
+ * @return true 成功
+ */
 bool GstreamRecorder::doBufferProbe(GstBuffer *buffer)
 {
     if (buffer) {
@@ -299,6 +360,9 @@ bool GstreamRecorder::doBufferProbe(GstBuffer *buffer)
     return true;
 }
 
+/**
+ * @brief GstreamRecorder::bufferProbed
+ */
 void GstreamRecorder::bufferProbed()
 {
     QAudioBuffer audioBuffer;
@@ -312,6 +376,9 @@ void GstreamRecorder::bufferProbed()
     emit audioBufferProbed(audioBuffer);
 }
 
+/**
+ * @brief GstreamRecorder::setStateToNull
+ */
 void GstreamRecorder::setStateToNull()
 {
     GstState cur_state, pending;
@@ -329,6 +396,9 @@ void GstreamRecorder::setStateToNull()
     gst_element_set_state(m_pipeline, GST_STATE_NULL);
 }
 
+/**
+ * @brief GstreamRecorder::initFormat
+ */
 void GstreamRecorder::initFormat()
 {
     //未压缩数据
@@ -341,7 +411,10 @@ void GstreamRecorder::initFormat()
     m_format.setSampleType(QAudioFormat::SignedInt);
     m_format.setSampleSize(16);
 }
-
+/**
+ * @brief GstreamRecorder::objectUnref
+ * @param object 处理对象
+ */
 void GstreamRecorder::objectUnref(gpointer object)
 {
     if (object != nullptr) {

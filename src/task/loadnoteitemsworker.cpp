@@ -24,11 +24,18 @@
 
 #include <DLog>
 
+/**
+ * @brief LoadNoteItemsWorker::LoadNoteItemsWorker
+ * @param parent
+ */
 LoadNoteItemsWorker::LoadNoteItemsWorker(QObject *parent)
     : VNTask(parent)
 {
 }
 
+/**
+ * @brief LoadNoteItemsWorker::run
+ */
 void LoadNoteItemsWorker::run()
 {
     static struct timeval start, backups, end;

@@ -25,17 +25,19 @@
 
 #include <QObject>
 #include <QRunnable>
-
+//加载默认图标线程
 class LoadIconsWorker : public VNTask
 {
     Q_OBJECT
 public:
     explicit LoadIconsWorker(QObject *parent = nullptr);
+    //图标置灰
     QPixmap greyPix(QPixmap pix);
 
     const int DEFAULTICONS_COUNT = 10;
 
 protected:
+    //加载图标
     virtual void run();
 
 signals:

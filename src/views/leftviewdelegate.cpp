@@ -32,12 +32,20 @@
 #include <DApplicationHelper>
 #include <DLog>
 
+/**
+ * @brief LeftViewDelegate::LeftViewDelegate
+ * @param parent
+ */
 LeftViewDelegate::LeftViewDelegate(QAbstractItemView *parent)
     : DStyledItemDelegate(parent)
     , m_treeView(parent)
 {
     init();
 }
+
+/**
+ * @brief LeftViewDelegate::init
+ */
 void LeftViewDelegate::init()
 {
     m_parentPb = DApplicationHelper::instance()->palette(m_treeView);
@@ -45,6 +53,13 @@ void LeftViewDelegate::init()
             &LeftViewDelegate::handleChangeTheme);
 }
 
+/**
+ * @brief LeftViewDelegate::createEditor
+ * @param parent
+ * @param option
+ * @param index
+ * @return 创建的编辑器
+ */
 QWidget *LeftViewDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                                         const QModelIndex &index) const
 {
@@ -56,6 +71,11 @@ QWidget *LeftViewDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
     return editBox;
 }
 
+/**
+ * @brief LeftViewDelegate::setEditorData
+ * @param editor
+ * @param index
+ */
 void LeftViewDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     QVariant var = index.data(Qt::UserRole + 2);
@@ -64,6 +84,12 @@ void LeftViewDelegate::setEditorData(QWidget *editor, const QModelIndex &index) 
     edit->setText(data->name);
 }
 
+/**
+ * @brief LeftViewDelegate::setModelData
+ * @param editor
+ * @param model
+ * @param index
+ */
 void LeftViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                     const QModelIndex &index) const
 {
@@ -87,6 +113,12 @@ void LeftViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
     }
 }
 
+/**
+ * @brief LeftViewDelegate::updateEditorGeometry
+ * @param editor
+ * @param option
+ * @param index
+ */
 void LeftViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
                                             const QModelIndex &index) const
 {
@@ -95,12 +127,21 @@ void LeftViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionV
     edit->move(option.rect.x() + 50, option.rect.y() + 8);
 }
 
+/**
+ * @brief LeftViewDelegate::handleChangeTheme
+ */
 void LeftViewDelegate::handleChangeTheme()
 {
     m_parentPb = DApplicationHelper::instance()->palette(m_treeView);
     m_treeView->update(m_treeView->currentIndex());
 }
 
+/**
+ * @brief LeftViewDelegate::sizeHint
+ * @param option
+ * @param index
+ * @return 列表项大小
+ */
 QSize LeftViewDelegate::sizeHint(const QStyleOptionViewItem &option,
                                  const QModelIndex &index) const
 {
@@ -115,6 +156,12 @@ QSize LeftViewDelegate::sizeHint(const QStyleOptionViewItem &option,
     }
 }
 
+/**
+ * @brief LeftViewDelegate::paint
+ * @param painter
+ * @param option
+ * @param index
+ */
 void LeftViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                              const QModelIndex &index) const
 {
@@ -129,6 +176,12 @@ void LeftViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     }
 }
 
+/**
+ * @brief LeftViewDelegate::paintNoteRoot
+ * @param painter
+ * @param option
+ * @param index
+ */
 void LeftViewDelegate::paintNoteRoot(QPainter *painter, const QStyleOptionViewItem &option,
                                      const QModelIndex &index) const
 {
@@ -137,6 +190,12 @@ void LeftViewDelegate::paintNoteRoot(QPainter *painter, const QStyleOptionViewIt
     Q_UNUSED(option)
 }
 
+/**
+ * @brief LeftViewDelegate::paintNoteItem
+ * @param painter
+ * @param option
+ * @param index
+ */
 void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewItem &option,
                                      const QModelIndex &index) const
 {
@@ -210,6 +269,10 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
     painter->restore();
 }
 
+/**
+ * @brief LeftViewDelegate::setEnableItem
+ * @param enable true 列表项可用
+ */
 void LeftViewDelegate::setEnableItem(bool enable)
 {
     m_enableItem = enable;

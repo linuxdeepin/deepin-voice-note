@@ -32,16 +32,29 @@
 
 #include <DLog>
 
+/**
+ * @brief VNoteFolderOper::VNoteFolderOper
+ * @param folder
+ */
 VNoteFolderOper::VNoteFolderOper(VNoteFolder *folder)
     : m_folder(folder)
 {
 }
 
+/**
+ * @brief VNoteFolderOper::isNoteItemLoaded
+ * @return true 数据加载完成
+ */
 bool VNoteFolderOper::isNoteItemLoaded()
 {
     return (m_folder) ? m_folder->fIsDataLoaded : false;
 }
 
+/**
+ * @brief VNoteFolderOper::deleteVNoteFolder
+ * @param folderId
+ * @return true 成功
+ */
 bool VNoteFolderOper::deleteVNoteFolder(qint64 folderId)
 {
     bool delOK = false;
@@ -57,6 +70,11 @@ bool VNoteFolderOper::deleteVNoteFolder(qint64 folderId)
     return delOK;
 }
 
+/**
+ * @brief VNoteFolderOper::deleteVNoteFolder
+ * @param folder
+ * @return true 成功
+ */
 bool VNoteFolderOper::deleteVNoteFolder(VNoteFolder *folder)
 {
     bool delOK = true;
@@ -67,6 +85,11 @@ bool VNoteFolderOper::deleteVNoteFolder(VNoteFolder *folder)
     return delOK;
 }
 
+/**
+ * @brief VNoteFolderOper::renameVNoteFolder
+ * @param folderName
+ * @return true 成功
+ */
 bool VNoteFolderOper::renameVNoteFolder(QString folderName)
 {
     bool isUpdateOK = true;
@@ -91,6 +114,10 @@ bool VNoteFolderOper::renameVNoteFolder(QString folderName)
     return isUpdateOK;
 }
 
+/**
+ * @brief VNoteFolderOper::loadVNoteFolders
+ * @return 所有记事本数据
+ */
 VNOTE_FOLDERS_MAP *VNoteFolderOper::loadVNoteFolders()
 {
     VNOTE_FOLDERS_MAP *foldersMap = new VNOTE_FOLDERS_MAP();
@@ -107,6 +134,11 @@ VNOTE_FOLDERS_MAP *VNoteFolderOper::loadVNoteFolders()
     return foldersMap;
 }
 
+/**
+ * @brief VNoteFolderOper::addFolder
+ * @param folder
+ * @return 数据处理后完整记事本数据
+ */
 VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
 {
     //Initialize
@@ -145,6 +177,11 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
     return newFolder;
 }
 
+/**
+ * @brief VNoteFolderOper::getFolder
+ * @param folderId
+ * @return 记事本数据
+ */
 VNoteFolder *VNoteFolderOper::getFolder(qint64 folderId)
 {
     VNoteFolder *folder = VNoteDataManager::instance()->getFolder(folderId);
@@ -152,11 +189,20 @@ VNoteFolder *VNoteFolderOper::getFolder(qint64 folderId)
     return folder;
 }
 
+/**
+ * @brief VNoteFolderOper::getFoldersCount
+ * @return 记事本数量
+ */
 qint32 VNoteFolderOper::getFoldersCount()
 {
     return VNoteDataManager::instance()->folderCount();
 }
 
+/**
+ * @brief VNoteFolderOper::getNotesCount
+ * @param folderId
+ * @return 记事项数量
+ */
 qint32 VNoteFolderOper::getNotesCount(qint64 folderId)
 {
     VNOTE_ITEMS_MAP *notesInFollder = VNoteDataManager::instance()->getFolderNotes(folderId);
@@ -170,6 +216,10 @@ qint32 VNoteFolderOper::getNotesCount(qint64 folderId)
     return notesCount;
 }
 
+/**
+ * @brief VNoteFolderOper::getNotesCount
+ * @return 记事项数量
+ */
 qint32 VNoteFolderOper::getNotesCount()
 {
     qint32 notesCount = 0;
@@ -181,6 +231,10 @@ qint32 VNoteFolderOper::getNotesCount()
     return notesCount;
 }
 
+/**
+ * @brief VNoteFolderOper::getDefaultFolderName
+ * @return 默认记事本名称
+ */
 QString VNoteFolderOper::getDefaultFolderName()
 {
     //TODO:
@@ -205,6 +259,10 @@ QString VNoteFolderOper::getDefaultFolderName()
     return defaultFolderName;
 }
 
+/**
+ * @brief VNoteFolderOper::getDefaultIcon
+ * @return 图标索引
+ */
 qint32 VNoteFolderOper::getDefaultIcon()
 {
     const int defalutIconCnt = 10;
@@ -215,6 +273,12 @@ qint32 VNoteFolderOper::getDefaultIcon()
     return (qrand() % defalutIconCnt);
 }
 
+/**
+ * @brief VNoteFolderOper::getDefaultIcon
+ * @param index
+ * @param type
+ * @return 图标
+ */
 QPixmap VNoteFolderOper::getDefaultIcon(qint32 index, IconsType type)
 {
     return VNoteDataManager::instance()->getDefaultIcon(index, type);

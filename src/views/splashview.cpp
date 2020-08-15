@@ -29,6 +29,10 @@
 
 DWIDGET_USE_NAMESPACE
 
+/**
+ * @brief SplashView::SplashView
+ * @param parent
+ */
 SplashView::SplashView(QWidget *parent)
     : QWidget(parent)
 {

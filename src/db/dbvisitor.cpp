@@ -69,6 +69,12 @@ const QStringList DbVisitor::DBSafer::saferColumnsName = {
     "create_time",
 };
 
+/**
+ * @brief DbVisitor::DbVisitor
+ * @param db 数据库对象
+ * @param inParam 参数
+ * @param result 结果
+ */
 DbVisitor::DbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : m_sqlQuery(new QSqlQuery(db))
 {
@@ -76,41 +82,74 @@ DbVisitor::DbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     results.ptr = result;
 }
 
+/**
+ * @brief DbVisitor::~DbVisitor
+ */
 DbVisitor::~DbVisitor()
 {
 }
 
+/**
+ * @brief DbVisitor::visitorData
+ * @return true 成功
+ */
 bool DbVisitor::visitorData()
 {
     // Default do nothing
     return true;
 }
 
+/**
+ * @brief DbVisitor::sqlQuery
+ * @return 数据库对象
+ */
 QSqlQuery *DbVisitor::sqlQuery()
 {
     return m_sqlQuery.get();
 }
 
+/**
+ * @brief DbVisitor::dbvSqls
+ * @return sql语句
+ */
 const QStringList &DbVisitor::dbvSqls()
 {
     return m_dbvSqls;
 }
 
+/**
+ * @brief DbVisitor::extraData
+ * @return 扩展数据
+ */
 DbVisitor::ExtraData &DbVisitor::extraData()
 {
     return m_extraData;
 }
 
+/**
+ * @brief DbVisitor::checkSqlStr
+ * @param sql
+ */
 void DbVisitor::checkSqlStr(QString &sql)
 {
     sql.replace("'", "''");
 }
 
+/**
+ * @brief FolderQryDbVisitor::FolderQryDbVisitor
+ * @param db
+ * @param inParam 参数
+ * @param result 结果
+ */
 FolderQryDbVisitor::FolderQryDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
 }
 
+/**
+ * @brief FolderQryDbVisitor::visitorData
+ * @return true 成功
+ */
 bool FolderQryDbVisitor::visitorData()
 {
     bool isOK = false;
@@ -151,6 +190,10 @@ bool FolderQryDbVisitor::visitorData()
     return isOK;
 }
 
+/**
+ * @brief FolderQryDbVisitor::prepareSqls
+ * @return true 成功
+ */
 bool FolderQryDbVisitor::prepareSqls()
 {
     static constexpr char const *QUERY_FOLDERS_FMT = "SELECT * FROM %s  ORDER BY %s DESC ;";
@@ -163,11 +206,21 @@ bool FolderQryDbVisitor::prepareSqls()
     return true;
 }
 
+/**
+ * @brief NoteQryDbVisitor::NoteQryDbVisitor
+ * @param db
+ * @param inParam 参数
+ * @param result 结果
+ */
 NoteQryDbVisitor::NoteQryDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
 }
 
+/**
+ * @brief NoteQryDbVisitor::visitorData
+ * @return true 成功
+ */
 bool NoteQryDbVisitor::visitorData()
 {
     bool isOK = false;
@@ -227,6 +280,10 @@ bool NoteQryDbVisitor::visitorData()
     return isOK;
 }
 
+/**
+ * @brief NoteQryDbVisitor::prepareSqls
+ * @return 成功
+ */
 bool NoteQryDbVisitor::prepareSqls()
 {
     static constexpr char const *QUERY_NOTES_FMT = "SELECT * FROM %s ORDER BY %s;";
@@ -239,11 +296,21 @@ bool NoteQryDbVisitor::prepareSqls()
     return true;
 }
 
+/**
+ * @brief MaxIdFolderDbVisitor::MaxIdFolderDbVisitor
+ * @param db
+ * @param inParam
+ * @param result
+ */
 MaxIdFolderDbVisitor::MaxIdFolderDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
 }
 
+/**
+ * @brief MaxIdFolderDbVisitor::visitorData
+ * @return true 成功
+ */
 bool MaxIdFolderDbVisitor::visitorData()
 {
     bool isOK = false;
@@ -260,6 +327,10 @@ bool MaxIdFolderDbVisitor::visitorData()
     return isOK;
 }
 
+/**
+ * @brief MaxIdFolderDbVisitor::prepareSqls
+ * @return true 成功
+ */
 bool MaxIdFolderDbVisitor::prepareSqls()
 {
     //TODO:
@@ -288,11 +359,21 @@ bool MaxIdFolderDbVisitor::prepareSqls()
     return true;
 }
 
+/**
+ * @brief AddFolderDbVisitor::AddFolderDbVisitor
+ * @param db
+ * @param inParam
+ * @param result
+ */
 AddFolderDbVisitor::AddFolderDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
 }
 
+/**
+ * @brief AddFolderDbVisitor::visitorData
+ * @return true 成功
+ */
 bool AddFolderDbVisitor::visitorData()
 {
     bool isOK = false;
@@ -325,6 +406,10 @@ bool AddFolderDbVisitor::visitorData()
     return isOK;
 }
 
+/**
+ * @brief AddFolderDbVisitor::prepareSqls
+ * @return true 成功
+ */
 bool AddFolderDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
@@ -356,11 +441,21 @@ bool AddFolderDbVisitor::prepareSqls()
     return fPrepareOK;
 }
 
+/**
+ * @brief RenameFolderDbVisitor::RenameFolderDbVisitor
+ * @param db
+ * @param inParam
+ * @param result
+ */
 RenameFolderDbVisitor::RenameFolderDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
 }
 
+/**
+ * @brief RenameFolderDbVisitor::prepareSqls
+ * @return true 成功
+ */
 bool RenameFolderDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
@@ -385,11 +480,21 @@ bool RenameFolderDbVisitor::prepareSqls()
     return fPrepareOK;
 }
 
+/**
+ * @brief DelFolderDbVisitor::DelFolderDbVisitor
+ * @param db
+ * @param inParam
+ * @param result
+ */
 DelFolderDbVisitor::DelFolderDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
 }
 
+/**
+ * @brief DelFolderDbVisitor::prepareSqls
+ * @return true 成功
+ */
 bool DelFolderDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
@@ -416,11 +521,21 @@ bool DelFolderDbVisitor::prepareSqls()
     return fPrepareOK;
 }
 
+/**
+ * @brief AddNoteDbVisitor::AddNoteDbVisitor
+ * @param db
+ * @param inParam
+ * @param result
+ */
 AddNoteDbVisitor::AddNoteDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
 }
 
+/**
+ * @brief AddNoteDbVisitor::visitorData
+ * @return true 成功
+ */
 bool AddNoteDbVisitor::visitorData()
 {
     bool isOK = false;
@@ -462,6 +577,10 @@ bool AddNoteDbVisitor::visitorData()
     return isOK;
 }
 
+/**
+ * @brief AddNoteDbVisitor::prepareSqls
+ * @return true 成功
+ */
 bool AddNoteDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
@@ -507,11 +626,21 @@ bool AddNoteDbVisitor::prepareSqls()
     return fPrepareOK;
 }
 
+/**
+ * @brief RenameNoteDbVisitor::RenameNoteDbVisitor
+ * @param db
+ * @param inParam
+ * @param result
+ */
 RenameNoteDbVisitor::RenameNoteDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
 }
 
+/**
+ * @brief RenameNoteDbVisitor::prepareSqls
+ * @return true 成功
+ */
 bool RenameNoteDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
@@ -542,11 +671,21 @@ bool RenameNoteDbVisitor::prepareSqls()
     return fPrepareOK;
 }
 
+/**
+ * @brief UpdateNoteDbVisitor::UpdateNoteDbVisitor
+ * @param db
+ * @param inParam
+ * @param result
+ */
 UpdateNoteDbVisitor::UpdateNoteDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
 }
 
+/**
+ * @brief UpdateNoteDbVisitor::prepareSqls
+ * @return true 成功
+ */
 bool UpdateNoteDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
@@ -577,11 +716,21 @@ bool UpdateNoteDbVisitor::prepareSqls()
     return fPrepareOK;
 }
 
+/**
+ * @brief DelNoteDbVisitor::DelNoteDbVisitor
+ * @param db
+ * @param inParam
+ * @param result
+ */
 DelNoteDbVisitor::DelNoteDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
 }
 
+/**
+ * @brief DelNoteDbVisitor::prepareSqls
+ * @return true 成功
+ */
 bool DelNoteDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
@@ -610,11 +759,21 @@ bool DelNoteDbVisitor::prepareSqls()
     return fPrepareOK;
 }
 
+/**
+ * @brief SaferQryDbVisitor::SaferQryDbVisitor
+ * @param db
+ * @param inParam
+ * @param result
+ */
 SaferQryDbVisitor::SaferQryDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
 }
 
+/**
+ * @brief SaferQryDbVisitor::visitorData
+ * @return true 成功
+ */
 bool SaferQryDbVisitor::visitorData()
 {
     bool isOK = false;
@@ -653,6 +812,10 @@ bool SaferQryDbVisitor::visitorData()
     return isOK;
 }
 
+/**
+ * @brief SaferQryDbVisitor::prepareSqls
+ * @return true 成功
+ */
 bool SaferQryDbVisitor::prepareSqls()
 {
     static constexpr char const *QUERY_FOLDERS_FMT = "SELECT * FROM %s ORDER BY %s DESC ;";
@@ -665,11 +828,21 @@ bool SaferQryDbVisitor::prepareSqls()
     return true;
 }
 
+/**
+ * @brief AddSaferDbVisitor::AddSaferDbVisitor
+ * @param db
+ * @param inParam
+ * @param result
+ */
 AddSaferDbVisitor::AddSaferDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
 }
 
+/**
+ * @brief AddSaferDbVisitor::prepareSqls
+ * @return true 成功
+ */
 bool AddSaferDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
@@ -688,11 +861,21 @@ bool AddSaferDbVisitor::prepareSqls()
     return fPrepareOK;
 }
 
+/**
+ * @brief DelSaferDbVisitor::DelSaferDbVisitor
+ * @param db
+ * @param inParam
+ * @param result
+ */
 DelSaferDbVisitor::DelSaferDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
 }
 
+/**
+ * @brief DelSaferDbVisitor::prepareSqls
+ * @return true 成功
+ */
 bool DelSaferDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;

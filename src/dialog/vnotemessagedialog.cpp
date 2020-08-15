@@ -28,6 +28,11 @@
 #include <DFontSizeManager>
 #include <DApplicationHelper>
 
+/**
+ * @brief VNoteMessageDialog::VNoteMessageDialog
+ * @param msgType 窗口类型
+ * @param parent
+ */
 VNoteMessageDialog::VNoteMessageDialog(int msgType, QWidget *parent)
     : VNoteBaseDialog(parent)
     , m_msgType(static_cast<MessageType>(msgType))
@@ -37,6 +42,9 @@ VNoteMessageDialog::VNoteMessageDialog(int msgType, QWidget *parent)
     initMessage();
 }
 
+/**
+ * @brief VNoteMessageDialog::setSingleButton
+ */
 void VNoteMessageDialog::setSingleButton()
 {
     m_buttonSpliter->setVisible(false);
@@ -44,6 +52,9 @@ void VNoteMessageDialog::setSingleButton()
     m_cancelBtn->setText(DApplication::translate("VNoteMessageDialog", "OK"));
 }
 
+/**
+ * @brief VNoteMessageDialog::initUI
+ */
 void VNoteMessageDialog::initUI()
 {
     QVBoxLayout *mainLayout = new QVBoxLayout();
@@ -93,6 +104,9 @@ void VNoteMessageDialog::initUI()
     addContent(mainFrame);
 }
 
+/**
+ * @brief VNoteMessageDialog::initConnections
+ */
 void VNoteMessageDialog::initConnections()
 {
     connect(m_cancelBtn, &DPushButton::clicked, this, [=]() {
@@ -106,6 +120,9 @@ void VNoteMessageDialog::initConnections()
     });
 }
 
+/**
+ * @brief VNoteMessageDialog::initMessage
+ */
 void VNoteMessageDialog::initMessage()
 {
     //TODO:

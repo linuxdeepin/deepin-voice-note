@@ -41,6 +41,11 @@
 
 #define DefaultHeight 64
 
+/**
+ * @brief VoiceNoteItem::VoiceNoteItem
+ * @param noteBlock 绑定的数据
+ * @param parent
+ */
 VoiceNoteItem::VoiceNoteItem(VNoteBlock *noteBlock, QWidget *parent)
     : DetailItemWidget(parent)
     , m_noteBlock(noteBlock)
@@ -51,6 +56,9 @@ VoiceNoteItem::VoiceNoteItem(VNoteBlock *noteBlock, QWidget *parent)
     onChangeTheme();
 }
 
+/**
+ * @brief VoiceNoteItem::initUi
+ */
 void VoiceNoteItem::initUi()
 {
     this->setFixedHeight(DefaultHeight);
@@ -133,6 +141,9 @@ void VoiceNoteItem::initUi()
     this->setLayout(mainLayout);
 }
 
+/**
+ * @brief VoiceNoteItem::initData
+ */
 void VoiceNoteItem::initData()
 {
     if (m_noteBlock != nullptr) {
@@ -148,6 +159,9 @@ void VoiceNoteItem::initData()
     }
 }
 
+/**
+ * @brief VoiceNoteItem::initConnection
+ */
 void VoiceNoteItem::initConnection()
 {
     connect(m_playBtn, &VNote2SIconButton::clicked, this, &VoiceNoteItem::onPlayBtnClicked);
@@ -160,6 +174,9 @@ void VoiceNoteItem::initConnection()
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this, &VoiceNoteItem::onChangeTheme);
 }
 
+/**
+ * @brief VoiceNoteItem::onPlayBtnClicked
+ */
 void VoiceNoteItem::onPlayBtnClicked()
 {
     bool isPress = m_playBtn->isPressed();
@@ -170,23 +187,36 @@ void VoiceNoteItem::onPlayBtnClicked()
     }
 }
 
+/**
+ * @brief VoiceNoteItem::getNoteBlock
+ * @return 绑定的数据
+ */
 VNoteBlock *VoiceNoteItem::getNoteBlock()
 {
     return m_noteBlock;
 }
 
+/**
+ * @brief VoiceNoteItem::showPlayBtn
+ */
 void VoiceNoteItem::showPlayBtn()
 {
     stopAnim();
     m_playBtn->setState(VNote2SIconButton::Normal);
 }
 
+/**
+ * @brief VoiceNoteItem::showPauseBtn
+ */
 void VoiceNoteItem::showPauseBtn()
 {
     startAnim();
     m_playBtn->setState(VNote2SIconButton::Press);
 }
 
+/**
+ * @brief VoiceNoteItem::showAsrStartWindow
+ */
 void VoiceNoteItem::showAsrStartWindow()
 {
     QTextOption option = m_asrText->document()->defaultTextOption();
@@ -197,6 +227,10 @@ void VoiceNoteItem::showAsrStartWindow()
     onAsrTextChange();
 }
 
+/**
+ * @brief VoiceNoteItem::showAsrEndWindow
+ * @param strResult 转文字的结果
+ */
 void VoiceNoteItem::showAsrEndWindow(const QString &strResult)
 {
     m_asrText->setPlainText(strResult);
@@ -211,11 +245,18 @@ void VoiceNoteItem::showAsrEndWindow(const QString &strResult)
     onAsrTextChange();
 }
 
+/**
+ * @brief VoiceNoteItem::enblePlayBtn
+ * @param enable
+ */
 void VoiceNoteItem::enblePlayBtn(bool enable)
 {
     m_playBtn->setEnabled(enable);
 }
 
+/**
+ * @brief VoiceNoteItem::onAsrTextChange
+ */
 void VoiceNoteItem::onAsrTextChange()
 {
     int height = DefaultHeight;
@@ -229,6 +270,9 @@ void VoiceNoteItem::onAsrTextChange()
     emit sigCursorHeightChange(this, height);
 }
 
+/**
+ * @brief VoiceNoteItem::onChangeTheme
+ */
 void VoiceNoteItem::onChangeTheme()
 {
     DPalette appDp = DApplicationHelper::instance()->applicationPalette();
@@ -257,11 +301,20 @@ void VoiceNoteItem::onChangeTheme()
     m_asrText->setPalette(pb);
 }
 
+/**
+ * @brief VoiceNoteItem::asrTextNotEmpty
+ * @return true 无转文字内容
+ */
 bool VoiceNoteItem::asrTextNotEmpty()
 {
     return m_noteBlock && !m_noteBlock->blockText.isEmpty();
 }
 
+/**
+ * @brief VoiceNoteItem::selectText
+ * @param globalPos
+ * @param op
+ */
 void VoiceNoteItem::selectText(const QPoint &globalPos, QTextCursor::MoveOperation op)
 {
     if (!isSelectAll() && asrTextNotEmpty()) {
@@ -269,6 +322,10 @@ void VoiceNoteItem::selectText(const QPoint &globalPos, QTextCursor::MoveOperati
     }
 }
 
+/**
+ * @brief VoiceNoteItem::selectText
+ * @param op
+ */
 void VoiceNoteItem::selectText(QTextCursor::MoveOperation op)
 {
     if (!isSelectAll() && asrTextNotEmpty()) {
@@ -276,6 +333,9 @@ void VoiceNoteItem::selectText(QTextCursor::MoveOperation op)
     }
 }
 
+/**
+ * @brief VoiceNoteItem::selectAllText
+ */
 void VoiceNoteItem::selectAllText()
 {
     if (m_selectAll == false) {
@@ -288,6 +348,9 @@ void VoiceNoteItem::selectAllText()
     }
 }
 
+/**
+ * @brief VoiceNoteItem::clearSelection
+ */
 void VoiceNoteItem::clearSelection()
 {
     m_coverWidget->setVisible(false);
@@ -297,6 +360,10 @@ void VoiceNoteItem::clearSelection()
     m_selectAll = false;
 }
 
+/**
+ * @brief VoiceNoteItem::getSelectFragment
+ * @return 选中的内容
+ */
 QTextDocumentFragment VoiceNoteItem::getSelectFragment()
 {
     QTextDocumentFragment ret;
@@ -310,6 +377,10 @@ QTextDocumentFragment VoiceNoteItem::getSelectFragment()
     return ret;
 }
 
+/**
+ * @brief VoiceNoteItem::getTextDocument
+ * @return 文档管理对象
+ */
 QTextDocument *VoiceNoteItem::getTextDocument()
 {
     QTextDocument *doc = nullptr;
@@ -319,11 +390,18 @@ QTextDocument *VoiceNoteItem::getTextDocument()
     return doc;
 }
 
+/**
+ * @brief VoiceNoteItem::hasSelection
+ * @return true 有选中
+ */
 bool VoiceNoteItem::hasSelection()
 {
     return m_selectAll || (asrTextNotEmpty() && m_asrText->hasSelection());
 }
 
+/**
+ * @brief VoiceNoteItem::removeSelectText
+ */
 void VoiceNoteItem::removeSelectText()
 {
     if (asrTextNotEmpty()) {
@@ -331,6 +409,10 @@ void VoiceNoteItem::removeSelectText()
     }
 }
 
+/**
+ * @brief VoiceNoteItem::getTextCursor
+ * @return 光标
+ */
 QTextCursor VoiceNoteItem::getTextCursor()
 {
     QTextCursor cursor;
@@ -340,18 +422,29 @@ QTextCursor VoiceNoteItem::getTextCursor()
     return cursor;
 }
 
+/**
+ * @brief VoiceNoteItem::setTextCursor
+ * @param cursor
+ */
 void VoiceNoteItem::setTextCursor(const QTextCursor &cursor)
 {
     if (asrTextNotEmpty()) {
         m_asrText->setTextCursor(cursor);
     }
 }
-
+/**
+ * @brief VoiceNoteItem::textIsEmpty
+ * @return true 无文本
+ */
 bool VoiceNoteItem::textIsEmpty()
 {
     return !asrTextNotEmpty();
 }
 
+/**
+ * @brief VoiceNoteItem::getCursorRect
+ * @return 光标区域
+ */
 QRect VoiceNoteItem::getCursorRect()
 {
     QRect rc;
@@ -361,18 +454,9 @@ QRect VoiceNoteItem::getCursorRect()
     return rc;
 }
 
-bool VoiceNoteItem::isAsrTextPos(const QPoint &globalPos)
-{
-    bool ret = false;
-    if (asrTextNotEmpty()) {
-        QPoint pos = m_asrText->mapFromGlobal(globalPos);
-        if (m_asrText->rect().contains(pos)) {
-            ret = true;
-        }
-    }
-    return ret;
-}
-
+/**
+ * @brief VoiceNoteItem::setFocus
+ */
 void VoiceNoteItem::setFocus()
 {
     QWidget *parent = static_cast<QWidget *>(this->parent());
@@ -381,6 +465,10 @@ void VoiceNoteItem::setFocus()
     }
 }
 
+/**
+ * @brief VoiceNoteItem::hasFocus
+ * @return true 有焦点
+ */
 bool VoiceNoteItem::hasFocus()
 {
     QWidget *parent = static_cast<QWidget *>(this->parent());
@@ -390,11 +478,18 @@ bool VoiceNoteItem::hasFocus()
     return false;
 }
 
+/**
+ * @brief VoiceNoteItem::isSelectAll
+ * @return true 全选
+ */
 bool VoiceNoteItem::isSelectAll()
 {
     return m_selectAll;
 }
 
+/**
+ * @brief VoiceNoteItem::updateAnim
+ */
 void VoiceNoteItem::updateAnim()
 {
     QPixmap playAnimPic = Utils::loadSVG(m_playBitmap[m_animPicIndex]);
@@ -407,6 +502,9 @@ void VoiceNoteItem::updateAnim()
     }
 }
 
+/**
+ * @brief VoiceNoteItem::stopAnim
+ */
 void VoiceNoteItem::stopAnim()
 {
     PlayAnimInferface::stopAnim();
@@ -417,6 +515,11 @@ void VoiceNoteItem::stopAnim()
     }
 }
 
+/**
+ * @brief VoiceNoteItem::isTextContainsPos
+ * @param globalPos
+ * @return true 文本区域包含坐标
+ */
 bool VoiceNoteItem::isTextContainsPos(const QPoint &globalPos)
 {
     if (asrTextNotEmpty()) {
@@ -427,10 +530,16 @@ bool VoiceNoteItem::isTextContainsPos(const QPoint &globalPos)
     return false;
 }
 
+/**
+ * @brief PlayAnimInferface::~PlayAnimInferface
+ */
 PlayAnimInferface::~PlayAnimInferface()
 {
 }
 
+/**
+ * @brief PlayAnimInferface::startAnim
+ */
 void PlayAnimInferface::startAnim()
 {
     if (nullptr != m_refreshTimer) {
@@ -442,6 +551,9 @@ void PlayAnimInferface::startAnim()
     }
 }
 
+/**
+ * @brief PlayAnimInferface::stopAnim
+ */
 void PlayAnimInferface::stopAnim()
 {
     if (nullptr != m_refreshTimer) {
@@ -451,6 +563,10 @@ void PlayAnimInferface::stopAnim()
     }
 }
 
+/**
+ * @brief PlayAnimInferface::setAnimTimer
+ * @param timer
+ */
 void PlayAnimInferface::setAnimTimer(QTimer *timer)
 {
     if (nullptr != timer) {
@@ -458,6 +574,9 @@ void PlayAnimInferface::setAnimTimer(QTimer *timer)
     }
 }
 
+/**
+ * @brief PlayAnimInferface::updateAnim
+ */
 void PlayAnimInferface::updateAnim()
 {
 }

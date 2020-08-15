@@ -29,17 +29,28 @@
 
 VNoteDataSafefyManager *VNoteDataSafefyManager::_instance = nullptr;
 
+/**
+ * @brief VNoteDataSafefyManager::VNoteDataSafefyManager
+ * @param parent
+ */
 VNoteDataSafefyManager::VNoteDataSafefyManager(QObject *parent)
     : QObject(parent)
 {
     initTaskWoker();
 }
 
+/**
+ * @brief VNoteDataSafefyManager::~VNoteDataSafefyManager
+ */
 VNoteDataSafefyManager::~VNoteDataSafefyManager()
 {
     m_safetyTaskWoker->quitWorker();
 }
 
+/**
+ * @brief VNoteDataSafefyManager::instance
+ * @return 单例对象
+ */
 VNoteDataSafefyManager *VNoteDataSafefyManager::instance()
 {
     if (nullptr == _instance) {
@@ -49,6 +60,9 @@ VNoteDataSafefyManager *VNoteDataSafefyManager::instance()
     return _instance;
 }
 
+/**
+ * @brief VNoteDataSafefyManager::reqSafers
+ */
 void VNoteDataSafefyManager::reqSafers()
 {
     m_pSaferLoadWorker = new LoadSafeteyDataWorker();
@@ -61,6 +75,10 @@ void VNoteDataSafefyManager::reqSafers()
     QThreadPool::globalInstance()->start(m_pSaferLoadWorker);
 }
 
+/**
+ * @brief VNoteDataSafefyManager::doSafer
+ * @param safer 缓存数据
+ */
 void VNoteDataSafefyManager::doSafer(const VDataSafer &safer)
 {
     if (safer.isValid()) {
@@ -72,6 +90,10 @@ void VNoteDataSafefyManager::doSafer(const VDataSafer &safer)
     }
 }
 
+/**
+ * @brief VNoteDataSafefyManager::onSafersLoaded
+ * @param safers 加载完成的缓存数据
+ */
 void VNoteDataSafefyManager::onSafersLoaded(SafetyDatas *safers)
 {
     if (m_qsSafetyDatas != nullptr) {
@@ -90,6 +112,9 @@ void VNoteDataSafefyManager::onSafersLoaded(SafetyDatas *safers)
     m_pSaferLoadWorker = nullptr;
 }
 
+/**
+ * @brief VNoteDataSafefyManager::initTaskWoker
+ */
 void VNoteDataSafefyManager::initTaskWoker()
 {
     m_safetyTaskWoker = new VNTaskWorker();

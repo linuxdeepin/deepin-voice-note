@@ -19,6 +19,10 @@
 #include "audiowatcher.h"
 #include "globaldef.h"
 
+/**
+ * @brief AudioWatcher::AudioWatcher
+ * @param parent 父类
+ */
 AudioWatcher::AudioWatcher(QObject *parent)
     : QObject(parent)
 {
@@ -27,6 +31,9 @@ AudioWatcher::AudioWatcher(QObject *parent)
     initConnections();
 }
 
+/**
+ * @brief AudioWatcher::initDeviceWacther
+ */
 void AudioWatcher::initDeviceWacther()
 {
     m_pAudioInterface.reset(new com::deepin::daemon::Audio(
@@ -59,6 +66,9 @@ void AudioWatcher::initDeviceWacther()
              << "\ncurrent output device name:" << m_pDefaultSink->name();
 }
 
+/**
+ * @brief AudioWatcher::initConnections
+ */
 void AudioWatcher::initConnections()
 {
     connect(m_pAudioInterface.get(), SIGNAL(DefaultSourceChanged(const QDBusObjectPath &)),
@@ -78,6 +88,10 @@ void AudioWatcher::initConnections()
             this, SLOT(onDefaultSinkActivePortChanged(AudioPort)));
 }
 
+/**
+ * @brief AudioWatcher::onSourceVolumeChanged
+ * @param value 当前音量值
+ */
 void AudioWatcher::onSourceVolumeChanged(double value)
 {
     m_inAudioPortVolume = value;
@@ -91,6 +105,10 @@ void AudioWatcher::onSourceVolumeChanged(double value)
     }
 }
 
+/**
+ * @brief AudioWatcher::onSinkVolumeChanged
+ * @param value 当前音量值
+ */
 void AudioWatcher::onSinkVolumeChanged(double value)
 {
     m_outAudioPortVolume = value;
@@ -104,6 +122,10 @@ void AudioWatcher::onSinkVolumeChanged(double value)
     }
 }
 
+/**
+ * @brief AudioWatcher::onDefaultSourceChanaged
+ * @param value 设备dbus路径
+ */
 void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &value)
 {
     qDebug() << "Input device change from:"
@@ -129,6 +151,10 @@ void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &value)
     emit sigDeviceChange(Micphone);
 }
 
+/**
+ * @brief AudioWatcher::onDefaultSinkChanaged
+ * @param value 设备dbus路径
+ */
 void AudioWatcher::onDefaultSinkChanaged(const QDBusObjectPath &value)
 {
     qDebug() << "Output device change from:"
@@ -154,6 +180,10 @@ void AudioWatcher::onDefaultSinkChanaged(const QDBusObjectPath &value)
     emit sigDeviceChange(Internal);
 }
 
+/**
+ * @brief AudioWatcher::onDefaultSinkActivePortChanged
+ * @param value 当前活动端口
+ */
 void AudioWatcher::onDefaultSinkActivePortChanged(AudioPort value)
 {
     qDebug() << "output active port change from:"
@@ -166,6 +196,10 @@ void AudioWatcher::onDefaultSinkActivePortChanged(AudioPort value)
     emit sigDeviceChange(Internal);
 }
 
+/**
+ * @brief AudioWatcher::onDefaultSourceActivePortChanged
+ * @param value 当前活动端口
+ */
 void AudioWatcher::onDefaultSourceActivePortChanged(AudioPort value)
 {
     qDebug() << "input active port change from:"
@@ -178,18 +212,31 @@ void AudioWatcher::onDefaultSourceActivePortChanged(AudioPort value)
     emit sigDeviceChange(Micphone);
 }
 
+/**
+ * @brief AudioWatcher::onSinkMuteChanged
+ * @param value 当前静音状态
+ */
 void AudioWatcher::onSinkMuteChanged(bool value)
 {
     m_outAudioMute = value;
     emit sigMuteChanged(Internal);
 }
 
+/**
+ * @brief AudioWatcher::onSourceMuteChanged
+ * @param value 当前静音状态
+ */
 void AudioWatcher::onSourceMuteChanged(bool value)
 {
     m_inAudioMute = value;
     emit sigMuteChanged(Micphone);
 }
 
+/**
+ * @brief AudioWatcher::getDeviceName
+ * @param mode
+ * @return 设备名称
+ */
 QString AudioWatcher::getDeviceName(AudioMode mode)
 {
     QString device = "";
@@ -215,16 +262,29 @@ QString AudioWatcher::getDeviceName(AudioMode mode)
     return device;
 }
 
+/**
+ * @brief AudioWatcher::getVolume
+ * @param mode
+ * @return 设备音量
+ */
 double AudioWatcher::getVolume(AudioMode mode)
 {
     return mode != Internal ? m_inAudioPortVolume : m_outAudioPortVolume;
 }
 
+/**
+ * @brief AudioWatcher::getMute
+ * @param mode
+ * @return 设备静音状态
+ */
 bool AudioWatcher::getMute(AudioMode mode)
 {
     return mode != Internal ? m_inAudioMute : m_outAudioMute;
 }
 
+/**
+ * @brief AudioWatcher::initWatcherCofing
+ */
 void AudioWatcher::initWatcherCofing()
 {
     //TODO:

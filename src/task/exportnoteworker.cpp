@@ -29,6 +29,14 @@
 
 #include <DLog>
 
+/**
+ * @brief ExportNoteWorker::ExportNoteWorker
+ * @param dirPath 导出目录
+ * @param exportType 导出类型
+ * @param note 绑定记事项数据
+ * @param block 绑定文本/语音
+ * @param parent
+ */
 ExportNoteWorker::ExportNoteWorker(QString dirPath, int exportType,
                                    VNoteItem *note, VNoteBlock *block, QObject *parent)
     : VNTask(parent)
@@ -38,7 +46,9 @@ ExportNoteWorker::ExportNoteWorker(QString dirPath, int exportType,
     , m_noteblock(block)
 {
 }
-
+/**
+ * @brief ExportNoteWorker::run
+ */
 void ExportNoteWorker::run()
 {
     ExportError error = static_cast<ExportError>(checkPath());
@@ -62,6 +72,10 @@ void ExportNoteWorker::run()
     emit exportFinished(error);
 }
 
+/**
+ * @brief ExportNoteWorker::checkPath
+ * @return 错误码
+ */
 int ExportNoteWorker::checkPath()
 {
     ExportError error = ExportOK;
@@ -83,6 +97,10 @@ int ExportNoteWorker::checkPath()
     return error;
 }
 
+/**
+ * @brief ExportNoteWorker::exportText
+ * @return 错误码
+ */
 int ExportNoteWorker::exportText()
 {
     ExportError error = ExportOK;
@@ -113,6 +131,10 @@ int ExportNoteWorker::exportText()
     return error;
 }
 
+/**
+ * @brief ExportNoteWorker::exportAllVoice
+ * @return 错误码
+ */
 int ExportNoteWorker::exportAllVoice()
 {
     ExportError error = ExportOK;
@@ -128,6 +150,11 @@ int ExportNoteWorker::exportAllVoice()
     return error;
 }
 
+/**
+ * @brief ExportNoteWorker::exportOneVoice
+ * @param noteblock
+ * @return 错误码
+ */
 int ExportNoteWorker::exportOneVoice(VNoteBlock *noteblock)
 {
     ExportError error = ExportOK;
@@ -143,6 +170,10 @@ int ExportNoteWorker::exportOneVoice(VNoteBlock *noteblock)
     return error;
 }
 
+/**
+ * @brief ExportNoteWorker::exportAll
+ * @return 错误码
+ */
 int ExportNoteWorker::exportAll()
 {
     ExportError error = ExportOK;

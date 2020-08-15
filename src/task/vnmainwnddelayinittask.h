@@ -27,7 +27,7 @@
 #include <QObject>
 
 class VNoteMainWindow;
-
+//延时任务线程，一些程序启动时不需要马上完成的任务，可以放在此线程中处理
 class VNMainWndDelayInitTask : public VNTask
 {
     Q_OBJECT
@@ -39,6 +39,7 @@ signals:
 public slots:
 
 protected:
+    //执行任务
     virtual void run();
 
 protected:

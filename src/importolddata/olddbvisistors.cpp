@@ -26,11 +26,21 @@
 #include <DLog>
 #include <DApplication>
 
+/**
+ * @brief OldFolderQryDbVisitor::OldFolderQryDbVisitor
+ * @param db
+ * @param inParam 参数
+ * @param result 结果
+ */
 OldFolderQryDbVisitor::OldFolderQryDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
 }
 
+/**
+ * @brief OldFolderQryDbVisitor::visitorData
+ * @return true 成功
+ */
 bool OldFolderQryDbVisitor::visitorData()
 {
     bool isOK = false;
@@ -73,6 +83,10 @@ bool OldFolderQryDbVisitor::visitorData()
     return isOK;
 }
 
+/**
+ * @brief OldFolderQryDbVisitor::prepareSqls
+ * @return true 成功
+ */
 bool OldFolderQryDbVisitor::prepareSqls()
 {
     //Query old folder data;
@@ -83,11 +97,21 @@ bool OldFolderQryDbVisitor::prepareSqls()
     return true;
 }
 
+/**
+ * @brief OldNoteQryDbVisitor::OldNoteQryDbVisitor
+ * @param db
+ * @param inParam
+ * @param result
+ */
 OldNoteQryDbVisitor::OldNoteQryDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
 }
 
+/**
+ * @brief OldNoteQryDbVisitor::visitorData
+ * @return true 成功
+ */
 bool OldNoteQryDbVisitor::visitorData()
 {
     bool isOK = false;
@@ -175,6 +199,10 @@ bool OldNoteQryDbVisitor::visitorData()
     return isOK;
 }
 
+/**
+ * @brief OldNoteQryDbVisitor::prepareSqls
+ * @return true 成功
+ */
 bool OldNoteQryDbVisitor::prepareSqls()
 {
     //Query old notes data

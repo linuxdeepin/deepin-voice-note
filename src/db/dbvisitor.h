@@ -31,14 +31,13 @@ class DbVisitor
 public:
     explicit DbVisitor(QSqlDatabase &db, const void *inParam, void *result = nullptr /*out*/);
     virtual ~DbVisitor();
-
-    /*
-     * Override the visitorData if need return data
-     * */
+    //sql执行结果数据处理
     virtual bool visitorData();
+    //准备sql语句
     virtual bool prepareSqls() = 0;
-
+    //获取对象
     QSqlQuery *sqlQuery();
+    //获取所有执行的sql语句
     const QStringList &dbvSqls();
 
     struct ExtraData {
@@ -48,10 +47,11 @@ public:
             //    Add expand data here
         } data;
     };
-
+    //扩展，用于执行一些特殊功能
     ExtraData &extraData();
 
 public:
+    //记事本表字段
     struct DBFolder {
         enum {
             folder_id = 0,
@@ -68,7 +68,7 @@ public:
 
         static const QStringList folderColumnsName;
     };
-
+    //记事项表字段
     struct DBNote {
         enum {
             note_id = 0,
@@ -84,7 +84,7 @@ public:
 
         static const QStringList noteColumnsName;
     };
-
+    //语音记录缓存表字段
     struct DBSafer {
         enum {
             id = 0,
@@ -102,7 +102,7 @@ public:
 protected:
     //Check & replace the "'" in the string.
     void checkSqlStr(QString &sql);
-
+    //sql处理的结果
     union {
         VNOTE_FOLDERS_MAP *folders;
         VNOTE_ALL_NOTES_MAP *notes;
@@ -113,7 +113,7 @@ protected:
         qint64 *id;
         void *ptr;
     } results;
-
+    //参数，用于生成sql语句
     union {
         const VNoteFolder *newFolder;
         const VNoteItem *newNote;
@@ -130,6 +130,7 @@ protected:
     ExtraData m_extraData; //Use defined, default not used.
 };
 
+//记事本数据查询
 class FolderQryDbVisitor : public DbVisitor
 {
 public:
@@ -139,6 +140,7 @@ public:
     virtual bool prepareSqls() override;
 };
 
+//记事本最大id查询
 class MaxIdFolderDbVisitor : public DbVisitor
 {
 public:
@@ -148,6 +150,7 @@ public:
     virtual bool prepareSqls() override;
 };
 
+//添加记事本
 class AddFolderDbVisitor : public DbVisitor
 {
 public:
@@ -157,6 +160,7 @@ public:
     virtual bool prepareSqls() override;
 };
 
+//记事本重命名
 class RenameFolderDbVisitor : public DbVisitor
 {
 public:
@@ -165,6 +169,7 @@ public:
     virtual bool prepareSqls() override;
 };
 
+//删除记事本
 class DelFolderDbVisitor : public DbVisitor
 {
 public:
@@ -173,6 +178,7 @@ public:
     virtual bool prepareSqls() override;
 };
 
+//记事项查询
 class NoteQryDbVisitor : public DbVisitor
 {
 public:
@@ -182,6 +188,7 @@ public:
     virtual bool prepareSqls() override;
 };
 
+//添加记事项
 class AddNoteDbVisitor : public DbVisitor
 {
 public:
@@ -191,6 +198,7 @@ public:
     virtual bool prepareSqls() override;
 };
 
+//记事项重命名
 class RenameNoteDbVisitor : public DbVisitor
 {
 public:
@@ -199,6 +207,7 @@ public:
     virtual bool prepareSqls() override;
 };
 
+//记事项更新
 class UpdateNoteDbVisitor : public DbVisitor
 {
 public:
@@ -207,6 +216,7 @@ public:
     virtual bool prepareSqls() override;
 };
 
+//记事项删除
 class DelNoteDbVisitor : public DbVisitor
 {
 public:
@@ -215,6 +225,7 @@ public:
     virtual bool prepareSqls() override;
 };
 
+//语音缓存记录查询
 class SaferQryDbVisitor : public DbVisitor
 {
 public:
@@ -224,6 +235,7 @@ public:
     virtual bool prepareSqls() override;
 };
 
+//添加语音缓存记录
 class AddSaferDbVisitor : public DbVisitor
 {
 public:
@@ -232,6 +244,7 @@ public:
     virtual bool prepareSqls() override;
 };
 
+//删除语音缓存记录
 class DelSaferDbVisitor : public DbVisitor
 {
 public:

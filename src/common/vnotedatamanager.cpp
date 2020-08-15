@@ -34,11 +34,19 @@ DCORE_USE_NAMESPACE
 
 VNoteDataManager *VNoteDataManager::_instance = nullptr;
 
+/**
+ * @brief VNoteDataManager::VNoteDataManager
+ * @param parent
+ */
 VNoteDataManager::VNoteDataManager(QObject *parent)
     : QObject(parent)
 {
 }
 
+/**
+ * @brief VNoteDataManager::instance
+ * @return 单例对象
+ */
 VNoteDataManager *VNoteDataManager::instance()
 {
     if (nullptr == _instance) {
@@ -52,11 +60,20 @@ VNoteDataManager *VNoteDataManager::instance()
     return _instance;
 }
 
+/**
+ * @brief VNoteDataManager::getNoteFolders
+ * @return 记事本数据
+ */
 VNOTE_FOLDERS_MAP *VNoteDataManager::getNoteFolders()
 {
     return m_qspNoteFoldersMap.get();
 }
 
+/**
+ * @brief VNoteDataManager::addFolder
+ * @param folder
+ * @return 处理后完整的数据
+ */
 VNoteFolder *VNoteDataManager::addFolder(VNoteFolder *folder)
 {
     VNoteFolder *retFlder = nullptr;
@@ -83,6 +100,11 @@ VNoteFolder *VNoteDataManager::addFolder(VNoteFolder *folder)
     return retFlder;
 }
 
+/**
+ * @brief VNoteDataManager::getFolder
+ * @param folderId
+ * @return  记事本数据
+ */
 VNoteFolder *VNoteDataManager::getFolder(qint64 folderId)
 {
     VNoteFolder *retFlder = nullptr;
@@ -100,6 +122,11 @@ VNoteFolder *VNoteDataManager::getFolder(qint64 folderId)
     return retFlder;
 }
 
+/**
+ * @brief VNoteDataManager::delFolder
+ * @param folderId
+ * @return 移除的记事本数据
+ */
 VNoteFolder *VNoteDataManager::delFolder(qint64 folderId)
 {
     VNoteFolder *retFlder = nullptr;
@@ -137,6 +164,10 @@ VNoteFolder *VNoteDataManager::delFolder(qint64 folderId)
     return retFlder;
 }
 
+/**
+ * @brief VNoteDataManager::folderCount
+ * @return 记事本数量
+ */
 qint32 VNoteDataManager::folderCount()
 {
     m_qspNoteFoldersMap->lock.lockForRead();
@@ -146,6 +177,11 @@ qint32 VNoteDataManager::folderCount()
     return count;
 }
 
+/**
+ * @brief VNoteDataManager::addNote
+ * @param note 记事项
+ * @return 处理后完整的记事项数据
+ */
 VNoteItem *VNoteDataManager::addNote(VNoteItem *note)
 {
     VNoteItem *retNote = nullptr;
@@ -200,6 +236,12 @@ VNoteItem *VNoteDataManager::addNote(VNoteItem *note)
     return retNote;
 }
 
+/**
+ * @brief VNoteDataManager::getNote
+ * @param folderId
+ * @param noteId
+ * @return 记事项数据
+ */
 VNoteItem *VNoteDataManager::getNote(qint64 folderId, qint32 noteId)
 {
     VNoteItem *retNote = nullptr;
@@ -236,6 +278,12 @@ VNoteItem *VNoteDataManager::getNote(qint64 folderId, qint32 noteId)
     return retNote;
 }
 
+/**
+ * @brief VNoteDataManager::delNote
+ * @param folderId
+ * @param noteId
+ * @return 移除的记事项数据
+ */
 VNoteItem *VNoteDataManager::delNote(qint64 folderId, qint32 noteId)
 {
     VNoteItem *retNote = nullptr;
@@ -276,6 +324,11 @@ VNoteItem *VNoteDataManager::delNote(qint64 folderId, qint32 noteId)
     return retNote;
 }
 
+/**
+ * @brief VNoteDataManager::folderNotesCount
+ * @param folderId
+ * @return 记事项数量
+ */
 qint32 VNoteDataManager::folderNotesCount(qint64 folderId)
 {
     qint32 notesCount = 0;
@@ -291,6 +344,11 @@ qint32 VNoteDataManager::folderNotesCount(qint64 folderId)
     return notesCount;
 }
 
+/**
+ * @brief VNoteDataManager::getFolderNotes
+ * @param folderId
+ * @return 记事本所有的记事项数据
+ */
 VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
 {
     VNOTE_ITEMS_MAP *folderNotes = nullptr;
@@ -313,6 +371,12 @@ VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
     return folderNotes;
 }
 
+/**
+ * @brief VNoteDataManager::getDefaultIcon
+ * @param index
+ * @param type
+ * @return 图标
+ */
 QPixmap VNoteDataManager::getDefaultIcon(qint32 index, IconsType type)
 {
     m_iconLock.lockForRead();
@@ -327,6 +391,10 @@ QPixmap VNoteDataManager::getDefaultIcon(qint32 index, IconsType type)
     return icon;
 }
 
+/**
+ * @brief VNoteDataManager::isAllDatasReady
+ * @return true 所有数据加载完成
+ */
 bool VNoteDataManager::isAllDatasReady() const
 {
     qInfo() << "m_fDataState:" << m_fDataState;
@@ -339,6 +407,9 @@ bool VNoteDataManager::isAllDatasReady() const
     }
 }
 
+/**
+ * @brief VNoteDataManager::reqNoteDefIcons
+ */
 void VNoteDataManager::reqNoteDefIcons()
 {
     LoadIconsWorker *iconLoadWorker = new LoadIconsWorker(); //
@@ -347,6 +418,9 @@ void VNoteDataManager::reqNoteDefIcons()
     QThreadPool::globalInstance()->start(iconLoadWorker, QThread::TimeCriticalPriority);
 }
 
+/**
+ * @brief VNoteDataManager::reqNoteFolders
+ */
 void VNoteDataManager::reqNoteFolders()
 {
     m_pForldesLoadThread = new LoadFolderWorker();
@@ -391,6 +465,9 @@ void VNoteDataManager::reqNoteFolders()
     QThreadPool::globalInstance()->start(m_pForldesLoadThread);
 }
 
+/**
+ * @brief VNoteDataManager::reqNoteItems
+ */
 void VNoteDataManager::reqNoteItems()
 {
     m_pNotesLoadThread = new LoadNoteItemsWorker();
@@ -441,6 +518,10 @@ void VNoteDataManager::reqNoteItems()
     QThreadPool::globalInstance()->start(m_pNotesLoadThread);
 }
 
+/**
+ * @brief VNoteDataManager::getAllNotesInFolder
+ * @return 所有记事本的记事项数据
+ */
 VNOTE_ALL_NOTES_MAP *VNoteDataManager::getAllNotesInFolder()
 {
     return m_qspAllNotesMap.get();

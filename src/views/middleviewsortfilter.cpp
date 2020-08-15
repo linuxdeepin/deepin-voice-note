@@ -23,11 +23,21 @@
 #include "common/vnoteitem.h"
 #include "common/standarditemcommon.h"
 
+/**
+ * @brief MiddleViewSortFilter::MiddleViewSortFilter
+ * @param parent
+ */
 MiddleViewSortFilter::MiddleViewSortFilter(QObject *parent)
     : QSortFilterProxyModel(parent)
 {
 }
 
+/**
+ * @brief MiddleViewSortFilter::sortView
+ * @param feild 排序类型
+ * @param column 排序列
+ * @param order 排序方式
+ */
 void MiddleViewSortFilter::sortView(MiddleViewSortFilter::sortFeild feild,
                                     int column,
                                     Qt::SortOrder order)
@@ -37,6 +47,12 @@ void MiddleViewSortFilter::sortView(MiddleViewSortFilter::sortFeild feild,
     sort(column, order);
 }
 
+/**
+ * @brief MiddleViewSortFilter::lessThan
+ * @param source_left
+ * @param source_right
+ * @return true source_left小于source_right
+ */
 bool MiddleViewSortFilter::lessThan(
     const QModelIndex &source_left,
     const QModelIndex &source_right) const

@@ -26,11 +26,19 @@
 
 DCORE_USE_NAMESPACE
 
+/**
+ * @brief VNoteA2TManager::VNoteA2TManager
+ * @param parent
+ */
 VNoteA2TManager::VNoteA2TManager(QObject *parent)
     : QObject(parent)
 {
 }
 
+/**
+ * @brief VNoteA2TManager::initSession
+ * @return 错误码
+ */
 int VNoteA2TManager::initSession()
 {
     m_session.reset(new com::iflytek::aiservice::session(
@@ -55,6 +63,13 @@ int VNoteA2TManager::initSession()
     return errorCode;
 }
 
+/**
+ * @brief VNoteA2TManager::startAsr
+ * @param filePath 文件路径
+ * @param fileDuration 文件时长
+ * @param srcLanguage 源语言
+ * @param targetLanguage 目标语言
+ */
 void VNoteA2TManager::startAsr(QString filePath,
                                qint64 fileDuration,
                                QString srcLanguage,
@@ -89,11 +104,18 @@ void VNoteA2TManager::startAsr(QString filePath,
     }
 }
 
+/**
+ * @brief VNoteA2TManager::stopAsr
+ */
 void VNoteA2TManager::stopAsr()
 {
     m_asrInterface->stopAsr();
 }
 
+/**
+ * @brief VNoteA2TManager::onNotify
+ * @param msg 数据信息
+ */
 void VNoteA2TManager::onNotify(const QString &msg)
 {
     asrMsg asrData;
@@ -118,6 +140,11 @@ void VNoteA2TManager::onNotify(const QString &msg)
     }
 }
 
+/**
+ * @brief VNoteA2TManager::asrJsonParser
+ * @param msg json串
+ * @param asrData 解析后的数据
+ */
 void VNoteA2TManager::asrJsonParser(const QString &msg, asrMsg &asrData)
 {
     QJsonParseError error;
@@ -148,6 +175,11 @@ void VNoteA2TManager::asrJsonParser(const QString &msg, asrMsg &asrData)
     }
 }
 
+/**
+ * @brief VNoteA2TManager::getErrorCode
+ * @param 消息数据
+ * @return 错误码
+ */
 VNoteA2TManager::ErrorCode VNoteA2TManager::getErrorCode(const asrMsg &asrData)
 {
     ErrorCode error = Success;

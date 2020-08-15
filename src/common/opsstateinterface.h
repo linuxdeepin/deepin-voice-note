@@ -41,14 +41,19 @@ public:
     };
 
     static OpsStateInterface *instance();
-
+    //根据操作类型设置对象状态
     void operState(int type, bool isSet);
-
+    //是否正在搜索
     bool isSearching() const;
+    //是否正在录音
     bool isRecording() const;
+    //是否正在播放
     bool isPlaying() const;
+    //是否正在语音转文字
     bool isVoice2Text() const;
+    //应用是否需要退出
     bool isAppQuit() const;
+    //后台语音服务是否存在，不存在则所有语音功能不可用
     bool isAiSrvExist() const;
 
 protected:

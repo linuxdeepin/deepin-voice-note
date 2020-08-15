@@ -91,20 +91,25 @@ public:
         NoteDetailCtxMenu,
     };
     Q_ENUM(MenuType)
-
-    DMenu *notebookContextMenu();
+    //获取记事本列表右键菜单
+    DMenu *notebookContextMenu();   
+    //获取记事项列表右键菜单
     DMenu *noteContextMenu();
+    //获取详情页右键菜单
     DMenu *detialContextMenu();
+    //获取菜单项ID
     ActionKind getActionKind(QAction *action);
+    //获取菜单项
     QAction *getActionById(ActionKind id);
-
+    //设置菜单项是否可用
     void enableAction(ActionKind actionId, bool enable);
-
+    //设置菜单项是否可见
     void visibleAction(ActionKind actionId, bool enable);
-
+    //重置菜单项可用状态
     void resetCtxMenu(MenuType type, bool enable = true);
 
 protected:
+    //初始化
     void initMenu();
 
     static ActionManager *_instance;

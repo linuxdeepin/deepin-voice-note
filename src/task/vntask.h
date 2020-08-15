@@ -23,7 +23,7 @@
 
 #include <QObject>
 #include <QRunnable>
-
+//任务基类，线程任务继承此类，可放入线程池
 class VNTask : public QObject
     , public QRunnable
 {

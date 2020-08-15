@@ -29,6 +29,10 @@
 #include <QDateTime>
 #include <QDebug>
 
+/**
+ * @brief VNoteRecordWidget::VNoteRecordWidget
+ * @param parent
+ */
 VNoteRecordWidget::VNoteRecordWidget(QWidget *parent)
     : DFloatingWidget(parent)
 {
@@ -37,6 +41,9 @@ VNoteRecordWidget::VNoteRecordWidget(QWidget *parent)
     initConnection();
 }
 
+/**
+ * @brief VNoteRecordWidget::initUi
+ */
 void VNoteRecordWidget::initUi()
 {
     m_pauseBtn = new VNoteIconButton(this, "pause_rec_normal.svg", "pause_rec_hover.svg", "pause_rec_press.svg");
@@ -75,11 +82,17 @@ void VNoteRecordWidget::initUi()
     m_continueBtn->setVisible(false);
 }
 
+/**
+ * @brief VNoteRecordWidget::initRecord
+ */
 void VNoteRecordWidget::initRecord()
 {
     m_audioRecoder = new GstreamRecorder(this);
 }
 
+/**
+ * @brief VNoteRecordWidget::initConnection
+ */
 void VNoteRecordWidget::initConnection()
 {
     connect(m_pauseBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onPauseRecord);
@@ -89,6 +102,9 @@ void VNoteRecordWidget::initConnection()
             this, SLOT(onAudioBufferProbed(const QAudioBuffer &)));
 }
 
+/**
+ * @brief VNoteRecordWidget::initRecordPath
+ */
 void VNoteRecordWidget::initRecordPath()
 {
     m_recordDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -99,12 +115,18 @@ void VNoteRecordWidget::initRecordPath()
     }
 }
 
+/**
+ * @brief VNoteRecordWidget::onFinshRecord
+ */
 void VNoteRecordWidget::onFinshRecord()
 {
     m_audioRecoder->stopRecord();
     emit sigFinshRecord(m_recordPath, m_recordMsec);
 }
 
+/**
+ * @brief VNoteRecordWidget::onPauseRecord
+ */
 void VNoteRecordWidget::onPauseRecord()
 {
     m_pauseBtn->setVisible(false);
@@ -112,6 +134,10 @@ void VNoteRecordWidget::onPauseRecord()
     m_audioRecoder->pauseRecord();
 }
 
+/**
+ * @brief VNoteRecordWidget::onContinueRecord
+ * @return true 成功
+ */
 bool VNoteRecordWidget::onContinueRecord()
 {
     m_pauseBtn->setVisible(true);
@@ -123,6 +149,10 @@ bool VNoteRecordWidget::onContinueRecord()
     return true;
 }
 
+/**
+ * @brief VNoteRecordWidget::startRecord
+ * @return true 成功
+ */
 bool VNoteRecordWidget::startRecord()
 {
     QString fileName = QDateTime::currentDateTime()
@@ -136,16 +166,27 @@ bool VNoteRecordWidget::startRecord()
     return onContinueRecord();
 }
 
+/**
+ * @brief VNoteRecordWidget::cancelRecord
+ */
 void VNoteRecordWidget::cancelRecord()
 {
     onFinshRecord();
 }
 
+/**
+ * @brief VNoteRecordWidget::getRecordPath
+ * @return 录音文件路径
+ */
 QString VNoteRecordWidget::getRecordPath() const
 {
     return m_recordPath;
 }
 
+/**
+ * @brief VNoteRecordWidget::onAudioBufferProbed
+ * @param buffer
+ */
 void VNoteRecordWidget::onAudioBufferProbed(const QAudioBuffer &buffer)
 {
     qint64 msec = buffer.startTime();
@@ -155,6 +196,10 @@ void VNoteRecordWidget::onAudioBufferProbed(const QAudioBuffer &buffer)
     m_waveForm->onAudioBufferProbed(buffer);
 }
 
+/**
+ * @brief VNoteRecordWidget::onRecordDurationChange
+ * @param duration
+ */
 void VNoteRecordWidget::onRecordDurationChange(qint64 duration)
 {
     m_recordMsec = duration;
@@ -165,6 +210,11 @@ void VNoteRecordWidget::onRecordDurationChange(qint64 duration)
         onFinshRecord();
     }
 }
+
+/**
+ * @brief VNoteRecordWidget::setAudioDevice
+ * @param device
+ */
 void VNoteRecordWidget::setAudioDevice(QString device)
 {
     m_audioRecoder->setDevice(device);

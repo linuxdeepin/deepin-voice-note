@@ -23,11 +23,19 @@
 
 #include <DLog>
 
+/**
+ * @brief VNTaskWorker::VNTaskWorker
+ * @param parent
+ */
 VNTaskWorker::VNTaskWorker(QObject *parent)
     : QThread(parent)
 {
 }
 
+/**
+ * @brief VNTaskWorker::addTask
+ * @param task 任务线程
+ */
 void VNTaskWorker::addTask(VNTask *task)
 {
     m_taskLock.lock();
@@ -37,16 +45,26 @@ void VNTaskWorker::addTask(VNTask *task)
     m_taskCondition.wakeAll();
 }
 
+/**
+ * @brief VNTaskWorker::setWorkerName
+ * @param worker 任务名称
+ */
 void VNTaskWorker::setWorkerName(const QString &worker)
 {
     m_workerName = worker;
 }
 
+/**
+ * @brief VNTaskWorker::quitWorker
+ */
 void VNTaskWorker::quitWorker()
 {
     m_fQuit = true;
 }
 
+/**
+ * @brief VNTaskWorker::run
+ */
 void VNTaskWorker::run()
 {
     do {

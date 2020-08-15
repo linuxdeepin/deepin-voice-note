@@ -73,6 +73,10 @@
 
 static OpsStateInterface *stateOperation = nullptr;
 
+/**
+ * @brief VNoteMainWindow::VNoteMainWindow
+ * @param parent
+ */
 VNoteMainWindow::VNoteMainWindow(QWidget *parent)
     : DMainWindow(parent)
 {
@@ -90,17 +94,26 @@ VNoteMainWindow::VNoteMainWindow(QWidget *parent)
     delayInitTasks();
 }
 
+/**
+ * @brief VNoteMainWindow::~VNoteMainWindow
+ */
 VNoteMainWindow::~VNoteMainWindow()
 {
     release();
 }
 
+/**
+ * @brief VNoteMainWindow::initUI
+ */
 void VNoteMainWindow::initUI()
 {
     initTitleBar();
     initMainView();
 }
 
+/**
+ * @brief VNoteMainWindow::initData
+ */
 void VNoteMainWindow::initData()
 {
     VNoteDataManager::instance()->reqNoteDefIcons();
@@ -108,11 +121,17 @@ void VNoteMainWindow::initData()
     VNoteDataManager::instance()->reqNoteItems();
 }
 
+/**
+ * @brief VNoteMainWindow::initAppSetting
+ */
 void VNoteMainWindow::initAppSetting()
 {
     stateOperation = OpsStateInterface::instance();
 }
 
+/**
+ * @brief VNoteMainWindow::initConnections
+ */
 void VNoteMainWindow::initConnections()
 {
     connect(VNoteDataManager::instance(), &VNoteDataManager::onAllDatasReady,
@@ -139,8 +158,6 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onRightViewVoicePause);
     connect(m_rightView, &RightView::sigCursorChange,
             this, &VNoteMainWindow::onCursorChange);
-    //    connect(this, &VNoteMainWindow::sigDltSelectContant,
-    //            m_rightView, &RightView::onDltSelectContant);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::onNewNotebook);
@@ -187,6 +204,9 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onMenuAction);
 }
 
+/**
+ * @brief VNoteMainWindow::initShortcuts
+ */
 void VNoteMainWindow::initShortcuts()
 {
     //*******************LeftView Shortcuts****************************
@@ -405,6 +425,9 @@ void VNoteMainWindow::initShortcuts()
             this, &VNoteMainWindow::onPreviewShortcut);
 }
 
+/**
+ * @brief VNoteMainWindow::initTitleBar
+ */
 void VNoteMainWindow::initTitleBar()
 {
     titlebar()->setFixedHeight(VNOTE_TITLEBAR_HEIGHT);
@@ -438,6 +461,9 @@ void VNoteMainWindow::initTitleBar()
     titlebar()->addWidget(m_noteSearchEdit);
 }
 
+/**
+ * @brief VNoteMainWindow::initMainView
+ */
 void VNoteMainWindow::initMainView()
 {
     initSpliterView();
@@ -484,6 +510,9 @@ void VNoteMainWindow::initMainView()
     setTitlebarShadowEnabled(true);
 }
 
+/**
+ * @brief VNoteMainWindow::initLeftView
+ */
 void VNoteMainWindow::initLeftView()
 {
     m_leftViewHolder = new QWidget(m_mainWndSpliter);
@@ -526,6 +555,9 @@ void VNoteMainWindow::initLeftView()
 #endif
 }
 
+/**
+ * @brief VNoteMainWindow::initMiddleView
+ */
 void VNoteMainWindow::initMiddleView()
 {
     m_middleViewHolder = new QWidget(m_mainWndSpliter);
@@ -561,6 +593,9 @@ void VNoteMainWindow::initMiddleView()
 #endif
 }
 
+/**
+ * @brief VNoteMainWindow::initRightView
+ */
 void VNoteMainWindow::initRightView()
 {
     m_rightViewHolder = new QWidget(m_mainWndSpliter);
@@ -609,6 +644,9 @@ void VNoteMainWindow::initRightView()
 #endif
 }
 
+/**
+ * @brief VNoteMainWindow::initA2TManager
+ */
 void VNoteMainWindow::initA2TManager()
 {
     //audio to text manager
@@ -619,6 +657,9 @@ void VNoteMainWindow::initA2TManager()
     connect(m_a2tManager, &VNoteA2TManager::asrSuccess, this, &VNoteMainWindow::onA2TSuccess);
 }
 
+/**
+ * @brief VNoteMainWindow::initLogin1Manager
+ */
 void VNoteMainWindow::initLogin1Manager()
 {
     m_pLogin1Manager = new DBusLogin1Manager(
@@ -632,6 +673,9 @@ void VNoteMainWindow::initLogin1Manager()
             this, &VNoteMainWindow::onSystemDown);
 }
 
+/**
+ * @brief VNoteMainWindow::holdHaltLock
+ */
 void VNoteMainWindow::holdHaltLock()
 {
     m_lockFd = m_pLogin1Manager->Inhibit(
@@ -645,17 +689,26 @@ void VNoteMainWindow::holdHaltLock()
     }
 }
 
+/**
+ * @brief VNoteMainWindow::releaseHaltLock
+ */
 void VNoteMainWindow::releaseHaltLock()
 {
     QDBusPendingReply<QDBusUnixFileDescriptor> releaseLock = m_lockFd;
     m_lockFd = QDBusPendingReply<QDBusUnixFileDescriptor>();
 }
 
+/**
+ * @brief VNoteMainWindow::initDelayWork
+ */
 void VNoteMainWindow::initDelayWork()
 {
     ;
 }
 
+/**
+ * @brief VNoteMainWindow::delayInitTasks
+ */
 void VNoteMainWindow::delayInitTasks()
 {
     VNMainWndDelayInitTask *pMainWndDelayTask = new VNMainWndDelayInitTask(this);
@@ -665,6 +718,9 @@ void VNoteMainWindow::delayInitTasks()
     QThreadPool::globalInstance()->start(pMainWndDelayTask);
 }
 
+/**
+ * @brief VNoteMainWindow::onVNoteFoldersLoaded
+ */
 void VNoteMainWindow::onVNoteFoldersLoaded()
 {
 #ifdef IMPORT_OLD_VERSION_DATA
@@ -685,6 +741,9 @@ void VNoteMainWindow::onVNoteFoldersLoaded()
     }
 }
 
+/**
+ * @brief VNoteMainWindow::onVNoteSearch
+ */
 void VNoteMainWindow::onVNoteSearch()
 {
     if (m_noteSearchEdit->lineEdit()->hasFocus()) {
@@ -699,6 +758,10 @@ void VNoteMainWindow::onVNoteSearch()
     }
 }
 
+/**
+ * @brief VNoteMainWindow::onVNoteSearchTextChange
+ * @param text
+ */
 void VNoteMainWindow::onVNoteSearchTextChange(const QString &text)
 {
     if (text.isEmpty()) {
@@ -706,6 +769,11 @@ void VNoteMainWindow::onVNoteSearchTextChange(const QString &text)
     }
 }
 
+/**
+ * @brief VNoteMainWindow::onVNoteFolderChange
+ * @param current
+ * @param previous
+ */
 void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QModelIndex &previous)
 {
     Q_UNUSED(previous);
@@ -717,6 +785,9 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
     }
 }
 
+/**
+ * @brief VNoteMainWindow::initSpliterView
+ */
 void VNoteMainWindow::initSpliterView()
 {
     m_mainWndSpliter = new DSplitter(Qt::Horizontal, this);
@@ -748,6 +819,9 @@ void VNoteMainWindow::initSpliterView()
 #ifdef IMPORT_OLD_VERSION_DATA
 //*******Upgrade old Db code here only********
 
+/**
+ * @brief VNoteMainWindow::initUpgradeView
+ */
 void VNoteMainWindow::initUpgradeView()
 {
     m_upgradeView = new UpgradeView(this);
@@ -767,16 +841,26 @@ void VNoteMainWindow::initUpgradeView()
 
 #endif
 
+/**
+ * @brief VNoteMainWindow::initSplashView
+ */
 void VNoteMainWindow::initSplashView()
 {
     m_splashView = new SplashView(this);
 }
 
+/**
+ * @brief VNoteMainWindow::initEmptyFoldersView
+ */
 void VNoteMainWindow::initEmptyFoldersView()
 {
     m_wndHomePage = new HomePage(this);
 }
 
+/**
+ * @brief VNoteMainWindow::onStartRecord
+ * @param path
+ */
 void VNoteMainWindow::onStartRecord(const QString &path)
 {
     setSpecialStatus(RecordStart);
@@ -801,6 +885,11 @@ void VNoteMainWindow::onStartRecord(const QString &path)
     holdHaltLock();
 }
 
+/**
+ * @brief VNoteMainWindow::onFinshRecord
+ * @param voicePath
+ * @param voiceSize
+ */
 void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 {
     if (voiceSize >= 1000) {
@@ -834,14 +923,26 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
     }
 }
 
+/**
+ * @brief VNoteMainWindow::onChangeTheme
+ */
 void VNoteMainWindow::onChangeTheme()
 {
     ;
 }
+
+/**
+ * @brief VNoteMainWindow::onA2TStartAgain
+ */
 void VNoteMainWindow ::onA2TStartAgain()
 {
     onA2TStart(false);
 }
+
+/**
+ * @brief VNoteMainWindow::onA2TStart
+ * @param first true第一次转文字
+ */
 void VNoteMainWindow::onA2TStart(bool first)
 {
     m_asrErrMeassage->setVisible(false);
@@ -882,6 +983,10 @@ void VNoteMainWindow::onA2TStart(bool first)
     }
 }
 
+/**
+ * @brief VNoteMainWindow::onA2TError
+ * @param error
+ */
 void VNoteMainWindow::onA2TError(int error)
 {
     VoiceNoteItem *asrVoiceItem = m_rightView->getCurVoiceAsr();
@@ -903,6 +1008,10 @@ void VNoteMainWindow::onA2TError(int error)
     setSpecialStatus(VoiceToTextEnd);
 }
 
+/**
+ * @brief VNoteMainWindow::onA2TSuccess
+ * @param text
+ */
 void VNoteMainWindow::onA2TSuccess(const QString &text)
 {
     VoiceNoteItem *asrVoiceItem = m_rightView->getCurVoiceAsr();
@@ -916,6 +1025,9 @@ void VNoteMainWindow::onA2TSuccess(const QString &text)
     m_rightView->setCurVoiceAsr(nullptr);
 }
 
+/**
+ * @brief VNoteMainWindow::onPreviewShortcut
+ */
 void VNoteMainWindow::onPreviewShortcut()
 {
     QRect rect = window()->geometry();
@@ -1041,6 +1153,10 @@ void VNoteMainWindow::onPreviewShortcut()
     connect(shortcutViewProcess, SIGNAL(finished(int)), shortcutViewProcess, SLOT(deleteLater()));
 }
 
+/**
+ * @brief VNoteMainWindow::closeEvent
+ * @param event
+ */
 void VNoteMainWindow::closeEvent(QCloseEvent *event)
 {
     if (checkIfNeedExit()) {
@@ -1057,6 +1173,10 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
     }
 }
 
+/**
+ * @brief VNoteMainWindow::resizeEvent
+ * @param event
+ */
 void VNoteMainWindow::resizeEvent(QResizeEvent *event)
 {
     if (m_asrErrMeassage->isVisible()) {
@@ -1074,11 +1194,19 @@ void VNoteMainWindow::resizeEvent(QResizeEvent *event)
     DMainWindow::resizeEvent(event);
 }
 
+/**
+ * @brief VNoteMainWindow::keyPressEvent
+ * @param event
+ */
 void VNoteMainWindow::keyPressEvent(QKeyEvent *event)
 {
     DMainWindow::keyPressEvent(event);
 }
 
+/**
+ * @brief VNoteMainWindow::checkIfNeedExit
+ * @return true 关闭应用
+ */
 bool VNoteMainWindow::checkIfNeedExit()
 {
     QScopedPointer<VNoteMessageDialog> pspMessageDialg;
@@ -1106,6 +1234,10 @@ bool VNoteMainWindow::checkIfNeedExit()
     return bNeedExit;
 }
 
+/**
+ * @brief VNoteMainWindow::onVNoteChange
+ * @param previous
+ */
 void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 {
     Q_UNUSED(previous);
@@ -1125,6 +1257,11 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
     m_rightView->initData(data, m_searchKey, m_rightViewHasFouse);
     m_rightViewHasFouse = false;
 }
+
+/**
+ * @brief VNoteMainWindow::onMenuAction
+ * @param action
+ */
 void VNoteMainWindow::onMenuAction(QAction *action)
 {
     ActionManager::ActionKind kind = ActionManager::Instance()->getActionKind(action);
@@ -1212,6 +1349,9 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     }
 }
 
+/**
+ * @brief VNoteMainWindow::onMenuAbout2Show
+ */
 void VNoteMainWindow::onMenuAbout2Show()
 {
     //TODO:
@@ -1261,6 +1401,10 @@ void VNoteMainWindow::onMenuAbout2Show()
     }
 }
 
+/**
+ * @brief VNoteMainWindow::loadNotepads
+ * @return 记事本数量
+ */
 int VNoteMainWindow::loadNotepads()
 {
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
@@ -1282,6 +1426,9 @@ int VNoteMainWindow::loadNotepads()
     return folderCount;
 }
 
+/**
+ * @brief VNoteMainWindow::addNotepad
+ */
 void VNoteMainWindow::addNotepad()
 {
     VNoteFolder itemData;
@@ -1298,6 +1445,9 @@ void VNoteMainWindow::addNotepad()
     }
 }
 
+/**
+ * @brief VNoteMainWindow::delNotepad
+ */
 void VNoteMainWindow::delNotepad()
 {
     VNoteFolder *data = m_leftView->removeFolder();
@@ -1313,11 +1463,17 @@ void VNoteMainWindow::delNotepad()
     }
 }
 
+/**
+ * @brief VNoteMainWindow::editNotepad
+ */
 void VNoteMainWindow::editNotepad()
 {
     m_leftView->editFolder();
 }
 
+/**
+ * @brief VNoteMainWindow::addNote
+ */
 void VNoteMainWindow::addNote()
 {
     qint64 id = m_middleView->getCurrentId();
@@ -1347,11 +1503,17 @@ void VNoteMainWindow::addNote()
     }
 }
 
+/**
+ * @brief VNoteMainWindow::editNote
+ */
 void VNoteMainWindow::editNote()
 {
     m_middleView->editNote();
 }
 
+/**
+ * @brief VNoteMainWindow::delNote
+ */
 void VNoteMainWindow::delNote()
 {
     VNoteItem *noteData = m_middleView->deleteCurrentRow();
@@ -1370,6 +1532,12 @@ void VNoteMainWindow::delNote()
         m_leftView->update(m_leftView->currentIndex());
     }
 }
+
+/**
+ * @brief VNoteMainWindow::loadNotes
+ * @param folder
+ * @return 记事项数量
+ */
 int VNoteMainWindow::loadNotes(VNoteFolder *folder)
 {
     m_middleView->clearAll();
@@ -1395,6 +1563,11 @@ int VNoteMainWindow::loadNotes(VNoteFolder *folder)
     return m_middleView->rowCount();
 }
 
+/**
+ * @brief VNoteMainWindow::loadSearchNotes
+ * @param key
+ * @return 记事项数量
+ */
 int VNoteMainWindow::loadSearchNotes(const QString &key)
 {
     m_middleView->clearAll();
@@ -1422,17 +1595,29 @@ int VNoteMainWindow::loadSearchNotes(const QString &key)
     return m_middleView->rowCount();
 }
 
+/**
+ * @brief VNoteMainWindow::onRightViewVoicePlay
+ * @param voiceData
+ */
 void VNoteMainWindow::onRightViewVoicePlay(VNVoiceBlock *voiceData)
 {
     setSpecialStatus(PlayVoiceStart);
     m_recordBar->playVoice(voiceData);
 }
 
+/**
+ * @brief VNoteMainWindow::onRightViewVoicePause
+ * @param voiceData
+ */
 void VNoteMainWindow::onRightViewVoicePause(VNVoiceBlock *voiceData)
 {
     m_recordBar->pauseVoice(voiceData);
 }
 
+/**
+ * @brief VNoteMainWindow::onPlayPlugVoicePlay
+ * @param voiceData
+ */
 void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
 {
     VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
@@ -1441,6 +1626,10 @@ void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
     }
 }
 
+/**
+ * @brief VNoteMainWindow::onPlayPlugVoicePause
+ * @param voiceData
+ */
 void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
 {
     VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
@@ -1449,6 +1638,10 @@ void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
     }
 }
 
+/**
+ * @brief VNoteMainWindow::onPlayPlugVoiceStop
+ * @param voiceData
+ */
 void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
 {
     VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
@@ -1460,6 +1653,9 @@ void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
     m_rightView->setFocus();
 }
 
+/**
+ * @brief VNoteMainWindow::onNewNotebook
+ */
 void VNoteMainWindow::onNewNotebook()
 {
     static struct timeval curret = {0, 0};
@@ -1474,6 +1670,9 @@ void VNoteMainWindow::onNewNotebook()
     }
 }
 
+/**
+ * @brief VNoteMainWindow::onNewNote
+ */
 void VNoteMainWindow::onNewNote()
 {
     static struct timeval curret = {0, 0};
@@ -1488,11 +1687,19 @@ void VNoteMainWindow::onNewNote()
     }
 }
 
+/**
+ * @brief VNoteMainWindow::canDoShortcutAction
+ * @return true 可以使用快捷键
+ */
 bool VNoteMainWindow::canDoShortcutAction() const
 {
     return (m_stackedWidget->currentIndex() == WndNoteShow);
 }
 
+/**
+ * @brief VNoteMainWindow::setSpecialStatus
+ * @param status
+ */
 void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
 {
     switch (status) {
@@ -1589,6 +1796,9 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
     }
 }
 
+/**
+ * @brief VNoteMainWindow::initAsrErrMessage
+ */
 void VNoteMainWindow::initAsrErrMessage()
 {
     m_asrErrMeassage = new DFloatingMessage(DFloatingMessage::ResidentType,
@@ -1612,6 +1822,9 @@ void VNoteMainWindow::initAsrErrMessage()
     m_asrErrMeassage->setVisible(false);
 }
 
+/**
+ * @brief VNoteMainWindow::initDeviceExceptionErrMessage
+ */
 void VNoteMainWindow::initDeviceExceptionErrMessage()
 {
     m_pDeviceExceptionMsg = new DFloatingMessage(DFloatingMessage::ResidentType,
@@ -1626,6 +1839,10 @@ void VNoteMainWindow::initDeviceExceptionErrMessage()
     m_pDeviceExceptionMsg->setVisible(false);
 }
 
+/**
+ * @brief VNoteMainWindow::showAsrErrMessage
+ * @param strMessage
+ */
 void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
 {
     m_asrErrMeassage->setMessage(strMessage);
@@ -1641,6 +1858,9 @@ void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
     m_asrErrMeassage->move(xPos, yPos);
 }
 
+/**
+ * @brief VNoteMainWindow::showDeviceExceptionErrMessage
+ */
 void VNoteMainWindow::showDeviceExceptionErrMessage()
 {
     m_pDeviceExceptionMsg->setVisible(true);
@@ -1655,11 +1875,18 @@ void VNoteMainWindow::showDeviceExceptionErrMessage()
     m_pDeviceExceptionMsg->move(xPos, yPos);
 }
 
+/**
+ * @brief VNoteMainWindow::closeDeviceExceptionErrMessage
+ */
 void VNoteMainWindow::closeDeviceExceptionErrMessage()
 {
     m_pDeviceExceptionMsg->setVisible(false);
 }
 
+/**
+ * @brief VNoteMainWindow::onSystemDown
+ * @param active
+ */
 void VNoteMainWindow::onSystemDown(bool active)
 {
     qInfo() << "System going down...";
@@ -1675,6 +1902,11 @@ void VNoteMainWindow::onSystemDown(bool active)
     }
 }
 
+/**
+ * @brief VNoteMainWindow::onCursorChange
+ * @param height
+ * @param mouseMove true 鼠标拖动
+ */
 void VNoteMainWindow::onCursorChange(int height, bool mouseMove)
 {
     QScrollBar *bar = m_rightViewScrollArea->verticalScrollBar();
@@ -1693,6 +1925,10 @@ void VNoteMainWindow::onCursorChange(int height, bool mouseMove)
     }
 }
 
+/**
+ * @brief VNoteMainWindow::switchWidget
+ * @param type
+ */
 void VNoteMainWindow::switchWidget(WindowType type)
 {
     bool searchEnable = type == WndNoteShow ? true : false;
@@ -1700,6 +1936,9 @@ void VNoteMainWindow::switchWidget(WindowType type)
     m_stackedWidget->setCurrentIndex(type);
 }
 
+/**
+ * @brief VNoteMainWindow::release
+ */
 void VNoteMainWindow::release()
 {
     //Save main window size
@@ -1718,6 +1957,9 @@ void VNoteMainWindow::release()
     VNoteDbManager::instance()->getVNoteDb().close();
 }
 
+/**
+ * @brief VNoteMainWindow::onShowPrivacy
+ */
 void VNoteMainWindow::onShowPrivacy()
 {
     QString url = "";
@@ -1731,6 +1973,9 @@ void VNoteMainWindow::onShowPrivacy()
     QDesktopServices::openUrl(url);
 }
 
+/**
+ * @brief VNoteMainWindow::onShowSettingDialog
+ */
 void VNoteMainWindow::onShowSettingDialog()
 {
     DSettingsDialog dialog(this);
@@ -1739,6 +1984,9 @@ void VNoteMainWindow::onShowSettingDialog()
     dialog.exec();
 }
 
+/**
+ * @brief VNoteMainWindow::initMenuExtension
+ */
 void VNoteMainWindow::initMenuExtension()
 {
     m_menuExtension = new DMenu(this);

@@ -31,7 +31,7 @@
 #include <DSuggestButton>
 
 DWIDGET_USE_NAMESPACE
-
+//无数据主页
 class HomePage : public QWidget
 {
     Q_OBJECT
@@ -39,10 +39,13 @@ public:
     explicit HomePage(QWidget *parent = nullptr);
 
 signals:
+    //添加记事本信号
     void sigAddFolderByInitPage();
 
 private:
+    //初始化UI布局
     void initUi();
+    //连接槽函数
     void initConnection();
 
     VNoteIconButton *m_Image;

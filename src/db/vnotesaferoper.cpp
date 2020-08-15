@@ -35,15 +35,26 @@
 //    "create_time",
 //};
 
+/**
+ * @brief VNoteSaferOper::VNoteSaferOper
+ */
 VNoteSaferOper::VNoteSaferOper()
 {
 }
 
+/**
+ * @brief VNoteSaferOper::VNoteSaferOper
+ * @param safer 操作对象
+ */
 VNoteSaferOper::VNoteSaferOper(const VDataSafer &safer)
     : m_dataSafer(safer)
 {
 }
 
+/**
+ * @brief VNoteSaferOper::loadSafers
+ * @return 缓存数据
+ */
 SafetyDatas *VNoteSaferOper::loadSafers()
 {
     SafetyDatas *safers = new SafetyDatas();
@@ -57,6 +68,10 @@ SafetyDatas *VNoteSaferOper::loadSafers()
     return safers;
 }
 
+/**
+ * @brief VNoteSaferOper::addSafer
+ * @param safer
+ */
 void VNoteSaferOper::addSafer(const VDataSafer &safer)
 {
     if (safer.isValid()) {
@@ -70,6 +85,10 @@ void VNoteSaferOper::addSafer(const VDataSafer &safer)
     }
 }
 
+/**
+ * @brief VNoteSaferOper::rmSafer
+ * @param safer
+ */
 void VNoteSaferOper::rmSafer(const VDataSafer &safer)
 {
     if (safer.isValid()) {

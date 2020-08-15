@@ -23,6 +23,8 @@
 
 #include <QObject>
 #include <QStandardItemModel>
+
+//用于treeview,listview的数据项
 class StandardItemCommon : public QObject
 {
     Q_OBJECT
@@ -35,8 +37,11 @@ public:
     };
     Q_ENUM(StandardItemType)
     StandardItemCommon();
+    //生成数据项
     static QStandardItem *createStandardItem(void *data, StandardItemType type);
+    //获取数据类型
     static StandardItemType getStandardItemType(const QModelIndex &index);
+    //获取数据内容
     static void *getStandardItemData(const QModelIndex &index);
 };
 

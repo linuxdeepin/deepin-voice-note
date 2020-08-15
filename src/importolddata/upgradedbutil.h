@@ -37,16 +37,21 @@ public:
         Processing,
         UpdateDone,
     };
-
+    //设置升级标志
     static void saveUpgradeState(int state);
+    //读取升级标志
     static int readUpgradeState();
-
+    //是否需要升级
     static bool needUpdateOldDb(int state);
+    //检查升级状态
     static void checkUpdateState(int state);
+    //老数据库备份
     static void backUpOldDb();
+    //删除语音文件
     static void clearVoices();
-
+    //记事本升级
     static void doFolderUpgrade(VNoteFolder *folder);
+    //记事项升级
     static void doFolderNoteUpgrade(qint64 newFolderId, qint64 oldFolderId);
 };
 

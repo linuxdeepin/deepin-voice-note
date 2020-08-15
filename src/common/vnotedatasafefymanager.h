@@ -27,7 +27,9 @@
 
 class VNTaskWorker;
 class LoadSafeteyDataWorker;
-
+//录音时录音记录相关信息先存入缓存表
+//录音完成会处理缓存表同时数据同步到其他数据库
+//录音过程中如出现异常退出，则缓存表信息未同步，则下次启动时默认是异常记录，会清理相关资源
 class VNoteDataSafefyManager : public QObject
 {
     Q_OBJECT
@@ -35,18 +37,20 @@ public:
     explicit VNoteDataSafefyManager(QObject *parent = nullptr);
 
     ~VNoteDataSafefyManager();
-
+    //单例
     static VNoteDataSafefyManager *instance();
-
+    //启动任务线程
     void reqSafers();
-
+    //处理数据
     void doSafer(const VDataSafer &safer);
 signals:
 
 public slots:
+    //程序启动时缓存数据加载完成
     void onSafersLoaded(SafetyDatas *safers);
 
 protected:
+    //初始化任务线程
     void initTaskWoker();
 
 protected:

@@ -31,8 +31,10 @@ public:
     OldDataLoadTask(QObject *parent = nullptr);
 
 protected:
+    //加载老数据库数据
     virtual void run();
 signals:
+    //数据加载完成
     void finishLoad();
 };
 
@@ -43,9 +45,12 @@ public:
     OldDataUpgradeTask(QObject *parent = nullptr);
 
 protected:
+    //升级数据
     virtual void run();
 signals:
+    //升级进度
     void progressValue(qint32);
+    //升级完成
     void finishUpgrade();
 };
 

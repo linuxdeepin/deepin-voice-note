@@ -22,9 +22,14 @@
 #include "textnoteedit.h"
 #include <QWheelEvent>
 #include <QTextBlock>
+
 #include <DFontSizeManager>
 #include <DApplicationHelper>
-#include <QDebug>
+
+/**
+ * @brief TextNoteEdit::TextNoteEdit
+ * @param parent
+ */
 TextNoteEdit::TextNoteEdit(QWidget *parent)
     : DTextEdit(parent)
 {
@@ -42,12 +47,20 @@ TextNoteEdit::TextNoteEdit(QWidget *parent)
     this->installEventFilter(this);
 }
 
+/**
+ * @brief TextNoteEdit::focusInEvent
+ * @param e
+ */
 void TextNoteEdit::focusInEvent(QFocusEvent *e)
 {
     DTextEdit::focusInEvent(e);
     emit sigFocusIn();
 }
 
+/**
+ * @brief TextNoteEdit::focusOutEvent
+ * @param e
+ */
 void TextNoteEdit::focusOutEvent(QFocusEvent *e)
 {
     DTextEdit::focusOutEvent(e);
@@ -56,11 +69,19 @@ void TextNoteEdit::focusOutEvent(QFocusEvent *e)
     }
 }
 
+/**
+ * @brief TextNoteEdit::wheelEvent
+ * @param e
+ */
 void TextNoteEdit::wheelEvent(QWheelEvent *e)
 {
     e->ignore();
 }
 
+/**
+ * @brief TextNoteEdit::contextMenuEvent
+ * @param e
+ */
 void TextNoteEdit::contextMenuEvent(QContextMenuEvent *e)
 {
     m_menuPop = true;
@@ -68,6 +89,10 @@ void TextNoteEdit::contextMenuEvent(QContextMenuEvent *e)
     m_menuPop = false;
 }
 
+/**
+ * @brief TextNoteEdit::keyPressEvent
+ * @param e
+ */
 void TextNoteEdit::keyPressEvent(QKeyEvent *e)
 {
     int key = e->key();
@@ -85,29 +110,50 @@ void TextNoteEdit::keyPressEvent(QKeyEvent *e)
     DTextEdit::keyPressEvent(e);
 }
 
+/**
+ * @brief TextNoteEdit::mousePressEvent
+ * @param event
+ */
 void TextNoteEdit::mousePressEvent(QMouseEvent *event)
 {
     DTextEdit::mousePressEvent(event);
     event->ignore();
 }
 
+/**
+ * @brief TextNoteEdit::mouseReleaseEvent
+ * @param event
+ */
 void TextNoteEdit::mouseReleaseEvent(QMouseEvent *event)
 {
     DTextEdit::mouseReleaseEvent(event);
     event->ignore();
 }
 
+/**
+ * @brief TextNoteEdit::mouseMoveEvent
+ * @param event
+ */
 void TextNoteEdit::mouseMoveEvent(QMouseEvent *event)
 {
     //DTextEdit::mouseMoveEvent(event);
     event->ignore();
 }
 
+/**
+ * @brief TextNoteEdit::mouseDoubleClickEvent
+ * @param event
+ */
 void TextNoteEdit::mouseDoubleClickEvent(QMouseEvent *event)
 {
     event->ignore();
 }
 
+/**
+ * @brief TextNoteEdit::selectText
+ * @param globalPos 全局光标坐标
+ * @param op 文本光标移动方式
+ */
 void TextNoteEdit::selectText(const QPoint &globalPos, QTextCursor::MoveOperation op)
 {
     QPoint pos = this->mapFromGlobal(globalPos);
@@ -119,6 +165,9 @@ void TextNoteEdit::selectText(const QPoint &globalPos, QTextCursor::MoveOperatio
     this->setTextCursor(cursor);
 }
 
+/**
+ * @brief TextNoteEdit::clearSelection
+ */
 void TextNoteEdit::clearSelection()
 {
     QTextCursor textCursor = this->textCursor();
@@ -128,24 +177,38 @@ void TextNoteEdit::clearSelection()
     }
 }
 
+/**
+ * @brief TextNoteEdit::getSelectFragment
+ * @return 选中的片段
+ */
 QString TextNoteEdit::getSelectFragment()
 {
     QTextCursor textCursor = this->textCursor();
     return textCursor.selectedText();
 }
 
+/**
+ * @brief TextNoteEdit::hasSelection
+ * @return true 有选中
+ */
 bool TextNoteEdit::hasSelection()
 {
     QTextCursor textCursor = this->textCursor();
     return textCursor.hasSelection();
 }
 
+/**
+ * @brief TextNoteEdit::removeSelectText
+ */
 void TextNoteEdit::removeSelectText()
 {
     QTextCursor textCursor = this->textCursor();
     textCursor.removeSelectedText();
 }
 
+/**
+ * @brief TextNoteEdit::indentText
+ */
 void TextNoteEdit::indentText()
 {
     QTextCursor cursor = textCursor();

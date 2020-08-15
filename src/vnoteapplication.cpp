@@ -29,12 +29,20 @@
 #include <DWidgetUtil>
 #include <DGuiApplicationHelper>
 
+/**
+ * @brief VNoteApplication::VNoteApplication
+ * @param argc
+ * @param argv
+ */
 VNoteApplication::VNoteApplication(int &argc, char **argv)
     : DApplication(argc, argv)
 {
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::newProcessInstance, this, &VNoteApplication::onNewProcessInstance);
 }
 
+/**
+ * @brief VNoteApplication::activateWindow
+ */
 void VNoteApplication::activateWindow()
 {
     //Init Normal window at first time
@@ -59,11 +67,20 @@ void VNoteApplication::activateWindow()
     }
 }
 
+/**
+ * @brief VNoteApplication::mainWindow
+ * @return 主窗口
+ */
 VNoteMainWindow *VNoteApplication::mainWindow() const
 {
     return m_qspMainWnd.get();
 }
 
+/**
+ * @brief VNoteApplication::onNewProcessInstance
+ * @param pid
+ * @param arguments
+ */
 void VNoteApplication::onNewProcessInstance(qint64 pid, const QStringList &arguments)
 {
     Q_UNUSED(pid);
@@ -75,6 +92,9 @@ void VNoteApplication::onNewProcessInstance(qint64 pid, const QStringList &argum
     activateWindow();
 }
 
+/**
+ * @brief VNoteApplication::handleQuitAction
+ */
 void VNoteApplication::handleQuitAction()
 {
     QEvent event(QEvent::Close);

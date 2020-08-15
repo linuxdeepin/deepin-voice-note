@@ -31,7 +31,7 @@ class VNoteApplication : public DApplication
     Q_OBJECT
 public:
     explicit VNoteApplication(int &argc, char **argv);
-
+    //激活窗口
     void activateWindow();
     /*
      * Comment:
@@ -43,9 +43,11 @@ public:
 signals:
 
 public slots:
+    //进程单例处理
     void onNewProcessInstance(qint64 pid, const QStringList &arguments);
 
 protected:
+    //重写标题栏退出事件
     virtual void handleQuitAction() override;
 
 protected:

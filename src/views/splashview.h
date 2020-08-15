@@ -23,7 +23,7 @@
 #define SPLASHVIEW_H
 
 #include <QWidget>
-
+//加载动画
 class SplashView : public QWidget
 {
     Q_OBJECT

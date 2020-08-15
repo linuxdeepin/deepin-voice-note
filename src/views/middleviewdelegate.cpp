@@ -37,7 +37,10 @@
 #include <QDebug>
 
 static VNoteFolderOper FolderOper;
-
+/**
+ * @brief The VNoteTextPHelper struct
+ * 搜索关键字分割字符串高亮显示
+ */
 struct VNoteTextPHelper {
     VNoteTextPHelper(QPainter *painter, QFontMetrics fontMetrics, QRect nameRect)
         : m_fontMetrics(fontMetrics)
@@ -67,8 +70,9 @@ struct VNoteTextPHelper {
         FolderPen,
         PenCount
     };
-
+    //分割字符串
     void spiltByKeyword(const QString &text, const QString &keyword);
+    //绘制文本
     void paintText(bool isSelected = false);
 
     QVector<Text> m_textsVector;
@@ -78,6 +82,11 @@ struct VNoteTextPHelper {
     QPainter *m_painter {nullptr};
 };
 
+/**
+ * @brief VNoteTextPHelper::spiltByKeyword
+ * @param text 记事项名称
+ * @param keyword 搜索关键字
+ */
 void VNoteTextPHelper::spiltByKeyword(const QString &text, const QString &keyword)
 {
     //Check if text exceed the name rect, elide the
@@ -129,6 +138,10 @@ void VNoteTextPHelper::spiltByKeyword(const QString &text, const QString &keywor
     }
 }
 
+/**
+ * @brief VNoteTextPHelper::paintText
+ * @param isSelected true 绘制项为选中项
+ */
 void VNoteTextPHelper::paintText(bool isSelected)
 {
     int currentX = m_nameRect.x();
@@ -156,6 +169,11 @@ void VNoteTextPHelper::paintText(bool isSelected)
     //Restore default pen
     m_painter->setPen(m_pens[OldPen]);
 }
+
+/**
+ * @brief MiddleViewDelegate::MiddleViewDelegate
+ * @param parent
+ */
 MiddleViewDelegate::MiddleViewDelegate(QAbstractItemView *parent)
     : DStyledItemDelegate(parent)
     , m_parentView(parent)
@@ -165,27 +183,48 @@ MiddleViewDelegate::MiddleViewDelegate(QAbstractItemView *parent)
             &MiddleViewDelegate::handleChangeTheme);
 }
 
+/**
+ * @brief MiddleViewDelegate::setSearchKey
+ * @param key
+ */
 void MiddleViewDelegate::setSearchKey(const QString &key)
 {
     m_searchKey = key;
 }
 
+/**
+ * @brief MiddleViewDelegate::handleChangeTheme
+ */
 void MiddleViewDelegate::handleChangeTheme()
 {
     m_parentPb = DApplicationHelper::instance()->palette(m_parentView);
     m_parentView->update(m_parentView->currentIndex());
 }
 
+/**
+ * @brief MiddleViewDelegate::setEnableItem
+ * @param enable
+ */
 void MiddleViewDelegate::setEnableItem(bool enable)
 {
     m_enableItem = enable;
 }
 
+/**
+ * @brief MiddleViewDelegate::setEditIsVisible
+ * @param isVisible
+ */
 void MiddleViewDelegate::setEditIsVisible(bool isVisible)
 {
     m_editVisible = isVisible;
 }
 
+/**
+ * @brief MiddleViewDelegate::sizeHint
+ * @param option
+ * @param index
+ * @return 记事项大小
+ */
 QSize MiddleViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     Q_UNUSED(index);
@@ -196,6 +235,13 @@ QSize MiddleViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QMo
     }
 }
 
+/**
+ * @brief MiddleViewDelegate::createEditor
+ * @param parent
+ * @param option
+ * @param index
+ * @return 编辑器窗口
+ */
 QWidget *MiddleViewDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                                           const QModelIndex &index) const
 {
@@ -208,6 +254,11 @@ QWidget *MiddleViewDelegate::createEditor(QWidget *parent, const QStyleOptionVie
     return editBox;
 }
 
+/**
+ * @brief MiddleViewDelegate::setEditorData
+ * @param editor
+ * @param index
+ */
 void MiddleViewDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     QVariant var = index.data(Qt::UserRole + 1);
@@ -218,6 +269,12 @@ void MiddleViewDelegate::setEditorData(QWidget *editor, const QModelIndex &index
     }
 }
 
+/**
+ * @brief MiddleViewDelegate::setModelData
+ * @param editor
+ * @param model
+ * @param index
+ */
 void MiddleViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                       const QModelIndex &index) const
 {
@@ -241,6 +298,12 @@ void MiddleViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     }
 }
 
+/**
+ * @brief MiddleViewDelegate::updateEditorGeometry
+ * @param editor
+ * @param option
+ * @param index
+ */
 void MiddleViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
                                               const QModelIndex &index) const
 {
@@ -249,6 +312,12 @@ void MiddleViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptio
     edit->move(option.rect.x() + 28, option.rect.y() + 17);
 }
 
+/**
+ * @brief MiddleViewDelegate::paint
+ * @param painter
+ * @param option
+ * @param index
+ */
 void MiddleViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
                                const QModelIndex &index) const
 {
@@ -259,6 +328,13 @@ void MiddleViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
     }
 }
 
+/**
+ * @brief MiddleViewDelegate::paintItemBase
+ * @param painter
+ * @param option
+ * @param rect
+ * @param isSelect
+ */
 void MiddleViewDelegate::paintItemBase(QPainter *painter, const QStyleOptionViewItem &option,
                                        const QRect &rect, bool &isSelect) const
 {
@@ -303,6 +379,13 @@ void MiddleViewDelegate::paintItemBase(QPainter *painter, const QStyleOptionView
         }
     }
 }
+
+/**
+ * @brief MiddleViewDelegate::paintNormalItem
+ * @param painter
+ * @param option
+ * @param index
+ */
 void MiddleViewDelegate::paintNormalItem(QPainter *painter, const QStyleOptionViewItem &option,
                                          const QModelIndex &index) const
 {
@@ -341,6 +424,12 @@ void MiddleViewDelegate::paintNormalItem(QPainter *painter, const QStyleOptionVi
     painter->restore();
 }
 
+/**
+ * @brief MiddleViewDelegate::paintSearchItem
+ * @param painter
+ * @param option
+ * @param index
+ */
 void MiddleViewDelegate::paintSearchItem(QPainter *painter, const QStyleOptionViewItem &option,
                                          const QModelIndex &index) const
 {

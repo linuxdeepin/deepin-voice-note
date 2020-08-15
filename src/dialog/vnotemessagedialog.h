@@ -47,9 +47,13 @@ public:
     };
 
 protected:
+    //初始化布局
     void initUI();
+    //连接槽函数
     void initConnections();
+    //设置文本
     void initMessage();
+    //显示单按钮
     void setSingleButton(); //Need to be Optimzed
 signals:
 

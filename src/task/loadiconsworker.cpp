@@ -27,6 +27,10 @@
 QVector<QPixmap> VNoteDataManager::m_defaultIcons[IconsType::MaxIconsType];
 QReadWriteLock VNoteDataManager::m_iconLock;
 
+/**
+ * @brief LoadIconsWorker::LoadIconsWorker
+ * @param parent
+ */
 LoadIconsWorker::LoadIconsWorker(QObject *parent)
     : VNTask(parent)
 {
@@ -36,6 +40,11 @@ LoadIconsWorker::LoadIconsWorker(QObject *parent)
     VNoteDataManager::m_iconLock.lockForWrite();
 }
 
+/**
+ * @brief LoadIconsWorker::greyPix
+ * @param pix
+ * @return 置灰后的图标
+ */
 QPixmap LoadIconsWorker::greyPix(QPixmap pix)
 {
     QPixmap temp(pix.size());
@@ -51,6 +60,9 @@ QPixmap LoadIconsWorker::greyPix(QPixmap pix)
     return temp;
 }
 
+/**
+ * @brief LoadIconsWorker::run
+ */
 void LoadIconsWorker::run()
 {
     QString defaultIconPathFmt(":/icons/deepin/builtin/default_folder_icons/%1.svg");

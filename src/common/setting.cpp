@@ -31,6 +31,10 @@ DWIDGET_USE_NAMESPACE
 
 static setting *settinginstance = nullptr;
 
+/**
+ * @brief GenerateSettingTranslate
+ * 生成翻译文件
+ */
 void GenerateSettingTranslate()
 {
     auto basic = DApplication::translate("Setting", "Basic");
@@ -39,17 +43,29 @@ void GenerateSettingTranslate()
     auto audio_micphone = DApplication::translate("Setting", "Micphone");
 }
 
+/**
+ * @brief CustemBackend::CustemBackend
+ * @param filepath 参数保存路径
+ * @param parent
+ */
 CustemBackend::CustemBackend(const QString &filepath, QObject *parent)
     : DSettingsBackend(parent)
 {
     m_settings = new QSettings(filepath, QSettings::IniFormat);
 }
 
+/**
+ * @brief CustemBackend::~CustemBackend
+ */
 CustemBackend::~CustemBackend()
 {
     ;
 }
 
+/**
+ * @brief CustemBackend::keys
+ * @return 参数的所有key值
+ */
 QStringList CustemBackend::keys() const
 {
     QStringList keyList = m_settings->allKeys();
@@ -61,6 +77,11 @@ QStringList CustemBackend::keys() const
     return keyList;
 }
 
+/**
+ * @brief CustemBackend::getOption
+ * @param key
+ * @return 参数内容
+ */
 QVariant CustemBackend::getOption(const QString &key) const
 {
     if (key.startsWith("old.")) {
@@ -69,11 +90,19 @@ QVariant CustemBackend::getOption(const QString &key) const
     return m_settings->value(key);
 }
 
+/**
+ * @brief CustemBackend::doSync
+ */
 void CustemBackend::doSync()
 {
     m_settings->sync();
 }
 
+/**
+ * @brief CustemBackend::doSetOption
+ * @param key 设置的key值
+ * @param value 设置的内容
+ */
 void CustemBackend::doSetOption(const QString &key, const QVariant &value)
 {
     m_writeLock.lock();
@@ -86,6 +115,10 @@ void CustemBackend::doSetOption(const QString &key, const QVariant &value)
     m_writeLock.unlock();
 }
 
+/**
+ * @brief setting::setting
+ * @param parent
+ */
 setting::setting(QObject *parent)
     : QObject(parent)
 {
@@ -103,6 +136,11 @@ setting::setting(QObject *parent)
     m_setting->setBackend(m_backend);
 }
 
+/**
+ * @brief setting::setOption
+ * @param key 设置的key值
+ * @param value 设置的内容
+ */
 void setting::setOption(const QString &key, const QVariant &value)
 {
     if (getOption(key) != value) {
@@ -111,16 +149,29 @@ void setting::setOption(const QString &key, const QVariant &value)
     }
 }
 
+/**
+ * @brief setting::getOption
+ * @param key
+ * @return 参数内容
+ */
 QVariant setting::getOption(const QString &key)
 {
     return m_setting->getOption(key);
 }
 
+/**
+ * @brief setting::getSetting
+ * @return 参数管理对象
+ */
 DSettings *setting::getSetting()
 {
     return m_setting;
 }
 
+/**
+ * @brief setting::instance
+ * @return 单例对象
+ */
 setting *setting::instance()
 {
     if (settinginstance == nullptr) {

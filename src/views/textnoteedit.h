@@ -34,29 +34,47 @@ class TextNoteEdit : public DTextEdit
     Q_OBJECT
 public:
     explicit TextNoteEdit(QWidget *parent = nullptr);
+    //选中
     void selectText(const QPoint &globalPos, QTextCursor::MoveOperation op);
+    //清除选中
     void clearSelection();
+    //删除选中内容
     void removeSelectText();
+    //获取选中内容
     QString getSelectFragment();
+    //是否有选中
     bool hasSelection();
 
 signals:
+    //获取焦点
     void sigFocusIn();
+    //失去焦点
     void sigFocusOut();
 
 private:
     bool m_menuPop {false};
+    //替换制表符'\t'
     void indentText();
 
 protected:
+    //获取焦点
     void focusInEvent(QFocusEvent *e) override;
+    //失去焦点
     void focusOutEvent(QFocusEvent *e) override;
+    //鼠标滚轮
     void wheelEvent(QWheelEvent *e) override;
+    //编辑器自带右键菜单弹出
     void contextMenuEvent(QContextMenuEvent *e) override;
+    //按键处理
     void keyPressEvent(QKeyEvent *e) override;
+    //鼠标事件
+    //单击
     void mousePressEvent(QMouseEvent *event) override;
+    //单击释放
     void mouseReleaseEvent(QMouseEvent *event) override;
+    //滚动
     void mouseMoveEvent(QMouseEvent *event) override;
+    //双击
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 };
 

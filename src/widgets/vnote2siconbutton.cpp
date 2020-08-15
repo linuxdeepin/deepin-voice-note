@@ -22,6 +22,12 @@
 #include "vnote2siconbutton.h"
 #include "common/utils.h"
 
+/**
+ * @brief VNote2SIconButton::VNote2SIconButton
+ * @param normal 图标路径
+ * @param press 图标路径
+ * @param parent
+ */
 VNote2SIconButton::VNote2SIconButton(
     const QString normal, const QString press, QWidget *parent)
     : DFloatingButton(parent)
@@ -31,12 +37,19 @@ VNote2SIconButton::VNote2SIconButton(
 
     updateIcon();
 }
-
+/**
+ * @brief VNote2SIconButton::isPressed
+ * @return true 显示press模式图标
+ */
 bool VNote2SIconButton::isPressed() const
 {
     return (Press == m_state);
 }
 
+/**
+ * @brief VNote2SIconButton::setState
+ * @param state
+ */
 void VNote2SIconButton::setState(int state)
 {
     if (m_state > Invalid && state < MaxState) {
@@ -46,6 +59,10 @@ void VNote2SIconButton::setState(int state)
     }
 }
 
+/**
+ * @brief VNote2SIconButton::mouseReleaseEvent
+ * @param event
+ */
 void VNote2SIconButton::mouseReleaseEvent(QMouseEvent *event)
 {
     if (rect().contains(event->pos()) && isEnabled()) {
@@ -61,6 +78,9 @@ void VNote2SIconButton::mouseReleaseEvent(QMouseEvent *event)
     DIconButton::mouseReleaseEvent(event);
 }
 
+/**
+ * @brief VNote2SIconButton::updateIcon
+ */
 void VNote2SIconButton::updateIcon()
 {
     if (!m_icons[m_state].isEmpty()) {
@@ -68,6 +88,10 @@ void VNote2SIconButton::updateIcon()
     }
 }
 
+/**
+ * @brief VNote2SIconButton::setCommonIcon
+ * @param isCommon true 图标不分主题
+ */
 void VNote2SIconButton::setCommonIcon(bool isCommon)
 {
     m_useCommonIcons = isCommon;
