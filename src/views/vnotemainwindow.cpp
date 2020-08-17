@@ -477,9 +477,6 @@ void VNoteMainWindow::initMainView()
     m_stackedWidget->insertWidget(WndHomePage, m_wndHomePage);
     m_stackedWidget->insertWidget(WndNoteShow, m_mainWndSpliter);
 
-    initAsrErrMessage();
-    initDeviceExceptionErrMessage();
-
     WindowType defaultWnd = WndSplashAnim;
 
 #ifdef IMPORT_OLD_VERSION_DATA
@@ -777,7 +774,11 @@ void VNoteMainWindow::onVNoteSearchTextChange(const QString &text)
 void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QModelIndex &previous)
 {
     Q_UNUSED(previous);
-    m_asrErrMeassage->setVisible(false);
+
+    if(m_asrErrMeassage){
+        m_asrErrMeassage->setVisible(false);
+    }
+
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
     if (!loadNotes(data)) {
         m_rightView->initData(nullptr, m_searchKey, false);
@@ -945,7 +946,10 @@ void VNoteMainWindow ::onA2TStartAgain()
  */
 void VNoteMainWindow::onA2TStart(bool first)
 {
-    m_asrErrMeassage->setVisible(false);
+    if(m_asrErrMeassage){
+        m_asrErrMeassage->setVisible(false);
+    }
+
     VoiceNoteItem *asrVoiceItem = nullptr;
 
     if (first) {
@@ -1179,13 +1183,13 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
  */
 void VNoteMainWindow::resizeEvent(QResizeEvent *event)
 {
-    if (m_asrErrMeassage->isVisible()) {
+    if (m_asrErrMeassage && m_asrErrMeassage->isVisible()) {
         int xPos = (m_centerWidget->width() - m_asrErrMeassage->width()) / 2;
         int yPos = m_centerWidget->height() - m_asrErrMeassage->height() - 5;
         m_asrErrMeassage->move(xPos, yPos);
     }
 
-    if (m_pDeviceExceptionMsg->isVisible()) {
+    if (m_pDeviceExceptionMsg && m_pDeviceExceptionMsg->isVisible()) {
         int xPos = (m_centerWidget->width() - m_pDeviceExceptionMsg->width()) / 2;
         int yPos = m_centerWidget->height() - m_pDeviceExceptionMsg->height() - 5;
         m_pDeviceExceptionMsg->move(xPos, yPos);
@@ -1241,7 +1245,10 @@ bool VNoteMainWindow::checkIfNeedExit()
 void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 {
     Q_UNUSED(previous);
-    m_asrErrMeassage->setVisible(false);
+    if(m_asrErrMeassage){
+        m_asrErrMeassage->setVisible(false);
+    }
+
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
 
@@ -1845,6 +1852,10 @@ void VNoteMainWindow::initDeviceExceptionErrMessage()
  */
 void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
 {
+    if(m_asrErrMeassage == nullptr){
+        initAsrErrMessage();
+    }
+
     m_asrErrMeassage->setMessage(strMessage);
     m_asrErrMeassage->setVisible(true);
     m_asrErrMeassage->setMinimumWidth(520);
@@ -1863,6 +1874,10 @@ void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
  */
 void VNoteMainWindow::showDeviceExceptionErrMessage()
 {
+    if(m_pDeviceExceptionMsg == nullptr){
+        initDeviceExceptionErrMessage();
+    }
+
     m_pDeviceExceptionMsg->setVisible(true);
     m_pDeviceExceptionMsg->setMinimumWidth(520);
     m_pDeviceExceptionMsg->setMinimumHeight(65);

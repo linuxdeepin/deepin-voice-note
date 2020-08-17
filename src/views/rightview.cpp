@@ -81,18 +81,6 @@ void RightView::initUi()
     m_placeholderWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_viewportLayout->addWidget(m_placeholderWidget, 1, Qt::AlignBottom);
 
-    DLabel *m_pMessage = new DLabel(this);
-    m_pMessage->setText(DApplication::translate("RightView", "The voice note has been deleted"));
-    DFontSizeManager::instance()->bind(m_pMessage, DFontSizeManager::T6);
-    m_pMessage->setForegroundRole(DPalette::BrightText);
-
-    m_fileHasDelDialog = new DDialog(this);
-    m_fileHasDelDialog->addContent(m_pMessage, Qt::AlignCenter);
-    m_fileHasDelDialog->setIcon(QIcon::fromTheme("dialog-warning"));
-    m_fileHasDelDialog->addButton(DApplication::translate(
-                                      "RightView",
-                                      "OK"),
-                                  false, DDialog::ButtonNormal);
     m_playAnimTimer = new QTimer(this);
     m_playAnimTimer->setInterval(300);
 }
@@ -800,6 +788,20 @@ bool RightView::checkFileExist(const QString &file)
 {
     QFileInfo fi(file);
     if (!fi.exists()) {
+        if(m_fileHasDelDialog == nullptr){
+            DLabel *m_pMessage = new DLabel(this);
+            m_pMessage->setText(DApplication::translate("RightView", "The voice note has been deleted"));
+            DFontSizeManager::instance()->bind(m_pMessage, DFontSizeManager::T6);
+            m_pMessage->setForegroundRole(DPalette::BrightText);
+
+            m_fileHasDelDialog = new DDialog(this);
+            m_fileHasDelDialog->addContent(m_pMessage, Qt::AlignCenter);
+            m_fileHasDelDialog->setIcon(QIcon::fromTheme("dialog-warning"));
+            m_fileHasDelDialog->addButton(DApplication::translate(
+                                              "RightView",
+                                              "OK"),
+                                          false, DDialog::ButtonNormal);
+        }
         m_fileHasDelDialog->exec();
         return false;
     }

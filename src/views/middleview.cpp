@@ -378,17 +378,6 @@ void MiddleView::initUI()
     QWidget *footer = new QWidget(this);
     footer->setFixedHeight(1);
     addFooterWidget(footer);
-
-    m_emptySearch = new DLabel(this);
-    m_emptySearch->setText(DApplication::translate("MiddleView", "No search results"));
-    m_emptySearch->setAlignment(Qt::AlignCenter);
-    DFontSizeManager::instance()->bind(m_emptySearch, DFontSizeManager::T6);
-    m_emptySearch->setForegroundRole(DPalette::PlaceholderText);
-    m_emptySearch->setVisible(false);
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(m_emptySearch);
-    this->setLayout(layout);
     //    this->installEventFilter(this);
 }
 
@@ -398,7 +387,20 @@ void MiddleView::initUI()
  */
 void MiddleView::setVisibleEmptySearch(bool visible)
 {
-    m_emptySearch->setVisible(visible);
+    if(visible && m_emptySearch == nullptr){
+        m_emptySearch = new DLabel(this);
+        m_emptySearch->setText(DApplication::translate("MiddleView", "No search results"));
+        m_emptySearch->setAlignment(Qt::AlignCenter);
+        DFontSizeManager::instance()->bind(m_emptySearch, DFontSizeManager::T6);
+        m_emptySearch->setForegroundRole(DPalette::PlaceholderText);
+        m_emptySearch->setVisible(visible);
+        QVBoxLayout *layout = new QVBoxLayout;
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->addWidget(m_emptySearch);
+        this->setLayout(layout);
+    }else if(m_emptySearch){
+        m_emptySearch->setVisible(visible);
+    }
 }
 
 /**
