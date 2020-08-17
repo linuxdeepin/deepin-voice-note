@@ -48,6 +48,8 @@ int main(int argc, char *argv[])
                                                           "Voice Notes is a lightweight memo tool to make text notes and voice recordings."));
 
     qputenv("DTK_USE_SEMAPHORE_SINGLEINSTANCE", "1");
+
+    DGuiApplicationHelper::instance()->setSingelInstanceInterval(-1);
     if (!DGuiApplicationHelper::instance()->setSingleInstance(
             app.applicationName(),
             DGuiApplicationHelper::UserScope)) {
