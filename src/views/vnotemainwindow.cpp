@@ -1895,7 +1895,9 @@ void VNoteMainWindow::showDeviceExceptionErrMessage()
  */
 void VNoteMainWindow::closeDeviceExceptionErrMessage()
 {
-    m_pDeviceExceptionMsg->setVisible(false);
+    if(m_pDeviceExceptionMsg){
+        m_pDeviceExceptionMsg->setVisible(false);
+    }
 }
 
 /**
