@@ -104,22 +104,22 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="179"/>
         <source>Text to Speech</source>
-        <translation type="unfinished"/>
+        <translation>Nga Tekst, Në të Folur </translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="180"/>
         <source>Stop reading</source>
-        <translation type="unfinished"/>
+        <translation>Ndaleni leximin</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="181"/>
         <source>Speech to Text</source>
-        <translation type="unfinished"/>
+        <translation>Nga e Folur, Në Tekst</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="182"/>
         <source>Translate</source>
-        <translation type="unfinished"/>
+        <translation>Përktheje</translation>
     </message>
 </context>
 <context>
@@ -191,22 +191,22 @@
     <message>
         <location filename="../src/common/setting.cpp" line="37"/>
         <source>Basic</source>
-        <translation type="unfinished"/>
+        <translation>Bazë</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="38"/>
         <source>Audio Source</source>
-        <translation type="unfinished"/>
+        <translation>Burim Audio</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="39"/>
         <source>Internal</source>
-        <translation type="unfinished"/>
+        <translation>I brendshëm</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="40"/>
-        <source>Micphone</source>
-        <translation type="unfinished"/>
+        <source>Microphone</source>
+        <translation>Mikrofon</translation>
     </message>
 </context>
 <context>
@@ -353,7 +353,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1764"/>
         <source>Privacy Policy</source>
-        <translation type="unfinished"/>
+        <translation>Rregulla Privatësie</translation>
     </message>
 </context>
 <context>
@@ -411,54 +411,54 @@
 <context>
     <name>VNoteMessageDialog</name>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="48"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="44"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="130"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="116"/>
         <source>Cancel</source>
         <translation>Anuloje</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="131"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="117"/>
         <source>Confirm</source>
         <translation>Ripohojeni</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="134"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="120"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
         <translation>Jeni i sigurt se doni të fshihet ky bllok shënimesh?
 Do të fshihen krejt shënimet në të</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="138"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="124"/>
         <source>Do you want to stop the current recording?</source>
         <translation>Doni të ndalet incizimi i tanishëm?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="142"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="128"/>
         <source>Are you sure you want to delete this note?</source>
         <translation>Jeni i sigurt se doni të fshihet ky shënim?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
         <translation>S’mund të shndërrohet ky shënim zanor, ngaqë, hëpërhë, s’mbulohen shënime mbi 20 minuta.</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="151"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="138"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
         <translation>Po shndërrohet një shënim zanor. Doni të ndalet?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="155"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="142"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
         <translation>Volumi i ulët në hyrje mund të sjellë incizime të këqija. Doni të vazhdohet?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
         <translation>Incizimet e prera dhe teksti i shndërruar nuk do të ngjiten. Doni të vazhdohet?</translation>
     </message>

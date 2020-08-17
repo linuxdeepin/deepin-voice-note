@@ -205,7 +205,7 @@
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="40"/>
-        <source>Micphone</source>
+        <source>Microphone</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -411,54 +411,54 @@
 <context>
     <name>VNoteMessageDialog</name>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="48"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="44"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="130"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="116"/>
         <source>Cancel</source>
         <translation>Batal</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="131"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="117"/>
         <source>Confirm</source>
         <translation>Sahkan</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="134"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="120"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
         <translation>Anda pasti mahu memadam buku nota ini?
 Semua nota di dalamnya akan terpadam</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="138"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="124"/>
         <source>Do you want to stop the current recording?</source>
         <translation>Anda pasti mahu menghentikan rakaman semasa?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="142"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="128"/>
         <source>Are you sure you want to delete this note?</source>
         <translation>Anda pasti mahu memadam nota ini?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
         <translation>Tidak dapat menukar format nota suara ini, kerana nota melebihi 20 minit tidak disokong buat masa ini.</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="151"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="138"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
         <translation>Menukar format satu nota suara sekarang. Anda mahu hentikannya?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="155"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="142"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
         <translation>Volum input rendah boleh mengakibatkan rakaman menjadi bermasalah. Anda mahu teruskan?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
         <translation>Rakaman terklip dan teks yang ditukarkan tidak akan ditampal. Anda pasti mahu teruskan?</translation>
     </message>

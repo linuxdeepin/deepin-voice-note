@@ -205,7 +205,7 @@
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="40"/>
-        <source>Micphone</source>
+        <source>Microphone</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -411,54 +411,54 @@
 <context>
     <name>VNoteMessageDialog</name>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="48"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="44"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="130"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="116"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="131"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="117"/>
         <source>Confirm</source>
         <translation>Bestätigen</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="134"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="120"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
         <translation>Sind Sie sicher, dass Sie dieses Notizbuch löschen möchten?
 Alle Notizen darin werden gelöscht</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="138"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="124"/>
         <source>Do you want to stop the current recording?</source>
         <translation>Möchten Sie die aktuelle Aufnahme stoppen?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="142"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="128"/>
         <source>Are you sure you want to delete this note?</source>
         <translation>Sind Sie sicher, dass Sie diese Notiz löschen möchten?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
         <translation>Diese Sprachnotiz kann nicht konvertiert werden, da Notizen über 20 Minuten derzeit nicht unterstützt werden.</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="151"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="138"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
         <translation>Sprachnotiz wird gerade konvertiert. Willst du damit beenden?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="155"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="142"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
         <translation>Die geringe Eingangslautstärke kann zu schlechten Aufnahmen führen. Wollen Sie weitermachen?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
         <translation>Die geschnittenen Aufnahmen und der konvertierte Text werden nicht eingefügt. Wollen Sie fortfahren?</translation>
     </message>

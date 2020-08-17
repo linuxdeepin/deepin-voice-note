@@ -40,7 +40,7 @@ void GenerateSettingTranslate()
     auto basic = DApplication::translate("Setting", "Basic");
     auto audio_source = DApplication::translate("Setting", "Audio Source");
     auto audio_internal = DApplication::translate("Setting", "Internal");
-    auto audio_micphone = DApplication::translate("Setting", "Micphone");
+    auto audio_micphone = DApplication::translate("Setting", "Microphone");
 }
 
 /**

@@ -104,22 +104,22 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="179"/>
         <source>Text to Speech</source>
-        <translation type="unfinished"/>
+        <translation>Текст у говор</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="180"/>
         <source>Stop reading</source>
-        <translation type="unfinished"/>
+        <translation>Заустави читање</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="181"/>
         <source>Speech to Text</source>
-        <translation type="unfinished"/>
+        <translation>Говор у текст</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="182"/>
         <source>Translate</source>
-        <translation type="unfinished"/>
+        <translation>Преведи</translation>
     </message>
 </context>
 <context>
@@ -191,22 +191,22 @@
     <message>
         <location filename="../src/common/setting.cpp" line="37"/>
         <source>Basic</source>
-        <translation type="unfinished"/>
+        <translation>Основно</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="38"/>
         <source>Audio Source</source>
-        <translation type="unfinished"/>
+        <translation>Аудио извор</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="39"/>
         <source>Internal</source>
-        <translation type="unfinished"/>
+        <translation>Унутрашњи</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="40"/>
-        <source>Micphone</source>
-        <translation type="unfinished"/>
+        <source>Microphone</source>
+        <translation>Микрофон</translation>
     </message>
 </context>
 <context>
@@ -353,7 +353,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1764"/>
         <source>Privacy Policy</source>
-        <translation type="unfinished"/>
+        <translation>Политика приватности</translation>
     </message>
 </context>
 <context>
@@ -411,54 +411,54 @@
 <context>
     <name>VNoteMessageDialog</name>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="48"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="44"/>
         <source>OK</source>
         <translation>У реду</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="130"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="116"/>
         <source>Cancel</source>
         <translation>Откажи</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="131"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="117"/>
         <source>Confirm</source>
         <translation>Потврди</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="134"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="120"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
         <translation>Заиста желите да обришете ову бележницу?
 Биће обрисане све белешке које садржи</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="138"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="124"/>
         <source>Do you want to stop the current recording?</source>
         <translation>Желите да зауставите тренутно снимање?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="142"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="128"/>
         <source>Are you sure you want to delete this note?</source>
         <translation>Заиста желите да обришете ову белешку?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
         <translation>Није могуће претворити ову гласовну белешку у текст. Тренутно нису подржани записи дужи од 20 мин.</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="151"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="138"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
         <translation>Претварање гласовне белешке у текст. Желите ли да зауставите?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="155"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="142"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
         <translation>Мала улазна јачина може узроковати лош снимак. Желите ли да наставите?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
         <translation>Припремљени снимци и претворени текст неће бити убачени. Желите ли да наставите?</translation>
     </message>

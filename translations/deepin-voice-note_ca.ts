@@ -104,22 +104,22 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="179"/>
         <source>Text to Speech</source>
-        <translation type="unfinished"/>
+        <translation>De text a veu</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="180"/>
         <source>Stop reading</source>
-        <translation type="unfinished"/>
+        <translation>Interromp la lectura</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="181"/>
         <source>Speech to Text</source>
-        <translation type="unfinished"/>
+        <translation>De veu a text</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="182"/>
         <source>Translate</source>
-        <translation type="unfinished"/>
+        <translation>Tradueix</translation>
     </message>
 </context>
 <context>
@@ -191,22 +191,22 @@
     <message>
         <location filename="../src/common/setting.cpp" line="37"/>
         <source>Basic</source>
-        <translation type="unfinished"/>
+        <translation>Bàsic</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="38"/>
         <source>Audio Source</source>
-        <translation type="unfinished"/>
+        <translation>Font d&apos;àudio</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="39"/>
         <source>Internal</source>
-        <translation type="unfinished"/>
+        <translation>Intern</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="40"/>
-        <source>Micphone</source>
-        <translation type="unfinished"/>
+        <source>Microphone</source>
+        <translation>Micròfon</translation>
     </message>
 </context>
 <context>
@@ -353,7 +353,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1764"/>
         <source>Privacy Policy</source>
-        <translation type="unfinished"/>
+        <translation>Política de privadesa</translation>
     </message>
 </context>
 <context>
@@ -411,54 +411,54 @@
 <context>
     <name>VNoteMessageDialog</name>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="48"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="44"/>
         <source>OK</source>
         <translation>D&apos;acord</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="130"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="116"/>
         <source>Cancel</source>
         <translation>Cancel·la</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="131"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="117"/>
         <source>Confirm</source>
         <translation>Confirmeu-ho</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="134"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="120"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
         <translation>Segur que voleu eliminar aquest quadern?
 Se n&apos;eliminaran totes les notes.</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="138"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="124"/>
         <source>Do you want to stop the current recording?</source>
-        <translation>Voleu aturar la gravació actual?</translation>
+        <translation>Voleu interrompre la gravació actual?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="142"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="128"/>
         <source>Are you sure you want to delete this note?</source>
         <translation>Segur que voleu eliminar aquesta nota?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
         <translation>No es pot convertir aquesta nota de veu. Actualment no s&apos;admeten les notes de més de 20 minuts.</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="151"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="138"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
-        <translation>Ara es converteix una nota de veu. Ho voleu aturar?</translation>
+        <translation>Ara es converteix una nota de veu. Ho voleu interrompre?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="155"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="142"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
         <translation>Un volum baix d&apos;entrada pot tenir com a resultat una mala gravació. Voleu continuar?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
         <translation>Les gravacions truncades i el text convertit no s&apos;enganxaran. Voleu continuar?</translation>
     </message>
