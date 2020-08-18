@@ -145,6 +145,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     //调整滚动条
     void adjustVerticalScrollBar(QWidget *widget, int defaultHeight);
+    void adjustVoiceVerticalScrollBar(DetailItemWidget *widget, int defaultHeight);
 
 private:
     //初始化布局

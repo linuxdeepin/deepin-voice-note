@@ -174,7 +174,7 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
 
     connect(item, &VoiceNoteItem::sigPlayBtnClicked, this, &RightView::onVoicePlay);
     connect(item, &VoiceNoteItem::sigPauseBtnClicked, this, &RightView::onVoicePause);
-    connect(item, &VoiceNoteItem::sigCursorHeightChange, this, &RightView::adjustVerticalScrollBar);
+    connect(item, &VoiceNoteItem::sigCursorHeightChange, this, &RightView::adjustVoiceVerticalScrollBar);
 
     QTextDocumentFragment cutStr;
     int curIndex = m_viewportLayout->indexOf(m_curItemWidget);
@@ -354,7 +354,7 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
                 m_curItemWidget = item;
                 connect(item, &VoiceNoteItem::sigPlayBtnClicked, this, &RightView::onVoicePlay);
                 connect(item, &VoiceNoteItem::sigPauseBtnClicked, this, &RightView::onVoicePause);
-                connect(item, &VoiceNoteItem::sigCursorHeightChange, this, &RightView::adjustVerticalScrollBar);
+                connect(item, &VoiceNoteItem::sigCursorHeightChange, this, &RightView::adjustVoiceVerticalScrollBar);
             }
         }
     } else {
@@ -821,6 +821,26 @@ void RightView::adjustVerticalScrollBar(QWidget *widget, int defaultHeight)
         tolHeight += m_viewportLayout->itemAt(i)->widget()->height();
     }
     emit sigCursorChange(tolHeight, false);
+}
+
+/**
+ * @brief RightView::adjustVoiceVerticalScrollBar
+ * @param widget
+ * @param defaultHeight
+ */
+void RightView::adjustVoiceVerticalScrollBar(DetailItemWidget *widget, int defaultHeight)
+{
+    int index = m_viewportLayout->indexOf(widget);
+    QLayoutItem* nextItem = m_viewportLayout->itemAt(index + 1);
+    if(nextItem){
+        DetailItemWidget *nextWidget = static_cast<DetailItemWidget *>(nextItem->widget());
+        if(nextWidget->hasFocus()){
+            widget = nextWidget;
+            QRect rc = nextWidget->getCursorRect();
+            defaultHeight = rc.bottom();
+        }
+    }
+    adjustVerticalScrollBar(widget, defaultHeight);
 }
 
 /**

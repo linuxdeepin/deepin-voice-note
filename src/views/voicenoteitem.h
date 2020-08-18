@@ -109,7 +109,7 @@ signals:
     void sigPlayBtnClicked(VoiceNoteItem *item);
     void sigPauseBtnClicked(VoiceNoteItem *item);
     //光标坐标改变
-    void sigCursorHeightChange(QWidget *widget, int height);
+    void sigCursorHeightChange(DetailItemWidget *widget, int height);
 
 public slots:
     //播放/暂停
@@ -122,6 +122,7 @@ public slots:
 private:
     void initUi();
     void initConnection();
+    bool m_adjustBar {true};
     bool m_selectAll {false};
     DLabel *m_hornLab {nullptr};
     DLabel *m_createTimeLab {nullptr};

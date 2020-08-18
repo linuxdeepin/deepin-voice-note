@@ -153,6 +153,7 @@ void VoiceNoteItem::initData()
             m_voiceNameLab->setText(voiceBlock->voiceTitle);
             m_voiceSizeLab->setText(Utils::formatMillisecond(voiceBlock->voiceSize));
             if (!m_noteBlock->blockText.isEmpty()) {
+                m_adjustBar = false;
                 showAsrEndWindow(m_noteBlock->blockText);
             }
         }
@@ -266,8 +267,12 @@ void VoiceNoteItem::onAsrTextChange()
         m_asrText->setFixedHeight(docHeight);
         height += docHeight + 10;
     }
+
     this->setFixedHeight(height);
-    emit sigCursorHeightChange(this, height);
+
+    if(m_adjustBar){
+        emit sigCursorHeightChange(this, height);
+    }
 }
 
 /**
