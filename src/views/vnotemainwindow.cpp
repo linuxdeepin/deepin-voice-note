@@ -183,9 +183,6 @@ void VNoteMainWindow::initConnections()
     connect(m_recordBar, &VNoteRecordBar::sigDeviceExceptionMsgClose,
             this, &VNoteMainWindow::closeDeviceExceptionErrMessage);
 
-    connect(m_asrAgainBtn, &DPushButton::clicked,
-            this, &VNoteMainWindow::onA2TStartAgain);
-
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &VNoteMainWindow::onChangeTheme);
 
@@ -1818,7 +1815,8 @@ void VNoteMainWindow::initAsrErrMessage()
         "VNoteErrorMessage",
         "Try Again"));
     m_asrAgainBtn->adjustSize();
-
+    connect(m_asrAgainBtn, &DPushButton::clicked,
+            this, &VNoteMainWindow::onA2TStartAgain);
     DWidget *m_widget = new DWidget(m_asrErrMeassage);
     QHBoxLayout *m_layout = new QHBoxLayout();
     m_layout->setContentsMargins(0, 0, 0, 0);
@@ -1827,6 +1825,7 @@ void VNoteMainWindow::initAsrErrMessage()
     m_widget->setLayout(m_layout);
     m_asrErrMeassage->setWidget(m_widget);
     m_asrErrMeassage->setVisible(false);
+
 }
 
 /**
