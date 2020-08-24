@@ -49,7 +49,6 @@ int main(int argc, char *argv[])
 
     qputenv("DTK_USE_SEMAPHORE_SINGLEINSTANCE", "1");
 
-    DGuiApplicationHelper::instance()->setSingelInstanceInterval(-1);
     if (!DGuiApplicationHelper::instance()->setSingleInstance(
             app.applicationName(),
             DGuiApplicationHelper::UserScope)) {
