@@ -23,6 +23,8 @@ if (NOT DEFINED VERSION)
     set(VERSION 1.2.2)
 endif ()
 
+add_definitions(-DQT_NO_DEBUG_OUTPUT)
+
 #common resource names
 set(APP_RES_DIR "assets")
 set(APP_BIN_NAME "deepin-voice-note")
@@ -50,9 +52,13 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "-Wl,-as-need -fPIE")
+set(CMAKE_EXE_LINKER_FLAGS "-pie")
 
 if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "sw_64")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mieee")
+elseif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "mips64")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ftree-vectorize -march=loongson3a -mhard-float -mno-micromips -mno-mips16 -flax-vector conversions -mloongson-ext2 -mloongson-mmi -Wl, as-need")
 endif ()
 
 #compile flags
@@ -61,7 +67,7 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra")
 
   # Enable Qt builtin debug mode
-  add_definitions("-DQT_MESSAGELOGCONTEXT")
+  #add_definitions("-DQT_MESSAGELOGCONTEXT")
 else()
   # -Wl, -O2 Enable linker optimizations
   # -Wl, --gc-sections Remove unused code resulting from -fdsta-sections and
