@@ -242,7 +242,7 @@ QString AudioWatcher::getDeviceName(AudioMode mode)
     QString device = "";
     if (mode == Internal) {
         //如果判断availability，则有可能会出现控制中心已选择输出设备，但录音按钮不可用的情况
-        if(m_outAudioPort.availability != 1 || !m_fNeedDeviceChecker){
+        if((m_outAudioPort.name.contains("output", Qt::CaseInsensitive) && m_outAudioPort.availability != 1) || !m_fNeedDeviceChecker){
             device = m_pDefaultSink->name();
             if (!device.isEmpty() && !device.endsWith(".monitor")) {
                 device += ".monitor";
@@ -250,7 +250,7 @@ QString AudioWatcher::getDeviceName(AudioMode mode)
         }
     } else {
         //如果判断availability，则有可能会出现控制中心已选择输入设备，但录音按钮不可用的情况
-        if(m_inAudioPort.availability != 1 || !m_fNeedDeviceChecker) {
+        if((m_inAudioPort.name.contains("input", Qt::CaseInsensitive) && m_inAudioPort.availability != 1) || !m_fNeedDeviceChecker) {
             device = m_pDefaultSource->name();
             if (device.endsWith(".monitor") && m_fNeedDeviceChecker) {
                 device.clear();
