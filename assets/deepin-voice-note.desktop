@@ -1,8 +1,8 @@
 [Desktop Entry]
 Categories=AudioVideo;
 Comment=Voice Notes is a lightweight memo tool to make text notes and voice recordings.
-#Exec=/usr/bin/deepin-voice-note %f
-Exec=/usr/bin/deepin-turbo-invoker  --type=dtkwidget deepin-voice-note %U 
+Exec=/usr/bin/deepin-voice-note %f
+#Exec=/usr/bin/deepin-turbo-invoker  --type=dtkwidget deepin-voice-note %U 
 GenericName=Voice Notes
 Icon=deepin-voice-note
 Name=Voice Notes
