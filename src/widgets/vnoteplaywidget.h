@@ -22,7 +22,7 @@
 #ifndef VNOTEPLAYWIDGET_H
 #define VNOTEPLAYWIDGET_H
 
-#include <QMediaPlayer>
+#include "common/vlcpalyer.h"
 
 #include <DFloatingWidget>
 #include <DLabel>
@@ -52,7 +52,7 @@ public:
     //停止播放
     void stopVideo();
     //获取状态
-    QMediaPlayer::State getPlayerStatus();
+    VlcPalyer::VlcState getPlayerStatus();
     //获取绑定的数据
     VNVoiceBlock *getVoiceData();
 signals:
@@ -95,7 +95,7 @@ private:
     DWidget *m_sliderHover {nullptr};
     DIconButton *m_closeBtn {nullptr};
     VNVoiceBlock *m_voiceBlock {nullptr};
-    QMediaPlayer *m_player {nullptr};
+    VlcPalyer *m_player {nullptr};
     VNote2SIconButton *m_playerBtn {nullptr};
 };
 

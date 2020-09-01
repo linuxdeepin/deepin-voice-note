@@ -26,6 +26,7 @@
 #include "common/utils.h"
 
 #include <QGridLayout>
+#include <QDebug>
 
 #include <DDialogCloseButton>
 
@@ -88,7 +89,7 @@ void VNotePlayWidget::initUI()
  */
 void VNotePlayWidget::initPlayer()
 {
-    m_player = new QMediaPlayer(this);
+    m_player = new VlcPalyer(this);
 }
 
 /**
@@ -96,10 +97,12 @@ void VNotePlayWidget::initPlayer()
  */
 void VNotePlayWidget::initConnection()
 {
-    connect(m_player, &QMediaPlayer::positionChanged,
-            this, &VNotePlayWidget::onVoicePlayPosChange);
-    connect(m_player, &QMediaPlayer::durationChanged,
-            this, &VNotePlayWidget::onDurationChanged);
+    connect(m_player, &VlcPalyer::positionChanged,
+            this, &VNotePlayWidget::onVoicePlayPosChange, Qt::QueuedConnection);
+    connect(m_player, &VlcPalyer::durationChanged,
+            this, &VNotePlayWidget::onDurationChanged, Qt::QueuedConnection);
+    connect(m_player, &VlcPalyer::playEnd,
+            this, &VNotePlayWidget::onCloseBtnClicked, Qt::QueuedConnection);
 
     connect(m_playerBtn, &VNote2SIconButton::clicked,
             this, &VNotePlayWidget::onPlayerBtnClicked);
@@ -124,10 +127,6 @@ void VNotePlayWidget::onVoicePlayPosChange(qint64 pos)
     if (m_sliderReleased == true) {
         onSliderMove(static_cast<int>(pos));
     }
-
-    if (pos >= m_slider->maximum()) {
-        onCloseBtnClicked();
-    }
 }
 
 /**
@@ -138,9 +137,9 @@ void VNotePlayWidget::setVoiceBlock(VNVoiceBlock *voiceData)
 {
     if (voiceData) {
         if (voiceData != m_voiceBlock) {
-            stopVideo();
+            m_slider->setValue(0);
             m_voiceBlock = voiceData;
-            m_player->setMedia(QUrl::fromLocalFile(m_voiceBlock->voicePath));
+            m_player->setFilePath(m_voiceBlock->voicePath);
             m_nameLab->setText(voiceData->voiceTitle);
             m_timeLab->setText(Utils::formatMillisecond(0, 0) + "/" + Utils::formatMillisecond(voiceData->voiceSize));
         }
@@ -215,7 +214,8 @@ void VNotePlayWidget::onSliderPressed()
 void VNotePlayWidget::onSliderReleased()
 {
     m_sliderReleased = true;
-    if (m_player->state() != QMediaPlayer::StoppedState) {
+    VlcPalyer::VlcState state = m_player->getState();
+    if (state == VlcPalyer::Playing || state == VlcPalyer::Paused) {
         int pos = m_slider->value();
         if (pos >= m_slider->maximum()) {
             onCloseBtnClicked();
@@ -271,9 +271,9 @@ VNVoiceBlock *VNotePlayWidget::getVoiceData()
  * @brief VNotePlayWidget::getPlayerStatus
  * @return 播放状态
  */
-QMediaPlayer::State VNotePlayWidget::getPlayerStatus()
+VlcPalyer::VlcState VNotePlayWidget::getPlayerStatus()
 {
-    return m_player->state();
+    return m_player->getState();
 }
 
 /**

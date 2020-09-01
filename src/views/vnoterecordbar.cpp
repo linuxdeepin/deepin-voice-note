@@ -245,10 +245,10 @@ VNVoiceBlock *VNoteRecordBar::getVoiceData()
 void VNoteRecordBar::playOrPauseVoice()
 {
     if (m_mainLayout->currentWidget() == m_playPanel) {
-        QMediaPlayer::State status = m_playPanel->getPlayerStatus();
-        if (status == QMediaPlayer::PlayingState) {
+        VlcPalyer::VlcState status = m_playPanel->getPlayerStatus();
+        if (status == VlcPalyer::Playing) {
             m_playPanel->onPauseBtnClicked();
-        } else if (status == QMediaPlayer::PausedState) {
+        } else if (status == VlcPalyer::Paused) {
             m_playPanel->onPlayBtnClicked();
         }
     }

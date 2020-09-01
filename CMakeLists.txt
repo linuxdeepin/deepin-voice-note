@@ -118,7 +118,9 @@ find_package(DtkWidget REQUIRED)
 find_package(DtkCore REQUIRED)
 find_package(DFrameworkdbus REQUIRED)
 pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
+pkg_check_modules(LIBVLC REQUIRED libvlc)
 include_directories(${GSTREAMER_INCLUDE_DIRS})
+include_directories(${LIBVLC_INCLUDE_DIRS})
 include_directories(${Qt5Gui_PRIVATE_INCLUDE_DIRS})
 
 # Tell CMake to create the executable
@@ -132,6 +134,7 @@ target_link_libraries(${APP_BIN_NAME}
     ${DtkCore_LIBRARIES}
     ${DFrameworkdbus_LIBRARIES}
     ${GSTREAMER_LIBRARIES}
+    ${LIBVLC_LIBRARIES}
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
