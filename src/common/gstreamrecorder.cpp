@@ -243,8 +243,10 @@ void GstreamRecorder::stopRecord()
     if (m_pipeline == nullptr)
         return;
     gst_element_send_event(m_pipeline, gst_event_new_eos());
+    gst_element_send_event(m_pipeline, gst_event_new_eos());
     g_usleep(5000);
     setStateToNull();
+    gst_element_set_state(m_pipeline, GST_STATE_NULL);
 }
 
 /**
@@ -390,7 +392,7 @@ void GstreamRecorder::setStateToNull()
     }
 
     gst_element_set_state(m_pipeline, GST_STATE_READY);
-    gst_element_get_state(m_pipeline, nullptr, nullptr, static_cast<GstClockTime>(-1));
+    gst_element_get_state(m_pipeline, nullptr, nullptr, 5000000000); //timeout 5s
     gst_element_set_state(m_pipeline, GST_STATE_NULL);
 }
 
