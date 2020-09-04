@@ -191,7 +191,7 @@
     <message>
         <location filename="../src/common/setting.cpp" line="37"/>
         <source>Basic</source>
-        <translation>Basis</translation>
+        <translation>Algemeen</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="38"/>

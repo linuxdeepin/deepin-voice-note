@@ -104,22 +104,22 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="179"/>
         <source>Text to Speech</source>
-        <translation type="unfinished"/>
+        <translation>Tekst na mowę</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="180"/>
         <source>Stop reading</source>
-        <translation type="unfinished"/>
+        <translation>Przestań czytać</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="181"/>
         <source>Speech to Text</source>
-        <translation type="unfinished"/>
+        <translation>Mowa na tekst</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="182"/>
         <source>Translate</source>
-        <translation type="unfinished"/>
+        <translation>Tłumacz</translation>
     </message>
 </context>
 <context>
@@ -191,22 +191,22 @@
     <message>
         <location filename="../src/common/setting.cpp" line="37"/>
         <source>Basic</source>
-        <translation type="unfinished"/>
+        <translation>Podstawowy</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="38"/>
         <source>Audio Source</source>
-        <translation type="unfinished"/>
+        <translation>Źródło dźwięku</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="39"/>
         <source>Internal</source>
-        <translation type="unfinished"/>
+        <translation>Wewnętrzny</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="40"/>
         <source>Microphone</source>
-        <translation type="unfinished"/>
+        <translation>Mikrofon</translation>
     </message>
 </context>
 <context>
@@ -353,7 +353,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1764"/>
         <source>Privacy Policy</source>
-        <translation type="unfinished"/>
+        <translation>Polityka Prywatności</translation>
     </message>
 </context>
 <context>

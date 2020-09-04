@@ -5,12 +5,12 @@
         <location filename="../src/main.cpp" line="46"/>
         <location filename="../src/views/vnotemainwindow.cpp" line="654"/>
         <source>Voice Notes</source>
-        <translation>Notas de voz</translation>
+        <translation>Notas de Voz</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="47"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation>O Notas de voz é uma ferramenta leve para fazer anotações de texto e gravações de voz.</translation>
+        <translation>O Notas de Voz é uma ferramenta leve para fazer anotações de texto e gravações de voz.</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="655"/>
