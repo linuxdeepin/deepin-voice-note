@@ -1163,7 +1163,7 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
     if (checkIfNeedExit()) {
         if (stateOperation->isRecording()) {
             stateOperation->operState(OpsStateInterface::StateAppQuit, true);
-            m_recordBar->cancelRecord();
+            m_recordBar->stopRecord();
             event->ignore();
         } else {
             release();
@@ -1909,7 +1909,7 @@ void VNoteMainWindow::onSystemDown(bool active)
 
     if (active) {
         if (stateOperation->isRecording()) {
-            m_recordBar->cancelRecord();
+            m_recordBar->stopRecord();
 
             qInfo() << "System going down when recording, cancel it.";
         }

@@ -97,9 +97,10 @@ void VNoteRecordWidget::initConnection()
 {
     connect(m_pauseBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onPauseRecord);
     connect(m_continueBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onContinueRecord);
-    connect(m_finshBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onFinshRecord);
+    connect(m_finshBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::stopRecord);
     connect(m_audioRecoder, SIGNAL(audioBufferProbed(const QAudioBuffer &)),
             this, SLOT(onAudioBufferProbed(const QAudioBuffer &)));
+    connect(m_audioRecoder, &GstreamRecorder::recordFinshed, this, &VNoteRecordWidget::onGstreamerFinshRecord, Qt::QueuedConnection);
 }
 
 /**
@@ -118,10 +119,9 @@ void VNoteRecordWidget::initRecordPath()
 /**
  * @brief VNoteRecordWidget::onFinshRecord
  */
-void VNoteRecordWidget::onFinshRecord()
+void VNoteRecordWidget::stopRecord()
 {
     m_audioRecoder->stopRecord();
-    emit sigFinshRecord(m_recordPath, m_recordMsec);
 }
 
 /**
@@ -143,7 +143,8 @@ bool VNoteRecordWidget::onContinueRecord()
     m_pauseBtn->setVisible(true);
     m_continueBtn->setVisible(false);
     if (!m_audioRecoder->startRecord()) {
-        onFinshRecord();
+        stopRecord();
+
         return false;
     }
     return true;
@@ -164,14 +165,6 @@ bool VNoteRecordWidget::startRecord()
     m_audioRecoder->setOutputFile(m_recordPath);
     m_timeLabel->setText("00:00");
     return onContinueRecord();
-}
-
-/**
- * @brief VNoteRecordWidget::cancelRecord
- */
-void VNoteRecordWidget::cancelRecord()
-{
-    onFinshRecord();
 }
 
 /**
@@ -207,7 +200,7 @@ void VNoteRecordWidget::onRecordDurationChange(qint64 duration)
     m_timeLabel->setText(strTime);
 
     if (duration >= (60 * 60 * 1000)) {
-        onFinshRecord();
+        stopRecord();
     }
 }
 
@@ -218,4 +211,13 @@ void VNoteRecordWidget::onRecordDurationChange(qint64 duration)
 void VNoteRecordWidget::setAudioDevice(QString device)
 {
     m_audioRecoder->setDevice(device);
+}
+
+/**
+ * @brief VNoteRecordWidget::onGstreamerFinshRecord
+ */
+void VNoteRecordWidget::onGstreamerFinshRecord()
+{
+    m_audioRecoder->setStateToNull();
+    emit sigFinshRecord(m_recordPath, m_recordMsec);
 }

@@ -174,9 +174,9 @@ void VNoteRecordBar::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 /**
  * @brief VNoteRecordBar::cancelRecord
  */
-void VNoteRecordBar::cancelRecord()
+void VNoteRecordBar::stopRecord()
 {
-    m_recordPanel->cancelRecord();
+    m_recordPanel->stopRecord();
 }
 
 /**
@@ -269,7 +269,7 @@ void VNoteRecordBar::onAudioVolumeChange(int mode)
             if (m_showVolumeWanning) {
                 VNoteMessageDialog volumeLowDialog(VNoteMessageDialog::VolumeTooLow, this);
                 connect(&volumeLowDialog, &VNoteMessageDialog::rejected, this, [this]() {
-                    cancelRecord();
+                    stopRecord();
                 });
 
                 volumeLowDialog.exec();
@@ -299,7 +299,7 @@ void VNoteRecordBar::onAudioDeviceChange(int mode)
                     "VNoteRecordBar",
                     "No recording device detected"));
             if (m_mainLayout->currentWidget() == m_recordPanel) {
-                cancelRecord();
+                stopRecord();
                 if (!msgshow) {
                     emit sigDeviceExceptionMsgShow();
                     msgshow = true;
@@ -313,7 +313,7 @@ void VNoteRecordBar::onAudioDeviceChange(int mode)
             m_recordBtn->setBtnDisabled(false);
             m_recordBtn->setToolTip("");
             if (m_mainLayout->currentWidget() == m_recordPanel) {
-                cancelRecord();
+                stopRecord();
             }
         }
     }

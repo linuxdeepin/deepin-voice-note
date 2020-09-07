@@ -39,10 +39,10 @@ public:
     explicit VNoteRecordWidget(QWidget *parent = nullptr);
     //开始录音
     bool startRecord();
+    //结束录音
+    void stopRecord();
     //设置录音设备
     void setAudioDevice(QString device);
-    //取消录音
-    void cancelRecord();
     //获取录音文件路径
     QString getRecordPath() const;
 
@@ -54,8 +54,8 @@ public slots:
     void onPauseRecord();
     //继续录音
     bool onContinueRecord();
-    //结束录音
-    void onFinshRecord();
+    //录音库结束
+    void onGstreamerFinshRecord();
     //录音时长改变
     void onRecordDurationChange(qint64 duration);
     //录音数据改变

@@ -43,8 +43,8 @@ public:
 
     static constexpr int REC_BTN_W = 68;
     static constexpr int REC_BTN_H = 68;
-    //取消录音
-    void cancelRecord();
+    //停止录音
+    void stopRecord();
     //快捷键暂停/继续语音播放
     void playOrPauseVoice();
     //播放语音

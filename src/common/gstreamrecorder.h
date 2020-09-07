@@ -48,6 +48,8 @@ public:
     bool doBusMessage(GstMessage *message);
     //获取编码器的输入数据
     bool doBufferProbe(GstBuffer *buffer);
+    //设置录音状态为NULL
+    void setStateToNull();
 
 private slots:
     //处理编码器的输入数据
@@ -57,14 +59,14 @@ Q_SIGNALS:
     void errorMsg(QString msg);
     //语音数据发生变化
     void audioBufferProbed(const QAudioBuffer &buffer);
+    //结束录音
+    void recordFinshed();
 
 private:
     //创建录音流水线通道
     bool createPipe();
     //对象使用计数减1
     void objectUnref(gpointer object);
-    //设置录音状态为NULL
-    void setStateToNull();
     //初始化数据格式
     void initFormat();
     //资源释放
