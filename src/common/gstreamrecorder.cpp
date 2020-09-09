@@ -241,6 +241,15 @@ bool GstreamRecorder::startRecord()
 void GstreamRecorder::stopRecord()
 {
     if(m_pipeline){
+        int state = -1;
+        int pending = -1;
+        GetGstState(&state, &pending);
+        if(state == GST_STATE_PAUSED){
+            gst_element_set_state(m_pipeline, GST_STATE_PLAYING);
+        }else if (state != GST_STATE_PLAYING) {
+            emit recordFinshed();
+            return;
+        }
         gst_element_send_event(m_pipeline, gst_event_new_eos());
     }
 }
