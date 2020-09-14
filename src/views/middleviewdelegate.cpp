@@ -32,6 +32,7 @@
 
 #include <QLineEdit>
 #include <QPainter>
+#include <QPainterPath>
 
 #include <DApplicationHelper>
 #include <QDebug>

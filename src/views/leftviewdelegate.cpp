@@ -26,6 +26,7 @@
 #include "db/vnotefolderoper.h"
 
 #include <QPainter>
+#include <QPainterPath>
 #include <QLineEdit>
 
 #include <DApplication>
