@@ -47,14 +47,14 @@ signals:
     void inputSourceChanged(const QString &name);
 public slots:
     void onDefaultSourceChanaged(const QDBusObjectPath & value);
-    void onCardsChanged(const QString & value);
+    //void onCardsChanged(const QString & value);
 protected:
     virtual void run() override;
 
     void initAudioMeter();
     void initConnections();
     void initAvailInputPorts(const QString& cards);
-    bool isMicrophoneAvail(const QString& activePort) const;
+    bool isMicrophoneAvail(const AudioPort& activePort) const;
 
 private:
     const QString m_serviceName {"com.deepin.daemon.Audio"};

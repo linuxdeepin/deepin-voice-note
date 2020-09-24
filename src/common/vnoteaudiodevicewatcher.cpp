@@ -40,23 +40,21 @@ VNoteAudioDeviceWatcher::~VNoteAudioDeviceWatcher()
 void VNoteAudioDeviceWatcher::initDeviceWatcher()
 {
     m_audioInterface.reset(
-                new com::deepin::daemon::Audio(
-                    m_serviceName,
-                    "/com/deepin/daemon/Audio",
-                    QDBusConnection::sessionBus(),
-                    this )
-                );
+        new com::deepin::daemon::Audio(
+            m_serviceName,
+            "/com/deepin/daemon/Audio",
+            QDBusConnection::sessionBus(),
+            this));
 
     m_defaultSource.reset(
-                new com::deepin::daemon::audio::Source (
-                    m_serviceName,
-                    m_audioInterface->defaultSource().path(),
-                    QDBusConnection::sessionBus(),
-                    this )
-                );
+        new com::deepin::daemon::audio::Source(
+            m_serviceName,
+            m_audioInterface->defaultSource().path(),
+            QDBusConnection::sessionBus(),
+            this));
 
     //Initialze the cards
-    onCardsChanged(m_audioInterface->cards());
+    //onCardsChanged(m_audioInterface->cards());
 }
 
 void VNoteAudioDeviceWatcher::initWatcherCofing()
@@ -70,16 +68,16 @@ void VNoteAudioDeviceWatcher::initWatcherCofing()
         "/usr/share/",
     };
 
-    QString configFileBasePath = QString(DEEPIN_VOICE_NOTE)+QString("/")
-            + QString(DEEPIN_VOICE_NOTE)+QString(".conf");
+    QString configFileBasePath = QString(DEEPIN_VOICE_NOTE) + QString("/")
+                                 + QString(DEEPIN_VOICE_NOTE) + QString(".conf");
 
     for (auto it : watcherConfigFilePaths) {
-        QString configFileName(it+configFileBasePath);
+        QString configFileName(it + configFileBasePath);
 
         QFileInfo watcherConfig(configFileName);
 
         if (watcherConfig.exists()) {
-            QSettings  watcherSettings(configFileName, QSettings::Format::IniFormat);
+            QSettings watcherSettings(configFileName, QSettings::Format::IniFormat);
 
             //Default need device watcher
             QVariant varValue = watcherSettings.value("Audio/CheckInputDevice");
@@ -115,12 +113,11 @@ void VNoteAudioDeviceWatcher::onDefaultSourceChanaged(const QDBusObjectPath &val
             << " name:" << m_defaultSource->name();
 
     m_defaultSource.reset(
-                new com::deepin::daemon::audio::Source (
-                    m_serviceName,
-                    value.path(),
-                    QDBusConnection::sessionBus(),
-                    this )
-                );
+        new com::deepin::daemon::audio::Source(
+            m_serviceName,
+            value.path(),
+            QDBusConnection::sessionBus(),
+            this));
 
     AudioPort activePort = m_defaultSource->activePort();
 
@@ -131,12 +128,12 @@ void VNoteAudioDeviceWatcher::onDefaultSourceChanaged(const QDBusObjectPath &val
     emit inputSourceChanged(activePort.description);
 }
 
-void VNoteAudioDeviceWatcher::onCardsChanged(const QString &value)
-{
-    qInfo() << "Cards changed:" << value;
+//void VNoteAudioDeviceWatcher::onCardsChanged(const QString &value)
+//{
+//    qInfo() << "Cards changed:" << value;
 
-    initAvailInputPorts(value);
-}
+//    initAvailInputPorts(value);
+//}
 
 void VNoteAudioDeviceWatcher::run()
 {
@@ -146,10 +143,10 @@ void VNoteAudioDeviceWatcher::run()
     MicrophoneState currentState = MicrophoneState::NotAvailable;
 
     //log microphone state one time per 1 minutes
-    const int LOG_FREQ = 1*60*1000;
+    const int LOG_FREQ = 1 * 60 * 1000;
 
-    static struct timeval curret = {0,0};
-    static struct timeval lastPrint = {0,0};
+    static struct timeval curret = {0, 0};
+    static struct timeval lastPrint = {0, 0};
 
     //
     bool fHighPriorityLog = false;
@@ -166,10 +163,10 @@ void VNoteAudioDeviceWatcher::run()
 
         AudioPort activePort = m_defaultSource->activePort();
 
-        if (isMicrophoneAvail(activePort.name) || (!m_fNeedDeviceChecker)) {
+        if (isMicrophoneAvail(activePort) || (!m_fNeedDeviceChecker)) {
             currentMicrophoneVolume = m_defaultSource->volume();
 
-            if ((currentMicrophoneVolume-volumeLowMark) >= DBL_EPSILON ) {
+            if ((currentMicrophoneVolume - volumeLowMark) >= DBL_EPSILON) {
                 currentState = MicrophoneState::Normal;
             } else {
                 currentState = MicrophoneState::VolumeTooLow;
@@ -217,8 +214,7 @@ void VNoteAudioDeviceWatcher::initConnections()
     connect(m_audioInterface.get(), &com::deepin::daemon::Audio::DefaultSourceChanged,
             this, &VNoteAudioDeviceWatcher::onDefaultSourceChanaged);
 
-    connect(m_audioInterface.get(), &com::deepin::daemon::Audio::CardsChanged
-            ,this, &VNoteAudioDeviceWatcher::onCardsChanged);
+    //connect(m_audioInterface.get(), &com::deepin::daemon::Audio::CardsChanged, this, &VNoteAudioDeviceWatcher::onCardsChanged);
 }
 
 void VNoteAudioDeviceWatcher::initAvailInputPorts(const QString &cards)
@@ -231,7 +227,7 @@ void VNoteAudioDeviceWatcher::initAvailInputPorts(const QString &cards)
     for (QJsonValue cardVar : jCards) {
         QJsonObject jCard = cardVar.toObject();
         const QString cardName = jCard["Name"].toString();
-        const int     cardId   = jCard["Id"].toInt();
+        const int cardId = jCard["Id"].toInt();
 
         QJsonArray jPorts = jCard["Ports"].toArray();
 
@@ -243,9 +239,9 @@ void VNoteAudioDeviceWatcher::initAvailInputPorts(const QString &cards)
 
             // 0 Unknow 1 Not available 2 Available
             if (port.available == PortState::Available || port.available == PortState::Unkown) {
-                port.portId   = jPort["Name"].toString();
+                port.portId = jPort["Name"].toString();
                 port.portName = jPort["Description"].toString();
-                port.cardId   = cardId;
+                port.cardId = cardId;
                 port.cardName = cardName;
 
                 if (port.isInputPort()) {
@@ -258,19 +254,20 @@ void VNoteAudioDeviceWatcher::initAvailInputPorts(const QString &cards)
     }
 }
 
-bool VNoteAudioDeviceWatcher::isMicrophoneAvail(const QString &activePort) const
+bool VNoteAudioDeviceWatcher::isMicrophoneAvail(const AudioPort &activePort) const
 {
-    bool fAvailable = false;
+//    bool fAvailable = false;
 
-    QMap<PortID, Port>::const_iterator iter = m_availableInputPorts.find(activePort);
+//    QMap<PortID, Port>::const_iterator iter = m_availableInputPorts.find(activePort);
 
-    if (iter != m_availableInputPorts.end()) {
-        if (!iter->isLoopback()) {
-            fAvailable = true;
-        }
-    }
+//    if (iter != m_availableInputPorts.end()) {
+//        if (!iter->isLoopback()) {
+//            fAvailable = true;
+//        }
+//    }
 
-    return fAvailable;
+//    return fAvailable;
+    return  activePort.availability != 1 && activePort.name.contains("input", Qt::CaseInsensitive);
 }
 
 bool VNoteAudioDeviceWatcher::Port::isInputPort() const
@@ -284,10 +281,10 @@ bool VNoteAudioDeviceWatcher::Port::isLoopback() const
 {
     const QString loopbackFingerprint("Loopback");
 
-    return cardName.contains(loopbackFingerprint,  Qt::CaseInsensitive);
+    return cardName.contains(loopbackFingerprint, Qt::CaseInsensitive);
 }
 
-QDebug & operator <<(QDebug &out, const VNoteAudioDeviceWatcher::Port &port)
+QDebug &operator<<(QDebug &out, const VNoteAudioDeviceWatcher::Port &port)
 {
     out << "\n Port { "
         << "portId=" << port.portId << ","
