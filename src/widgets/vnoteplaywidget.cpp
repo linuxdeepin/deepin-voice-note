@@ -79,6 +79,7 @@ void VNotePlayWidget::initUI()
 void VNotePlayWidget::initPlayer()
 {
     m_player = new QMediaPlayer(this);
+    m_player->setNotifyInterval(200);
 }
 
 void VNotePlayWidget::initConnection()
