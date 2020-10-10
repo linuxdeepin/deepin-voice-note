@@ -75,7 +75,7 @@ protected:
     qreal m_frameGain {0};
     const qreal m_defaultGain = 3;
 
-    int m_maxShowedSamples;
+    int m_maxShowedSamples {0};
     int m_waveStyle {WaveStyle::Columnar};
 };
 
