@@ -56,7 +56,7 @@ set(CMAKE_EXE_LINKER_FLAGS "-pie")
 if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "sw_64")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mieee")
 elseif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "mips64")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ftree-vectorize -march=loongson3a -mhard-float -mno-micromips -mno-mips16 -flax-vector-conversions -mloongson-ext2 -mloongson-mmi -Wl,--as-need")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftree-vectorize -march=loongson3a -mhard-float -mno-micromips -mno-mips16 -flax-vector-conversions -mloongson-ext2 -mloongson-mmi -Wl,--as-need")
 endif ()
 
 #compile flags
@@ -67,11 +67,11 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
   # Enable Qt builtin debug mode
   # add_definitions("-DQT_MESSAGELOGCONTEXT")
 else()
-  # -Wl, -O2 Enable linker optimizations
+  # -Wl, -O3 Enable linker optimizations
   # -Wl, --gc-sections Remove unused code resulting from -fdsta-sections and
   # -ffunction-sections
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O2 -Wl,-O1 -Wl,--gc-sections")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -Wl,-O1 -Wl,--gc-sections")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -Wl,-O1 -Wl,--gc-sections")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3 -Wl,-O1 -Wl,--gc-sections")
   add_definitions(-DQT_NO_DEBUG_OUTPUT)
 endif()
 
