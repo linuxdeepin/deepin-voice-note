@@ -19,6 +19,7 @@
 #include "audiowatcher.h"
 #include "globaldef.h"
 
+#include <DLog>
 /**
  * @brief AudioWatcher::AudioWatcher
  * @param parent 父类
@@ -58,7 +59,7 @@ void AudioWatcher::initDeviceWacther()
     m_outAudioPort = m_pDefaultSink->activePort();
     m_outAudioMute = m_pDefaultSink->mute();
 
-    qDebug() << "current input active port name:" << m_inAudioPort.name
+    qInfo() << "current input active port name:" << m_inAudioPort.name
              << "\ncurrent input active port availability:" << m_inAudioPort.availability
              << "\ncurrent input device name:" << m_pDefaultSource->name()
              << "\ncurrent output active port name:" << m_outAudioPort.name
@@ -99,8 +100,8 @@ void AudioWatcher::onSourceVolumeChanged(double value)
     if (m_inAudioPort.name == activePort.name) {
         emit sigVolumeChange(Micphone);
     } else {
-        qDebug() << "last input active port:" << m_inAudioPort.name;
-        qDebug() << "current input active port:" << activePort.name;
+        qInfo() << "last input active port:" << m_inAudioPort.name;
+        qInfo() << "current input active port:" << activePort.name;
         m_inAudioPort = activePort;
     }
 }
@@ -116,8 +117,8 @@ void AudioWatcher::onSinkVolumeChanged(double value)
     if (m_outAudioPort.name == activePort.name) {
         emit sigVolumeChange(Internal);
     } else {
-        qDebug() << "last output active port:" << m_outAudioPort.name;
-        qDebug() << "current output active port:" << activePort.name;
+        qInfo() << "last output active port:" << m_outAudioPort.name;
+        qInfo() << "current output active port:" << activePort.name;
         m_outAudioPort = activePort;
     }
 }
@@ -128,7 +129,7 @@ void AudioWatcher::onSinkVolumeChanged(double value)
  */
 void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &value)
 {
-    qDebug() << "Input device change from:"
+    qInfo() << "Input device change from:"
              << "\nactive port:" << m_inAudioPort.name
              << "\ndevice name:" << m_pDefaultSource->name();
 
@@ -144,7 +145,7 @@ void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &value)
     m_inAudioPort = m_pDefaultSource->activePort();
     m_inAudioMute = m_pDefaultSource->mute();
 
-    qDebug() << "\nTo:"
+    qInfo() << "\nTo:"
              << "\nactive port:" << m_inAudioPort.name << ";" << m_inAudioPort.availability
              << "\ndevice name:" << m_pDefaultSource->name();
 
@@ -157,7 +158,7 @@ void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &value)
  */
 void AudioWatcher::onDefaultSinkChanaged(const QDBusObjectPath &value)
 {
-    qDebug() << "Output device change from:"
+    qInfo() << "Output device change from:"
              << "\nactive port:" << m_outAudioPort.name << ";" << m_outAudioPort.availability
              << "\ndevice name:" << m_pDefaultSink->name();
 
@@ -173,7 +174,7 @@ void AudioWatcher::onDefaultSinkChanaged(const QDBusObjectPath &value)
     m_outAudioPort = m_pDefaultSink->activePort();
     m_outAudioMute = m_pDefaultSink->mute();
 
-    qDebug() << "\nTo:"
+    qInfo() << "\nTo:"
              << "\nactive port:" << m_outAudioPort.name << ";" << m_outAudioPort.availability
              << "\ndevice name:" << m_pDefaultSink->name();
 
@@ -186,7 +187,7 @@ void AudioWatcher::onDefaultSinkChanaged(const QDBusObjectPath &value)
  */
 void AudioWatcher::onDefaultSinkActivePortChanged(AudioPort value)
 {
-    qDebug() << "output active port change from:"
+    qInfo() << "output active port change from:"
              << "\nPort Name:" << m_outAudioPort.name
              << "\nPort Availability:" << m_outAudioPort.availability
              << "\nto:"
@@ -202,7 +203,7 @@ void AudioWatcher::onDefaultSinkActivePortChanged(AudioPort value)
  */
 void AudioWatcher::onDefaultSourceActivePortChanged(AudioPort value)
 {
-    qDebug() << "input active port change from:"
+    qInfo() << "input active port change from:"
              << "\nPort Name:" << m_inAudioPort.name
              << "\nPort Availability:" << m_inAudioPort.availability
              << "\nto:"

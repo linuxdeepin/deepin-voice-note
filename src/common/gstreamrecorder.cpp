@@ -19,7 +19,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "gstreamrecorder.h"
-#include <QDebug>
+#include <DLog>
 
 static const QString mp3Encoder = "capsfilter caps=audio/x-raw,rate=44100,channels=2 ! lamemp3enc name=enc target=0 quality=2 ! xingmux ! id3mux";
 
@@ -83,7 +83,7 @@ bool GstreamRecorder::createPipe()
     do {
         audioSrc = gst_element_factory_make("pulsesrc", "audioSrc");
         if (audioSrc == nullptr) {
-            qDebug() << "audioSrc make error";
+            qCritical() << "audioSrc make error";
             break;
         }
         if (!m_currentDevice.isEmpty()) {
@@ -92,35 +92,35 @@ bool GstreamRecorder::createPipe()
 
         //       audiowebrtcdsp= gst_element_factory_make("webrtcdsp","audiowebrtcdsp");
         //       if(audiowebrtcdsp == nullptr){
-        //           qDebug() << "audiowebrtcdsp make error";
+        //           qCritical() << "audiowebrtcdsp make error";
         //           break;
         //       }
         //       audiowebrtcechoprobe = gst_element_factory_make("webrtcechoprobe","webrtcechoprobe");
         //       if(audiowebrtcechoprobe == nullptr){
-        //           qDebug() << "audiowebrtcechoprobe make error";
+        //           qCritical() << "audiowebrtcechoprobe make error";
         //           break;
         //       }
         //       g_object_set(audiowebrtcdsp, "probe", "webrtcechoprobe", nullptr);
 
         audioResample = gst_element_factory_make("audioresample", nullptr);
         if (audioResample == nullptr) {
-            qDebug() << "audioResample make error";
+            qCritical() << "audioResample make error";
             break;
         }
         audioConvert = gst_element_factory_make("audioconvert", "audioconvert");
         if (audioConvert == nullptr) {
-            qDebug() << "audioConvert make error";
+            qCritical() << "audioConvert make error";
             break;
         }
         audioQueue = gst_element_factory_make("queue", "audioqueue");
         if (audioQueue == nullptr) {
-            qDebug() << "audioQueue make error";
+            qCritical() << "audioQueue make error";
             break;
         }
         audioEncoder = gst_parse_bin_from_description(mp3Encoder.toLatin1().constData(),
                                                       true, nullptr);
         if (audioEncoder == nullptr) {
-            qDebug() << "audioEncoder make error";
+            qCritical() << "audioEncoder make error";
             break;
         }
         GstPad *pad = gst_element_get_static_pad(audioEncoder, "sink");
@@ -128,12 +128,12 @@ bool GstreamRecorder::createPipe()
             gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, bufferProbe, this, nullptr);
             gst_object_unref(pad);
         } else {
-            qDebug() << "sink pad make error";
+            qCritical() << "sink pad make error";
             break;
         }
         audioOutput = gst_element_factory_make("filesink", "filesink");
         if (audioOutput == nullptr) {
-            qDebug() << "audioOutput make error";
+            qCritical() << "audioOutput make error";
             break;
         }
         if (!m_outputFile.isEmpty()) {
@@ -155,7 +155,7 @@ bool GstreamRecorder::createPipe()
                                    audioOutput, nullptr)) {
             objectUnref(m_pipeline);
             m_pipeline = nullptr;
-            qDebug() << "gst_element_link_many error";
+            qCritical() << "gst_element_link_many error";
             return success;
         }
         success = true;
@@ -229,7 +229,7 @@ bool GstreamRecorder::startRecord()
         return true;
     }
     if (gst_element_set_state(m_pipeline, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
-        qDebug() << "start error";
+        qCritical() << "start error";
         return false;
     }
     return true;
@@ -282,7 +282,7 @@ void GstreamRecorder::setDevice(QString device)
             GstElement *audioSrc = gst_bin_get_by_name(reinterpret_cast<GstBin *>(m_pipeline), "audioSrc");
             g_object_set(reinterpret_cast<gpointer *>(audioSrc), "device", device.toLatin1().data(), nullptr);
         }
-        qDebug() << device;
+        qInfo() << device;
     }
 }
 
@@ -318,7 +318,7 @@ bool GstreamRecorder::doBusMessage(GstMessage *message)
         QString errMsg = error->message;
         emit errorMsg(errMsg);
 
-        qDebug() << "Got pipeline error:" << errMsg;
+        qCritical() << "Got pipeline error:" << errMsg;
 
         if (dbg) {
             g_free(dbg);
