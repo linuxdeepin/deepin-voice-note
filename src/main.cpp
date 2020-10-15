@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
     app.setApplicationVersion(VERSION);
     app.setProductIcon(QIcon::fromTheme(DEEPIN_VOICE_NOTE));
     app.setProductName(DApplication::translate("AppMain", "Voice Notes"));
+    app.setApplicationDisplayName(DApplication::translate("AppMain", "Voice Notes"));
     app.setApplicationDescription(DApplication::translate("AppMain",
                                                           "Voice Notes is a lightweight memo tool to make text notes and voice recordings."));
 
