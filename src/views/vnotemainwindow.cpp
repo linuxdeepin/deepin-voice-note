@@ -69,6 +69,7 @@
 #include <DStatusBar>
 #include <DTitlebar>
 #include <DSettingsDialog>
+#include <DSysInfo>
 
 static OpsStateInterface *stateOperation = nullptr;
 
@@ -1980,10 +1981,19 @@ void VNoteMainWindow::onShowPrivacy()
     QString url = "";
     QLocale locale;
     QLocale::Country country = locale.country();
+    bool isCommunityEdition = DSysInfo::isCommunityEdition();
     if (country == QLocale::China) {
-        url = "https://www.uniontech.com/agreement/privacy-cn";
+        if(isCommunityEdition){
+            url = "https://www.uniontech.com/agreement/deepin-privacy-cn";
+        }else {
+            url = "https://www.uniontech.com/agreement/privacy-cn";
+        }
     } else {
-        url = "https://www.uniontech.com/agreement/privacy-en";
+        if(isCommunityEdition){
+            url = "https://www.uniontech.com/agreement/deepin-privacy-en";
+        }else {
+            url = "https://www.uniontech.com/agreement/privacy-en";
+        }
     }
     QDesktopServices::openUrl(url);
 }
