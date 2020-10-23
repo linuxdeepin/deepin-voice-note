@@ -22,6 +22,7 @@
 #include "vnoteapplication.h"
 #include "views/vnotemainwindow.h"
 #include "globaldef.h"
+#include "common/performancemonitor.h"
 
 #include <DApplication>
 #include <DApplicationSettings>
@@ -35,6 +36,8 @@ DWIDGET_USE_NAMESPACE
 
 int main(int argc, char *argv[])
 {
+    PerformanceMonitor::initializeAppStart();
+
     VNoteApplication app(argc, argv);
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
     app.loadTranslator();

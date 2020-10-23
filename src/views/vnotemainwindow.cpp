@@ -39,6 +39,7 @@
 #include "common/utils.h"
 #include "common/actionmanager.h"
 #include "common/setting.h"
+#include "common/performancemonitor.h"
 
 #include "db/vnotefolderoper.h"
 #include "db/vnoteitemoper.h"
@@ -733,6 +734,8 @@ void VNoteMainWindow::onVNoteFoldersLoaded()
     } else {
         switchWidget(WndHomePage);
     }
+
+    PerformanceMonitor::initializeAppFinish();
 }
 
 /**
