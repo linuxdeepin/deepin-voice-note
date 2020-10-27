@@ -57,6 +57,7 @@ const QStringList DbVisitor::DBNote::noteColumnsName = {
     "create_time",
     "modify_time",
     "delete_time",
+    "expand_filed1",
 };
 
 const QStringList DbVisitor::DBSafer::saferColumnsName = {
@@ -252,7 +253,7 @@ bool NoteQryDbVisitor::visitorData()
             //************Expand fileds begin**********
             //TODO:
             //    Add the expand fileds parse code here
-
+            note->isTop = m_sqlQuery->value(DBNote::is_top).toInt();
             //************Expand fileds end************
 
             VNOTE_ALL_NOTES_DATA_MAP::iterator it =
@@ -714,6 +715,41 @@ bool UpdateNoteDbVisitor::prepareSqls()
     }
 
     return fPrepareOK;
+}
+
+/**
+ * @brief UpdateNoteTopDbVisitor::UpdateNoteTopDbVisitor
+ * @param db
+ * @param inParam
+ * @param result
+ */
+UpdateNoteTopDbVisitor::UpdateNoteTopDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
+    : DbVisitor(db, inParam, result)
+{
+
+}
+
+/**
+ * @brief UpdateNoteDbVisitor::prepareSqls
+ */
+bool UpdateNoteTopDbVisitor::prepareSqls()
+{
+    bool fPrepareOK = true;
+    static constexpr char const *UPDATE_NOTE_TOP = "UPDATE %s SET %s=%d WHERE %s=%d;";
+    const VNoteItem *note = param.newNote;
+    if(note != nullptr){
+        QString updateSql;
+        updateSql.sprintf(UPDATE_NOTE_TOP,
+                          VNoteDbManager::NOTES_TABLE_NAME,
+                          DBNote::noteColumnsName[DBNote::is_top].toUtf8().data(),
+                note->isTop,
+                DBNote::noteColumnsName[DBNote::note_id].toUtf8().data(),
+                note->noteId);
+        m_dbvSqls.append(updateSql);
+    }else {
+       fPrepareOK = false;
+    }
+    return  fPrepareOK;
 }
 
 /**

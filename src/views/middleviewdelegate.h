@@ -22,8 +22,12 @@
 #ifndef LEFTVIEWDELEGATE_H
 #define LEFTVIEWDELEGATE_H
 
+#include <QPixmap>
+
 #include <DStyledItemDelegate>
 DWIDGET_USE_NAMESPACE
+
+struct VNoteItem;
 
 class MiddleViewDelegate : public DStyledItemDelegate
 {
@@ -65,12 +69,16 @@ private:
     //绘制搜索项
     void paintSearchItem(QPainter *painter, const QStyleOptionViewItem &option,
                          const QModelIndex &index) const;
+    //绘制置顶项
+    void paintTopItem(QPainter *painter, const QStyleOptionViewItem &option,
+                      const QModelIndex &index, VNoteItem* data) const;
 
     QAbstractItemView *m_parentView {nullptr};
     QString m_searchKey;
     DPalette m_parentPb;
     bool m_enableItem {true};
     bool m_editVisible {false};
+    QPixmap m_topIcon;
 };
 
 #endif // LEFTVIEWDELEGATE_H

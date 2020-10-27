@@ -46,6 +46,8 @@ public:
     QString getDefaultVoiceName() const;
     //删除记事项
     bool deleteNote();
+    //更新置顶属性
+    bool updateTop(int value);
 
 protected:
     VNoteItem *m_note {nullptr};

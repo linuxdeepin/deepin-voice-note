@@ -64,6 +64,9 @@ bool MiddleViewSortFilter::lessThan(
         StandardItemCommon::getStandardItemData(source_right));
 
     if (nullptr != leftNote && nullptr != rightNote) {
+        if(leftNote->isTop != rightNote->isTop){
+            return leftNote->isTop ? false : true;
+        }
         switch (m_sortFeild) {
         case modifyTime:
             return (leftNote->modifyTime < rightNote->modifyTime);

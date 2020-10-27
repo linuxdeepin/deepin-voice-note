@@ -51,6 +51,7 @@ public:
         //notes
         NoteMenuBase,
         NoteRename = NoteMenuBase,
+        NoteTop,
         NoteDelete,
         NoteSaveText,
         NoteSaveVoice,

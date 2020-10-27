@@ -291,3 +291,21 @@ bool VNoteItemOper::deleteNote()
 
     return delOK;
 }
+
+bool VNoteItemOper::updateTop(int value)
+{
+    bool updateOK = false;
+    if(nullptr != m_note){
+        if(m_note->isTop == value){
+            return updateOK;
+        }
+        m_note->isTop = value;
+        UpdateNoteTopDbVisitor updateNoteVisitor(VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
+        if(!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
+            updateOK = true;
+        }else {
+            m_note->isTop = !value;
+        }
+    }
+    return  updateOK;
+}

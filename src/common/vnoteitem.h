@@ -73,6 +73,8 @@ public:
     qint32 noteType {VNOTE_TYPE::VNT_Text};
     //状态
     qint32 noteState {State::Normal};
+    //是否置顶
+    qint32 isTop {0};
     //标题名称
     QString noteTitle;
     //创建时间
