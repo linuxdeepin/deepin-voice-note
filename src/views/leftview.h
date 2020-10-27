@@ -30,8 +30,11 @@ DWIDGET_USE_NAMESPACE
 
 class LeftViewDelegate;
 class LeftViewSortFilter;
+class LeftviewDialog;
 
 struct VNoteFolder;
+struct VNoteItem;
+
 //记事本列表
 class LeftView : public DTreeView
 {
@@ -66,6 +69,9 @@ public:
     QString getFolderSortId();
     //给当前记事本列表绑定排序编号
     bool setFolderSortNum();
+
+    //笔记移动
+    bool popupMoveDlg(const QModelIndexList &src);
 
 signals:
 
@@ -102,15 +108,18 @@ private:
     void initNotepadRoot();
     //初始化右键菜单
     void initMenu();
+    //笔记移动
+    bool doNoteMove(const QModelIndexList &src);
+
     DMenu *m_notepadMenu {nullptr};
     QStandardItemModel *m_pDataModel {nullptr};
     LeftViewDelegate *m_pItemDelegate {nullptr};
     LeftViewSortFilter *m_pSortViewFilter {nullptr};
     bool m_onlyCurItemMenuEnable {false};
-
     //以下为实现拖拽功能声明参数
     QModelIndex m_index;
     QPoint startPos;
+    LeftviewDialog *m_folderSelectDlg {nullptr};
 };
 
 #endif // LEFTVIEW_H

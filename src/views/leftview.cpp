@@ -29,6 +29,9 @@
 #include "common/standarditemcommon.h"
 #include "common/vnoteforlder.h"
 #include "common/setting.h"
+#include "common/vnoteitem.h"
+#include "db/vnoteitemoper.h"
+#include "dialog/leftviewdialog.h"
 
 #include <QMouseEvent>
 #include <QDragMoveEvent>
@@ -36,6 +39,8 @@
 #include <QMimeData>
 #include <QScrollBar>
 #include <QApplication>
+#include <QMouseEvent>
+#include <DLog>
 
 /**
  * @brief LeftView::LeftView
@@ -478,4 +483,51 @@ void LeftView::dragLeaveEvent(QDragLeaveEvent *event)
 void LeftView::closeMenu()
 {
     m_notepadMenu->close();
+}
+
+bool LeftView::popupMoveDlg(const QModelIndexList &src)
+{
+    bool ret = false;
+    if(src.size()){
+        if(m_folderSelectDlg == nullptr){
+            m_folderSelectDlg = new LeftviewDialog(m_pSortViewFilter, this);
+            m_folderSelectDlg->resize(448, 372);
+            connect(m_folderSelectDlg, &LeftviewDialog::accepted, this, [&src, &ret, this]() {
+               ret = doNoteMove(src);
+            });
+        }
+        VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(src[0]));
+        QString itemInfo = QString("移动 %1 等%2个笔记到：").arg(data->noteTitle).arg(src.size());
+        m_folderSelectDlg->setNoteContext(itemInfo);
+        m_folderSelectDlg->exec();
+    }
+    return ret;
+}
+
+bool LeftView::doNoteMove(const QModelIndexList &src)
+{
+    QModelIndex selectIndex = m_folderSelectDlg->getSelectIndex();
+    VNoteFolder *selectFolder = static_cast<VNoteFolder*>(StandardItemCommon::getStandardItemData(selectIndex));
+    VNoteItem *srcData = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(src[0]));
+
+    if(selectFolder && srcData->folderId != selectFolder->id){
+        VNoteItemOper noteOper;
+        VNOTE_ITEMS_MAP *srcNotes = noteOper.getFolderNotes(srcData->folderId);
+        VNOTE_ITEMS_MAP *destNotes = noteOper.getFolderNotes(selectFolder->id);
+        for(auto it : src){
+            srcData = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(it));
+            //更新内存数据
+            srcNotes->lock.lockForWrite();
+            srcNotes->folderNotes.remove(srcData->noteId);
+            srcNotes->lock.unlock();
+
+            destNotes->lock.lockForWrite();
+            srcData->folderId = selectFolder->id;
+            destNotes->folderNotes.insert(srcData->noteId, srcData);
+            destNotes->lock.unlock();
+            //更新数据库
+        }
+        return true;
+    }
+    return false;
 }

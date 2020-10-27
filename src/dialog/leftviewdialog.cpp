@@ -30,10 +30,9 @@
 #include <DLabel>
 #include <DApplication>
 #include <DStyle>
-LeftviewDialog::LeftviewDialog(LeftViewSortFilter *model, LeftViewDelegate *delegate,QWidget *parent)
+LeftviewDialog::LeftviewDialog(LeftViewSortFilter *model, QWidget *parent)
      :DAbstractDialog(parent)
      ,m_model(model)
-     ,m_delegate(delegate)
 {
     initUI();
     initConnections();
@@ -47,6 +46,8 @@ void LeftviewDialog::initUI()
     m_view = new DTreeView(this);
     DStyle::setFrameRadius(m_view, 20);
     m_view->setModel(m_model);
+    m_delegate = new LeftViewDelegate(m_view);
+    m_delegate->setDrawNotesNum(false);
     m_view->setItemDelegate(m_delegate);
     m_view->setHeaderHidden(true);
     m_view->setItemsExpandable(false);

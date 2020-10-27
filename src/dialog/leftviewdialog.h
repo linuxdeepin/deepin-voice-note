@@ -42,7 +42,7 @@ struct VNoteItem;
 class LeftviewDialog : public DAbstractDialog
 {
 public:
-    explicit LeftviewDialog(LeftViewSortFilter *model, LeftViewDelegate *delegate, QWidget *parent = nullptr);
+    explicit LeftviewDialog(LeftViewSortFilter *model, QWidget *parent = nullptr);
     void setNoteContext(const QString &text);
     QModelIndex getSelectIndex();
 protected:

@@ -22,6 +22,8 @@
 #ifndef MIDDLEVIEW_H
 #define MIDDLEVIEW_H
 
+#include <QVector>
+
 #include <DListView>
 #include <DMenu>
 #include <DLabel>
@@ -68,6 +70,9 @@ public:
     VNoteItem *deleteCurrentRow();
     //获取当前选中项数据
     VNoteItem *getCurrVNotedata() const;
+    //获取当所有选中的笔记
+    QModelIndexList getAllSelectNote();
+    void deleteModelIndexs(const QModelIndexList& indexs);
     //置顶/取消置顶
     void noteStickOnTop();
     //排序
