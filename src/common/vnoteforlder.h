@@ -61,6 +61,8 @@ public:
     QDateTime modifyTime;
     //删除时间
     QDateTime deleteTime;
+    //排序编号
+    qint32 sort_number = -1;
 
     struct {
         //正常图标

@@ -51,7 +51,12 @@ bool LeftViewSortFilter::lessThan(
 
         VNoteFolder *rightSource = reinterpret_cast<VNoteFolder *>(
             StandardItemCommon::getStandardItemData(source_right));
-        return leftSource->createTime < rightSource->createTime;
+
+        if (-1 != leftSource->sort_number && -1 != rightSource->sort_number){
+            return leftSource->sort_number < rightSource->sort_number;
+        } else {
+            return leftSource->createTime < rightSource->createTime;
+        }
     }
 
     return QSortFilterProxyModel::lessThan(source_left, source_right);

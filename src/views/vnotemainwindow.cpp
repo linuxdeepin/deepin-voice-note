@@ -1425,22 +1425,26 @@ void VNoteMainWindow::onMenuAbout2Show()
 int VNoteMainWindow::loadNotepads()
 {
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
+        QVariant value =  setting::instance()->getOption(VNOTE_FOLDER_SORT);
+        QStringList tmpsortFolders = value.toString().split(",");
 
-    int folderCount = 0;
+        int folderCount = 0;
 
-    if (folders) {
-        folders->lock.lockForRead();
+        if (folders) {
+            folders->lock.lockForRead();
 
-        folderCount = folders->folders.size();
+            folderCount = folders->folders.size();
 
-        for (auto it : folders->folders) {
-            m_leftView->appendFolder(it);
+            for (auto it : folders->folders) {
+                it->sort_number = folderCount - tmpsortFolders.indexOf(QString::number(it->id));
+                m_leftView->appendFolder(it);
+            }
+
+            m_leftView->sort();
+            folders->lock.unlock();
         }
 
-        folders->lock.unlock();
-    }
-
-    return folderCount;
+        return folderCount;
 }
 
 /**
@@ -1455,9 +1459,31 @@ void VNoteMainWindow::addNotepad()
     VNoteFolder *newFolder = folderOper.addFolder(itemData);
 
     if (newFolder) {
+        bool sortEnable = false;
+        if (m_leftView->getNotepadRoot()->hasChildren()) {
+            QModelIndex currindex = m_leftView->getNotepadRoot()->child(0)->index();
+            if (currindex.isValid()) {
+                VNoteFolder *vnotefolder = reinterpret_cast<VNoteFolder *>(
+                                    StandardItemCommon::getStandardItemData(currindex));
+                if(nullptr != vnotefolder) {
+                    if (-1 != vnotefolder->sort_number) {
+                        newFolder->sort_number = folderOper.getFoldersCount();
+                        sortEnable = true;
+                    }
+                }
+            }
+        }
+
         //Switch to note view
         switchWidget(WndNoteShow);
         m_leftView->addFolder(newFolder);
+        m_leftView->sort();
+
+        if (sortEnable) {
+            QString folderSortData = m_leftView->getFolderSortId();
+            setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
+        }
+
         addNote();
     }
 }
@@ -1468,15 +1494,25 @@ void VNoteMainWindow::addNotepad()
 void VNoteMainWindow::delNotepad()
 {
     VNoteFolder *data = m_leftView->removeFolder();
-
     m_rightView->removeCacheWidget(data);
 
-    VNoteFolderOper folderOper(data);
+    QString folderSortData = m_leftView->getFolderSortId();
 
+    VNoteFolderOper folderOper(data);
     folderOper.deleteVNoteFolder(data);
 
     if (m_leftView->folderCount() == 0) {
         switchWidget(WndHomePage);
+    }
+
+    // 如果第一行的排序编号不是默认值-1，则当前排序为按排序编号排序，将当前顺序记事本编号写入配置文件
+    QModelIndex currindex = m_leftView->getNotepadRoot()->child(0)->index();
+    VNoteFolder *vnotefolder = reinterpret_cast<VNoteFolder *>(
+                        StandardItemCommon::getStandardItemData(currindex));
+    if(nullptr != vnotefolder) {
+        if (-1 != vnotefolder->sort_number) {
+            setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
+        }
     }
 }
 

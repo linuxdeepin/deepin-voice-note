@@ -62,6 +62,10 @@ public:
     int folderCount();
     //删除选中的记事本
     VNoteFolder *removeFolder();
+    //获取当前顺序所有记事本编号
+    QString getFolderSortId();
+    //给当前记事本列表绑定排序编号
+    bool setFolderSortNum();
 
 signals:
 
@@ -80,6 +84,15 @@ protected:
     //关闭重命名编辑框触发
     void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
 
+    //放下动作
+    void dropEvent(QDropEvent *event) override;
+    //托到进入窗口动作
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    //拖着物体在窗口移动
+    void dragMoveEvent(QDragMoveEvent *event) override;
+    //拖走了没有释放
+    void dragLeaveEvent(QDragLeaveEvent *event) override;
+
 private:
     //初始化代理模块
     void initDelegate();
@@ -94,6 +107,10 @@ private:
     LeftViewDelegate *m_pItemDelegate {nullptr};
     LeftViewSortFilter *m_pSortViewFilter {nullptr};
     bool m_onlyCurItemMenuEnable {false};
+
+    //以下为实现拖拽功能声明参数
+    QModelIndex m_index;
+    QPoint startPos;
 };
 
 #endif // LEFTVIEW_H
