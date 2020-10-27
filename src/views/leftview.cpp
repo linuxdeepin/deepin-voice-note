@@ -131,15 +131,6 @@ void LeftView::mousePressEvent(QMouseEvent *event)
             m_notepadMenu->popup(event->globalPos());
         }
     }
-
-    if (event->button() == Qt::LeftButton) {
-        startPos = event->pos();
-        m_index = this->indexAt(startPos);
-        QDrag *drag = new QDrag(this);
-        QMimeData *mimeData = new QMimeData;
-        drag->setMimeData(mimeData);
-        drag->exec(Qt::MoveAction);
-    }
 }
 
 /**
@@ -170,11 +161,11 @@ void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void LeftView::mouseMoveEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton) {
-        if ((event->pos() - startPos).manhattanLength() < QApplication::startDragDistance()) {
-            DTreeView::mouseMoveEvent(event);
-            return;
-        }
+    if (event->buttons() & Qt::LeftButton) {
+        QDrag *drag = new QDrag(this);
+        QMimeData *mimeData = new QMimeData;
+        drag->setMimeData(mimeData);
+        drag->exec(Qt::MoveAction);
     }
 }
 
@@ -400,6 +391,7 @@ void LeftView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint h
 
 void LeftView::dropEvent(QDropEvent *event)
 {
+    m_index = this->currentIndex();
     if (StandardItemCommon::getStandardItemType(this->indexAt(event->pos())) != StandardItemCommon::NOTEPADITEM ||
             this->indexAt(event->pos()) == m_index) {
         DTreeView::dropEvent(event);

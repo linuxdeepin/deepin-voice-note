@@ -118,7 +118,6 @@ private:
     bool m_onlyCurItemMenuEnable {false};
     //以下为实现拖拽功能声明参数
     QModelIndex m_index;
-    QPoint startPos;
     LeftviewDialog *m_folderSelectDlg {nullptr};
 };
 
