@@ -48,7 +48,7 @@ void LeftviewDialog::initUI()
     m_view = new DTreeView(this);
     DStyle::setFrameRadius(m_view, 20);
     m_view->setModel(m_model);
-    m_delegate = new LeftViewDelegate(m_view);
+//    m_delegate = new LeftViewDelegate(m_view);
     m_delegate->setDrawNotesNum(false);
     m_view->setItemDelegate(m_delegate);
     m_view->setHeaderHidden(true);

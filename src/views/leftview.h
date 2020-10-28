@@ -72,12 +72,17 @@ public:
 
     //笔记移动
     bool popupMoveDlg(const QModelIndexList &src);
+    //笔记移动
+    bool doNoteMove(const QModelIndexList &src, const QModelIndex &dst);
+    //更新当前记事本排序编号
+    void updateFolderSortNum(const QModelIndex &sorceIndex, const QModelIndex &targetIndex);
 
 signals:
     //539触发选中当前点击位置
     void requestSelect();
     //539请求更新代理中拖拽状态
     void updateDragingStateDelay();
+
 protected:
     //鼠标事件
     //单击
@@ -94,7 +99,7 @@ protected:
     void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
 
     //放下动作
-    void dropEvent(QDropEvent *event) override;
+//    void dropEvent(QDropEvent *event) override;
     //托到进入窗口动作
     void dragEnterEvent(QDragEnterEvent *event) override;
     //拖着物体在窗口移动
@@ -113,14 +118,13 @@ private:
     void initNotepadRoot();
     //初始化右键菜单
     void initMenu();
-    //笔记移动
-    bool doNoteMove(const QModelIndexList &src, const QModelIndex &dst);
 
     DMenu *m_notepadMenu {nullptr};
     QStandardItemModel *m_pDataModel {nullptr};
     LeftViewDelegate *m_pItemDelegate {nullptr};
     LeftViewSortFilter *m_pSortViewFilter {nullptr};
     bool m_onlyCurItemMenuEnable {false};
+
     //以下为实现拖拽功能声明参数
     QModelIndex m_index;
     LeftviewDialog *m_folderSelectDlg {nullptr};

@@ -20,6 +20,7 @@
 */
 
 #include "leftviewdelegate.h"
+#include "leftview.h"
 #include "common/vnoteforlder.h"
 #include "common/standarditemcommon.h"
 
@@ -37,7 +38,7 @@
  * @brief LeftViewDelegate::LeftViewDelegate
  * @param parent
  */
-LeftViewDelegate::LeftViewDelegate(QAbstractItemView *parent)
+LeftViewDelegate::LeftViewDelegate(LeftView *parent)
     : DStyledItemDelegate(parent)
     , m_treeView(parent)
 {
@@ -238,18 +239,40 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
             painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::TextTitle)));
             enable = false;
         } else {
-            //539根据拖拽状态取消过度绘制hover状态
-            if (option.state & QStyle::State_MouseOver && !m_draging) {
-                painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
-                painter->fillPath(path, painter->brush());
-                painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
-            } else {
-                painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
-                painter->fillPath(path, painter->brush());
-                painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
+            if (option.state & QStyle::State_MouseOver) {
+                if(m_isDraging){
+                    painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
+                    painter->fillPath(path, painter->brush());
+                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
+                    QPoint point = m_treeView->mapFromGlobal(QCursor::pos());
+                    QModelIndex m_lectIndex = m_treeView->indexAt(point);
+                    QColor color(0, 129, 255, 1);
+                    painter->setBrush(color);
+                    if(m_treeView->currentIndex().row() < m_lectIndex.row()){
+                        painter->drawRect(QRect(option.rect.x()+ 10, option.rect.y() + option.rect.height(), 175, 2));
+                    }else {
+                        painter->drawRect(QRect(option.rect.x()+ 10, option.rect.y(), 175, 2));
+                    }
+                } else {
+                    painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
+                    painter->fillPath(path, painter->brush());
+                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
+                }
+
+                //539根据拖拽状态取消过度绘制hover状态
+                if (option.state & QStyle::State_MouseOver && !m_draging) {
+                    painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
+                    painter->fillPath(path, painter->brush());
+                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
+                } else {
+                    painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
+                    painter->fillPath(path, painter->brush());
+                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
+                }
             }
         }
     }
+
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(index));
     if (data != nullptr) {
         VNoteFolderOper folderOps(data);
@@ -290,4 +313,9 @@ void LeftViewDelegate::setEnableItem(bool enable)
 void LeftViewDelegate::setDrawNotesNum(bool enable)
 {
     m_drawNotesNum = enable;
+}
+
+void LeftViewDelegate::setDragState(bool state)
+{
+    m_isDraging = state;
 }

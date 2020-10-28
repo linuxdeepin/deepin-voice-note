@@ -24,18 +24,24 @@
 
 #include <DStyledItemDelegate>
 DWIDGET_USE_NAMESPACE
+
+class LeftView;
+
 //记事本列表代理
 class LeftViewDelegate : public DStyledItemDelegate
 {
 public:
-    LeftViewDelegate(QAbstractItemView *parent = nullptr);
+    LeftViewDelegate(LeftView *parent = nullptr);
     //主题切换处理
     void handleChangeTheme();
     //设置所有列表项是否可用
     void setEnableItem(bool enable);
     //设置是否绘制笔记数目
     void setDrawNotesNum(bool enable);
-    //539更新拖拽状态
+    //设置鼠标拖拽状态
+    void setDragState(bool state);
+
+    //539更新触屏拖拽状态
     void setDraging(bool draging);
 
     const int MAX_FOLDER_NAME_LEN = 64;
@@ -68,9 +74,10 @@ private:
     //绘制记事本项
     void paintNoteItem(QPainter *painter, const QStyleOptionViewItem &option,
                        const QModelIndex &index) const;
-    QAbstractItemView *m_treeView {nullptr};
+    LeftView *m_treeView {nullptr};
     DPalette m_parentPb;
     bool m_enableItem {true};
+    bool m_isDraging {false};
     bool m_drawNotesNum {true};
     //539拖拽状态用于判断是否绘制hover效果
     bool m_draging{false};
