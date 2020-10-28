@@ -222,7 +222,11 @@ void MiddleViewDelegate::setEditIsVisible(bool isVisible)
 {
     m_editVisible = isVisible;
 }
-
+//539更新用于绘制hover状态的拖拽状态
+void MiddleViewDelegate::setDraging(bool draging)
+{
+    m_draging = draging;
+}
 /**
  * @brief MiddleViewDelegate::sizeHint
  * @param option
@@ -398,7 +402,7 @@ void MiddleViewDelegate::paintNormalItem(QPainter *painter, const QStyleOptionVi
     if (!data) {
         return;
     }
-    if(data->isTop){
+    if (data->isTop) {
         return paintTopItem(painter, option, index, data);
     }
     painter->save();
@@ -504,12 +508,12 @@ void MiddleViewDelegate::paintTopItem(QPainter *painter, const QStyleOptionViewI
     painter->setRenderHint(QPainter::Antialiasing, true);
     painter->setRenderHints(QPainter::SmoothPixmapTransform);
 
-    QRect topInfoRect(QRect(option.rect.x() + 10 , option.rect.y(),option.rect.width()- 20, 30));
-    QRect itemRect(QRect(option.rect.x() + 10, option.rect.y()+ 30, option.rect.width() - 20 , 64));
-    QRect lineRect(QRect(option.rect.x() + 10, option.rect.y() + 102, option.rect.width() - 20 , 2));
+    QRect topInfoRect(QRect(option.rect.x() + 10, option.rect.y(), option.rect.width() - 20, 30));
+    QRect itemRect(QRect(option.rect.x() + 10, option.rect.y() + 30, option.rect.width() - 20, 64));
+    QRect lineRect(QRect(option.rect.x() + 10, option.rect.y() + 102, option.rect.width() - 20, 2));
 
     //绘制置顶信息
-    painter->drawPixmap(QRect(topInfoRect.x(),topInfoRect.y() + 10, 10, 10), m_topIcon);
+    painter->drawPixmap(QRect(topInfoRect.x(), topInfoRect.y() + 10, 10, 10), m_topIcon);
     topInfoRect.setX(topInfoRect.x() + 15);
     painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
     painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));

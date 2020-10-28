@@ -35,6 +35,8 @@ public:
     void setEnableItem(bool enable);
     //设置是否绘制笔记数目
     void setDrawNotesNum(bool enable);
+    //539更新拖拽状态
+    void setDraging(bool draging);
 
     const int MAX_FOLDER_NAME_LEN = 64;
 
@@ -70,6 +72,8 @@ private:
     DPalette m_parentPb;
     bool m_enableItem {true};
     bool m_drawNotesNum {true};
+    //539拖拽状态用于判断是否绘制hover效果
+    bool m_draging{false};
 };
 
 #endif // LeftViewDelegate_H

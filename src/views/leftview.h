@@ -74,7 +74,10 @@ public:
     bool popupMoveDlg(const QModelIndexList &src);
 
 signals:
-
+    //539触发选中当前点击位置
+    void requestSelect();
+    //539请求更新代理中拖拽状态
+    void updateDragingStateDelay();
 protected:
     //鼠标事件
     //单击
@@ -98,6 +101,8 @@ protected:
     void dragMoveEvent(QDragMoveEvent *event) override;
     //拖走了没有释放
     void dragLeaveEvent(QDragLeaveEvent *event) override;
+    //539设置当前点击index选中
+    void selectCurrentOnTouch();
 
 private:
     //初始化代理模块
@@ -119,6 +124,16 @@ private:
     //以下为实现拖拽功能声明参数
     QModelIndex m_index;
     LeftviewDialog *m_folderSelectDlg {nullptr};
+    //539以下为实现触摸屏功能声明参数
+    qint64 lastScrollTimer = 0;
+    qint64 pressStartMs = 0;
+    QPoint m_prePoint;
+    bool m_mousePressed{false};
+    bool m_mouseMoved{false};
+    bool m_draging{false};
+    int m_pressPointY = 0;
+    int m_pressPointX = 0;
+
 };
 
 #endif // LEFTVIEW_H

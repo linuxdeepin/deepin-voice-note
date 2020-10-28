@@ -136,6 +136,11 @@ void LeftViewDelegate::handleChangeTheme()
     m_parentPb = DApplicationHelper::instance()->palette(m_treeView);
     m_treeView->update(m_treeView->currentIndex());
 }
+//539更新拖拽状态,用于取消过度绘制hover效果
+void LeftViewDelegate::setDraging(bool draging)
+{
+    m_draging = draging;
+}
 
 /**
  * @brief LeftViewDelegate::sizeHint
@@ -233,7 +238,8 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
             painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::TextTitle)));
             enable = false;
         } else {
-            if (option.state & QStyle::State_MouseOver) {
+            //539根据拖拽状态取消过度绘制hover状态
+            if (option.state & QStyle::State_MouseOver && !m_draging) {
                 painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
                 painter->fillPath(path, painter->brush());
                 painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
@@ -256,7 +262,7 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
         QRect numRect(paintRect.right() - numWidth - 7, paintRect.top(), numWidth, paintRect.height());
         QRect nameRect(iconRect.right() + 12, paintRect.top(),
                        numRect.left() - iconRect.right() - 15, paintRect.height());
-        if(m_drawNotesNum){
+        if (m_drawNotesNum) {
             painter->drawText(numRect, Qt::AlignRight | Qt::AlignVCenter, strNum);
         }
 

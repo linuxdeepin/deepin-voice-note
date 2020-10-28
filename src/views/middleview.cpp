@@ -50,6 +50,9 @@ MiddleView::MiddleView(QWidget *parent)
     initDelegate();
     initMenu();
     initUI();
+    //539禁止系统右键菜单弹出
+    setContextMenuPolicy(Qt::NoContextMenu);
+    connect(this, &MiddleView::requestSelect, this, &MiddleView::selectCurrentOnTouch);
 }
 
 /**
@@ -155,7 +158,7 @@ VNoteItem *MiddleView::deleteCurrentRow()
 {
     QModelIndex index = currentIndex();
     VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-        StandardItemCommon::getStandardItemData(index));
+                              StandardItemCommon::getStandardItemData(index));
 
     m_pSortViewFilter->removeRow(index.row());
 
@@ -170,7 +173,7 @@ VNoteItem *MiddleView::getCurrVNotedata() const
 {
     QModelIndex index = currentIndex();
     VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-        StandardItemCommon::getStandardItemData(index));
+                              StandardItemCommon::getStandardItemData(index));
 
     return noteData;
 }
@@ -179,7 +182,7 @@ QModelIndexList MiddleView::getAllSelectNote()
 {
     QModelIndexList indexList;
     QModelIndex index = currentIndex();
-    if(index.isValid()){
+    if (index.isValid()) {
         indexList.append(index);
     }
     return  indexList;
@@ -187,7 +190,7 @@ QModelIndexList MiddleView::getAllSelectNote()
 
 void MiddleView::deleteModelIndexs(const QModelIndexList &indexs)
 {
-    for(auto &it : indexs){
+    for (auto &it : indexs) {
         m_pSortViewFilter->removeRow(it.row());
     }
 }
@@ -233,7 +236,7 @@ void MiddleView::saveAsText()
 {
     QModelIndex index = currentIndex();
     VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-        StandardItemCommon::getStandardItemData(index));
+                              StandardItemCommon::getStandardItemData(index));
     if (nullptr != noteData) {
         //TODO:
         //    Should check if this note is doing save action
@@ -270,7 +273,7 @@ void MiddleView::saveRecords()
 {
     QModelIndex index = currentIndex();
     VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-        StandardItemCommon::getStandardItemData(index));
+                              StandardItemCommon::getStandardItemData(index));
     if (nullptr != noteData) {
         //TODO:
         //    Should check if this note is doing save action
@@ -302,12 +305,36 @@ void MiddleView::saveRecords()
 }
 
 /**
+ * @brief LeftView::selectCurrentOnTouch 设置当前点击位置选中
+ * @return null
+ * @author 539
+ */
+void MiddleView::selectCurrentOnTouch()
+{
+    QTimer::singleShot(250, this, [ = ] {
+        if (!m_mouseMoved && m_mousePressed)
+            this->setCurrentIndex(m_index.row());
+    });
+}
+/**
  * @brief MiddleView::mousePressEvent
  * @param event
  */
 void MiddleView::mousePressEvent(QMouseEvent *event)
 {
     this->setFocus();
+    //539处理触摸屏单指press事件
+    if (event->source() == Qt::MouseEventSynthesizedByQt) {
+        if (viewport()->visibleRegion().contains(event->pos())) {
+            QDateTime current = QDateTime::currentDateTime();
+            pressStartMs = current.toMSecsSinceEpoch();
+            m_pressPointY = event->pos().y();
+            m_index = this->indexAt(event->pos());
+            m_mousePressed = true;
+            emit requestSelect();
+            return;
+        }
+    }
 
     if (!m_onlyCurItemMenuEnable) {
         event->setModifiers(Qt::NoModifier);
@@ -317,7 +344,7 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::RightButton) {
         QModelIndex index = this->indexAt(event->pos());
         if (index.isValid()
-            && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
+                && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
             DListView::setCurrentIndex(index);
             m_noteMenu->popup(event->globalPos());
         }
@@ -330,6 +357,23 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
  */
 void MiddleView::mouseReleaseEvent(QMouseEvent *event)
 {
+    m_mousePressed = false;
+    //539处理拖拽事件，由于与drop操作参数不同，暂未封装
+    if (m_draging) {
+        qDebug() << "draging method write in this";
+        m_mouseMoved = false;
+        m_draging = false;
+        return;
+    }
+    QModelIndex index = indexAt(event->pos());
+    if (index.row() != currentIndex().row() && !m_mouseMoved && !m_draging) {
+        setCurrentIndex(index.row());
+        m_mouseMoved = false;
+        return;
+    }
+    m_draging = false;
+    m_mouseMoved = false;
+
     if (!m_onlyCurItemMenuEnable) {
         DListView::mouseReleaseEvent(event);
     }
@@ -344,6 +388,7 @@ void MiddleView::mouseDoubleClickEvent(QMouseEvent *event)
     if (!m_onlyCurItemMenuEnable) {
         DListView::mouseDoubleClickEvent(event);
     }
+
 }
 
 /**
@@ -352,6 +397,58 @@ void MiddleView::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void MiddleView::mouseMoveEvent(QMouseEvent *event)
 {
+    //539处理触摸屏单指move事件，区分滑动、拖拽事件
+    m_pItemDelegate->setDraging(false);
+    if (event->source() == Qt::MouseEventSynthesizedByQt) {
+        double dist = event->pos().y() - m_pressPointY;
+        if ((qAbs(dist) > 10)) {
+            if (!m_mouseMoved && !m_draging) {
+                QDateTime current = QDateTime::currentDateTime();
+                qint64 timeParam = current.toMSecsSinceEpoch() - pressStartMs;
+                if (timeParam > 250 && timeParam < 1000) {
+                    m_draging = true;
+                    m_pItemDelegate->setDraging(true);
+                    setCurrentIndex(m_index.row());
+                    return;
+                } else if (timeParam <= 250) {
+                    m_mouseMoved = true;
+
+                    if (lastScrollTimer == 0)
+                        lastScrollTimer = pressStartMs;
+                    qint64 timerDis = timeParam - lastScrollTimer;
+                    double param = ((qAbs(dist)) / timerDis) + 0.5;
+                    verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
+                    if (dist > 0)
+                        verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepSub);
+                    else {
+                        verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepAdd);
+                    }
+                    lastScrollTimer = timeParam;
+                    m_pressPointY = event->pos().y();
+                    return;
+                }
+            } else if (m_draging) {
+                return;
+            } else if (m_mouseMoved) {
+                QDateTime current = QDateTime::currentDateTime();
+                qint64 timeParam = current.toMSecsSinceEpoch() - pressStartMs;
+                if (lastScrollTimer == 0)
+                    lastScrollTimer = pressStartMs;
+                qint64 timerDis = timeParam - lastScrollTimer;
+                double param = ((qAbs(dist)) / timerDis) + 0.5;
+                verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
+                if (dist > 0)
+                    verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepSub);
+                else {
+                    verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepAdd);
+                }
+                lastScrollTimer = timeParam;
+                m_pressPointY = event->pos().y();
+//                }
+            }
+        }
+        return;
+    }
     Q_UNUSED(event);
 }
 
@@ -408,7 +505,7 @@ void MiddleView::initUI()
  */
 void MiddleView::setVisibleEmptySearch(bool visible)
 {
-    if(visible && m_emptySearch == nullptr){
+    if (visible && m_emptySearch == nullptr) {
         m_emptySearch = new DLabel(this);
         m_emptySearch->setText(DApplication::translate("MiddleView", "No search results"));
         m_emptySearch->setAlignment(Qt::AlignCenter);
@@ -419,7 +516,7 @@ void MiddleView::setVisibleEmptySearch(bool visible)
         layout->setContentsMargins(0, 0, 0, 0);
         layout->addWidget(m_emptySearch);
         this->setLayout(layout);
-    }else if(m_emptySearch){
+    } else if (m_emptySearch) {
         m_emptySearch->setVisible(visible);
     }
 }
@@ -461,10 +558,10 @@ void MiddleView::noteStickOnTop()
 {
     QModelIndex index = this->currentIndex();
     VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-                StandardItemCommon::getStandardItemData(index));
-    if(noteData){
+                              StandardItemCommon::getStandardItemData(index));
+    if (noteData) {
         VNoteItemOper noteOper(noteData);
-        if(noteOper.updateTop(!noteData->isTop)){
+        if (noteOper.updateTop(!noteData->isTop)) {
             sortView();
         }
     }
@@ -477,7 +574,7 @@ void MiddleView::noteStickOnTop()
 void MiddleView::sortView(bool adjustCurrentItemBar)
 {
     m_pSortViewFilter->sortView();
-    if(adjustCurrentItemBar){
+    if (adjustCurrentItemBar) {
         this->scrollTo(currentIndex(), DListView::PositionAtBottom);
     }
 }

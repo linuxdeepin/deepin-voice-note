@@ -72,12 +72,13 @@ public:
     VNoteItem *getCurrVNotedata() const;
     //获取当所有选中的笔记
     QModelIndexList getAllSelectNote();
-    void deleteModelIndexs(const QModelIndexList& indexs);
+    void deleteModelIndexs(const QModelIndexList &indexs);
     //置顶/取消置顶
     void noteStickOnTop();
     //排序
     void sortView(bool adjustCurrentItemBar = true);
 signals:
+    void requestSelect();
 public slots:
     //更新记事项
     void onNoteChanged();
@@ -98,7 +99,8 @@ protected:
     void keyPressEvent(QKeyEvent *e) override;
     //关闭重命名编辑框触发
     void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
-
+    //539设置当前点击index选中
+    void selectCurrentOnTouch();
 private:
     //初始化代理模块
     void initDelegate();
@@ -117,6 +119,17 @@ private:
     QStandardItemModel *m_pDataModel {nullptr};
     MiddleViewDelegate *m_pItemDelegate {nullptr};
     MiddleViewSortFilter *m_pSortViewFilter {nullptr};
+
+    //539以下为实现触摸屏功能声明参数
+    QModelIndex m_index;
+    qint64 lastScrollTimer = 0;
+    qint64 pressStartMs = 0;
+    QPoint m_prePoint;
+    bool m_mouseMoved{false};
+    bool m_mousePressed{false};
+    bool m_draging{false};
+    int m_pressPointY = 0;
+    int m_pressPointX = 0;
 };
 
 #endif // MIDDLEVIEW_H

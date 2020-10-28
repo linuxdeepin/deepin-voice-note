@@ -43,6 +43,8 @@ public:
     //设置编辑状态
     void setEditIsVisible(bool isVisible);
     const int MAX_TITLE_LEN = 64;
+    //539更新拖拽状态
+    void setDraging(bool draging);
 
 protected:
     //绘制列表项
@@ -71,7 +73,7 @@ private:
                          const QModelIndex &index) const;
     //绘制置顶项
     void paintTopItem(QPainter *painter, const QStyleOptionViewItem &option,
-                      const QModelIndex &index, VNoteItem* data) const;
+                      const QModelIndex &index, VNoteItem *data) const;
 
     QAbstractItemView *m_parentView {nullptr};
     QString m_searchKey;
@@ -79,6 +81,8 @@ private:
     bool m_enableItem {true};
     bool m_editVisible {false};
     QPixmap m_topIcon;
+    //539拖拽状态用于绘制hover状态判断
+    bool m_draging{false};
 };
 
 #endif // LEFTVIEWDELEGATE_H

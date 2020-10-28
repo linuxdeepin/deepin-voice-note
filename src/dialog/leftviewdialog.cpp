@@ -33,8 +33,8 @@
 #include <DLog>
 
 LeftviewDialog::LeftviewDialog(LeftViewSortFilter *model, QWidget *parent)
-     :DAbstractDialog(parent)
-     ,m_model(model)
+    : DAbstractDialog(parent)
+    , m_model(model)
 {
     initUI();
     initConnections();
@@ -56,7 +56,7 @@ void LeftviewDialog::initUI()
     m_view->setIndentation(0);
     m_view->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_view->installEventFilter(this);
-    QModelIndex notepadRootIndex = m_model->index(0,0);
+    QModelIndex notepadRootIndex = m_model->index(0, 0);
     m_view->expand(notepadRootIndex);
 
     m_closeButton = new DWindowCloseButton(this);
@@ -70,7 +70,7 @@ void LeftviewDialog::initUI()
     titleLayout->setSpacing(0);
     titleLayout->setContentsMargins(10, 0, 0, 0);
     titleLayout->addStretch();
-    titleLayout->addWidget(labMove,0, Qt::AlignCenter | Qt::AlignVCenter);
+    titleLayout->addWidget(labMove, 0, Qt::AlignCenter | Qt::AlignVCenter);
     titleLayout->addStretch();
     titleLayout->addWidget(m_closeButton, 0, Qt::AlignRight | Qt::AlignVCenter);
 
@@ -113,11 +113,11 @@ void LeftviewDialog::initUI()
 
 void LeftviewDialog::initConnections()
 {
-    connect(m_cancelBtn, &DPushButton::clicked, this, [=]() {
+    connect(m_cancelBtn, &DPushButton::clicked, this, [ = ]() {
         this->reject();
     });
 
-    connect(m_confirmBtn, &DPushButton::clicked, this, [=]() {
+    connect(m_confirmBtn, &DPushButton::clicked, this, [ = ]() {
         this->accept();
     });
 
@@ -129,11 +129,11 @@ void LeftviewDialog::initConnections()
 bool LeftviewDialog::eventFilter(QObject *o, QEvent *e)
 {
     Q_UNUSED(o);
-    if(e->type() == QEvent::KeyPress){
+    if (e->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = reinterpret_cast<QKeyEvent *>(e);
-        if(keyEvent->key() == Qt::Key_PageUp || keyEvent->key() == Qt::Key_PageDown){
+        if (keyEvent->key() == Qt::Key_PageUp || keyEvent->key() == Qt::Key_PageDown) {
             return true;
-        }else {
+        } else {
             if (0 == m_view->currentIndex().row() && keyEvent->key() == Qt::Key_Up) {
                 return true;
             }
