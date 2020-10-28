@@ -485,7 +485,7 @@ bool LeftView::popupMoveDlg(const QModelIndexList &src)
             m_folderSelectDlg = new LeftviewDialog(m_pSortViewFilter, this);
             m_folderSelectDlg->resize(448, 372);
             connect(m_folderSelectDlg, &LeftviewDialog::accepted, this, [&src, &ret, this]() {
-               ret = doNoteMove(src);
+               ret = doNoteMove(src, m_folderSelectDlg->getSelectIndex());
             });
         }
         VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(src[0]));
@@ -496,10 +496,9 @@ bool LeftView::popupMoveDlg(const QModelIndexList &src)
     return ret;
 }
 
-bool LeftView::doNoteMove(const QModelIndexList &src)
+bool LeftView::doNoteMove(const QModelIndexList &src, const QModelIndex &dst)
 {
-    QModelIndex selectIndex = m_folderSelectDlg->getSelectIndex();
-    VNoteFolder *selectFolder = static_cast<VNoteFolder*>(StandardItemCommon::getStandardItemData(selectIndex));
+    VNoteFolder *selectFolder = static_cast<VNoteFolder*>(StandardItemCommon::getStandardItemData(dst));
     VNoteItem *srcData = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(src[0]));
 
     if(selectFolder && srcData->folderId != selectFolder->id){
@@ -518,6 +517,7 @@ bool LeftView::doNoteMove(const QModelIndexList &src)
             destNotes->folderNotes.insert(srcData->noteId, srcData);
             destNotes->lock.unlock();
             //更新数据库
+            noteOper.updateFolderId(srcData);
         }
         return true;
     }

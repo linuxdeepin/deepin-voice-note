@@ -109,7 +109,7 @@ private:
     //初始化右键菜单
     void initMenu();
     //笔记移动
-    bool doNoteMove(const QModelIndexList &src);
+    bool doNoteMove(const QModelIndexList &src, const QModelIndex &dst);
 
     DMenu *m_notepadMenu {nullptr};
     QStandardItemModel *m_pDataModel {nullptr};

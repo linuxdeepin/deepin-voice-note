@@ -30,6 +30,8 @@
 #include <DLabel>
 #include <DApplication>
 #include <DStyle>
+#include <DLog>
+
 LeftviewDialog::LeftviewDialog(LeftViewSortFilter *model, QWidget *parent)
      :DAbstractDialog(parent)
      ,m_model(model)
@@ -147,5 +149,10 @@ void LeftviewDialog::setNoteContext(const QString &text)
 
 QModelIndex LeftviewDialog::getSelectIndex()
 {
-    return m_view->currentIndex();
+    QModelIndex index = m_view->currentIndex();
+    QItemSelectionModel *model = m_view->selectionModel();
+    if (!model->isSelected(index)) {
+        index  = QModelIndex();
+    }
+    return  index;
 }

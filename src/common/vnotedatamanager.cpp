@@ -362,8 +362,9 @@ VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
         folderNotes = *it;
     } else {
         //       qInfo() << __FUNCTION__ << "Get note faild: the folder don't exist:" << folderId;
-        //        folderNotes = new VNOTE_ITEMS_MAP();
-        //        m_qspAllNotesMap->notes.insert(folderId, folderNotes);
+        folderNotes = new VNOTE_ITEMS_MAP();
+        folderNotes->autoRelease = true;
+        m_qspAllNotesMap->notes.insert(folderId, folderNotes);
     }
 
     m_qspAllNotesMap->lock.unlock();
