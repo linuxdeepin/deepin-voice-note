@@ -38,6 +38,9 @@ int main(int argc, char *argv[])
 {
     PerformanceMonitor::initializeAppStart();
 
+    qputenv("QT_WAYLAND_SHELL_INTEGRATION","kwayland-shell");
+    qputenv("DTK_USE_SEMAPHORE_SINGLEINSTANCE", "1");
+
     VNoteApplication app(argc, argv);
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
     app.loadTranslator();
@@ -49,8 +52,6 @@ int main(int argc, char *argv[])
     app.setApplicationDisplayName(DApplication::translate("AppMain", "Voice Notes"));
     app.setApplicationDescription(DApplication::translate("AppMain",
                                                           "Voice Notes is a lightweight memo tool to make text notes and voice recordings."));
-
-    qputenv("DTK_USE_SEMAPHORE_SINGLEINSTANCE", "1");
 
     DGuiApplicationHelper::instance()->setSingelInstanceInterval(-1);
     if (!DGuiApplicationHelper::instance()->setSingleInstance(
