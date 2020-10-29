@@ -128,6 +128,7 @@ private:
     //以下为实现拖拽功能声明参数
     QModelIndex m_index;
     LeftviewDialog *m_folderSelectDlg {nullptr};
+
     //539以下为实现触摸屏功能声明参数
     qint64 lastScrollTimer = 0;
     qint64 pressStartMs = 0;

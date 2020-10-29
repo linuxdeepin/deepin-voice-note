@@ -27,6 +27,7 @@
 #include "common/actionmanager.h"
 #include "common/standarditemcommon.h"
 #include "common/vnoteitem.h"
+#include "common/thumbnail.h"
 #include "task/exportnoteworker.h"
 #include "common/setting.h"
 #include "db/vnoteitemoper.h"
@@ -38,6 +39,9 @@
 #include <DApplication>
 #include <DFileDialog>
 #include <DLog>
+#include <QDrag>
+#include <QMimeData>
+#include <QDragMoveEvent>
 
 /**
  * @brief MiddleView::MiddleView
@@ -50,6 +54,10 @@ MiddleView::MiddleView(QWidget *parent)
     initDelegate();
     initMenu();
     initUI();
+    this->setDragEnabled(true);
+    this->setDragDropMode(QAbstractItemView::DragOnly);
+    this->setAcceptDrops(false);
+
     //539禁止系统右键菜单弹出
     setContextMenuPolicy(Qt::NoContextMenu);
     connect(this, &MiddleView::requestSelect, this, &MiddleView::selectCurrentOnTouch);
@@ -444,12 +452,26 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
                 }
                 lastScrollTimer = timeParam;
                 m_pressPointY = event->pos().y();
-//                }
             }
         }
         return;
+    } else if (event->buttons() & Qt::LeftButton) {
+        QString vnoteName = getCurrVNotedata()->noteTitle;
+        thumbnail *dragImage = new thumbnail(this);
+        dragImage->setupthumbnail(vnoteName);
+        QPixmap pixmap = dragImage->grab();
+        QDrag *drag = new QDrag(this);
+        QMimeData *mimeData = new QMimeData;
+        drag->setMimeData(mimeData);
+        drag->setPixmap(pixmap);
+        drag->setHotSpot(QPoint(pixmap.width() / 2, pixmap.height() / 2));
+        drag->exec(Qt::MoveAction);
+        drag->deleteLater();
+        dragImage->deleteLater();
+        emit currentNoteIndex();
+    } else {
+        DListView::mouseMoveEvent(event);
     }
-    Q_UNUSED(event);
 }
 
 /**

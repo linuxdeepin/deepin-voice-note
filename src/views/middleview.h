@@ -32,6 +32,8 @@ DWIDGET_USE_NAMESPACE
 class MiddleViewDelegate;
 class MiddleViewSortFilter;
 struct VNoteItem;
+class thumbnail;
+
 //记事项列表
 class MiddleView : public DListView
 {
@@ -79,6 +81,9 @@ public:
     void sortView(bool adjustCurrentItemBar = true);
 signals:
     void requestSelect();
+    //发送当前选中的Index列表
+    void currentNoteIndex();
+
 public slots:
     //更新记事项
     void onNoteChanged();
@@ -119,6 +124,8 @@ private:
     QStandardItemModel *m_pDataModel {nullptr};
     MiddleViewDelegate *m_pItemDelegate {nullptr};
     MiddleViewSortFilter *m_pSortViewFilter {nullptr};
+
+    //以下声明参数为笔记拖拽时使用
 
     //539以下为实现触摸屏功能声明参数
     QModelIndex m_index;

@@ -257,7 +257,7 @@ void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void LeftView::mouseMoveEvent(QMouseEvent *event)
 {
-    if ((event->buttons() & Qt::LeftButton) && event->source() == Qt::MouseEventSynthesizedByQt) {
+    if ((event->source() == Qt::MouseEventSynthesizedByQt && event->buttons() & Qt::LeftButton)) {
         //539处理触摸屏单指move事件，区分滑动、拖拽事件
         double dist = event->pos().y() - m_pressPointY;
         if ((qAbs(dist) > 10)) {
@@ -335,6 +335,8 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
         QPoint point = this->mapFromGlobal(QCursor::pos());
         QModelIndex selectIndex = this->indexAt(point);
         updateFolderSortNum(mouseMoveCurrentIndex, selectIndex);
+    } else {
+        DTreeView::mouseMoveEvent(event);
     }
 }
 

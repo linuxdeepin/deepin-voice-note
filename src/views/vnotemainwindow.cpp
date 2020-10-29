@@ -150,6 +150,8 @@ void VNoteMainWindow::initConnections()
     connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
             this, SLOT(onVNoteChange(const QModelIndex &)));
 
+    connect(m_middleView, SIGNAL(currentNoteIndex()), this, SLOT(dropNote()));
+
     connect(m_rightView, &RightView::contentChanged,
             m_middleView, &MiddleView::onNoteChanged);
 
@@ -2067,6 +2069,18 @@ void VNoteMainWindow::onShowSettingDialog()
     dialog.updateSettings("Setting", setting::instance()->getSetting());
     dialog.setResetVisible(false);
     dialog.exec();
+}
+
+void VNoteMainWindow::dropNote()
+{
+    QModelIndexList indexList =  m_middleView->getAllSelectNote();
+    QPoint point = m_leftView->mapFromGlobal(QCursor::pos());
+    QModelIndex selectIndex = m_leftView->indexAt(point);
+
+    bool ret = m_leftView->doNoteMove(indexList, selectIndex);
+    if (ret) {
+        m_middleView->deleteModelIndexs(indexList);
+    }
 }
 
 /**

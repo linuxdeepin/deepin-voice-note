@@ -208,6 +208,8 @@ public slots:
     void onShowPrivacy();
     //参数设置
     void onShowSettingDialog();
+    //笔记放下后进行记事本操作
+    void dropNote();
 
 private:
     //左侧列表视图操作相关
