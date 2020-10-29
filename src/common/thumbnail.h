@@ -18,18 +18,18 @@
 #ifndef THUMBNAIL_H
 #define THUMBNAIL_H
 
-#include <QWidget>
-#include <QPushButton>
+#include <QAbstractItemView>
+#include <QHBoxLayout>
+
+#include <DPushButton>
 #include <DLabel>
 #include <DApplicationHelper>
 #include <DWidget>
 
-#include <QHBoxLayout>
-
 #define RADIUS 17             //窗口边角的弧度
 #define ELLIPSE_RADIUS 8     //内部小圆半径
 #define RECT 10               //图标长/宽的一半
-#define TEXT_LENGTH 90       //文字长度
+#define TEXT_LENGTH 115       //文字长度
 
 DWIDGET_USE_NAMESPACE
 
@@ -37,22 +37,24 @@ class thumbnail : public DWidget
 {
     Q_OBJECT
 public:
-    thumbnail(QWidget *parent = nullptr);
+    thumbnail(QAbstractItemView *parent = nullptr);
+
     //记事本缩略图
     void setupthumbnail(QIcon icon, const QString &str, const QString &text1);
     //笔记缩略图
     void setupthumbnail(const QString &text);
-    void setIconSize(int size);
 
 private:
     void initUi();
     void paintEvent(QPaintEvent *);
 
 private:
-    QPushButton *ImageButton = nullptr;
-    DLabel *TextLabel = nullptr;
-    DLabel *TextLabel1 = nullptr;
-    QHBoxLayout *layout;
+    DPushButton *m_imageBtn = nullptr;
+    DLabel *m_textLbl = nullptr;
+    DLabel *m_textLbl1 = nullptr;
+    QHBoxLayout *m_layout;
+    DPalette m_parentPb;
+    QAbstractItemView *m_itemView {nullptr};
 };
 
 #endif // THUMBNAIL_H

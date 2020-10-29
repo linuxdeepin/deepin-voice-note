@@ -241,13 +241,10 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
         } else {
             if (option.state & QStyle::State_MouseOver) {
                 if (m_isDraging) {
-                    painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
-                    painter->fillPath(path, painter->brush());
-                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
                     QPoint point = m_treeView->mapFromGlobal(QCursor::pos());
                     QModelIndex m_lectIndex = m_treeView->indexAt(point);
-                    QColor color(0, 129, 255, 1);
-                    painter->setBrush(color);
+                    painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::Highlight)));
+                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::Highlight)));
                     if (m_treeView->currentIndex().row() < m_lectIndex.row()) {
                         painter->drawRect(QRect(option.rect.x() + 10, option.rect.y() + option.rect.height(), 175, 2));
                     } else {

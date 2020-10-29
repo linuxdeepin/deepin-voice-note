@@ -18,86 +18,77 @@
 #include "thumbnail.h"
 
 #include <QPainter>
+#include <DFontSizeManager>
 
-thumbnail::thumbnail(QWidget *parent) :
-    QWidget(parent)
+thumbnail::thumbnail(QAbstractItemView *parent) :
+    QWidget(parent),
+    m_itemView(parent)
 {
     initUi();
 }
 
 void thumbnail::initUi()
 {
+    m_parentPb = DApplicationHelper::instance()->palette(m_itemView);
     setWindowFlags(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
 
-    setFixedSize(180, 36);
+    m_imageBtn = new DPushButton(this);
+    m_imageBtn->setFixedSize(24, 24);
+    m_imageBtn->setIconSize(QSize(24, 24));
+    m_imageBtn->setFlat(true);
+    m_imageBtn->setFocusPolicy(Qt::NoFocus);
+    m_imageBtn->move(RADIUS - RECT, RADIUS - RECT);
 
-    ImageButton = new QPushButton(this);
-    ImageButton->setFixedSize(24, 24);
-    ImageButton->setIconSize(QSize(24, 24));
-    ImageButton->setFlat(true);
-    ImageButton->setFocusPolicy(Qt::NoFocus);
-    ImageButton->move(RADIUS - RECT, RADIUS - RECT);
+    m_textLbl = new DLabel(this);
+    m_textLbl->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    m_textLbl->setFocusPolicy(Qt::NoFocus);
+    DFontSizeManager::instance()->bind(m_textLbl, DFontSizeManager::T6);
 
-    TextLabel = new DLabel(this);
-    TextLabel->setFixedSize(90, 18);
-    TextLabel->setAlignment(Qt::AlignLeft);
-    TextLabel->setFont(QFont("PingFangSC", 10, QFont::Normal));
-    DPalette pa = DApplicationHelper::instance()->palette(TextLabel);
-    pa.setColor(DPalette::TextTitle, pa.textTiele().color());
-    DApplicationHelper::instance()->setPalette(TextLabel, pa);
-    TextLabel->setFocusPolicy(Qt::NoFocus);
+    m_textLbl1 = new DLabel(this);
+    m_textLbl1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    m_textLbl1->setFocusPolicy(Qt::NoFocus);
+    DFontSizeManager::instance()->bind(m_textLbl1, DFontSizeManager::T6);
 
-    TextLabel1 = new DLabel(this);
-    TextLabel1->setFixedSize(20, 18);
-    TextLabel1->setAlignment(Qt::AlignRight);
-    TextLabel1->setFont(QFont("PingFangSC", 10, QFont::Normal));
-    DApplicationHelper::instance()->setPalette(TextLabel1, pa);
-    TextLabel1->setFocusPolicy(Qt::NoFocus);
-
-    layout = new QHBoxLayout(this);
-    layout->setSpacing(0);
-    layout->addWidget(TextLabel);
-    layout->addWidget(TextLabel1);
-    layout->setContentsMargins(2 * RADIUS, 0, 0, 0);
+    m_layout = new QHBoxLayout(this);
+    m_layout->setSpacing(0);
+    m_layout->addWidget(m_textLbl);
+    m_layout->addWidget(m_textLbl1);
+    m_layout->setContentsMargins(2 * RADIUS, 0, 0, 0);
 }
 
 void thumbnail::setupthumbnail(QIcon icon, const QString &text, const QString &text1)
 {
-    ImageButton->setVisible(true);
-    TextLabel1->setVisible(true);
-    ImageButton->setIcon(QIcon(icon));
+    m_imageBtn->setVisible(true);
+    m_textLbl1->setVisible(true);
+    m_imageBtn->setIcon(QIcon(icon));
     setFixedSize(180, 36);
-    TextLabel1->setFixedSize(20, 18);
-    layout->setContentsMargins(2 * RADIUS, 0, 0, 0);
-    TextLabel->setText(text);
-    TextLabel1->setText(text1);
+    m_textLbl1->setFixedSize(20, 20);
+    m_textLbl->setFixedSize(110, 20);
+    m_layout->setContentsMargins(2 * RADIUS, 0, 0, 0);
+    m_textLbl->setText(text);
+    m_textLbl1->setText(text1);
 
     int textSize = fontMetrics().width(text);  //字符超长检测
     if(textSize > TEXT_LENGTH){
         QString Elide_text = fontMetrics().elidedText(text, Qt::ElideRight, TEXT_LENGTH);
-        TextLabel->setText(Elide_text);
+        m_textLbl->setText(Elide_text);
     }
 }
 
 void thumbnail::setupthumbnail(const QString &text)
 {
-    ImageButton->setVisible(false);
-    TextLabel1->setVisible(false);
-    TextLabel->setText(text);
-    TextLabel->setFixedSize(230, 18);
-    layout->setContentsMargins(RADIUS, 0, 0, 0);
+    m_imageBtn->setVisible(false);
+    m_textLbl1->setVisible(false);
+    m_textLbl->setText(text);
+    m_textLbl->setFixedSize(240, 18);
+    m_layout->setContentsMargins(RADIUS, 0, 0, 0);
     setFixedSize(240, 36);
     int textSize = fontMetrics().width(text);  //字符超长检测
     if(textSize > TEXT_LENGTH){
         QString Elide_text = fontMetrics().elidedText(text, Qt::ElideRight, TEXT_LENGTH);
-        TextLabel->setText(Elide_text);
+        m_textLbl->setText(Elide_text);
     }
-}
-
-void thumbnail::setIconSize(int size)
-{
-    ImageButton->setIconSize(QSize(size, size));
 }
 
 void thumbnail::paintEvent(QPaintEvent *)
@@ -105,10 +96,10 @@ void thumbnail::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHints(QPainter::SmoothPixmapTransform);
-    painter.setPen(Qt::NoPen);
-    QColor color(247, 247, 247);
-    color.setAlphaF(0.9);
-    painter.setBrush(color);
+    painter.setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ToolTipBase)));
+    QColor coverColor = m_parentPb.color(DPalette::Disabled, DPalette::TextTips);
+    coverColor.setAlphaF(0.9);
+    painter.setPen(QPen(coverColor));
     QPainterPath PainterPath;
     PainterPath.addRoundedRect(QRect(0, 0, width(), height()), 8, 8);  //Rect
     painter.drawPath(PainterPath);
