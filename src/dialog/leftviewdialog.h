@@ -21,6 +21,7 @@
 #ifndef LEFTVIEWDIALOG_H
 #define LEFTVIEWDIALOG_H
 #include "vnotebasedialog.h"
+#include "leftviewlist.h"
 
 #include <QVector>
 
@@ -54,7 +55,7 @@ protected:
     bool eventFilter(QObject *o, QEvent *e) override;
 private:
     DLabel      *m_noteInfo {nullptr};
-    DTreeView   *m_view {nullptr};
+    leftviewlist   *m_view {nullptr};
     DWindowCloseButton *m_closeButton {nullptr};
     LeftViewSortFilter *m_model {nullptr};
     LeftViewDelegate *m_delegate {nullptr};

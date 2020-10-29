@@ -58,9 +58,9 @@ LeftView::LeftView(QWidget *parent)
     this->setDragDropMode(QAbstractItemView::DragDrop);
     this->setDropIndicatorShown(true);
     this->setAcceptDrops(true);
-    //539禁止系统右键菜单弹出
+    //禁止系统右键菜单弹出
     this->setContextMenuPolicy(Qt::NoContextMenu);
-    //539设置当前点击index选中状态
+    //设置当前点击index选中状态
     connect(this, &LeftView::requestSelect, this, &LeftView::selectCurrentOnTouch);
     //延时更新代理中拖拽状态
     connect(this, &LeftView::updateDragingStateDelay, this, [ = ] {
@@ -124,12 +124,12 @@ QModelIndex LeftView::getNotepadRootIndex()
 /**
  * @brief LeftView::selectCurrentOnTouch 设置当前点击位置选中
  * @return null
- * @author 539
+ * @author
  */
 void LeftView::selectCurrentOnTouch()
 {
     QTimer::singleShot(250, this, [ = ] {
-        if (!m_mouseMoved && m_mousePressed)
+        if (!m_mouseMoved && m_mousePressed && m_index.isValid())
             this->setCurrentIndex(m_index);
     });
 }
@@ -141,7 +141,7 @@ void LeftView::selectCurrentOnTouch()
 void LeftView::mousePressEvent(QMouseEvent *event)
 {
     this->setFocus();
-    //539处理触摸屏单指press事件
+    //处理触摸屏单指press事件
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
         if (viewport()->visibleRegion().contains(event->pos())) {
             QDateTime current = QDateTime::currentDateTime();
@@ -149,6 +149,7 @@ void LeftView::mousePressEvent(QMouseEvent *event)
             m_pressPointY = event->pos().y();
             m_index = this->indexAt(event->pos());
             m_mousePressed = true;
+            m_draging = false;
             emit requestSelect();
             return;
         }
@@ -175,60 +176,17 @@ void LeftView::mousePressEvent(QMouseEvent *event)
 void LeftView::mouseReleaseEvent(QMouseEvent *event)
 {
     m_mousePressed = false;
-    //539处理拖拽事件，由于与drop操作参数不同，暂未封装
+    m_isDraging = false;
+    //处理拖拽事件，由于与drop操作参数不同，暂未封装
     if (m_draging) {
-        QModelIndex rootIndex = getNotepadRootIndex();
-        QModelIndex currentIndex;
-        QModelIndex currentSorceIndex;
-        QModelIndex currentTargetIndex;
-        int sorceRow = m_index.row();
-        int targetRow = this->indexAt(event->pos()).row();
-        int tmpRow = qAbs(targetRow - sorceRow);
-        int sorceSortNum = 0;
-        int targetSortNum = 0;
-        currentSorceIndex = m_pSortViewFilter->index(sorceRow, 0, rootIndex);
-        currentTargetIndex = m_pSortViewFilter->index(targetRow, 0, rootIndex);
-        m_mouseMoved = false;
-        m_draging = false;
-        if (!currentSorceIndex.isValid() || !currentTargetIndex.isValid()) {
-            return;
-        }
-        sorceSortNum = reinterpret_cast<VNoteFolder *>(
-                           StandardItemCommon::getStandardItemData(currentSorceIndex))->sort_number;
-        targetSortNum = reinterpret_cast<VNoteFolder *>(
-                            StandardItemCommon::getStandardItemData(currentTargetIndex))->sort_number;
-
-        for (int i = 0; i < tmpRow; i++) {
-            if (targetRow > sorceRow) {
-                currentIndex = m_pSortViewFilter->index(targetRow - i, 0, rootIndex);
-                if (!currentIndex.isValid()) {
-                    break;
-                }
-                reinterpret_cast<VNoteFolder *>(
-                    StandardItemCommon::getStandardItemData(currentIndex))->sort_number += 1;
-            } else if (targetRow < sorceRow) {
-                currentIndex = m_pSortViewFilter->index(targetRow + i, 0, rootIndex);
-                if (!currentIndex.isValid()) {
-                    break;
-                }
-                reinterpret_cast<VNoteFolder *>(
-                    StandardItemCommon::getStandardItemData(currentIndex))->sort_number -= 1;
-            }
-        }
-
-        reinterpret_cast<VNoteFolder *>(
-            StandardItemCommon::getStandardItemData(currentSorceIndex))->sort_number = targetSortNum;
-        sort();
-
-        QString folderSortData = getFolderSortId();
-        setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
         emit updateDragingStateDelay();
         return;
     }
-    //539正常点击状态，选择当前点击选项
+    //正常点击状态，选择当前点击选项
     QModelIndex index = indexAt(event->pos());
     if (index.row() != currentIndex().row() && !m_mouseMoved && !m_draging) {
-        setCurrentIndex(index);
+        if (index.isValid())
+            setCurrentIndex(index);
         m_mouseMoved = false;
         return;
     }
@@ -257,8 +215,9 @@ void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void LeftView::mouseMoveEvent(QMouseEvent *event)
 {
+    qDebug() << "mouseMoveEvent";
     if ((event->source() == Qt::MouseEventSynthesizedByQt && event->buttons() & Qt::LeftButton)) {
-        //539处理触摸屏单指move事件，区分滑动、拖拽事件
+        //处理触摸屏单指move事件，区分滑动、拖拽事件
         double dist = event->pos().y() - m_pressPointY;
         if ((qAbs(dist) > 10)) {
             if (!m_mouseMoved && !m_draging) {
@@ -268,11 +227,10 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
                     m_draging = true;
                     m_pItemDelegate->setDraging(true);
                     //选中后，页面禁止滚动
-                    //                    setCurrentIndex(m_index);
+                    handleDragEvent();
                     return;
                 } else if (timeParam <= 250) {
                     m_mouseMoved = true;
-
                     if (lastScrollTimer == 0)
                         lastScrollTimer = pressStartMs;
                     qint64 timerDis = timeParam - lastScrollTimer;
@@ -288,6 +246,7 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
                     return;
                 }
             } else if (m_draging) {
+                handleDragEvent();
                 return;
             } else if (m_mouseMoved) {
                 QDateTime current = QDateTime::currentDateTime();
@@ -307,37 +266,55 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
             }
         }
         return;
-    } else if (event->buttons() & Qt::LeftButton) {
-        QModelIndex mouseMoveCurrentIndex = this->currentIndex();
-        m_pItemDelegate->setDragState(true);
-        this->update();
-        QString vnoteName = "";
-        qint64 vnotesCount = 0;
-        QIcon icon;
-        VNoteFolder *data = reinterpret_cast<VNoteFolder *>(
-                    StandardItemCommon::getStandardItemData(mouseMoveCurrentIndex));
-        if (nullptr != data) {
-            vnoteName = data->name;
-            vnotesCount = data->getNotesCount();
-            icon = QIcon(data->UI.icon);
+    } else if ((event->buttons() & Qt::LeftButton) && !m_mousePressed) {
+        if (!m_isDraging) {
+            handleDragEvent();
         }
-
-        thumbnail *dragImage = new thumbnail(this);
-        dragImage->setupthumbnail(icon, vnoteName, QString::number(vnotesCount));
-        QPixmap pixmap = dragImage->grab();
-        QDrag *drag = new QDrag(this);
-        QMimeData *mimeData = new QMimeData;
-        drag->setMimeData(mimeData);
-        drag->setPixmap(pixmap);
-        drag->setHotSpot(QPoint(pixmap.width() / 2, pixmap.height() / 2));
-        drag->exec(Qt::MoveAction);
-        drag->deleteLater();
-        QPoint point = this->mapFromGlobal(QCursor::pos());
-        QModelIndex selectIndex = this->indexAt(point);
-        updateFolderSortNum(mouseMoveCurrentIndex, selectIndex);
     } else {
         DTreeView::mouseMoveEvent(event);
     }
+}
+
+/**
+ * @brief LeftView::handleDragEvent 处理拖拽事件
+ * @param
+ */
+void LeftView::handleDragEvent()
+{
+    QModelIndex mouseMoveCurrentIndex = this->currentIndex();
+    QPoint dragPoint = this->mapFromGlobal(QCursor::pos());
+    QModelIndex dragIndex = this->indexAt(dragPoint);
+
+    if (!dragIndex.isValid()) {
+        m_isDraging = true;
+        return;
+    }
+    m_pItemDelegate->setDragState(true);
+    this->update();
+    QString vnoteName = "";
+    qint64 vnotesCount = 0;
+    QIcon icon;
+    VNoteFolder *data = reinterpret_cast<VNoteFolder *>(
+                            StandardItemCommon::getStandardItemData(mouseMoveCurrentIndex));
+    if (nullptr != data) {
+        vnoteName = data->name;
+        vnotesCount = data->getNotesCount();
+        icon = QIcon(data->UI.icon);
+    }
+
+    thumbnail *dragImage = new thumbnail(this);
+    dragImage->setupthumbnail(icon, vnoteName, QString::number(vnotesCount));
+    QPixmap pixmap = dragImage->grab();
+    QDrag *drag = new QDrag(this);
+    QMimeData *mimeData = new QMimeData;
+    drag->setMimeData(mimeData);
+    drag->setPixmap(pixmap);
+    drag->setHotSpot(QPoint(pixmap.width() / 2, pixmap.height() / 2));
+    drag->exec(Qt::MoveAction);
+    drag->deleteLater();
+    QPoint point = this->mapFromGlobal(QCursor::pos());
+    QModelIndex selectIndex = this->indexAt(point);
+    updateFolderSortNum(mouseMoveCurrentIndex, selectIndex);
 }
 
 /**
@@ -529,6 +506,13 @@ void LeftView::initMenu()
 {
     m_notepadMenu = ActionManager::Instance()->notebookContextMenu();
 }
+/**
+ * @brief LeftView::setMoveList 更新移动笔记列表
+ */
+void LeftView::setMoveList(const QModelIndexList &moveList)
+{
+    m_moveList = moveList;
+}
 
 /**
  * @brief LeftView::setOnlyCurItemMenuEnable
@@ -585,19 +569,21 @@ void LeftView::closeMenu()
     m_notepadMenu->close();
 }
 
-bool LeftView::popupMoveDlg(const QModelIndexList &src)
+bool LeftView::popupMoveDlg()
 {
     bool ret = false;
-    if (src.size()) {
+    if (m_moveList.size()) {
         if (m_folderSelectDlg == nullptr) {
             m_folderSelectDlg = new LeftviewDialog(m_pSortViewFilter, this);
             m_folderSelectDlg->resize(448, 372);
-            connect(m_folderSelectDlg, &LeftviewDialog::accepted, this, [&src, &ret, this]() {
-                ret = doNoteMove(src, m_folderSelectDlg->getSelectIndex());
+            connect(m_folderSelectDlg, &LeftviewDialog::accepted, this, [&ret, this]() {
+                ret = doNoteMove(m_moveList, m_folderSelectDlg->getSelectIndex());
+                m_moveList.clear();
             });
         }
-        VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(src[0]));
-        QString itemInfo = QString("移动 %1 等%2个笔记到：").arg(data->noteTitle).arg(src.size());
+        m_folderSelectDlg->setEnabled(true);
+        VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(m_moveList[0]));
+        QString itemInfo = QString("移动 %1 等%2个笔记到：").arg(data->noteTitle).arg(m_moveList.size());
         m_folderSelectDlg->setNoteContext(itemInfo);
         m_folderSelectDlg->exec();
     }
@@ -647,12 +633,12 @@ void LeftView::updateFolderSortNum(const QModelIndex &sorceIndex, const QModelIn
         int tmpRow = qAbs(targetRow - sorceRow);
         int sorceSortNum = 0;
         int targetSortNum = 0;
-        if(!sorceIndex.isValid() || !targetIndex.isValid()) {
+        if (!sorceIndex.isValid() || !targetIndex.isValid()) {
             return;
         }
 
         sorceSortNum = reinterpret_cast<VNoteFolder *>(
-                    StandardItemCommon::getStandardItemData(sorceIndex))->sort_number;
+                           StandardItemCommon::getStandardItemData(sorceIndex))->sort_number;
         if (-1 == sorceSortNum) {
             if (!setFolderSortNum()) {
                 return;
@@ -660,30 +646,30 @@ void LeftView::updateFolderSortNum(const QModelIndex &sorceIndex, const QModelIn
         }
 
         sorceSortNum = reinterpret_cast<VNoteFolder *>(
-                    StandardItemCommon::getStandardItemData(sorceIndex))->sort_number;
+                           StandardItemCommon::getStandardItemData(sorceIndex))->sort_number;
         targetSortNum = reinterpret_cast<VNoteFolder *>(
-                    StandardItemCommon::getStandardItemData(targetIndex))->sort_number;
+                            StandardItemCommon::getStandardItemData(targetIndex))->sort_number;
 
         for (int i = 0; i < tmpRow; i++) {
-            if(targetRow > sorceRow) {
+            if (targetRow > sorceRow) {
                 currentIndex = m_pSortViewFilter->index(targetRow - i, 0, rootIndex);
-                if(!currentIndex.isValid()) {
+                if (!currentIndex.isValid()) {
                     break;
                 }
                 reinterpret_cast<VNoteFolder *>(
-                                    StandardItemCommon::getStandardItemData(currentIndex))->sort_number += 1;
+                    StandardItemCommon::getStandardItemData(currentIndex))->sort_number += 1;
             } else if (targetRow < sorceRow) {
                 currentIndex = m_pSortViewFilter->index(targetRow + i, 0, rootIndex);
-                if(!currentIndex.isValid()) {
+                if (!currentIndex.isValid()) {
                     break;
                 }
                 reinterpret_cast<VNoteFolder *>(
-                                    StandardItemCommon::getStandardItemData(currentIndex))->sort_number -= 1;
+                    StandardItemCommon::getStandardItemData(currentIndex))->sort_number -= 1;
             }
         }
 
         reinterpret_cast<VNoteFolder *>(
-                            StandardItemCommon::getStandardItemData(sorceIndex))->sort_number = targetSortNum;
+            StandardItemCommon::getStandardItemData(sorceIndex))->sort_number = targetSortNum;
         sort();
 
         QString folderSortData = getFolderSortId();

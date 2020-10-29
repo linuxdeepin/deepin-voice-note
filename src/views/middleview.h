@@ -104,8 +104,10 @@ protected:
     void keyPressEvent(QKeyEvent *e) override;
     //关闭重命名编辑框触发
     void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
-    //539设置当前点击index选中
+    //设置当前点击index选中
     void selectCurrentOnTouch();
+    //处理拖拽事件
+    void handleDragEvent();
 private:
     //初始化代理模块
     void initDelegate();
@@ -126,8 +128,9 @@ private:
     MiddleViewSortFilter *m_pSortViewFilter {nullptr};
 
     //以下声明参数为笔记拖拽时使用
+    bool m_isDraging {false};
 
-    //539以下为实现触摸屏功能声明参数
+    //以下为实现触摸屏功能声明参数
     QModelIndex m_index;
     qint64 lastScrollTimer = 0;
     qint64 pressStartMs = 0;

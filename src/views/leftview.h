@@ -71,16 +71,18 @@ public:
     bool setFolderSortNum();
 
     //笔记移动
-    bool popupMoveDlg(const QModelIndexList &src);
+    bool popupMoveDlg();
     //笔记移动
     bool doNoteMove(const QModelIndexList &src, const QModelIndex &dst);
     //更新当前记事本排序编号
     void updateFolderSortNum(const QModelIndex &sorceIndex, const QModelIndex &targetIndex);
+    //更新移动笔记列表
+    void setMoveList(const QModelIndexList &moveList);
 
 signals:
-    //539触发选中当前点击位置
+    //触发选中当前点击位置
     void requestSelect();
-    //539请求更新代理中拖拽状态
+    //请求更新代理中拖拽状态
     void updateDragingStateDelay();
 
 protected:
@@ -106,9 +108,10 @@ protected:
     void dragMoveEvent(QDragMoveEvent *event) override;
     //拖走了没有释放
     void dragLeaveEvent(QDragLeaveEvent *event) override;
-    //539设置当前点击index选中
+    //设置当前点击index选中
     void selectCurrentOnTouch();
-
+    //处理拖拽事件
+    void handleDragEvent();
 private:
     //初始化代理模块
     void initDelegate();
@@ -124,12 +127,13 @@ private:
     LeftViewDelegate *m_pItemDelegate {nullptr};
     LeftViewSortFilter *m_pSortViewFilter {nullptr};
     bool m_onlyCurItemMenuEnable {false};
-
+    QModelIndexList m_moveList;
     //以下为实现拖拽功能声明参数
     QModelIndex m_index;
     LeftviewDialog *m_folderSelectDlg {nullptr};
+    bool m_isDraging {false};
 
-    //539以下为实现触摸屏功能声明参数
+    //以下为实现触摸屏功能声明参数
     qint64 lastScrollTimer = 0;
     qint64 pressStartMs = 0;
     QPoint m_prePoint;

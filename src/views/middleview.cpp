@@ -58,7 +58,7 @@ MiddleView::MiddleView(QWidget *parent)
     this->setDragDropMode(QAbstractItemView::DragOnly);
     this->setAcceptDrops(false);
 
-    //539禁止系统右键菜单弹出
+    //禁止系统右键菜单弹出
     setContextMenuPolicy(Qt::NoContextMenu);
     connect(this, &MiddleView::requestSelect, this, &MiddleView::selectCurrentOnTouch);
 }
@@ -315,12 +315,12 @@ void MiddleView::saveRecords()
 /**
  * @brief LeftView::selectCurrentOnTouch 设置当前点击位置选中
  * @return null
- * @author 539
+ * @author
  */
 void MiddleView::selectCurrentOnTouch()
 {
     QTimer::singleShot(250, this, [ = ] {
-        if (!m_mouseMoved && m_mousePressed)
+        if (!m_mouseMoved && m_mousePressed && m_index.isValid())
             this->setCurrentIndex(m_index.row());
     });
 }
@@ -331,7 +331,7 @@ void MiddleView::selectCurrentOnTouch()
 void MiddleView::mousePressEvent(QMouseEvent *event)
 {
     this->setFocus();
-    //539处理触摸屏单指press事件
+    //处理触摸屏单指press事件
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
         if (viewport()->visibleRegion().contains(event->pos())) {
             QDateTime current = QDateTime::currentDateTime();
@@ -366,16 +366,17 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
 void MiddleView::mouseReleaseEvent(QMouseEvent *event)
 {
     m_mousePressed = false;
-    //539处理拖拽事件，由于与drop操作参数不同，暂未封装
+    m_isDraging = false;
+    //处理拖拽事件，由于与drop操作参数不同，暂未封装
     if (m_draging) {
-        qDebug() << "draging method write in this";
         m_mouseMoved = false;
         m_draging = false;
         return;
     }
     QModelIndex index = indexAt(event->pos());
     if (index.row() != currentIndex().row() && !m_mouseMoved && !m_draging) {
-        setCurrentIndex(index.row());
+        if (index.isValid())
+            setCurrentIndex(index.row());
         m_mouseMoved = false;
         return;
     }
@@ -405,7 +406,7 @@ void MiddleView::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void MiddleView::mouseMoveEvent(QMouseEvent *event)
 {
-    //539处理触摸屏单指move事件，区分滑动、拖拽事件
+    //处理触摸屏单指move事件，区分滑动、拖拽事件
     m_pItemDelegate->setDraging(false);
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
         double dist = event->pos().y() - m_pressPointY;
@@ -416,11 +417,11 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
                 if (timeParam > 250 && timeParam < 1000) {
                     m_draging = true;
                     m_pItemDelegate->setDraging(true);
+                    handleDragEvent();
                     setCurrentIndex(m_index.row());
                     return;
                 } else if (timeParam <= 250) {
                     m_mouseMoved = true;
-
                     if (lastScrollTimer == 0)
                         lastScrollTimer = pressStartMs;
                     qint64 timerDis = timeParam - lastScrollTimer;
@@ -436,6 +437,7 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
                     return;
                 }
             } else if (m_draging) {
+                handleDragEvent();
                 return;
             } else if (m_mouseMoved) {
                 QDateTime current = QDateTime::currentDateTime();
@@ -455,22 +457,44 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
             }
         }
         return;
-    } else if (event->buttons() & Qt::LeftButton) {
-        QString vnoteName = getCurrVNotedata()->noteTitle;
-        thumbnail *dragImage = new thumbnail(this);
-        dragImage->setupthumbnail(vnoteName);
-        QPixmap pixmap = dragImage->grab();
-        QDrag *drag = new QDrag(this);
-        QMimeData *mimeData = new QMimeData;
-        drag->setMimeData(mimeData);
-        drag->setPixmap(pixmap);
-        drag->setHotSpot(QPoint(pixmap.width() / 2, pixmap.height() / 2));
-        drag->exec(Qt::MoveAction);
-        drag->deleteLater();
-        dragImage->deleteLater();
-        emit currentNoteIndex();
+    } else if ((event->buttons() & Qt::LeftButton) && !m_mousePressed) {
+        if (!m_isDraging)
+            handleDragEvent();
     } else {
         DListView::mouseMoveEvent(event);
+    }
+}
+
+/**
+ * @brief LeftView::handleDragEvent 处理拖拽事件
+ * @param
+ */
+void MiddleView::handleDragEvent()
+{
+    QPoint dragPoint = this->mapFromGlobal(QCursor::pos());
+    QModelIndex dragIndex = this->indexAt(dragPoint);
+
+    if (!dragIndex.isValid()) {
+        m_isDraging = true;
+        return;
+    }
+    QString vnoteName = getCurrVNotedata()->noteTitle;
+    thumbnail *dragImage = new thumbnail(this);
+    dragImage->setupthumbnail(vnoteName);
+    QPixmap pixmap = dragImage->grab();
+    QDrag *drag = new QDrag(this);
+    QMimeData *mimeData = new QMimeData;
+    drag->setMimeData(mimeData);
+    drag->setPixmap(pixmap);
+    drag->setHotSpot(QPoint(pixmap.width() / 2, pixmap.height() / 2));
+    drag->exec(Qt::MoveAction);
+    drag->deleteLater();
+    dragImage->deleteLater();
+    emit currentNoteIndex();
+    if (m_draging) {
+        m_draging = false;
+        m_mouseMoved = false;
+        m_mousePressed = false;
     }
 }
 

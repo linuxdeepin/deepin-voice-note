@@ -43,7 +43,7 @@ public:
     //设置编辑状态
     void setEditIsVisible(bool isVisible);
     const int MAX_TITLE_LEN = 64;
-    //539更新拖拽状态
+    //更新拖拽状态
     void setDraging(bool draging);
 
 protected:
@@ -81,7 +81,7 @@ private:
     bool m_enableItem {true};
     bool m_editVisible {false};
     QPixmap m_topIcon;
-    //539拖拽状态用于绘制hover状态判断
+    //拖拽状态用于绘制hover状态判断
     bool m_draging{false};
 };
 

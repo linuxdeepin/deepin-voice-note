@@ -38,7 +38,7 @@
  * @brief LeftViewDelegate::LeftViewDelegate
  * @param parent
  */
-LeftViewDelegate::LeftViewDelegate(LeftView *parent)
+LeftViewDelegate::LeftViewDelegate(QAbstractItemView *parent)
     : DStyledItemDelegate(parent)
     , m_treeView(parent)
 {
@@ -137,7 +137,7 @@ void LeftViewDelegate::handleChangeTheme()
     m_parentPb = DApplicationHelper::instance()->palette(m_treeView);
     m_treeView->update(m_treeView->currentIndex());
 }
-//539更新拖拽状态,用于取消过度绘制hover效果
+//更新拖拽状态,用于取消过度绘制hover效果
 void LeftViewDelegate::setDraging(bool draging)
 {
     m_draging = draging;
@@ -240,7 +240,7 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
             enable = false;
         } else {
             if (option.state & QStyle::State_MouseOver) {
-                if(m_isDraging){
+                if (m_isDraging) {
                     painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
                     painter->fillPath(path, painter->brush());
                     painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
@@ -248,10 +248,10 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
                     QModelIndex m_lectIndex = m_treeView->indexAt(point);
                     QColor color(0, 129, 255, 1);
                     painter->setBrush(color);
-                    if(m_treeView->currentIndex().row() < m_lectIndex.row()){
-                        painter->drawRect(QRect(option.rect.x()+ 10, option.rect.y() + option.rect.height(), 175, 2));
-                    }else {
-                        painter->drawRect(QRect(option.rect.x()+ 10, option.rect.y(), 175, 2));
+                    if (m_treeView->currentIndex().row() < m_lectIndex.row()) {
+                        painter->drawRect(QRect(option.rect.x() + 10, option.rect.y() + option.rect.height(), 175, 2));
+                    } else {
+                        painter->drawRect(QRect(option.rect.x() + 10, option.rect.y(), 175, 2));
                     }
                 } else {
                     painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
@@ -259,7 +259,7 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
                     painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
                 }
 
-                //539根据拖拽状态取消过度绘制hover状态
+                //根据拖拽状态取消过度绘制hover状态
                 if (option.state & QStyle::State_MouseOver && !m_draging) {
                     painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
                     painter->fillPath(path, painter->brush());

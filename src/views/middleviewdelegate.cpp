@@ -222,7 +222,7 @@ void MiddleViewDelegate::setEditIsVisible(bool isVisible)
 {
     m_editVisible = isVisible;
 }
-//539更新用于绘制hover状态的拖拽状态
+//更新用于绘制hover状态的拖拽状态
 void MiddleViewDelegate::setDraging(bool draging)
 {
     m_draging = draging;
