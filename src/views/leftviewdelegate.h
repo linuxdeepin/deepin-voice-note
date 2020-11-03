@@ -33,7 +33,8 @@ public:
     void handleChangeTheme();
     //设置所有列表项是否可用
     void setEnableItem(bool enable);
-
+    //设置是否绘制笔记数目
+    void setDrawNotesNum(bool enable);
     const int MAX_FOLDER_NAME_LEN = 64;
 
 protected:
@@ -67,6 +68,7 @@ private:
     QAbstractItemView *m_treeView {nullptr};
     DPalette m_parentPb;
     bool m_enableItem {true};
+    bool m_drawNotesNum {true};
 };
 
 #endif // LeftViewDelegate_H

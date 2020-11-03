@@ -226,6 +226,14 @@ public:
     virtual bool prepareSqls() override;
 };
 
+class UpdateNoteFolderIdDbVisitor : public DbVisitor
+{
+public:
+    explicit UpdateNoteFolderIdDbVisitor(QSqlDatabase &db, const void *inParam, void *result);
+
+    virtual bool prepareSqls() override;
+};
+
 //记事项删除
 class DelNoteDbVisitor : public DbVisitor
 {

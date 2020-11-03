@@ -30,6 +30,7 @@ DWIDGET_USE_NAMESPACE
 
 class LeftViewDelegate;
 class LeftViewSortFilter;
+class FolderSelectDialog;
 
 struct VNoteFolder;
 //记事本列表
@@ -62,7 +63,9 @@ public:
     int folderCount();
     //删除选中的记事本
     VNoteFolder *removeFolder();
-
+    //移动笔记
+    bool doNoteMove(const QModelIndexList &src, const QModelIndex &dst);
+    QModelIndex selectMoveFolder(const QModelIndexList &src);
 signals:
 
 protected:
@@ -94,6 +97,7 @@ private:
     LeftViewDelegate *m_pItemDelegate {nullptr};
     LeftViewSortFilter *m_pSortViewFilter {nullptr};
     bool m_onlyCurItemMenuEnable {false};
+    FolderSelectDialog *m_folderSelectDialog {nullptr};
 };
 
 #endif // LEFTVIEW_H

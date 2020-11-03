@@ -753,6 +753,42 @@ bool UpdateNoteTopDbVisitor::prepareSqls()
 }
 
 /**
+ * @brief UpdateNoteFolderIdDbVisitor::UpdateNoteFolderIdDbVisitor
+ * @param db
+ * @param inParam
+ * @param result
+ */
+UpdateNoteFolderIdDbVisitor::UpdateNoteFolderIdDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
+    : DbVisitor(db, inParam, result)
+{
+
+}
+
+/**
+ * @brief UpdateNoteFolderIdDbVisitor::prepareSqls
+ * @return
+ */
+bool UpdateNoteFolderIdDbVisitor::prepareSqls()
+{
+     bool fPrepareOK = true;
+     static constexpr char const *UPDATE_NOTE_FOLDERID = "UPDATE %s SET %s=%lld WHERE %s=%d;";
+     const VNoteItem *note = param.newNote;
+     if(note != nullptr){
+         QString updateSql;
+         updateSql.sprintf(UPDATE_NOTE_FOLDERID,
+                           VNoteDbManager::NOTES_TABLE_NAME,
+                           DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data(),
+                 note->folderId,
+                 DBNote::noteColumnsName[DBNote::note_id].toUtf8().data(),
+                 note->noteId);
+         m_dbvSqls.append(updateSql);
+     }else {
+        fPrepareOK = false;
+     }
+     return  fPrepareOK;
+}
+
+/**
  * @brief DelNoteDbVisitor::DelNoteDbVisitor
  * @param db
  * @param inParam

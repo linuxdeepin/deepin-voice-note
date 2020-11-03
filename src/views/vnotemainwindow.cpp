@@ -1354,6 +1354,16 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::NoteTop:
         m_middleView->noteStickOnTop();
         break;
+    case ActionManager::NoteMove: {
+        QModelIndexList notesdata = m_middleView->getAllSelectNote();
+        if(notesdata.size()){
+            QModelIndex selectFolder = m_leftView->selectMoveFolder(notesdata);
+            if(selectFolder.isValid() && m_leftView->doNoteMove(notesdata, selectFolder)){
+                m_middleView->deleteModelIndexs(notesdata);
+            }
+        }
+    }
+       break;
     default:
         break;
     }
@@ -1385,6 +1395,7 @@ void VNoteMainWindow::onMenuAbout2Show()
             if (stateOperation->isRecording()) {
                 ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
             }
+            ActionManager::Instance()->enableAction(ActionManager::NoteMove, false);
         }
 
         //Disable SaveText if note have no text

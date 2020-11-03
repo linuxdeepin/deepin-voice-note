@@ -464,3 +464,21 @@ void MiddleView::sortView(bool adjustCurrentItemBar)
         this->scrollTo(currentIndex(), DListView::PositionAtBottom);
     }
 }
+
+QModelIndexList MiddleView::getAllSelectNote()
+{
+    QModelIndexList indexList;
+    QModelIndex index = currentIndex();
+    if(index.isValid()){
+        indexList.append(index);
+    }
+    return  indexList;
+}
+
+void MiddleView::deleteModelIndexs(const QModelIndexList &indexs)
+{
+    for(auto &it : indexs){
+        m_pSortViewFilter->removeRow(it.row());
+    }
+}
+

@@ -256,7 +256,11 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
         QRect numRect(paintRect.right() - numWidth - 7, paintRect.top(), numWidth, paintRect.height());
         QRect nameRect(iconRect.right() + 12, paintRect.top(),
                        numRect.left() - iconRect.right() - 15, paintRect.height());
-        painter->drawText(numRect, Qt::AlignRight | Qt::AlignVCenter, strNum);
+
+        if(m_drawNotesNum){
+            painter->drawText(numRect, Qt::AlignRight | Qt::AlignVCenter, strNum);
+        }
+
 
         if (enable == false) {
             painter->drawPixmap(iconRect, data->UI.grayIcon);
@@ -278,3 +282,9 @@ void LeftViewDelegate::setEnableItem(bool enable)
 {
     m_enableItem = enable;
 }
+
+void LeftViewDelegate::setDrawNotesNum(bool enable)
+{
+    m_drawNotesNum = enable;
+}
+

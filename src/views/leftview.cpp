@@ -22,10 +22,13 @@
 #include "leftview.h"
 #include "leftviewdelegate.h"
 #include "leftviewsortfilter.h"
+#include "dialog/folderselectdialog.h"
 
 #include "common/actionmanager.h"
 #include "common/standarditemcommon.h"
 #include "common/vnoteforlder.h"
+#include "common/vnoteitem.h"
+#include "db/vnoteitemoper.h"
 
 #include <QMouseEvent>
 
@@ -319,4 +322,52 @@ void LeftView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint h
 void LeftView::closeMenu()
 {
     m_notepadMenu->close();
+}
+
+bool LeftView::doNoteMove(const QModelIndexList &src, const QModelIndex &dst)
+{
+    if(src.size() && StandardItemCommon::getStandardItemType(dst) == StandardItemCommon::NOTEPADITEM){
+        VNoteFolder *selectFolder = static_cast<VNoteFolder*>(StandardItemCommon::getStandardItemData(dst));
+        VNoteItem *tmpData = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(src[0]));
+        if(selectFolder && tmpData->folderId != selectFolder->id){
+            VNoteItemOper noteOper;
+            VNOTE_ITEMS_MAP *srcNotes = noteOper.getFolderNotes(tmpData->folderId);
+            VNOTE_ITEMS_MAP *destNotes = noteOper.getFolderNotes(selectFolder->id);
+            for(auto it : src){
+                tmpData = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(it));
+                //更新内存数据
+                srcNotes->lock.lockForWrite();
+                srcNotes->folderNotes.remove(tmpData->noteId);
+                srcNotes->lock.unlock();
+
+                destNotes->lock.lockForWrite();
+                tmpData->folderId = selectFolder->id;
+                destNotes->folderNotes.insert(tmpData->noteId, tmpData);
+                destNotes->lock.unlock();
+                //更新数据库
+                noteOper.updateFolderId(tmpData);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
+{
+    QModelIndex index;
+    if(src.size()){
+        VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(src[0]));
+        QString itemInfo = QString("移动 %1 等%2个笔记到：").arg(data->noteTitle).arg(src.size());
+        if(m_folderSelectDialog == nullptr){
+            m_folderSelectDialog = new FolderSelectDialog(m_pSortViewFilter, this);
+            m_folderSelectDialog->resize(448, 372);
+        }
+        m_folderSelectDialog->setNoteContext(itemInfo);
+        m_folderSelectDialog->exec();
+        if(m_folderSelectDialog->result() == FolderSelectDialog::Accepted){
+            index = m_folderSelectDialog->getSelectIndex();
+        }
+    }
+    return index;
 }

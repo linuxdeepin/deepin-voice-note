@@ -48,6 +48,8 @@ public:
     bool deleteNote();
     //更新置顶属性
     bool updateTop(int value);
+    //更新folderid
+    bool updateFolderId(VNoteItem *data);
 
 protected:
     VNoteItem *m_note {nullptr};

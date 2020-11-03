@@ -72,6 +72,10 @@ public:
     void noteStickOnTop();
     //排序
     void sortView(bool adjustCurrentItemBar = true);
+
+    QModelIndexList getAllSelectNote();
+    void deleteModelIndexs(const QModelIndexList& indexs);
+
 signals:
 public slots:
     //更新记事项
