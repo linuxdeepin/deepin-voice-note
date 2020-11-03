@@ -21,6 +21,7 @@
 #include "moveview.h"
 #include "db/vnotefolderoper.h"
 #include "common/vnoteforlder.h"
+#include "common/vnoteitem.h"
 
 #include <QPainter>
 #include <QPainterPath>
@@ -40,6 +41,11 @@ void MoveView::setFolder(VNoteFolder *folder)
     m_folder = folder;
 }
 
+void MoveView::setNote(VNoteItem *note)
+{
+    m_note = note;
+}
+
 void MoveView::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
@@ -54,9 +60,10 @@ void MoveView::paintEvent(QPaintEvent *)
     QPainterPath PainterPath;
     PainterPath.addRoundedRect(QRect(0, 0, width(), height()), 8, 8);
     painter.drawPath(PainterPath);
+    QFontMetrics fontMetrics = painter.fontMetrics();
+    painter.setPen(QPen(pb.color(DPalette::Normal, DPalette::Text)));
     if(m_folder){
         VNoteFolderOper folderOps(m_folder);
-        QFontMetrics fontMetrics = painter.fontMetrics();
         QString strNum = QString::number(folderOps.getNotesCount());
         int numWidth = fontMetrics.width(strNum);
         QRect paintRect = rect();
@@ -65,11 +72,15 @@ void MoveView::paintEvent(QPaintEvent *)
         QRect numRect(paintRect.right() - numWidth - 7, paintRect.top(), numWidth, paintRect.height());
         QRect nameRect(iconRect.right() + 12, paintRect.top(),
                        numRect.left() - iconRect.right() - 15, paintRect.height());
-        painter.setPen(QPen(pb.color(DPalette::Normal, DPalette::Text)));
         painter.drawText(numRect, Qt::AlignRight | Qt::AlignVCenter, strNum);
         painter.drawPixmap(iconRect, m_folder->UI.icon);
         QString elideText = fontMetrics.elidedText(m_folder->name, Qt::ElideRight, nameRect.width());
         painter.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
+    }else if (m_note) {
+        QRect paintRect = rect();
+        paintRect.setLeft(paintRect.left() + 20);
+        paintRect.setRight(paintRect.right() - 20);
+        QString elideText = fontMetrics.elidedText(m_note->noteTitle, Qt::ElideRight, paintRect.width());
+        painter.drawText(paintRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
     }
-
 }

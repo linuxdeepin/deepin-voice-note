@@ -30,10 +30,13 @@
 #include "task/exportnoteworker.h"
 #include "common/setting.h"
 #include "db/vnoteitemoper.h"
+#include "moveview.h"
 
 #include <QMouseEvent>
 #include <QVBoxLayout>
 #include <QScrollBar>
+#include <QDrag>
+#include <QMimeData>
 
 #include <DApplication>
 #include <DFileDialog>
@@ -50,6 +53,10 @@ MiddleView::MiddleView(QWidget *parent)
     initDelegate();
     initMenu();
     initUI();
+    this->setDragEnabled(true);
+    this->setDragDropMode(QAbstractItemView::DragOnly);
+    this->setAcceptDrops(false);
+
 }
 
 /**
@@ -335,7 +342,25 @@ void MiddleView::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void MiddleView::mouseMoveEvent(QMouseEvent *event)
 {
-    Q_UNUSED(event);
+    if (event->buttons() & Qt::LeftButton) {
+        VNoteItem *noteData = getCurrVNotedata();
+        if(noteData){
+            if(m_MoveView == nullptr){
+                m_MoveView = new MoveView(this);
+            }
+            m_MoveView->setNote(noteData);
+            QPixmap pixmap = m_MoveView->grab();
+            QDrag *drag = new QDrag(this);
+            QMimeData *mimeData = new QMimeData;
+            drag->setMimeData(mimeData);
+            drag->setPixmap(pixmap);
+            drag->setHotSpot(QPoint(pixmap.width() / 2, pixmap.height() / 2));
+            drag->exec(Qt::MoveAction);
+            drag->deleteLater();
+            emit sigDragEnd();
+        }
+    }
+
 }
 
 /**

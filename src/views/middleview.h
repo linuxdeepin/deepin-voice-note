@@ -29,6 +29,8 @@
 DWIDGET_USE_NAMESPACE
 class MiddleViewDelegate;
 class MiddleViewSortFilter;
+class MoveView;
+
 struct VNoteItem;
 //记事项列表
 class MiddleView : public DListView
@@ -77,6 +79,8 @@ public:
     void deleteModelIndexs(const QModelIndexList& indexs);
 
 signals:
+    void sigDragEnd();
+
 public slots:
     //更新记事项
     void onNoteChanged();
@@ -116,6 +120,7 @@ private:
     QStandardItemModel *m_pDataModel {nullptr};
     MiddleViewDelegate *m_pItemDelegate {nullptr};
     MiddleViewSortFilter *m_pSortViewFilter {nullptr};
+    MoveView *m_MoveView {nullptr};
 };
 
 #endif // MIDDLEVIEW_H

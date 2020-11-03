@@ -26,16 +26,19 @@
 DWIDGET_USE_NAMESPACE
 
 struct VNoteFolder;
+struct VNoteItem;
 class MoveView : public DWidget
 {
     Q_OBJECT
 public:
     explicit MoveView( QWidget *parent = nullptr);
     void setFolder(VNoteFolder* folder);
+    void setNote(VNoteItem* note);
 protected:
     void paintEvent(QPaintEvent *) override;
 private:
     VNoteFolder *m_folder {nullptr};
+    VNoteItem   *m_note {nullptr};
 
 };
 
