@@ -233,10 +233,34 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
             painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::TextTitle)));
             enable = false;
         } else {
-            if (option.state & QStyle::State_MouseOver) {
-                painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
-                painter->fillPath(path, painter->brush());
-                painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
+            if ((option.state & QStyle::State_MouseOver)) {
+                if(m_draging){
+                    QPoint point = m_treeView->mapFromGlobal(QCursor::pos());
+                    QModelIndex dstIndex = m_treeView->indexAt(point);
+                    QModelIndex srcIndex = m_treeView->currentIndex();
+                    QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
+                    painter->setBrush(QBrush(fillColor));
+                    if(dstIndex.row() > srcIndex.row()){
+                        QRect rc(option.rect.x() + 12, option.rect.y() + option.rect.height() - 1 , 5, 5);
+                        paintTriangle(painter,rc, painter->brush(), true);
+                        painter->fillRect(QRect(option.rect.x() + 15, option.rect.y() + option.rect.height(), paintRect.width() - 10, 2), painter->brush());
+                        rc = QRect(option.rect.right() - 15, option.rect.y() + option.rect.height() - 1 , 5, 5);
+                        paintTriangle(painter,rc, painter->brush(), false);
+                    }else {
+                        QRect rc(option.rect.x() + 12, option.rect.y() - 1 , 5, 5);
+                        paintTriangle(painter,rc, painter->brush(), true);
+                        painter->fillRect(QRect(option.rect.x()+ 15, option.rect.y(), paintRect.width(), 2), painter->brush());
+                        rc = QRect(option.rect.right() - 15, option.rect.y() - 1 , 5, 5);
+                        paintTriangle(painter,rc, painter->brush(), false);
+                    }
+                    painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
+                    painter->fillPath(path, painter->brush());
+                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
+                }else if(m_drawHover){
+                    painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
+                    painter->fillPath(path, painter->brush());
+                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
+                }
             } else {
                 painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
                 painter->fillPath(path, painter->brush());
@@ -244,10 +268,10 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
             }
         }
     }
+    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(index));
     if (data != nullptr) {
         VNoteFolderOper folderOps(data);
-
         QFontMetrics fontMetrics = painter->fontMetrics();
         QString strNum = QString::number(folderOps.getNotesCount());
         int numWidth = fontMetrics.width(strNum);
@@ -261,7 +285,6 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
             painter->drawText(numRect, Qt::AlignRight | Qt::AlignVCenter, strNum);
         }
 
-
         if (enable == false) {
             painter->drawPixmap(iconRect, data->UI.grayIcon);
         } else {
@@ -272,6 +295,21 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
         painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
     }
     painter->restore();
+}
+
+void LeftViewDelegate::paintTriangle(QPainter *painter, const QRect& rc, const QBrush &brush, bool left) const
+{
+    QPainterPath path;
+    if(left){
+        path.moveTo(rc.topLeft());
+        path.lineTo(rc.right(), rc.top()+ (rc.height() / 2));
+        path.lineTo(rc.bottomLeft());
+    }else {
+        path.moveTo(rc.left(), rc.top()+ (rc.height() / 2));
+        path.lineTo(rc.bottomRight());
+        path.lineTo(rc.topRight());
+    }
+    painter->fillPath(path,brush);
 }
 
 /**
@@ -288,3 +326,12 @@ void LeftViewDelegate::setDrawNotesNum(bool enable)
     m_drawNotesNum = enable;
 }
 
+void LeftViewDelegate::setDragState(bool state)
+{
+    m_draging = state;
+}
+
+void LeftViewDelegate::setDrawHover(bool enable)
+{
+    m_drawHover = enable;
+}

@@ -51,6 +51,7 @@
 #define VNOTE_EXPORT_TEXT_PATH_KEY "old._app_export_text_path_key"
 #define VNOTE_EXPORT_VOICE_PATH_KEY "old._app_export_voice_path_key"
 #define VNOTE_AUDIO_SELECT "base.audiosource.select"
+#define VNOTE_FOLDER_SORT "base.folder_sort.folder_sort_data"
 //********************************************
 
 //Time format

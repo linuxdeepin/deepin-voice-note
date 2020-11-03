@@ -19,6 +19,17 @@
                             "default":1
                         }
                     ]
+                },
+                {
+                    "key":"folder_sort",
+                    "hide":true,
+                    "reset":false,
+                    "options":[
+                        {
+                            "key":"folder_sort_data",
+                            "default":""
+                        }
+                    ]
                 }
             ]
         },

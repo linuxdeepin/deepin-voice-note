@@ -31,6 +31,7 @@ DWIDGET_USE_NAMESPACE
 class LeftViewDelegate;
 class LeftViewSortFilter;
 class FolderSelectDialog;
+class MoveView;
 
 struct VNoteFolder;
 //记事本列表
@@ -66,6 +67,10 @@ public:
     //移动笔记
     bool doNoteMove(const QModelIndexList &src, const QModelIndex &dst);
     QModelIndex selectMoveFolder(const QModelIndexList &src);
+    //获取记事本顺序
+    QString getFolderSort();
+    //是否需要更新排序
+    bool needFolderSort();
 signals:
 
 protected:
@@ -83,6 +88,11 @@ protected:
     //关闭重命名编辑框触发
     void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
 
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dragMoveEvent(QDragMoveEvent *event) override;
+    void dragLeaveEvent(QDragLeaveEvent *event) override;
+
+
 private:
     //初始化代理模块
     void initDelegate();
@@ -92,12 +102,19 @@ private:
     void initNotepadRoot();
     //初始化右键菜单
     void initMenu();
+    //设置记事本默认顺序
+    bool setFolderSort();
+    //拖拽移动
+    void doDragMove(const QModelIndex&src, const QModelIndex& dst);
+
     DMenu *m_notepadMenu {nullptr};
     QStandardItemModel *m_pDataModel {nullptr};
     LeftViewDelegate *m_pItemDelegate {nullptr};
     LeftViewSortFilter *m_pSortViewFilter {nullptr};
     bool m_onlyCurItemMenuEnable {false};
     FolderSelectDialog *m_folderSelectDialog {nullptr};
+    MoveView *m_MoveView {nullptr};
+    bool    m_folderDraing {false};
 };
 
 #endif // LEFTVIEW_H
