@@ -39,6 +39,8 @@
 #include <QDrag>
 #include <QMimeData>
 #include <QDebug>
+#include <QTimer>
+#include <QScrollBar>
 
 /**
  * @brief LeftView::LeftView
@@ -51,12 +53,11 @@ LeftView::LeftView(QWidget *parent)
     initDelegate();
     initNotepadRoot();
     initMenu();
-
     this->setDragEnabled(true);
     this->setDragDropMode(QAbstractItemView::DragDrop);
     this->setDropIndicatorShown(true);
     this->setAcceptDrops(true);
-
+    this->setContextMenuPolicy(Qt::NoContextMenu);
 }
 
 /**
@@ -162,26 +163,9 @@ void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
 void LeftView::mouseMoveEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
-    if (event->buttons() & Qt::LeftButton) {
-        VNoteFolder *folder = reinterpret_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(currentIndex()));
-        if(folder){
-            QDrag *drag = new QDrag(this);
-            QMimeData *mimeData = new QMimeData;
 
-            if(m_MoveView == nullptr){
-                m_MoveView = new MoveView(this);
-            }
-            m_MoveView->setFolder(folder);
-            drag->setPixmap(m_MoveView->grab());
-            drag->setMimeData(mimeData);
-            m_folderDraing = true;
-            drag->exec(Qt::MoveAction);
-            drag->deleteLater();
-            doDragMove(currentIndex(), indexAt(mapFromGlobal(QCursor::pos())));
-            m_folderDraing = false;
-            m_pItemDelegate->setDragState(false);
-            m_pItemDelegate->setDrawHover(true);
-        }
+    if (event->buttons() & Qt::LeftButton) {
+        triggerDragFolder();
     }
 
 }
@@ -396,10 +380,14 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
         VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(src[0]));
         QString itemInfo = QString("移动 %1 等%2个笔记到：").arg(data->noteTitle).arg(src.size());
         if(m_folderSelectDialog == nullptr){
-            m_folderSelectDialog = new FolderSelectDialog(m_pSortViewFilter, this);
+            m_folderSelectDialog = new FolderSelectDialog(m_pDataModel, this);
             m_folderSelectDialog->resize(448, 372);
         }
+        QList<VNoteFolder *> folders;
+        folders.push_back(static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(currentIndex())));
+        m_folderSelectDialog->setFolderBlack(folders);
         m_folderSelectDialog->setNoteContext(itemInfo);
+        m_folderSelectDialog->clearSelection();
         m_folderSelectDialog->exec();
         if(m_folderSelectDialog->result() == FolderSelectDialog::Accepted){
             index = m_folderSelectDialog->getSelectIndex();
@@ -537,5 +525,28 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
          QString folderSortData = getFolderSort();
          setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
 
+     }
+ }
+
+ void LeftView::triggerDragFolder()
+ {
+     VNoteFolder *folder = reinterpret_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(currentIndex()));
+     if(folder){
+         QDrag *drag = new QDrag(this);
+         QMimeData *mimeData = new QMimeData;
+
+         if(m_MoveView == nullptr){
+             m_MoveView = new MoveView(this);
+         }
+         m_MoveView->setFolder(folder);
+         drag->setPixmap(m_MoveView->grab());
+         drag->setMimeData(mimeData);
+         m_folderDraing = true;
+         drag->exec(Qt::MoveAction);
+         drag->deleteLater();
+         doDragMove(currentIndex(), indexAt(mapFromGlobal(QCursor::pos())));
+         m_folderDraing = false;
+         m_pItemDelegate->setDragState(false);
+         m_pItemDelegate->setDrawHover(true);
      }
  }

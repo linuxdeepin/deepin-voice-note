@@ -61,3 +61,21 @@ bool LeftViewSortFilter::lessThan(
 
     return QSortFilterProxyModel::lessThan(source_left, source_right);
 }
+
+bool LeftViewSortFilter::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+{
+     QModelIndex index = sourceModel()->index(source_row, 0, source_parent);
+     VNoteFolder *data = reinterpret_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(index));
+     for(auto &it : m_blackFolders){
+         if(it == data){
+             return  false;
+         }
+     }
+     return true;
+}
+
+void LeftViewSortFilter::setBlackFolders(const QList<VNoteFolder *> &folders)
+{
+    m_blackFolders = folders;
+    invalidateFilter();
+}

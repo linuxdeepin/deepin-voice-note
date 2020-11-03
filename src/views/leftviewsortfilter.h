@@ -22,17 +22,24 @@
 #ifndef LEFTVIEWSORTFILTER_H
 #define LEFTVIEWSORTFILTER_H
 #include <QSortFilterProxyModel>
+#include <QList>
+
+struct VNoteFolder;
 //记事本排序过滤
 class LeftViewSortFilter : public QSortFilterProxyModel
 {
 public:
     LeftViewSortFilter(QObject *parent = nullptr);
-
+    void setBlackFolders(const QList<VNoteFolder*>& folders);
 protected:
     //处理排序
     virtual bool lessThan(
         const QModelIndex &source_left,
         const QModelIndex &source_right) const override;
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+
+private:
+    QList<VNoteFolder*> m_blackFolders;
 };
 
 #endif // LEFTVIEWSORTFILTER_H

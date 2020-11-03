@@ -21,6 +21,8 @@
 #ifndef FOLDERSELECTDIALOG_H
 #define FOLDERSELECTDIALOG_H
 
+#include <QStandardItemModel>
+#include <QList>
 #include <DPushButton>
 #include <DWarningButton>
 #include <DVerticalLine>
@@ -35,14 +37,18 @@ DWIDGET_USE_NAMESPACE
 
 class LeftViewDelegate;
 class LeftViewSortFilter;
+struct VNoteFolder;
 
 class FolderSelectDialog : public DAbstractDialog
 {
      Q_OBJECT
 public:
-    explicit FolderSelectDialog(LeftViewSortFilter *model, QWidget *parent = nullptr);
+    explicit FolderSelectDialog(QStandardItemModel *model, QWidget *parent = nullptr);
     void setNoteContext(const QString &text);
+    void setFolderBlack(const QList<VNoteFolder *>& folders);
+    void clearSelection();
     QModelIndex getSelectIndex();
+    void onVNoteFolderSelectChange(const QItemSelection &selected, const QItemSelection &deselected);
 protected:
     //初始化布局
     void initUI();
@@ -57,7 +63,6 @@ private:
     DPushButton *m_cancelBtn {nullptr};
     DSuggestButton *m_confirmBtn {nullptr};
     DVerticalLine *m_buttonSpliter {nullptr};
-
 };
 
 #endif // FOLDERSELECTDIALOG_H

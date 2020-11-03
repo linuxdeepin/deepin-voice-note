@@ -23,17 +23,21 @@
 #include "views/leftviewsortfilter.h"
 
 #include <QVBoxLayout>
+#include <QDebug>
 
 #include <DApplication>
 #include <DApplicationHelper>
 
-FolderSelectDialog::FolderSelectDialog(LeftViewSortFilter *model,QWidget *parent)
+FolderSelectDialog::FolderSelectDialog(QStandardItemModel *model,QWidget *parent)
     :DAbstractDialog(parent)
-    ,m_model(model)
-
 {
+
+    m_model = new LeftViewSortFilter(this);
+    m_model->setSourceModel(model);
     initUI();
     initConnections();
+    m_model->sort(0, Qt::DescendingOrder);
+
 }
 
 void FolderSelectDialog::initUI()
@@ -120,6 +124,8 @@ void FolderSelectDialog::initConnections()
     connect(m_closeButton, &DWindowCloseButton::clicked, this, [this]() {
         this->close();
     });
+    connect(m_view->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &FolderSelectDialog::onVNoteFolderSelectChange);
 }
 
 void FolderSelectDialog::setNoteContext(const QString &text)
@@ -135,4 +141,21 @@ QModelIndex FolderSelectDialog::getSelectIndex()
         index  = QModelIndex();
     }
     return  index;
+}
+
+void FolderSelectDialog::setFolderBlack(const QList<VNoteFolder* > &folders)
+{
+    m_model->setBlackFolders(folders);
+}
+
+void FolderSelectDialog::clearSelection()
+{
+    m_view->clearSelection();
+    m_confirmBtn->setEnabled(false);
+}
+
+void FolderSelectDialog::onVNoteFolderSelectChange(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    Q_UNUSED(deselected);
+    m_confirmBtn->setEnabled(!!selected.indexes().size());
 }

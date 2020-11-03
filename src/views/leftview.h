@@ -102,6 +102,8 @@ private:
     void initNotepadRoot();
     //初始化右键菜单
     void initMenu();
+    //触发拖动操作
+    void triggerDragFolder();
     //设置记事本默认顺序
     bool setFolderSort();
     //拖拽移动
