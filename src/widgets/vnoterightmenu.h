@@ -13,19 +13,23 @@ class VNoteRightMenu : public DMenu
 public:
     explicit VNoteRightMenu(QWidget *parent = nullptr);
     ~VNoteRightMenu() override;
-    void setPressPointY(int value);
+    void setPressPointY(QPoint point);
 
 protected:
+    //初始化信号槽连接
     void initConnections();
+    //处理鼠标move事件
     void mouseMoveEvent(QMouseEvent *eve)override;
+    //处理鼠标release事件
     void mouseReleaseEvent(QMouseEvent *eve)override;
-    void closeEvent(QCloseEvent *eve)override;
 private:
-    int m_pressPointY = 0;
+    QPoint m_touchPoint;
     bool m_moved {false};
     QTimer *m_timer;
 signals:
+    //触摸移动信号
     void menuTouchMoved();
+    //触摸释放信号
     void menuTouchReleased();
 private slots:
 

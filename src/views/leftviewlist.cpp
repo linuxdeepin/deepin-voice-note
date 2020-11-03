@@ -6,6 +6,10 @@ leftviewlist::leftviewlist(QWidget *parent)
 
 }
 
+/**
+ * @brief VNoteRightMenu::mouseMoveEvent 处理鼠标move事件
+ * @eve 事件
+ */
 void leftviewlist::mouseMoveEvent(QMouseEvent *eve)
 {
     if (eve->source() == Qt::MouseEventSynthesizedByQt) {
@@ -29,6 +33,10 @@ void leftviewlist::mouseMoveEvent(QMouseEvent *eve)
     }
 }
 
+/**
+ * @brief VNoteRightMenu::mousePressEvent 处理鼠标Press事件
+ * @eve 事件
+ */
 void leftviewlist::mousePressEvent(QMouseEvent *eve)
 {
     if (eve->source() == Qt::MouseEventSynthesizedByQt) {
@@ -38,6 +46,10 @@ void leftviewlist::mousePressEvent(QMouseEvent *eve)
     }
 }
 
+/**
+ * @brief VNoteRightMenu::mouseReleaseEvent 处理鼠标Release事件
+ * @eve 事件
+ */
 void leftviewlist::mouseReleaseEvent(QMouseEvent *eve)
 {
     //正常点击状态，选择当前点击选项

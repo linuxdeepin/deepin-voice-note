@@ -41,6 +41,14 @@ class MiddleView : public DListView
 {
     Q_OBJECT
 public:
+    //触摸屏事件
+    enum TouchState {
+        TouchNormal,
+        TouchMoving,
+        TouchDraging,
+        TouchPressing
+    };
+
     MiddleView(QWidget *parent = nullptr);
     //设置搜索关键字
     void setSearchKey(const QString &key);
@@ -81,6 +89,9 @@ public:
     void noteStickOnTop();
     //排序
     void sortView(bool adjustCurrentItemBar = true);
+    //更新触摸屏一指状态
+    void setTouchState(const TouchState &touchState);
+
 signals:
     void requestSelect();
     //发送当前选中的Index列表
@@ -110,6 +121,10 @@ protected:
     void selectCurrentOnTouch();
     //处理拖拽事件
     void handleDragEvent();
+    //处理触摸屏鼠标move事件，区分点击、滑动、拖拽、长按功能
+    void doTouchMoveEvent(QMouseEvent *eve);
+    //处理触摸屏slide事件
+    void handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point);
 private:
     //初始化代理模块
     void initDelegate();
@@ -131,17 +146,13 @@ private:
 
     //以下声明参数为笔记拖拽时使用
     bool m_isDraging {false};
+    QModelIndex m_index;
 
     //以下为实现触摸屏功能声明参数
-    QModelIndex m_index;
-    qint64 lastScrollTimer = 0;
-    qint64 pressStartMs = 0;
-    QPoint m_prePoint;
-    bool m_mouseMoved{false};
-    bool m_mousePressed{false};
-    bool m_draging{false};
-    int m_pressPointY = 0;
-    int m_pressPointX = 0;
+    qint64 m_touchInterval = 0;
+    qint64 m_touchPressStartMs = 0;
+    QPoint m_touchPressPoint;
+    TouchState m_touchState {TouchNormal};
 };
 
 #endif // MIDDLEVIEW_H

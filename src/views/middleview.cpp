@@ -62,8 +62,7 @@ MiddleView::MiddleView(QWidget *parent)
     setContextMenuPolicy(Qt::NoContextMenu);
     connect(m_noteMenu, &VNoteRightMenu::menuTouchMoved, this, &MiddleView::handleDragEvent);
     connect(m_noteMenu, &VNoteRightMenu::menuTouchReleased, this, [ = ] {
-        m_mousePressed = false;
-        m_draging = false;
+        m_touchState = TouchState::TouchNormal;
     });
 }
 
@@ -324,7 +323,7 @@ void MiddleView::saveRecords()
 void MiddleView::selectCurrentOnTouch()
 {
     QTimer::singleShot(250, this, [ = ] {
-        if (!m_mouseMoved && m_mousePressed && m_index.isValid())
+        if (m_touchState == TouchState::TouchPressing && m_index.isValid())
             this->setCurrentIndex(m_index.row());
     });
 }
@@ -339,11 +338,11 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
         if (viewport()->visibleRegion().contains(event->pos())) {
             QDateTime current = QDateTime::currentDateTime();
-            pressStartMs = current.toMSecsSinceEpoch();
-            m_pressPointY = event->pos().y();
+            m_touchPressStartMs = current.toMSecsSinceEpoch();
+            m_touchPressPoint = event->pos();
             m_index = this->indexAt(event->pos());
-            m_mousePressed = true;
-            m_noteMenu->setPressPointY(QCursor::pos().y());
+            setTouchState(TouchState::TouchPressing);
+            m_noteMenu->setPressPointY(QCursor::pos());
             selectCurrentOnTouch();
             return;
         }
@@ -371,23 +370,20 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
  */
 void MiddleView::mouseReleaseEvent(QMouseEvent *event)
 {
-    m_mousePressed = false;
     m_isDraging = false;
     //处理拖拽事件，由于与drop操作参数不同，暂未封装
-    if (m_draging) {
-        m_mouseMoved = false;
-        m_draging = false;
+    if (m_touchState == TouchState::TouchDraging) {
+        setTouchState(TouchState::TouchNormal);
         return;
     }
     QModelIndex index = indexAt(event->pos());
-    if (index.row() != currentIndex().row() && !m_mouseMoved && !m_draging) {
+    if (index.row() != currentIndex().row() && m_touchState == TouchState::TouchPressing) {
         if (index.isValid())
             setCurrentIndex(index.row());
-        m_mouseMoved = false;
+        setTouchState(TouchState::TouchNormal);
         return;
     }
-    m_draging = false;
-    m_mouseMoved = false;
+    setTouchState(TouchState::TouchNormal);
 
     if (!m_onlyCurItemMenuEnable) {
         DListView::mouseReleaseEvent(event);
@@ -412,55 +408,69 @@ void MiddleView::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void MiddleView::mouseMoveEvent(QMouseEvent *event)
 {
-    //处理触摸屏单指move事件，区分滑动、拖拽事件
-    m_pItemDelegate->setDraging(false);
-    if (event->source() == Qt::MouseEventSynthesizedByQt) {
-        double dist = event->pos().y() - m_pressPointY;
-        if ((qAbs(dist) > 10)) {
-            if (!m_mouseMoved && !m_draging) {
-                QDateTime current = QDateTime::currentDateTime();
-                qint64 timeParam = current.toMSecsSinceEpoch() - pressStartMs;
-                if (timeParam > 250 && timeParam < 1000) {
-                    m_draging = true;
-                    m_pItemDelegate->setDraging(true);
-                    handleDragEvent();
-                    setCurrentIndex(m_index.row());
-                    return;
-                } else if (timeParam <= 250) {
-                    m_mouseMoved = true;
-                    if (lastScrollTimer == 0)
-                        lastScrollTimer = pressStartMs;
-                    qint64 timerDis = timeParam - lastScrollTimer;
-                    double param = ((qAbs(dist)) / timerDis) + 0.5;
-                    verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
-                    verticalScrollBar()->triggerAction((dist > 0) ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
-                    lastScrollTimer = timeParam;
-                    m_pressPointY = event->pos().y();
-                    return;
-                }
-            } else if (m_draging) {
-                handleDragEvent();
-                return;
-            } else if (m_mouseMoved) {
-                QDateTime current = QDateTime::currentDateTime();
-                qint64 timeParam = current.toMSecsSinceEpoch() - pressStartMs;
-                if (lastScrollTimer == 0)
-                    lastScrollTimer = pressStartMs;
-                qint64 timerDis = timeParam - lastScrollTimer;
-                double param = ((qAbs(dist)) / timerDis) + 0.5;
-                verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
-                verticalScrollBar()->triggerAction((dist > 0) ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
-                lastScrollTimer = timeParam;
-                m_pressPointY = event->pos().y();
-            }
-        }
+    if (event->source() == Qt::MouseEventSynthesizedByQt && event->buttons() & Qt::LeftButton) {
+        doTouchMoveEvent(event);
         return;
-    } else if ((event->buttons() & Qt::LeftButton) && !m_mousePressed) {
+    } else if ((event->buttons() & Qt::LeftButton) && m_touchState == TouchState::TouchNormal) {
         if (!m_isDraging)
             handleDragEvent();
     } else {
         DListView::mouseMoveEvent(event);
     }
+}
+
+/**
+ * @brief LeftView::doTouchMoveEvent  处理触摸屏move事件，区分点击、滑动、拖拽、长按功能
+ * @param event
+ */
+void MiddleView::doTouchMoveEvent(QMouseEvent *event)
+{
+    //处理触摸屏单指move事件，区分滑动、拖拽事件
+    m_pItemDelegate->setDraging(false);
+    double distX = event->pos().x() - m_touchPressPoint.x();
+    double distY = event->pos().y() - m_touchPressPoint.y();
+    //获取时间间隔
+    QDateTime current = QDateTime::currentDateTime();
+    qint64 timeParam = current.toMSecsSinceEpoch() - m_touchPressStartMs;
+    //首次判断
+    //首次判断
+    if (m_touchState == TouchState::TouchPressing) {
+        if ((timeParam > 250 && timeParam < 1000) && (qAbs(distY) > 10 || qAbs(distX) > 10)) {
+            handleDragEvent();
+            return;
+        } else if (timeParam <= 250 && qAbs(distY) > 10) {
+            setTouchState(TouchState::TouchMoving);
+            handleTouchSlideEvent(timeParam, distY, event->pos());
+            return;
+        } else if (timeParam <= 250 && qAbs(distX) > 5) {
+            setTouchState(TouchState::TouchNormal);
+            return;
+        }
+    } else if (m_touchState == TouchState::TouchDraging) {
+        handleDragEvent();
+        return;
+    } else if (m_touchState == TouchState::TouchMoving) {
+        if (qAbs(distY) > 5)
+            handleTouchSlideEvent(timeParam, distY, event->pos());
+    }
+}
+
+/**
+ * @brief LeftView::handleTouchSlideEvent  处理触摸屏move事件，区分点击、滑动、拖拽、长按功能
+ * @param timeParam 时间间隔
+ * @param distY 纵向移动距离
+ * @param point 当前时间发生位置
+ */
+void MiddleView::handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point)
+{
+    if (m_touchInterval == 0)
+        m_touchInterval = m_touchPressStartMs;
+    qint64 timerDis = timeParam - m_touchInterval;
+    double param = ((qAbs(distY)) / timerDis) + 0.3;
+    verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
+    verticalScrollBar()->triggerAction((distY > 0) ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
+    m_touchInterval = timeParam;
+    m_touchPressPoint = point;
 }
 
 /**
@@ -470,7 +480,7 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
 void MiddleView::handleDragEvent()
 {
     m_noteMenu->setWindowOpacity(0.0);
-    m_draging = true;
+    setTouchState(TouchState::TouchDraging);
     m_pItemDelegate->setDraging(true);
     QPoint dragPoint = this->mapFromGlobal(QCursor::pos());
     QModelIndex dragIndex = this->indexAt(dragPoint);
@@ -492,11 +502,7 @@ void MiddleView::handleDragEvent()
     drag->deleteLater();
     dragImage->deleteLater();
     emit currentNoteIndex();
-    if (m_draging) {
-        m_draging = false;
-        m_mouseMoved = false;
-        m_mousePressed = false;
-    }
+    setTouchState(TouchState::TouchNormal);
     m_pItemDelegate->setDraging(false);
     m_noteMenu->hide();
     qDebug() << "mid menu hide";
@@ -547,6 +553,15 @@ void MiddleView::initUI()
     footer->setFixedHeight(1);
     addFooterWidget(footer);
     //    this->installEventFilter(this);
+}
+
+/**
+ * @brief LeftView::setTouchState 更新触摸屏一指状态
+ * @param touchState
+ */
+void MiddleView::setTouchState(const TouchState &touchState)
+{
+    m_touchState = touchState;
 }
 
 /**

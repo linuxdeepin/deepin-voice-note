@@ -16,8 +16,11 @@ public:
     explicit leftviewlist(QWidget *parent = nullptr);
     leftviewlist();
 protected:
+    //处理鼠标Move事件
     void mouseMoveEvent(QMouseEvent *eve)override;
+    //处理鼠标Press事件
     void mousePressEvent(QMouseEvent *eve)override;
+    //处理鼠标Release事件
     void mouseReleaseEvent(QMouseEvent *eve)override;
 private:
     int m_pressPointY = 0;

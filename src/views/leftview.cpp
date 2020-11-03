@@ -62,10 +62,8 @@ LeftView::LeftView(QWidget *parent)
     this->setContextMenuPolicy(Qt::NoContextMenu);
     connect(m_notepadMenu, &VNoteRightMenu::menuTouchMoved, this, &LeftView::handleDragEvent);
     connect(m_notepadMenu, &VNoteRightMenu::menuTouchReleased, this, [ = ] {
-        m_mousePressed = false;
         updateDragingState();
-        m_draging = false;
-
+        m_touchState = TouchState::TouchNormal;
     });
 }
 
@@ -128,7 +126,7 @@ QModelIndex LeftView::getNotepadRootIndex()
 void LeftView::selectCurrentOnTouch()
 {
     QTimer::singleShot(250, this, [ = ] {
-        if (!m_mouseMoved && m_mousePressed && m_index.isValid())
+        if (m_touchState == TouchState::TouchPressing && m_index.isValid())
             this->setCurrentIndex(m_index);
     });
 }
@@ -156,13 +154,11 @@ void LeftView::mousePressEvent(QMouseEvent *event)
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
         if (viewport()->visibleRegion().contains(event->pos())) {
             QDateTime current = QDateTime::currentDateTime();
-            pressStartMs = current.toMSecsSinceEpoch();
-            m_pressPointY = event->pos().y();
+            m_touchPressStartMs = current.toMSecsSinceEpoch();
+            m_touchPressPoint = event->pos();
             m_index = this->indexAt(event->pos());
-            m_mousePressed = true;
-            m_draging = false;
-            m_notepadMenu->setPressPointY(QCursor::pos().y());
-            //emit requestSelect();
+            setTouchState(TouchState::TouchPressing);
+            m_notepadMenu->setPressPointY(QCursor::pos());
             selectCurrentOnTouch();
             return;
         }
@@ -189,23 +185,22 @@ void LeftView::mousePressEvent(QMouseEvent *event)
  */
 void LeftView::mouseReleaseEvent(QMouseEvent *event)
 {
-    m_mousePressed = false;
     m_isDraging = false;
     //处理拖拽事件，由于与drop操作参数不同，暂未封装
-    if (m_draging) {
+    if (m_touchState == TouchState::TouchDraging) {
         updateDragingState();
+        setTouchState(TouchState::TouchNormal);
         return;
     }
     //正常点击状态，选择当前点击选项
     QModelIndex index = indexAt(event->pos());
-    if (index.row() != currentIndex().row() && !m_mouseMoved && !m_draging) {
+    if (index.row() != currentIndex().row() && m_touchState == TouchState::TouchPressing) {
         if (index.isValid())
             setCurrentIndex(index);
-        m_mouseMoved = false;
+        setTouchState(TouchState::TouchNormal);
         return;
     }
-    m_draging = false;
-    m_mouseMoved = false;
+    setTouchState(TouchState::TouchNormal);
 
     if (!m_onlyCurItemMenuEnable) {
         DTreeView::mouseReleaseEvent(event);
@@ -230,45 +225,9 @@ void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
 void LeftView::mouseMoveEvent(QMouseEvent *event)
 {
     if ((event->source() == Qt::MouseEventSynthesizedByQt && event->buttons() & Qt::LeftButton)) {
-        //处理触摸屏单指move事件，区分滑动、拖拽事件
-        double dist = event->pos().y() - m_pressPointY;
-        if ((qAbs(dist) > 10)) {
-            if (!m_mouseMoved && !m_draging) {
-                QDateTime current = QDateTime::currentDateTime();
-                qint64 timeParam = current.toMSecsSinceEpoch() - pressStartMs;
-                if (timeParam > 250 && timeParam < 1000) {
-                    handleDragEvent();
-                    return;
-                } else if (timeParam <= 250) {
-                    m_mouseMoved = true;
-                    if (lastScrollTimer == 0)
-                        lastScrollTimer = pressStartMs;
-                    qint64 timerDis = timeParam - lastScrollTimer;
-                    double param = ((qAbs(dist)) / timerDis) + 0.5;
-                    verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
-                    verticalScrollBar()->triggerAction((dist > 0) ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
-                    lastScrollTimer = timeParam;
-                    m_pressPointY = event->pos().y();
-                    return;
-                }
-            } else if (m_draging) {
-                handleDragEvent();
-                return;
-            } else if (m_mouseMoved) {
-                QDateTime current = QDateTime::currentDateTime();
-                qint64 timeParam = current.toMSecsSinceEpoch() - pressStartMs;
-                if (lastScrollTimer == 0)
-                    lastScrollTimer = pressStartMs;
-                qint64 timerDis = timeParam - lastScrollTimer;
-                double param = ((qAbs(dist)) / timerDis) + 0.5;
-                verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
-                verticalScrollBar()->triggerAction((dist > 0) ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
-                lastScrollTimer = timeParam;
-                m_pressPointY = event->pos().y();
-            }
-        }
+        doTouchMoveEvent(event);
         return;
-    } else if ((event->buttons() & Qt::LeftButton) && !m_mousePressed) {
+    } else if ((event->buttons() & Qt::LeftButton) && m_touchState == TouchState::TouchNormal) {
         if (!m_isDraging) {
             handleDragEvent();
         }
@@ -278,13 +237,66 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
 }
 
 /**
+ * @brief LeftView::doTouchMoveEvent  处理触摸屏move事件，区分点击、滑动、拖拽、长按功能
+ * @param event
+ */
+void LeftView::doTouchMoveEvent(QMouseEvent *event)
+{
+    //处理触摸屏单指move事件，区分滑动、拖拽事件
+    m_pItemDelegate->setDraging(false);
+    double distX = event->pos().x() - m_touchPressPoint.x();
+    double distY = event->pos().y() - m_touchPressPoint.y();
+    //获取时间间隔
+    QDateTime current = QDateTime::currentDateTime();
+    qint64 timeParam = current.toMSecsSinceEpoch() - m_touchPressStartMs;
+    //首次判断
+    if (m_touchState == TouchState::TouchPressing) {
+        if ((timeParam > 250 && timeParam < 1000) && (qAbs(distY) > 10 || qAbs(distX) > 10)) {
+            handleDragEvent();
+            return;
+        } else if (timeParam <= 250 && qAbs(distY) > 10) {
+            setTouchState(TouchState::TouchMoving);
+            handleTouchSlideEvent(timeParam, distY, event->pos());
+            return;
+        } else if (timeParam <= 250 && qAbs(distX) > 5) {
+            setTouchState(TouchState::TouchNormal);
+            return;
+        }
+    } else if (m_touchState == TouchState::TouchDraging) {
+        handleDragEvent();
+        return;
+    } else if (m_touchState == TouchState::TouchMoving) {
+        if (qAbs(distY) > 5)
+            handleTouchSlideEvent(timeParam, distY, event->pos());
+    }
+}
+
+/**
+ * @brief LeftView::handleTouchSlideEvent  处理触摸屏move事件，区分点击、滑动、拖拽、长按功能
+ * @param timeParam 时间间隔
+ * @param distY 纵向移动距离
+ * @param point 当前时间发生位置
+ */
+void LeftView::handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point)
+{
+    if (m_touchInterval == 0)
+        m_touchInterval = m_touchPressStartMs;
+    qint64 timerDis = timeParam - m_touchInterval;
+    double param = ((qAbs(distY)) / timerDis) + 0.3;
+    verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
+    verticalScrollBar()->triggerAction((distY > 0) ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
+    m_touchInterval = timeParam;
+    m_touchPressPoint = point;
+}
+
+/**
  * @brief LeftView::handleDragEvent 处理拖拽事件
  * @param
  */
 void LeftView::handleDragEvent()
 {
     m_notepadMenu->setWindowOpacity(0.0);
-    m_draging = true;
+    setTouchState(TouchState::TouchDraging);
     m_pItemDelegate->setDraging(true);
 
 
@@ -317,7 +329,6 @@ void LeftView::handleDragEvent()
     drag->setMimeData(mimeData);
     drag->setPixmap(pixmap);
     drag->setHotSpot(QPoint(pixmap.width() / 2, pixmap.height() / 2));
-    qDebug() << "drag:" << m_notepadMenu->isVisible();
 
     drag->exec(Qt::MoveAction);
     drag->deleteLater();
@@ -515,6 +526,16 @@ void LeftView::initMenu()
 {
     m_notepadMenu = ActionManager::Instance()->notebookContextMenu();
 }
+
+/**
+ * @brief LeftView::setTouchState 更新触摸屏一指状态
+ * @param touchState
+ */
+void LeftView::setTouchState(const TouchState &touchState)
+{
+    m_touchState = touchState;
+}
+
 /**
  * @brief LeftView::setMoveList 更新移动笔记列表
  */

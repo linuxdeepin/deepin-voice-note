@@ -41,6 +41,14 @@ class LeftView : public DTreeView
 {
     Q_OBJECT
 public:
+    //触摸屏事件
+    enum TouchState {
+        TouchNormal,
+        TouchMoving,
+        TouchDraging,
+        TouchPressing
+    };
+
     explicit LeftView(QWidget *parent = nullptr);
     //获取记事本项父节点
     QStandardItem *getNotepadRoot();
@@ -79,11 +87,12 @@ public:
     void updateFolderSortNum(const QModelIndex &sorceIndex, const QModelIndex &targetIndex);
     //更新移动笔记列表
     void setMoveList(const QModelIndexList &moveList);
+    //更新触摸屏一指状态
+    void setTouchState(const TouchState &touchState);
 
 signals:
 
 protected:
-    //鼠标事件
     //单击
     void mousePressEvent(QMouseEvent *event) override;
     //单击释放
@@ -109,8 +118,12 @@ protected:
     void selectCurrentOnTouch();
     //延时更新代理中拖拽状态
     void updateDragingState();
-    //处理拖拽事件
+    //处理触摸屏drag事件
     void handleDragEvent();
+    //处理触摸屏鼠标move事件，区分点击、滑动、拖拽、长按功能
+    void doTouchMoveEvent(QMouseEvent *eve);
+    //处理触摸屏slide事件
+    void handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point);
 private:
     //初始化代理模块
     void initDelegate();
@@ -133,14 +146,10 @@ private:
     bool m_isDraging {false};
 
     //以下为实现触摸屏功能声明参数
-    qint64 lastScrollTimer = 0;
-    qint64 pressStartMs = 0;
-    QPoint m_prePoint;
-    bool m_mousePressed{false};
-    bool m_mouseMoved{false};
-    bool m_draging{false};
-    int m_pressPointY = 0;
-    int m_pressPointX = 0;
+    qint64 m_touchInterval = 0;
+    qint64 m_touchPressStartMs = 0;
+    QPoint m_touchPressPoint;
+    TouchState m_touchState {TouchNormal};
 };
 
 #endif // LEFTVIEW_H

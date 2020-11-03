@@ -11,10 +11,16 @@ VNoteRightMenu::~VNoteRightMenu()
 {
 }
 
+/**
+ * @brief VNoteRightMenu::initConnections 初始化信号槽连接
+ * @param
+ */
 void VNoteRightMenu::initConnections()
 {
     connect(m_timer, &QTimer::timeout, this, [ = ] {
-        if (qAbs(QCursor::pos().y() - m_pressPointY) > 8)
+        int distY = QCursor::pos().y() - m_touchPoint.y();
+        int distX = QCursor::pos().x() - m_touchPoint.x();
+        if ((qAbs(distX) > 8) || (qAbs(distY) > 8))
             m_moved = true;
         else
         {
@@ -30,6 +36,10 @@ void VNoteRightMenu::initConnections()
     });
 }
 
+/**
+ * @brief VNoteRightMenu::mouseMoveEvent 处理鼠标move事件
+ * @eve 事件
+ */
 void VNoteRightMenu::mouseMoveEvent(QMouseEvent *eve)
 {
     if (eve->source() == Qt::MouseEventSynthesizedByQt) {
@@ -41,6 +51,10 @@ void VNoteRightMenu::mouseMoveEvent(QMouseEvent *eve)
     DMenu::mouseMoveEvent(eve);
 }
 
+/**
+ * @brief VNoteRightMenu::mouseReleaseEvent 处理鼠标release事件
+ * @eve 事件
+ */
 void VNoteRightMenu::mouseReleaseEvent(QMouseEvent *eve)
 {
     if (eve->source() == Qt::MouseEventSynthesizedByQt) {
@@ -51,14 +65,13 @@ void VNoteRightMenu::mouseReleaseEvent(QMouseEvent *eve)
     return DMenu::mouseReleaseEvent(eve);
 }
 
-void VNoteRightMenu::closeEvent(QCloseEvent *eve)
+/**
+ * @brief VNoteRightMenu::setPressPointY 设置菜单弹出位置
+ * @eve 位置
+ */
+void VNoteRightMenu::setPressPointY(QPoint point)
 {
-    DMenu::closeEvent(eve);
-}
-
-void VNoteRightMenu::setPressPointY(int value)
-{
-    m_pressPointY = value;
+    m_touchPoint = point;
 }
 
 
