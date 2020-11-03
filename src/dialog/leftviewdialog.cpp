@@ -147,6 +147,11 @@ void LeftviewDialog::setNoteContext(const QString &text)
     m_noteInfo->setText(text);
 }
 
+void LeftviewDialog::clearSelection()
+{
+    m_view->clearSelection();
+}
+
 QModelIndex LeftviewDialog::getSelectIndex()
 {
     QModelIndex index = m_view->currentIndex();

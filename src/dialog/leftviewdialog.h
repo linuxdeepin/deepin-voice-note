@@ -45,6 +45,7 @@ class LeftviewDialog : public DAbstractDialog
 public:
     explicit LeftviewDialog(LeftViewSortFilter *model, QWidget *parent = nullptr);
     void setNoteContext(const QString &text);
+    void clearSelection();
     QModelIndex getSelectIndex();
 protected:
     //初始化布局

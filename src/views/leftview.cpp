@@ -252,7 +252,8 @@ void LeftView::doTouchMoveEvent(QMouseEvent *event)
     //首次判断
     if (m_touchState == TouchState::TouchPressing) {
         if ((timeParam > 250 && timeParam < 1000) && (qAbs(distY) > 10 || qAbs(distX) > 10)) {
-            handleDragEvent();
+            if (!m_isDraging)
+                handleDragEvent();
             return;
         } else if (timeParam <= 250 && qAbs(distY) > 10) {
             setTouchState(TouchState::TouchMoving);
@@ -263,7 +264,8 @@ void LeftView::doTouchMoveEvent(QMouseEvent *event)
             return;
         }
     } else if (m_touchState == TouchState::TouchDraging) {
-        handleDragEvent();
+        if (!m_isDraging)
+            handleDragEvent();
         return;
     } else if (m_touchState == TouchState::TouchMoving) {
         if (qAbs(distY) > 5)
@@ -615,6 +617,7 @@ bool LeftView::popupMoveDlg()
         VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(m_moveList[0]));
         QString itemInfo = QString("移动 %1 等%2个笔记到：").arg(data->noteTitle).arg(m_moveList.size());
         m_folderSelectDlg->setNoteContext(itemInfo);
+        m_folderSelectDlg->clearSelection();
         m_folderSelectDlg->exec();
     }
     return ret;

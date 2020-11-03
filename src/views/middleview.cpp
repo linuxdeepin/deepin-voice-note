@@ -436,7 +436,8 @@ void MiddleView::doTouchMoveEvent(QMouseEvent *event)
     //首次判断
     if (m_touchState == TouchState::TouchPressing) {
         if ((timeParam > 250 && timeParam < 1000) && (qAbs(distY) > 10 || qAbs(distX) > 10)) {
-            handleDragEvent();
+            if (!m_isDraging)
+                handleDragEvent();
             return;
         } else if (timeParam <= 250 && qAbs(distY) > 10) {
             setTouchState(TouchState::TouchMoving);
@@ -447,7 +448,8 @@ void MiddleView::doTouchMoveEvent(QMouseEvent *event)
             return;
         }
     } else if (m_touchState == TouchState::TouchDraging) {
-        handleDragEvent();
+        if (!m_isDraging)
+            handleDragEvent();
         return;
     } else if (m_touchState == TouchState::TouchMoving) {
         if (qAbs(distY) > 5)
