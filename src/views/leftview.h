@@ -22,10 +22,11 @@
 #ifndef LEFTVIEW_H
 #define LEFTVIEW_H
 
+#include "vnoterightmenu.h"
+#include <DTreeView>
+
 #include <QStandardItemModel>
 
-#include <DTreeView>
-#include <DMenu>
 DWIDGET_USE_NAMESPACE
 
 class LeftViewDelegate;
@@ -80,10 +81,6 @@ public:
     void setMoveList(const QModelIndexList &moveList);
 
 signals:
-    //触发选中当前点击位置
-    void requestSelect();
-    //请求更新代理中拖拽状态
-    void updateDragingStateDelay();
 
 protected:
     //鼠标事件
@@ -110,6 +107,8 @@ protected:
     void dragLeaveEvent(QDragLeaveEvent *event) override;
     //设置当前点击index选中
     void selectCurrentOnTouch();
+    //延时更新代理中拖拽状态
+    void updateDragingState();
     //处理拖拽事件
     void handleDragEvent();
 private:
@@ -122,7 +121,7 @@ private:
     //初始化右键菜单
     void initMenu();
 
-    DMenu *m_notepadMenu {nullptr};
+    VNoteRightMenu *m_notepadMenu {nullptr};
     QStandardItemModel *m_pDataModel {nullptr};
     LeftViewDelegate *m_pItemDelegate {nullptr};
     LeftViewSortFilter *m_pSortViewFilter {nullptr};
@@ -142,7 +141,6 @@ private:
     bool m_draging{false};
     int m_pressPointY = 0;
     int m_pressPointX = 0;
-
 };
 
 #endif // LEFTVIEW_H

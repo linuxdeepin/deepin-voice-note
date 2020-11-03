@@ -60,7 +60,11 @@ MiddleView::MiddleView(QWidget *parent)
 
     //禁止系统右键菜单弹出
     setContextMenuPolicy(Qt::NoContextMenu);
-    connect(this, &MiddleView::requestSelect, this, &MiddleView::selectCurrentOnTouch);
+    connect(m_noteMenu, &VNoteRightMenu::menuTouchMoved, this, &MiddleView::handleDragEvent);
+    connect(m_noteMenu, &VNoteRightMenu::menuTouchReleased, this, [ = ] {
+        m_mousePressed = false;
+        m_draging = false;
+    });
 }
 
 /**
@@ -339,7 +343,8 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
             m_pressPointY = event->pos().y();
             m_index = this->indexAt(event->pos());
             m_mousePressed = true;
-            emit requestSelect();
+            m_noteMenu->setPressPointY(QCursor::pos().y());
+            selectCurrentOnTouch();
             return;
         }
     }
@@ -355,6 +360,7 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                 && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
             DListView::setCurrentIndex(index);
             m_noteMenu->popup(event->globalPos());
+            m_noteMenu->setWindowOpacity(1);
         }
     }
 }
@@ -427,11 +433,7 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
                     qint64 timerDis = timeParam - lastScrollTimer;
                     double param = ((qAbs(dist)) / timerDis) + 0.5;
                     verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
-                    if (dist > 0)
-                        verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepSub);
-                    else {
-                        verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepAdd);
-                    }
+                    verticalScrollBar()->triggerAction((dist > 0) ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
                     lastScrollTimer = timeParam;
                     m_pressPointY = event->pos().y();
                     return;
@@ -447,11 +449,7 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
                 qint64 timerDis = timeParam - lastScrollTimer;
                 double param = ((qAbs(dist)) / timerDis) + 0.5;
                 verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
-                if (dist > 0)
-                    verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepSub);
-                else {
-                    verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepAdd);
-                }
+                verticalScrollBar()->triggerAction((dist > 0) ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
                 lastScrollTimer = timeParam;
                 m_pressPointY = event->pos().y();
             }
@@ -471,6 +469,9 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
  */
 void MiddleView::handleDragEvent()
 {
+    m_noteMenu->setWindowOpacity(0.0);
+    m_draging = true;
+    m_pItemDelegate->setDraging(true);
     QPoint dragPoint = this->mapFromGlobal(QCursor::pos());
     QModelIndex dragIndex = this->indexAt(dragPoint);
 
@@ -496,6 +497,9 @@ void MiddleView::handleDragEvent()
         m_mouseMoved = false;
         m_mousePressed = false;
     }
+    m_pItemDelegate->setDraging(false);
+    m_noteMenu->hide();
+    qDebug() << "mid menu hide";
 }
 
 /**

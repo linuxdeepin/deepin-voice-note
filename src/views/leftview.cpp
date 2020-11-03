@@ -60,13 +60,12 @@ LeftView::LeftView(QWidget *parent)
     this->setAcceptDrops(true);
     //禁止系统右键菜单弹出
     this->setContextMenuPolicy(Qt::NoContextMenu);
-    //设置当前点击index选中状态
-    connect(this, &LeftView::requestSelect, this, &LeftView::selectCurrentOnTouch);
-    //延时更新代理中拖拽状态
-    connect(this, &LeftView::updateDragingStateDelay, this, [ = ] {
-        QTimer::singleShot(300, [ = ]{
-            m_pItemDelegate->setDraging(false);
-        });
+    connect(m_notepadMenu, &VNoteRightMenu::menuTouchMoved, this, &LeftView::handleDragEvent);
+    connect(m_notepadMenu, &VNoteRightMenu::menuTouchReleased, this, [ = ] {
+        m_mousePressed = false;
+        updateDragingState();
+        m_draging = false;
+
     });
 }
 
@@ -135,6 +134,18 @@ void LeftView::selectCurrentOnTouch()
 }
 
 /**
+ * @brief LeftView::updateDragingState //延时更新代理中拖拽状态
+ * @return null
+ * @author
+ */
+void LeftView::updateDragingState()
+{
+    QTimer::singleShot(300, [ = ] {
+        m_pItemDelegate->setDraging(false);
+    });
+}
+
+/**
  * @brief LeftView::mousePressEvent
  * @param event
  */
@@ -150,7 +161,9 @@ void LeftView::mousePressEvent(QMouseEvent *event)
             m_index = this->indexAt(event->pos());
             m_mousePressed = true;
             m_draging = false;
-            emit requestSelect();
+            m_notepadMenu->setPressPointY(QCursor::pos().y());
+            //emit requestSelect();
+            selectCurrentOnTouch();
             return;
         }
     }
@@ -165,6 +178,7 @@ void LeftView::mousePressEvent(QMouseEvent *event)
                 && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
             this->setCurrentIndex(index);
             m_notepadMenu->popup(event->globalPos());
+            m_notepadMenu->setWindowOpacity(1);
         }
     }
 }
@@ -179,7 +193,7 @@ void LeftView::mouseReleaseEvent(QMouseEvent *event)
     m_isDraging = false;
     //处理拖拽事件，由于与drop操作参数不同，暂未封装
     if (m_draging) {
-        emit updateDragingStateDelay();
+        updateDragingState();
         return;
     }
     //正常点击状态，选择当前点击选项
@@ -215,7 +229,6 @@ void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void LeftView::mouseMoveEvent(QMouseEvent *event)
 {
-    qDebug() << "mouseMoveEvent";
     if ((event->source() == Qt::MouseEventSynthesizedByQt && event->buttons() & Qt::LeftButton)) {
         //处理触摸屏单指move事件，区分滑动、拖拽事件
         double dist = event->pos().y() - m_pressPointY;
@@ -224,9 +237,6 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
                 QDateTime current = QDateTime::currentDateTime();
                 qint64 timeParam = current.toMSecsSinceEpoch() - pressStartMs;
                 if (timeParam > 250 && timeParam < 1000) {
-                    m_draging = true;
-                    m_pItemDelegate->setDraging(true);
-                    //选中后，页面禁止滚动
                     handleDragEvent();
                     return;
                 } else if (timeParam <= 250) {
@@ -236,11 +246,7 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
                     qint64 timerDis = timeParam - lastScrollTimer;
                     double param = ((qAbs(dist)) / timerDis) + 0.5;
                     verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
-                    if (dist > 0)
-                        verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepSub);
-                    else {
-                        verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepAdd);
-                    }
+                    verticalScrollBar()->triggerAction((dist > 0) ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
                     lastScrollTimer = timeParam;
                     m_pressPointY = event->pos().y();
                     return;
@@ -256,11 +262,7 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
                 qint64 timerDis = timeParam - lastScrollTimer;
                 double param = ((qAbs(dist)) / timerDis) + 0.5;
                 verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
-                if (dist > 0)
-                    verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepSub);
-                else {
-                    verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepAdd);
-                }
+                verticalScrollBar()->triggerAction((dist > 0) ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
                 lastScrollTimer = timeParam;
                 m_pressPointY = event->pos().y();
             }
@@ -281,6 +283,11 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
  */
 void LeftView::handleDragEvent()
 {
+    m_notepadMenu->setWindowOpacity(0.0);
+    m_draging = true;
+    m_pItemDelegate->setDraging(true);
+
+
     QModelIndex mouseMoveCurrentIndex = this->currentIndex();
     QPoint dragPoint = this->mapFromGlobal(QCursor::pos());
     QModelIndex dragIndex = this->indexAt(dragPoint);
@@ -310,6 +317,8 @@ void LeftView::handleDragEvent()
     drag->setMimeData(mimeData);
     drag->setPixmap(pixmap);
     drag->setHotSpot(QPoint(pixmap.width() / 2, pixmap.height() / 2));
+    qDebug() << "drag:" << m_notepadMenu->isVisible();
+
     drag->exec(Qt::MoveAction);
     drag->deleteLater();
     QPoint point = this->mapFromGlobal(QCursor::pos());
@@ -620,10 +629,11 @@ bool LeftView::doNoteMove(const QModelIndexList &src, const QModelIndex &dst)
 
 void LeftView::updateFolderSortNum(const QModelIndex &sorceIndex, const QModelIndex &targetIndex)
 {
-    m_pItemDelegate->setDragState(false);
     this->update();
+    m_pItemDelegate->setDragState(false);
     if (StandardItemCommon::getStandardItemType(targetIndex) != StandardItemCommon::NOTEPADITEM ||
             targetIndex == sorceIndex) {
+        m_notepadMenu->hide();
         return;
     } else {
         QModelIndex rootIndex = getNotepadRootIndex();
@@ -675,4 +685,5 @@ void LeftView::updateFolderSortNum(const QModelIndex &sorceIndex, const QModelIn
         QString folderSortData = getFolderSortId();
         setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
     }
+    m_notepadMenu->hide();
 }

@@ -55,7 +55,7 @@ ActionManager *ActionManager::Instance()
  * @brief ActionManager::notebookContextMenu
  * @return 记事本右键菜单
  */
-DMenu *ActionManager::notebookContextMenu()
+VNoteRightMenu *ActionManager::notebookContextMenu()
 {
     return m_notebookContextMenu.get();
 }
@@ -64,7 +64,7 @@ DMenu *ActionManager::notebookContextMenu()
  * @brief ActionManager::noteContextMenu
  * @return 记事项右键菜单
  */
-DMenu *ActionManager::noteContextMenu()
+VNoteRightMenu *ActionManager::noteContextMenu()
 {
     return m_noteContextMenu.get();
 }
@@ -73,7 +73,7 @@ DMenu *ActionManager::noteContextMenu()
  * @brief ActionManager::detialContextMenu
  * @return 详情页右键菜单
  */
-DMenu *ActionManager::detialContextMenu()
+VNoteRightMenu *ActionManager::detialContextMenu()
 {
     return m_detialContextMenu.get();
 }
@@ -177,7 +177,7 @@ void ActionManager::initMenu()
                       << DApplication::translate("NotebookContextMenu", "Delete")
                       << DApplication::translate("NotebookContextMenu", "New note");
 
-    m_notebookContextMenu.reset(new DMenu());
+    m_notebookContextMenu.reset(new VNoteRightMenu());
 
     int notebookMenuIdStart = ActionKind::NotebookMenuBase;
 
@@ -201,7 +201,7 @@ void ActionManager::initMenu()
                   << DApplication::translate("NotesContextMenu", "Save voice recording")
                   << DApplication::translate("NotesContextMenu", "New note");
 
-    m_noteContextMenu.reset(new DMenu());
+    m_noteContextMenu.reset(new VNoteRightMenu());
 
     int noteMenuIdStart = ActionKind::NoteMenuBase;
 
@@ -214,7 +214,7 @@ void ActionManager::initMenu()
 
         noteMenuIdStart++;
 
-        if(noteMenuIdStart == NoteAddNew){
+        if (noteMenuIdStart == NoteAddNew) {
             m_noteContextMenu->addSeparator();
         }
     }
@@ -233,7 +233,7 @@ void ActionManager::initMenu()
                         << DApplication::translate("NoteDetailContextMenu", "Speech to Text")
                         << DApplication::translate("NoteDetailContextMenu", "Translate");
 
-    m_detialContextMenu.reset(new DMenu());
+    m_detialContextMenu.reset(new VNoteRightMenu());
 
     int detailMenuIdStart = ActionKind::NoteDetailMenuBase;
 
@@ -245,7 +245,7 @@ void ActionManager::initMenu()
         m_actionsMap.insert(static_cast<ActionKind>(detailMenuIdStart), pAction);
         if (!isAISrvAvailable) {
             if (detailMenuIdStart == DetailVoice2Text
-                || detailMenuIdStart > DetailPaste) {
+                    || detailMenuIdStart > DetailPaste) {
                 pAction->setVisible(false);
             }
         } else if (detailMenuIdStart == DetailPaste) {

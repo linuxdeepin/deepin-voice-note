@@ -22,6 +22,8 @@
 #ifndef MIDDLEVIEW_H
 #define MIDDLEVIEW_H
 
+#include "vnoterightmenu.h"
+
 #include <QVector>
 
 #include <DListView>
@@ -122,7 +124,7 @@ private:
     qint64 m_currentId {-1};
     QString m_searchKey;
     DLabel *m_emptySearch {nullptr};
-    DMenu *m_noteMenu {nullptr};
+    VNoteRightMenu *m_noteMenu {nullptr};
     QStandardItemModel *m_pDataModel {nullptr};
     MiddleViewDelegate *m_pItemDelegate {nullptr};
     MiddleViewSortFilter *m_pSortViewFilter {nullptr};
