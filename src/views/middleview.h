@@ -68,7 +68,10 @@ public:
     VNoteItem *deleteCurrentRow();
     //获取当前选中项数据
     VNoteItem *getCurrVNotedata() const;
-
+    //置顶/取消置顶
+    void noteStickOnTop();
+    //排序
+    void sortView(bool adjustCurrentItemBar = true);
 signals:
 public slots:
     //更新记事项

@@ -194,6 +194,7 @@ void ActionManager::initMenu()
     //Note context menu
     QStringList noteMenuTexts;
     noteMenuTexts << DApplication::translate("NotesContextMenu", "Rename")
+                  << DApplication::translate("NotesContextMenu", "")
                   << DApplication::translate("NotesContextMenu", "Delete")
                   << DApplication::translate("NotesContextMenu", "Save as TXT")
                   << DApplication::translate("NotesContextMenu", "Save voice recording")
@@ -211,6 +212,10 @@ void ActionManager::initMenu()
         m_actionsMap.insert(static_cast<ActionKind>(noteMenuIdStart), pAction);
 
         noteMenuIdStart++;
+
+        if(noteMenuIdStart == NoteAddNew){
+            m_noteContextMenu->addSeparator();
+        }
     }
 
     //Voice context menu

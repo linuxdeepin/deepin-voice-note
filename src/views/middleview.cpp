@@ -26,11 +26,14 @@
 #include "middleviewsortfilter.h"
 #include "common/actionmanager.h"
 #include "common/standarditemcommon.h"
+#include "common/vnoteitem.h"
 #include "task/exportnoteworker.h"
 #include "common/setting.h"
+#include "db/vnoteitemoper.h"
 
 #include <QMouseEvent>
 #include <QVBoxLayout>
+#include <QScrollBar>
 
 #include <DApplication>
 #include <DFileDialog>
@@ -117,8 +120,10 @@ void MiddleView::addRowAtHead(VNoteItem *note)
     if (nullptr != note) {
         QStandardItem *item = StandardItemCommon::createStandardItem(note, StandardItemCommon::NOTEITEM);
         m_pDataModel->insertRow(0, item);
-
-        DListView::setCurrentIndex(m_pSortViewFilter->index(0, 0));
+        sortView(false);
+        QModelIndex index = m_pDataModel->index(item->row(), 0);
+        DListView::setCurrentIndex(m_pSortViewFilter->mapFromSource(index));
+        this->scrollTo(currentIndex());
     }
 }
 
@@ -175,8 +180,7 @@ VNoteItem *MiddleView::getCurrVNotedata() const
  */
 void MiddleView::onNoteChanged()
 {
-    m_pSortViewFilter->sortView();
-    this->scrollToTop();
+    sortView();
 }
 
 /**
@@ -431,4 +435,32 @@ void MiddleView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint
 void MiddleView::closeMenu()
 {
     m_noteMenu->close();
+}
+
+/**
+ * @brief MiddleView::noteStickOnTop
+ */
+void MiddleView::noteStickOnTop()
+{
+    QModelIndex index = this->currentIndex();
+    VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
+                StandardItemCommon::getStandardItemData(index));
+    if(noteData){
+        VNoteItemOper noteOper(noteData);
+        if(noteOper.updateTop(!noteData->isTop)){
+            sortView();
+        }
+    }
+}
+
+/**
+ * @brief MiddleView::sortView
+ * @param adjustCurrentItemBar true 调整当前滚动条
+ */
+void MiddleView::sortView(bool adjustCurrentItemBar)
+{
+    m_pSortViewFilter->sortView();
+    if(adjustCurrentItemBar){
+        this->scrollTo(currentIndex(), DListView::PositionAtBottom);
+    }
 }

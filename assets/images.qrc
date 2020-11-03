@@ -86,5 +86,7 @@
         <file>icons/deepin/builtin/play.svg</file>
         <file>icons/deepin/builtin/pause.svg</file>
         <file>deepin-voice-note-setting.json</file>
+        <file>icons/deepin/builtin/light/top.svg</file>
+        <file>icons/deepin/builtin/dark/top.svg</file>
     </qresource>
 </RCC>

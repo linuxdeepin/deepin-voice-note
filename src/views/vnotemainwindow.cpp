@@ -1351,6 +1351,9 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::DetailTranslate:
         VTextSpeechAndTrManager::onTextTranslate();
         break;
+    case ActionManager::NoteTop:
+        m_middleView->noteStickOnTop();
+        break;
     default:
         break;
     }
@@ -1366,21 +1369,22 @@ void VNoteMainWindow::onMenuAbout2Show()
     //Eg:
     //ActionManager::Instance()->enableAction(ActionManager::NoteAddNew, false);
     DMenu *menu = static_cast<DMenu *>(sender());
-
+    QAction *topAction = ActionManager::Instance()->getActionById(ActionManager::NoteTop);
     if (menu == ActionManager::Instance()->noteContextMenu()) {
         ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteCtxMenu);
-
         if (stateOperation->isPlaying()
             || stateOperation->isRecording()
-            || stateOperation->isVoice2Text()) {
+            || stateOperation->isVoice2Text()
+            || stateOperation->isSearching()) {
             ActionManager::Instance()->enableAction(ActionManager::NoteAddNew, false);
-            ActionManager::Instance()->enableAction(ActionManager::NoteDelete, false);
-
+            if(!stateOperation->isSearching()){
+                ActionManager::Instance()->enableAction(ActionManager::NoteDelete, false);
+            }else {
+                topAction->setEnabled(false);
+            }
             if (stateOperation->isRecording()) {
                 ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
             }
-        } else if (stateOperation->isSearching()) {
-            ActionManager::Instance()->enableAction(ActionManager::NoteAddNew, false);
         }
 
         //Disable SaveText if note have no text
@@ -1395,6 +1399,12 @@ void VNoteMainWindow::onMenuAbout2Show()
             if (!currNoteData->haveVoice()) {
                 ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
             }
+            if(currNoteData->isTop){
+                topAction->setText("取消置顶");
+            }else {
+                topAction->setText("置顶");
+            }
+
         }
     } else if (menu == ActionManager::Instance()->notebookContextMenu()) {
         ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NotebookCtxMenu);
@@ -1595,6 +1605,7 @@ int VNoteMainWindow::loadSearchNotes(const QString &key)
             m_rightView->initData(nullptr, m_searchKey);
             m_recordBar->setVisible(false);
         } else {
+            m_middleView->sortView(false);
             m_middleView->setVisibleEmptySearch(false);
             m_middleView->setCurrentIndex(0);
         }

@@ -182,6 +182,8 @@ MiddleViewDelegate::MiddleViewDelegate(QAbstractItemView *parent)
     m_parentPb = DApplicationHelper::instance()->palette(m_parentView);
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &MiddleViewDelegate::handleChangeTheme);
+
+    handleChangeTheme();
 }
 
 /**
@@ -198,6 +200,7 @@ void MiddleViewDelegate::setSearchKey(const QString &key)
  */
 void MiddleViewDelegate::handleChangeTheme()
 {
+    m_topIcon = Utils::loadSVG("top.svg");
     m_parentPb = DApplicationHelper::instance()->palette(m_parentView);
     m_parentView->update(m_parentView->currentIndex());
 }
@@ -230,7 +233,8 @@ QSize MiddleViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QMo
 {
     Q_UNUSED(index);
     if (m_searchKey.isEmpty()) {
-        return QSize(option.rect.width(), 74);
+        VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
+        return data->isTop ? QSize(option.rect.width(), 108) : QSize(option.rect.width(), 74);
     } else {
         return QSize(option.rect.width(), 102);
     }
@@ -394,6 +398,9 @@ void MiddleViewDelegate::paintNormalItem(QPainter *painter, const QStyleOptionVi
     if (!data) {
         return;
     }
+    if(data->isTop){
+        return paintTopItem(painter, option, index, data);
+    }
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing, true);
     painter->setRenderHints(QPainter::SmoothPixmapTransform);
@@ -487,4 +494,53 @@ void MiddleViewDelegate::paintSearchItem(QPainter *painter, const QStyleOptionVi
         painter->drawText(folderNameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
     }
     painter->restore();
+}
+
+void MiddleViewDelegate::paintTopItem(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index, VNoteItem *data) const
+{
+    Q_UNUSED(index);
+    QPainterPath path;
+    painter->save();
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    painter->setRenderHints(QPainter::SmoothPixmapTransform);
+
+    QRect topInfoRect(QRect(option.rect.x() + 10 , option.rect.y(),option.rect.width()- 20, 30));
+    QRect itemRect(QRect(option.rect.x() + 10, option.rect.y()+ 30, option.rect.width() - 20 , 64));
+    QRect lineRect(QRect(option.rect.x() + 10, option.rect.y() + 102, option.rect.width() - 20 , 2));
+
+    //绘制置顶信息
+    painter->drawPixmap(QRect(topInfoRect.x(),topInfoRect.y() + 10, 10, 10), m_topIcon);
+    topInfoRect.setX(topInfoRect.x() + 15);
+    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
+    painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
+    painter->drawText(topInfoRect, Qt::AlignLeft | Qt::AlignVCenter, "已置顶");
+
+    //绘制项
+    bool isSelect = false;
+    paintItemBase(painter, option, itemRect, isSelect);
+    if (isSelect == false || m_editVisible == false) {
+        painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T6));
+        QFontMetrics fontMetrics = painter->fontMetrics();
+        int space = (itemRect.height() - fontMetrics.height() * 2) / 2 + itemRect.top();
+        QRect nameRect(itemRect.left() + 20, space, itemRect.width() - 40, fontMetrics.height());
+        space += fontMetrics.height();
+        QRect timeRect(itemRect.left() + 20, space, itemRect.width() - 40, fontMetrics.height());
+        QString elideText = fontMetrics.elidedText(data->noteTitle, Qt::ElideRight, nameRect.width());
+        painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
+        if (!isSelect) {
+            if (m_enableItem == false || !(option.state & QStyle::State_Enabled)) {
+                painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::TextTips)));
+            } else {
+                painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
+            }
+        }
+        painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
+        painter->drawText(timeRect, Qt::AlignLeft | Qt::AlignVCenter, Utils::convertDateTime(data->modifyTime));
+    }
+
+    //绘制分割线
+    painter->fillRect(lineRect, m_parentPb.color(DPalette::Normal, DPalette::FrameShadowBorder));
+
+    painter->restore();
+
 }

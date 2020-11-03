@@ -80,6 +80,7 @@ public:
             create_time,
             modify_time,
             delete_time,
+            is_top,
         };
 
         static const QStringList noteColumnsName;
@@ -212,6 +213,15 @@ class UpdateNoteDbVisitor : public DbVisitor
 {
 public:
     explicit UpdateNoteDbVisitor(QSqlDatabase &db, const void *inParam, void *result);
+
+    virtual bool prepareSqls() override;
+};
+
+//更新记事项置顶属性
+class UpdateNoteTopDbVisitor :public DbVisitor
+{
+public:
+    explicit UpdateNoteTopDbVisitor(QSqlDatabase &db, const void *inParam, void *result);
 
     virtual bool prepareSqls() override;
 };
