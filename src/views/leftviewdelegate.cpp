@@ -260,6 +260,10 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
                     painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
                     painter->fillPath(path, painter->brush());
                     painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
+                }else {
+                    painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
+                    painter->fillPath(path, painter->brush());
+                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
                 }
             } else {
                 painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
@@ -268,7 +272,6 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
             }
         }
     }
-    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(index));
     if (data != nullptr) {
         VNoteFolderOper folderOps(data);
