@@ -78,8 +78,9 @@ public:
     void sortView(bool adjustCurrentItemBar = true);
 
     QModelIndexList getAllSelectNote();
-    void deleteModelIndexs(const QModelIndexList& indexs);
-
+    void deleteModelIndexs(const QModelIndexList &indexs);
+    //处理触摸屏slide事件
+    void handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point);
 signals:
     void sigDragEnd();
 
@@ -128,9 +129,10 @@ private:
     MiddleViewSortFilter *m_pSortViewFilter {nullptr};
     MoveView *m_MoveView {nullptr};
 
-    QDateTime m_pressTime;
-    QPoint m_pressPos;
-
+    //以下为实现触摸屏功能声明参数
+    bool m_isTouchSliding {false};
+    qint64 m_touchPressStartMs = 0;
+    int m_touchPressPointY = 0;
 };
 
 #endif // MIDDLEVIEW_H

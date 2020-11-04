@@ -178,6 +178,7 @@ void FolderSelectDialog::initUI()
     viewFrameLayout->setContentsMargins(5, 5, 0, 5);
     viewFrameLayout->addWidget(m_view);
     viewFrame->setLayout(viewFrameLayout);
+    viewFrame->setAttribute(Qt::WA_TranslucentBackground, true);
 
     mainLayout->addLayout(titleLayout);
     mainLayout->addWidget(m_noteInfo, 0, Qt::AlignCenter | Qt::AlignVCenter);

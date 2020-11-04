@@ -72,6 +72,9 @@ public:
     QString getFolderSort();
     //是否需要更新排序
     bool needFolderSort();
+    //处理触摸屏slide事件
+    void handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point);
+
 signals:
 
 protected:
@@ -109,7 +112,7 @@ private:
     //设置记事本默认顺序
     bool setFolderSort();
     //拖拽移动
-    void doDragMove(const QModelIndex&src, const QModelIndex& dst);
+    void doDragMove(const QModelIndex &src, const QModelIndex &dst);
 
     DMenu *m_notepadMenu {nullptr};
     QStandardItemModel *m_pDataModel {nullptr};
@@ -120,9 +123,10 @@ private:
     MoveView *m_MoveView {nullptr};
     bool    m_folderDraing {false};
 
-    QDateTime m_pressTime;
-    QPoint m_pressPos;
-
+    //以下为实现触摸屏功能声明参数
+    bool m_isTouchSliding {false};
+    qint64 m_touchPressStartMs = 0;
+    int m_touchPressPointY = 0;
 };
 
 #endif // LEFTVIEW_H

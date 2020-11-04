@@ -55,7 +55,7 @@ public:
 protected:
     //处理触摸屏鼠标滑动
     void doTouchMoveEvent(QMouseEvent *eve);
-    //
+    //处理触摸屏滑动事件
     void handleTouchSlideEvent(qint64 timeInterval, double distY, QPoint point);
 private:
     bool m_isTouchSliding {false};
