@@ -23,6 +23,7 @@
 #define LEFTVIEW_H
 
 #include <QStandardItemModel>
+#include <QDateTime>
 
 #include <DTreeView>
 #include <DMenu>
@@ -91,6 +92,7 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragMoveEvent(QDragMoveEvent *event) override;
     void dragLeaveEvent(QDragLeaveEvent *event) override;
+    void startDrag(Qt::DropActions supportedActions) override;
 
 
 private:
@@ -117,6 +119,10 @@ private:
     FolderSelectDialog *m_folderSelectDialog {nullptr};
     MoveView *m_MoveView {nullptr};
     bool    m_folderDraing {false};
+
+    QDateTime m_pressTime;
+    QPoint m_pressPos;
+
 };
 
 #endif // LEFTVIEW_H

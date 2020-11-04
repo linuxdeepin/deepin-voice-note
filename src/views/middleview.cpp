@@ -53,6 +53,8 @@ MiddleView::MiddleView(QWidget *parent)
     initDelegate();
     initMenu();
     initUI();
+
+    setContextMenuPolicy(Qt::NoContextMenu);
     this->setDragEnabled(true);
     this->setDragDropMode(QAbstractItemView::DragOnly);
     this->setAcceptDrops(false);
@@ -299,9 +301,14 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
 {
     this->setFocus();
 
+    if(event->source() == Qt::MouseEventSynthesizedByQt){
+        m_pressPos = event->pos();
+        m_pressTime = QDateTime::currentDateTime();
+    }
+
     if (!m_onlyCurItemMenuEnable) {
         event->setModifiers(Qt::NoModifier);
-        DListView::mouseMoveEvent(event);
+        DListView::mousePressEvent(event);
     }
 
     if (event->button() == Qt::RightButton) {
@@ -344,13 +351,28 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton) {
         if(!m_onlyCurItemMenuEnable){
-            OpsStateInterface *stateInterface = OpsStateInterface::instance();
-            if(!stateInterface->isSearching()){
-                QModelIndex index = currentIndex();
-                if(index.isValid() && index == indexAt(event->pos())){
-                    triggerDragNote();
+            if (event->source() == Qt::MouseEventSynthesizedByQt) {
+                QDateTime current = QDateTime::currentDateTime();
+                qint64 timeNow = current.toMSecsSinceEpoch();
+                qint64 timerDis = timeNow - m_pressTime.toMSecsSinceEpoch();
+                if( timerDis < 250){
+                    double dist = event->pos().y() - m_pressPos.y();
+                    if (qAbs(dist) > 10) {
+                        //计算滑动速度
+                        double speed = ((qAbs(dist)) / timerDis) + 0.5;
+                        verticalScrollBar()->setSingleStep(static_cast<int>(20 * speed));
+                        if (dist > 0)
+                            verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepSub);
+                        else {
+                            verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepAdd);
+                        }
+                        m_pressTime = current;
+                        m_pressPos = event->pos();
+                    }
+                    return;
                 }
             }
+            DListView::mouseMoveEvent(event);
         }
     }
 }
@@ -517,4 +539,19 @@ void MiddleView::triggerDragNote()
          drag->deleteLater();
          emit sigDragEnd();
      }
+}
+
+void MiddleView::startDrag(Qt::DropActions supportedActions)
+{
+    Q_UNUSED(supportedActions)
+    if(!m_onlyCurItemMenuEnable){
+        OpsStateInterface *stateInterface = OpsStateInterface::instance();
+        if(!stateInterface->isSearching()){
+            QModelIndex index = currentIndex();
+            QPoint pos = mapFromGlobal(QCursor::pos());
+            if(index.isValid() && index == indexAt(pos)){
+                triggerDragNote();
+            }
+        }
+    }
 }

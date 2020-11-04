@@ -23,6 +23,8 @@
 
 #include <QStandardItemModel>
 #include <QList>
+#include <QDateTime>
+
 #include <DPushButton>
 #include <DWarningButton>
 #include <DVerticalLine>
@@ -38,6 +40,20 @@ DWIDGET_USE_NAMESPACE
 class LeftViewDelegate;
 class LeftViewSortFilter;
 struct VNoteFolder;
+
+class FolderSelectView : public DTreeView
+{
+    Q_OBJECT
+public:
+    explicit FolderSelectView(QWidget *parent = nullptr);
+    //移动
+    void mouseMoveEvent(QMouseEvent *event) override;
+    //单击
+    void mousePressEvent(QMouseEvent *event) override;
+private:
+    QDateTime m_pressTime;
+    QPoint m_pressPos;
+};
 
 class FolderSelectDialog : public DAbstractDialog
 {
@@ -56,7 +72,7 @@ protected:
     void initConnections();
 private:
     DLabel      *m_noteInfo {nullptr};
-    DTreeView   *m_view {nullptr};
+    FolderSelectView   *m_view {nullptr};
     DWindowCloseButton *m_closeButton {nullptr};
     LeftViewSortFilter *m_model {nullptr};
     LeftViewDelegate *m_delegate {nullptr};

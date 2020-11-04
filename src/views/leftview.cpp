@@ -53,6 +53,7 @@ LeftView::LeftView(QWidget *parent)
     initDelegate();
     initNotepadRoot();
     initMenu();
+    setContextMenuPolicy(Qt::NoContextMenu);
     this->setDragEnabled(true);
     this->setDragDropMode(QAbstractItemView::DragDrop);
     this->setDropIndicatorShown(true);
@@ -119,9 +120,14 @@ void LeftView::mousePressEvent(QMouseEvent *event)
 {
     this->setFocus();
 
+    if(event->source() == Qt::MouseEventSynthesizedByQt){
+        m_pressPos = event->pos();
+        m_pressTime = QDateTime::currentDateTime();
+    }
+
     if (!m_onlyCurItemMenuEnable) {
         event->setModifiers(Qt::NoModifier);
-        DTreeView::mouseMoveEvent(event);
+        DTreeView::mousePressEvent(event);
     }
 
     if (event->button() == Qt::RightButton) {
@@ -165,7 +171,31 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
     Q_UNUSED(event);
 
     if (event->buttons() & Qt::LeftButton) {
-        triggerDragFolder();
+        if (!m_onlyCurItemMenuEnable) {
+            if (event->source() == Qt::MouseEventSynthesizedByQt) {
+                QDateTime current = QDateTime::currentDateTime();
+                qint64 timeNow = current.toMSecsSinceEpoch();
+                qint64 timerDis = timeNow - m_pressTime.toMSecsSinceEpoch();
+                if( timerDis < 250){
+                    double dist = event->pos().y() - m_pressPos.y();
+                    if (qAbs(dist) > 10) {
+                        //计算滑动速度
+                        double speed = ((qAbs(dist)) / timerDis) + 0.5;
+                        verticalScrollBar()->setSingleStep(static_cast<int>(20 * speed));
+                        if (dist > 0)
+                            verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepSub);
+                        else {
+                            verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepAdd);
+                        }
+                        m_pressTime = current;
+                        m_pressPos = event->pos();
+                    }
+                    return;
+                }
+            }
+            DTreeView::mouseMoveEvent(event);
+        }
+
     }
 
 }
@@ -452,6 +482,12 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
          }
      }
      return false;
+ }
+
+ void LeftView::startDrag(Qt::DropActions supportedActions)
+ {
+     Q_UNUSED(supportedActions);
+     triggerDragFolder();
  }
 
  void LeftView::dragEnterEvent(QDragEnterEvent *event)

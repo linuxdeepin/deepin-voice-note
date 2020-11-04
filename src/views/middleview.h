@@ -22,6 +22,8 @@
 #ifndef MIDDLEVIEW_H
 #define MIDDLEVIEW_H
 
+#include <QDateTime>
+
 #include <DListView>
 #include <DMenu>
 #include <DLabel>
@@ -101,6 +103,8 @@ protected:
     void keyPressEvent(QKeyEvent *e) override;
     //关闭重命名编辑框触发
     void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
+    //触发拖动事件
+    void startDrag(Qt::DropActions supportedActions) override;
 
 private:
     //初始化代理模块
@@ -123,6 +127,10 @@ private:
     MiddleViewDelegate *m_pItemDelegate {nullptr};
     MiddleViewSortFilter *m_pSortViewFilter {nullptr};
     MoveView *m_MoveView {nullptr};
+
+    QDateTime m_pressTime;
+    QPoint m_pressPos;
+
 };
 
 #endif // MIDDLEVIEW_H

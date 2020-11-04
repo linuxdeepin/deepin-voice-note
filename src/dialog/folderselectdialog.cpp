@@ -24,9 +24,52 @@
 
 #include <QVBoxLayout>
 #include <QDebug>
+#include <QMouseEvent>
+#include <QScrollBar>
 
 #include <DApplication>
 #include <DApplicationHelper>
+
+FolderSelectView::FolderSelectView(QWidget *parent)
+    :DTreeView (parent)
+{
+
+}
+
+void FolderSelectView::mousePressEvent(QMouseEvent *event)
+{
+    if(event->source() == Qt::MouseEventSynthesizedByQt){
+        m_pressPos = event->pos();
+        m_pressTime = QDateTime::currentDateTime();
+    }
+    DTreeView::mousePressEvent(event);
+}
+
+void FolderSelectView::mouseMoveEvent(QMouseEvent *event)
+{
+    if (event->source() == Qt::MouseEventSynthesizedByQt) {
+        QDateTime current = QDateTime::currentDateTime();
+        qint64 timeNow = current.toMSecsSinceEpoch();
+        qint64 timerDis = timeNow - m_pressTime.toMSecsSinceEpoch();
+        if( timerDis < 250){
+            double dist = event->pos().y() - m_pressPos.y();
+            if (qAbs(dist) > 10) {
+                //计算滑动速度
+                double speed = ((qAbs(dist)) / timerDis) + 0.5;
+                verticalScrollBar()->setSingleStep(static_cast<int>(20 * speed));
+                if (dist > 0)
+                    verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepSub);
+                else {
+                    verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepAdd);
+                }
+                m_pressTime = current;
+                m_pressPos = event->pos();
+            }
+            return;
+        }
+    }
+    DTreeView::mouseMoveEvent(event);
+}
 
 FolderSelectDialog::FolderSelectDialog(QStandardItemModel *model,QWidget *parent)
     :DAbstractDialog(parent)
@@ -45,9 +88,10 @@ void FolderSelectDialog::initUI()
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(10, 0, 10, 10);
-    m_view = new DTreeView(this);
+    m_view = new FolderSelectView(this);
     DStyle::setFrameRadius(m_view, 20);
     m_view->setModel(m_model);
+    m_view->setContextMenuPolicy(Qt::NoContextMenu);
     m_delegate = new LeftViewDelegate(m_view);
     m_delegate->setDrawNotesNum(false);
     m_view->setItemDelegate(m_delegate);
