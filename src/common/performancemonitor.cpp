@@ -44,5 +44,5 @@ void PerformanceMonitor::initializeAppFinish()
     QDateTime current = QDateTime::currentDateTime();
     initializeAppFinishMs = current.toMSecsSinceEpoch();
     qint64 time = initializeAppFinishMs - initializeAppStartMs;
-    qInfo()<< QString("[GRABPOINT] POINT-0001 startduration=%1ms").arg(time).toLatin1().constData();
+    qInfo()<< QString("[GRABPOINT] POINT-01 startduration=%1ms").arg(time);
 }
