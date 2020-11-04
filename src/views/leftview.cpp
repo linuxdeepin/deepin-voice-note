@@ -249,27 +249,36 @@ void LeftView::doTouchMoveEvent(QMouseEvent *event)
     //获取时间间隔
     QDateTime current = QDateTime::currentDateTime();
     qint64 timeParam = current.toMSecsSinceEpoch() - m_touchPressStartMs;
+
+    switch (m_touchState) {
     //首次判断
-    if (m_touchState == TouchState::TouchPressing) {
+    case TouchState::TouchPressing:
+        //250ms-1000ms之间移动超过10px，判断为拖拽
         if ((timeParam > 250 && timeParam < 1000) && (qAbs(distY) > 10 || qAbs(distX) > 10)) {
             if (!m_isDraging)
                 handleDragEvent();
-            return;
-        } else if (timeParam <= 250 && qAbs(distY) > 10) {
+        }
+        //250ms之内，上下移动距离超过10px或左右移动距离超过5px，判断为滑动
+        else if (timeParam <= 250 && (qAbs(distY) > 10 || qAbs(distX) > 5)) {
             setTouchState(TouchState::TouchMoving);
             handleTouchSlideEvent(timeParam, distY, event->pos());
-            return;
-        } else if (timeParam <= 250 && qAbs(distX) > 5) {
-            setTouchState(TouchState::TouchNormal);
-            return;
         }
-    } else if (m_touchState == TouchState::TouchDraging) {
+        break;
+    //如果正在拖拽
+    case TouchState::TouchDraging:
         if (!m_isDraging)
             handleDragEvent();
-        return;
-    } else if (m_touchState == TouchState::TouchMoving) {
-        if (qAbs(distY) > 5)
+        break;
+    //如果正在滑动
+    case TouchState::TouchMoving:
+        if (!viewport()->visibleRegion().contains(event->pos())) {
+            setTouchState(TouchState::TouchNormal);
+        } else if (qAbs(distY) > 5) {
             handleTouchSlideEvent(timeParam, distY, event->pos());
+        }
+        break;
+    default:
+        break;
     }
 }
 
