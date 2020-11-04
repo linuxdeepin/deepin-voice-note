@@ -16,30 +16,27 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ut_vnotedbmanager.h"
+#include "ut_folderselectdialog.h"
+
+#include "folderselectdialog.h"
 
 #define protected public
-#include "vnotedbmanager.h"
+#define private public
+#include "leftview.h"
+#include "leftviewdelegate.h"
+#include "leftviewsortfilter.h"
 #undef protected
+#undef private
 
-#include "vnotefolderoper.h"
-#include "vnoteforlder.h"
-#include "vnoteitemoper.h"
-#include "vnoteitem.h"
-
-ut_vnotedbmanager_test::ut_vnotedbmanager_test()
+ut_folderselectdialog_test::ut_folderselectdialog_test()
 {
 
 }
 
-TEST_F(ut_vnotedbmanager_test, initVNoteDb)
+TEST_F(ut_folderselectdialog_test, setNoteContext)
 {
-    VNoteDbManager vnotedbmanager;
-    vnotedbmanager.initVNoteDb();
-}
-
-TEST_F(ut_vnotedbmanager_test, getVNoteDb)
-{
-    VNoteDbManager vnotedbmanager;
-    vnotedbmanager.getVNoteDb();
+    LeftView leftview;
+    FolderSelectDialog folderselectdialog(leftview.m_pDataModel);
+    folderselectdialog.setNoteContext("test");
+    folderselectdialog.getSelectIndex();
 }

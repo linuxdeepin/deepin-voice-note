@@ -24,12 +24,11 @@ DWIDGET_USE_NAMESPACE
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+//    QApplication app(argc, argv);
 
     testing::InitGoogleTest();
 
-//    DApplication::loadDXcbPlugin();
-//    VNoteApplication app(argc, argv);
+    VNoteApplication app(argc, argv);
 //    app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 //    app.loadTranslator();
 //    app.setOrganizationName("deepin");
@@ -54,11 +53,11 @@ int main(int argc, char *argv[])
 //    DLogManager::registerFileAppender();
 
 //    app.activateWindow();
-//    qint64 tem = 1;
-//    QStringList tmplist;
-//    app.onNewProcessInstance(tem, tmplist);
+    qint64 tem = 1;
+    QStringList tmplist;
+    app.onNewProcessInstance(tem, tmplist);
 
-//    VNoteMainWindow* tmpptr = app.mainWindow();
+    VNoteMainWindow* tmpptr = app.mainWindow();
 
 //    int ret = RUN_ALL_TESTS();
 

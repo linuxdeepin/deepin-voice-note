@@ -21,11 +21,14 @@
 #define protected public
 #define private public
 #include "leftview.h"
+#include "leftviewdelegate.h"
+#include "leftviewsortfilter.h"
 #undef protected
 #undef private
 
-#include "leftviewdelegate.h"
 #include "vnoteforlder.h"
+
+#include <QLineEdit>
 
 ut_leftview_test::ut_leftview_test()
 {
@@ -64,7 +67,6 @@ TEST_F(ut_leftview_test, keyPressEvent)
     QKeyEvent* event1 = new QKeyEvent(QEvent::KeyPress, 0x01000001, Qt::NoModifier, "test");
     leftview.keyPressEvent(event1);
 }
-
 
 TEST_F(ut_leftview_test, restoreNotepadItem)
 {
@@ -116,4 +118,37 @@ TEST_F(ut_leftview_test, closeEditor)
     LeftView leftview;
     QWidget* editor = new QWidget;
     leftview.closeEditor(editor, QAbstractItemDelegate::NoHint);
+}
+
+TEST_F(ut_leftview_test, doNoteMove)
+{
+    LeftView leftview;
+    QModelIndexList indexList;
+    QModelIndex index = leftview.currentIndex();
+    leftview.doDragMove(index, index);
+    leftview.doNoteMove(indexList, index);
+    leftview.selectMoveFolder(indexList);
+    leftview.getFolderSort();
+    leftview.setFolderSort();
+    leftview.needFolderSort();
+}
+
+TEST_F(ut_leftview_test, setDrawNotesNum)
+{
+    LeftView leftview;
+    QLineEdit *lineedit = new QLineEdit();
+    lineedit->setText("test2agrrserfgargafgasrfgargargarsgarefgaehbsrtbhaerfgaertfaerfgaerfarfarfa3qw4taerarfa");
+
+    leftview.m_pItemDelegate->setDrawNotesNum(false);
+    leftview.m_pItemDelegate->setDragState(false);
+    leftview.m_pItemDelegate->setDrawHover(false);
+    leftview.m_pItemDelegate->setModelData(lineedit, leftview.m_pDataModel, leftview.currentIndex());
+}
+
+TEST_F(ut_leftview_test, lessThan)
+{
+    LeftView leftview;
+    QModelIndex sorce;
+    QModelIndex target;
+    leftview.m_pSortViewFilter->lessThan(sorce, target);
 }

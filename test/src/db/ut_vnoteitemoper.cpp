@@ -17,6 +17,15 @@
 */
 
 #include "ut_vnoteitemoper.h"
+#define protected public
+#define private public
+#include "vnotedbmanager.h"
+#include "vnotedatamanager.h"
+#undef protected
+#undef private
+
+#include "vnotefolderoper.h"
+#include "vnoteforlder.h"
 #include "vnoteitemoper.h"
 #include "vnoteitem.h"
 
@@ -52,15 +61,31 @@ TEST_F(ut_vnoteitemoper_test, updateNote)
 
 TEST_F(ut_vnoteitemoper_test, addNote)
 {
-//    VNoteItemOper noteOper;
-//    VNoteItem noteitem;
-//    noteitem.folderId = 1;
-//    noteitem.noteType = VNoteItem::VNT_Text;
-//    VNoteBlock *ptrBlock = noteitem.newBlock(VNoteBlock::Text);
-//    noteitem.addBlock(ptrBlock);
-//    noteitem.noteTitle = noteOper.getDefaultNoteName(noteitem.folderId);
+    VNoteDbManager vnotedbmanager;
+    vnotedbmanager.initVNoteDb(false);
+    VNoteFolder folder;
+    folder.id = 2;
+    folder.notesCount = 1;
+    folder.name = "test";
+    VNoteFolderOper vnotefolderoper(&folder);
+    vnotefolderoper.loadVNoteFolders();
 
-//    m_vnoteitemoper->addNote(noteitem);
+    VNoteItem tmpNote;
+    tmpNote.folderId = 2;
+    tmpNote.noteType = VNoteItem::VNT_Text;
+    VNoteBlock *ptrBlock1 = tmpNote.newBlock(VNoteBlock::Text);
+    tmpNote.addBlock(ptrBlock1);
+    VNoteItemOper noteOper(&tmpNote);
+    tmpNote.noteTitle = noteOper.getDefaultNoteName(tmpNote.folderId);
+
+    vnotefolderoper.getDefaultFolderName();
+    vnotefolderoper.addFolder(folder);
+    noteOper.addNote(tmpNote);
+    noteOper.updateTop(1);
+    noteOper.updateFolderId(&tmpNote);
+    noteOper.updateNote();
+    noteOper.deleteNote();
+    noteOper.modifyNoteTitle("test");
 }
 
 TEST_F(ut_vnoteitemoper_test, getDefaultVoiceName)

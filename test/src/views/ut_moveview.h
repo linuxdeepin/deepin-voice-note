@@ -15,31 +15,17 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef UT_MOVEVIEW_H
+#define UT_MOVEVIEW_H
 
-#include "ut_vnotedbmanager.h"
+#include "gtest/gtest.h"
+#include <QObject>
 
-#define protected public
-#include "vnotedbmanager.h"
-#undef protected
-
-#include "vnotefolderoper.h"
-#include "vnoteforlder.h"
-#include "vnoteitemoper.h"
-#include "vnoteitem.h"
-
-ut_vnotedbmanager_test::ut_vnotedbmanager_test()
+class ut_MoveView_test : public QObject, public::testing::Test
 {
+    Q_OBJECT
+public:
+    ut_MoveView_test();
+};
 
-}
-
-TEST_F(ut_vnotedbmanager_test, initVNoteDb)
-{
-    VNoteDbManager vnotedbmanager;
-    vnotedbmanager.initVNoteDb();
-}
-
-TEST_F(ut_vnotedbmanager_test, getVNoteDb)
-{
-    VNoteDbManager vnotedbmanager;
-    vnotedbmanager.getVNoteDb();
-}
+#endif // UT_MOVEVIEW_H

@@ -16,30 +16,20 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ut_vnotedbmanager.h"
+#include "ut_vnwaveform.h"
 
-#define protected public
-#include "vnotedbmanager.h"
-#undef protected
+#include "vnwaveform.h"
 
-#include "vnotefolderoper.h"
-#include "vnoteforlder.h"
-#include "vnoteitemoper.h"
-#include "vnoteitem.h"
-
-ut_vnotedbmanager_test::ut_vnotedbmanager_test()
+ut_vnwaveform_test::ut_vnwaveform_test()
 {
 
 }
 
-TEST_F(ut_vnotedbmanager_test, initVNoteDb)
-{
-    VNoteDbManager vnotedbmanager;
-    vnotedbmanager.initVNoteDb();
-}
 
-TEST_F(ut_vnotedbmanager_test, getVNoteDb)
+TEST_F(ut_vnwaveform_test, onAudioBufferProbed)
 {
-    VNoteDbManager vnotedbmanager;
-    vnotedbmanager.getVNoteDb();
+    VNWaveform vnwaveform;
+    QAudioBuffer buffer;
+    buffer.format().setSampleSize(16);
+    vnwaveform.onAudioBufferProbed(buffer);
 }

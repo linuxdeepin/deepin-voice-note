@@ -21,10 +21,10 @@
 #define protected public
 #define private public
 #include "middleview.h"
+#include "middleviewdelegate.h"
 #undef protected
 #undef private
 
-#include "middleviewdelegate.h"
 #include "vnoteitem.h"
 
 ut_middleview_test::ut_middleview_test()
