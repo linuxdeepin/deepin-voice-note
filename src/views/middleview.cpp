@@ -343,24 +343,16 @@ void MiddleView::mouseDoubleClickEvent(QMouseEvent *event)
 void MiddleView::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton) {
-        VNoteItem *noteData = getCurrVNotedata();
-        if(noteData){
-            if(m_MoveView == nullptr){
-                m_MoveView = new MoveView(this);
+        if(!m_onlyCurItemMenuEnable){
+            OpsStateInterface *stateInterface = OpsStateInterface::instance();
+            if(!stateInterface->isSearching()){
+                QModelIndex index = currentIndex();
+                if(index.isValid() && index == indexAt(event->pos())){
+                    triggerDragNote();
+                }
             }
-            m_MoveView->setNote(noteData);
-            QPixmap pixmap = m_MoveView->grab();
-            QDrag *drag = new QDrag(this);
-            QMimeData *mimeData = new QMimeData;
-            drag->setMimeData(mimeData);
-            drag->setPixmap(pixmap);
-            drag->setHotSpot(QPoint(pixmap.width() / 2, pixmap.height() / 2));
-            drag->exec(Qt::MoveAction);
-            drag->deleteLater();
-            emit sigDragEnd();
         }
     }
-
 }
 
 /**
@@ -507,3 +499,22 @@ void MiddleView::deleteModelIndexs(const QModelIndexList &indexs)
     }
 }
 
+void MiddleView::triggerDragNote()
+{
+    VNoteItem *noteData = getCurrVNotedata();
+     if(noteData){
+         if(m_MoveView == nullptr){
+             m_MoveView = new MoveView(this);
+         }
+         m_MoveView->setNote(noteData);
+         QPixmap pixmap = m_MoveView->grab();
+         QDrag *drag = new QDrag(this);
+         QMimeData *mimeData = new QMimeData;
+         drag->setMimeData(mimeData);
+         drag->setPixmap(pixmap);
+         drag->setHotSpot(QPoint(pixmap.width() / 2, pixmap.height() / 2));
+         drag->exec(Qt::MoveAction);
+         drag->deleteLater();
+         emit sigDragEnd();
+     }
+}

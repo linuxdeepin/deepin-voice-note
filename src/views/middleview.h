@@ -111,6 +111,8 @@ private:
     void initMenu();
     //初始化UI布局
     void initUI();
+    //触发拖动操作
+    void triggerDragNote();
 
     bool m_onlyCurItemMenuEnable {false};
     qint64 m_currentId {-1};
