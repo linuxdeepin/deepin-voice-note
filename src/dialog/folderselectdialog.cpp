@@ -31,48 +31,74 @@
 #include <DApplicationHelper>
 
 FolderSelectView::FolderSelectView(QWidget *parent)
-    :DTreeView (parent)
+    : DTreeView(parent)
 {
 
 }
 
 void FolderSelectView::mousePressEvent(QMouseEvent *event)
 {
-    if(event->source() == Qt::MouseEventSynthesizedByQt){
-        m_pressPos = event->pos();
-        m_pressTime = QDateTime::currentDateTime();
+    if (event->source() == Qt::MouseEventSynthesizedByQt) {
+        m_touchPressPointY = event->pos().y();
+        m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
+        return;
     }
     DTreeView::mousePressEvent(event);
+}
+
+void FolderSelectView::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->source() == Qt::MouseEventSynthesizedByQt) {
+        if (m_isTouchSliding)
+            m_isTouchSliding = false;
+        else {
+            if (indexAt(event->pos()).isValid())
+                setCurrentIndex(indexAt(event->pos()));
+        }
+        return;
+    }
+    return DTreeView::mouseReleaseEvent(event);
 }
 
 void FolderSelectView::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
-        QDateTime current = QDateTime::currentDateTime();
-        qint64 timeNow = current.toMSecsSinceEpoch();
-        qint64 timerDis = timeNow - m_pressTime.toMSecsSinceEpoch();
-        if( timerDis < 250){
-            double dist = event->pos().y() - m_pressPos.y();
-            if (qAbs(dist) > 10) {
-                //计算滑动速度
-                double speed = ((qAbs(dist)) / timerDis) + 0.5;
-                verticalScrollBar()->setSingleStep(static_cast<int>(20 * speed));
-                if (dist > 0)
-                    verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepSub);
-                else {
-                    verticalScrollBar()->triggerAction(QScrollBar::SliderSingleStepAdd);
-                }
-                m_pressTime = current;
-                m_pressPos = event->pos();
-            }
-            return;
-        }
+        return doTouchMoveEvent(event);
     }
     DTreeView::mouseMoveEvent(event);
 }
 
-FolderSelectDialog::FolderSelectDialog(QStandardItemModel *model,QWidget *parent)
-    :DAbstractDialog(parent)
+void FolderSelectView::doTouchMoveEvent(QMouseEvent *event)
+{
+    //处理触摸屏单指滑动事件
+    double distY = event->pos().y() - m_touchPressPointY;
+    qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    qint64 timeInterval = currentTime - m_touchPressStartMs;
+    //上下移动距离超过10px
+    if (m_isTouchSliding) {
+        if (qAbs(distY) > 5)
+            handleTouchSlideEvent(timeInterval, distY, event->pos());
+    } else {
+        if (qAbs(distY) > 10) {
+            m_isTouchSliding = true;
+            handleTouchSlideEvent(timeInterval, distY, event->pos());
+        }
+    }
+}
+
+void FolderSelectView::handleTouchSlideEvent(qint64 timeInterval, double distY, QPoint point)
+{
+    if (timeInterval == 0)
+        return;
+    double param = ((qAbs(distY)) / timeInterval) + 0.3;
+    verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
+    verticalScrollBar()->triggerAction((distY > 0) ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
+    m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    m_touchPressPointY = point.y();
+}
+
+FolderSelectDialog::FolderSelectDialog(QStandardItemModel *model, QWidget *parent)
+    : DAbstractDialog(parent)
 {
 
     m_model = new LeftViewSortFilter(this);
@@ -100,7 +126,7 @@ void FolderSelectDialog::initUI()
     m_view->setIndentation(0);
     m_view->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_view->installEventFilter(this);
-    QModelIndex notepadRootIndex = m_model->index(0,0);
+    QModelIndex notepadRootIndex = m_model->index(0, 0);
     m_view->expand(notepadRootIndex);
 
     m_closeButton = new DWindowCloseButton(this);
@@ -114,7 +140,7 @@ void FolderSelectDialog::initUI()
     titleLayout->setSpacing(0);
     titleLayout->setContentsMargins(10, 0, 0, 0);
     titleLayout->addStretch();
-    titleLayout->addWidget(labMove,0, Qt::AlignCenter | Qt::AlignVCenter);
+    titleLayout->addWidget(labMove, 0, Qt::AlignCenter | Qt::AlignVCenter);
     titleLayout->addStretch();
     titleLayout->addWidget(m_closeButton, 0, Qt::AlignRight | Qt::AlignVCenter);
 
@@ -157,11 +183,11 @@ void FolderSelectDialog::initUI()
 
 void FolderSelectDialog::initConnections()
 {
-    connect(m_cancelBtn, &DPushButton::clicked, this, [=]() {
+    connect(m_cancelBtn, &DPushButton::clicked, this, [ = ]() {
         this->reject();
     });
 
-    connect(m_confirmBtn, &DPushButton::clicked, this, [=]() {
+    connect(m_confirmBtn, &DPushButton::clicked, this, [ = ]() {
         this->accept();
     });
 
@@ -187,7 +213,7 @@ QModelIndex FolderSelectDialog::getSelectIndex()
     return  index;
 }
 
-void FolderSelectDialog::setFolderBlack(const QList<VNoteFolder* > &folders)
+void FolderSelectDialog::setFolderBlack(const QList<VNoteFolder * > &folders)
 {
     m_model->setBlackFolders(folders);
 }

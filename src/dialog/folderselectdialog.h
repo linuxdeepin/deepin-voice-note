@@ -50,18 +50,26 @@ public:
     void mouseMoveEvent(QMouseEvent *event) override;
     //单击
     void mousePressEvent(QMouseEvent *event) override;
+    //释放
+    void mouseReleaseEvent(QMouseEvent *event) override;
+protected:
+    //处理触摸屏鼠标滑动
+    void doTouchMoveEvent(QMouseEvent *eve);
+    //
+    void handleTouchSlideEvent(qint64 timeInterval, double distY, QPoint point);
 private:
-    QDateTime m_pressTime;
-    QPoint m_pressPos;
+    bool m_isTouchSliding {false};
+    qint64 m_touchPressStartMs = 0;
+    int m_touchPressPointY = 0;
 };
 
 class FolderSelectDialog : public DAbstractDialog
 {
-     Q_OBJECT
+    Q_OBJECT
 public:
     explicit FolderSelectDialog(QStandardItemModel *model, QWidget *parent = nullptr);
     void setNoteContext(const QString &text);
-    void setFolderBlack(const QList<VNoteFolder *>& folders);
+    void setFolderBlack(const QList<VNoteFolder *> &folders);
     void clearSelection();
     QModelIndex getSelectIndex();
     void onVNoteFolderSelectChange(const QItemSelection &selected, const QItemSelection &deselected);
