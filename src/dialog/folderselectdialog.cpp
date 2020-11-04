@@ -128,6 +128,7 @@ void FolderSelectDialog::initUI()
     m_view->installEventFilter(this);
     QModelIndex notepadRootIndex = m_model->index(0, 0);
     m_view->expand(notepadRootIndex);
+    m_view->setFrameShape(DTreeView::NoFrame);
 
     m_closeButton = new DWindowCloseButton(this);
     m_closeButton->setFocusPolicy(Qt::NoFocus);
@@ -148,7 +149,7 @@ void FolderSelectDialog::initUI()
     m_noteInfo->setForegroundRole(DPalette::TextTips);
     DFontSizeManager::instance()->bind(m_noteInfo, DFontSizeManager::T6);
     QHBoxLayout *actionBarLayout = new QHBoxLayout();
-    actionBarLayout->setSpacing(10);
+    actionBarLayout->setSpacing(5);
     actionBarLayout->setContentsMargins(0, 0, 0, 0);
 
     m_cancelBtn = new DPushButton(this);
@@ -172,10 +173,16 @@ void FolderSelectDialog::initUI()
     // actionBarLayout->addSpacing(8);
     actionBarLayout->addWidget(m_confirmBtn);
 
+    DFrame *viewFrame = new DFrame(this);
+    QHBoxLayout *viewFrameLayout = new QHBoxLayout();
+    viewFrameLayout->setContentsMargins(5, 5, 0, 5);
+    viewFrameLayout->addWidget(m_view);
+    viewFrame->setLayout(viewFrameLayout);
+
     mainLayout->addLayout(titleLayout);
     mainLayout->addWidget(m_noteInfo, 0, Qt::AlignCenter | Qt::AlignVCenter);
     mainLayout->addSpacing(10);
-    mainLayout->addWidget(m_view, 1);
+    mainLayout->addWidget(viewFrame, 1);
     mainLayout->addSpacing(10);
     mainLayout->addLayout(actionBarLayout);
     this->setLayout(mainLayout);
