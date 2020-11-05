@@ -100,20 +100,18 @@ void FolderSelectView::handleTouchSlideEvent(qint64 timeInterval, double distY, 
 FolderSelectDialog::FolderSelectDialog(QStandardItemModel *model, QWidget *parent)
     : DAbstractDialog(parent)
 {
-
     m_model = new LeftViewSortFilter(this);
     m_model->setSourceModel(model);
     initUI();
     initConnections();
     m_model->sort(0, Qt::DescendingOrder);
-
 }
 
 void FolderSelectDialog::initUI()
 {
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(10, 0, 10, 10);
+    mainLayout->setContentsMargins(10, 0, 0, 10);
     m_view = new FolderSelectView(this);
     DStyle::setFrameRadius(m_view, 20);
     m_view->setModel(m_model);
@@ -168,10 +166,9 @@ void FolderSelectDialog::initUI()
     m_buttonSpliter->setFixedSize(4, 28);
 
     actionBarLayout->addWidget(m_cancelBtn);
-    //actionBarLayout->addSpacing(8);
     actionBarLayout->addWidget(m_buttonSpliter);
-    // actionBarLayout->addSpacing(8);
     actionBarLayout->addWidget(m_confirmBtn);
+    actionBarLayout->addSpacing(10);
 
     DFrame *viewFrame = new DFrame(this);
     QHBoxLayout *viewFrameLayout = new QHBoxLayout();
