@@ -46,12 +46,14 @@ class FolderSelectView : public DTreeView
     Q_OBJECT
 public:
     explicit FolderSelectView(QWidget *parent = nullptr);
-    //移动
+    //鼠标move
     void mouseMoveEvent(QMouseEvent *event) override;
-    //单击
+    //鼠标press
     void mousePressEvent(QMouseEvent *event) override;
-    //释放
+    //鼠标release
     void mouseReleaseEvent(QMouseEvent *event) override;
+    //键盘press
+    void keyPressEvent(QKeyEvent *event) override;
 protected:
     //处理触摸屏鼠标滑动
     void doTouchMoveEvent(QMouseEvent *eve);

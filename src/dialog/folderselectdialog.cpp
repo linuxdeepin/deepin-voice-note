@@ -38,12 +38,16 @@ FolderSelectView::FolderSelectView(QWidget *parent)
 
 void FolderSelectView::mousePressEvent(QMouseEvent *event)
 {
+    //此页面只需单击选中功能，此处屏蔽辅助功能键
+    event->setModifiers(Qt::NoModifier);
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
         m_touchPressPointY = event->pos().y();
         m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
         return;
     }
-    DTreeView::mousePressEvent(event);
+    //如果选择位置为空，不继续执行，避免取消当前选中
+    if (indexAt(event->pos()).isValid())
+        DTreeView::mousePressEvent(event);
 }
 
 void FolderSelectView::mouseReleaseEvent(QMouseEvent *event)
@@ -60,8 +64,20 @@ void FolderSelectView::mouseReleaseEvent(QMouseEvent *event)
     return DTreeView::mouseReleaseEvent(event);
 }
 
+void FolderSelectView::keyPressEvent(QKeyEvent *event)
+{
+    //QAbstractItemView底层问题，索引0按上键会取消选中效果，通过keypress屏蔽
+    if (event->key() == Qt::Key_Up && currentIndex().row() == 0){
+        event->ignore();
+    } else {
+        DTreeView::keyPressEvent(event);
+    }
+}
+
 void FolderSelectView::mouseMoveEvent(QMouseEvent *event)
 {
+    //此处解决选择闪烁问题
+    event->setModifiers(Qt::NoModifier);
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
         return doTouchMoveEvent(event);
     }
