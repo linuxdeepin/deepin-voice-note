@@ -132,7 +132,7 @@ private:
     //以下为实现触摸屏功能声明参数
     bool m_isTouchSliding {false};
     qint64 m_touchPressStartMs = 0;
-    int m_touchPressPointY = 0;
+    QPoint m_touchPressPoint;
 };
 
 #endif // MIDDLEVIEW_H

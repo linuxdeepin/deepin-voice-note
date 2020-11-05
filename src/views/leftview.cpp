@@ -122,7 +122,7 @@ void LeftView::mousePressEvent(QMouseEvent *event)
     this->setFocus();
 
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
-        m_touchPressPointY = event->pos().y();
+        m_touchPressPoint = event->pos();
         m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
     }
 
@@ -175,10 +175,10 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
     if (event->buttons() & Qt::LeftButton) {
         if (!m_onlyCurItemMenuEnable) {
             if (event->source() == Qt::MouseEventSynthesizedByQt) {
-                double distY = event->pos().y() - m_touchPressPointY;
+                double distY = event->pos().y() - m_touchPressPoint.y();
+                double distX = event->pos().x() - m_touchPressPoint.x();
                 qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
                 qint64 timeInterval = currentTime - m_touchPressStartMs;
-                //上下移动距离超过10px
                 if (m_isTouchSliding) {
                     if (qAbs(distY) > 5)
                         handleTouchSlideEvent(timeInterval, distY, event->pos());
@@ -188,6 +188,8 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
                         if (qAbs(distY) > 10) {
                             m_isTouchSliding = true;
                             handleTouchSlideEvent(timeInterval, distY, event->pos());
+                        } else if (qAbs(distX) > 5) {
+                            m_isTouchSliding = true;
                         }
                         return;
                     }
@@ -494,7 +496,7 @@ void LeftView::handleTouchSlideEvent(qint64 timeParam, double distY, QPoint poin
     verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
     verticalScrollBar()->triggerAction((distY > 0) ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
     m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    m_touchPressPointY = point.y();
+    m_touchPressPoint = point;
 }
 
 void LeftView::startDrag(Qt::DropActions supportedActions)
