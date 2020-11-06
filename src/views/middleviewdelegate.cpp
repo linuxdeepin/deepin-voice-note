@@ -455,7 +455,7 @@ void MiddleViewDelegate::paintNormalItem(QPainter *painter, const QStyleOptionVi
 
     if (lineRect.isValid()) {
         //绘制分割线
-        painter->fillRect(lineRect, m_parentPb.color(DPalette::Normal, DPalette::FrameShadowBorder));
+        painter->fillRect(lineRect, m_parentPb.color(DPalette::Normal, DPalette::FrameBorder));
 
     }
 
