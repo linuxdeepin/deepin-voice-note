@@ -263,6 +263,7 @@ void LeftView::addFolder(VNoteFolder *folder)
         QModelIndex index = m_pSortViewFilter->mapFromSource(pItem->index());
         setCurrentIndex(index);
     }
+    this->scrollToTop();
 }
 
 /**
