@@ -80,6 +80,9 @@
 //Enable/Disable import old data
 #define IMPORT_OLD_VERSION_DATA
 
+#define NOTES_DRAG_KEY "notes_drag"
+#define NOTEPAD_DRAG_KEY "notepad_drag"
+
 #include <sys/time.h>
 #include <QtMath>
 #define TM(s, e) ( \

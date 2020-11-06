@@ -514,6 +514,12 @@ void LeftView::startDrag(Qt::DropActions supportedActions)
 
 void LeftView::dragEnterEvent(QDragEnterEvent *event)
 {
+    if(!event->mimeData()->hasFormat(NOTES_DRAG_KEY)
+            && !event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)){
+        event->ignore();
+        return DTreeView::dragEnterEvent(event);
+    }
+
     if (m_folderDraing) {
         m_pItemDelegate->setDragState(true);
         this->update();
@@ -592,7 +598,7 @@ void LeftView::triggerDragFolder()
     if (folder) {
         QDrag *drag = new QDrag(this);
         QMimeData *mimeData = new QMimeData;
-
+        mimeData->setData(NOTEPAD_DRAG_KEY, QByteArray());
         if (m_MoveView == nullptr) {
             m_MoveView = new MoveView(this);
         }
@@ -602,9 +608,18 @@ void LeftView::triggerDragFolder()
         m_folderDraing = true;
         drag->exec(Qt::MoveAction);
         drag->deleteLater();
-        doDragMove(currentIndex(), indexAt(mapFromGlobal(QCursor::pos())));
         m_folderDraing = false;
         m_pItemDelegate->setDragState(false);
         m_pItemDelegate->setDrawHover(true);
+    }
+}
+
+
+void LeftView::dropEvent(QDropEvent * event)
+{
+    if(event->mimeData()->hasFormat(NOTES_DRAG_KEY)){
+        emit dropNotesEnd();
+    } else if (event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)) {
+        doDragMove(currentIndex(), indexAt(mapFromGlobal(QCursor::pos())));
     }
 }

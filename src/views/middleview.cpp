@@ -549,12 +549,12 @@ void MiddleView::triggerDragNote()
         QPixmap pixmap = m_MoveView->grab();
         QDrag *drag = new QDrag(this);
         QMimeData *mimeData = new QMimeData;
+        mimeData->setData(NOTES_DRAG_KEY, QByteArray());
         drag->setMimeData(mimeData);
         drag->setPixmap(pixmap);
         drag->setHotSpot(QPoint(pixmap.width() / 2, pixmap.height() / 2));
         drag->exec(Qt::MoveAction);
         drag->deleteLater();
-        emit sigDragEnd();
     }
 }
 

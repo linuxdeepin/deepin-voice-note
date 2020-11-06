@@ -76,7 +76,7 @@ public:
     void handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point);
 
 signals:
-
+    void dropNotesEnd();
 protected:
     //鼠标事件
     //单击
@@ -95,6 +95,7 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragMoveEvent(QDragMoveEvent *event) override;
     void dragLeaveEvent(QDragLeaveEvent *event) override;
+    void dropEvent (QDropEvent * event ) override;
     void startDrag(Qt::DropActions supportedActions) override;
 
 

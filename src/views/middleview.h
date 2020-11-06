@@ -81,8 +81,6 @@ public:
     void deleteModelIndexs(const QModelIndexList &indexs);
     //处理触摸屏slide事件
     void handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point);
-signals:
-    void sigDragEnd();
 
 public slots:
     //更新记事项
