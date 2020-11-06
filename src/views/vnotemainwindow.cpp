@@ -520,7 +520,7 @@ void VNoteMainWindow::initLeftView()
 
     QVBoxLayout *leftHolderLayout = new QVBoxLayout();
     leftHolderLayout->setSpacing(0);
-    leftHolderLayout->setContentsMargins(0, 5, 0, 0);
+    leftHolderLayout->setContentsMargins(0, 0, 0, 0);
     m_leftView = new LeftView(m_leftViewHolder);
 
     //背景色透明，隐藏disable时的背景色
@@ -542,7 +542,7 @@ void VNoteMainWindow::initLeftView()
                                       m_leftViewHolder);
     QVBoxLayout *btnLayout = new QVBoxLayout();
     btnLayout->addWidget(m_addNotepadBtn);
-    btnLayout->setContentsMargins(10, 5, 10, 10);
+    btnLayout->setContentsMargins(10, 0, 10, 10);
     leftHolderLayout->addLayout(btnLayout, Qt::AlignHCenter);
     m_leftViewHolder->setLayout(leftHolderLayout);
 

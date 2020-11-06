@@ -37,6 +37,10 @@
  * @brief LeftViewDelegate::LeftViewDelegate
  * @param parent
  */
+//首个index高度参数
+static const int firstIndexHeightParam = 51;
+//尾个index高度参数
+static const int lastIndexHeightParam = 52;
 LeftViewDelegate::LeftViewDelegate(QAbstractItemView *parent)
     : DStyledItemDelegate(parent)
     , m_treeView(parent)
@@ -147,11 +151,22 @@ QSize LeftViewDelegate::sizeHint(const QStyleOptionViewItem &option,
                                  const QModelIndex &index) const
 {
     StandardItemCommon::StandardItemType type = StandardItemCommon::getStandardItemType(index);
+    QModelIndex nextIndex = index.siblingAtRow(index.row() + 1);
+    //初始高度
+    int height = 47;
     switch (type) {
     case StandardItemCommon::NOTEPADROOT:
         return QSize(option.rect.width(), 1); //隐藏记事本一级目录
     case StandardItemCommon::NOTEPADITEM:
-        return QSize(option.rect.width(), 47);
+        //第一行空间+4
+        if (index.row() == 0) {
+            height += 4;
+        }
+        //最后一行空间+5
+        else if (!nextIndex.isValid()) {
+            height += 5;
+        }
+        return QSize(option.rect.width(), height);
     default:
         return DStyledItemDelegate::sizeHint(option, index);
     }
@@ -206,8 +221,20 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing, true);
     painter->setRenderHints(QPainter::SmoothPixmapTransform);
-    QRect paintRect(option.rect.x() + 10, option.rect.y() + 5,
-                    option.rect.width() - 20, option.rect.height() - 10);
+    //绘制区域
+    QRect paintRect;
+    if ( firstIndexHeightParam == option.rect.height() ) {
+        paintRect = QRect(option.rect.x() + 10, option.rect.y() + 10,
+                          option.rect.width() - 20, option.rect.height() - 14);
+    } else if  (lastIndexHeightParam == option.rect.height()) {
+        paintRect = QRect(option.rect.x() + 10, option.rect.y() + 5,
+                          option.rect.width() - 20, option.rect.height() - 14);
+    } else {
+        paintRect = QRect(option.rect.x() + 10, option.rect.y() + 5,
+                          option.rect.width() - 20, option.rect.height() - 10);
+    }
+    int param =  (option.rect.height() == 51) ?  5 : 0;
+    param = (option.rect.height() == 52 ) ? 4 : param;
     QPainterPath path;
     const int radius = 8;
     path.moveTo(paintRect.bottomRight() - QPoint(0, radius));
@@ -241,17 +268,17 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
                     QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
                     painter->setBrush(QBrush(fillColor));
                     if(dstIndex.row() > srcIndex.row()){
-                        QRect rc(option.rect.x() + 12, option.rect.y() + option.rect.height() - 1 , 5, 5);
+                        QRect rc(option.rect.x() + 12, option.rect.y() + option.rect.height() - param - 2, 5, 5);
                         paintTriangle(painter,rc, painter->brush(), true);
-                        painter->fillRect(QRect(option.rect.x() + 15, option.rect.y() + option.rect.height(), paintRect.width() - 10, 2), painter->brush());
-                        rc = QRect(option.rect.right() - 15, option.rect.y() + option.rect.height() - 1 , 5, 5);
+                        painter->fillRect(QRect(option.rect.x() + 15, option.rect.y() - 1 + option.rect.height() - param, paintRect.width() - 10, 2), painter->brush());
+                        rc = QRect(option.rect.right() - 15, option.rect.y() + option.rect.height() - param -2, 5, 5);
                         paintTriangle(painter,rc, painter->brush(), false);
                     }else {
-                        QRect rc(option.rect.x() + 12, option.rect.y() - 1 , 5, 5);
+                        QRect rc(option.rect.x() + 12, option.rect.y() + param - 2, 5, 5);
                         paintTriangle(painter,rc, painter->brush(), true);
                         //调整横线长度
-                        painter->fillRect(QRect(option.rect.x()+ 15, option.rect.y(), paintRect.width() - 10 , 2), painter->brush());
-                        rc = QRect(option.rect.right() - 15, option.rect.y() - 1 , 5, 5);
+                        painter->fillRect(QRect(option.rect.x()+ 15, option.rect.y() + param -1, paintRect.width() - 10 , 2), painter->brush());
+                        rc = QRect(option.rect.right() - 15, option.rect.y() + param - 2, 5, 5);
                         paintTriangle(painter,rc, painter->brush(), false);
                     }
                     painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
