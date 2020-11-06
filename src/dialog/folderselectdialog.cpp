@@ -127,9 +127,8 @@ void FolderSelectDialog::initUI()
 {
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(10, 0, 0, 10);
+    mainLayout->setContentsMargins(10, 0, 10, 10);
     m_view = new FolderSelectView(this);
-    DStyle::setFrameRadius(m_view, 20);
     m_view->setModel(m_model);
     m_view->setContextMenuPolicy(Qt::NoContextMenu);
     m_delegate = new LeftViewDelegate(m_view);
@@ -139,7 +138,6 @@ void FolderSelectDialog::initUI()
     m_view->setItemsExpandable(false);
     m_view->setIndentation(0);
     m_view->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    m_view->installEventFilter(this);
     QModelIndex notepadRootIndex = m_model->index(0, 0);
     m_view->expand(notepadRootIndex);
     m_view->setFrameShape(DTreeView::NoFrame);
@@ -184,7 +182,6 @@ void FolderSelectDialog::initUI()
     actionBarLayout->addWidget(m_cancelBtn);
     actionBarLayout->addWidget(m_buttonSpliter);
     actionBarLayout->addWidget(m_confirmBtn);
-    actionBarLayout->addSpacing(10);
 
     DFrame *viewFrame = new DFrame(this);
     QHBoxLayout *viewFrameLayout = new QHBoxLayout();
