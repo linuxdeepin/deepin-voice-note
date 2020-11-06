@@ -234,7 +234,22 @@ QSize MiddleViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QMo
     Q_UNUSED(index);
     if (m_searchKey.isEmpty()) {
         VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
-        return data->isTop ? QSize(option.rect.width(), 108) : QSize(option.rect.width(), 74);
+        QModelIndex nextIndex = index.siblingAtRow(index.row() + 1);
+        VNoteItem *nextData = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(nextIndex));
+        int height = 74;
+        if (data->isTop) { //需要置顶
+            if (index.row() == 0) {
+                height += 25; //置顶第一项留出绘制置顶图标位置
+            }
+            if (nextData) {
+                if (!nextData->isTop) {
+                    height += 10; //下一个笔记没有置顶留出绘制置顶分割线位置
+                }
+            } else {
+                height += 10; //没有下个笔记留出绘制置顶分割线位置
+            }
+        }
+        return QSize(option.rect.width(), height);
     } else {
         return QSize(option.rect.width(), 102);
     }
@@ -398,24 +413,57 @@ void MiddleViewDelegate::paintNormalItem(QPainter *painter, const QStyleOptionVi
     if (!data) {
         return;
     }
-    if(data->isTop){
-        return paintTopItem(painter, option, index, data);
+
+    QRect lineRect;
+    QRect topInfoRect;
+    QRect itemBaseRect;
+
+    int height = option.rect.height();
+    if (height == 99 || height == 109) {
+        topInfoRect = QRect(QRect(option.rect.x() + 10, option.rect.y(), option.rect.width() - 20, 30));
+        itemBaseRect = QRect(QRect(option.rect.x() + 10, option.rect.y() + 30, option.rect.width() - 20, 64));
+        if (height == 109) {
+            lineRect = QRect(QRect(option.rect.x() + 10, option.rect.y() + 102, option.rect.width() - 20, 2));
+        }
+    } else if (height == 84) {
+        itemBaseRect = QRect(option.rect.x() + 10, option.rect.y() + 5,
+                             option.rect.width() - 20, option.rect.height() - 20);
+        lineRect = QRect(QRect(option.rect.x() + 10, option.rect.y() + 78, option.rect.width() - 20, 2));
+
+    } else {
+        itemBaseRect = QRect(option.rect.x() + 10, option.rect.y() + 5,
+                             option.rect.width() - 20, option.rect.height() - 10);
     }
+
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing, true);
     painter->setRenderHints(QPainter::SmoothPixmapTransform);
-    QRect paintRect(option.rect.x() + 10, option.rect.y() + 5,
-                    option.rect.width() - 20, option.rect.height() - 10);
+
+    if (topInfoRect.isValid()) {
+        //绘制置顶信息
+        painter->drawPixmap(QRect(topInfoRect.x(), topInfoRect.y() + 10, 10, 10), m_topIcon);
+        topInfoRect.setX(topInfoRect.x() + 15);
+        painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
+        painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
+        painter->drawText(topInfoRect, Qt::AlignLeft | Qt::AlignVCenter, "已置顶");
+    }
+
+    if (lineRect.isValid()) {
+        //绘制分割线
+        painter->fillRect(lineRect, m_parentPb.color(DPalette::Normal, DPalette::FrameShadowBorder));
+
+    }
+
     bool isSelect = false;
-    paintItemBase(painter, option, paintRect, isSelect);
+    paintItemBase(painter, option, itemBaseRect, isSelect);
 
     if (isSelect == false || m_editVisible == false) {
         painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T6));
         QFontMetrics fontMetrics = painter->fontMetrics();
-        int space = (paintRect.height() - fontMetrics.height() * 2) / 2 + paintRect.top();
-        QRect nameRect(paintRect.left() + 20, space, paintRect.width() - 40, fontMetrics.height());
+        int space = (itemBaseRect.height() - fontMetrics.height() * 2) / 2 + itemBaseRect.top();
+        QRect nameRect(itemBaseRect.left() + 20, space, itemBaseRect.width() - 40, fontMetrics.height());
         space += fontMetrics.height();
-        QRect timeRect(paintRect.left() + 20, space, paintRect.width() - 40, fontMetrics.height());
+        QRect timeRect(itemBaseRect.left() + 20, space, itemBaseRect.width() - 40, fontMetrics.height());
         QString elideText = fontMetrics.elidedText(data->noteTitle, Qt::ElideRight, nameRect.width());
         painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
         if (!isSelect) {
@@ -494,53 +542,4 @@ void MiddleViewDelegate::paintSearchItem(QPainter *painter, const QStyleOptionVi
         painter->drawText(folderNameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
     }
     painter->restore();
-}
-
-void MiddleViewDelegate::paintTopItem(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index, VNoteItem *data) const
-{
-    Q_UNUSED(index);
-    QPainterPath path;
-    painter->save();
-    painter->setRenderHint(QPainter::Antialiasing, true);
-    painter->setRenderHints(QPainter::SmoothPixmapTransform);
-
-    QRect topInfoRect(QRect(option.rect.x() + 10 , option.rect.y(),option.rect.width()- 20, 30));
-    QRect itemRect(QRect(option.rect.x() + 10, option.rect.y()+ 30, option.rect.width() - 20 , 64));
-    QRect lineRect(QRect(option.rect.x() + 10, option.rect.y() + 102, option.rect.width() - 20 , 2));
-
-    //绘制置顶信息
-    painter->drawPixmap(QRect(topInfoRect.x(),topInfoRect.y() + 10, 10, 10), m_topIcon);
-    topInfoRect.setX(topInfoRect.x() + 15);
-    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
-    painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
-    painter->drawText(topInfoRect, Qt::AlignLeft | Qt::AlignVCenter, "已置顶");
-
-    //绘制项
-    bool isSelect = false;
-    paintItemBase(painter, option, itemRect, isSelect);
-    if (isSelect == false || m_editVisible == false) {
-        painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T6));
-        QFontMetrics fontMetrics = painter->fontMetrics();
-        int space = (itemRect.height() - fontMetrics.height() * 2) / 2 + itemRect.top();
-        QRect nameRect(itemRect.left() + 20, space, itemRect.width() - 40, fontMetrics.height());
-        space += fontMetrics.height();
-        QRect timeRect(itemRect.left() + 20, space, itemRect.width() - 40, fontMetrics.height());
-        QString elideText = fontMetrics.elidedText(data->noteTitle, Qt::ElideRight, nameRect.width());
-        painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
-        if (!isSelect) {
-            if (m_enableItem == false || !(option.state & QStyle::State_Enabled)) {
-                painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::TextTips)));
-            } else {
-                painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
-            }
-        }
-        painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
-        painter->drawText(timeRect, Qt::AlignLeft | Qt::AlignVCenter, Utils::convertDateTime(data->modifyTime));
-    }
-
-    //绘制分割线
-    painter->fillRect(lineRect, m_parentPb.color(DPalette::Normal, DPalette::FrameShadowBorder));
-
-    painter->restore();
-
 }

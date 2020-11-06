@@ -69,9 +69,6 @@ private:
     //绘制搜索项
     void paintSearchItem(QPainter *painter, const QStyleOptionViewItem &option,
                          const QModelIndex &index) const;
-    //绘制置顶项
-    void paintTopItem(QPainter *painter, const QStyleOptionViewItem &option,
-                      const QModelIndex &index, VNoteItem* data) const;
 
     QAbstractItemView *m_parentView {nullptr};
     QString m_searchKey;
