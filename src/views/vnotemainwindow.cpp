@@ -1448,7 +1448,10 @@ int VNoteMainWindow::loadNotepads()
         folderCount = folders->folders.size();
 
         for (auto it : folders->folders) {
-            it->sortNumber = folderCount - tmpsortFolders.indexOf(QString::number(it->id));
+            int tmpIndexCount = tmpsortFolders.indexOf(QString::number(it->id));
+            if (-1 != tmpIndexCount) {
+                it->sortNumber = folderCount - tmpIndexCount;
+            }
             m_leftView->appendFolder(it);
         }
 
@@ -1499,19 +1502,18 @@ void VNoteMainWindow::delNotepad()
 {
     VNoteFolder *data = m_leftView->removeFolder();
 
+    if (-1 != data->sortNumber) {
+        QString folderSortData = m_leftView->getFolderSort();
+        setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
+    }
+
     m_rightView->removeCacheWidget(data);
 
     VNoteFolderOper folderOper(data);
-
     folderOper.deleteVNoteFolder(data);
 
     if (m_leftView->folderCount() == 0) {
         switchWidget(WndHomePage);
-    }
-
-    if(m_leftView->needFolderSort()){
-        QString folderSortData = m_leftView->getFolderSort();
-        setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
     }
 }
 
