@@ -249,7 +249,8 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
                     }else {
                         QRect rc(option.rect.x() + 12, option.rect.y() - 1 , 5, 5);
                         paintTriangle(painter,rc, painter->brush(), true);
-                        painter->fillRect(QRect(option.rect.x()+ 15, option.rect.y(), paintRect.width(), 2), painter->brush());
+                        //调整横线长度
+                        painter->fillRect(QRect(option.rect.x()+ 15, option.rect.y(), paintRect.width() - 10 , 2), painter->brush());
                         rc = QRect(option.rect.right() - 15, option.rect.y() - 1 , 5, 5);
                         paintTriangle(painter,rc, painter->brush(), false);
                     }
