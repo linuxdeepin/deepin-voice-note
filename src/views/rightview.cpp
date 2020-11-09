@@ -815,7 +815,10 @@ bool RightView::checkFileExist(const QString &file)
  */
 void RightView::adjustVerticalScrollBar(QWidget *widget, int defaultHeight)
 {
-    int tolHeight = defaultHeight + 20;
+    int tolHeight = defaultHeight;
+    if(tolHeight >= 0){
+        tolHeight += 20;
+    }
     int index = m_viewportLayout->indexOf(widget);
     for (int i = 0; i < index; i++) {
         tolHeight += m_viewportLayout->itemAt(i)->widget()->height();
