@@ -127,7 +127,7 @@ void FolderSelectDialog::initUI()
 {
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(10, 0, 10, 10);
+    mainLayout->setContentsMargins(10, 0, 0, 10);
     m_view = new FolderSelectView(this);
     m_view->setModel(m_model);
     m_view->setContextMenuPolicy(Qt::NoContextMenu);
@@ -182,12 +182,14 @@ void FolderSelectDialog::initUI()
     actionBarLayout->addWidget(m_cancelBtn);
     actionBarLayout->addWidget(m_buttonSpliter);
     actionBarLayout->addWidget(m_confirmBtn);
+    actionBarLayout->addSpacing(10);
 
     DFrame *viewFrame = new DFrame(this);
     QHBoxLayout *viewFrameLayout = new QHBoxLayout();
     viewFrameLayout->setContentsMargins(5, 5, 0, 5);
     viewFrameLayout->addWidget(m_view);
     viewFrame->setLayout(viewFrameLayout);
+    viewFrame->setContentsMargins(0,0,10,0);
     viewFrame->setAttribute(Qt::WA_TranslucentBackground, true);
 
     mainLayout->addLayout(titleLayout);
