@@ -414,7 +414,12 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
         if (textSize > 147) {
             elideText = fontMetrics().elidedText(data->noteTitle, Qt::ElideRight, 147);
         }
-        QString itemInfo = QString("移动 %1 等%2个笔记到：").arg(elideText).arg(src.size());
+        QString itemInfo = "";
+        if(src.size() == 1){
+           itemInfo = QString("Move the note \"%1\" to:").arg(elideText);
+        }else {
+           itemInfo = QString("Move %1 notes (%2, ...) to:").arg(elideText).arg(src.size());
+        }
 
         if (m_folderSelectDialog == nullptr) {
             m_folderSelectDialog = new FolderSelectDialog(m_pDataModel, this);

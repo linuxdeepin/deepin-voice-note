@@ -195,7 +195,7 @@ void ActionManager::initMenu()
     QStringList noteMenuTexts;
     noteMenuTexts << DApplication::translate("NotesContextMenu", "Rename")
                   << DApplication::translate("NotesContextMenu", "")
-                  << DApplication::translate("NotesContextMenu", "移动")
+                  << DApplication::translate("NotesContextMenu", "Move")
                   << DApplication::translate("NotesContextMenu", "Delete")
                   << DApplication::translate("NotesContextMenu", "Save as TXT")
                   << DApplication::translate("NotesContextMenu", "Save voice recording")

@@ -450,7 +450,7 @@ void MiddleViewDelegate::paintNormalItem(QPainter *painter, const QStyleOptionVi
         topInfoRect.setX(topInfoRect.x() + 15);
         painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTips)));
         painter->setFont(DFontSizeManager::instance()->get(DFontSizeManager::T8));
-        painter->drawText(topInfoRect, Qt::AlignLeft | Qt::AlignVCenter, "已置顶");
+        painter->drawText(topInfoRect, Qt::AlignLeft | Qt::AlignVCenter, DApplication::translate("MiddleViewDelegate", "Sticky Notes"));
     }
 
     if (lineRect.isValid()) {

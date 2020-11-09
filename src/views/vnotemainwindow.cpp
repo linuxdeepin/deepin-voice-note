@@ -1412,9 +1412,9 @@ void VNoteMainWindow::onMenuAbout2Show()
                 ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
             }
             if(currNoteData->isTop){
-                topAction->setText("取消置顶");
+                topAction->setText(DApplication::translate("NotesContextMenu", "Unstick"));
             }else {
-                topAction->setText("置顶");
+                topAction->setText(DApplication::translate("NotesContextMenu", "Sticky on Top"));
             }
 
         }

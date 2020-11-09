@@ -148,7 +148,7 @@ void FolderSelectDialog::initUI()
 
     DLabel *labMove = new DLabel(this);
     DFontSizeManager::instance()->bind(labMove, DFontSizeManager::T6);
-    labMove->setText("移动笔记");
+    labMove->setText(DApplication::translate("FolderSelectDialog", "Move Notes"));
     QHBoxLayout *titleLayout = new QHBoxLayout();
     titleLayout->setSpacing(0);
     titleLayout->setContentsMargins(10, 0, 0, 0);
@@ -167,8 +167,8 @@ void FolderSelectDialog::initUI()
     m_cancelBtn = new DPushButton(this);
     m_confirmBtn = new DSuggestButton(this);
 
-    m_cancelBtn->setText(DApplication::translate("LeftviewDialog", "Cancel"));
-    m_confirmBtn->setText(DApplication::translate("LeftviewDialog", "Confirm"));
+    m_cancelBtn->setText(DApplication::translate("FolderSelectDialog", "Cancel"));
+    m_confirmBtn->setText(DApplication::translate("FolderSelectDialog", "Confirm"));
 
     m_buttonSpliter = new DVerticalLine(this);
     DPalette pa = DApplicationHelper::instance()->palette(m_buttonSpliter);
