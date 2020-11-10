@@ -128,7 +128,7 @@ VNOTE_FOLDERS_MAP *VNoteFolderOper::loadVNoteFolders()
     FolderQryDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), nullptr, foldersMap);
 
     if (!VNoteDbManager::instance()->queryData(&folderVisitor)) {
-        qCritical() << "Query faild!";
+        qCritical() << "Query failed!";
     }
 
     return foldersMap;
@@ -164,7 +164,7 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
                 << "Create time:" << newFolder->createTime
                 << "Modify time:" << newFolder->modifyTime;
     } else {
-        qCritical() << "Add folder failded:"
+        qCritical() << "Add folder failed:"
                     << "New folder:" << newFolder->id
                     << "Name:" << newFolder->name
                     << "Create time:" << newFolder->createTime

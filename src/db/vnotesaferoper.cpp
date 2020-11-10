@@ -62,7 +62,7 @@ SafetyDatas *VNoteSaferOper::loadSafers()
     SaferQryDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), nullptr, safers);
 
     if (!VNoteDbManager::instance()->queryData(&folderVisitor)) {
-        qCritical() << "Query faild!";
+        qCritical() << "Query failed!";
     }
 
     return safers;
