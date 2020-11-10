@@ -10,6 +10,7 @@ Terminal=false
 TryExec=/usr/bin/deepin-voice-note
 Type=Application
 X-Deepin-Vendor=deepin
+Keywords=deepin-voice-note
 
 # Translations:
 # Do not manually modify!
