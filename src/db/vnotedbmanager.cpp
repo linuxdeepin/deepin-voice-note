@@ -85,7 +85,7 @@ bool VNoteDbManager::insertData(DbVisitor* visitor /*in/out*/)
     }
 
     if (Q_UNLIKELY(!visitor->prepareSqls())) {
-        qCritical() << "prepare sqls faild!";
+        qCritical() << "prepare sqls failed!";
         return false;
     }
 
@@ -126,7 +126,7 @@ bool VNoteDbManager::updateData(DbVisitor* visitor /*in/out*/)
     }
 
     if (Q_UNLIKELY(!visitor->prepareSqls())) {
-        qCritical() << "prepare sqls faild!";
+        qCritical() << "prepare sqls failed!";
         return false;
     }
 
@@ -159,7 +159,7 @@ bool VNoteDbManager::queryData(DbVisitor* visitor /*in/out*/)
     }
 
     if (Q_UNLIKELY(!visitor->prepareSqls())) {
-        qCritical() << "prepare sqls faild!";
+        qCritical() << "prepare sqls failed!";
         return false;
     }
 
@@ -197,7 +197,7 @@ bool VNoteDbManager::deleteData(DbVisitor* visitor /*in/out*/)
     }
 
     if (Q_UNLIKELY(!visitor->prepareSqls())) {
-        qCritical() << "prepare sqls faild!";
+        qCritical() << "prepare sqls failed!";
         return false;
     }
 
@@ -263,7 +263,7 @@ int VNoteDbManager::initVNoteDb(bool fOldDB)
     }
 
     if (!m_vnoteDB.open()) {
-        qCritical() << "Open database failded:" << m_vnoteDB.lastError().text();
+        qCritical() << "Open database failed:" << m_vnoteDB.lastError().text();
 
         return -1;
     }

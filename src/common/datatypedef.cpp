@@ -141,7 +141,7 @@ void VNOTE_DATAS::classifyAddBlk(VNoteBlock *block)
     } else if (VNoteBlock::Voice == block->getType()) {
         voiceBlocks.push_back(block);
     } else {
-        qCritical() << __FUNCTION__ << "Unkown VNoteBlock type " << block->getType();
+        qCritical() << __FUNCTION__ << "Unknown VNoteBlock type " << block->getType();
     }
 }
 
@@ -160,7 +160,7 @@ void VNOTE_DATAS::classifyDelBlk(VNoteBlock *block)
             voiceBlocks.remove(index);
         }
     } else {
-        qCritical() << __FUNCTION__ << "Unkown VNoteBlock type " << block->getType();
+        qCritical() << __FUNCTION__ << "Unknown VNoteBlock type " << block->getType();
     }
 
     //Don't need delete the block anymore,

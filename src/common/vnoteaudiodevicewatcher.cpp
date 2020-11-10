@@ -179,7 +179,7 @@ void VNoteAudioDeviceWatcher::run()
             m_microphoneState = currentState;
             emit microphoneAvailableState(m_microphoneState);
 
-            qInfo() << "Microphone aviable state change:" << m_microphoneState;
+            qInfo() << "Microphone available state change:" << m_microphoneState;
 
             //We need log the state change log.
             fHighPriorityLog = true;

@@ -42,7 +42,7 @@ void OldDataLoadTask::run()
     OldFolderQryDbVisitor folderVisitor(VNoteOldDataManager::instance()->m_oldDbManger->getVNoteDb(), nullptr, foldersMap);
 
     if (!VNoteDbManager::instance()->queryData(&folderVisitor) ) {
-      qCritical() << "Query old folder faild!";
+      qCritical() << "Query old folder failed!";
     }
 
 
@@ -56,7 +56,7 @@ void OldDataLoadTask::run()
     OldNoteQryDbVisitor noteVisitor(VNoteOldDataManager::instance()->m_oldDbManger->getVNoteDb(), nullptr, notesMap);
 
     if (!VNoteDbManager::instance()->queryData(&noteVisitor) ) {
-        qCritical() << "Query old notes faild!";
+        qCritical() << "Query old notes failed!";
     }
 
     emit finishLoad();

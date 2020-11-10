@@ -112,7 +112,7 @@ void UpgradeDbUtil::backUpOldDb()
         QFile oldDBFile(dbFileInfo.filePath());
 
         if (!oldDBFile.rename(backupDir.filePath()+QDir::separator()+oldDbName)) {
-            qInfo() << "Backup old database failded." << oldDBFile.errorString();
+            qInfo() << "Backup old database failed." << oldDBFile.errorString();
         }
     }
 }
@@ -126,7 +126,7 @@ void UpgradeDbUtil::clearVoices()
 
     if (oldVoiceDir.exists()) {
         if (!oldVoiceDir.removeRecursively()) {
-            qInfo() << "Clear old voices failded!";
+            qInfo() << "Clear old voices failed!";
         } else {
             qInfo() << "Clear old voices done!";
         }
