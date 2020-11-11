@@ -127,9 +127,12 @@ void LeftViewDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 void LeftViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
                                             const QModelIndex &index) const
 {
-    Q_UNUSED(index)
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
-    edit->move(option.rect.x() + 50, option.rect.y() + 8);
+    int y = 8;
+    if(0 == index.row()){
+        y += 5;
+    }
+    edit->move(option.rect.x() + 50, option.rect.y() + y);
 }
 
 /**
