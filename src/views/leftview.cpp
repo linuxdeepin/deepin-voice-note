@@ -383,6 +383,12 @@ void LeftView::closeMenu()
     m_notepadMenu->close();
 }
 
+/**
+ * @brief LeftView::doNoteMove
+ * @param src
+ * @param dst
+ * @return
+ */
 bool LeftView::doNoteMove(const QModelIndexList &src, const QModelIndex &dst)
 {
     if (src.size() && StandardItemCommon::getStandardItemType(dst) == StandardItemCommon::NOTEPADITEM) {
@@ -412,6 +418,11 @@ bool LeftView::doNoteMove(const QModelIndexList &src, const QModelIndex &dst)
     return false;
 }
 
+/**
+ * @brief LeftView::selectMoveFolder
+ * @param src
+ * @return
+ */
 QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
 {
     QModelIndex index;
@@ -446,6 +457,11 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
     return index;
 }
 
+/**
+ * @brief LeftView::getFolderSort
+ * @return 当前所有记事本的排序编号字符串
+ * 获取记事本顺序
+ */
 QString LeftView::getFolderSort()
 {
     QString tmpQstr = "";
@@ -468,6 +484,11 @@ QString LeftView::getFolderSort()
     return tmpQstr;
 }
 
+/**
+ * @brief LeftView::setFolderSort
+ * @return true 排序成功，false 排序失败
+ * 设置记事本默认顺序
+ */
 bool LeftView::setFolderSort()
 {
     bool sortResult = false;
@@ -491,6 +512,11 @@ bool LeftView::setFolderSort()
     return sortResult;
 }
 
+/**
+ * @brief LeftView::needFolderSort
+ * @return true 需要，false 不需要
+ * 是否需要更新排序
+ */
 bool LeftView::needFolderSort()
 {
     if (getNotepadRoot()->hasChildren()) {
@@ -520,16 +546,27 @@ void LeftView::handleTouchSlideEvent(qint64 timeParam, double distY, QPoint poin
     m_touchPressPoint = point;
 }
 
+/**
+ * @brief LeftView::startDrag
+ * @param supportedActions
+ * 开始拖拽事件
+ */
 void LeftView::startDrag(Qt::DropActions supportedActions)
 {
     Q_UNUSED(supportedActions);
     triggerDragFolder();
 }
 
+/**
+ * @brief LeftView::dragEnterEvent
+ * @param event
+ * 拖拽进入视图事件
+ */
 void LeftView::dragEnterEvent(QDragEnterEvent *event)
 {
-    if(!event->mimeData()->hasFormat(NOTES_DRAG_KEY)
-            && !event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)){
+    // 判断拖拽进入视图事件触发类型（笔记：NOTES_DRAG_KEY；记事本：NOTEPAD_DRAG_KEY）
+    if (!event->mimeData()->hasFormat(NOTES_DRAG_KEY)
+            && !event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)) {
         event->ignore();
         return DTreeView::dragEnterEvent(event);
     }
@@ -538,9 +575,15 @@ void LeftView::dragEnterEvent(QDragEnterEvent *event)
         m_pItemDelegate->setDragState(true);
         this->update();
     }
+
     event->accept();
 }
 
+/**
+ * @brief LeftView::dragMoveEvent
+ * @param event
+ * 拖拽移动事件
+ */
 void LeftView::dragMoveEvent(QDragMoveEvent *event)
 {
     DTreeView::dragMoveEvent(event);
@@ -548,6 +591,11 @@ void LeftView::dragMoveEvent(QDragMoveEvent *event)
     event->accept();
 }
 
+/**
+ * @brief LeftView::dragLeaveEvent
+ * @param event
+ * 拖拽离开视图事件
+ */
 void LeftView::dragLeaveEvent(QDragLeaveEvent *event)
 {
     Q_UNUSED(event)
@@ -559,22 +607,34 @@ void LeftView::dragLeaveEvent(QDragLeaveEvent *event)
     event->accept();
 }
 
+/**
+ * @brief LeftView::doDragMove
+ * @param src
+ * @param dst
+ * 拖拽移动
+ */
 void LeftView::doDragMove(const QModelIndex &src, const QModelIndex &dst)
 {
     if (src.isValid() && dst.isValid() && src != dst) {
         VNoteFolder *tmpFolder = reinterpret_cast<VNoteFolder *>(
                                      StandardItemCommon::getStandardItemData(dst));
-        if (tmpFolder == nullptr) {
+        if (nullptr == tmpFolder) {
             return;
         }
+
+        // 判断当前是否需要进行重新排序
         if (!needFolderSort()) {
             setFolderSort();
         }
+
         int tmpRow = qAbs(src.row() - dst.row());
         int dstNum = tmpFolder->sortNumber;
         QModelIndex tmpIndex;
         QModelIndex rootIndex = getNotepadRootIndex();
+
+        // 根据拖拽放下的位置，给相应的记事本重新赋值排序编号
         for (int i = 0; i < tmpRow; i++) {
+            // 目标位置所在的行数比被拖拽的记事本的行数大，则将目标位置记事本和被拖拽记事本之间的记事本的排序编号依次加1，反之依次减1
             if (dst.row() > src.row()) {
                 tmpIndex = m_pSortViewFilter->index(dst.row() - i, 0, rootIndex);
                 if (!tmpIndex.isValid()) {
@@ -594,26 +654,34 @@ void LeftView::doDragMove(const QModelIndex &src, const QModelIndex &dst)
                 tmpFolder->sortNumber -= 1;
             }
         }
+
         tmpFolder = reinterpret_cast<VNoteFolder *>(
                         StandardItemCommon::getStandardItemData(src));
         tmpFolder->sortNumber = dstNum;
 
         sort();
 
+        // 获取重新排序后每个记事本的排序编号，写入配置文件中
         QString folderSortData = getFolderSort();
         setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
 
     }
 }
 
+/**
+ * @brief LeftView::triggerDragFolder
+ * 触发拖动操作
+ */
 void LeftView::triggerDragFolder()
 {
     VNoteFolder *folder = reinterpret_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(currentIndex()));
+    // 判断当前拖拽的记事本是否可用，如果可用，则初始化拖拽操作的数据
     if (folder) {
         QDrag *drag = new QDrag(this);
         QMimeData *mimeData = new QMimeData;
         mimeData->setData(NOTEPAD_DRAG_KEY, QByteArray());
-        if (m_MoveView == nullptr) {
+
+        if (nullptr == m_MoveView) {
             m_MoveView = new MoveView(this);
         }
         m_MoveView->setFolder(folder);
@@ -628,10 +696,15 @@ void LeftView::triggerDragFolder()
     }
 }
 
-
+/**
+ * @brief LeftView::dropEvent
+ * @param event
+ * 拖拽放下事件
+ */
 void LeftView::dropEvent(QDropEvent * event)
 {
-    if(event->mimeData()->hasFormat(NOTES_DRAG_KEY)){
+    // 判断拖拽放下事件触发类型（笔记：NOTES_DRAG_KEY；记事本：NOTEPAD_DRAG_KEY）
+    if (event->mimeData()->hasFormat(NOTES_DRAG_KEY)) {
         emit dropNotesEnd();
     } else if (event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)) {
         doDragMove(currentIndex(), indexAt(mapFromGlobal(QCursor::pos())));

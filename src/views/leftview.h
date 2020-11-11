@@ -77,6 +77,7 @@ public:
 
 signals:
     void dropNotesEnd();
+
 protected:
     //鼠标事件
     //单击
@@ -92,12 +93,16 @@ protected:
     //关闭重命名编辑框触发
     void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
 
+    // 拖拽进入视图事件
     void dragEnterEvent(QDragEnterEvent *event) override;
+    // 拖拽移动事件
     void dragMoveEvent(QDragMoveEvent *event) override;
+    // 拖拽离开视图事件
     void dragLeaveEvent(QDragLeaveEvent *event) override;
+    // 拖拽放下事件
     void dropEvent (QDropEvent * event ) override;
+    // 开始拖拽事件
     void startDrag(Qt::DropActions supportedActions) override;
-
 
 private:
     //初始化代理模块

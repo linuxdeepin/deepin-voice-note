@@ -544,9 +544,14 @@ void MiddleView::deleteModelIndexs(const QModelIndexList &indexs)
     }
 }
 
+/**
+ * @brief MiddleView::triggerDragNote
+ * 触发拖动操作
+ */
 void MiddleView::triggerDragNote()
 {
     VNoteItem *noteData = getCurrVNotedata();
+    // 判断当前拖拽的笔记是否可用，如果可用，则初始化拖拽操作的数据
     if (noteData) {
         if (m_MoveView == nullptr) {
             m_MoveView = new MoveView(this);

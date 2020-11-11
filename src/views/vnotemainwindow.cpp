@@ -1502,6 +1502,7 @@ void VNoteMainWindow::delNotepad()
 {
     VNoteFolder *data = m_leftView->removeFolder();
 
+    // 判断当前删除的记事本的排序编号，如果不是-1，则将当前所有记事本的排序编号写入配置文件中
     if (-1 != data->sortNumber) {
         QString folderSortData = m_leftView->getFolderSort();
         setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
@@ -1512,7 +1513,7 @@ void VNoteMainWindow::delNotepad()
     VNoteFolderOper folderOper(data);
     folderOper.deleteVNoteFolder(data);
 
-    if (m_leftView->folderCount() == 0) {
+    if (0 == m_leftView->folderCount()) {
         switchWidget(WndHomePage);
     }
 }
