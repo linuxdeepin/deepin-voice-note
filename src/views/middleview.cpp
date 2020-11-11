@@ -527,6 +527,10 @@ void MiddleView::sortView(bool adjustCurrentItemBar)
     }
 }
 
+/**
+ * @brief MiddleView::getAllSelectNote
+ * @return 选中的笔记列表
+ */
 QModelIndexList MiddleView::getAllSelectNote()
 {
     QModelIndexList indexList;
@@ -537,6 +541,10 @@ QModelIndexList MiddleView::getAllSelectNote()
     return  indexList;
 }
 
+/**
+ * @brief MiddleView::deleteModelIndexs
+ * @param indexs　需要删除的笔记列表
+ */
 void MiddleView::deleteModelIndexs(const QModelIndexList &indexs)
 {
     for (auto &it : indexs) {

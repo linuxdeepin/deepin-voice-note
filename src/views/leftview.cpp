@@ -596,7 +596,6 @@ void LeftView::dragMoveEvent(QDragMoveEvent *event)
  */
 void LeftView::dragLeaveEvent(QDragLeaveEvent *event)
 {
-    Q_UNUSED(event)
     if (m_folderDraing) {
         m_pItemDelegate->setDragState(false);
         m_pItemDelegate->setDrawHover(false);

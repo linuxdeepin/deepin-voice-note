@@ -32,9 +32,12 @@ class MoveView : public DWidget
     Q_OBJECT
 public:
     explicit MoveView( QWidget *parent = nullptr);
+    //设置记事本数据
     void setFolder(VNoteFolder* folder);
+    //设置笔记数据
     void setNote(VNoteItem* note);
 protected:
+    //重写paint事件
     void paintEvent(QPaintEvent *) override;
 private:
     VNoteFolder *m_folder {nullptr};

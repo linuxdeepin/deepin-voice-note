@@ -226,6 +226,7 @@ public:
     virtual bool prepareSqls() override;
 };
 
+//更新笔记所属记事本id
 class UpdateNoteFolderIdDbVisitor : public DbVisitor
 {
 public:

@@ -36,16 +36,27 @@ MoveView::MoveView(QWidget *parent)
     setFixedSize(180, 36);
 }
 
+/**
+ * @brief MoveView::setFolder
+ * @param folder 记事本数据
+ */
 void MoveView::setFolder(VNoteFolder *folder)
 {
     m_folder = folder;
 }
 
+/**
+ * @brief MoveView::setNote
+ * @param note 笔记数据
+ */
 void MoveView::setNote(VNoteItem *note)
 {
     m_note = note;
 }
 
+/**
+ * @brief MoveView::paintEvent
+ */
 void MoveView::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
@@ -62,6 +73,7 @@ void MoveView::paintEvent(QPaintEvent *)
     painter.drawPath(PainterPath);
     QFontMetrics fontMetrics = painter.fontMetrics();
     painter.setPen(QPen(pb.color(DPalette::Normal, DPalette::Text)));
+    //绘制记事本拖动缩略图
     if(m_folder){
         VNoteFolderOper folderOps(m_folder);
         QString strNum = QString::number(folderOps.getNotesCount());
@@ -76,6 +88,7 @@ void MoveView::paintEvent(QPaintEvent *)
         painter.drawPixmap(iconRect, m_folder->UI.icon);
         QString elideText = fontMetrics.elidedText(m_folder->name, Qt::ElideRight, nameRect.width());
         painter.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
+        //绘制笔记拖动缩略图
     }else if (m_note) {
         QRect paintRect = rect();
         paintRect.setLeft(paintRect.left() + 20);

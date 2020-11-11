@@ -76,8 +76,9 @@ public:
     void noteStickOnTop();
     //排序
     void sortView(bool adjustCurrentItemBar = true);
-
+    //获取选中的笔记列表
     QModelIndexList getAllSelectNote();
+    //删除笔记列表
     void deleteModelIndexs(const QModelIndexList &indexs);
     //处理触摸屏slide事件
     void handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point);

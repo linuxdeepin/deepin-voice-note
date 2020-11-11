@@ -333,6 +333,13 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
     painter->restore();
 }
 
+/**
+ * @brief LeftViewDelegate::paintTriangle
+ * @param painter
+ * @param rc
+ * @param brush
+ * @param left true:三角向右，false:三角向左
+ */
 void LeftViewDelegate::paintTriangle(QPainter *painter, const QRect& rc, const QBrush &brush, bool left) const
 {
     QPainterPath path;
@@ -357,16 +364,28 @@ void LeftViewDelegate::setEnableItem(bool enable)
     m_enableItem = enable;
 }
 
+/**
+ * @brief LeftViewDelegate::setDrawNotesNum
+ * @param enable true 绘制笔记数目
+ */
 void LeftViewDelegate::setDrawNotesNum(bool enable)
 {
     m_drawNotesNum = enable;
 }
 
+/**
+ * @brief LeftViewDelegate::setDragState
+ * @param state true　正在拖动状态
+ */
 void LeftViewDelegate::setDragState(bool state)
 {
     m_draging = state;
 }
 
+/**
+ * @brief LeftViewDelegate::setDrawHover
+ * @param enable true 绘制hover效果
+ */
 void LeftViewDelegate::setDrawHover(bool enable)
 {
     m_drawHover = enable;

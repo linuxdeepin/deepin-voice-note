@@ -70,10 +70,15 @@ class FolderSelectDialog : public DAbstractDialog
     Q_OBJECT
 public:
     explicit FolderSelectDialog(QStandardItemModel *model, QWidget *parent = nullptr);
+    //设置移动笔记信息
     void setNoteContext(const QString &text);
+    //设置不需要显示的记事本
     void setFolderBlack(const QList<VNoteFolder *> &folders);
+    //清除选中
     void clearSelection();
+    //获取选中的记事本
     QModelIndex getSelectIndex();
+    //选中变化处理
     void onVNoteFolderSelectChange(const QItemSelection &selected, const QItemSelection &deselected);
 protected:
     //初始化布局

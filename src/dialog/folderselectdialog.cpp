@@ -146,6 +146,11 @@ void FolderSelectView::handleTouchSlideEvent(qint64 timeInterval, double distY, 
     m_touchPressPointY = point.y();
 }
 
+/**
+ * @brief FolderSelectDialog::FolderSelectDialog
+ * @param model 数据模型
+ * @param parent
+ */
 FolderSelectDialog::FolderSelectDialog(QStandardItemModel *model, QWidget *parent)
     : DAbstractDialog(parent)
 {
@@ -156,6 +161,9 @@ FolderSelectDialog::FolderSelectDialog(QStandardItemModel *model, QWidget *paren
     m_model->sort(0, Qt::DescendingOrder);
 }
 
+/**
+ * @brief FolderSelectDialog::initUI
+ */
 void FolderSelectDialog::initUI()
 {
     QVBoxLayout *mainLayout = new QVBoxLayout();
@@ -236,6 +244,9 @@ void FolderSelectDialog::initUI()
     this->setLayout(mainLayout);
 }
 
+/**
+ * @brief FolderSelectDialog::initConnections
+ */
 void FolderSelectDialog::initConnections()
 {
     connect(m_cancelBtn, &DPushButton::clicked, this, [ = ]() {
@@ -253,11 +264,19 @@ void FolderSelectDialog::initConnections()
             this, &FolderSelectDialog::onVNoteFolderSelectChange);
 }
 
+/**
+ * @brief FolderSelectDialog::setNoteContext
+ * @param text 移动笔记信息
+ */
 void FolderSelectDialog::setNoteContext(const QString &text)
 {
     m_noteInfo->setText(text);
 }
 
+/**
+ * @brief FolderSelectDialog::getSelectIndex
+ * @return 选中的记事本
+ */
 QModelIndex FolderSelectDialog::getSelectIndex()
 {
     QModelIndex index = m_view->currentIndex();
@@ -268,17 +287,30 @@ QModelIndex FolderSelectDialog::getSelectIndex()
     return  index;
 }
 
+/**
+ * @brief FolderSelectDialog::setFolderBlack
+ * @param folders 不需要显示的笔记项
+ */
 void FolderSelectDialog::setFolderBlack(const QList<VNoteFolder * > &folders)
 {
     m_model->setBlackFolders(folders);
 }
 
+/**
+ * @brief FolderSelectDialog::clearSelection
+ */
 void FolderSelectDialog::clearSelection()
 {
     m_view->clearSelection();
     m_confirmBtn->setEnabled(false);
 }
 
+/**
+ * @brief FolderSelectDialog::onVNoteFolderSelectChange
+ * @param selected
+ * @param deselected
+ * 没有选中项确定按钮不可用
+ */
 void FolderSelectDialog::onVNoteFolderSelectChange(const QItemSelection &selected, const QItemSelection &deselected)
 {
     Q_UNUSED(deselected);
