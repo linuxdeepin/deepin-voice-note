@@ -513,21 +513,19 @@ bool LeftView::setFolderSort()
 }
 
 /**
- * @brief LeftView::needFolderSort
- * @return true 需要，false 不需要
- * 是否需要更新排序
+ * @brief LeftView::getFirstFolder
+ * @return 第一个记事本
  */
-bool LeftView::needFolderSort()
+VNoteFolder* LeftView::getFirstFolder()
 {
-    if (getNotepadRoot()->hasChildren()) {
-        QModelIndex child = getNotepadRoot()->child(0)->index();
-        if (child.isValid()) {
-            VNoteFolder *vnotefolder = reinterpret_cast<VNoteFolder *>(
-                                           StandardItemCommon::getStandardItemData(child));
-            return  vnotefolder && (-1 != vnotefolder->sortNumber);
-        }
+    QModelIndex rootIndex = getNotepadRootIndex();
+    QModelIndex child = m_pSortViewFilter->index(0, 0, rootIndex);
+    if (child.isValid()) {
+        VNoteFolder *vnotefolder = reinterpret_cast<VNoteFolder *>(
+                    StandardItemCommon::getStandardItemData(child));
+        return  vnotefolder;
     }
-    return false;
+    return nullptr;
 }
 
 /**
@@ -623,7 +621,8 @@ void LeftView::doDragMove(const QModelIndex &src, const QModelIndex &dst)
         }
 
         // 判断当前是否需要进行重新排序
-        if (!needFolderSort()) {
+        VNoteFolder *firstFolder = getFirstFolder();
+        if (firstFolder && -1 == firstFolder->sortNumber) {
             setFolderSort();
         }
 

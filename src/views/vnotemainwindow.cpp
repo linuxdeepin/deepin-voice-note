@@ -1478,9 +1478,11 @@ void VNoteMainWindow::addNotepad()
         //Switch to note view
         switchWidget(WndNoteShow);
 
-        bool sortEnable = m_leftView->needFolderSort();
-        if(sortEnable){
-            newFolder->sortNumber = folderOper.getFoldersCount();
+        bool sortEnable = false;
+        VNoteFolder *tmpFolder = m_leftView->getFirstFolder();
+        if(tmpFolder && -1 != tmpFolder->sortNumber){
+             newFolder->sortNumber = tmpFolder->sortNumber + 1;
+             sortEnable = true;
         }
 
         m_leftView->addFolder(newFolder);

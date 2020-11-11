@@ -70,8 +70,8 @@ public:
     QModelIndex selectMoveFolder(const QModelIndexList &src);
     //获取记事本顺序
     QString getFolderSort();
-    //是否需要更新排序
-    bool needFolderSort();
+    //获取第一个记事本
+    VNoteFolder* getFirstFolder();
     //处理触摸屏slide事件
     void handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point);
 
