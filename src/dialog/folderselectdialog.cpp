@@ -36,11 +36,17 @@ FolderSelectView::FolderSelectView(QWidget *parent)
 
 }
 
+/**
+ * @brief mousePressEvent 鼠标press事件处理函数
+ * @return event 事件
+ */
 void FolderSelectView::mousePressEvent(QMouseEvent *event)
 {
     //此页面只需单击选中功能，此处屏蔽辅助功能键
     event->setModifiers(Qt::NoModifier);
+    //触摸屏手势操作
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
+        //更新触控起始时间点与起始位置
         m_touchPressPointY = event->pos().y();
         m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
         return;
@@ -50,12 +56,18 @@ void FolderSelectView::mousePressEvent(QMouseEvent *event)
         DTreeView::mousePressEvent(event);
 }
 
+/**
+ * @brief mouseReleaseEvent 鼠标release事件处理函数
+ * @return event 事件
+ */
 void FolderSelectView::mouseReleaseEvent(QMouseEvent *event)
 {
+    //触摸屏手势操作，恢复参数状态与判断选中
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
         if (m_isTouchSliding)
             m_isTouchSliding = false;
         else {
+            //如果触摸点击未移动，选中当前index
             if (indexAt(event->pos()).isValid())
                 setCurrentIndex(indexAt(event->pos()));
         }
@@ -64,6 +76,10 @@ void FolderSelectView::mouseReleaseEvent(QMouseEvent *event)
     return DTreeView::mouseReleaseEvent(event);
 }
 
+/**
+ * @brief keyPressEvent 键盘press事件处理函数
+ * @return event 事件
+ */
 void FolderSelectView::keyPressEvent(QKeyEvent *event)
 {
     //QAbstractItemView底层问题，索引0按上键会取消选中效果，通过keypress屏蔽
@@ -74,23 +90,32 @@ void FolderSelectView::keyPressEvent(QKeyEvent *event)
     }
 }
 
+/**
+ * @brief mouseMoveEvent 鼠标move事件处理函数
+ * @return event 事件
+ */
 void FolderSelectView::mouseMoveEvent(QMouseEvent *event)
 {
     //此处解决选择闪烁问题
     event->setModifiers(Qt::NoModifier);
+    //触摸屏收拾操作，判断滚动
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
         return doTouchMoveEvent(event);
     }
     DTreeView::mouseMoveEvent(event);
 }
 
+/**
+ * @brief doTouchMoveEvent 手势滑动处理函数
+ * @return event 事件
+ */
 void FolderSelectView::doTouchMoveEvent(QMouseEvent *event)
 {
-    //处理触摸屏单指滑动事件
+    //处理触摸屏单指滑动事件, distY为上下移动距离，timeInterval为滑动时间间隔
     double distY = event->pos().y() - m_touchPressPointY;
     qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
     qint64 timeInterval = currentTime - m_touchPressStartMs;
-    //上下移动距离超过10px
+    //上下移动距离超过10px执行滚动操作，滚动过程中移动距离大于5继续执行
     if (m_isTouchSliding) {
         if (qAbs(distY) > 5)
             handleTouchSlideEvent(timeInterval, distY, event->pos());
@@ -102,13 +127,21 @@ void FolderSelectView::doTouchMoveEvent(QMouseEvent *event)
     }
 }
 
+/**
+ * @brief doTouchMoveEvent 手势滑动处理
+ * @return timeInterval 时间间隔
+ * @return distY 上下滑动距离
+ * @return point 上一次鼠标点击位置
+ */
 void FolderSelectView::handleTouchSlideEvent(qint64 timeInterval, double distY, QPoint point)
 {
     if (timeInterval == 0)
         return;
+    //根据滑动速度计算滚动步长
     double param = ((qAbs(distY)) / timeInterval) + 0.3;
     verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
     verticalScrollBar()->triggerAction((distY > 0) ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
+    //更新用于下次判断的位置和时间节点
     m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
     m_touchPressPointY = point.y();
 }
@@ -184,12 +217,14 @@ void FolderSelectDialog::initUI()
     actionBarLayout->addWidget(m_confirmBtn);
     actionBarLayout->addSpacing(10);
 
+    //实现内部视图列表圆角
     DFrame *viewFrame = new DFrame(this);
     QHBoxLayout *viewFrameLayout = new QHBoxLayout();
     viewFrameLayout->setContentsMargins(5, 5, 0, 5);
     viewFrameLayout->addWidget(m_view);
     viewFrame->setLayout(viewFrameLayout);
     viewFrame->setContentsMargins(0,0,10,0);
+    //设置外部frame背景透明
     viewFrame->setAttribute(Qt::WA_TranslucentBackground, true);
 
     mainLayout->addLayout(titleLayout);

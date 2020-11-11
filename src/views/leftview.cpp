@@ -120,8 +120,9 @@ QModelIndex LeftView::getNotepadRootIndex()
 void LeftView::mousePressEvent(QMouseEvent *event)
 {
     this->setFocus();
-
+    //触控屏手势
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
+        //记录触控起始位置与时间点
         m_touchPressPoint = event->pos();
         m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
     }
@@ -174,21 +175,28 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
 
     if (event->buttons() & Qt::LeftButton) {
         if (!m_onlyCurItemMenuEnable) {
+            //鼠标左键滑动
             if (event->source() == Qt::MouseEventSynthesizedByQt) {
+                //计算上下、左右移动距离与时间间隔
                 double distY = event->pos().y() - m_touchPressPoint.y();
                 double distX = event->pos().x() - m_touchPressPoint.x();
                 qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
                 qint64 timeInterval = currentTime - m_touchPressStartMs;
+                //正在滑动时移动距离超过5px，持续执行滚动操作
                 if (m_isTouchSliding) {
                     if (qAbs(distY) > 5)
                         handleTouchSlideEvent(timeInterval, distY, event->pos());
                     return;
-                } else {
+                }
+                //初次判断，如果在250ms之内滑动距离超过5px，执行滚动操作
+                else {
                     if (timeInterval < 250) {
                         if (qAbs(distY) > 10) {
                             m_isTouchSliding = true;
                             handleTouchSlideEvent(timeInterval, distY, event->pos());
-                        } else if (qAbs(distX) > 5) {
+                        }
+                        //仅有左右滑动距离超过5px，更新为滚动状态但不执行滚动操作，用于区分拖拽事件
+                        else if (qAbs(distX) > 5) {
                             m_isTouchSliding = true;
                         }
                         return;
@@ -504,6 +512,7 @@ bool LeftView::needFolderSort()
  */
 void LeftView::handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point)
 {
+    //根据移动距离与时间计算滑动速度，用于设置滚动步长
     double param = ((qAbs(distY)) / timeParam) + 0.3;
     verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
     verticalScrollBar()->triggerAction((distY > 0) ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);

@@ -300,8 +300,9 @@ void MiddleView::saveRecords()
 void MiddleView::mousePressEvent(QMouseEvent *event)
 {
     this->setFocus();
-
+    //触控屏手势
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
+        //记录此时触控点的位置，用于move事件中滑动距离与速度
         m_touchPressPoint = event->pos();
         m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
     }
@@ -352,17 +353,21 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton) {
         if (!m_onlyCurItemMenuEnable) {
+            //触控屏单指滑动
             if (event->source() == Qt::MouseEventSynthesizedByQt) {
+                //计算上下、左右移动距离，用于计算滑动速度
                 double distY = event->pos().y() - m_touchPressPoint.y();
                 double distX = event->pos().x() - m_touchPressPoint.x();
                 qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
                 qint64 timeInterval = currentTime - m_touchPressStartMs;
-                //上下移动距离超过10px
+                //正在滑动状态且上下移动距离超过5px，持续执行滚动事件
                 if (m_isTouchSliding) {
                     if (qAbs(distY) > 5)
                         handleTouchSlideEvent(timeInterval, distY, event->pos());
                     return;
-                } else {
+                }
+                //初次判断，250ms之内移动距离超过10px，执行滚动事件，仅左右移动距离超过5px，更新滑动状态，区分拖拽操作
+                else {
                     if (timeInterval < 250) {
                         if (qAbs(distY) > 10) {
                             m_isTouchSliding = true;
@@ -387,8 +392,9 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
  */
 void MiddleView::handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point)
 {
-    double param = ((qAbs(distY)) / timeParam) + 0.3;
-    verticalScrollBar()->setSingleStep(static_cast<int>(20 * param));
+    //根据移动距离和时间计算滑动速度，设置滚动步长
+    double slideSpeed = ((qAbs(distY)) / timeParam) + 0.3;
+    verticalScrollBar()->setSingleStep(static_cast<int>(20 * slideSpeed));
     verticalScrollBar()->triggerAction((distY > 0) ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
     m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
     m_touchPressPoint = point;
