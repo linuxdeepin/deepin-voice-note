@@ -328,7 +328,7 @@ void MiddleViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptio
                                               const QModelIndex &index) const
 {
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
-    if (index.isValid() && index.row() == 0){
+    if (m_searchKey.isEmpty() && index.isValid() && index.row() == 0){
         VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
         if(data && data->isTop){
             return edit->move(option.rect.x() + 28, option.rect.y() + 43);
