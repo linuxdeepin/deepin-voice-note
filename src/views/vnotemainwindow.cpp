@@ -699,7 +699,7 @@ void VNoteMainWindow::releaseHaltLock()
 void VNoteMainWindow::initDelayWork()
 {
     //Check aiservice state
-    bool fExist = m_a2tManager->checkAiService();
+    bool fExist = /*m_a2tManager->checkAiService()*/ false;
     operState(OpsStateInterface::StateAISrvAvailable, fExist);
 
     //TODO:
