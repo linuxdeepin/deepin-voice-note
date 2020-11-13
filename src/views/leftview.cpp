@@ -43,6 +43,8 @@
 #include <QTimer>
 #include <QScrollBar>
 
+#include <DApplication>
+
 /**
  * @brief LeftView::LeftView
  * @param parent
@@ -435,9 +437,9 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
         }
         QString itemInfo = "";
         if(src.size() == 1){
-           itemInfo = QString("Move the note \"%1\" to:").arg(elideText);
+           itemInfo = DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(elideText);
         }else {
-           itemInfo = QString("Move %1 notes (%2, ...) to:").arg(elideText).arg(src.size());
+           itemInfo = DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg(elideText).arg(src.size());
         }
 
         if (m_folderSelectDialog == nullptr) {
