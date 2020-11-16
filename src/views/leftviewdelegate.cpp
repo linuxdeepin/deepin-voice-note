@@ -271,19 +271,23 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
                     QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
                     painter->setBrush(QBrush(fillColor));
                     if(dstIndex.row() > srcIndex.row()){
-                        QRect rc(option.rect.x() + 12, option.rect.y() + option.rect.height() - param - 2, 5, 5);
+                        //左下triangle
+                        QRect rc(option.rect.x() + 12, option.rect.y() + option.rect.height() - param - 3, 6, 7);
                         paintTriangle(painter,rc, painter->brush(), true);
                         painter->fillRect(QRect(option.rect.x() + 15, option.rect.y() - 1 + option.rect.height() - param, paintRect.width() - 10, 2), painter->brush());
-                        rc = QRect(option.rect.right() - 15, option.rect.y() + option.rect.height() - param -2, 5, 5);
+                        //右下triangle
+                        rc = QRect(option.rect.right() - 15, option.rect.y() + option.rect.height() - param - 3, 6, 7);
                         paintTriangle(painter,rc, painter->brush(), false);
                     }
                     //目标索引与当前索引相当时，不绘制横线效果
                     else if(dstIndex.row() < srcIndex.row()){
-                        QRect rc(option.rect.x() + 12, option.rect.y() + param - 2, 5, 5);
+                        //左上triangle
+                        QRect rc(option.rect.x() + 12, option.rect.y() + param - 3, 6, 7);
                         paintTriangle(painter,rc, painter->brush(), true);
                         //调整横线长度
                         painter->fillRect(QRect(option.rect.x()+ 15, option.rect.y() + param -1, paintRect.width() - 10 , 2), painter->brush());
-                        rc = QRect(option.rect.right() - 15, option.rect.y() + param - 2, 5, 5);
+                        //右上triangle
+                        rc = QRect(option.rect.right() - 15, option.rect.y() + param - 3, 6, 7);
                         paintTriangle(painter,rc, painter->brush(), false);
                     }
                     painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
