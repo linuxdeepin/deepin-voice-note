@@ -29,6 +29,10 @@
 #include <QStandardItem>
 #include <QList>
 #include <QDBusPendingReply>
+#include <QWebEngineProfile>
+#include <QWebEngineUrlRequestInterceptor>
+#include <QtWebChannel/QWebChannel>
+#include <QtWebEngineWidgets/QWebEngineView>
 
 #include <DMainWindow>
 #include <DSearchEdit>
@@ -298,7 +302,7 @@ private:
     //*****************Shortcut keys end**********************
 
     QString m_searchKey;
-    //VoiceNoteItem    *m_currentAsrVoice {nullptr};
+    QWebEngineView *m_webView {nullptr};
     DFloatingMessage *m_asrErrMeassage {nullptr};
     DFloatingMessage *m_pDeviceExceptionMsg {nullptr};
     DPushButton *m_asrAgainBtn {nullptr};

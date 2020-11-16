@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Summernote</title>
+  <link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css" rel="stylesheet">
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
+  <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script>
+  <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css" rel="stylesheet">
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.js"></script>
+</head>
+
+<style>
+    .mian{
+        width: 620px;
+        margin: 100px auto;
+        position: relative;
+        height: 500px;
+        overflow-y: auto;
+    }
+    #summernote{
+        /* width: 300px; */
+    }
+    .list{
+        width: 500px;
+        height: 50px;
+        background: red;
+    }
+    .item{
+        width: 100px;
+        height: 30px;
+        background: blue;
+    }
+    .demo{
+        display: inline-block;
+        text-align: center;
+        white-space: nowrap;
+        cursor: pointer !important;
+        display: flex;
+        justify-content: space-between;
+        padding-right: 30px;
+        padding-bottom: 10px;
+        padding-bottom: 12px;
+        user-select: none;
+        border-radius: 8px;
+        box-sizing: border-box;
+        -webkit-user-drag: element;
+
+    }
+    .li{
+        background: rgba(0,0,0,0.05);
+    }
+    #demo{
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .active{
+        background: red;
+    }
+    .left{
+        width: 60px;
+        height: 60px;
+        background: #0081FF;
+        margin: 2px 10px;
+    }
+    .right{
+        display: flex;
+        justify-content: space-between;
+        flex: 1;
+        justify-items: end;
+    }
+
+</style>
+
+<body>
+    <div id="summernote"></div>
+</body>
+</html>
+<script type="text/javascript">
+$('body').on('click','.demo',function(){
+    $(this).parents('.li').find('.translate').html('把一种语言译成另一种语言） translate; interpret; put ... into ...; turn ... into ...; transcribe;')
+});
+    //调用富文本编辑
+    $(document).ready(function() {
+        var $summernote = $('#summernote').summernote({
+            height: 300,
+            minHeight: null,
+            maxHeight: null,
+            focus: true,
+            callbacks: {
+            onInit: function() {
+               /* $('.note-editor > .note-toolbar')
+                    .on('mouseenter', function() {
+                        $('.note-editor .translate').attr('contenteditable', true);
+                    }).on('mouseleave', function() {
+                        $('.note-editor .translate').attr('contenteditable', false);
+                    });
+                $('.note-editor > .note-editing-area')
+                    .on('focus mouseenter mousedown mouseup keyup', function() {
+                        $('.note-editor .translate').attr('contenteditable', false);
+                    })
+                    .on('keydown', function(e) {
+                        if (e.metaKey || e.ctrlKey) {
+                            $('.note-editor .translate').attr('contenteditable', true);
+                        } else {
+                            $('.note-editor .translate').attr('contenteditable', false);
+                        }
+                    });*/
+                    $('#summernote').summernote('fullscreen.toggle')
+            },
+            onEnter: function(){
+                var options=$("#test option:selected");
+            }
+        }
+
+        });
+    });
+    var i=0;
+    var b=0;
+    function test(){
+        i++;
+    b=i;
+    var oHML=`
+    <div class="demo" contenteditable="false" forder_id="hello-world">
+    <div class="left">
+        </div>
+        <div class="right">
+            <div class="lf">
+                <div class="title" contenteditable="false">语音${b}</div>
+                <div class="minute" contenteditable="false">1分钟前</div>
+            </div>
+            <div class="lr">
+                <div class="icon" contenteditable="false">122</div>
+                <div class="time" contenteditable="false">12:01</div>
+            </div>
+        </div>
+    </div>
+    <div class="translate" contenteditable="false"></div>`;
+    var oA=document.createElement('div');
+    oA.className='li';
+    oA.id='demo'+b
+    oA.innerHTML=oHML;
+    $('#summernote').summernote('insertNode', oA);
+};
+</script>

@@ -150,15 +150,15 @@ void VNoteMainWindow::initConnections()
     connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
             this, SLOT(onVNoteChange(const QModelIndex &)));
 
-    connect(m_rightView, &RightView::contentChanged,
-            m_middleView, &MiddleView::onNoteChanged);
+//    connect(m_rightView, &RightView::contentChanged,
+//            m_middleView, &MiddleView::onNoteChanged);
 
-    connect(m_rightView, &RightView::sigVoicePlay,
-            this, &VNoteMainWindow::onRightViewVoicePlay);
-    connect(m_rightView, &RightView::sigVoicePause,
-            this, &VNoteMainWindow::onRightViewVoicePause);
-    connect(m_rightView, &RightView::sigCursorChange,
-            this, &VNoteMainWindow::onCursorChange);
+//    connect(m_rightView, &RightView::sigVoicePlay,
+//            this, &VNoteMainWindow::onRightViewVoicePlay);
+//    connect(m_rightView, &RightView::sigVoicePause,
+//            this, &VNoteMainWindow::onRightViewVoicePause);
+//    connect(m_rightView, &RightView::sigCursorChange,
+//            this, &VNoteMainWindow::onCursorChange);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::onNewNotebook);
@@ -397,10 +397,10 @@ void VNoteMainWindow::initShortcuts()
                     deleteAct = ActionManager::Instance()->getActionById(
                         ActionManager::NoteDelete);
                 }
-            } else if (m_rightView->hasFocus()) {
+            } /*else if (m_rightView->hasFocus()) {
                 deleteAct = ActionManager::Instance()->getActionById(
                     ActionManager::DetailDelete);
-            } else {
+            }*/ else {
                 QPoint pos = m_rightViewHolder->mapFromGlobal(QCursor::pos());
                 if (m_rightViewHolder->rect().contains(pos)) {
                     deleteAct = ActionManager::Instance()->getActionById(
@@ -602,14 +602,17 @@ void VNoteMainWindow::initRightView()
     QVBoxLayout *rightHolderLayout = new QVBoxLayout;
     rightHolderLayout->setSpacing(0);
     rightHolderLayout->setContentsMargins(0, 15, 0, 3);
-
+    m_webView = new QWebEngineView(m_rightViewHolder);
+    m_webView->load(QUrl("qrc:/web/jishiben2.html"));
+    rightHolderLayout->addWidget(m_webView);
+#if 0
     m_rightViewScrollArea = new DScrollArea(m_rightViewHolder);
     m_rightView = new RightView(m_rightViewScrollArea);
     m_rightViewScrollArea->setLineWidth(0);
     m_rightViewScrollArea->setWidgetResizable(true);
     m_rightViewScrollArea->setWidget(m_rightView);
     rightHolderLayout->addWidget(m_rightViewScrollArea);
-
+#endif
     //TODO:
     //    Add record area code here
     m_recordBarHolder = new QWidget(m_rightViewHolder);
@@ -781,7 +784,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
 
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
     if (!loadNotes(data)) {
-        m_rightView->initData(nullptr, m_searchKey, false);
+        //m_rightView->initData(nullptr, m_searchKey, false);
         m_recordBar->setVisible(false);
     }
 }
@@ -893,6 +896,7 @@ void VNoteMainWindow::onStartRecord(const QString &path)
  */
 void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 {
+#if 0
     if (voiceSize >= 1000) {
         m_rightView->insertVoiceItem(voicePath, voiceSize);
 
@@ -922,6 +926,8 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
         release();
         exit(0);
     }
+#endif
+    m_webView->page()->runJavaScript("test()");
 }
 
 /**
@@ -949,7 +955,7 @@ void VNoteMainWindow::onA2TStart(bool first)
     if(m_asrErrMeassage){
         m_asrErrMeassage->setVisible(false);
     }
-
+#if 0
     VoiceNoteItem *asrVoiceItem = nullptr;
 
     if (first) {
@@ -985,6 +991,7 @@ void VNoteMainWindow::onA2TStart(bool first)
             }
         }
     }
+#endif
 }
 
 /**
@@ -1257,11 +1264,12 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
     } else {
         m_recordBar->setVisible(true);
     }
-
+#if 0
     QScrollBar *bar = m_rightViewScrollArea->verticalScrollBar();
     bar->setValue(bar->minimum());
 
     m_rightView->initData(data, m_searchKey, m_rightViewHasFouse);
+#endif
     m_rightViewHasFouse = false;
 }
 
@@ -1459,7 +1467,7 @@ void VNoteMainWindow::delNotepad()
 {
     VNoteFolder *data = m_leftView->removeFolder();
 
-    m_rightView->removeCacheWidget(data);
+    //m_rightView->removeCacheWidget(data);
 
     VNoteFolderOper folderOper(data);
 
@@ -1505,7 +1513,7 @@ void VNoteMainWindow::addNote()
 
         //Refresh the notes count of folder
         m_leftView->update(m_leftView->currentIndex());
-        m_rightView->saveNote();
+        //m_rightView->saveNote();
         m_middleView->addRowAtHead(newNote);
     }
 }
@@ -1526,7 +1534,7 @@ void VNoteMainWindow::delNote()
     VNoteItem *noteData = m_middleView->deleteCurrentRow();
 
     if (noteData) {
-        m_rightView->removeCacheWidget(noteData);
+        //m_rightView->removeCacheWidget(noteData);
         VNoteItemOper noteOper(noteData);
         noteOper.deleteNote();
 
@@ -1592,7 +1600,7 @@ int VNoteMainWindow::loadSearchNotes(const QString &key)
         noteAll->lock.unlock();
         if (m_middleView->rowCount() == 0) {
             m_middleView->setVisibleEmptySearch(true);
-            m_rightView->initData(nullptr, m_searchKey);
+            //m_rightView->initData(nullptr, m_searchKey);
             m_recordBar->setVisible(false);
         } else {
             m_middleView->setVisibleEmptySearch(false);
@@ -1950,8 +1958,8 @@ void VNoteMainWindow::onCursorChange(int height, bool mouseMove)
  */
 void VNoteMainWindow::switchWidget(WindowType type)
 {
-    bool searchEnable = type == WndNoteShow ? true : false;
-    m_noteSearchEdit->setEnabled(searchEnable);
+    //bool searchEnable = type == WndNoteShow ? true : false;
+    m_noteSearchEdit->setEnabled(false);
     m_stackedWidget->setCurrentIndex(type);
 }
 
@@ -1966,7 +1974,7 @@ void VNoteMainWindow::release()
     }
 
     VTextSpeechAndTrManager::onStopTextToSpeech();
-    m_rightView->saveNote();
+   // m_rightView->saveNote();
 
     QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
     if (stateOperation->isVoice2Text()) {

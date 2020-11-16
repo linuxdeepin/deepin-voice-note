@@ -122,6 +122,8 @@ find_package(Qt5Gui REQUIRED)
 find_package(DtkWidget REQUIRED)
 find_package(DtkCore REQUIRED)
 find_package(DFrameworkdbus REQUIRED)
+find_package(Qt5WebChannel REQUIRED)
+find_package(Qt5WebEngineWidgets REQUIRED)
 pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
 pkg_check_modules(LIBVLC REQUIRED libvlc)
 include_directories(${GSTREAMER_INCLUDE_DIRS})
@@ -146,6 +148,9 @@ target_link_libraries(${APP_BIN_NAME}
     Qt5::DBus
     Qt5::Sql
     Qt5::Multimedia
+    Qt5::WebChannel
+    Qt5::WebEngineWidgets
+
 )
 
 set(CMAKE_INSTALL_PREFIX /usr)

@@ -86,5 +86,43 @@
         <file>icons/deepin/builtin/play.svg</file>
         <file>icons/deepin/builtin/pause.svg</file>
         <file>deepin-voice-note-setting.json</file>
+        <file>web/css/font/summernote.eot</file>
+        <file>web/css/font/summernote.ttf</file>
+        <file>web/css/font/summernote.woff</file>
+        <file>web/css/font_4/demo.css</file>
+        <file>web/css/font_4/demo_index.html</file>
+        <file>web/css/font_4/iconfont.css</file>
+        <file>web/css/font_4/iconfont.eot</file>
+        <file>web/css/font_4/iconfont.js</file>
+        <file>web/css/font_4/iconfont.json</file>
+        <file>web/css/font_4/iconfont.svg</file>
+        <file>web/css/font_4/iconfont.ttf</file>
+        <file>web/css/font_4/iconfont.woff</file>
+        <file>web/css/font_4/iconfont.woff2</file>
+        <file>web/css/bootstrap.css</file>
+        <file>web/css/index.css</file>
+        <file>web/css/reset.css</file>
+        <file>web/css/summernote.css</file>
+        <file>web/js/bootstrap.js</file>
+        <file>web/js/clipboard.min.js</file>
+        <file>web/js/dmailweb.js</file>
+        <file>web/js/index.js</file>
+        <file>web/js/index.min.js</file>
+        <file>web/js/jquery.js</file>
+        <file>web/js/jquery.textSearch-1.0.js</file>
+        <file>web/js/jquery.textSearch-1.0备份.js</file>
+        <file>web/js/moni.js</file>
+        <file>web/js/qwebchannel.js</file>
+        <file>web/js/re.js</file>
+        <file>web/js/summer-clear.js</file>
+        <file>web/js/summernote-dmail.js</file>
+        <file>web/js/summernote-zh-CN.js</file>
+        <file>web/js/summernote.js</file>
+        <file>web/js/summernote1.js</file>
+        <file>web/js/summernote1.min.js</file>
+        <file>web/js/summernote2.js</file>
+        <file>web/js/summernote_v0.8.13.js</file>
+        <file>web/js/test.js</file>
+        <file>web/jishiben2.html</file>
     </qresource>
 </RCC>

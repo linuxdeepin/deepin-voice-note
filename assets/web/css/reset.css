@@ -1,0 +1,161 @@
+@font-face {
+    font-family: 'iconfont';  /* project id 406416 */
+    src: url('./font_4/iconfont.eot');
+    src: url('./font_4/iconfont.eot?#iefix') format('embedded-opentype'),
+    url('./font_4/iconfont.woff2') format('woff2'),
+    url('./font_4/iconfont.woff') format('woff'),
+    url('./font_4/iconfont.ttf') format('truetype'),
+    url('./font_4/iconfont.svg#iconfont') format('svg');
+  }
+  .note-icon-caret:before{
+    content: '' !important;
+}
+
+.note-editor.note-frame{
+    border:none !important;
+}
+
+.note-current-fontname + .note-icon-caret:before,.note-current-fontsize + .note-icon-caret:before{
+    content: "\f110" !important;;  
+    display: inline-block;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit; 
+
+} 
+.note-current-fontname + .note-icon-caret:before,.note-current-fontsize + .note-icon-caret{
+    margin-left:10px !important;
+ }
+.panel-heading.note-toolbar .note-color .dropdown-toggle{
+    border-color:#ccc !important;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0)!important;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0)!important;
+}
+.panel-heading.note-toolbar .note-color .dropdown-toggle:hover{
+    border-color:#ccc !important;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0)!important;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0)!important;
+}
+.panel-heading.note-toolbar .note-color .dropdown-toggle.active,.panel-heading.note-toolbar .note-color .dropdown-toggleL:focus{
+    border-color:#ccc !important;
+    -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0)!important;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0)!important;
+}
+.panel-heading.note-toolbar .note-color .dropdown-toggle .note-icon-caret{
+    height:12px;
+    width:12px;
+    display:inline-block;
+/*    background-color:#ffff00;*/
+    background-color:#1C52B7;
+    border-radius:4px;
+    float:left;
+}
+.panel-heading.note-toolbar .note-color .dropdown-toggle{
+    height:36px;
+    padding: 8px 0 !important;
+    padding-right: 7px !important;
+    border-left:none;
+    margin-left: 0;
+} 
+.note-recent-color{
+    background-color: transparent !important;
+}
+  .icon{
+    width: 20px;
+    height: 20px;
+    position: relative;;
+    background: red;
+}
+.icon:after{
+    content: '\e60e';
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: inline-block;
+    font-family: "iconfont";
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+}
+.iconfont:before{
+    display: inline-block;
+    font-family: "iconfont";
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit; 
+}
+.note-icon-bold.iconfont:before{
+    content: '\e619';
+    display: inline-block;
+    font-family: "iconfont";
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+}
+/* .dropdown-toggle:hover{
+    background:none !important;
+} */
+/* .note-editable {
+    font-family:'Courier New';
+    font-size:16px！important;
+} */
+.note-editor.note-frame .note-editing-area .note-editable:-webkit-scrollbar-track {
+    -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,0);
+    background-color:rgba(0,0,0,0)
+}
+.note-editor.note-frame .note-editing-area .note-editable::-webkit-scrollbar {
+    width:10px;
+    height:10px;
+}
+.note-editor.note-frame .note-editing-area .note-editable::-webkit-scrollbar:horizontal{
+    height:10px
+}
+.note-editor.note-frame .note-editing-area .note-editable::-webkit-scrollbar-thumb{
+    border-radius: 5px;
+    border-style: dashed;
+    background-color: rgba(83,96,118,.4);
+    border-color: transparent;
+    border-width: 2px;
+    background-clip: padding-box;
+}
+.note-editor.note-frame .note-editing-area .note-editable::-webkit-scrollbar-thumb:hover{
+    border-width: 1px;
+    background-color:rgba(83,96,118,.5);
+    border-radius:5px;
+    /* -webkit-box-shadow:inset 0 0 6px rgba(83,96,118,.5) */
+}
+.note-editor.note-frame .note-editing-area .note-editable::-webkit-scrollbar-thumb:active{
+    border-width: 1px;
+    background-color:rgba(83,96,118,.6);
+    border-radius:5px;
+    /* -webkit-box-shadow:inset 0 0 6px rgba(83,96,118,.6) */
+}
+#summernote{
+    width: 300px;
+}
+body{
+    background: red;
+}
+
+.note-popover.popover.note-image-popover .arrow{
+    display: none;
+
+}
+
+ .reset-btn-default:focus,
+.reset-btn-default:active:focus,
+.reset-btn-default.active:focus,
+.reset-btn-default.focus,
+.reset-btn-default:active.focus,
+.reset-btn-default.active.focus {
+    outline: none;
+    border-color: transparent;
+    box-shadow:none;
+}
+  
+button.close{
+    width:20px;
+    height:20px;
+    font-size:0;
+}
