@@ -85,6 +85,8 @@ protected:
     void initUI();
     //连接槽函数
     void initConnections();
+    //隐藏事件
+    void hideEvent(QHideEvent *event);
 private:
     DLabel      *m_noteInfo {nullptr};
     FolderSelectView   *m_view {nullptr};

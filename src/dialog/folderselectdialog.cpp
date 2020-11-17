@@ -316,3 +316,16 @@ void FolderSelectDialog::onVNoteFolderSelectChange(const QItemSelection &selecte
     Q_UNUSED(deselected);
     m_confirmBtn->setEnabled(!!selected.indexes().size());
 }
+
+
+/**
+ * @brief FolderSelectDialog::hideEvent
+ * @param event
+ *  隐藏事件 bug 54701
+ */
+void FolderSelectDialog::hideEvent(QHideEvent *event)
+{
+    //取消按钮的hover状态
+    m_closeButton->setAttribute(Qt::WA_UnderMouse, false);
+    DAbstractDialog::hideEvent(event);
+}
