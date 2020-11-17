@@ -87,8 +87,11 @@ protected:
     void initConnections();
     //隐藏事件
     void hideEvent(QHideEvent *event);
+    //主题切换刷新文本颜色
+    void refreshTextColor(bool dark);
 private:
-    DLabel      *m_noteInfo {nullptr};
+    DLabel *m_noteInfo {nullptr};
+    DLabel *m_labMove {nullptr};
     FolderSelectView   *m_view {nullptr};
     DWindowCloseButton *m_closeButton {nullptr};
     LeftViewSortFilter *m_model {nullptr};

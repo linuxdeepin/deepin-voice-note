@@ -155,19 +155,23 @@ QSize LeftViewDelegate::sizeHint(const QStyleOptionViewItem &option,
 {
     StandardItemCommon::StandardItemType type = StandardItemCommon::getStandardItemType(index);
     QModelIndex nextIndex = index.siblingAtRow(index.row() + 1);
-    //初始高度
-    int height = 47;
+
+    //待移动记事本列表行高36,左侧记事本列表行高47px
+    int height = (m_isPendingList)? 36 : 47;
     switch (type) {
     case StandardItemCommon::NOTEPADROOT:
         return QSize(option.rect.width(), 1); //隐藏记事本一级目录
     case StandardItemCommon::NOTEPADITEM:
-        //第一行空间+4
-        if (index.row() == 0) {
-            height += 4;
-        }
-        //最后一行空间+5
-        else if (!nextIndex.isValid()) {
-            height += 5;
+        //左侧记事本列表调整高度
+        if(!m_isPendingList){
+            //第一行空间+4
+            if (index.row() == 0) {
+                height += 4;
+            }
+            //最后一行空间+5
+            else if (!nextIndex.isValid()) {
+                height += 5;
+            }
         }
         return QSize(option.rect.width(), height);
     default:
@@ -226,15 +230,20 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
     painter->setRenderHints(QPainter::SmoothPixmapTransform);
     //绘制区域
     QRect paintRect;
-    if ( firstIndexHeightParam == option.rect.height() ) {
-        paintRect = QRect(option.rect.x() + 10, option.rect.y() + 10,
-                          option.rect.width() - 20, option.rect.height() - 14);
-    } else if  (lastIndexHeightParam == option.rect.height()) {
-        paintRect = QRect(option.rect.x() + 10, option.rect.y() + 5,
-                          option.rect.width() - 20, option.rect.height() - 14);
-    } else {
-        paintRect = QRect(option.rect.x() + 10, option.rect.y() + 5,
-                          option.rect.width() - 20, option.rect.height() - 10);
+    //区分左侧记事本列表和待移动记事本列表
+    if(m_isPendingList){
+            paintRect = QRect(option.rect.x(), option.rect.y() ,option.rect.width() -5, option.rect.height());
+    }else {
+        if ( firstIndexHeightParam == option.rect.height() ) {
+            paintRect = QRect(option.rect.x() + 10, option.rect.y() + 10,
+                              option.rect.width() - 20, option.rect.height() - 14);
+        } else if  (lastIndexHeightParam == option.rect.height()) {
+            paintRect = QRect(option.rect.x() + 10, option.rect.y() + 5,
+                              option.rect.width() - 20, option.rect.height() - 14);
+        } else {
+            paintRect = QRect(option.rect.x() + 10, option.rect.y() + 5,
+                              option.rect.width() - 20, option.rect.height() - 10);
+        }
     }
     int param =  (option.rect.height() == 51) ?  5 : 0;
     param = (option.rect.height() == 52 ) ? 4 : param;
@@ -303,9 +312,12 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
                     painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
                 }
             } else {
-                painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
-                painter->fillPath(path, painter->brush());
-                painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
+                //根据ui设计，区分奇偶行背景颜色
+                if(index.row()%2 == 0 || !m_isPendingList){
+                        painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
+                        painter->fillPath(path, painter->brush());
+                        painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
+                }
             }
         }
     }
@@ -357,6 +369,16 @@ void LeftViewDelegate::paintTriangle(QPainter *painter, const QRect& rc, const Q
         path.lineTo(rc.topRight());
     }
     painter->fillPath(path,brush);
+}
+
+/**
+ * @brief LeftViewDelegate::setSelectView
+ * @param selectView : 是否为待移动记事本列表
+ * 更新判断标志
+ */
+void LeftViewDelegate::setSelectView(bool selectView)
+{
+    m_isPendingList = selectView;
 }
 
 /**

@@ -451,6 +451,7 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
         m_folderSelectDialog->setFolderBlack(folders);
         m_folderSelectDialog->setNoteContext(itemInfo);
         m_folderSelectDialog->clearSelection();
+
         m_folderSelectDialog->exec();
         if (m_folderSelectDialog->result() == FolderSelectDialog::Accepted) {
             index = m_folderSelectDialog->getSelectIndex();

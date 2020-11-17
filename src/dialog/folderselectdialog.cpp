@@ -29,6 +29,7 @@
 
 #include <DApplication>
 #include <DApplicationHelper>
+#include <QGraphicsOpacityEffect>
 
 FolderSelectView::FolderSelectView(QWidget *parent)
     : DTreeView(parent)
@@ -173,6 +174,8 @@ void FolderSelectDialog::initUI()
     m_view->setModel(m_model);
     m_view->setContextMenuPolicy(Qt::NoContextMenu);
     m_delegate = new LeftViewDelegate(m_view);
+    //更新代理判断标志
+    m_delegate->setSelectView(true);
     m_delegate->setDrawNotesNum(false);
     m_view->setItemDelegate(m_delegate);
     m_view->setHeaderHidden(true);
@@ -187,20 +190,25 @@ void FolderSelectDialog::initUI()
     m_closeButton->setFocusPolicy(Qt::NoFocus);
     m_closeButton->setIconSize(QSize(50, 50));
 
-    DLabel *labMove = new DLabel(this);
-    DFontSizeManager::instance()->bind(labMove, DFontSizeManager::T6);
-    labMove->setText(DApplication::translate("FolderSelectDialog", "Move Notes"));
+    m_labMove = new DLabel(this);
+    DFontSizeManager::instance()->bind(m_labMove, DFontSizeManager::T6,QFont::Medium);
+    m_labMove->setText(DApplication::translate("FolderSelectDialog", "Move Notes"));
+
     QHBoxLayout *titleLayout = new QHBoxLayout();
     titleLayout->setSpacing(0);
     titleLayout->setContentsMargins(10, 0, 0, 0);
     titleLayout->addStretch();
-    titleLayout->addWidget(labMove, 0, Qt::AlignCenter | Qt::AlignVCenter);
+    titleLayout->addWidget(m_labMove, 0, Qt::AlignCenter | Qt::AlignVCenter);
     titleLayout->addStretch();
     titleLayout->addWidget(m_closeButton, 0, Qt::AlignRight | Qt::AlignVCenter);
 
     m_noteInfo = new DLabel(this);
-    m_noteInfo->setForegroundRole(DPalette::TextTips);
-    DFontSizeManager::instance()->bind(m_noteInfo, DFontSizeManager::T6);
+    m_noteInfo->setFixedWidth(165);
+    //初始化标题与提示字体颜色
+    bool isDark = DGuiApplicationHelper::instance()->themeType()==DGuiApplicationHelper::DarkType?true:false;
+    refreshTextColor(isDark);
+
+    DFontSizeManager::instance()->bind(m_noteInfo, DFontSizeManager::T6,QFont::Normal);
     QHBoxLayout *actionBarLayout = new QHBoxLayout();
     actionBarLayout->setSpacing(5);
     actionBarLayout->setContentsMargins(0, 0, 0, 0);
@@ -228,6 +236,7 @@ void FolderSelectDialog::initUI()
     //实现内部视图列表圆角
     DFrame *viewFrame = new DFrame(this);
     QHBoxLayout *viewFrameLayout = new QHBoxLayout();
+    //根据ui调整边距大小
     viewFrameLayout->setContentsMargins(5, 5, 0, 5);
     viewFrameLayout->addWidget(m_view);
     viewFrame->setLayout(viewFrameLayout);
@@ -236,7 +245,7 @@ void FolderSelectDialog::initUI()
     viewFrame->setAttribute(Qt::WA_TranslucentBackground, true);
 
     mainLayout->addLayout(titleLayout);
-    mainLayout->addWidget(m_noteInfo, 0, Qt::AlignCenter | Qt::AlignVCenter);
+    mainLayout->addWidget(m_noteInfo, 0, Qt::AlignHCenter | Qt::AlignVCenter);
     mainLayout->addSpacing(10);
     mainLayout->addWidget(viewFrame, 1);
     mainLayout->addSpacing(10);
@@ -260,8 +269,54 @@ void FolderSelectDialog::initConnections()
     connect(m_closeButton, &DWindowCloseButton::clicked, this, [this]() {
         this->close();
     });
+
     connect(m_view->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &FolderSelectDialog::onVNoteFolderSelectChange);
+
+    //由于ui中颜色与dtk颜色库不对应，需要手动判断并设置s
+    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this, [ = ] {
+            bool isDark = DGuiApplicationHelper::instance()->themeType()==DGuiApplicationHelper::DarkType?true:false;
+            this->refreshTextColor(isDark);
+    });
+}
+
+/**
+ * @brief FolderSelectDialog::themeChanged
+ * @param dark 深色主题或浅色主题
+ * 主题切换刷新文本颜色
+ */
+void FolderSelectDialog::refreshTextColor(bool dark){
+    // 黑色主题
+    if (dark){
+        //标题
+        DPalette titlePalette = DApplicationHelper::instance()->palette(m_labMove);
+        QColor color = QColor(255,255,255);
+        titlePalette.setBrush(DPalette::WindowText, color);
+        DApplicationHelper::instance()->setPalette(m_labMove, titlePalette);
+        //提示内容
+        DPalette infoPalette = DApplicationHelper::instance()->palette(m_noteInfo);
+        color.setAlphaF(0.7);
+        infoPalette.setBrush(DPalette::WindowText, color);
+        //30%的透明度
+        DApplicationHelper::instance()->setPalette(m_noteInfo, infoPalette);
+    }
+    //白色主题
+    else {
+        //标题
+        DPalette titlePalette = DApplicationHelper::instance()->palette(m_labMove);
+        QColor color = QColor(0,0,0,1);
+        //10%的透明度
+        color.setAlphaF(0.9);
+        titlePalette.setBrush(DPalette::WindowText, color);
+        DApplicationHelper::instance()->setPalette(m_labMove, titlePalette);
+        //提示内容
+        DPalette infoPalette = DApplicationHelper::instance()->palette(m_noteInfo);
+        color.setAlphaF(1);
+        //30%的透明度
+        color.setAlphaF(0.7);
+        infoPalette.setBrush(DPalette::WindowText,color);
+        DApplicationHelper::instance()->setPalette(m_noteInfo, infoPalette);
+    }
 }
 
 /**
