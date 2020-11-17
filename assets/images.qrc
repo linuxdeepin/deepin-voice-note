@@ -128,5 +128,6 @@
         <file>web/light/play.svg</file>
         <file>web/light/pause.svg</file>
         <file>web/index.css</file>
+        <file>web/index.js</file>
     </qresource>
 </RCC>
