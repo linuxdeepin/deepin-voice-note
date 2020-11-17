@@ -48,8 +48,8 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
         this->setVisible(false);
         return;
     }
-    this->setVisible(true);
     m_noteData = data;
+    this->setVisible(true);
     emit m_jsContent->initData(data->metaDataRef().toString());
 }
 
@@ -66,6 +66,6 @@ void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
     notetmp.datas.datas.push_back(data);
     MetaDataParser parse;
     QVariant value;
-    parse.makeMetaData(&notetmp, value);
+    parse.makeMetaData(&notetmp, value, true);
     emit m_jsContent->insertVoiceItem(value.toString());
 }

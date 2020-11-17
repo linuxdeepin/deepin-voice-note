@@ -240,8 +240,8 @@ bool NoteQryDbVisitor::visitorData()
 
             //Parse meta data
             QVariant metaData = m_sqlQuery->value(DBNote::meta_data);
-            note->setMetadata(metaData);
             metaParser.parse(metaData, note);
+            note->setMetadata(metaData);
 
             note->noteState = m_sqlQuery->value(DBNote::note_state).toInt();
 
@@ -555,8 +555,8 @@ bool AddNoteDbVisitor::visitorData()
 
             //Parse meta data
             QVariant metaData = m_sqlQuery->value(DBNote::meta_data);
-            note->setMetadata(metaData);
             metaParser.parse(metaData, note);
+            note->setMetadata(metaData);
 
             note->noteState = m_sqlQuery->value(DBNote::note_state).toInt();
 

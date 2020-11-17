@@ -35,7 +35,7 @@ MetaDataParser::MetaDataParser()
  * @param metaData 数据源
  * @param noteData 解析后的数据
  */
-void MetaDataParser::parse(const QVariant &metaData, VNoteItem *noteData)
+void MetaDataParser::parse(QVariant &metaData, VNoteItem *noteData)
 {
 #ifdef VN_XML_METADATA_PARSER
     xmlParse(metaData, noteData);
@@ -49,12 +49,12 @@ void MetaDataParser::parse(const QVariant &metaData, VNoteItem *noteData)
  * @param noteData 数据源
  * @param metaData 生成的数据
  */
-void MetaDataParser::makeMetaData(const VNoteItem *noteData, QVariant &metaData)
+void MetaDataParser::makeMetaData(const VNoteItem *noteData, QVariant &metaData, bool blockid)
 {
 #ifdef VN_XML_METADATA_PARSER
     xmlMakeMetadata(noteData, metaData);
 #elif defined(VN_JSON_METADATA_PARSER)
-    jsonMakeMetadata(noteData, metaData);
+    jsonMakeMetadata(noteData, metaData, blockid);
 #endif
 }
 
@@ -200,7 +200,7 @@ void MetaDataParser::xmlParseNoteItem(QXmlStreamReader &xmlSRead, VNoteItem *not
  * @param metaData 数据源
  * @param noteData 解析的数据
  */
-void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*out*/)
+void MetaDataParser::jsonParse(QVariant &metaData, VNoteItem *noteData /*out*/)
 {
     Q_ASSERT(nullptr != noteData);
 
@@ -208,6 +208,7 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*o
 
     QJsonObject note = noteDoc.object();
     QJsonArray noteDatas;
+
     //    int         noteCount = -1;
 
     //    //noteCount doesn't used now
@@ -219,16 +220,18 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*o
     if (note.contains(m_jsonNodeNameMap[NVoiceMaxId])) {
         noteData->maxVoiceIdRef() = note.value(m_jsonNodeNameMap[NVoiceMaxId]).toInt(0);
     }
-
-    if (note.contains(m_jsonNodeNameMap[NDatas])) {
-        noteDatas = note.value(m_jsonNodeNameMap[NDatas]).toArray();
+    QJsonValueRef arrayRef = note.find(m_jsonNodeNameMap[NDatas]).value();
+    if (!arrayRef.isNull()) {
+        noteDatas = arrayRef.toArray();
     }
 
     //Parse the note datas
-    for (auto it : noteDatas) {
+    for (QJsonArray::iterator it = noteDatas.begin(); it != noteDatas.end(); it++) {
         VNoteBlock *ptrBlock = nullptr;
 
-        QJsonObject noteItem = it.toObject();
+
+        QJsonValueRef elementOneValueRef = it[0];
+        QJsonObject noteItem = elementOneValueRef.toObject();
 
         int noteType = noteItem.value(m_jsonNodeNameMap[NDataType]).toInt(VNoteBlock::InValid);
 
@@ -247,9 +250,11 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*o
                 ptrBlock->ptrVoice->createTime = QDateTime::fromString(
                     noteItem.value(m_jsonNodeNameMap[NCreateTime]).toString(), VNOTE_TIME_FMT);
             }
-
             noteData->datas.addBlock(ptrBlock);
         }
+        elementOneValueRef = noteItem;
+        arrayRef = noteDatas;
+        metaData = QJsonDocument(note).toJson(QJsonDocument::Compact);
     }
 }
 
@@ -258,7 +263,7 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*o
  * @param noteData 数据源
  * @param metaData 生成的数据
  */
-void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaData)
+void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaData, bool blockid)
 {
     Q_ASSERT(nullptr != noteData);
 
@@ -287,7 +292,9 @@ void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaD
                 noteItem.insert(m_jsonNodeNameMap[NCreateTime],
                                 it->ptrVoice->createTime.toString(VNOTE_TIME_FMT));
             }
-            noteItem.insert(m_jsonNodeNameMap[BlockId], it->blockid);
+            if(blockid){
+                noteItem.insert(m_jsonNodeNameMap[BlockId], it->blockid);
+            }
             noteDatas.append(noteItem);
         }
     }

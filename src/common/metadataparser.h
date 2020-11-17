@@ -109,9 +109,9 @@ public:
     };
 #endif
     //源数据解析
-    void parse(const QVariant &metaData, VNoteItem *noteData /*out*/);
+    void parse(QVariant &metaData, VNoteItem *noteData /*out*/);
     //源数据生成
-    void makeMetaData(const VNoteItem *noteData, QVariant &metaData /*out*/);
+    void makeMetaData(const VNoteItem *noteData, QVariant &metaData /*out*/,bool blockid = false);
 
 protected:
 #ifdef VN_XML_METADATA_PARSER
@@ -150,9 +150,9 @@ protected:
         {BlockId, "BlockId"},
     };
     //json串解析
-    void jsonParse(const QVariant &metaData, VNoteItem *noteData /*out*/);
+    void jsonParse(QVariant &metaData, VNoteItem *noteData /*out*/);
     //json串生成
-    void jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaData /*out*/);
+    void jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaData /*out*/, bool blockid = false);
 #endif
 };
 
