@@ -784,7 +784,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
 
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
     if (!loadNotes(data)) {
-        //m_rightView->initData(nullptr, m_searchKey, false);
+        m_webView->initData(nullptr, m_searchKey, false);
         m_recordBar->setVisible(false);
     }
 }
