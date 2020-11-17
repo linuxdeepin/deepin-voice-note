@@ -124,5 +124,9 @@
         <file>web/js/summernote_v0.8.13.js</file>
         <file>web/js/test.js</file>
         <file>web/jishiben2.html</file>
+        <file>web/index.html</file>
+        <file>web/light/play.svg</file>
+        <file>web/light/pause.svg</file>
+        <file>web/index.css</file>
     </qresource>
 </RCC>

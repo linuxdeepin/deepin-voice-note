@@ -603,7 +603,7 @@ void VNoteMainWindow::initRightView()
     rightHolderLayout->setSpacing(0);
     rightHolderLayout->setContentsMargins(0, 15, 0, 3);
     m_webView = new QWebEngineView(m_rightViewHolder);
-    m_webView->load(QUrl("qrc:/web/jishiben2.html"));
+    m_webView->load(QUrl("qrc:/web/index.html"));
     rightHolderLayout->addWidget(m_webView);
 #if 0
     m_rightViewScrollArea = new DScrollArea(m_rightViewHolder);
