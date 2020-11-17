@@ -1,3 +1,6 @@
+// getVoiceTime 语音插件创建时间格式化,参数字符串，例如"2020-10-20 16:23:44"，返回格式化后的字符串
+// getVoiceSize 参数数字型,单位毫秒，例如1000,返回格式化后的字符串;
+
 var webobj;
 var initData = function (text) {
     var initText = JSON.parse(text);
@@ -5,6 +8,14 @@ var initData = function (text) {
     newText.forEach(item => {
         item.type = item.type == 1 ? false : true
     })
+    var strTime="2020-10-20 16:23:44";
+    webobj.getVoiceTime(strTime, function(n){
+        alert(n);
+    });
+    var size=10000;
+    webobj.getVoiceSize(size, function(n){
+        alert(n);
+    });
     initText.noteDatas = newText;
     init(1, initText)
     //alert("init" + text);

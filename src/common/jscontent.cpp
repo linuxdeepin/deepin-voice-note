@@ -19,8 +19,24 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "jscontent.h"
+#include "common/utils.h"
+#include <QDateTime>
+#include <QDebug>
 
 JsContent::JsContent(QObject *parent) : QObject(parent)
 {
 
+}
+
+QString JsContent::getVoiceSize(qint64 millisecond)
+{
+    return Utils::formatMillisecond(millisecond, 0);
+}
+
+QString JsContent::getVoiceTime(const QString &time)
+{
+    QDateTime dataTime = QDateTime::fromString(time, "yyyy-MM-dd hh:mm:ss");;
+    QString str =  Utils::convertDateTime(dataTime);
+    qDebug() << str;
+    return  str;
 }

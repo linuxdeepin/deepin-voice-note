@@ -32,6 +32,8 @@ signals:
     void initData(const QString& jsonData/*, const QString& seachKey*/);
     void insertVoiceItem(const QString &jsonData);
 public slots:
+    QString getVoiceSize(qint64 millisecond);
+    QString getVoiceTime(const QString &time);
 };
 
 #endif // JSCONTENT_H
