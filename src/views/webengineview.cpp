@@ -50,6 +50,7 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
     }
     m_noteData = data;
     this->setVisible(true);
+    qDebug() << data->metaDataRef().toString();
     emit m_jsContent->initData(data->metaDataRef().toString());
 }
 

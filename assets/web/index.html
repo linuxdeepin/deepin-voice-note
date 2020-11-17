@@ -10,59 +10,64 @@
     <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css" rel="stylesheet">
     <link href="./index.css" rel="stylesheet">
     <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/handlebars.js/2.0.0/handlebars.js"></script>
     <script src="./js/qwebchannel.js"></script>
 </head>
+
 <body>
     <div class="main">
-        <div class="list" data-id="0">
-            <div id="summernote" data-id="0">
-            </div>
-        </div>
     </div>
     <script>
     </script>
     <script id="main" type="text/x-handlebars-template">
-        {{#if list}}
-        {{#each list}}
-        <a>
-        {{#if list}}
-        <div class="li">
-            <div class="demo" forder_id="{{}}">
-            <div class="left">
-                <div class="btn play"></div>
-                </div>
-                <div class="right">
-                    <div class="lf">
-                        <div class="title">{{data.time}}</div>
-                        <div class="minute padtop">{{data.time}}</div>
+        {{#if this.dataCount}}
+        {{#each this.noteDatas}}
+        {{#if this.type}}	
+            <div class="li">
+                <div class="demo" forder_id={{item.id}}>
+                <div class="left">
+                    <div class="btn play"></div>
                     </div>
-                    <div class="lr">
-                        <div class="icon">
-                        <div class="wifi-symbol">
-                            <div class="wifi-circle first"></div>
-                            <div class="wifi-circle second"></div>
-                            <div class="wifi-circle third"></div>
-                            <div class="wifi-circle four"></div>
+                    <div class="right">
+                        <div class="lf">
+                            <div class="title">{{this.title}}</div>
+                            <div class="minute padtop">{{this.createTime}}</div>
                         </div>
+                        <div class="lr">
+                            <div class="icon">
+                            <div class="wifi-symbol">
+                                <div class="wifi-circle first"></div>
+                                <div class="wifi-circle second"></div>
+                                <div class="wifi-circle third"></div>
+                                <div class="wifi-circle four"></div>
+                            </div>
+                            </div>
+                            <div class="time padtop">{{this.voiceSize}}</div>
                         </div>
-                        <div class="time padtop">{{data}}</div>
                     </div>
                 </div>
-            </div><div class="translate"></div>
+            <div class="translate"></div>
             </div>
-            {{else}}
-            <div id="${str}" data-id="${b}">
-            </div>
-            {{/if}}
-        </a>
+        {{else}}
+        <div id="summernote{{this.BlockId}}" data-id="{{this.BlockId}}">
+        </div>
+        {{/if}}
         {{/each}}
         {{else}}
         <div class="list" data-id="0">
             <div id="summernote" data-id="0">
             </div>
         </div>
+        {{/if}}
     </script>
-    <div class="self-btn" onclick="fnClick()">录音</div>
+    <script id="test" type="text/x-handlebars-template">
+        {{#if this.total}}
+            <div>456</div>
+        {{else}}
+            <div>789</div>
+        {{/if}}
+    </script>
+    <!-- <div class="self-btn" onclick="fnClick()">录音</div> -->
     <script src="./index.js"></script>
 </body>
 
