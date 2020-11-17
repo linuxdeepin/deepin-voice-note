@@ -135,6 +135,7 @@ struct VNoteBlock {
     //获取数据类型
     qint32 getType();
 
+    QString blockid {""};
     qint32 blockType {InValid};
     /*
      * Comment:

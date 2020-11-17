@@ -51,6 +51,7 @@
 #include "views/vnoterecordbar.h"
 #include "widgets/vnoteiconbutton.h"
 #include "task/vnmainwnddelayinittask.h"
+#include "views/webengineview.h"
 
 #ifdef IMPORT_OLD_VERSION_DATA
 #include "importolddata/upgradeview.h"
@@ -602,8 +603,7 @@ void VNoteMainWindow::initRightView()
     QVBoxLayout *rightHolderLayout = new QVBoxLayout;
     rightHolderLayout->setSpacing(0);
     rightHolderLayout->setContentsMargins(0, 15, 0, 3);
-    m_webView = new QWebEngineView(m_rightViewHolder);
-    m_webView->load(QUrl("qrc:/web/index.html"));
+    m_webView = new WebEngineView(m_rightViewHolder);
     rightHolderLayout->addWidget(m_webView);
 #if 0
     m_rightViewScrollArea = new DScrollArea(m_rightViewHolder);
@@ -896,9 +896,9 @@ void VNoteMainWindow::onStartRecord(const QString &path)
  */
 void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 {
-#if 0
+#if 1
     if (voiceSize >= 1000) {
-        m_rightView->insertVoiceItem(voicePath, voiceSize);
+        m_webView->insertVoiceItem(voicePath, voiceSize);
 
         //Recording normal,remove the data safer.
         VNoteItem *currentNote = m_middleView->getCurrVNotedata();
@@ -927,7 +927,6 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
         exit(0);
     }
 #endif
-    m_webView->page()->runJavaScript("test()");
 }
 
 /**
@@ -1270,6 +1269,7 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 
     m_rightView->initData(data, m_searchKey, m_rightViewHasFouse);
 #endif
+    m_webView->initData(data, m_searchKey, m_rightViewHasFouse);
     m_rightViewHasFouse = false;
 }
 
@@ -1771,7 +1771,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_middleView->closeMenu();
         m_addNotepadBtn->setEnabled(false);
         m_middleView->setOnlyCurItemMenuEnable(true);
-        m_rightView->setEnablePlayBtn(false);
+        //m_rightView->setEnablePlayBtn(false);
         m_addNoteBtn->setDisabled(true);
         break;
     case RecordEnd:
@@ -1782,7 +1782,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_middleView->setOnlyCurItemMenuEnable(false);
             m_addNoteBtn->setDisabled(false);
         }
-        m_rightView->setEnablePlayBtn(true);
+        //m_rightView->setEnablePlayBtn(true);
         stateOperation->operState(OpsStateInterface::StateRecording, false);
         break;
     case VoiceToTextStart:

@@ -61,7 +61,7 @@ class VoiceNoteItem;
 class DBusLogin1Manager;
 class VNMainWndDelayInitTask;
 class UpgradeView;
-
+class WebEngineView;
 class VNoteMainWindow : public DMainWindow
 {
     Q_OBJECT
@@ -302,7 +302,7 @@ private:
     //*****************Shortcut keys end**********************
 
     QString m_searchKey;
-    QWebEngineView *m_webView {nullptr};
+    WebEngineView *m_webView {nullptr};
     DFloatingMessage *m_asrErrMeassage {nullptr};
     DFloatingMessage *m_pDeviceExceptionMsg {nullptr};
     DPushButton *m_asrAgainBtn {nullptr};

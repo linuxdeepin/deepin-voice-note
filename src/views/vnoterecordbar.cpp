@@ -125,13 +125,10 @@ bool VNoteRecordBar::eventFilter(QObject *o, QEvent *e)
  */
 void VNoteRecordBar::startRecord()
 {
-#if 0
     m_mainLayout->setCurrentWidget(m_recordPanel);
     if (m_recordPanel->startRecord()) {
         emit sigStartRecord(m_recordPanel->getRecordPath());
     }
-#endif
-    emit emit sigFinshRecord("", 0);
 }
 
 /**

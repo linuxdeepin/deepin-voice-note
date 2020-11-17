@@ -81,7 +81,7 @@ struct VNOTE_DATAS {
 
     const VNOTE_DATA_VECTOR &dataConstRef();
 
-protected:
+  public:
     //新建数据块
     VNoteBlock *newBlock(int type);
     //添加数据块

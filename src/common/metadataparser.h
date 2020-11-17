@@ -105,6 +105,7 @@ public:
         NVoicePath,
         NVoiceSize,
         NCreateTime,
+        BlockId,
     };
 #endif
     //源数据解析
@@ -146,6 +147,7 @@ protected:
         {NVoicePath, "voicePath"},
         {NVoiceSize, "voiceSize"},
         {NCreateTime, "createTime"},
+        {BlockId, "BlockId"},
     };
     //json串解析
     void jsonParse(const QVariant &metaData, VNoteItem *noteData /*out*/);

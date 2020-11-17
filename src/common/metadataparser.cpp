@@ -235,7 +235,7 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*o
         if (VNoteBlock::InValid != noteType) {
             //Allocate block
             ptrBlock = noteData->datas.newBlock(noteType);
-
+            noteItem.insert(m_jsonNodeNameMap[BlockId],  ptrBlock->blockid);
             if (VNoteBlock::Text == noteType) {
                 ptrBlock->ptrText->blockText = noteItem.value(m_jsonNodeNameMap[NText]).toString();
             } else if (VNoteBlock::Voice == noteType) {
@@ -287,7 +287,7 @@ void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaD
                 noteItem.insert(m_jsonNodeNameMap[NCreateTime],
                                 it->ptrVoice->createTime.toString(VNOTE_TIME_FMT));
             }
-
+            noteItem.insert(m_jsonNodeNameMap[BlockId], it->blockid);
             noteDatas.append(noteItem);
         }
     }
@@ -295,6 +295,7 @@ void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaD
     note.insert(m_jsonNodeNameMap[NDataCount], noteCount);
     note.insert(m_jsonNodeNameMap[NVoiceMaxId], noteData->voiceMaxId());
     note.insert(m_jsonNodeNameMap[NDatas], noteDatas);
+
 
     noteDoc.setObject(note);
 
