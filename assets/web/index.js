@@ -1,4 +1,21 @@
-      //DOM对象转换为string
+var webobj;
+var initData=function(text)
+{
+    init(text)
+       //alert("init" + text);
+}
+var insertVoiceItem=function(text)
+{
+       alert("insert voice:" + text);
+}
+new QWebChannel(qt.webChannelTransport,
+   function(channel){
+    webobj = channel.objects.webobj;
+    window.foo = webobj;
+    webobj.initData.connect(initData);
+    webobj.insertVoiceItem.connect(insertVoiceItem);
+})
+//DOM对象转换为string
       if (!document.HTMLDOMtoString) {
         document.HTMLDOMtoString = function (HTMLDOM) {
             const div = document.createElement("div")

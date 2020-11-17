@@ -25,12 +25,21 @@
 #include "common/vnotedatamanager.h"
 #include "common/actionmanager.h"
 #include "common/metadataparser.h"
-
+#include "common/jscontent.h"
 #include <QDebug>
 WebEngineView::WebEngineView(QWidget *parent) :
     QWebEngineView(parent)
 {
-      load(QUrl("qrc:/web/index.html"));
+     init();
+}
+
+void WebEngineView::init()
+{
+    m_jsContent = new JsContent(this);
+    m_channel = new QWebChannel(this);
+    m_channel->registerObject("webobj", m_jsContent);
+    page()->setWebChannel(m_channel);
+    load(QUrl("qrc:/web/index.html"));
 }
 
 void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
@@ -41,7 +50,7 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
     }
     this->setVisible(true);
     m_noteData = data;
-    qDebug() << data->metaDataRef().toString();
+    emit m_jsContent->initData(data->metaDataRef().toString());
 }
 
 void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
@@ -58,5 +67,5 @@ void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
     MetaDataParser parse;
     QVariant value;
     parse.makeMetaData(&notetmp, value);
-    qDebug() << value.toString();
+    emit m_jsContent->insertVoiceItem(value.toString());
 }

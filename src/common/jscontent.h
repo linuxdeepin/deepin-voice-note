@@ -18,33 +18,20 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef WEBENGINEVIEW_H
-#define WEBENGINEVIEW_H
+#ifndef JSCONTENT_H
+#define JSCONTENT_H
 
 #include <QObject>
-#include <QWebEngineProfile>
-#include <QWebEngineUrlRequestInterceptor>
-#include <QtWebChannel/QWebChannel>
-#include <QtWebEngineWidgets/QWebEngineView>
 
-struct VNoteItem;
-class JsContent;
-
-class WebEngineView : public QWebEngineView
+class JsContent : public QObject
 {
     Q_OBJECT
 public:
-    explicit WebEngineView(QWidget *parent = nullptr);
-    void initData(VNoteItem *data, QString reg, bool fouse = false);
-    void insertVoiceItem(const QString &voicePath, qint64 voiceSize);
+    explicit JsContent(QObject *parent = nullptr);
 signals:
-
+    void initData(const QString& jsonData/*, const QString& seachKey*/);
+    void insertVoiceItem(const QString &jsonData);
 public slots:
-private:
-    void init();
-    VNoteItem *m_noteData {nullptr};
-    QWebChannel *m_channel {nullptr};
-    JsContent *m_jsContent {nullptr};
 };
 
-#endif // WEBENGINEVIEW_H
+#endif // JSCONTENT_H
