@@ -24,9 +24,9 @@
         {{#each this.noteDatas}}
         {{#if this.type}}	
             <div class="li">
-                <div class="demo" forder_id={{item.id}}>
+                <div class="demo" data-id={{this.BlockId}}>
                 <div class="left">
-                    <div class="btn play"></div>
+                    <div class="btn play" data-id="{{this.BlockId}}"></div>
                     </div>
                     <div class="right">
                         <div class="lf">

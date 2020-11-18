@@ -16,10 +16,32 @@ var initData = function (text) {
     newText.forEach(item => {
         item.type = item.type == 1 ? false : true
     })
-    initText.noteDatas = newText;
-    init(1, initText)
-    //alert("init" + text);
+    //解决异步更新数据页面接收不到问题
+    function fnAsync(item){
+        return new Promise(function(resolve,reject){
+            webobj.getVoiceTime(item.createTime,function(time){
+                item.createTime=time;
+                resolve();
+            });
+            webobj.getVoiceSize(item.voiceSize,function(vSize){
+                item.voiceSize=vSize;
+                resolve()
+            })
+        })
+    }
+    Promise.all(
+        newText.map( item => {
+        return new Promise(async (resolve, reject) =>{
+          await fnAsync(item)
+          resolve()
+        })
+      })
+    ).then(() =>{
+        initText.noteDatas = newText;
+        init(1, initText)
+    })
 }
+//录音插入数据
 var insertVoiceItem = function (text) {
     var insertItem = JSON.parse(text);
     init(2, insertItem);
@@ -115,10 +137,15 @@ function fnClick(str) {
 //播放
 $('body').on('click', '.left .btn', function (e) {
     e.stopPropagation();
+    var bId=$(this).attr('data-id');
+  
     if ($(this).hasClass('play')) {
+        playButtonClick(bId,1);
+        //播放
         $('.left .btn').removeClass('pause').addClass('play');
         $(this).addClass('pause').removeClass('play');
     } else {
+        //暂停
         //$('.left .btn').removeClass('play').addClass('pause');
         $(this).removeClass('pause').addClass('play');
     }
