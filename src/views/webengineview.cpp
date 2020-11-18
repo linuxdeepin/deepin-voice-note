@@ -62,9 +62,17 @@ void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
     data->ptrVoice->voicePath = voicePath;
     data->ptrVoice->createTime = QDateTime::currentDateTime();
     data->ptrVoice->voiceTitle = noteOps.getDefaultVoiceName();
-    m_noteData->addBlock(nullptr, data);
+
     VNoteItem notetmp;
+    m_noteData->addBlock(m_noteData->datas.datas.last(), data);
     notetmp.datas.datas.push_back(data);
+    data = m_noteData->newBlock(VNoteBlock::Text);
+    m_noteData->addBlock(m_noteData->datas.datas.last(), data);
+    notetmp.datas.datas.push_back(data);
+    if (!noteOps.updateNote()) {
+        qInfo() << "Save note error";
+    }
+
     MetaDataParser parse;
     QVariant value;
     parse.makeMetaData(&notetmp, value, true);
