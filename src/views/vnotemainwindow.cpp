@@ -602,7 +602,7 @@ void VNoteMainWindow::initRightView()
 
     QVBoxLayout *rightHolderLayout = new QVBoxLayout;
     rightHolderLayout->setSpacing(0);
-    rightHolderLayout->setContentsMargins(0, 15, 0, 3);
+    rightHolderLayout->setContentsMargins(0, 15, 10, 3);
     m_webView = new WebEngineView(m_rightViewHolder);
     rightHolderLayout->addWidget(m_webView);
 #if 0

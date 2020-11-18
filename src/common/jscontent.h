@@ -33,7 +33,7 @@ signals:
     void insertVoiceItem(const QString &jsonData);
     void switchPlayBtn(const QString& id, int status);
 public slots:
-    void playButtonClick(const QString& id, int status);
+    int playButtonClick(const QString& id, int status);
     QString getVoiceSize(qint64 millisecond);
     QString getVoiceTime(const QString &time);
 };

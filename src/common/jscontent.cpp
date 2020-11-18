@@ -39,7 +39,8 @@ QString JsContent::getVoiceTime(const QString &time)
     return  Utils::convertDateTime(dataTime);
 }
 
-void JsContent::playButtonClick(const QString& id, int status)
+int JsContent::playButtonClick(const QString& id, int status)
 {
-    emit switchPlayBtn(id, !status);
+    qDebug() << id << status;
+    return 1;
 }

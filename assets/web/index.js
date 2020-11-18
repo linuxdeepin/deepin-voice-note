@@ -5,7 +5,8 @@
 // switchPlayBtn(const QString& id, int status);设置播放按钮，id为创建插件传入的ｉｄ，state 为１，０，分别代表显示播放按钮，暂停按钮
 
 //js 调用c++ 函数
-//playButtonClick(const QString& id, int status); 通知播放按钮被按下，id为创建插件传入的ｉｄ，state 为０，１，分别代表播放按钮按下，暂停按钮按下
+//通知播放按钮被按下，id为创建插件传入的ｉｄ，state 为０，１，分别代表播放按钮按下，暂停按钮按下, 返回值１代表成功，０代表失败
+//playButtonClick(const QString& id, int status);
 //getVoiceSize(qint64 millisecond); 参数数字型,单位毫秒，例如1000,返回格式化后的字符串;
 //getVoiceTime(const QString &time);语音插件创建时间格式化,参数字符串，例如"2020-10-20 16:23:44"，返回格式化后的字符串
 
