@@ -40,7 +40,7 @@
 #include "common/actionmanager.h"
 #include "common/setting.h"
 #include "common/performancemonitor.h"
-
+#include "common/jscontent.h"
 #include "db/vnotefolderoper.h"
 #include "db/vnoteitemoper.h"
 #include "db/vnotedbmanager.h"
@@ -160,6 +160,11 @@ void VNoteMainWindow::initConnections()
 //            this, &VNoteMainWindow::onRightViewVoicePause);
 //    connect(m_rightView, &RightView::sigCursorChange,
 //            this, &VNoteMainWindow::onCursorChange);
+
+    connect(JsContent::instance(), &JsContent::voicePlay,
+            this, &VNoteMainWindow::onRightViewVoicePlay);
+    connect(JsContent::instance(), &JsContent::voicePause,
+            this, &VNoteMainWindow::onRightViewVoicePause);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::onNewNotebook);
@@ -1635,10 +1640,11 @@ void VNoteMainWindow::onRightViewVoicePause(VNVoiceBlock *voiceData)
  */
 void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
 {
-    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
-    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
-        voiceItem->showPauseBtn();
-    }
+//    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
+//    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
+//        voiceItem->showPauseBtn();
+//    }
+    emit JsContent::instance()->switchPlayBtn(QString::number(reinterpret_cast<qint64>(voiceData)), 0);
 }
 
 /**
@@ -1647,10 +1653,11 @@ void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
  */
 void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
 {
-    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
-    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
-        voiceItem->showPlayBtn();
-    }
+//    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
+//    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
+//        voiceItem->showPlayBtn();
+//    }
+    emit JsContent::instance()->switchPlayBtn(QString::number(reinterpret_cast<qint64>(voiceData)), 1);
 }
 
 /**

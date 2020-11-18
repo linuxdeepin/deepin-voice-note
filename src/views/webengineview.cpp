@@ -35,7 +35,7 @@ WebEngineView::WebEngineView(QWidget *parent) :
 
 void WebEngineView::init()
 {
-    m_jsContent = new JsContent(this);
+    m_jsContent = JsContent::instance();
     m_channel = new QWebChannel(this);
     m_channel->registerObject("webobj", m_jsContent);
     page()->setWebChannel(m_channel);
@@ -48,6 +48,7 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
         this->setVisible(false);
         return;
     }
+    JsContent::instance()->setNoteItem(data);
     m_noteData = data;
     this->setVisible(true);
     qDebug() << data->metaDataRef().toString();

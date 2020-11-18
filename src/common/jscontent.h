@@ -22,20 +22,30 @@
 #define JSCONTENT_H
 
 #include <QObject>
+struct VNVoiceBlock;
+struct VNoteBlock;
+struct VNoteItem;
 
 class JsContent : public QObject
 {
     Q_OBJECT
 public:
     explicit JsContent(QObject *parent = nullptr);
+    static JsContent *instance();
+    void setNoteItem(VNoteItem *notedata);
+    VNoteBlock *getBlock(const QString& id);
 signals:
     void initData(const QString& jsonData/*, const QString& seachKey*/);
     void insertVoiceItem(const QString &jsonData);
     void switchPlayBtn(const QString& id, int status);
+    void voicePlay(VNVoiceBlock *voiceData);
+    void voicePause(VNVoiceBlock *voiceData);
 public slots:
     int playButtonClick(const QString& id, int status);
     QString getVoiceSize(qint64 millisecond);
     QString getVoiceTime(const QString &time);
+private:
+    VNoteItem *m_notedata {nullptr};
 };
 
 #endif // JSCONTENT_H

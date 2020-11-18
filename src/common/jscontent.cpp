@@ -20,8 +20,12 @@
 */
 #include "jscontent.h"
 #include "common/utils.h"
+#include "common/vnoteitem.h"
+
 #include <QDateTime>
 #include <QDebug>
+
+static JsContent *jsInstance = nullptr;
 
 JsContent::JsContent(QObject *parent) : QObject(parent)
 {
@@ -41,6 +45,41 @@ QString JsContent::getVoiceTime(const QString &time)
 
 int JsContent::playButtonClick(const QString& id, int status)
 {
-    qDebug() << id << status;
-    return 1;
+    VNoteBlock *data = getBlock(id);
+    if(data && data->getType() == VNoteBlock::Voice){
+        if(status == 1){
+            emit voicePlay(data->ptrVoice);
+        }else {
+            emit voicePause(data->ptrVoice);
+        }
+    }
+    qInfo() << "can not get id:" << id;
+    return 0;
+}
+
+void JsContent::setNoteItem(VNoteItem *notedata)
+{
+    m_notedata = notedata;
+}
+
+VNoteBlock *JsContent::getBlock(const QString &id)
+{
+    VNoteBlock *data = nullptr;
+    if(m_notedata){
+        for(auto it : m_notedata->datas.datas){
+            if(id == QString::number(reinterpret_cast<qint64>(it))){
+                data = it;
+                break;
+            }
+        }
+    }
+    return  data;
+}
+
+JsContent* JsContent::instance()
+{
+    if (jsInstance == nullptr) {
+        jsInstance = new JsContent;
+    }
+    return jsInstance;
 }
