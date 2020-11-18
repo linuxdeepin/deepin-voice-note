@@ -45,17 +45,19 @@ QString JsContent::getVoiceTime(const QString &time)
 
 int JsContent::playButtonClick(const QString& id, int status)
 {
+    qInfo() << "get status:" << status ;
     VNoteBlock *data = getBlock(id);
     if(data && data->getType() == VNoteBlock::Voice){
-        if(status == 1){
+        if(status == 0){
             emit voicePlay(data->ptrVoice);
+            return 1;
         }else {
             emit voicePause(data->ptrVoice);
+            return 0;
         }
-        return 1;
     }
     qInfo() << "can not get id:" << id;
-    return 0;
+    return -1;
 }
 
 void JsContent::setNoteItem(VNoteItem *notedata)

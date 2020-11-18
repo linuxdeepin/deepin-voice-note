@@ -11,42 +11,59 @@
 //getVoiceTime(const QString &time);语音插件创建时间格式化,参数字符串，例如"2020-10-20 16:23:44"，返回格式化后的字符串
 
 var webobj;
-var initData = function (text) {
+//初始化
+function init(type, arr) {
+    var tpl = $("#main").html();
+    var template = Handlebars.compile(tpl);
+    var html = template(arr);
+    if (type == 1) {
+        $('.main').html(html);
+    } else {
+        $('.main').append(html);
+    }
+    arr.noteDatas.forEach((item, index) => {
+        if (item.type == false) {
+            readyEditor('summernote' + item.BlockId);
+        }
+    })
+} 
+function fnInit(text,type){
     var initText = JSON.parse(text);
     var newText = initText.noteDatas;
     newText.forEach(item => {
         item.type = item.type == 1 ? false : true
     })
-    //解决异步更新数据页面接收不到问题
-    function fnAsync(item){
-        return new Promise(function(resolve,reject){
-            webobj.getVoiceTime(item.createTime,function(time){
-                item.createTime=time;
+    //解决异步更新数据页面接收问题
+    function fnAsync(item) {
+        return new Promise(function (resolve, reject) {
+            webobj.getVoiceTime(item.createTime, function (time) {
+                item.createTime = time;
                 resolve();
             });
-            webobj.getVoiceSize(item.voiceSize,function(vSize){
-                item.voiceSize=vSize;
+            webobj.getVoiceSize(item.voiceSize, function (vSize) {
+                item.voiceSize = vSize;
                 resolve()
             })
         })
     }
     Promise.all(
-        newText.map( item => {
-        return new Promise(async (resolve, reject) =>{
-          await fnAsync(item)
-          resolve()
+        newText.map(item => {
+            return new Promise(async (resolve, reject) => {
+                await fnAsync(item)
+                resolve()
+            })
         })
-      })
-    ).then(() =>{
+    ).then(() => {
         initText.noteDatas = newText;
-        init(1, initText)
+        init(type, initText)
     })
+}
+var initData = function (text) {
+    fnInit(text,1)
 }
 //录音插入数据
 var insertVoiceItem = function (text) {
-    var insertItem = JSON.parse(text);
-    init(2, insertItem);
-
+    fnInit(text,2);
 }
 new QWebChannel(qt.webChannelTransport,
     function (channel) {
@@ -56,6 +73,7 @@ new QWebChannel(qt.webChannelTransport,
         //例如 webobj.c++fun.connect(jsfun)
         webobj.initData.connect(initData);
         webobj.insertVoiceItem.connect(insertVoiceItem);
+        webobj.switchPlayBtn.connect(toggleState);
     })
 //DOM对象转换为string
 if (!document.HTMLDOMtoString) {
@@ -138,19 +156,24 @@ function fnClick(str) {
 //播放
 $('body').on('click', '.left .btn', function (e) {
     e.stopPropagation();
-    var bId=$(this).attr('data-id');
-  
-    if ($(this).hasClass('play')) {
-        playButtonClick(bId,1);
-        //播放
-        $('.left .btn').removeClass('pause').addClass('play');
-        $(this).addClass('pause').removeClass('play');
-    } else {
-        //暂停
-        //$('.left .btn').removeClass('play').addClass('pause');
-        $(this).removeClass('pause').addClass('play');
-    }
+    var bId = $(this).attr('data-id');
+    var state=$(this).hasClass('play')?0:1;
+    webobj.playButtonClick(bId, state, function (state) {
+        //item 
+        toggleState(state,bId)
+    });
+    //播放
 })
+//按钮切换状态 c++调用
+function toggleState(state,item){
+    if (state == '1') {
+            $('.left .btn').removeClass('pause').addClass('play');
+            $('.left .btn[data-id='+item+']').addClass('pause').removeClass('play');
+    } else if(state=='0'){
+        $('.left .btn[data-id='+item+']').removeClass('pause').addClass('play');
+        
+    }
+}
 //点击变色
 $('body').on('click', '.li', function (e) {
     e.stopPropagation();
@@ -230,19 +253,4 @@ function themeColor(color) {
     document.getElementsByTagName('head')[0].appendChild(nod);
 }
 themeColor('237,86,86');
-//初始化
-function init(type, arr) {
-    var tpl = $("#main").html();
-    var template = Handlebars.compile(tpl);
-    var html = template(arr);
-    if (type == 1) {
-        $('.main').html(html);
-    } else {
-        $('.main').append(html);
-    }
-    arr.noteDatas.forEach((item, index) => {
-        if (item.type == false) {
-            readyEditor('summernote' + item.BlockId);
-        }
-    })
-} 
+

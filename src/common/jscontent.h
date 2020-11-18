@@ -37,7 +37,7 @@ public:
 signals:
     void initData(const QString& jsonData/*, const QString& seachKey*/);
     void insertVoiceItem(const QString &jsonData);
-    void switchPlayBtn(const QString& id, int status);
+    void switchPlayBtn(int status, const QString& id);
     void voicePlay(VNVoiceBlock *voiceData);
     void voicePause(VNVoiceBlock *voiceData);
 public slots:

@@ -1644,7 +1644,7 @@ void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
 //    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
 //        voiceItem->showPauseBtn();
 //    }
-    emit JsContent::instance()->switchPlayBtn(QString::number(reinterpret_cast<qint64>(voiceData)), 0);
+    emit JsContent::instance()->switchPlayBtn(1, QString::number(reinterpret_cast<qint64>(voiceData)));
 }
 
 /**
@@ -1657,7 +1657,7 @@ void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
 //    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
 //        voiceItem->showPlayBtn();
 //    }
-    emit JsContent::instance()->switchPlayBtn(QString::number(reinterpret_cast<qint64>(voiceData)), 1);
+    emit JsContent::instance()->switchPlayBtn(0, QString::number(reinterpret_cast<qint64>(voiceData)));
 }
 
 /**
@@ -1670,7 +1670,7 @@ void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
 //    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
 //        voiceItem->showPlayBtn();
 //    }
-    emit JsContent::instance()->switchPlayBtn(QString::number(reinterpret_cast<qint64>(voiceData)), 1);
+    emit JsContent::instance()->switchPlayBtn(0, QString::number(reinterpret_cast<qint64>(voiceData)));
     setSpecialStatus(PlayVoiceEnd);
 //    m_rightView->setCurVoicePlay(nullptr);
 //    m_rightView->setFocus();

@@ -77,5 +77,6 @@ void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
     MetaDataParser parse;
     QVariant value;
     parse.makeMetaData(&notetmp, value, true);
+    qInfo() << value.toString();
     emit m_jsContent->insertVoiceItem(value.toString());
 }
