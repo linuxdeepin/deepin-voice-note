@@ -36,7 +36,10 @@ QString JsContent::getVoiceSize(qint64 millisecond)
 QString JsContent::getVoiceTime(const QString &time)
 {
     QDateTime dataTime = QDateTime::fromString(time, "yyyy-MM-dd hh:mm:ss");;
-    QString str =  Utils::convertDateTime(dataTime);
-    qDebug() << str;
-    return  str;
+    return  Utils::convertDateTime(dataTime);
+}
+
+void JsContent::playButtonClick(const QString& id, int status)
+{
+    emit switchPlayBtn(id, !status);
 }

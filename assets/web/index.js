@@ -1,5 +1,13 @@
-// getVoiceTime 语音插件创建时间格式化,参数字符串，例如"2020-10-20 16:23:44"，返回格式化后的字符串
-// getVoiceSize 参数数字型,单位毫秒，例如1000,返回格式化后的字符串;
+//C++ 调用js接口
+
+// initData(const QString& jsonData); 初始化，参数为json字符串
+// insertVoiceItem(const QString &jsonData);　插入语音，参数为json字符串
+// switchPlayBtn(const QString& id, int status);设置播放按钮，id为创建插件传入的ｉｄ，state 为１，０，分别代表显示播放按钮，暂停按钮
+
+//js 调用c++ 函数
+//playButtonClick(const QString& id, int status); 通知播放按钮被按下，id为创建插件传入的ｉｄ，state 为０，１，分别代表播放按钮按下，暂停按钮按下
+//getVoiceSize(qint64 millisecond); 参数数字型,单位毫秒，例如1000,返回格式化后的字符串;
+//getVoiceTime(const QString &time);语音插件创建时间格式化,参数字符串，例如"2020-10-20 16:23:44"，返回格式化后的字符串
 
 var webobj;
 var initData = function (text) {
@@ -8,14 +16,6 @@ var initData = function (text) {
     newText.forEach(item => {
         item.type = item.type == 1 ? false : true
     })
-    var strTime="2020-10-20 16:23:44";
-    webobj.getVoiceTime(strTime, function(n){
-        alert(n);
-    });
-    var size=10000;
-    webobj.getVoiceSize(size, function(n){
-        alert(n);
-    });
     initText.noteDatas = newText;
     init(1, initText)
     //alert("init" + text);
@@ -29,6 +29,8 @@ new QWebChannel(qt.webChannelTransport,
     function (channel) {
         webobj = channel.objects.webobj;
         window.foo = webobj;
+        //所有的c++ 调用js的接口都需要在此绑定格式，webobj.c++函数名（jscontent.cpp查看.connect(js处理函数)
+        //例如 webobj.c++fun.connect(jsfun)
         webobj.initData.connect(initData);
         webobj.insertVoiceItem.connect(insertVoiceItem);
     })
