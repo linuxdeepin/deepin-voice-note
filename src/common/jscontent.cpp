@@ -52,6 +52,7 @@ int JsContent::playButtonClick(const QString& id, int status)
         }else {
             emit voicePause(data->ptrVoice);
         }
+        return 1;
     }
     qInfo() << "can not get id:" << id;
     return 0;

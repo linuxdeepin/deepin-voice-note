@@ -1666,13 +1666,15 @@ void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
  */
 void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
 {
-    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
-    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
-        voiceItem->showPlayBtn();
-    }
+//    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
+//    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
+//        voiceItem->showPlayBtn();
+//    }
+    emit JsContent::instance()->switchPlayBtn(QString::number(reinterpret_cast<qint64>(voiceData)), 1);
     setSpecialStatus(PlayVoiceEnd);
-    m_rightView->setCurVoicePlay(nullptr);
-    m_rightView->setFocus();
+//    m_rightView->setCurVoicePlay(nullptr);
+//    m_rightView->setFocus();
+
 }
 
 /**
