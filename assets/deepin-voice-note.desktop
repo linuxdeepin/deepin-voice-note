@@ -1,18 +1,6 @@
 [Desktop Entry]
 Categories=AudioVideo;
 Comment=Voice Notes is a lightweight memo tool to make text notes and voice recordings.
-Exec=/usr/bin/deepin-voice-note %f
-GenericName=Voice Notes
-Icon=deepin-voice-note
-Name=Voice Notes
-StartupNotify=false
-Terminal=false
-TryExec=/usr/bin/deepin-voice-note
-Type=Application
-X-Deepin-Vendor=deepin
-
-# Translations:
-# Do not manually modify!
 Comment[ar]=الملاحظات الصوتية هي أداة مذكرة خفيفة لعمل الملاحظات النصية والتسجيلات الصوتية.
 Comment[br]=Notennoù mouezh a zo un ostilh evit gellout krouiñ notennoù testenn hag enrolladennoù mouezh.
 Comment[ca]=Les Notes de veu és una eina lleugera per fer notes de text i gravacions de veu.
@@ -43,6 +31,8 @@ Comment[uk]=«Голосовий нотатник» — невибаглива �
 Comment[zh_CN]=语音记事本是一款提供文本记事、语音录音记录的轻量级记事工具。
 Comment[zh_HK]=語音記事本是一款提供文本記事、語音錄音記錄的輕量級記事工具。
 Comment[zh_TW]=語音記事本是一款提供文字記事、語音錄音記錄的輕量級記事工具。
+Exec=/usr/bin/deepin-voice-note %f
+GenericName=Voice Notes
 GenericName[ar]=الملاحظات الصوتية
 GenericName[br]=Notennoù mouezh
 GenericName[ca]=Notes de veu
@@ -73,6 +63,8 @@ GenericName[uk]=Голосові нотатки
 GenericName[zh_CN]=语音记事本
 GenericName[zh_HK]=語音記事本
 GenericName[zh_TW]=語音記事本
+Icon=deepin-voice-note
+Name=Voice Notes
 Name[ar]=الملاحظات الصوتية
 Name[br]=Notennoù mouezh
 Name[ca]=Notes de veu
@@ -103,4 +95,8 @@ Name[uk]=Голосові нотатки
 Name[zh_CN]=语音记事本
 Name[zh_HK]=語音記事本
 Name[zh_TW]=語音記事本
-
+StartupNotify=false
+Terminal=false
+TryExec=/usr/bin/deepin-voice-note
+Type=Application
+X-Deepin-Vendor=user-custom

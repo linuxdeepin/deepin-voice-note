@@ -565,6 +565,8 @@ void MiddleView::triggerDragNote()
             m_MoveView = new MoveView(this);
         }
         m_MoveView->setNote(noteData);
+        //重设视图大小
+        m_MoveView->setFixedSize(260,56);
         QPixmap pixmap = m_MoveView->grab();
         QDrag *drag = new QDrag(this);
         QMimeData *mimeData = new QMimeData;
