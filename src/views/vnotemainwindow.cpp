@@ -1023,7 +1023,6 @@ void VNoteMainWindow::onA2TSuccess(const QString &text)
 {
     VNoteBlock *data = JsContent::instance()->getCurrentBlock();
     if (data && data->getType() == VNoteBlock::Voice) {
-        m_rightView->clearAllSelection();
         data->blockText = text;
         emit JsContent::instance()->setVoiceToText(data->blockid, text, 1);
     }
