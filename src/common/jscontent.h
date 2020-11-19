@@ -46,6 +46,7 @@ signals:
     void voicePlay(VNVoiceBlock *voiceData);
     void voicePause(VNVoiceBlock *voiceData);
     void setVoiceToText(const QString & id, const QString & text, int state);
+    void deleteVoice(const QString & id);
 public slots:
     void rightMenuClick(const QString& id, int select);
     int playButtonClick(const QString& id, int status);

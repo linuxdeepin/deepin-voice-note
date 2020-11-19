@@ -26,6 +26,8 @@
 #include "common/actionmanager.h"
 #include "common/metadataparser.h"
 #include "common/jscontent.h"
+#include <QTimer>
+
 #include <QDebug>
 WebEngineView::WebEngineView(QWidget *parent) :
     QWebEngineView(parent)
@@ -85,4 +87,25 @@ void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
 
     qInfo() << value.toString();
     emit m_jsContent->insertVoiceItem(value.toString());
+}
+
+void WebEngineView::deleteVoice(const QString &id)
+{
+    VNoteBlock *data = JsContent::instance()->getBlock(id);
+    if(data){
+        emit JsContent::instance()->deleteVoice(id);
+        QTimer::singleShot(0, this, [this, data]() {
+            int index = m_noteData->datas.datas.indexOf(data);
+            VNoteBlock *nextData = m_noteData->datas.datas[index + 1];
+            data->releaseSpecificData();
+            m_noteData->delBlock(data);
+            if(nextData){
+                m_noteData->delBlock(nextData);
+            }
+            VNoteItemOper noteOps(m_noteData);
+            if (!noteOps.updateNote()) {
+                qInfo() << "Save note error";
+            }
+        });
+    }
 }

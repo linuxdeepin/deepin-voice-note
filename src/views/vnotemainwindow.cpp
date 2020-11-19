@@ -222,9 +222,10 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stNewNotebook.get(), &QShortcut::activated, this, [this] {
         if (!(stateOperation->isRecording()
-              || stateOperation->isPlaying()
-              || stateOperation->isVoice2Text()
-              || stateOperation->isSearching())) {
+                || stateOperation->isPlaying()
+                || stateOperation->isVoice2Text()
+                || stateOperation->isSearching()))
+        {
             onNewNotebook();
 
             //If do shortcut in home page,need switch to note
@@ -242,7 +243,8 @@ void VNoteMainWindow::initShortcuts()
     m_stRemNotebook->setAutoRepeat(false);
 
     connect(m_stRemNotebook.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction())
+        {
             if (!stateOperation->isSearching()) {
                 editNotepad();
             }
@@ -258,10 +260,11 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stNewNote.get(), &QShortcut::activated, this, [this] {
         if (canDoShortcutAction()
-            && !(stateOperation->isRecording()
-                 || stateOperation->isPlaying()
-                 || stateOperation->isVoice2Text()
-                 || stateOperation->isSearching())) {
+                && !(stateOperation->isRecording()
+                     || stateOperation->isPlaying()
+                     || stateOperation->isVoice2Text()
+                     || stateOperation->isSearching()))
+        {
             onNewNote();
         }
     });
@@ -273,7 +276,8 @@ void VNoteMainWindow::initShortcuts()
     m_stRemNote->setAutoRepeat(false);
 
     connect(m_stRemNote.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction())
+        {
             editNote();
         }
     });
@@ -286,7 +290,8 @@ void VNoteMainWindow::initShortcuts()
     m_stPlayorPause->setAutoRepeat(false);
 
     connect(m_stPlayorPause.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction())
+        {
             m_recordBar->playOrPauseVoice();
         }
     });
@@ -298,7 +303,8 @@ void VNoteMainWindow::initShortcuts()
     m_stRecording->setAutoRepeat(false);
 
     connect(m_stRecording.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction())
+        {
             m_recordBar->onStartRecord();
         }
     });
@@ -311,7 +317,8 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stVoice2Text.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction())
+        {
             if (!stateOperation->isVoice2Text() && stateOperation->isAiSrvExist()) {
                 this->onA2TStart();
             }
@@ -327,7 +334,8 @@ void VNoteMainWindow::initShortcuts()
     connect(m_stSaveAsMp3.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
         Q_UNUSED(this);
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction())
+        {
             m_rightView->saveMp3();
         }
     });
@@ -340,7 +348,8 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stSaveAsText.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction())
+        {
             VNoteItem *currNote = m_middleView->getCurrVNotedata();
             if (nullptr != currNote) {
                 if (currNote->haveText()) {
@@ -358,7 +367,8 @@ void VNoteMainWindow::initShortcuts()
 
     connect(m_stSaveVoices.get(), &QShortcut::activated, this, [this] {
         //Call method in rightview
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction())
+        {
             //Can't save recording when do recording.
             if (!stateOperation->isRecording()) {
                 VNoteItem *currNote = m_middleView->getCurrVNotedata();
@@ -378,7 +388,8 @@ void VNoteMainWindow::initShortcuts()
     m_stDelete->setAutoRepeat(false);
 
     connect(m_stDelete.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
+        if (canDoShortcutAction())
+        {
             QAction *deleteAct = nullptr;
 
             /*
@@ -390,18 +401,18 @@ void VNoteMainWindow::initShortcuts()
              * */
             if (m_leftView->hasFocus()) {
                 if (!stateOperation->isRecording()
-                    && !stateOperation->isVoice2Text()
-                    && !stateOperation->isPlaying()) {
+                        && !stateOperation->isVoice2Text()
+                        && !stateOperation->isPlaying()) {
                     deleteAct = ActionManager::Instance()->getActionById(
                         ActionManager::NotebookDelete);
                 }
             } else if (m_middleView->hasFocus()) {
                 if (!stateOperation->isRecording()
-                    && !stateOperation->isVoice2Text()
-                    && !stateOperation->isPlaying()
-                    && m_middleView->count() > 0) {
+                        && !stateOperation->isVoice2Text()
+                        && !stateOperation->isPlaying()
+                        && m_middleView->count() > 0) {
                     deleteAct = ActionManager::Instance()->getActionById(
-                        ActionManager::NoteDelete);
+                                    ActionManager::NoteDelete);
                 }
             } /*else if (m_rightView->hasFocus()) {
                 deleteAct = ActionManager::Instance()->getActionById(
@@ -410,7 +421,7 @@ void VNoteMainWindow::initShortcuts()
                 QPoint pos = m_rightViewHolder->mapFromGlobal(QCursor::pos());
                 if (m_rightViewHolder->rect().contains(pos)) {
                     deleteAct = ActionManager::Instance()->getActionById(
-                        ActionManager::DetailDelete);
+                                    ActionManager::DetailDelete);
                 }
             }
 
@@ -682,10 +693,10 @@ void VNoteMainWindow::initLogin1Manager()
 void VNoteMainWindow::holdHaltLock()
 {
     m_lockFd = m_pLogin1Manager->Inhibit(
-        "shutdown:sleep",
-        DApplication::translate("AppMain", "Voice Notes"),
-        DApplication::translate("AppMain", "Recordings not saved"),
-        "block");
+                   "shutdown:sleep",
+                   DApplication::translate("AppMain", "Voice Notes"),
+                   DApplication::translate("AppMain", "Recordings not saved"),
+                   "block");
 
     if (m_lockFd.isError()) {
         qCritical() << "Init login manager error:" << m_lockFd.error();
@@ -783,7 +794,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
 {
     Q_UNUSED(previous);
 
-    if(m_asrErrMeassage){
+    if (m_asrErrMeassage) {
         m_asrErrMeassage->setVisible(false);
     }
 
@@ -836,16 +847,16 @@ void VNoteMainWindow::initUpgradeView()
     m_upgradeView = new UpgradeView(this);
 
     connect(m_upgradeView, &UpgradeView::upgradeDone,
-            this, [this]() {
-                //Clear the flag after upgrade & and call
-                //the data loaded slot to refresh.
-                m_fNeedUpgradeOldDb = false;
+    this, [this]() {
+        //Clear the flag after upgrade & and call
+        //the data loaded slot to refresh.
+        m_fNeedUpgradeOldDb = false;
 
-                onVNoteFoldersLoaded();
+        onVNoteFoldersLoaded();
 
-                qInfo() << "upgrade success.";
-            },
-            Qt::QueuedConnection);
+        qInfo() << "upgrade success.";
+    },
+    Qt::QueuedConnection);
 }
 
 #endif
@@ -956,7 +967,7 @@ void VNoteMainWindow ::onA2TStartAgain()
  */
 void VNoteMainWindow::onA2TStart(bool first)
 {
-    if(m_asrErrMeassage){
+    if (m_asrErrMeassage) {
         m_asrErrMeassage->setVisible(false);
     }
     VNoteBlock *data = JsContent::instance()->getCurrentBlock();
@@ -992,13 +1003,13 @@ void VNoteMainWindow::onA2TError(int error)
     QString message = "";
     if (error == VNoteA2TManager::NetworkError) {
         message = DApplication::translate(
-            "VNoteErrorMessage",
-            "The voice conversion failed due to the poor network connection. "
-            "Do you want to try again?");
+                      "VNoteErrorMessage",
+                      "The voice conversion failed due to the poor network connection. "
+                      "Do you want to try again?");
     } else {
         message = DApplication::translate(
-            "VNoteErrorMessage",
-            "The voice conversion failed. Do you want to try again?");
+                      "VNoteErrorMessage",
+                      "The voice conversion failed. Do you want to try again?");
     }
     showAsrErrMessage(message);
     setSpecialStatus(VoiceToTextEnd);
@@ -1044,7 +1055,7 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray notebookJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutNotebookKeymap.begin();
-         it != shortcutNotebookKeymap.end(); it++) {
+            it != shortcutNotebookKeymap.end(); it++) {
         QJsonObject jsonItem;
         jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
@@ -1074,7 +1085,7 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray noteJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutNoteKeymap.begin();
-         it != shortcutNoteKeymap.end(); it++) {
+            it != shortcutNoteKeymap.end(); it++) {
         QJsonObject jsonItem;
         jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
@@ -1098,7 +1109,7 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray editJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutEditKeymap.begin();
-         it != shortcutEditKeymap.end(); it++) {
+            it != shortcutEditKeymap.end(); it++) {
         QJsonObject jsonItem;
         jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
@@ -1122,7 +1133,7 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray settingJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutSettingKeymap.begin();
-         it != shortcutSettingKeymap.end(); it++) {
+            it != shortcutSettingKeymap.end(); it++) {
         QJsonObject jsonItem;
         jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
@@ -1210,12 +1221,12 @@ bool VNoteMainWindow::checkIfNeedExit()
     //Is audio converting to text
     if (stateOperation->isVoice2Text()) {
         pspMessageDialg.reset(new VNoteMessageDialog(
-            VNoteMessageDialog::AborteAsr,
-            this));
+                                  VNoteMessageDialog::AborteAsr,
+                                  this));
     } else if (stateOperation->isRecording()) { //Is recording
         pspMessageDialg.reset(new VNoteMessageDialog(
-            VNoteMessageDialog::AbortRecord,
-            this));
+                                  VNoteMessageDialog::AbortRecord,
+                                  this));
     }
 
     if (!pspMessageDialg.isNull()) {
@@ -1235,7 +1246,7 @@ bool VNoteMainWindow::checkIfNeedExit()
 void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 {
     Q_UNUSED(previous);
-    if(m_asrErrMeassage){
+    if (m_asrErrMeassage) {
         m_asrErrMeassage->setVisible(false);
     }
 
@@ -1293,20 +1304,17 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::NoteRename:
         editNote();
         break;
-//    case ActionManager::DetailDelete: {
-//        int ret = m_rightView->showWarningDialog();
-//        if (ret == 1) {
-//            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this);
-//            connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
-//                m_rightView->delSelectText();
-//            });
+    case ActionManager::DetailDelete: {
+        VNoteBlock *data = JsContent::instance()->getCurrentBlock();
+        if (data) {
+            if (data->getType() == VNoteBlock::Voice) {
+                m_webView->deleteVoice(data->blockid);
+            } else {
+                m_webView->triggerPageAction(QWebEnginePage::Cut);
+            }
+        }
 
-//            confirmDialog.exec();
-//        } else if (ret == 0) {
-//            m_rightView->delSelectText();
-//        }
-
-//    } break;
+    } break;
     case ActionManager::NoteSaveText: {
         m_middleView->saveAsText();
     } break;
@@ -1316,18 +1324,34 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::DetailVoice2Text:
         onA2TStart();
         break;
-//    case ActionManager::DetailSelectAll:
-//        m_rightView->selectAllItem();
-//        break;
-//    case ActionManager::DetailCopy:
-//        m_rightView->copySelectText();
-//        break;
-//    case ActionManager::DetailPaste:
-//        m_rightView->pasteText();
-//        break;
-//    case ActionManager::DetailCut:
-//        m_rightView->cutSelectText();
-//        break;
+    case ActionManager::DetailSelectAll: {
+        VNoteBlock *data = JsContent::instance()->getCurrentBlock();
+        if (data && data->getType() == VNoteBlock::Text) {
+            m_webView->triggerPageAction(QWebEnginePage::SelectAll);
+        }
+    }
+    break;
+    case ActionManager::DetailCopy: {
+        VNoteBlock *data = JsContent::instance()->getCurrentBlock();
+        if (data && data->getType() == VNoteBlock::Text) {
+            m_webView->triggerPageAction(QWebEnginePage::Copy);
+        }
+    }
+    break;
+    case ActionManager::DetailPaste: {
+        VNoteBlock *data = JsContent::instance()->getCurrentBlock();
+        if (data && data->getType() == VNoteBlock::Text) {
+            m_webView->triggerPageAction(QWebEnginePage::Paste);
+        }
+    }
+    break;
+    case ActionManager::DetailCut: {
+        VNoteBlock *data = JsContent::instance()->getCurrentBlock();
+        if (data && data->getType() == VNoteBlock::Text) {
+            m_webView->triggerPageAction(QWebEnginePage::Cut);
+        }
+    }
+    break;
 //    case ActionManager::DetailVoiceSave:
 //        m_rightView->saveMp3();
 //        break;
@@ -1363,8 +1387,8 @@ void VNoteMainWindow::onMenuAbout2Show()
         ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteCtxMenu);
 
         if (stateOperation->isPlaying()
-            || stateOperation->isRecording()
-            || stateOperation->isVoice2Text()) {
+                || stateOperation->isRecording()
+                || stateOperation->isVoice2Text()) {
             ActionManager::Instance()->enableAction(ActionManager::NoteAddNew, false);
             ActionManager::Instance()->enableAction(ActionManager::NoteDelete, false);
 
@@ -1392,8 +1416,8 @@ void VNoteMainWindow::onMenuAbout2Show()
         ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NotebookCtxMenu);
 
         if (stateOperation->isPlaying()
-            || stateOperation->isRecording()
-            || stateOperation->isVoice2Text()) {
+                || stateOperation->isRecording()
+                || stateOperation->isVoice2Text()) {
             ActionManager::Instance()->enableAction(ActionManager::NotebookAddNew, false);
             ActionManager::Instance()->enableAction(ActionManager::NotebookDelete, false);
         }
@@ -1811,8 +1835,8 @@ void VNoteMainWindow::initAsrErrMessage()
     m_asrErrMeassage->setIcon(QIcon(iconPath));
     m_asrAgainBtn = new DPushButton(m_asrErrMeassage);
     m_asrAgainBtn->setText(DApplication::translate(
-        "VNoteErrorMessage",
-        "Try Again"));
+                               "VNoteErrorMessage",
+                               "Try Again"));
     m_asrAgainBtn->adjustSize();
     connect(m_asrAgainBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::onA2TStartAgain);
@@ -1850,7 +1874,7 @@ void VNoteMainWindow::initDeviceExceptionErrMessage()
  */
 void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
 {
-    if(m_asrErrMeassage == nullptr){
+    if (m_asrErrMeassage == nullptr) {
         initAsrErrMessage();
     }
 
@@ -1872,7 +1896,7 @@ void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
  */
 void VNoteMainWindow::showDeviceExceptionErrMessage()
 {
-    if(m_pDeviceExceptionMsg == nullptr){
+    if (m_pDeviceExceptionMsg == nullptr) {
         initDeviceExceptionErrMessage();
     }
 
@@ -1893,7 +1917,7 @@ void VNoteMainWindow::showDeviceExceptionErrMessage()
  */
 void VNoteMainWindow::closeDeviceExceptionErrMessage()
 {
-    if(m_pDeviceExceptionMsg){
+    if (m_pDeviceExceptionMsg) {
         m_pDeviceExceptionMsg->setVisible(false);
     }
 }
@@ -1962,7 +1986,7 @@ void VNoteMainWindow::release()
     }
 
     VTextSpeechAndTrManager::onStopTextToSpeech();
-   // m_rightView->saveNote();
+    // m_rightView->saveNote();
 
     QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
     if (stateOperation->isVoice2Text()) {
@@ -1982,15 +2006,15 @@ void VNoteMainWindow::onShowPrivacy()
     QLocale::Country country = locale.country();
     bool isCommunityEdition = DSysInfo::isCommunityEdition();
     if (country == QLocale::China) {
-        if(isCommunityEdition){
+        if (isCommunityEdition) {
             url = "https://www.uniontech.com/agreement/deepin-privacy-cn";
-        }else {
+        } else {
             url = "https://www.uniontech.com/agreement/privacy-cn";
         }
     } else {
-        if(isCommunityEdition){
+        if (isCommunityEdition) {
             url = "https://www.uniontech.com/agreement/deepin-privacy-en";
-        }else {
+        } else {
             url = "https://www.uniontech.com/agreement/privacy-en";
         }
     }
