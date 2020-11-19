@@ -170,3 +170,6 @@
             opacity: 1; /*结尾状态 透明度为1*/
         }
     }
+.noselect{
+    user-select: none;
+}

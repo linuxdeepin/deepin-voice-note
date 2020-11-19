@@ -11,6 +11,7 @@
 //getVoiceTime(const QString &time);语音插件创建时间格式化,参数字符串，例如"2020-10-20 16:23:44"，返回格式化后的字符串
 //rightMenuClick(const QString& id, int select); 鼠标右键单击，　参数：id为创建插件传入的ｉｄ,select 1 此插件有选中内容，０没有选中内容
 var webobj;
+var sumId;
 //初始化
 function init(type, arr) {
     var tpl = $("#main").html();
@@ -101,6 +102,11 @@ function readyEditor(id, text) {
                 currentId = text;
             },
             onChange: function () {
+                if($(this).attr('data-click')=='false'){
+                    $(this).attr('data-click','true');
+                }else{
+                    sumId=$(this).attr('data-id');
+                }
                 // console.log(document)
                 // var range = document.selection.createRange();
                 // var srcele = range.parentElement();//获取到当前元素
@@ -108,7 +114,7 @@ function readyEditor(id, text) {
             }
         }
     });
-    $('#' + id + '').summernote('code', text)
+    $('#' + id + '').summernote('code', text);
 }
 readyEditor('summernote');
 function fnClick(str) {
@@ -195,17 +201,23 @@ $('body').on('click', '.li', function (e) {
 //转换文本
 function transText(id, text, state) {
     if (state) {
+        if(!text) return; 
         $('.li[data-id=' + id + ']').find('.translate').text(text);
     }else{
-        $('.li[data-id=' + id + ']').find('.translate').html(text);
+        if(text){
+            $('.li[data-id=' + id + ']').find('.translate').html('<p class="noselect">'+text+'</p>');
+        }else{
+            $('.li[data-id=' + id + ']').find('.translate').html('');
+        }
+        
     }
 }
 //删除
 function deleteItem(id){
-    $('.li[data-id=' + id + ']').remove();
+    $('.li[data-id=' + id + ']').next().next().remove();
     $('.li[data-id=' + id + ']').next().remove();
+    $('.li[data-id=' + id + ']').remove();
 }
-
 $('body').on('click', function () {
     $('.li').removeClass('active');
 })
