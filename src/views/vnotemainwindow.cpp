@@ -1314,20 +1314,20 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::NoteRename:
         editNote();
         break;
-    case ActionManager::DetailDelete: {
-        int ret = m_rightView->showWarningDialog();
-        if (ret == 1) {
-            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this);
-            connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
-                m_rightView->delSelectText();
-            });
+//    case ActionManager::DetailDelete: {
+//        int ret = m_rightView->showWarningDialog();
+//        if (ret == 1) {
+//            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this);
+//            connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+//                m_rightView->delSelectText();
+//            });
 
-            confirmDialog.exec();
-        } else if (ret == 0) {
-            m_rightView->delSelectText();
-        }
+//            confirmDialog.exec();
+//        } else if (ret == 0) {
+//            m_rightView->delSelectText();
+//        }
 
-    } break;
+//    } break;
     case ActionManager::NoteSaveText: {
         m_middleView->saveAsText();
     } break;
@@ -1337,21 +1337,21 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::DetailVoice2Text:
         onA2TStart();
         break;
-    case ActionManager::DetailSelectAll:
-        m_rightView->selectAllItem();
-        break;
-    case ActionManager::DetailCopy:
-        m_rightView->copySelectText();
-        break;
-    case ActionManager::DetailPaste:
-        m_rightView->pasteText();
-        break;
-    case ActionManager::DetailCut:
-        m_rightView->cutSelectText();
-        break;
-    case ActionManager::DetailVoiceSave:
-        m_rightView->saveMp3();
-        break;
+//    case ActionManager::DetailSelectAll:
+//        m_rightView->selectAllItem();
+//        break;
+//    case ActionManager::DetailCopy:
+//        m_rightView->copySelectText();
+//        break;
+//    case ActionManager::DetailPaste:
+//        m_rightView->pasteText();
+//        break;
+//    case ActionManager::DetailCut:
+//        m_rightView->cutSelectText();
+//        break;
+//    case ActionManager::DetailVoiceSave:
+//        m_rightView->saveMp3();
+//        break;
     case ActionManager::DetailText2Speech:
         VTextSpeechAndTrManager::onTextToSpeech();
         break;

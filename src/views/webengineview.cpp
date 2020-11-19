@@ -40,6 +40,7 @@ void WebEngineView::init()
     m_channel->registerObject("webobj", m_jsContent);
     page()->setWebChannel(m_channel);
     load(QUrl("qrc:/web/index.html"));
+    setContextMenuPolicy(Qt::NoContextMenu);
 }
 
 void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)

@@ -9,7 +9,7 @@
 //playButtonClick(const QString& id, int status);
 //getVoiceSize(qint64 millisecond); 参数数字型,单位毫秒，例如1000,返回格式化后的字符串;
 //getVoiceTime(const QString &time);语音插件创建时间格式化,参数字符串，例如"2020-10-20 16:23:44"，返回格式化后的字符串
-
+//rightMenuClick(const QString& id, int select); 鼠标右键单击，　参数：id为创建插件传入的ｉｄ,select 1 此插件有选中内容，０没有选中内容
 var webobj;
 //初始化
 function init(type, arr) {
@@ -197,16 +197,19 @@ $('body').on('click', function () {
 $(document).on('contextmenu','.li,.note-editor',function(e){
     e.preventDefault();
     var oId='';
+    var text=0;
     if(3 == e.which){
         //alert($(this).attr('data-id'))
         //列表区域
         if($(this).hasClass('li')){
             oId=$(this).attr('data-id');
+            text=0;
         }else{
             //文本区域
-            var text=getSelectedHtml();
+            text=getSelectedHtml()?1:0;
             oId=$(this).prev().attr('data-id');
         }
+        webobj.rightMenuClick(oId, text)
    }
 })
 //删除

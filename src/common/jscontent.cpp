@@ -21,7 +21,9 @@
 #include "jscontent.h"
 #include "common/utils.h"
 #include "common/vnoteitem.h"
-
+#include "common/actionmanager.h"
+#include "common/opsstateinterface.h"
+#include "common/vtextspeechandtrmanager.h"
 #include <QDateTime>
 #include <QDebug>
 
@@ -29,12 +31,12 @@ static JsContent *jsInstance = nullptr;
 
 JsContent::JsContent(QObject *parent) : QObject(parent)
 {
-
+     m_noteDetailContextMenu = ActionManager::Instance()->detialContextMenu();
 }
 
-QString JsContent::getVoiceSize(qint64 millisecond)
+QString JsContent::getVoiceSize(const QString &millisecond)
 {
-    return Utils::formatMillisecond(millisecond, 0);
+    return Utils::formatMillisecond(millisecond.toLong(), 0);
 }
 
 QString JsContent::getVoiceTime(const QString &time)
@@ -77,6 +79,83 @@ VNoteBlock *JsContent::getBlock(const QString &id)
         }
     }
     return  data;
+}
+
+void JsContent::rightMenuClick(const QString& id, int select)
+{
+    qInfo() << "get select:" << select;
+    m_currentBlock = getBlock(id);
+    if(m_currentBlock){
+        bool TTSisWorking = false;
+        OpsStateInterface *stateInterface = OpsStateInterface::instance();
+        bool isAISrvAvailable = stateInterface->isAiSrvExist();
+        ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteDetailCtxMenu, false);
+        if (isAISrvAvailable) {
+            TTSisWorking = VTextSpeechAndTrManager::isTextToSpeechInWorking();
+            if (TTSisWorking) {
+                ActionManager::Instance()->visibleAction(ActionManager::DetailStopreading, true);
+                ActionManager::Instance()->visibleAction(ActionManager::DetailText2Speech, false);
+                ActionManager::Instance()->enableAction(ActionManager::DetailStopreading, true);
+            } else {
+                ActionManager::Instance()->visibleAction(ActionManager::DetailStopreading, false);
+                ActionManager::Instance()->visibleAction(ActionManager::DetailText2Speech, true);
+            }
+        }
+        bool canCutDel = true;
+        if(m_currentBlock->getType() == VNoteBlock::Text){
+            if(select){
+                ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
+                if (isAISrvAvailable) {
+                    if (VTextSpeechAndTrManager::getTransEnable()) {
+                        ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
+                    }
+                    if (!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()) {
+                        ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
+                    }
+                }
+                if (canCutDel) {
+                    ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
+                    ActionManager::Instance()->enableAction(ActionManager::DetailDelete, canCutDel);
+                }
+            }else {
+                ActionManager::Instance()->enableAction(ActionManager::DetailPaste, true);
+                if (isAISrvAvailable && VTextSpeechAndTrManager::getSpeechToTextEnable()) {
+                    ActionManager::Instance()->enableAction(ActionManager::DetailSpeech2Text, true);
+                }
+                canCutDel = false;
+            }
+
+        }else{
+            if(select){
+                ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
+                if (isAISrvAvailable) {
+                    if (VTextSpeechAndTrManager::getTransEnable()) {
+                        ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
+                    }
+                    if (!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()) {
+                        ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
+                    }
+                }
+            }else {
+                ActionManager::Instance()->enableAction(ActionManager::DetailVoiceSave, true);
+                if (isAISrvAvailable && !stateInterface->isVoice2Text()) {
+                    ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, true);
+                }
+            }
+        }
+
+        if (canCutDel) {
+            ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
+            ActionManager::Instance()->enableAction(ActionManager::DetailDelete, canCutDel);
+        }
+
+        m_noteDetailContextMenu->exec(QCursor::pos());
+    }
+}
+
+VNoteBlock* JsContent::getCurrentBlock()
+{
+    return  m_currentBlock;
 }
 
 JsContent* JsContent::instance()

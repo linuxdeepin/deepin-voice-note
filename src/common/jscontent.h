@@ -22,9 +22,13 @@
 #define JSCONTENT_H
 
 #include <QObject>
+#include <DMenu>
+
 struct VNVoiceBlock;
 struct VNoteBlock;
 struct VNoteItem;
+
+DWIDGET_USE_NAMESPACE
 
 class JsContent : public QObject
 {
@@ -34,6 +38,7 @@ public:
     static JsContent *instance();
     void setNoteItem(VNoteItem *notedata);
     VNoteBlock *getBlock(const QString& id);
+    VNoteBlock *getCurrentBlock();
 signals:
     void initData(const QString& jsonData/*, const QString& seachKey*/);
     void insertVoiceItem(const QString &jsonData);
@@ -41,11 +46,14 @@ signals:
     void voicePlay(VNVoiceBlock *voiceData);
     void voicePause(VNVoiceBlock *voiceData);
 public slots:
+    void rightMenuClick(const QString& id, int select);
     int playButtonClick(const QString& id, int status);
-    QString getVoiceSize(qint64 millisecond);
-    QString getVoiceTime(const QString &time);
+    QString getVoiceSize(const QString& millisecond);
+    QString getVoiceTime(const QString & time);
 private:
     VNoteItem *m_notedata {nullptr};
+    DMenu *m_noteDetailContextMenu{nullptr};
+    VNoteBlock *m_currentBlock{nullptr};
 };
 
 #endif // JSCONTENT_H
