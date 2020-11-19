@@ -49,12 +49,12 @@ void MetaDataParser::parse(QVariant &metaData, VNoteItem *noteData)
  * @param noteData 数据源
  * @param metaData 生成的数据
  */
-void MetaDataParser::makeMetaData(const VNoteItem *noteData, QVariant &metaData, bool blockid)
+void MetaDataParser::makeMetaData(const VNoteItem *noteData, QVariant &metaData)
 {
 #ifdef VN_XML_METADATA_PARSER
     xmlMakeMetadata(noteData, metaData);
 #elif defined(VN_JSON_METADATA_PARSER)
-    jsonMakeMetadata(noteData, metaData, blockid);
+    jsonMakeMetadata(noteData, metaData);
 #endif
 }
 
@@ -263,7 +263,7 @@ void MetaDataParser::jsonParse(QVariant &metaData, VNoteItem *noteData /*out*/)
  * @param noteData 数据源
  * @param metaData 生成的数据
  */
-void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaData, bool blockid)
+void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaData)
 {
     Q_ASSERT(nullptr != noteData);
 
@@ -292,9 +292,7 @@ void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaD
                 noteItem.insert(m_jsonNodeNameMap[NCreateTime],
                                 it->ptrVoice->createTime.toString(VNOTE_TIME_FMT));
             }
-            if(blockid){
-                noteItem.insert(m_jsonNodeNameMap[BlockId], it->blockid);
-            }
+            noteItem.insert(m_jsonNodeNameMap[BlockId], it->blockid);
             noteDatas.append(noteItem);
         }
     }

@@ -149,7 +149,7 @@ void JsContent::rightMenuClick(const QString& id, int select)
             ActionManager::Instance()->enableAction(ActionManager::DetailDelete, canCutDel);
         }
 
-        m_noteDetailContextMenu->exec(QCursor::pos());
+        m_noteDetailContextMenu->popup(QCursor::pos());
     }
 }
 

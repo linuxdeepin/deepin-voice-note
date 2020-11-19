@@ -35,7 +35,7 @@
         border-radius: 8px;
         box-sizing: border-box;
         /* -webkit-user-drag: element; */
-        user-select: none;
+        /*user-select: none;*/
         
     }
     .li{

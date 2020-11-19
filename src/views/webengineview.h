@@ -43,6 +43,7 @@ public slots:
 private:
     void init();
     VNoteItem *m_noteData {nullptr};
+    VNoteItem *m_noteTmp {nullptr};
     QWebChannel *m_channel {nullptr};
     JsContent *m_jsContent {nullptr};
 };
