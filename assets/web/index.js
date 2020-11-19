@@ -23,7 +23,7 @@ function init(type, arr) {
     }
     arr.noteDatas.forEach((item, index) => {
         if (item.type == false) {
-            readyEditor('summernote' + item.BlockId,item.text);
+            readyEditor('summernote' + item.BlockId, item.text);
         }
     })
 }
@@ -87,7 +87,7 @@ if (!document.HTMLDOMtoString) {
 var i = 0;
 var b = 0;
 var currentId = 0;
-function readyEditor(id,text) {
+function readyEditor(id, text) {
     $('#' + id + '').summernote({
         airMode: true,
         disableDragAndDrop: true,
@@ -106,7 +106,7 @@ function readyEditor(id,text) {
             }
         }
     });
-    $('#' + id + '').summernote('code',text)
+    $('#' + id + '').summernote('code', text)
 }
 readyEditor('summernote');
 function fnClick(str) {
@@ -182,45 +182,51 @@ $('body').on('click', '.li', function (e) {
     $(this).addClass('active').siblings('.li').removeClass('active');
 })
 //转换文本
-$('body').on('click', '.time', function (e) {
-    e.stopPropagation();
-    $(this).parents('.li').find('.translate').html('<p>语音转文本.....</p>');
-    var that = $(this);
-    setTimeout(function () {
-        that.parents('.li').find('.translate').html('<div class="">转换成功</div>');
-    }, 1000)
-})
+// $('body').on('click', '.time', function (e) {
+//     e.stopPropagation();
+//     $(this).parents('.li').find('.translate').html('<p>语音转文本.....</p>');
+//     var that = $(this);
+//     setTimeout(function () {
+//         that.parents('.li').find('.translate').html('<div class="">转换成功</div>');
+//     }, 1000)
+// })
+//转换文本
+function transText(id, text, state) {
+    if (state) {
+        $('.li[data-id=' + id + ']').find('.translate').text(text);
+    }else{
+        $('.li[data-id=' + id + ']').find('.translate').html(text);
+    }
+}
+//删除
+function deleteItem(id){
+    $('.li[data-id=' + id + ']').remove();
+    $('.li[data-id=' + id + ']').next().remove();
+}
+
 $('body').on('click', function () {
     $('.li').removeClass('active');
 })
 //右键操作
-$(document).on('contextmenu','.li,.note-editor',function(e){
-    e.preventDefault();
-    var oId='';
-    var text=0;
-    if(3 == e.which){
+$(document).on('contextmenu', '.li,.note-editor', function (e) {
+    //e.preventDefault();
+    var oId = '';
+    var text = 0;
+    if (3 == e.which) {
         //alert($(this).attr('data-id'))
         //列表区域
-        if($(this).hasClass('li')){
-            oId=$(this).attr('data-id');
-            text=0;
-        }else{
+        if ($(this).hasClass('li')) {
+            oId = $(this).attr('data-id');
+            text = 0;
+        } else {
             //文本区域
-            text=getSelectedHtml()?1:0;
-            oId=$(this).prev().attr('data-id');
+            text = getSelectedHtml() ? 1 : 0;
+            oId = $(this).prev().attr('data-id');
         }
         webobj.rightMenuClick(oId, text)
-   }
-})
-//删除
-$('body').on('click', '.title', function () {
-    var a = confirm('是否删除');
-    if (a) {
-        $(this).parents('.li').remove();
-    } else {
-        return
     }
 })
+
 document.ondrop = function (event) {
     return false;
 };

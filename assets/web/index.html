@@ -21,38 +21,38 @@
     </script>
     <script id="main" type="text/x-handlebars-template">
         {{#if this.dataCount}}
-        {{#each this.noteDatas}}
-        {{#if this.type}}	
-            <div class="li" data-id="{{this.BlockId}}">
-                <div class="demo" data-id={{this.BlockId}}>
-                <div class="left">
-                    <div class="btn play" data-id="{{this.BlockId}}"></div>
-                    </div>
-                    <div class="right">
-                        <div class="lf">
-                            <div class="title">{{this.title}}</div>
-                            <div class="minute padtop">{{this.createTime}}</div>
-                        </div>
-                        <div class="lr">
-                            <div class="icon">
-                            <div class="wifi-symbol">
-                                <div class="wifi-circle first"></div>
-                                <div class="wifi-circle second"></div>
-                                <div class="wifi-circle third"></div>
-                                <div class="wifi-circle four"></div>
+            {{#each this.noteDatas}}
+                {{#if this.type}}	
+                    <div class="li" data-id="{{this.BlockId}}">
+                        <div class="demo" data-id={{this.BlockId}}>
+                        <div class="left">
+                            <div class="btn play" data-id="{{this.BlockId}}"></div>
                             </div>
+                            <div class="right">
+                                <div class="lf">
+                                    <div class="title">{{this.title}}</div>
+                                    <div class="minute padtop">{{this.createTime}}</div>
+                                </div>
+                                <div class="lr">
+                                    <div class="icon">
+                                    <div class="wifi-symbol">
+                                        <div class="wifi-circle first"></div>
+                                        <div class="wifi-circle second"></div>
+                                        <div class="wifi-circle third"></div>
+                                        <div class="wifi-circle four"></div>
+                                    </div>
+                                    </div>
+                                    <div class="time padtop">{{this.voiceSize}}</div>
+                                </div>
                             </div>
-                            <div class="time padtop">{{this.voiceSize}}</div>
                         </div>
+                    <div class="translate"></div>
                     </div>
+                {{else}}
+                <div id="summernote{{this.BlockId}}" data-id="{{this.BlockId}}">
                 </div>
-            <div class="translate"></div>
-            </div>
-        {{else}}
-        <div id="summernote{{this.BlockId}}" data-id="{{this.BlockId}}">
-        </div>
-        {{/if}}
-        {{/each}}
+                {{/if}}
+            {{/each}}
         {{else}}
         <div class="list" data-id="0">
             <div id="summernote" data-id="0">
