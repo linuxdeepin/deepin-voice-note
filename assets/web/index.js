@@ -214,6 +214,11 @@ function transText(id, text, state) {
 }
 //删除
 function deleteItem(id){
+    var preId=$('.li[data-id=' + id + ']').prev().prev().attr('id');
+    var nextId=$('.li[data-id=' + id + ']').next().attr('id');
+    var oldText=$('#'+preId).summernote('code');
+    var nextText=$('#'+nextId).summernote('code');
+    $('#'+preId).summernote('code',oldText+nextText);
     $('.li[data-id=' + id + ']').next().next().remove();
     $('.li[data-id=' + id + ']').next().remove();
     $('.li[data-id=' + id + ']').remove();
