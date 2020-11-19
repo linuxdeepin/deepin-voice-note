@@ -26,9 +26,16 @@
 #include "common/actionmanager.h"
 #include "common/metadataparser.h"
 #include "common/jscontent.h"
+#include "common/setting.h"
+#include "task/exportnoteworker.h"
 #include <QTimer>
-
 #include <QDebug>
+#include <QStandardPaths>
+#include <QThreadPool>
+
+#include <DFileDialog>
+#include <DApplication>
+
 WebEngineView::WebEngineView(QWidget *parent) :
     QWebEngineView(parent)
 {
@@ -107,5 +114,34 @@ void WebEngineView::deleteVoice(const QString &id)
                 qInfo() << "Save note error";
             }
         });
+    }
+}
+
+void WebEngineView::saveMp3()
+{
+    VNoteBlock *block = JsContent::instance()->getCurrentBlock();
+    if (block && block->blockType == VNoteBlock::Voice) {
+        DFileDialog dialog;
+        dialog.setFileMode(DFileDialog::DirectoryOnly);
+
+        dialog.setLabelText(DFileDialog::Accept, DApplication::translate("RightView", "Save"));
+        dialog.setNameFilter("MP3(*.mp3)");
+        QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
+        if (historyDir.isEmpty()) {
+            historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+        }
+        dialog.setDirectory(historyDir);
+        if (QDialog::Accepted == dialog.exec()) {
+            // save the directory string to config file.
+            setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
+
+            QString exportDir = dialog.directoryUrl().toLocalFile();
+
+            ExportNoteWorker *exportWorker = new ExportNoteWorker(
+                        exportDir, ExportNoteWorker::ExportOneVoice, m_noteData, block);
+            exportWorker->setAutoDelete(true);
+
+            QThreadPool::globalInstance()->start(exportWorker);
+        }
     }
 }

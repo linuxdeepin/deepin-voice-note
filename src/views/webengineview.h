@@ -38,6 +38,7 @@ public:
     void initData(VNoteItem *data, QString reg, bool fouse = false);
     void insertVoiceItem(const QString &voicePath, qint64 voiceSize);
     void deleteVoice(const QString &id);
+    void saveMp3();
 signals:
 
 public slots:
