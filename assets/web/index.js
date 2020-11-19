@@ -23,11 +23,11 @@ function init(type, arr) {
     }
     arr.noteDatas.forEach((item, index) => {
         if (item.type == false) {
-            readyEditor('summernote' + item.BlockId);
+            readyEditor('summernote' + item.BlockId,item.text);
         }
     })
-} 
-function fnInit(text,type){
+}
+function fnInit(text, type) {
     var initText = JSON.parse(text);
     var newText = initText.noteDatas;
     newText.forEach(item => {
@@ -58,12 +58,13 @@ function fnInit(text,type){
         init(type, initText)
     })
 }
+//初始化数据
 var initData = function (text) {
-    fnInit(text,1)
+    fnInit(text, 1)
 }
 //录音插入数据
 var insertVoiceItem = function (text) {
-    fnInit(text,2);
+    fnInit(text, 2);
 }
 new QWebChannel(qt.webChannelTransport,
     function (channel) {
@@ -86,7 +87,7 @@ if (!document.HTMLDOMtoString) {
 var i = 0;
 var b = 0;
 var currentId = 0;
-function readyEditor(id) {
+function readyEditor(id,text) {
     $('#' + id + '').summernote({
         airMode: true,
         disableDragAndDrop: true,
@@ -105,6 +106,7 @@ function readyEditor(id) {
             }
         }
     });
+    $('#' + id + '').summernote('code',text)
 }
 readyEditor('summernote');
 function fnClick(str) {
@@ -157,21 +159,21 @@ function fnClick(str) {
 $('body').on('click', '.left .btn', function (e) {
     e.stopPropagation();
     var bId = $(this).attr('data-id');
-    var state=$(this).hasClass('play')?0:1;
+    var state = $(this).hasClass('play') ? 0 : 1;
     webobj.playButtonClick(bId, state, function (state) {
         //item 
-        toggleState(state,bId)
+        toggleState(state, bId)
     });
     //播放
 })
 //按钮切换状态 c++调用
-function toggleState(state,item){
+function toggleState(state, item) {
     if (state == '1') {
-            $('.left .btn').removeClass('pause').addClass('play');
-            $('.left .btn[data-id='+item+']').addClass('pause').removeClass('play');
-    } else if(state=='0'){
-        $('.left .btn[data-id='+item+']').removeClass('pause').addClass('play');
-        
+        $('.left .btn').removeClass('pause').addClass('play');
+        $('.left .btn[data-id=' + item + ']').addClass('pause').removeClass('play');
+    } else if (state == '0') {
+        $('.left .btn[data-id=' + item + ']').removeClass('pause').addClass('play');
+
     }
 }
 //点击变色
@@ -190,6 +192,22 @@ $('body').on('click', '.time', function (e) {
 })
 $('body').on('click', function () {
     $('.li').removeClass('active');
+})
+//右键操作
+$(document).on('contextmenu','.li,.note-editor',function(e){
+    e.preventDefault();
+    var oId='';
+    if(3 == e.which){
+        //alert($(this).attr('data-id'))
+        //列表区域
+        if($(this).hasClass('li')){
+            oId=$(this).attr('data-id');
+        }else{
+            //文本区域
+            var text=getSelectedHtml();
+            oId=$(this).prev().attr('data-id');
+        }
+   }
 })
 //删除
 $('body').on('click', '.title', function () {
