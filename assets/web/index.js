@@ -75,6 +75,7 @@ new QWebChannel(qt.webChannelTransport,
         webobj.initData.connect(initData);
         webobj.insertVoiceItem.connect(insertVoiceItem);
         webobj.switchPlayBtn.connect(toggleState);
+        webobj.setVoiceToText.connect(transText);
     })
 //DOM对象转换为string
 if (!document.HTMLDOMtoString) {

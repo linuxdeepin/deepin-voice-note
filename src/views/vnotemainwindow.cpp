@@ -959,43 +959,24 @@ void VNoteMainWindow::onA2TStart(bool first)
     if(m_asrErrMeassage){
         m_asrErrMeassage->setVisible(false);
     }
-#if 0
-    VoiceNoteItem *asrVoiceItem = nullptr;
-
-    if (first) {
-        DetailItemWidget *widget = m_rightView->getOnlyOneSelectVoice();
-        asrVoiceItem = static_cast<VoiceNoteItem *>(widget);
-        m_rightView->setCurVoiceAsr(asrVoiceItem);
-    } else {
-        asrVoiceItem = m_rightView->getCurVoiceAsr();
-        if (asrVoiceItem) {
-            if (m_rightView->getOnlyOneSelectVoice() != asrVoiceItem) {
-                m_rightView->setCurVoiceAsr(nullptr);
-                return;
-            }
-        }
-    }
-
-    if (asrVoiceItem && asrVoiceItem->getNoteBlock()->blockText.isEmpty()) {
-        VNVoiceBlock *data = asrVoiceItem->getNoteBlock()->ptrVoice;
-
+    VNoteBlock *data = JsContent::instance()->getCurrentBlock();
+    if (data && data->getType() == VNoteBlock::Voice && data->blockText.isEmpty()) {
         if (nullptr != data) {
             //Check whether the audio lenght out of 20 minutes
-            if (data->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
+            if (data->ptrVoice->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
                 VNoteMessageDialog audioOutLimit(
                     VNoteMessageDialog::AsrTimeLimit, this);
 
                 audioOutLimit.exec();
             } else {
                 setSpecialStatus(VoiceToTextStart);
-                asrVoiceItem->showAsrStartWindow();
+                emit JsContent::instance()->setVoiceToText(data->blockid, DApplication::translate("VoiceNoteItem", "Converting voice to text"), 0);
                 QTimer::singleShot(0, this, [this, data]() {
-                    m_a2tManager->startAsr(data->voicePath, data->voiceSize);
+                    m_a2tManager->startAsr(data->ptrVoice->voicePath, data->ptrVoice->voiceSize);
                 });
             }
         }
     }
-#endif
 }
 
 /**
@@ -1004,9 +985,9 @@ void VNoteMainWindow::onA2TStart(bool first)
  */
 void VNoteMainWindow::onA2TError(int error)
 {
-    VoiceNoteItem *asrVoiceItem = m_rightView->getCurVoiceAsr();
-    if (asrVoiceItem) {
-        asrVoiceItem->showAsrEndWindow("");
+    VNoteBlock *data = JsContent::instance()->getCurrentBlock();
+    if (data && data->getType() == VNoteBlock::Voice) {
+        emit JsContent::instance()->setVoiceToText(data->blockid, "", 0);
     }
     QString message = "";
     if (error == VNoteA2TManager::NetworkError) {
@@ -1029,15 +1010,13 @@ void VNoteMainWindow::onA2TError(int error)
  */
 void VNoteMainWindow::onA2TSuccess(const QString &text)
 {
-    VoiceNoteItem *asrVoiceItem = m_rightView->getCurVoiceAsr();
-    if (asrVoiceItem) {
+    VNoteBlock *data = JsContent::instance()->getCurrentBlock();
+    if (data && data->getType() == VNoteBlock::Voice) {
         m_rightView->clearAllSelection();
-        asrVoiceItem->getNoteBlock()->blockText = text;
-        asrVoiceItem->showAsrEndWindow(text);
-        m_rightView->updateData();
+        data->blockText = text;
+        emit JsContent::instance()->setVoiceToText(data->blockid, text, 1);
     }
     setSpecialStatus(VoiceToTextEnd);
-    m_rightView->setCurVoiceAsr(nullptr);
 }
 
 /**
@@ -1803,7 +1782,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNoteBtn->setDisabled(true);
         m_leftView->closeMenu();
         m_middleView->closeMenu();
-        m_rightView->closeMenu();
+        //m_rightView->closeMenu();
         break;
     case VoiceToTextEnd:
         if (!stateOperation->isRecording() && !stateOperation->isPlaying()) {

@@ -72,7 +72,7 @@ VNoteBlock *JsContent::getBlock(const QString &id)
     VNoteBlock *data = nullptr;
     if(m_notedata){
         for(auto it : m_notedata->datas.datas){
-            if(id == QString::number(reinterpret_cast<qint64>(it))){
+            if(id == it->blockid){
                 data = it;
                 break;
             }
