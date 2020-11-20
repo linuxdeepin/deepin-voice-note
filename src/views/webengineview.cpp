@@ -58,6 +58,7 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
         this->setVisible(false);
         return;
     }
+    JsContent::instance()->updateNote();
     JsContent::instance()->setNoteItem(data);
     m_noteData = data;
     this->setVisible(true);
@@ -115,6 +116,11 @@ void WebEngineView::deleteVoice(const QString &id)
             }
         });
     }
+}
+
+void WebEngineView::leaveEvent(QEvent *event)
+{
+    JsContent::instance()->updateNote();
 }
 
 void WebEngineView::saveMp3()

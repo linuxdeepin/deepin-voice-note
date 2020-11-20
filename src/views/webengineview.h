@@ -42,6 +42,8 @@ public:
 signals:
 
 public slots:
+protected:
+     void leaveEvent(QEvent *event) override;
 private:
     void init();
     VNoteItem *m_noteData {nullptr};

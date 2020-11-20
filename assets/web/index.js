@@ -67,6 +67,7 @@ var initData = function (text) {
 var insertVoiceItem = function (text) {
     fnInit(text, 2);
 }
+
 new QWebChannel(qt.webChannelTransport,
     function (channel) {
         webobj = channel.objects.webobj;
@@ -106,6 +107,7 @@ function readyEditor(id, text) {
                     $(this).attr('data-click','true');
                 }else{
                     sumId=$(this).attr('data-id');
+                    webobj.textChange(sumId);
                 }
                 // console.log(document)
                 // var range = document.selection.createRange();

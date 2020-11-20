@@ -23,6 +23,7 @@
 
 #include <QObject>
 #include <DMenu>
+#include <QMutex>
 
 struct VNVoiceBlock;
 struct VNoteBlock;
@@ -39,15 +40,21 @@ public:
     void setNoteItem(VNoteItem *notedata);
     VNoteBlock *getBlock(const QString& id);
     VNoteBlock *getCurrentBlock();
+    void updateNote();
 signals:
+    //c++ 调用JS接口
     void initData(const QString& jsonData/*, const QString& seachKey*/);
     void insertVoiceItem(const QString &jsonData);
     void switchPlayBtn(int status, const QString& id);
-    void voicePlay(VNVoiceBlock *voiceData);
-    void voicePause(VNVoiceBlock *voiceData);
     void setVoiceToText(const QString & id, const QString & text, int state);
     void deleteVoice(const QString & id);
+    QString getText(const QString& id);
+    //内部信号
+    void voicePlay(VNVoiceBlock *voiceData);
+    void voicePause(VNVoiceBlock *voiceData);
 public slots:
+    //ＪＳ调用C++接口
+    void textChange(const QString& id);
     void rightMenuClick(const QString& id, int select);
     int playButtonClick(const QString& id, int status);
     QString getVoiceSize(const QString& millisecond);
@@ -56,6 +63,7 @@ private:
     VNoteItem *m_notedata {nullptr};
     DMenu *m_noteDetailContextMenu{nullptr};
     VNoteBlock *m_currentBlock{nullptr};
+    QStringList m_textsChange;
 };
 
 #endif // JSCONTENT_H

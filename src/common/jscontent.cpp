@@ -22,6 +22,7 @@
 #include "common/utils.h"
 #include "common/vnoteitem.h"
 #include "common/actionmanager.h"
+#include "db/vnoteitemoper.h"
 #include "common/opsstateinterface.h"
 #include "common/vtextspeechandtrmanager.h"
 #include <QDateTime>
@@ -156,6 +157,33 @@ void JsContent::rightMenuClick(const QString& id, int select)
 VNoteBlock* JsContent::getCurrentBlock()
 {
     return  m_currentBlock;
+}
+
+void JsContent::textChange(const QString& id)
+{
+    if(!id.isEmpty() && !m_textsChange.contains(id)){
+        m_textsChange.push_back(id);
+    }
+}
+
+void JsContent::updateNote()
+{
+    if(m_textsChange.size() && m_notedata){
+        for(auto it : m_notedata->datas.dataConstRef()){
+            if(it->getType() == VNoteBlock::Text){
+                for(auto it1 : m_textsChange){
+                    if(it->blockid == it1){
+                        qDebug() << it->blockid << ";change";
+                    }
+                }
+            }
+        }
+        VNoteItemOper noteOps(m_notedata);
+        if (!noteOps.updateNote()) {
+            qInfo() << "Save note error";
+        }
+        m_textsChange.clear();
+    }
 }
 
 JsContent* JsContent::instance()
