@@ -176,6 +176,10 @@ $('body').on('click', '.left .btn', function (e) {
     });
     //播放
 })
+//获取编辑器html
+function textResult(id){
+    return $('#summernote'+id).summernote('code');
+}
 //按钮切换状态 c++调用
 function toggleState(state, item) {
     if (state == '1') {
