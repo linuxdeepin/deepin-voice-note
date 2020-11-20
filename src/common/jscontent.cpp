@@ -27,12 +27,12 @@
 #include "common/vtextspeechandtrmanager.h"
 #include <QDateTime>
 #include <QDebug>
-
+#include <QSemaphore>
 static JsContent *jsInstance = nullptr;
 
 JsContent::JsContent(QObject *parent) : QObject(parent)
 {
-     m_noteDetailContextMenu = ActionManager::Instance()->detialContextMenu();
+    m_noteDetailContextMenu = ActionManager::Instance()->detialContextMenu();
 }
 
 QString JsContent::getVoiceSize(const QString &millisecond)
@@ -46,15 +46,15 @@ QString JsContent::getVoiceTime(const QString &time)
     return  Utils::convertDateTime(dataTime);
 }
 
-int JsContent::playButtonClick(const QString& id, int status)
+int JsContent::playButtonClick(const QString &id, int status)
 {
     qInfo() << "get status:" << status ;
     VNoteBlock *data = getBlock(id);
-    if(data && data->getType() == VNoteBlock::Voice){
-        if(status == 0){
+    if (data && data->getType() == VNoteBlock::Voice) {
+        if (status == 0) {
             emit voicePlay(data->ptrVoice);
             return 1;
-        }else {
+        } else {
             emit voicePause(data->ptrVoice);
             return 0;
         }
@@ -71,9 +71,9 @@ void JsContent::setNoteItem(VNoteItem *notedata)
 VNoteBlock *JsContent::getBlock(const QString &id)
 {
     VNoteBlock *data = nullptr;
-    if(m_notedata){
-        for(auto it : m_notedata->datas.datas){
-            if(id == it->blockid){
+    if (m_notedata) {
+        for (auto it : m_notedata->datas.datas) {
+            if (id == it->blockid) {
                 data = it;
                 break;
             }
@@ -82,11 +82,11 @@ VNoteBlock *JsContent::getBlock(const QString &id)
     return  data;
 }
 
-void JsContent::rightMenuClick(const QString& id, int select)
+void JsContent::rightMenuClick(const QString &id, int select)
 {
     qInfo() << "get select:" << select;
     m_currentBlock = getBlock(id);
-    if(m_currentBlock){
+    if (m_currentBlock) {
         bool TTSisWorking = false;
         OpsStateInterface *stateInterface = OpsStateInterface::instance();
         bool isAISrvAvailable = stateInterface->isAiSrvExist();
@@ -103,8 +103,8 @@ void JsContent::rightMenuClick(const QString& id, int select)
             }
         }
         bool canCutDel = true;
-        if(m_currentBlock->getType() == VNoteBlock::Text){
-            if(select){
+        if (m_currentBlock->getType() == VNoteBlock::Text) {
+            if (select) {
                 ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
                 if (isAISrvAvailable) {
                     if (VTextSpeechAndTrManager::getTransEnable()) {
@@ -118,7 +118,7 @@ void JsContent::rightMenuClick(const QString& id, int select)
                     ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
                     ActionManager::Instance()->enableAction(ActionManager::DetailDelete, canCutDel);
                 }
-            }else {
+            } else {
                 ActionManager::Instance()->enableAction(ActionManager::DetailPaste, true);
                 if (isAISrvAvailable && VTextSpeechAndTrManager::getSpeechToTextEnable()) {
                     ActionManager::Instance()->enableAction(ActionManager::DetailSpeech2Text, true);
@@ -126,8 +126,8 @@ void JsContent::rightMenuClick(const QString& id, int select)
                 canCutDel = false;
             }
 
-        }else{
-            if(select){
+        } else {
+            if (select) {
                 ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
                 if (isAISrvAvailable) {
                     if (VTextSpeechAndTrManager::getTransEnable()) {
@@ -137,7 +137,7 @@ void JsContent::rightMenuClick(const QString& id, int select)
                         ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
                     }
                 }
-            }else {
+            } else {
                 ActionManager::Instance()->enableAction(ActionManager::DetailVoiceSave, true);
                 if (isAISrvAvailable && !stateInterface->isVoice2Text()) {
                     ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, true);
@@ -154,39 +154,62 @@ void JsContent::rightMenuClick(const QString& id, int select)
     }
 }
 
-VNoteBlock* JsContent::getCurrentBlock()
+VNoteBlock *JsContent::getCurrentBlock()
 {
     return  m_currentBlock;
 }
 
-void JsContent::textChange(const QString& id)
+void JsContent::textChange(const QString &id)
 {
-    if(!id.isEmpty() && !m_textsChange.contains(id)){
+    m_textChangeMutex.lock();
+    if (!id.isEmpty() && !m_textsChange.contains(id)) {
         m_textsChange.push_back(id);
     }
+    m_textChangeMutex.unlock();
 }
 
-void JsContent::updateNote()
+void JsContent::updateNote(QWebEnginePage *page)
 {
-    if(m_textsChange.size() && m_notedata){
-        for(auto it : m_notedata->datas.dataConstRef()){
-            if(it->getType() == VNoteBlock::Text){
-                for(auto it1 : m_textsChange){
-                    if(it->blockid == it1){
-                        qDebug() << it->blockid << ";change";
+    m_textChangeMutex.lock();
+    if (!m_textsChange.isEmpty() && m_notedata) {
+        for (auto it : m_notedata->datas.dataConstRef()) {
+            if (it->getType() == VNoteBlock::Text) {
+                for (auto it1 : m_textsChange) {
+                    if (it->blockid == it1) {
+                        page->runJavaScript(QString("textResult(%1)").arg(it->blockid), [ = ](const QVariant & result) {
+                            it->blockText = result.toString();
+                            m_textChangeMutex.lock();
+                            m_textsChange.removeOne(it->blockid);
+                            bool needUpdate = m_textsChange.isEmpty();
+                            m_textChangeMutex.unlock();
+                            if (needUpdate) {
+                                updateNote(m_notedata);
+                                emit updateNoteFinsh();
+                            }
+                        });
                     }
                 }
             }
         }
-        VNoteItemOper noteOps(m_notedata);
+    }else {
+        emit updateNoteFinsh();
+    }
+    m_textChangeMutex.unlock();
+}
+
+void JsContent::updateNote(VNoteItem* notedata)
+{
+    VNoteItem* tmpData = nullptr == notedata ? m_notedata : notedata;
+    if(tmpData){
+        VNoteItemOper noteOps(tmpData);
         if (!noteOps.updateNote()) {
             qInfo() << "Save note error";
         }
-        m_textsChange.clear();
+        qInfo() << "update success";
     }
 }
 
-JsContent* JsContent::instance()
+JsContent *JsContent::instance()
 {
     if (jsInstance == nullptr) {
         jsInstance = new JsContent;

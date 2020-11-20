@@ -58,7 +58,7 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
         this->setVisible(false);
         return;
     }
-    JsContent::instance()->updateNote();
+    JsContent::instance()->updateNote(page());
     JsContent::instance()->setNoteItem(data);
     m_noteData = data;
     this->setVisible(true);
@@ -84,6 +84,7 @@ void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
     data = m_noteData->newBlock(VNoteBlock::Text);
     m_noteData->addBlock(data);
     m_noteTmp->datas.datas.push_back(data);
+
     if (!noteOps.updateNote()) {
         qInfo() << "Save note error";
     }
@@ -110,17 +111,14 @@ void WebEngineView::deleteVoice(const QString &id)
             if(nextData){
                 m_noteData->delBlock(nextData);
             }
-            VNoteItemOper noteOps(m_noteData);
-            if (!noteOps.updateNote()) {
-                qInfo() << "Save note error";
-            }
+            JsContent::instance()->updateNote(m_noteData);
         });
     }
 }
 
 void WebEngineView::leaveEvent(QEvent *event)
 {
-    JsContent::instance()->updateNote();
+    JsContent::instance()->updateNote(page());
 }
 
 void WebEngineView::saveMp3()
