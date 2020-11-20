@@ -139,7 +139,7 @@ void JsContent::rightMenuClick(const QString &id, int select)
                 }
             } else {
                 ActionManager::Instance()->enableAction(ActionManager::DetailVoiceSave, true);
-                if (isAISrvAvailable && !stateInterface->isVoice2Text()) {
+                if (isAISrvAvailable && !stateInterface->isVoice2Text() && m_currentBlock->blockText.isEmpty()) {
                     ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, true);
                 }
             }

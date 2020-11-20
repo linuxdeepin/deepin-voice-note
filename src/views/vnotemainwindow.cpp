@@ -1756,7 +1756,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_recordBar->setVisible(true);
         }
         stateOperation->operState(OpsStateInterface::StatePlaying, true);
-        m_noteSearchEdit->setEnabled(false);
+       // m_noteSearchEdit->setEnabled(false);
         m_leftView->setOnlyCurItemMenuEnable(true);
         m_addNotepadBtn->setEnabled(false);
         m_middleView->setOnlyCurItemMenuEnable(true);
@@ -1767,7 +1767,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_recordBar->setVisible(false);
         }
         if (!stateOperation->isVoice2Text()) {
-            m_noteSearchEdit->setEnabled(true);
+          //  m_noteSearchEdit->setEnabled(true);
             m_leftView->setOnlyCurItemMenuEnable(false);
             m_addNotepadBtn->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
@@ -1788,7 +1788,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         break;
     case RecordEnd:
         if (!stateOperation->isVoice2Text()) {
-            m_noteSearchEdit->setEnabled(true);
+          //  m_noteSearchEdit->setEnabled(true);
             m_leftView->setOnlyCurItemMenuEnable(false);
             m_addNotepadBtn->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
@@ -1810,7 +1810,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         break;
     case VoiceToTextEnd:
         if (!stateOperation->isRecording() && !stateOperation->isPlaying()) {
-            m_noteSearchEdit->setEnabled(true);
+          //  m_noteSearchEdit->setEnabled(true);
             m_leftView->setOnlyCurItemMenuEnable(false);
             m_addNotepadBtn->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
