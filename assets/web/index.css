@@ -112,12 +112,13 @@
     .translate{
         padding: 0 20px;
         line-height: 20px;
+        font-size: 12px;
     }
-    .translate p{
+    .translate>p{
         text-align: center;
         padding: 10px 0;
     }
-    .translate div{
+    .translate>div{
         padding:10px 0;
     }
     .icon{

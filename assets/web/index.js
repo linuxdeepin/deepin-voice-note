@@ -208,7 +208,7 @@ $('body').on('click', '.li', function (e) {
 function transText(id, text, state) {
     if (state) {
         if(!text) return; 
-        $('.li[data-id=' + id + ']').find('.translate').text(text);
+        $('.li[data-id=' + id + ']').find('.translate').html('<div>'+text+'</div>');
     }else{
         if(text){
             $('.li[data-id=' + id + ']').find('.translate').html('<p class="noselect">'+text+'</p>');

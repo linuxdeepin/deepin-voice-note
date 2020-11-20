@@ -46,7 +46,11 @@
                                 </div>
                             </div>
                         </div>
-                    <div class="translate"></div>
+                    <div class="translate">
+                        {{#if text}}
+                        <div>{{this.text}}</div>
+                        {{/if}}
+                    </div>
                     </div>
                 {{else}}
                 <div id="summernote{{this.BlockId}}" data-id="{{this.BlockId}}" data-click='false'>
