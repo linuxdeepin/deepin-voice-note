@@ -17,14 +17,8 @@
 */
 
 #include "ut_middleview.h"
-
-#define protected public
-#define private public
 #include "middleview.h"
 #include "middleviewdelegate.h"
-#undef protected
-#undef private
-
 #include "vnoteitem.h"
 
 ut_middleview_test::ut_middleview_test()

@@ -17,20 +17,13 @@
 */
 
 #include "ut_rightview.h"
-
-#define protected public
-#define private public
 #include "rightview.h"
 #include "datatypedef.h"
-#undef protected
-#undef private
-
 #include "textnoteitem.h"
 #include "voicenoteitem.h"
 #include "globaldef.h"
 #include "vnoteapplication.h"
 #include "common/utils.h"
-
 #include "vnoteforlder.h"
 #include "vnoteitem.h"
 #include "vnotedatamanager.h"

@@ -17,13 +17,9 @@
 */
 
 #include "ut_moveview.h"
-
 #include "vnoteforlder.h"
-
-#define protected public
 #include "moveview.h"
 #include "vnoteitem.h"
-#undef protected
 
 #include <QRect>
 #include <QPaintEvent>

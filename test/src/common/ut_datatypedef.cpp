@@ -17,15 +17,10 @@
 */
 
 #include "ut_datatypedef.h"
-
-#define protected public
 #include "datatypedef.h"
-#undef protected
-
 #include "vnoteforlder.h"
 #include "vnoteitem.h"
 #include "globaldef.h"
-
 #include <DLog>
 
 ut_datatypedef_test::ut_datatypedef_test()

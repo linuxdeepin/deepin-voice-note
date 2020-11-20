@@ -17,11 +17,7 @@
 */
 
 #include "ut_actionmanager.h"
-
-#define protected public
 #include "actionmanager.h"
-#undef protected
-
 #include "opsstateinterface.h"
 
 ut_actionmanager_test::ut_actionmanager_test()

@@ -17,10 +17,7 @@
 */
 
 #include "ut_homepage.h"
-
-#define private public
 #include "homepage.h"
-#undef private
 
 ut_homepage_test::ut_homepage_test()
 {

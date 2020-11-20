@@ -17,13 +17,7 @@
 */
 
 #include "ut_vnoteiconbutton.h"
-
-#define protected public
-#define private public
 #include "vnoteiconbutton.h"
-#undef protected
-#undef private
-
 #include "globaldef.h"
 
 ut_vnoteiconbutton_test::ut_vnoteiconbutton_test()

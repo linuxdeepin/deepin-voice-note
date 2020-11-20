@@ -2,7 +2,25 @@ Source: deepin-voice-note
 Section: devel
 Priority: optional
 Maintainer: deepin <packages@deepin.com>
-Build-Depends: debhelper (>= 11), cmake, qttools5-dev-tools, libutf8proc-dev, qtbase5-dev, pkg-config, libsqlite3-dev, qtbase5-private-dev, qtmultimedia5-dev, libglib2.0-dev, libdtkwidget-dev, libdtkwidget5-bin,libdtkcore5-bin, libdframeworkdbus-dev, libgstreamer1.0-dev, libvlc-dev,libvlccore-dev
+Build-Depends:
+ debhelper (>= 11),
+ cmake,
+ qttools5-dev-tools,
+ libutf8proc-dev,
+ qtbase5-dev,
+ pkg-config,
+ libsqlite3-dev,
+ qtbase5-private-dev,
+ qtmultimedia5-dev,
+ libglib2.0-dev,
+ libdtkwidget-dev,
+ libdtkwidget5-bin,
+ libdtkcore5-bin,
+ libdframeworkdbus-dev,
+ libgstreamer1.0-dev,
+ libvlc-dev,
+ libvlccore-dev,
+ libgtest-dev
 Standards-Version: 4.1.3
 Homepage: <insert the upstream URL, if relevant>
 #Vcs-Browser: https://salsa.debian.org/debian/voice-note

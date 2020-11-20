@@ -17,11 +17,7 @@
 */
 
 #include "ut_vnote2siconbutton.h"
-
-#define protected public
 #include "vnote2siconbutton.h"
-#undef protected
-
 #include "utils.h"
 
 ut_vnote2siconbutton_test::ut_vnote2siconbutton_test()

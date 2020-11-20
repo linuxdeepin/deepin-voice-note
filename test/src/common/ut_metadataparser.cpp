@@ -17,11 +17,7 @@
 */
 
 #include "ut_metadataparser.h"
-
-#define protected public
 #include "metadataparser.h"
-#undef protected
-
 #include "vnoteitem.h"
 
 ut_metadataparser_test::ut_metadataparser_test()

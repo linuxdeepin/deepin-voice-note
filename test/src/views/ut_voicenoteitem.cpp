@@ -17,11 +17,7 @@
 */
 
 #include "ut_voicenoteitem.h"
-
-#define protected public
 #include "voicenoteitem.h"
-#undef protected
-
 #include "textnoteedit.h"
 #include "vnoteitem.h"
 #include "utils.h"

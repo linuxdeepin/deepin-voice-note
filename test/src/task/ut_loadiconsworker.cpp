@@ -17,11 +17,7 @@
 */
 
 #include "ut_loadiconsworker.h"
-
-#define protected public
 #include "loadiconsworker.h"
-#undef protected
-
 #include "vnotedatamanager.h"
 
 #include <QPixmap>

@@ -17,10 +17,7 @@
 */
 
 #include "ut_loadfolderworker.h"
-
-#define protected public
 #include "loadfolderworker.h"
-#undef protected
 
 #include <QThreadPool>
 

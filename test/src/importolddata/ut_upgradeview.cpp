@@ -17,10 +17,7 @@
 */
 
 #include "ut_upgradeview.h"
-
-#define protected public
 #include "upgradeview.h"
-#undef protected
 
 ut_upgradeview_test::ut_upgradeview_test()
 {

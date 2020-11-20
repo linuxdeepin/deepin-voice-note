@@ -159,7 +159,4 @@ install(FILES ${APP_DESKTOP} DESTINATION share/applications)
 install(FILES ${APP_CONFIG} DESTINATION share/deepin-voice-note)
 install(FILES ${APP_LOGO} DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps/)
 
-option(USE_TEST "UT" no)
-if (USE_TEST)
 add_subdirectory(test)
-endif(USE_TEST)

@@ -17,13 +17,7 @@
 */
 
 #include "ut_vnoterecordbar.h"
-
-#define protected public
-#define private public
 #include "vnoterecordbar.h"
-#undef protected
-#undef private
-
 #include "globaldef.h"
 #include "vnoterecordwidget.h"
 #include "vnoteiconbutton.h"

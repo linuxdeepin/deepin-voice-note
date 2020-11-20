@@ -19,9 +19,7 @@
 #include "ut_utils.h"
 #include "utils.h"
 #include "textnoteedit.h"
-#define protected public
 #include "datatypedef.h"
-#undef protected
 #include "vnoteitem.h"
 
 #include <DStyle>

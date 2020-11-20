@@ -17,10 +17,7 @@
 */
 
 #include "ut_dbvisitor.h"
-
-#define protected public
 #include "dbvisitor.h"
-#undef protected
 
 ut_dbvisitor_test::ut_dbvisitor_test()
 {

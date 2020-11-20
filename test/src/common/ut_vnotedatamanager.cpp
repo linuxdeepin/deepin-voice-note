@@ -17,12 +17,7 @@
 */
 
 #include "ut_vnotedatamanager.h"
-
-#define private public
-#define protected public
 #include "vnotedatamanager.h"
-#undef private
-#undef protected
 
 ut_vnotedatamanager_test::ut_vnotedatamanager_test()
 {

@@ -17,10 +17,7 @@
 */
 
 #include "ut_vnotebasedialog.h"
-
-#define protected public
 #include "vnotebasedialog.h"
-#undef protected
 
 ut_vnotebasedialog_test::ut_vnotebasedialog_test()
 {

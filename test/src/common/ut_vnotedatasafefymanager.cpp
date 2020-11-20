@@ -17,10 +17,7 @@
 */
 
 #include "ut_vnotedatasafefymanager.h"
-
-#define protected public
 #include "vnotedatasafefymanager.h"
-#undef protected
 
 ut_vnotedatasafefymanager_test::ut_vnotedatasafefymanager_test()
 {

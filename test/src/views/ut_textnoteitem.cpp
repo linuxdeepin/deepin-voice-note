@@ -17,15 +17,10 @@
 */
 
 #include "ut_textnoteitem.h"
-
-#define private public
-#define protected public
 #include "datatypedef.h"
 #include "textnoteitem.h"
 #include "textnoteedit.h"
 #include "utils.h"
-#undef private
-#undef protected
 
 ut_textnoteitem_test::ut_textnoteitem_test()
 {

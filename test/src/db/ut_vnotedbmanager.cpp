@@ -17,11 +17,7 @@
 */
 
 #include "ut_vnotedbmanager.h"
-
-#define protected public
 #include "vnotedbmanager.h"
-#undef protected
-
 #include "vnotefolderoper.h"
 #include "vnoteforlder.h"
 #include "vnoteitemoper.h"

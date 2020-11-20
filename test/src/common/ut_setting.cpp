@@ -16,10 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "ut_setting.h"
-
-#define private public
 #include "setting.h"
-#undef private
 
 ut_setting_test::ut_setting_test()
 {

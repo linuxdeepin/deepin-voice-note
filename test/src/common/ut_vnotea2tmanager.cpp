@@ -17,10 +17,7 @@
 */
 
 #include "ut_vnotea2tmanager.h"
-
-#define protected public
 #include "vnotea2tmanager.h"
-#undef protected
 
 ut_vnotea2tmanager_test::ut_vnotea2tmanager_test()
 {

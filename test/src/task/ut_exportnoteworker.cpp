@@ -17,11 +17,7 @@
 */
 
 #include "ut_exportnoteworker.h"
-
-#define protected public
 #include "exportnoteworker.h"
-#undef protected
-
 #include "vnoteitem.h"
 
 #include <QThreadPool>

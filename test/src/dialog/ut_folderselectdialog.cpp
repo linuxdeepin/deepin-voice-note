@@ -17,16 +17,10 @@
 */
 
 #include "ut_folderselectdialog.h"
-
 #include "folderselectdialog.h"
-
-#define protected public
-#define private public
 #include "leftview.h"
 #include "leftviewdelegate.h"
 #include "leftviewsortfilter.h"
-#undef protected
-#undef private
 
 ut_folderselectdialog_test::ut_folderselectdialog_test()
 {

@@ -17,10 +17,7 @@
 */
 
 #include "ut_vnotemessagedialog.h"
-
-#define protected public
 #include "vnotemessagedialog.h"
-#undef protected
 
 ut_vnotemessagedialog_test::ut_vnotemessagedialog_test()
 {

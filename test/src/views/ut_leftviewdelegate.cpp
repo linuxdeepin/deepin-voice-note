@@ -17,12 +17,7 @@
 */
 
 #include "ut_leftviewdelegate.h"
-
-#define protected public
-#define private public
 #include "leftviewdelegate.h"
-#undef protected
-#undef private
 
 ut_leftviewdelegate_test::ut_leftviewdelegate_test()
 {

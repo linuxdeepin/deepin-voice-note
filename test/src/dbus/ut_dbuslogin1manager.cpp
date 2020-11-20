@@ -17,9 +17,7 @@
 */
 
 #include "ut_dbuslogin1manager.h"
-#define private public
 #include "dbuslogin1manager.h"
-#undef private
 
 ut_dbuslogin1manager_test::ut_dbuslogin1manager_test()
 {

@@ -17,7 +17,6 @@
 */
 
 #include "ut_vnwaveform.h"
-
 #include "vnwaveform.h"
 
 ut_vnwaveform_test::ut_vnwaveform_test()

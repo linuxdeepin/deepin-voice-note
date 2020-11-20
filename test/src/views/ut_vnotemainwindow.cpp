@@ -17,13 +17,7 @@
 */
 
 #include "ut_vnotemainwindow.h"
-
-#define protected public
-#define private public
 #include "vnotemainwindow.h"
-#undef protected
-#undef private
-
 #include "leftview.h"
 #include "middleview.h"
 #include "rightview.h"
@@ -31,7 +25,6 @@
 #include "splashview.h"
 #include "voicenoteitem.h"
 #include "middleviewsortfilter.h"
-
 #include "standarditemcommon.h"
 #include "vnotedatamanager.h"
 #include "vnotea2tmanager.h"
@@ -39,17 +32,13 @@
 #include "vnoteforlder.h"
 #include "actionmanager.h"
 #include "vnotedatasafefymanager.h"
-
 #include "utils.h"
 #include "actionmanager.h"
 #include "setting.h"
-
 #include "vnotefolderoper.h"
 #include "vnoteitemoper.h"
 #include "vnotedbmanager.h"
-
 #include "dbuslogin1manager.h"
-
 #include "vnotemessagedialog.h"
 #include "vnoterecordbar.h"
 #include "vnoteiconbutton.h"

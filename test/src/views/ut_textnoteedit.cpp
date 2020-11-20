@@ -17,12 +17,7 @@
 */
 
 #include "ut_textnoteedit.h"
-
-#define protected public
-#define private public
 #include "textnoteedit.h"
-#undef protected
-#undef private
 
 ut_textnoteedit_test::ut_textnoteedit_test()
 {

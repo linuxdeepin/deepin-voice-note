@@ -16,10 +16,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "ut_vnoteitem.h"
-
-#define protected public
 #include "vnoteitem.h"
-#undef protected
 
 ut_vnoteitem_test::ut_vnoteitem_test()
 {

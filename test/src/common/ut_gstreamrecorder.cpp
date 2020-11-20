@@ -17,14 +17,8 @@
 */
 
 #include "ut_gstreamrecorder.h"
-
-#define private public
 #include "gstreamrecorder.h"
-#undef private
-
-#define protected public
 #include "vnoterecordbar.h"
-#undef protected
 
 ut_gstreamrecorder_test::ut_gstreamrecorder_test()
 {

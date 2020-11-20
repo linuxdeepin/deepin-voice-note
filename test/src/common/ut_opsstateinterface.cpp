@@ -17,7 +17,6 @@
 */
 
 #include "ut_opsstateinterface.h"
-
 #include "opsstateinterface.h"
 
 

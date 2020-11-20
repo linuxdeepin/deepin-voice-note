@@ -1,14 +1,9 @@
 // test_main.cpp 测试入口
 
 #include <gtest/gtest.h>
-#include <gmock/gmock-matchers.h>
 #include <QTest>
 
-#define protected public
-#define private public
 #include "vnoteapplication.h"
-#undef protected
-#undef private
 #include "views/vnotemainwindow.h"
 #include "globaldef.h"
 
@@ -26,7 +21,7 @@ int main(int argc, char *argv[])
 {
 //    QApplication app(argc, argv);
 
-    testing::InitGoogleTest();
+    testing::InitGoogleTest(&argc, argv);
 
     VNoteApplication app(argc, argv);
 //    app.setAttribute(Qt::AA_UseHighDpiPixmaps);
