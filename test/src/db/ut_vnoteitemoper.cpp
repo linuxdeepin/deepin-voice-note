@@ -26,7 +26,6 @@
 
 ut_vnoteitemoper_test::ut_vnoteitemoper_test()
 {
-
 }
 
 void ut_vnoteitemoper_test::SetUp()
@@ -54,34 +53,34 @@ TEST_F(ut_vnoteitemoper_test, updateNote)
     m_vnoteitemoper->updateNote();
 }
 
-TEST_F(ut_vnoteitemoper_test, addNote)
-{
-    VNoteDbManager vnotedbmanager;
-    vnotedbmanager.initVNoteDb(false);
-    VNoteFolder folder;
-    folder.id = 2;
-    folder.notesCount = 1;
-    folder.name = "test";
-    VNoteFolderOper vnotefolderoper(&folder);
-    vnotefolderoper.loadVNoteFolders();
+//TEST_F(ut_vnoteitemoper_test, addNote)
+//{
+//    VNoteDbManager vnotedbmanager;
+//    vnotedbmanager.initVNoteDb(false);
+//    VNoteFolder folder;
+//    folder.id = 2;
+//    folder.notesCount = 1;
+//    folder.name = "test";
+//    VNoteFolderOper vnotefolderoper(&folder);
+//    vnotefolderoper.loadVNoteFolders();
 
-    VNoteItem tmpNote;
-    tmpNote.folderId = 2;
-    tmpNote.noteType = VNoteItem::VNT_Text;
-    VNoteBlock *ptrBlock1 = tmpNote.newBlock(VNoteBlock::Text);
-    tmpNote.addBlock(ptrBlock1);
-    VNoteItemOper noteOper(&tmpNote);
-    tmpNote.noteTitle = noteOper.getDefaultNoteName(tmpNote.folderId);
+//    VNoteItem tmpNote;
+//    tmpNote.folderId = 2;addRowAtHead
+//    tmpNote.noteType = VNoteItem::VNT_Text;
+//    VNoteBlock *ptrBlock1 = tmpNote.newBlock(VNoteBlock::Text);
+//    tmpNote.addBlock(ptrBlock1);
+//    VNoteItemOper noteOper(&tmpNote);
+//    tmpNote.noteTitle = noteOper.getDefaultNoteName(tmpNote.folderId);
 
-    vnotefolderoper.getDefaultFolderName();
-    vnotefolderoper.addFolder(folder);
-    noteOper.addNote(tmpNote);
-    noteOper.updateTop(1);
-    noteOper.updateFolderId(&tmpNote);
-    noteOper.updateNote();
-    noteOper.deleteNote();
-    noteOper.modifyNoteTitle("test");
-}
+//    vnotefolderoper.getDefaultFolderName();
+//    vnotefolderoper.addFolder(folder);
+//    noteOper.addNote(tmpNote);
+//    noteOper.updateTop(1);
+//    noteOper.updateFolderId(&tmpNote);
+//    noteOper.updateNote();
+//    noteOper.deleteNote();
+//    noteOper.modifyNoteTitle("test");
+//}
 
 TEST_F(ut_vnoteitemoper_test, getDefaultVoiceName)
 {

@@ -29,14 +29,13 @@
 
 ut_vnoterecordbar_test::ut_vnoterecordbar_test()
 {
-
 }
 
 TEST_F(ut_vnoterecordbar_test, eventFilter)
 {
     VNoteRecordBar vnoterecordbar;
-    QEvent* event = new QEvent(QEvent::MouseButtonPress);
-    QWidget* widget = new QWidget;
+    QEvent *event = new QEvent(QEvent::MouseButtonPress);
+    QWidget *widget = new QWidget;
     vnoterecordbar.eventFilter(widget, event);
 }
 
@@ -58,19 +57,19 @@ TEST_F(ut_vnoterecordbar_test, cancelRecord)
     VNoteRecordBar vnoterecordbar;
 }
 
-TEST_F(ut_vnoterecordbar_test, onClosePlayWidget)
-{
-    VNoteRecordBar vnoterecordbar;
-    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
-    vnvoiceblock->voicePath = "/usr/share/music/bensound-sunny.mp3";
-    vnvoiceblock->voiceSize = 2650;
-    vnvoiceblock->voiceTitle = "test";
-    vnvoiceblock->state = true;
-    vnoterecordbar.onClosePlayWidget(vnvoiceblock);
-    vnoterecordbar.pauseVoice(vnvoiceblock);
-    vnoterecordbar.playVoice(vnvoiceblock);
-    vnoterecordbar.stopVoice(vnvoiceblock);
-}
+//TEST_F(ut_vnoterecordbar_test, onClosePlayWidget)
+//{
+//    VNoteRecordBar vnoterecordbar;
+//    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
+//    vnvoiceblock->voicePath = "/usr/share/music/bensound-sunny.mp3";
+//    vnvoiceblock->voiceSize = 2650;
+//    vnvoiceblock->voiceTitle = "test";
+//    vnvoiceblock->state = true;
+//    vnoterecordbar.onClosePlayWidget(vnvoiceblock);
+//    vnoterecordbar.pauseVoice(vnvoiceblock);
+//    vnoterecordbar.playVoice(vnvoiceblock);
+//    vnoterecordbar.stopVoice(vnvoiceblock);
+//}
 
 TEST_F(ut_vnoterecordbar_test, getVoiceData)
 {

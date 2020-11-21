@@ -23,7 +23,6 @@
 
 ut_middleview_test::ut_middleview_test()
 {
-
 }
 
 TEST_F(ut_middleview_test, setSearchKey)
@@ -45,30 +44,30 @@ TEST_F(ut_middleview_test, setCurrentId)
     vnoteitem.folderId = 2;
 }
 
-TEST_F(ut_middleview_test, addRowAtHead)
-{
-    MiddleView middleview;
-    VNoteItem *vnoteitem = new VNoteItem;
-    vnoteitem->noteId = 2;
-    vnoteitem->folderId = 2;
-    vnoteitem->noteTitle = "test";
-    middleview.addRowAtHead(vnoteitem);
-    middleview.appendRow(vnoteitem);
-    middleview.onNoteChanged();
-    middleview.rowCount();
-    middleview.setCurrentIndex(1);
-    middleview.editNote();
-    middleview.saveAsText();
-    middleview.saveRecords();
-    middleview.getCurrVNotedata();
-    middleview.deleteCurrentRow();
-}
+//TEST_F(ut_middleview_test, addRowAtHead)
+//{
+//    MiddleView middleview;
+//    VNoteItem *vnoteitem = new VNoteItem;
+//    vnoteitem->noteId = 2;
+//    vnoteitem->folderId = 2;
+//    vnoteitem->noteTitle = "test";
+//    middleview.addRowAtHead(vnoteitem);
+//    middleview.appendRow(vnoteitem);
+//    middleview.onNoteChanged();
+//    middleview.rowCount();
+//    middleview.setCurrentIndex(1);
+//    middleview.editNote();
+//    middleview.saveAsText();
+//    middleview.saveRecords();
+//    middleview.getCurrVNotedata();
+//    middleview.deleteCurrentRow();
+//}
 
 TEST_F(ut_middleview_test, mouseEvent)
 {
     MiddleView middleview;
     QPointF localPos;
-    QMouseEvent* event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
     middleview.mousePressEvent(event);
     middleview.mouseReleaseEvent(event);
     middleview.mouseDoubleClickEvent(event);
@@ -78,18 +77,18 @@ TEST_F(ut_middleview_test, mouseEvent)
 TEST_F(ut_middleview_test, eventFilter)
 {
     MiddleView middleview;
-    QKeyEvent* event = new QKeyEvent(QEvent::FocusIn, 0x01000016, Qt::NoModifier, "test");
+    QKeyEvent *event = new QKeyEvent(QEvent::FocusIn, 0x01000016, Qt::NoModifier, "test");
     middleview.eventFilter(&middleview, event);
-    QKeyEvent* event1 = new QKeyEvent(QEvent::Destroy, 0x01000001, Qt::NoModifier, "test");
+    QKeyEvent *event1 = new QKeyEvent(QEvent::Destroy, 0x01000001, Qt::NoModifier, "test");
     middleview.eventFilter(&middleview, event1);
 }
 
 TEST_F(ut_middleview_test, keyPressEvent)
 {
     MiddleView middleview;
-    QKeyEvent* event = new QKeyEvent(QEvent::KeyPress, 0x01000016, Qt::NoModifier, "test");
+    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, 0x01000016, Qt::NoModifier, "test");
     middleview.keyPressEvent(event);
-    QKeyEvent* event1 = new QKeyEvent(QEvent::KeyPress, 0x01000001, Qt::NoModifier, "test");
+    QKeyEvent *event1 = new QKeyEvent(QEvent::KeyPress, 0x01000001, Qt::NoModifier, "test");
     middleview.keyPressEvent(event1);
 }
 
