@@ -172,6 +172,8 @@ void JsContent::updateNote(QWebEnginePage *page)
 {
     m_textChangeMutex.lock();
     if (!m_textsChange.isEmpty() && m_notedata) {
+        QEventLoop loop;
+        connect(this, &JsContent::updateNoteFinsh, &loop, &QEventLoop::quit);
         for (auto it : m_notedata->datas.dataConstRef()) {
             if (it->getType() == VNoteBlock::Text) {
                 for (auto it1 : m_textsChange) {
@@ -191,10 +193,11 @@ void JsContent::updateNote(QWebEnginePage *page)
                 }
             }
         }
+        m_textChangeMutex.unlock();
+        loop.exec();
     }else {
-        emit updateNoteFinsh();
+        m_textChangeMutex.unlock();
     }
-    m_textChangeMutex.unlock();
 }
 
 void JsContent::updateNote(VNoteItem* notedata)
