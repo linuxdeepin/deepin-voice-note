@@ -44,9 +44,9 @@ TEST_F(ut_leftview_test, getNotepadRootIndex)
 
 TEST_F(ut_leftview_test, mouseEvent)
 {
-    LeftView leftview;
-    QPointF localPos;
-    QMouseEvent* event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+//    LeftView leftview;
+//    QPointF localPos;
+//    QMouseEvent* event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
 //    leftview.mousePressEvent(event);
 //    leftview.mouseReleaseEvent(event);
 //    leftview.mouseDoubleClickEvent(event);
@@ -57,9 +57,9 @@ TEST_F(ut_leftview_test, keyPressEvent)
 {
     LeftView leftview;
     QKeyEvent* event = new QKeyEvent(QEvent::KeyPress, 0x01000016, Qt::NoModifier, "test");
-    leftview.keyPressEvent(event);
+//    leftview.keyPressEvent(event);
     QKeyEvent* event1 = new QKeyEvent(QEvent::KeyPress, 0x01000001, Qt::NoModifier, "test");
-    leftview.keyPressEvent(event1);
+//    leftview.keyPressEvent(event1);
 }
 
 TEST_F(ut_leftview_test, restoreNotepadItem)

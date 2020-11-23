@@ -22,6 +22,8 @@
 #ifndef LEFTVIEW_H
 #define LEFTVIEW_H
 
+#include "widgets/vnoterightmenu.h"
+
 #include <QStandardItemModel>
 #include <QDateTime>
 
@@ -40,6 +42,15 @@ class LeftView : public DTreeView
 {
     Q_OBJECT
 public:
+    //触摸屏事件
+    enum TouchState {
+        TouchNormal,
+        TouchMoving,
+        TouchDraging,
+        TouchPressing,
+        TouchOutVisibleRegion
+    };
+
     explicit LeftView(QWidget *parent = nullptr);
     //获取记事本项父节点
     QStandardItem *getNotepadRoot();
@@ -74,7 +85,8 @@ public:
     VNoteFolder* getFirstFolder();
     //处理触摸屏slide事件
     void handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point);
-
+    //更新触摸屏一指状态
+    void setTouchState(const TouchState &touchState);
 signals:
     void dropNotesEnd();
 
@@ -101,9 +113,10 @@ protected:
     void dragLeaveEvent(QDragLeaveEvent *event) override;
     // 拖拽放下事件
     void dropEvent (QDropEvent * event ) override;
-    // 开始拖拽事件
-    void startDrag(Qt::DropActions supportedActions) override;
-
+    //处理触摸移动事件
+    void doTouchMoveEvent(QMouseEvent *event);
+    //处理触摸屏拖拽事件
+    void handleDragEvent(bool isTouch = true);
 private:
     //初始化代理模块
     void initDelegate();
@@ -113,6 +126,8 @@ private:
     void initNotepadRoot();
     //初始化右键菜单
     void initMenu();
+    //初始化连接
+    void initConnections();
     //触发拖动操作
     void triggerDragFolder();
     //设置记事本默认顺序
@@ -120,7 +135,9 @@ private:
     //拖拽移动
     void doDragMove(const QModelIndex &src, const QModelIndex &dst);
 
-    DMenu *m_notepadMenu {nullptr};
+    //记事本列表右键菜单
+    VNoteRightMenu *m_notepadMenu {nullptr};
+//    DMenu *m_notepadMenu {nullptr};
     QStandardItemModel *m_pDataModel {nullptr};
     LeftViewDelegate *m_pItemDelegate {nullptr};
     LeftViewSortFilter *m_pSortViewFilter {nullptr};
@@ -133,6 +150,11 @@ private:
     bool m_isTouchSliding {false};
     qint64 m_touchPressStartMs = 0;
     QPoint m_touchPressPoint;
+    //是否鼠标拖拽
+    bool m_isDraging {false};
+    QModelIndex m_index ;
+    TouchState m_touchState {TouchNormal};
+    void checkIfselectCurrent();
 };
 
 #endif // LEFTVIEW_H

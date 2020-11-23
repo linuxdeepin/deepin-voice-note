@@ -21,6 +21,8 @@
 #ifndef ACTIONFACTORY_H
 #define ACTIONFACTORY_H
 
+#include <widgets/vnoterightmenu.h>
+
 #include <QObject>
 #include <QMap>
 
@@ -94,9 +96,9 @@ public:
     };
     Q_ENUM(MenuType)
     //获取记事本列表右键菜单
-    DMenu *notebookContextMenu();   
+    VNoteRightMenu *notebookContextMenu();
     //获取记事项列表右键菜单
-    DMenu *noteContextMenu();
+    VNoteRightMenu *noteContextMenu();
     //获取详情页右键菜单
     DMenu *detialContextMenu();
     //获取菜单项ID
@@ -115,10 +117,10 @@ protected:
     void initMenu();
 
     static ActionManager *_instance;
-
-    QScopedPointer<DMenu> m_notebookContextMenu;
-    QScopedPointer<DMenu> m_noteContextMenu;
-    QScopedPointer<DMenu> m_detialContextMenu;
+    //获取菜单指针
+    QScopedPointer<VNoteRightMenu> m_notebookContextMenu;
+    QScopedPointer<VNoteRightMenu> m_noteContextMenu;
+    QScopedPointer<VNoteRightMenu> m_detialContextMenu;
 
     QMap<ActionKind, QAction *> m_actionsMap;
 };

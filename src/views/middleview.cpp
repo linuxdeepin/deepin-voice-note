@@ -53,12 +53,12 @@ MiddleView::MiddleView(QWidget *parent)
     initDelegate();
     initMenu();
     initUI();
+    initConnections();
 
     setContextMenuPolicy(Qt::NoContextMenu);
     this->setDragEnabled(true);
     this->setDragDropMode(QAbstractItemView::DragOnly);
     this->setAcceptDrops(false);
-
 }
 
 /**
@@ -82,6 +82,15 @@ void MiddleView::initDelegate()
 {
     m_pItemDelegate = new MiddleViewDelegate(this);
     this->setItemDelegate(m_pItemDelegate);
+}
+
+/**
+ * @brief LeftView::setTouchState 更新触摸屏一指状态
+ * @param touchState
+ */
+void MiddleView::setTouchState(const TouchState &touchState)
+{
+    m_touchState = touchState;
 }
 
 /**
@@ -305,11 +314,16 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
         //记录此时触控点的位置，用于move事件中滑动距离与速度
         m_touchPressPoint = event->pos();
         m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
+        //更新触摸状态
+        setTouchState(TouchPressing);
+        m_index = indexAt(event->pos());
+        m_noteMenu->setPressPoint(QCursor::pos());
+        checkIfselectCurrent();
     }
 
     if (!m_onlyCurItemMenuEnable) {
         event->setModifiers(Qt::NoModifier);
-        DListView::mousePressEvent(event);
+//        DListView::mousePressEvent(event);
     }
 
     if (event->button() == Qt::RightButton) {
@@ -318,6 +332,8 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                 && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
             DListView::setCurrentIndex(index);
             m_noteMenu->popup(event->globalPos());
+            //通过此方法隐藏菜单，在处理拖拽事件结束后hide
+            m_noteMenu->setWindowOpacity(1);
         }
     }
 }
@@ -328,7 +344,22 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
  */
 void MiddleView::mouseReleaseEvent(QMouseEvent *event)
 {
-    m_isTouchSliding = false;
+    m_isDraging = false;
+    //处理拖拽事件，由于与drop操作参数不同，暂未封装
+    if (m_touchState == TouchState::TouchDraging) {
+        setTouchState(TouchState::TouchNormal);
+        return;
+    }
+    //正常点击状态，选择当前点击选项
+    QModelIndex index = indexAt(event->pos());
+    if (index.row() != currentIndex().row() && m_touchState == TouchState::TouchPressing) {
+        if (index.isValid())
+            setCurrentIndex(index.row());
+        setTouchState(TouchState::TouchNormal);
+        return;
+    }
+    setTouchState(TouchState::TouchNormal);
+
     if (!m_onlyCurItemMenuEnable) {
         DListView::mouseReleaseEvent(event);
     }
@@ -351,36 +382,19 @@ void MiddleView::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void MiddleView::mouseMoveEvent(QMouseEvent *event)
 {
-    if (event->buttons() & Qt::LeftButton) {
-        if (!m_onlyCurItemMenuEnable) {
-            //触控屏单指滑动
-            if (event->source() == Qt::MouseEventSynthesizedByQt) {
-                //计算上下、左右移动距离，用于计算滑动速度
-                double distY = event->pos().y() - m_touchPressPoint.y();
-                double distX = event->pos().x() - m_touchPressPoint.x();
-                qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-                qint64 timeInterval = currentTime - m_touchPressStartMs;
-                //正在滑动状态且上下移动距离超过5px，持续执行滚动事件
-                if (m_isTouchSliding) {
-                    if (qAbs(distY) > 5)
-                        handleTouchSlideEvent(timeInterval, distY, event->pos());
-                    return;
-                }
-                //初次判断，250ms之内移动距离超过10px，执行滚动事件，仅左右移动距离超过5px，更新滑动状态，区分拖拽操作
-                else {
-                    if (timeInterval < 250) {
-                        if (qAbs(distY) > 10) {
-                            m_isTouchSliding = true;
-                            handleTouchSlideEvent(timeInterval, distY, event->pos());
-                        } else if (qAbs(distX) > 5) {
-                            m_isTouchSliding = true;
-                        }
-                        return;
-                    }
-                }
-            }
-            DListView::mouseMoveEvent(event);
+    //处理触摸屏一指操作
+    if ((event->source() == Qt::MouseEventSynthesizedByQt && event->buttons() & Qt::LeftButton)) {
+        if(TouchState::TouchOutVisibleRegion !=  m_touchState){
+            doTouchMoveEvent(event);
         }
+        return;
+    } else if ((event->buttons() & Qt::LeftButton) && m_touchState == TouchState::TouchNormal) {
+        if (!m_isDraging) {
+            setCurrentIndex(indexAt(event->pos()).row());
+            handleDragEvent(false);
+        }
+    } else {
+        DListView::mouseMoveEvent(event);
     }
 }
 
@@ -445,6 +459,17 @@ void MiddleView::initUI()
     footer->setFixedHeight(1);
     addFooterWidget(footer);
     //    this->installEventFilter(this);
+}
+
+/**
+ * @brief MiddleView::initConnections
+ */
+void MiddleView::initConnections()
+{
+    connect(m_noteMenu, &VNoteRightMenu::menuTouchMoved, this, &MiddleView::handleDragEvent);
+    connect(m_noteMenu, &VNoteRightMenu::menuTouchReleased, this, [ = ] {
+        m_touchState = TouchState::TouchNormal;
+    });
 }
 
 /**
@@ -558,6 +583,11 @@ void MiddleView::deleteModelIndexs(const QModelIndexList &indexs)
  */
 void MiddleView::triggerDragNote()
 {
+    QModelIndex dragIndex = this->indexAt(mapFromGlobal(QCursor::pos()));
+    if(!dragIndex.isValid()){
+        m_isDraging = true;
+        return;
+    }
     VNoteItem *noteData = getCurrVNotedata();
     // 判断当前拖拽的笔记是否可用，如果可用，则初始化拖拽操作的数据
     if (noteData) {
@@ -576,20 +606,79 @@ void MiddleView::triggerDragNote()
         drag->setHotSpot(QPoint(pixmap.width() / 2, pixmap.height() / 2));
         drag->exec(Qt::MoveAction);
         drag->deleteLater();
+        //隐藏菜单
+        m_noteMenu->hide();
     }
 }
 
-void MiddleView::startDrag(Qt::DropActions supportedActions)
+/**
+ * @brief LeftView::selectCurrentOnTouch 设置当前点击位置选中
+ * @return null
+ * @author
+ */
+void MiddleView::checkIfselectCurrent()
 {
-    Q_UNUSED(supportedActions)
-    if (!m_onlyCurItemMenuEnable) {
-        OpsStateInterface *stateInterface = OpsStateInterface::instance();
-        if (!stateInterface->isSearching()) {
-            QModelIndex index = currentIndex();
-            QPoint pos = mapFromGlobal(QCursor::pos());
-            if (index.isValid() && index == indexAt(pos)) {
-                triggerDragNote();
-            }
+    QTimer::singleShot(250, this, [ = ] {
+        if (m_touchState == TouchState::TouchPressing && indexAt(QCursor::pos()).isValid())
+            this->setCurrentIndex(indexAt(QCursor::pos()).row());
+    });
+}
+
+/**
+ * @brief LeftView::doTouchMoveEvent  处理触摸屏move事件，区分点击、滑动、拖拽、长按功能
+ * @param event
+ */
+void MiddleView::doTouchMoveEvent(QMouseEvent *event)
+{
+    //处理触摸屏单指move事件，区分滑动、拖拽事件
+//    m_pItemDelegate->setDraging(false);
+    double distX = event->pos().x() - m_touchPressPoint.x();
+    double distY = event->pos().y() - m_touchPressPoint.y();
+    //获取时间间隔
+    QDateTime current = QDateTime::currentDateTime();
+    qint64 timeParam = current.toMSecsSinceEpoch() - m_touchPressStartMs;
+
+    switch (m_touchState) {
+    //首次判断
+    case TouchState::TouchPressing:
+        //250ms-1000ms之间移动超过10px，判断为拖拽
+        if ((timeParam > 250 && timeParam < 1000) && (qAbs(distY) > 10 || qAbs(distX) > 10)) {
+            if (!m_isDraging)
+                handleDragEvent();
         }
+        //250ms之内，上下移动距离超过10px或左右移动距离超过5px，判断为滑动
+        else if (timeParam <= 250 && (qAbs(distY) > 10 || qAbs(distX) > 5)) {
+            setTouchState(TouchState::TouchMoving);
+            handleTouchSlideEvent(timeParam, distY, event->pos());
+        }
+        break;
+    //如果正在拖拽
+    case TouchState::TouchDraging:
+        if (!m_isDraging)
+            handleDragEvent();
+        break;
+    //如果正在滑动
+    case TouchState::TouchMoving:
+        if (!viewport()->visibleRegion().contains(event->pos())) {
+            setTouchState(TouchState::TouchOutVisibleRegion);
+        } else if (qAbs(distY) > 5) {
+            handleTouchSlideEvent(timeParam, distY, event->pos());
+        }
+        break;
+    default:
+        break;
     }
+}
+
+/**
+ * @brief LeftView::handleDragEvent
+ * @param isTouch 是否触屏
+ */
+void MiddleView::handleDragEvent(bool isTouch)
+{
+    if(isTouch){
+        setTouchState(TouchState::TouchDraging);
+    }
+    m_noteMenu->setWindowOpacity(0.0);
+    triggerDragNote();
 }

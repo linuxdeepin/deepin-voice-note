@@ -22,6 +22,8 @@
 #ifndef MIDDLEVIEW_H
 #define MIDDLEVIEW_H
 
+#include "widgets/vnoterightmenu.h"
+
 #include <QDateTime>
 
 #include <DListView>
@@ -39,6 +41,15 @@ class MiddleView : public DListView
 {
     Q_OBJECT
 public:
+    //触摸屏事件状态
+    enum TouchState {
+        TouchNormal,
+        TouchMoving,
+        TouchDraging,
+        TouchPressing,
+        TouchOutVisibleRegion
+    };
+
     MiddleView(QWidget *parent = nullptr);
     //设置搜索关键字
     void setSearchKey(const QString &key);
@@ -82,7 +93,8 @@ public:
     void deleteModelIndexs(const QModelIndexList &indexs);
     //处理触摸屏slide事件
     void handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point);
-
+    //更新触摸屏一指状态
+    void setTouchState(const TouchState &touchState);
 public slots:
     //更新记事项
     void onNoteChanged();
@@ -103,9 +115,10 @@ protected:
     void keyPressEvent(QKeyEvent *e) override;
     //关闭重命名编辑框触发
     void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
-    //触发拖动事件
-    void startDrag(Qt::DropActions supportedActions) override;
-
+    //处理触摸屏move操作
+    void doTouchMoveEvent(QMouseEvent *event);
+    //处理拖拽事件
+    void handleDragEvent(bool isTouch = true);
 private:
     //初始化代理模块
     void initDelegate();
@@ -115,14 +128,20 @@ private:
     void initMenu();
     //初始化UI布局
     void initUI();
+    //初始化连接
+    void initConnections();
     //触发拖动操作
     void triggerDragNote();
+    //延时选中
+    void checkIfselectCurrent();
 
     bool m_onlyCurItemMenuEnable {false};
     qint64 m_currentId {-1};
     QString m_searchKey;
     DLabel *m_emptySearch {nullptr};
-    DMenu *m_noteMenu {nullptr};
+    //笔记列表右键菜单
+    VNoteRightMenu *m_noteMenu {nullptr};
+
     QStandardItemModel *m_pDataModel {nullptr};
     MiddleViewDelegate *m_pItemDelegate {nullptr};
     MiddleViewSortFilter *m_pSortViewFilter {nullptr};
@@ -132,6 +151,10 @@ private:
     bool m_isTouchSliding {false};
     qint64 m_touchPressStartMs = 0;
     QPoint m_touchPressPoint;
+    //正在鼠标拖拽
+    bool m_isDraging {false};
+    QModelIndex m_index ;
+    TouchState m_touchState {TouchNormal};
 };
 
 #endif // MIDDLEVIEW_H

@@ -32,7 +32,7 @@
 #include "common/vnoteforlder.h"
 #include "common/vnoteitem.h"
 #include "common/setting.h"
-
+#include "widgets/vnoterightmenu.h"
 #include "db/vnoteitemoper.h"
 
 #include <QMouseEvent>
@@ -56,6 +56,7 @@ LeftView::LeftView(QWidget *parent)
     initDelegate();
     initNotepadRoot();
     initMenu();
+    initConnections();
     setContextMenuPolicy(Qt::NoContextMenu);
     this->setDragEnabled(true);
     this->setDragDropMode(QAbstractItemView::DragDrop);
@@ -127,19 +128,26 @@ void LeftView::mousePressEvent(QMouseEvent *event)
         //记录触控起始位置与时间点
         m_touchPressPoint = event->pos();
         m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
+        //更新触摸状态
+        setTouchState(TouchPressing);
+        m_index = indexAt(event->pos());
+        m_notepadMenu->setPressPoint(QCursor::pos());
+        checkIfselectCurrent();
     }
 
     if (!m_onlyCurItemMenuEnable) {
         event->setModifiers(Qt::NoModifier);
-        DTreeView::mousePressEvent(event);
+        //不使用自动判断
+//        DTreeView::mousePressEvent(event);
     }
-
     if (event->button() == Qt::RightButton) {
         QModelIndex index = this->indexAt(event->pos());
         if (StandardItemCommon::getStandardItemType(index) == StandardItemCommon::NOTEPADITEM
                 && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
             this->setCurrentIndex(index);
             m_notepadMenu->popup(event->globalPos());
+            //通过此方法隐藏菜单，在处理拖拽事件结束后hide
+            m_notepadMenu->setWindowOpacity(1);
         }
     }
 }
@@ -150,10 +158,34 @@ void LeftView::mousePressEvent(QMouseEvent *event)
  */
 void LeftView::mouseReleaseEvent(QMouseEvent *event)
 {
-    m_isTouchSliding = false;
+    m_isDraging = false;
+    //处理拖拽事件，由于与drop操作参数不同，暂未封装
+    if (m_touchState == TouchState::TouchDraging) {
+        setTouchState(TouchState::TouchNormal);
+        return;
+    }
+    //正常点击状态，选择当前点击选项
+    QModelIndex index = indexAt(event->pos());
+    if (index.row() != currentIndex().row() && m_touchState == TouchState::TouchPressing) {
+        if (index.isValid())
+            setCurrentIndex(index);
+        setTouchState(TouchState::TouchNormal);
+        return;
+    }
+    setTouchState(TouchState::TouchNormal);
+
     if (!m_onlyCurItemMenuEnable) {
         DTreeView::mouseReleaseEvent(event);
     }
+}
+
+/**
+ * @brief LeftView::setTouchState 更新触摸屏一指状态
+ * @param touchState
+ */
+void LeftView::setTouchState(const TouchState &touchState)
+{
+    m_touchState = touchState;
 }
 
 /**
@@ -174,40 +206,81 @@ void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
 void LeftView::mouseMoveEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
-
-    if (event->buttons() & Qt::LeftButton) {
-        if (!m_onlyCurItemMenuEnable) {
-            //鼠标左键滑动
-            if (event->source() == Qt::MouseEventSynthesizedByQt) {
-                //计算上下、左右移动距离与时间间隔
-                double distY = event->pos().y() - m_touchPressPoint.y();
-                double distX = event->pos().x() - m_touchPressPoint.x();
-                qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-                qint64 timeInterval = currentTime - m_touchPressStartMs;
-                //正在滑动时移动距离超过5px，持续执行滚动操作
-                if (m_isTouchSliding) {
-                    if (qAbs(distY) > 5)
-                        handleTouchSlideEvent(timeInterval, distY, event->pos());
-                    return;
-                }
-                //初次判断，如果在250ms之内滑动距离超过5px，执行滚动操作
-                else {
-                    if (timeInterval < 250) {
-                        if (qAbs(distY) > 10) {
-                            m_isTouchSliding = true;
-                            handleTouchSlideEvent(timeInterval, distY, event->pos());
-                        }
-                        //仅有左右滑动距离超过5px，更新为滚动状态但不执行滚动操作，用于区分拖拽事件
-                        else if (qAbs(distX) > 5) {
-                            m_isTouchSliding = true;
-                        }
-                        return;
-                    }
-                }
-            }
-            DTreeView::mouseMoveEvent(event);
+    //处理触摸屏一指操作
+    if ((event->source() == Qt::MouseEventSynthesizedByQt && event->buttons() & Qt::LeftButton)) {
+        if(TouchState::TouchOutVisibleRegion !=  m_touchState){
+            doTouchMoveEvent(event);
         }
+        return;
     }
+    //处理鼠标拖拽操作
+    else if ((event->buttons() & Qt::LeftButton) && m_touchState == TouchState::TouchNormal) {
+        if (!m_isDraging) {
+            setCurrentIndex(indexAt(event->pos()));
+            handleDragEvent(false);
+        }
+    } else {
+        DTreeView::mouseMoveEvent(event);
+    }
+}
+
+/**
+ * @brief LeftView::doTouchMoveEvent  处理触摸屏move事件，区分点击、滑动、拖拽、长按功能
+ * @param event
+ */
+void LeftView::doTouchMoveEvent(QMouseEvent *event)
+{
+    //处理触摸屏单指move事件，区分滑动、拖拽事件
+//    m_pItemDelegate->setDraging(false);
+    double distX = event->pos().x() - m_touchPressPoint.x();
+    double distY = event->pos().y() - m_touchPressPoint.y();
+    //获取时间间隔
+    QDateTime current = QDateTime::currentDateTime();
+    qint64 timeParam = current.toMSecsSinceEpoch() - m_touchPressStartMs;
+
+    switch (m_touchState) {
+    //首次判断
+    case TouchState::TouchPressing:
+        //250ms-1000ms之间移动超过10px，判断为拖拽
+        if ((timeParam > 250 && timeParam < 1000) && (qAbs(distY) > 10 || qAbs(distX) > 10)) {
+            if (!m_isDraging)
+                handleDragEvent();
+        }
+        //250ms之内，上下移动距离超过10px或左右移动距离超过5px，判断为滑动
+        else if (timeParam <= 250 && (qAbs(distY) > 10 || qAbs(distX) > 5)) {
+            setTouchState(TouchState::TouchMoving);
+            handleTouchSlideEvent(timeParam, distY, event->pos());
+        }
+        break;
+    //如果正在拖拽
+    case TouchState::TouchDraging:
+        if (!m_isDraging)
+            handleDragEvent();
+        break;
+    //如果正在滑动
+    case TouchState::TouchMoving:
+        if (!viewport()->visibleRegion().contains(event->pos())) {
+            setTouchState(TouchState::TouchOutVisibleRegion);
+        } else if (qAbs(distY) > 5) {
+            handleTouchSlideEvent(timeParam, distY, event->pos());
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+/**
+ * @brief LeftView::handleDragEvent
+ * @param isTouch 是否触屏
+ */
+void LeftView::handleDragEvent(bool isTouch){
+    qDebug () <<"menumoved";
+    if(isTouch){
+        setTouchState(TouchState::TouchDraging);
+    }
+    m_notepadMenu->setWindowOpacity(0.0);
+    triggerDragFolder();
 }
 
 /**
@@ -254,6 +327,7 @@ QModelIndex LeftView::restoreNotepadItem()
 QModelIndex LeftView::setDefaultNotepadItem()
 {
     QModelIndex index = m_pSortViewFilter->index(0, 0, getNotepadRootIndex());
+    qDebug()<<"222222222";
     this->setCurrentIndex(index);
     return index;
 }
@@ -345,6 +419,19 @@ int LeftView::folderCount()
 void LeftView::initMenu()
 {
     m_notepadMenu = ActionManager::Instance()->notebookContextMenu();
+}
+
+/**
+ * @brief LeftView::initConnections
+ */
+void LeftView::initConnections()
+{
+    //右键菜单滑动
+    connect(m_notepadMenu, &VNoteRightMenu::menuTouchMoved, this, &LeftView::handleDragEvent);
+    //右键菜单释放
+    connect(m_notepadMenu, &VNoteRightMenu::menuTouchReleased, this, [ = ] {
+        m_touchState = TouchState::TouchNormal;
+    });
 }
 
 /**
@@ -548,17 +635,6 @@ void LeftView::handleTouchSlideEvent(qint64 timeParam, double distY, QPoint poin
 }
 
 /**
- * @brief LeftView::startDrag
- * @param supportedActions
- * 开始拖拽事件
- */
-void LeftView::startDrag(Qt::DropActions supportedActions)
-{
-    Q_UNUSED(supportedActions);
-    triggerDragFolder();
-}
-
-/**
  * @brief LeftView::dragEnterEvent
  * @param event
  * 拖拽进入视图事件
@@ -665,8 +741,20 @@ void LeftView::doDragMove(const QModelIndex &src, const QModelIndex &dst)
         // 获取重新排序后每个记事本的排序编号，写入配置文件中
         QString folderSortData = getFolderSort();
         setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
-
     }
+}
+
+/**
+ * @brief LeftView::selectCurrentOnTouch 设置当前点击位置选中
+ * @return null
+ * @author
+ */
+void LeftView::checkIfselectCurrent()
+{
+    QTimer::singleShot(250, this, [ = ] {
+        if (m_touchState == TouchState::TouchPressing && m_index.isValid())
+            this->setCurrentIndex(m_index);
+    });
 }
 
 /**
@@ -675,6 +763,12 @@ void LeftView::doDragMove(const QModelIndex &src, const QModelIndex &dst)
  */
 void LeftView::triggerDragFolder()
 {
+    QModelIndex dragIndex = this->indexAt(mapFromGlobal(QCursor::pos()));
+    if(!dragIndex.isValid()){
+        m_isDraging = true;
+        return;
+    }
+
     VNoteFolder *folder = reinterpret_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(currentIndex()));
     // 判断当前拖拽的记事本是否可用，如果可用，则初始化拖拽操作的数据
     if (folder) {
@@ -694,6 +788,8 @@ void LeftView::triggerDragFolder()
         m_folderDraing = false;
         m_pItemDelegate->setDragState(false);
         m_pItemDelegate->setDrawHover(true);
+        //隐藏菜单
+        m_notepadMenu->hide();
     }
 }
 
