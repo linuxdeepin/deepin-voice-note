@@ -137,6 +137,7 @@ void LeftView::mousePressEvent(QMouseEvent *event)
 
     if (!m_onlyCurItemMenuEnable) {
         event->setModifiers(Qt::NoModifier);
+        setTouchState(TouchState::TouchPressing);
         //不使用自动判断
 //        DTreeView::mousePressEvent(event);
     }
@@ -167,8 +168,9 @@ void LeftView::mouseReleaseEvent(QMouseEvent *event)
     //正常点击状态，选择当前点击选项
     QModelIndex index = indexAt(event->pos());
     if (index.row() != currentIndex().row() && m_touchState == TouchState::TouchPressing) {
-        if (index.isValid())
+        if (index.isValid()){
             setCurrentIndex(index);
+        }
         setTouchState(TouchState::TouchNormal);
         return;
     }
