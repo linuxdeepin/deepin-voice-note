@@ -91,8 +91,8 @@ int ExportNoteWorker::exportText()
     if (nullptr != m_note) {
         QString fileName = QString("%1-%2.txt").arg(m_note->noteTitle)
                 .arg(QDateTime::currentDateTime().toLocalTime().toString(VNOTE_TIME_FMT));
-
-        QFile exportFile(m_exportPath+"/"+fileName);
+        QString fullPath = m_exportPath+"/"+fileName;
+        QFile exportFile(fullPath);
 
         if (exportFile.open(QIODevice::ReadWrite)) {
             QTextStream stream( &exportFile);
@@ -108,6 +108,7 @@ int ExportNoteWorker::exportText()
         } else {
             error = PathDenied;
         }
+        QFile::setPermissions(fullPath, QFile::ReadOwner | QFile::WriteOwner | QFile::ReadGroup | QFile::WriteGroup);
     } else {
         error = NoteInvalid;
     }
@@ -140,6 +141,8 @@ int ExportNoteWorker::exportOneVoice(VNoteBlock *noteblock)
        QString destFileName = m_exportPath + "/" +
                noteblock->ptrVoice->voiceTitle + "-" + targetFile.fileName();
        QFile::copy(noteblock->ptrVoice->voicePath, destFileName);
+       QFile::setPermissions(destFileName, QFile::ReadOwner | QFile::WriteOwner | QFile::ReadGroup | QFile::WriteGroup);
+
     }else {
         error = NoteInvalid;
     }
