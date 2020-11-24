@@ -38,6 +38,8 @@ int main(int argc, char *argv[])
 {
     PerformanceMonitor::initializeAppStart();
 
+    qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "7777");
+
     VNoteApplication app(argc, argv);
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
     app.loadTranslator();

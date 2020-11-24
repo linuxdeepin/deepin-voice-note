@@ -36,10 +36,12 @@
 #include <DFileDialog>
 #include <DApplication>
 
+const char webPage[] = WEB_PATH "/index.html";
+
 WebEngineView::WebEngineView(QWidget *parent) :
     QWebEngineView(parent)
 {
-     init();
+    init();
 }
 
 void WebEngineView::init()
@@ -48,13 +50,14 @@ void WebEngineView::init()
     m_channel = new QWebChannel(this);
     m_channel->registerObject("webobj", m_jsContent);
     page()->setWebChannel(m_channel);
-    load(QUrl("qrc:/web/index.html"));
+    const QFileInfo info(webPage);
+    load(QUrl::fromLocalFile(info.absoluteFilePath()));
     setContextMenuPolicy(Qt::NoContextMenu);
 }
 
 void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
 {
-    if(data == nullptr){
+    if (data == nullptr) {
         this->setVisible(false);
         return;
     }
@@ -75,7 +78,7 @@ void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
     data->ptrVoice->createTime = QDateTime::currentDateTime();
     data->ptrVoice->voiceTitle = noteOps.getDefaultVoiceName();
 
-    if(m_noteTmp == nullptr){
+    if (m_noteTmp == nullptr) {
         m_noteTmp = new VNoteItem;
     }
     m_noteData->addBlock(data);
@@ -101,14 +104,14 @@ void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
 void WebEngineView::deleteVoice(const QString &id)
 {
     VNoteBlock *data = JsContent::instance()->getBlock(id);
-    if(data){
+    if (data) {
         emit JsContent::instance()->deleteVoice(id);
         QTimer::singleShot(0, this, [this, data]() {
             int index = m_noteData->datas.datas.indexOf(data);
             VNoteBlock *nextData = m_noteData->datas.datas[index + 1];
             data->releaseSpecificData();
             m_noteData->delBlock(data);
-            if(nextData){
+            if (nextData) {
                 m_noteData->delBlock(nextData);
             }
             JsContent::instance()->updateNote(m_noteData);
@@ -142,7 +145,7 @@ void WebEngineView::saveMp3()
             QString exportDir = dialog.directoryUrl().toLocalFile();
 
             ExportNoteWorker *exportWorker = new ExportNoteWorker(
-                        exportDir, ExportNoteWorker::ExportOneVoice, m_noteData, block);
+                exportDir, ExportNoteWorker::ExportOneVoice, m_noteData, block);
             exportWorker->setAutoDelete(true);
 
             QThreadPool::globalInstance()->start(exportWorker);

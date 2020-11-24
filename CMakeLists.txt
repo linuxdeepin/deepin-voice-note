@@ -63,6 +63,7 @@ endif ()
 if (CMAKE_BUILD_TYPE MATCHES Debug)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -Wall -Wextra")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra")
+  add_definitions(-DWEB_PATH="${CMAKE_SOURCE_DIR}/assets/web")
 
   # Enable Qt builtin debug mode
   # add_definitions("-DQT_MESSAGELOGCONTEXT")
@@ -72,6 +73,7 @@ else()
   # -ffunction-sections
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -Wl,-O1 -Wl,--gc-sections")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3 -Wl,-O1 -Wl,--gc-sections")
+  add_definitions(-DWEB_PATH="${CMAKE_INSTALL_PREFIX}/share/deepin-voice-note/web")
   add_definitions(-DQT_NO_DEBUG_OUTPUT)
 endif()
 
@@ -163,6 +165,8 @@ install(FILES ${APP_QM_FILES} DESTINATION share/deepin-voice-note/translations)
 install(FILES ${APP_DESKTOP} DESTINATION share/applications)
 install(FILES ${APP_CONFIG} DESTINATION share/deepin-voice-note)
 install(FILES ${APP_LOGO} DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps/)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/web
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/deepin-voice-note)
 
 option(USE_TEST "UT" no)
 if (USE_TEST)

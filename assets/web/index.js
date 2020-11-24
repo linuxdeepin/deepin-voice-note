@@ -290,6 +290,7 @@ function getSelectedHtml() {
     return selectedHtml;
 }
 function themeColor(color) {
+    
     //$('.left').css('background-color',color);
     var nod = document.createElement('style'),
         str = `
