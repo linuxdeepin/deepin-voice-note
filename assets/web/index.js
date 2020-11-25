@@ -98,6 +98,7 @@ function readyEditor(id, text) {
         airMode: true,
         disableDragAndDrop: true,
         focus: true,
+        shortcuts:false,
         callbacks: {
             onFocus: function () {
                 //var text=document.HTMLDOMtoString(this);
@@ -194,6 +195,7 @@ function toggleState(state, item) {
 }
 //点击变色
 $('body').on('click', '.li', function (e) {
+    console.log('div click...');
     e.stopPropagation();
     $(this).addClass('active').siblings('.li').removeClass('active');
 })
@@ -286,13 +288,13 @@ function getSelectedHtml() {
         }
 
     } catch (err) {
-
+    
     }
-
     return selectedHtml;
 }
+
 function themeColor(color) {
-    
+
     //$('.left').css('background-color',color);
     var nod = document.createElement('style'),
         str = `
