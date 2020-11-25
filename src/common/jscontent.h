@@ -46,6 +46,7 @@ public:
 signals:
     //c++ 调用JS接口
     void initData(const QString& jsonData/*, const QString& seachKey*/);
+    void setHtml(const QString& html);
     void insertVoiceItem(const QString &jsonData);
     void switchPlayBtn(int status, const QString& id);
     void setVoiceToText(const QString & id, const QString & text, int state);
@@ -56,7 +57,7 @@ signals:
     void updateNoteFinsh();
 public slots:
     //ＪＳ调用C++接口
-    void textChange(const QString& id);
+    void textChange();
     void rightMenuClick(const QString& id, int select);
     int playButtonClick(const QString& id, int status);
     QString getVoiceSize(const QString& millisecond);
@@ -65,8 +66,8 @@ private:
     VNoteItem *m_notedata {nullptr};
     DMenu *m_noteDetailContextMenu{nullptr};
     VNoteBlock *m_currentBlock{nullptr};
-    QStringList m_textsChange;
-    QMutex m_textChangeMutex;
+    int         m_currentBlockIndex {-1};
+    bool m_textChange {false};
 };
 
 #endif // JSCONTENT_H

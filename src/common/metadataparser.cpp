@@ -49,7 +49,7 @@ void MetaDataParser::parse(QVariant &metaData, VNoteItem *noteData)
  * @param noteData 数据源
  * @param metaData 生成的数据
  */
-void MetaDataParser::makeMetaData(const VNoteItem *noteData, QVariant &metaData)
+void MetaDataParser::makeMetaData(VNoteItem *noteData, QVariant &metaData)
 {
 #ifdef VN_XML_METADATA_PARSER
     xmlMakeMetadata(noteData, metaData);
@@ -208,7 +208,6 @@ void MetaDataParser::jsonParse(QVariant &metaData, VNoteItem *noteData /*out*/)
 
     QJsonObject note = noteDoc.object();
     QJsonArray noteDatas;
-
     //    int         noteCount = -1;
 
     //    //noteCount doesn't used now
@@ -216,29 +215,32 @@ void MetaDataParser::jsonParse(QVariant &metaData, VNoteItem *noteData /*out*/)
     //        noteCount = note.value(m_jsonNodeNameMap[NDataCount]).toInt(0);
     //    }
 
+    if(note.contains(m_jsonNodeNameMap[NHtmlCode])){
+        noteData->htmlCode = note.value(m_jsonNodeNameMap[NHtmlCode]).toString();
+        return;
+    }
+
     //Get default voice max id
     if (note.contains(m_jsonNodeNameMap[NVoiceMaxId])) {
         noteData->maxVoiceIdRef() = note.value(m_jsonNodeNameMap[NVoiceMaxId]).toInt(0);
     }
-    QJsonValueRef arrayRef = note.find(m_jsonNodeNameMap[NDatas]).value();
-    if (!arrayRef.isNull()) {
-        noteDatas = arrayRef.toArray();
+
+    if (note.contains(m_jsonNodeNameMap[NDatas])) {
+        noteDatas = note.value(m_jsonNodeNameMap[NDatas]).toArray();
     }
 
     //Parse the note datas
-    for (QJsonArray::iterator it = noteDatas.begin(); it != noteDatas.end(); it++) {
+    for (auto it : noteDatas) {
         VNoteBlock *ptrBlock = nullptr;
 
-
-        QJsonValueRef elementOneValueRef = it[0];
-        QJsonObject noteItem = elementOneValueRef.toObject();
+        QJsonObject noteItem = it.toObject();
 
         int noteType = noteItem.value(m_jsonNodeNameMap[NDataType]).toInt(VNoteBlock::InValid);
 
         if (VNoteBlock::InValid != noteType) {
             //Allocate block
             ptrBlock = noteData->datas.newBlock(noteType);
-            noteItem.insert(m_jsonNodeNameMap[BlockId],  ptrBlock->blockid);
+
             if (VNoteBlock::Text == noteType) {
                 ptrBlock->ptrText->blockText = noteItem.value(m_jsonNodeNameMap[NText]).toString();
             } else if (VNoteBlock::Voice == noteType) {
@@ -248,13 +250,11 @@ void MetaDataParser::jsonParse(QVariant &metaData, VNoteItem *noteData /*out*/)
                 ptrBlock->ptrVoice->voicePath = noteItem.value(m_jsonNodeNameMap[NVoicePath]).toString();
                 ptrBlock->ptrVoice->voiceSize = noteItem.value(m_jsonNodeNameMap[NVoiceSize]).toInt(0);
                 ptrBlock->ptrVoice->createTime = QDateTime::fromString(
-                    noteItem.value(m_jsonNodeNameMap[NCreateTime]).toString(), VNOTE_TIME_FMT);
+                            noteItem.value(m_jsonNodeNameMap[NCreateTime]).toString(), VNOTE_TIME_FMT);
             }
+
             noteData->datas.addBlock(ptrBlock);
         }
-        elementOneValueRef = noteItem;
-        arrayRef = noteDatas;
-        metaData = QJsonDocument(note).toJson(QJsonDocument::Compact);
     }
 }
 
@@ -263,7 +263,7 @@ void MetaDataParser::jsonParse(QVariant &metaData, VNoteItem *noteData /*out*/)
  * @param noteData 数据源
  * @param metaData 生成的数据
  */
-void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaData)
+void MetaDataParser::jsonMakeMetadata(VNoteItem *noteData, QVariant &metaData)
 {
     Q_ASSERT(nullptr != noteData);
 
@@ -271,16 +271,18 @@ void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaD
 
     QJsonObject note;
     QJsonArray noteDatas;
-    int noteCount = noteData->datas.datas.length();
-
+    int noteCount = 0;
+    bool htmlIsEmpty = noteData->htmlCode.isEmpty();
+    QList<VNoteBlock*> delBlocks;
     for (auto it : noteData->datas.datas) {
+        if(!htmlIsEmpty){
+            delBlocks.push_back(it);
+            continue;
+        }
         int noteType = it->getType();
-
         if (VNoteBlock::InValid != noteType) {
             QJsonObject noteItem;
-
             noteItem.insert(m_jsonNodeNameMap[NDataType], it->getType());
-
             if (VNoteBlock::Text == noteType) {
                 noteItem.insert(m_jsonNodeNameMap[NText], it->ptrText->blockText);
             } else if (VNoteBlock::Voice == noteType) {
@@ -292,15 +294,21 @@ void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaD
                 noteItem.insert(m_jsonNodeNameMap[NCreateTime],
                                 it->ptrVoice->createTime.toString(VNOTE_TIME_FMT));
             }
-            noteItem.insert(m_jsonNodeNameMap[BlockId], it->blockid);
             noteDatas.append(noteItem);
+            noteCount++;
         }
     }
 
-    note.insert(m_jsonNodeNameMap[NDataCount], noteCount);
-    note.insert(m_jsonNodeNameMap[NVoiceMaxId], noteData->voiceMaxId());
-    note.insert(m_jsonNodeNameMap[NDatas], noteDatas);
-
+    if(!htmlIsEmpty){
+        note.insert(m_jsonNodeNameMap[NHtmlCode], noteData->htmlCode);
+        for (auto it : delBlocks){
+            noteData->delBlock(it);
+        }
+    }else {
+        note.insert(m_jsonNodeNameMap[NDataCount], noteCount);
+        note.insert(m_jsonNodeNameMap[NVoiceMaxId], noteData->voiceMaxId());
+        note.insert(m_jsonNodeNameMap[NDatas], noteDatas);
+    }
 
     noteDoc.setObject(note);
 

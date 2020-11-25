@@ -105,13 +105,13 @@ public:
         NVoicePath,
         NVoiceSize,
         NCreateTime,
-        BlockId,
+        NHtmlCode,
     };
 #endif
     //源数据解析
     void parse(QVariant &metaData, VNoteItem *noteData /*out*/);
     //源数据生成
-    void makeMetaData(const VNoteItem *noteData, QVariant &metaData /*out*/);
+    void makeMetaData(VNoteItem *noteData, QVariant &metaData /*out*/);
 
 protected:
 #ifdef VN_XML_METADATA_PARSER
@@ -147,12 +147,12 @@ protected:
         {NVoicePath, "voicePath"},
         {NVoiceSize, "voiceSize"},
         {NCreateTime, "createTime"},
-        {BlockId, "BlockId"},
+        {NHtmlCode, "htmlCode"},
     };
     //json串解析
     void jsonParse(QVariant &metaData, VNoteItem *noteData /*out*/);
     //json串生成
-    void jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaData /*out*/);
+    void jsonMakeMetadata(VNoteItem *noteData, QVariant &metaData /*out*/);
 #endif
 };
 

@@ -81,6 +81,8 @@ public:
     QDateTime modifyTime;
     //删除时间
     QDateTime deleteTime;
+    //富文本
+    QString htmlCode {""};
     //获取元数据
     QVariant &metaDataRef();
     const QVariant &metaDataConstRef() const;

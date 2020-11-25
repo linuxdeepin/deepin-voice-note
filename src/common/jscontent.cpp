@@ -19,6 +19,8 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "jscontent.h"
+#include "globaldef.h"
+
 #include "common/utils.h"
 #include "common/vnoteitem.h"
 #include "common/actionmanager.h"
@@ -42,7 +44,7 @@ QString JsContent::getVoiceSize(const QString &millisecond)
 
 QString JsContent::getVoiceTime(const QString &time)
 {
-    QDateTime dataTime = QDateTime::fromString(time, "yyyy-MM-dd hh:mm:ss");;
+    QDateTime dataTime = QDateTime::fromString(time, VNOTE_TIME_FMT);;
     return  Utils::convertDateTime(dataTime);
 }
 
@@ -159,44 +161,23 @@ VNoteBlock *JsContent::getCurrentBlock()
     return  m_currentBlock;
 }
 
-void JsContent::textChange(const QString &id)
+void JsContent::textChange()
 {
-    m_textChangeMutex.lock();
-    if (!id.isEmpty() && !m_textsChange.contains(id)) {
-        m_textsChange.push_back(id);
-    }
-    m_textChangeMutex.unlock();
+   m_textChange = true;
 }
 
 void JsContent::updateNote(QWebEnginePage *page)
 {
-    m_textChangeMutex.lock();
-    if (!m_textsChange.isEmpty() && m_notedata) {
+    if (m_textChange && m_notedata) {
         QEventLoop loop;
         connect(this, &JsContent::updateNoteFinsh, &loop, &QEventLoop::quit);
-        for (auto it : m_notedata->datas.dataConstRef()) {
-            if (it->getType() == VNoteBlock::Text) {
-                for (auto it1 : m_textsChange) {
-                    if (it->blockid == it1) {
-                        page->runJavaScript(QString("textResult(%1)").arg(it->blockid), [ = ](const QVariant & result) {
-                            it->blockText = result.toString();
-                            m_textChangeMutex.lock();
-                            m_textsChange.removeOne(it->blockid);
-                            bool needUpdate = m_textsChange.isEmpty();
-                            m_textChangeMutex.unlock();
-                            if (needUpdate) {
-                                updateNote(m_notedata);
-                                emit updateNoteFinsh();
-                            }
-                        });
-                    }
-                }
-            }
-        }
-        m_textChangeMutex.unlock();
+        page->runJavaScript("getHtml()", [ = ](const QVariant & result) {
+            m_notedata->htmlCode = result.toString();
+            updateNote(m_notedata);
+            emit updateNoteFinsh();
+        });
         loop.exec();
-    }else {
-        m_textChangeMutex.unlock();
+        m_textChange = false;
     }
 }
 

@@ -61,12 +61,16 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
         this->setVisible(false);
         return;
     }
-    JsContent::instance()->updateNote(page());
     JsContent::instance()->setNoteItem(data);
     m_noteData = data;
     this->setVisible(true);
-    qDebug() << data->metaDataRef().toString();
-    emit m_jsContent->initData(data->metaDataRef().toString());
+    if(data->htmlCode.isEmpty()){
+        qDebug() << "initData:" << data->metaDataRef().toString();
+        emit m_jsContent->initData(data->metaDataRef().toString());
+    }else {
+        qDebug() << "setHtml:" << data->htmlCode;
+        emit m_jsContent->setHtml(data->htmlCode);
+    }
 }
 
 void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
@@ -84,13 +88,11 @@ void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
     m_noteData->addBlock(data);
     m_noteTmp->datas.datas.push_back(data);
 
-    data = m_noteData->newBlock(VNoteBlock::Text);
-    m_noteData->addBlock(data);
     m_noteTmp->datas.datas.push_back(data);
 
-    if (!noteOps.updateNote()) {
-        qInfo() << "Save note error";
-    }
+//    if (!noteOps.updateNote()) {
+//        qInfo() << "Save note error";
+//    }
 
     MetaDataParser parse;
     QVariant value;

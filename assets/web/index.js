@@ -1,6 +1,8 @@
 //C++ 调用js接口
 
 // initData(const QString& jsonData); 初始化，参数为json字符串
+// void setHtml(const QString& html); 初始化，设置html
+// const QString getHtml();获取整个html
 // insertVoiceItem(const QString &jsonData);　插入语音，参数为json字符串
 // switchPlayBtn(const QString& id, int status);设置播放按钮，id为创建插件传入的ｉｄ，state 为１，０，分别代表显示播放按钮，暂停按钮
 
