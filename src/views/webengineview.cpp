@@ -46,7 +46,13 @@ WebEngineView::WebEngineView(QWidget *parent) :
 
 void WebEngineView::init()
 {
+    m_updateTimer = new QTimer(this);
+    connect(m_updateTimer, &QTimer::timeout, this, [=]{
+        JsContent::instance()->updateNote();
+    });
+    m_updateTimer->setInterval(1000);
     m_jsContent = JsContent::instance();
+    m_jsContent->setPage(page());
     m_channel = new QWebChannel(this);
     m_channel->registerObject("webobj", m_jsContent);
     page()->setWebChannel(m_channel);
@@ -61,7 +67,9 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
         this->setVisible(false);
         return;
     }
-    JsContent::instance()->setNoteItem(data);
+    m_updateTimer->stop();
+    m_jsContent->updateNote();
+    m_jsContent->setNoteItem(data);
     m_noteData = data;
     this->setVisible(true);
     if(data->htmlCode.isEmpty()){
@@ -71,6 +79,14 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
         qDebug() << "setHtml:" << data->htmlCode;
         emit m_jsContent->setHtml(data->htmlCode);
     }
+    m_updateTimer->start();
+}
+
+void WebEngineView::manualUpdate()
+{
+    m_updateTimer->stop();
+    m_jsContent->updateNote();
+    m_updateTimer->start();
 }
 
 void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
@@ -85,14 +101,9 @@ void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
     if (m_noteTmp == nullptr) {
         m_noteTmp = new VNoteItem;
     }
+
     m_noteData->addBlock(data);
     m_noteTmp->datas.datas.push_back(data);
-
-    m_noteTmp->datas.datas.push_back(data);
-
-//    if (!noteOps.updateNote()) {
-//        qInfo() << "Save note error";
-//    }
 
     MetaDataParser parse;
     QVariant value;
@@ -116,14 +127,8 @@ void WebEngineView::deleteVoice(const QString &id)
             if (nextData) {
                 m_noteData->delBlock(nextData);
             }
-            JsContent::instance()->updateNote(m_noteData);
         });
     }
-}
-
-void WebEngineView::leaveEvent(QEvent *event)
-{
-    JsContent::instance()->updateNote(page());
 }
 
 void WebEngineView::saveMp3()

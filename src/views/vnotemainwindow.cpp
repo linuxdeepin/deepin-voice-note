@@ -1025,7 +1025,6 @@ void VNoteMainWindow::onA2TSuccess(const QString &text)
     if (data && data->getType() == VNoteBlock::Voice) {
         data->blockText = text;
         emit JsContent::instance()->setVoiceToText(data->blockid, text, 1);
-        JsContent::instance()->updateNote();
     }
     setSpecialStatus(VoiceToTextEnd);
 }

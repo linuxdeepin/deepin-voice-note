@@ -70,6 +70,11 @@ void JsContent::setNoteItem(VNoteItem *notedata)
     m_notedata = notedata;
 }
 
+void JsContent::setPage(QWebEnginePage *page)
+{
+    m_page = page;
+}
+
 VNoteBlock *JsContent::getBlock(const QString &id)
 {
     VNoteBlock *data = nullptr;
@@ -166,31 +171,28 @@ void JsContent::textChange()
    m_textChange = true;
 }
 
-void JsContent::updateNote(QWebEnginePage *page)
+void JsContent::updateNote()
 {
-    if (m_textChange && m_notedata) {
+    if (m_textChange && m_notedata && m_page) {
         QEventLoop loop;
         connect(this, &JsContent::updateNoteFinsh, &loop, &QEventLoop::quit);
-        page->runJavaScript("getHtml()", [ = ](const QVariant & result) {
+        m_page->runJavaScript("getHtml()", [ = ](const QVariant & result) {
             m_notedata->htmlCode = result.toString();
-            updateNote(m_notedata);
+            VNoteItemOper noteOps(m_notedata);
+            if (!noteOps.updateNote()) {
+                qInfo() << "Save note error";
+            }
             emit updateNoteFinsh();
         });
         loop.exec();
         m_textChange = false;
+        qInfo() << "update success";
     }
 }
 
-void JsContent::updateNote(VNoteItem* notedata)
+QWebEnginePage* JsContent::getPage()
 {
-    VNoteItem* tmpData = nullptr == notedata ? m_notedata : notedata;
-    if(tmpData){
-        VNoteItemOper noteOps(tmpData);
-        if (!noteOps.updateNote()) {
-            qInfo() << "Save note error";
-        }
-        qInfo() << "update success";
-    }
+    return  m_page;
 }
 
 JsContent *JsContent::instance()

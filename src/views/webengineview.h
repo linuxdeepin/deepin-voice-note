@@ -22,6 +22,8 @@
 #define WEBENGINEVIEW_H
 
 #include <QObject>
+#include <QTimer>
+
 #include <QWebEngineProfile>
 #include <QWebEngineUrlRequestInterceptor>
 #include <QtWebChannel/QWebChannel>
@@ -39,17 +41,17 @@ public:
     void insertVoiceItem(const QString &voicePath, qint64 voiceSize);
     void deleteVoice(const QString &id);
     void saveMp3();
+    void manualUpdate();
 signals:
 
 public slots:
-protected:
-     void leaveEvent(QEvent *event) override;
 private:
     void init();
     VNoteItem *m_noteData {nullptr};
     VNoteItem *m_noteTmp {nullptr};
     QWebChannel *m_channel {nullptr};
     JsContent *m_jsContent {nullptr};
+    QTimer *m_updateTimer {nullptr};
 };
 
 #endif // WEBENGINEVIEW_H

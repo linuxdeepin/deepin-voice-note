@@ -39,10 +39,11 @@ public:
     explicit JsContent(QObject *parent = nullptr);
     static JsContent *instance();
     void setNoteItem(VNoteItem *notedata);
+    void setPage(QWebEnginePage *page);
+    QWebEnginePage *getPage();
     VNoteBlock *getBlock(const QString& id);
     VNoteBlock *getCurrentBlock();
-    void updateNote(QWebEnginePage *page);
-    void updateNote(VNoteItem* notedata = nullptr);
+    void updateNote();
 signals:
     //c++ 调用JS接口
     void initData(const QString& jsonData/*, const QString& seachKey*/);
@@ -64,6 +65,7 @@ public slots:
     QString getVoiceTime(const QString & time);
 private:
     VNoteItem *m_notedata {nullptr};
+    QWebEnginePage *m_page;
     DMenu *m_noteDetailContextMenu{nullptr};
     VNoteBlock *m_currentBlock{nullptr};
     int         m_currentBlockIndex {-1};
