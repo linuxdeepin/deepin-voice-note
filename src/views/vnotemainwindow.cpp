@@ -765,12 +765,13 @@ void VNoteMainWindow::onVNoteSearch()
     if (m_noteSearchEdit->lineEdit()->hasFocus()) {
         QString text = m_noteSearchEdit->text();
         if (!text.isEmpty()) {
-            setSpecialStatus(SearchStart);
+            //setSpecialStatus(SearchStart);
             m_searchKey = text;
-            loadSearchNotes(m_searchKey);
+//            loadSearchNotes(m_searchKey);
         } else {
-            setSpecialStatus(SearchEnd);
+            //setSpecialStatus(SearchEnd);
         }
+        m_webView->findText(text);
     }
 }
 
@@ -1787,7 +1788,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         break;
     case RecordEnd:
         if (!stateOperation->isVoice2Text()) {
-          //  m_noteSearchEdit->setEnabled(true);
+           m_noteSearchEdit->setEnabled(true);
             m_leftView->setOnlyCurItemMenuEnable(false);
             m_addNotepadBtn->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
@@ -1809,7 +1810,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         break;
     case VoiceToTextEnd:
         if (!stateOperation->isRecording() && !stateOperation->isPlaying()) {
-          //  m_noteSearchEdit->setEnabled(true);
+            m_noteSearchEdit->setEnabled(true);
             m_leftView->setOnlyCurItemMenuEnable(false);
             m_addNotepadBtn->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
@@ -1969,8 +1970,8 @@ void VNoteMainWindow::onCursorChange(int height, bool mouseMove)
  */
 void VNoteMainWindow::switchWidget(WindowType type)
 {
-    //bool searchEnable = type == WndNoteShow ? true : false;
-    m_noteSearchEdit->setEnabled(false);
+    bool searchEnable = type == WndNoteShow ? true : false;
+    m_noteSearchEdit->setEnabled(searchEnable);
     m_stackedWidget->setCurrentIndex(type);
 }
 
