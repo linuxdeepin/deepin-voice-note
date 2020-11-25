@@ -36,6 +36,7 @@
 #include <DFileDialog>
 #include <DApplication>
 
+//const char webPage[] = WEB_PATH "/temp/index.html";
 const char webPage[] = WEB_PATH "/index.html";
 
 WebEngineView::WebEngineView(QWidget *parent) :
@@ -72,10 +73,10 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
     m_jsContent->setNoteItem(data);
     m_noteData = data;
     this->setVisible(true);
-    if(data->htmlCode.isEmpty()){
+    if (data->htmlCode.isEmpty()) {
         qDebug() << "initData:" << data->metaDataRef().toString();
         emit m_jsContent->initData(data->metaDataRef().toString());
-    }else {
+    } else {
         qDebug() << "setHtml:" << data->htmlCode;
         emit m_jsContent->setHtml(data->htmlCode);
     }

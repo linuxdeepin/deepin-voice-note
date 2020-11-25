@@ -8,71 +8,43 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.js"></script>
     <script src="http://netdna.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.js"></script>
     <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css" rel="stylesheet">
-    <link href="./index.css" rel="stylesheet">
     <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/handlebars.js/2.0.0/handlebars.js"></script>
     <script src="./js/qwebchannel.js"></script>
+    <link href="./index.css" rel="stylesheet">
+    
 </head>
 
 <body>
-    <div class="main">
-    </div>
-    <script>
-    </script>
-    <script id="main" type="text/x-handlebars-template">
-        {{#if this.dataCount}}
-            {{#each this.noteDatas}}
-                {{#if this.type}}	
-                    <div class="li" data-id="{{this.BlockId}}">
-                        <div class="demo" data-id={{this.BlockId}}>
-                            <div class="left">
-                            <div class="btn play" data-id="{{this.BlockId}}"></div>
-                            </div>
-                            <div class="right">
-                                <div class="lf">
-                                    <div class="title">{{this.title}}</div>
-                                    <div class="minute padtop">{{this.createTime}}</div>
-                                </div>
-                                <div class="lr">
-                                    <div class="icon">
-                                    <div class="wifi-symbol">
-                                        <div class="wifi-circle first"></div>
-                                        <div class="wifi-circle second"></div>
-                                        <div class="wifi-circle third"></div>
-                                        <div class="wifi-circle four"></div>
-                                    </div>
-                                    </div>
-                                    <div class="time padtop">{{this.voiceSize}}</div>
-                                </div>
-                            </div>
-                        </div>
-                    <div class="translate">
-                        {{#if text}}
-                        <div>{{this.text}}</div>
-                        {{/if}}
-                    </div>
-                    </div>
-                {{else}}
-                <div id="summernote{{this.BlockId}}" data-id="{{this.BlockId}}" data-click='false'>
+    <div id="summernote"></div>
+    <script id="voiceTemplate" type="text/x-handlebars-template">	
+        <div class="demo" data-id={{this.BlockId}}>
+            <div class="left">
+            <div class="btn play" data-id="{{this.BlockId}} "></div>
+            </div>
+            <div class="right">
+                <div class="lf">
+                    <div class="title">{{this.title}}</div>
+                    <div class="minute padtop">{{this.createTime}}</div>
                 </div>
-                {{/if}}
-            {{/each}}
-        {{else}}
-        <div class="list" data-id="0">
-            <div id="summernote" data-id="0">
+                <div class="lr">
+                    <div class="icon">
+                    <div class="wifi-symbol">
+                        <div class="wifi-circle first"></div>
+                        <div class="wifi-circle second"></div>
+                        <div class="wifi-circle third"></div>
+                        <div class="wifi-circle four"></div>
+                    </div>
+                    </div>
+                    <div class="time padtop">{{this.voiceSize}}</div>
+                </div>
             </div>
         </div>
-        {{/if}}
+        <div class="translate">
+            {{#if text}}
+            <div>{{this.text}}</div>
+            {{/if}}
+        </div>
     </script>
-    <script id="test" type="text/x-handlebars-template">
-        {{#if this.total}}
-            <div>456</div>
-        {{else}}
-            <div>789</div>
-        {{/if}}
-    </script>
-    <!-- <div class="self-btn" onclick="fnClick()">录音</div> -->
     <script src="./index.js"></script>
 </body>
-
-</html>
