@@ -18,7 +18,7 @@ $('body').on('click', '.li', function (e) {
     $(this).addClass('active');
 })
 
-    //播放
+//播放
 $('body').on('click', '.left .btn', function (e) {
     
     e.stopPropagation();
@@ -107,8 +107,6 @@ var initData = function (text) {
     fnInit(text, 1)
 }
 
-
-
 new QWebChannel(qt.webChannelTransport,
     function (channel) {
         console.log('qt.webChannelTransport....');
@@ -116,8 +114,22 @@ new QWebChannel(qt.webChannelTransport,
         //所有的c++ 调用js的接口都需要在此绑定格式，webobj.c++函数名（jscontent.cpp查看.connect(js处理函数)
         //例如 webobj.c++fun.connect(jsfun)
         webobj.initData.connect(initData);
-        // webobj.switchPlayBtn.connect(toggleState);
+        webobj.switchPlayBtn.connect(toggleState);
+        webobj.setHtml.connect(setHtml);
 })
+
+
+function getHtml(){
+    // console.log('===html==>',$('#summernote').summernote('code'));
+    return $('#summernote').summernote('code');
+}
+
+
+function setHtml(html){
+    $('#summernote').summernote('pasteHTML',html);
+}
+
+
 
   var BlockId = 0;
   var createTime = '02.20';
