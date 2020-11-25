@@ -318,19 +318,28 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
         setTouchState(TouchPressing);
         m_index = indexAt(event->pos());
         m_noteMenu->setPressPoint(QCursor::pos());
-        checkIfselectCurrent();
+        //检查是否选中
+        m_selectCurrentTimer->start(250);
+        //是否弹出右键菜单
+        m_popMenuTimer->start(1000);
+        return;
     }
 
     if (!m_onlyCurItemMenuEnable) {
         event->setModifiers(Qt::NoModifier);
+        setTouchState(TouchState::TouchPressing);
 //        DListView::mousePressEvent(event);
     }
 
     if (event->button() == Qt::RightButton) {
+        if(MenuStatus::ReleaseFromMenu == m_menuState){
+            m_menuState = MenuStatus::Normal;
+            return;
+        }
         QModelIndex index = this->indexAt(event->pos());
         if (index.isValid()
                 && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
-            DListView::setCurrentIndex(index);
+            setCurrentIndex(index.row());
             m_noteMenu->popup(event->globalPos());
             //通过此方法隐藏菜单，在处理拖拽事件结束后hide
             m_noteMenu->setWindowOpacity(1);
@@ -345,6 +354,10 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
 void MiddleView::mouseReleaseEvent(QMouseEvent *event)
 {
     m_isDraging = false;
+    //停止计时器
+    m_selectCurrentTimer->stop();
+    m_popMenuTimer->stop();
+    m_menuState = MenuStatus::Normal;
     //处理拖拽事件，由于与drop操作参数不同，暂未封装
     if (m_touchState == TouchState::TouchDraging) {
         setTouchState(TouchState::TouchNormal);
@@ -353,13 +366,13 @@ void MiddleView::mouseReleaseEvent(QMouseEvent *event)
     //正常点击状态，选择当前点击选项
     QModelIndex index = indexAt(event->pos());
     if (index.row() != currentIndex().row() && m_touchState == TouchState::TouchPressing) {
-        if (index.isValid())
+        if (index.isValid()){
             setCurrentIndex(index.row());
+        }
         setTouchState(TouchState::TouchNormal);
         return;
     }
     setTouchState(TouchState::TouchNormal);
-
     if (!m_onlyCurItemMenuEnable) {
         DListView::mouseReleaseEvent(event);
     }
@@ -388,10 +401,14 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
             doTouchMoveEvent(event);
         }
         return;
-    } else if ((event->buttons() & Qt::LeftButton) && m_touchState == TouchState::TouchNormal) {
+    } else if ((event->buttons() & Qt::LeftButton) && m_touchState == TouchState::TouchPressing) {
         if (!m_isDraging) {
             setCurrentIndex(indexAt(event->pos()).row());
-            handleDragEvent(false);
+            //需判断移动距离
+            if(qAbs(event->pos().x() - m_touchPressPoint.x()) > 3
+                    || qAbs(event->pos().y() - m_touchPressPoint.y()) > 3){
+                handleDragEvent(false);
+            }
         }
     } else {
         DListView::mouseMoveEvent(event);
@@ -466,9 +483,28 @@ void MiddleView::initUI()
  */
 void MiddleView::initConnections()
 {
+    //右键菜单滑动
     connect(m_noteMenu, &VNoteRightMenu::menuTouchMoved, this, &MiddleView::handleDragEvent);
+    //右键菜单释放
     connect(m_noteMenu, &VNoteRightMenu::menuTouchReleased, this, [ = ] {
         m_touchState = TouchState::TouchNormal;
+        m_menuState = MenuStatus::ReleaseFromMenu;
+    });
+    //定时器用于判断是否选中当前
+    m_selectCurrentTimer = new QTimer();
+    connect(m_selectCurrentTimer,&QTimer::timeout,[=]{
+        if (m_touchState == TouchState::TouchPressing && m_index.isValid())
+            this->setCurrentIndex(m_index.row());
+        m_selectCurrentTimer->stop();
+    });
+     //定时器用于判断是否弹出菜单
+    m_popMenuTimer = new QTimer();
+    connect(m_popMenuTimer,&QTimer::timeout,[=]{
+        if (m_touchState == TouchState::TouchPressing && m_index.isValid()){
+            m_noteMenu->setWindowOpacity(1);
+            m_noteMenu->exec(QCursor::pos());
+        }
+        m_popMenuTimer->stop();
     });
 }
 
@@ -612,19 +648,6 @@ void MiddleView::triggerDragNote()
 }
 
 /**
- * @brief LeftView::selectCurrentOnTouch 设置当前点击位置选中
- * @return null
- * @author
- */
-void MiddleView::checkIfselectCurrent()
-{
-    QTimer::singleShot(250, this, [ = ] {
-        if (m_touchState == TouchState::TouchPressing && indexAt(QCursor::pos()).isValid())
-            this->setCurrentIndex(indexAt(QCursor::pos()).row());
-    });
-}
-
-/**
  * @brief LeftView::doTouchMoveEvent  处理触摸屏move事件，区分点击、滑动、拖拽、长按功能
  * @param event
  */
@@ -679,6 +702,7 @@ void MiddleView::handleDragEvent(bool isTouch)
     if(isTouch){
         setTouchState(TouchState::TouchDraging);
     }
+    m_popMenuTimer->stop();
     m_noteMenu->setWindowOpacity(0.0);
     triggerDragNote();
 }

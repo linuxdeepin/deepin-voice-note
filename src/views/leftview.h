@@ -50,7 +50,12 @@ public:
         TouchPressing,
         TouchOutVisibleRegion
     };
-
+    //菜单状态
+    enum MenuStatus{
+        InitialState,
+        ReleaseFromMenu,
+        Normal
+    };
     explicit LeftView(QWidget *parent = nullptr);
     //获取记事本项父节点
     QStandardItem *getNotepadRoot();
@@ -153,8 +158,10 @@ private:
     //是否鼠标拖拽
     bool m_isDraging {false};
     QModelIndex m_index ;
+    MenuStatus m_menuState {InitialState};
+    QTimer *m_selectCurrentTimer {nullptr};
+    QTimer *m_popMenuTimer {nullptr};
     TouchState m_touchState {TouchNormal};
-    void checkIfselectCurrent();
 };
 
 #endif // LEFTVIEW_H

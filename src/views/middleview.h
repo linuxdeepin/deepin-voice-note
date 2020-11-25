@@ -49,7 +49,12 @@ public:
         TouchPressing,
         TouchOutVisibleRegion
     };
-
+    //菜单状态
+    enum MenuStatus{
+        InitialState,
+        ReleaseFromMenu,
+        Normal
+    };
     MiddleView(QWidget *parent = nullptr);
     //设置搜索关键字
     void setSearchKey(const QString &key);
@@ -95,6 +100,7 @@ public:
     void handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point);
     //更新触摸屏一指状态
     void setTouchState(const TouchState &touchState);
+
 public slots:
     //更新记事项
     void onNoteChanged();
@@ -132,9 +138,6 @@ private:
     void initConnections();
     //触发拖动操作
     void triggerDragNote();
-    //延时选中
-    void checkIfselectCurrent();
-
     bool m_onlyCurItemMenuEnable {false};
     qint64 m_currentId {-1};
     QString m_searchKey;
@@ -154,6 +157,9 @@ private:
     //正在鼠标拖拽
     bool m_isDraging {false};
     QModelIndex m_index ;
+    QTimer *m_selectCurrentTimer {nullptr};
+    QTimer *m_popMenuTimer {nullptr};
+    MenuStatus m_menuState {InitialState};
     TouchState m_touchState {TouchNormal};
 };
 
