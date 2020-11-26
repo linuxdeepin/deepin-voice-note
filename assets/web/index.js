@@ -137,10 +137,10 @@ new QWebChannel(qt.webChannelTransport,
         webobj = channel.objects.webobj;
         //所有的c++ 调用js的接口都需要在此绑定格式，webobj.c++函数名（jscontent.cpp查看.connect(js处理函数)
         //例如 webobj.c++fun.connect(jsfun)
-        webobj.initData.connect(initData);
-        webobj.insertVoiceItem.connect(insertVoiceItem);
-        webobj.switchPlayBtn.connect(toggleState);
-        webobj.setHtml.connect(setHtml);
+        webobj.jsInitData.connect(initData);
+        webobj.jsInsertVoice.connect(insertVoiceItem);
+        //webobj.switchPlayBtn.connect(toggleState);
+        webobj.jsSetHtml.connect(setHtml);
 })
 
 

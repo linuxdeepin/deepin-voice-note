@@ -25,10 +25,10 @@
 #include "common/vnotedatamanager.h"
 #include "common/actionmanager.h"
 #include "common/metadataparser.h"
-#include "common/jscontent.h"
 #include "common/setting.h"
 #include "common/actionmanager.h"
 #include "common/vtextspeechandtrmanager.h"
+#include "common/utils.h"
 
 #include "task/exportnoteworker.h"
 #include <QTimer>
@@ -54,18 +54,51 @@ void WebEngineView::init()
 {
     m_updateTimer = new QTimer(this);
     connect(m_updateTimer, &QTimer::timeout, this, [=]{
-        JsContent::instance()->updateNote();
+        updateNote();
     });
     m_updateTimer->setInterval(1000);
-    m_jsContent = JsContent::instance();
-    m_jsContent->setPage(page());
     m_channel = new QWebChannel(this);
-    m_channel->registerObject("webobj", m_jsContent);
+    m_channel->registerObject("webobj", this);
     page()->setWebChannel(m_channel);
     const QFileInfo info(webPage);
     load(QUrl::fromLocalFile(info.absoluteFilePath()));
     //setContextMenuPolicy(Qt::NoContextMenu);
     m_noteDetailContextMenu = ActionManager::Instance()->detialContextMenu();
+}
+
+void WebEngineView::updateNote()
+{
+    if (/*m_textChange &&*/ m_noteData) {
+        QEventLoop loop;
+        connect(this, &WebEngineView::synComplete, &loop, &QEventLoop::quit);
+        page()->runJavaScript("getHtml()", [ = ](const QVariant & result) {
+            m_noteData->htmlCode = result.toString();
+            VNoteItemOper noteOps(m_noteData);
+            if (!noteOps.updateNote()) {
+                qInfo() << "Save note error";
+            }
+            emit synComplete();
+        });
+        loop.exec();
+        m_textChange = false;
+        qInfo() << "update success";
+    }
+}
+
+void WebEngineView::textChange()
+{
+     m_textChange = true;
+}
+
+QString WebEngineView::getVoiceSize(const QString& millisecond)
+{
+    return Utils::formatMillisecond(millisecond.toLong(), 0);
+}
+
+QString WebEngineView::getVoiceTime(const QString & time)
+{
+    QDateTime dataTime = QDateTime::fromString(time, VNOTE_TIME_FMT);;
+    return  Utils::convertDateTime(dataTime);
 }
 
 void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
@@ -75,25 +108,15 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
         return;
     }
     //m_updateTimer->stop();
-    m_jsContent->updateNote();
-    m_jsContent->setNoteItem(data);
+    updateNote();
     m_noteData = data;
     this->setVisible(true);
     if (data->htmlCode.isEmpty()) {
-        qDebug() << "initData:" << data->metaDataRef().toString();
-        emit m_jsContent->initData(data->metaDataRef().toString());
+        emit jsInitData(data->metaDataRef().toString());
     } else {
-        qDebug() << "setHtml:" << data->htmlCode;
-        emit m_jsContent->setHtml(data->htmlCode);
+        emit jsSetHtml(data->htmlCode);
     }
     //m_updateTimer->start();
-}
-
-void WebEngineView::manualUpdate()
-{
-    m_updateTimer->stop();
-    m_jsContent->updateNote();
-    m_updateTimer->start();
 }
 
 void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
@@ -118,24 +141,7 @@ void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
     m_noteTmp->datas.datas.clear();
 
     qInfo() << value.toString();
-    emit m_jsContent->insertVoiceItem(value.toString());
-}
-
-void WebEngineView::deleteVoice(const QString &id)
-{
-    VNoteBlock *data = JsContent::instance()->getBlock(id);
-    if (data) {
-        emit JsContent::instance()->deleteVoice(id);
-        QTimer::singleShot(0, this, [this, data]() {
-            int index = m_noteData->datas.datas.indexOf(data);
-            VNoteBlock *nextData = m_noteData->datas.datas[index + 1];
-            data->releaseSpecificData();
-            m_noteData->delBlock(data);
-            if (nextData) {
-                m_noteData->delBlock(nextData);
-            }
-        });
-    }
+    emit jsInsertVoice(value.toString());
 }
 
 void WebEngineView::contextMenuEvent(QContextMenuEvent *e)
@@ -190,33 +196,4 @@ void WebEngineView::contextMenuEvent(QContextMenuEvent *e)
     }
     m_noteDetailContextMenu->exec(QCursor::pos());
 
-}
-
-void WebEngineView::saveMp3()
-{
-    VNoteBlock *block = JsContent::instance()->getCurrentBlock();
-    if (block && block->blockType == VNoteBlock::Voice) {
-        DFileDialog dialog;
-        dialog.setFileMode(DFileDialog::DirectoryOnly);
-
-        dialog.setLabelText(DFileDialog::Accept, DApplication::translate("RightView", "Save"));
-        dialog.setNameFilter("MP3(*.mp3)");
-        QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
-        if (historyDir.isEmpty()) {
-            historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-        }
-        dialog.setDirectory(historyDir);
-        if (QDialog::Accepted == dialog.exec()) {
-            // save the directory string to config file.
-            setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
-
-            QString exportDir = dialog.directoryUrl().toLocalFile();
-
-            ExportNoteWorker *exportWorker = new ExportNoteWorker(
-                exportDir, ExportNoteWorker::ExportOneVoice, m_noteData, block);
-            exportWorker->setAutoDelete(true);
-
-            QThreadPool::globalInstance()->start(exportWorker);
-        }
-    }
 }

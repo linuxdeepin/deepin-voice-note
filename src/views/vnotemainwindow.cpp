@@ -40,7 +40,6 @@
 #include "common/actionmanager.h"
 #include "common/setting.h"
 #include "common/performancemonitor.h"
-#include "common/jscontent.h"
 #include "db/vnotefolderoper.h"
 #include "db/vnoteitemoper.h"
 #include "db/vnotedbmanager.h"
@@ -160,11 +159,6 @@ void VNoteMainWindow::initConnections()
 //            this, &VNoteMainWindow::onRightViewVoicePause);
 //    connect(m_rightView, &RightView::sigCursorChange,
 //            this, &VNoteMainWindow::onCursorChange);
-
-    connect(JsContent::instance(), &JsContent::voicePlay,
-            this, &VNoteMainWindow::onRightViewVoicePlay);
-    connect(JsContent::instance(), &JsContent::voicePause,
-            this, &VNoteMainWindow::onRightViewVoicePause);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::onNewNotebook);
@@ -336,7 +330,7 @@ void VNoteMainWindow::initShortcuts()
         Q_UNUSED(this);
         if (canDoShortcutAction())
         {
-            m_webView->saveMp3();
+            ;
         }
     });
 
@@ -968,27 +962,7 @@ void VNoteMainWindow ::onA2TStartAgain()
  */
 void VNoteMainWindow::onA2TStart(bool first)
 {
-    if (m_asrErrMeassage) {
-        m_asrErrMeassage->setVisible(false);
-    }
-    VNoteBlock *data = JsContent::instance()->getCurrentBlock();
-    if (data && data->getType() == VNoteBlock::Voice && data->blockText.isEmpty()) {
-        if (nullptr != data) {
-            //Check whether the audio lenght out of 20 minutes
-            if (data->ptrVoice->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
-                VNoteMessageDialog audioOutLimit(
-                    VNoteMessageDialog::AsrTimeLimit, this);
-
-                audioOutLimit.exec();
-            } else {
-                setSpecialStatus(VoiceToTextStart);
-                emit JsContent::instance()->setVoiceToText(data->blockid, DApplication::translate("VoiceNoteItem", "Converting voice to text"), 0);
-                QTimer::singleShot(0, this, [this, data]() {
-                    m_a2tManager->startAsr(data->ptrVoice->voicePath, data->ptrVoice->voiceSize);
-                });
-            }
-        }
-    }
+   ;
 }
 
 /**
@@ -997,10 +971,6 @@ void VNoteMainWindow::onA2TStart(bool first)
  */
 void VNoteMainWindow::onA2TError(int error)
 {
-    VNoteBlock *data = JsContent::instance()->getCurrentBlock();
-    if (data && data->getType() == VNoteBlock::Voice) {
-        emit JsContent::instance()->setVoiceToText(data->blockid, "", 0);
-    }
     QString message = "";
     if (error == VNoteA2TManager::NetworkError) {
         message = DApplication::translate(
@@ -1022,11 +992,6 @@ void VNoteMainWindow::onA2TError(int error)
  */
 void VNoteMainWindow::onA2TSuccess(const QString &text)
 {
-    VNoteBlock *data = JsContent::instance()->getCurrentBlock();
-    if (data && data->getType() == VNoteBlock::Voice) {
-        data->blockText = text;
-        emit JsContent::instance()->setVoiceToText(data->blockid, text, 1);
-    }
     setSpecialStatus(VoiceToTextEnd);
 }
 
@@ -1329,7 +1294,6 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         m_webView->triggerPageAction(QWebEnginePage::Cut);
         break;
     case ActionManager::DetailVoiceSave:
-        m_webView->saveMp3();
         break;
     case ActionManager::DetailText2Speech:
         VTextSpeechAndTrManager::onTextToSpeech();
@@ -1619,11 +1583,7 @@ void VNoteMainWindow::onRightViewVoicePause(VNVoiceBlock *voiceData)
  */
 void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
 {
-//    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
-//    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
-//        voiceItem->showPauseBtn();
-//    }
-    emit JsContent::instance()->switchPlayBtn(1, QString::number(reinterpret_cast<qint64>(voiceData)));
+    ;
 }
 
 /**
@@ -1632,11 +1592,7 @@ void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
  */
 void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
 {
-//    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
-//    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
-//        voiceItem->showPlayBtn();
-//    }
-    emit JsContent::instance()->switchPlayBtn(0, QString::number(reinterpret_cast<qint64>(voiceData)));
+    ;
 }
 
 /**
@@ -1645,14 +1601,7 @@ void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
  */
 void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
 {
-//    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
-//    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
-//        voiceItem->showPlayBtn();
-//    }
-    emit JsContent::instance()->switchPlayBtn(0, QString::number(reinterpret_cast<qint64>(voiceData)));
     setSpecialStatus(PlayVoiceEnd);
-//    m_rightView->setCurVoicePlay(nullptr);
-//    m_rightView->setFocus();
 
 }
 
