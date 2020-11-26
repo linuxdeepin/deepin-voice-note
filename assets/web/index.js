@@ -45,28 +45,27 @@ function toggleState(state, element) {
 
 function init(type, arr) {
     console.log('=============>',arr);
+    $('#summernote').summernote('reset');
+    $('#summernote').summernote('focus');
     var tpl = $("#voiceTemplate").html();
     var template = Handlebars.compile(tpl);
-    var html;
+    var html = '';
+    var voiceHtml;
+    var txtHtml;
     arr.noteDatas.forEach((item, index) => {
-        $('#summernote').summernote('saveRange');
         //false: txt
         if (item.type == false) {
-            $('#summernote').summernote('pasteHTML',item.text);
+            txtHtml = '<p>' + item.text +'</p>'
+            html += txtHtml;
         }
         // //true: voice
         else{
-            html = template(item);
-            var element=document.createElement('div');
-            element.className='li'; 
-            // oA.SetAttribute("displayNum", "6");
-            element.setAttribute('jsonValue',item);
-            element.contentEditable = false;
-            element.innerHTML=html;
-            $('#summernote').summernote('insertNode', element);
+            voiceHtml = template(item);
+            html += voiceHtml
         }
-        $('#summernote').summernote('restoreRange');
     })
+
+    $('#summernote').summernote('code', html);
 }
 
 function fnInit(text, type) {
@@ -104,6 +103,7 @@ function fnInit(text, type) {
 
 //初始化数据
 var initData = function (text) {
+    console.log('--initdata---',text);
     fnInit(text, 1)
 }
 
@@ -126,7 +126,7 @@ function getHtml(){
 
 
 function setHtml(html){
-    $('#summernote').summernote('pasteHTML',html);
+    $('#summernote').summernote('code',html);
 }
 
 
