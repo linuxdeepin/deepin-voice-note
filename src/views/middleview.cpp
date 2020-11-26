@@ -309,40 +309,52 @@ void MiddleView::saveRecords()
 void MiddleView::mousePressEvent(QMouseEvent *event)
 {
     this->setFocus();
-    //触控屏手势
-    if (event->source() == Qt::MouseEventSynthesizedByQt) {
-        //记录此时触控点的位置，用于move事件中滑动距离与速度
-        m_touchPressPoint = event->pos();
-        m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
-        //更新触摸状态
-        setTouchState(TouchPressing);
-        m_index = indexAt(event->pos());
-        m_noteMenu->setPressPoint(QCursor::pos());
-        //检查是否选中
-        m_selectCurrentTimer->start(250);
-        //是否弹出右键菜单
-        m_popMenuTimer->start(1000);
-        return;
-    }
 
     if (!m_onlyCurItemMenuEnable) {
+        //触控屏手势
+        if (event->source() == Qt::MouseEventSynthesizedByQt) {
+            //记录此时触控点的位置，用于move事件中滑动距离与速度
+            m_touchPressPoint = event->pos();
+            m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
+            //更新触摸状态
+            setTouchState(TouchPressing);
+            m_index = indexAt(event->pos());
+            m_noteMenu->setPressPoint(QCursor::pos());
+            //检查是否选中
+            m_selectCurrentTimer->start(250);
+            //是否弹出右键菜单
+            m_popMenuTimer->start(1000);
+            return;
+        }
         event->setModifiers(Qt::NoModifier);
         setTouchState(TouchState::TouchPressing);
 //        DListView::mousePressEvent(event);
-    }
-
-    if (event->button() == Qt::RightButton) {
-        if(MenuStatus::ReleaseFromMenu == m_menuState){
-            m_menuState = MenuStatus::Normal;
-            return;
+        if (event->button() == Qt::RightButton) {
+            if(MenuStatus::ReleaseFromMenu == m_menuState){
+                m_menuState = MenuStatus::Normal;
+                return;
+            }
+            QModelIndex index = this->indexAt(event->pos());
+            if (index.isValid()
+                    && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
+                setCurrentIndex(index.row());
+                m_noteMenu->popup(event->globalPos());
+                //通过此方法隐藏菜单，在处理拖拽事件结束后hide
+                m_noteMenu->setWindowOpacity(1);
+            }
         }
-        QModelIndex index = this->indexAt(event->pos());
-        if (index.isValid()
-                && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
-            setCurrentIndex(index.row());
-            m_noteMenu->popup(event->globalPos());
-            //通过此方法隐藏菜单，在处理拖拽事件结束后hide
-            m_noteMenu->setWindowOpacity(1);
+    }else {
+        //触控屏手势
+        if (event->source() == Qt::MouseEventSynthesizedByQt) {
+            //是否弹出右键菜单
+            m_popMenuTimer->start(1000);
+            return;
+        }else {
+            if(Qt::RightButton == event->button()){
+                m_noteMenu->setWindowOpacity(1);
+                //多选-右键菜单
+                m_noteMenu->popup(event->globalPos());
+            }
         }
     }
 }
@@ -395,6 +407,9 @@ void MiddleView::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void MiddleView::mouseMoveEvent(QMouseEvent *event)
 {
+    if(m_onlyCurItemMenuEnable){
+        return;
+    }
     //处理触摸屏一指操作
     if ((event->source() == Qt::MouseEventSynthesizedByQt && event->buttons() & Qt::LeftButton)) {
         if(TouchState::TouchOutVisibleRegion !=  m_touchState){
@@ -699,6 +714,8 @@ void MiddleView::doTouchMoveEvent(QMouseEvent *event)
  */
 void MiddleView::handleDragEvent(bool isTouch)
 {
+    if(m_onlyCurItemMenuEnable)
+        return;
     if(isTouch){
         setTouchState(TouchState::TouchDraging);
     }
