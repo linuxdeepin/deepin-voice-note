@@ -28,21 +28,29 @@ JsContent::JsContent(QObject *parent) : QObject(parent)
 
 }
 
-QString JsContent::jsCallGetVoiceSize(const QString& millisecond)
+QString JsContent::jsCallGetVoiceSize(const QString &millisecond)
 {
     return Utils::formatMillisecond(millisecond.toLong(), 0);
 }
 
-QString JsContent::jsCallGetVoiceTime(const QString & time)
+QString JsContent::jsCallGetVoiceTime(const QString &time)
 {
     QDateTime dataTime = QDateTime::fromString(time, VNOTE_TIME_FMT);;
     return  Utils::convertDateTime(dataTime);
 }
 
+int JsContent::jsCallPlayButton(const QString &json, const bool &bIsSame)
+{
+    qDebug() << "json: " << json;
+    qDebug() << "bIsSame: " << bIsSame;
+    return 1;
+
+}
+
 QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &js)
 {
     m_synResult.clear();
-    if(page){
+    if (page) {
         page->runJavaScript(js, [ = ](const QVariant & result) {
             m_synResult = result;
             m_synLoop.quit();

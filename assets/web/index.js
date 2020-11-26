@@ -1,4 +1,19 @@
-var webobj;
+//C++ 调用js接口
+
+//信号绑定
+// initData(const QString& jsonData); 初始化，参数为json字符串
+// void setHtml(const QString& html); 初始化，设置html
+// insertVoiceItem(const QString &jsonData);　插入语音，参数为json字符串
+//callback回调
+// const QString getHtml();获取整个html
+
+
+//js 调用c++接口
+
+
+
+var webobj;    //js与qt通信对象
+var curActiveVoiceBtn;  //当前播放的语音对象
 $('#summernote').summernote({
     height: 300,                 // set editor height
     minHeight: null,             // set minimum height of editor
@@ -19,30 +34,39 @@ $('body').on('click', '.li', function (e) {
 })
 
 //播放
-$('body').on('click', '.left .btn', function (e) {
+$('body').on('click', '.btn', function (e) {
     
     e.stopPropagation();
-    var bId = $(this).attr('data-id');
-    var state = $(this).hasClass('play') ? 0 : 1;
-    console.log('.....bofang...',state,this);
-    // webobj.playButtonClick(bId, state, function (state) {
-    //     //item 
-    //     toggleState(statse, bId)
-    // });
+    var curVoiceBtn = this;
+    var curVoice = $(this).parents('.li:first');
+
+
+    var jsonString = curVoice.attr('jsonKey');
+    var bIsSame = curVoiceBtn.isEqualNode(curActiveVoiceBtn);
+
+    console.log('---->',bIsSame);
+    console.log('cur json---->',jsonString);
+
+    webobj.jsCallPlayButton(jsonString, bIsSame, function (state) {
+        curActiveVoiceBtn = curVoiceBtn;
+
+        //item 
+        // toggleState(statse, bId)
+    });
     //播放
-     toggleState(state,  $(this))
 })
 
 //按钮切换状态 c++调用
 function toggleState(state, element) {
     if (state == '0') {
-        $('.left .btn').removeClass('pause').addClass('play');
+        $('.btn').removeClass('pause').addClass('play');
         element.removeClass('play').addClass('pause');
     } else if (state == '1') {
         element.removeClass('pause').addClass('play');
     }
 }
 
+//type:1 初始化  2 插入
 function init(type, arr) {
     console.log('=============>',arr);
     var tpl = $("#voiceTemplate").html();
@@ -50,6 +74,9 @@ function init(type, arr) {
     var html = '';
     var voiceHtml;
     var txtHtml;
+    if (type == 1){
+        html += '<p><br></p>';
+    }
     arr.noteDatas.forEach((item, index) => {
         //false: txt
         if (item.type == false) {
@@ -62,13 +89,16 @@ function init(type, arr) {
             }
             html += txtHtml;
         }
-        // //true: voice
+        //true: voice
         else{
+            //将json内容当其属性与标签绑定
+            var strItem = JSON.stringify(item);
+            item.jsonValue = strItem;
             voiceHtml = template(item);
             html += voiceHtml
         }
     })
-    html += '<br>';
+    html += '<p><br></p>';
     if (type == 1){
         $('#summernote').summernote('code', html);
     }
@@ -88,8 +118,9 @@ function fnInit(text, type) {
     //获取转换时间
     function fnAsyncTime(item) {
         return new Promise(function (resolve, reject) {
-            webobj.getVoiceTime(item.createTime, function (time) {
-                item.createTime = time;
+            webobj.jsCallGetVoiceTime(item.createTime, function (time) {
+                // item.createTime = time;
+                item.transTime = time;
                 resolve();
             });
         })
@@ -97,12 +128,14 @@ function fnInit(text, type) {
     //获取转换时长
     function fnAsyncSize(item){
         return new Promise(function (resolve, reject) {
-            webobj.getVoiceSize(item.voiceSize, function (vSize) {
-                item.voiceSize = vSize;
+            webobj.jsCallGetVoiceSize(item.voiceSize, function (vSize) {
+                // item.voiceSize = vSize;
+                item.transSize = vSize;
                 resolve()
             })
         })
     }
+
 
     Promise.all(
         newText.map(item => {
@@ -137,61 +170,17 @@ new QWebChannel(qt.webChannelTransport,
         webobj = channel.objects.webobj;
         //所有的c++ 调用js的接口都需要在此绑定格式，webobj.c++函数名（jscontent.cpp查看.connect(js处理函数)
         //例如 webobj.c++fun.connect(jsfun)
-        webobj.jsInitData.connect(initData);
-        webobj.jsInsertVoice.connect(insertVoiceItem);
-        //webobj.switchPlayBtn.connect(toggleState);
-        webobj.jsSetHtml.connect(setHtml);
+        webobj.callJsInitData.connect(initData);
+        webobj.callJsInsertVoice.connect(insertVoiceItem);
+        // webobj.switchPlayBtn.connect(toggleState);
+        webobj.callJsSetHtml.connect(setHtml);
 })
-
 
 function getHtml(){
     return $('#summernote').summernote('code');
 }
 
-
 function setHtml(html){
     console.log('--setHtml---',html);
     $('#summernote').summernote('code',html);
-}
-
-
-
-  var BlockId = 0;
-  var createTime = '02.20';
-  var title = '语音';
-
-  function btnClick(){
-      console.log('btn click...');
-    this.BlockId ++;
-    var titleTmp = this.title + this.BlockId; 
-    var oHML=`
-                    <div class="demo" data-id={{this.BlockId}}>
-                        <div class="left">
-                            <div class="btn play" data-id="{{this.BlockId}}"></div>
-                        </div>
-                        <div class="right">
-                            <div class="lf">
-                                <div class="title">${titleTmp}</div>
-                                <div class="minute padtop">${this.createTime}</div>
-                            </div>
-                            <div class="lr">
-                                <div class="icon">
-                                <div class="wifi-symbol">
-                                    <div class="wifi-circle first"></div>
-                                    <div class="wifi-circle second"></div>
-                                    <div class="wifi-circle third"></div>
-                                    <div class="wifi-circle four"></div>
-                                </div>
-                                </div>
-                                <div class="time padtop">{{this.voiceSize}}</div>
-                        </div>
-                    </div>`;
-    var oA=document.createElement('div');
-    oA.className='li'; 
-    oA.contentEditable = false;
-    oA.innerHTML=oHML;
-    // $('#summernote').summernote('pasteHTML', oHML);
-    $('#summernote').summernote('saveRange');
-	$('#summernote').summernote('insertNode', oA);
-    $('#summernote').summernote('restoreRange');
 }

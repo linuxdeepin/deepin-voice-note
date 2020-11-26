@@ -33,12 +33,13 @@ public:
     explicit JsContent(QObject *parent = nullptr);
     QVariant callJsSynchronous(QWebEnginePage *page, const QString &js);
 signals:
-    void callJsInitData(const QString& jsonData);
-    void callJsSetHtml(const QString& html);
+    void callJsInitData(const QString &jsonData);
+    void callJsSetHtml(const QString &html);
     void callJsInsertVoice(const QString &jsonData);
 public slots:
-    QString jsCallGetVoiceSize(const QString& millisecond);
-    QString jsCallGetVoiceTime(const QString & time);
+    QString jsCallGetVoiceSize(const QString &millisecond);
+    QString jsCallGetVoiceTime(const QString &time);
+    int jsCallPlayButton(const QString &json, const bool &bIsSame);
 private:
     QVariant m_synResult;
     QEventLoop m_synLoop;
