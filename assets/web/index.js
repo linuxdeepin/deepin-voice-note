@@ -45,8 +45,6 @@ function toggleState(state, element) {
 
 function init(type, arr) {
     console.log('=============>',arr);
-    $('#summernote').summernote('reset');
-    $('#summernote').summernote('focus');
     var tpl = $("#voiceTemplate").html();
     var template = Handlebars.compile(tpl);
     var html = '';
@@ -60,7 +58,7 @@ function init(type, arr) {
                 txtHtml = '<br>';
             }
             else{
-                txtHtml = '<p>' + item.text +'</p>';
+                txtHtml = '<div>' + item.text +'</div>';
             }
             html += txtHtml;
         }
@@ -71,7 +69,12 @@ function init(type, arr) {
         }
     })
     html += '<br>';
-    $('#summernote').summernote('code', html);
+    if (type == 1){
+        $('#summernote').summernote('code', html);
+    }
+    else{
+        $('#summernote').summernote('pasteHTML', html);
+    }
 }
 
 function fnInit(text, type) {
@@ -80,23 +83,32 @@ function fnInit(text, type) {
     newText.forEach(item => {
         item.type = item.type == 1 ? false : true
     })
+
     //解决异步更新数据页面接收问题
-    function fnAsync(item) {
+    //获取转换时间
+    function fnAsyncTime(item) {
         return new Promise(function (resolve, reject) {
             webobj.getVoiceTime(item.createTime, function (time) {
                 item.createTime = time;
                 resolve();
             });
+        })
+    }
+    //获取转换时长
+    function fnAsyncSize(item){
+        return new Promise(function (resolve, reject) {
             webobj.getVoiceSize(item.voiceSize, function (vSize) {
                 item.voiceSize = vSize;
                 resolve()
             })
         })
     }
+
     Promise.all(
         newText.map(item => {
             return new Promise(async (resolve, reject) => {
-                await fnAsync(item)
+                await fnAsyncTime(item);
+                await fnAsyncSize(item);
                 resolve()
             })
         })
@@ -113,6 +125,12 @@ var initData = function (text) {
     fnInit(text, 1)
 }
 
+//录音插入数据
+var insertVoiceItem = function (text) {
+    console.log('--insertVoiceItem---',text);
+    fnInit(text, 2);
+}
+
 new QWebChannel(qt.webChannelTransport,
     function (channel) {
         console.log('qt.webChannelTransport....');
@@ -120,18 +138,19 @@ new QWebChannel(qt.webChannelTransport,
         //所有的c++ 调用js的接口都需要在此绑定格式，webobj.c++函数名（jscontent.cpp查看.connect(js处理函数)
         //例如 webobj.c++fun.connect(jsfun)
         webobj.initData.connect(initData);
+        webobj.insertVoiceItem.connect(insertVoiceItem);
         webobj.switchPlayBtn.connect(toggleState);
         webobj.setHtml.connect(setHtml);
 })
 
 
 function getHtml(){
-    // console.log('===html==>',$('#summernote').summernote('code'));
     return $('#summernote').summernote('code');
 }
 
 
 function setHtml(html){
+    console.log('--setHtml---',html);
     $('#summernote').summernote('code',html);
 }
 

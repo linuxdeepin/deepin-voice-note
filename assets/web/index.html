@@ -23,7 +23,7 @@
 
 <body>
     <div id="summernote"></div>
-    <script id="voiceTemplate" type="text/x-handlebars-template">
+    <!-- <script id="voiceTemplate" type="text/x-handlebars-template">
         <div class="li" contenteditable="false">	
             <div class="demo" >
                 <div class="left">
@@ -50,6 +50,37 @@
             <div class="translate">
                 {{#if this.text}}
                 <div>{{this.text}}</div>
+                {{/if}}
+            </div>
+        </div>
+    </script> -->
+    <script id="voiceTemplate" type="text/x-handlebars-template">
+        <div class="li" contenteditable="false">	
+            <div class="demo" >
+                <div class="left">
+                <div class="btn play"></div>
+                </div>
+                <div class="right">
+                    <div class="lf">
+                        <div class="title">{{title}}</div>
+                        <div class="minute padtop">{{createTime}}</div>
+                    </div>
+                    <div class="lr">
+                        <div class="icon">
+                        <div class="wifi-symbol">
+                            <div class="wifi-circle first"></div>
+                            <div class="wifi-circle second"></div>
+                            <div class="wifi-circle third"></div>
+                            <div class="wifi-circle four"></div>
+                        </div>
+                        </div>
+                        <div class="time padtop">{{voiceSize}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="translate">
+                {{#if text}}
+                <div>{{text}}</div>
                 {{/if}}
             </div>
         </div>
