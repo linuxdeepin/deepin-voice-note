@@ -34,6 +34,7 @@
 DWIDGET_USE_NAMESPACE
 
 struct VNoteItem;
+class JsContent;
 
 class WebEngineView : public QWebEngineView
 {
@@ -44,15 +45,8 @@ public:
     void insertVoiceItem(const QString &voicePath, qint64 voiceSize);
     void updateNote();
 signals:
-    void jsInitData(const QString& jsonData);
-    void jsSetHtml(const QString& html);
-    void jsInsertVoice(const QString &jsonData);
-
     void synComplete();
 public slots:
-    void textChange();
-    QString getVoiceSize(const QString& millisecond);
-    QString getVoiceTime(const QString & time);
 protected:
      void contextMenuEvent(QContextMenuEvent*e ) override;
 private:
@@ -63,6 +57,7 @@ private:
     QWebChannel *m_channel {nullptr};
     QTimer *m_updateTimer {nullptr};
     DMenu  *m_noteDetailContextMenu{nullptr};
+    JsContent *m_jsContent {nullptr};
 };
 
 #endif // WEBENGINEVIEW_H

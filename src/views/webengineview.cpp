@@ -28,7 +28,7 @@
 #include "common/setting.h"
 #include "common/actionmanager.h"
 #include "common/vtextspeechandtrmanager.h"
-#include "common/utils.h"
+#include "common/jscontent.h"
 
 #include "task/exportnoteworker.h"
 #include <QTimer>
@@ -57,8 +57,9 @@ void WebEngineView::init()
         updateNote();
     });
     m_updateTimer->setInterval(1000);
+    m_jsContent = new JsContent(this);
     m_channel = new QWebChannel(this);
-    m_channel->registerObject("webobj", this);
+    m_channel->registerObject("webobj", m_jsContent);
     page()->setWebChannel(m_channel);
     const QFileInfo info(webPage);
     load(QUrl::fromLocalFile(info.absoluteFilePath()));
@@ -69,36 +70,17 @@ void WebEngineView::init()
 void WebEngineView::updateNote()
 {
     if (/*m_textChange &&*/ m_noteData) {
-        QEventLoop loop;
-        connect(this, &WebEngineView::synComplete, &loop, &QEventLoop::quit);
-        page()->runJavaScript("getHtml()", [ = ](const QVariant & result) {
+        QVariant result = m_jsContent->callJsSynchronous(page(),"getHtml()");
+        if(result.isValid()){
             m_noteData->htmlCode = result.toString();
             VNoteItemOper noteOps(m_noteData);
             if (!noteOps.updateNote()) {
                 qInfo() << "Save note error";
             }
-            emit synComplete();
-        });
-        loop.exec();
+        }
         m_textChange = false;
         qInfo() << "update success";
     }
-}
-
-void WebEngineView::textChange()
-{
-     m_textChange = true;
-}
-
-QString WebEngineView::getVoiceSize(const QString& millisecond)
-{
-    return Utils::formatMillisecond(millisecond.toLong(), 0);
-}
-
-QString WebEngineView::getVoiceTime(const QString & time)
-{
-    QDateTime dataTime = QDateTime::fromString(time, VNOTE_TIME_FMT);;
-    return  Utils::convertDateTime(dataTime);
 }
 
 void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
@@ -112,9 +94,9 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
     m_noteData = data;
     this->setVisible(true);
     if (data->htmlCode.isEmpty()) {
-        emit jsInitData(data->metaDataRef().toString());
+        emit m_jsContent->callJsInitData(data->metaDataRef().toString());
     } else {
-        emit jsSetHtml(data->htmlCode);
+        emit m_jsContent->callJsSetHtml(data->htmlCode);
     }
     //m_updateTimer->start();
 }
@@ -141,7 +123,7 @@ void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
     m_noteTmp->datas.datas.clear();
 
     qInfo() << value.toString();
-    emit jsInsertVoice(value.toString());
+    emit m_jsContent->callJsInsertVoice(value.toString());
 }
 
 void WebEngineView::contextMenuEvent(QContextMenuEvent *e)
