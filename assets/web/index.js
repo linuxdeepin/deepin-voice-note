@@ -55,7 +55,13 @@ function init(type, arr) {
     arr.noteDatas.forEach((item, index) => {
         //false: txt
         if (item.type == false) {
-            txtHtml = '<p>' + item.text +'</p>'
+            if (item.text == '')
+            {
+                txtHtml = '<br>';
+            }
+            else{
+                txtHtml = '<p>' + item.text +'</p>';
+            }
             html += txtHtml;
         }
         // //true: voice
@@ -64,7 +70,7 @@ function init(type, arr) {
             html += voiceHtml
         }
     })
-
+    html += '<br>';
     $('#summernote').summernote('code', html);
 }
 
