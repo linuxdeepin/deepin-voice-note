@@ -1304,54 +1304,30 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::NoteRename:
         editNote();
         break;
-    case ActionManager::DetailDelete: {
-        VNoteBlock *data = JsContent::instance()->getCurrentBlock();
-        if (data) {
-            if (data->getType() == VNoteBlock::Voice) {
-                m_webView->deleteVoice(data->blockid);
-            } else {
-                m_webView->triggerPageAction(QWebEnginePage::Cut);
-            }
-        }
-
-    } break;
-    case ActionManager::NoteSaveText: {
+    case ActionManager::DetailDelete:
+        m_webView->triggerPageAction(QWebEnginePage::Cut);
+        break;
+    case ActionManager::NoteSaveText:
         m_middleView->saveAsText();
-    } break;
-    case ActionManager::NoteSaveVoice: {
+        break;
+    case ActionManager::NoteSaveVoice:
         m_middleView->saveRecords();
-    } break;
+        break;
     case ActionManager::DetailVoice2Text:
         onA2TStart();
         break;
-    case ActionManager::DetailSelectAll: {
-        VNoteBlock *data = JsContent::instance()->getCurrentBlock();
-        if (data && data->getType() == VNoteBlock::Text) {
-            m_webView->triggerPageAction(QWebEnginePage::SelectAll);
-        }
-    }
-    break;
-    case ActionManager::DetailCopy: {
-        VNoteBlock *data = JsContent::instance()->getCurrentBlock();
-        if (data && data->getType() == VNoteBlock::Text) {
-            m_webView->triggerPageAction(QWebEnginePage::Copy);
-        }
-    }
-    break;
-    case ActionManager::DetailPaste: {
-        VNoteBlock *data = JsContent::instance()->getCurrentBlock();
-        if (data && data->getType() == VNoteBlock::Text) {
-            m_webView->triggerPageAction(QWebEnginePage::Paste);
-        }
-    }
-    break;
-    case ActionManager::DetailCut: {
-        VNoteBlock *data = JsContent::instance()->getCurrentBlock();
-        if (data && data->getType() == VNoteBlock::Text) {
-            m_webView->triggerPageAction(QWebEnginePage::Cut);
-        }
-    }
-    break;
+    case ActionManager::DetailSelectAll:
+        m_webView->triggerPageAction(QWebEnginePage::SelectAll);
+        break;
+    case ActionManager::DetailCopy:
+        m_webView->triggerPageAction(QWebEnginePage::Copy);
+        break;
+    case ActionManager::DetailPaste:
+        m_webView->triggerPageAction(QWebEnginePage::Paste);
+        break;
+    case ActionManager::DetailCut:
+        m_webView->triggerPageAction(QWebEnginePage::Cut);
+        break;
     case ActionManager::DetailVoiceSave:
         m_webView->saveMp3();
         break;

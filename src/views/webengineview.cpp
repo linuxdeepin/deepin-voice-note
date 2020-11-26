@@ -27,11 +27,16 @@
 #include "common/metadataparser.h"
 #include "common/jscontent.h"
 #include "common/setting.h"
+#include "common/actionmanager.h"
+#include "common/vtextspeechandtrmanager.h"
+
 #include "task/exportnoteworker.h"
 #include <QTimer>
 #include <QDebug>
 #include <QStandardPaths>
 #include <QThreadPool>
+#include <QContextMenuEvent>
+#include <QWebEngineContextMenuData>
 
 #include <DFileDialog>
 #include <DApplication>
@@ -59,7 +64,8 @@ void WebEngineView::init()
     page()->setWebChannel(m_channel);
     const QFileInfo info(webPage);
     load(QUrl::fromLocalFile(info.absoluteFilePath()));
-    setContextMenuPolicy(Qt::NoContextMenu);
+    //setContextMenuPolicy(Qt::NoContextMenu);
+    m_noteDetailContextMenu = ActionManager::Instance()->detialContextMenu();
 }
 
 void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
@@ -68,7 +74,7 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
         this->setVisible(false);
         return;
     }
-    m_updateTimer->stop();
+    //m_updateTimer->stop();
     m_jsContent->updateNote();
     m_jsContent->setNoteItem(data);
     m_noteData = data;
@@ -80,7 +86,7 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
         qDebug() << "setHtml:" << data->htmlCode;
         emit m_jsContent->setHtml(data->htmlCode);
     }
-    m_updateTimer->start();
+    //m_updateTimer->start();
 }
 
 void WebEngineView::manualUpdate()
@@ -130,6 +136,60 @@ void WebEngineView::deleteVoice(const QString &id)
             }
         });
     }
+}
+
+void WebEngineView::contextMenuEvent(QContextMenuEvent *e)
+{
+    const QWebEngineContextMenuData &data = page()->contextMenuData();
+    QWebEngineContextMenuData::EditFlags flags = data.editFlags();
+    bool TTSisWorking = false;
+    OpsStateInterface *stateInterface = OpsStateInterface::instance();
+    bool isAISrvAvailable = stateInterface->isAiSrvExist();
+    ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteDetailCtxMenu, false);
+    if (isAISrvAvailable) {
+        TTSisWorking = VTextSpeechAndTrManager::isTextToSpeechInWorking();
+        if (TTSisWorking) {
+            ActionManager::Instance()->visibleAction(ActionManager::DetailStopreading, true);
+            ActionManager::Instance()->visibleAction(ActionManager::DetailText2Speech, false);
+            ActionManager::Instance()->enableAction(ActionManager::DetailStopreading, true);
+        } else {
+            ActionManager::Instance()->visibleAction(ActionManager::DetailStopreading, false);
+            ActionManager::Instance()->visibleAction(ActionManager::DetailText2Speech, true);
+        }
+    }
+    bool canDelete = flags.testFlag(QWebEngineContextMenuData::CanDelete);
+    bool canCopy = flags.testFlag(QWebEngineContextMenuData::CanCopy);
+    bool canCut = flags.testFlag(QWebEngineContextMenuData::CanCut);
+    bool canPaste = flags.testFlag(QWebEngineContextMenuData::CanPaste);
+    bool canSelectAll = flags.testFlag(QWebEngineContextMenuData::CanSelectAll);
+    if(canSelectAll){
+        ActionManager::Instance()->enableAction(ActionManager::DetailSelectAll, canSelectAll);
+    }
+    if(canCopy){
+        ActionManager::Instance()->enableAction(ActionManager::DetailCopy, canCopy);
+        if (isAISrvAvailable) {
+            if (VTextSpeechAndTrManager::getTransEnable()) {
+                ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
+            }
+            if (!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()) {
+                ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
+            }
+        }
+    }
+    if(canCut){
+        ActionManager::Instance()->enableAction(ActionManager::DetailCut, true);
+    }
+    if(canDelete){
+        ActionManager::Instance()->enableAction(ActionManager::DetailDelete, true);
+    }
+    if(canPaste){
+       ActionManager::Instance()->enableAction(ActionManager::DetailPaste, true);
+       if (isAISrvAvailable && VTextSpeechAndTrManager::getSpeechToTextEnable()) {
+           ActionManager::Instance()->enableAction(ActionManager::DetailSpeech2Text, true);
+       }
+    }
+    m_noteDetailContextMenu->exec(QCursor::pos());
+
 }
 
 void WebEngineView::saveMp3()

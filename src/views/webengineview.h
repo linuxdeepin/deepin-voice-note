@@ -29,6 +29,10 @@
 #include <QtWebChannel/QWebChannel>
 #include <QtWebEngineWidgets/QWebEngineView>
 
+#include <DMenu>
+
+DWIDGET_USE_NAMESPACE
+
 struct VNoteItem;
 class JsContent;
 
@@ -45,6 +49,8 @@ public:
 signals:
 
 public slots:
+protected:
+     void contextMenuEvent(QContextMenuEvent*e ) override;
 private:
     void init();
     VNoteItem *m_noteData {nullptr};
@@ -52,6 +58,7 @@ private:
     QWebChannel *m_channel {nullptr};
     JsContent *m_jsContent {nullptr};
     QTimer *m_updateTimer {nullptr};
+    DMenu  *m_noteDetailContextMenu{nullptr};
 };
 
 #endif // WEBENGINEVIEW_H

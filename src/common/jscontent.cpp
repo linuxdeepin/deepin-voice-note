@@ -92,6 +92,7 @@ VNoteBlock *JsContent::getBlock(const QString &id)
 void JsContent::rightMenuClick(const QString &id, int select)
 {
     qInfo() << "get select:" << select;
+    return;
     m_currentBlock = getBlock(id);
     if (m_currentBlock) {
         bool TTSisWorking = false;
