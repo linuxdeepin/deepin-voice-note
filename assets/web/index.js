@@ -74,18 +74,18 @@ function init(type, arr) {
     var html = '';
     var voiceHtml;
     var txtHtml;
-    if (type == 1){
-        html += '<p><br></p>';
-    }
+    // if (type == 1){
+    //     html += '<p><br></p>';
+    // }
     arr.noteDatas.forEach((item, index) => {
         //false: txt
-        if (item.type == false) {
+        if (item.type == 1) {
             if (item.text == '')
             {
-                txtHtml = '<br>';
+                txtHtml = '<p><br></p>';
             }
             else{
-                txtHtml = '<div>' + item.text +'</div>';
+                txtHtml = '<p>' + item.text +'</p>';
             }
             html += txtHtml;
         }
@@ -110,9 +110,6 @@ function init(type, arr) {
 function fnInit(text, type) {
     var initText = JSON.parse(text);
     var newText = initText.noteDatas;
-    newText.forEach(item => {
-        item.type = item.type == 1 ? false : true
-    })
 
     //解决异步更新数据页面接收问题
     //获取转换时间
