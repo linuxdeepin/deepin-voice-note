@@ -27,6 +27,9 @@ set(APP_QRC "../assets/images.qrc")
 
 ADD_COMPILE_OPTIONS(-fno-access-control)
 
+# 设置添加gocv相关信息的输出
+set(CMAKE_CXX_FLAGS "-g -fprofile-arcs -ftest-coverage")
+
 find_package(Qt5Test REQUIRED)
 
 find_package(GTest REQUIRED)
@@ -84,46 +87,16 @@ target_link_libraries(${PROJECT_NAME_TEST}
     Qt5::Test
 )
 
-
 ##------------------------------ 创建'make test'指令---------------------------------------
 add_custom_target(test
-#    #执行mkdir -p 创建 coverageResult
-#    COMMAND mkdir -p test/coverageResult
-#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
-
 
 add_custom_command(TARGET test
     COMMAND echo " =================== TEST BEGIN ==================== "
-
-#    #1.清理原先的gcov信息
-#    COMMAND lcov --directory ./test/CMakeFiles/${PROJECT_NAME_TEST}.dir --zerocounters
-#    COMMAND lcov --directory ./test/CMakeFiles/${PROJECT_NAME}.dir --zerocounters
     COMMAND ${CMAKE_BINARY_DIR}/test/${PROJECT_NAME_TEST}
-
-#    #2.收集gcov信息到.info文件中
-#    COMMAND lcov --directory . --capture --output-file ./test/coverageResult/${PROJECT_NAME}_Coverage.info
-
-#    #3.过滤一些我们不感兴趣的文件的覆盖率信息
-#    COMMAND echo " =================== do filter begin ==================== "
-#    COMMAND lcov --remove ./test/coverageResult/${PROJECT_NAME}_Coverage.info
-#    '*/${PROJECT_NAME_TEST}_autogen/*' '*/${PROJECT_NAME}_autogen/*' '*/usr/include/*' '*/dbuslogin1manager*' '*/test/*' '*/googletest/*'
-#    -o ./test/coverageResult/${PROJECT_NAME}_Coverage.info
-#    COMMAND echo " =================== do filter end ==================== "
-
-#    #3.将.info信息生成报告到reprot文件夹中
-#    COMMAND genhtml -o ./test/coverageResult/report ./test/coverageResult/${PROJECT_NAME}_Coverage.info
-
     COMMAND echo " =================== TEST END ==================== "
-
-#    COMMAND echo " Coverage files have been output to ${CMAKE_BINARY_DIR}/coverageResult/report "
-
-#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
 ##'make test'命令依赖与我们的测试程序
 add_dependencies(test ${PROJECT_NAME_TEST})
-
-## 设置添加gocv相关信息的输出
-#set(CMAKE_CXX_FLAGS "-g -fprofile-arcs -ftest-coverage")
 
