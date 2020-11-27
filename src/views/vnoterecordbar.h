@@ -45,17 +45,8 @@ public:
     static constexpr int REC_BTN_H = 68;
     //停止录音
     void stopRecord();
-    //快捷键暂停/继续语音播放
-    void playOrPauseVoice();
     //播放语音
-    void playVoice(VNVoiceBlock *voiceData);
-    //暂停播放
-    void pauseVoice(VNVoiceBlock *voiceData);
-    //停止播放
-    bool stopVoice(VNVoiceBlock *voiceData);
-    //获取当前播放语音数据
-    VNVoiceBlock *getVoiceData();
-
+    void playVoice(const VNVoiceBlock *voiceData, const bool &bIsSame);
 private:
     //初始化设备检测
     void initAudioWatcher();
@@ -73,9 +64,9 @@ signals:
     void sigStartRecord(const QString &recordPath);
     void sigFinshRecord(const QString &voicePath, qint64 voiceSize);
     //播放信号
-    void sigPlayVoice(VNVoiceBlock *voiceData);
-    void sigPauseVoice(VNVoiceBlock *voiceData);
-    void sigWidgetClose(VNVoiceBlock *voiceData);
+    void sigPlayVoice();
+    void sigPauseVoice();
+    void sigStopVoice();
     //设备异常提示
     void sigDeviceExceptionMsgShow();
     void sigDeviceExceptionMsgClose();
@@ -86,7 +77,7 @@ public slots:
     //结束录音
     void onFinshRecord(const QString &voicePath, qint64 voiceSize);
     //播放窗口关闭
-    void onClosePlayWidget(VNVoiceBlock *voiceData);
+    void onStopVoice();
     //设备音量改变
     void onAudioVolumeChange(int mode);
     //设备改变

@@ -93,12 +93,12 @@ void VNoteRecordBar::initConnections()
     connect(m_recordBtn, &VNoteIconButton::clicked, this, &VNoteRecordBar::onStartRecord);
     connect(m_recordPanel, SIGNAL(sigFinshRecord(const QString &, qint64)),
             this, SLOT(onFinshRecord(const QString &, qint64)));
-    connect(m_playPanel, &VNotePlayWidget::sigWidgetClose,
-            this, &VNoteRecordBar::onClosePlayWidget);
-    connect(m_playPanel, SIGNAL(sigPlayVoice(VNVoiceBlock *)),
-            this, SIGNAL(sigPlayVoice(VNVoiceBlock *)));
-    connect(m_playPanel, SIGNAL(sigPauseVoice(VNVoiceBlock *)),
-            this, SIGNAL(sigPauseVoice(VNVoiceBlock *)));
+    connect(m_playPanel, &VNotePlayWidget::sigStopVoice,
+            this, &VNoteRecordBar::onStopVoice);
+    connect(m_playPanel, SIGNAL(sigPlayVoice()),
+            this, SIGNAL(sigPlayVoice()));
+    connect(m_playPanel, SIGNAL(sigPauseVoice()),
+            this, SIGNAL(sigPauseVoice()));
 }
 
 /**
@@ -179,79 +179,20 @@ void VNoteRecordBar::stopRecord()
     m_recordPanel->stopRecord();
 }
 
+void VNoteRecordBar::playVoice(const VNVoiceBlock *voiceData, const bool &bIsSame)
+{
+    m_mainLayout->setCurrentWidget(m_playPanel);
+    m_playPanel->playVideo(voiceData, bIsSame);
+}
+
 /**
  * @brief VNoteRecordBar::onClosePlayWidget
  * @param voiceData
  */
-void VNoteRecordBar::onClosePlayWidget(VNVoiceBlock *voiceData)
+void VNoteRecordBar::onStopVoice()
 {
     m_mainLayout->setCurrentWidget(m_recordBtnHover);
-    emit sigWidgetClose(voiceData);
-}
-
-/**
- * @brief VNoteRecordBar::playVoice
- * @param voiceData
- */
-void VNoteRecordBar::playVoice(VNVoiceBlock *voiceData)
-{
-    m_mainLayout->setCurrentWidget(m_playPanel);
-    m_playPanel->setVoiceBlock(voiceData);
-}
-
-/**
- * @brief VNoteRecordBar::pauseVoice
- * @param voiceData
- */
-void VNoteRecordBar::pauseVoice(VNVoiceBlock *voiceData)
-{
-    if (m_mainLayout->currentWidget() == m_playPanel
-        && m_playPanel->getVoiceData() == voiceData) {
-        m_playPanel->onPauseBtnClicked();
-    }
-}
-
-/**
- * @brief VNoteRecordBar::stopVoice
- * @param voiceData
- * @return true 成功
- */
-bool VNoteRecordBar::stopVoice(VNVoiceBlock *voiceData)
-{
-    if (m_mainLayout->currentWidget() == m_playPanel
-        && m_playPanel->getVoiceData() == voiceData) {
-        m_playPanel->stopVideo();
-        m_mainLayout->setCurrentWidget(m_recordBtnHover);
-        return true;
-    }
-    return false;
-}
-
-/**
- * @brief VNoteRecordBar::getVoiceData
- * @return 绑定的播放语音数据
- */
-VNVoiceBlock *VNoteRecordBar::getVoiceData()
-{
-    if (m_mainLayout->currentWidget() == m_playPanel) {
-        return m_playPanel->getVoiceData();
-    }
-    return nullptr;
-}
-
-/**
- * @brief VNoteRecordBar::playOrPauseVoice
- */
-void VNoteRecordBar::playOrPauseVoice()
-{
-    if (m_mainLayout->currentWidget() == m_playPanel) {
-        VlcPalyer::VlcState status = m_playPanel->getPlayerStatus();
-        if (status == VlcPalyer::Playing) {
-            m_playPanel->onPauseBtnClicked();
-        } else if (status == VlcPalyer::Paused) {
-            m_playPanel->onPlayBtnClicked();
-        }
-    }
+    emit sigStopVoice();
 }
 
 /**

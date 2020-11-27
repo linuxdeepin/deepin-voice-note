@@ -26,23 +26,33 @@
 #include <QWebEnginePage>
 #include <QEventLoop>
 
+struct VNVoiceBlock;
+
 class JsContent : public QObject
 {
     Q_OBJECT
 public:
     explicit JsContent(QObject *parent = nullptr);
+    ~JsContent();
+    static JsContent *instance();
     QVariant callJsSynchronous(QWebEnginePage *page, const QString &js);
 signals:
     void callJsInitData(const QString &jsonData);
     void callJsSetHtml(const QString &html);
     void callJsInsertVoice(const QString &jsonData);
+    //设置播放状态，0,播放中，1暂停中，2.结束播放
+    void callJsSetPlayStatus(int status);
+
+    void playVoice(const VNVoiceBlock *block, const bool &bIsSame);
 public slots:
     QString jsCallGetVoiceSize(const QString &millisecond);
     QString jsCallGetVoiceTime(const QString &time);
-    int jsCallPlayButton(const QString &json, const bool &bIsSame);
+    int jsCallPlayVoice(const QVariant &json, const bool &bIsSame);
 private:
     QVariant m_synResult;
     QEventLoop m_synLoop;
+    VNVoiceBlock *m_currentPlay {nullptr};
+    VNVoiceBlock *m_currentVoiceToText {nullptr};
 };
 
 #endif // JSCONTENT_H

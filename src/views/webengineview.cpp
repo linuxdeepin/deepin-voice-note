@@ -57,7 +57,7 @@ void WebEngineView::init()
         updateNote();
     });
     m_updateTimer->setInterval(1000);
-    m_jsContent = new JsContent(this);
+    m_jsContent = JsContent::instance();
     m_channel = new QWebChannel(this);
     m_channel->registerObject("webobj", m_jsContent);
     page()->setWebChannel(m_channel);

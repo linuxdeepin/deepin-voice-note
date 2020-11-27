@@ -171,15 +171,13 @@ public slots:
     //结束录音
     void onFinshRecord(const QString &voicePath, qint64 voiceSize);
     //详情页播放事件处理
-    void onRightViewVoicePlay(VNVoiceBlock *voiceData);
-    //详情页暂停播放事件处理
-    void onRightViewVoicePause(VNVoiceBlock *voiceData);
+    void onRightViewVoicePlay(const VNVoiceBlock *block, const bool &bIsSame);
     //播放窗口播放事件处理
-    void onPlayPlugVoicePlay(VNVoiceBlock *voiceData);
+    void onPlayPlugVoicePlay();
     //播放窗口暂停播放事件处理
-    void onPlayPlugVoicePause(VNVoiceBlock *voiceData);
+    void onPlayPlugVoicePause();
     //播放窗口停止播放
-    void onPlayPlugVoiceStop(VNVoiceBlock *voiceData);
+    void onPlayPlugVoiceStop();
     //新建记事本
     void onNewNotebook();
     //新建记事项

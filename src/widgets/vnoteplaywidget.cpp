@@ -130,74 +130,14 @@ void VNotePlayWidget::onVoicePlayPosChange(qint64 pos)
 }
 
 /**
- * @brief VNotePlayWidget::setVoiceBlock
- * @param voiceData
- */
-void VNotePlayWidget::setVoiceBlock(VNVoiceBlock *voiceData)
-{
-    if (voiceData) {
-        if (voiceData != m_voiceBlock) {
-            m_slider->setValue(0);
-            m_voiceBlock = voiceData;
-            m_player->setFilePath(m_voiceBlock->voicePath);
-            m_nameLab->setText(voiceData->voiceTitle);
-            m_timeLab->setText(Utils::formatMillisecond(0, 0) + "/" + Utils::formatMillisecond(voiceData->voiceSize));
-        }
-        onPlayBtnClicked();
-    }
-}
-
-/**
- * @brief VNotePlayWidget::stopVideo
- */
-void VNotePlayWidget::stopVideo()
-{
-    m_player->stop();
-}
-
-/**
- * @brief VNotePlayWidget::playVideo
- */
-void VNotePlayWidget::playVideo()
-{
-    m_player->play();
-}
-
-/**
- * @brief VNotePlayWidget::pauseVideo
- */
-void VNotePlayWidget::pauseVideo()
-{
-    m_player->pause();
-}
-
-/**
- * @brief VNotePlayWidget::onPlayBtnClicked
- */
-void VNotePlayWidget::onPlayBtnClicked()
-{
-    m_playerBtn->setState(VNote2SIconButton::Press);
-    onPlayerBtnClicked();
-}
-
-/**
- * @brief VNotePlayWidget::onPauseBtnClicked
- */
-void VNotePlayWidget::onPauseBtnClicked()
-{
-    m_playerBtn->setState(VNote2SIconButton::Normal);
-    onPlayerBtnClicked();
-}
-
-/**
  * @brief VNotePlayWidget::onCloseBtnClicked
  */
 void VNotePlayWidget::onCloseBtnClicked()
 {
     m_slider->setValue(0);
-    stopVideo();
+    m_player->stop();
     m_sliderReleased = true;
-    emit sigWidgetClose(m_voiceBlock);
+    emit sigStopVoice();
 }
 
 /**
@@ -259,15 +199,6 @@ bool VNotePlayWidget::eventFilter(QObject *o, QEvent *e)
 }
 
 /**
- * @brief VNotePlayWidget::getVoiceData
- * @return 绑定数据
- */
-VNVoiceBlock *VNotePlayWidget::getVoiceData()
-{
-    return m_voiceBlock;
-}
-
-/**
  * @brief VNotePlayWidget::getPlayerStatus
  * @return 播放状态
  */
@@ -292,12 +223,30 @@ void VNotePlayWidget::onDurationChanged(qint64 duration)
  */
 void VNotePlayWidget::onPlayerBtnClicked()
 {
-    bool isPress = m_playerBtn->isPressed();
-    if (isPress) {
-        playVideo();
-        emit sigPlayVoice(m_voiceBlock);
-    } else {
-        pauseVideo();
-        emit sigPauseVoice(m_voiceBlock);
+   playVideo(m_voiceBlock, true);
+}
+
+void VNotePlayWidget::playVideo(const VNVoiceBlock *voiceData, const bool &bIsSame)
+{
+    if(bIsSame){
+        VlcPalyer::VlcState status = getPlayerStatus();
+        if (status == VlcPalyer::Playing) {
+            m_player->pause();
+            m_playerBtn->setState(VNote2SIconButton::Normal);
+            emit sigPauseVoice();
+        } else if(VlcPalyer::Paused){
+            m_player->play();
+            m_playerBtn->setState(VNote2SIconButton::Press);
+            emit sigPlayVoice();
+        }
+    }else {
+        m_slider->setValue(0);
+        m_voiceBlock = voiceData;
+        m_player->setFilePath(m_voiceBlock->voicePath);
+        m_nameLab->setText(voiceData->voiceTitle);
+        m_timeLab->setText(Utils::formatMillisecond(0, 0) + "/" + Utils::formatMillisecond(voiceData->voiceSize));
+        m_playerBtn->setState(VNote2SIconButton::Press);
+        m_player->play();
+        emit sigPlayVoice();
     }
 }

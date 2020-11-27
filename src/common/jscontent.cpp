@@ -22,10 +22,33 @@
 #include "globaldef.h"
 
 #include "common/utils.h"
+#include "common/vnoteitem.h"
+#include "common/metadataparser.h"
+#include "db/vnoteitemoper.h"
+
+static JsContent *jsContentInstance = nullptr;
 
 JsContent::JsContent(QObject *parent) : QObject(parent)
 {
 
+}
+
+JsContent *JsContent::instance()
+{
+    if (jsContentInstance == nullptr) {
+        jsContentInstance = new JsContent;
+    }
+    return jsContentInstance;
+}
+
+JsContent::~JsContent()
+{
+    if(m_currentPlay){
+        delete m_currentPlay;
+    }
+    if(m_currentVoiceToText){
+        delete  m_currentVoiceToText;
+    }
 }
 
 QString JsContent::jsCallGetVoiceSize(const QString &millisecond)
@@ -39,10 +62,17 @@ QString JsContent::jsCallGetVoiceTime(const QString &time)
     return  Utils::convertDateTime(dataTime);
 }
 
-int JsContent::jsCallPlayButton(const QString &json, const bool &bIsSame)
+int JsContent::jsCallPlayVoice(const QVariant &json, const bool &bIsSame)
 {
-    qDebug() << "json: " << json;
-    qDebug() << "bIsSame: " << bIsSame;
+    if(m_currentPlay == nullptr){
+        m_currentPlay = new VNVoiceBlock();
+    }
+    if(!bIsSame){
+        MetaDataParser dataParser;
+        dataParser.jsonParse(json,m_currentPlay);
+    }
+    qDebug() << bIsSame;
+    emit playVoice(m_currentPlay, bIsSame);
     return 1;
 
 }

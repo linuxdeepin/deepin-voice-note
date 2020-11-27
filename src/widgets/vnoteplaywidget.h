@@ -44,21 +44,13 @@ class VNotePlayWidget : public DFloatingWidget
 public:
     explicit VNotePlayWidget(QWidget *parent = nullptr);
     //绑定数据
-    void setVoiceBlock(VNVoiceBlock *voiceData);
-    //暂停播放
-    void pauseVideo();
-    //播放
-    void playVideo();
-    //停止播放
-    void stopVideo();
+    void playVideo(const VNVoiceBlock *voiceData, const bool &bIsSame);
     //获取状态
     VlcPalyer::VlcState getPlayerStatus();
-    //获取绑定的数据
-    VNVoiceBlock *getVoiceData();
 signals:
-    void sigPlayVoice(VNVoiceBlock *voiceData);
-    void sigPauseVoice(VNVoiceBlock *voiceData);
-    void sigWidgetClose(VNVoiceBlock *voiceData);
+    void sigPlayVoice();
+    void sigPauseVoice();
+    void sigStopVoice();
 public slots:
     //当前播放位置改变
     void onVoicePlayPosChange(qint64 pos);
@@ -68,10 +60,6 @@ public slots:
     void onSliderReleased();
     //进度条移动
     void onSliderMove(int pos);
-    //播放
-    void onPlayBtnClicked();
-    //暂停
-    void onPauseBtnClicked();
     //播放/暂停
     void onPlayerBtnClicked();
     //播放结束，关闭播放窗口
@@ -89,12 +77,12 @@ private:
     //初始化播放库
     void initPlayer();
     bool m_sliderReleased {true};
+    const VNVoiceBlock *m_voiceBlock {nullptr};
     DLabel *m_timeLab {nullptr};
     DLabel *m_nameLab {nullptr};
     DSlider *m_slider {nullptr};
     DWidget *m_sliderHover {nullptr};
     DIconButton *m_closeBtn {nullptr};
-    VNVoiceBlock *m_voiceBlock {nullptr};
     VlcPalyer *m_player {nullptr};
     VNote2SIconButton *m_playerBtn {nullptr};
 };

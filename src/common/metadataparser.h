@@ -110,9 +110,10 @@ public:
 #endif
     //源数据解析
     void parse(QVariant &metaData, VNoteItem *noteData /*out*/);
+    void jsonParse(const QVariant &metaData, VNoteBlock *blockData /*out*/);
     //源数据生成
     void makeMetaData(VNoteItem *noteData, QVariant &metaData /*out*/);
-
+    void jsonMakeMetadata(VNoteBlock *blockData, QVariant &metaData /*out*/);
 protected:
 #ifdef VN_XML_METADATA_PARSER
     const QMap<int, QString> m_xmlNodeNameMap = {

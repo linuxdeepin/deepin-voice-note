@@ -35,6 +35,7 @@
 #include "common/vnoteforlder.h"
 #include "common/actionmanager.h"
 #include "common/vnotedatasafefymanager.h"
+#include "common/jscontent.h"
 
 #include "common/utils.h"
 #include "common/actionmanager.h"
@@ -160,6 +161,9 @@ void VNoteMainWindow::initConnections()
 //    connect(m_rightView, &RightView::sigCursorChange,
 //            this, &VNoteMainWindow::onCursorChange);
 
+    connect(JsContent::instance(), &JsContent::playVoice,
+            this,  &VNoteMainWindow::onRightViewVoicePlay);
+
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::onNewNotebook);
 
@@ -177,7 +181,7 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onPlayPlugVoicePlay);
     connect(m_recordBar, &VNoteRecordBar::sigPauseVoice,
             this, &VNoteMainWindow::onPlayPlugVoicePause);
-    connect(m_recordBar, &VNoteRecordBar::sigWidgetClose,
+    connect(m_recordBar, &VNoteRecordBar::sigStopVoice,
             this, &VNoteMainWindow::onPlayPlugVoiceStop);
     connect(m_recordBar, &VNoteRecordBar::sigDeviceExceptionMsgShow,
             this, &VNoteMainWindow::showDeviceExceptionErrMessage);
@@ -286,7 +290,7 @@ void VNoteMainWindow::initShortcuts()
     connect(m_stPlayorPause.get(), &QShortcut::activated, this, [this] {
         if (canDoShortcutAction())
         {
-            m_recordBar->playOrPauseVoice();
+            m_recordBar->playVoice(nullptr, true);
         }
     });
 
@@ -1562,47 +1566,43 @@ int VNoteMainWindow::loadSearchNotes(const QString &key)
  * @brief VNoteMainWindow::onRightViewVoicePlay
  * @param voiceData
  */
-void VNoteMainWindow::onRightViewVoicePlay(VNVoiceBlock *voiceData)
+void VNoteMainWindow::onRightViewVoicePlay(const VNVoiceBlock *block, const bool &bIsSame)
 {
     setSpecialStatus(PlayVoiceStart);
-    m_recordBar->playVoice(voiceData);
+    m_recordBar->setFocus();
+    m_recordBar->playVoice(block, bIsSame);
 }
 
-/**
- * @brief VNoteMainWindow::onRightViewVoicePause
- * @param voiceData
- */
-void VNoteMainWindow::onRightViewVoicePause(VNVoiceBlock *voiceData)
-{
-    m_recordBar->pauseVoice(voiceData);
-}
 
 /**
  * @brief VNoteMainWindow::onPlayPlugVoicePlay
  * @param voiceData
  */
-void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
+void VNoteMainWindow::onPlayPlugVoicePlay()
 {
-    ;
+    qDebug() << "voice play";
+    emit JsContent::instance()->callJsSetPlayStatus(0);
 }
 
 /**
  * @brief VNoteMainWindow::onPlayPlugVoicePause
  * @param voiceData
  */
-void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
+void VNoteMainWindow::onPlayPlugVoicePause()
 {
-    ;
+     qDebug() << "voice pause";
+     emit JsContent::instance()->callJsSetPlayStatus(1);
 }
 
 /**
  * @brief VNoteMainWindow::onPlayPlugVoiceStop
  * @param voiceData
  */
-void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
+void VNoteMainWindow::onPlayPlugVoiceStop()
 {
     setSpecialStatus(PlayVoiceEnd);
-
+    qDebug() << "voice stop";
+    emit JsContent::instance()->callJsSetPlayStatus(2);
 }
 
 /**
@@ -1656,7 +1656,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
 {
     switch (status) {
     case SearchStart:
-        if (!stateOperation->isSearching()) {
+        if (!stateOperation->isPlaying() && !stateOperation->isSearching()) {
             stateOperation->operState(OpsStateInterface::StateSearching, true);
             m_leftView->clearSelection();
             m_leftView->setEnabled(false);

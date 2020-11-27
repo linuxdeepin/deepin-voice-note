@@ -47,7 +47,7 @@ $('body').on('click', '.btn', function (e) {
     console.log('---->',bIsSame);
     console.log('cur json---->',jsonString);
 
-    webobj.jsCallPlayButton(jsonString, bIsSame, function (state) {
+    webobj.jsCallPlayVoice(jsonString, bIsSame, function (state) {
         curActiveVoiceBtn = curVoiceBtn;
 
         //item 
