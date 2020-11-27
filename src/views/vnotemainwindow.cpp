@@ -968,7 +968,24 @@ void VNoteMainWindow ::onA2TStartAgain()
  */
 void VNoteMainWindow::onA2TStart(bool first)
 {
-   ;
+    if(m_asrErrMeassage){
+        m_asrErrMeassage->setVisible(false);
+    }
+    VNVoiceBlock *voice = JsContent::instance()->getCurrentVoice();
+    if(voice && voice->blockText.isEmpty()){
+        if (voice->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
+            VNoteMessageDialog audioOutLimit(
+                        VNoteMessageDialog::AsrTimeLimit, this);
+
+            audioOutLimit.exec();
+        } else {
+            setSpecialStatus(VoiceToTextStart);
+            QTimer::singleShot(0, this, [this, voice]() {
+                m_a2tManager->startAsr(voice->voicePath, voice->voiceSize);
+            });
+        }
+
+    }
 }
 
 /**
@@ -977,6 +994,7 @@ void VNoteMainWindow::onA2TStart(bool first)
  */
 void VNoteMainWindow::onA2TError(int error)
 {
+    emit JsContent::instance()->callJsSetVoiceText("", 1);
     QString message = "";
     if (error == VNoteA2TManager::NetworkError) {
         message = DApplication::translate(
@@ -998,6 +1016,7 @@ void VNoteMainWindow::onA2TError(int error)
  */
 void VNoteMainWindow::onA2TSuccess(const QString &text)
 {
+    emit JsContent::instance()->callJsSetVoiceText(text, 1);
     setSpecialStatus(VoiceToTextEnd);
 }
 
@@ -1582,7 +1601,6 @@ void VNoteMainWindow::onRightViewVoicePlay(const VNVoiceBlock *block, const bool
  */
 void VNoteMainWindow::onPlayPlugVoicePlay()
 {
-    qDebug() << "voice play";
     emit JsContent::instance()->callJsSetPlayStatus(0);
 }
 
@@ -1592,7 +1610,6 @@ void VNoteMainWindow::onPlayPlugVoicePlay()
  */
 void VNoteMainWindow::onPlayPlugVoicePause()
 {
-     qDebug() << "voice pause";
      emit JsContent::instance()->callJsSetPlayStatus(1);
 }
 
@@ -1602,9 +1619,8 @@ void VNoteMainWindow::onPlayPlugVoicePause()
  */
 void VNoteMainWindow::onPlayPlugVoiceStop()
 {
-    setSpecialStatus(PlayVoiceEnd);
-    qDebug() << "voice stop";
     emit JsContent::instance()->callJsSetPlayStatus(2);
+    setSpecialStatus(PlayVoiceEnd);
 }
 
 /**
@@ -1664,6 +1680,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_leftView->setEnabled(false);
             m_addNotepadBtn->setVisible(false);
             m_addNoteBtn->setVisible(false);
+            emit JsContent::instance()->callJsSetVoiceText(DApplication::translate("VoiceNoteItem", "Converting voice to text"), 0);
         }
         break;
     case SearchEnd:

@@ -36,23 +36,28 @@ public:
     ~JsContent();
     static JsContent *instance();
     QVariant callJsSynchronous(QWebEnginePage *page, const QString &js);
+    VNVoiceBlock *getCurrentVoice();
 signals:
     void callJsInitData(const QString &jsonData);
     void callJsSetHtml(const QString &html);
     void callJsInsertVoice(const QString &jsonData);
     //设置播放状态，0,播放中，1暂停中，2.结束播放
     void callJsSetPlayStatus(int status);
+    //设置语音转文字结果，text为内容，flag 0 提示性文本（＂正在转文字中＂,１结果文本,空代表转失败了
+    void callJsSetVoiceText(const QString &text, int flag);
 
     void playVoice(const VNVoiceBlock *block, const bool &bIsSame);
 public slots:
     QString jsCallGetVoiceSize(const QString &millisecond);
     QString jsCallGetVoiceTime(const QString &time);
-    int jsCallPlayVoice(const QVariant &json, const bool &bIsSame);
+    int  jsCallPlayVoice(const QVariant &json, const bool &bIsSame);
+    //弹出语音操作选项
+    void jsCallPopVoiceMenu(const QVariant &json);
 private:
     QVariant m_synResult;
     QEventLoop m_synLoop;
     VNVoiceBlock *m_currentPlay {nullptr};
-    VNVoiceBlock *m_currentVoiceToText {nullptr};
+    VNVoiceBlock *m_currentVoice {nullptr};
 };
 
 #endif // JSCONTENT_H

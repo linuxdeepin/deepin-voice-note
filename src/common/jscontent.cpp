@@ -20,7 +20,7 @@
 */
 #include "jscontent.h"
 #include "globaldef.h"
-
+#include "common/actionmanager.h"
 #include "common/utils.h"
 #include "common/vnoteitem.h"
 #include "common/metadataparser.h"
@@ -46,9 +46,14 @@ JsContent::~JsContent()
     if(m_currentPlay){
         delete m_currentPlay;
     }
-    if(m_currentVoiceToText){
-        delete  m_currentVoiceToText;
+    if(m_currentVoice){
+        delete  m_currentVoice;
     }
+}
+
+VNVoiceBlock *JsContent::getCurrentVoice()
+{
+    return  m_currentVoice;
 }
 
 QString JsContent::jsCallGetVoiceSize(const QString &millisecond)
@@ -88,4 +93,14 @@ QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &js)
         m_synLoop.exec();
     }
     return m_synResult;
+}
+
+void JsContent::jsCallPopVoiceMenu(const QVariant &json)
+{
+    if(m_currentVoice == nullptr){
+        m_currentVoice = new VNVoiceBlock();
+    }
+    MetaDataParser dataParser;
+    dataParser.jsonParse(json,m_currentVoice);
+    ActionManager::Instance()->detialVoiceMenu()->exec(QCursor::pos());
 }

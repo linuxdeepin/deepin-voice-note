@@ -78,6 +78,11 @@ DMenu *ActionManager::detialContextMenu()
     return m_detialContextMenu.get();
 }
 
+DMenu *ActionManager::detialVoiceMenu()
+{
+    return  m_detialVoiceMenu.get();
+}
+
 /**
  * @brief ActionManager::getActionKind
  * @param action 菜单项
@@ -215,9 +220,7 @@ void ActionManager::initMenu()
 
     //Voice context menu
     QStringList noteDetailMenuTexts;
-    noteDetailMenuTexts << DApplication::translate("NoteDetailContextMenu", "Save as MP3")
-                        << DApplication::translate("NoteDetailContextMenu", "Voice to Text")
-                        << DApplication::translate("NoteDetailContextMenu", "Delete")
+    noteDetailMenuTexts << DApplication::translate("NoteDetailContextMenu", "Delete")
                         << DApplication::translate("NoteDetailContextMenu", "Select all")
                         << DApplication::translate("NoteDetailContextMenu", "Copy")
                         << DApplication::translate("NoteDetailContextMenu", "Cut")
@@ -244,6 +247,25 @@ void ActionManager::initMenu()
             }
         } else if (detailMenuIdStart == DetailPaste) {
             m_detialContextMenu->addSeparator();
+        }
+        detailMenuIdStart++;
+    }
+
+    QStringList noteDetailMenuVoiceTexts;
+    noteDetailMenuVoiceTexts << DApplication::translate("NoteDetailContextMenu", "Save as MP3")
+                            << DApplication::translate("NoteDetailContextMenu", "Voice to Text");
+    detailMenuIdStart = DetailVoiceSave;
+    m_detialVoiceMenu.reset(new DMenu());
+    for (auto it : noteDetailMenuVoiceTexts) {
+        QAction *pAction = new QAction(it, m_detialContextMenu.get());
+        pAction->setProperty(MenuId, detailMenuIdStart);
+
+        m_detialVoiceMenu->addAction(pAction);
+        m_actionsMap.insert(static_cast<ActionKind>(detailMenuIdStart), pAction);
+        if (!isAISrvAvailable) {
+            if (detailMenuIdStart == DetailVoice2Text) {
+                pAction->setVisible(false);
+            }
         }
         detailMenuIdStart++;
     }

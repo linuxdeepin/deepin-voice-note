@@ -62,9 +62,7 @@ public:
 
         //NoteDetail
         NoteDetailMenuBase,
-        DetailVoiceSave = NoteDetailMenuBase,
-        DetailVoice2Text,
-        DetailDelete,
+        DetailDelete = NoteDetailMenuBase,
         DetailSelectAll,
         DetailCopy,
         DetailCut,
@@ -74,6 +72,11 @@ public:
         DetailStopreading,
         DetailSpeech2Text,
         DetailTranslate,
+
+        //voice menu
+        DetailVoiceSave,
+        DetailVoice2Text,
+
         //Add NoteDetail menu item begin {
 
         //Add NoteDetail menu item end }
@@ -97,6 +100,8 @@ public:
     DMenu *noteContextMenu();
     //获取详情页右键菜单
     DMenu *detialContextMenu();
+    //获取详情页右键菜单
+    DMenu *detialVoiceMenu();
     //获取菜单项ID
     ActionKind getActionKind(QAction *action);
     //获取菜单项
@@ -117,6 +122,7 @@ protected:
     QScopedPointer<DMenu> m_notebookContextMenu;
     QScopedPointer<DMenu> m_noteContextMenu;
     QScopedPointer<DMenu> m_detialContextMenu;
+    QScopedPointer<DMenu> m_detialVoiceMenu;
 
     QMap<ActionKind, QAction *> m_actionsMap;
 };
