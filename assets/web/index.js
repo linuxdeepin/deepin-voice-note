@@ -13,7 +13,7 @@
 
 
 var webobj;    //js与qt通信对象
-var curActiveVoiceBtn;  //当前播放的语音对象
+var activeVoice;  //当前正操作的语音对象
 $('#summernote').summernote({
     height: 300,                 // set editor height
     minHeight: null,             // set minimum height of editor
@@ -29,7 +29,6 @@ $('body').on('click', '.li', function (e) {
     console.log('div click...');
     e.stopPropagation();
     $('.li').removeClass('active');
-    console.log('=======click...',$('.li'));
     $(this).addClass('active');
 })
 
@@ -37,32 +36,32 @@ $('body').on('click', '.li', function (e) {
 $('body').on('click', '.btn', function (e) {
     
     e.stopPropagation();
-    var curVoiceBtn = this;
     var curVoice = $(this).parents('.li:first');
-
-
     var jsonString = curVoice.attr('jsonKey');
-    var bIsSame = curVoiceBtn.isEqualNode(curActiveVoiceBtn);
-
-    console.log('---->',bIsSame);
-    console.log('cur json---->',jsonString);
-
+    var bIsSame = $(this).hasClass('active');
+    var curBtn = $(this);
+    $('.btn').removeClass('active');
+    activeVoice = curBtn;
+    activeVoice.addClass('active');
+    
     webobj.jsCallPlayVoice(jsonString, bIsSame, function (state) {
-        curActiveVoiceBtn = curVoiceBtn;
-
-        //item 
-        // toggleState(statse, bId)
+        //TODO 录音错误处理
     });
     //播放
 })
 
-//按钮切换状态 c++调用
-function toggleState(state, element) {
+//播放状态，0,播放中，1暂停中，2.结束播放
+function toggleState(state) {
+    console.log('========.');
     if (state == '0') {
         $('.btn').removeClass('pause').addClass('play');
-        element.removeClass('play').addClass('pause');
+        activeVoice.removeClass('play').addClass('pause');
     } else if (state == '1') {
-        element.removeClass('pause').addClass('play');
+        activeVoice.removeClass('pause').addClass('play');
+    }
+    else{
+        activeVoice.removeClass('pause').addClass('play');
+        $('.btn').removeClass('active');
     }
 }
 
@@ -169,7 +168,7 @@ new QWebChannel(qt.webChannelTransport,
         //例如 webobj.c++fun.connect(jsfun)
         webobj.callJsInitData.connect(initData);
         webobj.callJsInsertVoice.connect(insertVoiceItem);
-        // webobj.switchPlayBtn.connect(toggleState);
+        webobj.callJsSetPlayStatus.connect(toggleState);
         webobj.callJsSetHtml.connect(setHtml);
 })
 
