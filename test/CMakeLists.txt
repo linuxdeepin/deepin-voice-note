@@ -89,9 +89,6 @@ target_link_libraries(${PROJECT_NAME_TEST}
 
 ##------------------------------ 创建'make test'指令---------------------------------------
 add_custom_target(test
-)
-
-add_custom_command(TARGET test
     COMMAND echo " =================== TEST BEGIN ==================== "
     COMMAND ${CMAKE_BINARY_DIR}/test/${PROJECT_NAME_TEST}
     COMMAND echo " =================== TEST END ==================== "
