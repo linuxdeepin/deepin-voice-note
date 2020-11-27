@@ -290,7 +290,9 @@ void VNoteMainWindow::initShortcuts()
     connect(m_stPlayorPause.get(), &QShortcut::activated, this, [this] {
         if (canDoShortcutAction())
         {
-            m_recordBar->playVoice(nullptr, true);
+            if(stateOperation->isPlaying()){
+                m_recordBar->playVoice(nullptr, true);
+            }
         }
     });
 
