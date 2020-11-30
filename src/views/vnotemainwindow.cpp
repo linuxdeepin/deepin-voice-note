@@ -204,6 +204,8 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onMenuAbout2Show);
     connect(ActionManager::Instance()->detialContextMenu(), &DMenu::triggered,
             this, &VNoteMainWindow::onMenuAction);
+    connect(ActionManager::Instance()->detialVoiceMenu(), &DMenu::triggered,
+            this, &VNoteMainWindow::onMenuAction);
 }
 
 /**

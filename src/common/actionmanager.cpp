@@ -244,8 +244,7 @@ void ActionManager::initMenu()
         m_detialContextMenu->addAction(pAction);
         m_actionsMap.insert(static_cast<ActionKind>(detailMenuIdStart), pAction);
         if (!isAISrvAvailable) {
-            if (detailMenuIdStart == DetailVoice2Text
-                || detailMenuIdStart > DetailPaste) {
+            if (detailMenuIdStart > DetailPaste) {
                 pAction->setVisible(false);
             }
         } else if (detailMenuIdStart == DetailPaste) {
