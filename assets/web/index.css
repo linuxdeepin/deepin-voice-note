@@ -7,23 +7,23 @@
         user-select: none; */
         padding:0 30px;
     }
-    .mian{
+    /* .mian{
         width: 620px;
         margin: 100px auto;
         position: relative;
         height: 500px;
         overflow-y: auto;
-    }
-    .list{
+    } */
+    /* .list{ */
         /* width: 500px;
         height: 50px;
         background: red;    */
-    }
-    .item{
+    /* } */
+    /* .item{
         width: 100px;
         height: 30px;
         background: blue;
-    }
+    } */
     .demo{
         display: inline-block;
         text-align: center;
@@ -42,7 +42,6 @@
         background: rgba(0,0,0,0.05);
         min-height: 30px;
         border-radius: 8px;
-
     }
     #demo{
         width: 100%;
@@ -80,7 +79,7 @@
         justify-items: end;
         padding-top: 12px;
     }
-    .list{
+    /* .list{
         width: 100%;
         user-select: none;
     }
@@ -91,7 +90,7 @@
     }
     .list.active{
         background-color: aqua;
-    } 
+    }  */
     .minute{
         color:#8AA1B4;
         font-size:12px;
@@ -106,6 +105,12 @@
         color:#414D68;
         font-size:12px;
         line-height:17px;
+    }
+    .transBtn{
+        width: 40px;
+        height: 40px;
+        background-image:url(./light/more_hover.svg);
+        background-size: contain;
     }
     .padtop{
         padding-top: 6px;
