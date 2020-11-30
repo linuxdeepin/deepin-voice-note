@@ -20,6 +20,7 @@
 */
 #include "metadataparser.h"
 #include "vnoteitem.h"
+#include "common/utils.h"
 
 #include <DLog>
 
@@ -316,6 +317,7 @@ void MetaDataParser::jsonMakeMetadata(VNoteItem *noteData, QVariant &metaData)
                 noteItem.insert(m_jsonNodeNameMap[NVoiceSize], it->ptrVoice->voiceSize);
                 noteItem.insert(m_jsonNodeNameMap[NCreateTime],
                                 it->ptrVoice->createTime.toString(VNOTE_TIME_FMT));
+                noteItem.insert(m_jsonNodeNameMap[NFormatSize], Utils::formatMillisecond(it->ptrVoice->voiceSize));
             }
             noteDatas.append(noteItem);
             noteCount++;

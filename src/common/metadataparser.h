@@ -106,6 +106,7 @@ public:
         NVoiceSize,
         NCreateTime,
         NHtmlCode,
+        NFormatSize,
     };
 #endif
     //源数据解析
@@ -149,6 +150,7 @@ protected:
         {NVoiceSize, "voiceSize"},
         {NCreateTime, "createTime"},
         {NHtmlCode, "htmlCode"},
+        {NFormatSize, "transSize"},
     };
     //json串解析
     void jsonParse(QVariant &metaData, VNoteItem *noteData /*out*/);

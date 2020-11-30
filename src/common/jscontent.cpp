@@ -76,7 +76,6 @@ int JsContent::jsCallPlayVoice(const QVariant &json, const bool &bIsSame)
         MetaDataParser dataParser;
         dataParser.jsonParse(json,m_currentPlay);
     }
-    qDebug() << bIsSame;
     emit playVoice(m_currentPlay, bIsSame);
     return 1;
 
