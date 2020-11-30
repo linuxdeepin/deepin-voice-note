@@ -1682,7 +1682,6 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_leftView->setEnabled(false);
             m_addNotepadBtn->setVisible(false);
             m_addNoteBtn->setVisible(false);
-            emit JsContent::instance()->callJsSetVoiceText(DApplication::translate("VoiceNoteItem", "Converting voice to text"), 0);
         }
         break;
     case SearchEnd:
@@ -1753,6 +1752,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_leftView->closeMenu();
         m_middleView->closeMenu();
         //m_rightView->closeMenu();
+        emit JsContent::instance()->callJsSetVoiceText(DApplication::translate("VoiceNoteItem", "Converting voice to text"), 0);
         break;
     case VoiceToTextEnd:
         if (!stateOperation->isRecording() && !stateOperation->isPlaying()) {

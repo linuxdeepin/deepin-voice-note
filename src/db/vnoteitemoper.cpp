@@ -114,7 +114,7 @@ bool VNoteItemOper::updateNote()
         //Prepare meta data
         MetaDataParser metaParser;
 
-        metaParser.makeMetaData(m_note, m_note->metaDataRef());
+        metaParser.jsonMakeMetadata(m_note, m_note->metaDataRef());
 
         m_note->modifyTime = QDateTime::currentDateTime();
 
@@ -156,7 +156,7 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
     //Prepare meta data
     MetaDataParser metaParser;
     QVariant metaData;
-    metaParser.makeMetaData(&note, note.metaDataRef());
+    metaParser.jsonMakeMetadata(&note, note.metaDataRef());
 
     VNoteItem *newNote = new VNoteItem();
     AddNoteDbVisitor addNoteVisitor(VNoteDbManager::instance()->getVNoteDb(), &note, newNote);

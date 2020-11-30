@@ -26,29 +26,10 @@
 
 #include <QString>
 #include <QMap>
-#include <QXmlStreamReader>
-#include <QXmlStreamWriter>
+#include <QVariant>
 
 /*
 Eg: meta-data format
-
-    xml-format:
-
-    <?xml version="1.0" encoding="UTF-8"?>
-    <Note NoteElementsCount="3" VoiceMaxId="1">
-        <NoteItem NoteItemType="1">
-            <NoteText>I Love China</NoteText>
-        </NoteItem>
-        <NoteItem NoteItemType="2">;
-            <NoteVoicePath>/home/archermind/1.mp3</NoteVoicePath>
-            <NoteVoiceSize>1134556</NoteVoiceSize>
-            <NoteVoiceTitle>语音1</NoteVoiceTitle>
-            <NoteVoiceText></NoteVoiceText>
-            <NoteVoiceState>0</NoteVoiceState>
-            <NoteVoiceCreateTime>2020-02-27 10:21:55.528</NoteVoiceCreateTime>
-        </NoteItem>
-    </Note>
-
     //------------------------------------------------------------------------
     json-format:
 
@@ -77,23 +58,6 @@ class MetaDataParser
 {
 public:
     MetaDataParser();
-
-#ifdef VN_XML_METADATA_PARSER
-    enum {
-        NRootNode,
-        NVoiceMaxIdAttr,
-        NItemCountAttr,
-        NItemNode,
-        NItemTypeAttr,
-        NTextNode,
-        NVoicePathNode,
-        NVoiceSizeNode,
-        NVoiceTitleNode,
-        NVoiceCreateTimeNode,
-        NVoiceStateNode, // State: 1 for audio to text done, 0 for have not done
-        NVoiceTextNode,
-    };
-#elif defined(VN_JSON_METADATA_PARSER)
     enum {
         NDataCount,
         NVoiceMaxId,
@@ -108,36 +72,13 @@ public:
         NHtmlCode,
         NFormatSize,
     };
-#endif
     //源数据解析
-    void parse(QVariant &metaData, VNoteItem *noteData /*out*/);
     void jsonParse(const QVariant &metaData, VNoteBlock *blockData /*out*/);
+    void jsonParse(QVariant &metaData, VNoteItem *noteData /*out*/);
     //源数据生成
-    void makeMetaData(VNoteItem *noteData, QVariant &metaData /*out*/);
+    void jsonMakeMetadata(VNoteItem *noteData, QVariant &metaData /*out*/);
     void jsonMakeMetadata(VNoteBlock *blockData, QVariant &metaData /*out*/);
 protected:
-#ifdef VN_XML_METADATA_PARSER
-    const QMap<int, QString> m_xmlNodeNameMap = {
-        {NRootNode, "Note"},
-        {NVoiceMaxIdAttr, "VoiceMaxId"},
-        {NItemCountAttr, "NoteElementsCount"},
-        {NItemNode, "NoteItem"},
-        {NItemTypeAttr, "NoteItemType"},
-        {NTextNode, "NoteText"},
-        {NVoicePathNode, "NoteVoicePath"},
-        {NVoiceSizeNode, "NoteVoiceSize"},
-        {NVoiceTitleNode, "NoteVoiceTitle"},
-        {NVoiceCreateTimeNode, "NoteVoiceCreateTime"},
-        {NVoiceStateNode, "NoteVoiceState"},
-        {NVoiceTextNode, "NoteVoiceText"},
-    };
-
-    void xmlParse(const QVariant &metaData, VNoteItem *noteData /*out*/);
-    void xmlMakeMetadata(const VNoteItem *noteData, QVariant &metaData /*out*/);
-    void xmlParseRoot(QXmlStreamReader &xmlSRead, VNoteItem *noteData);
-    void xmlParseNoteItem(QXmlStreamReader &xmlSRead, VNoteItem *noteData /*out*/);
-
-#elif defined(VN_JSON_METADATA_PARSER)
     QMap<int, QString> m_jsonNodeNameMap = {
         {NDataCount, "dataCount"},
         {NVoiceMaxId, "voiceMaxId"},
@@ -152,11 +93,6 @@ protected:
         {NHtmlCode, "htmlCode"},
         {NFormatSize, "transSize"},
     };
-    //json串解析
-    void jsonParse(QVariant &metaData, VNoteItem *noteData /*out*/);
-    //json串生成
-    void jsonMakeMetadata(VNoteItem *noteData, QVariant &metaData /*out*/);
-#endif
 };
 
 #endif // METADATAPARSER_H
