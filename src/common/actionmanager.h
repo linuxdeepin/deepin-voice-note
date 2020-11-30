@@ -73,6 +73,8 @@ public:
         DetailSpeech2Text,
         DetailTranslate,
 
+        NoteDetailCtxMenuMax,
+
         //voice menu
         DetailVoiceSave,
         DetailVoice2Text,
@@ -80,7 +82,7 @@ public:
         //Add NoteDetail menu item begin {
 
         //Add NoteDetail menu item end }
-        NoteDetailMenuMax,
+        NoteDetailVoiceMenuMax,
 
         MenuMaxId
     };
@@ -92,6 +94,7 @@ public:
         NotebookCtxMenu,
         NoteCtxMenu,
         NoteDetailCtxMenu,
+        NoteDetailVoiceMenu,
     };
     Q_ENUM(MenuType)
     //获取记事本列表右键菜单

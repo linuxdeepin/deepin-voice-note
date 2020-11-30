@@ -157,7 +157,10 @@ void ActionManager::resetCtxMenu(ActionManager::MenuType type, bool enable)
         endMenuId = NoteMenuMax;
     } else if (MenuType::NoteDetailCtxMenu == type) {
         startMenuId = NoteDetailMenuBase;
-        endMenuId = NoteDetailMenuMax;
+        endMenuId = NoteDetailCtxMenuMax;
+    }else if (MenuType::NoteDetailCtxMenu == type) {
+        startMenuId = DetailVoiceSave;
+        endMenuId = NoteDetailVoiceMenuMax;
     }
 
     QAction *pAction = nullptr;
