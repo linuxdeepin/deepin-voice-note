@@ -1321,6 +1321,7 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         m_webView->triggerPageAction(QWebEnginePage::Cut);
         break;
     case ActionManager::DetailVoiceSave:
+        m_webView->saveMp3();
         break;
     case ActionManager::DetailText2Speech:
         VTextSpeechAndTrManager::onTextToSpeech();

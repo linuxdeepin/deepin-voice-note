@@ -174,3 +174,32 @@ void WebEngineView::contextMenuEvent(QContextMenuEvent *e)
     m_noteDetailContextMenu->exec(QCursor::pos());
 
 }
+
+void WebEngineView::saveMp3()
+{
+     VNVoiceBlock * block = m_jsContent->getCurrentVoice();
+     if(block){
+         DFileDialog dialog;
+         dialog.setFileMode(DFileDialog::DirectoryOnly);
+
+         dialog.setLabelText(DFileDialog::Accept, DApplication::translate("RightView", "Save"));
+         dialog.setNameFilter("MP3(*.mp3)");
+         QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
+         if (historyDir.isEmpty()) {
+             historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+         }
+         dialog.setDirectory(historyDir);
+         if (QDialog::Accepted == dialog.exec()) {
+             // save the directory string to config file.
+             setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
+
+             QString exportDir = dialog.directoryUrl().toLocalFile();
+
+             ExportNoteWorker *exportWorker = new ExportNoteWorker(
+                 exportDir, ExportNoteWorker::ExportOneVoice, m_noteData, block);
+             exportWorker->setAutoDelete(true);
+
+             QThreadPool::globalInstance()->start(exportWorker);
+         }
+     }
+}

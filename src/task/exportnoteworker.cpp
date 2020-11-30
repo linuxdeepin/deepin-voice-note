@@ -161,7 +161,7 @@ int ExportNoteWorker::exportOneVoice(VNoteBlock *noteblock)
 
     if (noteblock && noteblock->blockType == VNoteBlock::Voice) {
         QFileInfo targetFile(noteblock->ptrVoice->voicePath);
-        QString destFileName = m_exportPath + "/" + noteblock->ptrVoice->voiceTitle + "-" + targetFile.fileName();
+        QString destFileName = m_exportPath + "/" + targetFile.fileName();
         QFile::copy(noteblock->ptrVoice->voicePath, destFileName);
     } else {
         error = NoteInvalid;

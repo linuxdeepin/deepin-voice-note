@@ -44,6 +44,7 @@ public:
     void initData(VNoteItem *data, QString reg, bool fouse = false);
     void insertVoiceItem(const QString &voicePath, qint64 voiceSize);
     void updateNote();
+    void saveMp3();
 signals:
     void synComplete();
 public slots:
