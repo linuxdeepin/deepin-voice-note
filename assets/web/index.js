@@ -44,18 +44,31 @@ var h5Tpl  = `
 </div>`;
 
 var webobj;    //js与qt通信对象
-var activeVoice;  //当前正操作的语音对象
-var activeTransVoice; 
+var activeVoice = null;  //当前正操作的语音对象
+var activeTransVoice = null;
+var initFinish = false; 
 
+//设置默认焦点， 不可拖拽， 
 $('#summernote').summernote({
-    // height: 300,                 // set editor height
     minHeight: null,             // set minimum height of editor
     maxHeight: null,             // set maximum height of editor
     focus: true,                  // set focus to editable area after initializin
     // airMode: true,
     disableDragAndDrop: true,
     shortcuts:false,
-}); 
+});
+
+//设置全屏模式
+$('#summernote').summernote('fullscreen.toggle');
+
+//捕捉change事件
+$('#summernote').on('summernote.change', function(we, contents, $editable) {
+    if (webobj && initFinish)
+    {
+        console.log('---------->change');
+        webobj.jsCallTxtChange();
+    }
+});
 
 //点击变色
 $('body').on('click', '.li', function (e) {
@@ -67,7 +80,7 @@ $('body').on('click', '.li', function (e) {
 
 //播放
 $('body').on('click', '.btn', function (e) {
-    
+    console.log('------playBtn click...');
     e.stopPropagation();
     var curVoice = $(this).parents('.li:first');
     var jsonString = curVoice.attr('jsonKey');
@@ -84,7 +97,8 @@ $('body').on('click', '.btn', function (e) {
 
 //语音转文字按钮
 $('body').on('click', '.transBtn', function (e) {
-    console.log('------trans click...');
+    console.log('------transBtn click...');
+    e.stopPropagation();
     var jsonString = $(this).parents('.li:first').attr('jsonKey');
     webobj.jsCallPopVoiceMenu(jsonString);
     activeTransVoice = $(this).parents('.li:first');
@@ -92,7 +106,6 @@ $('body').on('click', '.transBtn', function (e) {
 
 //播放状态，0,播放中，1暂停中，2.结束播放
 function toggleState(state) {
-    console.log('========.');
     if (state == '0') {
         $('.btn').removeClass('pause').addClass('play');
         activeVoice.removeClass('play').addClass('pause');
@@ -101,8 +114,11 @@ function toggleState(state) {
     }
     else{
         activeVoice.removeClass('pause').addClass('play');
-        $('.btn').removeClass('now');
+        activeVoice.removeClass('now');
+        activeVoice = null;
     }
+
+    enableSummerNote();
 }
 
 function getHtml(){
@@ -120,12 +136,16 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsSetPlayStatus.connect(toggleState);
         webobj.callJsSetHtml.connect(setHtml);
         webobj.callJsSetVoiceText.connect(setVoiceText);
-})
+
+
+        
+    }
+)
 
 //初始化数据 
 function initData(text) {
+    console.log('=============>',text);
     var arr = JSON.parse(text);
-    console.log('=============>',arr);
     var html = '';
     var voiceHtml;
     var txtHtml;
@@ -152,6 +172,7 @@ function initData(text) {
     })
 
     $('#summernote').summernote('code', html);
+    initFinish = true;
 }
 
 //录音插入数据
@@ -166,6 +187,7 @@ function insertVoiceItem(text) {
 function setHtml(html){
     console.log('--setHtml---',html);
     $('#summernote').summernote('code',html);
+    initFinish = true;
 }
 
 //设置录音转文字内容 flag: 0: 转换过程中 提示性文本（＂正在转文字中＂)１:结果 文本,空代表转失败了
@@ -176,16 +198,18 @@ function setVoiceText(text,flag){
     {
         if (flag)
         {
-            if(!text) return;
-        activeTransVoice.find('.translate').html('<div>'+text+'</div>');
+            activeTransVoice.find('.translate').html('<div>'+text+'</div>');
+            activeTransVoice = null;
         }
         else
         {
             activeTransVoice.find('.translate').html('<p class="noselect">'+text+'</p>');
         }
     }
+    enableSummerNote();
 }
 
+//json串拼接成对应html串
 function transHtml(json){
     //将json内容当其属性与标签绑定
     var strItem = JSON.stringify(json);
@@ -193,4 +217,16 @@ function transHtml(json){
     var template = Handlebars.compile(h5Tpl);
     var retHtml =  template(json);
     return retHtml;
+}
+
+//设置summerNote编辑状态 
+function enableSummerNote(){
+    if (activeVoice || activeTransVoice)
+    {
+        $('#summernote').summernote('disable');
+    }
+    else
+    {
+        $('#summernote').summernote('enable');
+    }
 }

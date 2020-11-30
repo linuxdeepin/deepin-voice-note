@@ -43,10 +43,10 @@ JsContent *JsContent::instance()
 
 JsContent::~JsContent()
 {
-    if(m_currentPlay){
+    if (m_currentPlay) {
         delete m_currentPlay;
     }
-    if(m_currentVoice){
+    if (m_currentVoice) {
         delete  m_currentVoice;
     }
 }
@@ -69,12 +69,12 @@ QString JsContent::jsCallGetVoiceTime(const QString &time)
 
 int JsContent::jsCallPlayVoice(const QVariant &json, const bool &bIsSame)
 {
-    if(m_currentPlay == nullptr){
+    if (m_currentPlay == nullptr) {
         m_currentPlay = new VNVoiceBlock();
     }
-    if(!bIsSame){
+    if (!bIsSame) {
         MetaDataParser dataParser;
-        dataParser.jsonParse(json,m_currentPlay);
+        dataParser.jsonParse(json, m_currentPlay);
     }
     emit playVoice(m_currentPlay, bIsSame);
     return 1;
@@ -96,10 +96,15 @@ QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &js)
 
 void JsContent::jsCallPopVoiceMenu(const QVariant &json)
 {
-    if(m_currentVoice == nullptr){
+    if (m_currentVoice == nullptr) {
         m_currentVoice = new VNVoiceBlock();
     }
     MetaDataParser dataParser;
-    dataParser.jsonParse(json,m_currentVoice);
+    dataParser.jsonParse(json, m_currentVoice);
     ActionManager::Instance()->detialVoiceMenu()->exec(QCursor::pos());
+}
+
+void JsContent::jsCallTxtChange()
+{
+
 }

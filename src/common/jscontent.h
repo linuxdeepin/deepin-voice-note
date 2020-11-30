@@ -53,6 +53,7 @@ public slots:
     int  jsCallPlayVoice(const QVariant &json, const bool &bIsSame);
     //弹出语音操作选项
     void jsCallPopVoiceMenu(const QVariant &json);
+    void jsCallTxtChange();
 private:
     QVariant m_synResult;
     QEventLoop m_synLoop;
