@@ -50,6 +50,7 @@ var initFinish = false;
 
 //设置默认焦点， 不可拖拽， 
 $('#summernote').summernote({
+    height: 500,
     minHeight: null,             // set minimum height of editor
     maxHeight: null,             // set maximum height of editor
     focus: true,                  // set focus to editable area after initializin
@@ -59,7 +60,7 @@ $('#summernote').summernote({
 });
 
 //设置全屏模式
-$('#summernote').summernote('fullscreen.toggle');
+// $('#summernote').summernote('fullscreen.toggle');
 
 //捕捉change事件
 $('#summernote').on('summernote.change', function(we, contents, $editable) {
@@ -125,6 +126,19 @@ function getHtml(){
     return $('#summernote').summernote('code');
 }
 
+function getAllNote(){
+    var noteList = $('.li');
+    var retJson = {};
+    var jsonArray = [];
+    var jsonString;
+    noteList.forEach((obj,index) =>{
+        jsonString = obj.attr('jsonKey');
+        jsonArray.push(jsonString);
+    })
+    retJson.noteDatas = jsonArray;
+    return retJson;
+}
+
 new QWebChannel(qt.webChannelTransport,
     function (channel) {
         console.log('qt.webChannelTransport....');
@@ -136,14 +150,12 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsSetPlayStatus.connect(toggleState);
         webobj.callJsSetHtml.connect(setHtml);
         webobj.callJsSetVoiceText.connect(setVoiceText);
-
-
-        
     }
 )
 
 //初始化数据 
 function initData(text) {
+    initFinish = false;
     console.log('=============>',text);
     var arr = JSON.parse(text);
     var html = '';
@@ -185,6 +197,7 @@ function insertVoiceItem(text) {
 
 //设置整个html内容
 function setHtml(html){
+    initFinish = false;
     console.log('--setHtml---',html);
     $('#summernote').summernote('code',html);
     initFinish = true;
@@ -198,7 +211,14 @@ function setVoiceText(text,flag){
     {
         if (flag)
         {
-            activeTransVoice.find('.translate').html('<div>'+text+'</div>');
+            if (text)
+            {
+                activeTransVoice.find('.translate').html('<div>'+text+'</div>');
+            }
+            else
+            {
+                activeTransVoice.find('.translate').html('');
+            }
             activeTransVoice = null;
         }
         else
