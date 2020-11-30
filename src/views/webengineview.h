@@ -53,7 +53,6 @@ private:
     void init();
     bool m_textChange {false};
     VNoteItem *m_noteData {nullptr};
-    VNoteItem *m_noteTmp {nullptr};
     QWebChannel *m_channel {nullptr};
     QTimer *m_updateTimer {nullptr};
     DMenu  *m_noteDetailContextMenu{nullptr};

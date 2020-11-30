@@ -68,6 +68,29 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteBlock *blockData)
     }
 }
 
+void MetaDataParser::jsonMakeMetadata(VNoteBlock *blockData, QVariant &metaData)
+{
+    QJsonDocument noteDoc;
+    QJsonObject note;
+    int noteType = blockData->getType();
+    if (VNoteBlock::InValid != noteType) {
+        note.insert(m_jsonNodeNameMap[NDataType], blockData->getType());
+        if (VNoteBlock::Text == noteType) {
+            note.insert(m_jsonNodeNameMap[NText], blockData->ptrText->blockText);
+        } else if (VNoteBlock::Voice == noteType) {
+            note.insert(m_jsonNodeNameMap[NText], blockData->ptrVoice->blockText);
+            note.insert(m_jsonNodeNameMap[NTitle], blockData->ptrVoice->voiceTitle);
+            note.insert(m_jsonNodeNameMap[NState], blockData->ptrVoice->state);
+            note.insert(m_jsonNodeNameMap[NVoicePath], blockData->ptrVoice->voicePath);
+            note.insert(m_jsonNodeNameMap[NVoiceSize], blockData->ptrVoice->voiceSize);
+            note.insert(m_jsonNodeNameMap[NCreateTime],
+                            blockData->ptrVoice->createTime.toString(VNOTE_TIME_FMT));
+            note.insert(m_jsonNodeNameMap[NFormatSize], Utils::formatMillisecond(blockData->ptrVoice->voiceSize));
+        }
+    }
+    noteDoc.setObject(note);
+    metaData = noteDoc.toJson(QJsonDocument::Compact);
+}
 /**
  * @brief MetaDataParser::makeMetaData
  * @param noteData 数据源
