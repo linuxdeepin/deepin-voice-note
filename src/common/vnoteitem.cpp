@@ -69,12 +69,19 @@ bool VNoteItem::search(const QString &keyword)
     if (noteTitle.contains(keyword, Qt::CaseInsensitive)) {
         fContainKeyword = true;
     } else {
+        if(!htmlCode.isEmpty()){
+            QTextDocument doc;
+            doc.setHtml(htmlCode);
+            fContainKeyword = doc.toPlainText().contains(keyword, Qt::CaseInsensitive);
+        }
         //Need search data blocks in note
-        for (auto it : datas.datas) {
-            if (VNoteBlock::Text == it->getType()) {
-                if (it->blockText.contains(keyword, Qt::CaseInsensitive)) {
-                    fContainKeyword = true;
-                    break;
+        else {
+            for (auto it : datas.datas) {
+                if (VNoteBlock::Text == it->getType()) {
+                    if (it->blockText.contains(keyword, Qt::CaseInsensitive)) {
+                        fContainKeyword = true;
+                        break;
+                    }
                 }
             }
         }

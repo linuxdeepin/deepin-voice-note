@@ -767,13 +767,12 @@ void VNoteMainWindow::onVNoteSearch()
     if (m_noteSearchEdit->lineEdit()->hasFocus()) {
         QString text = m_noteSearchEdit->text();
         if (!text.isEmpty()) {
-            //setSpecialStatus(SearchStart);
+            setSpecialStatus(SearchStart);
             m_searchKey = text;
-//            loadSearchNotes(m_searchKey);
+            loadSearchNotes(m_searchKey);
         } else {
-            //setSpecialStatus(SearchEnd);
+            setSpecialStatus(SearchEnd);
         }
-        m_webView->findText(text);
     }
 }
 
@@ -1576,7 +1575,7 @@ int VNoteMainWindow::loadSearchNotes(const QString &key)
         noteAll->lock.unlock();
         if (m_middleView->rowCount() == 0) {
             m_middleView->setVisibleEmptySearch(true);
-            //m_rightView->initData(nullptr, m_searchKey);
+            m_webView->initData(nullptr, m_searchKey);
             m_recordBar->setVisible(false);
         } else {
             m_middleView->setVisibleEmptySearch(false);
@@ -1702,7 +1701,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_recordBar->setVisible(true);
         }
         stateOperation->operState(OpsStateInterface::StatePlaying, true);
-       // m_noteSearchEdit->setEnabled(false);
+        m_noteSearchEdit->setEnabled(false);
         m_leftView->setOnlyCurItemMenuEnable(true);
         m_addNotepadBtn->setEnabled(false);
         m_middleView->setOnlyCurItemMenuEnable(true);
@@ -1713,7 +1712,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_recordBar->setVisible(false);
         }
         if (!stateOperation->isVoice2Text()) {
-          //  m_noteSearchEdit->setEnabled(true);
+            m_noteSearchEdit->setEnabled(true);
             m_leftView->setOnlyCurItemMenuEnable(false);
             m_addNotepadBtn->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);

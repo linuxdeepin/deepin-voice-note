@@ -58,18 +58,20 @@ void WebEngineView::init()
     });
     m_updateTimer->setInterval(1000);
     m_jsContent = JsContent::instance();
+    connect(m_jsContent, &JsContent::textChange, this, [=]{
+       m_textChange = true;
+    });
     m_channel = new QWebChannel(this);
     m_channel->registerObject("webobj", m_jsContent);
     page()->setWebChannel(m_channel);
     const QFileInfo info(webPage);
     load(QUrl::fromLocalFile(info.absoluteFilePath()));
-    //setContextMenuPolicy(Qt::NoContextMenu);
     m_noteDetailContextMenu = ActionManager::Instance()->detialContextMenu();
 }
 
 void WebEngineView::updateNote()
 {
-    if (/*m_textChange &&*/ m_noteData) {
+    if (m_textChange && m_noteData) {
         QVariant result = m_jsContent->callJsSynchronous(page(),"getHtml()");
         if(result.isValid()){
             m_noteData->htmlCode = result.toString();
@@ -85,12 +87,12 @@ void WebEngineView::updateNote()
 
 void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
 {
+    //m_updateTimer->stop();
+    updateNote();
     if (data == nullptr) {
         this->setVisible(false);
         return;
     }
-    //m_updateTimer->stop();
-    updateNote();
     m_noteData = data;
     this->setVisible(true);
     if (data->htmlCode.isEmpty()) {
@@ -99,6 +101,7 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
         emit m_jsContent->callJsSetHtml(data->htmlCode);
     }
     //m_updateTimer->start();
+    findText(reg);
 }
 
 void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)

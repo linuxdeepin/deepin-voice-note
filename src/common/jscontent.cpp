@@ -25,6 +25,7 @@
 #include "common/vnoteitem.h"
 #include "common/metadataparser.h"
 #include "db/vnoteitemoper.h"
+#include "common/opsstateinterface.h"
 
 static JsContent *jsContentInstance = nullptr;
 
@@ -101,10 +102,12 @@ void JsContent::jsCallPopVoiceMenu(const QVariant &json)
     }
     MetaDataParser dataParser;
     dataParser.jsonParse(json, m_currentVoice);
+    bool enable = !OpsStateInterface::instance()->isVoice2Text() && m_currentVoice->blockText.isEmpty();
+    ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, enable);
     ActionManager::Instance()->detialVoiceMenu()->exec(QCursor::pos());
 }
 
 void JsContent::jsCallTxtChange()
 {
-
+    emit textChange();
 }

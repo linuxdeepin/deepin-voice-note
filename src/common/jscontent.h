@@ -47,6 +47,7 @@ signals:
     void callJsSetVoiceText(const QString &text, int flag);
 
     void playVoice(const VNVoiceBlock *block, const bool &bIsSame);
+    void textChange();
 public slots:
     QString jsCallGetVoiceSize(const QString &millisecond);
     QString jsCallGetVoiceTime(const QString &time);
