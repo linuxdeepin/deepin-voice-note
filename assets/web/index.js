@@ -83,17 +83,18 @@ $('body').on('click', '.li', function (e) {
 $('body').on('click', '.btn', function (e) {
     console.log('------playBtn click...');
     e.stopPropagation();
-    var curVoice = $(this).parents('.li:first');
-    var jsonString = curVoice.attr('jsonKey');
-    var bIsSame = $(this).hasClass('now');
-    var curBtn = $(this);
-    $('.btn').removeClass('now');
-    activeVoice = curBtn;
-    activeVoice.addClass('now');
+    getAllNote();
+    // var curVoice = $(this).parents('.li:first');
+    // var jsonString = curVoice.attr('jsonKey');
+    // var bIsSame = $(this).hasClass('now');
+    // var curBtn = $(this);
+    // $('.btn').removeClass('now');
+    // activeVoice = curBtn;
+    // activeVoice.addClass('now');
     
-    webobj.jsCallPlayVoice(jsonString, bIsSame, function (state) {
-        //TODO 录音错误处理
-    });
+    // webobj.jsCallPlayVoice(jsonString, bIsSame, function (state) {
+    //     //TODO 录音错误处理
+    // });
 })
 
 //语音转文字按钮
@@ -122,20 +123,22 @@ function toggleState(state) {
     enableSummerNote();
 }
 
+//获取整个Html串
 function getHtml(){
     return $('#summernote').summernote('code');
 }
 
+//获取当前所有的语音列表
 function getAllNote(){
-    var noteList = $('.li');
-    var retJson = {};
+    var jsonObj = {};
     var jsonArray = [];
     var jsonString;
-    noteList.forEach((obj,index) =>{
-        jsonString = obj.attr('jsonKey');
-        jsonArray.push(jsonString);
+    $('.li').each(function() {
+        jsonString = $(this).attr('jsonKey');
+        jsonArray[jsonArray.length] = jsonString;     
     })
-    retJson.noteDatas = jsonArray;
+    jsonObj.noteDatas = jsonArray;
+    var retJson = JSON.stringify(jsonObj);
     return retJson;
 }
 
