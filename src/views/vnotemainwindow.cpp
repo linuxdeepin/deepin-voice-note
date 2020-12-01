@@ -151,8 +151,8 @@ void VNoteMainWindow::initConnections()
     connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
             this, SLOT(onVNoteChange(const QModelIndex &)));
 
-//    connect(m_rightView, &RightView::contentChanged,
-//            m_middleView, &MiddleView::onNoteChanged);
+    connect(m_webView, &WebEngineView::contentChanged,
+            m_middleView, &MiddleView::onNoteChanged);
 
 //    connect(m_rightView, &RightView::sigVoicePlay,
 //            this, &VNoteMainWindow::onRightViewVoicePlay);

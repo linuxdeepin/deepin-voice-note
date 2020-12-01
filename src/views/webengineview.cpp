@@ -59,7 +59,11 @@ void WebEngineView::init()
     m_updateTimer->setInterval(1000);
     m_jsContent = JsContent::instance();
     connect(m_jsContent, &JsContent::textChange, this, [=]{
-       m_textChange = true;
+        if(m_textChange == false && m_noteData){
+            m_textChange = true;
+            m_noteData->modifyTime = QDateTime::currentDateTime();
+            emit contentChanged();
+        }
     });
     m_channel = new QWebChannel(this);
     m_channel->registerObject("webobj", m_jsContent);

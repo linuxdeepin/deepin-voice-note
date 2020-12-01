@@ -46,7 +46,7 @@ public:
     void updateNote();
     void saveMp3();
 signals:
-    void synComplete();
+    void contentChanged();
 public slots:
 protected:
      void contextMenuEvent(QContextMenuEvent*e ) override;
