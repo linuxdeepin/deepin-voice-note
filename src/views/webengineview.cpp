@@ -53,7 +53,7 @@ WebEngineView::WebEngineView(QWidget *parent) :
 void WebEngineView::init()
 {
     m_updateTimer = new QTimer(this);
-    connect(m_updateTimer, &QTimer::timeout, this, [=]{
+    connect(m_updateTimer, &QTimer::timeout, this, [ = ] {
         updateNote();
     });
     m_updateTimer->setInterval(1000);
@@ -116,7 +116,7 @@ void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
     data->ptrVoice->createTime = QDateTime::currentDateTime();
 
     int index = voicePath.lastIndexOf('/');
-    data->ptrVoice->voiceTitle = data->ptrVoice->voicePath.right(voicePath.length() - index -1);
+    data->ptrVoice->voiceTitle = data->ptrVoice->voicePath.right(voicePath.length() - index - 1);
 
     MetaDataParser parse;
     QVariant value;
@@ -125,6 +125,7 @@ void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
     data = nullptr;
 
     qInfo() << value.toString();
+    this->setFocus();
     emit m_jsContent->callJsInsertVoice(value.toString());
 }
 
@@ -152,10 +153,10 @@ void WebEngineView::contextMenuEvent(QContextMenuEvent *e)
     bool canCut = flags.testFlag(QWebEngineContextMenuData::CanCut);
     bool canPaste = flags.testFlag(QWebEngineContextMenuData::CanPaste);
     bool canSelectAll = flags.testFlag(QWebEngineContextMenuData::CanSelectAll);
-    if(canSelectAll){
+    if (canSelectAll) {
         ActionManager::Instance()->enableAction(ActionManager::DetailSelectAll, canSelectAll);
     }
-    if(canCopy){
+    if (canCopy) {
         ActionManager::Instance()->enableAction(ActionManager::DetailCopy, canCopy);
         if (isAISrvAvailable) {
             if (VTextSpeechAndTrManager::getTransEnable()) {
@@ -166,17 +167,17 @@ void WebEngineView::contextMenuEvent(QContextMenuEvent *e)
             }
         }
     }
-    if(canCut){
+    if (canCut) {
         ActionManager::Instance()->enableAction(ActionManager::DetailCut, true);
     }
-    if(canDelete){
+    if (canDelete) {
         ActionManager::Instance()->enableAction(ActionManager::DetailDelete, true);
     }
-    if(canPaste){
-       ActionManager::Instance()->enableAction(ActionManager::DetailPaste, true);
-       if (isAISrvAvailable && VTextSpeechAndTrManager::getSpeechToTextEnable()) {
-           ActionManager::Instance()->enableAction(ActionManager::DetailSpeech2Text, true);
-       }
+    if (canPaste) {
+        ActionManager::Instance()->enableAction(ActionManager::DetailPaste, true);
+        if (isAISrvAvailable && VTextSpeechAndTrManager::getSpeechToTextEnable()) {
+            ActionManager::Instance()->enableAction(ActionManager::DetailSpeech2Text, true);
+        }
     }
     m_noteDetailContextMenu->exec(QCursor::pos());
 
@@ -184,29 +185,29 @@ void WebEngineView::contextMenuEvent(QContextMenuEvent *e)
 
 void WebEngineView::saveMp3()
 {
-     VNVoiceBlock * block = m_jsContent->getCurrentVoice();
-     if(block){
-         DFileDialog dialog;
-         dialog.setFileMode(DFileDialog::DirectoryOnly);
+    VNVoiceBlock *block = m_jsContent->getCurrentVoice();
+    if (block) {
+        DFileDialog dialog;
+        dialog.setFileMode(DFileDialog::DirectoryOnly);
 
-         dialog.setLabelText(DFileDialog::Accept, DApplication::translate("RightView", "Save"));
-         dialog.setNameFilter("MP3(*.mp3)");
-         QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
-         if (historyDir.isEmpty()) {
-             historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-         }
-         dialog.setDirectory(historyDir);
-         if (QDialog::Accepted == dialog.exec()) {
-             // save the directory string to config file.
-             setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
+        dialog.setLabelText(DFileDialog::Accept, DApplication::translate("RightView", "Save"));
+        dialog.setNameFilter("MP3(*.mp3)");
+        QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
+        if (historyDir.isEmpty()) {
+            historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+        }
+        dialog.setDirectory(historyDir);
+        if (QDialog::Accepted == dialog.exec()) {
+            // save the directory string to config file.
+            setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
 
-             QString exportDir = dialog.directoryUrl().toLocalFile();
+            QString exportDir = dialog.directoryUrl().toLocalFile();
 
-             ExportNoteWorker *exportWorker = new ExportNoteWorker(
-                 exportDir, ExportNoteWorker::ExportOneVoice, m_noteData, block);
-             exportWorker->setAutoDelete(true);
+            ExportNoteWorker *exportWorker = new ExportNoteWorker(
+                exportDir, ExportNoteWorker::ExportOneVoice, m_noteData, block);
+            exportWorker->setAutoDelete(true);
 
-             QThreadPool::globalInstance()->start(exportWorker);
-         }
-     }
+            QThreadPool::globalInstance()->start(exportWorker);
+        }
+    }
 }
