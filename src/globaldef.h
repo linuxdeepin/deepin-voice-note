@@ -33,6 +33,9 @@
 //LeftView width
 #define VNOTE_LEFTVIEW_W 200
 
+//FolderSelectDialog Width
+#define VNOTE_SELECTDIALOG_W 448
+
 //MiddleView width
 #define VNOTE_MIDDLEVIEW_W 260
 

@@ -21,6 +21,7 @@
 #include "folderselectdialog.h"
 #include "views/leftviewdelegate.h"
 #include "views/leftviewsortfilter.h"
+#include "globaldef.h"
 
 #include <QVBoxLayout>
 #include <QDebug>
@@ -198,12 +199,16 @@ void FolderSelectDialog::initUI()
     titleLayout->setSpacing(0);
     titleLayout->setContentsMargins(10, 0, 0, 0);
     titleLayout->addStretch();
+    //多选-自动截断提示长度
+    titleLayout->addSpacing(m_closeButton->width()/3);
+
     titleLayout->addWidget(m_labMove, 0, Qt::AlignCenter | Qt::AlignVCenter);
     titleLayout->addStretch();
     titleLayout->addWidget(m_closeButton, 0, Qt::AlignRight | Qt::AlignVCenter);
 
     m_noteInfo = new DLabel(this);
-    m_noteInfo->setFixedWidth(165);
+    //长度不超过视图宽度
+    m_noteInfo->setFixedWidth(VNOTE_SELECTDIALOG_W - 20);
     //初始化标题与提示字体颜色
     bool isDark = DGuiApplicationHelper::instance()->themeType()==DGuiApplicationHelper::DarkType?true:false;
     refreshTextColor(isDark);
@@ -245,7 +250,14 @@ void FolderSelectDialog::initUI()
     viewFrame->setAttribute(Qt::WA_TranslucentBackground, true);
 
     mainLayout->addLayout(titleLayout);
-    mainLayout->addWidget(m_noteInfo, 0, Qt::AlignHCenter | Qt::AlignVCenter);
+    //解决提示内容不居中问题
+    QHBoxLayout *noteInfoLayout = new QHBoxLayout();
+    noteInfoLayout->addStretch();
+    noteInfoLayout->addWidget(m_noteInfo, Qt::AlignHCenter);
+    noteInfoLayout->addSpacing(10);
+    noteInfoLayout->addStretch();
+//    mainLayout->addWidget(m_noteInfo, 0, Qt::AlignCenter);
+    mainLayout->addLayout(noteInfoLayout,0);
     mainLayout->addSpacing(10);
     mainLayout->addWidget(viewFrame, 1);
     mainLayout->addSpacing(10);
@@ -325,6 +337,8 @@ void FolderSelectDialog::refreshTextColor(bool dark){
  */
 void FolderSelectDialog::setNoteContext(const QString &text)
 {
+    //多选-自动截断提示长度
+    m_noteInfo->setAlignment(Qt::AlignCenter);
     m_noteInfo->setText(text);
 }
 

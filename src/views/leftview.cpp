@@ -568,20 +568,36 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
     if (src.size()) {
         VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(src[0]));
         QString elideText = data->noteTitle;
-        int textSize = fontMetrics().width(elideText);
-        if (textSize > 147) {
-            elideText = fontMetrics().elidedText(data->noteTitle, Qt::ElideRight, 147);
-        }
         QString itemInfo = "";
+        //多选-自动截断提示长度
+        QFontMetrics fontMetric(this->font());
+        QString notesName = "";
+        QString currentStr = "";
+        int curWidth = 0;
+        int constantWidth = fontMetric.width(DApplication::translate("LeftView", "Move the note \"  \" to:"))
+                +fontMetric.width("...");
+        for (auto str : elideText) {
+            if (str == "\t") {
+                curWidth  += fontMetric.width("a");
+            } else {
+                curWidth  += fontMetric.width(str);
+            }
+            currentStr += str;
+            if (curWidth > VNOTE_SELECTDIALOG_W-23-constantWidth) {
+                notesName = currentStr.append("...");
+                break;
+            }
+            notesName = currentStr;
+        }
         if(src.size() == 1){
-           itemInfo = DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(elideText);
+           itemInfo = DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(notesName);
         }else {
-           itemInfo = DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg(elideText).arg(src.size());
+           itemInfo = DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg(notesName).arg(src.size());
         }
 
         if (m_folderSelectDialog == nullptr) {
             m_folderSelectDialog = new FolderSelectDialog(m_pDataModel, this);
-            m_folderSelectDialog->resize(448, 372);
+            m_folderSelectDialog->resize(VNOTE_SELECTDIALOG_W, 372);
         }
         QList<VNoteFolder *> folders;
         folders.push_back(static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(currentIndex())));

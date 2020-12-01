@@ -260,6 +260,9 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
     path.arcTo(QRect(QPoint(paintRect.bottomRight() - QPoint(radius * 2, radius * 2)), QSize(radius * 2, radius * 2)), 270, 90);
 
     bool enable = true;
+    //解决待移动列表字体颜色问题
+    bool isPaintBackGroud = false;
+
     if (option.state & QStyle::State_Selected) {
         QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
         painter->setBrush(QBrush(fillColor));
@@ -314,9 +317,8 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
             } else {
                 //根据ui设计，区分奇偶行背景颜色
                 if(index.row()%2 == 0 || !m_isPendingList){
-                        painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
-                        painter->fillPath(path, painter->brush());
-                        painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
+                    //解决待移动列表字体颜色问题
+                    isPaintBackGroud = true;
                 }
             }
         }
@@ -345,6 +347,12 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
 
         QString elideText = fontMetrics.elidedText(data->name, Qt::ElideRight, nameRect.width());
         painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
+    }
+    //解决待移动列表字体颜色问题
+    if(isPaintBackGroud){
+        painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
+        painter->fillPath(path, painter->brush());
+        painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
     }
     painter->restore();
 }
