@@ -1,5 +1,5 @@
-@font-face {
-    font-family: 'iconfont';  /* project id 406416 */
+/* @font-face {
+    font-family: 'iconfont'; 
     src: url('./font_4/iconfont.eot');
     src: url('./font_4/iconfont.eot?#iefix') format('embedded-opentype'),
     url('./font_4/iconfont.woff2') format('woff2'),
@@ -45,7 +45,6 @@
     height:12px;
     width:12px;
     display:inline-block;
-/*    background-color:#ffff00;*/
     background-color:#1C52B7;
     border-radius:4px;
     float:left;
@@ -92,7 +91,7 @@
     font-style: normal;
     font-weight: normal;
     text-decoration: inherit;
-}
+} */
 /* .dropdown-toggle:hover{
     background:none !important;
 } */
@@ -131,7 +130,7 @@
     border-radius:5px;
     /* -webkit-box-shadow:inset 0 0 6px rgba(83,96,118,.6) */
 }
-#summernote{
+/* #summernote{
     width: 300px;
 }
 body{
@@ -158,4 +157,4 @@ button.close{
     width:20px;
     height:20px;
     font-size:0;
-}
+} */

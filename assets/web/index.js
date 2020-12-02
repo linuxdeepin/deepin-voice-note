@@ -146,18 +146,20 @@ $('body').on('click', '.transBtn', function (e) {
 
 //获取整个处理后Html串,去除所有标签中临时状态
 function getHtml(){
-    var rightCode = $('#summernote').summernote('code');
-    $('.li').removeClass('active');
+    // var rightCode = $('#summernote').summernote('code');
+    // $('.li').removeClass('active');
 
-    if (activeVoice)
-    {
-        activeVoice.removeClass('pause').addClass('play');
-        activeVoice.addClass('now');
-    }
+    // if (activeVoice)
+    // {
+    //     activeVoice.removeClass('pause').addClass('play');
+    //     activeVoice.addClass('now');
+    // }
 
-    var handleCode = $('#summernote').summernote('code');
-    setHtml(rightCode);
-    return handleCode;
+    // var handleCode = $('#summernote').summernote('code');
+    // setHtml(rightCode);
+    // return handleCode;
+
+    return $('#summernote').summernote('code');
 }
 
 //获取当前所有的语音列表
