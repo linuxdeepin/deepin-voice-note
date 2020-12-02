@@ -85,13 +85,12 @@ void WebEngineView::updateNote()
             }
         }
         m_textChange = false;
-        qInfo() << "update success";
     }
 }
 
 void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
 {
-    //m_updateTimer->stop();
+    m_updateTimer->stop();
     updateNote();
     if (data == nullptr) {
         this->setVisible(false);
@@ -104,7 +103,7 @@ void WebEngineView::initData(VNoteItem *data, QString reg, bool fouse)
     } else {
         emit m_jsContent->callJsSetHtml(data->htmlCode);
     }
-    //m_updateTimer->start();
+    m_updateTimer->start();
     findText(reg);
 }
 
@@ -131,6 +130,7 @@ void WebEngineView::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
 
 void WebEngineView::contextMenuEvent(QContextMenuEvent *e)
 {
+    Q_UNUSED(e)
     const QWebEngineContextMenuData &data = page()->contextMenuData();
     QWebEngineContextMenuData::EditFlags flags = data.editFlags();
     bool TTSisWorking = false;

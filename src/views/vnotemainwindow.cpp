@@ -52,7 +52,7 @@
 #include "widgets/vnoteiconbutton.h"
 #include "task/vnmainwnddelayinittask.h"
 #include "views/webengineview.h"
-
+#include "task/vnclearunusedvoicetask.h"
 #ifdef IMPORT_OLD_VERSION_DATA
 #include "importolddata/upgradeview.h"
 #include "importolddata/upgradedbutil.h"
@@ -755,6 +755,10 @@ void VNoteMainWindow::onVNoteFoldersLoaded()
     } else {
         switchWidget(WndHomePage);
     }
+
+    VNClearUnusedVoiceTask *clearVoiceTask = new VNClearUnusedVoiceTask;
+    clearVoiceTask->setAutoDelete(true);
+    QThreadPool::globalInstance()->start(clearVoiceTask);
 
     PerformanceMonitor::initializeAppFinish();
 }
