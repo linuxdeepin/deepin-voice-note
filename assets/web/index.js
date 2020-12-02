@@ -83,19 +83,16 @@ var initFinish = false;
 
 //设置默认焦点， 不可拖拽， 
 $('#summernote').summernote({
-    height: 500, 
     minHeight: null,             // set minimum height of editor
     maxHeight: null,             // set maximum height of editor
     focus: true,                  // set focus to editable area after initializin
-    // airMode: true,
     disableDragAndDrop: true,
     shortcuts:false,
+    toolbar: []
 });
 
 //设置全屏模式
-// $('#summernote').summernote('fullscreen.toggle');
-
-
+$('#summernote').summernote('fullscreen.toggle');
 
 //捕捉change事件
 $('#summernote').on('summernote.change', function(we, contents, $editable) {
