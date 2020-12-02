@@ -228,14 +228,17 @@ bool VNoteItem::haveVoice() const
 bool VNoteItem::haveText() const
 {
     bool fHaveText = false;
-
-    for (auto it : datas.textBlocks) {
-        if (!it->blockText.isEmpty()) {
-            fHaveText = true;
-            break;
+    if(!htmlCode.isEmpty() && htmlCode != "<p><br></p>"){
+        fHaveText = true;
+    }else {
+        for (auto it : datas.textBlocks) {
+            if (!it->blockText.isEmpty()) {
+                fHaveText = true;
+                break;
+            }
         }
-    }
 
+    }
     return fHaveText;
 }
 

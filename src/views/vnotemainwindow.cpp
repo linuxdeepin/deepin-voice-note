@@ -1382,8 +1382,8 @@ void VNoteMainWindow::onMenuAbout2Show()
             if (!currNoteData->haveText()) {
                 ActionManager::Instance()->enableAction(ActionManager::NoteSaveText, false);
             }
-
-            if (!currNoteData->haveVoice()) {
+            QVariant ret = JsContent::instance()->callJsSynchronous(m_webView->page(),"bHaveNote()");
+            if(ret.isValid() && !ret.toBool()){
                 ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
             }
         }
