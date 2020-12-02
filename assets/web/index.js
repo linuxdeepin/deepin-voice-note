@@ -337,7 +337,7 @@ function transHtml(json,flag){
 
 //设置summerNote编辑状态 
 function enableSummerNote(){
-    if (activeVoice || activeTransVoice)
+    if (activeVoice || (activeTransVoice && !bTransVoiceIsReady))
     {
         $('#summernote').summernote('disable');
     }
