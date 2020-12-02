@@ -17,8 +17,8 @@ var h5Tpl  = `
 <div class="li" contenteditable="false" jsonKey="{{jsonValue}}">
     <div>
     <div class="demo" >
-        <div class="left">
-        <div class="btn play"></div>
+        <div class="left"> 
+            <div class="btn play"></div>
         </div>
         <div class="right">
             <div class="lf">
@@ -50,7 +50,7 @@ var h5Tpl  = `
 var nodeTpl = `
     <div>
     <div class="demo" >
-        <div class="left">
+        <div class="left"> 
             <div class="btn play"></div>
         </div>
         <div class="right">
@@ -117,7 +117,7 @@ $('body').on('click', '.li', function (e) {
 //播放
 $('body').on('click', '.btn', function (e) {
     console.log('------playBtn click...');
-    e.stopPropagation();
+    // e.stopPropagation();
     var curVoice = $(this).parents('.li:first');
     var jsonString = curVoice.attr('jsonKey');
     var bIsSame = $(this).hasClass('now');
@@ -134,7 +134,7 @@ $('body').on('click', '.btn', function (e) {
 //语音转文字按钮
 $('body').on('click', '.transBtn', function (e) {
     console.log('------transBtn click...');
-    e.stopPropagation();
+    // e.stopPropagation();
     var jsonString = $(this).parents('.li:first').attr('jsonKey');
     webobj.jsCallPopVoiceMenu(jsonString);
     // 当前没有语音在转文字时， 才可以转文字
@@ -144,9 +144,20 @@ $('body').on('click', '.transBtn', function (e) {
     }
 })
 
-//获取整个Html串
+//获取整个处理后Html串,去除所有标签中临时状态
 function getHtml(){
-    return $('#summernote').summernote('code');
+    var rightCode = $('#summernote').summernote('code');
+    $('.li').removeClass('active');
+
+    if (activeVoice)
+    {
+        activeVoice.removeClass('pause').addClass('play');
+        activeVoice.addClass('now');
+    }
+
+    var handleCode = $('#summernote').summernote('code');
+    setHtml(rightCode);
+    return handleCode;
 }
 
 //获取当前所有的语音列表
@@ -174,6 +185,16 @@ function bHaveNote(){
     return bFlag;
 }
 
+//获取当前选中录音json串
+function getActiveNote(){
+    var retJson = '';
+    if ($('.active').length > 0)
+    {
+        retJson = $('.active').attr('jsonKey');
+    }
+    return retJson;
+}
+
 new QWebChannel(qt.webChannelTransport,
     function (channel) {
         console.log('qt.webChannelTransport....');
@@ -185,6 +206,9 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsSetPlayStatus.connect(toggleState);
         webobj.callJsSetHtml.connect(setHtml);
         webobj.callJsSetVoiceText.connect(setVoiceText);
+
+        //通知QT层完成通信绑定
+        webobj.jsCallChannleFinish();
     }
 )
 

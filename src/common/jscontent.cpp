@@ -111,3 +111,8 @@ void JsContent::jsCallTxtChange()
 {
     emit textChange();
 }
+
+void JsContent::jsCallChannleFinish()
+{
+    qDebug() << "========>channle init finish";
+}
