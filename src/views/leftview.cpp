@@ -571,30 +571,14 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
         QString itemInfo = "";
         //多选-自动截断提示长度
         QFontMetrics fontMetric(this->font());
-        QString notesName = "";
-        QString currentStr = "";
-        int curWidth = 0;
-        int constantWidth = fontMetric.width(DApplication::translate("LeftView", "Move the note \"  \" to:"))
-                +fontMetric.width("...");
-        for (auto str : elideText) {
-            if (str == "\t") {
-                curWidth  += fontMetric.width("a");
-            } else {
-                curWidth  += fontMetric.width(str);
-            }
-            currentStr += str;
-            if (curWidth > VNOTE_SELECTDIALOG_W-23-constantWidth) {
-                notesName = currentStr.append("...");
-                break;
-            }
-            notesName = currentStr;
-        }
+        //用于计算当前文本名截断宽度的常量
+        int constantWidth = fontMetric.width(DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(""));
+        QString notesName = fontMetric.elidedText(elideText,Qt::ElideRight,VNOTE_SELECTDIALOG_W-20-constantWidth);
         if(src.size() == 1){
-           itemInfo = DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(notesName);
+            itemInfo = DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(notesName);
         }else {
-           itemInfo = DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg(notesName).arg(src.size());
+            itemInfo = DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg(notesName).arg(src.size());
         }
-
         if (m_folderSelectDialog == nullptr) {
             m_folderSelectDialog = new FolderSelectDialog(m_pDataModel, this);
             m_folderSelectDialog->resize(VNOTE_SELECTDIALOG_W, 372);
