@@ -771,9 +771,13 @@ void VNoteMainWindow::onVNoteSearch()
     if (m_noteSearchEdit->lineEdit()->hasFocus()) {
         QString text = m_noteSearchEdit->text();
         if (!text.isEmpty()) {
-            setSpecialStatus(SearchStart);
-            m_searchKey = text;
-            loadSearchNotes(m_searchKey);
+            if(m_searchKey != text){
+                setSpecialStatus(SearchStart);
+                m_searchKey = text;
+                loadSearchNotes(m_searchKey);
+            }else {
+                m_webView->findText(m_searchKey);
+            }
         } else {
             setSpecialStatus(SearchEnd);
         }
@@ -1936,7 +1940,7 @@ void VNoteMainWindow::release()
     }
 
     VTextSpeechAndTrManager::onStopTextToSpeech();
-    // m_rightView->saveNote();
+    m_webView->updateNote();
 
     QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
     if (stateOperation->isVoice2Text()) {
