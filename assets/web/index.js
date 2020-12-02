@@ -1,11 +1,13 @@
 //C++ 调用js接口
-
 //信号绑定
 // initData(const QString& jsonData); 初始化，参数为json字符串
 // void setHtml(const QString& html); 初始化，设置html
 // insertVoiceItem(const QString &jsonData);　插入语音，参数为json字符串
+
 //callback回调
 // const QString getHtml();获取整个html
+// const QString getAllNote();获取所有语音列表的Json
+//
 
 
 //js 调用c++接口
@@ -78,7 +80,8 @@ var nodeTpl = `
 
 var webobj;    //js与qt通信对象
 var activeVoice = null;  //当前正操作的语音对象
-var activeTransVoice = null;
+var activeTransVoice = null;  //执行语音转文字对象
+var bTransVoiceIsReady = true;  //语音转文字是否准备好
 var initFinish = false; 
 
 //设置默认焦点， 不可拖拽， 
@@ -134,26 +137,12 @@ $('body').on('click', '.transBtn', function (e) {
     e.stopPropagation();
     var jsonString = $(this).parents('.li:first').attr('jsonKey');
     webobj.jsCallPopVoiceMenu(jsonString);
-    activeTransVoice = $(this).parents('.li:first');
+    // 当前没有语音在转文字时， 才可以转文字
+    if (bTransVoiceIsReady)
+    {
+        activeTransVoice = $(this).parents('.li:first');
+    }
 })
-
-//播放状态，0,播放中，1暂停中，2.结束播放
-function toggleState(state) {
-    console.log('---toggleState--');
-    if (state == '0') {
-        $('.btn').removeClass('pause').addClass('play');
-        activeVoice.removeClass('play').addClass('pause');
-    } else if (state == '1') {
-        activeVoice.removeClass('pause').addClass('play');
-    }
-    else{
-        activeVoice.removeClass('pause').addClass('play');
-        activeVoice.removeClass('now');
-        activeVoice = null;
-    }
-
-    enableSummerNote();
-}
 
 //获取整个Html串
 function getHtml(){
@@ -172,6 +161,17 @@ function getAllNote(){
     jsonObj.noteDatas = jsonArray;
     var retJson = JSON.stringify(jsonObj);
     return retJson;
+}
+
+//当前记事本是否有语音
+function bHaveNote(){
+    var noteList  = $('.li');
+    var bFlag = false;
+    if (noteList.length > 0)
+    {
+        bFlag = true;
+    }
+    return bFlag;
 }
 
 new QWebChannel(qt.webChannelTransport,
@@ -238,6 +238,24 @@ function insertVoiceItem(text) {
     $('#summernote').summernote('restoreRange');
 }
 
+//播放状态，0,播放中，1暂停中，2.结束播放
+function toggleState(state) {
+    console.log('---toggleState--');
+    if (state == '0') {
+        $('.btn').removeClass('pause').addClass('play');
+        activeVoice.removeClass('play').addClass('pause');
+    } else if (state == '1') {
+        activeVoice.removeClass('pause').addClass('play');
+    }
+    else{
+        activeVoice.removeClass('pause').addClass('play');
+        activeVoice.removeClass('now');
+        activeVoice = null;
+    }
+
+    enableSummerNote();
+}
+
 //设置整个html内容
 function setHtml(html){
     initFinish = false;
@@ -249,7 +267,6 @@ function setHtml(html){
 //设置录音转文字内容 flag: 0: 转换过程中 提示性文本（＂正在转文字中＂)１:结果 文本,空代表转失败了
 function setVoiceText(text,flag){
     console.log('----voice text----');
-    // activeTransVoice.
     if (activeTransVoice)
     {
         if (flag)
@@ -263,10 +280,12 @@ function setVoiceText(text,flag){
                 activeTransVoice.find('.translate').html('');
             }
             activeTransVoice = null;
+            bTransVoiceIsReady = true;
         }
         else
         {
             activeTransVoice.find('.translate').html('<p class="noselect">'+text+'</p>');
+            bTransVoiceIsReady = false;
         }
     }
     enableSummerNote();
