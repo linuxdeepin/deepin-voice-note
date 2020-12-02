@@ -179,7 +179,7 @@ void WebEngineView::contextMenuEvent(QContextMenuEvent *e)
             ActionManager::Instance()->enableAction(ActionManager::DetailSpeech2Text, true);
         }
     }
-    m_noteDetailContextMenu->exec(QCursor::pos());
+    m_noteDetailContextMenu->popup(QCursor::pos());
 
 }
 

@@ -104,7 +104,7 @@ void JsContent::jsCallPopVoiceMenu(const QVariant &json)
     dataParser.jsonParse(json, m_currentVoice);
     bool enable = !OpsStateInterface::instance()->isVoice2Text() && m_currentVoice->blockText.isEmpty();
     ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, enable);
-    ActionManager::Instance()->detialVoiceMenu()->exec(QCursor::pos());
+    ActionManager::Instance()->detialVoiceMenu()->popup(QCursor::pos());
 }
 
 void JsContent::jsCallTxtChange()
