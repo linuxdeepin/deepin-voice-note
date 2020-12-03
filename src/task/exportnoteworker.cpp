@@ -21,11 +21,13 @@
 #include "exportnoteworker.h"
 #include "globaldef.h"
 #include "common/vnoteitem.h"
+#include "common/metadataparser.h"
 
 #include <QDir>
 #include <QDateTime>
 #include <QFile>
 #include <QFileInfo>
+#include <QTextDocument>
 
 #include <DLog>
 
@@ -37,10 +39,11 @@
  * @param block 绑定文本/语音
  * @param parent
  */
-ExportNoteWorker::ExportNoteWorker(QString dirPath, int exportType,
+ExportNoteWorker::ExportNoteWorker(QString dirPath, int exportType, const QVariant& jsonVoices,
                                    VNoteItem *note, VNoteBlock *block, QObject *parent)
     : VNTask(parent)
     , m_exportType(exportType)
+    , m_jsonVoices(jsonVoices)
     , m_exportPath(dirPath)
     , m_note(note)
     , m_noteblock(block)
@@ -109,17 +112,20 @@ int ExportNoteWorker::exportText()
         QString fileName = QString("%1-%2.txt").arg(m_note->noteTitle).arg(QDateTime::currentDateTime().toLocalTime().toString(VNOTE_TIME_FMT));
 
         QFile exportFile(m_exportPath + "/" + fileName);
-
         if (exportFile.open(QIODevice::ReadWrite)) {
             QTextStream stream(&exportFile);
-
-            for (auto it : m_note->datas.datas) {
-                if (VNoteBlock::Text == it->getType()) {
-                    stream << it->blockText;
-                    stream << '\n';
+            if(m_note->htmlCode.isEmpty()){
+                for (auto it : m_note->datas.datas) {
+                    if (VNoteBlock::Text == it->getType()) {
+                        stream << it->blockText;
+                        stream << '\n';
+                    }
                 }
+            }else{
+                QTextDocument doc;
+                doc.setHtml(m_note->htmlCode);
+                stream << doc.toPlainText();
             }
-
             stream.flush();
         } else {
             error = PathDenied;
@@ -143,7 +149,16 @@ int ExportNoteWorker::exportAllVoice()
         for (auto it : m_note->datas.datas) {
             exportOneVoice(it);
         }
-    } else {
+    } else if(!m_jsonVoices.isNull()){
+        QVector<VNoteBlock *> blocks;
+        MetaDataParser prase;
+        prase.jsonParse(m_jsonVoices, blocks);
+        for(auto it: blocks){
+            exportOneVoice(it);
+            delete it;
+            it = nullptr;
+        }
+    }else {
         error = NoteInvalid;
     }
 

@@ -1354,7 +1354,7 @@ void RightView::saveMp3()
                 QString exportDir = dialog.directoryUrl().toLocalFile();
 
                 ExportNoteWorker *exportWorker = new ExportNoteWorker(
-                    exportDir, ExportNoteWorker::ExportOneVoice, m_noteItemData, block);
+                    exportDir, ExportNoteWorker::ExportOneVoice, QVariant(), m_noteItemData, block);
                 exportWorker->setAutoDelete(true);
 
                 QThreadPool::globalInstance()->start(exportWorker);

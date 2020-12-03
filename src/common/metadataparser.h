@@ -75,6 +75,7 @@ public:
     //源数据解析
     void jsonParse(const QVariant &metaData, VNoteBlock *blockData /*out*/);
     void jsonParse(QVariant &metaData, VNoteItem *noteData /*out*/);
+    void jsonParse(QVariant &metaData, QVector<VNoteBlock *> &blocksData /*out*/);
     //源数据生成
     void jsonMakeMetadata(VNoteItem *noteData, QVariant &metaData /*out*/);
     void jsonMakeMetadata(VNoteBlock *blockData, QVariant &metaData /*out*/);

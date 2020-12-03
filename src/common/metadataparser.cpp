@@ -54,6 +54,47 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteBlock *blockData)
     }
 }
 
+void MetaDataParser::jsonParse(QVariant &metaData, QVector<VNoteBlock *> &blocksData)
+{
+
+    QJsonDocument noteDoc = QJsonDocument::fromJson(metaData.toByteArray());
+    QJsonObject note = noteDoc.object();
+    QJsonArray noteDatas;
+    if (note.contains(m_jsonNodeNameMap[NDatas])) {
+        noteDatas = note.value(m_jsonNodeNameMap[NDatas]).toArray();
+    }
+    for (auto it : noteDatas) {
+        VNoteBlock *ptrBlock = nullptr;
+
+        QJsonObject noteItem = it.toObject();
+
+        int noteType = noteItem.value(m_jsonNodeNameMap[NDataType]).toInt(VNoteBlock::InValid);
+
+        if (VNoteBlock::InValid != noteType) {
+            //Allocate block
+
+            if (VNoteBlock::Text == noteType) {
+                ptrBlock = new VNTextBlock;
+                ptrBlock->blockType = noteType;
+                ptrBlock->ptrText->blockText = noteItem.value(m_jsonNodeNameMap[NText]).toString();
+            } else if (VNoteBlock::Voice == noteType) {
+                ptrBlock = new VNVoiceBlock;
+                ptrBlock->ptrVoice->blockText = noteItem.value(m_jsonNodeNameMap[NText]).toString();
+                ptrBlock->ptrVoice->voiceTitle = noteItem.value(m_jsonNodeNameMap[NTitle]).toString();
+                ptrBlock->ptrVoice->state = noteItem.value(m_jsonNodeNameMap[NState]).toBool(false);
+                ptrBlock->ptrVoice->voicePath = noteItem.value(m_jsonNodeNameMap[NVoicePath]).toString();
+                ptrBlock->ptrVoice->voiceSize = noteItem.value(m_jsonNodeNameMap[NVoiceSize]).toInt(0);
+                ptrBlock->ptrVoice->createTime = QDateTime::fromString(
+                            noteItem.value(m_jsonNodeNameMap[NCreateTime]).toString(), VNOTE_TIME_FMT);
+            }
+            if(ptrBlock){
+                blocksData.push_back(ptrBlock);
+            }
+        }
+    }
+
+}
+
 /**
  * @brief MetaDataParser::jsonParse
  * @param metaData 数据源

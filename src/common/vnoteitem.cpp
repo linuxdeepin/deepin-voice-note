@@ -19,6 +19,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "vnoteitem.h"
+#include "common/jscontent.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -214,10 +215,16 @@ bool VNoteItem::haveVoice() const
 {
     bool fHaveVoice = false;
 
-    if (datas.voiceBlocks.size() > 0) {
-        fHaveVoice = true;
+    if(htmlCode.isEmpty()){
+        if (datas.voiceBlocks.size() > 0) {
+            fHaveVoice = true;
+        }
+    }else {
+        QVariant ret = JsContent::instance()->callJsSynchronous("bHaveNote()");
+        if(ret.isValid() && ret.toBool()){
+            fHaveVoice = true;
+        }
     }
-
     return fHaveVoice;
 }
 

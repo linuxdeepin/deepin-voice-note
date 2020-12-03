@@ -118,11 +118,6 @@ bool VNoteItemOper::updateNote()
 
         m_note->modifyTime = QDateTime::currentDateTime();
 
-        //Reset the max voice id when no voice file.
-        if (!m_note->haveVoice()) {
-            m_note->maxVoiceIdRef() = 0;
-        }
-
         UpdateNoteDbVisitor updateNoteVisitor(
             VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
 

@@ -82,11 +82,11 @@ int JsContent::jsCallPlayVoice(const QVariant &json, const bool &bIsSame)
 
 }
 
-QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &js)
+QVariant JsContent::callJsSynchronous(const QString &js)
 {
     m_synResult.clear();
-    if (page) {
-        page->runJavaScript(js, [ = ](const QVariant & result) {
+    if (m_page) {
+        m_page->runJavaScript(js, [ = ](const QVariant & result) {
             m_synResult = result;
             m_synLoop.quit();
         });
@@ -114,5 +114,21 @@ void JsContent::jsCallTxtChange()
 
 void JsContent::jsCallChannleFinish()
 {
+    m_loadFinsh = true;
     qDebug() << "========>channle init finish";
+}
+
+void JsContent::setWebPage(QWebEnginePage *page)
+{
+    m_page = page;
+}
+
+QWebEnginePage* JsContent::getWebPage()
+{
+    return  m_page;
+}
+
+bool JsContent::webLoadFinsh()
+{
+    return m_loadFinsh;
 }

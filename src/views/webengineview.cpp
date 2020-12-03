@@ -58,6 +58,7 @@ void WebEngineView::init()
     });
     m_updateTimer->setInterval(1000);
     m_jsContent = JsContent::instance();
+    m_jsContent->setWebPage(page());
     connect(m_jsContent, &JsContent::textChange, this, [=]{
         if(m_textChange == false && m_noteData){
             m_textChange = true;
@@ -75,16 +76,18 @@ void WebEngineView::init()
 
 void WebEngineView::updateNote()
 {
-    if (m_textChange && m_noteData) {
-        QVariant result = m_jsContent->callJsSynchronous(page(),"getHtml()");
-        if(result.isValid()){
-            m_noteData->htmlCode = result.toString();
-            VNoteItemOper noteOps(m_noteData);
-            if (!noteOps.updateNote()) {
-                qInfo() << "Save note error";
+    if (m_noteData) {
+        if(m_textChange || m_noteData->htmlCode.isEmpty()){
+            QVariant result = m_jsContent->callJsSynchronous("getHtml()");
+            if(result.isValid()){
+                m_noteData->htmlCode = result.toString();
+                VNoteItemOper noteOps(m_noteData);
+                if (!noteOps.updateNote()) {
+                    qInfo() << "Save note error";
+                }
             }
+            m_textChange = false;
         }
-        m_textChange = false;
     }
 }
 
@@ -204,7 +207,7 @@ void WebEngineView::saveMp3()
             QString exportDir = dialog.directoryUrl().toLocalFile();
 
             ExportNoteWorker *exportWorker = new ExportNoteWorker(
-                exportDir, ExportNoteWorker::ExportOneVoice, m_noteData, block);
+                exportDir, ExportNoteWorker::ExportOneVoice, QVariant(), m_noteData, block);
             exportWorker->setAutoDelete(true);
 
             QThreadPool::globalInstance()->start(exportWorker);

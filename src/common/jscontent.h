@@ -35,8 +35,11 @@ public:
     explicit JsContent(QObject *parent = nullptr);
     ~JsContent();
     static JsContent *instance();
-    QVariant callJsSynchronous(QWebEnginePage *page, const QString &js);
+    QVariant callJsSynchronous(const QString &js);
     VNVoiceBlock *getCurrentVoice();
+    void setWebPage(QWebEnginePage *page);
+    QWebEnginePage *getWebPage();
+    bool webLoadFinsh();
 signals:
     void callJsInitData(const QString &jsonData);
     void callJsSetHtml(const QString &html);
@@ -57,6 +60,8 @@ public slots:
     void jsCallTxtChange();
     void jsCallChannleFinish();
 private:
+    bool m_loadFinsh {false};
+    QWebEnginePage *m_page {nullptr};
     QVariant m_synResult;
     QEventLoop m_synLoop;
     VNVoiceBlock *m_currentPlay {nullptr};

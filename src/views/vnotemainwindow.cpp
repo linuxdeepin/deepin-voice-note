@@ -746,7 +746,6 @@ void VNoteMainWindow::onVNoteFoldersLoaded()
         return;
     }
 #endif
-
     //If have folders show note view,else show
     //default home page
     if (loadNotepads() > 0) {
@@ -1382,8 +1381,7 @@ void VNoteMainWindow::onMenuAbout2Show()
             if (!currNoteData->haveText()) {
                 ActionManager::Instance()->enableAction(ActionManager::NoteSaveText, false);
             }
-            QVariant ret = JsContent::instance()->callJsSynchronous(m_webView->page(),"bHaveNote()");
-            if(ret.isValid() && !ret.toBool()){
+            if(!currNoteData->haveVoice()){
                 ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
             }
         }

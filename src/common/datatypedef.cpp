@@ -106,7 +106,6 @@ VNoteBlock *VNOTE_DATAS::newBlock(int type)
     } else if (type == VNoteBlock::Voice) {
         ptrBlock = new VNVoiceBlock();
     }
-    ptrBlock->blockid = QString::number(reinterpret_cast<qint64>(ptrBlock));
 
     return ptrBlock;
 }

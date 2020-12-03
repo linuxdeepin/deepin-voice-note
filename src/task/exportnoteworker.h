@@ -26,7 +26,7 @@
 
 #include <QObject>
 #include <QRunnable>
-
+#include <QVariant>
 //一个记事项文本，语音导出线程
 class ExportNoteWorker : public VNTask
 {
@@ -34,7 +34,8 @@ class ExportNoteWorker : public VNTask
 public:
     explicit ExportNoteWorker(QString dirPath,
                               int exportType,
-                              VNoteItem *note,
+                              const QVariant& jsonVoices = QVariant(),
+                              VNoteItem *note = nullptr,
                               VNoteBlock *block = nullptr,
                               QObject *parent = nullptr);
     enum {
@@ -70,6 +71,8 @@ protected:
     int exportOneVoice(VNoteBlock *block);
 
     int m_exportType {ExportNothing};
+    QVariant m_jsonVoices;
+
     QString m_exportPath;
     VNoteItem *m_note {nullptr};
     VNoteBlock *m_noteblock {nullptr};

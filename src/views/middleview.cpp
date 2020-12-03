@@ -28,6 +28,8 @@
 #include "common/standarditemcommon.h"
 #include "task/exportnoteworker.h"
 #include "common/setting.h"
+#include "common/jscontent.h"
+#include "common/metadataparser.h"
 
 #include <QMouseEvent>
 #include <QVBoxLayout>
@@ -234,7 +236,7 @@ void MiddleView::saveAsText()
 
             QString exportDir = dialog.directoryUrl().toLocalFile();
             ExportNoteWorker *exportWorker = new ExportNoteWorker(
-                exportDir, ExportNoteWorker::ExportText, noteData);
+                exportDir, ExportNoteWorker::ExportText, QVariant(), noteData);
             exportWorker->setAutoDelete(true);
 
             QThreadPool::globalInstance()->start(exportWorker);
@@ -270,9 +272,10 @@ void MiddleView::saveRecords()
             setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
 
             QString exportDir = dialog.directoryUrl().toLocalFile();
+            QVariant ret = JsContent::instance()->callJsSynchronous("getAllNote()");
 
             ExportNoteWorker *exportWorker = new ExportNoteWorker(
-                exportDir, ExportNoteWorker::ExportAllVoice, noteData);
+                exportDir, ExportNoteWorker::ExportAllVoice, ret);
             exportWorker->setAutoDelete(true);
 
             QThreadPool::globalInstance()->start(exportWorker);
