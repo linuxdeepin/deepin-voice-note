@@ -321,9 +321,9 @@ void VNoteMainWindow::initShortcuts()
         //Call method in rightview
         if (canDoShortcutAction())
         {
-            if (!stateOperation->isVoice2Text() && stateOperation->isAiSrvExist()) {
-                this->onA2TStart();
-            }
+//            if (!stateOperation->isVoice2Text() && stateOperation->isAiSrvExist()) {
+//                this->onA2TStart();
+//            }
         }
     });
 
@@ -1789,7 +1789,7 @@ void VNoteMainWindow::initAsrErrMessage()
     m_asrAgainBtn->setText(DApplication::translate(
                                "VNoteErrorMessage",
                                "Try Again"));
-    m_asrAgainBtn->adjustSize();
+    m_asrAgainBtn->setVisible(false);
     connect(m_asrAgainBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::onA2TStartAgain);
     DWidget *m_widget = new DWidget(m_asrErrMeassage);

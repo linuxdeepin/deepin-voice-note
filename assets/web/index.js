@@ -254,7 +254,7 @@ function insertVoiceItem(text) {
     var oA=document.createElement('div');
     oA.className='li';
     oA.contentEditable = false;
-    oA.setAttribute('jsonKey', text);
+    oA.setAttribute('jsonKey', text);
     oA.innerHTML=voiceHtml;
     $('#summernote').summernote('saveRange');
 	$('#summernote').summernote('insertNode', oA);
@@ -301,6 +301,7 @@ function setVoiceText(text,flag){
             if (text)
             {
                 activeTransVoice.find('.translate').html('<div>'+text+'</div>');
+                webobj.jsCallTxtChange();
             }
             else
             {
