@@ -86,7 +86,7 @@ $('#summernote').summernote({
     focus: true,                  // set focus to editable area after initializin
     disableDragAndDrop: true,
     shortcuts:false,
-    // toolbar: []
+    toolbar: []
 });
 
 //设置全屏模式
@@ -306,6 +306,12 @@ function setVoiceText(text,flag){
             {
                 activeTransVoice.find('.translate').html('');
             }
+            //将转文字文本写到json属性里
+            var jsonValue = activeTransVoice.attr('jsonKey');
+            var jsonObj = JSON.parse(jsonValue);
+            jsonObj.text = text;
+            activeTransVoice.attr('jsonKey',JSON.stringify(jsonObj));
+
             activeTransVoice = null;
             bTransVoiceIsReady = true;
         }

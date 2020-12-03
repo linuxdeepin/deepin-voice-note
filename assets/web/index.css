@@ -35,13 +35,14 @@
         border-radius: 8px;
         box-sizing: border-box;
         /* -webkit-user-drag: element; */
-        user-select: none;
+        /* user-select: none; */
         
     }
     .li{
         background: rgba(0,0,0,0.05);
         min-height: 30px;
         border-radius: 8px;
+        user-select: none;
     }
     #demo{
         width: 100%;
