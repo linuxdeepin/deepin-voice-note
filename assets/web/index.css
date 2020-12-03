@@ -35,7 +35,7 @@
         border-radius: 8px;
         box-sizing: border-box;
         /* -webkit-user-drag: element; */
-        /*user-select: none;*/
+        user-select: none;
         
     }
     .li{
@@ -48,7 +48,7 @@
         box-sizing: border-box;
     }
     .active{
-        background: brown; 
+        background: #da686e; 
     }
     .left{
         width: 60px;
@@ -139,7 +139,36 @@
         left: 0;
         top: 0; 
     }
+
     .wifi-symbol .first{
+        background-image: url(./light/play_voice1.svg);
+        background-size: contain;
+        width: 24px;
+        height: 21px;
+    }
+
+    .wifi-symbol .second{
+        background-image: url(./light/play_voice2.svg);
+        background-size: contain;
+        width: 24px;
+        height: 21px;
+    }
+
+    .wifi-symbol .third{
+        background-image: url(./light/play_voice3.svg);
+        background-size: contain;
+        width: 24px;
+        height: 21px;
+    }
+
+    .wifi-symbol .four{
+        background-image: url(./light/play_voice4.svg);
+        background-size: contain;
+        width: 24px;
+        height: 21px;
+    }
+
+    /* .wifi-symbol .first{
         background-image: url(./light/play_voice1.svg);
         background-size: contain;
         width: 24px;
@@ -161,22 +190,23 @@
         animation: fadeInOut 1.2s infinite .8s;
         opacity: 0;
     }
-    /* .wifi-symbol .four{
+    .wifi-symbol .four{
         background-image: url(./light/play_voice4.svg);
         background-size: contain;
         width: 24px;
         height: 21px;
         animation: fadeInOut 1.6s infinite 1.6s;
         opacity: 0;
-    } */
+    }
+    */
     @keyframes fadeInOut {
         0% {
-            opacity: 0; /*初始状态 透明度为0*/
+            opacity: 0; /*初始状态 透明度为0/
         }
         100% {
             opacity: 1; /*结尾状态 透明度为1*/
         }
-    }
+    } 
 .noselect{
     user-select: none;
 }

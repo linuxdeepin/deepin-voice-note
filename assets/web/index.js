@@ -28,10 +28,7 @@ var h5Tpl  = `
             <div class="lr">
                 <div class="icon">
                 <div class="wifi-symbol">
-                    <div class="wifi-circle first"></div>
-                    <div class="wifi-circle second"></div>
-                    <div class="wifi-circle third"></div>
-                    <div class="wifi-circle four"></div>
+                    <div class="wifi-circle"></div>
                 </div>
                 </div>
                 <div class="time padtop">{{transSize}}</div>
@@ -61,10 +58,7 @@ var nodeTpl = `
             <div class="lr">
                 <div class="icon">
                 <div class="wifi-symbol">
-                    <div class="wifi-circle first"></div>
-                    <div class="wifi-circle second"></div>
-                    <div class="wifi-circle third"></div>
-                    <div class="wifi-circle four"></div>
+                    <div class="wifi-circle"></div>
                 </div>
                 </div>
                 <div class="time padtop">{{transSize}}</div>
@@ -82,7 +76,8 @@ var webobj;    //js与qt通信对象
 var activeVoice = null;  //当前正操作的语音对象
 var activeTransVoice = null;  //执行语音转文字对象
 var bTransVoiceIsReady = true;  //语音转文字是否准备好
-var initFinish = false; 
+var initFinish = false;
+var voiceIntervalObj;    //语音播放动画定时器对象
 
 //设置默认焦点， 不可拖拽， 
 $('#summernote').summernote({
@@ -91,7 +86,7 @@ $('#summernote').summernote({
     focus: true,                  // set focus to editable area after initializin
     disableDragAndDrop: true,
     shortcuts:false,
-    toolbar: []
+    // toolbar: []
 });
 
 //设置全屏模式
@@ -268,17 +263,21 @@ function insertVoiceItem(text) {
 
 //播放状态，0,播放中，1暂停中，2.结束播放
 function toggleState(state) {
-    console.log('---toggleState--');
+    console.log('---toggleState--',state);
     if (state == '0') {
         $('.btn').removeClass('pause').addClass('play');
         activeVoice.removeClass('play').addClass('pause');
+
+        voicePlay(true);
     } else if (state == '1') {
         activeVoice.removeClass('pause').addClass('play');
+        voicePlay(false);
     }
     else{
         activeVoice.removeClass('pause').addClass('play');
         activeVoice.removeClass('now');
         activeVoice = null;
+        voicePlay(false);
     }
 
     enableSummerNote();
@@ -347,4 +346,37 @@ function enableSummerNote(){
     {
         $('#summernote').summernote('enable');
     }
+}
+
+// 录音播放控制， bIsPaly=ture 表示播放。
+function voicePlay(bIsPaly){
+    clearInterval(voiceIntervalObj);
+    $('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four');
+
+    if (bIsPaly)
+    {
+        var index = 0;
+        voiceIntervalObj = setInterval(function(){
+            if (activeVoice && activeVoice.hasClass('pause'))
+            {
+                var voiceObj = activeVoice.parent().next().find('.wifi-circle');
+                index++;
+                switch(index){
+                    case 1:
+                        voiceObj.removeClass('four').addClass('first');
+                        break;
+                    case 2:
+                        voiceObj.removeClass('first').addClass('second');
+                        break;
+                    case 3:
+                        voiceObj.removeClass('second').addClass('third');
+                        break;
+                    case 4:
+                        voiceObj.removeClass('third').addClass('four');
+                        index = 0;
+                        break;
+                }
+            }
+        },400);
+    }  
 }
