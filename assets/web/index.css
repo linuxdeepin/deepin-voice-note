@@ -48,9 +48,9 @@
         width: 100%;
         box-sizing: border-box;
     }
-    .active{
+    /* .active{
         background: #da686e; 
-    }
+    } */
     .left{
         width: 60px;
         height: 60px;

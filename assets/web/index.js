@@ -312,6 +312,7 @@ function setVoiceText(text,flag){
             jsonObj.text = text;
             activeTransVoice.attr('jsonKey',JSON.stringify(jsonObj));
 
+            webobj.jsCallTxtChange();
             activeTransVoice = null;
             bTransVoiceIsReady = true;
         }
