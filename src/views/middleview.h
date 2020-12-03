@@ -55,6 +55,19 @@ public:
         ReleaseFromMenu,
         Normal
     };
+    //dx-选择
+    enum ModifierState{
+            noModifier = 0,
+            ctrlModifier = 1,
+            shiftAndKeyModifier = 2,
+            shiftAndMouseModifier = 3
+    };
+    //dx-选择
+    enum MouseState{
+        normal = 0,
+        pressing = 1,
+        moving = 2
+    };
     MiddleView(QWidget *parent = nullptr);
     //设置搜索关键字
     void setSearchKey(const QString &key);
@@ -84,10 +97,12 @@ public:
     qint64 getCurrentId();
     //获取记事项数目
     qint32 rowCount() const;
-    //删除当前选中项
-    VNoteItem *deleteCurrentRow();
+    //dx-右键删除
+    QList<VNoteItem *>deleteCurrentRow();
     //获取当前选中项数据
     VNoteItem *getCurrVNotedata() const;
+    //dx-拖拽移动
+    QList<VNoteItem *> getCurrVNotedataList() const;
     //置顶/取消置顶
     void noteStickOnTop();
     //排序
@@ -100,6 +115,23 @@ public:
     void handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point);
     //更新触摸屏一指状态
     void setTouchState(const TouchState &touchState);
+    //dx-右键菜单
+    bool isMultipleSelected();
+    //dx-选中是否有文本
+    bool haveText();
+    //dx-选中是否有语音
+    bool haveVoice();
+    //dx-移除后选中
+    void setNextSelection();
+    //dx-移除后选中
+    void selectAfterRemoved();
+    //dx-刷新详情页
+    int getSelectedCount();
+    //dx-拖拽取消后选中
+    void setDragSuccess(bool dragSuccess = false);
+signals:
+    //dx-刷新详情页
+    void requestChangeRightView(bool isMultipleOption);
 
 public slots:
     //更新记事项
@@ -125,6 +157,13 @@ protected:
     void doTouchMoveEvent(QMouseEvent *event);
     //处理拖拽事件
     void handleDragEvent(bool isTouch = true);
+    //dx-选择
+    void handleShiftAndPress(QModelIndex &index);
+    void setModifierState(const ModifierState &modifierState);
+    ModifierState getModifierState() const;
+    void setMouseState(const MouseState &mouseState);
+    //dx-右键菜单
+    void onMenuShow(QPoint point);
 private:
     //初始化代理模块
     void initDelegate();
@@ -138,6 +177,8 @@ private:
     void initConnections();
     //触发拖动操作
     void triggerDragNote();
+    //dx-刷新详情页
+    void changeRightView(bool isMultipleDetailPage = true);
     bool m_onlyCurItemMenuEnable {false};
     qint64 m_currentId {-1};
     QString m_searchKey;
@@ -161,6 +202,15 @@ private:
     QTimer *m_popMenuTimer {nullptr};
     MenuStatus m_menuState {InitialState};
     TouchState m_touchState {TouchNormal};
+    //dx-选择
+    int m_currentRow = -1;
+    int m_shiftSelection = -1;
+    ModifierState m_modifierState {ModifierState::noModifier};
+    MouseState m_mouseState {normal};
+    //dx-移除后选中
+    int m_nextSelection  = -1;
+    //dx-拖拽取消后选中
+    bool m_dragSuccess {false};
 };
 
 #endif // MIDDLEVIEW_H

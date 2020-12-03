@@ -32,9 +32,10 @@ class ExportNoteWorker : public VNTask
 {
     Q_OBJECT
 public:
+    //dx-导出语音
     explicit ExportNoteWorker(QString dirPath,
                               int exportType,
-                              VNoteItem *note,
+                              QList<VNoteItem *>noteList,
                               VNoteBlock *block = nullptr,
                               QObject *parent = nullptr);
     enum {
@@ -71,7 +72,8 @@ protected:
 
     int m_exportType {ExportNothing};
     QString m_exportPath;
-    VNoteItem *m_note {nullptr};
+    //dx-导出语音
+    QList<VNoteItem *>m_noteList {nullptr};
     VNoteBlock *m_noteblock {nullptr};
 };
 

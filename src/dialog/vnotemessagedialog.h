@@ -34,7 +34,8 @@ class VNoteMessageDialog : public VNoteBaseDialog
 {
     Q_OBJECT
 public:
-    explicit VNoteMessageDialog(int msgType, QWidget *parent = nullptr);
+    //dx-删除
+    explicit VNoteMessageDialog(int msgType , QWidget *parent = nullptr ,int notesCount =1 );
 
     enum MessageType {
         DeleteNote,
@@ -64,7 +65,8 @@ protected:
     DPushButton *m_cancelBtn {nullptr};
     DWarningButton *m_confirmBtn {nullptr};
     DVerticalLine *m_buttonSpliter {nullptr};
-
+    //dx-删除
+    int m_notesCount = 1;
     MessageType m_msgType;
 };
 

@@ -110,7 +110,10 @@ public:
     VoiceNoteItem *getCurVoiceAsr();
     //操作是否需要弹出提示框
     int showWarningDialog();
-
+    //dx-多选详情页
+    void setIsNormalView(bool value);
+    //dx-多选详情页
+    bool getIsNormalView() const;
 signals:
     //播放信号
     void sigVoicePlay(VNVoiceBlock *voiceData);
@@ -180,6 +183,8 @@ private:
     QString m_searchKey {""};
 
     QMap<VNoteBlock *, DetailItemWidget *> m_mapWidgetCache;
+    //dx-多选详情页
+    bool m_isNormalView {true};
 };
 
 #endif // RIGHTVIEW_H

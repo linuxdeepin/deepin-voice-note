@@ -56,76 +56,145 @@ void MoveView::setNote(VNoteItem *note)
     m_note = note;
 }
 
+//dx-拖拽移动
+void MoveView::setNoteList(QList<VNoteItem *>noteList)
+{
+    m_noteList = noteList;
+}
+
+//dx-多选拖拽
+void MoveView::setMultiple(bool isMultiple)
+{
+    m_isMultiple = isMultiple;
+}
+
 /**
  * @brief MoveView::paintEvent
  */
 void MoveView::paintEvent(QPaintEvent *)
 {
-    if(m_note){
-        setFixedSize(260,56);
-    }
+    //dx-多选拖拽
+    QPixmap bitmap;
     QPainter painter(this);
     ///从系统获取画板
     DPalette pb = DApplicationHelper::instance()->applicationPalette();
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHints(QPainter::SmoothPixmapTransform);
     painter.setPen(Qt::NoPen);
-    //设置背景颜色
-    QColor color;
-    color = pb.color(DPalette::Normal,DPalette::Window);
-    color.setAlphaF(0.80);
-    painter.setBrush(color);
-    QPainterPath PainterPath;
-    //绘制内部
-    PainterPath.addRoundedRect(QRect( 10, 10, width() - 21, height()-19), 7, 7);
-    painter.drawPath(PainterPath);
-    //绘制边界
-    PainterPath.addRoundedRect(QRect( 9, 9, width() - 21, height() - 19), 8, 8);
-    painter.setBrush(pb.color(DPalette::Normal,DPalette::FrameShadowBorder));
-    painter.drawPath(PainterPath);
-
     QFontMetrics fontMetrics = painter.fontMetrics();
-    painter.setPen(QPen(pb.color(DPalette::Normal, DPalette::Text)));
-    //绘制记事本拖动缩略图
+    QRect paintRect = rect();
+    bool isDark = DGuiApplicationHelper::instance()->themeType()==DGuiApplicationHelper::DarkType?true:false;
     if(m_folder){
+        setFixedSize(224,91);
+        if(isDark){
+            bitmap = QPixmap(":/icons/deepin/multipleSelectPage/icon_notePad_dark.svg");
+        }else {
+            painter.setOpacity(0.9);
+            bitmap = QPixmap(":/icons/deepin/multipleSelectPage/icon_notePad_lignt.svg");
+        }
+        //设置透明度
+        painter.drawPixmap(rect(),bitmap);
+        painter.setOpacity(1);
+        //设置背景颜色
+        QColor color;
+        color = pb.color(DPalette::Normal,DPalette::Window);
+        color.setAlphaF(0.80);
+        painter.setBrush(color);
+        QPainterPath PainterPath;
+
         VNoteFolderOper folderOps(m_folder);
         QString strNum = QString::number(folderOps.getNotesCount());
         int numWidth = fontMetrics.width(strNum);
         QRect paintRect = rect();
         int iconSpace = (paintRect.height() - 24) / 2;
         //绘制内部信息
-        QRect iconRect(paintRect.left() + 22, paintRect.top() + iconSpace, 24, 24);
-        QRect numRect(paintRect.right() - numWidth - 17, paintRect.top(), numWidth, paintRect.height());
+        painter.setPen(QPen(pb.color(DPalette::Normal, DPalette::Text)));
+        QRect iconRect(paintRect.left() + 32, paintRect.top() + iconSpace, 24, 24);
+        QRect numRect(paintRect.right() - numWidth - 30, paintRect.top(), numWidth, paintRect.height());
         QRect nameRect(iconRect.right() + 12, paintRect.top(),
-                       numRect.left() - iconRect.right() - 15, paintRect.height());
+                       numRect.left() - iconRect.right() - 14, paintRect.height());
         painter.drawText(numRect, Qt::AlignRight | Qt::AlignVCenter, strNum);
         painter.drawPixmap(iconRect, m_folder->UI.icon);
         QString elideText = fontMetrics.elidedText(m_folder->name, Qt::ElideRight, nameRect.width());
         painter.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
         //绘制笔记拖动缩略图
-    }else if (m_note) {
-        QRect paintRect = rect();
-        paintRect.setLeft(paintRect.left() + 30);
-        paintRect.setRight(paintRect.right() - 30);
-        QString elideText = fontMetrics.elidedText(m_note->noteTitle, Qt::ElideRight, paintRect.width());
-        painter.drawText(paintRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
+    }else {
+        setFixedSize(282,91);
+        //多个笔记拖拽
+        if(m_noteList.size() > 1){
+            if(isDark){
+                painter.setOpacity(0.98);
+                bitmap = QPixmap(":/icons/deepin/multipleSelectPage/notes_dark.svg");
+            }else {
+                bitmap = QPixmap(":/icons/deepin/multipleSelectPage/notes_light.svg");
+            }
+            //设置透明度
+            painter.drawPixmap(rect(),bitmap);
+            painter.setOpacity(1);
+
+            QColor color;
+            color = pb.color(DPalette::Normal,DPalette::Window);
+//            color.setAlphaF(0.80);
+            painter.setBrush(color);
+            painter.setPen(QPen(pb.color(DPalette::Normal, DPalette::Text)));
+            paintRect.setLeft(paintRect.left() + 42);
+            paintRect.setRight(paintRect.right() - 42);
+            //dx-拖拽移动
+            QString elideText = fontMetrics.elidedText(m_noteList[0]->noteTitle, Qt::ElideRight, paintRect.width());
+            painter.drawText(paintRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
+
+            //字体大小设置成固定大小，以免显示遮挡
+            int widths = 0;
+            QString numString  = "";
+            if(99 < m_notesNumber){
+                widths = fontMetrics.width(("..."));
+                numString = "...";
+            }else {
+                widths = fontMetrics.width(QString::number(m_notesNumber));
+                numString = QString::number(m_notesNumber);
+            }
+            //绘制圆
+            QColor color2("#FD5E5E");
+            painter.setPen(QPen(color2));
+            painter.setBrush(color2);
+            if(m_notesNumber < 10){
+                painter.drawEllipse(QPointF(248, 28 ), 12.5, 12.5);
+            }else {
+                painter.drawEllipse(QPointF(248, 28 ), 12.5+(widths-7)/4,12.5+(widths-7)/4);
+            }
+            QColor color3("#FFFFFF");
+            painter.setPen(QPen(color3));
+            painter.setBrush(color3);
+            QRect numberRect(QPoint(240-((widths-7)/2),17),QSize(16+(widths-7),18));
+            painter.drawText(numberRect, Qt::AlignCenter, numString);
+        }
+        //单个笔记拖拽
+        else if (1 == m_noteList.size()) {
+            if(isDark){
+                bitmap = QPixmap(":/icons/deepin/multipleSelectPage/icon_sigleNote_dark.svg");
+            }else {
+                painter.setOpacity(0.9);
+                bitmap = QPixmap(":/icons/deepin/multipleSelectPage/icon_sigleNote_light.svg");
+            }
+            painter.drawPixmap(rect(),bitmap);
+            painter.setOpacity(1);
+//            painter.drawPixmap(rect(),bitmap);
+            QColor color;
+            color = pb.color(DPalette::Normal,DPalette::Window);
+//            color.setAlphaF(0.80);
+            painter.setBrush(color);
+            painter.setPen(QPen(pb.color(DPalette::Normal, DPalette::Text)));
+            paintRect.setLeft(paintRect.left() + 42);
+            paintRect.setRight(paintRect.right() - 42);
+            //dx-拖拽移动
+            QString elideText = fontMetrics.elidedText(m_noteList[0]->noteTitle, Qt::ElideRight, paintRect.width());
+            painter.drawText(paintRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
+        }
     }
-    //绘制阴影效果
-    QPainter painterShadow(this);
-    painterShadow.setRenderHint(QPainter::Antialiasing, true);
-    QColor colorShadow(0,0,0,50);
-    for(int i=0; i<10; i++)
-    {
-        QPainterPath pathw;
-        QPainterPath line;
-        pathw.setFillRule(Qt::WindingFill);
-        //左上加深
-        pathw.addRoundedRect(10-(i/2)-1, 10-(i/2)-1, this->width()-(10-i)*2+3-((i+1-i/2))-3, this->height()-(10-i)*2+3-((i+1-i/2)),8,8);
-        //右下加深
-        //pathw.addRoundedRect(10-i-1, 10-i-1, this->width()-(10-i)*2+3-(i/2+1), this->height()-(10-i)*2+3-(i/2+1),7,9);
-        colorShadow.setAlpha(shadow[i]);
-        painterShadow.setPen(colorShadow);
-        //绘制外部阴影
-        painterShadow.drawPath(pathw);
-    }
+}
+
+//dx-多选拖拽
+void MoveView::setNotesNumber(int value)
+{
+    m_notesNumber = value;
 }

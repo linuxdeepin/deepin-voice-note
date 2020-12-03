@@ -93,7 +93,9 @@ public:
     //更新触摸屏一指状态
     void setTouchState(const TouchState &touchState);
 signals:
-    void dropNotesEnd();
+    //dx-多选拖拽到当前记事本
+    //dx-拖拽取消后选中
+    void dropNotesEnd(bool dropCancel);
 
 protected:
     //鼠标事件

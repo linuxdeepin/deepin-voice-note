@@ -32,9 +32,10 @@
  * @brief VNoteMessageDialog::VNoteMessageDialog
  * @param msgType 窗口类型
  * @param parent
- */
-VNoteMessageDialog::VNoteMessageDialog(int msgType, QWidget *parent)
+ *///dx-删除
+VNoteMessageDialog::VNoteMessageDialog(int msgType, QWidget *parent , int notesCount)
     : VNoteBaseDialog(parent)
+    , m_notesCount(notesCount)
     , m_msgType(static_cast<MessageType>(msgType))
 {
     initUI();
@@ -138,8 +139,12 @@ void VNoteMessageDialog::initMessage()
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "Do you want to stop the current recording?"));
     } break;
     case DeleteNote: {
-        m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "Are you sure you want to delete this note?"));
-
+        //dx-删除(文案)
+        if(m_notesCount>1){
+            m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "Are you sure you want to delete %1 note?").arg(m_notesCount));
+        }else {
+            m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "Are you sure you want to delete this note?"));
+        }
     } break;
     case AsrTimeLimit: {
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "Cannot convert this voice note, as notes over 20 minutes are not supported at present."));

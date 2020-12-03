@@ -36,19 +36,20 @@
  * @param note 绑定记事项数据
  * @param block 绑定文本/语音
  * @param parent
- */
+ *///dx-导出语音
 ExportNoteWorker::ExportNoteWorker(QString dirPath, int exportType,
-                                   VNoteItem *note, VNoteBlock *block, QObject *parent)
+                                   QList<VNoteItem *>noteList, VNoteBlock *block, QObject *parent)
     : VNTask(parent)
     , m_exportType(exportType)
     , m_exportPath(dirPath)
-    , m_note(note)
+    //dx-导出语音
+    , m_noteList(noteList)
     , m_noteblock(block)
 {
 }
 /**
  * @brief ExportNoteWorker::run
- */
+ *///dx-导出语音
 void ExportNoteWorker::run()
 {
     ExportError error = static_cast<ExportError>(checkPath());
@@ -61,12 +62,15 @@ void ExportNoteWorker::run()
         } else if (ExportAll == m_exportType) {
             exportAll();
         } else if (ExportOneVoice == m_exportType) {
-            exportOneVoice(m_noteblock);
+            //dx-导出语音
+            if(m_noteList.size()>1){
+                exportAllVoice();
+            }else {
+                exportOneVoice(m_noteblock);
+            }
         }
     } else {
-        qCritical() << "Export note error: m_exportType=" << m_exportType
-                    << " error:" << error
-                    << " " << *m_note;
+        qCritical() << "Export note error: m_exportType=" << m_exportType;
     }
 
     emit exportFinished(error);
@@ -100,29 +104,29 @@ int ExportNoteWorker::checkPath()
 /**
  * @brief ExportNoteWorker::exportText
  * @return 错误码
- */
+ *///dx-导出文本
 int ExportNoteWorker::exportText()
 {
     ExportError error = ExportOK;
+    //存在note
+    if (m_noteList.size()) {
+        for(auto noteData: m_noteList){
+            QString fileName = QString("%1-%2.txt").arg(noteData->noteTitle).arg(QDateTime::currentDateTime().toLocalTime().toString(VNOTE_TIME_FMT));
+            QFile exportFile(m_exportPath + "/" + fileName);
+            if (exportFile.open(QIODevice::ReadWrite)) {
+                QTextStream stream(&exportFile);
 
-    if (nullptr != m_note) {
-        QString fileName = QString("%1-%2.txt").arg(m_note->noteTitle).arg(QDateTime::currentDateTime().toLocalTime().toString(VNOTE_TIME_FMT));
-
-        QFile exportFile(m_exportPath + "/" + fileName);
-
-        if (exportFile.open(QIODevice::ReadWrite)) {
-            QTextStream stream(&exportFile);
-
-            for (auto it : m_note->datas.datas) {
-                if (VNoteBlock::Text == it->getType()) {
-                    stream << it->blockText;
-                    stream << '\n';
+                for (auto it : noteData->datas.datas) {
+                    if (VNoteBlock::Text == it->getType()) {
+                        stream << it->blockText;
+                        stream << '\n';
+                    }
                 }
-            }
 
-            stream.flush();
-        } else {
-            error = PathDenied;
+                stream.flush();
+            } else {
+                error = PathDenied;
+            }
         }
     } else {
         error = NoteInvalid;
@@ -134,14 +138,16 @@ int ExportNoteWorker::exportText()
 /**
  * @brief ExportNoteWorker::exportAllVoice
  * @return 错误码
- */
+ *///dx-导出语音
 int ExportNoteWorker::exportAllVoice()
 {
     ExportError error = ExportOK;
-
-    if (nullptr != m_note) {
-        for (auto it : m_note->datas.datas) {
-            exportOneVoice(it);
+    //存在note
+    if (m_noteList.size()) {
+        for(auto noteData : m_noteList){
+            for (auto it : noteData->datas.datas) {
+                exportOneVoice(it);
+            }
         }
     } else {
         error = NoteInvalid;

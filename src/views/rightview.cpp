@@ -969,6 +969,17 @@ DetailItemWidget *RightView::getWidgetByPos(const QPoint &pos)
     return nullptr;
 }
 
+//dx-多选详情页
+bool RightView::getIsNormalView() const
+{
+    return m_isNormalView;
+}
+//dx-多选详情页
+void RightView::setIsNormalView(bool value)
+{
+    m_isNormalView = value;
+}
+
 /**
  * @brief RightView::mouseMoveSelect
  * @param event
@@ -1355,9 +1366,11 @@ void RightView::saveMp3()
                 setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
 
                 QString exportDir = dialog.directoryUrl().toLocalFile();
-
+                //dx-导出语音
+                QList<VNoteItem *>noteDataList;
+                noteDataList.append(m_noteItemData);
                 ExportNoteWorker *exportWorker = new ExportNoteWorker(
-                    exportDir, ExportNoteWorker::ExportOneVoice, m_noteItemData, block);
+                    exportDir, ExportNoteWorker::ExportOneVoice, noteDataList, block);
                 exportWorker->setAutoDelete(true);
 
                 QThreadPool::globalInstance()->start(exportWorker);

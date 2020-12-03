@@ -166,7 +166,7 @@ void LeftView::mousePressEvent(QMouseEvent *event)
         }else {
             if(Qt::RightButton == event->button()){
                 m_notepadMenu->setWindowOpacity(1);
-                //多选-右键菜单
+                //dx-右键菜单
                 m_notepadMenu->popup(event->globalPos());
             }
         }
@@ -528,6 +528,7 @@ void LeftView::closeMenu()
  * @param dst
  * @return
  */
+//dx-右键移动
 bool LeftView::doNoteMove(const QModelIndexList &src, const QModelIndex &dst)
 {
     if (src.size() && StandardItemCommon::getStandardItemType(dst) == StandardItemCommon::NOTEPADITEM) {
@@ -569,7 +570,7 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
         VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(src[0]));
         QString elideText = data->noteTitle;
         QString itemInfo = "";
-        //多选-自动截断提示长度
+        //dx-自动截断提示长度
         QFontMetrics fontMetric(this->font());
         //用于计算当前文本名截断宽度的常量
         int constantWidth = fontMetric.width(DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(""));
@@ -816,10 +817,13 @@ void LeftView::triggerDragFolder()
         if (nullptr == m_MoveView) {
             m_MoveView = new MoveView(this);
         }
+        m_MoveView->setFixedSize(224,91);
         m_MoveView->setFolder(folder);
         drag->setPixmap(m_MoveView->grab());
         drag->setMimeData(mimeData);
         m_folderDraing = true;
+        //解决高分屏显示与鼠标位置不对应问题，使用固定位置
+        drag->setHotSpot(QPoint(21,25));
         drag->exec(Qt::MoveAction);
         drag->deleteLater();
         m_folderDraing = false;
@@ -839,7 +843,10 @@ void LeftView::dropEvent(QDropEvent * event)
 {
     // 判断拖拽放下事件触发类型（笔记：NOTES_DRAG_KEY；记事本：NOTEPAD_DRAG_KEY）
     if (event->mimeData()->hasFormat(NOTES_DRAG_KEY)) {
-        emit dropNotesEnd();
+        //dx-拖拽到当前记事本不取消选中
+        bool currentNotePad = currentIndex().row() == indexAt( event->pos()).row()? true:false;
+        //dx-拖拽取消后选中
+        emit dropNotesEnd(currentNotePad);
     } else if (event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)) {
         doDragMove(currentIndex(), indexAt(mapFromGlobal(QCursor::pos())));
     }

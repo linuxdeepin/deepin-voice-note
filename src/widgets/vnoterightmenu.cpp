@@ -57,7 +57,6 @@ void VNoteRightMenu::mouseMoveEvent(QMouseEvent *eve)
  */
 void VNoteRightMenu::mouseReleaseEvent(QMouseEvent *eve)
 {
-    qDebug()<<"release";
     if (eve->source() == Qt::MouseEventSynthesizedByQt) {
         emit menuTouchReleased();
         m_timer->stop();

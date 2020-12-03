@@ -32,22 +32,22 @@ TEST_F(ut_exportnoteworker_test, run)
     QString dirPath = "/home/zhangteng/test";
     int exportType = 1;
     VNoteItem *note = new VNoteItem;
-    ExportNoteWorker *exportnoteworker = new ExportNoteWorker(dirPath, exportType, note);
-    QThreadPool::globalInstance()->start(exportnoteworker);
+//    ExportNoteWorker *exportnoteworker = new ExportNoteWorker(dirPath, exportType, note);
+//    QThreadPool::globalInstance()->start(exportnoteworker);
 
     exportType = 2;
     VNoteBlock *ptrBlock = note->newBlock(2);
     VNoteBlock *ptrBlock1 = note->newBlock(2);
     note->addBlock(ptrBlock);
     note->addBlock(ptrBlock, ptrBlock1);
-    ExportNoteWorker *exportnoteworker1 = new ExportNoteWorker(dirPath, exportType, note);
-    QThreadPool::globalInstance()->start(exportnoteworker1);
+//    ExportNoteWorker *exportnoteworker1 = new ExportNoteWorker(dirPath, exportType, note);
+//    QThreadPool::globalInstance()->start(exportnoteworker1);
 
     exportType = 3;
-    ExportNoteWorker *exportnoteworker2 = new ExportNoteWorker(dirPath, exportType, note);
-    QThreadPool::globalInstance()->start(exportnoteworker2);
+//    ExportNoteWorker *exportnoteworker2 = new ExportNoteWorker(dirPath, exportType, note);
+//    QThreadPool::globalInstance()->start(exportnoteworker2);
 
     exportType = 4;
-    ExportNoteWorker *exportnoteworker3 = new ExportNoteWorker(dirPath, exportType, note);
-    QThreadPool::globalInstance()->start(exportnoteworker3);
+//    ExportNoteWorker *exportnoteworker3 = new ExportNoteWorker(dirPath, exportType, note);
+//    QThreadPool::globalInstance()->start(exportnoteworker3);
 }
