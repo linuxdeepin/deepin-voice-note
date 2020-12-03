@@ -17,7 +17,7 @@ var h5Tpl  = `
 <div class="li" contenteditable="false" jsonKey="{{jsonValue}}">
     <div>
     <div class="demo" >
-        <div class="left"> 
+        <div class="left">
             <div class="btn play"></div>
         </div>
         <div class="right">
@@ -50,7 +50,7 @@ var h5Tpl  = `
 var nodeTpl = `
     <div>
     <div class="demo" >
-        <div class="left"> 
+        <div class="left">
             <div class="btn play"></div>
         </div>
         <div class="right">
@@ -169,10 +169,12 @@ function getAllNote(){
     var jsonString;
     $('.li').each(function() {
         jsonString = $(this).attr('jsonKey');
-        jsonArray[jsonArray.length] = jsonString;     
+        jsonArray[jsonArray.length] = JSON.parse(jsonString);     
     })
     jsonObj.noteDatas = jsonArray;
     var retJson = JSON.stringify(jsonObj);
+
+    console.log('========>',retJson);
     return retJson;
 }
 
