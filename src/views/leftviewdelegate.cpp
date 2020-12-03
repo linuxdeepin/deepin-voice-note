@@ -282,24 +282,51 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
                     QModelIndex srcIndex = m_treeView->currentIndex();
                     QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
                     painter->setBrush(QBrush(fillColor));
+                    bool underCurrentRect = false;
+                    QRect rect = option.rect;
+                    if(point.y()>option.rect.topLeft().y()+0.5*option.rect.height()){
+                        underCurrentRect = true;
+                    }else if (point.y()<option.rect.topLeft().y()+0.5*option.rect.height()) {
+                        underCurrentRect = false;
+                    }
                     if(dstIndex.row() > srcIndex.row()){
+                        if(!underCurrentRect){
+                            int upperParam = lastIndexHeightParam == option.rect.height()?4:0;
+                            if(dstIndex.row() == srcIndex.row()+1){
+                                rect = QRect(QPoint(option.rect.topLeft().x(),option.rect.topLeft().y())
+                                             ,QPoint(option.rect.bottomRight().x(),option.rect.bottomRight().y()));
+                            }else {
+                                rect = QRect(QPoint(option.rect.topLeft().x(),option.rect.topLeft().y()-option.rect.height()+upperParam)
+                                             ,QPoint(option.rect.bottomRight().x(),option.rect.bottomRight().y()-option.rect.height()+upperParam));
+                            }
+                        }
                         //左下triangle
-                        QRect rc(option.rect.x() + 12, option.rect.y() + option.rect.height() - param - 3, 6, 7);
+                        QRect rc(rect.x() + 12, rect.y() + rect.height() - param - 3, 6, 7);
                         paintTriangle(painter,rc, painter->brush(), true);
-                        painter->fillRect(QRect(option.rect.x() + 15, option.rect.y() - 1 + option.rect.height() - param, paintRect.width() - 10, 2), painter->brush());
+                        painter->fillRect(QRect(rect.x() + 15, rect.y() - 1 + rect.height() - param, paintRect.width() - 10, 2), painter->brush());
                         //右下triangle
-                        rc = QRect(option.rect.right() - 15, option.rect.y() + option.rect.height() - param - 3, 6, 7);
+                        rc = QRect(rect.right() - 15, rect.y() + rect.height() - param - 3, 6, 7);
                         paintTriangle(painter,rc, painter->brush(), false);
                     }
                     //目标索引与当前索引相当时，不绘制横线效果
                     else if(dstIndex.row() < srcIndex.row()){
+                        if(underCurrentRect){
+                            int lowerParam = index.row()==0?5:0;
+                            if(dstIndex.row() == srcIndex.row()-1){
+                                rect = QRect(QPoint(option.rect.topLeft().x(),option.rect.topLeft().y())
+                                             ,QPoint(option.rect.bottomRight().x(),option.rect.bottomRight().y()));
+                            }else {
+                                rect = QRect(QPoint(option.rect.topLeft().x(),option.rect.topLeft().y()+option.rect.height()-lowerParam)
+                                             ,QPoint(option.rect.bottomRight().x(),option.rect.bottomRight().y()+option.rect.height()-lowerParam));
+                            }
+                        }
                         //左上triangle
-                        QRect rc(option.rect.x() + 12, option.rect.y() + param - 3, 6, 7);
+                        QRect rc(rect.x() + 12, rect.y() + param - 3, 6, 7);
                         paintTriangle(painter,rc, painter->brush(), true);
                         //调整横线长度
-                        painter->fillRect(QRect(option.rect.x()+ 15, option.rect.y() + param -1, paintRect.width() - 10 , 2), painter->brush());
+                        painter->fillRect(QRect(rect.x()+ 15, rect.y() + param -1, paintRect.width() - 10 , 2), painter->brush());
                         //右上triangle
-                        rc = QRect(option.rect.right() - 15, option.rect.y() + param - 3, 6, 7);
+                        rc = QRect(rect.right() - 15, rect.y() + param - 3, 6, 7);
                         paintTriangle(painter,rc, painter->brush(), false);
                     }
                     painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));

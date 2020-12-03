@@ -1393,6 +1393,7 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         QModelIndexList notesdataList = m_middleView->getAllSelectNote();
         if(notesdataList.size()){
             QModelIndex selectFolder = m_leftView->selectMoveFolder(notesdataList);
+            m_leftView->setNumberOfNotes(m_middleView->count());
             if(selectFolder.isValid() && m_leftView->doNoteMove(notesdataList, selectFolder)){
                 m_middleView->deleteModelIndexs(notesdataList);
                 //dx-移除后选中
@@ -1698,11 +1699,14 @@ int VNoteMainWindow::loadSearchNotes(const QString &key)
             m_middleView->setVisibleEmptySearch(true);
             m_rightView->initData(nullptr, m_searchKey);
             m_recordBar->setVisible(false);
+            m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
         } else {
             m_middleView->sortView(false);
             m_middleView->setVisibleEmptySearch(false);
             m_middleView->setCurrentIndex(0);
         }
+        //dx-切换详情页到单文本页面
+        m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
     }
     return m_middleView->rowCount();
 }
@@ -2146,7 +2150,7 @@ void VNoteMainWindow::onDropNote(bool dropCancel)
     QModelIndexList indexList =  m_middleView->getAllSelectNote();
     QPoint point = m_leftView->mapFromGlobal(QCursor::pos());
     QModelIndex selectIndex = m_leftView->indexAt(point);
-
+    m_leftView->setNumberOfNotes(m_middleView->count());
     bool ret = m_leftView->doNoteMove(indexList, selectIndex);
     if (ret) {
         m_middleView->deleteModelIndexs(indexList);
@@ -2167,6 +2171,7 @@ void VNoteMainWindow::handleMultipleOption(int id){
             QModelIndexList notesdata = m_middleView->getAllSelectNote();
             if(notesdata.size()){
                 QModelIndex selectFolder = m_leftView->selectMoveFolder(notesdata);
+                m_leftView->setNumberOfNotes(m_middleView->count());
                 if(selectFolder.isValid() && m_leftView->doNoteMove(notesdata, selectFolder)){
                     m_middleView->deleteModelIndexs(notesdata);
                     //dx-移除后选中

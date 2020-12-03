@@ -92,6 +92,9 @@ public:
     void handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point);
     //更新触摸屏一指状态
     void setTouchState(const TouchState &touchState);
+    //当前记事本笔记个数
+    void setNumberOfNotes(int numberOfNotes);
+
 signals:
     //dx-多选拖拽到当前记事本
     //dx-拖拽取消后选中
@@ -164,6 +167,7 @@ private:
     QTimer *m_selectCurrentTimer {nullptr};
     QTimer *m_popMenuTimer {nullptr};
     TouchState m_touchState {TouchNormal};
+    int m_notesNumberOfCurrentFolder = 0;
 };
 
 #endif // LEFTVIEW_H

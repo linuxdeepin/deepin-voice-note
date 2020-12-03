@@ -147,6 +147,8 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     //移动
     void mouseMoveEvent(QMouseEvent *event) override;
+    //按键释放事件
+    void keyReleaseEvent(QKeyEvent *event) override;
     //事件过滤器
     bool eventFilter(QObject *o, QEvent *e) override;
     //按键事件

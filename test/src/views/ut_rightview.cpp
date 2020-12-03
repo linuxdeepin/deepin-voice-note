@@ -199,3 +199,17 @@ TEST_F(ut_rightview_test, closeMenu)
     RightView rightview;
     rightview.closeMenu();
 }
+
+TEST_F(ut_rightview_test, setIsNormalView)
+{
+    RightView rightview;
+    bool value = false;
+    rightview.setIsNormalView(value);
+}
+
+TEST_F(ut_rightview_test, getIsNormalView)
+{
+    RightView rightview;
+    rightview.setIsNormalView(true);
+    EXPECT_TRUE(rightview.getIsNormalView());
+}

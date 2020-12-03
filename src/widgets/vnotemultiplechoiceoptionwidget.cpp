@@ -1,6 +1,7 @@
 #include "vnotemultiplechoiceoptionwidget.h"
 
-#include <libdtk-5.2.2/DWidget/dapplication.h>
+//#include <libdtk-5.2.2/DWidget/dapplication.h>
+#include <DApplication>
 //#include <DApplicationHelper>
 
 //dx-多选详情页

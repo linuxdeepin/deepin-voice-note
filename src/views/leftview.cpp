@@ -552,6 +552,15 @@ bool LeftView::doNoteMove(const QModelIndexList &src, const QModelIndex &dst)
                 //更新数据库
                 noteOper.updateFolderId(tmpData);
             }
+
+            //全部移除后重置当前记事本maxid
+            if(src.count() == m_notesNumberOfCurrentFolder){
+                VNoteFolder *folder = reinterpret_cast<VNoteFolder *>
+                        (StandardItemCommon::getStandardItemData(currentIndex()));
+                folder->maxNoteIdRef() = 0;
+            }else {
+                selectFolder->maxNoteIdRef() +=src.size();
+            }
             return true;
         }
     }
@@ -793,6 +802,11 @@ void LeftView::doDragMove(const QModelIndex &src, const QModelIndex &dst)
         QString folderSortData = getFolderSort();
         setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
     }
+}
+
+void LeftView::setNumberOfNotes(int numberOfNotes)
+{
+    m_notesNumberOfCurrentFolder = numberOfNotes;
 }
 
 /**

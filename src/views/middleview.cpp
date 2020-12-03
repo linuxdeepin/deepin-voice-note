@@ -390,13 +390,16 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                     //从shift切换到ctrl/ctrl切换到shift状态时，未刷新详情页状态
                     changeRightView(false);
                 }else {
-
                     if(selectedIndexes().contains(modelIndex)){
                         selectionModel()->select(m_pSortViewFilter->index(modelIndex.row(), 0), QItemSelectionModel::Deselect);
                         //dx-刷新详情页
                         if(selectedIndexes().count()==1){
                             //普通详情页
+                            int row = selectedIndexes().last().row();
                             changeRightView(false);
+                            //触发currentChanged信号，刷新详情页
+                            setCurrentIndex(row);
+                            selectionModel()->select(m_pSortViewFilter->index(row, 0), QItemSelectionModel::Select);
                         }else {
                             //多选详情页
                             changeRightView();
@@ -712,6 +715,15 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
+//dx-键盘释放重置shift判断位置
+void MiddleView::keyReleaseEvent(QKeyEvent *event)
+{
+    if( Qt::Key_Shift == event->key()){
+        m_shiftSelection = -1;
+    }
+    DListView::keyReleaseEvent(event);
+}
+
 /**
  * @brief LeftView::handleTouchSlideEvent  处理触摸屏move事件，区分点击、滑动、拖拽、长按功能
  * @param timeParam 时间间隔
@@ -769,7 +781,11 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
                     selectionModel()->select(m_pSortViewFilter->index(m_shiftSelection, 0), QItemSelectionModel::Deselect);
                     //普通详情页
                     if(nextIndex == m_currentRow){
+                        int row = selectedIndexes().last().row();
                         changeRightView(false);
+                        //触发currentChanged信号，刷新详情页
+                        setCurrentIndex(row);
+                        selectionModel()->select(m_pSortViewFilter->index(row, 0), QItemSelectionModel::Select);
                     }
                     selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
                 }
@@ -797,7 +813,11 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
                     selectionModel()->select(m_pSortViewFilter->index(m_shiftSelection, 0), QItemSelectionModel::Deselect);
                     //普通详情页
                     if(nextIndex == m_currentRow){
+                        int row = selectedIndexes().last().row();
                         changeRightView(false);
+                        //触发currentChanged信号，刷新详情页
+                        setCurrentIndex(row);
+                        selectionModel()->select(m_pSortViewFilter->index(row, 0), QItemSelectionModel::Select);
                     }
                     selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
                 }
