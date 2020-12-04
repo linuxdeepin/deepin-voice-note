@@ -88,20 +88,20 @@
         <file>deepin-voice-note-setting.json</file>
         <file>icons/deepin/builtin/light/top.svg</file>
         <file>icons/deepin/builtin/dark/top.svg</file>
-        <file>icons/deepin/multipleSelectPage/icon_saveText_dark.svg</file>
-        <file>icons/deepin/multipleSelectPage/icon_delete_dark.svg</file>
-        <file>icons/deepin/multipleSelectPage/icon_delete_light.svg</file>
-        <file>icons/deepin/multipleSelectPage/icon_move_dark.svg</file>
-        <file>icons/deepin/multipleSelectPage/icon_move_light.svg</file>
-        <file>icons/deepin/multipleSelectPage/icon_notePad_dark.svg</file>
-        <file>icons/deepin/multipleSelectPage/icon_notePad_lignt.svg</file>
-        <file>icons/deepin/multipleSelectPage/icon_notes.svg</file>
-        <file>icons/deepin/multipleSelectPage/icon_saveText_light.svg</file>
-        <file>icons/deepin/multipleSelectPage/icon_saveVoice_dark.svg</file>
-        <file>icons/deepin/multipleSelectPage/icon_saveVoice_light.svg</file>
-        <file>icons/deepin/multipleSelectPage/icon_sigleNote_dark.svg</file>
-        <file>icons/deepin/multipleSelectPage/icon_sigleNote_light.svg</file>
-        <file>icons/deepin/multipleSelectPage/notes_dark.svg</file>
-        <file>icons/deepin/multipleSelectPage/notes_light.svg</file>
+        <file>icons/deepin/builtin/dark/drag_notePad.svg</file>
+        <file>icons/deepin/builtin/dark/drag_notes.svg</file>
+        <file>icons/deepin/builtin/dark/drag_note.svg</file>
+        <file>icons/deepin/builtin/light/drag_notes.svg</file>
+        <file>icons/deepin/builtin/light/detail_notes_delete.svg</file>
+        <file>icons/deepin/builtin/light/detail_notes_move.svg</file>
+        <file>icons/deepin/builtin/light/detail_notes_saveText.svg</file>
+        <file>icons/deepin/builtin/light/detail_notes_saveVoice.svg</file>
+        <file>icons/deepin/builtin/light/drag_note.svg</file>
+        <file>icons/deepin/builtin/detail_icon/detail_icon_note.svg</file>
+        <file>icons/deepin/builtin/light/drag_notePad.svg</file>
+        <file>icons/deepin/builtin/dark/detail_notes_delete.svg</file>
+        <file>icons/deepin/builtin/dark/detail_notes_move.svg</file>
+        <file>icons/deepin/builtin/dark/detail_notes_saveText.svg</file>
+        <file>icons/deepin/builtin/dark/detail_notes_saveVoice.svg</file>
     </qresource>
 </RCC>

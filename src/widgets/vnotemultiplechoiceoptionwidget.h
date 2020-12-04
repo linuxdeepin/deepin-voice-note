@@ -38,10 +38,10 @@ protected:
     void initConnections();
 private:
     DLabel *m_tipsLabel  {nullptr};
-    DToolButton *moveButton {nullptr};
+    DToolButton *m_moveButton {nullptr};
     DToolButton *m_saveVoiceButton {nullptr};
     DToolButton *m_saveTextButton {nullptr};
-    DToolButton *deleteButton {nullptr};
+    DToolButton *m_deleteButton {nullptr};
     int m_noteNumber  = 0;
 };
 

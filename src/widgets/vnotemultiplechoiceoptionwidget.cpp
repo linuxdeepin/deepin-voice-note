@@ -1,5 +1,5 @@
 #include "vnotemultiplechoiceoptionwidget.h"
-
+#include "globaldef.h"
 //#include <libdtk-5.2.2/DWidget/dapplication.h>
 #include <DApplication>
 //#include <DApplicationHelper>
@@ -20,7 +20,7 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     QVBoxLayout *vlayout = new QVBoxLayout();
 
     DLabel *iconLabel = new DLabel();
-    QImage image(":/icons/deepin/multipleSelectPage/icon_notes.svg");
+    QImage image(QString(STAND_ICON_PAHT).append("detail_icon/detail_icon_note.svg"));
     iconLabel->setPixmap(QPixmap::fromImage(image));
     iconLabel->setFixedSize(186,186);
     QHBoxLayout *iconLayout = new QHBoxLayout();
@@ -38,10 +38,10 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     tipsLayout->addWidget(m_tipsLabel);
     tipsLayout->addStretch();
 
-    moveButton = new DToolButton();
-    moveButton->setFixedHeight(26);
-    moveButton->setText(DApplication::translate("NotesContextMenu", "Move"));
-    moveButton->setIconSize(QSize(24,24));
+    m_moveButton = new DToolButton();
+    m_moveButton->setFixedHeight(26);
+    m_moveButton->setText(DApplication::translate("NotesContextMenu", "Move"));
+    m_moveButton->setIconSize(QSize(24,24));
     m_saveTextButton = new DToolButton();
     m_saveTextButton->setFixedHeight(26);
     m_saveTextButton->setText(DApplication::translate("NotesContextMenu", "Save as TXT"));
@@ -50,10 +50,10 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     m_saveVoiceButton->setFixedHeight(26);
     m_saveVoiceButton->setText(DApplication::translate("NotesContextMenu", "Save voice recording"));
     m_saveVoiceButton->setIconSize(QSize(24,24));
-    deleteButton = new DToolButton();
-    deleteButton->setFixedHeight(26);
-    deleteButton->setText(DApplication::translate("NotesContextMenu", "Delete"));
-    deleteButton->setIconSize(QSize(24,24));
+    m_deleteButton = new DToolButton();
+    m_deleteButton->setFixedHeight(26);
+    m_deleteButton->setText(DApplication::translate("NotesContextMenu", "Delete"));
+    m_deleteButton->setIconSize(QSize(24,24));
     //设置主题
     changeFromThemeType();
     //初始化链接
@@ -66,10 +66,10 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     vlayout->addSpacing(20);
     QHBoxLayout *hlayout = new QHBoxLayout();
     hlayout->addStretch(1);
-    hlayout->addWidget(moveButton);
+    hlayout->addWidget(m_moveButton);
     hlayout->addWidget(m_saveTextButton);
     hlayout->addWidget(m_saveVoiceButton);
-    hlayout->addWidget(deleteButton);
+    hlayout->addWidget(m_deleteButton);
     hlayout->addSpacing(10);
     hlayout->addStretch(1);
     vlayout->addLayout(hlayout);
@@ -82,7 +82,7 @@ void VnoteMultipleChoiceOptionWidget::initUi()
  * @param number
  *///初始化链接
 void VnoteMultipleChoiceOptionWidget::initConnections(){
-    connect(moveButton,&DToolButton::clicked,this,[this]{
+    connect(m_moveButton,&DToolButton::clicked,this,[this]{
         trigger(ButtonValue::Move);
     });
     connect(m_saveTextButton,&DToolButton::clicked,this,[this]{
@@ -91,7 +91,7 @@ void VnoteMultipleChoiceOptionWidget::initConnections(){
     connect(m_saveVoiceButton,&DToolButton::clicked,this,[this]{
         trigger(ButtonValue::SaveAsVoice);
     });
-    connect(deleteButton,&DToolButton::clicked,this,[this]{
+    connect(m_deleteButton,&DToolButton::clicked,this,[this]{
         trigger(ButtonValue::Delete);
     });
     //主题切换更换按钮和文本颜色
@@ -136,23 +136,23 @@ void VnoteMultipleChoiceOptionWidget::trigger(int id){
  *///多选-根据主题设置图标与删除按钮文本颜色
 void VnoteMultipleChoiceOptionWidget::changeFromThemeType(){
     bool isDark = (DApplicationHelper::DarkType ==  DApplicationHelper::instance()->themeType())? true:false;
+    QString iconPath = QString(STAND_ICON_PAHT);
     if(isDark){
-        moveButton->setIcon(QIcon(":/icons/deepin/multipleSelectPage/icon_move_dark.svg"));
-        m_saveTextButton->setIcon(QIcon(":/icons/deepin/multipleSelectPage/icon_saveText_dark.svg"));
-        m_saveVoiceButton->setIcon(QIcon(":/icons/deepin/multipleSelectPage/icon_saveVoice_dark.svg"));
-        deleteButton->setIcon(QIcon(":/icons/deepin/multipleSelectPage/icon_delete_dark.svg"));
+        iconPath.append("dark/");
         //设置字体颜色（特殊颜色与UI沟通可以不根据DTK色板单独设置）
-        DPalette deletePalette = DApplicationHelper::instance()->palette(deleteButton);
+        DPalette deletePalette = DApplicationHelper::instance()->palette(m_deleteButton);
         deletePalette.setBrush(DPalette::ButtonText,QColor("#9A2F2F"));
-        DApplicationHelper::instance()->setPalette(deleteButton, deletePalette);
+        DApplicationHelper::instance()->setPalette(m_deleteButton, deletePalette);
     }else {
-        moveButton->setIcon(QIcon(":/icons/deepin/multipleSelectPage/icon_move_light.svg"));
-        m_saveTextButton->setIcon(QIcon(":/icons/deepin/multipleSelectPage/icon_saveText_light.svg"));
-        m_saveVoiceButton->setIcon(QIcon(":/icons/deepin/multipleSelectPage/icon_saveVoice_light.svg"));
-        deleteButton->setIcon(QIcon(":/icons/deepin/multipleSelectPage/icon_delete_light.svg"));
+        iconPath.append("light/");
         //设置字体颜色（特殊颜色与UI沟通可以不根据DTK色板单独设置）
-        DPalette deletePalette = DApplicationHelper::instance()->palette(deleteButton);
+        DPalette deletePalette = DApplicationHelper::instance()->palette(m_deleteButton);
         deletePalette.setBrush(DPalette::ButtonText,QColor("#FF5736"));
-        DApplicationHelper::instance()->setPalette(deleteButton, deletePalette);
+        DApplicationHelper::instance()->setPalette(m_deleteButton, deletePalette);
     }
+    //根据主题设置图标
+    m_moveButton->setIcon(QIcon(QString("%1%2").arg(iconPath).arg("detail_notes_move.svg")));
+    m_saveTextButton->setIcon(QIcon(QString("%1%2").arg(iconPath).arg("detail_notes_saveText.svg")));
+    m_saveVoiceButton->setIcon(QIcon(QString("%1%2").arg(iconPath).arg("detail_notes_saveVoice.svg")));
+    m_deleteButton->setIcon(QIcon(QString("%1%2").arg(iconPath).arg("detail_notes_delete.svg")));
 }

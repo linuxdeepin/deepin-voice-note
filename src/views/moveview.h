@@ -44,15 +44,10 @@ protected:
     //重写paint事件
     void paintEvent(QPaintEvent *) override;
 private:
-    //初始化背景图片
-    void initBackGroundMap();
-
     VNoteFolder *m_folder {nullptr};
     VNoteItem   *m_note {nullptr};
     //多选-笔记列表
     QList<VNoteItem *>m_noteList {nullptr};
-    //多选-是否多选
-    bool m_isMultiple {false};
     //多选-笔记数量
     int m_notesNumber = 0;
     //初始化背景图片

@@ -22,7 +22,7 @@
 #include "db/vnotefolderoper.h"
 #include "common/vnoteforlder.h"
 #include "common/vnoteitem.h"
-
+#include "globaldef.h"
 #include <QPainter>
 #include <QPainterPath>
 #include <DApplicationHelper>
@@ -53,40 +53,6 @@ void MoveView::setFolder(VNoteFolder *folder)
 /**
  * @brief MoveView::setNote
  * @param note 笔记数据
- *///初始化背景图片
-void MoveView::initBackGroundMap(){
-    if(DGuiApplicationHelper::instance()->themeType()==DGuiApplicationHelper::LightType){
-        m_isDarkThemeType = false;
-    }
-    //深色主题
-    if(m_isDarkThemeType){
-        if(m_folder){
-            m_backGroundPixMap = QPixmap(":/icons/deepin/multipleSelectPage/icon_notePad_dark.svg");
-        }else {
-            if(1 < m_noteList.size()){
-                m_backGroundPixMap = QPixmap(":/icons/deepin/multipleSelectPage/notes_dark.svg");
-            }else if(1 == m_noteList.size()){
-                m_backGroundPixMap = QPixmap(":/icons/deepin/multipleSelectPage/icon_sigleNote_dark.svg");
-            }
-        }
-    }
-    //浅色主题
-    else {
-        if(m_folder){
-            m_backGroundPixMap = QPixmap(":/icons/deepin/multipleSelectPage/icon_notePad_lignt.svg");
-        }else {
-            if(1 < m_noteList.size()){
-                m_backGroundPixMap = QPixmap(":/icons/deepin/multipleSelectPage/notes_light.svg");
-            }else if(1 == m_noteList.size()){
-                m_backGroundPixMap = QPixmap(":/icons/deepin/multipleSelectPage/icon_sigleNote_light.svg");
-            }
-        }
-    }
-}
-
-/**
- * @brief MoveView::setNote
- * @param note 笔记数据
  */
 void MoveView::setNote(VNoteItem *note)
 {
@@ -106,8 +72,29 @@ void MoveView::setNoteList(QList<VNoteItem *>noteList)
  */
 void MoveView::paintEvent(QPaintEvent *)
 {
-    //初始化背景图片
-    initBackGroundMap();
+    if(DGuiApplicationHelper::instance()->themeType()==DGuiApplicationHelper::LightType){
+        m_isDarkThemeType = false;
+    }else {
+        m_isDarkThemeType = true;
+    }
+    QString imagePath = QString(STAND_ICON_PAHT);
+    //深色主题
+    if(m_isDarkThemeType){
+        imagePath.append("dark/");
+    }
+    //浅色主题
+    else {
+        imagePath.append("light/");
+    }
+    if(m_folder){
+        m_backGroundPixMap = QPixmap(imagePath.append("drag_notePad.svg"));
+    }else {
+        if(1 < m_notesNumber){
+            m_backGroundPixMap = QPixmap(imagePath.append("drag_notes.svg"));
+        }else if(1 == m_notesNumber){
+            m_backGroundPixMap = QPixmap(imagePath.append("drag_note.svg"));
+        }
+    }
     //多选-多选拖拽
     QPainter painter(this);
     ///从系统获取画板
@@ -149,7 +136,7 @@ void MoveView::paintEvent(QPaintEvent *)
         //绘制笔记拖动缩略图
     }else {
         //多个笔记拖拽
-        if(m_noteList.size() > 1){
+        if(m_notesNumber > 1){
             if(m_isDarkThemeType){
                 painter.setOpacity(0.98);
             }
@@ -193,7 +180,7 @@ void MoveView::paintEvent(QPaintEvent *)
             painter.drawText(numberRect, Qt::AlignCenter, numString);
         }
         //单个笔记拖拽
-        else if (1 == m_noteList.size()) {
+        else if (1 == m_notesNumber) {
             if(!m_isDarkThemeType){
                 painter.setOpacity(0.9);
             }
