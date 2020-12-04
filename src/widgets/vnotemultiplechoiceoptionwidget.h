@@ -3,16 +3,17 @@
 
 #include <QWidget>
 
-#include <DToolButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+
+#include <DToolButton>
 #include <DFontSizeManager>
 #include <DApplicationHelper>
 #include <DWidget>
 #include <DLabel>
 
 DWIDGET_USE_NAMESPACE
-//dx-多选详情页
+//多选-多选详情页
 class VnoteMultipleChoiceOptionWidget : public DWidget
 {
     Q_OBJECT
@@ -28,6 +29,7 @@ public:
     void setNoteNumber(int number);
     //设置按钮是否置灰
     void enableButtons(bool saveAsTxtButtonStatus = true,bool saveAsVoiceButtonStatus = true);
+
 signals:
     void requestMultipleOption(int id);
 protected:

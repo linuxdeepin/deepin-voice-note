@@ -64,13 +64,6 @@ TEST_F(ut_MoveView_test,setNotesNumber)
     moveView.setNotesNumber(number);
 }
 
-TEST_F(ut_MoveView_test,setMultiple)
-{
-    bool multiple = true;
-    MoveView moveView;
-    moveView.setMultiple(multiple);
-}
-
 TEST_F(ut_MoveView_test,setNoteList)
 {
     QList<VNoteItem *>noteList;

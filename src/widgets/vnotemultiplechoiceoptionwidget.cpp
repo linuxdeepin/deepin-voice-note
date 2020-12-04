@@ -4,7 +4,7 @@
 #include <DApplication>
 //#include <DApplicationHelper>
 
-//dx-多选详情页
+//多选-多选详情页
 VnoteMultipleChoiceOptionWidget::VnoteMultipleChoiceOptionWidget(QWidget *parent)
     :DWidget(parent)
 {
@@ -30,8 +30,8 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     iconLayout->addStretch();
 
     m_tipsLabel = new DLabel();
-//    m_tipsLabel->setText(DApplication::translate("%1 notes selected", "DetailPage").arg(m_noteNumber));
     m_tipsLabel->setFixedHeight(29);
+
     DFontSizeManager::instance()->bind(m_tipsLabel,DFontSizeManager::T4);
     QHBoxLayout *tipsLayout = new QHBoxLayout();
     tipsLayout->addStretch();
@@ -133,7 +133,7 @@ void VnoteMultipleChoiceOptionWidget::trigger(int id){
 /**
  * @brief VnoteMultipleChoiceOptionWidget::changeFromThemeType
  * @param
- *///dx-根据主题设置图标与删除按钮文本颜色
+ *///多选-根据主题设置图标与删除按钮文本颜色
 void VnoteMultipleChoiceOptionWidget::changeFromThemeType(){
     bool isDark = (DApplicationHelper::DarkType ==  DApplicationHelper::instance()->themeType())? true:false;
     if(isDark){

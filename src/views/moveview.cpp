@@ -28,14 +28,17 @@
 #include <DApplicationHelper>
 #include <DLog>
 
-const int shadow[10] = {15,13,11,9,6,5,4,3,2,1};
 MoveView::MoveView(QWidget *parent)
     : QWidget(parent)
 {
-    ////shadow
+    //shadow
     setWindowFlags(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground,true);
-    setFixedSize(200,56);
+    if(m_folder){
+        setFixedSize(224,91);
+    }else {
+        setFixedSize(282,91);
+    }
 }
 
 /**
@@ -50,22 +53,52 @@ void MoveView::setFolder(VNoteFolder *folder)
 /**
  * @brief MoveView::setNote
  * @param note 笔记数据
+ *///初始化背景图片
+void MoveView::initBackGroundMap(){
+    if(DGuiApplicationHelper::instance()->themeType()==DGuiApplicationHelper::LightType){
+        m_isDarkThemeType = false;
+    }
+    //深色主题
+    if(m_isDarkThemeType){
+        if(m_folder){
+            m_backGroundPixMap = QPixmap(":/icons/deepin/multipleSelectPage/icon_notePad_dark.svg");
+        }else {
+            if(1 < m_noteList.size()){
+                m_backGroundPixMap = QPixmap(":/icons/deepin/multipleSelectPage/notes_dark.svg");
+            }else if(1 == m_noteList.size()){
+                m_backGroundPixMap = QPixmap(":/icons/deepin/multipleSelectPage/icon_sigleNote_dark.svg");
+            }
+        }
+    }
+    //浅色主题
+    else {
+        if(m_folder){
+            m_backGroundPixMap = QPixmap(":/icons/deepin/multipleSelectPage/icon_notePad_lignt.svg");
+        }else {
+            if(1 < m_noteList.size()){
+                m_backGroundPixMap = QPixmap(":/icons/deepin/multipleSelectPage/notes_light.svg");
+            }else if(1 == m_noteList.size()){
+                m_backGroundPixMap = QPixmap(":/icons/deepin/multipleSelectPage/icon_sigleNote_light.svg");
+            }
+        }
+    }
+}
+
+/**
+ * @brief MoveView::setNote
+ * @param note 笔记数据
  */
 void MoveView::setNote(VNoteItem *note)
 {
     m_note = note;
 }
 
-//dx-拖拽移动
+/**
+ * @brief MoveView::setNoteList
+ *///多选-拖拽移动
 void MoveView::setNoteList(QList<VNoteItem *>noteList)
 {
     m_noteList = noteList;
-}
-
-//dx-多选拖拽
-void MoveView::setMultiple(bool isMultiple)
-{
-    m_isMultiple = isMultiple;
 }
 
 /**
@@ -73,8 +106,9 @@ void MoveView::setMultiple(bool isMultiple)
  */
 void MoveView::paintEvent(QPaintEvent *)
 {
-    //dx-多选拖拽
-    QPixmap bitmap;
+    //初始化背景图片
+    initBackGroundMap();
+    //多选-多选拖拽
     QPainter painter(this);
     ///从系统获取画板
     DPalette pb = DApplicationHelper::instance()->applicationPalette();
@@ -83,17 +117,12 @@ void MoveView::paintEvent(QPaintEvent *)
     painter.setPen(Qt::NoPen);
     QFontMetrics fontMetrics = painter.fontMetrics();
     QRect paintRect = rect();
-    bool isDark = DGuiApplicationHelper::instance()->themeType()==DGuiApplicationHelper::DarkType?true:false;
     if(m_folder){
-        setFixedSize(224,91);
-        if(isDark){
-            bitmap = QPixmap(":/icons/deepin/multipleSelectPage/icon_notePad_dark.svg");
-        }else {
-            painter.setOpacity(0.9);
-            bitmap = QPixmap(":/icons/deepin/multipleSelectPage/icon_notePad_lignt.svg");
-        }
         //设置透明度
-        painter.drawPixmap(rect(),bitmap);
+        if(!m_isDarkThemeType){
+            painter.setOpacity(0.9);
+        }
+        painter.drawPixmap(rect(),m_backGroundPixMap);
         painter.setOpacity(1);
         //设置背景颜色
         QColor color;
@@ -119,27 +148,22 @@ void MoveView::paintEvent(QPaintEvent *)
         painter.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
         //绘制笔记拖动缩略图
     }else {
-        setFixedSize(282,91);
         //多个笔记拖拽
         if(m_noteList.size() > 1){
-            if(isDark){
+            if(m_isDarkThemeType){
                 painter.setOpacity(0.98);
-                bitmap = QPixmap(":/icons/deepin/multipleSelectPage/notes_dark.svg");
-            }else {
-                bitmap = QPixmap(":/icons/deepin/multipleSelectPage/notes_light.svg");
             }
             //设置透明度
-            painter.drawPixmap(rect(),bitmap);
+            painter.drawPixmap(rect(),m_backGroundPixMap);
             painter.setOpacity(1);
 
             QColor color;
             color = pb.color(DPalette::Normal,DPalette::Window);
-//            color.setAlphaF(0.80);
             painter.setBrush(color);
             painter.setPen(QPen(pb.color(DPalette::Normal, DPalette::Text)));
             paintRect.setLeft(paintRect.left() + 42);
             paintRect.setRight(paintRect.right() - 42);
-            //dx-拖拽移动
+            //多选-拖拽移动
             QString elideText = fontMetrics.elidedText(m_noteList[0]->noteTitle, Qt::ElideRight, paintRect.width());
             painter.drawText(paintRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
 
@@ -170,30 +194,25 @@ void MoveView::paintEvent(QPaintEvent *)
         }
         //单个笔记拖拽
         else if (1 == m_noteList.size()) {
-            if(isDark){
-                bitmap = QPixmap(":/icons/deepin/multipleSelectPage/icon_sigleNote_dark.svg");
-            }else {
+            if(!m_isDarkThemeType){
                 painter.setOpacity(0.9);
-                bitmap = QPixmap(":/icons/deepin/multipleSelectPage/icon_sigleNote_light.svg");
             }
-            painter.drawPixmap(rect(),bitmap);
+            painter.drawPixmap(rect(),m_backGroundPixMap);
             painter.setOpacity(1);
-//            painter.drawPixmap(rect(),bitmap);
             QColor color;
             color = pb.color(DPalette::Normal,DPalette::Window);
-//            color.setAlphaF(0.80);
             painter.setBrush(color);
             painter.setPen(QPen(pb.color(DPalette::Normal, DPalette::Text)));
             paintRect.setLeft(paintRect.left() + 42);
             paintRect.setRight(paintRect.right() - 42);
-            //dx-拖拽移动
+            //多选-拖拽移动
             QString elideText = fontMetrics.elidedText(m_noteList[0]->noteTitle, Qt::ElideRight, paintRect.width());
             painter.drawText(paintRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
         }
     }
 }
 
-//dx-多选拖拽
+//多选-多选拖拽
 void MoveView::setNotesNumber(int value)
 {
     m_notesNumber = value;

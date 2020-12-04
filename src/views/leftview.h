@@ -24,11 +24,12 @@
 
 #include "widgets/vnoterightmenu.h"
 
+#include <DTreeView>
+#include <DMenu>
+
 #include <QStandardItemModel>
 #include <QDateTime>
 
-#include <DTreeView>
-#include <DMenu>
 DWIDGET_USE_NAMESPACE
 
 class LeftViewDelegate;
@@ -96,8 +97,8 @@ public:
     void setNumberOfNotes(int numberOfNotes);
 
 signals:
-    //dx-多选拖拽到当前记事本
-    //dx-拖拽取消后选中
+    //多选-多选拖拽到当前记事本
+    //多选-拖拽取消后选中
     void dropNotesEnd(bool dropCancel);
 
 protected:

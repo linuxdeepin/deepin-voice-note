@@ -199,7 +199,7 @@ void FolderSelectDialog::initUI()
     titleLayout->setSpacing(0);
     titleLayout->setContentsMargins(10, 0, 0, 0);
     titleLayout->addStretch();
-    //dx-自动截断提示长度
+    //多选-自动截断提示长度
     titleLayout->addSpacing(m_closeButton->width()/3);
 
     titleLayout->addWidget(m_labMove, 0, Qt::AlignCenter | Qt::AlignVCenter);
@@ -337,7 +337,7 @@ void FolderSelectDialog::refreshTextColor(bool dark){
  */
 void FolderSelectDialog::setNoteContext(const QString &text)
 {
-    //dx-自动截断提示长度
+    //多选-自动截断提示长度
     m_noteInfo->setAlignment(Qt::AlignCenter);
     m_noteInfo->setText(text);
 }

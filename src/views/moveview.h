@@ -36,24 +36,28 @@ public:
     void setFolder(VNoteFolder* folder);
     //设置笔记数据
     void setNote(VNoteItem* note);
-    //dx-拖拽移动
+    //多选-设置笔记数据列表
     void setNoteList(QList<VNoteItem *> noteList);
-    //dx-多选拖拽
-    void setMultiple(bool isMultiple = false);
-    //dx-多选拖拽
+    //多选-设置笔记数量
     void setNotesNumber(int value);
 protected:
     //重写paint事件
     void paintEvent(QPaintEvent *) override;
 private:
+    //初始化背景图片
+    void initBackGroundMap();
+
     VNoteFolder *m_folder {nullptr};
     VNoteItem   *m_note {nullptr};
-    //dx-拖拽移动
+    //多选-笔记列表
     QList<VNoteItem *>m_noteList {nullptr};
-    //dx-多选拖拽
+    //多选-是否多选
     bool m_isMultiple {false};
-    //dx-多选拖拽
+    //多选-笔记数量
     int m_notesNumber = 0;
+    //初始化背景图片
+    QPixmap m_backGroundPixMap ;
+    bool m_isDarkThemeType {true};
 };
 
 #endif // MoveView_H

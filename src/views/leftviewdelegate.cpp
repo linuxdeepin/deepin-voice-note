@@ -290,15 +290,10 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
                         underCurrentRect = false;
                     }
                     if(dstIndex.row() > srcIndex.row()){
-                        if(!underCurrentRect){
+                        if(!underCurrentRect && dstIndex.row() != srcIndex.row()+1){
                             int upperParam = lastIndexHeightParam == option.rect.height()?4:0;
-                            if(dstIndex.row() == srcIndex.row()+1){
-                                rect = QRect(QPoint(option.rect.topLeft().x(),option.rect.topLeft().y())
-                                             ,QPoint(option.rect.bottomRight().x(),option.rect.bottomRight().y()));
-                            }else {
-                                rect = QRect(QPoint(option.rect.topLeft().x(),option.rect.topLeft().y()-option.rect.height()+upperParam)
-                                             ,QPoint(option.rect.bottomRight().x(),option.rect.bottomRight().y()-option.rect.height()+upperParam));
-                            }
+                            rect = QRect(QPoint(option.rect.topLeft().x(),option.rect.topLeft().y()-option.rect.height()+upperParam)
+                                         ,QPoint(option.rect.bottomRight().x(),option.rect.bottomRight().y()-option.rect.height()+upperParam));
                         }
                         //左下triangle
                         QRect rc(rect.x() + 12, rect.y() + rect.height() - param - 3, 6, 7);
@@ -310,15 +305,10 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
                     }
                     //目标索引与当前索引相当时，不绘制横线效果
                     else if(dstIndex.row() < srcIndex.row()){
-                        if(underCurrentRect){
+                        if(underCurrentRect && dstIndex.row() != srcIndex.row()-1){
                             int lowerParam = index.row()==0?5:0;
-                            if(dstIndex.row() == srcIndex.row()-1){
-                                rect = QRect(QPoint(option.rect.topLeft().x(),option.rect.topLeft().y())
-                                             ,QPoint(option.rect.bottomRight().x(),option.rect.bottomRight().y()));
-                            }else {
-                                rect = QRect(QPoint(option.rect.topLeft().x(),option.rect.topLeft().y()+option.rect.height()-lowerParam)
-                                             ,QPoint(option.rect.bottomRight().x(),option.rect.bottomRight().y()+option.rect.height()-lowerParam));
-                            }
+                            rect = QRect(QPoint(option.rect.topLeft().x(),option.rect.topLeft().y()+option.rect.height()-lowerParam)
+                                         ,QPoint(option.rect.bottomRight().x(),option.rect.bottomRight().y()+option.rect.height()-lowerParam));
                         }
                         //左上triangle
                         QRect rc(rect.x() + 12, rect.y() + param - 3, 6, 7);

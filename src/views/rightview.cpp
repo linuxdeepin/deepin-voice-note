@@ -37,6 +37,13 @@
 
 #include "dialog/vnotemessagedialog.h"
 
+#include <DFontSizeManager>
+#include <DApplicationHelper>
+#include <DFileDialog>
+#include <DMessageBox>
+#include <DApplication>
+#include <DStyle>
+
 #include <QBoxLayout>
 #include <QDebug>
 #include <QStandardPaths>
@@ -47,13 +54,6 @@
 #include <QList>
 #include <QClipboard>
 #include <QThreadPool>
-
-#include <DFontSizeManager>
-#include <DApplicationHelper>
-#include <DFileDialog>
-#include <DMessageBox>
-#include <DApplication>
-#include <DStyle>
 
 /**
  * @brief RightView::RightView
@@ -969,12 +969,19 @@ DetailItemWidget *RightView::getWidgetByPos(const QPoint &pos)
     return nullptr;
 }
 
-//dx-多选详情页
+/**
+ * @brief RightView::getIsNormalView
+ * @param
+ *///多选-多选详情页
 bool RightView::getIsNormalView() const
 {
     return m_isNormalView;
 }
-//dx-多选详情页
+
+/**
+ * @brief RightView::setIsNormalView
+ * @param value
+ *///多选-多选详情页
 void RightView::setIsNormalView(bool value)
 {
     m_isNormalView = value;
@@ -1366,7 +1373,7 @@ void RightView::saveMp3()
                 setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
 
                 QString exportDir = dialog.directoryUrl().toLocalFile();
-                //dx-导出语音
+                //多选-导出语音
                 QList<VNoteItem *>noteDataList;
                 noteDataList.append(m_noteItemData);
                 ExportNoteWorker *exportWorker = new ExportNoteWorker(

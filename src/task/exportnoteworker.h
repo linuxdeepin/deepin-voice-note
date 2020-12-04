@@ -32,7 +32,7 @@ class ExportNoteWorker : public VNTask
 {
     Q_OBJECT
 public:
-    //dx-导出语音
+    //多选-导出语音
     explicit ExportNoteWorker(QString dirPath,
                               int exportType,
                               QList<VNoteItem *>noteList,
@@ -72,7 +72,7 @@ protected:
 
     int m_exportType {ExportNothing};
     QString m_exportPath;
-    //dx-导出语音
+    //多选-导出语音
     QList<VNoteItem *>m_noteList {nullptr};
     VNoteBlock *m_noteblock {nullptr};
 };
