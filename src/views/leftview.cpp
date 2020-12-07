@@ -587,7 +587,7 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
         if(src.size() == 1){
             itemInfo = DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(notesName);
         }else {
-            itemInfo = DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg(notesName).arg(src.size());
+            itemInfo = DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg(src.size()).arg(notesName);
         }
         if (m_folderSelectDialog == nullptr) {
             m_folderSelectDialog = new FolderSelectDialog(m_pDataModel, this);
