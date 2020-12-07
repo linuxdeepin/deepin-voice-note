@@ -59,8 +59,9 @@ public:
     enum ModifierState{
             noModifier = 0,
             ctrlModifier = 1,
-            shiftAndKeyModifier = 2,
-            shiftAndMouseModifier = 3
+            shiftAndUpOrDownModifier = 2,
+            shiftAndMouseModifier = 3,
+            shiftAndHomeOrEndKeyModifier = 4
     };
     //多选-选择
     enum MouseState{
@@ -181,6 +182,9 @@ private:
     void triggerDragNote();
     //多选-刷新详情页
     void changeRightView(bool isMultipleDetailPage = true);
+    //初始化位置状态
+    void initPositionStatus(int row);
+
     bool m_onlyCurItemMenuEnable {false};
     qint64 m_currentId {-1};
     QString m_searchKey;

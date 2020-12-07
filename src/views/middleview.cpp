@@ -147,7 +147,7 @@ void MiddleView::addRowAtHead(VNoteItem *note)
         //多选-添加后选中
         m_currentRow = currentIndex().row();
         //添加note后需要刷新详情页显示
-        emit requestChangeRightView(false);
+        changeRightView(false);
     }
 }
 
@@ -417,8 +417,7 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                 }
                 //更新当前状态
                 setModifierState(ModifierState::ctrlModifier);
-                m_currentRow = modelIndex.row();
-                m_shiftSelection = -1;
+                initPositionStatus(modelIndex.row());
                 return;
             }
             //shift+左/中键
@@ -477,8 +476,7 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                 if(!selectedIndexes().contains(modelIndex)){
                     clearSelection();
                     DListView::setCurrentIndex(modelIndex);
-                    m_currentRow = modelIndex.row();
-                    m_shiftSelection = -1;
+                    initPositionStatus(modelIndex.row());
                     //多选时，右击未选中，刷新详情页状态
                     changeRightView(false);
                 }
@@ -526,8 +524,7 @@ void MiddleView::mouseReleaseEvent(QMouseEvent *event)
     }
     QModelIndex index = indexAt(event->pos());
     if(MouseState::pressing == m_mouseState && Qt::NoModifier == event->modifiers()){
-        m_currentRow = indexAt(event->pos()).row();
-        m_shiftSelection = -1;
+        initPositionStatus(indexAt(event->pos()).row());
         if (index.isValid()){
             clearSelection();
             setCurrentIndex(index.row());
@@ -725,6 +722,7 @@ void MiddleView::keyReleaseEvent(QKeyEvent *event)
 {
     if( Qt::Key_Shift == event->key()){
         m_shiftSelection = -1;
+        setModifierState(ModifierState::noModifier);
     }
     DListView::keyReleaseEvent(event);
 }
@@ -775,14 +773,14 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
     } else if(Qt::Key_Up == e->key() || Qt::Key_Down == e->key()){
         if(Qt::ShiftModifier == e->modifiers() && Qt::Key_Up == e->key()){
             int nextIndex = m_shiftSelection==-1?m_currentRow-1:m_shiftSelection-1;
+            if(getModifierState() != ModifierState::shiftAndUpOrDownModifier){
+                clearSelection();
+            }
             if(-1 !=nextIndex)
             {
-                if(getModifierState() != ModifierState::shiftAndKeyModifier){
-                    clearSelection();
-                }
+                scrollTo(m_pSortViewFilter->index(nextIndex,0));
                 //多选在下，shift+上
                 if (nextIndex>=m_currentRow){
-                    scrollTo(m_pSortViewFilter->index(nextIndex,0));
                     selectionModel()->select(m_pSortViewFilter->index(m_shiftSelection, 0), QItemSelectionModel::Deselect);
                     //普通详情页
                     if(nextIndex == m_currentRow){
@@ -796,25 +794,27 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
                 }
                 //多选在上，shift+上
                 else {
-                    scrollTo(m_pSortViewFilter->index(nextIndex,0));
                     selectionModel()->select(m_pSortViewFilter->index(nextIndex, 0), QItemSelectionModel::Select);
                     selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
                     //多选详情页
                     changeRightView();
                 }
                 m_shiftSelection = nextIndex;
-                setModifierState(ModifierState::shiftAndKeyModifier);
+                setModifierState(ModifierState::shiftAndUpOrDownModifier);
+            }else {
+                selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
+                scrollTo(m_pSortViewFilter->index(m_currentRow,0));
             }
         }else if (Qt::ShiftModifier == e->modifiers() && Qt::Key_Down == e->key()) {
             int nextIndex = m_shiftSelection==-1?m_currentRow+1: m_shiftSelection +1;
+            if(getModifierState() != ModifierState::shiftAndUpOrDownModifier){
+                clearSelection();
+            }
             if(count() !=nextIndex)
             {
-                if(getModifierState() != ModifierState::shiftAndKeyModifier){
-                    clearSelection();
-                }
+                scrollTo(m_pSortViewFilter->index(nextIndex,0));
                 //多选在上，shift+下
                 if(nextIndex<=m_currentRow){
-                    scrollTo(m_pSortViewFilter->index(nextIndex,0));
                     selectionModel()->select(m_pSortViewFilter->index(m_shiftSelection, 0), QItemSelectionModel::Deselect);
                     //普通详情页
                     if(nextIndex == m_currentRow){
@@ -828,37 +828,83 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
                 }
                 //多选在下，shift+下
                 else {
-                    scrollTo(m_pSortViewFilter->index(nextIndex,0));
                     selectionModel()->select(m_pSortViewFilter->index(nextIndex, 0), QItemSelectionModel::Select);
                     //多选详情页
                     selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
                     changeRightView();
                 }
                 m_shiftSelection = nextIndex;
-                setModifierState(ModifierState::shiftAndKeyModifier);
+                setModifierState(ModifierState::shiftAndUpOrDownModifier);
+            }else {
+                selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
+                scrollTo(m_pSortViewFilter->index(m_currentRow,0));
             }
-        }else {
+        }
+        else {
             setModifierState(ModifierState::noModifier);
             DListView::keyPressEvent(e);
             //多选-刷新详情页
             changeRightView(false);
             //由于启用多选，导致键盘操作不会清空和实现选中效果，在此处实现
             clearSelection();
-            m_shiftSelection = -1;
-            m_currentRow = currentIndex().row();
+            initPositionStatus(currentIndex().row());
             selectionModel()->select(m_pSortViewFilter->index(currentIndex().row(), 0), QItemSelectionModel::Select);
-        }
-    }else {
-        //多选-全选
-        setModifierState(ModifierState::noModifier);
-        if(Qt::CTRL == e->modifiers() && Qt::Key_A == e->key()){
-            for(int i = 0;i<count();i++){
-                selectionModel()->select(m_pSortViewFilter->index(i, 0), QItemSelectionModel::Select);
-            }
-            if(count()>1)
-                changeRightView();
+            scrollTo(currentIndex());
+            changeRightView(false);
         }
     }
+    //关于shift+home/end的判断
+    else if(Qt::Key_Home == e->key() || Qt::Key_End == e->key()){
+        if(Qt::Key_Home == e->key()){
+            scrollTo(m_pSortViewFilter->index(0,0));
+            clearSelection();
+            if(Qt::ShiftModifier == e->modifiers()){
+                for(int i = 0;i<=m_currentRow;i++){
+                    selectionModel()->select(m_pSortViewFilter->index(i, 0), QItemSelectionModel::Select);
+                }
+                setModifierState(ModifierState::shiftAndHomeOrEndKeyModifier);
+                if(selectedIndexes().count()>1){
+                    changeRightView();
+                }
+            }else {
+                setCurrentIndex(0);
+                changeRightView(false);
+                initPositionStatus(currentIndex().row());
+            }
+        }else {
+            scrollTo(m_pSortViewFilter->index(count()-1,0));
+            clearSelection();
+            if(Qt::ShiftModifier == e->modifiers()){
+                for(int i = m_currentRow;i<count();i++){
+                    selectionModel()->select(m_pSortViewFilter->index(i, 0), QItemSelectionModel::Select);
+                }
+                setModifierState(ModifierState::shiftAndHomeOrEndKeyModifier);
+                if(selectedIndexes().count()>1){
+                    changeRightView();
+                }
+            }else {
+                setCurrentIndex(count()-1);
+                changeRightView(false);
+                initPositionStatus(currentIndex().row());
+            }
+        }
+    }else if(Qt::CTRL == e->modifiers() && Qt::Key_A == e->key()){
+        //多选-全选
+        setModifierState(ModifierState::noModifier);
+        for(int i = 0;i<count();i++){
+            selectionModel()->select(m_pSortViewFilter->index(i, 0), QItemSelectionModel::Select);
+        }
+        if(count()>1)
+            changeRightView();
+    }
+}
+
+/**
+ * @brief MiddleView::initPositionStatus
+ *///初始化位置状态
+void MiddleView::initPositionStatus(int row){
+    m_shiftSelection = -1;
+    m_currentRow = row;
 }
 
 /**
