@@ -263,7 +263,10 @@ void MiddleView::saveAsText()
     for(auto index : indexList){
         VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
                                   StandardItemCommon::getStandardItemData(index));
-        noteDataList.append(noteData);
+        //只需导出有文本内容的笔记
+        if(noteData->haveText()){
+            noteDataList.append(noteData);
+        }
     }
     if (indexList.size()) {
         //TODO:
