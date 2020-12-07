@@ -242,6 +242,8 @@ private:
     void release();
     //标题栏菜单项功能扩展
     void initMenuExtension();
+    //刷新详情页显示
+    void changeRightView(bool isMultiple);
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};

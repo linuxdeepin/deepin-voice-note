@@ -208,24 +208,29 @@ void VNoteMainWindow::initConnections()
     //多选-拖拽取消后选中
     connect(m_leftView,&LeftView::dropNotesEnd,this,&VNoteMainWindow::onDropNote);
     //多选-刷新详情页
-    connect(m_middleView,&MiddleView::requestChangeRightView,this,[=](bool isMultiple){
-        m_multipleSelectWidget->setNoteNumber(m_middleView->getSelectedCount());
-        if(isMultiple){
-            if(m_rightView->getIsNormalView()){
-                m_stackedRightMainWidget->setCurrentWidget(m_multipleSelectWidget);
-                m_rightView->setIsNormalView(false);
-            }
-            //设置按钮是否置灰
-            m_multipleSelectWidget->enableButtons(m_middleView->haveText(),m_middleView->haveVoice());
-        }else {
-            if(!m_rightView->getIsNormalView()){
-                m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
-                m_rightView->setIsNormalView(true);
-            }
-        }
-    });
+    connect(m_middleView,&MiddleView::requestChangeRightView,this,&VNoteMainWindow::changeRightView);
     //多选-多选详情页
     connect(m_multipleSelectWidget,&VnoteMultipleChoiceOptionWidget::requestMultipleOption,this,&VNoteMainWindow::handleMultipleOption);
+}
+
+/**
+ * @brief VNoteMainWindow::changeRightView
+ *///刷新详情页显示
+void VNoteMainWindow::changeRightView(bool isMultiple){
+    m_multipleSelectWidget->setNoteNumber(m_middleView->getSelectedCount());
+    if(isMultiple){
+        if(m_rightView->getIsNormalView()){
+            m_stackedRightMainWidget->setCurrentWidget(m_multipleSelectWidget);
+            m_rightView->setIsNormalView(false);
+        }
+        //设置按钮是否置灰
+        m_multipleSelectWidget->enableButtons(m_middleView->haveText(),m_middleView->haveVoice());
+    }else {
+        if(!m_rightView->getIsNormalView()){
+            m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
+            m_rightView->setIsNormalView(true);
+        }
+    }
 }
 
 /**
@@ -815,7 +820,8 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
     if(m_asrErrMeassage){
         m_asrErrMeassage->setVisible(false);
     }
-
+    //记事本切换后刷新详情页
+    changeRightView(false);
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
     if (!loadNotes(data)) {
         m_rightView->initData(nullptr, m_searchKey, false);

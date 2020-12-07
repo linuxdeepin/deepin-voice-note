@@ -146,6 +146,8 @@ void MiddleView::addRowAtHead(VNoteItem *note)
         this->scrollTo(currentIndex());
         //多选-添加后选中
         m_currentRow = currentIndex().row();
+        //添加note后需要刷新详情页显示
+        emit requestChangeRightView(false);
     }
 }
 
