@@ -657,12 +657,10 @@ void MiddleView::onMenuShow(QPoint point)
     if(isMultipleSelected()){
         ActionManager::Instance()->visibleAction(ActionManager::NoteTop, false);
         ActionManager::Instance()->visibleAction(ActionManager::NoteRename, false);
-        ActionManager::Instance()->visibleAction(ActionManager::NoteAddNew, false);
         ActionManager::Instance()->visibleAction(ActionManager::NoteMenuBase, false);
     }else {
         ActionManager::Instance()->visibleAction(ActionManager::NoteTop, true);
         ActionManager::Instance()->visibleAction(ActionManager::NoteRename, true);
-        ActionManager::Instance()->visibleAction(ActionManager::NoteAddNew, true);
         ActionManager::Instance()->visibleAction(ActionManager::NoteMenuBase, true);
         m_noteMenu = ActionManager::Instance()->noteContextMenu();
     }
