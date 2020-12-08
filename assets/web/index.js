@@ -18,7 +18,7 @@ var h5Tpl  = `
     <div>
     <div class="demo" >
         <div class="left">
-            <div class="btn play"></div>
+            <div class="voiceBtn play"></div>
         </div>
         <div class="right">
             <div class="lf">
@@ -48,7 +48,7 @@ var nodeTpl = `
     <div>
     <div class="demo" >
         <div class="left">
-            <div class="btn play"></div>
+            <div class="voiceBtn play"></div>
         </div>
         <div class="right">
             <div class="lf">
@@ -86,7 +86,15 @@ $('#summernote').summernote({
     focus: true,                  // set focus to editable area after initializin
     disableDragAndDrop: true,
     shortcuts:false,
-    toolbar: []
+    toolbar: [
+        ['style', ['style']],
+        ['font', ['bold', 'underline', 'clear']],
+        ['fontname', ['fontname']],
+        ['color', ['color']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['table', ['table']],
+        ['insert', ['link', 'picture', 'video']],
+    ]
 });
 
 //设置全屏模式
@@ -110,14 +118,14 @@ $('body').on('click', '.li', function (e) {
 })
 
 //播放
-$('body').on('click', '.btn', function (e) {
+$('body').on('click', '.voiceBtn', function (e) {
     console.log('------playBtn click...');
     // e.stopPropagation();
     var curVoice = $(this).parents('.li:first');
     var jsonString = curVoice.attr('jsonKey');
     var bIsSame = $(this).hasClass('now');
     var curBtn = $(this);
-    $('.btn').removeClass('now');
+    $('.voiceBtn').removeClass('now');
     activeVoice = curBtn;
     activeVoice.addClass('now');
     
@@ -265,7 +273,7 @@ function insertVoiceItem(text) {
 function toggleState(state) {
     console.log('---toggleState--',state);
     if (state == '0') {
-        $('.btn').removeClass('pause').addClass('play');
+        $('.voiceBtn').removeClass('pause').addClass('play');
         activeVoice.removeClass('play').addClass('pause');
 
         voicePlay(true);
