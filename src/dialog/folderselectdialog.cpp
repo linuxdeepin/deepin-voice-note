@@ -356,13 +356,13 @@ void FolderSelectDialog::onFontChanged(){
     //多选-自动截断提示长度
     QFontMetrics fontMetric(this->font());
     //用于计算当前文本名截断宽度的常量
-    int constantWidth = m_notesNumber>1? fontMetric.width(DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg("").arg(" "))
+    int constantWidth = m_notesNumber>1? fontMetric.width(DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg("").arg("\"\""))
                                     :fontMetric.width(DApplication::translate("LeftView", "Move the note \"%1\" to:").arg("  "));
-    QString notesName = fontMetric.elidedText(m_notesName,Qt::ElideRight,VNOTE_SELECTDIALOG_W-20-constantWidth);
+    QString notesName = fontMetric.elidedText(m_notesName.append("\"\""),Qt::ElideRight,VNOTE_SELECTDIALOG_W-20-constantWidth);
     if(1 == m_notesNumber){
-        itemInfo = QString(" ").append(DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(notesName));
+        itemInfo = DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(notesName);
     }else {
-        itemInfo = QString(" ").append(DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg(m_notesNumber).arg(notesName));
+        itemInfo = DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg(m_notesNumber).arg(notesName);
     }
         m_noteInfo->setText(itemInfo);
 }
