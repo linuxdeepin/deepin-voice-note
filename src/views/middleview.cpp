@@ -197,7 +197,7 @@ VNoteItem *MiddleView::getCurrVNotedata() const
 {
     //多选-选择
     VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-                              StandardItemCommon::getStandardItemData(m_index));
+                              StandardItemCommon::getStandardItemData(currentIndex()));
 
     return noteData;
 }

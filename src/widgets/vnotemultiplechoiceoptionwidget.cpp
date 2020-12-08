@@ -3,6 +3,7 @@
 
 #include <DApplication>
 
+#include <QFile>
 #include <QImageReader>
 
 //多选-多选详情页
@@ -95,16 +96,16 @@ void VnoteMultipleChoiceOptionWidget::initUi()
  * @param number
  *///初始化链接
 void VnoteMultipleChoiceOptionWidget::initConnections(){
-    connect(m_moveButton,&DToolButton::clicked,this,[this]{
+    connect(m_moveButton,&DToolButton::released,this,[this]{
         trigger(ButtonValue::Move);
     });
-    connect(m_saveTextButton,&DToolButton::clicked,this,[this]{
+    connect(m_saveTextButton,&DToolButton::released,this,[this]{
         trigger(ButtonValue::SaveAsTxT);
     });
-    connect(m_saveVoiceButton,&DToolButton::clicked,this,[this]{
+    connect(m_saveVoiceButton,&DToolButton::released,this,[this]{
         trigger(ButtonValue::SaveAsVoice);
     });
-    connect(m_deleteButton,&DToolButton::clicked,this,[this]{
+    connect(m_deleteButton,&DToolButton::released,this,[this]{
         trigger(ButtonValue::Delete);
     });
     //主题切换更换按钮和文本颜色
@@ -169,3 +170,4 @@ void VnoteMultipleChoiceOptionWidget::changeFromThemeType(){
     m_saveVoiceButton->setIcon(QIcon(QString("%1%2").arg(iconPath).arg("detail_notes_saveVoice.svg")));
     m_deleteButton->setIcon(QIcon(QString("%1%2").arg(iconPath).arg("detail_notes_delete.svg")));
 }
+
