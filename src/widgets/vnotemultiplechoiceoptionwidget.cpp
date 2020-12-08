@@ -1,8 +1,9 @@
 #include "vnotemultiplechoiceoptionwidget.h"
 #include "globaldef.h"
-//#include <libdtk-5.2.2/DWidget/dapplication.h>
+
 #include <DApplication>
-//#include <DApplicationHelper>
+
+#include <QImageReader>
 
 //多选-多选详情页
 VnoteMultipleChoiceOptionWidget::VnoteMultipleChoiceOptionWidget(QWidget *parent)
@@ -20,14 +21,26 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     QVBoxLayout *vlayout = new QVBoxLayout();
 
     DLabel *iconLabel = new DLabel();
-    QImage image(QString(STAND_ICON_PAHT).append("detail_icon/detail_icon_note.svg"));
-    iconLabel->setPixmap(QPixmap::fromImage(image));
-    iconLabel->setFixedSize(186,186);
+    QImageReader reader;
+    QPixmap pixmap;
+    QSize size(162,156);
+    reader.setFileName(QString(STAND_ICON_PAHT).append("detail_icon/detail_icon_note.svg"));
+    const qreal ratio = qApp->devicePixelRatio();
+    if (reader.canRead()) {
+        reader.setScaledSize(size * ratio);
+        pixmap = QPixmap::fromImage(reader.read());
+        pixmap.setDevicePixelRatio(ratio);
+    } else {
+        pixmap.load(QString(STAND_ICON_PAHT).append("detail_icon/detail_icon_note.svg"));
+    }
+    iconLabel->setPixmap(pixmap);
+//    iconLabel->setFixedSize(186,186);
+
     QHBoxLayout *iconLayout = new QHBoxLayout();
-    iconLayout->addStretch();
-    iconLayout->addSpacing(30);
+    iconLayout->addStretch(2);
+    iconLayout->addSpacing(58);
     iconLayout->addWidget(iconLabel,Qt::AlignHCenter);
-    iconLayout->addStretch();
+    iconLayout->addStretch(2);
 
     m_tipsLabel = new DLabel();
     m_tipsLabel->setFixedHeight(29);

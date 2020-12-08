@@ -1044,11 +1044,12 @@ void MiddleView::sortView(bool adjustCurrentItemBar)
  *///多选-右键移动
 QModelIndexList MiddleView::getAllSelectNote()
 {
+    QModelIndexList indexList;
     if(selectedIndexes().count()){
-        return  selectedIndexes();
-    }else {
-        return QModelIndexList();
+        indexList = selectedIndexes();
+        qSort(indexList);
     }
+    return indexList;
 }
 
 /**
