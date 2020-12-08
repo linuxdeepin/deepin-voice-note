@@ -31,6 +31,6 @@ TEST_F(ut_folderselectdialog_test, setNoteContext)
 {
     LeftView leftview;
     FolderSelectDialog folderselectdialog(leftview.m_pDataModel);
-    folderselectdialog.setNoteContext("test");
+    folderselectdialog.setNoteContextInfo("test",1);
     folderselectdialog.getSelectIndex();
 }

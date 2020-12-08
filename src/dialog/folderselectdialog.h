@@ -71,7 +71,7 @@ class FolderSelectDialog : public DAbstractDialog
 public:
     explicit FolderSelectDialog(QStandardItemModel *model, QWidget *parent = nullptr);
     //设置移动笔记信息
-    void setNoteContext(const QString &text);
+    void setNoteContextInfo(const QString &text,int notesNumber);
     //设置不需要显示的记事本
     void setFolderBlack(const QList<VNoteFolder *> &folders);
     //清除选中
@@ -80,6 +80,9 @@ public:
     QModelIndex getSelectIndex();
     //选中变化处理
     void onVNoteFolderSelectChange(const QItemSelection &selected, const QItemSelection &deselected);
+    //字体切换长度适应
+    void onFontChanged();
+
 protected:
     //初始化布局
     void initUI();
@@ -89,8 +92,11 @@ protected:
     void hideEvent(QHideEvent *event);
     //主题切换刷新文本颜色
     void refreshTextColor(bool dark);
+
 private:
     DLabel *m_noteInfo {nullptr};
+    QString m_notesName = "" ;
+    int m_notesNumber = 0;
     DLabel *m_labMove {nullptr};
     FolderSelectView   *m_view {nullptr};
     DWindowCloseButton *m_closeButton {nullptr};

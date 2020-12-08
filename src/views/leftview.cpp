@@ -578,17 +578,6 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
     if (src.size()) {
         VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(src[0]));
         QString elideText = data->noteTitle;
-        QString itemInfo = "";
-        //多选-自动截断提示长度
-        QFontMetrics fontMetric(this->font());
-        //用于计算当前文本名截断宽度的常量
-        int constantWidth = fontMetric.width(DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(""));
-        QString notesName = fontMetric.elidedText(elideText,Qt::ElideRight,VNOTE_SELECTDIALOG_W-20-constantWidth);
-        if(src.size() == 1){
-            itemInfo = DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(notesName);
-        }else {
-            itemInfo = DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg(src.size()).arg(notesName);
-        }
         if (m_folderSelectDialog == nullptr) {
             m_folderSelectDialog = new FolderSelectDialog(m_pDataModel, this);
             m_folderSelectDialog->resize(VNOTE_SELECTDIALOG_W, 372);
@@ -596,7 +585,7 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
         QList<VNoteFolder *> folders;
         folders.push_back(static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(currentIndex())));
         m_folderSelectDialog->setFolderBlack(folders);
-        m_folderSelectDialog->setNoteContext(itemInfo);
+        m_folderSelectDialog->setNoteContextInfo(elideText,src.size());
         m_folderSelectDialog->clearSelection();
 
         m_folderSelectDialog->exec();

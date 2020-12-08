@@ -290,6 +290,9 @@ void FolderSelectDialog::initConnections()
             bool isDark = DGuiApplicationHelper::instance()->themeType()==DGuiApplicationHelper::DarkType?true:false;
             this->refreshTextColor(isDark);
     });
+    //字体切换长度适应
+    connect(qApp, &DApplication::fontChanged, this, &FolderSelectDialog::onFontChanged);
+
 }
 
 /**
@@ -335,11 +338,33 @@ void FolderSelectDialog::refreshTextColor(bool dark){
  * @brief FolderSelectDialog::setNoteContext
  * @param text 移动笔记信息
  */
-void FolderSelectDialog::setNoteContext(const QString &text)
+void FolderSelectDialog::setNoteContextInfo(const QString &text,int notesNumber)
 {
     //多选-自动截断提示长度
     m_noteInfo->setAlignment(Qt::AlignCenter);
-    m_noteInfo->setText(text);
+    m_notesName = text;
+    m_notesNumber = notesNumber;
+    onFontChanged();
+}
+
+/**
+ * @brief FolderSelectDialog::getSelectIndex
+ * @return 选中的记事本
+ *///字体切换长度适应
+void FolderSelectDialog::onFontChanged(){
+    QString itemInfo = "";
+    //多选-自动截断提示长度
+    QFontMetrics fontMetric(this->font());
+    //用于计算当前文本名截断宽度的常量
+    int constantWidth = m_notesNumber>1? fontMetric.width(DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg("").arg(" "))
+                                    :fontMetric.width(DApplication::translate("LeftView", "Move the note \"%1\" to:").arg("  "));
+    QString notesName = fontMetric.elidedText(m_notesName,Qt::ElideRight,VNOTE_SELECTDIALOG_W-20-constantWidth);
+    if(1 == m_notesNumber){
+        itemInfo = QString(" ").append(DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(notesName));
+    }else {
+        itemInfo = QString(" ").append(DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg(m_notesNumber).arg(notesName));
+    }
+        m_noteInfo->setText(itemInfo);
 }
 
 /**
