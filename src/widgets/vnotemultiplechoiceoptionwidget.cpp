@@ -3,7 +3,6 @@
 
 #include <DApplication>
 
-#include <QFile>
 #include <QImageReader>
 
 //多选-多选详情页
@@ -130,10 +129,11 @@ void VnoteMultipleChoiceOptionWidget::setNoteNumber(int number)
  * @brief VnoteMultipleChoiceOptionWidget::enableButtons
  * @param saveAsTxtButtonStatus,saveAsVoiceButtonStatus
  *///设置按钮是否置灰
-void VnoteMultipleChoiceOptionWidget::enableButtons(bool saveAsTxtButtonStatus, bool saveAsVoiceButtonStatus)
+void VnoteMultipleChoiceOptionWidget::enableButtons(bool saveAsTxtButtonStatus, bool saveAsVoiceButtonStatus,bool moveButtonStatus)
 {
     m_saveTextButton->setEnabled(saveAsTxtButtonStatus);
     m_saveVoiceButton->setEnabled(saveAsVoiceButtonStatus);
+    m_moveButton->setEnabled(moveButtonStatus);
 }
 
 /**

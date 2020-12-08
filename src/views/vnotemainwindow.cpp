@@ -224,7 +224,7 @@ void VNoteMainWindow::changeRightView(bool isMultiple){
             m_rightView->setIsNormalView(false);
         }
         //设置按钮是否置灰
-        m_multipleSelectWidget->enableButtons(m_middleView->haveText(),m_middleView->haveVoice());
+        m_multipleSelectWidget->enableButtons(m_middleView->haveText(),m_middleView->haveVoice(),1< m_leftView->folderCount());
     }else {
         if(!m_rightView->getIsNormalView()){
             m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
@@ -1445,6 +1445,9 @@ void VNoteMainWindow::onMenuAbout2Show()
         //Disable SaveText if note have no text
         //Disable SaveVoice if note have no voice.
         //多选-右键菜单
+        if(1 == m_leftView->folderCount()){
+            ActionManager::Instance()->enableAction(ActionManager::NoteMove, false);
+        }
         if(m_middleView->isMultipleSelected()){
             if(!m_middleView->haveText()){
                 ActionManager::Instance()->enableAction(ActionManager::NoteSaveText, false);

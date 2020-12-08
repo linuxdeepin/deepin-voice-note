@@ -28,7 +28,7 @@ public:
     void initUi();
     void setNoteNumber(int number);
     //设置按钮是否置灰
-    void enableButtons(bool saveAsTxtButtonStatus = true,bool saveAsVoiceButtonStatus = true);
+    void enableButtons(bool saveAsTxtButtonStatus = true,bool saveAsVoiceButtonStatus = true , bool moveButtonStatus = true);
 
 signals:
     void requestMultipleOption(int id);
