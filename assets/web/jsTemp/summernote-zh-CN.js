@@ -2,7 +2,7 @@
   $.extend($.summernote.lang, {
     'zh-CN': {
       font: {
-        bold: '粗体',
+        bold: '加粗',
         italic: '斜体',
         underline: '下划线',
         clear: '清除格式',
@@ -11,7 +11,7 @@
         strikethrough: '删除线',
         subscript: '下标',
         superscript: '上标',
-        size: '字号'
+        size: '字号',
       },
       image: {
         image: '图片',
@@ -27,42 +27,42 @@
         shapeThumbnail: '形状: 缩略图',
         shapeNone: '形状: 无',
         dragImageHere: '将图片拖拽至此处',
-        dropImage: 'Drop image or Text',
+        dropImage: '拖拽图片或文本',
         selectFromFiles: '从本地上传',
         maximumFileSize: '文件大小最大值',
         maximumFileSizeError: '文件大小超出最大值。',
         url: '图片地址',
         remove: '移除图片',
-        original: 'Original'
+        original: '原始图片',
       },
       video: {
         video: '视频',
         videoLink: '视频链接',
         insert: '插入视频',
         url: '视频地址',
-        providers: '(优酷, 腾讯, Instagram, DailyMotion, Youtube等)'
+        providers: '(优酷, 腾讯, Instagram, DailyMotion, Youtube等)',
       },
       link: {
-        link: '链接',
+        link: '超链接',
         insert: '插入链接',
         unlink: '去除链接',
         edit: '编辑链接',
         textToDisplay: '显示文本',
         url: '链接地址',
-        openInNewWindow: '在新窗口打开'
+        openInNewWindow: '在新窗口打开',
       },
       table: {
         table: '表格',
-        addRowAbove: '上面添加一行', //Add row above
-        addRowBelow: '下面添加一行',//Add row below
-        addColLeft: '左侧添加一列', //Add column left
-        addColRight: '右侧添加一列', //Add column right
-        delRow: '删除行', //Delete row
-        delCol: '删除列', //Delete column
-        delTable: '删除表格' //Delete table
+        addRowAbove: '在上方插入行',
+        addRowBelow: '在下方插入行',
+        addColLeft: '在左侧插入列',
+        addColRight: '在右侧插入列',
+        delRow: '删除行',
+        delCol: '删除列',
+        delTable: '删除表格',
       },
       hr: {
-        insert: '水平线'
+        insert: '水平线',
       },
       style: {
         style: '样式',
@@ -74,35 +74,35 @@
         h3: '标题 3',
         h4: '标题 4',
         h5: '标题 5',
-        h6: '标题 6'
+        h6: '标题 6',
       },
       lists: {
-        unordered: '无序列表',
-        ordered: '有序列表'
+        unordered: '无序列',
+        ordered: '有序列',
       },
       options: {
         help: '帮助',
         fullscreen: '全屏',
-        codeview: '源代码'
+        codeview: '源代码',
       },
       paragraph: {
         paragraph: '段落',
-        outdent: '减少缩进',
-        indent: '增加缩进',
+        outdent: '向左缩进',
+        indent: '向右缩进',
         left: '左对齐',
         center: '居中对齐',
         right: '右对齐',
-        justify: '两端对齐'
+        justify: '两端对齐',
       },
       color: {
         recent: '最近使用',
         more: '更多',
-        background: '背景',
-        foreground: '前景',
+        background: '背景颜色',
+        foreground: '字体颜色',
         transparent: '透明',
         setTransparent: '透明',
         reset: '重置',
-        resetToDefault: '默认'
+        resetToDefault: '默认',
       },
       shortcut: {
         shortcuts: '快捷键',
@@ -111,7 +111,7 @@
         action: '动作',
         paragraphFormatting: '段落格式',
         documentStyle: '文档样式',
-        extraKeys: '额外按键'
+        extraKeys: '额外按键',
       },
       help: {
         insertParagraph: '插入段落',
@@ -119,7 +119,7 @@
         redo: '重做',
         tab: '增加缩进',
         untab: '减少缩进',
-        bold: '粗体',
+        bold: '加粗',
         italic: '斜体',
         underline: '下划线',
         strikethrough: '删除线',
@@ -128,10 +128,10 @@
         justifyCenter: '居中对齐',
         justifyRight: '右对齐',
         justifyFull: '两端对齐',
-        insertUnorderedList: '无序列表',
-        insertOrderedList: '有序列表',
-        outdent: '减少缩进',
-        indent: '增加缩进',
+        Bullets: '无序列',
+        Numbering: '有序列',
+        outdent: '向左缩进',
+        indent: '向右缩进',
         formatPara: '设置选中内容样式为 普通',
         formatH1: '设置选中内容样式为 标题1',
         formatH2: '设置选中内容样式为 标题2',
@@ -140,16 +140,16 @@
         formatH5: '设置选中内容样式为 标题5',
         formatH6: '设置选中内容样式为 标题6',
         insertHorizontalRule: '插入水平线',
-        'linkDialog.show': '显示链接对话框'
+        'linkDialog.show': '显示链接对话框',
       },
       history: {
         undo: '撤销',
-        redo: '重做'
+        redo: '重做',
       },
       specialChar: {
-        specialChar: 'SPECIAL CHARACTERS',
-        select: 'Select Special characters'
-      }
-    }
+        specialChar: '特殊字符',
+        select: '选取特殊字符',
+      },
+    },
   });
 })(jQuery);

@@ -18,7 +18,7 @@ var h5Tpl  = `
     <div>
     <div class="demo" >
         <div class="left">
-            <div class="voiceBtn play"></div>
+            <div class="voicebtn play"></div>
         </div>
         <div class="right">
             <div class="lf">
@@ -48,7 +48,7 @@ var nodeTpl = `
     <div>
     <div class="demo" >
         <div class="left">
-            <div class="voiceBtn play"></div>
+            <div class="voicebtn play"></div>
         </div>
         <div class="right">
             <div class="lf">
@@ -86,14 +86,48 @@ $('#summernote').summernote({
     focus: true,                  // set focus to editable area after initializin
     disableDragAndDrop: true,
     shortcuts:false,
-    toolbar: [
-        ['style', ['style']],
-        ['font', ['bold', 'underline', 'clear']],
+    lang: 'zh-CN',
+    // toolbar: [
+    //     ['style', ['style']],
+    //     ['font', ['bold', 'underline', 'clear']],
+    //     ['fontname', ['fontname']],
+    //     ['color', ['color']],
+    //     ['para', ['ul', 'ol', 'paragraph']],
+    //     ['table', ['table']],
+    //     ['insert', ['link', 'picture', 'video']],
+    // ]
+
+
+
+//     toolbar: [
+//         ['fontname', ['fontname']],
+//         ['fontsize', ['fontsize']],
+//         ['forecolor', ['forecolor']],
+//         ['forecolor', ['backcolor']],
+//         ['style', ['bold', 'italic', 'underline', 'strikethrough']],
+//         ['para', ['justifyLeft', 'justifyCenter', 'justifyRight','justifyFull']],
+//         ['para', ['indent', 'outdent']],
+//         ['table', ['table']],
+//         ['para', ['ul','ol']],
+//         ['undo',['undo']], 
+//         ['redo',['redo']],
+//         ['link', ['link']]
+//    ]
+
+   toolbar: [
         ['fontname', ['fontname']],
+        ['fontsize', ['fontsize']],
         ['color', ['color']],
-        ['para', ['ul', 'ol', 'paragraph']],
+        // ['forecolor', ['forecolor']],
+        // ['forecolor', ['backcolor']],
+        ['style', ['bold', 'italic', 'underline', 'strikethrough']],
+        // ['para', ['justifyLeft', 'justifyCenter', 'justifyRight','justifyFull']],
+        // ['para', ['indent', 'outdent']],
         ['table', ['table']],
-        ['insert', ['link', 'picture', 'video']],
+        ['para', ['ul','ol']],
+        ['undo',['undo']], 
+        ['redo',['redo']],
+        ['link', ['link']]
     ]
 });
 
@@ -118,14 +152,14 @@ $('body').on('click', '.li', function (e) {
 })
 
 //播放
-$('body').on('click', '.voiceBtn', function (e) {
+$('body').on('click', '.voicebtn', function (e) {
     console.log('------playBtn click...');
     // e.stopPropagation();
     var curVoice = $(this).parents('.li:first');
     var jsonString = curVoice.attr('jsonKey');
     var bIsSame = $(this).hasClass('now');
     var curBtn = $(this);
-    $('.voiceBtn').removeClass('now');
+    $('.voicebtn').removeClass('now');
     activeVoice = curBtn;
     activeVoice.addClass('now');
     
@@ -273,7 +307,7 @@ function insertVoiceItem(text) {
 function toggleState(state) {
     console.log('---toggleState--',state);
     if (state == '0') {
-        $('.voiceBtn').removeClass('pause').addClass('play');
+        $('.voicebtn').removeClass('pause').addClass('play');
         activeVoice.removeClass('play').addClass('pause');
 
         voicePlay(true);

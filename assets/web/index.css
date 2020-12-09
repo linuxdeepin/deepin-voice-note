@@ -59,17 +59,17 @@
         align-items: center;
         justify-content:center;
     }
-    .left .voiceBtn{
+    .left .voicebtn{
         border-radius: 50%;
         width: 40px;
         height: 40px;
         background-color: red;
     }
-    .left .voiceBtn.play{
+    .left .voicebtn.play{
         background-image:url(./light/play.svg);
         background-size: contain;
     }
-    .left .voiceBtn.pause{
+    .left .voicebtn.pause{
         background-image:url(./light/pause.svg);
         background-size: contain;
     }
