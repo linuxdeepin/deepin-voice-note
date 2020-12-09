@@ -249,7 +249,10 @@ void MiddleView::setCurrentIndex(int index)
  */
 void MiddleView::editNote()
 {
-    edit(currentIndex());
+    //多选取消重命名
+    if(1 == selectedIndexes().count()){
+        edit(currentIndex());
+    }
 }
 
 /**
@@ -430,6 +433,8 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                     changeRightView();
                 }else {
                     //普通详情页
+                    clearSelection();
+                    setCurrentIndex(modelIndex.row());
                     changeRightView(false);
                 }
                 return;
