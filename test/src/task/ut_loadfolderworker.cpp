@@ -28,8 +28,8 @@ ut_loadfolderworker_test::ut_loadfolderworker_test()
 
 TEST_F(ut_loadfolderworker_test, run)
 {
-    LoadFolderWorker *loadfolderworker = new LoadFolderWorker();
-    loadfolderworker->setAutoDelete(true);
+//    LoadFolderWorker *loadfolderworker = new LoadFolderWorker();
+//    loadfolderworker->setAutoDelete(true);
 
-    QThreadPool::globalInstance()->start(loadfolderworker);
+//    QThreadPool::globalInstance()->start(loadfolderworker);
 }
