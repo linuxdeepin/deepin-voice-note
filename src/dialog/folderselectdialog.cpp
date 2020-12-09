@@ -358,11 +358,19 @@ void FolderSelectDialog::onFontChanged(){
     //用于计算当前文本名截断宽度的常量
     int constantWidth = m_notesNumber>1? fontMetric.width(DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg("").arg("\"\""))
                                     :fontMetric.width(DApplication::translate("LeftView", "Move the note \"%1\" to:").arg("  "));
-    QString notesName = fontMetric.elidedText(m_notesName.append("\"\""),Qt::ElideRight,VNOTE_SELECTDIALOG_W-20-constantWidth);
+    QString notesName = fontMetric.elidedText(m_notesName,Qt::ElideRight,VNOTE_SELECTDIALOG_W-20-constantWidth);
+    QString temp = "";
+    int width = fontMetric.width(DApplication::translate("LeftView", "Move the note \"%1\" to:").arg("").at(0))/3;
+    for(int i = 0;i<10;i++){
+        if(fontMetric.width(temp)+fontMetric.width(" ")>width){
+            break;
+        }
+        temp.append(" ");
+    }
     if(1 == m_notesNumber){
-        itemInfo = DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(notesName);
+        itemInfo = QString(temp).append(DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(notesName));
     }else {
-        itemInfo = DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg(m_notesNumber).arg(notesName);
+        itemInfo = QString(temp).append(DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg(m_notesNumber).arg(notesName));
     }
         m_noteInfo->setText(itemInfo);
 }

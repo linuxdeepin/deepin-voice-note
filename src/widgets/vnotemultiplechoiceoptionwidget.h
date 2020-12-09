@@ -5,6 +5,10 @@
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QDomDocument>
+#include <QDomElement>
+#include <QSvgRenderer>
+#include <QFile>
 
 #include <DToolButton>
 #include <DFontSizeManager>
@@ -25,11 +29,20 @@ public:
         Delete = 4
     };
     explicit VnoteMultipleChoiceOptionWidget(QWidget *parent = nullptr);
+    //初始化ui
     void initUi();
+    //更新笔记数量
     void setNoteNumber(int number);
     //设置按钮是否置灰
     void enableButtons(bool saveAsTxtButtonStatus = true,bool saveAsVoiceButtonStatus = true , bool moveButtonStatus = true);
+    //press更新svg
+    void buttonPressed(ButtonValue value);
 
+private:
+    //获得svg
+    QPixmap setSvgColor(QString svgPath,QString color);
+    //设置svg颜色属性
+    void setSVGBackColor(QDomElement &elem,QString attr,QString val);
 signals:
     void requestMultipleOption(int id);
 protected:

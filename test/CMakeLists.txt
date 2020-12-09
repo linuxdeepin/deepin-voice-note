@@ -31,8 +31,9 @@ ADD_COMPILE_OPTIONS(-fno-access-control)
 set(CMAKE_CXX_FLAGS "-g -fprofile-arcs -ftest-coverage")
 
 find_package(Qt5Test REQUIRED)
-
 find_package(GTest REQUIRED)
+find_package(Qt5Svg REQUIRED)
+find_package(Qt5Xml REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 include_directories(src)
 
@@ -85,6 +86,8 @@ target_link_libraries(${PROJECT_NAME_TEST}
     Qt5::Sql
     Qt5::Multimedia
     Qt5::Test
+    ${Qt5Svg_LIBRARIES}
+    ${Qt5Xml_LIBRARIES}
 )
 
 ##------------------------------ 创建'make test'指令---------------------------------------

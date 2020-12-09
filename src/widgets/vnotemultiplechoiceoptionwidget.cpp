@@ -15,7 +15,7 @@ VnoteMultipleChoiceOptionWidget::VnoteMultipleChoiceOptionWidget(QWidget *parent
 /**
  * @brief VnoteMultipleChoiceOptionWidget::initUi
  * @param
- */
+ *///初始化ui
 void VnoteMultipleChoiceOptionWidget::initUi()
 {
     QVBoxLayout *vlayout = new QVBoxLayout();
@@ -95,21 +95,75 @@ void VnoteMultipleChoiceOptionWidget::initUi()
  * @param number
  *///初始化链接
 void VnoteMultipleChoiceOptionWidget::initConnections(){
-    connect(m_moveButton,&DToolButton::released,this,[this]{
+    //移动
+    connect(m_moveButton,&DToolButton::pressed,this,[=]{
+       buttonPressed(ButtonValue::Move);
+    });
+    connect(m_moveButton,&DToolButton::clicked,this,[=]{
         trigger(ButtonValue::Move);
     });
-    connect(m_saveTextButton,&DToolButton::released,this,[this]{
+    //保存文本
+    connect(m_saveTextButton,&DToolButton::pressed,this,[=]{
+       buttonPressed(ButtonValue::SaveAsTxT);
+    });
+    connect(m_saveTextButton,&DToolButton::clicked,this,[=]{
         trigger(ButtonValue::SaveAsTxT);
     });
-    connect(m_saveVoiceButton,&DToolButton::released,this,[this]{
+    //保存语音
+    connect(m_saveVoiceButton,&DToolButton::pressed,this,[=]{
+       buttonPressed(ButtonValue::SaveAsVoice);
+    });
+    connect(m_saveVoiceButton,&DToolButton::clicked,this,[=]{
         trigger(ButtonValue::SaveAsVoice);
     });
-    connect(m_deleteButton,&DToolButton::released,this,[this]{
+    //删除
+    connect(m_deleteButton,&DToolButton::pressed,this,[=]{
+       buttonPressed(ButtonValue::Delete);
+    });
+    connect(m_deleteButton,&DToolButton::clicked,this,[=]{
         trigger(ButtonValue::Delete);
+    });
+    //恢复图标
+    connect(m_saveVoiceButton,&DToolButton::released,this,[=]{
+        changeFromThemeType();
+    });
+    connect(m_saveTextButton,&DToolButton::released,this,[=]{
+        changeFromThemeType();
+    });
+    connect(m_moveButton,&DToolButton::released,this,[=]{
+       changeFromThemeType();
+    });
+    connect(m_deleteButton,&DToolButton::released,this,[=]{
+        changeFromThemeType();
     });
     //主题切换更换按钮和文本颜色
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
             &VnoteMultipleChoiceOptionWidget::changeFromThemeType);
+}
+
+/**
+ * @brief VnoteMultipleChoiceOptionWidget::buttonPressed
+ * @param value
+ *///press更新svg
+void VnoteMultipleChoiceOptionWidget::buttonPressed(ButtonValue value){
+    DPalette dpalette  = DApplicationHelper::instance()->palette(m_deleteButton);
+    QColor textColor = dpalette.color(DPalette::Highlight);
+   QString color = textColor.name(QColor::HexRgb);
+   QString iconPath = QString(STAND_ICON_PAHT).append("light/");
+   QPixmap pixmap;
+    if(ButtonValue::Move == value){
+        pixmap = setSvgColor(iconPath.append("detail_notes_move.svg"),color);
+        m_moveButton->setIcon(pixmap);
+    }else if (ButtonValue::SaveAsTxT == value) {
+        pixmap = setSvgColor(iconPath.append("detail_notes_saveText.svg"),color);
+        m_saveTextButton->setIcon(pixmap);
+    }else if (ButtonValue::SaveAsVoice == value) {
+        pixmap = setSvgColor(iconPath.append("detail_notes_saveVoice.svg"),color);
+        m_saveVoiceButton->setIcon(pixmap);
+    }else{
+        pixmap = setSvgColor(iconPath.append("detail_notes_delete.svg"),color);
+        m_deleteButton->setIcon(pixmap);
+    }
 }
 
 /**
@@ -134,6 +188,58 @@ void VnoteMultipleChoiceOptionWidget::enableButtons(bool saveAsTxtButtonStatus, 
     m_saveTextButton->setEnabled(saveAsTxtButtonStatus);
     m_saveVoiceButton->setEnabled(saveAsVoiceButtonStatus);
     m_moveButton->setEnabled(moveButtonStatus);
+}
+
+/**
+ * @brief VnoteMultipleChoiceOptionWidget::setSvgColor
+ * @param svgPath
+ * @param color
+ *///获得svg
+QPixmap VnoteMultipleChoiceOptionWidget::setSvgColor(QString svgPath ,QString color)
+{
+  //设置图标颜色
+    QString path = svgPath;
+    QFile file(path);
+    file.open(QIODevice::ReadOnly);
+    QByteArray data = file.readAll();
+    QDomDocument doc;
+    doc.setContent(data);
+    file.close();
+    QDomElement elem = doc.documentElement();
+    setSVGBackColor(elem, "fill", color);
+
+//    int scaled =qApp->devicePixelRatio() == 1.25 ? 2 : 1;
+    double scaled = qApp->devicePixelRatio();
+    QSvgRenderer svg_render(doc.toByteArray());
+
+    QPixmap pixmap(QSize(24,24)*scaled);
+    pixmap.fill(Qt::transparent);
+    pixmap.setDevicePixelRatio(scaled);
+
+    QPainter painter(&pixmap);
+    svg_render.render(&painter,QRect(0,0,24,24));
+    return  pixmap;
+}
+
+/**
+ * @brief VnoteMultipleChoiceOptionWidget::setSVGBackColor
+ * @param ielem
+ * @param attr
+ * @param val
+ *///设置svg颜色属性
+void VnoteMultipleChoiceOptionWidget::setSVGBackColor(QDomElement &elem, QString attr, QString val)
+{
+    if (elem.tagName().compare("g") == 0 && elem.attribute("id").compare("color") == 0)
+    {
+        QString before_color = elem.attribute(attr);
+        elem.setAttribute(attr, val);
+    }
+    for (int i = 0; i < elem.childNodes().count(); i++)
+    {
+        if (!elem.childNodes().at(i).isElement()) continue;
+        QDomElement element = elem.childNodes().at(i).toElement();
+        setSVGBackColor(element, attr, val);
+    }
 }
 
 /**

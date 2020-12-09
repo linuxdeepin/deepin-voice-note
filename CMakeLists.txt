@@ -121,12 +121,16 @@ find_package(Qt5 COMPONENTS DBus Sql Multimedia REQUIRED)
 find_package(Qt5Gui REQUIRED)
 find_package(DtkWidget REQUIRED)
 find_package(DtkCore REQUIRED)
+find_package(Qt5Svg REQUIRED)
+find_package(Qt5Xml REQUIRED)
 find_package(DFrameworkdbus REQUIRED)
 pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
 pkg_check_modules(LIBVLC REQUIRED libvlc)
 include_directories(${GSTREAMER_INCLUDE_DIRS})
 include_directories(${LIBVLC_INCLUDE_DIRS})
 include_directories(${Qt5Gui_PRIVATE_INCLUDE_DIRS})
+include_directories(${Qt5Svg_INCLUDE_DIRS})
+include_directories(${Qt5Xml_INCLUDE_DIRS})
 
 # Tell CMake to create the executable
 add_executable(${PROJECT_NAME} ${VNOTE_SRC} ${APP_QRC})
@@ -146,6 +150,8 @@ target_link_libraries(${APP_BIN_NAME}
     Qt5::DBus
     Qt5::Sql
     Qt5::Multimedia
+    ${Qt5Svg_LIBRARIES}
+    ${Qt5Xml_LIBRARIES}
 )
 
 set(CMAKE_INSTALL_PREFIX /usr)
