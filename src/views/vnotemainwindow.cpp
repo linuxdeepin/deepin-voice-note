@@ -622,10 +622,10 @@ void VNoteMainWindow::initRightView()
 {
     //多选-多选详情页
     m_stackedRightMainWidget = new QStackedWidget(m_mainWndSpliter);
-    m_rightViewHolder = new QWidget();
+    m_rightViewHolder = new QWidget(this);
 
     //多选-多选详情页
-    m_multipleSelectWidget = new VnoteMultipleChoiceOptionWidget();
+    m_multipleSelectWidget = new VnoteMultipleChoiceOptionWidget(this);
     m_multipleSelectWidget->setBackgroundRole(DPalette::Base);
     m_multipleSelectWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_multipleSelectWidget->setAutoFillBackground(true);
@@ -639,7 +639,7 @@ void VNoteMainWindow::initRightView()
     m_rightViewHolder->setBackgroundRole(DPalette::Base);
     m_rightViewHolder->setAutoFillBackground(true);
 
-    QVBoxLayout *rightHolderLayout = new QVBoxLayout;
+    QVBoxLayout *rightHolderLayout = new QVBoxLayout(this);
     rightHolderLayout->setSpacing(0);
     rightHolderLayout->setContentsMargins(0, 15, 0, 3);
 

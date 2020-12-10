@@ -222,8 +222,8 @@ QList<VNoteItem *>MiddleView::getCurrVNotedataList() const
 void MiddleView::onNoteChanged()
 {
     sortView();
-    //多选-选择
-    m_currentRow = -1;
+    //多选-选择-刷新当前判断行
+    initPositionStatus(currentIndex().row());
 }
 
 /**
@@ -845,14 +845,16 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
         }
         else {
             setModifierState(ModifierState::noModifier);
+            if(-1 == currentIndex().row()){
+                setCurrentIndex(m_currentRow);
+            }
             DListView::keyPressEvent(e);
-            //多选-刷新详情页
-            changeRightView(false);
             //由于启用多选，导致键盘操作不会清空和实现选中效果，在此处实现
             clearSelection();
             initPositionStatus(currentIndex().row());
             selectionModel()->select(m_pSortViewFilter->index(currentIndex().row(), 0), QItemSelectionModel::Select);
             scrollTo(currentIndex());
+            //多选-刷新详情页
             changeRightView(false);
         }
     }

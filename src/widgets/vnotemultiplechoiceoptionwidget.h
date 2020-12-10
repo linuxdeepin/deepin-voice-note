@@ -47,8 +47,10 @@ signals:
     void requestMultipleOption(int id);
 protected:
     void trigger(int id);
-    void changeFromThemeType();
     void initConnections();
+    void changeFromThemeType();
+    void onFontChanged();
+    void resizeEvent(QResizeEvent *event)override;
 private:
     DLabel *m_tipsLabel  {nullptr};
     DToolButton *m_moveButton {nullptr};
