@@ -224,7 +224,13 @@ void VNoteMainWindow::changeRightView(bool isMultiple){
             m_rightView->setIsNormalView(false);
         }
         //设置按钮是否置灰
-        m_multipleSelectWidget->enableButtons(m_middleView->haveText(),m_middleView->haveVoice(),1< m_leftView->folderCount());
+        bool moveButtonEnable = true;
+        if (stateOperation->isVoice2Text()
+            || stateOperation->isSearching()
+            || 1== m_leftView->folderCount()) {
+            moveButtonEnable = false;
+        }
+        m_multipleSelectWidget->enableButtons(m_middleView->haveText(),m_middleView->haveVoice(),moveButtonEnable);
     }else {
         if(!m_rightView->getIsNormalView()){
             m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);

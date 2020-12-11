@@ -458,16 +458,25 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
             if(Qt::ShiftModifier == event->modifiers() || Qt::CTRL == event->modifiers()){
                 //shift+右键
                 if(Qt::ShiftModifier == event->modifiers()){
-                    handleShiftAndPress(modelIndex);
+                    //shift+you
+                    if(m_currentRow == modelIndex.row()){
+                        //普通详情页
+                        clearSelection();
+                        setCurrentIndex(modelIndex.row());
+                        changeRightView(false);
+                    } else{
+                        handleShiftAndPress(modelIndex);
+                    }
                 }
                 //ctrl+右键
                 else {
                     //多选-刷新详情页
                     if(modelIndex.row()!=currentIndex().row()){
                         //多选详情页
+                        //shift+you
+                        selectionModel()->select(m_pSortViewFilter->index(modelIndex.row(), 0), QItemSelectionModel::Select);
                         changeRightView();
                     }
-                    selectionModel()->select(m_pSortViewFilter->index(modelIndex.row(), 0), QItemSelectionModel::Select);
                 }
                 //多选-右键菜单
                 m_noteMenu->setWindowOpacity(1);
@@ -868,9 +877,8 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
                     selectionModel()->select(m_pSortViewFilter->index(i, 0), QItemSelectionModel::Select);
                 }
                 setModifierState(ModifierState::shiftAndHomeOrEndKeyModifier);
-                if(selectedIndexes().count()>1){
-                    changeRightView();
-                }
+                //刷新详情页
+                changeRightView(selectedIndexes().count()>1?true:false);
             }else {
                 setCurrentIndex(0);
                 changeRightView(false);
@@ -884,9 +892,8 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
                     selectionModel()->select(m_pSortViewFilter->index(i, 0), QItemSelectionModel::Select);
                 }
                 setModifierState(ModifierState::shiftAndHomeOrEndKeyModifier);
-                if(selectedIndexes().count()>1){
-                    changeRightView();
-                }
+                //刷新详情页
+                changeRightView(selectedIndexes().count()>1?true:false);
             }else {
                 setCurrentIndex(count()-1);
                 changeRightView(false);
