@@ -34,10 +34,8 @@ void VnoteMultipleChoiceOptionWidget::initUi()
         pixmap.load(QString(STAND_ICON_PAHT).append("detail_icon/detail_icon_note.svg"));
     }
     iconLabel->setPixmap(pixmap);
-//    iconLabel->setFixedSize(186,186);
 
     QHBoxLayout *iconLayout = new QHBoxLayout(this);
-//    iconLayout->addSpacing(58);
     iconLayout->addStretch();
     iconLayout->addWidget(iconLabel);
     iconLayout->addStretch();
@@ -82,7 +80,6 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     hlayout->addWidget(m_saveTextButton);
     hlayout->addWidget(m_saveVoiceButton);
     hlayout->addWidget(m_deleteButton);
-//    hlayout->addSpacing(10);
     hlayout->addStretch();
     vlayout->addLayout(hlayout);
     vlayout->addStretch(7);

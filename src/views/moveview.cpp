@@ -97,7 +97,7 @@ void MoveView::paintEvent(QPaintEvent *)
     }
     //多选-多选拖拽
     QPainter painter(this);
-    ///从系统获取画板
+    //从系统获取画板
     DPalette pb = DApplicationHelper::instance()->applicationPalette();
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHints(QPainter::SmoothPixmapTransform);
