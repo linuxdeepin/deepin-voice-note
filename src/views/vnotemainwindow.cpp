@@ -2111,13 +2111,13 @@ void VNoteMainWindow::onShowPrivacy()
     bool isCommunityEdition = DSysInfo::isCommunityEdition();
     if (country == QLocale::China) {
         if(isCommunityEdition){
-            url = "https://www.uniontech.com/agreement/deepin-privacy-cn";
+            url = "https://www.deepin.org/zh/agreement/privacy/";
         }else {
             url = "https://www.uniontech.com/agreement/privacy-cn";
         }
     } else {
         if(isCommunityEdition){
-            url = "https://www.uniontech.com/agreement/deepin-privacy-en";
+            url = "https://www.deepin.org/en/agreement/privacy/";
         }else {
             url = "https://www.uniontech.com/agreement/privacy-en";
         }

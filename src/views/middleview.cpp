@@ -382,7 +382,6 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
         if(Qt::LeftButton == event->button() || Qt::MidButton == event->button()){
             //ctrl+左/中键
             if(Qt::ControlModifier == event->modifiers()){
-                //ctrl+mousepress，如果当前是shift+key/shift+mousepress,清空多余选中
                 //当前点击位置为最后一个选择，不做处理
                 if(selectedIndexes().count()==1 && selectedIndexes().last().row() == indexAt(event->pos()).row()){
                     return;
@@ -395,7 +394,6 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
 
                     selectionModel()->select(m_pSortViewFilter->index(modelIndex.row(), 0), QItemSelectionModel::Select);
                     //普通详情页
-                    //从shift切换到ctrl/ctrl切换到shift状态时，未刷新详情页状态
                     changeRightView(false);
                 }else {
                     if(selectedIndexes().contains(modelIndex)){
