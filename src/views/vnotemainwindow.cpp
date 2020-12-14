@@ -797,6 +797,8 @@ void VNoteMainWindow::onVNoteSearch()
             setSpecialStatus(SearchStart);
             m_searchKey = text;
             loadSearchNotes(m_searchKey);
+            //搜索内容不为空，切换为单选详情页面
+            changeRightView(false);
         } else {
             setSpecialStatus(SearchEnd);
         }
