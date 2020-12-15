@@ -18,7 +18,7 @@ VnoteMultipleChoiceOptionWidget::VnoteMultipleChoiceOptionWidget(QWidget *parent
  *///初始化ui
 void VnoteMultipleChoiceOptionWidget::initUi()
 {
-    QVBoxLayout *vlayout = new QVBoxLayout(this);
+    QVBoxLayout *vlayout = new QVBoxLayout;
 
     DLabel *iconLabel = new DLabel(this);
     QImageReader reader;
@@ -35,7 +35,7 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     }
     iconLabel->setPixmap(pixmap);
 
-    QHBoxLayout *iconLayout = new QHBoxLayout(this);
+    QHBoxLayout *iconLayout = new QHBoxLayout;
     iconLayout->addStretch();
     iconLayout->addWidget(iconLabel);
     iconLayout->addStretch();
@@ -44,7 +44,7 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     m_tipsLabel->setFixedHeight(29);
 
     DFontSizeManager::instance()->bind(m_tipsLabel,DFontSizeManager::T4);
-    QHBoxLayout *tipsLayout = new QHBoxLayout(this);
+    QHBoxLayout *tipsLayout = new QHBoxLayout;
     tipsLayout->addStretch();
     tipsLayout->addWidget(m_tipsLabel);
     tipsLayout->addStretch();
@@ -74,7 +74,7 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     vlayout->addSpacing(10);
     vlayout->addLayout(tipsLayout);
     vlayout->addSpacing(20);
-    QHBoxLayout *hlayout = new QHBoxLayout(this);
+    QHBoxLayout *hlayout = new QHBoxLayout;
     hlayout->addStretch();
     hlayout->addWidget(m_moveButton);
     hlayout->addWidget(m_saveTextButton);

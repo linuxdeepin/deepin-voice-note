@@ -645,7 +645,7 @@ void VNoteMainWindow::initRightView()
     m_rightViewHolder->setBackgroundRole(DPalette::Base);
     m_rightViewHolder->setAutoFillBackground(true);
 
-    QVBoxLayout *rightHolderLayout = new QVBoxLayout(this);
+    QVBoxLayout *rightHolderLayout = new QVBoxLayout;
     rightHolderLayout->setSpacing(0);
     rightHolderLayout->setContentsMargins(0, 15, 0, 3);
 
@@ -794,11 +794,11 @@ void VNoteMainWindow::onVNoteSearch()
     if (m_noteSearchEdit->lineEdit()->hasFocus()) {
         QString text = m_noteSearchEdit->text();
         if (!text.isEmpty()) {
+            //搜索内容不为空，切换为单选详情页面
+            changeRightView(false);
             setSpecialStatus(SearchStart);
             m_searchKey = text;
             loadSearchNotes(m_searchKey);
-            //搜索内容不为空，切换为单选详情页面
-            changeRightView(false);
         } else {
             setSpecialStatus(SearchEnd);
         }

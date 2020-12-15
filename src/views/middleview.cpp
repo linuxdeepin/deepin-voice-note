@@ -431,9 +431,9 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                     changeRightView();
                 }else {
                     //普通详情页
+                    changeRightView(false);
                     clearSelection();
                     setCurrentIndex(modelIndex.row());
-                    changeRightView(false);
                 }
                 return;
             }
@@ -459,9 +459,9 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                     //shift+you
                     if(m_currentRow == modelIndex.row()){
                         //普通详情页
+                        changeRightView(false);
                         clearSelection();
                         setCurrentIndex(modelIndex.row());
-                        changeRightView(false);
                     } else{
                         handleShiftAndPress(modelIndex);
                     }
@@ -812,8 +812,11 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
                 m_shiftSelection = nextIndex;
                 setModifierState(ModifierState::shiftAndUpOrDownModifier);
             }else {
-                selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
+                clearSelection();
+                setCurrentIndex(m_currentRow);
                 scrollTo(m_pSortViewFilter->index(m_currentRow,0));
+                //切换详情显示页面
+               changeRightView(false);
             }
         }else if (Qt::ShiftModifier == e->modifiers() && Qt::Key_Down == e->key()) {
             int nextIndex = m_shiftSelection==-1?m_currentRow+1: m_shiftSelection +1;
@@ -846,8 +849,11 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
                 m_shiftSelection = nextIndex;
                 setModifierState(ModifierState::shiftAndUpOrDownModifier);
             }else {
-                selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
+                clearSelection();
+                setCurrentIndex(m_currentRow);
                 scrollTo(m_pSortViewFilter->index(m_currentRow,0));
+                //切换详情显示页面
+               changeRightView(false);
             }
         }
         else {
@@ -1120,8 +1126,14 @@ void MiddleView::triggerDragNote()
         //多选-移除后选中
             selectAfterRemoved();
         }else {
-            for(auto index : modelList){
-                selectionModel()->select(m_pSortViewFilter->index(index.row(), 0), QItemSelectionModel::Select);
+            //拖拽取消后，如果当前选中单个笔记，刷新单选详情页
+            if(1 == modelList.size()){
+                clearSelection();
+                setCurrentIndex(modelList.at(0).row());
+            }else {
+                for(auto index: modelList){
+                    selectionModel()->select(m_pSortViewFilter->index(index.row(),0),QItemSelectionModel::Select);
+                }
             }
         }
         setDragSuccess(false);
