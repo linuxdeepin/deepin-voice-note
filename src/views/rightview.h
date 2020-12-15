@@ -110,9 +110,9 @@ public:
     VoiceNoteItem *getCurVoiceAsr();
     //操作是否需要弹出提示框
     int showWarningDialog();
-    //多选-多选详情页
+    //更新详情页状态
     void setIsNormalView(bool value);
-    //多选-多选详情页
+    //详情页是否为当前笔记
     bool getIsNormalView() const;
 signals:
     //播放信号
@@ -183,7 +183,7 @@ private:
     QString m_searchKey {""};
 
     QMap<VNoteBlock *, DetailItemWidget *> m_mapWidgetCache;
-    //多选-多选详情页
+    //详情页是否为当前笔记
     bool m_isNormalView {true};
 };
 

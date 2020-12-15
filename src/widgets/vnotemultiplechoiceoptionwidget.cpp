@@ -5,7 +5,8 @@
 #include <QDebug>
 #include <QImageReader>
 
-//多选-多选详情页
+//多选操作页面
+const int m_iconWidth = 24;
 VnoteMultipleChoiceOptionWidget::VnoteMultipleChoiceOptionWidget(QWidget *parent)
     :DWidget(parent)
 {
@@ -16,7 +17,6 @@ VnoteMultipleChoiceOptionWidget::VnoteMultipleChoiceOptionWidget(QWidget *parent
  * @brief VnoteMultipleChoiceOptionWidget::initUi
  * @param
  *///初始化ui
-const int m_iconWidth = 24;
 void VnoteMultipleChoiceOptionWidget::initUi()
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
@@ -236,7 +236,8 @@ void VnoteMultipleChoiceOptionWidget::setSVGBackColor(QDomElement &elem, QString
 /**
  * @brief VnoteMultipleChoiceOptionWidget::trigger
  * @param id
- *///触发菜单操作
+ * 触发多选操作
+ */
 void VnoteMultipleChoiceOptionWidget::trigger(int id){
     m_moveButton->setAttribute(Qt::WA_UnderMouse, false);
     m_saveTextButton->setAttribute(Qt::WA_UnderMouse, false);
@@ -248,7 +249,8 @@ void VnoteMultipleChoiceOptionWidget::trigger(int id){
 /**
  * @brief VnoteMultipleChoiceOptionWidget::changeFromThemeType
  * @param
- *///多选-根据主题设置图标与删除按钮文本颜色
+ * 根据主题设置图标与删除按钮文本颜色
+ */
 void VnoteMultipleChoiceOptionWidget::changeFromThemeType(){
     bool isDark = (DApplicationHelper::DarkType ==  DApplicationHelper::instance()->themeType())? true:false;
     QString iconPath = QString(STAND_ICON_PAHT);
@@ -272,6 +274,10 @@ void VnoteMultipleChoiceOptionWidget::changeFromThemeType(){
     m_deleteButton->setIcon(QIcon(QString("%1%2").arg(iconPath).arg("detail_notes_delete.svg")));
 }
 
+/**
+ * @brief VnoteMultipleChoiceOptionWidget::onFontChanged
+ * @param
+ *///根据字体大小调整按钮UI
 void VnoteMultipleChoiceOptionWidget::onFontChanged(){
     QFontMetrics fontMetrics(m_deleteButton->font());
     //设置move和delete按钮的高度和文本内容
@@ -304,6 +310,10 @@ void VnoteMultipleChoiceOptionWidget::onFontChanged(){
     m_deleteButton->setIconSize(iconSize);
 }
 
+/**
+ * @brief VnoteMultipleChoiceOptionWidget::resizeEvent
+ * @param
+ */
 void VnoteMultipleChoiceOptionWidget::resizeEvent(QResizeEvent *event)
 {
     DWidget::resizeEvent(event);

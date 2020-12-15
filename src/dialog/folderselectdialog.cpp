@@ -199,7 +199,6 @@ void FolderSelectDialog::initUI()
     titleLayout->setSpacing(0);
     titleLayout->setContentsMargins(10, 0, 0, 0);
     titleLayout->addStretch();
-    //多选-自动截断提示长度
     titleLayout->addSpacing(m_closeButton->width()/3);
 
     titleLayout->addWidget(m_labMove, 0, Qt::AlignCenter | Qt::AlignVCenter);
@@ -341,7 +340,6 @@ void FolderSelectDialog::refreshTextColor(bool dark){
  */
 void FolderSelectDialog::setNoteContextInfo(const QString &text,int notesNumber)
 {
-    //多选-自动截断提示长度
     m_noteInfo->setAlignment(Qt::AlignCenter);
     m_notesName = text;
     m_notesNumber = notesNumber;
@@ -351,10 +349,10 @@ void FolderSelectDialog::setNoteContextInfo(const QString &text,int notesNumber)
 /**
  * @brief FolderSelectDialog::getSelectIndex
  * @return 选中的记事本
- *///字体切换长度适应
+ */
 void FolderSelectDialog::onFontChanged(){
     QString itemInfo = "";
-    //多选-自动截断提示长度
+    //自动截断提示长度
     QFontMetrics fontMetric(this->font());
     //用于计算当前文本名截断宽度的常量
     int constantWidth = m_notesNumber>1? fontMetric.width(DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg("").arg("\"\""))

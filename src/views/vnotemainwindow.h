@@ -57,7 +57,7 @@ class VoiceNoteItem;
 class DBusLogin1Manager;
 class VNMainWndDelayInitTask;
 class UpgradeView;
-//多选-多选详情页
+//多选操作页面
 class VnoteMultipleChoiceOptionWidget;
 class VNoteMainWindow : public DMainWindow
 {
@@ -209,9 +209,9 @@ public slots:
     void onShowPrivacy();
     //参数设置
     void onShowSettingDialog();
-    //多选-笔记拖拽结束
+    //笔记拖拽结束
     void onDropNote(bool dropCancel);
-    //多选-多选详情页
+    //响应多选详情页操作
     void handleMultipleOption(int id);
 private:
     //左侧列表视图操作相关
@@ -260,7 +260,7 @@ private:
 #endif
 
     DScrollArea *m_rightViewScrollArea {nullptr};
-    //多选-多选详情页
+    //多选操作页面
     VnoteMultipleChoiceOptionWidget *m_multipleSelectWidget {nullptr};
     QStackedWidget *m_stackedRightMainWidget {nullptr};
 

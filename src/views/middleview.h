@@ -55,7 +55,7 @@ public:
         ReleaseFromMenu,
         Normal
     };
-    //多选-选择
+    //辅助键状态
     enum ModifierState{
             noModifier = 0,
             ctrlModifier = 1,
@@ -63,7 +63,7 @@ public:
             shiftAndMouseModifier = 3,
             shiftAndHomeOrEndKeyModifier = 4
     };
-    //多选-选择
+    //鼠标状态
     enum MouseState{
         normal = 0,
         pressing = 1,
@@ -98,11 +98,11 @@ public:
     qint64 getCurrentId();
     //获取记事项数目
     qint32 rowCount() const;
-    //多选-右键删除
+    //删除当前选中笔记
     QList<VNoteItem *>deleteCurrentRow();
     //获取当前选中项数据
     VNoteItem *getCurrVNotedata() const;
-    //多选-拖拽移动
+    //当前选中数据项列表
     QList<VNoteItem *> getCurrVNotedataList() const;
     //置顶/取消置顶
     void noteStickOnTop();
@@ -116,22 +116,22 @@ public:
     void handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point);
     //更新触摸屏一指状态
     void setTouchState(const TouchState &touchState);
-    //多选-右键菜单
+    //当前是否为多选
     bool isMultipleSelected();
-    //多选-选中是否有文本
+    //当前选中笔记是否有文本
     bool haveText();
-    //多选-选中是否有语音
+    //当前选中笔记是否有语音
     bool haveVoice();
-    //多选-移除后选中
+    //记录笔记项移除前位置
     void setNextSelection();
-    //多选-移除后选中
+    //笔记项移除后选中
     void selectAfterRemoved();
-    //多选-刷新详情页
+    //获取笔记数量
     int getSelectedCount();
-    //多选-拖拽取消后选中
+    //更新拖拽状态
     void setDragSuccess(bool dragSuccess = false);
 signals:
-    //多选-刷新详情页
+    //请求刷新详情页
     void requestChangeRightView(bool isMultipleOption);
 
 public slots:
@@ -160,12 +160,12 @@ protected:
     void doTouchMoveEvent(QMouseEvent *event);
     //处理拖拽事件
     void handleDragEvent(bool isTouch = true);
-    //多选-选择
+    //处理shift+鼠标press选中操作
     void handleShiftAndPress(QModelIndex &index);
     void setModifierState(const ModifierState &modifierState);
     ModifierState getModifierState() const;
     void setMouseState(const MouseState &mouseState);
-    //多选-右键菜单
+    //响应右键菜单弹出
     void onMenuShow(QPoint point);
 private:
     //初始化代理模块
@@ -180,7 +180,7 @@ private:
     void initConnections();
     //触发拖动操作
     void triggerDragNote();
-    //多选-刷新详情页
+    //请求刷新详情页
     void changeRightView(bool isMultipleDetailPage = true);
     //初始化位置状态
     void initPositionStatus(int row);
@@ -208,14 +208,14 @@ private:
     QTimer *m_popMenuTimer {nullptr};
     MenuStatus m_menuState {InitialState};
     TouchState m_touchState {TouchNormal};
-    //多选-选择
+
     int m_currentRow = -1;
-    int m_shiftSelection = -1;
     ModifierState m_modifierState {ModifierState::noModifier};
     MouseState m_mouseState {normal};
-    //多选-移除后选中
+    //用于shift多选判断位置
+    int m_shiftSelection = -1;
     int m_nextSelection  = -1;
-    //多选-拖拽取消后选中
+    //拖拽完成标志
     bool m_dragSuccess {false};
 };
 

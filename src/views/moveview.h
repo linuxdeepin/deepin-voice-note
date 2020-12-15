@@ -36,9 +36,9 @@ public:
     void setFolder(VNoteFolder* folder);
     //设置笔记数据
     void setNote(VNoteItem* note);
-    //多选-设置笔记数据列表
+    //设置笔记数据列表
     void setNoteList(QList<VNoteItem *> noteList);
-    //多选-设置笔记数量
+    //设置笔记数量
     void setNotesNumber(int value);
 protected:
     //重写paint事件
@@ -46,9 +46,9 @@ protected:
 private:
     VNoteFolder *m_folder {nullptr};
     VNoteItem   *m_note {nullptr};
-    //多选-笔记列表
+    //当前选中笔记列表
     QList<VNoteItem *>m_noteList {nullptr};
-    //多选-笔记数量
+    //拖拽笔记数量
     int m_notesNumber = 0;
     //初始化背景图片
     QPixmap m_backGroundPixMap ;

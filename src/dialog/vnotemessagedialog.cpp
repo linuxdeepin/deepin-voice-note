@@ -32,7 +32,7 @@
  * @brief VNoteMessageDialog::VNoteMessageDialog
  * @param msgType 窗口类型
  * @param parent
- *///多选-删除
+ */
 VNoteMessageDialog::VNoteMessageDialog(int msgType, QWidget *parent , int notesCount)
     : VNoteBaseDialog(parent)
     , m_notesCount(notesCount)
@@ -139,7 +139,6 @@ void VNoteMessageDialog::initMessage()
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "Do you want to stop the current recording?"));
     } break;
     case DeleteNote: {
-        //多选-删除(文案)
         if(m_notesCount>1){
             m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "Are you sure you want to delete the selected %1 notes?").arg(m_notesCount));
         }else {

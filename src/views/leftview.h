@@ -97,8 +97,7 @@ public:
     void setNumberOfNotes(int numberOfNotes);
 
 signals:
-    //多选-多选拖拽到当前记事本
-    //多选-拖拽取消后选中
+    //拖拽到当前记事本
     void dropNotesEnd(bool dropCancel);
 
 protected:

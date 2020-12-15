@@ -17,11 +17,12 @@
 #include <DLabel>
 
 DWIDGET_USE_NAMESPACE
-//多选-多选详情页
+//多选操作页面
 class VnoteMultipleChoiceOptionWidget : public DWidget
 {
     Q_OBJECT
 public:
+    //按钮id
     enum ButtonValue{
        Move = 1,
         SaveAsTxT = 2,
@@ -44,11 +45,16 @@ private:
     //设置svg颜色属性
     void setSVGBackColor(QDomElement &elem,QString attr,QString val);
 signals:
+    //请求多选操作
     void requestMultipleOption(int id);
 protected:
+    //触发多选操作
     void trigger(int id);
+    //初始化槽连接
     void initConnections();
+    //根据主题设置图标与删除按钮文本颜色
     void changeFromThemeType();
+    //根据字体大小调整按钮UI
     void onFontChanged();
     void resizeEvent(QResizeEvent *event)override;
 private:

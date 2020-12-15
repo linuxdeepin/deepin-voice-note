@@ -36,20 +36,21 @@
  * @param note 绑定记事项数据
  * @param block 绑定文本/语音
  * @param parent
- *///多选-导出语音
+ */
 ExportNoteWorker::ExportNoteWorker(QString dirPath, int exportType,
                                    QList<VNoteItem *>noteList, VNoteBlock *block, QObject *parent)
     : VNTask(parent)
     , m_exportType(exportType)
     , m_exportPath(dirPath)
-    //多选-导出语音
+    //笔记列表
     , m_noteList(noteList)
     , m_noteblock(block)
 {
 }
 /**
  * @brief ExportNoteWorker::run
- *///多选-导出语音
+ * 执行导出操作
+ */
 void ExportNoteWorker::run()
 {
     ExportError error = static_cast<ExportError>(checkPath());
@@ -62,7 +63,7 @@ void ExportNoteWorker::run()
         } else if (ExportAll == m_exportType) {
             exportAll();
         } else if (ExportOneVoice == m_exportType) {
-            //多选-导出语音
+            //导出语音
             if(m_noteList.size()>1){
                 exportAllVoice();
             }else {
@@ -104,7 +105,8 @@ int ExportNoteWorker::checkPath()
 /**
  * @brief ExportNoteWorker::exportText
  * @return 错误码
- *///多选-导出文本
+ * 导出文本
+ */
 int ExportNoteWorker::exportText()
 {
     ExportError error = ExportOK;
@@ -138,7 +140,8 @@ int ExportNoteWorker::exportText()
 /**
  * @brief ExportNoteWorker::exportAllVoice
  * @return 错误码
- *///多选-导出语音
+ * 导出语音
+ */
 int ExportNoteWorker::exportAllVoice()
 {
     ExportError error = ExportOK;

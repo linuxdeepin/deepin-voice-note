@@ -35,7 +35,6 @@
 #include "common/vnoteforlder.h"
 #include "common/actionmanager.h"
 #include "common/vnotedatasafefymanager.h"
-//多选-多选详情页
 #include "widgets/vnotemultiplechoiceoptionwidget.h"
 
 #include "common/utils.h"
@@ -66,7 +65,6 @@
 #include <QDesktopServices>
 
 #include <DApplication>
-//多选-多选详情页
 #include <DToolButton>
 #include <DApplicationHelper>
 #include <DFontSizeManager>
@@ -205,11 +203,11 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onMenuAbout2Show);
     connect(ActionManager::Instance()->detialContextMenu(), &DMenu::triggered,
             this, &VNoteMainWindow::onMenuAction);
-    //多选-拖拽取消后选中
+    //处理笔记拖拽释放
     connect(m_leftView,&LeftView::dropNotesEnd,this,&VNoteMainWindow::onDropNote);
-    //多选-刷新详情页
+    //处理详情页刷新请求
     connect(m_middleView,&MiddleView::requestChangeRightView,this,&VNoteMainWindow::changeRightView);
-    //多选-多选详情页
+    //处理详情页多选操作
     connect(m_multipleSelectWidget,&VnoteMultipleChoiceOptionWidget::requestMultipleOption,this,&VNoteMainWindow::handleMultipleOption);
 }
 
@@ -370,8 +368,7 @@ void VNoteMainWindow::initShortcuts()
     m_stSaveAsText->setAutoRepeat(false);
 
     connect(m_stSaveAsText.get(), &QShortcut::activated, this, [this] {
-        //Call method in rightview
-        //多选-快捷键-保存为文本
+        //多选笔记导出文本
         if (canDoShortcutAction()) {
                 if (m_middleView->haveText()) {
                     m_middleView->saveAsText();
@@ -389,7 +386,7 @@ void VNoteMainWindow::initShortcuts()
         //Call method in rightview
         if (canDoShortcutAction()) {
             //Can't save recording when do recording.
-            //多选-快捷键-保存语音
+            //多选笔记导出语音
             if (!stateOperation->isRecording()) {
                     if (m_middleView->haveVoice()) {
                         m_middleView->saveRecords();
@@ -626,17 +623,16 @@ void VNoteMainWindow::initMiddleView()
  */
 void VNoteMainWindow::initRightView()
 {
-    //多选-多选详情页
     m_stackedRightMainWidget = new QStackedWidget(m_mainWndSpliter);
     m_rightViewHolder = new QWidget(this);
 
-    //多选-多选详情页
+    //初始化多选详情页面
     m_multipleSelectWidget = new VnoteMultipleChoiceOptionWidget(this);
     m_multipleSelectWidget->setBackgroundRole(DPalette::Base);
     m_multipleSelectWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_multipleSelectWidget->setAutoFillBackground(true);
 
-    //多选-多选详情页
+    //添加多选与单选详情页
     m_stackedRightMainWidget->addWidget(m_rightViewHolder);
     m_stackedRightMainWidget->addWidget(m_multipleSelectWidget);
 
@@ -676,7 +672,7 @@ void VNoteMainWindow::initRightView()
     m_rightViewHolder->setLayout(rightHolderLayout);
 
     m_recordBar->setVisible(false);
-    //多选-多选详情页
+    //初始化详情页面为当前笔记
     m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
 
 #ifdef VNOTE_LAYOUT_DEBUG
@@ -850,7 +846,6 @@ void VNoteMainWindow::initSpliterView()
     initRightView();
 
     // Disable spliter drag & resize
-    //多选-多选详情页
     QList<QWidget *> Children {m_middleViewHolder, m_stackedRightMainWidget};
 
     for (auto it : Children) {
@@ -1333,7 +1328,6 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         addNote();
         break;
     case ActionManager::NoteDelete: {
-        //多选-删除
         VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this,m_middleView->getSelectedCount());
         connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
             delNote();
@@ -1401,7 +1395,7 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         m_middleView->noteStickOnTop();
         break;
     case ActionManager::NoteMove: {
-        //多选-移除后选中
+        //删除前记录选中位置
         m_middleView->setNextSelection();
 
         QModelIndexList notesdataList = m_middleView->getAllSelectNote();
@@ -1410,9 +1404,9 @@ void VNoteMainWindow::onMenuAction(QAction *action)
             m_leftView->setNumberOfNotes(m_middleView->count());
             if(selectFolder.isValid() && m_leftView->doNoteMove(notesdataList, selectFolder)){
                 m_middleView->deleteModelIndexs(notesdataList);
-                //多选-移除后选中
+                //删除后设置选中
                 m_middleView->selectAfterRemoved();
-            }//取消move后不改变选中状态
+            }
         }
     }
        break;
@@ -1452,7 +1446,7 @@ void VNoteMainWindow::onMenuAbout2Show()
 
         //Disable SaveText if note have no text
         //Disable SaveVoice if note have no voice.
-        //多选-右键菜单
+        //只有当前一个记事本，右键移动置灰
         if(1 == m_leftView->folderCount()){
             ActionManager::Instance()->enableAction(ActionManager::NoteMove, false);
         }
@@ -1596,7 +1590,6 @@ void VNoteMainWindow::editNotepad()
  */
 void VNoteMainWindow::addNote()
 {
-    //多选-添加后选中
     m_middleView->clearSelection();
 
     qint64 id = m_middleView->getCurrentId();
@@ -1636,10 +1629,11 @@ void VNoteMainWindow::editNote()
 
 /**
  * @brief VNoteMainWindow::delNote
- *///多选-右键删除
+ * 删除记事项
+ */
 void VNoteMainWindow::delNote()
 {
-    //多选-移除后选中
+    //记录移除前位置
     m_middleView->setNextSelection();
 
     QList<VNoteItem *> noteDataList = m_middleView->deleteCurrentRow();
@@ -1658,7 +1652,7 @@ void VNoteMainWindow::delNote()
         //Refresh the notes count of folder
         m_leftView->update(m_leftView->currentIndex());
     }
-    //多选-移除后选中
+    //设置移除后选中
     m_middleView->selectAfterRemoved();
 }
 
@@ -1722,7 +1716,7 @@ int VNoteMainWindow::loadSearchNotes(const QString &key)
             m_middleView->setVisibleEmptySearch(false);
             m_middleView->setCurrentIndex(0);
         }
-        //多选-切换详情页到单文本页面
+        //刷新详情页-切换至当前笔记
         m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
     }
     return m_middleView->rowCount();
@@ -2156,10 +2150,11 @@ void VNoteMainWindow::initMenuExtension()
 /**
  * @brief MiddleView::onDropNote
  * @param dropCancel
- *///多选-拖拽取消后选中
+ * 笔记拖拽结束
+ */
 void VNoteMainWindow::onDropNote(bool dropCancel)
 {
-    //多选-拖拽取消后选中
+    //取消拖拽，return
     if(dropCancel){
         m_middleView->setDragSuccess(false);
         return;
@@ -2172,18 +2167,19 @@ void VNoteMainWindow::onDropNote(bool dropCancel)
     if (ret) {
         m_middleView->deleteModelIndexs(indexList);
     }
-    //多选-拖拽取消后选中
+    //拖拽完成
     m_middleView->setDragSuccess(true);
 }
 
 /**
  * @brief MiddleView::handleMultipleOption
  * @param id
- *///多选-多选详情页
+ * 响应多选详情页操作
+ */
 void VNoteMainWindow::handleMultipleOption(int id){
     switch (id) {
     case 1:{
-             //多选-移除后选中
+             //多选页面-移动
              m_middleView->setNextSelection();
             QModelIndexList notesdata = m_middleView->getAllSelectNote();
             if(notesdata.size()){
@@ -2191,29 +2187,27 @@ void VNoteMainWindow::handleMultipleOption(int id){
                 m_leftView->setNumberOfNotes(m_middleView->count());
                 if(selectFolder.isValid() && m_leftView->doNoteMove(notesdata, selectFolder)){
                     m_middleView->deleteModelIndexs(notesdata);
-                    //多选-移除后选中
+                    //移除后选中
                     m_middleView->selectAfterRemoved();
                 }
             }
         }
         break;
-    case 2:{
-            m_middleView->saveAsText();
-        }
+    case 2:
+        //多选页面-保存TxT
+        m_middleView->saveAsText();
         break;
-    case 3: {
-            m_middleView->saveRecords();
-        }
+    case 3:
+        //多选页面-保存语音
+        m_middleView->saveRecords();
         break;
-    case 4:{
-            //多选-删除
-            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this,m_middleView->getSelectedCount());
-            connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
-                delNote();
-            });
-
-            confirmDialog.exec();
-        }
+    case 4:
+        //多选页面-删除
+        VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this,m_middleView->getSelectedCount());
+        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+            delNote();
+        });
+        confirmDialog.exec();
         break;
     }
 }

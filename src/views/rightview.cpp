@@ -972,7 +972,8 @@ DetailItemWidget *RightView::getWidgetByPos(const QPoint &pos)
 /**
  * @brief RightView::getIsNormalView
  * @param
- *///多选-多选详情页
+ * 详情页是否为当前笔记
+ */
 bool RightView::getIsNormalView() const
 {
     return m_isNormalView;
@@ -981,7 +982,8 @@ bool RightView::getIsNormalView() const
 /**
  * @brief RightView::setIsNormalView
  * @param value
- *///多选-多选详情页
+ * 更新详情页状态
+ */
 void RightView::setIsNormalView(bool value)
 {
     m_isNormalView = value;
@@ -1373,7 +1375,7 @@ void RightView::saveMp3()
                 setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
 
                 QString exportDir = dialog.directoryUrl().toLocalFile();
-                //多选-导出语音
+                //多选操作-导出语音
                 QList<VNoteItem *>noteDataList;
                 noteDataList.append(m_noteItemData);
                 ExportNoteWorker *exportWorker = new ExportNoteWorker(

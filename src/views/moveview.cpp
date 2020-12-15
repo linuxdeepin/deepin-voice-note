@@ -61,7 +61,8 @@ void MoveView::setNote(VNoteItem *note)
 
 /**
  * @brief MoveView::setNoteList
- *///多选-拖拽移动
+ * 设置笔记数据列表
+ */
 void MoveView::setNoteList(QList<VNoteItem *>noteList)
 {
     m_noteList = noteList;
@@ -95,7 +96,6 @@ void MoveView::paintEvent(QPaintEvent *)
             m_backGroundPixMap = QPixmap(imagePath.append("drag_note.svg"));
         }
     }
-    //多选-多选拖拽
     QPainter painter(this);
     //从系统获取画板
     DPalette pb = DApplicationHelper::instance()->applicationPalette();
@@ -129,11 +129,13 @@ void MoveView::paintEvent(QPaintEvent *)
         QRect numRect(paintRect.right() - numWidth - 30, paintRect.top(), numWidth, paintRect.height());
         QRect nameRect(iconRect.right() + 12, paintRect.top(),
                        numRect.left() - iconRect.right() - 14, paintRect.height());
+        //绘制记事本笔记数量
         painter.drawText(numRect, Qt::AlignRight | Qt::AlignVCenter, strNum);
+        //绘制记事本图标
         painter.drawPixmap(iconRect, m_folder->UI.icon);
+        //绘制记事本名称
         QString elideText = fontMetrics.elidedText(m_folder->name, Qt::ElideRight, nameRect.width());
         painter.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
-        //绘制笔记拖动缩略图
     }else {
         //多个笔记拖拽
         if(m_notesNumber > 1){
@@ -150,7 +152,7 @@ void MoveView::paintEvent(QPaintEvent *)
             painter.setPen(QPen(pb.color(DPalette::Normal, DPalette::Text)));
             paintRect.setLeft(paintRect.left() + 42);
             paintRect.setRight(paintRect.right() - 42);
-            //多选-拖拽移动
+            //绘制笔记名称
             QString elideText = fontMetrics.elidedText(m_noteList[0]->noteTitle, Qt::ElideRight, paintRect.width());
             painter.drawText(paintRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
 
@@ -164,7 +166,7 @@ void MoveView::paintEvent(QPaintEvent *)
                 widths = fontMetrics.width(QString::number(m_notesNumber));
                 numString = QString::number(m_notesNumber);
             }
-            //绘制圆
+            //绘制笔记数量背景圆
             QColor color2("#FD5E5E");
             painter.setPen(QPen(color2));
             painter.setBrush(color2);
@@ -176,6 +178,7 @@ void MoveView::paintEvent(QPaintEvent *)
             QColor color3("#FFFFFF");
             painter.setPen(QPen(color3));
             painter.setBrush(color3);
+            //绘制笔记数量
             QRect numberRect(QPoint(240-((widths-7)/2),17),QSize(16+(widths-7),18));
             painter.drawText(numberRect, Qt::AlignCenter, numString);
         }
@@ -192,14 +195,18 @@ void MoveView::paintEvent(QPaintEvent *)
             painter.setPen(QPen(pb.color(DPalette::Normal, DPalette::Text)));
             paintRect.setLeft(paintRect.left() + 42);
             paintRect.setRight(paintRect.right() - 42);
-            //多选-拖拽移动
+            //绘制笔记名称
             QString elideText = fontMetrics.elidedText(m_noteList[0]->noteTitle, Qt::ElideRight, paintRect.width());
             painter.drawText(paintRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
         }
     }
 }
 
-//多选-多选拖拽
+/**
+ * @brief MiddleView::mouseDoubleClickEvent
+ * @param event
+ * 设置笔记数量
+ */
 void MoveView::setNotesNumber(int value)
 {
     m_notesNumber = value;

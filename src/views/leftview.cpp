@@ -160,13 +160,11 @@ void LeftView::mousePressEvent(QMouseEvent *event)
         }
     }else {
         if (event->source() == Qt::MouseEventSynthesizedByQt) {
-            //是否弹出右键菜单
             m_popMenuTimer->start(1000);
             return;
         }else {
             if(Qt::RightButton == event->button()){
                 m_notepadMenu->setWindowOpacity(1);
-                //多选-右键菜单
                 m_notepadMenu->popup(event->globalPos());
             }
         }
@@ -528,7 +526,6 @@ void LeftView::closeMenu()
  * @param dst
  * @return
  */
-//多选-右键移动
 bool LeftView::doNoteMove(const QModelIndexList &src, const QModelIndex &dst)
 {
     if (src.size() && StandardItemCommon::getStandardItemType(dst) == StandardItemCommon::NOTEPADITEM) {
@@ -846,9 +843,9 @@ void LeftView::dropEvent(QDropEvent * event)
 {
     // 判断拖拽放下事件触发类型（笔记：NOTES_DRAG_KEY；记事本：NOTEPAD_DRAG_KEY）
     if (event->mimeData()->hasFormat(NOTES_DRAG_KEY)) {
-        //多选-拖拽到当前记事本不取消选中
+        //拖拽到当前记事本不取消选中
         bool currentNotePad = currentIndex().row() == indexAt( event->pos()).row()? true:false;
-        //多选-拖拽取消后选中
+        //拖拽取消后选中
         emit dropNotesEnd(currentNotePad);
     } else if (event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)) {
         doDragMove(currentIndex(), indexAt(mapFromGlobal(QCursor::pos())));
