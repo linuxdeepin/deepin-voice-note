@@ -525,6 +525,9 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
  */
 void MiddleView::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (m_onlyCurItemMenuEnable) {
+        return;
+    }
     m_isDraging = false;
     //停止计时器
     m_selectCurrentTimer->stop();
@@ -561,9 +564,7 @@ void MiddleView::mouseReleaseEvent(QMouseEvent *event)
         return;
     }
     setTouchState(TouchState::TouchNormal);
-    if (!m_onlyCurItemMenuEnable) {
-        DListView::mouseReleaseEvent(event);
-    }
+    DListView::mouseReleaseEvent(event);
 }
 
 /**
@@ -1194,7 +1195,6 @@ void MiddleView::handleDragEvent(bool isTouch)
 {
     //多选-移除后选中
     setNextSelection();
-
     if(m_onlyCurItemMenuEnable)
         return;
     if(isTouch){

@@ -16,6 +16,7 @@ VnoteMultipleChoiceOptionWidget::VnoteMultipleChoiceOptionWidget(QWidget *parent
  * @brief VnoteMultipleChoiceOptionWidget::initUi
  * @param
  *///初始化ui
+const int m_iconWidth = 24;
 void VnoteMultipleChoiceOptionWidget::initUi()
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
@@ -50,19 +51,10 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     tipsLayout->addStretch();
 
     m_moveButton = new DToolButton(this);
-    m_moveButton->setFixedHeight(26);
-    m_moveButton->setIconSize(QSize(24,24));
-    m_saveTextButton = new DToolButton(this);
-    m_saveTextButton->setFixedHeight(26);
-    m_saveTextButton->setIconSize(QSize(24,24));
-    m_saveVoiceButton = new DToolButton(this);
-    m_saveVoiceButton->setFixedHeight(26);
-    m_saveVoiceButton->setIconSize(QSize(24,24));
     m_deleteButton = new DToolButton(this);
-    m_deleteButton->setFixedHeight(26);
-    m_deleteButton->setIconSize(QSize(24,24));
-    m_moveButton->setText(DApplication::translate("NotesContextMenu", "Move"));
-    m_deleteButton->setText(DApplication::translate("NotesContextMenu", "Delete"));
+    m_saveTextButton = new DToolButton(this);
+    m_saveVoiceButton = new DToolButton(this);
+
     onFontChanged();
     //设置主题
     changeFromThemeType();
@@ -282,21 +274,34 @@ void VnoteMultipleChoiceOptionWidget::changeFromThemeType(){
 
 void VnoteMultipleChoiceOptionWidget::onFontChanged(){
     QFontMetrics fontMetrics(m_deleteButton->font());
+    //设置move和delete按钮的高度和文本内容
+    m_moveButton->setText(DApplication::translate("NotesContextMenu", "Move"));
+    m_moveButton->setFixedHeight(m_iconWidth+2);
+    m_deleteButton->setText(DApplication::translate("NotesContextMenu", "Delete"));
+    m_deleteButton->setFixedHeight(m_iconWidth+2);
+    //计算参数
     int midWidth = width()-m_moveButton->width()-m_deleteButton->width();
-    int iconWidth = qCeil(qApp->devicePixelRatio()*24)+11;
+    int iconWidth = qCeil(qApp->devicePixelRatio()*m_iconWidth)+11;
     int saveTextWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save as TXT"))+iconWidth;
     int saveVoiceWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save voice recording"))+iconWidth;
+    //设置saveAsTxt按钮和saveAsVoice按钮文本和size
     if(midWidth>saveTextWidth+saveVoiceWidth+11){
-        m_saveTextButton->setFixedWidth(saveTextWidth+5);
-        m_saveVoiceButton->setFixedWidth(saveVoiceWidth+5);
+        m_saveTextButton->setFixedSize(saveTextWidth+5,m_iconWidth+2);
+        m_saveVoiceButton->setFixedSize(saveVoiceWidth+5,m_iconWidth+2);
         m_saveTextButton->setText(DApplication::translate("NotesContextMenu", "Save as TXT"));
         m_saveVoiceButton->setText(DApplication::translate("NotesContextMenu", "Save voice recording"));
-    }else {
-        m_saveTextButton->setFixedWidth(midWidth/2-11);
-        m_saveVoiceButton->setFixedWidth(midWidth/2-11);
+    }else if(midWidth >0){
+        m_saveTextButton->setFixedSize(midWidth/2-11,m_iconWidth+2);
+        m_saveVoiceButton->setFixedSize(midWidth/2-11,m_iconWidth+2);
         m_saveTextButton->setText(fontMetrics.elidedText(DApplication::translate("NotesContextMenu", "Save as TXT"),Qt::ElideRight,midWidth/2-iconWidth-11));
         m_saveVoiceButton->setText(fontMetrics.elidedText(DApplication::translate("NotesContextMenu", "Save voice recording"),Qt::ElideRight,midWidth/2-iconWidth-11));
     }
+    //设置iconSize
+    QSize iconSize(m_iconWidth,m_iconWidth);
+    m_moveButton->setIconSize(iconSize);
+    m_saveTextButton->setIconSize(iconSize);
+    m_saveVoiceButton->setIconSize(iconSize);
+    m_deleteButton->setIconSize(iconSize);
 }
 
 void VnoteMultipleChoiceOptionWidget::resizeEvent(QResizeEvent *event)
