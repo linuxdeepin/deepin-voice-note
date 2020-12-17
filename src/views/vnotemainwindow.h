@@ -89,7 +89,13 @@ public:
         VoiceToTextStart,
         VoiceToTextEnd
     };
-
+    //多选详情页id
+    enum ButtonValue{
+       Move = 1,
+        SaveAsTxT = 2,
+        SaveAsVoice = 3,
+        Delete = 4
+    };
 protected:
     //初始化UI布局
     void initUI();

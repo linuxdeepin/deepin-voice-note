@@ -269,8 +269,11 @@ void VNoteMainWindow::initShortcuts()
     m_stRemNotebook->setAutoRepeat(false);
 
     connect(m_stRemNotebook.get(), &QShortcut::activated, this, [this] {
+        //当前记事本是否正在编辑
+        bool isEditing = m_leftView->isPersistentEditorOpen(m_leftView->currentIndex());
+        //如果已在编辑状态，取消操作，解决重复快捷键警告信息
         if (canDoShortcutAction()) {
-            if (!stateOperation->isSearching()) {
+            if (!stateOperation->isSearching() && !isEditing) {
                 editNotepad();
             }
         }
@@ -300,7 +303,10 @@ void VNoteMainWindow::initShortcuts()
     m_stRemNote->setAutoRepeat(false);
 
     connect(m_stRemNote.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
+        //当前笔记是否正在编辑
+        bool isEditing = m_middleView->isPersistentEditorOpen(m_middleView->currentIndex());
+        //如果已在编辑状态，取消操作，解决重复快捷键警告信息
+        if (canDoShortcutAction() && !isEditing){
             editNote();
         }
     });
@@ -2176,7 +2182,7 @@ void VNoteMainWindow::onDropNote(bool dropCancel)
  */
 void VNoteMainWindow::handleMultipleOption(int id){
     switch (id) {
-    case 1:{
+    case ButtonValue::Move:{
              //多选页面-移动
              m_middleView->setNextSelection();
             QModelIndexList notesdata = m_middleView->getAllSelectNote();
@@ -2191,15 +2197,15 @@ void VNoteMainWindow::handleMultipleOption(int id){
             }
         }
         break;
-    case 2:
+    case ButtonValue::SaveAsTxT:
         //多选页面-保存TxT
         m_middleView->saveAsText();
         break;
-    case 3:
+    case ButtonValue::SaveAsVoice:
         //多选页面-保存语音
         m_middleView->saveRecords();
         break;
-    case 4:
+    case ButtonValue::Delete:
         //多选页面-删除
         VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this,m_middleView->getSelectedCount());
         connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
