@@ -127,6 +127,8 @@ protected:
     void doTouchMoveEvent(QMouseEvent *event);
     //处理触摸屏拖拽事件
     void handleDragEvent(bool isTouch = true);
+    //事件过滤
+    bool eventFilter(QObject *o, QEvent *e)override;
 private:
     //初始化代理模块
     void initDelegate();

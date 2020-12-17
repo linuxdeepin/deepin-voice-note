@@ -386,15 +386,16 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
             //ctrl+左/中键
             if(Qt::ControlModifier == event->modifiers()){
                 //当前点击位置为最后一个选择，不做处理
-                if(selectedIndexes().count()==1 && selectedIndexes().last().row() == indexAt(event->pos()).row()){
-                    return;
+                if(selectedIndexes().count()==1){
+                    if(selectedIndexes().last().row() == indexAt(event->pos()).row()){
+                        return;
+                    }
                 }
                 //不延续当前状态则清空当前选中
                 if(getModifierState()!=ModifierState::noModifier && getModifierState()!= ModifierState::ctrlModifier){
                     clearSelection();
                     //多选详情页
                     setCurrentIndex(modelIndex.row());
-
                     selectionModel()->select(m_pSortViewFilter->index(modelIndex.row(), 0), QItemSelectionModel::Select);
                     //普通详情页
                     changeRightView(false);
@@ -445,7 +446,6 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                 setModifierState(ModifierState::noModifier);
                 setMouseState(MouseState::pressing);
                 //普通详情页
-//                emit requestReFreshRightView(false);
                 return;
             }
         }
@@ -618,9 +618,9 @@ void MiddleView::setModifierState(const ModifierState &modifierState)
 }
 
 /**
- * @brief MiddleView::setMouseState
- * @param mouseState
- * 更新鼠标状态
+ * @brief MiddleView::getModifierState
+ * @param
+ * 获取当前辅助键状态
  */
 MiddleView::ModifierState MiddleView::getModifierState() const
 {

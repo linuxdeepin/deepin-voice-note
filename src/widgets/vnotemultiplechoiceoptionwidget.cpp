@@ -135,25 +135,31 @@ void VnoteMultipleChoiceOptionWidget::initConnections(){
 /**
  * @brief VnoteMultipleChoiceOptionWidget::buttonPressed
  * @param value
- *///press更新svg
+ * press更新svg
+ */
 void VnoteMultipleChoiceOptionWidget::buttonPressed(ButtonValue value){
     DPalette dpalette  = DApplicationHelper::instance()->palette(m_deleteButton);
     QColor textColor = dpalette.color(DPalette::Highlight);
-   QString color = textColor.name(QColor::HexRgb);
-   QString iconPath = QString(STAND_ICON_PAHT).append("light/");
-   QPixmap pixmap;
-    if(ButtonValue::Move == value){
+    QString color = textColor.name(QColor::HexRgb);
+    QString iconPath = QString(STAND_ICON_PAHT).append("light/");
+    QPixmap pixmap;
+    switch (value) {
+    case ButtonValue::Move:
         pixmap = setSvgColor(iconPath.append("detail_notes_move.svg"),color);
         m_moveButton->setIcon(pixmap);
-    }else if (ButtonValue::SaveAsTxT == value) {
+        break;
+    case ButtonValue::SaveAsTxT:
         pixmap = setSvgColor(iconPath.append("detail_notes_saveText.svg"),color);
         m_saveTextButton->setIcon(pixmap);
-    }else if (ButtonValue::SaveAsVoice == value) {
+        break;
+    case ButtonValue::SaveAsVoice:
         pixmap = setSvgColor(iconPath.append("detail_notes_saveVoice.svg"),color);
         m_saveVoiceButton->setIcon(pixmap);
-    }else{
+        break;
+    case ButtonValue::Delete:
         pixmap = setSvgColor(iconPath.append("detail_notes_delete.svg"),color);
         m_deleteButton->setIcon(pixmap);
+        break;
     }
 }
 
@@ -239,6 +245,7 @@ void VnoteMultipleChoiceOptionWidget::setSVGBackColor(QDomElement &elem, QString
  * 触发多选操作
  */
 void VnoteMultipleChoiceOptionWidget::trigger(int id){
+    //dtk控件偶现不能清空hover状态问题，手动清空hover状态
     m_moveButton->setAttribute(Qt::WA_UnderMouse, false);
     m_saveTextButton->setAttribute(Qt::WA_UnderMouse, false);
     m_saveVoiceButton->setAttribute(Qt::WA_UnderMouse, false);

@@ -63,6 +63,7 @@ LeftView::LeftView(QWidget *parent)
     this->setDropIndicatorShown(true);
     this->setAcceptDrops(true);
     this->setContextMenuPolicy(Qt::NoContextMenu);
+    viewport()->installEventFilter(this);
 }
 
 /**
@@ -379,6 +380,25 @@ void LeftView::addFolder(VNoteFolder *folder)
         setCurrentIndex(index);
     }
     this->scrollToTop();
+}
+
+/**
+ * @brief LeftView::eventFilter
+ * @param o
+ * @param e
+ * @return false 不过滤，事件正常处理
+ */
+bool LeftView::eventFilter(QObject *o, QEvent *e)
+{
+    Q_UNUSED(o);
+    if (e->type() == QEvent::DragLeave) {
+        m_pItemDelegate->setDrawHover(false);
+        update();
+    }else if (e->type() == QEvent::DragEnter) {
+        m_pItemDelegate->setDrawHover(true);
+        update();
+    }
+    return false;
 }
 
 /**

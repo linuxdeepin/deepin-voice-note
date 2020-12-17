@@ -179,7 +179,7 @@ void MoveView::paintEvent(QPaintEvent *)
             painter.setPen(QPen(color3));
             painter.setBrush(color3);
             //绘制笔记数量
-            QRect numberRect(QPoint(240-((widths-7)/2),17),QSize(16+(widths-7),18));
+            QRect numberRect(QPoint(240-((widths-7)/2),19),QSize(16+(widths-7),19));
             painter.drawText(numberRect, Qt::AlignCenter, numString);
         }
         //单个笔记拖拽

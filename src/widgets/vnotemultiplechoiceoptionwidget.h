@@ -56,7 +56,9 @@ protected:
     void changeFromThemeType();
     //根据字体大小调整按钮UI
     void onFontChanged();
+    //窗口大小重设
     void resizeEvent(QResizeEvent *event)override;
+
 private:
     DLabel *m_tipsLabel  {nullptr};
     DToolButton *m_moveButton {nullptr};
