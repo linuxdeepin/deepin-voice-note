@@ -864,9 +864,11 @@ void LeftView::dropEvent(QDropEvent * event)
     // 判断拖拽放下事件触发类型（笔记：NOTES_DRAG_KEY；记事本：NOTEPAD_DRAG_KEY）
     if (event->mimeData()->hasFormat(NOTES_DRAG_KEY)) {
         //拖拽到当前记事本不取消选中
-        bool currentNotePad = currentIndex().row() == indexAt( event->pos()).row()? true:false;
+        QModelIndex index = indexAt( event->pos());
+        //如果释放位置为当前笔记或空白区域，取消拖拽
+        bool isDragCancelled = currentIndex().row() == index.row()|| !index.isValid()? true:false;
         //拖拽取消后选中
-        emit dropNotesEnd(currentNotePad);
+        emit dropNotesEnd(isDragCancelled);
     } else if (event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)) {
         doDragMove(currentIndex(), indexAt(mapFromGlobal(QCursor::pos())));
     }
