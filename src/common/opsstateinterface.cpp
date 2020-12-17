@@ -32,15 +32,15 @@ static OpsStateInterface *objectInstance = nullptr;
 OpsStateInterface::OpsStateInterface()
 {
     bool fAiServiceExist = false;
-    DSysInfo::DeepinType deepinType = DSysInfo::deepinType();
-    switch (deepinType) {
-    case DSysInfo::DeepinProfessional:
-    case DSysInfo::DeepinPersonal:
-        fAiServiceExist = true;
-        break;
-    default:
-        break;
-    }
+//    DSysInfo::DeepinType deepinType = DSysInfo::deepinType();
+//    switch (deepinType) {
+//    case DSysInfo::DeepinProfessional:
+//    case DSysInfo::DeepinPersonal:
+//        fAiServiceExist = true;
+//        break;
+//    default:
+//        break;
+//    }
     QString systemInfo = QString("[%1-%2]")
                              .arg(DSysInfo::operatingSystemName())
                              .arg(DSysInfo::deepinTypeDisplayName());
