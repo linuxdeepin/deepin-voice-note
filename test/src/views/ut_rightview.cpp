@@ -84,33 +84,33 @@ TEST_F(ut_rightview_test, initData)
 
 TEST_F(ut_rightview_test, onVoicePlay)
 {
-//    RightView rightview;
-//    VNOTE_DATAS datas;
-//    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
-//    vnvoiceblock->voicePath = "/usr/share/music/bensound-sunny.mp3";
-//    vnvoiceblock->voiceSize = 2650;
-//    vnvoiceblock->voiceTitle = "test";
-//    vnvoiceblock->state = true;
-//    VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
-//    block->ptrVoice = vnvoiceblock;
-//    VoiceNoteItem *item = new VoiceNoteItem(block);
+    RightView rightview;
+    VNOTE_DATAS datas;
+    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
+    vnvoiceblock->voicePath = "/usr/share/music/bensound-sunny.mp3";
+    vnvoiceblock->voiceSize = 2650;
+    vnvoiceblock->voiceTitle = "test";
+    vnvoiceblock->state = true;
+    VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
+    block->ptrVoice = vnvoiceblock;
+    VoiceNoteItem *item = new VoiceNoteItem(block);
 //    rightview.onVoicePlay(item);
 }
 
-//TEST_F(ut_rightview_test, onVoicePause)
-//{
-//    RightView rightview;
-//    VNOTE_DATAS datas;
-//    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
-//    vnvoiceblock->voicePath = "/usr/share/music/bensound-sunny.mp3";
-//    vnvoiceblock->voiceSize = 2650;
-//    vnvoiceblock->voiceTitle = "test";
-//    vnvoiceblock->state = true;
-//    VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
-//    block->ptrVoice = vnvoiceblock;
-//    VoiceNoteItem *item = new VoiceNoteItem(block);
+TEST_F(ut_rightview_test, onVoicePause)
+{
+    RightView rightview;
+    VNOTE_DATAS datas;
+    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
+    vnvoiceblock->voicePath = "/usr/share/music/bensound-sunny.mp3";
+    vnvoiceblock->voiceSize = 2650;
+    vnvoiceblock->voiceTitle = "test";
+    vnvoiceblock->state = true;
+    VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
+    block->ptrVoice = vnvoiceblock;
+    VoiceNoteItem *item = new VoiceNoteItem(block);
 //    rightview.onVoicePause(item);
-//}
+}
 
 TEST_F(ut_rightview_test, onPlayUpdate)
 {
@@ -118,45 +118,45 @@ TEST_F(ut_rightview_test, onPlayUpdate)
     rightview.onPlayUpdate();
 }
 
-//TEST_F(ut_rightview_test, leaveEvent)
-//{
-//    RightView rightview;
-//    QEvent *event = new QEvent(QEvent::MouseMove);
-//    rightview.leaveEvent(event);
-//}
+TEST_F(ut_rightview_test, leaveEvent)
+{
+    RightView rightview;
+    QEvent *event = new QEvent(QEvent::MouseMove);
+    rightview.leaveEvent(event);
+}
 
-//TEST_F(ut_rightview_test, mouseEvent)
-//{
-//    RightView rightview;
-//    VNoteItem *vnoteitem = new VNoteItem;
-//    vnoteitem->noteId = 2;
-//    vnoteitem->folderId = 2;
-//    vnoteitem->noteTitle = "test";
-//    rightview.m_noteItemData = vnoteitem;
-//    QPointF localPos;
-//    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+TEST_F(ut_rightview_test, mouseEvent)
+{
+    RightView rightview;
+    VNoteItem *vnoteitem = new VNoteItem;
+    vnoteitem->noteId = 2;
+    vnoteitem->folderId = 2;
+    vnoteitem->noteTitle = "test";
+    rightview.m_noteItemData = vnoteitem;
+    QPointF localPos;
+    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
 //    rightview.mousePressEvent(event);
-//    QMouseEvent *event1 = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-//    rightview.mouseReleaseEvent(event1);
-//    rightview.mouseMoveEvent(event);
-//}
+    QMouseEvent *event1 = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    rightview.mouseReleaseEvent(event1);
+    rightview.mouseMoveEvent(event);
+}
 
-//TEST_F(ut_rightview_test, keyPressEvent)
-//{
-//    RightView rightview;
-//    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, 0x43, Qt::ControlModifier, "test");
-//    rightview.keyPressEvent(event);
-//    QKeyEvent *event1 = new QKeyEvent(QEvent::KeyPress, 0x41, Qt::ControlModifier, "test");
-//    rightview.keyPressEvent(event1);
-//    QKeyEvent *event2 = new QKeyEvent(QEvent::KeyPress, 0x58, Qt::ControlModifier, "test");
-//    rightview.keyPressEvent(event2);
-//    QKeyEvent *event3 = new QKeyEvent(QEvent::KeyPress, 0x56, Qt::ControlModifier, "test");
-//    rightview.keyPressEvent(event3);
-//    QKeyEvent *event4 = new QKeyEvent(QEvent::KeyPress, 0x59, Qt::ControlModifier, "test");
-//    rightview.keyPressEvent(event4);
-//    QKeyEvent *event5 = new QKeyEvent(QEvent::KeyPress, 0x01000007, Qt::NoModifier, "test");
-//    rightview.keyPressEvent(event5);
-//}
+TEST_F(ut_rightview_test, keyPressEvent)
+{
+    RightView rightview;
+    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, 0x43, Qt::ControlModifier, "test");
+    rightview.keyPressEvent(event);
+    QKeyEvent *event1 = new QKeyEvent(QEvent::KeyPress, 0x41, Qt::ControlModifier, "test");
+    rightview.keyPressEvent(event1);
+    QKeyEvent *event2 = new QKeyEvent(QEvent::KeyPress, 0x58, Qt::ControlModifier, "test");
+    rightview.keyPressEvent(event2);
+    QKeyEvent *event3 = new QKeyEvent(QEvent::KeyPress, 0x56, Qt::ControlModifier, "test");
+    rightview.keyPressEvent(event3);
+    QKeyEvent *event4 = new QKeyEvent(QEvent::KeyPress, 0x59, Qt::ControlModifier, "test");
+    rightview.keyPressEvent(event4);
+    QKeyEvent *event5 = new QKeyEvent(QEvent::KeyPress, 0x01000007, Qt::NoModifier, "test");
+    rightview.keyPressEvent(event5);
+}
 
 TEST_F(ut_rightview_test, delSelectText)
 {
@@ -164,23 +164,23 @@ TEST_F(ut_rightview_test, delSelectText)
     rightview.delSelectText();
 }
 
-//TEST_F(ut_rightview_test, setCurVoicePlay)
-//{
-//    RightView rightview;
-//    VNOTE_DATAS datas;
-//    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
-//    vnvoiceblock->voicePath = "/usr/share/music/bensound-sunny.mp3";
-//    vnvoiceblock->voiceSize = 2650;
-//    vnvoiceblock->voiceTitle = "test";
-//    vnvoiceblock->state = true;
-//    VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
-//    block->ptrVoice = vnvoiceblock;
-//    VoiceNoteItem *item = new VoiceNoteItem(block);
-//    rightview.setCurVoicePlay(item);
-//    rightview.setCurVoiceAsr(item);
-//    rightview.getCurVoicePlay();
-//    rightview.getCurVoiceAsr();
-//}
+TEST_F(ut_rightview_test, setCurVoicePlay)
+{
+    RightView rightview;
+    VNOTE_DATAS datas;
+    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
+    vnvoiceblock->voicePath = "/usr/share/music/bensound-sunny.mp3";
+    vnvoiceblock->voiceSize = 2650;
+    vnvoiceblock->voiceTitle = "test";
+    vnvoiceblock->state = true;
+    VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
+    block->ptrVoice = vnvoiceblock;
+    VoiceNoteItem *item = new VoiceNoteItem(block);
+    rightview.setCurVoicePlay(item);
+    rightview.setCurVoiceAsr(item);
+    rightview.getCurVoicePlay();
+    rightview.getCurVoiceAsr();
+}
 
 TEST_F(ut_rightview_test, saveMp3)
 {

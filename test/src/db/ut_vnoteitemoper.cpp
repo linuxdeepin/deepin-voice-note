@@ -53,22 +53,22 @@ TEST_F(ut_vnoteitemoper_test, updateNote)
     m_vnoteitemoper->updateNote();
 }
 
-//TEST_F(ut_vnoteitemoper_test, addNote)
-//{
-//    VNoteDbManager vnotedbmanager;
-//    vnotedbmanager.initVNoteDb(false);
-//    VNoteFolder folder;
-//    folder.id = 2;
-//    folder.notesCount = 1;
-//    folder.name = "test";
-//    VNoteFolderOper vnotefolderoper(&folder);
+TEST_F(ut_vnoteitemoper_test, addNote)
+{
+    VNoteDbManager vnotedbmanager;
+    vnotedbmanager.initVNoteDb(false);
+    VNoteFolder folder;
+    folder.id = 2;
+    folder.notesCount = 1;
+    folder.name = "test";
+    VNoteFolderOper vnotefolderoper(&folder);
 //    vnotefolderoper.loadVNoteFolders();
 
-//    VNoteItem tmpNote;
-//    tmpNote.folderId = 2;addRowAtHead
-//    tmpNote.noteType = VNoteItem::VNT_Text;
-//    VNoteBlock *ptrBlock1 = tmpNote.newBlock(VNoteBlock::Text);
-//    tmpNote.addBlock(ptrBlock1);
+    VNoteItem tmpNote;
+    tmpNote.folderId = 2;
+    tmpNote.noteType = VNoteItem::VNT_Text;
+    VNoteBlock *ptrBlock1 = tmpNote.newBlock(VNoteBlock::Text);
+    tmpNote.addBlock(ptrBlock1);
 //    VNoteItemOper noteOper(&tmpNote);
 //    tmpNote.noteTitle = noteOper.getDefaultNoteName(tmpNote.folderId);
 
@@ -80,7 +80,7 @@ TEST_F(ut_vnoteitemoper_test, updateNote)
 //    noteOper.updateNote();
 //    noteOper.deleteNote();
 //    noteOper.modifyNoteTitle("test");
-//}
+}
 
 TEST_F(ut_vnoteitemoper_test, getDefaultVoiceName)
 {
