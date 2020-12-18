@@ -72,18 +72,18 @@ TEST_F(ut_rightview_test, onTextEditTextChange)
     rightview.onTextEditTextChange();
 }
 
-//TEST_F(ut_rightview_test, initData)
-//{
-//    RightView rightview;
-//    VNoteItem *vnoteitem = new VNoteItem;
-//    vnoteitem->noteId = 2;
-//    vnoteitem->folderId = 2;
-//    vnoteitem->noteTitle = "test";
-//    rightview.initData(vnoteitem, "test", true);
-//}
+TEST_F(ut_rightview_test, initData)
+{
+    RightView rightview;
+    VNoteItem *vnoteitem = new VNoteItem;
+    vnoteitem->noteId = 2;
+    vnoteitem->folderId = 2;
+    vnoteitem->noteTitle = "test";
+    rightview.initData(vnoteitem, "test", true);
+}
 
-//TEST_F(ut_rightview_test, onVoicePlay)
-//{
+TEST_F(ut_rightview_test, onVoicePlay)
+{
 //    RightView rightview;
 //    VNOTE_DATAS datas;
 //    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
@@ -95,7 +95,7 @@ TEST_F(ut_rightview_test, onTextEditTextChange)
 //    block->ptrVoice = vnvoiceblock;
 //    VoiceNoteItem *item = new VoiceNoteItem(block);
 //    rightview.onVoicePlay(item);
-//}
+}
 
 //TEST_F(ut_rightview_test, onVoicePause)
 //{

@@ -19,14 +19,20 @@
 #define UT_GSTREAMRECORDER_TEST_H
 
 #include "gtest/gtest.h"
-#include <QTest>
-#include <QObject>
 
-class ut_gstreamrecorder_test : public QObject, public::testing::Test
+class GstreamRecorder;
+class ut_gstreamrecorder_test : public::testing::Test
 {
-    Q_OBJECT
 public:
     ut_gstreamrecorder_test();
+
+    // Test interface
+protected:
+    virtual void SetUp() override;
+    virtual void TearDown() override;
+
+private:
+    GstreamRecorder* m_GstreamRecorder;
 };
 
 #endif // UT_GSTREAMRECORDER_TEST_H

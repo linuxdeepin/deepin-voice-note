@@ -19,14 +19,20 @@
 #define UT_AUDIOWATCHER_H
 
 #include "gtest/gtest.h"
-#include <QTest>
-#include <QObject>
+class AudioWatcher;
 
-class ut_audiowatcher_test : public QObject, public::testing::Test
+class ut_audiowatcher_test : public::testing::Test
 {
-    Q_OBJECT
 public:
     ut_audiowatcher_test();
+
+    // Test interface
+protected:
+    virtual void SetUp() override;
+    virtual void TearDown() override;
+
+private:
+    AudioWatcher* m_AudioWatcher;
 };
 
 #endif // UT_AUDIOWATCHER_H

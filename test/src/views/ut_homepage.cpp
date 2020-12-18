@@ -24,8 +24,17 @@ ut_homepage_test::ut_homepage_test()
 
 }
 
+void ut_homepage_test::SetUp()
+{
+    m_homepage = new HomePage;
+}
+
+void ut_homepage_test::TearDown()
+{
+    delete m_homepage;
+}
+
 TEST_F(ut_homepage_test, initUi)
 {
-    HomePage homepage;
-//    homepage.initUi();
+    m_homepage->initUi();
 }

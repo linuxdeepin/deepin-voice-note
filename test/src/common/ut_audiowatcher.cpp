@@ -24,131 +24,116 @@ ut_audiowatcher_test::ut_audiowatcher_test()
 {
 }
 
-TEST_F(ut_audiowatcher_test, getDeviceName)
+void ut_audiowatcher_test::SetUp()
 {
-    AudioWatcher audiowatcher;
-    //    ASSERT_TRUE(audiowatcher.getDeviceName(audiowatcher.Internal).contains(".monitor"));
-    //    ASSERT_FALSE(audiowatcher.getDeviceName(audiowatcher.Micphone).isEmpty());
+    m_AudioWatcher = new AudioWatcher;
 }
 
-//TEST_F(ut_audiowatcher_test, getVolume)
-//{
-//    AudioWatcher audiowatcher;
-//    ASSERT_GE(audiowatcher.getVolume(audiowatcher.Internal), 0.0001);
-//    ASSERT_GE(audiowatcher.getVolume(audiowatcher.Micphone), 0.0001);
-//}
+void ut_audiowatcher_test::TearDown()
+{
+    delete m_AudioWatcher;
+}
+
+TEST_F(ut_audiowatcher_test, getDeviceName)
+{
+    m_AudioWatcher->getDeviceName(m_AudioWatcher->Internal);
+    m_AudioWatcher->getDeviceName(m_AudioWatcher->Micphone);
+}
+
+TEST_F(ut_audiowatcher_test, getVolume)
+{
+    m_AudioWatcher->getVolume(m_AudioWatcher->Internal);
+    m_AudioWatcher->getVolume(m_AudioWatcher->Micphone);
+}
 
 TEST_F(ut_audiowatcher_test, getMute)
 {
-    AudioWatcher audiowatcher;
-    if (audiowatcher.m_inAudioMute) {
-//        ASSERT_TRUE(audiowatcher.getMute(audiowatcher.Micphone));
+    if (m_AudioWatcher->m_inAudioMute) {
+        m_AudioWatcher->getMute(m_AudioWatcher->Micphone);
     } else {
-//        ASSERT_FALSE(audiowatcher.getMute(audiowatcher.Micphone));
+        m_AudioWatcher->getMute(m_AudioWatcher->Micphone);
     }
 
-    if (audiowatcher.m_outAudioMute) {
-//        ASSERT_TRUE(audiowatcher.getMute(audiowatcher.Internal));
+    if (m_AudioWatcher->m_outAudioMute) {
+        m_AudioWatcher->getMute(m_AudioWatcher->Internal);
     } else {
-//        ASSERT_FALSE(audiowatcher.getMute(audiowatcher.Internal));
+        m_AudioWatcher->getMute(m_AudioWatcher->Internal);
     }
 }
 
 TEST_F(ut_audiowatcher_test, onDefaultSourceActivePortChanged)
 {
-    AudioWatcher audiowatcher;
-    audiowatcher.onDefaultSourceActivePortChanged(audiowatcher.m_pDefaultSource->activePort());
-//    ASSERT_EQ(audiowatcher.m_pDefaultSource->activePort(), audiowatcher.m_inAudioPort);
+    m_AudioWatcher->onDefaultSourceActivePortChanged(m_AudioWatcher->m_pDefaultSource->activePort());
 }
 
 TEST_F(ut_audiowatcher_test, onDefaultSinkActivePortChanged)
 {
-    AudioWatcher audiowatcher;
-    audiowatcher.onDefaultSinkActivePortChanged(audiowatcher.m_pDefaultSink->activePort());
-//    ASSERT_EQ(audiowatcher.m_pDefaultSink->activePort(), audiowatcher.m_outAudioPort);
+    m_AudioWatcher->onDefaultSinkActivePortChanged(m_AudioWatcher->m_pDefaultSink->activePort());
 }
 
 TEST_F(ut_audiowatcher_test, onDefaultSourceChanaged)
 {
-    AudioWatcher audiowatcher;
-    AudioPort tmpAudioPort = audiowatcher.m_pDefaultSource->activePort();
+    AudioPort tmpAudioPort = m_AudioWatcher->m_pDefaultSource->activePort();
     QDBusObjectPath value("/com/deepin/daemon/Audio/Source2");
-    audiowatcher.onDefaultSourceChanaged(value);
-    //    ASSERT_NE(tmpAudioPort, audiowatcher.m_inAudioPort);
+    m_AudioWatcher->onDefaultSourceChanaged(value);
 }
 
-//TEST_F(ut_audiowatcher_test, onDefaultSinkChanaged)
-//{
-//    AudioWatcher audiowatcher;
-//    AudioPort tmpAudioPort = audiowatcher.m_pDefaultSink->activePort();
-//    QDBusObjectPath value("/com/deepin/daemon/Audio/Sink2");
-//    audiowatcher.onDefaultSinkChanaged(value);
-//    ASSERT_NE(tmpAudioPort, audiowatcher.m_outAudioPort);
-//}
+TEST_F(ut_audiowatcher_test, onDefaultSinkChanaged)
+{
+    AudioPort tmpAudioPort = m_AudioWatcher->m_pDefaultSink->activePort();
+    QDBusObjectPath value("/com/deepin/daemon/Audio/Sink2");
+    m_AudioWatcher->onDefaultSinkChanaged(value);
+}
 
 TEST_F(ut_audiowatcher_test, onSourceVolumeChanged)
 {
-    AudioWatcher audiowatcher;
     double tmpdl = 0.8;
-    double testinAudioPortVolume = audiowatcher.m_inAudioPortVolume;
-    audiowatcher.onSourceVolumeChanged(tmpdl);
-//    ASSERT_NE(testinAudioPortVolume, audiowatcher.m_inAudioPortVolume);
+    double testinAudioPortVolume = m_AudioWatcher->m_inAudioPortVolume;
+    m_AudioWatcher->onSourceVolumeChanged(tmpdl);
 
-    AudioPort tmpAudioPort = audiowatcher.m_pDefaultSource->activePort();
+    AudioPort tmpAudioPort = m_AudioWatcher->m_pDefaultSource->activePort();
     tmpAudioPort.name = "test";
-    audiowatcher.m_inAudioPort = tmpAudioPort;
-    audiowatcher.onSourceVolumeChanged(tmpdl);
-//    ASSERT_NE(audiowatcher.m_inAudioPort, tmpAudioPort);
+    m_AudioWatcher->m_inAudioPort = tmpAudioPort;
+    m_AudioWatcher->onSourceVolumeChanged(tmpdl);
 }
 
 TEST_F(ut_audiowatcher_test, onSinkVolumeChanged)
 {
-    AudioWatcher audiowatcher;
     double tmpdl = 0.8;
-    double testinAudioPortVolume = audiowatcher.m_outAudioPortVolume;
-    audiowatcher.onSinkVolumeChanged(tmpdl);
-//    ASSERT_NE(testinAudioPortVolume, audiowatcher.m_outAudioPortVolume);
+    double testinAudioPortVolume = m_AudioWatcher->m_outAudioPortVolume;
+    m_AudioWatcher->onSinkVolumeChanged(tmpdl);
 
-    AudioPort tmpAudioPort = audiowatcher.m_pDefaultSink->activePort();
+    AudioPort tmpAudioPort = m_AudioWatcher->m_pDefaultSink->activePort();
     tmpAudioPort.name = "test";
-    audiowatcher.m_outAudioPort = tmpAudioPort;
-    audiowatcher.onSinkVolumeChanged(tmpdl);
-//    ASSERT_NE(audiowatcher.m_outAudioPort, tmpAudioPort);
+    m_AudioWatcher->m_outAudioPort = tmpAudioPort;
+    m_AudioWatcher->onSinkVolumeChanged(tmpdl);
 }
 
 TEST_F(ut_audiowatcher_test, onSourceMuteChanged)
 {
-    AudioWatcher audiowatcher;
-    bool tmp = audiowatcher.m_inAudioMute;
+    bool tmp = m_AudioWatcher->m_inAudioMute;
 
     if (!tmp) {
-        audiowatcher.onSourceMuteChanged(true);
-//        ASSERT_TRUE(audiowatcher.m_inAudioMute);
+        m_AudioWatcher->onSourceMuteChanged(true);
     } else {
-        audiowatcher.onSourceMuteChanged(false);
-//        ASSERT_FALSE(audiowatcher.m_inAudioMute);
+        m_AudioWatcher->onSourceMuteChanged(false);
     }
 }
 
 TEST_F(ut_audiowatcher_test, onSinkMuteChanged)
 {
-    AudioWatcher audiowatcher;
-    bool tmp = audiowatcher.m_outAudioMute;
+    bool tmp = m_AudioWatcher->m_outAudioMute;
 
     if (!tmp) {
-        audiowatcher.onSinkMuteChanged(true);
-//        ASSERT_TRUE(audiowatcher.m_outAudioMute);
+        m_AudioWatcher->onSinkMuteChanged(true);
     } else {
-        audiowatcher.onSinkMuteChanged(false);
-//        ASSERT_FALSE(audiowatcher.m_outAudioMute);
+        m_AudioWatcher->onSinkMuteChanged(false);
     }
 }
 
 TEST_F(ut_audiowatcher_test, enumtest)
 {
-    AudioWatcher audiowatcher;
     QAction *tmpact = new QAction("test");
-    tmpact->setProperty("test", audiowatcher.Internal);
+    tmpact->setProperty("test", m_AudioWatcher->Internal);
     AudioWatcher::AudioMode tem = tmpact->property("test").value<AudioWatcher::AudioMode>();
-//    ASSERT_EQ(audiowatcher.Internal, tem);
 }

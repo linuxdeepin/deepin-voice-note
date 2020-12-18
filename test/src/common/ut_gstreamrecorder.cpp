@@ -24,39 +24,44 @@ ut_gstreamrecorder_test::ut_gstreamrecorder_test()
 {
 }
 
-//TEST_F(ut_gstreamrecorder_test, createPipe)
-//{
-//    GstreamRecorder gstreamrecorder;
-//    ASSERT_TRUE(gstreamrecorder.createPipe());
-//}
+void ut_gstreamrecorder_test::SetUp()
+{
+    m_GstreamRecorder = new GstreamRecorder;
+}
+
+void ut_gstreamrecorder_test::TearDown()
+{
+    delete m_GstreamRecorder;
+}
+
+TEST_F(ut_gstreamrecorder_test, createPipe)
+{
+    m_GstreamRecorder->createPipe();
+}
 
 TEST_F(ut_gstreamrecorder_test, deinit)
 {
-    GstreamRecorder gstreamrecorder;
-    gstreamrecorder.deinit();
+    m_GstreamRecorder->deinit();
 }
 
 TEST_F(ut_gstreamrecorder_test, GetGstState)
 {
-    GstreamRecorder gstreamrecorder;
     int state = -1;
     int pending = -1;
-    gstreamrecorder.GetGstState(&state, &pending);
+    m_GstreamRecorder->GetGstState(&state, &pending);
 }
 
 TEST_F(ut_gstreamrecorder_test, startRecord)
 {
-    GstreamRecorder gstreamrecorder;
     QString tmpstr = "alsa_output.pci-0000_00_1f.3.analog-stereo.monitor";
     QString outpath = "/home/zhangteng";
-    ASSERT_FALSE(gstreamrecorder.startRecord());
+    m_GstreamRecorder->startRecord();
 }
 
 TEST_F(ut_gstreamrecorder_test, pauseRecord)
 {
-    GstreamRecorder gstreamrecorder;
-    gstreamrecorder.createPipe();
-    gstreamrecorder.pauseRecord();
+    m_GstreamRecorder->createPipe();
+    m_GstreamRecorder->pauseRecord();
 }
 
 TEST_F(ut_gstreamrecorder_test, stopRecord)
@@ -67,35 +72,31 @@ TEST_F(ut_gstreamrecorder_test, stopRecord)
 
 TEST_F(ut_gstreamrecorder_test, setDevice)
 {
-    GstreamRecorder gstreamrecorder;
     QString tmpstr = "alsa_output.pci-0000_00_1f.3.analog-stereo.monitortest";
-    gstreamrecorder.setDevice(tmpstr);
-    ASSERT_TRUE(tmpstr == gstreamrecorder.m_currentDevice);
+    m_GstreamRecorder->setDevice(tmpstr);
 }
 
 TEST_F(ut_gstreamrecorder_test, objectUnref)
 {
-    GstreamRecorder gstreamrecorder;
+//    GstreamRecorder gstreamrecorder;
 }
 
 TEST_F(ut_gstreamrecorder_test, setStateToNull)
 {
-    GstreamRecorder gstreamrecorder;
-    gstreamrecorder.setStateToNull();
+    m_GstreamRecorder->setStateToNull();
 }
 
 TEST_F(ut_gstreamrecorder_test, initFormat)
 {
-    GstreamRecorder gstreamrecorder;
-    gstreamrecorder.initFormat();
+    m_GstreamRecorder->initFormat();
 }
 
 TEST_F(ut_gstreamrecorder_test, doBusMessage)
 {
-    GstreamRecorder gstreamrecorder;
+//    GstreamRecorder gstreamrecorder;
 }
 
 TEST_F(ut_gstreamrecorder_test, doBufferProbe)
 {
-    GstreamRecorder gstreamrecorder;
+//    GstreamRecorder gstreamrecorder;
 }

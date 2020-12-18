@@ -19,14 +19,18 @@
 #define UT_HOMEPAGE_H
 
 #include "gtest/gtest.h"
-#include <QTest>
-#include <QObject>
+class HomePage;
 
-class ut_homepage_test : public QObject, public::testing::Test
+class ut_homepage_test : public::testing::Test
 {
-    Q_OBJECT
 public:
     ut_homepage_test();
+
+    virtual void SetUp() override;
+    virtual void TearDown() override;
+
+protected:
+    HomePage *m_homepage;
 };
 
 #endif // UT_HOMEPAGE_H
