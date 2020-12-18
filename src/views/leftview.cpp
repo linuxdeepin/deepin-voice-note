@@ -124,7 +124,6 @@ QModelIndex LeftView::getNotepadRootIndex()
 void LeftView::mousePressEvent(QMouseEvent *event)
 {
     this->setFocus();
-
     if (!m_onlyCurItemMenuEnable) {
         //触控屏手势
         if (event->source() == Qt::MouseEventSynthesizedByQt) {
@@ -327,6 +326,9 @@ void LeftView::keyPressEvent(QKeyEvent *e)
     } else {
         if (0 == this->currentIndex().row() && e->key() == Qt::Key_Up) {
             e->ignore();
+        } else if (e->key() == Qt::Key_Home) {
+            //如果自动处理键盘home事件，会导致首个index与根节点重合，导致实际选项为空，此处手动设置选中
+            this->setCurrentIndex(m_pSortViewFilter->index(0,0,getNotepadRootIndex()));
         } else {
             DTreeView::keyPressEvent(e);
         }
