@@ -23,6 +23,9 @@
 #include <vlc/vlc.h>
 #include <vlc/libvlc_media.h>
 
+#include <DApplication>
+
+DWIDGET_USE_NAMESPACE
 /**
  * @brief VlcPalyer::VlcPalyer
  * @param parent
@@ -47,6 +50,8 @@ void VlcPalyer::init()
 {
     if(m_vlcInst == nullptr){
         m_vlcInst = libvlc_new(0,nullptr);
+        libvlc_set_user_agent(m_vlcInst,DApplication::translate("AppMain", "Voice Notes").toUtf8().constData(),"");
+        libvlc_set_app_id(m_vlcInst, "", "", "deepin-voice-note");
     }
     if(m_vlcPlayer == nullptr){
        m_vlcPlayer = libvlc_media_player_new(m_vlcInst);
