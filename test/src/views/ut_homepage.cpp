@@ -21,7 +21,6 @@
 
 ut_homepage_test::ut_homepage_test()
 {
-
 }
 
 void ut_homepage_test::SetUp()

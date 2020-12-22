@@ -21,7 +21,6 @@
 
 ut_vtextspeechandtrmanager_test::ut_vtextspeechandtrmanager_test()
 {
-
 }
 
 void ut_vtextspeechandtrmanager_test::SetUp()

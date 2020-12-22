@@ -21,7 +21,6 @@
 
 ut_dbusvariant_test::ut_dbusvariant_test()
 {
-
 }
 
 TEST_F(ut_dbusvariant_test, testout)
@@ -71,4 +70,3 @@ TEST_F(ut_dbusvariant_test, SessionInfo)
     argument << sessioninfo;
     argument >> sessioninfo;
 }
-

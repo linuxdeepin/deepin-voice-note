@@ -78,7 +78,7 @@ TEST_F(ut_gstreamrecorder_test, setDevice)
 
 TEST_F(ut_gstreamrecorder_test, objectUnref)
 {
-//    GstreamRecorder gstreamrecorder;
+    //    GstreamRecorder gstreamrecorder;
 }
 
 TEST_F(ut_gstreamrecorder_test, setStateToNull)
@@ -93,10 +93,10 @@ TEST_F(ut_gstreamrecorder_test, initFormat)
 
 TEST_F(ut_gstreamrecorder_test, doBusMessage)
 {
-//    GstreamRecorder gstreamrecorder;
+    //    GstreamRecorder gstreamrecorder;
 }
 
 TEST_F(ut_gstreamrecorder_test, doBufferProbe)
 {
-//    GstreamRecorder gstreamrecorder;
+    //    GstreamRecorder gstreamrecorder;
 }

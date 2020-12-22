@@ -22,7 +22,8 @@
 #include <QTest>
 #include <QObject>
 
-class ut_voicenoteitem_test : public QObject, public::testing::Test
+class ut_voicenoteitem_test : public QObject
+    , public ::testing::Test
 {
     Q_OBJECT
 public:

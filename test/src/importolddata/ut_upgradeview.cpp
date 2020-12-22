@@ -21,7 +21,6 @@
 
 ut_upgradeview_test::ut_upgradeview_test()
 {
-
 }
 
 TEST_F(ut_upgradeview_test, onUpgradeFinish)
@@ -29,7 +28,6 @@ TEST_F(ut_upgradeview_test, onUpgradeFinish)
     UpgradeView upgradeview;
     upgradeview.onUpgradeFinish();
 }
-
 
 TEST_F(ut_upgradeview_test, setProgress)
 {

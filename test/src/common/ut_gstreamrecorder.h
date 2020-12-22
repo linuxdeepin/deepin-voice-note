@@ -21,7 +21,7 @@
 #include "gtest/gtest.h"
 
 class GstreamRecorder;
-class ut_gstreamrecorder_test : public::testing::Test
+class ut_gstreamrecorder_test : public ::testing::Test
 {
 public:
     ut_gstreamrecorder_test();
@@ -32,7 +32,7 @@ protected:
     virtual void TearDown() override;
 
 private:
-    GstreamRecorder* m_GstreamRecorder;
+    GstreamRecorder *m_GstreamRecorder;
 };
 
 #endif // UT_GSTREAMRECORDER_TEST_H

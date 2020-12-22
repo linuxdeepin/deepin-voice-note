@@ -22,13 +22,12 @@
 
 ut_vnoteiconbutton_test::ut_vnoteiconbutton_test()
 {
-
 }
 
 TEST_F(ut_vnoteiconbutton_test, mousePressEvent)
 {
     VNoteIconButton vnoteiconbutton;
     QPointF localPos;
-    QMouseEvent* event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
     vnoteiconbutton.mousePressEvent(event);
 }

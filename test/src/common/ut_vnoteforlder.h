@@ -24,7 +24,8 @@
 
 struct VNoteFolder;
 
-class ut_vnoteforlder_test : public QObject, public::testing::Test
+class ut_vnoteforlder_test : public QObject
+    , public ::testing::Test
 {
     Q_OBJECT
 public:

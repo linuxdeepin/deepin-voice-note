@@ -21,7 +21,6 @@
 
 ut_vnoteforlder_test::ut_vnoteforlder_test()
 {
-
 }
 
 void ut_vnoteforlder_test::SetUp()
@@ -46,7 +45,7 @@ TEST_F(ut_vnoteforlder_test, maxNoteIdRef)
 
 TEST_F(ut_vnoteforlder_test, getNotesCount)
 {
-//    m_vnoteforlder->getNotesCount();
+    //    m_vnoteforlder->getNotesCount();
 }
 
 TEST_F(ut_vnoteforlder_test, qdebugtest)

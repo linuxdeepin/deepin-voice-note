@@ -22,7 +22,6 @@
 
 ut_metadataparser_test::ut_metadataparser_test()
 {
-
 }
 
 TEST_F(ut_metadataparser_test, parse)

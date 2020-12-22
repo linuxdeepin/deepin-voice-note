@@ -25,7 +25,6 @@
 
 ut_vnotedbmanager_test::ut_vnotedbmanager_test()
 {
-
 }
 
 TEST_F(ut_vnotedbmanager_test, initVNoteDb)

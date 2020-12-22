@@ -21,7 +21,7 @@
 #include "gtest/gtest.h"
 class AudioWatcher;
 
-class ut_audiowatcher_test : public::testing::Test
+class ut_audiowatcher_test : public ::testing::Test
 {
 public:
     ut_audiowatcher_test();
@@ -32,7 +32,7 @@ protected:
     virtual void TearDown() override;
 
 private:
-    AudioWatcher* m_AudioWatcher;
+    AudioWatcher *m_AudioWatcher;
 };
 
 #endif // UT_AUDIOWATCHER_H

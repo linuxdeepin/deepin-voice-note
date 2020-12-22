@@ -21,7 +21,6 @@
 
 ut_olddbvisistors_test::ut_olddbvisistors_test()
 {
-
 }
 
 TEST_F(ut_olddbvisistors_test, visitorData)

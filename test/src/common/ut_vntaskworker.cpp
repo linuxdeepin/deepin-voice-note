@@ -20,10 +20,8 @@
 #include "vntaskworker.h"
 #include "vndatasafertask.h"
 
-
 ut_vntaskworker_test::ut_vntaskworker_test()
 {
-
 }
 
 void ut_vntaskworker_test::SetUp()

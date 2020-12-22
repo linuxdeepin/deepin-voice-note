@@ -23,7 +23,8 @@
 #include <QObject>
 
 class VNoteFolderOper;
-class ut_vnotefolderoper_test : public QObject, public::testing::Test
+class ut_vnotefolderoper_test : public QObject
+    , public ::testing::Test
 {
     Q_OBJECT
 public:

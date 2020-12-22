@@ -28,13 +28,12 @@
 
 ut_voicenoteitem_test::ut_voicenoteitem_test()
 {
-
 }
 
 TEST_F(ut_voicenoteitem_test, onPlayBtnClicked)
 {
     QPoint pos;
-    QTimer* timer = new QTimer();
+    QTimer *timer = new QTimer();
     timer->setInterval(300);
     VNOTE_DATAS datas;
     VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
@@ -59,7 +58,7 @@ TEST_F(ut_voicenoteitem_test, onPlayBtnClicked)
     voicenoteitem.hasFocus();
     voicenoteitem.isTextContainsPos(pos);
 
-    PlayAnimInferface* playaniminferface = new VoiceNoteItem(block);
+    PlayAnimInferface *playaniminferface = new VoiceNoteItem(block);
     playaniminferface->setAnimTimer(timer);
     playaniminferface->startAnim();
     playaniminferface->stopAnim();

@@ -27,7 +27,6 @@
 
 ut_utils_test::ut_utils_test()
 {
-
 }
 
 void ut_utils_test::SetUp()
@@ -63,13 +62,13 @@ TEST_F(ut_utils_test, loadSVG)
 
 TEST_F(ut_utils_test, highTextEdit)
 {
-//    TextNoteEdit *m_textEdit = new TextNoteEdit();
-//    m_textEdit->setContextMenuPolicy(Qt::NoContextMenu);
-//    m_textEdit->document()->setDocumentMargin(0);
-//    DStyle::setFocusRectVisible(m_textEdit, false);
-//    DPalette pb = DApplicationHelper::instance()->palette(m_textEdit);
-//    pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));
-//    m_textEdit->setPalette(pb);
+    //    TextNoteEdit *m_textEdit = new TextNoteEdit();
+    //    m_textEdit->setContextMenuPolicy(Qt::NoContextMenu);
+    //    m_textEdit->document()->setDocumentMargin(0);
+    //    DStyle::setFocusRectVisible(m_textEdit, false);
+    //    DPalette pb = DApplicationHelper::instance()->palette(m_textEdit);
+    //    pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));
+    //    m_textEdit->setPalette(pb);
     QTextDocument *document = new QTextDocument("test");
     QString searchKey = "test";
     DPalette pb;
@@ -110,29 +109,3 @@ TEST_F(ut_utils_test, formatMillisecond)
     tmpvoicesize = 18901111;
     m_utils->formatMillisecond(tmpvoicesize);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

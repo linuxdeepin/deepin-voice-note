@@ -21,7 +21,7 @@
 #include "gtest/gtest.h"
 class HomePage;
 
-class ut_homepage_test : public::testing::Test
+class ut_homepage_test : public ::testing::Test
 {
 public:
     ut_homepage_test();

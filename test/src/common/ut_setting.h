@@ -22,7 +22,8 @@
 #include <QTest>
 #include <QObject>
 
-class ut_setting_test : public QObject, public::testing::Test
+class ut_setting_test : public QObject
+    , public ::testing::Test
 {
     Q_OBJECT
 public:

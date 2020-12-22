@@ -23,7 +23,8 @@
 #include <QObject>
 
 class OpsStateInterface;
-class ut_opsstateinterface_test : public QObject, public::testing::Test
+class ut_opsstateinterface_test : public QObject
+    , public ::testing::Test
 {
     Q_OBJECT
 public:

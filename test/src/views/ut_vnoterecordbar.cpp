@@ -67,7 +67,7 @@ TEST_F(ut_vnoterecordbar_test, onClosePlayWidget)
     vnvoiceblock->state = true;
     vnoterecordbar.onClosePlayWidget(vnvoiceblock);
     vnoterecordbar.pauseVoice(vnvoiceblock);
-//    vnoterecordbar.playVoice(vnvoiceblock);
+    //    vnoterecordbar.playVoice(vnvoiceblock);
     vnoterecordbar.stopVoice(vnvoiceblock);
 }
 

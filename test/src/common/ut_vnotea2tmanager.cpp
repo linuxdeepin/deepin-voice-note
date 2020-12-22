@@ -21,7 +21,6 @@
 
 ut_vnotea2tmanager_test::ut_vnotea2tmanager_test()
 {
-
 }
 
 TEST_F(ut_vnotea2tmanager_test, startAsr)
@@ -82,22 +81,3 @@ TEST_F(ut_vnotea2tmanager_test, getErrorCode)
     tmpstruct.status = vnotea2tmanager.XF_finish;
     vnotea2tmanager.getErrorCode(tmpstruct);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

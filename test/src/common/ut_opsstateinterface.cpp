@@ -19,10 +19,8 @@
 #include "ut_opsstateinterface.h"
 #include "opsstateinterface.h"
 
-
 ut_opsstateinterface_test::ut_opsstateinterface_test()
 {
-
 }
 
 void ut_opsstateinterface_test::SetUp()
@@ -70,12 +68,3 @@ TEST_F(ut_opsstateinterface_test, isAiSrvExist)
     m_opsstateinterface->operState(m_opsstateinterface->StateAISrvAvailable, true);
     ASSERT_TRUE(m_opsstateinterface->isAiSrvExist());
 }
-
-
-
-
-
-
-
-
-

@@ -21,7 +21,6 @@
 
 ut_standarditemcommon_test::ut_standarditemcommon_test()
 {
-
 }
 
 void ut_standarditemcommon_test::SetUp()
@@ -43,11 +42,11 @@ TEST_F(ut_standarditemcommon_test, getStandardItemType)
         pDataModel->insertRow(0, pItem);
     }
 
-    QModelIndex index = pDataModel->index(0,0);
+    QModelIndex index = pDataModel->index(0, 0);
     m_standarditemcommon->getStandardItemType(index);
     m_standarditemcommon->getStandardItemData(index);
 
-    index = pDataModel->index(0,1);
+    index = pDataModel->index(0, 1);
     m_standarditemcommon->getStandardItemType(index);
     m_standarditemcommon->getStandardItemData(index);
 }

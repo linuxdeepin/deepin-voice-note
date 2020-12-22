@@ -22,7 +22,6 @@
 
 ut_upgradedbutil_test::ut_upgradedbutil_test()
 {
-
 }
 
 void ut_upgradedbutil_test::SetUp()

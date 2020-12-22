@@ -21,7 +21,6 @@
 
 ut_leftviewdelegate_test::ut_leftviewdelegate_test()
 {
-
 }
 
 TEST_F(ut_leftviewdelegate_test, setModelData)

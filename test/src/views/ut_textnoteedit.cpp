@@ -21,20 +21,19 @@
 
 ut_textnoteedit_test::ut_textnoteedit_test()
 {
-
 }
 
 TEST_F(ut_textnoteedit_test, focusInEvent)
 {
     TextNoteEdit textnoteedit;
-    QFocusEvent* event = new QFocusEvent(QEvent::FocusIn);
+    QFocusEvent *event = new QFocusEvent(QEvent::FocusIn);
     textnoteedit.focusInEvent(event);
 }
 
 TEST_F(ut_textnoteedit_test, focusOutEvent)
 {
     TextNoteEdit textnoteedit;
-    QFocusEvent* event = new QFocusEvent(QEvent::FocusOut);
+    QFocusEvent *event = new QFocusEvent(QEvent::FocusOut);
     textnoteedit.focusOutEvent(event);
 }
 
@@ -42,7 +41,7 @@ TEST_F(ut_textnoteedit_test, wheelEvent)
 {
     TextNoteEdit textnoteedit;
     QPointF pos;
-    QWheelEvent* event = new QWheelEvent(pos, 1, Qt::NoButton, Qt::NoModifier);
+    QWheelEvent *event = new QWheelEvent(pos, 1, Qt::NoButton, Qt::NoModifier);
     textnoteedit.wheelEvent(event);
 }
 
@@ -50,18 +49,18 @@ TEST_F(ut_textnoteedit_test, contextMenuEvent)
 {
     TextNoteEdit textnoteedit;
     QPoint pos;
-    QContextMenuEvent* event = new QContextMenuEvent(QContextMenuEvent::Mouse, pos, pos, Qt::NoModifier);
+    QContextMenuEvent *event = new QContextMenuEvent(QContextMenuEvent::Mouse, pos, pos, Qt::NoModifier);
     textnoteedit.contextMenuEvent(event);
 }
 
 TEST_F(ut_textnoteedit_test, keyPressEvent)
 {
     TextNoteEdit textnoteedit;
-    QKeyEvent* event = new QKeyEvent(QEvent::KeyPress, 0x43, Qt::AltModifier, "test");
+    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, 0x43, Qt::AltModifier, "test");
     textnoteedit.keyPressEvent(event);
-    QKeyEvent* event1 = new QKeyEvent(QEvent::KeyPress, 0x43, Qt::ControlModifier, "test");
+    QKeyEvent *event1 = new QKeyEvent(QEvent::KeyPress, 0x43, Qt::ControlModifier, "test");
     textnoteedit.keyPressEvent(event1);
-    QKeyEvent* event2 = new QKeyEvent(QEvent::KeyPress, 0x01000001, Qt::NoModifier, "test");
+    QKeyEvent *event2 = new QKeyEvent(QEvent::KeyPress, 0x01000001, Qt::NoModifier, "test");
     textnoteedit.keyPressEvent(event2);
 }
 
@@ -69,7 +68,7 @@ TEST_F(ut_textnoteedit_test, mouseEvent)
 {
     TextNoteEdit textnoteedit;
     QPointF localPos;
-    QMouseEvent* event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
     textnoteedit.mousePressEvent(event);
     textnoteedit.mouseReleaseEvent(event);
     textnoteedit.mouseMoveEvent(event);

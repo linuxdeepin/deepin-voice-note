@@ -24,7 +24,6 @@
 
 ut_textnoteitem_test::ut_textnoteitem_test()
 {
-
 }
 
 TEST_F(ut_textnoteitem_test, getNoteBlock)

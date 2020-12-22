@@ -24,13 +24,12 @@
 
 ut_folderselectdialog_test::ut_folderselectdialog_test()
 {
-
 }
 
 TEST_F(ut_folderselectdialog_test, setNoteContext)
 {
     LeftView leftview;
     FolderSelectDialog folderselectdialog(leftview.m_pDataModel);
-    folderselectdialog.setNoteContextInfo("test",1);
+    folderselectdialog.setNoteContextInfo("test", 1);
     folderselectdialog.getSelectIndex();
 }

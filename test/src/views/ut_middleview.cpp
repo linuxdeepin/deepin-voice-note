@@ -102,7 +102,7 @@ TEST_F(ut_middleview_test, setVisibleEmptySearch)
 TEST_F(ut_middleview_test, selectAfterRemoved)
 {
     MiddleView middleview;
-    if(middleview.count()){
+    if (middleview.count()) {
         middleview.m_nextSelection = 0;
     }
     middleview.selectAfterRemoved();
@@ -113,7 +113,7 @@ TEST_F(ut_middleview_test, selectAfterRemoved)
 TEST_F(ut_middleview_test, setNextSelection)
 {
     MiddleView middleview;
-    if(middleview.count()){
+    if (middleview.count()) {
         middleview.setCurrentIndex(0);
     }
     middleview.setNextSelection();
@@ -126,14 +126,14 @@ TEST_F(ut_middleview_test, setDragSuccess)
     middleview.setDragSuccess(value);
 }
 
-TEST_F(ut_middleview_test,changeRightView)
+TEST_F(ut_middleview_test, changeRightView)
 {
     MiddleView middleview;
     bool value = true;
     middleview.changeRightView(value);
 }
 
-TEST_F(ut_middleview_test,handleDragEvent)
+TEST_F(ut_middleview_test, handleDragEvent)
 {
     MiddleView middleview;
     middleview.m_onlyCurItemMenuEnable = false;
@@ -141,17 +141,17 @@ TEST_F(ut_middleview_test,handleDragEvent)
     middleview.handleDragEvent(value);
 }
 
-TEST_F(ut_middleview_test,deleteModelIndexs)
+TEST_F(ut_middleview_test, deleteModelIndexs)
 {
     MiddleView middleview;
     QModelIndexList indexList;
-    if(middleview.count()){
-        indexList.append(middleview.m_pDataModel->index(0,0));
+    if (middleview.count()) {
+        indexList.append(middleview.m_pDataModel->index(0, 0));
     }
     middleview.deleteModelIndexs(indexList);
 }
 
-TEST_F(ut_middleview_test,keyReleaseEvent)
+TEST_F(ut_middleview_test, keyReleaseEvent)
 {
     MiddleView middleview;
     QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Shift, Qt::NoModifier, "test");
@@ -160,7 +160,7 @@ TEST_F(ut_middleview_test,keyReleaseEvent)
     middleview.keyReleaseEvent(event);
 }
 
-TEST_F(ut_middleview_test,getSelectedCount)
+TEST_F(ut_middleview_test, getSelectedCount)
 {
     MiddleView middleview;
     middleview.getSelectedCount();
@@ -183,13 +183,13 @@ TEST_F(ut_middleview_test,getSelectedCount)
 //    middleview.haveVoice();
 //}
 
-TEST_F(ut_middleview_test,isMultipleSelected)
+TEST_F(ut_middleview_test, isMultipleSelected)
 {
     MiddleView middleview;
     middleview.isMultipleSelected();
 }
 
-TEST_F(ut_middleview_test,setMouseState)
+TEST_F(ut_middleview_test, setMouseState)
 {
     MiddleView middleview;
 
@@ -197,40 +197,40 @@ TEST_F(ut_middleview_test,setMouseState)
     middleview.setMouseState(mouseState);
 }
 
-TEST_F(ut_middleview_test,getModifierState)
+TEST_F(ut_middleview_test, getModifierState)
 {
     MiddleView middleview;
     middleview.getModifierState();
 }
 
-TEST_F(ut_middleview_test,setModifierState)
+TEST_F(ut_middleview_test, setModifierState)
 {
     MiddleView middleview;
     MiddleView::ModifierState modifierState {MiddleView::ModifierState::noModifier};
     middleview.setModifierState(modifierState);
 }
 
-TEST_F(ut_middleview_test,onNoteChanged)
+TEST_F(ut_middleview_test, onNoteChanged)
 {
     MiddleView middleview;
     middleview.onNoteChanged();
 }
 
-TEST_F(ut_middleview_test,getCurrVNotedataList)
+TEST_F(ut_middleview_test, getCurrVNotedataList)
 {
     MiddleView middleview;
     middleview.setCurrentIndex(0);
     middleview.getCurrVNotedataList();
 }
 
-TEST_F(ut_middleview_test,getCurrVNotedata)
+TEST_F(ut_middleview_test, getCurrVNotedata)
 {
     MiddleView middleview;
     middleview.m_index = middleview.currentIndex();
     middleview.getCurrVNotedata();
 }
 
-TEST_F(ut_middleview_test,deleteCurrentRow)
+TEST_F(ut_middleview_test, deleteCurrentRow)
 {
     MiddleView middleview;
     middleview.setCurrentIndex(0);

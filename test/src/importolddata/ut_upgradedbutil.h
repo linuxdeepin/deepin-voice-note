@@ -23,7 +23,8 @@
 #include <QObject>
 
 class UpgradeDbUtil;
-class ut_upgradedbutil_test : public QObject, public::testing::Test
+class ut_upgradedbutil_test : public QObject
+    , public ::testing::Test
 {
     Q_OBJECT
 public:

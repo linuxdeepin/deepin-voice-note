@@ -22,7 +22,6 @@
 
 ut_vnote2siconbutton_test::ut_vnote2siconbutton_test()
 {
-
 }
 
 TEST_F(ut_vnote2siconbutton_test, isPressed)
@@ -36,6 +35,6 @@ TEST_F(ut_vnote2siconbutton_test, mouseReleaseEvent)
 {
     VNote2SIconButton vnote2siconbutton("test", "test");
     QPointF localPos;
-    QMouseEvent* event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
     vnote2siconbutton.mouseReleaseEvent(event);
 }

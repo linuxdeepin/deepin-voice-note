@@ -22,7 +22,8 @@
 #include <QTest>
 #include <QObject>
 
-class ut_vnotedbmanager_test : public QObject, public::testing::Test
+class ut_vnotedbmanager_test : public QObject
+    , public ::testing::Test
 {
     Q_OBJECT
 public:

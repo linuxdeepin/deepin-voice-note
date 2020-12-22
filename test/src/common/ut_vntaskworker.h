@@ -24,7 +24,8 @@
 
 class VNTaskWorker;
 
-class ut_vntaskworker_test : public QObject, public::testing::Test
+class ut_vntaskworker_test : public QObject
+    , public ::testing::Test
 {
     Q_OBJECT
 public:

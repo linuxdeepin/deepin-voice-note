@@ -21,12 +21,11 @@
 
 ut_vnotedatasafefymanager_test::ut_vnotedatasafefymanager_test()
 {
-
 }
 
 TEST_F(ut_vnotedatasafefymanager_test, instance)
 {
-    VNoteDataSafefyManager* vnotedatasafefymanager;
+    VNoteDataSafefyManager *vnotedatasafefymanager;
     vnotedatasafefymanager = VNoteDataSafefyManager::instance();
 }
 
@@ -39,22 +38,3 @@ TEST_F(ut_vnotedatasafefymanager_test, initTaskWoker)
     safer.setSaferType(VDataSafer::Safe);
     vnotedatasafefymanager.doSafer(safer);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

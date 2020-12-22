@@ -21,25 +21,23 @@
 
 ut_vnotedatamanager_test::ut_vnotedatamanager_test()
 {
-
 }
 
 TEST_F(ut_vnotedatamanager_test, folderNotesCount)
 {
-
 }
 
 TEST_F(ut_vnotedatamanager_test, isAllDatasReady)
 {
     VNoteDataManager vnotedatamanager;
-//    vnotedatamanager.reqNoteDefIcons();
-//    vnotedatamanager.reqNoteFolders();
-//    vnotedatamanager.reqNoteItems();
+    //    vnotedatamanager.reqNoteDefIcons();
+    //    vnotedatamanager.reqNoteFolders();
+    //    vnotedatamanager.reqNoteItems();
     vnotedatamanager.isAllDatasReady();
 }
 
 TEST_F(ut_vnotedatamanager_test, instance)
 {
-    VNoteDataManager* vnotedatamanager;
+    VNoteDataManager *vnotedatamanager;
     vnotedatamanager = VNoteDataManager::instance();
 }

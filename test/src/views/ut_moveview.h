@@ -21,7 +21,8 @@
 #include "gtest/gtest.h"
 #include <QObject>
 
-class ut_MoveView_test : public QObject, public::testing::Test
+class ut_MoveView_test : public QObject
+    , public ::testing::Test
 {
     Q_OBJECT
 public:

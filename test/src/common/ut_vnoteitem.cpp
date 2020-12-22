@@ -20,7 +20,6 @@
 
 ut_vnoteitem_test::ut_vnoteitem_test()
 {
-
 }
 
 TEST_F(ut_vnoteitem_test, isValid)
@@ -60,7 +59,7 @@ TEST_F(ut_vnoteitem_test, qdebugtest)
     vnoteitem.createTime = QDateTime::currentDateTime();
     vnoteitem.modifyTime = QDateTime::currentDateTime();
     vnoteitem.deleteTime = QDateTime::currentDateTime();
-    qDebug() << "" <<vnoteitem;
+    qDebug() << "" << vnoteitem;
 }
 
 TEST_F(ut_vnoteitem_test, metaDataRef)
@@ -94,9 +93,9 @@ TEST_F(ut_vnoteitem_test, addBlock)
     vnoteitem.addBlock(ptrBlock);
     vnoteitem.addBlock(ptrBlock, ptrBlock1);
     vnoteitem.delBlock(ptrBlock);
-//    ASSERT_TRUE(vnoteitem.haveVoice());
-//    ASSERT_FALSE(vnoteitem.haveText());
-//    ASSERT_GE(vnoteitem.voiceCount(), 0);
+    //    ASSERT_TRUE(vnoteitem.haveVoice());
+    //    ASSERT_FALSE(vnoteitem.haveText());
+    //    ASSERT_GE(vnoteitem.voiceCount(), 0);
 }
 
 TEST_F(ut_vnoteitem_test, setMetadata)
@@ -105,22 +104,3 @@ TEST_F(ut_vnoteitem_test, setMetadata)
     QString tmpstr = "{\"dataCount\":3,\"noteDatas\":[{\"text\":\"wafwaefawffvbdafvadfasdf\",\"type\":1},{\"createTime\":\"2020-08-25 14:39:21.473\",\"state\":false,\"text\":\"\",\"title\":\"Voice2\",\"type\":2,\"voicePath\":\"/usr/share/music/bensound-sunny.mp3\",\"voiceSize\":3630},{\"text\":\"wafwaefawffvbdafvadfasdf\",\"type\":1}],\"voiceMaxId\":3}";
     vnoteitem.setMetadata(tmpstr);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

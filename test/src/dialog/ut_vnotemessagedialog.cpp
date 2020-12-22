@@ -21,7 +21,6 @@
 
 ut_vnotemessagedialog_test::ut_vnotemessagedialog_test()
 {
-
 }
 
 TEST_F(ut_vnotemessagedialog_test, setSingleButton)

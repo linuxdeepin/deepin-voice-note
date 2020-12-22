@@ -94,7 +94,7 @@ TEST_F(ut_rightview_test, onVoicePlay)
     VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
     block->ptrVoice = vnvoiceblock;
     VoiceNoteItem *item = new VoiceNoteItem(block);
-//    rightview.onVoicePlay(item);
+    //    rightview.onVoicePlay(item);
 }
 
 TEST_F(ut_rightview_test, onVoicePause)
@@ -109,7 +109,7 @@ TEST_F(ut_rightview_test, onVoicePause)
     VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
     block->ptrVoice = vnvoiceblock;
     VoiceNoteItem *item = new VoiceNoteItem(block);
-//    rightview.onVoicePause(item);
+    //    rightview.onVoicePause(item);
 }
 
 TEST_F(ut_rightview_test, onPlayUpdate)
@@ -135,7 +135,7 @@ TEST_F(ut_rightview_test, mouseEvent)
     rightview.m_noteItemData = vnoteitem;
     QPointF localPos;
     QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
-//    rightview.mousePressEvent(event);
+    //    rightview.mousePressEvent(event);
     QMouseEvent *event1 = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
     rightview.mouseReleaseEvent(event1);
     rightview.mouseMoveEvent(event);

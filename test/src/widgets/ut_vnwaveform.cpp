@@ -21,9 +21,7 @@
 
 ut_vnwaveform_test::ut_vnwaveform_test()
 {
-
 }
-
 
 TEST_F(ut_vnwaveform_test, onAudioBufferProbed)
 {

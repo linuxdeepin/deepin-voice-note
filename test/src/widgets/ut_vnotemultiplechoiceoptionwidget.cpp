@@ -3,7 +3,6 @@
 
 ut_vnotemultiplechoiceoptionwidget_test::ut_vnotemultiplechoiceoptionwidget_test()
 {
-
 }
 
 void ut_vnotemultiplechoiceoptionwidget_test::SetUp()
@@ -31,7 +30,7 @@ TEST_F(ut_vnotemultiplechoiceoptionwidget_test, enableButtons)
 {
     bool txtButtonStatus = false;
     bool voiceButtonStatus = true;
-    m_widget->enableButtons(txtButtonStatus,voiceButtonStatus);
+    m_widget->enableButtons(txtButtonStatus, voiceButtonStatus);
 }
 
 TEST_F(ut_vnotemultiplechoiceoptionwidget_test, setNoteNumber)

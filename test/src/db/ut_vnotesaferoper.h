@@ -23,7 +23,8 @@
 #include <QObject>
 
 class VNoteSaferOper;
-class ut_vnotesaferoper_test : public QObject, public::testing::Test
+class ut_vnotesaferoper_test : public QObject
+    , public ::testing::Test
 {
     Q_OBJECT
 public:

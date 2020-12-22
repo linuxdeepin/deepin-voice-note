@@ -21,7 +21,6 @@
 
 ut_vnoteolddatamanager_test::ut_vnoteolddatamanager_test()
 {
-
 }
 
 void ut_vnoteolddatamanager_test::SetUp()
@@ -46,12 +45,12 @@ TEST_F(ut_vnoteolddatamanager_test, initOldDb)
 
 TEST_F(ut_vnoteolddatamanager_test, reqDatas)
 {
-//    m_vnoteolddatamanager->reqDatas();
+    //    m_vnoteolddatamanager->reqDatas();
 }
 
 TEST_F(ut_vnoteolddatamanager_test, doUpgrade)
 {
-//    m_vnoteolddatamanager->doUpgrade();
+    //    m_vnoteolddatamanager->doUpgrade();
 }
 
 TEST_F(ut_vnoteolddatamanager_test, onFinishLoad)

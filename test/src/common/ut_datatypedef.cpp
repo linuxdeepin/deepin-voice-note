@@ -25,7 +25,6 @@
 
 ut_datatypedef_test::ut_datatypedef_test()
 {
-
 }
 
 TEST_F(ut_datatypedef_test, dataConstRef)
@@ -157,19 +156,3 @@ TEST_F(ut_datatypedef_test, TEST_VNOTE_ALL_NOTES_MAP)
     vnote_all_notes_map.notes.insert(1, vnote_items_map);
     vnote_all_notes_map.autoRelease = true;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

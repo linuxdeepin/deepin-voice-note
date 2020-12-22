@@ -20,7 +20,6 @@
 
 ut_setting_test::ut_setting_test()
 {
-
 }
 
 TEST_F(ut_setting_test, keys)
@@ -56,7 +55,7 @@ TEST_F(ut_setting_test, doSetOption)
 
 TEST_F(ut_setting_test, getSetting)
 {
-    DSettings* tmpset = setting::instance()->getSetting();
+    DSettings *tmpset = setting::instance()->getSetting();
     ASSERT_TRUE(tmpset != nullptr);
 }
 

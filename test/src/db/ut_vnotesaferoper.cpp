@@ -21,7 +21,6 @@
 
 ut_vnotesaferoper_test::ut_vnotesaferoper_test()
 {
-
 }
 
 void ut_vnotesaferoper_test::SetUp()

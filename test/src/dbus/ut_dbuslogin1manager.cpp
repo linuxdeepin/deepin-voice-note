@@ -21,14 +21,13 @@
 
 ut_dbuslogin1manager_test::ut_dbuslogin1manager_test()
 {
-
 }
 
 TEST_F(ut_dbuslogin1manager_test, staticInterfaceName)
 {
     DBusLogin1Manager *dbuslogin1manager = new DBusLogin1Manager(
-                "org.freedesktop.login1",
-                "/org/freedesktop/login1",
-                QDBusConnection::systemBus(), this);
+        "org.freedesktop.login1",
+        "/org/freedesktop/login1",
+        QDBusConnection::systemBus(), this);
     dbuslogin1manager->staticInterfaceName();
 }

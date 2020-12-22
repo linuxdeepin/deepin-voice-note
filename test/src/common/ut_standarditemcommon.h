@@ -24,7 +24,8 @@
 
 class StandardItemCommon;
 
-class ut_standarditemcommon_test : public QObject, public::testing::Test
+class ut_standarditemcommon_test : public QObject
+    , public ::testing::Test
 {
     Q_OBJECT
 public:

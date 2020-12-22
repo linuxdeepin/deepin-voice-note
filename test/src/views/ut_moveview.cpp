@@ -26,7 +26,6 @@
 
 ut_MoveView_test::ut_MoveView_test()
 {
-
 }
 
 TEST_F(ut_MoveView_test, setFolder)
@@ -57,16 +56,16 @@ TEST_F(ut_MoveView_test, setFolder)
     moveview.setNote(&vnoteitem);
 }
 
-TEST_F(ut_MoveView_test,setNotesNumber)
+TEST_F(ut_MoveView_test, setNotesNumber)
 {
     int number = 1;
     MoveView moveView;
     moveView.setNotesNumber(number);
 }
 
-TEST_F(ut_MoveView_test,setNoteList)
+TEST_F(ut_MoveView_test, setNoteList)
 {
-    QList<VNoteItem *>noteList;
+    QList<VNoteItem *> noteList;
     MoveView moveView;
     moveView.setNoteList(noteList);
 }

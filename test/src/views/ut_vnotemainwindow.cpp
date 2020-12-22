@@ -53,7 +53,6 @@
 
 ut_vnotemainwindow_test::ut_vnotemainwindow_test()
 {
-
 }
 
 TEST_F(ut_vnotemainwindow_test, holdHaltLock)
@@ -111,24 +110,24 @@ TEST_F(ut_vnotemainwindow_test, event)
     QSize size;
     QResizeEvent *event1 = new QResizeEvent(size, size);
     vnotemainwindow.resizeEvent(event1);
-    QKeyEvent* event2 = new QKeyEvent(QEvent::KeyPress, 0x58, Qt::ControlModifier, "test");
+    QKeyEvent *event2 = new QKeyEvent(QEvent::KeyPress, 0x58, Qt::ControlModifier, "test");
     vnotemainwindow.keyPressEvent(event2);
 }
 
 TEST_F(ut_vnotemainwindow_test, handleMultipleOption)
 {
-//    VNoteMainWindow vnotemainwindow;
-//    int id = 1;
-//    if(vnotemainwindow.m_middleView->count()>0){
-//        vnotemainwindow.m_middleView->setCurrentIndex(1);
-//    }
-//    vnotemainwindow.handleMultipleOption(id);
-//    int id2 = 2;
-//    vnotemainwindow.handleMultipleOption(id2);
-//    int id3 = 3;
-//    vnotemainwindow.handleMultipleOption(id3);
-//    int id4 = 4;
-//    vnotemainwindow.handleMultipleOption(id4);
+    //    VNoteMainWindow vnotemainwindow;
+    //    int id = 1;
+    //    if(vnotemainwindow.m_middleView->count()>0){
+    //        vnotemainwindow.m_middleView->setCurrentIndex(1);
+    //    }
+    //    vnotemainwindow.handleMultipleOption(id);
+    //    int id2 = 2;
+    //    vnotemainwindow.handleMultipleOption(id2);
+    //    int id3 = 3;
+    //    vnotemainwindow.handleMultipleOption(id3);
+    //    int id4 = 4;
+    //    vnotemainwindow.handleMultipleOption(id4);
 }
 
 TEST_F(ut_vnotemainwindow_test, onDropNote)
@@ -138,24 +137,4 @@ TEST_F(ut_vnotemainwindow_test, onDropNote)
     vnotemainwindow.onDropNote(dropCancel);
     bool dropCancels = false;
     vnotemainwindow.onDropNote(dropCancels);
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

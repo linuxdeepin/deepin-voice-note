@@ -21,7 +21,6 @@
 
 ut_vnotebasedialog_test::ut_vnotebasedialog_test()
 {
-
 }
 
 TEST_F(ut_vnotebasedialog_test, initUI)
@@ -75,4 +74,3 @@ TEST_F(ut_vnotebasedialog_test, showEvent)
     QShowEvent *event = new QShowEvent;
     vnotebasedialog.showEvent(event);
 }
-

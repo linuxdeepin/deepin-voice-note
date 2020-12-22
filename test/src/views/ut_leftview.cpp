@@ -26,7 +26,6 @@
 
 ut_leftview_test::ut_leftview_test()
 {
-
 }
 
 TEST_F(ut_leftview_test, getNotepadRoot)
@@ -44,22 +43,22 @@ TEST_F(ut_leftview_test, getNotepadRootIndex)
 
 TEST_F(ut_leftview_test, mouseEvent)
 {
-//    LeftView leftview;
-//    QPointF localPos;
-//    QMouseEvent* event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
-//    leftview.mousePressEvent(event);
-//    leftview.mouseReleaseEvent(event);
-//    leftview.mouseDoubleClickEvent(event);
-//    leftview.mouseMoveEvent(event);
+    //    LeftView leftview;
+    //    QPointF localPos;
+    //    QMouseEvent* event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+    //    leftview.mousePressEvent(event);
+    //    leftview.mouseReleaseEvent(event);
+    //    leftview.mouseDoubleClickEvent(event);
+    //    leftview.mouseMoveEvent(event);
 }
 
 TEST_F(ut_leftview_test, keyPressEvent)
 {
     LeftView leftview;
-    QKeyEvent* event = new QKeyEvent(QEvent::KeyPress, 0x01000016, Qt::NoModifier, "test");
-//    leftview.keyPressEvent(event);
-    QKeyEvent* event1 = new QKeyEvent(QEvent::KeyPress, 0x01000001, Qt::NoModifier, "test");
-//    leftview.keyPressEvent(event1);
+    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, 0x01000016, Qt::NoModifier, "test");
+    //    leftview.keyPressEvent(event);
+    QKeyEvent *event1 = new QKeyEvent(QEvent::KeyPress, 0x01000001, Qt::NoModifier, "test");
+    //    leftview.keyPressEvent(event1);
 }
 
 TEST_F(ut_leftview_test, restoreNotepadItem)
@@ -80,6 +79,7 @@ TEST_F(ut_leftview_test, addFolder)
     leftview.addFolder(&folder);
     leftview.editFolder();
     leftview.folderCount();
+    leftview.sort();
 }
 
 TEST_F(ut_leftview_test, appendFolder)
@@ -110,7 +110,7 @@ TEST_F(ut_leftview_test, closeMenu)
 TEST_F(ut_leftview_test, closeEditor)
 {
     LeftView leftview;
-    QWidget* editor = new QWidget;
+    QWidget *editor = new QWidget;
     leftview.closeEditor(editor, QAbstractItemDelegate::NoHint);
 }
 
@@ -124,7 +124,7 @@ TEST_F(ut_leftview_test, doNoteMove)
     leftview.selectMoveFolder(indexList);
     leftview.getFolderSort();
     leftview.setFolderSort();
-//    leftview.needFolderSort();
+    //    leftview.needFolderSort();
 }
 
 TEST_F(ut_leftview_test, setDrawNotesNum)
