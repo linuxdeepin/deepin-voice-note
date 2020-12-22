@@ -35,7 +35,6 @@
 FolderSelectView::FolderSelectView(QWidget *parent)
     : DTreeView(parent)
 {
-
 }
 
 /**
@@ -85,7 +84,7 @@ void FolderSelectView::mouseReleaseEvent(QMouseEvent *event)
 void FolderSelectView::keyPressEvent(QKeyEvent *event)
 {
     //QAbstractItemView底层问题，索引0按上键会取消选中效果，通过keypress屏蔽
-    if (event->key() == Qt::Key_Up && currentIndex().row() == 0){
+    if (event->key() == Qt::Key_Up && currentIndex().row() == 0) {
         event->ignore();
     } else {
         DTreeView::keyPressEvent(event);
@@ -192,14 +191,14 @@ void FolderSelectDialog::initUI()
     m_closeButton->setIconSize(QSize(50, 50));
 
     m_labMove = new DLabel(this);
-    DFontSizeManager::instance()->bind(m_labMove, DFontSizeManager::T6,QFont::Medium);
+    DFontSizeManager::instance()->bind(m_labMove, DFontSizeManager::T6, QFont::Medium);
     m_labMove->setText(DApplication::translate("FolderSelectDialog", "Move Notes"));
 
     QHBoxLayout *titleLayout = new QHBoxLayout();
     titleLayout->setSpacing(0);
     titleLayout->setContentsMargins(10, 0, 0, 0);
     titleLayout->addStretch();
-    titleLayout->addSpacing(m_closeButton->width()/3);
+    titleLayout->addSpacing(m_closeButton->width() / 3);
 
     titleLayout->addWidget(m_labMove, 0, Qt::AlignCenter | Qt::AlignVCenter);
     titleLayout->addStretch();
@@ -209,10 +208,10 @@ void FolderSelectDialog::initUI()
     //长度不超过视图宽度
     m_noteInfo->setFixedWidth(VNOTE_SELECTDIALOG_W - 20);
     //初始化标题与提示字体颜色
-    bool isDark = DGuiApplicationHelper::instance()->themeType()==DGuiApplicationHelper::DarkType?true:false;
+    bool isDark = DGuiApplicationHelper::instance()->themeType() == DGuiApplicationHelper::DarkType ? true : false;
     refreshTextColor(isDark);
 
-    DFontSizeManager::instance()->bind(m_noteInfo, DFontSizeManager::T6,QFont::Normal);
+    DFontSizeManager::instance()->bind(m_noteInfo, DFontSizeManager::T6, QFont::Normal);
     QHBoxLayout *actionBarLayout = new QHBoxLayout();
     actionBarLayout->setSpacing(5);
     actionBarLayout->setContentsMargins(0, 0, 0, 0);
@@ -245,7 +244,7 @@ void FolderSelectDialog::initUI()
     viewFrameLayout->setContentsMargins(5, 5, 0, 5);
     viewFrameLayout->addWidget(m_view);
     viewFrame->setLayout(viewFrameLayout);
-    viewFrame->setContentsMargins(0,0,10,0);
+    viewFrame->setContentsMargins(0, 0, 10, 0);
     //设置外部frame背景透明
     viewFrame->setAttribute(Qt::WA_TranslucentBackground, true);
 
@@ -256,8 +255,8 @@ void FolderSelectDialog::initUI()
     noteInfoLayout->addWidget(m_noteInfo, Qt::AlignHCenter);
     noteInfoLayout->addSpacing(10);
     noteInfoLayout->addStretch();
-//    mainLayout->addWidget(m_noteInfo, 0, Qt::AlignCenter);
-    mainLayout->addLayout(noteInfoLayout,0);
+    //    mainLayout->addWidget(m_noteInfo, 0, Qt::AlignCenter);
+    mainLayout->addLayout(noteInfoLayout, 0);
     mainLayout->addSpacing(10);
     mainLayout->addWidget(viewFrame, 1);
     mainLayout->addSpacing(10);
@@ -270,11 +269,11 @@ void FolderSelectDialog::initUI()
  */
 void FolderSelectDialog::initConnections()
 {
-    connect(m_cancelBtn, &DPushButton::clicked, this, [ = ]() {
+    connect(m_cancelBtn, &DPushButton::clicked, this, [=]() {
         this->reject();
     });
 
-    connect(m_confirmBtn, &DPushButton::clicked, this, [ = ]() {
+    connect(m_confirmBtn, &DPushButton::clicked, this, [=]() {
         this->accept();
     });
 
@@ -286,13 +285,12 @@ void FolderSelectDialog::initConnections()
             this, &FolderSelectDialog::onVNoteFolderSelectChange);
 
     //由于ui中颜色与dtk颜色库不对应，需要手动判断并设置s
-    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this, [ = ] {
-            bool isDark = DGuiApplicationHelper::instance()->themeType()==DGuiApplicationHelper::DarkType?true:false;
-            this->refreshTextColor(isDark);
+    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this, [=] {
+        bool isDark = DGuiApplicationHelper::instance()->themeType() == DGuiApplicationHelper::DarkType ? true : false;
+        this->refreshTextColor(isDark);
     });
     //字体切换长度适应
     connect(qApp, &DApplication::fontChanged, this, &FolderSelectDialog::onFontChanged);
-
 }
 
 /**
@@ -300,12 +298,13 @@ void FolderSelectDialog::initConnections()
  * @param dark 深色主题或浅色主题
  * 主题切换刷新文本颜色
  */
-void FolderSelectDialog::refreshTextColor(bool dark){
+void FolderSelectDialog::refreshTextColor(bool dark)
+{
     // 黑色主题
-    if (dark){
+    if (dark) {
         //标题
         DPalette titlePalette = DApplicationHelper::instance()->palette(m_labMove);
-        QColor color = QColor(255,255,255);
+        QColor color = QColor(255, 255, 255);
         titlePalette.setBrush(DPalette::WindowText, color);
         DApplicationHelper::instance()->setPalette(m_labMove, titlePalette);
         //提示内容
@@ -319,7 +318,7 @@ void FolderSelectDialog::refreshTextColor(bool dark){
     else {
         //标题
         DPalette titlePalette = DApplicationHelper::instance()->palette(m_labMove);
-        QColor color = QColor(0,0,0,1);
+        QColor color = QColor(0, 0, 0, 1);
         //10%的透明度
         color.setAlphaF(0.9);
         titlePalette.setBrush(DPalette::WindowText, color);
@@ -329,7 +328,7 @@ void FolderSelectDialog::refreshTextColor(bool dark){
         color.setAlphaF(1);
         //30%的透明度
         color.setAlphaF(0.7);
-        infoPalette.setBrush(DPalette::WindowText,color);
+        infoPalette.setBrush(DPalette::WindowText, color);
         DApplicationHelper::instance()->setPalette(m_noteInfo, infoPalette);
     }
 }
@@ -338,7 +337,7 @@ void FolderSelectDialog::refreshTextColor(bool dark){
  * @brief FolderSelectDialog::setNoteContext
  * @param text 移动笔记信息
  */
-void FolderSelectDialog::setNoteContextInfo(const QString &text,int notesNumber)
+void FolderSelectDialog::setNoteContextInfo(const QString &text, int notesNumber)
 {
     m_noteInfo->setAlignment(Qt::AlignCenter);
     m_notesName = text;
@@ -350,28 +349,29 @@ void FolderSelectDialog::setNoteContextInfo(const QString &text,int notesNumber)
  * @brief FolderSelectDialog::getSelectIndex
  * @return 选中的记事本
  */
-void FolderSelectDialog::onFontChanged(){
+void FolderSelectDialog::onFontChanged()
+{
     QString itemInfo = "";
     //自动截断提示长度
     QFontMetrics fontMetric(this->font());
     //用于计算当前文本名截断宽度的常量
-    int constantWidth = m_notesNumber>1? fontMetric.width(DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg("").arg("\"\""))
-                                    :fontMetric.width(DApplication::translate("LeftView", "Move the note \"%1\" to:").arg("  "));
-    QString notesName = fontMetric.elidedText(m_notesName,Qt::ElideRight,VNOTE_SELECTDIALOG_W-20-constantWidth);
+    int constantWidth = m_notesNumber > 1 ? fontMetric.width(DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg("").arg("\"\""))
+                                          : fontMetric.width(DApplication::translate("LeftView", "Move the note \"%1\" to:").arg("  "));
+    QString notesName = fontMetric.elidedText(m_notesName, Qt::ElideRight, VNOTE_SELECTDIALOG_W - 20 - constantWidth);
     QString temp = "";
-    int width = fontMetric.width(DApplication::translate("LeftView", "Move the note \"%1\" to:").arg("").at(0))/3;
-    for(int i = 0;i<10;i++){
-        if(fontMetric.width(temp)+fontMetric.width(" ")>width){
+    int width = fontMetric.width(DApplication::translate("LeftView", "Move the note \"%1\" to:").arg("").at(0)) / 3;
+    for (int i = 0; i < 10; i++) {
+        if (fontMetric.width(temp) + fontMetric.width(" ") > width) {
             break;
         }
         temp.append(" ");
     }
-    if(1 == m_notesNumber){
+    if (1 == m_notesNumber) {
         itemInfo = QString(temp).append(DApplication::translate("LeftView", "Move the note \"%1\" to:").arg(notesName));
-    }else {
+    } else {
         itemInfo = QString(temp).append(DApplication::translate("LeftView", "Move %1 notes (%2, ...) to:").arg(m_notesNumber).arg(notesName));
     }
-        m_noteInfo->setText(itemInfo);
+    m_noteInfo->setText(itemInfo);
 }
 
 /**
@@ -383,16 +383,16 @@ QModelIndex FolderSelectDialog::getSelectIndex()
     QModelIndex index = m_view->currentIndex();
     QItemSelectionModel *model = m_view->selectionModel();
     if (!model->isSelected(index)) {
-        index  = QModelIndex();
+        index = QModelIndex();
     }
-    return  index;
+    return index;
 }
 
 /**
  * @brief FolderSelectDialog::setFolderBlack
  * @param folders 不需要显示的笔记项
  */
-void FolderSelectDialog::setFolderBlack(const QList<VNoteFolder * > &folders)
+void FolderSelectDialog::setFolderBlack(const QList<VNoteFolder *> &folders)
 {
     m_model->setBlackFolders(folders);
 }
@@ -417,7 +417,6 @@ void FolderSelectDialog::onVNoteFolderSelectChange(const QItemSelection &selecte
     Q_UNUSED(deselected);
     m_confirmBtn->setEnabled(!!selected.indexes().size());
 }
-
 
 /**
  * @brief FolderSelectDialog::hideEvent

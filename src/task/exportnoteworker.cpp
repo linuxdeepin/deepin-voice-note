@@ -38,7 +38,7 @@
  * @param parent
  */
 ExportNoteWorker::ExportNoteWorker(QString dirPath, int exportType,
-                                   QList<VNoteItem *>noteList, VNoteBlock *block, QObject *parent)
+                                   QList<VNoteItem *> noteList, VNoteBlock *block, QObject *parent)
     : VNTask(parent)
     , m_exportType(exportType)
     , m_exportPath(dirPath)
@@ -64,9 +64,9 @@ void ExportNoteWorker::run()
             exportAll();
         } else if (ExportOneVoice == m_exportType) {
             //导出语音
-            if(m_noteList.size()>1){
+            if (m_noteList.size() > 1) {
                 exportAllVoice();
-            }else {
+            } else {
                 exportOneVoice(m_noteblock);
             }
         }
@@ -112,7 +112,7 @@ int ExportNoteWorker::exportText()
     ExportError error = ExportOK;
     //存在note
     if (m_noteList.size()) {
-        for(auto noteData: m_noteList){
+        for (auto noteData : m_noteList) {
             QString fileName = QString("%1-%2.txt").arg(noteData->noteTitle).arg(QDateTime::currentDateTime().toLocalTime().toString(VNOTE_TIME_FMT));
             QFile exportFile(m_exportPath + "/" + fileName);
             if (exportFile.open(QIODevice::ReadWrite)) {
@@ -147,7 +147,7 @@ int ExportNoteWorker::exportAllVoice()
     ExportError error = ExportOK;
     //存在note
     if (m_noteList.size()) {
-        for(auto noteData : m_noteList){
+        for (auto noteData : m_noteList) {
             for (auto it : noteData->datas.datas) {
                 exportOneVoice(it);
             }

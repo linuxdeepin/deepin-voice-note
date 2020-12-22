@@ -17,21 +17,19 @@ VNoteRightMenu::~VNoteRightMenu()
  */
 void VNoteRightMenu::initConnections()
 {
-    connect(m_timer, &QTimer::timeout, this, [ = ] {
+    connect(m_timer, &QTimer::timeout, this, [=] {
         int distY = QCursor::pos().y() - m_touchPoint.y();
         int distX = QCursor::pos().x() - m_touchPoint.x();
         if ((qAbs(distX) > 8) || (qAbs(distY) > 8))
             m_moved = true;
-        else
-        {
+        else {
             m_moved = false;
         }
-
     });
-    connect(this, &VNoteRightMenu::aboutToShow, this, [ = ] {
+    connect(this, &VNoteRightMenu::aboutToShow, this, [=] {
         m_timer->start(50);
     });
-    connect(this, &VNoteRightMenu::aboutToHide, this, [ = ] {
+    connect(this, &VNoteRightMenu::aboutToHide, this, [=] {
         m_timer->stop();
     });
 }
@@ -60,7 +58,6 @@ void VNoteRightMenu::mouseReleaseEvent(QMouseEvent *eve)
     if (eve->source() == Qt::MouseEventSynthesizedByQt) {
         emit menuTouchReleased();
         m_timer->stop();
-
     }
     return DMenu::mouseReleaseEvent(eve);
 }

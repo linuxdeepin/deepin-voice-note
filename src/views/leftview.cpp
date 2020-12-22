@@ -143,27 +143,27 @@ void LeftView::mousePressEvent(QMouseEvent *event)
         event->setModifiers(Qt::NoModifier);
         setTouchState(TouchState::TouchPressing);
         //不使用自动判断
-//        DTreeView::mousePressEvent(event);
+        //        DTreeView::mousePressEvent(event);
         if (event->button() == Qt::RightButton) {
-            if(MenuStatus::ReleaseFromMenu == m_menuState){
+            if (MenuStatus::ReleaseFromMenu == m_menuState) {
                 m_menuState = MenuStatus::Normal;
                 return;
             }
             QModelIndex index = this->indexAt(event->pos());
             if (StandardItemCommon::getStandardItemType(index) == StandardItemCommon::NOTEPADITEM
-                    && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
+                && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
                 this->setCurrentIndex(index);
                 m_notepadMenu->popup(event->globalPos());
                 //通过此方法隐藏菜单，在处理拖拽事件结束后hide
                 m_notepadMenu->setWindowOpacity(1);
             }
         }
-    }else {
+    } else {
         if (event->source() == Qt::MouseEventSynthesizedByQt) {
             m_popMenuTimer->start(1000);
             return;
-        }else {
-            if(Qt::RightButton == event->button()){
+        } else {
+            if (Qt::RightButton == event->button()) {
                 m_notepadMenu->setWindowOpacity(1);
                 m_notepadMenu->popup(event->globalPos());
             }
@@ -190,7 +190,7 @@ void LeftView::mouseReleaseEvent(QMouseEvent *event)
     //正常点击状态，选择当前点击选项
     QModelIndex index = indexAt(event->pos());
     if (index.row() != currentIndex().row() && m_touchState == TouchState::TouchPressing) {
-        if (index.isValid()){
+        if (index.isValid()) {
             setCurrentIndex(index);
         }
         setTouchState(TouchState::TouchNormal);
@@ -229,12 +229,12 @@ void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
 void LeftView::mouseMoveEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
-    if(m_onlyCurItemMenuEnable){
+    if (m_onlyCurItemMenuEnable) {
         return;
     }
     //处理触摸屏一指操作
     if ((event->source() == Qt::MouseEventSynthesizedByQt && event->buttons() & Qt::LeftButton)) {
-        if(TouchState::TouchOutVisibleRegion !=  m_touchState){
+        if (TouchState::TouchOutVisibleRegion != m_touchState) {
             doTouchMoveEvent(event);
         }
         return;
@@ -244,8 +244,8 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
         if (!m_isDraging) {
             setCurrentIndex(indexAt(event->pos()));
             //需判断移动距离
-            if(qAbs(event->pos().x() - m_touchPressPoint.x()) > 3
-                    || qAbs(event->pos().y() - m_touchPressPoint.y()) > 3){
+            if (qAbs(event->pos().x() - m_touchPressPoint.x()) > 3
+                || qAbs(event->pos().y() - m_touchPressPoint.y()) > 3) {
                 handleDragEvent(false);
             }
         }
@@ -261,7 +261,7 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
 void LeftView::doTouchMoveEvent(QMouseEvent *event)
 {
     //处理触摸屏单指move事件，区分滑动、拖拽事件
-//    m_pItemDelegate->setDraging(false);
+    //    m_pItemDelegate->setDraging(false);
     double distX = event->pos().x() - m_touchPressPoint.x();
     double distY = event->pos().y() - m_touchPressPoint.y();
     //获取时间间隔
@@ -304,10 +304,11 @@ void LeftView::doTouchMoveEvent(QMouseEvent *event)
  * @brief LeftView::handleDragEvent
  * @param isTouch 是否触屏
  */
-void LeftView::handleDragEvent(bool isTouch){
-    if(m_onlyCurItemMenuEnable)
+void LeftView::handleDragEvent(bool isTouch)
+{
+    if (m_onlyCurItemMenuEnable)
         return;
-    if(isTouch){
+    if (isTouch) {
         setTouchState(TouchState::TouchDraging);
     }
     m_popMenuTimer->stop();
@@ -328,7 +329,7 @@ void LeftView::keyPressEvent(QKeyEvent *e)
             e->ignore();
         } else if (e->key() == Qt::Key_Home) {
             //如果自动处理键盘home事件，会导致首个index与根节点重合，导致实际选项为空，此处手动设置选中
-            this->setCurrentIndex(m_pSortViewFilter->index(0,0,getNotepadRootIndex()));
+            this->setCurrentIndex(m_pSortViewFilter->index(0, 0, getNotepadRootIndex()));
         } else {
             DTreeView::keyPressEvent(e);
         }
@@ -374,7 +375,7 @@ void LeftView::addFolder(VNoteFolder *folder)
 {
     if (nullptr != folder) {
         QStandardItem *pItem = StandardItemCommon::createStandardItem(
-                                   folder, StandardItemCommon::NOTEPADITEM);
+            folder, StandardItemCommon::NOTEPADITEM);
 
         QStandardItem *root = getNotepadRoot();
         root->appendRow(pItem);
@@ -396,7 +397,7 @@ bool LeftView::eventFilter(QObject *o, QEvent *e)
     if (e->type() == QEvent::DragLeave) {
         m_pItemDelegate->setDrawHover(false);
         update();
-    }else if (e->type() == QEvent::DragEnter) {
+    } else if (e->type() == QEvent::DragEnter) {
         m_pItemDelegate->setDrawHover(true);
         update();
     }
@@ -411,7 +412,7 @@ void LeftView::appendFolder(VNoteFolder *folder)
 {
     if (nullptr != folder) {
         QStandardItem *pItem = StandardItemCommon::createStandardItem(
-                                   folder, StandardItemCommon::NOTEPADITEM);
+            folder, StandardItemCommon::NOTEPADITEM);
 
         QStandardItem *root = getNotepadRoot();
 
@@ -442,7 +443,7 @@ VNoteFolder *LeftView::removeFolder()
     }
 
     VNoteFolder *data = reinterpret_cast<VNoteFolder *>(
-                            StandardItemCommon::getStandardItemData(index));
+        StandardItemCommon::getStandardItemData(index));
 
     m_pSortViewFilter->removeRow(index.row(), index.parent());
 
@@ -482,21 +483,21 @@ void LeftView::initConnections()
     //右键菜单滑动
     connect(m_notepadMenu, &VNoteRightMenu::menuTouchMoved, this, &LeftView::handleDragEvent);
     //右键菜单释放
-    connect(m_notepadMenu, &VNoteRightMenu::menuTouchReleased, this, [ = ] {
+    connect(m_notepadMenu, &VNoteRightMenu::menuTouchReleased, this, [=] {
         m_touchState = TouchState::TouchNormal;
         m_menuState = MenuStatus::ReleaseFromMenu;
     });
     //定时器用于判断是否选中当前
     m_selectCurrentTimer = new QTimer();
-    connect(m_selectCurrentTimer,&QTimer::timeout,[=]{
+    connect(m_selectCurrentTimer, &QTimer::timeout, [=] {
         if (m_touchState == TouchState::TouchPressing && m_index.isValid())
             this->setCurrentIndex(m_index);
         m_selectCurrentTimer->stop();
     });
     //定时器用于判断是否弹出菜单
     m_popMenuTimer = new QTimer();
-    connect(m_popMenuTimer,&QTimer::timeout,[=]{
-        if (m_touchState == TouchState::TouchPressing && m_index.isValid()){
+    connect(m_popMenuTimer, &QTimer::timeout, [=] {
+        if (m_touchState == TouchState::TouchPressing && m_index.isValid()) {
             m_notepadMenu->setWindowOpacity(1);
             m_notepadMenu->exec(QCursor::pos());
         }
@@ -573,12 +574,11 @@ bool LeftView::doNoteMove(const QModelIndexList &src, const QModelIndex &dst)
             }
 
             //全部移除后重置当前记事本maxid
-            if(src.count() == m_notesNumberOfCurrentFolder){
-                VNoteFolder *folder = reinterpret_cast<VNoteFolder *>
-                        (StandardItemCommon::getStandardItemData(currentIndex()));
+            if (src.count() == m_notesNumberOfCurrentFolder) {
+                VNoteFolder *folder = reinterpret_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(currentIndex()));
                 folder->maxNoteIdRef() = 0;
-            }else {
-                selectFolder->maxNoteIdRef() +=src.size();
+            } else {
+                selectFolder->maxNoteIdRef() += src.size();
             }
             return true;
         }
@@ -604,7 +604,7 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
         QList<VNoteFolder *> folders;
         folders.push_back(static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(currentIndex())));
         m_folderSelectDialog->setFolderBlack(folders);
-        m_folderSelectDialog->setNoteContextInfo(elideText,src.size());
+        m_folderSelectDialog->setNoteContextInfo(elideText, src.size());
         m_folderSelectDialog->clearSelection();
 
         m_folderSelectDialog->exec();
@@ -632,7 +632,7 @@ QString LeftView::getFolderSort()
             break;
         }
         data = reinterpret_cast<VNoteFolder *>(
-                   StandardItemCommon::getStandardItemData(currentIndex));
+            StandardItemCommon::getStandardItemData(currentIndex));
         if (tmpQstr.isEmpty()) {
             tmpQstr = QString::number(data->id);
         } else {
@@ -660,10 +660,11 @@ bool LeftView::setFolderSort()
             break;
         }
         data = reinterpret_cast<VNoteFolder *>(
-                   StandardItemCommon::getStandardItemData(currentIndex));
+            StandardItemCommon::getStandardItemData(currentIndex));
         if (nullptr != data) {
             reinterpret_cast<VNoteFolder *>(
-                StandardItemCommon::getStandardItemData(currentIndex))->sortNumber = rowCount - i;
+                StandardItemCommon::getStandardItemData(currentIndex))
+                ->sortNumber = rowCount - i;
         }
         sortResult = true;
     }
@@ -674,14 +675,14 @@ bool LeftView::setFolderSort()
  * @brief LeftView::getFirstFolder
  * @return 第一个记事本
  */
-VNoteFolder* LeftView::getFirstFolder()
+VNoteFolder *LeftView::getFirstFolder()
 {
     QModelIndex rootIndex = getNotepadRootIndex();
     QModelIndex child = m_pSortViewFilter->index(0, 0, rootIndex);
     if (child.isValid()) {
         VNoteFolder *vnotefolder = reinterpret_cast<VNoteFolder *>(
-                    StandardItemCommon::getStandardItemData(child));
-        return  vnotefolder;
+            StandardItemCommon::getStandardItemData(child));
+        return vnotefolder;
     }
     return nullptr;
 }
@@ -711,7 +712,7 @@ void LeftView::dragEnterEvent(QDragEnterEvent *event)
 {
     // 判断拖拽进入视图事件触发类型（笔记：NOTES_DRAG_KEY；记事本：NOTEPAD_DRAG_KEY）
     if (!event->mimeData()->hasFormat(NOTES_DRAG_KEY)
-            && !event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)) {
+        && !event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)) {
         event->ignore();
         return DTreeView::dragEnterEvent(event);
     }
@@ -761,7 +762,7 @@ void LeftView::doDragMove(const QModelIndex &src, const QModelIndex &dst)
 {
     if (src.isValid() && dst.isValid() && src != dst) {
         VNoteFolder *tmpFolder = reinterpret_cast<VNoteFolder *>(
-                                     StandardItemCommon::getStandardItemData(dst));
+            StandardItemCommon::getStandardItemData(dst));
         if (nullptr == tmpFolder) {
             return;
         }
@@ -786,7 +787,7 @@ void LeftView::doDragMove(const QModelIndex &src, const QModelIndex &dst)
                     break;
                 }
                 tmpFolder = reinterpret_cast<VNoteFolder *>(
-                                StandardItemCommon::getStandardItemData(tmpIndex));
+                    StandardItemCommon::getStandardItemData(tmpIndex));
                 tmpFolder->sortNumber += 1;
 
             } else {
@@ -795,13 +796,13 @@ void LeftView::doDragMove(const QModelIndex &src, const QModelIndex &dst)
                     break;
                 }
                 tmpFolder = reinterpret_cast<VNoteFolder *>(
-                                StandardItemCommon::getStandardItemData(tmpIndex));
+                    StandardItemCommon::getStandardItemData(tmpIndex));
                 tmpFolder->sortNumber -= 1;
             }
         }
 
         tmpFolder = reinterpret_cast<VNoteFolder *>(
-                        StandardItemCommon::getStandardItemData(src));
+            StandardItemCommon::getStandardItemData(src));
         tmpFolder->sortNumber = dstNum;
 
         sort();
@@ -824,7 +825,7 @@ void LeftView::setNumberOfNotes(int numberOfNotes)
 void LeftView::triggerDragFolder()
 {
     QModelIndex dragIndex = this->indexAt(mapFromGlobal(QCursor::pos()));
-    if(!dragIndex.isValid()){
+    if (!dragIndex.isValid()) {
         m_isDraging = true;
         return;
     }
@@ -839,13 +840,13 @@ void LeftView::triggerDragFolder()
         if (nullptr == m_MoveView) {
             m_MoveView = new MoveView(this);
         }
-        m_MoveView->setFixedSize(224,91);
+        m_MoveView->setFixedSize(224, 91);
         m_MoveView->setFolder(folder);
         drag->setPixmap(m_MoveView->grab());
         drag->setMimeData(mimeData);
         m_folderDraing = true;
         //解决高分屏显示与鼠标位置不对应问题，使用固定位置
-        drag->setHotSpot(QPoint(21,25));
+        drag->setHotSpot(QPoint(21, 25));
         drag->exec(Qt::MoveAction);
         drag->deleteLater();
         m_folderDraing = false;
@@ -861,14 +862,14 @@ void LeftView::triggerDragFolder()
  * @param event
  * 拖拽放下事件
  */
-void LeftView::dropEvent(QDropEvent * event)
+void LeftView::dropEvent(QDropEvent *event)
 {
     // 判断拖拽放下事件触发类型（笔记：NOTES_DRAG_KEY；记事本：NOTEPAD_DRAG_KEY）
     if (event->mimeData()->hasFormat(NOTES_DRAG_KEY)) {
         //拖拽到当前记事本不取消选中
-        QModelIndex index = indexAt( event->pos());
+        QModelIndex index = indexAt(event->pos());
         //如果释放位置为当前笔记或空白区域，取消拖拽
-        bool isDragCancelled = currentIndex().row() == index.row()|| !index.isValid()? true:false;
+        bool isDragCancelled = currentIndex().row() == index.row() || !index.isValid() ? true : false;
         //拖拽取消后选中
         emit dropNotesEnd(isDragCancelled);
     } else if (event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)) {

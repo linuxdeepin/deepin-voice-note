@@ -240,13 +240,13 @@ bool GstreamRecorder::startRecord()
  */
 void GstreamRecorder::stopRecord()
 {
-    if(m_pipeline){
+    if (m_pipeline) {
         int state = -1;
         int pending = -1;
         GetGstState(&state, &pending);
-        if(state == GST_STATE_PAUSED){
+        if (state == GST_STATE_PAUSED) {
             gst_element_set_state(m_pipeline, GST_STATE_PLAYING);
-        }else if (state != GST_STATE_PLAYING) {
+        } else if (state != GST_STATE_PLAYING) {
             emit recordFinshed();
             return;
         }
@@ -329,7 +329,7 @@ bool GstreamRecorder::doBusMessage(GstMessage *message)
         }
         break;
     }
-    case GST_MESSAGE_EOS:{
+    case GST_MESSAGE_EOS: {
         emit recordFinshed();
         break;
     }
@@ -392,8 +392,8 @@ void GstreamRecorder::setStateToNull()
 {
     GstState cur_state, pending;
     gst_element_get_state(m_pipeline, &cur_state, &pending, 0);
-    if(cur_state == GST_STATE_NULL){
-        if(pending != GST_STATE_VOID_PENDING){
+    if (cur_state == GST_STATE_NULL) {
+        if (pending != GST_STATE_VOID_PENDING) {
             gst_element_set_state(m_pipeline, GST_STATE_NULL);
         }
         return;

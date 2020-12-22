@@ -129,7 +129,7 @@ void LeftViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionV
 {
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
     int y = 8;
-    if(0 == index.row()){
+    if (0 == index.row()) {
         y += 5;
     }
     edit->move(option.rect.x() + 50, option.rect.y() + y);
@@ -157,13 +157,13 @@ QSize LeftViewDelegate::sizeHint(const QStyleOptionViewItem &option,
     QModelIndex nextIndex = index.siblingAtRow(index.row() + 1);
 
     //待移动记事本列表行高36,左侧记事本列表行高47px
-    int height = (m_isPendingList)? 36 : 47;
+    int height = (m_isPendingList) ? 36 : 47;
     switch (type) {
     case StandardItemCommon::NOTEPADROOT:
         return QSize(option.rect.width(), 1); //隐藏记事本一级目录
     case StandardItemCommon::NOTEPADITEM:
         //左侧记事本列表调整高度
-        if(!m_isPendingList){
+        if (!m_isPendingList) {
             //第一行空间+4
             if (index.row() == 0) {
                 height += 4;
@@ -231,13 +231,13 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
     //绘制区域
     QRect paintRect;
     //区分左侧记事本列表和待移动记事本列表
-    if(m_isPendingList){
-            paintRect = QRect(option.rect.x(), option.rect.y() ,option.rect.width() -5, option.rect.height());
-    }else {
-        if ( firstIndexHeightParam == option.rect.height() ) {
+    if (m_isPendingList) {
+        paintRect = QRect(option.rect.x(), option.rect.y(), option.rect.width() - 5, option.rect.height());
+    } else {
+        if (firstIndexHeightParam == option.rect.height()) {
             paintRect = QRect(option.rect.x() + 10, option.rect.y() + 10,
                               option.rect.width() - 20, option.rect.height() - 14);
-        } else if  (lastIndexHeightParam == option.rect.height()) {
+        } else if (lastIndexHeightParam == option.rect.height()) {
             paintRect = QRect(option.rect.x() + 10, option.rect.y() + 5,
                               option.rect.width() - 20, option.rect.height() - 14);
         } else {
@@ -245,8 +245,8 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
                               option.rect.width() - 20, option.rect.height() - 10);
         }
     }
-    int param =  (option.rect.height() == 51) ?  5 : 0;
-    param = (option.rect.height() == 52 ) ? 4 : param;
+    int param = (option.rect.height() == 51) ? 5 : 0;
+    param = (option.rect.height() == 52) ? 4 : param;
     QPainterPath path;
     const int radius = 8;
     path.moveTo(paintRect.bottomRight() - QPoint(0, radius));
@@ -276,7 +276,7 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
             enable = false;
         } else {
             if ((option.state & QStyle::State_MouseOver)) {
-                if(m_draging){
+                if (m_draging) {
                     QPoint point = m_treeView->mapFromGlobal(QCursor::pos());
                     QModelIndex dstIndex = m_treeView->indexAt(point);
                     QModelIndex srcIndex = m_treeView->currentIndex();
@@ -284,56 +284,54 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
                     painter->setBrush(QBrush(fillColor));
                     bool underCurrentRect = false;
                     QRect rect = option.rect;
-                    if(point.y()>option.rect.topLeft().y()+0.5*option.rect.height()){
+                    if (point.y() > option.rect.topLeft().y() + 0.5 * option.rect.height()) {
                         underCurrentRect = true;
-                    }else if (point.y()<option.rect.topLeft().y()+0.5*option.rect.height()) {
+                    } else if (point.y() < option.rect.topLeft().y() + 0.5 * option.rect.height()) {
                         underCurrentRect = false;
                     }
-                    if(dstIndex.row() > srcIndex.row()){
-                        if(!underCurrentRect && dstIndex.row() != srcIndex.row()+1){
-                            int upperParam = lastIndexHeightParam == option.rect.height()?4:0;
-                            rect = QRect(QPoint(option.rect.topLeft().x(),option.rect.topLeft().y()-option.rect.height()+upperParam)
-                                         ,QPoint(option.rect.bottomRight().x(),option.rect.bottomRight().y()-option.rect.height()+upperParam));
+                    if (dstIndex.row() > srcIndex.row()) {
+                        if (!underCurrentRect && dstIndex.row() != srcIndex.row() + 1) {
+                            int upperParam = lastIndexHeightParam == option.rect.height() ? 4 : 0;
+                            rect = QRect(QPoint(option.rect.topLeft().x(), option.rect.topLeft().y() - option.rect.height() + upperParam), QPoint(option.rect.bottomRight().x(), option.rect.bottomRight().y() - option.rect.height() + upperParam));
                         }
                         //左下triangle
                         QRect rc(rect.x() + 12, rect.y() + rect.height() - param - 3, 6, 7);
-                        paintTriangle(painter,rc, painter->brush(), true);
+                        paintTriangle(painter, rc, painter->brush(), true);
                         painter->fillRect(QRect(rect.x() + 15, rect.y() - 1 + rect.height() - param, paintRect.width() - 10, 2), painter->brush());
                         //右下triangle
                         rc = QRect(rect.right() - 15, rect.y() + rect.height() - param - 3, 6, 7);
-                        paintTriangle(painter,rc, painter->brush(), false);
+                        paintTriangle(painter, rc, painter->brush(), false);
                     }
                     //目标索引与当前索引相当时，不绘制横线效果
-                    else if(dstIndex.row() < srcIndex.row()){
-                        if(underCurrentRect && dstIndex.row() != srcIndex.row()-1){
-                            int lowerParam = index.row()==0?5:0;
-                            rect = QRect(QPoint(option.rect.topLeft().x(),option.rect.topLeft().y()+option.rect.height()-lowerParam)
-                                         ,QPoint(option.rect.bottomRight().x(),option.rect.bottomRight().y()+option.rect.height()-lowerParam));
+                    else if (dstIndex.row() < srcIndex.row()) {
+                        if (underCurrentRect && dstIndex.row() != srcIndex.row() - 1) {
+                            int lowerParam = index.row() == 0 ? 5 : 0;
+                            rect = QRect(QPoint(option.rect.topLeft().x(), option.rect.topLeft().y() + option.rect.height() - lowerParam), QPoint(option.rect.bottomRight().x(), option.rect.bottomRight().y() + option.rect.height() - lowerParam));
                         }
                         //左上triangle
                         QRect rc(rect.x() + 12, rect.y() + param - 3, 6, 7);
-                        paintTriangle(painter,rc, painter->brush(), true);
+                        paintTriangle(painter, rc, painter->brush(), true);
                         //调整横线长度
-                        painter->fillRect(QRect(rect.x()+ 15, rect.y() + param -1, paintRect.width() - 10 , 2), painter->brush());
+                        painter->fillRect(QRect(rect.x() + 15, rect.y() + param - 1, paintRect.width() - 10, 2), painter->brush());
                         //右上triangle
                         rc = QRect(rect.right() - 15, rect.y() + param - 3, 6, 7);
-                        paintTriangle(painter,rc, painter->brush(), false);
+                        paintTriangle(painter, rc, painter->brush(), false);
                     }
                     painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
                     painter->fillPath(path, painter->brush());
                     painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
-                }else if(m_drawHover){
+                } else if (m_drawHover) {
                     painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
                     painter->fillPath(path, painter->brush());
                     painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
-                }else {
+                } else {
                     painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
                     painter->fillPath(path, painter->brush());
                     painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
                 }
             } else {
                 //根据ui设计，区分奇偶行背景颜色
-                if(index.row()%2 == 0 || !m_isPendingList){
+                if (index.row() % 2 == 0 || !m_isPendingList) {
                     //解决待移动列表字体颜色问题
                     isPaintBackGroud = true;
                 }
@@ -352,7 +350,7 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
         QRect nameRect(iconRect.right() + 12, paintRect.top(),
                        numRect.left() - iconRect.right() - 15, paintRect.height());
 
-        if(m_drawNotesNum){
+        if (m_drawNotesNum) {
             painter->drawText(numRect, Qt::AlignRight | Qt::AlignVCenter, strNum);
         }
 
@@ -366,7 +364,7 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
         painter->drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
     }
     //解决待移动列表字体颜色问题
-    if(isPaintBackGroud){
+    if (isPaintBackGroud) {
         painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
         painter->fillPath(path, painter->brush());
         painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
@@ -381,19 +379,19 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
  * @param brush
  * @param left true:三角向右，false:三角向左
  */
-void LeftViewDelegate::paintTriangle(QPainter *painter, const QRect& rc, const QBrush &brush, bool left) const
+void LeftViewDelegate::paintTriangle(QPainter *painter, const QRect &rc, const QBrush &brush, bool left) const
 {
     QPainterPath path;
-    if(left){
+    if (left) {
         path.moveTo(rc.topLeft());
-        path.lineTo(rc.right(), rc.top()+ (rc.height() / 2));
+        path.lineTo(rc.right(), rc.top() + (rc.height() / 2));
         path.lineTo(rc.bottomLeft());
-    }else {
-        path.moveTo(rc.left(), rc.top()+ (rc.height() / 2));
+    } else {
+        path.moveTo(rc.left(), rc.top() + (rc.height() / 2));
         path.lineTo(rc.bottomRight());
         path.lineTo(rc.topRight());
     }
-    painter->fillPath(path,brush);
+    painter->fillPath(path, brush);
 }
 
 /**

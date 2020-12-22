@@ -726,7 +726,6 @@ bool UpdateNoteDbVisitor::prepareSqls()
 UpdateNoteTopDbVisitor::UpdateNoteTopDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
-
 }
 
 /**
@@ -737,19 +736,19 @@ bool UpdateNoteTopDbVisitor::prepareSqls()
     bool fPrepareOK = true;
     static constexpr char const *UPDATE_NOTE_TOP = "UPDATE %s SET %s=%d WHERE %s=%d;";
     const VNoteItem *note = param.newNote;
-    if(note != nullptr){
+    if (note != nullptr) {
         QString updateSql;
         updateSql.sprintf(UPDATE_NOTE_TOP,
                           VNoteDbManager::NOTES_TABLE_NAME,
                           DBNote::noteColumnsName[DBNote::is_top].toUtf8().data(),
-                note->isTop,
-                DBNote::noteColumnsName[DBNote::note_id].toUtf8().data(),
-                note->noteId);
+                          note->isTop,
+                          DBNote::noteColumnsName[DBNote::note_id].toUtf8().data(),
+                          note->noteId);
         m_dbvSqls.append(updateSql);
-    }else {
-       fPrepareOK = false;
+    } else {
+        fPrepareOK = false;
     }
-    return  fPrepareOK;
+    return fPrepareOK;
 }
 
 /**
@@ -761,7 +760,6 @@ bool UpdateNoteTopDbVisitor::prepareSqls()
 UpdateNoteFolderIdDbVisitor::UpdateNoteFolderIdDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
-
 }
 
 /**
@@ -770,22 +768,22 @@ UpdateNoteFolderIdDbVisitor::UpdateNoteFolderIdDbVisitor(QSqlDatabase &db, const
  */
 bool UpdateNoteFolderIdDbVisitor::prepareSqls()
 {
-     bool fPrepareOK = true;
-     static constexpr char const *UPDATE_NOTE_FOLDERID = "UPDATE %s SET %s=%lld WHERE %s=%d;";
-     const VNoteItem *note = param.newNote;
-     if(note != nullptr){
-         QString updateSql;
-         updateSql.sprintf(UPDATE_NOTE_FOLDERID,
-                           VNoteDbManager::NOTES_TABLE_NAME,
-                           DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data(),
-                 note->folderId,
-                 DBNote::noteColumnsName[DBNote::note_id].toUtf8().data(),
-                 note->noteId);
-         m_dbvSqls.append(updateSql);
-     }else {
+    bool fPrepareOK = true;
+    static constexpr char const *UPDATE_NOTE_FOLDERID = "UPDATE %s SET %s=%lld WHERE %s=%d;";
+    const VNoteItem *note = param.newNote;
+    if (note != nullptr) {
+        QString updateSql;
+        updateSql.sprintf(UPDATE_NOTE_FOLDERID,
+                          VNoteDbManager::NOTES_TABLE_NAME,
+                          DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data(),
+                          note->folderId,
+                          DBNote::noteColumnsName[DBNote::note_id].toUtf8().data(),
+                          note->noteId);
+        m_dbvSqls.append(updateSql);
+    } else {
         fPrepareOK = false;
-     }
-     return  fPrepareOK;
+    }
+    return fPrepareOK;
 }
 
 /**

@@ -28,7 +28,7 @@
 //多选操作页面
 const int m_iconWidth = 24;
 VnoteMultipleChoiceOptionWidget::VnoteMultipleChoiceOptionWidget(QWidget *parent)
-    :DWidget(parent)
+    : DWidget(parent)
 {
     initUi();
 }
@@ -36,7 +36,8 @@ VnoteMultipleChoiceOptionWidget::VnoteMultipleChoiceOptionWidget(QWidget *parent
 /**
  * @brief VnoteMultipleChoiceOptionWidget::initUi
  * @param
- *///初始化ui
+ */
+//初始化ui
 void VnoteMultipleChoiceOptionWidget::initUi()
 {
     QVBoxLayout *vlayout = new QVBoxLayout;
@@ -44,7 +45,7 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     DLabel *iconLabel = new DLabel(this);
     QImageReader reader;
     QPixmap pixmap;
-    QSize size(162,156);
+    QSize size(162, 156);
     reader.setFileName(QString(STAND_ICON_PAHT).append("detail_icon/detail_icon_note.svg"));
     const qreal ratio = qApp->devicePixelRatio();
     if (reader.canRead()) {
@@ -64,7 +65,7 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     m_tipsLabel = new DLabel(this);
     m_tipsLabel->setFixedHeight(29);
 
-    DFontSizeManager::instance()->bind(m_tipsLabel,DFontSizeManager::T4);
+    DFontSizeManager::instance()->bind(m_tipsLabel, DFontSizeManager::T4);
     QHBoxLayout *tipsLayout = new QHBoxLayout;
     tipsLayout->addStretch();
     tipsLayout->addWidget(m_tipsLabel);
@@ -101,47 +102,49 @@ void VnoteMultipleChoiceOptionWidget::initUi()
 /**
  * @brief VnoteMultipleChoiceOptionWidget::initConnections
  * @param number
- *///初始化链接
-void VnoteMultipleChoiceOptionWidget::initConnections(){
+ */
+//初始化链接
+void VnoteMultipleChoiceOptionWidget::initConnections()
+{
     //移动
-    connect(m_moveButton,&DToolButton::pressed,this,[=]{
-       buttonPressed(ButtonValue::Move);
+    connect(m_moveButton, &DToolButton::pressed, this, [=] {
+        buttonPressed(ButtonValue::Move);
     });
-    connect(m_moveButton,&DToolButton::clicked,this,[=]{
+    connect(m_moveButton, &DToolButton::clicked, this, [=] {
         trigger(ButtonValue::Move);
     });
     //保存文本
-    connect(m_saveTextButton,&DToolButton::pressed,this,[=]{
-       buttonPressed(ButtonValue::SaveAsTxT);
+    connect(m_saveTextButton, &DToolButton::pressed, this, [=] {
+        buttonPressed(ButtonValue::SaveAsTxT);
     });
-    connect(m_saveTextButton,&DToolButton::clicked,this,[=]{
+    connect(m_saveTextButton, &DToolButton::clicked, this, [=] {
         trigger(ButtonValue::SaveAsTxT);
     });
     //保存语音
-    connect(m_saveVoiceButton,&DToolButton::pressed,this,[=]{
-       buttonPressed(ButtonValue::SaveAsVoice);
+    connect(m_saveVoiceButton, &DToolButton::pressed, this, [=] {
+        buttonPressed(ButtonValue::SaveAsVoice);
     });
-    connect(m_saveVoiceButton,&DToolButton::clicked,this,[=]{
+    connect(m_saveVoiceButton, &DToolButton::clicked, this, [=] {
         trigger(ButtonValue::SaveAsVoice);
     });
     //删除
-    connect(m_deleteButton,&DToolButton::pressed,this,[=]{
-       buttonPressed(ButtonValue::Delete);
+    connect(m_deleteButton, &DToolButton::pressed, this, [=] {
+        buttonPressed(ButtonValue::Delete);
     });
-    connect(m_deleteButton,&DToolButton::clicked,this,[=]{
+    connect(m_deleteButton, &DToolButton::clicked, this, [=] {
         trigger(ButtonValue::Delete);
     });
     //恢复图标
-    connect(m_saveVoiceButton,&DToolButton::released,this,[=]{
+    connect(m_saveVoiceButton, &DToolButton::released, this, [=] {
         changeFromThemeType();
     });
-    connect(m_saveTextButton,&DToolButton::released,this,[=]{
+    connect(m_saveTextButton, &DToolButton::released, this, [=] {
         changeFromThemeType();
     });
-    connect(m_moveButton,&DToolButton::released,this,[=]{
-       changeFromThemeType();
+    connect(m_moveButton, &DToolButton::released, this, [=] {
+        changeFromThemeType();
     });
-    connect(m_deleteButton,&DToolButton::released,this,[=]{
+    connect(m_deleteButton, &DToolButton::released, this, [=] {
         changeFromThemeType();
     });
     //主题切换更换按钮和文本颜色
@@ -157,27 +160,28 @@ void VnoteMultipleChoiceOptionWidget::initConnections(){
  * @param value
  * press更新svg
  */
-void VnoteMultipleChoiceOptionWidget::buttonPressed(ButtonValue value){
-    DPalette dpalette  = DApplicationHelper::instance()->palette(m_deleteButton);
+void VnoteMultipleChoiceOptionWidget::buttonPressed(ButtonValue value)
+{
+    DPalette dpalette = DApplicationHelper::instance()->palette(m_deleteButton);
     QColor textColor = dpalette.color(DPalette::Highlight);
     QString color = textColor.name(QColor::HexRgb);
     QString iconPath = QString(STAND_ICON_PAHT).append("light/");
     QPixmap pixmap;
     switch (value) {
     case ButtonValue::Move:
-        pixmap = setSvgColor(iconPath.append("detail_notes_move.svg"),color);
+        pixmap = setSvgColor(iconPath.append("detail_notes_move.svg"), color);
         m_moveButton->setIcon(pixmap);
         break;
     case ButtonValue::SaveAsTxT:
-        pixmap = setSvgColor(iconPath.append("detail_notes_saveText.svg"),color);
+        pixmap = setSvgColor(iconPath.append("detail_notes_saveText.svg"), color);
         m_saveTextButton->setIcon(pixmap);
         break;
     case ButtonValue::SaveAsVoice:
-        pixmap = setSvgColor(iconPath.append("detail_notes_saveVoice.svg"),color);
+        pixmap = setSvgColor(iconPath.append("detail_notes_saveVoice.svg"), color);
         m_saveVoiceButton->setIcon(pixmap);
         break;
     case ButtonValue::Delete:
-        pixmap = setSvgColor(iconPath.append("detail_notes_delete.svg"),color);
+        pixmap = setSvgColor(iconPath.append("detail_notes_delete.svg"), color);
         m_deleteButton->setIcon(pixmap);
         break;
     }
@@ -186,10 +190,11 @@ void VnoteMultipleChoiceOptionWidget::buttonPressed(ButtonValue value){
 /**
  * @brief VnoteMultipleChoiceOptionWidget::setNoteNumber
  * @param number
- *///设置笔记数量
+ */
+//设置笔记数量
 void VnoteMultipleChoiceOptionWidget::setNoteNumber(int number)
 {
-    if(number != m_noteNumber){
+    if (number != m_noteNumber) {
         m_noteNumber = number;
         QString str = QString(DApplication::translate("DetailPage", "%1 notes selected").arg(number));
         m_tipsLabel->setText(str);
@@ -199,8 +204,9 @@ void VnoteMultipleChoiceOptionWidget::setNoteNumber(int number)
 /**
  * @brief VnoteMultipleChoiceOptionWidget::enableButtons
  * @param saveAsTxtButtonStatus,saveAsVoiceButtonStatus
- *///设置按钮是否置灰
-void VnoteMultipleChoiceOptionWidget::enableButtons(bool saveAsTxtButtonStatus, bool saveAsVoiceButtonStatus,bool moveButtonStatus)
+ */
+//设置按钮是否置灰
+void VnoteMultipleChoiceOptionWidget::enableButtons(bool saveAsTxtButtonStatus, bool saveAsVoiceButtonStatus, bool moveButtonStatus)
 {
     m_saveTextButton->setEnabled(saveAsTxtButtonStatus);
     m_saveVoiceButton->setEnabled(saveAsVoiceButtonStatus);
@@ -211,10 +217,11 @@ void VnoteMultipleChoiceOptionWidget::enableButtons(bool saveAsTxtButtonStatus, 
  * @brief VnoteMultipleChoiceOptionWidget::setSvgColor
  * @param svgPath
  * @param color
- *///获得svg
-QPixmap VnoteMultipleChoiceOptionWidget::setSvgColor(QString svgPath ,QString color)
+ */
+//获得svg
+QPixmap VnoteMultipleChoiceOptionWidget::setSvgColor(QString svgPath, QString color)
 {
-  //设置图标颜色
+    //设置图标颜色
     QString path = svgPath;
     QFile file(path);
     file.open(QIODevice::ReadOnly);
@@ -225,17 +232,17 @@ QPixmap VnoteMultipleChoiceOptionWidget::setSvgColor(QString svgPath ,QString co
     QDomElement elem = doc.documentElement();
     setSVGBackColor(elem, "fill", color);
 
-//    int scaled =qApp->devicePixelRatio() == 1.25 ? 2 : 1;
+    //    int scaled =qApp->devicePixelRatio() == 1.25 ? 2 : 1;
     double scaled = qApp->devicePixelRatio();
     QSvgRenderer svg_render(doc.toByteArray());
 
-    QPixmap pixmap(QSize(24,24)*scaled);
+    QPixmap pixmap(QSize(24, 24) * scaled);
     pixmap.fill(Qt::transparent);
     pixmap.setDevicePixelRatio(scaled);
 
     QPainter painter(&pixmap);
-    svg_render.render(&painter,QRect(0,0,24,24));
-    return  pixmap;
+    svg_render.render(&painter, QRect(0, 0, 24, 24));
+    return pixmap;
 }
 
 /**
@@ -243,17 +250,17 @@ QPixmap VnoteMultipleChoiceOptionWidget::setSvgColor(QString svgPath ,QString co
  * @param ielem
  * @param attr
  * @param val
- *///设置svg颜色属性
+ */
+//设置svg颜色属性
 void VnoteMultipleChoiceOptionWidget::setSVGBackColor(QDomElement &elem, QString attr, QString val)
 {
-    if (elem.tagName().compare("g") == 0 && elem.attribute("id").compare("color") == 0)
-    {
+    if (elem.tagName().compare("g") == 0 && elem.attribute("id").compare("color") == 0) {
         QString before_color = elem.attribute(attr);
         elem.setAttribute(attr, val);
     }
-    for (int i = 0; i < elem.childNodes().count(); i++)
-    {
-        if (!elem.childNodes().at(i).isElement()) continue;
+    for (int i = 0; i < elem.childNodes().count(); i++) {
+        if (!elem.childNodes().at(i).isElement())
+            continue;
         QDomElement element = elem.childNodes().at(i).toElement();
         setSVGBackColor(element, attr, val);
     }
@@ -264,7 +271,8 @@ void VnoteMultipleChoiceOptionWidget::setSVGBackColor(QDomElement &elem, QString
  * @param id
  * 触发多选操作
  */
-void VnoteMultipleChoiceOptionWidget::trigger(int id){
+void VnoteMultipleChoiceOptionWidget::trigger(int id)
+{
     //dtk控件偶现不能清空hover状态问题，手动清空hover状态
     m_moveButton->setAttribute(Qt::WA_UnderMouse, false);
     m_saveTextButton->setAttribute(Qt::WA_UnderMouse, false);
@@ -278,20 +286,21 @@ void VnoteMultipleChoiceOptionWidget::trigger(int id){
  * @param
  * 根据主题设置图标与删除按钮文本颜色
  */
-void VnoteMultipleChoiceOptionWidget::changeFromThemeType(){
-    bool isDark = (DApplicationHelper::DarkType ==  DApplicationHelper::instance()->themeType())? true:false;
+void VnoteMultipleChoiceOptionWidget::changeFromThemeType()
+{
+    bool isDark = (DApplicationHelper::DarkType == DApplicationHelper::instance()->themeType()) ? true : false;
     QString iconPath = QString(STAND_ICON_PAHT);
-    if(isDark){
+    if (isDark) {
         iconPath.append("dark/");
         //设置字体颜色（特殊颜色与UI沟通可以不根据DTK色板单独设置）
         DPalette deletePalette = DApplicationHelper::instance()->palette(m_deleteButton);
-        deletePalette.setBrush(DPalette::ButtonText,QColor("#9A2F2F"));
+        deletePalette.setBrush(DPalette::ButtonText, QColor("#9A2F2F"));
         DApplicationHelper::instance()->setPalette(m_deleteButton, deletePalette);
-    }else {
+    } else {
         iconPath.append("light/");
         //设置字体颜色（特殊颜色与UI沟通可以不根据DTK色板单独设置）
         DPalette deletePalette = DApplicationHelper::instance()->palette(m_deleteButton);
-        deletePalette.setBrush(DPalette::ButtonText,QColor("#FF5736"));
+        deletePalette.setBrush(DPalette::ButtonText, QColor("#FF5736"));
         DApplicationHelper::instance()->setPalette(m_deleteButton, deletePalette);
     }
     //根据主题设置图标
@@ -304,33 +313,35 @@ void VnoteMultipleChoiceOptionWidget::changeFromThemeType(){
 /**
  * @brief VnoteMultipleChoiceOptionWidget::onFontChanged
  * @param
- *///根据字体大小调整按钮UI
-void VnoteMultipleChoiceOptionWidget::onFontChanged(){
+ */
+//根据字体大小调整按钮UI
+void VnoteMultipleChoiceOptionWidget::onFontChanged()
+{
     QFontMetrics fontMetrics(m_deleteButton->font());
     //设置move和delete按钮的高度和文本内容
     m_moveButton->setText(DApplication::translate("NotesContextMenu", "Move"));
-    m_moveButton->setFixedHeight(m_iconWidth+2);
+    m_moveButton->setFixedHeight(m_iconWidth + 2);
     m_deleteButton->setText(DApplication::translate("NotesContextMenu", "Delete"));
-    m_deleteButton->setFixedHeight(m_iconWidth+2);
+    m_deleteButton->setFixedHeight(m_iconWidth + 2);
     //计算参数
-    int midWidth = width()-m_moveButton->width()-m_deleteButton->width();
-    int iconWidth = qCeil(qApp->devicePixelRatio()*m_iconWidth)+11;
-    int saveTextWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save as TXT"))+iconWidth;
-    int saveVoiceWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save voice recording"))+iconWidth;
+    int midWidth = width() - m_moveButton->width() - m_deleteButton->width();
+    int iconWidth = qCeil(qApp->devicePixelRatio() * m_iconWidth) + 11;
+    int saveTextWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save as TXT")) + iconWidth;
+    int saveVoiceWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save voice recording")) + iconWidth;
     //设置saveAsTxt按钮和saveAsVoice按钮文本和size
-    if(midWidth>saveTextWidth+saveVoiceWidth+11){
-        m_saveTextButton->setFixedSize(saveTextWidth+5,m_iconWidth+2);
-        m_saveVoiceButton->setFixedSize(saveVoiceWidth+5,m_iconWidth+2);
+    if (midWidth > saveTextWidth + saveVoiceWidth + 11) {
+        m_saveTextButton->setFixedSize(saveTextWidth + 5, m_iconWidth + 2);
+        m_saveVoiceButton->setFixedSize(saveVoiceWidth + 5, m_iconWidth + 2);
         m_saveTextButton->setText(DApplication::translate("NotesContextMenu", "Save as TXT"));
         m_saveVoiceButton->setText(DApplication::translate("NotesContextMenu", "Save voice recording"));
-    }else if(midWidth >0){
-        m_saveTextButton->setFixedSize(midWidth/2-11,m_iconWidth+2);
-        m_saveVoiceButton->setFixedSize(midWidth/2-11,m_iconWidth+2);
-        m_saveTextButton->setText(fontMetrics.elidedText(DApplication::translate("NotesContextMenu", "Save as TXT"),Qt::ElideRight,midWidth/2-iconWidth-11));
-        m_saveVoiceButton->setText(fontMetrics.elidedText(DApplication::translate("NotesContextMenu", "Save voice recording"),Qt::ElideRight,midWidth/2-iconWidth-11));
+    } else if (midWidth > 0) {
+        m_saveTextButton->setFixedSize(midWidth / 2 - 11, m_iconWidth + 2);
+        m_saveVoiceButton->setFixedSize(midWidth / 2 - 11, m_iconWidth + 2);
+        m_saveTextButton->setText(fontMetrics.elidedText(DApplication::translate("NotesContextMenu", "Save as TXT"), Qt::ElideRight, midWidth / 2 - iconWidth - 11));
+        m_saveVoiceButton->setText(fontMetrics.elidedText(DApplication::translate("NotesContextMenu", "Save voice recording"), Qt::ElideRight, midWidth / 2 - iconWidth - 11));
     }
     //设置iconSize
-    QSize iconSize(m_iconWidth,m_iconWidth);
+    QSize iconSize(m_iconWidth, m_iconWidth);
     m_moveButton->setIconSize(iconSize);
     m_saveTextButton->setIconSize(iconSize);
     m_saveVoiceButton->setIconSize(iconSize);

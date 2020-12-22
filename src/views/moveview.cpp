@@ -33,11 +33,11 @@ MoveView::MoveView(QWidget *parent)
 {
     //shadow
     setWindowFlags(Qt::FramelessWindowHint);
-    setAttribute(Qt::WA_TranslucentBackground,true);
-    if(m_folder){
-        setFixedSize(224,91);
-    }else {
-        setFixedSize(282,91);
+    setAttribute(Qt::WA_TranslucentBackground, true);
+    if (m_folder) {
+        setFixedSize(224, 91);
+    } else {
+        setFixedSize(282, 91);
     }
 }
 
@@ -63,7 +63,7 @@ void MoveView::setNote(VNoteItem *note)
  * @brief MoveView::setNoteList
  * 设置笔记数据列表
  */
-void MoveView::setNoteList(QList<VNoteItem *>noteList)
+void MoveView::setNoteList(QList<VNoteItem *> noteList)
 {
     m_noteList = noteList;
 }
@@ -73,26 +73,26 @@ void MoveView::setNoteList(QList<VNoteItem *>noteList)
  */
 void MoveView::paintEvent(QPaintEvent *)
 {
-    if(DGuiApplicationHelper::instance()->themeType()==DGuiApplicationHelper::LightType){
+    if (DGuiApplicationHelper::instance()->themeType() == DGuiApplicationHelper::LightType) {
         m_isDarkThemeType = false;
-    }else {
+    } else {
         m_isDarkThemeType = true;
     }
     QString imagePath = QString(STAND_ICON_PAHT);
     //深色主题
-    if(m_isDarkThemeType){
+    if (m_isDarkThemeType) {
         imagePath.append("dark/");
     }
     //浅色主题
     else {
         imagePath.append("light/");
     }
-    if(m_folder){
+    if (m_folder) {
         m_backGroundPixMap = QPixmap(imagePath.append("drag_notePad.svg"));
-    }else {
-        if(1 < m_notesNumber){
+    } else {
+        if (1 < m_notesNumber) {
             m_backGroundPixMap = QPixmap(imagePath.append("drag_notes.svg"));
-        }else if(1 == m_notesNumber){
+        } else if (1 == m_notesNumber) {
             m_backGroundPixMap = QPixmap(imagePath.append("drag_note.svg"));
         }
     }
@@ -104,16 +104,16 @@ void MoveView::paintEvent(QPaintEvent *)
     painter.setPen(Qt::NoPen);
     QFontMetrics fontMetrics = painter.fontMetrics();
     QRect paintRect = rect();
-    if(m_folder){
+    if (m_folder) {
         //设置透明度
-        if(!m_isDarkThemeType){
+        if (!m_isDarkThemeType) {
             painter.setOpacity(0.9);
         }
-        painter.drawPixmap(rect(),m_backGroundPixMap);
+        painter.drawPixmap(rect(), m_backGroundPixMap);
         painter.setOpacity(1);
         //设置背景颜色
         QColor color;
-        color = pb.color(DPalette::Normal,DPalette::Window);
+        color = pb.color(DPalette::Normal, DPalette::Window);
         color.setAlphaF(0.80);
         painter.setBrush(color);
         QPainterPath PainterPath;
@@ -136,18 +136,18 @@ void MoveView::paintEvent(QPaintEvent *)
         //绘制记事本名称
         QString elideText = fontMetrics.elidedText(m_folder->name, Qt::ElideRight, nameRect.width());
         painter.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
-    }else {
+    } else {
         //多个笔记拖拽
-        if(m_notesNumber > 1){
-            if(m_isDarkThemeType){
+        if (m_notesNumber > 1) {
+            if (m_isDarkThemeType) {
                 painter.setOpacity(0.98);
             }
             //设置透明度
-            painter.drawPixmap(rect(),m_backGroundPixMap);
+            painter.drawPixmap(rect(), m_backGroundPixMap);
             painter.setOpacity(1);
 
             QColor color;
-            color = pb.color(DPalette::Normal,DPalette::Window);
+            color = pb.color(DPalette::Normal, DPalette::Window);
             painter.setBrush(color);
             painter.setPen(QPen(pb.color(DPalette::Normal, DPalette::Text)));
             paintRect.setLeft(paintRect.left() + 42);
@@ -158,11 +158,11 @@ void MoveView::paintEvent(QPaintEvent *)
 
             //字体大小设置成固定大小，以免显示遮挡
             int widths = 0;
-            QString numString  = "";
-            if(99 < m_notesNumber){
+            QString numString = "";
+            if (99 < m_notesNumber) {
                 widths = fontMetrics.width(("..."));
                 numString = "...";
-            }else {
+            } else {
                 widths = fontMetrics.width(QString::number(m_notesNumber));
                 numString = QString::number(m_notesNumber);
             }
@@ -170,27 +170,27 @@ void MoveView::paintEvent(QPaintEvent *)
             QColor color2("#FD5E5E");
             painter.setPen(QPen(color2));
             painter.setBrush(color2);
-            if(m_notesNumber < 10){
-                painter.drawEllipse(QPointF(248, 28 ), 12.5, 12.5);
-            }else {
-                painter.drawEllipse(QPointF(248, 28 ), 12.5+(widths-7)/4,12.5+(widths-7)/4);
+            if (m_notesNumber < 10) {
+                painter.drawEllipse(QPointF(248, 28), 12.5, 12.5);
+            } else {
+                painter.drawEllipse(QPointF(248, 28), 12.5 + (widths - 7) / 4, 12.5 + (widths - 7) / 4);
             }
             QColor color3("#FFFFFF");
             painter.setPen(QPen(color3));
             painter.setBrush(color3);
             //绘制笔记数量
-            QRect numberRect(QPoint(240-((widths-7)/2),19),QSize(16+(widths-7),19));
+            QRect numberRect(QPoint(240 - ((widths - 7) / 2), 19), QSize(16 + (widths - 7), 19));
             painter.drawText(numberRect, Qt::AlignCenter, numString);
         }
         //单个笔记拖拽
         else if (1 == m_notesNumber) {
-            if(!m_isDarkThemeType){
+            if (!m_isDarkThemeType) {
                 painter.setOpacity(0.9);
             }
-            painter.drawPixmap(rect(),m_backGroundPixMap);
+            painter.drawPixmap(rect(), m_backGroundPixMap);
             painter.setOpacity(1);
             QColor color;
-            color = pb.color(DPalette::Normal,DPalette::Window);
+            color = pb.color(DPalette::Normal, DPalette::Window);
             painter.setBrush(color);
             painter.setPen(QPen(pb.color(DPalette::Normal, DPalette::Text)));
             paintRect.setLeft(paintRect.left() + 42);

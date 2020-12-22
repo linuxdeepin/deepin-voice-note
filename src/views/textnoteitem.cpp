@@ -287,7 +287,7 @@ void TextNoteItem::onTextChange()
 void TextNoteItem::onTextCursorChange()
 {
     if (this->hasFocus()) {
-        QRect rc =  m_textEdit->cursorRect();
+        QRect rc = m_textEdit->cursorRect();
         int height = rc.top() ? rc.bottom() + 5 : -(rc.bottom() + 5);
         if (m_lastCursorHeight != height) {
             m_lastCursorHeight = height;

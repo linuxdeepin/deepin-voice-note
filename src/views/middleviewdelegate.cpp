@@ -328,9 +328,9 @@ void MiddleViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptio
                                               const QModelIndex &index) const
 {
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
-    if (m_searchKey.isEmpty() && index.isValid() && index.row() == 0){
+    if (m_searchKey.isEmpty() && index.isValid() && index.row() == 0) {
         VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
-        if(data && data->isTop){
+        if (data && data->isTop) {
             return edit->move(option.rect.x() + 28, option.rect.y() + 43);
         }
     }
@@ -456,7 +456,6 @@ void MiddleViewDelegate::paintNormalItem(QPainter *painter, const QStyleOptionVi
     if (lineRect.isValid()) {
         //绘制分割线
         painter->fillRect(lineRect, m_parentPb.color(DPalette::Normal, DPalette::FrameBorder));
-
     }
 
     bool isSelect = false;

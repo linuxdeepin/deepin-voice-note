@@ -295,29 +295,29 @@ bool VNoteItemOper::deleteNote()
 bool VNoteItemOper::updateTop(int value)
 {
     bool updateOK = false;
-    if(nullptr != m_note){
-        if(m_note->isTop == value){
+    if (nullptr != m_note) {
+        if (m_note->isTop == value) {
             return updateOK;
         }
         m_note->isTop = value;
         UpdateNoteTopDbVisitor updateNoteVisitor(VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
-        if(!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
+        if (!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
             updateOK = true;
-        }else {
+        } else {
             m_note->isTop = !value;
         }
     }
-    return  updateOK;
+    return updateOK;
 }
 
 bool VNoteItemOper::updateFolderId(VNoteItem *data)
 {
     bool updateOK = false;
-    if(nullptr != data){
+    if (nullptr != data) {
         UpdateNoteFolderIdDbVisitor updateNoteVisitor(VNoteDbManager::instance()->getVNoteDb(), data, nullptr);
-        if(!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
+        if (!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
             updateOK = true;
         }
     }
-    return  updateOK;
+    return updateOK;
 }

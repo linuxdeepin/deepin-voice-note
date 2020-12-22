@@ -270,7 +270,7 @@ void VoiceNoteItem::onAsrTextChange()
 
     this->setFixedHeight(height);
 
-    if(m_adjustBar){
+    if (m_adjustBar) {
         emit sigCursorHeightChange(this, height);
     }
 }

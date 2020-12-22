@@ -31,8 +31,8 @@ static qint64 initializeAppFinishMs = 0;
  */
 void PerformanceMonitor::initializeAppStart()
 {
-     QDateTime current = QDateTime::currentDateTime();
-     initializeAppStartMs = current.toMSecsSinceEpoch();
+    QDateTime current = QDateTime::currentDateTime();
+    initializeAppStartMs = current.toMSecsSinceEpoch();
 }
 
 /**
@@ -44,5 +44,5 @@ void PerformanceMonitor::initializeAppFinish()
     QDateTime current = QDateTime::currentDateTime();
     initializeAppFinishMs = current.toMSecsSinceEpoch();
     qint64 time = initializeAppFinishMs - initializeAppStartMs;
-    qInfo()<< QString("[GRABPOINT] POINT-01 startduration=%1ms").arg(time);
+    qInfo() << QString("[GRABPOINT] POINT-01 startduration=%1ms").arg(time);
 }

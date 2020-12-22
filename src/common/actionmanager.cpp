@@ -215,7 +215,7 @@ void ActionManager::initMenu()
 
         noteMenuIdStart++;
 
-        if(noteMenuIdStart == NoteAddNew){
+        if (noteMenuIdStart == NoteAddNew) {
             m_noteContextMenu->addSeparator();
         }
     }

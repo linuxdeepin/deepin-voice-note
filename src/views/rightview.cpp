@@ -243,14 +243,14 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
  */
 void RightView::onTextEditFocusIn()
 {
-    if(m_curAsrItem){
-       TextNoteItem *widget = static_cast<TextNoteItem *>(sender());
-       int height = 0;
-       QRect rc = widget->getCursorRect();
-       if (!rc.isEmpty()) {
-           height = rc.bottom();
-       }
-       adjustVerticalScrollBar(widget, height);
+    if (m_curAsrItem) {
+        TextNoteItem *widget = static_cast<TextNoteItem *>(sender());
+        int height = 0;
+        QRect rc = widget->getCursorRect();
+        if (!rc.isEmpty()) {
+            height = rc.bottom();
+        }
+        adjustVerticalScrollBar(widget, height);
     }
 }
 
@@ -788,7 +788,7 @@ bool RightView::checkFileExist(const QString &file)
 {
     QFileInfo fi(file);
     if (!fi.exists()) {
-        if(m_fileHasDelDialog == nullptr){
+        if (m_fileHasDelDialog == nullptr) {
             DLabel *m_pMessage = new DLabel(this);
             m_pMessage->setText(DApplication::translate("RightView", "The voice note has been deleted"));
             DFontSizeManager::instance()->bind(m_pMessage, DFontSizeManager::T6);
@@ -816,7 +816,7 @@ bool RightView::checkFileExist(const QString &file)
 void RightView::adjustVerticalScrollBar(QWidget *widget, int defaultHeight)
 {
     int tolHeight = defaultHeight;
-    if(tolHeight >= 0){
+    if (tolHeight >= 0) {
         tolHeight += 20;
     }
     int index = m_viewportLayout->indexOf(widget);
@@ -834,10 +834,10 @@ void RightView::adjustVerticalScrollBar(QWidget *widget, int defaultHeight)
 void RightView::adjustVoiceVerticalScrollBar(DetailItemWidget *widget, int defaultHeight)
 {
     int index = m_viewportLayout->indexOf(widget);
-    QLayoutItem* nextItem = m_viewportLayout->itemAt(index + 1);
-    if(nextItem){
+    QLayoutItem *nextItem = m_viewportLayout->itemAt(index + 1);
+    if (nextItem) {
         DetailItemWidget *nextWidget = static_cast<DetailItemWidget *>(nextItem->widget());
-        if(nextWidget->hasFocus()){
+        if (nextWidget->hasFocus()) {
             widget = nextWidget;
             QRect rc = nextWidget->getCursorRect();
             defaultHeight = rc.bottom();
@@ -1376,7 +1376,7 @@ void RightView::saveMp3()
 
                 QString exportDir = dialog.directoryUrl().toLocalFile();
                 //多选操作-导出语音
-                QList<VNoteItem *>noteDataList;
+                QList<VNoteItem *> noteDataList;
                 noteDataList.append(m_noteItemData);
                 ExportNoteWorker *exportWorker = new ExportNoteWorker(
                     exportDir, ExportNoteWorker::ExportOneVoice, noteDataList, block);

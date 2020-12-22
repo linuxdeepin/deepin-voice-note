@@ -202,20 +202,22 @@ void VNoteMainWindow::initConnections()
     connect(ActionManager::Instance()->detialContextMenu(), &DMenu::triggered,
             this, &VNoteMainWindow::onMenuAction);
     //处理笔记拖拽释放
-    connect(m_leftView,&LeftView::dropNotesEnd,this,&VNoteMainWindow::onDropNote);
+    connect(m_leftView, &LeftView::dropNotesEnd, this, &VNoteMainWindow::onDropNote);
     //处理详情页刷新请求
-    connect(m_middleView,&MiddleView::requestChangeRightView,this,&VNoteMainWindow::changeRightView);
+    connect(m_middleView, &MiddleView::requestChangeRightView, this, &VNoteMainWindow::changeRightView);
     //处理详情页多选操作
-    connect(m_multipleSelectWidget,&VnoteMultipleChoiceOptionWidget::requestMultipleOption,this,&VNoteMainWindow::handleMultipleOption);
+    connect(m_multipleSelectWidget, &VnoteMultipleChoiceOptionWidget::requestMultipleOption, this, &VNoteMainWindow::handleMultipleOption);
 }
 
 /**
  * @brief VNoteMainWindow::changeRightView
- *///刷新详情页显示
-void VNoteMainWindow::changeRightView(bool isMultiple){
+ */
+//刷新详情页显示
+void VNoteMainWindow::changeRightView(bool isMultiple)
+{
     m_multipleSelectWidget->setNoteNumber(m_middleView->getSelectedCount());
-    if(isMultiple){
-        if(m_rightView->getIsNormalView()){
+    if (isMultiple) {
+        if (m_rightView->getIsNormalView()) {
             m_stackedRightMainWidget->setCurrentWidget(m_multipleSelectWidget);
             m_rightView->setIsNormalView(false);
         }
@@ -223,12 +225,12 @@ void VNoteMainWindow::changeRightView(bool isMultiple){
         bool moveButtonEnable = true;
         if (stateOperation->isVoice2Text()
             || stateOperation->isSearching()
-            || 1== m_leftView->folderCount()) {
+            || 1 == m_leftView->folderCount()) {
             moveButtonEnable = false;
         }
-        m_multipleSelectWidget->enableButtons(m_middleView->haveText(),m_middleView->haveVoice(),moveButtonEnable);
-    }else {
-        if(!m_rightView->getIsNormalView()){
+        m_multipleSelectWidget->enableButtons(m_middleView->haveText(), m_middleView->haveVoice(), moveButtonEnable);
+    } else {
+        if (!m_rightView->getIsNormalView()) {
             m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
             m_rightView->setIsNormalView(true);
         }
@@ -306,7 +308,7 @@ void VNoteMainWindow::initShortcuts()
         //当前笔记是否正在编辑
         bool isEditing = m_middleView->isPersistentEditorOpen(m_middleView->currentIndex());
         //如果已在编辑状态，取消操作，解决重复快捷键警告信息
-        if (canDoShortcutAction() && !isEditing){
+        if (canDoShortcutAction() && !isEditing) {
             editNote();
         }
     });
@@ -374,9 +376,9 @@ void VNoteMainWindow::initShortcuts()
     connect(m_stSaveAsText.get(), &QShortcut::activated, this, [this] {
         //多选笔记导出文本
         if (canDoShortcutAction()) {
-                if (m_middleView->haveText()) {
-                    m_middleView->saveAsText();
-                }
+            if (m_middleView->haveText()) {
+                m_middleView->saveAsText();
+            }
         }
     });
 
@@ -392,9 +394,9 @@ void VNoteMainWindow::initShortcuts()
             //Can't save recording when do recording.
             //多选笔记导出语音
             if (!stateOperation->isRecording()) {
-                    if (m_middleView->haveVoice()) {
-                        m_middleView->saveRecords();
-                    }
+                if (m_middleView->haveVoice()) {
+                    m_middleView->saveRecords();
+                }
             }
         }
     });
@@ -825,7 +827,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
 {
     Q_UNUSED(previous);
 
-    if(m_asrErrMeassage){
+    if (m_asrErrMeassage) {
         m_asrErrMeassage->setVisible(false);
     }
     //记事本切换后刷新详情页
@@ -990,7 +992,7 @@ void VNoteMainWindow ::onA2TStartAgain()
  */
 void VNoteMainWindow::onA2TStart(bool first)
 {
-    if(m_asrErrMeassage){
+    if (m_asrErrMeassage) {
         m_asrErrMeassage->setVisible(false);
     }
 
@@ -1289,7 +1291,7 @@ bool VNoteMainWindow::checkIfNeedExit()
 void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 {
     Q_UNUSED(previous);
-    if(m_asrErrMeassage){
+    if (m_asrErrMeassage) {
         m_asrErrMeassage->setVisible(false);
     }
 
@@ -1332,7 +1334,7 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         addNote();
         break;
     case ActionManager::NoteDelete: {
-        VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this,m_middleView->getSelectedCount());
+        VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this, m_middleView->getSelectedCount());
         connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
             delNote();
         });
@@ -1403,17 +1405,16 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         m_middleView->setNextSelection();
 
         QModelIndexList notesdataList = m_middleView->getAllSelectNote();
-        if(notesdataList.size()){
+        if (notesdataList.size()) {
             QModelIndex selectFolder = m_leftView->selectMoveFolder(notesdataList);
             m_leftView->setNumberOfNotes(m_middleView->count());
-            if(selectFolder.isValid() && m_leftView->doNoteMove(notesdataList, selectFolder)){
+            if (selectFolder.isValid() && m_leftView->doNoteMove(notesdataList, selectFolder)) {
                 m_middleView->deleteModelIndexs(notesdataList);
                 //删除后设置选中
                 m_middleView->selectAfterRemoved();
             }
         }
-    }
-       break;
+    } break;
     default:
         break;
     }
@@ -1437,9 +1438,9 @@ void VNoteMainWindow::onMenuAbout2Show()
             || stateOperation->isVoice2Text()
             || stateOperation->isSearching()) {
             ActionManager::Instance()->enableAction(ActionManager::NoteAddNew, false);
-            if(!stateOperation->isSearching()){
+            if (!stateOperation->isSearching()) {
                 ActionManager::Instance()->enableAction(ActionManager::NoteDelete, false);
-            }else {
+            } else {
                 topAction->setEnabled(false);
             }
             if (stateOperation->isRecording()) {
@@ -1451,17 +1452,17 @@ void VNoteMainWindow::onMenuAbout2Show()
         //Disable SaveText if note have no text
         //Disable SaveVoice if note have no voice.
         //只有当前一个记事本，右键移动置灰
-        if(1 == m_leftView->folderCount()){
+        if (1 == m_leftView->folderCount()) {
             ActionManager::Instance()->enableAction(ActionManager::NoteMove, false);
         }
-        if(m_middleView->isMultipleSelected()){
-            if(!m_middleView->haveText()){
+        if (m_middleView->isMultipleSelected()) {
+            if (!m_middleView->haveText()) {
                 ActionManager::Instance()->enableAction(ActionManager::NoteSaveText, false);
             }
-            if(!m_middleView->haveVoice()){
+            if (!m_middleView->haveVoice()) {
                 ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
             }
-        }else {
+        } else {
             VNoteItem *currNoteData = m_middleView->getCurrVNotedata();
 
             if (nullptr != currNoteData) {
@@ -1472,9 +1473,9 @@ void VNoteMainWindow::onMenuAbout2Show()
                 if (!currNoteData->haveVoice()) {
                     ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
                 }
-                if(currNoteData->isTop){
+                if (currNoteData->isTop) {
                     topAction->setText(DApplication::translate("NotesContextMenu", "Unstick"));
-                }else {
+                } else {
                     topAction->setText(DApplication::translate("NotesContextMenu", "Sticky on Top"));
                 }
             }
@@ -1498,7 +1499,7 @@ void VNoteMainWindow::onMenuAbout2Show()
 int VNoteMainWindow::loadNotepads()
 {
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
-    QVariant value =  setting::instance()->getOption(VNOTE_FOLDER_SORT);
+    QVariant value = setting::instance()->getOption(VNOTE_FOLDER_SORT);
     QStringList tmpsortFolders = value.toString().split(",");
 
     int folderCount = 0;
@@ -1541,9 +1542,9 @@ void VNoteMainWindow::addNotepad()
 
         bool sortEnable = false;
         VNoteFolder *tmpFolder = m_leftView->getFirstFolder();
-        if(tmpFolder && -1 != tmpFolder->sortNumber){
-             newFolder->sortNumber = tmpFolder->sortNumber + 1;
-             sortEnable = true;
+        if (tmpFolder && -1 != tmpFolder->sortNumber) {
+            newFolder->sortNumber = tmpFolder->sortNumber + 1;
+            sortEnable = true;
         }
 
         m_leftView->addFolder(newFolder);
@@ -1643,7 +1644,7 @@ void VNoteMainWindow::delNote()
     QList<VNoteItem *> noteDataList = m_middleView->deleteCurrentRow();
 
     if (noteDataList.size()) {
-        for(auto noteData : noteDataList){
+        for (auto noteData : noteDataList) {
             m_rightView->removeCacheWidget(noteData);
             VNoteItemOper noteOper(noteData);
             noteOper.deleteNote();
@@ -1952,7 +1953,6 @@ void VNoteMainWindow::initAsrErrMessage()
     m_widget->setLayout(m_layout);
     m_asrErrMeassage->setWidget(m_widget);
     m_asrErrMeassage->setVisible(false);
-
 }
 
 /**
@@ -1978,7 +1978,7 @@ void VNoteMainWindow::initDeviceExceptionErrMessage()
  */
 void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
 {
-    if(m_asrErrMeassage == nullptr){
+    if (m_asrErrMeassage == nullptr) {
         initAsrErrMessage();
     }
 
@@ -2000,7 +2000,7 @@ void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
  */
 void VNoteMainWindow::showDeviceExceptionErrMessage()
 {
-    if(m_pDeviceExceptionMsg == nullptr){
+    if (m_pDeviceExceptionMsg == nullptr) {
         initDeviceExceptionErrMessage();
     }
 
@@ -2021,7 +2021,7 @@ void VNoteMainWindow::showDeviceExceptionErrMessage()
  */
 void VNoteMainWindow::closeDeviceExceptionErrMessage()
 {
-    if(m_pDeviceExceptionMsg){
+    if (m_pDeviceExceptionMsg) {
         m_pDeviceExceptionMsg->setVisible(false);
     }
 }
@@ -2110,15 +2110,15 @@ void VNoteMainWindow::onShowPrivacy()
     QLocale::Country country = locale.country();
     bool isCommunityEdition = DSysInfo::isCommunityEdition();
     if (country == QLocale::China) {
-        if(isCommunityEdition){
+        if (isCommunityEdition) {
             url = "https://www.deepin.org/zh/agreement/privacy/";
-        }else {
+        } else {
             url = "https://www.uniontech.com/agreement/privacy-cn";
         }
     } else {
-        if(isCommunityEdition){
+        if (isCommunityEdition) {
             url = "https://www.deepin.org/en/agreement/privacy/";
-        }else {
+        } else {
             url = "https://www.uniontech.com/agreement/privacy-en";
         }
     }
@@ -2159,11 +2159,11 @@ void VNoteMainWindow::initMenuExtension()
 void VNoteMainWindow::onDropNote(bool dropCancel)
 {
     //取消拖拽，return
-    if(dropCancel){
+    if (dropCancel) {
         m_middleView->setDragSuccess(false);
         return;
     }
-    QModelIndexList indexList =  m_middleView->getAllSelectNote();
+    QModelIndexList indexList = m_middleView->getAllSelectNote();
     QPoint point = m_leftView->mapFromGlobal(QCursor::pos());
     QModelIndex selectIndex = m_leftView->indexAt(point);
     m_leftView->setNumberOfNotes(m_middleView->count());
@@ -2180,23 +2180,23 @@ void VNoteMainWindow::onDropNote(bool dropCancel)
  * @param id
  * 响应多选详情页操作
  */
-void VNoteMainWindow::handleMultipleOption(int id){
+void VNoteMainWindow::handleMultipleOption(int id)
+{
     switch (id) {
-    case ButtonValue::Move:{
-             //多选页面-移动
-             m_middleView->setNextSelection();
-            QModelIndexList notesdata = m_middleView->getAllSelectNote();
-            if(notesdata.size()){
-                QModelIndex selectFolder = m_leftView->selectMoveFolder(notesdata);
-                m_leftView->setNumberOfNotes(m_middleView->count());
-                if(selectFolder.isValid() && m_leftView->doNoteMove(notesdata, selectFolder)){
-                    m_middleView->deleteModelIndexs(notesdata);
-                    //移除后选中
-                    m_middleView->selectAfterRemoved();
-                }
+    case ButtonValue::Move: {
+        //多选页面-移动
+        m_middleView->setNextSelection();
+        QModelIndexList notesdata = m_middleView->getAllSelectNote();
+        if (notesdata.size()) {
+            QModelIndex selectFolder = m_leftView->selectMoveFolder(notesdata);
+            m_leftView->setNumberOfNotes(m_middleView->count());
+            if (selectFolder.isValid() && m_leftView->doNoteMove(notesdata, selectFolder)) {
+                m_middleView->deleteModelIndexs(notesdata);
+                //移除后选中
+                m_middleView->selectAfterRemoved();
             }
         }
-        break;
+    } break;
     case ButtonValue::SaveAsTxT:
         //多选页面-保存TxT
         m_middleView->saveAsText();
@@ -2207,7 +2207,7 @@ void VNoteMainWindow::handleMultipleOption(int id){
         break;
     case ButtonValue::Delete:
         //多选页面-删除
-        VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this,m_middleView->getSelectedCount());
+        VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this, m_middleView->getSelectedCount());
         connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
             delNote();
         });

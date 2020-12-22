@@ -175,14 +175,14 @@ void MiddleView::clearAll()
  * @brief MiddleView::deleteCurrentRow
  * @return 移除的记事项绑定的数据
  */
-QList<VNoteItem *>MiddleView::deleteCurrentRow()
+QList<VNoteItem *> MiddleView::deleteCurrentRow()
 {
     QModelIndexList indexList = selectedIndexes();
     QList<VNoteItem *> noteItemList;
     qSort(indexList);
-    for(int i = indexList.size()-1;i>-1;i--){
+    for (int i = indexList.size() - 1; i > -1; i--) {
         VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-                                  StandardItemCommon::getStandardItemData(indexList[i]));
+            StandardItemCommon::getStandardItemData(indexList[i]));
         noteItemList.append(noteData);
         m_pSortViewFilter->removeRow(indexList[i].row());
     }
@@ -196,7 +196,7 @@ QList<VNoteItem *>MiddleView::deleteCurrentRow()
 VNoteItem *MiddleView::getCurrVNotedata() const
 {
     VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-                              StandardItemCommon::getStandardItemData(currentIndex()));
+        StandardItemCommon::getStandardItemData(currentIndex()));
 
     return noteData;
 }
@@ -205,13 +205,13 @@ VNoteItem *MiddleView::getCurrVNotedata() const
  * @brief MiddleView::getCurrVNotedataList
  * 获取当前笔记项
  */
-QList<VNoteItem *>MiddleView::getCurrVNotedataList() const
+QList<VNoteItem *> MiddleView::getCurrVNotedataList() const
 {
     QModelIndexList modelList = selectedIndexes();
     QList<VNoteItem *> noteDataList;
-    for(auto index:modelList){
+    for (auto index : modelList) {
         VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-                                  StandardItemCommon::getStandardItemData(index));
+            StandardItemCommon::getStandardItemData(index));
         noteDataList.append(noteData);
     }
 
@@ -252,7 +252,7 @@ void MiddleView::setCurrentIndex(int index)
 void MiddleView::editNote()
 {
     //多选取消重命名
-    if(1 == selectedIndexes().count()){
+    if (1 == selectedIndexes().count()) {
         edit(currentIndex());
     }
 }
@@ -266,11 +266,11 @@ void MiddleView::saveAsText()
     QModelIndexList indexList = selectedIndexes();
     qSort(indexList);
     QList<VNoteItem *> noteDataList;
-    for(auto index : indexList){
+    for (auto index : indexList) {
         VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-                                  StandardItemCommon::getStandardItemData(index));
+            StandardItemCommon::getStandardItemData(index));
         //只需导出有文本内容的笔记
-        if(noteData->haveText()){
+        if (noteData->haveText()) {
             noteDataList.append(noteData);
         }
     }
@@ -311,10 +311,10 @@ void MiddleView::saveRecords()
 {
     QModelIndexList indexList = selectedIndexes();
     qSort(indexList);
-    QList<VNoteItem *>noteItemList;
-    for(auto index : indexList){
+    QList<VNoteItem *> noteItemList;
+    for (auto index : indexList) {
         VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-                                  StandardItemCommon::getStandardItemData(index));
+            StandardItemCommon::getStandardItemData(index));
         noteItemList.append(noteData);
     }
     if (noteItemList.size()) {
@@ -359,7 +359,7 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
         //触控屏手势
         if (event->source() == Qt::MouseEventSynthesizedByQt) {
             //触屏多选
-            if(Qt::NoModifier == event->modifiers()){
+            if (Qt::NoModifier == event->modifiers()) {
                 //记录此时触控点的位置，用于move事件中滑动距离与速度
                 m_touchPressPoint = event->pos();
                 m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
@@ -381,40 +381,40 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
         if (!modelIndex.isValid())
             return;
         m_index = indexAt(event->pos());
-        m_currentRow = m_currentRow==-1?0:m_currentRow;
-        if(Qt::LeftButton == event->button() || Qt::MidButton == event->button()){
+        m_currentRow = m_currentRow == -1 ? 0 : m_currentRow;
+        if (Qt::LeftButton == event->button() || Qt::MidButton == event->button()) {
             //ctrl+左/中键
-            if(Qt::ControlModifier == event->modifiers()){
+            if (Qt::ControlModifier == event->modifiers()) {
                 //当前点击位置为最后一个选择，不做处理
-                if(selectedIndexes().count()==1){
-                    if(selectedIndexes().last().row() == indexAt(event->pos()).row()){
+                if (selectedIndexes().count() == 1) {
+                    if (selectedIndexes().last().row() == indexAt(event->pos()).row()) {
                         return;
                     }
                 }
                 //不延续当前状态则清空当前选中
-                if(getModifierState()!=ModifierState::noModifier && getModifierState()!= ModifierState::ctrlModifier){
+                if (getModifierState() != ModifierState::noModifier && getModifierState() != ModifierState::ctrlModifier) {
                     clearSelection();
                     //多选详情页
                     setCurrentIndex(modelIndex.row());
                     selectionModel()->select(m_pSortViewFilter->index(modelIndex.row(), 0), QItemSelectionModel::Select);
                     //普通详情页
                     changeRightView(false);
-                }else {
-                    if(selectedIndexes().contains(modelIndex)){
+                } else {
+                    if (selectedIndexes().contains(modelIndex)) {
                         selectionModel()->select(m_pSortViewFilter->index(modelIndex.row(), 0), QItemSelectionModel::Deselect);
                         //刷新详情页
-                        if(selectedIndexes().count()==1){
+                        if (selectedIndexes().count() == 1) {
                             //普通详情页
                             int row = selectedIndexes().last().row();
                             changeRightView(false);
                             //触发currentChanged信号，刷新详情页
                             setCurrentIndex(row);
                             selectionModel()->select(m_pSortViewFilter->index(row, 0), QItemSelectionModel::Select);
-                        }else {
+                        } else {
                             //多选详情页
                             changeRightView();
                         }
-                    }else {
+                    } else {
                         selectionModel()->select(m_pSortViewFilter->index(modelIndex.row(), 0), QItemSelectionModel::Select);
                         //多选详情页
                         changeRightView();
@@ -430,9 +430,9 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                 handleShiftAndPress(modelIndex);
                 selectionModel()->select(m_pSortViewFilter->index(modelIndex.row(), 0), QItemSelectionModel::Select);
                 //刷新详情页
-                if(modelIndex.row()!=m_currentRow){
+                if (modelIndex.row() != m_currentRow) {
                     changeRightView();
-                }else {
+                } else {
                     //普通详情页
                     changeRightView(false);
                     clearSelection();
@@ -451,25 +451,25 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
         }
         //右键press
         else {
-            if(MenuStatus::ReleaseFromMenu == m_menuState){
+            if (MenuStatus::ReleaseFromMenu == m_menuState) {
                 m_menuState = MenuStatus::Normal;
                 return;
             }
-            if(Qt::ShiftModifier == event->modifiers() || Qt::CTRL == event->modifiers()){
+            if (Qt::ShiftModifier == event->modifiers() || Qt::CTRL == event->modifiers()) {
                 //shift+右键
-                if(Qt::ShiftModifier == event->modifiers()){
+                if (Qt::ShiftModifier == event->modifiers()) {
                     //首先处理选中
-                    if(m_currentRow == modelIndex.row()){
+                    if (m_currentRow == modelIndex.row()) {
                         changeRightView(false);
                         clearSelection();
                         setCurrentIndex(modelIndex.row());
-                    } else{
+                    } else {
                         handleShiftAndPress(modelIndex);
                     }
                 }
                 //ctrl+右键
                 else {
-                    if(modelIndex.row()!=currentIndex().row()){
+                    if (modelIndex.row() != currentIndex().row()) {
                         selectionModel()->select(m_pSortViewFilter->index(modelIndex.row(), 0), QItemSelectionModel::Select);
                         changeRightView();
                     }
@@ -478,9 +478,9 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                 onMenuShow(event->globalPos());
             }
             //仅右键
-            else if(!m_onlyCurItemMenuEnable || modelIndex == this->currentIndex()){
+            else if (!m_onlyCurItemMenuEnable || modelIndex == this->currentIndex()) {
                 //不在选中范围内
-                if(!selectedIndexes().contains(modelIndex)){
+                if (!selectedIndexes().contains(modelIndex)) {
                     clearSelection();
                     DListView::setCurrentIndex(modelIndex);
                     initPositionStatus(modelIndex.row());
@@ -493,14 +493,14 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
             event->setModifiers(Qt::NoModifier);
             setTouchState(TouchState::TouchPressing);
         }
-    }else {
+    } else {
         //触控屏手势
         if (event->source() == Qt::MouseEventSynthesizedByQt) {
             //是否弹出右键菜单
             m_popMenuTimer->start(1000);
             return;
-        }else {
-            if(Qt::RightButton == event->button()){
+        } else {
+            if (Qt::RightButton == event->button()) {
                 m_noteMenu->setWindowOpacity(1);
                 onMenuShow(event->globalPos());
             }
@@ -523,13 +523,13 @@ void MiddleView::mouseReleaseEvent(QMouseEvent *event)
     m_popMenuTimer->stop();
     m_menuState = MenuStatus::Normal;
 
-    if(TouchState::TouchMoving == m_touchState){
+    if (TouchState::TouchMoving == m_touchState) {
         return;
     }
     QModelIndex index = indexAt(event->pos());
-    if(MouseState::pressing == m_mouseState && Qt::NoModifier == event->modifiers()){
+    if (MouseState::pressing == m_mouseState && Qt::NoModifier == event->modifiers()) {
         initPositionStatus(indexAt(event->pos()).row());
-        if (index.isValid()){
+        if (index.isValid()) {
             clearSelection();
             setCurrentIndex(index.row());
             //请求刷新详情页为当前笔记
@@ -546,7 +546,7 @@ void MiddleView::mouseReleaseEvent(QMouseEvent *event)
     }
     //正常点击状态，选择当前点击选项
     if (index.row() != currentIndex().row() && m_touchState == TouchState::TouchPressing && Qt::NoModifier == event->modifiers()) {
-        if (index.isValid()){
+        if (index.isValid()) {
             setCurrentIndex(index.row());
         }
         setTouchState(TouchState::TouchNormal);
@@ -572,8 +572,9 @@ void MiddleView::mouseDoubleClickEvent(QMouseEvent *event)
  * @param index
  * 处理shift+鼠标press选中操作
  */
-void MiddleView::handleShiftAndPress(QModelIndex &index){
-    if(getModifierState()!=ModifierState::noModifier && getModifierState()!= ModifierState::shiftAndMouseModifier){
+void MiddleView::handleShiftAndPress(QModelIndex &index)
+{
+    if (getModifierState() != ModifierState::noModifier && getModifierState() != ModifierState::shiftAndMouseModifier) {
         clearSelection();
         selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
     }
@@ -600,7 +601,7 @@ void MiddleView::handleShiftAndPress(QModelIndex &index){
         selectionModel()->select(m_pSortViewFilter->index(i, 0), QItemSelectionModel::Select);
     }
     //选中大于1请求刷新详情页为多选操作页面
-    if(end>begin ){
+    if (end > begin) {
         changeRightView();
     }
 
@@ -644,7 +645,7 @@ void MiddleView::setMouseState(const MouseState &mouseState)
  */
 bool MiddleView::isMultipleSelected()
 {
-    return (selectedIndexes().count()>1);
+    return (selectedIndexes().count() > 1);
 }
 
 /**
@@ -654,10 +655,10 @@ bool MiddleView::isMultipleSelected()
  */
 bool MiddleView::haveText()
 {
-    for(auto index:selectedIndexes()){
+    for (auto index : selectedIndexes()) {
         VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-                                  StandardItemCommon::getStandardItemData(index));
-        if(noteData->haveText()){
+            StandardItemCommon::getStandardItemData(index));
+        if (noteData->haveText()) {
             return true;
         }
     }
@@ -671,10 +672,10 @@ bool MiddleView::haveText()
  */
 bool MiddleView::haveVoice()
 {
-    for(auto index:selectedIndexes()){
+    for (auto index : selectedIndexes()) {
         VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-                                  StandardItemCommon::getStandardItemData(index));
-        if(noteData->haveVoice()){
+            StandardItemCommon::getStandardItemData(index));
+        if (noteData->haveVoice()) {
             return true;
         }
     }
@@ -688,11 +689,11 @@ bool MiddleView::haveVoice()
  */
 void MiddleView::onMenuShow(QPoint point)
 {
-    if(isMultipleSelected()){
+    if (isMultipleSelected()) {
         ActionManager::Instance()->visibleAction(ActionManager::NoteTop, false);
         ActionManager::Instance()->visibleAction(ActionManager::NoteRename, false);
         ActionManager::Instance()->visibleAction(ActionManager::NoteMenuBase, false);
-    }else {
+    } else {
         ActionManager::Instance()->visibleAction(ActionManager::NoteTop, true);
         ActionManager::Instance()->visibleAction(ActionManager::NoteRename, true);
         ActionManager::Instance()->visibleAction(ActionManager::NoteMenuBase, true);
@@ -717,23 +718,23 @@ int MiddleView::getSelectedCount()
  */
 void MiddleView::mouseMoveEvent(QMouseEvent *event)
 {
-    if(m_onlyCurItemMenuEnable){
+    if (m_onlyCurItemMenuEnable) {
         return;
     }
     //处理触摸屏一指操作
     if ((event->source() == Qt::MouseEventSynthesizedByQt && event->buttons() & Qt::LeftButton)) {
-        if(TouchState::TouchOutVisibleRegion !=  m_touchState){
+        if (TouchState::TouchOutVisibleRegion != m_touchState) {
             doTouchMoveEvent(event);
         }
         return;
     } else if ((event->buttons() & Qt::LeftButton) && m_touchState == TouchState::TouchPressing) {
         if (!m_isDraging) {
             m_shiftSelection = -1;
-            if(!selectedIndexes().contains(m_index)){
+            if (!selectedIndexes().contains(m_index)) {
                 //解决点击多选问题
-                if(!selectedIndexes().contains(m_index)){
+                if (!selectedIndexes().contains(m_index)) {
                     clearSelection();
-                    selectionModel()->select(m_pSortViewFilter->index(m_index.row(),0), QItemSelectionModel::Select);
+                    selectionModel()->select(m_pSortViewFilter->index(m_index.row(), 0), QItemSelectionModel::Select);
                     //请求刷新详情页为当前笔记
                     m_currentRow = m_index.row();
                     changeRightView(false);
@@ -741,14 +742,14 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
             }
 
             //需判断移动距离
-            if(qAbs(event->pos().x() - m_touchPressPoint.x()) > 3
-                    || qAbs(event->pos().y() - m_touchPressPoint.y()) > 3){
+            if (qAbs(event->pos().x() - m_touchPressPoint.x()) > 3
+                || qAbs(event->pos().y() - m_touchPressPoint.y()) > 3) {
                 handleDragEvent(false);
             }
         }
     } else {
         return;
-//        DListView::mouseMoveEvent(event);
+        //        DListView::mouseMoveEvent(event);
     }
 }
 
@@ -758,7 +759,7 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
  */
 void MiddleView::keyReleaseEvent(QKeyEvent *event)
 {
-    if( Qt::Key_Shift == event->key()){
+    if (Qt::Key_Shift == event->key()) {
         m_shiftSelection = -1;
         setModifierState(ModifierState::noModifier);
     }
@@ -808,20 +809,19 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
 {
     if (m_onlyCurItemMenuEnable || e->key() == Qt::Key_PageUp || e->key() == Qt::Key_PageDown) {
         e->ignore();
-    } else if(Qt::Key_Up == e->key() || Qt::Key_Down == e->key()){
-        if(Qt::ShiftModifier == e->modifiers() && Qt::Key_Up == e->key()){
-            int nextIndex = m_shiftSelection==-1?m_currentRow-1:m_shiftSelection-1;
-            if(getModifierState() != ModifierState::shiftAndUpOrDownModifier){
+    } else if (Qt::Key_Up == e->key() || Qt::Key_Down == e->key()) {
+        if (Qt::ShiftModifier == e->modifiers() && Qt::Key_Up == e->key()) {
+            int nextIndex = m_shiftSelection == -1 ? m_currentRow - 1 : m_shiftSelection - 1;
+            if (getModifierState() != ModifierState::shiftAndUpOrDownModifier) {
                 clearSelection();
             }
-            if(-1 !=nextIndex)
-            {
-                scrollTo(m_pSortViewFilter->index(nextIndex,0));
+            if (-1 != nextIndex) {
+                scrollTo(m_pSortViewFilter->index(nextIndex, 0));
                 //多选在下，shift+上
-                if (nextIndex>=m_currentRow){
+                if (nextIndex >= m_currentRow) {
                     selectionModel()->select(m_pSortViewFilter->index(m_shiftSelection, 0), QItemSelectionModel::Deselect);
                     //普通详情页
-                    if(nextIndex == m_currentRow){
+                    if (nextIndex == m_currentRow) {
                         int row = selectedIndexes().last().row();
                         changeRightView(false);
                         //触发currentChanged信号，刷新详情页
@@ -839,26 +839,25 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
                 }
                 m_shiftSelection = nextIndex;
                 setModifierState(ModifierState::shiftAndUpOrDownModifier);
-            }else {
+            } else {
                 clearSelection();
                 setCurrentIndex(m_currentRow);
-                scrollTo(m_pSortViewFilter->index(m_currentRow,0));
+                scrollTo(m_pSortViewFilter->index(m_currentRow, 0));
                 //切换详情显示页面
-               changeRightView(false);
+                changeRightView(false);
             }
-        }else if (Qt::ShiftModifier == e->modifiers() && Qt::Key_Down == e->key()) {
-            int nextIndex = m_shiftSelection==-1?m_currentRow+1: m_shiftSelection +1;
-            if(getModifierState() != ModifierState::shiftAndUpOrDownModifier){
+        } else if (Qt::ShiftModifier == e->modifiers() && Qt::Key_Down == e->key()) {
+            int nextIndex = m_shiftSelection == -1 ? m_currentRow + 1 : m_shiftSelection + 1;
+            if (getModifierState() != ModifierState::shiftAndUpOrDownModifier) {
                 clearSelection();
             }
-            if(count() !=nextIndex)
-            {
-                scrollTo(m_pSortViewFilter->index(nextIndex,0));
+            if (count() != nextIndex) {
+                scrollTo(m_pSortViewFilter->index(nextIndex, 0));
                 //多选在上，shift+下
-                if(nextIndex<=m_currentRow){
+                if (nextIndex <= m_currentRow) {
                     selectionModel()->select(m_pSortViewFilter->index(m_shiftSelection, 0), QItemSelectionModel::Deselect);
                     //普通详情页
-                    if(nextIndex == m_currentRow){
+                    if (nextIndex == m_currentRow) {
                         int row = selectedIndexes().last().row();
                         changeRightView(false);
                         //触发currentChanged信号，刷新详情页
@@ -876,17 +875,16 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
                 }
                 m_shiftSelection = nextIndex;
                 setModifierState(ModifierState::shiftAndUpOrDownModifier);
-            }else {
+            } else {
                 clearSelection();
                 setCurrentIndex(m_currentRow);
-                scrollTo(m_pSortViewFilter->index(m_currentRow,0));
+                scrollTo(m_pSortViewFilter->index(m_currentRow, 0));
                 //切换详情显示页面
-               changeRightView(false);
+                changeRightView(false);
             }
-        }
-        else {
+        } else {
             setModifierState(ModifierState::noModifier);
-            if(-1 == currentIndex().row()){
+            if (-1 == currentIndex().row()) {
                 setCurrentIndex(m_currentRow);
             }
             DListView::keyPressEvent(e);
@@ -900,53 +898,55 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
         }
     }
     //关于shift+home/end的判断
-    else if(Qt::Key_Home == e->key() || Qt::Key_End == e->key()){
-        if(Qt::Key_Home == e->key()){
-            scrollTo(m_pSortViewFilter->index(0,0));
+    else if (Qt::Key_Home == e->key() || Qt::Key_End == e->key()) {
+        if (Qt::Key_Home == e->key()) {
+            scrollTo(m_pSortViewFilter->index(0, 0));
             clearSelection();
-            if(Qt::ShiftModifier == e->modifiers()){
-                for(int i = 0;i<=m_currentRow;i++){
+            if (Qt::ShiftModifier == e->modifiers()) {
+                for (int i = 0; i <= m_currentRow; i++) {
                     selectionModel()->select(m_pSortViewFilter->index(i, 0), QItemSelectionModel::Select);
                 }
                 setModifierState(ModifierState::shiftAndHomeOrEndKeyModifier);
                 //刷新详情页
-                changeRightView(selectedIndexes().count()>1?true:false);
-            }else {
+                changeRightView(selectedIndexes().count() > 1 ? true : false);
+            } else {
                 setCurrentIndex(0);
                 changeRightView(false);
                 initPositionStatus(currentIndex().row());
             }
-        }else {
-            scrollTo(m_pSortViewFilter->index(count()-1,0));
+        } else {
+            scrollTo(m_pSortViewFilter->index(count() - 1, 0));
             clearSelection();
-            if(Qt::ShiftModifier == e->modifiers()){
-                for(int i = m_currentRow;i<count();i++){
+            if (Qt::ShiftModifier == e->modifiers()) {
+                for (int i = m_currentRow; i < count(); i++) {
                     selectionModel()->select(m_pSortViewFilter->index(i, 0), QItemSelectionModel::Select);
                 }
                 setModifierState(ModifierState::shiftAndHomeOrEndKeyModifier);
                 //刷新详情页
-                changeRightView(selectedIndexes().count()>1?true:false);
-            }else {
-                setCurrentIndex(count()-1);
+                changeRightView(selectedIndexes().count() > 1 ? true : false);
+            } else {
+                setCurrentIndex(count() - 1);
                 changeRightView(false);
                 initPositionStatus(currentIndex().row());
             }
         }
-    }else if(Qt::CTRL == e->modifiers() && Qt::Key_A == e->key()){
+    } else if (Qt::CTRL == e->modifiers() && Qt::Key_A == e->key()) {
         //实现笔记全选功能
         setModifierState(ModifierState::noModifier);
-        for(int i = 0;i<count();i++){
+        for (int i = 0; i < count(); i++) {
             selectionModel()->select(m_pSortViewFilter->index(i, 0), QItemSelectionModel::Select);
         }
-        if(count()>1)
+        if (count() > 1)
             changeRightView();
     }
 }
 
 /**
  * @brief MiddleView::initPositionStatus
- *///初始化位置状态
-void MiddleView::initPositionStatus(int row){
+ */
+//初始化位置状态
+void MiddleView::initPositionStatus(int row)
+{
     m_shiftSelection = -1;
     m_currentRow = row;
 }
@@ -974,15 +974,15 @@ void MiddleView::initConnections()
     //右键菜单滑动
     connect(m_noteMenu, &VNoteRightMenu::menuTouchMoved, this, &MiddleView::handleDragEvent);
     //右键菜单释放
-    connect(m_noteMenu, &VNoteRightMenu::menuTouchReleased, this, [ = ] {
+    connect(m_noteMenu, &VNoteRightMenu::menuTouchReleased, this, [=] {
         m_touchState = TouchState::TouchNormal;
         m_menuState = MenuStatus::ReleaseFromMenu;
     });
     //定时器用于判断是否选中当前
     m_selectCurrentTimer = new QTimer();
-    connect(m_selectCurrentTimer,&QTimer::timeout,[=]{
+    connect(m_selectCurrentTimer, &QTimer::timeout, [=] {
         if (m_touchState == TouchState::TouchPressing && m_index.isValid())
-            if(!selectedIndexes().contains(m_index)){
+            if (!selectedIndexes().contains(m_index)) {
                 //选中当前并刷新详情页
                 this->clearSelection();
                 m_currentRow = m_index.row();
@@ -992,10 +992,10 @@ void MiddleView::initConnections()
 
         m_selectCurrentTimer->stop();
     });
-     //定时器用于判断是否弹出菜单
+    //定时器用于判断是否弹出菜单
     m_popMenuTimer = new QTimer();
-    connect(m_popMenuTimer,&QTimer::timeout,[=]{
-        if (m_touchState == TouchState::TouchPressing && m_index.isValid()){
+    connect(m_popMenuTimer, &QTimer::timeout, [=] {
+        if (m_touchState == TouchState::TouchPressing && m_index.isValid()) {
             m_noteMenu->setWindowOpacity(1);
             onMenuShow(QCursor::pos());
         }
@@ -1062,7 +1062,7 @@ void MiddleView::noteStickOnTop()
 {
     QModelIndex index = this->currentIndex();
     VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-                              StandardItemCommon::getStandardItemData(index));
+        StandardItemCommon::getStandardItemData(index));
     if (noteData) {
         VNoteItemOper noteOper(noteData);
         if (noteOper.updateTop(!noteData->isTop)) {
@@ -1091,7 +1091,7 @@ void MiddleView::sortView(bool adjustCurrentItemBar)
 QModelIndexList MiddleView::getAllSelectNote()
 {
     QModelIndexList indexList;
-    if(selectedIndexes().count()){
+    if (selectedIndexes().count()) {
         indexList = selectedIndexes();
         qSort(indexList);
     }
@@ -1107,7 +1107,7 @@ void MiddleView::deleteModelIndexs(const QModelIndexList &indexs)
 {
     QModelIndexList indexList = indexs;
     qSort(indexList);
-    for(int i = indexList.size()-1;i>-1;i--){
+    for (int i = indexList.size() - 1; i > -1; i--) {
         m_pSortViewFilter->removeRow(indexList[i].row());
     }
 }
@@ -1118,12 +1118,12 @@ void MiddleView::deleteModelIndexs(const QModelIndexList &indexs)
  */
 void MiddleView::triggerDragNote()
 {
-    if(!m_index.isValid()){
+    if (!m_index.isValid()) {
         m_isDraging = true;
         return;
     }
 
-    QList<VNoteItem *>noteDataList = getCurrVNotedataList();
+    QList<VNoteItem *> noteDataList = getCurrVNotedataList();
 
     if (noteDataList.size()) {
         if (m_MoveView == nullptr) {
@@ -1134,7 +1134,7 @@ void MiddleView::triggerDragNote()
         m_MoveView->setNotesNumber(modelList.count());
         m_MoveView->setNoteList(noteDataList);
         //重设视图大小
-        m_MoveView->setFixedSize(282,91);
+        m_MoveView->setFixedSize(282, 91);
         QPixmap pixmap = m_MoveView->grab();
         QDrag *drag = new QDrag(this);
         QMimeData *mimeData = new QMimeData;
@@ -1142,23 +1142,23 @@ void MiddleView::triggerDragNote()
         drag->setMimeData(mimeData);
         drag->setPixmap(pixmap);
         //解决高分屏显示与鼠标位置不对应问题，使用固定位置
-        drag->setHotSpot(QPoint(18,25));
+        drag->setHotSpot(QPoint(18, 25));
         drag->exec(Qt::MoveAction);
         drag->deleteLater();
         //隐藏菜单
         m_noteMenu->hide();
         //拖拽取消后选中
-        if(m_dragSuccess){
+        if (m_dragSuccess) {
             //笔记项移除后选中
             selectAfterRemoved();
-        }else {
+        } else {
             //拖拽取消后，如果当前选中单个笔记，刷新单选详情页
-            if(1 == modelList.size()){
+            if (1 == modelList.size()) {
                 clearSelection();
                 setCurrentIndex(modelList.at(0).row());
-            }else {
-                for(auto index: modelList){
-                    selectionModel()->select(m_pSortViewFilter->index(index.row(),0),QItemSelectionModel::Select);
+            } else {
+                for (auto index : modelList) {
+                    selectionModel()->select(m_pSortViewFilter->index(index.row(), 0), QItemSelectionModel::Select);
                 }
             }
         }
@@ -1173,7 +1173,7 @@ void MiddleView::triggerDragNote()
 void MiddleView::doTouchMoveEvent(QMouseEvent *event)
 {
     //处理触摸屏单指move事件，区分滑动、拖拽事件
-//    m_pItemDelegate->setDraging(false);
+    //    m_pItemDelegate->setDraging(false);
     double distX = event->pos().x() - m_touchPressPoint.x();
     double distY = event->pos().y() - m_touchPressPoint.y();
     //获取时间间隔
@@ -1219,9 +1219,9 @@ void MiddleView::doTouchMoveEvent(QMouseEvent *event)
 void MiddleView::handleDragEvent(bool isTouch)
 {
     setNextSelection();
-    if(m_onlyCurItemMenuEnable)
+    if (m_onlyCurItemMenuEnable)
         return;
-    if(isTouch){
+    if (isTouch) {
         setTouchState(TouchState::TouchDraging);
     }
     m_popMenuTimer->stop();
@@ -1258,7 +1258,7 @@ void MiddleView::setNextSelection()
 {
     QModelIndexList indexList = selectedIndexes();
     qSort(indexList);
-    if(indexList.count()){
+    if (indexList.count()) {
         m_nextSelection = indexList.first().row();
     }
 }
@@ -1268,14 +1268,15 @@ void MiddleView::setNextSelection()
  * @param
  * 笔记项移除后选中
  */
-void MiddleView::selectAfterRemoved(){
+void MiddleView::selectAfterRemoved()
+{
     clearSelection();
-    if(m_pSortViewFilter->index(m_nextSelection,0).isValid()){
+    if (m_pSortViewFilter->index(m_nextSelection, 0).isValid()) {
         setCurrentIndex(m_nextSelection);
         m_currentRow = m_nextSelection;
-    }else if(m_pSortViewFilter->index(m_nextSelection -1 ,0).isValid()){
-        setCurrentIndex(m_nextSelection-1);
-        m_currentRow = m_nextSelection-1;
+    } else if (m_pSortViewFilter->index(m_nextSelection - 1, 0).isValid()) {
+        setCurrentIndex(m_nextSelection - 1);
+        m_currentRow = m_nextSelection - 1;
     }
     //滚动到当前选中
     scrollTo(currentIndex());
