@@ -20,6 +20,21 @@ TEST_F(ut_vnotemultiplechoiceoptionwidget_test, changeFromThemeType)
     m_widget->changeFromThemeType();
 }
 
+TEST_F(ut_vnotemultiplechoiceoptionwidget_test, buttonPressed)
+{
+    m_widget->buttonPressed(m_widget->Move);
+    m_widget->buttonPressed(m_widget->SaveAsTxT);
+    m_widget->buttonPressed(m_widget->SaveAsVoice);
+    m_widget->buttonPressed(m_widget->Delete);
+}
+
+TEST_F(ut_vnotemultiplechoiceoptionwidget_test, setSvgColor)
+{
+    QString path(":/icons/deepin/builtin/light/detail_notes_move.svg");
+    QString color = QColor(Qt::red).name();
+    m_widget->setSvgColor(path, color);
+}
+
 TEST_F(ut_vnotemultiplechoiceoptionwidget_test, trigger)
 {
     int id = 2;

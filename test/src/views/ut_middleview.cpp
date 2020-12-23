@@ -21,6 +21,9 @@
 #include "middleviewdelegate.h"
 #include "vnoteitem.h"
 
+#include <standarditemcommon.h>
+#include <vnoteitemoper.h>
+
 ut_middleview_test::ut_middleview_test()
 {
 }
@@ -67,11 +70,54 @@ TEST_F(ut_middleview_test, mouseEvent)
 {
     MiddleView middleview;
     QPointF localPos;
-    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
-    middleview.mousePressEvent(event);
-    middleview.mouseReleaseEvent(event);
-    middleview.mouseDoubleClickEvent(event);
-    middleview.mouseMoveEvent(event);
+    //mousePressEvent
+    middleview.m_onlyCurItemMenuEnable = false;
+    QMouseEvent *mousePressEvent = new QMouseEvent(QEvent::MouseButtonPress, localPos, localPos, localPos, Qt::RightButton, Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
+    middleview.mousePressEvent(mousePressEvent);
+    middleview.m_onlyCurItemMenuEnable = true;
+    middleview.mousePressEvent(mousePressEvent);
+
+    //mouseReleaseEvent
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+    middleview.m_onlyCurItemMenuEnable = false;
+    QPoint point = QPoint(middleview.visualRect(middleview.currentIndex()).topLeft().x() + 10, middleview.visualRect(middleview.currentIndex()).topLeft().y() - 10);
+    middleview.mouseReleaseEvent(releaseEvent);
+
+    //doubleClickEvent
+    middleview.m_onlyCurItemMenuEnable = false;
+    QMouseEvent *doubleClickEvent = new QMouseEvent(QEvent::MouseButtonDblClick, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    middleview.mouseDoubleClickEvent(doubleClickEvent);
+
+    //mouseMoveEvent
+    middleview.m_onlyCurItemMenuEnable = false;
+    QMouseEvent *mouseMoveEvent = new QMouseEvent(QEvent::MouseMove, localPos, localPos, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
+    middleview.setTouchState(middleview.TouchMoving);
+    middleview.mouseMoveEvent(mouseMoveEvent);
+}
+
+TEST_F(ut_middleview_test, setTouchState)
+{
+    MiddleView middleview;
+    middleview.setTouchState(middleview.TouchNormal);
+}
+
+TEST_F(ut_middleview_test, doTouchMoveEvent)
+{
+    MiddleView middleview;
+    QPointF localPos;
+    QMouseEvent *mouseMoveEvent = new QMouseEvent(QEvent::MouseMove, localPos, localPos, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
+    middleview.m_touchPressPoint = QPoint(localPos.x(), localPos.y() - 11);
+    QDateTime time = QDateTime::currentDateTime();
+    middleview.m_touchPressStartMs = time.toMSecsSinceEpoch() - 260;
+    middleview.setTouchState(middleview.TouchMoving);
+    middleview.doTouchMoveEvent(mouseMoveEvent);
+}
+
+TEST_F(ut_middleview_test, setOnlyCurItemMenuEnable)
+{
+    MiddleView middleview;
+    bool enable = false;
+    middleview.setOnlyCurItemMenuEnable(enable);
 }
 
 TEST_F(ut_middleview_test, eventFilter)
@@ -83,13 +129,71 @@ TEST_F(ut_middleview_test, eventFilter)
     middleview.eventFilter(&middleview, event1);
 }
 
+TEST_F(ut_middleview_test, addRowAtHead)
+{
+    MiddleView middleview;
+    VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
+        StandardItemCommon::getStandardItemData(middleview.indexAt(QPoint(10, 10))));
+    middleview.addRowAtHead(noteData);
+}
+
+TEST_F(ut_middleview_test, appendRow)
+{
+    MiddleView middleview;
+    VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
+        StandardItemCommon::getStandardItemData(middleview.indexAt(QPoint(10, 10))));
+    middleview.appendRow(noteData);
+}
+
+TEST_F(ut_middleview_test, rowCount)
+{
+    MiddleView middleview;
+    middleview.rowCount();
+}
+
+TEST_F(ut_middleview_test, editNote)
+{
+    MiddleView middleview;
+    middleview.setCurrentIndex(0);
+    middleview.editNote();
+}
+
+TEST_F(ut_middleview_test, saveAsText)
+{
+    MiddleView middleview;
+    middleview.setCurrentIndex(0);
+    middleview.saveAsText();
+}
+
+TEST_F(ut_middleview_test, saveRecords)
+{
+    MiddleView middleview;
+    middleview.setCurrentIndex(0);
+    middleview.saveRecords();
+}
+
+TEST_F(ut_middleview_test, handleShiftAndPress)
+{
+    MiddleView middleview;
+    middleview.setModifierState(middleview.shiftAndUpOrDownModifier);
+    middleview.m_currentRow = 0;
+    QModelIndex index = middleview.m_pDataModel->index(1, 0);
+    middleview.handleShiftAndPress(index);
+}
+
 TEST_F(ut_middleview_test, keyPressEvent)
 {
     MiddleView middleview;
-    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, 0x01000016, Qt::NoModifier, "test");
+    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Up, Qt::ShiftModifier, "test");
     middleview.keyPressEvent(event);
-    QKeyEvent *event1 = new QKeyEvent(QEvent::KeyPress, 0x01000001, Qt::NoModifier, "test");
+    middleview.m_shiftSelection = -1;
+    QKeyEvent *event1 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Down, Qt::ShiftModifier, "test2");
     middleview.keyPressEvent(event1);
+    QKeyEvent *event2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Home, Qt::ShiftModifier, "test3");
+    middleview.keyPressEvent(event2);
+    delete event;
+    //    delete event1;
+    delete event2;
 }
 
 TEST_F(ut_middleview_test, setVisibleEmptySearch)
@@ -182,6 +286,32 @@ TEST_F(ut_middleview_test, getSelectedCount)
 //    middleview.selectionModel()->select(middleview.m_pSortViewFilter->index(index.row(), 0), QItemSelectionModel::Select);
 //    middleview.haveVoice();
 //}
+
+TEST_F(ut_middleview_test, haveText)
+{
+    MiddleView middleview;
+    middleview.setCurrentIndex(0);
+    middleview.haveText();
+}
+
+TEST_F(ut_middleview_test, haveVoice)
+{
+    MiddleView middleview;
+    middleview.setCurrentIndex(0);
+    middleview.haveVoice();
+}
+
+TEST_F(ut_middleview_test, onMenuShow)
+{
+    MiddleView middleview;
+    middleview.onMenuShow(QCursor::pos());
+}
+
+TEST_F(ut_middleview_test, handleTouchSlideEvent)
+{
+    MiddleView middleview;
+    middleview.handleTouchSlideEvent(24, 11, QCursor::pos());
+}
 
 TEST_F(ut_middleview_test, isMultipleSelected)
 {

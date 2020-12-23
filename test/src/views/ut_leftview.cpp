@@ -23,6 +23,8 @@
 #include "vnoteforlder.h"
 
 #include <QLineEdit>
+#include <QDateTime>
+#include <QMimeData>
 
 ut_leftview_test::ut_leftview_test()
 {
@@ -43,13 +45,74 @@ TEST_F(ut_leftview_test, getNotepadRootIndex)
 
 TEST_F(ut_leftview_test, mouseEvent)
 {
-    //    LeftView leftview;
-    //    QPointF localPos;
-    //    QMouseEvent* event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
-    //    leftview.mousePressEvent(event);
-    //    leftview.mouseReleaseEvent(event);
-    //    leftview.mouseDoubleClickEvent(event);
-    //    leftview.mouseMoveEvent(event);
+    LeftView leftview;
+    QPointF localPos;
+    //mousePressEvent
+    leftview.m_onlyCurItemMenuEnable = false;
+    QMouseEvent *mousePressEvent = new QMouseEvent(QEvent::MouseButtonPress, localPos, localPos, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
+    leftview.mousePressEvent(mousePressEvent);
+    leftview.m_onlyCurItemMenuEnable = true;
+    leftview.mousePressEvent(mousePressEvent);
+
+    //mouseReleaseEvent
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+    leftview.m_onlyCurItemMenuEnable = false;
+    QPoint point = QPoint(leftview.visualRect(leftview.currentIndex()).topLeft().x() + 10, leftview.visualRect(leftview.currentIndex()).topLeft().y() - 10);
+    leftview.mouseReleaseEvent(releaseEvent);
+
+    //doubleClickEvent
+    leftview.m_onlyCurItemMenuEnable = false;
+    QMouseEvent *doubleClickEvent = new QMouseEvent(QEvent::MouseButtonDblClick, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    leftview.mouseDoubleClickEvent(doubleClickEvent);
+
+    //mouseMoveEvent
+    leftview.m_onlyCurItemMenuEnable = false;
+    QMouseEvent *mouseMoveEvent = new QMouseEvent(QEvent::MouseMove, localPos, localPos, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
+    leftview.setTouchState(leftview.TouchMoving);
+    leftview.mouseMoveEvent(mouseMoveEvent);
+}
+
+TEST_F(ut_leftview_test, setTouchState)
+{
+    LeftView leftview;
+    leftview.setTouchState(leftview.TouchNormal);
+}
+
+TEST_F(ut_leftview_test, doTouchMoveEvent)
+{
+    LeftView leftview;
+    QPointF localPos;
+    QMouseEvent *mouseMoveEvent = new QMouseEvent(QEvent::MouseMove, localPos, localPos, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
+    leftview.m_touchPressPoint = QPoint(localPos.x(), localPos.y() - 11);
+    QDateTime time = QDateTime::currentDateTime();
+    leftview.m_touchPressStartMs = time.toMSecsSinceEpoch() - 260;
+    leftview.setTouchState(leftview.TouchMoving);
+    leftview.doTouchMoveEvent(mouseMoveEvent);
+}
+
+TEST_F(ut_leftview_test, handleDragEvent)
+{
+    LeftView leftview;
+    bool isTouch = true;
+    leftview.handleDragEvent(isTouch);
+}
+
+TEST_F(ut_leftview_test, dropEvent)
+{
+    LeftView leftview;
+    QPointF localPos;
+    QMimeData *mimeData = new QMimeData;
+    mimeData->setData("notepad_drag", QByteArray());
+    QDropEvent *event = new QDropEvent(localPos, Qt::MoveAction, mimeData,
+                                       Qt::LeftButton, Qt::NoModifier, QEvent::Drop);
+    leftview.dropEvent(event);
+}
+
+TEST_F(ut_leftview_test, setOnlyCurItemMenuEnable)
+{
+    LeftView leftview;
+    bool enable = false;
+    leftview.setOnlyCurItemMenuEnable(enable);
 }
 
 TEST_F(ut_leftview_test, keyPressEvent)
@@ -93,12 +156,6 @@ TEST_F(ut_leftview_test, appendFolder)
     folder.createTime = QDateTime::currentDateTime();
     leftview.appendFolder(&folder);
     leftview.removeFolder();
-}
-
-TEST_F(ut_leftview_test, setOnlyCurItemMenuEnable)
-{
-    LeftView leftview;
-    leftview.setOnlyCurItemMenuEnable(false);
 }
 
 TEST_F(ut_leftview_test, closeMenu)

@@ -82,6 +82,52 @@ TEST_F(ut_rightview_test, initData)
     rightview.initData(vnoteitem, "test", true);
 }
 
+TEST_F(ut_rightview_test, initAction)
+{
+    RightView rightview;
+    QLayoutItem *layoutItem = rightview.m_viewportLayout->itemAt(0);
+    DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
+    widget = nullptr;
+    rightview.initAction(widget);
+}
+
+TEST_F(ut_rightview_test, mousePressEvent)
+{
+    RightView rightview;
+    QPointF localPos;
+    QMouseEvent *mousePressEvent = new QMouseEvent(QEvent::MouseButtonPress, localPos, localPos, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+    rightview.mousePressEvent(mousePressEvent);
+}
+
+TEST_F(ut_rightview_test, removeSelectWidget)
+{
+    RightView rightview;
+    QLayoutItem *layoutItem = rightview.m_viewportLayout->itemAt(0);
+    DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
+    rightview.removeSelectWidget(widget);
+}
+
+TEST_F(ut_rightview_test, removeCacheWidget)
+{
+    RightView rightview;
+    VNoteItem *vnoteitem = new VNoteItem;
+    vnoteitem->noteId = 1;
+    vnoteitem->folderId = 1;
+    vnoteitem->noteTitle = "test";
+    rightview.removeCacheWidget(vnoteitem);
+
+    VNoteFolder *vnotefolder = new VNoteFolder;
+    rightview.removeCacheWidget(vnotefolder);
+}
+
+TEST_F(ut_rightview_test, delWidget)
+{
+    RightView rightview;
+    QLayoutItem *layoutItem = rightview.m_viewportLayout->itemAt(0);
+    DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
+    rightview.delWidget(widget, false);
+}
+
 TEST_F(ut_rightview_test, onVoicePlay)
 {
     RightView rightview;
