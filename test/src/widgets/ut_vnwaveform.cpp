@@ -21,6 +21,8 @@
 
 ut_vnwaveform_test::ut_vnwaveform_test()
 {
+    VNWaveform vnwaveform;
+    vnwaveform.grab();
 }
 
 TEST_F(ut_vnwaveform_test, onAudioBufferProbed)

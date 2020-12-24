@@ -29,6 +29,39 @@
 ut_MoveView_test::ut_MoveView_test()
 {
     MoveView moveView;
+    VNoteItem *vnoteitem = new VNoteItem;
+    vnoteitem->noteId = 23;
+    vnoteitem->folderId = 23;
+    vnoteitem->noteTitle = "test1";
+    QList<VNoteItem *> list;
+    list.append(vnoteitem);
+    moveView.setNoteList(list);
+    moveView.setNotesNumber(1);
+    moveView.grab();
+
+    VNoteItem *vnoteitem1 = new VNoteItem;
+    vnoteitem1->noteId = 2;
+    vnoteitem1->folderId = 3;
+    vnoteitem1->noteTitle = "test2";
+    list.append(vnoteitem1);
+    moveView.setNoteList(list);
+    moveView.setNotesNumber(2);
+    moveView.grab();
+
+    moveView.m_noteList.clear();
+    VNoteFolder *vnotefolder = new VNoteFolder;
+    vnotefolder->id = 0;
+    vnotefolder->category = 1;
+    vnotefolder->notesCount = 2;
+    vnotefolder->defaultIcon = 3;
+    vnotefolder->folder_state = vnotefolder->Normal;
+    vnotefolder->name = "test";
+    vnotefolder->iconPath = "/home/zhangteng/works/deepin-voice-note/assets/icons/deepin/builtin/default_folder_icons";
+    vnotefolder->sortNumber = 4;
+    vnotefolder->createTime = QDateTime::currentDateTime();
+    vnotefolder->modifyTime = QDateTime::currentDateTime();
+    vnotefolder->deleteTime = QDateTime::currentDateTime();
+    moveView.setFolder(vnotefolder);
     moveView.grab();
 }
 
@@ -58,7 +91,6 @@ TEST_F(ut_MoveView_test, setFolder)
 
     moveview.setFolder(&vnotefolder);
     moveview.setNote(&vnoteitem);
-    moveview.paintEvent(nullptr);
 }
 
 TEST_F(ut_MoveView_test, setNotesNumber)

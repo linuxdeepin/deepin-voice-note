@@ -82,6 +82,66 @@ TEST_F(ut_vnotemainwindow_test, initSpliterView)
     vnotemainwindow.initSplashView();
 }
 
+TEST_F(ut_vnotemainwindow_test, initTitleBar)
+{
+    VNoteMainWindow vnotemainwindow;
+    vnotemainwindow.initTitleBar();
+}
+
+TEST_F(ut_vnotemainwindow_test, initMiddleView)
+{
+    VNoteMainWindow vnotemainwindow;
+    vnotemainwindow.initMiddleView();
+}
+
+TEST_F(ut_vnotemainwindow_test, initRightView)
+{
+    VNoteMainWindow vnotemainwindow;
+    vnotemainwindow.initRightView();
+}
+
+TEST_F(ut_vnotemainwindow_test, initA2TManager)
+{
+    VNoteMainWindow vnotemainwindow;
+    vnotemainwindow.initA2TManager();
+}
+
+TEST_F(ut_vnotemainwindow_test, initLogin1Manager)
+{
+    VNoteMainWindow vnotemainwindow;
+    vnotemainwindow.initLogin1Manager();
+}
+
+TEST_F(ut_vnotemainwindow_test, loadNotepads)
+{
+    VNoteMainWindow vnotemainwindow;
+    vnotemainwindow.loadNotepads();
+}
+
+TEST_F(ut_vnotemainwindow_test, loadNotes)
+{
+    VNoteMainWindow vnotemainwindow;
+    VNoteFolder *vnotefolder = new VNoteFolder;
+    vnotefolder->id = 0;
+    vnotefolder->category = 1;
+    vnotefolder->notesCount = 2;
+    vnotefolder->defaultIcon = 3;
+    vnotefolder->folder_state = vnotefolder->Normal;
+    vnotefolder->name = "test";
+    vnotefolder->iconPath = "/home/zhangteng/works/deepin-voice-note/assets/icons/deepin/builtin/default_folder_icons";
+    vnotefolder->sortNumber = 4;
+    vnotefolder->createTime = QDateTime::currentDateTime();
+    vnotefolder->modifyTime = QDateTime::currentDateTime();
+    vnotefolder->deleteTime = QDateTime::currentDateTime();
+    vnotemainwindow.loadNotes(vnotefolder);
+}
+
+TEST_F(ut_vnotemainwindow_test, loadSearchNotes)
+{
+    VNoteMainWindow vnotemainwindow;
+    vnotemainwindow.loadSearchNotes("本");
+}
+
 TEST_F(ut_vnotemainwindow_test, onStartRecord)
 {
     VNoteMainWindow vnotemainwindow;
