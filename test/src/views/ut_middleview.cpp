@@ -132,9 +132,11 @@ TEST_F(ut_middleview_test, eventFilter)
 TEST_F(ut_middleview_test, addRowAtHead)
 {
     MiddleView middleview;
-    VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-        StandardItemCommon::getStandardItemData(middleview.indexAt(QPoint(10, 10))));
-    middleview.addRowAtHead(noteData);
+    VNoteItem *vnoteitem = new VNoteItem;
+    vnoteitem->noteId = 2;
+    vnoteitem->folderId = 2;
+    vnoteitem->noteTitle = "test";
+    middleview.addRowAtHead(vnoteitem);
 }
 
 TEST_F(ut_middleview_test, appendRow)
@@ -161,7 +163,7 @@ TEST_F(ut_middleview_test, editNote)
 TEST_F(ut_middleview_test, saveAsText)
 {
     MiddleView middleview;
-    middleview.setCurrentIndex(0);
+    middleview.selectionModel()->select(middleview.m_pDataModel->index(0, 0), QItemSelectionModel::Select);
     middleview.saveAsText();
 }
 

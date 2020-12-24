@@ -45,6 +45,12 @@ TEST_F(ut_vnoterecordbar_test, onStartRecord)
     vnoterecordbar.onStartRecord();
 }
 
+TEST_F(ut_vnoterecordbar_test, startRecord)
+{
+    VNoteRecordBar vnoterecordbar;
+    vnoterecordbar.startRecord();
+}
+
 TEST_F(ut_vnoterecordbar_test, onFinshRecord)
 {
     VNoteRecordBar vnoterecordbar;

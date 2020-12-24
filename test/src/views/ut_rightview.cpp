@@ -90,15 +90,15 @@ TEST_F(ut_rightview_test, onTextEditTextChange)
     rightview.onTextEditTextChange();
 }
 
-TEST_F(ut_rightview_test, initData)
-{
-    RightView rightview;
-    VNoteItem *vnoteitem = new VNoteItem;
-    vnoteitem->noteId = 2;
-    vnoteitem->folderId = 2;
-    vnoteitem->noteTitle = "test";
-    rightview.initData(vnoteitem, "test", true);
-}
+//TEST_F(ut_rightview_test, initData)
+//{
+//    RightView rightview;
+//    VNoteItem *vnoteitem = new VNoteItem;
+//    vnoteitem->noteId = 2;
+//    vnoteitem->folderId = 2;
+//    vnoteitem->noteTitle = "test";
+//    rightview.initData(vnoteitem, "test", true);
+//}
 
 TEST_F(ut_rightview_test, initAction)
 {
@@ -153,20 +153,28 @@ TEST_F(ut_rightview_test, delWidget)
     rightview.delWidget(widget, false);
 }
 
-TEST_F(ut_rightview_test, onVoicePlay)
+TEST_F(ut_rightview_test, adjustVoiceVerticalScrollBar)
 {
     RightView rightview;
-    VNOTE_DATAS datas;
-    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
-    vnvoiceblock->voicePath = "/usr/share/music/bensound-sunny.mp3";
-    vnvoiceblock->voiceSize = 2650;
-    vnvoiceblock->voiceTitle = "test";
-    vnvoiceblock->state = true;
-    VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
-    block->ptrVoice = vnvoiceblock;
-    VoiceNoteItem *item = new VoiceNoteItem(block);
-    //    rightview.onVoicePlay(item);
+    QLayoutItem *layoutItem = rightview.m_viewportLayout->itemAt(0);
+    DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
+    rightview.adjustVoiceVerticalScrollBar(widget, 28);
 }
+
+//TEST_F(ut_rightview_test, onVoicePlay)
+//{
+//    RightView rightview;
+//    VNOTE_DATAS datas;
+//    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
+//    vnvoiceblock->voicePath = "/usr/share/music/bensound-sunny.mp3";
+//    vnvoiceblock->voiceSize = 2650;
+//    vnvoiceblock->voiceTitle = "test";
+//    vnvoiceblock->state = true;
+//    VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
+//    block->ptrVoice = vnvoiceblock;
+//    VoiceNoteItem *item = new VoiceNoteItem(block);
+//    rightview.onVoicePlay(item);
+//}
 
 TEST_F(ut_rightview_test, onVoicePause)
 {
@@ -205,8 +213,10 @@ TEST_F(ut_rightview_test, mouseEvent)
     vnoteitem->noteTitle = "test";
     rightview.m_noteItemData = vnoteitem;
     QPointF localPos;
-    QPointF point(30, 15);
-    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+    QPointF pointF(30, 15);
+    QPoint point(30, 15);
+    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, pointF, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    rightview.m_curItemWidget = rightview.getWidgetByPos(point);
     rightview.mouseMoveEvent(event);
     QMouseEvent *event1 = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
     rightview.mouseReleaseEvent(event1);

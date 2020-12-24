@@ -40,3 +40,9 @@ TEST_F(ut_vnotemessagedialog_test, setSingleButton)
     vnotemessagedialog.m_msgType = vnotemessagedialog.CutNote;
     vnotemessagedialog.initMessage();
 }
+
+TEST_F(ut_vnotemessagedialog_test, initMessage)
+{
+    VNoteMessageDialog vnotemessagedialog(1);
+    vnotemessagedialog.initMessage();
+}

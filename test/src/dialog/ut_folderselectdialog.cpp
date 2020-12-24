@@ -33,3 +33,18 @@ TEST_F(ut_folderselectdialog_test, setNoteContext)
     folderselectdialog.setNoteContextInfo("test", 1);
     folderselectdialog.getSelectIndex();
 }
+
+TEST_F(ut_folderselectdialog_test, clearSelection)
+{
+    LeftView leftview;
+    FolderSelectDialog folderselectdialog(leftview.m_pDataModel);
+    folderselectdialog.clearSelection();
+}
+
+TEST_F(ut_folderselectdialog_test, hideEvent)
+{
+    LeftView leftview;
+    FolderSelectDialog folderselectdialog(leftview.m_pDataModel);
+    QHideEvent *event = new QHideEvent();
+    folderselectdialog.hideEvent(event);
+}

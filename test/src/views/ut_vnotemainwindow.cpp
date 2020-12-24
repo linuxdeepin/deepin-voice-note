@@ -142,6 +142,55 @@ TEST_F(ut_vnotemainwindow_test, loadSearchNotes)
     vnotemainwindow.loadSearchNotes("本");
 }
 
+TEST_F(ut_vnotemainwindow_test, initDeviceExceptionErrMessage)
+{
+    VNoteMainWindow vnotemainwindow;
+    vnotemainwindow.initDeviceExceptionErrMessage();
+}
+
+TEST_F(ut_vnotemainwindow_test, showAsrErrMessage)
+{
+    VNoteMainWindow vnotemainwindow;
+    vnotemainwindow.showAsrErrMessage("error Message");
+}
+
+TEST_F(ut_vnotemainwindow_test, showDeviceExceptionErrMessage)
+{
+    VNoteMainWindow vnotemainwindow;
+    vnotemainwindow.showDeviceExceptionErrMessage();
+}
+
+TEST_F(ut_vnotemainwindow_test, onCursorChange)
+{
+    VNoteMainWindow vnotemainwindow;
+    vnotemainwindow.onCursorChange(150, true);
+}
+
+TEST_F(ut_vnotemainwindow_test, initMenuExtension)
+{
+    VNoteMainWindow vnotemainwindow;
+    vnotemainwindow.initMenuExtension();
+}
+
+TEST_F(ut_vnotemainwindow_test, setSpecialStatus)
+{
+    VNoteMainWindow vnotemainwindow;
+    vnotemainwindow.setSpecialStatus(vnotemainwindow.SearchStart);
+    vnotemainwindow.setSpecialStatus(vnotemainwindow.SearchEnd);
+    vnotemainwindow.setSpecialStatus(vnotemainwindow.PlayVoiceStart);
+    vnotemainwindow.setSpecialStatus(vnotemainwindow.PlayVoiceEnd);
+    vnotemainwindow.setSpecialStatus(vnotemainwindow.RecordStart);
+    vnotemainwindow.setSpecialStatus(vnotemainwindow.RecordEnd);
+    vnotemainwindow.setSpecialStatus(vnotemainwindow.VoiceToTextStart);
+    vnotemainwindow.setSpecialStatus(vnotemainwindow.VoiceToTextEnd);
+}
+
+TEST_F(ut_vnotemainwindow_test, initAsrErrMessage)
+{
+    VNoteMainWindow vnotemainwindow;
+    vnotemainwindow.initAsrErrMessage();
+}
+
 TEST_F(ut_vnotemainwindow_test, onStartRecord)
 {
     VNoteMainWindow vnotemainwindow;
@@ -176,18 +225,15 @@ TEST_F(ut_vnotemainwindow_test, event)
 
 TEST_F(ut_vnotemainwindow_test, handleMultipleOption)
 {
-    //    VNoteMainWindow vnotemainwindow;
-    //    int id = 1;
-    //    if(vnotemainwindow.m_middleView->count()>0){
-    //        vnotemainwindow.m_middleView->setCurrentIndex(1);
-    //    }
-    //    vnotemainwindow.handleMultipleOption(id);
-    //    int id2 = 2;
-    //    vnotemainwindow.handleMultipleOption(id2);
-    //    int id3 = 3;
-    //    vnotemainwindow.handleMultipleOption(id3);
-    //    int id4 = 4;
-    //    vnotemainwindow.handleMultipleOption(id4);
+    VNoteMainWindow vnotemainwindow;
+    MiddleView middleview;
+    middleview.setCurrentIndex(0);
+    int id = 1;
+    vnotemainwindow.handleMultipleOption(id);
+    int id2 = 2;
+    vnotemainwindow.handleMultipleOption(id2);
+    int id3 = 3;
+    vnotemainwindow.handleMultipleOption(id3);
 }
 
 TEST_F(ut_vnotemainwindow_test, onDropNote)
