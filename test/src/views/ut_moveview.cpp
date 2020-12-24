@@ -24,9 +24,12 @@
 
 #include <QRect>
 #include <QPaintEvent>
+#include <standarditemcommon.h>
 
 ut_MoveView_test::ut_MoveView_test()
 {
+    MoveView moveView;
+    moveView.grab();
 }
 
 TEST_F(ut_MoveView_test, setFolder)
@@ -60,24 +63,8 @@ TEST_F(ut_MoveView_test, setFolder)
 
 TEST_F(ut_MoveView_test, setNotesNumber)
 {
-    int number = 1;
     MoveView moveView;
-    moveView.setNotesNumber(number);
-}
-
-TEST_F(ut_MoveView_test, paintEvent)
-{
-    MoveView moveView;
-    MiddleView middleview;
-    middleview.selectionModel()->select(middleview.m_pDataModel->index(0, 0), QItemSelectionModel::Select);
-    QPaintEvent *event = new QPaintEvent(QRect(QPoint(0, 0), QSize(moveView.width(), moveView.height())));
-    moveView.paintEvent(event);
-    middleview.selectionModel()->select(middleview.m_pDataModel->index(0, 0), QItemSelectionModel::Select);
-    middleview.selectionModel()->select(middleview.m_pDataModel->index(1, 0), QItemSelectionModel::Select);
-    QPaintEvent *event1 = new QPaintEvent(QRect(QPoint(0, 0), QSize(moveView.width(), moveView.height())));
-    moveView.paintEvent(event1);
-    delete event;
-    delete event1;
+    moveView.setNotesNumber(2);
 }
 
 TEST_F(ut_MoveView_test, setNoteList)

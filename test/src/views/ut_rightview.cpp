@@ -35,8 +35,18 @@
 
 #include "vnotemessagedialog.h"
 
+#include "stub.h"
+
 ut_rightview_test::ut_rightview_test()
 {
+}
+
+QAction *stub_exec(const QPoint &pos, QAction *at = nullptr)
+{
+    Q_UNUSED(pos)
+    Q_UNUSED(at)
+
+    return nullptr;
 }
 
 TEST_F(ut_rightview_test, insertTextEdit)
@@ -50,6 +60,14 @@ TEST_F(ut_rightview_test, insertTextEdit)
 TEST_F(ut_rightview_test, insertVoiceItem)
 {
     RightView rightview;
+    VNoteItem *vnoteitem = new VNoteItem;
+    vnoteitem->noteId = 1;
+    vnoteitem->folderId = 1;
+    vnoteitem->noteTitle = "test";
+    rightview.m_noteItemData = vnoteitem;
+    VNOTE_DATAS datas;
+    VNoteBlock *block = datas.newBlock(VNoteBlock::Text);
+    rightview.m_curItemWidget = rightview.insertTextEdit(block, true, QTextCursor::Up, "test");
     QString tmppath = "/usr/share/music/bensound-sunny.mp3";
     rightview.insertVoiceItem(tmppath, 2650);
 }
@@ -93,8 +111,15 @@ TEST_F(ut_rightview_test, initAction)
 
 TEST_F(ut_rightview_test, mousePressEvent)
 {
+    Stub s;
+    s.set((QAction * (QMenu::*)(const QPoint &, QAction *)) ADDR(QMenu, exec), stub_exec);
     RightView rightview;
     QPointF localPos;
+    VNoteItem *vnoteitem = new VNoteItem;
+    vnoteitem->noteId = 1;
+    vnoteitem->folderId = 1;
+    vnoteitem->noteTitle = "test1";
+    rightview.m_noteItemData = vnoteitem;
     QMouseEvent *mousePressEvent = new QMouseEvent(QEvent::MouseButtonPress, localPos, localPos, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
     rightview.mousePressEvent(mousePressEvent);
 }
@@ -180,11 +205,11 @@ TEST_F(ut_rightview_test, mouseEvent)
     vnoteitem->noteTitle = "test";
     rightview.m_noteItemData = vnoteitem;
     QPointF localPos;
-    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
-    //    rightview.mousePressEvent(event);
+    QPointF point(30, 15);
+    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+    rightview.mouseMoveEvent(event);
     QMouseEvent *event1 = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
     rightview.mouseReleaseEvent(event1);
-    rightview.mouseMoveEvent(event);
 }
 
 TEST_F(ut_rightview_test, keyPressEvent)
