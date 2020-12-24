@@ -18,6 +18,8 @@
 
 #include "ut_vnoteforlder.h"
 #include "vnoteforlder.h"
+#include "vnotedatamanager.h"
+#include <QtDebug>
 
 ut_vnoteforlder_test::ut_vnoteforlder_test()
 {
@@ -45,22 +47,7 @@ TEST_F(ut_vnoteforlder_test, maxNoteIdRef)
 
 TEST_F(ut_vnoteforlder_test, getNotesCount)
 {
-    //    m_vnoteforlder->getNotesCount();
-}
-
-TEST_F(ut_vnoteforlder_test, qdebugtest)
-{
-    VNoteFolder vnotefolder;
-    vnotefolder.id = 0;
-    vnotefolder.category = 1;
-    vnotefolder.notesCount = 2;
-    vnotefolder.defaultIcon = 3;
-    vnotefolder.folder_state = vnotefolder.Normal;
-    vnotefolder.name = "test";
-    vnotefolder.iconPath = "test";
-    vnotefolder.createTime = QDateTime::currentDateTime();
-    vnotefolder.modifyTime = QDateTime::currentDateTime();
-    vnotefolder.deleteTime = QDateTime::currentDateTime();
-
-    qDebug() << "" << vnotefolder;
+    VNoteDataManager::instance()->m_qspNoteFoldersMap.reset(new VNOTE_FOLDERS_MAP());
+    VNoteDataManager::instance()->m_qspAllNotesMap.reset(new VNOTE_ALL_NOTES_MAP());
+    m_vnoteforlder->getNotesCount();
 }

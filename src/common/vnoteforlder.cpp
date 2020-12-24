@@ -87,21 +87,3 @@ VNOTE_ITEMS_MAP *VNoteFolder::getNotes()
 
     return notes;
 }
-
-QDebug &operator<<(QDebug &out, VNoteFolder &folder)
-{
-    out << "\n{ "
-        << "id=" << folder.id << ","
-        << "name=" << folder.name << ","
-        << "defaultIcon=" << folder.defaultIcon << ","
-        << "iconPath=" << folder.iconPath << ","
-        << "notesCount=" << folder.notesCount << ","
-        << "folder_state=" << folder.folder_state << ","
-        << "maxNoteId=" << folder.maxNoteId << ","
-        << "createTime=" << folder.createTime << ","
-        << "modifyTime=" << folder.modifyTime << ","
-        << "deleteTime=" << folder.deleteTime
-        << " }\n";
-
-    return out;
-}

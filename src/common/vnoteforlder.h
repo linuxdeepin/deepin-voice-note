@@ -62,8 +62,7 @@ public:
     //删除时间
     QDateTime deleteTime;
     //排序编号
-    qint32 sortNumber{-1};
-
+    qint32 sortNumber {-1};
 
     struct {
         //正常图标
@@ -77,8 +76,6 @@ public:
     qint32 getNotesCount();
     //获取记事项数据
     VNOTE_ITEMS_MAP *getNotes();
-
-    friend QDebug &operator<<(QDebug &out, VNoteFolder &folder);
 
 protected:
     bool fIsDataLoaded {false};

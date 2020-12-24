@@ -55,6 +55,7 @@ TEST_F(ut_MoveView_test, setFolder)
 
     moveview.setFolder(&vnotefolder);
     moveview.setNote(&vnoteitem);
+    moveview.paintEvent(nullptr);
 }
 
 TEST_F(ut_MoveView_test, setNotesNumber)
