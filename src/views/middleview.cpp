@@ -1067,6 +1067,8 @@ void MiddleView::noteStickOnTop()
         VNoteItemOper noteOper(noteData);
         if (noteOper.updateTop(!noteData->isTop)) {
             sortView();
+            //刷新起始位置
+            m_currentRow = currentIndex().row();
         }
     }
 }
