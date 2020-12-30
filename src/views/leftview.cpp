@@ -187,6 +187,9 @@ void LeftView::mouseReleaseEvent(QMouseEvent *event)
         setTouchState(TouchState::TouchNormal);
         return;
     }
+    if (m_onlyCurItemMenuEnable) {
+        return;
+    }
     //正常点击状态，选择当前点击选项
     QModelIndex index = indexAt(event->pos());
     if (index.row() != currentIndex().row() && m_touchState == TouchState::TouchPressing) {
@@ -197,9 +200,7 @@ void LeftView::mouseReleaseEvent(QMouseEvent *event)
         return;
     }
     setTouchState(TouchState::TouchNormal);
-    if (!m_onlyCurItemMenuEnable) {
-        DTreeView::mouseReleaseEvent(event);
-    }
+    DTreeView::mouseReleaseEvent(event);
 }
 
 /**
@@ -732,6 +733,7 @@ void LeftView::dragEnterEvent(QDragEnterEvent *event)
  */
 void LeftView::dragMoveEvent(QDragMoveEvent *event)
 {
+    qDebug() << "dragmove";
     DTreeView::dragMoveEvent(event);
     this->update();
     event->accept();
