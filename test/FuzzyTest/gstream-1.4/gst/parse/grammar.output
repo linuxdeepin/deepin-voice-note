@@ -1,0 +1,455 @@
+终端机在文法中未使用
+
+   '.'
+   '!'
+   '='
+
+
+语法
+
+    0 $accept: graph $end
+
+    1 element: IDENTIFIER
+    2        | element ASSIGNMENT
+
+    3 elementary: element
+    4           | bin
+
+    5 chain: openchain
+
+    6 openchain: elementary pads
+    7          | openchain link pads elementary pads
+
+    8 link: LINK
+
+    9 pads: %empty
+   10     | PADREF morepads
+
+   11 morepads: %empty
+   12         | ',' IDENTIFIER morepads
+
+   13 chain: openchain link PARSE_URL
+
+   14 openchain: PARSE_URL
+
+   15 chain: openchain link reference
+
+   16 openchain: reference
+
+   17 reference: REF morepads
+
+   18 chainlist: %empty
+   19          | chainlist chain
+   20          | chainlist error
+
+   21 assignments: %empty
+   22            | ASSIGNMENT assignments
+
+   23 binopener: '('
+   24          | BINREF
+
+   25 bin: binopener assignments chainlist ')'
+
+   26 graph: chainlist
+
+
+终结语词，附有它们出现处的规则
+
+$end (0) 0
+'!' (33)
+'(' (40) 23
+')' (41) 25
+',' (44) 12
+'.' (46)
+'=' (61)
+error (256) 20
+PARSE_URL <ss> (258) 13 14
+IDENTIFIER <ss> (259) 1 12
+REF <ss> (260) 17
+PADREF <ss> (261) 10
+BINREF <ss> (262) 24
+ASSIGNMENT <ss> (263) 2 22
+LINK <ss> (264) 8
+
+
+非终结语词，附有它们出现处的规则
+
+$accept (16)
+    于左侧： 0
+element <ee> (17)
+    于左侧： 1 2, 于右侧： 2 3
+elementary <cc> (18)
+    于左侧： 3 4, 于右侧： 6 7
+chain <cc> (19)
+    于左侧： 5 13 15, 于右侧： 19
+openchain <cc> (20)
+    于左侧： 6 7 14 16, 于右侧： 5 7 13 15
+link <ll> (21)
+    于左侧： 8, 于右侧： 7 13 15
+pads <pp> (22)
+    于左侧： 9 10, 于右侧： 6 7
+morepads <pp> (23)
+    于左侧： 11 12, 于右侧： 10 12 17
+reference <rr> (24)
+    于左侧： 17, 于右侧： 15 16
+chainlist <cc> (25)
+    于左侧： 18 19 20, 于右侧： 19 20 25 26
+assignments <pp> (26)
+    于左侧： 21 22, 于右侧： 22 25
+binopener <ss> (27)
+    于左侧： 23 24, 于右侧： 25
+bin <cc> (28)
+    于左侧： 25, 于右侧： 4
+graph <gg> (29)
+    于左侧： 26, 于右侧： 0
+
+
+状态 0
+
+    0 $accept: . graph $end
+
+    $default  使用规则 18 以归约 (chainlist)
+
+    chainlist  转到状态 1
+    graph      转到状态 2
+
+
+状态 1
+
+   19 chainlist: chainlist . chain
+   20          | chainlist . error
+   26 graph: chainlist .
+
+    error       偏移，并进入状态 3
+    PARSE_URL   偏移，并进入状态 4
+    IDENTIFIER  偏移，并进入状态 5
+    REF         偏移，并进入状态 6
+    BINREF      偏移，并进入状态 7
+    '('         偏移，并进入状态 8
+
+    $end  使用规则 26 以归约 (graph)
+
+    element     转到状态 9
+    elementary  转到状态 10
+    chain       转到状态 11
+    openchain   转到状态 12
+    reference   转到状态 13
+    binopener   转到状态 14
+    bin         转到状态 15
+
+
+状态 2
+
+    0 $accept: graph . $end
+
+    $end  偏移，并进入状态 16
+
+
+状态 3
+
+   20 chainlist: chainlist error .
+
+    $default  使用规则 20 以归约 (chainlist)
+
+
+状态 4
+
+   14 openchain: PARSE_URL .
+
+    $default  使用规则 14 以归约 (openchain)
+
+
+状态 5
+
+    1 element: IDENTIFIER .
+
+    $default  使用规则 1 以归约 (element)
+
+
+状态 6
+
+   17 reference: REF . morepads
+
+    ','  偏移，并进入状态 17
+
+    $default  使用规则 11 以归约 (morepads)
+
+    morepads  转到状态 18
+
+
+状态 7
+
+   24 binopener: BINREF .
+
+    $default  使用规则 24 以归约 (binopener)
+
+
+状态 8
+
+   23 binopener: '(' .
+
+    $default  使用规则 23 以归约 (binopener)
+
+
+状态 9
+
+    2 element: element . ASSIGNMENT
+    3 elementary: element .
+
+    ASSIGNMENT  偏移，并进入状态 19
+
+    $default  使用规则 3 以归约 (elementary)
+
+
+状态 10
+
+    6 openchain: elementary . pads
+
+    PADREF  偏移，并进入状态 20
+
+    $default  使用规则 9 以归约 (pads)
+
+    pads  转到状态 21
+
+
+状态 11
+
+   19 chainlist: chainlist chain .
+
+    $default  使用规则 19 以归约 (chainlist)
+
+
+状态 12
+
+    5 chain: openchain .
+    7 openchain: openchain . link pads elementary pads
+   13 chain: openchain . link PARSE_URL
+   15      | openchain . link reference
+
+    LINK  偏移，并进入状态 22
+
+    $default  使用规则 5 以归约 (chain)
+
+    link  转到状态 23
+
+
+状态 13
+
+   16 openchain: reference .
+
+    $default  使用规则 16 以归约 (openchain)
+
+
+状态 14
+
+   25 bin: binopener . assignments chainlist ')'
+
+    ASSIGNMENT  偏移，并进入状态 24
+
+    $default  使用规则 21 以归约 (assignments)
+
+    assignments  转到状态 25
+
+
+状态 15
+
+    4 elementary: bin .
+
+    $default  使用规则 4 以归约 (elementary)
+
+
+状态 16
+
+    0 $accept: graph $end .
+
+    $default  接受
+
+
+状态 17
+
+   12 morepads: ',' . IDENTIFIER morepads
+
+    IDENTIFIER  偏移，并进入状态 26
+
+
+状态 18
+
+   17 reference: REF morepads .
+
+    $default  使用规则 17 以归约 (reference)
+
+
+状态 19
+
+    2 element: element ASSIGNMENT .
+
+    $default  使用规则 2 以归约 (element)
+
+
+状态 20
+
+   10 pads: PADREF . morepads
+
+    ','  偏移，并进入状态 17
+
+    $default  使用规则 11 以归约 (morepads)
+
+    morepads  转到状态 27
+
+
+状态 21
+
+    6 openchain: elementary pads .
+
+    $default  使用规则 6 以归约 (openchain)
+
+
+状态 22
+
+    8 link: LINK .
+
+    $default  使用规则 8 以归约 (link)
+
+
+状态 23
+
+    7 openchain: openchain link . pads elementary pads
+   13 chain: openchain link . PARSE_URL
+   15      | openchain link . reference
+
+    PARSE_URL  偏移，并进入状态 28
+    REF        偏移，并进入状态 6
+    PADREF     偏移，并进入状态 20
+
+    $default  使用规则 9 以归约 (pads)
+
+    pads       转到状态 29
+    reference  转到状态 30
+
+
+状态 24
+
+   22 assignments: ASSIGNMENT . assignments
+
+    ASSIGNMENT  偏移，并进入状态 24
+
+    $default  使用规则 21 以归约 (assignments)
+
+    assignments  转到状态 31
+
+
+状态 25
+
+   25 bin: binopener assignments . chainlist ')'
+
+    $default  使用规则 18 以归约 (chainlist)
+
+    chainlist  转到状态 32
+
+
+状态 26
+
+   12 morepads: ',' IDENTIFIER . morepads
+
+    ','  偏移，并进入状态 17
+
+    $default  使用规则 11 以归约 (morepads)
+
+    morepads  转到状态 33
+
+
+状态 27
+
+   10 pads: PADREF morepads .
+
+    $default  使用规则 10 以归约 (pads)
+
+
+状态 28
+
+   13 chain: openchain link PARSE_URL .
+
+    $default  使用规则 13 以归约 (chain)
+
+
+状态 29
+
+    7 openchain: openchain link pads . elementary pads
+
+    IDENTIFIER  偏移，并进入状态 5
+    BINREF      偏移，并进入状态 7
+    '('         偏移，并进入状态 8
+
+    element     转到状态 9
+    elementary  转到状态 34
+    binopener   转到状态 14
+    bin         转到状态 15
+
+
+状态 30
+
+   15 chain: openchain link reference .
+
+    $default  使用规则 15 以归约 (chain)
+
+
+状态 31
+
+   22 assignments: ASSIGNMENT assignments .
+
+    $default  使用规则 22 以归约 (assignments)
+
+
+状态 32
+
+   19 chainlist: chainlist . chain
+   20          | chainlist . error
+   25 bin: binopener assignments chainlist . ')'
+
+    error       偏移，并进入状态 3
+    PARSE_URL   偏移，并进入状态 4
+    IDENTIFIER  偏移，并进入状态 5
+    REF         偏移，并进入状态 6
+    BINREF      偏移，并进入状态 7
+    '('         偏移，并进入状态 8
+    ')'         偏移，并进入状态 35
+
+    element     转到状态 9
+    elementary  转到状态 10
+    chain       转到状态 11
+    openchain   转到状态 12
+    reference   转到状态 13
+    binopener   转到状态 14
+    bin         转到状态 15
+
+
+状态 33
+
+   12 morepads: ',' IDENTIFIER morepads .
+
+    $default  使用规则 12 以归约 (morepads)
+
+
+状态 34
+
+    7 openchain: openchain link pads elementary . pads
+
+    PADREF  偏移，并进入状态 20
+
+    $default  使用规则 9 以归约 (pads)
+
+    pads  转到状态 36
+
+
+状态 35
+
+   25 bin: binopener assignments chainlist ')' .
+
+    $default  使用规则 25 以归约 (bin)
+
+
+状态 36
+
+    7 openchain: openchain link pads elementary pads .
+
+    $default  使用规则 7 以归约 (openchain)
