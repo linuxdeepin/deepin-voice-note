@@ -494,15 +494,18 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
             setTouchState(TouchState::TouchPressing);
         }
     } else {
-        //触控屏手势
-        if (event->source() == Qt::MouseEventSynthesizedByQt) {
-            //是否弹出右键菜单
-            m_popMenuTimer->start(1000);
-            return;
-        } else {
-            if (Qt::RightButton == event->button()) {
-                m_noteMenu->setWindowOpacity(1);
-                onMenuShow(event->globalPos());
+        //置灰状态下只有当前笔记可操作
+        if (currentIndex() == indexAt(event->pos())) {
+            //触控屏手势
+            if (event->source() == Qt::MouseEventSynthesizedByQt) {
+                //是否弹出右键菜单
+                m_popMenuTimer->start(1000);
+                return;
+            } else {
+                if (Qt::RightButton == event->button()) {
+                    m_noteMenu->setWindowOpacity(1);
+                    onMenuShow(event->globalPos());
+                }
             }
         }
     }

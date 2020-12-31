@@ -159,13 +159,16 @@ void LeftView::mousePressEvent(QMouseEvent *event)
             }
         }
     } else {
-        if (event->source() == Qt::MouseEventSynthesizedByQt) {
-            m_popMenuTimer->start(1000);
-            return;
-        } else {
-            if (Qt::RightButton == event->button()) {
-                m_notepadMenu->setWindowOpacity(1);
-                m_notepadMenu->popup(event->globalPos());
+        //置灰状态下只有当前记事本可操作
+        if (currentIndex() == indexAt(event->pos())) {
+            if (event->source() == Qt::MouseEventSynthesizedByQt) {
+                m_popMenuTimer->start(1000);
+                return;
+            } else {
+                if (Qt::RightButton == event->button()) {
+                    m_notepadMenu->setWindowOpacity(1);
+                    m_notepadMenu->popup(event->globalPos());
+                }
             }
         }
     }
