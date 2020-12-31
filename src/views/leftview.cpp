@@ -245,7 +245,7 @@ void LeftView::mouseMoveEvent(QMouseEvent *event)
     }
     //处理鼠标拖拽操作
     else if ((event->buttons() & Qt::LeftButton) && m_touchState == TouchState::TouchPressing) {
-        if (!m_isDraging) {
+        if (!m_isDraging && indexAt(event->pos()).isValid()) {
             setCurrentIndex(indexAt(event->pos()));
             //需判断移动距离
             if (qAbs(event->pos().x() - m_touchPressPoint.x()) > 3

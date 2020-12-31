@@ -731,7 +731,7 @@ void MiddleView::mouseMoveEvent(QMouseEvent *event)
         }
         return;
     } else if ((event->buttons() & Qt::LeftButton) && m_touchState == TouchState::TouchPressing) {
-        if (!m_isDraging) {
+        if (!m_isDraging && indexAt(event->pos()).isValid()) {
             m_shiftSelection = -1;
             if (!selectedIndexes().contains(m_index)) {
                 //解决点击多选问题
