@@ -75,7 +75,8 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     m_deleteButton = new DToolButton(this);
     m_saveTextButton = new DToolButton(this);
     m_saveVoiceButton = new DToolButton(this);
-
+    m_saveTextButton->setVisible(false);
+    m_saveVoiceButton->setVisible(false);
     onFontChanged();
     //设置主题
     changeFromThemeType();

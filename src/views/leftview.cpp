@@ -397,13 +397,20 @@ void LeftView::addFolder(VNoteFolder *folder)
  */
 bool LeftView::eventFilter(QObject *o, QEvent *e)
 {
-    Q_UNUSED(o);
-    if (e->type() == QEvent::DragLeave) {
-        m_pItemDelegate->setDrawHover(false);
-        update();
-    } else if (e->type() == QEvent::DragEnter) {
-        m_pItemDelegate->setDrawHover(true);
-        update();
+    if (o == viewport()) {
+        if (e->type() == QEvent::DragLeave) {
+            m_pItemDelegate->setDrawHover(false);
+            update();
+        } else if (e->type() == QEvent::DragEnter) {
+            m_pItemDelegate->setDrawHover(true);
+            update();
+        }
+    } else {
+        if (e->type() == QEvent::FocusIn) {
+            emit virtualKeyboardShow(true);
+        } else if (e->type() == QEvent::Destroy) {
+            emit virtualKeyboardShow(false);
+        }
     }
     return false;
 }
@@ -736,7 +743,6 @@ void LeftView::dragEnterEvent(QDragEnterEvent *event)
  */
 void LeftView::dragMoveEvent(QDragMoveEvent *event)
 {
-    qDebug() << "dragmove";
     DTreeView::dragMoveEvent(event);
     this->update();
     event->accept();

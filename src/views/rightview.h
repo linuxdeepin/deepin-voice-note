@@ -27,6 +27,7 @@
 #include <QShortcut>
 #include <QMultiMap>
 #include <QList>
+#include <QTimer>
 
 #include <DWidget>
 #include <DDialog>
@@ -123,6 +124,7 @@ signals:
     void contentChanged();
     //滚动条调整
     void sigCursorChange(int height, bool mouseMove);
+    void virtualKeyboardShow(bool show);
 public slots:
     //编辑框获取焦点
     void onTextEditFocusIn();
@@ -141,7 +143,6 @@ public slots:
 
 protected:
     //鼠标与按键事件
-    void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *e) override;
@@ -173,6 +174,8 @@ private:
     QVBoxLayout *m_viewportLayout {nullptr};
     //Voice control context menu
     DMenu *m_noteDetailContextMenu {nullptr};
+    DMenu *m_noteDetailVoiceMenu {nullptr};
+
     DDialog *m_fileHasDelDialog {nullptr};
     bool m_fIsNoteModified {false};
     bool m_isFristTextChange {false};
@@ -185,6 +188,8 @@ private:
     QMap<VNoteBlock *, DetailItemWidget *> m_mapWidgetCache;
     //详情页是否为当前笔记
     bool m_isNormalView {true};
+
+    QTimer *m_updateTimer;
 };
 
 #endif // RIGHTVIEW_H

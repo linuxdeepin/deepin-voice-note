@@ -65,10 +65,14 @@ public:
         NoteMenuMax,
 
         //NoteDetail
-        NoteDetailMenuBase,
-        DetailVoiceSave = NoteDetailMenuBase,
+        NoteDetailVoiceBase,
+        DetailVoiceSave = NoteDetailVoiceBase,
         DetailVoice2Text,
-        DetailDelete,
+        DetailVoiceDelete,
+        DetailVoiceMax,
+
+        NoteDetailContextBase,
+        DetailContextDelete = NoteDetailContextBase,
         DetailSelectAll,
         DetailCopy,
         DetailCut,
@@ -93,6 +97,7 @@ public:
         NotebookCtxMenu,
         NoteCtxMenu,
         NoteDetailCtxMenu,
+        NoteDetailvoiceMenu,
     };
     Q_ENUM(MenuType)
     //获取记事本列表右键菜单
@@ -101,6 +106,8 @@ public:
     VNoteRightMenu *noteContextMenu();
     //获取详情页右键菜单
     DMenu *detialContextMenu();
+    //获取详情页语音菜单
+    DMenu *detialVoiceMenu();
     //获取菜单项ID
     ActionKind getActionKind(QAction *action);
     //获取菜单项
@@ -121,7 +128,7 @@ protected:
     QScopedPointer<VNoteRightMenu> m_notebookContextMenu;
     QScopedPointer<VNoteRightMenu> m_noteContextMenu;
     QScopedPointer<VNoteRightMenu> m_detialContextMenu;
-
+    QScopedPointer<VNoteRightMenu> m_detialVoiceMenu;
     QMap<ActionKind, QAction *> m_actionsMap;
 };
 

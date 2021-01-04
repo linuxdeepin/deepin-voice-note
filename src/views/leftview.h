@@ -52,7 +52,7 @@ public:
         TouchOutVisibleRegion
     };
     //菜单状态
-    enum MenuStatus{
+    enum MenuStatus {
         InitialState,
         ReleaseFromMenu,
         Normal
@@ -88,7 +88,7 @@ public:
     //获取记事本顺序
     QString getFolderSort();
     //获取第一个记事本
-    VNoteFolder* getFirstFolder();
+    VNoteFolder *getFirstFolder();
     //处理触摸屏slide事件
     void handleTouchSlideEvent(qint64 timeParam, double distY, QPoint point);
     //更新触摸屏一指状态
@@ -99,6 +99,7 @@ public:
 signals:
     //拖拽到当前记事本
     void dropNotesEnd(bool dropCancel);
+    void virtualKeyboardShow(bool show);
 
 protected:
     //鼠标事件
@@ -122,13 +123,14 @@ protected:
     // 拖拽离开视图事件
     void dragLeaveEvent(QDragLeaveEvent *event) override;
     // 拖拽放下事件
-    void dropEvent (QDropEvent * event ) override;
+    void dropEvent(QDropEvent *event) override;
     //处理触摸移动事件
     void doTouchMoveEvent(QMouseEvent *event);
     //处理触摸屏拖拽事件
     void handleDragEvent(bool isTouch = true);
     //事件过滤
-    bool eventFilter(QObject *o, QEvent *e)override;
+    bool eventFilter(QObject *o, QEvent *e) override;
+
 private:
     //初始化代理模块
     void initDelegate();
@@ -149,14 +151,14 @@ private:
 
     //记事本列表右键菜单
     VNoteRightMenu *m_notepadMenu {nullptr};
-//    DMenu *m_notepadMenu {nullptr};
+    //    DMenu *m_notepadMenu {nullptr};
     QStandardItemModel *m_pDataModel {nullptr};
     LeftViewDelegate *m_pItemDelegate {nullptr};
     LeftViewSortFilter *m_pSortViewFilter {nullptr};
     bool m_onlyCurItemMenuEnable {false};
     FolderSelectDialog *m_folderSelectDialog {nullptr};
     MoveView *m_MoveView {nullptr};
-    bool    m_folderDraing {false};
+    bool m_folderDraing {false};
 
     //以下为实现触摸屏功能声明参数
     bool m_isTouchSliding {false};
@@ -164,7 +166,7 @@ private:
     QPoint m_touchPressPoint;
     //是否鼠标拖拽
     bool m_isDraging {false};
-    QModelIndex m_index ;
+    QModelIndex m_index;
     MenuStatus m_menuState {InitialState};
     QTimer *m_selectCurrentTimer {nullptr};
     QTimer *m_popMenuTimer {nullptr};

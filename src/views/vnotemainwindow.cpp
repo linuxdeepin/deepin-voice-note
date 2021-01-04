@@ -149,8 +149,15 @@ void VNoteMainWindow::initConnections()
     connect(m_leftView->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &VNoteMainWindow::onVNoteFolderChange);
 
+    connect(m_leftView, &LeftView::virtualKeyboardShow,
+            this, &VNoteMainWindow::onVirtualKeyboardShow);
+
     connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
             this, SLOT(onVNoteChange(const QModelIndex &)));
+
+    connect(m_middleView, &MiddleView::virtualKeyboardShow,
+            this, &VNoteMainWindow::onVirtualKeyboardShow);
+
     connect(m_rightView, &RightView::contentChanged,
             m_middleView, &MiddleView::onNoteChanged);
 
@@ -160,6 +167,8 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onRightViewVoicePause);
     connect(m_rightView, &RightView::sigCursorChange,
             this, &VNoteMainWindow::onCursorChange);
+    connect(m_rightView, &RightView::virtualKeyboardShow,
+            this, &VNoteMainWindow::onVirtualKeyboardShow);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::onNewNotebook);
@@ -200,6 +209,8 @@ void VNoteMainWindow::initConnections()
     connect(ActionManager::Instance()->detialContextMenu(), &DMenu::aboutToShow,
             this, &VNoteMainWindow::onMenuAbout2Show);
     connect(ActionManager::Instance()->detialContextMenu(), &DMenu::triggered,
+            this, &VNoteMainWindow::onMenuAction);
+    connect(ActionManager::Instance()->detialVoiceMenu(), &DMenu::triggered,
             this, &VNoteMainWindow::onMenuAction);
     //处理笔记拖拽释放
     connect(m_leftView, &LeftView::dropNotesEnd, this, &VNoteMainWindow::onDropNote);
@@ -337,7 +348,7 @@ void VNoteMainWindow::initShortcuts()
             m_recordBar->onStartRecord();
         }
     });
-
+#if 0
     //Voice to Text
     m_stVoice2Text.reset(new QShortcut(this));
     m_stVoice2Text->setKey(Qt::CTRL + Qt::Key_W);
@@ -400,7 +411,7 @@ void VNoteMainWindow::initShortcuts()
             }
         }
     });
-
+#endif
     //Notebook/Note/Detial delete key
     m_stDelete.reset(new QShortcut(this));
     m_stDelete->setKey(Qt::Key_Delete);
@@ -435,12 +446,12 @@ void VNoteMainWindow::initShortcuts()
                 }
             } else if (m_rightView->hasFocus()) {
                 deleteAct = ActionManager::Instance()->getActionById(
-                    ActionManager::DetailDelete);
+                    ActionManager::DetailContextDelete);
             } else {
                 QPoint pos = m_rightViewHolder->mapFromGlobal(QCursor::pos());
                 if (m_rightViewHolder->rect().contains(pos)) {
                     deleteAct = ActionManager::Instance()->getActionById(
-                        ActionManager::DetailDelete);
+                        ActionManager::DetailContextDelete);
                 }
             }
 
@@ -493,6 +504,7 @@ void VNoteMainWindow::initTitleBar()
     m_noteSearchEdit->setFixedSize(QSize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H));
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
     titlebar()->addWidget(m_noteSearchEdit);
+    m_noteSearchEdit->lineEdit()->installEventFilter(this);
 }
 
 /**
@@ -562,7 +574,6 @@ void VNoteMainWindow::initLeftView()
     DPalette pb = DApplicationHelper::instance()->palette(m_leftView->viewport());
     pb.setBrush(DPalette::Base, QColor(0, 0, 0, 0));
     m_leftView->viewport()->setPalette(pb);
-
     m_leftView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_leftView->setContentsMargins(0, 0, 0, 0);
     m_leftView->setHeaderHidden(true);
@@ -575,6 +586,7 @@ void VNoteMainWindow::initLeftView()
 
     m_addNotepadBtn = new DPushButton(DApplication::translate("VNoteMainWindow", "Create Notebook"),
                                       m_leftViewHolder);
+
     QVBoxLayout *btnLayout = new QVBoxLayout();
     btnLayout->addWidget(m_addNotepadBtn);
     btnLayout->setContentsMargins(10, 0, 10, 10);
@@ -712,8 +724,8 @@ void VNoteMainWindow::initLogin1Manager()
         "/org/freedesktop/login1",
         QDBusConnection::systemBus(), this);
 
-    connect(m_pLogin1Manager, &DBusLogin1Manager::PrepareForSleep,
-            this, &VNoteMainWindow::onSystemDown);
+    //    connect(m_pLogin1Manager, &DBusLogin1Manager::PrepareForSleep,
+    //            this, &VNoteMainWindow::onSystemDown);
     connect(m_pLogin1Manager, &DBusLogin1Manager::PrepareForShutdown,
             this, &VNoteMainWindow::onSystemDown);
 }
@@ -929,7 +941,7 @@ void VNoteMainWindow::onStartRecord(const QString &path)
     }
 
     //Hold shutdown locker
-    holdHaltLock();
+    // holdHaltLock();
 }
 
 /**
@@ -962,7 +974,7 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
     setSpecialStatus(RecordEnd);
 
     //Release shutdonw locker
-    releaseHaltLock();
+    //releaseHaltLock();
 
     if (stateOperation->isAppQuit()) {
         release();
@@ -1119,10 +1131,10 @@ void VNoteMainWindow::onPreviewShortcut()
         {DApplication::translate("Shortcuts", "Delete note"), "Delete"},
         {DApplication::translate("Shortcuts", "Play/Pause"), "Space"},
         {DApplication::translate("Shortcuts", "Record voice"), "Ctrl+R"},
-        {DApplication::translate("Shortcuts", "Voice to Text"), "Ctrl+W"},
-        {DApplication::translate("Shortcuts", "Save as MP3"), "Ctrl+P"},
-        {DApplication::translate("Shortcuts", "Save as TXT"), "Ctrl+S"},
-        {DApplication::translate("Shortcuts", "Save recordings"), "Ctrl+Y"},
+        //{DApplication::translate("Shortcuts", "Voice to Text"), "Ctrl+W"},
+        //{DApplication::translate("Shortcuts", "Save as MP3"), "Ctrl+P"},
+        //{DApplication::translate("Shortcuts", "Save as TXT"), "Ctrl+S"},
+        //{DApplication::translate("Shortcuts", "Save recordings"), "Ctrl+Y"},
     };
 
     QJsonObject noteJsonGroup;
@@ -1347,7 +1359,8 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::NoteRename:
         editNote();
         break;
-    case ActionManager::DetailDelete: {
+    case ActionManager::DetailVoiceDelete:
+    case ActionManager::DetailContextDelete: {
         int ret = m_rightView->showWarningDialog();
         if (ret == 1) {
             VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this);
@@ -2032,16 +2045,13 @@ void VNoteMainWindow::closeDeviceExceptionErrMessage()
  */
 void VNoteMainWindow::onSystemDown(bool active)
 {
+    Q_UNUSED(active)
     qInfo() << "System going down...";
 
-    if (active) {
-        if (stateOperation->isRecording()) {
-            m_recordBar->stopRecord();
+    if (stateOperation->isRecording()) {
+        m_recordBar->stopRecord();
 
-            qInfo() << "System going down when recording, cancel it.";
-        }
-
-        releaseHaltLock();
+        qInfo() << "System going down when recording, cancel it.";
     }
 }
 
@@ -2143,11 +2153,11 @@ void VNoteMainWindow::initMenuExtension()
 {
     m_menuExtension = new DMenu(this);
     QAction *setting = new QAction(DApplication::translate("TitleBar", "Settings"), m_menuExtension);
-    QAction *privacy = new QAction(DApplication::translate("TitleBar", "Privacy Policy"), m_menuExtension);
+    //QAction *privacy = new QAction(DApplication::translate("TitleBar", "Privacy Policy"), m_menuExtension);
     m_menuExtension->addAction(setting);
-    m_menuExtension->addAction(privacy);
+    //m_menuExtension->addAction(privacy);
     m_menuExtension->addSeparator();
-    connect(privacy, &QAction::triggered, this, &VNoteMainWindow::onShowPrivacy);
+    //connect(privacy, &QAction::triggered, this, &VNoteMainWindow::onShowPrivacy);
     connect(setting, &QAction::triggered, this, &VNoteMainWindow::onShowSettingDialog);
 }
 
@@ -2214,4 +2224,41 @@ void VNoteMainWindow::handleMultipleOption(int id)
         confirmDialog.exec();
         break;
     }
+}
+
+void VNoteMainWindow::onVirtualKeyboardShow(bool show)
+{
+    if (show) {
+        virtualKeyboardUser += 1;
+    } else {
+        virtualKeyboardUser -= 1;
+    }
+
+    QWidget *widget = static_cast<QWidget *>(sender());
+    if (widget == m_leftView) {
+        qDebug() << "m_leftView:" << show;
+    } else if (widget == m_middleView) {
+        qDebug() << "m_middleView:" << show;
+    } else if (widget == m_rightView) {
+        qDebug() << "m_rightView:" << show;
+    } else {
+        qDebug() << "m_searchedit:" << show;
+    }
+
+    if (virtualKeyboardUser <= 0) {
+        qDebug() << "close virtualKeyboard";
+    } else {
+        qDebug() << "show virtualKeyboard:" << virtualKeyboardUser;
+    }
+}
+
+bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
+{
+    Q_UNUSED(o)
+    if (e->type() == QEvent::FocusIn) {
+        onVirtualKeyboardShow(true);
+    } else if (e->type() == QEvent::FocusOut) {
+        onVirtualKeyboardShow(false);
+    }
+    return false;
 }

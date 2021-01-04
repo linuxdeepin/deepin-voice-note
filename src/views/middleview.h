@@ -50,21 +50,21 @@ public:
         TouchOutVisibleRegion
     };
     //菜单状态
-    enum MenuStatus{
+    enum MenuStatus {
         InitialState,
         ReleaseFromMenu,
         Normal
     };
     //辅助键状态
-    enum ModifierState{
-            noModifier = 0,
-            ctrlModifier = 1,
-            shiftAndUpOrDownModifier = 2,
-            shiftAndMouseModifier = 3,
-            shiftAndHomeOrEndKeyModifier = 4
+    enum ModifierState {
+        noModifier = 0,
+        ctrlModifier = 1,
+        shiftAndUpOrDownModifier = 2,
+        shiftAndMouseModifier = 3,
+        shiftAndHomeOrEndKeyModifier = 4
     };
     //鼠标状态
-    enum MouseState{
+    enum MouseState {
         normal = 0,
         pressing = 1,
         moving = 2
@@ -99,7 +99,7 @@ public:
     //获取记事项数目
     qint32 rowCount() const;
     //删除当前选中笔记
-    QList<VNoteItem *>deleteCurrentRow();
+    QList<VNoteItem *> deleteCurrentRow();
     //获取当前选中项数据
     VNoteItem *getCurrVNotedata() const;
     //当前选中数据项列表
@@ -133,6 +133,7 @@ public:
 signals:
     //请求刷新详情页
     void requestChangeRightView(bool isMultipleOption);
+    void virtualKeyboardShow(bool show);
 
 public slots:
     //更新记事项
@@ -167,6 +168,7 @@ protected:
     void setMouseState(const MouseState &mouseState);
     //响应右键菜单弹出
     void onMenuShow(QPoint point);
+
 private:
     //初始化代理模块
     void initDelegate();
@@ -203,7 +205,7 @@ private:
     QPoint m_touchPressPoint;
     //正在鼠标拖拽
     bool m_isDraging {false};
-    QModelIndex m_index ;
+    QModelIndex m_index;
     QTimer *m_selectCurrentTimer {nullptr};
     QTimer *m_popMenuTimer {nullptr};
     MenuStatus m_menuState {InitialState};
@@ -214,7 +216,7 @@ private:
     MouseState m_mouseState {normal};
     //用于shift多选判断位置
     int m_shiftSelection = -1;
-    int m_nextSelection  = -1;
+    int m_nextSelection = -1;
     //拖拽完成标志
     bool m_dragSuccess {false};
 };

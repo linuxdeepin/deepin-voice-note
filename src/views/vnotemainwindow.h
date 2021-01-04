@@ -90,12 +90,13 @@ public:
         VoiceToTextEnd
     };
     //多选详情页id
-    enum ButtonValue{
-       Move = 1,
+    enum ButtonValue {
+        Move = 1,
         SaveAsTxT = 2,
         SaveAsVoice = 3,
         Delete = 4
     };
+
 protected:
     //初始化UI布局
     void initUI();
@@ -219,6 +220,10 @@ public slots:
     void onDropNote(bool dropCancel);
     //响应多选详情页操作
     void handleMultipleOption(int id);
+    //关闭虚拟键盘
+    void onVirtualKeyboardShow(bool show);
+    bool eventFilter(QObject *o, QEvent *e) override;
+
 private:
     //左侧列表视图操作相关
     //添加记事本
@@ -291,7 +296,7 @@ private:
     SplashView *m_splashView {nullptr};
     HomePage *m_wndHomePage {nullptr};
     DStackedWidget *m_stackedWidget {nullptr};
-    bool m_rightViewHasFouse {true};
+    bool m_rightViewHasFouse {false};
 
     //Shortcuts key
     //*****************Shortcut key begin*********************
@@ -322,7 +327,7 @@ private:
     //Login session manager
     DBusLogin1Manager *m_pLogin1Manager {nullptr};
     QDBusPendingReply<QDBusUnixFileDescriptor> m_lockFd;
-
+    int virtualKeyboardUser {0};
     friend class VNMainWndDelayInitTask;
 };
 

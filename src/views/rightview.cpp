@@ -47,7 +47,6 @@
 #include <QBoxLayout>
 #include <QDebug>
 #include <QStandardPaths>
-#include <QTimer>
 #include <QScrollBar>
 #include <QScrollArea>
 #include <QAbstractTextDocumentLayout>
@@ -83,6 +82,9 @@ void RightView::initUi()
 
     m_playAnimTimer = new QTimer(this);
     m_playAnimTimer->setInterval(300);
+
+    m_updateTimer = new QTimer(this);
+    m_updateTimer->setInterval(1000);
 }
 
 /**
@@ -92,6 +94,7 @@ void RightView::initMenu()
 {
     //Init voice context Menu
     m_noteDetailContextMenu = ActionManager::Instance()->detialContextMenu();
+    m_noteDetailVoiceMenu = ActionManager::Instance()->detialVoiceMenu();
 }
 
 /**
@@ -252,6 +255,7 @@ void RightView::onTextEditFocusIn()
         }
         adjustVerticalScrollBar(widget, height);
     }
+    emit virtualKeyboardShow(true);
 }
 
 /**
@@ -263,6 +267,7 @@ void RightView::onTextEditFocusOut()
         TextNoteItem *widget = static_cast<TextNoteItem *>(sender());
         Utils::documentToBlock(widget->getNoteBlock(), widget->getTextDocument());
     }
+    emit virtualKeyboardShow(false);
     saveNote();
 }
 
@@ -272,9 +277,10 @@ void RightView::onTextEditFocusOut()
 void RightView::onTextEditTextChange()
 {
     m_fIsNoteModified = true;
+
     if (m_isFristTextChange == false) {
-        m_isFristTextChange = true;
         saveNote();
+        m_isFristTextChange = true;
     }
 }
 
@@ -288,7 +294,6 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
 {
     this->setVisible(false);
     clearAllSelection();
-
     if (m_noteItemData == data) {
         m_searchKey = reg;
         for (int i = 0; i < m_viewportLayout->count() - 1; i++) {
@@ -316,10 +321,10 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
     }
 
     m_searchKey = reg;
-    m_isFristTextChange = false;
     m_noteItemData = data;
     m_curAsrItem = nullptr;
     m_curPlayItem = nullptr;
+    m_isFristTextChange = false;
 
     if (m_noteItemData == nullptr) {
         m_curItemWidget = nullptr;
@@ -422,18 +427,6 @@ void RightView::onPlayUpdate()
 }
 
 /**
- * @brief RightView::leaveEvent
- * @param event
- */
-void RightView::leaveEvent(QEvent *event)
-{
-    Q_UNUSED(event);
-    //TODO:
-    //    Add the note save code here.
-    saveNote();
-}
-
-/**
  * @brief RightView::saveNote
  */
 void RightView::saveNote()
@@ -469,9 +462,43 @@ void RightView::saveNote()
  */
 int RightView::initAction(DetailItemWidget *widget)
 {
-    bool TTSisWorking = false;
+    auto voiceWidgets = m_selectWidget.values(VoicePlugin);
+    auto textWidgets = m_selectWidget.values(TextEditPlugin);
+    bool canCutDel = true;
     OpsStateInterface *stateInterface = OpsStateInterface::instance();
     bool isAISrvAvailable = stateInterface->isAiSrvExist();
+    if (m_curPlayItem && m_curPlayItem->hasSelection()) {
+        canCutDel = false;
+    }
+
+    if (stateInterface->isVoice2Text() && m_curAsrItem && m_curAsrItem->hasSelection()) {
+        canCutDel = false;
+    }
+    bool allTextEmpty = isAllWidgetEmpty(textWidgets);
+    bool onlyOneVoice = false;
+
+    if (voiceWidgets.size() == 1 && allTextEmpty) {
+        onlyOneVoice = true;
+        VNoteBlock *blockData = voiceWidgets[0]->getNoteBlock();
+        if (voiceWidgets[0]->isSelectAll()) { //语音菜单
+            if (!checkFileExist(blockData->ptrVoice->voicePath)) {
+                removeSelectWidget(voiceWidgets[0]);
+                delWidget(voiceWidgets[0]);
+                updateData();
+                return -1;
+            }
+            ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteDetailvoiceMenu, false);
+            if (isAISrvAvailable && !stateInterface->isVoice2Text() && blockData->blockText.isEmpty()) {
+                ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, true);
+            }
+            ActionManager::Instance()->enableAction(ActionManager::DetailVoiceSave, true);
+            if (canCutDel) {
+                ActionManager::Instance()->enableAction(ActionManager::DetailVoiceDelete, canCutDel);
+            }
+            return 0;
+        }
+    }
+    bool TTSisWorking = false;
     ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteDetailCtxMenu, false);
     if (isAISrvAvailable) {
         TTSisWorking = VTextSpeechAndTrManager::isTextToSpeechInWorking();
@@ -495,14 +522,7 @@ int RightView::initAction(DetailItemWidget *widget)
         ActionManager::Instance()->enableAction(ActionManager::DetailSelectAll, true);
     }
 
-    auto voiceWidget = m_selectWidget.values(VoicePlugin);
-    auto textWidget = m_selectWidget.values(TextEditPlugin);
-
-    int voiceCount = voiceWidget.size();
-    int textCount = textWidget.size();
-
-    bool allTextEmpty = isAllWidgetEmpty(textWidget);
-    if (!voiceCount && allTextEmpty && widget) {
+    if (!voiceWidgets.size() && allTextEmpty && widget) {
         VNoteBlock *blockData = widget->getNoteBlock();
         if (widget->hasFocus() && blockData->blockType == VNoteBlock::Text) {
             ActionManager::Instance()->enableAction(ActionManager::DetailPaste, true);
@@ -510,85 +530,11 @@ int RightView::initAction(DetailItemWidget *widget)
                 ActionManager::Instance()->enableAction(ActionManager::DetailSpeech2Text, true);
             }
         }
-        return 0;
+        return 1;
     }
 
-    bool canCutDel = true;
-
-    if (m_curPlayItem && m_curPlayItem->hasSelection()) {
-        canCutDel = false;
-    }
-
-    if (stateInterface->isVoice2Text() && m_curAsrItem && m_curAsrItem->hasSelection()) {
-        canCutDel = false;
-    }
-
-    if (voiceCount) {
-        if (allTextEmpty) {
-            if (voiceCount == 1) {
-                if (voiceWidget[0]->isSelectAll()) {
-                    VNoteBlock *blockData = voiceWidget[0]->getNoteBlock();
-                    if (!checkFileExist(blockData->ptrVoice->voicePath)) {
-                        removeSelectWidget(voiceWidget[0]);
-                        delWidget(voiceWidget[0]);
-                        updateData();
-                        return -1;
-                    }
-
-                    if (!blockData->ptrVoice->blockText.isEmpty()) {
-                        ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
-                        if (isAISrvAvailable) {
-                            if (VTextSpeechAndTrManager::getTransEnable()) {
-                                ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
-                            }
-                            if (!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()) {
-                                ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
-                            }
-                        }
-                    } else {
-                        if (isAISrvAvailable && !stateInterface->isVoice2Text()) {
-                            ActionManager::Instance()->enableAction(ActionManager::DetailVoice2Text, true);
-                        }
-                    }
-
-                    ActionManager::Instance()->enableAction(ActionManager::DetailVoiceSave, true);
-
-                    if (canCutDel) {
-                        ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
-                        ActionManager::Instance()->enableAction(ActionManager::DetailDelete, canCutDel);
-                    }
-
-                    return 0;
-                }
-                ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
-                if (isAISrvAvailable) {
-                    if (VTextSpeechAndTrManager::getTransEnable()) {
-                        ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
-                    }
-                    if (!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()) {
-                        ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
-                    }
-                }
-                return 0;
-            }
-
-            if (!isAllWidgetEmpty(voiceWidget)) {
-                ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
-                if (isAISrvAvailable) {
-                    if (VTextSpeechAndTrManager::getTransEnable()) {
-                        ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
-                    }
-                    if (!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()) {
-                        ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
-                    }
-                }
-            }
-
-            if (canCutDel) {
-                ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
-                ActionManager::Instance()->enableAction(ActionManager::DetailDelete, canCutDel);
-            }
-        } else if (textCount) {
+    if (voiceWidgets.size()) {
+        if (!isAllWidgetEmpty(voiceWidgets)) {
             ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
             if (isAISrvAvailable) {
                 if (VTextSpeechAndTrManager::getTransEnable()) {
@@ -598,29 +544,30 @@ int RightView::initAction(DetailItemWidget *widget)
                     ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
                 }
             }
-            if (canCutDel) {
-                ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
-                ActionManager::Instance()->enableAction(ActionManager::DetailDelete, canCutDel);
+        }
+
+        if (canCutDel && !onlyOneVoice) {
+            ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
+            ActionManager::Instance()->enableAction(ActionManager::DetailContextDelete, canCutDel);
+        }
+
+    } else if (textWidgets.size()) {
+        ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
+        if (isAISrvAvailable) {
+            if (VTextSpeechAndTrManager::getTransEnable()) {
+                ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
+            }
+            if (!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()) {
+                ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
             }
         }
-        return 0;
-    }
-
-    ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
-    if (isAISrvAvailable) {
-        if (VTextSpeechAndTrManager::getTransEnable()) {
-            ActionManager::Instance()->enableAction(ActionManager::DetailTranslate, true);
+        if (canCutDel) {
+            ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
+            ActionManager::Instance()->enableAction(ActionManager::DetailContextDelete, canCutDel);
         }
-        if (!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()) {
-            ActionManager::Instance()->enableAction(ActionManager::DetailText2Speech, true);
-        }
+        return 1;
     }
-
-    if (canCutDel) {
-        ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
-        ActionManager::Instance()->enableAction(ActionManager::DetailDelete, canCutDel);
-    }
-    return 0;
+    return 1;
 }
 
 /**
@@ -629,8 +576,16 @@ int RightView::initAction(DetailItemWidget *widget)
  */
 void RightView::onMenuShow(DetailItemWidget *widget)
 {
-    if (initAction(widget) != -1) {
-        m_noteDetailContextMenu->exec(QCursor::pos());
+    int ret = initAction(widget);
+    switch (ret) {
+    case 0:
+        m_noteDetailVoiceMenu->popup(QCursor::pos());
+        break;
+    case 1:
+        m_noteDetailContextMenu->popup(QCursor::pos());
+        break;
+    default:
+        break;
     }
 }
 
@@ -775,8 +730,10 @@ void RightView::setEnablePlayBtn(bool enable)
  */
 void RightView::updateData()
 {
+    m_updateTimer->stop();
     m_fIsNoteModified = true;
     saveNote();
+    m_updateTimer->start();
 }
 
 /**
@@ -865,8 +822,6 @@ void RightView::mouseMoveEvent(QMouseEvent *event)
  */
 void RightView::mousePressEvent(QMouseEvent *event)
 {
-    DWidget::mousePressEvent(event);
-
     if (m_noteItemData == nullptr) {
         return;
     }
@@ -1341,6 +1296,8 @@ int RightView::showWarningDialog()
 void RightView::initConnection()
 {
     connect(m_playAnimTimer, &QTimer::timeout, this, &RightView::onPlayUpdate);
+    connect(m_updateTimer, &QTimer::timeout, this, &RightView::saveNote);
+    m_updateTimer->start();
 }
 
 /**
@@ -1498,4 +1455,5 @@ void RightView::removeCacheWidget(const VNoteFolder *data)
 void RightView::closeMenu()
 {
     m_noteDetailContextMenu->close();
+    m_noteDetailVoiceMenu->close();
 }
