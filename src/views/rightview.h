@@ -30,7 +30,6 @@
 #include <QTimer>
 
 #include <DWidget>
-#include <DDialog>
 
 #include "textnoteedit.h"
 #include "vtextspeechandtrmanager.h"
@@ -176,7 +175,6 @@ private:
     DMenu *m_noteDetailContextMenu {nullptr};
     DMenu *m_noteDetailVoiceMenu {nullptr};
 
-    DDialog *m_fileHasDelDialog {nullptr};
     bool m_fIsNoteModified {false};
     bool m_isFristTextChange {false};
 

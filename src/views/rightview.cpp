@@ -745,21 +745,7 @@ bool RightView::checkFileExist(const QString &file)
 {
     QFileInfo fi(file);
     if (!fi.exists()) {
-        if (m_fileHasDelDialog == nullptr) {
-            DLabel *m_pMessage = new DLabel(this);
-            m_pMessage->setText(DApplication::translate("RightView", "The voice note has been deleted"));
-            DFontSizeManager::instance()->bind(m_pMessage, DFontSizeManager::T6);
-            m_pMessage->setForegroundRole(DPalette::BrightText);
-
-            m_fileHasDelDialog = new DDialog(this);
-            m_fileHasDelDialog->addContent(m_pMessage, Qt::AlignCenter);
-            m_fileHasDelDialog->setIcon(QIcon::fromTheme("dialog-warning"));
-            m_fileHasDelDialog->addButton(DApplication::translate(
-                                              "RightView",
-                                              "OK"),
-                                          false, DDialog::ButtonNormal);
-        }
-        m_fileHasDelDialog->exec();
+        VNoteMessageDialog::getDialog(VNoteMessageDialog::VoiceDeleted, this)->exec();
         return false;
     }
     return true;
@@ -1077,12 +1063,12 @@ void RightView::cutSelectText()
 {
     int ret = showWarningDialog();
     if (ret == 1) {
-        VNoteMessageDialog confirmDialog(VNoteMessageDialog::CutNote, this);
-        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+        VNoteMessageDialog *confirmDialog = VNoteMessageDialog::getDialog(VNoteMessageDialog::CutNote, this);
+        connect(confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
             copySelectText(false);
             delSelectText();
         });
-        confirmDialog.exec();
+        confirmDialog->exec();
     } else if (ret == 0) {
         copySelectText(false);
         delSelectText();
@@ -1213,11 +1199,11 @@ void RightView::keyPressEvent(QKeyEvent *e)
     } else if (e->key() == Qt::Key_Delete) {
         int ret = showWarningDialog();
         if (ret == 1) {
-            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this);
-            connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+            VNoteMessageDialog *confirmDialog = VNoteMessageDialog::getDialog(VNoteMessageDialog::DeleteNote, this);
+            connect(confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
                 delSelectText();
             });
-            confirmDialog.exec();
+            confirmDialog->exec();
         } else if (ret == 0) {
             delSelectText();
         }

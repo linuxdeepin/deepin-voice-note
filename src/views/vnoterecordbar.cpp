@@ -145,14 +145,14 @@ void VNoteRecordBar::onStartRecord()
             static_cast<AudioWatcher::AudioMode>(m_currentMode));
         m_showVolumeWanning = volumeToolow(volume);
         if (m_showVolumeWanning) {
-            VNoteMessageDialog volumeLowDialog(VNoteMessageDialog::VolumeTooLow, this);
-            connect(&volumeLowDialog, &VNoteMessageDialog::accepted, this, [this]() {
+            VNoteMessageDialog *volumeLowDialog = VNoteMessageDialog::getDialog(VNoteMessageDialog::VolumeTooLow, this);
+            connect(volumeLowDialog, &VNoteMessageDialog::accepted, this, [this]() {
                 //User confirmed record when volume too low
                 //start recording anyway.
                 startRecord();
             });
 
-            volumeLowDialog.exec();
+            volumeLowDialog->exec();
         } else {
             //Volume normal
             startRecord();
@@ -267,12 +267,12 @@ void VNoteRecordBar::onAudioVolumeChange(int mode)
         if (!m_showVolumeWanning) {
             m_showVolumeWanning = volumeToolow(volume);
             if (m_showVolumeWanning) {
-                VNoteMessageDialog volumeLowDialog(VNoteMessageDialog::VolumeTooLow, this);
-                connect(&volumeLowDialog, &VNoteMessageDialog::rejected, this, [this]() {
+                VNoteMessageDialog *volumeLowDialog = VNoteMessageDialog::getDialog(VNoteMessageDialog::VolumeTooLow, this);
+                connect(volumeLowDialog, &VNoteMessageDialog::rejected, this, [this]() {
                     stopRecord();
                 });
 
-                volumeLowDialog.exec();
+                volumeLowDialog->exec();
             }
         } else {
             if (!volumeToolow(volume)) {

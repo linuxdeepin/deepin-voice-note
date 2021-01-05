@@ -1030,10 +1030,7 @@ void VNoteMainWindow::onA2TStart(bool first)
         if (nullptr != data) {
             //Check whether the audio lenght out of 20 minutes
             if (data->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
-                VNoteMessageDialog audioOutLimit(
-                    VNoteMessageDialog::AsrTimeLimit, this);
-
-                audioOutLimit.exec();
+                VNoteMessageDialog::getDialog(VNoteMessageDialog::AsrTimeLimit, this)->exec();
             } else {
                 setSpecialStatus(VoiceToTextStart);
                 asrVoiceItem->showAsrStartWindow();
@@ -1271,24 +1268,20 @@ void VNoteMainWindow::keyPressEvent(QKeyEvent *event)
  */
 bool VNoteMainWindow::checkIfNeedExit()
 {
-    QScopedPointer<VNoteMessageDialog> pspMessageDialg;
+    VNoteMessageDialog *pspMessageDialog = nullptr;
 
     bool bNeedExit = true;
 
     //Is audio converting to text
     if (stateOperation->isVoice2Text()) {
-        pspMessageDialg.reset(new VNoteMessageDialog(
-            VNoteMessageDialog::AborteAsr,
-            this));
+        pspMessageDialog = VNoteMessageDialog::getDialog(VNoteMessageDialog::AborteAsr, this);
     } else if (stateOperation->isRecording()) { //Is recording
-        pspMessageDialg.reset(new VNoteMessageDialog(
-            VNoteMessageDialog::AbortRecord,
-            this));
+        pspMessageDialog = VNoteMessageDialog::getDialog(VNoteMessageDialog::AbortRecord, this);
     }
 
-    if (!pspMessageDialg.isNull()) {
+    if (pspMessageDialog) {
         //Use cancel exit.
-        if (QDialog::Rejected == pspMessageDialg->exec()) {
+        if (QDialog::Rejected == pspMessageDialog->exec()) {
             bNeedExit = false;
         }
     }
@@ -1335,23 +1328,23 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         editNotepad();
         break;
     case ActionManager::NotebookDelete: {
-        VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteFolder, this);
-        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+        VNoteMessageDialog *confirmDialog = VNoteMessageDialog::getDialog(VNoteMessageDialog::DeleteFolder, this);
+        connect(confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
             delNotepad();
         });
 
-        confirmDialog.exec();
+        confirmDialog->exec();
     } break;
     case ActionManager::NotebookAddNew:
         addNote();
         break;
     case ActionManager::NoteDelete: {
-        VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this, m_middleView->getSelectedCount());
-        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+        VNoteMessageDialog *confirmDialog = VNoteMessageDialog::getDialog(VNoteMessageDialog::DeleteNote, this, m_middleView->getSelectedCount());
+        connect(confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
             delNote();
         });
 
-        confirmDialog.exec();
+        confirmDialog->exec();
     } break;
     case ActionManager::NoteAddNew:
         addNote();
@@ -1363,12 +1356,12 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::DetailContextDelete: {
         int ret = m_rightView->showWarningDialog();
         if (ret == 1) {
-            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this);
-            connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+            VNoteMessageDialog *confirmDialog = VNoteMessageDialog::getDialog(VNoteMessageDialog::DeleteNote, this);
+            connect(confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
                 m_rightView->delSelectText();
             });
 
-            confirmDialog.exec();
+            confirmDialog->exec();
         } else if (ret == 0) {
             m_rightView->delSelectText();
         }
@@ -2217,11 +2210,11 @@ void VNoteMainWindow::handleMultipleOption(int id)
         break;
     case ButtonValue::Delete:
         //多选页面-删除
-        VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this, m_middleView->getSelectedCount());
-        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+        VNoteMessageDialog *confirmDialog = VNoteMessageDialog::getDialog(VNoteMessageDialog::DeleteNote, this, m_middleView->getSelectedCount());
+        connect(confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
             delNote();
         });
-        confirmDialog.exec();
+        confirmDialog->exec();
         break;
     }
 }

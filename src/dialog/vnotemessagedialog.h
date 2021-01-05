@@ -34,7 +34,7 @@ class VNoteMessageDialog : public VNoteBaseDialog
 {
     Q_OBJECT
 public:
-    explicit VNoteMessageDialog(int msgType , QWidget *parent = nullptr ,int notesCount =1 );
+    explicit VNoteMessageDialog(int msgType, QWidget *parent = nullptr, int notesCount = 1);
 
     enum MessageType {
         DeleteNote,
@@ -44,7 +44,9 @@ public:
         AborteAsr,
         VolumeTooLow,
         CutNote,
+        VoiceDeleted,
     };
+    static VNoteMessageDialog *getDialog(int msgType, QWidget *parent, int notesCount = 1);
 
 protected:
     //初始化布局

@@ -185,4 +185,7 @@ void VNoteBaseDialog::showEvent(QShowEvent *event)
         resize(size);
         setAttribute(Qt::WA_Resized, false);
     }
+
+    m_tileText->setFocus();
+    m_closeButton->setAttribute(Qt::WA_UnderMouse, false);
 }

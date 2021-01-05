@@ -22,12 +22,40 @@
 #include "vnotemessagedialog.h"
 
 #include <QVBoxLayout>
+#include <QMap>
 
 #include <DVerticalLine>
 #include <DApplication>
 #include <DFontSizeManager>
 #include <DApplicationHelper>
 
+static QMap<int, VNoteMessageDialog *> messageDialogs;
+
+VNoteMessageDialog *VNoteMessageDialog::getDialog(int msgType, QWidget *parent, int notesCount)
+{
+    VNoteMessageDialog *dialog = nullptr;
+    QMap<int, VNoteMessageDialog *>::iterator iter = messageDialogs.begin();
+    while (iter != messageDialogs.end()) {
+        if (iter.key() == msgType) {
+            dialog = iter.value();
+            dialog->disconnect(dialog->parent());
+            dialog->setParent(parent);
+            if (msgType == DeleteNote && dialog->m_notesCount != notesCount) {
+                dialog->m_notesCount = notesCount;
+                dialog->initMessage();
+            }
+            dialog->setEnabled(true);
+        } else {
+            iter.value()->close();
+        }
+        iter++;
+    }
+    if (nullptr == dialog && msgType >= 0) {
+        dialog = new VNoteMessageDialog(msgType, parent, notesCount);
+        messageDialogs.insert(msgType, dialog);
+    }
+    return dialog;
+}
 /**
  * @brief VNoteMessageDialog::VNoteMessageDialog
  * @param msgType 窗口类型
@@ -58,6 +86,9 @@ void VNoteMessageDialog::setSingleButton()
  */
 void VNoteMessageDialog::initUI()
 {
+    if (m_msgType == VoiceDeleted) {
+        setIconPixmap(QIcon::fromTheme("dialog-warning").pixmap(QSize(32, 32)));
+    }
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(10, 0, 10, 10);
@@ -82,6 +113,9 @@ void VNoteMessageDialog::initUI()
     m_cancelBtn = new DPushButton(this);
     m_confirmBtn = new DWarningButton(this);
 
+    m_cancelBtn->setText(DApplication::translate("VNoteMessageDialog", "Cancel"));
+    m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "Confirm"));
+
     m_buttonSpliter = new DVerticalLine(this);
     DPalette pa = DApplicationHelper::instance()->palette(m_buttonSpliter);
     QColor splitColor = pa.color(DPalette::ItemBackground);
@@ -92,9 +126,7 @@ void VNoteMessageDialog::initUI()
     m_buttonSpliter->setFixedSize(4, 28);
 
     actionBarLayout->addWidget(m_cancelBtn);
-    //actionBarLayout->addSpacing(8);
     actionBarLayout->addWidget(m_buttonSpliter);
-    // actionBarLayout->addSpacing(8);
     actionBarLayout->addWidget(m_confirmBtn);
 
     mainLayout->addWidget(m_pMessage, 1);
@@ -112,11 +144,13 @@ void VNoteMessageDialog::initConnections()
 {
     connect(m_cancelBtn, &DPushButton::clicked, this, [=]() {
         this->reject();
+        m_cancelBtn->setAttribute(Qt::WA_UnderMouse, false);
         this->setEnabled(false);
     });
 
     connect(m_confirmBtn, &DPushButton::clicked, this, [=]() {
         this->accept();
+        m_confirmBtn->setAttribute(Qt::WA_UnderMouse, false);
         this->setEnabled(false);
     });
 }
@@ -129,8 +163,6 @@ void VNoteMessageDialog::initMessage()
     //TODO:
     //   The default button text is Cancel & Confirm
     //In some case OK button text is need to change
-    m_cancelBtn->setText(DApplication::translate("VNoteMessageDialog", "Cancel"));
-    m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "Confirm"));
     switch (m_msgType) {
     case DeleteFolder: {
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "Are you sure you want to delete this notebook?\nAll notes in it will be deleted"));
@@ -157,6 +189,10 @@ void VNoteMessageDialog::initMessage()
     } break;
     case CutNote: {
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "The clipped recordings and converted text will not be pasted. Do you want to continue?"));
+    } break;
+    case VoiceDeleted: {
+        m_pMessage->setText(DApplication::translate("RightView", "The voice note has been deleted"));
+        setSingleButton();
     }
     }
 }
