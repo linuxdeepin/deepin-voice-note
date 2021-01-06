@@ -2069,6 +2069,10 @@ void VNoteMainWindow::onCursorChange(int height, bool mouseMove)
     if (value > height) {
         bar->setValue(height);
     }
+
+    if (virtualKeyboardUser && !mouseMove) {
+        qDebug() << "current cursor:" << m_rightView->getEditerGlobalY();
+    }
 }
 
 /**
@@ -2099,8 +2103,6 @@ void VNoteMainWindow::release()
     if (stateOperation->isVoice2Text()) {
         releaseA2TManger->stopAsr();
     }
-
-    VNoteDbManager::instance()->getVNoteDb().close();
 }
 
 /**
@@ -2228,12 +2230,19 @@ void VNoteMainWindow::onVirtualKeyboardShow(bool show)
     }
 
     QWidget *widget = static_cast<QWidget *>(sender());
+    int editerGlobalY = -1;
     if (widget == m_leftView) {
-        qDebug() << "m_leftView:" << show;
+        if (show) {
+            editerGlobalY = m_leftView->getEditerGlobalY();
+        }
     } else if (widget == m_middleView) {
-        qDebug() << "m_middleView:" << show;
+        if (show) {
+            editerGlobalY = m_middleView->getEditerGlobalY();
+        }
     } else if (widget == m_rightView) {
-        qDebug() << "m_rightView:" << show;
+        if (show) {
+            editerGlobalY = m_rightView->getEditerGlobalY();
+        }
     } else {
         qDebug() << "m_searchedit:" << show;
     }
@@ -2241,7 +2250,9 @@ void VNoteMainWindow::onVirtualKeyboardShow(bool show)
     if (virtualKeyboardUser <= 0) {
         qDebug() << "close virtualKeyboard";
     } else {
-        qDebug() << "show virtualKeyboard:" << virtualKeyboardUser;
+        if (editerGlobalY >= 0) {
+            qDebug() << "show virtualKeyboard:" << editerGlobalY;
+        }
     }
 }
 

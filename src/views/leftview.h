@@ -29,7 +29,7 @@
 
 #include <QStandardItemModel>
 #include <QDateTime>
-
+#include <QLineEdit>
 DWIDGET_USE_NAMESPACE
 
 class LeftViewDelegate;
@@ -96,6 +96,7 @@ public:
     //当前记事本笔记个数
     void setNumberOfNotes(int numberOfNotes);
 
+    int getEditerGlobalY();
 signals:
     //拖拽到当前记事本
     void dropNotesEnd(bool dropCancel);
@@ -172,6 +173,7 @@ private:
     QTimer *m_popMenuTimer {nullptr};
     TouchState m_touchState {TouchNormal};
     int m_notesNumberOfCurrentFolder = 0;
+    QLineEdit *m_editer {nullptr};
 };
 
 #endif // LEFTVIEW_H

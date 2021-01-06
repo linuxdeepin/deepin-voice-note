@@ -130,6 +130,9 @@ public:
     int getSelectedCount();
     //更新拖拽状态
     void setDragSuccess(bool dragSuccess = false);
+
+    int getEditerGlobalY();
+
 signals:
     //请求刷新详情页
     void requestChangeRightView(bool isMultipleOption);
@@ -219,6 +222,8 @@ private:
     int m_nextSelection = -1;
     //拖拽完成标志
     bool m_dragSuccess {false};
+
+    QLineEdit *m_editer {nullptr};
 };
 
 #endif // MIDDLEVIEW_H

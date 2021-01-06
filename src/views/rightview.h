@@ -114,6 +114,9 @@ public:
     void setIsNormalView(bool value);
     //详情页是否为当前笔记
     bool getIsNormalView() const;
+
+    int getEditerGlobalY();
+
 signals:
     //播放信号
     void sigVoicePlay(VNVoiceBlock *voiceData);
@@ -186,7 +189,7 @@ private:
     QMap<VNoteBlock *, DetailItemWidget *> m_mapWidgetCache;
     //详情页是否为当前笔记
     bool m_isNormalView {true};
-
+    bool m_virtualKeyboardShow {false};
     QTimer *m_updateTimer;
 };
 

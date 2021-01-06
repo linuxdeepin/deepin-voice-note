@@ -796,10 +796,12 @@ bool MiddleView::eventFilter(QObject *o, QEvent *e)
     Q_UNUSED(o);
     if (e->type() == QEvent::FocusIn) {
         m_pItemDelegate->setEditIsVisible(true);
+        m_editer = qobject_cast<QLineEdit *>(o);
         this->update(currentIndex());
         emit virtualKeyboardShow(true);
     } else if (e->type() == QEvent::Destroy) {
         m_pItemDelegate->setEditIsVisible(false);
+        m_editer = nullptr;
         this->update(currentIndex());
         emit virtualKeyboardShow(false);
     }
@@ -1290,4 +1292,14 @@ void MiddleView::selectAfterRemoved()
     //滚动到当前选中
     scrollTo(currentIndex());
     return;
+}
+
+int MiddleView::getEditerGlobalY()
+{
+    int yPos = -1;
+    if (m_editer) {
+        QPoint pos = m_editer->mapToGlobal(m_editer->rect().bottomLeft());
+        yPos = pos.y();
+    }
+    return yPos;
 }

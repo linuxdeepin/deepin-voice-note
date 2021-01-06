@@ -407,8 +407,10 @@ bool LeftView::eventFilter(QObject *o, QEvent *e)
         }
     } else {
         if (e->type() == QEvent::FocusIn) {
+            m_editer = qobject_cast<QLineEdit *>(o);
             emit virtualKeyboardShow(true);
         } else if (e->type() == QEvent::Destroy) {
+            m_editer = nullptr;
             emit virtualKeyboardShow(false);
         }
     }
@@ -886,4 +888,14 @@ void LeftView::dropEvent(QDropEvent *event)
     } else if (event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)) {
         doDragMove(currentIndex(), indexAt(mapFromGlobal(QCursor::pos())));
     }
+}
+
+int LeftView::getEditerGlobalY()
+{
+    int yPos = -1;
+    if (m_editer) {
+        QPoint pos = m_editer->mapToGlobal(m_editer->rect().bottomLeft());
+        yPos = pos.y();
+    }
+    return yPos;
 }

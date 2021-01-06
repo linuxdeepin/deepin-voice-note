@@ -255,7 +255,10 @@ void RightView::onTextEditFocusIn()
         }
         adjustVerticalScrollBar(widget, height);
     }
-    emit virtualKeyboardShow(true);
+    if (!m_virtualKeyboardShow) {
+        m_virtualKeyboardShow = true;
+        emit virtualKeyboardShow(m_virtualKeyboardShow);
+    }
 }
 
 /**
@@ -267,8 +270,23 @@ void RightView::onTextEditFocusOut()
         TextNoteItem *widget = static_cast<TextNoteItem *>(sender());
         Utils::documentToBlock(widget->getNoteBlock(), widget->getTextDocument());
     }
-    emit virtualKeyboardShow(false);
     saveNote();
+    if (m_virtualKeyboardShow) {
+        VNoteBlock *block = m_curItemWidget->getNoteBlock();
+        bool hideVirtualKeyboard = false;
+        if (block->getType() == VNoteBlock::Voice) {
+            hideVirtualKeyboard = true;
+        } else if (!m_curItemWidget->hasFocus()) {
+            QPoint pos = mapFromGlobal(QCursor::pos());
+            if (!geometry().contains(pos)) {
+                hideVirtualKeyboard = true;
+            }
+        }
+        if (hideVirtualKeyboard) {
+            m_virtualKeyboardShow = false;
+            emit virtualKeyboardShow(m_virtualKeyboardShow);
+        }
+    }
 }
 
 /**
@@ -1442,4 +1460,14 @@ void RightView::closeMenu()
 {
     m_noteDetailContextMenu->close();
     m_noteDetailVoiceMenu->close();
+}
+
+int RightView::getEditerGlobalY()
+{
+    int yPos = -1;
+    if (m_curItemWidget) {
+        QPoint pos = m_curItemWidget->mapToGlobal(m_curItemWidget->getCursorRect().bottomLeft());
+        yPos = pos.y();
+    }
+    return yPos;
 }
