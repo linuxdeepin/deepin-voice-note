@@ -763,7 +763,7 @@ bool RightView::checkFileExist(const QString &file)
 {
     QFileInfo fi(file);
     if (!fi.exists()) {
-        VNoteMessageDialog::getDialog(VNoteMessageDialog::VoiceDeleted, this)->exec();
+        VNoteMessageDialog::getDialog(VNoteMessageDialog::VoiceDeleted, this)->show();
         return false;
     }
     return true;
@@ -1086,7 +1086,7 @@ void RightView::cutSelectText()
             copySelectText(false);
             delSelectText();
         });
-        confirmDialog->exec();
+        confirmDialog->show();
     } else if (ret == 0) {
         copySelectText(false);
         delSelectText();
@@ -1146,6 +1146,7 @@ void RightView::clearAllSelection()
             board->clear(QClipboard::Selection);
         }
     }
+    VNoteMessageDialog::getDialog(-1, this);
 }
 
 /**
@@ -1221,7 +1222,7 @@ void RightView::keyPressEvent(QKeyEvent *e)
             connect(confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
                 delSelectText();
             });
-            confirmDialog->exec();
+            confirmDialog->show();
         } else if (ret == 0) {
             delSelectText();
         }

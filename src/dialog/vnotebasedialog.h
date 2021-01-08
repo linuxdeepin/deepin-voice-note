@@ -59,6 +59,7 @@ protected:
     //重写窗口事件
     void closeEvent(QCloseEvent *event) override;
     void showEvent(QShowEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 signals:
     //窗口关闭信号
     void closed();

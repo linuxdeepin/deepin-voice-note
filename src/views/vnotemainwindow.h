@@ -41,6 +41,7 @@
 #include <DFloatingMessage>
 #include <DScrollArea>
 #include <DMenu>
+#include <DSettingsDialog>
 
 DWIDGET_USE_NAMESPACE
 
@@ -328,6 +329,7 @@ private:
     DBusLogin1Manager *m_pLogin1Manager {nullptr};
     QDBusPendingReply<QDBusUnixFileDescriptor> m_lockFd;
     int virtualKeyboardUser {0};
+    DSettingsDialog *m_settingDialog {nullptr};
     friend class VNMainWndDelayInitTask;
 };
 

@@ -429,3 +429,8 @@ void FolderSelectDialog::hideEvent(QHideEvent *event)
     m_closeButton->setAttribute(Qt::WA_UnderMouse, false);
     DAbstractDialog::hideEvent(event);
 }
+
+void FolderSelectDialog::mouseMoveEvent(QMouseEvent *event)
+{
+    event->ignore();
+}

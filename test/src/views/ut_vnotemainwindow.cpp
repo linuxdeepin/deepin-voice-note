@@ -133,6 +133,8 @@ TEST_F(ut_vnotemainwindow_test, loadNotes)
     vnotefolder->createTime = QDateTime::currentDateTime();
     vnotefolder->modifyTime = QDateTime::currentDateTime();
     vnotefolder->deleteTime = QDateTime::currentDateTime();
+    VNoteDataManager::instance()->m_qspNoteFoldersMap.reset(new VNOTE_FOLDERS_MAP());
+    VNoteDataManager::instance()->m_qspAllNotesMap.reset(new VNOTE_ALL_NOTES_MAP());
     vnotemainwindow.loadNotes(vnotefolder);
 }
 

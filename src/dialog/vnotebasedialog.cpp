@@ -189,3 +189,8 @@ void VNoteBaseDialog::showEvent(QShowEvent *event)
     m_tileText->setFocus();
     m_closeButton->setAttribute(Qt::WA_UnderMouse, false);
 }
+
+void VNoteBaseDialog::mouseMoveEvent(QMouseEvent *event)
+{
+    event->ignore();
+}
