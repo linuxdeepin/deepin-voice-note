@@ -2092,9 +2092,9 @@ void VNoteMainWindow::switchWidget(WindowType type)
 void VNoteMainWindow::release()
 {
     //Save main window size
-    if (!isMaximized()) {
-        setting::instance()->setOption(VNOTE_MAINWND_SZ_KEY, saveGeometry());
-    }
+    //    if (!isMaximized()) {
+    //        setting::instance()->setOption(VNOTE_MAINWND_SZ_KEY, saveGeometry());
+    //    }
 
     VTextSpeechAndTrManager::onStopTextToSpeech();
     m_rightView->saveNote();

@@ -48,21 +48,22 @@ void VNoteApplication::activateWindow()
     //Init Normal window at first time
     if (nullptr == m_qspMainWnd.get()) {
         m_qspMainWnd.reset(new VNoteMainWindow());
+        m_qspMainWnd->setWindowState(Qt::WindowActive | Qt::WindowMaximized);
 
-        m_qspMainWnd->setMinimumSize(DEFAULT_WINDOWS_WIDTH, DEFAULT_WINDOWS_HEIGHT);
+        //        m_qspMainWnd->setMinimumSize(DEFAULT_WINDOWS_WIDTH, DEFAULT_WINDOWS_HEIGHT);
 
-        QByteArray mainWindowSize = setting::instance()->getOption(VNOTE_MAINWND_SZ_KEY).toByteArray();
+        //        QByteArray mainWindowSize = setting::instance()->getOption(VNOTE_MAINWND_SZ_KEY).toByteArray();
 
-        if (!mainWindowSize.isEmpty()) {
-            m_qspMainWnd->restoreGeometry(mainWindowSize);
-        }
+        //        if (!mainWindowSize.isEmpty()) {
+        //            m_qspMainWnd->restoreGeometry(mainWindowSize);
+        //        }
 
         //Should be called befor show
         Dtk::Widget::moveToCenter(m_qspMainWnd.get());
 
         m_qspMainWnd->show();
     } else {
-        m_qspMainWnd->setWindowState(Qt::WindowActive);
+        m_qspMainWnd->setWindowState(Qt::WindowActive | Qt::WindowMaximized);
         m_qspMainWnd->activateWindow();
     }
 }
