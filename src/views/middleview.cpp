@@ -921,6 +921,7 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
             scrollTo(m_pSortViewFilter->index(count() - 1, 0));
             clearSelection();
             if (Qt::ShiftModifier == e->modifiers()) {
+                setCurrentIndex(m_currentRow);
                 for (int i = m_currentRow; i < count(); i++) {
                     selectionModel()->select(m_pSortViewFilter->index(i, 0), QItemSelectionModel::Select);
                 }
