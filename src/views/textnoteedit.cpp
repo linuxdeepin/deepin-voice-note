@@ -95,6 +95,11 @@ void TextNoteEdit::contextMenuEvent(QContextMenuEvent *e)
  */
 void TextNoteEdit::keyPressEvent(QKeyEvent *e)
 {
+    if (this->hasSelection()) {
+        e->ignore();
+        return;
+    }
+
     int key = e->key();
 
     if (e->modifiers() == Qt::ControlModifier || key == Qt::Key_Delete) {
