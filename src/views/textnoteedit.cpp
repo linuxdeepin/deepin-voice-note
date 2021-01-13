@@ -116,7 +116,9 @@ void TextNoteEdit::keyPressEvent(QKeyEvent *e)
  */
 void TextNoteEdit::mousePressEvent(QMouseEvent *event)
 {
-    DTextEdit::mousePressEvent(event);
+    if (event->source() != Qt::MouseEventSynthesizedByQt) {
+        DTextEdit::mousePressEvent(event);
+    }
     event->ignore();
 }
 
@@ -126,7 +128,9 @@ void TextNoteEdit::mousePressEvent(QMouseEvent *event)
  */
 void TextNoteEdit::mouseReleaseEvent(QMouseEvent *event)
 {
-    DTextEdit::mouseReleaseEvent(event);
+    if (event->source() != Qt::MouseEventSynthesizedByQt) {
+        DTextEdit::mouseReleaseEvent(event);
+    }
     event->ignore();
 }
 

@@ -480,6 +480,7 @@ void RightView::saveNote()
  */
 int RightView::initAction(DetailItemWidget *widget)
 {
+    Q_UNUSED(widget);
     auto voiceWidgets = m_selectWidget.values(VoicePlugin);
     auto textWidgets = m_selectWidget.values(TextEditPlugin);
     bool canCutDel = true;
@@ -516,6 +517,8 @@ int RightView::initAction(DetailItemWidget *widget)
             return 0;
         }
     }
+    return -1;
+#if 0
     bool TTSisWorking = false;
     ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteDetailCtxMenu, false);
     if (isAISrvAvailable) {
@@ -586,6 +589,7 @@ int RightView::initAction(DetailItemWidget *widget)
         return 1;
     }
     return 1;
+#endif
 }
 
 /**
@@ -594,13 +598,37 @@ int RightView::initAction(DetailItemWidget *widget)
  */
 void RightView::onMenuShow(DetailItemWidget *widget)
 {
+    if (widget && widget->getNoteBlock()->blockType == VNoteBlock::Voice) {
+        if (!widget->hasSelection()) {
+            if (TouchNormal == m_touchState) {
+                clearAllSelection();
+            }
+            widget->selectAllText();
+            m_selectWidget.insert(VoicePlugin, widget);
+            m_curItemWidget = widget;
+            QString selecText = m_curItemWidget->getSelectFragment().toPlainText();
+            if (!selecText.isEmpty()) {
+                QClipboard *board = QApplication::clipboard();
+                if (board) {
+                    board->setText(selecText, QClipboard::Selection);
+                }
+            }
+        }
+    } else {
+        return;
+    }
+
     int ret = initAction(widget);
     switch (ret) {
     case 0:
-        m_noteDetailVoiceMenu->popup(QCursor::pos());
+        if (!m_noteDetailVoiceMenu->isVisible()) {
+            m_noteDetailVoiceMenu->popup(QCursor::pos());
+        }
         break;
     case 1:
-        m_noteDetailContextMenu->popup(QCursor::pos());
+        if (!m_noteDetailVoiceMenu->isVisible()) {
+            m_noteDetailContextMenu->popup(QCursor::pos());
+        }
         break;
     default:
         break;
@@ -816,8 +844,50 @@ void RightView::mouseMoveEvent(QMouseEvent *event)
     if (m_noteItemData == nullptr) {
         return;
     }
-    emit sigCursorChange(event->pos().y(), true);
-    mouseMoveSelect(event);
+    double dis = 0;
+    QPoint pt = m_touchPressPoint;
+    if (event->source() == Qt::MouseEventSynthesizedByQt) {
+        double distX = mapFromGlobal(QCursor::pos()).x() - m_touchPressPoint.x();
+        double distY = mapFromGlobal(QCursor::pos()).y() - m_touchPressPoint.y();
+        dis = qAbs(distX) > qAbs(distY) ? qAbs(distX) : qAbs(distY);
+        QDateTime current = QDateTime::currentDateTime();
+        qint64 timeParam = current.toMSecsSinceEpoch() - m_touchPressStartMs;
+        bool isReturn = false;
+        if (TouchState::TouchPressing == m_touchState) {
+            if ((qAbs(distY) <= 10 || qAbs(distX) <= 10)) {
+                return;
+            }
+            if (timeParam <= 250) {
+                emit requestToSlide(distY > 0);
+                m_touchState = TouchState::TouchSliding;
+                isReturn = true;
+            }
+        } else if (TouchState::TouchSliding == m_touchState) {
+            if (qAbs(distY) > 10) {
+                double speed = distY / timeParam;
+                emit requestToSlide(distY > 0);
+                qDebug() << speed;
+            }
+            isReturn = true;
+        }
+        m_touchPressPoint = event->pos();
+        m_touchPressStartMs = current.toMSecsSinceEpoch();
+        if (isReturn)
+            return;
+    }
+    if (dis > 1 || TouchNormal == m_touchState) {
+        if (event->source() == Qt::MouseEventSynthesizedByQt) {
+            if (TouchSelecting != m_touchState) {
+                DetailItemWidget *widget = getWidgetByPos(pt);
+                if (widget) {
+                    widget->setCursorByPos(event->globalPos());
+                }
+            }
+            m_touchState = TouchSelecting;
+        }
+        emit sigCursorChange(event->pos().y(), true);
+        mouseMoveSelect(event);
+    }
 }
 
 /**
@@ -833,38 +903,44 @@ void RightView::mousePressEvent(QMouseEvent *event)
     Qt::MouseButton btn = event->button();
     DetailItemWidget *widget = getWidgetByPos(event->pos());
 
-    if (btn == Qt::RightButton) {
-        if (widget && widget->getNoteBlock()->blockType == VNoteBlock::Voice) {
-            if (!widget->hasSelection()) {
-                clearAllSelection();
-                widget->selectAllText();
-                m_selectWidget.insert(VoicePlugin, widget);
-                m_curItemWidget = widget;
-                QString selecText = m_curItemWidget->getSelectFragment().toPlainText();
-                if (!selecText.isEmpty()) {
-                    QClipboard *board = QApplication::clipboard();
-                    if (board) {
-                        board->setText(selecText, QClipboard::Selection);
-                    }
+    if (nullptr != widget) {
+        m_curItemWidget = widget;
+    }
+
+    if (m_curItemWidget) {
+        m_curItemWidget->setFocus();
+    }
+
+    if (event->source() == Qt::MouseEventSynthesizedByQt) {
+        m_touchState = TouchState::TouchPressing;
+        m_touchPressPoint = event->pos();
+        m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
+        if (m_popMenuTimer == nullptr) {
+            m_popMenuTimer = new QTimer(this);
+            m_popMenuTimer->setSingleShot(true);
+            m_popMenuTimer->setInterval(1000);
+            connect(m_popMenuTimer, &QTimer::timeout, this, [=] {
+                if (m_touchState == TouchState::TouchPressing) {
+                    onMenuShow(getWidgetByPos(mapFromGlobal(QCursor::pos())));
                 }
-            }
+            });
         }
+        m_popMenuTimer->start();
+    } else {
+        m_touchState = TouchState::TouchNormal;
+    }
 
-        if (m_curItemWidget) {
-            m_curItemWidget->setFocus();
-        }
-
-        onMenuShow(m_curItemWidget);
+    if (btn == Qt::RightButton) {
+        onMenuShow(widget);
     } else if (btn == Qt::LeftButton) {
-        clearAllSelection();
-
-        if (widget != nullptr) {
-            m_curItemWidget = widget;
+        if (event->source() != Qt::MouseEventSynthesizedByQt) {
+            clearAllSelection();
         }
-
         if (m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Voice) {
-            if (widget && !m_curItemWidget->isTextContainsPos(event->globalPos())) {
+            if (widget && !m_curItemWidget->isTextContainsPos(event->globalPos()) && !m_curItemWidget->hasSelection()) {
+                clearAllSelection();
                 m_curItemWidget->selectAllText();
+                m_selectWidget.insert(VoicePlugin, widget);
             }
         }
     }
@@ -876,10 +952,32 @@ void RightView::mousePressEvent(QMouseEvent *event)
  */
 void RightView::mouseReleaseEvent(QMouseEvent *event)
 {
-    DWidget::mouseReleaseEvent(event);
+    if (m_popMenuTimer && m_popMenuTimer->isActive()) {
+        m_popMenuTimer->stop();
+    }
 
     if (m_noteItemData == nullptr) {
         return;
+    }
+
+    DetailItemWidget *widget = getWidgetByPos(event->pos());
+
+    if (TouchPressing == m_touchState) {
+        QDateTime current = QDateTime::currentDateTime();
+        qint64 timeParam = current.toMSecsSinceEpoch() - m_touchPressStartMs;
+        if (timeParam < 1000) {
+            clearAllSelection();
+            if (widget) {
+                //单机语音插件选中
+                if (widget->getNoteBlock()->blockType == VNoteBlock::Voice && !widget->isTextContainsPos(event->globalPos())) {
+                    widget->selectAllText();
+                    m_selectWidget.insert(VoicePlugin, widget);
+                } else if (widget->getNoteBlock()->blockType == VNoteBlock::Text) { //编辑器设置光标
+                    widget->setCursorByPos(event->globalPos());
+                }
+            }
+        }
+        m_touchState = TouchState::TouchNormal;
     }
 
     Qt::MouseButton btn = event->button();
@@ -1002,23 +1100,12 @@ void RightView::mouseMoveSelect(QMouseEvent *event)
                 }
             }
         } else if (minIndex == 0 && maxIndex == 0) {
-            QLayoutItem *layoutItem = m_viewportLayout->itemAt(curIndex + 1);
-            DetailItemWidget *preWidget = nullptr, *nextWidget = nullptr;
-            if (layoutItem) {
-                nextWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
-            }
-
-            if (curIndex > 0) {
-                layoutItem = m_viewportLayout->itemAt(curIndex - 1);
-                preWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
-            }
-
-            if (nextWidget && nextWidget != m_placeholderWidget) {
-                nextWidget->clearSelection();
-            }
-
-            if (preWidget) {
-                preWidget->clearSelection();
+            for (int i = 0; i < m_viewportLayout->count() - 1; i++) {
+                QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
+                DetailItemWidget *tmpWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
+                if (tmpWidget != m_curItemWidget) {
+                    tmpWidget->clearSelection();
+                }
             }
         }
     }

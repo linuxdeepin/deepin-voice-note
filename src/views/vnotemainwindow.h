@@ -153,6 +153,7 @@ protected:
     void closeEvent(QCloseEvent *event) override;
     //按键处理
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
+    bool eventFilter(QObject *o, QEvent *e) override;
 
 public slots:
     //记事本数据加载完成
@@ -221,9 +222,8 @@ public slots:
     void onDropNote(bool dropCancel);
     //响应多选详情页操作
     void handleMultipleOption(int id);
-    //关闭虚拟键盘
     void onVirtualKeyboardShow(bool show);
-    bool eventFilter(QObject *o, QEvent *e) override;
+    void slideRightScrollBar(bool isUp);
 
 private:
     //左侧列表视图操作相关

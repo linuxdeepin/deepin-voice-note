@@ -103,6 +103,7 @@ public:
     bool isTextContainsPos(const QPoint &globalPos) override;
     QTextDocumentFragment getSelectFragment() override;
     QTextDocument *getTextDocument() override;
+    void setCursorByPos(const QPoint &pos) override;
 
 signals:
     //播放相关信号

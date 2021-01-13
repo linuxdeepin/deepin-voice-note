@@ -320,3 +320,11 @@ void TextNoteItem::onChangeTheme()
     m_textDocumentUndo = false;
     updateSearchKey(m_serchKey);
 }
+
+void TextNoteItem::setCursorByPos(const QPoint &pos)
+{
+    m_textEdit->clearSelection();
+    QPoint position = m_textEdit->mapFromGlobal(pos);
+    QTextCursor cursor = m_textEdit->cursorForPosition(position);
+    m_textEdit->setTextCursor(cursor);
+}

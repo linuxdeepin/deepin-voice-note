@@ -51,6 +51,13 @@ class RightView : public DWidget
 {
     Q_OBJECT
 public:
+    enum TouchState {
+        TouchNormal = 1,
+        TouchSelecting,
+        TouchSliding,
+        TouchPressing,
+        TouchOutVisibleRegion
+    };
     explicit RightView(QWidget *parent = nullptr);
     //加载数据
     void initData(VNoteItem *data, QString reg, bool fouse = false);
@@ -127,6 +134,7 @@ signals:
     //滚动条调整
     void sigCursorChange(int height, bool mouseMove);
     void virtualKeyboardShow(bool show);
+    void requestToSlide(bool isUp);
 public slots:
     //编辑框获取焦点
     void onTextEditFocusIn();
@@ -191,6 +199,11 @@ private:
     bool m_isNormalView {true};
     bool m_virtualKeyboardShow {false};
     QTimer *m_updateTimer;
+    QTimer *m_popMenuTimer {nullptr};
+    qint64 m_touchPressStartMs {0};
+    QPoint m_touchPressPoint;
+    TouchState m_touchState {TouchNormal};
+    bool m_isSelecting {false};
 };
 
 #endif // RIGHTVIEW_H

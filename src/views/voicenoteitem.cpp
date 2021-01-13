@@ -535,6 +535,13 @@ bool VoiceNoteItem::isTextContainsPos(const QPoint &globalPos)
     return false;
 }
 
+void VoiceNoteItem::setCursorByPos(const QPoint &pos)
+{
+    QPoint position = m_asrText->mapFromGlobal(pos);
+    QTextCursor cursor = m_asrText->cursorForPosition(position);
+    m_asrText->setTextCursor(cursor);
+}
+
 /**
  * @brief PlayAnimInferface::~PlayAnimInferface
  */

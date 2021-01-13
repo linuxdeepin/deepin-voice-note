@@ -123,7 +123,6 @@ protected:
 struct VNTextBlock;
 struct VNVoiceBlock;
 
-
 struct VNoteBlock {
     enum {
         InValid,
@@ -220,6 +219,8 @@ public:
     virtual QTextDocumentFragment getSelectFragment() = 0;
     //获取整个内容
     virtual QTextDocument *getTextDocument() = 0;
+    //根据坐标设置光标位置
+    virtual void setCursorByPos(const QPoint &pos) = 0;
 };
 
 #endif // VNOTEITEM_H

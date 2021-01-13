@@ -169,6 +169,8 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onCursorChange);
     connect(m_rightView, &RightView::virtualKeyboardShow,
             this, &VNoteMainWindow::onVirtualKeyboardShow);
+    connect(m_rightView, &RightView::requestToSlide,
+            this, &VNoteMainWindow::slideRightScrollBar);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::onNewNotebook);
@@ -2267,14 +2269,14 @@ void VNoteMainWindow::onVirtualKeyboardShow(bool show)
             editerGlobalY = m_rightView->getEditerGlobalY();
         }
     } else {
-        qDebug() << "m_searchedit:" << show;
+        //qDebug() << "m_searchedit:" << show;
     }
 
     if (virtualKeyboardUser <= 0) {
-        qDebug() << "close virtualKeyboard";
+        //qDebug() << "close virtualKeyboard";
     } else {
         if (editerGlobalY >= 0) {
-            qDebug() << "show virtualKeyboard:" << editerGlobalY;
+            //qDebug() << "show virtualKeyboard:" << editerGlobalY;
         }
     }
 }
@@ -2293,4 +2295,11 @@ bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
         }
     }
     return false;
+}
+
+void VNoteMainWindow::slideRightScrollBar(bool isUp)
+{
+    QScrollBar *bar = m_rightViewScrollArea->verticalScrollBar();
+    //bar->setSingleStep(qCeil(20 * speed));
+    bar->triggerAction(isUp ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
 }

@@ -51,6 +51,7 @@ public:
     void setFocus();
     bool hasFocus();
     bool isSelectAll();
+    void setCursorByPos(const QPoint &pos);
     //最后光标y坐标
     void setLastCursorHeight(int height);
 
