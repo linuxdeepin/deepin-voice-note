@@ -604,26 +604,26 @@ bool LeftView::doNoteMove(const QModelIndexList &src, const QModelIndex &dst)
  * @param src
  * @return
  */
-FolderSelectDialog *LeftView::selectMoveFolder(const QModelIndexList &src)
+QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
 {
+    QModelIndex index;
     if (src.size()) {
         VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(src[0]));
         QString elideText = data->noteTitle;
         if (m_folderSelectDialog == nullptr) {
             m_folderSelectDialog = new FolderSelectDialog(m_pDataModel, this);
             m_folderSelectDialog->resize(VNOTE_SELECTDIALOG_W, 372);
-            m_folderSelectDialog->setWindowFlags(m_folderSelectDialog->windowFlags() | Qt::Popup);
         }
         QList<VNoteFolder *> folders;
         folders.push_back(static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(currentIndex())));
         m_folderSelectDialog->setFolderBlack(folders);
         m_folderSelectDialog->setNoteContextInfo(elideText, src.size());
         m_folderSelectDialog->clearSelection();
-        m_folderSelectDialog->setWindowState(Qt::WindowNoState);
-        m_folderSelectDialog->setWindowState(Qt::WindowActive);
-        m_folderSelectDialog->show();
+        if (m_folderSelectDialog->exec() == FolderSelectDialog::Accepted) {
+            index = m_folderSelectDialog->getSelectIndex();
+        }
     }
-    return m_folderSelectDialog;
+    return index;
 }
 
 /**

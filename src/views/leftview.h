@@ -84,7 +84,7 @@ public:
     VNoteFolder *removeFolder();
     //移动笔记
     bool doNoteMove(const QModelIndexList &src, const QModelIndex &dst);
-    FolderSelectDialog *selectMoveFolder(const QModelIndexList &src);
+    QModelIndex selectMoveFolder(const QModelIndexList &src);
     //获取记事本顺序
     QString getFolderSort();
     //获取第一个记事本

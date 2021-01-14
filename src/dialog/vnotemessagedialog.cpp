@@ -54,16 +54,11 @@ VNoteMessageDialog *VNoteMessageDialog::getDialog(int msgType, QWidget *parent, 
     }
     if (nullptr == dialog && msgType >= 0) {
         dialog = new VNoteMessageDialog(msgType, parent, notesCount);
-        dialog->setWindowFlags(dialog->windowFlags() | Qt::Popup);
         messageDialogs.insert(msgType, dialog);
     }
-    if (dialog) {
-        dialog->setWindowState(Qt::WindowNoState);
-        dialog->setWindowState(Qt::WindowActive);
-    }
-
     return dialog;
 }
+
 /**
  * @brief VNoteMessageDialog::VNoteMessageDialog
  * @param msgType 窗口类型

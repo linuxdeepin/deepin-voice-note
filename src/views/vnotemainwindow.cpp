@@ -49,7 +49,6 @@
 #include "dbus/dbuslogin1manager.h"
 
 #include "dialog/vnotemessagedialog.h"
-#include "dialog/folderselectdialog.h"
 #include "views/vnoterecordbar.h"
 #include "widgets/vnoteiconbutton.h"
 #include "task/vnmainwnddelayinittask.h"
@@ -248,13 +247,6 @@ void VNoteMainWindow::changeRightView(bool isMultiple)
             m_rightView->setIsNormalView(true);
         }
     }
-
-    FolderSelectDialog *selectFolderDialog = m_leftView->selectMoveFolder(QModelIndexList());
-    if (selectFolderDialog && selectFolderDialog->isVisible()) {
-        selectFolderDialog->clearSelection();
-        selectFolderDialog->close();
-    }
-    VNoteMessageDialog::getDialog(-1, this);
 }
 
 /**
@@ -1039,7 +1031,7 @@ void VNoteMainWindow::onA2TStart(bool first)
         if (nullptr != data) {
             //Check whether the audio lenght out of 20 minutes
             if (data->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
-                VNoteMessageDialog::getDialog(VNoteMessageDialog::AsrTimeLimit, this)->show();
+                VNoteMessageDialog::getDialog(VNoteMessageDialog::AsrTimeLimit, this)->exec();
             } else {
                 setSpecialStatus(VoiceToTextStart);
                 asrVoiceItem->showAsrStartWindow();
@@ -1338,7 +1330,7 @@ void VNoteMainWindow::onMenuAction(QAction *action)
             delNotepad();
         });
 
-        confirmDialog->show();
+        confirmDialog->exec();
     } break;
     case ActionManager::NotebookAddNew:
         addNote();
@@ -1349,7 +1341,7 @@ void VNoteMainWindow::onMenuAction(QAction *action)
             delNote();
         });
 
-        confirmDialog->show();
+        confirmDialog->exec();
     } break;
     case ActionManager::NoteAddNew:
         addNote();
@@ -1366,7 +1358,7 @@ void VNoteMainWindow::onMenuAction(QAction *action)
                 m_rightView->delSelectText();
             });
 
-            confirmDialog->show();
+            confirmDialog->exec();
         } else if (ret == 0) {
             m_rightView->delSelectText();
         }
@@ -1414,22 +1406,14 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::NoteMove: {
         //删除前记录选中位置
         m_middleView->setNextSelection();
-
         QModelIndexList notesdataList = m_middleView->getAllSelectNote();
         if (notesdataList.size()) {
-            FolderSelectDialog *selectFolderDialog = m_leftView->selectMoveFolder(notesdataList);
+            QModelIndex selectFolder = m_leftView->selectMoveFolder(notesdataList);
             m_leftView->setNumberOfNotes(m_middleView->count());
-            if (selectFolderDialog) {
-                selectFolderDialog->disconnect(this);
-                connect(selectFolderDialog, &FolderSelectDialog::accepted, this, [=] {
-                    QModelIndex index = selectFolderDialog->getSelectIndex();
-                    if (index.isValid() && m_leftView->doNoteMove(notesdataList, index)) {
-                        m_middleView->deleteModelIndexs(notesdataList);
-                        //删除后设置选中
-                        m_middleView->selectAfterRemoved();
-                        selectFolderDialog->clearSelection();
-                    }
-                });
+            if (selectFolder.isValid() && m_leftView->doNoteMove(notesdataList, selectFolder)) {
+                m_middleView->deleteModelIndexs(notesdataList);
+                //删除后设置选中
+                m_middleView->selectAfterRemoved();
             }
         }
     } break;
@@ -2154,9 +2138,7 @@ void VNoteMainWindow::onShowSettingDialog()
         m_settingDialog->setResetVisible(false);
         m_settingDialog->installEventFilter(this);
     }
-    m_settingDialog->setWindowState(Qt::WindowNoState);
-    m_settingDialog->setWindowState(Qt::WindowActive);
-    m_settingDialog->show();
+    m_settingDialog->exec();
 }
 
 /**
@@ -2211,19 +2193,12 @@ void VNoteMainWindow::handleMultipleOption(int id)
         m_middleView->setNextSelection();
         QModelIndexList notesdata = m_middleView->getAllSelectNote();
         if (notesdata.size()) {
-            FolderSelectDialog *selectFolderDialog = m_leftView->selectMoveFolder(notesdata);
+            QModelIndex selectFolder = m_leftView->selectMoveFolder(notesdata);
             m_leftView->setNumberOfNotes(m_middleView->count());
-            if (selectFolderDialog) {
-                selectFolderDialog->disconnect(this);
-                connect(selectFolderDialog, &FolderSelectDialog::accepted, this, [=] {
-                    QModelIndex index = selectFolderDialog->getSelectIndex();
-                    if (index.isValid() && m_leftView->doNoteMove(notesdata, index)) {
-                        m_middleView->deleteModelIndexs(notesdata);
-                        //删除后设置选中
-                        m_middleView->selectAfterRemoved();
-                        selectFolderDialog->clearSelection();
-                    }
-                });
+            if (selectFolder.isValid() && m_leftView->doNoteMove(notesdata, selectFolder)) {
+                m_middleView->deleteModelIndexs(notesdata);
+                //移除后选中
+                m_middleView->selectAfterRemoved();
             }
         }
     } break;
@@ -2241,7 +2216,7 @@ void VNoteMainWindow::handleMultipleOption(int id)
         connect(confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
             delNote();
         });
-        confirmDialog->show();
+        confirmDialog->exec();
         break;
     }
 }
