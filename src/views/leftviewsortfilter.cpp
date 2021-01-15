@@ -61,11 +61,17 @@ bool LeftViewSortFilter::lessThan(
     return QSortFilterProxyModel::lessThan(source_left, source_right);
 }
 
+/**
+ * @brief LeftViewSortFilter::filterAcceptsRow
+ * @param source_row
+ * @param source_parent
+ * @return false不显示，ｔｒue显示
+ */
 bool LeftViewSortFilter::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
     QModelIndex index = sourceModel()->index(source_row, 0, source_parent);
     VNoteFolder *data = reinterpret_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(index));
-    for (auto &it : m_blackFolders) {
+    for (auto &it : m_blackFolders) { //找到不显示项返回false
         if (it == data) {
             return false;
         }
@@ -73,6 +79,10 @@ bool LeftViewSortFilter::filterAcceptsRow(int source_row, const QModelIndex &sou
     return true;
 }
 
+/**
+ * @brief LeftViewSortFilter::setBlackFolders
+ * @param folders 不显示的项
+ */
 void LeftViewSortFilter::setBlackFolders(const QList<VNoteFolder *> &folders)
 {
     m_blackFolders = folders;

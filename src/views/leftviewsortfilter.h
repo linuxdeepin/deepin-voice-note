@@ -30,16 +30,19 @@ class LeftViewSortFilter : public QSortFilterProxyModel
 {
 public:
     LeftViewSortFilter(QObject *parent = nullptr);
-    void setBlackFolders(const QList<VNoteFolder*>& folders);
+    //设置不显示项
+    void setBlackFolders(const QList<VNoteFolder *> &folders);
+
 protected:
     //处理排序
     virtual bool lessThan(
         const QModelIndex &source_left,
         const QModelIndex &source_right) const override;
+    //数据过滤
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 
 private:
-    QList<VNoteFolder*> m_blackFolders;
+    QList<VNoteFolder *> m_blackFolders;
 };
 
 #endif // LEFTVIEWSORTFILTER_H

@@ -292,6 +292,11 @@ bool VNoteItemOper::deleteNote()
     return delOK;
 }
 
+/**
+ * @brief VNoteItemOper::updateTop
+ * @param value　0取消置顶，１置顶
+ * @return true成功，false失败
+ */
 bool VNoteItemOper::updateTop(int value)
 {
     bool updateOK = false;
@@ -310,6 +315,11 @@ bool VNoteItemOper::updateTop(int value)
     return updateOK;
 }
 
+/**
+ * @brief VNoteItemOper::updateFolderId
+ * @param data 需要更新的笔记
+ * @return true成功，false失败
+ */
 bool VNoteItemOper::updateFolderId(VNoteItem *data)
 {
     bool updateOK = false;
