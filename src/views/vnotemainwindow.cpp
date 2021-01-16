@@ -63,6 +63,7 @@
 #include <QScrollBar>
 #include <QLocale>
 #include <QDesktopServices>
+#include <QDesktopWidget>
 
 #include <DApplication>
 #include <DToolButton>
@@ -92,6 +93,7 @@ VNoteMainWindow::VNoteMainWindow(QWidget *parent)
     initA2TManager();
     //Init the login manager
     initLogin1Manager();
+    initVirtualKeyboard();
     //Init delay task
     delayInitTasks();
 }
@@ -148,14 +150,8 @@ void VNoteMainWindow::initConnections()
     connect(m_leftView->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &VNoteMainWindow::onVNoteFolderChange);
 
-    connect(m_leftView, &LeftView::virtualKeyboardShow,
-            this, &VNoteMainWindow::onVirtualKeyboardShow);
-
     connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
             this, SLOT(onVNoteChange(const QModelIndex &)));
-
-    connect(m_middleView, &MiddleView::virtualKeyboardShow,
-            this, &VNoteMainWindow::onVirtualKeyboardShow);
 
     connect(m_rightView, &RightView::contentChanged,
             m_middleView, &MiddleView::onNoteChanged);
@@ -166,8 +162,7 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onRightViewVoicePause);
     connect(m_rightView, &RightView::sigCursorChange,
             this, &VNoteMainWindow::onCursorChange);
-    connect(m_rightView, &RightView::virtualKeyboardShow,
-            this, &VNoteMainWindow::onVirtualKeyboardShow);
+
     connect(m_rightView, &RightView::requestToSlide,
             this, &VNoteMainWindow::slideRightScrollBar);
 
@@ -505,7 +500,6 @@ void VNoteMainWindow::initTitleBar()
     m_noteSearchEdit->setFixedSize(QSize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H));
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
     titlebar()->addWidget(m_noteSearchEdit);
-    m_noteSearchEdit->lineEdit()->installEventFilter(this);
 }
 
 /**
@@ -587,7 +581,7 @@ void VNoteMainWindow::initLeftView()
 
     m_addNotepadBtn = new DPushButton(DApplication::translate("VNoteMainWindow", "Create Notebook"),
                                       m_leftViewHolder);
-
+    m_addNotepadBtn->setFixedHeight(36);
     QVBoxLayout *btnLayout = new QVBoxLayout();
     btnLayout->addWidget(m_addNotepadBtn);
     btnLayout->setContentsMargins(10, 0, 10, 10);
@@ -1246,7 +1240,9 @@ void VNoteMainWindow::resizeEvent(QResizeEvent *event)
         int yPos = m_centerWidget->height() - m_pDeviceExceptionMsg->height() - 5;
         m_pDeviceExceptionMsg->move(xPos, yPos);
     }
-
+    m_leftView->scrollTo(m_leftView->currentIndex());
+    m_middleView->scrollTo(m_middleView->currentIndex());
+    m_rightView->scrollToCursor();
     DMainWindow::resizeEvent(event);
 }
 
@@ -2065,10 +2061,6 @@ void VNoteMainWindow::onCursorChange(int height, bool mouseMove)
     if (value > height) {
         bar->setValue(height);
     }
-
-    if (virtualKeyboardUser && !mouseMove) {
-        qDebug() << "current cursor:" << m_rightView->getEditerGlobalY();
-    }
 }
 
 /**
@@ -2091,6 +2083,10 @@ void VNoteMainWindow::release()
     //    if (!isMaximized()) {
     //        setting::instance()->setOption(VNOTE_MAINWND_SZ_KEY, saveGeometry());
     //    }
+
+    if (m_virtualKeyboard) {
+        delete m_virtualKeyboard;
+    }
 
     VTextSpeechAndTrManager::onStopTextToSpeech();
     m_rightView->saveNote();
@@ -2223,51 +2219,31 @@ void VNoteMainWindow::handleMultipleOption(int id)
 
 void VNoteMainWindow::onVirtualKeyboardShow(bool show)
 {
-    if (show) {
-        virtualKeyboardUser += 1;
-    } else {
-        virtualKeyboardUser -= 1;
-    }
-
-    QWidget *widget = static_cast<QWidget *>(sender());
-    int editerGlobalY = -1;
-    if (widget == m_leftView) {
+    if (m_virtualKeyboard) {
         if (show) {
-            editerGlobalY = m_leftView->getEditerGlobalY();
-        }
-    } else if (widget == m_middleView) {
-        if (show) {
-            editerGlobalY = m_middleView->getEditerGlobalY();
-        }
-    } else if (widget == m_rightView) {
-        if (show) {
-            editerGlobalY = m_rightView->getEditerGlobalY();
-        }
-    } else {
-        //qDebug() << "m_searchedit:" << show;
-    }
-
-    if (virtualKeyboardUser <= 0) {
-        //qDebug() << "close virtualKeyboard";
-    } else {
-        if (editerGlobalY >= 0) {
-            //qDebug() << "show virtualKeyboard:" << editerGlobalY;
+            QRect rc = m_virtualKeyboard->property("geometry").toRect();
+            this->setFixedHeight(QApplication::desktop()->geometry().height() - rc.height());
+            if (m_recordBar->height() != 0) {
+                m_recordBarHolder->setFixedHeight(0);
+                m_addNoteBtn->setFixedHeight(0);
+                m_addNotepadBtn->setFixedHeight(0);
+            }
+        } else {
+            if (m_recordBar->height() == 0) {
+                m_recordBarHolder->setFixedHeight(78);
+                m_addNoteBtn->setFixedHeight(54);
+                m_addNotepadBtn->setFixedHeight(40);
+                this->setFixedHeight(QApplication::desktop()->availableGeometry().height());
+            }
         }
     }
 }
 
 bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
 {
-    if (m_settingDialog == o) {
-        if (e->type() == QEvent::MouseMove) {
-            return true;
-        }
-    } else {
-        if (e->type() == QEvent::FocusIn) {
-            onVirtualKeyboardShow(true);
-        } else if (e->type() == QEvent::FocusOut) {
-            onVirtualKeyboardShow(false);
-        }
+    Q_UNUSED(o)
+    if (e->type() == QEvent::MouseMove) {
+        return true;
     }
     return false;
 }
@@ -2277,4 +2253,18 @@ void VNoteMainWindow::slideRightScrollBar(bool isUp)
     QScrollBar *bar = m_rightViewScrollArea->verticalScrollBar();
     //bar->setSingleStep(qCeil(20 * speed));
     bar->triggerAction(isUp ? QScrollBar::SliderSingleStepSub : QScrollBar::SliderSingleStepAdd);
+}
+
+void VNoteMainWindow::initVirtualKeyboard()
+{
+    m_virtualKeyboard = new QDBusInterface("com.deepin.im",
+                                           "/com/deepin/im",
+                                           "com.deepin.im",
+                                           QDBusConnection::sessionBus());
+    if (m_virtualKeyboard->isValid()) {
+        connect(m_virtualKeyboard, SIGNAL(imActiveChanged(bool)), this, SLOT(onVirtualKeyboardShow(bool)));
+    } else {
+        delete m_virtualKeyboard;
+        m_virtualKeyboard = nullptr;
+    }
 }

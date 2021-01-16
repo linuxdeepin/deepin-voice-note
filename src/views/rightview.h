@@ -122,7 +122,7 @@ public:
     //详情页是否为当前笔记
     bool getIsNormalView() const;
 
-    int getEditerGlobalY();
+    void scrollToCursor();
 
 signals:
     //播放信号
@@ -133,7 +133,6 @@ signals:
     void contentChanged();
     //滚动条调整
     void sigCursorChange(int height, bool mouseMove);
-    void virtualKeyboardShow(bool show);
     void requestToSlide(bool isUp);
 public slots:
     //编辑框获取焦点
@@ -197,7 +196,6 @@ private:
     QMap<VNoteBlock *, DetailItemWidget *> m_mapWidgetCache;
     //详情页是否为当前笔记
     bool m_isNormalView {true};
-    bool m_virtualKeyboardShow {false};
     QTimer *m_updateTimer;
     QTimer *m_popMenuTimer {nullptr};
     qint64 m_touchPressStartMs {0};

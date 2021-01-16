@@ -29,6 +29,7 @@
 #include <QStandardItem>
 #include <QList>
 #include <QDBusPendingReply>
+#include <QDBusInterface>
 
 #include <DMainWindow>
 #include <DSearchEdit>
@@ -131,6 +132,8 @@ protected:
     void initDelayWork();
     //延时任务
     void delayInitTasks();
+    //初始化虚拟键盘
+    void initVirtualKeyboard();
 
 #ifdef IMPORT_OLD_VERSION_DATA
     //*******Upgrade old Db code here only********
@@ -328,9 +331,9 @@ private:
     //Login session manager
     DBusLogin1Manager *m_pLogin1Manager {nullptr};
     QDBusPendingReply<QDBusUnixFileDescriptor> m_lockFd;
-    int virtualKeyboardUser {0};
     DSettingsDialog *m_settingDialog {nullptr};
     friend class VNMainWndDelayInitTask;
+    QDBusInterface *m_virtualKeyboard {nullptr};
 };
 
 #endif // VNOTEMAINWINDOW_H

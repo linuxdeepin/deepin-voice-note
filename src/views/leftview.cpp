@@ -124,6 +124,7 @@ QModelIndex LeftView::getNotepadRootIndex()
 void LeftView::mousePressEvent(QMouseEvent *event)
 {
     this->setFocus();
+    m_index = indexAt(event->pos());
     if (!m_onlyCurItemMenuEnable) {
         //触控屏手势
         if (event->source() == Qt::MouseEventSynthesizedByQt) {
@@ -132,7 +133,6 @@ void LeftView::mousePressEvent(QMouseEvent *event)
             m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
             //更新触摸状态
             setTouchState(TouchPressing);
-            m_index = indexAt(event->pos());
             m_notepadMenu->setPressPoint(QCursor::pos());
             //检查是否选中
             m_selectCurrentTimer->start(250);
@@ -149,10 +149,9 @@ void LeftView::mousePressEvent(QMouseEvent *event)
                 m_menuState = MenuStatus::Normal;
                 return;
             }
-            QModelIndex index = this->indexAt(event->pos());
-            if (StandardItemCommon::getStandardItemType(index) == StandardItemCommon::NOTEPADITEM
-                && (!m_onlyCurItemMenuEnable || index == this->currentIndex())) {
-                this->setCurrentIndex(index);
+            if (StandardItemCommon::getStandardItemType(m_index) == StandardItemCommon::NOTEPADITEM
+                && (!m_onlyCurItemMenuEnable || m_index == this->currentIndex())) {
+                this->setCurrentIndex(m_index);
                 m_notepadMenu->popup(event->globalPos());
                 //通过此方法隐藏菜单，在处理拖拽事件结束后hide
                 m_notepadMenu->setWindowOpacity(1);
@@ -160,7 +159,7 @@ void LeftView::mousePressEvent(QMouseEvent *event)
         }
     } else {
         //置灰状态下只有当前记事本可操作
-        if (currentIndex() == indexAt(event->pos())) {
+        if (currentIndex() == m_index) {
             if (event->source() == Qt::MouseEventSynthesizedByQt) {
                 m_popMenuTimer->start(1000);
                 return;
@@ -194,10 +193,9 @@ void LeftView::mouseReleaseEvent(QMouseEvent *event)
         return;
     }
     //正常点击状态，选择当前点击选项
-    QModelIndex index = indexAt(event->pos());
-    if (index.row() != currentIndex().row() && m_touchState == TouchState::TouchPressing) {
-        if (index.isValid()) {
-            setCurrentIndex(index);
+    if (m_index.row() != currentIndex().row() && m_touchState == TouchState::TouchPressing) {
+        if (m_index.isValid()) {
+            setCurrentIndex(m_index);
         }
         setTouchState(TouchState::TouchNormal);
         return;
@@ -397,22 +395,13 @@ void LeftView::addFolder(VNoteFolder *folder)
  */
 bool LeftView::eventFilter(QObject *o, QEvent *e)
 {
-    if (o == viewport()) {
-        if (e->type() == QEvent::DragLeave) {
-            m_pItemDelegate->setDrawHover(false);
-            update();
-        } else if (e->type() == QEvent::DragEnter) {
-            m_pItemDelegate->setDrawHover(true);
-            update();
-        }
-    } else {
-        if (e->type() == QEvent::FocusIn) {
-            m_editer = qobject_cast<QLineEdit *>(o);
-            emit virtualKeyboardShow(true);
-        } else if (e->type() == QEvent::Destroy) {
-            m_editer = nullptr;
-            emit virtualKeyboardShow(false);
-        }
+    Q_UNUSED(o)
+    if (e->type() == QEvent::DragLeave) {
+        m_pItemDelegate->setDrawHover(false);
+        update();
+    } else if (e->type() == QEvent::DragEnter) {
+        m_pItemDelegate->setDrawHover(true);
+        update();
     }
     return false;
 }
@@ -886,14 +875,4 @@ void LeftView::dropEvent(QDropEvent *event)
     } else if (event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)) {
         doDragMove(currentIndex(), indexAt(mapFromGlobal(QCursor::pos())));
     }
-}
-
-int LeftView::getEditerGlobalY()
-{
-    int yPos = -1;
-    if (m_editer) {
-        QPoint pos = m_editer->mapToGlobal(m_editer->rect().bottomLeft());
-        yPos = pos.y();
-    }
-    return yPos;
 }
