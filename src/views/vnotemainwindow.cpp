@@ -775,7 +775,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
 {
     Q_UNUSED(previous);
 
-    if(m_asrErrMeassage){
+    if (m_asrErrMeassage) {
         m_asrErrMeassage->setVisible(false);
     }
 
@@ -946,7 +946,7 @@ void VNoteMainWindow ::onA2TStartAgain()
  */
 void VNoteMainWindow::onA2TStart(bool first)
 {
-    if(m_asrErrMeassage){
+    if (m_asrErrMeassage) {
         m_asrErrMeassage->setVisible(false);
     }
 
@@ -1073,12 +1073,13 @@ void VNoteMainWindow::onPreviewShortcut()
         {DApplication::translate("Shortcuts", "Delete note"), "Delete"},
         {DApplication::translate("Shortcuts", "Play/Pause"), "Space"},
         {DApplication::translate("Shortcuts", "Record voice"), "Ctrl+R"},
-        {DApplication::translate("Shortcuts", "Voice to Text"), "Ctrl+W"},
         {DApplication::translate("Shortcuts", "Save as MP3"), "Ctrl+P"},
         {DApplication::translate("Shortcuts", "Save as TXT"), "Ctrl+S"},
         {DApplication::translate("Shortcuts", "Save recordings"), "Ctrl+Y"},
     };
-
+    if (stateOperation->isAiSrvExist()) {
+        shortcutNoteKeymap.insert(DApplication::translate("Shortcuts", "Voice to Text"), "Ctrl+W");
+    }
     QJsonObject noteJsonGroup;
     noteJsonGroup.insert("groupName", DApplication::translate("ShortcutsGroups", "Notes"));
     QJsonArray noteJsonItems;
@@ -1245,7 +1246,7 @@ bool VNoteMainWindow::checkIfNeedExit()
 void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 {
     Q_UNUSED(previous);
-    if(m_asrErrMeassage){
+    if (m_asrErrMeassage) {
         m_asrErrMeassage->setVisible(false);
     }
 
@@ -1828,7 +1829,6 @@ void VNoteMainWindow::initAsrErrMessage()
     m_widget->setLayout(m_layout);
     m_asrErrMeassage->setWidget(m_widget);
     m_asrErrMeassage->setVisible(false);
-
 }
 
 /**
@@ -1854,7 +1854,7 @@ void VNoteMainWindow::initDeviceExceptionErrMessage()
  */
 void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
 {
-    if(m_asrErrMeassage == nullptr){
+    if (m_asrErrMeassage == nullptr) {
         initAsrErrMessage();
     }
 
@@ -1876,7 +1876,7 @@ void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
  */
 void VNoteMainWindow::showDeviceExceptionErrMessage()
 {
-    if(m_pDeviceExceptionMsg == nullptr){
+    if (m_pDeviceExceptionMsg == nullptr) {
         initDeviceExceptionErrMessage();
     }
 
@@ -1897,7 +1897,7 @@ void VNoteMainWindow::showDeviceExceptionErrMessage()
  */
 void VNoteMainWindow::closeDeviceExceptionErrMessage()
 {
-    if(m_pDeviceExceptionMsg){
+    if (m_pDeviceExceptionMsg) {
         m_pDeviceExceptionMsg->setVisible(false);
     }
 }
@@ -1986,15 +1986,15 @@ void VNoteMainWindow::onShowPrivacy()
     QLocale::Country country = locale.country();
     bool isCommunityEdition = DSysInfo::isCommunityEdition();
     if (country == QLocale::China) {
-        if(isCommunityEdition){
+        if (isCommunityEdition) {
             url = "https://www.uniontech.com/agreement/deepin-privacy-cn";
-        }else {
+        } else {
             url = "https://www.uniontech.com/agreement/privacy-cn";
         }
     } else {
-        if(isCommunityEdition){
+        if (isCommunityEdition) {
             url = "https://www.uniontech.com/agreement/deepin-privacy-en";
-        }else {
+        } else {
             url = "https://www.uniontech.com/agreement/privacy-en";
         }
     }
