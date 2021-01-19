@@ -1202,6 +1202,10 @@ void RightView::selectAllItem()
     for (int i = 0; i < m_viewportLayout->count() - 1; i++) {
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
         DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
+        if (m_viewportLayout->count() == 2 && widget->textIsEmpty()) {
+            widget->clearSelection();
+            continue;
+        }
         widget->selectAllText();
         if (widget->getNoteBlock()->blockType == VNoteBlock::Text) {
             m_selectWidget.insert(TextEditPlugin, widget);
