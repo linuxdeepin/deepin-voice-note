@@ -79,7 +79,10 @@ void TextNoteItem::initConnection()
     connect(m_textEdit, SIGNAL(textChanged()), this, SLOT(onTextChange()));
     connect(m_textEdit, SIGNAL(sigFocusIn()), this, SIGNAL(sigFocusIn()));
     connect(m_textEdit, SIGNAL(sigFocusOut()), this, SIGNAL(sigFocusOut()));
-    connect(m_textEdit, SIGNAL(selectionChanged()), this, SIGNAL(sigSelectionChanged()));
+    connect(m_textEdit, &TextNoteEdit::selectionChanged, this, [=] {
+        m_textEdit->setAttribute(Qt::WA_InputMethodEnabled, !m_textEdit->hasSelection());
+        emit sigSelectionChanged();
+    });
     connect(m_textEdit, SIGNAL(cursorPositionChanged()), this, SLOT(onTextCursorChange()));
 
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged,
