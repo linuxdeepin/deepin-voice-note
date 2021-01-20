@@ -825,7 +825,6 @@ void RightView::mouseMoveEvent(QMouseEvent *event)
         return;
     }
     double dis = 0;
-    QPoint pt = m_touchPressPoint;
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
         double distX = mapFromGlobal(QCursor::pos()).x() - m_touchPressPoint.x();
         double distY = mapFromGlobal(QCursor::pos()).y() - m_touchPressPoint.y();
@@ -844,9 +843,8 @@ void RightView::mouseMoveEvent(QMouseEvent *event)
             }
         } else if (TouchState::TouchSliding == m_touchState) {
             if (qAbs(distY) > 10) {
-                double speed = distY / timeParam;
+                //double speed = distY / timeParam;
                 emit requestToSlide(distY > 0);
-                qDebug() << speed;
             }
             isReturn = true;
         }
@@ -857,12 +855,6 @@ void RightView::mouseMoveEvent(QMouseEvent *event)
     }
     if (dis > 1 || TouchNormal == m_touchState) {
         if (event->source() == Qt::MouseEventSynthesizedByQt) {
-            if (TouchSelecting != m_touchState) {
-                DetailItemWidget *widget = getWidgetByPos(pt);
-                if (widget) {
-                    widget->setCursorByPos(event->globalPos());
-                }
-            }
             m_touchState = TouchSelecting;
         }
         emit sigCursorChange(event->pos().y(), true);
@@ -906,8 +898,6 @@ void RightView::mousePressEvent(QMouseEvent *event)
             });
         }
         m_popMenuTimer->start();
-    } else {
-        m_touchState = TouchState::TouchNormal;
     }
 
     if (btn == Qt::RightButton) {
