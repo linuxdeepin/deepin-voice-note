@@ -903,6 +903,7 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
             scrollTo(m_pSortViewFilter->index(0, 0));
             clearSelection();
             if (Qt::ShiftModifier == e->modifiers()) {
+                setCurrentIndex(m_currentRow);
                 for (int i = 0; i <= m_currentRow; i++) {
                     selectionModel()->select(m_pSortViewFilter->index(i, 0), QItemSelectionModel::Select);
                 }
@@ -919,6 +920,7 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
             clearSelection();
             setCurrentIndex(m_currentRow);
             if (Qt::ShiftModifier == e->modifiers()) {
+                setCurrentIndex(m_currentRow);
                 for (int i = m_currentRow; i < count(); i++) {
                     selectionModel()->select(m_pSortViewFilter->index(i, 0), QItemSelectionModel::Select);
                 }
