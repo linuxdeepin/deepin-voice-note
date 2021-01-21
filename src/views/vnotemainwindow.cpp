@@ -2223,13 +2223,13 @@ void VNoteMainWindow::onVirtualKeyboardShow(bool show)
         if (show) {
             QRect rc = m_virtualKeyboard->property("geometry").toRect();
             this->setFixedHeight(QApplication::desktop()->geometry().height() - rc.height());
-            if (m_recordBar->height() != 0) {
+            if (m_recordBarHolder->height() != 0) {
                 m_recordBarHolder->setFixedHeight(0);
                 m_addNoteBtn->setFixedHeight(0);
                 m_addNotepadBtn->setFixedHeight(0);
             }
         } else {
-            if (m_recordBar->height() == 0) {
+            if (m_recordBarHolder->height() == 0) {
                 m_recordBarHolder->setFixedHeight(78);
                 m_addNoteBtn->setFixedHeight(54);
                 m_addNotepadBtn->setFixedHeight(40);
