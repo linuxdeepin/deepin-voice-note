@@ -43,7 +43,7 @@ bool LeftViewSortFilter::lessThan(
     const QModelIndex &source_right) const
 {
     StandardItemCommon::StandardItemType leftSourceType = StandardItemCommon::getStandardItemType(source_left);
-    StandardItemCommon::StandardItemType rightSourceType = StandardItemCommon::getStandardItemType(source_left);
+    StandardItemCommon::StandardItemType rightSourceType = StandardItemCommon::getStandardItemType(source_right);
 
     if (leftSourceType == StandardItemCommon::NOTEPADITEM && rightSourceType == StandardItemCommon::NOTEPADITEM) {
         VNoteFolder *leftSource = reinterpret_cast<VNoteFolder *>(
