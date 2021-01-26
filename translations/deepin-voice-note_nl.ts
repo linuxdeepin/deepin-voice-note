@@ -508,7 +508,7 @@ Alle bijbehorende memo&apos;s worden eveneens verwijderd.</translation>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="144"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
+        <translation>Weet je zeker dat je de %1 geselecteerde aantekeningen wilt verwijderen?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>

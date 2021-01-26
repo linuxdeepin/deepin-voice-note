@@ -43,7 +43,7 @@
     <message>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="110"/>
         <source>%1 notes selected</source>
-        <translation type="unfinished"/>
+        <translation>Vybráno %1 poznámek</translation>
     </message>
 </context>
 <context>
@@ -508,7 +508,7 @@ Veškeré poznámky v něm budou smazány</translation>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="144"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
+        <translation>Opravdu chcete smazat označených %1 poznámek?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>

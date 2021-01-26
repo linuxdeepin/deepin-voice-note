@@ -508,7 +508,7 @@ Toutes les notes qu&apos;il contient seront supprimées</translation>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="144"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
+        <translation>Voulez-vous vraiment supprimer les notes %1 sélectionnées ?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>

@@ -43,7 +43,7 @@
     <message>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="110"/>
         <source>%1 notes selected</source>
-        <translation type="unfinished"/>
+        <translation>%1 नोट्स चयनित</translation>
     </message>
 </context>
 <context>

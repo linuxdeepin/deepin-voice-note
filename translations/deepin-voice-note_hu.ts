@@ -508,7 +508,7 @@ Az összes jegyzet törlődik</translation>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="144"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
+        <translation>Biztosan törli a kijelölt %1 jegyzeteket?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>

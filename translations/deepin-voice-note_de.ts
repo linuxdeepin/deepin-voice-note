@@ -158,7 +158,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="233"/>
         <source>Stop reading</source>
-        <translation type="unfinished"/>
+        <translation>Lesen beenden</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="234"/>
@@ -228,7 +228,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1461"/>
         <source>Unstick</source>
-        <translation type="unfinished"/>
+        <translation>Lösen</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1463"/>
@@ -508,7 +508,7 @@ Alle Notizen darin werden gelöscht</translation>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="144"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
+        <translation>Sind Sie sicher, dass Sie die ausgewählten %1 Notizen löschen möchten?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>

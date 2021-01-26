@@ -43,7 +43,7 @@
     <message>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="110"/>
         <source>%1 notes selected</source>
-        <translation type="unfinished"/>
+        <translation>%1 белешки/е је изабрано</translation>
     </message>
 </context>
 <context>
@@ -372,7 +372,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1158"/>
         <source>Display shortcuts</source>
-        <translation>Прикажи прачице</translation>
+        <translation>Прикажи пречице</translation>
     </message>
 </context>
 <context>
@@ -508,7 +508,7 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="144"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
+        <translation>Заиста желите да обришете %1 изабране/их белешки?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>

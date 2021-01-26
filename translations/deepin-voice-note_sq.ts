@@ -508,7 +508,7 @@ Do të fshihen krejt shënimet në të</translation>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="144"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
+        <translation>Jeni i sigurt se doni të fshihen %1 shënimet e përzgjedhura?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
