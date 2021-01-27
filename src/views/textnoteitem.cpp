@@ -171,12 +171,10 @@ void TextNoteItem::selectText(const QPoint &globalPos, QTextCursor::MoveOperatio
  */
 void TextNoteItem::selectAllText()
 {
-    if (m_selectAll == false) {
-        if (!textIsEmpty()) {
-            m_textEdit->selectAll();
-        }
-        m_selectAll = true;
+    if (!textIsEmpty()) {
+        m_textEdit->selectAll();
     }
+    m_selectAll = true;
 }
 
 /**
