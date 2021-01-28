@@ -20,6 +20,7 @@
 #include "middleview.h"
 #include "middleviewdelegate.h"
 #include "vnoteitem.h"
+#include "middleviewsortfilter.h"
 
 #include <standarditemcommon.h>
 #include <vnoteitemoper.h>
@@ -142,9 +143,16 @@ TEST_F(ut_middleview_test, addRowAtHead)
 TEST_F(ut_middleview_test, appendRow)
 {
     MiddleView middleview;
-    VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-        StandardItemCommon::getStandardItemData(middleview.indexAt(QPoint(10, 10))));
+    VNoteItem *noteData = new VNoteItem;
+    VNoteItem *noteData1 = new VNoteItem;
     middleview.appendRow(noteData);
+    middleview.appendRow(noteData1);
+    middleview.sortView();
+    noteData1->isTop = 1;
+    middleview.sortView();
+    noteData1->isTop = 0;
+    middleview.m_pSortViewFilter->sortView(MiddleViewSortFilter::title);
+    middleview.m_pSortViewFilter->sortView(MiddleViewSortFilter::createTime);
 }
 
 TEST_F(ut_middleview_test, rowCount)

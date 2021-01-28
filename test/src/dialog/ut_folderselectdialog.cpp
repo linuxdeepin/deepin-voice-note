@@ -21,6 +21,9 @@
 #include "leftview.h"
 #include "leftviewdelegate.h"
 #include "leftviewsortfilter.h"
+#include "common/vnoteforlder.h"
+
+#include <QStandardItemModel>
 
 ut_folderselectdialog_test::ut_folderselectdialog_test()
 {
@@ -47,4 +50,23 @@ TEST_F(ut_folderselectdialog_test, hideEvent)
     FolderSelectDialog folderselectdialog(leftview.m_pDataModel);
     QHideEvent *event = new QHideEvent();
     folderselectdialog.hideEvent(event);
+}
+
+TEST_F(ut_folderselectdialog_test, refreshTextColor)
+{
+    QStandardItemModel dataModel;
+    FolderSelectDialog folderselectdialog(&dataModel);
+    folderselectdialog.refreshTextColor(true);
+    folderselectdialog.refreshTextColor(false);
+}
+
+TEST_F(ut_folderselectdialog_test, setFolderBlack)
+{
+    VNoteFolder *folder1 = new VNoteFolder;
+    LeftView leftview;
+    leftview.addFolder(folder1);
+    FolderSelectDialog folderselectdialog(leftview.m_pDataModel);
+    QList<VNoteFolder *> blackList;
+    blackList.push_back(folder1);
+    folderselectdialog.setFolderBlack(blackList);
 }

@@ -147,15 +147,25 @@ TEST_F(ut_leftview_test, restoreNotepadItem)
 TEST_F(ut_leftview_test, addFolder)
 {
     LeftView leftview;
-    VNoteFolder folder;
-    folder.notesCount = 1;
-    folder.defaultIcon = 1;
-    folder.name = "test";
-    folder.iconPath = "test1";
-    folder.createTime = QDateTime::currentDateTime();
-    leftview.addFolder(&folder);
+    VNoteFolder *folder1 = new VNoteFolder;
+    VNoteFolder *folder2 = new VNoteFolder;
+    folder1->notesCount = 1;
+    folder1->defaultIcon = 1;
+    folder1->name = "test";
+    folder1->iconPath = "test1";
+    folder1->createTime = QDateTime::currentDateTime();
+    folder2->notesCount = 0;
+    folder2->defaultIcon = 1;
+    folder2->name = "test";
+    folder2->iconPath = "test1";
+    folder2->createTime = QDateTime::currentDateTime();
+    leftview.addFolder(folder1);
+    leftview.addFolder(folder2);
     leftview.editFolder();
     leftview.folderCount();
+    leftview.sort();
+    folder1->sortNumber = 1;
+    folder2->sortNumber = 2;
     leftview.sort();
 }
 
