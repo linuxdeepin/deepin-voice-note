@@ -167,5 +167,5 @@ install(FILES ${APP_LOGO} DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/icons/hicol
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/deepin-voice-note     DESTINATION /usr/share/deepin-manual/manual-assets/application/)
 
 #if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
-    add_subdirectory(test)
+    add_subdirectory(tests)
 #endif()
