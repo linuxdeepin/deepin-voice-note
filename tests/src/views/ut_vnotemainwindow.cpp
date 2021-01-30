@@ -63,11 +63,11 @@ TEST_F(ut_vnotemainwindow_test, holdHaltLock)
     vnotemainwindow.onVNoteFoldersLoaded();
 }
 
-TEST_F(ut_vnotemainwindow_test, onVNoteSearch)
-{
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.onVNoteSearch();
-}
+//TEST_F(ut_vnotemainwindow_test, onVNoteSearch)
+//{
+//    VNoteMainWindow vnotemainwindow;
+//    vnotemainwindow.onVNoteSearch();
+//}
 
 TEST_F(ut_vnotemainwindow_test, onVNoteSearchTextChange)
 {
