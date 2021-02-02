@@ -88,6 +88,8 @@ void VNoteBaseDialog::initUI()
     mainLayout->addWidget(m_titleBar);
     mainLayout->addWidget(m_content);
     setLayout(mainLayout);
+
+    m_closeButton->setVisible(false);
 }
 
 /**
