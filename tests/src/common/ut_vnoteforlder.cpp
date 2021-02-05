@@ -27,12 +27,12 @@ ut_vnoteforlder_test::ut_vnoteforlder_test()
 
 void ut_vnoteforlder_test::SetUp()
 {
-    m_vnoteforlder = new VNoteFolder;
+    m_vnoteforlder = VNoteDataManager::instance()->getNoteFolders()->folders[0];
 }
 
 void ut_vnoteforlder_test::TearDown()
 {
-    delete m_vnoteforlder;
+    ;
 }
 
 TEST_F(ut_vnoteforlder_test, isValid)
@@ -47,7 +47,5 @@ TEST_F(ut_vnoteforlder_test, maxNoteIdRef)
 
 TEST_F(ut_vnoteforlder_test, getNotesCount)
 {
-    VNoteDataManager::instance()->m_qspNoteFoldersMap.reset(new VNOTE_FOLDERS_MAP());
-    VNoteDataManager::instance()->m_qspAllNotesMap.reset(new VNOTE_ALL_NOTES_MAP());
     m_vnoteforlder->getNotesCount();
 }

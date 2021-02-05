@@ -6,6 +6,8 @@
 
 #include "common/vnotedatamanager.h"
 #include "common/vnoteforlder.h"
+#include "common/metadataparser.h"
+
 #include "common/vnoteitem.h"
 #include "db/vnoteitemoper.h"
 #include "db/vnotefolderoper.h"
@@ -29,6 +31,44 @@ void GlobalEnvent::SetUp()
         QPixmap bitmap(iconPath);
         VNoteDataManager::m_defaultIcons[IconsType::DefaultIcon].push_back(bitmap);
         VNoteDataManager::m_defaultIcons[IconsType::DefaultGrayIcon].push_back(bitmap);
+    }
+
+    for (int i = 0; i < 2; i++) {
+        VNoteFolder *folder = new VNoteFolder;
+        folder->name = "folderDefault";
+        folder->createTime = QDateTime::currentDateTime();
+        folder->modifyTime = QDateTime::currentDateTime();
+        folder->deleteTime = QDateTime::currentDateTime();
+        folder->id = i;
+        folder->UI.icon = VNoteDataManager::instance()->getDefaultIcon(
+            0, IconsType::DefaultIcon);
+        folder->UI.grayIcon = VNoteDataManager::instance()->getDefaultIcon(
+            0, IconsType::DefaultGrayIcon);
+        dataManager->addFolder(folder);
+
+        for (int j = 0; j < 2; j++) {
+            VNoteItem *note = new VNoteItem;
+            note->folderId = folder->id;
+            note->noteId = i + j;
+            note->noteTitle = "noteDefault";
+            folder->maxNoteIdRef()++;
+            note->setFolder(folder);
+            for (int k = 0; k < 5; k++) {
+                VNoteBlock *ptrBlock = nullptr;
+                if (k % 2 == 0) {
+                    ptrBlock = note->newBlock(VNoteBlock::Text);
+                } else {
+                    ptrBlock = note->newBlock(VNoteBlock::Voice);
+                    ptrBlock->ptrVoice->voiceSize = 0;
+                    ptrBlock->ptrVoice->voiceTitle = "voicetitle";
+                }
+                ptrBlock->blockText = "blockDefault";
+                note->addBlock(ptrBlock);
+            }
+            MetaDataParser metaParser;
+            metaParser.makeMetaData(note, note->metaDataRef());
+            VNoteDataManager::instance()->addNote(note);
+        }
     }
 }
 

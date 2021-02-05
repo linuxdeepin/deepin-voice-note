@@ -33,9 +33,6 @@ TEST_F(ut_vnotedatamanager_test, folderNotesCount)
 TEST_F(ut_vnotedatamanager_test, isAllDatasReady)
 {
     VNoteDataManager vnotedatamanager;
-    //    vnotedatamanager.reqNoteDefIcons();
-    //    vnotedatamanager.reqNoteFolders();
-    //    vnotedatamanager.reqNoteItems();
     vnotedatamanager.isAllDatasReady();
 }
 
@@ -74,13 +71,5 @@ TEST_F(ut_vnotedatamanager_test, addFolder)
     vnotedatamanager.folderCount();
     vnotedatamanager.getFolderNotes(3);
     vnotedatamanager.getAllNotesInFolder();
-
-    QString defaultIconPathFmt(":/icons/deepin/builtin/default_folder_icons/%1.svg");
-
-    for (int i = 0; i < 10; i++) {
-        QString iconPath = defaultIconPathFmt.arg(i + 1);
-        QPixmap bitmap(iconPath);
-        VNoteDataManager::m_defaultIcons[IconsType::DefaultIcon].push_back(bitmap);
-    }
     vnotedatamanager.getDefaultIcon(0, IconsType::DefaultIcon);
 }

@@ -43,14 +43,10 @@ TEST_F(ut_utils_test, convertDateTime)
 {
     QDateTime currDateTime = QDateTime::currentDateTime();
     m_utils->convertDateTime(currDateTime);
-
-    QDate currDate1(2020, 8, 19);
-    QDateTime currDateTime1 = QDateTime::currentDateTime();
-    m_utils->convertDateTime(currDateTime1);
-
-    QDate currDate2(2020, 8, 19);
-    QDateTime currDateTime2(currDate2);
-    m_utils->convertDateTime(currDateTime2);
+    m_utils->convertDateTime(currDateTime.addDays(-1));
+    m_utils->convertDateTime(currDateTime.addMonths(-1));
+    m_utils->convertDateTime(currDateTime.addSecs(-3600));
+    m_utils->convertDateTime(currDateTime.addYears(-1));
 }
 
 TEST_F(ut_utils_test, loadSVG)
@@ -73,6 +69,7 @@ TEST_F(ut_utils_test, highTextEdit)
     QString searchKey = "test";
     DPalette pb;
     QColor highColor = pb.color(DPalette::Highlight);
+    m_utils->highTextEdit(document, searchKey, highColor);
     m_utils->highTextEdit(document, searchKey, highColor, true);
 }
 
