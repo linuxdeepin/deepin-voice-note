@@ -29,12 +29,10 @@ ut_vnotedbmanager_test::ut_vnotedbmanager_test()
 
 TEST_F(ut_vnotedbmanager_test, initVNoteDb)
 {
-    VNoteDbManager vnotedbmanager;
-    vnotedbmanager.initVNoteDb();
+    VNoteDbManager::instance()->initVNoteDb();
 }
 
 TEST_F(ut_vnotedbmanager_test, getVNoteDb)
 {
-    VNoteDbManager vnotedbmanager;
-    vnotedbmanager.getVNoteDb();
+    VNoteDbManager::instance()->getVNoteDb();
 }

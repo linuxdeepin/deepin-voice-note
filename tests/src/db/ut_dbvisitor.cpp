@@ -18,6 +18,7 @@
 
 #include "ut_dbvisitor.h"
 #include "dbvisitor.h"
+#include "vnotedbmanager.h"
 
 ut_dbvisitor_test::ut_dbvisitor_test()
 {
@@ -26,7 +27,7 @@ ut_dbvisitor_test::ut_dbvisitor_test()
 TEST_F(ut_dbvisitor_test, visitorData)
 {
     DbVisitor *dbvisitor;
-    QSqlDatabase db;
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
     FolderQryDbVisitor folderqrydbvisitor(db, nullptr, nullptr);
     dbvisitor = new FolderQryDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
@@ -39,7 +40,7 @@ TEST_F(ut_dbvisitor_test, visitorData)
 TEST_F(ut_dbvisitor_test, MaxIdFolderDbVisitor)
 {
     DbVisitor *dbvisitor;
-    QSqlDatabase db;
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
     MaxIdFolderDbVisitor maxidfolderdbvisitor(db, nullptr, nullptr);
     dbvisitor = new MaxIdFolderDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
@@ -49,7 +50,7 @@ TEST_F(ut_dbvisitor_test, MaxIdFolderDbVisitor)
 TEST_F(ut_dbvisitor_test, AddFolderDbVisitor)
 {
     DbVisitor *dbvisitor;
-    QSqlDatabase db;
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
     AddFolderDbVisitor addfolderdbvisitor(db, nullptr, nullptr);
     dbvisitor = new AddFolderDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
@@ -59,7 +60,7 @@ TEST_F(ut_dbvisitor_test, AddFolderDbVisitor)
 TEST_F(ut_dbvisitor_test, RenameFolderDbVisitor)
 {
     DbVisitor *dbvisitor;
-    QSqlDatabase db;
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
     RenameFolderDbVisitor renamefolderdbvisitor(db, nullptr, nullptr);
     dbvisitor = new RenameFolderDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
@@ -69,7 +70,7 @@ TEST_F(ut_dbvisitor_test, RenameFolderDbVisitor)
 TEST_F(ut_dbvisitor_test, DelFolderDbVisitor)
 {
     DbVisitor *dbvisitor;
-    QSqlDatabase db;
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
     DelFolderDbVisitor delfolderdbvisitor(db, nullptr, nullptr);
     dbvisitor = new DelFolderDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
@@ -79,7 +80,7 @@ TEST_F(ut_dbvisitor_test, DelFolderDbVisitor)
 TEST_F(ut_dbvisitor_test, NoteQryDbVisitor)
 {
     DbVisitor *dbvisitor;
-    QSqlDatabase db;
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
     NoteQryDbVisitor noteqrydbvisitor(db, nullptr, nullptr);
     dbvisitor = new NoteQryDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
@@ -89,7 +90,7 @@ TEST_F(ut_dbvisitor_test, NoteQryDbVisitor)
 //TEST_F(ut_dbvisitor_test, AddNoteDbVisitor)
 //{
 //    DbVisitor *dbvisitor;
-//    QSqlDatabase db;
+//    QSqlDatabase db=VNoteDbManager::instance()->getVNoteDb();
 //    AddNoteDbVisitor addnotedbvisitor(db, nullptr, nullptr);
 //    dbvisitor = new AddNoteDbVisitor(db, nullptr, nullptr);
 //    dbvisitor->prepareSqls();
@@ -99,7 +100,7 @@ TEST_F(ut_dbvisitor_test, NoteQryDbVisitor)
 TEST_F(ut_dbvisitor_test, RenameNoteDbVisitor)
 {
     DbVisitor *dbvisitor;
-    QSqlDatabase db;
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
     RenameNoteDbVisitor renamenotedbvisitor(db, nullptr, nullptr);
     dbvisitor = new RenameNoteDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
@@ -109,7 +110,7 @@ TEST_F(ut_dbvisitor_test, RenameNoteDbVisitor)
 TEST_F(ut_dbvisitor_test, UpdateNoteDbVisitor)
 {
     DbVisitor *dbvisitor;
-    QSqlDatabase db;
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
     UpdateNoteDbVisitor updatenotedbvisitor(db, nullptr, nullptr);
     dbvisitor = new UpdateNoteDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
@@ -119,7 +120,7 @@ TEST_F(ut_dbvisitor_test, UpdateNoteDbVisitor)
 TEST_F(ut_dbvisitor_test, DelNoteDbVisitor)
 {
     DbVisitor *dbvisitor;
-    QSqlDatabase db;
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
     DelNoteDbVisitor delnotedbvisitor(db, nullptr, nullptr);
     dbvisitor = new DelNoteDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
@@ -129,7 +130,7 @@ TEST_F(ut_dbvisitor_test, DelNoteDbVisitor)
 TEST_F(ut_dbvisitor_test, SaferQryDbVisitor)
 {
     DbVisitor *dbvisitor;
-    QSqlDatabase db;
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
     SaferQryDbVisitor saferqrydbvisitor(db, nullptr, nullptr);
     dbvisitor = new SaferQryDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
@@ -139,7 +140,7 @@ TEST_F(ut_dbvisitor_test, SaferQryDbVisitor)
 TEST_F(ut_dbvisitor_test, AddSaferDbVisitor)
 {
     DbVisitor *dbvisitor;
-    QSqlDatabase db;
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
     AddSaferDbVisitor addsaferdbvisitor(db, nullptr, nullptr);
     dbvisitor = new AddSaferDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
@@ -149,7 +150,7 @@ TEST_F(ut_dbvisitor_test, AddSaferDbVisitor)
 TEST_F(ut_dbvisitor_test, DelSaferDbVisitor)
 {
     DbVisitor *dbvisitor;
-    QSqlDatabase db;
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
     DelSaferDbVisitor delsaferdbvisitor(db, nullptr, nullptr);
     dbvisitor = new DelSaferDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
