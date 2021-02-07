@@ -47,7 +47,7 @@ public:
 
 signals:
     //获取焦点
-    void sigFocusIn();
+    void sigFocusIn(Qt::FocusReason reson);
     //失去焦点
     void sigFocusOut();
 

@@ -125,7 +125,7 @@ signals:
     void sigCursorChange(int height, bool mouseMove);
 public slots:
     //编辑框获取焦点
-    void onTextEditFocusIn();
+    void onTextEditFocusIn(Qt::FocusReason reason);
     //编辑框失去焦点
     void onTextEditFocusOut();
     //编辑框内容改变

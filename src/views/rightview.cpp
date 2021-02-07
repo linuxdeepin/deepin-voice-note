@@ -241,16 +241,26 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
 /**
  * @brief RightView::onTextEditFocusIn
  */
-void RightView::onTextEditFocusIn()
+void RightView::onTextEditFocusIn(Qt::FocusReason reason)
 {
-    if (m_curAsrItem) {
-        TextNoteItem *widget = static_cast<TextNoteItem *>(sender());
+    TextNoteItem *widget = static_cast<TextNoteItem *>(sender());
+    if (widget && m_curAsrItem) {
         int height = 0;
         QRect rc = widget->getCursorRect();
         if (!rc.isEmpty()) {
             height = rc.bottom();
         }
         adjustVerticalScrollBar(widget, height);
+    }
+
+    if (reason == Qt::TabFocusReason) {
+        QLayoutItem *layoutItem = m_viewportLayout->itemAt(m_viewportLayout->count() - 2);
+        DetailItemWidget *lastWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
+        m_curItemWidget = lastWidget;
+        lastWidget->setFocus();
+        QTextCursor cursor = m_curItemWidget->getTextCursor();
+        cursor.movePosition(QTextCursor::End);
+        m_curItemWidget->setTextCursor(cursor);
     }
 }
 

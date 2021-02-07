@@ -54,7 +54,7 @@ TextNoteEdit::TextNoteEdit(QWidget *parent)
 void TextNoteEdit::focusInEvent(QFocusEvent *e)
 {
     DTextEdit::focusInEvent(e);
-    emit sigFocusIn();
+    emit sigFocusIn(e->reason());
 }
 
 /**

@@ -75,7 +75,9 @@ TEST_F(ut_rightview_test, insertVoiceItem)
 TEST_F(ut_rightview_test, onTextEditFocusIn)
 {
     RightView rightview;
-    rightview.onTextEditFocusIn();
+    VNoteItem *retNote = VNoteDataManager::instance()->getNote(0, 0);
+    rightview.initData(retNote, "");
+    rightview.onTextEditFocusIn(Qt::TabFocusReason);
 }
 
 TEST_F(ut_rightview_test, onTextEditFocusOut)

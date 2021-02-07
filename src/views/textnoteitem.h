@@ -60,7 +60,7 @@ signals:
     //内容改变
     void sigTextChanged();
     //获取焦点
-    void sigFocusIn();
+    void sigFocusIn(Qt::FocusReason);
     //失去焦点
     void sigFocusOut();
     //选中改变
