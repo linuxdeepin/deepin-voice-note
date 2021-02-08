@@ -127,12 +127,9 @@ bool VNoteDbManager::insertData(DbVisitor *visitor /*in/out*/)
 
     CRITICAL_SECTION_END();
 
-    //Get new record data
-    if (nullptr != visitor) {
-        if (!visitor->visitorData()) {
-            insertOK = false;
-            qCritical() << "Query new data failed: visitorData failed.";
-        }
+    if (!visitor->visitorData()) {
+        insertOK = false;
+        qCritical() << "Query new data failed: visitorData failed.";
     }
 
     return insertOK;

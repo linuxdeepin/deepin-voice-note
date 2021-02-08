@@ -315,16 +315,14 @@ bool GstreamRecorder::doBusMessage(GstMessage *message)
 
         gst_message_parse_error(message, &error, &dbg);
 
-        QString errMsg = error->message;
-        emit errorMsg(errMsg);
-
-        qCritical() << "Got pipeline error:" << errMsg;
-
         if (dbg) {
             g_free(dbg);
         }
 
         if (error) {
+            QString errMsg = error->message;
+            emit errorMsg(errMsg);
+            qCritical() << "Got pipeline error:" << errMsg;
             g_error_free(error);
         }
         break;
