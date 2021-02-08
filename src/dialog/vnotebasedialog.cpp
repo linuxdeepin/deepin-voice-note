@@ -64,7 +64,6 @@ void VNoteBaseDialog::initUI()
     m_logoIcon->setPixmap(QIcon::fromTheme(DEEPIN_VOICE_NOTE).pixmap(QSize(32, 32)));
 
     m_closeButton = new DWindowCloseButton(this);
-    m_closeButton->setFocusPolicy(Qt::NoFocus);
     m_closeButton->setIconSize(QSize(50, 50));
 
     m_tileText = new DLabel(this);

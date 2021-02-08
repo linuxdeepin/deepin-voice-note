@@ -439,3 +439,21 @@ void LeftViewDelegate::setDrawHover(bool enable)
 {
     m_drawHover = enable;
 }
+
+/**
+ * @brief LeftViewDelegate::setTabFocus
+ * @param focus true 有tab焦点，false 无tab焦点
+ */
+void LeftViewDelegate::setTabFocus(bool focus)
+{
+    m_tabFocus = focus;
+}
+
+/**
+ * @brief LeftViewDelegate::isTabFocus
+ * @return true 有tab焦点，false 无tab焦点
+ */
+bool LeftViewDelegate::isTabFocus()
+{
+    return m_tabFocus;
+}

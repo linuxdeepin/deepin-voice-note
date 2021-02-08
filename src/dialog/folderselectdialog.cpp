@@ -106,6 +106,19 @@ void FolderSelectView::mouseMoveEvent(QMouseEvent *event)
     DTreeView::mouseMoveEvent(event);
 }
 
+void FolderSelectView::focusInEvent(QFocusEvent *e)
+{
+    LeftViewDelegate *delegate = dynamic_cast<LeftViewDelegate *>(itemDelegate());
+    delegate->setTabFocus(e->reason() == Qt::TabFocusReason);
+    DTreeView::focusInEvent(e);
+}
+void FolderSelectView::focusOutEvent(QFocusEvent *e)
+{
+    LeftViewDelegate *delegate = dynamic_cast<LeftViewDelegate *>(itemDelegate());
+    delegate->setTabFocus(false);
+    DTreeView::focusOutEvent(e);
+}
+
 /**
  * @brief doTouchMoveEvent 手势滑动处理函数
  * @return event 事件
@@ -170,6 +183,9 @@ void FolderSelectDialog::initUI()
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(10, 0, 0, 10);
+
+    m_closeButton = new DWindowCloseButton(this);
+    m_closeButton->setIconSize(QSize(50, 50));
     m_view = new FolderSelectView(this);
     m_view->setModel(m_model);
     m_view->setContextMenuPolicy(Qt::NoContextMenu);
@@ -185,10 +201,6 @@ void FolderSelectDialog::initUI()
     QModelIndex notepadRootIndex = m_model->index(0, 0);
     m_view->expand(notepadRootIndex);
     m_view->setFrameShape(DTreeView::NoFrame);
-
-    m_closeButton = new DWindowCloseButton(this);
-    m_closeButton->setFocusPolicy(Qt::NoFocus);
-    m_closeButton->setIconSize(QSize(50, 50));
 
     m_labMove = new DLabel(this);
     DFontSizeManager::instance()->bind(m_labMove, DFontSizeManager::T6, QFont::Medium);
@@ -427,5 +439,12 @@ void FolderSelectDialog::hideEvent(QHideEvent *event)
 {
     //取消按钮的hover状态
     m_closeButton->setAttribute(Qt::WA_UnderMouse, false);
+    m_view->setFocus(Qt::MouseFocusReason);
     DAbstractDialog::hideEvent(event);
+}
+
+void FolderSelectDialog::setDefaultSelect()
+{
+    QModelIndex index = m_model->index(0, 0).child(0, 0);
+    m_view->setCurrentIndex(index);
 }

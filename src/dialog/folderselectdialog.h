@@ -46,6 +46,8 @@ class FolderSelectView : public DTreeView
     Q_OBJECT
 public:
     explicit FolderSelectView(QWidget *parent = nullptr);
+
+protected:
     //鼠标move
     void mouseMoveEvent(QMouseEvent *event) override;
     //鼠标press
@@ -54,11 +56,17 @@ public:
     void mouseReleaseEvent(QMouseEvent *event) override;
     //键盘press
     void keyPressEvent(QKeyEvent *event) override;
+    //获取焦点
+    void focusInEvent(QFocusEvent *e) override;
+    //失去焦点
+    void focusOutEvent(QFocusEvent *e) override;
+
 protected:
     //处理触摸屏鼠标滑动
     void doTouchMoveEvent(QMouseEvent *eve);
     //处理触摸屏滑动事件
     void handleTouchSlideEvent(qint64 timeInterval, double distY, QPoint point);
+
 private:
     bool m_isTouchSliding {false};
     qint64 m_touchPressStartMs = 0;
@@ -71,11 +79,13 @@ class FolderSelectDialog : public DAbstractDialog
 public:
     explicit FolderSelectDialog(QStandardItemModel *model, QWidget *parent = nullptr);
     //设置移动笔记信息
-    void setNoteContextInfo(const QString &text,int notesNumber);
+    void setNoteContextInfo(const QString &text, int notesNumber);
     //设置不需要显示的记事本
     void setFolderBlack(const QList<VNoteFolder *> &folders);
     //清除选中
     void clearSelection();
+    //默认选中
+    void setDefaultSelect();
     //获取选中的记事本
     QModelIndex getSelectIndex();
     //选中变化处理
@@ -95,10 +105,10 @@ protected:
 
 private:
     DLabel *m_noteInfo {nullptr};
-    QString m_notesName = "" ;
+    QString m_notesName = "";
     int m_notesNumber = 0;
     DLabel *m_labMove {nullptr};
-    FolderSelectView   *m_view {nullptr};
+    FolderSelectView *m_view {nullptr};
     DWindowCloseButton *m_closeButton {nullptr};
     LeftViewSortFilter *m_model {nullptr};
     LeftViewDelegate *m_delegate {nullptr};

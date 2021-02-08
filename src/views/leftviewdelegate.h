@@ -42,6 +42,10 @@ public:
     const int MAX_FOLDER_NAME_LEN = 64;
     //更新判断标志
     void setSelectView(bool selectView);
+    //设置tab焦点标志
+    void setTabFocus(bool focus);
+    //判断是否为tab焦点
+    bool isTabFocus();
 
 protected:
     //绘制列表项
@@ -72,14 +76,15 @@ private:
     void paintNoteItem(QPainter *painter, const QStyleOptionViewItem &option,
                        const QModelIndex &index) const;
     //绘制三角
-    void paintTriangle(QPainter *painter, const QRect& rc, const QBrush &brush, bool left) const;
+    void paintTriangle(QPainter *painter, const QRect &rc, const QBrush &brush, bool left) const;
 
     QAbstractItemView *m_treeView {nullptr};
     DPalette m_parentPb;
     bool m_enableItem {true};
     bool m_drawNotesNum {true};
-    bool m_draging  {false};
-    bool m_drawHover  {true};
+    bool m_draging {false};
+    bool m_drawHover {true};
+    bool m_tabFocus {false};
 
     //是否为待移动记事本列表
     bool m_isPendingList {false};
