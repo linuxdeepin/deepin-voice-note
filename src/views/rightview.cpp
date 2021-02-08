@@ -1376,7 +1376,7 @@ void RightView::saveMp3()
     if (m_curItemWidget) {
         VNoteBlock *block = m_curItemWidget->getNoteBlock();
         if (block->blockType == VNoteBlock::Voice) {
-            DFileDialog dialog;
+            DFileDialog dialog(this);
             dialog.setFileMode(DFileDialog::DirectoryOnly);
 
             dialog.setLabelText(DFileDialog::Accept, DApplication::translate("RightView", "Save"));

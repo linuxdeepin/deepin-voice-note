@@ -278,7 +278,7 @@ void MiddleView::saveAsText()
         //TODO:
         //    Should check if this note is doing save action
 
-        DFileDialog dialog;
+        DFileDialog dialog(this);
         dialog.setFileMode(DFileDialog::DirectoryOnly);
         dialog.setLabelText(DFileDialog::Accept, DApplication::translate("MiddleView", "Save"));
         dialog.setNameFilter("TXT(*.txt)");
@@ -321,7 +321,7 @@ void MiddleView::saveRecords()
         //TODO:
         //    Should check if this note is doing save action
 
-        DFileDialog dialog;
+        DFileDialog dialog(this);
         dialog.setFileMode(DFileDialog::DirectoryOnly);
         dialog.setLabelText(DFileDialog::Accept, DApplication::translate("MiddleView", "Save"));
         dialog.setNameFilter("MP3(*.mp3)");
