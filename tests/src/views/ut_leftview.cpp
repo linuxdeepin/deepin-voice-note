@@ -22,6 +22,7 @@
 #include "leftviewsortfilter.h"
 #include "vnoteforlder.h"
 #include "middleview.h"
+#include "vnotedatamanager.h"
 
 #include <QLineEdit>
 #include <QDateTime>
@@ -147,26 +148,21 @@ TEST_F(ut_leftview_test, restoreNotepadItem)
 TEST_F(ut_leftview_test, addFolder)
 {
     LeftView leftview;
-    VNoteFolder *folder1 = new VNoteFolder;
-    VNoteFolder *folder2 = new VNoteFolder;
-    folder1->notesCount = 1;
-    folder1->defaultIcon = 1;
-    folder1->name = "test";
-    folder1->iconPath = "test1";
-    folder1->createTime = QDateTime::currentDateTime();
-    folder2->notesCount = 0;
-    folder2->defaultIcon = 1;
-    folder2->name = "test";
-    folder2->iconPath = "test1";
-    folder2->createTime = QDateTime::currentDateTime();
-    leftview.addFolder(folder1);
-    leftview.addFolder(folder2);
+    QModelIndex notepadRootIndex = leftview.getNotepadRootIndex();
+    leftview.expand(notepadRootIndex);
+    VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
+    for (auto it : folders->folders) {
+        leftview.addFolder(it);
+    }
     leftview.editFolder();
     leftview.folderCount();
     leftview.sort();
-    folder1->sortNumber = 1;
-    folder2->sortNumber = 2;
+    int sortNum = 0;
+    for (auto it : folders->folders) {
+        it->sortNumber = sortNum++;
+    }
     leftview.sort();
+    leftview.grab();
 }
 
 TEST_F(ut_leftview_test, appendFolder)

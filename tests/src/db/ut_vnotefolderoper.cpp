@@ -35,7 +35,7 @@ void ut_vnotefolderoper_test::TearDown()
 
 TEST_F(ut_vnotefolderoper_test, deleteVNoteFolder)
 {
-    m_vnotefolderoper->deleteVNoteFolder(1);
+    m_vnotefolderoper->deleteVNoteFolder(2);
 }
 
 TEST_F(ut_vnotefolderoper_test, renameVNoteFolder)

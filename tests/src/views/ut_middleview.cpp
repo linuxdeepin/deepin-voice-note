@@ -21,6 +21,9 @@
 #include "middleviewdelegate.h"
 #include "vnoteitem.h"
 #include "middleviewsortfilter.h"
+#include "vnotedatamanager.h"
+#include "vnoteitemoper.h"
+#include "vnoteforlder.h"
 
 #include <standarditemcommon.h>
 #include <vnoteitemoper.h>
@@ -32,7 +35,18 @@ ut_middleview_test::ut_middleview_test()
 TEST_F(ut_middleview_test, setSearchKey)
 {
     MiddleView middleview;
-    middleview.setSearchKey("test");
+    VNoteFolder *folder = VNoteDataManager::instance()->getNoteFolders()->folders[0];
+    VNoteItemOper noteOper;
+    VNOTE_ITEMS_MAP *notes = noteOper.getFolderNotes(folder->id);
+    if (notes) {
+        notes->lock.lockForRead();
+        for (auto it : notes->folderNotes) {
+            middleview.appendRow(it);
+        }
+        notes->lock.unlock();
+    }
+    middleview.setSearchKey("note");
+    middleview.grab();
     middleview.m_pItemDelegate->handleChangeTheme();
     middleview.clearAll();
     middleview.closeMenu();
