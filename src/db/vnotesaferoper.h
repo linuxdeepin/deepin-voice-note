@@ -27,7 +27,7 @@ class VNoteSaferOper
 {
 public:
     VNoteSaferOper();
-    VNoteSaferOper(const VDataSafer &safer);
+    explicit VNoteSaferOper(const VDataSafer &safer);
     //加载表数据
     SafetyDatas *loadSafers();
     //添加记录

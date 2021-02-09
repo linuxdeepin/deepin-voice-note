@@ -28,7 +28,7 @@ class OldDataLoadTask : public VNTask
 {
     Q_OBJECT
 public:
-    OldDataLoadTask(QObject *parent = nullptr);
+    explicit OldDataLoadTask(QObject *parent = nullptr);
 
 protected:
     //加载老数据库数据
@@ -42,7 +42,7 @@ class OldDataUpgradeTask : public VNTask
 {
     Q_OBJECT
 public:
-    OldDataUpgradeTask(QObject *parent = nullptr);
+    explicit OldDataUpgradeTask(QObject *parent = nullptr);
 
 protected:
     //升级数据

@@ -627,7 +627,6 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
 QString LeftView::getFolderSort()
 {
     QString tmpQstr = "";
-    VNoteFolder *data {nullptr};
     QModelIndex rootIndex = getNotepadRootIndex();
     QModelIndex currentIndex;
     for (int i = 0; i < folderCount(); i++) {
@@ -635,7 +634,7 @@ QString LeftView::getFolderSort()
         if (!currentIndex.isValid()) {
             break;
         }
-        data = reinterpret_cast<VNoteFolder *>(
+        VNoteFolder *data = reinterpret_cast<VNoteFolder *>(
             StandardItemCommon::getStandardItemData(currentIndex));
         if (tmpQstr.isEmpty()) {
             tmpQstr = QString::number(data->id);
@@ -654,7 +653,6 @@ QString LeftView::getFolderSort()
 bool LeftView::setFolderSort()
 {
     bool sortResult = false;
-    VNoteFolder *data {nullptr};
     QModelIndex rootIndex = getNotepadRootIndex();
     QModelIndex currentIndex;
     int rowCount = folderCount();
@@ -663,7 +661,7 @@ bool LeftView::setFolderSort()
         if (!currentIndex.isValid()) {
             break;
         }
-        data = reinterpret_cast<VNoteFolder *>(
+        VNoteFolder *data = reinterpret_cast<VNoteFolder *>(
             StandardItemCommon::getStandardItemData(currentIndex));
         if (nullptr != data) {
             reinterpret_cast<VNoteFolder *>(

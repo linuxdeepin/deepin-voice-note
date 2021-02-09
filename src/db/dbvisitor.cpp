@@ -344,8 +344,6 @@ bool MaxIdFolderDbVisitor::prepareSqls()
     //    primary key table name : SQLITE_SEQUENCE
     //    max primary key feild  : SEQ
     static constexpr char const *QUERY_DEFNAME_FMT = "SELECT SEQ FROM SQLITE_SEQUENCE where NAME='%s';";
-    static constexpr char const *RESET_FOLDER_ID = "UPDATE SQLITE_SEQUENCE SET SEQ=%s where NAME='%s';";
-
     QString querySql;
     querySql.sprintf(QUERY_DEFNAME_FMT, VNoteDbManager::FOLDER_TABLE_NAME);
 
@@ -353,6 +351,7 @@ bool MaxIdFolderDbVisitor::prepareSqls()
 
     if (m_extraData.data.flag) {
         QString resetFolderIdSql;
+        static constexpr char const *RESET_FOLDER_ID = "UPDATE SQLITE_SEQUENCE SET SEQ=%s where NAME='%s';";
         resetFolderIdSql.sprintf(RESET_FOLDER_ID, QString("%1").arg(0).toUtf8().data(), VNoteDbManager::FOLDER_TABLE_NAME);
         m_dbvSqls.append(resetFolderIdSql);
     }
@@ -414,11 +413,10 @@ bool AddFolderDbVisitor::visitorData()
 bool AddFolderDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
-
-    static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s,%s,%s,%s) VALUES ('%s', %s, '%s', '%s', '%s');";
-    static constexpr char const *NEWREC_FMT = "SELECT * FROM %s ORDER BY %s DESC LIMIT 1;";
-
     if (nullptr != param.newFolder) {
+        static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s,%s,%s,%s) VALUES ('%s', %s, '%s', '%s', '%s');";
+        static constexpr char const *NEWREC_FMT = "SELECT * FROM %s ORDER BY %s DESC LIMIT 1;";
+
         //Check&Init the create time parameter
         //create/modify/delete time are same for new folder
         QDateTime createTime = param.newFolder->createTime;
@@ -460,12 +458,9 @@ RenameFolderDbVisitor::RenameFolderDbVisitor(QSqlDatabase &db, const void *inPar
 bool RenameFolderDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
-
-    static constexpr char const *RENAME_FOLDERS_FMT = "UPDATE %s SET %s='%s', %s='%s' WHERE %s=%s;";
-
     const VNoteFolder *folder = param.newFolder;
-
     if (nullptr != folder) {
+        static constexpr char const *RENAME_FOLDERS_FMT = "UPDATE %s SET %s='%s', %s='%s' WHERE %s=%s;";
         QString sqlFolderName = folder->name;
         checkSqlStr(sqlFolderName);
 
@@ -500,10 +495,9 @@ bool DelFolderDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
 
-    static constexpr char const *DEL_FOLDER_FMT = "DELETE FROM %s WHERE %s=%s;";
-    static constexpr char const *DEL_FNOTE_FMT = "DELETE FROM %s WHERE %s=%s;";
-
     if (nullptr != param.id) {
+        static constexpr char const *DEL_FOLDER_FMT = "DELETE FROM %s WHERE %s=%s;";
+        static constexpr char const *DEL_FNOTE_FMT = "DELETE FROM %s WHERE %s=%s;";
         qint64 folderId = *param.id;
         QString deleteFolderSql;
 
@@ -585,15 +579,14 @@ bool AddNoteDbVisitor::visitorData()
 bool AddNoteDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
-
-    static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s) VALUES (%s,%s,'%s','%s','%s','%s','%s');";
-    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s,%s='%s' WHERE %s=%s;";
-    static constexpr char const *NEWREC_FMT = "SELECT * FROM %s WHERE %s=%s ORDER BY %s DESC LIMIT 1;";
-
     const VNoteFolder *folder = param.newNote->folder();
     const VNoteItem *note = param.newNote;
 
     if ((nullptr != note) && (nullptr != folder)) {
+        static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s) VALUES (%s,%s,'%s','%s','%s','%s','%s');";
+        static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s,%s='%s' WHERE %s=%s;";
+        static constexpr char const *NEWREC_FMT = "SELECT * FROM %s WHERE %s=%s ORDER BY %s DESC LIMIT 1;";
+
         //Check&Init the create time parameter
         //create/modify/delete time are same for new note
         QDateTime createTime = param.newNote->createTime;
@@ -645,13 +638,12 @@ RenameNoteDbVisitor::RenameNoteDbVisitor(QSqlDatabase &db, const void *inParam, 
 bool RenameNoteDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
-
-    static constexpr char const *MODIFY_NOTETEXT_FMT = "UPDATE %s SET %s='%s', %s='%s' WHERE %s=%s AND %s=%s;";
-    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s='%s' WHERE %s=%s;";
-
     const VNoteItem *note = param.newNote;
 
     if (nullptr != note) {
+        static constexpr char const *MODIFY_NOTETEXT_FMT = "UPDATE %s SET %s='%s', %s='%s' WHERE %s=%s AND %s=%s;";
+        static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s='%s' WHERE %s=%s;";
+
         QString sqlTitle = note->noteTitle;
         checkSqlStr(sqlTitle);
 
@@ -690,13 +682,12 @@ UpdateNoteDbVisitor::UpdateNoteDbVisitor(QSqlDatabase &db, const void *inParam, 
 bool UpdateNoteDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
-
-    static constexpr char const *MODIFY_NOTETEXT_FMT = "UPDATE %s SET %s='%s', %s='%s' WHERE %s=%s AND %s=%s;";
-    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s='%s' WHERE %s=%s;";
-
     const VNoteItem *note = param.newNote;
 
     if (nullptr != note) {
+        static constexpr char const *MODIFY_NOTETEXT_FMT = "UPDATE %s SET %s='%s', %s='%s' WHERE %s=%s AND %s=%s;";
+        static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s='%s' WHERE %s=%s;";
+
         QString metaDataStr = note->metaDataConstRef().toString();
         checkSqlStr(metaDataStr);
 
@@ -734,9 +725,9 @@ UpdateNoteTopDbVisitor::UpdateNoteTopDbVisitor(QSqlDatabase &db, const void *inP
 bool UpdateNoteTopDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
-    static constexpr char const *UPDATE_NOTE_TOP = "UPDATE %s SET %s=%d WHERE %s=%d;";
     const VNoteItem *note = param.newNote;
     if (note != nullptr) {
+        static constexpr char const *UPDATE_NOTE_TOP = "UPDATE %s SET %s=%d WHERE %s=%d;";
         QString updateSql;
         updateSql.sprintf(UPDATE_NOTE_TOP,
                           VNoteDbManager::NOTES_TABLE_NAME,
@@ -769,9 +760,9 @@ UpdateNoteFolderIdDbVisitor::UpdateNoteFolderIdDbVisitor(QSqlDatabase &db, const
 bool UpdateNoteFolderIdDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
-    static constexpr char const *UPDATE_NOTE_FOLDERID = "UPDATE %s SET %s=%lld WHERE %s=%d;";
     const VNoteItem *note = param.newNote;
     if (note != nullptr) {
+        static constexpr char const *UPDATE_NOTE_FOLDERID = "UPDATE %s SET %s=%lld WHERE %s=%d;";
         QString updateSql;
         updateSql.sprintf(UPDATE_NOTE_FOLDERID,
                           VNoteDbManager::NOTES_TABLE_NAME,
@@ -804,13 +795,11 @@ DelNoteDbVisitor::DelNoteDbVisitor(QSqlDatabase &db, const void *inParam, void *
 bool DelNoteDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
-
-    static constexpr char const *DEL_NOTE_FMT = "DELETE FROM %s WHERE %s=%s AND %s=%s;";
-    static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s, %s='%s' WHERE %s=%s;";
-
     const VNoteItem *note = param.newNote;
-
     if (nullptr != note && nullptr != note->folder()) {
+        static constexpr char const *DEL_NOTE_FMT = "DELETE FROM %s WHERE %s=%s AND %s=%s;";
+        static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s, %s='%s' WHERE %s=%s;";
+
         QString deleteSql;
 
         deleteSql.sprintf(DEL_NOTE_FMT, VNoteDbManager::NOTES_TABLE_NAME, DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data(), QString("%1").arg(note->folderId).toUtf8().data(), DBNote::noteColumnsName[DBNote::note_id].toUtf8().data(), QString("%1").arg(note->noteId).toUtf8().data());
@@ -916,10 +905,8 @@ AddSaferDbVisitor::AddSaferDbVisitor(QSqlDatabase &db, const void *inParam, void
 bool AddSaferDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
-
-    static constexpr char const *INSERT_SAFER_FMT = "INSERT INTO %s (%s,%s,%s) VALUES (%s,%s,'%s');";
-
     if (nullptr != param.safer) {
+        static constexpr char const *INSERT_SAFER_FMT = "INSERT INTO %s (%s,%s,%s) VALUES (%s,%s,'%s');";
         QString addSaferSql;
         addSaferSql.sprintf(INSERT_SAFER_FMT, VNoteDbManager::SAFER_TABLE_NAME, DBSafer::saferColumnsName[DBSafer::folder_id].toUtf8().data(), DBSafer::saferColumnsName[DBSafer::note_id].toUtf8().data(), DBSafer::saferColumnsName[DBSafer::path].toUtf8().data(), QString("%1").arg(param.safer->folder_id).toUtf8().data(), QString("%1").arg(param.safer->note_id).toUtf8().data(), param.safer->path.toUtf8().data());
 
@@ -949,10 +936,8 @@ DelSaferDbVisitor::DelSaferDbVisitor(QSqlDatabase &db, const void *inParam, void
 bool DelSaferDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
-
-    static constexpr char const *DEL_SAFER_FMT = "DELETE FROM %s WHERE %s=%s AND %s=%s AND %s='%s';";
-
     if (nullptr != param.safer) {
+        static constexpr char const *DEL_SAFER_FMT = "DELETE FROM %s WHERE %s=%s AND %s=%s AND %s='%s';";
         QString delSaferSql;
         delSaferSql.sprintf(DEL_SAFER_FMT, VNoteDbManager::SAFER_TABLE_NAME, DBSafer::saferColumnsName[DBSafer::folder_id].toUtf8().data(), QString("%1").arg(param.safer->folder_id).toUtf8().data(), DBSafer::saferColumnsName[DBSafer::note_id].toUtf8().data(), QString("%1").arg(param.safer->note_id).toUtf8().data(), DBSafer::saferColumnsName[DBSafer::path].toUtf8().data(), param.safer->path.toUtf8().data());
 

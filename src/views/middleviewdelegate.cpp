@@ -97,11 +97,10 @@ void VNoteTextPHelper::spiltByKeyword(const QString &text, const QString &keywor
     int keyLen = keyword.length();
     int textLen = text.length();
     int startPos = 0;
-    int pos = 0;
-
     m_textsVector.clear();
 
     if (!keyword.isEmpty()) {
+        int pos = 0;
         while ((pos = elideText.indexOf(keyword, startPos, Qt::CaseInsensitive)) != -1) {
             Text tb;
 

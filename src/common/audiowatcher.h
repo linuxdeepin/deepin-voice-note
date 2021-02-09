@@ -30,7 +30,7 @@ public:
     enum AudioMode { Internal,
                      Micphone };
     Q_ENUM(AudioMode)
-    explicit AudioWatcher(QObject *parent = nullptr);
+    AudioWatcher(QObject *parent = nullptr);
     //获取设备名称
     QString getDeviceName(AudioMode mode);
     //获取设备音量

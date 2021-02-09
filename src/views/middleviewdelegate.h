@@ -33,7 +33,7 @@ class MiddleViewDelegate : public DStyledItemDelegate
 {
     Q_OBJECT
 public:
-    MiddleViewDelegate(QAbstractItemView *parent = nullptr);
+    explicit MiddleViewDelegate(QAbstractItemView *parent = nullptr);
     //主题改变处理
     void handleChangeTheme();
     //设置搜索关键字

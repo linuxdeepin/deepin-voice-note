@@ -28,7 +28,7 @@ DWIDGET_USE_NAMESPACE
 class LeftViewDelegate : public DStyledItemDelegate
 {
 public:
-    LeftViewDelegate(QAbstractItemView *parent = nullptr);
+    explicit LeftViewDelegate(QAbstractItemView *parent = nullptr);
     //主题切换处理
     void handleChangeTheme();
     //设置所有列表项是否可用

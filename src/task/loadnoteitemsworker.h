@@ -32,7 +32,7 @@ class LoadNoteItemsWorker : public VNTask
 {
     Q_OBJECT
 public:
-    LoadNoteItemsWorker(QObject *parent = nullptr);
+    explicit LoadNoteItemsWorker(QObject *parent = nullptr);
 
 protected:
     //加载数据

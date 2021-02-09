@@ -121,7 +121,6 @@ void MoveView::paintEvent(QPaintEvent *)
         VNoteFolderOper folderOps(m_folder);
         QString strNum = QString::number(folderOps.getNotesCount());
         int numWidth = fontMetrics.width(strNum);
-        QRect paintRect = rect();
         int iconSpace = (paintRect.height() - 24) / 2;
         //绘制内部信息
         painter.setPen(QPen(pb.color(DPalette::Normal, DPalette::Text)));

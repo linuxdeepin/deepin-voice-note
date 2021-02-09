@@ -63,7 +63,7 @@ class VNoteMainWindow : public DMainWindow
 {
     Q_OBJECT
 public:
-    VNoteMainWindow(QWidget *parent = nullptr);
+    explicit VNoteMainWindow(QWidget *parent = nullptr);
     virtual ~VNoteMainWindow() override;
     //提示框选择是否关闭应用
     bool checkIfNeedExit();

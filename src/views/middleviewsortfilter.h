@@ -27,7 +27,7 @@
 class MiddleViewSortFilter : public QSortFilterProxyModel
 {
 public:
-    MiddleViewSortFilter(QObject *parent = nullptr);
+    explicit MiddleViewSortFilter(QObject *parent = nullptr);
 
     enum sortFeild {
         title,

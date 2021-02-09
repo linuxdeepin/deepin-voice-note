@@ -29,7 +29,7 @@ struct VNoteFolder;
 class LeftViewSortFilter : public QSortFilterProxyModel
 {
 public:
-    LeftViewSortFilter(QObject *parent = nullptr);
+    explicit LeftViewSortFilter(QObject *parent = nullptr);
     //设置不显示项
     void setBlackFolders(const QList<VNoteFolder *> &folders);
 

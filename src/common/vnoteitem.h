@@ -123,7 +123,6 @@ protected:
 struct VNTextBlock;
 struct VNVoiceBlock;
 
-
 struct VNoteBlock {
     enum {
         InValid,
@@ -152,8 +151,8 @@ struct VNoteBlock {
     };
 
 protected:
-    VNoteBlock(qint32 type = InValid);
-    VNoteBlock(const VNoteBlock &);
+    explicit VNoteBlock(qint32 type = InValid);
+    explicit VNoteBlock(const VNoteBlock &);
     const VNoteBlock &operator=(const VNoteBlock &);
 };
 

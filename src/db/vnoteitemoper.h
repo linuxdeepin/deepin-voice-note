@@ -27,7 +27,7 @@
 class VNoteItemOper
 {
 public:
-    VNoteItemOper(VNoteItem *note = nullptr);
+    explicit VNoteItemOper(VNoteItem *note = nullptr);
     //获取所有记事项数据
     VNOTE_ALL_NOTES_MAP *loadAllVNotes();
     //修改名称
