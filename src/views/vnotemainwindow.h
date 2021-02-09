@@ -67,6 +67,8 @@ public:
     virtual ~VNoteMainWindow() override;
     //提示框选择是否关闭应用
     bool checkIfNeedExit();
+    //设置标题栏tab焦点
+    void setTitleBarTabFocus(QKeyEvent *event = nullptr);
 
     enum WindowType {
         WndSplashAnim,
@@ -90,12 +92,13 @@ public:
         VoiceToTextEnd
     };
     //多选详情页id
-    enum ButtonValue{
-       Move = 1,
+    enum ButtonValue {
+        Move = 1,
         SaveAsTxT = 2,
         SaveAsVoice = 3,
         Delete = 4
     };
+
 protected:
     //初始化UI布局
     void initUI();
@@ -219,6 +222,7 @@ public slots:
     void onDropNote(bool dropCancel);
     //响应多选详情页操作
     void handleMultipleOption(int id);
+
 private:
     //左侧列表视图操作相关
     //添加记事本

@@ -42,6 +42,9 @@ signals:
     //添加记事本信号
     void sigAddFolderByInitPage();
 
+protected:
+    bool eventFilter(QObject *o, QEvent *e) override;
+
 private:
     //初始化UI布局
     void initUi();

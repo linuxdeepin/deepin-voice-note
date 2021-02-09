@@ -47,8 +47,8 @@ void HomePage::initUi()
     m_PushButton = new DSuggestButton(
         QString(DApplication::translate("HomePage", "Create Notebook")), this);
     m_PushButton->setFixedSize(QSize(302, 36));
-    DStyle::setFocusRectVisible(m_PushButton, false);
     DFontSizeManager::instance()->bind(m_PushButton, DFontSizeManager::T6);
+    m_PushButton->installEventFilter(this);
 
     m_Image = new VNoteIconButton(this, "home_page_logo.svg");
     m_Image->setIconSize(QSize(128, 128));
@@ -88,4 +88,26 @@ void HomePage::initUi()
 void HomePage::initConnection()
 {
     connect(m_PushButton, SIGNAL(clicked()), this, SIGNAL(sigAddFolderByInitPage()));
+}
+
+/**
+ * @brief HomePage::eventFilter
+ * @param o
+ * @param e
+ * @return
+ */
+bool HomePage::eventFilter(QObject *o, QEvent *e)
+{
+    Q_UNUSED(o)
+    if (e->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = dynamic_cast<QKeyEvent *>(e);
+        if (keyEvent->key() == Qt::Key_Tab) {
+            Utils::setTitleBarTabFocus(keyEvent);
+            return true;
+        } else if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
+            emit sigAddFolderByInitPage();
+            return true;
+        }
+    }
+    return false;
 }

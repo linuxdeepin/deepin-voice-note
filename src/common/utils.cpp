@@ -21,6 +21,7 @@
 #include "utils.h"
 #include "globaldef.h"
 #include "vnoteitem.h"
+#include "vnoteapplication.h"
 
 #include <QImageReader>
 #include <QIcon>
@@ -266,4 +267,19 @@ void Utils::setDefaultColor(QTextDocument *srcDoc, const QColor &color)
     QTextCharFormat newFormat = cursor.charFormat();
     newFormat.setForeground(color);
     cursor.mergeCharFormat(newFormat);
+}
+
+/**
+ * @brief Utils::setTitleBarTabFocus
+ * @param event
+ */
+void Utils::setTitleBarTabFocus(QKeyEvent *event)
+{
+    VNoteApplication *app = dynamic_cast<VNoteApplication *>(qApp);
+    if (app) {
+        VNoteMainWindow *wnd = app->mainWindow();
+        if (wnd) {
+            wnd->setTitleBarTabFocus(event);
+        }
+    }
 }

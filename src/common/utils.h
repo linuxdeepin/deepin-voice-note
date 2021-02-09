@@ -52,4 +52,6 @@ public:
     static void blockToDocument(const VNoteBlock *block, QTextDocument *doc);
     //设置编辑器字体颜色
     static void setDefaultColor(QTextDocument *srcDoc, const QColor &color);
+    //设置标题栏tab焦点
+    static void setTitleBarTabFocus(QKeyEvent *event);
 };

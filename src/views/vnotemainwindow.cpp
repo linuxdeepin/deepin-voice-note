@@ -2215,3 +2215,15 @@ void VNoteMainWindow::handleMultipleOption(int id)
         break;
     }
 }
+
+/**
+ * @brief VNoteMainWindow::setTitleBarTabFocus
+ * @param event
+ */
+void VNoteMainWindow::setTitleBarTabFocus(QKeyEvent *event)
+{
+    titlebar()->setFocus(Qt::TabFocusReason);
+    if (event != nullptr) {
+        DWidget::keyPressEvent(event);
+    }
+}
