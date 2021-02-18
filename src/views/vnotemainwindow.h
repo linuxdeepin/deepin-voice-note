@@ -312,7 +312,7 @@ private:
     QScopedPointer<QShortcut> m_stSaveAsText; //Ctrl+S
     QScopedPointer<QShortcut> m_stSaveVoices; //Ctrl+Y
     QScopedPointer<QShortcut> m_stDelete; //Delete
-
+    QScopedPointer<QShortcut> m_stEsc; //Esc
     QScopedPointer<QShortcut> m_stPreviewShortcuts;
     //     Help                               //F1 DTK Implementaion
     //*****************Shortcut keys end**********************

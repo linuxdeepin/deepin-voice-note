@@ -242,6 +242,15 @@ void VNoteMainWindow::changeRightView(bool isMultiple)
  */
 void VNoteMainWindow::initShortcuts()
 {
+    m_stEsc.reset(new QShortcut(this));
+    m_stEsc->setKey(Qt::Key_Escape);
+    m_stEsc->setContext(Qt::WidgetWithChildrenShortcut);
+    m_stEsc->setAutoRepeat(false);
+
+    connect(m_stEsc.get(), &QShortcut::activated, this, [=] {
+        setTitleBarTabFocus();
+    });
+
     //*******************LeftView Shortcuts****************************
     //Add notebook
     m_stNewNotebook.reset(new QShortcut(this));
