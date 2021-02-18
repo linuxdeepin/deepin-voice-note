@@ -2105,8 +2105,6 @@ void VNoteMainWindow::release()
     if (stateOperation->isVoice2Text()) {
         releaseA2TManger->stopAsr();
     }
-
-    VNoteDbManager::instance()->getVNoteDb().close();
 }
 
 /**

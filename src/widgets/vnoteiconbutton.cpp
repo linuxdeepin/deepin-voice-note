@@ -39,7 +39,7 @@ VNoteIconButton::VNoteIconButton(QWidget *parent, QString normal, QString hover,
     m_icons[Normal] = normal;
     m_icons[Hover] = hover;
     m_icons[Press] = press;
-    DStyle::setFocusRectVisible(this, false);
+
     updateIcon();
 
     //TODO:x
@@ -251,4 +251,26 @@ void VNoteIconButton::updateIcon()
     if (!m_icons[m_state].isEmpty()) {
         setIcon(loadPixmap(m_icons[m_state]));
     }
+}
+
+/**
+ * @brief VNoteIconButton::focusInEvent
+ * @param e
+ */
+void VNoteIconButton::focusInEvent(QFocusEvent *e)
+{
+    m_focusReason = e->reason();
+    DIconButton::focusInEvent(e);
+}
+
+/**
+ * @brief VNoteIconButton::getFocusReason
+ * @return
+ */
+Qt::FocusReason VNoteIconButton::getFocusReason()
+{
+    if (!this->hasFocus()) {
+        m_focusReason = Qt::NoFocusReason;
+    }
+    return m_focusReason;
 }

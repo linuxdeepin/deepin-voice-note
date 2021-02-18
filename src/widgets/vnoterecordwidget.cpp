@@ -129,8 +129,13 @@ void VNoteRecordWidget::stopRecord()
  */
 void VNoteRecordWidget::onPauseRecord()
 {
+    Qt::FocusReason reason = m_pauseBtn->getFocusReason();
     m_pauseBtn->setVisible(false);
     m_continueBtn->setVisible(true);
+    if (reason == Qt::TabFocusReason) {
+        m_continueBtn->setFocus(Qt::TabFocusReason);
+    }
+
     m_audioRecoder->pauseRecord();
 }
 
@@ -140,8 +145,14 @@ void VNoteRecordWidget::onPauseRecord()
  */
 bool VNoteRecordWidget::onContinueRecord()
 {
+    Qt::FocusReason reason = m_continueBtn->getFocusReason();
     m_pauseBtn->setVisible(true);
     m_continueBtn->setVisible(false);
+
+    if (reason == Qt::TabFocusReason) {
+        m_pauseBtn->setFocus(Qt::TabFocusReason);
+    }
+
     if (!m_audioRecoder->startRecord()) {
         stopRecord();
 

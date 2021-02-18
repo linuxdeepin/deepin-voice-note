@@ -41,6 +41,8 @@ public:
     void SetDisableIcon(const QString &disableIcon);
     //设置按钮是否可用
     void setBtnDisabled(bool disabled);
+    //获取焦点类型
+    Qt::FocusReason getFocusReason();
 
 protected:
     //重写鼠标事件
@@ -54,6 +56,8 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
     //移动
     void mouseMoveEvent(QMouseEvent *event) override;
+    //获取焦点
+    void focusInEvent(QFocusEvent *e) override;
 
 signals:
 
@@ -83,6 +87,8 @@ private:
 
     //Disable state
     bool m_isDisabled {false};
+
+    Qt::FocusReason m_focusReason {Qt::NoFocusReason};
 };
 
 #endif // VNOTEICONBUTTON_H
