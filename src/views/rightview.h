@@ -114,6 +114,8 @@ public:
     void setIsNormalView(bool value);
     //详情页是否为当前笔记
     bool getIsNormalView() const;
+    //弹出右键菜单
+    void popupMenu();
 signals:
     //播放信号
     void sigVoicePlay(VNVoiceBlock *voiceData);

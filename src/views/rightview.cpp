@@ -254,6 +254,7 @@ void RightView::onTextEditFocusIn(Qt::FocusReason reason)
     }
 
     if (reason == Qt::TabFocusReason) {
+        clearAllSelection();
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(m_viewportLayout->count() - 2);
         DetailItemWidget *lastWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
         m_curItemWidget = lastWidget;
@@ -1282,6 +1283,8 @@ void RightView::keyPressEvent(QKeyEvent *e)
         } else if (ret == 0) {
             delSelectText();
         }
+    } else if (e->modifiers() == Qt::AltModifier && e->key() == Qt::Key_M) {
+        popupMenu();
     }
 }
 
@@ -1514,4 +1517,25 @@ void RightView::removeCacheWidget(const VNoteFolder *data)
 void RightView::closeMenu()
 {
     m_noteDetailContextMenu->close();
+}
+
+/**
+ * @brief RightView::popupMenu
+ */
+void RightView::popupMenu()
+{
+    if (m_noteItemData) {
+        if (hasFocus() || (m_curItemWidget && m_curItemWidget->hasFocus())) {
+            if (initAction(m_curItemWidget) != -1) {
+                QPoint pos;
+                if (m_curItemWidget) {
+                    QRect rc = m_curItemWidget->getCursorRect();
+                    pos = m_curItemWidget->mapToGlobal(rc.topLeft());
+                } else {
+                    pos = mapToGlobal(QPoint(50, 50));
+                }
+                m_noteDetailContextMenu->exec(pos);
+            }
+        }
+    }
 }

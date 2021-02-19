@@ -130,6 +130,8 @@ public:
     int getSelectedCount();
     //更新拖拽状态
     void setDragSuccess(bool dragSuccess = false);
+    //弹出右键菜单
+    void popupMenu();
 signals:
     //请求刷新详情页
     void requestChangeRightView(bool isMultipleOption);

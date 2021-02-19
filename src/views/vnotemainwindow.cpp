@@ -251,6 +251,27 @@ void VNoteMainWindow::initShortcuts()
         setTitleBarTabFocus();
     });
 
+    m_stPopupMenu.reset(new QShortcut(this));
+    m_stPopupMenu->setKey(Qt::ALT + Qt::Key_M);
+    m_stPopupMenu->setContext(Qt::ApplicationShortcut);
+    m_stPopupMenu->setAutoRepeat(false);
+
+    connect(m_stPopupMenu.get(), &QShortcut::activated, this, [this] {
+        if (m_leftView->hasFocus()) {
+            m_leftView->popupMenu();
+        } else if (m_middleView->hasFocus()) {
+            m_middleView->popupMenu();
+        } else if (m_noteSearchEdit->lineEdit()->hasFocus()) {
+            if (!m_showSearchEditMenu) {
+                QPoint pos(m_noteSearchEdit->pos());
+                QContextMenuEvent eve(QContextMenuEvent::Reason::Keyboard, pos, m_noteSearchEdit->mapToGlobal(pos));
+                m_showSearchEditMenu = QApplication::sendEvent(m_noteSearchEdit->lineEdit(), &eve);
+            }
+        } else {
+            m_rightView->popupMenu();
+        }
+    });
+
     //*******************LeftView Shortcuts****************************
     //Add notebook
     m_stNewNotebook.reset(new QShortcut(this));
@@ -501,6 +522,7 @@ void VNoteMainWindow::initTitleBar()
     DFontSizeManager::instance()->bind(m_noteSearchEdit, DFontSizeManager::T6);
     m_noteSearchEdit->setFixedSize(QSize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H));
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
+    m_noteSearchEdit->lineEdit()->installEventFilter(this);
     titlebar()->addWidget(m_noteSearchEdit);
 }
 
@@ -2233,4 +2255,18 @@ void VNoteMainWindow::setTitleBarTabFocus(QKeyEvent *event)
     if (event != nullptr) {
         DWidget::keyPressEvent(event);
     }
+}
+
+/**
+ * @brief VNoteMainWindow::eventFilter
+ * @param o
+ * @param e
+ * @return
+ */
+bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
+{
+    if (o == m_noteSearchEdit->lineEdit() && e->type() == QEvent::FocusIn) {
+        m_showSearchEditMenu = false;
+    }
+    return false;
 }

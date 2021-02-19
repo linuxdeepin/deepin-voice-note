@@ -1291,3 +1291,20 @@ void MiddleView::selectAfterRemoved()
     scrollTo(currentIndex());
     return;
 }
+
+/**
+ * @brief MiddleView::popupMenu
+ */
+void MiddleView::popupMenu()
+{
+    QModelIndexList selectIndexes = selectedIndexes();
+    if (selectIndexes.count()) {
+        QRect curRect = visualRect(selectIndexes.first());
+        //判断选中是否可见
+        if (!viewport()->visibleRegion().contains(curRect.center())) {
+            scrollTo(selectIndexes.first());
+            curRect = visualRect(selectIndexes.first());
+        }
+        onMenuShow(mapToGlobal(curRect.center()));
+    }
+}

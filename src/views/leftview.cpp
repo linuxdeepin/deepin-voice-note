@@ -609,7 +609,7 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
         folders.push_back(static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(currentIndex())));
         m_folderSelectDialog->setFolderBlack(folders);
         m_folderSelectDialog->setNoteContextInfo(elideText, src.size());
-        m_folderSelectDialog->clearSelection();
+        m_folderSelectDialog->setDefaultSelect();
 
         m_folderSelectDialog->exec();
         if (m_folderSelectDialog->result() == FolderSelectDialog::Accepted) {
@@ -877,5 +877,23 @@ void LeftView::dropEvent(QDropEvent *event)
         emit dropNotesEnd(isDragCancelled);
     } else if (event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)) {
         doDragMove(currentIndex(), indexAt(mapFromGlobal(QCursor::pos())));
+    }
+}
+
+/**
+ * @brief LeftView::popupMenu
+ */
+void LeftView::popupMenu()
+{
+    QModelIndexList selectIndexes = selectedIndexes();
+    if (selectIndexes.count()) {
+        QRect curRect = visualRect(selectIndexes.first());
+        //判断选中是否可见
+        if (!viewport()->visibleRegion().contains(curRect.center())) {
+            scrollTo(selectIndexes.first());
+            curRect = visualRect(selectIndexes.first());
+        }
+        m_notepadMenu->popup(mapToGlobal(curRect.center()));
+        m_notepadMenu->setWindowOpacity(1);
     }
 }

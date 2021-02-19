@@ -154,6 +154,8 @@ protected:
     void closeEvent(QCloseEvent *event) override;
     //按键处理
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
+    //事件过滤
+    bool eventFilter(QObject *o, QEvent *e) override;
 
 public slots:
     //记事本数据加载完成
@@ -296,6 +298,7 @@ private:
     HomePage *m_wndHomePage {nullptr};
     DStackedWidget *m_stackedWidget {nullptr};
     bool m_rightViewHasFouse {true};
+    bool m_showSearchEditMenu {false};
 
     //Shortcuts key
     //*****************Shortcut key begin*********************
@@ -313,12 +316,12 @@ private:
     QScopedPointer<QShortcut> m_stSaveVoices; //Ctrl+Y
     QScopedPointer<QShortcut> m_stDelete; //Delete
     QScopedPointer<QShortcut> m_stEsc; //Esc
+    QScopedPointer<QShortcut> m_stPopupMenu; //Alt+M
     QScopedPointer<QShortcut> m_stPreviewShortcuts;
     //     Help                               //F1 DTK Implementaion
     //*****************Shortcut keys end**********************
 
     QString m_searchKey;
-    //VoiceNoteItem    *m_currentAsrVoice {nullptr};
     DFloatingMessage *m_asrErrMeassage {nullptr};
     DFloatingMessage *m_pDeviceExceptionMsg {nullptr};
     DPushButton *m_asrAgainBtn {nullptr};
