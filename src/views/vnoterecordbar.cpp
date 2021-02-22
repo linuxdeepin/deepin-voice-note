@@ -22,7 +22,7 @@
 #include "vnoterecordbar.h"
 #include "globaldef.h"
 #include "widgets/vnoterecordwidget.h"
-#include "widgets/vnoteiconbutton.h"
+#include "widgets/vnote2siconbutton.h"
 #include "widgets/vnoteplaywidget.h"
 #include "common/vnoteitem.h"
 #include "common/audiowatcher.h"
@@ -61,12 +61,12 @@ void VNoteRecordBar::initUI()
     m_mainLayout->addWidget(m_recordPanel);
 
     m_recordBtnHover = new DWidget(this);
-    m_recordBtn = new VNoteIconButton(m_recordBtnHover, "audio_normal.svg", "audio_hover.svg", "audio_press.svg");
-    m_recordBtn->SetDisableIcon("audio_disabled.svg");
+    m_recordBtn = new VNote2SIconButton("record.svg", "record.svg", m_recordBtnHover);
     m_recordBtn->setFlat(true);
     m_recordBtn->setIconSize(QSize(REC_BTN_W, REC_BTN_H));
     m_recordBtn->setFixedSize(QSize(REC_BTN_W, REC_BTN_H));
     QGridLayout *recordBtnHoverLayout = new QGridLayout;
+    recordBtnHoverLayout->setContentsMargins(0, 8, 0, 0);
     recordBtnHoverLayout->addWidget(m_recordBtn, 0, 1);
     recordBtnHoverLayout->setColumnStretch(0, 1);
     recordBtnHoverLayout->setColumnStretch(1, 0);
@@ -90,7 +90,7 @@ void VNoteRecordBar::initConnections()
     installEventFilter(this);
     m_recordBtn->installEventFilter(this);
 
-    connect(m_recordBtn, &VNoteIconButton::clicked, this, &VNoteRecordBar::onStartRecord);
+    connect(m_recordBtn, &VNote2SIconButton::clicked, this, &VNoteRecordBar::onStartRecord);
     connect(m_recordPanel, SIGNAL(sigFinshRecord(const QString &, qint64)),
             this, SLOT(onFinshRecord(const QString &, qint64)));
     connect(m_playPanel, &VNotePlayWidget::sigWidgetClose,
@@ -294,7 +294,7 @@ void VNoteRecordBar::onAudioDeviceChange(int mode)
         QString info = m_audioWatcher->getDeviceName(
             static_cast<AudioWatcher::AudioMode>(mode));
         if (info.isEmpty()) { //切换后的设备异常
-            m_recordBtn->setBtnDisabled(true);
+            m_recordBtn->setEnabled(false);
             m_recordBtn->setToolTip(
                 DApplication::translate(
                     "VNoteRecordBar",
@@ -311,7 +311,7 @@ void VNoteRecordBar::onAudioDeviceChange(int mode)
                 emit sigDeviceExceptionMsgClose();
                 msgshow = false;
             }
-            m_recordBtn->setBtnDisabled(false);
+            m_recordBtn->setEnabled(true);
             m_recordBtn->setToolTip("");
             if (m_mainLayout->currentWidget() == m_recordPanel) {
                 stopRecord();

@@ -32,7 +32,7 @@ DWIDGET_USE_NAMESPACE
 class AudioWatcher;
 class VNotePlayWidget;
 class VNoteRecordWidget;
-class VNoteIconButton;
+class VNote2SIconButton;
 struct VNVoiceBlock;
 
 class VNoteRecordBar : public QWidget
@@ -41,8 +41,8 @@ class VNoteRecordBar : public QWidget
 public:
     explicit VNoteRecordBar(QWidget *parent = nullptr);
 
-    static constexpr int REC_BTN_W = 68;
-    static constexpr int REC_BTN_H = 68;
+    static constexpr int REC_BTN_W = 54;
+    static constexpr int REC_BTN_H = 54;
     //停止录音
     void stopRecord();
     //快捷键暂停/继续语音播放
@@ -104,7 +104,7 @@ protected:
     QStackedLayout *m_mainLayout {nullptr};
     VNotePlayWidget *m_playPanel {nullptr};
     VNoteRecordWidget *m_recordPanel {nullptr};
-    VNoteIconButton *m_recordBtn {nullptr};
+    VNote2SIconButton *m_recordBtn {nullptr};
     QWidget *m_recordBtnHover {nullptr};
     QScopedPointer<DAnchorsBase> m_recBtnAnchor;
 
