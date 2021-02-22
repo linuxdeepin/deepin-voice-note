@@ -132,6 +132,8 @@ public:
     void setDragSuccess(bool dragSuccess = false);
     //弹出右键菜单
     void popupMenu();
+    //是否是搜索无结果界面
+    bool searchEmpty();
 signals:
     //请求刷新详情页
     void requestChangeRightView(bool isMultipleOption);

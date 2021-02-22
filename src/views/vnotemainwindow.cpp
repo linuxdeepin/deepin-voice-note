@@ -524,6 +524,9 @@ void VNoteMainWindow::initTitleBar()
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
     m_noteSearchEdit->lineEdit()->installEventFilter(this);
     titlebar()->addWidget(m_noteSearchEdit);
+    titlebar()->installEventFilter(this);
+    DWindowCloseButton *closeBtn = titlebar()->findChild<DWindowCloseButton *>("DTitlebarDWindowCloseButton");
+    closeBtn->installEventFilter(this);
 }
 
 /**
@@ -606,6 +609,8 @@ void VNoteMainWindow::initLeftView()
 
     m_addNotepadBtn = new DPushButton(DApplication::translate("VNoteMainWindow", "Create Notebook"),
                                       m_leftViewHolder);
+    m_addNotepadBtn->installEventFilter(this);
+
     QVBoxLayout *btnLayout = new QVBoxLayout();
     btnLayout->addWidget(m_addNotepadBtn);
     btnLayout->setContentsMargins(10, 0, 10, 10);
@@ -644,6 +649,8 @@ void VNoteMainWindow::initMiddleView()
     buttonAnchor.setBottomMargin(6);
     buttonAnchor.setLeftMargin(97);
 
+    m_middleView->installEventFilter(this);
+    m_addNoteBtn->installEventFilter(this);
     // ToDo:
     //    Add Left view widget here
     middleHolderLayout->addWidget(m_middleView);
@@ -2105,6 +2112,7 @@ void VNoteMainWindow::onCursorChange(int height, bool mouseMove)
  */
 void VNoteMainWindow::switchWidget(WindowType type)
 {
+    titlebar()->setFocus(Qt::TabFocusReason);
     bool searchEnable = type == WndNoteShow ? true : false;
     m_noteSearchEdit->setEnabled(searchEnable);
     m_stackedWidget->setCurrentIndex(type);
@@ -2265,8 +2273,134 @@ void VNoteMainWindow::setTitleBarTabFocus(QKeyEvent *event)
  */
 bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
 {
+    if (e->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = dynamic_cast<QKeyEvent *>(e);
+        if (keyEvent->key() == Qt::Key_Tab) {
+            return setTabFocus(o, keyEvent);
+        } else if (o == m_addNotepadBtn && (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return)) {
+            addNotepad();
+            return true;
+        }
+    }
     if (o == m_noteSearchEdit->lineEdit() && e->type() == QEvent::FocusIn) {
         m_showSearchEditMenu = false;
+    }
+    return false;
+}
+
+/**
+ * @brief VNoteMainWindow::setTabFocus
+ * @param obj
+ * @param event
+ * @return
+ */
+bool VNoteMainWindow::setTabFocus(QObject *obj, QKeyEvent *event)
+{
+    if (obj == m_noteSearchEdit->lineEdit()) {
+        setTitleBarTabFocus(event);
+    } else if (obj == titlebar()) {
+        return setTitlebarNext(event);
+    } else if (obj == m_addNoteBtn) {
+        return setAddnoteButtonNext(event);
+    } else if (obj == m_middleView) {
+        return setMiddleviewNext(event);
+    } else if (obj == m_addNotepadBtn) {
+        return setAddnotepadButtonNext(event);
+    } else {
+        return setTitleCloseButtonNext(event);
+    }
+    return true;
+}
+
+/**
+ * @brief VNoteMainWindow::setAddnotepadButtonNext
+ * @param event
+ * @return
+ */
+bool VNoteMainWindow::setAddnotepadButtonNext(QKeyEvent *event)
+{
+    if (m_middleView->rowCount()) {
+        return false;
+    }
+    if (m_addNoteBtn->isEnabled() && m_addNoteBtn->isVisible()) {
+        m_addNoteBtn->setFocus(Qt::TabFocusReason);
+        return true;
+    }
+
+    return setMiddleviewNext(event);
+}
+
+/**
+ * @brief VNoteMainWindow::setAddnoteButtonNext
+ * @param event
+ * @return
+ */
+bool VNoteMainWindow::setAddnoteButtonNext(QKeyEvent *event)
+{
+    if (m_middleView->rowCount() == 0) {
+        return setTitlebarNext(event);
+    }
+    if (m_rightView->getIsNormalView()) {
+        m_recordBar->setFocus(Qt::TabFocusReason);
+    } else {
+        m_multipleSelectWidget->setFocus(Qt::TabFocusReason);
+    }
+    DWidget::keyPressEvent(event);
+    return true;
+}
+
+/**
+ * @brief VNoteMainWindow::setTitleCloseButtonNext
+ * @param event
+ * @return
+ */
+bool VNoteMainWindow::setTitleCloseButtonNext(QKeyEvent *event)
+{
+    if (stateOperation->isSearching()) {
+        if (m_middleView->searchEmpty()) {
+            m_noteSearchEdit->lineEdit()->setFocus(Qt::TabFocusReason);
+            return true;
+        }
+        m_middleView->setFocus(Qt::TabFocusReason);
+        return true;
+    }
+    m_stackedWidget->currentWidget()->setFocus();
+    DWidget::keyPressEvent(event);
+    return true;
+}
+
+/**
+ * @brief VNoteMainWindow::setTitlebarNext
+ * @param event
+ * @return
+ */
+bool VNoteMainWindow::setTitlebarNext(QKeyEvent *event)
+{
+    Q_UNUSED(event)
+    if (m_noteSearchEdit->isEnabled()) {
+        m_noteSearchEdit->lineEdit()->setFocus(Qt::TabFocusReason);
+    } else {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * @brief VNoteMainWindow::setMiddleviewNext
+ * @param event
+ * @return
+ */
+bool VNoteMainWindow::setMiddleviewNext(QKeyEvent *event)
+{
+    if (stateOperation->isSearching()) {
+        m_rightView->setFocus(Qt::TabFocusReason);
+        DWidget::keyPressEvent(event);
+        return true;
+    }
+    if (stateOperation->isRecording() || stateOperation->isPlaying()) {
+        m_recordBar->setFocus(Qt::TabFocusReason);
+        DWidget::keyPressEvent(event);
+        return true;
     }
     return false;
 }

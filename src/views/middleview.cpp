@@ -1308,3 +1308,8 @@ void MiddleView::popupMenu()
         onMenuShow(mapToGlobal(curRect.center()));
     }
 }
+
+bool MiddleView::searchEmpty()
+{
+    return m_emptySearch && m_emptySearch->isVisible();
+}

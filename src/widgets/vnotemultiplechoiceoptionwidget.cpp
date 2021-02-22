@@ -72,9 +72,9 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     tipsLayout->addStretch();
 
     m_moveButton = new DToolButton(this);
-    m_deleteButton = new DToolButton(this);
     m_saveTextButton = new DToolButton(this);
     m_saveVoiceButton = new DToolButton(this);
+    m_deleteButton = new DToolButton(this);
 
     onFontChanged();
     //设置主题

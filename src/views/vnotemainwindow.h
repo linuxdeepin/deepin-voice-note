@@ -256,6 +256,18 @@ private:
     void initMenuExtension();
     //刷新详情页显示
     void changeRightView(bool isMultiple);
+    //设置tab焦点
+    bool setTabFocus(QObject *obj, QKeyEvent *event);
+    //设置标题栏关闭按钮下个控件tab焦点
+    bool setTitleCloseButtonNext(QKeyEvent *event);
+    //设置标题栏下个控件tab焦点
+    bool setTitlebarNext(QKeyEvent *event);
+    //设置笔记列表下个控件tab焦点
+    bool setMiddleviewNext(QKeyEvent *event);
+    //设置添加笔记按钮下个控件tab焦点
+    bool setAddnoteButtonNext(QKeyEvent *event);
+    //设置添加记事本按钮下个控件tab焦点
+    bool setAddnotepadButtonNext(QKeyEvent *event);
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
