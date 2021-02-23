@@ -105,5 +105,6 @@
         <file>icons/deepin/builtin/dark/detail_notes_saveVoice.svg</file>
         <file>icons/deepin/builtin/circle_record.svg</file>
         <file>icons/deepin/builtin/record.svg</file>
+        <file>icons/deepin/builtin/finish_record.svg</file>
     </qresource>
 </RCC>

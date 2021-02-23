@@ -49,8 +49,6 @@ TEST_F(ut_vnoterecordwidget_test, startRecord)
     m_vnoterecordwidget->onAudioBufferProbed(buffer);
     m_vnoterecordwidget->startRecord();
     m_vnoterecordwidget->onRecordDurationChange(4);
-    m_vnoterecordwidget->onPauseRecord();
-    m_vnoterecordwidget->onContinueRecord();
     m_vnoterecordwidget->stopRecord();
 }
 

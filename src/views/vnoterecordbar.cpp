@@ -61,7 +61,7 @@ void VNoteRecordBar::initUI()
     m_mainLayout->addWidget(m_recordPanel);
 
     m_recordBtnHover = new DWidget(this);
-    m_recordBtn = new VNote2SIconButton("record.svg", "record.svg", m_recordBtnHover);
+    m_recordBtn = new VNote2SIconButton("circle_record.svg", "circle_record.svg", m_recordBtnHover);
     m_recordBtn->setFlat(true);
     m_recordBtn->setIconSize(QSize(REC_BTN_W, REC_BTN_H));
     m_recordBtn->setFixedSize(QSize(REC_BTN_W, REC_BTN_H));

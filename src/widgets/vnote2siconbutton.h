@@ -49,6 +49,8 @@ signals:
 
 public slots:
 protected:
+    //按键处理
+    void keyPressEvent(QKeyEvent *e) override;
     //鼠标释放
     void mouseReleaseEvent(QMouseEvent *event) override;
     //更新图标

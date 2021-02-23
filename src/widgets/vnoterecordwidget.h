@@ -22,7 +22,7 @@
 #ifndef VNOTERECORDWIDGET_H
 #define VNOTERECORDWIDGET_H
 
-#include "widgets/vnoteiconbutton.h"
+#include "widgets/vnote2siconbutton.h"
 #include "widgets/vnwaveform.h"
 #include "common/gstreamrecorder.h"
 
@@ -50,10 +50,7 @@ signals:
     void sigFinshRecord(const QString &voicePath, qint64 voiceSize);
 
 public slots:
-    //暂停录音
-    void onPauseRecord();
-    //继续录音
-    bool onContinueRecord();
+    void onRecordBtnClicked();
     //录音库结束
     void onGstreamerFinshRecord();
     //录音时长改变
@@ -72,9 +69,8 @@ private:
     void initConnection();
 
 private:
-    VNoteIconButton *m_pauseBtn {nullptr};
-    VNoteIconButton *m_continueBtn {nullptr};
-    VNoteIconButton *m_finshBtn {nullptr};
+    VNote2SIconButton *m_recordBtn {nullptr};
+    VNote2SIconButton *m_finshBtn {nullptr};
     DLabel *m_timeLabel {nullptr};
     VNWaveform *m_waveForm {nullptr};
     GstreamRecorder *m_audioRecoder {nullptr};

@@ -46,17 +46,13 @@ VNoteRecordWidget::VNoteRecordWidget(QWidget *parent)
  */
 void VNoteRecordWidget::initUi()
 {
-    m_pauseBtn = new VNoteIconButton(this, "pause_rec_normal.svg", "pause_rec_hover.svg", "pause_rec_press.svg");
-    m_pauseBtn->setIconSize(QSize(60, 60));
-    m_pauseBtn->setFlat(true);
+    m_recordBtn = new VNote2SIconButton("record.svg", "pause.svg", this);
+    m_recordBtn->setIconSize(QSize(40, 40));
+    m_recordBtn->setFixedSize(QSize(46, 46));
 
-    m_continueBtn = new VNoteIconButton(this, "record_normal.svg", "record_hover.svg", "record_press.svg");
-    m_continueBtn->setIconSize(QSize(60, 60));
-    m_continueBtn->setFlat(true);
-
-    m_finshBtn = new VNoteIconButton(this, "stop_rec_normal.svg", "stop_rec_hover.svg", "stop_rec_press.svg");
-    m_finshBtn->setIconSize(QSize(60, 60));
-    m_finshBtn->setFlat(true);
+    m_finshBtn = new VNote2SIconButton("finish_record.svg", "finish_record.svg", this);
+    m_finshBtn->setIconSize(QSize(40, 40));
+    m_finshBtn->setFixedSize(QSize(46, 46));
 
     QFont recordTimeFont;
     recordTimeFont.setPixelSize(14);
@@ -70,16 +66,12 @@ void VNoteRecordWidget::initUi()
     waveLayout->setContentsMargins(0, 15, 10, 15);
 
     QHBoxLayout *mainLayout = new QHBoxLayout;
-    QGridLayout *btnLayout = new QGridLayout;
-    btnLayout->addWidget(m_pauseBtn, 0, 0);
-    btnLayout->addWidget(m_continueBtn, 0, 0);
-    mainLayout->addLayout(btnLayout);
+    mainLayout->addWidget(m_recordBtn);
     mainLayout->addLayout(waveLayout, 1);
     mainLayout->addWidget(m_timeLabel);
     mainLayout->addWidget(m_finshBtn);
-    mainLayout->setContentsMargins(6, 0, 6, 3);
+    mainLayout->setContentsMargins(10, 0, 10, 0);
     this->setLayout(mainLayout);
-    m_continueBtn->setVisible(false);
 }
 
 /**
@@ -95,9 +87,8 @@ void VNoteRecordWidget::initRecord()
  */
 void VNoteRecordWidget::initConnection()
 {
-    connect(m_pauseBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onPauseRecord);
-    connect(m_continueBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::onContinueRecord);
-    connect(m_finshBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::stopRecord);
+    connect(m_recordBtn, &VNote2SIconButton::clicked, this, &VNoteRecordWidget::onRecordBtnClicked);
+    connect(m_finshBtn, &DFloatingButton::clicked, this, &VNoteRecordWidget::stopRecord);
     connect(m_audioRecoder, SIGNAL(audioBufferProbed(const QAudioBuffer &)),
             this, SLOT(onAudioBufferProbed(const QAudioBuffer &)));
     connect(m_audioRecoder, &GstreamRecorder::recordFinshed, this, &VNoteRecordWidget::onGstreamerFinshRecord, Qt::QueuedConnection);
@@ -124,41 +115,14 @@ void VNoteRecordWidget::stopRecord()
     m_audioRecoder->stopRecord();
 }
 
-/**
- * @brief VNoteRecordWidget::onPauseRecord
- */
-void VNoteRecordWidget::onPauseRecord()
+void VNoteRecordWidget::onRecordBtnClicked()
 {
-    Qt::FocusReason reason = m_pauseBtn->getFocusReason();
-    m_pauseBtn->setVisible(false);
-    m_continueBtn->setVisible(true);
-    if (reason == Qt::TabFocusReason) {
-        m_continueBtn->setFocus(Qt::TabFocusReason);
+    bool isPress = m_recordBtn->isPressed();
+    if (!isPress) {
+        m_audioRecoder->pauseRecord();
+    } else {
+        m_audioRecoder->startRecord();
     }
-
-    m_audioRecoder->pauseRecord();
-}
-
-/**
- * @brief VNoteRecordWidget::onContinueRecord
- * @return true 成功
- */
-bool VNoteRecordWidget::onContinueRecord()
-{
-    Qt::FocusReason reason = m_continueBtn->getFocusReason();
-    m_pauseBtn->setVisible(true);
-    m_continueBtn->setVisible(false);
-
-    if (reason == Qt::TabFocusReason) {
-        m_pauseBtn->setFocus(Qt::TabFocusReason);
-    }
-
-    if (!m_audioRecoder->startRecord()) {
-        stopRecord();
-
-        return false;
-    }
-    return true;
 }
 
 /**
@@ -175,7 +139,13 @@ bool VNoteRecordWidget::startRecord()
     m_recordPath = m_recordDir + fileName;
     m_audioRecoder->setOutputFile(m_recordPath);
     m_timeLabel->setText("00:00");
-    return onContinueRecord();
+    bool ret = m_audioRecoder->startRecord();
+    if (!ret) {
+        stopRecord();
+    } else {
+        m_recordBtn->setState(VNote2SIconButton::Press);
+    }
+    return ret;
 }
 
 /**

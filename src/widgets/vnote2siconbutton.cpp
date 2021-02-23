@@ -96,3 +96,21 @@ void VNote2SIconButton::setCommonIcon(bool isCommon)
 {
     m_useCommonIcons = isCommon;
 }
+
+/**
+ * @brief VNote2SIconButton::keyPressEvent
+ * @param e
+ */
+void VNote2SIconButton::keyPressEvent(QKeyEvent *e)
+{
+    if (e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) {
+        if (Normal == m_state) {
+            m_state = Press;
+        } else {
+            m_state = Normal;
+        }
+
+        updateIcon();
+    }
+    DFloatingButton::keyPressEvent(e);
+}
