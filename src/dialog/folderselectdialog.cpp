@@ -86,6 +86,8 @@ void FolderSelectView::keyPressEvent(QKeyEvent *event)
     //QAbstractItemView底层问题，索引0按上键会取消选中效果，通过keypress屏蔽
     if (event->key() == Qt::Key_Up && currentIndex().row() == 0) {
         event->ignore();
+    } else if (event->key() == Qt::Key_PageDown || event->key() == Qt::Key_PageUp || event->key() == Qt::Key_Home) {
+        event->ignore();
     } else {
         DTreeView::keyPressEvent(event);
     }

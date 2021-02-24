@@ -614,6 +614,7 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
             m_folderSelectDialog = new FolderSelectDialog(m_pDataModel, this);
             m_folderSelectDialog->resize(VNOTE_SELECTDIALOG_W, 372);
         }
+        m_folderSelectDialog->setFocus();
         QList<VNoteFolder *> folders;
         folders.push_back(static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(currentIndex())));
         m_folderSelectDialog->setFolderBlack(folders);
