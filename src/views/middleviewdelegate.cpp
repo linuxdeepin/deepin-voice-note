@@ -375,15 +375,15 @@ void MiddleViewDelegate::paintItemBase(QPainter *painter, const QStyleOptionView
     path.arcTo(QRect(QPoint(rect.bottomRight() - QPoint(radius * 2, radius * 2)), QSize(radius * 2, radius * 2)), 270, 90);
     if (option.state & QStyle::State_Selected) {
         QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
-        //        if (enable) {
-        //            fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
-        //        } else {
-        //            fillColor = option.palette.color(DPalette::Disabled, DPalette::Highlight);
-        //        }
         painter->setBrush(QBrush(fillColor));
         painter->fillPath(path, painter->brush());
         painter->setPen(QPen(Qt::white));
         isSelect = true;
+        if (m_tabFocus) {
+            QPainterPath borderPath;
+            borderPath.addRoundedRect(QRect(rect.left() + 3, rect.top() + 3, rect.width() - 7, rect.height() - 7), 4, 4);
+            painter->drawPath(borderPath);
+        }
     } else {
         isSelect = false;
         if (m_enableItem == false || !(option.state & QStyle::State_Enabled)) {
@@ -545,4 +545,13 @@ void MiddleViewDelegate::paintSearchItem(QPainter *painter, const QStyleOptionVi
         painter->drawText(folderNameRect, Qt::AlignLeft | Qt::AlignVCenter, elideText);
     }
     painter->restore();
+}
+
+/**
+ * @brief MiddleViewDelegate::setTabFocus
+ * @param focus
+ */
+void MiddleViewDelegate::setTabFocus(bool focus)
+{
+    m_tabFocus = focus;
 }

@@ -64,6 +64,7 @@ LeftView::LeftView(QWidget *parent)
     this->setAcceptDrops(true);
     this->setContextMenuPolicy(Qt::NoContextMenu);
     viewport()->installEventFilter(this);
+    this->installEventFilter(this);
 }
 
 /**
@@ -397,13 +398,21 @@ void LeftView::addFolder(VNoteFolder *folder)
  */
 bool LeftView::eventFilter(QObject *o, QEvent *e)
 {
-    Q_UNUSED(o);
-    if (e->type() == QEvent::DragLeave) {
-        m_pItemDelegate->setDrawHover(false);
-        update();
-    } else if (e->type() == QEvent::DragEnter) {
-        m_pItemDelegate->setDrawHover(true);
-        update();
+    if (o == this) {
+        if (e->type() == QEvent::FocusIn) {
+            QFocusEvent *event = dynamic_cast<QFocusEvent *>(e);
+            m_pItemDelegate->setTabFocus(event->reason() == Qt::TabFocusReason);
+        } else if (e->type() == QEvent::FocusOut) {
+            m_pItemDelegate->setTabFocus(false);
+        }
+    } else {
+        if (e->type() == QEvent::DragLeave) {
+            m_pItemDelegate->setDrawHover(false);
+            update();
+        } else if (e->type() == QEvent::DragEnter) {
+            m_pItemDelegate->setDrawHover(true);
+            update();
+        }
     }
     return false;
 }

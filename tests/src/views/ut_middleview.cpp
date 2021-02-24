@@ -138,10 +138,13 @@ TEST_F(ut_middleview_test, setOnlyCurItemMenuEnable)
 TEST_F(ut_middleview_test, eventFilter)
 {
     MiddleView middleview;
-    QKeyEvent *event = new QKeyEvent(QEvent::FocusIn, 0x01000016, Qt::NoModifier, "test");
-    middleview.eventFilter(&middleview, event);
+    QFocusEvent focusInEvent(QEvent::FocusIn, Qt::TabFocusReason);
+    middleview.eventFilter(&middleview, &focusInEvent);
+    QFocusEvent focusOutEvent(QEvent::FocusOut);
+    middleview.eventFilter(&middleview, &focusOutEvent);
     QKeyEvent *event1 = new QKeyEvent(QEvent::Destroy, 0x01000001, Qt::NoModifier, "test");
-    middleview.eventFilter(&middleview, event1);
+    middleview.eventFilter(nullptr, event1);
+    middleview.eventFilter(nullptr, &focusInEvent);
 }
 
 TEST_F(ut_middleview_test, addRowAtHead)

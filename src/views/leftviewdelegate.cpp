@@ -268,6 +268,11 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
         painter->setBrush(QBrush(fillColor));
         painter->fillPath(path, painter->brush());
         painter->setPen(QPen(Qt::white));
+        if (m_tabFocus) {
+            QPainterPath borderPath;
+            borderPath.addRoundedRect(QRect(paintRect.left() + 3, paintRect.top() + 3, paintRect.width() - 7, paintRect.height() - 7), 4, 4);
+            painter->drawPath(borderPath);
+        }
     } else {
         if (m_enableItem == false || !(option.state & QStyle::State_Enabled)) {
             painter->setBrush(QBrush(m_parentPb.color(DPalette::Disabled, DPalette::ItemBackground)));
@@ -447,13 +452,4 @@ void LeftViewDelegate::setDrawHover(bool enable)
 void LeftViewDelegate::setTabFocus(bool focus)
 {
     m_tabFocus = focus;
-}
-
-/**
- * @brief LeftViewDelegate::isTabFocus
- * @return true 有tab焦点，false 无tab焦点
- */
-bool LeftViewDelegate::isTabFocus()
-{
-    return m_tabFocus;
 }

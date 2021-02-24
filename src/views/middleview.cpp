@@ -61,6 +61,7 @@ MiddleView::MiddleView(QWidget *parent)
     this->setAcceptDrops(false);
     //启用多选
     this->setSelectionMode(QAbstractItemView::MultiSelection);
+    this->installEventFilter(this);
 }
 
 /**
@@ -793,13 +794,21 @@ void MiddleView::handleTouchSlideEvent(qint64 timeParam, double distY, QPoint po
  */
 bool MiddleView::eventFilter(QObject *o, QEvent *e)
 {
-    Q_UNUSED(o);
-    if (e->type() == QEvent::FocusIn) {
-        m_pItemDelegate->setEditIsVisible(true);
-        this->update(currentIndex());
-    } else if (e->type() == QEvent::Destroy) {
-        m_pItemDelegate->setEditIsVisible(false);
-        this->update(currentIndex());
+    if (o == this) {
+        if (e->type() == QEvent::FocusIn) {
+            QFocusEvent *event = dynamic_cast<QFocusEvent *>(e);
+            m_pItemDelegate->setTabFocus(event->reason() == Qt::TabFocusReason);
+        } else if (e->type() == QEvent::FocusOut) {
+            m_pItemDelegate->setTabFocus(false);
+        }
+    } else {
+        if (e->type() == QEvent::FocusIn) {
+            m_pItemDelegate->setEditIsVisible(true);
+            this->update(currentIndex());
+        } else if (e->type() == QEvent::Destroy) {
+            m_pItemDelegate->setEditIsVisible(false);
+            this->update(currentIndex());
+        }
     }
     return false;
 }

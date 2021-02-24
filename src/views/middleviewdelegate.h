@@ -42,6 +42,9 @@ public:
     void setEnableItem(bool enable);
     //设置编辑状态
     void setEditIsVisible(bool isVisible);
+    //设置tab焦点标志
+    void setTabFocus(bool focus);
+
     const int MAX_TITLE_LEN = 64;
 
 protected:
@@ -75,6 +78,7 @@ private:
     DPalette m_parentPb;
     bool m_enableItem {true};
     bool m_editVisible {false};
+    bool m_tabFocus {false};
     QPixmap m_topIcon;
 };
 
