@@ -1279,6 +1279,8 @@ void VNoteMainWindow::resizeEvent(QResizeEvent *event)
         m_pDeviceExceptionMsg->move(xPos, yPos);
     }
 
+    m_needShowMax = windowState().testFlag(Qt::WindowMaximized);
+
     DMainWindow::resizeEvent(event);
 }
 
@@ -2405,4 +2407,13 @@ bool VNoteMainWindow::setMiddleviewNext(QKeyEvent *event)
         return true;
     }
     return false;
+}
+
+/**
+ * @brief VNoteMainWindow::needShowMax
+ * @return
+ */
+bool VNoteMainWindow::needShowMax()
+{
+    return m_needShowMax;
 }

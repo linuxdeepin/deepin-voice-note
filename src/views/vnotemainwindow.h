@@ -69,6 +69,8 @@ public:
     bool checkIfNeedExit();
     //设置标题栏tab焦点
     void setTitleBarTabFocus(QKeyEvent *event = nullptr);
+    //是否需要显示最大化窗口
+    bool needShowMax();
 
     enum WindowType {
         WndSplashAnim,
@@ -311,6 +313,7 @@ private:
     DStackedWidget *m_stackedWidget {nullptr};
     bool m_rightViewHasFouse {true};
     bool m_showSearchEditMenu {false};
+    bool m_needShowMax {false};
 
     //Shortcuts key
     //*****************Shortcut key begin*********************
