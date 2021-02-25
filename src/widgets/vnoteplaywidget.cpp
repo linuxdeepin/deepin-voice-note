@@ -79,6 +79,7 @@ void VNotePlayWidget::initUI()
     mainLayout->setSizeConstraint(QLayout::SetNoConstraint);
     this->setLayout(mainLayout);
     m_sliderHover->installEventFilter(this);
+    m_slider->installEventFilter(this);
 }
 
 /**
@@ -157,7 +158,11 @@ void VNotePlayWidget::stopVideo()
  */
 void VNotePlayWidget::playVideo()
 {
+    VlcPalyer::VlcState status = m_player->getState();
     m_player->play();
+    if (status == VlcPalyer::Paused) {
+        m_player->setPosition(m_slider->value());
+    }
 }
 
 /**
@@ -217,7 +222,9 @@ void VNotePlayWidget::onSliderReleased()
         if (pos >= m_slider->maximum()) {
             onCloseBtnClicked();
         } else {
-            m_player->setPosition(pos);
+            if (m_player->getState() == VlcPalyer::Playing) {
+                m_player->setPosition(pos);
+            }
         }
     }
 }
@@ -246,11 +253,38 @@ void VNotePlayWidget::onSliderMove(int pos)
  */
 bool VNotePlayWidget::eventFilter(QObject *o, QEvent *e)
 {
-    Q_UNUSED(o)
-    if (e->type() == QEvent::Enter) {
-        m_nameLab->setVisible(false);
-    } else if (e->type() == QEvent::Leave) {
-        m_nameLab->setVisible(true);
+    if (o == m_slider && e->type() == QEvent::KeyRelease) {
+        QKeyEvent *keyEvent = dynamic_cast<QKeyEvent *>(e);
+        if (keyEvent->key() == Qt::Key_Left) {
+            int pos = m_slider->value() - 5000;
+            if (pos < 0) {
+                pos = 0;
+            }
+            if (m_player->getState() == VlcPalyer::Playing) {
+                m_player->setPosition(pos);
+            } else {
+                onSliderMove(pos);
+            }
+        } else if (keyEvent->key() == Qt::Key_Right) {
+            int pos = m_slider->value() + 5000;
+            if (pos > m_slider->maximum()) {
+                pos = m_slider->maximum();
+            }
+            if (m_player->getState() == VlcPalyer::Playing) {
+                m_player->setPosition(pos);
+            } else {
+                onSliderMove(pos);
+            }
+        } else {
+            return false;
+        }
+        return true;
+    } else {
+        if (e->type() == QEvent::Enter) {
+            m_nameLab->setVisible(false);
+        } else if (e->type() == QEvent::Leave) {
+            m_nameLab->setVisible(true);
+        }
     }
     return false;
 }
@@ -297,4 +331,5 @@ void VNotePlayWidget::onPlayerBtnClicked()
         pauseVideo();
         emit sigPauseVoice(m_voiceBlock);
     }
+    this->setFocus();
 }
