@@ -2112,8 +2112,10 @@ void VNoteMainWindow::onCursorChange(int height, bool mouseMove)
  */
 void VNoteMainWindow::switchWidget(WindowType type)
 {
-    titlebar()->setFocus(Qt::TabFocusReason);
     bool searchEnable = type == WndNoteShow ? true : false;
+    if (!searchEnable) {
+        titlebar()->setFocus(Qt::TabFocusReason);
+    }
     m_noteSearchEdit->setEnabled(searchEnable);
     m_stackedWidget->setCurrentIndex(type);
 }

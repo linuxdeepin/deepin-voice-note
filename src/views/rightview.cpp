@@ -262,6 +262,8 @@ void RightView::onTextEditFocusIn(Qt::FocusReason reason)
         QTextCursor cursor = m_curItemWidget->getTextCursor();
         cursor.movePosition(QTextCursor::End);
         m_curItemWidget->setTextCursor(cursor);
+        QRect rc = m_curItemWidget->getCursorRect();
+        adjustVerticalScrollBar(m_curItemWidget, rc.bottom());
     }
 }
 
