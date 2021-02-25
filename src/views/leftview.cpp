@@ -903,7 +903,9 @@ void LeftView::popupMenu()
             scrollTo(selectIndexes.first());
             curRect = visualRect(selectIndexes.first());
         }
-        m_notepadMenu->popup(mapToGlobal(curRect.center()));
+        bool tabFocus = m_pItemDelegate->isTabFocus();
         m_notepadMenu->setWindowOpacity(1);
+        m_notepadMenu->exec(mapToGlobal(curRect.center()));
+        m_pItemDelegate->setTabFocus(tabFocus);
     }
 }

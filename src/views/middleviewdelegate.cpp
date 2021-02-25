@@ -555,3 +555,8 @@ void MiddleViewDelegate::setTabFocus(bool focus)
 {
     m_tabFocus = focus;
 }
+
+bool MiddleViewDelegate::isTabFocus()
+{
+    return m_tabFocus;
+}

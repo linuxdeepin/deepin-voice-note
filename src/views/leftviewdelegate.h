@@ -44,6 +44,8 @@ public:
     void setSelectView(bool selectView);
     //设置tab焦点标志
     void setTabFocus(bool focus);
+    //判断是否tab焦点状态
+    bool isTabFocus();
 
 protected:
     //绘制列表项

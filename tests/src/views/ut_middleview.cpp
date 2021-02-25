@@ -328,12 +328,6 @@ TEST_F(ut_middleview_test, haveVoice)
     middleview.haveVoice();
 }
 
-TEST_F(ut_middleview_test, onMenuShow)
-{
-    MiddleView middleview;
-    middleview.onMenuShow(QCursor::pos());
-}
-
 TEST_F(ut_middleview_test, handleTouchSlideEvent)
 {
     MiddleView middleview;

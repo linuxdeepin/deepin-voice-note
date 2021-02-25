@@ -453,3 +453,12 @@ void LeftViewDelegate::setTabFocus(bool focus)
 {
     m_tabFocus = focus;
 }
+
+/**
+ * @brief LeftViewDelegate::isTabFocus
+ * @return
+ */
+bool LeftViewDelegate::isTabFocus()
+{
+    return m_tabFocus;
+}

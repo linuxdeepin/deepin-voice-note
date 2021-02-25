@@ -476,7 +476,7 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                     }
                 }
                 m_noteMenu->setWindowOpacity(1);
-                onMenuShow(event->globalPos());
+                m_noteMenu->popup(event->globalPos());
             }
             //仅右键
             else if (!m_onlyCurItemMenuEnable || modelIndex == this->currentIndex()) {
@@ -489,7 +489,7 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                     initPositionStatus(modelIndex.row());
                 }
                 m_noteMenu->setWindowOpacity(1);
-                onMenuShow(event->globalPos());
+                m_noteMenu->popup(event->globalPos());
             }
             event->setModifiers(Qt::NoModifier);
             setTouchState(TouchState::TouchPressing);
@@ -505,7 +505,7 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
             } else {
                 if (Qt::RightButton == event->button()) {
                     m_noteMenu->setWindowOpacity(1);
-                    onMenuShow(event->globalPos());
+                    m_noteMenu->popup(event->globalPos());
                 }
             }
         }
@@ -684,26 +684,6 @@ bool MiddleView::haveVoice()
         }
     }
     return false;
-}
-
-/**
- * @brief MiddleView::onMenuShow
- * @param point
- * 响应右键菜单弹出
- */
-void MiddleView::onMenuShow(QPoint point)
-{
-    if (isMultipleSelected()) {
-        ActionManager::Instance()->visibleAction(ActionManager::NoteTop, false);
-        ActionManager::Instance()->visibleAction(ActionManager::NoteRename, false);
-        ActionManager::Instance()->visibleAction(ActionManager::NoteMenuBase, false);
-    } else {
-        ActionManager::Instance()->visibleAction(ActionManager::NoteTop, true);
-        ActionManager::Instance()->visibleAction(ActionManager::NoteRename, true);
-        ActionManager::Instance()->visibleAction(ActionManager::NoteMenuBase, true);
-        m_noteMenu = ActionManager::Instance()->noteContextMenu();
-    }
-    m_noteMenu->popup(point);
 }
 
 /**
@@ -1011,7 +991,7 @@ void MiddleView::initConnections()
     connect(m_popMenuTimer, &QTimer::timeout, [=] {
         if (m_touchState == TouchState::TouchPressing && m_index.isValid()) {
             m_noteMenu->setWindowOpacity(1);
-            onMenuShow(QCursor::pos());
+            m_noteMenu->popup(QCursor::pos());
         }
         m_popMenuTimer->stop();
     });
@@ -1314,7 +1294,10 @@ void MiddleView::popupMenu()
             scrollTo(selectIndexes.first());
             curRect = visualRect(selectIndexes.first());
         }
-        onMenuShow(mapToGlobal(curRect.center()));
+        bool tabFocus = m_pItemDelegate->isTabFocus();
+        m_noteMenu->setWindowOpacity(1);
+        m_noteMenu->exec(mapToGlobal(curRect.center()));
+        m_pItemDelegate->setTabFocus(tabFocus);
     }
 }
 

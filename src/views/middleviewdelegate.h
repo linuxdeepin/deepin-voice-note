@@ -44,6 +44,8 @@ public:
     void setEditIsVisible(bool isVisible);
     //设置tab焦点标志
     void setTabFocus(bool focus);
+    //判断是否tab焦点状态
+    bool isTabFocus();
 
     const int MAX_TITLE_LEN = 64;
 

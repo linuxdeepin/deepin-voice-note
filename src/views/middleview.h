@@ -169,8 +169,6 @@ protected:
     void setModifierState(const ModifierState &modifierState);
     ModifierState getModifierState() const;
     void setMouseState(const MouseState &mouseState);
-    //响应右键菜单弹出
-    void onMenuShow(QPoint point);
 
 private:
     //初始化代理模块

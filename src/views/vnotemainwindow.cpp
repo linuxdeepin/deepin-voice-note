@@ -1472,6 +1472,10 @@ void VNoteMainWindow::onMenuAbout2Show()
     DMenu *menu = static_cast<DMenu *>(sender());
     QAction *topAction = ActionManager::Instance()->getActionById(ActionManager::NoteTop);
     if (menu == ActionManager::Instance()->noteContextMenu()) {
+        bool notMultipleSelected = !m_middleView->isMultipleSelected();
+        ActionManager::Instance()->visibleAction(ActionManager::NoteTop, notMultipleSelected);
+        ActionManager::Instance()->visibleAction(ActionManager::NoteRename, notMultipleSelected);
+
         ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteCtxMenu);
         if (stateOperation->isPlaying()
             || stateOperation->isRecording()
