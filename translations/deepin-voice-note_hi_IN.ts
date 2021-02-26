@@ -51,7 +51,7 @@
     <message>
         <location filename="../src/dialog/folderselectdialog.cpp" line="196"/>
         <source>Move Notes</source>
-        <translation type="unfinished"/>
+        <translation>नोट्स अंतरण</translation>
     </message>
     <message>
         <location filename="../src/dialog/folderselectdialog.cpp" line="224"/>
@@ -83,12 +83,12 @@
         <location filename="../src/views/leftview.cpp" line="585"/>
         <location filename="../src/views/leftview.cpp" line="588"/>
         <source>Move the note &quot;%1&quot; to:</source>
-        <translation type="unfinished"/>
+        <translation>नोट &quot;%1&quot; को यहाँ अंतरित करें :</translation>
     </message>
     <message>
         <location filename="../src/views/leftview.cpp" line="590"/>
         <source>Move %1 notes (%2, ...) to:</source>
-        <translation type="unfinished"/>
+        <translation>%1 नोट (%2, ...) यहाँ अंतरित करें :</translation>
     </message>
 </context>
 <context>
@@ -110,7 +110,7 @@
     <message>
         <location filename="../src/views/middleviewdelegate.cpp" line="453"/>
         <source>Sticky Notes</source>
-        <translation type="unfinished"/>
+        <translation>तारांकित नोट्स</translation>
     </message>
 </context>
 <context>
@@ -200,7 +200,7 @@
         <location filename="../src/common/actionmanager.cpp" line="198"/>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="43"/>
         <source>Move</source>
-        <translation type="unfinished"/>
+        <translation>अंतरित करें</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="199"/>
@@ -228,12 +228,12 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1461"/>
         <source>Unstick</source>
-        <translation type="unfinished"/>
+        <translation>तारांकन हटाएँ</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1463"/>
         <source>Sticky on Top</source>
-        <translation type="unfinished"/>
+        <translation>शीर्ष पर तारांकित</translation>
     </message>
 </context>
 <context>
@@ -508,7 +508,7 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="144"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
+        <translation>क्या आप निश्चित ही चयनित %1 नोट हटाना चाहते हैं?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>

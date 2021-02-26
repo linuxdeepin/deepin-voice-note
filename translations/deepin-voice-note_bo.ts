@@ -43,7 +43,7 @@
     <message>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="110"/>
         <source>%1 notes selected</source>
-        <translation type="unfinished"/>
+        <translation>ཟིན་བྲིས་%1 བདམས་པ།</translation>
     </message>
 </context>
 <context>
@@ -508,7 +508,7 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="144"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
+        <translation>ཁྱོད་ཀྱིས་བདམས་ཡོད་པའི་ཟིན་བྲིས་%1 བསུབ་རྒྱུ་ཡིན་པ་གཏན་ཁེལ་ལམ།</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
