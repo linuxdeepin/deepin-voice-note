@@ -63,7 +63,7 @@ void VNoteApplication::activateWindow()
         m_qspMainWnd->show();
     } else {
         if (m_qspMainWnd->needShowMax()) {
-            m_qspMainWnd->setWindowState(Qt::WindowMaximized | Qt::WindowActive);
+            m_qspMainWnd->setWindowState(Qt::WindowMaximized);
         } else {
             m_qspMainWnd->setWindowState(Qt::WindowActive);
         }
