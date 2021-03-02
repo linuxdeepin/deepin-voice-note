@@ -331,5 +331,4 @@ void VNotePlayWidget::onPlayerBtnClicked()
         pauseVideo();
         emit sigPauseVoice(m_voiceBlock);
     }
-    this->setFocus();
 }
