@@ -44,7 +44,10 @@ public:
     QString getSelectFragment();
     //是否有选中
     bool hasSelection();
-
+    bool isSelectAll();
+    bool hasSelectVoice();
+    void setSelectVoice(bool flag);
+    void setSelectAll(bool flag);
 signals:
     //获取焦点
     void sigFocusIn(Qt::FocusReason reson);
@@ -52,6 +55,8 @@ signals:
     void sigFocusOut();
 
 private:
+    bool m_isSelectAll {false};
+    bool m_hasSelectVoice {false};
     bool m_menuPop {false};
     //替换制表符'\t'
     void indentText();

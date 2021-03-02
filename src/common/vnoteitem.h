@@ -199,7 +199,7 @@ public:
     //获取光标区域
     virtual QRect getCursorRect() = 0;
     //设置焦点
-    virtual void setFocus() = 0;
+    virtual void setFocus(bool hasVoice) = 0;
     //判断是否有焦点
     virtual bool hasFocus() = 0;
     //选中文本

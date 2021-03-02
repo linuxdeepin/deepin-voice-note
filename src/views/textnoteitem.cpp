@@ -79,10 +79,7 @@ void TextNoteItem::initConnection()
     connect(m_textEdit, SIGNAL(textChanged()), this, SLOT(onTextChange()));
     connect(m_textEdit, SIGNAL(sigFocusIn(Qt::FocusReason)), this, SIGNAL(sigFocusIn(Qt::FocusReason)));
     connect(m_textEdit, SIGNAL(sigFocusOut()), this, SIGNAL(sigFocusOut()));
-    connect(m_textEdit, &TextNoteEdit::selectionChanged, this, [=] {
-        m_textEdit->setAttribute(Qt::WA_InputMethodEnabled, !m_textEdit->hasSelection());
-        emit sigSelectionChanged();
-    });
+    connect(m_textEdit, SIGNAL(selectionChanged()), this, SIGNAL(sigSelectionChanged()));
     connect(m_textEdit, SIGNAL(cursorPositionChanged()), this, SLOT(onTextCursorChange()));
 
     connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged,
@@ -171,10 +168,7 @@ void TextNoteItem::selectText(const QPoint &globalPos, QTextCursor::MoveOperatio
  */
 void TextNoteItem::selectAllText()
 {
-    if (!textIsEmpty()) {
-        m_textEdit->selectAll();
-    }
-    m_selectAll = true;
+    m_textEdit->setSelectAll(true);
 }
 
 /**
@@ -199,7 +193,6 @@ void TextNoteItem::removeSelectText()
  */
 void TextNoteItem::clearSelection()
 {
-    m_selectAll = false;
     return m_textEdit->clearSelection();
 }
 
@@ -209,7 +202,7 @@ void TextNoteItem::clearSelection()
  */
 bool TextNoteItem::hasSelection()
 {
-    return m_selectAll || m_textEdit->hasSelection();
+    return m_textEdit->hasSelection();
 }
 
 /**
@@ -224,8 +217,9 @@ QTextDocumentFragment TextNoteItem::getSelectFragment()
 /**
  * @brief TextNoteItem::setFocus
  */
-void TextNoteItem::setFocus()
+void TextNoteItem::setFocus(bool hasVoice)
 {
+    m_textEdit->setSelectVoice(hasVoice);
     return m_textEdit->setFocus();
 }
 
@@ -244,7 +238,7 @@ bool TextNoteItem::hasFocus()
  */
 bool TextNoteItem::isSelectAll()
 {
-    return m_selectAll;
+    return m_textEdit->isSelectAll();
 }
 
 /**
@@ -320,4 +314,9 @@ void TextNoteItem::onChangeTheme()
     m_searchCount = 1;
     m_textDocumentUndo = false;
     updateSearchKey(m_serchKey);
+}
+
+void TextNoteItem::setSelectVoice(bool flag)
+{
+    m_textEdit->setSelectVoice(flag);
 }

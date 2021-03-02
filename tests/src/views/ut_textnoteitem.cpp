@@ -42,7 +42,7 @@ TEST_F(ut_textnoteitem_test, getNoteBlock)
     textnoteitem.clearSelection();
     textnoteitem.hasSelection();
     textnoteitem.getSelectFragment();
-    textnoteitem.setFocus();
+    textnoteitem.setFocus(false);
     textnoteitem.hasFocus();
     textnoteitem.isSelectAll();
     textnoteitem.getTextDocument();

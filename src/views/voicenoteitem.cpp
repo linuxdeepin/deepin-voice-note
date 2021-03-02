@@ -462,8 +462,9 @@ QRect VoiceNoteItem::getCursorRect()
 /**
  * @brief VoiceNoteItem::setFocus
  */
-void VoiceNoteItem::setFocus()
+void VoiceNoteItem::setFocus(bool hasVoice)
 {
+    Q_UNUSED(hasVoice)
     QWidget *parent = static_cast<QWidget *>(this->parent());
     if (parent) {
         parent->setFocus();

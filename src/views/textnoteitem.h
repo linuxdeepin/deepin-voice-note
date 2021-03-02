@@ -48,11 +48,12 @@ public:
     QTextDocument *getTextDocument();
 
     void pasteText();
-    void setFocus();
+    void setFocus(bool hasVoice);
     bool hasFocus();
     bool isSelectAll();
     //最后光标y坐标
     void setLastCursorHeight(int height);
+    void setSelectVoice(bool flag);
 
 signals:
     //光标位置改变
@@ -79,7 +80,6 @@ private:
     //连接槽函数
     void initConnection();
     bool m_isSearching {false};
-    bool m_selectAll {false};
     bool m_textDocumentUndo {false};
     int m_searchCount {0};
     int m_lastCursorHeight {0};

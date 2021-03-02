@@ -123,7 +123,7 @@ DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextC
     m_viewportLayout->insertWidget(index, editItem);
 
     if (focus) {
-        editItem->setFocus();
+        editItem->setFocus(m_selectWidget.contains(VoicePlugin));
     }
 
     editItem->updateSearchKey(reg);
@@ -152,6 +152,8 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
         qDebug() << "can not insert";
         return nullptr;
     }
+
+    clearAllSelection();
 
     if (m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Voice) {
         VNoteBlock *textBlock = m_noteItemData->newBlock(VNoteBlock::Text);
@@ -224,7 +226,7 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
         m_curItemWidget->setTextCursor(cursor);
     }
 
-    m_curItemWidget->setFocus();
+    m_curItemWidget->setFocus(m_selectWidget.contains(VoicePlugin));
 
     int height = 0;
     QRect rc = m_curItemWidget->getCursorRect();
@@ -258,7 +260,7 @@ void RightView::onTextEditFocusIn(Qt::FocusReason reason)
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(m_viewportLayout->count() - 2);
         DetailItemWidget *lastWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
         m_curItemWidget = lastWidget;
-        lastWidget->setFocus();
+        lastWidget->setFocus(m_selectWidget.contains(VoicePlugin));
         QTextCursor cursor = m_curItemWidget->getTextCursor();
         cursor.movePosition(QTextCursor::End);
         m_curItemWidget->setTextCursor(cursor);
@@ -380,7 +382,7 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(0);
         m_curItemWidget = static_cast<DetailItemWidget *>(layoutItem->widget());
     } else {
-        m_curItemWidget->setFocus();
+        m_curItemWidget->setFocus(m_selectWidget.contains(VoicePlugin));
         adjustVerticalScrollBar(m_curItemWidget, m_curItemWidget->height());
     }
     this->setVisible(true);
@@ -738,7 +740,7 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
             delete layoutItem;
             layoutItem = nullptr;
 
-            nextWidget->setFocus();
+            nextWidget->setFocus((m_selectWidget.contains(VoicePlugin)));
 
             if (m_curItemWidget == preWidget) {
                 m_curItemWidget = nextWidget;
@@ -760,7 +762,7 @@ void RightView::delWidget(DetailItemWidget *widget, bool merge)
         if (m_curItemWidget->getNoteBlock()->blockType == VNoteBlock::Text) {
             QRect rc = m_curItemWidget->getCursorRect();
             height += rc.bottom();
-            m_curItemWidget->setFocus();
+            m_curItemWidget->setFocus((m_selectWidget.contains(VoicePlugin)));
         }
         adjustVerticalScrollBar(m_curItemWidget, height);
     }
@@ -907,7 +909,7 @@ void RightView::mousePressEvent(QMouseEvent *event)
         }
 
         if (m_curItemWidget) {
-            m_curItemWidget->setFocus();
+            m_curItemWidget->setFocus((m_selectWidget.contains(VoicePlugin)));
         }
 
         onMenuShow(m_curItemWidget);
@@ -964,7 +966,7 @@ void RightView::mouseReleaseEvent(QMouseEvent *event)
     }
 
     if (m_curItemWidget) {
-        m_curItemWidget->setFocus();
+        m_curItemWidget->setFocus((m_selectWidget.contains(VoicePlugin)));
     }
 }
 
@@ -1228,6 +1230,10 @@ void RightView::selectAllItem()
         selecText.append(widget->getSelectFragment().toPlainText());
     }
 
+    if (m_curItemWidget) {
+        m_curItemWidget->setFocus((m_selectWidget.contains(VoicePlugin)));
+    }
+
     QClipboard *board = QApplication::clipboard();
     if (board) {
         board->setText(selecText, QClipboard::Selection);
@@ -1244,7 +1250,7 @@ void RightView::pasteText()
         auto textWidget = m_selectWidget.values(TextEditPlugin);
         if (!voiceWidget.size() && isAllWidgetEmpty(textWidget)) { //没有选中才可以粘贴
             m_curItemWidget->pasteText();
-            m_curItemWidget->setFocus();
+            m_curItemWidget->setFocus((m_selectWidget.contains(VoicePlugin)));
         }
     }
 }
@@ -1274,7 +1280,7 @@ void RightView::keyPressEvent(QKeyEvent *e)
         default:
             break;
         }
-    } else if (e->key() == Qt::Key_Delete) {
+    } else if (e->key() == Qt::Key_Delete || e->key() == Qt::Key_Backspace) {
         int ret = showWarningDialog();
         if (ret == 1) {
             VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this);
@@ -1471,7 +1477,13 @@ void RightView::removeSelectWidget(DetailItemWidget *widget)
 void RightView::onTextEditSelectChange()
 {
     TextNoteItem *editItem = static_cast<TextNoteItem *>(sender());
-    if (!editItem->hasSelection()) {
+    if (m_viewportLayout->count() == 2 && !editItem->textIsEmpty()) {
+        QTextCursor cursor = editItem->getTextCursor();
+        if (!cursor.hasSelection()) {
+            editItem->clearSelection();
+            removeSelectWidget(editItem);
+        }
+    } else if (!editItem->hasSelection()) {
         removeSelectWidget(editItem);
     }
 }

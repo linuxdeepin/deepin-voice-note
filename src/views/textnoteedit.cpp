@@ -40,11 +40,6 @@ TextNoteEdit::TextNoteEdit(QWidget *parent)
     DFontSizeManager::instance()->bind(this, DFontSizeManager::T8); //DTK设置字体大小
     setContextMenuPolicy(Qt::NoContextMenu);
     setMouseTracking(true);
-
-    //Edit get focus only by click
-    //setFocusPolicy(Qt::ClickFocus);
-
-    this->installEventFilter(this);
 }
 
 /**
@@ -95,14 +90,17 @@ void TextNoteEdit::contextMenuEvent(QContextMenuEvent *e)
  */
 void TextNoteEdit::keyPressEvent(QKeyEvent *e)
 {
-    if (this->hasSelection()) {
+    int key = e->key();
+
+    if (this->hasSelectVoice()) {
+        if (key == Qt::Key_Tab && e->modifiers() == Qt::NoModifier) {
+            return;
+        }
         e->ignore();
         return;
     }
 
-    int key = e->key();
-
-    if (e->modifiers() == Qt::ControlModifier || key == Qt::Key_Delete) {
+    if (e->modifiers() == Qt::ControlModifier) {
         e->ignore();
         return;
     }
@@ -175,6 +173,8 @@ void TextNoteEdit::selectText(const QPoint &globalPos, QTextCursor::MoveOperatio
  */
 void TextNoteEdit::clearSelection()
 {
+    setSelectAll(false);
+    setSelectVoice(false);
     QTextCursor textCursor = this->textCursor();
     if (textCursor.hasSelection()) {
         textCursor.clearSelection();
@@ -198,6 +198,9 @@ QString TextNoteEdit::getSelectFragment()
  */
 bool TextNoteEdit::hasSelection()
 {
+    if (m_isSelectAll) {
+        return true;
+    }
     QTextCursor textCursor = this->textCursor();
     return textCursor.hasSelection();
 }
@@ -222,4 +225,28 @@ void TextNoteEdit::indentText()
     QString spaces(indent, ' ');
     cursor.insertText(spaces);
     cursor.endEditBlock();
+}
+
+void TextNoteEdit::setSelectVoice(bool flag)
+{
+    m_hasSelectVoice = flag;
+    setAttribute(Qt::WA_InputMethodEnabled, !m_hasSelectVoice);
+}
+
+void TextNoteEdit::setSelectAll(bool flag)
+{
+    m_isSelectAll = flag;
+    if (flag && !document()->isEmpty()) {
+        selectAll();
+    }
+}
+
+bool TextNoteEdit::isSelectAll()
+{
+    return m_isSelectAll;
+}
+
+bool TextNoteEdit::hasSelectVoice()
+{
+    return m_hasSelectVoice;
 }

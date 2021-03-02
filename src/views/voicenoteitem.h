@@ -96,7 +96,7 @@ public:
     void removeSelectText() override;
     void selectAllText() override;
     void clearSelection() override;
-    void setFocus() override;
+    void setFocus(bool hasVoice) override;
     bool hasFocus() override;
     bool hasSelection() override;
     bool isSelectAll() override;

@@ -54,7 +54,7 @@ TEST_F(ut_voicenoteitem_test, onPlayBtnClicked)
     voicenoteitem.getTextCursor();
     voicenoteitem.textIsEmpty();
     voicenoteitem.getCursorRect();
-    voicenoteitem.setFocus();
+    voicenoteitem.setFocus(false);
     voicenoteitem.hasFocus();
     voicenoteitem.isTextContainsPos(pos);
 
