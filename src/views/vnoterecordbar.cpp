@@ -76,7 +76,7 @@ void VNoteRecordBar::initUI()
 
     m_playPanel = new VNotePlayWidget(this);
     m_mainLayout->addWidget(m_playPanel);
-
+    onChangeTheme();
     m_mainLayout->setCurrentWidget(m_recordBtnHover);
 }
 
@@ -99,6 +99,8 @@ void VNoteRecordBar::initConnections()
             this, SIGNAL(sigPlayVoice(VNVoiceBlock *)));
     connect(m_playPanel, SIGNAL(sigPauseVoice(VNVoiceBlock *)),
             this, SIGNAL(sigPauseVoice(VNVoiceBlock *)));
+    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged,
+            this, &VNoteRecordBar::onChangeTheme);
 }
 
 /**
@@ -361,4 +363,16 @@ void VNoteRecordBar::initAudioWatcher()
 bool VNoteRecordBar::volumeToolow(const double &volume)
 {
     return (volume - 0.2 < 0.0) ? true : false;
+}
+
+void VNoteRecordBar::onChangeTheme()
+{
+    DPalette palette = DApplicationHelper::instance()->palette(m_recordBtn);
+    DGuiApplicationHelper::ColorType theme =
+        DGuiApplicationHelper::instance()->themeType();
+    QColor highColor = theme == DGuiApplicationHelper::DarkType ? "#B82222" : "#F45959";
+    palette.setBrush(DPalette::Highlight, highColor);
+    highColor.setAlphaF(0.4);
+    palette.setColor(DPalette::Disabled, DPalette::Highlight, highColor);
+    m_recordBtn->setPalette(palette);
 }

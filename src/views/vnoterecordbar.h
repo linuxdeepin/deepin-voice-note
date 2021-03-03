@@ -93,6 +93,7 @@ public slots:
     void onAudioDeviceChange(int mode);
     //输入/输出设备切换
     void onAudioSelectChange(QVariant value);
+    void onChangeTheme();
 
 protected:
     //事件过滤器

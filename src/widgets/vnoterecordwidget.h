@@ -57,6 +57,7 @@ public slots:
     void onRecordDurationChange(qint64 duration);
     //录音数据改变
     void onAudioBufferProbed(const QAudioBuffer &buffer);
+    void onChangeTheme();
 
 private:
     //初始化UI布局

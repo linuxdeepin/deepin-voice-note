@@ -71,6 +71,7 @@ void VNoteRecordWidget::initUi()
     mainLayout->addWidget(m_timeLabel);
     mainLayout->addWidget(m_finshBtn);
     mainLayout->setContentsMargins(10, 0, 10, 0);
+    onChangeTheme();
     this->setLayout(mainLayout);
 }
 
@@ -92,6 +93,8 @@ void VNoteRecordWidget::initConnection()
     connect(m_audioRecoder, SIGNAL(audioBufferProbed(const QAudioBuffer &)),
             this, SLOT(onAudioBufferProbed(const QAudioBuffer &)));
     connect(m_audioRecoder, &GstreamRecorder::recordFinshed, this, &VNoteRecordWidget::onGstreamerFinshRecord, Qt::QueuedConnection);
+    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged,
+            this, &VNoteRecordWidget::onChangeTheme);
 }
 
 /**
@@ -201,4 +204,17 @@ void VNoteRecordWidget::onGstreamerFinshRecord()
 {
     m_audioRecoder->setStateToNull();
     emit sigFinshRecord(m_recordPath, m_recordMsec);
+}
+
+void VNoteRecordWidget::onChangeTheme()
+{
+    DPalette palette = DApplicationHelper::instance()->palette(m_recordBtn);
+    DGuiApplicationHelper::ColorType theme =
+        DGuiApplicationHelper::instance()->themeType();
+    QColor highColor = theme == DGuiApplicationHelper::DarkType ? "#B82222" : "#F45959";
+    palette.setBrush(DPalette::Highlight, highColor);
+    m_recordBtn->setPalette(palette);
+    palette = DApplicationHelper::instance()->palette(m_finshBtn);
+    palette.setBrush(DPalette::Highlight, highColor);
+    m_finshBtn->setPalette(palette);
 }
