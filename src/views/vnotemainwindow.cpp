@@ -45,6 +45,7 @@
 #include "db/vnotefolderoper.h"
 #include "db/vnoteitemoper.h"
 #include "db/vnotedbmanager.h"
+#include "db/vnotesaferoper.h"
 
 #include "dbus/dbuslogin1manager.h"
 
@@ -990,12 +991,15 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
             safer.folder_id = currentNote->folderId;
             safer.note_id = currentNote->noteId;
             safer.path = voicePath;
-
-            VNoteDataSafefyManager::instance()->doSafer(safer);
+            if (!stateOperation->isAppQuit()) {
+                VNoteDataSafefyManager::instance()->doSafer(safer);
+            } else { //需要关闭应用时,同步更新数据库
+                VNoteSaferOper saferOper;
+                saferOper.rmSafer(safer);
+            }
         } else {
             qCritical() << "UnSafe get currentNote data is null! Dangerous!!!";
         }
-    } else {
     }
     setSpecialStatus(RecordEnd);
 
