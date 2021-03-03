@@ -402,6 +402,9 @@ bool LeftView::eventFilter(QObject *o, QEvent *e)
         if (e->type() == QEvent::FocusIn) {
             QFocusEvent *event = dynamic_cast<QFocusEvent *>(e);
             m_pItemDelegate->setTabFocus(event->reason() == Qt::TabFocusReason);
+            if (m_pItemDelegate->isTabFocus()) {
+                scrollTo(currentIndex());
+            }
         } else if (e->type() == QEvent::FocusOut) {
             m_pItemDelegate->setTabFocus(false);
         }
