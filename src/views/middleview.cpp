@@ -1300,7 +1300,9 @@ void MiddleView::popupMenu()
         bool tabFocus = m_pItemDelegate->isTabFocus();
         m_noteMenu->setWindowOpacity(1);
         m_noteMenu->exec(mapToGlobal(curRect.center()));
-        m_pItemDelegate->setTabFocus(tabFocus);
+        if (hasFocus()) {
+            m_pItemDelegate->setTabFocus(tabFocus);
+        }
     }
 }
 

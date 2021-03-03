@@ -909,6 +909,8 @@ void LeftView::popupMenu()
         bool tabFocus = m_pItemDelegate->isTabFocus();
         m_notepadMenu->setWindowOpacity(1);
         m_notepadMenu->exec(mapToGlobal(curRect.center()));
-        m_pItemDelegate->setTabFocus(tabFocus);
+        if (hasFocus()) {
+            m_pItemDelegate->setTabFocus(tabFocus);
+        }
     }
 }
