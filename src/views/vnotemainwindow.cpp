@@ -1283,7 +1283,14 @@ void VNoteMainWindow::resizeEvent(QResizeEvent *event)
         m_pDeviceExceptionMsg->move(xPos, yPos);
     }
 
-    m_needShowMax = windowState().testFlag(Qt::WindowMaximized);
+    Qt::WindowStates states = windowState();
+    m_needShowMax = states.testFlag(Qt::WindowMaximized);
+
+    //最大化状态同时拥有Qt::WindowActive状态会导致最大化图标错误,去除该状态
+    if (m_needShowMax && states.testFlag(Qt::WindowActive)) {
+        states.setFlag(Qt::WindowActive, false);
+        setWindowState(states);
+    }
 
     DMainWindow::resizeEvent(event);
 }
