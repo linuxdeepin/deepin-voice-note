@@ -2409,7 +2409,7 @@ bool VNoteMainWindow::setMiddleviewNext(QKeyEvent *event)
         DWidget::keyPressEvent(event);
         return true;
     }
-    if (stateOperation->isRecording() || stateOperation->isPlaying()) {
+    if (stateOperation->isRecording() || stateOperation->isPlaying() || stateOperation->isVoice2Text()) {
         m_recordBar->setFocus(Qt::TabFocusReason);
         DWidget::keyPressEvent(event);
         return true;
