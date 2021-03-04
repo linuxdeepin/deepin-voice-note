@@ -264,7 +264,7 @@ void VNoteRecordBar::onAudioVolumeChange(int mode)
         && m_currentMode == mode) {
         double volume = m_audioWatcher->getVolume(
             static_cast<AudioWatcher::AudioMode>(mode));
-        if(!m_showVolumeWanning){
+        if (!m_showVolumeWanning) {
             m_showVolumeWanning = volumeToolow(volume);
             if (m_showVolumeWanning) {
                 VNoteMessageDialog volumeLowDialog(VNoteMessageDialog::VolumeTooLow, this);
@@ -274,8 +274,8 @@ void VNoteRecordBar::onAudioVolumeChange(int mode)
 
                 volumeLowDialog.exec();
             }
-        }else {
-            if(!volumeToolow(volume)){
+        } else {
+            if (!volumeToolow(volume)) {
                 m_showVolumeWanning = false;
             }
         }
@@ -347,6 +347,8 @@ void VNoteRecordBar::initAudioWatcher()
 {
     m_audioWatcher = new AudioWatcher(this);
     connect(m_audioWatcher, &AudioWatcher::sigDeviceChange,
+            this, &VNoteRecordBar::onAudioDeviceChange);
+    connect(m_audioWatcher, &AudioWatcher::sigMuteChanged,
             this, &VNoteRecordBar::onAudioDeviceChange);
     connect(m_audioWatcher, &AudioWatcher::sigVolumeChange,
             this, &VNoteRecordBar::onAudioVolumeChange);
