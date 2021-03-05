@@ -61,8 +61,11 @@ void VNotePlayWidget::initUI()
     m_slider->setMinimum(0);
     m_slider->setValue(0);
 
-    m_closeBtn = new DDialogCloseButton(this);
+    m_closeBtn = new DIconButton(DStyle::SP_CloseButton, this);
     m_closeBtn->setIconSize(QSize(26, 26));
+    m_closeBtn->setFixedSize(QSize(26, 26));
+    m_closeBtn->setFlat(true);
+    m_closeBtn->setEnabledCircle(true);
 
     QVBoxLayout *sliderLayout = new QVBoxLayout;
     sliderLayout->addWidget(m_nameLab, Qt::AlignLeft);
