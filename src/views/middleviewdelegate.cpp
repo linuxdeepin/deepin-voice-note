@@ -363,27 +363,17 @@ void MiddleViewDelegate::paintItemBase(QPainter *painter, const QStyleOptionView
                                        const QRect &rect, bool &isSelect) const
 {
     QPainterPath path;
-    const int radius = 8;
-    path.moveTo(rect.bottomRight() - QPoint(0, radius));
-    path.lineTo(rect.topRight() + QPoint(0, radius));
-    path.arcTo(QRect(QPoint(rect.topRight() - QPoint(radius * 2, 0)), QSize(radius * 2, radius * 2)), 0, 90);
-    path.lineTo(rect.topLeft() + QPoint(radius, 0));
-    path.arcTo(QRect(QPoint(rect.topLeft()), QSize(radius * 2, radius * 2)), 90, 90);
-    path.lineTo(rect.bottomLeft() - QPoint(0, radius));
-    path.arcTo(QRect(QPoint(rect.bottomLeft() - QPoint(0, radius * 2)), QSize(radius * 2, radius * 2)), 180, 90);
-    path.lineTo(rect.bottomLeft() + QPoint(radius, 0));
-    path.arcTo(QRect(QPoint(rect.bottomRight() - QPoint(radius * 2, radius * 2)), QSize(radius * 2, radius * 2)), 270, 90);
+    setPaintPath(rect, path, 0, 0, 8);
     if (option.state & QStyle::State_Selected) {
-        QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
-        painter->setBrush(QBrush(fillColor));
-        painter->fillPath(path, painter->brush());
+        if (!m_tabFocus) {
+            QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
+            painter->setBrush(QBrush(fillColor));
+            painter->fillPath(path, painter->brush());
+        } else {
+            paintTabFocusBackground(painter, option, rect);
+        }
         painter->setPen(QPen(Qt::white));
         isSelect = true;
-        if (m_tabFocus) {
-            QPainterPath borderPath;
-            borderPath.addRoundedRect(QRect(rect.left() + 3, rect.top() + 3, rect.width() - 7, rect.height() - 7), 4, 4);
-            painter->drawPath(borderPath);
-        }
     } else {
         isSelect = false;
         if (m_enableItem == false || !(option.state & QStyle::State_Enabled)) {
@@ -559,4 +549,40 @@ void MiddleViewDelegate::setTabFocus(bool focus)
 bool MiddleViewDelegate::isTabFocus()
 {
     return m_tabFocus;
+}
+
+void MiddleViewDelegate::setPaintPath(const QRect &bgRect, QPainterPath &path, const int xDifference, const int yDifference, const int radius) const
+{
+    QPoint path_bottomRight(bgRect.bottomRight().x() - xDifference, bgRect.bottomRight().y() - yDifference);
+    QPoint path_topRight(bgRect.topRight().x() - xDifference, bgRect.topRight().y() + yDifference);
+    QPoint path_topLeft(bgRect.topLeft().x() + xDifference, bgRect.topLeft().y() + yDifference);
+    QPoint path_bottomLeft(bgRect.bottomLeft().x() + xDifference, bgRect.bottomLeft().y() - yDifference);
+    path.moveTo(path_bottomRight - QPoint(0, 10));
+    path.lineTo(path_topRight + QPoint(0, 10));
+    path.arcTo(QRect(QPoint(path_topRight - QPoint(radius * 2, 0)), QSize(radius * 2, radius * 2)), 0, 90);
+    path.lineTo(path_topLeft + QPoint(10, 0));
+    path.arcTo(QRect(QPoint(path_topLeft), QSize(radius * 2, radius * 2)), 90, 90);
+    path.lineTo(path_bottomLeft - QPoint(0, 10));
+    path.arcTo(QRect(QPoint(path_bottomLeft - QPoint(0, radius * 2)), QSize(radius * 2, radius * 2)), 180, 90);
+    path.lineTo(path_bottomRight - QPoint(10, 0));
+    path.arcTo(QRect(QPoint(path_bottomRight - QPoint(radius * 2, radius * 2)), QSize(radius * 2, radius * 2)), 270, 90);
+}
+
+void MiddleViewDelegate::paintTabFocusBackground(QPainter *painter, const QStyleOptionViewItem &option, const QRect &bgRect) const
+{
+    //初始化绘制高亮色区域路径
+    QPainterPath path;
+    setPaintPath(bgRect, path, 0, 0, 8);
+
+    //初始化绘制窗口色区域路径
+    QPainterPath path2;
+    setPaintPath(bgRect, path2, 2, 2, 6);
+
+    //初始化绘制背景色区域路径
+    QPainterPath path3;
+    setPaintPath(bgRect, path3, 3, 3, 6);
+
+    painter->fillPath(path, option.palette.color(DPalette::Normal, DPalette::Highlight));
+    painter->fillPath(path2, option.palette.color(DPalette::Normal, DPalette::Window));
+    painter->fillPath(path3, option.palette.color(DPalette::Normal, DPalette::Highlight));
 }

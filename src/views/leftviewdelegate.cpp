@@ -248,31 +248,20 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
     int param = (option.rect.height() == 51) ? 5 : 0;
     param = (option.rect.height() == 52) ? 4 : param;
     QPainterPath path;
-    const int radius = 8;
-    path.moveTo(paintRect.bottomRight() - QPoint(0, radius));
-    path.lineTo(paintRect.topRight() + QPoint(0, radius));
-    path.arcTo(QRect(QPoint(paintRect.topRight() - QPoint(radius * 2, 0)), QSize(radius * 2, radius * 2)), 0, 90);
-    path.lineTo(paintRect.topLeft() + QPoint(radius, 0));
-    path.arcTo(QRect(QPoint(paintRect.topLeft()), QSize(radius * 2, radius * 2)), 90, 90);
-    path.lineTo(paintRect.bottomLeft() - QPoint(0, radius));
-    path.arcTo(QRect(QPoint(paintRect.bottomLeft() - QPoint(0, radius * 2)), QSize(radius * 2, radius * 2)), 180, 90);
-    path.lineTo(paintRect.bottomLeft() + QPoint(radius, 0));
-    path.arcTo(QRect(QPoint(paintRect.bottomRight() - QPoint(radius * 2, radius * 2)), QSize(radius * 2, radius * 2)), 270, 90);
-
+    setPaintPath(paintRect, path, 0, 0, 8);
     bool enable = true;
     //解决待移动列表字体颜色问题
     bool isPaintBackGroud = false;
 
     if (option.state & QStyle::State_Selected) {
-        QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
-        painter->setBrush(QBrush(fillColor));
-        painter->fillPath(path, painter->brush());
-        painter->setPen(QPen(Qt::white));
-        if (m_tabFocus) {
-            QPainterPath borderPath;
-            borderPath.addRoundedRect(QRect(paintRect.left() + 3, paintRect.top() + 3, paintRect.width() - 7, paintRect.height() - 7), 4, 4);
-            painter->drawPath(borderPath);
+        if (!m_tabFocus) {
+            QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
+            painter->setBrush(QBrush(fillColor));
+            painter->fillPath(path, painter->brush());
+        } else {
+            paintTabFocusBackground(painter, option, paintRect);
         }
+        painter->setPen(QPen(Qt::white));
     } else {
         if (m_enableItem == false || !(option.state & QStyle::State_Enabled)) {
             painter->setBrush(QBrush(m_parentPb.color(DPalette::Disabled, DPalette::ItemBackground)));
@@ -461,4 +450,40 @@ void LeftViewDelegate::setTabFocus(bool focus)
 bool LeftViewDelegate::isTabFocus()
 {
     return m_tabFocus;
+}
+
+void LeftViewDelegate::setPaintPath(const QRect &bgRect, QPainterPath &path, const int xDifference, const int yDifference, const int radius) const
+{
+    QPoint path_bottomRight(bgRect.bottomRight().x() - xDifference, bgRect.bottomRight().y() - yDifference);
+    QPoint path_topRight(bgRect.topRight().x() - xDifference, bgRect.topRight().y() + yDifference);
+    QPoint path_topLeft(bgRect.topLeft().x() + xDifference, bgRect.topLeft().y() + yDifference);
+    QPoint path_bottomLeft(bgRect.bottomLeft().x() + xDifference, bgRect.bottomLeft().y() - yDifference);
+    path.moveTo(path_bottomRight - QPoint(0, 10));
+    path.lineTo(path_topRight + QPoint(0, 10));
+    path.arcTo(QRect(QPoint(path_topRight - QPoint(radius * 2, 0)), QSize(radius * 2, radius * 2)), 0, 90);
+    path.lineTo(path_topLeft + QPoint(10, 0));
+    path.arcTo(QRect(QPoint(path_topLeft), QSize(radius * 2, radius * 2)), 90, 90);
+    path.lineTo(path_bottomLeft - QPoint(0, 10));
+    path.arcTo(QRect(QPoint(path_bottomLeft - QPoint(0, radius * 2)), QSize(radius * 2, radius * 2)), 180, 90);
+    path.lineTo(path_bottomRight - QPoint(10, 0));
+    path.arcTo(QRect(QPoint(path_bottomRight - QPoint(radius * 2, radius * 2)), QSize(radius * 2, radius * 2)), 270, 90);
+}
+
+void LeftViewDelegate::paintTabFocusBackground(QPainter *painter, const QStyleOptionViewItem &option, const QRect &bgRect) const
+{
+    //初始化绘制高亮色区域路径
+    QPainterPath path;
+    setPaintPath(bgRect, path, 0, 0, 8);
+
+    //初始化绘制窗口色区域路径
+    QPainterPath path2;
+    setPaintPath(bgRect, path2, 2, 2, 6);
+
+    //初始化绘制背景色区域路径
+    QPainterPath path3;
+    setPaintPath(bgRect, path3, 3, 3, 6);
+
+    painter->fillPath(path, option.palette.color(DPalette::Normal, DPalette::Highlight));
+    painter->fillPath(path2, option.palette.color(DPalette::Normal, DPalette::Window));
+    painter->fillPath(path3, option.palette.color(DPalette::Normal, DPalette::Highlight));
 }

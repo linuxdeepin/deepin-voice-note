@@ -75,6 +75,10 @@ private:
     void paintSearchItem(QPainter *painter, const QStyleOptionViewItem &option,
                          const QModelIndex &index) const;
 
+    void setPaintPath(const QRect &bgRect, QPainterPath &path, const int xDifference, const int yDifference, const int radius) const;
+
+    void paintTabFocusBackground(QPainter *painter, const QStyleOptionViewItem &option, const QRect &bgRect) const;
+
     QAbstractItemView *m_parentView {nullptr};
     QString m_searchKey;
     DPalette m_parentPb;

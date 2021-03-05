@@ -78,6 +78,10 @@ private:
     //绘制三角
     void paintTriangle(QPainter *painter, const QRect &rc, const QBrush &brush, bool left) const;
 
+    void setPaintPath(const QRect &bgRect, QPainterPath &path, const int xDifference, const int yDifference, const int radius) const;
+
+    void paintTabFocusBackground(QPainter *painter, const QStyleOptionViewItem &option, const QRect &bgRect) const;
+
     QAbstractItemView *m_treeView {nullptr};
     DPalette m_parentPb;
     bool m_enableItem {true};
