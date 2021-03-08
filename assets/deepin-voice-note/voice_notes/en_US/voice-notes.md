@@ -1,4 +1,4 @@
-# Voice Notes|../common/deepin_voice_note_96.svg|
+# Voice Notes|deepin-voice-note|
 
 ## Overview
 
@@ -40,7 +40,7 @@ On the Voice Notes interface, press **Ctrl** + **Shift** + **?** on the keyboard
 
 >![tips](../common/tips.svg)Tips: You can change the notebook order by dragging the notebook in the notebook list.
 
-### Create notes
+### Create Notes
 
 1. When a notebook is created in Voice Note, a text is also created by default. Click the ![add](../common/circlebutton_add2.svg) icon under the notes list to create more new notes.
 2. Right-click a notebook or note and select **New Note** to create a new note.
@@ -150,7 +150,7 @@ The notebook created will be automatically saved as **Note (n)**. You can rename
 1. On the Voice Notes interface, right-click a notebook.
 2. Select **Rename**.
 3. Enter the file name.
-4. Click in the blank area on the interface, or press the **Enter** key on the keyboard to rename.
+4. Click in the blank area on the interface, or press the **Enter** key on the keyboard to rename it.
 
 > ![tips](../common/tips.svg) Tips: You can also rename each text note under a notebook. 
 
@@ -188,9 +188,9 @@ You can set up audio source from **Internal** and **Microphone** (default) optio
 
 ### Privacy Policy
 
-On the Voice Notes interface, click ![icon_menu](../common/icon_menu.svg).
+1. On the Voice Notes interface, click ![icon_menu](../common/icon_menu.svg).
+2. Click **Privacy Policy** to view the relevant content on privacy policies.
 
-Click **Privacy Policy** to view the relevant content on privacy policies.
 
 ### Theme
 

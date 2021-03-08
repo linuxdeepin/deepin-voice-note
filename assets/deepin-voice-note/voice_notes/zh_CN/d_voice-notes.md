@@ -1,4 +1,4 @@
-# 语音记事本|../common/deepin_voice_note_96.svg|
+# 语音记事本|deepin-voice-note|
 
 ## 概述
 
