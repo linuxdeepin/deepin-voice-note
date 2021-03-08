@@ -43,8 +43,8 @@ class VnoteMultipleChoiceOptionWidget : public DWidget
     Q_OBJECT
 public:
     //按钮id
-    enum ButtonValue{
-       Move = 1,
+    enum ButtonValue {
+        Move = 1,
         SaveAsTxT = 2,
         SaveAsVoice = 3,
         Delete = 4
@@ -55,18 +55,19 @@ public:
     //更新笔记数量
     void setNoteNumber(int number);
     //设置按钮是否置灰
-    void enableButtons(bool saveAsTxtButtonStatus = true,bool saveAsVoiceButtonStatus = true , bool moveButtonStatus = true);
+    void enableButtons(bool saveAsTxtButtonStatus = true, bool saveAsVoiceButtonStatus = true, bool moveButtonStatus = true);
     //press更新svg
     void buttonPressed(ButtonValue value);
 
 private:
     //获得svg
-    QPixmap setSvgColor(QString svgPath,QString color);
+    QPixmap setSvgColor(QString svgPath, QString color);
     //设置svg颜色属性
-    void setSVGBackColor(QDomElement &elem,QString attr,QString val);
+    void setSVGBackColor(QDomElement &elem, QString attr, QString val);
 signals:
     //请求多选操作
     void requestMultipleOption(int id);
+
 protected:
     //触发多选操作
     void trigger(int id);
@@ -77,15 +78,17 @@ protected:
     //根据字体大小调整按钮UI
     void onFontChanged();
     //窗口大小重设
-    void resizeEvent(QResizeEvent *event)override;
+    void resizeEvent(QResizeEvent *event) override;
+
+    bool eventFilter(QObject *o, QEvent *e) override;
 
 private:
-    DLabel *m_tipsLabel  {nullptr};
+    DLabel *m_tipsLabel {nullptr};
     DToolButton *m_moveButton {nullptr};
     DToolButton *m_saveVoiceButton {nullptr};
     DToolButton *m_saveTextButton {nullptr};
     DToolButton *m_deleteButton {nullptr};
-    int m_noteNumber  = 0;
+    int m_noteNumber = 0;
 };
 
 #endif // VNOTEMULTIPLECHOICERIGHTWIDGET_H

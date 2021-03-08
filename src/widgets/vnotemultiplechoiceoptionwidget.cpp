@@ -24,7 +24,7 @@
 #include <DApplication>
 #include <QDebug>
 #include <QImageReader>
-
+#include <QKeyEvent>
 //多选操作页面
 const int m_iconWidth = 24;
 VnoteMultipleChoiceOptionWidget::VnoteMultipleChoiceOptionWidget(QWidget *parent)
@@ -75,7 +75,10 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     m_saveTextButton = new DToolButton(this);
     m_saveVoiceButton = new DToolButton(this);
     m_deleteButton = new DToolButton(this);
-
+    m_moveButton->installEventFilter(this);
+    m_saveTextButton->installEventFilter(this);
+    m_saveVoiceButton->installEventFilter(this);
+    m_deleteButton->installEventFilter(this);
     onFontChanged();
     //设置主题
     changeFromThemeType();
@@ -356,4 +359,17 @@ void VnoteMultipleChoiceOptionWidget::resizeEvent(QResizeEvent *event)
 {
     DWidget::resizeEvent(event);
     onFontChanged();
+}
+
+bool VnoteMultipleChoiceOptionWidget::eventFilter(QObject *o, QEvent *e)
+{
+    if (e->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = dynamic_cast<QKeyEvent *>(e);
+        if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
+            DToolButton *btn = dynamic_cast<DToolButton *>(o);
+            btn->click();
+            return true;
+        }
+    }
+    return false;
 }
