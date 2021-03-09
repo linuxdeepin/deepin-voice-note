@@ -692,6 +692,7 @@ void VNoteMainWindow::initRightView()
 
     m_rightViewScrollArea = new DScrollArea(m_rightViewHolder);
     m_rightView = new RightView(m_rightViewScrollArea);
+    m_rightView->installEventFilter(this);
     m_rightViewScrollArea->setLineWidth(0);
     m_rightViewScrollArea->setWidgetResizable(true);
     m_rightViewScrollArea->setWidget(m_rightView);
@@ -2315,7 +2316,9 @@ bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
  */
 bool VNoteMainWindow::setTabFocus(QObject *obj, QKeyEvent *event)
 {
-    if (obj == m_noteSearchEdit->lineEdit()) {
+    if (obj == m_rightView) {
+        return true;
+    } else if (obj == m_noteSearchEdit->lineEdit()) {
         setTitleBarTabFocus(event);
     } else if (obj == titlebar()) {
         return setTitlebarNext(event);
