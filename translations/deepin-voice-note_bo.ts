@@ -88,7 +88,7 @@
     <message>
         <location filename="../src/views/leftview.cpp" line="590"/>
         <source>Move %1 notes (%2, ...) to:</source>
-        <translation>%2 སོགས་ཀྱི་%1གི་ཟིན་དེབ་་་་་་སྤོ་བ།</translation>
+        <translation>སྤོ་བ%1གི་དབྱངས་རྟགས(%2, ...)ནས</translation>
     </message>
 </context>
 <context>
