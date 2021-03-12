@@ -121,19 +121,19 @@ The notebook created will be automatically saved as **Note (n)**. You can rename
 ### Delete Notebooks
 
 1. Select a notebook on the Voice Notes interface.
-2. Right-click, and select **Delete**.
+2. Right-click, and select **Delete** or press the **Delete** key on the keyboard.
 3. Click **Confirm** in the pop-up prompt box.
 
 ### Delete Text Notes
 
 1.   Select a text note or multiple text notes in the text note list with **Ctrl/Shift**.
-2.  Right-click, and select **Delete**.
+2.  Right-click, and select **Delete** or press the **Delete** key on the keyboard.
 3.  Click **Confirm** in the pop-up prompt box.
 
 ### Delete Voice Notes
 
 1.  Select a voice file on the Voice Notes interface.
-2.  Right-click, and select **Delete**.
+2.  Right-click, and select **Delete** or press the **Delete** key on the keyboard.
 3.  Click **Confirm** in the pop-up prompt box.
 
 ## Main Menu
