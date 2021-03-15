@@ -874,6 +874,9 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
     changeRightView(false);
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
     if (!loadNotes(data)) {
+        if (!m_middleView->isMultipleSelected()) {
+            m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
+        }
         m_rightView->initData(nullptr, m_searchKey, false);
         m_recordBar->setVisible(false);
     }
@@ -1358,7 +1361,9 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 
     QScrollBar *bar = m_rightViewScrollArea->verticalScrollBar();
     bar->setValue(bar->minimum());
-
+    if (!m_middleView->isMultipleSelected()) {
+        m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
+    }
     m_rightView->initData(data, m_searchKey, m_rightViewHasFouse);
     m_rightViewHasFouse = false;
 }
@@ -1769,9 +1774,9 @@ int VNoteMainWindow::loadSearchNotes(const QString &key)
         noteAll->lock.unlock();
         if (m_middleView->rowCount() == 0) {
             m_middleView->setVisibleEmptySearch(true);
+            m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
             m_rightView->initData(nullptr, m_searchKey);
             m_recordBar->setVisible(false);
-            m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
         } else {
             m_middleView->sortView(false);
             m_middleView->setVisibleEmptySearch(false);
