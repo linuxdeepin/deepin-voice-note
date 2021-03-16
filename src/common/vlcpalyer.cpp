@@ -56,6 +56,7 @@ void VlcPalyer::init()
     }
     if (m_vlcPlayer == nullptr) {
         m_vlcPlayer = libvlc_media_player_new(m_vlcInst);
+        libvlc_media_player_set_role(m_vlcPlayer, libvlc_role_None);
         attachEvent();
     }
 }
