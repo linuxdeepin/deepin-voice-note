@@ -47,11 +47,11 @@ VNoteRecordWidget::VNoteRecordWidget(QWidget *parent)
 void VNoteRecordWidget::initUi()
 {
     m_recordBtn = new VNote2SIconButton("record.svg", "pause.svg", this);
-    m_recordBtn->setIconSize(QSize(40, 40));
+    m_recordBtn->setIconSize(QSize(28, 28));
     m_recordBtn->setFixedSize(QSize(46, 46));
 
     m_finshBtn = new VNote2SIconButton("finish_record.svg", "finish_record.svg", this);
-    m_finshBtn->setIconSize(QSize(40, 40));
+    m_finshBtn->setIconSize(QSize(28, 28));
     m_finshBtn->setFixedSize(QSize(46, 46));
 
     QFont recordTimeFont;

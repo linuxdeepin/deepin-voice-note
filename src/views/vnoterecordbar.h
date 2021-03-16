@@ -40,9 +40,6 @@ class VNoteRecordBar : public QWidget
     Q_OBJECT
 public:
     explicit VNoteRecordBar(QWidget *parent = nullptr);
-
-    static constexpr int REC_BTN_W = 54;
-    static constexpr int REC_BTN_H = 54;
     //停止录音
     void stopRecord();
     //快捷键暂停/继续语音播放
