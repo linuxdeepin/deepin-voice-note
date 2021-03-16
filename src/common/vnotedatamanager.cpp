@@ -143,8 +143,9 @@ VNoteFolder *VNoteDataManager::delFolder(qint64 folderId)
         VNOTE_ALL_NOTES_DATA_MAP::iterator itNote = m_qspAllNotesMap->notes.find(folderId);
 
         if (itNote != m_qspAllNotesMap->notes.end()) {
-            m_qspAllNotesMap->notes.remove(itNote.key());
-            QScopedPointer<VNOTE_ITEMS_MAP> foldersMap(*itNote);
+            VNOTE_ITEMS_MAP *itemsMap = itNote.value();
+            m_qspAllNotesMap->notes.erase(itNote);
+            QScopedPointer<VNOTE_ITEMS_MAP> foldersMap(itemsMap);
 
             //Remove voice files in the folder
             for (auto it : foldersMap->folderNotes) {
@@ -156,7 +157,7 @@ VNoteFolder *VNoteDataManager::delFolder(qint64 folderId)
         m_qspAllNotesMap->lock.unlock();
 
         retFlder = *itFolder;
-        m_qspNoteFoldersMap->folders.remove(itFolder.key());
+        m_qspNoteFoldersMap->folders.erase(itFolder);
     }
 
     m_qspNoteFoldersMap->lock.unlock();
@@ -308,7 +309,7 @@ VNoteItem *VNoteDataManager::delNote(qint64 folderId, qint32 noteId)
 
         if (noteIter != notesInFolder->folderNotes.end()) {
             retNote = *noteIter;
-            notesInFolder->folderNotes.remove(noteIter.key());
+            notesInFolder->folderNotes.erase(noteIter);
 
             //Remove voice file of voice note
             retNote->delNoteData();
