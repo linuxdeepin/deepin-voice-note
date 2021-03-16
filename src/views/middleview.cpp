@@ -945,7 +945,8 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
 void MiddleView::initPositionStatus(int row)
 {
     m_shiftSelection = -1;
-    m_currentRow = row;
+    QModelIndexList indexes = selectedIndexes();
+    m_currentRow = indexes.size() == 1 ? indexes.last().row() : row;
 }
 
 /**
