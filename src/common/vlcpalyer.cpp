@@ -23,13 +23,18 @@
 #include <vlc/vlc.h>
 #include <vlc/libvlc_media.h>
 
+#include <DApplication>
+
+DWIDGET_USE_NAMESPACE
+
 /**
  * @brief VlcPalyer::VlcPalyer
  * @param parent
  */
-VlcPalyer::VlcPalyer(QObject *parent) : QObject(parent)
+VlcPalyer::VlcPalyer(QObject *parent)
+    : QObject(parent)
 {
-   ;
+    ;
 }
 
 /**
@@ -45,12 +50,15 @@ VlcPalyer::~VlcPalyer()
  */
 void VlcPalyer::init()
 {
-    if(m_vlcInst == nullptr){
-        m_vlcInst = libvlc_new(0,nullptr);
+    if (m_vlcInst == nullptr) {
+        m_vlcInst = libvlc_new(0, nullptr);
+        libvlc_set_user_agent(m_vlcInst, DApplication::translate("AppMain", "Voice Notes").toUtf8().constData(), "");
+        libvlc_set_app_id(m_vlcInst, "", "", "deepin-voice-note");
     }
-    if(m_vlcPlayer == nullptr){
-       m_vlcPlayer = libvlc_media_player_new(m_vlcInst);
-       attachEvent();
+    if (m_vlcPlayer == nullptr) {
+        m_vlcPlayer = libvlc_media_player_new(m_vlcInst);
+        libvlc_media_player_set_role(m_vlcPlayer, libvlc_role_None);
+        attachEvent();
     }
 }
 
@@ -59,16 +67,16 @@ void VlcPalyer::init()
  */
 void VlcPalyer::deinit()
 {
-    if(m_vlcPlayer){
+    if (m_vlcPlayer) {
         detachEvent();
         libvlc_media_t *media = libvlc_media_player_get_media(m_vlcPlayer);
-        if(media){
+        if (media) {
             libvlc_media_release(media);
         }
         libvlc_media_player_release(m_vlcPlayer);
         m_vlcPlayer = nullptr;
     }
-    if (m_vlcInst){
+    if (m_vlcInst) {
         libvlc_release(m_vlcInst);
         m_vlcInst = nullptr;
     }
@@ -80,10 +88,10 @@ void VlcPalyer::deinit()
 void VlcPalyer::attachEvent()
 {
     libvlc_event_manager_t *vlc_evt_man = libvlc_media_player_event_manager(m_vlcPlayer);
-    if(vlc_evt_man){
-        libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerEndReached, handleEvent , this);
-        libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerTimeChanged, handleEvent , this);
-        libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerLengthChanged, handleEvent , this);
+    if (vlc_evt_man) {
+        libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerEndReached, handleEvent, this);
+        libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerTimeChanged, handleEvent, this);
+        libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerLengthChanged, handleEvent, this);
     }
 }
 
@@ -93,10 +101,10 @@ void VlcPalyer::attachEvent()
 void VlcPalyer::detachEvent()
 {
     libvlc_event_manager_t *vlc_evt_man = libvlc_media_player_event_manager(m_vlcPlayer);
-    if(vlc_evt_man){
-        libvlc_event_detach(vlc_evt_man, libvlc_MediaPlayerEndReached, handleEvent , this);
-        libvlc_event_detach(vlc_evt_man, libvlc_MediaPlayerTimeChanged, handleEvent , this);
-        libvlc_event_detach(vlc_evt_man, libvlc_MediaPlayerLengthChanged, handleEvent , this);
+    if (vlc_evt_man) {
+        libvlc_event_detach(vlc_evt_man, libvlc_MediaPlayerEndReached, handleEvent, this);
+        libvlc_event_detach(vlc_evt_man, libvlc_MediaPlayerTimeChanged, handleEvent, this);
+        libvlc_event_detach(vlc_evt_man, libvlc_MediaPlayerLengthChanged, handleEvent, this);
     }
 }
 
@@ -108,7 +116,7 @@ void VlcPalyer::setFilePath(QString path)
 {
     init();
     libvlc_media_t *media = libvlc_media_new_path(m_vlcInst, path.toLatin1().constData());
-    if(media){
+    if (media) {
         libvlc_media_player_set_media(m_vlcPlayer, media);
         libvlc_media_release(media);
     }
@@ -119,7 +127,7 @@ void VlcPalyer::setFilePath(QString path)
  */
 void VlcPalyer::play()
 {
-    if(m_vlcPlayer){
+    if (m_vlcPlayer) {
         libvlc_media_player_play(m_vlcPlayer);
     }
 }
@@ -129,7 +137,7 @@ void VlcPalyer::play()
  */
 void VlcPalyer::pause()
 {
-    if(m_vlcPlayer){
+    if (m_vlcPlayer) {
         libvlc_media_player_pause(m_vlcPlayer);
     }
 }
@@ -139,7 +147,7 @@ void VlcPalyer::pause()
  */
 void VlcPalyer::stop()
 {
-    if(m_vlcPlayer){
+    if (m_vlcPlayer) {
         libvlc_media_player_stop(m_vlcPlayer);
     }
 }
@@ -173,7 +181,7 @@ void VlcPalyer::handleEvent(const libvlc_event_t *event, void *data)
  */
 void VlcPalyer::setPosition(qint64 pos)
 {
-    if(m_vlcPlayer){
+    if (m_vlcPlayer) {
         libvlc_media_player_set_time(m_vlcPlayer, pos);
     }
 }
@@ -184,9 +192,9 @@ void VlcPalyer::setPosition(qint64 pos)
  */
 VlcPalyer::VlcState VlcPalyer::getState()
 {
-   VlcPalyer::VlcState state = None;
-   if(m_vlcPlayer){
-       state = static_cast<VlcPalyer::VlcState>(libvlc_media_player_get_state(m_vlcPlayer));
-   }
-   return state;
+    VlcPalyer::VlcState state = None;
+    if (m_vlcPlayer) {
+        state = static_cast<VlcPalyer::VlcState>(libvlc_media_player_get_state(m_vlcPlayer));
+    }
+    return state;
 }
