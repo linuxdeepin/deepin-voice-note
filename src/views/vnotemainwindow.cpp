@@ -874,9 +874,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
     changeRightView(false);
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
     if (!loadNotes(data)) {
-        if (!m_middleView->isMultipleSelected()) {
-            m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
-        }
+        m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
         m_rightView->initData(nullptr, m_searchKey, false);
         m_recordBar->setVisible(false);
     }
@@ -1361,9 +1359,7 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 
     QScrollBar *bar = m_rightViewScrollArea->verticalScrollBar();
     bar->setValue(bar->minimum());
-    if (!m_middleView->isMultipleSelected()) {
-        m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
-    }
+    m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
     m_rightView->initData(data, m_searchKey, m_rightViewHasFouse);
     m_rightViewHasFouse = false;
 }
