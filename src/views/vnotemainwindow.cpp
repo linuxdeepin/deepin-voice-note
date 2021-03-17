@@ -1,4 +1,4 @@
-﻿/*
+/*
 * Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
 *
 * Author:     liuyanga <liuyanga@uniontech.com>
@@ -2018,11 +2018,11 @@ void VNoteMainWindow::onShowSettingDialog()
 void VNoteMainWindow::initMenuExtension()
 {
     m_menuExtension = new DMenu(this);
-    QAction *setting = new QAction(DApplication::translate("TitleBar", "Settings"), m_menuExtension);
+    //QAction *setting = new QAction(DApplication::translate("TitleBar", "Settings"), m_menuExtension);
     QAction *privacy = new QAction(DApplication::translate("TitleBar", "Privacy Policy"), m_menuExtension);
-    m_menuExtension->addAction(setting);
+    //m_menuExtension->addAction(setting);
     m_menuExtension->addAction(privacy);
     m_menuExtension->addSeparator();
     connect(privacy, &QAction::triggered, this, &VNoteMainWindow::onShowPrivacy);
-    connect(setting, &QAction::triggered, this, &VNoteMainWindow::onShowSettingDialog);
+    //connect(setting, &QAction::triggered, this, &VNoteMainWindow::onShowSettingDialog);
 }
