@@ -59,6 +59,11 @@ signals:
     void onAllDatasReady();
 
 public slots:
+    //加载记事本数据线程执行完成
+    void onFoldersLoaded(VNOTE_FOLDERS_MAP *foldesMap);
+    //加载笔记数据线程执行完成
+    void onAllNotesLoaded(VNOTE_ALL_NOTES_MAP *notesMap);
+
 protected:
     //添加一个记事本
     VNoteFolder *addFolder(VNoteFolder *folder);

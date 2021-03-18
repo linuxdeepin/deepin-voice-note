@@ -427,42 +427,9 @@ void VNoteDataManager::reqNoteFolders()
 {
     m_pForldesLoadThread = new LoadFolderWorker();
     m_pForldesLoadThread->setAutoDelete(true);
+
     connect(m_pForldesLoadThread, &LoadFolderWorker::onFoldersLoaded,
-            this, [this](VNOTE_FOLDERS_MAP *foldesMap) {
-                //Release old data
-                if (m_qspNoteFoldersMap != nullptr) {
-                    qInfo() << "Release old foldersMap:" << m_qspNoteFoldersMap.get()
-                            << " size:" << m_qspNoteFoldersMap->folders.size();
-
-                    m_qspNoteFoldersMap->lock.lockForWrite();
-
-                    for (auto it : m_qspNoteFoldersMap->folders) {
-                        delete reinterpret_cast<VNOTE_FOLDERS_MAP *>(it);
-                    }
-
-                    m_qspNoteFoldersMap->folders.clear();
-
-                    m_qspNoteFoldersMap->lock.unlock();
-                }
-
-                m_qspNoteFoldersMap.reset(foldesMap);
-
-                qInfo() << "Loaded new foldersMap:" << m_qspNoteFoldersMap.get()
-                        << " size:" << m_qspNoteFoldersMap->folders.size();
-
-                //Object is already deleted
-                m_pForldesLoadThread = nullptr;
-
-                //Set folder data ready flag
-                m_fDataState |= DataState::FolderDataReady;
-
-                emit onNoteFoldersLoaded();
-
-                //Send data ready signal if data ready
-                if (isAllDatasReady()) {
-                    emit onAllDatasReady();
-                }
-            });
+            this, &VNoteDataManager::onFoldersLoaded);
 
     QThreadPool::globalInstance()->start(m_pForldesLoadThread);
 }
@@ -476,46 +443,7 @@ void VNoteDataManager::reqNoteItems()
     m_pNotesLoadThread->setAutoDelete(true);
 
     connect(m_pNotesLoadThread, &LoadNoteItemsWorker::onAllNotesLoaded,
-            this, [this](VNOTE_ALL_NOTES_MAP *notesMap) {
-                //Release old data
-                if (m_qspAllNotesMap != nullptr) {
-                    qInfo() << "Release old notesMap:" << m_qspAllNotesMap.get()
-                            << "All notes in folders:" << m_qspAllNotesMap->notes.size();
-
-                    m_qspAllNotesMap->lock.lockForWrite();
-
-                    for (auto folderNotes : m_qspAllNotesMap->notes) {
-                        for (auto note : folderNotes->folderNotes) {
-                            delete reinterpret_cast<VNoteItem *>(note);
-                        }
-
-                        folderNotes->folderNotes.clear();
-                        delete reinterpret_cast<VNOTE_ITEMS_MAP *>(folderNotes);
-                    }
-
-                    m_qspAllNotesMap->notes.clear();
-
-                    m_qspAllNotesMap->lock.unlock();
-                }
-
-                m_qspAllNotesMap.reset(notesMap);
-
-                qInfo() << "Release old notesMap:" << m_qspAllNotesMap.get()
-                        << "All notes in folders:" << m_qspAllNotesMap->notes.size();
-
-                //Object is already deleted
-                m_pNotesLoadThread = nullptr;
-
-                //Set folder data ready flag
-                m_fDataState |= DataState::NotesDataReady;
-
-                emit onNoteItemsLoaded();
-
-                //Send data ready signal if data ready
-                if (isAllDatasReady()) {
-                    emit onAllDatasReady();
-                }
-            });
+            this, &VNoteDataManager::onAllNotesLoaded);
 
     QThreadPool::globalInstance()->start(m_pNotesLoadThread);
 }
@@ -527,4 +455,91 @@ void VNoteDataManager::reqNoteItems()
 VNOTE_ALL_NOTES_MAP *VNoteDataManager::getAllNotesInFolder()
 {
     return m_qspAllNotesMap.get();
+}
+
+/**
+ * @brief VNoteDataManager::onFoldersLoaded
+ * @param foldesMap 记事本数据
+ */
+void VNoteDataManager::onFoldersLoaded(VNOTE_FOLDERS_MAP *foldesMap)
+{
+    //Release old data
+    if (m_qspNoteFoldersMap != nullptr) {
+        qInfo() << "Release old foldersMap:" << m_qspNoteFoldersMap.get()
+                << " size:" << m_qspNoteFoldersMap->folders.size();
+
+        m_qspNoteFoldersMap->lock.lockForWrite();
+
+        for (auto it : m_qspNoteFoldersMap->folders) {
+            delete it;
+        }
+
+        m_qspNoteFoldersMap->folders.clear();
+
+        m_qspNoteFoldersMap->lock.unlock();
+    }
+
+    m_qspNoteFoldersMap.reset(foldesMap);
+
+    qInfo() << "Loaded new foldersMap:" << m_qspNoteFoldersMap.get()
+            << " size:" << m_qspNoteFoldersMap->folders.size();
+
+    //Object is already deleted
+    m_pForldesLoadThread = nullptr;
+
+    //Set folder data ready flag
+    m_fDataState |= DataState::FolderDataReady;
+
+    emit onNoteFoldersLoaded();
+
+    //Send data ready signal if data ready
+    if (isAllDatasReady()) {
+        emit onAllDatasReady();
+    }
+}
+
+/**
+ * @brief VNoteDataManager::onAllNotesLoaded
+ * @param notesMap 笔记数据
+ */
+void VNoteDataManager::onAllNotesLoaded(VNOTE_ALL_NOTES_MAP *notesMap)
+{
+    //Release old data
+    if (m_qspAllNotesMap != nullptr) {
+        qInfo() << "Release old notesMap:" << m_qspAllNotesMap.get()
+                << "All notes in folders:" << m_qspAllNotesMap->notes.size();
+
+        m_qspAllNotesMap->lock.lockForWrite();
+
+        for (auto folderNotes : m_qspAllNotesMap->notes) {
+            for (auto note : folderNotes->folderNotes) {
+                delete note;
+            }
+
+            folderNotes->folderNotes.clear();
+            delete reinterpret_cast<VNOTE_ITEMS_MAP *>(folderNotes);
+        }
+
+        m_qspAllNotesMap->notes.clear();
+
+        m_qspAllNotesMap->lock.unlock();
+    }
+
+    m_qspAllNotesMap.reset(notesMap);
+
+    qInfo() << "Release old notesMap:" << m_qspAllNotesMap.get()
+            << "All notes in folders:" << m_qspAllNotesMap->notes.size();
+
+    //Object is already deleted
+    m_pNotesLoadThread = nullptr;
+
+    //Set folder data ready flag
+    m_fDataState |= DataState::NotesDataReady;
+
+    emit onNoteItemsLoaded();
+
+    //Send data ready signal if data ready
+    if (isAllDatasReady()) {
+        emit onAllDatasReady();
+    }
 }

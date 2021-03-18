@@ -73,3 +73,23 @@ TEST_F(ut_vnotedatamanager_test, addFolder)
     vnotedatamanager.getAllNotesInFolder();
     vnotedatamanager.getDefaultIcon(0, IconsType::DefaultIcon);
 }
+
+TEST_F(ut_vnotedatamanager_test, onFoldersLoaded)
+{
+    VNoteDataManager vnotedatamanager;
+    vnotedatamanager.m_qspNoteFoldersMap.reset(new VNOTE_FOLDERS_MAP);
+    VNOTE_FOLDERS_MAP *folders = vnotedatamanager.getNoteFolders();
+    folders->folders.insert(0, new VNoteFolder());
+    vnotedatamanager.onFoldersLoaded(new VNOTE_FOLDERS_MAP);
+}
+
+TEST_F(ut_vnotedatamanager_test, onAllNotesLoaded)
+{
+    VNoteDataManager vnotedatamanager;
+    vnotedatamanager.m_qspAllNotesMap.reset(new VNOTE_ALL_NOTES_MAP);
+    VNOTE_ALL_NOTES_MAP *notes = vnotedatamanager.getAllNotesInFolder();
+    VNOTE_ITEMS_MAP *items = new VNOTE_ITEMS_MAP;
+    items->folderNotes.insert(0, new VNoteItem);
+    notes->notes.insert(0, items);
+    vnotedatamanager.onAllNotesLoaded(new VNOTE_ALL_NOTES_MAP);
+}
