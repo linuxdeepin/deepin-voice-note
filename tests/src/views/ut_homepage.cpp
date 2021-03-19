@@ -37,3 +37,11 @@ TEST_F(ut_homepage_test, initUi)
 {
     m_homepage->initUi();
 }
+
+TEST_F(ut_homepage_test, eventFilter)
+{
+    QKeyEvent keyTab(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier);
+    m_homepage->eventFilter(nullptr, &keyTab);
+    QKeyEvent keyEnter(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
+    m_homepage->eventFilter(nullptr, &keyEnter);
+}

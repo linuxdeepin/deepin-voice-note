@@ -40,11 +40,15 @@ TEST_F(ut_middleview_test, setSearchKey)
     VNOTE_ITEMS_MAP *notes = noteOper.getFolderNotes(folder->id);
     if (notes) {
         notes->lock.lockForRead();
+        int i = 0;
         for (auto it : notes->folderNotes) {
+            it->isTop = i % 2 == 0 ? true : false;
+            i++;
             middleview.appendRow(it);
         }
         notes->lock.unlock();
     }
+    middleview.grab();
     middleview.setSearchKey("note");
     middleview.grab();
     middleview.m_pItemDelegate->handleChangeTheme();
