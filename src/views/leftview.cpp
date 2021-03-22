@@ -622,7 +622,7 @@ QModelIndex LeftView::selectMoveFolder(const QModelIndexList &src)
         folders.push_back(static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(currentIndex())));
         m_folderSelectDialog->setFolderBlack(folders);
         m_folderSelectDialog->setNoteContextInfo(elideText, src.size());
-        m_folderSelectDialog->setDefaultSelect();
+        m_folderSelectDialog->clearSelection();
 
         m_folderSelectDialog->exec();
         if (m_folderSelectDialog->result() == FolderSelectDialog::Accepted) {

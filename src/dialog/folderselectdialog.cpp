@@ -111,7 +111,15 @@ void FolderSelectView::mouseMoveEvent(QMouseEvent *event)
 void FolderSelectView::focusInEvent(QFocusEvent *e)
 {
     LeftViewDelegate *delegate = dynamic_cast<LeftViewDelegate *>(itemDelegate());
-    delegate->setTabFocus(e->reason() == Qt::TabFocusReason);
+    if (e->reason() == Qt::TabFocusReason) {
+        if (!selectedIndexes().count()) {
+            QModelIndex index = model()->index(0, 0).child(0, 0);
+            setCurrentIndex(index);
+        }
+        delegate->setTabFocus(true);
+    } else {
+        delegate->setTabFocus(false);
+    }
     DTreeView::focusInEvent(e);
 }
 void FolderSelectView::focusOutEvent(QFocusEvent *e)
@@ -443,10 +451,4 @@ void FolderSelectDialog::hideEvent(QHideEvent *event)
     m_closeButton->setAttribute(Qt::WA_UnderMouse, false);
     m_view->setFocus(Qt::MouseFocusReason);
     DAbstractDialog::hideEvent(event);
-}
-
-void FolderSelectDialog::setDefaultSelect()
-{
-    QModelIndex index = m_model->index(0, 0).child(0, 0);
-    m_view->setCurrentIndex(index);
 }

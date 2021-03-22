@@ -84,8 +84,6 @@ public:
     void setFolderBlack(const QList<VNoteFolder *> &folders);
     //清除选中
     void clearSelection();
-    //默认选中
-    void setDefaultSelect();
     //获取选中的记事本
     QModelIndex getSelectIndex();
     //选中变化处理
