@@ -848,14 +848,19 @@ void RightView::mouseMoveEvent(QMouseEvent *event)
             }
             isReturn = true;
         }
-        m_touchPressPoint = event->pos();
-        m_touchPressStartMs = current.toMSecsSinceEpoch();
         if (isReturn)
             return;
     }
     if (dis > 1 || TouchNormal == m_touchState) {
-        if (event->source() == Qt::MouseEventSynthesizedByQt) {
+        if (event->source() == Qt::MouseEventSynthesizedByQt && m_touchState != TouchSelecting) {
+            DetailItemWidget *widget = getWidgetByPos(m_touchPressPoint);
             m_touchState = TouchSelecting;
+            if (widget) {
+                QPoint pos = mapToGlobal(m_touchPressPoint);
+                if (widget->isTextContainsPos(pos)) {
+                    widget->setCursorByPos(pos);
+                }
+            }
         }
         emit sigCursorChange(event->pos().y(), true);
         mouseMoveSelect(event);
