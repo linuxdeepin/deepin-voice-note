@@ -118,9 +118,9 @@ file(GLOB_RECURSE VNOTE_SRC ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
 find_package(PkgConfig REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5 COMPONENTS DBus Sql Multimedia REQUIRED)
-find_package(Qt5Gui REQUIRED)
-find_package(DtkWidget REQUIRED)
-find_package(DtkCore REQUIRED)
+find_package(DtkGui5.5 REQUIRED)
+find_package(DtkWidget5.5 REQUIRED)
+find_package(DtkCore5.5 REQUIRED)
 find_package(Qt5Svg REQUIRED)
 find_package(Qt5Xml REQUIRED)
 find_package(DFrameworkdbus REQUIRED)
@@ -136,11 +136,11 @@ include_directories(${Qt5Xml_INCLUDE_DIRS})
 add_executable(${PROJECT_NAME} ${VNOTE_SRC} ${APP_QRC})
 
 target_include_directories(${APP_BIN_NAME}
-    PUBLIC ${DtkWidget_INCLUDE_DIRS} ${OBJECT_BINARY_DIR})
+    PUBLIC ${DtkWidget5.5_INCLUDE_DIRS} ${OBJECT_BINARY_DIR})
 
 target_link_libraries(${APP_BIN_NAME}
-    ${DtkWidget_LIBRARIES}
-    ${DtkCore_LIBRARIES}
+    ${DtkWidget5.5_LIBRARIES}
+    ${DtkCore5.5_LIBRARIES}
     ${DFrameworkdbus_LIBRARIES}
     ${GSTREAMER_LIBRARIES}
     ${LIBVLC_LIBRARIES}

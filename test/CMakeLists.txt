@@ -67,13 +67,13 @@ add_executable(${PROJECT_NAME_TEST}
 # 生成测试可执行程序的依赖库
 target_link_libraries(${PROJECT_NAME_TEST} gtest gtest_main -pthread)
 
-target_include_directories(${PROJECT_NAME_TEST} PUBLIC ${DtkWidget_INCLUDE_DIRS}
-                                                       ${DtkCore_INCLUDE_DIRS}
-                                                        ${DtkGui_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME_TEST} PUBLIC ${DtkWidget5.5_INCLUDE_DIRS}
+                                                       ${DtkCore5.5_INCLUDE_DIRS}
+                                                        ${DtkGui5.5_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME_TEST}
-    ${DtkWidget_LIBRARIES}
-    ${DtkCore_LIBRARIES}
+    ${DtkWidget5.5_LIBRARIES}
+    ${DtkCore5.5_LIBRARIES}
     ${DFrameworkdbus_LIBRARIES}
     ${GSTREAMER_LIBRARIES}
     ${LIBVLC_LIBRARIES}
