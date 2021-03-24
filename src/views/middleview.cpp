@@ -894,6 +894,12 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
     }
     //关于shift+home/end的判断
     else if (Qt::Key_Home == e->key() || Qt::Key_End == e->key()) {
+        if (Qt::ShiftModifier == e->modifiers()) {
+            QModelIndexList indexes = selectedIndexes();
+            if (indexes.size() == 1) {
+                m_currentRow = indexes.last().row();
+            }
+        }
         if (Qt::Key_Home == e->key()) {
             scrollTo(m_pSortViewFilter->index(0, 0));
             clearSelection();
@@ -945,8 +951,7 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
 void MiddleView::initPositionStatus(int row)
 {
     m_shiftSelection = -1;
-    QModelIndexList indexes = selectedIndexes();
-    m_currentRow = indexes.size() == 1 ? indexes.last().row() : row;
+    m_currentRow = row;
 }
 
 /**
