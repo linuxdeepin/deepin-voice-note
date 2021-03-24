@@ -525,7 +525,6 @@ void VNoteMainWindow::initTitleBar()
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
     m_noteSearchEdit->lineEdit()->installEventFilter(this);
     titlebar()->addWidget(m_noteSearchEdit);
-    titlebar()->installEventFilter(this);
     DWindowCloseButton *closeBtn = titlebar()->findChild<DWindowCloseButton *>("DTitlebarDWindowCloseButton");
     closeBtn->installEventFilter(this);
 }
@@ -2320,9 +2319,7 @@ bool VNoteMainWindow::setTabFocus(QObject *obj, QKeyEvent *event)
     if (obj == m_rightView) {
         return true;
     } else if (obj == m_noteSearchEdit->lineEdit()) {
-        setTitleBarTabFocus(event);
-    } else if (obj == titlebar()) {
-        return setTitlebarNext(event);
+        return false;
     } else if (obj == m_addNoteBtn) {
         return setAddnoteButtonNext(event);
     } else if (obj == m_middleView) {
@@ -2332,7 +2329,6 @@ bool VNoteMainWindow::setTabFocus(QObject *obj, QKeyEvent *event)
     } else {
         return setTitleCloseButtonNext(event);
     }
-    return true;
 }
 
 /**
