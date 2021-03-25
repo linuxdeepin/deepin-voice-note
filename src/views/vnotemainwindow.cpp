@@ -1358,7 +1358,6 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 
     QScrollBar *bar = m_rightViewScrollArea->verticalScrollBar();
     bar->setValue(bar->minimum());
-    m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
     m_rightView->initData(data, m_searchKey, m_rightViewHasFouse);
     m_rightViewHasFouse = false;
 }
@@ -1694,6 +1693,7 @@ void VNoteMainWindow::editNote()
  */
 void VNoteMainWindow::delNote()
 {
+    m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
     //记录移除前位置
     m_middleView->setNextSelection();
 
