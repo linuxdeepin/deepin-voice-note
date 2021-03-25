@@ -103,7 +103,7 @@ Select a text note or multiple text notes with **Ctrl/Shift** in the text note l
 2.  Right-click, and select **Save as TXT**.
 3.  Save the text note to the storage device in TXT format.
 
-![0|save](fig/d_toTxT.png)
+![0|save](fig/toTxT.png)
 
 ### Rename Notebooks
 

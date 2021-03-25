@@ -11,25 +11,25 @@
 
 ### 运行语音记事本
 
-1. 单击桌面底部的 ![deepin_launcher](../common/deepin_launcher.svg)，进入启动器界面。
-2. 上下滚动鼠标滚轮浏览或通过搜索，找到语音记事本 ![deepin_voice_note](../common/deepin_voice_note.svg) 单击运行。
+1. 单击任务栏上的启动器图标![deepin_launcher](../common/deepin_launcher.svg)，进入启动器界面。
+2. 上下滚动鼠标滚轮浏览或通过搜索，找到语音记事本图标 ![deepin_voice_note](../common/deepin_voice_note.svg)，单击运行。
 3. 右键单击 ![deepin_voice_note](../common/deepin_voice_note.svg)，您可以：
 
    - 单击 **发送到桌面**，在桌面创建快捷方式。
    - 单击 **发送到任务栏**，将应用程序固定到任务栏。
    - 单击 **开机自动启动**，将应用程序添加到开机启动项，在电脑开机时自动运行该应用。
 
-> ![notes](../common/notes.svg)说明：如果语音记事本已经默认固定在任务栏上，您也可以点击任务栏上的 ![deepin_voice_note](../common/deepin_voice_note.svg) 来运行。
 
 ### 关闭语音记事本
 
 - 在语音记事本界面单击 ![close_icon](../common/close_icon.svg)，退出语音记事本。
-- 在任务栏右键单击 ![deepin_voice_note](../common/deepin_voice_note.svg)，选择 **关闭所有** 来退出语音记事本。
-- 在语音记事本界面单击 ![icon_menu](../common/icon_menu.svg)，选择 **退出** 来退出语音记事本。
+- 在任务栏右键单击 ![deepin_voice_note](../common/deepin_voice_note.svg)，选择 **关闭所有**，退出语音记事本。
+- 在语音记事本界面单击 ![icon_menu](../common/icon_menu.svg)，选择 **退出**，退出语音记事本。
 
 ### 查看快捷键
 
-在语音记事本界面上，按下键盘上的 **Ctrl + Shift + ?** 组合键来查看快捷键，熟练地使用快捷键，将大大提升您的操作效率。
+在语音记事本界面，使用快捷键 **Ctrl + Shift + ?** 打开快捷键预览界面，熟练地使用快捷键，将大大提升您的操作效率。
+
 
 ![1|hotkey](fig/hotkey.png)
 

@@ -11,25 +11,24 @@
 
 ### 運行語音記事本
 
-1. 單擊桌面底部的 ![deepin_launcher](../common/deepin_launcher.svg)，進入啟動器界面。
-2. 上下滾動鼠標滾輪瀏覽或通過搜索，找到語音記事本 ![deepin_voice_note](../common/deepin_voice_note.svg)單擊運行。
+1. 單擊任務欄上的啟動器圖標 ![deepin_launcher](../common/deepin_launcher.svg)，進入啟動器界面。
+2. 上下滾動鼠標滾輪瀏覽或通過搜索，找到語音記事本圖標 ![deepin_voice_note](../common/deepin_voice_note.svg)，單擊運行。
 3. 右鍵單擊 ![deepin_voice_note](../common/deepin_voice_note.svg)，您可以：
 
    - 單擊 **傳送到桌面**，在桌面創建快捷方式。
    - 單擊 **傳送到任務欄**，將應用程序固定到任務欄。
    - 單擊 **加至開機啟動**，將應用程序添加到開機啟動項，在電腦開機時自動運行該應用。
 
-> ![notes](../common/notes.svg)說明：如果語音記事本已經默認固定在任務欄上，您也可以單擊任務欄上的 ![deepin_voice_note](../common/deepin_voice_note.svg)來運行。
 
 ### 關閉語音記事本
 
 - 在語音記事本界面單擊 ![close_icon](../common/close_icon.svg)，關閉語音記事本。
-- 在任務欄右鍵單擊 ![deepin_voice_note](../common/deepin_voice_note.svg)，選擇 **關閉所有** 來關閉語音記事本。
-- 在語音記事本界面單擊 ![icon_menu](../common/icon_menu.svg)，選擇 **退出** 來關閉語音記事本。
+- 在任務欄右鍵單擊 ![deepin_voice_note](../common/deepin_voice_note.svg)，選擇 **關閉所有**，關閉語音記事本。
+- 在語音記事本界面單擊 ![icon_menu](../common/icon_menu.svg)，選擇 **退出**，關閉語音記事本。
 
 ### 查看快捷鍵
 
-在語音記事本界面上，按下鍵盤上的 **Ctrl + Shift + ?** 組合鍵來查看快捷鍵，熟練地使用快捷鍵，將大大提升您的操作效率。
+在語音記事本界面，使用快捷鍵 **Ctrl + Shift + ?** 打開快捷鍵預覽界面，熟練地使用快捷鍵，將大大提升您的操作效率。
 
  ![1|hotkey](fig/hotkey.png)
 
