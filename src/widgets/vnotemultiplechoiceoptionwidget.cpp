@@ -75,6 +75,12 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     m_saveTextButton = new DToolButton(this);
     m_saveVoiceButton = new DToolButton(this);
     m_deleteButton = new DToolButton(this);
+
+    m_moveButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    m_saveTextButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    m_saveVoiceButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    m_deleteButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
     m_moveButton->installEventFilter(this);
     m_saveTextButton->installEventFilter(this);
     m_saveVoiceButton->installEventFilter(this);
