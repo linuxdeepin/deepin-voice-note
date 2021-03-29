@@ -1143,7 +1143,7 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray notebookJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutNotebookKeymap.begin();
-         it != shortcutNotebookKeymap.end(); it++) {
+         it != shortcutNotebookKeymap.end(); ++it) {
         QJsonObject jsonItem;
         jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
@@ -1173,7 +1173,7 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray noteJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutNoteKeymap.begin();
-         it != shortcutNoteKeymap.end(); it++) {
+         it != shortcutNoteKeymap.end(); ++it) {
         QJsonObject jsonItem;
         jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
@@ -1197,7 +1197,7 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray editJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutEditKeymap.begin();
-         it != shortcutEditKeymap.end(); it++) {
+         it != shortcutEditKeymap.end(); ++it) {
         QJsonObject jsonItem;
         jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
@@ -1221,7 +1221,7 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray settingJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutSettingKeymap.begin();
-         it != shortcutSettingKeymap.end(); it++) {
+         it != shortcutSettingKeymap.end(); ++it) {
         QJsonObject jsonItem;
         jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
