@@ -30,7 +30,15 @@ ut_vnoteitemoper_test::ut_vnoteitemoper_test()
 
 void ut_vnoteitemoper_test::SetUp()
 {
-    m_vnoteitemoper = new VNoteItemOper;
+    VNOTE_ALL_NOTES_MAP *notes = VNoteDataManager::instance()->getAllNotesInFolder();
+    if (notes && !notes->notes.isEmpty()) {
+        VNOTE_ITEMS_MAP *tmp = notes->notes.first();
+        if (tmp && !tmp->folderNotes.isEmpty()) {
+            m_note = tmp->folderNotes.first();
+        }
+    }
+
+    m_vnoteitemoper = new VNoteItemOper(m_note);
 }
 
 void ut_vnoteitemoper_test::TearDown()
@@ -55,31 +63,15 @@ TEST_F(ut_vnoteitemoper_test, updateNote)
 
 TEST_F(ut_vnoteitemoper_test, addNote)
 {
-    VNoteDbManager vnotedbmanager;
-    vnotedbmanager.initVNoteDb(false);
-    VNoteFolder folder;
-    folder.id = 2;
-    folder.notesCount = 1;
-    folder.name = "test";
-    //    VNoteFolderOper vnotefolderoper(&folder);
-    //    vnotefolderoper.loadVNoteFolders();
-
     VNoteItem tmpNote;
-    tmpNote.folderId = 2;
+    tmpNote.folderId = m_note->folderId;
     tmpNote.noteType = VNoteItem::VNT_Text;
+    tmpNote.noteTitle = m_vnoteitemoper->getDefaultNoteName(tmpNote.folderId);
     VNoteBlock *ptrBlock1 = tmpNote.newBlock(VNoteBlock::Text);
     tmpNote.addBlock(ptrBlock1);
-    //    VNoteItemOper noteOper(&tmpNote);
-    //    tmpNote.noteTitle = noteOper.getDefaultNoteName(tmpNote.folderId);
-
-    //    vnotefolderoper.getDefaultFolderName();
-    //    vnotefolderoper.addFolder(folder);
-    //    noteOper.addNote(tmpNote);
-    //    noteOper.updateTop(1);
-    //    noteOper.updateFolderId(&tmpNote);
-    //    noteOper.updateNote();
-    //    noteOper.deleteNote();
-    //    noteOper.modifyNoteTitle("test");
+    m_vnoteitemoper->addNote(tmpNote);
+    VNoteItemOper op(&tmpNote);
+    op.deleteNote();
 }
 
 TEST_F(ut_vnoteitemoper_test, getDefaultVoiceName)
@@ -87,7 +79,18 @@ TEST_F(ut_vnoteitemoper_test, getDefaultVoiceName)
     m_vnoteitemoper->getDefaultVoiceName();
 }
 
-TEST_F(ut_vnoteitemoper_test, deleteNote)
+TEST_F(ut_vnoteitemoper_test, updateTop)
 {
-    m_vnoteitemoper->deleteNote();
+    m_vnoteitemoper->updateTop(!m_note->isTop);
+    m_vnoteitemoper->updateTop(!m_note->isTop);
+}
+
+TEST_F(ut_vnoteitemoper_test, updateFolderId)
+{
+    m_vnoteitemoper->updateFolderId(m_note);
+}
+
+TEST_F(ut_vnoteitemoper_test, getNote)
+{
+    m_vnoteitemoper->getNote(m_note->folderId, m_note->noteId);
 }

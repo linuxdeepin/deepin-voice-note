@@ -23,6 +23,7 @@
 #include <QObject>
 
 class VNoteItemOper;
+struct VNoteItem;
 class ut_vnoteitemoper_test : public QObject
     , public ::testing::Test
 {
@@ -32,6 +33,7 @@ public:
 
     virtual void SetUp() override;
     virtual void TearDown() override;
+    VNoteItem *m_note {nullptr};
 
 protected:
     VNoteItemOper *m_vnoteitemoper;
