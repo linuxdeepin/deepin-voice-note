@@ -18,6 +18,7 @@
 
 #include "ut_vnotefolderoper.h"
 #include "vnotefolderoper.h"
+#include "vnotedatamanager.h"
 
 ut_vnotefolderoper_test::ut_vnotefolderoper_test()
 {
@@ -25,7 +26,12 @@ ut_vnotefolderoper_test::ut_vnotefolderoper_test()
 
 void ut_vnotefolderoper_test::SetUp()
 {
-    m_vnotefolderoper = new VNoteFolderOper;
+    VNoteFolder *folder = nullptr;
+    VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
+    if (folders && folders->folders.size()) {
+        folder = folders->folders[0];
+    }
+    m_vnotefolderoper = new VNoteFolderOper(folder);
 }
 
 void ut_vnotefolderoper_test::TearDown()
@@ -35,7 +41,7 @@ void ut_vnotefolderoper_test::TearDown()
 
 TEST_F(ut_vnotefolderoper_test, deleteVNoteFolder)
 {
-    m_vnotefolderoper->deleteVNoteFolder(2);
+    m_vnotefolderoper->deleteVNoteFolder(4);
 }
 
 TEST_F(ut_vnotefolderoper_test, renameVNoteFolder)
@@ -57,4 +63,14 @@ TEST_F(ut_vnotefolderoper_test, getNotesCount)
 TEST_F(ut_vnotefolderoper_test, getDefaultIcon)
 {
     m_vnotefolderoper->getDefaultIcon();
+}
+
+TEST_F(ut_vnotefolderoper_test, getFoldersCount)
+{
+    m_vnotefolderoper->getFoldersCount();
+}
+
+TEST_F(ut_vnotefolderoper_test, getDefaultFolderName)
+{
+    m_vnotefolderoper->getDefaultFolderName();
 }
