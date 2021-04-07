@@ -26,6 +26,7 @@
 #include <QIcon>
 #include <QDebug>
 #include <QTextBlock>
+#include <QDir>
 
 #include <DGuiApplicationHelper>
 
@@ -266,4 +267,18 @@ void Utils::setDefaultColor(QTextDocument *srcDoc, const QColor &color)
     QTextCharFormat newFormat = cursor.charFormat();
     newFormat.setForeground(color);
     cursor.mergeCharFormat(newFormat);
+}
+
+QString Utils::mkMutiDir(const QString &path)
+{
+    QDir dir(path);
+    if (path.isEmpty() || dir.exists()) {
+        return path;
+    }
+    QString parentDir = mkMutiDir(path.mid(0, path.lastIndexOf('/')));
+    QString dirname = path.mid(path.lastIndexOf('/') + 1);
+    QDir parentPath(parentDir);
+    if (!dirname.isEmpty())
+        parentPath.mkpath(dirname);
+    return parentDir + "/" + dirname;
 }
