@@ -52,4 +52,6 @@ public:
     static void blockToDocument(const VNoteBlock *block, QTextDocument *doc);
     //设置编辑器字体颜色
     static void setDefaultColor(QTextDocument *srcDoc, const QColor &color);
+    //创建多级文件夹
+    static QString mkMutiDir(const QString &path);
 };

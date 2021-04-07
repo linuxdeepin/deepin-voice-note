@@ -21,6 +21,7 @@
 #include "db/vnotedbmanager.h"
 #include "db/dbvisitor.h"
 #include "globaldef.h"
+#include "common/utils.h"
 
 #include <QStandardPaths>
 #include <QDir>
@@ -290,7 +291,7 @@ int VNoteDbManager::initVNoteDb(bool fOldDB)
     dbDir.setFile(vnoteDatabasePath + QDir::separator());
 
     if (!dbDir.exists()) {
-        QDir(dbDir.filePath()).mkdir(dbDir.filePath());
+        Utils::mkMutiDir(vnoteDatabasePath);
         qInfo() << "Create vnote db directory:" << vnoteDatabasePath;
     }
 
