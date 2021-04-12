@@ -75,7 +75,7 @@ void RightView::initUi()
     setContextMenuPolicy(Qt::CustomContextMenu);
     m_viewportLayout = new QVBoxLayout;
     m_viewportLayout->setSpacing(0);
-    m_viewportLayout->setContentsMargins(20, 0, 20, 0);
+    m_viewportLayout->setContentsMargins(10, 0, 10, 0);
     this->setLayout(m_viewportLayout);
     m_placeholderWidget = new DWidget(this); //占位的
     m_placeholderWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
