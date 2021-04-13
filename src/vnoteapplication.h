@@ -46,7 +46,7 @@ public slots:
     //进程单例处理
     void onNewProcessInstance(qint64 pid, const QStringList &arguments);
 
-protected:
+public:
     //重写标题栏退出事件
     virtual void handleQuitAction() override;
 

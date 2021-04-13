@@ -24,6 +24,8 @@
 #include "globaldef.h"
 #include "common/performancemonitor.h"
 
+#include <signal.h>
+
 #include <DApplication>
 #include <DApplicationSettings>
 #include <DGuiApplicationHelper>
@@ -33,6 +35,21 @@
 
 DCORE_USE_NAMESPACE
 DWIDGET_USE_NAMESPACE
+
+void signalHander(int signo)
+{
+    switch (signo) {
+    case SIGINT:
+        break;
+    case SIGTERM: {
+        VNoteApplication *app = dynamic_cast<VNoteApplication *>(qApp);
+        app->handleQuitAction();
+        qInfo() << "get SIGTERM";
+    } break;
+    default:
+        break;
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -52,14 +69,14 @@ int main(int argc, char *argv[])
 
     qputenv("DTK_USE_SEMAPHORE_SINGLEINSTANCE", "1");
 
-    DGuiApplicationHelper::instance()->setSingelInstanceInterval(-1);
+    DGuiApplicationHelper::instance()->setSingleInstanceInterval(-1);
     if (!DGuiApplicationHelper::instance()->setSingleInstance(
             app.applicationName(),
             DGuiApplicationHelper::UserScope)) {
         return 0;
     }
 
-    DApplicationSettings settings;
+    signal(SIGTERM, signalHander);
 
     DLogManager::registerConsoleAppender();
     DLogManager::registerFileAppender();
