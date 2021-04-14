@@ -105,6 +105,8 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     hlayout->addStretch();
     vlayout->addLayout(hlayout);
     vlayout->addStretch(7);
+    hlayout->setContentsMargins(0, 0, 0, 0);
+    vlayout->setContentsMargins(0, 0, 0, 0);
     setLayout(vlayout);
 }
 
@@ -332,24 +334,38 @@ void VnoteMultipleChoiceOptionWidget::onFontChanged()
     m_moveButton->setFixedHeight(m_iconWidth + 2);
     m_deleteButton->setText(DApplication::translate("NotesContextMenu", "Delete"));
     m_deleteButton->setFixedHeight(m_iconWidth + 2);
-    //计算参数
-    int midWidth = width() - m_moveButton->width() - m_deleteButton->width();
-    int iconWidth = qCeil(qApp->devicePixelRatio() * m_iconWidth) + 11;
+    //    //计算参数
+    int iconWidth = qCeil(qApp->devicePixelRatio() * m_iconWidth) + 30;
     int saveTextWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save as TXT")) + iconWidth;
     int saveVoiceWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save voice recording")) + iconWidth;
-    //设置saveAsTxt按钮和saveAsVoice按钮文本和size
-    if (midWidth > saveTextWidth + saveVoiceWidth + 11) {
-        m_saveTextButton->setFixedSize(saveTextWidth + 5, m_iconWidth + 2);
-        m_saveVoiceButton->setFixedSize(saveVoiceWidth + 5, m_iconWidth + 2);
+    int deleteButtonWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Delete")) + iconWidth;
+    int moveButtonWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Move")) + iconWidth;
+
+    m_moveButton->setFixedWidth(moveButtonWidth);
+    m_deleteButton->setFixedWidth(deleteButtonWidth);
+    m_saveTextButton->setFixedSize(saveTextWidth, m_iconWidth + 2);
+    m_saveVoiceButton->setFixedSize(saveVoiceWidth, m_iconWidth + 2);
+
+    if (m_saveTextButton->width() + m_saveVoiceButton->width() + m_deleteButton->width() + m_moveButton->width() <= width()) {
         m_saveTextButton->setText(DApplication::translate("NotesContextMenu", "Save as TXT"));
         m_saveVoiceButton->setText(DApplication::translate("NotesContextMenu", "Save voice recording"));
-    } else if (midWidth > 0) {
-        m_saveTextButton->setFixedSize(midWidth / 2 - 11, m_iconWidth + 2);
-        m_saveVoiceButton->setFixedSize(midWidth / 2 - 11, m_iconWidth + 2);
-        m_saveTextButton->setText(fontMetrics.elidedText(DApplication::translate("NotesContextMenu", "Save as TXT"), Qt::ElideRight, midWidth / 2 - iconWidth - 11));
-        m_saveVoiceButton->setText(fontMetrics.elidedText(DApplication::translate("NotesContextMenu", "Save voice recording"), Qt::ElideRight, midWidth / 2 - iconWidth - 11));
+    } else {
+        int midWidth = (width() - m_deleteButton->width() - m_moveButton->width()) / 2;
+        if (m_saveTextButton->width() > midWidth) {
+            m_saveTextButton->setFixedWidth(midWidth);
+            m_saveTextButton->setText(fontMetrics.elidedText(DApplication::translate("NotesContextMenu", "Save as TXT"), Qt::ElideRight, midWidth - iconWidth));
+        } else {
+            m_saveTextButton->setText(DApplication::translate("NotesContextMenu", "Save as TXT"));
+        }
+        saveVoiceWidth = width() - m_deleteButton->width() - m_moveButton->width() - m_saveTextButton->width() - 30;
+        if (saveVoiceWidth < m_saveVoiceButton->width()) {
+            m_saveVoiceButton->setFixedWidth(saveVoiceWidth);
+            m_saveVoiceButton->setText(fontMetrics.elidedText(DApplication::translate("NotesContextMenu", "Save voice recording"), Qt::ElideRight, saveVoiceWidth - iconWidth));
+        } else {
+            m_saveVoiceButton->setText(DApplication::translate("NotesContextMenu", "Save voice recording"));
+        }
     }
-    //设置iconSize
+
     QSize iconSize(m_iconWidth, m_iconWidth);
     m_moveButton->setIconSize(iconSize);
     m_saveTextButton->setIconSize(iconSize);
