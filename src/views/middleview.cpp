@@ -496,6 +496,12 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
         if (currentIndex() == m_index) {
             //触控屏手势
             if (event->source() == Qt::MouseEventSynthesizedByQt) {
+                //记录此时触控点的位置，用于move事件中滑动距离与速度
+                m_touchPressPoint = event->pos();
+                m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
+                //更新触摸状态
+                setTouchState(TouchPressing);
+                m_noteMenu->setPressPoint(QCursor::pos());
                 //是否弹出右键菜单
                 m_popMenuTimer->start(1000);
                 return;
