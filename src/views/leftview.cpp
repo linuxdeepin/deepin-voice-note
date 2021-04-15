@@ -163,6 +163,11 @@ void LeftView::mousePressEvent(QMouseEvent *event)
         //置灰状态下只有当前记事本可操作
         if (currentIndex() == indexAt(event->pos())) {
             if (event->source() == Qt::MouseEventSynthesizedByQt) {
+                m_touchPressPoint = event->pos();
+                m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
+                //更新触摸状态
+                setTouchState(TouchPressing);
+                m_notepadMenu->setPressPoint(QCursor::pos());
                 m_popMenuTimer->start(1000);
                 return;
             } else {
