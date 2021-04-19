@@ -156,14 +156,12 @@ void VNoteMainWindow::initConnections()
 
     connect(m_rightView, &RightView::contentChanged,
             m_middleView, &MiddleView::onNoteChanged);
-
     connect(m_rightView, &RightView::sigVoicePlay,
             this, &VNoteMainWindow::onRightViewVoicePlay);
     connect(m_rightView, &RightView::sigVoicePause,
             this, &VNoteMainWindow::onRightViewVoicePause);
     connect(m_rightView, &RightView::sigCursorChange,
             this, &VNoteMainWindow::onCursorChange);
-
     connect(m_rightView, &RightView::requestToSlide,
             this, &VNoteMainWindow::slideRightScrollBar);
 
@@ -2224,6 +2222,7 @@ void VNoteMainWindow::handleMultipleOption(int id)
 void VNoteMainWindow::onVirtualKeyboardShow(bool show)
 {
     if (m_virtualKeyboard) {
+        m_currentVirtualKeyboardShow = show;
         if (show) {
             QRect rc = m_virtualKeyboard->property("geometry").toRect();
             this->setFixedHeight(QApplication::desktop()->geometry().height() - rc.height());
@@ -2267,8 +2266,18 @@ void VNoteMainWindow::initVirtualKeyboard()
                                            QDBusConnection::sessionBus());
     if (m_virtualKeyboard->isValid()) {
         connect(m_virtualKeyboard, SIGNAL(imActiveChanged(bool)), this, SLOT(onVirtualKeyboardShow(bool)));
+        m_currentVirtualKeyboardShow = m_virtualKeyboard->property("imActive").toBool();
     } else {
         delete m_virtualKeyboard;
         m_virtualKeyboard = nullptr;
+    }
+}
+
+void VNoteMainWindow::onSetVirtualKeyboardShow(bool show)
+{
+    if(m_virtualKeyboard){
+        if(m_currentVirtualKeyboardShow != show && m_virtualKeyboard->setProperty("imActive", show)){
+            m_currentVirtualKeyboardShow = show;
+        }
     }
 }

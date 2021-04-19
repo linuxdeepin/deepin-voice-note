@@ -227,6 +227,7 @@ public slots:
     void handleMultipleOption(int id);
     void onVirtualKeyboardShow(bool show);
     void slideRightScrollBar(bool isUp);
+    void onSetVirtualKeyboardShow(bool show);
 
 private:
     //左侧列表视图操作相关
@@ -334,6 +335,7 @@ private:
     DSettingsDialog *m_settingDialog {nullptr};
     friend class VNMainWndDelayInitTask;
     QDBusInterface *m_virtualKeyboard {nullptr};
+    bool m_currentVirtualKeyboardShow {false};
 };
 
 #endif // VNOTEMAINWINDOW_H

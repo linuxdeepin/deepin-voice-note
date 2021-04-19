@@ -255,6 +255,7 @@ void RightView::onTextEditFocusIn()
         }
         adjustVerticalScrollBar(widget, height);
     }
+    Utils::setImVisible(true);
 }
 
 /**
@@ -266,6 +267,7 @@ void RightView::onTextEditFocusOut()
         TextNoteItem *widget = static_cast<TextNoteItem *>(sender());
         Utils::documentToBlock(widget->getNoteBlock(), widget->getTextDocument());
     }
+    Utils::setImVisible(false);
     saveNote();
 }
 

@@ -54,4 +54,5 @@ public:
     static void setDefaultColor(QTextDocument *srcDoc, const QColor &color);
     //创建多级文件夹
     static QString mkMutiDir(const QString &path);
+    static void setImVisible(bool visible);
 };

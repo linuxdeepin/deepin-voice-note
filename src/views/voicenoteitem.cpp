@@ -467,6 +467,7 @@ void VoiceNoteItem::setFocus()
     QWidget *parent = static_cast<QWidget *>(this->parent());
     if (parent) {
         parent->setFocus();
+        Utils::setImVisible(false);
     }
 }
 

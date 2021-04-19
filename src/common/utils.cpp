@@ -21,6 +21,7 @@
 #include "utils.h"
 #include "globaldef.h"
 #include "vnoteitem.h"
+#include "vnoteapplication.h"
 
 #include <QImageReader>
 #include <QIcon>
@@ -281,4 +282,12 @@ QString Utils::mkMutiDir(const QString &path)
     if (!dirname.isEmpty())
         parentPath.mkpath(dirname);
     return parentDir + "/" + dirname;
+}
+
+void Utils::setImVisible(bool visible)
+{
+    VNoteApplication *app = dynamic_cast<VNoteApplication *>(qApp);
+    if(app){
+        app->mainWindow()->onSetVirtualKeyboardShow(visible);
+    }
 }
