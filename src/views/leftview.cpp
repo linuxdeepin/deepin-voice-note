@@ -32,6 +32,7 @@
 #include "common/vnoteforlder.h"
 #include "common/vnoteitem.h"
 #include "common/setting.h"
+#include "common/utils.h"
 #include "widgets/vnoterightmenu.h"
 #include "db/vnoteitemoper.h"
 
@@ -400,14 +401,22 @@ void LeftView::addFolder(VNoteFolder *folder)
  */
 bool LeftView::eventFilter(QObject *o, QEvent *e)
 {
-    Q_UNUSED(o)
-    if (e->type() == QEvent::DragLeave) {
-        m_pItemDelegate->setDrawHover(false);
-        update();
-    } else if (e->type() == QEvent::DragEnter) {
-        m_pItemDelegate->setDrawHover(true);
-        update();
+    if (o == viewport()) {
+        if (e->type() == QEvent::DragLeave) {
+            m_pItemDelegate->setDrawHover(false);
+            update();
+        } else if (e->type() == QEvent::DragEnter) {
+            m_pItemDelegate->setDrawHover(true);
+            update();
+        }
+    } else {
+        if (e->type() == QEvent::FocusIn || e->type() == QEvent::MouseButtonPress) {
+            Utils::setImVisible(true);
+        } else if (e->type() == QEvent::FocusOut) {
+            Utils::setImVisible(false);
+        }
     }
+
     return false;
 }
 

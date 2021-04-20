@@ -29,6 +29,7 @@
 #include "common/vnoteitem.h"
 #include "task/exportnoteworker.h"
 #include "common/setting.h"
+#include "common/utils.h"
 #include "db/vnoteitemoper.h"
 #include "moveview.h"
 
@@ -799,7 +800,12 @@ bool MiddleView::eventFilter(QObject *o, QEvent *e)
     Q_UNUSED(o);
     if (e->type() == QEvent::FocusIn) {
         m_pItemDelegate->setEditIsVisible(true);
+        Utils::setImVisible(true);
         this->update(currentIndex());
+    } else if (e->type() == QEvent::MouseButtonPress) {
+        Utils::setImVisible(true);
+    } else if (e->type() == QEvent::FocusOut) {
+        Utils::setImVisible(false);
     } else if (e->type() == QEvent::Destroy) {
         m_pItemDelegate->setEditIsVisible(false);
         this->update(currentIndex());

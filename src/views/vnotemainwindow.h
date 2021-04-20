@@ -30,6 +30,8 @@
 #include <QList>
 #include <QDBusPendingReply>
 #include <QDBusInterface>
+#include <QMutex>
+#include <QStack>
 
 #include <DMainWindow>
 #include <DSearchEdit>
@@ -336,6 +338,8 @@ private:
     friend class VNMainWndDelayInitTask;
     QDBusInterface *m_virtualKeyboard {nullptr};
     bool m_currentVirtualKeyboardShow {false};
+    QMutex m_imShowFlagMutex;
+    QStack<bool> m_imShowFlags;
 };
 
 #endif // VNOTEMAINWINDOW_H
