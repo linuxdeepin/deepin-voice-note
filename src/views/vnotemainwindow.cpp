@@ -498,6 +498,7 @@ void VNoteMainWindow::initTitleBar()
     DFontSizeManager::instance()->bind(m_noteSearchEdit, DFontSizeManager::T6);
     m_noteSearchEdit->setFixedSize(QSize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H));
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
+    m_noteSearchEdit->lineEdit()->installEventFilter(this);
     titlebar()->addWidget(m_noteSearchEdit);
 }
 
@@ -2244,9 +2245,16 @@ void VNoteMainWindow::onVirtualKeyboardShow(bool show)
 
 bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
 {
-    Q_UNUSED(o)
-    if (e->type() == QEvent::MouseMove) {
-        return true;
+    if (o == m_settingDialog) {
+        if (e->type() == QEvent::MouseMove) {
+            return true;
+        }
+    } else {
+        if (e->type() == QEvent::FocusIn || e->type() == QEvent::MouseButtonPress) {
+            onSetVirtualKeyboardShow(true);
+        } else if (e->type() == QEvent::FocusOut) {
+            onSetVirtualKeyboardShow(false);
+        }
     }
     return false;
 }
