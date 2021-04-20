@@ -2225,13 +2225,15 @@ void VNoteMainWindow::onVirtualKeyboardShow(bool show)
     if (m_virtualKeyboard) {
         m_currentVirtualKeyboardShow = show;
         if (show) {
-            QRect rc = m_virtualKeyboard->property("geometry").toRect();
-            this->setFixedHeight(QApplication::desktop()->geometry().height() - rc.height());
-            if (m_recordBarHolder->height() != 0) {
-                m_recordBarHolder->setFixedHeight(0);
-                m_addNoteBtn->setFixedHeight(0);
-                m_addNotepadBtn->setFixedHeight(0);
-            }
+            QTimer::singleShot(300, this, [=] {
+                QRect rc = m_virtualKeyboard->property("geometry").toRect();
+                this->setFixedHeight(QApplication::desktop()->geometry().height() - rc.height());
+                if (m_recordBarHolder->height() != 0) {
+                    m_recordBarHolder->setFixedHeight(0);
+                    m_addNoteBtn->setFixedHeight(0);
+                    m_addNotepadBtn->setFixedHeight(0);
+                }
+            });
         } else {
             if (m_recordBarHolder->height() == 0) {
                 m_recordBarHolder->setFixedHeight(78);
@@ -2287,7 +2289,7 @@ void VNoteMainWindow::onSetVirtualKeyboardShow(bool show)
         m_imShowFlagMutex.lock();
         m_imShowFlags.push(show);
         m_imShowFlagMutex.unlock();
-        QTimer::singleShot(100, this, [=] {
+        QTimer::singleShot(300, this, [=] {
             m_imShowFlagMutex.lock();
             if (m_imShowFlags.size()) {
                 bool flag = m_imShowFlags.pop();
