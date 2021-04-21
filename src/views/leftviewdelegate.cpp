@@ -38,9 +38,9 @@
  * @param parent
  */
 //首个index高度参数
-static const int firstIndexHeightParam = 51;
+static const int firstIndexHeightParam = 60;
 //尾个index高度参数
-static const int lastIndexHeightParam = 52;
+static const int lastIndexHeightParam = 61;
 LeftViewDelegate::LeftViewDelegate(QAbstractItemView *parent)
     : DStyledItemDelegate(parent)
     , m_treeView(parent)
@@ -129,7 +129,7 @@ void LeftViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionV
                                             const QModelIndex &index) const
 {
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
-    int y = 8;
+    int y = 12;
     if (0 == index.row()) {
         y += 5;
     }
@@ -158,7 +158,7 @@ QSize LeftViewDelegate::sizeHint(const QStyleOptionViewItem &option,
     QModelIndex nextIndex = index.siblingAtRow(index.row() + 1);
 
     //待移动记事本列表行高36,左侧记事本列表行高47px
-    int height = (m_isPendingList) ? 36 : 47;
+    int height = (m_isPendingList) ? 36 : 56;
     switch (type) {
     case StandardItemCommon::NOTEPADROOT:
         return QSize(option.rect.width(), 1); //隐藏记事本一级目录
