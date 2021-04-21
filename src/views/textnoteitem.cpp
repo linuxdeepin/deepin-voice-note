@@ -30,7 +30,7 @@
 
 #include <DStyle>
 #include <DApplicationHelper>
-
+#include <DFontSizeManager>
 /**
  * @brief TextNoteItem::TextNoteItem
  * @param noteBlock 绑定的数据
@@ -58,6 +58,7 @@ void TextNoteItem::initUi()
     DPalette pb = DApplicationHelper::instance()->palette(m_textEdit);
     pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));
     m_textEdit->setPalette(pb);
+    DFontSizeManager::instance()->bind(m_textEdit, DFontSizeManager::T6);
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_textEdit);
