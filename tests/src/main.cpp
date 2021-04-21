@@ -4,6 +4,10 @@
 #include <QStandardPaths>
 #include <QDebug>
 
+#if defined(CMAKE_SAFETYTEST_ARG_ON)
+#include <sanitizer/asan_interface.h>
+#endif
+
 #include "common/vnotedatamanager.h"
 #include "common/vnoteforlder.h"
 #include "common/metadataparser.h"
@@ -84,5 +88,11 @@ int main(int argc, char *argv[])
 
     testing::InitGoogleTest(&argc, argv);
     testing::AddGlobalTestEnvironment(new GlobalEnvent);
-    return RUN_ALL_TESTS();
+    int ret = RUN_ALL_TESTS();
+
+#if defined(CMAKE_SAFETYTEST_ARG_ON)
+    __sanitizer_set_report_path("asan.log");
+#endif
+
+    return ret;
 }

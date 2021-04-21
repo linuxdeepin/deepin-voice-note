@@ -27,8 +27,22 @@ set(APP_QRC "../assets/images.qrc")
 
 ADD_COMPILE_OPTIONS(-fno-access-control)
 
+set(CMAKE_SAFETYTEST "${CMAKE_SAFETYTEST_ARG}")
+
+if(CMAKE_SAFETYTEST STREQUAL "")
+    set(CMAKE_SAFETYTEST "CMAKE_SAFETYTEST_ARG_OFF")
+endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D${CMAKE_SAFETYTEST}")
+
+if(CMAKE_SAFETYTEST STREQUAL "CMAKE_SAFETYTEST_ARG_ON")
+  #安全测试选项
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fsanitize=address -O2")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fsanitize=address -O2")
+endif()
+
 # 设置添加gocv相关信息的输出
-set(CMAKE_CXX_FLAGS "-g -fprofile-arcs -ftest-coverage")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fprofile-arcs -ftest-coverage")
 
 find_package(Qt5Test REQUIRED)
 find_package(GTest REQUIRED)
@@ -52,9 +66,6 @@ file(GLOB_RECURSE VNOTE_SRC_TEST ${CMAKE_CURRENT_LIST_DIR}/../src/*.cpp)
 file(GLOB_RECURSE VNOTE_SRC_TEST1 ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
 
 list(REMOVE_ITEM VNOTE_SRC_TEST "${CMAKE_CURRENT_LIST_DIR}/../src/main.cpp")
-list(REMOVE_ITEM VNOTE_SRC_TEST "${CMAKE_CURRENT_LIST_DIR}/../src/common/vnoteaudiodevicewatcher.cpp")
-list(REMOVE_ITEM VNOTE_SRC_TEST "${CMAKE_CURRENT_LIST_DIR}/../src/common/vnoteaudiomanager.cpp")
-
 
 # 生成测试可执行程序
 add_executable(${PROJECT_NAME_TEST}
