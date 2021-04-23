@@ -1852,9 +1852,9 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_leftView->setEnabled(true);
             m_addNotepadBtn->setVisible(true);
             m_addNoteBtn->setVisible(true);
-            m_noteSearchEdit->lineEdit()->setFocus();
             stateOperation->operState(OpsStateInterface::StateSearching, false);
             onVNoteFolderChange(m_leftView->restoreNotepadItem(), QModelIndex());
+            m_noteSearchEdit->lineEdit()->setFocus();
         }
         break;
     case PlayVoiceStart:
@@ -2256,6 +2256,12 @@ bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
             onSetVirtualKeyboardShow(true);
         } else if (e->type() == QEvent::FocusOut) {
             onSetVirtualKeyboardShow(false);
+        } else if (e->type() == QEvent::KeyPress) {
+            QKeyEvent *keyEvent = dynamic_cast<QKeyEvent *>(e);
+            if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
+                onVNoteSearch();
+                return true;
+            }
         }
     }
     return false;
