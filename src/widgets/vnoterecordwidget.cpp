@@ -21,7 +21,7 @@
 
 #include "vnoterecordwidget.h"
 #include "common/utils.h"
-
+#include <unistd.h>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QStandardPaths>
@@ -219,5 +219,11 @@ void VNoteRecordWidget::setAudioDevice(QString device)
 void VNoteRecordWidget::onGstreamerFinshRecord()
 {
     m_audioRecoder->setStateToNull();
+    QFile f(m_recordPath);
+    if (f.open(QIODevice::ReadWrite | QIODevice::Text)) {
+        f.flush(); //将用户缓存中的内容写入内核缓冲区
+        fsync(f.handle()); //将内核缓冲写入磁盘
+        f.close();
+    }
     emit sigFinshRecord(m_recordPath, m_recordMsec);
 }
