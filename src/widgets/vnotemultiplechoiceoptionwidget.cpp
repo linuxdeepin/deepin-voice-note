@@ -351,7 +351,7 @@ void VnoteMultipleChoiceOptionWidget::onFontChanged()
         m_saveVoiceButton->setText(DApplication::translate("NotesContextMenu", "Save voice recording"));
     } else {
         int midWidth = (width() - m_deleteButton->width() - m_moveButton->width()) / 2;
-        if (m_saveTextButton->width() > midWidth) {
+        if (midWidth > 0 && m_saveTextButton->width() > midWidth) {
             m_saveTextButton->setFixedWidth(midWidth);
             m_saveTextButton->setText(fontMetrics.elidedText(DApplication::translate("NotesContextMenu", "Save as TXT"), Qt::ElideRight, midWidth - iconWidth));
         } else {
