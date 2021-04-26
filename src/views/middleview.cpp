@@ -381,7 +381,7 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
         QModelIndex modelIndex = indexAt(event->pos());
         if (!modelIndex.isValid())
             return;
-        m_index = indexAt(event->pos());
+        m_index = modelIndex;
         m_currentRow = m_currentRow == -1 ? 0 : m_currentRow;
         if (Qt::LeftButton == event->button() || Qt::MidButton == event->button()) {
             //ctrl+左/中键

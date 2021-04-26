@@ -747,7 +747,6 @@ void LeftView::dragEnterEvent(QDragEnterEvent *event)
  */
 void LeftView::dragMoveEvent(QDragMoveEvent *event)
 {
-    qDebug() << "dragmove";
     DTreeView::dragMoveEvent(event);
     this->update();
     event->accept();
