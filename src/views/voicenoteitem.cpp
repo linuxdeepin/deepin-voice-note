@@ -88,14 +88,8 @@ void VoiceNoteItem::initUi()
     DFontSizeManager::instance()->bind(m_voiceNameLab, DFontSizeManager::T6);
 
     m_hornLab = new DLabel(m_bgWidget);
-    m_hornLab->setFixedSize(28, 25);
-
-    m_hornLab->setAlignment(Qt::AlignRight);
-    DAnchorsBase buttonAnchor(m_hornLab);
-    buttonAnchor.setAnchor(Qt::AnchorRight, m_bgWidget, Qt::AnchorRight);
-    buttonAnchor.setAnchor(Qt::AnchorTop, m_bgWidget, Qt::AnchorTop);
-    buttonAnchor.setTopMargin(10);
-    buttonAnchor.setRightMargin(25);
+    DFontSizeManager::instance()->bind(m_hornLab, DFontSizeManager::T6);
+    m_hornLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
 
     QVBoxLayout *playBtnLayout = new QVBoxLayout;
     playBtnLayout->addWidget(m_playBtn);
@@ -111,10 +105,12 @@ void VoiceNoteItem::initUi()
     nameLayout->setSpacing(0);
 
     QVBoxLayout *rightLayout = new QVBoxLayout;
-    rightLayout->addSpacing(34);
-    rightLayout->setContentsMargins(5, 5, 20, 5);
+    rightLayout->addSpacing(2);
+    rightLayout->addWidget(m_hornLab);
+    rightLayout->addSpacing(4);
+    rightLayout->setContentsMargins(0, 0, 20, 0);
     rightLayout->addWidget(m_voiceSizeLab);
-    rightLayout->setSizeConstraint(QLayout::SetNoConstraint);
+    rightLayout->setSpacing(0);
 
     QHBoxLayout *itemLayout = new QHBoxLayout;
     itemLayout->addLayout(playBtnLayout);
