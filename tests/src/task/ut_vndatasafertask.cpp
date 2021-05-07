@@ -16,7 +16,7 @@ TEST_F(ut_vndatasafertask_test, run)
     param.saferType = VDataSafer::Safe;
     VNDataSaferTask taskSafe(param);
     taskSafe.run();
-    VNDataSaferTask taskUnSafe(param);
     param.saferType = VDataSafer::Unsafe;
+    VNDataSaferTask taskUnSafe(param);
     taskUnSafe.run();
 }

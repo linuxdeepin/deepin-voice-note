@@ -21,6 +21,7 @@
 #include "gtest/gtest.h"
 #include <QTest>
 #include <QObject>
+class DBusLogin1Manager;
 
 class ut_dbuslogin1manager_test : public QObject
     , public ::testing::Test
@@ -28,6 +29,9 @@ class ut_dbuslogin1manager_test : public QObject
     Q_OBJECT
 public:
     ut_dbuslogin1manager_test();
+    virtual void SetUp() override;
+    virtual void TearDown() override;
+    DBusLogin1Manager *m_loginManager {nullptr};
 };
 
 #endif // UT_DBUSLOGIN1MANAGER_H
