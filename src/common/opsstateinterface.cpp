@@ -32,19 +32,19 @@ static OpsStateInterface *objectInstance = nullptr;
 OpsStateInterface::OpsStateInterface()
 {
     bool fAiServiceExist = false;
-    DSysInfo::DeepinType deepinType = DSysInfo::deepinType();
-    switch (deepinType) {
-    case DSysInfo::DeepinProfessional:
-    case DSysInfo::DeepinPersonal:
+    DSysInfo::UosEdition uosType = DSysInfo::uosEditionType();
+    switch (uosType) {
+    case DSysInfo::UosProfessional:
+    case DSysInfo::UosHome:
         fAiServiceExist = true;
         break;
     default:
         break;
     }
-    QString systemInfo = QString("[%1-%2]")
-                             .arg(DSysInfo::operatingSystemName())
-                             .arg(DSysInfo::deepinTypeDisplayName());
-
+    QString systemInfo = QString("[%1-%2-%3]")
+                             .arg(DSysInfo::uosSystemName())
+                             .arg(DSysInfo::uosProductTypeName())
+                             .arg(DSysInfo::uosEditionName());
     qInfo() << systemInfo << " IsAvailable use voice to text:" << fAiServiceExist;
     operState(StateAISrvAvailable, fAiServiceExist);
 }
