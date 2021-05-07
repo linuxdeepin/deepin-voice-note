@@ -35,7 +35,7 @@ public:
     virtual void TearDown() override;
 
 protected:
-    StandardItemCommon *m_standarditemcommon;
+    StandardItemCommon *m_standarditemcommon {nullptr};
 };
 
 #endif // UT_STANDARDITEMCOMMON_H

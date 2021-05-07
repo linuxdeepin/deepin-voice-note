@@ -36,7 +36,7 @@ protected:
     virtual void TearDown() override;
 
 private:
-    VNotePlayWidget* m_vnoteplaywidget;
+    VNotePlayWidget *m_vnoteplaywidget {nullptr};
 };
 
 #endif // UT_VNOTEPLAYWIDGET_H

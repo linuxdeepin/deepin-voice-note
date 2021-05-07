@@ -34,7 +34,7 @@ public:
     virtual void TearDown() override;
 
 protected:
-    VNoteOldDataManager *m_vnoteolddatamanager;
+    VNoteOldDataManager *m_vnoteolddatamanager {nullptr};
 };
 
 #endif // UT_VNOTEOLDDATAMANAGER_H

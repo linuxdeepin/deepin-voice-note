@@ -36,29 +36,20 @@ void ut_audiowatcher_test::TearDown()
 
 TEST_F(ut_audiowatcher_test, getDeviceName)
 {
-    m_AudioWatcher->getDeviceName(m_AudioWatcher->Internal);
-    m_AudioWatcher->getDeviceName(m_AudioWatcher->Micphone);
+    m_AudioWatcher->getDeviceName(AudioWatcher::Internal);
+    m_AudioWatcher->getDeviceName(AudioWatcher::Micphone);
 }
 
 TEST_F(ut_audiowatcher_test, getVolume)
 {
-    m_AudioWatcher->getVolume(m_AudioWatcher->Internal);
-    m_AudioWatcher->getVolume(m_AudioWatcher->Micphone);
+    m_AudioWatcher->getVolume(AudioWatcher::Internal);
+    m_AudioWatcher->getVolume(AudioWatcher::Micphone);
 }
 
 TEST_F(ut_audiowatcher_test, getMute)
 {
-    if (m_AudioWatcher->m_inAudioMute) {
-        m_AudioWatcher->getMute(m_AudioWatcher->Micphone);
-    } else {
-        m_AudioWatcher->getMute(m_AudioWatcher->Micphone);
-    }
-
-    if (m_AudioWatcher->m_outAudioMute) {
-        m_AudioWatcher->getMute(m_AudioWatcher->Internal);
-    } else {
-        m_AudioWatcher->getMute(m_AudioWatcher->Internal);
-    }
+    m_AudioWatcher->getMute(AudioWatcher::Internal);
+    m_AudioWatcher->getMute(AudioWatcher::Micphone);
 }
 
 TEST_F(ut_audiowatcher_test, onDefaultSourceActivePortChanged)
@@ -88,7 +79,6 @@ TEST_F(ut_audiowatcher_test, onDefaultSinkChanaged)
 TEST_F(ut_audiowatcher_test, onSourceVolumeChanged)
 {
     double tmpdl = 0.8;
-    double testinAudioPortVolume = m_AudioWatcher->m_inAudioPortVolume;
     m_AudioWatcher->onSourceVolumeChanged(tmpdl);
 
     AudioPort tmpAudioPort = m_AudioWatcher->m_pDefaultSource->activePort();
@@ -100,7 +90,6 @@ TEST_F(ut_audiowatcher_test, onSourceVolumeChanged)
 TEST_F(ut_audiowatcher_test, onSinkVolumeChanged)
 {
     double tmpdl = 0.8;
-    double testinAudioPortVolume = m_AudioWatcher->m_outAudioPortVolume;
     m_AudioWatcher->onSinkVolumeChanged(tmpdl);
 
     AudioPort tmpAudioPort = m_AudioWatcher->m_pDefaultSink->activePort();

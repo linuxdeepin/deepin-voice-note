@@ -105,10 +105,7 @@ TEST_F(ut_rightview_test, onTextEditTextChange)
 TEST_F(ut_rightview_test, initAction)
 {
     RightView rightview;
-    QLayoutItem *layoutItem = rightview.m_viewportLayout->itemAt(0);
-    DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
-    widget = nullptr;
-    rightview.initAction(widget);
+    rightview.initAction(nullptr);
 }
 
 TEST_F(ut_rightview_test, mousePressEvent)
@@ -178,20 +175,20 @@ TEST_F(ut_rightview_test, adjustVoiceVerticalScrollBar)
 //    rightview.onVoicePlay(item);
 //}
 
-TEST_F(ut_rightview_test, onVoicePause)
-{
-    RightView rightview;
-    VNOTE_DATAS datas;
-    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
-    vnvoiceblock->voicePath = "/usr/share/music/bensound-sunny.mp3";
-    vnvoiceblock->voiceSize = 2650;
-    vnvoiceblock->voiceTitle = "test";
-    vnvoiceblock->state = true;
-    VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
-    block->ptrVoice = vnvoiceblock;
-    VoiceNoteItem *item = new VoiceNoteItem(block);
-    //    rightview.onVoicePause(item);
-}
+//TEST_F(ut_rightview_test, onVoicePause)
+//{
+//    RightView rightview;
+//    VNOTE_DATAS datas;
+//    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
+//    vnvoiceblock->voicePath = "/usr/share/music/bensound-sunny.mp3";
+//    vnvoiceblock->voiceSize = 2650;
+//    vnvoiceblock->voiceTitle = "test";
+//    vnvoiceblock->state = true;
+//    VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
+//    block->ptrVoice = vnvoiceblock;
+//    VoiceNoteItem *item = new VoiceNoteItem(block);
+//    rightview.onVoicePause(item);
+//}
 
 TEST_F(ut_rightview_test, onPlayUpdate)
 {

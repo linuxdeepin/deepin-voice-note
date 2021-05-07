@@ -40,6 +40,7 @@ TEST_F(ut_vnotedatamanager_test, instance)
 {
     VNoteDataManager *vnotedatamanager;
     vnotedatamanager = VNoteDataManager::instance();
+    ASSERT_FALSE(vnotedatamanager == nullptr);
 }
 
 TEST_F(ut_vnotedatamanager_test, addFolder)

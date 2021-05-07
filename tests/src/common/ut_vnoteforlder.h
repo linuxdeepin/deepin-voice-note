@@ -35,7 +35,7 @@ public:
     virtual void TearDown() override;
 
 protected:
-    VNoteFolder *m_vnoteforlder;
+    VNoteFolder *m_vnoteforlder {nullptr};
 };
 
 #endif // UT_VNOTEFORLDER_H

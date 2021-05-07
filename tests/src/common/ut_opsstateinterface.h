@@ -34,7 +34,7 @@ public:
     virtual void TearDown() override;
 
 protected:
-    OpsStateInterface *m_opsstateinterface;
+    OpsStateInterface *m_opsstateinterface {nullptr};
 };
 
 #endif // UT_OPSSTATEINTERFACE_H

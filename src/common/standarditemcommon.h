@@ -36,7 +36,7 @@ public:
         NOTEITEM //笔记项
     };
     Q_ENUM(StandardItemType)
-    StandardItemCommon();
+    explicit StandardItemCommon();
     //生成数据项
     static QStandardItem *createStandardItem(void *data, StandardItemType type);
     //获取数据类型

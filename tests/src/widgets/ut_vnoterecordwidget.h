@@ -36,7 +36,7 @@ protected:
     virtual void TearDown() override;
 
 private:
-    VNoteRecordWidget* m_vnoterecordwidget;
+    VNoteRecordWidget *m_vnoterecordwidget {nullptr};
 };
 
 #endif // UT_VNOTERECORDWIDGET_H

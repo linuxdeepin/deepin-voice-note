@@ -35,7 +35,7 @@ public:
     virtual void TearDown() override;
 
 protected:
-    VNTaskWorker *m_vntaskworker;
+    VNTaskWorker *m_vntaskworker {nullptr};
 };
 
 #endif // UT_VNTASKWORKER_H

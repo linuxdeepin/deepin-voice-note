@@ -27,6 +27,7 @@ TEST_F(ut_vnotedatasafefymanager_test, instance)
 {
     VNoteDataSafefyManager *vnotedatasafefymanager;
     vnotedatasafefymanager = VNoteDataSafefyManager::instance();
+    ASSERT_FALSE(vnotedatasafefymanager == nullptr);
 }
 
 TEST_F(ut_vnotedatasafefymanager_test, initTaskWoker)

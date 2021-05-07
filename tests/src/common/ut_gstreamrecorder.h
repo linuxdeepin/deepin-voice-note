@@ -32,7 +32,7 @@ protected:
     virtual void TearDown() override;
 
 private:
-    GstreamRecorder *m_GstreamRecorder;
+    GstreamRecorder *m_GstreamRecorder {nullptr};
 };
 
 #endif // UT_GSTREAMRECORDER_TEST_H

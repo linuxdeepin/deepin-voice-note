@@ -30,7 +30,7 @@ public:
     enum AudioMode { Internal,
                      Micphone };
     Q_ENUM(AudioMode)
-    AudioWatcher(QObject *parent = nullptr);
+    explicit AudioWatcher(QObject *parent = nullptr);
     //获取设备名称
     QString getDeviceName(AudioMode mode);
     //获取设备音量
@@ -54,9 +54,9 @@ protected slots:
     //默认输出设备改变
     void onDefaultSinkChanaged(const QDBusObjectPath &value);
     //默认输入设备音量改变
-    void onSourceVolumeChanged(double d);
+    void onSourceVolumeChanged(double value);
     //默认输出设备音量改变
-    void onSinkVolumeChanged(double d);
+    void onSinkVolumeChanged(double value);
     //默认输入设备静音状态改变
     void onSourceMuteChanged(bool value);
     //默认输出设备静音状态改变

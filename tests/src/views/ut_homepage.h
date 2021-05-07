@@ -30,7 +30,7 @@ public:
     virtual void TearDown() override;
 
 protected:
-    HomePage *m_homepage;
+    HomePage *m_homepage {nullptr};
 };
 
 #endif // UT_HOMEPAGE_H

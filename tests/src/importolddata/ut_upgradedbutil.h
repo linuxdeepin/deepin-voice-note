@@ -34,7 +34,7 @@ public:
     virtual void TearDown() override;
 
 protected:
-    UpgradeDbUtil *m_upgradedbutil;
+    UpgradeDbUtil *m_upgradedbutil {nullptr};
 };
 
 #endif // UT_UPGRADEDBUTIL_H

@@ -34,7 +34,7 @@ public:
     virtual void TearDown() override;
 
 protected:
-    VTextSpeechAndTrManager *m_vtextspeechandtrmanager;
+    VTextSpeechAndTrManager *m_vtextspeechandtrmanager {nullptr};
 };
 
 #endif // UT_VTEXTSPEECHANDTRMANAGER_H

@@ -34,7 +34,7 @@ public:
     virtual void TearDown() override;
 
 protected:
-    VNoteSaferOper *m_vnotesaferoper;
+    VNoteSaferOper *m_vnotesaferoper {nullptr};
 };
 
 #endif // UT_VNOTESAFEROPER_H

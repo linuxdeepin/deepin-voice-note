@@ -171,7 +171,6 @@ TEST_F(ut_middleview_test, appendRow)
     middleview.sortView();
     noteData1->isTop = 1;
     middleview.sortView();
-    noteData1->isTop = 0;
     middleview.m_pSortViewFilter->sortView(MiddleViewSortFilter::title);
     middleview.m_pSortViewFilter->sortView(MiddleViewSortFilter::createTime);
 }
@@ -292,7 +291,7 @@ TEST_F(ut_middleview_test, keyReleaseEvent)
     QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Shift, Qt::NoModifier, "test");
     middleview.keyReleaseEvent(event);
     QKeyEvent *event2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_A, Qt::NoModifier, "test");
-    middleview.keyReleaseEvent(event);
+    middleview.keyReleaseEvent(event2);
 }
 
 TEST_F(ut_middleview_test, getSelectedCount)

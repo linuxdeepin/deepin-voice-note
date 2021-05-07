@@ -44,10 +44,8 @@
 #include "vnoteiconbutton.h"
 #include "vnmainwnddelayinittask.h"
 
-#ifdef IMPORT_OLD_VERSION_DATA
 #include "upgradeview.h"
 #include "upgradedbutil.h"
-#endif
 
 #include "vnoteapplication.h"
 

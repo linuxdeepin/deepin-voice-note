@@ -425,13 +425,15 @@ void VNoteDataManager::reqNoteDefIcons()
  */
 void VNoteDataManager::reqNoteFolders()
 {
-    m_pForldesLoadThread = new LoadFolderWorker();
-    m_pForldesLoadThread->setAutoDelete(true);
+    if (m_pNotesLoadThread == nullptr) {
+        m_pForldesLoadThread = new LoadFolderWorker();
+        m_pForldesLoadThread->setAutoDelete(true);
 
-    connect(m_pForldesLoadThread, &LoadFolderWorker::onFoldersLoaded,
-            this, &VNoteDataManager::onFoldersLoaded);
+        connect(m_pForldesLoadThread, &LoadFolderWorker::onFoldersLoaded,
+                this, &VNoteDataManager::onFoldersLoaded);
 
-    QThreadPool::globalInstance()->start(m_pForldesLoadThread);
+        QThreadPool::globalInstance()->start(m_pForldesLoadThread);
+    }
 }
 
 /**
@@ -439,13 +441,15 @@ void VNoteDataManager::reqNoteFolders()
  */
 void VNoteDataManager::reqNoteItems()
 {
-    m_pNotesLoadThread = new LoadNoteItemsWorker();
-    m_pNotesLoadThread->setAutoDelete(true);
+    if (m_pNotesLoadThread == nullptr) {
+        m_pNotesLoadThread = new LoadNoteItemsWorker();
+        m_pNotesLoadThread->setAutoDelete(true);
 
-    connect(m_pNotesLoadThread, &LoadNoteItemsWorker::onAllNotesLoaded,
-            this, &VNoteDataManager::onAllNotesLoaded);
+        connect(m_pNotesLoadThread, &LoadNoteItemsWorker::onAllNotesLoaded,
+                this, &VNoteDataManager::onAllNotesLoaded);
 
-    QThreadPool::globalInstance()->start(m_pNotesLoadThread);
+        QThreadPool::globalInstance()->start(m_pNotesLoadThread);
+    }
 }
 
 /**

@@ -16,7 +16,7 @@ public:
     virtual void TearDown() override;
 
 protected:
-    VnoteMultipleChoiceOptionWidget *m_widget;
+    VnoteMultipleChoiceOptionWidget *m_widget {nullptr};
 };
 
 #endif // UT_VNOTEMULTIPLECHOICEOPTIONWIDGET_H

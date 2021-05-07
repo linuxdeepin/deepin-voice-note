@@ -134,7 +134,8 @@ TEST_F(ut_leftview_test, keyPressEvent)
     LeftView leftview;
     leftview.m_onlyCurItemMenuEnable = true;
     QKeyEvent *event1 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Up, Qt::NoModifier, "test");
-    leftview.m_onlyCurItemMenuEnable = true;
+    leftview.keyPressEvent(event1);
+    leftview.m_onlyCurItemMenuEnable = false;
     QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Home, Qt::NoModifier, "test2");
     leftview.keyPressEvent(event);
 }

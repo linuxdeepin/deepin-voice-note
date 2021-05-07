@@ -35,7 +35,7 @@ public:
     virtual void TearDown() override;
 
 protected:
-    Utils *m_utils;
+    Utils *m_utils {nullptr};
 };
 
 #endif // UT_UTILS_H

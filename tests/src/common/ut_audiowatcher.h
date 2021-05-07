@@ -32,7 +32,7 @@ protected:
     virtual void TearDown() override;
 
 private:
-    AudioWatcher *m_AudioWatcher;
+    AudioWatcher *m_AudioWatcher {nullptr};
 };
 
 #endif // UT_AUDIOWATCHER_H

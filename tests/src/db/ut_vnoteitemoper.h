@@ -36,7 +36,7 @@ public:
     VNoteItem *m_note {nullptr};
 
 protected:
-    VNoteItemOper *m_vnoteitemoper;
+    VNoteItemOper *m_vnoteitemoper {nullptr};
 };
 
 #endif // UT_VNOTEITEMOPER_H
