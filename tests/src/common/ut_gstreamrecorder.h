@@ -25,14 +25,6 @@ class ut_gstreamrecorder_test : public ::testing::Test
 {
 public:
     ut_gstreamrecorder_test();
-
-    // Test interface
-protected:
-    virtual void SetUp() override;
-    virtual void TearDown() override;
-
-private:
-    GstreamRecorder *m_GstreamRecorder {nullptr};
 };
 
 #endif // UT_GSTREAMRECORDER_TEST_H

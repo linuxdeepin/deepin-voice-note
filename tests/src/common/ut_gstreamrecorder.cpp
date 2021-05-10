@@ -19,84 +19,92 @@
 #include "ut_gstreamrecorder.h"
 #include "gstreamrecorder.h"
 #include "vnoterecordbar.h"
+#include "stub.h"
+#include <QDebug>
+
+static void stub_gstreamrecorde_common()
+{
+    qInfo() << "I am gstreamrecorder common stub";
+}
 
 ut_gstreamrecorder_test::ut_gstreamrecorder_test()
 {
 }
 
-void ut_gstreamrecorder_test::SetUp()
-{
-    m_GstreamRecorder = new GstreamRecorder;
-}
-
-void ut_gstreamrecorder_test::TearDown()
-{
-    delete m_GstreamRecorder;
-}
-
 TEST_F(ut_gstreamrecorder_test, createPipe)
 {
-    m_GstreamRecorder->createPipe();
-}
-
-TEST_F(ut_gstreamrecorder_test, deinit)
-{
-    m_GstreamRecorder->deinit();
+    Stub stub;
+    stub.set(ADDR(GstreamRecorder, createPipe), stub_gstreamrecorde_common);
+    GstreamRecorder gstreamrecorder;
+    gstreamrecorder.createPipe();
 }
 
 TEST_F(ut_gstreamrecorder_test, GetGstState)
 {
-    int state = -1;
-    int pending = -1;
-    m_GstreamRecorder->GetGstState(&state, &pending);
+    Stub stub;
+    stub.set(ADDR(GstreamRecorder, GetGstState), stub_gstreamrecorde_common);
+    GstreamRecorder gstreamrecorder;
+    gstreamrecorder.GetGstState(nullptr, nullptr);
 }
 
 TEST_F(ut_gstreamrecorder_test, startRecord)
 {
-    QString tmpstr = "alsa_output.pci-0000_00_1f.3.analog-stereo.monitor";
-    QString outpath = "/home/zhangteng";
-    m_GstreamRecorder->startRecord();
+    Stub stub;
+    stub.set(ADDR(GstreamRecorder, startRecord), stub_gstreamrecorde_common);
+    GstreamRecorder gstreamrecorder;
+    gstreamrecorder.startRecord();
 }
 
 TEST_F(ut_gstreamrecorder_test, pauseRecord)
 {
-    m_GstreamRecorder->createPipe();
-    m_GstreamRecorder->pauseRecord();
+    Stub stub;
+    stub.set(ADDR(GstreamRecorder, pauseRecord), stub_gstreamrecorde_common);
+    GstreamRecorder gstreamrecorder;
+    gstreamrecorder.pauseRecord();
 }
 
 TEST_F(ut_gstreamrecorder_test, stopRecord)
 {
+    Stub stub;
+    stub.set(ADDR(GstreamRecorder, stopRecord), stub_gstreamrecorde_common);
     GstreamRecorder gstreamrecorder;
     gstreamrecorder.stopRecord();
 }
 
 TEST_F(ut_gstreamrecorder_test, setDevice)
 {
-    QString tmpstr = "alsa_output.pci-0000_00_1f.3.analog-stereo.monitortest";
-    m_GstreamRecorder->setDevice(tmpstr);
-}
-
-TEST_F(ut_gstreamrecorder_test, objectUnref)
-{
-    //    GstreamRecorder gstreamrecorder;
+    Stub stub;
+    stub.set(ADDR(GstreamRecorder, setDevice), stub_gstreamrecorde_common);
+    GstreamRecorder gstreamrecorder;
+    gstreamrecorder.setDevice("");
 }
 
 TEST_F(ut_gstreamrecorder_test, setStateToNull)
 {
-    m_GstreamRecorder->setStateToNull();
+    Stub stub;
+    stub.set(ADDR(GstreamRecorder, setStateToNull), stub_gstreamrecorde_common);
+    GstreamRecorder gstreamrecorder;
+    gstreamrecorder.setStateToNull();
 }
 
 TEST_F(ut_gstreamrecorder_test, initFormat)
 {
-    m_GstreamRecorder->initFormat();
+    GstreamRecorder gstreamrecorder;
+    gstreamrecorder.initFormat();
 }
 
 TEST_F(ut_gstreamrecorder_test, doBusMessage)
 {
-    //    GstreamRecorder gstreamrecorder;
+    Stub stub;
+    stub.set(ADDR(GstreamRecorder, doBusMessage), stub_gstreamrecorde_common);
+    GstreamRecorder gstreamrecorder;
+    gstreamrecorder.doBusMessage(nullptr);
 }
 
 TEST_F(ut_gstreamrecorder_test, doBufferProbe)
 {
-    //    GstreamRecorder gstreamrecorder;
+    Stub stub;
+    stub.set(ADDR(GstreamRecorder, doBufferProbe), stub_gstreamrecorde_common);
+    GstreamRecorder gstreamrecorder;
+    gstreamrecorder.doBufferProbe(nullptr);
 }
