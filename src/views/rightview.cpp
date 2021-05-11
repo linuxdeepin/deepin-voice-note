@@ -255,7 +255,6 @@ void RightView::onTextEditFocusIn()
         }
         adjustVerticalScrollBar(widget, height);
     }
-    Utils::setImVisible(true);
 }
 
 /**
@@ -886,10 +885,6 @@ void RightView::mousePressEvent(QMouseEvent *event)
         m_curItemWidget = widget;
     }
 
-    if (m_curItemWidget) {
-        m_curItemWidget->setFocus();
-    }
-
     if (event->source() == Qt::MouseEventSynthesizedByQt) {
         m_touchState = TouchState::TouchPressing;
         m_touchPressPoint = event->pos();
@@ -982,7 +977,7 @@ void RightView::mouseReleaseEvent(QMouseEvent *event)
         }
     }
 
-    if (m_curItemWidget) {
+    if (m_curItemWidget && m_touchState != TouchSliding) {
         m_curItemWidget->setFocus();
     }
 }
