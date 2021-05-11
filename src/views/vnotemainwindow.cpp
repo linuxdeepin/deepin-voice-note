@@ -2133,7 +2133,6 @@ void VNoteMainWindow::onShowSettingDialog()
     if (m_settingDialog == nullptr) {
         m_settingDialog = new DSettingsDialog(this);
         m_settingDialog->updateSettings("Setting", setting::instance()->getSetting());
-        m_settingDialog->setWindowFlags(m_settingDialog->windowFlags() | Qt::Popup);
         m_settingDialog->setResetVisible(false);
         m_settingDialog->installEventFilter(this);
     }
