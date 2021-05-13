@@ -116,6 +116,8 @@ public:
     bool getIsNormalView() const;
     //弹出右键菜单
     void popupMenu();
+    //刷新语音插件创建时间
+    void refreshVoiceCreateTime();
 signals:
     //播放信号
     void sigVoicePlay(VNVoiceBlock *voiceData);

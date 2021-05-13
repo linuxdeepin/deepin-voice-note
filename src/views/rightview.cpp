@@ -1553,3 +1553,18 @@ void RightView::popupMenu()
         }
     }
 }
+
+/**
+ * @brief RightView::refreshVoiceCreateTime
+ */
+void RightView::refreshVoiceCreateTime()
+{
+    for (int i = 0; i < m_viewportLayout->count() - 1; i++) {
+        QLayoutItem *layoutItem = m_viewportLayout->itemAt(i);
+        DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
+        if (widget && widget->getNoteBlock()->blockType == VNoteBlock::Voice) {
+            VoiceNoteItem *voice = dynamic_cast<VoiceNoteItem *>(widget);
+            voice->refreshCreateTime();
+        }
+    }
+}

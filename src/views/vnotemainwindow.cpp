@@ -152,6 +152,10 @@ void VNoteMainWindow::initConnections()
 
     connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
             this, SLOT(onVNoteChange(const QModelIndex &)));
+
+    connect(m_middleView, &MiddleView::requestRefresh,
+            m_rightView, &RightView::refreshVoiceCreateTime);
+
     connect(m_rightView, &RightView::contentChanged,
             m_middleView, &MiddleView::onNoteChanged);
 

@@ -533,6 +533,17 @@ bool VoiceNoteItem::isTextContainsPos(const QPoint &globalPos)
 }
 
 /**
+ * @brief VoiceNoteItem::refreshCreateTime
+ */
+void VoiceNoteItem::refreshCreateTime()
+{
+    VNVoiceBlock *voiceBlock = m_noteBlock->ptrVoice;
+    if (voiceBlock) {
+        m_createTimeLab->setText(Utils::convertDateTime(voiceBlock->createTime));
+    }
+}
+
+/**
  * @brief PlayAnimInferface::~PlayAnimInferface
  */
 PlayAnimInferface::~PlayAnimInferface()

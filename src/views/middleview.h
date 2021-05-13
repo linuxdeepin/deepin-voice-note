@@ -137,10 +137,14 @@ public:
 signals:
     //请求刷新详情页
     void requestChangeRightView(bool isMultipleOption);
+    //刷新窗口
+    void requestRefresh();
 
 public slots:
     //更新记事项
     void onNoteChanged();
+    //刷新窗口
+    void onRefresh();
 
 protected:
     //鼠标事件
@@ -220,6 +224,7 @@ private:
     int m_nextSelection = -1;
     //拖拽完成标志
     bool m_dragSuccess {false};
+    QTimer *m_refreshTimer {nullptr};
 };
 
 #endif // MIDDLEVIEW_H

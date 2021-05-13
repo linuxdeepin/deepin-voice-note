@@ -118,6 +118,8 @@ public slots:
     void onAsrTextChange();
     //主题切换
     void onChangeTheme();
+    //刷新创建时间
+    void refreshCreateTime();
 
 private:
     void initUi();

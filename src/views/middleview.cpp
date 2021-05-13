@@ -973,6 +973,9 @@ void MiddleView::initUI()
     footer->setFixedHeight(1);
     addFooterWidget(footer);
     //    this->installEventFilter(this);
+    m_refreshTimer = new QTimer(this);
+    connect(m_refreshTimer, &QTimer::timeout, this, &MiddleView::onRefresh);
+    m_refreshTimer->start(30 * 1000);
 }
 
 /**
@@ -1321,4 +1324,13 @@ void MiddleView::popupMenu()
 bool MiddleView::searchEmpty()
 {
     return m_emptySearch && m_emptySearch->isVisible();
+}
+
+/**
+ * @brief MiddleView::onRefresh
+ */
+void MiddleView::onRefresh()
+{
+    update();
+    emit requestRefresh();
 }
