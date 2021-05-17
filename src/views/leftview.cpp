@@ -509,14 +509,14 @@ void LeftView::initConnections()
         m_menuState = MenuStatus::ReleaseFromMenu;
     });
     //定时器用于判断是否选中当前
-    m_selectCurrentTimer = new QTimer();
+    m_selectCurrentTimer = new QTimer(this);
     connect(m_selectCurrentTimer, &QTimer::timeout, [=] {
         if (m_touchState == TouchState::TouchPressing && m_index.isValid())
             this->setCurrentIndex(m_index);
         m_selectCurrentTimer->stop();
     });
     //定时器用于判断是否弹出菜单
-    m_popMenuTimer = new QTimer();
+    m_popMenuTimer = new QTimer(this);
     connect(m_popMenuTimer, &QTimer::timeout, [=] {
         if (m_touchState == TouchState::TouchPressing && m_index.isValid()) {
             m_notepadMenu->setWindowOpacity(1);

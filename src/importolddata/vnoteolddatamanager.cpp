@@ -87,7 +87,7 @@ void VNoteOldDataManager::initOldDb()
 {
     //Init old database when create data manager
     //Bcs data manager depends on db.
-    m_oldDbManger = new VNoteDbManager(true);
+    m_oldDbManger = new VNoteDbManager(true, this);
 }
 
 /**

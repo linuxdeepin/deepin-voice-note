@@ -738,7 +738,7 @@ void VNoteMainWindow::initRightView()
 void VNoteMainWindow::initA2TManager()
 {
     //audio to text manager
-    m_a2tManager = new VNoteA2TManager();
+    m_a2tManager = new VNoteA2TManager(this);
 
     //connect(m_rightView, &RightView::asrStart, this, &VNoteMainWindow::onA2TStart);
     connect(m_a2tManager, &VNoteA2TManager::asrError, this, &VNoteMainWindow::onA2TError);
@@ -1247,7 +1247,7 @@ void VNoteMainWindow::onPreviewShortcut()
     QString param2 = "-p=" + QString::number(pos.x()) + "," + QString::number(pos.y());
     shortcutString << param1 << param2;
 
-    QProcess *shortcutViewProcess = new QProcess();
+    QProcess *shortcutViewProcess = new QProcess(this);
     shortcutViewProcess->startDetached("deepin-shortcut-viewer", shortcutString);
 
     connect(shortcutViewProcess, SIGNAL(finished(int)), shortcutViewProcess, SLOT(deleteLater()));

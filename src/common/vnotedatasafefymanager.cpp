@@ -45,6 +45,7 @@ VNoteDataSafefyManager::VNoteDataSafefyManager(QObject *parent)
 VNoteDataSafefyManager::~VNoteDataSafefyManager()
 {
     m_safetyTaskWoker->quitWorker();
+    m_safetyTaskWoker->deleteLater();
 }
 
 /**

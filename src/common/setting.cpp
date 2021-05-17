@@ -59,7 +59,7 @@ CustemBackend::CustemBackend(const QString &filepath, QObject *parent)
  */
 CustemBackend::~CustemBackend()
 {
-    ;
+    delete m_settings;
 }
 
 /**

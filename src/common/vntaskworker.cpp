@@ -60,6 +60,9 @@ void VNTaskWorker::setWorkerName(const QString &worker)
 void VNTaskWorker::quitWorker()
 {
     m_fQuit = true;
+    m_taskLock.lock();
+    m_taskCondition.wakeAll();
+    m_taskLock.unlock();
 }
 
 /**
