@@ -2,7 +2,7 @@
 
 ## Overview
 
-Voice Notes is a simple memo software with texts and voice recordings. You are able to save the recordings as MP3 format or texts. 
+Voice Notes is a simple memo software with texts and voice recordings. With it, you are able to record your daily life and work in MP3 format or texts. 
 
 ## Guide
 
@@ -10,14 +10,12 @@ You can run, exit, and create a shortcut for Voice Notes in the following ways.
 
 ### Run Voice Notes
 
-1. Click ![deepin_launcher](../common/deepin_launcher.svg) in the dock to enter the Launcher interface.
+1. Click the Launcher icon ![deepin_launcher](../common/deepin_launcher.svg) in the dock to enter the Launcher interface.
 2. Locate ![deepin_voice_note](../common/deepin_voice_note.svg) by scrolling the mouse wheel or searching "voice notes" in the Launcher interface, and click it to run.
 3. Right-click ![deepin_voice_note](../common/deepin_voice_note.svg), and you can:
    - Click **Send to desktop** to create a desktop shortcut.
    - Click **Send to dock** to fix it in the Dock.
    - Click **Add to startup** to add the application to startup, and it will automatically run when the system starts up.
-
-> ![notes](../common/notes.svg) Notes: If Voice Notes has been fixed in the dock by default, you can click ![deepin_voice_note](../common/deepin_voice_note.svg) in the dock to run it.
 
 ### Exit Voice Notes
 
@@ -116,10 +114,10 @@ Select a text note or multiple text notes with **Ctrl/Shift** in the text note l
 
 1. Go to **Control Center** > **Assistive Tools**, and enable **Text to Speech**.
 2. Select a paragraph of text on the Voice Notes interface, and right-click to select **Text to Speech**. The text selected will be converted to speech and read accordingly. 
-3. In the text to speech mode, right-click to select **Stop reading** or left-click to stop reading.
+3. In the Text to Speech mode, right-click to select **Stop reading** or left-click to stop reading.
 
  >![notes](../common/notes.svg) Notes:
- >- When no text is selected, **Text to Speech** is greyed out and inoperable. 
+ >- When no text is selected, **Text to Speech** is grayed out and inoperable. 
  >- When only an audio file is selected, **Text to Speech** is inoperable; if the audio file selected contains voice-to-text content, **Text to Speech** can be operated.
 
 ![0|speech](fig/speech.png)
@@ -128,7 +126,7 @@ Select a text note or multiple text notes with **Ctrl/Shift** in the text note l
 
 1. Go to **Control Center** > **Assistive Tools**. Enable **Speech to Text**, and select **Language**.
 2. In the text input box on the Voice Notes interface, right-click and select **Speech to Text**. Now you can input audios via microphone, and the translated text will be edited and displayed in the text input box. 
-3. In the speech to text mode, click the the blank area on the Voice Notes interface to stop text editing and display. 
+3. In the Speech to Text mode, click the the blank area on the Voice Notes interface to stop text editing and display. 
 
 > ![tips](../common/tips.svg) Tips: You can enable **Speech to Text** while recording audios. 
 

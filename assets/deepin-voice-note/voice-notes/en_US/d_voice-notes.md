@@ -2,7 +2,7 @@
 
 ## Overview
 
-Voice Notes is a simple memo software with texts and voice recordings. You are able to save the recordings as MP3 format or texts. 
+Voice Notes is a simple memo software with texts and voice recordings. With it, you are able to record your daily life and work in MP3 format or texts. 
 
 ## Guide
 
@@ -10,7 +10,7 @@ You can run, exit, and create a shortcut for Voice Notes in the following ways.
 
 ### Run Voice Notes
 
-1. Click ![deepin_launcher](../common/deepin_launcher.svg) in the dock to enter the Launcher interface.
+1. Click the Launcher icon ![deepin_launcher](../common/deepin_launcher.svg) in the dock to enter the Launcher interface.
 2. Locate ![deepin_voice_note](../common/deepin_voice_note.svg) by scrolling the mouse wheel or searching "voice notes" in the Launcher interface, and click it to run.
 3. Right-click ![deepin_voice_note](../common/deepin_voice_note.svg), and you can:
    - Click **Send to desktop** to create a desktop shortcut.
@@ -29,7 +29,7 @@ You can run, exit, and create a shortcut for Voice Notes in the following ways.
 
 On the Voice Notes interface, press **Ctrl** + **Shift** + **?** on the keyboard to view shortcuts. Proficiency in shortcuts will greatly improve your efficiency.
 
-![1|hotkey](fig/hotkey.png)
+![1|hotkey](fig/d_hotkey.png)
 
 ## Operations
 

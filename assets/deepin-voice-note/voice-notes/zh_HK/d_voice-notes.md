@@ -2,7 +2,7 @@
 
 ## 概述
 
-語音記事本是一款設計簡潔、美觀易用的記事軟件，支持文字筆記和語音筆記。
+語音記事本是一款集語音、文字於一體的記事軟件，一般用來記錄生活日常或工作事項。
 
 
 ## 使用入門
@@ -29,9 +29,9 @@
 
 ### 查看快捷鍵
 
-在語音記事本界面，使用快捷鍵 **Ctrl + Shift + ?** 打開快捷鍵預覽界面，熟練地使用快捷鍵，將大大提升您的操作效率。
+在語音記事本界面，使用快捷鍵 **Ctrl + Shift + ?** 打開快捷鍵預覽界面。熟練地使用快捷鍵，將大大提升您的操作效率。
 
-![1|hotkey](fig/hotkey.png)
+![1|hotkey](fig/d_hotkey.png)
 
 ## 操作介紹
 
@@ -44,7 +44,7 @@
 
 ### 新建筆記
 
-- 當第一次新建記事本後，系統默認創建一個筆記，在筆記列表內單擊 ![add](../common/circlebutton_add2.svg) 按鈕可繼續創建新的筆記。
+- 當第一次新建記事本後，系統默認創建一個筆記，在筆記列表內單擊按鈕 ![add](../common/circlebutton_add2.svg) 可繼續創建新的筆記。
 - 右鍵單擊記事本或筆記，選擇 **新建筆記** 來創建一個新筆記。
 
 
@@ -59,10 +59,10 @@
 
 1. 在語音記事本界面上，選擇一個筆記。
 2. 在右側詳情頁內單擊 ![record_normal](../common/record_normal.svg)，添加語音。
-3. 單擊 ![finish](../common/finish_normal.svg) 按鈕完成語音錄製。
+3. 單擊按鈕 ![finish](../common/finish_normal.svg) 完成語音錄製。
    
-   > ![notes](../common/notes.svg)說明：添加語音的過程中您可以單擊 ![pause](../common/pause_red_normal.svg) 按鈕暫停錄音，再次單擊 ![record_normal](../common/record_normal.svg) 按鈕繼續錄音。錄音的限制時長為60分鐘。
-3. 錄製完成後，單擊 ![play_blue_normal](../common/play_blue_normal.svg) 播放按鈕可以回放語音。
+   > ![notes](../common/notes.svg)說明：添加語音的過程中您可以單擊按鈕 ![pause](../common/pause_red_normal.svg) 暫停錄音，再次單擊按鈕 ![record_normal](../common/record_normal.svg) 繼續錄音。錄音的限制時長為60分鐘。
+3. 錄製完成後，單擊播放按鈕 ![play_blue_normal](../common/play_blue_normal.svg) 回放語音。
 
 ![0|replay](fig/recorder.png)
 
@@ -135,7 +135,7 @@
 
 ### 刪除語音
 
-1. 在語音記事本界面上，選擇一個語音文件。
+1. 在語音記事本界面，選擇一個語音文件。
 2. 單擊鼠標右鍵選擇 **刪除** 或按下鍵盤上的 **Delete** 鍵。
 3. 在彈出的對話框中，單擊 **確定**。
 
