@@ -309,6 +309,7 @@ void TextNoteItem::onChangeTheme()
     DPalette dp = DApplicationHelper::instance()->palette(m_textEdit);
     dp.setBrush(DPalette::Highlight, appDp.color(DPalette::Normal, DPalette::Highlight));
     dp.setBrush(DPalette::HighlightedText, appDp.color(DPalette::Normal, DPalette::HighlightedText));
+    dp.setBrush(DPalette::Text, appDp.color(DPalette::Active, DPalette::Text));
     m_textEdit->setPalette(dp);
 
     m_searchCount = 1;

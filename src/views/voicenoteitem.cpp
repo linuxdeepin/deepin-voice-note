@@ -298,7 +298,7 @@ void VoiceNoteItem::onChangeTheme()
 
     DPalette pb = DApplicationHelper::instance()->palette(m_asrText);
     pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));
-    pb.setBrush(DPalette::Text, pb.color(DPalette::Highlight));
+    pb.setBrush(DPalette::Text, pb.color(DPalette::Active, DPalette::Highlight));
     m_asrText->setPalette(pb);
 }
 
