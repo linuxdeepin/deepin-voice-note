@@ -48,7 +48,8 @@ void ut_vnoteitemoper_test::TearDown()
 
 TEST_F(ut_vnoteitemoper_test, loadAllVNotes)
 {
-    m_vnoteitemoper->loadAllVNotes();
+    VNOTE_ALL_NOTES_MAP *notes = m_vnoteitemoper->loadAllVNotes();
+    delete notes;
 }
 
 TEST_F(ut_vnoteitemoper_test, modifyNoteTitle)

@@ -39,4 +39,5 @@ TEST_F(ut_vntaskworker_test, addTask)
     VDataSafer safer;
     VNDataSaferTask *pSafeTask = new VNDataSaferTask(safer);
     m_vntaskworker->addTask(pSafeTask);
+    delete pSafeTask;
 }

@@ -37,4 +37,5 @@ TEST_F(ut_vnote2siconbutton_test, mouseReleaseEvent)
     QPointF localPos;
     QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
     vnote2siconbutton.mouseReleaseEvent(event);
+    delete event;
 }

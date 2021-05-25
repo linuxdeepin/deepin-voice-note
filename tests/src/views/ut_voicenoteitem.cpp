@@ -63,4 +63,6 @@ TEST_F(ut_voicenoteitem_test, onPlayBtnClicked)
     playaniminferface->startAnim();
     playaniminferface->stopAnim();
     playaniminferface->updateAnim();
+
+    datas.delBlock(block);
 }

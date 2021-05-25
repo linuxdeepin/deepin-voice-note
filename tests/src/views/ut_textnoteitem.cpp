@@ -51,4 +51,5 @@ TEST_F(ut_textnoteitem_test, getNoteBlock)
     textnoteitem.onTextCursorChange();
     textnoteitem.setLastCursorHeight(12);
     textnoteitem.onChangeTheme();
+    datas.delBlock(block);
 }

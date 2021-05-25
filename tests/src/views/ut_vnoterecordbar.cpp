@@ -37,6 +37,8 @@ TEST_F(ut_vnoterecordbar_test, eventFilter)
     QEvent *event = new QEvent(QEvent::MouseButtonPress);
     QWidget *widget = new QWidget;
     vnoterecordbar.eventFilter(widget, event);
+    delete event;
+    delete widget;
 }
 
 TEST_F(ut_vnoterecordbar_test, onStartRecord)
@@ -75,6 +77,7 @@ TEST_F(ut_vnoterecordbar_test, onClosePlayWidget)
     vnoterecordbar.pauseVoice(vnvoiceblock);
     //    vnoterecordbar.playVoice(vnvoiceblock);
     vnoterecordbar.stopVoice(vnvoiceblock);
+    delete vnvoiceblock;
 }
 
 TEST_F(ut_vnoterecordbar_test, getVoiceData)

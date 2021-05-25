@@ -35,6 +35,7 @@ TEST_F(ut_dbvisitor_test, visitorData)
     dbvisitor->sqlQuery();
     dbvisitor->dbvSqls();
     dbvisitor->extraData();
+    delete dbvisitor;
 }
 
 TEST_F(ut_dbvisitor_test, MaxIdFolderDbVisitor)
@@ -45,6 +46,7 @@ TEST_F(ut_dbvisitor_test, MaxIdFolderDbVisitor)
     dbvisitor = new MaxIdFolderDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
     dbvisitor->visitorData();
+    delete dbvisitor;
 }
 
 TEST_F(ut_dbvisitor_test, AddFolderDbVisitor)
@@ -55,6 +57,7 @@ TEST_F(ut_dbvisitor_test, AddFolderDbVisitor)
     dbvisitor = new AddFolderDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
     dbvisitor->visitorData();
+    delete dbvisitor;
 }
 
 TEST_F(ut_dbvisitor_test, RenameFolderDbVisitor)
@@ -65,6 +68,7 @@ TEST_F(ut_dbvisitor_test, RenameFolderDbVisitor)
     dbvisitor = new RenameFolderDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
     dbvisitor->visitorData();
+    delete dbvisitor;
 }
 
 TEST_F(ut_dbvisitor_test, DelFolderDbVisitor)
@@ -75,6 +79,7 @@ TEST_F(ut_dbvisitor_test, DelFolderDbVisitor)
     dbvisitor = new DelFolderDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
     dbvisitor->visitorData();
+    delete dbvisitor;
 }
 
 TEST_F(ut_dbvisitor_test, NoteQryDbVisitor)
@@ -85,6 +90,7 @@ TEST_F(ut_dbvisitor_test, NoteQryDbVisitor)
     dbvisitor = new NoteQryDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
     dbvisitor->visitorData();
+    delete dbvisitor;
 }
 
 //TEST_F(ut_dbvisitor_test, AddNoteDbVisitor)
@@ -105,6 +111,7 @@ TEST_F(ut_dbvisitor_test, RenameNoteDbVisitor)
     dbvisitor = new RenameNoteDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
     dbvisitor->visitorData();
+    delete dbvisitor;
 }
 
 TEST_F(ut_dbvisitor_test, UpdateNoteDbVisitor)
@@ -115,6 +122,7 @@ TEST_F(ut_dbvisitor_test, UpdateNoteDbVisitor)
     dbvisitor = new UpdateNoteDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
     dbvisitor->visitorData();
+    delete dbvisitor;
 }
 
 TEST_F(ut_dbvisitor_test, DelNoteDbVisitor)
@@ -125,6 +133,7 @@ TEST_F(ut_dbvisitor_test, DelNoteDbVisitor)
     dbvisitor = new DelNoteDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
     dbvisitor->visitorData();
+    delete dbvisitor;
 }
 
 TEST_F(ut_dbvisitor_test, SaferQryDbVisitor)
@@ -135,6 +144,7 @@ TEST_F(ut_dbvisitor_test, SaferQryDbVisitor)
     dbvisitor = new SaferQryDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
     dbvisitor->visitorData();
+    delete dbvisitor;
 }
 
 TEST_F(ut_dbvisitor_test, AddSaferDbVisitor)
@@ -145,6 +155,7 @@ TEST_F(ut_dbvisitor_test, AddSaferDbVisitor)
     dbvisitor = new AddSaferDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
     dbvisitor->visitorData();
+    delete dbvisitor;
 }
 
 TEST_F(ut_dbvisitor_test, DelSaferDbVisitor)
@@ -155,4 +166,5 @@ TEST_F(ut_dbvisitor_test, DelSaferDbVisitor)
     dbvisitor = new DelSaferDbVisitor(db, nullptr, nullptr);
     dbvisitor->prepareSqls();
     dbvisitor->visitorData();
+    delete dbvisitor;
 }

@@ -21,6 +21,7 @@
 #include "vnoteforlder.h"
 #include "vnoteitem.h"
 #include "vnoteitemoper.h"
+#include "vnotefolderoper.h"
 
 ut_vnotedatamanager_test::ut_vnotedatamanager_test()
 {
@@ -55,10 +56,10 @@ TEST_F(ut_vnotedatamanager_test, addFolder)
     vnotedatamanager.m_qspAllNotesMap.reset(new VNOTE_ALL_NOTES_MAP());
     vnotedatamanager.addFolder(&folder);
     vnotedatamanager.getFolder(folder.id);
-    vnotedatamanager.delFolder(folder.id);
 
     VNoteItem tmpNote;
     tmpNote.folderId = 2;
+    tmpNote.noteId = 0;
     tmpNote.noteType = VNoteItem::VNT_Text;
     VNoteBlock *ptrBlock1 = tmpNote.newBlock(VNoteBlock::Text);
     tmpNote.addBlock(ptrBlock1);
@@ -70,9 +71,11 @@ TEST_F(ut_vnotedatamanager_test, addFolder)
     vnotedatamanager.folderNotesCount(folder.id);
     vnotedatamanager.getFolderNotes(folder.id);
     vnotedatamanager.folderCount();
-    vnotedatamanager.getFolderNotes(3);
+    VNOTE_ITEMS_MAP *tmpfolder = vnotedatamanager.getFolderNotes(3);
+    delete tmpfolder;
     vnotedatamanager.getAllNotesInFolder();
     vnotedatamanager.getDefaultIcon(0, IconsType::DefaultIcon);
+    vnotedatamanager.delFolder(folder.id);
 }
 
 TEST_F(ut_vnotedatamanager_test, onFoldersLoaded)
@@ -81,7 +84,7 @@ TEST_F(ut_vnotedatamanager_test, onFoldersLoaded)
     vnotedatamanager.m_qspNoteFoldersMap.reset(new VNOTE_FOLDERS_MAP);
     VNOTE_FOLDERS_MAP *folders = vnotedatamanager.getNoteFolders();
     folders->folders.insert(0, new VNoteFolder());
-    vnotedatamanager.onFoldersLoaded(new VNOTE_FOLDERS_MAP);
+    vnotedatamanager.onFoldersLoaded(folders);
 }
 
 TEST_F(ut_vnotedatamanager_test, onAllNotesLoaded)
@@ -92,5 +95,11 @@ TEST_F(ut_vnotedatamanager_test, onAllNotesLoaded)
     VNOTE_ITEMS_MAP *items = new VNOTE_ITEMS_MAP;
     items->folderNotes.insert(0, new VNoteItem);
     notes->notes.insert(0, items);
-    vnotedatamanager.onAllNotesLoaded(new VNOTE_ALL_NOTES_MAP);
+    vnotedatamanager.onAllNotesLoaded(notes);
+}
+
+TEST_F(ut_vnotedatamanager_test, reqNoteDefIcons)
+{
+    VNoteDataManager vnotedatamanager;
+    vnotedatamanager.reqNoteDefIcons();
 }

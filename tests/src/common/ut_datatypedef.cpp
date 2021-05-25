@@ -45,9 +45,10 @@ TEST_F(ut_datatypedef_test, newBlock)
     VNoteBlock *ptrBlock = nullptr;
     ptrBlock = vnote_datas.newBlock(1);
     ASSERT_EQ(ptrBlock->blockType, VNoteBlock::Text);
-
+    vnote_datas.delBlock(ptrBlock);
     ptrBlock = vnote_datas.newBlock(2);
     ASSERT_EQ(ptrBlock->blockType, VNoteBlock::Voice);
+    vnote_datas.delBlock(ptrBlock);
 }
 
 TEST_F(ut_datatypedef_test, addBlock)
@@ -97,6 +98,8 @@ TEST_F(ut_datatypedef_test, classifyAddBlk)
     ptrBlock->blockType = VNoteBlock::InValid;
     vnote_datas.classifyAddBlk(ptrBlock);
     ASSERT_EQ(vnote_datas.datas.size(), 0);
+    vnote_datas.classifyDelBlk(ptrBlock);
+    vnote_datas.delBlock(ptrBlock);
 }
 
 TEST_F(ut_datatypedef_test, classifyDelBlk)
@@ -109,6 +112,7 @@ TEST_F(ut_datatypedef_test, classifyDelBlk)
     ptrBlock->blockType = VNoteBlock::InValid;
     vnote_datas.classifyAddBlk(ptrBlock);
     vnote_datas.classifyDelBlk(ptrBlock);
+    vnote_datas.delBlock(ptrBlock);
 }
 
 TEST_F(ut_datatypedef_test, isValid)

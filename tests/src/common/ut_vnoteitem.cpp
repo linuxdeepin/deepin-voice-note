@@ -80,9 +80,10 @@ TEST_F(ut_vnoteitem_test, newBlock)
     VNoteBlock *ptrBlock = nullptr;
     ptrBlock = vnoteitem.newBlock(1);
     ASSERT_EQ(ptrBlock->blockType, VNoteBlock::Text);
-
+    vnoteitem.delBlock(ptrBlock);
     ptrBlock = vnoteitem.newBlock(2);
     ASSERT_EQ(ptrBlock->blockType, VNoteBlock::Voice);
+    vnoteitem.delBlock(ptrBlock);
 }
 
 TEST_F(ut_vnoteitem_test, addBlock)

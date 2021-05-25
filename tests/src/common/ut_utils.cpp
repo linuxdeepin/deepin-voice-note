@@ -58,45 +58,36 @@ TEST_F(ut_utils_test, loadSVG)
 
 TEST_F(ut_utils_test, highTextEdit)
 {
-    //    TextNoteEdit *m_textEdit = new TextNoteEdit();
-    //    m_textEdit->setContextMenuPolicy(Qt::NoContextMenu);
-    //    m_textEdit->document()->setDocumentMargin(0);
-    //    DStyle::setFocusRectVisible(m_textEdit, false);
-    //    DPalette pb = DApplicationHelper::instance()->palette(m_textEdit);
-    //    pb.setBrush(DPalette::Button, QColor(0, 0, 0, 0));
-    //    m_textEdit->setPalette(pb);
-    QTextDocument *document = new QTextDocument("test");
+    QTextDocument document;
+    document.setPlainText("test");
     QString searchKey = "test";
     DPalette pb;
     QColor highColor = pb.color(DPalette::Highlight);
-    m_utils->highTextEdit(document, searchKey, highColor);
-    m_utils->highTextEdit(document, searchKey, highColor, true);
+    m_utils->highTextEdit(&document, searchKey, highColor);
+    m_utils->highTextEdit(&document, searchKey, highColor, true);
 }
 
 TEST_F(ut_utils_test, setDefaultColor)
 {
-    QTextDocument *document = new QTextDocument("test");
+    QTextDocument document;
     DPalette pb;
     QColor highColor = pb.color(DPalette::Highlight);
-    m_utils->setDefaultColor(document, highColor);
+    m_utils->setDefaultColor(&document, highColor);
 }
 
 TEST_F(ut_utils_test, blockToDocument)
 {
-    VNOTE_DATAS datas;
-    VNoteBlock *block = datas.newBlock(VNoteBlock::Text);
-    QTextDocument *document = new QTextDocument("test");
-    m_utils->blockToDocument(block, document);
+    VNTextBlock block;
+    QTextDocument document;
+    m_utils->blockToDocument(&block, &document);
 }
 
 TEST_F(ut_utils_test, documentToBlock)
 {
-    VNOTE_DATAS datas;
-    VNoteBlock *block = datas.newBlock(VNoteBlock::Text);
-    VNoteItem *m_noteItemData = new VNoteItem;
-    m_noteItemData->addBlock(block);
-    QTextDocument *document = new QTextDocument("test");
-    m_utils->documentToBlock(block, document);
+    VNTextBlock block;
+    QTextDocument document;
+    document.setPlainText("test");
+    m_utils->documentToBlock(&block, &document);
 }
 
 TEST_F(ut_utils_test, formatMillisecond)

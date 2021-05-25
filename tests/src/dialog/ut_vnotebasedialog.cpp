@@ -23,12 +23,6 @@ ut_vnotebasedialog_test::ut_vnotebasedialog_test()
 {
 }
 
-TEST_F(ut_vnotebasedialog_test, initUI)
-{
-    VNoteBaseDialog vnotebasedialog;
-    vnotebasedialog.initUI();
-}
-
 TEST_F(ut_vnotebasedialog_test, setTitle)
 {
     VNoteBaseDialog vnotebasedialog;
@@ -59,6 +53,7 @@ TEST_F(ut_vnotebasedialog_test, addContent)
     VNoteBaseDialog vnotebasedialog;
     QWidget *content = new QWidget;
     vnotebasedialog.addContent(content);
+    delete content;
 }
 
 TEST_F(ut_vnotebasedialog_test, closeEvent)
@@ -66,6 +61,7 @@ TEST_F(ut_vnotebasedialog_test, closeEvent)
     VNoteBaseDialog vnotebasedialog;
     QCloseEvent *event = new QCloseEvent;
     vnotebasedialog.closeEvent(event);
+    delete event;
 }
 
 TEST_F(ut_vnotebasedialog_test, showEvent)
@@ -73,4 +69,5 @@ TEST_F(ut_vnotebasedialog_test, showEvent)
     VNoteBaseDialog vnotebasedialog;
     QShowEvent *event = new QShowEvent;
     vnotebasedialog.showEvent(event);
+    delete event;
 }

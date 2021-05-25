@@ -48,77 +48,53 @@
 #include "upgradedbutil.h"
 
 #include "vnoteapplication.h"
+#include "stub.h"
+
+void stub_vnotemainwindow()
+{
+}
 
 ut_vnotemainwindow_test::ut_vnotemainwindow_test()
 {
 }
 
+void ut_vnotemainwindow_test::SetUp()
+{
+    Stub stub;
+    stub.set(ADDR(VNoteMainWindow, initData), stub_vnotemainwindow);
+    m_mainWindow = new VNoteMainWindow;
+}
+
+void ut_vnotemainwindow_test::TearDown()
+{
+    delete m_mainWindow;
+}
+
 TEST_F(ut_vnotemainwindow_test, holdHaltLock)
 {
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.holdHaltLock();
-    vnotemainwindow.releaseHaltLock();
-    vnotemainwindow.onVNoteFoldersLoaded();
+    m_mainWindow->holdHaltLock();
+    m_mainWindow->releaseHaltLock();
+    m_mainWindow->onVNoteFoldersLoaded();
 }
 
 //TEST_F(ut_vnotemainwindow_test, onVNoteSearch)
 //{
 //    VNoteMainWindow vnotemainwindow;
-//    vnotemainwindow.onVNoteSearch();
+//     m_mainWindow->onVNoteSearch();
 //}
 
 TEST_F(ut_vnotemainwindow_test, onVNoteSearchTextChange)
 {
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.onVNoteSearchTextChange("");
-}
-
-TEST_F(ut_vnotemainwindow_test, initSpliterView)
-{
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.initSpliterView();
-    vnotemainwindow.initSplashView();
-}
-
-TEST_F(ut_vnotemainwindow_test, initTitleBar)
-{
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.initTitleBar();
-}
-
-TEST_F(ut_vnotemainwindow_test, initMiddleView)
-{
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.initMiddleView();
-}
-
-TEST_F(ut_vnotemainwindow_test, initRightView)
-{
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.initRightView();
-}
-
-TEST_F(ut_vnotemainwindow_test, initA2TManager)
-{
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.initA2TManager();
-}
-
-TEST_F(ut_vnotemainwindow_test, initLogin1Manager)
-{
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.initLogin1Manager();
+    m_mainWindow->onVNoteSearchTextChange("");
 }
 
 TEST_F(ut_vnotemainwindow_test, loadNotepads)
 {
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.loadNotepads();
+    m_mainWindow->loadNotepads();
 }
 
 TEST_F(ut_vnotemainwindow_test, loadNotes)
 {
-    VNoteMainWindow vnotemainwindow;
     VNoteFolder *vnotefolder = new VNoteFolder;
     vnotefolder->id = 0;
     vnotefolder->category = 1;
@@ -131,114 +107,101 @@ TEST_F(ut_vnotemainwindow_test, loadNotes)
     vnotefolder->createTime = QDateTime::currentDateTime();
     vnotefolder->modifyTime = QDateTime::currentDateTime();
     vnotefolder->deleteTime = QDateTime::currentDateTime();
-    vnotemainwindow.loadNotes(vnotefolder);
+    m_mainWindow->loadNotes(vnotefolder);
+    delete vnotefolder;
 }
 
 TEST_F(ut_vnotemainwindow_test, loadSearchNotes)
 {
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.loadSearchNotes("本");
+    m_mainWindow->loadSearchNotes("本");
 }
 
 TEST_F(ut_vnotemainwindow_test, initDeviceExceptionErrMessage)
 {
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.initDeviceExceptionErrMessage();
+    m_mainWindow->initDeviceExceptionErrMessage();
 }
 
 TEST_F(ut_vnotemainwindow_test, showAsrErrMessage)
 {
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.showAsrErrMessage("error Message");
+    m_mainWindow->showAsrErrMessage("error Message");
 }
 
 TEST_F(ut_vnotemainwindow_test, showDeviceExceptionErrMessage)
 {
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.showDeviceExceptionErrMessage();
+    m_mainWindow->showDeviceExceptionErrMessage();
 }
 
 TEST_F(ut_vnotemainwindow_test, onCursorChange)
 {
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.onCursorChange(150, true);
+    m_mainWindow->onCursorChange(150, true);
 }
 
 TEST_F(ut_vnotemainwindow_test, initMenuExtension)
 {
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.initMenuExtension();
+    m_mainWindow->initMenuExtension();
 }
 
 TEST_F(ut_vnotemainwindow_test, setSpecialStatus)
 {
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.setSpecialStatus(vnotemainwindow.SearchStart);
-    vnotemainwindow.setSpecialStatus(vnotemainwindow.SearchEnd);
-    vnotemainwindow.setSpecialStatus(vnotemainwindow.PlayVoiceStart);
-    vnotemainwindow.setSpecialStatus(vnotemainwindow.PlayVoiceEnd);
-    vnotemainwindow.setSpecialStatus(vnotemainwindow.RecordStart);
-    vnotemainwindow.setSpecialStatus(vnotemainwindow.RecordEnd);
-    vnotemainwindow.setSpecialStatus(vnotemainwindow.VoiceToTextStart);
-    vnotemainwindow.setSpecialStatus(vnotemainwindow.VoiceToTextEnd);
+    m_mainWindow->setSpecialStatus(m_mainWindow->SearchStart);
+    m_mainWindow->setSpecialStatus(m_mainWindow->SearchEnd);
+    m_mainWindow->setSpecialStatus(m_mainWindow->PlayVoiceStart);
+    m_mainWindow->setSpecialStatus(m_mainWindow->PlayVoiceEnd);
+    m_mainWindow->setSpecialStatus(m_mainWindow->RecordStart);
+    m_mainWindow->setSpecialStatus(m_mainWindow->RecordEnd);
+    m_mainWindow->setSpecialStatus(m_mainWindow->VoiceToTextStart);
+    m_mainWindow->setSpecialStatus(m_mainWindow->VoiceToTextEnd);
 }
 
 TEST_F(ut_vnotemainwindow_test, initAsrErrMessage)
 {
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.initAsrErrMessage();
+    m_mainWindow->initAsrErrMessage();
 }
 
 TEST_F(ut_vnotemainwindow_test, onStartRecord)
 {
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.onStartRecord("/usr/share/music/bensound-sunny.mp3");
-    vnotemainwindow.onFinshRecord("/usr/share/music/bensound-sunny.mp3", 2650);
+    m_mainWindow->onStartRecord("/usr/share/music/bensound-sunny.mp3");
+    m_mainWindow->onFinshRecord("/usr/share/music/bensound-sunny.mp3", 2650);
 }
 
 TEST_F(ut_vnotemainwindow_test, onA2TStartAgain)
 {
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.onChangeTheme();
-    vnotemainwindow.onA2TStartAgain();
-    vnotemainwindow.onA2TError(1);
-    vnotemainwindow.onA2TSuccess("/usr/share/music/bensound-sunny.mp3");
+    m_mainWindow->onChangeTheme();
+    m_mainWindow->onA2TStartAgain();
+    m_mainWindow->onA2TError(1);
+    m_mainWindow->onA2TSuccess("/usr/share/music/bensound-sunny.mp3");
 }
 
 TEST_F(ut_vnotemainwindow_test, onPreviewShortcut)
 {
-    VNoteMainWindow vnotemainwindow;
-    vnotemainwindow.onPreviewShortcut();
+    m_mainWindow->onPreviewShortcut();
 }
 
 TEST_F(ut_vnotemainwindow_test, event)
 {
-    VNoteMainWindow vnotemainwindow;
     QSize size;
     QResizeEvent *event1 = new QResizeEvent(size, size);
-    vnotemainwindow.resizeEvent(event1);
+    m_mainWindow->resizeEvent(event1);
     QKeyEvent *event2 = new QKeyEvent(QEvent::KeyPress, 0x58, Qt::ControlModifier, "test");
-    vnotemainwindow.keyPressEvent(event2);
+    m_mainWindow->keyPressEvent(event2);
+    delete event1;
+    delete event2;
 }
 
 TEST_F(ut_vnotemainwindow_test, handleMultipleOption)
 {
-    VNoteMainWindow vnotemainwindow;
-    MiddleView middleview;
-    middleview.setCurrentIndex(0);
     int id = 1;
-    vnotemainwindow.handleMultipleOption(id);
+    m_mainWindow->handleMultipleOption(id);
     int id2 = 2;
-    vnotemainwindow.handleMultipleOption(id2);
+    m_mainWindow->handleMultipleOption(id2);
     int id3 = 3;
-    vnotemainwindow.handleMultipleOption(id3);
+    m_mainWindow->handleMultipleOption(id3);
 }
 
 TEST_F(ut_vnotemainwindow_test, onDropNote)
 {
-    VNoteMainWindow vnotemainwindow;
     bool dropCancel = true;
-    vnotemainwindow.onDropNote(dropCancel);
+    m_mainWindow->onDropNote(dropCancel);
     bool dropCancels = false;
-    vnotemainwindow.onDropNote(dropCancels);
+    m_mainWindow->onDropNote(dropCancels);
 }

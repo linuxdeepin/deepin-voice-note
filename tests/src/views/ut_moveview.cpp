@@ -63,6 +63,10 @@ ut_MoveView_test::ut_MoveView_test()
     vnotefolder->deleteTime = QDateTime::currentDateTime();
     moveView.setFolder(vnotefolder);
     moveView.grab();
+
+    delete vnoteitem;
+    delete vnoteitem1;
+    delete vnotefolder;
 }
 
 TEST_F(ut_MoveView_test, setFolder)

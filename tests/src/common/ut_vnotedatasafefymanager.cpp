@@ -33,8 +33,6 @@ TEST_F(ut_vnotedatasafefymanager_test, instance)
 TEST_F(ut_vnotedatasafefymanager_test, initTaskWoker)
 {
     VNoteDataSafefyManager vnotedatasafefymanager;
-    vnotedatasafefymanager.initTaskWoker();
-
     VDataSafer safer;
     safer.setSaferType(VDataSafer::Safe);
     vnotedatasafefymanager.doSafer(safer);

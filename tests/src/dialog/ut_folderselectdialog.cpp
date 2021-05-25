@@ -31,25 +31,26 @@ ut_folderselectdialog_test::ut_folderselectdialog_test()
 
 TEST_F(ut_folderselectdialog_test, setNoteContext)
 {
-    LeftView leftview;
-    FolderSelectDialog folderselectdialog(leftview.m_pDataModel);
+    QStandardItemModel data;
+    FolderSelectDialog folderselectdialog(&data);
     folderselectdialog.setNoteContextInfo("test", 1);
     folderselectdialog.getSelectIndex();
 }
 
 TEST_F(ut_folderselectdialog_test, clearSelection)
 {
-    LeftView leftview;
-    FolderSelectDialog folderselectdialog(leftview.m_pDataModel);
+    QStandardItemModel data;
+    FolderSelectDialog folderselectdialog(&data);
     folderselectdialog.clearSelection();
 }
 
 TEST_F(ut_folderselectdialog_test, hideEvent)
 {
-    LeftView leftview;
-    FolderSelectDialog folderselectdialog(leftview.m_pDataModel);
+    QStandardItemModel data;
+    FolderSelectDialog folderselectdialog(&data);
     QHideEvent *event = new QHideEvent();
     folderselectdialog.hideEvent(event);
+    delete event;
 }
 
 TEST_F(ut_folderselectdialog_test, refreshTextColor)
@@ -63,10 +64,10 @@ TEST_F(ut_folderselectdialog_test, refreshTextColor)
 TEST_F(ut_folderselectdialog_test, setFolderBlack)
 {
     VNoteFolder *folder1 = new VNoteFolder;
-    LeftView leftview;
-    leftview.addFolder(folder1);
-    FolderSelectDialog folderselectdialog(leftview.m_pDataModel);
+    QStandardItemModel dataModel;
+    FolderSelectDialog folderselectdialog(&dataModel);
     QList<VNoteFolder *> blackList;
     blackList.push_back(folder1);
     folderselectdialog.setFolderBlack(blackList);
+    delete folder1;
 }

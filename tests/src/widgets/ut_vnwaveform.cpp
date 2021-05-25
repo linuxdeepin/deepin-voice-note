@@ -51,6 +51,7 @@ TEST_F(ut_vnwaveform_test, resizeEvent)
     QSize size2(5, 6);
     QResizeEvent *event = new QResizeEvent(size1, size2);
     vnwaveform.resizeEvent(event);
+    delete event;
 }
 
 TEST_F(ut_vnwaveform_test, getBufferLevels)

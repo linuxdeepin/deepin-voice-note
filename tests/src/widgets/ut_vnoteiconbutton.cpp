@@ -30,4 +30,5 @@ TEST_F(ut_vnoteiconbutton_test, mousePressEvent)
     QPointF localPos;
     QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
     vnoteiconbutton.mousePressEvent(event);
+    delete event;
 }

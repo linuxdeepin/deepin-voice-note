@@ -34,4 +34,5 @@ TEST_F(ut_metadataparser_test, parse)
     metadata = "{\"dataCount\":5,\"noteDatas\":[{\"text\":\"\",\"type\":1},{\"createTime\":\"2020-08-18 19:21:15.710\",\"state\":false,\"text\":\"\",\"title\":\"语音1\",\"type\":2,\"voicePath\":\"/usr/share/music/bensound-sunny.mp3\",\"voiceSize\":2650},{\"text\":\"142424\",\"type\":1},{\"createTime\":\"2020-08-18 19:23:24.006\",\"state\":false,\"text\":\"\",\"title\":\"语音2\",\"type\":2,\"voicePath\":\"/usr/share/music/bensound-sunny.mp3\",\"voiceSize\":3860},{\"text\":\"\",\"type\":1}],\"voiceMaxId\":2}";
     metadataparser.parse(metadata, noteData);
     metadataparser.makeMetaData(noteData, metadata);
+    delete noteData;
 }

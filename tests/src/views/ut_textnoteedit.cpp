@@ -28,6 +28,7 @@ TEST_F(ut_textnoteedit_test, focusInEvent)
     TextNoteEdit textnoteedit;
     QFocusEvent *event = new QFocusEvent(QEvent::FocusIn);
     textnoteedit.focusInEvent(event);
+    delete event;
 }
 
 TEST_F(ut_textnoteedit_test, focusOutEvent)
@@ -35,6 +36,7 @@ TEST_F(ut_textnoteedit_test, focusOutEvent)
     TextNoteEdit textnoteedit;
     QFocusEvent *event = new QFocusEvent(QEvent::FocusOut);
     textnoteedit.focusOutEvent(event);
+    delete event;
 }
 
 TEST_F(ut_textnoteedit_test, wheelEvent)
@@ -43,6 +45,7 @@ TEST_F(ut_textnoteedit_test, wheelEvent)
     QPointF pos;
     QWheelEvent *event = new QWheelEvent(pos, 1, Qt::NoButton, Qt::NoModifier);
     textnoteedit.wheelEvent(event);
+    delete event;
 }
 
 TEST_F(ut_textnoteedit_test, contextMenuEvent)
@@ -51,6 +54,7 @@ TEST_F(ut_textnoteedit_test, contextMenuEvent)
     QPoint pos;
     QContextMenuEvent *event = new QContextMenuEvent(QContextMenuEvent::Mouse, pos, pos, Qt::NoModifier);
     textnoteedit.contextMenuEvent(event);
+    delete event;
 }
 
 TEST_F(ut_textnoteedit_test, keyPressEvent)
@@ -62,6 +66,9 @@ TEST_F(ut_textnoteedit_test, keyPressEvent)
     textnoteedit.keyPressEvent(event1);
     QKeyEvent *event2 = new QKeyEvent(QEvent::KeyPress, 0x01000001, Qt::NoModifier, "test");
     textnoteedit.keyPressEvent(event2);
+    delete event;
+    delete event1;
+    delete event2;
 }
 
 TEST_F(ut_textnoteedit_test, mouseEvent)
@@ -73,6 +80,7 @@ TEST_F(ut_textnoteedit_test, mouseEvent)
     textnoteedit.mouseReleaseEvent(event);
     textnoteedit.mouseMoveEvent(event);
     textnoteedit.mouseDoubleClickEvent(event);
+    delete event;
 }
 
 TEST_F(ut_textnoteedit_test, clearSelection)

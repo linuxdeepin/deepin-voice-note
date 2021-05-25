@@ -33,11 +33,6 @@ void ut_homepage_test::TearDown()
     delete m_homepage;
 }
 
-TEST_F(ut_homepage_test, initUi)
-{
-    m_homepage->initUi();
-}
-
 TEST_F(ut_homepage_test, eventFilter)
 {
     QKeyEvent keyTab(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier);

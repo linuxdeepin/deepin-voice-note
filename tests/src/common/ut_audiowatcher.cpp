@@ -125,4 +125,5 @@ TEST_F(ut_audiowatcher_test, enumtest)
     QAction *tmpact = new QAction("test");
     tmpact->setProperty("test", m_AudioWatcher->Internal);
     AudioWatcher::AudioMode tem = tmpact->property("test").value<AudioWatcher::AudioMode>();
+    delete tmpact;
 }

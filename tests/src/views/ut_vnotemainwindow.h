@@ -22,12 +22,19 @@
 #include <QTest>
 #include <QObject>
 
+class VNoteMainWindow;
+
 class ut_vnotemainwindow_test : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
     ut_vnotemainwindow_test();
+    VNoteMainWindow *m_mainWindow {nullptr};
+
+protected:
+    virtual void SetUp() override;
+    virtual void TearDown() override;
 };
 
 #endif // UT_VNOTEMAINWINDOW_H

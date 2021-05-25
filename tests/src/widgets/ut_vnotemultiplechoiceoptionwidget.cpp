@@ -59,8 +59,3 @@ TEST_F(ut_vnotemultiplechoiceoptionwidget_test, initConnections)
 {
     m_widget->initConnections();
 }
-
-TEST_F(ut_vnotemultiplechoiceoptionwidget_test, initUi)
-{
-    m_widget->initUi();
-}

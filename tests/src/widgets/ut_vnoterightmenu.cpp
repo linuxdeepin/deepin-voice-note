@@ -30,4 +30,5 @@ TEST_F(ut_vnoterightmenu_test, mouseMoveEvent)
     QPointF localPos;
     QMouseEvent *mouseMoveEvent = new QMouseEvent(QEvent::MouseMove, localPos, localPos, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
     rightmenu.mouseMoveEvent(mouseMoveEvent);
+    delete mouseMoveEvent;
 }

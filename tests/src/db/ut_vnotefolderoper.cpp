@@ -52,7 +52,8 @@ TEST_F(ut_vnotefolderoper_test, renameVNoteFolder)
 
 TEST_F(ut_vnotefolderoper_test, loadVNoteFolders)
 {
-    m_vnotefolderoper->loadVNoteFolders();
+    VNOTE_FOLDERS_MAP *folders = m_vnotefolderoper->loadVNoteFolders();
+    delete folders;
 }
 
 TEST_F(ut_vnotefolderoper_test, getNotesCount)

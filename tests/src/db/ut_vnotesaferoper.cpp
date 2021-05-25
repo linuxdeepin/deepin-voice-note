@@ -35,9 +35,8 @@ void ut_vnotesaferoper_test::TearDown()
 
 TEST_F(ut_vnotesaferoper_test, loadSafers)
 {
-    VDataSafer vdatasafer;
-    VNoteSaferOper vnotesaferoper(vdatasafer);
-    m_vnotesaferoper->loadSafers();
+    SafetyDatas *datas = m_vnotesaferoper->loadSafers();
+    delete datas;
 }
 
 TEST_F(ut_vnotesaferoper_test, addSafer)

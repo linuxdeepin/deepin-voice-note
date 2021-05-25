@@ -23,23 +23,24 @@
 
 ut_folderselectview_test::ut_folderselectview_test()
 {
-
 }
 
 TEST_F(ut_folderselectview_test, mousePressEvent)
 {
     FolderSelectView selectview;
-    QPointF localPos(30,20);
+    QPointF localPos(30, 20);
     QMouseEvent *mousePressEvent = new QMouseEvent(QEvent::MouseButtonPress, localPos, localPos, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
     selectview.mousePressEvent(mousePressEvent);
+    delete mousePressEvent;
 }
 
 TEST_F(ut_folderselectview_test, mouseReleaseEvent)
 {
     FolderSelectView selectview;
-    QPointF localPos(30,20);
+    QPointF localPos(30, 20);
     QMouseEvent *mousePressEvent = new QMouseEvent(QEvent::MouseButtonRelease, localPos, localPos, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
     selectview.mouseReleaseEvent(mousePressEvent);
+    delete mousePressEvent;
 }
 
 TEST_F(ut_folderselectview_test, keyPressEvent)
@@ -47,27 +48,30 @@ TEST_F(ut_folderselectview_test, keyPressEvent)
     FolderSelectView selectview;
     QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Up, Qt::NoModifier, "test");
     selectview.keyPressEvent(event);
+    delete event;
 }
 
 TEST_F(ut_folderselectview_test, mouseMoveEvent)
 {
     FolderSelectView selectview;
-    QPointF localPos(30,20);
+    QPointF localPos(30, 20);
     QMouseEvent *mouseMoveEvent = new QMouseEvent(QEvent::MouseMove, localPos, localPos, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
     selectview.mouseMoveEvent(mouseMoveEvent);
+    delete mouseMoveEvent;
 }
 
 TEST_F(ut_folderselectview_test, doTouchMoveEvent)
 {
     FolderSelectView selectview;
-    QPointF localPos(30,20);
+    QPointF localPos(30, 20);
     QMouseEvent *mouseMoveEvent = new QMouseEvent(QEvent::MouseMove, localPos, localPos, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
     selectview.doTouchMoveEvent(mouseMoveEvent);
+    delete mouseMoveEvent;
 }
 
 TEST_F(ut_folderselectview_test, handleTouchSlideEvent)
 {
     FolderSelectView selectview;
-    QPoint localPos(30,20);
-    selectview.handleTouchSlideEvent(20,40,localPos);
+    QPoint localPos(30, 20);
+    selectview.handleTouchSlideEvent(20, 40, localPos);
 }

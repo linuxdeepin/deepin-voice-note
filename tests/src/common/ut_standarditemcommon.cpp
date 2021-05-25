@@ -49,4 +49,5 @@ TEST_F(ut_standarditemcommon_test, getStandardItemType)
     index = pDataModel->index(0, 1);
     m_standarditemcommon->getStandardItemType(index);
     m_standarditemcommon->getStandardItemData(index);
+    delete pDataModel;
 }

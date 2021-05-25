@@ -95,23 +95,27 @@ TEST_F(ut_middleview_test, mouseEvent)
     middleview.mousePressEvent(mousePressEvent);
     middleview.m_onlyCurItemMenuEnable = true;
     middleview.mousePressEvent(mousePressEvent);
+    delete mousePressEvent;
 
     //mouseReleaseEvent
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
     middleview.m_onlyCurItemMenuEnable = false;
     QPoint point = QPoint(middleview.visualRect(middleview.currentIndex()).topLeft().x() + 10, middleview.visualRect(middleview.currentIndex()).topLeft().y() - 10);
     middleview.mouseReleaseEvent(releaseEvent);
+    delete releaseEvent;
 
     //doubleClickEvent
     middleview.m_onlyCurItemMenuEnable = false;
     QMouseEvent *doubleClickEvent = new QMouseEvent(QEvent::MouseButtonDblClick, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
     middleview.mouseDoubleClickEvent(doubleClickEvent);
+    delete doubleClickEvent;
 
     //mouseMoveEvent
     middleview.m_onlyCurItemMenuEnable = false;
     QMouseEvent *mouseMoveEvent = new QMouseEvent(QEvent::MouseMove, localPos, localPos, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
     middleview.setTouchState(middleview.TouchMoving);
     middleview.mouseMoveEvent(mouseMoveEvent);
+    delete mouseMoveEvent;
 }
 
 TEST_F(ut_middleview_test, setTouchState)
@@ -130,6 +134,7 @@ TEST_F(ut_middleview_test, doTouchMoveEvent)
     middleview.m_touchPressStartMs = time.toMSecsSinceEpoch() - 260;
     middleview.setTouchState(middleview.TouchMoving);
     middleview.doTouchMoveEvent(mouseMoveEvent);
+    delete mouseMoveEvent;
 }
 
 TEST_F(ut_middleview_test, setOnlyCurItemMenuEnable)
@@ -149,6 +154,7 @@ TEST_F(ut_middleview_test, eventFilter)
     QKeyEvent *event1 = new QKeyEvent(QEvent::Destroy, 0x01000001, Qt::NoModifier, "test");
     middleview.eventFilter(nullptr, event1);
     middleview.eventFilter(nullptr, &focusInEvent);
+    delete event1;
 }
 
 TEST_F(ut_middleview_test, addRowAtHead)
@@ -159,6 +165,7 @@ TEST_F(ut_middleview_test, addRowAtHead)
     vnoteitem->folderId = 2;
     vnoteitem->noteTitle = "test";
     middleview.addRowAtHead(vnoteitem);
+    delete vnoteitem;
 }
 
 TEST_F(ut_middleview_test, appendRow)
@@ -173,6 +180,8 @@ TEST_F(ut_middleview_test, appendRow)
     middleview.sortView();
     middleview.m_pSortViewFilter->sortView(MiddleViewSortFilter::title);
     middleview.m_pSortViewFilter->sortView(MiddleViewSortFilter::createTime);
+    delete noteData;
+    delete noteData1;
 }
 
 TEST_F(ut_middleview_test, rowCount)
@@ -222,7 +231,7 @@ TEST_F(ut_middleview_test, keyPressEvent)
     QKeyEvent *event2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Home, Qt::ShiftModifier, "test3");
     middleview.keyPressEvent(event2);
     delete event;
-    //    delete event1;
+    delete event1;
     delete event2;
 }
 
@@ -292,6 +301,8 @@ TEST_F(ut_middleview_test, keyReleaseEvent)
     middleview.keyReleaseEvent(event);
     QKeyEvent *event2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_A, Qt::NoModifier, "test");
     middleview.keyReleaseEvent(event2);
+    delete event;
+    delete event2;
 }
 
 TEST_F(ut_middleview_test, getSelectedCount)
