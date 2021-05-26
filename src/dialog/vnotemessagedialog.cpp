@@ -50,7 +50,7 @@ void VNoteMessageDialog::setSingleButton()
 {
     m_buttonSpliter->setVisible(false);
     m_confirmBtn->setVisible(false);
-    m_cancelBtn->setText(DApplication::translate("VNoteMessageDialog", "OK"));
+    m_cancelBtn->setText(DApplication::translate("VNoteMessageDialog", "OK", "button"));
 }
 
 /**
@@ -129,8 +129,8 @@ void VNoteMessageDialog::initMessage()
     //TODO:
     //   The default button text is Cancel & Confirm
     //In some case OK button text is need to change
-    m_cancelBtn->setText(DApplication::translate("VNoteMessageDialog", "Cancel"));
-    m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "Confirm"));
+    m_cancelBtn->setText(DApplication::translate("VNoteMessageDialog", "Cancel", "button"));
+    m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "Confirm", "button"));
     switch (m_msgType) {
     case DeleteFolder: {
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "Are you sure you want to delete this notebook?\nAll notes in it will be deleted"));

@@ -241,8 +241,8 @@ void FolderSelectDialog::initUI()
     m_cancelBtn = new DPushButton(this);
     m_confirmBtn = new DSuggestButton(this);
 
-    m_cancelBtn->setText(DApplication::translate("FolderSelectDialog", "Cancel"));
-    m_confirmBtn->setText(DApplication::translate("FolderSelectDialog", "Confirm"));
+    m_cancelBtn->setText(DApplication::translate("FolderSelectDialog", "Cancel", "button"));
+    m_confirmBtn->setText(DApplication::translate("FolderSelectDialog", "Confirm", "button"));
 
     m_buttonSpliter = new DVerticalLine(this);
     DPalette pa = DApplicationHelper::instance()->palette(m_buttonSpliter);

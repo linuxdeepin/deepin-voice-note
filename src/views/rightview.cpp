@@ -814,7 +814,7 @@ bool RightView::checkFileExist(const QString &file)
             m_fileHasDelDialog->setIcon(QIcon::fromTheme("dialog-warning"));
             m_fileHasDelDialog->addButton(DApplication::translate(
                                               "RightView",
-                                              "OK"),
+                                              "OK", "button"),
                                           false, DDialog::ButtonNormal);
         }
         m_fileHasDelDialog->exec();
