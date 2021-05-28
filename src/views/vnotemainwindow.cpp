@@ -2291,21 +2291,8 @@ void VNoteMainWindow::initVirtualKeyboard()
 void VNoteMainWindow::onSetVirtualKeyboardShow(bool show)
 {
     if (m_virtualKeyboard) {
-        m_imShowFlagMutex.lock();
-        m_imShowFlags.push(show);
-        m_imShowFlagMutex.unlock();
-        QTimer::singleShot(300, this, [=] {
-            m_imShowFlagMutex.lock();
-            if (m_imShowFlags.size()) {
-                bool flag = m_imShowFlags.pop();
-                m_imShowFlags.clear();
-                m_imShowFlagMutex.unlock();
-                if (flag != m_currentVirtualKeyboardShow && m_virtualKeyboard->setProperty("imActive", flag)) {
-                    m_currentVirtualKeyboardShow = flag;
-                }
-            } else {
-                m_imShowFlagMutex.unlock();
-            }
-        });
+        if (show != m_currentVirtualKeyboardShow && m_virtualKeyboard->setProperty("imActive", show)) {
+            m_currentVirtualKeyboardShow = show;
+        }
     }
 }
