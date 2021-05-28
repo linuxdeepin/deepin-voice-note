@@ -23,13 +23,13 @@
 #include "textnoteedit.h"
 #include "common/utils.h"
 
+#include <DStyle>
+#include <DApplicationHelper>
+
 #include <QVBoxLayout>
 #include <QAbstractTextDocumentLayout>
 #include <QClipboard>
 #include <QDebug>
-
-#include <DStyle>
-#include <DApplicationHelper>
 
 /**
  * @brief TextNoteItem::TextNoteItem

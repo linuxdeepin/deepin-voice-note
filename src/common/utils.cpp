@@ -23,12 +23,12 @@
 #include "vnoteitem.h"
 #include "vnoteapplication.h"
 
+#include <DGuiApplicationHelper>
+
 #include <QImageReader>
 #include <QIcon>
 #include <QDebug>
 #include <QTextBlock>
-
-#include <DGuiApplicationHelper>
 
 Utils::Utils()
 {

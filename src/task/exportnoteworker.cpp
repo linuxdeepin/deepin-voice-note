@@ -22,12 +22,12 @@
 #include "globaldef.h"
 #include "common/vnoteitem.h"
 
+#include <DLog>
+
 #include <QDir>
 #include <QDateTime>
 #include <QFile>
 #include <QFileInfo>
-
-#include <DLog>
 
 /**
  * @brief ExportNoteWorker::ExportNoteWorker

@@ -26,9 +26,9 @@
 #include "vnoteforlder.h"
 #include "vnoteitem.h"
 
-#include <QThreadPool>
-
 #include <DLog>
+
+#include <QThreadPool>
 
 DCORE_USE_NAMESPACE
 

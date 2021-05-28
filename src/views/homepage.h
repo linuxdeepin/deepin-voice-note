@@ -24,11 +24,11 @@
 
 #include "widgets/vnoteiconbutton.h"
 
-#include <QWidget>
-
 #include <DLabel>
 #include <DPushButton>
 #include <DSuggestButton>
+
+#include <QWidget>
 
 DWIDGET_USE_NAMESPACE
 //无数据主页

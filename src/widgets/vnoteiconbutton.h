@@ -22,10 +22,10 @@
 #ifndef VNOTEICONBUTTON_H
 #define VNOTEICONBUTTON_H
 
-#include <QMouseEvent>
-
 #include <DApplicationHelper>
 #include <DIconButton>
+
+#include <QMouseEvent>
 
 DWIDGET_USE_NAMESPACE
 

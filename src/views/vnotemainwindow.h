@@ -25,11 +25,6 @@
 #include "common/datatypedef.h"
 #include "globaldef.h"
 
-#include <QShortcut>
-#include <QStandardItem>
-#include <QList>
-#include <QDBusPendingReply>
-
 #include <DMainWindow>
 #include <DSearchEdit>
 #include <DSplitter>
@@ -41,6 +36,11 @@
 #include <DFloatingMessage>
 #include <DScrollArea>
 #include <DMenu>
+
+#include <QShortcut>
+#include <QStandardItem>
+#include <QList>
+#include <QDBusPendingReply>
 
 DWIDGET_USE_NAMESPACE
 
@@ -194,8 +194,6 @@ public slots:
     void onNewNotebook();
     //新建记事项
     void onNewNote();
-    //主题改变
-    void onChangeTheme();
     //开始转文字
     void onA2TStart(bool first = true);
     //转写失败，重新转文字
@@ -226,6 +224,8 @@ public slots:
     void onDropNote(bool dropCancel);
     //响应多选详情页操作
     void handleMultipleOption(int id);
+    //delete 快捷键
+    void onDeleteShortcut();
 
 private:
     //左侧列表视图操作相关

@@ -25,11 +25,11 @@
 #include "vnoteapplication.h"
 #include "setting.h"
 
-#include <QVBoxLayout>
-
 #include <DApplication>
 #include <DFontSizeManager>
 #include <DLog>
+
+#include <QVBoxLayout>
 
 /**
  * @brief UpgradeView::UpgradeView

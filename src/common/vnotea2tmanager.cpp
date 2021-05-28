@@ -20,9 +20,9 @@
 */
 #include "vnotea2tmanager.h"
 
-#include <QDBusError>
-
 #include <DSysInfo>
+
+#include <QDBusError>
 
 DCORE_USE_NAMESPACE
 

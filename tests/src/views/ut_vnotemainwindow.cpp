@@ -166,7 +166,6 @@ TEST_F(ut_vnotemainwindow_test, onStartRecord)
 
 TEST_F(ut_vnotemainwindow_test, onA2TStartAgain)
 {
-    m_mainWindow->onChangeTheme();
     m_mainWindow->onA2TStartAgain();
     m_mainWindow->onA2TError(1);
     m_mainWindow->onA2TSuccess("/usr/share/music/bensound-sunny.mp3");

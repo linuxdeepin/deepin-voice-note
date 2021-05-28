@@ -22,10 +22,10 @@
 #ifndef VNOTE2SICONBUTTON_H
 #define VNOTE2SICONBUTTON_H
 
-#include <QMouseEvent>
-
 #include <DApplicationHelper>
 #include <DFloatingButton>
+
+#include <QMouseEvent>
 
 DWIDGET_USE_NAMESPACE
 

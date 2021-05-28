@@ -22,12 +22,12 @@
 #include "globaldef.h"
 #include "setting.h"
 
+#include <DWidgetUtil>
+#include <DGuiApplicationHelper>
+
 #include <QDir>
 #include <QFileInfo>
 #include <QStandardPaths>
-
-#include <DWidgetUtil>
-#include <DGuiApplicationHelper>
 
 /**
  * @brief VNoteApplication::VNoteApplication

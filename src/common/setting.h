@@ -21,10 +21,12 @@
 #ifndef SETTING_H
 #define SETTING_H
 
-#include <QSettings>
 #include <qsettingbackend.h>
+
 #include <DSettings>
 #include <DSettingsOption>
+
+#include <QSettings>
 #include <QMutex>
 
 DCORE_USE_NAMESPACE

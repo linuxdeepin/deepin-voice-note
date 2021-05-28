@@ -21,7 +21,11 @@
 #ifndef VNOTEMULTIPLECHOICERIGHTWIDGET_H
 #define VNOTEMULTIPLECHOICERIGHTWIDGET_H
 
-#include <QWidget>
+#include <DToolButton>
+#include <DFontSizeManager>
+#include <DApplicationHelper>
+#include <DWidget>
+#include <DLabel>
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -29,12 +33,6 @@
 #include <QDomElement>
 #include <QSvgRenderer>
 #include <QFile>
-
-#include <DToolButton>
-#include <DFontSizeManager>
-#include <DApplicationHelper>
-#include <DWidget>
-#include <DLabel>
 
 DWIDGET_USE_NAMESPACE
 //多选操作页面

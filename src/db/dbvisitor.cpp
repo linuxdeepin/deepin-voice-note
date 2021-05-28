@@ -30,9 +30,9 @@
 #include "common/vnoteitem.h"
 #include "db/vnotedbmanager.h"
 
-#include <QVariant>
-
 #include <DLog>
+
+#include <QVariant>
 
 const QStringList DbVisitor::DBFolder::folderColumnsName = {
     "folder_id",

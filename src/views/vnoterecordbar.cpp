@@ -30,10 +30,10 @@
 
 #include "dialog/vnotemessagedialog.h"
 
-#include <QVBoxLayout>
-
 #include <DApplication>
 #include <DLog>
+
+#include <QVBoxLayout>
 
 /**
  * @brief VNoteRecordBar::VNoteRecordBar

@@ -61,10 +61,6 @@
 
 #include "vnoteapplication.h"
 
-#include <QScrollBar>
-#include <QLocale>
-#include <QDesktopServices>
-
 #include <DApplication>
 #include <DToolButton>
 #include <DApplicationHelper>
@@ -74,6 +70,10 @@
 #include <DTitlebar>
 #include <DSettingsDialog>
 #include <DSysInfo>
+
+#include <QScrollBar>
+#include <QLocale>
+#include <QDesktopServices>
 
 static OpsStateInterface *stateOperation = nullptr;
 
@@ -189,9 +189,6 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::showDeviceExceptionErrMessage);
     connect(m_recordBar, &VNoteRecordBar::sigDeviceExceptionMsgClose,
             this, &VNoteMainWindow::closeDeviceExceptionErrMessage);
-
-    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
-            &VNoteMainWindow::onChangeTheme);
 
     //Bind all context menu states handler
     connect(ActionManager::Instance()->notebookContextMenu(), &DMenu::aboutToShow,
@@ -442,48 +439,7 @@ void VNoteMainWindow::initShortcuts()
     m_stDelete->setContext(Qt::ApplicationShortcut);
     m_stDelete->setAutoRepeat(false);
 
-    connect(m_stDelete.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
-            QAction *deleteAct = nullptr;
-
-            /*
-             * TODO:
-             *     We check focus here to choice what action we will
-             * take. Focus in leftview for delete notebook, in midlle
-             * view for delete note, in Rightview for delete note content.
-             * or do nothing.
-             * */
-            if (m_leftView->hasFocus()) {
-                if (!stateOperation->isRecording()
-                    && !stateOperation->isVoice2Text()
-                    && !stateOperation->isPlaying()) {
-                    deleteAct = ActionManager::Instance()->getActionById(
-                        ActionManager::NotebookDelete);
-                }
-            } else if (m_middleView->hasFocus()) {
-                if (!stateOperation->isRecording()
-                    && !stateOperation->isVoice2Text()
-                    && !stateOperation->isPlaying()
-                    && m_middleView->count() > 0) {
-                    deleteAct = ActionManager::Instance()->getActionById(
-                        ActionManager::NoteDelete);
-                }
-            } else if (m_rightView->hasFocus()) {
-                deleteAct = ActionManager::Instance()->getActionById(
-                    ActionManager::DetailDelete);
-            } else {
-                QPoint pos = m_rightViewHolder->mapFromGlobal(QCursor::pos());
-                if (m_rightViewHolder->rect().contains(pos)) {
-                    deleteAct = ActionManager::Instance()->getActionById(
-                        ActionManager::DetailDelete);
-                }
-            }
-
-            if (nullptr != deleteAct) {
-                deleteAct->triggered();
-            }
-        }
-    });
+    connect(m_stDelete.get(), &QShortcut::activated, this, &VNoteMainWindow::onDeleteShortcut);
 
     m_stPreviewShortcuts.reset(new QShortcut(this));
     m_stPreviewShortcuts->setKey(QString("Ctrl+Shift+/"));
@@ -1018,14 +974,6 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 }
 
 /**
- * @brief VNoteMainWindow::onChangeTheme
- */
-void VNoteMainWindow::onChangeTheme()
-{
-    ;
-}
-
-/**
  * @brief VNoteMainWindow::onA2TStartAgain
  */
 void VNoteMainWindow ::onA2TStartAgain()
@@ -1382,22 +1330,18 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         break;
     case ActionManager::NotebookDelete: {
         VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteFolder, this);
-        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+        if (VNoteBaseDialog::Accepted == confirmDialog.exec()) {
             delNotepad();
-        });
-
-        confirmDialog.exec();
+        }
     } break;
     case ActionManager::NotebookAddNew:
         addNote();
         break;
     case ActionManager::NoteDelete: {
         VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this, m_middleView->getSelectedCount());
-        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+        if (VNoteBaseDialog::Accepted == confirmDialog.exec()) {
             delNote();
-        });
-
-        confirmDialog.exec();
+        }
     } break;
     case ActionManager::NoteAddNew:
         addNote();
@@ -1409,11 +1353,9 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         int ret = m_rightView->showWarningDialog();
         if (ret == 1) {
             VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this);
-            connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+            if (VNoteBaseDialog::Accepted == confirmDialog.exec()) {
                 m_rightView->delSelectText();
-            });
-
-            confirmDialog.exec();
+            }
         } else if (ret == 0) {
             m_rightView->delSelectText();
         }
@@ -2272,10 +2214,9 @@ void VNoteMainWindow::handleMultipleOption(int id)
     case ButtonValue::Delete:
         //多选页面-删除
         VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this, m_middleView->getSelectedCount());
-        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+        if (VNoteBaseDialog::Accepted == confirmDialog.exec()) {
             delNote();
-        });
-        confirmDialog.exec();
+        }
         break;
     }
 }
@@ -2438,4 +2379,48 @@ bool VNoteMainWindow::setMiddleviewNext(QKeyEvent *event)
 bool VNoteMainWindow::needShowMax()
 {
     return m_needShowMax;
+}
+
+void VNoteMainWindow::onDeleteShortcut()
+{
+    if (canDoShortcutAction()) {
+        QAction *deleteAct = nullptr;
+
+        /*
+         * TODO:
+         *     We check focus here to choice what action we will
+         * take. Focus in leftview for delete notebook, in midlle
+         * view for delete note, in Rightview for delete note content.
+         * or do nothing.
+         * */
+        if (m_leftView->hasFocus()) {
+            if (!stateOperation->isRecording()
+                && !stateOperation->isVoice2Text()
+                && !stateOperation->isPlaying()) {
+                deleteAct = ActionManager::Instance()->getActionById(
+                    ActionManager::NotebookDelete);
+            }
+        } else if (m_middleView->hasFocus()) {
+            if (!stateOperation->isRecording()
+                && !stateOperation->isVoice2Text()
+                && !stateOperation->isPlaying()
+                && m_middleView->count() > 0) {
+                deleteAct = ActionManager::Instance()->getActionById(
+                    ActionManager::NoteDelete);
+            }
+        } else if (m_rightView->hasFocus()) {
+            deleteAct = ActionManager::Instance()->getActionById(
+                ActionManager::DetailDelete);
+        } else {
+            QPoint pos = m_rightViewHolder->mapFromGlobal(QCursor::pos());
+            if (m_rightViewHolder->rect().contains(pos)) {
+                deleteAct = ActionManager::Instance()->getActionById(
+                    ActionManager::DetailDelete);
+            }
+        }
+
+        if (nullptr != deleteAct) {
+            deleteAct->triggered();
+        }
+    }
 }

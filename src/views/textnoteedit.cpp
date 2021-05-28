@@ -20,11 +20,12 @@
 */
 
 #include "textnoteedit.h"
-#include <QWheelEvent>
-#include <QTextBlock>
 
 #include <DFontSizeManager>
 #include <DApplicationHelper>
+
+#include <QWheelEvent>
+#include <QTextBlock>
 
 /**
  * @brief TextNoteEdit::TextNoteEdit

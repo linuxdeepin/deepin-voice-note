@@ -23,13 +23,13 @@
 #include "views/leftviewsortfilter.h"
 #include "globaldef.h"
 
+#include <DApplication>
+#include <DApplicationHelper>
+
 #include <QVBoxLayout>
 #include <QDebug>
 #include <QMouseEvent>
 #include <QScrollBar>
-
-#include <DApplication>
-#include <DApplicationHelper>
 #include <QGraphicsOpacityEffect>
 
 FolderSelectView::FolderSelectView(QWidget *parent)

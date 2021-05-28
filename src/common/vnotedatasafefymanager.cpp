@@ -23,9 +23,9 @@
 #include "task/loadsafeteydataworker.h"
 #include "task/vndatasafertask.h"
 
-#include <QThreadPool>
-
 #include <DLog>
+
+#include <QThreadPool>
 
 VNoteDataSafefyManager *VNoteDataSafefyManager::_instance = nullptr;
 

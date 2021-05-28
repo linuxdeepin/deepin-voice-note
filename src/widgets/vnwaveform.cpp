@@ -22,11 +22,11 @@
 #include "vnwaveform.h"
 #include "globaldef.h"
 
+#include <DLog>
+
 #include <QMouseEvent>
 #include <QPen>
 #include <QPainter>
-
-#include <DLog>
 
 /**
  * @brief VNWaveform::VNWaveform

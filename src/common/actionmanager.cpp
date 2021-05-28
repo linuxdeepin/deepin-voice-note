@@ -22,9 +22,9 @@
 #include "common/opsstateinterface.h"
 
 #include <DApplication>
-#include <QSignalMapper>
-
 #include <DLog>
+
+#include <QSignalMapper>
 
 #define MenuId "_menuid_"
 

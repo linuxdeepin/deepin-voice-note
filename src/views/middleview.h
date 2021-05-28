@@ -24,11 +24,11 @@
 
 #include "widgets/vnoterightmenu.h"
 
-#include <QDateTime>
-
 #include <DListView>
 #include <DMenu>
 #include <DLabel>
+
+#include <QDateTime>
 
 DWIDGET_USE_NAMESPACE
 class MiddleViewDelegate;

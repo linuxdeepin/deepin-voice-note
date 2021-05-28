@@ -26,11 +26,11 @@
 #include "db/dbvisitor.h"
 #include "globaldef.h"
 
+#include <DLog>
+
 #include <QVariant>
 #include <QObject>
 #include <QDateTime>
-
-#include <DLog>
 
 /**
  * @brief VNoteFolderOper::VNoteFolderOper

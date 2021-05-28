@@ -23,8 +23,6 @@
 #define VOICENOTEITEM_H
 #include "common/vnoteitem.h"
 
-#include <QMovie>
-
 #include <DWidget>
 #include <DFrame>
 #include <DLabel>

@@ -22,17 +22,17 @@
 #ifndef RIGHTVIEW_H
 #define RIGHTVIEW_H
 
+#include "textnoteedit.h"
+#include "vtextspeechandtrmanager.h"
+
+#include <DWidget>
+#include <DDialog>
+
 #include <QVBoxLayout>
 #include <QList>
 #include <QShortcut>
 #include <QMultiMap>
 #include <QList>
-
-#include <DWidget>
-#include <DDialog>
-
-#include "textnoteedit.h"
-#include "vtextspeechandtrmanager.h"
 
 DWIDGET_USE_NAMESPACE
 struct VNoteFolder;

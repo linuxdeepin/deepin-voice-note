@@ -23,12 +23,12 @@
 
 #include "common/datatypedef.h"
 
+#include <DWidget>
+
 #include <QDateTime>
 #include <QTextCursor>
 #include <QTextDocumentFragment>
 #include <QTextDocument>
-
-#include <DWidget>
 
 DWIDGET_USE_NAMESPACE
 

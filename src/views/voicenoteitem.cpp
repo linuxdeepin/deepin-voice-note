@@ -28,6 +28,9 @@
 
 #include "widgets/vnote2siconbutton.h"
 
+#include <DFontSizeManager>
+#include <DStyle>
+
 #include <QDebug>
 #include <QGridLayout>
 #include <QVBoxLayout>
@@ -35,9 +38,6 @@
 #include <QAbstractTextDocumentLayout>
 #include <QTimer>
 #include <QGridLayout>
-#include <DFontSizeManager>
-#include <DStyle>
-#include <DAnchors>
 
 #define DefaultHeight 64
 

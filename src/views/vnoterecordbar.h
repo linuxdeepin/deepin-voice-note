@@ -22,11 +22,11 @@
 #ifndef VNOTERECORDBAR_H
 #define VNOTERECORDBAR_H
 
-#include <QWidget>
-#include <QStackedLayout>
-
 #include <DAnchors>
 #include <DFloatingMessage>
+
+#include <QWidget>
+#include <QStackedLayout>
 
 DWIDGET_USE_NAMESPACE
 class AudioWatcher;

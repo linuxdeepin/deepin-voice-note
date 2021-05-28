@@ -22,13 +22,13 @@
 #include "db/dbvisitor.h"
 #include "globaldef.h"
 
+#include <DLog>
+
 #include <QStandardPaths>
 #include <QDir>
 #include <QFile>
 #include <QFileDevice>
 #include <QSqlError>
-
-#include <DLog>
 
 #define CRITICAL_SECTION_BEGIN() \
     do { \

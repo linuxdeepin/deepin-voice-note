@@ -32,15 +32,15 @@
 #include "db/vnoteitemoper.h"
 #include "moveview.h"
 
+#include <DApplication>
+#include <DFileDialog>
+#include <DLog>
+
 #include <QMouseEvent>
 #include <QVBoxLayout>
 #include <QScrollBar>
 #include <QDrag>
 #include <QMimeData>
-
-#include <DApplication>
-#include <DFileDialog>
-#include <DLog>
 
 /**
  * @brief MiddleView::MiddleView

@@ -20,10 +20,10 @@
 */
 #include "vnoteitem.h"
 
+#include <DLog>
+
 #include <QFile>
 #include <QFileInfo>
-
-#include <DLog>
 
 /**
  * @brief VNoteItem::VNoteItem

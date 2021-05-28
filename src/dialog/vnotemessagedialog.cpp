@@ -21,12 +21,12 @@
 
 #include "vnotemessagedialog.h"
 
-#include <QVBoxLayout>
-
 #include <DVerticalLine>
 #include <DApplication>
 #include <DFontSizeManager>
 #include <DApplicationHelper>
+
+#include <QVBoxLayout>
 
 /**
  * @brief VNoteMessageDialog::VNoteMessageDialog

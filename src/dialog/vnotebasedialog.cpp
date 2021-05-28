@@ -22,10 +22,10 @@
 #include "dialog/vnotebasedialog.h"
 #include "globaldef.h"
 
+#include <DFontSizeManager>
+
 #include <QVBoxLayout>
 #include <QShowEvent>
-
-#include <DFontSizeManager>
 
 /**
  * @brief VNoteBaseDialog::VNoteBaseDialog

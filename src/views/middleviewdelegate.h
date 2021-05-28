@@ -22,9 +22,10 @@
 #ifndef LEFTVIEWDELEGATE_H
 #define LEFTVIEWDELEGATE_H
 
+#include <DStyledItemDelegate>
+
 #include <QPixmap>
 
-#include <DStyledItemDelegate>
 DWIDGET_USE_NAMESPACE
 
 struct VNoteItem;

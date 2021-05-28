@@ -23,10 +23,11 @@
 #include "common/vnoteforlder.h"
 #include "common/vnoteitem.h"
 #include "globaldef.h"
+
+#include <DApplicationHelper>
+
 #include <QPainter>
 #include <QPainterPath>
-#include <DApplicationHelper>
-#include <DLog>
 
 MoveView::MoveView(QWidget *parent)
     : QWidget(parent)

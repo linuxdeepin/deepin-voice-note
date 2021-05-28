@@ -20,13 +20,14 @@
 */
 #include "setting.h"
 
+#include <DSettingsOption>
+#include <DApplication>
+
 #include <QStandardPaths>
 #include <QFileInfo>
 #include <QDir>
 #include <QDebug>
 
-#include <DSettingsOption>
-#include <DApplication>
 DWIDGET_USE_NAMESPACE
 
 static setting *settinginstance = nullptr;

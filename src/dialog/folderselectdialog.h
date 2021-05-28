@@ -21,10 +21,6 @@
 #ifndef FOLDERSELECTDIALOG_H
 #define FOLDERSELECTDIALOG_H
 
-#include <QStandardItemModel>
-#include <QList>
-#include <QDateTime>
-
 #include <DPushButton>
 #include <DWarningButton>
 #include <DVerticalLine>
@@ -34,6 +30,10 @@
 #include <DSuggestButton>
 #include <DLabel>
 #include <DAbstractDialog>
+
+#include <QStandardItemModel>
+#include <QList>
+#include <QDateTime>
 
 DWIDGET_USE_NAMESPACE
 

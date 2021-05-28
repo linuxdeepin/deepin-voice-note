@@ -21,11 +21,11 @@
 
 #include "splashview.h"
 
-#include <QVBoxLayout>
-
 #include <DLabel>
 #include <DWaterProgress>
 #include <DApplication>
+
+#include <QVBoxLayout>
 
 DWIDGET_USE_NAMESPACE
 

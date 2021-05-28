@@ -22,9 +22,11 @@
 #include "globaldef.h"
 
 #include <DApplication>
+
 #include <QDebug>
 #include <QImageReader>
 #include <QKeyEvent>
+
 //多选操作页面
 const int m_iconWidth = 24;
 VnoteMultipleChoiceOptionWidget::VnoteMultipleChoiceOptionWidget(QWidget *parent)

@@ -25,13 +25,13 @@
 
 #include "db/vnotefolderoper.h"
 
-#include <QPainter>
-#include <QPainterPath>
-#include <QLineEdit>
-
 #include <DApplication>
 #include <DApplicationHelper>
 #include <DLog>
+
+#include <QPainter>
+#include <QPainterPath>
+#include <QLineEdit>
 
 /**
  * @brief LeftViewDelegate::LeftViewDelegate

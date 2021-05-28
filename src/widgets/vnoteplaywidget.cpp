@@ -21,14 +21,13 @@
 
 #include "vnoteplaywidget.h"
 #include "vnote2siconbutton.h"
-
 #include "common/vnoteitem.h"
 #include "common/utils.h"
 
+#include <DDialogCloseButton>
+
 #include <QGridLayout>
 #include <QDebug>
-
-#include <DDialogCloseButton>
 
 /**
  * @brief VNotePlayWidget::VNotePlayWidget

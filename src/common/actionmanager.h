@@ -21,12 +21,12 @@
 #ifndef ACTIONFACTORY_H
 #define ACTIONFACTORY_H
 
-#include <widgets/vnoterightmenu.h>
+#include "widgets/vnoterightmenu.h"
+
+#include <DMenu>
 
 #include <QObject>
 #include <QMap>
-
-#include <DMenu>
 
 DWIDGET_USE_NAMESPACE
 
