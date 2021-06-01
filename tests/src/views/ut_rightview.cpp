@@ -37,279 +37,316 @@
 
 #include "stub.h"
 
+#include <DFileDialog>
+DWIDGET_USE_NAMESPACE
+
 ut_rightview_test::ut_rightview_test()
 {
 }
 
-QAction *stub_exec(const QPoint &pos, QAction *at = nullptr)
+void ut_rightview_test::SetUp()
 {
-    Q_UNUSED(pos)
-    Q_UNUSED(at)
-
-    return nullptr;
+    VNOTE_ALL_NOTES_MAP *notes = VNoteDataManager::instance()->getAllNotesInFolder();
+    if (notes && !notes->notes.isEmpty()) {
+        VNOTE_ITEMS_MAP *tmp = notes->notes.first();
+        if (tmp && !tmp->folderNotes.isEmpty()) {
+            m_noteItem = tmp->folderNotes.first();
+        }
+    }
 }
 
-//TEST_F(ut_rightview_test, insertTextEdit)
-//{
-//    RightView rightview;
-//    VNOTE_DATAS datas;
-//    VNoteBlock *block = datas.newBlock(VNoteBlock::Text);
-//    rightview.insertTextEdit(block, true, QTextCursor::Up, "test");
-//}
+bool stub_right_view()
+{
+    return true;
+}
 
-//TEST_F(ut_rightview_test, insertVoiceItem)
-//{
-//    RightView rightview;
-//    VNoteItem *vnoteitem = new VNoteItem;
-//    vnoteitem->noteId = 1;
-//    vnoteitem->folderId = 1;
-//    vnoteitem->noteTitle = "test";
-//    rightview.m_noteItemData = vnoteitem;
-//    VNTextBlock *block = new VNTextBlock;
-//    rightview.m_curItemWidget = rightview.insertTextEdit(block, true, QTextCursor::Up, "test");
-//    QString tmppath = "/usr/share/music/bensound-sunny.mp3";
-//    rightview.insertVoiceItem(tmppath, 2650);
-//    delete vnoteitem;
-//    delete block;
-//}
+TEST_F(ut_rightview_test, insertTextEdit)
+{
+    RightView rightview;
+    VNTextBlock block;
+    rightview.insertTextEdit(&block, true, QTextCursor::Up, "test");
+    rightview.insertTextEdit(&block, false, QTextCursor::Up, "test");
+}
 
-//TEST_F(ut_rightview_test, onTextEditFocusIn)
-//{
-//    RightView rightview;
-//    VNoteItem *retNote = VNoteDataManager::instance()->getNote(0, 0);
-//    rightview.initData(retNote, "");
-//    rightview.onTextEditFocusIn(Qt::TabFocusReason);
-//}
+TEST_F(ut_rightview_test, insertVoiceItem)
+{
+    RightView rightview;
+    VNoteItem noteItem;
+    rightview.initData(&noteItem, "");
+    rightview.initAction(rightview.m_curItemWidget);
+    if (rightview.m_curItemWidget) {
+        QTextCursor cursor = rightview.m_curItemWidget->getTextCursor();
+        cursor.insertText("test");
+        cursor.setPosition(1);
+        rightview.m_curItemWidget->setTextCursor(cursor);
+    }
+    QString tmppath = "/usr/share/music/bensound-sunny.mp3";
+    DetailItemWidget *widget1 = rightview.insertVoiceItem(tmppath, 2650);
+    DetailItemWidget *widget2 = rightview.insertVoiceItem(tmppath, 2650);
+    rightview.delWidget(widget1, true);
+    int index = rightview.layout()->indexOf(widget2);
+    DetailItemWidget *widget3 = static_cast<DetailItemWidget *>(rightview.layout()->itemAt(index - 1)->widget());
+    rightview.m_curItemWidget = widget3;
+    rightview.setCurVoiceAsr(static_cast<VoiceNoteItem *>(widget3));
+    rightview.setCurVoicePlay(static_cast<VoiceNoteItem *>(widget3));
+    rightview.delWidget(widget3, true);
+}
 
-//TEST_F(ut_rightview_test, onTextEditFocusOut)
-//{
-//    RightView rightview;
-//    rightview.onTextEditFocusOut();
-//}
+TEST_F(ut_rightview_test, onTextEditFocusIn)
+{
+    RightView rightview;
+    VNTextBlock block;
+    rightview.insertTextEdit(&block, false, QTextCursor::Up, "test");
+    rightview.onTextEditFocusIn(Qt::TabFocusReason);
+}
 
-//TEST_F(ut_rightview_test, onTextEditTextChange)
-//{
-//    RightView rightview;
-//    rightview.onTextEditTextChange();
-//}
+TEST_F(ut_rightview_test, onTextEditFocusOut)
+{
+    RightView rightview;
+    rightview.onTextEditFocusOut();
+}
 
-////TEST_F(ut_rightview_test, initData)
-////{
-////    RightView rightview;
-////    VNoteItem *vnoteitem = new VNoteItem;
-////    vnoteitem->noteId = 2;
-////    vnoteitem->folderId = 2;
-////    vnoteitem->noteTitle = "test";
-////    rightview.initData(vnoteitem, "test", true);
-////}
+TEST_F(ut_rightview_test, onTextEditTextChange)
+{
+    RightView rightview;
+    rightview.onTextEditTextChange();
+}
 
-//TEST_F(ut_rightview_test, initAction)
-//{
-//    RightView rightview;
-//    rightview.initAction(nullptr);
-//}
+TEST_F(ut_rightview_test, mousePressEvent)
+{
+    Stub stub;
+    stub.set(ADDR(RightView, onMenuShow), stub_right_view);
+    RightView rightview;
+    QPointF localPos;
+    rightview.initData(m_noteItem, "");
+    QMouseEvent *mousePressEvent = new QMouseEvent(QEvent::MouseButtonPress, localPos, localPos, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+    rightview.mousePressEvent(mousePressEvent);
+    delete mousePressEvent;
+}
 
-//TEST_F(ut_rightview_test, mousePressEvent)
-//{
-//    Stub s;
-//    s.set((QAction * (QMenu::*)(const QPoint &, QAction *)) ADDR(QMenu, exec), stub_exec);
-//    RightView rightview;
-//    QPointF localPos;
-//    VNoteItem *vnoteitem = new VNoteItem;
-//    vnoteitem->noteId = 1;
-//    vnoteitem->folderId = 1;
-//    vnoteitem->noteTitle = "test1";
-//    rightview.m_noteItemData = vnoteitem;
-//    QMouseEvent *mousePressEvent = new QMouseEvent(QEvent::MouseButtonPress, localPos, localPos, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
-//    rightview.mousePressEvent(mousePressEvent);
-//    delete vnoteitem;
-//    delete mousePressEvent;
-//}
+TEST_F(ut_rightview_test, removeSelectWidget)
+{
+    RightView rightview;
+    VNTextBlock block;
+    DetailItemWidget *widget = rightview.insertTextEdit(&block, true, QTextCursor::Up, "test");
+    rightview.m_selectWidget.insert(TextEditPlugin, widget);
+    rightview.removeSelectWidget(widget);
+}
 
-//TEST_F(ut_rightview_test, removeSelectWidget)
-//{
-//    RightView rightview;
-//    QLayoutItem *layoutItem = rightview.m_viewportLayout->itemAt(0);
-//    DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
-//    rightview.removeSelectWidget(widget);
-//}
+TEST_F(ut_rightview_test, removeCacheWidget)
+{
+    RightView rightview;
+    rightview.initData(m_noteItem, "");
+    rightview.initData(m_noteItem, "");
+    rightview.removeCacheWidget(m_noteItem->folder());
+    rightview.initData(nullptr, "");
+}
 
-//TEST_F(ut_rightview_test, removeCacheWidget)
-//{
-//    RightView rightview;
-//    VNoteItem *vnoteitem = new VNoteItem;
-//    vnoteitem->noteId = 1;
-//    vnoteitem->folderId = 1;
-//    vnoteitem->noteTitle = "test";
-//    rightview.removeCacheWidget(vnoteitem);
+TEST_F(ut_rightview_test, adjustVoiceVerticalScrollBar)
+{
+    RightView rightview;
+    rightview.initData(m_noteItem, "");
+    VNTextBlock block;
+    DetailItemWidget *widget = rightview.insertTextEdit(&block, true, QTextCursor::Up, "test");
+    rightview.adjustVoiceVerticalScrollBar(widget, 28);
+}
 
-//    VNoteFolder *vnotefolder = new VNoteFolder;
-//    rightview.removeCacheWidget(vnotefolder);
+TEST_F(ut_rightview_test, onVoicePlay)
+{
+    typedef int (*fptr)();
+    fptr A_foo = (fptr)(&DFileDialog::exec);
+    Stub stub;
+    stub.set(ADDR(RightView, checkFileExist), stub_right_view);
+    stub.set(A_foo, stub_right_view);
+    RightView rightview;
+    rightview.initData(m_noteItem, "");
+    QVBoxLayout *layout = static_cast<QVBoxLayout *>(rightview.layout());
+    for (int i = 0; i < layout->count() - 1; i++) {
+        QLayoutItem *layoutItem = layout->itemAt(i);
+        DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
+        if (widget && widget->getNoteBlock()->blockType == VNoteBlock::Voice) {
+            VoiceNoteItem *voiceWidget = static_cast<VoiceNoteItem *>(widget);
+            rightview.onVoicePlay(voiceWidget);
+            rightview.setCurVoicePlay(voiceWidget);
+            rightview.getCurVoicePlay();
+            rightview.onPlayUpdate();
+            rightview.setCurVoiceAsr(voiceWidget);
+            rightview.getCurVoiceAsr();
+            rightview.m_selectWidget.insert(VoicePlugin, voiceWidget);
+            voiceWidget->selectAllText();
+            rightview.saveMp3();
+            break;
+        }
+    }
+}
 
-//    delete vnoteitem;
-//    delete vnotefolder;
-//}
+TEST_F(ut_rightview_test, onVoicePause)
+{
+    Stub stub;
+    stub.set(ADDR(RightView, checkFileExist), stub_right_view);
+    RightView rightview;
+    rightview.initData(m_noteItem, "");
+    QVBoxLayout *layout = static_cast<QVBoxLayout *>(rightview.layout());
+    for (int i = 0; i < layout->count() - 1; i++) {
+        QLayoutItem *layoutItem = layout->itemAt(i);
+        DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
+        if (widget && widget->getNoteBlock()->blockType == VNoteBlock::Voice) {
+            rightview.onVoicePause(static_cast<VoiceNoteItem *>(widget));
+            break;
+        }
+    }
+}
 
-//TEST_F(ut_rightview_test, delWidget)
-//{
-//    RightView rightview;
-//    QLayoutItem *layoutItem = rightview.m_viewportLayout->itemAt(0);
-//    DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
-//    rightview.delWidget(widget, false);
-//}
+TEST_F(ut_rightview_test, leaveEvent)
+{
+    RightView rightview;
+    QEvent *event = new QEvent(QEvent::MouseMove);
+    rightview.leaveEvent(event);
+    delete event;
+}
 
-//TEST_F(ut_rightview_test, adjustVoiceVerticalScrollBar)
-//{
-//    RightView rightview;
-//    QLayoutItem *layoutItem = rightview.m_viewportLayout->itemAt(0);
-//    DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
-//    rightview.adjustVoiceVerticalScrollBar(widget, 28);
-//}
+TEST_F(ut_rightview_test, mouseEvent)
+{
+    RightView rightview;
+    rightview.initData(m_noteItem, "");
+    QPointF localPos;
+    QPointF pointF(30, 15);
+    QPoint point(30, 15);
+    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, pointF, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    rightview.m_curItemWidget = rightview.getWidgetByPos(point);
+    rightview.mouseMoveEvent(event);
+    QMouseEvent *event1 = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    rightview.mouseReleaseEvent(event1);
+    delete event;
+    delete event1;
+}
 
-////TEST_F(ut_rightview_test, onVoicePlay)
-////{
-////    RightView rightview;
-////    VNOTE_DATAS datas;
-////    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
-////    vnvoiceblock->voicePath = "/usr/share/music/bensound-sunny.mp3";
-////    vnvoiceblock->voiceSize = 2650;
-////    vnvoiceblock->voiceTitle = "test";
-////    vnvoiceblock->state = true;
-////    VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
-////    block->ptrVoice = vnvoiceblock;
-////    VoiceNoteItem *item = new VoiceNoteItem(block);
-////    rightview.onVoicePlay(item);
-////}
+TEST_F(ut_rightview_test, keyPressEvent)
+{
+    RightView rightview;
+    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, 0x43, Qt::ControlModifier, "test");
+    rightview.keyPressEvent(event);
+    QKeyEvent *event1 = new QKeyEvent(QEvent::KeyPress, 0x41, Qt::ControlModifier, "test");
+    rightview.keyPressEvent(event1);
+    QKeyEvent *event2 = new QKeyEvent(QEvent::KeyPress, 0x58, Qt::ControlModifier, "test");
+    rightview.keyPressEvent(event2);
+    QKeyEvent *event3 = new QKeyEvent(QEvent::KeyPress, 0x56, Qt::ControlModifier, "test");
+    rightview.keyPressEvent(event3);
+    QKeyEvent *event4 = new QKeyEvent(QEvent::KeyPress, 0x59, Qt::ControlModifier, "test");
+    rightview.keyPressEvent(event4);
+    QKeyEvent *event5 = new QKeyEvent(QEvent::KeyPress, 0x01000007, Qt::NoModifier, "test");
+    rightview.keyPressEvent(event5);
 
-////TEST_F(ut_rightview_test, onVoicePause)
-////{
-////    RightView rightview;
-////    VNOTE_DATAS datas;
-////    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
-////    vnvoiceblock->voicePath = "/usr/share/music/bensound-sunny.mp3";
-////    vnvoiceblock->voiceSize = 2650;
-////    vnvoiceblock->voiceTitle = "test";
-////    vnvoiceblock->state = true;
-////    VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
-////    block->ptrVoice = vnvoiceblock;
-////    VoiceNoteItem *item = new VoiceNoteItem(block);
-////    rightview.onVoicePause(item);
-////}
+    delete event;
+    delete event1;
+    delete event2;
+    delete event3;
+    delete event4;
+    delete event5;
+}
 
-//TEST_F(ut_rightview_test, onPlayUpdate)
-//{
-//    RightView rightview;
-//    rightview.onPlayUpdate();
-//}
+TEST_F(ut_rightview_test, delSelectText)
+{
+    RightView rightview;
+    VNTextBlock block;
+    block.blockText = "test";
+    DetailItemWidget *widget = rightview.insertTextEdit(&block, false, QTextCursor::Up, "test");
+    rightview.selectAllItem();
+    rightview.delSelectText();
+    QTextCursor cursor = widget->getTextCursor();
+    cursor.insertText("blocktext test");
+    cursor.setPosition(0);
+    cursor.setPosition(2, QTextCursor::KeepAnchor);
+    widget->setTextCursor(cursor);
+    qInfo() << widget->getSelectFragment().toPlainText();
+    rightview.m_selectWidget.insert(TextEditPlugin, widget);
+    rightview.delSelectText();
+}
 
-//TEST_F(ut_rightview_test, leaveEvent)
-//{
-//    RightView rightview;
-//    QEvent *event = new QEvent(QEvent::MouseMove);
-//    rightview.leaveEvent(event);
-//    delete event;
-//}
+TEST_F(ut_rightview_test, closeMenu)
+{
+    RightView rightview;
+    rightview.closeMenu();
+}
 
-//TEST_F(ut_rightview_test, mouseEvent)
-//{
-//    RightView rightview;
-//    VNoteItem *vnoteitem = new VNoteItem;
-//    vnoteitem->noteId = 2;
-//    vnoteitem->folderId = 2;
-//    vnoteitem->noteTitle = "test";
-//    rightview.m_noteItemData = vnoteitem;
-//    QPointF localPos;
-//    QPointF pointF(30, 15);
-//    QPoint point(30, 15);
-//    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, pointF, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-//    rightview.m_curItemWidget = rightview.getWidgetByPos(point);
-//    rightview.mouseMoveEvent(event);
-//    QMouseEvent *event1 = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-//    rightview.mouseReleaseEvent(event1);
-//    delete event;
-//    delete event1;
-//    delete vnoteitem;
-//}
+TEST_F(ut_rightview_test, setIsNormalView)
+{
+    RightView rightview;
+    rightview.setIsNormalView(false);
+    rightview.getIsNormalView();
+}
 
-//TEST_F(ut_rightview_test, keyPressEvent)
-//{
-//    RightView rightview;
-//    QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, 0x43, Qt::ControlModifier, "test");
-//    rightview.keyPressEvent(event);
-//    QKeyEvent *event1 = new QKeyEvent(QEvent::KeyPress, 0x41, Qt::ControlModifier, "test");
-//    rightview.keyPressEvent(event1);
-//    QKeyEvent *event2 = new QKeyEvent(QEvent::KeyPress, 0x58, Qt::ControlModifier, "test");
-//    rightview.keyPressEvent(event2);
-//    QKeyEvent *event3 = new QKeyEvent(QEvent::KeyPress, 0x56, Qt::ControlModifier, "test");
-//    rightview.keyPressEvent(event3);
-//    QKeyEvent *event4 = new QKeyEvent(QEvent::KeyPress, 0x59, Qt::ControlModifier, "test");
-//    rightview.keyPressEvent(event4);
-//    QKeyEvent *event5 = new QKeyEvent(QEvent::KeyPress, 0x01000007, Qt::NoModifier, "test");
-//    rightview.keyPressEvent(event5);
+TEST_F(ut_rightview_test, initAction)
+{
+    Stub stub;
+    stub.set(ADDR(RightView, checkFileExist), stub_right_view);
 
-//    delete event;
-//    delete event1;
-//    delete event2;
-//    delete event3;
-//    delete event4;
-//    delete event5;
-//}
+    RightView rightview;
+    rightview.initData(m_noteItem, "");
 
-//TEST_F(ut_rightview_test, delSelectText)
-//{
-//    RightView rightview;
-//    rightview.delSelectText();
-//}
+    OpsStateInterface *stateInterface = OpsStateInterface::instance();
+    stateInterface->operState(OpsStateInterface::StateAISrvAvailable, true);
+    QList<VoiceNoteItem *> voiceItems;
+    QList<TextNoteItem *> textItems;
 
-//TEST_F(ut_rightview_test, setCurVoicePlay)
-//{
-//    RightView rightview;
-//    VNOTE_DATAS datas;
-//    VNVoiceBlock *vnvoiceblock = new VNVoiceBlock;
-//    vnvoiceblock->voicePath = "/usr/share/music/bensound-sunny.mp3";
-//    vnvoiceblock->voiceSize = 2650;
-//    vnvoiceblock->voiceTitle = "test";
-//    vnvoiceblock->state = true;
-//    VNoteBlock *block = datas.newBlock(VNoteBlock::Voice);
-//    block->ptrVoice = vnvoiceblock;
-//    VoiceNoteItem *item = new VoiceNoteItem(block);
-//    rightview.setCurVoicePlay(item);
-//    rightview.setCurVoiceAsr(item);
-//    rightview.getCurVoicePlay();
-//    rightview.getCurVoiceAsr();
+    QVBoxLayout *layout = static_cast<QVBoxLayout *>(rightview.layout());
+    for (int i = 0; i < layout->count() - 1; i++) {
+        QLayoutItem *layoutItem = layout->itemAt(i);
+        DetailItemWidget *widget = static_cast<DetailItemWidget *>(layoutItem->widget());
+        if (widget && widget->getNoteBlock()->blockType == VNoteBlock::Voice) {
+            voiceItems.push_back(static_cast<VoiceNoteItem *>(widget));
+        } else {
+            textItems.push_back(static_cast<TextNoteItem *>(widget));
+        }
+    }
+    textItems[0]->setFocus(false);
+    rightview.m_selectWidget.insert(TextEditPlugin, textItems[0]);
+    rightview.initAction(textItems[0]);
 
-//    delete item;
-//    delete vnvoiceblock;
-//}
+    textItems[0]->selectAllText();
+    rightview.initAction(textItems[0]);
 
-//TEST_F(ut_rightview_test, saveMp3)
-//{
-//    RightView rightview;
-//    rightview.saveMp3();
-//}
+    rightview.m_selectWidget.insert(VoicePlugin, voiceItems[0]);
+    rightview.initAction(voiceItems[0]);
 
-//TEST_F(ut_rightview_test, getOnlyOneSelectVoice)
-//{
-//    RightView rightview;
-//    rightview.getOnlyOneSelectVoice();
-//}
+    rightview.m_selectWidget.clear();
+    rightview.m_selectWidget.insert(VoicePlugin, voiceItems[0]);
 
-//TEST_F(ut_rightview_test, closeMenu)
-//{
-//    RightView rightview;
-//    rightview.closeMenu();
-//}
+    rightview.initAction(voiceItems[0]);
+    voiceItems[0]->selectAllText();
+    rightview.initAction(voiceItems[0]);
+    rightview.m_selectWidget.insert(VoicePlugin, voiceItems[1]);
+    rightview.initAction(voiceItems[0]);
+}
 
-//TEST_F(ut_rightview_test, setIsNormalView)
-//{
-//    RightView rightview;
-//    bool value = false;
-//    rightview.setIsNormalView(value);
-//}
+TEST_F(ut_rightview_test, checkFileExist)
+{
+    typedef int (*fptr)();
+    fptr A_foo = (fptr)(&DDialog::exec);
+    Stub stub;
+    stub.set(A_foo, stub_right_view);
+    RightView rightview;
+    rightview.checkFileExist("/test");
+}
 
-//TEST_F(ut_rightview_test, getIsNormalView)
-//{
-//    RightView rightview;
-//    rightview.setIsNormalView(true);
-//    EXPECT_TRUE(rightview.getIsNormalView());
-//}
+TEST_F(ut_rightview_test, copySelectText)
+{
+    RightView rightview;
+    rightview.initData(m_noteItem, "");
+    rightview.selectAllItem();
+    rightview.copySelectText();
+}
+
+TEST_F(ut_rightview_test, setEnablePlayBtn)
+{
+    RightView rightview;
+    rightview.initData(m_noteItem, "");
+    rightview.setEnablePlayBtn(false);
+}
+
+TEST_F(ut_rightview_test, refreshVoiceCreateTime)
+{
+    RightView rightview;
+    rightview.initData(m_noteItem, "");
+    rightview.refreshVoiceCreateTime();
+}

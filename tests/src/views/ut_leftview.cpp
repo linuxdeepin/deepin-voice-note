@@ -181,6 +181,7 @@ TEST_F(ut_leftview_test, addFolder)
 TEST_F(ut_leftview_test, appendFolder)
 {
     LeftView leftview;
+
     VNoteFolder folder;
     folder.notesCount = 1;
     folder.defaultIcon = 1;
@@ -188,6 +189,7 @@ TEST_F(ut_leftview_test, appendFolder)
     folder.iconPath = "test1";
     folder.createTime = QDateTime::currentDateTime();
     leftview.appendFolder(&folder);
+    leftview.setDefaultNotepadItem();
     leftview.removeFolder();
 }
 
@@ -231,7 +233,14 @@ TEST_F(ut_leftview_test, doDragMove)
 TEST_F(ut_leftview_test, getFolderSort)
 {
     LeftView leftview;
+    VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
+    if (folders) {
+        for (auto it : folders->folders) {
+            leftview.appendFolder(it);
+        }
+    }
     leftview.getFolderSort();
+    leftview.setFolderSort();
 }
 
 TEST_F(ut_leftview_test, setDrawNotesNum)
@@ -254,4 +263,29 @@ TEST_F(ut_leftview_test, lessThan)
     QModelIndex sorce;
     QModelIndex target;
     leftview.m_pSortViewFilter->lessThan(sorce, target);
+}
+
+TEST_F(ut_leftview_test, eventFilter)
+{
+    LeftView leftview;
+    QFocusEvent event(QEvent::FocusOut);
+    leftview.eventFilter(&leftview, &event);
+    QFocusEvent event1(QEvent::FocusIn);
+    leftview.eventFilter(&leftview, &event1);
+    QEvent event2(QEvent::DragLeave);
+    leftview.eventFilter(nullptr, &event2);
+    QEvent event3(QEvent::DragEnter);
+    leftview.eventFilter(nullptr, &event3);
+}
+
+TEST_F(ut_leftview_test, sort)
+{
+    LeftView leftview;
+    VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
+    if (folders) {
+        for (auto it : folders->folders) {
+            leftview.appendFolder(it);
+        }
+    }
+    leftview.sort();
 }

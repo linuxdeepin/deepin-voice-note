@@ -24,17 +24,26 @@
 #include "vnotedatamanager.h"
 #include "vnoteitemoper.h"
 #include "vnoteforlder.h"
+#include "stub.h"
 
 #include <standarditemcommon.h>
 #include <vnoteitemoper.h>
+
+#include <DFileDialog>
+DWIDGET_USE_NAMESPACE
+
+int stub_middleview()
+{
+    return 1;
+}
 
 ut_middleview_test::ut_middleview_test()
 {
 }
 
-TEST_F(ut_middleview_test, setSearchKey)
+void ut_middleview_test::SetUp()
 {
-    MiddleView middleview;
+    m_middleView = new MiddleView;
     VNoteFolder *folder = VNoteDataManager::instance()->getNoteFolders()->folders[0];
     VNoteItemOper noteOper;
     VNOTE_ITEMS_MAP *notes = noteOper.getFolderNotes(folder->id);
@@ -44,16 +53,25 @@ TEST_F(ut_middleview_test, setSearchKey)
         for (auto it : notes->folderNotes) {
             it->isTop = i % 2 == 0 ? true : false;
             i++;
-            middleview.appendRow(it);
+            m_middleView->appendRow(it);
         }
         notes->lock.unlock();
     }
-    middleview.grab();
-    middleview.setSearchKey("note");
-    middleview.grab();
-    middleview.m_pItemDelegate->handleChangeTheme();
-    middleview.clearAll();
-    middleview.closeMenu();
+}
+
+void ut_middleview_test::TearDown()
+{
+    delete m_middleView;
+}
+
+TEST_F(ut_middleview_test, setSearchKey)
+{
+    m_middleView->grab();
+    m_middleView->setSearchKey("note");
+    m_middleView->grab();
+    m_middleView->m_pItemDelegate->handleChangeTheme();
+    m_middleView->clearAll();
+    m_middleView->closeMenu();
 }
 
 TEST_F(ut_middleview_test, setCurrentId)
@@ -61,9 +79,6 @@ TEST_F(ut_middleview_test, setCurrentId)
     MiddleView middleview;
     middleview.setCurrentId(1);
     middleview.getCurrentId();
-    VNoteItem vnoteitem;
-    vnoteitem.noteId = 2;
-    vnoteitem.folderId = 2;
 }
 
 //TEST_F(ut_middleview_test, addRowAtHead)
@@ -87,34 +102,54 @@ TEST_F(ut_middleview_test, setCurrentId)
 
 TEST_F(ut_middleview_test, mouseEvent)
 {
-    MiddleView middleview;
-    QPointF localPos;
-    //mousePressEvent
-    middleview.m_onlyCurItemMenuEnable = false;
-    QMouseEvent *mousePressEvent = new QMouseEvent(QEvent::MouseButtonPress, localPos, localPos, localPos, Qt::RightButton, Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
-    middleview.mousePressEvent(mousePressEvent);
-    middleview.m_onlyCurItemMenuEnable = true;
-    middleview.mousePressEvent(mousePressEvent);
+    m_middleView->selectAll();
+    QModelIndex index = m_middleView->currentIndex();
+    QPoint localPos, globalPos;
+    if (index.isValid()) {
+        QRect rc = m_middleView->visualRect(index);
+        localPos = rc.center();
+        globalPos = m_middleView->mapToGlobal(localPos);
+    }
+
+    m_middleView->m_onlyCurItemMenuEnable = false;
+    QMouseEvent *mousePressEvent = new QMouseEvent(QEvent::MouseButtonPress, localPos, localPos, localPos, Qt::LeftButton, Qt::RightButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
+    m_middleView->mousePressEvent(mousePressEvent);
+    mousePressEvent->setModifiers(Qt::ControlModifier);
+    m_middleView->mousePressEvent(mousePressEvent);
+    m_middleView->setModifierState(MiddleView::shiftAndMouseModifier);
+    m_middleView->mousePressEvent(mousePressEvent);
+    mousePressEvent->setModifiers(Qt::ShiftModifier);
+    m_middleView->mousePressEvent(mousePressEvent);
+    m_middleView->m_onlyCurItemMenuEnable = true;
+    m_middleView->mousePressEvent(mousePressEvent);
     delete mousePressEvent;
+
+    m_middleView->m_onlyCurItemMenuEnable = false;
+    QMouseEvent *rMousePressEvent = new QMouseEvent(QEvent::MouseButtonPress, localPos, localPos, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+    m_middleView->mousePressEvent(rMousePressEvent);
+    rMousePressEvent->setModifiers(Qt::ShiftModifier);
+    m_middleView->mousePressEvent(rMousePressEvent);
+    rMousePressEvent->setModifiers(Qt::ControlModifier);
+    m_middleView->mousePressEvent(rMousePressEvent);
+    delete rMousePressEvent;
 
     //mouseReleaseEvent
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
-    middleview.m_onlyCurItemMenuEnable = false;
-    QPoint point = QPoint(middleview.visualRect(middleview.currentIndex()).topLeft().x() + 10, middleview.visualRect(middleview.currentIndex()).topLeft().y() - 10);
-    middleview.mouseReleaseEvent(releaseEvent);
+    m_middleView->m_onlyCurItemMenuEnable = false;
+    m_middleView->mouseReleaseEvent(releaseEvent);
     delete releaseEvent;
 
     //doubleClickEvent
-    middleview.m_onlyCurItemMenuEnable = false;
+    m_middleView->m_onlyCurItemMenuEnable = false;
     QMouseEvent *doubleClickEvent = new QMouseEvent(QEvent::MouseButtonDblClick, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-    middleview.mouseDoubleClickEvent(doubleClickEvent);
+    m_middleView->mouseDoubleClickEvent(doubleClickEvent);
     delete doubleClickEvent;
 
     //mouseMoveEvent
-    middleview.m_onlyCurItemMenuEnable = false;
+    m_middleView->m_onlyCurItemMenuEnable = false;
     QMouseEvent *mouseMoveEvent = new QMouseEvent(QEvent::MouseMove, localPos, localPos, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
-    middleview.setTouchState(middleview.TouchMoving);
-    middleview.mouseMoveEvent(mouseMoveEvent);
+    m_middleView->setTouchState(MiddleView::TouchMoving);
+    m_middleView->mouseMoveEvent(mouseMoveEvent);
     delete mouseMoveEvent;
 }
 
@@ -199,16 +234,22 @@ TEST_F(ut_middleview_test, editNote)
 
 TEST_F(ut_middleview_test, saveAsText)
 {
-    MiddleView middleview;
-    middleview.selectionModel()->select(middleview.m_pDataModel->index(0, 0), QItemSelectionModel::Select);
-    middleview.saveAsText();
+    typedef int (*fptr)();
+    fptr A_foo = (fptr)(&DFileDialog::exec);
+    Stub stub;
+    stub.set(A_foo, stub_middleview);
+    m_middleView->selectAll();
+    m_middleView->saveAsText();
 }
 
 TEST_F(ut_middleview_test, saveRecords)
 {
-    MiddleView middleview;
-    middleview.setCurrentIndex(0);
-    middleview.saveRecords();
+    typedef int (*fptr)();
+    fptr A_foo = (fptr)(&DFileDialog::exec);
+    Stub stub;
+    stub.set(A_foo, stub_middleview);
+    m_middleView->selectAll();
+    m_middleView->saveRecords();
 }
 
 TEST_F(ut_middleview_test, handleShiftAndPress)
@@ -222,17 +263,44 @@ TEST_F(ut_middleview_test, handleShiftAndPress)
 
 TEST_F(ut_middleview_test, keyPressEvent)
 {
-    MiddleView middleview;
     QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Up, Qt::ShiftModifier, "test");
-    middleview.keyPressEvent(event);
-    middleview.m_shiftSelection = -1;
+    m_middleView->initPositionStatus(0);
+    m_middleView->keyPressEvent(event);
+    m_middleView->initPositionStatus(1);
+    m_middleView->keyPressEvent(event);
+    m_middleView->initPositionStatus(0);
+    m_middleView->m_shiftSelection = 1;
+    m_middleView->keyPressEvent(event);
+    event->setModifiers(Qt::NoModifier);
+    m_middleView->keyPressEvent(event);
+
     QKeyEvent *event1 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Down, Qt::ShiftModifier, "test2");
-    middleview.keyPressEvent(event1);
+    m_middleView->initPositionStatus(0);
+    m_middleView->keyPressEvent(event1);
+    m_middleView->initPositionStatus(1);
+    m_middleView->m_shiftSelection = 0;
+    m_middleView->keyPressEvent(event1);
+    m_middleView->m_shiftSelection = -1;
+    m_middleView->keyPressEvent(event1);
+
     QKeyEvent *event2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_Home, Qt::ShiftModifier, "test3");
-    middleview.keyPressEvent(event2);
+    m_middleView->keyPressEvent(event2);
+    event2->setModifiers(Qt::NoModifier);
+    m_middleView->keyPressEvent(event2);
+
+    QKeyEvent *event3 = new QKeyEvent(QEvent::KeyPress, Qt::Key_End, Qt::ShiftModifier, "test3");
+    m_middleView->keyPressEvent(event3);
+    event3->setModifiers(Qt::NoModifier);
+    m_middleView->keyPressEvent(event3);
+
+    QKeyEvent *event4 = new QKeyEvent(QEvent::KeyPress, Qt::Key_A, Qt::ControlModifier, "test3");
+    m_middleView->keyPressEvent(event4);
+
     delete event;
     delete event1;
     delete event2;
+    delete event3;
+    delete event4;
 }
 
 TEST_F(ut_middleview_test, setVisibleEmptySearch)
@@ -320,26 +388,16 @@ TEST_F(ut_middleview_test, getSelectedCount)
 //    middleview.onMenuShow(point);
 //}
 
-//TEST_F(ut_middleview_test,haveVoice)
-//{
-//    MiddleView middleview;
-//    QModelIndex index = middleview.indexAt(QCursor::pos());
-//    middleview.selectionModel()->select(middleview.m_pSortViewFilter->index(index.row(), 0), QItemSelectionModel::Select);
-//    middleview.haveVoice();
-//}
-
 TEST_F(ut_middleview_test, haveText)
 {
-    MiddleView middleview;
-    middleview.setCurrentIndex(0);
-    middleview.haveText();
+    m_middleView->selectAll();
+    m_middleView->haveText();
 }
 
 TEST_F(ut_middleview_test, haveVoice)
 {
-    MiddleView middleview;
-    middleview.setCurrentIndex(0);
-    middleview.haveVoice();
+    m_middleView->selectAll();
+    m_middleView->haveVoice();
 }
 
 TEST_F(ut_middleview_test, handleTouchSlideEvent)
@@ -383,9 +441,8 @@ TEST_F(ut_middleview_test, onNoteChanged)
 
 TEST_F(ut_middleview_test, getCurrVNotedataList)
 {
-    MiddleView middleview;
-    middleview.setCurrentIndex(0);
-    middleview.getCurrVNotedataList();
+    m_middleView->selectAll();
+    m_middleView->getCurrVNotedataList();
 }
 
 TEST_F(ut_middleview_test, getCurrVNotedata)
@@ -397,7 +454,6 @@ TEST_F(ut_middleview_test, getCurrVNotedata)
 
 TEST_F(ut_middleview_test, deleteCurrentRow)
 {
-    MiddleView middleview;
-    middleview.setCurrentIndex(0);
-    middleview.deleteCurrentRow();
+    m_middleView->setCurrentIndex(0);
+    m_middleView->deleteCurrentRow();
 }

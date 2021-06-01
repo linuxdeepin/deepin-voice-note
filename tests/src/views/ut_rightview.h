@@ -21,6 +21,7 @@
 #include "gtest/gtest.h"
 #include <QTest>
 #include <QObject>
+class VNoteItem;
 
 class ut_rightview_test : public QObject
     , public ::testing::Test
@@ -28,6 +29,8 @@ class ut_rightview_test : public QObject
     Q_OBJECT
 public:
     ut_rightview_test();
+    virtual void SetUp() override;
+    VNoteItem *m_noteItem {nullptr};
 };
 
 #endif // UT_RIGHTVIEW_H

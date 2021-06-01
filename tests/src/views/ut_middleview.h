@@ -22,12 +22,17 @@
 #include <QTest>
 #include <QObject>
 
+class MiddleView;
+
 class ut_middleview_test : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
     ut_middleview_test();
+    virtual void SetUp() override;
+    virtual void TearDown() override;
+    MiddleView *m_middleView {nullptr};
 };
 
 #endif // UT_MIDDLEVIEW_H
