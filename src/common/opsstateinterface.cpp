@@ -34,6 +34,9 @@ OpsStateInterface::OpsStateInterface()
     bool fAiServiceExist = false;
     DSysInfo::UosEdition uosType = DSysInfo::uosEditionType();
     switch (uosType) {
+#if (DTK_VERSION > DTK_VERSION_CHECK(5, 4, 10, 0))
+    case DSysInfo::UosEducation: // 教育版
+#endif
     case DSysInfo::UosProfessional:
     case DSysInfo::UosHome:
         fAiServiceExist = true;
