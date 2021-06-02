@@ -188,6 +188,7 @@ void VNoteBaseDialog::showEvent(QShowEvent *event)
 
     m_tileText->setFocus();
     m_closeButton->setAttribute(Qt::WA_UnderMouse, false);
+    moveToCenter();
 }
 
 void VNoteBaseDialog::mouseMoveEvent(QMouseEvent *event)
