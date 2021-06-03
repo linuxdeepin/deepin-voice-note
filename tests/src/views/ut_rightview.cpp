@@ -55,9 +55,20 @@ void ut_rightview_test::SetUp()
     }
 }
 
-bool stub_right_view()
+static void stub_onMenuShow(DetailItemWidget *widget)
 {
+    Q_UNUSED(widget)
+}
+
+static bool stub_checkFileExist(const QString &file)
+{
+    Q_UNUSED(file)
     return true;
+}
+
+static int stub_dialog()
+{
+    return 1;
 }
 
 TEST_F(ut_rightview_test, insertTextEdit)
@@ -115,7 +126,7 @@ TEST_F(ut_rightview_test, onTextEditTextChange)
 TEST_F(ut_rightview_test, mousePressEvent)
 {
     Stub stub;
-    stub.set(ADDR(RightView, onMenuShow), stub_right_view);
+    stub.set(ADDR(RightView, onMenuShow), stub_onMenuShow);
     RightView rightview;
     QPointF localPos;
     rightview.initData(m_noteItem, "");
@@ -156,8 +167,8 @@ TEST_F(ut_rightview_test, onVoicePlay)
     typedef int (*fptr)();
     fptr A_foo = (fptr)(&DFileDialog::exec);
     Stub stub;
-    stub.set(ADDR(RightView, checkFileExist), stub_right_view);
-    stub.set(A_foo, stub_right_view);
+    stub.set(ADDR(RightView, checkFileExist), stub_checkFileExist);
+    stub.set(A_foo, stub_dialog);
     RightView rightview;
     rightview.initData(m_noteItem, "");
     QVBoxLayout *layout = static_cast<QVBoxLayout *>(rightview.layout());
@@ -183,7 +194,7 @@ TEST_F(ut_rightview_test, onVoicePlay)
 TEST_F(ut_rightview_test, onVoicePause)
 {
     Stub stub;
-    stub.set(ADDR(RightView, checkFileExist), stub_right_view);
+    stub.set(ADDR(RightView, checkFileExist), stub_checkFileExist);
     RightView rightview;
     rightview.initData(m_noteItem, "");
     QVBoxLayout *layout = static_cast<QVBoxLayout *>(rightview.layout());
@@ -279,7 +290,7 @@ TEST_F(ut_rightview_test, setIsNormalView)
 TEST_F(ut_rightview_test, initAction)
 {
     Stub stub;
-    stub.set(ADDR(RightView, checkFileExist), stub_right_view);
+    stub.set(ADDR(RightView, checkFileExist), stub_checkFileExist);
 
     RightView rightview;
     rightview.initData(m_noteItem, "");
@@ -324,7 +335,7 @@ TEST_F(ut_rightview_test, checkFileExist)
     typedef int (*fptr)();
     fptr A_foo = (fptr)(&DDialog::exec);
     Stub stub;
-    stub.set(A_foo, stub_right_view);
+    stub.set(A_foo, stub_dialog);
     RightView rightview;
     rightview.checkFileExist("/test");
 }

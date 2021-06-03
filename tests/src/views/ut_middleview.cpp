@@ -32,7 +32,7 @@
 #include <DFileDialog>
 DWIDGET_USE_NAMESPACE
 
-int stub_middleview()
+static int stub_dialog()
 {
     return 1;
 }
@@ -237,7 +237,7 @@ TEST_F(ut_middleview_test, saveAsText)
     typedef int (*fptr)();
     fptr A_foo = (fptr)(&DFileDialog::exec);
     Stub stub;
-    stub.set(A_foo, stub_middleview);
+    stub.set(A_foo, stub_dialog);
     m_middleView->selectAll();
     m_middleView->saveAsText();
 }
@@ -247,7 +247,7 @@ TEST_F(ut_middleview_test, saveRecords)
     typedef int (*fptr)();
     fptr A_foo = (fptr)(&DFileDialog::exec);
     Stub stub;
-    stub.set(A_foo, stub_middleview);
+    stub.set(A_foo, stub_dialog);
     m_middleView->selectAll();
     m_middleView->saveRecords();
 }

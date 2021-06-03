@@ -20,8 +20,9 @@
 #include "utils.h"
 #include "stub.h"
 
-void stub_vnoterecordwidget()
+static bool stub_startRecord()
 {
+    return true;
 }
 
 ut_vnoterecordwidget_test::ut_vnoterecordwidget_test()
@@ -52,8 +53,7 @@ TEST_F(ut_vnoterecordwidget_test, startRecord)
     audioformat.setSampleSize(16);
     QAudioBuffer buffer(data, audioformat);
     Stub stub;
-    stub.set(ADDR(GstreamRecorder, startRecord), stub_vnoterecordwidget);
-    stub.set(ADDR(GstreamRecorder, stopRecord), stub_vnoterecordwidget);
+    stub.set(ADDR(GstreamRecorder, startRecord), stub_startRecord);
     m_vnoterecordwidget->onAudioBufferProbed(buffer);
     m_vnoterecordwidget->startRecord();
     m_vnoterecordwidget->onRecordDurationChange(4);

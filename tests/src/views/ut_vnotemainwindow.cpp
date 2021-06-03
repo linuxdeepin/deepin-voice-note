@@ -50,7 +50,7 @@
 #include "vnoteapplication.h"
 #include "stub.h"
 
-void stub_vnotemainwindow()
+static void stub_vnotemainwindow()
 {
 }
 

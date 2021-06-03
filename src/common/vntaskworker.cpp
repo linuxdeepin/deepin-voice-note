@@ -77,6 +77,7 @@ void VNTaskWorker::run()
 
         if (m_fQuit) {
             qInfo() << m_workerName << "-->Going to quit!";
+            m_taskLock.unlock();
             break;
         }
 

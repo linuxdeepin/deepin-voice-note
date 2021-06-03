@@ -19,71 +19,45 @@
 #include "ut_gstreamrecorder.h"
 #include "gstreamrecorder.h"
 #include "vnoterecordbar.h"
-#include "stub.h"
-#include <QDebug>
-
-static void stub_gstreamrecorde_common()
-{
-    qInfo() << "I am gstreamrecorder common stub";
-}
 
 ut_gstreamrecorder_test::ut_gstreamrecorder_test()
 {
 }
 
-TEST_F(ut_gstreamrecorder_test, createPipe)
-{
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, createPipe), stub_gstreamrecorde_common);
-    GstreamRecorder gstreamrecorder;
-    gstreamrecorder.createPipe();
-}
-
 TEST_F(ut_gstreamrecorder_test, GetGstState)
 {
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, GetGstState), stub_gstreamrecorde_common);
+    int state = -1;
+    int pending = -1;
     GstreamRecorder gstreamrecorder;
-    gstreamrecorder.GetGstState(nullptr, nullptr);
-}
-
-TEST_F(ut_gstreamrecorder_test, startRecord)
-{
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, startRecord), stub_gstreamrecorde_common);
-    GstreamRecorder gstreamrecorder;
-    gstreamrecorder.startRecord();
+    gstreamrecorder.createPipe();
+    gstreamrecorder.GetGstState(&state, &pending);
 }
 
 TEST_F(ut_gstreamrecorder_test, pauseRecord)
 {
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, pauseRecord), stub_gstreamrecorde_common);
     GstreamRecorder gstreamrecorder;
+    gstreamrecorder.createPipe();
     gstreamrecorder.pauseRecord();
 }
 
 TEST_F(ut_gstreamrecorder_test, stopRecord)
 {
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, stopRecord), stub_gstreamrecorde_common);
     GstreamRecorder gstreamrecorder;
+    gstreamrecorder.createPipe();
     gstreamrecorder.stopRecord();
 }
 
 TEST_F(ut_gstreamrecorder_test, setDevice)
 {
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, setDevice), stub_gstreamrecorde_common);
     GstreamRecorder gstreamrecorder;
-    gstreamrecorder.setDevice("");
+    gstreamrecorder.createPipe();
+    gstreamrecorder.setDevice(QString("test"));
 }
 
 TEST_F(ut_gstreamrecorder_test, setStateToNull)
 {
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, setStateToNull), stub_gstreamrecorde_common);
     GstreamRecorder gstreamrecorder;
+    gstreamrecorder.createPipe();
     gstreamrecorder.setStateToNull();
 }
 
@@ -91,20 +65,4 @@ TEST_F(ut_gstreamrecorder_test, initFormat)
 {
     GstreamRecorder gstreamrecorder;
     gstreamrecorder.initFormat();
-}
-
-TEST_F(ut_gstreamrecorder_test, doBusMessage)
-{
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, doBusMessage), stub_gstreamrecorde_common);
-    GstreamRecorder gstreamrecorder;
-    gstreamrecorder.doBusMessage(nullptr);
-}
-
-TEST_F(ut_gstreamrecorder_test, doBufferProbe)
-{
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, doBufferProbe), stub_gstreamrecorde_common);
-    GstreamRecorder gstreamrecorder;
-    gstreamrecorder.doBufferProbe(nullptr);
 }
