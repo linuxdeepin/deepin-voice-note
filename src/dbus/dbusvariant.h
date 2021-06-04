@@ -33,12 +33,12 @@
 class Inhibit
 {
 public:
-    QString what;
-    QString who;
-    QString why;
-    QString mode;
-    quint32 uid;
-    quint32 pid;
+    QString what {""};
+    QString who {""};
+    QString why {""};
+    QString mode {""};
+    quint32 uid {0};
+    quint32 pid {0};
 
     Inhibit();
     ~Inhibit();
@@ -51,9 +51,9 @@ public:
 class UserInfo
 {
 public:
-    qlonglong pid;
-    QString id;
-    QString userName;
+    qlonglong pid {0};
+    QString id {""};
+    QString userName {""};
 
     UserInfo();
     ~UserInfo();
@@ -66,8 +66,8 @@ public:
 class SeatInfo
 {
 public:
-    QString id;
-    QString seat;
+    QString id {""};
+    QString seat {""};
 
     SeatInfo();
     ~SeatInfo();
@@ -80,11 +80,11 @@ public:
 class SessionInfo
 {
 public:
-    QString session;
-    qlonglong pid;
-    QString user;
-    QString id;
-    QString seat;
+    QString session {""};
+    qlonglong pid {0};
+    QString user {""};
+    QString id {""};
+    QString seat {""};
 
     SessionInfo();
     ~SessionInfo();

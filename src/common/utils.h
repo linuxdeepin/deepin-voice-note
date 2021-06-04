@@ -45,7 +45,7 @@ public:
     static int highTextEdit(QTextDocument *textDoc, const QString &searchKey,
                             const QColor &highColor, bool undo = false);
     //格式化录音时长
-    static QString formatMillisecond(qint64 millisecond, bool minValue = 1);
+    static QString formatMillisecond(qint64 millisecond, qint64 minValue = 1);
     //内存数据同步编辑器显示内容
     static void documentToBlock(VNoteBlock *block, const QTextDocument *doc);
     //编辑器同步内存数据

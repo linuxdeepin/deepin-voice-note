@@ -76,7 +76,7 @@ public:
     //是否置顶
     qint32 isTop {0};
     //标题名称
-    QString noteTitle;
+    QString noteTitle {""};
     //创建时间
     QDateTime createTime;
     //修改时间
@@ -169,9 +169,9 @@ struct VNVoiceBlock : public VNoteBlock {
     virtual ~VNVoiceBlock() override;
     virtual void releaseSpecificData() override;
 
-    QString voicePath;
-    qint64 voiceSize;
-    QString voiceTitle;
+    QString voicePath {""};
+    qint64 voiceSize {0};
+    QString voiceTitle {""};
     bool state {false};
     QDateTime createTime;
 };

@@ -190,14 +190,14 @@ int Utils::highTextEdit(QTextDocument *textDoc, const QString &searchKey,
  * @param minValue 最小显示的时间
  * @return 格式化后的字符串
  */
-QString Utils::formatMillisecond(qint64 millisecond, bool minValue)
+QString Utils::formatMillisecond(qint64 millisecond, qint64 minValue)
 {
-    uint curSecond = static_cast<uint>(millisecond / 1000);
+    qint64 curSecond = millisecond / 1000;
     if (curSecond < minValue) {
         curSecond = minValue;
     }
     if (curSecond < 3600) {
-        return QDateTime::fromTime_t(curSecond).toUTC().toString("mm:ss");
+        return QDateTime::fromTime_t(static_cast<uint>(curSecond)).toUTC().toString("mm:ss");
     }
 
     return QString("60:00");
