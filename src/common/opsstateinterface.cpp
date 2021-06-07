@@ -31,26 +31,7 @@ static OpsStateInterface *objectInstance = nullptr;
  */
 OpsStateInterface::OpsStateInterface()
 {
-    bool fAiServiceExist = false;
-    DSysInfo::UosEdition uosType = DSysInfo::uosEditionType();
-    switch (uosType) {
-#if (DTK_VERSION > DTK_VERSION_CHECK(5, 4, 10, 0))
-    case DSysInfo::UosEducation: // 教育版
-#endif
-    case DSysInfo::UosProfessional:
-    case DSysInfo::UosHome:
-        fAiServiceExist = true;
-        break;
-    default:
-        break;
-    }
-    QString systemInfo = QString("[%1-%2-%3]")
-                             .arg(DSysInfo::uosSystemName())
-                             .arg(DSysInfo::uosProductTypeName())
-                             .arg(DSysInfo::uosEditionName());
-
-    qInfo() << systemInfo << " IsAvailable use voice to text:" << fAiServiceExist;
-    operState(StateAISrvAvailable, fAiServiceExist);
+    operState(StateAISrvAvailable, true);
 }
 
 /**

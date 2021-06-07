@@ -92,7 +92,7 @@ public:
     };
     Q_ENUM(MenuType)
     //获取记事本列表右键菜单
-    DMenu *notebookContextMenu();   
+    DMenu *notebookContextMenu();
     //获取记事项列表右键菜单
     DMenu *noteContextMenu();
     //获取详情页右键菜单
@@ -107,17 +107,18 @@ public:
     void visibleAction(ActionKind actionId, bool enable);
     //重置菜单项可用状态
     void resetCtxMenu(MenuType type, bool enable = true);
+    //隐藏语音服务菜单项
+    void hideAiActions();
 
 protected:
     //初始化
     void initMenu();
 
     static ActionManager *_instance;
-
     QScopedPointer<DMenu> m_notebookContextMenu;
     QScopedPointer<DMenu> m_noteContextMenu;
     QScopedPointer<DMenu> m_detialContextMenu;
-
+    QAction *m_detailPasteSeparator {nullptr};
     QMap<ActionKind, QAction *> m_actionsMap;
 };
 

@@ -699,7 +699,17 @@ void VNoteMainWindow::releaseHaltLock()
  */
 void VNoteMainWindow::initDelayWork()
 {
-    ;
+    com::iflytek::aiservice::session session(
+        "com.iflytek.aiservice",
+        "/",
+        QDBusConnection::sessionBus());
+    bool isVailid = session.isValid();
+    stateOperation->operState(OpsStateInterface::StateAISrvAvailable, isVailid);
+    if (!isVailid) {
+        QDBusError error = session.lastError();
+        qInfo() << "Ai service error:" << error.errorString(error.type());
+        ActionManager::Instance()->hideAiActions();
+    }
 }
 
 /**
