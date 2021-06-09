@@ -21,7 +21,7 @@
 #include "gstreamrecorder.h"
 #include <DLog>
 
-static const QString mp3Encoder = "capsfilter caps=audio/x-raw,rate=44100,channels=2 ! lamemp3enc name=enc target=0 quality=2 ! xingmux ! id3mux";
+static const QString mp3Encoder = "capsfilter caps=audio/x-raw,rate=44100,channels=2 ! lamemp3enc name=enc target=1 cbr=true bitrate=192";
 
 /**
  * @brief bufferProbe
@@ -241,16 +241,7 @@ bool GstreamRecorder::startRecord()
 void GstreamRecorder::stopRecord()
 {
     if (m_pipeline) {
-        int state = -1;
-        int pending = -1;
-        GetGstState(&state, &pending);
-        if (state == GST_STATE_PAUSED) {
-            gst_element_set_state(m_pipeline, GST_STATE_PLAYING);
-        } else if (state != GST_STATE_PLAYING) {
-            emit recordFinshed();
-            return;
-        }
-        gst_element_send_event(m_pipeline, gst_event_new_eos());
+        setStateToNull();
     }
 }
 
@@ -327,10 +318,6 @@ bool GstreamRecorder::doBusMessage(GstMessage *message)
         if (error) {
             g_error_free(error);
         }
-        break;
-    }
-    case GST_MESSAGE_EOS: {
-        emit recordFinshed();
         break;
     }
     default:

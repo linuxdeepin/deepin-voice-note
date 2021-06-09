@@ -100,7 +100,6 @@ void VNoteRecordWidget::initConnection()
     connect(m_finshBtn, &VNoteIconButton::clicked, this, &VNoteRecordWidget::stopRecord);
     connect(m_audioRecoder, SIGNAL(audioBufferProbed(const QAudioBuffer &)),
             this, SLOT(onAudioBufferProbed(const QAudioBuffer &)));
-    connect(m_audioRecoder, &GstreamRecorder::recordFinshed, this, &VNoteRecordWidget::onGstreamerFinshRecord, Qt::QueuedConnection);
 }
 
 /**
@@ -122,6 +121,13 @@ void VNoteRecordWidget::initRecordPath()
 void VNoteRecordWidget::stopRecord()
 {
     m_audioRecoder->stopRecord();
+    QFile f(m_recordPath);
+    if (f.open(QIODevice::ReadWrite | QIODevice::Text)) {
+        f.flush(); //将用户缓存中的内容写入内核缓冲区
+        fsync(f.handle()); //将内核缓冲写入磁盘
+        f.close();
+    }
+    emit sigFinshRecord(m_recordPath, m_recordMsec);
 }
 
 /**
@@ -211,19 +217,4 @@ void VNoteRecordWidget::onRecordDurationChange(qint64 duration)
 void VNoteRecordWidget::setAudioDevice(QString device)
 {
     m_audioRecoder->setDevice(device);
-}
-
-/**
- * @brief VNoteRecordWidget::onGstreamerFinshRecord
- */
-void VNoteRecordWidget::onGstreamerFinshRecord()
-{
-    m_audioRecoder->setStateToNull();
-    QFile f(m_recordPath);
-    if (f.open(QIODevice::ReadWrite | QIODevice::Text)) {
-        f.flush(); //将用户缓存中的内容写入内核缓冲区
-        fsync(f.handle()); //将内核缓冲写入磁盘
-        f.close();
-    }
-    emit sigFinshRecord(m_recordPath, m_recordMsec);
 }

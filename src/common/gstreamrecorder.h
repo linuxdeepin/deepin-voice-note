@@ -59,8 +59,6 @@ Q_SIGNALS:
     void errorMsg(QString msg);
     //语音数据发生变化
     void audioBufferProbed(const QAudioBuffer &buffer);
-    //结束录音
-    void recordFinshed();
 
 private:
     //创建录音流水线通道

@@ -63,8 +63,3 @@ TEST_F(ut_vnoterecordwidget_test, setAudioDevice)
 {
     m_vnoterecordwidget->setAudioDevice("test");
 }
-
-TEST_F(ut_vnoterecordwidget_test, onGstreamerFinshRecord)
-{
-    m_vnoterecordwidget->onGstreamerFinshRecord();
-}
