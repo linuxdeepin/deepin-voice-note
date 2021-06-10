@@ -2251,7 +2251,7 @@ bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
             return true;
         }
     } else {
-        if (e->type() == QEvent::FocusIn || e->type() == QEvent::MouseButtonPress) {
+        if (e->type() == QEvent::FocusIn || (e->type() == QEvent::MouseButtonPress && m_noteSearchEdit->isEnabled())) {
             onSetVirtualKeyboardShow(true);
         } else if (e->type() == QEvent::FocusOut) {
             onSetVirtualKeyboardShow(false);
