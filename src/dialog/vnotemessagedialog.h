@@ -47,6 +47,7 @@ public:
         VoiceDeleted,
     };
     static VNoteMessageDialog *getDialog(int msgType, QWidget *parent, int notesCount = 1);
+    void updateTextColor();
 
 protected:
     //初始化布局

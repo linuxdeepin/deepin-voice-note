@@ -44,6 +44,7 @@ VNoteMessageDialog *VNoteMessageDialog::getDialog(int msgType, QWidget *parent, 
                 dialog->m_notesCount = notesCount;
                 dialog->initMessage();
             }
+            dialog->updateTextColor();
             dialog->setEnabled(true);
         } else {
             if (iter.value()->isVisible()) {
@@ -198,4 +199,14 @@ void VNoteMessageDialog::initMessage()
         setSingleButton();
     }
     }
+}
+
+void VNoteMessageDialog::updateTextColor()
+{
+    DPalette pa = DApplicationHelper::instance()->palette(m_buttonSpliter);
+    pa.setBrush(DPalette::Background, pa.color(DPalette::ItemBackground));
+    m_buttonSpliter->setPalette(pa);
+    pa = DApplicationHelper::instance()->palette(m_pMessage);
+    pa.setBrush(DPalette::WindowText, pa.color(DPalette::BrightText));
+    m_pMessage->setPalette(pa);
 }
