@@ -2,18 +2,20 @@
 <context>
     <name>AppMain</name>
     <message>
-        <location filename="../src/main.cpp" line="46"/>
-        <location filename="../src/views/vnotemainwindow.cpp" line="654"/>
+        <location filename="../src/common/vlcpalyer.cpp" line="54"/>
+        <location filename="../src/main.cpp" line="48"/>
+        <location filename="../src/main.cpp" line="49"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="771"/>
         <source>Voice Notes</source>
         <translation>Голосовые Заметки</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="47"/>
+        <location filename="../src/main.cpp" line="50"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation>Голосовые Записки - это легкий инструмент для создания текстовых заметок и записи голоса.</translation>
+        <translation>Голосовые Записки - это легковесный инструмент для создания текстовых заметок и записи голоса.</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="655"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="772"/>
         <source>Recordings not saved</source>
         <translation>Записи не сохранены</translation>
     </message>
@@ -21,121 +23,173 @@
 <context>
     <name>DefaultName</name>
     <message>
-        <location filename="../src/db/vnotefolderoper.cpp" line="193"/>
+        <location filename="../src/db/vnotefolderoper.cpp" line="245"/>
         <source>Notebook</source>
         <translation>Записная книжка</translation>
     </message>
     <message>
-        <location filename="../src/db/vnoteitemoper.cpp" line="194"/>
+        <location filename="../src/db/vnoteitemoper.cpp" line="228"/>
         <source>Text</source>
         <translation>Текст</translation>
     </message>
     <message>
-        <location filename="../src/db/vnoteitemoper.cpp" line="205"/>
-        <location filename="../src/importolddata/olddbvisistors.cpp" line="132"/>
+        <location filename="../src/db/vnoteitemoper.cpp" line="243"/>
+        <location filename="../src/importolddata/olddbvisistors.cpp" line="154"/>
         <source>Voice</source>
         <translation>Голос</translation>
     </message>
 </context>
 <context>
+    <name>DetailPage</name>
+    <message>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="210"/>
+        <source>%1 notes selected</source>
+        <translation>%1 заметок выбрано</translation>
+    </message>
+</context>
+<context>
+    <name>FolderSelectDialog</name>
+    <message>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="217"/>
+        <source>Move Notes</source>
+        <translation>Переместить заметки</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="244"/>
+        <source>Cancel</source>
+        <comment>button</comment>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="245"/>
+        <source>Confirm</source>
+        <comment>button</comment>
+        <translation>Подтвердить</translation>
+    </message>
+</context>
+<context>
     <name>HomePage</name>
     <message>
-        <location filename="../src/views/homepage.cpp" line="41"/>
+        <location filename="../src/views/homepage.cpp" line="48"/>
         <source>Create Notebook</source>
         <translation>Создать Записную книжку</translation>
     </message>
     <message>
-        <location filename="../src/views/homepage.cpp" line="53"/>
+        <location filename="../src/views/homepage.cpp" line="60"/>
         <source>Create a notebook to start recording voice and making notes</source>
         <translation>Создать записную книжку, чтобы начать запись голоса и создания заметок</translation>
     </message>
 </context>
 <context>
+    <name>LeftView</name>
+    <message>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="381"/>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="384"/>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="392"/>
+        <source>Move the note &quot;%1&quot; to:</source>
+        <translation>Переместить заметку &quot;%1&quot; в:</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="380"/>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="394"/>
+        <source>Move %1 notes (%2, ...) to:</source>
+        <translation>Переместить %1 заметок (%2, ...) в:</translation>
+    </message>
+</context>
+<context>
     <name>MiddleView</name>
     <message>
-        <location filename="../src/views/middleview.cpp" line="164"/>
-        <location filename="../src/views/middleview.cpp" line="199"/>
+        <location filename="../src/views/middleview.cpp" line="284"/>
+        <location filename="../src/views/middleview.cpp" line="327"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="../src/views/middleview.cpp" line="294"/>
+        <location filename="../src/views/middleview.cpp" line="1026"/>
         <source>No search results</source>
-        <translation>Ничего не найдено</translation>
+        <translation>Поиск не дал результатов</translation>
+    </message>
+</context>
+<context>
+    <name>MiddleViewDelegate</name>
+    <message>
+        <location filename="../src/views/middleviewdelegate.cpp" line="442"/>
+        <source>Sticky Notes</source>
+        <translation>Заметки</translation>
     </message>
 </context>
 <context>
     <name>NoteDetailContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="172"/>
+        <location filename="../src/common/actionmanager.cpp" line="225"/>
         <source>Save as MP3</source>
         <translation>Сохранить как MP3</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="173"/>
+        <location filename="../src/common/actionmanager.cpp" line="226"/>
         <source>Voice to Text</source>
-        <translation>Голос в Текст</translation>
+        <translation>Преобразование голосового сообщения в текстовую заметку</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="174"/>
+        <location filename="../src/common/actionmanager.cpp" line="227"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="175"/>
+        <location filename="../src/common/actionmanager.cpp" line="228"/>
         <source>Select all</source>
         <translation>Выделить все</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="176"/>
+        <location filename="../src/common/actionmanager.cpp" line="229"/>
         <source>Copy</source>
         <translation>Копировать</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="177"/>
+        <location filename="../src/common/actionmanager.cpp" line="230"/>
         <source>Cut</source>
         <translation>Вырезать</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="178"/>
+        <location filename="../src/common/actionmanager.cpp" line="231"/>
         <source>Paste</source>
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="179"/>
+        <location filename="../src/common/actionmanager.cpp" line="232"/>
         <source>Text to Speech</source>
-        <translation type="unfinished"/>
+        <translation>Преобразование текстовой заметки в голосовое сообщение</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="180"/>
+        <location filename="../src/common/actionmanager.cpp" line="233"/>
         <source>Stop reading</source>
-        <translation type="unfinished"/>
+        <translation>Остановка чтения</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="181"/>
+        <location filename="../src/common/actionmanager.cpp" line="234"/>
         <source>Speech to Text</source>
-        <translation type="unfinished"/>
+        <translation>Преобразование речи в текстовую заметку</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="182"/>
+        <location filename="../src/common/actionmanager.cpp" line="235"/>
         <source>Translate</source>
-        <translation type="unfinished"/>
+        <translation>Перевести</translation>
     </message>
 </context>
 <context>
     <name>NotebookContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="130"/>
+        <location filename="../src/common/actionmanager.cpp" line="176"/>
         <source>Rename</source>
         <translation>Переименовать</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="131"/>
+        <location filename="../src/common/actionmanager.cpp" line="177"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="132"/>
+        <location filename="../src/common/actionmanager.cpp" line="178"/>
         <source>New note</source>
         <translation>Новая запись</translation>
     </message>
@@ -143,45 +197,73 @@
 <context>
     <name>NotesContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="150"/>
+        <location filename="../src/common/actionmanager.cpp" line="196"/>
         <source>Rename</source>
         <translation>Переименовать</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="151"/>
+        <location filename="../src/common/actionmanager.cpp" line="198"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="333"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="342"/>
+        <source>Move</source>
+        <translation>Переместить</translation>
+    </message>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="199"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="335"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="341"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="152"/>
+        <location filename="../src/common/actionmanager.cpp" line="200"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="339"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="350"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="356"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="358"/>
         <source>Save as TXT</source>
-        <translation>Сохранить как TXT</translation>
+        <translation>Сохранить  в текстовом формате</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="153"/>
+        <location filename="../src/common/actionmanager.cpp" line="201"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="340"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="351"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="363"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="365"/>
         <source>Save voice recording</source>
         <translation>Сохранить запись голоса</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="154"/>
+        <location filename="../src/common/actionmanager.cpp" line="202"/>
         <source>New note</source>
         <translation>Новая запись</translation>
+    </message>
+    <message>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1539"/>
+        <source>Unstick</source>
+        <translation>Открепить</translation>
+    </message>
+    <message>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1541"/>
+        <source>Sticky on Top</source>
+        <translation>Прикрепить сверху</translation>
     </message>
 </context>
 <context>
     <name>RightView</name>
     <message>
-        <location filename="../src/views/rightview.cpp" line="78"/>
+        <location filename="../src/views/rightview.cpp" line="808"/>
         <source>The voice note has been deleted</source>
-        <translation>Голосовая заметка удалена</translation>
+        <translation>Голосовая запись удалена</translation>
     </message>
     <message>
-        <location filename="../src/views/rightview.cpp" line="86"/>
+        <location filename="../src/views/rightview.cpp" line="815"/>
         <source>OK</source>
+        <comment>button</comment>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../src/views/rightview.cpp" line="1153"/>
+        <location filename="../src/views/rightview.cpp" line="1393"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
@@ -189,143 +271,143 @@
 <context>
     <name>Setting</name>
     <message>
-        <location filename="../src/common/setting.cpp" line="37"/>
-        <source>Basic</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/common/setting.cpp" line="38"/>
-        <source>Audio Source</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/common/setting.cpp" line="39"/>
-        <source>Internal</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
         <location filename="../src/common/setting.cpp" line="40"/>
+        <source>Basic</source>
+        <translation>Основной</translation>
+    </message>
+    <message>
+        <location filename="../src/common/setting.cpp" line="41"/>
+        <source>Audio Source</source>
+        <translation>Источник звука</translation>
+    </message>
+    <message>
+        <location filename="../src/common/setting.cpp" line="42"/>
+        <source>Internal</source>
+        <translation>Внутренний</translation>
+    </message>
+    <message>
+        <location filename="../src/common/setting.cpp" line="43"/>
         <source>Microphone</source>
-        <translation type="unfinished"/>
+        <translation>Микрофон</translation>
     </message>
 </context>
 <context>
     <name>Shortcuts</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="947"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1140"/>
         <source>New notebook</source>
         <translation>Новая записная книжка</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="948"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1141"/>
         <source>Rename notebook</source>
         <translation>Переименовать записную книжку</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="949"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1142"/>
         <source>Delete notebook</source>
-        <translation>Удалить блокнот</translation>
+        <translation>Удалить записную книжку</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="971"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1164"/>
         <source>New note</source>
         <translation>Новая запись</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="972"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1165"/>
         <source>Rename note</source>
-        <translation>Примечание к переименованию</translation>
+        <translation>Переименовать запись</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="973"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1166"/>
         <source>Delete note</source>
         <translation>Удалить запись</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="974"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1167"/>
         <source>Play/Pause</source>
         <translation>Воспроизвести/Пауза</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="975"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1168"/>
         <source>Record voice</source>
         <translation>Запись голоса</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="976"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1175"/>
         <source>Voice to Text</source>
-        <translation>Голос в Текст</translation>
+        <translation>Преобразование голосового сообщения в текстовую заметку</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="977"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1169"/>
         <source>Save as MP3</source>
-        <translation>Сохранить как MP3</translation>
+        <translation>Сохранить в формате MP3</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="978"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1170"/>
         <source>Save as TXT</source>
-        <translation>Сохранить как TXT</translation>
+        <translation>Сохранить  в текстовом формате</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="979"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1171"/>
         <source>Save recordings</source>
-        <translation>Сохранять записи</translation>
+        <translation>Сохранить записи</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="999"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1195"/>
         <source>Select all</source>
         <translation>Выделить все</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1000"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1196"/>
         <source>Copy</source>
         <translation>Копировать</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1001"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1197"/>
         <source>Cut</source>
         <translation>Вырезать</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1002"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1198"/>
         <source>Paste</source>
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1003"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1199"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1026"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1222"/>
         <source>Help</source>
         <translation>Помощь</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1027"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1223"/>
         <source>Display shortcuts</source>
-        <translation>Показать иконки</translation>
+        <translation>Показать ярлыки</translation>
     </message>
 </context>
 <context>
     <name>ShortcutsGroups</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="953"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1146"/>
         <source>Notebooks</source>
         <translation>Записные книжки</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="983"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1179"/>
         <source>Notes</source>
         <translation>Записки</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1007"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1203"/>
         <source>Edit</source>
         <translation>Редактирование</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1031"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1227"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
@@ -333,7 +415,7 @@
 <context>
     <name>SplashView</name>
     <message>
-        <location filename="../src/views/splashview.cpp" line="42"/>
+        <location filename="../src/views/splashview.cpp" line="46"/>
         <source>Loading...</source>
         <translation>Загрузка...</translation>
     </message>
@@ -341,43 +423,43 @@
 <context>
     <name>TitleBar</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="449"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="529"/>
         <source>Search</source>
         <translation>Поиск</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1762"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="2209"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1764"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="2210"/>
         <source>Privacy Policy</source>
-        <translation type="unfinished"/>
+        <translation>Политика конфиденциальности</translation>
     </message>
 </context>
 <context>
     <name>UpgradeView</name>
     <message>
-        <location filename="../src/importolddata/upgradeview.cpp" line="46"/>
+        <location filename="../src/importolddata/upgradeview.cpp" line="50"/>
         <source>Importing notes from the old version, please wait...</source>
-        <translation type="unfinished"/>
+        <translation>Импортирую записи из старой версии, пожалуйста подождите</translation>
     </message>
 </context>
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../src/common/utils.cpp" line="45"/>
+        <location filename="../src/common/utils.cpp" line="53"/>
         <source>1 min ago</source>
         <translation>1 минута назад</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="47"/>
+        <location filename="../src/common/utils.cpp" line="55"/>
         <source>%1 mins ago</source>
-        <translation>%1 минуту назад</translation>
+        <translation>%1 минут назад</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="53"/>
+        <location filename="../src/common/utils.cpp" line="61"/>
         <source>Yesterday</source>
         <translation>Вчера</translation>
     </message>
@@ -385,25 +467,25 @@
 <context>
     <name>VNoteErrorMessage</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="909"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1095"/>
         <source>The voice conversion failed due to the poor network connection. Do you want to try again?</source>
-        <translation>Конвертация голоса не удалась в связи с плохим сетевым соединением. Хотите попытаться ще раз?</translation>
+        <translation>Конвертация голоса не удалась, из-за плохого сетевого соединения. Хотите повторить еще раз?</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="914"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1100"/>
         <source>The voice conversion failed. Do you want to try again?</source>
-        <translation>Конвертация голоса не удалась. Хотите попытаться еще раз?</translation>
+        <translation>Конвертация голоса не удалась. Хотите повторить еще раз?</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1616"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="2005"/>
         <source>Try Again</source>
-        <translation>Попробовать Ещё Раз</translation>
+        <translation>Повторить ещё раз</translation>
     </message>
 </context>
 <context>
     <name>VNoteMainWindow</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="528"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="614"/>
         <source>Create Notebook</source>
         <translation>Создать Записную книжку</translation>
     </message>
@@ -411,66 +493,74 @@
 <context>
     <name>VNoteMessageDialog</name>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="44"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="53"/>
         <source>OK</source>
+        <comment>button</comment>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="116"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="132"/>
         <source>Cancel</source>
+        <comment>button</comment>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="117"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
         <source>Confirm</source>
-        <translation>Применить</translation>
+        <comment>button</comment>
+        <translation>Подтвердить</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="120"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="136"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
-        <translation>Вы уверены, что хотите удалить эту записную книжку? Все заметки в ней будут удалены.</translation>
+        <translation>Вы уверены, что хотите удалить эту записную книжку? Все записи в ней будут удалены.</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="124"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="139"/>
         <source>Do you want to stop the current recording?</source>
         <translation>Остановить текущую запись?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="128"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="143"/>
+        <source>Are you sure you want to delete the selected %1 notes?</source>
+        <translation>Вы уверены, что хотите удалить выделенные %1 записи?</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="145"/>
         <source>Are you sure you want to delete this note?</source>
-        <translation>Вы уверены, что хотите удалить эту записку?</translation>
+        <translation>Вы уверены, что хотите удалить эту запись?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="149"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
-        <translation>Невозможно конвертировать голосовую заметку, поскольку заметки продолжительностью более 20 минут в настоящее время не поддерживаются.</translation>
+        <translation>Конвертация голосовой записи невозможна, поскольку заметки продолжительностью более 20 минут в настоящее время не поддерживаются.</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="138"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="153"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
-        <translation>Конвертирование голосовой записки. Прервать конвертацию?</translation>
+        <translation>Идет конвертация  голосовой записи. Прервать?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="142"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="156"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
-        <translation>Низкая громкость ввода может привести к плохим записям. Хотите продолжить?</translation>
+        <translation>Низкая громкость звука  может привести к плохому качеству записи.  Продолжить?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
-        <translation>Вырезанные записи и преобразованный текст не будут вставлены. Хотите продолжить?</translation>
+        <translation>Вырезанные записи и преобразованный текст не будут вставлены.  Продолжить?</translation>
     </message>
 </context>
 <context>
     <name>VNoteRecordBar</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1639"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="2032"/>
         <source>Your audio recording device does not work.</source>
-        <translation>Ваше оборудование для аудио записи не работает.</translation>
+        <translation>Оборудование для аудио записи не работает.</translation>
     </message>
     <message>
-        <location filename="../src/views/vnoterecordbar.cpp" line="233"/>
+        <location filename="../src/views/vnoterecordbar.cpp" line="301"/>
         <source>No recording device detected</source>
         <translation>Устройство записи не обнаружено</translation>
     </message>
@@ -478,9 +568,9 @@ All notes in it will be deleted</source>
 <context>
     <name>VoiceNoteItem</name>
     <message>
-        <location filename="../src/views/voicenoteitem.cpp" line="196"/>
+        <location filename="../src/views/voicenoteitem.cpp" line="222"/>
         <source>Converting voice to text</source>
-        <translation>Конвертирую текст в голос</translation>
+        <translation>Конвертирую  голосовую запись в текстовую заметку.</translation>
     </message>
 </context>
 </TS>
