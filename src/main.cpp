@@ -76,6 +76,8 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    DApplicationSettings settings;
+
     signal(SIGTERM, signalHander);
 
     DLogManager::registerConsoleAppender();
