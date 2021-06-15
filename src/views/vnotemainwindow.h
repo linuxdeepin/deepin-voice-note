@@ -136,7 +136,8 @@ protected:
     void delayInitTasks();
     //初始化虚拟键盘
     void initVirtualKeyboard();
-
+    //初始化状态栏
+    void initStatusBar();
 #ifdef IMPORT_OLD_VERSION_DATA
     //*******Upgrade old Db code here only********
     void initUpgradeView();
@@ -230,6 +231,7 @@ public slots:
     void onVirtualKeyboardShow(bool show);
     void slideRightScrollBar(bool isUp);
     void onSetVirtualKeyboardShow(bool show);
+    void onStatusBarHeightChange();
 
 private:
     //左侧列表视图操作相关
@@ -337,6 +339,8 @@ private:
     DSettingsDialog *m_settingDialog {nullptr};
     friend class VNMainWndDelayInitTask;
     QDBusInterface *m_virtualKeyboard {nullptr};
+    QDBusInterface *m_statusBar {nullptr};
+    int m_statusBarHeight {0};
     bool m_currentVirtualKeyboardShow {false};
 };
 

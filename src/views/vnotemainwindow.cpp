@@ -94,6 +94,7 @@ VNoteMainWindow::VNoteMainWindow(QWidget *parent)
     initA2TManager();
     //Init the login manager
     initLogin1Manager();
+    initStatusBar();
     initVirtualKeyboard();
     //Init delay task
     delayInitTasks();
@@ -2226,7 +2227,8 @@ void VNoteMainWindow::onVirtualKeyboardShow(bool show)
         if (show) {
             QTimer::singleShot(300, this, [=] {
                 QRect rc = m_virtualKeyboard->property("geometry").toRect();
-                this->setFixedHeight(QApplication::desktop()->geometry().height() - rc.height());
+                this->setFixedHeight(QApplication::desktop()->geometry().height() - rc.height() - m_statusBarHeight);
+                this->move(0, m_statusBarHeight);
                 if (m_recordBarHolder->height() != 0) {
                     m_recordBarHolder->setFixedHeight(0);
                     m_addNoteBtn->setFixedHeight(0);
@@ -2238,6 +2240,7 @@ void VNoteMainWindow::onVirtualKeyboardShow(bool show)
                 m_recordBarHolder->setFixedHeight(78);
                 m_addNoteBtn->setFixedHeight(54);
                 m_addNotepadBtn->setFixedHeight(40);
+                this->move(0, 0);
                 this->setFixedHeight(QApplication::desktop()->availableGeometry().height());
             }
         }
@@ -2282,6 +2285,11 @@ void VNoteMainWindow::initVirtualKeyboard()
     if (m_virtualKeyboard->isValid()) {
         connect(m_virtualKeyboard, SIGNAL(imActiveChanged(bool)), this, SLOT(onVirtualKeyboardShow(bool)));
         m_currentVirtualKeyboardShow = m_virtualKeyboard->property("imActive").toBool();
+        if (m_currentVirtualKeyboardShow) {
+            QRect rc = m_virtualKeyboard->property("geometry").toRect();
+            this->setFixedHeight(QApplication::desktop()->geometry().height() - rc.height() - m_statusBarHeight);
+            this->move(0, m_statusBarHeight);
+        }
     } else {
         delete m_virtualKeyboard;
         m_virtualKeyboard = nullptr;
@@ -2294,5 +2302,32 @@ void VNoteMainWindow::onSetVirtualKeyboardShow(bool show)
         if (show != m_currentVirtualKeyboardShow && m_virtualKeyboard->setProperty("imActive", show)) {
             m_currentVirtualKeyboardShow = show;
         }
+    }
+}
+
+void VNoteMainWindow::onStatusBarHeightChange()
+{
+    QDBusReply<uint> reply = m_statusBar->call("height");
+    if (reply.isValid()) {
+        m_statusBarHeight = static_cast<int>(reply.value());
+        qInfo() << "status bar height:" << m_statusBarHeight;
+    } else {
+        qInfo() << "call statusBar height error";
+    }
+}
+
+void VNoteMainWindow::initStatusBar()
+{
+    m_statusBar = new QDBusInterface("com.deepin.due.statusbar",
+                                     "/com/deepin/due/statusbar",
+                                     "com.deepin.due.statusbar",
+                                     QDBusConnection::sessionBus());
+    if (m_statusBar->isValid()) {
+        onStatusBarHeightChange();
+        connect(m_statusBar, SIGNAL(heightChanged()), this, SLOT(onStatusBarHeightChange()));
+    } else {
+        delete m_statusBar;
+        m_statusBar = nullptr;
+        qInfo() << "connect status bar dbus error";
     }
 }
