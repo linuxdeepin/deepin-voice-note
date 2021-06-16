@@ -160,6 +160,7 @@ protected:
     //按键处理
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
     bool eventFilter(QObject *o, QEvent *e) override;
+    void changeEvent(QEvent *event) override;
 
 public slots:
     //记事本数据加载完成

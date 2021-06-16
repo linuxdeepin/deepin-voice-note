@@ -49,12 +49,6 @@ public:
         TouchPressing,
         TouchOutVisibleRegion
     };
-    //菜单状态
-    enum MenuStatus {
-        InitialState,
-        ReleaseFromMenu,
-        Normal
-    };
     //辅助键状态
     enum ModifierState {
         noModifier = 0,
@@ -168,6 +162,7 @@ protected:
     void setMouseState(const MouseState &mouseState);
     //响应右键菜单弹出
     void onMenuShow(QPoint point);
+    void contextMenuEvent(QContextMenuEvent *e) override;
 
 private:
     //初始化代理模块
@@ -207,8 +202,6 @@ private:
     bool m_isDraging {false};
     QModelIndex m_index;
     QTimer *m_selectCurrentTimer {nullptr};
-    QTimer *m_popMenuTimer {nullptr};
-    MenuStatus m_menuState {InitialState};
     TouchState m_touchState {TouchNormal};
 
     int m_currentRow = -1;

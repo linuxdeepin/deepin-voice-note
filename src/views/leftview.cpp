@@ -58,12 +58,10 @@ LeftView::LeftView(QWidget *parent)
     initNotepadRoot();
     initMenu();
     initConnections();
-    setContextMenuPolicy(Qt::NoContextMenu);
     this->setDragEnabled(true);
     this->setDragDropMode(QAbstractItemView::DragDrop);
     this->setDropIndicatorShown(true);
     this->setAcceptDrops(true);
-    this->setContextMenuPolicy(Qt::NoContextMenu);
     viewport()->installEventFilter(this);
 }
 
@@ -137,27 +135,10 @@ void LeftView::mousePressEvent(QMouseEvent *event)
             m_notepadMenu->setPressPoint(QCursor::pos());
             //检查是否选中
             m_selectCurrentTimer->start(250);
-            //是否弹出右键菜单
-            m_popMenuTimer->start(1000);
             return;
         }
         event->setModifiers(Qt::NoModifier);
         setTouchState(TouchState::TouchPressing);
-        //不使用自动判断
-        //        DTreeView::mousePressEvent(event);
-        if (event->button() == Qt::RightButton) {
-            if (MenuStatus::ReleaseFromMenu == m_menuState) {
-                m_menuState = MenuStatus::Normal;
-                return;
-            }
-            if (StandardItemCommon::getStandardItemType(m_index) == StandardItemCommon::NOTEPADITEM
-                && (!m_onlyCurItemMenuEnable || m_index == this->currentIndex())) {
-                this->setCurrentIndex(m_index);
-                m_notepadMenu->popup(event->globalPos());
-                //通过此方法隐藏菜单，在处理拖拽事件结束后hide
-                m_notepadMenu->setWindowOpacity(1);
-            }
-        }
     } else {
         //置灰状态下只有当前记事本可操作
         if (currentIndex() == m_index) {
@@ -167,13 +148,6 @@ void LeftView::mousePressEvent(QMouseEvent *event)
                 //更新触摸状态
                 setTouchState(TouchPressing);
                 m_notepadMenu->setPressPoint(QCursor::pos());
-                m_popMenuTimer->start(1000);
-                return;
-            } else {
-                if (Qt::RightButton == event->button()) {
-                    m_notepadMenu->setWindowOpacity(1);
-                    m_notepadMenu->popup(event->globalPos());
-                }
             }
         }
     }
@@ -188,8 +162,6 @@ void LeftView::mouseReleaseEvent(QMouseEvent *event)
     m_isDraging = false;
     //停止计时器
     m_selectCurrentTimer->stop();
-    m_popMenuTimer->stop();
-    m_menuState = MenuStatus::Normal;
     //处理拖拽事件，由于与drop操作参数不同，暂未封装
     if (m_touchState == TouchState::TouchDraging) {
         setTouchState(TouchState::TouchNormal);
@@ -319,7 +291,6 @@ void LeftView::handleDragEvent(bool isTouch)
     if (isTouch) {
         setTouchState(TouchState::TouchDraging);
     }
-    m_popMenuTimer->stop();
     m_notepadMenu->setWindowOpacity(0.0);
     triggerDragFolder();
 }
@@ -501,23 +472,13 @@ void LeftView::initConnections()
     //右键菜单释放
     connect(m_notepadMenu, &VNoteRightMenu::menuTouchReleased, this, [=] {
         m_touchState = TouchState::TouchNormal;
-        m_menuState = MenuStatus::ReleaseFromMenu;
     });
     //定时器用于判断是否选中当前
-    m_selectCurrentTimer = new QTimer();
+    m_selectCurrentTimer = new QTimer(this);
     connect(m_selectCurrentTimer, &QTimer::timeout, [=] {
         if (m_touchState == TouchState::TouchPressing && m_index.isValid())
             this->setCurrentIndex(m_index);
         m_selectCurrentTimer->stop();
-    });
-    //定时器用于判断是否弹出菜单
-    m_popMenuTimer = new QTimer();
-    connect(m_popMenuTimer, &QTimer::timeout, [=] {
-        if (m_touchState == TouchState::TouchPressing && m_index.isValid()) {
-            m_notepadMenu->setWindowOpacity(1);
-            m_notepadMenu->exec(QCursor::pos());
-        }
-        m_popMenuTimer->stop();
     });
 }
 
@@ -888,5 +849,16 @@ void LeftView::dropEvent(QDropEvent *event)
         emit dropNotesEnd(isDragCancelled);
     } else if (event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)) {
         doDragMove(currentIndex(), indexAt(mapFromGlobal(QCursor::pos())));
+    }
+}
+
+void LeftView::contextMenuEvent(QContextMenuEvent *e)
+{
+    Q_UNUSED(e)
+    if (StandardItemCommon::getStandardItemType(m_index) == StandardItemCommon::NOTEPADITEM
+        && (!m_onlyCurItemMenuEnable || m_index == this->currentIndex())) {
+        this->setCurrentIndex(m_index);
+        m_notepadMenu->setWindowOpacity(1);
+        m_notepadMenu->popup(QCursor::pos());
     }
 }

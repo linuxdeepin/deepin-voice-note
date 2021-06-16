@@ -2299,6 +2299,7 @@ void VNoteMainWindow::initVirtualKeyboard()
 void VNoteMainWindow::onSetVirtualKeyboardShow(bool show)
 {
     if (m_virtualKeyboard) {
+        qInfo() << "current flag:" << m_currentVirtualKeyboardShow << " set flag:" << show;
         if (show != m_currentVirtualKeyboardShow && m_virtualKeyboard->setProperty("imActive", show)) {
             m_currentVirtualKeyboardShow = show;
         }
@@ -2330,4 +2331,12 @@ void VNoteMainWindow::initStatusBar()
         m_statusBar = nullptr;
         qInfo() << "connect status bar dbus error";
     }
+}
+
+void VNoteMainWindow::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::ActivationChange) {
+        qInfo() << qApp->activeWindow();
+    }
+    DMainWindow::changeEvent(event);
 }

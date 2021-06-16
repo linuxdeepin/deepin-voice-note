@@ -71,7 +71,6 @@ RightView::RightView(QWidget *parent)
  */
 void RightView::initUi()
 {
-    setContextMenuPolicy(Qt::CustomContextMenu);
     m_viewportLayout = new QVBoxLayout;
     m_viewportLayout->setSpacing(0);
     m_viewportLayout->setContentsMargins(10, 0, 10, 0);
@@ -889,22 +888,8 @@ void RightView::mousePressEvent(QMouseEvent *event)
         m_touchState = TouchState::TouchPressing;
         m_touchPressPoint = event->pos();
         m_touchPressStartMs = QDateTime::currentDateTime().toMSecsSinceEpoch();
-        if (m_popMenuTimer == nullptr) {
-            m_popMenuTimer = new QTimer(this);
-            m_popMenuTimer->setSingleShot(true);
-            m_popMenuTimer->setInterval(1000);
-            connect(m_popMenuTimer, &QTimer::timeout, this, [=] {
-                if (m_touchState == TouchState::TouchPressing) {
-                    onMenuShow(getWidgetByPos(mapFromGlobal(QCursor::pos())));
-                }
-            });
-        }
-        m_popMenuTimer->start();
     }
-
-    if (btn == Qt::RightButton) {
-        onMenuShow(widget);
-    } else if (btn == Qt::LeftButton) {
+    if (btn == Qt::LeftButton) {
         if (event->source() != Qt::MouseEventSynthesizedByQt) {
             clearAllSelection();
         }
@@ -924,10 +909,6 @@ void RightView::mousePressEvent(QMouseEvent *event)
  */
 void RightView::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (m_popMenuTimer && m_popMenuTimer->isActive()) {
-        m_popMenuTimer->stop();
-    }
-
     if (m_noteItemData == nullptr) {
         return;
     }
@@ -1527,4 +1508,10 @@ void RightView::scrollToCursor()
         int height = m_curItemWidget->getCursorRect().bottom() + 5;
         adjustVerticalScrollBar(m_curItemWidget, height);
     }
+}
+
+void RightView::contextMenuEvent(QContextMenuEvent *e)
+{
+    Q_UNUSED(e)
+    onMenuShow(getWidgetByPos(mapFromGlobal(QCursor::pos())));
 }

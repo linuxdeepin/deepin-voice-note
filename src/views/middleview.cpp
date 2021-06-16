@@ -55,8 +55,6 @@ MiddleView::MiddleView(QWidget *parent)
     initMenu();
     initUI();
     initConnections();
-
-    setContextMenuPolicy(Qt::NoContextMenu);
     this->setDragEnabled(true);
     this->setDragDropMode(QAbstractItemView::DragOnly);
     this->setAcceptDrops(false);
@@ -375,8 +373,6 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
 
                 //检查是否选中
                 m_selectCurrentTimer->start(250);
-                //是否弹出右键菜单
-                m_popMenuTimer->start(1000);
                 return;
             }
         }
@@ -450,10 +446,6 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
         }
         //右键press
         else {
-            if (MenuStatus::ReleaseFromMenu == m_menuState) {
-                m_menuState = MenuStatus::Normal;
-                return;
-            }
             if (Qt::ShiftModifier == event->modifiers() || Qt::CTRL == event->modifiers()) {
                 //shift+右键
                 if (Qt::ShiftModifier == event->modifiers()) {
@@ -473,8 +465,6 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                         changeRightView();
                     }
                 }
-                m_noteMenu->setWindowOpacity(1);
-                onMenuShow(event->globalPos());
             }
             //仅右键
             else if (!m_onlyCurItemMenuEnable || m_index == this->currentIndex()) {
@@ -486,8 +476,6 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                     DListView::setCurrentIndex(m_index);
                     initPositionStatus(m_index.row());
                 }
-                m_noteMenu->setWindowOpacity(1);
-                onMenuShow(event->globalPos());
             }
             event->setModifiers(Qt::NoModifier);
             setTouchState(TouchState::TouchPressing);
@@ -503,14 +491,7 @@ void MiddleView::mousePressEvent(QMouseEvent *event)
                 //更新触摸状态
                 setTouchState(TouchPressing);
                 m_noteMenu->setPressPoint(QCursor::pos());
-                //是否弹出右键菜单
-                m_popMenuTimer->start(1000);
                 return;
-            } else {
-                if (Qt::RightButton == event->button()) {
-                    m_noteMenu->setWindowOpacity(1);
-                    onMenuShow(event->globalPos());
-                }
             }
         }
     }
@@ -528,9 +509,6 @@ void MiddleView::mouseReleaseEvent(QMouseEvent *event)
     m_isDraging = false;
     //停止计时器
     m_selectCurrentTimer->stop();
-    m_popMenuTimer->stop();
-    m_menuState = MenuStatus::Normal;
-
     if (TouchState::TouchMoving == m_touchState) {
         return;
     }
@@ -706,6 +684,7 @@ void MiddleView::onMenuShow(QPoint point)
         ActionManager::Instance()->visibleAction(ActionManager::NoteMenuBase, true);
         m_noteMenu = ActionManager::Instance()->noteContextMenu();
     }
+    m_noteMenu->setWindowOpacity(1.0);
     m_noteMenu->popup(point);
 }
 
@@ -991,7 +970,6 @@ void MiddleView::initConnections()
     //右键菜单释放
     connect(m_noteMenu, &VNoteRightMenu::menuTouchReleased, this, [=] {
         m_touchState = TouchState::TouchNormal;
-        m_menuState = MenuStatus::ReleaseFromMenu;
     });
     //定时器用于判断是否选中当前
     m_selectCurrentTimer = new QTimer();
@@ -1006,15 +984,6 @@ void MiddleView::initConnections()
             }
 
         m_selectCurrentTimer->stop();
-    });
-    //定时器用于判断是否弹出菜单
-    m_popMenuTimer = new QTimer();
-    connect(m_popMenuTimer, &QTimer::timeout, [=] {
-        if (m_touchState == TouchState::TouchPressing && m_index.isValid()) {
-            m_noteMenu->setWindowOpacity(1);
-            onMenuShow(QCursor::pos());
-        }
-        m_popMenuTimer->stop();
     });
 }
 
@@ -1241,7 +1210,6 @@ void MiddleView::handleDragEvent(bool isTouch)
     if (isTouch) {
         setTouchState(TouchState::TouchDraging);
     }
-    m_popMenuTimer->stop();
     m_noteMenu->setWindowOpacity(0.0);
     triggerDragNote();
 }
@@ -1300,4 +1268,13 @@ void MiddleView::selectAfterRemoved()
     //滚动到当前选中
     scrollTo(currentIndex());
     return;
+}
+
+void MiddleView::contextMenuEvent(QContextMenuEvent *e)
+{
+    Q_UNUSED(e)
+    if (StandardItemCommon::getStandardItemType(m_index) == StandardItemCommon::NOTEITEM
+        && (!m_onlyCurItemMenuEnable || m_index == this->currentIndex())) {
+        onMenuShow(QCursor::pos());
+    }
 }

@@ -156,6 +156,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *e) override;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    void contextMenuEvent(QContextMenuEvent *e) override;
     //调整滚动条
     void adjustVerticalScrollBar(QWidget *widget, int defaultHeight);
     void adjustVoiceVerticalScrollBar(DetailItemWidget *widget, int defaultHeight);
@@ -197,7 +198,6 @@ private:
     //详情页是否为当前笔记
     bool m_isNormalView {true};
     QTimer *m_updateTimer;
-    QTimer *m_popMenuTimer {nullptr};
     qint64 m_touchPressStartMs {0};
     QPoint m_touchPressPoint;
     TouchState m_touchState {TouchNormal};
