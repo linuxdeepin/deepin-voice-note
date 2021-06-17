@@ -2174,6 +2174,8 @@ void VNoteMainWindow::onDropNote(bool dropCancel)
     bool ret = m_leftView->doNoteMove(indexList, selectIndex);
     if (ret) {
         m_middleView->deleteModelIndexs(indexList);
+        m_middleView->update();
+        m_leftView->update();
     }
     //拖拽完成
     m_middleView->setDragSuccess(true);
