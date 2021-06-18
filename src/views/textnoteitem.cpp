@@ -226,8 +226,8 @@ QTextDocumentFragment TextNoteItem::getSelectFragment()
  */
 void TextNoteItem::setFocus()
 {
+    m_textEdit->setFocus();
     Utils::setImVisible(true);
-    return m_textEdit->setFocus();
 }
 
 /**
