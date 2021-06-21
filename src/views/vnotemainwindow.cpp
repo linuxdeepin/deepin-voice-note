@@ -501,6 +501,7 @@ void VNoteMainWindow::initTitleBar()
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
     m_noteSearchEdit->lineEdit()->installEventFilter(this);
     titlebar()->addWidget(m_noteSearchEdit);
+    setWindowRadius(0);
 }
 
 /**
@@ -1247,6 +1248,7 @@ void VNoteMainWindow::resizeEvent(QResizeEvent *event)
     m_leftView->scrollTo(m_leftView->currentIndex());
     m_middleView->scrollTo(m_middleView->currentIndex());
     m_rightView->scrollToCursor();
+    qInfo() << this->geometry() << this->rect();
     DMainWindow::resizeEvent(event);
 }
 
@@ -2230,7 +2232,6 @@ void VNoteMainWindow::onVirtualKeyboardShow(bool show)
             QTimer::singleShot(300, this, [=] {
                 QRect rc = m_virtualKeyboard->property("geometry").toRect();
                 this->setFixedHeight(QApplication::desktop()->geometry().height() - rc.height() - m_statusBarHeight);
-                this->move(0, m_statusBarHeight);
                 if (m_recordBarHolder->height() != 0) {
                     m_recordBarHolder->setFixedHeight(0);
                     m_addNoteBtn->setFixedHeight(0);
@@ -2242,7 +2243,6 @@ void VNoteMainWindow::onVirtualKeyboardShow(bool show)
                 m_recordBarHolder->setFixedHeight(78);
                 m_addNoteBtn->setFixedHeight(54);
                 m_addNotepadBtn->setFixedHeight(40);
-                this->move(0, 0);
                 this->setFixedHeight(QApplication::desktop()->availableGeometry().height());
             }
         }
@@ -2290,7 +2290,6 @@ void VNoteMainWindow::initVirtualKeyboard()
         if (m_currentVirtualKeyboardShow) {
             QRect rc = m_virtualKeyboard->property("geometry").toRect();
             this->setFixedHeight(QApplication::desktop()->geometry().height() - rc.height() - m_statusBarHeight);
-            this->move(0, m_statusBarHeight);
         }
     } else {
         delete m_virtualKeyboard;
