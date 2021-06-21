@@ -2300,7 +2300,7 @@ void VNoteMainWindow::initVirtualKeyboard()
 
 void VNoteMainWindow::onSetVirtualKeyboardShow(bool show)
 {
-    if (m_virtualKeyboard) {
+    if (m_virtualKeyboard && (!stateOperation->isAppQuit() || false == show)) {
         qInfo() << "current flag:" << m_currentVirtualKeyboardShow << " set flag:" << show;
         if (show != m_currentVirtualKeyboardShow && m_virtualKeyboard->setProperty("imActive", show)) {
             m_currentVirtualKeyboardShow = show;
