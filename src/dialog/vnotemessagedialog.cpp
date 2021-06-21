@@ -44,7 +44,6 @@ VNoteMessageDialog *VNoteMessageDialog::getDialog(int msgType, QWidget *parent, 
                 dialog->m_notesCount = notesCount;
                 dialog->initMessage();
             }
-            dialog->updateTextColor();
             dialog->setEnabled(true);
         } else {
             if (iter.value()->isVisible()) {
@@ -104,11 +103,7 @@ void VNoteMessageDialog::initUI()
     m_pMessage->setWordWrap(true);
     m_pMessage->setAlignment(Qt::AlignCenter);
     DFontSizeManager::instance()->bind(m_pMessage, DFontSizeManager::T6);
-
-    //Set Message color to TextTips
-    DPalette paMsg = DApplicationHelper::instance()->palette(m_pMessage);
-    paMsg.setBrush(DPalette::WindowText, paMsg.color(DPalette::BrightText));
-    m_pMessage->setPalette(paMsg);
+    m_pMessage->setForegroundRole(DPalette::BrightText);
 
     QHBoxLayout *actionBarLayout = new QHBoxLayout();
     actionBarLayout->setSpacing(10);
@@ -121,10 +116,6 @@ void VNoteMessageDialog::initUI()
     m_confirmBtn->setText(DApplication::translate("VNoteMessageDialog", "Confirm"));
 
     m_buttonSpliter = new DVerticalLine(this);
-    DPalette pa = DApplicationHelper::instance()->palette(m_buttonSpliter);
-    QColor splitColor = pa.color(DPalette::ItemBackground);
-    pa.setBrush(DPalette::Background, splitColor);
-    m_buttonSpliter->setPalette(pa);
     m_buttonSpliter->setBackgroundRole(QPalette::Background);
     m_buttonSpliter->setAutoFillBackground(true);
     m_buttonSpliter->setFixedSize(4, 28);
@@ -199,14 +190,4 @@ void VNoteMessageDialog::initMessage()
         setSingleButton();
     }
     }
-}
-
-void VNoteMessageDialog::updateTextColor()
-{
-    DPalette pa = DApplicationHelper::instance()->palette(m_buttonSpliter);
-    pa.setBrush(DPalette::Background, pa.color(DPalette::ItemBackground));
-    m_buttonSpliter->setPalette(pa);
-    pa = DApplicationHelper::instance()->palette(m_pMessage);
-    pa.setBrush(DPalette::WindowText, pa.color(DPalette::BrightText));
-    m_pMessage->setPalette(pa);
 }
