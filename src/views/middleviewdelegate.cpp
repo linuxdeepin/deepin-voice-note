@@ -268,6 +268,7 @@ QWidget *MiddleViewDelegate::createEditor(QWidget *parent, const QStyleOptionVie
     Q_UNUSED(option)
     Q_UNUSED(index)
     QLineEdit *editBox = new QLineEdit(parent);
+    editBox->setObjectName("note_edit");
     editBox->setMaxLength(MAX_TITLE_LEN);
     editBox->setFixedSize(204, 38);
     editBox->installEventFilter(m_parentView);

@@ -776,18 +776,19 @@ void MiddleView::handleTouchSlideEvent(qint64 timeParam, double distY, QPoint po
  */
 bool MiddleView::eventFilter(QObject *o, QEvent *e)
 {
-    Q_UNUSED(o);
-    if (e->type() == QEvent::FocusIn) {
-        m_pItemDelegate->setEditIsVisible(true);
-        Utils::setImVisible(true);
-        this->update(currentIndex());
-    } else if (e->type() == QEvent::MouseButtonPress) {
-        Utils::setImVisible(true);
-    } else if (e->type() == QEvent::FocusOut) {
-        Utils::setImVisible(false);
-    } else if (e->type() == QEvent::Destroy) {
-        m_pItemDelegate->setEditIsVisible(false);
-        this->update(currentIndex());
+    if (o->objectName() == "note_edit") {
+        if (e->type() == QEvent::FocusIn) {
+            m_pItemDelegate->setEditIsVisible(true);
+            Utils::setImVisible(true);
+            this->update(currentIndex());
+        } else if (e->type() == QEvent::MouseButtonPress) {
+            Utils::setImVisible(true);
+        } else if (e->type() == QEvent::FocusOut) {
+            Utils::setImVisible(false);
+        } else if (e->type() == QEvent::Destroy) {
+            m_pItemDelegate->setEditIsVisible(false);
+            this->update(currentIndex());
+        }
     }
     return false;
 }

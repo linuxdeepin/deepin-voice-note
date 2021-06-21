@@ -380,7 +380,7 @@ bool LeftView::eventFilter(QObject *o, QEvent *e)
             m_pItemDelegate->setDrawHover(true);
             update();
         }
-    } else {
+    } else if (o->objectName() == "note_edit") {
         if (e->type() == QEvent::FocusIn || e->type() == QEvent::MouseButtonPress) {
             Utils::setImVisible(true);
         } else if (e->type() == QEvent::FocusOut) {
