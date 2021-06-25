@@ -54,7 +54,6 @@ LeftView::LeftView(QWidget *parent)
 {
     initModel();
     initDelegate();
-    initNotepadRoot();
     initMenu();
     initConnections();
     setContextMenuPolicy(Qt::NoContextMenu);
@@ -89,24 +88,17 @@ void LeftView::initDelegate()
 }
 
 /**
- * @brief LeftView::initNotepadRoot
+ * @brief LeftView::getNotepadRoot
+ * @return 记事本项父节点
  */
-void LeftView::initNotepadRoot()
+QStandardItem *LeftView::getNotepadRoot()
 {
     QStandardItem *pItem = m_pDataModel->item(0);
     if (pItem == nullptr) {
         pItem = StandardItemCommon::createStandardItem(nullptr, StandardItemCommon::NOTEPADROOT);
         m_pDataModel->insertRow(0, pItem);
     }
-}
-
-/**
- * @brief LeftView::getNotepadRoot
- * @return 记事本项父节点
- */
-QStandardItem *LeftView::getNotepadRoot()
-{
-    return m_pDataModel->item(0);
+    return pItem;
 }
 
 /**
