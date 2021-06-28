@@ -821,7 +821,7 @@ void LeftView::triggerDragFolder()
         drag->setMimeData(mimeData);
         m_folderDraing = true;
         //解决高分屏显示与鼠标位置不对应问题，使用固定位置
-        drag->setHotSpot(QPoint(21, 25));
+        drag->setHotSpot(QPoint(90, 100));
         drag->exec(Qt::MoveAction);
         drag->deleteLater();
         m_folderDraing = false;

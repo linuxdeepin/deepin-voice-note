@@ -1129,7 +1129,7 @@ void MiddleView::triggerDragNote()
         drag->setMimeData(mimeData);
         drag->setPixmap(pixmap);
         //解决高分屏显示与鼠标位置不对应问题，使用固定位置
-        drag->setHotSpot(QPoint(18, 25));
+        drag->setHotSpot(QPoint(90, 100));
         drag->exec(Qt::MoveAction);
         drag->deleteLater();
         //隐藏菜单
