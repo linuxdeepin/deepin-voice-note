@@ -62,7 +62,6 @@ LeftView::LeftView(QWidget *parent)
     this->setDragDropMode(QAbstractItemView::DragDrop);
     this->setDropIndicatorShown(true);
     this->setAcceptDrops(true);
-    viewport()->installEventFilter(this);
 }
 
 /**
@@ -372,15 +371,7 @@ void LeftView::addFolder(VNoteFolder *folder)
  */
 bool LeftView::eventFilter(QObject *o, QEvent *e)
 {
-    if (o == viewport()) {
-        if (e->type() == QEvent::DragLeave) {
-            m_pItemDelegate->setDrawHover(false);
-            update();
-        } else if (e->type() == QEvent::DragEnter) {
-            m_pItemDelegate->setDrawHover(true);
-            update();
-        }
-    } else if (o->objectName() == "note_edit") {
+    if (o->objectName() == "note_edit") {
         if (e->type() == QEvent::FocusIn || e->type() == QEvent::MouseButtonPress) {
             Utils::setImVisible(true);
         } else if (e->type() == QEvent::FocusOut) {
@@ -721,7 +712,6 @@ void LeftView::dragLeaveEvent(QDragLeaveEvent *event)
 {
     if (m_folderDraing) {
         m_pItemDelegate->setDragState(false);
-        m_pItemDelegate->setDrawHover(false);
         this->update();
     }
     event->accept();
@@ -826,7 +816,6 @@ void LeftView::triggerDragFolder()
         drag->deleteLater();
         m_folderDraing = false;
         m_pItemDelegate->setDragState(false);
-        m_pItemDelegate->setDrawHover(true);
         //隐藏菜单
         m_notepadMenu->hide();
     }

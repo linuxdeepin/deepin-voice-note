@@ -37,8 +37,6 @@ public:
     void setDrawNotesNum(bool enable);
     //设置是否拖动效果
     void setDragState(bool state);
-    //设置是否绘制hover效果
-    void setDrawHover(bool enable);
     const int MAX_FOLDER_NAME_LEN = 64;
     //更新判断标志
     void setSelectView(bool selectView);
@@ -72,14 +70,13 @@ private:
     void paintNoteItem(QPainter *painter, const QStyleOptionViewItem &option,
                        const QModelIndex &index) const;
     //绘制三角
-    void paintTriangle(QPainter *painter, const QRect& rc, const QBrush &brush, bool left) const;
+    void paintTriangle(QPainter *painter, const QRect &rc, const QBrush &brush, bool left) const;
 
     QAbstractItemView *m_treeView {nullptr};
     DPalette m_parentPb;
     bool m_enableItem {true};
     bool m_drawNotesNum {true};
-    bool m_draging  {false};
-    bool m_drawHover  {true};
+    bool m_draging {false};
 
     //是否为待移动记事本列表
     bool m_isPendingList {false};

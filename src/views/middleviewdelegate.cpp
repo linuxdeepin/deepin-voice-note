@@ -377,11 +377,6 @@ void MiddleViewDelegate::paintItemBase(QPainter *painter, const QStyleOptionView
     path.arcTo(QRect(QPoint(rect.bottomRight() - QPoint(radius * 2, radius * 2)), QSize(radius * 2, radius * 2)), 270, 90);
     if (option.state & QStyle::State_Selected) {
         QColor fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
-        //        if (enable) {
-        //            fillColor = option.palette.color(DPalette::Normal, DPalette::Highlight);
-        //        } else {
-        //            fillColor = option.palette.color(DPalette::Disabled, DPalette::Highlight);
-        //        }
         painter->setBrush(QBrush(fillColor));
         painter->fillPath(path, painter->brush());
         painter->setPen(QPen(Qt::white));
@@ -393,15 +388,9 @@ void MiddleViewDelegate::paintItemBase(QPainter *painter, const QStyleOptionView
             painter->fillPath(path, painter->brush());
             painter->setPen(QPen(m_parentPb.color(DPalette::Disabled, DPalette::WindowText)));
         } else {
-            if (option.state & QStyle::State_MouseOver) {
-                painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
-                painter->fillPath(path, painter->brush());
-                painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
-            } else {
-                painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
-                painter->fillPath(path, painter->brush());
-                painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
-            }
+            painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
+            painter->fillPath(path, painter->brush());
+            painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
         }
     }
 }

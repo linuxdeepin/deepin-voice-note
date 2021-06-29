@@ -222,7 +222,6 @@ TEST_F(ut_leftview_test, setDrawNotesNum)
 
     leftview.m_pItemDelegate->setDrawNotesNum(false);
     leftview.m_pItemDelegate->setDragState(false);
-    leftview.m_pItemDelegate->setDrawHover(false);
     leftview.m_pItemDelegate->setModelData(lineedit, leftview.m_pDataModel, leftview.currentIndex());
 }
 
