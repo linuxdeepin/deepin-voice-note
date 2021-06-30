@@ -109,7 +109,7 @@ DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextC
     if (m_curItemWidget != nullptr) {
         index = m_viewportLayout->indexOf(m_curItemWidget) + 1;
     }
-
+    //从缓存窗口池中查找，没找到新建后放入缓存池
     auto it = m_mapWidgetCache.find(data);
     if (it != m_mapWidgetCache.end()) {
         editItem = static_cast<TextNoteItem *>(it.value());
@@ -181,7 +181,7 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
     QTextDocumentFragment cutStr;
     int curIndex = m_viewportLayout->indexOf(m_curItemWidget);
     VNoteBlock *curBlock = m_curItemWidget->getNoteBlock();
-
+    //根据光标分割编辑器
     if (curBlock->blockType == VNoteBlock::Text) {
         QTextCursor cursor = m_curItemWidget->getTextCursor();
         cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
@@ -196,6 +196,7 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
     curIndex += 1;
     m_viewportLayout->insertWidget(curIndex, item);
 
+    //查找上一个插件获取绑定数据确定后台数据插入位置
     VNoteBlock *preBlock = nullptr;
     if (curIndex > 0) {
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(curIndex - 1);
@@ -206,6 +207,7 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
     m_noteItemData->addBlock(preBlock, data);
     m_curItemWidget = item;
 
+    //查找下一插件，如果不是编辑器则新建一个编辑器
     QLayoutItem *nextlayoutItem = m_viewportLayout->itemAt(curIndex + 1);
     DetailItemWidget *nextWidget = static_cast<DetailItemWidget *>(nextlayoutItem->widget());
 
@@ -216,7 +218,7 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
     } else {
         m_curItemWidget = nextWidget;
     }
-
+    //在下一插件插入前面根据光标分割的内容
     if (!cutStr.isEmpty()) {
         QTextCursor cursor = m_curItemWidget->getTextCursor();
         cursor.movePosition(QTextCursor::Start);
@@ -228,6 +230,7 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
 
     m_curItemWidget->setFocus(m_selectWidget.contains(VoicePlugin));
 
+    //调整滚动条更新后台数据
     int height = 0;
     QRect rc = m_curItemWidget->getCursorRect();
     if (!rc.isEmpty()) {
@@ -254,7 +257,7 @@ void RightView::onTextEditFocusIn(Qt::FocusReason reason)
         }
         adjustVerticalScrollBar(widget, height);
     }
-
+    //键盘交互，tab键进入时光标移动到最后
     if (reason == Qt::TabFocusReason) {
         clearAllSelection();
         QLayoutItem *layoutItem = m_viewportLayout->itemAt(m_viewportLayout->count() - 2);
@@ -274,6 +277,7 @@ void RightView::onTextEditFocusIn(Qt::FocusReason reason)
  */
 void RightView::onTextEditFocusOut()
 {
+    //失去焦点时进行后端数据同步
     if (m_fIsNoteModified) {
         TextNoteItem *widget = static_cast<TextNoteItem *>(sender());
         Utils::documentToBlock(widget->getNoteBlock(), widget->getTextDocument());
@@ -286,6 +290,7 @@ void RightView::onTextEditFocusOut()
  */
 void RightView::onTextEditTextChange()
 {
+    //数据变化记录，第一次变化时通知笔记列表进行排序
     m_fIsNoteModified = true;
     if (m_isFristTextChange == false) {
         m_isFristTextChange = true;
@@ -304,6 +309,7 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
     this->setVisible(false);
     clearAllSelection();
 
+    //数据相同时只更新搜索高亮
     if (m_noteItemData == data) {
         m_searchKey = reg;
         for (int i = 0; i < m_viewportLayout->count() - 1; i++) {
@@ -316,7 +322,7 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
         this->setVisible(true);
         return;
     }
-
+    //清空原有数据
     while (m_viewportLayout->indexOf(m_placeholderWidget) != 0) {
         QLayoutItem *layoutItem = m_viewportLayout->takeAt(0);
         QWidget *widget = layoutItem->widget();
@@ -341,16 +347,16 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
         this->setVisible(true);
         return;
     }
-
+    //插入数据
     int size = m_noteItemData->datas.dataConstRef().size();
     QTextCursor::MoveOperation op = fouse ? QTextCursor::End : QTextCursor::Start;
     if (size) {
         for (auto it : m_noteItemData->datas.dataConstRef()) {
             if (VNoteBlock::Text == it->getType()) {
-                m_curItemWidget = insertTextEdit(it, false, op, reg);
+                m_curItemWidget = insertTextEdit(it, false, op, reg); //插入编辑器
             } else if (VNoteBlock::Voice == it->getType()) {
                 VoiceNoteItem *item = nullptr;
-
+                //插入语音
                 auto itWidget = m_mapWidgetCache.find(it);
                 if (itWidget != m_mapWidgetCache.end()) {
                     item = static_cast<VoiceNoteItem *>(itWidget.value());
@@ -373,6 +379,7 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
             }
         }
     } else {
+        //没有任何数据则插入一个编辑器用于内容编辑
         VNoteBlock *textBlock = m_noteItemData->newBlock(VNoteBlock::Text);
         m_curItemWidget = insertTextEdit(textBlock, fouse, op, reg);
         m_noteItemData->addBlock(nullptr, textBlock);
@@ -395,7 +402,7 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
 void RightView::onVoicePlay(VoiceNoteItem *item)
 {
     VNVoiceBlock *data = item->getNoteBlock()->ptrVoice;
-    if (data) {
+    if (data && item) {
         if (!checkFileExist(data->voicePath)) {
             removeSelectWidget(item);
             delWidget(item);
@@ -540,8 +547,8 @@ int RightView::initAction(DetailItemWidget *widget)
 
     if (voiceCount) {
         if (allTextEmpty) {
-            if (voiceCount == 1) {
-                if (voiceWidget[0]->isSelectAll()) {
+            if (voiceCount == 1) { //只有一个语音的情况
+                if (voiceWidget[0]->isSelectAll()) { //该语音全部选中
                     VNoteBlock *blockData = voiceWidget[0]->getNoteBlock();
                     if (!checkFileExist(blockData->ptrVoice->voicePath)) {
                         removeSelectWidget(voiceWidget[0]);
@@ -587,7 +594,7 @@ int RightView::initAction(DetailItemWidget *widget)
                 return 0;
             }
 
-            if (!isAllWidgetEmpty(voiceWidget)) {
+            if (!isAllWidgetEmpty(voiceWidget)) { //只选中了语音转文字
                 ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
                 if (isAISrvAvailable) {
                     if (VTextSpeechAndTrManager::getTransEnable()) {
@@ -603,7 +610,7 @@ int RightView::initAction(DetailItemWidget *widget)
                 ActionManager::Instance()->enableAction(ActionManager::DetailCut, canCutDel);
                 ActionManager::Instance()->enableAction(ActionManager::DetailDelete, canCutDel);
             }
-        } else if (textCount) {
+        } else if (textCount) { //只选中了文本
             ActionManager::Instance()->enableAction(ActionManager::DetailCopy, true);
             if (isAISrvAvailable) {
                 if (VTextSpeechAndTrManager::getTransEnable()) {
@@ -830,6 +837,7 @@ bool RightView::checkFileExist(const QString &file)
  */
 void RightView::adjustVerticalScrollBar(QWidget *widget, int defaultHeight)
 {
+    //获取所有插件的总高度＋光标位置的高度
     int index = m_viewportLayout->indexOf(widget);
     int tolHeight = defaultHeight;
     if (tolHeight >= 0) {
@@ -850,6 +858,7 @@ void RightView::adjustVerticalScrollBar(QWidget *widget, int defaultHeight)
  */
 void RightView::adjustVoiceVerticalScrollBar(DetailItemWidget *widget, int defaultHeight)
 {
+    //滚动条调整到语音插件下方的编辑器
     int index = m_viewportLayout->indexOf(widget);
     QLayoutItem *nextItem = m_viewportLayout->itemAt(index + 1);
     if (nextItem) {
@@ -1013,7 +1022,7 @@ void RightView::setIsNormalView(bool value)
 void RightView::mouseMoveSelect(QMouseEvent *event)
 {
     DetailItemWidget *widget = getWidgetByPos(event->pos());
-
+    //获取鼠标按下的插件位置以及鼠标移动当前的插件位置
     if (widget && m_curItemWidget) {
         int widgetIndex = m_viewportLayout->indexOf(widget);
         int curIndex = m_viewportLayout->indexOf(m_curItemWidget);
@@ -1031,7 +1040,7 @@ void RightView::mouseMoveSelect(QMouseEvent *event)
                 maxIndex = widgetIndex;
             }
         }
-
+        //选中文本
         widget->selectText(event->globalPos(), op);
 
         if (minIndex != maxIndex) {

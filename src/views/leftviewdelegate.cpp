@@ -85,8 +85,10 @@ void LeftViewDelegate::setEditorData(QWidget *editor, const QModelIndex &index) 
 {
     QVariant var = index.data(Qt::UserRole + 2);
     VNoteFolder *data = static_cast<VNoteFolder *>(var.value<void *>());
-    QLineEdit *edit = static_cast<QLineEdit *>(editor);
-    edit->setText(data->name);
+    if (nullptr != data) {
+        QLineEdit *edit = static_cast<QLineEdit *>(editor);
+        edit->setText(data->name);
+    }
 }
 
 /**

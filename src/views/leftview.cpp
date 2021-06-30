@@ -61,7 +61,6 @@ LeftView::LeftView(QWidget *parent)
     this->setDragDropMode(QAbstractItemView::DragDrop);
     this->setDropIndicatorShown(true);
     this->setAcceptDrops(true);
-    this->setContextMenuPolicy(Qt::NoContextMenu);
     viewport()->installEventFilter(this);
     this->installEventFilter(this);
 }
@@ -230,7 +229,6 @@ void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void LeftView::mouseMoveEvent(QMouseEvent *event)
 {
-    Q_UNUSED(event);
     if (m_onlyCurItemMenuEnable) {
         return;
     }
