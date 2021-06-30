@@ -94,7 +94,7 @@ VNoteMainWindow::VNoteMainWindow(QWidget *parent)
     initA2TManager();
     //Init the login manager
     initLogin1Manager();
-    //initStatusBar();
+    initStatusBar();
     initVirtualKeyboard();
     //Init delay task
     delayInitTasks();
@@ -1245,13 +1245,9 @@ void VNoteMainWindow::resizeEvent(QResizeEvent *event)
         int yPos = m_centerWidget->height() - m_pDeviceExceptionMsg->height() - 5;
         m_pDeviceExceptionMsg->move(xPos, yPos);
     }
-
-    if (false == m_currentVirtualKeyboardShow) {
-        m_leftView->scrollTo(m_leftView->currentIndex());
-        m_middleView->scrollTo(m_middleView->currentIndex());
-        m_rightView->scrollToCursor();
-    }
-    qInfo() << this->geometry() << this->rect();
+    m_leftView->scrollTo(m_leftView->currentIndex());
+    m_middleView->scrollTo(m_middleView->currentIndex());
+    m_rightView->scrollToCursor();
     DMainWindow::resizeEvent(event);
 }
 
@@ -2232,16 +2228,21 @@ void VNoteMainWindow::onVirtualKeyboardShow(bool show)
     if (m_virtualKeyboard) {
         m_currentVirtualKeyboardShow = show;
         if (show) {
-            if (m_recordBarHolder->height() != 0) {
-                m_recordBarHolder->setFixedHeight(0);
-                m_addNoteBtn->setFixedHeight(0);
-                m_addNotepadBtn->setFixedHeight(0);
-            }
+            QTimer::singleShot(300, this, [=] {
+                QRect rc = m_virtualKeyboard->property("geometry").toRect();
+                this->setFixedHeight(QApplication::desktop()->geometry().height() - rc.height() - m_statusBarHeight);
+                if (m_recordBarHolder->height() != 0) {
+                    m_recordBarHolder->setFixedHeight(0);
+                    m_addNoteBtn->setFixedHeight(0);
+                    m_addNotepadBtn->setFixedHeight(0);
+                }
+            });
         } else {
             if (m_recordBarHolder->height() == 0) {
                 m_recordBarHolder->setFixedHeight(78);
                 m_addNoteBtn->setFixedHeight(54);
                 m_addNotepadBtn->setFixedHeight(40);
+                this->setFixedHeight(QApplication::desktop()->availableGeometry().height());
             }
         }
     }

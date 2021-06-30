@@ -60,7 +60,7 @@ void VNoteApplication::activateWindow()
 
         //Should be called befor show
         Dtk::Widget::moveToCenter(m_qspMainWnd.get());
-
+        qApp->ignoreVirtualKeyboard(m_qspMainWnd.get());
         m_qspMainWnd->show();
     } else {
         m_qspMainWnd->setWindowState(Qt::WindowActive | Qt::WindowMaximized);
