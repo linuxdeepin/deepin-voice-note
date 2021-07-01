@@ -29,14 +29,11 @@ class ut_vnoteplaywidget_test : public QObject
     Q_OBJECT
 public:
     ut_vnoteplaywidget_test();
-
+    VNotePlayWidget *m_vnoteplaywidget {nullptr};
     // Test interface
 protected:
     virtual void SetUp() override;
     virtual void TearDown() override;
-
-private:
-    VNotePlayWidget *m_vnoteplaywidget {nullptr};
 };
 
 #endif // UT_VNOTEPLAYWIDGET_H

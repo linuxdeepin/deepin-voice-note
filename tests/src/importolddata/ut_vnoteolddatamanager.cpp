@@ -45,7 +45,7 @@ TEST_F(ut_vnoteolddatamanager_test, initOldDb)
 
 TEST_F(ut_vnoteolddatamanager_test, reqDatas)
 {
-    //m_vnoteolddatamanager->reqDatas();
+    m_vnoteolddatamanager->reqDatas();
 }
 
 TEST_F(ut_vnoteolddatamanager_test, doUpgrade)

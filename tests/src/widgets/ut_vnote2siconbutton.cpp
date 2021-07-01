@@ -39,3 +39,10 @@ TEST_F(ut_vnote2siconbutton_test, mouseReleaseEvent)
     vnote2siconbutton.mouseReleaseEvent(event);
     delete event;
 }
+
+TEST_F(ut_vnote2siconbutton_test, keyPressEvent)
+{
+    VNote2SIconButton vnote2siconbutton("test", "test");
+    QKeyEvent e(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
+    vnote2siconbutton.keyPressEvent(&e);
+}

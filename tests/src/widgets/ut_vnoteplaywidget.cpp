@@ -42,11 +42,6 @@ TEST_F(ut_vnoteplaywidget_test, onVoicePlayPosChange)
 
 TEST_F(ut_vnoteplaywidget_test, setVoiceBlock)
 {
-    //    VNoteItem tmpNote;
-    //    tmpNote.folderId = 2;
-    //    tmpNote.noteType = VNoteItem::VNT_Voice;
-    //    VNVoiceBlock *ptrBlock = new VNVoiceBlock;
-    //    m_vnoteplaywidget->setVoiceBlock(ptrBlock);
 }
 
 TEST_F(ut_vnoteplaywidget_test, playVideo)
@@ -59,4 +54,5 @@ TEST_F(ut_vnoteplaywidget_test, playVideo)
     m_vnoteplaywidget->onCloseBtnClicked();
     m_vnoteplaywidget->getPlayerStatus();
     m_vnoteplaywidget->getVoiceData();
+    m_vnoteplaywidget->onDurationChanged(100);
 }

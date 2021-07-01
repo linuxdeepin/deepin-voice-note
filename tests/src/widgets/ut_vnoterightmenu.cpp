@@ -32,3 +32,9 @@ TEST_F(ut_vnoterightmenu_test, mouseMoveEvent)
     rightmenu.mouseMoveEvent(mouseMoveEvent);
     delete mouseMoveEvent;
 }
+
+TEST_F(ut_vnoterightmenu_test, setPressPoint)
+{
+    VNoteRightMenu rightmenu;
+    rightmenu.setPressPoint(QPoint(0, 0));
+}

@@ -26,9 +26,24 @@ ut_vnoteiconbutton_test::ut_vnoteiconbutton_test()
 
 TEST_F(ut_vnoteiconbutton_test, mousePressEvent)
 {
-    VNoteIconButton vnoteiconbutton;
+    VNoteIconButton vnoteiconbutton(nullptr, "home_page_logo.svg", "home_page_logo.svg", "home_page_logo.svg");
     QPointF localPos;
     QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    vnoteiconbutton.mouseMoveEvent(event);
     vnoteiconbutton.mousePressEvent(event);
+    vnoteiconbutton.mouseReleaseEvent(event);
     delete event;
+}
+
+TEST_F(ut_vnoteiconbutton_test, setSeparateThemIcons)
+{
+    VNoteIconButton vnoteiconbutton(nullptr, "home_page_logo.svg", "home_page_logo.svg", "home_page_logo.svg");
+    vnoteiconbutton.enterEvent(nullptr);
+    vnoteiconbutton.leaveEvent(nullptr);
+    vnoteiconbutton.setSeparateThemIcons(false);
+    vnoteiconbutton.SetDisableIcon("home_page_logo.svg");
+    vnoteiconbutton.setBtnDisabled(false);
+    vnoteiconbutton.setBtnDisabled(true);
+    vnoteiconbutton.getFocusReason();
+    vnoteiconbutton.onThemeChanged(DGuiApplicationHelper::LightType);
 }
