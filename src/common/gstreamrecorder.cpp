@@ -76,8 +76,8 @@ bool GstreamRecorder::createPipe()
     GstElement *audioEncoder = nullptr; //编码器
     GstElement *audioOutput = nullptr; //输出文件
     //   回音消除与噪声抑制
-    //   GstElement *audiowebrtcdsp = nullptr;
-    //   GstElement *audiowebrtcechoprobe = nullptr;
+    GstElement *audiowebrtcdsp = nullptr;
+    GstElement *audiowebrtcechoprobe = nullptr;
 
     bool success = false;
     do {
@@ -90,17 +90,17 @@ bool GstreamRecorder::createPipe()
             g_object_set(reinterpret_cast<gpointer *>(audioSrc), "device", m_currentDevice.toLatin1().data(), nullptr);
         }
 
-        //       audiowebrtcdsp= gst_element_factory_make("webrtcdsp","audiowebrtcdsp");
-        //       if(audiowebrtcdsp == nullptr){
-        //           qCritical() << "audiowebrtcdsp make error";
-        //           break;
-        //       }
-        //       audiowebrtcechoprobe = gst_element_factory_make("webrtcechoprobe","webrtcechoprobe");
-        //       if(audiowebrtcechoprobe == nullptr){
-        //           qCritical() << "audiowebrtcechoprobe make error";
-        //           break;
-        //       }
-        //       g_object_set(audiowebrtcdsp, "probe", "webrtcechoprobe", nullptr);
+        audiowebrtcdsp = gst_element_factory_make("webrtcdsp", "audiowebrtcdsp");
+        if (audiowebrtcdsp == nullptr) {
+            qCritical() << "audiowebrtcdsp make error";
+            break;
+        }
+        audiowebrtcechoprobe = gst_element_factory_make("webrtcechoprobe", "webrtcechoprobe");
+        if (audiowebrtcechoprobe == nullptr) {
+            qCritical() << "audiowebrtcechoprobe make error";
+            break;
+        }
+        g_object_set(audiowebrtcdsp, "probe", "webrtcechoprobe", nullptr);
 
         audioResample = gst_element_factory_make("audioresample", nullptr);
         if (audioResample == nullptr) {
@@ -145,11 +145,11 @@ bool GstreamRecorder::createPipe()
         gst_object_unref(bus);
 
         gst_bin_add_many(reinterpret_cast<GstBin *>(m_pipeline), audioSrc,
-                         /*audiowebrtcdsp,audiowebrtcechoprobe,*/
+                         audiowebrtcdsp, audiowebrtcechoprobe,
                          audioResample, audioConvert, audioQueue,
                          audioEncoder, audioOutput, nullptr);
         if (!gst_element_link_many(audioSrc,
-                                   /*audiowebrtcdsp,audiowebrtcechoprobe,*/
+                                   audiowebrtcdsp, audiowebrtcechoprobe,
                                    audioResample, audioConvert,
                                    audioQueue, audioEncoder,
                                    audioOutput, nullptr)) {
@@ -167,8 +167,8 @@ bool GstreamRecorder::createPipe()
         objectUnref(audioQueue);
         objectUnref(audioEncoder);
         objectUnref(audioOutput);
-        //       objectUnref(audiowebrtcdsp);
-        //       objectUnref(audiowebrtcechoprobe);
+        objectUnref(audiowebrtcdsp);
+        objectUnref(audiowebrtcechoprobe);
     }
     return success;
 }
@@ -240,13 +240,13 @@ bool GstreamRecorder::startRecord()
  */
 void GstreamRecorder::stopRecord()
 {
-    if(m_pipeline){
+    if (m_pipeline) {
         int state = -1;
         int pending = -1;
         GetGstState(&state, &pending);
-        if(state == GST_STATE_PAUSED){
+        if (state == GST_STATE_PAUSED) {
             gst_element_set_state(m_pipeline, GST_STATE_PLAYING);
-        }else if (state != GST_STATE_PLAYING) {
+        } else if (state != GST_STATE_PLAYING) {
             emit recordFinshed();
             return;
         }
@@ -329,7 +329,7 @@ bool GstreamRecorder::doBusMessage(GstMessage *message)
         }
         break;
     }
-    case GST_MESSAGE_EOS:{
+    case GST_MESSAGE_EOS: {
         emit recordFinshed();
         break;
     }
@@ -392,8 +392,8 @@ void GstreamRecorder::setStateToNull()
 {
     GstState cur_state, pending;
     gst_element_get_state(m_pipeline, &cur_state, &pending, 0);
-    if(cur_state == GST_STATE_NULL){
-        if(pending != GST_STATE_VOID_PENDING){
+    if (cur_state == GST_STATE_NULL) {
+        if (pending != GST_STATE_VOID_PENDING) {
             gst_element_set_state(m_pipeline, GST_STATE_NULL);
         }
         return;
