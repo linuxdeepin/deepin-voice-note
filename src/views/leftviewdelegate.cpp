@@ -322,6 +322,10 @@ void LeftViewDelegate::paintNoteItem(QPainter *painter, const QStyleOptionViewIt
                     painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
                     painter->fillPath(path, painter->brush());
                     painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
+                } else if (m_drawHover) {
+                    painter->setBrush(QBrush(m_parentPb.color(DPalette::Light)));
+                    painter->fillPath(path, painter->brush());
+                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::TextTitle)));
                 } else {
                     painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
                     painter->fillPath(path, painter->brush());
@@ -427,4 +431,13 @@ void LeftViewDelegate::setDrawNotesNum(bool enable)
 void LeftViewDelegate::setDragState(bool state)
 {
     m_draging = state;
+}
+
+/**
+ * @brief LeftViewDelegate::setDrawHover
+ * @param enable true 绘制hover效果
+ */
+void LeftViewDelegate::setDrawHover(bool enable)
+{
+    m_drawHover = enable;
 }

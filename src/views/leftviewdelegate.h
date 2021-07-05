@@ -40,6 +40,8 @@ public:
     const int MAX_FOLDER_NAME_LEN = 64;
     //更新判断标志
     void setSelectView(bool selectView);
+    //设置是否绘制hover效果
+    void setDrawHover(bool enable);
 
 protected:
     //绘制列表项
@@ -77,7 +79,7 @@ private:
     bool m_enableItem {true};
     bool m_drawNotesNum {true};
     bool m_draging {false};
-
+    bool m_drawHover {false};
     //是否为待移动记事本列表
     bool m_isPendingList {false};
 };

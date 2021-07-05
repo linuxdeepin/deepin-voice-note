@@ -682,12 +682,9 @@ void LeftView::dragEnterEvent(QDragEnterEvent *event)
         event->ignore();
         return DTreeView::dragEnterEvent(event);
     }
-
-    if (m_folderDraing) {
-        m_pItemDelegate->setDragState(true);
-        this->update();
-    }
-
+    m_pItemDelegate->setDrawHover(event->mimeData()->hasFormat(NOTES_DRAG_KEY));
+    m_pItemDelegate->setDragState(event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY));
+    this->update();
     event->accept();
 }
 
@@ -710,10 +707,9 @@ void LeftView::dragMoveEvent(QDragMoveEvent *event)
  */
 void LeftView::dragLeaveEvent(QDragLeaveEvent *event)
 {
-    if (m_folderDraing) {
-        m_pItemDelegate->setDragState(false);
-        this->update();
-    }
+    m_pItemDelegate->setDrawHover(false);
+    m_pItemDelegate->setDragState(false);
+    this->update();
     event->accept();
 }
 
@@ -809,13 +805,10 @@ void LeftView::triggerDragFolder()
         m_MoveView->setFolder(folder);
         drag->setPixmap(m_MoveView->grab());
         drag->setMimeData(mimeData);
-        m_folderDraing = true;
         //解决高分屏显示与鼠标位置不对应问题，使用固定位置
         drag->setHotSpot(QPoint(90, 100));
         drag->exec(Qt::MoveAction);
         drag->deleteLater();
-        m_folderDraing = false;
-        m_pItemDelegate->setDragState(false);
         //隐藏菜单
         m_notepadMenu->hide();
     }
@@ -839,6 +832,9 @@ void LeftView::dropEvent(QDropEvent *event)
     } else if (event->mimeData()->hasFormat(NOTEPAD_DRAG_KEY)) {
         doDragMove(currentIndex(), indexAt(mapFromGlobal(QCursor::pos())));
     }
+    m_pItemDelegate->setDrawHover(false);
+    m_pItemDelegate->setDragState(false);
+    this->update();
 }
 
 void LeftView::contextMenuEvent(QContextMenuEvent *e)

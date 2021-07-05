@@ -151,7 +151,6 @@ private:
     bool m_onlyCurItemMenuEnable {false};
     FolderSelectDialog *m_folderSelectDialog {nullptr};
     MoveView *m_MoveView {nullptr};
-    bool m_folderDraing {false};
 
     //以下为实现触摸屏功能声明参数
     bool m_isTouchSliding {false};
