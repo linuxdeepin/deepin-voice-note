@@ -95,7 +95,7 @@ VNoteMainWindow::VNoteMainWindow(QWidget *parent)
     //Init the login manager
     initLogin1Manager();
     //Init delay task
-    delayInitTasks();
+    //delayInitTasks();
 }
 
 /**

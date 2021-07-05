@@ -133,8 +133,8 @@ DetailItemWidget *RightView::insertTextEdit(VNoteBlock *data, bool focus, QTextC
     editItem->setTextCursor(cursor);
 
     connect(editItem, &TextNoteItem::sigCursorHeightChange, this, &RightView::adjustVerticalScrollBar);
-    connect(editItem, &TextNoteItem::sigFocusIn, this, &RightView::onTextEditFocusIn);
-    connect(editItem, &TextNoteItem::sigFocusOut, this, &RightView::onTextEditFocusOut);
+    connect(editItem, SIGNAL(sigFocusIn(Qt::FocusReason)), this, SLOT(onTextEditFocusIn(Qt::FocusReason)));
+    connect(editItem, SIGNAL(sigFocusOut()), this, SLOT(onTextEditFocusOut()));
     connect(editItem, &TextNoteItem::sigSelectionChanged, this, &RightView::onTextEditSelectChange);
     connect(editItem, &TextNoteItem::sigTextChanged, this, &RightView::onTextEditTextChange);
     return editItem;
@@ -209,9 +209,9 @@ DetailItemWidget *RightView::insertVoiceItem(const QString &voicePath, qint64 vo
 
     //查找下一插件，如果不是编辑器则新建一个编辑器
     QLayoutItem *nextlayoutItem = m_viewportLayout->itemAt(curIndex + 1);
-    DetailItemWidget *nextWidget = static_cast<DetailItemWidget *>(nextlayoutItem->widget());
+    DetailItemWidget *nextWidget = qobject_cast<DetailItemWidget *>(nextlayoutItem->widget());
 
-    if (nextWidget == m_placeholderWidget || nextWidget->getNoteBlock()->blockType == VNoteBlock::Voice) {
+    if (nextWidget == nullptr || nextWidget->getNoteBlock()->blockType == VNoteBlock::Voice) {
         VNoteBlock *textBlock = m_noteItemData->newBlock(VNoteBlock::Text);
         m_noteItemData->addBlock(m_curItemWidget->getNoteBlock(), textBlock);
         m_curItemWidget = insertTextEdit(textBlock, false);
@@ -279,8 +279,10 @@ void RightView::onTextEditFocusOut()
 {
     //失去焦点时进行后端数据同步
     if (m_fIsNoteModified) {
-        TextNoteItem *widget = static_cast<TextNoteItem *>(sender());
-        Utils::documentToBlock(widget->getNoteBlock(), widget->getTextDocument());
+        TextNoteItem *widget = qobject_cast<TextNoteItem *>(sender());
+        if (widget) {
+            Utils::documentToBlock(widget->getNoteBlock(), widget->getTextDocument());
+        }
     }
     saveNote();
 }

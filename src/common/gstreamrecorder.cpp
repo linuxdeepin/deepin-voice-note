@@ -388,7 +388,7 @@ void GstreamRecorder::bufferProbed()
  */
 void GstreamRecorder::setStateToNull()
 {
-    GstState cur_state, pending;
+    GstState cur_state = GST_STATE_NULL, pending = GST_STATE_NULL;
     gst_element_get_state(m_pipeline, &cur_state, &pending, 0);
     if (cur_state == GST_STATE_NULL) {
         if (pending != GST_STATE_VOID_PENDING) {

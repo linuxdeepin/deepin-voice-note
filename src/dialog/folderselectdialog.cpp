@@ -312,7 +312,7 @@ void FolderSelectDialog::initConnections()
         this->refreshTextColor(isDark);
     });
     //字体切换长度适应
-    connect(qApp, &DApplication::fontChanged, this, &FolderSelectDialog::onFontChanged);
+    connect(qGuiApp, &QGuiApplication::fontChanged, this, &FolderSelectDialog::onFontChanged);
 }
 
 /**

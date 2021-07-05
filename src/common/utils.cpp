@@ -122,7 +122,7 @@ QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
 
     qreal ratio = 1.0;
 
-    const qreal devicePixelRatio = qApp->devicePixelRatio();
+    const qreal devicePixelRatio = qGuiApp->devicePixelRatio();
 
     QPixmap pixmap;
 
@@ -275,7 +275,7 @@ void Utils::setDefaultColor(QTextDocument *srcDoc, const QColor &color)
  */
 void Utils::setTitleBarTabFocus(QKeyEvent *event)
 {
-    VNoteApplication *app = dynamic_cast<VNoteApplication *>(qApp);
+    VNoteApplication *app = dynamic_cast<VNoteApplication *>(qGuiApp);
     if (app) {
         VNoteMainWindow *wnd = app->mainWindow();
         if (wnd) {

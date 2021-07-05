@@ -49,7 +49,7 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     QPixmap pixmap;
     QSize size(162, 156);
     reader.setFileName(QString(STAND_ICON_PAHT).append("detail_icon/detail_icon_note.svg"));
-    const qreal ratio = qApp->devicePixelRatio();
+    const qreal ratio = qGuiApp->devicePixelRatio();
     if (reader.canRead()) {
         reader.setScaledSize(size * ratio);
         pixmap = QPixmap::fromImage(reader.read());
@@ -165,7 +165,7 @@ void VnoteMultipleChoiceOptionWidget::initConnections()
             &VnoteMultipleChoiceOptionWidget::changeFromThemeType);
 
     //字体切换长度适应
-    connect(qApp, &DApplication::fontChanged, this, &VnoteMultipleChoiceOptionWidget::onFontChanged);
+    connect(qGuiApp, &QGuiApplication::fontChanged, this, &VnoteMultipleChoiceOptionWidget::onFontChanged);
 }
 
 /**
@@ -246,7 +246,7 @@ QPixmap VnoteMultipleChoiceOptionWidget::setSvgColor(QString svgPath, QString co
     setSVGBackColor(elem, "fill", color);
 
     //    int scaled =qApp->devicePixelRatio() == 1.25 ? 2 : 1;
-    double scaled = qApp->devicePixelRatio();
+    double scaled = qGuiApp->devicePixelRatio();
     QSvgRenderer svg_render(doc.toByteArray());
 
     QPixmap pixmap(QSize(24, 24) * scaled);
@@ -337,7 +337,7 @@ void VnoteMultipleChoiceOptionWidget::onFontChanged()
     m_deleteButton->setText(DApplication::translate("NotesContextMenu", "Delete"));
     m_deleteButton->setFixedHeight(m_iconWidth + 2);
     //    //计算参数
-    int iconWidth = qCeil(qApp->devicePixelRatio() * m_iconWidth) + 30;
+    int iconWidth = qCeil(qGuiApp->devicePixelRatio() * m_iconWidth) + 30;
     int saveTextWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save as TXT")) + iconWidth;
     int saveVoiceWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save voice recording")) + iconWidth;
     int deleteButtonWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Delete")) + iconWidth;
