@@ -51,8 +51,6 @@ signals:
 
 public slots:
     void onRecordBtnClicked();
-    //录音库结束
-    void onGstreamerFinshRecord();
     //录音时长改变
     void onRecordDurationChange(qint64 duration);
     //录音数据改变
