@@ -36,7 +36,7 @@
 #include "db/vnoteitemoper.h"
 
 #include <DApplication>
-
+#include <DWindowManagerHelper>
 #include <QMouseEvent>
 #include <QDebug>
 #include <QDrag>
@@ -850,7 +850,11 @@ void LeftView::triggerDragFolder()
         if (nullptr == m_MoveView) {
             m_MoveView = new MoveView(this);
         }
-        m_MoveView->setFixedSize(224, 91);
+        if (DWindowManagerHelper::instance()->hasComposite()) {
+            m_MoveView->setFixedSize(224, 91);
+        } else {
+            m_MoveView->setFixedSize(180, 36);
+        }
         m_MoveView->setFolder(folder);
         drag->setPixmap(m_MoveView->grab());
         drag->setMimeData(mimeData);

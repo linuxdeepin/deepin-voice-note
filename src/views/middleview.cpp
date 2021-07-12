@@ -35,6 +35,7 @@
 #include <DApplication>
 #include <DFileDialog>
 #include <DLog>
+#include <DWindowManagerHelper>
 
 #include <QMouseEvent>
 #include <QVBoxLayout>
@@ -1148,7 +1149,11 @@ void MiddleView::triggerDragNote()
         m_MoveView->setNotesNumber(modelList.count());
         m_MoveView->setNoteList(noteDataList);
         //重设视图大小
-        m_MoveView->setFixedSize(282, 91);
+        if (DWindowManagerHelper::instance()->hasComposite()) {
+            m_MoveView->setFixedSize(282, 91);
+        } else {
+            m_MoveView->setFixedSize(240, 36);
+        }
         QPixmap pixmap = m_MoveView->grab();
         QDrag *drag = new QDrag(this);
         QMimeData *mimeData = new QMimeData;
