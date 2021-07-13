@@ -62,6 +62,7 @@ void ut_vnotemainwindow_test::SetUp()
 {
     Stub stub;
     stub.set(ADDR(VNoteMainWindow, initData), stub_vnotemainwindow);
+    stub.set(ADDR(VNoteMainWindow, delayInitTasks), stub_vnotemainwindow);
     m_mainWindow = new VNoteMainWindow;
 }
 
