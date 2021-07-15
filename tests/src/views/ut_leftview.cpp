@@ -23,6 +23,7 @@
 #include "vnoteforlder.h"
 #include "middleview.h"
 #include "vnotedatamanager.h"
+#include "globaldef.h"
 
 #include <QLineEdit>
 #include <QDateTime>
@@ -211,13 +212,16 @@ TEST_F(ut_leftview_test, doNoteMove)
 {
     LeftView leftview;
     QModelIndexList indexList;
-    QModelIndex index = leftview.currentIndex();
-    leftview.doDragMove(index, index);
-    leftview.doNoteMove(indexList, index);
-    leftview.selectMoveFolder(indexList);
+    VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
+    if (folders) {
+        for (auto it : folders->folders) {
+            leftview.appendFolder(it);
+        }
+    }
+    QModelIndex index = leftview.setDefaultNotepadItem();
+    leftview.doDragMove(index, index.siblingAtRow(index.row() + 1));
     leftview.getFolderSort();
     leftview.setFolderSort();
-    //    leftview.needFolderSort();
 }
 
 TEST_F(ut_leftview_test, doDragMove)
@@ -288,4 +292,24 @@ TEST_F(ut_leftview_test, sort)
         }
     }
     leftview.sort();
+}
+
+TEST_F(ut_leftview_test, handleTouchSlideEvent)
+{
+    LeftView leftview;
+    leftview.handleTouchSlideEvent(10, 5.0, QPoint(0, 0));
+}
+
+TEST_F(ut_leftview_test, dragEvent)
+{
+    LeftView leftview;
+    QMimeData data;
+    QDragEnterEvent event(QPoint(0, 0), Qt::IgnoreAction, &data, Qt::LeftButton, Qt::NoModifier);
+    leftview.dragEnterEvent(&event);
+    data.setData(NOTEPAD_DRAG_KEY, QByteArray());
+    leftview.m_folderDraing = true;
+    leftview.dragEnterEvent(&event);
+    leftview.dragMoveEvent(&event);
+    QDragLeaveEvent event1;
+    leftview.dragLeaveEvent(&event1);
 }
