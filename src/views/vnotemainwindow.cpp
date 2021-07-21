@@ -248,31 +248,13 @@ void VNoteMainWindow::initShortcuts()
     m_stEsc->setKey(Qt::Key_Escape);
     m_stEsc->setContext(Qt::WidgetWithChildrenShortcut);
     m_stEsc->setAutoRepeat(false);
-
-    connect(m_stEsc.get(), &QShortcut::activated, this, [=] {
-        setTitleBarTabFocus();
-    });
+    connect(m_stEsc.get(), &QShortcut::activated, this, &VNoteMainWindow::onEscShortcut);
 
     m_stPopupMenu.reset(new QShortcut(this));
     m_stPopupMenu->setKey(Qt::ALT + Qt::Key_M);
     m_stPopupMenu->setContext(Qt::ApplicationShortcut);
     m_stPopupMenu->setAutoRepeat(false);
-
-    connect(m_stPopupMenu.get(), &QShortcut::activated, this, [this] {
-        if (m_leftView->hasFocus()) {
-            m_leftView->popupMenu();
-        } else if (m_middleView->hasFocus()) {
-            m_middleView->popupMenu();
-        } else if (m_noteSearchEdit->lineEdit()->hasFocus()) {
-            if (!m_showSearchEditMenu) {
-                QPoint pos(m_noteSearchEdit->pos());
-                QContextMenuEvent eve(QContextMenuEvent::Reason::Keyboard, pos, m_noteSearchEdit->mapToGlobal(pos));
-                m_showSearchEditMenu = QApplication::sendEvent(m_noteSearchEdit->lineEdit(), &eve);
-            }
-        } else {
-            m_rightView->popupMenu();
-        }
-    });
+    connect(m_stPopupMenu.get(), &QShortcut::activated, this, &VNoteMainWindow::onPoppuMenuShortcut);
 
     //*******************LeftView Shortcuts****************************
     //Add notebook
@@ -280,38 +262,14 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNotebook->setKey(Qt::CTRL + Qt::Key_N);
     m_stNewNotebook->setContext(Qt::ApplicationShortcut);
     m_stNewNotebook->setAutoRepeat(false);
-
-    connect(m_stNewNotebook.get(), &QShortcut::activated, this, [this] {
-        if (!(stateOperation->isRecording()
-              || stateOperation->isPlaying()
-              || stateOperation->isVoice2Text()
-              || stateOperation->isSearching())) {
-            onNewNotebook();
-
-            //If do shortcut in home page,need switch to note
-            //page after add new notebook.
-            if (!canDoShortcutAction()) {
-                switchWidget(WndNoteShow);
-            }
-        }
-    });
+    connect(m_stNewNotebook.get(), &QShortcut::activated, this, &VNoteMainWindow::onAddNotepadShortcut);
 
     //Rename notebook
     m_stRemNotebook.reset(new QShortcut(this));
     m_stRemNotebook->setKey(Qt::Key_F2);
     m_stRemNotebook->setContext(Qt::ApplicationShortcut);
     m_stRemNotebook->setAutoRepeat(false);
-
-    connect(m_stRemNotebook.get(), &QShortcut::activated, this, [this] {
-        //当前记事本是否正在编辑
-        bool isEditing = m_leftView->isPersistentEditorOpen(m_leftView->currentIndex());
-        //如果已在编辑状态，取消操作，解决重复快捷键警告信息
-        if (canDoShortcutAction()) {
-            if (!stateOperation->isSearching() && !isEditing) {
-                editNotepad();
-            }
-        }
-    });
+    connect(m_stRemNotebook.get(), &QShortcut::activated, this, &VNoteMainWindow::onReNameNotepadShortcut);
 
     //*******************MiddleView Shortcuts***************************
     //Add note
@@ -319,31 +277,14 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNote->setKey(Qt::CTRL + Qt::Key_B);
     m_stNewNote->setContext(Qt::ApplicationShortcut);
     m_stNewNote->setAutoRepeat(false);
-
-    connect(m_stNewNote.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()
-            && !(stateOperation->isRecording()
-                 || stateOperation->isPlaying()
-                 || stateOperation->isVoice2Text()
-                 || stateOperation->isSearching())) {
-            onNewNote();
-        }
-    });
+    connect(m_stNewNote.get(), &QShortcut::activated, this, &VNoteMainWindow::onAddNoteShortcut);
 
     //Rename note
     m_stRemNote.reset(new QShortcut(this));
     m_stRemNote->setKey(Qt::Key_F3);
     m_stRemNote->setContext(Qt::ApplicationShortcut);
     m_stRemNote->setAutoRepeat(false);
-
-    connect(m_stRemNote.get(), &QShortcut::activated, this, [this] {
-        //当前笔记是否正在编辑
-        bool isEditing = m_middleView->isPersistentEditorOpen(m_middleView->currentIndex());
-        //如果已在编辑状态，取消操作，解决重复快捷键警告信息
-        if (canDoShortcutAction() && !isEditing) {
-            editNote();
-        }
-    });
+    connect(m_stRemNote.get(), &QShortcut::activated, this, &VNoteMainWindow::onRenameNoteShortcut);
 
     //*******************RightView Shortcuts*****************************
     //Play/Pause
@@ -351,101 +292,54 @@ void VNoteMainWindow::initShortcuts()
     m_stPlayorPause->setKey(Qt::Key_Space);
     m_stPlayorPause->setContext(Qt::ApplicationShortcut);
     m_stPlayorPause->setAutoRepeat(false);
-
-    connect(m_stPlayorPause.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
-            m_recordBar->playOrPauseVoice();
-        }
-    });
+    connect(m_stPlayorPause.get(), &QShortcut::activated, this, &VNoteMainWindow::onPlayPauseShortcut);
 
     //Add new recording
     m_stRecording.reset(new QShortcut(this));
     m_stRecording->setKey(Qt::CTRL + Qt::Key_R);
     m_stRecording->setContext(Qt::ApplicationShortcut);
     m_stRecording->setAutoRepeat(false);
-
-    connect(m_stRecording.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
-            m_recordBar->onStartRecord();
-        }
-    });
+    connect(m_stRecording.get(), &QShortcut::activated, this, &VNoteMainWindow::onRecordShorcut);
 
     //Voice to Text
     m_stVoice2Text.reset(new QShortcut(this));
     m_stVoice2Text->setKey(Qt::CTRL + Qt::Key_W);
     m_stVoice2Text->setContext(Qt::ApplicationShortcut);
     m_stVoice2Text->setAutoRepeat(false);
-
-    connect(m_stVoice2Text.get(), &QShortcut::activated, this, [this] {
-        //Call method in rightview
-        if (canDoShortcutAction()) {
-            if (!stateOperation->isVoice2Text() && stateOperation->isAiSrvExist()) {
-                this->onA2TStart();
-            }
-        }
-    });
+    connect(m_stVoice2Text.get(), &QShortcut::activated, this, &VNoteMainWindow::onVoice2TextShortcut);
 
     //Save as Mp3
     m_stSaveAsMp3.reset(new QShortcut(this));
     m_stSaveAsMp3->setKey(Qt::CTRL + Qt::Key_P);
     m_stSaveAsMp3->setContext(Qt::ApplicationShortcut);
     m_stSaveAsMp3->setAutoRepeat(false);
-
-    connect(m_stSaveAsMp3.get(), &QShortcut::activated, this, [this] {
-        //Call method in rightview
-        Q_UNUSED(this);
-        if (canDoShortcutAction()) {
-            m_rightView->saveMp3();
-        }
-    });
+    connect(m_stSaveAsMp3.get(), &QShortcut::activated, this, &VNoteMainWindow::onSaveMp3Shortcut);
 
     //Save as Text
     m_stSaveAsText.reset(new QShortcut(this));
     m_stSaveAsText->setKey(Qt::CTRL + Qt::Key_S);
     m_stSaveAsText->setContext(Qt::ApplicationShortcut);
     m_stSaveAsText->setAutoRepeat(false);
-
-    connect(m_stSaveAsText.get(), &QShortcut::activated, this, [this] {
-        //多选笔记导出文本
-        if (canDoShortcutAction()) {
-            if (m_middleView->haveText()) {
-                m_middleView->saveAsText();
-            }
-        }
-    });
+    connect(m_stSaveAsText.get(), &QShortcut::activated, this, &VNoteMainWindow::onSaveTextShortcut);
 
     //Save recordings
     m_stSaveVoices.reset(new QShortcut(this));
     m_stSaveVoices->setKey(Qt::CTRL + Qt::Key_Y);
     m_stSaveVoices->setContext(Qt::ApplicationShortcut);
     m_stSaveVoices->setAutoRepeat(false);
-
-    connect(m_stSaveVoices.get(), &QShortcut::activated, this, [this] {
-        //Call method in rightview
-        if (canDoShortcutAction()) {
-            //Can't save recording when do recording.
-            //多选笔记导出语音
-            if (!stateOperation->isRecording()) {
-                if (m_middleView->haveVoice()) {
-                    m_middleView->saveRecords();
-                }
-            }
-        }
-    });
+    connect(m_stSaveVoices.get(), &QShortcut::activated, this, &VNoteMainWindow::onSaveVoicesShortcut);
 
     //Notebook/Note/Detial delete key
     m_stDelete.reset(new QShortcut(this));
     m_stDelete->setKey(Qt::Key_Delete);
     m_stDelete->setContext(Qt::ApplicationShortcut);
     m_stDelete->setAutoRepeat(false);
-
     connect(m_stDelete.get(), &QShortcut::activated, this, &VNoteMainWindow::onDeleteShortcut);
 
     m_stPreviewShortcuts.reset(new QShortcut(this));
     m_stPreviewShortcuts->setKey(QString("Ctrl+Shift+/"));
     m_stPreviewShortcuts->setContext(Qt::ApplicationShortcut);
     m_stPreviewShortcuts->setAutoRepeat(false);
-
     connect(m_stPreviewShortcuts.get(), &QShortcut::activated,
             this, &VNoteMainWindow::onPreviewShortcut);
 }
@@ -1570,6 +1464,10 @@ void VNoteMainWindow::delNotepad()
 {
     VNoteFolder *data = m_leftView->removeFolder();
 
+    if (nullptr == data) {
+        return;
+    }
+
     // 判断当前删除的记事本的排序编号，如果不是-1，则将当前所有记事本的排序编号写入配置文件中
     if (-1 != data->sortNumber) {
         QString folderSortData = m_leftView->getFolderSort();
@@ -2421,6 +2319,130 @@ void VNoteMainWindow::onDeleteShortcut()
 
         if (nullptr != deleteAct) {
             deleteAct->triggered();
+        }
+    }
+}
+
+void VNoteMainWindow::onEscShortcut()
+{
+    setTitleBarTabFocus();
+}
+
+void VNoteMainWindow::onPoppuMenuShortcut()
+{
+    if (m_leftView->hasFocus()) {
+        m_leftView->popupMenu();
+    } else if (m_middleView->hasFocus()) {
+        m_middleView->popupMenu();
+    } else if (m_noteSearchEdit->lineEdit()->hasFocus()) {
+        if (!m_showSearchEditMenu) {
+            QPoint pos(m_noteSearchEdit->pos());
+            QContextMenuEvent eve(QContextMenuEvent::Reason::Keyboard, pos, m_noteSearchEdit->mapToGlobal(pos));
+            m_showSearchEditMenu = QApplication::sendEvent(m_noteSearchEdit->lineEdit(), &eve);
+        }
+    } else {
+        m_rightView->popupMenu();
+    }
+}
+
+void VNoteMainWindow::onAddNotepadShortcut()
+{
+    if (!(stateOperation->isRecording()
+          || stateOperation->isPlaying()
+          || stateOperation->isVoice2Text()
+          || stateOperation->isSearching())) {
+        onNewNotebook();
+
+        //If do shortcut in home page,need switch to note
+        //page after add new notebook.
+        if (!canDoShortcutAction()) {
+            switchWidget(WndNoteShow);
+        }
+    }
+}
+
+void VNoteMainWindow::onReNameNotepadShortcut()
+{
+    //当前记事本是否正在编辑
+    bool isEditing = m_leftView->isPersistentEditorOpen(m_leftView->currentIndex());
+    //如果已在编辑状态，取消操作，解决重复快捷键警告信息
+    if (canDoShortcutAction()) {
+        if (!stateOperation->isSearching() && !isEditing) {
+            editNotepad();
+        }
+    }
+}
+
+void VNoteMainWindow::onAddNoteShortcut()
+{
+    if (canDoShortcutAction()
+        && !(stateOperation->isRecording()
+             || stateOperation->isPlaying()
+             || stateOperation->isVoice2Text()
+             || stateOperation->isSearching())) {
+        onNewNote();
+    }
+}
+
+void VNoteMainWindow::onRenameNoteShortcut()
+{
+    //当前笔记是否正在编辑
+    bool isEditing = m_middleView->isPersistentEditorOpen(m_middleView->currentIndex());
+    //如果已在编辑状态，取消操作，解决重复快捷键警告信息
+    if (canDoShortcutAction() && !isEditing) {
+        editNote();
+    }
+}
+
+void VNoteMainWindow::onPlayPauseShortcut()
+{
+    if (canDoShortcutAction()) {
+        m_recordBar->playOrPauseVoice();
+    }
+}
+
+void VNoteMainWindow::onRecordShorcut()
+{
+    if (canDoShortcutAction()) {
+        m_recordBar->onStartRecord();
+    }
+}
+
+void VNoteMainWindow::onVoice2TextShortcut()
+{
+    if (canDoShortcutAction()) {
+        if (!stateOperation->isVoice2Text() && stateOperation->isAiSrvExist()) {
+            this->onA2TStart();
+        }
+    }
+}
+
+void VNoteMainWindow::onSaveMp3Shortcut()
+{
+    if (canDoShortcutAction()) {
+        m_rightView->saveMp3();
+    }
+}
+
+void VNoteMainWindow::onSaveTextShortcut()
+{
+    //多选笔记导出文本
+    if (canDoShortcutAction()) {
+        if (m_middleView->haveText()) {
+            m_middleView->saveAsText();
+        }
+    }
+}
+
+void VNoteMainWindow::onSaveVoicesShortcut()
+{
+    if (canDoShortcutAction()) {
+        //Can't save recording when do recording.
+        //多选笔记导出语音
+        if (!stateOperation->isRecording()) {
+            if (m_middleView->haveVoice()) {
+                m_middleView->saveRecords();
+            }
         }
     }
 }

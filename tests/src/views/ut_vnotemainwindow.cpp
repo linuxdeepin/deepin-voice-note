@@ -54,6 +54,11 @@ static void stub_vnotemainwindow()
 {
 }
 
+static int stub_int()
+{
+    return 1;
+}
+
 ut_vnotemainwindow_test::ut_vnotemainwindow_test()
 {
 }
@@ -64,6 +69,7 @@ void ut_vnotemainwindow_test::SetUp()
     stub.set(ADDR(VNoteMainWindow, initData), stub_vnotemainwindow);
     stub.set(ADDR(VNoteMainWindow, delayInitTasks), stub_vnotemainwindow);
     m_mainWindow = new VNoteMainWindow;
+    m_mainWindow->switchWidget(VNoteMainWindow::WndNoteShow);
 }
 
 void ut_vnotemainwindow_test::TearDown()
@@ -204,4 +210,66 @@ TEST_F(ut_vnotemainwindow_test, onDropNote)
     m_mainWindow->onDropNote(dropCancel);
     bool dropCancels = false;
     m_mainWindow->onDropNote(dropCancels);
+}
+
+TEST_F(ut_vnotemainwindow_test, onShortcut)
+{
+    m_mainWindow->onEscShortcut();
+    m_mainWindow->onDeleteShortcut();
+
+    QScopedPointer<Stub> stub;
+    stub.reset(new Stub);
+    stub->set(ADDR(LeftView, hasFocus), stub_int);
+    //m_mainWindow->onDeleteShortcut();
+    m_mainWindow->onPoppuMenuShortcut();
+    stub.reset(new Stub);
+    stub->set(ADDR(MiddleView, hasFocus), stub_int);
+    //m_mainWindow->onDeleteShortcut();
+    m_mainWindow->onPoppuMenuShortcut();
+    stub.reset(new Stub);
+    stub->set(ADDR(RightView, hasFocus), stub_int);
+    stub->set(ADDR(QLineEdit, hasFocus), stub_int);
+    //m_mainWindow->onDeleteShortcut();
+    m_mainWindow->onPoppuMenuShortcut();
+
+    m_mainWindow->onAddNotepadShortcut();
+    m_mainWindow->onReNameNotepadShortcut();
+    m_mainWindow->onAddNoteShortcut();
+    m_mainWindow->onRenameNoteShortcut();
+    m_mainWindow->onVoice2TextShortcut();
+    m_mainWindow->onPlayPauseShortcut();
+    m_mainWindow->onSaveMp3Shortcut();
+    m_mainWindow->onSaveTextShortcut();
+    m_mainWindow->onSaveVoicesShortcut();
+}
+
+TEST_F(ut_vnotemainwindow_test, setviewNext)
+{
+    QKeyEvent e(QEvent::KeyPress, 0x58, Qt::ControlModifier, "test");
+    m_mainWindow->setTitleBarTabFocus(&e);
+    m_mainWindow->setMiddleviewNext(&e);
+    m_mainWindow->setTitleCloseButtonNext(&e);
+    m_mainWindow->setTitlebarNext(&e);
+    m_mainWindow->setAddnoteButtonNext(&e);
+    m_mainWindow->setAddnotepadButtonNext(&e);
+}
+
+TEST_F(ut_vnotemainwindow_test, onNewNote)
+{
+    m_mainWindow->onNewNote();
+    m_mainWindow->delNote();
+}
+
+TEST_F(ut_vnotemainwindow_test, onNewNotebook)
+{
+    m_mainWindow->onNewNotebook();
+    m_mainWindow->delNotepad();
+}
+
+TEST_F(ut_vnotemainwindow_test, onPlayPlugVoice)
+{
+    m_mainWindow->onPlayPlugVoicePlay(nullptr);
+    m_mainWindow->onPlayPlugVoicePause(nullptr);
+    m_mainWindow->onPlayPlugVoiceStop(nullptr);
+    m_mainWindow->onRightViewVoicePause(nullptr);
 }

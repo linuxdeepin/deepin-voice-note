@@ -224,8 +224,20 @@ public slots:
     void onDropNote(bool dropCancel);
     //响应多选详情页操作
     void handleMultipleOption(int id);
-    //delete 快捷键
+    //快捷键
     void onDeleteShortcut();
+    void onEscShortcut();
+    void onPoppuMenuShortcut();
+    void onAddNotepadShortcut();
+    void onReNameNotepadShortcut();
+    void onAddNoteShortcut();
+    void onRenameNoteShortcut();
+    void onPlayPauseShortcut();
+    void onRecordShorcut();
+    void onVoice2TextShortcut();
+    void onSaveMp3Shortcut();
+    void onSaveTextShortcut();
+    void onSaveVoicesShortcut();
 
 private:
     //左侧列表视图操作相关

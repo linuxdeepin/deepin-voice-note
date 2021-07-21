@@ -195,6 +195,10 @@ TEST_F(ut_rightview_test, onVoicePause)
 {
     Stub stub;
     stub.set(ADDR(RightView, checkFileExist), stub_checkFileExist);
+    typedef int (*fptr)();
+    fptr A_foo = (fptr)(&DDialog::exec);
+    stub.set(A_foo, stub_dialog);
+
     RightView rightview;
     rightview.initData(m_noteItem, "");
     QVBoxLayout *layout = static_cast<QVBoxLayout *>(rightview.layout());
@@ -291,6 +295,9 @@ TEST_F(ut_rightview_test, initAction)
 {
     Stub stub;
     stub.set(ADDR(RightView, checkFileExist), stub_checkFileExist);
+    typedef int (*fptr)();
+    fptr A_foo = (fptr)(&DDialog::exec);
+    stub.set(A_foo, stub_dialog);
 
     RightView rightview;
     rightview.initData(m_noteItem, "");
