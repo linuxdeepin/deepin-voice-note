@@ -215,7 +215,7 @@ TEST_F(ut_vnotemainwindow_test, onDropNote)
 TEST_F(ut_vnotemainwindow_test, onShortcut)
 {
     m_mainWindow->onEscShortcut();
-    m_mainWindow->onDeleteShortcut();
+    //m_mainWindow->onDeleteShortcut();
 
     QScopedPointer<Stub> stub;
     stub.reset(new Stub);
@@ -228,6 +228,8 @@ TEST_F(ut_vnotemainwindow_test, onShortcut)
     m_mainWindow->onPoppuMenuShortcut();
     stub.reset(new Stub);
     stub->set(ADDR(RightView, hasFocus), stub_int);
+    m_mainWindow->onPoppuMenuShortcut();
+    stub.reset(new Stub);
     stub->set(ADDR(QLineEdit, hasFocus), stub_int);
     //m_mainWindow->onDeleteShortcut();
     m_mainWindow->onPoppuMenuShortcut();
