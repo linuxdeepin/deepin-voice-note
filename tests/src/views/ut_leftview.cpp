@@ -125,7 +125,7 @@ TEST_F(ut_leftview_test, dropEvent)
     LeftView leftview;
     QPointF localPos;
     QMimeData *mimeData = new QMimeData;
-    mimeData->setData("notepad_drag", QByteArray());
+    mimeData->setData(NOTES_DRAG_KEY, QByteArray());
     QDropEvent *event = new QDropEvent(localPos, Qt::MoveAction, mimeData,
                                        Qt::LeftButton, Qt::NoModifier, QEvent::Drop);
     leftview.dropEvent(event);

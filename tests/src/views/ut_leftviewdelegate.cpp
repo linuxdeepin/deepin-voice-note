@@ -18,11 +18,42 @@
 
 #include "ut_leftviewdelegate.h"
 #include "leftviewdelegate.h"
+#include "leftview.h"
+
+#include "common/vnotedatamanager.h"
+#include "common/standarditemcommon.h"
+
+#include <QLineEdit>
+#include <QStyleOptionViewItem>
+#include <QPainter>
 
 ut_leftviewdelegate_test::ut_leftviewdelegate_test()
 {
 }
 
-TEST_F(ut_leftviewdelegate_test, setModelData)
+TEST_F(ut_leftviewdelegate_test, paintNoteItem)
 {
+    LeftView view;
+    for (auto it : VNoteDataManager::instance()->getNoteFolders()->folders) {
+        view.addFolder(it);
+    }
+    view.setDefaultNotepadItem();
+    LeftViewDelegate *delegate = view.m_pItemDelegate;
+    QLineEdit edit;
+    edit.setText(QString("111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"));
+    delegate->setModelData(&edit, view.model(), view.currentIndex());
+    QStyleOptionViewItem option;
+    option.state.setFlag(QStyle::State_MouseOver, true);
+    option.rect = QRect(0, 0, 40, 30);
+    delegate->setDragState(true);
+    QPainter paint;
+    delegate->paintNoteItem(&paint, option, view.currentIndex());
+    delegate->setEnableItem(true);
+    option.state.setFlag(QStyle::State_Enabled, true);
+    delegate->paintNoteItem(&paint, option, view.currentIndex());
+    delegate->setDragState(false);
+    delegate->paintNoteItem(&paint, option, view.currentIndex());
+    delegate->setDrawHover(true);
+    delegate->paintNoteItem(&paint, option, view.currentIndex());
+    delegate->paintTabFocusBackground(&paint, option, option.rect);
 }

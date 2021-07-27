@@ -18,6 +18,18 @@
 
 #include "ut_olddbvisistors.h"
 #include "olddbvisistors.h"
+#include "stub.h"
+
+static bool ret = true;
+
+bool stub_sql()
+{
+    if (ret == true) {
+        ret = false;
+        return true;
+    }
+    return ret;
+}
 
 ut_olddbvisistors_test::ut_olddbvisistors_test()
 {
@@ -25,12 +37,20 @@ ut_olddbvisistors_test::ut_olddbvisistors_test()
 
 TEST_F(ut_olddbvisistors_test, visitorData)
 {
+    Stub stub1;
+    stub1.set(ADDR(QSqlQuery, next), stub_sql);
     QSqlDatabase db;
-    OldFolderQryDbVisitor oldfolderqrydbvisitor(db, nullptr, nullptr);
+    VNOTE_FOLDERS_MAP folders;
+    folders.autoRelease = true;
+
+    OldFolderQryDbVisitor oldfolderqrydbvisitor(db, nullptr, &folders);
     oldfolderqrydbvisitor.prepareSqls();
     oldfolderqrydbvisitor.visitorData();
+    VNOTE_ALL_NOTES_MAP notes;
+    notes.autoRelease = true;
 
-    OldNoteQryDbVisitor oldnoteqrydbvisitor(db, nullptr, nullptr);
+    ret = true;
+    OldNoteQryDbVisitor oldnoteqrydbvisitor(db, nullptr, &notes);
     oldnoteqrydbvisitor.prepareSqls();
     oldnoteqrydbvisitor.visitorData();
 }
