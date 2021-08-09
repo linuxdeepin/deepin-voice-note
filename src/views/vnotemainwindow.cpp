@@ -209,6 +209,13 @@ void VNoteMainWindow::initConnections()
     connect(m_middleView, &MiddleView::requestChangeRightView, this, &VNoteMainWindow::changeRightView);
     //处理详情页多选操作
     connect(m_multipleSelectWidget, &VnoteMultipleChoiceOptionWidget::requestMultipleOption, this, &VNoteMainWindow::handleMultipleOption);
+
+    connect(m_viewChange, &DIconButton::clicked, this, &VNoteMainWindow::onViewChangeClicked);
+
+    connect(m_imgInsert, &VNoteIconButton::clicked, this, &VNoteMainWindow::onImgInsertClicked);
+
+    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::paletteTypeChanged,
+            this, &VNoteMainWindow::onThemeChanged);
 }
 
 /**
@@ -372,13 +379,38 @@ void VNoteMainWindow::initTitleBar()
 #endif
     initMenuExtension();
     titlebar()->setMenu(m_menuExtension);
+
+    initTitleIconButton(); //初始化标题栏图标控件
+    //自定义标题栏中部控件的基控件
+    QWidget *titleWidget = new QWidget();
+    titlebar()->setCustomWidget(titleWidget);
+    QHBoxLayout *titleLayout = new QHBoxLayout(titleWidget); //标题栏中部控件以横向列表展示
+    titleLayout->setSpacing(10);
+    titleLayout->addWidget(m_viewChange); //添加记事本列表收起控件按钮
+
+    //添加分割线
+    QFrame *line = new QFrame();
+    line->setFrameShape(QFrame::VLine);
+    line->setFrameShadow(QFrame::Plain);
+    line->setMaximumHeight(28);
+    titleLayout->addWidget(line);
+
+    titleLayout->addWidget(m_imgInsert); //添加图片插入控件
+    //占位控件（让左右控件占位长度保持一致，搜索框保持在整个界面正中部）
+    QLabel *placeholder = new QLabel();
+    placeholder->setMaximumWidth(35);
+    placeholder->setMinimumWidth(35);
+    titleLayout->addWidget(placeholder);
+    titleLayout->addStretch(1);
+
     // Search note
     m_noteSearchEdit = new DSearchEdit(this);
     DFontSizeManager::instance()->bind(m_noteSearchEdit, DFontSizeManager::T6);
     m_noteSearchEdit->setFixedSize(QSize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H));
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
     m_noteSearchEdit->lineEdit()->installEventFilter(this);
-    titlebar()->addWidget(m_noteSearchEdit);
+    titleLayout->addWidget(m_noteSearchEdit); //将搜索框添加到标题栏中部控件中
+    titleLayout->addStretch(1);
     DWindowCloseButton *closeBtn = titlebar()->findChild<DWindowCloseButton *>("DTitlebarDWindowCloseButton");
     closeBtn->installEventFilter(this);
 }
@@ -1982,6 +2014,8 @@ void VNoteMainWindow::switchWidget(WindowType type)
         titlebar()->setFocus(Qt::TabFocusReason);
     }
     m_noteSearchEdit->setEnabled(searchEnable);
+    m_viewChange->setEnabled(searchEnable); //设置记事本收起按钮禁用状态
+    m_imgInsert->setBtnDisabled(!searchEnable); //设置图片插入按钮禁用状态
     m_stackedWidget->setCurrentIndex(type);
 }
 
@@ -2053,6 +2087,25 @@ void VNoteMainWindow::initMenuExtension()
     m_menuExtension->addSeparator();
     connect(privacy, &QAction::triggered, this, &VNoteMainWindow::onShowPrivacy);
     connect(setting, &QAction::triggered, this, &VNoteMainWindow::onShowSettingDialog);
+}
+
+/**
+ * @brief VNoteMainWindow::initMenuExtension
+ * 初始化标题栏图标按钮
+ */
+void VNoteMainWindow::initTitleIconButton()
+{
+    m_viewChange = new DIconButton(this);
+    m_viewChange->setIcon(Utils::loadSVG("view_change_show.svg", false));
+    m_viewChange->setBackgroundRole(DPalette::Highlight);
+    m_viewChange->setIconSize(QSize(36, 36));
+    m_viewChange->setFixedSize(QSize(36, 36));
+    m_imgInsert = new VNoteIconButton(this, "img_insert_normal.svg");
+    m_imgInsert->setIconSize(QSize(36, 36));
+    m_imgInsert->setFixedSize(QSize(36, 36));
+    m_imgInsert->SetDisableIcon("img_insert_disable.svg");
+    m_imgInsert->setSeparateThemIcons(true); //区分主题
+    m_imgInsert->setBtnDisabled(false);
 }
 
 /**
@@ -2445,4 +2498,44 @@ void VNoteMainWindow::onSaveVoicesShortcut()
             }
         }
     }
+}
+
+/**
+ * @brief VNoteMainWindow::onThemeChanged
+ * 主题切换响应槽
+ */
+void VNoteMainWindow::onThemeChanged()
+{
+    if (m_leftViewHolder->isVisible()) {
+        m_viewChange->setIcon(Utils::loadSVG("view_change_show.svg", false));
+        m_viewChange->setBackgroundRole(DPalette::Highlight);
+    } else {
+        m_viewChange->setIcon(Utils::loadSVG("view_change_hide.svg", false));
+        m_viewChange->setBackgroundRole(DPalette::Window);
+    }
+}
+
+/**
+ * @brief VNoteMainWindow::onViewChangeClicked
+ * 记事本列表显示或隐藏事件响应
+ */
+void VNoteMainWindow::onViewChangeClicked()
+{
+    if (m_leftViewHolder->isVisible()) {
+        m_viewChange->setIcon(Utils::loadSVG("view_change_hide.svg", false));
+        m_viewChange->setBackgroundRole(DPalette::Window);
+        m_leftViewHolder->hide();
+    } else {
+        m_viewChange->setIcon(Utils::loadSVG("view_change_show.svg", false));
+        m_viewChange->setBackgroundRole(DPalette::Highlight);
+        m_leftViewHolder->show();
+    }
+}
+
+/**
+ * @brief VNoteMainWindow::onImgInsertClicked
+ * 图片插入点击事件响应
+ */
+void VNoteMainWindow::onImgInsertClicked()
+{
 }

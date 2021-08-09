@@ -24,6 +24,7 @@
 
 #include "common/datatypedef.h"
 #include "globaldef.h"
+#include "widgets/vnoteiconbutton.h"
 
 #include <DMainWindow>
 #include <DSearchEdit>
@@ -239,6 +240,13 @@ public slots:
     void onSaveTextShortcut();
     void onSaveVoicesShortcut();
 
+    //主题切换
+    void onThemeChanged();
+    //记事本列表显示或隐藏事件响应
+    void onViewChangeClicked();
+    //图片插入点击事件响应
+    void onImgInsertClicked();
+
 private:
     //左侧列表视图操作相关
     //添加记事本
@@ -268,6 +276,8 @@ private:
     void release();
     //标题栏菜单项功能扩展
     void initMenuExtension();
+    //标题栏图标控件初始化
+    void initTitleIconButton();
     //刷新详情页显示
     void changeRightView(bool isMultiple);
     //设置tab焦点
@@ -318,6 +328,9 @@ private:
 
     VNoteRecordBar *m_recordBar {nullptr};
     VNoteA2TManager *m_a2tManager {nullptr};
+
+    DIconButton *m_viewChange {nullptr}; //记事本列表收起控件
+    VNoteIconButton *m_imgInsert {nullptr}; //图片插入控件
 
     UpgradeView *m_upgradeView {nullptr};
     SplashView *m_splashView {nullptr};
