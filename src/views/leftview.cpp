@@ -221,6 +221,12 @@ void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
     if (!m_onlyCurItemMenuEnable) {
         DTreeView::mouseDoubleClickEvent(event);
     }
+
+    //左键双击事件
+    if (event->button() == Qt::LeftButton) {
+        if (indexAt(event->pos()) == currentIndex())
+            editFolder(); //在记事本列表双击左键进入重命名状态
+    }
 }
 
 /**

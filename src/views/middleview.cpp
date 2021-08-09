@@ -576,6 +576,12 @@ void MiddleView::mouseDoubleClickEvent(QMouseEvent *event)
     if (!m_onlyCurItemMenuEnable) {
         DListView::mouseDoubleClickEvent(event);
     }
+
+    //左键双击事件
+    if (event->button() == Qt::LeftButton) {
+        if (indexAt(event->pos()) == currentIndex())
+            editNote(); //在笔记列表双击左键进入重命名状态
+    }
 }
 
 /**
