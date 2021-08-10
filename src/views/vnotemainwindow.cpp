@@ -383,7 +383,6 @@ void VNoteMainWindow::initTitleBar()
     initTitleIconButton(); //初始化标题栏图标控件
     //自定义标题栏中部控件的基控件
     QWidget *titleWidget = new QWidget();
-    titlebar()->setCustomWidget(titleWidget);
     QHBoxLayout *titleLayout = new QHBoxLayout(titleWidget); //标题栏中部控件以横向列表展示
     titleLayout->setSpacing(10);
     titleLayout->addWidget(m_viewChange); //添加记事本列表收起控件按钮
@@ -395,13 +394,7 @@ void VNoteMainWindow::initTitleBar()
     line->setMaximumHeight(28);
     titleLayout->addWidget(line);
 
-    titleLayout->addWidget(m_imgInsert); //添加图片插入控件
-    //占位控件（让左右控件占位长度保持一致，搜索框保持在整个界面正中部）
-    QLabel *placeholder = new QLabel();
-    placeholder->setMaximumWidth(35);
-    placeholder->setMinimumWidth(35);
-    titleLayout->addWidget(placeholder);
-    titleLayout->addStretch(1);
+    titleLayout->addWidget(m_imgInsert); //添加图片插入控
 
     // Search note
     m_noteSearchEdit = new DSearchEdit(this);
@@ -409,8 +402,13 @@ void VNoteMainWindow::initTitleBar()
     m_noteSearchEdit->setFixedSize(QSize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H));
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
     m_noteSearchEdit->lineEdit()->installEventFilter(this);
-    titleLayout->addWidget(m_noteSearchEdit); //将搜索框添加到标题栏中部控件中
-    titleLayout->addStretch(1);
+
+    titlebar()->addWidget(titleWidget, Qt::AlignLeft); //图标控件居左显示
+    titlebar()->addWidget(m_noteSearchEdit, Qt::AlignCenter); //将搜索框添加到标题栏居中显示
+
+    QWidget::setTabOrder(titlebar(), m_viewChange); //设置title焦点传递的下一个控件
+    QWidget::setTabOrder(m_viewChange, m_imgInsert); //设置焦点传递顺序
+
     DWindowCloseButton *closeBtn = titlebar()->findChild<DWindowCloseButton *>("DTitlebarDWindowCloseButton");
     closeBtn->installEventFilter(this);
 }
@@ -2274,8 +2272,19 @@ bool VNoteMainWindow::setAddnoteButtonNext(QKeyEvent *event)
  */
 bool VNoteMainWindow::setTitleCloseButtonNext(QKeyEvent *event)
 {
+    //搜索状态
     if (stateOperation->isSearching()) {
+        //搜索内容为空状态
         if (m_middleView->searchEmpty()) {
+            //焦点切换由第一个控件m_viewChange开始
+            if (m_viewChange->isEnabled()) {
+                m_viewChange->setFocus(Qt::TabFocusReason);
+                return true;
+            }
+            if (m_imgInsert->isEnabled()) {
+                m_imgInsert->setFocus(Qt::TabFocusReason);
+                return true;
+            }
             m_noteSearchEdit->lineEdit()->setFocus(Qt::TabFocusReason);
             return true;
         }
