@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
     if (!QString(qgetenv("XDG_CURRENT_DESKTOP")).toLower().startsWith("deepin")) {
         setenv("XDG_CURRENT_DESKTOP", "Deepin", 1);
     }
+    qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "7777");
     PerformanceMonitor::initializeAppStart();
     VNoteApplication app(argc, argv);
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);

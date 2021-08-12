@@ -35,7 +35,6 @@
 #include <DFloatingButton>
 #include <DAnchors>
 #include <DFloatingMessage>
-#include <DScrollArea>
 #include <DMenu>
 
 #include <QShortcut>
@@ -51,7 +50,7 @@ class VNoteIconButton;
 class VNoteA2TManager;
 class LeftView;
 class MiddleView;
-class RightView;
+class RichTextEdit;
 class HomePage;
 class SplashView;
 class VoiceNoteItem;
@@ -175,8 +174,6 @@ public slots:
     void onVNoteSearch();
     //搜索关键字改变
     void onVNoteSearchTextChange(const QString &text);
-    //调整详情页滚动条
-    void onCursorChange(int height, bool mouseMove);
     //开始录音
     void onStartRecord(const QString &path);
     //结束录音
@@ -296,18 +293,10 @@ private:
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
 
-#ifdef TITLE_ACITON_PANEL
-    //titlebar actions
-    QWidget *m_actionPanel {nullptr};
-    DIconButton *m_addNewNoteBtn {nullptr};
-#endif
-
 #ifdef IMPORT_OLD_VERSION_DATA
     //*******Upgrade old Db code here only********
     bool m_fNeedUpgradeOldDb = false;
 #endif
-
-    DScrollArea *m_rightViewScrollArea {nullptr};
     //多选操作页面
     VnoteMultipleChoiceOptionWidget *m_multipleSelectWidget {nullptr};
     QStackedWidget *m_stackedRightMainWidget {nullptr};
@@ -321,7 +310,7 @@ private:
     DSplitter *m_mainWndSpliter {nullptr};
     LeftView *m_leftView {nullptr};
     MiddleView *m_middleView {nullptr};
-    RightView *m_rightView {nullptr};
+    RichTextEdit *m_richTextEdit {nullptr};
 
     DPushButton *m_addNotepadBtn {nullptr};
     DFloatingButton *m_addNoteBtn {nullptr};

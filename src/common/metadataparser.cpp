@@ -20,6 +20,7 @@
 */
 #include "metadataparser.h"
 #include "vnoteitem.h"
+#include "common/utils.h"
 
 #include <DLog>
 
@@ -49,13 +50,37 @@ void MetaDataParser::parse(const QVariant &metaData, VNoteItem *noteData)
  * @param noteData 数据源
  * @param metaData 生成的数据
  */
-void MetaDataParser::makeMetaData(const VNoteItem *noteData, QVariant &metaData)
+void MetaDataParser::makeMetaData(VNoteItem *noteData, QVariant &metaData)
 {
 #ifdef VN_XML_METADATA_PARSER
     xmlMakeMetadata(noteData, metaData);
 #elif defined(VN_JSON_METADATA_PARSER)
     jsonMakeMetadata(noteData, metaData);
 #endif
+}
+
+void MetaDataParser::makeMetaData(const VNoteBlock *blockData, QVariant &metaData)
+{
+    QJsonDocument noteDoc;
+    QJsonObject note;
+    qint32 noteType = blockData->blockType;
+    if (VNoteBlock::InValid != noteType) {
+        note.insert(m_jsonNodeNameMap[NDataType], blockData->blockType);
+        if (VNoteBlock::Text == noteType) {
+            note.insert(m_jsonNodeNameMap[NText], blockData->ptrText->blockText);
+        } else if (VNoteBlock::Voice == noteType) {
+            note.insert(m_jsonNodeNameMap[NText], blockData->ptrVoice->blockText);
+            note.insert(m_jsonNodeNameMap[NTitle], blockData->ptrVoice->voiceTitle);
+            note.insert(m_jsonNodeNameMap[NState], blockData->ptrVoice->state);
+            note.insert(m_jsonNodeNameMap[NVoicePath], blockData->ptrVoice->voicePath);
+            note.insert(m_jsonNodeNameMap[NVoiceSize], blockData->ptrVoice->voiceSize);
+            note.insert(m_jsonNodeNameMap[NCreateTime],
+                        blockData->ptrVoice->createTime.toString(VNOTE_TIME_FMT));
+            note.insert(m_jsonNodeNameMap[NFormatSize], Utils::formatMillisecond(blockData->ptrVoice->voiceSize));
+        }
+    }
+    noteDoc.setObject(note);
+    metaData = noteDoc.toJson(QJsonDocument::Compact);
 }
 
 //*****************Implementation of xml meta-data parser***********************
@@ -208,12 +233,11 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*o
 
     QJsonObject note = noteDoc.object();
     QJsonArray noteDatas;
-    //    int         noteCount = -1;
 
-    //    //noteCount doesn't used now
-    //    if (note.contains(m_jsonNodeNameMap[NDataCount])) {
-    //        noteCount = note.value(m_jsonNodeNameMap[NDataCount]).toInt(0);
-    //    }
+    if (note.contains(m_jsonNodeNameMap[NHtmlCode])) {
+        noteData->htmlCode = note.value(m_jsonNodeNameMap[NHtmlCode]).toString();
+        return;
+    }
 
     //Get default voice max id
     if (note.contains(m_jsonNodeNameMap[NVoiceMaxId])) {
@@ -258,7 +282,7 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*o
  * @param noteData 数据源
  * @param metaData 生成的数据
  */
-void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaData)
+void MetaDataParser::jsonMakeMetadata(VNoteItem *noteData, QVariant &metaData)
 {
     Q_ASSERT(nullptr != noteData);
 
@@ -267,13 +291,18 @@ void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaD
     QJsonObject note;
     QJsonArray noteDatas;
     int noteCount = noteData->datas.datas.length();
+    bool htmlIsEmpty = noteData->htmlCode.isEmpty();
+    QList<VNoteBlock *> delBlocks;
 
     for (auto it : noteData->datas.datas) {
         int noteType = it->getType();
 
         if (VNoteBlock::InValid != noteType) {
+            if (!htmlIsEmpty) {
+                delBlocks.push_back(it);
+                continue;
+            }
             QJsonObject noteItem;
-
             noteItem.insert(m_jsonNodeNameMap[NDataType], it->getType());
 
             if (VNoteBlock::Text == noteType) {
@@ -292,10 +321,16 @@ void MetaDataParser::jsonMakeMetadata(const VNoteItem *noteData, QVariant &metaD
         }
     }
 
-    note.insert(m_jsonNodeNameMap[NDataCount], noteCount);
-    note.insert(m_jsonNodeNameMap[NVoiceMaxId], noteData->voiceMaxId());
-    note.insert(m_jsonNodeNameMap[NDatas], noteDatas);
-
+    if (!htmlIsEmpty) {
+        note.insert(m_jsonNodeNameMap[NHtmlCode], noteData->htmlCode);
+        for (auto it : delBlocks) {
+            noteData->delBlock(it);
+        }
+    } else {
+        note.insert(m_jsonNodeNameMap[NDataCount], noteCount);
+        note.insert(m_jsonNodeNameMap[NVoiceMaxId], noteData->voiceMaxId());
+        note.insert(m_jsonNodeNameMap[NDatas], noteDatas);
+    }
     noteDoc.setObject(note);
 
     //qDebug() << noteDoc.toJson();

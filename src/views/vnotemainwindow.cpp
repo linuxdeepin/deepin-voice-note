@@ -27,6 +27,7 @@
 #include "views/splashview.h"
 #include "views/voicenoteitem.h"
 #include "views/middleviewsortfilter.h"
+#include "views/richtextedit.h"
 
 #include "common/standarditemcommon.h"
 #include "common/vnotedatamanager.h"
@@ -153,19 +154,6 @@ void VNoteMainWindow::initConnections()
     connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
             this, SLOT(onVNoteChange(const QModelIndex &)));
 
-    connect(m_middleView, &MiddleView::requestRefresh,
-            m_rightView, &RightView::refreshVoiceCreateTime);
-
-    connect(m_rightView, &RightView::contentChanged,
-            m_middleView, &MiddleView::onNoteChanged);
-
-    connect(m_rightView, &RightView::sigVoicePlay,
-            this, &VNoteMainWindow::onRightViewVoicePlay);
-    connect(m_rightView, &RightView::sigVoicePause,
-            this, &VNoteMainWindow::onRightViewVoicePause);
-    connect(m_rightView, &RightView::sigCursorChange,
-            this, &VNoteMainWindow::onCursorChange);
-
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::onNewNotebook);
 
@@ -226,11 +214,9 @@ void VNoteMainWindow::changeRightView(bool isMultiple)
 {
     m_multipleSelectWidget->setNoteNumber(m_middleView->getSelectedCount());
     if (isMultiple) {
-        if (m_rightView->getIsNormalView()) {
+        if (m_stackedRightMainWidget->currentWidget() == m_rightViewHolder) {
             m_stackedRightMainWidget->setCurrentWidget(m_multipleSelectWidget);
-            m_rightView->setIsNormalView(false);
         }
-        //设置按钮是否置灰
         bool moveButtonEnable = true;
         if (stateOperation->isVoice2Text()
             || stateOperation->isSearching()
@@ -239,10 +225,7 @@ void VNoteMainWindow::changeRightView(bool isMultiple)
         }
         m_multipleSelectWidget->enableButtons(m_middleView->haveText(), m_middleView->haveVoice(), moveButtonEnable);
     } else {
-        if (!m_rightView->getIsNormalView()) {
-            m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
-            m_rightView->setIsNormalView(true);
-        }
+        m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
     }
 }
 
@@ -361,22 +344,6 @@ void VNoteMainWindow::initTitleBar()
     // Add logo
     titlebar()->setIcon(QIcon::fromTheme(DEEPIN_VOICE_NOTE));
 
-#ifdef TITLE_ACITON_PANEL
-    //Add action buttons
-    m_actionPanel = new QWidget(this);
-
-    QHBoxLayout *actionPanelLayout = new QHBoxLayout(m_actionPanel);
-    actionPanelLayout->setSpacing(0);
-    actionPanelLayout->setContentsMargins(0, 0, 0, 0);
-
-    m_addNewNoteBtn = new DIconButton(m_actionPanel);
-    m_addNewNoteBtn->setFixedSize(QSize(36, 36));
-
-    actionPanelLayout->addSpacing(VNOTE_LEFTVIEW_W - 45);
-    actionPanelLayout->addWidget(m_addNewNoteBtn, Qt::AlignLeft);
-
-    titlebar()->addWidget(m_actionPanel, Qt::AlignLeft);
-#endif
     initMenuExtension();
     titlebar()->setMenu(m_menuExtension);
 
@@ -500,10 +467,6 @@ void VNoteMainWindow::initLeftView()
     btnLayout->setContentsMargins(10, 0, 10, 10);
     leftHolderLayout->addLayout(btnLayout, Qt::AlignHCenter);
     m_leftViewHolder->setLayout(leftHolderLayout);
-
-#ifdef VNOTE_LAYOUT_DEBUG
-    m_leftView->setStyleSheet("background: green");
-#endif
 }
 
 /**
@@ -540,10 +503,6 @@ void VNoteMainWindow::initMiddleView()
     middleHolderLayout->addWidget(m_middleView);
 
     m_middleViewHolder->setLayout(middleHolderLayout);
-
-#ifdef VNOTE_LAYOUT_DEBUG
-    m_middleView->setStyleSheet("background: green");
-#endif
 }
 
 /**
@@ -569,18 +528,13 @@ void VNoteMainWindow::initRightView()
     m_rightViewHolder->setBackgroundRole(DPalette::Base);
     m_rightViewHolder->setAutoFillBackground(true);
 
-    QVBoxLayout *rightHolderLayout = new QVBoxLayout;
+    QVBoxLayout *rightHolderLayout = new QVBoxLayout(m_rightViewHolder);
     rightHolderLayout->setSpacing(0);
     rightHolderLayout->setContentsMargins(0, 15, 0, 3);
 
-    m_rightViewScrollArea = new DScrollArea(m_rightViewHolder);
-    m_rightView = new RightView(m_rightViewScrollArea);
-    m_rightView->installEventFilter(this);
-    m_rightViewScrollArea->setLineWidth(0);
-    m_rightViewScrollArea->setWidgetResizable(true);
-    m_rightViewScrollArea->setWidget(m_rightView);
-    rightHolderLayout->addWidget(m_rightViewScrollArea);
-
+    m_richTextEdit = new RichTextEdit(m_rightViewHolder);
+    rightHolderLayout->addWidget(m_richTextEdit);
+    m_richTextEdit->installEventFilter(this);
     //TODO:
     //    Add record area code here
     m_recordBarHolder = new QWidget(m_rightViewHolder);
@@ -603,13 +557,6 @@ void VNoteMainWindow::initRightView()
     m_recordBar->setVisible(false);
     //初始化详情页面为当前笔记
     m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
-
-#ifdef VNOTE_LAYOUT_DEBUG
-    m_rightViewHolder->setStyleSheet("background: red");
-    m_rightViewScrollArea->setStyleSheet("background: blue");
-    m_recordBarHolder->setStyleSheet("background: yellow");
-    m_recordBar->setStyleSheet("background: yellow");
-#endif
 }
 
 /**
@@ -758,7 +705,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
     if (!loadNotes(data)) {
         m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
-        m_rightView->initData(nullptr, m_searchKey, false);
+        m_richTextEdit->initData(nullptr, m_searchKey, false);
         m_recordBar->setVisible(false);
     }
 }
@@ -864,7 +811,7 @@ void VNoteMainWindow::onStartRecord(const QString &path)
 void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 {
     if (voiceSize >= 1000) {
-        m_rightView->insertVoiceItem(voicePath, voiceSize);
+        m_richTextEdit->insertVoiceItem(voicePath, voiceSize);
 
         //Recording normal,remove the data safer.
         VNoteItem *currentNote = m_middleView->getCurrVNotedata();
@@ -911,45 +858,45 @@ void VNoteMainWindow ::onA2TStartAgain()
  */
 void VNoteMainWindow::onA2TStart(bool first)
 {
-    if (m_asrErrMeassage) {
-        m_asrErrMeassage->setVisible(false);
-    }
+    //    if (m_asrErrMeassage) {
+    //        m_asrErrMeassage->setVisible(false);
+    //    }
 
-    VoiceNoteItem *asrVoiceItem = nullptr;
+    //    VoiceNoteItem *asrVoiceItem = nullptr;
 
-    if (first) {
-        DetailItemWidget *widget = m_rightView->getOnlyOneSelectVoice();
-        asrVoiceItem = static_cast<VoiceNoteItem *>(widget);
-        m_rightView->setCurVoiceAsr(asrVoiceItem);
-    } else {
-        asrVoiceItem = m_rightView->getCurVoiceAsr();
-        if (asrVoiceItem) {
-            if (m_rightView->getOnlyOneSelectVoice() != asrVoiceItem) {
-                m_rightView->setCurVoiceAsr(nullptr);
-                return;
-            }
-        }
-    }
+    //    if (first) {
+    //        DetailItemWidget *widget = m_rightView->getOnlyOneSelectVoice();
+    //        asrVoiceItem = static_cast<VoiceNoteItem *>(widget);
+    //        m_rightView->setCurVoiceAsr(asrVoiceItem);
+    //    } else {
+    //        asrVoiceItem = m_rightView->getCurVoiceAsr();
+    //        if (asrVoiceItem) {
+    //            if (m_rightView->getOnlyOneSelectVoice() != asrVoiceItem) {
+    //                m_rightView->setCurVoiceAsr(nullptr);
+    //                return;
+    //            }
+    //        }
+    //    }
 
-    if (asrVoiceItem && asrVoiceItem->getNoteBlock()->blockText.isEmpty()) {
-        VNVoiceBlock *data = asrVoiceItem->getNoteBlock()->ptrVoice;
+    //    if (asrVoiceItem && asrVoiceItem->getNoteBlock()->blockText.isEmpty()) {
+    //        VNVoiceBlock *data = asrVoiceItem->getNoteBlock()->ptrVoice;
 
-        if (nullptr != data) {
-            //Check whether the audio lenght out of 20 minutes
-            if (data->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
-                VNoteMessageDialog audioOutLimit(
-                    VNoteMessageDialog::AsrTimeLimit, this);
+    //        if (nullptr != data) {
+    //            //Check whether the audio lenght out of 20 minutes
+    //            if (data->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
+    //                VNoteMessageDialog audioOutLimit(
+    //                    VNoteMessageDialog::AsrTimeLimit, this);
 
-                audioOutLimit.exec();
-            } else {
-                setSpecialStatus(VoiceToTextStart);
-                asrVoiceItem->showAsrStartWindow();
-                QTimer::singleShot(0, this, [this, data]() {
-                    m_a2tManager->startAsr(data->voicePath, data->voiceSize);
-                });
-            }
-        }
-    }
+    //                audioOutLimit.exec();
+    //            } else {
+    //                setSpecialStatus(VoiceToTextStart);
+    //                asrVoiceItem->showAsrStartWindow();
+    //                QTimer::singleShot(0, this, [this, data]() {
+    //                    m_a2tManager->startAsr(data->voicePath, data->voiceSize);
+    //                });
+    //            }
+    //        }
+    //    }
 }
 
 /**
@@ -958,23 +905,23 @@ void VNoteMainWindow::onA2TStart(bool first)
  */
 void VNoteMainWindow::onA2TError(int error)
 {
-    VoiceNoteItem *asrVoiceItem = m_rightView->getCurVoiceAsr();
-    if (asrVoiceItem) {
-        asrVoiceItem->showAsrEndWindow("");
-    }
-    QString message = "";
-    if (error == VNoteA2TManager::NetworkError) {
-        message = DApplication::translate(
-            "VNoteErrorMessage",
-            "The voice conversion failed due to the poor network connection. "
-            "Do you want to try again?");
-    } else {
-        message = DApplication::translate(
-            "VNoteErrorMessage",
-            "The voice conversion failed. Do you want to try again?");
-    }
-    showAsrErrMessage(message);
-    setSpecialStatus(VoiceToTextEnd);
+    //    VoiceNoteItem *asrVoiceItem = m_rightView->getCurVoiceAsr();
+    //    if (asrVoiceItem) {
+    //        asrVoiceItem->showAsrEndWindow("");
+    //    }
+    //    QString message = "";
+    //    if (error == VNoteA2TManager::NetworkError) {
+    //        message = DApplication::translate(
+    //            "VNoteErrorMessage",
+    //            "The voice conversion failed due to the poor network connection. "
+    //            "Do you want to try again?");
+    //    } else {
+    //        message = DApplication::translate(
+    //            "VNoteErrorMessage",
+    //            "The voice conversion failed. Do you want to try again?");
+    //    }
+    //    showAsrErrMessage(message);
+    //    setSpecialStatus(VoiceToTextEnd);
 }
 
 /**
@@ -983,15 +930,15 @@ void VNoteMainWindow::onA2TError(int error)
  */
 void VNoteMainWindow::onA2TSuccess(const QString &text)
 {
-    VoiceNoteItem *asrVoiceItem = m_rightView->getCurVoiceAsr();
-    if (asrVoiceItem) {
-        m_rightView->clearAllSelection();
-        asrVoiceItem->getNoteBlock()->blockText = text;
-        asrVoiceItem->showAsrEndWindow(text);
-        m_rightView->updateData();
-    }
-    setSpecialStatus(VoiceToTextEnd);
-    m_rightView->setCurVoiceAsr(nullptr);
+    //    VoiceNoteItem *asrVoiceItem = m_rightView->getCurVoiceAsr();
+    //    if (asrVoiceItem) {
+    //        m_rightView->clearAllSelection();
+    //        asrVoiceItem->getNoteBlock()->blockText = text;
+    //        asrVoiceItem->showAsrEndWindow(text);
+    //        m_rightView->updateData();
+    //    }
+    //    setSpecialStatus(VoiceToTextEnd);
+    //    m_rightView->setCurVoiceAsr(nullptr);
 }
 
 /**
@@ -1235,9 +1182,7 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
         m_recordBar->setVisible(true);
     }
 
-    QScrollBar *bar = m_rightViewScrollArea->verticalScrollBar();
-    bar->setValue(bar->minimum());
-    m_rightView->initData(data, m_searchKey, m_rightViewHasFouse);
+    m_richTextEdit->initData(data, m_searchKey, m_rightViewHasFouse);
     m_rightViewHasFouse = false;
 }
 
@@ -1273,42 +1218,42 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::NoteRename:
         editNote();
         break;
-    case ActionManager::DetailDelete: {
-        int ret = m_rightView->showWarningDialog();
-        if (ret == 1) {
-            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this);
-            if (VNoteBaseDialog::Accepted == confirmDialog.exec()) {
-                m_rightView->delSelectText();
-            }
-        } else if (ret == 0) {
-            m_rightView->delSelectText();
-        }
+        //    case ActionManager::DetailDelete: {
+        //        int ret = m_rightView->showWarningDialog();
+        //        if (ret == 1) {
+        //            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this);
+        //            if (VNoteBaseDialog::Accepted == confirmDialog.exec()) {
+        //                m_rightView->delSelectText();
+        //            }
+        //        } else if (ret == 0) {
+        //            m_rightView->delSelectText();
+        //        }
 
-    } break;
-    case ActionManager::NoteSaveText: {
-        m_middleView->saveAsText();
-    } break;
-    case ActionManager::NoteSaveVoice: {
-        m_middleView->saveRecords();
-    } break;
-    case ActionManager::DetailVoice2Text:
-        onA2TStart();
-        break;
-    case ActionManager::DetailSelectAll:
-        m_rightView->selectAllItem();
-        break;
-    case ActionManager::DetailCopy:
-        m_rightView->copySelectText();
-        break;
-    case ActionManager::DetailPaste:
-        m_rightView->pasteText();
-        break;
-    case ActionManager::DetailCut:
-        m_rightView->cutSelectText();
-        break;
-    case ActionManager::DetailVoiceSave:
-        m_rightView->saveMp3();
-        break;
+        //    } break;
+        //    case ActionManager::NoteSaveText: {
+        //        m_middleView->saveAsText();
+        //    } break;
+        //    case ActionManager::NoteSaveVoice: {
+        //        m_middleView->saveRecords();
+        //    } break;
+        //    case ActionManager::DetailVoice2Text:
+        //        onA2TStart();
+        //        break;
+        //    case ActionManager::DetailSelectAll:
+        //        m_rightView->selectAllItem();
+        //        break;
+        //    case ActionManager::DetailCopy:
+        //        m_rightView->copySelectText();
+        //        break;
+        //    case ActionManager::DetailPaste:
+        //        m_rightView->pasteText();
+        //        break;
+        //    case ActionManager::DetailCut:
+        //        m_rightView->cutSelectText();
+        //        break;
+        //    case ActionManager::DetailVoiceSave:
+        //        m_rightView->saveMp3();
+        //        break;
     case ActionManager::DetailText2Speech:
         VTextSpeechAndTrManager::onTextToSpeech();
         break;
@@ -1504,8 +1449,6 @@ void VNoteMainWindow::delNotepad()
         setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
     }
 
-    m_rightView->removeCacheWidget(data);
-
     VNoteFolderOper folderOper(data);
     folderOper.deleteVNoteFolder(data);
 
@@ -1551,7 +1494,7 @@ void VNoteMainWindow::addNote()
 
         //Refresh the notes count of folder
         m_leftView->update(m_leftView->currentIndex());
-        m_rightView->saveNote();
+        m_richTextEdit->updateNote();
         m_middleView->addRowAtHead(newNote);
     }
 }
@@ -1578,7 +1521,6 @@ void VNoteMainWindow::delNote()
 
     if (noteDataList.size()) {
         for (auto noteData : noteDataList) {
-            m_rightView->removeCacheWidget(noteData);
             VNoteItemOper noteOper(noteData);
             noteOper.deleteNote();
         }
@@ -1647,7 +1589,7 @@ int VNoteMainWindow::loadSearchNotes(const QString &key)
         if (m_middleView->rowCount() == 0) {
             m_middleView->setVisibleEmptySearch(true);
             m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
-            m_rightView->initData(nullptr, m_searchKey);
+            m_richTextEdit->initData(nullptr, m_searchKey);
             m_recordBar->setVisible(false);
         } else {
             m_middleView->sortView(false);
@@ -1685,10 +1627,10 @@ void VNoteMainWindow::onRightViewVoicePause(VNVoiceBlock *voiceData)
  */
 void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
 {
-    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
-    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
-        voiceItem->showPauseBtn();
-    }
+    //    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
+    //    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
+    //        voiceItem->showPauseBtn();
+    //    }
 }
 
 /**
@@ -1697,10 +1639,10 @@ void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
  */
 void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
 {
-    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
-    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
-        voiceItem->showPlayBtn();
-    }
+    //    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
+    //    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
+    //        voiceItem->showPlayBtn();
+    //    }
 }
 
 /**
@@ -1709,13 +1651,13 @@ void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
  */
 void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
 {
-    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
-    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
-        voiceItem->showPlayBtn();
-    }
-    setSpecialStatus(PlayVoiceEnd);
-    m_rightView->setCurVoicePlay(nullptr);
-    m_rightView->setFocus();
+    //    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
+    //    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
+    //        voiceItem->showPlayBtn();
+    //    }
+    //    setSpecialStatus(PlayVoiceEnd);
+    //    m_rightView->setCurVoicePlay(nullptr);
+    //    m_rightView->setFocus();
 }
 
 /**
@@ -1821,7 +1763,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_middleView->closeMenu();
         m_addNotepadBtn->setEnabled(false);
         m_middleView->setOnlyCurItemMenuEnable(true);
-        m_rightView->setEnablePlayBtn(false);
+        //m_rightView->setEnablePlayBtn(false);
         m_addNoteBtn->setDisabled(true);
         break;
     case RecordEnd:
@@ -1832,7 +1774,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_middleView->setOnlyCurItemMenuEnable(false);
             m_addNoteBtn->setDisabled(false);
         }
-        m_rightView->setEnablePlayBtn(true);
+        //m_rightView->setEnablePlayBtn(true);
         stateOperation->operState(OpsStateInterface::StateRecording, false);
         break;
     case VoiceToTextStart:
@@ -1844,7 +1786,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNoteBtn->setDisabled(true);
         m_leftView->closeMenu();
         m_middleView->closeMenu();
-        m_rightView->closeMenu();
+        // m_rightView->closeMenu();
         break;
     case VoiceToTextEnd:
         if (!stateOperation->isRecording() && !stateOperation->isPlaying()) {
@@ -1979,29 +1921,6 @@ void VNoteMainWindow::onSystemDown(bool active)
 }
 
 /**
- * @brief VNoteMainWindow::onCursorChange
- * @param height
- * @param mouseMove true 鼠标拖动
- */
-void VNoteMainWindow::onCursorChange(int height, bool mouseMove)
-{
-    QScrollBar *bar = m_rightViewScrollArea->verticalScrollBar();
-    if (height > bar->value() + m_rightViewScrollArea->height()) {
-        int value = height - m_rightViewScrollArea->height();
-        if (!mouseMove) {
-            if (value > bar->maximum()) {
-                bar->setMaximum(value);
-            }
-        }
-        bar->setValue(value);
-    }
-    int value = bar->value();
-    if (value > height) {
-        bar->setValue(height);
-    }
-}
-
-/**
  * @brief VNoteMainWindow::switchWidget
  * @param type
  */
@@ -2028,7 +1947,7 @@ void VNoteMainWindow::release()
     }
 
     VTextSpeechAndTrManager::onStopTextToSpeech();
-    m_rightView->saveNote();
+    m_richTextEdit->updateNote();
 
     QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
     if (stateOperation->isVoice2Text()) {
@@ -2213,7 +2132,7 @@ bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
  */
 bool VNoteMainWindow::setTabFocus(QObject *obj, QKeyEvent *event)
 {
-    if (obj == m_rightView) {
+    if (obj == m_richTextEdit) {
         return true;
     } else if (obj == m_noteSearchEdit->lineEdit()) {
         return false;
@@ -2256,7 +2175,7 @@ bool VNoteMainWindow::setAddnoteButtonNext(QKeyEvent *event)
     if (m_middleView->rowCount() == 0) {
         return setTitlebarNext(event);
     }
-    if (m_rightView->getIsNormalView()) {
+    if (m_stackedRightMainWidget->currentWidget() == m_rightViewHolder) {
         m_recordBar->setFocus(Qt::TabFocusReason);
     } else {
         m_multipleSelectWidget->setFocus(Qt::TabFocusReason);
@@ -2320,7 +2239,7 @@ bool VNoteMainWindow::setTitlebarNext(QKeyEvent *event)
 bool VNoteMainWindow::setMiddleviewNext(QKeyEvent *event)
 {
     if (stateOperation->isSearching()) {
-        m_rightView->setFocus(Qt::TabFocusReason);
+        m_richTextEdit->setFocus(Qt::TabFocusReason);
         DWidget::keyPressEvent(event);
         return true;
     }
@@ -2368,10 +2287,11 @@ void VNoteMainWindow::onDeleteShortcut()
                 deleteAct = ActionManager::Instance()->getActionById(
                     ActionManager::NoteDelete);
             }
-        } else if (m_rightView->hasFocus()) {
+        } /* else if (m_rightView->hasFocus()) {
             deleteAct = ActionManager::Instance()->getActionById(
                 ActionManager::DetailDelete);
-        } else {
+        }*/
+        else {
             QPoint pos = m_rightViewHolder->mapFromGlobal(QCursor::pos());
             if (m_rightViewHolder->rect().contains(pos)) {
                 deleteAct = ActionManager::Instance()->getActionById(
@@ -2403,7 +2323,7 @@ void VNoteMainWindow::onPoppuMenuShortcut()
             m_showSearchEditMenu = QApplication::sendEvent(m_noteSearchEdit->lineEdit(), &eve);
         }
     } else {
-        m_rightView->popupMenu();
+        // m_rightView->popupMenu();
     }
 }
 
@@ -2481,9 +2401,9 @@ void VNoteMainWindow::onVoice2TextShortcut()
 
 void VNoteMainWindow::onSaveMp3Shortcut()
 {
-    if (canDoShortcutAction()) {
-        m_rightView->saveMp3();
-    }
+    //    if (canDoShortcutAction()) {
+    //        m_rightView->saveMp3();
+    //    }
 }
 
 void VNoteMainWindow::onSaveTextShortcut()

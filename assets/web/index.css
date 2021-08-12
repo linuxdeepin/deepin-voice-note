@@ -1,0 +1,214 @@
+
+    body{
+        /* -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -o-user-select: none;
+        user-select: none; */
+        padding:0 30px;
+    }
+    /* .mian{
+        width: 620px;
+        margin: 100px auto;
+        position: relative;
+        height: 500px;
+        overflow-y: auto;
+    } */
+    /* .list{ */
+        /* width: 500px;
+        height: 50px;
+        background: red;    */
+    /* } */
+    /* .item{
+        width: 100px;
+        height: 30px;
+        background: blue;
+    } */
+    .demo{
+        display: inline-block;
+        text-align: center;
+        white-space: nowrap;
+        /* cursor: pointer !important; */
+        display: flex;
+        justify-content: space-between;
+        padding-right: 30px;
+        border-radius: 8px;
+        box-sizing: border-box;
+        /* -webkit-user-drag: element; */
+        /* user-select: none; */
+        
+    }
+    .li{
+        background: rgba(0,0,0,0.05);
+        min-height: 30px;
+        border-radius: 8px;
+        user-select: none;
+    }
+    #demo{
+        width: 100%;
+        box-sizing: border-box;
+    }
+    /* .active{
+        background: #da686e; 
+    } */
+    .left{
+        width: 60px;
+        height: 60px;
+        margin: 2px 10px;
+        display: flex;
+        align-items: center;
+        justify-content:center;
+    }
+    .left .voicebtn{
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        background-color: red;
+    }
+    .left .voicebtn.play{
+        background-image:url(./light/play.svg);
+        background-size: contain;
+    }
+    .left .voicebtn.pause{
+        background-image:url(./light/pause.svg);
+        background-size: contain;
+    }
+    .right{
+        display: flex;
+        justify-content: space-between;
+        flex: 1;
+        justify-items: end;
+        padding-top: 12px;
+    }
+    /* .list{
+        width: 100%;
+        user-select: none;
+    }
+    .self-btn{
+        margin: 0 auto;
+        margin-top: 50px;
+        width: 50px;
+    }
+    .list.active{
+        background-color: aqua;
+    }  */
+    .minute{
+        color:#8AA1B4;
+        font-size:12px;
+        line-height:20px;
+    }
+    .title{
+        color:#001A2E;
+        font-size:14px;
+        line-height:17px;
+    }
+    .time{
+        color:#414D68;
+        font-size:12px;
+        line-height:17px;
+    }
+    .transBtn{
+        width: 40px;
+        height: 40px;
+        background-image:url(./light/more_hover.svg);
+        background-size: contain;
+    }
+    .padtop{
+        padding-top: 6px;
+    }
+    .translate{
+        padding: 0 20px;
+        line-height: 20px;
+        font-size: 12px;
+    }
+    .translate>p{
+        text-align: center;
+        padding: 10px 0;
+    }
+    .translate>div{
+        padding:10px 0;
+    }
+    .icon{
+        height: 21px;
+        position: relative;
+    }
+    .wifi-symbol{
+        position: relative;
+    }
+    .wifi-circle{
+        position: absolute;
+        left: 0;
+        top: 0; 
+    }
+
+    .wifi-symbol .first{
+        background-image: url(./light/play_voice1.svg);
+        background-size: contain;
+        width: 24px;
+        height: 21px;
+    }
+
+    .wifi-symbol .second{
+        background-image: url(./light/play_voice2.svg);
+        background-size: contain;
+        width: 24px;
+        height: 21px;
+    }
+
+    .wifi-symbol .third{
+        background-image: url(./light/play_voice3.svg);
+        background-size: contain;
+        width: 24px;
+        height: 21px;
+    }
+
+    .wifi-symbol .four{
+        background-image: url(./light/play_voice4.svg);
+        background-size: contain;
+        width: 24px;
+        height: 21px;
+    }
+
+    /* .wifi-symbol .first{
+        background-image: url(./light/play_voice1.svg);
+        background-size: contain;
+        width: 24px;
+        height: 21px;
+    }
+    .wifi-symbol .second{
+        background-image: url(./light/play_voice2.svg);
+        background-size: contain;
+        width: 24px;
+        height: 21px;
+        animation: fadeInOut 1.2s infinite .4s;
+        opacity: 0;
+    }
+    .wifi-symbol .third{
+        background-image: url(./light/play_voice3.svg);
+        background-size: contain;
+        width: 24px;
+        height: 21px;
+        animation: fadeInOut 1.2s infinite .8s;
+        opacity: 0;
+    }
+    .wifi-symbol .four{
+        background-image: url(./light/play_voice4.svg);
+        background-size: contain;
+        width: 24px;
+        height: 21px;
+        animation: fadeInOut 1.6s infinite 1.6s;
+        opacity: 0;
+    }
+    */
+    @keyframes fadeInOut {
+        0% {
+            opacity: 0; /*初始状态 透明度为0/
+        }
+        100% {
+            opacity: 1; /*结尾状态 透明度为1*/
+        }
+    } 
+.noselect{
+    user-select: none;
+}
+

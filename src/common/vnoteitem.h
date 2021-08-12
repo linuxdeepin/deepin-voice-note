@@ -77,6 +77,8 @@ public:
     qint32 isTop {0};
     //标题名称
     QString noteTitle {""};
+    //富文本内容
+    QString htmlCode {""};
     //创建时间
     QDateTime createTime;
     //修改时间
