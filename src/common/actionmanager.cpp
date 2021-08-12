@@ -170,7 +170,6 @@ void ActionManager::resetCtxMenu(ActionManager::MenuType type, bool enable)
  */
 void ActionManager::initMenu()
 {
-    bool isAISrvAvailable = OpsStateInterface::instance()->isAiSrvExist();
     //Notebook context menu
     QStringList notebookMenuTexts;
     notebookMenuTexts << DApplication::translate("NotebookContextMenu", "Rename")
@@ -245,14 +244,20 @@ void ActionManager::initMenu()
 
         m_detialContextMenu->addAction(pAction);
         m_actionsMap.insert(static_cast<ActionKind>(detailMenuIdStart), pAction);
-        if (!isAISrvAvailable) {
-            if (detailMenuIdStart == DetailVoice2Text
-                || detailMenuIdStart > DetailPaste) {
-                pAction->setVisible(false);
-            }
-        } else if (detailMenuIdStart == DetailPaste) {
-            m_detialContextMenu->addSeparator();
+        if (detailMenuIdStart == DetailPaste) {
+            m_detailPasteSeparator = m_detialContextMenu->addSeparator();
         }
+
         detailMenuIdStart++;
     }
+}
+
+void ActionManager::hideAiActions()
+{
+    visibleAction(ActionManager::DetailVoice2Text, false);
+    visibleAction(ActionManager::DetailText2Speech, false);
+    visibleAction(ActionManager::DetailStopreading, false);
+    visibleAction(ActionManager::DetailSpeech2Text, false);
+    visibleAction(ActionManager::DetailTranslate, false);
+    m_detailPasteSeparator->setVisible(false);
 }

@@ -641,7 +641,13 @@ void VNoteMainWindow::releaseHaltLock()
  */
 void VNoteMainWindow::initDelayWork()
 {
-    ;
+    QDBusConnection connection = QDBusConnection::sessionBus();
+    QDBusConnectionInterface *bus = connection.interface();
+    bool isVailid = bus->isServiceRegistered("com.iflytek.aiassistant");
+    if (!isVailid) {
+        ActionManager::Instance()->hideAiActions();
+    }
+    stateOperation->operState(OpsStateInterface::StateAISrvAvailable, isVailid);
 }
 
 /**
