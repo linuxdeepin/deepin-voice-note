@@ -243,6 +243,10 @@ public slots:
     void onViewChangeClicked();
     //图片插入点击事件响应
     void onImgInsertClicked();
+    //记事本或笔记进入重命名状态响应
+    void onEnterNoteRename();
+    //记事本或笔记退出重命名状态响应
+    void onCloseNoteRename();
 
 private:
     //左侧列表视图操作相关

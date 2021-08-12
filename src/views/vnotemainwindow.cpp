@@ -151,8 +151,16 @@ void VNoteMainWindow::initConnections()
     connect(m_leftView->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &VNoteMainWindow::onVNoteFolderChange);
 
+    connect(m_leftView, &LeftView::enterRename, this, &VNoteMainWindow::onEnterNoteRename);
+
+    connect(m_leftView, &LeftView::closeRename, this, &VNoteMainWindow::onCloseNoteRename);
+
     connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
             this, SLOT(onVNoteChange(const QModelIndex &)));
+
+    connect(m_middleView, &MiddleView::enterRename, this, &VNoteMainWindow::onEnterNoteRename);
+
+    connect(m_middleView, &MiddleView::closeRename, this, &VNoteMainWindow::onCloseNoteRename);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::onNewNotebook);
@@ -1462,7 +1470,9 @@ void VNoteMainWindow::delNotepad()
  */
 void VNoteMainWindow::editNotepad()
 {
-    m_leftView->editFolder();
+    //只有在记事本列表可见的情况下进行记事本重命名操作
+    if (m_leftViewHolder->isVisible())
+        m_leftView->editFolder();
 }
 
 /**
@@ -2467,4 +2477,22 @@ void VNoteMainWindow::onViewChangeClicked()
  */
 void VNoteMainWindow::onImgInsertClicked()
 {
+}
+
+/**
+ * @brief onStartNoteRename
+ * 记事本或笔记进入重命名状态响应
+ */
+void VNoteMainWindow::onEnterNoteRename()
+{
+    m_imgInsert->setBtnDisabled(true);
+}
+
+/**
+ * @brief onCloseNoteRename
+ * 记事本或笔记退出重命名状态响应
+ */
+void VNoteMainWindow::onCloseNoteRename()
+{
+    m_imgInsert->setBtnDisabled(false);
 }

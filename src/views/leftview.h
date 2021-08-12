@@ -100,6 +100,10 @@ public:
 signals:
     //拖拽到当前记事本
     void dropNotesEnd(bool dropCancel);
+    //记事本进入重命名状态
+    void enterRename();
+    //记事本退出重命名状态
+    void closeRename();
 
 protected:
     //鼠标事件
