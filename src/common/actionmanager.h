@@ -83,6 +83,51 @@ public:
         //Add NoteDetail menu item end }
         NoteDetailMenuMax,
 
+        //Voice
+        VoiceMenuBase,
+        VoiceAsSave = VoiceMenuBase,
+        VoiceToText,
+        VoiceDelete,
+        VoiceSelectAll,
+        VoiceCopy,
+        VoiceCut,
+        VoicePaste,
+        //Add voice menu item begin {
+
+        //Add voice menu item end }
+        VoiceMenuMax,
+
+        //pciture
+        PictureMenuBase,
+        PictureView = PictureMenuBase,
+        PictureDelete,
+        PictureSelectAll,
+        PictureCopy,
+        PictureCut,
+        PicturePaste,
+        PictureSaveAs,
+        //Add pciture menu item begin {
+
+        //Add pciture menu item end }
+        PictureMenuMax,
+
+        //txt
+        TxtMenuBase,
+        TxtDelete = TxtMenuBase,
+        TxtSelectAll,
+        TxtCopy,
+        TxtCut,
+        TxtPaste,
+
+        TxtSpeech,
+        TxtStopreading,
+        TxtDictation,
+        TxtTranslate,
+        //Add Txt menu item begin {
+
+        //Add Txt menu item end }
+        TxtMenuMax,
+
         MenuMaxId
     };
 
@@ -93,6 +138,9 @@ public:
         NotebookCtxMenu,
         NoteCtxMenu,
         NoteDetailCtxMenu,
+        VoiceCtxMenu,
+        PictureCtxMenu,
+        TxtCtxMenu
     };
     Q_ENUM(MenuType)
     //获取记事本列表右键菜单
@@ -101,6 +149,12 @@ public:
     VNoteRightMenu *noteContextMenu();
     //获取详情页右键菜单
     DMenu *detialContextMenu();
+    //获取语音文本右键菜单
+    VNoteRightMenu *voiceContextMenu();
+    //获取图片文本右键菜单
+    VNoteRightMenu *pictureContextMenu();
+    //获取文字文本右键菜单
+    VNoteRightMenu *txtContextMenu();
     //获取菜单项ID
     ActionKind getActionKind(QAction *action);
     //获取菜单项
@@ -121,6 +175,9 @@ protected:
     QScopedPointer<VNoteRightMenu> m_notebookContextMenu;
     QScopedPointer<VNoteRightMenu> m_noteContextMenu;
     QScopedPointer<VNoteRightMenu> m_detialContextMenu;
+    QScopedPointer<VNoteRightMenu> m_voiceContextMenu;
+    QScopedPointer<VNoteRightMenu> m_pictureContextMenu;
+    QScopedPointer<VNoteRightMenu> m_txtContextMenu;
 
     QMap<ActionKind, QAction *> m_actionsMap;
 };

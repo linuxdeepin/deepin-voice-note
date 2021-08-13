@@ -199,6 +199,12 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onMenuAbout2Show);
     connect(ActionManager::Instance()->detialContextMenu(), &DMenu::triggered,
             this, &VNoteMainWindow::onMenuAction);
+    connect(ActionManager::Instance()->voiceContextMenu(), &DMenu::triggered,
+            this, &VNoteMainWindow::onMenuAction);
+    connect(ActionManager::Instance()->pictureContextMenu(), &DMenu::triggered,
+            this, &VNoteMainWindow::onMenuAction);
+    connect(ActionManager::Instance()->txtContextMenu(), &DMenu::triggered,
+            this, &VNoteMainWindow::onMenuAction);
     //处理笔记拖拽释放
     connect(m_leftView, &LeftView::dropNotesEnd, this, &VNoteMainWindow::onDropNote);
     //处理详情页刷新请求
@@ -1292,6 +1298,52 @@ void VNoteMainWindow::onMenuAction(QAction *action)
             }
         }
     } break;
+    case ActionManager::VoiceAsSave:
+        break;
+    case ActionManager::VoiceToText:
+        break;
+    case ActionManager::VoiceDelete:
+        break;
+    case ActionManager::VoiceSelectAll:
+        break;
+    case ActionManager::VoiceCopy:
+        break;
+    case ActionManager::VoiceCut:
+        break;
+    case ActionManager::VoicePaste:
+        break;
+    case ActionManager::PictureView:
+        break;
+    case ActionManager::PictureDelete:
+        break;
+    case ActionManager::PictureSelectAll:
+        break;
+    case ActionManager::PictureCopy:
+        break;
+    case ActionManager::PictureCut:
+        break;
+    case ActionManager::PicturePaste:
+        break;
+    case ActionManager::PictureSaveAs:
+        break;
+    case ActionManager::TxtDelete:
+        break;
+    case ActionManager::TxtSelectAll:
+        break;
+    case ActionManager::TxtCopy:
+        break;
+    case ActionManager::TxtCut:
+        break;
+    case ActionManager::TxtPaste:
+        break;
+    case ActionManager::TxtSpeech:
+        break;
+    case ActionManager::TxtStopreading:
+        break;
+    case ActionManager::TxtDictation:
+        break;
+    case ActionManager::TxtTranslate:
+        break;
     default:
         break;
     }
