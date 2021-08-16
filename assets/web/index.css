@@ -5,7 +5,7 @@
         -moz-user-select: none;
         -o-user-select: none;
         user-select: none; */
-        padding:0 30px;
+        padding:0px;
     }
     /* .mian{
         width: 620px;
@@ -25,24 +25,36 @@
         background: blue;
     } */
     .demo{
-        display: inline-block;
-        text-align: center;
-        white-space: nowrap;
+        /* display: inline-block; */
+        /* text-align: center; */
+        /* white-space: nowrap; */
         /* cursor: pointer !important; */
-        display: flex;
-        justify-content: space-between;
-        padding-right: 30px;
-        border-radius: 8px;
+        /* display: flex;
+        justify-content: space-between; */
+        padding: 12px 0;
+        margin: 10px 0;
+        border-radius: 10px;
         box-sizing: border-box;
         /* -webkit-user-drag: element; */
         /* user-select: none; */
         
+    }
+    .demo>div{
+        display: inline-block;
+        vertical-align: bottom;
+    }
+    .lr {
+        float: right;
+        margin: 0px 20px 0 0;
     }
     .li{
         background: rgba(0,0,0,0.05);
         min-height: 30px;
         border-radius: 8px;
         user-select: none;
+        margin-left: 30px;
+        margin-right: 30px;
+
     }
     #demo{
         width: 100%;
@@ -51,35 +63,31 @@
     /* .active{
         background: #da686e; 
     } */
-    .left{
-        width: 60px;
-        height: 60px;
-        margin: 2px 10px;
-        display: flex;
-        align-items: center;
-        justify-content:center;
-    }
-    .left .voicebtn{
+
+    .voicebtn{
         border-radius: 50%;
         width: 40px;
         height: 40px;
-        background-color: red;
+        background-color: #0183FF;
+        margin: 0 20px 0 20px;
+        cursor: pointer;
+        overflow: hidden;
     }
-    .left .voicebtn.play{
-        background-image:url(./light/play.svg);
+     .voicebtn.play{
+        background-image:url(./img/play.svg);
         background-size: contain;
     }
-    .left .voicebtn.pause{
-        background-image:url(./light/pause.svg);
+     .voicebtn.pause{
+        background-image:url(./img/pause.svg);
         background-size: contain;
     }
-    .right{
+    /* .right{
         display: flex;
         justify-content: space-between;
         flex: 1;
         justify-items: end;
         padding-top: 12px;
-    }
+    } */
     /* .list{
         width: 100%;
         user-select: none;
@@ -92,26 +100,23 @@
     .list.active{
         background-color: aqua;
     }  */
-    .minute{
-        color:#8AA1B4;
-        font-size:12px;
-        line-height:20px;
-    }
     .title{
-        color:#001A2E;
+        color:rgba(0,26,46,1);
         font-size:14px;
-        line-height:17px;
+        line-height:16px;
     }
-    .time{
-        color:#414D68;
+    .minute{
+        color:rgba(138,161,180,1);
         font-size:12px;
-        line-height:17px;
+        line-height:12px;
+        margin-top: 5px;
     }
-    .transBtn{
-        width: 40px;
-        height: 40px;
-        background-image:url(./light/more_hover.svg);
-        background-size: contain;
+ 
+
+    .time{
+        color:rgba(65,77,104,1);
+        font-size:12px;
+        line-height:12px;
     }
     .padtop{
         padding-top: 6px;
@@ -142,41 +147,41 @@
     }
 
     .wifi-symbol .first{
-        background-image: url(./light/play_voice1.svg);
+        background-image: url(./img/play_voice1.svg);
         background-size: contain;
-        width: 24px;
-        height: 21px;
+        width: 19px;
+        height: 17px;
     }
 
     .wifi-symbol .second{
-        background-image: url(./light/play_voice2.svg);
+        background-image: url(./img/play_voice2.svg);
         background-size: contain;
-        width: 24px;
-        height: 21px;
+        width: 19px;
+        height: 17px;
     }
 
     .wifi-symbol .third{
-        background-image: url(./light/play_voice3.svg);
+        background-image: url(./img/play_voice3.svg);
         background-size: contain;
-        width: 24px;
-        height: 21px;
+        width: 19px;
+        height: 17px;
     }
 
     .wifi-symbol .four{
-        background-image: url(./light/play_voice4.svg);
+        background-image: url(./img/play_voice4.svg);
         background-size: contain;
-        width: 24px;
-        height: 21px;
+        width: 19px;
+        height: 17px;
     }
 
     /* .wifi-symbol .first{
-        background-image: url(./light/play_voice1.svg);
+        background-image: url(./img/play_voice1.svg);
         background-size: contain;
         width: 24px;
         height: 21px;
     }
     .wifi-symbol .second{
-        background-image: url(./light/play_voice2.svg);
+        background-image: url(./img/play_voice2.svg);
         background-size: contain;
         width: 24px;
         height: 21px;
@@ -184,7 +189,7 @@
         opacity: 0;
     }
     .wifi-symbol .third{
-        background-image: url(./light/play_voice3.svg);
+        background-image: url(./img/play_voice3.svg);
         background-size: contain;
         width: 24px;
         height: 21px;
@@ -192,7 +197,7 @@
         opacity: 0;
     }
     .wifi-symbol .four{
-        background-image: url(./light/play_voice4.svg);
+        background-image: url(./img/play_voice4.svg);
         background-size: contain;
         width: 24px;
         height: 21px;
