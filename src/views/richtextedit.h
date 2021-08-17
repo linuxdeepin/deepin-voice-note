@@ -51,6 +51,10 @@ public:
      * @brief 更新编辑区内容
      */
     void updateNote();
+    /**
+     * @brief 从剪贴板中获取数据
+     */
+    void getImagePathsByClipboard();
 signals:
 
 public slots:
@@ -58,6 +62,14 @@ public slots:
      * @brief 编辑区内容变化
      */
     void onTextChange();
+    /**
+     * @brief 图片插入点击事件响应
+     */
+    void onImgInsertClicked();
+    /**
+     * @brief ctrl+V事件
+     */
+    void onPaste();
 
 private:
     /**

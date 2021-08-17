@@ -213,8 +213,8 @@ void VNoteMainWindow::initConnections()
     connect(m_multipleSelectWidget, &VnoteMultipleChoiceOptionWidget::requestMultipleOption, this, &VNoteMainWindow::handleMultipleOption);
 
     connect(m_viewChange, &DIconButton::clicked, this, &VNoteMainWindow::onViewChangeClicked);
-
-    connect(m_imgInsert, &VNoteIconButton::clicked, this, &VNoteMainWindow::onImgInsertClicked);
+    //关联图片插入按钮点击事件
+    connect(m_imgInsert, &VNoteIconButton::clicked, m_richTextEdit, &RichTextEdit::onImgInsertClicked);
 
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::paletteTypeChanged,
             this, &VNoteMainWindow::onThemeChanged);
@@ -346,6 +346,14 @@ void VNoteMainWindow::initShortcuts()
     m_stPreviewShortcuts->setAutoRepeat(false);
     connect(m_stPreviewShortcuts.get(), &QShortcut::activated,
             this, &VNoteMainWindow::onPreviewShortcut);
+
+    //粘贴
+    m_stPaste.reset(new QShortcut(this));
+    m_stPaste->setKey(Qt::CTRL + Qt::Key_V);
+    m_stPaste->setContext(Qt::ApplicationShortcut);
+    m_stPaste->setAutoRepeat(false);
+    connect(m_stPaste.get(), &QShortcut::activated,
+            m_richTextEdit, &RichTextEdit::onPaste);
 }
 
 /**
@@ -2527,14 +2535,6 @@ void VNoteMainWindow::onViewChangeClicked()
         m_viewChange->setBackgroundRole(DPalette::Highlight);
         m_leftViewHolder->show();
     }
-}
-
-/**
- * @brief VNoteMainWindow::onImgInsertClicked
- * 图片插入点击事件响应
- */
-void VNoteMainWindow::onImgInsertClicked()
-{
 }
 
 /**

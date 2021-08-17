@@ -241,8 +241,6 @@ public slots:
     void onThemeChanged();
     //记事本列表显示或隐藏事件响应
     void onViewChangeClicked();
-    //图片插入点击事件响应
-    void onImgInsertClicked();
     //记事本或笔记进入重命名状态响应
     void onEnterNoteRename();
     //记事本或笔记退出重命名状态响应
@@ -347,6 +345,7 @@ private:
     QScopedPointer<QShortcut> m_stSaveAsMp3; //Ctrl+P
     QScopedPointer<QShortcut> m_stSaveAsText; //Ctrl+S
     QScopedPointer<QShortcut> m_stSaveVoices; //Ctrl+Y
+    QScopedPointer<QShortcut> m_stPaste; //Ctrl+V
     QScopedPointer<QShortcut> m_stDelete; //Delete
     QScopedPointer<QShortcut> m_stEsc; //Esc
     QScopedPointer<QShortcut> m_stPopupMenu; //Alt+M

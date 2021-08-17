@@ -21,6 +21,7 @@
 #include "jscontent.h"
 
 #include <QApplication>
+#include <QFile>
 
 static JsContent *jsContentInstance = nullptr;
 
@@ -35,6 +36,34 @@ JsContent *JsContent::instance()
         jsContentInstance = new JsContent;
     }
     return jsContentInstance;
+}
+
+/**
+ * @brief JsContent::insertImages
+ * 判断图片路径是否有效，存在有效路径将其传到web端中
+ * @param filePaths
+ * @return 此次操作是否有效
+ */
+bool JsContent::insertImages(QStringList filePaths)
+{
+    for (int i = filePaths.size() - 1; i >= 0; --i) {
+        //判断路径后缀
+        if (!(filePaths.at(i).endsWith(".jpg") || filePaths.at(i).endsWith(".png") || filePaths.at(i).endsWith(".bmp"))) {
+            filePaths.removeAt(i);
+            continue;
+        }
+        //判断文件是否存在
+        if (!QFile(filePaths.at(i)).exists()) {
+            filePaths.removeAt(i);
+        }
+    }
+
+    //无有效图片路径
+    if (filePaths.size() == 0) {
+        return false;
+    }
+    emit callJsInsertImages(filePaths);
+    return true;
 }
 
 void JsContent::jsCallTxtChange()

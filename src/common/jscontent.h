@@ -33,6 +33,13 @@ public:
     explicit JsContent(QObject *parent = nullptr);
     static JsContent *instance();
     QVariant callJsSynchronous(QWebEnginePage *page, const QString &funtion);
+    /**
+     * @brief 插入图片
+     * @param filePaths 图片路径
+     * @return
+     */
+    bool insertImages(QStringList filePaths);
+
 signals:
     void callJsInitData(const QString &jsonData); //调用web前端，设置json格式数据
     void callJsSetHtml(const QString &html); //调用web前端，设置html格式数据

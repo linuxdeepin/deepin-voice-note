@@ -25,8 +25,12 @@
 #include "db/vnoteitemoper.h"
 
 #include <DFileDialog>
+#include <DStandardPaths>
+#include <DApplication>
 
+#include <QClipboard>
 #include <QVBoxLayout>
+#include <QMimeData>
 
 static const char webPage[] = WEB_PATH "/index.html";
 
@@ -95,6 +99,28 @@ void RichTextEdit::updateNote()
     }
 }
 
+/**
+ * @brief RichTextEdit::getImagePathsByClipboard
+ * 从系统剪贴板中获取图片路径
+ */
+void RichTextEdit::getImagePathsByClipboard()
+{
+    //获取剪贴板信息
+    QClipboard *clipboard = QApplication::clipboard();
+    const QMimeData *mimeData = clipboard->mimeData();
+    //存在文件url
+    if (mimeData->hasUrls()) {
+        QStringList paths;
+        for (auto url : mimeData->urls()) {
+            paths.push_back(url.path());
+        }
+        if (m_jsContent->insertImages(paths))
+            return;
+    }
+    //无图片文件，直接调用web端的粘贴事件
+    m_webView->page()->triggerAction(QWebEnginePage::Paste);
+}
+
 void RichTextEdit::onTextChange()
 {
     m_textChange = true;
@@ -113,4 +139,28 @@ void RichTextEdit::initWebView()
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_webView);
+}
+
+/**
+ * @brief VNoteMainWindow::onImgInsertClicked
+ * 图片插入点击事件响应
+ */
+void RichTextEdit::onImgInsertClicked()
+{
+    QStringList filePaths = DFileDialog::getOpenFileNames(
+        this,
+        "Please choose an image file",
+        QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
+        "Image file(*.jpg *.png *.bmp)");
+
+    m_jsContent->insertImages(filePaths);
+}
+
+/**
+ * @brief VNoteMainWindow::onPaste
+ * 粘贴事件
+ */
+void RichTextEdit::onPaste()
+{
+    getImagePathsByClipboard();
 }
