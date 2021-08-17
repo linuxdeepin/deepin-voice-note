@@ -23,32 +23,54 @@
 
 #include <QObject>
 #include <QTimer>
-//#include <QWebEngineProfile>
-//#include <QWebEngineUrlRequestInterceptor>
 #include <QtWebChannel/QWebChannel>
 #include <QtWebEngineWidgets/QWebEngineView>
 
 struct VNoteItem;
 class JsContent;
 
-class RichTextEdit : public QWebEngineView
+class RichTextEdit : public QWidget
 {
     Q_OBJECT
 public:
     explicit RichTextEdit(QWidget *parent = nullptr);
+    /**
+     * @brief 设置笔记内容
+     * @param data: 笔记内容
+     * @param reg: 搜索关键字
+     * @param fouse: 焦点
+     */
     void initData(VNoteItem *data, const QString &reg, bool fouse = false);
+    /**
+     * @brief 插入语音
+     * @param voicePath：语音路径
+     * @param voiceSize: 语音时长，单位毫秒
+     */
     void insertVoiceItem(const QString &voicePath, qint64 voiceSize);
+    /**
+     * @brief 更新编辑区内容
+     */
     void updateNote();
 signals:
 
 public slots:
+    /**
+     * @brief 编辑区内容变化
+     */
     void onTextChange();
+
+private:
+    /**
+     * @brief 初始化编辑区
+     */
+    void initWebView();
 
 private:
     VNoteItem *m_noteData {nullptr};
     QWebChannel *m_channel {nullptr};
     JsContent *m_jsContent {nullptr};
     QTimer *m_updateTimer {nullptr};
+    QWebEngineView *m_webView {nullptr};
     bool m_textChange {false};
 };
 

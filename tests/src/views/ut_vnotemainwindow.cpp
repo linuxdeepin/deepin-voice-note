@@ -20,7 +20,6 @@
 #include "vnotemainwindow.h"
 #include "leftview.h"
 #include "middleview.h"
-#include "rightview.h"
 #include "homepage.h"
 #include "splashview.h"
 #include "voicenoteitem.h"
@@ -43,6 +42,7 @@
 #include "vnoterecordbar.h"
 #include "vnoteiconbutton.h"
 #include "vnmainwnddelayinittask.h"
+#include "richtextedit.h"
 
 #include "upgradeview.h"
 #include "upgradedbutil.h"
@@ -68,6 +68,7 @@ void ut_vnotemainwindow_test::SetUp()
     Stub stub;
     stub.set(ADDR(VNoteMainWindow, initData), stub_vnotemainwindow);
     stub.set(ADDR(VNoteMainWindow, delayInitTasks), stub_vnotemainwindow);
+    stub.set(ADDR(RichTextEdit, initWebView), stub_vnotemainwindow);
     m_mainWindow = new VNoteMainWindow;
     m_mainWindow->switchWidget(VNoteMainWindow::WndNoteShow);
 }
@@ -136,11 +137,6 @@ TEST_F(ut_vnotemainwindow_test, showAsrErrMessage)
 TEST_F(ut_vnotemainwindow_test, showDeviceExceptionErrMessage)
 {
     m_mainWindow->showDeviceExceptionErrMessage();
-}
-
-TEST_F(ut_vnotemainwindow_test, onCursorChange)
-{
-    m_mainWindow->onCursorChange(150, true);
 }
 
 TEST_F(ut_vnotemainwindow_test, initMenuExtension)
@@ -225,9 +221,6 @@ TEST_F(ut_vnotemainwindow_test, onShortcut)
     stub.reset(new Stub);
     stub->set(ADDR(MiddleView, hasFocus), stub_int);
     //m_mainWindow->onDeleteShortcut();
-    m_mainWindow->onPoppuMenuShortcut();
-    stub.reset(new Stub);
-    stub->set(ADDR(RightView, hasFocus), stub_int);
     m_mainWindow->onPoppuMenuShortcut();
     stub.reset(new Stub);
     stub->set(ADDR(QLineEdit, hasFocus), stub_int);

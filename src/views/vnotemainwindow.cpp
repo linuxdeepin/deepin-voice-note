@@ -22,13 +22,13 @@
 #include "views/vnotemainwindow.h"
 #include "views/leftview.h"
 #include "views/middleview.h"
-#include "views/rightview.h"
 #include "views/homepage.h"
 #include "views/splashview.h"
 #include "views/voicenoteitem.h"
 #include "views/middleviewsortfilter.h"
 #include "views/richtextedit.h"
 
+#include "common/vtextspeechandtrmanager.h"
 #include "common/standarditemcommon.h"
 #include "common/vnotedatamanager.h"
 #include "common/vnotea2tmanager.h"
@@ -911,6 +911,7 @@ void VNoteMainWindow::onA2TStart(bool first)
     //            }
     //        }
     //    }
+    Q_UNUSED(first)
 }
 
 /**
@@ -936,6 +937,7 @@ void VNoteMainWindow::onA2TError(int error)
     //    }
     //    showAsrErrMessage(message);
     //    setSpecialStatus(VoiceToTextEnd);
+    Q_UNUSED(error)
 }
 
 /**
@@ -953,6 +955,7 @@ void VNoteMainWindow::onA2TSuccess(const QString &text)
     //    }
     //    setSpecialStatus(VoiceToTextEnd);
     //    m_rightView->setCurVoiceAsr(nullptr);
+    Q_UNUSED(text)
 }
 
 /**
@@ -1693,6 +1696,7 @@ void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
     //    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
     //        voiceItem->showPauseBtn();
     //    }
+    Q_UNUSED(voiceData)
 }
 
 /**
@@ -1705,6 +1709,7 @@ void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
     //    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
     //        voiceItem->showPlayBtn();
     //    }
+    Q_UNUSED(voiceData)
 }
 
 /**
@@ -1720,6 +1725,7 @@ void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
     //    setSpecialStatus(PlayVoiceEnd);
     //    m_rightView->setCurVoicePlay(nullptr);
     //    m_rightView->setFocus();
+    Q_UNUSED(voiceData)
 }
 
 /**

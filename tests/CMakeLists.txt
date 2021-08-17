@@ -97,6 +97,8 @@ target_link_libraries(${PROJECT_NAME_TEST}
     Qt5::Sql
     Qt5::Multimedia
     Qt5::Test
+    Qt5::WebChannel
+    Qt5::WebEngineWidgets
     ${Qt5Svg_LIBRARIES}
     ${Qt5Xml_LIBRARIES}
 )
