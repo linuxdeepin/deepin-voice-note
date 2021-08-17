@@ -52,17 +52,16 @@
         min-height: 30px;
         border-radius: 8px;
         user-select: none;
-        margin-left: 30px;
-        margin-right: 30px;
+     
 
     }
     #demo{
         width: 100%;
         box-sizing: border-box;
     }
-    /* .active{
-        background: #da686e; 
-    } */
+    .active{
+        background: rgba(0,129,255,0.5)!important; 
+    }
 
     .voicebtn{
         border-radius: 50%;

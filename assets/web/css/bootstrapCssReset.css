@@ -106,8 +106,7 @@ body {
 
 p {
     margin: 0!important;
-    line-height: 30px;
-    padding: 0 30px;
+    line-height: 24px;
 }
 
 .voiceRightMouse {
@@ -294,15 +293,16 @@ ol>li, ul>li {
 .lightColor:before {
     color: #C5CFE0!important;
 }
+
 .darkColor:before {
     color: #536076!important;
 }
+
 .btn-default:focus, .btn-default.focus {
     background-color: rgba(0, 0, 0, 0.05)!important;
 }
 
 .note-current-fontsize {
-
     margin-right: 2px;
 }
 
@@ -313,7 +313,11 @@ ol>li, ul>li {
 .note-fontsize button {
     padding-bottom: 2px!important;
 }
-.note-color-back .dropdown-toggle{
-    padding-bottom: 2px!important;
 
+.note-color-back .dropdown-toggle {
+    padding-bottom: 2px!important;
+}
+
+.note-editable {
+    padding: 0 15px 0 30px;
 }

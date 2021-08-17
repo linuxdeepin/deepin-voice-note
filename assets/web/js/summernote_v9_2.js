@@ -3944,6 +3944,8 @@
                     document.execCommand('foreColor', false, foreColor);
                 }
                 if (backColor) {
+                    // var sel = window.getSelection();
+                    // console.log(sel)
                     document.execCommand('backColor', false, backColor);
                 }
             });
@@ -5843,6 +5845,7 @@
                             else if (backColor) {
                                 _this.context.invoke('editor.color', {
                                     backColor: $button.attr('data-backColor')
+
                                 });
                             }
                             else if (foreColor) {
@@ -5881,11 +5884,11 @@
                         items: (backColor ? [
                             '<div class="note-palette">',
                             // '  <div class="note-palette-title">' + this.lang.color.background + '</div>',
-                            // '  <div>',
-                            // '    <button type="button" class="note-color-reset btn btn-light" data-event="backColor" data-value="inherit">',
-                            // this.lang.color.transparent,
-                            // '    </button>',
-                            // '  </div>',
+                            '  <div>',
+                            '    <button type="button" class="note-color-reset btn btn-light" data-event="backColor" data-value="inherit">',
+                            "无填充色",
+                            '    </button>',
+                            '  </div>',
                             '  <div class="note-holder" data-event="backColor"/>',
                             '  <div class="colorFont">',
                             '  最近使用',
@@ -6016,7 +6019,6 @@
                                 }
 
                                 $currentButton.attr('data-' + eventName, value);
-
                                 _this.context.invoke('editor.' + eventName, value);
                             }
                             // event.stopPropagation();

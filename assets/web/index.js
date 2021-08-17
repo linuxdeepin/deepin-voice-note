@@ -64,6 +64,9 @@ var nodeTpl = `
             </div>
         </div>`;
 
+var formatHtml = ''
+var pasteData = "";
+
 var webobj;    //js与qt通信对象
 var activeVoice = null;  //当前正操作的语音对象
 var activeTransVoice = null;  //执行语音转文字对象
@@ -73,7 +76,7 @@ var voiceIntervalObj;    //语音播放动画定时器对象
 
 //设置默认焦点， 不可拖拽， 
 $('#summernote').summernote({
-    minHeight: null,             // set minimum height of editor
+    minHeight: $(window).height(),             // set minimum height of editor
     maxHeight: null,             // set maximum height of editor
     focus: true,                  // set focus to editable area after initializin
     disableDragAndDrop: true,
@@ -97,26 +100,65 @@ $('#summernote').summernote({
     airMode: true,
 
 });
+// 监听窗口变化
+$(window).resize(function () {
+    $('.note-editable').height($(window).height())
 
+});
 //设置全屏模式
 // $('#summernote').summernote('fullscreen.toggle');
 
 //捕捉change事件
 $('#summernote').on('summernote.change', function (we, contents, $editable) {
+
+
     if (webobj && initFinish) {
         console.log('---------->change');
         webobj.jsCallTxtChange();
     }
 });
-
-//点击变色
+// 判断是否为空
+function isNoteNull() {
+    return $('.note-editable').html() === '<p><br></p>'
+}
+// 监听键盘删除事件
+$('body').on('keydown', function (e) {
+    if (e.keyCode == 8 && isNoteNull()) {
+        e.preventDefault()
+    }
+})
+//选中录音
 $('body').on('click', '.li', function (e) {
     console.log('div click...');
     e.stopPropagation();
     $('.li').removeClass('active');
-    $(this).addClass('active');
+    // $(this).addClass('active');
 })
+// 取消选中
+$('body').on('click', function () {
+    $('.li').removeClass('active');
+})
+// 语音复制粘贴
+document.addEventListener('copy', function (event) {
+    var selectionObj = window.getSelection();
+    var rangeObj = selectionObj.getRangeAt(0);
+    console.log(rangeObj)
+    var docFragment = rangeObj.cloneContents();
+    var testDiv = document.createElement("div");
+    testDiv.appendChild(docFragment);
+    formatHtml = testDiv.innerHTML;
+    pasteData = window.getSelection().toString();
+    if (formatHtml.substr(0, 11) != "<p><br></p>") {
+        formatHtml = "";
+    }
+});
 
+document.addEventListener('paste', function (event) {
+    if (formatHtml != "" && pasteData == event.clipboardData.getData('Text')) {
+        document.execCommand('insertHTML', false, formatHtml + "<p><br></p>");
+        event.preventDefault();
+    }
+});
 //播放
 $('body').on('click', '.voicebtn', function (e) {
     console.log('------playBtn click...');
@@ -164,8 +206,6 @@ function getAllNote() {
     })
     jsonObj.noteDatas = jsonArray;
     var retJson = JSON.stringify(jsonObj);
-
-    console.log('========>', retJson);
     return retJson;
 }
 
@@ -208,7 +248,7 @@ new QWebChannel(qt.webChannelTransport,
 //初始化数据 
 function initData(text) {
     initFinish = false;
-    console.log('=============>', text);
+    console.log('=============>initData', text);
     var arr = JSON.parse(text);
     var html = '';
     var voiceHtml;
@@ -249,14 +289,28 @@ function insertVoiceItem(text) {
     oA.setAttribute('jsonKey', text);
     oA.innerHTML = voiceHtml;
     // $('#summernote').summernote('saveRange');
-    $('#summernote').summernote('insertNode', oA);
-    // document.execCommand('innerHTML', false, voiceHtml);
+
+    var tmpNode = document.createElement("div");
+    tmpNode.appendChild(oA.cloneNode(true));
+    var str = tmpNode.innerHTML + '<p><br></p>';
+
+    // $('#summernote').summernote('insertNode', oA);
+    document.execCommand('insertHTML', false, str);
+    
+    addBrNullP()
     // $('#summernote').summernote('restoreRange');
-    // let pList = document.querySelectorAll('p')
-    // console.log(pList)
-    // pList[4].setSelectionRange(0, 0);
-    // pList[4].focus()
 }
+
+// 空段落加br
+function addBrNullP() {
+    $('p').each((index, item) => {
+        if (item.innerHTML === '') {
+            $(item).html('<br>');
+        }
+    })
+
+}
+
 
 //播放状态，0,播放中，1暂停中，2.结束播放
 function toggleState(state) {
@@ -490,6 +544,7 @@ function changeColor(flag) {
     }
 
 }
+// 改变图标颜色
 function changeIconColor(color) {
     let iconList = ['icon-strikethrough', 'icon-bold', 'icon-italic', 'icon-underline', 'icon-forecolor', 'icon-backcolor', 'icon-ul', 'icon-ol']
 
@@ -504,6 +559,4 @@ function changeIconColor(color) {
             $('.' + item).addClass(color)
         }
     })
-
-
 }
