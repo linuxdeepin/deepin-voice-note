@@ -43,14 +43,13 @@ RichTextEdit::RichTextEdit(QWidget *parent)
     m_updateTimer->setInterval(1000);
     connect(m_updateTimer, &QTimer::timeout, this, &RichTextEdit::updateNote);
     connect(m_jsContent, &JsContent::textChange, this, &RichTextEdit::onTextChange);
+    connect(m_jsContent, &JsContent::setDataFinsh, this, &RichTextEdit::onSetDataFinsh);
     //初始化编辑区，ut测试中此函数打桩解决无法新建QWebEngineView问题
     initWebView();
 }
 
 void RichTextEdit::initData(VNoteItem *data, const QString &reg, bool fouse)
 {
-    Q_UNUSED(reg)
-    m_updateTimer->stop();
     if (fouse && m_webView) {
         m_webView->setFocus();
     }
@@ -58,14 +57,22 @@ void RichTextEdit::initData(VNoteItem *data, const QString &reg, bool fouse)
         this->setVisible(false);
         return;
     }
-    m_noteData = data;
     this->setVisible(true);
-    if (data->htmlCode.isEmpty()) {
-        emit m_jsContent->callJsInitData(data->metaDataRef().toString());
-    } else {
-        emit m_jsContent->callJsSetHtml(data->htmlCode);
+    m_searchKey = reg;
+
+    if (m_noteData != data) { //笔记切换时设置笔记内容
+        m_updateTimer->stop();
+        updateNote();
+        m_noteData = data;
+        if (data->htmlCode.isEmpty()) {
+            emit m_jsContent->callJsInitData(data->metaDataRef().toString());
+        } else {
+            emit m_jsContent->callJsSetHtml(data->htmlCode);
+        }
+        m_updateTimer->start();
+    } else if (m_webView) { //笔记相同时执行搜索
+        m_webView->findText(reg);
     }
-    m_updateTimer->start();
 }
 
 void RichTextEdit::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
@@ -207,4 +214,27 @@ bool RichTextEdit::eventFilter(QObject *o, QEvent *e)
         }
     }
     return QWidget::eventFilter(o, e);
+}
+
+void RichTextEdit::onSetDataFinsh()
+{
+    //只有编辑区内容加载完成才能搜索
+    if (!m_searchKey.isEmpty()) {
+        m_webView->findText(m_searchKey);
+    }
+}
+
+bool RichTextEdit::findText(const QString &searchKey)
+{
+    bool ret = false;
+    if (m_webView) {
+        //同步获取搜索结果
+        QEventLoop synLoop;
+        m_webView->findText(searchKey, QWebEnginePage::FindFlags(), [&](const bool &result) {
+            ret = result;
+            synLoop.quit();
+        });
+        synLoop.exec();
+    }
+    return ret;
 }

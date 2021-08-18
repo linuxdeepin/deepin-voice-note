@@ -683,8 +683,25 @@ void VNoteMainWindow::onVNoteSearch()
             //搜索内容不为空，切换为单选详情页面
             changeRightView(false);
             setSpecialStatus(SearchStart);
-            m_searchKey = text;
-            loadSearchNotes(m_searchKey);
+            if (m_searchKey == text) { //搜索关键字不变只更新当前笔记搜索
+                //没有搜索到则从笔记列表删除当前笔记
+                if (!m_richTextEdit->findText(m_searchKey)) {
+                    m_middleView->setNextSelection();
+                    m_middleView->deleteCurrentRow();
+                    //没有笔记符合条件则提示搜索无结果
+                    if (0 == m_middleView->rowCount()) {
+                        m_middleView->setVisibleEmptySearch(true);
+                    } else {
+                        m_middleView->selectAfterRemoved();
+                    }
+                }
+            } else {
+                m_searchKey = text;
+                //重新搜索之前先更新笔记内容
+                m_richTextEdit->updateNote();
+                //重新搜索
+                loadSearchNotes(m_searchKey);
+            }
         } else {
             setSpecialStatus(SearchEnd);
         }

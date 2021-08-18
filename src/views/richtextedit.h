@@ -55,6 +55,13 @@ public:
      * @brief 从剪贴板中获取数据
      */
     void getImagePathsByClipboard();
+
+    /**
+     * @brief 搜索当前笔记
+     * @param searchKey : 搜索关键字
+     * @return　搜索无结果返回false
+     */
+    bool findText(const QString &searchKey);
 signals:
 
 public slots:
@@ -70,6 +77,11 @@ public slots:
      * @brief ctrl+V事件
      */
     void onPaste();
+
+    /**
+     * @brief 编辑区内容设置完成
+     */
+    void onSetDataFinsh();
 
 private:
     /**
@@ -90,6 +102,7 @@ private:
     QTimer *m_updateTimer {nullptr};
     QWebEngineView *m_webView {nullptr};
     bool m_textChange {false};
+    QString m_searchKey {""};
 };
 
 #endif // RICHTEXTEDIT_H

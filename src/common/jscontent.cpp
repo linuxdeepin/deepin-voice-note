@@ -22,6 +22,8 @@
 
 #include <QApplication>
 #include <QFile>
+#include <QVariant>
+#include <QEventLoop>
 
 static JsContent *jsContentInstance = nullptr;
 
@@ -95,13 +97,19 @@ QString JsContent::getTranslation(const QString &context, const QString &key)
 
 QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &funtion)
 {
-    m_synResult.clear();
+    QVariant synResult;
+    QEventLoop synLoop;
     if (page) {
-        page->runJavaScript(funtion, [=](const QVariant &result) {
-            m_synResult = result;
-            m_synLoop.quit();
+        page->runJavaScript(funtion, [&](const QVariant &result) {
+            synResult = result;
+            synLoop.quit();
         });
-        m_synLoop.exec();
+        synLoop.exec();
     }
-    return m_synResult;
+    return synResult;
+}
+
+void JsContent::jsCallSetDataFinsh()
+{
+    emit setDataFinsh();
 }

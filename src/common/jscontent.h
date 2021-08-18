@@ -22,8 +22,6 @@
 #define JSCONTENT_H
 
 #include <QObject>
-#include <QVariant>
-#include <QEventLoop>
 #include <QtWebEngineWidgets/qwebenginepage.h>
 
 class JsContent : public QObject
@@ -54,16 +52,21 @@ signals:
     void loadFinsh();
     void popupMenu(int type, int x, int y, const QVariant &json);
     void playVoice(const QVariant &json, bool bIsSame);
+    /**
+     * @brief 编辑区内容加载完成信号
+     */
+    void setDataFinsh();
 
 public slots:
+    /**
+     * @brief web前端编辑区内容设置完成后，通知后端
+     */
+    void jsCallSetDataFinsh();
     void jsCallTxtChange(); //web前端调用后端，通知数据变化
     void jsCallChannleFinish(); //web前端调用后端，通知网页加载完成
     void jsCallPopupMenu(int type, int x, int y, const QVariant &json); //web前端调用后端，弹出右键菜单
     void jsCallPlayVoice(const QVariant &json, bool bIsSame); //web前端调用后端，播放语音
     QString getTranslation(const QString &context, const QString &key); //web前端调用后端，获取翻译文件
-private:
-    QVariant m_synResult;
-    QEventLoop m_synLoop;
 };
 
 #endif // JSCONTENT_H
