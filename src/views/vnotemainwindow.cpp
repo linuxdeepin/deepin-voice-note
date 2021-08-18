@@ -346,14 +346,6 @@ void VNoteMainWindow::initShortcuts()
     m_stPreviewShortcuts->setAutoRepeat(false);
     connect(m_stPreviewShortcuts.get(), &QShortcut::activated,
             this, &VNoteMainWindow::onPreviewShortcut);
-
-    //粘贴
-    m_stPaste.reset(new QShortcut(this));
-    m_stPaste->setKey(Qt::CTRL + Qt::Key_V);
-    m_stPaste->setContext(Qt::ApplicationShortcut);
-    m_stPaste->setAutoRepeat(false);
-    connect(m_stPaste.get(), &QShortcut::activated,
-            m_richTextEdit, &RichTextEdit::onPaste);
 }
 
 /**

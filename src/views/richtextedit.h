@@ -77,6 +77,12 @@ private:
      */
     void initWebView();
 
+protected:
+    /**
+     * @brief 事件过滤处理
+     */
+    bool eventFilter(QObject *o, QEvent *e) override;
+
 private:
     VNoteItem *m_noteData {nullptr};
     QWebChannel *m_channel {nullptr};

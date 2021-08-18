@@ -57,7 +57,6 @@ bool JsContent::insertImages(QStringList filePaths)
             filePaths.removeAt(i);
         }
     }
-
     //无有效图片路径
     if (filePaths.size() == 0) {
         return false;

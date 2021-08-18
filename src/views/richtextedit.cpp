@@ -31,6 +31,7 @@
 #include <QClipboard>
 #include <QVBoxLayout>
 #include <QMimeData>
+#include <QDragEnterEvent>
 
 static const char webPage[] = WEB_PATH "/index.html";
 
@@ -116,6 +117,20 @@ void RichTextEdit::getImagePathsByClipboard()
         }
         if (m_jsContent->insertImages(paths))
             return;
+    } else if (mimeData->hasImage()) {
+        QPixmap pixmap = clipboard->pixmap();
+        QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/image";
+        QDir dir;
+        //文件夹是否存在
+        if (!dir.exists(dirPath)) {
+            dir.mkdir(dirPath); //创建文件夹
+        }
+        //保存文件，文件名为当前年月日时分秒，后缀为png
+        QDateTime currentDateTime = QDateTime::currentDateTime();
+        QString fileName = currentDateTime.toString("yyyyMMddhhmmss.png");
+        if (pixmap.save(dirPath + "/" + fileName)) {
+            m_jsContent->insertImages(QStringList(dirPath + "/" + fileName));
+        }
     }
     //无图片文件，直接调用web端的粘贴事件
     m_webView->page()->triggerAction(QWebEnginePage::Paste);
@@ -139,6 +154,7 @@ void RichTextEdit::initWebView()
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_webView);
+    m_webView->installEventFilter(this);
 }
 
 /**
@@ -163,4 +179,32 @@ void RichTextEdit::onImgInsertClicked()
 void RichTextEdit::onPaste()
 {
     getImagePathsByClipboard();
+}
+
+/**
+ * @brief RichTextEdit::eventFilter
+ * 拦截web界面的Drop事件处理
+ * @param o
+ * @param e
+ * @return
+ */
+bool RichTextEdit::eventFilter(QObject *o, QEvent *e)
+{
+    if (o == m_webView) {
+        //web控件的Drop事件
+        if (e->type() == QEvent::Drop) {
+            QDropEvent *event = static_cast<QDropEvent *>(e);
+            // 获取文件路径
+            if (event->mimeData()->hasUrls()) {
+                QStringList paths;
+                //获取文件路径
+                for (auto url : event->mimeData()->urls()) {
+                    paths.push_back(url.path());
+                }
+                m_jsContent->insertImages(paths); //向web端发送路径
+            }
+            return true;
+        }
+    }
+    return QWidget::eventFilter(o, e);
 }
