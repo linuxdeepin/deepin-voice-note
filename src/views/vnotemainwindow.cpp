@@ -199,12 +199,6 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onMenuAbout2Show);
     connect(ActionManager::Instance()->detialContextMenu(), &DMenu::triggered,
             this, &VNoteMainWindow::onMenuAction);
-    connect(ActionManager::Instance()->voiceContextMenu(), &DMenu::triggered,
-            this, &VNoteMainWindow::onMenuAction);
-    connect(ActionManager::Instance()->pictureContextMenu(), &DMenu::triggered,
-            this, &VNoteMainWindow::onMenuAction);
-    connect(ActionManager::Instance()->txtContextMenu(), &DMenu::triggered,
-            this, &VNoteMainWindow::onMenuAction);
     //处理笔记拖拽释放
     connect(m_leftView, &LeftView::dropNotesEnd, this, &VNoteMainWindow::onDropNote);
     //处理详情页刷新请求
@@ -1252,54 +1246,12 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::NoteRename:
         editNote();
         break;
-        //    case ActionManager::DetailDelete: {
-        //        int ret = m_rightView->showWarningDialog();
-        //        if (ret == 1) {
-        //            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this);
-        //            if (VNoteBaseDialog::Accepted == confirmDialog.exec()) {
-        //                m_rightView->delSelectText();
-        //            }
-        //        } else if (ret == 0) {
-        //            m_rightView->delSelectText();
-        //        }
-
-        //    } break;
-        //    case ActionManager::NoteSaveText: {
-        //        m_middleView->saveAsText();
-        //    } break;
-        //    case ActionManager::NoteSaveVoice: {
-        //        m_middleView->saveRecords();
-        //    } break;
-        //    case ActionManager::DetailVoice2Text:
-        //        onA2TStart();
-        //        break;
-        //    case ActionManager::DetailSelectAll:
-        //        m_rightView->selectAllItem();
-        //        break;
-        //    case ActionManager::DetailCopy:
-        //        m_rightView->copySelectText();
-        //        break;
-        //    case ActionManager::DetailPaste:
-        //        m_rightView->pasteText();
-        //        break;
-        //    case ActionManager::DetailCut:
-        //        m_rightView->cutSelectText();
-        //        break;
-        //    case ActionManager::DetailVoiceSave:
-        //        m_rightView->saveMp3();
-        //        break;
-    case ActionManager::DetailText2Speech:
-        VTextSpeechAndTrManager::onTextToSpeech();
-        break;
-    case ActionManager::DetailStopreading:
-        VTextSpeechAndTrManager::onStopTextToSpeech();
-        break;
-    case ActionManager::DetailSpeech2Text:
-        VTextSpeechAndTrManager::onSpeechToText();
-        break;
-    case ActionManager::DetailTranslate:
-        VTextSpeechAndTrManager::onTextTranslate();
-        break;
+    case ActionManager::NoteSaveText: {
+        m_middleView->saveAsText();
+    } break;
+    case ActionManager::NoteSaveVoice: {
+        m_middleView->saveRecords();
+    } break;
     case ActionManager::NoteTop:
         m_middleView->noteStickOnTop();
         break;
@@ -1318,52 +1270,6 @@ void VNoteMainWindow::onMenuAction(QAction *action)
             }
         }
     } break;
-    case ActionManager::VoiceAsSave:
-        break;
-    case ActionManager::VoiceToText:
-        break;
-    case ActionManager::VoiceDelete:
-        break;
-    case ActionManager::VoiceSelectAll:
-        break;
-    case ActionManager::VoiceCopy:
-        break;
-    case ActionManager::VoiceCut:
-        break;
-    case ActionManager::VoicePaste:
-        break;
-    case ActionManager::PictureView:
-        break;
-    case ActionManager::PictureDelete:
-        break;
-    case ActionManager::PictureSelectAll:
-        break;
-    case ActionManager::PictureCopy:
-        break;
-    case ActionManager::PictureCut:
-        break;
-    case ActionManager::PicturePaste:
-        break;
-    case ActionManager::PictureSaveAs:
-        break;
-    case ActionManager::TxtDelete:
-        break;
-    case ActionManager::TxtSelectAll:
-        break;
-    case ActionManager::TxtCopy:
-        break;
-    case ActionManager::TxtCut:
-        break;
-    case ActionManager::TxtPaste:
-        break;
-    case ActionManager::TxtSpeech:
-        break;
-    case ActionManager::TxtStopreading:
-        break;
-    case ActionManager::TxtDictation:
-        break;
-    case ActionManager::TxtTranslate:
-        break;
     default:
         break;
     }

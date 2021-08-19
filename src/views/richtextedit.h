@@ -21,19 +21,56 @@
 #ifndef RICHTEXTEDIT_H
 #define RICHTEXTEDIT_H
 
+#include "widgets/vnoterightmenu.h"
+
 #include <QObject>
 #include <QTimer>
 #include <QtWebChannel/QWebChannel>
 #include <QtWebEngineWidgets/QWebEngineView>
+#include <QWebEngineContextMenuData>
 
 struct VNoteItem;
 class JsContent;
+
+class WebView : public QWebEngineView
+{
+    Q_OBJECT
+public:
+    explicit WebView(QWidget *parent = nullptr)
+        : QWebEngineView(parent)
+    {
+    }
+
+signals:
+    /**
+     * @brief QWebEngineView的右键信号
+     */
+    void sendMenuEvent(QContextMenuEvent *e);
+
+protected:
+    /**
+      * @brief 右键操作
+      * 拦截并屏蔽掉QWebEngineView的右键操作
+      */
+    void contextMenuEvent(QContextMenuEvent *e) override
+    {
+        emit sendMenuEvent(e);
+    }
+};
 
 class RichTextEdit : public QWidget
 {
     Q_OBJECT
 public:
     explicit RichTextEdit(QWidget *parent = nullptr);
+
+    enum Menu {
+        PictureMenu = 0,
+        VoiceMenu,
+        TxtMenu,
+        MaxMenu,
+    };
+
     /**
      * @brief 设置笔记内容
      * @param data: 笔记内容
@@ -77,17 +114,54 @@ public slots:
      * @brief ctrl+V事件
      */
     void onPaste();
+    /**
+     * @brief saveMenuParam 接收web弹出菜单类型及数据
+     * @param type  菜单类型
+     * @param x 弹出位置横坐标
+     * @param y 弹出位置纵坐标
+     * @param json  内容
+     */
+    void saveMenuParam(int m_menuType, int x, int y, const QVariant &json);
 
     /**
      * @brief 编辑区内容设置完成
      */
     void onSetDataFinsh();
+    /**
+     * @brief web端右键响应
+     */
+    void webContextMenuEvent(QContextMenuEvent *e);
+    /**
+     * @brief 右键菜单项点击响应
+     * @param action
+     */
+    void onMenuActionClicked(QAction *action);
 
 private:
     /**
      * @brief 初始化编辑区
      */
     void initWebView();
+    /**
+     * @brief 初始化右键菜单
+     */
+    void initRightMenu();
+    /**
+     * @brief 初始化信号连接
+     */
+    void initConnections();
+    /**
+     * @brief 文字菜单显示
+     */
+    void showTxtMenu();
+    /**
+     * @brief 图片菜单显示
+     */
+    void showPictureMenu();
+    /**
+     * @brief 语音菜单显示
+     */
+    void showVoiceMenu();
 
 protected:
     /**
@@ -100,9 +174,17 @@ private:
     QWebChannel *m_channel {nullptr};
     JsContent *m_jsContent {nullptr};
     QTimer *m_updateTimer {nullptr};
-    QWebEngineView *m_webView {nullptr};
+    WebView *m_webView {nullptr};
     bool m_textChange {false};
     QString m_searchKey {""};
+    QPoint m_menuPoint {};
+    Menu m_menuType = MaxMenu;
+    QVariant m_menuJson = {};
+
+    //右键菜单
+    VNoteRightMenu *m_pictureRightMenu {nullptr}; //图片右键菜单
+    VNoteRightMenu *m_voiceRightMenu {nullptr}; //语音右键菜单
+    VNoteRightMenu *m_txtRightMenu {nullptr}; //文字右键菜单
 };
 
 #endif // RICHTEXTEDIT_H
