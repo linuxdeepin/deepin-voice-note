@@ -321,3 +321,18 @@ ol>li, ul>li {
 .note-editable {
     padding: 0 15px 0 30px;
 }
+.note-editable img{
+    padding: 2px!important;
+    margin: 2px!important;
+
+}
+.slopingside{
+    height:0px;
+    border: 1px solid red;
+    width: 20px;
+    transform:rotate(45deg);
+ 
+}
+
+
+

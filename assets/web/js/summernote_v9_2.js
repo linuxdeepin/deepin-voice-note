@@ -118,13 +118,16 @@
             var buttons = [];
             for (var col = 0, colSize = colors.length; col < colSize; col++) {
                 var color = colors[col];
+
                 buttons.push([
                     '<button type="button" class="note-color-btn"',
                     'style="background-color:', color, '" ',
                     'data-event="', eventName, '" ',
                     'data-value="', color, '" ',
-                    'title="', color, '" ',
-                    'data-toggle="button" tabindex="-1"></button>'
+                    'title="', color == 'transparent' ? '透明' : color, '" ',
+                    'data-toggle="button" tabindex="-1">',
+                    color == 'transparent' ? '<div class="slopingside"></div>' : '',
+                    '</button>'
                 ].join(''));
             }
             contents.push('<div class="note-color-row">' + buttons.join('') + '</div>');
@@ -3005,21 +3008,34 @@
          * @param {String} listName - OL or UL
          */
         Bullet.prototype.toggleList = function (listName, editable) {
+
             var _this = this;
             var rng = range.create(editable).wrapBodyInlineWithPara();
             var paras = rng.nodes(dom.isPara, { includeAncestor: true });
             var bookmark = rng.paraBookmark(paras);
             var clustereds = lists.clusterBy(paras, func.peq2('parentNode'));
+            console.log(paras)
             // paragraph to list
+            // 判断list是否有p标签
             if (lists.find(paras, dom.isPurePara)) {
                 var wrappedParas_1 = [];
+                let allLi = null
                 $$1.each(clustereds, function (idx, paras) {
-                    wrappedParas_1 = wrappedParas_1.concat(_this.wrapList(paras, listName));
+                    console.log()
+                    let content = _this.wrapList(paras, listName);
+                    // if (allLi) {
+                    // } else {
+                    //     allLi = content
+                    // }
+                    wrappedParas_1 = wrappedParas_1.concat(content);
                 });
                 paras = wrappedParas_1;
+                console.log(paras)
+
                 // list to paragraph or change list style
             }
             else {
+                console.log('没有p标签');
                 var diffLists = rng.nodes(dom.isList, {
                     includeAncestor: true
                 }).filter(function (listNode) {
@@ -3049,7 +3065,9 @@
             var listNode = prevList || dom.insertAfter(dom.create(listName || 'UL'), last);
             // P to LI
             paras = paras.map(function (para) {
+
                 return dom.isPurePara(para) ? dom.replace(para, 'LI') : para;
+
             });
             // append to list(<ul>, <ol>)
             dom.appendChildNodes(listNode, paras);
@@ -4926,9 +4944,10 @@
                     h: $image.outerHeight(false)
                 };
                 $selection.css({
-                    display: 'block',
+                    // display: 'block',
                     left: pos.left,
                     top: pos.top,
+
                     width: imageSize.w,
                     height: imageSize.h
                 }).data('target', $image); // save current image element.
@@ -4936,6 +4955,7 @@
                 origImageObj.src = $image.attr('src');
                 var sizingText = imageSize.w + 'x' + imageSize.h + ' (' + this.lang.image.original + ': ' + origImageObj.width + 'x' + origImageObj.height + ')';
                 $selection.find('.note-control-selection-info').text(sizingText);
+                $selection.attr('data-img-url', $image.attr('src'))
                 this.context.invoke('editor.saveTarget', target);
             }
             else {
@@ -5883,19 +5903,14 @@
                     this.ui.dropdown({
                         items: (backColor ? [
                             '<div class="note-palette">',
-                            // '  <div class="note-palette-title">' + this.lang.color.background + '</div>',
-                            '  <div>',
-                            '    <button type="button" class="note-color-reset btn btn-light" data-event="backColor" data-value="inherit">',
-                            "无填充色",
-                            '    </button>',
-                            '  </div>',
+                            // '  <div>',
+                            // '    <button type="button" class="note-color-reset btn btn-light" data-event="backColor" data-value="inherit">',
+                            // "无填充色",
+                            // '    </button>',
+                            // '  </div>',
                             '  <div class="note-holder" data-event="backColor"/>',
                             '  <div class="colorFont">',
                             '  最近使用',
-                            // '    <button type="button" class="note-color-select btn" data-event="openPalette" data-value="backColorPicker">',
-                            // '  <img src="./img/plan.svg" alt="">',
-                            // '    </button>',
-                            // '    <input type="color" id="backColorPicker" class="note-btn note-color-select-btn" value="' + this.options.colorButton.backColor + '" data-event="backColorPalette">',
                             '  </div>',
                             '  <div class="note-holder-custom" id="backColorPalette" data-event="backColor"/>',
                             '  <div class="colorFont planButton">',
@@ -5940,7 +5955,7 @@
                                     colorsName: _this.options.colorsName,
                                     eventName: $holder.data('event'),
                                     container: _this.options.container,
-                                    tooltip: _this.options.tooltip
+                                    tooltip: _this.options.tooltip == 'transparent' ? '透明' : _this.options.tooltip
                                 }).render());
                             });
                             /* TODO: do we have to record recent custom colors within cookies? */
@@ -6445,6 +6460,7 @@
             this.context.invoke('editor.saveRange');
             this.showImageDialog().then(function (data) {
                 // [workaround] hide dialog before restore range for IE range focus
+                console.log('image')
                 _this.ui.hideDialog(_this.$dialog);
                 _this.context.invoke('editor.restoreRange');
                 if (typeof data === 'string') {
@@ -6876,7 +6892,7 @@
                 'summernote.keyup summernote.mouseup summernote.scroll ': function (e) {
                     let sel = window.getSelection();
                     // summernote.contextmenu
-
+                    // console.log(sel)
                     setTimeout(function () {
                         _this.update();
                     }, 10)
@@ -7369,11 +7385,6 @@
             var methodName = hasSeparator ? lists.last(splits) : lists.head(splits);
             var module = this.modules[moduleName || 'editor'];
 
-            if (namespace == 'editor.backColor') {
-                console.log(moduleName, methodName, module)
-            }
-
-
             if (!moduleName && this[methodName]) {
                 return this[methodName].apply(this, args);
             }
@@ -7516,10 +7527,10 @@
             fontSizes: ['8', '9', '10', '11', '12', '14', '18', '24', '36'],
             // pallete colors(n x n)
             colors: [
-                ['#000000', '#424242', '#636363', '#9C9C94', '#CEC6CE', '#EFEFEF', '#F7F7F7', '#FFFFFF'],
+                ['transparent', '#424242', '#636363', '#9C9C94', '#CEC6CE', '#EFEFEF', '#F7F7F7', '#FFFFFF'],
                 ['#FF0000', '#FF9C00', '#FFFF00', '#00FF00', '#00FFFF', '#0000FF', '#9C00FF', '#FF00FF'],
                 ['#F7C6CE', '#FFE7CE', '#FFEFC6', '#D6EFD6', '#CEDEE7', '#CEE7F7', '#D6D6E7', '#E7D6DE'],
-                ['#E79C9C', '#FFC69C', '#FFE79C', '#B5D6A5', '#A5C6CE', '#9CC6EF', '#B5A5D6', '#D6A5BD'],
+                ['#E79C9C', '#FFC69C', '#FFE79C', '#B5D6A5', '#A5C6CE', '#9CC6EF', '#B5A5D6', '#000000'],
 
             ],
             colorButton: {

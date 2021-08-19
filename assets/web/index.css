@@ -1,93 +1,104 @@
-
-    body{
-        /* -webkit-user-select: none;
+body {
+    /* -webkit-user-select: none;
         -khtml-user-select: none;
         -moz-user-select: none;
         -o-user-select: none;
         user-select: none; */
-        padding:0px;
-    }
-    /* .mian{
+    padding: 0px;
+}
+
+/* .mian{
         width: 620px;
         margin: 100px auto;
         position: relative;
         height: 500px;
         overflow-y: auto;
     } */
-    /* .list{ */
-        /* width: 500px;
+
+/* .list{ */
+
+/* width: 500px;
         height: 50px;
         background: red;    */
-    /* } */
-    /* .item{
+
+/* } */
+
+/* .item{
         width: 100px;
         height: 30px;
         background: blue;
     } */
-    .demo{
-        /* display: inline-block; */
-        /* text-align: center; */
-        /* white-space: nowrap; */
-        /* cursor: pointer !important; */
-        /* display: flex;
+
+.demo {
+    /* display: inline-block; */
+    /* text-align: center; */
+    /* white-space: nowrap; */
+    /* cursor: pointer !important; */
+    /* display: flex;
         justify-content: space-between; */
-        padding: 12px 0;
-        margin: 10px 0;
-        border-radius: 10px;
-        box-sizing: border-box;
-        /* -webkit-user-drag: element; */
-        /* user-select: none; */
-        
-    }
-    .demo>div{
-        display: inline-block;
-        vertical-align: bottom;
-    }
-    .lr {
-        float: right;
-        margin: 0px 20px 0 0;
-    }
-    .li{
-        background: rgba(0,0,0,0.05);
-        min-height: 30px;
-        border-radius: 8px;
-        user-select: none;
-     
+    padding: 12px 0;
+    margin: 10px 0;
+    border-radius: 10px;
+    box-sizing: border-box;
+    /* -webkit-user-drag: element; */
+    /* user-select: none; */
+}
 
-    }
-    #demo{
-        width: 100%;
-        box-sizing: border-box;
-    }
-    .active{
-        background: rgba(0,129,255,0.5)!important; 
-    }
+.demo>div {
+    display: inline-block;
+    vertical-align: bottom;
+}
 
-    .voicebtn{
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        background-color: #0183FF;
-        margin: 0 20px 0 20px;
-        cursor: pointer;
-        overflow: hidden;
-    }
-     .voicebtn.play{
-        background-image:url(./img/play.svg);
-        background-size: contain;
-    }
-     .voicebtn.pause{
-        background-image:url(./img/pause.svg);
-        background-size: contain;
-    }
-    /* .right{
+.lr {
+    float: right;
+    margin: 0px 20px 0 0;
+}
+
+.li {
+    background: rgba(0, 0, 0, 0.05);
+    min-height: 30px;
+    border-radius: 8px;
+    /* user-select: none; */
+}
+
+#demo {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.active {
+    background: rgba(51, 143, 255, 0.5)!important;
+}
+
+.voicebtn {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    background-color: #0183FF;
+    margin: 0 20px 0 20px;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.voicebtn.play {
+    background-image: url(./img/play.svg);
+    background-size: contain;
+}
+
+.voicebtn.pause {
+    background-image: url(./img/pause.svg);
+    background-size: contain;
+}
+
+/* .right{
         display: flex;
         justify-content: space-between;
         flex: 1;
         justify-items: end;
         padding-top: 12px;
     } */
-    /* .list{
+
+/* .list{
         width: 100%;
         user-select: none;
     }
@@ -99,81 +110,103 @@
     .list.active{
         background-color: aqua;
     }  */
-    .title{
-        color:rgba(0,26,46,1);
-        font-size:14px;
-        line-height:16px;
-    }
-    .minute{
-        color:rgba(138,161,180,1);
-        font-size:12px;
-        line-height:12px;
-        margin-top: 5px;
-    }
- 
 
-    .time{
-        color:rgba(65,77,104,1);
-        font-size:12px;
-        line-height:12px;
-    }
-    .padtop{
-        padding-top: 6px;
-    }
-    .translate{
-        padding: 0 20px;
-        line-height: 20px;
-        font-size: 12px;
-    }
-    .translate>p{
-        text-align: center;
-        padding: 10px 0;
-    }
-    .translate>div{
-        padding:10px 0;
-    }
-    .icon{
-        height: 21px;
-        position: relative;
-    }
-    .wifi-symbol{
-        position: relative;
-    }
-    .wifi-circle{
-        position: absolute;
-        left: 0;
-        top: 0; 
-    }
+.title {
+    color: rgba(0, 26, 46, 1);
+    font-size: 14px!important;
+    line-height: 16px;
+}
 
-    .wifi-symbol .first{
-        background-image: url(./img/play_voice1.svg);
-        background-size: contain;
-        width: 19px;
-        height: 17px;
-    }
+.minute {
+    color: rgba(138, 161, 180, 1);
+    font-size: 12px!important;
+    line-height: 12px;
+    margin-top: 5px;
+}
 
-    .wifi-symbol .second{
-        background-image: url(./img/play_voice2.svg);
-        background-size: contain;
-        width: 19px;
-        height: 17px;
-    }
+.time {
+    color: rgba(65, 77, 104, 1);
+    font-size: 12px!important;
+    line-height: 12px;
+}
 
-    .wifi-symbol .third{
-        background-image: url(./img/play_voice3.svg);
-        background-size: contain;
-        width: 19px;
-        height: 17px;
-    }
+/* 字体大小固定 */
 
-    .wifi-symbol .four{
-        background-image: url(./img/play_voice4.svg);
-        background-size: contain;
-        width: 19px;
-        height: 17px;
-    }
+.title span {
+    font-size: 14px!important;
+}
 
-    /* .wifi-symbol .first{
+.minute span {
+    font-size: 12px!important;
+}
+
+.time span {
+    font-size: 12px!important;
+}
+
+.padtop {
+    padding-top: 6px;
+}
+
+.translate {
+    padding: 0 20px;
+    line-height: 20px;
+    font-size: 12px;
+}
+
+.translate>p {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.translate>div {
+    padding: 10px 0;
+}
+
+.icon {
+    height: 21px;
+    position: relative;
+}
+
+.wifi-symbol {
+    position: relative;
+}
+
+.wifi-circle {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.wifi-symbol .first {
+    background-image: url(./img/play_voice1.svg);
+    background-size: contain;
+    width: 19px;
+    height: 17px;
+}
+
+.wifi-symbol .second {
+    background-image: url(./img/play_voice2.svg);
+    background-size: contain;
+    width: 19px;
+    height: 17px;
+}
+
+.wifi-symbol .third {
+    background-image: url(./img/play_voice3.svg);
+    background-size: contain;
+    width: 19px;
+    height: 17px;
+}
+
+.wifi-symbol .four {
+    background-image: url(./img/play_voice4.svg);
+    background-size: contain;
+    width: 19px;
+    height: 17px;
+}
+
+/* .wifi-symbol .first{
         background-image: url(./img/play_voice1.svg);
         background-size: contain;
         width: 24px;
@@ -204,15 +237,17 @@
         opacity: 0;
     }
     */
-    @keyframes fadeInOut {
-        0% {
-            opacity: 0; /*初始状态 透明度为0/
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        /*初始状态 透明度为0/
         }
         100% {
             opacity: 1; /*结尾状态 透明度为1*/
-        }
-    } 
-.noselect{
-    user-select: none;
+    }
 }
 
+.noselect {
+    user-select: none;
+}

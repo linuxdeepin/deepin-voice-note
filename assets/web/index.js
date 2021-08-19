@@ -98,11 +98,11 @@ $('#summernote').summernote({
 
     },
     airMode: true,
-
+  
 });
 // 监听窗口变化
 $(window).resize(function () {
-    $('.note-editable').height($(window).height())
+    $('.note-editable').css('min-height', $(window).height())
 
 });
 //设置全屏模式
@@ -110,8 +110,6 @@ $(window).resize(function () {
 
 //捕捉change事件
 $('#summernote').on('summernote.change', function (we, contents, $editable) {
-
-
     if (webobj && initFinish) {
         console.log('---------->change');
         webobj.jsCallTxtChange();
@@ -122,11 +120,11 @@ function isNoteNull() {
     return $('.note-editable').html() === '<p><br></p>'
 }
 // 监听键盘删除事件
-$('body').on('keydown', function (e) {
-    if (e.keyCode == 8 && isNoteNull()) {
-        e.preventDefault()
-    }
-})
+// $('body').on('keydown', function (e) {
+//     if (e.keyCode == 8 && isNoteNull()) {
+//         e.preventDefault()
+//     }
+// })
 //选中录音
 $('body').on('click', '.li', function (e) {
     console.log('div click...');
@@ -239,7 +237,7 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsSetPlayStatus.connect(toggleState);
         webobj.callJsSetHtml.connect(setHtml);
         webobj.callJsSetVoiceText.connect(setVoiceText);
-
+        webobj.callJsInsertImages.connect(insertImg);
         //通知QT层完成通信绑定
         webobj.jsCallChannleFinish();
     }
@@ -275,6 +273,8 @@ function initData(text) {
     })
 
     $('#summernote').summernote('code', html);
+    // 搜索功能
+    webobj.jsCallSetDataFinsh();
     initFinish = true;
 }
 
@@ -288,24 +288,25 @@ function insertVoiceItem(text) {
     oA.contentEditable = false;
     oA.setAttribute('jsonKey', text);
     oA.innerHTML = voiceHtml;
-    // $('#summernote').summernote('saveRange');
 
     var tmpNode = document.createElement("div");
     tmpNode.appendChild(oA.cloneNode(true));
-    var str = tmpNode.innerHTML + '<p><br></p>';
+    var str = '<p><br></p>' + tmpNode.innerHTML + '<p><br></p>';
 
+    // $('#summernote').summernote('saveRange');
     // $('#summernote').summernote('insertNode', oA);
-    document.execCommand('insertHTML', false, str);
-    
-    addBrNullP()
     // $('#summernote').summernote('restoreRange');
+    document.execCommand('insertHTML', false, str);
+
+    addBrNullP()
 }
 
 // 空段落加br
 function addBrNullP() {
     $('p').each((index, item) => {
         if (item.innerHTML === '') {
-            $(item).html('<br>');
+            // $(item).html('<br>');
+            $(item).remove();
         }
     })
 
@@ -340,7 +341,9 @@ function setHtml(html) {
     console.log('--setHtml---');
     $('#summernote').summernote('code', html);
     initFinish = true;
-    changeColor(1)
+    changeColor(1);
+    // 搜索功能
+    webobj.jsCallSetDataFinsh();
 }
 
 //设置录音转文字内容 flag: 0: 转换过程中 提示性文本（＂正在转文字中＂)１:结果 文本,空代表转失败了
@@ -429,29 +432,63 @@ function voicePlay(bIsPaly) {
         }, 400);
     }
 }
-// 鼠标右键事件
-$('body').on('contextmenu', '.demo', function (e) {
+
+// 图片右键
+$('body').on('contextmenu', '.note-control-selection', function (e) {
+    console.log("图片右键点击")
+    console.log($(e.currentTarget).attr('data-img-url'))
     e.preventDefault()
-    // e.stopPropagation();
-    var jsonString = $(this).parents('.li:first').attr('jsonKey');
-    webobj.jsCallPopVoiceMenu(jsonString);
-    // 当前没有语音在转文字时， 才可以转文字
-    if (bTransVoiceIsReady) {
-        activeTransVoice = $(this).parents('.li:first');
-    }
-
-    //    $('#summernote').summernote('airPopover.rightUpdate')
-    $('#summernote').summernote('airPopover.hide')
-
-    var sel = window.getSelection();
-    sel.removeAllRanges();
 
 })
-//关闭右键菜单
-//  window.onclick = function (e) {
-//     //用户触发click事件就可以关闭了，因为绑定在window上，按事件冒泡处理，不会影响菜单的功能
-//     document.querySelector('.voiceRightMouse').style.height = 0;
-// }
+
+// 0图片 1语音 2文本
+$('body').on('contextmenu', function (e) {
+    let type = null;
+    let json = null;
+    let x = e.pageX
+    let y = e.pageY
+    if (e.target.tagName == 'IMG') {
+        type = 0;
+        let imgUrl = $(e.target).attr('src')
+        let img = e.target
+        img.focus();
+        // 设置选区
+        var range = document.createRange();
+        range.selectNode(img);
+        // range.collapse(true);
+        var sel = window.getSelection();
+        if (sel.anchorOffset == 0) {
+            sel.removeAllRanges();
+            sel.addRange(range);
+        };
+        console.log("图片右键点击")
+        console.log(imgUrl)
+        json = imgUrl
+
+    } else if ($(e.target).hasClass('demo') || $(e.target).parents('.demo').length != 0) {
+        type = 1;
+        console.log('语音右键点击')
+        // e.stopPropagation();
+        var jsonString = JSON.parse($(e.target).parents('.li:first').attr('jsonKey'));
+        json = jsonString
+        // 当前没有语音在转文字时， 才可以转文字
+        if (bTransVoiceIsReady) {
+            activeTransVoice = $(this).parents('.li:first');
+        }
+        // $('#summernote').summernote('airPopover.rightUpdate')
+        $('#summernote').summernote('airPopover.hide')
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+    } else {
+        json = ''
+        type = 2;
+        console.log("文本右键点击")
+    }
+    webobj.jsCallPopupMenu(type, x, y, json);
+    // e.preventDefault()
+
+})
+
 
 // 颜色模式 1浅色 2深色
 function changeColor(flag) {
@@ -558,5 +595,11 @@ function changeIconColor(color) {
 
             $('.' + item).addClass(color)
         }
+    })
+}
+// 插入图片
+function insertImg(urlStr) {
+    urlStr.forEach((item, index) => {
+        $("#summernote").summernote('insertImage', item, 'img');
     })
 }
