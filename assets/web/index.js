@@ -9,13 +9,14 @@
 // const QString getAllNote();获取所有语音列表的Json
 //
 
-
-//js 调用c++接口
-
+// 注册右键点击事件
+$('body').on('contextmenu', rightClick)
+// 注册内容改变事件
+$('#summernote').on('summernote.change', changeContent);
 
 var h5Tpl = `
-    <div class="li" contenteditable="false" jsonKey="{{jsonValue}}">
-        <div>
+    <div class="li voiceBox" contenteditable="false" jsonKey="{{jsonValue}}">
+        <div class='voiceInfoBox'>
             <div class="demo" >              
                 <div class="voicebtn play"></div>
                 <div class="lf">
@@ -40,8 +41,7 @@ var h5Tpl = `
     </div>`;
 
 var nodeTpl = `
-   
-        <div>
+        <div class='voiceInfoBox'>
             <div class="demo" >
                 <div class="voicebtn play"></div>
                 <div class="lf">
@@ -66,7 +66,6 @@ var nodeTpl = `
 
 var formatHtml = ''
 var pasteData = "";
-
 var webobj;    //js与qt通信对象
 var activeVoice = null;  //当前正操作的语音对象
 var activeTransVoice = null;  //执行语音转文字对象
@@ -74,11 +73,9 @@ var bTransVoiceIsReady = true;  //语音转文字是否准备好
 var initFinish = false;
 var voiceIntervalObj;    //语音播放动画定时器对象
 
-//设置默认焦点， 不可拖拽， 
+// 初始化summernote
 $('#summernote').summernote({
-    minHeight: $(window).height(),             // set minimum height of editor
-    maxHeight: null,             // set maximum height of editor
-    focus: true,                  // set focus to editable area after initializin
+    focus: true,
     disableDragAndDrop: true,
     shortcuts: false,
     lang: 'zh-CN',
@@ -93,49 +90,48 @@ $('#summernote').summernote({
             ['strikethrough', ['strikethrough']],
             ['ul', ['ul']],
             ['ol', ['ol']],
-
         ],
-
     },
     airMode: true,
-  
 });
-// 监听窗口变化
+
+// 监听窗口大小变化
 $(window).resize(function () {
     $('.note-editable').css('min-height', $(window).height())
-
 });
-//设置全屏模式
-// $('#summernote').summernote('fullscreen.toggle');
 
-//捕捉change事件
-$('#summernote').on('summernote.change', function (we, contents, $editable) {
+/**
+ * 通知后台存储页面内容
+ * @date 2021-08-19
+ * @param {any} we
+ * @param {any} contents
+ * @param {any} $editable
+ * @returns {any}
+ */
+function changeContent(we, contents, $editable) {
     if (webobj && initFinish) {
-        console.log('---------->change');
         webobj.jsCallTxtChange();
     }
-});
-// 判断是否为空
+}
+
+// 判断编辑区是否为空
 function isNoteNull() {
     return $('.note-editable').html() === '<p><br></p>'
 }
-// 监听键盘删除事件
-// $('body').on('keydown', function (e) {
-//     if (e.keyCode == 8 && isNoteNull()) {
-//         e.preventDefault()
-//     }
-// })
-//选中录音
+
+//点击选中录音
 $('body').on('click', '.li', function (e) {
     console.log('div click...');
     e.stopPropagation();
     $('.li').removeClass('active');
     // $(this).addClass('active');
 })
+
 // 取消选中
 $('body').on('click', function () {
     $('.li').removeClass('active');
 })
+
 // 语音复制粘贴
 document.addEventListener('copy', function (event) {
     var selectionObj = window.getSelection();
@@ -157,6 +153,7 @@ document.addEventListener('paste', function (event) {
         event.preventDefault();
     }
 });
+
 //播放
 $('body').on('click', '.voicebtn', function (e) {
     console.log('------playBtn click...');
@@ -173,7 +170,6 @@ $('body').on('click', '.voicebtn', function (e) {
         //TODO 录音错误处理
     });
 })
-
 
 //获取整个处理后Html串,去除所有标签中临时状态
 function getHtml() {
@@ -205,16 +201,6 @@ function getAllNote() {
     jsonObj.noteDatas = jsonArray;
     var retJson = JSON.stringify(jsonObj);
     return retJson;
-}
-
-//当前记事本是否有语音
-function bHaveNote() {
-    var noteList = $('.li');
-    var bFlag = false;
-    if (noteList.length > 0) {
-        bFlag = true;
-    }
-    return bFlag;
 }
 
 //获取当前选中录音json串
@@ -284,7 +270,7 @@ function insertVoiceItem(text) {
     var arr = JSON.parse(text);
     var voiceHtml = transHtml(arr, true);
     var oA = document.createElement('div');
-    oA.className = 'li';
+    oA.className = 'li voiceBox';
     oA.contentEditable = false;
     oA.setAttribute('jsonKey', text);
     oA.innerHTML = voiceHtml;
@@ -297,23 +283,29 @@ function insertVoiceItem(text) {
     // $('#summernote').summernote('insertNode', oA);
     // $('#summernote').summernote('restoreRange');
     document.execCommand('insertHTML', false, str);
-
-    addBrNullP()
+    removeNullP()
 }
 
-// 空段落加br
-function addBrNullP() {
+/**
+ * 移除无内容p标签
+ * @date 2021-08-19
+ * @returns {any}
+ */
+function removeNullP() {
     $('p').each((index, item) => {
         if (item.innerHTML === '') {
-            // $(item).html('<br>');
             $(item).remove();
         }
     })
 
 }
 
-
-//播放状态，0,播放中，1暂停中，2.结束播放
+/**
+ * 切换播放状态
+ * @date 2021-08-19
+ * @param {string} state 0,播放中，1暂停中，2.结束播放
+ * @returns {any}
+ */
 function toggleState(state) {
     console.log('---toggleState--', state);
     if (state == '0') {
@@ -335,10 +327,14 @@ function toggleState(state) {
     enableSummerNote();
 }
 
-//设置整个html内容
+/**
+ * 设置整个html内容
+ * @date 2021-08-19
+ * @param {string} html
+ * @returns {any}
+ */
 function setHtml(html) {
     initFinish = false;
-    console.log('--setHtml---');
     $('#summernote').summernote('code', html);
     initFinish = true;
     changeColor(1);
@@ -433,21 +429,20 @@ function voicePlay(bIsPaly) {
     }
 }
 
-// 图片右键
-$('body').on('contextmenu', '.note-control-selection', function (e) {
-    console.log("图片右键点击")
-    console.log($(e.currentTarget).attr('data-img-url'))
-    e.preventDefault()
-
-})
-
-// 0图片 1语音 2文本
-$('body').on('contextmenu', function (e) {
+/**
+ * 右键功能
+ * @date 2021-08-19
+ * @param {any} e
+ * @returns {any} 
+ * type: 0图片 1语音 2文本
+ */
+function rightClick(e) {
     let type = null;
     let json = null;
-    let x = e.pageX
-    let y = e.pageY
+    let x = e.clientX
+    let y = e.clientY
     if (e.target.tagName == 'IMG') {
+        // 图片右键
         type = 0;
         let imgUrl = $(e.target).attr('src')
         let img = e.target
@@ -461,16 +456,12 @@ $('body').on('contextmenu', function (e) {
             sel.removeAllRanges();
             sel.addRange(range);
         };
-        console.log("图片右键点击")
-        console.log(imgUrl)
         json = imgUrl
 
     } else if ($(e.target).hasClass('demo') || $(e.target).parents('.demo').length != 0) {
+        // 语音右键
         type = 1;
-        console.log('语音右键点击')
-        // e.stopPropagation();
-        var jsonString = JSON.parse($(e.target).parents('.li:first').attr('jsonKey'));
-        json = jsonString
+        json = $(e.target).parents('.li:first').attr('jsonKey')
         // 当前没有语音在转文字时， 才可以转文字
         if (bTransVoiceIsReady) {
             activeTransVoice = $(this).parents('.li:first');
@@ -479,20 +470,25 @@ $('body').on('contextmenu', function (e) {
         $('#summernote').summernote('airPopover.hide')
         var sel = window.getSelection();
         sel.removeAllRanges();
+
     } else {
+        // 文本右键
         json = ''
         type = 2;
-        console.log("文本右键点击")
+
     }
     webobj.jsCallPopupMenu(type, x, y, json);
+    // 阻止默认右键事件
     // e.preventDefault()
+}
 
-})
-
-
-// 颜色模式 1浅色 2深色
+/**
+ * 深色浅色变换
+ * @date 2021-08-19
+ * @param {any} flag 1浅色 2深色
+ * @returns {any}
+ */
 function changeColor(flag) {
-    let nameList = ['bold', 'italic', 'underline', 'strikethrough', 'forecolor', 'backcolor', 'ul', 'ol']
     if (flag == 1) {
         $('body').css({
             'background': 'rgba(255,255,255,1)',
@@ -519,13 +515,6 @@ function changeColor(flag) {
         $('.note-icon-caret').css({
             "color": 'rgba(65,77,104,1)'
         })
-        // nameList.forEach((item, index) => {
-        //     if ($('.note-btn-' + item).length) {
-        //         $('.note-btn-' + item).find('img').attr('src', './img/' + item + '.svg')
-        //     } else {
-        //         $('.' + item + 'Img').attr('src', './img/' + item + '.svg')
-        //     }
-        // })
         $('.dropdown-menu').css({
             "background": 'rgba(247,247,247,1)'
         })
@@ -556,18 +545,9 @@ function changeColor(flag) {
         $('.note-icon-caret').css({
             "color": 'rgba(197,207,224,1)'
         })
-
         $('.note-popover .popover-content i').css({
             "color": '#C5CFE0'
         })
-
-        // nameList.forEach((item, index) => {
-        //     if ($('.note-btn-' + item).length) {
-        //         $('.note-btn-' + item).find('img').attr('src', './img/' + item + '_dark.svg')
-        //     } else {
-        //         $('.' + item + 'Img').attr('src', './img/' + item + '_dark.svg')
-        //     }
-        // })
         $('.dropdown-menu').css({
             "background": 'rgba(42,42,42,1)'
         })
@@ -581,10 +561,15 @@ function changeColor(flag) {
     }
 
 }
-// 改变图标颜色
+
+/**
+ * 改变icon图标颜色
+ * @date 2021-08-19
+ * @param {any} color
+ * @returns {any}
+ */
 function changeIconColor(color) {
     let iconList = ['icon-strikethrough', 'icon-bold', 'icon-italic', 'icon-underline', 'icon-forecolor', 'icon-backcolor', 'icon-ul', 'icon-ol']
-
     iconList.forEach((item, index) => {
         if (item == 'icon-forecolor') {
             $('.' + item + ' .path3').addClass(color)
@@ -592,12 +577,17 @@ function changeIconColor(color) {
             $('.' + item + ' .path1,.path2,.path3,.path4').addClass(color)
         }
         else {
-
             $('.' + item).addClass(color)
         }
     })
 }
-// 插入图片
+
+/**
+ * 插入图片
+ * @date 2021-08-19
+ * @param {any} urlStr 图片地址list
+ * @returns {any}
+ */
 function insertImg(urlStr) {
     urlStr.forEach((item, index) => {
         $("#summernote").summernote('insertImage', item, 'img');

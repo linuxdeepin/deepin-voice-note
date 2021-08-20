@@ -54,17 +54,7 @@ body {
     border: none;
 }
 
-.voiceBox {
-    background-color: #F3F3F3;
-    padding: 10px 0;
-    border-radius: 10px;
-    margin: 10px 0;
-}
 
-.voiceBox>div {
-    display: inline-block;
-    vertical-align: bottom;
-}
 
 .playImgBg {
     margin: 0 20px 0 20px;
@@ -106,7 +96,7 @@ body {
 
 p {
     margin: 0!important;
-    line-height: 24px;
+    /* line-height: 24px; */
 }
 
 .voiceRightMouse {
@@ -129,11 +119,6 @@ p {
     padding: 0px !important;
     border-radius: 6px;
 }
-
-/* .note-popover .popover-content .note-color .dropdown-toggle, .panel-heading.note-toolbar .note-color .dropdown-toggle {
-    padding-left: 0px !important;
-    padding-right: 0px !important;
-} */
 
 .note-popover .popover-content .note-color .dropdown-toggle {
     width: auto;
@@ -259,9 +244,12 @@ p {
 .planPoa {
     height: 250px;
 }
-
+ol,ul{
+    margin-bottom: 0px;
+}
 ol>li, ul>li {
     padding-right: 30px;
+    /* line-height: 24px; */
 }
 
 .dropdown-fontsize {

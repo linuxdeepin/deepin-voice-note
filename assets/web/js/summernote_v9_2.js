@@ -100,7 +100,7 @@
         $node.html(markup);
     });
     var dropdownButtonContents = function (contents, options) {
-        return contents + ' ' + icon(options.icons.caret, 'span');
+        return contents + ' ' + icon(options.icons.down, 'span');
     };
     var dropdownCheck = renderer.create('<div class="dropdown-menu note-check">', function ($node, options) {
         var markup = $$1.isArray(options.items) ? options.items.map(function (item) {
@@ -2225,6 +2225,9 @@
                 if (dom.isEditable(point.node)) {
                     return;
                 }
+                if ($(point.node).parents('.voiceBox').length != 0) {
+                    return;
+                }
                 var node;
                 if (fullyContains) {
                     if (dom.isLeftEdgePoint(point)) {
@@ -2240,6 +2243,7 @@
                 else {
                     node = point.node;
                 }
+
                 if (node && pred(node)) {
                     nodes.push(node);
                 }
@@ -2503,7 +2507,25 @@
          */
         WrappedRange.prototype.getClientRects = function () {
             var nativeRng = this.nativeRange();
-            return nativeRng.getClientRects();
+            let result = nativeRng.getClientRects();
+            if (result.length == 0 && nativeRng.startContainer) {
+                console.log($(nativeRng.startContainer))
+                result = []
+                let height = $(nativeRng.startContainer).height()
+                let left = $(nativeRng.startContainer).offset().left - $(document).scrollLeft()
+                let top = $(nativeRng.startContainer).offset().top - $(document).scrollTop()
+                result.push({
+                    bottom: top + height,
+                    height: height,
+                    left: left,
+                    right: left,
+                    top: top,
+                    width: 0,
+                    x: left,
+                    y: top,
+                })
+            }
+            return result
         };
         return WrappedRange;
     }());
@@ -3014,23 +3036,23 @@
             var paras = rng.nodes(dom.isPara, { includeAncestor: true });
             var bookmark = rng.paraBookmark(paras);
             var clustereds = lists.clusterBy(paras, func.peq2('parentNode'));
-            console.log(paras)
+            // 屏蔽语音文件序列化
+            let isVoice = paras.find((item) => {
+                return $(item).hasClass('voiceBox')
+            })
+            if (isVoice) {
+                return;
+            }
             // paragraph to list
             // 判断list是否有p标签
             if (lists.find(paras, dom.isPurePara)) {
+
                 var wrappedParas_1 = [];
-                let allLi = null
                 $$1.each(clustereds, function (idx, paras) {
-                    console.log()
                     let content = _this.wrapList(paras, listName);
-                    // if (allLi) {
-                    // } else {
-                    //     allLi = content
-                    // }
                     wrappedParas_1 = wrappedParas_1.concat(content);
                 });
                 paras = wrappedParas_1;
-                console.log(paras)
 
                 // list to paragraph or change list style
             }
@@ -6892,12 +6914,13 @@
                 'summernote.keyup summernote.mouseup summernote.scroll ': function (e) {
                     let sel = window.getSelection();
                     // summernote.contextmenu
-                    // console.log(sel)
+                    console.log(sel)
                     setTimeout(function () {
                         _this.update();
                     }, 10)
                 },
                 'summernote.contextmenu': function (e) {
+                    console.log('airpopover')
                     _this.rightUpdate()
 
                 },
@@ -6941,7 +6964,7 @@
                     if (winWidth - left < 300) {
                         left = winWidth - 300
                     }
-                    if (top < 0) {
+                    if (top < 100) {
                         top = top + 70
                     }
                     this.$popover.css({
@@ -6961,12 +6984,12 @@
         AirPopover.prototype.rightUpdate = function () {
             var styleInfo = this.context.invoke('editor.currentStyle');
             var rect = lists.last(styleInfo.range.getClientRects());
-
             if (rect) {
 
                 var bnd = func.rect2bnd(rect);
                 let winWidth = $(document).width()
                 let left = Math.max(bnd.left + bnd.width / 2 - 150, 0);
+                console.log(bnd)
                 let top = bnd.top + bnd.height - 60;
                 if (winWidth - left < 300) {
                     left = winWidth - 300
@@ -7527,14 +7550,14 @@
             fontSizes: ['8', '9', '10', '11', '12', '14', '18', '24', '36'],
             // pallete colors(n x n)
             colors: [
-                ['transparent', '#424242', '#636363', '#9C9C94', '#CEC6CE', '#EFEFEF', '#F7F7F7', '#FFFFFF'],
-                ['#FF0000', '#FF9C00', '#FFFF00', '#00FF00', '#00FFFF', '#0000FF', '#9C00FF', '#FF00FF'],
-                ['#F7C6CE', '#FFE7CE', '#FFEFC6', '#D6EFD6', '#CEDEE7', '#CEE7F7', '#D6D6E7', '#E7D6DE'],
-                ['#E79C9C', '#FFC69C', '#FFE79C', '#B5D6A5', '#A5C6CE', '#9CC6EF', '#B5A5D6', '#000000'],
+                ['transparent', '#424242', '#636363', '#414D68', '#C0C6D4', '#D0C6CF', '#EFEFEF', '#FFFFFF'],
+                ['#F6989A', '#FFC395', '#FFE691', '#ABD7A0', '#9BC7CF', '#8EC7F3', '#B9A4DA', '#E1A2BE'],
+                ['#E50000', '#F78F12', '#F9C400', '#53A73A', '#337D8E', '#0086CC', '#6848AB', '#B4427D'],
+                ['#AE0000', '#C45E00', '#C69200', '#017D02', '#004B5C', '#005399', '#351578', '#000000'],
 
             ],
             colorButton: {
-                foreColor: '#000000',
+                foreColor: '#414D68',
                 backColor: ''
             },
             lineHeights: ['1.0', '1.2', '1.4', '1.5', '1.6', '1.8', '2.0', '3.0'],

@@ -61,12 +61,13 @@
 .icon-bold:before {
   content: "\e906";
   color: #536076;
- 
 }
-.icon-down{
 
-  font-size: 12px;
+.icon-down {
+  padding-left: 3px;
+  font-size: 10px;
 }
+
 .icon-down:before {
   content: "\e907";
   color: rgb(83, 96, 118);
@@ -96,15 +97,18 @@
   content: "\e90c";
   color: #536076;
 }
-.icon-forecolor{
+
+.icon-forecolor {
   font-size: 22px;
 }
-.icon-backcolor{
+
+.icon-backcolor {
   font-size: 22px;
 }
+
 .icon-forecolor .path1:before {
   content: "\e90d";
-  color: rgb(0, 0, 0);
+  color: #414D68;
 }
 
 .icon-forecolor .path2:before {
