@@ -31,7 +31,6 @@
 
 struct VNoteItem;
 class JsContent;
-
 class WebView : public QWebEngineView
 {
     Q_OBJECT
@@ -104,7 +103,13 @@ public:
      * @brief 解除绑定的笔记数据
      */
     void unboundCurrentNoteData();
+
 signals:
+    /**
+     * @brief 发送开始语音转文字的信号
+     * @param json 语音json格式信息
+     */
+    void asrStart(const QVariant &json);
 
 public slots:
     /**

@@ -378,6 +378,7 @@ void RichTextEdit::onMenuActionClicked(QAction *action)
     case ActionManager::VoiceAsSave:
         break;
     case ActionManager::VoiceToText:
+        emit asrStart(m_menuJson); //通知主窗口进行转写服务
         break;
     case ActionManager::VoiceDelete:
     case ActionManager::PictureDelete:

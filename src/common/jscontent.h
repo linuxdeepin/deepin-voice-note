@@ -30,6 +30,17 @@ class JsContent : public QObject
 public:
     explicit JsContent(QObject *parent = nullptr);
     static JsContent *instance();
+
+    /**
+     * @brief The AsrFlag enum
+     * 语音转写文字标志
+     */
+    enum AsrFlag {
+        Start = 0, //开始转写
+        End //转写结束
+    };
+    Q_ENUM(AsrFlag)
+
     QVariant callJsSynchronous(QWebEnginePage *page, const QString &funtion);
     /**
      * @brief 插入图片
@@ -42,8 +53,12 @@ signals:
     void callJsInitData(const QString &jsonData); //调用web前端，设置json格式数据
     void callJsSetHtml(const QString &html); //调用web前端，设置html格式数据
     void callJsInsertVoice(const QString &jsonData); //调用web前端，插入语音
-    void callJsSetVoiceText(const QString &text); //调用web前端，设置语音转文字结果
-    void callJsAsrTip(const QString &text); //调用web前端，设置语音转文字提示信息
+    /**
+     * @brief 调用web前端，设置语音转文字结果
+     * @param text 文本
+     * @param flag 转写标志 参数说明依据AsrFlag枚举
+     */
+    void callJsSetVoiceText(const QString &text, int asrflag);
     void callJsInsertImages(const QStringList &images); //调用web前端，插入图片
     void callJsSetPlayStatus(int status); //调用web前端, 设置播放状态，0播放中，1暂停中 2.结束播放
     bool callJsSearch(const QString &html); //调用web前端，设置json格式数据

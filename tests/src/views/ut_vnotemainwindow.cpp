@@ -169,7 +169,6 @@ TEST_F(ut_vnotemainwindow_test, onStartRecord)
 
 TEST_F(ut_vnotemainwindow_test, onA2TStartAgain)
 {
-    m_mainWindow->onA2TStartAgain();
     m_mainWindow->onA2TError(1);
     m_mainWindow->onA2TSuccess("/usr/share/music/bensound-sunny.mp3");
 }
@@ -231,7 +230,6 @@ TEST_F(ut_vnotemainwindow_test, onShortcut)
     m_mainWindow->onReNameNotepadShortcut();
     m_mainWindow->onAddNoteShortcut();
     m_mainWindow->onRenameNoteShortcut();
-    m_mainWindow->onVoice2TextShortcut();
     m_mainWindow->onPlayPauseShortcut();
     m_mainWindow->onSaveMp3Shortcut();
     m_mainWindow->onSaveTextShortcut();

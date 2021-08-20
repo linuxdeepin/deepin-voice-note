@@ -188,10 +188,11 @@ public slots:
     void onNewNotebook();
     //新建记事项
     void onNewNote();
-    //开始转文字
-    void onA2TStart(bool first = true);
-    //转写失败，重新转文字
-    void onA2TStartAgain();
+    /**
+     * @brief 开始语音转文字
+     * @param json 语音json格式数据
+     */
+    void onA2TStart(const QVariant &json);
     //转写错误
     void onA2TError(int error);
     //转写成功
@@ -228,7 +229,6 @@ public slots:
     void onRenameNoteShortcut();
     void onPlayPauseShortcut();
     void onRecordShorcut();
-    void onVoice2TextShortcut();
     void onSaveMp3Shortcut();
     void onSaveTextShortcut();
     void onSaveVoicesShortcut();
@@ -335,6 +335,7 @@ private:
     bool m_needShowMax {false};
 
     QScopedPointer<VNVoiceBlock> m_currentPlayVoice {nullptr};
+    QScopedPointer<VNVoiceBlock> m_currentA2TVoice {nullptr};
 
     //Shortcuts key
     //*****************Shortcut key begin*********************

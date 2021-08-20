@@ -303,13 +303,6 @@ void VNoteMainWindow::initShortcuts()
     m_stRecording->setAutoRepeat(false);
     connect(m_stRecording.get(), &QShortcut::activated, this, &VNoteMainWindow::onRecordShorcut);
 
-    //Voice to Text
-    m_stVoice2Text.reset(new QShortcut(this));
-    m_stVoice2Text->setKey(Qt::CTRL + Qt::Key_W);
-    m_stVoice2Text->setContext(Qt::ApplicationShortcut);
-    m_stVoice2Text->setAutoRepeat(false);
-    connect(m_stVoice2Text.get(), &QShortcut::activated, this, &VNoteMainWindow::onVoice2TextShortcut);
-
     //Save as Mp3
     m_stSaveAsMp3.reset(new QShortcut(this));
     m_stSaveAsMp3->setKey(Qt::CTRL + Qt::Key_P);
@@ -579,7 +572,7 @@ void VNoteMainWindow::initA2TManager()
     //audio to text manager
     m_a2tManager = new VNoteA2TManager(this);
 
-    //connect(m_rightView, &RightView::asrStart, this, &VNoteMainWindow::onA2TStart);
+    connect(m_richTextEdit, &RichTextEdit::asrStart, this, &VNoteMainWindow::onA2TStart);
     connect(m_a2tManager, &VNoteA2TManager::asrError, this, &VNoteMainWindow::onA2TError);
     connect(m_a2tManager, &VNoteA2TManager::asrSuccess, this, &VNoteMainWindow::onA2TSuccess);
 }
@@ -874,103 +867,64 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 }
 
 /**
- * @brief VNoteMainWindow::onA2TStartAgain
- */
-void VNoteMainWindow ::onA2TStartAgain()
-{
-    onA2TStart(false);
-}
-
-/**
  * @brief VNoteMainWindow::onA2TStart
- * @param first true第一次转文字
+ * @param json 语音json数据
  */
-void VNoteMainWindow::onA2TStart(bool first)
+void VNoteMainWindow::onA2TStart(const QVariant &json)
 {
-    //    if (m_asrErrMeassage) {
-    //        m_asrErrMeassage->setVisible(false);
-    //    }
+    if (m_asrErrMeassage) {
+        m_asrErrMeassage->setVisible(false);
+    }
 
-    //    VoiceNoteItem *asrVoiceItem = nullptr;
+    m_currentA2TVoice.reset(new VNVoiceBlock);
+    MetaDataParser dataParser;
+    dataParser.parse(json, m_currentA2TVoice.get()); //解析json数据
 
-    //    if (first) {
-    //        DetailItemWidget *widget = m_rightView->getOnlyOneSelectVoice();
-    //        asrVoiceItem = static_cast<VoiceNoteItem *>(widget);
-    //        m_rightView->setCurVoiceAsr(asrVoiceItem);
-    //    } else {
-    //        asrVoiceItem = m_rightView->getCurVoiceAsr();
-    //        if (asrVoiceItem) {
-    //            if (m_rightView->getOnlyOneSelectVoice() != asrVoiceItem) {
-    //                m_rightView->setCurVoiceAsr(nullptr);
-    //                return;
-    //            }
-    //        }
-    //    }
-
-    //    if (asrVoiceItem && asrVoiceItem->getNoteBlock()->blockText.isEmpty()) {
-    //        VNVoiceBlock *data = asrVoiceItem->getNoteBlock()->ptrVoice;
-
-    //        if (nullptr != data) {
-    //            //Check whether the audio lenght out of 20 minutes
-    //            if (data->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
-    //                VNoteMessageDialog audioOutLimit(
-    //                    VNoteMessageDialog::AsrTimeLimit, this);
-
-    //                audioOutLimit.exec();
-    //            } else {
-    //                setSpecialStatus(VoiceToTextStart);
-    //                asrVoiceItem->showAsrStartWindow();
-    //                QTimer::singleShot(0, this, [this, data]() {
-    //                    m_a2tManager->startAsr(data->voicePath, data->voiceSize);
-    //                });
-    //            }
-    //        }
-    //    }
-    Q_UNUSED(first)
+    //超过20分钟的语音不支持转文字
+    if (m_currentA2TVoice->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
+        VNoteMessageDialog audioOutLimit(
+            VNoteMessageDialog::AsrTimeLimit, this);
+        audioOutLimit.exec();
+    } else {
+        setSpecialStatus(VoiceToTextStart); //更新状态
+        QTimer::singleShot(0, this, [this]() {
+            m_a2tManager->startAsr(m_currentA2TVoice->voicePath, m_currentA2TVoice->voiceSize); //开始转文字
+        });
+    }
 }
 
 /**
  * @brief VNoteMainWindow::onA2TError
+ * 语音转文字失败
  * @param error
  */
 void VNoteMainWindow::onA2TError(int error)
 {
-    //    VoiceNoteItem *asrVoiceItem = m_rightView->getCurVoiceAsr();
-    //    if (asrVoiceItem) {
-    //        asrVoiceItem->showAsrEndWindow("");
-    //    }
-    //    QString message = "";
-    //    if (error == VNoteA2TManager::NetworkError) {
-    //        message = DApplication::translate(
-    //            "VNoteErrorMessage",
-    //            "The voice conversion failed due to the poor network connection. "
-    //            "Do you want to try again?");
-    //    } else {
-    //        message = DApplication::translate(
-    //            "VNoteErrorMessage",
-    //            "The voice conversion failed. Do you want to try again?");
-    //    }
-    //    showAsrErrMessage(message);
-    //    setSpecialStatus(VoiceToTextEnd);
-    Q_UNUSED(error)
+    emit JsContent::instance()->callJsSetVoiceText("", JsContent::AsrFlag::End);
+    QString message = ""; //错误信息提示语
+    if (error == VNoteA2TManager::NetworkError) {
+        message = DApplication::translate(
+            "VNoteErrorMessage",
+            "The voice conversion failed due to the poor network connection. "
+            "Do you want to try again?");
+    } else {
+        message = DApplication::translate(
+            "VNoteErrorMessage",
+            "The voice conversion failed. Do you want to try again?");
+    }
+    showAsrErrMessage(message); //显示错误信息
+    setSpecialStatus(VoiceToTextEnd); //更新状态
 }
 
 /**
  * @brief VNoteMainWindow::onA2TSuccess
- * @param text
+ * 语音转文字成功
+ * @param text 转写后的文本
  */
 void VNoteMainWindow::onA2TSuccess(const QString &text)
 {
-    //    VoiceNoteItem *asrVoiceItem = m_rightView->getCurVoiceAsr();
-    //    if (asrVoiceItem) {
-    //        m_rightView->clearAllSelection();
-    //        asrVoiceItem->getNoteBlock()->blockText = text;
-    //        asrVoiceItem->showAsrEndWindow(text);
-    //        m_rightView->updateData();
-    //    }
-    //    setSpecialStatus(VoiceToTextEnd);
-    //    m_rightView->setCurVoiceAsr(nullptr);
-    Q_UNUSED(text)
+    emit JsContent::instance()->callJsSetVoiceText(text, JsContent::AsrFlag::End); //将转写后的文本发送到web端
+    setSpecialStatus(VoiceToTextEnd); //更新状态
 }
 
 /**
@@ -1751,6 +1705,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         stateOperation->operState(OpsStateInterface::StateRecording, false);
         break;
     case VoiceToTextStart:
+        emit JsContent::instance()->callJsSetVoiceText(DApplication::translate("VoiceNoteItem", "Converting voice to text"), JsContent::AsrFlag::Start);
         stateOperation->operState(OpsStateInterface::StateVoice2Text, true);
         m_noteSearchEdit->setEnabled(false);
         m_leftView->setOnlyCurItemMenuEnable(true);
@@ -1759,7 +1714,6 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNoteBtn->setDisabled(true);
         m_leftView->closeMenu();
         m_middleView->closeMenu();
-        // m_rightView->closeMenu();
         break;
     case VoiceToTextEnd:
         if (!stateOperation->isRecording() && !stateOperation->isPlaying()) {
@@ -1791,8 +1745,6 @@ void VNoteMainWindow::initAsrErrMessage()
         "VNoteErrorMessage",
         "Try Again"));
     m_asrAgainBtn->adjustSize();
-    connect(m_asrAgainBtn, &DPushButton::clicked,
-            this, &VNoteMainWindow::onA2TStartAgain);
     DWidget *m_widget = new DWidget(m_asrErrMeassage);
     QHBoxLayout *m_layout = new QHBoxLayout();
     m_layout->setContentsMargins(0, 0, 0, 0);
@@ -2360,15 +2312,6 @@ void VNoteMainWindow::onRecordShorcut()
 {
     if (canDoShortcutAction()) {
         m_recordBar->onStartRecord();
-    }
-}
-
-void VNoteMainWindow::onVoice2TextShortcut()
-{
-    if (canDoShortcutAction()) {
-        if (!stateOperation->isVoice2Text() && stateOperation->isAiSrvExist()) {
-            this->onA2TStart();
-        }
     }
 }
 
