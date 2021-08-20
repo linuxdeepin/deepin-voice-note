@@ -444,3 +444,11 @@ bool RichTextEdit::findText(const QString &searchKey)
     }
     return ret;
 }
+
+void RichTextEdit::unboundCurrentNoteData()
+{
+    //停止更新定时器
+    m_updateTimer->stop();
+    //绑定数据设置为空
+    m_noteData = nullptr;
+}

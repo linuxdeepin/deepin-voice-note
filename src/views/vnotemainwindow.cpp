@@ -1429,6 +1429,9 @@ void VNoteMainWindow::delNotepad()
         return;
     }
 
+    //删除记事本之前先解除详情页绑定的笔记数据
+    m_richTextEdit->unboundCurrentNoteData();
+
     // 判断当前删除的记事本的排序编号，如果不是-1，则将当前所有记事本的排序编号写入配置文件中
     if (-1 != data->sortNumber) {
         QString folderSortData = m_leftView->getFolderSort();
@@ -1508,6 +1511,8 @@ void VNoteMainWindow::delNote()
     QList<VNoteItem *> noteDataList = m_middleView->deleteCurrentRow();
 
     if (noteDataList.size()) {
+        //删除笔记之前先解除详情页绑定的笔记数据
+        m_richTextEdit->unboundCurrentNoteData();
         for (auto noteData : noteDataList) {
             VNoteItemOper noteOper(noteData);
             noteOper.deleteNote();

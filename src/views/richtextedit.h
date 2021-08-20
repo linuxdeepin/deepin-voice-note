@@ -99,6 +99,11 @@ public:
      * @return　搜索无结果返回false
      */
     bool findText(const QString &searchKey);
+
+    /**
+     * @brief 解除绑定的笔记数据
+     */
+    void unboundCurrentNoteData();
 signals:
 
 public slots:
