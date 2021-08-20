@@ -10,9 +10,9 @@ You can run, exit, and create a shortcut for Voice Notes in the following ways.
 
 ### Run Voice Notes
 
-1. Click the Launcher icon ![deepin_launcher](../common/deepin_launcher.svg) in the dock to enter the Launcher interface.
-2. Locate ![deepin_voice_note](../common/deepin_voice_note.svg) by scrolling the mouse wheel or searching "voice notes" in the Launcher interface, and click it to run.
-3. Right-click ![deepin_voice_note](../common/deepin_voice_note.svg), and you can:
+1. Click the Launcher icon ![deepin_launcher](../common/deepin_launcher.svg) in the Dock to enter the Launcher interface.
+2. Locate Voice Notes![deepin_voice_note](../common/deepin_voice_note.svg) by scrolling the mouse wheel or searching "voice notes" in the Launcher interface, and click it to run.
+3. Right-click ![deepin_voice_note](../common/deepin_voice_note.svg) and you can:
    - Click **Send to desktop** to create a desktop shortcut.
    - Click **Send to dock** to fix it in the Dock.
    - Click **Add to startup** to add the application to startup, and it will automatically run when the system starts up.
@@ -20,7 +20,7 @@ You can run, exit, and create a shortcut for Voice Notes in the following ways.
 ### Exit Voice Notes
 
 - Click ![close](../common/close_icon.svg) on the Voice Notes interface to exit Voice Notes.
-- Right-click ![deepin_voice_note](../common/deepin_voice_note.svg) in the dock, and select **Close All** to exit.
+- Right-click ![deepin_voice_note](../common/deepin_voice_note.svg) in the Dock, and select **Close All** to exit.
 - Click ![icon_menu](../common/icon_menu.svg) on the Voice Notes interface, and select **Exit** to exit.
 
 ### View Shortcuts
@@ -178,7 +178,7 @@ On the main menu, you can set audio source, check privacy policy, switch window 
 
 ### Settings
 
-You can set up audio source from **Internal** and **Microphone** (default) options.
+You can set up audio source from **Internal** and **Microphone** options.
 1. On the Voice Notes interface, click ![icon_menu](../common/icon_menu.svg).
 2. Set up audio source:
    - Select **Internal** source, and only system built-in sound will be recorded. 

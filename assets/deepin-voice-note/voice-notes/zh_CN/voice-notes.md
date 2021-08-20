@@ -22,15 +22,15 @@
 
 ### 关闭语音记事本
 
-- 在语音记事本界面点击 ![close_icon](../common/close_icon.svg)，退出语音记事本。
+- 在语音记事本界面单击 ![close_icon](../common/close_icon.svg)，退出语音记事本。
 - 在任务栏右键单击 ![deepin_voice_note](../common/deepin_voice_note.svg)，选择 **关闭所有**，退出语音记事本。
-- 在语音记事本界面点击 ![icon_menu](../common/icon_menu.svg)，选择 **退出**，退出语音记事本。
+- 在语音记事本界面单击 ![icon_menu](../common/icon_menu.svg)，选择 **退出**，退出语音记事本。
 
 ### 查看快捷键
 
 在语音记事本界面，使用快捷键 **Ctrl + Shift + ?** 打开快捷键预览界面。熟练地使用快捷键，将大大提升您的操作效率。
 
-![1|hotkey](fig/hotkey.png)
+![hotkey](fig/hotkey.png)
 
 ## 操作介绍
 
@@ -45,7 +45,6 @@
 
 - 当第一次新建记事本后，系统默认创建一个笔记，在笔记列表内单击按钮 ![add](../common/circlebutton_add2.svg) 可继续创建新的笔记。
 - 右键单击记事本或笔记，选择 **新建笔记** 来创建一个新笔记。
-
 
 ![0|new](fig/create1.png)
 
@@ -63,7 +62,7 @@
 3. 单击按钮 ![finish](../common/finish_normal.svg) 完成语音录制。
    
    > ![notes](../common/notes.svg)说明：添加语音的过程中您可以单击按钮 ![pause](../common/pause_red_normal.svg) 暂停录音，再次单击按钮 ![record_normal](../common/record_normal.svg) 继续录音。录音的限制时长为60分钟。
-3. 录制完成后，单击按钮 ![play_blue_normal](../common/play_blue_normal.svg) 可以回放语音。
+3. 录制完成后，单击按钮 ![play_blue_normal](../common/play_blue_normal.svg) 可以回放录音。
 
 
 ![0|Recorder](fig/recorder2.png)
@@ -84,7 +83,6 @@
 ### 置顶笔记
 
 1. 在笔记列表中，右键单击笔记。
-
 2. 选择 **置顶**，该笔记会排在笔记列表最前面。
 
    右键单击已置顶的笔记，选择 **取消置顶**。
@@ -117,7 +115,6 @@
 在“控制中心” > “辅助功能”中开启语音朗读后，可执行以下操作。
 
 1. 在语音记事本界面选中一段文字，单击右键选择 **语音朗读**，语音播报选中的文字。
-
 2. 在语音朗读模式下，单击右键选择 **停止朗读** 或者单击左键停止朗读。
 
 >![notes](../common/notes.svg)说明：
@@ -227,5 +224,4 @@
 
 1. 在语音记事本界面，单击 ![icon_menu](../common/icon_menu.svg)。
 2. 选择 **退出**。
-
 

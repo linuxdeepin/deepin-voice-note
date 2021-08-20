@@ -11,7 +11,7 @@
 
 ### 运行语音记事本
 
-1. 单击任务栏上的启动器图标![deepin_launcher](../common/deepin_launcher.svg)，进入启动器界面。
+1. 单击任务栏上的启动器图标 ![deepin_launcher](../common/deepin_launcher.svg)，进入启动器界面。
 2. 上下滚动鼠标滚轮浏览或通过搜索，找到语音记事本图标 ![deepin_voice_note](../common/deepin_voice_note.svg)，单击运行。
 3. 右键单击 ![deepin_voice_note](../common/deepin_voice_note.svg)，您可以：
 
@@ -63,7 +63,7 @@
 3. 单击按钮 ![finish](../common/finish_normal.svg) 完成语音录制。
    
    > ![notes](../common/notes.svg)说明：添加语音的过程中您可以单击按钮 ![pause](../common/pause_red_normal.svg) 暂停录音，再次单击按钮 ![record_normal](../common/record_normal.svg) 继续录音。录音的限制时长为60分钟。
-3. 录制完成后，单击播放按钮 ![play_blue_normal](../common/play_blue_normal.svg) 可以回放语音。
+3. 录制完成后，单击播放按钮 ![play_blue_normal](../common/play_blue_normal.svg) 可以回放录音。
 
 
 ![0|Recorder](fig/recorder2.png)
@@ -184,5 +184,4 @@
 
 1. 在语音记事本界面，单击 ![icon_menu](../common/icon_menu.svg) 。
 2. 选择 **退出**。
-
 
