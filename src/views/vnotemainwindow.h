@@ -25,6 +25,7 @@
 #include "common/datatypedef.h"
 #include "globaldef.h"
 #include "widgets/vnoteiconbutton.h"
+#include "common/vnoteitem.h"
 
 #include <DMainWindow>
 #include <DSearchEdit>
@@ -44,7 +45,6 @@
 
 DWIDGET_USE_NAMESPACE
 
-struct VNVoiceBlock;
 class VNoteRecordBar;
 class VNoteIconButton;
 class VNoteA2TManager;
@@ -178,10 +178,6 @@ public slots:
     void onStartRecord(const QString &path);
     //结束录音
     void onFinshRecord(const QString &voicePath, qint64 voiceSize);
-    //详情页播放事件处理
-    void onRightViewVoicePlay(VNVoiceBlock *voiceData);
-    //详情页暂停播放事件处理
-    void onRightViewVoicePause(VNVoiceBlock *voiceData);
     //播放窗口播放事件处理
     void onPlayPlugVoicePlay(VNVoiceBlock *voiceData);
     //播放窗口暂停播放事件处理
@@ -245,6 +241,13 @@ public slots:
     void onEnterNoteRename();
     //记事本或笔记退出重命名状态响应
     void onCloseNoteRename();
+
+    /**
+     * @brief 响应web前端语音播放控制
+     * @param json :语音数据
+     * @param bIsSame : 此次语音是否与上一次语音相同
+     */
+    void onWebVoicePlay(const QVariant &json, bool bIsSame);
 
 private:
     //左侧列表视图操作相关
@@ -330,6 +333,8 @@ private:
     bool m_rightViewHasFouse {true};
     bool m_showSearchEditMenu {false};
     bool m_needShowMax {false};
+
+    QScopedPointer<VNVoiceBlock> m_currentPlayVoice {nullptr};
 
     //Shortcuts key
     //*****************Shortcut key begin*********************

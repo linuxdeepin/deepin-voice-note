@@ -42,16 +42,12 @@ public:
     explicit VNoteRecordBar(QWidget *parent = nullptr);
     //停止录音
     void stopRecord();
-    //快捷键暂停/继续语音播放
-    void playOrPauseVoice();
-    //播放语音
-    void playVoice(VNVoiceBlock *voiceData);
-    //暂停播放
-    void pauseVoice(VNVoiceBlock *voiceData);
-    //停止播放
-    bool stopVoice(VNVoiceBlock *voiceData);
-    //获取当前播放语音数据
-    VNVoiceBlock *getVoiceData();
+    /**
+     * @brief 播放语音
+     * @param voiceData :语音信息
+     * @param bIsSame :此次播放的语音是否与上一次操作的语音相同
+     */
+    void playVoice(VNVoiceBlock *voiceData, bool bIsSame);
 
 private:
     //初始化设备检测

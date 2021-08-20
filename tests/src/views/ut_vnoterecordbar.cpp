@@ -74,22 +74,7 @@ TEST_F(ut_vnoterecordbar_test, onClosePlayWidget)
     vnvoiceblock->voiceTitle = "test";
     vnvoiceblock->state = true;
     vnoterecordbar.onClosePlayWidget(vnvoiceblock);
-    vnoterecordbar.pauseVoice(vnvoiceblock);
-    //    vnoterecordbar.playVoice(vnvoiceblock);
-    vnoterecordbar.stopVoice(vnvoiceblock);
     delete vnvoiceblock;
-}
-
-TEST_F(ut_vnoterecordbar_test, getVoiceData)
-{
-    VNoteRecordBar vnoterecordbar;
-    vnoterecordbar.getVoiceData();
-}
-
-TEST_F(ut_vnoterecordbar_test, playOrPauseVoice)
-{
-    VNoteRecordBar vnoterecordbar;
-    vnoterecordbar.playOrPauseVoice();
 }
 
 TEST_F(ut_vnoterecordbar_test, onAudioDeviceChange)

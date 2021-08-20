@@ -266,5 +266,4 @@ TEST_F(ut_vnotemainwindow_test, onPlayPlugVoice)
     m_mainWindow->onPlayPlugVoicePlay(nullptr);
     m_mainWindow->onPlayPlugVoicePause(nullptr);
     m_mainWindow->onPlayPlugVoiceStop(nullptr);
-    m_mainWindow->onRightViewVoicePause(nullptr);
 }

@@ -48,11 +48,8 @@ TEST_F(ut_vnoteplaywidget_test, playVideo)
 {
     m_vnoteplaywidget->onSliderPressed();
     m_vnoteplaywidget->initPlayer();
-    m_vnoteplaywidget->onPlayBtnClicked();
     m_vnoteplaywidget->onSliderReleased();
-    m_vnoteplaywidget->onPauseBtnClicked();
     m_vnoteplaywidget->onCloseBtnClicked();
     m_vnoteplaywidget->getPlayerStatus();
-    m_vnoteplaywidget->getVoiceData();
     m_vnoteplaywidget->onDurationChanged(100);
 }

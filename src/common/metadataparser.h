@@ -111,6 +111,12 @@ public:
 #endif
     //源数据解析
     void parse(const QVariant &metaData, VNoteItem *noteData /*out*/);
+    /**
+     * @brief 解析语音数据
+     * @param 输入参数
+     * @param 输出结构体
+     */
+    void parse(const QVariant &metaData, VNoteBlock *blockData /*out*/);
     //源数据生成
     void makeMetaData(VNoteItem *noteData, QVariant &metaData /*out*/);
     void makeMetaData(const VNoteBlock *blockData, QVariant &metaData /*out*/);

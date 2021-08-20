@@ -36,12 +36,15 @@
 #include "common/vnoteforlder.h"
 #include "common/actionmanager.h"
 #include "common/vnotedatasafefymanager.h"
+#include "common/metadataparser.h"
+
 #include "widgets/vnotemultiplechoiceoptionwidget.h"
 
 #include "common/utils.h"
 #include "common/actionmanager.h"
 #include "common/setting.h"
 #include "common/performancemonitor.h"
+#include "common/jscontent.h"
 
 #include "db/vnotefolderoper.h"
 #include "db/vnoteitemoper.h"
@@ -212,6 +215,7 @@ void VNoteMainWindow::initConnections()
 
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::paletteTypeChanged,
             this, &VNoteMainWindow::onThemeChanged);
+    connect(JsContent::instance(), &JsContent::playVoice, this, &VNoteMainWindow::onWebVoicePlay);
 }
 
 /**
@@ -1596,35 +1600,14 @@ int VNoteMainWindow::loadSearchNotes(const QString &key)
 }
 
 /**
- * @brief VNoteMainWindow::onRightViewVoicePlay
- * @param voiceData
- */
-void VNoteMainWindow::onRightViewVoicePlay(VNVoiceBlock *voiceData)
-{
-    setSpecialStatus(PlayVoiceStart);
-    m_recordBar->playVoice(voiceData);
-}
-
-/**
- * @brief VNoteMainWindow::onRightViewVoicePause
- * @param voiceData
- */
-void VNoteMainWindow::onRightViewVoicePause(VNVoiceBlock *voiceData)
-{
-    m_recordBar->pauseVoice(voiceData);
-}
-
-/**
  * @brief VNoteMainWindow::onPlayPlugVoicePlay
  * @param voiceData
  */
 void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
 {
-    //    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
-    //    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
-    //        voiceItem->showPauseBtn();
-    //    }
     Q_UNUSED(voiceData)
+    //更新web前端语音播放状态
+    emit JsContent::instance()->callJsSetPlayStatus(0);
 }
 
 /**
@@ -1633,11 +1616,9 @@ void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
  */
 void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
 {
-    //    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
-    //    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
-    //        voiceItem->showPlayBtn();
-    //    }
     Q_UNUSED(voiceData)
+    //更新web前端语音暂停状态
+    emit JsContent::instance()->callJsSetPlayStatus(1);
 }
 
 /**
@@ -1646,14 +1627,8 @@ void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
  */
 void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
 {
-    //    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
-    //    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
-    //        voiceItem->showPlayBtn();
-    //    }
-    //    setSpecialStatus(PlayVoiceEnd);
-    //    m_rightView->setCurVoicePlay(nullptr);
-    //    m_rightView->setFocus();
     Q_UNUSED(voiceData)
+    setSpecialStatus(PlayVoiceEnd);
 }
 
 /**
@@ -1750,6 +1725,8 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_addNoteBtn->setDisabled(false);
         }
         stateOperation->operState(OpsStateInterface::StatePlaying, false);
+        //停止播放更新web前端语音停止状态
+        emit JsContent::instance()->callJsSetPlayStatus(2);
         break;
     case RecordStart:
         stateOperation->operState(OpsStateInterface::StateRecording, true);
@@ -2375,7 +2352,7 @@ void VNoteMainWindow::onRenameNoteShortcut()
 void VNoteMainWindow::onPlayPauseShortcut()
 {
     if (canDoShortcutAction()) {
-        m_recordBar->playOrPauseVoice();
+        m_recordBar->playVoice(nullptr, true);
     }
 }
 
@@ -2473,4 +2450,27 @@ void VNoteMainWindow::onEnterNoteRename()
 void VNoteMainWindow::onCloseNoteRename()
 {
     m_imgInsert->setBtnDisabled(false);
+}
+
+void VNoteMainWindow::onWebVoicePlay(const QVariant &json, bool bIsSame)
+{
+    //录音状态下不允许播放
+    if (stateOperation->isRecording()) {
+        qInfo() << "The recording cannot be played";
+        return;
+    }
+    //不同语音则重新解析json文件
+    if (!bIsSame) {
+        m_currentPlayVoice.reset(new VNVoiceBlock);
+        MetaDataParser dataParser;
+        dataParser.parse(json, m_currentPlayVoice.get());
+    }
+
+    //文件不存在不执行播放
+    if (!QFile::exists(m_currentPlayVoice->voicePath)) {
+        qInfo() << m_currentPlayVoice->voicePath << " is not exists";
+        return;
+    }
+
+    m_recordBar->playVoice(m_currentPlayVoice.get(), bIsSame);
 }
