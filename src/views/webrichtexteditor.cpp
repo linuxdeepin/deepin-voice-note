@@ -27,7 +27,8 @@
 
 #include "db/vnoteitemoper.h"
 
-#include <QFileDialog>
+#include <DFileDialog>
+
 #include <QEventLoop>
 #include <QClipboard>
 #include <QMimeData>
@@ -293,6 +294,8 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
     case ActionManager::PictureView:
         break;
     case ActionManager::PictureSaveAs:
+        //另存图片
+        savePictureAs();
         break;
     case ActionManager::TxtSpeech:
         VTextSpeechAndTrManager::onTextToSpeech();
@@ -309,6 +312,27 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
     default:
         break;
     }
+}
+
+/**
+ * @brief WebRichTextEditor::savePictureAs
+ * 另存图片
+ */
+void WebRichTextEditor::savePictureAs()
+{
+    QString originalPath = m_menuJson.toString(); //获取原图片路径
+    QFileInfo fileInfo(originalPath);
+
+    QString filter = "*." + fileInfo.suffix();
+    QString dir = QString("%1/%2")
+                      .arg(QStandardPaths::writableLocation(QStandardPaths::PicturesLocation))
+                      .arg(fileInfo.baseName());
+    //获取需要保存的文件位置，默认路径为用户图片文件夹，默认文件名为原文件名
+    QString newPath = DFileDialog::getSaveFileName(this, "", dir, filter);
+    if (newPath.isEmpty()) {
+        return;
+    }
+    QFile::copy(originalPath, newPath); //复制文件
 }
 
 void WebRichTextEditor::onPaste()

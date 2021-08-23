@@ -144,6 +144,10 @@ private:
      * @brief 语音菜单显示
      */
     void showVoiceMenu();
+    /**
+     * @brief 另存图片
+     */
+    void savePictureAs();
 
 private:
     VNoteItem *m_noteData {nullptr};
