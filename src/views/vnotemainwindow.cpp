@@ -74,6 +74,7 @@
 #include <DTitlebar>
 #include <DSettingsDialog>
 #include <DSysInfo>
+#include <DFileDialog>
 
 #include <QScrollBar>
 #include <QLocale>
@@ -211,7 +212,7 @@ void VNoteMainWindow::initConnections()
 
     connect(m_viewChange, &DIconButton::clicked, this, &VNoteMainWindow::onViewChangeClicked);
     //关联图片插入按钮点击事件
-    connect(m_imgInsert, &VNoteIconButton::clicked, m_richTextEdit, &RichTextEdit::onImgInsertClicked);
+    connect(m_imgInsert, &VNoteIconButton::clicked, this, &VNoteMainWindow::onInsertImageToWebEditor);
 
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::paletteTypeChanged,
             this, &VNoteMainWindow::onThemeChanged);
@@ -540,6 +541,7 @@ void VNoteMainWindow::initRightView()
     m_richTextEdit = new RichTextEdit(m_rightViewHolder);
     rightHolderLayout->addWidget(m_richTextEdit);
     m_richTextEdit->installEventFilter(this);
+    m_richTextEdit->initWebView();
     //TODO:
     //    Add record area code here
     m_recordBarHolder = new QWidget(m_rightViewHolder);
@@ -2416,4 +2418,14 @@ void VNoteMainWindow::onWebVoicePlay(const QVariant &json, bool bIsSame)
     }
 
     m_recordBar->playVoice(m_currentPlayVoice.get(), bIsSame);
+}
+
+void VNoteMainWindow::onInsertImageToWebEditor()
+{
+    QStringList filePaths = DFileDialog::getOpenFileNames(
+        this,
+        "Please choose an image file",
+        QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
+        "Image file(*.jpg *.png *.bmp)");
+    JsContent::instance()->insertImages(filePaths);
 }

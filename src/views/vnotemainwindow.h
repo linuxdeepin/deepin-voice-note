@@ -243,6 +243,11 @@ public slots:
     void onCloseNoteRename();
 
     /**
+     * @brief 富文本编辑器插入图片
+     */
+    void onInsertImageToWebEditor();
+
+    /**
      * @brief 响应web前端语音播放控制
      * @param json :语音数据
      * @param bIsSame : 此次语音是否与上一次语音相同
