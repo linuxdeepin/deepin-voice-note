@@ -32,6 +32,8 @@ RichTextEdit::RichTextEdit(QWidget *parent)
 void RichTextEdit::initData(VNoteItem *data, const QString &reg, bool fouse)
 {
     if (m_webRichTextEditer) {
+        //富文本编辑区焦点切换到当前窗口
+        setFocus();
         return m_webRichTextEditer->initData(data, reg, fouse);
     }
 }

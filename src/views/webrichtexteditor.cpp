@@ -89,6 +89,10 @@ void WebRichTextEditor::initData(VNoteItem *data, const QString &reg, bool fouse
     }
     if (data == nullptr) {
         this->setVisible(false);
+        //无数据时先保存之前数据
+        updateNote();
+        //解绑当前数据
+        unboundCurrentNoteData();
         return;
     }
     this->setVisible(true);
