@@ -721,9 +721,6 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
 {
     Q_UNUSED(previous);
 
-    if (m_asrErrMeassage) {
-        m_asrErrMeassage->setVisible(false);
-    }
     //记事本切换后刷新详情页
     changeRightView(false);
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
@@ -874,10 +871,6 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
  */
 void VNoteMainWindow::onA2TStart(const QVariant &json)
 {
-    if (m_asrErrMeassage) {
-        m_asrErrMeassage->setVisible(false);
-    }
-
     m_currentA2TVoice.reset(new VNVoiceBlock);
     MetaDataParser dataParser;
     dataParser.parse(json, m_currentA2TVoice.get()); //解析json数据
@@ -1157,9 +1150,6 @@ bool VNoteMainWindow::checkIfNeedExit()
 void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 {
     Q_UNUSED(previous);
-    if (m_asrErrMeassage) {
-        m_asrErrMeassage->setVisible(false);
-    }
 
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
@@ -1728,24 +1718,20 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
 
 /**
  * @brief VNoteMainWindow::initAsrErrMessage
+ * 初始化语音转文字失败提示框
  */
 void VNoteMainWindow::initAsrErrMessage()
 {
-    m_asrErrMeassage = new DFloatingMessage(DFloatingMessage::ResidentType,
+    //实例化为临时消息弹出
+    m_asrErrMeassage = new DFloatingMessage(DFloatingMessage::TransientType,
                                             m_centerWidget);
     QString iconPath = STAND_ICON_PAHT;
     iconPath.append("warning.svg");
     m_asrErrMeassage->setIcon(QIcon(iconPath));
-    m_asrAgainBtn = new DPushButton(m_asrErrMeassage);
-    m_asrAgainBtn->setText(DApplication::translate(
-        "VNoteErrorMessage",
-        "Try Again"));
-    m_asrAgainBtn->adjustSize();
     DWidget *m_widget = new DWidget(m_asrErrMeassage);
     QHBoxLayout *m_layout = new QHBoxLayout();
     m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->addStretch();
-    m_layout->addWidget(m_asrAgainBtn);
     m_widget->setLayout(m_layout);
     m_asrErrMeassage->setWidget(m_widget);
     m_asrErrMeassage->setVisible(false);

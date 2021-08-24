@@ -366,7 +366,6 @@ private:
     QString m_searchKey;
     DFloatingMessage *m_asrErrMeassage {nullptr};
     DFloatingMessage *m_pDeviceExceptionMsg {nullptr};
-    DPushButton *m_asrAgainBtn {nullptr};
     DMenu *m_menuExtension {nullptr};
     //Login session manager
     DBusLogin1Manager *m_pLogin1Manager {nullptr};
