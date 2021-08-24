@@ -54,8 +54,6 @@ body {
     border: none;
 }
 
-
-
 .playImgBg {
     margin: 0 20px 0 20px;
     width: 40px;
@@ -244,9 +242,11 @@ p {
 .planPoa {
     height: 250px;
 }
-ol,ul{
+
+ol, ul {
     margin-bottom: 0px;
 }
+
 ol>li, ul>li {
     padding-right: 30px;
     /* line-height: 24px; */
@@ -295,7 +295,7 @@ ol>li, ul>li {
 }
 
 .note-forecolor {
-    padding: 0 4px!important;
+    padding-right: 4px!important;
 }
 
 .note-fontsize button {
@@ -309,18 +309,31 @@ ol>li, ul>li {
 .note-editable {
     padding: 0 15px 0 30px;
 }
-.note-editable img{
+
+.note-editable img {
     padding: 2px!important;
     margin: 2px!important;
-
 }
-.slopingside{
-    height:0px;
+
+.slopingside {
+    height: 0px;
     border: 1px solid red;
     width: 20px;
-    transform:rotate(45deg);
- 
+    transform: rotate(45deg);
 }
 
+.fontSizeBut {
+    padding: 0 4px!important;
+}
 
+.dropdown-fontsize {
+    overflow: hidden;
+}
 
+.dropdown-fontsize>li>a {
+    width: 100%;
+}
+
+.dropdown-fontsize>li>a:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}

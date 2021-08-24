@@ -136,22 +136,21 @@ $('body').on('click', function () {
 document.addEventListener('copy', function (event) {
     var selectionObj = window.getSelection();
     var rangeObj = selectionObj.getRangeAt(0);
-    console.log(rangeObj)
     var docFragment = rangeObj.cloneContents();
     var testDiv = document.createElement("div");
     testDiv.appendChild(docFragment);
     formatHtml = testDiv.innerHTML;
     pasteData = window.getSelection().toString();
-    if (formatHtml.substr(0, 11) != "<p><br></p>") {
-        formatHtml = "";
-    }
+    // if (formatHtml.substr(0, 11) != "<p><br></p>") {
+    //     formatHtml = "";
+    // }
 });
 
 document.addEventListener('paste', function (event) {
     if (formatHtml != "" && pasteData == event.clipboardData.getData('Text')) {
         document.execCommand('insertHTML', false, formatHtml + "<p><br></p>");
-        event.preventDefault();
     }
+    removeNullP()
 });
 
 //播放
@@ -464,7 +463,8 @@ function rightClick(e) {
         json = $(e.target).parents('.li:first').attr('jsonKey')
         // 当前没有语音在转文字时， 才可以转文字
         if (bTransVoiceIsReady) {
-            activeTransVoice = $(this).parents('.li:first');
+            console.log(activeTransVoice)
+            activeTransVoice = $(e.target).parents('.li:first');
         }
         // $('#summernote').summernote('airPopover.rightUpdate')
         $('#summernote').summernote('airPopover.hide')
@@ -593,3 +593,4 @@ function insertImg(urlStr) {
         $("#summernote").summernote('insertImage', item, 'img');
     })
 }
+

@@ -2509,7 +2509,6 @@
             var nativeRng = this.nativeRange();
             let result = nativeRng.getClientRects();
             if (result.length == 0 && nativeRng.startContainer) {
-                console.log($(nativeRng.startContainer))
                 result = []
                 let height = $(nativeRng.startContainer).height()
                 let left = $(nativeRng.startContainer).offset().left - $(document).scrollLeft()
@@ -3030,15 +3029,14 @@
          * @param {String} listName - OL or UL
          */
         Bullet.prototype.toggleList = function (listName, editable) {
-
             var _this = this;
             var rng = range.create(editable).wrapBodyInlineWithPara();
             var paras = rng.nodes(dom.isPara, { includeAncestor: true });
             var bookmark = rng.paraBookmark(paras);
             var clustereds = lists.clusterBy(paras, func.peq2('parentNode'));
-            // 屏蔽语音文件序列化
+            // 屏蔽语音文件、图片序列化
             let isVoice = paras.find((item) => {
-                return $(item).hasClass('voiceBox')
+                return $(item).hasClass('voiceBox') || $(item).find('img').length != 0
             })
             if (isVoice) {
                 return;
@@ -3046,14 +3044,12 @@
             // paragraph to list
             // 判断list是否有p标签
             if (lists.find(paras, dom.isPurePara)) {
-
                 var wrappedParas_1 = [];
                 $$1.each(clustereds, function (idx, paras) {
                     let content = _this.wrapList(paras, listName);
                     wrappedParas_1 = wrappedParas_1.concat(content);
                 });
                 paras = wrappedParas_1;
-
                 // list to paragraph or change list style
             }
             else {
@@ -5305,7 +5301,7 @@
             this.context.memo('button.fontsize', function () {
                 return _this.ui.buttonGroup([
                     _this.button({
-                        className: 'dropdown-toggle',
+                        className: 'dropdown-toggle fontSizeBut',
                         contents: _this.ui.dropdownButtonContents('<span class="note-current-fontsize"/>', _this.options),
                         tooltip: _this.lang.font.size,
                         data: {
@@ -6482,7 +6478,6 @@
             this.context.invoke('editor.saveRange');
             this.showImageDialog().then(function (data) {
                 // [workaround] hide dialog before restore range for IE range focus
-                console.log('image')
                 _this.ui.hideDialog(_this.$dialog);
                 _this.context.invoke('editor.restoreRange');
                 if (typeof data === 'string') {
@@ -6914,13 +6909,11 @@
                 'summernote.keyup summernote.mouseup summernote.scroll ': function (e) {
                     let sel = window.getSelection();
                     // summernote.contextmenu
-                    console.log(sel)
                     setTimeout(function () {
                         _this.update();
                     }, 10)
                 },
                 'summernote.contextmenu': function (e) {
-                    console.log('airpopover')
                     _this.rightUpdate()
 
                 },
@@ -6985,11 +6978,9 @@
             var styleInfo = this.context.invoke('editor.currentStyle');
             var rect = lists.last(styleInfo.range.getClientRects());
             if (rect) {
-
                 var bnd = func.rect2bnd(rect);
                 let winWidth = $(document).width()
                 let left = Math.max(bnd.left + bnd.width / 2 - 150, 0);
-                console.log(bnd)
                 let top = bnd.top + bnd.height - 60;
                 if (winWidth - left < 300) {
                     left = winWidth - 300
