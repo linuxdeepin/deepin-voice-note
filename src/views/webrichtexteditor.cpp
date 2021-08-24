@@ -24,6 +24,7 @@
 #include "common/vnoteitem.h"
 #include "common/metadataparser.h"
 #include "common/vtextspeechandtrmanager.h"
+#include "dialog/imageviewerdialog.h"
 
 #include "db/vnoteitemoper.h"
 
@@ -45,6 +46,13 @@ WebRichTextEditor::WebRichTextEditor(QWidget *parent)
     initWebView();
     initRightMenu();
     initUpdateTimer();
+}
+
+WebRichTextEditor::~WebRichTextEditor()
+{
+    if (imgView != nullptr) {
+        delete imgView;
+    }
 }
 
 void WebRichTextEditor::initWebView()
@@ -296,6 +304,8 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
         onPaste();
         break;
     case ActionManager::PictureView:
+        //查看图片
+        viewPicture(m_menuJson.toString());
         break;
     case ActionManager::PictureSaveAs:
         //另存图片
@@ -337,6 +347,20 @@ void WebRichTextEditor::savePictureAs()
         return;
     }
     QFile::copy(originalPath, newPath); //复制文件
+}
+
+/**
+ * @brief WebRichTextEditor::viewPicture
+ * 查看图片
+ * @param filePath 图片路径
+ */
+void WebRichTextEditor::viewPicture(const QString &filePath)
+{
+    if (imgView == nullptr) {
+        imgView = new ImageViewerDialog(this);
+    }
+    //加载图片并显示
+    imgView->open(filePath);
 }
 
 void WebRichTextEditor::onPaste()

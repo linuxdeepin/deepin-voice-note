@@ -29,12 +29,13 @@
 
 struct VNoteItem;
 class VNoteRightMenu;
-
+class ImageViewerDialog;
 class WebRichTextEditor : public QWebEngineView
 {
     Q_OBJECT
 public:
     explicit WebRichTextEditor(QWidget *parent = nullptr);
+    ~WebRichTextEditor();
 
     enum Menu {
         PictureMenu = 0,
@@ -110,6 +111,10 @@ public slots:
      * @brief 删除选中内容
      */
     void deleteSelectText();
+    /**
+     * @brief 查看图片
+     */
+    void viewPicture(const QString &filePath);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
@@ -157,6 +162,7 @@ private:
     QPoint m_menuPoint {};
     Menu m_menuType = MaxMenu;
     QVariant m_menuJson = {};
+    ImageViewerDialog *imgView {nullptr}; //
 
     //右键菜单
     VNoteRightMenu *m_pictureRightMenu {nullptr}; //图片右键菜单
