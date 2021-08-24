@@ -1429,14 +1429,8 @@ void VNoteMainWindow::addNote()
         VNoteItem tmpNote;
         tmpNote.folderId = id;
         tmpNote.noteType = VNoteItem::VNT_Text;
-
-        //Add default text block
-        //Comment:
-        //    ptrBlock will be released when the data set is destroyed,
-        //so don't need release it here.
-        VNoteBlock *ptrBlock = tmpNote.newBlock(VNoteBlock::Text);
-        tmpNote.addBlock(ptrBlock);
-
+        //无内容时富文本为空白段落标签
+        tmpNote.htmlCode = "<p></p>";
         VNoteItemOper noteOper;
         //Get default note name in the folder
         tmpNote.noteTitle = noteOper.getDefaultNoteName(tmpNote.folderId);

@@ -127,7 +127,7 @@ void WebRichTextEditor::insertVoiceItem(const QString &voicePath, qint64 voiceSi
 void WebRichTextEditor::updateNote()
 {
     if (m_noteData) {
-        if (m_textChange || m_noteData->htmlCode.isEmpty()) {
+        if (m_textChange) {
             QVariant result = JsContent::instance()->callJsSynchronous(page(), QString("getHtml()"));
             if (result.isValid()) {
                 m_noteData->htmlCode = result.toString();
