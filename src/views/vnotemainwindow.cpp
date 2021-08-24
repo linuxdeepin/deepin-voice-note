@@ -2300,7 +2300,10 @@ void VNoteMainWindow::onRenameNoteShortcut()
 void VNoteMainWindow::onPlayPauseShortcut()
 {
     if (canDoShortcutAction()) {
-        m_recordBar->playVoice(nullptr, true);
+        //只要播放状态下才能用快捷键控制播放/暂停
+        if (stateOperation->isPlaying()) {
+            m_recordBar->playVoice(m_currentPlayVoice.get(), true);
+        }
     }
 }
 
