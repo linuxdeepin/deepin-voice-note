@@ -68,6 +68,7 @@ void WebRichTextEditor::initWebView()
     connect(content, &JsContent::textChange, this, &WebRichTextEditor::onTextChange);
     connect(content, &JsContent::setDataFinsh, this, &WebRichTextEditor::onSetDataFinsh);
     connect(content, &JsContent::popupMenu, this, &WebRichTextEditor::saveMenuParam);
+    connect(content, &JsContent::textPaste, this, &WebRichTextEditor::onPaste);
 }
 
 void WebRichTextEditor::initRightMenu()

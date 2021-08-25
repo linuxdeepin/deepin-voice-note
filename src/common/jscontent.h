@@ -63,6 +63,7 @@ signals:
     void callJsSetPlayStatus(int status); //调用web前端, 设置播放状态，0播放中，1暂停中 2.结束播放
     bool callJsSearch(const QString &html); //调用web前端，设置json格式数据
 
+    void textPaste(); //粘贴信号
     void textChange();
     void loadFinsh();
     void popupMenu(int type, int x, int y, const QVariant &json);
@@ -81,6 +82,7 @@ public slots:
     void jsCallChannleFinish(); //web前端调用后端，通知网页加载完成
     void jsCallPopupMenu(int type, int x, int y, const QVariant &json); //web前端调用后端，弹出右键菜单
     void jsCallPlayVoice(const QVariant &json, bool bIsSame); //web前端调用后端，播放语音
+    void jsCallPaste(); //web前端调用后端，编辑区粘贴功能
     QString getTranslation(const QString &context, const QString &key); //web前端调用后端，获取翻译文件
 };
 

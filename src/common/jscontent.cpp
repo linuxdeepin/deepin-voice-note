@@ -113,3 +113,8 @@ void JsContent::jsCallSetDataFinsh()
 {
     emit setDataFinsh();
 }
+
+void JsContent::jsCallPaste()
+{
+    emit textPaste();
+}
