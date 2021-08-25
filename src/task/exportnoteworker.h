@@ -68,6 +68,7 @@ protected:
     int exportAll();
     //导出一个语音
     int exportOneVoice(VNoteBlock *block);
+    int exportOneVoice(const QString &);
 
     int m_exportType {ExportNothing};
     QString m_exportPath;

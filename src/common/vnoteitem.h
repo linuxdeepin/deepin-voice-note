@@ -107,6 +107,8 @@ public:
     bool haveText() const;
     //语音数目
     qint32 voiceCount() const;
+    //获取文本内所有语音json数据
+    QStringList getVoiceJsons() const;
 
 protected:
     QVariant metaData;

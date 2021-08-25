@@ -21,6 +21,7 @@
 #include "exportnoteworker.h"
 #include "globaldef.h"
 #include "common/vnoteitem.h"
+#include "common/metadataparser.h"
 
 #include <DLog>
 
@@ -153,8 +154,15 @@ int ExportNoteWorker::exportAllVoice()
     //存在note
     if (m_noteList.size()) {
         for (auto noteData : m_noteList) {
-            for (auto it : noteData->datas.datas) {
-                exportOneVoice(it);
+            if (noteData->htmlCode.isEmpty()) {
+                for (auto it : noteData->datas.datas) {
+                    exportOneVoice(it);
+                }
+            } else {
+                //富文本笔记
+                for (auto it : noteData->getVoiceJsons()) {
+                    exportOneVoice(it);
+                }
             }
         }
     } else {
@@ -162,6 +170,23 @@ int ExportNoteWorker::exportAllVoice()
     }
 
     return error;
+}
+
+/**
+ * @brief ExportNoteWorker::exportOneVoice
+ * 导出语音
+ * @param json json格式的语音数据
+ * @return 错误码
+ */
+int ExportNoteWorker::exportOneVoice(const QString &json)
+{
+    VNVoiceBlock voiceBlock;
+    MetaDataParser dataParser;
+    //解析json数据
+    if (dataParser.parse(json, &voiceBlock)) {
+        return exportOneVoice(&voiceBlock);
+    }
+    return NoteInvalid;
 }
 
 /**

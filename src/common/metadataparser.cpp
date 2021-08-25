@@ -50,25 +50,39 @@ void MetaDataParser::parse(const QVariant &metaData, VNoteItem *noteData)
  * @param metaData 数据源
  * @param blockData 解析后的数据
  */
-void MetaDataParser::parse(const QVariant &metaData, VNoteBlock *blockData)
+bool MetaDataParser::parse(const QVariant &metaData, VNoteBlock *blockData)
 {
     QJsonDocument noteDoc = QJsonDocument::fromJson(metaData.toByteArray());
-    QJsonObject note = noteDoc.object();
-    int noteType = note.value(m_jsonNodeNameMap[NDataType]).toInt(VNoteBlock::InValid);
-    if (VNoteBlock::InValid != noteType) {
-        blockData->blockType = noteType;
-        if (VNoteBlock::Text == noteType) {
-            blockData->ptrText->blockText = note.value(m_jsonNodeNameMap[NText]).toString();
-        } else if (VNoteBlock::Voice == noteType) {
-            blockData->ptrVoice->blockText = note.value(m_jsonNodeNameMap[NText]).toString();
-            blockData->ptrVoice->voiceTitle = note.value(m_jsonNodeNameMap[NTitle]).toString();
-            blockData->ptrVoice->state = note.value(m_jsonNodeNameMap[NState]).toBool(false);
-            blockData->ptrVoice->voicePath = note.value(m_jsonNodeNameMap[NVoicePath]).toString();
-            blockData->ptrVoice->voiceSize = note.value(m_jsonNodeNameMap[NVoiceSize]).toInt(0);
-            blockData->ptrVoice->createTime = QDateTime::fromString(
-                note.value(m_jsonNodeNameMap[NCreateTime]).toString(), VNOTE_TIME_FMT);
-        }
+    //不是可解析的json字符串
+    if (noteDoc.toJson().isEmpty()) {
+        return false;
     }
+    QJsonObject note = noteDoc.object();
+    //获取数据类型
+    int noteType = note.value(m_jsonNodeNameMap[NDataType]).toInt(VNoteBlock::InValid);
+
+    //不是需要的解析类型
+    if (VNoteBlock::InValid == noteType) {
+        return false;
+    }
+    blockData->blockType = noteType;
+    if (VNoteBlock::Text == noteType) {
+        //普通文本
+        blockData->ptrText->blockText = note.value(m_jsonNodeNameMap[NText]).toString();
+    } else if (VNoteBlock::Voice == noteType) {
+        //语音文本
+        blockData->ptrVoice->blockText = note.value(m_jsonNodeNameMap[NText]).toString();
+        blockData->ptrVoice->voiceTitle = note.value(m_jsonNodeNameMap[NTitle]).toString();
+        blockData->ptrVoice->state = note.value(m_jsonNodeNameMap[NState]).toBool(false);
+        blockData->ptrVoice->voicePath = note.value(m_jsonNodeNameMap[NVoicePath]).toString();
+        blockData->ptrVoice->voiceSize = note.value(m_jsonNodeNameMap[NVoiceSize]).toInt(0);
+        blockData->ptrVoice->createTime = QDateTime::fromString(
+            note.value(m_jsonNodeNameMap[NCreateTime]).toString(), VNOTE_TIME_FMT);
+    } else {
+        //其他类型
+        return false;
+    }
+    return true;
 }
 /**
  * @brief MetaDataParser::makeMetaData

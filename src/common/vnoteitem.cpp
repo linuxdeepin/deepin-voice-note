@@ -24,6 +24,7 @@
 
 #include <QFile>
 #include <QFileInfo>
+#include <QRegExp>
 
 /**
  * @brief VNoteItem::VNoteItem
@@ -205,17 +206,21 @@ void VNoteItem::delBlock(VNoteBlock *block)
 
 /**
  * @brief VNoteItem::haveVoice
+ * 判断是否存在语言
  * @return true 有语音
  */
 bool VNoteItem::haveVoice() const
 {
-    bool fHaveVoice = false;
-
-    if (datas.voiceBlocks.size() > 0) {
-        fHaveVoice = true;
+    if (htmlCode.isEmpty()) {
+        return datas.voiceBlocks.size() > 0;
     }
-
-    return fHaveVoice;
+    //匹配语音块标签的正则表达式
+    QRegExp rx("<div.+jsonkey.+>");
+    rx.setMinimal(true); //最小匹配
+    if (rx.indexIn(htmlCode) == -1) {
+        return false;
+    }
+    return true;
 }
 
 /**
@@ -248,7 +253,38 @@ bool VNoteItem::haveText() const
  */
 qint32 VNoteItem::voiceCount() const
 {
-    return datas.voiceBlocks.size();
+    //老版本
+    if (htmlCode.isEmpty()) {
+        return datas.voiceBlocks.size();
+    }
+    //新富文本版本
+    return getVoiceJsons().size();
+}
+
+/**
+ * @brief VNoteItem::getVoiceJsons
+ * 获取文本中所有的语音json字符串
+ * @return 语音json字符串列表
+ */
+QStringList VNoteItem::getVoiceJsons() const
+{
+    //匹配语音块标签的正则表达式
+    QRegExp rx("<div.+jsonkey.+>");
+    rx.setMinimal(true); //最小匹配
+    //匹配语音json数据的正则表达式
+    QRegExp rxJson("\\{.*\\}");
+    rxJson.setMinimal(true); //最小匹配
+    QStringList list;
+    int pos = 0;
+    //查找语音块
+    while ((pos = rx.indexIn(htmlCode, pos)) != -1) {
+        //获取语音json数据
+        if (rxJson.indexIn(rx.cap(0))) {
+            list << rxJson.cap(0).replace("&quot;", "\"");
+        }
+        pos += rx.matchedLength();
+    }
+    return list;
 }
 
 QDebug &operator<<(QDebug &out, VNoteItem &noteItem)

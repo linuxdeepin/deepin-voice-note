@@ -116,7 +116,7 @@ public:
      * @param 输入参数
      * @param 输出结构体
      */
-    void parse(const QVariant &metaData, VNoteBlock *blockData /*out*/);
+    bool parse(const QVariant &metaData, VNoteBlock *blockData /*out*/);
     //源数据生成
     void makeMetaData(VNoteItem *noteData, QVariant &metaData /*out*/);
     void makeMetaData(const VNoteBlock *blockData, QVariant &metaData /*out*/);
