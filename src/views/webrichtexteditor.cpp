@@ -29,6 +29,7 @@
 #include "db/vnoteitemoper.h"
 
 #include <DFileDialog>
+#include <DGuiApplicationHelper>
 
 #include <QEventLoop>
 #include <QClipboard>
@@ -69,6 +70,9 @@ void WebRichTextEditor::initWebView()
     connect(content, &JsContent::setDataFinsh, this, &WebRichTextEditor::onSetDataFinsh);
     connect(content, &JsContent::popupMenu, this, &WebRichTextEditor::saveMenuParam);
     connect(content, &JsContent::textPaste, this, &WebRichTextEditor::onPaste);
+    connect(content, &JsContent::loadFinsh, this, &WebRichTextEditor::onThemeChanged);
+    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::paletteTypeChanged,
+            this, &WebRichTextEditor::onThemeChanged);
 }
 
 void WebRichTextEditor::initRightMenu()
@@ -440,4 +444,11 @@ void WebRichTextEditor::deleteSelectText()
             QApplication::sendEvent(obj, &event);
         }
     }
+}
+
+void WebRichTextEditor::onThemeChanged()
+{
+    DGuiApplicationHelper::ColorType theme =
+        DGuiApplicationHelper::instance()->themeType();
+    emit JsContent::instance()->callJsSetTheme(theme);
 }

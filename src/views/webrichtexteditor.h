@@ -116,6 +116,11 @@ public slots:
      */
     void viewPicture(const QString &filePath);
 
+    /**
+     * @brief 系统主题发生改变处理
+     */
+    void onThemeChanged();
+
 protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
     void dropEvent(QDropEvent *event) override;

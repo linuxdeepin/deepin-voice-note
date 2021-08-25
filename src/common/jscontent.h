@@ -61,7 +61,11 @@ signals:
     void callJsSetVoiceText(const QString &text, int asrflag);
     void callJsInsertImages(const QStringList &images); //调用web前端，插入图片
     void callJsSetPlayStatus(int status); //调用web前端, 设置播放状态，0播放中，1暂停中 2.结束播放
-    bool callJsSearch(const QString &html); //调用web前端，设置json格式数据
+    /**
+     * @brief 调用web前端，设置系统主题
+     * @param theme : 主题类型，0 未知，1浅色主题，2深色主题，参考DGuiApplicationHelper::ColorType
+     */
+    void callJsSetTheme(int theme);
 
     void textPaste(); //粘贴信号
     void textChange();
