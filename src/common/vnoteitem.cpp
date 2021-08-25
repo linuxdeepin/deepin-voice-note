@@ -224,8 +224,14 @@ bool VNoteItem::haveVoice() const
  */
 bool VNoteItem::haveText() const
 {
-    bool fHaveText = false;
+    if (!htmlCode.isEmpty()) { //富文本文本内容判断
+        if (htmlCode == "<br>" || htmlCode == "<p></p>") {
+            return false;
+        }
+        return true;
+    }
 
+    bool fHaveText = false;
     for (auto it : datas.textBlocks) {
         if (!it->blockText.isEmpty()) {
             fHaveText = true;

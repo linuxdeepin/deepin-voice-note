@@ -1237,6 +1237,9 @@ void VNoteMainWindow::onMenuAbout2Show()
     DMenu *menu = static_cast<DMenu *>(sender());
     QAction *topAction = ActionManager::Instance()->getActionById(ActionManager::NoteTop);
     if (menu == ActionManager::Instance()->noteContextMenu()) {
+        //右键弹出先更新数据，避免数据不同步
+        m_richTextEdit->updateNote();
+
         bool notMultipleSelected = !m_middleView->isMultipleSelected();
         ActionManager::Instance()->visibleAction(ActionManager::NoteTop, notMultipleSelected);
         ActionManager::Instance()->visibleAction(ActionManager::NoteRename, notMultipleSelected);

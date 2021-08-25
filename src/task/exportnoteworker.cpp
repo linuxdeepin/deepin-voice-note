@@ -117,14 +117,19 @@ int ExportNoteWorker::exportText()
             QFile exportFile(m_exportPath + "/" + fileName);
             if (exportFile.open(QIODevice::ReadWrite)) {
                 QTextStream stream(&exportFile);
-
-                for (auto it : noteData->datas.datas) {
-                    if (VNoteBlock::Text == it->getType()) {
-                        stream << it->blockText;
-                        stream << '\n';
+                //富文本数据需要转换为纯文本
+                if (!noteData->htmlCode.isEmpty()) {
+                    QTextDocument doc;
+                    doc.setHtml(noteData->htmlCode);
+                    stream << doc.toPlainText();
+                } else {
+                    for (auto it : noteData->datas.datas) {
+                        if (VNoteBlock::Text == it->getType()) {
+                            stream << it->blockText;
+                            stream << '\n';
+                        }
                     }
                 }
-
                 stream.flush();
             } else {
                 error = PathDenied;
