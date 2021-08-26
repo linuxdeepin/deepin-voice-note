@@ -22,6 +22,7 @@
 #include "webrichtexteditor.h"
 
 #include <QVBoxLayout>
+#include <QTimer>
 
 RichTextEdit::RichTextEdit(QWidget *parent)
     : QWidget(parent)
@@ -36,7 +37,10 @@ void RichTextEdit::initData(VNoteItem *data, const QString &reg, bool fouse)
         if (m_webRichTextEditer->hasFocus()) {
             setFocus();
         }
-        return m_webRichTextEditer->initData(data, reg, fouse);
+        //富文本设置异步操作，解决笔记列表不实时刷新
+        QTimer::singleShot(0, this, [=] {
+            m_webRichTextEditer->initData(data, reg, fouse);
+        });
     }
 }
 
