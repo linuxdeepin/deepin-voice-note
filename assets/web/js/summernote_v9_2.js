@@ -2225,9 +2225,11 @@
                 if (dom.isEditable(point.node)) {
                     return;
                 }
-                if ($(point.node).parents('.voiceBox').length != 0) {
-                    return;
-                }
+                // console.log($(point.node), '1111')
+                // if ($(point.node).parents('.translate').length == 0 && $(point.node).parents('.voiceBox').length != 0) {
+                //     console.log($(point.node),'1212')
+                //     return;
+                // }
                 var node;
                 if (fullyContains) {
                     if (dom.isLeftEdgePoint(point)) {
@@ -3032,11 +3034,15 @@
             var _this = this;
             var rng = range.create(editable).wrapBodyInlineWithPara();
             var paras = rng.nodes(dom.isPara, { includeAncestor: true });
+            console.log(paras);
             var bookmark = rng.paraBookmark(paras);
             var clustereds = lists.clusterBy(paras, func.peq2('parentNode'));
             // 屏蔽语音文件、图片序列化
             let isVoice = paras.find((item) => {
-                return $(item).hasClass('voiceBox') || $(item).find('img').length != 0
+                return $(item).hasClass('voiceBox')
+                    || $(item).find('img').length != 0
+                    || $(item).hasClass('translate')
+                    || $(item).parents('.translate').length != 0
             })
             if (isVoice) {
                 return;
@@ -4399,7 +4405,7 @@
         Editor.prototype.fontStyling = function (target, value) {
             var rng = this.createRange();
             if (rng) {
-                console.log(rng)
+
                 var spans = this.style.styleNodes(rng);
                 $$1(spans).css(target, value);
                 // [workaround] added styled bogus span for style
@@ -7625,7 +7631,7 @@
                     'CMD+SHIFT+Z': 'redo',
                     'TAB': 'tab',
                     'SHIFT+TAB': 'untab',
-                    'CMD+B': 'bold',
+                    // 'CMD+B': 'bold',
                     'CMD+I': 'italic',
                     'CMD+U': 'underline',
                     'CMD+SHIFT+S': 'strikethrough',

@@ -33,9 +33,9 @@ var h5Tpl = `
                     <div class="time padtop">{{transSize}}</div>
                 </div>
             </div>
-            <div class="translate">
+            <div class="translate {{#if text}} translatePadding {{/if}}">
                 {{#if text}}
-                <div>{{text}}</div>
+                <p>{{text}}</p>
                 {{/if}} 
             </div>
         </div>
@@ -60,7 +60,7 @@ var nodeTpl = `
             </div>
             <div class="translate">
                 {{#if text}}
-                <div>{{text}}</div>
+                <p>{{text}}</p>
                 {{/if}}
             </div>
         </div>`;
@@ -140,15 +140,22 @@ $('body').on('click', function () {
 
 // 语音复制
 document.addEventListener('copy', function (event) {
-    // $('.voiceBox').attr('contentEditable', false)
+
     var selectionObj = window.getSelection();
     var rangeObj = selectionObj.getRangeAt(0);
     var docFragment = rangeObj.cloneContents();
     var testDiv = document.createElement("div");
+    $(docFragment).find('.translate').removeClass('translatePadding')
     $(docFragment).find('.translate').html('')
     $(docFragment).find('.voiceBox').attr('contentEditable', false)
     testDiv.appendChild(docFragment);
+
     formatHtml = testDiv.innerHTML;
+
+    if ($(testDiv).children().length == 1 && $(testDiv).find('.voiceBox').length != 0) {
+        formatHtml = '<p><br></p>' + formatHtml
+    }
+
     pasteData = window.getSelection().toString();
     // if (formatHtml.substr(0, 11) != "<p><br></p>") {
     //     formatHtml = "";
@@ -157,17 +164,31 @@ document.addEventListener('copy', function (event) {
 });
 // 粘贴
 document.addEventListener('paste', function (event) {
+    console.log(formatHtml)
     if (formatHtml != "" && pasteData == event.clipboardData.getData('Text')) {
         document.execCommand('insertHTML', false, formatHtml + "<p><br></p>");
+        event.preventDefault()
+        $('.voiceBox').removeAttr('contentEditable')
     }
-    $('.voiceBox').removeAttr('contentEditable')
-    event.preventDefault()
     removeNullP()
 });
 
+// 判断选区是否包含语音
+function isRangVoice() {
+    // 获取当前选区
+    var selectionObj = window.getSelection();
+    var rangeObj = selectionObj.getRangeAt(0);
+    var docFragment = rangeObj.cloneContents();
+    var testDiv = document.createElement("div");
+    testDiv.appendChild(docFragment);
+    formatHtml = testDiv.innerHTML;
+    console.log(formatHtml)
+
+}
 // 监听键盘删除事件
 $('body').on('keydown', function (e) {
     if (e.keyCode == 8) {
+
         var sel = window.getSelection();
         var range = sel.getRangeAt(0);
         if (range.collapsed) {
@@ -178,34 +199,50 @@ $('body').on('keydown', function (e) {
                 range.startOffset = range.startOffset - 1;
             }
         }
+        console.log($(range.startContainer).parents('li'))
         // console.log($(range.commonAncestorContainer).parents('.voiceBox'))
         if ($(range.start).hasClass('voiceBox')) {
             $(range.start).attr('contentEditable', false)
         }
-        if ($(range.start).hasClass('demo')) {
-            $(range.commonAncestorContainer).html('')
-            let nextP = $(range.commonAncestorContainer).parents('.voiceBox').next()[0]
-            nextP.focus();
-            var newRange = document.createRange();
-            newRange.selectNode(nextP);
-            if (sel.anchorOffset == 0) {
-                sel.removeAllRanges();
-                sel.addRange(newRange);
-            };
+
+        if ($(range.startContainer).parents('p').prev().hasClass('voiceBox')) {
+            $(range.startContainer).parents('p').prev().attr('contentEditable', false)
+        }
+        if ($(range.startContainer).parents('ul').prev().hasClass('voiceBox')) {
+            $(range.startContainer).parents('ul').prev().attr('contentEditable', false)
+        }
+        if ($(range.startContainer).parents('ol').prev().hasClass('voiceBox')) {
+            $(range.startContainer).parents('ol').prev().attr('contentEditable', false)
+        }
+        if ($(range.commonAncestorContainer).parents('.translate').html() == '<p><br></p>') {
+            $(range.commonAncestorContainer).parents('.translate').removeClass('translatePadding')
+            $(range.commonAncestorContainer).parents('.translate').html('')
+            // let nextP = $(range.commonAncestorContainer).parents('.voiceBox').next()[0]
+            // nextP.focus();
+            // var newRange = document.createRange();
+            // newRange.selectNode(nextP);
+            // if (sel.anchorOffset == 0) {
+            //     sel.removeAllRanges();
+            //     sel.addRange(newRange);
+            // };
             e.preventDefault();
             e.stopPropagation();
         }
-        if (range.start == null &&
-            range.startOffset == 0 &&
-            range.endOffset == 0 &&
-            $(range.commonAncestorContainer).parents('.voiceBox').length != 0) {
+        if (range.start == null
+            && range.startOffset == 0
+            && range.endOffset == 0
+            && $(range.commonAncestorContainer).parents('.voiceBox').length != 0
+            && $(range.commonAncestorContainer).parents('p').prev().length == 0) {
             e.preventDefault();
             e.stopPropagation();
         }
     }
 })
 
-
+// 语音文字点击
+$('body').on('mousedown', '.translate', function (e) {
+    $('.voiceBox').removeAttr('contentEditable')
+})
 
 
 //播放
@@ -389,21 +426,23 @@ function setHtml(html) {
     initFinish = false;
     $('#summernote').summernote('code', html);
     initFinish = true;
-    changeColor(1);
     // 搜索功能
     webobj.jsCallSetDataFinsh();
 }
 
 //设置录音转文字内容 flag: 0: 转换过程中 提示性文本（＂正在转文字中＂)１:结果 文本,空代表转失败了
 function setVoiceText(text, flag) {
+    // text = '语音专文字测试'
     if (activeTransVoice) {
         if (flag) {
             if (text) {
-                activeTransVoice.find('.translate').html('<div>' + text + '</div>');
+                activeTransVoice.find('.translate').html('<p>' + text + '</p>');
+                activeTransVoice.find('.translate').addClass('translatePadding')
                 webobj.jsCallTxtChange();
             }
             else {
                 activeTransVoice.find('.translate').html('');
+                activeTransVoice.find('.translate').removeClass('translatePadding')
             }
             //将转文字文本写到json属性里
             var jsonValue = activeTransVoice.attr('jsonKey');
@@ -416,7 +455,8 @@ function setVoiceText(text, flag) {
             bTransVoiceIsReady = true;
         }
         else {
-            activeTransVoice.find('.translate').html('<p class="noselect">' + text + '</p>');
+            activeTransVoice.find('.translate').html('<div class="noselect">' + text + '</div>');
+            activeTransVoice.find('.translate').addClass('translatePadding')
             bTransVoiceIsReady = false;
         }
     }
@@ -523,6 +563,17 @@ function rightClick(e) {
         var sel = window.getSelection();
         sel.removeAllRanges();
 
+        // 设置选区
+        var range = document.createRange();
+        range.selectNode($(e.target).parents('.voiceBox')[0]);
+        // range.collapse(true);
+        var sel = window.getSelection();
+        if (sel.anchorOffset == 0) {
+            sel.removeAllRanges();
+            sel.addRange(range);
+        };
+
+
     } else {
         // 文本右键
         json = ''
@@ -541,6 +592,7 @@ function rightClick(e) {
  * @returns {any}
  */
 function changeColor(flag) {
+    console.log(flag)
     if (flag == 1) {
         $('body').css({
             'background': 'rgba(255,255,255,1)',
@@ -573,7 +625,7 @@ function changeColor(flag) {
         $('.colorFont').css({
             "color": 'rgba(65,77,104,1)'
         })
-        changeIconColor('darkColor');
+        changeIconColor('lightColor');
     } else {
         $('body').css({
             'background': 'rgba(40,40,40,1)',
@@ -609,7 +661,7 @@ function changeColor(flag) {
         $('.dropdown-fontsize li a').css({
             "color": 'rgba(192,198,212,1)'
         })
-        changeIconColor('lightColor');
+        changeIconColor('darkColor');
     }
 
 }
@@ -621,15 +673,20 @@ function changeColor(flag) {
  * @returns {any}
  */
 function changeIconColor(color) {
-    let iconList = ['icon-strikethrough', 'icon-bold', 'icon-italic', 'icon-underline', 'icon-forecolor', 'icon-backcolor', 'icon-ul', 'icon-ol']
+    let newColor = color == "lightColor" ? 'lightColor' : "darkColor"
+    let oldColor = color == "lightColor" ? 'darkColor' : "lightColor"
+    let iconList = ['icon-down', 'icon-strikethrough', 'icon-bold', 'icon-italic', 'icon-underline', 'icon-forecolor', 'icon-backcolor', 'icon-ul', 'icon-ol']
     iconList.forEach((item, index) => {
         if (item == 'icon-forecolor') {
-            $('.' + item + ' .path3').addClass(color)
+            $('.' + item + ' .path3').removeClass(oldColor)
+            $('.' + item + ' .path3').addClass(newColor)
         } else if (item == 'icon-backcolor') {
-            $('.' + item + ' .path1,.path2,.path3,.path4').addClass(color)
+            $('.' + item + ' .path1,.path2,.path3,.path4').removeClass(oldColor)
+            $('.' + item + ' .path1,.path2,.path3,.path4').addClass(newColor)
         }
         else {
-            $('.' + item).addClass(color)
+            $('.' + item).removeClass(oldColor)
+            $('.' + item).addClass(newColor)
         }
     })
 }

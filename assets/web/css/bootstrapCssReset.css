@@ -278,11 +278,11 @@ ol>li, ul>li {
     height: 24px;
 }
 
-.lightColor:before {
+.darkColor:before {
     color: #C5CFE0!important;
 }
 
-.darkColor:before {
+.lightColor:before {
     color: #536076!important;
 }
 
