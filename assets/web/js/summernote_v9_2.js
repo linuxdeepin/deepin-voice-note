@@ -3821,7 +3821,10 @@
                 return _this.fontStyling('font-family', "\'" + value + "\'");
             });
             this.fontSize = this.wrapCommand(function (value) {
+                // debugger;
                 return _this.fontStyling('font-size', value + 'px');
+                // document.execCommand('fontSize', false, 1);
+
             });
             for (var idx = 1; idx <= 6; idx++) {
                 this['formatH' + idx] = (function (idx) {
@@ -4077,6 +4080,8 @@
                 _this.context.triggerEvent('paste', event);
             }).on('contextmenu', function (event) {
                 _this.context.triggerEvent('contextmenu', event);
+            }).on('dblclick', function (event) {
+                _this.context.triggerEvent('dblclick', event);
             });
 
 
@@ -4394,6 +4399,7 @@
         Editor.prototype.fontStyling = function (target, value) {
             var rng = this.createRange();
             if (rng) {
+                console.log(rng)
                 var spans = this.style.styleNodes(rng);
                 $$1(spans).css(target, value);
                 // [workaround] added styled bogus span for style
@@ -4561,6 +4567,7 @@
             if (clipboardData && clipboardData.items && clipboardData.items.length) {
                 var item = lists.head(clipboardData.items);
                 if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
+
                     this.context.invoke('editor.insertImagesOrCallback', [item.getAsFile()]);
                 }
                 this.context.invoke('editor.afterCommand');
@@ -6906,8 +6913,7 @@
             this.ui = $$1.summernote.ui;
             this.options = context.options;
             this.events = {
-                'summernote.keyup summernote.mouseup summernote.scroll ': function (e) {
-                    let sel = window.getSelection();
+                'summernote.mouseup summernote.scroll ': function (e) {
                     // summernote.contextmenu
                     setTimeout(function () {
                         _this.update();
@@ -6915,6 +6921,13 @@
                 },
                 'summernote.contextmenu': function (e) {
                     _this.rightUpdate()
+
+                },
+                'summernote.dblclick': function (e) {
+                    let selStr = window.getSelection().toString();
+                    if (selStr == '\n') {
+                        _this.hide();
+                    }
 
                 },
                 'summernote.disable summernote.change summernote.dialog.shown': function () {
@@ -6947,6 +6960,10 @@
         };
         AirPopover.prototype.update = function () {
             var styleInfo = this.context.invoke('editor.currentStyle');
+            let selStr = window.getSelection().toString();
+            if (selStr == '\n') {
+                return _this.hide();
+            }
             if (styleInfo.range && !styleInfo.range.isCollapsed()) {
                 var rect = lists.last(styleInfo.range.getClientRects());
                 if (rect) {
@@ -6985,7 +7002,7 @@
                 if (winWidth - left < 300) {
                     left = winWidth - 300
                 }
-                if (top < 0) {
+                if (top < 100) {
                     top = top + 70
                 }
                 this.$popover.css({
@@ -7384,13 +7401,10 @@
             return function (event) {
                 event.preventDefault();
                 var $target = $$1(event.target);
-                // debugger;
                 _this.invoke(namespace, value || $target.closest('[data-value]').data('value'), $target);
             };
         };
         Context.prototype.invoke = function () {
-
-
             var namespace = lists.head(arguments);
             var args = lists.tail(lists.from(arguments));
             var splits = namespace.split('.');
@@ -7398,7 +7412,6 @@
             var moduleName = hasSeparator && lists.head(splits);
             var methodName = hasSeparator ? lists.last(splits) : lists.head(splits);
             var module = this.modules[moduleName || 'editor'];
-
             if (!moduleName && this[methodName]) {
                 return this[methodName].apply(this, args);
             }
@@ -7583,9 +7596,9 @@
                     'CTRL+Y': 'redo',
                     'TAB': 'tab',
                     'SHIFT+TAB': 'untab',
-                    'CTRL+B': 'bold',
-                    'CTRL+I': 'italic',
-                    'CTRL+U': 'underline',
+                    // 'CTRL+B': 'bold',
+                    // 'CTRL+I': 'italic',
+                    // 'CTRL+U': 'underline',
                     'CTRL+SHIFT+S': 'strikethrough',
                     'CTRL+BACKSLASH': 'removeFormat',
                     'CTRL+SHIFT+L': 'justifyLeft',

@@ -14,10 +14,11 @@ $('body').on('contextmenu', rightClick)
 // 注册内容改变事件
 $('#summernote').on('summernote.change', changeContent);
 
+// 初始化渲染模板
 var h5Tpl = `
-    <div class="li voiceBox" contenteditable="false" jsonKey="{{jsonValue}}">
+    <div class="li voiceBox"  jsonKey="{{jsonValue}}">
         <div class='voiceInfoBox'>
-            <div class="demo" >              
+            <div class="demo" contenteditable="false">              
                 <div class="voicebtn play"></div>
                 <div class="lf">
                     <div class="title">{{title}}</div>
@@ -35,14 +36,14 @@ var h5Tpl = `
             <div class="translate">
                 {{#if text}}
                 <div>{{text}}</div>
-                {{/if}}
+                {{/if}} 
             </div>
         </div>
     </div>`;
-
+// 语音插入模板
 var nodeTpl = `
         <div class='voiceInfoBox'>
-            <div class="demo" >
+            <div class="demo" contenteditable="false" >
                 <div class="voicebtn play"></div>
                 <div class="lf">
                     <div class="title">{{title}}</div>
@@ -93,6 +94,12 @@ $('#summernote').summernote({
         ],
     },
     airMode: true,
+    callbacks: {
+        onPaste: function (e) {
+            return;
+        }
+    }
+
 });
 
 // 监听窗口大小变化
@@ -121,7 +128,6 @@ function isNoteNull() {
 
 //点击选中录音
 $('body').on('click', '.li', function (e) {
-    console.log('div click...');
     e.stopPropagation();
     $('.li').removeClass('active');
     // $(this).addClass('active');
@@ -132,30 +138,78 @@ $('body').on('click', function () {
     $('.li').removeClass('active');
 })
 
-// 语音复制粘贴
+// 语音复制
 document.addEventListener('copy', function (event) {
+    // $('.voiceBox').attr('contentEditable', false)
     var selectionObj = window.getSelection();
     var rangeObj = selectionObj.getRangeAt(0);
     var docFragment = rangeObj.cloneContents();
     var testDiv = document.createElement("div");
+    $(docFragment).find('.translate').html('')
+    $(docFragment).find('.voiceBox').attr('contentEditable', false)
     testDiv.appendChild(docFragment);
     formatHtml = testDiv.innerHTML;
     pasteData = window.getSelection().toString();
     // if (formatHtml.substr(0, 11) != "<p><br></p>") {
     //     formatHtml = "";
     // }
-});
 
+});
+// 粘贴
 document.addEventListener('paste', function (event) {
     if (formatHtml != "" && pasteData == event.clipboardData.getData('Text')) {
         document.execCommand('insertHTML', false, formatHtml + "<p><br></p>");
     }
+    $('.voiceBox').removeAttr('contentEditable')
+    event.preventDefault()
     removeNullP()
 });
 
+// 监听键盘删除事件
+$('body').on('keydown', function (e) {
+    if (e.keyCode == 8) {
+        var sel = window.getSelection();
+        var range = sel.getRangeAt(0);
+        if (range.collapsed) {
+            if (range.startOffset === 0) {
+                range.start = range.startContainer.previousElementSibling;
+            } else {
+                // range.setStartOffset(range.startOffset  - 1);
+                range.startOffset = range.startOffset - 1;
+            }
+        }
+        // console.log($(range.commonAncestorContainer).parents('.voiceBox'))
+        if ($(range.start).hasClass('voiceBox')) {
+            $(range.start).attr('contentEditable', false)
+        }
+        if ($(range.start).hasClass('demo')) {
+            $(range.commonAncestorContainer).html('')
+            let nextP = $(range.commonAncestorContainer).parents('.voiceBox').next()[0]
+            nextP.focus();
+            var newRange = document.createRange();
+            newRange.selectNode(nextP);
+            if (sel.anchorOffset == 0) {
+                sel.removeAllRanges();
+                sel.addRange(newRange);
+            };
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        if (range.start == null &&
+            range.startOffset == 0 &&
+            range.endOffset == 0 &&
+            $(range.commonAncestorContainer).parents('.voiceBox').length != 0) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+})
+
+
+
+
 //播放
 $('body').on('click', '.voicebtn', function (e) {
-    console.log('------playBtn click...');
     // e.stopPropagation();
     var curVoice = $(this).parents('.li:first');
     var jsonString = curVoice.attr('jsonKey');
@@ -213,7 +267,6 @@ function getActiveNote() {
 
 new QWebChannel(qt.webChannelTransport,
     function (channel) {
-        console.log('qt.webChannelTransport....');
         webobj = channel.objects.webobj;
         //所有的c++ 调用js的接口都需要在此绑定格式，webobj.c++函数名（jscontent.cpp查看.connect(js处理函数)
         //例如 webobj.c++fun.connect(jsfun)
@@ -223,6 +276,8 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsSetHtml.connect(setHtml);
         webobj.callJsSetVoiceText.connect(setVoiceText);
         webobj.callJsInsertImages.connect(insertImg);
+        webobj.callJsSetTheme.connect(changeColor);
+
         //通知QT层完成通信绑定
         webobj.jsCallChannleFinish();
     }
@@ -231,7 +286,6 @@ new QWebChannel(qt.webChannelTransport,
 //初始化数据 
 function initData(text) {
     initFinish = false;
-    console.log('=============>initData', text);
     var arr = JSON.parse(text);
     var html = '';
     var voiceHtml;
@@ -240,7 +294,6 @@ function initData(text) {
     arr.noteDatas.forEach((item, index) => {
         //false: txt
         if (item.type == 1) {
-            console.log('---txt---');
             if (item.text == '') {
                 txtHtml = '<p><br></p>';
             }
@@ -251,7 +304,6 @@ function initData(text) {
         }
         //true: voice
         else {
-            console.log('---voice---');
             voiceHtml = transHtml(item, false);
             html += voiceHtml;
         }
@@ -265,7 +317,6 @@ function initData(text) {
 
 //录音插入数据
 function insertVoiceItem(text) {
-    console.log('--insertVoiceItem---');
     var arr = JSON.parse(text);
     var voiceHtml = transHtml(arr, true);
     var oA = document.createElement('div');
@@ -282,6 +333,9 @@ function insertVoiceItem(text) {
     // $('#summernote').summernote('insertNode', oA);
     // $('#summernote').summernote('restoreRange');
     document.execCommand('insertHTML', false, str);
+
+    $('.voiceBox').removeAttr('contentEditable')
+
     removeNullP()
 }
 
@@ -306,7 +360,6 @@ function removeNullP() {
  * @returns {any}
  */
 function toggleState(state) {
-    console.log('---toggleState--', state);
     if (state == '0') {
         $('.voicebtn').removeClass('pause').addClass('play');
         activeVoice.removeClass('play').addClass('pause');
@@ -343,7 +396,6 @@ function setHtml(html) {
 
 //设置录音转文字内容 flag: 0: 转换过程中 提示性文本（＂正在转文字中＂)１:结果 文本,空代表转失败了
 function setVoiceText(text, flag) {
-    console.log('----voice text----');
     if (activeTransVoice) {
         if (flag) {
             if (text) {
@@ -461,9 +513,9 @@ function rightClick(e) {
         // 语音右键
         type = 1;
         json = $(e.target).parents('.li:first').attr('jsonKey')
+        console.log($(e.target).parents('.voiceBox'))
         // 当前没有语音在转文字时， 才可以转文字
         if (bTransVoiceIsReady) {
-            console.log(activeTransVoice)
             activeTransVoice = $(e.target).parents('.li:first');
         }
         // $('#summernote').summernote('airPopover.rightUpdate')
@@ -593,4 +645,21 @@ function insertImg(urlStr) {
         $("#summernote").summernote('insertImage', item, 'img');
     })
 }
+
+// 禁用ctrl+v
+document.onkeydown = function (event) {
+    if (event.ctrlKey && window.event.keyCode == 86) {
+
+        webobj.jsCallPaste()
+        return false;
+    }
+
+}
+// ctrl+z 移除可编辑
+document.onkeyup = function (event) {
+    if (event.ctrlKey && window.event.keyCode == 90) {
+        $('.voiceBox').removeAttr('contentEditable')
+    }
+}
+
 

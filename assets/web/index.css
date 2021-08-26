@@ -33,10 +33,13 @@ body {
     background: rgba(0, 0, 0, 0.05);
     min-height: 30px;
     border-radius: 8px;
- 
     /* user-select: none; */
     /* position: relative; */
     margin-bottom: 10px;
+}
+
+.translate>div {
+    /* user-select: auto */
 }
 
 #demo {
