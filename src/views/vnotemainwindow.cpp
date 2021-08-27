@@ -217,6 +217,7 @@ void VNoteMainWindow::initConnections()
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::paletteTypeChanged,
             this, &VNoteMainWindow::onThemeChanged);
     connect(JsContent::instance(), &JsContent::playVoice, this, &VNoteMainWindow::onWebVoicePlay);
+    connect(m_richTextEdit, &RichTextEdit::currentSearchEmpty, this, &VNoteMainWindow::onWebSearchEmpty);
 }
 
 /**
@@ -676,18 +677,8 @@ void VNoteMainWindow::onVNoteSearch()
             //搜索内容不为空，切换为单选详情页面
             changeRightView(false);
             setSpecialStatus(SearchStart);
-            if (m_searchKey == text) { //搜索关键字不变只更新当前笔记搜索
-                //没有搜索到则从笔记列表删除当前笔记
-                if (!m_richTextEdit->findText(m_searchKey)) {
-                    m_middleView->setNextSelection();
-                    m_middleView->deleteCurrentRow();
-                    //没有笔记符合条件则提示搜索无结果
-                    if (0 == m_middleView->rowCount()) {
-                        m_middleView->setVisibleEmptySearch(true);
-                    } else {
-                        m_middleView->selectAfterRemoved();
-                    }
-                }
+            if (m_searchKey == text && m_stackedRightMainWidget->currentWidget() == m_richTextEdit) { //搜索关键字不变只更新当前笔记搜索
+                m_richTextEdit->searchText(m_searchKey);
             } else {
                 m_searchKey = text;
                 //重新搜索之前先更新笔记内容
@@ -2414,4 +2405,17 @@ void VNoteMainWindow::onInsertImageToWebEditor()
         QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
         "Image file(*.jpg *.png *.bmp)");
     JsContent::instance()->insertImages(filePaths);
+}
+
+void VNoteMainWindow::onWebSearchEmpty()
+{
+    //没有搜索到则从笔记列表删除当前笔记
+    m_middleView->setNextSelection();
+    m_middleView->deleteCurrentRow();
+    //没有笔记符合条件则提示搜索无结果
+    if (0 == m_middleView->rowCount()) {
+        m_middleView->setVisibleEmptySearch(true);
+    } else {
+        m_middleView->selectAfterRemoved();
+    }
 }

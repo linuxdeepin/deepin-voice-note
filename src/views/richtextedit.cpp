@@ -64,16 +64,17 @@ void RichTextEdit::initWebView()
     m_webRichTextEditer = new WebRichTextEditor(this);
     connect(m_webRichTextEditer, SIGNAL(asrStart(const QVariant &)),
             this, SIGNAL(asrStart(const QVariant &)));
+    connect(m_webRichTextEditer, SIGNAL(currentSearchEmpty()),
+            this, SIGNAL(currentSearchEmpty()));
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_webRichTextEditer);
 }
 
-bool RichTextEdit::findText(const QString &searchKey)
+void RichTextEdit::searchText(const QString &searchKey)
 {
     if (m_webRichTextEditer) {
-        return m_webRichTextEditer->findText(searchKey);
+        m_webRichTextEditer->searchText(searchKey);
     }
-    return false;
 }
 
 void RichTextEdit::unboundCurrentNoteData()

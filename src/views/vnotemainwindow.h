@@ -254,6 +254,11 @@ public slots:
      */
     void onWebVoicePlay(const QVariant &json, bool bIsSame);
 
+    /**
+     * @brief 当前编辑区内容搜索为空
+     */
+    void onWebSearchEmpty();
+
 private:
     //左侧列表视图操作相关
     //添加记事本

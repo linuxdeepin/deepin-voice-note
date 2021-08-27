@@ -165,17 +165,13 @@ void WebRichTextEditor::updateNote()
     }
 }
 
-bool WebRichTextEditor::findText(const QString &searchKey)
+void WebRichTextEditor::searchText(const QString &searchKey)
 {
-    bool ret = false;
-    //同步获取搜索结果
-    QEventLoop synLoop;
-    QWebEngineView::findText(searchKey, QWebEnginePage::FindFlags(), [&](const bool &result) {
-        ret = result;
-        synLoop.quit();
+    findText(searchKey, QWebEnginePage::FindFlags(), [=](const bool &result) {
+        if (result == false) {
+            emit currentSearchEmpty();
+        }
     });
-    synLoop.exec();
-    return ret;
 }
 
 void WebRichTextEditor::unboundCurrentNoteData()

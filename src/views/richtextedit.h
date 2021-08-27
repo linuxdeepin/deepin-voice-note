@@ -60,9 +60,8 @@ public:
     /**
      * @brief 搜索当前笔记
      * @param searchKey : 搜索关键字
-     * @return　搜索无结果返回false
      */
-    bool findText(const QString &searchKey);
+    void searchText(const QString &searchKey);
 
     /**
      * @brief 解除绑定的笔记数据
@@ -75,6 +74,11 @@ signals:
      * @param json 语音json格式信息
      */
     void asrStart(const QVariant &json);
+
+    /**
+     * @brief 当前编辑区搜索内容为空
+     */
+    void currentSearchEmpty();
 
     //public slots:
 
