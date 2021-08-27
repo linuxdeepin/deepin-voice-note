@@ -138,6 +138,13 @@ void WebRichTextEditor::insertVoiceItem(const QString &voicePath, qint64 voiceSi
     QVariant value;
     parse.makeMetaData(&data, value);
     this->setFocus();
+    //关闭应用时，需要同步插入语音并进行后台更新
+    if (OpsStateInterface::instance()->isAppQuit()) {
+        JsContent::instance()->callJsSynchronous(page(), QString("insertVoiceItem('%1')").arg(value.toString()));
+        m_textChange = true;
+        update();
+        return;
+    }
     emit JsContent::instance()->callJsInsertVoice(value.toString());
 }
 
