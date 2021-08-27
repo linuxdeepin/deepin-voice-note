@@ -70,6 +70,16 @@ VNoteRightMenu *ActionManager::noteContextMenu()
 }
 
 /**
+ * @brief ActionManager::saveNoteContextMenu
+ * 获取记事项列表右键菜单的的二级菜单保存笔记右键菜单
+ * @return 保存笔记二级菜单
+ */
+VNoteRightMenu *ActionManager::saveNoteContextMenu()
+{
+    return m_saveNoteContextMenu.get();
+}
+
+/**
  * @brief ActionManager::detialContextMenu
  * @return 详情页右键菜单
  */
@@ -177,6 +187,9 @@ void ActionManager::resetCtxMenu(ActionManager::MenuType type, bool enable)
     } else if (MenuType::TxtCtxMenu == type) {
         startMenuId = TxtMenuBase;
         endMenuId = TxtMenuMax;
+    } else if (MenuType::SaveNoteCtxMenu == type) {
+        startMenuId = SaveNoteMenuBase;
+        endMenuId = SaveNoteMax;
     }
 
     QAction *pAction = nullptr;
@@ -194,6 +207,31 @@ void ActionManager::resetCtxMenu(ActionManager::MenuType type, bool enable)
  */
 void ActionManager::initMenu()
 {
+    //保存笔记二级菜单项文案
+    QStringList saveNoteMenuTexts;
+    saveNoteMenuTexts << DApplication::translate("NotesContextMenu", "Save as HTML")
+                      << DApplication::translate("NotesContextMenu", "Save as TXT");
+
+    //初始化笔记右键菜单
+    VNoteRightMenu *saveNoteMenu = new VNoteRightMenu();
+    saveNoteMenu->setTitle(DApplication::translate("NotesContextMenu", "Save note"));
+    m_saveNoteContextMenu.reset(saveNoteMenu);
+    int saveNoteMenuIdStart = ActionKind::SaveNoteMenuBase;
+
+    //添加菜单选项
+    for (auto it : saveNoteMenuTexts) {
+        QAction *pAction = new QAction(it, m_saveNoteContextMenu.get());
+        pAction->setProperty(MenuId, saveNoteMenuIdStart);
+
+        m_saveNoteContextMenu->addAction(pAction);
+        m_actionsMap.insert(static_cast<ActionKind>(saveNoteMenuIdStart), pAction);
+
+        saveNoteMenuIdStart++;
+        if (SaveNoteMax == saveNoteMenuIdStart) {
+            break;
+        }
+    }
+
     bool isAISrvAvailable = OpsStateInterface::instance()->isAiSrvExist();
     //Notebook context menu
     QStringList notebookMenuTexts;
@@ -231,6 +269,13 @@ void ActionManager::initMenu()
     int noteMenuIdStart = ActionKind::NoteMenuBase;
 
     for (auto it : noteMenuTexts) {
+        //添加二级菜单
+        if (NoteSave == noteMenuIdStart) {
+            m_noteContextMenu->addMenu(m_saveNoteContextMenu.get());
+            noteMenuIdStart++;
+            continue;
+        }
+
         QAction *pAction = new QAction(it, m_noteContextMenu.get());
         pAction->setProperty(MenuId, noteMenuIdStart);
 

@@ -70,6 +70,8 @@ void ExportNoteWorker::run()
             } else {
                 exportOneVoice(m_noteblock);
             }
+        } else if (ExportHtml == m_exportType) {
+            exportAsHtml();
         }
     } else {
         qCritical() << "Export note error: m_exportType=" << m_exportType;
@@ -206,6 +208,25 @@ int ExportNoteWorker::exportOneVoice(VNoteBlock *noteblock)
         error = NoteInvalid;
     }
 
+    return error;
+}
+
+/**
+ * @brief ExportNoteWorker::exportAsHtml
+ * 将笔记导出为Html
+ * @return 错误码
+ */
+int ExportNoteWorker::exportAsHtml()
+{
+    ExportError error = ExportOK;
+    for (auto note : m_noteList) {
+        //构建文件名
+        QString fileName = QString("%1-%2.html").arg(note->noteTitle).arg(QDateTime::currentDateTime().toLocalTime().toString("yyyyMMddhhmmss"));
+        QFile out(m_exportPath + "/" + fileName);
+        out.open(QIODevice::WriteOnly | QIODevice::Text);
+        out.write(note->getFullHtml().toUtf8());
+        out.close();
+    }
     return error;
 }
 

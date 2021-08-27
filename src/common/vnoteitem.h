@@ -109,6 +109,8 @@ public:
     qint32 voiceCount() const;
     //获取文本内所有语音json数据
     QStringList getVoiceJsons() const;
+    //获取html
+    QString getFullHtml() const;
 
 protected:
     QVariant metaData;

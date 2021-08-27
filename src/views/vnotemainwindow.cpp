@@ -195,6 +195,8 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onMenuAbout2Show);
     connect(ActionManager::Instance()->detialContextMenu(), &DMenu::triggered,
             this, &VNoteMainWindow::onMenuAction);
+    connect(ActionManager::Instance()->saveNoteContextMenu(), &DMenu::aboutToShow,
+            this, &VNoteMainWindow::onMenuAbout2Show);
     //处理笔记拖拽释放
     connect(m_leftView, &LeftView::dropNotesEnd, this, &VNoteMainWindow::onDropNote);
     //处理详情页刷新请求
@@ -1188,12 +1190,15 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::NoteRename:
         editNote();
         break;
-    case ActionManager::NoteSaveText: {
+    case ActionManager::SaveNoteAsText:
         m_middleView->saveAsText();
-    } break;
-    case ActionManager::NoteSaveVoice: {
+        break;
+    case ActionManager::SaveNoteAsHtml:
+        m_middleView->saveAsHtml();
+        break;
+    case ActionManager::NoteSaveVoice:
         m_middleView->saveRecords();
-    } break;
+        break;
     case ActionManager::NoteTop:
         m_middleView->noteStickOnTop();
         break;
@@ -1228,6 +1233,7 @@ void VNoteMainWindow::onMenuAbout2Show()
     //ActionManager::Instance()->enableAction(ActionManager::NoteAddNew, false);
     DMenu *menu = static_cast<DMenu *>(sender());
     QAction *topAction = ActionManager::Instance()->getActionById(ActionManager::NoteTop);
+
     if (menu == ActionManager::Instance()->noteContextMenu()) {
         //右键弹出先更新数据，避免数据不同步
         m_richTextEdit->updateNote();
@@ -1237,6 +1243,7 @@ void VNoteMainWindow::onMenuAbout2Show()
         ActionManager::Instance()->visibleAction(ActionManager::NoteRename, notMultipleSelected);
 
         ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteCtxMenu);
+
         if (stateOperation->isPlaying()
             || stateOperation->isRecording()
             || stateOperation->isVoice2Text()
@@ -1260,20 +1267,12 @@ void VNoteMainWindow::onMenuAbout2Show()
             ActionManager::Instance()->enableAction(ActionManager::NoteMove, false);
         }
         if (m_middleView->isMultipleSelected()) {
-            if (!m_middleView->haveText()) {
-                ActionManager::Instance()->enableAction(ActionManager::NoteSaveText, false);
-            }
             if (!m_middleView->haveVoice()) {
                 ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
             }
         } else {
             VNoteItem *currNoteData = m_middleView->getCurrVNotedata();
-
             if (nullptr != currNoteData) {
-                if (!currNoteData->haveText()) {
-                    ActionManager::Instance()->enableAction(ActionManager::NoteSaveText, false);
-                }
-
                 if (!currNoteData->haveVoice()) {
                     ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
                 }
@@ -1292,6 +1291,25 @@ void VNoteMainWindow::onMenuAbout2Show()
             || stateOperation->isVoice2Text()) {
             ActionManager::Instance()->enableAction(ActionManager::NotebookAddNew, false);
             ActionManager::Instance()->enableAction(ActionManager::NotebookDelete, false);
+        }
+    } else if (menu == ActionManager::Instance()->saveNoteContextMenu()) {
+        ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::SaveNoteCtxMenu);
+        if (m_middleView->isMultipleSelected()) {
+            //多选状态
+            if (!m_middleView->haveText()) {
+                //所有笔记都为空
+                ActionManager::Instance()->enableAction(ActionManager::SaveNoteAsHtml, false);
+                ActionManager::Instance()->enableAction(ActionManager::SaveNoteAsText, false);
+            }
+        } else {
+            //单选状态
+            VNoteItem *currNoteData = m_middleView->getCurrVNotedata();
+            if (nullptr != currNoteData) {
+                if (!currNoteData->haveText()) {
+                    ActionManager::Instance()->enableAction(ActionManager::SaveNoteAsText, false);
+                    ActionManager::Instance()->enableAction(ActionManager::SaveNoteAsHtml, false);
+                }
+            }
         }
     }
 }

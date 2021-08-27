@@ -306,6 +306,48 @@ void MiddleView::saveAsText()
 }
 
 /**
+ * @brief MiddleView::saveAsHtml
+ */
+void MiddleView::saveAsHtml()
+{
+    QModelIndexList indexList = selectedIndexes();
+    qSort(indexList);
+    QList<VNoteItem *> noteDataList;
+    //获取笔记
+    for (auto index : indexList) {
+        VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
+            StandardItemCommon::getStandardItemData(index));
+        //只需导出有文本内容的笔记
+        if (noteData->haveText()) {
+            noteDataList.append(noteData);
+        }
+    }
+
+    if (indexList.size() == 0) {
+        return;
+    }
+    //获取历史使用的路径
+    QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
+    if (historyDir.isEmpty()) {
+        historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    }
+    //获取导出路径
+    QString exportDir = DFileDialog::getExistingDirectory(this, "", historyDir);
+
+    if (exportDir.isEmpty()) {
+        return;
+    }
+    // 将现选择的路径保存
+    setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, exportDir);
+
+    ExportNoteWorker *exportWorker = new ExportNoteWorker(
+        exportDir, ExportNoteWorker::ExportHtml, noteDataList);
+    exportWorker->setAutoDelete(true);
+
+    QThreadPool::globalInstance()->start(exportWorker);
+}
+
+/**
  * @brief MiddleView::saveRecords
  * 保存语音
  */

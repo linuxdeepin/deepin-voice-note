@@ -90,7 +90,9 @@ public:
     void editNote();
     //导出文本
     void saveAsText();
-    //到处语音
+    //导出为Html
+    void saveAsHtml();
+    //导出语音
     void saveRecords();
     //关闭右键菜单
     void closeMenu();

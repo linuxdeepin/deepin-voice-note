@@ -54,4 +54,6 @@ public:
     static void setDefaultColor(QTextDocument *srcDoc, const QColor &color);
     //设置标题栏tab焦点
     static void setTitleBarTabFocus(QKeyEvent *event);
+    //图片转base64
+    static bool pictureToBase64(QString imgPath, QString &base64);
 };

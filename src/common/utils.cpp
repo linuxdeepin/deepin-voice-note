@@ -29,6 +29,8 @@
 #include <QIcon>
 #include <QDebug>
 #include <QTextBlock>
+#include <QBuffer>
+#include <QFileInfo>
 
 Utils::Utils()
 {
@@ -282,4 +284,35 @@ void Utils::setTitleBarTabFocus(QKeyEvent *event)
             wnd->setTitleBarTabFocus(event);
         }
     }
+}
+
+/**
+ * @brief Utils::pictureToBase64
+ * 图片转base64
+ * @param imgPath 图片路径
+ * @param base64 base64编码
+ * @return  转换是否成功 true:成功， false:失败
+ */
+bool Utils::pictureToBase64(QString imgPath, QString &base64)
+{
+    //加载图片，目前的参考格式为（bmp, jpg, png, jpeg, gif, ico）
+    QImage img(imgPath, "bmp, jpg, png, jpeg, gif, ico");
+    //非本地文件返回空字符串
+    if (img.isNull()) {
+        return false;
+    }
+
+    QByteArray ba;
+    QBuffer buf(&ba);
+    QFileInfo fileInfo(imgPath);
+
+    int maxLen = 512; //图片最大宽度和最大长度
+    int width = img.width() > maxLen ? maxLen : img.width();
+    int height = img.height() > maxLen ? maxLen : img.height();
+
+    //等比例缩放图片
+    img.scaled(width, height, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(&buf, qPrintable(fileInfo.suffix()));
+    //图片转base64
+    base64 = QString("data:image/%1;base64," + ba.toBase64()).arg(fileInfo.suffix());
+    return true;
 }

@@ -56,7 +56,7 @@ public:
         NoteTop,
         NoteMove,
         NoteDelete,
-        NoteSaveText,
+        NoteSave,
         NoteSaveVoice,
         NoteAddNew,
         //Add note menu item begin {
@@ -128,6 +128,11 @@ public:
         //Add Txt menu item end }
         TxtMenuMax,
 
+        SaveNoteMenuBase,
+        SaveNoteAsHtml = SaveNoteMenuBase, //保存为HTML
+        SaveNoteAsText, //保存为txt
+        SaveNoteMax,
+
         MenuMaxId
     };
 
@@ -140,13 +145,16 @@ public:
         NoteDetailCtxMenu,
         VoiceCtxMenu,
         PictureCtxMenu,
-        TxtCtxMenu
+        TxtCtxMenu,
+        SaveNoteCtxMenu, //保存笔记二级菜单
     };
     Q_ENUM(MenuType)
     //获取记事本列表右键菜单
     VNoteRightMenu *notebookContextMenu();
     //获取记事项列表右键菜单
     VNoteRightMenu *noteContextMenu();
+    //获取记事项列表右键菜单的的二级菜单保存笔记菜单
+    VNoteRightMenu *saveNoteContextMenu();
     //获取详情页右键菜单
     DMenu *detialContextMenu();
     //获取语音文本右键菜单
@@ -178,6 +186,7 @@ protected:
     QScopedPointer<VNoteRightMenu> m_voiceContextMenu;
     QScopedPointer<VNoteRightMenu> m_pictureContextMenu;
     QScopedPointer<VNoteRightMenu> m_txtContextMenu;
+    QScopedPointer<VNoteRightMenu> m_saveNoteContextMenu;
 
     QMap<ActionKind, QAction *> m_actionsMap;
 };

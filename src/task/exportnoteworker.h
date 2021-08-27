@@ -42,7 +42,8 @@ public:
         ExportText,
         ExportAllVoice,
         ExportAll,
-        ExportOneVoice
+        ExportOneVoice,
+        ExportHtml, //导出为html
     };
 
     enum ExportError {
@@ -66,9 +67,11 @@ protected:
     int exportAllVoice();
     //导出所有文本和语音
     int exportAll();
-    //导出一个语音
+    //导出语音
     int exportOneVoice(VNoteBlock *block);
     int exportOneVoice(const QString &);
+    //导出为HTML
+    int exportAsHtml();
 
     int m_exportType {ExportNothing};
     QString m_exportPath;
