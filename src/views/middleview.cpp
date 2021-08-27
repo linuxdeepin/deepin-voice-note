@@ -256,7 +256,6 @@ void MiddleView::editNote()
     //多选取消重命名
     if (1 == selectedIndexes().count()) {
         edit(currentIndex());
-        emit enterRename();
     }
 }
 
@@ -1064,7 +1063,6 @@ void MiddleView::setOnlyCurItemMenuEnable(bool enable)
 void MiddleView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)
 {
     Q_UNUSED(hint);
-    emit closeRename();
     DListView::closeEditor(editor, QAbstractItemDelegate::NoHint);
 }
 

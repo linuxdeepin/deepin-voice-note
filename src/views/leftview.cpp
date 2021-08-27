@@ -445,7 +445,6 @@ void LeftView::appendFolder(VNoteFolder *folder)
 void LeftView::editFolder()
 {
     edit(currentIndex());
-    emit enterRename();
 }
 
 /**
@@ -550,7 +549,6 @@ void LeftView::sort()
 void LeftView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)
 {
     Q_UNUSED(hint);
-    emit closeRename();
     DTreeView::closeEditor(editor, QAbstractItemDelegate::NoHint);
 }
 

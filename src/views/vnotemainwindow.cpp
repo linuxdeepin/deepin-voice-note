@@ -155,16 +155,8 @@ void VNoteMainWindow::initConnections()
     connect(m_leftView->selectionModel(), &QItemSelectionModel::currentChanged,
             this, &VNoteMainWindow::onVNoteFolderChange);
 
-    connect(m_leftView, &LeftView::enterRename, this, &VNoteMainWindow::onEnterNoteRename);
-
-    connect(m_leftView, &LeftView::closeRename, this, &VNoteMainWindow::onCloseNoteRename);
-
     connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
             this, SLOT(onVNoteChange(const QModelIndex &)));
-
-    connect(m_middleView, &MiddleView::enterRename, this, &VNoteMainWindow::onEnterNoteRename);
-
-    connect(m_middleView, &MiddleView::closeRename, this, &VNoteMainWindow::onCloseNoteRename);
 
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::onNewNotebook);
@@ -231,6 +223,8 @@ void VNoteMainWindow::changeRightView(bool isMultiple)
         if (m_stackedRightMainWidget->currentWidget() == m_rightViewHolder) {
             m_stackedRightMainWidget->setCurrentWidget(m_multipleSelectWidget);
         }
+        //多选插入图片按钮禁用
+        m_imgInsert->setDisabled(true);
         bool moveButtonEnable = true;
         if (stateOperation->isVoice2Text()
             || stateOperation->isSearching()
@@ -240,6 +234,10 @@ void VNoteMainWindow::changeRightView(bool isMultiple)
         m_multipleSelectWidget->enableButtons(m_middleView->haveText(), m_middleView->haveVoice(), moveButtonEnable);
     } else {
         m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
+        //恢复单选如果有笔记图片按钮可用
+        if (nullptr != m_middleView->getCurrVNotedata()) {
+            m_imgInsert->setDisabled(false);
+        }
     }
 }
 
@@ -718,6 +716,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
     if (!loadNotes(data)) {
         m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
         m_richTextEdit->initData(nullptr, m_searchKey, false);
+        m_imgInsert->setDisabled(true);
         m_recordBar->setVisible(false);
     }
 }
@@ -1152,6 +1151,8 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
     }
 
     m_richTextEdit->initData(data, m_searchKey, m_rightViewHasFouse);
+    //没有数据，插入图片按钮禁用
+    m_imgInsert->setDisabled(nullptr == data);
     m_rightViewHasFouse = false;
 }
 
@@ -1521,6 +1522,7 @@ int VNoteMainWindow::loadSearchNotes(const QString &key)
             m_middleView->setVisibleEmptySearch(true);
             m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
             m_richTextEdit->initData(nullptr, m_searchKey);
+            m_imgInsert->setDisabled(true);
             m_recordBar->setVisible(false);
         } else {
             m_middleView->sortView(false);
@@ -1833,7 +1835,6 @@ void VNoteMainWindow::switchWidget(WindowType type)
     }
     m_noteSearchEdit->setEnabled(searchEnable);
     m_viewChange->setEnabled(searchEnable); //设置记事本收起按钮禁用状态
-    m_imgInsert->setBtnDisabled(!searchEnable); //设置图片插入按钮禁用状态
     m_stackedWidget->setCurrentIndex(type);
 }
 
@@ -2354,24 +2355,6 @@ void VNoteMainWindow::onViewChangeClicked()
         m_viewChange->setBackgroundRole(DPalette::Highlight);
         m_leftViewHolder->show();
     }
-}
-
-/**
- * @brief onStartNoteRename
- * 记事本或笔记进入重命名状态响应
- */
-void VNoteMainWindow::onEnterNoteRename()
-{
-    m_imgInsert->setBtnDisabled(true);
-}
-
-/**
- * @brief onCloseNoteRename
- * 记事本或笔记退出重命名状态响应
- */
-void VNoteMainWindow::onCloseNoteRename()
-{
-    m_imgInsert->setBtnDisabled(false);
 }
 
 void VNoteMainWindow::onWebVoicePlay(const QVariant &json, bool bIsSame)

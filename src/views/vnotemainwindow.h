@@ -237,11 +237,6 @@ public slots:
     void onThemeChanged();
     //记事本列表显示或隐藏事件响应
     void onViewChangeClicked();
-    //记事本或笔记进入重命名状态响应
-    void onEnterNoteRename();
-    //记事本或笔记退出重命名状态响应
-    void onCloseNoteRename();
-
     /**
      * @brief 富文本编辑器插入图片
      */

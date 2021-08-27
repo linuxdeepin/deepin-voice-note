@@ -139,10 +139,6 @@ signals:
     void requestChangeRightView(bool isMultipleOption);
     //刷新窗口
     void requestRefresh();
-    //笔记进入重命名状态
-    void enterRename();
-    //笔记退出重命名状态
-    void closeRename();
 
 public slots:
     //更新记事项
