@@ -73,6 +73,8 @@ var activeTransVoice = null;  //执行语音转文字对象
 var bTransVoiceIsReady = true;  //语音转文字是否准备好
 var initFinish = false;
 var voiceIntervalObj;    //语音播放动画定时器对象
+var isVoicePaste = false
+var isShowAir = true
 
 // 初始化summernote
 $('#summernote').summernote({
@@ -130,17 +132,46 @@ function isNoteNull() {
 $('body').on('click', '.li', function (e) {
     e.stopPropagation();
     $('.li').removeClass('active');
-    // $(this).addClass('active');
+    setSelectRange(this)
+    // console.log($(this).find('.translate')[0])
+    // removeSelectRange($(this).find('.translate')[0])
+    $('.note-editable').blur()
+    isShowAir = false
+    $(this).addClass('active');
 })
 
-// 取消选中
+$('body').on('click', '.translate', function (e) {
+    // 阻止冒泡
+    e.stopPropagation();
+})
+
+// 设置选区
+function setSelectRange(dom) {
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    var range = document.createRange();
+    range.selectNode(dom);
+    if (sel.anchorOffset == 0) {
+        sel.removeAllRanges();
+        sel.addRange(range);
+    };
+}
+// 移除选区
+function removeSelectRange(dom) {
+    var sel = window.getSelection();
+    var range = document.createRange();
+    range.selectNode(dom);
+    sel.removeRange(range)
+}
+
+// 取消选中样式
 $('body').on('click', function () {
     $('.li').removeClass('active');
 })
 
 // 语音复制
 document.addEventListener('copy', function (event) {
-
+    isVoicePaste = false
     var selectionObj = window.getSelection();
     var rangeObj = selectionObj.getRangeAt(0);
     var docFragment = rangeObj.cloneContents();
@@ -148,6 +179,11 @@ document.addEventListener('copy', function (event) {
     $(docFragment).find('.translate').removeClass('translatePadding')
     $(docFragment).find('.translate').html('')
     $(docFragment).find('.voiceBox').attr('contentEditable', false)
+    // 判断是否语音复制
+    if ($(docFragment).find('.voiceBox').length != 0) {
+        $(docFragment).find('.voiceBox').removeClass('active')
+        isVoicePaste = true
+    }
     testDiv.appendChild(docFragment);
 
     formatHtml = testDiv.innerHTML;
@@ -162,10 +198,11 @@ document.addEventListener('copy', function (event) {
     // }
 
 });
+
 // 粘贴
 document.addEventListener('paste', function (event) {
-    console.log(formatHtml)
-    if (formatHtml != "" && pasteData == event.clipboardData.getData('Text')) {
+    // pasteData == event.clipboardData.getData('Text')
+    if (formatHtml != "" && isVoicePaste) {
         document.execCommand('insertHTML', false, formatHtml + "<p><br></p>");
         event.preventDefault()
         $('.voiceBox').removeAttr('contentEditable')
@@ -179,10 +216,9 @@ function isRangVoice() {
     var selectionObj = window.getSelection();
     var rangeObj = selectionObj.getRangeAt(0);
     var docFragment = rangeObj.cloneContents();
+    // $(docFragment).find('.voiceBox')
+    $(docFragment).find('.voiceBox').addClass('active')
     var testDiv = document.createElement("div");
-    testDiv.appendChild(docFragment);
-    formatHtml = testDiv.innerHTML;
-    console.log(formatHtml)
 
 }
 // 监听键盘删除事件
@@ -199,8 +235,6 @@ $('body').on('keydown', function (e) {
                 range.startOffset = range.startOffset - 1;
             }
         }
-        console.log($(range.startContainer).parents('li'))
-        // console.log($(range.commonAncestorContainer).parents('.voiceBox'))
         if ($(range.start).hasClass('voiceBox')) {
             $(range.start).attr('contentEditable', false)
         }
@@ -244,6 +278,10 @@ $('body').on('mousedown', '.translate', function (e) {
     $('.voiceBox').removeAttr('contentEditable')
 })
 
+// 监听鼠标抬起事件
+$('body').on('mouseup', function () {
+    isRangVoice()
+})
 
 //播放
 $('body').on('click', '.voicebtn', function (e) {
@@ -432,7 +470,6 @@ function setHtml(html) {
 
 //设置录音转文字内容 flag: 0: 转换过程中 提示性文本（＂正在转文字中＂)１:结果 文本,空代表转失败了
 function setVoiceText(text, flag) {
-    // text = '语音专文字测试'
     if (activeTransVoice) {
         if (flag) {
             if (text) {
@@ -465,6 +502,9 @@ function setVoiceText(text, flag) {
 
 //json串拼接成对应html串 flag==》》 false: h5串  true：node串
 function transHtml(json, flag) {
+    let createTime = json.createTime.slice(0, 16)
+    createTime = createTime.replace(/-/g, `/`)
+    json.createTime = createTime
     //将json内容当其属性与标签绑定
     var strJson = JSON.stringify(json);
     json.jsonValue = strJson;
@@ -537,45 +577,31 @@ function rightClick(e) {
         type = 0;
         let imgUrl = $(e.target).attr('src')
         let img = e.target
-        img.focus();
+        // img.focus();
         // 设置选区
-        var range = document.createRange();
-        range.selectNode(img);
-        // range.collapse(true);
-        var sel = window.getSelection();
-        if (sel.anchorOffset == 0) {
-            sel.removeAllRanges();
-            sel.addRange(range);
-        };
+        $('.note-editable ').blur()
+        setSelectRange(img)
         json = imgUrl
 
     } else if ($(e.target).hasClass('demo') || $(e.target).parents('.demo').length != 0) {
         // 语音右键
         type = 1;
         json = $(e.target).parents('.li:first').attr('jsonKey')
-        console.log($(e.target).parents('.voiceBox'))
+
+        // 选中效果
+        $('.li').removeClass('active');
+        $(e.target).parents('.li').addClass('active');
         // 当前没有语音在转文字时， 才可以转文字
         if (bTransVoiceIsReady) {
             activeTransVoice = $(e.target).parents('.li:first');
         }
         // $('#summernote').summernote('airPopover.rightUpdate')
         $('#summernote').summernote('airPopover.hide')
-        var sel = window.getSelection();
-        sel.removeAllRanges();
-
         // 设置选区
-        var range = document.createRange();
-        range.selectNode($(e.target).parents('.voiceBox')[0]);
-        // range.collapse(true);
-        var sel = window.getSelection();
-        if (sel.anchorOffset == 0) {
-            sel.removeAllRanges();
-            sel.addRange(range);
-        };
-
-
+        setSelectRange($(e.target).parents('.voiceBox')[0])
     } else {
         // 文本右键
+        y = $('.note-air-popover').offset().top - $(document).scrollTop() + 50
         json = ''
         type = 2;
 
@@ -592,7 +618,6 @@ function rightClick(e) {
  * @returns {any}
  */
 function changeColor(flag) {
-    console.log(flag)
     if (flag == 1) {
         $('body').css({
             'background': 'rgba(255,255,255,1)',
@@ -706,7 +731,6 @@ function insertImg(urlStr) {
 // 禁用ctrl+v
 document.onkeydown = function (event) {
     if (event.ctrlKey && window.event.keyCode == 86) {
-
         webobj.jsCallPaste()
         return false;
     }
@@ -716,6 +740,13 @@ document.onkeydown = function (event) {
 document.onkeyup = function (event) {
     if (event.ctrlKey && window.event.keyCode == 90) {
         $('.voiceBox').removeAttr('contentEditable')
+    }
+}
+
+// ctrl+b 
+document.onkeyup = function (event) {
+    if (event.ctrlKey && window.event.keyCode == 66) {
+        console.log("ctrl+b")
     }
 }
 

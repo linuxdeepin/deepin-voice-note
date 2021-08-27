@@ -1,13 +1,15 @@
 body {
     padding: 0px;
-    line-height: 1.5;
+    line-height: 1.7;
 }
 
 .demo {
     padding: 12px 0;
     /* margin: 10px 0; */
+    user-select: none;
     border-radius: 10px;
     box-sizing: border-box;
+    background-color: transparent!important;
 }
 
 .testimg {
@@ -36,6 +38,8 @@ body {
     /* user-select: none; */
     /* position: relative; */
     margin-bottom: 10px;
+    margin-top: 10px;
+
 }
 
 .translate>div {
@@ -48,7 +52,7 @@ body {
 }
 
 .active {
-    background: rgba(51, 143, 255, 0.5)!important;
+    background: rgba(0,129,255,0.5)!important;
 }
 
 .voicebtn {

@@ -1916,7 +1916,7 @@
         'NUM7': 55,
         'NUM8': 56,
         // Alphabet: a-z
-        'B': 66,
+        // 'B': 66,
         'E': 69,
         'I': 73,
         'J': 74,
@@ -3827,7 +3827,6 @@
                 return _this.fontStyling('font-family', "\'" + value + "\'");
             });
             this.fontSize = this.wrapCommand(function (value) {
-                // debugger;
                 return _this.fontStyling('font-size', value + 'px');
                 // document.execCommand('fontSize', false, 1);
 
@@ -4062,6 +4061,7 @@
                         _this.handleKeyMap(event);
                     }
                     else {
+
                         _this.preventDefaultEditableShortCuts(event);
                     }
                 }
@@ -5921,7 +5921,7 @@
                         }
                     }),
                     this.button({
-                        className: 'dropdown-toggle',
+                        className: backColor ? "dropdown-toggle backColor-dropdown" : "dropdown-toggle",
                         // contents: this.ui.dropdownButtonContents('', this.options),
                         // contents: backColor ? this.ui.dropdownButtonContents('', this.options) : _this.ui.icon('note-recent-color forecolorImg', 'img src="./img/forecolor.svg"'),
                         contents: backColor ? this.ui.dropdownButtonContents('', this.options) : _this.ui.icon(this.options.icons.forecolor),
@@ -6931,7 +6931,11 @@
                 },
                 'summernote.dblclick': function (e) {
                     let selStr = window.getSelection().toString();
-                    if (selStr == '\n') {
+                    let range = window.getSelection().getRangeAt(0)
+                    var docFragment = range.cloneContents();
+                    if (selStr == '\n'
+                        || $(docFragment).find('.voiceBox').length != 0) {
+                        isShowAir = false
                         _this.hide();
                     }
 
@@ -6968,7 +6972,11 @@
             var styleInfo = this.context.invoke('editor.currentStyle');
             let selStr = window.getSelection().toString();
             if (selStr == '\n') {
-                return _this.hide();
+                return this.hide();
+            }
+            if (!isShowAir) {
+                isShowAir = true
+                return this.hide();
             }
             if (styleInfo.range && !styleInfo.range.isCollapsed()) {
                 var rect = lists.last(styleInfo.range.getClientRects());
@@ -6977,8 +6985,8 @@
                     let winWidth = $(document).width()
                     let left = Math.max(bnd.left + bnd.width / 2 - 150, 0);
                     let top = bnd.top + bnd.height - 60;
-                    if (winWidth - left < 300) {
-                        left = winWidth - 300
+                    if (winWidth - left < 320) {
+                        left = winWidth - 320
                     }
                     if (top < 100) {
                         top = top + 70
