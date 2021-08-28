@@ -64,25 +64,6 @@ public:
         //Add note menu item end }
         NoteMenuMax,
 
-        //NoteDetail
-        NoteDetailMenuBase,
-        DetailVoiceSave = NoteDetailMenuBase,
-        DetailVoice2Text,
-        DetailDelete,
-        DetailSelectAll,
-        DetailCopy,
-        DetailCut,
-        DetailPaste,
-
-        DetailText2Speech,
-        DetailStopreading,
-        DetailSpeech2Text,
-        DetailTranslate,
-        //Add NoteDetail menu item begin {
-
-        //Add NoteDetail menu item end }
-        NoteDetailMenuMax,
-
         //Voice
         VoiceMenuBase,
         VoiceAsSave = VoiceMenuBase,
@@ -142,7 +123,6 @@ public:
     enum MenuType {
         NotebookCtxMenu,
         NoteCtxMenu,
-        NoteDetailCtxMenu,
         VoiceCtxMenu,
         PictureCtxMenu,
         TxtCtxMenu,
@@ -155,8 +135,6 @@ public:
     VNoteRightMenu *noteContextMenu();
     //获取记事项列表右键菜单的的二级菜单保存笔记菜单
     VNoteRightMenu *saveNoteContextMenu();
-    //获取详情页右键菜单
-    DMenu *detialContextMenu();
     //获取语音文本右键菜单
     VNoteRightMenu *voiceContextMenu();
     //获取图片文本右键菜单
@@ -182,7 +160,6 @@ protected:
     //获取菜单指针
     QScopedPointer<VNoteRightMenu> m_notebookContextMenu;
     QScopedPointer<VNoteRightMenu> m_noteContextMenu;
-    QScopedPointer<VNoteRightMenu> m_detialContextMenu;
     QScopedPointer<VNoteRightMenu> m_voiceContextMenu;
     QScopedPointer<VNoteRightMenu> m_pictureContextMenu;
     QScopedPointer<VNoteRightMenu> m_txtContextMenu;

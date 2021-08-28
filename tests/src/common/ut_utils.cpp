@@ -18,7 +18,6 @@
 
 #include "ut_utils.h"
 #include "utils.h"
-#include "textnoteedit.h"
 #include "datatypedef.h"
 #include "vnoteitem.h"
 

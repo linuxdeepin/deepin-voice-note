@@ -79,15 +79,6 @@ VNoteRightMenu *ActionManager::saveNoteContextMenu()
     return m_saveNoteContextMenu.get();
 }
 
-/**
- * @brief ActionManager::detialContextMenu
- * @return 详情页右键菜单
- */
-DMenu *ActionManager::detialContextMenu()
-{
-    return m_detialContextMenu.get();
-}
-
 VNoteRightMenu *ActionManager::voiceContextMenu()
 {
     return m_voiceContextMenu.get();
@@ -175,9 +166,6 @@ void ActionManager::resetCtxMenu(ActionManager::MenuType type, bool enable)
     } else if (MenuType::NoteCtxMenu == type) {
         startMenuId = NoteMenuBase;
         endMenuId = NoteMenuMax;
-    } else if (MenuType::NoteDetailCtxMenu == type) {
-        startMenuId = NoteDetailMenuBase;
-        endMenuId = NoteDetailMenuMax;
     } else if (MenuType::VoiceCtxMenu == type) {
         startMenuId = VoiceMenuBase;
         endMenuId = VoiceMenuMax;
@@ -290,42 +278,6 @@ void ActionManager::initMenu()
     }
 
     //Voice context menu
-    QStringList noteDetailMenuTexts;
-    noteDetailMenuTexts << DApplication::translate("NoteDetailContextMenu", "Save as MP3")
-                        << DApplication::translate("NoteDetailContextMenu", "Voice to Text")
-                        << DApplication::translate("NoteDetailContextMenu", "Delete")
-                        << DApplication::translate("NoteDetailContextMenu", "Select all")
-                        << DApplication::translate("NoteDetailContextMenu", "Copy")
-                        << DApplication::translate("NoteDetailContextMenu", "Cut")
-                        << DApplication::translate("NoteDetailContextMenu", "Paste")
-                        << DApplication::translate("NoteDetailContextMenu", "Text to Speech")
-                        << DApplication::translate("NoteDetailContextMenu", "Stop reading")
-                        << DApplication::translate("NoteDetailContextMenu", "Speech to Text")
-                        << DApplication::translate("NoteDetailContextMenu", "Translate");
-
-    //初始化详情页右键菜单
-    m_detialContextMenu.reset(new VNoteRightMenu());
-
-    int detailMenuIdStart = ActionKind::NoteDetailMenuBase;
-
-    for (auto it : noteDetailMenuTexts) {
-        QAction *pAction = new QAction(it, m_detialContextMenu.get());
-        pAction->setProperty(MenuId, detailMenuIdStart);
-
-        m_detialContextMenu->addAction(pAction);
-        m_actionsMap.insert(static_cast<ActionKind>(detailMenuIdStart), pAction);
-        if (!isAISrvAvailable) {
-            if (detailMenuIdStart == DetailVoice2Text
-                || detailMenuIdStart > DetailPaste) {
-                pAction->setVisible(false);
-            }
-        } else if (detailMenuIdStart == DetailPaste) {
-            m_detialContextMenu->addSeparator();
-        }
-        detailMenuIdStart++;
-    }
-
-    //Voice context menu
     QStringList voiceMenuTexts;
     voiceMenuTexts << DApplication::translate("NoteDetailContextMenu", "Save as MP3")
                    << DApplication::translate("NoteDetailContextMenu", "Voice to Text")
@@ -341,7 +293,7 @@ void ActionManager::initMenu()
     int voiceMenuIdStart = ActionKind::VoiceMenuBase;
 
     for (auto it : voiceMenuTexts) {
-        QAction *pAction = new QAction(it, m_detialContextMenu.get());
+        QAction *pAction = new QAction(it, m_voiceContextMenu.get());
         pAction->setProperty(MenuId, voiceMenuIdStart);
 
         m_voiceContextMenu->addAction(pAction);

@@ -218,7 +218,7 @@ public:
 };
 
 //更新记事项置顶属性
-class UpdateNoteTopDbVisitor :public DbVisitor
+class UpdateNoteTopDbVisitor : public DbVisitor
 {
 public:
     explicit UpdateNoteTopDbVisitor(QSqlDatabase &db, const void *inParam, void *result);
@@ -240,34 +240,6 @@ class DelNoteDbVisitor : public DbVisitor
 {
 public:
     explicit DelNoteDbVisitor(QSqlDatabase &db, const void *inParam, void *result);
-
-    virtual bool prepareSqls() override;
-};
-
-//语音缓存记录查询
-class SaferQryDbVisitor : public DbVisitor
-{
-public:
-    explicit SaferQryDbVisitor(QSqlDatabase &db, const void *inParam, void *result);
-
-    virtual bool visitorData() override;
-    virtual bool prepareSqls() override;
-};
-
-//添加语音缓存记录
-class AddSaferDbVisitor : public DbVisitor
-{
-public:
-    explicit AddSaferDbVisitor(QSqlDatabase &db, const void *inParam, void *result);
-
-    virtual bool prepareSqls() override;
-};
-
-//删除语音缓存记录
-class DelSaferDbVisitor : public DbVisitor
-{
-public:
-    explicit DelSaferDbVisitor(QSqlDatabase &db, const void *inParam, void *result);
 
     virtual bool prepareSqls() override;
 };

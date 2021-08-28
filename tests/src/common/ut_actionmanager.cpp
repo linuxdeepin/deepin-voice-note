@@ -38,13 +38,6 @@ TEST_F(ut_actionmanager_test, noteContextMenu)
     ASSERT_FALSE(actionmanager.m_noteContextMenu->isEmpty());
 }
 
-TEST_F(ut_actionmanager_test, detialContextMenu)
-{
-    ActionManager actionmanager;
-    actionmanager.detialContextMenu();
-    ASSERT_FALSE(actionmanager.m_detialContextMenu->isEmpty());
-}
-
 TEST_F(ut_actionmanager_test, getActionKind)
 {
     ActionManager actionmanager;
@@ -84,10 +77,6 @@ TEST_F(ut_actionmanager_test, resetCtxMenu)
 
     tmpact = actionmanager.getActionById(actionmanager.NoteRename);
     actionmanager.resetCtxMenu(actionmanager.NoteCtxMenu, false);
-    ASSERT_FALSE(tmpact->isEnabled());
-
-    tmpact = actionmanager.getActionById(actionmanager.DetailVoice2Text);
-    actionmanager.resetCtxMenu(actionmanager.NoteDetailCtxMenu, false);
     ASSERT_FALSE(tmpact->isEnabled());
 }
 

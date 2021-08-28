@@ -364,44 +364,6 @@ QDebug &operator<<(QDebug &out, VNoteItem &noteItem)
 }
 
 /**
- * @brief DetailItemWidget::DetailItemWidget
- * @param parent
- */
-DetailItemWidget::DetailItemWidget(QWidget *parent)
-    : QWidget(parent)
-{
-    ;
-}
-
-/**
- * @brief DetailItemWidget::updateSearchKey
- * @param searchKey 搜索关键字
- */
-void DetailItemWidget::updateSearchKey(QString searchKey)
-{
-    Q_UNUSED(searchKey);
-}
-
-/**
- * @brief DetailItemWidget::pasteText
- */
-void DetailItemWidget::pasteText()
-{
-    ;
-}
-
-/**
- * @brief DetailItemWidget::isTextContainsPos
- * @param globalPos 全局坐标点
- * @return true 坐标点在文本区域内
- */
-bool DetailItemWidget::isTextContainsPos(const QPoint &globalPos)
-{
-    Q_UNUSED(globalPos);
-    return true;
-}
-
-/**
  * @brief VNoteBlock::VNoteBlock
  * @param type
  */

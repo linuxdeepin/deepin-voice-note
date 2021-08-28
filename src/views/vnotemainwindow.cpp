@@ -24,7 +24,6 @@
 #include "views/middleview.h"
 #include "views/homepage.h"
 #include "views/splashview.h"
-#include "views/voicenoteitem.h"
 #include "views/middleviewsortfilter.h"
 #include "views/richtextedit.h"
 
@@ -35,7 +34,6 @@
 #include "common/vnoteitem.h"
 #include "common/vnoteforlder.h"
 #include "common/actionmanager.h"
-#include "common/vnotedatasafefymanager.h"
 #include "common/metadataparser.h"
 
 #include "widgets/vnotemultiplechoiceoptionwidget.h"
@@ -49,7 +47,6 @@
 #include "db/vnotefolderoper.h"
 #include "db/vnoteitemoper.h"
 #include "db/vnotedbmanager.h"
-#include "db/vnotesaferoper.h"
 
 #include "dbus/dbuslogin1manager.h"
 
@@ -190,10 +187,6 @@ void VNoteMainWindow::initConnections()
     connect(ActionManager::Instance()->noteContextMenu(), &DMenu::aboutToShow,
             this, &VNoteMainWindow::onMenuAbout2Show);
     connect(ActionManager::Instance()->noteContextMenu(), &DMenu::triggered,
-            this, &VNoteMainWindow::onMenuAction);
-    connect(ActionManager::Instance()->detialContextMenu(), &DMenu::aboutToShow,
-            this, &VNoteMainWindow::onMenuAbout2Show);
-    connect(ActionManager::Instance()->detialContextMenu(), &DMenu::triggered,
             this, &VNoteMainWindow::onMenuAction);
     connect(ActionManager::Instance()->saveNoteContextMenu(), &DMenu::aboutToShow,
             this, &VNoteMainWindow::onMenuAbout2Show);
@@ -794,24 +787,8 @@ void VNoteMainWindow::initEmptyFoldersView()
  */
 void VNoteMainWindow::onStartRecord(const QString &path)
 {
+    Q_UNUSED(path)
     setSpecialStatus(RecordStart);
-
-    //Add recording data safer.
-    VNoteItem *currentNote = m_middleView->getCurrVNotedata();
-
-    if (nullptr != currentNote && !path.isEmpty()) {
-        VDataSafer safer;
-        safer.setSaferType(VDataSafer::Safe);
-
-        safer.folder_id = currentNote->folderId;
-        safer.note_id = currentNote->noteId;
-        safer.path = path;
-
-        VNoteDataSafefyManager::instance()->doSafer(safer);
-    } else {
-        qCritical() << "UnSafe get currentNote data is null! Dangerous!!!" << path;
-    }
-
     //Hold shutdown locker
     holdHaltLock();
 }
@@ -825,26 +802,6 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 {
     if (voiceSize >= 1000) {
         m_richTextEdit->insertVoiceItem(voicePath, voiceSize);
-
-        //Recording normal,remove the data safer.
-        VNoteItem *currentNote = m_middleView->getCurrVNotedata();
-
-        if (nullptr != currentNote && !voicePath.isEmpty()) {
-            VDataSafer safer;
-            safer.setSaferType(VDataSafer::Unsafe);
-
-            safer.folder_id = currentNote->folderId;
-            safer.note_id = currentNote->noteId;
-            safer.path = voicePath;
-            if (!stateOperation->isAppQuit()) {
-                VNoteDataSafefyManager::instance()->doSafer(safer);
-            } else { //需要关闭应用时,同步更新数据库
-                VNoteSaferOper saferOper;
-                saferOper.rmSafer(safer);
-            }
-        } else {
-            qCritical() << "UnSafe get currentNote data is null! Dangerous!!!";
-        }
     }
     setSpecialStatus(RecordEnd);
 
@@ -2207,18 +2164,7 @@ void VNoteMainWindow::onDeleteShortcut()
                 deleteAct = ActionManager::Instance()->getActionById(
                     ActionManager::NoteDelete);
             }
-        } /* else if (m_rightView->hasFocus()) {
-            deleteAct = ActionManager::Instance()->getActionById(
-                ActionManager::DetailDelete);
-        }*/
-        else {
-            QPoint pos = m_rightViewHolder->mapFromGlobal(QCursor::pos());
-            if (m_rightViewHolder->rect().contains(pos)) {
-                deleteAct = ActionManager::Instance()->getActionById(
-                    ActionManager::DetailDelete);
-            }
         }
-
         if (nullptr != deleteAct) {
             deleteAct->triggered();
         }

@@ -135,36 +135,3 @@ TEST_F(ut_dbvisitor_test, DelNoteDbVisitor)
     dbvisitor->visitorData();
     delete dbvisitor;
 }
-
-TEST_F(ut_dbvisitor_test, SaferQryDbVisitor)
-{
-    DbVisitor *dbvisitor;
-    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
-    SaferQryDbVisitor saferqrydbvisitor(db, nullptr, nullptr);
-    dbvisitor = new SaferQryDbVisitor(db, nullptr, nullptr);
-    dbvisitor->prepareSqls();
-    dbvisitor->visitorData();
-    delete dbvisitor;
-}
-
-TEST_F(ut_dbvisitor_test, AddSaferDbVisitor)
-{
-    DbVisitor *dbvisitor;
-    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
-    AddSaferDbVisitor addsaferdbvisitor(db, nullptr, nullptr);
-    dbvisitor = new AddSaferDbVisitor(db, nullptr, nullptr);
-    dbvisitor->prepareSqls();
-    dbvisitor->visitorData();
-    delete dbvisitor;
-}
-
-TEST_F(ut_dbvisitor_test, DelSaferDbVisitor)
-{
-    DbVisitor *dbvisitor;
-    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
-    DelSaferDbVisitor delsaferdbvisitor(db, nullptr, nullptr);
-    dbvisitor = new DelSaferDbVisitor(db, nullptr, nullptr);
-    dbvisitor->prepareSqls();
-    dbvisitor->visitorData();
-    delete dbvisitor;
-}

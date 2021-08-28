@@ -18,7 +18,6 @@
 
 #include "ut_vntaskworker.h"
 #include "vntaskworker.h"
-#include "vndatasafertask.h"
 
 ut_vntaskworker_test::ut_vntaskworker_test()
 {
@@ -36,8 +35,5 @@ void ut_vntaskworker_test::TearDown()
 
 TEST_F(ut_vntaskworker_test, addTask)
 {
-    VDataSafer safer;
-    VNDataSaferTask *pSafeTask = new VNDataSaferTask(safer);
-    m_vntaskworker->addTask(pSafeTask);
-    delete pSafeTask;
+    ;
 }
