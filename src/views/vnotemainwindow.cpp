@@ -205,6 +205,8 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onThemeChanged);
     connect(JsContent::instance(), &JsContent::playVoice, this, &VNoteMainWindow::onWebVoicePlay);
     connect(m_richTextEdit, &RichTextEdit::currentSearchEmpty, this, &VNoteMainWindow::onWebSearchEmpty);
+    //创建笔记
+    connect(JsContent::instance(), &JsContent::createNote, this, &VNoteMainWindow::onAddNoteShortcut, Qt::QueuedConnection);
 }
 
 /**

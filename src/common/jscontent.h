@@ -76,6 +76,8 @@ signals:
     void loadFinsh();
     void popupMenu(int type, int x, int y, const QVariant &json);
     void playVoice(const QVariant &json, bool bIsSame);
+    void viewPictrue(const QString &imagePath);
+    void createNote();
     /**
      * @brief 编辑区内容加载完成信号
      */
@@ -91,6 +93,8 @@ public slots:
     void jsCallPopupMenu(int type, int x, int y, const QVariant &json); //web前端调用后端，弹出右键菜单
     void jsCallPlayVoice(const QVariant &json, bool bIsSame); //web前端调用后端，播放语音
     void jsCallPaste(); //web前端调用后端，编辑区粘贴功能
+    void jsCallViewPicture(const QString &imagePath); //web前端调用后端，进行图片预览
+    void jsCallCreateNote(); //web前端调用后端，新建笔记
     QString getTranslation(const QString &context, const QString &key); //web前端调用后端，获取翻译文件
 };
 

@@ -71,6 +71,7 @@ void WebRichTextEditor::initWebView()
     connect(content, &JsContent::popupMenu, this, &WebRichTextEditor::saveMenuParam);
     connect(content, &JsContent::textPaste, this, &WebRichTextEditor::onPaste);
     connect(content, &JsContent::loadFinsh, this, &WebRichTextEditor::onThemeChanged);
+    connect(content, &JsContent::viewPictrue, this, &WebRichTextEditor::viewPicture);
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::paletteTypeChanged,
             this, &WebRichTextEditor::onThemeChanged);
 }

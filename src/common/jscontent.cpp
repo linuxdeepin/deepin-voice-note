@@ -156,3 +156,13 @@ void JsContent::jsCallPaste()
 {
     emit textPaste();
 }
+
+void JsContent::jsCallViewPicture(const QString &imagePath)
+{
+    emit viewPictrue(imagePath);
+}
+
+void JsContent::jsCallCreateNote()
+{
+    emit createNote();
+}
