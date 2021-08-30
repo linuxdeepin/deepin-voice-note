@@ -31,6 +31,7 @@
 #include <QTextBlock>
 #include <QBuffer>
 #include <QFileInfo>
+#include <QProcess>
 
 Utils::Utils()
 {
@@ -315,4 +316,23 @@ bool Utils::pictureToBase64(QString imgPath, QString &base64)
     //图片转base64
     base64 = QString("data:image/%1;base64," + ba.toBase64()).arg(fileInfo.suffix());
     return true;
+}
+
+bool Utils::isLoongsonPlatform()
+{
+    static QString cpuModeName = "";
+    if (cpuModeName.isEmpty()) {
+        QProcess process;
+        //获取CPU型号
+        process.start("cat /proc/cpuinfo");
+        if (process.waitForFinished()) {
+            QString result = process.readAllStandardOutput();
+            if (result.contains("Loongson")) {
+                cpuModeName = "Loongson";
+                return true;
+            }
+            cpuModeName = "other";
+        }
+    }
+    return cpuModeName.contains("Loongson");
 }

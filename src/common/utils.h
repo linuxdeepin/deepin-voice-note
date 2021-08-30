@@ -56,4 +56,6 @@ public:
     static void setTitleBarTabFocus(QKeyEvent *event);
     //图片转base64
     static bool pictureToBase64(QString imgPath, QString &base64);
+    //判断是否龙芯平台
+    static bool isLoongsonPlatform();
 };
