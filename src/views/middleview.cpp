@@ -323,7 +323,7 @@ void MiddleView::saveAsHtml()
         }
     }
 
-    if (indexList.size() == 0) {
+    if (noteDataList.size() == 0) {
         return;
     }
     //获取历史使用的路径

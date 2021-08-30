@@ -25,6 +25,8 @@
 #include "common/metadataparser.h"
 #include "common/vtextspeechandtrmanager.h"
 #include "dialog/imageviewerdialog.h"
+#include "common/setting.h"
+#include "task/exportnoteworker.h"
 
 #include "db/vnoteitemoper.h"
 
@@ -38,6 +40,7 @@
 #include <QWebEngineContextMenuData>
 #include <QApplication>
 #include <QStandardPaths>
+#include <QThreadPool>
 
 static const char webPage[] = WEB_PATH "/index.html";
 
@@ -279,9 +282,12 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
     ActionManager::ActionKind kind = ActionManager::Instance()->getActionKind(action);
     switch (kind) {
     case ActionManager::VoiceAsSave:
+        //另存语音
+        saveMP3As();
         break;
     case ActionManager::VoiceToText:
-        emit asrStart(m_menuJson); //通知主窗口进行转写服务
+        //通知主窗口进行转写服务
+        emit asrStart(m_menuJson);
         break;
     case ActionManager::VoiceDelete:
     case ActionManager::PictureDelete:
@@ -356,6 +362,34 @@ void WebRichTextEditor::savePictureAs()
         return;
     }
     QFile::copy(originalPath, newPath); //复制文件
+}
+
+void WebRichTextEditor::saveMP3As()
+{
+    m_voiceBlock.reset(new VNVoiceBlock);
+    MetaDataParser dataParser;
+    //解析json数据
+    if (!dataParser.parse(m_menuJson, m_voiceBlock.get())) {
+        return;
+    }
+    //获取历史使用的路径
+    QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
+    if (historyDir.isEmpty()) {
+        historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    }
+    //获取导出路径
+    QString exportDir = DFileDialog::getExistingDirectory(this, "", historyDir);
+
+    if (exportDir.isEmpty()) {
+        return;
+    }
+    // 将现选择的路径保存
+    setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, exportDir);
+
+    ExportNoteWorker *exportWorker = new ExportNoteWorker(
+        exportDir, ExportNoteWorker::ExportOneVoice, QList<VNoteItem *>(), m_voiceBlock.get());
+    exportWorker->setAutoDelete(true);
+    QThreadPool::globalInstance()->start(exportWorker);
 }
 
 /**

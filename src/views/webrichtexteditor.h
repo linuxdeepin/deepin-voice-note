@@ -21,6 +21,8 @@
 #ifndef WEBRICHTEXTEDITOR_H
 #define WEBRICHTEXTEDITOR_H
 
+#include "common/vnoteitem.h"
+
 #include <QObject>
 #include <QtWebChannel/QWebChannel>
 #include <QtWebEngineWidgets/QWebEngineView>
@@ -162,6 +164,10 @@ private:
      * @brief 另存图片
      */
     void savePictureAs();
+    /**
+     * @brief 另存语音
+     */
+    void saveMP3As();
 
 private:
     VNoteItem *m_noteData {nullptr};
@@ -177,6 +183,8 @@ private:
     VNoteRightMenu *m_pictureRightMenu {nullptr}; //图片右键菜单
     VNoteRightMenu *m_voiceRightMenu {nullptr}; //语音右键菜单
     VNoteRightMenu *m_txtRightMenu {nullptr}; //文字右键菜单
+
+    QScopedPointer<VNVoiceBlock> m_voiceBlock {nullptr}; //待另存的语音数据
 };
 
 #endif // WEBRICHTEXTEDITOR_H
