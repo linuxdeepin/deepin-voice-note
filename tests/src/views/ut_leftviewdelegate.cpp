@@ -46,14 +46,18 @@ TEST_F(ut_leftviewdelegate_test, paintNoteItem)
     option.state.setFlag(QStyle::State_MouseOver, true);
     option.rect = QRect(0, 0, 40, 30);
     delegate->setDragState(true);
+    EXPECT_EQ(true, delegate->m_draging);
     QPainter paint;
     delegate->paintNoteItem(&paint, option, view.currentIndex());
     delegate->setEnableItem(true);
+    EXPECT_EQ(true, delegate->m_enableItem);
     option.state.setFlag(QStyle::State_Enabled, true);
     delegate->paintNoteItem(&paint, option, view.currentIndex());
     delegate->setDragState(false);
+    EXPECT_EQ(false, delegate->m_draging);
     delegate->paintNoteItem(&paint, option, view.currentIndex());
     delegate->setDrawHover(true);
+    EXPECT_EQ(true, delegate->m_drawHover);
     delegate->paintNoteItem(&paint, option, view.currentIndex());
     delegate->paintTabFocusBackground(&paint, option, option.rect);
 }

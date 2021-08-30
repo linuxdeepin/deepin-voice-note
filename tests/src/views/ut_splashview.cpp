@@ -26,4 +26,5 @@ ut_splashview_test::ut_splashview_test()
 TEST_F(ut_splashview_test, testsplshview)
 {
     SplashView splashview;
+    EXPECT_EQ(false, splashview.isVisible());
 }

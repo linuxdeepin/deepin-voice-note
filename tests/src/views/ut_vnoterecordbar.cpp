@@ -36,7 +36,7 @@ TEST_F(ut_vnoterecordbar_test, eventFilter)
     VNoteRecordBar vnoterecordbar;
     QEvent *event = new QEvent(QEvent::MouseButtonPress);
     QWidget *widget = new QWidget;
-    vnoterecordbar.eventFilter(widget, event);
+    EXPECT_FALSE(vnoterecordbar.eventFilter(widget, event));
     delete event;
     delete widget;
 }
@@ -58,11 +58,7 @@ TEST_F(ut_vnoterecordbar_test, onFinshRecord)
     VNoteRecordBar vnoterecordbar;
     QString tmppath = "/usr/share/music/bensound-sunny.mp3";
     vnoterecordbar.onFinshRecord(tmppath, 2650);
-}
-
-TEST_F(ut_vnoterecordbar_test, cancelRecord)
-{
-    VNoteRecordBar vnoterecordbar;
+    EXPECT_EQ(vnoterecordbar.m_mainLayout->currentWidget(), vnoterecordbar.m_recordBtnHover);
 }
 
 TEST_F(ut_vnoterecordbar_test, onClosePlayWidget)
@@ -75,6 +71,7 @@ TEST_F(ut_vnoterecordbar_test, onClosePlayWidget)
     vnvoiceblock->state = true;
     vnoterecordbar.onClosePlayWidget(vnvoiceblock);
     delete vnvoiceblock;
+    EXPECT_EQ(vnoterecordbar.m_mainLayout->currentWidget(), vnoterecordbar.m_recordBtnHover);
 }
 
 TEST_F(ut_vnoterecordbar_test, onAudioDeviceChange)
@@ -88,10 +85,11 @@ TEST_F(ut_vnoterecordbar_test, onAudioSelectChange)
 {
     VNoteRecordBar vnoterecordbar;
     vnoterecordbar.onAudioSelectChange(1);
+    EXPECT_EQ(vnoterecordbar.m_currentMode, 1);
 }
 
 TEST_F(ut_vnoterecordbar_test, volumeToolow)
 {
     VNoteRecordBar vnoterecordbar;
-    vnoterecordbar.volumeToolow(1.1);
+    EXPECT_FALSE(vnoterecordbar.volumeToolow(1.1));
 }

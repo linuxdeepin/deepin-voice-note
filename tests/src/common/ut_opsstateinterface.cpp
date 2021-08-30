@@ -36,35 +36,35 @@ void ut_opsstateinterface_test::TearDown()
 TEST_F(ut_opsstateinterface_test, isSearching)
 {
     m_opsstateinterface->operState(m_opsstateinterface->StateSearching, true);
-    ASSERT_TRUE(m_opsstateinterface->isSearching());
+    EXPECT_TRUE(m_opsstateinterface->isSearching());
 }
 
 TEST_F(ut_opsstateinterface_test, isRecording)
 {
     m_opsstateinterface->operState(m_opsstateinterface->StateRecording, true);
-    ASSERT_TRUE(m_opsstateinterface->isRecording());
+    EXPECT_TRUE(m_opsstateinterface->isRecording());
 }
 
 TEST_F(ut_opsstateinterface_test, isPlaying)
 {
     m_opsstateinterface->operState(m_opsstateinterface->StatePlaying, true);
-    ASSERT_TRUE(m_opsstateinterface->isPlaying());
+    EXPECT_TRUE(m_opsstateinterface->isPlaying());
 }
 
 TEST_F(ut_opsstateinterface_test, isVoice2Text)
 {
     m_opsstateinterface->operState(m_opsstateinterface->StateVoice2Text, true);
-    ASSERT_TRUE(m_opsstateinterface->isVoice2Text());
+    EXPECT_TRUE(m_opsstateinterface->isVoice2Text());
 }
 
 TEST_F(ut_opsstateinterface_test, isAppQuit)
 {
     m_opsstateinterface->operState(m_opsstateinterface->StateAppQuit, true);
-    ASSERT_TRUE(m_opsstateinterface->isAppQuit());
+    EXPECT_TRUE(m_opsstateinterface->isAppQuit());
 }
 
 TEST_F(ut_opsstateinterface_test, isAiSrvExist)
 {
     m_opsstateinterface->operState(m_opsstateinterface->StateAISrvAvailable, true);
-    ASSERT_TRUE(m_opsstateinterface->isAiSrvExist());
+    EXPECT_TRUE(m_opsstateinterface->isAiSrvExist());
 }

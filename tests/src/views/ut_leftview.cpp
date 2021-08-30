@@ -37,13 +37,14 @@ TEST_F(ut_leftview_test, getNotepadRoot)
 {
     LeftView leftview;
     leftview.m_pItemDelegate->handleChangeTheme();
-    leftview.getNotepadRoot();
+    EXPECT_TRUE(nullptr != leftview.getNotepadRoot());
 }
 
 TEST_F(ut_leftview_test, getNotepadRootIndex)
 {
     LeftView leftview;
     leftview.getNotepadRootIndex();
+    EXPECT_TRUE(leftview.getNotepadRootIndex().isValid());
 }
 
 TEST_F(ut_leftview_test, mouseEvent)
@@ -55,6 +56,7 @@ TEST_F(ut_leftview_test, mouseEvent)
     QMouseEvent *mousePressEvent = new QMouseEvent(QEvent::MouseButtonPress, localPos, localPos, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
     QMouseEvent *mousePressEvent2 = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
     leftview.mousePressEvent(mousePressEvent);
+
     leftview.mousePressEvent(mousePressEvent2);
     leftview.m_onlyCurItemMenuEnable = true;
     leftview.mousePressEvent(mousePressEvent);
@@ -91,6 +93,7 @@ TEST_F(ut_leftview_test, setTouchState)
 {
     LeftView leftview;
     leftview.setTouchState(leftview.TouchNormal);
+    EXPECT_EQ(LeftView::TouchNormal, leftview.m_touchState);
 }
 
 TEST_F(ut_leftview_test, doTouchMoveEvent)
@@ -118,6 +121,7 @@ TEST_F(ut_leftview_test, handleDragEvent)
     LeftView leftview;
     bool isTouch = true;
     leftview.handleDragEvent(isTouch);
+    EXPECT_EQ(LeftView::TouchDraging, leftview.m_touchState);
 }
 
 TEST_F(ut_leftview_test, dropEvent)
@@ -138,6 +142,7 @@ TEST_F(ut_leftview_test, setOnlyCurItemMenuEnable)
     LeftView leftview;
     bool enable = false;
     leftview.setOnlyCurItemMenuEnable(enable);
+    EXPECT_EQ(enable, leftview.m_onlyCurItemMenuEnable);
 }
 
 TEST_F(ut_leftview_test, keyPressEvent)
@@ -156,7 +161,7 @@ TEST_F(ut_leftview_test, keyPressEvent)
 TEST_F(ut_leftview_test, restoreNotepadItem)
 {
     LeftView leftview;
-    leftview.restoreNotepadItem();
+    EXPECT_TRUE(!leftview.restoreNotepadItem().isValid());
 }
 
 TEST_F(ut_leftview_test, addFolder)
@@ -169,14 +174,14 @@ TEST_F(ut_leftview_test, addFolder)
         leftview.addFolder(it);
     }
     leftview.editFolder();
-    leftview.folderCount();
+    EXPECT_TRUE(0 != leftview.folderCount());
     leftview.sort();
     int sortNum = 0;
     for (auto it : folders->folders) {
         it->sortNumber = sortNum++;
     }
     leftview.sort();
-    leftview.grab();
+    EXPECT_FALSE(leftview.grab().isNull());
 }
 
 TEST_F(ut_leftview_test, appendFolder)
@@ -191,13 +196,17 @@ TEST_F(ut_leftview_test, appendFolder)
     folder.createTime = QDateTime::currentDateTime();
     leftview.appendFolder(&folder);
     leftview.setDefaultNotepadItem();
-    leftview.removeFolder();
+    EXPECT_TRUE(leftview.currentIndex().isValid());
+    VNoteFolder *removeFolder = leftview.removeFolder();
+    EXPECT_EQ(&folder, removeFolder);
 }
 
 TEST_F(ut_leftview_test, closeMenu)
 {
     LeftView leftview;
+    leftview.m_notepadMenu->setVisible(true);
     leftview.closeMenu();
+    EXPECT_TRUE(!leftview.m_notepadMenu->isVisible());
 }
 
 TEST_F(ut_leftview_test, closeEditor)
@@ -205,10 +214,11 @@ TEST_F(ut_leftview_test, closeEditor)
     LeftView leftview;
     QWidget *editor = new QWidget;
     leftview.closeEditor(editor, QAbstractItemDelegate::NoHint);
+    EXPECT_TRUE(!editor->isVisible());
     delete editor;
 }
 
-TEST_F(ut_leftview_test, doNoteMove)
+TEST_F(ut_leftview_test, doMove)
 {
     LeftView leftview;
     QModelIndexList indexList;
@@ -219,19 +229,10 @@ TEST_F(ut_leftview_test, doNoteMove)
         }
     }
     QModelIndex index = leftview.setDefaultNotepadItem();
+    QString sortString = leftview.getFolderSort();
     leftview.doDragMove(index, index.siblingAtRow(index.row() + 1));
-    leftview.getFolderSort();
     leftview.setFolderSort();
-}
-
-TEST_F(ut_leftview_test, doDragMove)
-{
-    LeftView leftview;
-    leftview.setCurrentIndex(leftview.m_pDataModel->index(0, 0));
-    QModelIndex src = leftview.currentIndex();
-    leftview.setCurrentIndex(leftview.m_pDataModel->index(1, 0));
-    QModelIndex des = leftview.currentIndex();
-    leftview.doDragMove(src, des);
+    EXPECT_TRUE(sortString != leftview.getFolderSort());
 }
 
 TEST_F(ut_leftview_test, getFolderSort)
@@ -243,8 +244,8 @@ TEST_F(ut_leftview_test, getFolderSort)
             leftview.appendFolder(it);
         }
     }
-    leftview.getFolderSort();
-    leftview.setFolderSort();
+    EXPECT_TRUE(!leftview.getFolderSort().isEmpty());
+    EXPECT_EQ(true, leftview.setFolderSort());
 }
 
 TEST_F(ut_leftview_test, setDrawNotesNum)
@@ -255,18 +256,11 @@ TEST_F(ut_leftview_test, setDrawNotesNum)
 
     leftview.m_pItemDelegate->setDrawNotesNum(false);
     leftview.m_pItemDelegate->setDragState(false);
+    EXPECT_EQ(false, leftview.m_pItemDelegate->m_draging);
     leftview.m_pItemDelegate->setDrawHover(false);
+    EXPECT_EQ(false, leftview.m_pItemDelegate->m_drawHover);
     leftview.m_pItemDelegate->setModelData(lineedit, leftview.m_pDataModel, leftview.currentIndex());
-
     delete lineedit;
-}
-
-TEST_F(ut_leftview_test, lessThan)
-{
-    LeftView leftview;
-    QModelIndex sorce;
-    QModelIndex target;
-    leftview.m_pSortViewFilter->lessThan(sorce, target);
 }
 
 TEST_F(ut_leftview_test, eventFilter)
@@ -274,12 +268,17 @@ TEST_F(ut_leftview_test, eventFilter)
     LeftView leftview;
     QFocusEvent event(QEvent::FocusOut);
     leftview.eventFilter(&leftview, &event);
+    EXPECT_EQ(false, leftview.m_pItemDelegate->m_tabFocus);
     QFocusEvent event1(QEvent::FocusIn);
+    event1.m_reason = Qt::TabFocusReason;
     leftview.eventFilter(&leftview, &event1);
+    EXPECT_EQ(true, leftview.m_pItemDelegate->m_tabFocus);
     QEvent event2(QEvent::DragLeave);
     leftview.eventFilter(nullptr, &event2);
+    EXPECT_EQ(false, leftview.m_pItemDelegate->m_drawHover);
     QEvent event3(QEvent::DragEnter);
     leftview.eventFilter(nullptr, &event3);
+    EXPECT_EQ(true, leftview.m_pItemDelegate->m_drawHover);
 }
 
 TEST_F(ut_leftview_test, sort)
@@ -292,12 +291,15 @@ TEST_F(ut_leftview_test, sort)
         }
     }
     leftview.sort();
+    EXPECT_TRUE(!leftview.getFolderSort().isEmpty());
 }
 
 TEST_F(ut_leftview_test, handleTouchSlideEvent)
 {
     LeftView leftview;
-    leftview.handleTouchSlideEvent(10, 5.0, QPoint(0, 0));
+    QPoint point(0, 10);
+    leftview.handleTouchSlideEvent(10, 5.0, point);
+    EXPECT_EQ(point, leftview.m_touchPressPoint);
 }
 
 TEST_F(ut_leftview_test, dragEvent)
@@ -310,6 +312,8 @@ TEST_F(ut_leftview_test, dragEvent)
     leftview.m_folderDraing = true;
     leftview.dragEnterEvent(&event);
     leftview.dragMoveEvent(&event);
+    EXPECT_EQ(true, leftview.m_pItemDelegate->m_draging);
     QDragLeaveEvent event1;
     leftview.dragLeaveEvent(&event1);
+    EXPECT_EQ(false, leftview.m_pItemDelegate->m_draging);
 }

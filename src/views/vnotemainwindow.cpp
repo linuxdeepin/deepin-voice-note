@@ -1055,15 +1055,6 @@ void VNoteMainWindow::resizeEvent(QResizeEvent *event)
 }
 
 /**
- * @brief VNoteMainWindow::keyPressEvent
- * @param event
- */
-void VNoteMainWindow::keyPressEvent(QKeyEvent *event)
-{
-    DMainWindow::keyPressEvent(event);
-}
-
-/**
  * @brief VNoteMainWindow::checkIfNeedExit
  * @return true 关闭应用
  */

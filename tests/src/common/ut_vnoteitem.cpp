@@ -79,10 +79,10 @@ TEST_F(ut_vnoteitem_test, newBlock)
     VNoteItem vnoteitem;
     VNoteBlock *ptrBlock = nullptr;
     ptrBlock = vnoteitem.newBlock(1);
-    ASSERT_EQ(ptrBlock->blockType, VNoteBlock::Text);
+    EXPECT_EQ(ptrBlock->blockType, VNoteBlock::Text);
     vnoteitem.delBlock(ptrBlock);
     ptrBlock = vnoteitem.newBlock(2);
-    ASSERT_EQ(ptrBlock->blockType, VNoteBlock::Voice);
+    EXPECT_EQ(ptrBlock->blockType, VNoteBlock::Voice);
     vnoteitem.delBlock(ptrBlock);
 }
 
@@ -94,9 +94,9 @@ TEST_F(ut_vnoteitem_test, addBlock)
     vnoteitem.addBlock(ptrBlock);
     vnoteitem.addBlock(ptrBlock, ptrBlock1);
     vnoteitem.delBlock(ptrBlock);
-    //    ASSERT_TRUE(vnoteitem.haveVoice());
-    //    ASSERT_FALSE(vnoteitem.haveText());
-    //    ASSERT_GE(vnoteitem.voiceCount(), 0);
+    //    EXPECT_TRUE(vnoteitem.haveVoice());
+    //    EXPECT_FALSE(vnoteitem.haveText());
+    //    EXPECT_GE(vnoteitem.voiceCount(), 0);
 }
 
 TEST_F(ut_vnoteitem_test, setMetadata)

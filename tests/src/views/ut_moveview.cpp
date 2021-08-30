@@ -36,6 +36,7 @@ TEST_F(ut_MoveView_test, setFolder)
     MoveView moveView;
     VNoteFolder *folder = VNoteDataManager::instance()->getNoteFolders()->folders[0];
     moveView.setFolder(folder);
+    EXPECT_EQ(moveView.m_folder, folder);
     moveView.grab();
     moveView.m_hasComposite = !moveView.m_hasComposite;
     moveView.grab();
@@ -49,14 +50,20 @@ TEST_F(ut_MoveView_test, setNoteList)
     QList<VNoteItem *> list;
     list.append(note);
     moveView.setNote(note);
+    EXPECT_EQ(moveView.m_note, note);
     moveView.setNoteList(list);
+    EXPECT_EQ(moveView.m_noteList, list);
     moveView.setNotesNumber(1);
+    EXPECT_EQ(moveView.m_notesNumber, 1);
     moveView.grab();
     moveView.setNotesNumber(2);
+    EXPECT_EQ(moveView.m_notesNumber, 2);
     moveView.grab();
     moveView.m_hasComposite = !moveView.m_hasComposite;
     moveView.setNotesNumber(1);
+    EXPECT_EQ(moveView.m_notesNumber, 1);
     moveView.grab();
     moveView.setNotesNumber(2);
+    EXPECT_EQ(moveView.m_notesNumber, 2);
     moveView.grab();
 }

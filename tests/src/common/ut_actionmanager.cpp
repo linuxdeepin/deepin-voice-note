@@ -28,28 +28,28 @@ TEST_F(ut_actionmanager_test, notebookContextMenu)
 {
     ActionManager actionmanager;
     actionmanager.notebookContextMenu();
-    ASSERT_FALSE(actionmanager.m_notebookContextMenu->isEmpty());
+    EXPECT_FALSE(actionmanager.m_notebookContextMenu->isEmpty());
 }
 
 TEST_F(ut_actionmanager_test, noteContextMenu)
 {
     ActionManager actionmanager;
     actionmanager.noteContextMenu();
-    ASSERT_FALSE(actionmanager.m_noteContextMenu->isEmpty());
+    EXPECT_FALSE(actionmanager.m_noteContextMenu->isEmpty());
 }
 
 TEST_F(ut_actionmanager_test, getActionKind)
 {
     ActionManager actionmanager;
     QAction *tmpact = actionmanager.getActionById(actionmanager.NotebookAddNew);
-    ASSERT_EQ(actionmanager.getActionKind(tmpact), 3);
+    EXPECT_EQ(actionmanager.getActionKind(tmpact), 3);
 }
 
 TEST_F(ut_actionmanager_test, getActionById)
 {
     ActionManager actionmanager;
     QAction *tmpact = actionmanager.getActionById(actionmanager.NotebookRename);
-    ASSERT_EQ(tmpact->text(), "Rename");
+    EXPECT_EQ(tmpact->text(), "Rename");
 }
 
 TEST_F(ut_actionmanager_test, enableAction)
@@ -57,7 +57,7 @@ TEST_F(ut_actionmanager_test, enableAction)
     ActionManager actionmanager;
     QAction *tmpact = actionmanager.getActionById(actionmanager.NotebookRename);
     actionmanager.enableAction(actionmanager.NotebookRename, false);
-    ASSERT_FALSE(tmpact->isEnabled());
+    EXPECT_FALSE(tmpact->isEnabled());
 }
 
 TEST_F(ut_actionmanager_test, visibleAction)
@@ -65,7 +65,7 @@ TEST_F(ut_actionmanager_test, visibleAction)
     ActionManager actionmanager;
     QAction *tmpact = actionmanager.getActionById(actionmanager.NotebookRename);
     actionmanager.visibleAction(actionmanager.NotebookRename, false);
-    ASSERT_FALSE(tmpact->isVisible());
+    EXPECT_FALSE(tmpact->isVisible());
 }
 
 TEST_F(ut_actionmanager_test, resetCtxMenu)
@@ -73,11 +73,11 @@ TEST_F(ut_actionmanager_test, resetCtxMenu)
     ActionManager actionmanager;
     QAction *tmpact = actionmanager.getActionById(actionmanager.NotebookRename);
     actionmanager.resetCtxMenu(actionmanager.NotebookCtxMenu, false);
-    ASSERT_FALSE(tmpact->isEnabled());
+    EXPECT_FALSE(tmpact->isEnabled());
 
     tmpact = actionmanager.getActionById(actionmanager.NoteRename);
     actionmanager.resetCtxMenu(actionmanager.NoteCtxMenu, false);
-    ASSERT_FALSE(tmpact->isEnabled());
+    EXPECT_FALSE(tmpact->isEnabled());
 }
 
 TEST_F(ut_actionmanager_test, initMenu)
@@ -88,5 +88,5 @@ TEST_F(ut_actionmanager_test, initMenu)
 
 TEST_F(ut_actionmanager_test, Instance)
 {
-    ASSERT_TRUE(ActionManager::Instance());
+    EXPECT_TRUE(ActionManager::Instance());
 }

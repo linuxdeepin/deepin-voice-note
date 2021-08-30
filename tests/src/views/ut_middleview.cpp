@@ -68,17 +68,20 @@ TEST_F(ut_middleview_test, setSearchKey)
 {
     m_middleView->grab();
     m_middleView->setSearchKey("note");
+    EXPECT_EQ(m_middleView->m_searchKey, QString("note"));
     m_middleView->grab();
     m_middleView->m_pItemDelegate->handleChangeTheme();
     m_middleView->clearAll();
+    EXPECT_FALSE(m_middleView->rowCount());
     m_middleView->closeMenu();
+    EXPECT_FALSE(m_middleView->m_noteMenu->isVisible());
 }
 
 TEST_F(ut_middleview_test, setCurrentId)
 {
     MiddleView middleview;
     middleview.setCurrentId(1);
-    middleview.getCurrentId();
+    EXPECT_EQ(1, middleview.getCurrentId());
 }
 
 //TEST_F(ut_middleview_test, addRowAtHead)
@@ -157,6 +160,7 @@ TEST_F(ut_middleview_test, setTouchState)
 {
     MiddleView middleview;
     middleview.setTouchState(middleview.TouchNormal);
+    EXPECT_EQ(m_middleView->m_touchState, middleview.TouchNormal);
 }
 
 TEST_F(ut_middleview_test, doTouchMoveEvent)
@@ -167,7 +171,8 @@ TEST_F(ut_middleview_test, doTouchMoveEvent)
     middleview.m_touchPressPoint = QPoint(localPos.x(), localPos.y() - 11);
     QDateTime time = QDateTime::currentDateTime();
     middleview.m_touchPressStartMs = time.toMSecsSinceEpoch() - 260;
-    middleview.setTouchState(middleview.TouchMoving);
+    middleview.setTouchState(MiddleView::TouchMoving);
+    EXPECT_EQ(middleview.m_touchState, MiddleView::TouchMoving);
     middleview.doTouchMoveEvent(mouseMoveEvent);
     delete mouseMoveEvent;
 }
@@ -177,6 +182,7 @@ TEST_F(ut_middleview_test, setOnlyCurItemMenuEnable)
     MiddleView middleview;
     bool enable = false;
     middleview.setOnlyCurItemMenuEnable(enable);
+    EXPECT_EQ(middleview.m_onlyCurItemMenuEnable, enable);
 }
 
 TEST_F(ut_middleview_test, eventFilter)
@@ -184,11 +190,14 @@ TEST_F(ut_middleview_test, eventFilter)
     MiddleView middleview;
     QFocusEvent focusInEvent(QEvent::FocusIn, Qt::TabFocusReason);
     middleview.eventFilter(&middleview, &focusInEvent);
+    EXPECT_EQ(middleview.m_pItemDelegate->m_tabFocus, true);
     QFocusEvent focusOutEvent(QEvent::FocusOut);
     middleview.eventFilter(&middleview, &focusOutEvent);
+    EXPECT_EQ(middleview.m_pItemDelegate->m_tabFocus, false);
     QKeyEvent *event1 = new QKeyEvent(QEvent::Destroy, 0x01000001, Qt::NoModifier, "test");
-    middleview.eventFilter(nullptr, event1);
+    EXPECT_FALSE(middleview.eventFilter(nullptr, event1));
     middleview.eventFilter(nullptr, &focusInEvent);
+    EXPECT_EQ(middleview.m_pItemDelegate->m_editVisible, true);
     delete event1;
 }
 
@@ -200,6 +209,7 @@ TEST_F(ut_middleview_test, addRowAtHead)
     vnoteitem->folderId = 2;
     vnoteitem->noteTitle = "test";
     middleview.addRowAtHead(vnoteitem);
+    EXPECT_EQ(1, middleview.rowCount());
     delete vnoteitem;
 }
 
@@ -210,11 +220,14 @@ TEST_F(ut_middleview_test, appendRow)
     VNoteItem *noteData1 = new VNoteItem;
     middleview.appendRow(noteData);
     middleview.appendRow(noteData1);
+    EXPECT_EQ(2, middleview.rowCount());
     middleview.sortView();
     noteData1->isTop = 1;
     middleview.sortView();
     middleview.m_pSortViewFilter->sortView(MiddleViewSortFilter::title);
+    EXPECT_EQ(middleview.m_pSortViewFilter->m_sortFeild, MiddleViewSortFilter::title);
     middleview.m_pSortViewFilter->sortView(MiddleViewSortFilter::createTime);
+    EXPECT_EQ(middleview.m_pSortViewFilter->m_sortFeild, MiddleViewSortFilter::createTime);
     delete noteData;
     delete noteData1;
 }
@@ -222,14 +235,13 @@ TEST_F(ut_middleview_test, appendRow)
 TEST_F(ut_middleview_test, rowCount)
 {
     MiddleView middleview;
-    middleview.rowCount();
+    EXPECT_EQ(qint32(0), middleview.rowCount());
 }
 
 TEST_F(ut_middleview_test, editNote)
 {
-    MiddleView middleview;
-    middleview.setCurrentIndex(0);
-    middleview.editNote();
+    m_middleView->setCurrentIndex(0);
+    m_middleView->editNote();
 }
 
 TEST_F(ut_middleview_test, saveAsText)
@@ -239,7 +251,8 @@ TEST_F(ut_middleview_test, saveAsText)
     Stub stub;
     stub.set(A_foo, stub_dialog);
     m_middleView->selectAll();
-    m_middleView->saveAsText();
+    EXPECT_FALSE(m_middleView->selectedIndexes().isEmpty());
+    //m_middleView->saveAsText();
 }
 
 TEST_F(ut_middleview_test, saveRecords)
@@ -249,26 +262,31 @@ TEST_F(ut_middleview_test, saveRecords)
     Stub stub;
     stub.set(A_foo, stub_dialog);
     m_middleView->selectAll();
+    EXPECT_FALSE(m_middleView->selectedIndexes().isEmpty());
     m_middleView->saveRecords();
 }
 
 TEST_F(ut_middleview_test, handleShiftAndPress)
 {
-    MiddleView middleview;
-    middleview.setModifierState(middleview.shiftAndUpOrDownModifier);
-    middleview.m_currentRow = 0;
-    QModelIndex index = middleview.m_pDataModel->index(1, 0);
-    middleview.handleShiftAndPress(index);
+    m_middleView->setCurrentIndex(0);
+    QModelIndex index = m_middleView->currentIndex();
+    m_middleView->handleShiftAndPress(index);
+    EXPECT_EQ(m_middleView->getModifierState(), MiddleView::shiftAndMouseModifier);
 }
 
 TEST_F(ut_middleview_test, keyPressEvent)
 {
     QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Up, Qt::ShiftModifier, "test");
     m_middleView->initPositionStatus(0);
+    EXPECT_EQ(m_middleView->m_shiftSelection, -1);
+    EXPECT_EQ(m_middleView->m_currentRow, 0);
+
     m_middleView->keyPressEvent(event);
     m_middleView->initPositionStatus(1);
+    EXPECT_EQ(m_middleView->m_currentRow, 1);
     m_middleView->keyPressEvent(event);
     m_middleView->initPositionStatus(0);
+    EXPECT_EQ(m_middleView->m_currentRow, 0);
     m_middleView->m_shiftSelection = 1;
     m_middleView->keyPressEvent(event);
     event->setModifiers(Qt::NoModifier);
@@ -278,6 +296,7 @@ TEST_F(ut_middleview_test, keyPressEvent)
     m_middleView->initPositionStatus(0);
     m_middleView->keyPressEvent(event1);
     m_middleView->initPositionStatus(1);
+    EXPECT_EQ(m_middleView->m_currentRow, 1);
     m_middleView->m_shiftSelection = 0;
     m_middleView->keyPressEvent(event1);
     m_middleView->m_shiftSelection = -1;
@@ -307,27 +326,9 @@ TEST_F(ut_middleview_test, setVisibleEmptySearch)
 {
     MiddleView middleview;
     middleview.setVisibleEmptySearch(true);
+    EXPECT_FALSE(nullptr == middleview.m_emptySearch);
     middleview.setOnlyCurItemMenuEnable(true);
-}
-
-TEST_F(ut_middleview_test, selectAfterRemoved)
-{
-    MiddleView middleview;
-    if (middleview.count()) {
-        middleview.m_nextSelection = 0;
-    }
-    middleview.selectAfterRemoved();
-    middleview.m_nextSelection = -1;
-    middleview.selectAfterRemoved();
-}
-
-TEST_F(ut_middleview_test, setNextSelection)
-{
-    MiddleView middleview;
-    if (middleview.count()) {
-        middleview.setCurrentIndex(0);
-    }
-    middleview.setNextSelection();
+    EXPECT_EQ(middleview.m_onlyCurItemMenuEnable, true);
 }
 
 TEST_F(ut_middleview_test, setDragSuccess)
@@ -335,6 +336,7 @@ TEST_F(ut_middleview_test, setDragSuccess)
     MiddleView middleview;
     bool value = true;
     middleview.setDragSuccess(value);
+    EXPECT_EQ(value, middleview.m_dragSuccess);
 }
 
 TEST_F(ut_middleview_test, changeRightView)
@@ -350,25 +352,28 @@ TEST_F(ut_middleview_test, handleDragEvent)
     middleview.m_onlyCurItemMenuEnable = false;
     bool value = true;
     middleview.handleDragEvent(value);
+    EXPECT_EQ(middleview.m_touchState, MiddleView::TouchDraging);
 }
 
 TEST_F(ut_middleview_test, deleteModelIndexs)
 {
-    MiddleView middleview;
-    QModelIndexList indexList;
-    if (middleview.count()) {
-        indexList.append(middleview.m_pDataModel->index(0, 0));
-    }
-    middleview.deleteModelIndexs(indexList);
+    m_middleView->selectAll();
+    QModelIndexList indexList = m_middleView->selectedIndexes();
+    m_middleView->deleteModelIndexs(indexList);
+    EXPECT_FALSE(m_middleView->rowCount());
 }
 
 TEST_F(ut_middleview_test, keyReleaseEvent)
 {
     MiddleView middleview;
+    middleview.m_shiftSelection = 1;
     QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Shift, Qt::NoModifier, "test");
     middleview.keyReleaseEvent(event);
+    EXPECT_EQ(middleview.m_shiftSelection, -1);
+    middleview.m_shiftSelection = 1;
     QKeyEvent *event2 = new QKeyEvent(QEvent::KeyPress, Qt::Key_A, Qt::NoModifier, "test");
     middleview.keyReleaseEvent(event2);
+    EXPECT_EQ(middleview.m_shiftSelection, 1);
     delete event;
     delete event2;
 }
@@ -376,7 +381,7 @@ TEST_F(ut_middleview_test, keyReleaseEvent)
 TEST_F(ut_middleview_test, getSelectedCount)
 {
     MiddleView middleview;
-    middleview.getSelectedCount();
+    EXPECT_EQ(middleview.getSelectedCount(), 0);
 }
 
 //TEST_F(ut_middleview_test,onMenuShow){
@@ -391,25 +396,28 @@ TEST_F(ut_middleview_test, getSelectedCount)
 TEST_F(ut_middleview_test, haveText)
 {
     m_middleView->selectAll();
-    m_middleView->haveText();
+    EXPECT_TRUE(m_middleView->getSelectedCount());
+    EXPECT_TRUE(m_middleView->haveText());
 }
 
 TEST_F(ut_middleview_test, haveVoice)
 {
     m_middleView->selectAll();
-    m_middleView->haveVoice();
+    EXPECT_TRUE(m_middleView->getSelectedCount());
+    EXPECT_TRUE(m_middleView->haveVoice());
 }
 
 TEST_F(ut_middleview_test, handleTouchSlideEvent)
 {
     MiddleView middleview;
     middleview.handleTouchSlideEvent(24, 11, QCursor::pos());
+    EXPECT_EQ(middleview.m_touchPressPoint, QCursor::pos());
 }
 
 TEST_F(ut_middleview_test, isMultipleSelected)
 {
     MiddleView middleview;
-    middleview.isMultipleSelected();
+    EXPECT_FALSE(middleview.isMultipleSelected());
 }
 
 TEST_F(ut_middleview_test, setMouseState)
@@ -418,12 +426,13 @@ TEST_F(ut_middleview_test, setMouseState)
 
     MiddleView::MouseState mouseState {MiddleView::MouseState::normal};
     middleview.setMouseState(mouseState);
+    EXPECT_EQ(middleview.m_mouseState, mouseState);
 }
 
 TEST_F(ut_middleview_test, getModifierState)
 {
     MiddleView middleview;
-    middleview.getModifierState();
+    EXPECT_EQ(MiddleView::noModifier, middleview.getModifierState());
 }
 
 TEST_F(ut_middleview_test, setModifierState)
@@ -431,29 +440,33 @@ TEST_F(ut_middleview_test, setModifierState)
     MiddleView middleview;
     MiddleView::ModifierState modifierState {MiddleView::ModifierState::noModifier};
     middleview.setModifierState(modifierState);
+    EXPECT_EQ(modifierState, middleview.getModifierState());
 }
 
 TEST_F(ut_middleview_test, onNoteChanged)
 {
     MiddleView middleview;
     middleview.onNoteChanged();
+    EXPECT_EQ(middleview.m_shiftSelection, -1);
 }
 
 TEST_F(ut_middleview_test, getCurrVNotedataList)
 {
     m_middleView->selectAll();
-    m_middleView->getCurrVNotedataList();
+    QList<VNoteItem *> notes = m_middleView->getCurrVNotedataList();
+    EXPECT_FALSE(notes.isEmpty());
 }
 
 TEST_F(ut_middleview_test, getCurrVNotedata)
 {
-    MiddleView middleview;
-    middleview.m_index = middleview.currentIndex();
-    middleview.getCurrVNotedata();
+    m_middleView->setCurrentIndex(0);
+    EXPECT_FALSE(m_middleView->getCurrVNotedata() == nullptr);
 }
 
 TEST_F(ut_middleview_test, deleteCurrentRow)
 {
+    int count = m_middleView->rowCount();
     m_middleView->setCurrentIndex(0);
     m_middleView->deleteCurrentRow();
+    EXPECT_EQ(m_middleView->rowCount(), count - 1);
 }

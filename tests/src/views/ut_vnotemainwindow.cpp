@@ -80,7 +80,9 @@ TEST_F(ut_vnotemainwindow_test, holdHaltLock)
 {
     m_mainWindow->holdHaltLock();
     m_mainWindow->releaseHaltLock();
+    EXPECT_FALSE(m_mainWindow->m_lockFd.isValid());
     m_mainWindow->onVNoteFoldersLoaded();
+    EXPECT_FALSE(m_mainWindow->m_stackedWidget->currentIndex() != VNoteMainWindow::WndNoteShow);
 }
 
 //TEST_F(ut_vnotemainwindow_test, onVNoteSearch)
@@ -92,11 +94,12 @@ TEST_F(ut_vnotemainwindow_test, holdHaltLock)
 TEST_F(ut_vnotemainwindow_test, onVNoteSearchTextChange)
 {
     m_mainWindow->onVNoteSearchTextChange("");
+    EXPECT_EQ(OpsStateInterface::instance()->isSearching(), false);
 }
 
 TEST_F(ut_vnotemainwindow_test, loadNotepads)
 {
-    m_mainWindow->loadNotepads();
+    EXPECT_TRUE(m_mainWindow->loadNotepads());
 }
 
 TEST_F(ut_vnotemainwindow_test, loadNotes)
@@ -114,61 +117,78 @@ TEST_F(ut_vnotemainwindow_test, loadNotes)
     vnotefolder->modifyTime = QDateTime::currentDateTime();
     vnotefolder->deleteTime = QDateTime::currentDateTime();
     m_mainWindow->loadNotes(vnotefolder);
+    EXPECT_EQ(m_mainWindow->m_middleView->getCurrentId(), vnotefolder->id);
     delete vnotefolder;
 }
 
 TEST_F(ut_vnotemainwindow_test, loadSearchNotes)
 {
-    m_mainWindow->loadSearchNotes("本");
+    EXPECT_FALSE(m_mainWindow->loadSearchNotes("本"));
 }
 
 TEST_F(ut_vnotemainwindow_test, initDeviceExceptionErrMessage)
 {
     m_mainWindow->initDeviceExceptionErrMessage();
+    EXPECT_TRUE(m_mainWindow->m_pDeviceExceptionMsg);
 }
 
 TEST_F(ut_vnotemainwindow_test, showAsrErrMessage)
 {
     m_mainWindow->showAsrErrMessage("error Message");
+    EXPECT_TRUE(m_mainWindow->m_asrErrMeassage);
 }
 
 TEST_F(ut_vnotemainwindow_test, showDeviceExceptionErrMessage)
 {
     m_mainWindow->showDeviceExceptionErrMessage();
+    EXPECT_TRUE(m_mainWindow->m_pDeviceExceptionMsg);
 }
 
 TEST_F(ut_vnotemainwindow_test, initMenuExtension)
 {
     m_mainWindow->initMenuExtension();
+    EXPECT_TRUE(m_mainWindow->m_menuExtension);
 }
 
 TEST_F(ut_vnotemainwindow_test, setSpecialStatus)
 {
     m_mainWindow->setSpecialStatus(m_mainWindow->SearchStart);
+    EXPECT_EQ(OpsStateInterface::instance()->isSearching(), true);
     m_mainWindow->setSpecialStatus(m_mainWindow->SearchEnd);
+    EXPECT_EQ(OpsStateInterface::instance()->isSearching(), false);
     m_mainWindow->setSpecialStatus(m_mainWindow->PlayVoiceStart);
+    EXPECT_EQ(OpsStateInterface::instance()->isPlaying(), true);
     m_mainWindow->setSpecialStatus(m_mainWindow->PlayVoiceEnd);
+    EXPECT_EQ(OpsStateInterface::instance()->isPlaying(), false);
     m_mainWindow->setSpecialStatus(m_mainWindow->RecordStart);
+    EXPECT_EQ(OpsStateInterface::instance()->isRecording(), true);
     m_mainWindow->setSpecialStatus(m_mainWindow->RecordEnd);
+    EXPECT_EQ(OpsStateInterface::instance()->isRecording(), false);
     m_mainWindow->setSpecialStatus(m_mainWindow->VoiceToTextStart);
+    EXPECT_EQ(OpsStateInterface::instance()->isVoice2Text(), true);
     m_mainWindow->setSpecialStatus(m_mainWindow->VoiceToTextEnd);
+    EXPECT_EQ(OpsStateInterface::instance()->isVoice2Text(), false);
 }
 
 TEST_F(ut_vnotemainwindow_test, initAsrErrMessage)
 {
     m_mainWindow->initAsrErrMessage();
+    EXPECT_TRUE(m_mainWindow->m_asrErrMeassage);
 }
 
 TEST_F(ut_vnotemainwindow_test, onStartRecord)
 {
     m_mainWindow->onStartRecord("/usr/share/music/bensound-sunny.mp3");
+    EXPECT_EQ(OpsStateInterface::instance()->isRecording(), true);
     m_mainWindow->onFinshRecord("/usr/share/music/bensound-sunny.mp3", 2650);
+    EXPECT_EQ(OpsStateInterface::instance()->isRecording(), false);
 }
 
 TEST_F(ut_vnotemainwindow_test, onA2TStartAgain)
 {
     m_mainWindow->onA2TError(1);
     m_mainWindow->onA2TSuccess("/usr/share/music/bensound-sunny.mp3");
+    EXPECT_TRUE(m_mainWindow->m_asrErrMeassage);
 }
 
 TEST_F(ut_vnotemainwindow_test, onPreviewShortcut)
@@ -181,10 +201,7 @@ TEST_F(ut_vnotemainwindow_test, event)
     QSize size;
     QResizeEvent *event1 = new QResizeEvent(size, size);
     m_mainWindow->resizeEvent(event1);
-    QKeyEvent *event2 = new QKeyEvent(QEvent::KeyPress, 0x58, Qt::ControlModifier, "test");
-    m_mainWindow->keyPressEvent(event2);
     delete event1;
-    delete event2;
 }
 
 TEST_F(ut_vnotemainwindow_test, handleMultipleOption)
@@ -201,8 +218,10 @@ TEST_F(ut_vnotemainwindow_test, onDropNote)
 {
     bool dropCancel = true;
     m_mainWindow->onDropNote(dropCancel);
+    EXPECT_EQ(m_mainWindow->m_middleView->m_dragSuccess, false);
     bool dropCancels = false;
     m_mainWindow->onDropNote(dropCancels);
+    EXPECT_EQ(m_mainWindow->m_middleView->m_dragSuccess, true);
 }
 
 TEST_F(ut_vnotemainwindow_test, onShortcut)
@@ -249,12 +268,14 @@ TEST_F(ut_vnotemainwindow_test, onNewNote)
 {
     m_mainWindow->onNewNote();
     m_mainWindow->delNote();
+    EXPECT_EQ(m_mainWindow->m_middleView->rowCount(), 0);
 }
 
 TEST_F(ut_vnotemainwindow_test, onNewNotebook)
 {
     m_mainWindow->onNewNotebook();
     m_mainWindow->delNotepad();
+    EXPECT_EQ(m_mainWindow->m_leftView->folderCount(), 0);
 }
 
 TEST_F(ut_vnotemainwindow_test, onPlayPlugVoice)

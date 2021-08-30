@@ -154,8 +154,6 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     //窗口关闭
     void closeEvent(QCloseEvent *event) override;
-    //按键处理
-    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
     //事件过滤
     bool eventFilter(QObject *o, QEvent *e) override;
 

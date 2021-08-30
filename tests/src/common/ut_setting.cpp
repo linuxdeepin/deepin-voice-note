@@ -26,9 +26,9 @@ TEST_F(ut_setting_test, keys)
 {
     CustemBackend custembackend("/home/zhangteng/.config/deepin/deepin-voice-note/config.conf");
     QStringList keyList;
-    ASSERT_EQ(keyList.size(), 0);
+    EXPECT_EQ(keyList.size(), 0);
     keyList = custembackend.keys();
-    ASSERT_GE(keyList.size(), 0);
+    EXPECT_GE(keyList.size(), 0);
 }
 
 TEST_F(ut_setting_test, setOption)
@@ -36,7 +36,7 @@ TEST_F(ut_setting_test, setOption)
     QString key = "old._app_main_wnd_sz_key_";
     QString value = "/home/zhangteng/test";
     setting::instance()->setOption(key, value);
-    ASSERT_FALSE(key.isEmpty());
+    EXPECT_FALSE(key.isEmpty());
     QStringList keyList = setting::instance()->m_setting->keys();
     value = "test";
     setting::instance()->setOption(key, value);
@@ -56,7 +56,7 @@ TEST_F(ut_setting_test, doSetOption)
 TEST_F(ut_setting_test, getSetting)
 {
     DSettings *tmpset = setting::instance()->getSetting();
-    ASSERT_TRUE(tmpset != nullptr);
+    EXPECT_TRUE(tmpset != nullptr);
 }
 
 TEST_F(ut_setting_test, GenerateSettingTranslate)

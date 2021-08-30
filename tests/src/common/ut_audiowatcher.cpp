@@ -151,7 +151,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSourceVolumeChanged_001)
     m_AudioWatcher->m_pDefaultSource->activePort().description = "activePort";
     m_AudioWatcher->onSourceVolumeChanged(tmpdl);
     EXPECT_EQ(0.8, m_AudioWatcher->m_inAudioPortVolume) << "value = 0.8";
-    ASSERT_NE(m_AudioWatcher->m_pDefaultSource->activePort(), m_AudioWatcher->m_inAudioPort);
+    EXPECT_NE(m_AudioWatcher->m_pDefaultSource->activePort(), m_AudioWatcher->m_inAudioPort);
 }
 
 TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSourceVolumeChanged_002)
@@ -161,7 +161,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSourceVolumeChanged_002)
     m_AudioWatcher->m_pDefaultSource->activePort().name = "activePort";
     m_AudioWatcher->onSourceVolumeChanged(tmpdl);
     EXPECT_EQ(0.6, m_AudioWatcher->m_inAudioPortVolume) << "value = 0.6";
-    ASSERT_EQ(m_AudioWatcher->m_pDefaultSource->activePort(), m_AudioWatcher->m_inAudioPort);
+    EXPECT_EQ(m_AudioWatcher->m_pDefaultSource->activePort(), m_AudioWatcher->m_inAudioPort);
 }
 
 TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSinkVolumeChanged_001)
@@ -172,7 +172,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSinkVolumeChanged_001)
     m_AudioWatcher->m_pDefaultSink->activePort().description = "activePort";
     m_AudioWatcher->onSinkVolumeChanged(tmpdl);
     EXPECT_EQ(0.8, m_AudioWatcher->m_outAudioPortVolume) << "value = 0.8";
-    ASSERT_NE(m_AudioWatcher->m_pDefaultSink->activePort(), m_AudioWatcher->m_outAudioPort);
+    EXPECT_NE(m_AudioWatcher->m_pDefaultSink->activePort(), m_AudioWatcher->m_outAudioPort);
 }
 
 TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSinkVolumeChanged_002)
@@ -182,7 +182,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSinkVolumeChanged_002)
     m_AudioWatcher->m_pDefaultSink->activePort().name = "activePort";
     m_AudioWatcher->onSinkVolumeChanged(tmpdl);
     EXPECT_EQ(0.6, m_AudioWatcher->m_outAudioPortVolume) << "value = 0.8";
-    ASSERT_EQ(m_AudioWatcher->m_pDefaultSink->activePort(), m_AudioWatcher->m_outAudioPort);
+    EXPECT_EQ(m_AudioWatcher->m_pDefaultSink->activePort(), m_AudioWatcher->m_outAudioPort);
 }
 
 TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSourceMuteChanged_001)

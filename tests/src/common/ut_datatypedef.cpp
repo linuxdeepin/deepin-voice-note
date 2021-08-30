@@ -31,12 +31,12 @@ TEST_F(ut_datatypedef_test, dataConstRef)
 {
     VNOTE_DATAS vnote_datas;
     VNOTE_DATA_VECTOR vnote_data_vector;
-    ASSERT_TRUE(vnote_data_vector.size() == 0);
+    EXPECT_TRUE(vnote_data_vector.size() == 0);
 
     VNoteBlock *ptrBlock = nullptr;
     vnote_datas.datas.push_back(ptrBlock);
     vnote_data_vector = vnote_datas.dataConstRef();
-    ASSERT_FALSE(vnote_data_vector.size() == 0);
+    EXPECT_FALSE(vnote_data_vector.size() == 0);
 }
 
 TEST_F(ut_datatypedef_test, newBlock)
@@ -44,10 +44,10 @@ TEST_F(ut_datatypedef_test, newBlock)
     VNOTE_DATAS vnote_datas;
     VNoteBlock *ptrBlock = nullptr;
     ptrBlock = vnote_datas.newBlock(1);
-    ASSERT_EQ(ptrBlock->blockType, VNoteBlock::Text);
+    EXPECT_EQ(ptrBlock->blockType, VNoteBlock::Text);
     vnote_datas.delBlock(ptrBlock);
     ptrBlock = vnote_datas.newBlock(2);
-    ASSERT_EQ(ptrBlock->blockType, VNoteBlock::Voice);
+    EXPECT_EQ(ptrBlock->blockType, VNoteBlock::Voice);
     vnote_datas.delBlock(ptrBlock);
 }
 
@@ -56,7 +56,7 @@ TEST_F(ut_datatypedef_test, addBlock)
     VNOTE_DATAS vnote_datas;
     VNoteBlock *ptrBlock = vnote_datas.newBlock(1);
     vnote_datas.addBlock(ptrBlock);
-    ASSERT_NE(vnote_datas.datas.size(), 0);
+    EXPECT_NE(vnote_datas.datas.size(), 0);
 }
 
 TEST_F(ut_datatypedef_test, addBlock1)
@@ -66,16 +66,16 @@ TEST_F(ut_datatypedef_test, addBlock1)
     VNoteBlock *ptrBlock1 = vnote_datas.newBlock(2);
     vnote_datas.addBlock(ptrBlock);
     vnote_datas.addBlock(ptrBlock, ptrBlock1);
-    ASSERT_NE(vnote_datas.datas.size(), 0);
+    EXPECT_NE(vnote_datas.datas.size(), 0);
 
     VNoteBlock *ptrBlock2 = vnote_datas.newBlock(1);
     vnote_datas.addBlock(ptrBlock2, ptrBlock2);
-    ASSERT_NE(vnote_datas.datas.size(), 0);
+    EXPECT_NE(vnote_datas.datas.size(), 0);
 
     ptrBlock2 = nullptr;
     VNoteBlock *ptrBlock3 = vnote_datas.newBlock(2);
     vnote_datas.addBlock(ptrBlock2, ptrBlock3);
-    ASSERT_NE(vnote_datas.datas.size(), 0);
+    EXPECT_NE(vnote_datas.datas.size(), 0);
 }
 
 TEST_F(ut_datatypedef_test, delBlock)
@@ -85,10 +85,10 @@ TEST_F(ut_datatypedef_test, delBlock)
     VNoteBlock *ptrBlock1 = vnote_datas.newBlock(2);
     vnote_datas.addBlock(ptrBlock);
     vnote_datas.addBlock(ptrBlock, ptrBlock1);
-    ASSERT_NE(vnote_datas.datas.size(), 0);
+    EXPECT_NE(vnote_datas.datas.size(), 0);
 
     vnote_datas.delBlock(ptrBlock);
-    ASSERT_NE(vnote_datas.datas.size(), 0);
+    EXPECT_NE(vnote_datas.datas.size(), 0);
 }
 
 TEST_F(ut_datatypedef_test, classifyAddBlk)
@@ -97,7 +97,7 @@ TEST_F(ut_datatypedef_test, classifyAddBlk)
     VNoteBlock *ptrBlock = vnote_datas.newBlock(2);
     ptrBlock->blockType = VNoteBlock::InValid;
     vnote_datas.classifyAddBlk(ptrBlock);
-    ASSERT_EQ(vnote_datas.datas.size(), 0);
+    EXPECT_EQ(vnote_datas.datas.size(), 0);
     vnote_datas.classifyDelBlk(ptrBlock);
     vnote_datas.delBlock(ptrBlock);
 }
@@ -118,14 +118,14 @@ TEST_F(ut_datatypedef_test, classifyDelBlk)
 TEST_F(ut_datatypedef_test, isValid)
 {
     VDataSafer vdatasafer;
-    ASSERT_FALSE(vdatasafer.isValid());
+    EXPECT_FALSE(vdatasafer.isValid());
 }
 
 TEST_F(ut_datatypedef_test, setSaferType)
 {
     VDataSafer vdatasafer;
     vdatasafer.setSaferType(vdatasafer.Unsafe);
-    ASSERT_EQ(vdatasafer.saferType, vdatasafer.Unsafe);
+    EXPECT_EQ(vdatasafer.saferType, vdatasafer.Unsafe);
 }
 
 TEST_F(ut_datatypedef_test, qdebugout)
