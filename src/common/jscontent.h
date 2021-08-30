@@ -48,6 +48,10 @@ public:
      * @return
      */
     bool insertImages(QStringList filePaths);
+    /**
+     * @brief 插入图片
+     */
+    bool insertImages(const QImage &image);
 
 signals:
     void callJsInitData(const QString &jsonData); //调用web前端，设置json格式数据

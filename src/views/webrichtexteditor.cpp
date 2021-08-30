@@ -384,19 +384,7 @@ void WebRichTextEditor::onPaste()
         }
         JsContent::instance()->insertImages(paths);
     } else if (mimeData->hasImage()) {
-        QPixmap pixmap = clipboard->pixmap();
-        QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/image";
-        QDir dir;
-        //文件夹是否存在
-        if (!dir.exists(dirPath)) {
-            dir.mkdir(dirPath); //创建文件夹
-        }
-        //保存文件，文件名为当前年月日时分秒，后缀为png
-        QDateTime currentDateTime = QDateTime::currentDateTime();
-        QString fileName = currentDateTime.toString("yyyyMMddhhmmss.png");
-        if (pixmap.save(dirPath + "/" + fileName)) {
-            JsContent::instance()->insertImages(QStringList(dirPath + "/" + fileName));
-        }
+        JsContent::instance()->insertImages(qvariant_cast<QImage>(mimeData->imageData()));
     } else {
         //无图片文件，直接调用web端的粘贴事件
         page()->triggerAction(QWebEnginePage::Paste);

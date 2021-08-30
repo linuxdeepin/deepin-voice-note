@@ -311,8 +311,8 @@ QString VNoteItem::getFullHtml() const
     //匹配图片块标签的正则表达式
     QRegExp rx("<img.+src=.+>");
     rx.setMinimal(true); //最小匹配
-    //匹配本地图片路径的正则表达式（图片位置限制在image文件夹，后缀限制为a-z长度为3到4位）
-    QRegExp rxPath("(/\\S+)+/image/\\w+\\.[a-z]{3,4}");
+    //匹配本地图片路径的正则表达式（图片位置限制在images文件夹，后缀限制为a-z长度为3到4位）
+    QRegExp rxPath("(/\\S+)+/images/[\\w\\-]+\\.[a-z]{3,4}");
     rxPath.setMinimal(false); //最大匹配
     int pos = 0;
     int last = 0;

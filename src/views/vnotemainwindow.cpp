@@ -2348,7 +2348,7 @@ void VNoteMainWindow::onInsertImageToWebEditor()
 {
     QStringList filePaths = DFileDialog::getOpenFileNames(
         this,
-        "Please choose an image file",
+        "",
         QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
         "Image file(*.jpg *.png *.bmp)");
     JsContent::instance()->insertImages(filePaths);

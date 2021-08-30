@@ -24,6 +24,9 @@
 #include <QFile>
 #include <QVariant>
 #include <QEventLoop>
+#include <QFileInfo>
+#include <QStandardPaths>
+#include <QDir>
 
 static JsContent *jsContentInstance = nullptr;
 
@@ -42,28 +45,63 @@ JsContent *JsContent::instance()
 
 /**
  * @brief JsContent::insertImages
- * 判断图片路径是否有效，存在有效路径将其传到web端中
- * @param filePaths
+ * 判断图片路径是否有效，存在有效路径则创建副本传到web端中
+ * @param filePaths 图片路径
  * @return 此次操作是否有效
  */
 bool JsContent::insertImages(QStringList filePaths)
 {
-    for (int i = filePaths.size() - 1; i >= 0; --i) {
-        //判断路径后缀
-        if (!(filePaths.at(i).endsWith(".jpg") || filePaths.at(i).endsWith(".png") || filePaths.at(i).endsWith(".bmp"))) {
-            filePaths.removeAt(i);
+    int count = 0;
+    QStringList paths;
+    //获取文件夹路径
+    QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/images";
+    //创建文件夹
+    QDir().mkdir(dirPath);
+    //获取时间戳
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+    QString date = currentDateTime.toString("yyyyMMddhhmmss");
+
+    for (auto path : filePaths) {
+        QFileInfo fileInfo(path);
+        QString suffix = fileInfo.suffix();
+        if (!(suffix == "jpg" || suffix == "png" || suffix == "bmp")) {
             continue;
         }
-        //判断文件是否存在
-        if (!QFile(filePaths.at(i)).exists()) {
-            filePaths.removeAt(i);
+        //创建文件路径
+        QString newPath = QString("%1/%2_%3.%4").arg(dirPath).arg(date).arg(++count).arg(suffix);
+        if (QFile::copy(path, newPath)) {
+            paths.push_back(newPath);
         }
     }
-    //无有效图片路径
-    if (filePaths.size() == 0) {
+    if (paths.size() == 0) {
         return false;
     }
-    emit callJsInsertImages(filePaths);
+    emit callJsInsertImages(paths);
+    return true;
+}
+
+/**
+ * @brief JsContent::insertImages
+ * 向web端传入图片
+ * @param image
+ * @return 操作是否成功 true:成功
+ */
+bool JsContent::insertImages(const QImage &image)
+{
+    //获取文件夹路径
+    QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/images";
+    //创建文件夹
+    QDir().mkdir(dirPath);
+    //保存文件，文件名为当前年月日时分秒
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+    QString fileName = currentDateTime.toString("yyyyMMddhhmmss.png");
+    QString imgPath = dirPath + "/" + fileName;
+
+    //保存文件
+    if (!image.save(imgPath)) {
+        return false;
+    }
+    emit callJsInsertImages(QStringList(imgPath));
     return true;
 }
 
