@@ -2890,7 +2890,9 @@
             var nodes = rng.nodes(dom.isText, {
                 fullyContains: true
             }).map(function (text) {
-                return dom.singleChildAncestor(text, pred) || dom.wrap(text, nodeName);
+                if ($(text).parents('.voiceBox').length == 0) {
+                    return dom.singleChildAncestor(text, pred) || dom.wrap(text, nodeName);
+                }
             });
             if (expandClosestSibling) {
                 if (onlyPartialContains) {
@@ -4405,7 +4407,6 @@
         Editor.prototype.fontStyling = function (target, value) {
             var rng = this.createRange();
             if (rng) {
-
                 var spans = this.style.styleNodes(rng);
                 $$1(spans).css(target, value);
                 // [workaround] added styled bogus span for style
@@ -6920,7 +6921,6 @@
             this.options = context.options;
             this.events = {
                 'summernote.mouseup summernote.scroll ': function (e) {
-                    // summernote.contextmenu
                     setTimeout(function () {
                         _this.update();
                     }, 10)
@@ -6971,15 +6971,20 @@
         AirPopover.prototype.update = function () {
             var styleInfo = this.context.invoke('editor.currentStyle');
             let selStr = window.getSelection().toString();
-            if (selStr == '\n') {
-                return this.hide();
-            }
             if (!isShowAir) {
                 isShowAir = true
                 return this.hide();
             }
+
+            if (selStr == '\n'
+                || selStr == '') {
+                return this.hide();
+            }
+
+
             if (styleInfo.range && !styleInfo.range.isCollapsed()) {
                 var rect = lists.last(styleInfo.range.getClientRects());
+
                 if (rect) {
                     var bnd = func.rect2bnd(rect);
                     let winWidth = $(document).width()
@@ -7008,13 +7013,14 @@
         AirPopover.prototype.rightUpdate = function () {
             var styleInfo = this.context.invoke('editor.currentStyle');
             var rect = lists.last(styleInfo.range.getClientRects());
+            console.log(styleInfo)
             if (rect) {
                 var bnd = func.rect2bnd(rect);
                 let winWidth = $(document).width()
                 let left = Math.max(bnd.left + bnd.width / 2 - 150, 0);
                 let top = bnd.top + bnd.height - 60;
-                if (winWidth - left < 300) {
-                    left = winWidth - 300
+                if (winWidth - left < 320) {
+                    left = winWidth - 320
                 }
                 if (top < 100) {
                     top = top + 70

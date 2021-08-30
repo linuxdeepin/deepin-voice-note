@@ -75,7 +75,11 @@ var initFinish = false;
 var voiceIntervalObj;    //语音播放动画定时器对象
 var isVoicePaste = false
 var isShowAir = true
-
+var nowClickVoice = null
+$(document).ready(function () {
+    // var u = navigator.userAgent;
+    // console.log(u)
+})
 // 初始化summernote
 $('#summernote').summernote({
     focus: true,
@@ -132,8 +136,8 @@ function isNoteNull() {
 $('body').on('click', '.li', function (e) {
     e.stopPropagation();
     $('.li').removeClass('active');
+    // nowClickVoice = this
     setSelectRange(this)
-    // console.log($(this).find('.translate')[0])
     // removeSelectRange($(this).find('.translate')[0])
     $('.note-editable').blur()
     isShowAir = false
@@ -166,11 +170,18 @@ function removeSelectRange(dom) {
 
 // 取消选中样式
 $('body').on('click', function () {
+    // nowClickVoice = null
     $('.li').removeClass('active');
 })
 
 // 语音复制
 document.addEventListener('copy', function (event) {
+
+    // if (nowClickVoice) {
+    //     setSelectRange(nowClickVoice)
+    //     nowClickVoice = null
+    // }
+
     isVoicePaste = false
     var selectionObj = window.getSelection();
     var rangeObj = selectionObj.getRangeAt(0);
@@ -568,6 +579,7 @@ function voicePlay(bIsPaly) {
  * type: 0图片 1语音 2文本
  */
 function rightClick(e) {
+    isShowAir = false;
     let type = null;
     let json = null;
     let x = e.clientX
@@ -584,6 +596,7 @@ function rightClick(e) {
         json = imgUrl
 
     } else if ($(e.target).hasClass('demo') || $(e.target).parents('.demo').length != 0) {
+
         // 语音右键
         type = 1;
         json = $(e.target).parents('.li:first').attr('jsonKey')

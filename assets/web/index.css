@@ -1,12 +1,15 @@
 body {
     padding: 0px;
     line-height: 1.7;
+    font-family: 'Helvetica';
+    overflow-y: overlay;
+    /* overflow-y: hidden; */
 }
 
 .demo {
     padding: 12px 0;
     /* margin: 10px 0; */
-    user-select: none;
+    /* user-select: none; */
     border-radius: 10px;
     box-sizing: border-box;
     background-color: transparent!important;
@@ -39,7 +42,6 @@ body {
     /* position: relative; */
     margin-bottom: 10px;
     margin-top: 10px;
-
 }
 
 .translate>div {
@@ -52,7 +54,7 @@ body {
 }
 
 .active {
-    background: rgba(0,129,255,0.5)!important;
+    background: rgba(0, 129, 255, 0.5)!important;
 }
 
 .voicebtn {
@@ -92,6 +94,24 @@ body {
     color: rgba(65, 77, 104, 1);
     font-size: 12px!important;
     line-height: 12px;
+}
+.demo::selection {
+    background: transparent!important;
+}
+.lf::selection {
+    background: transparent!important;
+}
+
+.title::selection {
+    background: transparent!important;
+}
+
+.minute::selection {
+    background: transparent!important;
+}
+
+.time::selection {
+    background: transparent!important;
 }
 
 /* 字体大小固定 */
