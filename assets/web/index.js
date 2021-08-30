@@ -78,7 +78,7 @@ var isShowAir = true
 var nowClickVoice = null
 $(document).ready(function () {
     // var u = navigator.userAgent;
-    // console.log(u)
+
 })
 // 初始化summernote
 $('#summernote').summernote({
@@ -100,11 +100,6 @@ $('#summernote').summernote({
         ],
     },
     airMode: true,
-    callbacks: {
-        onPaste: function (e) {
-            return;
-        }
-    }
 
 });
 
@@ -122,6 +117,10 @@ $(window).resize(function () {
  * @returns {any}
  */
 function changeContent(we, contents, $editable) {
+    if ($('.note-editable').html() == '') {
+        $('.note-editable').html('<p><br></p>')
+        console.log($('.note-editable').html())
+    }
     if (webobj && initFinish) {
         webobj.jsCallTxtChange();
     }
@@ -139,7 +138,8 @@ $('body').on('click', '.li', function (e) {
     // nowClickVoice = this
     setSelectRange(this)
     // removeSelectRange($(this).find('.translate')[0])
-    $('.note-editable').blur()
+    // $('.note-editable').blur()
+    console.log($(this).next())
     isShowAir = false
     $(this).addClass('active');
 })
@@ -156,9 +156,9 @@ function setSelectRange(dom) {
     var range = document.createRange();
     range.selectNode(dom);
     if (sel.anchorOffset == 0) {
-        sel.removeAllRanges();
         sel.addRange(range);
     };
+    
 }
 // 移除选区
 function removeSelectRange(dom) {
@@ -177,11 +177,6 @@ $('body').on('click', function () {
 // 语音复制
 document.addEventListener('copy', function (event) {
 
-    // if (nowClickVoice) {
-    //     setSelectRange(nowClickVoice)
-    //     nowClickVoice = null
-    // }
-
     isVoicePaste = false
     var selectionObj = window.getSelection();
     var rangeObj = selectionObj.getRangeAt(0);
@@ -196,18 +191,11 @@ document.addEventListener('copy', function (event) {
         isVoicePaste = true
     }
     testDiv.appendChild(docFragment);
-
     formatHtml = testDiv.innerHTML;
-
     if ($(testDiv).children().length == 1 && $(testDiv).find('.voiceBox').length != 0) {
         formatHtml = '<p><br></p>' + formatHtml
     }
-
     pasteData = window.getSelection().toString();
-    // if (formatHtml.substr(0, 11) != "<p><br></p>") {
-    //     formatHtml = "";
-    // }
-
 });
 
 // 粘贴
@@ -235,7 +223,6 @@ function isRangVoice() {
 // 监听键盘删除事件
 $('body').on('keydown', function (e) {
     if (e.keyCode == 8) {
-
         var sel = window.getSelection();
         var range = sel.getRangeAt(0);
         if (range.collapsed) {
@@ -262,14 +249,6 @@ $('body').on('keydown', function (e) {
         if ($(range.commonAncestorContainer).parents('.translate').html() == '<p><br></p>') {
             $(range.commonAncestorContainer).parents('.translate').removeClass('translatePadding')
             $(range.commonAncestorContainer).parents('.translate').html('')
-            // let nextP = $(range.commonAncestorContainer).parents('.voiceBox').next()[0]
-            // nextP.focus();
-            // var newRange = document.createRange();
-            // newRange.selectNode(nextP);
-            // if (sel.anchorOffset == 0) {
-            //     sel.removeAllRanges();
-            //     sel.addRange(newRange);
-            // };
             e.preventDefault();
             e.stopPropagation();
         }
@@ -756,11 +735,19 @@ document.onkeyup = function (event) {
     }
 }
 
-// ctrl+b 
+// ctrl+b 添加记事本
 document.onkeyup = function (event) {
     if (event.ctrlKey && window.event.keyCode == 66) {
-        console.log("ctrl+b")
+        webobj.jsCallCreateNote()
+
     }
 }
 
+// 图片双击预览
+$('body').on('dblclick', 'img', function (e) {
+    e.stopPropagation()
+    e.preventDefault()
+    let imgUrl = $(e.target).attr('src')
+    webobj.jsCallViewPicture(imgUrl)
+})
 

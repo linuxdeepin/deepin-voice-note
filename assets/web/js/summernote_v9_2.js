@@ -2890,7 +2890,7 @@
             var nodes = rng.nodes(dom.isText, {
                 fullyContains: true
             }).map(function (text) {
-                if ($(text).parents('.voiceBox').length == 0) {
+                if ($(text).parents('.demo').length == 0) {
                     return dom.singleChildAncestor(text, pred) || dom.wrap(text, nodeName);
                 }
             });
@@ -3036,7 +3036,6 @@
             var _this = this;
             var rng = range.create(editable).wrapBodyInlineWithPara();
             var paras = rng.nodes(dom.isPara, { includeAncestor: true });
-            console.log(paras);
             var bookmark = rng.paraBookmark(paras);
             var clustereds = lists.clusterBy(paras, func.peq2('parentNode'));
             // 屏蔽语音文件、图片序列化
@@ -3061,7 +3060,6 @@
                 // list to paragraph or change list style
             }
             else {
-                console.log('没有p标签');
                 var diffLists = rng.nodes(dom.isList, {
                     includeAncestor: true
                 }).filter(function (listNode) {
@@ -3990,8 +3988,6 @@
                     document.execCommand('foreColor', false, foreColor);
                 }
                 if (backColor) {
-                    // var sel = window.getSelection();
-                    // console.log(sel)
                     document.execCommand('backColor', false, backColor);
                 }
             });
@@ -6019,8 +6015,6 @@
                             // $dropdown.find('.paigusu').paigusu({
                             //     color: '#1926dc',//初始色  
                             // }, function (event, obj) {
-                            //     console.log(event);
-                            //     console.log(obj);
                             //     $(event).css('color', '#' + obj.hex)
                             // });
                         },
@@ -6971,6 +6965,23 @@
         AirPopover.prototype.update = function () {
             var styleInfo = this.context.invoke('editor.currentStyle');
             let selStr = window.getSelection().toString();
+
+            var selectionObj = window.getSelection();
+            var rangeObj = selectionObj.getRangeAt(0);
+            var docFragment = rangeObj.cloneContents();
+            var testDiv = document.createElement("div");
+            testDiv.appendChild(docFragment);
+            if ($(testDiv).find('.translate').length != 0
+                || $(styleInfo.range.sc).parents('.translate').length != 0
+                || $(testDiv).find('img').length != 0) {
+                $('.note-ul').hide()
+                $('.note-ol').hide()
+            } else {
+                $('.note-ul').show()
+                $('.note-ol').show()
+            }
+
+
             if (!isShowAir) {
                 isShowAir = true
                 return this.hide();
@@ -7013,7 +7024,6 @@
         AirPopover.prototype.rightUpdate = function () {
             var styleInfo = this.context.invoke('editor.currentStyle');
             var rect = lists.last(styleInfo.range.getClientRects());
-            console.log(styleInfo)
             if (rect) {
                 var bnd = func.rect2bnd(rect);
                 let winWidth = $(document).width()
