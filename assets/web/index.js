@@ -135,10 +135,8 @@ function isNoteNull() {
 $('body').on('click', '.li', function (e) {
     e.stopPropagation();
     $('.li').removeClass('active');
-    // nowClickVoice = this
     setSelectRange(this)
     // removeSelectRange($(this).find('.translate')[0])
-    // $('.note-editable').blur()
     console.log($(this).next())
     isShowAir = false
     $(this).addClass('active');
@@ -158,7 +156,7 @@ function setSelectRange(dom) {
     if (sel.anchorOffset == 0) {
         sel.addRange(range);
     };
-    
+
 }
 // 移除选区
 function removeSelectRange(dom) {
@@ -170,13 +168,16 @@ function removeSelectRange(dom) {
 
 // 取消选中样式
 $('body').on('click', function () {
-    // nowClickVoice = null
     $('.li').removeClass('active');
 })
 
 // 语音复制
-document.addEventListener('copy', function (event) {
+document.addEventListener('copy', copyVoice);
+// 语音剪切
+document.addEventListener('cut', copyVoice);
 
+// 语音复制功能
+function copyVoice(event) {
     isVoicePaste = false
     var selectionObj = window.getSelection();
     var rangeObj = selectionObj.getRangeAt(0);
@@ -196,7 +197,7 @@ document.addEventListener('copy', function (event) {
         formatHtml = '<p><br></p>' + formatHtml
     }
     pasteData = window.getSelection().toString();
-});
+}
 
 // 粘贴
 document.addEventListener('paste', function (event) {
