@@ -54,6 +54,7 @@
 #include "views/vnoterecordbar.h"
 #include "widgets/vnoteiconbutton.h"
 #include "task/vnmainwnddelayinittask.h"
+#include "task/filecleanupworker.h"
 
 #ifdef IMPORT_OLD_VERSION_DATA
 #include "importolddata/upgradeview.h"
@@ -660,6 +661,13 @@ void VNoteMainWindow::onVNoteFoldersLoaded()
     }
 
     PerformanceMonitor::initializeAppFinish();
+
+    //注册文件清理工作
+    FileCleanupWorker *pFileCleanupWorker =
+        new FileCleanupWorker(VNoteDataManager::instance()->getAllNotesInFolder(), this);
+    pFileCleanupWorker->setAutoDelete(true);
+    pFileCleanupWorker->setObjectName("FileCleanupWorker");
+    QThreadPool::globalInstance()->start(pFileCleanupWorker);
 }
 
 /**
