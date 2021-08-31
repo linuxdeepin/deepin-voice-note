@@ -188,7 +188,14 @@ void WebRichTextEditor::unboundCurrentNoteData()
 
 void WebRichTextEditor::onTextChange()
 {
-    m_textChange = true;
+    if (!m_textChange) {
+        m_textChange = true;
+        //更新修改时间
+        if (nullptr != m_noteData) {
+            m_noteData->modifyTime = QDateTime::currentDateTime();
+            emit contentChanged();
+        }
+    }
 }
 
 void WebRichTextEditor::saveMenuParam(int type, int x, int y, const QVariant &json)

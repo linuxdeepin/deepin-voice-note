@@ -86,6 +86,11 @@ signals:
      */
     void currentSearchEmpty();
 
+    /**
+     * @brief 编辑区内容更新
+     */
+    void contentChanged();
+
 public slots:
     /**
     * @brief 编辑区内容变化

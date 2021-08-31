@@ -66,6 +66,8 @@ void RichTextEdit::initWebView()
             this, SIGNAL(asrStart(const QVariant &)));
     connect(m_webRichTextEditer, SIGNAL(currentSearchEmpty()),
             this, SIGNAL(currentSearchEmpty()));
+    connect(m_webRichTextEditer, SIGNAL(contentChanged()),
+            this, SIGNAL(contentChanged()));
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_webRichTextEditer);
 }
