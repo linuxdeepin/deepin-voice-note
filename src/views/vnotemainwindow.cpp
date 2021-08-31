@@ -1510,6 +1510,10 @@ int VNoteMainWindow::loadSearchNotes(const QString &key)
 void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
 {
     Q_UNUSED(voiceData)
+    //设置播放状态
+    if (!stateOperation->isPlaying()) {
+        setSpecialStatus(PlayVoiceStart);
+    }
     //更新web前端语音播放状态
     emit JsContent::instance()->callJsSetPlayStatus(0);
 }
