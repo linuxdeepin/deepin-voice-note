@@ -29,12 +29,17 @@ TEST_F(ut_vnoterightmenu_test, mouseMoveEvent)
     VNoteRightMenu rightmenu;
     QPointF localPos;
     QMouseEvent *mouseMoveEvent = new QMouseEvent(QEvent::MouseMove, localPos, localPos, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
+    rightmenu.m_timer->start(100);
+    rightmenu.m_moved = true;
     rightmenu.mouseMoveEvent(mouseMoveEvent);
+    EXPECT_FALSE(rightmenu.m_timer->isActive());
     delete mouseMoveEvent;
 }
 
 TEST_F(ut_vnoterightmenu_test, setPressPoint)
 {
     VNoteRightMenu rightmenu;
-    rightmenu.setPressPoint(QPoint(0, 0));
+    QPoint pos(10, 10);
+    rightmenu.setPressPoint(pos);
+    EXPECT_EQ(rightmenu.m_touchPoint, pos);
 }

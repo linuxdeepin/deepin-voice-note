@@ -38,18 +38,20 @@ void ut_vnoteplaywidget_test::TearDown()
 TEST_F(ut_vnoteplaywidget_test, onVoicePlayPosChange)
 {
     m_vnoteplaywidget->onVoicePlayPosChange(24);
-}
-
-TEST_F(ut_vnoteplaywidget_test, setVoiceBlock)
-{
+    EXPECT_EQ(m_vnoteplaywidget->m_slider->value(), 24);
 }
 
 TEST_F(ut_vnoteplaywidget_test, playVideo)
 {
     m_vnoteplaywidget->onSliderPressed();
+    EXPECT_EQ(m_vnoteplaywidget->m_sliderReleased, false);
     m_vnoteplaywidget->initPlayer();
+    EXPECT_TRUE(m_vnoteplaywidget->m_player != nullptr);
     m_vnoteplaywidget->onSliderReleased();
+    EXPECT_EQ(m_vnoteplaywidget->m_sliderReleased, true);
     m_vnoteplaywidget->onCloseBtnClicked();
+    EXPECT_EQ(m_vnoteplaywidget->m_slider->value(), 0);
     m_vnoteplaywidget->getPlayerStatus();
     m_vnoteplaywidget->onDurationChanged(100);
+    EXPECT_EQ(m_vnoteplaywidget->m_slider->maximum(), 100);
 }

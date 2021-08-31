@@ -55,17 +55,22 @@ TEST_F(ut_vnoterecordwidget_test, startRecord)
     Stub stub;
     stub.set(ADDR(GstreamRecorder, startRecord), stub_startRecord);
     m_vnoterecordwidget->onAudioBufferProbed(buffer);
+    EXPECT_EQ(m_vnoterecordwidget->m_recordMsec, -1);
     m_vnoterecordwidget->startRecord();
+    EXPECT_FALSE(m_vnoterecordwidget->getRecordPath().isEmpty());
     m_vnoterecordwidget->onRecordDurationChange(4);
+    EXPECT_EQ(m_vnoterecordwidget->m_recordMsec, 4);
     m_vnoterecordwidget->stopRecord();
 }
 
 TEST_F(ut_vnoterecordwidget_test, getRecordPath)
 {
-    m_vnoterecordwidget->getRecordPath();
+    m_vnoterecordwidget->initRecordPath();
+    EXPECT_FALSE(m_vnoterecordwidget->m_recordDir.isEmpty());
 }
 
 TEST_F(ut_vnoterecordwidget_test, setAudioDevice)
 {
     m_vnoterecordwidget->setAudioDevice("test");
+    EXPECT_EQ(m_vnoterecordwidget->m_audioRecoder->m_currentDevice, "test");
 }

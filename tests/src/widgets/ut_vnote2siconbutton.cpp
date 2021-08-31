@@ -29,6 +29,7 @@ TEST_F(ut_vnote2siconbutton_test, isPressed)
     VNote2SIconButton vnote2siconbutton("test", "test");
     vnote2siconbutton.isPressed();
     vnote2siconbutton.setCommonIcon(true);
+    EXPECT_EQ(vnote2siconbutton.m_useCommonIcons, true);
 }
 
 TEST_F(ut_vnote2siconbutton_test, mouseReleaseEvent)
@@ -36,13 +37,17 @@ TEST_F(ut_vnote2siconbutton_test, mouseReleaseEvent)
     VNote2SIconButton vnote2siconbutton("test", "test");
     QPointF localPos;
     QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+    int status = vnote2siconbutton.m_state;
     vnote2siconbutton.mouseReleaseEvent(event);
+    EXPECT_TRUE(status != vnote2siconbutton.m_state);
     delete event;
 }
 
 TEST_F(ut_vnote2siconbutton_test, keyPressEvent)
 {
     VNote2SIconButton vnote2siconbutton("test", "test");
+    int status = vnote2siconbutton.m_state;
     QKeyEvent e(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
     vnote2siconbutton.keyPressEvent(&e);
+    EXPECT_TRUE(status != vnote2siconbutton.m_state);
 }
