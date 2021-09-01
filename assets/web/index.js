@@ -16,34 +16,9 @@ $('#summernote').on('summernote.change', changeContent);
 
 // 初始化渲染模板
 var h5Tpl = `
-    <div class="li voiceBox"  jsonKey="{{jsonValue}}">
+    <div class="li voiceBox" contenteditable="false" jsonKey="{{jsonValue}}">
         <div class='voiceInfoBox'>
-            <div class="demo" contenteditable="false">              
-                <div class="voicebtn play"></div>
-                <div class="lf">
-                    <div class="title">{{title}}</div>
-                    <div class="minute padtop">{{createTime}}</div>
-                </div>
-                <div class="lr">
-                    <div class="icon">
-                        <div class="wifi-symbol">
-                            <div class="wifi-circle"></div>
-                        </div>
-                    </div>
-                    <div class="time padtop">{{transSize}}</div>
-                </div>
-            </div>
-            <div class="translate {{#if text}} translatePadding {{/if}}">
-                {{#if text}}
-                <p>{{text}}</p>
-                {{/if}} 
-            </div>
-        </div>
-    </div>`;
-// 语音插入模板
-var nodeTpl = `
-        <div class='voiceInfoBox'>
-            <div class="demo" contenteditable="false" >
+            <div class="demo" >              
                 <div class="voicebtn play"></div>
                 <div class="lf">
                     <div class="title">{{title}}</div>
@@ -59,9 +34,28 @@ var nodeTpl = `
                 </div>
             </div>
             <div class="translate">
-                {{#if text}}
-                <p>{{text}}</p>
-                {{/if}}
+            </div>
+        </div>
+    </div>`;
+// 语音插入模板
+var nodeTpl = `
+        <div class='voiceInfoBox' contenteditable="false">
+            <div class="demo"  >
+                <div class="voicebtn play"></div>
+                <div class="lf">
+                    <div class="title">{{title}}</div>
+                    <div class="minute padtop">{{createTime}}</div>
+                </div>
+                <div class="lr">
+                    <div class="icon">
+                        <div class="wifi-symbol">
+                            <div class="wifi-circle"></div>
+                        </div>
+                    </div>
+                    <div class="time padtop">{{transSize}}</div>
+                </div>
+            </div>
+            <div class="translate">
             </div>
         </div>`;
 
@@ -106,6 +100,7 @@ $('#summernote').summernote({
 // 监听窗口大小变化
 $(window).resize(function () {
     $('.note-editable').css('min-height', $(window).height())
+    $('.note-editable').find("img").width($('.note-editable').width())
 });
 
 /**
@@ -119,7 +114,6 @@ $(window).resize(function () {
 function changeContent(we, contents, $editable) {
     if ($('.note-editable').html() == '') {
         $('.note-editable').html('<p><br></p>')
-        console.log($('.note-editable').html())
     }
     if (webobj && initFinish) {
         webobj.jsCallTxtChange();
@@ -136,8 +130,6 @@ $('body').on('click', '.li', function (e) {
     e.stopPropagation();
     $('.li').removeClass('active');
     setSelectRange(this)
-    // removeSelectRange($(this).find('.translate')[0])
-    console.log($(this).next())
     isShowAir = false
     $(this).addClass('active');
 })
@@ -183,9 +175,7 @@ function copyVoice(event) {
     var rangeObj = selectionObj.getRangeAt(0);
     var docFragment = rangeObj.cloneContents();
     var testDiv = document.createElement("div");
-    $(docFragment).find('.translate').removeClass('translatePadding')
     $(docFragment).find('.translate').html('')
-    $(docFragment).find('.voiceBox').attr('contentEditable', false)
     // 判断是否语音复制
     if ($(docFragment).find('.voiceBox').length != 0) {
         $(docFragment).find('.voiceBox').removeClass('active')
@@ -201,11 +191,10 @@ function copyVoice(event) {
 
 // 粘贴
 document.addEventListener('paste', function (event) {
-    // pasteData == event.clipboardData.getData('Text')
+    console.log(JSON.stringify(event.clipboardData.items))
     if (formatHtml != "" && isVoicePaste) {
         document.execCommand('insertHTML', false, formatHtml + "<p><br></p>");
         event.preventDefault()
-        $('.voiceBox').removeAttr('contentEditable')
     }
     removeNullP()
 });
@@ -221,53 +210,6 @@ function isRangVoice() {
     var testDiv = document.createElement("div");
 
 }
-// 监听键盘删除事件
-$('body').on('keydown', function (e) {
-    if (e.keyCode == 8) {
-        var sel = window.getSelection();
-        var range = sel.getRangeAt(0);
-        if (range.collapsed) {
-            if (range.startOffset === 0) {
-                range.start = range.startContainer.previousElementSibling;
-            } else {
-                // range.setStartOffset(range.startOffset  - 1);
-                range.startOffset = range.startOffset - 1;
-            }
-        }
-        if ($(range.start).hasClass('voiceBox')) {
-            $(range.start).attr('contentEditable', false)
-        }
-
-        if ($(range.startContainer).parents('p').prev().hasClass('voiceBox')) {
-            $(range.startContainer).parents('p').prev().attr('contentEditable', false)
-        }
-        if ($(range.startContainer).parents('ul').prev().hasClass('voiceBox')) {
-            $(range.startContainer).parents('ul').prev().attr('contentEditable', false)
-        }
-        if ($(range.startContainer).parents('ol').prev().hasClass('voiceBox')) {
-            $(range.startContainer).parents('ol').prev().attr('contentEditable', false)
-        }
-        if ($(range.commonAncestorContainer).parents('.translate').html() == '<p><br></p>') {
-            $(range.commonAncestorContainer).parents('.translate').removeClass('translatePadding')
-            $(range.commonAncestorContainer).parents('.translate').html('')
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        if (range.start == null
-            && range.startOffset == 0
-            && range.endOffset == 0
-            && $(range.commonAncestorContainer).parents('.voiceBox').length != 0
-            && $(range.commonAncestorContainer).parents('p').prev().length == 0) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-    }
-})
-
-// 语音文字点击
-$('body').on('mousedown', '.translate', function (e) {
-    $('.voiceBox').removeAttr('contentEditable')
-})
 
 // 监听鼠标抬起事件
 $('body').on('mouseup', function () {
@@ -304,7 +246,6 @@ function getHtml() {
     // var handleCode = $('#summernote').summernote('code');
     // setHtml(rightCode);
     // return handleCode;
-
     return $('#summernote').summernote('code');
 }
 
@@ -399,9 +340,6 @@ function insertVoiceItem(text) {
     // $('#summernote').summernote('insertNode', oA);
     // $('#summernote').summernote('restoreRange');
     document.execCommand('insertHTML', false, str);
-
-    $('.voiceBox').removeAttr('contentEditable')
-
     removeNullP()
 }
 
@@ -441,8 +379,6 @@ function toggleState(state) {
         activeVoice = null;
         voicePlay(false);
     }
-
-    enableSummerNote();
 }
 
 /**
@@ -452,6 +388,9 @@ function toggleState(state) {
  * @returns {any}
  */
 function setHtml(html) {
+    if (html == '<p></p>') {
+        html = '<p><br></p>'
+    }
     initFinish = false;
     $('#summernote').summernote('code', html);
     initFinish = true;
@@ -463,14 +402,10 @@ function setHtml(html) {
 function setVoiceText(text, flag) {
     if (activeTransVoice) {
         if (flag) {
+            activeTransVoice.find('.translate').html('');
             if (text) {
-                activeTransVoice.find('.translate').html('<p>' + text + '</p>');
-                activeTransVoice.find('.translate').addClass('translatePadding')
+                activeTransVoice.after('<p>' + text + '</p>');
                 webobj.jsCallTxtChange();
-            }
-            else {
-                activeTransVoice.find('.translate').html('');
-                activeTransVoice.find('.translate').removeClass('translatePadding')
             }
             //将转文字文本写到json属性里
             var jsonValue = activeTransVoice.attr('jsonKey');
@@ -484,11 +419,9 @@ function setVoiceText(text, flag) {
         }
         else {
             activeTransVoice.find('.translate').html('<div class="noselect">' + text + '</div>');
-            activeTransVoice.find('.translate').addClass('translatePadding')
             bTransVoiceIsReady = false;
         }
     }
-    enableSummerNote();
 }
 
 //json串拼接成对应html串 flag==》》 false: h5串  true：node串
@@ -613,7 +546,7 @@ function rightClick(e) {
 function changeColor(flag) {
     if (flag == 1) {
         $('body').css({
-            'background': 'rgba(255,255,255,1)',
+            // 'background': 'rgba(255,255,255,1)',
             "color": 'rgba(65,77,104,1)'
         })
         $('.title').css({
@@ -646,7 +579,7 @@ function changeColor(flag) {
         changeIconColor('lightColor');
     } else {
         $('body').css({
-            'background': 'rgba(40,40,40,1)',
+            // 'background': 'rgba(40,40,40,1)',
             "color": 'rgba(192,198,212,1)'
         })
         $('.title , .time').css({
@@ -728,12 +661,6 @@ document.onkeydown = function (event) {
         return false;
     }
 
-}
-// ctrl+z 移除可编辑
-document.onkeyup = function (event) {
-    if (event.ctrlKey && window.event.keyCode == 90) {
-        $('.voiceBox').removeAttr('contentEditable')
-    }
 }
 
 // ctrl+b 添加记事本

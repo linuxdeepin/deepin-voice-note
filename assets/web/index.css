@@ -2,8 +2,7 @@ body {
     padding: 0px;
     line-height: 1.7;
     font-family: 'Helvetica';
-    overflow-y: overlay;
-    /* overflow-y: hidden; */
+    background-color: transparent!important;
 }
 
 .demo {
@@ -95,9 +94,11 @@ body {
     font-size: 12px!important;
     line-height: 12px;
 }
+
 .demo::selection {
     background: transparent!important;
 }
+
 .lf::selection {
     background: transparent!important;
 }
@@ -135,10 +136,6 @@ body {
 .translate {
     line-height: 20px;
     font-size: 12px;
-}
-
-.translatePadding {
-    padding: 5px 20px 10px 20px;
 }
 
 .translate>p {
@@ -205,4 +202,5 @@ body {
 
 .noselect {
     user-select: none;
+    padding: 5px 20px 10px 20px;
 }
