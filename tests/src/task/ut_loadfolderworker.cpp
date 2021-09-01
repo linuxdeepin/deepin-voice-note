@@ -28,6 +28,7 @@ ut_loadfolderworker_test::ut_loadfolderworker_test(QObject *parent)
 
 void ut_loadfolderworker_test::onFolderLoad(VNOTE_FOLDERS_MAP *folders)
 {
+    EXPECT_TRUE(nullptr != folders);
     if (folders) {
         delete folders;
         folders = nullptr;

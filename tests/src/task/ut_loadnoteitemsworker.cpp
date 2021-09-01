@@ -28,6 +28,7 @@ ut_loadnoteItemsworker_test::ut_loadnoteItemsworker_test(QObject *parent)
 
 void ut_loadnoteItemsworker_test::onNoteLoad(VNOTE_ALL_NOTES_MAP *notesMap)
 {
+    EXPECT_TRUE(nullptr != notesMap);
     if (notesMap) {
         delete notesMap;
         notesMap = nullptr;

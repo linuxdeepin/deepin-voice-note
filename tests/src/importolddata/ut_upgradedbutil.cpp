@@ -37,16 +37,18 @@ void ut_upgradedbutil_test::TearDown()
 TEST_F(ut_upgradedbutil_test, saveUpgradeState)
 {
     m_upgradedbutil->saveUpgradeState(m_upgradedbutil->Loading);
+    EXPECT_EQ(UpgradeDbUtil::Loading, m_upgradedbutil->readUpgradeState());
 }
 
 TEST_F(ut_upgradedbutil_test, readUpgradeState)
 {
-    m_upgradedbutil->readUpgradeState();
+    m_upgradedbutil->saveUpgradeState(m_upgradedbutil->Loading);
+    EXPECT_EQ(UpgradeDbUtil::Loading, m_upgradedbutil->readUpgradeState());
 }
 
 TEST_F(ut_upgradedbutil_test, needUpdateOldDb)
 {
-    m_upgradedbutil->needUpdateOldDb(m_upgradedbutil->Loading);
+    EXPECT_FALSE(m_upgradedbutil->needUpdateOldDb(m_upgradedbutil->Loading));
 }
 
 TEST_F(ut_upgradedbutil_test, checkUpdateState)

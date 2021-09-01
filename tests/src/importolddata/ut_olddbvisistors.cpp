@@ -45,12 +45,14 @@ TEST_F(ut_olddbvisistors_test, visitorData)
 
     OldFolderQryDbVisitor oldfolderqrydbvisitor(db, nullptr, &folders);
     oldfolderqrydbvisitor.prepareSqls();
-    oldfolderqrydbvisitor.visitorData();
+    EXPECT_FALSE(oldfolderqrydbvisitor.m_dbvSqls.isEmpty());
+    EXPECT_TRUE(oldfolderqrydbvisitor.visitorData());
     VNOTE_ALL_NOTES_MAP notes;
     notes.autoRelease = true;
 
     ret = true;
     OldNoteQryDbVisitor oldnoteqrydbvisitor(db, nullptr, &notes);
     oldnoteqrydbvisitor.prepareSqls();
-    oldnoteqrydbvisitor.visitorData();
+    EXPECT_FALSE(oldfolderqrydbvisitor.m_dbvSqls.isEmpty());
+    EXPECT_TRUE(oldfolderqrydbvisitor.visitorData());
 }

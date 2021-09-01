@@ -32,6 +32,7 @@ TEST_F(ut_olddataloadworks_test, OldDataLoadTask)
     OldDataLoadTask task;
     if (nullptr == VNoteOldDataManager::instance()->m_oldDbManger) {
         VNoteOldDataManager::instance()->initOldDb();
+        EXPECT_FALSE(nullptr == VNoteOldDataManager::instance()->m_oldDbManger);
     }
     task.run();
 }

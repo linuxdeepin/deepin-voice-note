@@ -35,12 +35,13 @@ void ut_vnoteolddatamanager_test::TearDown()
 
 TEST_F(ut_vnoteolddatamanager_test, folders)
 {
-    m_vnoteolddatamanager->folders();
+    EXPECT_EQ(nullptr, m_vnoteolddatamanager->folders());
 }
 
 TEST_F(ut_vnoteolddatamanager_test, initOldDb)
 {
     m_vnoteolddatamanager->initOldDb();
+    EXPECT_TRUE(nullptr != m_vnoteolddatamanager->m_oldDbManger);
 }
 
 TEST_F(ut_vnoteolddatamanager_test, reqDatas)

@@ -27,10 +27,12 @@ TEST_F(ut_upgradeview_test, onUpgradeFinish)
 {
     UpgradeView upgradeview;
     upgradeview.onUpgradeFinish();
+    EXPECT_EQ(100, upgradeview.m_waterProgress->value());
 }
 
 TEST_F(ut_upgradeview_test, setProgress)
 {
     UpgradeView upgradeview;
     upgradeview.setProgress(1);
+    EXPECT_EQ(1, upgradeview.m_waterProgress->value());
 }
