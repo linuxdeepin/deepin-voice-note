@@ -1905,7 +1905,7 @@ void VNoteMainWindow::initTitleIconButton()
     m_imgInsert->setFixedSize(QSize(36, 36));
     m_imgInsert->SetDisableIcon("img_insert_disable.svg");
     m_imgInsert->setSeparateThemIcons(true); //区分主题
-    m_imgInsert->setBtnDisabled(false);
+    m_imgInsert->setDisabled(true); //初始为禁用状态
 }
 
 /**
