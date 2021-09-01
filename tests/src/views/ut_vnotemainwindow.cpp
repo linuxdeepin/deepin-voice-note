@@ -48,6 +48,8 @@
 #include "vnoteapplication.h"
 #include "stub.h"
 
+#include <DFileDialog>
+
 static void stub_vnotemainwindow()
 {
 }
@@ -55,6 +57,11 @@ static void stub_vnotemainwindow()
 static int stub_int()
 {
     return 1;
+}
+
+static int stub_fileDialog()
+{
+    return 0;
 }
 
 ut_vnotemainwindow_test::ut_vnotemainwindow_test()
@@ -206,6 +213,10 @@ TEST_F(ut_vnotemainwindow_test, event)
 
 TEST_F(ut_vnotemainwindow_test, handleMultipleOption)
 {
+    typedef int (*fptr)();
+    fptr A_foo = (fptr)(&DFileDialog::exec);
+    Stub stub;
+    stub.set(A_foo, stub_fileDialog);
     int id = 1;
     m_mainWindow->handleMultipleOption(id);
     int id2 = 2;

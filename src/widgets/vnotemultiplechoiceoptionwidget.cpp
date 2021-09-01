@@ -338,7 +338,7 @@ void VnoteMultipleChoiceOptionWidget::onFontChanged()
     m_deleteButton->setFixedHeight(m_iconWidth + 2);
     //    //计算参数
     int iconWidth = qCeil(qGuiApp->devicePixelRatio() * m_iconWidth) + 30;
-    int saveTextWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save as TXT")) + iconWidth;
+    int saveTextWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save as")) + iconWidth;
     int saveVoiceWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save voice recording")) + iconWidth;
     int deleteButtonWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Delete")) + iconWidth;
     int moveButtonWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Move")) + iconWidth;
@@ -349,15 +349,15 @@ void VnoteMultipleChoiceOptionWidget::onFontChanged()
     m_saveVoiceButton->setFixedSize(saveVoiceWidth, m_iconWidth + 2);
 
     if (m_saveTextButton->width() + m_saveVoiceButton->width() + m_deleteButton->width() + m_moveButton->width() <= width()) {
-        m_saveTextButton->setText(DApplication::translate("NotesContextMenu", "Save as TXT"));
+        m_saveTextButton->setText(DApplication::translate("NotesContextMenu", "Save as"));
         m_saveVoiceButton->setText(DApplication::translate("NotesContextMenu", "Save voice recording"));
     } else {
         int midWidth = (width() - m_deleteButton->width() - m_moveButton->width()) / 2;
         if (midWidth > 0 && m_saveTextButton->width() > midWidth) {
             m_saveTextButton->setFixedWidth(midWidth);
-            m_saveTextButton->setText(fontMetrics.elidedText(DApplication::translate("NotesContextMenu", "Save as TXT"), Qt::ElideRight, midWidth - iconWidth));
+            m_saveTextButton->setText(fontMetrics.elidedText(DApplication::translate("NotesContextMenu", "Save as"), Qt::ElideRight, midWidth - iconWidth));
         } else {
-            m_saveTextButton->setText(DApplication::translate("NotesContextMenu", "Save as TXT"));
+            m_saveTextButton->setText(DApplication::translate("NotesContextMenu", "Save as"));
         }
         saveVoiceWidth = width() - m_deleteButton->width() - m_moveButton->width() - m_saveTextButton->width() - 30;
         if (saveVoiceWidth > 0 && saveVoiceWidth < m_saveVoiceButton->width()) {

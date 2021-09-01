@@ -69,6 +69,14 @@ public:
         pressing = 1,
         moving = 2
     };
+    //另存为类型
+    enum SaveAsType {
+        TextAndHtml = 0, //txt和html类型
+        Text, //txt类型
+        Html, //html类型
+        Voice, //语音类型
+    };
+
     explicit MiddleView(QWidget *parent = nullptr);
     //设置搜索关键字
     void setSearchKey(const QString &key);
@@ -88,12 +96,14 @@ public:
     void setCurrentIndex(int index);
     //记事项重命名
     void editNote();
+    //另存为
+    void saveAs(SaveAsType);
     //导出文本
-    void saveAsText();
+    void saveAsText(const QString &exportDir);
     //导出为Html
-    void saveAsHtml();
+    void saveAsHtml(const QString &exportDir);
     //导出语音
-    void saveRecords();
+    void saveRecords(const QString &exportDir);
     //关闭右键菜单
     void closeMenu();
     //获取记事项id

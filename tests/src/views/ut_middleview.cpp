@@ -263,7 +263,7 @@ TEST_F(ut_middleview_test, saveRecords)
     stub.set(A_foo, stub_dialog);
     m_middleView->selectAll();
     EXPECT_FALSE(m_middleView->selectedIndexes().isEmpty());
-    m_middleView->saveRecords();
+    m_middleView->saveAs(MiddleView::SaveAsType::Voice);
 }
 
 TEST_F(ut_middleview_test, handleShiftAndPress)

@@ -260,11 +260,53 @@ void MiddleView::editNote()
 }
 
 /**
+ * @brief MiddleView::saveAs
+ * 笔记另存为，统一获取文件夹路径
+ */
+void MiddleView::saveAs(SaveAsType type)
+{
+    //文件筛选类型
+    QStringList filterTypes {"TXT(*.txt);;HTML(*.html)", "TXT(*.txt)", "HTML(*.html)", "MP3(*.mp3)"};
+
+    //文管弹窗
+    DFileDialog dialog(this);
+    dialog.setFileMode(DFileDialog::DirectoryOnly);
+    dialog.setLabelText(DFileDialog::Accept, DApplication::translate("MiddleView", "Save"));
+    dialog.setNameFilter(filterTypes.at(type));
+
+    //获取历史选用的文件夹路径
+    QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
+    if (historyDir.isEmpty()) {
+        historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    }
+    dialog.setDirectory(historyDir);
+
+    if (QDialog::Rejected == dialog.exec()) {
+        return;
+    }
+    //获取选择的文件夹路径
+    QString exportDir = dialog.directory().path();
+    //获取选择的文件类型
+    QString filter = dialog.selectedNameFilter();
+    //保存文件夹路径
+    setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, exportDir);
+    //保存文件
+    if (filterTypes.at(1) == filter) {
+        saveAsText(exportDir);
+    } else if (filterTypes.at(2) == filter) {
+        saveAsHtml(exportDir);
+    } else if (filterTypes.at(3) == filter) {
+        saveRecords(exportDir);
+    }
+}
+
+/**
  * @brief MiddleView::saveAsText
  * 导出文本
  */
-void MiddleView::saveAsText()
+void MiddleView::saveAsText(const QString &exportDir)
 {
+    //获取有文本的笔记
     QModelIndexList indexList = selectedIndexes();
     QList<VNoteItem *> noteDataList;
     for (auto index : indexList) {
@@ -275,40 +317,24 @@ void MiddleView::saveAsText()
             noteDataList.append(noteData);
         }
     }
-    if (indexList.size()) {
-        //TODO:
-        //    Should check if this note is doing save action
 
-        DFileDialog dialog(this);
-        dialog.setFileMode(DFileDialog::DirectoryOnly);
-        dialog.setLabelText(DFileDialog::Accept, DApplication::translate("MiddleView", "Save"));
-        dialog.setNameFilter("TXT(*.txt)");
-
-        QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
-        if (historyDir.isEmpty()) {
-            historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-        }
-        dialog.setDirectory(historyDir);
-
-        if (QDialog::Accepted == dialog.exec()) {
-            // save the directory string to config file.
-            setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, dialog.directoryUrl().toLocalFile());
-
-            QString exportDir = dialog.directoryUrl().toLocalFile();
-            ExportNoteWorker *exportWorker = new ExportNoteWorker(
-                exportDir, ExportNoteWorker::ExportText, noteDataList);
-            exportWorker->setAutoDelete(true);
-
-            QThreadPool::globalInstance()->start(exportWorker);
-        }
+    if (indexList.size() == 0) {
+        return;
     }
+
+    ExportNoteWorker *exportWorker = new ExportNoteWorker(
+        exportDir, ExportNoteWorker::ExportText, noteDataList);
+    exportWorker->setAutoDelete(true);
+
+    QThreadPool::globalInstance()->start(exportWorker);
 }
 
 /**
  * @brief MiddleView::saveAsHtml
  */
-void MiddleView::saveAsHtml()
+void MiddleView::saveAsHtml(const QString &exportDir)
 {
+    //获取有文本的笔记
     QModelIndexList indexList = selectedIndexes();
     QList<VNoteItem *> noteDataList;
     //获取笔记
@@ -324,19 +350,6 @@ void MiddleView::saveAsHtml()
     if (noteDataList.size() == 0) {
         return;
     }
-    //获取历史使用的路径
-    QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
-    if (historyDir.isEmpty()) {
-        historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-    }
-    //获取导出路径
-    QString exportDir = DFileDialog::getExistingDirectory(this, "", historyDir);
-
-    if (exportDir.isEmpty()) {
-        return;
-    }
-    // 将现选择的路径保存
-    setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, exportDir);
 
     ExportNoteWorker *exportWorker = new ExportNoteWorker(
         exportDir, ExportNoteWorker::ExportHtml, noteDataList);
@@ -349,8 +362,9 @@ void MiddleView::saveAsHtml()
  * @brief MiddleView::saveRecords
  * 保存语音
  */
-void MiddleView::saveRecords()
+void MiddleView::saveRecords(const QString &exportDir)
 {
+    //获取有语音的笔记
     QModelIndexList indexList = selectedIndexes();
     QList<VNoteItem *> noteItemList;
     for (auto index : indexList) {
@@ -358,34 +372,16 @@ void MiddleView::saveRecords()
             StandardItemCommon::getStandardItemData(index));
         noteItemList.append(noteData);
     }
-    if (noteItemList.size()) {
-        //TODO:
-        //    Should check if this note is doing save action
 
-        DFileDialog dialog(this);
-        dialog.setFileMode(DFileDialog::DirectoryOnly);
-        dialog.setLabelText(DFileDialog::Accept, DApplication::translate("MiddleView", "Save"));
-        dialog.setNameFilter("MP3(*.mp3)");
-
-        QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
-        if (historyDir.isEmpty()) {
-            historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-        }
-        dialog.setDirectory(historyDir);
-
-        if (QDialog::Accepted == dialog.exec()) {
-            // save the directory string to config file.
-            setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
-
-            QString exportDir = dialog.directoryUrl().toLocalFile();
-
-            ExportNoteWorker *exportWorker = new ExportNoteWorker(
-                exportDir, ExportNoteWorker::ExportAllVoice, noteItemList);
-            exportWorker->setAutoDelete(true);
-
-            QThreadPool::globalInstance()->start(exportWorker);
-        }
+    if (noteItemList.size() == 0) {
+        return;
     }
+
+    ExportNoteWorker *exportWorker = new ExportNoteWorker(
+        exportDir, ExportNoteWorker::ExportAllVoice, noteItemList);
+    exportWorker->setAutoDelete(true);
+
+    QThreadPool::globalInstance()->start(exportWorker);
 }
 
 /**

@@ -1150,13 +1150,13 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         editNote();
         break;
     case ActionManager::SaveNoteAsText:
-        m_middleView->saveAsText();
+        m_middleView->saveAs(MiddleView::SaveAsType::Text);
         break;
     case ActionManager::SaveNoteAsHtml:
-        m_middleView->saveAsHtml();
+        m_middleView->saveAs(MiddleView::SaveAsType::Html);
         break;
     case ActionManager::NoteSaveVoice:
-        m_middleView->saveRecords();
+        m_middleView->saveAs(MiddleView::SaveAsType::Voice);
         break;
     case ActionManager::NoteTop:
         m_middleView->noteStickOnTop();
@@ -1956,11 +1956,11 @@ void VNoteMainWindow::handleMultipleOption(int id)
     } break;
     case ButtonValue::SaveAsTxT:
         //多选页面-保存TxT
-        m_middleView->saveAsText();
+        m_middleView->saveAs(MiddleView::SaveAsType::TextAndHtml);
         break;
     case ButtonValue::SaveAsVoice:
         //多选页面-保存语音
-        m_middleView->saveRecords();
+        m_middleView->saveAs(MiddleView::SaveAsType::Voice);
         break;
     case ButtonValue::Delete:
         //多选页面-删除
@@ -2277,7 +2277,7 @@ void VNoteMainWindow::onSaveTextShortcut()
     //多选笔记导出文本
     if (canDoShortcutAction()) {
         if (m_middleView->haveText()) {
-            m_middleView->saveAsText();
+            m_middleView->saveAs(MiddleView::SaveAsType::TextAndHtml);
         }
     }
 }
@@ -2289,7 +2289,7 @@ void VNoteMainWindow::onSaveVoicesShortcut()
         //多选笔记导出语音
         if (!stateOperation->isRecording()) {
             if (m_middleView->haveVoice()) {
-                m_middleView->saveRecords();
+                m_middleView->saveAs(MiddleView::SaveAsType::Voice);
             }
         }
     }
