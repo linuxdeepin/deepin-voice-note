@@ -266,7 +266,6 @@ void MiddleView::editNote()
 void MiddleView::saveAsText()
 {
     QModelIndexList indexList = selectedIndexes();
-    qSort(indexList);
     QList<VNoteItem *> noteDataList;
     for (auto index : indexList) {
         VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
@@ -311,7 +310,6 @@ void MiddleView::saveAsText()
 void MiddleView::saveAsHtml()
 {
     QModelIndexList indexList = selectedIndexes();
-    qSort(indexList);
     QList<VNoteItem *> noteDataList;
     //获取笔记
     for (auto index : indexList) {
@@ -354,7 +352,6 @@ void MiddleView::saveAsHtml()
 void MiddleView::saveRecords()
 {
     QModelIndexList indexList = selectedIndexes();
-    qSort(indexList);
     QList<VNoteItem *> noteItemList;
     for (auto index : indexList) {
         VNoteItem *noteData = reinterpret_cast<VNoteItem *>(

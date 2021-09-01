@@ -50,9 +50,9 @@ public:
      * @brief 设置笔记内容
      * @param data: 笔记内容
      * @param reg: 搜索关键字
-     * @param fouse: 焦点
+     * @param focus: 焦点
      */
-    void initData(VNoteItem *data, const QString &reg, bool fouse = false);
+    void initData(VNoteItem *data, const QString &reg, bool focus = false);
     /**
      * @brief 插入语音
      * @param voicePath：语音路径

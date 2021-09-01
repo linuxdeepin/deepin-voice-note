@@ -99,12 +99,12 @@ void WebRichTextEditor::initUpdateTimer()
     connect(m_updateTimer, &QTimer::timeout, this, &WebRichTextEditor::updateNote);
 }
 
-void WebRichTextEditor::initData(VNoteItem *data, const QString &reg, bool fouse)
+void WebRichTextEditor::initData(VNoteItem *data, const QString &reg, bool focus)
 {
-    if (fouse) {
+    if (focus) {
         setFocus();
     }
-    if (data == nullptr) {
+    if (nullptr == data) {
         this->setVisible(false);
         //无数据时先保存之前数据
         updateNote();
@@ -368,7 +368,10 @@ void WebRichTextEditor::savePictureAs()
     if (newPath.isEmpty()) {
         return;
     }
-    QFile::copy(originalPath, newPath); //复制文件
+    //复制文件
+    if (!QFile::copy(originalPath, newPath)) {
+        qCritical() << "copy failed:" << originalPath << ";" << newPath;
+    }
 }
 
 void WebRichTextEditor::saveMP3As()
