@@ -2890,7 +2890,8 @@
             var nodes = rng.nodes(dom.isText, {
                 fullyContains: true
             }).map(function (text) {
-                if ($(text).parents('.demo').length == 0) {
+                // 排除语音
+                if ($(text).parents('.voiceBox').length == 0) {
                     return dom.singleChildAncestor(text, pred) || dom.wrap(text, nodeName);
                 }
             });
@@ -3817,6 +3818,8 @@
                 this[commands[idx]] = (function (sCmd) {
                     return function (value) {
                         _this.beforeCommand();
+                        // 设置样式
+                        console.log(sCmd, value)
                         document.execCommand(sCmd, false, value);
                         _this.afterCommand(true);
                     };
@@ -4318,6 +4321,7 @@
         Editor.prototype.insertImage = function (src, param) {
             var _this = this;
             return createImage(src, param).then(function ($image) {
+                console.log($image)
                 _this.beforeCommand();
                 if (typeof param === 'function') {
                     param($image);
@@ -4407,6 +4411,7 @@
                 $$1(spans).css(target, value);
                 // [workaround] added styled bogus span for style
                 //  - also bogus character needed for cursor position
+                console.log(rng)
                 if (rng.isCollapsed()) {
                     var firstSpan = lists.head(spans);
                     if (firstSpan && !dom.nodeLength(firstSpan)) {
@@ -4414,6 +4419,13 @@
                         range.createFromNodeAfter(firstSpan.firstChild).select();
                         this.$editable.data(KEY_BOGUS, firstSpan);
                     }
+                } else {
+                    // 重新设置选区
+                    var startRange = range.createFromNodeBefore(lists.head(spans));
+                    var startPoint = startRange.getStartPoint();
+                    var endRange = range.createFromNodeAfter(lists.last(spans));
+                    var endPoint = endRange.getEndPoint();
+                    range.create(startPoint.node, startPoint.offset, endPoint.node, endPoint.offset).select();
                 }
             }
         };
@@ -5218,9 +5230,7 @@
                 return _this.button({
                     className: 'note-btn-bold',
                     contents: _this.ui.icon(_this.options.icons.bold),
-                    // contents: _this.ui.icon('', 'img src="./img/bold.svg"'),
                     tooltip: '加粗',
-                    // tooltip: _this.lang.font.bold + _this.representShortcut('bold'),
                     click: _this.context.createInvokeHandlerAndUpdateState('editor.bold')
                 }).render();
             });
@@ -5228,9 +5238,7 @@
                 return _this.button({
                     className: 'note-btn-italic',
                     contents: _this.ui.icon(_this.options.icons.italic),
-                    // contents: _this.ui.icon('', 'img  src="./img/italic.svg"'),
                     tooltip: '斜体',
-                    // tooltip: _this.lang.font.italic + _this.representShortcut('italic'),
                     click: _this.context.createInvokeHandlerAndUpdateState('editor.italic')
                 }).render();
             });
@@ -5238,9 +5246,7 @@
                 return _this.button({
                     className: 'note-btn-underline',
                     contents: _this.ui.icon(_this.options.icons.underline),
-                    // contents: _this.ui.icon('', 'img src="./img/underline.svg"'),
                     tooltip: '下划线',
-                    // tooltip: _this.lang.font.underline + _this.representShortcut('underline'),
                     click: _this.context.createInvokeHandlerAndUpdateState('editor.underline')
                 }).render();
             });
@@ -5255,9 +5261,7 @@
                 return _this.button({
                     className: 'note-btn-strikethrough',
                     contents: _this.ui.icon(_this.options.icons.strikethrough),
-                    // contents: _this.ui.icon('', 'img src="./img/strikethrough.svg"'),
                     tooltip: '删除线',
-                    // tooltip: _this.lang.font.strikethrough + _this.representShortcut('strikethrough'),
                     click: _this.context.createInvokeHandlerAndUpdateState('editor.strikethrough')
                 }).render();
             });
@@ -6012,11 +6016,6 @@
                                     $chip.click();
                                 });
                             });
-                            // $dropdown.find('.paigusu').paigusu({
-                            //     color: '#1926dc',//初始色  
-                            // }, function (event, obj) {
-                            //     $(event).css('color', '#' + obj.hex)
-                            // });
                         },
                         click: function (event) {
 
@@ -6919,10 +6918,10 @@
                         _this.update();
                     }, 10)
                 },
-                'summernote.contextmenu': function (e) {
-                    _this.rightUpdate()
+                // 'summernote.contextmenu': function (e) {
+                //     _this.rightUpdate()
 
-                },
+                // },
                 'summernote.dblclick': function (e) {
                     let selStr = window.getSelection().toString();
                     let range = window.getSelection().getRangeAt(0)
@@ -7021,7 +7020,8 @@
 
         };
 
-        AirPopover.prototype.rightUpdate = function () {
+        AirPopover.prototype.rightUpdate = function (x, y) {
+            console.log(x, y)
             var styleInfo = this.context.invoke('editor.currentStyle');
             var rect = lists.last(styleInfo.range.getClientRects());
             if (rect) {
@@ -7029,16 +7029,16 @@
                 let winWidth = $(document).width()
                 let left = Math.max(bnd.left + bnd.width / 2 - 150, 0);
                 let top = bnd.top + bnd.height - 60;
-                if (winWidth - left < 320) {
-                    left = winWidth - 320
+                if (winWidth - x < 320) {
+                    x = winWidth - 320
                 }
-                if (top < 100) {
-                    top = top + 70
+                if (y < 100) {
+                    y = y + 70
                 }
                 this.$popover.css({
                     display: 'block',
-                    left: left,
-                    top: top
+                    left: x + $(document).scrollLeft(),
+                    top: y + $(document).scrollTop()
                 });
                 this.context.invoke('buttons.updateCurrentStyle', this.$popover);
             }
@@ -7656,8 +7656,8 @@
                     'TAB': 'tab',
                     'SHIFT+TAB': 'untab',
                     // 'CMD+B': 'bold',
-                    'CMD+I': 'italic',
-                    'CMD+U': 'underline',
+                    // 'CMD+I': 'italic',
+                    // 'CMD+U': 'underline',
                     'CMD+SHIFT+S': 'strikethrough',
                     'CMD+BACKSLASH': 'removeFormat',
                     'CMD+SHIFT+L': 'justifyLeft',
@@ -7733,13 +7733,3 @@
     });
 
 })));
-//# sourceMappingURL=summernote.js.map
-function getSelectionText() {
-    if (window.getSelection) {
-        return window.getSelection().toString();
-    } else if (document.selection && document.selection.createRange) {
-        return document.selection.createRange().text;
-    }
-    return '';
-}
-let oldSelect = null

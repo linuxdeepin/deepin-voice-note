@@ -7,20 +7,9 @@ body {
 
 .demo {
     padding: 12px 0;
-    /* margin: 10px 0; */
-    /* user-select: none; */
     border-radius: 10px;
     box-sizing: border-box;
     background-color: transparent!important;
-}
-
-.testimg {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    height: 64px;
-    width: 461px;
-    z-index: 1;
 }
 
 .demo>div {
@@ -37,19 +26,8 @@ body {
     background: rgba(0, 0, 0, 0.05);
     min-height: 30px;
     border-radius: 8px;
-    /* user-select: none; */
-    /* position: relative; */
     margin-bottom: 10px;
     margin-top: 10px;
-}
-
-.translate>div {
-    /* user-select: auto */
-}
-
-#demo {
-    width: 100%;
-    box-sizing: border-box;
 }
 
 .active {

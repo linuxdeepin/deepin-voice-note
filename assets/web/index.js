@@ -39,7 +39,7 @@ var h5Tpl = `
     </div>`;
 // 语音插入模板
 var nodeTpl = `
-        <div class='voiceInfoBox' contenteditable="false">
+        <div class='voiceInfoBox'>
             <div class="demo"  >
                 <div class="voicebtn play"></div>
                 <div class="lf">
@@ -196,6 +196,8 @@ document.addEventListener('paste', function (event) {
         document.execCommand('insertHTML', false, formatHtml + "<p><br></p>");
         event.preventDefault()
     }
+    var sel = document.getSelection();
+    sel.focusNode.scrollIntoView(false)
     removeNullP()
 });
 
@@ -521,16 +523,14 @@ function rightClick(e) {
         if (bTransVoiceIsReady) {
             activeTransVoice = $(e.target).parents('.li:first');
         }
-        // $('#summernote').summernote('airPopover.rightUpdate')
         $('#summernote').summernote('airPopover.hide')
         // 设置选区
         setSelectRange($(e.target).parents('.voiceBox')[0])
     } else {
         // 文本右键
-        y = $('.note-air-popover').offset().top - $(document).scrollTop() + 50
+        // y = $('.note-air-popover').offset().top - $(document).scrollTop() + 50
         json = ''
         type = 2;
-
     }
     webobj.jsCallPopupMenu(type, x, y, json);
     // 阻止默认右键事件
@@ -679,3 +679,7 @@ $('body').on('dblclick', 'img', function (e) {
     webobj.jsCallViewPicture(imgUrl)
 })
 
+// 右键显示悬浮工具栏
+function showRightMenu(x, y) {
+    $('#summernote').summernote('airPopover.rightUpdate', x, y)
+}
