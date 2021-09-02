@@ -65,7 +65,7 @@
 
 #include <DApplication>
 #include <DToolButton>
-#include <DApplicationHelper>
+#include <DGuiApplicationHelper>
 #include <DFontSizeManager>
 #include <DLog>
 #include <DStatusBar>
@@ -202,7 +202,7 @@ void VNoteMainWindow::initConnections()
     //关联图片插入按钮点击事件
     connect(m_imgInsert, &VNoteIconButton::clicked, this, &VNoteMainWindow::onInsertImageToWebEditor);
 
-    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::paletteTypeChanged,
+    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
             this, &VNoteMainWindow::onThemeChanged);
     connect(JsContent::instance(), &JsContent::playVoice, this, &VNoteMainWindow::onWebVoicePlay);
     connect(m_richTextEdit, &RichTextEdit::currentSearchEmpty, this, &VNoteMainWindow::onWebSearchEmpty);

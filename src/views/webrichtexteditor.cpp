@@ -78,7 +78,7 @@ void WebRichTextEditor::initWebView()
     connect(content, &JsContent::textPaste, this, &WebRichTextEditor::onPaste);
     connect(content, &JsContent::loadFinsh, this, &WebRichTextEditor::onThemeChanged);
     connect(content, &JsContent::viewPictrue, this, &WebRichTextEditor::viewPicture);
-    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::paletteTypeChanged,
+    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
             this, &WebRichTextEditor::onThemeChanged);
 }
 
@@ -496,9 +496,12 @@ void WebRichTextEditor::deleteSelectText()
 
 void WebRichTextEditor::onThemeChanged()
 {
-    DGuiApplicationHelper::ColorType theme =
-        DGuiApplicationHelper::instance()->themeType();
-    emit JsContent::instance()->callJsSetTheme(theme);
+    DGuiApplicationHelper *dAppHelper = DGuiApplicationHelper::instance();
+    //获取系统高亮色
+    QString color = dAppHelper->applicationPalette().highlight().color().name();
+    //获取系统主题类型
+    DGuiApplicationHelper::ColorType theme = dAppHelper->themeType();
+    emit JsContent::instance()->callJsSetTheme(theme, color);
 }
 
 void WebRichTextEditor::onShowEditToolbar(const QPoint &pos)
