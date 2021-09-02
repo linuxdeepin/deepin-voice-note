@@ -145,6 +145,7 @@ function setSelectRange(dom) {
     sel.removeAllRanges();
     var range = document.createRange();
     range.selectNode(dom);
+    // range.collapse(true);
     if (sel.anchorOffset == 0) {
         sel.addRange(range);
     };
@@ -175,10 +176,16 @@ function copyVoice(event) {
     var rangeObj = selectionObj.getRangeAt(0);
     var docFragment = rangeObj.cloneContents();
     var testDiv = document.createElement("div");
-    $(docFragment).find('.translate').html('')
     // 判断是否语音复制
     if ($(docFragment).find('.voiceBox').length != 0) {
+        $(docFragment).find('.translate').html('')
         $(docFragment).find('.voiceBox').removeClass('active')
+
+        $(docFragment).find('.voicebtn').removeClass('pause').addClass('play');
+        $(docFragment).find('.voicebtn').removeClass('now');
+        $(docFragment).find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four');
+
+        event.preventDefault()
         isVoicePaste = true
     }
     testDiv.appendChild(docFragment);
@@ -189,9 +196,13 @@ function copyVoice(event) {
     pasteData = window.getSelection().toString();
 }
 
+// 剪切板内容变化
+function shearPlateChange() {
+    isVoicePaste = false
+}
+
 // 粘贴
 document.addEventListener('paste', function (event) {
-    console.log(JSON.stringify(event.clipboardData.items))
     if (formatHtml != "" && isVoicePaste) {
         document.execCommand('insertHTML', false, formatHtml + "<p><br></p>");
         event.preventDefault()
@@ -236,19 +247,13 @@ $('body').on('click', '.voicebtn', function (e) {
 
 //获取整个处理后Html串,去除所有标签中临时状态
 function getHtml() {
-    // var rightCode = $('#summernote').summernote('code');
-    // $('.li').removeClass('active');
-
-    // if (activeVoice)
-    // {
-    //     activeVoice.removeClass('pause').addClass('play');
-    //     activeVoice.addClass('now');
-    // }
-
-    // var handleCode = $('#summernote').summernote('code');
-    // setHtml(rightCode);
-    // return handleCode;
-    return $('#summernote').summernote('code');
+    var $cloneCode = $('.note-editable').clone();
+    $cloneCode.find('.li').removeClass('active');
+    $cloneCode.find('.voicebtn').removeClass('pause').addClass('play');
+    $cloneCode.find('.voicebtn').removeClass('now');
+    $cloneCode.find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four');
+    $cloneCode.find('.translate').html("")
+    return $cloneCode[0].innerHTML;
 }
 
 //获取当前所有的语音列表
@@ -288,6 +293,8 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsSetTheme.connect(changeColor);
         webobj.calllJsShowEditToolbar.connect(showRightMenu);
         webobj.callJsHideEditToolbar.connect(hideRightMenu);
+        webobj.callJsClipboardDataChanged.connect(shearPlateChange);
+
 
         //通知QT层完成通信绑定
         webobj.jsCallChannleFinish();
@@ -371,7 +378,6 @@ function toggleState(state) {
     if (state == '0') {
         $('.voicebtn').removeClass('pause').addClass('play');
         activeVoice.removeClass('play').addClass('pause');
-
         voicePlay(true);
     } else if (state == '1') {
         activeVoice.removeClass('pause').addClass('play');
@@ -532,7 +538,7 @@ function rightClick(e) {
         json = ''
         type = 2;
     }
-    webobj.jsCallPopupMenu(type,json);
+    webobj.jsCallPopupMenu(type, json);
     // 阻止默认右键事件
     // e.preventDefault()
 }

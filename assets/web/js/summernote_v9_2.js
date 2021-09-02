@@ -3819,7 +3819,9 @@
                     return function (value) {
                         _this.beforeCommand();
                         // 设置样式
-                        console.log(sCmd, value)
+                        let sel = document.getSelection()
+                        let range = sel.getRangeAt(0)
+                        console.log(range)
                         document.execCommand(sCmd, false, value);
                         _this.afterCommand(true);
                     };
@@ -4321,7 +4323,6 @@
         Editor.prototype.insertImage = function (src, param) {
             var _this = this;
             return createImage(src, param).then(function ($image) {
-                console.log($image)
                 _this.beforeCommand();
                 if (typeof param === 'function') {
                     param($image);
@@ -4332,6 +4333,7 @@
                     }
                     $image.css('width', Math.min(_this.$editable.width(), $image.width()));
                 }
+
                 $image.show();
                 range.create(_this.editable).insertNode($image[0]);
                 range.createFromNodeAfter($image[0]).select();
@@ -7021,9 +7023,24 @@
         };
 
         AirPopover.prototype.rightUpdate = function (x, y) {
-            console.log(x, y)
             var styleInfo = this.context.invoke('editor.currentStyle');
             var rect = lists.last(styleInfo.range.getClientRects());
+
+            var selectionObj = window.getSelection();
+            var rangeObj = selectionObj.getRangeAt(0);
+            var docFragment = rangeObj.cloneContents();
+            var testDiv = document.createElement("div");
+            testDiv.appendChild(docFragment);
+            if ($(testDiv).find('.translate').length != 0
+                || $(styleInfo.range.sc).parents('.translate').length != 0
+                || $(testDiv).find('img').length != 0) {
+                $('.note-ul').hide()
+                $('.note-ol').hide()
+            } else {
+                $('.note-ul').show()
+                $('.note-ol').show()
+            }
+            
             if (rect) {
                 var bnd = func.rect2bnd(rect);
                 let winWidth = $(document).width()
@@ -7031,9 +7048,6 @@
                 let top = bnd.top + bnd.height - 60;
                 if (winWidth - x < 320) {
                     x = winWidth - 320
-                }
-                if (y < 100) {
-                    y = y + 70
                 }
                 this.$popover.css({
                     display: 'block',
