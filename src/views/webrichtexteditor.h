@@ -107,7 +107,7 @@ public slots:
     * @param y 弹出位置纵坐标
     * @param json  内容
     */
-    void saveMenuParam(int m_menuType, int x, int y, const QVariant &json);
+    void saveMenuParam(int m_menuType, const QVariant &json);
     /**
     * @brief 编辑区内容设置完成
     */
@@ -131,6 +131,17 @@ public slots:
      * @brief 系统主题发生改变处理
      */
     void onThemeChanged();
+
+    /**
+     * @brief 显示编辑工具栏
+     * @param pos 位置
+     */
+    void onShowEditToolbar(const QPoint &pos);
+
+    /**
+     * @brief 隐藏编辑工具栏
+     */
+    void onHideEditToolbar();
 
 protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
@@ -179,10 +190,10 @@ private:
     QTimer *m_updateTimer {nullptr};
     bool m_textChange {false};
     QString m_searchKey {""};
-    QPoint m_menuPoint {};
     Menu m_menuType = MaxMenu;
     QVariant m_menuJson = {};
     ImageViewerDialog *imgView {nullptr}; //
+    QRect m_editToolbarRect; //编辑工具栏坐标
 
     //右键菜单
     VNoteRightMenu *m_pictureRightMenu {nullptr}; //图片右键菜单

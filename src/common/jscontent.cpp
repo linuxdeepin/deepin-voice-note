@@ -115,9 +115,9 @@ void JsContent::jsCallChannleFinish()
     emit loadFinsh();
 }
 
-void JsContent::jsCallPopupMenu(int type, int x, int y, const QVariant &json)
+void JsContent::jsCallPopupMenu(int type, const QVariant &json)
 {
-    emit popupMenu(type, x, y, json);
+    emit popupMenu(type, json);
 }
 
 void JsContent::jsCallPlayVoice(const QVariant &json, bool bIsSame)

@@ -72,10 +72,13 @@ signals:
     void callJsSetTheme(int theme);
     void callJsClipboardDataChanged(); //剪切板数据发生改变信号
 
+    void calllJsShowEditToolbar(int x, int y); //显示编辑工具栏
+    void callJsHideEditToolbar(); //隐藏编辑工具栏
+
     void textPaste(); //粘贴信号
     void textChange();
     void loadFinsh();
-    void popupMenu(int type, int x, int y, const QVariant &json);
+    void popupMenu(int type, const QVariant &json);
     void playVoice(const QVariant &json, bool bIsSame);
     void viewPictrue(const QString &imagePath);
     void createNote();
@@ -91,7 +94,7 @@ public slots:
     void jsCallSetDataFinsh();
     void jsCallTxtChange(); //web前端调用后端，通知数据变化
     void jsCallChannleFinish(); //web前端调用后端，通知网页加载完成
-    void jsCallPopupMenu(int type, int x, int y, const QVariant &json); //web前端调用后端，弹出右键菜单
+    void jsCallPopupMenu(int type, const QVariant &json); //web前端调用后端，弹出右键菜单
     void jsCallPlayVoice(const QVariant &json, bool bIsSame); //web前端调用后端，播放语音
     void jsCallPaste(); //web前端调用后端，编辑区粘贴功能
     void jsCallViewPicture(const QString &imagePath); //web前端调用后端，进行图片预览

@@ -41,6 +41,7 @@
 #include <QApplication>
 #include <QStandardPaths>
 #include <QThreadPool>
+#include <QDesktopWidget>
 
 static const char webPage[] = WEB_PATH "/index.html";
 
@@ -92,6 +93,8 @@ void WebRichTextEditor::initRightMenu()
             this, &WebRichTextEditor::onMenuActionClicked);
     connect(m_txtRightMenu, &DMenu::triggered,
             this, &WebRichTextEditor::onMenuActionClicked);
+    //文本右键菜单隐藏隐藏编辑工具栏
+    connect(m_txtRightMenu, &DMenu::aboutToHide, this, &WebRichTextEditor::onHideEditToolbar);
 }
 
 void WebRichTextEditor::initConnections()
@@ -206,11 +209,9 @@ void WebRichTextEditor::onTextChange()
     }
 }
 
-void WebRichTextEditor::saveMenuParam(int type, int x, int y, const QVariant &json)
+void WebRichTextEditor::saveMenuParam(int type, const QVariant &json)
 {
     m_menuType = static_cast<Menu>(type);
-    m_menuPoint.setX(x);
-    m_menuPoint.setY(y);
     m_menuJson = json;
 }
 
@@ -272,7 +273,7 @@ void WebRichTextEditor::showTxtMenu()
             ActionManager::Instance()->enableAction(ActionManager::TxtDictation, true);
         }
     }
-    m_txtRightMenu->popup(mapToGlobal(m_menuPoint));
+    m_txtRightMenu->popup(QCursor::pos());
 }
 
 /**
@@ -280,7 +281,7 @@ void WebRichTextEditor::showTxtMenu()
  */
 void WebRichTextEditor::showPictureMenu()
 {
-    m_pictureRightMenu->popup(mapToGlobal(m_menuPoint));
+    m_pictureRightMenu->popup(QCursor::pos());
 }
 
 /**
@@ -290,7 +291,7 @@ void WebRichTextEditor::showVoiceMenu()
 {
     //如果当前有语音处于转换状态就将语音转文字选项置灰
     ActionManager::Instance()->enableAction(ActionManager::VoiceToText, !OpsStateInterface::instance()->isVoice2Text());
-    m_voiceRightMenu->popup(mapToGlobal(m_menuPoint));
+    m_voiceRightMenu->popup(QCursor::pos());
 }
 
 void WebRichTextEditor::onMenuActionClicked(QAction *action)
@@ -460,6 +461,8 @@ void WebRichTextEditor::contextMenuEvent(QContextMenuEvent *e)
     case TxtMenu:
         //文字菜单
         showTxtMenu();
+        //显示编辑工具栏
+        onShowEditToolbar(e->pos());
         break;
     default:
         break;
@@ -496,4 +499,37 @@ void WebRichTextEditor::onThemeChanged()
     DGuiApplicationHelper::ColorType theme =
         DGuiApplicationHelper::instance()->themeType();
     emit JsContent::instance()->callJsSetTheme(theme);
+}
+
+void WebRichTextEditor::onShowEditToolbar(const QPoint &pos)
+{
+    QPoint menuPoint = pos;
+    menuPoint.setX(menuPoint.x() - 9);
+    int width = this->width() - menuPoint.x() - 320;
+    if (width < 0) {
+        menuPoint.setX(menuPoint.x() + width);
+    }
+    if (menuPoint.y() < 100) { //工具栏显示在右键菜单下方
+        menuPoint.setY(menuPoint.y() + 15 + m_txtRightMenu->height());
+    } else {
+        int maxHeight = QApplication::desktop()->availableGeometry().height();
+        //窗口无法显示右键菜单时，菜单会自动调整左下角坐标=鼠标位置，工具栏显示在右键菜单上方
+        if (mapToGlobal(menuPoint).y() + m_txtRightMenu->height() > maxHeight) {
+            menuPoint.setY(menuPoint.y() - m_txtRightMenu->height() - 45);
+        } else {
+            //窗无口正常显示右键菜单时，菜单左上角坐标=鼠标位置，工具栏显示在右键菜单上方
+            menuPoint.setY(menuPoint.y() - 45);
+        }
+    }
+    //记录编辑工具栏的坐标位置
+    m_editToolbarRect = QRect(menuPoint, QPoint(menuPoint.x() + 290, menuPoint.y() + 35));
+    emit JsContent::instance()->calllJsShowEditToolbar(menuPoint.x(), menuPoint.y());
+}
+
+void WebRichTextEditor::onHideEditToolbar()
+{
+    //当前鼠标位置不在编辑工具栏上，则隐藏编辑工具栏
+    if (!m_editToolbarRect.contains(mapFromGlobal(QCursor::pos()))) {
+        emit JsContent::instance()->callJsHideEditToolbar();
+    }
 }

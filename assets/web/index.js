@@ -286,6 +286,8 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsSetVoiceText.connect(setVoiceText);
         webobj.callJsInsertImages.connect(insertImg);
         webobj.callJsSetTheme.connect(changeColor);
+        webobj.calllJsShowEditToolbar.connect(showRightMenu);
+        webobj.callJsHideEditToolbar.connect(hideRightMenu);
 
         //通知QT层完成通信绑定
         webobj.jsCallChannleFinish();
@@ -497,8 +499,6 @@ function rightClick(e) {
     isShowAir = false;
     let type = null;
     let json = null;
-    let x = e.clientX
-    let y = e.clientY
     if (e.target.tagName == 'IMG') {
         // 图片右键
         type = 0;
@@ -532,7 +532,7 @@ function rightClick(e) {
         json = ''
         type = 2;
     }
-    webobj.jsCallPopupMenu(type, x, y, json);
+    webobj.jsCallPopupMenu(type,json);
     // 阻止默认右键事件
     // e.preventDefault()
 }
@@ -682,4 +682,9 @@ $('body').on('dblclick', 'img', function (e) {
 // 右键显示悬浮工具栏
 function showRightMenu(x, y) {
     $('#summernote').summernote('airPopover.rightUpdate', x, y)
+}
+
+// 右键隐藏悬浮工具栏
+function hideRightMenu() {
+    $('#summernote').summernote('airPopover.hide')
 }
