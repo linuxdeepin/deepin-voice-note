@@ -280,7 +280,8 @@ void WebRichTextEditor::showPictureMenu()
  */
 void WebRichTextEditor::showVoiceMenu()
 {
-    ActionManager::Instance()->visibleAction(ActionManager::VoiceToText, !OpsStateInterface::instance()->isVoice2Text());
+    //如果当前有语音处于转换状态就将语音转文字选项置灰
+    ActionManager::Instance()->enableAction(ActionManager::VoiceToText, !OpsStateInterface::instance()->isVoice2Text());
     m_voiceRightMenu->popup(mapToGlobal(m_menuPoint));
 }
 
