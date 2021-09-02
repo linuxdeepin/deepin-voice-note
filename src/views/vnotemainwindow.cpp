@@ -860,12 +860,11 @@ void VNoteMainWindow::onA2TError(int error)
     if (error == VNoteA2TManager::NetworkError) {
         message = DApplication::translate(
             "VNoteErrorMessage",
-            "The voice conversion failed due to the poor network connection. "
-            "Do you want to try again?");
+            "The voice conversion failed due to the poor network connection, please have a check");
     } else {
         message = DApplication::translate(
             "VNoteErrorMessage",
-            "The voice conversion failed. Do you want to try again?");
+            "Voice to text conversion failed");
     }
     showAsrErrMessage(message); //显示错误信息
     setSpecialStatus(VoiceToTextEnd); //更新状态
