@@ -50,6 +50,8 @@ WebRichTextEditor::WebRichTextEditor(QWidget *parent)
     initWebView();
     initRightMenu();
     initUpdateTimer();
+
+    initConnections();
 }
 
 WebRichTextEditor::~WebRichTextEditor()
@@ -90,6 +92,12 @@ void WebRichTextEditor::initRightMenu()
             this, &WebRichTextEditor::onMenuActionClicked);
     connect(m_txtRightMenu, &DMenu::triggered,
             this, &WebRichTextEditor::onMenuActionClicked);
+}
+
+void WebRichTextEditor::initConnections()
+{
+    //剪贴板数据发生改变信号转发
+    connect(QApplication::clipboard(), &QClipboard::dataChanged, JsContent::instance(), &JsContent::callJsClipboardDataChanged);
 }
 
 void WebRichTextEditor::initUpdateTimer()

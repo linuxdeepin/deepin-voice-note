@@ -70,6 +70,7 @@ signals:
      * @param theme : 主题类型，0 未知，1浅色主题，2深色主题，参考DGuiApplicationHelper::ColorType
      */
     void callJsSetTheme(int theme);
+    void callJsClipboardDataChanged(); //剪切板数据发生改变信号
 
     void textPaste(); //粘贴信号
     void textChange();
