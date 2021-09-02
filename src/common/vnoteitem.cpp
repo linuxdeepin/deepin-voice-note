@@ -241,7 +241,7 @@ bool VNoteItem::haveVoice() const
 bool VNoteItem::haveText() const
 {
     if (!htmlCode.isEmpty()) { //富文本文本内容判断
-        if (htmlCode == "<br>" || htmlCode == "<p></p>") {
+        if (htmlCode == "<p><br></p>") {
             return false;
         }
         return true;

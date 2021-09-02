@@ -1392,7 +1392,7 @@ void VNoteMainWindow::addNote()
         tmpNote.folderId = id;
         tmpNote.noteType = VNoteItem::VNT_Text;
         //无内容时富文本为空白段落标签
-        tmpNote.htmlCode = "<p></p>";
+        tmpNote.htmlCode = "<p><br></p>";
         VNoteItemOper noteOper;
         //Get default note name in the folder
         tmpNote.noteTitle = noteOper.getDefaultNoteName(tmpNote.folderId);
