@@ -78,7 +78,7 @@ $(document).ready(function () {
 $('#summernote').summernote({
     focus: true,
     disableDragAndDrop: true,
-    shortcuts: false,
+    // shortcuts: false,
     lang: 'zh-CN',
     popover: {
         air: [
@@ -694,3 +694,4 @@ function showRightMenu(x, y) {
 function hideRightMenu() {
     $('#summernote').summernote('airPopover.hide')
 }
+

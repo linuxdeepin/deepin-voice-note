@@ -3818,11 +3818,21 @@
                 this[commands[idx]] = (function (sCmd) {
                     return function (value) {
                         _this.beforeCommand();
+
                         // 设置样式
+                        // 重新设置选区
                         let sel = document.getSelection()
                         let range = sel.getRangeAt(0)
-                        console.log(range)
+                        if (range.startContainer.tagName == 'U' || range.startContainer.tagName == 'STRIKE') {
+                            $(range.startContainer).parents('p').before('<p class="heightNull">&nbsp;</p>')
+                            range.setStart($('.heightNull')[0], 1)
+                            sel.addRange(range);
+                        }
+
                         document.execCommand(sCmd, false, value);
+
+                        $('.heightNull').remove()
+
                         _this.afterCommand(true);
                     };
                 })(commands[idx]);
@@ -4413,7 +4423,6 @@
                 $$1(spans).css(target, value);
                 // [workaround] added styled bogus span for style
                 //  - also bogus character needed for cursor position
-                console.log(rng)
                 if (rng.isCollapsed()) {
                     var firstSpan = lists.head(spans);
                     if (firstSpan && !dom.nodeLength(firstSpan)) {
@@ -7040,7 +7049,7 @@
                 $('.note-ul').show()
                 $('.note-ol').show()
             }
-            
+
             if (rect) {
                 var bnd = func.rect2bnd(rect);
                 let winWidth = $(document).width()
@@ -7637,7 +7646,7 @@
                 pc: {
                     'ENTER': 'insertParagraph',
                     'CTRL+Z': 'undo',
-                    'CTRL+Y': 'redo',
+                    'CTRL+SHIFT+Z': 'redo',
                     'TAB': 'tab',
                     'SHIFT+TAB': 'untab',
                     // 'CTRL+B': 'bold',
