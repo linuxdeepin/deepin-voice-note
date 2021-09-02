@@ -2333,6 +2333,13 @@ void VNoteMainWindow::onWebVoicePlay(const QVariant &json, bool bIsSame)
         qInfo() << "The recording cannot be played";
         return;
     }
+
+    //当前播放的语音为空时，此时bIsSame应该为false
+    if (m_currentPlayVoice.isNull() && true == bIsSame) {
+        qInfo() << "Parameter error";
+        bIsSame = false;
+    }
+
     //不同语音则重新解析json文件
     if (!bIsSame) {
         m_currentPlayVoice.reset(new VNVoiceBlock);
