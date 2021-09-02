@@ -36,10 +36,10 @@ TEST_F(ut_setting_test, setOption)
     QString key = "old._app_main_wnd_sz_key_";
     QString value = "/home/zhangteng/test";
     setting::instance()->setOption(key, value);
+    EXPECT_EQ("/home/zhangteng/test", setting::instance()->getOption(key));
     EXPECT_FALSE(key.isEmpty());
     QStringList keyList = setting::instance()->m_setting->keys();
-    value = "test";
-    setting::instance()->setOption(key, value);
+    EXPECT_TRUE(keyList.contains(key));
 }
 
 TEST_F(ut_setting_test, doSetOption)
@@ -48,9 +48,10 @@ TEST_F(ut_setting_test, doSetOption)
     QString key = "old._app_main_wnd_sz_key_";
     QString value = "/home/zhangteng/test";
     custembackend.doSetOption(key, value);
+    EXPECT_EQ("/home/zhangteng/test", custembackend.getOption("_app_main_wnd_sz_key_"));
     key = "_app_main_wnd_sz_key_";
     custembackend.doSetOption(key, value);
-    custembackend.getOption(key);
+    EXPECT_EQ("/home/zhangteng/test", custembackend.getOption("_app_main_wnd_sz_key_"));
 }
 
 TEST_F(ut_setting_test, getSetting)

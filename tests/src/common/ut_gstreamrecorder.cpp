@@ -31,6 +31,8 @@ TEST_F(ut_gstreamrecorder_test, GetGstState)
     GstreamRecorder gstreamrecorder;
     gstreamrecorder.createPipe();
     gstreamrecorder.GetGstState(&state, &pending);
+    EXPECT_NE(-1, state) << "state";
+    EXPECT_NE(-1, pending) << "pending";
 }
 
 TEST_F(ut_gstreamrecorder_test, pauseRecord)
@@ -51,7 +53,9 @@ TEST_F(ut_gstreamrecorder_test, setDevice)
 {
     GstreamRecorder gstreamrecorder;
     gstreamrecorder.createPipe();
+    gstreamrecorder.m_currentDevice = "123";
     gstreamrecorder.setDevice(QString("test"));
+    EXPECT_EQ("test", gstreamrecorder.m_currentDevice);
 }
 
 TEST_F(ut_gstreamrecorder_test, setStateToNull)
@@ -65,4 +69,8 @@ TEST_F(ut_gstreamrecorder_test, initFormat)
 {
     GstreamRecorder gstreamrecorder;
     gstreamrecorder.initFormat();
+    EXPECT_EQ(44100, gstreamrecorder.m_format.sampleRate()) << "code";
+    EXPECT_EQ(QAudioFormat::LittleEndian, gstreamrecorder.m_format.byteOrder()) << "byteOrder";
+    EXPECT_EQ(QAudioFormat::SignedInt, gstreamrecorder.m_format.sampleType()) << "sampleType";
+    EXPECT_EQ(16, gstreamrecorder.m_format.sampleSize()) << "sampleSize";
 }

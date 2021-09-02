@@ -18,6 +18,7 @@
 
 #include "ut_vntaskworker.h"
 #include "vntaskworker.h"
+#include "filecleanupworker.h"
 
 ut_vntaskworker_test::ut_vntaskworker_test()
 {
@@ -35,5 +36,8 @@ void ut_vntaskworker_test::TearDown()
 
 TEST_F(ut_vntaskworker_test, addTask)
 {
-    ;
+    FileCleanupWorker *task = new FileCleanupWorker(nullptr);
+    m_vntaskworker->addTask(task);
+    EXPECT_EQ(m_vntaskworker->m_safetyTaskQueue.front(), task);
+    delete task;
 }

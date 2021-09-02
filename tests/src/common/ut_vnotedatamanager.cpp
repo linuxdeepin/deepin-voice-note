@@ -34,7 +34,12 @@ TEST_F(ut_vnotedatamanager_test, folderNotesCount)
 TEST_F(ut_vnotedatamanager_test, isAllDatasReady)
 {
     VNoteDataManager vnotedatamanager;
-    vnotedatamanager.isAllDatasReady();
+    vnotedatamanager.m_fDataState = 3;
+    EXPECT_TRUE(vnotedatamanager.isAllDatasReady()) << "m_fDataState is 3";
+    vnotedatamanager.m_fDataState = 2;
+    EXPECT_FALSE(vnotedatamanager.isAllDatasReady()) << "m_fDataState is 2";
+    vnotedatamanager.m_fDataState = 1;
+    EXPECT_FALSE(vnotedatamanager.isAllDatasReady()) << "m_fDataState is 1";
 }
 
 TEST_F(ut_vnotedatamanager_test, instance)
@@ -54,8 +59,8 @@ TEST_F(ut_vnotedatamanager_test, addFolder)
     VNoteDataManager vnotedatamanager;
     vnotedatamanager.m_qspNoteFoldersMap.reset(new VNOTE_FOLDERS_MAP());
     vnotedatamanager.m_qspAllNotesMap.reset(new VNOTE_ALL_NOTES_MAP());
-    vnotedatamanager.addFolder(&folder);
-    vnotedatamanager.getFolder(folder.id);
+    EXPECT_EQ("test", vnotedatamanager.addFolder(&folder)->name) << "addFolder";
+    EXPECT_EQ("test", vnotedatamanager.getFolder(2)->name) << "getFolder";
 
     VNoteItem tmpNote;
     tmpNote.folderId = 2;
@@ -63,9 +68,12 @@ TEST_F(ut_vnotedatamanager_test, addFolder)
     tmpNote.noteType = VNoteItem::VNT_Text;
     VNoteBlock *ptrBlock1 = tmpNote.newBlock(VNoteBlock::Text);
     tmpNote.addBlock(ptrBlock1);
-    vnotedatamanager.addNote(&tmpNote);
-    vnotedatamanager.getNote(folder.id, tmpNote.noteId);
-    vnotedatamanager.getNote(3, tmpNote.noteId);
+    //    vnotedatamanager.addNote(&tmpNote);
+    EXPECT_EQ(VNoteItem::VNT_Text, vnotedatamanager.addNote(&tmpNote)->noteType);
+    //    vnotedatamanager.getNote(folder.id, tmpNote.noteId);
+    EXPECT_EQ(VNoteItem::VNT_Text, vnotedatamanager.getNote(folder.id, tmpNote.noteId)->noteType);
+    //    vnotedatamanager.getNote(3, tmpNote.noteId);
+    EXPECT_TRUE(nullptr == vnotedatamanager.getNote(3, tmpNote.noteId));
     vnotedatamanager.delNote(folder.id, tmpNote.noteId);
     vnotedatamanager.delNote(3, tmpNote.noteId);
     vnotedatamanager.folderNotesCount(folder.id);
@@ -85,6 +93,7 @@ TEST_F(ut_vnotedatamanager_test, onFoldersLoaded)
     VNOTE_FOLDERS_MAP *folders = vnotedatamanager.getNoteFolders();
     folders->folders.insert(0, new VNoteFolder());
     vnotedatamanager.onFoldersLoaded(folders);
+    EXPECT_EQ(nullptr, vnotedatamanager.m_pForldesLoadThread);
 }
 
 TEST_F(ut_vnotedatamanager_test, onAllNotesLoaded)
@@ -96,6 +105,7 @@ TEST_F(ut_vnotedatamanager_test, onAllNotesLoaded)
     items->folderNotes.insert(0, new VNoteItem);
     notes->notes.insert(0, items);
     vnotedatamanager.onAllNotesLoaded(notes);
+    EXPECT_EQ(nullptr, vnotedatamanager.m_pNotesLoadThread);
 }
 
 TEST_F(ut_vnotedatamanager_test, reqNoteDefIcons)

@@ -17,6 +17,7 @@
 */
 #include "ut_vnoteitem.h"
 #include "vnoteitem.h"
+#include "vnoteforlder.h"
 
 ut_vnoteitem_test::ut_vnoteitem_test()
 {
@@ -27,7 +28,7 @@ TEST_F(ut_vnoteitem_test, isValid)
     VNoteItem vnoteitem;
     vnoteitem.noteId = 2;
     vnoteitem.folderId = 2;
-    vnoteitem.isValid();
+    EXPECT_EQ(true, vnoteitem.isValid());
 }
 
 TEST_F(ut_vnoteitem_test, delNoteData)
@@ -41,13 +42,20 @@ TEST_F(ut_vnoteitem_test, search)
     VNoteItem vnoteitem;
     vnoteitem.noteTitle = "test";
     QString tmpstr = "test";
-    vnoteitem.search(tmpstr);
+    EXPECT_TRUE(vnoteitem.search(tmpstr)) << "search title";
+    EXPECT_FALSE(vnoteitem.search("1234")) << "search data";
+    vnoteitem.htmlCode = "1234561";
+    EXPECT_TRUE(vnoteitem.search("1234")) << "search htmlcode";
 }
 
 TEST_F(ut_vnoteitem_test, folder)
 {
     VNoteItem vnoteitem;
-    vnoteitem.folder();
+    VNoteFolder *folder = new VNoteFolder();
+    vnoteitem.setFolder(folder);
+    EXPECT_NE(nullptr, vnoteitem.ownFolder) << "setFolder";
+    EXPECT_EQ(folder, vnoteitem.folder()) << "getFolder";
+    delete folder;
 }
 
 TEST_F(ut_vnoteitem_test, qdebugtest)
@@ -65,13 +73,19 @@ TEST_F(ut_vnoteitem_test, qdebugtest)
 TEST_F(ut_vnoteitem_test, metaDataRef)
 {
     VNoteItem vnoteitem;
-    vnoteitem.metaDataRef();
+    QVariant data;
+    vnoteitem.setMetadata(data);
+    EXPECT_EQ(data, vnoteitem.metaData);
+    EXPECT_EQ(data, vnoteitem.metaDataRef());
 }
 
 TEST_F(ut_vnoteitem_test, metaDataConstRef)
 {
     VNoteItem vnoteitem;
-    vnoteitem.metaDataConstRef();
+    QVariant data;
+    vnoteitem.setMetadata(data);
+    EXPECT_EQ(data, vnoteitem.metaData);
+    EXPECT_EQ(data, vnoteitem.metaDataConstRef());
 }
 
 TEST_F(ut_vnoteitem_test, newBlock)
@@ -94,9 +108,9 @@ TEST_F(ut_vnoteitem_test, addBlock)
     vnoteitem.addBlock(ptrBlock);
     vnoteitem.addBlock(ptrBlock, ptrBlock1);
     vnoteitem.delBlock(ptrBlock);
-    //    EXPECT_TRUE(vnoteitem.haveVoice());
-    //    EXPECT_FALSE(vnoteitem.haveText());
-    //    EXPECT_GE(vnoteitem.voiceCount(), 0);
+    EXPECT_TRUE(vnoteitem.haveVoice());
+    EXPECT_FALSE(vnoteitem.haveText());
+    EXPECT_GE(vnoteitem.voiceCount(), 0);
 }
 
 TEST_F(ut_vnoteitem_test, setMetadata)
@@ -104,4 +118,5 @@ TEST_F(ut_vnoteitem_test, setMetadata)
     VNoteItem vnoteitem;
     QString tmpstr = "{\"dataCount\":3,\"noteDatas\":[{\"text\":\"wafwaefawffvbdafvadfasdf\",\"type\":1},{\"createTime\":\"2020-08-25 14:39:21.473\",\"state\":false,\"text\":\"\",\"title\":\"Voice2\",\"type\":2,\"voicePath\":\"/usr/share/music/bensound-sunny.mp3\",\"voiceSize\":3630},{\"text\":\"wafwaefawffvbdafvadfasdf\",\"type\":1}],\"voiceMaxId\":3}";
     vnoteitem.setMetadata(tmpstr);
+    EXPECT_EQ(vnoteitem.metaData, tmpstr);
 }

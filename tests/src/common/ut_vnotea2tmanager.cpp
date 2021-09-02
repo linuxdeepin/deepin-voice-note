@@ -54,30 +54,39 @@ TEST_F(ut_vnotea2tmanager_test, getErrorCode)
     tmpstruct.failType = vnotea2tmanager.XF_upload;
     tmpstruct.descInfo = "test";
     tmpstruct.text = "test";
-    vnotea2tmanager.getErrorCode(tmpstruct);
+    EXPECT_EQ(VNoteA2TManager::ErrorCode::UploadAudioFileFail, vnotea2tmanager.getErrorCode(tmpstruct))
+        << "XF_fail, XF_other";
 
     tmpstruct.failType = vnotea2tmanager.XF_decode;
-    vnotea2tmanager.getErrorCode(tmpstruct);
+    EXPECT_EQ(VNoteA2TManager::ErrorCode::AudioDecodeFail, vnotea2tmanager.getErrorCode(tmpstruct))
+        << "XF_fail, XF_decode";
 
     tmpstruct.failType = vnotea2tmanager.XF_recognize;
-    vnotea2tmanager.getErrorCode(tmpstruct);
+    EXPECT_EQ(VNoteA2TManager::ErrorCode::AudioRecognizeFail, vnotea2tmanager.getErrorCode(tmpstruct))
+        << "XF_fail, XF_recognize";
 
     tmpstruct.failType = vnotea2tmanager.XF_limit;
-    vnotea2tmanager.getErrorCode(tmpstruct);
+    EXPECT_EQ(VNoteA2TManager::ErrorCode::AudioExceedeLimit, vnotea2tmanager.getErrorCode(tmpstruct))
+        << "XF_fail, XF_limit";
 
     tmpstruct.failType = vnotea2tmanager.XF_verify;
-    vnotea2tmanager.getErrorCode(tmpstruct);
+    EXPECT_EQ(VNoteA2TManager::ErrorCode::AudioVerifyFailed, vnotea2tmanager.getErrorCode(tmpstruct))
+        << "XF_fail, XF_verify";
 
     tmpstruct.failType = vnotea2tmanager.XF_mute;
-    vnotea2tmanager.getErrorCode(tmpstruct);
+    EXPECT_EQ(VNoteA2TManager::ErrorCode::AudioMuteFile, vnotea2tmanager.getErrorCode(tmpstruct))
+        << "XF_fail, XF_mute";
 
     tmpstruct.failType = vnotea2tmanager.XF_other;
-    vnotea2tmanager.getErrorCode(tmpstruct);
+    EXPECT_EQ(VNoteA2TManager::ErrorCode::AudioOther, vnotea2tmanager.getErrorCode(tmpstruct))
+        << "XF_fail, XF_other";
 
     tmpstruct.code = vnotea2tmanager.CODE_NETWORK;
-    vnotea2tmanager.getErrorCode(tmpstruct);
+    EXPECT_EQ(VNoteA2TManager::ErrorCode::NetworkError, vnotea2tmanager.getErrorCode(tmpstruct))
+        << "CODE_NETWORK, XF_fail";
 
     tmpstruct.code = vnotea2tmanager.CODE_SUCCESS;
     tmpstruct.status = vnotea2tmanager.XF_finish;
-    vnotea2tmanager.getErrorCode(tmpstruct);
+    EXPECT_EQ(VNoteA2TManager::ErrorCode::DontCareError, vnotea2tmanager.getErrorCode(tmpstruct))
+        << "CODE_SUCCESS, XF_finish";
 }

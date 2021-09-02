@@ -43,11 +43,13 @@ TEST_F(ut_standarditemcommon_test, getStandardItemType)
     }
 
     QModelIndex index = pDataModel->index(0, 0);
-    m_standarditemcommon->getStandardItemType(index);
-    m_standarditemcommon->getStandardItemData(index);
+    int ret = m_standarditemcommon->getStandardItemType(index);
+    EXPECT_EQ(ret, StandardItemCommon::StandardItemType::NOTEPADROOT) << "getStandardItemType, index(0, 0)";
+    EXPECT_FALSE(m_standarditemcommon->getStandardItemData(index)) << "getStandardItemData, index(0, 0)";
 
     index = pDataModel->index(0, 1);
-    m_standarditemcommon->getStandardItemType(index);
-    m_standarditemcommon->getStandardItemData(index);
+    ret = m_standarditemcommon->getStandardItemType(index);
+    EXPECT_EQ(ret, StandardItemCommon::StandardItemType::Invalid) << "getStandardItemType, index(0, 0)";
+    EXPECT_FALSE(m_standarditemcommon->getStandardItemData(index)) << "getStandardItemData, index(0, 1)";
     delete pDataModel;
 }

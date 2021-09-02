@@ -107,18 +107,29 @@ TEST_F(ut_datatypedef_test, classifyDelBlk)
     VNOTE_DATAS vnote_datas;
     VNoteBlock *ptrBlock = vnote_datas.newBlock(2);
     vnote_datas.classifyAddBlk(ptrBlock);
+    ASSERT_NE(0, vnote_datas.voiceBlocks.size()) << "add voice, size is 0";
+    EXPECT_TRUE(vnote_datas.voiceBlocks.contains(ptrBlock));
     vnote_datas.classifyDelBlk(ptrBlock);
+    EXPECT_FALSE(vnote_datas.voiceBlocks.contains(ptrBlock)) << "remove voice";
 
     ptrBlock->blockType = VNoteBlock::InValid;
     vnote_datas.classifyAddBlk(ptrBlock);
+    int voiceSize = vnote_datas.voiceBlocks.size();
+    int textSize = vnote_datas.textBlocks.size();
     vnote_datas.classifyDelBlk(ptrBlock);
+    EXPECT_EQ(voiceSize, vnote_datas.voiceBlocks.size());
+    EXPECT_EQ(textSize, vnote_datas.textBlocks.size());
     vnote_datas.delBlock(ptrBlock);
 }
 
 TEST_F(ut_datatypedef_test, isValid)
 {
     VDataSafer vdatasafer;
-    EXPECT_FALSE(vdatasafer.isValid());
+    ASSERT_FALSE(vdatasafer.isValid()) << "init";
+    vdatasafer.path = "/home";
+    vdatasafer.folder_id = 2;
+    vdatasafer.note_id = 3;
+    EXPECT_TRUE(vdatasafer.isValid()) << "true";
 }
 
 TEST_F(ut_datatypedef_test, setSaferType)

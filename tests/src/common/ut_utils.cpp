@@ -41,29 +41,39 @@ void ut_utils_test::TearDown()
 TEST_F(ut_utils_test, convertDateTime)
 {
     QDateTime currDateTime = QDateTime::currentDateTime();
-    m_utils->convertDateTime(currDateTime);
-    m_utils->convertDateTime(currDateTime.addDays(-1));
-    m_utils->convertDateTime(currDateTime.addMonths(-1));
-    m_utils->convertDateTime(currDateTime.addSecs(-3600));
-    m_utils->convertDateTime(currDateTime.addYears(-1));
+    currDateTime = currDateTime.addSecs(-10);
+    EXPECT_EQ(DApplication::translate("Utils", "1 min ago"), m_utils->convertDateTime(currDateTime));
+    EXPECT_EQ(DApplication::translate("Utils", "1 min ago"), m_utils->convertDateTime(currDateTime.addSecs(-70)));
+    currDateTime = currDateTime.addSecs(-3600);
+    EXPECT_EQ(currDateTime.toString("hh:mm"), m_utils->convertDateTime(currDateTime));
+    currDateTime = currDateTime.addDays(-1);
+    for (int i = 1; i <= 777; i++) {
+        QDateTime dateTime = currDateTime.addDays(-1 * i);
+        if (QDate::currentDate().year() == dateTime.date().year()) {
+            EXPECT_EQ(dateTime.toString("MM-dd"), m_utils->convertDateTime(dateTime)) << i << " days age";
+        } else {
+            EXPECT_EQ(dateTime.toString("yyyy-MM-dd"), m_utils->convertDateTime(dateTime)) << i << " days age";
+        }
+    }
 }
 
 TEST_F(ut_utils_test, loadSVG)
 {
     QString fileName = "play.svg";
-    m_utils->loadSVG(fileName, false);
-    m_utils->loadSVG(fileName, true);
+    EXPECT_TRUE(m_utils->loadSVG(fileName, false).isNull()) << "fCommon = false";
+    EXPECT_FALSE(m_utils->loadSVG(fileName, true).isNull()) << "fCommon = true";
 }
 
 TEST_F(ut_utils_test, highTextEdit)
 {
     QTextDocument document;
-    document.setPlainText("test");
+    document.setPlainText("testeee");
     QString searchKey = "test";
     DPalette pb;
     QColor highColor = pb.color(DPalette::Highlight);
-    m_utils->highTextEdit(&document, searchKey, highColor);
-    m_utils->highTextEdit(&document, searchKey, highColor, true);
+    EXPECT_EQ(1, m_utils->highTextEdit(&document, searchKey, highColor)) << "searchKey is 'test'";
+    EXPECT_EQ(2, m_utils->highTextEdit(&document, "t", highColor, true)) << "searchKey is 't'";
+    EXPECT_EQ(4, m_utils->highTextEdit(&document, "e", highColor, true)) << "searchKey is 'e'";
 }
 
 TEST_F(ut_utils_test, setDefaultColor)
@@ -85,14 +95,24 @@ TEST_F(ut_utils_test, documentToBlock)
 {
     VNTextBlock block;
     QTextDocument document;
+    block.blockText = "abc";
     document.setPlainText("test");
     m_utils->documentToBlock(&block, &document);
+    EXPECT_EQ(document.toPlainText(), block.blockText);
 }
 
 TEST_F(ut_utils_test, formatMillisecond)
 {
     qint64 tmpvoicesize = 890;
     m_utils->formatMillisecond(tmpvoicesize, 4);
+    EXPECT_EQ(QDateTime::fromTime_t(static_cast<uint>(4)).toUTC().toString("mm:ss"), m_utils->formatMillisecond(tmpvoicesize, 4));
+    for (int i = 5301; i < 7300000; i *= 1.5) {
+        if (i < 3600000) {
+            EXPECT_EQ(QDateTime::fromTime_t(static_cast<uint>(i / 1000)).toUTC().toString("mm:ss"), m_utils->formatMillisecond(i, 4));
+        } else {
+            EXPECT_EQ("60:00", m_utils->formatMillisecond(i, 4));
+        }
+    }
     tmpvoicesize = 18901111;
-    m_utils->formatMillisecond(tmpvoicesize);
+    EXPECT_EQ("60:00", m_utils->formatMillisecond(tmpvoicesize));
 }

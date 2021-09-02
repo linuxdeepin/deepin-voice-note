@@ -37,15 +37,15 @@ void ut_vnoteforlder_test::TearDown()
 
 TEST_F(ut_vnoteforlder_test, isValid)
 {
-    m_vnoteforlder->isValid();
+    EXPECT_EQ(true, m_vnoteforlder->isValid());
 }
 
 TEST_F(ut_vnoteforlder_test, maxNoteIdRef)
 {
-    m_vnoteforlder->maxNoteIdRef();
+    EXPECT_EQ(2, m_vnoteforlder->maxNoteIdRef());
 }
 
 TEST_F(ut_vnoteforlder_test, getNotesCount)
 {
-    m_vnoteforlder->getNotesCount();
+    EXPECT_EQ(2, m_vnoteforlder->getNotesCount());
 }
