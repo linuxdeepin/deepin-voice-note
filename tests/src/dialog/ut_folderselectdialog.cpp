@@ -34,7 +34,10 @@ TEST_F(ut_folderselectdialog_test, setNoteContext)
     QStandardItemModel data;
     FolderSelectDialog folderselectdialog(&data);
     folderselectdialog.setNoteContextInfo("test", 1);
-    folderselectdialog.getSelectIndex();
+    EXPECT_EQ(Qt::AlignCenter, folderselectdialog.m_noteInfo->alignment()) << "alignment";
+    EXPECT_EQ("test", folderselectdialog.m_notesName) << "m_notesName";
+    EXPECT_EQ(1, folderselectdialog.m_notesNumber) << "m_notesNumber";
+    EXPECT_EQ(-1, folderselectdialog.getSelectIndex().row());
 }
 
 TEST_F(ut_folderselectdialog_test, clearSelection)
@@ -42,6 +45,7 @@ TEST_F(ut_folderselectdialog_test, clearSelection)
     QStandardItemModel data;
     FolderSelectDialog folderselectdialog(&data);
     folderselectdialog.clearSelection();
+    EXPECT_FALSE(folderselectdialog.m_confirmBtn->isEnabled());
 }
 
 TEST_F(ut_folderselectdialog_test, hideEvent)
@@ -50,6 +54,8 @@ TEST_F(ut_folderselectdialog_test, hideEvent)
     FolderSelectDialog folderselectdialog(&data);
     QHideEvent *event = new QHideEvent();
     folderselectdialog.hideEvent(event);
+    EXPECT_FALSE(folderselectdialog.m_closeButton->testAttribute(Qt::WA_UnderMouse)) << "attribute";
+    EXPECT_FALSE(folderselectdialog.m_view->hasFocus()) << "hasfocus";
     delete event;
 }
 
@@ -57,8 +63,21 @@ TEST_F(ut_folderselectdialog_test, refreshTextColor)
 {
     QStandardItemModel dataModel;
     FolderSelectDialog folderselectdialog(&dataModel);
+    QColor colorDark = QColor(255, 255, 255);
     folderselectdialog.refreshTextColor(true);
+    EXPECT_EQ(colorDark, folderselectdialog.m_labMove->palette().windowText().color())
+        << "dark is true, m_view color";
+    colorDark.setAlphaF(0.7);
+    EXPECT_EQ(colorDark, folderselectdialog.m_noteInfo->palette().windowText().color())
+        << "dark is true, m_noteInfo color";
+    QColor color = QColor(0, 0, 0, 1);
+    color.setAlphaF(0.9);
     folderselectdialog.refreshTextColor(false);
+    EXPECT_EQ(color, folderselectdialog.m_labMove->palette().windowText().color())
+        << "dark is false, m_view color";
+    color.setAlphaF(0.7);
+    EXPECT_EQ(color, folderselectdialog.m_noteInfo->palette().windowText().color())
+        << "dark is false, m_noteInfo color";
 }
 
 TEST_F(ut_folderselectdialog_test, setFolderBlack)
@@ -69,5 +88,6 @@ TEST_F(ut_folderselectdialog_test, setFolderBlack)
     QList<VNoteFolder *> blackList;
     blackList.push_back(folder1);
     folderselectdialog.setFolderBlack(blackList);
+    EXPECT_EQ(blackList, folderselectdialog.m_model->m_blackFolders);
     delete folder1;
 }

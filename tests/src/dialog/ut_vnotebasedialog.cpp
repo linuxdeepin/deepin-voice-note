@@ -18,6 +18,7 @@
 
 #include "ut_vnotebasedialog.h"
 #include "vnotebasedialog.h"
+#include <QVBoxLayout>
 
 ut_vnotebasedialog_test::ut_vnotebasedialog_test()
 {
@@ -27,18 +28,22 @@ TEST_F(ut_vnotebasedialog_test, setTitle)
 {
     VNoteBaseDialog vnotebasedialog;
     vnotebasedialog.setTitle("test");
+    EXPECT_EQ("test", vnotebasedialog.m_tileText->text());
 }
 
 TEST_F(ut_vnotebasedialog_test, getContentLayout)
 {
     VNoteBaseDialog vnotebasedialog;
-    vnotebasedialog.getContentLayout();
+    EXPECT_TRUE(vnotebasedialog.getContentLayout());
 }
 
 TEST_F(ut_vnotebasedialog_test, setLogoVisable)
 {
     VNoteBaseDialog vnotebasedialog;
-    vnotebasedialog.setLogoVisable();
+    vnotebasedialog.setLogoVisable(true);
+    EXPECT_FALSE(vnotebasedialog.m_logoIcon->isVisible()) << "visible is true";
+    vnotebasedialog.setLogoVisable(false);
+    EXPECT_FALSE(vnotebasedialog.m_logoIcon->isVisible()) << "visible is false";
 }
 
 TEST_F(ut_vnotebasedialog_test, setIconPixmap)
@@ -46,6 +51,7 @@ TEST_F(ut_vnotebasedialog_test, setIconPixmap)
     VNoteBaseDialog vnotebasedialog;
     QPixmap iconpixmap;
     vnotebasedialog.setIconPixmap(iconpixmap);
+    EXPECT_EQ(iconpixmap, *(vnotebasedialog.m_logoIcon->pixmap()));
 }
 
 TEST_F(ut_vnotebasedialog_test, addContent)
@@ -53,6 +59,7 @@ TEST_F(ut_vnotebasedialog_test, addContent)
     VNoteBaseDialog vnotebasedialog;
     QWidget *content = new QWidget;
     vnotebasedialog.addContent(content);
+    EXPECT_EQ(1, vnotebasedialog.m_contentLayout->count());
     delete content;
 }
 
@@ -69,5 +76,6 @@ TEST_F(ut_vnotebasedialog_test, showEvent)
     VNoteBaseDialog vnotebasedialog;
     QShowEvent *event = new QShowEvent;
     vnotebasedialog.showEvent(event);
+    EXPECT_EQ(QSize(380, 140), vnotebasedialog.size());
     delete event;
 }
