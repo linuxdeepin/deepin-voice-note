@@ -30,9 +30,11 @@ ut_vnotedbmanager_test::ut_vnotedbmanager_test()
 TEST_F(ut_vnotedbmanager_test, initVNoteDb)
 {
     VNoteDbManager::instance()->initVNoteDb();
+    EXPECT_TRUE(VNoteDbManager::instance()->m_vnoteDB.isValid());
 }
 
 TEST_F(ut_vnotedbmanager_test, getVNoteDb)
 {
     VNoteDbManager::instance()->getVNoteDb();
+    EXPECT_TRUE(VNoteDbManager::instance()->m_vnoteDB.isValid());
 }

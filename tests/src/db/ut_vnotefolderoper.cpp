@@ -41,37 +41,38 @@ void ut_vnotefolderoper_test::TearDown()
 
 TEST_F(ut_vnotefolderoper_test, deleteVNoteFolder)
 {
-    m_vnotefolderoper->deleteVNoteFolder(4);
+    EXPECT_FALSE(m_vnotefolderoper->deleteVNoteFolder(4));
 }
 
 TEST_F(ut_vnotefolderoper_test, renameVNoteFolder)
 {
     QString foldername = "test";
-    m_vnotefolderoper->renameVNoteFolder(foldername);
+    EXPECT_FALSE(m_vnotefolderoper->renameVNoteFolder(foldername));
 }
 
 TEST_F(ut_vnotefolderoper_test, loadVNoteFolders)
 {
     VNOTE_FOLDERS_MAP *folders = m_vnotefolderoper->loadVNoteFolders();
+    EXPECT_FALSE(folders == nullptr);
     delete folders;
 }
 
 TEST_F(ut_vnotefolderoper_test, getNotesCount)
 {
-    m_vnotefolderoper->getNotesCount();
+    EXPECT_TRUE(m_vnotefolderoper->getNotesCount() >= 0);
 }
 
 TEST_F(ut_vnotefolderoper_test, getDefaultIcon)
 {
-    m_vnotefolderoper->getDefaultIcon();
+    EXPECT_TRUE(m_vnotefolderoper->getDefaultIcon() >= 0);
 }
 
 TEST_F(ut_vnotefolderoper_test, getFoldersCount)
 {
-    m_vnotefolderoper->getFoldersCount();
+    EXPECT_TRUE(m_vnotefolderoper->getFoldersCount() > 0);
 }
 
 TEST_F(ut_vnotefolderoper_test, getDefaultFolderName)
 {
-    m_vnotefolderoper->getDefaultFolderName();
+    EXPECT_FALSE(m_vnotefolderoper->getDefaultFolderName().isEmpty());
 }

@@ -49,17 +49,18 @@ void ut_vnoteitemoper_test::TearDown()
 TEST_F(ut_vnoteitemoper_test, loadAllVNotes)
 {
     VNOTE_ALL_NOTES_MAP *notes = m_vnoteitemoper->loadAllVNotes();
+    EXPECT_FALSE(nullptr == notes);
     delete notes;
 }
 
 TEST_F(ut_vnoteitemoper_test, modifyNoteTitle)
 {
-    m_vnoteitemoper->modifyNoteTitle("test");
+    EXPECT_FALSE(m_vnoteitemoper->modifyNoteTitle("test"));
 }
 
 TEST_F(ut_vnoteitemoper_test, updateNote)
 {
-    m_vnoteitemoper->updateNote();
+    EXPECT_FALSE(m_vnoteitemoper->updateNote());
 }
 
 TEST_F(ut_vnoteitemoper_test, addNote)
@@ -70,9 +71,9 @@ TEST_F(ut_vnoteitemoper_test, addNote)
     tmpNote.noteTitle = m_vnoteitemoper->getDefaultNoteName(tmpNote.folderId);
     VNoteBlock *ptrBlock1 = tmpNote.newBlock(VNoteBlock::Text);
     tmpNote.addBlock(ptrBlock1);
-    m_vnoteitemoper->addNote(tmpNote);
+    EXPECT_TRUE(m_vnoteitemoper->addNote(tmpNote) == nullptr);
     VNoteItemOper op(&tmpNote);
-    op.deleteNote();
+    EXPECT_FALSE(op.deleteNote());
 }
 
 TEST_F(ut_vnoteitemoper_test, getDefaultVoiceName)
@@ -82,16 +83,16 @@ TEST_F(ut_vnoteitemoper_test, getDefaultVoiceName)
 
 TEST_F(ut_vnoteitemoper_test, updateTop)
 {
-    m_vnoteitemoper->updateTop(!m_note->isTop);
-    m_vnoteitemoper->updateTop(!m_note->isTop);
+    EXPECT_FALSE(m_vnoteitemoper->updateTop(!m_note->isTop));
+    EXPECT_FALSE(m_vnoteitemoper->updateTop(!m_note->isTop));
 }
 
 TEST_F(ut_vnoteitemoper_test, updateFolderId)
 {
-    m_vnoteitemoper->updateFolderId(m_note);
+    EXPECT_FALSE(m_vnoteitemoper->updateFolderId(m_note));
 }
 
 TEST_F(ut_vnoteitemoper_test, getNote)
 {
-    m_vnoteitemoper->getNote(m_note->folderId, m_note->noteId);
+    EXPECT_TRUE(m_vnoteitemoper->getNote(m_note->folderId, m_note->noteId));
 }
