@@ -170,11 +170,13 @@
      border-radius: 8px;
  }
 
+ .note-icon-caret {
+     color: rgba(65, 77, 104, 1)
+ }
+
  .dropdown-menu {
      background: rgba(247, 247, 247, 1);
      width: 233px;
-     /* height: 206px; */
-     /* background: rgba(235,235,235,0.30); */
      border: 1px solid rgba(0, 0, 0, 0.05);
      border-radius: 18px;
      box-shadow: 0px -6px 20px 0px rgba(0, 0, 0, 0.20);
@@ -202,7 +204,7 @@
  }
 
  .colorFont {
-     color: #000;
+     color: rgba(65, 77, 104, 1);
      margin: 3px;
      font-size: 12px;
  }
@@ -289,6 +291,7 @@
 
  .note-current-fontsize {
      margin-right: 2px;
+     color: rgba(65, 77, 104, 1)
  }
 
  .note-forecolor {

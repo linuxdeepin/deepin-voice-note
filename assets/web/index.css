@@ -2,7 +2,8 @@ body {
     padding: 0px;
     line-height: 1.7;
     font-family: 'Helvetica';
-    background-color: transparent!important;
+    background-color: transparent;
+    color: rgba(65, 77, 104, 1)
 }
 
 .demo {

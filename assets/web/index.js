@@ -303,7 +303,7 @@ new QWebChannel(qt.webChannelTransport,
         webobj.calllJsShowEditToolbar.connect(showRightMenu);
         webobj.callJsHideEditToolbar.connect(hideRightMenu);
         webobj.callJsClipboardDataChanged.connect(shearPlateChange);
-
+        webobj.callJsSetVoicePlayBtnEnable.connect(playButColor);
 
         //通知QT层完成通信绑定
         webobj.jsCallChannleFinish();
@@ -340,6 +340,21 @@ function initData(text) {
     // 搜索功能
     webobj.jsCallSetDataFinsh();
     initFinish = true;
+}
+
+/**
+ * 播放按钮置灰
+ * @date 2021-09-03
+ * @param {boolean} status false禁用 true启用
+ * @returns {any}
+ */
+function playButColor(status) {
+    console.log(status)
+    if (!status) {
+        $('.voicebtn').css('background-color', 'rgba(37,183,255,1)')
+    } else {
+        $('.voicebtn').css('background-color', '#0183FF')
+    }
 }
 
 //录音插入数据
@@ -435,11 +450,18 @@ function setVoiceText(text, flag) {
             webobj.jsCallTxtChange();
             activeTransVoice = null;
             bTransVoiceIsReady = true;
+
+            // 移除选区
+            var sel = window.getSelection();
+            var range = sel.getRangeAt(0);
+            sel.removeRange(range)
+            $('.li').removeClass('active');
         }
         else {
             activeTransVoice.find('.translate').html('<div class="noselect">' + text + '</div>');
             bTransVoiceIsReady = false;
         }
+
     }
 }
 
@@ -559,86 +581,34 @@ function rightClick(e) {
  * @returns {any}
  */
 function changeColor(flag, activeColor) {
-    console.log(activeColor)
-    $('.dropdown-fontsize>li>a').hover(function (e) {
 
+    $('.dropdown-fontsize>li>a').hover(function (e) {
         $(this).css('background-color', activeColor);
         $(this).css('color', '#fff');
 
     }, function () {
         $('.dropdown-fontsize>li>a').css('background-color', 'transparent');
-        $('.dropdown-fontsize>li>a').css('color', "black");
+        if (flag == 1) {
 
+            $('.dropdown-fontsize>li>a').css('color', "black");
+        } else {
+            $('.dropdown-fontsize>li>a').css('color', "rgba(197,207,224,1)");
+        }
     })
 
     if (flag == 1) {
-        $('body').css({
-            // 'background': 'rgba(255,255,255,1)',
-            "color": 'rgba(65,77,104,1)'
-        })
-        $('.title').css({
-            "color": 'rgba(0,26,46,1)'
-        })
-        $('.time').css({
-            "color": 'rgba(65,77,104,1)'
-        })
-        $('.li').css({
-            "background": 'rgba(0,0,0,0.05)'
-        })
-        $('.minute').css({
-            "color": 'rgba(138,161,180,1)'
-        })
-        $('.note-popover .popover-content').css({
-            "background": 'rgba(247,247,247,1)'
-        })
-        $('.note-current-fontsize').css({
-            "color": 'rgba(65,77,104,1)'
-        })
-        $('.note-icon-caret').css({
-            "color": 'rgba(65,77,104,1)'
-        })
-        $('.dropdown-menu').css({
-            "background": 'rgba(247,247,247,1)'
-        })
-        $('.colorFont').css({
-            "color": 'rgba(65,77,104,1)'
-        })
+        $('#dark').remove()
         changeIconColor('lightColor');
     } else {
-        $('body').css({
-            // 'background': 'rgba(40,40,40,1)',
-            "color": 'rgba(192,198,212,1)'
-        })
-        $('.title , .time').css({
-            "color": 'rgba(192,198,212,1)'
-        })
-        $('.li').css({
-            "background": 'rgba(255,255,255,0.05)'
-        })
-        $('.minute').css({
-            "color": 'rgba(109,124,136,1)'
-        })
-        $('.note-popover .popover-content').css({
-            "background": 'rgba(42,42,42,1)'
-        })
-        $('.note-current-fontsize').css({
-            "color": 'rgba(197,207,224,1)'
-        })
-        $('.note-icon-caret').css({
-            "color": 'rgba(197,207,224,1)'
-        })
-        $('.note-popover .popover-content i').css({
-            "color": '#C5CFE0'
-        })
-        $('.dropdown-menu').css({
-            "background": 'rgba(42,42,42,1)'
-        })
-        $('.colorFont').css({
-            "color": 'rgba(192,198,212,1)'
-        })
-        $('.dropdown-fontsize li a').css({
-            "color": 'rgba(192,198,212,1)'
-        })
+        $("head").append("<link>");
+        var css = $("head").children(":last");
+        css.attr({
+            id: 'dark',
+            rel: "stylesheet",
+            type: "text/css",
+            href: "./css/dark.css"
+        });
+
         changeIconColor('darkColor');
     }
 
@@ -679,6 +649,7 @@ function insertImg(urlStr) {
     urlStr.forEach((item, index) => {
         $("#summernote").summernote('insertImage', item, 'img');
     })
+    setFocus()
 }
 
 // 禁用ctrl+v
@@ -722,3 +693,8 @@ function hideRightMenu() {
     $('#summernote').summernote('airPopover.hide')
 }
 
+function setFocus() {
+    console.log('setFocus')
+    // document.querySelector('.note-editable').focus()
+    $('#summernote').summernote('editor.focus')
+}

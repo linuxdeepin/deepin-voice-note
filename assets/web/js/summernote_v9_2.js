@@ -4347,10 +4347,14 @@
                 }
 
                 $image.show();
+
+                if ($(range.create(_this.editable).sc).closest('li').prop("tagName") == 'LI') {
+                    $image.css('width', $(range.create(_this.editable).sc).closest('li').width());
+                }
+
                 range.create(_this.editable).insertNode($image[0]);
                 range.createFromNodeAfter($image[0]).select();
                 _this.afterCommand();
-
                 let voiceBoxList = document.querySelectorAll('.voiceBox')
                 voiceBoxList.forEach((item, index) => {
                     if ($(item).find('img').length != 0) {
@@ -4359,7 +4363,7 @@
                     }
 
                 })
-                resizeImg()
+                // resizeImg()
             }).fail(function (e) {
                 _this.context.triggerEvent('image.upload.error', e);
             });

@@ -1,0 +1,43 @@
+body {
+    color: rgba(192, 198, 212, 1)!important;
+}
+
+.title, .tiem {
+    color: rgba(192, 198, 212, 1)!important
+}
+
+.li {
+    background: rgba(255, 255, 255, 0.05)
+}
+
+.minute {
+    color: rgba(109, 124, 136, 1)!important
+}
+
+.note-popover .popover-content {
+    background: rgba(42, 42, 42, 1)!important
+}
+
+.note-current-fontsize {
+    color: rgba(197, 207, 224, 1)!important
+}
+
+.note-icon-caret {
+    color: rgba(197, 207, 224, 1)!important
+}
+
+.note-popover .popover-content i {
+    color: #C5CFE0!important
+}
+
+.dropdown-menu {
+    background: rgba(42, 42, 42, 1)!important
+}
+
+.colorFont {
+    color: rgba(192, 198, 212, 1)!important
+}
+
+.dropdown-fontsize li a {
+    color: rgba(192, 198, 212, 1)!important
+}
