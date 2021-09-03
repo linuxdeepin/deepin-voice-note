@@ -925,14 +925,9 @@ void VNoteMainWindow::onPreviewShortcut()
         {DApplication::translate("Shortcuts", "Delete note"), "Delete"},
         {DApplication::translate("Shortcuts", "Play/Pause"), "Space"},
         {DApplication::translate("Shortcuts", "Record voice"), "Ctrl+R"},
-        {DApplication::translate("Shortcuts", "Save as MP3"), "Ctrl+P"},
         {DApplication::translate("Shortcuts", "Save as TXT"), "Ctrl+S"},
         {DApplication::translate("Shortcuts", "Save recordings"), "Ctrl+Y"},
     };
-
-    if (stateOperation->isAiSrvExist()) {
-        shortcutNoteKeymap.insert(DApplication::translate("Shortcuts", "Voice to Text"), "Ctrl+W");
-    }
 
     QJsonObject noteJsonGroup;
     noteJsonGroup.insert("groupName", DApplication::translate("ShortcutsGroups", "Notes"));
