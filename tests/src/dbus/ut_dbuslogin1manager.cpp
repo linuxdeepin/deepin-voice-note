@@ -44,276 +44,276 @@ TEST_F(ut_dbuslogin1manager_test, staticInterfaceName)
 
 TEST_F(ut_dbuslogin1manager_test, blockInhibited)
 {
-    m_loginManager->blockInhibited();
+    EXPECT_TRUE(m_loginManager->blockInhibited().isEmpty());
 }
 
 TEST_F(ut_dbuslogin1manager_test, controlGroupHierarchy)
 {
-    m_loginManager->controlGroupHierarchy();
+    EXPECT_TRUE(m_loginManager->controlGroupHierarchy().isEmpty());
 }
 
 TEST_F(ut_dbuslogin1manager_test, controllers)
 {
-    m_loginManager->controllers();
+    EXPECT_TRUE(m_loginManager->controllers().isEmpty());
 }
 
 TEST_F(ut_dbuslogin1manager_test, delayInhibited)
 {
-    m_loginManager->delayInhibited();
+    EXPECT_TRUE(m_loginManager->delayInhibited().isEmpty());
 }
 
 TEST_F(ut_dbuslogin1manager_test, handleHibernateKey)
 {
-    m_loginManager->handleHibernateKey();
+    EXPECT_TRUE(m_loginManager->handleHibernateKey().isEmpty());
 }
 
 TEST_F(ut_dbuslogin1manager_test, handleLidSwitch)
 {
-    m_loginManager->handleLidSwitch();
+    EXPECT_TRUE(m_loginManager->handleLidSwitch().isEmpty());
 }
 
 TEST_F(ut_dbuslogin1manager_test, handlePowerKey)
 {
-    m_loginManager->handlePowerKey();
+    EXPECT_TRUE(m_loginManager->handlePowerKey().isEmpty());
 }
 
 TEST_F(ut_dbuslogin1manager_test, handleSuspendKey)
 {
-    m_loginManager->handleSuspendKey();
+    EXPECT_TRUE(m_loginManager->handleSuspendKey().isEmpty());
 }
 
 TEST_F(ut_dbuslogin1manager_test, idleAction)
 {
-    m_loginManager->idleAction();
+    EXPECT_TRUE(m_loginManager->idleAction().isEmpty());
 }
 
 TEST_F(ut_dbuslogin1manager_test, idleActionUSec)
 {
-    m_loginManager->idleActionUSec();
+    EXPECT_EQ(0, m_loginManager->idleActionUSec());
 }
 
 TEST_F(ut_dbuslogin1manager_test, idleHint)
 {
-    m_loginManager->idleHint();
+    EXPECT_FALSE(m_loginManager->idleHint());
 }
 
 TEST_F(ut_dbuslogin1manager_test, idleSinceHint)
 {
-    m_loginManager->idleSinceHint();
+    EXPECT_FALSE(m_loginManager->idleSinceHint());
 }
 
 TEST_F(ut_dbuslogin1manager_test, idleSinceHintMonotonic)
 {
-    m_loginManager->idleSinceHintMonotonic();
+    EXPECT_FALSE(m_loginManager->idleSinceHintMonotonic());
 }
 
 TEST_F(ut_dbuslogin1manager_test, inhibitDelayMaxUSec)
 {
-    m_loginManager->inhibitDelayMaxUSec();
+    EXPECT_FALSE(m_loginManager->inhibitDelayMaxUSec());
 }
 
 TEST_F(ut_dbuslogin1manager_test, killExcludeUsers)
 {
-    m_loginManager->killExcludeUsers();
+    EXPECT_TRUE(m_loginManager->killExcludeUsers().isEmpty());
 }
 
 TEST_F(ut_dbuslogin1manager_test, killOnlyUsers)
 {
-    m_loginManager->killOnlyUsers();
+    EXPECT_TRUE(m_loginManager->killOnlyUsers().isEmpty());
 }
 
 TEST_F(ut_dbuslogin1manager_test, killUserProcesses)
 {
-    m_loginManager->killUserProcesses();
+    EXPECT_FALSE(m_loginManager->killUserProcesses());
 }
 
 TEST_F(ut_dbuslogin1manager_test, nAutoVTs)
 {
-    m_loginManager->nAutoVTs();
+    EXPECT_FALSE(m_loginManager->nAutoVTs());
 }
 
 TEST_F(ut_dbuslogin1manager_test, preparingForShutdown)
 {
-    m_loginManager->preparingForShutdown();
+    EXPECT_FALSE(m_loginManager->preparingForShutdown());
 }
 
 TEST_F(ut_dbuslogin1manager_test, preparingForSleep)
 {
-    m_loginManager->preparingForSleep();
+    EXPECT_FALSE(m_loginManager->preparingForSleep());
 }
 
 TEST_F(ut_dbuslogin1manager_test, resetControllers)
 {
-    m_loginManager->resetControllers();
+    EXPECT_TRUE(m_loginManager->resetControllers().isEmpty());
 }
 
 TEST_F(ut_dbuslogin1manager_test, ActivateSession)
 {
-    m_loginManager->ActivateSession("");
+    EXPECT_FALSE(m_loginManager->ActivateSession("").isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, ActivateSessionOnSeat)
 {
-    m_loginManager->ActivateSessionOnSeat("", "");
+    EXPECT_FALSE(m_loginManager->ActivateSessionOnSeat("", "").isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, AttachDevice)
 {
-    m_loginManager->AttachDevice("", "", false);
+    EXPECT_FALSE(m_loginManager->AttachDevice("", "", false).isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, CanHibernate)
 {
-    m_loginManager->CanHibernate();
+    EXPECT_FALSE(m_loginManager->CanHibernate().isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, CanHybridSleep)
 {
-    m_loginManager->CanHybridSleep();
+    EXPECT_FALSE(m_loginManager->CanHybridSleep().isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, CanPowerOff)
 {
-    m_loginManager->CanPowerOff();
+    EXPECT_FALSE(m_loginManager->CanPowerOff().isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, CanReboot)
 {
-    m_loginManager->CanReboot();
+    EXPECT_FALSE(m_loginManager->CanReboot().isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, CanSuspend)
 {
-    m_loginManager->CanSuspend();
+    EXPECT_FALSE(m_loginManager->CanSuspend().isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, FlushDevices)
 {
-    m_loginManager->FlushDevices(false);
+    EXPECT_FALSE(m_loginManager->FlushDevices(false).isValid());
 }
 TEST_F(ut_dbuslogin1manager_test, GetSeat)
 {
-    m_loginManager->GetSeat("");
+    EXPECT_FALSE(m_loginManager->GetSeat("").isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, GetSession)
 {
-    m_loginManager->GetSession("");
+    EXPECT_FALSE(m_loginManager->GetSession("").isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, GetSessionByPID)
 {
-    m_loginManager->GetSessionByPID(0);
+    EXPECT_FALSE(m_loginManager->GetSessionByPID(0).isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, GetUser)
 {
-    m_loginManager->GetUser(0);
+    EXPECT_FALSE(m_loginManager->GetUser(0).isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, Hibernate)
 {
-    m_loginManager->Hibernate(false);
+    EXPECT_FALSE(m_loginManager->Hibernate(false).isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, HybridSleep)
 {
-    m_loginManager->HybridSleep(false);
+    EXPECT_FALSE(m_loginManager->HybridSleep(false).isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, Inhibit)
 {
-    m_loginManager->Inhibit("", "", "", "");
+    EXPECT_FALSE(m_loginManager->Inhibit("", "", "", "").isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, KillSession)
 {
-    m_loginManager->KillSession("", "", "");
+    EXPECT_FALSE(m_loginManager->KillSession("", "", "").isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, KillUser)
 {
-    m_loginManager->KillUser(0, "");
+    EXPECT_FALSE(m_loginManager->KillUser(0, "").isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, ListInhibitors)
 {
-    m_loginManager->ListInhibitors();
+    EXPECT_FALSE(m_loginManager->ListInhibitors().isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, ListSeats)
 {
-    m_loginManager->ListSeats();
+    EXPECT_FALSE(m_loginManager->ListSeats().isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, ListSessions)
 {
-    m_loginManager->ListSessions();
+    EXPECT_FALSE(m_loginManager->ListSessions().isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, ListUsers)
 {
-    m_loginManager->ListUsers();
+    EXPECT_FALSE(m_loginManager->ListUsers().isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, LockSession)
 {
-    m_loginManager->LockSession("");
+    EXPECT_FALSE(m_loginManager->LockSession("").isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, LockSessions)
 {
-    m_loginManager->LockSessions();
+    EXPECT_FALSE(m_loginManager->LockSessions().isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, PowerOff)
 {
-    m_loginManager->PowerOff(false);
+    EXPECT_FALSE(m_loginManager->PowerOff(false).isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, Reboot)
 {
-    m_loginManager->Reboot(false);
+    EXPECT_FALSE(m_loginManager->Reboot(false).isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, ReleaseSession)
 {
-    m_loginManager->ReleaseSession("");
+    EXPECT_FALSE(m_loginManager->ReleaseSession("").isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, SetUserLinger)
 {
-    m_loginManager->SetUserLinger(0, false, false);
+    EXPECT_FALSE(m_loginManager->SetUserLinger(0, false, false).isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, Suspend)
 {
-    m_loginManager->Suspend(false);
+    EXPECT_FALSE(m_loginManager->Suspend(false).isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, TerminateSeat)
 {
-    m_loginManager->TerminateSeat("");
+    EXPECT_FALSE(m_loginManager->TerminateSeat("").isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, TerminateSession)
 {
-    m_loginManager->TerminateSession("");
+    EXPECT_FALSE(m_loginManager->TerminateSession("").isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, TerminateUser)
 {
-    m_loginManager->TerminateUser(0);
+    EXPECT_FALSE(m_loginManager->TerminateUser(0).isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, UnlockSession)
 {
-    m_loginManager->UnlockSession("");
+    EXPECT_FALSE(m_loginManager->UnlockSession("").isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, UnlockSessions)
 {
-    m_loginManager->UnlockSessions();
+    EXPECT_FALSE(m_loginManager->UnlockSessions().isValid());
 }
 
 TEST_F(ut_dbuslogin1manager_test, __propertyChanged__)

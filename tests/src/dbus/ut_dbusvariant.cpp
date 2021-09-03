@@ -34,7 +34,8 @@ TEST_F(ut_dbusvariant_test, testout)
     inhibit.pid = 2;
     QDBusArgument argument;
     argument << inhibit;
-    argument >> inhibit;
+    Inhibit inhibit2;
+    argument >> inhibit2;
 }
 
 TEST_F(ut_dbusvariant_test, UserInfo)
