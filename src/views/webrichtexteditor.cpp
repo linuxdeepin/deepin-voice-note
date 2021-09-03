@@ -71,6 +71,7 @@ void WebRichTextEditor::initWebView()
     QFileInfo info(webPage);
     load(QUrl::fromLocalFile(info.absoluteFilePath()));
     this->installEventFilter(this);
+    page()->setBackgroundColor(DGuiApplicationHelper::instance()->applicationPalette().base().color());
 
     connect(content, &JsContent::textChange, this, &WebRichTextEditor::onTextChange);
     connect(content, &JsContent::setDataFinsh, this, &WebRichTextEditor::onSetDataFinsh);
@@ -499,6 +500,7 @@ void WebRichTextEditor::onThemeChanged()
     DGuiApplicationHelper *dAppHelper = DGuiApplicationHelper::instance();
     //获取系统高亮色
     QString color = dAppHelper->applicationPalette().highlight().color().name();
+    page()->setBackgroundColor(dAppHelper->applicationPalette().base().color());
     //获取系统主题类型
     DGuiApplicationHelper::ColorType theme = dAppHelper->themeType();
     emit JsContent::instance()->callJsSetTheme(theme, color);
