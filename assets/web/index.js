@@ -100,8 +100,17 @@ $('#summernote').summernote({
 // 监听窗口大小变化
 $(window).resize(function () {
     $('.note-editable').css('min-height', $(window).height())
-    $('.note-editable').find("img").width($('.note-editable').width())
+    // $('.note-editable').find("img").width($('.note-editable').width())
+    resizeImg()
 });
+
+// 重置图片宽度
+function resizeImg() {
+    let imgs = document.querySelectorAll('.note-editable img')
+    imgs.forEach((item, index) => {
+        $(item).width($(item).parent().width())
+    })
+}
 
 /**
  * 通知后台存储页面内容
@@ -549,7 +558,19 @@ function rightClick(e) {
  * @param {any} flag 1浅色 2深色
  * @returns {any}
  */
-function changeColor(flag) {
+function changeColor(flag, activeColor) {
+    console.log(activeColor)
+    $('.dropdown-fontsize>li>a').hover(function (e) {
+
+        $(this).css('background-color', activeColor);
+        $(this).css('color', '#fff');
+
+    }, function () {
+        $('.dropdown-fontsize>li>a').css('background-color', 'transparent');
+        $('.dropdown-fontsize>li>a').css('color', "black");
+
+    })
+
     if (flag == 1) {
         $('body').css({
             // 'background': 'rgba(255,255,255,1)',
@@ -685,7 +706,13 @@ $('body').on('dblclick', 'img', function (e) {
     webobj.jsCallViewPicture(imgUrl)
 })
 
-// 右键显示悬浮工具栏
+/**
+ * 右键显示悬浮工具栏
+ * @date 2021-09-03
+ * @param {any} x 坐标
+ * @param {any} y 坐标
+ * @returns {any}
+ */
 function showRightMenu(x, y) {
     $('#summernote').summernote('airPopover.rightUpdate', x, y)
 }

@@ -4341,13 +4341,25 @@
                     if (typeof param === 'string') {
                         $image.attr('data-filename', param);
                     }
-                    $image.css('width', Math.min(_this.$editable.width(), $image.width()));
+                    // $image.css('width', Math.min(_this.$editable.width(), $image.width()));
+                    $image.css('width', _this.$editable.width());
+
                 }
 
                 $image.show();
                 range.create(_this.editable).insertNode($image[0]);
                 range.createFromNodeAfter($image[0]).select();
                 _this.afterCommand();
+
+                let voiceBoxList = document.querySelectorAll('.voiceBox')
+                voiceBoxList.forEach((item, index) => {
+                    if ($(item).find('img').length != 0) {
+                        $(item).after($(item).clone().html())
+                        $(item).remove()
+                    }
+
+                })
+                resizeImg()
             }).fail(function (e) {
                 _this.context.triggerEvent('image.upload.error', e);
             });
