@@ -1641,6 +1641,8 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         break;
     case RecordStart:
         stateOperation->operState(OpsStateInterface::StateRecording, true);
+        //录音时设置播放按钮不可用
+        emit JsContent::instance()->callJsSetVoicePlayBtnEnable(false);
         m_noteSearchEdit->setEnabled(false);
         m_leftView->setOnlyCurItemMenuEnable(true);
         m_leftView->closeMenu();
@@ -1651,6 +1653,8 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNoteBtn->setDisabled(true);
         break;
     case RecordEnd:
+        //结束录音时设置播放按钮可用
+        emit JsContent::instance()->callJsSetVoicePlayBtnEnable(true);
         if (!stateOperation->isVoice2Text()) {
             m_noteSearchEdit->setEnabled(true);
             m_leftView->setOnlyCurItemMenuEnable(false);

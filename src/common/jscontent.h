@@ -74,6 +74,7 @@ signals:
 
     void calllJsShowEditToolbar(int x, int y); //显示编辑工具栏
     void callJsHideEditToolbar(); //隐藏编辑工具栏
+    void callJsSetVoicePlayBtnEnable(bool enable); //设置播放按钮是否可用
 
     void textPaste(); //粘贴信号
     void textChange();
