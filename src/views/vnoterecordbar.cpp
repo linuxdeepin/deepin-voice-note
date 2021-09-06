@@ -199,6 +199,8 @@ void VNoteRecordBar::onClosePlayWidget(VNVoiceBlock *voiceData)
  */
 void VNoteRecordBar::playVoice(VNVoiceBlock *voiceData, bool bIsSame)
 {
+    //焦点切换到当前窗口，响应播放快捷键
+    setFocus();
     m_mainLayout->setCurrentWidget(m_playPanel);
     m_playPanel->playVoice(voiceData, bIsSame);
 }
