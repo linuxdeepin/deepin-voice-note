@@ -70,6 +70,10 @@ var voiceIntervalObj;    //语音播放动画定时器对象
 var isVoicePaste = false
 var isShowAir = true
 var nowClickVoice = null
+
+var global_activeColor = ''
+var global_disableColor = ''
+
 $(document).ready(function () {
     // var u = navigator.userAgent;
 
@@ -349,11 +353,11 @@ function initData(text) {
  * @returns {any}
  */
 function playButColor(status) {
-    console.log(status)
     if (!status) {
-        $('.voicebtn').css('background-color', 'rgba(37,183,255,1)')
+        setVoiceButColor(global_disableColor)
+
     } else {
-        $('.voicebtn').css('background-color', '#0183FF')
+        setVoiceButColor(global_activeColor)
     }
 }
 
@@ -574,13 +578,29 @@ function rightClick(e) {
     // e.preventDefault()
 }
 
+
+/**
+ * 设置播放按钮颜色
+ * @date 2021-09-06
+ * @param {any} color
+ * @returns {any}
+ */
+function setVoiceButColor(color) {
+    $("style").html('.voiceBox .voicebtn{background-color:' + color + '}')
+}
+
 /**
  * 深色浅色变换
  * @date 2021-08-19
  * @param {any} flag 1浅色 2深色
  * @returns {any}
  */
-function changeColor(flag, activeColor) {
+function changeColor(flag, activeColor, disableColor) {
+
+    global_activeColor = activeColor
+    global_disableColor = disableColor
+
+    setVoiceButColor(global_activeColor)
 
     $('.dropdown-fontsize>li>a').hover(function (e) {
         $(this).css('background-color', activeColor);
@@ -589,15 +609,14 @@ function changeColor(flag, activeColor) {
     }, function () {
         $('.dropdown-fontsize>li>a').css('background-color', 'transparent');
         if (flag == 1) {
-
             $('.dropdown-fontsize>li>a').css('color', "black");
         } else {
             $('.dropdown-fontsize>li>a').css('color', "rgba(197,207,224,1)");
         }
     })
-
     if (flag == 1) {
         $('#dark').remove()
+        $('.dropdown-fontsize>li>a').css('color', "black");
         changeIconColor('lightColor');
     } else {
         $("head").append("<link>");

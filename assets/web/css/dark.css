@@ -2,7 +2,7 @@ body {
     color: rgba(192, 198, 212, 1)!important;
 }
 
-.title, .tiem {
+.title, .time {
     color: rgba(192, 198, 212, 1)!important
 }
 
@@ -31,7 +31,7 @@ body {
 }
 
 .dropdown-menu {
-    background: rgba(42, 42, 42, 1)!important
+    background: rgba(42, 42, 42, 0.98)!important
 }
 
 .colorFont {
@@ -40,4 +40,24 @@ body {
 
 .dropdown-fontsize li a {
     color: rgba(192, 198, 212, 1)!important
+}
+
+.wifi-symbol .first {
+    background-image: url(../img/d1.svg);
+}
+
+.wifi-symbol .second {
+    background-image: url(../img/d2.svg);
+}
+
+.wifi-symbol .third {
+    background-image: url(../img/d3.svg);
+}
+
+.wifi-symbol .four {
+    background-image: url(../img/d4.svg);
+}
+
+.dropdown-fontsize>li>a {
+    color: rgba(197, 207, 224, 1)
 }
