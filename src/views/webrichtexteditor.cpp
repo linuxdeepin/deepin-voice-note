@@ -498,12 +498,14 @@ void WebRichTextEditor::deleteSelectText()
 void WebRichTextEditor::onThemeChanged()
 {
     DGuiApplicationHelper *dAppHelper = DGuiApplicationHelper::instance();
+    DPalette dp = dAppHelper->applicationPalette();
     //获取系统高亮色
-    QString color = dAppHelper->applicationPalette().highlight().color().name();
-    page()->setBackgroundColor(dAppHelper->applicationPalette().base().color());
+    QString activeHightColor = dp.color(DPalette::Active, DPalette::Highlight).name();
+    QString disableHightColor = dp.color(DPalette::Disabled, DPalette::Highlight).name();
+    page()->setBackgroundColor(dp.base().color());
     //获取系统主题类型
     DGuiApplicationHelper::ColorType theme = dAppHelper->themeType();
-    emit JsContent::instance()->callJsSetTheme(theme, color);
+    emit JsContent::instance()->callJsSetTheme(theme, activeHightColor, disableHightColor);
 }
 
 void WebRichTextEditor::onShowEditToolbar(const QPoint &pos)
