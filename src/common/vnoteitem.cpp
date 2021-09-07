@@ -22,6 +22,7 @@
 #include "common/utils.h"
 
 #include <DLog>
+#include <DGuiApplicationHelper>
 
 #include <QFile>
 #include <QFileInfo>
@@ -307,6 +308,13 @@ QString VNoteItem::getFullHtml() const
 {
     //html字符串
     QString html = htmlHead;
+
+    DPalette dp = DGuiApplicationHelper::instance()->applicationPalette();
+    //获取系统高亮色
+    QString activeHightColor = dp.color(DPalette::Active, DPalette::Highlight).name();
+    //替换颜色
+    html.replace("#0183FF", activeHightColor);
+
     html.append("<body> <div class=\"note-editable\" contenteditable=\"false\">");
     //匹配图片块标签的正则表达式
     QRegExp rx("<img.+src=.+>");
