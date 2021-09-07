@@ -143,11 +143,6 @@ public slots:
      */
     void onHideEditToolbar();
 
-    /**
-     * @brief 编辑区选中内容变化
-     */
-    void onSelectionChange();
-
 protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
     void dropEvent(QDropEvent *event) override;

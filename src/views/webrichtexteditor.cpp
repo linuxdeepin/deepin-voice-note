@@ -82,7 +82,6 @@ void WebRichTextEditor::initWebView()
     connect(content, &JsContent::viewPictrue, this, &WebRichTextEditor::viewPicture);
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
             this, &WebRichTextEditor::onThemeChanged);
-    connect(page(), &QWebEnginePage::selectionChanged, this, &WebRichTextEditor::onSelectionChange);
 }
 
 void WebRichTextEditor::initRightMenu()
@@ -115,9 +114,13 @@ void WebRichTextEditor::initUpdateTimer()
 
 void WebRichTextEditor::initData(VNoteItem *data, const QString &reg, bool focus)
 {
-    if (focus) {
+    //有焦点先隐藏编辑工具栏
+    if (hasFocus()) {
+        emit JsContent::instance()->callJsHideEditToolbar();
+    } else if (focus) {
         setFocus();
     }
+
     if (nullptr == data) {
         this->setVisible(false);
         //无数据时先保存之前数据
@@ -571,14 +574,6 @@ void WebRichTextEditor::onHideEditToolbar()
 {
     //当前鼠标位置不在编辑工具栏上，则隐藏编辑工具栏
     if (!m_editToolbarRect.contains(mapFromGlobal(QCursor::pos()))) {
-        emit JsContent::instance()->callJsHideEditToolbar();
-    }
-}
-
-void WebRichTextEditor::onSelectionChange()
-{
-    //没有选中则隐藏编辑工具栏
-    if (!page()->hasSelection()) {
         emit JsContent::instance()->callJsHideEditToolbar();
     }
 }
