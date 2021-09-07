@@ -93,6 +93,7 @@ $('#summernote').summernote({
             ['italic', ['italic']],
             ['underline', ['underline']],
             ['strikethrough', ['strikethrough']],
+            ['line'],
             ['ul', ['ul']],
             ['ol', ['ol']],
         ],
@@ -225,21 +226,37 @@ document.addEventListener('paste', function (event) {
     removeNullP()
 });
 
-// 判断选区是否包含语音
+
+/**
+ * 判断选区类别
+ * @date 2021-09-06
+ * @returns {int} 1 语音 2 图片 3 文本
+ */
 function isRangVoice() {
-    // 获取当前选区
+    let flag = null
     var selectionObj = window.getSelection();
     var rangeObj = selectionObj.getRangeAt(0);
     var docFragment = rangeObj.cloneContents();
-    // $(docFragment).find('.voiceBox')
-    $(docFragment).find('.voiceBox').addClass('active')
     var testDiv = document.createElement("div");
+    testDiv.appendChild(docFragment)
 
+    let childrenLength = $(testDiv).children().length
+    let voiceLength = $(testDiv).find('.voiceBox').length
+    let imgLength = $(testDiv).find('img').length
+
+    if (voiceLength == childrenLength && childrenLength != 0) {
+        flag = 1
+    } else if (imgLength == childrenLength && childrenLength != 0) {
+        flag = 2
+    } else {
+        flag = 3
+    }
+    return flag
 }
 
 // 监听鼠标抬起事件
 $('body').on('mouseup', function () {
-    isRangVoice()
+    // isRangVoice()
 })
 
 //播放
@@ -580,13 +597,24 @@ function rightClick(e) {
 
 
 /**
- * 设置播放按钮颜色
+ * 设置活动色
  * @date 2021-09-06
  * @param {any} color
  * @returns {any}
  */
 function setVoiceButColor(color) {
-    $("style").html('.voiceBox .voicebtn{background-color:' + color + '}')
+    $("style").html(`
+    
+    .voiceBox .voicebtn {
+        background-color:${color}
+    } 
+    .btn-default.active i {
+        color:${color}!important
+    }
+    .btn-default:active {
+        color:${color}!important
+    }
+    `)
 }
 
 /**
@@ -604,7 +632,7 @@ function changeColor(flag, activeColor, disableColor) {
 
     $('.dropdown-fontsize>li>a').hover(function (e) {
         $(this).css('background-color', activeColor);
-        $(this).css('color', '#fff');
+        // $(this).css('color', '#fff');
 
     }, function () {
         $('.dropdown-fontsize>li>a').css('background-color', 'transparent');
@@ -617,7 +645,6 @@ function changeColor(flag, activeColor, disableColor) {
     if (flag == 1) {
         $('#dark').remove()
         $('.dropdown-fontsize>li>a').css('color', "black");
-        changeIconColor('lightColor');
     } else {
         $("head").append("<link>");
         var css = $("head").children(":last");
@@ -627,35 +654,8 @@ function changeColor(flag, activeColor, disableColor) {
             type: "text/css",
             href: "./css/dark.css"
         });
-
-        changeIconColor('darkColor');
     }
 
-}
-
-/**
- * 改变icon图标颜色
- * @date 2021-08-19
- * @param {any} color
- * @returns {any}
- */
-function changeIconColor(color) {
-    let newColor = color == "lightColor" ? 'lightColor' : "darkColor"
-    let oldColor = color == "lightColor" ? 'darkColor' : "lightColor"
-    let iconList = ['icon-down', 'icon-strikethrough', 'icon-bold', 'icon-italic', 'icon-underline', 'icon-forecolor', 'icon-backcolor', 'icon-ul', 'icon-ol']
-    iconList.forEach((item, index) => {
-        if (item == 'icon-forecolor') {
-            $('.' + item + ' .path3').removeClass(oldColor)
-            $('.' + item + ' .path3').addClass(newColor)
-        } else if (item == 'icon-backcolor') {
-            $('.' + item + ' .path1,.path2,.path3,.path4').removeClass(oldColor)
-            $('.' + item + ' .path1,.path2,.path3,.path4').addClass(newColor)
-        }
-        else {
-            $('.' + item).removeClass(oldColor)
-            $('.' + item).addClass(newColor)
-        }
-    })
 }
 
 /**

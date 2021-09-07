@@ -206,10 +206,11 @@
 
  ol, ul {
      margin-bottom: 0px;
+     padding-left: 20px;
  }
 
  ol>li, ul>li {
-     padding-right: 30px;
+     /* padding-right: 30px; */
      /* line-height: 24px; */
  }
 
@@ -220,15 +221,15 @@
  /* hover事件 */
 
  .btn-default:active, .btn-default.active, .open>.dropdown-toggle.btn-default {
-     background-color: rgba(0, 0, 0, 0.1)!important;
+     background-color: transparent!important;
  }
 
  .btn-default:active:hover {
      background-color: rgba(0, 0, 0, 0.1)!important;
  }
 
- .btn-default.active {
-     background-color: rgba(0, 0, 0, 0.1)!important;
+ .btn-default {
+     color: rgb(83, 96, 118);
  }
 
  .btn-default:hover {
@@ -240,20 +241,16 @@
  }
 
  .darkColor:before {
-     color: #C5CFE0!important;
+     /* color: #C5CFE0!important; */
  }
 
  .lightColor:before {
-     color: #536076!important;
- }
-
- .btn-default:focus, .btn-default.focus {
-     background-color: rgba(0, 0, 0, 0.05)!important;
+     /* color: #536076!important; */
  }
 
  .note-current-fontsize {
      margin-right: 2px;
-     color: rgba(65, 77, 104, 1)
+     /* color: rgba(65, 77, 104, 1) */
  }
 
  .note-forecolor {
@@ -305,21 +302,30 @@
      width: 100%;
      height: 34px;
      line-height: 30px;
-     border-bottom: 1px solid #E4E9F1;
+     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
  }
 
  .dropdown-fontsize>li:nth-last-child(1) a {
      border-bottom: none;
  }
 
- .dropdown-fontsize>li>a i {
-     color: #000;
+ .note-popover .popover-content .dropdown-menu.note-check li a i {
+     padding-right: 5px;
+     color: inherit;
  }
 
  .dropdown-fontsize>li>a:hover {
      background-color: rgba(0, 0, 0, 0.05);
+     color: #fff!important;
  }
 
  .btn-group.open .dropdown-toggle {
      box-shadow: none;
+ }
+
+ .note-editor .note-toolbar>.note-btn-group, .note-popover .popover-content>.note-line {
+     margin-right: 2px;
+     margin-left: 2px;
+     height: 18px;
+     border: 0.5px solid rgba(0, 0, 0, 0.1);
  }

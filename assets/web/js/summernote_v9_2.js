@@ -100,7 +100,7 @@
         $node.html(markup);
     });
     var dropdownButtonContents = function (contents, options) {
-        return contents + ' ' + icon(options.icons.down, 'span');
+        return contents + ' ' + icon(options.icons.down, 'i');
     };
     var dropdownCheck = renderer.create('<div class="dropdown-menu note-check">', function ($node, options) {
         var markup = $$1.isArray(options.items) ? options.items.map(function (item) {
@@ -184,9 +184,9 @@
     var icon = function (iconClassName, tagName) {
 
         if (iconClassName == 'icon-backcolor') {
-            return `<span class="icon-backcolor"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span></span>`
+            return `<i class="icon-backcolor"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span></i>`
         } else if (iconClassName == 'icon-forecolor') {
-            return `<span class="icon-forecolor"><span class="path1"></span><span class="path2"></span><span class="path3"></span></span>`
+            return `<i class="icon-forecolor"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>`
         }
         tagName = tagName || 'i';
         return '<' + tagName + ' class="' + iconClassName + '"/>';
@@ -6075,14 +6075,9 @@
                                 var $currentButton = $button.closest('.note-color').find('.note-current-color-button');
                                 // $color.css(key, value);
                                 if (eventName == 'backColor') {
-                                    $('#selectBackColor').remove();
-                                    $('head').append("<style id='selectBackColor'>.selectBackColor:before{color: " + value + "!important}</style>");
-                                    $('.icon-backcolor .path6').addClass('selectBackColor')
-
+                                    $('.icon-backcolor .path6').css('color', value)
                                 } else if (eventName == 'foreColor') {
-                                    $('#selectForeColor').remove();
-                                    $('head').append("<style id='selectForeColor'>.selectForeColor:before{color: " + value + "!important}</style>");
-                                    $('.icon-forecolor .path1').addClass('selectForeColor')
+                                    $('.icon-forecolor .path1').css('color', value)
                                 }
 
                                 $currentButton.attr('data-' + eventName, value);

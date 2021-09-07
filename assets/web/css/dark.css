@@ -61,3 +61,7 @@ body {
 .dropdown-fontsize>li>a {
     color: rgba(197, 207, 224, 1)
 }
+
+[class^="icon-"], [class*=" icon-"] {
+    color: #C5CFE0;
+}
