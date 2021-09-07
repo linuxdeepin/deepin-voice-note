@@ -126,8 +126,10 @@ void WebRichTextEditor::initData(VNoteItem *data, const QString &reg, bool focus
         return;
     }
     this->setVisible(true);
+    //清除选中需重新加载，解决匹配字符显示灰色问题
+    bool reSet = !m_searchKey.isEmpty() && reg.isEmpty();
     m_searchKey = reg;
-    if (m_noteData != data) { //笔记切换时设置笔记内容
+    if (m_noteData != data || reSet) { //笔记切换或清除搜索结果时设置笔记内容
         m_updateTimer->stop();
         updateNote();
         m_noteData = data;
@@ -485,14 +487,9 @@ void WebRichTextEditor::dropEvent(QDropEvent *event)
 
 void WebRichTextEditor::deleteSelectText()
 {
-    QObjectList children = page()->view()->children();
-    for (auto obj : children) {
-        //内部渲染代理窗口为RenderWidgetHostViewQtDelegateWidget，发送delete按键，触发内部的delete按键
-        if (qobject_cast<QWidget *>(obj)) { //widget类型即为渲染代理窗口
-            QKeyEvent event(QEvent::KeyPress, Qt::Key_Delete, Qt::NoModifier);
-            QApplication::sendEvent(obj, &event);
-        }
-    }
+    //向焦点代理窗口发送delete按键，删除选中内容
+    QKeyEvent event(QEvent::KeyPress, Qt::Key_Delete, Qt::NoModifier);
+    QApplication::sendEvent(focusProxy(), &event);
 }
 
 void WebRichTextEditor::onThemeChanged()
