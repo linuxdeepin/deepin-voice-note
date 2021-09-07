@@ -51,6 +51,7 @@ public:
         NoteInvalid,
         PathDenied,
         PathInvalid,
+        Savefailed, //保存失败
     };
 
 signals:
@@ -60,18 +61,16 @@ public slots:
 protected:
     virtual void run() override;
     //检查路径
-    int checkPath();
+    ExportError checkPath();
     //导出文本
-    int exportText();
+    ExportError exportText();
     //导出所有语音
-    int exportAllVoice();
-    //导出所有文本和语音
-    int exportAll();
+    ExportError exportAllVoice();
     //导出语音
-    int exportOneVoice(VNoteBlock *block);
-    int exportOneVoice(const QString &);
+    ExportError exportOneVoice(VNoteBlock *block);
+    ExportError exportOneVoice(const QString &);
     //导出为HTML
-    int exportAsHtml();
+    ExportError exportAsHtml();
 
     int m_exportType {ExportNothing};
     QString m_exportPath;

@@ -157,6 +157,8 @@ public slots:
     void onNoteChanged();
     //刷新窗口
     void onRefresh();
+    //文件导出完成
+    void onExportFinished(int err);
 
 protected:
     //鼠标事件

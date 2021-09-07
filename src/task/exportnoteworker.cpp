@@ -54,24 +54,22 @@ ExportNoteWorker::ExportNoteWorker(QString dirPath, int exportType,
  */
 void ExportNoteWorker::run()
 {
-    ExportError error = static_cast<ExportError>(checkPath());
+    ExportError error = checkPath();
 
     if (ExportOK == error) {
         if (ExportText == m_exportType) {
-            exportText();
+            error = exportText();
         } else if (ExportAllVoice == m_exportType) {
-            exportAllVoice();
-        } else if (ExportAll == m_exportType) {
-            exportAll();
+            error = exportAllVoice();
         } else if (ExportOneVoice == m_exportType) {
             //导出语音
             if (m_noteList.size() > 1) {
-                exportAllVoice();
+                error = exportAllVoice();
             } else {
-                exportOneVoice(m_noteblock);
+                error = exportOneVoice(m_noteblock);
             }
         } else if (ExportHtml == m_exportType) {
-            exportAsHtml();
+            error = exportAsHtml();
         }
     } else {
         qCritical() << "Export note error: m_exportType=" << m_exportType;
@@ -84,7 +82,7 @@ void ExportNoteWorker::run()
  * @brief ExportNoteWorker::checkPath
  * @return 错误码
  */
-int ExportNoteWorker::checkPath()
+ExportNoteWorker::ExportError ExportNoteWorker::checkPath()
 {
     ExportError error = ExportOK;
 
@@ -110,7 +108,7 @@ int ExportNoteWorker::checkPath()
  * @return 错误码
  * 导出文本
  */
-int ExportNoteWorker::exportText()
+ExportNoteWorker::ExportError ExportNoteWorker::exportText()
 {
     ExportError error = ExportOK;
     //存在note
@@ -150,7 +148,7 @@ int ExportNoteWorker::exportText()
  * @return 错误码
  * 导出语音
  */
-int ExportNoteWorker::exportAllVoice()
+ExportNoteWorker::ExportError ExportNoteWorker::exportAllVoice()
 {
     ExportError error = ExportOK;
     //存在note
@@ -158,12 +156,20 @@ int ExportNoteWorker::exportAllVoice()
         for (auto noteData : m_noteList) {
             if (noteData->htmlCode.isEmpty()) {
                 for (auto it : noteData->datas.datas) {
-                    exportOneVoice(it);
+                    error = exportOneVoice(it);
+                    //某一个保存失败则后续的不再进行保存操作
+                    if (Savefailed == error) {
+                        return error;
+                    }
                 }
             } else {
                 //富文本笔记
                 for (auto it : noteData->getVoiceJsons()) {
-                    exportOneVoice(it);
+                    error = exportOneVoice(it);
+                    //某一个保存失败则后续的不再进行保存操作
+                    if (Savefailed == error) {
+                        return error;
+                    }
                 }
             }
         }
@@ -180,7 +186,7 @@ int ExportNoteWorker::exportAllVoice()
  * @param json json格式的语音数据
  * @return 错误码
  */
-int ExportNoteWorker::exportOneVoice(const QString &json)
+ExportNoteWorker::ExportError ExportNoteWorker::exportOneVoice(const QString &json)
 {
     VNVoiceBlock voiceBlock;
     MetaDataParser dataParser;
@@ -196,14 +202,16 @@ int ExportNoteWorker::exportOneVoice(const QString &json)
  * @param noteblock
  * @return 错误码
  */
-int ExportNoteWorker::exportOneVoice(VNoteBlock *noteblock)
+ExportNoteWorker::ExportError ExportNoteWorker::exportOneVoice(VNoteBlock *noteblock)
 {
     ExportError error = ExportOK;
 
     if (noteblock && noteblock->blockType == VNoteBlock::Voice) {
         QFileInfo targetFile(noteblock->ptrVoice->voicePath);
         QString destFileName = m_exportPath + "/" + noteblock->ptrVoice->voiceTitle + "-" + targetFile.fileName();
-        QFile::copy(noteblock->ptrVoice->voicePath, destFileName);
+        if (!QFile::copy(noteblock->ptrVoice->voicePath, destFileName)) {
+            error = Savefailed; //保存失败
+        }
     } else {
         error = NoteInvalid;
     }
@@ -216,7 +224,7 @@ int ExportNoteWorker::exportOneVoice(VNoteBlock *noteblock)
  * 将笔记导出为Html
  * @return 错误码
  */
-int ExportNoteWorker::exportAsHtml()
+ExportNoteWorker::ExportError ExportNoteWorker::exportAsHtml()
 {
     ExportError error = ExportOK;
     for (auto note : m_noteList) {
@@ -224,19 +232,10 @@ int ExportNoteWorker::exportAsHtml()
         QString fileName = QString("%1-%2.html").arg(note->noteTitle).arg(QDateTime::currentDateTime().toLocalTime().toString("yyyyMMddhhmmss"));
         QFile out(m_exportPath + "/" + fileName);
         out.open(QIODevice::WriteOnly | QIODevice::Text);
-        out.write(note->getFullHtml().toUtf8());
+        if (!out.write(note->getFullHtml().toUtf8())) {
+            error = Savefailed; //保存失败
+        }
         out.close();
     }
-    return error;
-}
-
-/**
- * @brief ExportNoteWorker::exportAll
- * @return 错误码
- */
-int ExportNoteWorker::exportAll()
-{
-    ExportError error = ExportOK;
-
     return error;
 }

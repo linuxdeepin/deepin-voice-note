@@ -31,6 +31,7 @@
 #include "common/setting.h"
 #include "db/vnoteitemoper.h"
 #include "moveview.h"
+#include "dialog/vnotemessagedialog.h"
 
 #include <DApplication>
 #include <DFileDialog>
@@ -325,7 +326,7 @@ void MiddleView::saveAsText(const QString &exportDir)
     ExportNoteWorker *exportWorker = new ExportNoteWorker(
         exportDir, ExportNoteWorker::ExportText, noteDataList);
     exportWorker->setAutoDelete(true);
-
+    connect(exportWorker, &ExportNoteWorker::exportFinished, this, &MiddleView::onExportFinished);
     QThreadPool::globalInstance()->start(exportWorker);
 }
 
@@ -354,7 +355,7 @@ void MiddleView::saveAsHtml(const QString &exportDir)
     ExportNoteWorker *exportWorker = new ExportNoteWorker(
         exportDir, ExportNoteWorker::ExportHtml, noteDataList);
     exportWorker->setAutoDelete(true);
-
+    connect(exportWorker, &ExportNoteWorker::exportFinished, this, &MiddleView::onExportFinished);
     QThreadPool::globalInstance()->start(exportWorker);
 }
 
@@ -380,7 +381,7 @@ void MiddleView::saveRecords(const QString &exportDir)
     ExportNoteWorker *exportWorker = new ExportNoteWorker(
         exportDir, ExportNoteWorker::ExportAllVoice, noteItemList);
     exportWorker->setAutoDelete(true);
-
+    connect(exportWorker, &ExportNoteWorker::exportFinished, this, &MiddleView::onExportFinished);
     QThreadPool::globalInstance()->start(exportWorker);
 }
 
@@ -1379,4 +1380,23 @@ void MiddleView::onRefresh()
 {
     update();
     emit requestRefresh();
+}
+
+/**
+ * @brief MiddleView::onExportFinished
+ * @param err
+ */
+void MiddleView::onExportFinished(int err)
+{
+    //保存文件失败
+    if (ExportNoteWorker::Savefailed == err) {
+        VNoteMessageDialog audioOutLimit(VNoteMessageDialog::SaveFailed);
+        audioOutLimit.exec();
+    }
+
+    //无权限
+    if (ExportNoteWorker::PathDenied == err) {
+        VNoteMessageDialog audioOutLimit(VNoteMessageDialog::NoPermission);
+        audioOutLimit.exec();
+    }
 }

@@ -189,6 +189,10 @@ private:
      * @brief 另存语音
      */
     void saveMP3As();
+    /**
+     * @brief 另存文件
+     */
+    QString saveAsFile(const QString &originalPath, QString dirPath = "");
 
 private:
     VNoteItem *m_noteData {nullptr};

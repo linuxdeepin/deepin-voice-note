@@ -27,6 +27,7 @@
 #include "dialog/imageviewerdialog.h"
 #include "common/setting.h"
 #include "task/exportnoteworker.h"
+#include "dialog/vnotemessagedialog.h"
 
 #include "db/vnoteitemoper.h"
 
@@ -370,23 +371,13 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
 void WebRichTextEditor::savePictureAs()
 {
     QString originalPath = m_menuJson.toString(); //获取原图片路径
-    QFileInfo fileInfo(originalPath);
-
-    QString filter = "*." + fileInfo.suffix();
-    QString dir = QString("%1/%2")
-                      .arg(QStandardPaths::writableLocation(QStandardPaths::PicturesLocation))
-                      .arg(fileInfo.baseName());
-    //获取需要保存的文件位置，默认路径为用户图片文件夹，默认文件名为原文件名
-    QString newPath = DFileDialog::getSaveFileName(this, "", dir, filter);
-    if (newPath.isEmpty()) {
-        return;
-    }
-    //复制文件
-    if (!QFile::copy(originalPath, newPath)) {
-        qCritical() << "copy failed:" << originalPath << ";" << newPath;
-    }
+    saveAsFile(originalPath, QStandardPaths::writableLocation(QStandardPaths::PicturesLocation));
 }
 
+/**
+ * @brief WebRichTextEditor::saveMP3As
+ * 另存语音
+ */
 void WebRichTextEditor::saveMP3As()
 {
     m_voiceBlock.reset(new VNVoiceBlock);
@@ -396,23 +387,69 @@ void WebRichTextEditor::saveMP3As()
         return;
     }
     //获取历史使用的路径
-    QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
+    QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
     if (historyDir.isEmpty()) {
         historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     }
-    //获取导出路径
-    QString exportDir = DFileDialog::getExistingDirectory(this, "", historyDir);
 
-    if (exportDir.isEmpty()) {
-        return;
+    QString newPath = saveAsFile(m_voiceBlock->voicePath, historyDir);
+    if (!newPath.isEmpty()) {
+        setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, QFileInfo(newPath).dir().path());
     }
-    // 将现选择的路径保存
-    setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, exportDir);
+}
 
-    ExportNoteWorker *exportWorker = new ExportNoteWorker(
-        exportDir, ExportNoteWorker::ExportOneVoice, QList<VNoteItem *>(), m_voiceBlock.get());
-    exportWorker->setAutoDelete(true);
-    QThreadPool::globalInstance()->start(exportWorker);
+/**
+ * @brief WebRichTextEditor::saveAsFile
+ * 另存文件
+ * @param originalPath  原文件路径
+ * @param dirPath 默认保存文件夹路径
+ * @return  保存的文件路径
+ */
+QString WebRichTextEditor::saveAsFile(const QString &originalPath, QString dirPath)
+{
+    //存储文件夹默认为桌面
+    if (dirPath.isEmpty()) {
+        dirPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    }
+
+    QFileInfo fileInfo(originalPath);
+    QString filter = "*." + fileInfo.suffix();
+    QString dir = QString("%1/%2")
+                      .arg(dirPath)
+                      .arg(fileInfo.baseName());
+    //获取需要保存的文件位置，默认路径为用户图片文件夹，默认文件名为原文件名
+    QString newPath = DFileDialog::getSaveFileName(this, "", dir, filter);
+    if (newPath.isEmpty()) {
+        return "";
+    }
+
+    QFileInfo info(newPath);
+
+    if (!QFileInfo(info.dir().path()).isWritable()) {
+        //文件夹没有写权限
+        VNoteMessageDialog audioOutLimit(VNoteMessageDialog::NoPermission);
+        audioOutLimit.exec();
+        return "";
+    }
+    if (info.exists()) {
+        //文件已存在，删除原文件
+        if (!info.isWritable()) {
+            //文件没有写权限
+            VNoteMessageDialog audioOutLimit(VNoteMessageDialog::NoPermission);
+            audioOutLimit.exec();
+            return "";
+        }
+        QFile::remove(newPath);
+    }
+
+    //复制文件
+    if (!QFile::copy(originalPath, newPath)) {
+        VNoteMessageDialog audioOutLimit(VNoteMessageDialog::SaveFailed);
+        audioOutLimit.exec();
+        qCritical() << "copy failed:" << originalPath << ";" << newPath;
+        return "";
+    }
+    return newPath;
 }
 
 /**

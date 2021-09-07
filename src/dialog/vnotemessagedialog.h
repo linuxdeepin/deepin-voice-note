@@ -44,6 +44,8 @@ public:
         AborteAsr,
         VolumeTooLow,
         CutNote,
+        SaveFailed, //保存失败
+        NoPermission, //无权限
     };
 
 protected:
