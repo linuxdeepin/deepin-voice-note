@@ -536,10 +536,6 @@ void VNoteMainWindow::initRightView()
     rightHolderLayout->setSpacing(0);
     rightHolderLayout->setContentsMargins(0, 0, 10, 0);
 
-    m_richTextEdit = new RichTextEdit(m_rightViewHolder);
-    rightHolderLayout->addWidget(m_richTextEdit);
-    m_richTextEdit->installEventFilter(this);
-    m_richTextEdit->initWebView();
     //TODO:
     //    Add record area code here
     m_recordBarHolder = new QWidget(m_rightViewHolder);
@@ -552,6 +548,11 @@ void VNoteMainWindow::initRightView()
     m_recordBar->setBackgroundRole(DPalette::Base);
     m_recordBar->setAutoFillBackground(true);
     m_recordBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    m_richTextEdit = new RichTextEdit(m_rightViewHolder);
+    rightHolderLayout->addWidget(m_richTextEdit);
+    m_richTextEdit->installEventFilter(this);
+    m_richTextEdit->initWebView();
 
     recordBarHolderLayout->addWidget(m_recordBar);
 
@@ -2077,15 +2078,7 @@ bool VNoteMainWindow::setTitleCloseButtonNext(QKeyEvent *event)
         //搜索内容为空状态
         if (m_middleView->searchEmpty()) {
             //焦点切换由第一个控件m_viewChange开始
-            if (m_viewChange->isEnabled()) {
-                m_viewChange->setFocus(Qt::TabFocusReason);
-                return true;
-            }
-            if (m_imgInsert->isEnabled()) {
-                m_imgInsert->setFocus(Qt::TabFocusReason);
-                return true;
-            }
-            m_noteSearchEdit->lineEdit()->setFocus(Qt::TabFocusReason);
+            m_viewChange->setFocus(Qt::TabFocusReason);
             return true;
         }
         m_middleView->setFocus(Qt::TabFocusReason);
@@ -2104,11 +2097,8 @@ bool VNoteMainWindow::setTitleCloseButtonNext(QKeyEvent *event)
 bool VNoteMainWindow::setTitlebarNext(QKeyEvent *event)
 {
     Q_UNUSED(event)
-    if (m_noteSearchEdit->isEnabled()) {
-        m_noteSearchEdit->lineEdit()->setFocus(Qt::TabFocusReason);
-    } else {
-        return false;
-    }
+    //设置标题栏第一个tab焦点
+    m_viewChange->setFocus(Qt::TabFocusReason);
     return true;
 }
 
