@@ -130,6 +130,19 @@ function changeContent(we, contents, $editable) {
         $('.note-editable').html('<p><br></p>')
     }
     if (webobj && initFinish) {
+        if (!$('.note-air-popover').is(':hidden')) {
+            // 获取选区
+            var selectionObj = window.getSelection();
+            var rangeObj = selectionObj.getRangeAt(0);
+            var docFragment = rangeObj.cloneContents();
+            var testDiv = document.createElement("div");
+            testDiv.appendChild(docFragment)
+            console.log(testDiv.innerHTML)
+            if (testDiv.innerHTML == "") {
+                $('#summernote').summernote('airPopover.hide')
+            }
+        }
+
         webobj.jsCallTxtChange();
     }
 }
@@ -612,6 +625,9 @@ function setVoiceButColor(color) {
         color:${color}!important
     }
     .btn-default:active {
+        color:${color}!important
+    }
+    .btn-default i:active {
         color:${color}!important
     }
     `)

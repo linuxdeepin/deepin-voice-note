@@ -3049,6 +3049,7 @@
             if (isVoice) {
                 return;
             }
+
             // paragraph to list
             // 判断list是否有p标签
             if (lists.find(paras, dom.isPurePara)) {
@@ -6940,10 +6941,6 @@
                         _this.update();
                     }, 10)
                 },
-                // 'summernote.contextmenu': function (e) {
-                //     _this.rightUpdate()
-
-                // },
                 'summernote.dblclick': function (e) {
                     let selStr = window.getSelection().toString();
                     let range = window.getSelection().getRangeAt(0)
@@ -6953,7 +6950,6 @@
                         isShowAir = false
                         _this.hide();
                     }
-
                 },
                 'summernote.disable summernote.change summernote.dialog.shown': function () {
                     // _this.hide();
@@ -7002,7 +6998,6 @@
                 $('.note-ol').show()
             }
 
-
             if (!isShowAir) {
                 isShowAir = true
                 return this.hide();
@@ -7013,10 +7008,8 @@
                 return this.hide();
             }
 
-
             if (styleInfo.range && !styleInfo.range.isCollapsed()) {
                 var rect = lists.last(styleInfo.range.getClientRects());
-
                 if (rect) {
                     var bnd = func.rect2bnd(rect);
                     let winWidth = $(document).width()
