@@ -28,6 +28,7 @@
 #include <QtWebEngineWidgets/QWebEngineView>
 #include <QWebEngineContextMenuData>
 #include <QOpenGLWidget>
+#include <QShortcut>
 
 struct VNoteItem;
 class VNoteRightMenu;
@@ -142,6 +143,11 @@ public slots:
      * @brief 隐藏编辑工具栏
      */
     void onHideEditToolbar();
+    /**
+     * @brief onMenuShortcut
+     * Ctrl+M事件响应
+     */
+    void onMenuShortcut();
 
 protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
@@ -165,17 +171,22 @@ private:
      */
     void initConnections();
     /**
+     * @brief initShortcuts
+     * 注册快捷键事件
+     */
+    void initShortcuts();
+    /**
      * @brief 文字菜单显示
      */
-    void showTxtMenu();
+    void showTxtMenu(const QPoint &pos);
     /**
      * @brief 图片菜单显示
      */
-    void showPictureMenu();
+    void showPictureMenu(const QPoint &pos);
     /**
      * @brief 语音菜单显示
      */
-    void showVoiceMenu();
+    void showVoiceMenu(const QPoint &pos);
     /**
      * @brief 另存图片
      */
@@ -205,6 +216,8 @@ private:
     VNoteRightMenu *m_txtRightMenu {nullptr}; //文字右键菜单
 
     QScopedPointer<VNVoiceBlock> m_voiceBlock {nullptr}; //待另存的语音数据
+
+    QScopedPointer<QShortcut> m_stMenu; //Ctrl+m
 };
 
 #endif // WEBRICHTEXTEDITOR_H

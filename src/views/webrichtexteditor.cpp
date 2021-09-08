@@ -52,6 +52,7 @@ WebRichTextEditor::WebRichTextEditor(QWidget *parent)
     initWebView();
     initRightMenu();
     initUpdateTimer();
+    initShortcuts();
 
     initConnections();
 }
@@ -103,6 +104,15 @@ void WebRichTextEditor::initConnections()
 {
     //剪贴板数据发生改变信号转发
     connect(QApplication::clipboard(), &QClipboard::dataChanged, JsContent::instance(), &JsContent::callJsClipboardDataChanged);
+}
+
+void WebRichTextEditor::initShortcuts()
+{
+    m_stMenu.reset(new QShortcut(this));
+    m_stMenu->setKey(Qt::CTRL + Qt::Key_M);
+    m_stMenu->setContext(Qt::ApplicationShortcut);
+    m_stMenu->setAutoRepeat(false);
+    connect(m_stMenu.get(), &QShortcut::activated, this, &WebRichTextEditor::onMenuShortcut);
 }
 
 void WebRichTextEditor::initUpdateTimer()
@@ -230,7 +240,7 @@ void WebRichTextEditor::onSetDataFinsh()
     }
 }
 
-void WebRichTextEditor::showTxtMenu()
+void WebRichTextEditor::showTxtMenu(const QPoint &pos)
 {
     ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::TxtCtxMenu, false); //重置菜单选项
     bool isAlSrvAvailabel = OpsStateInterface::instance()->isAiSrvExist(); //获取语音服务是否可用
@@ -280,25 +290,25 @@ void WebRichTextEditor::showTxtMenu()
             ActionManager::Instance()->enableAction(ActionManager::TxtDictation, true);
         }
     }
-    m_txtRightMenu->popup(QCursor::pos());
+    m_txtRightMenu->popup(pos);
 }
 
 /**
  * @brief 图片菜单显示
  */
-void WebRichTextEditor::showPictureMenu()
+void WebRichTextEditor::showPictureMenu(const QPoint &pos)
 {
-    m_pictureRightMenu->popup(QCursor::pos());
+    m_pictureRightMenu->popup(pos);
 }
 
 /**
  * @brief 语音菜单显示
  */
-void WebRichTextEditor::showVoiceMenu()
+void WebRichTextEditor::showVoiceMenu(const QPoint &pos)
 {
     //如果当前有语音处于转换状态就将语音转文字选项置灰
     ActionManager::Instance()->enableAction(ActionManager::VoiceToText, !OpsStateInterface::instance()->isVoice2Text());
-    m_voiceRightMenu->popup(QCursor::pos());
+    m_voiceRightMenu->popup(pos);
 }
 
 void WebRichTextEditor::onMenuActionClicked(QAction *action)
@@ -491,19 +501,18 @@ void WebRichTextEditor::onPaste()
 
 void WebRichTextEditor::contextMenuEvent(QContextMenuEvent *e)
 {
-    Q_UNUSED(e)
     switch (m_menuType) {
     case PictureMenu:
         //图片菜单
-        showPictureMenu();
+        showPictureMenu(e->globalPos());
         break;
     case VoiceMenu:
         //语音菜单
-        showVoiceMenu();
+        showVoiceMenu(e->globalPos());
         break;
     case TxtMenu:
         //文字菜单
-        showTxtMenu();
+        showTxtMenu(e->globalPos());
         //显示编辑工具栏
         onShowEditToolbar(e->pos());
         break;
@@ -576,4 +585,19 @@ void WebRichTextEditor::onHideEditToolbar()
     if (!m_editToolbarRect.contains(mapFromGlobal(QCursor::pos()))) {
         emit JsContent::instance()->callJsHideEditToolbar();
     }
+}
+
+/**
+ * @brief WebRichTextEditor::onMenuShortcut
+ * Ctrl+M事件响应，模拟menu键事件
+ */
+void WebRichTextEditor::onMenuShortcut()
+{
+    //当前编辑区没有焦点则不做处理
+    if (!hasFocus()) {
+        return;
+    }
+    //模拟发送菜单键事件
+    QKeyEvent event(QEvent::KeyPress, Qt::Key_Menu, Qt::NoModifier);
+    QApplication::sendEvent(focusProxy(), &event);
 }
