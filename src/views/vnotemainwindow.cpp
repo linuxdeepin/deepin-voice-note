@@ -1896,7 +1896,14 @@ void VNoteMainWindow::initTitleIconButton()
 {
     m_viewChange = new DIconButton(this);
     m_viewChange->setIcon(Utils::loadSVG("view_change_show.svg", false));
-    m_viewChange->setBackgroundRole(DPalette::Highlight);
+
+    highlightDp = DApplicationHelper::instance()->palette(m_viewChange);
+    windowDp = highlightDp;
+    //修改记事本隐藏按钮高亮色调色板
+    highlightDp.setBrush(DPalette::Light, highlightDp.highlight());
+    highlightDp.setBrush(DPalette::Dark, highlightDp.highlight());
+
+    m_viewChange->setPalette(highlightDp);
     m_viewChange->setIconSize(QSize(36, 36));
     m_viewChange->setFixedSize(QSize(36, 36));
     m_imgInsert = new VNoteIconButton(this, "img_insert_normal.svg");
@@ -2289,12 +2296,17 @@ void VNoteMainWindow::onSaveVoicesShortcut()
  */
 void VNoteMainWindow::onThemeChanged()
 {
+    //修改记事本隐藏按钮高亮色调色板
+    DPalette appDp = DGuiApplicationHelper::instance()->applicationPalette();
+    highlightDp.setBrush(DPalette::Light, appDp.color(DPalette::Active, DPalette::Highlight));
+    highlightDp.setBrush(DPalette::Dark, appDp.color(DPalette::Active, DPalette::Highlight));
+
     if (m_leftViewHolder->isVisible()) {
         m_viewChange->setIcon(Utils::loadSVG("view_change_show.svg", false));
-        m_viewChange->setBackgroundRole(DPalette::Highlight);
+        m_viewChange->setPalette(highlightDp);
     } else {
         m_viewChange->setIcon(Utils::loadSVG("view_change_hide.svg", false));
-        m_viewChange->setBackgroundRole(DPalette::Window);
+        m_viewChange->setPalette(windowDp);
     }
 }
 
@@ -2306,11 +2318,11 @@ void VNoteMainWindow::onViewChangeClicked()
 {
     if (m_leftViewHolder->isVisible()) {
         m_viewChange->setIcon(Utils::loadSVG("view_change_hide.svg", false));
-        m_viewChange->setBackgroundRole(DPalette::Window);
+        m_viewChange->setPalette(windowDp); //记事本隐藏按钮背景调成灰色
         m_leftViewHolder->hide();
     } else {
         m_viewChange->setIcon(Utils::loadSVG("view_change_show.svg", false));
-        m_viewChange->setBackgroundRole(DPalette::Highlight);
+        m_viewChange->setPalette(highlightDp); //记事本隐藏按钮背景调成高亮色
         m_leftViewHolder->show();
     }
 }

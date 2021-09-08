@@ -336,6 +336,8 @@ private:
     bool m_rightViewHasFouse {true};
     bool m_showSearchEditMenu {false};
     bool m_needShowMax {false};
+    DPalette highlightDp; //图标高亮调色板
+    DPalette windowDp; //图标灰色调色板
 
     QScopedPointer<VNVoiceBlock> m_currentPlayVoice {nullptr};
     QScopedPointer<VNVoiceBlock> m_currentA2TVoice {nullptr};
