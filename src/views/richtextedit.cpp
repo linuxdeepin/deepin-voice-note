@@ -81,3 +81,12 @@ void RichTextEdit::unboundCurrentNoteData()
         return m_webRichTextEditer->unboundCurrentNoteData();
     }
 }
+
+/**
+ * @brief RichTextEdit::setWebViewFocus
+ * 将焦点转移至编辑区
+ */
+void RichTextEdit::setWebViewFocus()
+{
+    m_webRichTextEditer->setFocus();
+}

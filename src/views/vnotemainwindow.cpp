@@ -2365,6 +2365,7 @@ void VNoteMainWindow::onInsertImageToWebEditor()
         QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
         "Image file(*.jpg *.png *.bmp)");
     JsContent::instance()->insertImages(filePaths);
+    m_richTextEdit->setWebViewFocus(); //将焦点转移至编辑区
 }
 
 void VNoteMainWindow::onWebSearchEmpty()

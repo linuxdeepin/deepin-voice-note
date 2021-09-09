@@ -67,6 +67,10 @@ public:
      * @brief 解除绑定的笔记数据
      */
     void unboundCurrentNoteData();
+    /**
+     * @brief 将焦点转移至编辑区
+     */
+    void setWebViewFocus();
 
 signals:
     /**
