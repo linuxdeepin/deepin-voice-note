@@ -36,7 +36,11 @@ var h5Tpl = `
             <div class="translate">
             </div>
         </div>
-    </div>`;
+    </div>
+    {{#if text}}
+    <p>{{text}}</p>
+    {{/if}}
+    `;
 // 语音插入模板
 var nodeTpl = `
         <div class='voiceInfoBox'>
@@ -74,13 +78,28 @@ var nowClickVoice = null
 var global_activeColor = ''
 var global_disableColor = ''
 
+var tooltipContent = {
+    fontsize: '字号',
+    forecolor: '字体颜色',
+    backcolor: '背景色',
+    bold: '加粗',
+    italic: '斜体',
+    underline: '下划线',
+    strikethrough: '删除线',
+    ul: '无序列表',
+    ol: '有序列表',
+    more: '更多颜色',
+    transparent: '透明',
+    recentlyUsed: '最近使用'
+}
+
 $(document).ready(function () {
     // var u = navigator.userAgent;
 
 })
 // 初始化summernote
 $('#summernote').summernote({
-    focus: true,
+    // focus: true,
     disableDragAndDrop: true,
     // shortcuts: false,
     lang: 'zh-CN',
@@ -131,18 +150,10 @@ function changeContent(we, contents, $editable) {
     }
     if (webobj && initFinish) {
         if (!$('.note-air-popover').is(':hidden')) {
-            // 获取选区
-            var selectionObj = window.getSelection();
-            var rangeObj = selectionObj.getRangeAt(0);
-            var docFragment = rangeObj.cloneContents();
-            var testDiv = document.createElement("div");
-            testDiv.appendChild(docFragment)
-            console.log(testDiv.innerHTML)
-            if (testDiv.innerHTML == "") {
+            if (getSelectedRange().innerHTML == "") {
                 $('#summernote').summernote('airPopover.hide')
             }
         }
-
         webobj.jsCallTxtChange();
     }
 }
@@ -165,6 +176,40 @@ $('body').on('click', '.translate', function (e) {
     // 阻止冒泡
     e.stopPropagation();
 })
+
+/**
+ * 获取选区
+ * @date 2021-09-08
+ * @returns {any} div
+ */
+function getSelectedRange() {
+    var selectionObj = window.getSelection();
+    var rangeObj = selectionObj.getRangeAt(0);
+    var docFragment = rangeObj.cloneContents();
+    var testDiv = document.createElement("div");
+    testDiv.appendChild(docFragment)
+    return testDiv
+}
+
+/**
+ * 设置光标位置
+ * @date 2021-09-09
+ * @param {any} element 元素
+ * @param {any} pos 起始偏移量
+ * @returns {any}
+ */
+function setFocus(element, pos) {
+    var range, selection;
+    range = document.createRange();
+    range.selectNodeContents(element);
+    if (element.innerHTML.length > 0) {
+        range.setStart(element.childNodes[0], pos);
+    }
+    range.collapse(true);       //设置选中区域为一个点
+    selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
 
 // 设置选区
 function setSelectRange(dom) {
@@ -211,7 +256,18 @@ function copyVoice(event) {
         $(docFragment).find('.voicebtn').removeClass('pause').addClass('play');
         $(docFragment).find('.voicebtn').removeClass('now');
         $(docFragment).find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four');
-
+        if (event.type == 'cut') {
+            rangeObj.deleteContents()
+            let p = document.createElement('p');
+            p.innerHTML = '<br>'
+            rangeObj.insertNode(p)
+            // 设置焦点
+            setFocus(p, 0)
+            // 记录之前数据
+            $('#summernote').summernote('editor.recordUndo')
+            // 主动触发change事件
+            changeContent()
+        }
         event.preventDefault()
         isVoicePaste = true
     }
@@ -234,42 +290,50 @@ document.addEventListener('paste', function (event) {
         document.execCommand('insertHTML', false, formatHtml + "<p><br></p>");
         event.preventDefault()
     }
-    var sel = document.getSelection();
-    sel.focusNode.scrollIntoView(false)
+    setFocusScroll()
     removeNullP()
 });
 
+// 页面滚动到光标位置
+function setFocusScroll() {
+    let focusY = getCursortPosition(document.querySelector('.note-editable'))
+    let viewY = $(window).height() + $(document).scrollTop()
+    if (focusY > viewY) {
+        let sel = document.getSelection();
+        sel.focusNode.scrollIntoView(false)
+    }
+}
 
 /**
  * 判断选区类别
  * @date 2021-09-06
- * @returns {int} 1 语音 2 图片 3 文本
+ * @returns {object} 0图片 1语音 2文本
  */
-function isRangVoice() {
-    let flag = null
-    var selectionObj = window.getSelection();
-    var rangeObj = selectionObj.getRangeAt(0);
-    var docFragment = rangeObj.cloneContents();
-    var testDiv = document.createElement("div");
-    testDiv.appendChild(docFragment)
-
+function isRangeVoice() {
+    let selectedRange = {
+        flag: null,
+        info: ''
+    }
+    var testDiv = getSelectedRange();
     let childrenLength = $(testDiv).children().length
     let voiceLength = $(testDiv).find('.voiceBox').length
     let imgLength = $(testDiv).find('img').length
 
     if (voiceLength == childrenLength && childrenLength != 0) {
-        flag = 1
-    } else if (imgLength == childrenLength && childrenLength != 0) {
-        flag = 2
+        selectedRange.flag = 1
+        selectedRange.info = $(testDiv).find('.voiceBox:first').attr('jsonKey')
+    } else if (imgLength == childrenLength && childrenLength == 1) {
+        selectedRange.flag = 0
+        selectedRange.info = $(testDiv).find('img').attr('src')
     } else {
-        flag = 3
+        selectedRange.flag = 2
     }
-    return flag
+    return selectedRange
 }
 
 // 监听鼠标抬起事件
 $('body').on('mouseup', function () {
-    // isRangVoice()
+    // console.log(isRangVoice())
 })
 
 //播放
@@ -344,6 +408,27 @@ new QWebChannel(qt.webChannelTransport,
     }
 )
 
+/**
+ * 获取光标Y轴位置
+ * @date 2021-09-08
+ * @param {any} element 可编辑dom
+ * @returns {number} Y轴位置 
+ */
+function getCursortPosition(element) {
+    var caretOffset = 0;
+    var doc = element.ownerDocument || element.document;
+    var win = doc.defaultView || doc.parentWindow;
+    var sel = win.getSelection();
+    if (sel.rangeCount > 0) {
+        var range = win.getSelection().getRangeAt(0);
+        var preCaretRange = range.cloneRange();
+        preCaretRange.selectNodeContents(element);
+        preCaretRange.setEnd(range.endContainer, range.endOffset);  //重置选中区域的结束位置
+        caretOffset = preCaretRange.toString().length;
+    }
+    return caretOffset;
+}
+
 //初始化数据 
 function initData(text) {
     initFinish = false;
@@ -393,6 +478,9 @@ function playButColor(status) {
 
 //录音插入数据
 function insertVoiceItem(text) {
+    // 记录插入前数据
+    $('#summernote').summernote('editor.recordUndo')
+
     var arr = JSON.parse(text);
     var voiceHtml = transHtml(arr, true);
     var oA = document.createElement('div');
@@ -405,11 +493,11 @@ function insertVoiceItem(text) {
     tmpNode.appendChild(oA.cloneNode(true));
     var str = '<p><br></p>' + tmpNode.innerHTML + '<p><br></p>';
 
-    // $('#summernote').summernote('saveRange');
-    // $('#summernote').summernote('insertNode', oA);
-    // $('#summernote').summernote('restoreRange');
     document.execCommand('insertHTML', false, str);
+    $('#summernote').summernote('editor.recordUndo')
+
     removeNullP()
+    setFocusScroll()
 }
 
 /**
@@ -464,6 +552,7 @@ function setHtml(html) {
     initFinish = true;
     // 搜索功能
     webobj.jsCallSetDataFinsh();
+    resetScroll()
 }
 
 //设置录音转文字内容 flag: 0: 转换过程中 提示性文本（＂正在转文字中＂)１:结果 文本,空代表转失败了
@@ -564,46 +653,26 @@ function voicePlay(bIsPaly) {
  * @date 2021-08-19
  * @param {any} e
  * @returns {any} 
- * type: 0图片 1语音 2文本
  */
 function rightClick(e) {
-    isShowAir = false;
-    let type = null;
-    let json = null;
+    // isShowAir = false;
+    $('.li').removeClass('active');
     if (e.target.tagName == 'IMG') {
-        // 图片右键
-        type = 0;
-        let imgUrl = $(e.target).attr('src')
         let img = e.target
         // img.focus();
-        // 设置选区
         $('.note-editable ').blur()
         setSelectRange(img)
-        json = imgUrl
-
     } else if ($(e.target).hasClass('demo') || $(e.target).parents('.demo').length != 0) {
-
-        // 语音右键
-        type = 1;
-        json = $(e.target).parents('.li:first').attr('jsonKey')
-
-        // 选中效果
-        $('.li').removeClass('active');
         $(e.target).parents('.li').addClass('active');
         // 当前没有语音在转文字时， 才可以转文字
         if (bTransVoiceIsReady) {
             activeTransVoice = $(e.target).parents('.li:first');
         }
         $('#summernote').summernote('airPopover.hide')
-        // 设置选区
         setSelectRange($(e.target).parents('.voiceBox')[0])
-    } else {
-        // 文本右键
-        // y = $('.note-air-popover').offset().top - $(document).scrollTop() + 50
-        json = ''
-        type = 2;
     }
-    webobj.jsCallPopupMenu(type, json);
+    let info = isRangeVoice()
+    webobj.jsCallPopupMenu(info.flag, info.info);
     // 阻止默认右键事件
     // e.preventDefault()
 }
@@ -616,7 +685,7 @@ function rightClick(e) {
  * @returns {any}
  */
 function setVoiceButColor(color) {
-    $("style").html(`
+    $("#style").html(`
     
     .voiceBox .voicebtn {
         background-color:${color}
@@ -684,7 +753,7 @@ function insertImg(urlStr) {
     urlStr.forEach((item, index) => {
         $("#summernote").summernote('insertImage', item, 'img');
     })
-    setFocus()
+
 }
 
 // 禁用ctrl+v
@@ -693,7 +762,6 @@ document.onkeydown = function (event) {
         webobj.jsCallPaste()
         return false;
     }
-
 }
 
 // ctrl+b 添加记事本
@@ -728,8 +796,37 @@ function hideRightMenu() {
     $('#summernote').summernote('airPopover.hide')
 }
 
-function setFocus() {
-    console.log('setFocus')
-    // document.querySelector('.note-editable').focus()
-    $('#summernote').summernote('editor.focus')
+// 重置滚动条
+function resetScroll() {
+    if ($(document).scrollTop() != 0) {
+
+        $(document).scrollTop(0)
+    }
+}
+
+let scrollHide = null
+// 监听滚动事件
+$(document).scroll(function () {
+    if (scrollHide) {
+        clearTimeout(scrollHide)
+    }
+    $('#scrollStyle').html(`
+        body::-webkit-scrollbar-thumb {
+        background-color: rgba(83, 96, 118, .5);
+        }`
+    )
+    scrollHide = setTimeout(() => {
+        $('#scrollStyle').html('')
+    }, 1500);
+});
+
+
+/**
+ * 改变光标颜色
+ * @date 2021-09-09
+ * @param {int} flag 1 透明 2 自动
+ * @returns {any}
+ */
+function setFocusColor(flag) {
+    $('.note-editable').css('caret-color', flag == 1 ? 'transparent' : 'auto')
 }

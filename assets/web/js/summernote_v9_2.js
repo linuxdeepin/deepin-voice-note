@@ -2757,6 +2757,7 @@
         * Leaves the stack intact, so that "Redo" can still be used.
         */
         History.prototype.rewind = function () {
+
             // Create snap shot if not yet recorded
             if (this.$editable.html() !== this.stack[this.stackOffset].contents) {
                 this.recordUndo();
@@ -2784,6 +2785,7 @@
          * undo
          */
         History.prototype.undo = function () {
+            // debugger;
             // Create snap shot if not yet recorded
             if (this.$editable.html() !== this.stack[this.stackOffset].contents) {
                 this.recordUndo();
@@ -2973,13 +2975,15 @@
          * toggle ordered list
          */
         Bullet.prototype.insertOrderedList = function (editable) {
-            this.toggleList('OL', editable);
+            // this.toggleList('OL', editable);
+            document.execCommand('insertOrderedList', false)
         };
         /**
          * toggle unordered list
          */
         Bullet.prototype.insertUnorderedList = function (editable) {
-            this.toggleList('UL', editable);
+            // this.toggleList('UL', editable);
+            document.execCommand('insertUnorderedList', false)
         };
         /**
          * indent
@@ -3084,6 +3088,7 @@
          * @return {Node[]}
          */
         Bullet.prototype.wrapList = function (paras, listName) {
+            debugger;
             var head = lists.head(paras);
             var last = lists.last(paras);
             var prevList = dom.isList(head.previousSibling) && head.previousSibling;
@@ -3095,6 +3100,12 @@
                 return dom.isPurePara(para) ? dom.replace(para, 'LI') : para;
 
             });
+            console.log(head)
+            console.log(last)
+            console.log(prevList)
+            console.log(nextList)
+            console.log(listNode)
+            console.log(paras)
             // append to list(<ul>, <ol>)
             dom.appendChildNodes(listNode, paras);
             if (nextList) {
@@ -4134,6 +4145,9 @@
         Editor.prototype.destroy = function () {
             this.$editable.off();
         };
+        Editor.prototype.recordUndo = function () {
+            this.history.recordUndo();
+        };
         Editor.prototype.handleKeyMap = function (event) {
             var keyMap = this.options.keyMap[env.isMac ? 'mac' : 'pc'];
             var keys = [];
@@ -4332,6 +4346,8 @@
          * @return {Promise}
          */
         Editor.prototype.insertImage = function (src, param) {
+            // 记录插入图片之前的操作
+            this.history.recordUndo();
             var _this = this;
             return createImage(src, param).then(function ($image) {
                 _this.beforeCommand();
@@ -5258,7 +5274,7 @@
                 return _this.button({
                     className: 'note-btn-bold',
                     contents: _this.ui.icon(_this.options.icons.bold),
-                    tooltip: '加粗',
+                    tooltip: tooltipContent.bold,
                     click: _this.context.createInvokeHandlerAndUpdateState('editor.bold')
                 }).render();
             });
@@ -5266,7 +5282,7 @@
                 return _this.button({
                     className: 'note-btn-italic',
                     contents: _this.ui.icon(_this.options.icons.italic),
-                    tooltip: '斜体',
+                    tooltip: tooltipContent.italic,
                     click: _this.context.createInvokeHandlerAndUpdateState('editor.italic')
                 }).render();
             });
@@ -5274,7 +5290,7 @@
                 return _this.button({
                     className: 'note-btn-underline',
                     contents: _this.ui.icon(_this.options.icons.underline),
-                    tooltip: '下划线',
+                    tooltip: tooltipContent.underline,
                     click: _this.context.createInvokeHandlerAndUpdateState('editor.underline')
                 }).render();
             });
@@ -5289,7 +5305,7 @@
                 return _this.button({
                     className: 'note-btn-strikethrough',
                     contents: _this.ui.icon(_this.options.icons.strikethrough),
-                    tooltip: '删除线',
+                    tooltip: tooltipContent.strikethrough,
                     click: _this.context.createInvokeHandlerAndUpdateState('editor.strikethrough')
                 }).render();
             });
@@ -5345,7 +5361,7 @@
                     _this.button({
                         className: 'dropdown-toggle fontSizeBut',
                         contents: _this.ui.dropdownButtonContents('<span class="note-current-fontsize"/>', _this.options),
-                        tooltip: _this.lang.font.size,
+                        tooltip: tooltipContent.fontsize,
                         data: {
                             toggle: 'dropdown'
                         }
@@ -5438,26 +5454,22 @@
             });
             ////////背景
             this.context.memo('button.forecolor', function () {
-                return _this.colorPalette('note-color-fore', '字体颜色', false, true);
+                return _this.colorPalette('note-color-fore', tooltipContent.forecolor, false, true);
             });
             this.context.memo('button.backcolor', function () {
-                return _this.colorPalette('note-color-back', '背景色', true, false);
+                return _this.colorPalette('note-color-back', tooltipContent.backcolor, true, false);
             });
             this.context.memo('button.ul', function () {
                 return _this.button({
                     contents: _this.ui.icon(_this.options.icons.unorderedlist),
-                    // contents: _this.ui.icon('', 'img class="ulImg" src="./img/ul.svg"'),
-                    tooltip: '无序列表',
-                    // tooltip: _this.lang.lists.unordered + _this.representShortcut('insertUnorderedList'),
+                    tooltip: tooltipContent.ul,
                     click: _this.context.createInvokeHandler('editor.insertUnorderedList')
                 }).render();
             });
             this.context.memo('button.ol', function () {
                 return _this.button({
                     contents: _this.ui.icon(_this.options.icons.orderedlist),
-                    // contents: _this.ui.icon('', 'img class="olImg" src="./img/ol.svg"'),
-                    tooltip: '有序列表',
-                    // tooltip: _this.lang.lists.ordered + _this.representShortcut('insertOrderedList'),
+                    tooltip: tooltipContent.ol,
                     click: _this.context.createInvokeHandler('editor.insertOrderedList')
                 }).render();
             });
@@ -5955,7 +5967,7 @@
                         // contents: backColor ? this.ui.dropdownButtonContents('', this.options) : _this.ui.icon('note-recent-color forecolorImg', 'img src="./img/forecolor.svg"'),
                         contents: backColor ? this.ui.dropdownButtonContents('', this.options) : _this.ui.icon(this.options.icons.forecolor),
 
-                        tooltip: backColor ? '更多颜色' : '字体颜色',
+                        tooltip: backColor ? tooltipContent.more : tooltipContent.forecolor,
                         data: {
                             toggle: 'dropdown'
                         }
@@ -5963,14 +5975,9 @@
                     this.ui.dropdown({
                         items: (backColor ? [
                             '<div class="note-palette">',
-                            // '  <div>',
-                            // '    <button type="button" class="note-color-reset btn btn-light" data-event="backColor" data-value="inherit">',
-                            // "无填充色",
-                            // '    </button>',
-                            // '  </div>',
                             '  <div class="note-holder" data-event="backColor"/>',
                             '  <div class="colorFont">',
-                            '  最近使用',
+                            tooltipContent.recentlyUsed,
                             '  </div>',
                             '  <div class="note-holder-custom" id="backColorPalette" data-event="backColor"/>',
                             '  <div class="colorFont planButton">',
@@ -5983,19 +5990,9 @@
                         ].join('') : '') +
                             (foreColor ? [
                                 '<div class="note-palette">',
-                                // '  <div class="note-palette-title">' + this.lang.color.foreground + '</div>',
-                                // '  <div>',
-                                // '    <button type="button" class="note-color-reset btn btn-light" data-event="removeFormat" data-value="foreColor">',
-                                // this.lang.color.resetToDefault,
-                                // '    </button>',
-                                // '  </div>',
                                 '  <div class="note-holder" data-event="foreColor"/>',
                                 '  <div class="colorFont">',
-                                '  最近使用',
-                                // '    <button type="button" class="note-color-select btn " data-event="openPalette" data-value="foreColorPicker">',
-                                // this.lang.color.cpSelect,
-                                // '    </button>',
-                                // '    <input type="color" id="foreColorPicker" class="note-btn note-color-select-btn" value="' + this.options.colorButton.foreColor + '" data-event="foreColorPalette">',
+                                tooltipContent.recentlyUsed,
                                 '  </div>',
                                 '  <div class="note-holder-custom" id="foreColorPalette" data-event="foreColor"/>',
                                 '  <div class="colorFont planButton">',
@@ -6007,7 +6004,6 @@
                                 '</div>',
                             ].join('') : ''),
                         callback: function ($dropdown) {
-
                             $dropdown.find('.note-holder').each(function (idx, item) {
                                 var $holder = $$1(item);
                                 $holder.append(_this.ui.palette({
@@ -6015,7 +6011,7 @@
                                     colorsName: _this.options.colorsName,
                                     eventName: $holder.data('event'),
                                     container: _this.options.container,
-                                    tooltip: _this.options.tooltip == 'transparent' ? '透明' : _this.options.tooltip
+                                    tooltip: _this.options.tooltip == 'transparent' ? tooltipContent.transparent : _this.options.tooltip
                                 }).render());
                             });
                             /* TODO: do we have to record recent custom colors within cookies? */
@@ -6993,11 +6989,12 @@
                 || $(testDiv).find('img').length != 0) {
                 $('.note-ul').hide()
                 $('.note-ol').hide()
+                $('.note-line').hide()
             } else {
                 $('.note-ul').show()
                 $('.note-ol').show()
+                $('.note-line').show()
             }
-
             if (!isShowAir) {
                 isShowAir = true
                 return this.hide();
@@ -7007,6 +7004,7 @@
                 || selStr == '') {
                 return this.hide();
             }
+
 
             if (styleInfo.range && !styleInfo.range.isCollapsed()) {
                 var rect = lists.last(styleInfo.range.getClientRects());
@@ -7048,12 +7046,12 @@
                 || $(styleInfo.range.sc).parents('.translate').length != 0
                 || $(testDiv).find('img').length != 0) {
                 $('.note-ul').hide()
-                $('.note-ol').hide()
+                $('.note-line').hide()
             } else {
                 $('.note-ul').show()
                 $('.note-ol').show()
+                $('.note-line').show()
             }
-
             if (rect) {
                 var bnd = func.rect2bnd(rect);
                 let winWidth = $(document).width()
@@ -7548,7 +7546,8 @@
                 'tablePopover': TablePopover,
                 'videoDialog': VideoDialog,
                 'helpDialog': HelpDialog,
-                'airPopover': AirPopover
+                'airPopover': AirPopover,
+                'history': History
             },
             buttons: {},
             lang: 'en-US',
