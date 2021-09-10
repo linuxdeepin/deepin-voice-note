@@ -2296,6 +2296,10 @@ void VNoteMainWindow::onSaveVoicesShortcut()
  */
 void VNoteMainWindow::onThemeChanged()
 {
+    //当前主界面未显示不向下处理
+    if (!isVisible()) {
+        return;
+    }
     //修改记事本隐藏按钮高亮色调色板
     DPalette appDp = DGuiApplicationHelper::instance()->applicationPalette();
     highlightDp.setBrush(DPalette::Light, appDp.color(DPalette::Active, DPalette::Highlight));
