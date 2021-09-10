@@ -2062,7 +2062,8 @@ bool VNoteMainWindow::setAddnotepadButtonNext(QKeyEvent *event)
 bool VNoteMainWindow::setAddnoteButtonNext(QKeyEvent *event)
 {
     if (m_middleView->rowCount() == 0) {
-        return setTitlebarNext(event);
+        setTitleBarTabFocus(event);
+        return true;
     }
     if (m_stackedRightMainWidget->currentWidget() == m_rightViewHolder) {
         m_recordBar->setFocus(Qt::TabFocusReason);
@@ -2091,21 +2092,14 @@ bool VNoteMainWindow::setTitleCloseButtonNext(QKeyEvent *event)
         m_middleView->setFocus(Qt::TabFocusReason);
         return true;
     }
-    m_stackedWidget->currentWidget()->setFocus();
+    m_stackedWidget->currentWidget()->setFocus(Qt::TabFocusReason);
+    //当前记事本列表为隐藏笔记列表为显示状态
+    if (!m_leftViewHolder->isVisible()
+        && m_middleViewHolder->isVisible()) {
+        //进入笔记列表焦点获取优先级选择
+        return setAddnotepadButtonNext(event);
+    }
     DWidget::keyPressEvent(event);
-    return true;
-}
-
-/**
- * @brief VNoteMainWindow::setTitlebarNext
- * @param event
- * @return
- */
-bool VNoteMainWindow::setTitlebarNext(QKeyEvent *event)
-{
-    Q_UNUSED(event)
-    //设置标题栏第一个tab焦点
-    m_viewChange->setFocus(Qt::TabFocusReason);
     return true;
 }
 
@@ -2331,6 +2325,11 @@ void VNoteMainWindow::onViewChangeClicked()
     }
 }
 
+/**
+ * @brief 响应web前端语音播放控制
+ * @param json :语音数据
+ * @param bIsSame : 此次语音是否与上一次语音相同
+ */
 void VNoteMainWindow::onWebVoicePlay(const QVariant &json, bool bIsSame)
 {
     //录音状态下不允许播放
@@ -2361,6 +2360,9 @@ void VNoteMainWindow::onWebVoicePlay(const QVariant &json, bool bIsSame)
     m_recordBar->playVoice(m_currentPlayVoice.get(), bIsSame);
 }
 
+/**
+ * @brief 富文本编辑器插入图片
+ */
 void VNoteMainWindow::onInsertImageToWebEditor()
 {
     QStringList filePaths = DFileDialog::getOpenFileNames(
@@ -2372,6 +2374,9 @@ void VNoteMainWindow::onInsertImageToWebEditor()
     m_richTextEdit->setWebViewFocus(); //将焦点转移至编辑区
 }
 
+/**
+ * @brief 当前编辑区内容搜索为空
+ */
 void VNoteMainWindow::onWebSearchEmpty()
 {
     //没有搜索到则从笔记列表删除当前笔记

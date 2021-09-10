@@ -20,6 +20,7 @@
 */
 #include "vnotemultiplechoiceoptionwidget.h"
 #include "globaldef.h"
+#include "common/utils.h"
 
 #include <DApplication>
 
@@ -392,6 +393,10 @@ bool VnoteMultipleChoiceOptionWidget::eventFilter(QObject *o, QEvent *e)
         if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
             DToolButton *btn = dynamic_cast<DToolButton *>(o);
             btn->click();
+            return true;
+        }
+        if (o == m_deleteButton && keyEvent->key() == Qt::Key_Tab) {
+            Utils::setTitleBarTabFocus(keyEvent); //将焦点转移至标题栏下一个控件
             return true;
         }
     }

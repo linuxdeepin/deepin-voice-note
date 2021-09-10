@@ -270,7 +270,6 @@ TEST_F(ut_vnotemainwindow_test, setviewNext)
     m_mainWindow->setTitleBarTabFocus(&e);
     m_mainWindow->setMiddleviewNext(&e);
     m_mainWindow->setTitleCloseButtonNext(&e);
-    m_mainWindow->setTitlebarNext(&e);
     m_mainWindow->setAddnoteButtonNext(&e);
     m_mainWindow->setAddnotepadButtonNext(&e);
 }

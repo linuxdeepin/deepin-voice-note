@@ -186,10 +186,7 @@ public slots:
     void onNewNotebook();
     //新建记事项
     void onNewNote();
-    /**
-     * @brief 开始语音转文字
-     * @param json 语音json格式数据
-     */
+    //开始语音转文字
     void onA2TStart(const QVariant &json);
     //转写错误
     void onA2TError(int error);
@@ -235,21 +232,11 @@ public slots:
     void onThemeChanged();
     //记事本列表显示或隐藏事件响应
     void onViewChangeClicked();
-    /**
-     * @brief 富文本编辑器插入图片
-     */
+    //富文本编辑器插入图片
     void onInsertImageToWebEditor();
-
-    /**
-     * @brief 响应web前端语音播放控制
-     * @param json :语音数据
-     * @param bIsSame : 此次语音是否与上一次语音相同
-     */
+    //响应web前端语音播放控制
     void onWebVoicePlay(const QVariant &json, bool bIsSame);
-
-    /**
-     * @brief 当前编辑区内容搜索为空
-     */
+    //当前编辑区内容搜索为空
     void onWebSearchEmpty();
 
 private:
@@ -289,8 +276,6 @@ private:
     bool setTabFocus(QObject *obj, QKeyEvent *event);
     //设置标题栏关闭按钮下个控件tab焦点
     bool setTitleCloseButtonNext(QKeyEvent *event);
-    //设置标题栏下个控件tab焦点
-    bool setTitlebarNext(QKeyEvent *event);
     //设置笔记列表下个控件tab焦点
     bool setMiddleviewNext(QKeyEvent *event);
     //设置添加笔记按钮下个控件tab焦点
