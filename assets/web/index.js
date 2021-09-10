@@ -74,9 +74,10 @@ var voiceIntervalObj;    //语音播放动画定时器对象
 var isVoicePaste = false
 var isShowAir = true
 var nowClickVoice = null
-
 var global_activeColor = ''
 var global_disableColor = ''
+var global_theme = 1
+var scrollHide = null  //滚动条隐藏定时器
 
 var tooltipContent = {
     fontsize: '字号',
@@ -99,9 +100,8 @@ $(document).ready(function () {
 })
 // 初始化summernote
 $('#summernote').summernote({
-    // focus: true,
+    focus: true,
     disableDragAndDrop: true,
-    // shortcuts: false,
     lang: 'zh-CN',
     popover: {
         air: [
@@ -124,7 +124,6 @@ $('#summernote').summernote({
 // 监听窗口大小变化
 $(window).resize(function () {
     $('.note-editable').css('min-height', $(window).height())
-    // $('.note-editable').find("img").width($('.note-editable').width())
     resizeImg()
 });
 
@@ -134,6 +133,7 @@ function resizeImg() {
     imgs.forEach((item, index) => {
         $(item).width($(item).parent().width())
     })
+    // changeContent()
 }
 
 /**
@@ -211,7 +211,12 @@ function setFocus(element, pos) {
     selection.addRange(range);
 }
 
-// 设置选区
+/**
+ * 设置选区
+ * @date 2021-09-10
+ * @param {any} dom
+ * @returns {any}
+ */
 function setSelectRange(dom) {
     var sel = window.getSelection();
     sel.removeAllRanges();
@@ -223,7 +228,13 @@ function setSelectRange(dom) {
     };
 
 }
-// 移除选区
+
+/**
+ * 移除选区
+ * @date 2021-09-10
+ * @param {any} dom
+ * @returns {any}
+ */
 function removeSelectRange(dom) {
     var sel = window.getSelection();
     var range = document.createRange();
@@ -553,6 +564,7 @@ function setHtml(html) {
     // 搜索功能
     webobj.jsCallSetDataFinsh();
     resetScroll()
+    resizeImg()
 }
 
 //设置录音转文字内容 flag: 0: 转换过程中 提示性文本（＂正在转文字中＂)１:结果 文本,空代表转失败了
@@ -709,7 +721,7 @@ function setVoiceButColor(color) {
  * @returns {any}
  */
 function changeColor(flag, activeColor, disableColor) {
-
+    global_theme = flag
     global_activeColor = activeColor
     global_disableColor = disableColor
 
@@ -799,22 +811,21 @@ function hideRightMenu() {
 // 重置滚动条
 function resetScroll() {
     if ($(document).scrollTop() != 0) {
-
         $(document).scrollTop(0)
     }
 }
 
-let scrollHide = null
 // 监听滚动事件
 $(document).scroll(function () {
     if (scrollHide) {
         clearTimeout(scrollHide)
-    }
-    $('#scrollStyle').html(`
+        $('#scrollStyle').html(`
         body::-webkit-scrollbar-thumb {
-        background-color: rgba(83, 96, 118, .5);
+        background-color:${global_theme == 1 ? "rgba(0, 0, 0, 0.30)" : "rgba(255, 255, 255, 0.20)"} ;
         }`
-    )
+        )
+    }
+
     scrollHide = setTimeout(() => {
         $('#scrollStyle').html('')
     }, 1500);

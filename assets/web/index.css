@@ -3,7 +3,8 @@ body {
     line-height: 1.7;
     font-family: 'Helvetica';
     background-color: transparent;
-    color: rgba(65, 77, 104, 1)
+    color: rgba(65, 77, 104, 1);
+    overflow-x: hidden;
 }
 
 .demo {

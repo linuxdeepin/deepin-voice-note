@@ -71,3 +71,13 @@ body {
 .btn-default:hover {
     background-color: rgba(255, 255, 255, 0.05)!important;
 }
+
+body::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, .25);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+body::-webkit-scrollbar-thumb:active {
+    background-color: rgba(255, 255, 255, .3);
+    border-color: rgba(0, 0, 0, 0.1);
+}
