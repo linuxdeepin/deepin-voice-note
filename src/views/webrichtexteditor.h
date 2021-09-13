@@ -143,11 +143,6 @@ public slots:
      * @brief 隐藏编辑工具栏
      */
     void onHideEditToolbar();
-    /**
-     * @brief onMenuShortcut
-     * Ctrl+M事件响应
-     */
-    void onMenuShortcut();
 
 protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
@@ -174,11 +169,6 @@ private:
      * @brief 初始化信号连接
      */
     void initConnections();
-    /**
-     * @brief initShortcuts
-     * 注册快捷键事件
-     */
-    void initShortcuts();
     /**
      * @brief 文字菜单显示
      */

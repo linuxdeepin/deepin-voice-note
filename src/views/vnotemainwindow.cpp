@@ -2182,8 +2182,10 @@ void VNoteMainWindow::onPoppuMenuShortcut()
             QContextMenuEvent eve(QContextMenuEvent::Reason::Keyboard, pos, m_noteSearchEdit->mapToGlobal(pos));
             m_showSearchEditMenu = QApplication::sendEvent(m_noteSearchEdit->lineEdit(), &eve);
         }
-    } else {
-        // m_rightView->popupMenu();
+    } else if (m_richTextEdit->hasFocus()) {
+        //模拟发送菜单键事件
+        QKeyEvent event(QEvent::KeyPress, Qt::Key_Menu, Qt::NoModifier);
+        QApplication::sendEvent(m_richTextEdit->focusProxy(), &event);
     }
 }
 

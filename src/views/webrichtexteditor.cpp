@@ -52,7 +52,6 @@ WebRichTextEditor::WebRichTextEditor(QWidget *parent)
     initWebView();
     initRightMenu();
     initUpdateTimer();
-    initShortcuts();
 
     initConnections();
 }
@@ -104,15 +103,6 @@ void WebRichTextEditor::initConnections()
 {
     //剪贴板数据发生改变信号转发
     connect(QApplication::clipboard(), &QClipboard::dataChanged, JsContent::instance(), &JsContent::callJsClipboardDataChanged);
-}
-
-void WebRichTextEditor::initShortcuts()
-{
-    m_stMenu.reset(new QShortcut(this));
-    m_stMenu->setKey(Qt::CTRL + Qt::Key_M);
-    m_stMenu->setContext(Qt::ApplicationShortcut);
-    m_stMenu->setAutoRepeat(false);
-    connect(m_stMenu.get(), &QShortcut::activated, this, &WebRichTextEditor::onMenuShortcut);
 }
 
 void WebRichTextEditor::initUpdateTimer()
@@ -587,21 +577,6 @@ void WebRichTextEditor::onHideEditToolbar()
     if (!m_editToolbarRect.contains(mapFromGlobal(QCursor::pos()))) {
         emit JsContent::instance()->callJsHideEditToolbar();
     }
-}
-
-/**
- * @brief WebRichTextEditor::onMenuShortcut
- * Ctrl+M事件响应，模拟menu键事件
- */
-void WebRichTextEditor::onMenuShortcut()
-{
-    //当前编辑区没有焦点则不做处理
-    if (!hasFocus()) {
-        return;
-    }
-    //模拟发送菜单键事件
-    QKeyEvent event(QEvent::KeyPress, Qt::Key_Menu, Qt::NoModifier);
-    QApplication::sendEvent(focusProxy(), &event);
 }
 
 void WebRichTextEditor::setData(VNoteItem *data, const QString &reg, bool focus)
