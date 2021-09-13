@@ -21,6 +21,8 @@
 #include "gtest/gtest.h"
 #include <QTest>
 #include <QObject>
+#include <QWebChannel>
+#include <QWebEnginePage>
 
 class VNoteMainWindow;
 
@@ -31,6 +33,7 @@ class ut_vnotemainwindow_test : public QObject
 public:
     ut_vnotemainwindow_test();
     VNoteMainWindow *m_mainWindow {nullptr};
+    QWebEnginePage *stub_page();
 
 protected:
     virtual void SetUp() override;

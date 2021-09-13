@@ -40,7 +40,7 @@
 #include "vnoterecordbar.h"
 #include "vnoteiconbutton.h"
 #include "vnmainwnddelayinittask.h"
-#include "richtextedit.h"
+#include "webrichtexteditor.h"
 
 #include "upgradeview.h"
 #include "upgradedbutil.h"
@@ -49,6 +49,8 @@
 #include "stub.h"
 
 #include <DFileDialog>
+
+static QWebChannel *webchannel;
 
 static void stub_vnotemainwindow()
 {
@@ -63,6 +65,15 @@ static int stub_fileDialog()
 {
     return 0;
 }
+void stub_setWeb(QWebChannel *channel)
+{
+    webchannel = channel;
+}
+
+QWebEnginePage *ut_vnotemainwindow_test::stub_page()
+{
+    return (QWebEnginePage *)this;
+}
 
 ut_vnotemainwindow_test::ut_vnotemainwindow_test()
 {
@@ -73,7 +84,12 @@ void ut_vnotemainwindow_test::SetUp()
     Stub stub;
     stub.set(ADDR(VNoteMainWindow, initData), stub_vnotemainwindow);
     stub.set(ADDR(VNoteMainWindow, delayInitTasks), stub_vnotemainwindow);
-    stub.set(ADDR(RichTextEdit, initWebView), stub_vnotemainwindow);
+    stub.set((QWebEnginePage * (QWebEngineView::*)()) ADDR(QWebEngineView, page), ADDR(ut_vnotemainwindow_test, stub_page));
+    stub.set((void (QWebEnginePage::*)(QWebChannel *))ADDR(QWebEnginePage, setWebChannel), stub_setWeb);
+    stub.set((void (QWebEngineView::*)(const QUrl &))ADDR(QWebEngineView, load), stub_vnotemainwindow);
+    stub.set((void (QWebEnginePage::*)(const QString &))ADDR(QWebEnginePage, runJavaScript), stub_vnotemainwindow);
+    stub.set((void (QWebEnginePage::*)(const QColor &))ADDR(QWebEnginePage, setBackgroundColor), stub_vnotemainwindow);
+
     m_mainWindow = new VNoteMainWindow;
     m_mainWindow->switchWidget(VNoteMainWindow::WndNoteShow);
 }

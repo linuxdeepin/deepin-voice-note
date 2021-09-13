@@ -25,7 +25,7 @@
 #include "views/homepage.h"
 #include "views/splashview.h"
 #include "views/middleviewsortfilter.h"
-#include "views/richtextedit.h"
+#include "views/webrichtexteditor.h"
 
 #include "common/vtextspeechandtrmanager.h"
 #include "common/standarditemcommon.h"
@@ -205,8 +205,8 @@ void VNoteMainWindow::initConnections()
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
             this, &VNoteMainWindow::onThemeChanged);
     connect(JsContent::instance(), &JsContent::playVoice, this, &VNoteMainWindow::onWebVoicePlay);
-    connect(m_richTextEdit, &RichTextEdit::currentSearchEmpty, this, &VNoteMainWindow::onWebSearchEmpty);
-    connect(m_richTextEdit, &RichTextEdit::contentChanged, m_middleView, &MiddleView::onNoteChanged, Qt::QueuedConnection);
+    connect(m_richTextEdit, &WebRichTextEditor::currentSearchEmpty, this, &VNoteMainWindow::onWebSearchEmpty);
+    connect(m_richTextEdit, &WebRichTextEditor::contentChanged, m_middleView, &MiddleView::onNoteChanged, Qt::QueuedConnection);
     //创建笔记
     connect(JsContent::instance(), &JsContent::createNote, this, &VNoteMainWindow::onAddNoteShortcut, Qt::QueuedConnection);
 }
@@ -549,10 +549,9 @@ void VNoteMainWindow::initRightView()
     m_recordBar->setAutoFillBackground(true);
     m_recordBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    m_richTextEdit = new RichTextEdit(m_rightViewHolder);
+    m_richTextEdit = new WebRichTextEditor(m_rightViewHolder);
     rightHolderLayout->addWidget(m_richTextEdit);
     m_richTextEdit->installEventFilter(this);
-    m_richTextEdit->initWebView();
 
     recordBarHolderLayout->addWidget(m_recordBar);
 
@@ -573,7 +572,7 @@ void VNoteMainWindow::initA2TManager()
     //audio to text manager
     m_a2tManager = new VNoteA2TManager(this);
 
-    connect(m_richTextEdit, &RichTextEdit::asrStart, this, &VNoteMainWindow::onA2TStart);
+    connect(m_richTextEdit, &WebRichTextEditor::asrStart, this, &VNoteMainWindow::onA2TStart);
     connect(m_a2tManager, &VNoteA2TManager::asrError, this, &VNoteMainWindow::onA2TError);
     connect(m_a2tManager, &VNoteA2TManager::asrSuccess, this, &VNoteMainWindow::onA2TSuccess);
 }
@@ -2371,7 +2370,7 @@ void VNoteMainWindow::onInsertImageToWebEditor()
         QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
         "Image file(*.jpg *.png *.bmp)");
     JsContent::instance()->insertImages(filePaths);
-    m_richTextEdit->setWebViewFocus(); //将焦点转移至编辑区
+    m_richTextEdit->setFocus(); //将焦点转移至编辑区
 }
 
 /**

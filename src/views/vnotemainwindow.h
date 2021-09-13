@@ -50,7 +50,7 @@ class VNoteIconButton;
 class VNoteA2TManager;
 class LeftView;
 class MiddleView;
-class RichTextEdit;
+class WebRichTextEditor;
 class HomePage;
 class SplashView;
 class VoiceNoteItem;
@@ -303,7 +303,7 @@ private:
     DSplitter *m_mainWndSpliter {nullptr};
     LeftView *m_leftView {nullptr};
     MiddleView *m_middleView {nullptr};
-    RichTextEdit *m_richTextEdit {nullptr};
+    WebRichTextEditor *m_richTextEdit {nullptr};
 
     DPushButton *m_addNotepadBtn {nullptr};
     DFloatingButton *m_addNoteBtn {nullptr};

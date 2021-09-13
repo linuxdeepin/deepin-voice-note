@@ -124,38 +124,10 @@ void WebRichTextEditor::initUpdateTimer()
 
 void WebRichTextEditor::initData(VNoteItem *data, const QString &reg, bool focus)
 {
-    //有焦点先隐藏编辑工具栏
-    if (hasFocus()) {
-        emit JsContent::instance()->callJsHideEditToolbar();
-    } else if (focus) {
-        setFocus();
-    }
-
-    if (nullptr == data) {
-        this->setVisible(false);
-        //无数据时先保存之前数据
-        updateNote();
-        //解绑当前数据
-        unboundCurrentNoteData();
-        return;
-    }
-    this->setVisible(true);
-    //清除选中需重新加载，解决匹配字符显示灰色问题
-    bool reSet = !m_searchKey.isEmpty() && reg.isEmpty();
-    m_searchKey = reg;
-    if (m_noteData != data || reSet) { //笔记切换或清除搜索结果时设置笔记内容
-        m_updateTimer->stop();
-        updateNote();
-        m_noteData = data;
-        if (data->htmlCode.isEmpty()) {
-            emit JsContent::instance()->callJsInitData(data->metaDataRef().toString());
-        } else {
-            emit JsContent::instance()->callJsSetHtml(data->htmlCode);
-        }
-        m_updateTimer->start();
-    } else { //笔记相同时执行搜索
-        findText(reg);
-    }
+    //富文本设置异步操作，解决笔记列表不实时刷新
+    QTimer::singleShot(0, this, [=] {
+        setData(data, reg, focus);
+    });
 }
 
 void WebRichTextEditor::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
@@ -600,4 +572,40 @@ void WebRichTextEditor::onMenuShortcut()
     //模拟发送菜单键事件
     QKeyEvent event(QEvent::KeyPress, Qt::Key_Menu, Qt::NoModifier);
     QApplication::sendEvent(focusProxy(), &event);
+}
+
+void WebRichTextEditor::setData(VNoteItem *data, const QString &reg, bool focus)
+{
+    //有焦点先隐藏编辑工具栏
+    if (hasFocus()) {
+        emit JsContent::instance()->callJsHideEditToolbar();
+    } else if (focus) {
+        setFocus();
+    }
+
+    if (nullptr == data) {
+        this->setVisible(false);
+        //无数据时先保存之前数据
+        updateNote();
+        //解绑当前数据
+        unboundCurrentNoteData();
+        return;
+    }
+    this->setVisible(true);
+    //清除选中需重新加载，解决匹配字符显示灰色问题
+    bool reSet = !m_searchKey.isEmpty() && reg.isEmpty();
+    m_searchKey = reg;
+    if (m_noteData != data || reSet) { //笔记切换或清除搜索结果时设置笔记内容
+        m_updateTimer->stop();
+        updateNote();
+        m_noteData = data;
+        if (data->htmlCode.isEmpty()) {
+            emit JsContent::instance()->callJsInitData(data->metaDataRef().toString());
+        } else {
+            emit JsContent::instance()->callJsSetHtml(data->htmlCode);
+        }
+        m_updateTimer->start();
+    } else { //笔记相同时执行搜索
+        findText(reg);
+    }
 }
