@@ -493,6 +493,36 @@ void WebRichTextEditor::contextMenuEvent(QContextMenuEvent *e)
     }
 }
 
+/**
+ * @brief WebRichTextEditor::dragEnterEvent
+ * 拖拽移入， 覆盖父类方法
+ * @param event
+ */
+void WebRichTextEditor::dragEnterEvent(QDragEnterEvent *event)
+{
+    event->acceptProposedAction();
+}
+
+/**
+ * @brief WebRichTextEditor::dragLeaveEvent
+ * 拖拽移出， 覆盖父类方法
+ * @param event
+ */
+void WebRichTextEditor::dragLeaveEvent(QDragLeaveEvent *event)
+{
+    Q_UNUSED(event);
+}
+
+/**
+ * @brief WebRichTextEditor::dragMoveEvent
+ * 拖拽移动， 覆盖父类方法
+ * @param e
+ */
+void WebRichTextEditor::dragMoveEvent(QDragMoveEvent *e)
+{
+    Q_UNUSED(e);
+}
+
 void WebRichTextEditor::dropEvent(QDropEvent *event)
 {
     // 获取文件路径
