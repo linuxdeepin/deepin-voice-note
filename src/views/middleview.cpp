@@ -246,6 +246,7 @@ qint32 MiddleView::rowCount() const
  */
 void MiddleView::setCurrentIndex(int index)
 {
+    initPositionStatus(index);
     DListView::setCurrentIndex(m_pSortViewFilter->index(index, 0));
 }
 
