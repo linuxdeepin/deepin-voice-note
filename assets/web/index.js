@@ -94,10 +94,6 @@ var tooltipContent = {
     recentlyUsed: '最近使用'
 }
 
-$(document).ready(function () {
-    // var u = navigator.userAgent;
-
-})
 // 初始化summernote
 $('#summernote').summernote({
     focus: true,
@@ -124,17 +120,9 @@ $('#summernote').summernote({
 // 监听窗口大小变化
 $(window).resize(function () {
     $('.note-editable').css('min-height', $(window).height())
-    resizeImg()
 });
 
-// 重置图片宽度
-function resizeImg() {
-    let imgs = document.querySelectorAll('.note-editable img')
-    imgs.forEach((item, index) => {
-        $(item).width($(item).parent().width())
-    })
-    // changeContent()
-}
+
 
 /**
  * 通知后台存储页面内容
@@ -342,11 +330,6 @@ function isRangeVoice() {
     return selectedRange
 }
 
-// 监听鼠标抬起事件
-$('body').on('mouseup', function () {
-    // console.log(isRangVoice())
-})
-
 //播放
 $('body').on('click', '.voicebtn', function (e) {
     // e.stopPropagation();
@@ -442,7 +425,6 @@ function getCursortPosition(element) {
 
 //初始化数据 
 function initData(text) {
-    console.log(text)
     initFinish = false;
     var arr = JSON.parse(text);
     var html = '';
@@ -566,8 +548,6 @@ function setHtml(html) {
     // 搜索功能
     webobj.jsCallSetDataFinsh();
     resetScroll()
-    resizeImg()
-
     $('#summernote').summernote('editor.resetRecord')
 }
 
@@ -796,6 +776,12 @@ $('body').on('dblclick', 'img', function (e) {
     webobj.jsCallViewPicture(imgUrl)
 })
 
+// 图片单击选中
+$('body').on('click', 'img', function (e) {
+    let img = e.target
+    setSelectRange(img)
+})
+
 /**
  * 右键显示悬浮工具栏
  * @date 2021-09-03
@@ -834,7 +820,6 @@ $(document).scroll(function () {
         $('#scrollStyle').html('')
     }, 1500);
 });
-
 
 /**
  * 改变光标颜色

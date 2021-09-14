@@ -265,6 +265,7 @@
  .note-editable img {
      padding: 2px!important;
      margin: 2px!important;
+     width: 100%!important;
  }
 
  .slopingside {

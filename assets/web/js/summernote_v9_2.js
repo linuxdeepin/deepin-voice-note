@@ -2988,6 +2988,7 @@
         Bullet.prototype.insertOrderedList = function (editable) {
             // this.toggleList('OL', editable);
             document.execCommand('insertOrderedList', false)
+            this.removeP()
         };
         /**
          * toggle unordered list
@@ -2995,6 +2996,19 @@
         Bullet.prototype.insertUnorderedList = function (editable) {
             // this.toggleList('UL', editable);
             document.execCommand('insertUnorderedList', false)
+            this.removeP()
+        };
+        /**
+         * 移除P标签
+         * @date 2021-09-14
+         * @returns {any}
+         */
+        Bullet.prototype.removeP = function () {
+            let selection = window.getSelection().getRangeAt(0);
+            let startNode = selection.startContainer.parentNode;
+            if ($(startNode).parents('P').length) {
+                $(startNode).parents('P').children().unwrap()
+            }
         };
         /**
          * indent
@@ -3069,14 +3083,14 @@
                 paras = this.releaseList(clustereds, true);
             } else if (paras.every((item, index) => item.tagName == "LI")) {
                 console.log('只有li标签')
-                paras = _this.removeList(paras, listName);
+                paras = this.changeList(paras, listName);
             }
             else {
                 console.log('带有其他标签')
-                paras = _this.wrapList(paras, listName);
+                paras = this.wrapList(paras, listName);
             }
             range.createFromParaBookmark(bookmark, paras).select();
-  
+
             // paragraph to list
             // 判断list是否有p标签
             // if (lists.find(paras, dom.isPurePara)) {
@@ -3129,21 +3143,10 @@
                 $(last).unwrap()
                 listNode = head.parentNode
             }
-            if (listNode.nextSibling && listNode.nextSibling.tagName == listNode.tagName) {
-                for (let i = 0; i < listNode.nextSibling.children.length; i++) {
-                    $(listNode).appendChild($(listNode.nextSibling.children[i]))
-                }
-                listNode.nextSibling.remove()
-            }
-            if (listNode.previousSibling && listNode.previousSibling.tagName == listNode.tagName) {
-                for (let i = 0; i < listNode.previousSibling.children.length; i++) {
-                    $(listNode).prepend($(listNode.previousSibling.children[i]))
-                }
-                listNode.previousSibling.remove()
-            }
+            this.autoPrevAndNext(listNode)
             return paras;
         };
-        Bullet.prototype.removeList = function (paras, listName) {
+        Bullet.prototype.changeList = function (paras, listName) {
             var head = lists.head(paras);
             var last = lists.last(paras);
             var prevAllList = $(head).prevAll();
@@ -3160,13 +3163,42 @@
             prevAllList.toArray().reverse().forEach(item => {
                 prevAllListParent.append(item)
             })
+            this.removeNullList()
+            this.autoPrevAndNext(listNode)
+            return paras;
+        };
+        /**
+         * 自动适应上下文
+         * @date 2021-09-14
+         * @param {any} listNode
+         * @returns {any}
+         */
+        Bullet.prototype.autoPrevAndNext = function (listNode) {
+            if (listNode.nextSibling && listNode.nextSibling.tagName == listNode.tagName) {
+                for (let i = 0; i < listNode.nextSibling.children.length; i++) {
+                    $(listNode).appendChild($(listNode.nextSibling.children[i]))
+                }
+                listNode.nextSibling.remove()
+            }
+            if (listNode.previousSibling && listNode.previousSibling.tagName == listNode.tagName) {
+                for (let i = 0; i < listNode.previousSibling.children.length; i++) {
+                    $(listNode).prepend($(listNode.previousSibling.children[i]))
+                }
+                listNode.previousSibling.remove()
+            }
+        };
+        /**
+         * 移除空UL,OL
+         * @date 2021-09-14
+         * @returns {any}
+         */
+        Bullet.prototype.removeNullList = function () {
             $('ul,ol').toArray().forEach(item => {
                 if ($(item).html() == '') {
                     $(item).remove()
                 }
             })
-            return paras;
-        };
+        }
         /**
          * @method releaseList
          *
@@ -4414,29 +4446,20 @@
                     if (typeof param === 'string') {
                         $image.attr('data-filename', param);
                     }
-                    // $image.css('width', Math.min(_this.$editable.width(), $image.width()));
-                    $image.css('width', '100%');
-
                 }
-
                 $image.show();
-
-                if ($(range.create(_this.editable).sc).closest('li').prop("tagName") == 'LI') {
-                    $image.css('width', $(range.create(_this.editable).sc).closest('li').width());
-                }
-
                 range.create(_this.editable).insertNode($image[0]);
                 range.createFromNodeAfter($image[0]).select();
-                _this.afterCommand();
+
                 let voiceBoxList = document.querySelectorAll('.voiceBox')
                 voiceBoxList.forEach((item, index) => {
                     if ($(item).find('img').length != 0) {
                         $(item).after($(item).clone().html())
                         $(item).remove()
                     }
-
                 })
-                // resizeImg()
+
+                _this.afterCommand();
             }).fail(function (e) {
                 _this.context.triggerEvent('image.upload.error', e);
             });
@@ -7031,18 +7054,25 @@
         AirPopover.prototype.destroy = function () {
             this.$popover.remove();
         };
-        AirPopover.prototype.update = function () {
-            var styleInfo = this.context.invoke('editor.currentStyle');
-            let selStr = window.getSelection().toString();
-
+        /**
+         * 隐藏olul
+         * @date 2021-09-14
+         * @param {any} styleInfo
+         * @returns {any}
+         */
+        AirPopover.prototype.isShowOlUl = function (styleInfo) {
             var selectionObj = window.getSelection();
             var rangeObj = selectionObj.getRangeAt(0);
             var docFragment = rangeObj.cloneContents();
             var testDiv = document.createElement("div");
             testDiv.appendChild(docFragment);
-            if ($(testDiv).find('.translate').length != 0
-                || $(styleInfo.range.sc).parents('.translate').length != 0
-                || $(testDiv).find('img').length != 0) {
+            if ($(testDiv).find('.translate').length
+                || $(styleInfo.range.sc).parents('.translate').length
+                || $(testDiv).find('img').length
+                || $(rangeObj.startContainer).closest('li').find('img').length
+                || $(rangeObj.startContainer).closest('li').find('.translate').length
+                || $(rangeObj.endContainer).closest('li').find('img').length
+                || $(rangeObj.endContainer).closest('li').find('.translate').length) {
                 $('.note-ul').hide()
                 $('.note-ol').hide()
                 $('.note-line').hide()
@@ -7051,6 +7081,13 @@
                 $('.note-ol').show()
                 $('.note-line').show()
             }
+        };
+        AirPopover.prototype.update = function () {
+            var styleInfo = this.context.invoke('editor.currentStyle');
+            let selStr = window.getSelection().toString();
+
+            this.isShowOlUl(styleInfo)
+
             if (!isShowAir) {
                 isShowAir = true
                 return this.hide();
@@ -7060,7 +7097,6 @@
                 || selStr == '') {
                 return this.hide();
             }
-
 
             if (styleInfo.range && !styleInfo.range.isCollapsed()) {
                 var rect = lists.last(styleInfo.range.getClientRects());
@@ -7093,26 +7129,10 @@
             var styleInfo = this.context.invoke('editor.currentStyle');
             var rect = lists.last(styleInfo.range.getClientRects());
 
-            var selectionObj = window.getSelection();
-            var rangeObj = selectionObj.getRangeAt(0);
-            var docFragment = rangeObj.cloneContents();
-            var testDiv = document.createElement("div");
-            testDiv.appendChild(docFragment);
-            if ($(testDiv).find('.translate').length != 0
-                || $(styleInfo.range.sc).parents('.translate').length != 0
-                || $(testDiv).find('img').length != 0) {
-                $('.note-ul').hide()
-                $('.note-line').hide()
-            } else {
-                $('.note-ul').show()
-                $('.note-ol').show()
-                $('.note-line').show()
-            }
+            this.isShowOlUl(styleInfo)
+
             if (rect) {
-                var bnd = func.rect2bnd(rect);
                 let winWidth = $(document).width()
-                let left = Math.max(bnd.left + bnd.width / 2 - 150, 0);
-                let top = bnd.top + bnd.height - 60;
                 if (winWidth - x < 320) {
                     x = winWidth - 320
                 }
@@ -7123,8 +7143,6 @@
                 });
                 this.context.invoke('buttons.updateCurrentStyle', this.$popover);
             }
-
-
 
         };
 
