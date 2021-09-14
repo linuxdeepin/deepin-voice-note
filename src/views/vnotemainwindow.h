@@ -225,7 +225,7 @@ public slots:
     void onPlayPauseShortcut();
     void onRecordShorcut();
     void onSaveMp3Shortcut();
-    void onSaveTextShortcut();
+    void onSaveNoteShortcut();
     void onSaveVoicesShortcut();
 
     //主题切换

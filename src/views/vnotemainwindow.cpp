@@ -314,7 +314,7 @@ void VNoteMainWindow::initShortcuts()
     m_stSaveAsText->setKey(Qt::CTRL + Qt::Key_S);
     m_stSaveAsText->setContext(Qt::ApplicationShortcut);
     m_stSaveAsText->setAutoRepeat(false);
-    connect(m_stSaveAsText.get(), &QShortcut::activated, this, &VNoteMainWindow::onSaveTextShortcut);
+    connect(m_stSaveAsText.get(), &QShortcut::activated, this, &VNoteMainWindow::onSaveNoteShortcut);
 
     //Save recordings
     m_stSaveVoices.reset(new QShortcut(this));
@@ -925,7 +925,7 @@ void VNoteMainWindow::onPreviewShortcut()
         {DApplication::translate("Shortcuts", "Delete note"), "Delete"},
         {DApplication::translate("Shortcuts", "Play/Pause"), "Space"},
         {DApplication::translate("Shortcuts", "Record voice"), "Ctrl+R"},
-        {DApplication::translate("Shortcuts", "Save as TXT"), "Ctrl+S"},
+        {DApplication::translate("Shortcuts", "Save note"), "Ctrl+S"},
         {DApplication::translate("Shortcuts", "Save recordings"), "Ctrl+Y"},
     };
 
@@ -1223,9 +1223,13 @@ void VNoteMainWindow::onMenuAbout2Show()
             if (!m_middleView->haveVoice()) {
                 ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
             }
+            //根据选中笔记是否有文本设置保存笔记二级菜单置灰状态
+            ActionManager::Instance()->saveNoteContextMenu()->setEnabled(m_middleView->haveText());
         } else {
             VNoteItem *currNoteData = m_middleView->getCurrVNotedata();
             if (nullptr != currNoteData) {
+                //根据当前笔记是否有文本设置保存笔记二级菜单置灰状态
+                ActionManager::Instance()->saveNoteContextMenu()->setEnabled(currNoteData->haveText());
                 if (!currNoteData->haveVoice()) {
                     ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
                 }
@@ -1244,25 +1248,6 @@ void VNoteMainWindow::onMenuAbout2Show()
             || stateOperation->isVoice2Text()) {
             ActionManager::Instance()->enableAction(ActionManager::NotebookAddNew, false);
             ActionManager::Instance()->enableAction(ActionManager::NotebookDelete, false);
-        }
-    } else if (menu == ActionManager::Instance()->saveNoteContextMenu()) {
-        ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::SaveNoteCtxMenu);
-        if (m_middleView->isMultipleSelected()) {
-            //多选状态
-            if (!m_middleView->haveText()) {
-                //所有笔记都为空
-                ActionManager::Instance()->enableAction(ActionManager::SaveNoteAsHtml, false);
-                ActionManager::Instance()->enableAction(ActionManager::SaveNoteAsText, false);
-            }
-        } else {
-            //单选状态
-            VNoteItem *currNoteData = m_middleView->getCurrVNotedata();
-            if (nullptr != currNoteData) {
-                if (!currNoteData->haveText()) {
-                    ActionManager::Instance()->enableAction(ActionManager::SaveNoteAsText, false);
-                    ActionManager::Instance()->enableAction(ActionManager::SaveNoteAsHtml, false);
-                }
-            }
         }
     }
 }
@@ -1961,7 +1946,7 @@ void VNoteMainWindow::handleMultipleOption(int id)
     } break;
     case ButtonValue::SaveAsTxT:
         //多选页面-保存TxT
-        m_middleView->saveAs(MiddleView::SaveAsType::TextAndHtml);
+        m_middleView->saveAs(MiddleView::SaveAsType::Note);
         break;
     case ButtonValue::SaveAsVoice:
         //多选页面-保存语音
@@ -2262,12 +2247,12 @@ void VNoteMainWindow::onSaveMp3Shortcut()
     //    }
 }
 
-void VNoteMainWindow::onSaveTextShortcut()
+void VNoteMainWindow::onSaveNoteShortcut()
 {
     //多选笔记导出文本
     if (canDoShortcutAction()) {
         if (m_middleView->haveText()) {
-            m_middleView->saveAs(MiddleView::SaveAsType::TextAndHtml);
+            m_middleView->saveAs(MiddleView::SaveAsType::Note);
         }
     }
 }

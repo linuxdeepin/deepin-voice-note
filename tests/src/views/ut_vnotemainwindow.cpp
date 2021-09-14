@@ -276,7 +276,7 @@ TEST_F(ut_vnotemainwindow_test, onShortcut)
     m_mainWindow->onRenameNoteShortcut();
     m_mainWindow->onPlayPauseShortcut();
     m_mainWindow->onSaveMp3Shortcut();
-    m_mainWindow->onSaveTextShortcut();
+    m_mainWindow->onSaveNoteShortcut();
     m_mainWindow->onSaveVoicesShortcut();
 }
 

@@ -71,7 +71,7 @@ public:
     };
     //另存为类型
     enum SaveAsType {
-        TextAndHtml = 0, //txt和html类型
+        Note = 0, //保存笔记
         Text, //txt类型
         Html, //html类型
         Voice, //语音类型

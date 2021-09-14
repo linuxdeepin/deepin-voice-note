@@ -247,7 +247,7 @@ void ActionManager::initMenu()
                   << DApplication::translate("NotesContextMenu", "")
                   << DApplication::translate("NotesContextMenu", "Move")
                   << DApplication::translate("NotesContextMenu", "Delete")
-                  << DApplication::translate("NotesContextMenu", "Save as TXT")
+                  << DApplication::translate("NotesContextMenu", "")
                   << DApplication::translate("NotesContextMenu", "Save voice recording")
                   << DApplication::translate("NotesContextMenu", "New note");
 
