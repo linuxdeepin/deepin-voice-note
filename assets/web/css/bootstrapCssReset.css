@@ -53,6 +53,7 @@
  p {
      margin: 0!important;
      word-wrap: break-word;
+     white-space: pre
  }
 
  .voiceRightMouse {

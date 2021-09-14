@@ -2781,11 +2781,22 @@
             // Record our first snapshot (of nothing).
             this.recordUndo();
         };
+        History.prototype.resetRecord = function () {
+            // Clear the stack.
+            this.stack = [];
+            // Restore stackOffset to its original value.
+            this.stackOffset = -1;
+            // Record our first snapshot (of nothing).
+            this.recordUndo();
+        };
         /**
          * undo
          */
         History.prototype.undo = function () {
             // debugger;
+            console.log(this.stack);
+            console.log(this.stackOffset);
+
             // Create snap shot if not yet recorded
             if (this.$editable.html() !== this.stack[this.stackOffset].contents) {
                 this.recordUndo();
@@ -3053,34 +3064,46 @@
             if (isVoice) {
                 return;
             }
-
-            // paragraph to list
-            // 判断list是否有p标签
-            if (lists.find(paras, dom.isPurePara)) {
-                var wrappedParas_1 = [];
-                $$1.each(clustereds, function (idx, paras) {
-                    let content = _this.wrapList(paras, listName);
-                    wrappedParas_1 = wrappedParas_1.concat(content);
-                });
-                paras = wrappedParas_1;
-                // list to paragraph or change list style
+            if (paras.every(item => item.parentNode == paras[0].parentNode) && paras[0].parentNode.tagName == listName) {
+                console.log('取消列表')
+                paras = this.releaseList(clustereds, true);
+            } else if (paras.every((item, index) => item.tagName == "LI")) {
+                console.log('只有li标签')
+                paras = _this.removeList(paras, listName);
             }
             else {
-                var diffLists = rng.nodes(dom.isList, {
-                    includeAncestor: true
-                }).filter(function (listNode) {
-                    return !$$1.nodeName(listNode, listName);
-                });
-                if (diffLists.length) {
-                    $$1.each(diffLists, function (idx, listNode) {
-                        dom.replace(listNode, listName);
-                    });
-                }
-                else {
-                    paras = this.releaseList(clustereds, true);
-                }
+                console.log('带有其他标签')
+                paras = _this.wrapList(paras, listName);
             }
             range.createFromParaBookmark(bookmark, paras).select();
+  
+            // paragraph to list
+            // 判断list是否有p标签
+            // if (lists.find(paras, dom.isPurePara)) {
+            //     var wrappedParas_1 = [];
+            //     $$1.each(clustereds, function (idx, paras) {
+            //         let content = _this.wrapList(paras, listName);
+            //         wrappedParas_1 = wrappedParas_1.concat(content);
+            //     });
+            //     paras = wrappedParas_1;
+            //     // list to paragraph or change list style
+            // }
+            // else {
+            //     var diffLists = rng.nodes(dom.isList, {
+            //         includeAncestor: true
+            //     }).filter(function (listNode) {
+            //         return !$$1.nodeName(listNode, listName);
+            //     });
+            //     if (diffLists.length) {
+            //         $$1.each(diffLists, function (idx, listNode) {
+            //             dom.replace(listNode, listName);
+            //         });
+            //     }
+            //     else {
+            //         paras = this.releaseList(clustereds, true);
+            //     }
+            // }
+            // range.createFromParaBookmark(bookmark, paras).select();
         };
         /**
          * @param {Node[]} paras
@@ -3088,30 +3111,60 @@
          * @return {Node[]}
          */
         Bullet.prototype.wrapList = function (paras, listName) {
-            debugger;
             var head = lists.head(paras);
             var last = lists.last(paras);
+
             var prevList = dom.isList(head.previousSibling) && head.previousSibling;
+            console.log(head.previousSibling)
             var nextList = dom.isList(last.nextSibling) && last.nextSibling;
-            var listNode = prevList || dom.insertAfter(dom.create(listName || 'UL'), last);
+            var isLi = dom.isList(last.parentNode)
+            var listNode = (prevList ? (prevList.tagName == listName ? prevList : null) : null) || dom.insertAfter(dom.create(listName || 'UL'), last);
             // P to LI
             paras = paras.map(function (para) {
-
-                return dom.isPurePara(para) ? dom.replace(para, 'LI') : para;
-
+                return !dom.isLi(para) ? dom.replace(para, 'LI') : para;
             });
-            console.log(head)
-            console.log(last)
-            console.log(prevList)
-            console.log(nextList)
-            console.log(listNode)
-            console.log(paras)
             // append to list(<ul>, <ol>)
             dom.appendChildNodes(listNode, paras);
-            if (nextList) {
-                dom.appendChildNodes(listNode, lists.from(nextList.childNodes));
-                dom.remove(nextList);
+            if (isLi) {
+                $(last).unwrap()
+                listNode = head.parentNode
             }
+            if (listNode.nextSibling && listNode.nextSibling.tagName == listNode.tagName) {
+                for (let i = 0; i < listNode.nextSibling.children.length; i++) {
+                    $(listNode).appendChild($(listNode.nextSibling.children[i]))
+                }
+                listNode.nextSibling.remove()
+            }
+            if (listNode.previousSibling && listNode.previousSibling.tagName == listNode.tagName) {
+                for (let i = 0; i < listNode.previousSibling.children.length; i++) {
+                    $(listNode).prepend($(listNode.previousSibling.children[i]))
+                }
+                listNode.previousSibling.remove()
+            }
+            return paras;
+        };
+        Bullet.prototype.removeList = function (paras, listName) {
+            var head = lists.head(paras);
+            var last = lists.last(paras);
+            var prevAllList = $(head).prevAll();
+            var nextAllList = $(last).nextAll();
+            var nextAllListParent = dom.insertAfter(dom.create(last.parentNode.tagName || 'UL'), head.parentNode);
+            var listNode = dom.insertAfter(dom.create(listName || 'UL'), head.parentNode);
+            var prevAllListParent = dom.insertAfter(dom.create(head.parentNode.tagName || 'UL'), head.parentNode);
+            nextAllList.toArray().forEach(item => {
+                nextAllListParent.append(item)
+            })
+            paras.forEach(item => {
+                listNode.append(item)
+            })
+            prevAllList.toArray().reverse().forEach(item => {
+                prevAllListParent.append(item)
+            })
+            $('ul,ol').toArray().forEach(item => {
+                if ($(item).html() == '') {
+                    $(item).remove()
+                }
+            })
             return paras;
         };
         /**
@@ -4147,6 +4200,9 @@
         };
         Editor.prototype.recordUndo = function () {
             this.history.recordUndo();
+        };
+        Editor.prototype.resetRecord = function () {
+            this.history.resetRecord();
         };
         Editor.prototype.handleKeyMap = function (event) {
             var keyMap = this.options.keyMap[env.isMac ? 'mac' : 'pc'];

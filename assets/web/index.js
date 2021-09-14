@@ -442,6 +442,7 @@ function getCursortPosition(element) {
 
 //初始化数据 
 function initData(text) {
+    console.log(text)
     initFinish = false;
     var arr = JSON.parse(text);
     var html = '';
@@ -470,6 +471,7 @@ function initData(text) {
     // 搜索功能
     webobj.jsCallSetDataFinsh();
     initFinish = true;
+    $('#summernote').summernote('editor.resetRecord')
 }
 
 /**
@@ -565,6 +567,8 @@ function setHtml(html) {
     webobj.jsCallSetDataFinsh();
     resetScroll()
     resizeImg()
+
+    $('#summernote').summernote('editor.resetRecord')
 }
 
 //设置录音转文字内容 flag: 0: 转换过程中 提示性文本（＂正在转文字中＂)１:结果 文本,空代表转失败了
