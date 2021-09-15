@@ -187,7 +187,7 @@ public slots:
     //新建记事项
     void onNewNote();
     //开始语音转文字
-    void onA2TStart(const QVariant &json);
+    void onA2TStart(const VNVoiceBlock *voiceBlock);
     //转写错误
     void onA2TError(int error);
     //转写成功
@@ -323,9 +323,9 @@ private:
     bool m_needShowMax {false};
     DPalette highlightDp; //图标高亮调色板
     DPalette windowDp; //图标灰色调色板
+    const VNVoiceBlock *m_voiceBlock {nullptr}; //语音数据
 
     QScopedPointer<VNVoiceBlock> m_currentPlayVoice {nullptr};
-    QScopedPointer<VNVoiceBlock> m_currentA2TVoice {nullptr};
 
     //Shortcuts key
     //*****************Shortcut key begin*********************

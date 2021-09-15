@@ -268,6 +268,22 @@ void WebRichTextEditor::showPictureMenu(const QPoint &pos)
  */
 void WebRichTextEditor::showVoiceMenu(const QPoint &pos)
 {
+    m_voiceBlock.reset(new VNVoiceBlock);
+    MetaDataParser dataParser;
+    //解析json数据
+    if (!dataParser.parse(m_menuJson, m_voiceBlock.get())) {
+        return;
+    }
+
+    //语音文件不存在使用弹出提示
+    if (!QFile(m_voiceBlock->voicePath).exists()) {
+        VNoteMessageDialog audioOutLimit(VNoteMessageDialog::VoicePathNoAvail);
+        audioOutLimit.exec();
+        //删除语音文本
+        deleteSelectText();
+        return;
+    }
+
     //如果当前有语音处于转换状态就将语音转文字选项置灰
     ActionManager::Instance()->enableAction(ActionManager::VoiceToText, !OpsStateInterface::instance()->isVoice2Text());
     m_voiceRightMenu->popup(pos);
@@ -283,7 +299,7 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
         break;
     case ActionManager::VoiceToText:
         //通知主窗口进行转写服务
-        emit asrStart(m_menuJson);
+        emit asrStart(m_voiceBlock.get());
         break;
     case ActionManager::VoiceDelete:
     case ActionManager::PictureDelete:
@@ -355,12 +371,10 @@ void WebRichTextEditor::savePictureAs()
  */
 void WebRichTextEditor::saveMP3As()
 {
-    m_voiceBlock.reset(new VNVoiceBlock);
-    MetaDataParser dataParser;
-    //解析json数据
-    if (!dataParser.parse(m_menuJson, m_voiceBlock.get())) {
+    if (m_voiceBlock.isNull()) {
         return;
     }
+
     //获取历史使用的路径
     QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
     if (historyDir.isEmpty()) {

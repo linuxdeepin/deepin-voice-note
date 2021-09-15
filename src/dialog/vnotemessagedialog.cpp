@@ -166,5 +166,10 @@ void VNoteMessageDialog::initMessage()
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "You do not have permission to save files there"));
         setSingleButton(); //单按钮
     } break;
+    case VoicePathNoAvail: {
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "The voice note has been deleted"));
+        setIconPixmap(QIcon::fromTheme("dialog-warning").pixmap(QSize(32, 32))); //设置图标
+        setSingleButton(); //单按钮
+    } break;
     }
 }

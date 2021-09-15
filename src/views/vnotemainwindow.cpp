@@ -827,23 +827,24 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 
 /**
  * @brief VNoteMainWindow::onA2TStart
- * @param json 语音json数据
+ * @param voiceBlock 语音数据
  */
-void VNoteMainWindow::onA2TStart(const QVariant &json)
+void VNoteMainWindow::onA2TStart(const VNVoiceBlock *voiceBlock)
 {
-    m_currentA2TVoice.reset(new VNVoiceBlock);
-    MetaDataParser dataParser;
-    dataParser.parse(json, m_currentA2TVoice.get()); //解析json数据
+    m_voiceBlock = voiceBlock;
 
+    if (nullptr == m_voiceBlock) {
+        return;
+    }
     //超过20分钟的语音不支持转文字
-    if (m_currentA2TVoice->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
+    if (m_voiceBlock->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
         VNoteMessageDialog audioOutLimit(
             VNoteMessageDialog::AsrTimeLimit, this);
         audioOutLimit.exec();
     } else {
         setSpecialStatus(VoiceToTextStart); //更新状态
         QTimer::singleShot(0, this, [this]() {
-            m_a2tManager->startAsr(m_currentA2TVoice->voicePath, m_currentA2TVoice->voiceSize); //开始转文字
+            m_a2tManager->startAsr(m_voiceBlock->voicePath, m_voiceBlock->voiceSize); //开始转文字
         });
     }
 }
@@ -2337,9 +2338,13 @@ void VNoteMainWindow::onWebVoicePlay(const QVariant &json, bool bIsSame)
         dataParser.parse(json, m_currentPlayVoice.get());
     }
 
-    //文件不存在不执行播放
+    //文件不存在出现错误弹出并删除该语音文本
     if (!QFile::exists(m_currentPlayVoice->voicePath)) {
-        qInfo() << m_currentPlayVoice->voicePath << " is not exists";
+        //弹出提示
+        VNoteMessageDialog audioOutLimit(VNoteMessageDialog::VoicePathNoAvail);
+        audioOutLimit.exec();
+        //删除语音文本
+        m_richTextEdit->deleteSelectText();
         return;
     }
 

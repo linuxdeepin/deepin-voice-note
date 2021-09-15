@@ -78,9 +78,9 @@ public:
 signals:
     /**
      * @brief 发送开始语音转文字的信号
-     * @param json 语音json格式信息
+     * @param voiceBlock 语音信息
      */
-    void asrStart(const QVariant &json);
+    void asrStart(const VNVoiceBlock *voiceBlock);
 
     /**
      * @brief 当前编辑区搜索内容为空
@@ -118,7 +118,6 @@ public slots:
     * @param action
     */
     void onMenuActionClicked(QAction *action);
-
     /**
      * @brief 删除选中内容
      */
