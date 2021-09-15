@@ -32,9 +32,9 @@ class ExportNoteWorker : public VNTask
 {
     Q_OBJECT
 public:
-    explicit ExportNoteWorker(QString dirPath,
+    explicit ExportNoteWorker(const QString &dirPath,
                               int exportType,
-                              QList<VNoteItem *>noteList,
+                              const QList<VNoteItem *> &noteList,
                               VNoteBlock *block = nullptr,
                               QObject *parent = nullptr);
     enum {

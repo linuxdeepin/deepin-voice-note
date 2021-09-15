@@ -38,8 +38,8 @@
  * @param block 绑定文本/语音
  * @param parent
  */
-ExportNoteWorker::ExportNoteWorker(QString dirPath, int exportType,
-                                   QList<VNoteItem *> noteList, VNoteBlock *block, QObject *parent)
+ExportNoteWorker::ExportNoteWorker(const QString &dirPath, int exportType,
+                                   const QList<VNoteItem *> &noteList, VNoteBlock *block, QObject *parent)
     : VNTask(parent)
     , m_exportType(exportType)
     , m_exportPath(dirPath)

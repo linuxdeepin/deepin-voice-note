@@ -60,7 +60,7 @@ void MoveView::setNote(VNoteItem *note)
  * @brief MoveView::setNoteList
  * 设置笔记数据列表
  */
-void MoveView::setNoteList(QList<VNoteItem *> noteList)
+void MoveView::setNoteList(const QList<VNoteItem *> &noteList)
 {
     m_noteList = noteList;
 }

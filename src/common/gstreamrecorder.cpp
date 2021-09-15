@@ -265,7 +265,7 @@ void GstreamRecorder::pauseRecord()
  * @brief GstreamRecorder::setDevice
  * @param device 设备名称
  */
-void GstreamRecorder::setDevice(QString device)
+void GstreamRecorder::setDevice(const QString &device)
 {
     if (device != m_currentDevice) {
         m_currentDevice = device;
@@ -281,7 +281,7 @@ void GstreamRecorder::setDevice(QString device)
  * @brief GstreamRecorder::setOutputFile
  * @param path 录音文件路径
  */
-void GstreamRecorder::setOutputFile(QString path)
+void GstreamRecorder::setOutputFile(const QString &path)
 {
     m_outputFile = path;
     if (m_pipeline != nullptr) {

@@ -37,7 +37,7 @@ public:
     //设置笔记数据
     void setNote(VNoteItem *note);
     //设置笔记数据列表
-    void setNoteList(QList<VNoteItem *> noteList);
+    void setNoteList(const QList<VNoteItem *> &noteList);
     //设置笔记数量
     void setNotesNumber(int value);
 

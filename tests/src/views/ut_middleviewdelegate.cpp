@@ -62,7 +62,9 @@ TEST_F(ut_middleviewdelegate_test, ModifyTextAndPaint)
     EXPECT_TRUE(edit != nullptr);
     delegate->updateEditorGeometry(edit, option, view.currentIndex());
     delegate->setEditorData(edit, view.currentIndex());
-    EXPECT_EQ(edit->text(), data->noteTitle);
+    if(nullptr != data){
+        EXPECT_EQ(edit->text(), data->noteTitle);
+    }
     edit->setText(QString("111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"));
     delegate->setModelData(edit, view.model(), view.currentIndex());
 

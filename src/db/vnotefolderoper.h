@@ -54,7 +54,7 @@ public:
     bool deleteVNoteFolder(qint64 folderId);
     bool deleteVNoteFolder(VNoteFolder *folder);
     //重命名记事本
-    bool renameVNoteFolder(QString folderName);
+    bool renameVNoteFolder(const QString &folderName);
 
 protected:
     VNoteFolder *m_folder {nullptr};

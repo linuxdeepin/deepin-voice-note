@@ -33,7 +33,7 @@ class VNote2SIconButton : public DFloatingButton
 {
     Q_OBJECT
 public:
-    explicit VNote2SIconButton(const QString normal, const QString press, QWidget *parent = nullptr);
+    explicit VNote2SIconButton(const QString &normal, const QString &press, QWidget *parent = nullptr);
 
     enum {
         Invalid = -1,

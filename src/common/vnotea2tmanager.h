@@ -71,7 +71,7 @@ signals:
     //转文字失败
     void asrError(ErrorCode errorCode);
     //转文字成功
-    void asrSuccess(const QString text);
+    void asrSuccess(const QString &text);
 public slots:
     //转写过程中，信息处理
     void onNotify(const QString &msg);

@@ -233,7 +233,7 @@ void VnoteMultipleChoiceOptionWidget::enableButtons(bool saveAsTxtButtonStatus, 
  * @param color
  */
 //获得svg
-QPixmap VnoteMultipleChoiceOptionWidget::setSvgColor(QString svgPath, QString color)
+QPixmap VnoteMultipleChoiceOptionWidget::setSvgColor(const QString &svgPath, const QString &color)
 {
     //设置图标颜色
     QString path = svgPath;

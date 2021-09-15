@@ -72,7 +72,7 @@ VNOTE_ALL_NOTES_MAP *VNoteItemOper::loadAllVNotes()
  * @param title
  * @return true 成功
  */
-bool VNoteItemOper::modifyNoteTitle(QString title)
+bool VNoteItemOper::modifyNoteTitle(const QString &title)
 {
     bool isUpdateOK = true;
 
