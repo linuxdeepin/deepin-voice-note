@@ -53,6 +53,6 @@ TEST_F(ut_olddbvisistors_test, visitorData)
     ret = true;
     OldNoteQryDbVisitor oldnoteqrydbvisitor(db, nullptr, &notes);
     oldnoteqrydbvisitor.prepareSqls();
-    EXPECT_FALSE(oldfolderqrydbvisitor.m_dbvSqls.isEmpty());
-    EXPECT_TRUE(oldfolderqrydbvisitor.visitorData());
+    EXPECT_FALSE(oldnoteqrydbvisitor.m_dbvSqls.isEmpty());
+    EXPECT_TRUE(oldnoteqrydbvisitor.visitorData());
 }
