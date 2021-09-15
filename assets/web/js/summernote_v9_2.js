@@ -2793,10 +2793,6 @@
          * undo
          */
         History.prototype.undo = function () {
-            // debugger;
-            console.log(this.stack);
-            console.log(this.stackOffset);
-
             // Create snap shot if not yet recorded
             if (this.$editable.html() !== this.stack[this.stackOffset].contents) {
                 this.recordUndo();
@@ -2986,28 +2982,30 @@
          * toggle ordered list
          */
         Bullet.prototype.insertOrderedList = function (editable) {
-            // this.toggleList('OL', editable);
-            document.execCommand('insertOrderedList', false)
-            this.removeP()
+            this.toggleList('OL', editable);
+            // document.execCommand('insertOrderedList', false)
+            // this.removeP('ol')
         };
         /**
          * toggle unordered list
          */
         Bullet.prototype.insertUnorderedList = function (editable) {
-            // this.toggleList('UL', editable);
-            document.execCommand('insertUnorderedList', false)
-            this.removeP()
+            this.toggleList('UL', editable);
+            // document.execCommand('insertUnorderedList', false)
+            // this.removeP('ul')
         };
         /**
          * 移除P标签
          * @date 2021-09-14
          * @returns {any}
          */
-        Bullet.prototype.removeP = function () {
+        Bullet.prototype.removeP = function (name) {
             let selection = window.getSelection().getRangeAt(0);
             let startNode = selection.startContainer.parentNode;
-            if ($(startNode).parents('P').length) {
+            if ($(selection.startContainer).closest(name).length && $(startNode).parents('P').length) {
                 $(startNode).parents('P').children().unwrap()
+            } else {
+
             }
         };
         /**
@@ -3065,6 +3063,7 @@
         Bullet.prototype.toggleList = function (listName, editable) {
             var _this = this;
             var rng = range.create(editable).wrapBodyInlineWithPara();
+            console.log(rng)
             var paras = rng.nodes(dom.isPara, { includeAncestor: true });
             var bookmark = rng.paraBookmark(paras);
             var clustereds = lists.clusterBy(paras, func.peq2('parentNode'));
@@ -3079,14 +3078,14 @@
                 return;
             }
             if (paras.every(item => item.parentNode == paras[0].parentNode) && paras[0].parentNode.tagName == listName) {
-                console.log('取消列表')
+                console.log('取消列表,条件：属于同一个父元素且按钮名等于父元素名')
                 paras = this.releaseList(clustereds, true);
             } else if (paras.every((item, index) => item.tagName == "LI")) {
-                console.log('只有li标签')
+                console.log('只有li标签,条件：只有li')
                 paras = this.changeList(paras, listName);
             }
             else {
-                console.log('带有其他标签')
+                console.log('其他标签')
                 paras = this.wrapList(paras, listName);
             }
             range.createFromParaBookmark(bookmark, paras).select();
@@ -3127,22 +3126,27 @@
         Bullet.prototype.wrapList = function (paras, listName) {
             var head = lists.head(paras);
             var last = lists.last(paras);
-
             var prevList = dom.isList(head.previousSibling) && head.previousSibling;
-            console.log(head.previousSibling)
             var nextList = dom.isList(last.nextSibling) && last.nextSibling;
-            var isLi = dom.isList(last.parentNode)
-            var listNode = (prevList ? (prevList.tagName == listName ? prevList : null) : null) || dom.insertAfter(dom.create(listName || 'UL'), last);
+            var address = last
+            paras.forEach(item => {
+                if (!dom.isLi(item)) {
+                    address = item
+                    return;
+                }
+            })
+            var listNode = (prevList ? (prevList.tagName == listName ? prevList : null) : null) || dom.insertAfter(dom.create(listName || 'UL'), address);
             // P to LI
             paras = paras.map(function (para) {
                 return !dom.isLi(para) ? dom.replace(para, 'LI') : para;
             });
             // append to list(<ul>, <ol>)
             dom.appendChildNodes(listNode, paras);
-            if (isLi) {
+            if (dom.isList(listNode.parentNode)) {
                 $(last).unwrap()
                 listNode = head.parentNode
             }
+            this.removeNullList()
             this.autoPrevAndNext(listNode)
             return paras;
         };
@@ -3174,17 +3178,18 @@
          * @returns {any}
          */
         Bullet.prototype.autoPrevAndNext = function (listNode) {
-            if (listNode.nextSibling && listNode.nextSibling.tagName == listNode.tagName) {
-                for (let i = 0; i < listNode.nextSibling.children.length; i++) {
-                    $(listNode).appendChild($(listNode.nextSibling.children[i]))
+            if (listNode.nextElementSibling && listNode.nextElementSibling.tagName == listNode.tagName) {
+                while (listNode.nextElementSibling.children.length) {
+                    $(listNode).append($(listNode.nextElementSibling.firstChild))
                 }
-                listNode.nextSibling.remove()
+                listNode.nextElementSibling.remove()
             }
-            if (listNode.previousSibling && listNode.previousSibling.tagName == listNode.tagName) {
-                for (let i = 0; i < listNode.previousSibling.children.length; i++) {
-                    $(listNode).prepend($(listNode.previousSibling.children[i]))
+            if (listNode.previousElementSibling && listNode.previousElementSibling.tagName == listNode.tagName) {
+
+                while (listNode.previousElementSibling.children.length) {
+                    $(listNode).prepend($(listNode.previousElementSibling.lastChild))
                 }
-                listNode.previousSibling.remove()
+                listNode.previousElementSibling.remove()
             }
         };
         /**
@@ -7066,13 +7071,18 @@
             var docFragment = rangeObj.cloneContents();
             var testDiv = document.createElement("div");
             testDiv.appendChild(docFragment);
+
             if ($(testDiv).find('.translate').length
                 || $(styleInfo.range.sc).parents('.translate').length
                 || $(testDiv).find('img').length
                 || $(rangeObj.startContainer).closest('li').find('img').length
                 || $(rangeObj.startContainer).closest('li').find('.translate').length
-                || $(rangeObj.endContainer).closest('li').find('img').length
-                || $(rangeObj.endContainer).closest('li').find('.translate').length) {
+                || ($(rangeObj.endContainer).closest('li').find('img').length
+                    && !rangeObj.collapsed && (rangeObj.endOffset != rangeObj.startOffset && (rangeObj.endOffset != 0 || rangeObj.startOffset != 0)))
+                || ($(rangeObj.endContainer).closest('li').find('.translate').length
+                    && !rangeObj.collapsed && (rangeObj.endOffset != rangeObj.startOffset && (rangeObj.endOffset != 0 || rangeObj.startOffset != 0))
+                )
+            ) {
                 $('.note-ul').hide()
                 $('.note-ol').hide()
                 $('.note-line').hide()

@@ -652,7 +652,9 @@ function voicePlay(bIsPaly) {
  */
 function rightClick(e) {
     // isShowAir = false;
-    $('.li').removeClass('active');
+    if (e.which == 3) {
+        $('.li').removeClass('active');
+    }
     if (e.target.tagName == 'IMG') {
         let img = e.target
         // img.focus();
