@@ -116,30 +116,28 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportText()
         for (auto noteData : m_noteList) {
             QString fileName = QString("%1-%2.txt").arg(noteData->noteTitle).arg(QDateTime::currentDateTime().toLocalTime().toString(VNOTE_TIME_FMT));
             QFile exportFile(m_exportPath + "/" + fileName);
-            if (exportFile.open(QIODevice::ReadWrite)) {
-                QTextStream stream(&exportFile);
-                //富文本数据需要转换为纯文本
-                if (!noteData->htmlCode.isEmpty()) {
-                    QTextDocument doc;
-                    doc.setHtml(noteData->htmlCode);
-                    stream << doc.toPlainText();
-                } else {
-                    for (auto it : noteData->datas.datas) {
-                        if (VNoteBlock::Text == it->getType()) {
-                            stream << it->blockText;
-                            stream << '\n';
-                        }
+            if (!exportFile.open(QIODevice::ReadWrite)) {
+                return Savefailed;
+            }
+            QTextStream stream(&exportFile);
+            //富文本数据需要转换为纯文本
+            if (!noteData->htmlCode.isEmpty()) {
+                QTextDocument doc;
+                doc.setHtml(noteData->htmlCode);
+                stream << doc.toPlainText();
+            } else {
+                for (auto it : noteData->datas.datas) {
+                    if (VNoteBlock::Text == it->getType()) {
+                        stream << it->blockText;
+                        stream << '\n';
                     }
                 }
-                stream.flush();
-            } else {
-                error = PathDenied;
             }
+            stream.flush();
         }
     } else {
         error = NoteInvalid;
     }
-
     return error;
 }
 
@@ -231,11 +229,12 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAsHtml()
         //构建文件名
         QString fileName = QString("%1-%2.html").arg(note->noteTitle).arg(QDateTime::currentDateTime().toLocalTime().toString("yyyyMMddhhmmss"));
         QFile out(m_exportPath + "/" + fileName);
-        out.open(QIODevice::WriteOnly | QIODevice::Text);
-        if (!out.write(note->getFullHtml().toUtf8())) {
-            error = Savefailed; //保存失败
+        if (!out.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            return Savefailed; //保存失败
         }
-        out.close();
+        if (!out.write(note->getFullHtml().toUtf8())) {
+            return Savefailed; //保存失败
+        }
     }
     return error;
 }
