@@ -3064,6 +3064,11 @@
             var _this = this;
             var rng = range.create(editable).wrapBodyInlineWithPara();
             console.log(rng)
+            var selectionObj = window.getSelection();
+            var rangeObj = selectionObj.getRangeAt(0);
+            console.log(selectionObj)
+            console.log(rangeObj)
+
             var paras = rng.nodes(dom.isPara, { includeAncestor: true });
             var bookmark = rng.paraBookmark(paras);
             var clustereds = lists.clusterBy(paras, func.peq2('parentNode'));
@@ -3185,7 +3190,6 @@
                 listNode.nextElementSibling.remove()
             }
             if (listNode.previousElementSibling && listNode.previousElementSibling.tagName == listNode.tagName) {
-
                 while (listNode.previousElementSibling.children.length) {
                     $(listNode).prepend($(listNode.previousElementSibling.lastChild))
                 }

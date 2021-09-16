@@ -53,7 +53,6 @@
  p {
      margin: 0!important;
      word-wrap: break-word;
-     white-space: pre
  }
 
  .voiceRightMouse {
@@ -208,11 +207,6 @@
  ol, ul {
      margin-bottom: 0px;
      padding-left: 20px;
- }
-
- ol>li, ul>li {
-     /* padding-right: 30px; */
-     /* line-height: 24px; */
  }
 
  .dropdown-fontsize {

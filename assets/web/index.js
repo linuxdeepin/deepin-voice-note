@@ -429,8 +429,7 @@ function initData(text) {
     var arr = JSON.parse(text);
     var html = '';
     var voiceHtml;
-    var txtHtml;
-
+    var txtHtml = '';
     arr.noteDatas.forEach((item, index) => {
         //false: txt
         if (item.type == 1) {
@@ -438,7 +437,10 @@ function initData(text) {
                 txtHtml = '<p><br></p>';
             }
             else {
-                txtHtml = '<p>' + item.text + '</p>';
+                let textArr = item.text.split('\n')
+                textArr.forEach(ite => {
+                    txtHtml = txtHtml + '<p>' + ite + '</p>';
+                })
             }
             html += txtHtml;
         }

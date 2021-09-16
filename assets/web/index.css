@@ -44,6 +44,7 @@ body {
     margin: 0 20px 0 20px;
     cursor: pointer;
     overflow: hidden;
+    box-shadow: 0px 4px 6px 0px rgba(44,167,248,0.40); 
 }
 
 .voicebtn.play {
@@ -116,10 +117,6 @@ body {
 .translate {
     line-height: 20px;
     font-size: 12px;
-}
-
-.translate>p {
-    /* padding: 10px 0; */
 }
 
 .translate>div {
