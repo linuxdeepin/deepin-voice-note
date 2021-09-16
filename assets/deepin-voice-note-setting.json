@@ -30,6 +30,17 @@
                             "default":""
                         }
                     ]
+                },
+                {
+                    "key":"notepadlist",
+                    "hide":true,
+                    "reset":false,
+                    "options":[
+                        {
+                            "key":"show",
+                            "default":true
+                        }
+                    ]
                 }
             ]
         },

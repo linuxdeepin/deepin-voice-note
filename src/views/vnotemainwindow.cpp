@@ -428,6 +428,8 @@ void VNoteMainWindow::initMainView()
     switchWidget(defaultWnd);
     setCentralWidget(m_centerWidget);
     setTitlebarShadowEnabled(true);
+
+    showNotepadList();
 }
 
 /**
@@ -1880,17 +1882,9 @@ void VNoteMainWindow::initMenuExtension()
 void VNoteMainWindow::initTitleIconButton()
 {
     m_viewChange = new DIconButton(this);
-    m_viewChange->setIcon(Utils::loadSVG("view_change_show.svg", false));
-
-    highlightDp = DApplicationHelper::instance()->palette(m_viewChange);
-    windowDp = highlightDp;
-    //修改记事本隐藏按钮高亮色调色板
-    highlightDp.setBrush(DPalette::Light, highlightDp.highlight());
-    highlightDp.setBrush(DPalette::Dark, highlightDp.highlight());
-
-    m_viewChange->setPalette(highlightDp);
     m_viewChange->setIconSize(QSize(36, 36));
     m_viewChange->setFixedSize(QSize(36, 36));
+
     m_imgInsert = new VNoteIconButton(this, "img_insert_normal.svg");
     m_imgInsert->setIconSize(QSize(36, 36));
     m_imgInsert->setFixedSize(QSize(36, 36));
@@ -2277,22 +2271,7 @@ void VNoteMainWindow::onSaveVoicesShortcut()
  */
 void VNoteMainWindow::onThemeChanged()
 {
-    //当前主界面未显示不向下处理
-    if (!isVisible()) {
-        return;
-    }
-    //修改记事本隐藏按钮高亮色调色板
-    DPalette appDp = DGuiApplicationHelper::instance()->applicationPalette();
-    highlightDp.setBrush(DPalette::Light, appDp.color(DPalette::Active, DPalette::Highlight));
-    highlightDp.setBrush(DPalette::Dark, appDp.color(DPalette::Active, DPalette::Highlight));
-
-    if (m_leftViewHolder->isVisible()) {
-        m_viewChange->setIcon(Utils::loadSVG("view_change_show.svg", false));
-        m_viewChange->setPalette(highlightDp);
-    } else {
-        m_viewChange->setIcon(Utils::loadSVG("view_change_hide.svg", false));
-        m_viewChange->setPalette(windowDp);
-    }
+    showNotepadList();
 }
 
 /**
@@ -2301,15 +2280,8 @@ void VNoteMainWindow::onThemeChanged()
  */
 void VNoteMainWindow::onViewChangeClicked()
 {
-    if (m_leftViewHolder->isVisible()) {
-        m_viewChange->setIcon(Utils::loadSVG("view_change_hide.svg", false));
-        m_viewChange->setPalette(windowDp); //记事本隐藏按钮背景调成灰色
-        m_leftViewHolder->hide();
-    } else {
-        m_viewChange->setIcon(Utils::loadSVG("view_change_show.svg", false));
-        m_viewChange->setPalette(highlightDp); //记事本隐藏按钮背景调成高亮色
-        m_leftViewHolder->show();
-    }
+    setting::instance()->setOption(VNOTE_NOTEPAD_LIST_SHOW, !setting::instance()->getOption(VNOTE_NOTEPAD_LIST_SHOW).toBool());
+    showNotepadList();
 }
 
 /**
@@ -2379,4 +2351,21 @@ void VNoteMainWindow::onWebSearchEmpty()
     } else {
         m_middleView->selectAfterRemoved();
     }
+}
+
+void VNoteMainWindow::showNotepadList()
+{
+    //切换主题色/图标
+    DPalette appDp = DGuiApplicationHelper::instance()->applicationPalette();
+    bool visible = setting::instance()->getOption(VNOTE_NOTEPAD_LIST_SHOW).toBool();
+    if (false == visible) {
+        appDp.setBrush(DPalette::Light, appDp.color(DPalette::Active, DPalette::Highlight));
+        appDp.setBrush(DPalette::Dark, appDp.color(DPalette::Active, DPalette::Highlight));
+        m_viewChange->setIcon(Utils::loadSVG("view_change_show.svg", false));
+    } else {
+        m_viewChange->setIcon(Utils::loadSVG("view_change_hide.svg", false));
+    }
+    m_viewChange->setPalette(appDp);
+    //显示/隐藏笔记列表
+    m_leftViewHolder->setVisible(!visible);
 }

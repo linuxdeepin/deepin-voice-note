@@ -282,6 +282,8 @@ private:
     bool setAddnoteButtonNext(QKeyEvent *event);
     //设置添加记事本按钮下个控件tab焦点
     bool setAddnotepadButtonNext(QKeyEvent *event);
+    //显示记事本列表
+    void showNotepadList();
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
@@ -321,8 +323,6 @@ private:
     bool m_rightViewHasFouse {true};
     bool m_showSearchEditMenu {false};
     bool m_needShowMax {false};
-    DPalette highlightDp; //图标高亮调色板
-    DPalette windowDp; //图标灰色调色板
     const VNVoiceBlock *m_voiceBlock {nullptr}; //语音数据
 
     QScopedPointer<VNVoiceBlock> m_currentPlayVoice {nullptr};
