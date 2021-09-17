@@ -20,13 +20,18 @@
 */
 #include "jscontent.h"
 
-#include <QApplication>
 #include <QFile>
 #include <QVariant>
 #include <QEventLoop>
 #include <QFileInfo>
 #include <QStandardPaths>
 #include <QDir>
+#include <QJsonDocument>
+#include <QJsonObject>
+
+#include <DApplication>
+
+DWIDGET_USE_NAMESPACE
 
 static JsContent *jsContentInstance = nullptr;
 
@@ -125,12 +130,25 @@ void JsContent::jsCallPlayVoice(const QVariant &json, bool bIsSame)
     emit playVoice(json, bIsSame);
 }
 
-QString JsContent::getTranslation(const QString &context, const QString &key)
+QString JsContent::jsCallGetTranslation()
 {
-    if (context.isEmpty()) {
-        return QObject::tr(key.toLatin1().data());
+    static QJsonDocument doc;
+    if (doc.isEmpty()) {
+        QJsonObject object;
+        object.insert("fontsize", DApplication::translate("web", "Font size"));
+        object.insert("forecolor", DApplication::translate("web", "Font color"));
+        object.insert("backcolor", DApplication::translate("web", "Text highlight color"));
+        object.insert("bold", DApplication::translate("web", "Bold"));
+        object.insert("italic", DApplication::translate("web", "Italic"));
+        object.insert("underline", DApplication::translate("web", "Underline"));
+        object.insert("strikethrough", DApplication::translate("web", "Strikethrough"));
+        object.insert("ul", DApplication::translate("web", "Bullets"));
+        object.insert("ol", DApplication::translate("web", "Numbering"));
+        object.insert("more", DApplication::translate("web", "More colors"));
+        object.insert("recentlyUsed", DApplication::translate("web", "Recent"));
+        doc.setObject(object);
     }
-    return QApplication::translate(context.toLatin1().data(), key.toLatin1().data());
+    return doc.toJson(QJsonDocument::Compact);
 }
 
 QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &funtion)
