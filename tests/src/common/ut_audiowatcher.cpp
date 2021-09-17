@@ -18,23 +18,70 @@
 
 #include "ut_audiowatcher.h"
 #include "audiowatcher.h"
+#include "stub.h"
 #include <QAction>
 
-ut_audiowatcher_test::ut_audiowatcher_test()
+QVariant stub_settings_value(QString value)
+{
+    Q_UNUSED(value);
+    return QVariant();
+}
+
+UT_AudioWatcher::UT_AudioWatcher()
 {
 }
 
-void ut_audiowatcher_test::SetUp()
+void UT_AudioWatcher::SetUp()
 {
     m_AudioWatcher = new AudioWatcher;
 }
 
-void ut_audiowatcher_test::TearDown()
+void UT_AudioWatcher::TearDown()
 {
     delete m_AudioWatcher;
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_getDeviceName_001)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_initWatcherCofing_001)
+{
+    m_AudioWatcher->initWatcherCofing();
+    EXPECT_TRUE(m_AudioWatcher->m_fNeedDeviceChecker);
+
+    Stub stub;
+    stub.set(ADDR(QSettings, value), stub_settings_value);
+    AudioWatcher audioWatcher;
+}
+
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_initConnections_001)
+{
+    m_AudioWatcher->initConnections();
+}
+
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_initDeviceWacther_001)
+{
+    m_AudioWatcher->initDeviceWacther();
+    EXPECT_FALSE(m_AudioWatcher->m_pAudioInterface.isNull()) << "m_pAudioInterface";
+    EXPECT_FALSE(m_AudioWatcher->m_pDefaultSink.isNull()) << "m_pDefaultSink";
+    EXPECT_FALSE(m_AudioWatcher->m_pDefaultSource.isNull()) << "m_pDefaultSource";
+    EXPECT_EQ(m_AudioWatcher->m_inAudioPortVolume, m_AudioWatcher->m_pDefaultSource->volume())
+        << "m_inAudioPortVolume";
+
+    EXPECT_EQ(m_AudioWatcher->m_inAudioPort, m_AudioWatcher->m_pDefaultSource->activePort())
+        << "m_inAudioPort";
+
+    EXPECT_EQ(m_AudioWatcher->m_inAudioMute, m_AudioWatcher->m_pDefaultSource->mute())
+        << "m_inAudioMute";
+
+    EXPECT_EQ(m_AudioWatcher->m_outAudioPortVolume, m_AudioWatcher->m_pDefaultSink->volume())
+        << "m_outAudioPortVolume";
+
+    EXPECT_EQ(m_AudioWatcher->m_outAudioPort, m_AudioWatcher->m_pDefaultSink->activePort())
+        << "m_outAudioPort";
+
+    EXPECT_EQ(m_AudioWatcher->m_outAudioMute, m_AudioWatcher->m_pDefaultSink->mute())
+        << "m_outAudioMute";
+}
+
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_getDeviceName_001)
 {
     m_AudioWatcher->m_fNeedDeviceChecker = true;
     m_AudioWatcher->m_outAudioPort.availability = 0;
@@ -47,7 +94,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_getDeviceName_001)
         << "AudioMode = Micphone, m_inAudioPort.availability = 0";
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_getDeviceName_002)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_getDeviceName_002)
 {
     m_AudioWatcher->m_fNeedDeviceChecker = true;
     m_AudioWatcher->m_outAudioPort.availability = 2;
@@ -60,7 +107,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_getDeviceName_002)
         << "AudioMode = Micphone, m_inAudioPort.availability = 2";
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_getDeviceName_003)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_getDeviceName_003)
 {
     m_AudioWatcher->m_fNeedDeviceChecker = false;
     QString device = m_AudioWatcher->getDeviceName(AudioWatcher::Internal);
@@ -71,7 +118,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_getDeviceName_003)
         << "AudioMode = Micphone, m_fNeedDeviceChecker = false";
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_getDeviceName_004)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_getDeviceName_004)
 {
     m_AudioWatcher->m_fNeedDeviceChecker = true;
     m_AudioWatcher->m_outAudioPort.availability = 1;
@@ -85,7 +132,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_getDeviceName_004)
            "m_inAudioPort.availability = 1";
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_getVolume_001)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_getVolume_001)
 {
     m_AudioWatcher->m_outAudioPortVolume = 1;
     m_AudioWatcher->m_inAudioPortVolume = 2;
@@ -96,7 +143,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_getVolume_001)
         << "AudioMode = Micphone";
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_getMute_001)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_getMute_001)
 {
     m_AudioWatcher->m_inAudioMute = true;
     m_AudioWatcher->m_outAudioMute = false;
@@ -107,7 +154,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_getMute_001)
         << "AudioMode = Micphone";
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onDefaultSourceActivePortChanged_001)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_onDefaultSourceActivePortChanged_001)
 {
     AudioPort ap;
     ap.name = "AudioPort";
@@ -115,7 +162,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onDefaultSourceActivePortChanged_00
     EXPECT_EQ(m_AudioWatcher->m_inAudioPort, ap);
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onDefaultSinkActivePortChanged_001)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_onDefaultSinkActivePortChanged_001)
 {
     AudioPort ap;
     ap.name = "AudioPort";
@@ -123,7 +170,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onDefaultSinkActivePortChanged_001)
     EXPECT_EQ(m_AudioWatcher->m_outAudioPort, ap);
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onDefaultSourceChanaged_001)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_onDefaultSourceChanaged_001)
 {
     AudioPort tmpAudioPort = m_AudioWatcher->m_pDefaultSource->activePort();
     QDBusObjectPath value("/com/deepin/daemon/Audio/Source2");
@@ -133,7 +180,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onDefaultSourceChanaged_001)
     EXPECT_EQ(m_AudioWatcher->m_pDefaultSource->activePort(), m_AudioWatcher->m_inAudioPort);
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onDefaultSinkChanaged_001)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_onDefaultSinkChanaged_001)
 {
     AudioPort tmpAudioPort = m_AudioWatcher->m_pDefaultSink->activePort();
     QDBusObjectPath value("/com/deepin/daemon/Audio/Sink2");
@@ -143,7 +190,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onDefaultSinkChanaged_001)
     EXPECT_EQ(m_AudioWatcher->m_pDefaultSource->activePort(), m_AudioWatcher->m_inAudioPort);
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSourceVolumeChanged_001)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_onSourceVolumeChanged_001)
 {
     double tmpdl = 0.8;
     m_AudioWatcher->m_inAudioPort.name = m_AudioWatcher->m_pDefaultSource->activePort().name;
@@ -154,7 +201,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSourceVolumeChanged_001)
     EXPECT_NE(m_AudioWatcher->m_pDefaultSource->activePort(), m_AudioWatcher->m_inAudioPort);
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSourceVolumeChanged_002)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_onSourceVolumeChanged_002)
 {
     double tmpdl = 0.6;
     m_AudioWatcher->m_inAudioPort.name = "activePort_2";
@@ -164,7 +211,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSourceVolumeChanged_002)
     EXPECT_EQ(m_AudioWatcher->m_pDefaultSource->activePort(), m_AudioWatcher->m_inAudioPort);
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSinkVolumeChanged_001)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_onSinkVolumeChanged_001)
 {
     double tmpdl = 0.8;
     m_AudioWatcher->m_outAudioPort.name = m_AudioWatcher->m_pDefaultSink->activePort().name;
@@ -175,7 +222,7 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSinkVolumeChanged_001)
     EXPECT_NE(m_AudioWatcher->m_pDefaultSink->activePort(), m_AudioWatcher->m_outAudioPort);
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSinkVolumeChanged_002)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_onSinkVolumeChanged_002)
 {
     double tmpdl = 0.6;
     m_AudioWatcher->m_outAudioPort.name = "m_outAudioPort";
@@ -185,35 +232,35 @@ TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSinkVolumeChanged_002)
     EXPECT_EQ(m_AudioWatcher->m_pDefaultSink->activePort(), m_AudioWatcher->m_outAudioPort);
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSourceMuteChanged_001)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_onSourceMuteChanged_001)
 {
     m_AudioWatcher->m_inAudioMute = false;
     m_AudioWatcher->onSourceMuteChanged(true);
     EXPECT_EQ(true, m_AudioWatcher->m_inAudioMute) << "value = true";
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSourceMuteChanged_002)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_onSourceMuteChanged_002)
 {
     m_AudioWatcher->m_inAudioMute = true;
     m_AudioWatcher->onSourceMuteChanged(false);
     EXPECT_EQ(false, m_AudioWatcher->m_inAudioMute) << "value = false";
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSinkMuteChanged_001)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_onSinkMuteChanged_001)
 {
     m_AudioWatcher->m_outAudioMute = false;
     m_AudioWatcher->onSinkMuteChanged(true);
     EXPECT_EQ(true, m_AudioWatcher->m_outAudioMute) << "value = true";
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_onSinkMuteChanged_002)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_onSinkMuteChanged_002)
 {
     m_AudioWatcher->m_outAudioMute = true;
     m_AudioWatcher->onSinkMuteChanged(false);
     EXPECT_EQ(false, m_AudioWatcher->m_outAudioMute) << "value = false";
 }
 
-TEST_F(ut_audiowatcher_test, ut_AudioWatcher_enumtest_001)
+TEST_F(UT_AudioWatcher, UT_AudioWatcher_enumtest_001)
 {
     QAction *tmpact = new QAction("test");
     QMetaEnum metaEnum = QMetaEnum::fromType<AudioWatcher::AudioMode>();

@@ -20,11 +20,17 @@
 #include "vnotemessagedialog.h"
 #include <DApplication>
 
-ut_vnotemessagedialog_test::ut_vnotemessagedialog_test()
+UT_VNoteMessageDialog::UT_VNoteMessageDialog()
 {
 }
 
-TEST_F(ut_vnotemessagedialog_test, setSingleButton)
+TEST_F(UT_VNoteMessageDialog, UT_VNoteMessageDialog_initConnections_001)
+{
+    VNoteMessageDialog vnotemessagedialog(0);
+    vnotemessagedialog.initConnections();
+}
+
+TEST_F(UT_VNoteMessageDialog, UT_VNoteMessageDialog_setSingleButton_001)
 {
     VNoteMessageDialog vnotemessagedialog(0);
     vnotemessagedialog.setSingleButton();
@@ -37,7 +43,7 @@ TEST_F(ut_vnotemessagedialog_test, setSingleButton)
         << "setSingleButton, m_cancelBtn->text";
 }
 
-TEST_F(ut_vnotemessagedialog_test, ut_vnotemessagedialog_initMessage_001)
+TEST_F(UT_VNoteMessageDialog, UT_VNoteMessageDialog_initMessage_001)
 {
     VNoteMessageDialog vnotemessagedialog(0);
     vnotemessagedialog.m_msgType = vnotemessagedialog.DeleteFolder;
@@ -105,4 +111,22 @@ TEST_F(ut_vnotemessagedialog_test, ut_vnotemessagedialog_initMessage_001)
     EXPECT_EQ(DApplication::translate("VNoteMessageDialog", "Confirm", "button"),
               vnotemessagedialog.m_confirmBtn->text())
         << "m_confirmBtn->text";
+}
+
+TEST_F(UT_VNoteMessageDialog, UT_VNoteMessageDialog_initMessage_002)
+{
+    VNoteMessageDialog vnotemessagedialog1(7);
+    EXPECT_EQ(DApplication::translate("VNoteMessageDialog", "Save failed"),
+              vnotemessagedialog1.m_pMessage->text())
+        << "m_msgType is SaveFailed";
+
+    VNoteMessageDialog vnotemessagedialog2(8);
+    EXPECT_EQ(DApplication::translate("VNoteMessageDialog", "You do not have permission to save files there"),
+              vnotemessagedialog2.m_pMessage->text())
+        << "m_msgType is NoPermission";
+
+    VNoteMessageDialog vnotemessagedialog3(9);
+    EXPECT_EQ(DApplication::translate("VNoteMessageDialog", "The voice note has been deleted"),
+              vnotemessagedialog3.m_pMessage->text())
+        << "m_msgType is VoicePathNoAvail";
 }

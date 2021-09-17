@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_metadataparser_test : public QObject
+class UT_MetaDataParser : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_metadataparser_test();
+    UT_MetaDataParser();
 };
 
 #endif // UT_METADATAPARSER_H

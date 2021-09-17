@@ -19,11 +19,11 @@
 #include "vnoteitem.h"
 #include "vnoteforlder.h"
 
-ut_vnoteitem_test::ut_vnoteitem_test()
+UT_VnoteItem::UT_VnoteItem()
 {
 }
 
-TEST_F(ut_vnoteitem_test, isValid)
+TEST_F(UT_VnoteItem, UT_VnoteItem_isValid_001)
 {
     VNoteItem vnoteitem;
     vnoteitem.noteId = 2;
@@ -31,13 +31,13 @@ TEST_F(ut_vnoteitem_test, isValid)
     EXPECT_EQ(true, vnoteitem.isValid());
 }
 
-TEST_F(ut_vnoteitem_test, delNoteData)
+TEST_F(UT_VnoteItem, UT_VnoteItem_delNoteData_001)
 {
     VNoteItem vnoteitem;
     vnoteitem.delNoteData();
 }
 
-TEST_F(ut_vnoteitem_test, search)
+TEST_F(UT_VnoteItem, UT_VnoteItem_search_001)
 {
     VNoteItem vnoteitem;
     vnoteitem.noteTitle = "test";
@@ -48,7 +48,7 @@ TEST_F(ut_vnoteitem_test, search)
     EXPECT_TRUE(vnoteitem.search("1234")) << "search htmlcode";
 }
 
-TEST_F(ut_vnoteitem_test, folder)
+TEST_F(UT_VnoteItem, UT_VnoteItem_folder_001)
 {
     VNoteItem vnoteitem;
     VNoteFolder *folder = new VNoteFolder();
@@ -58,7 +58,7 @@ TEST_F(ut_vnoteitem_test, folder)
     delete folder;
 }
 
-TEST_F(ut_vnoteitem_test, qdebugtest)
+TEST_F(UT_VnoteItem, UT_VnoteItem_qdebugtest_001)
 {
     VNoteItem vnoteitem;
     vnoteitem.noteId = 0;
@@ -70,7 +70,7 @@ TEST_F(ut_vnoteitem_test, qdebugtest)
     qDebug() << "" << vnoteitem;
 }
 
-TEST_F(ut_vnoteitem_test, metaDataRef)
+TEST_F(UT_VnoteItem, UT_VnoteItem_metaDataRef_001)
 {
     VNoteItem vnoteitem;
     QVariant data;
@@ -79,7 +79,7 @@ TEST_F(ut_vnoteitem_test, metaDataRef)
     EXPECT_EQ(data, vnoteitem.metaDataRef());
 }
 
-TEST_F(ut_vnoteitem_test, metaDataConstRef)
+TEST_F(UT_VnoteItem, UT_VnoteItem_metaDataConstRef_001)
 {
     VNoteItem vnoteitem;
     QVariant data;
@@ -88,7 +88,7 @@ TEST_F(ut_vnoteitem_test, metaDataConstRef)
     EXPECT_EQ(data, vnoteitem.metaDataConstRef());
 }
 
-TEST_F(ut_vnoteitem_test, newBlock)
+TEST_F(UT_VnoteItem, UT_VnoteItem_newBlock_001)
 {
     VNoteItem vnoteitem;
     VNoteBlock *ptrBlock = nullptr;
@@ -100,7 +100,7 @@ TEST_F(ut_vnoteitem_test, newBlock)
     vnoteitem.delBlock(ptrBlock);
 }
 
-TEST_F(ut_vnoteitem_test, addBlock)
+TEST_F(UT_VnoteItem, UT_VnoteItem_addBlock_001)
 {
     VNoteItem vnoteitem;
     VNoteBlock *ptrBlock = vnoteitem.newBlock(2);
@@ -113,10 +113,72 @@ TEST_F(ut_vnoteitem_test, addBlock)
     EXPECT_GE(vnoteitem.voiceCount(), 0);
 }
 
-TEST_F(ut_vnoteitem_test, setMetadata)
+TEST_F(UT_VnoteItem, setMetadata)
 {
     VNoteItem vnoteitem;
     QString tmpstr = "{\"dataCount\":3,\"noteDatas\":[{\"text\":\"wafwaefawffvbdafvadfasdf\",\"type\":1},{\"createTime\":\"2020-08-25 14:39:21.473\",\"state\":false,\"text\":\"\",\"title\":\"Voice2\",\"type\":2,\"voicePath\":\"/usr/share/music/bensound-sunny.mp3\",\"voiceSize\":3630},{\"text\":\"wafwaefawffvbdafvadfasdf\",\"type\":1}],\"voiceMaxId\":3}";
     vnoteitem.setMetadata(tmpstr);
     EXPECT_EQ(vnoteitem.metaData, tmpstr);
+}
+
+TEST_F(UT_VnoteItem, UT_VnoteItem_haveVoice_001)
+{
+    VNoteItem vnoteitem;
+    EXPECT_FALSE(vnoteitem.haveVoice()) << "html is empty";
+
+    vnoteitem.htmlCode = "<div> </div>";
+    EXPECT_FALSE(vnoteitem.haveVoice()) << "jsonkey is empty";
+
+    vnoteitem.htmlCode = "<div jsonkey=\"123\"> </div>";
+    EXPECT_TRUE(vnoteitem.haveVoice()) << "has jsonkey";
+}
+
+TEST_F(UT_VnoteItem, UT_VnoteItem_haveText_001)
+{
+    VNoteItem vnoteitem;
+    EXPECT_FALSE(vnoteitem.haveText()) << "html is empty";
+
+    vnoteitem.htmlCode = "<div> </div>";
+    EXPECT_TRUE(vnoteitem.haveText()) << "jsonkey is empty";
+
+    vnoteitem.htmlCode = "<p><br></p>";
+    EXPECT_FALSE(vnoteitem.haveText()) << "has jsonkey";
+}
+
+TEST_F(UT_VnoteItem, UT_VnoteItem_voiceCount_001)
+{
+    VNoteItem vnoteitem;
+    EXPECT_FALSE(vnoteitem.voiceCount()) << "html is empty";
+
+    vnoteitem.htmlCode = "<div> </div>";
+    EXPECT_FALSE(vnoteitem.voiceCount()) << "jsonkey is empty";
+
+    vnoteitem.htmlCode = "<div jsonkey=\"123\"> </div>";
+    EXPECT_TRUE(vnoteitem.voiceCount()) << "has jsonkey";
+}
+
+TEST_F(UT_VnoteItem, UT_VnoteItem_getVoiceJsons_001)
+{
+    VNoteItem vnoteitem;
+    vnoteitem.htmlCode = "<div =\"123\"> </div>";
+    EXPECT_EQ(0, vnoteitem.getVoiceJsons().size()) << "jsonkey is empty";
+
+    vnoteitem.htmlCode = "<div jsonkey={\"123\"}> </div>";
+    EXPECT_EQ(1, vnoteitem.getVoiceJsons().size()) << "has jsonkey";
+}
+
+TEST_F(UT_VnoteItem, UT_VnoteItem_getFullHtml_001)
+{
+    VNoteItem vnoteitem;
+    vnoteitem.htmlCode = "<div =\"123\"> <img src=\"\"> </div>";
+    EXPECT_TRUE(vnoteitem.getFullHtml().size()) << "path is empty";
+
+    vnoteitem.htmlCode = "<div =\"123\"> <img src=\"/tmp/1.jpg\"> </div>";
+    EXPECT_TRUE(vnoteitem.getFullHtml().size()) << "has path";
+}
+
+TEST_F(UT_VnoteItem, UT_VnoteItem_operator_001)
+{
+    VNoteItem vnoteitem;
+    qDebug() << "" << vnoteitem;
 }

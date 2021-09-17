@@ -23,15 +23,15 @@
 #include "vnoteitemoper.h"
 #include "vnotefolderoper.h"
 
-ut_vnotedatamanager_test::ut_vnotedatamanager_test()
+UT_VnoteDataManager::UT_VnoteDataManager()
 {
 }
 
-TEST_F(ut_vnotedatamanager_test, folderNotesCount)
+TEST_F(UT_VnoteDataManager, folderNotesCount)
 {
 }
 
-TEST_F(ut_vnotedatamanager_test, isAllDatasReady)
+TEST_F(UT_VnoteDataManager, UT_VnoteDataManager_isAllDatasReady_001)
 {
     VNoteDataManager vnotedatamanager;
     vnotedatamanager.m_fDataState = 3;
@@ -42,14 +42,14 @@ TEST_F(ut_vnotedatamanager_test, isAllDatasReady)
     EXPECT_FALSE(vnotedatamanager.isAllDatasReady()) << "m_fDataState is 1";
 }
 
-TEST_F(ut_vnotedatamanager_test, instance)
+TEST_F(UT_VnoteDataManager, instance)
 {
     VNoteDataManager *vnotedatamanager;
     vnotedatamanager = VNoteDataManager::instance();
     EXPECT_FALSE(vnotedatamanager == nullptr);
 }
 
-TEST_F(ut_vnotedatamanager_test, addFolder)
+TEST_F(UT_VnoteDataManager, UT_VnoteDataManager_addFolder_001)
 {
     VNoteFolder folder;
     folder.id = 2;
@@ -86,7 +86,7 @@ TEST_F(ut_vnotedatamanager_test, addFolder)
     vnotedatamanager.delFolder(folder.id);
 }
 
-TEST_F(ut_vnotedatamanager_test, onFoldersLoaded)
+TEST_F(UT_VnoteDataManager, UT_VnoteDataManager_onFoldersLoaded_001)
 {
     VNoteDataManager vnotedatamanager;
     vnotedatamanager.m_qspNoteFoldersMap.reset(new VNOTE_FOLDERS_MAP);
@@ -96,7 +96,7 @@ TEST_F(ut_vnotedatamanager_test, onFoldersLoaded)
     EXPECT_EQ(nullptr, vnotedatamanager.m_pForldesLoadThread);
 }
 
-TEST_F(ut_vnotedatamanager_test, onAllNotesLoaded)
+TEST_F(UT_VnoteDataManager, UT_VnoteDataManager_onAllNotesLoaded_001)
 {
     VNoteDataManager vnotedatamanager;
     vnotedatamanager.m_qspAllNotesMap.reset(new VNOTE_ALL_NOTES_MAP);
@@ -108,8 +108,20 @@ TEST_F(ut_vnotedatamanager_test, onAllNotesLoaded)
     EXPECT_EQ(nullptr, vnotedatamanager.m_pNotesLoadThread);
 }
 
-TEST_F(ut_vnotedatamanager_test, reqNoteDefIcons)
+TEST_F(UT_VnoteDataManager, reqNoteDefIcons)
 {
     VNoteDataManager vnotedatamanager;
     vnotedatamanager.reqNoteDefIcons();
+}
+
+TEST_F(UT_VnoteDataManager, UT_VnoteDataManager_reqNoteFolders_001)
+{
+    VNoteDataManager vnotedatamanager;
+    vnotedatamanager.reqNoteFolders();
+}
+
+TEST_F(UT_VnoteDataManager, UT_VnoteDataManager_reqNoteItems_001)
+{
+    VNoteDataManager vnotedatamanager;
+    vnotedatamanager.reqNoteItems();
 }

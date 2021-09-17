@@ -24,12 +24,12 @@
 
 class Utils;
 
-class ut_utils_test : public QObject
+class UT_Utils : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_utils_test();
+    UT_Utils();
 
     virtual void SetUp() override;
     virtual void TearDown() override;
