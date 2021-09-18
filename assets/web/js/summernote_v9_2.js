@@ -124,7 +124,6 @@
                     'style="background-color:', color, '" ',
                     'data-event="', eventName, '" ',
                     'data-value="', color, '" ',
-                    'title="', color == 'transparent' ? '透明' : color, '" ',
                     'data-toggle="button" tabindex="-1">',
                     color == 'transparent' ? '<div class="slopingside"></div>' : '',
                     '</button>'
@@ -2225,11 +2224,6 @@
                 if (dom.isEditable(point.node)) {
                     return;
                 }
-                // console.log($(point.node), '1111')
-                // if ($(point.node).parents('.translate').length == 0 && $(point.node).parents('.voiceBox').length != 0) {
-                //     console.log($(point.node),'1212')
-                //     return;
-                // }
                 var node;
                 if (fullyContains) {
                     if (dom.isLeftEdgePoint(point)) {
@@ -3063,12 +3057,8 @@
         Bullet.prototype.toggleList = function (listName, editable) {
             var _this = this;
             var rng = range.create(editable).wrapBodyInlineWithPara();
-            console.log(rng)
             var selectionObj = window.getSelection();
             var rangeObj = selectionObj.getRangeAt(0);
-            console.log(selectionObj)
-            console.log(rangeObj)
-
             var paras = rng.nodes(dom.isPara, { includeAncestor: true });
             var bookmark = rng.paraBookmark(paras);
             var clustereds = lists.clusterBy(paras, func.peq2('parentNode'));
@@ -4469,6 +4459,7 @@
                 })
 
                 _this.afterCommand();
+                setFocusScroll()
             }).fail(function (e) {
                 _this.context.triggerEvent('image.upload.error', e);
             });
@@ -5360,7 +5351,7 @@
             }
             this.context.memo('button.bold', function () {
                 return _this.button({
-                    className: 'note-btn-bold',
+                    className: 'note-btn-bold boldBut',
                     contents: _this.ui.icon(_this.options.icons.bold),
                     tooltip: tooltipContent.bold,
                     click: _this.context.createInvokeHandlerAndUpdateState('editor.bold')
@@ -5368,7 +5359,7 @@
             });
             this.context.memo('button.italic', function () {
                 return _this.button({
-                    className: 'note-btn-italic',
+                    className: 'note-btn-italic italicBut',
                     contents: _this.ui.icon(_this.options.icons.italic),
                     tooltip: tooltipContent.italic,
                     click: _this.context.createInvokeHandlerAndUpdateState('editor.italic')
@@ -5376,7 +5367,7 @@
             });
             this.context.memo('button.underline', function () {
                 return _this.button({
-                    className: 'note-btn-underline',
+                    className: 'note-btn-underline underlineBut',
                     contents: _this.ui.icon(_this.options.icons.underline),
                     tooltip: tooltipContent.underline,
                     click: _this.context.createInvokeHandlerAndUpdateState('editor.underline')
@@ -5391,7 +5382,7 @@
             });
             this.context.memo('button.strikethrough', function () {
                 return _this.button({
-                    className: 'note-btn-strikethrough',
+                    className: 'note-btn-strikethrough strikethroughBut',
                     contents: _this.ui.icon(_this.options.icons.strikethrough),
                     tooltip: tooltipContent.strikethrough,
                     click: _this.context.createInvokeHandlerAndUpdateState('editor.strikethrough')
@@ -5447,7 +5438,7 @@
             this.context.memo('button.fontsize', function () {
                 return _this.ui.buttonGroup([
                     _this.button({
-                        className: 'dropdown-toggle fontSizeBut',
+                        className: 'dropdown-toggle fontsizeBut',
                         contents: _this.ui.dropdownButtonContents('<span class="note-current-fontsize"/>', _this.options),
                         tooltip: tooltipContent.fontsize,
                         data: {
@@ -5549,6 +5540,7 @@
             });
             this.context.memo('button.ul', function () {
                 return _this.button({
+                    className: 'ulBut',
                     contents: _this.ui.icon(_this.options.icons.unorderedlist),
                     tooltip: tooltipContent.ul,
                     click: _this.context.createInvokeHandler('editor.insertUnorderedList')
@@ -5556,6 +5548,7 @@
             });
             this.context.memo('button.ol', function () {
                 return _this.button({
+                    className: 'olBut',
                     contents: _this.ui.icon(_this.options.icons.orderedlist),
                     tooltip: tooltipContent.ol,
                     click: _this.context.createInvokeHandler('editor.insertOrderedList')
@@ -6009,7 +6002,7 @@
                 className: 'note-color ' + className,
                 children: [
                     this.buttonColor({
-                        className: 'note-current-color-button',
+                        className: 'note-current-color-button backcolorBut',
                         contents: this.ui.icon(this.options.icons.backcolor),
                         // contents: _this.ui.icon('iconImgStyle note-recent-color', foreColor ? 'img src="./img/forecolor.svg"' : 'img src="./img/backcolor.svg"'),
                         // contents: _this.ui.icon('note-recent-color backcolorImg', 'img src="./img/backcolor.svg"'),
@@ -6050,7 +6043,7 @@
                         }
                     }),
                     this.button({
-                        className: backColor ? "dropdown-toggle backColor-dropdown" : "dropdown-toggle",
+                        className: backColor ? "dropdown-toggle backColor-dropdown moreBut" : "dropdown-toggle forecolorBut",
                         // contents: this.ui.dropdownButtonContents('', this.options),
                         // contents: backColor ? this.ui.dropdownButtonContents('', this.options) : _this.ui.icon('note-recent-color forecolorImg', 'img src="./img/forecolor.svg"'),
                         contents: backColor ? this.ui.dropdownButtonContents('', this.options) : _this.ui.icon(this.options.icons.forecolor),
@@ -6064,7 +6057,7 @@
                         items: (backColor ? [
                             '<div class="note-palette">',
                             '  <div class="note-holder" data-event="backColor"/>',
-                            '  <div class="colorFont">',
+                            '  <div class="colorFont recentlyUsedBut">',
                             tooltipContent.recentlyUsed,
                             '  </div>',
                             '  <div class="note-holder-custom" id="backColorPalette" data-event="backColor"/>',
@@ -6079,7 +6072,7 @@
                             (foreColor ? [
                                 '<div class="note-palette">',
                                 '  <div class="note-holder" data-event="foreColor"/>',
-                                '  <div class="colorFont">',
+                                '  <div class="colorFont recentlyUsedBut">',
                                 tooltipContent.recentlyUsed,
                                 '  </div>',
                                 '  <div class="note-holder-custom" id="foreColorPalette" data-event="foreColor"/>',
@@ -6099,7 +6092,7 @@
                                     colorsName: _this.options.colorsName,
                                     eventName: $holder.data('event'),
                                     container: _this.options.container,
-                                    tooltip: _this.options.tooltip == 'transparent' ? tooltipContent.transparent : _this.options.tooltip
+
                                 }).render());
                             });
                             /* TODO: do we have to record recent custom colors within cookies? */
@@ -6123,8 +6116,7 @@
                                     var color = this.value.toUpperCase();
                                     $chip.css('background-color', color)
                                         .attr('aria-label', color)
-                                        .attr('data-value', color)
-                                        .attr('data-original-title', color);
+                                        .attr('data-value', color);
                                     $chip.click();
                                 });
                             });
@@ -6148,8 +6140,7 @@
                                 var color = $picker.val();
                                 $chip.css('background-color', color)
                                     .attr('aria-label', color)
-                                    .attr('data-value', color)
-                                    .attr('data-original-title', color);
+                                    .attr('data-value', color);
                                 $palette.prepend($chip);
                                 $picker.click();
                             }
@@ -6168,37 +6159,6 @@
                                 $currentButton.attr('data-' + eventName, value);
                                 _this.context.invoke('editor.' + eventName, value);
                             }
-                            // event.stopPropagation();
-                            // var $parent = $$1('.' + className);
-                            // var $button = $$1(event.target);
-                            // var eventName = $button.data('event');
-                            // var value = $button.attr('data-value');
-                            // // if (eventName === 'openPalette') {
-
-                            // var $palette = $$1($parent.find('#' + eventName + 'Palette').find('.note-color-row')[0]);
-                            // // Shift palette chips
-                            // var $chip = $palette.find('.note-color-btn').last().detach();
-                            // // Set chip attributes
-                            // var color = value;
-                            // $chip.css('background-color', color)
-                            //     .attr('aria-label', color)
-                            //     .attr('data-value', color)
-                            //     .attr('data-original-title', color);
-                            // $palette.prepend($chip);
-                            // // $picker.click();
-                            // // }
-                            // // else if (lists.contains(['backColor', 'foreColor'], eventName)) {
-
-                            // // var key = eventName === 'backColor' ? 'background-color' : 'color';
-                            // var key = 'color';
-                            // var $color = $button.closest('.note-color').find('.note-recent-color');
-                            // var $currentButton = $button.closest('.note-color').find('.note-current-color-button');
-                            // $color.css(key, value);
-                            // $currentButton.attr('data-' + eventName, value);
-                            // _this.context.invoke('editor.' + eventName, value);
-
-
-                            // // }
                         }
                     }),
                 ]
@@ -7706,7 +7666,7 @@
             ],
             colorButton: {
                 foreColor: '#414D68',
-                backColor: ''
+                backColor: 'transparent'
             },
             lineHeights: ['1.0', '1.2', '1.4', '1.5', '1.6', '1.8', '2.0', '3.0'],
             tableClassName: 'table table-bordered',

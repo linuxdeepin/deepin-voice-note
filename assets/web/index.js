@@ -90,8 +90,18 @@ var tooltipContent = {
     ul: '无序列表',
     ol: '有序列表',
     more: '更多颜色',
-    transparent: '透明',
     recentlyUsed: '最近使用'
+}
+
+// 国际化
+function changeLang(tooltipContent) {
+    for (let item in tooltipContent) {
+        if (item != 'recentlyUsed') {
+            $(`.${item}But`).attr('data-original-title', tooltipContent[item])
+        } else {
+            $('.recentlyUsedBut').html(tooltipContent[item])
+        }
+    }
 }
 
 // 初始化summernote
@@ -114,15 +124,12 @@ $('#summernote').summernote({
         ],
     },
     airMode: true,
-
 });
 
 // 监听窗口大小变化
 $(window).resize(function () {
     $('.note-editable').css('min-height', $(window).height())
 });
-
-
 
 /**
  * 通知后台存储页面内容
@@ -296,10 +303,10 @@ document.addEventListener('paste', function (event) {
 // 页面滚动到光标位置
 function setFocusScroll() {
     let focusY = getCursortPosition(document.querySelector('.note-editable'))
-    let viewY = $(window).height() + $(document).scrollTop()
-    if (focusY > viewY) {
-        let sel = document.getSelection();
-        sel.focusNode.scrollIntoView(false)
+    let scrollTop = $(document).scrollTop()
+    let viewY = $(window).height() + scrollTop
+    if (focusY < scrollTop || focusY > viewY) {
+        $(document).scrollTop(focusY - $(window).height() + 16)
     }
 }
 
@@ -399,6 +406,11 @@ new QWebChannel(qt.webChannelTransport,
 
         //通知QT层完成通信绑定
         webobj.jsCallChannleFinish();
+        // 设置语言
+        webobj.jsCallGetTranslation(function (res) {
+            changeLang(JSON.parse(res))
+        })
+
     }
 )
 
@@ -415,10 +427,11 @@ function getCursortPosition(element) {
     var sel = win.getSelection();
     if (sel.rangeCount > 0) {
         var range = win.getSelection().getRangeAt(0);
-        var preCaretRange = range.cloneRange();
-        preCaretRange.selectNodeContents(element);
-        preCaretRange.setEnd(range.endContainer, range.endOffset);  //重置选中区域的结束位置
-        caretOffset = preCaretRange.toString().length;
+        let span = document.createElement('span');
+        $(span).addClass('focusAddress')
+        range.insertNode(span)
+        caretOffset = $(span).offset().top
+        $(span).remove()
     }
     return caretOffset;
 }
@@ -433,6 +446,7 @@ function initData(text) {
     arr.noteDatas.forEach((item, index) => {
         //false: txt
         if (item.type == 1) {
+            txtHtml = ''
             if (item.text == '') {
                 txtHtml = '<p><br></p>';
             }
@@ -749,11 +763,10 @@ function changeColor(flag, activeColor, disableColor) {
  * @param {any} urlStr 图片地址list
  * @returns {any}
  */
-function insertImg(urlStr) {
+async function insertImg(urlStr) {
     urlStr.forEach((item, index) => {
         $("#summernote").summernote('insertImage', item, 'img');
     })
-
 }
 
 // 禁用ctrl+v
@@ -761,6 +774,14 @@ document.onkeydown = function (event) {
     if (event.ctrlKey && window.event.keyCode == 86) {
         webobj.jsCallPaste()
         return false;
+    }
+}
+
+// 回车健
+document.onkeydown = function (event) {
+    console.log(window.event.keyCode)
+    if (window.event.keyCode == 13) {
+        setFocusScroll()
     }
 }
 
