@@ -380,7 +380,7 @@ void MiddleView::saveRecords(const QString &exportDir)
     }
 
     ExportNoteWorker *exportWorker = new ExportNoteWorker(
-        exportDir, ExportNoteWorker::ExportAllVoice, noteItemList);
+        exportDir, ExportNoteWorker::ExportVoice, noteItemList);
     exportWorker->setAutoDelete(true);
     connect(exportWorker, &ExportNoteWorker::exportFinished, this, &MiddleView::onExportFinished);
     QThreadPool::globalInstance()->start(exportWorker);

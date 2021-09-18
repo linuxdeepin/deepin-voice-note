@@ -381,7 +381,7 @@ void WebRichTextEditor::saveMP3As()
         historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     }
 
-    QString newPath = saveAsFile(m_voiceBlock->voicePath, historyDir);
+    QString newPath = saveAsFile(m_voiceBlock->voicePath, historyDir, m_voiceBlock->voiceTitle);
     if (!newPath.isEmpty()) {
         setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, QFileInfo(newPath).dir().path());
     }
@@ -392,9 +392,10 @@ void WebRichTextEditor::saveMP3As()
  * 另存文件
  * @param originalPath  原文件路径
  * @param dirPath 默认保存文件夹路径
+ * @param defalutName 默认保存文件名
  * @return  保存的文件路径
  */
-QString WebRichTextEditor::saveAsFile(const QString &originalPath, QString dirPath)
+QString WebRichTextEditor::saveAsFile(const QString &originalPath, QString dirPath, const QString &defalutName)
 {
     //存储文件夹默认为桌面
     if (dirPath.isEmpty()) {
@@ -403,9 +404,8 @@ QString WebRichTextEditor::saveAsFile(const QString &originalPath, QString dirPa
 
     QFileInfo fileInfo(originalPath);
     QString filter = "*." + fileInfo.suffix();
-    QString dir = QString("%1/%2")
-                      .arg(dirPath)
-                      .arg(fileInfo.baseName());
+    QString baseName = defalutName.isEmpty() ? fileInfo.baseName() : defalutName;
+    QString dir = QString("%1/%2").arg(dirPath).arg(baseName);
     //获取需要保存的文件位置，默认路径为用户图片文件夹，默认文件名为原文件名
     QString newPath = DFileDialog::getSaveFileName(this, "", dir, filter);
     if (newPath.isEmpty()) {

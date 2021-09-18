@@ -191,7 +191,7 @@ private:
     /**
      * @brief 另存文件
      */
-    QString saveAsFile(const QString &originalPath, QString dirPath = "");
+    QString saveAsFile(const QString &originalPath, QString dirPath = "", const QString &defalutName = "");
 
     /**
      * @brief 设置笔记内容

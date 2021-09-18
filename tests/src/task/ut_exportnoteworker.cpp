@@ -33,34 +33,20 @@ ut_exportnoteworker_test::ut_exportnoteworker_test()
 
 TEST_F(ut_exportnoteworker_test, exportText)
 {
-    ExportNoteWorker work(QCoreApplication::applicationDirPath(), ExportNoteWorker::ExportText, m_noteList, m_block);
+    ExportNoteWorker work(QCoreApplication::applicationDirPath(), ExportNoteWorker::ExportText, m_noteList);
     work.run();
     EXPECT_EQ(work.m_exportType, ExportNoteWorker::ExportText);
 }
 
 TEST_F(ut_exportnoteworker_test, exportAllVoice)
 {
-    ExportNoteWorker work(QCoreApplication::applicationDirPath(), ExportNoteWorker::ExportAllVoice, m_noteList, m_block);
+    ExportNoteWorker work(QCoreApplication::applicationDirPath(), ExportNoteWorker::ExportVoice, m_noteList);
     work.run();
-    EXPECT_EQ(work.m_exportType, ExportNoteWorker::ExportAllVoice);
-}
-
-TEST_F(ut_exportnoteworker_test, exportAll)
-{
-    ExportNoteWorker work(QCoreApplication::applicationDirPath(), ExportNoteWorker::ExportAll, m_noteList, m_block);
-    work.run();
-    EXPECT_EQ(work.m_exportType, ExportNoteWorker::ExportAll);
-}
-TEST_F(ut_exportnoteworker_test, exportOneVoice)
-{
-    ExportNoteWorker work(QCoreApplication::applicationDirPath(), ExportNoteWorker::ExportOneVoice, m_noteList, m_block);
-    work.run();
-    EXPECT_EQ(work.m_exportType, ExportNoteWorker::ExportOneVoice);
+    EXPECT_EQ(work.m_exportType, ExportNoteWorker::ExportVoice);
 }
 
 TEST_F(ut_exportnoteworker_test, checkPath)
 {
-    ExportNoteWorker work("test", ExportNoteWorker::ExportOneVoice, m_noteList, m_block);
-    work.run();
-    EXPECT_EQ(work.m_exportType, ExportNoteWorker::ExportOneVoice);
+    ExportNoteWorker work(QCoreApplication::applicationDirPath(), ExportNoteWorker::ExportVoice, m_noteList);
+    EXPECT_EQ(work.checkPath(), ExportNoteWorker::ExportOK);
 }

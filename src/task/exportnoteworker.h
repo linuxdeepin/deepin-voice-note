@@ -32,17 +32,10 @@ class ExportNoteWorker : public VNTask
 {
     Q_OBJECT
 public:
-    explicit ExportNoteWorker(const QString &dirPath,
-                              int exportType,
-                              const QList<VNoteItem *> &noteList,
-                              VNoteBlock *block = nullptr,
-                              QObject *parent = nullptr);
-    enum {
+    enum ExportType {
         ExportNothing,
         ExportText,
-        ExportAllVoice,
-        ExportAll,
-        ExportOneVoice,
+        ExportVoice,
         ExportHtml, //导出为html
     };
 
@@ -53,6 +46,11 @@ public:
         PathInvalid,
         Savefailed, //保存失败
     };
+
+    explicit ExportNoteWorker(const QString &dirPath,
+                              ExportType exportType,
+                              const QList<VNoteItem *> &noteList,
+                              QObject *parent = nullptr);
 
 signals:
     //导出完成信号
@@ -72,11 +70,9 @@ protected:
     //导出为HTML
     ExportError exportAsHtml();
 
-    int m_exportType {ExportNothing};
-    QString m_exportPath;
-    //导出语音
-    QList<VNoteItem *>m_noteList {nullptr};
-    VNoteBlock *m_noteblock {nullptr};
+    ExportType m_exportType {ExportNothing};
+    QString m_exportPath {""};
+    QList<VNoteItem *> m_noteList {nullptr};
 };
 
 #endif // EXPORTNOTEWORKER_H

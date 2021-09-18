@@ -35,19 +35,18 @@
  * @param dirPath 导出目录
  * @param exportType 导出类型
  * @param note 绑定记事项数据
- * @param block 绑定文本/语音
  * @param parent
  */
-ExportNoteWorker::ExportNoteWorker(const QString &dirPath, int exportType,
-                                   const QList<VNoteItem *> &noteList, VNoteBlock *block, QObject *parent)
+ExportNoteWorker::ExportNoteWorker(const QString &dirPath, ExportType exportType,
+                                   const QList<VNoteItem *> &noteList, QObject *parent)
     : VNTask(parent)
     , m_exportType(exportType)
     , m_exportPath(dirPath)
     //笔记列表
     , m_noteList(noteList)
-    , m_noteblock(block)
 {
 }
+
 /**
  * @brief ExportNoteWorker::run
  * 执行导出操作
@@ -59,15 +58,8 @@ void ExportNoteWorker::run()
     if (ExportOK == error) {
         if (ExportText == m_exportType) {
             error = exportText();
-        } else if (ExportAllVoice == m_exportType) {
+        } else if (ExportVoice == m_exportType) {
             error = exportAllVoice();
-        } else if (ExportOneVoice == m_exportType) {
-            //导出语音
-            if (m_noteList.size() > 1) {
-                error = exportAllVoice();
-            } else {
-                error = exportOneVoice(m_noteblock);
-            }
         } else if (ExportHtml == m_exportType) {
             error = exportAsHtml();
         }
@@ -113,27 +105,37 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportText()
     ExportError error = ExportOK;
     //存在note
     if (m_noteList.size()) {
+        QString fileSuffix = ".txt";
         for (auto noteData : m_noteList) {
-            QString fileName = QString("%1-%2.txt").arg(noteData->noteTitle).arg(QDateTime::currentDateTime().toLocalTime().toString(VNOTE_TIME_FMT));
-            QFile exportFile(m_exportPath + "/" + fileName);
-            if (!exportFile.open(QIODevice::ReadWrite)) {
-                return Savefailed;
+            QString baseFileName = m_exportPath + "/" + noteData->noteTitle;
+            int count = 1;
+            QString filePath = baseFileName + fileSuffix;
+            //文件已存在，获取新文件名，直到新文件名不存在
+            while (1) {
+                QFile file(filePath);
+                if (!file.exists()) {
+                    break;
+                }
+                filePath = baseFileName + "[" + QString::number(count++) + "]" + fileSuffix;
             }
-            QTextStream stream(&exportFile);
+            QFile out(filePath);
+            if (!out.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                return Savefailed; //保存失败
+            }
             //富文本数据需要转换为纯文本
             if (!noteData->htmlCode.isEmpty()) {
                 QTextDocument doc;
                 doc.setHtml(noteData->htmlCode);
-                stream << doc.toPlainText();
+                out.write(doc.toPlainText().toUtf8());
             } else {
                 for (auto it : noteData->datas.datas) {
                     if (VNoteBlock::Text == it->getType()) {
-                        stream << it->blockText;
-                        stream << '\n';
+                        out.write(it->blockText.toUtf8());
+                        out.write("\n");
                     }
                 }
             }
-            stream.flush();
+            out.close();
         }
     } else {
         error = NoteInvalid;
@@ -206,8 +208,19 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportOneVoice(VNoteBlock *noteb
 
     if (noteblock && noteblock->blockType == VNoteBlock::Voice) {
         QFileInfo targetFile(noteblock->ptrVoice->voicePath);
-        QString destFileName = m_exportPath + "/" + noteblock->ptrVoice->voiceTitle + "-" + targetFile.fileName();
-        if (!QFile::copy(noteblock->ptrVoice->voicePath, destFileName)) {
+        QString baseFileName = m_exportPath + "/" + noteblock->ptrVoice->voiceTitle;
+        QString fileSuffix = "." + targetFile.suffix();
+        QString dstFileName = baseFileName + fileSuffix;
+        int count = 1;
+        //文件已存在，获取新文件名，直到新文件名不存在
+        while (1) {
+            QFile file(dstFileName);
+            if (!file.exists()) {
+                break;
+            }
+            dstFileName = baseFileName + "[" + QString::number(count++) + "]" + fileSuffix;
+        }
+        if (!QFile::copy(noteblock->ptrVoice->voicePath, dstFileName)) {
             error = Savefailed; //保存失败
         }
     } else {
@@ -225,10 +238,20 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportOneVoice(VNoteBlock *noteb
 ExportNoteWorker::ExportError ExportNoteWorker::exportAsHtml()
 {
     ExportError error = ExportOK;
+    QString fileSuffix = ".html";
     for (auto note : m_noteList) {
-        //构建文件名
-        QString fileName = QString("%1-%2.html").arg(note->noteTitle).arg(QDateTime::currentDateTime().toLocalTime().toString("yyyyMMddhhmmss"));
-        QFile out(m_exportPath + "/" + fileName);
+        QString baseFileName = m_exportPath + "/" + note->noteTitle;
+        int count = 1;
+        QString filePath = baseFileName + fileSuffix;
+        //文件已存在，获取新文件名，直到新文件名不存在
+        while (1) {
+            QFile file(filePath);
+            if (!file.exists()) {
+                break;
+            }
+            filePath = baseFileName + "[" + QString::number(count++) + "]" + fileSuffix;
+        }
+        QFile out(filePath);
         if (!out.open(QIODevice::WriteOnly | QIODevice::Text)) {
             return Savefailed; //保存失败
         }
