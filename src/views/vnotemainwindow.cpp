@@ -1101,14 +1101,15 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
-
     if (data == nullptr || stateOperation->isSearching()) {
         m_recordBar->setVisible(false);
     } else {
         m_recordBar->setVisible(true);
     }
-
-    m_richTextEdit->initData(data, m_searchKey, m_rightViewHasFouse);
+    //多选笔记时不更新详情页内容
+    if (!m_middleView->isMultipleSelected()) {
+        m_richTextEdit->initData(data, m_searchKey, m_rightViewHasFouse);
+    }
     //没有数据，插入图片按钮禁用
     m_imgInsert->setDisabled(nullptr == data);
     m_rightViewHasFouse = false;
