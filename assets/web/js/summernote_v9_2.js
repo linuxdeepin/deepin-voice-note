@@ -3908,7 +3908,7 @@
             var commands = [
                 'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript',
                 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull',
-                'formatBlock', 'removeFormat', 'backColor'
+                'formatBlock', 'removeFormat', 'backColor', 'foreColor'
             ];
             for (var idx = 0, len = commands.length; idx < len; idx++) {
                 this[commands[idx]] = (function (sCmd) {
@@ -3924,8 +3924,13 @@
                             range.setStart($('.heightNull')[0], 1)
                             sel.addRange(range);
                         }
+                        if (sCmd == "foreColor") {
+                            document.execCommand('styleWithCSS', false, true);
+                            document.execCommand('foreColor', false, value);
+                        } else {
 
-                        document.execCommand(sCmd, false, value);
+                            document.execCommand(sCmd, false, value);
+                        }
 
                         $('.heightNull').remove()
 
@@ -4107,10 +4112,10 @@
              *
              * @param {String} colorCode foreground color code
              */
-            this.foreColor = this.wrapCommand(function (colorInfo) {
-                document.execCommand('styleWithCSS', false, true);
-                document.execCommand('foreColor', false, colorInfo);
-            });
+            // this.foreColor = this.wrapCommand(function (colorInfo) {
+            //     document.execCommand('styleWithCSS', false, true);
+            //     document.execCommand('foreColor', false, colorInfo);
+            // });
             /**
              * insert Table
              *
@@ -6004,8 +6009,6 @@
                     this.buttonColor({
                         className: 'note-current-color-button backcolorBut',
                         contents: this.ui.icon(this.options.icons.backcolor),
-                        // contents: _this.ui.icon('iconImgStyle note-recent-color', foreColor ? 'img src="./img/forecolor.svg"' : 'img src="./img/backcolor.svg"'),
-                        // contents: _this.ui.icon('note-recent-color backcolorImg', 'img src="./img/backcolor.svg"'),
                         tooltip: tooltip,
                         click: function (e) {
                             var $button = $$1(e.currentTarget);
@@ -6044,10 +6047,7 @@
                     }),
                     this.button({
                         className: backColor ? "dropdown-toggle backColor-dropdown moreBut" : "dropdown-toggle forecolorBut",
-                        // contents: this.ui.dropdownButtonContents('', this.options),
-                        // contents: backColor ? this.ui.dropdownButtonContents('', this.options) : _this.ui.icon('note-recent-color forecolorImg', 'img src="./img/forecolor.svg"'),
                         contents: backColor ? this.ui.dropdownButtonContents('', this.options) : _this.ui.icon(this.options.icons.forecolor),
-
                         tooltip: backColor ? tooltipContent.more : tooltipContent.forecolor,
                         data: {
                             toggle: 'dropdown'
@@ -7059,7 +7059,6 @@
         AirPopover.prototype.update = function () {
             var styleInfo = this.context.invoke('editor.currentStyle');
             let selStr = window.getSelection().toString();
-
             this.isShowOlUl(styleInfo)
 
             if (!isShowAir) {
@@ -7071,7 +7070,6 @@
                 || selStr == '') {
                 return this.hide();
             }
-
             if (styleInfo.range && !styleInfo.range.isCollapsed()) {
                 var rect = lists.last(styleInfo.range.getClientRects());
                 if (rect) {
@@ -7121,6 +7119,7 @@
         };
 
         AirPopover.prototype.hide = function () {
+            this.$popover.find('.note-color').removeClass('open')
             this.$popover.hide();
         };
         return AirPopover;
@@ -7519,7 +7518,6 @@
                 return this[methodName].apply(this, args);
             }
             else if (module && module[methodName] && module.shouldInitialize()) {
-
                 return module[methodName].apply(module, args);
             }
         };

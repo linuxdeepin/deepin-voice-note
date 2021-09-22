@@ -702,7 +702,7 @@ function setVoiceButColor(color) {
     $("#style").html(`
     
     .voiceBox .voicebtn {
-        background-color:${color}
+        background-color:${color};
     } 
     .btn-default.active i {
         color:${color}!important
@@ -779,7 +779,6 @@ document.onkeydown = function (event) {
 
 // 回车健
 document.onkeydown = function (event) {
-    console.log(window.event.keyCode)
     if (window.event.keyCode == 13) {
         setFocusScroll()
     }
