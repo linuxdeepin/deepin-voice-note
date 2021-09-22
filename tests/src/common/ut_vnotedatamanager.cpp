@@ -108,20 +108,8 @@ TEST_F(UT_VnoteDataManager, UT_VnoteDataManager_onAllNotesLoaded_001)
     EXPECT_EQ(nullptr, vnotedatamanager.m_pNotesLoadThread);
 }
 
-TEST_F(UT_VnoteDataManager, reqNoteDefIcons)
+TEST_F(UT_VnoteDataManager, UT_VnoteDataManager_reqNoteDefIcons_001)
 {
     VNoteDataManager vnotedatamanager;
     vnotedatamanager.reqNoteDefIcons();
-}
-
-TEST_F(UT_VnoteDataManager, UT_VnoteDataManager_reqNoteFolders_001)
-{
-    VNoteDataManager vnotedatamanager;
-    vnotedatamanager.reqNoteFolders();
-}
-
-TEST_F(UT_VnoteDataManager, UT_VnoteDataManager_reqNoteItems_001)
-{
-    VNoteDataManager vnotedatamanager;
-    vnotedatamanager.reqNoteItems();
 }

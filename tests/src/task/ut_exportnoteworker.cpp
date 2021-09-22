@@ -6,7 +6,7 @@
 #include <QApplication>
 #include <QList>
 
-void ut_exportnoteworker_test::SetUp()
+void UT_ExportNoteWorker::SetUp()
 {
     VNOTE_ALL_NOTES_MAP *notes = VNoteDataManager::instance()->getAllNotesInFolder();
     if (notes && !notes->notes.isEmpty()) {
@@ -21,32 +21,63 @@ void ut_exportnoteworker_test::SetUp()
             }
         }
     }
+    note = new VNoteItem();
+    note->htmlCode = "<div> <p> <p> </div>";
+    m_noteList.push_back(note);
 }
 
-void ut_exportnoteworker_test::TearDown()
+void UT_ExportNoteWorker::TearDown()
+{
+    delete note;
+}
+
+UT_ExportNoteWorker::UT_ExportNoteWorker()
 {
 }
 
-ut_exportnoteworker_test::ut_exportnoteworker_test()
-{
-}
-
-TEST_F(ut_exportnoteworker_test, exportText)
+TEST_F(UT_ExportNoteWorker, UT_ExportNoteWorker_exportText_001)
 {
     ExportNoteWorker work(QCoreApplication::applicationDirPath(), ExportNoteWorker::ExportText, m_noteList);
     work.run();
     EXPECT_EQ(work.m_exportType, ExportNoteWorker::ExportText);
 }
 
-TEST_F(ut_exportnoteworker_test, exportAllVoice)
+TEST_F(UT_ExportNoteWorker, UT_ExportNoteWorker_exportAllVoice_001)
 {
     ExportNoteWorker work(QCoreApplication::applicationDirPath(), ExportNoteWorker::ExportVoice, m_noteList);
     work.run();
     EXPECT_EQ(work.m_exportType, ExportNoteWorker::ExportVoice);
 }
 
-TEST_F(ut_exportnoteworker_test, checkPath)
+TEST_F(UT_ExportNoteWorker, UT_ExportNoteWorker_exportOneVoice_002)
+{
+    QString metadata = "{\"createTime\":\"2021-09-16 17:19:22.065\",\"state\":false,\"text\":\"\",\"title\":\"20210916 17.19.22\",\"transSize\":\"00:01\",\"type\":2,"
+                       "\"voicePath\":\"/home/uos/.local/share/deepin/deepin-voice-note/voicenote/0020210916171920.mp3\",\"voiceSize\":1420}";
+    ExportNoteWorker work(QCoreApplication::applicationDirPath(), ExportNoteWorker::ExportVoice, m_noteList);
+    EXPECT_EQ(ExportNoteWorker::Savefailed, work.exportOneVoice(metadata)) << "has data";
+
+    metadata = "{}";
+    EXPECT_EQ(ExportNoteWorker::NoteInvalid, work.exportOneVoice(metadata)) << "not have data";
+}
+
+TEST_F(UT_ExportNoteWorker, UT_ExportNoteWorker_checkPath_001)
 {
     ExportNoteWorker work(QCoreApplication::applicationDirPath(), ExportNoteWorker::ExportVoice, m_noteList);
     EXPECT_EQ(work.checkPath(), ExportNoteWorker::ExportOK);
+}
+
+TEST_F(UT_ExportNoteWorker, UT_ExportNoteWorker_exportAsHtml_001)
+{
+    ExportNoteWorker work("test", ExportNoteWorker::ExportHtml, m_noteList);
+    work.run();
+    EXPECT_EQ(ExportNoteWorker::ExportOK, work.exportAsHtml());
+    EXPECT_EQ(work.m_exportType, ExportNoteWorker::ExportHtml);
+}
+
+TEST_F(UT_ExportNoteWorker, UT_ExportNoteWorker_exportAsHtml_002)
+{
+    ExportNoteWorker work("/test", ExportNoteWorker::ExportHtml, m_noteList);
+    work.run();
+    EXPECT_EQ(ExportNoteWorker::Savefailed, work.exportAsHtml());
+    EXPECT_EQ(work.m_exportType, ExportNoteWorker::ExportHtml);
 }

@@ -7,16 +7,18 @@
 struct VNoteItem;
 struct VNoteBlock;
 
-class ut_exportnoteworker_test :  public ::testing::Test
+class UT_ExportNoteWorker : public ::testing::Test
 {
 public:
-    ut_exportnoteworker_test();
+    UT_ExportNoteWorker();
+
 protected:
     virtual void SetUp() override;
     virtual void TearDown() override;
  public:
-    QList<VNoteItem *>m_noteList;
-    VNoteBlock *m_block = nullptr;
+     QList<VNoteItem *> m_noteList;
+     VNoteBlock *m_block = nullptr;
+     VNoteItem *note {nullptr};
 };
 
 #endif // UT_EXPORTNOTEWORKER_H
