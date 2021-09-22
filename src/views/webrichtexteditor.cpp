@@ -116,8 +116,14 @@ void WebRichTextEditor::initData(VNoteItem *data, const QString &reg, bool focus
 {
     //富文本设置异步操作，解决笔记列表不实时刷新
     QTimer::singleShot(0, this, [=] {
-        setData(data, reg, focus);
+        setData(data, reg);
     });
+    //延时设置焦点，解决有焦点无光标问题
+    if (focus) {
+        QTimer::singleShot(100, this, [this] {
+            setFocus();
+        });
+    }
 }
 
 void WebRichTextEditor::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
@@ -593,13 +599,11 @@ void WebRichTextEditor::onHideEditToolbar()
     }
 }
 
-void WebRichTextEditor::setData(VNoteItem *data, const QString &reg, bool focus)
+void WebRichTextEditor::setData(VNoteItem *data, const QString &reg)
 {
     //有焦点先隐藏编辑工具栏
     if (hasFocus()) {
         emit JsContent::instance()->callJsHideEditToolbar();
-    } else if (focus) {
-        setFocus();
     }
 
     if (nullptr == data) {

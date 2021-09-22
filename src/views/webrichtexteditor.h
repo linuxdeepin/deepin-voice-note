@@ -197,9 +197,8 @@ private:
      * @brief 设置笔记内容
      * @param data 笔记数据
      * @param reg 搜索关键字
-     * @param focus 是否有焦点
      */
-    void setData(VNoteItem *data, const QString &reg, bool focus = false);
+    void setData(VNoteItem *data, const QString &reg);
 
 private:
     VNoteItem *m_noteData {nullptr};
