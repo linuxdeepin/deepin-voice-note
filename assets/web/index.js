@@ -290,6 +290,11 @@ function shearPlateChange() {
     isVoicePaste = false
 }
 
+// 复制标志
+function returnCopyFlag() {
+    return isVoicePaste
+}
+
 // 粘贴
 document.addEventListener('paste', function (event) {
     if (formatHtml != "" && isVoicePaste) {
