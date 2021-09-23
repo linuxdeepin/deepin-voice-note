@@ -19,6 +19,7 @@
 #define UT_VNOTEMAINWINDOW_H
 
 #include "gtest/gtest.h"
+
 #include <QTest>
 #include <QObject>
 #include <QWebChannel>
@@ -26,12 +27,12 @@
 
 class VNoteMainWindow;
 
-class ut_vnotemainwindow_test : public QObject
+class UT_VNoteMainWindow : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnotemainwindow_test();
+    UT_VNoteMainWindow();
     VNoteMainWindow *m_mainWindow {nullptr};
     QWebEnginePage *stub_page();
 
