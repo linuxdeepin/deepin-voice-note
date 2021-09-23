@@ -2359,7 +2359,7 @@ void VNoteMainWindow::showNotepadList()
     //切换主题色/图标
     DPalette appDp = DGuiApplicationHelper::instance()->applicationPalette();
     bool visible = setting::instance()->getOption(VNOTE_NOTEPAD_LIST_SHOW).toBool();
-    if (false == visible) {
+    if (visible) {
         appDp.setBrush(DPalette::Light, appDp.color(DPalette::Active, DPalette::Highlight));
         appDp.setBrush(DPalette::Dark, appDp.color(DPalette::Active, DPalette::Highlight));
         m_viewChange->setIcon(Utils::loadSVG("view_change_show.svg", false));
@@ -2368,5 +2368,5 @@ void VNoteMainWindow::showNotepadList()
     }
     m_viewChange->setPalette(appDp);
     //显示/隐藏笔记列表
-    m_leftViewHolder->setVisible(!visible);
+    m_leftViewHolder->setVisible(visible);
 }
