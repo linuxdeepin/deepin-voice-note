@@ -98,12 +98,6 @@ public:
     void editNote();
     //另存为
     void saveAs(SaveAsType);
-    //导出文本
-    void saveAsText(const QString &exportDir);
-    //导出为Html
-    void saveAsHtml(const QString &exportDir);
-    //导出语音
-    void saveRecords(const QString &exportDir);
     //关闭右键菜单
     void closeMenu();
     //获取记事项id

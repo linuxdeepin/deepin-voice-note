@@ -267,120 +267,83 @@ void MiddleView::editNote()
  */
 void MiddleView::saveAs(SaveAsType type)
 {
-    //文件筛选类型
-    QStringList filterTypes {"TXT(*.txt);;HTML(*.html)", "TXT(*.txt)", "HTML(*.html)", "MP3(*.mp3)"};
-
-    //文管弹窗
-    DFileDialog dialog(this);
-    dialog.setFileMode(DFileDialog::DirectoryOnly);
-    dialog.setLabelText(DFileDialog::Accept, DApplication::translate("MiddleView", "Save"));
-    dialog.setNameFilter(filterTypes.at(type));
-
-    //获取历史选用的文件夹路径
-    QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
-    if (historyDir.isEmpty()) {
-        historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-    }
-    dialog.setDirectory(historyDir);
-
-    if (QDialog::Rejected == dialog.exec()) {
-        return;
-    }
-    //获取选择的文件夹路径
-    QString exportDir = dialog.directory().path();
-    //获取选择的文件类型
-    QString filter = dialog.selectedNameFilter();
-    //保存文件夹路径
-    setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, exportDir);
-    //保存文件
-    if (filterTypes.at(1) == filter) {
-        saveAsText(exportDir);
-    } else if (filterTypes.at(2) == filter) {
-        saveAsHtml(exportDir);
-    } else if (filterTypes.at(3) == filter) {
-        saveRecords(exportDir);
-    }
-}
-
-/**
- * @brief MiddleView::saveAsText
- * 导出文本
- */
-void MiddleView::saveAsText(const QString &exportDir)
-{
-    //获取有文本的笔记
+    //获取选中的笔记
     QModelIndexList indexList = selectedIndexes();
     QList<VNoteItem *> noteDataList;
     for (auto index : indexList) {
         VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
             StandardItemCommon::getStandardItemData(index));
-        //只需导出有文本内容的笔记
-        if (noteData->haveText()) {
-            noteDataList.append(noteData);
-        }
+        noteDataList.append(noteData);
     }
 
     if (indexList.size() == 0) {
         return;
     }
 
-    ExportNoteWorker *exportWorker = new ExportNoteWorker(
-        exportDir, ExportNoteWorker::ExportText, noteDataList);
-    exportWorker->setAutoDelete(true);
-    connect(exportWorker, &ExportNoteWorker::exportFinished, this, &MiddleView::onExportFinished);
-    QThreadPool::globalInstance()->start(exportWorker);
-}
-
-/**
- * @brief MiddleView::saveAsHtml
- */
-void MiddleView::saveAsHtml(const QString &exportDir)
-{
-    //获取有文本的笔记
-    QModelIndexList indexList = selectedIndexes();
-    QList<VNoteItem *> noteDataList;
-    //获取笔记
-    for (auto index : indexList) {
-        VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-            StandardItemCommon::getStandardItemData(index));
-        //只需导出有文本内容的笔记
-        if (noteData->haveText()) {
-            noteDataList.append(noteData);
+    //文件筛选类型
+    QStringList filterTypes {"TXT(*.txt);;HTML(*.html)", "TXT(*.txt)", "HTML(*.html)", "MP3(*.mp3)"};
+    DFileDialog dialog(this);
+    dialog.setNameFilter(filterTypes.at(type));
+    QString historyDir = "";
+    QString defaultName = "";
+    //获取默认路径
+    if (type == Voice) {
+        historyDir = setting::instance()->getOption(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
+    } else {
+        historyDir = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
+    }
+    if (historyDir.isEmpty()) {
+        historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    }
+    dialog.setDirectory(historyDir);
+    //多选或者语音时，选择文件夹
+    if (indexList.size() > 1 || type == Voice) {
+        dialog.setFileMode(DFileDialog::DirectoryOnly);
+        dialog.setLabelText(DFileDialog::Accept, DApplication::translate("MiddleView", "Save"));
+        if (QDialog::Rejected == dialog.exec()) {
+            return;
+        }
+    } else {
+        //单选笔记时，保存文件可指定名称
+        dialog.setFileMode(DFileDialog::AnyFile);
+        dialog.setAcceptMode(DFileDialog::AcceptSave);
+        VNoteItem *note = getCurrVNotedata();
+        //设置默认名称为笔记名称
+        if (note) {
+            dialog.selectFile(note->noteTitle);
+        }
+        if (QDialog::Rejected == dialog.exec()) {
+            return;
+        }
+        //获取文件名称
+        QList<QUrl> urls = dialog.selectedUrls();
+        if (!urls.size()) {
+            return;
+        }
+        defaultName = urls.value(0).fileName();
+        if (defaultName.isEmpty()) {
+            return;
         }
     }
 
-    if (noteDataList.size() == 0) {
+    //获取选择的文件夹路径
+    QString exportDir = dialog.directory().path();
+    if (exportDir.isEmpty()) {
         return;
     }
 
-    ExportNoteWorker *exportWorker = new ExportNoteWorker(
-        exportDir, ExportNoteWorker::ExportHtml, noteDataList);
-    exportWorker->setAutoDelete(true);
-    connect(exportWorker, &ExportNoteWorker::exportFinished, this, &MiddleView::onExportFinished);
-    QThreadPool::globalInstance()->start(exportWorker);
-}
-
-/**
- * @brief MiddleView::saveRecords
- * 保存语音
- */
-void MiddleView::saveRecords(const QString &exportDir)
-{
-    //获取有语音的笔记
-    QModelIndexList indexList = selectedIndexes();
-    QList<VNoteItem *> noteItemList;
-    for (auto index : indexList) {
-        VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-            StandardItemCommon::getStandardItemData(index));
-        noteItemList.append(noteData);
+    ExportNoteWorker::ExportType exportType = ExportNoteWorker::ExportNothing;
+    QString filter = dialog.selectedNameFilter();
+    //保存文件
+    if (filterTypes.at(1) == filter) {
+        exportType = ExportNoteWorker::ExportText;
+    } else if (filterTypes.at(2) == filter) {
+        exportType = ExportNoteWorker::ExportHtml;
+    } else if (filterTypes.at(3) == filter) {
+        exportType = ExportNoteWorker::ExportVoice;
     }
-
-    if (noteItemList.size() == 0) {
-        return;
-    }
-
     ExportNoteWorker *exportWorker = new ExportNoteWorker(
-        exportDir, ExportNoteWorker::ExportVoice, noteItemList);
+        exportDir, exportType, noteDataList, defaultName);
     exportWorker->setAutoDelete(true);
     connect(exportWorker, &ExportNoteWorker::exportFinished, this, &MiddleView::onExportFinished);
     QThreadPool::globalInstance()->start(exportWorker);

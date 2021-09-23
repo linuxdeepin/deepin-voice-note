@@ -50,6 +50,7 @@ public:
     explicit ExportNoteWorker(const QString &dirPath,
                               ExportType exportType,
                               const QList<VNoteItem *> &noteList,
+                              const QString &defaultName = "",
                               QObject *parent = nullptr);
 
 signals:
@@ -72,6 +73,8 @@ protected:
 
     ExportType m_exportType {ExportNothing};
     QString m_exportPath {""};
+    //默认导出名称
+    QString m_exportName {""};
     QList<VNoteItem *> m_noteList {nullptr};
 };
 

@@ -314,24 +314,6 @@ TEST_F(UT_MiddleView, UT_MiddleView_saveAs_001)
     m_middleView->saveAs(MiddleView::Html);
 }
 
-TEST_F(UT_MiddleView, UT_MiddleView_saveAsText_001)
-{
-    EXPECT_TRUE(m_middleView->selectedIndexes().isEmpty());
-    m_middleView->saveAsText("/tmp");
-}
-
-TEST_F(UT_MiddleView, UT_MiddleView_saveAsHtml_001)
-{
-    EXPECT_TRUE(m_middleView->selectedIndexes().isEmpty());
-    m_middleView->saveAsHtml("/tmp");
-}
-
-TEST_F(UT_MiddleView, UT_MiddleView_saveRecords_001)
-{
-    EXPECT_TRUE(m_middleView->selectedIndexes().isEmpty());
-    m_middleView->saveRecords("/tmp");
-}
-
 TEST_F(UT_MiddleView, saveRecords)
 {
     typedef int (*fptr)();

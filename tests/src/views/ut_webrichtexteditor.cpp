@@ -567,20 +567,20 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_setData_001)
     VNoteItem *data = new VNoteItem();
 
     m_web->clearFocus();
-    m_web->setData(nullptr, "", true);
+    m_web->setData(nullptr, "");
 
     m_web->setFocus();
-    m_web->setData(data, "a", true);
+    m_web->setData(data, "a");
     EXPECT_EQ("a", m_web->m_searchKey) << "a";
     EXPECT_EQ(data, m_web->m_noteData) << "a";
 
     data->htmlCode = "<div> </div>";
-    m_web->setData(data, "", true);
+    m_web->setData(data, "");
     EXPECT_EQ("", m_web->m_searchKey) << "b";
     EXPECT_EQ(data, m_web->m_noteData) << "b";
 
     m_web->m_noteData = data;
-    m_web->setData(data, "a", true);
+    m_web->setData(data, "a");
     EXPECT_EQ("a", m_web->m_searchKey) << "c";
     EXPECT_EQ(data, m_web->m_noteData) << "c";
 
