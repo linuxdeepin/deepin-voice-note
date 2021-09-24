@@ -283,10 +283,13 @@ void WebRichTextEditor::showVoiceMenu(const QPoint &pos)
 
     //语音文件不存在使用弹出提示
     if (!QFile(m_voiceBlock->voicePath).exists()) {
-        VNoteMessageDialog audioOutLimit(VNoteMessageDialog::VoicePathNoAvail);
-        audioOutLimit.exec();
-        //删除语音文本
-        deleteSelectText();
+        //异步操作，防止阻塞前端事件
+        QTimer::singleShot(0, this, [this] {
+            VNoteMessageDialog audioOutLimit(VNoteMessageDialog::VoicePathNoAvail);
+            audioOutLimit.exec();
+            //删除语音文本
+            deleteSelectText();
+        });
         return;
     }
 
