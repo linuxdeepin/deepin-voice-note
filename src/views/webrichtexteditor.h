@@ -200,6 +200,12 @@ private:
      */
     void setData(VNoteItem *data, const QString &reg);
 
+    /**
+     * @brief 判断是否为语音粘贴
+     * @return
+     */
+    bool isVoicePaste();
+
 private:
     VNoteItem *m_noteData {nullptr};
     QTimer *m_updateTimer {nullptr};

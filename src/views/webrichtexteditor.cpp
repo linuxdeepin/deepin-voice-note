@@ -463,6 +463,11 @@ void WebRichTextEditor::viewPicture(const QString &filePath)
 
 void WebRichTextEditor::onPaste()
 {
+    //语音插件复制不经过系统剪切板,粘贴无法通过剪切板内容判断，直接调用前端粘贴事件
+    if (isVoicePaste()) {
+        return page()->triggerAction(QWebEnginePage::Paste);
+    }
+
     //获取剪贴板信息
     QClipboard *clipboard = QApplication::clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
@@ -631,4 +636,10 @@ void WebRichTextEditor::setData(VNoteItem *data, const QString &reg)
     } else { //笔记相同时执行搜索
         findText(reg);
     }
+}
+
+bool WebRichTextEditor::isVoicePaste()
+{
+    //调用web前端接口
+    return JsContent::instance()->callJsSynchronous(page(), "returnCopyFlag()").toBool();
 }

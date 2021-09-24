@@ -859,3 +859,8 @@ $(document).scroll(function () {
 function setFocusColor(flag) {
     $('.note-editable').css('caret-color', flag == 1 ? 'transparent' : 'auto')
 }
+
+// 复制标志
+function returnCopyFlag() {
+    return isVoicePaste
+}

@@ -77,6 +77,11 @@ void stub_WebRichTextEditor_setWebChannel(QWebChannel *channel)
     webchannel = channel;
 }
 
+bool stub_isVoicePaste()
+{
+    return false;
+}
+
 static void stub_findText(const QString &subString, QWebEnginePage::FindFlags options, const QWebEngineCallback<bool> &resultCallback) {
     Q_UNUSED(subString)
         Q_UNUSED(options)
@@ -438,6 +443,7 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_viewPicture_001)
 TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onPaste_001)
 {
     Stub stub;
+    stub.set(ADDR(WebRichTextEditor, isVoicePaste), stub_isVoicePaste);
     QClipboard *clip = QApplication::clipboard();
     QMimeData *data = new QMimeData;
     data->setImageData(QImage());
@@ -449,6 +455,7 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onPaste_001)
 TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onPaste_002)
 {
     Stub stub;
+    stub.set(ADDR(WebRichTextEditor, isVoicePaste), stub_isVoicePaste);
     QClipboard *clip = QApplication::clipboard();
     QMimeData *data = new QMimeData;
     QList<QUrl> list;
@@ -465,6 +472,7 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onPaste_003)
     fptr A_foo = (fptr)(&QWebEnginePage::triggerAction);
     stub.set(ADDR(QWebEngineView, page), ADDR(UT_WebRichTextEditor, stub_page));
     stub.set(A_foo, stub_WebRichTextEditor);
+    stub.set(ADDR(WebRichTextEditor, isVoicePaste), stub_isVoicePaste);
     QClipboard *clip = QApplication::clipboard();
     QMimeData *data = new QMimeData;
     clip->setMimeData(data);
