@@ -298,6 +298,7 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onMenuActionClicked_001)
     stub.set(ADDR(QWidget, focusProxy), ADDR(UT_WebRichTextEditor, stub_focusProxy));
     stub.set(ADDR(QFileDialog, getSaveFileName), stub_emptyString);
     stub.set(ADDR(WebRichTextEditor, onPaste), stub_WebRichTextEditor);
+    stub.set(ADDR(WebRichTextEditor, isVoicePaste), stub_isVoicePaste);
 
     ActionManager actionManager;
     QAction *pAction = actionManager.getActionById(ActionManager::VoiceAsSave);
@@ -442,8 +443,6 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_viewPicture_001)
 
 TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onPaste_001)
 {
-    Stub stub;
-    stub.set(ADDR(WebRichTextEditor, isVoicePaste), stub_isVoicePaste);
     QClipboard *clip = QApplication::clipboard();
     QMimeData *data = new QMimeData;
     data->setImageData(QImage());
@@ -454,8 +453,6 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onPaste_001)
 
 TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onPaste_002)
 {
-    Stub stub;
-    stub.set(ADDR(WebRichTextEditor, isVoicePaste), stub_isVoicePaste);
     QClipboard *clip = QApplication::clipboard();
     QMimeData *data = new QMimeData;
     QList<QUrl> list;
@@ -472,11 +469,19 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onPaste_003)
     fptr A_foo = (fptr)(&QWebEnginePage::triggerAction);
     stub.set(ADDR(QWebEngineView, page), ADDR(UT_WebRichTextEditor, stub_page));
     stub.set(A_foo, stub_WebRichTextEditor);
-    stub.set(ADDR(WebRichTextEditor, isVoicePaste), stub_isVoicePaste);
     QClipboard *clip = QApplication::clipboard();
     QMimeData *data = new QMimeData;
     clip->setMimeData(data);
     m_web->onPaste();
+}
+TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onPaste_004)
+{
+    Stub stub;
+    typedef int (*fptr)();
+    fptr A_foo = (fptr)(&QWebEnginePage::triggerAction);
+    stub.set(ADDR(QWebEngineView, page), ADDR(UT_WebRichTextEditor, stub_page));
+    stub.set(A_foo, stub_WebRichTextEditor);
+    m_web->onPaste(true);
 }
 
 TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_contextMenuEvent_001)

@@ -170,9 +170,9 @@ void JsContent::jsCallSetDataFinsh()
     emit setDataFinsh();
 }
 
-void JsContent::jsCallPaste()
+void JsContent::jsCallPaste(bool isVoicePaste)
 {
-    emit textPaste();
+    emit textPaste(isVoicePaste);
 }
 
 void JsContent::jsCallViewPicture(const QString &imagePath)

@@ -337,7 +337,7 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
     case ActionManager::PicturePaste:
     case ActionManager::TxtPaste:
         //粘贴事件，从剪贴板获取数据
-        onPaste();
+        onPaste(isVoicePaste());
         break;
     case ActionManager::PictureView:
         //查看图片
@@ -464,13 +464,12 @@ void WebRichTextEditor::viewPicture(const QString &filePath)
     imgView->open(filePath);
 }
 
-void WebRichTextEditor::onPaste()
+void WebRichTextEditor::onPaste(bool isVoicePaste)
 {
     //语音插件复制不经过系统剪切板,粘贴无法通过剪切板内容判断，直接调用前端粘贴事件
-    if (isVoicePaste()) {
+    if (isVoicePaste) {
         return page()->triggerAction(QWebEnginePage::Paste);
     }
-
     //获取剪贴板信息
     QClipboard *clipboard = QApplication::clipboard();
     const QMimeData *mimeData = clipboard->mimeData();

@@ -818,7 +818,7 @@ document.onkeydown = function (event) {
     if (window.event.keyCode == 13) {
         setFocusScroll()
     } else if (event.ctrlKey && window.event.keyCode == 86) {
-        webobj.jsCallPaste()
+        webobj.jsCallPaste(returnCopyFlag())
         return false;
     }
 }

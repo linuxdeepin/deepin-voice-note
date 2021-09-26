@@ -100,7 +100,7 @@ public slots:
     /**
     * @brief 粘贴
     */
-    void onPaste();
+    void onPaste(bool isVoicePaste = false);
     /**
     * @brief saveMenuParam 接收web弹出菜单类型及数据
     * @param type  菜单类型

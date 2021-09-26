@@ -78,7 +78,7 @@ signals:
     void callJsHideEditToolbar(); //隐藏编辑工具栏
     void callJsSetVoicePlayBtnEnable(bool enable); //设置播放按钮是否可用
 
-    void textPaste(); //粘贴信号
+    void textPaste(bool isVoicePaste); //粘贴信号
     void textChange();
     void loadFinsh();
     void popupMenu(int type, const QVariant &json);
@@ -99,7 +99,7 @@ public slots:
     void jsCallChannleFinish(); //web前端调用后端，通知网页加载完成
     void jsCallPopupMenu(int type, const QVariant &json); //web前端调用后端，弹出右键菜单
     void jsCallPlayVoice(const QVariant &json, bool bIsSame); //web前端调用后端，播放语音
-    void jsCallPaste(); //web前端调用后端，编辑区粘贴功能
+    void jsCallPaste(bool isVoicePaste = false); //web前端调用后端，编辑区粘贴功能
     void jsCallViewPicture(const QString &imagePath); //web前端调用后端，进行图片预览
     void jsCallCreateNote(); //web前端调用后端，新建笔记
     QString jsCallGetTranslation(); //web前端调用后端，获取翻译
