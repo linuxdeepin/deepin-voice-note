@@ -21,11 +21,11 @@
 #include "leftviewdelegate.h"
 #include "leftviewsortfilter.h"
 
-ut_folderselectview_test::ut_folderselectview_test()
+UT_FolderSelectView::UT_FolderSelectView()
 {
 }
 
-TEST_F(ut_folderselectview_test, mousePressEvent)
+TEST_F(UT_FolderSelectView, UT_FolderSelectView_mousePressEvent_001)
 {
     FolderSelectView selectview;
     QPointF localPos(30, 20);
@@ -36,7 +36,18 @@ TEST_F(ut_folderselectview_test, mousePressEvent)
     delete mousePressEvent;
 }
 
-TEST_F(ut_folderselectview_test, mouseReleaseEvent)
+TEST_F(UT_FolderSelectView, UT_FolderSelectView_mousePressEvent_002)
+{
+    FolderSelectView selectview;
+    QPointF localPos(30, 20);
+    QMouseEvent *e = new QMouseEvent(QEvent::MouseButtonPress, localPos, localPos, localPos,
+                                     Qt::LeftButton, Qt::LeftButton, Qt::NoModifier,
+                                     Qt::MouseEventSource::MouseEventNotSynthesized);
+    selectview.mousePressEvent(e);
+    delete e;
+}
+
+TEST_F(UT_FolderSelectView, UT_FolderSelectView_mouseReleaseEvent_001)
 {
     FolderSelectView selectview;
     QPointF localPos(30, 20);
@@ -46,7 +57,29 @@ TEST_F(ut_folderselectview_test, mouseReleaseEvent)
     delete mousePressEvent;
 }
 
-TEST_F(ut_folderselectview_test, keyPressEvent)
+TEST_F(UT_FolderSelectView, UT_FolderSelectView_mouseReleaseEvent_002)
+{
+    FolderSelectView selectview;
+    QPointF localPos(30, 20);
+    QMouseEvent *mousePressEvent = new QMouseEvent(QEvent::MouseButtonRelease, localPos, localPos, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventSynthesizedByQt);
+    selectview.m_isTouchSliding = true;
+    selectview.mouseReleaseEvent(mousePressEvent);
+    EXPECT_FALSE(selectview.m_isTouchSliding);
+    delete mousePressEvent;
+}
+
+TEST_F(UT_FolderSelectView, UT_FolderSelectView_mouseReleaseEvent_003)
+{
+    FolderSelectView selectview;
+    QPointF localPos(30, 20);
+    QMouseEvent *mousePressEvent = new QMouseEvent(QEvent::MouseButtonRelease, localPos, localPos, localPos,
+                                                   Qt::LeftButton, Qt::LeftButton, Qt::NoModifier,
+                                                   Qt::MouseEventSource::MouseEventNotSynthesized);
+    selectview.mouseReleaseEvent(mousePressEvent);
+    delete mousePressEvent;
+}
+
+TEST_F(UT_FolderSelectView, UT_FolderSelectView_keyPressEvent_001)
 {
     FolderSelectView selectview;
     QKeyEvent *event = new QKeyEvent(QEvent::KeyPress, Qt::Key_Up, Qt::NoModifier, "test");
@@ -63,7 +96,7 @@ TEST_F(ut_folderselectview_test, keyPressEvent)
     delete event;
 }
 
-TEST_F(ut_folderselectview_test, mouseMoveEvent)
+TEST_F(UT_FolderSelectView, UT_FolderSelectView_mouseMoveEvent_001)
 {
     FolderSelectView selectview;
     QPointF localPos(30, 20);
@@ -73,7 +106,18 @@ TEST_F(ut_folderselectview_test, mouseMoveEvent)
     delete mouseMoveEvent;
 }
 
-TEST_F(ut_folderselectview_test, doTouchMoveEvent)
+TEST_F(UT_FolderSelectView, UT_FolderSelectView_mouseMoveEvent_002)
+{
+    FolderSelectView selectview;
+    QPointF localPos(30, 20);
+    QMouseEvent *mouseMoveEvent = new QMouseEvent(QEvent::MouseMove, localPos, localPos, localPos, Qt::LeftButton,
+                                                  Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventNotSynthesized);
+    selectview.mouseMoveEvent(mouseMoveEvent);
+    EXPECT_EQ(Qt::NoModifier, mouseMoveEvent->modifiers());
+    delete mouseMoveEvent;
+}
+
+TEST_F(UT_FolderSelectView, UT_FolderSelectView_doTouchMoveEvent_001)
 {
     FolderSelectView selectview;
     QPointF localPos(30, 20);
@@ -86,7 +130,7 @@ TEST_F(ut_folderselectview_test, doTouchMoveEvent)
     delete mouseMoveEvent;
 }
 
-TEST_F(ut_folderselectview_test, handleTouchSlideEvent)
+TEST_F(UT_FolderSelectView, UT_FolderSelectView_handleTouchSlideEvent_001)
 {
     FolderSelectView selectview;
     QPoint localPos(30, 20);

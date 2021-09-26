@@ -84,25 +84,6 @@ TEST_F(UT_MiddleView, setCurrentId)
     EXPECT_EQ(1, middleview.getCurrentId());
 }
 
-//TEST_F(ut_middleview_test, addRowAtHead)
-//{
-//    MiddleView middleview;
-//    VNoteItem *vnoteitem = new VNoteItem;
-//    vnoteitem->noteId = 2;
-//    vnoteitem->folderId = 2;
-//    vnoteitem->noteTitle = "test";
-//    middleview.addRowAtHead(vnoteitem);
-//    middleview.appendRow(vnoteitem);
-//    middleview.onNoteChanged();
-//    middleview.rowCount();
-//    middleview.setCurrentIndex(1);
-//    middleview.editNote();
-//    middleview.saveAsText();
-//    middleview.saveRecords();
-//    middleview.getCurrVNotedata();
-//    middleview.deleteCurrentRow();
-//}
-
 TEST_F(UT_MiddleView, UT_MiddleView_mousePressEvent_001)
 {
     m_middleView->selectAll();
@@ -308,6 +289,21 @@ TEST_F(UT_MiddleView, UT_MiddleView_saveAs_001)
     Stub stub;
     stub.set(A_foo, stub_dialog);
     EXPECT_TRUE(m_middleView->selectedIndexes().isEmpty());
+    m_middleView->saveAs(MiddleView::Note);
+    m_middleView->saveAs(MiddleView::Text);
+    m_middleView->saveAs(MiddleView::Voice);
+    m_middleView->saveAs(MiddleView::Html);
+}
+
+TEST_F(UT_MiddleView, UT_MiddleView_saveAs_002)
+{
+    typedef int (*fptr)();
+    fptr A_foo = (fptr)(&DFileDialog::exec);
+    Stub stub;
+    stub.set(A_foo, stub_dialog);
+    stub.set(ADDR(QModelIndexList, size), stub_dialog);
+    m_middleView->selectAll();
+    EXPECT_FALSE(m_middleView->selectedIndexes().isEmpty());
     m_middleView->saveAs(MiddleView::Note);
     m_middleView->saveAs(MiddleView::Text);
     m_middleView->saveAs(MiddleView::Voice);

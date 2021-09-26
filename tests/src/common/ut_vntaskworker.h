@@ -24,12 +24,12 @@
 
 class VNTaskWorker;
 
-class ut_vntaskworker_test : public QObject
+class UT_VNTaskWorker : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vntaskworker_test();
+    UT_VNTaskWorker();
 
     virtual void SetUp() override;
     virtual void TearDown() override;

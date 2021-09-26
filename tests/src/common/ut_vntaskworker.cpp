@@ -20,24 +20,40 @@
 #include "vntaskworker.h"
 #include "filecleanupworker.h"
 
-ut_vntaskworker_test::ut_vntaskworker_test()
+UT_VNTaskWorker::UT_VNTaskWorker()
 {
 }
 
-void ut_vntaskworker_test::SetUp()
+void UT_VNTaskWorker::SetUp()
 {
     m_vntaskworker = new VNTaskWorker;
 }
 
-void ut_vntaskworker_test::TearDown()
+void UT_VNTaskWorker::TearDown()
 {
     delete m_vntaskworker;
 }
 
-TEST_F(ut_vntaskworker_test, addTask)
+TEST_F(UT_VNTaskWorker, UT_VNTaskWorker_addTask_001)
 {
-    //    FileCleanupWorker *task = new FileCleanupWorker(nullptr);
-    //    m_vntaskworker->addTask(task);
-    //    EXPECT_EQ(m_vntaskworker->m_safetyTaskQueue.front(), task);
-    //    delete task;
+    m_vntaskworker->addTask(nullptr);
+}
+
+TEST_F(UT_VNTaskWorker, UT_VNTaskWorker_setWorkerName_001)
+{
+    QString worke = "aaa";
+    m_vntaskworker->setWorkerName(worke);
+    EXPECT_EQ("aaa", m_vntaskworker->m_workerName);
+}
+
+TEST_F(UT_VNTaskWorker, UT_VNTaskWorker_quitWorker_001)
+{
+    m_vntaskworker->quitWorker();
+    EXPECT_TRUE(m_vntaskworker->m_fQuit);
+}
+
+TEST_F(UT_VNTaskWorker, UT_VNTaskWorker_run_001)
+{
+    m_vntaskworker->m_fQuit = true;
+    m_vntaskworker->run();
 }
