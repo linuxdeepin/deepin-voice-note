@@ -494,6 +494,8 @@ function playButColor(status) {
 
 //录音插入数据
 function insertVoiceItem(text) {
+    //插入语音之前先设置焦点
+    $('#summernote').summernote('editor.focus')
     // 记录插入前数据
     $('#summernote').summernote('editor.recordUndo')
 
