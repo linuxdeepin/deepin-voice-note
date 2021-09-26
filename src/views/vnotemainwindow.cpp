@@ -2313,11 +2313,14 @@ void VNoteMainWindow::onWebVoicePlay(const QVariant &json, bool bIsSame)
 
     //文件不存在出现错误弹出并删除该语音文本
     if (!QFile::exists(m_currentPlayVoice->voicePath)) {
-        //弹出提示
-        VNoteMessageDialog audioOutLimit(VNoteMessageDialog::VoicePathNoAvail);
-        audioOutLimit.exec();
-        //删除语音文本
-        m_richTextEdit->deleteSelectText();
+        //异步提示，防止阻塞前端事件
+        QTimer::singleShot(0, this, [this] {
+            //弹出提示
+            VNoteMessageDialog audioOutLimit(VNoteMessageDialog::VoicePathNoAvail);
+            audioOutLimit.exec();
+            //删除语音文本
+            m_richTextEdit->deleteSelectText();
+        });
         return;
     }
 
