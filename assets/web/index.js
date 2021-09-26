@@ -64,7 +64,6 @@ var nodeTpl = `
         </div>`;
 
 var formatHtml = ''
-var pasteData = "";
 var webobj;    //js与qt通信对象
 var activeVoice = null;  //当前正操作的语音对象
 var activeTransVoice = null;  //执行语音转文字对象
@@ -78,6 +77,7 @@ var global_activeColor = ''
 var global_disableColor = ''
 var global_theme = 1
 var scrollHide = null  //滚动条隐藏定时器
+var isUlOrOl = false
 
 var tooltipContent = {
     fontsize: '字号',
@@ -250,10 +250,12 @@ document.addEventListener('cut', copyVoice);
 // 语音复制功能
 function copyVoice(event) {
     isVoicePaste = false
+    isUlOrOl = false
     var selectionObj = window.getSelection();
     var rangeObj = selectionObj.getRangeAt(0);
     var docFragment = rangeObj.cloneContents();
     var testDiv = document.createElement("div");
+
     // 判断是否语音复制
     if ($(docFragment).find('.voiceBox').length != 0) {
         $(docFragment).find('.translate').html('')
@@ -262,27 +264,63 @@ function copyVoice(event) {
         $(docFragment).find('.voicebtn').removeClass('pause').addClass('play');
         $(docFragment).find('.voicebtn').removeClass('now');
         $(docFragment).find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four');
-        if (event.type == 'cut') {
-            rangeObj.deleteContents()
+
+        event.preventDefault()
+        isVoicePaste = true
+
+    }
+    testDiv.appendChild(docFragment);
+    isUlOrOl = $(testDiv).children().toArray().every(item => {
+        return item.tagName == 'LI'
+    })
+    // 有序无序列表复制
+    if (isVoicePaste && isUlOrOl) {
+        let tagName = rangeObj.commonAncestorContainer.tagName
+        let box = document.createElement(tagName)
+        docFragment = rangeObj.cloneContents();
+        box.appendChild(docFragment)
+        $(box).find('p').toArray().forEach(item => {
+            if (item.innerHTML == '') {
+                item.innerHTML = '<br />'
+            }
+        })
+        testDiv.innerHTML = ''
+        testDiv.appendChild(box)
+    }
+    if (isVoicePaste && event.type == 'cut') {
+        // 记录之前数据
+        $('#summernote').summernote('editor.recordUndo')
+        rangeObj.deleteContents()
+        if (!isUlOrOl) {
             let p = document.createElement('p');
             p.innerHTML = '<br>'
             rangeObj.insertNode(p)
             // 设置焦点
             setFocus(p, 0)
-            // 记录之前数据
-            $('#summernote').summernote('editor.recordUndo')
-            // 主动触发change事件
-            changeContent()
         }
-        event.preventDefault()
-        isVoicePaste = true
+        removeUlOl()
+        // 主动触发change事件
+        changeContent()
+
     }
-    testDiv.appendChild(docFragment);
     formatHtml = testDiv.innerHTML;
+    console.log(formatHtml)
     if ($(testDiv).children().length == 1 && $(testDiv).find('.voiceBox').length != 0) {
         formatHtml = '<p><br></p>' + formatHtml
     }
-    pasteData = window.getSelection().toString();
+}
+
+// 移除当前焦点所在行空ulol
+function removeUlOl() {
+    var sel = window.getSelection();
+    $(sel.focusNode).children().toArray().forEach(item => {
+        if (item.innerHTML == '') {
+            item.remove()
+        }
+    })
+    if (!$(sel.focusNode).children().length) {
+        sel.focusNode.remove()
+    }
 }
 
 // 剪切板内容变化
@@ -705,11 +743,11 @@ function rightClick(e) {
  * @param {any} color
  * @returns {any}
  */
-function setVoiceButColor(color) {
+function setVoiceButColor(color, shdow) {
     $("#style").html(`
-    
     .voiceBox .voicebtn {
         background-color:${color};
+        box-shadow: 0px 4px 6px 0px ${shdow}66; 
     } 
     .btn-default.active i {
         color:${color}!important
@@ -733,8 +771,7 @@ function changeColor(flag, activeColor, disableColor) {
     global_theme = flag
     global_activeColor = activeColor
     global_disableColor = disableColor
-
-    setVoiceButColor(global_activeColor)
+    setVoiceButColor(global_activeColor, global_disableColor)
 
     $('.dropdown-fontsize>li>a').hover(function (e) {
         $(this).css('background-color', activeColor);
@@ -776,18 +813,13 @@ async function insertImg(urlStr) {
     })
 }
 
-// 禁用ctrl+v
-document.onkeydown = function (event) {
-    if (event.ctrlKey && window.event.keyCode == 86) {
-        webobj.jsCallPaste()
-        return false;
-    }
-}
-
-// 回车健
+// 回车健 ,ctrl+v
 document.onkeydown = function (event) {
     if (window.event.keyCode == 13) {
         setFocusScroll()
+    } else if (event.ctrlKey && window.event.keyCode == 86) {
+        webobj.jsCallPaste()
+        return false;
     }
 }
 
@@ -795,7 +827,6 @@ document.onkeydown = function (event) {
 document.onkeyup = function (event) {
     if (event.ctrlKey && window.event.keyCode == 66) {
         webobj.jsCallCreateNote()
-
     }
 }
 

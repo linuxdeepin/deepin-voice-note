@@ -44,6 +44,7 @@ body {
     margin: 0 20px 0 20px;
     cursor: pointer;
     overflow: hidden;
+    box-shadow: 0px 4px 6px 0px #94c8fa66; 
 }
 
 .voicebtn.play {

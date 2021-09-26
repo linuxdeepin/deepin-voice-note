@@ -3289,6 +3289,11 @@
             var nextPara;
             // on paragraph: split paragraph
             if (splitRoot) {
+                console.log(splitRoot.parentNode.nodeName)
+                console.log(dom.isEmpty(splitRoot) && dom.isLi(splitRoot));
+                console.log(dom.isEmpty(splitRoot) && dom.isPara(splitRoot) && dom.isBlockquote(splitRoot.parentNode));
+                console.log(dom.isEmpty(splitRoot) && splitRoot.parentNode.tagName == 'LI' && $(splitRoot.parentNode).find('.voiceBox').length);
+
                 // if it is an empty line with li
                 if (dom.isEmpty(splitRoot) && dom.isLi(splitRoot)) {
                     // toogle UL/OL and escape
@@ -3301,6 +3306,16 @@
                     dom.insertAfter(splitRoot, splitRoot.parentNode);
                     nextPara = splitRoot;
                     // if new line has content (not a line break)
+                }
+                else if (dom.isEmpty(splitRoot) && splitRoot.parentNode.tagName == 'LI' && $(splitRoot.parentNode).find('.voiceBox').length) {
+                    // console.log($(splitRoot).find('li'))
+                    let li = document.createElement('li')
+                    li.innerHTML = '<br>'
+                    $(splitRoot).closest('li').after(li)
+                    // return;
+                    // this.bullet.toggleList(splitRoot.parentNode.parentNode.nodeName);
+                     nextPara = li;;
+
                 }
                 else {
                     nextPara = dom.splitTree(splitRoot, rng.getStartPoint());
