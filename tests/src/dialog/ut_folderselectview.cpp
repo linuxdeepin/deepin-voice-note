@@ -21,6 +21,8 @@
 #include "leftviewdelegate.h"
 #include "leftviewsortfilter.h"
 
+#include <QStandardItemModel>
+
 UT_FolderSelectView::UT_FolderSelectView()
 {
 }
@@ -114,6 +116,48 @@ TEST_F(UT_FolderSelectView, UT_FolderSelectView_mouseMoveEvent_002)
                                                   Qt::LeftButton, Qt::NoModifier, Qt::MouseEventSource::MouseEventNotSynthesized);
     selectview.mouseMoveEvent(mouseMoveEvent);
     EXPECT_EQ(Qt::NoModifier, mouseMoveEvent->modifiers());
+    delete mouseMoveEvent;
+}
+
+TEST_F(UT_FolderSelectView, UT_FolderSelectView_focusInEvent_001)
+{
+    FolderSelectView selectview;
+    QStandardItemModel *pDataModel = new QStandardItemModel();
+    LeftViewDelegate *pItemDelegate = new LeftViewDelegate(&selectview);
+    selectview.setModel(pDataModel);
+    selectview.setItemDelegate(pItemDelegate);
+    QFocusEvent *mouseMoveEvent = new QFocusEvent(QEvent::MouseMove, Qt::TabFocusReason);
+    selectview.focusInEvent(mouseMoveEvent);
+    delete pDataModel;
+    delete pItemDelegate;
+    delete mouseMoveEvent;
+}
+
+TEST_F(UT_FolderSelectView, UT_FolderSelectView_focusInEvent_002)
+{
+    FolderSelectView selectview;
+    QStandardItemModel *pDataModel = new QStandardItemModel();
+    LeftViewDelegate *pItemDelegate = new LeftViewDelegate(&selectview);
+    selectview.setModel(pDataModel);
+    selectview.setItemDelegate(pItemDelegate);
+    QFocusEvent *mouseMoveEvent = new QFocusEvent(QEvent::MouseMove);
+    selectview.focusInEvent(mouseMoveEvent);
+    delete pDataModel;
+    delete pItemDelegate;
+    delete mouseMoveEvent;
+}
+
+TEST_F(UT_FolderSelectView, UT_FolderSelectView_focusOutEvent_001)
+{
+    FolderSelectView selectview;
+    QStandardItemModel *pDataModel = new QStandardItemModel();
+    LeftViewDelegate *pItemDelegate = new LeftViewDelegate(&selectview);
+    selectview.setModel(pDataModel);
+    selectview.setItemDelegate(pItemDelegate);
+    QFocusEvent *mouseMoveEvent = new QFocusEvent(QEvent::MouseMove, Qt::TabFocusReason);
+    selectview.focusOutEvent(mouseMoveEvent);
+    delete pDataModel;
+    delete pItemDelegate;
     delete mouseMoveEvent;
 }
 

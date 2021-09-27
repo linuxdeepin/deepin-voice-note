@@ -37,8 +37,10 @@ protected:
 public:
     UT_WebRichTextEditor();
     WebRichTextEditor *m_web {nullptr};
+    QWebEngineContextMenuData m_data;
     QWebEnginePage *stub_page();
     QWidget *stub_focusProxy();
+    QWebEngineContextMenuData &stub_contextMenuData();
 };
 
 #endif // UT_WEBRICHTEXTEDITOR_H

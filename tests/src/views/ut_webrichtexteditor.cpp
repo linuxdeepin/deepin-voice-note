@@ -92,10 +92,9 @@ QWebEnginePage *UT_WebRichTextEditor::stub_page()
     return (QWebEnginePage *)this;
 }
 
-QWebEngineContextMenuData &stub_contextMenuData()
+QWebEngineContextMenuData &UT_WebRichTextEditor::stub_contextMenuData()
 {
-    QWebEngineContextMenuData data;
-    return data;
+    return m_data;
 }
 
 QWebEngineContextMenuData::EditFlags stub_editFlags()
@@ -229,7 +228,7 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_showTxtMenu_001)
 {
     Stub stub;
     stub.set(ADDR(QWebEngineView, page), ADDR(UT_WebRichTextEditor, stub_page));
-    stub.set(ADDR(QWebEnginePage, contextMenuData), stub_contextMenuData);
+    stub.set(ADDR(QWebEnginePage, contextMenuData), ADDR(UT_WebRichTextEditor, stub_contextMenuData));
     stub.set(ADDR(QWebEngineContextMenuData, editFlags), stub_editFlags);
     m_web->showTxtMenu(QPoint());
     EXPECT_TRUE(ActionManager::Instance()->getActionById(ActionManager::TxtSelectAll)->isEnabled()) << "TxtSelectAll";
@@ -243,7 +242,7 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_showTxtMenu_002)
 {
     Stub stub;
     stub.set(ADDR(QWebEngineView, page), ADDR(UT_WebRichTextEditor, stub_page));
-    stub.set(ADDR(QWebEnginePage, contextMenuData), stub_contextMenuData);
+    stub.set(ADDR(QWebEnginePage, contextMenuData), ADDR(UT_WebRichTextEditor, stub_contextMenuData));
     stub.set(ADDR(QWebEngineContextMenuData, editFlags), stub_editFlags);
     OpsStateInterface::instance()->m_states |= (1 << OpsStateInterface::StateAISrvAvailable);
     m_web->showTxtMenu(QPoint());
@@ -255,7 +254,7 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_showTxtMenu_003)
 {
     Stub stub;
     stub.set(ADDR(QWebEngineView, page), ADDR(UT_WebRichTextEditor, stub_page));
-    stub.set(ADDR(QWebEnginePage, contextMenuData), stub_contextMenuData);
+    stub.set(ADDR(QWebEnginePage, contextMenuData), ADDR(UT_WebRichTextEditor, stub_contextMenuData));
     stub.set(ADDR(QWebEngineContextMenuData, editFlags), stub_editFlags);
     stub.set(ADDR(VTextSpeechAndTrManager, isTextToSpeechInWorking), stub_int);
     OpsStateInterface::instance()->m_states |= (1 << OpsStateInterface::StateAISrvAvailable);
@@ -328,6 +327,9 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onMenuActionClicked_001)
     pAction = actionManager.getActionById(ActionManager::TxtSelectAll);
     m_web->onMenuActionClicked(pAction);
 
+    pAction = actionManager.getActionById(ActionManager::VoiceCopy);
+    m_web->onMenuActionClicked(pAction);
+
     pAction = actionManager.getActionById(ActionManager::PictureCopy);
     m_web->onMenuActionClicked(pAction);
 
@@ -369,8 +371,6 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onMenuActionClicked_001)
 
     pAction = actionManager.getActionById(ActionManager::TxtTranslate);
     m_web->onMenuActionClicked(pAction);
-
-    delete pAction;
 }
 
 TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_savePictureAs_001)
