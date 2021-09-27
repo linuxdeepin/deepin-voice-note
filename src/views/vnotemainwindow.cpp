@@ -2092,7 +2092,6 @@ bool VNoteMainWindow::setMiddleviewNext(QKeyEvent *event)
 {
     if (stateOperation->isSearching()) {
         m_richTextEdit->setFocus(Qt::TabFocusReason);
-        DWidget::keyPressEvent(event);
         return true;
     }
     if (stateOperation->isRecording() || stateOperation->isPlaying() || stateOperation->isVoice2Text()) {
