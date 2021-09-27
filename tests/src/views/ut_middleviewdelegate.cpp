@@ -29,12 +29,12 @@
 #include <QLineEdit>
 #include <QPainter>
 
-ut_middleviewdelegate_test::ut_middleviewdelegate_test(QObject *parent)
+UT_MiddleViewDelegate::UT_MiddleViewDelegate(QObject *parent)
     : QObject(parent)
 {
 }
 
-TEST_F(ut_middleviewdelegate_test, ModifyTextAndPaint)
+TEST_F(UT_MiddleViewDelegate, UT_MiddleViewDelegate_ModifyTextAndPaint_001)
 {
     VNoteFolder *folder = VNoteDataManager::instance()->getNoteFolders()->folders[0];
     VNoteItemOper noteOper;

@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_upgradeview_test : public QObject
+class UT_UpgradeView : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_upgradeview_test();
+    UT_UpgradeView();
 };
 
 #endif // UT_UPGRADEVIEW_H

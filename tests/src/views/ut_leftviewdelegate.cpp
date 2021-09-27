@@ -27,11 +27,11 @@
 #include <QStyleOptionViewItem>
 #include <QPainter>
 
-ut_leftviewdelegate_test::ut_leftviewdelegate_test()
+UT_LeftViewDelegate::UT_LeftViewDelegate()
 {
 }
 
-TEST_F(ut_leftviewdelegate_test, paintNoteItem)
+TEST_F(UT_LeftViewDelegate, UT_LeftViewDelegate_paintNoteItem_001)
 {
     LeftView view;
     for (auto it : VNoteDataManager::instance()->getNoteFolders()->folders) {

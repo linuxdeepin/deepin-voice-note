@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_dbvisitor_test : public QObject
+class UT_DbVisitor : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_dbvisitor_test();
+    UT_DbVisitor();
 };
 
 #endif // UT_DBVISITOR_H

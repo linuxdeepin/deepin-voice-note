@@ -24,11 +24,11 @@
 #include "vnoteitemoper.h"
 #include "vnoteitem.h"
 
-ut_vnoteitemoper_test::ut_vnoteitemoper_test()
+UT_VNoteItemOper::UT_VNoteItemOper()
 {
 }
 
-void ut_vnoteitemoper_test::SetUp()
+void UT_VNoteItemOper::SetUp()
 {
     VNOTE_ALL_NOTES_MAP *notes = VNoteDataManager::instance()->getAllNotesInFolder();
     if (notes && !notes->notes.isEmpty()) {
@@ -41,29 +41,29 @@ void ut_vnoteitemoper_test::SetUp()
     m_vnoteitemoper = new VNoteItemOper(m_note);
 }
 
-void ut_vnoteitemoper_test::TearDown()
+void UT_VNoteItemOper::TearDown()
 {
     delete m_vnoteitemoper;
 }
 
-TEST_F(ut_vnoteitemoper_test, loadAllVNotes)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_loadAllVNotes_001)
 {
     VNOTE_ALL_NOTES_MAP *notes = m_vnoteitemoper->loadAllVNotes();
     EXPECT_FALSE(nullptr == notes);
     delete notes;
 }
 
-TEST_F(ut_vnoteitemoper_test, modifyNoteTitle)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_modifyNoteTitle_001)
 {
     EXPECT_FALSE(m_vnoteitemoper->modifyNoteTitle("test"));
 }
 
-TEST_F(ut_vnoteitemoper_test, updateNote)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_updateNote_001)
 {
     EXPECT_FALSE(m_vnoteitemoper->updateNote());
 }
 
-TEST_F(ut_vnoteitemoper_test, addNote)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_addNote_001)
 {
     VNoteItem tmpNote;
     tmpNote.folderId = m_note->folderId;
@@ -76,23 +76,23 @@ TEST_F(ut_vnoteitemoper_test, addNote)
     EXPECT_FALSE(op.deleteNote());
 }
 
-TEST_F(ut_vnoteitemoper_test, getDefaultVoiceName)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_getDefaultVoiceName_001)
 {
     m_vnoteitemoper->getDefaultVoiceName();
 }
 
-TEST_F(ut_vnoteitemoper_test, updateTop)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_updateTop_001)
 {
     EXPECT_FALSE(m_vnoteitemoper->updateTop(!m_note->isTop));
     EXPECT_FALSE(m_vnoteitemoper->updateTop(!m_note->isTop));
 }
 
-TEST_F(ut_vnoteitemoper_test, updateFolderId)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_updateFolderId_001)
 {
     EXPECT_FALSE(m_vnoteitemoper->updateFolderId(m_note));
 }
 
-TEST_F(ut_vnoteitemoper_test, getNote)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_getNote_001)
 {
     EXPECT_TRUE(m_vnoteitemoper->getNote(m_note->folderId, m_note->noteId));
 }

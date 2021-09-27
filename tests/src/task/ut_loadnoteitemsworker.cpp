@@ -21,12 +21,12 @@
 #include "ut_loadnoteitemsworker.h"
 #include "task/loadnoteitemsworker.h"
 
-ut_loadnoteItemsworker_test::ut_loadnoteItemsworker_test(QObject *parent)
+UT_LoadNoteItemsWorker::UT_LoadNoteItemsWorker(QObject *parent)
     : QObject(parent)
 {
 }
 
-void ut_loadnoteItemsworker_test::onNoteLoad(VNOTE_ALL_NOTES_MAP *notesMap)
+void UT_LoadNoteItemsWorker::onNoteLoad(VNOTE_ALL_NOTES_MAP *notesMap)
 {
     EXPECT_TRUE(nullptr != notesMap);
     if (notesMap) {
@@ -35,9 +35,9 @@ void ut_loadnoteItemsworker_test::onNoteLoad(VNOTE_ALL_NOTES_MAP *notesMap)
     }
 }
 
-TEST_F(ut_loadnoteItemsworker_test, run)
+TEST_F(UT_LoadNoteItemsWorker, UT_LoadNoteItemsWorker_run_001)
 {
     LoadNoteItemsWorker work;
-    connect(&work, &LoadNoteItemsWorker::onAllNotesLoaded, this, &ut_loadnoteItemsworker_test::onNoteLoad);
+    connect(&work, &LoadNoteItemsWorker::onAllNotesLoaded, this, &UT_LoadNoteItemsWorker::onNoteLoad);
     work.run();
 }

@@ -1,35 +1,35 @@
 #include "ut_vlcplayer.h"
 #include "common/vlcpalyer.h"
 
-ut_vlcplayer_test::ut_vlcplayer_test()
+UT_VlcPalyer::UT_VlcPalyer()
 {
 }
 
-TEST_F(ut_vlcplayer_test, setPosition)
+TEST_F(UT_VlcPalyer, UT_VlcPalyer_setPosition_001)
 {
     VlcPalyer player;
     player.setPosition(1);
 }
 
-TEST_F(ut_vlcplayer_test, play)
+TEST_F(UT_VlcPalyer, UT_VlcPalyer_play_001)
 {
     VlcPalyer player;
     player.play();
 }
 
-TEST_F(ut_vlcplayer_test, pause)
+TEST_F(UT_VlcPalyer, UT_VlcPalyer_pause_001)
 {
     VlcPalyer player;
     player.pause();
 }
 
-TEST_F(ut_vlcplayer_test, stop)
+TEST_F(UT_VlcPalyer, UT_VlcPalyer_stop_001)
 {
     VlcPalyer player;
     player.stop();
 }
 
-TEST_F(ut_vlcplayer_test, getState)
+TEST_F(UT_VlcPalyer, UT_VlcPalyer_getState_001)
 {
     VlcPalyer player;
     player.getState();

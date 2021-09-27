@@ -24,13 +24,12 @@
 #include "gtest/gtest.h"
 #include <QObject>
 
-class ut_olddataloadworks_test : public QObject
-        , public ::testing::Test
+class UT_OldDataLoadTask : public QObject
+    , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_olddataloadworks_test();
-
+    UT_OldDataLoadTask();
 };
 
 #endif // UT_OLDDATALOADWORKS_H

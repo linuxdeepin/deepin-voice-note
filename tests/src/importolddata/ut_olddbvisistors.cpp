@@ -31,11 +31,11 @@ bool stub_sql()
     return ret;
 }
 
-ut_olddbvisistors_test::ut_olddbvisistors_test()
+UT_OldDBVisistors::UT_OldDBVisistors()
 {
 }
 
-TEST_F(ut_olddbvisistors_test, visitorData)
+TEST_F(UT_OldDBVisistors, UT_OldDBVisistors_visitorData_001)
 {
     Stub stub1;
     stub1.set(ADDR(QSqlQuery, next), stub_sql);

@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_folderselectdialog_test : public QObject
+class UT_FolderSelectDialog : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_folderselectdialog_test();
+    UT_FolderSelectDialog();
 };
 
 #endif // UT_FOLDERSELECTDIALOG_H

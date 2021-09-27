@@ -20,11 +20,11 @@
 #include "gstreamrecorder.h"
 #include "vnoterecordbar.h"
 
-ut_gstreamrecorder_test::ut_gstreamrecorder_test()
+UT_GstreamRecorder::UT_GstreamRecorder()
 {
 }
 
-TEST_F(ut_gstreamrecorder_test, GetGstState)
+TEST_F(UT_GstreamRecorder, UT_GstreamRecorder_GetGstState_001)
 {
     int state = -1;
     int pending = -1;
@@ -35,21 +35,21 @@ TEST_F(ut_gstreamrecorder_test, GetGstState)
     EXPECT_NE(-1, pending) << "pending";
 }
 
-TEST_F(ut_gstreamrecorder_test, pauseRecord)
+TEST_F(UT_GstreamRecorder, UT_GstreamRecorder_pauseRecord_001)
 {
     GstreamRecorder gstreamrecorder;
     gstreamrecorder.createPipe();
     gstreamrecorder.pauseRecord();
 }
 
-TEST_F(ut_gstreamrecorder_test, stopRecord)
+TEST_F(UT_GstreamRecorder, UT_GstreamRecorder_stopRecord_001)
 {
     GstreamRecorder gstreamrecorder;
     gstreamrecorder.createPipe();
     gstreamrecorder.stopRecord();
 }
 
-TEST_F(ut_gstreamrecorder_test, setDevice)
+TEST_F(UT_GstreamRecorder, UT_GstreamRecorder_setDevice_001)
 {
     GstreamRecorder gstreamrecorder;
     gstreamrecorder.createPipe();
@@ -58,14 +58,14 @@ TEST_F(ut_gstreamrecorder_test, setDevice)
     EXPECT_EQ("test", gstreamrecorder.m_currentDevice);
 }
 
-TEST_F(ut_gstreamrecorder_test, setStateToNull)
+TEST_F(UT_GstreamRecorder, UT_GstreamRecorder_setStateToNull_001)
 {
     GstreamRecorder gstreamrecorder;
     gstreamrecorder.createPipe();
     gstreamrecorder.setStateToNull();
 }
 
-TEST_F(ut_gstreamrecorder_test, initFormat)
+TEST_F(UT_GstreamRecorder, UT_GstreamRecorder_initFormat)
 {
     GstreamRecorder gstreamrecorder;
     gstreamrecorder.initFormat();

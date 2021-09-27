@@ -23,12 +23,12 @@
 #include <QObject>
 
 class UpgradeDbUtil;
-class ut_upgradedbutil_test : public QObject
+class UT_UpgradeDbUtil : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_upgradedbutil_test();
+    UT_UpgradeDbUtil();
 
     virtual void SetUp() override;
     virtual void TearDown() override;

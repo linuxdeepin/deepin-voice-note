@@ -20,11 +20,11 @@
 #include "dbvisitor.h"
 #include "vnotedbmanager.h"
 
-ut_dbvisitor_test::ut_dbvisitor_test()
+UT_DbVisitor::UT_DbVisitor()
 {
 }
 
-TEST_F(ut_dbvisitor_test, visitorData)
+TEST_F(UT_DbVisitor, UT_DbVisitor_visitorData_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
@@ -38,7 +38,7 @@ TEST_F(ut_dbvisitor_test, visitorData)
     delete dbvisitor;
 }
 
-TEST_F(ut_dbvisitor_test, MaxIdFolderDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_MaxIdFolderDbVisitor_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
@@ -49,7 +49,7 @@ TEST_F(ut_dbvisitor_test, MaxIdFolderDbVisitor)
     delete dbvisitor;
 }
 
-TEST_F(ut_dbvisitor_test, AddFolderDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_AddFolderDbVisitor_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
@@ -60,7 +60,7 @@ TEST_F(ut_dbvisitor_test, AddFolderDbVisitor)
     delete dbvisitor;
 }
 
-TEST_F(ut_dbvisitor_test, RenameFolderDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_RenameFolderDbVisitor_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
@@ -71,7 +71,7 @@ TEST_F(ut_dbvisitor_test, RenameFolderDbVisitor)
     delete dbvisitor;
 }
 
-TEST_F(ut_dbvisitor_test, DelFolderDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_DelFolderDbVisitor_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
@@ -82,7 +82,7 @@ TEST_F(ut_dbvisitor_test, DelFolderDbVisitor)
     delete dbvisitor;
 }
 
-TEST_F(ut_dbvisitor_test, NoteQryDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_NoteQryDbVisitor_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
@@ -93,17 +93,7 @@ TEST_F(ut_dbvisitor_test, NoteQryDbVisitor)
     delete dbvisitor;
 }
 
-//TEST_F(ut_dbvisitor_test, AddNoteDbVisitor)
-//{
-//    DbVisitor *dbvisitor;
-//    QSqlDatabase db=VNoteDbManager::instance()->getVNoteDb();
-//    AddNoteDbVisitor addnotedbvisitor(db, nullptr, nullptr);
-//    dbvisitor = new AddNoteDbVisitor(db, nullptr, nullptr);
-//    dbvisitor->prepareSqls();
-//    dbvisitor->visitorData();
-//}
-
-TEST_F(ut_dbvisitor_test, RenameNoteDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_RenameNoteDbVisitor_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
@@ -114,7 +104,7 @@ TEST_F(ut_dbvisitor_test, RenameNoteDbVisitor)
     delete dbvisitor;
 }
 
-TEST_F(ut_dbvisitor_test, UpdateNoteDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_UpdateNoteDbVisitor_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
@@ -125,7 +115,7 @@ TEST_F(ut_dbvisitor_test, UpdateNoteDbVisitor)
     delete dbvisitor;
 }
 
-TEST_F(ut_dbvisitor_test, DelNoteDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_DelNoteDbVisitor_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();

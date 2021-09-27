@@ -21,10 +21,10 @@
 #include "gtest/gtest.h"
 class HomePage;
 
-class ut_homepage_test : public ::testing::Test
+class UT_HomePage : public ::testing::Test
 {
 public:
-    ut_homepage_test();
+    UT_HomePage();
 
     virtual void SetUp() override;
     virtual void TearDown() override;

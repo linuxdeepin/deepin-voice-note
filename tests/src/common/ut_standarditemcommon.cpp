@@ -19,21 +19,21 @@
 #include "ut_standarditemcommon.h"
 #include "standarditemcommon.h"
 
-ut_standarditemcommon_test::ut_standarditemcommon_test()
+UT_StandardItemCommon::UT_StandardItemCommon()
 {
 }
 
-void ut_standarditemcommon_test::SetUp()
+void UT_StandardItemCommon::SetUp()
 {
     m_standarditemcommon = new StandardItemCommon();
 }
 
-void ut_standarditemcommon_test::TearDown()
+void UT_StandardItemCommon::TearDown()
 {
     delete m_standarditemcommon;
 }
 
-TEST_F(ut_standarditemcommon_test, getStandardItemType)
+TEST_F(UT_StandardItemCommon, UT_StandardItemCommon_getStandardItemType_001)
 {
     QStandardItemModel *pDataModel = new QStandardItemModel();
     QStandardItem *pItem = pDataModel->item(0);

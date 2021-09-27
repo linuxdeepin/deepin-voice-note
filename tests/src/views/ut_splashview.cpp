@@ -19,11 +19,11 @@
 #include "ut_splashview.h"
 #include "splashview.h"
 
-ut_splashview_test::ut_splashview_test()
+UT_SplashView::UT_SplashView()
 {
 }
 
-TEST_F(ut_splashview_test, testsplshview)
+TEST_F(UT_SplashView, UT_SplashView_testsplshview_001)
 {
     SplashView splashview;
     EXPECT_EQ(false, splashview.isVisible());

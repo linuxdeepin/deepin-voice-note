@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_vnotebasedialog_test : public QObject
+class UT_VNoteBaseDialog : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnotebasedialog_test();
+    UT_VNoteBaseDialog();
 };
 
 #endif // UT_VNOTEBASEDIALOG_H

@@ -23,12 +23,12 @@
 #include <QObject>
 
 class VTextSpeechAndTrManager;
-class ut_vtextspeechandtrmanager_test : public QObject
+class UT_VTextSpeechAndTrManager : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vtextspeechandtrmanager_test();
+    UT_VTextSpeechAndTrManager();
 
     virtual void SetUp() override;
     virtual void TearDown() override;

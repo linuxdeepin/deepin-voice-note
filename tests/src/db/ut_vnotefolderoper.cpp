@@ -20,11 +20,11 @@
 #include "vnotefolderoper.h"
 #include "vnotedatamanager.h"
 
-ut_vnotefolderoper_test::ut_vnotefolderoper_test()
+UT_VNoteFolderOper::UT_VNoteFolderOper()
 {
 }
 
-void ut_vnotefolderoper_test::SetUp()
+void UT_VNoteFolderOper::SetUp()
 {
     VNoteFolder *folder = nullptr;
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
@@ -34,45 +34,45 @@ void ut_vnotefolderoper_test::SetUp()
     m_vnotefolderoper = new VNoteFolderOper(folder);
 }
 
-void ut_vnotefolderoper_test::TearDown()
+void UT_VNoteFolderOper::TearDown()
 {
     delete m_vnotefolderoper;
 }
 
-TEST_F(ut_vnotefolderoper_test, deleteVNoteFolder)
+TEST_F(UT_VNoteFolderOper, UT_VNoteFolderOper_deleteVNoteFolder_001)
 {
     EXPECT_FALSE(m_vnotefolderoper->deleteVNoteFolder(4));
 }
 
-TEST_F(ut_vnotefolderoper_test, renameVNoteFolder)
+TEST_F(UT_VNoteFolderOper, UT_VNoteFolderOper_renameVNoteFolder_001)
 {
     QString foldername = "test";
     EXPECT_FALSE(m_vnotefolderoper->renameVNoteFolder(foldername));
 }
 
-TEST_F(ut_vnotefolderoper_test, loadVNoteFolders)
+TEST_F(UT_VNoteFolderOper, UT_VNoteFolderOper_loadVNoteFolders_001)
 {
     VNOTE_FOLDERS_MAP *folders = m_vnotefolderoper->loadVNoteFolders();
     EXPECT_FALSE(folders == nullptr);
     delete folders;
 }
 
-TEST_F(ut_vnotefolderoper_test, getNotesCount)
+TEST_F(UT_VNoteFolderOper, UT_VNoteFolderOper_getNotesCount_001)
 {
     EXPECT_TRUE(m_vnotefolderoper->getNotesCount() >= 0);
 }
 
-TEST_F(ut_vnotefolderoper_test, getDefaultIcon)
+TEST_F(UT_VNoteFolderOper, UT_VNoteFolderOper_getDefaultIcon_001)
 {
     EXPECT_TRUE(m_vnotefolderoper->getDefaultIcon() >= 0);
 }
 
-TEST_F(ut_vnotefolderoper_test, getFoldersCount)
+TEST_F(UT_VNoteFolderOper, UT_VNoteFolderOper_getFoldersCount_001)
 {
     EXPECT_TRUE(m_vnotefolderoper->getFoldersCount() > 0);
 }
 
-TEST_F(ut_vnotefolderoper_test, getDefaultFolderName)
+TEST_F(UT_VNoteFolderOper, UT_VNoteFolderOper_getDefaultFolderName_001)
 {
     EXPECT_FALSE(m_vnotefolderoper->getDefaultFolderName().isEmpty());
 }

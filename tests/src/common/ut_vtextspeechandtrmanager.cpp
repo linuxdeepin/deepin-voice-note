@@ -19,53 +19,53 @@
 #include "ut_vtextspeechandtrmanager.h"
 #include "vtextspeechandtrmanager.h"
 
-ut_vtextspeechandtrmanager_test::ut_vtextspeechandtrmanager_test()
+UT_VTextSpeechAndTrManager::UT_VTextSpeechAndTrManager()
 {
 }
 
-void ut_vtextspeechandtrmanager_test::SetUp()
+void UT_VTextSpeechAndTrManager::SetUp()
 {
     m_vtextspeechandtrmanager = new VTextSpeechAndTrManager;
 }
 
-void ut_vtextspeechandtrmanager_test::TearDown()
+void UT_VTextSpeechAndTrManager::TearDown()
 {
     delete m_vtextspeechandtrmanager;
 }
 
-TEST_F(ut_vtextspeechandtrmanager_test, getTextToSpeechEnable)
+TEST_F(UT_VTextSpeechAndTrManager, UT_VTextSpeechAndTrManager_getTextToSpeechEnable_001)
 {
     m_vtextspeechandtrmanager->getTextToSpeechEnable();
 }
 
-TEST_F(ut_vtextspeechandtrmanager_test, getSpeechToTextEnable)
+TEST_F(UT_VTextSpeechAndTrManager, UT_VTextSpeechAndTrManager_getSpeechToTextEnable_001)
 {
     m_vtextspeechandtrmanager->getSpeechToTextEnable();
 }
 
-TEST_F(ut_vtextspeechandtrmanager_test, getTransEnable)
+TEST_F(UT_VTextSpeechAndTrManager, UT_VTextSpeechAndTrManager_getTransEnable_001)
 {
     m_vtextspeechandtrmanager->getTransEnable();
 }
 
-TEST_F(ut_vtextspeechandtrmanager_test, onTextToSpeech)
+TEST_F(UT_VTextSpeechAndTrManager, UT_VTextSpeechAndTrManager_onTextToSpeech_001)
 {
     m_vtextspeechandtrmanager->onTextToSpeech();
     m_vtextspeechandtrmanager->onStopTextToSpeech();
 }
 
-TEST_F(ut_vtextspeechandtrmanager_test, isTextToSpeechInWorking)
+TEST_F(UT_VTextSpeechAndTrManager, UT_VTextSpeechAndTrManager_isTextToSpeechInWorking_001)
 {
     m_vtextspeechandtrmanager->onTextToSpeech();
     m_vtextspeechandtrmanager->isTextToSpeechInWorking();
 }
 
-TEST_F(ut_vtextspeechandtrmanager_test, onSpeechToText)
+TEST_F(UT_VTextSpeechAndTrManager, UT_VTextSpeechAndTrManager_onSpeechToText_001)
 {
     m_vtextspeechandtrmanager->onSpeechToText();
 }
 
-TEST_F(ut_vtextspeechandtrmanager_test, onTextTranslate)
+TEST_F(UT_VTextSpeechAndTrManager, UT_VTextSpeechAndTrManager_onTextTranslate_001)
 {
     m_vtextspeechandtrmanager->onTextTranslate();
 }

@@ -20,11 +20,11 @@
 #include "vnoterightmenu.h"
 #include "globaldef.h"
 
-ut_vnoterightmenu_test::ut_vnoterightmenu_test()
+UT_VNoteRightMenu::UT_VNoteRightMenu()
 {
 }
 
-TEST_F(ut_vnoterightmenu_test, mouseMoveEvent)
+TEST_F(UT_VNoteRightMenu, UT_VNoteRightMenu_mouseMoveEvent_001)
 {
     VNoteRightMenu rightmenu;
     QPointF localPos;
@@ -36,7 +36,7 @@ TEST_F(ut_vnoterightmenu_test, mouseMoveEvent)
     delete mouseMoveEvent;
 }
 
-TEST_F(ut_vnoterightmenu_test, setPressPoint)
+TEST_F(UT_VNoteRightMenu, UT_VNoteRightMenu_setPressPoint_001)
 {
     VNoteRightMenu rightmenu;
     QPoint pos(10, 10);

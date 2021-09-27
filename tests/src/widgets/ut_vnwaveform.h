@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_vnwaveform_test : public QObject
+class UT_VNWaveform : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnwaveform_test();
+    UT_VNWaveform();
 };
 
 #endif // UT_VNWAVEFORM_H

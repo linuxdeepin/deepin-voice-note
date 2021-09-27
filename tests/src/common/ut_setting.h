@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_setting_test : public QObject
+class UT_Setting : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_setting_test();
+    UT_Setting();
 };
 
 #endif // UT_SETTING_H

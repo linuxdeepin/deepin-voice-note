@@ -20,11 +20,11 @@
 #include "vnoteiconbutton.h"
 #include "globaldef.h"
 
-ut_vnoteiconbutton_test::ut_vnoteiconbutton_test()
+UT_VNoteIconButton::UT_VNoteIconButton()
 {
 }
 
-TEST_F(ut_vnoteiconbutton_test, mousePressEvent)
+TEST_F(UT_VNoteIconButton, UT_VNoteIconButton_mousePressEvent_001)
 {
     VNoteIconButton vnoteiconbutton(nullptr, "home_page_logo.svg", "home_page_logo.svg", "home_page_logo.svg");
     QPointF localPos;
@@ -38,7 +38,7 @@ TEST_F(ut_vnoteiconbutton_test, mousePressEvent)
     delete event;
 }
 
-TEST_F(ut_vnoteiconbutton_test, setSeparateThemIcons)
+TEST_F(UT_VNoteIconButton, UT_VNoteIconButton_setSeparateThemIcons_001)
 {
     VNoteIconButton vnoteiconbutton(nullptr, "home_page_logo.svg", "home_page_logo.svg", "home_page_logo.svg");
     vnoteiconbutton.enterEvent(nullptr);

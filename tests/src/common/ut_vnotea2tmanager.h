@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_vnotea2tmanager_test : public QObject
+class UT_VNoteA2TManager : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnotea2tmanager_test();
+    UT_VNoteA2TManager();
 };
 
 #endif // UT_VNOTEA2TMANAGER_H

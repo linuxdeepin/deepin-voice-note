@@ -23,17 +23,17 @@
 #include "vnoteitemoper.h"
 #include "vnoteitem.h"
 
-ut_vnotedbmanager_test::ut_vnotedbmanager_test()
+UT_VNoteDbManager::UT_VNoteDbManager()
 {
 }
 
-TEST_F(ut_vnotedbmanager_test, initVNoteDb)
+TEST_F(UT_VNoteDbManager, UT_VNoteDbManager_initVNoteDb_001)
 {
     VNoteDbManager::instance()->initVNoteDb();
     EXPECT_TRUE(VNoteDbManager::instance()->m_vnoteDB.isValid());
 }
 
-TEST_F(ut_vnotedbmanager_test, getVNoteDb)
+TEST_F(UT_VNoteDbManager, UT_VNoteDbManager_getVNoteDb_001)
 {
     VNoteDbManager::instance()->getVNoteDb();
     EXPECT_TRUE(VNoteDbManager::instance()->m_vnoteDB.isValid());

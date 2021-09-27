@@ -21,12 +21,12 @@
 #include "gtest/gtest.h"
 #include <QObject>
 
-class ut_MoveView_test : public QObject
+class UT_MoveView : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_MoveView_test();
+    UT_MoveView();
 };
 
 #endif // UT_MOVEVIEW_H

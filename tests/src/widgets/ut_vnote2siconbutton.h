@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_vnote2siconbutton_test : public QObject
+class UT_VNote2SIconButton : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnote2siconbutton_test();
+    UT_VNote2SIconButton();
 };
 
 #endif // UT_VNOTE2SICONBUTTON_H

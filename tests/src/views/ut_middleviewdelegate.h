@@ -24,11 +24,12 @@
 
 #include <QObject>
 
-class ut_middleviewdelegate_test : public QObject,public ::testing::Test
+class UT_MiddleViewDelegate : public QObject
+    , public ::testing::Test
 {
     Q_OBJECT
 public:
-    explicit ut_middleviewdelegate_test(QObject *parent = nullptr);
+    explicit UT_MiddleViewDelegate(QObject *parent = nullptr);
 
 signals:
 

@@ -23,12 +23,12 @@
 #include <QObject>
 
 class OpsStateInterface;
-class ut_opsstateinterface_test : public QObject
+class UT_OpsStateInterface : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_opsstateinterface_test();
+    UT_OpsStateInterface();
 
     virtual void SetUp() override;
     virtual void TearDown() override;

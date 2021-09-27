@@ -20,11 +20,11 @@
 #include "vnote2siconbutton.h"
 #include "utils.h"
 
-ut_vnote2siconbutton_test::ut_vnote2siconbutton_test()
+UT_VNote2SIconButton::UT_VNote2SIconButton()
 {
 }
 
-TEST_F(ut_vnote2siconbutton_test, isPressed)
+TEST_F(UT_VNote2SIconButton, isPressed)
 {
     VNote2SIconButton vnote2siconbutton("test", "test");
     vnote2siconbutton.isPressed();
@@ -32,7 +32,7 @@ TEST_F(ut_vnote2siconbutton_test, isPressed)
     EXPECT_EQ(vnote2siconbutton.m_useCommonIcons, true);
 }
 
-TEST_F(ut_vnote2siconbutton_test, mouseReleaseEvent)
+TEST_F(UT_VNote2SIconButton, UT_VNote2SIconButton_mouseReleaseEvent_001)
 {
     VNote2SIconButton vnote2siconbutton("test", "test");
     QPointF localPos;
@@ -43,7 +43,7 @@ TEST_F(ut_vnote2siconbutton_test, mouseReleaseEvent)
     delete event;
 }
 
-TEST_F(ut_vnote2siconbutton_test, keyPressEvent)
+TEST_F(UT_VNote2SIconButton, UT_VNote2SIconButton_keyPressEvent_001)
 {
     VNote2SIconButton vnote2siconbutton("test", "test");
     int status = vnote2siconbutton.m_state;

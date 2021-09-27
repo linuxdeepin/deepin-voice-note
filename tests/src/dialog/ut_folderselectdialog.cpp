@@ -25,11 +25,11 @@
 
 #include <QStandardItemModel>
 
-ut_folderselectdialog_test::ut_folderselectdialog_test()
+UT_FolderSelectDialog::UT_FolderSelectDialog()
 {
 }
 
-TEST_F(ut_folderselectdialog_test, setNoteContext)
+TEST_F(UT_FolderSelectDialog, UT_FolderSelectDialog_setNoteContext_001)
 {
     QStandardItemModel data;
     FolderSelectDialog folderselectdialog(&data);
@@ -40,7 +40,7 @@ TEST_F(ut_folderselectdialog_test, setNoteContext)
     EXPECT_EQ(-1, folderselectdialog.getSelectIndex().row());
 }
 
-TEST_F(ut_folderselectdialog_test, clearSelection)
+TEST_F(UT_FolderSelectDialog, UT_FolderSelectDialog_clearSelection_001)
 {
     QStandardItemModel data;
     FolderSelectDialog folderselectdialog(&data);
@@ -48,7 +48,7 @@ TEST_F(ut_folderselectdialog_test, clearSelection)
     EXPECT_FALSE(folderselectdialog.m_confirmBtn->isEnabled());
 }
 
-TEST_F(ut_folderselectdialog_test, hideEvent)
+TEST_F(UT_FolderSelectDialog, UT_FolderSelectDialog_hideEvent)
 {
     QStandardItemModel data;
     FolderSelectDialog folderselectdialog(&data);
@@ -59,7 +59,7 @@ TEST_F(ut_folderselectdialog_test, hideEvent)
     delete event;
 }
 
-TEST_F(ut_folderselectdialog_test, refreshTextColor)
+TEST_F(UT_FolderSelectDialog, UT_FolderSelectDialog_refreshTextColor_001)
 {
     QStandardItemModel dataModel;
     FolderSelectDialog folderselectdialog(&dataModel);
@@ -80,7 +80,7 @@ TEST_F(ut_folderselectdialog_test, refreshTextColor)
         << "dark is false, m_noteInfo color";
 }
 
-TEST_F(ut_folderselectdialog_test, setFolderBlack)
+TEST_F(UT_FolderSelectDialog, UT_FolderSelectDialog_setFolderBlack_001)
 {
     VNoteFolder *folder1 = new VNoteFolder;
     QStandardItemModel dataModel;

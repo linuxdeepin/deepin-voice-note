@@ -23,11 +23,11 @@
 #include "common/vnoteforlder.h"
 #include "importolddata/vnoteolddatamanager.h"
 
-ut_olddataloadworks_test::ut_olddataloadworks_test()
+UT_OldDataLoadTask::UT_OldDataLoadTask()
 {
 }
 
-TEST_F(ut_olddataloadworks_test, OldDataLoadTask)
+TEST_F(UT_OldDataLoadTask, UT_OldDataLoadTask_OldDataLoadTask_001)
 {
     OldDataLoadTask task;
     if (nullptr == VNoteOldDataManager::instance()->m_oldDbManger) {
@@ -37,7 +37,7 @@ TEST_F(ut_olddataloadworks_test, OldDataLoadTask)
     task.run();
 }
 
-TEST_F(ut_olddataloadworks_test, OldDataUpgradeTask)
+TEST_F(UT_OldDataLoadTask, UT_OldDataLoadTask_OldDataUpgradeTask_001)
 {
     VNOTE_FOLDERS_MAP *foldersMap = new VNOTE_FOLDERS_MAP();
     VNoteFolder *folder = new VNoteFolder;

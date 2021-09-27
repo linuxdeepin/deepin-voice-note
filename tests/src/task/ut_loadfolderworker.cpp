@@ -21,12 +21,12 @@
 #include "ut_loadfolderworker.h"
 #include "task/loadfolderworker.h"
 
-ut_loadfolderworker_test::ut_loadfolderworker_test(QObject *parent)
+UT_LoadFolderWorker::UT_LoadFolderWorker(QObject *parent)
     : QObject(parent)
 {
 }
 
-void ut_loadfolderworker_test::onFolderLoad(VNOTE_FOLDERS_MAP *folders)
+void UT_LoadFolderWorker::onFolderLoad(VNOTE_FOLDERS_MAP *folders)
 {
     EXPECT_TRUE(nullptr != folders);
     if (folders) {
@@ -35,9 +35,9 @@ void ut_loadfolderworker_test::onFolderLoad(VNOTE_FOLDERS_MAP *folders)
     }
 }
 
-TEST_F(ut_loadfolderworker_test, run)
+TEST_F(UT_LoadFolderWorker, UT_LoadFolderWorker_run_001)
 {
     LoadFolderWorker work;
-    connect(&work, &LoadFolderWorker::onFoldersLoaded, this, &ut_loadfolderworker_test::onFolderLoad);
+    connect(&work, &LoadFolderWorker::onFoldersLoaded, this, &UT_LoadFolderWorker::onFolderLoad);
     work.run();
 }

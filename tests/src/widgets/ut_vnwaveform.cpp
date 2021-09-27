@@ -19,11 +19,11 @@
 #include "ut_vnwaveform.h"
 #include "vnwaveform.h"
 
-ut_vnwaveform_test::ut_vnwaveform_test()
+UT_VNWaveform::UT_VNWaveform()
 {
 }
 
-TEST_F(ut_vnwaveform_test, onAudioBufferProbed)
+TEST_F(UT_VNWaveform, UT_VNWaveform_onAudioBufferProbed_001)
 {
     VNWaveform vnwaveform;
     QAudioBuffer buffer;
@@ -32,7 +32,7 @@ TEST_F(ut_vnwaveform_test, onAudioBufferProbed)
     EXPECT_TRUE(vnwaveform.m_audioScaleSamples.isEmpty());
 }
 
-TEST_F(ut_vnwaveform_test, paintEvent)
+TEST_F(UT_VNWaveform, UT_VNWaveform_paintEvent_001)
 {
     VNWaveform vnwaveform;
     vnwaveform.m_audioScaleSamples.push_back(1.1);
@@ -43,7 +43,7 @@ TEST_F(ut_vnwaveform_test, paintEvent)
     EXPECT_FALSE(vnwaveform.grab().isNull());
 }
 
-TEST_F(ut_vnwaveform_test, resizeEvent)
+TEST_F(UT_VNWaveform, UT_VNWaveform_resizeEvent_001)
 {
     VNWaveform vnwaveform;
     QSize size1(10, 12);
@@ -56,7 +56,7 @@ TEST_F(ut_vnwaveform_test, resizeEvent)
     delete event;
 }
 
-TEST_F(ut_vnwaveform_test, getBufferLevels)
+TEST_F(UT_VNWaveform, UT_VNWaveform_getBufferLevels_001)
 {
     VNWaveform vnwaveform;
     QAudioFormat audioformat;
@@ -101,7 +101,7 @@ TEST_F(ut_vnwaveform_test, getBufferLevels)
     vnwaveform.getBufferLevels(buffer6, scaleSamples, frameGain);
 }
 
-TEST_F(ut_vnwaveform_test, getPeakValue)
+TEST_F(UT_VNWaveform, UT_VNWaveform_getPeakValue_001)
 {
     VNWaveform vnwaveform;
     QAudioFormat audioformat;

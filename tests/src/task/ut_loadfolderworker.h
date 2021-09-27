@@ -25,11 +25,12 @@
 #include "gtest/gtest.h"
 struct VNOTE_FOLDERS_MAP;
 
-class ut_loadfolderworker_test : public QObject , public ::testing::Test
+class UT_LoadFolderWorker : public QObject
+    , public ::testing::Test
 {
     Q_OBJECT
 public:
-    explicit ut_loadfolderworker_test(QObject *parent = nullptr);
+    explicit UT_LoadFolderWorker(QObject *parent = nullptr);
 
 signals:
 

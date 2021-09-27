@@ -24,11 +24,12 @@
 #include <QObject>
 #include "gtest/gtest.h"
 struct VNOTE_ALL_NOTES_MAP;
-class ut_loadnoteItemsworker_test : public QObject, public ::testing::Test
+class UT_LoadNoteItemsWorker : public QObject
+    , public ::testing::Test
 {
     Q_OBJECT
 public:
-    explicit ut_loadnoteItemsworker_test(QObject *parent = nullptr);
+    explicit UT_LoadNoteItemsWorker(QObject *parent = nullptr);
 
 signals:
 

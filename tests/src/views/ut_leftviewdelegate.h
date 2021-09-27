@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_leftviewdelegate_test : public QObject
+class UT_LeftViewDelegate : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_leftviewdelegate_test();
+    UT_LeftViewDelegate();
 };
 
 #endif // UT_LEFTVIEWDELEGATE_H

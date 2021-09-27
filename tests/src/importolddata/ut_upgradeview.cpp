@@ -19,18 +19,18 @@
 #include "ut_upgradeview.h"
 #include "upgradeview.h"
 
-ut_upgradeview_test::ut_upgradeview_test()
+UT_UpgradeView::UT_UpgradeView()
 {
 }
 
-TEST_F(ut_upgradeview_test, onUpgradeFinish)
+TEST_F(UT_UpgradeView, UT_UpgradeView_onUpgradeFinish_001)
 {
     UpgradeView upgradeview;
     upgradeview.onUpgradeFinish();
     EXPECT_EQ(100, upgradeview.m_waterProgress->value());
 }
 
-TEST_F(ut_upgradeview_test, setProgress)
+TEST_F(UT_UpgradeView, UT_UpgradeView_setProgress_001)
 {
     UpgradeView upgradeview;
     upgradeview.setProgress(1);

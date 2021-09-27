@@ -27,11 +27,11 @@
 #include <QPaintEvent>
 #include <standarditemcommon.h>
 
-ut_MoveView_test::ut_MoveView_test()
+UT_MoveView::UT_MoveView()
 {
 }
 
-TEST_F(ut_MoveView_test, setFolder)
+TEST_F(UT_MoveView, UT_MoveView_setFolder_001)
 {
     MoveView moveView;
     VNoteFolder *folder = VNoteDataManager::instance()->getNoteFolders()->folders[0];
@@ -42,7 +42,7 @@ TEST_F(ut_MoveView_test, setFolder)
     moveView.grab();
 }
 
-TEST_F(ut_MoveView_test, setNoteList)
+TEST_F(UT_MoveView, UT_MoveView_setNoteList_001)
 {
     MoveView moveView;
     VNoteFolder *folder = VNoteDataManager::instance()->getNoteFolders()->folders[0];

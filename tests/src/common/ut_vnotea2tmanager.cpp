@@ -19,11 +19,11 @@
 #include "ut_vnotea2tmanager.h"
 #include "vnotea2tmanager.h"
 
-ut_vnotea2tmanager_test::ut_vnotea2tmanager_test()
+UT_VNoteA2TManager::UT_VNoteA2TManager()
 {
 }
 
-TEST_F(ut_vnotea2tmanager_test, startAsr)
+TEST_F(UT_VNoteA2TManager, UT_VNoteA2TManager_startAsr_001)
 {
     VNoteA2TManager vnotea2tmanager;
     QString filepath = "/usr/share/music/bensound-sunny.mp3";
@@ -32,7 +32,7 @@ TEST_F(ut_vnotea2tmanager_test, startAsr)
     vnotea2tmanager.stopAsr();
 }
 
-TEST_F(ut_vnotea2tmanager_test, onNotify)
+TEST_F(UT_VNoteA2TManager, UT_VNoteA2TManager_onNotify_001)
 {
     VNoteA2TManager vnotea2tmanager;
     QString messg = "{\n    \"code\": \"000000\",\n    \"descInfo\": \"success\",\n    \"failType\": 0,\n    \"status\": 4,\n    \"text\": \"乙醇汽油的保质期呢是15~25天，建议呢在15天之内用完，那乙醇汽油确实是比较容易变质的，但过了一个月还是可以继续使用的。这就好比我买了这个薯片过期了一天，啊那不是说马上它就烂掉了长蘑菇了，呃只是过了这个期限。啊\"\n}\n";
@@ -45,7 +45,7 @@ TEST_F(ut_vnotea2tmanager_test, onNotify)
     vnotea2tmanager.onNotify(messg3);
 }
 
-TEST_F(ut_vnotea2tmanager_test, getErrorCode)
+TEST_F(UT_VNoteA2TManager, UT_VNoteA2TManager_getErrorCode_001)
 {
     VNoteA2TManager vnotea2tmanager;
     asrMsg tmpstruct;

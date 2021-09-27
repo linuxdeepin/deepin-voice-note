@@ -20,24 +20,24 @@
 #include "vnotebasedialog.h"
 #include <QVBoxLayout>
 
-ut_vnotebasedialog_test::ut_vnotebasedialog_test()
+UT_VNoteBaseDialog::UT_VNoteBaseDialog()
 {
 }
 
-TEST_F(ut_vnotebasedialog_test, setTitle)
+TEST_F(UT_VNoteBaseDialog, UT_VNoteBaseDialog_setTitle_001)
 {
     VNoteBaseDialog vnotebasedialog;
     vnotebasedialog.setTitle("test");
     EXPECT_EQ("test", vnotebasedialog.m_tileText->text());
 }
 
-TEST_F(ut_vnotebasedialog_test, getContentLayout)
+TEST_F(UT_VNoteBaseDialog, UT_VNoteBaseDialog_getContentLayout_001)
 {
     VNoteBaseDialog vnotebasedialog;
     EXPECT_TRUE(vnotebasedialog.getContentLayout());
 }
 
-TEST_F(ut_vnotebasedialog_test, setLogoVisable)
+TEST_F(UT_VNoteBaseDialog, UT_VNoteBaseDialog_setLogoVisable_001)
 {
     VNoteBaseDialog vnotebasedialog;
     vnotebasedialog.setLogoVisable(true);
@@ -46,7 +46,7 @@ TEST_F(ut_vnotebasedialog_test, setLogoVisable)
     EXPECT_FALSE(vnotebasedialog.m_logoIcon->isVisible()) << "visible is false";
 }
 
-TEST_F(ut_vnotebasedialog_test, setIconPixmap)
+TEST_F(UT_VNoteBaseDialog, UT_VNoteBaseDialog_setIconPixmap_001)
 {
     VNoteBaseDialog vnotebasedialog;
     QPixmap iconpixmap;
@@ -54,7 +54,7 @@ TEST_F(ut_vnotebasedialog_test, setIconPixmap)
     EXPECT_EQ(iconpixmap, *(vnotebasedialog.m_logoIcon->pixmap()));
 }
 
-TEST_F(ut_vnotebasedialog_test, addContent)
+TEST_F(UT_VNoteBaseDialog, UT_VNoteBaseDialog_addContent_001)
 {
     VNoteBaseDialog vnotebasedialog;
     QWidget *content = new QWidget;
@@ -63,7 +63,7 @@ TEST_F(ut_vnotebasedialog_test, addContent)
     delete content;
 }
 
-TEST_F(ut_vnotebasedialog_test, closeEvent)
+TEST_F(UT_VNoteBaseDialog, UT_VNoteBaseDialog_closeEvent_001)
 {
     VNoteBaseDialog vnotebasedialog;
     QCloseEvent *event = new QCloseEvent;
@@ -71,7 +71,7 @@ TEST_F(ut_vnotebasedialog_test, closeEvent)
     delete event;
 }
 
-TEST_F(ut_vnotebasedialog_test, showEvent)
+TEST_F(UT_VNoteBaseDialog, UT_VNoteBaseDialog_showEvent_001)
 {
     VNoteBaseDialog vnotebasedialog;
     QShowEvent *event = new QShowEvent;
