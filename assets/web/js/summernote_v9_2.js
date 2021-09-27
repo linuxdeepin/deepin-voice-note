@@ -2732,8 +2732,10 @@
         History.prototype.makeSnapshot = function () {
             var rng = range.create(this.editable);
             var emptyBookmark = { s: { path: [], offset: 0 }, e: { path: [], offset: 0 } };
+            let editableClone = this.$editable.clone()
+            $(editableClone).find(".translate").html('')
             return {
-                contents: this.$editable.html(),
+                contents: $(editableClone).html(),
                 bookmark: (rng ? rng.bookmark(this.editable) : emptyBookmark)
             };
         };
@@ -3289,11 +3291,6 @@
             var nextPara;
             // on paragraph: split paragraph
             if (splitRoot) {
-                console.log(splitRoot.parentNode.nodeName)
-                console.log(dom.isEmpty(splitRoot) && dom.isLi(splitRoot));
-                console.log(dom.isEmpty(splitRoot) && dom.isPara(splitRoot) && dom.isBlockquote(splitRoot.parentNode));
-                console.log(dom.isEmpty(splitRoot) && splitRoot.parentNode.tagName == 'LI' && $(splitRoot.parentNode).find('.voiceBox').length);
-
                 // if it is an empty line with li
                 if (dom.isEmpty(splitRoot) && dom.isLi(splitRoot)) {
                     // toogle UL/OL and escape
@@ -3308,13 +3305,10 @@
                     // if new line has content (not a line break)
                 }
                 else if (dom.isEmpty(splitRoot) && splitRoot.parentNode.tagName == 'LI' && $(splitRoot.parentNode).find('.voiceBox').length) {
-                    // console.log($(splitRoot).find('li'))
                     let li = document.createElement('li')
                     li.innerHTML = '<br>'
                     $(splitRoot).closest('li').after(li)
-                    // return;
-                    // this.bullet.toggleList(splitRoot.parentNode.parentNode.nodeName);
-                     nextPara = li;;
+                    nextPara = li;;
 
                 }
                 else {

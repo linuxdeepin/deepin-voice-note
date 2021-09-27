@@ -303,9 +303,15 @@ function copyVoice(event) {
         changeContent()
 
     }
+    else if (event.type == 'cut' && getSelectedRange().innerHTML == document.querySelector('.note-editable').innerHTML) {
+        // 记录之前数据
+        $('#summernote').summernote('editor.recordUndo')
+        rangeObj.deleteContents()
+        // 主动触发change事件
+        changeContent()
+    }
     formatHtml = testDiv.innerHTML;
-    console.log(formatHtml)
-    if ($(testDiv).children().length == 1 && $(testDiv).find('.voiceBox').length != 0) {
+    if ($(testDiv).children().length == 1 && $(testDiv).children()[0].tagName != 'UL' && $(testDiv).find('.voiceBox').length != 0) {
         formatHtml = '<p><br></p>' + formatHtml
     }
 }
@@ -616,7 +622,7 @@ function setHtml(html) {
 function setVoiceText(text, flag) {
     if (activeTransVoice) {
         if (flag) {
-            activeTransVoice.find('.translate').html('');
+            $('.translate').html('')
             if (text) {
                 activeTransVoice.after('<p>' + text + '</p>');
                 webobj.jsCallTxtChange();
@@ -641,7 +647,6 @@ function setVoiceText(text, flag) {
             activeTransVoice.find('.translate').html('<div class="noselect">' + text + '</div>');
             bTransVoiceIsReady = false;
         }
-
     }
 }
 
@@ -813,14 +818,40 @@ async function insertImg(urlStr) {
     })
 }
 
-// 回车健 ,ctrl+v
+//  
 document.onkeydown = function (event) {
     if (window.event.keyCode == 13) {
+        // 回车
         setFocusScroll()
     } else if (event.ctrlKey && window.event.keyCode == 86) {
+        // ctrl+v
         webobj.jsCallPaste(returnCopyFlag())
         return false;
+    } else if (event.ctrlKey && window.event.keyCode == 65) {
+        // ctrl+a
+        selectAll()
+        return false;
+    } else if (window.event.keyCode == 8) {
+        // backspace
+        if (getSelectedRange().innerHTML == document.querySelector('.note-editable').innerHTML) {
+            $('.note-editable').html('<p><br></p>')
+        }
+    } else if (window.event.keyCode == 46) {
+        // delete
+        if (getSelectedRange().innerHTML == document.querySelector('.note-editable').innerHTML) {
+            $('.note-editable').html('<p><br></p>')
+        }
     }
+
+}
+
+// 全选
+function selectAll() {
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    var range = document.createRange();
+    range.selectNodeContents(document.querySelector('.note-editable'));
+    sel.addRange(range);
 }
 
 // ctrl+b 添加记事本
