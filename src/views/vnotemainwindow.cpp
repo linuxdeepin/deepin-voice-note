@@ -2163,9 +2163,7 @@ void VNoteMainWindow::onPoppuMenuShortcut()
             m_showSearchEditMenu = QApplication::sendEvent(m_noteSearchEdit->lineEdit(), &eve);
         }
     } else if (m_richTextEdit->hasFocus()) {
-        //模拟发送菜单键事件
-        QKeyEvent event(QEvent::KeyPress, Qt::Key_Menu, Qt::NoModifier);
-        QApplication::sendEvent(m_richTextEdit->focusProxy(), &event);
+        m_richTextEdit->shortcutPopupMenu();
     }
 }
 

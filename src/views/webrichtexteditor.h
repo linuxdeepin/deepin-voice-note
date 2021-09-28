@@ -75,6 +75,11 @@ public:
      */
     void unboundCurrentNoteData();
 
+    /**
+     * @brief 快捷键触发右键菜单
+     */
+    void shortcutPopupMenu();
+
 signals:
     /**
      * @brief 发送开始语音转文字的信号

@@ -490,20 +490,27 @@ void WebRichTextEditor::onPaste(bool isVoicePaste)
 
 void WebRichTextEditor::contextMenuEvent(QContextMenuEvent *e)
 {
+    QPoint globalPos = e->globalPos();
+    QPoint pos = e->pos();
+    //菜单y坐标为负数时，右键菜单显示在编辑区中间
+    if (globalPos.y() < 0) {
+        pos = rect().center();
+        globalPos = mapToGlobal(pos);
+    }
     switch (m_menuType) {
     case PictureMenu:
         //图片菜单
-        showPictureMenu(e->globalPos());
+        showPictureMenu(globalPos);
         break;
     case VoiceMenu:
         //语音菜单
-        showVoiceMenu(e->globalPos());
+        showVoiceMenu(globalPos);
         break;
     case TxtMenu:
         //文字菜单
-        showTxtMenu(e->globalPos());
+        showTxtMenu(globalPos);
         //显示编辑工具栏
-        onShowEditToolbar(e->pos());
+        onShowEditToolbar(pos);
         break;
     default:
         break;
@@ -644,4 +651,17 @@ bool WebRichTextEditor::isVoicePaste()
 {
     //调用web前端接口
     return JsContent::instance()->callJsSynchronous(page(), "returnCopyFlag()").toBool();
+}
+
+void WebRichTextEditor::shortcutPopupMenu()
+{
+    //同步获取菜单类型与参数
+    QMap<QString, QVariant> param = JsContent::instance()->callJsSynchronous(page(), "isRangeVoice()").toMap();
+    if (2 == param.size()) {
+        m_menuType = static_cast<Menu>(param["flag"].toInt());
+        m_menuJson = param["info"];
+        //模拟发送菜单键事件
+        QKeyEvent event(QEvent::KeyPress, Qt::Key_Menu, Qt::NoModifier);
+        QApplication::sendEvent(focusProxy(), &event);
+    }
 }
