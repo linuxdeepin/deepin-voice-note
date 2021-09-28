@@ -2733,6 +2733,9 @@
             var rng = range.create(this.editable);
             var emptyBookmark = { s: { path: [], offset: 0 }, e: { path: [], offset: 0 } };
             let editableClone = this.$editable.clone()
+            $(editableClone).find('.voicebtn').removeClass('pause').addClass('play');
+            $(editableClone).find('.voicebtn').removeClass('now');
+            $(editableClone).find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four');
             $(editableClone).find(".translate").html('')
             return {
                 contents: $(editableClone).html(),
@@ -3308,8 +3311,7 @@
                     let li = document.createElement('li')
                     li.innerHTML = '<br>'
                     $(splitRoot).closest('li').after(li)
-                    nextPara = li;;
-
+                    nextPara = li;
                 }
                 else {
                     nextPara = dom.splitTree(splitRoot, rng.getStartPoint());
@@ -7044,17 +7046,17 @@
             var docFragment = rangeObj.cloneContents();
             var testDiv = document.createElement("div");
             testDiv.appendChild(docFragment);
-
             if ($(testDiv).find('.translate').length
                 || $(styleInfo.range.sc).parents('.translate').length
                 || $(testDiv).find('img').length
                 || $(rangeObj.startContainer).closest('li').find('img').length
                 || $(rangeObj.startContainer).closest('li').find('.translate').length
-                || ($(rangeObj.endContainer).closest('li').find('img').length
-                    && !rangeObj.collapsed && (rangeObj.endOffset != rangeObj.startOffset && (rangeObj.endOffset != 0 || rangeObj.startOffset != 0)))
-                || ($(rangeObj.endContainer).closest('li').find('.translate').length
-                    && !rangeObj.collapsed && (rangeObj.endOffset != rangeObj.startOffset && (rangeObj.endOffset != 0 || rangeObj.startOffset != 0))
-                )
+                || $(rangeObj.endContainer).closest('li').find('.translate').length
+                || $(rangeObj.endContainer).closest('li').find('img').length
+                // || ($(rangeObj.endContainer).closest('li').find('img').length
+                //     && !rangeObj.collapsed && (rangeObj.endOffset != rangeObj.startOffset && (rangeObj.endOffset != 0 || rangeObj.startOffset != 0)))
+                // || ($(rangeObj.endContainer).closest('li').find('.translate').length
+                //     && !rangeObj.collapsed && (rangeObj.endOffset != rangeObj.startOffset && (rangeObj.endOffset != 0 || rangeObj.startOffset != 0)))
             ) {
                 $('.note-ul').hide()
                 $('.note-ol').hide()

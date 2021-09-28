@@ -309,6 +309,8 @@ function copyVoice(event) {
         rangeObj.deleteContents()
         // 主动触发change事件
         changeContent()
+        event.preventDefault()
+        isVoicePaste = true
     }
     formatHtml = testDiv.innerHTML;
     if ($(testDiv).children().length == 1 && $(testDiv).children()[0].tagName != 'UL' && $(testDiv).find('.voiceBox').length != 0) {
@@ -341,6 +343,7 @@ function returnCopyFlag() {
 
 // 粘贴
 document.addEventListener('paste', function (event) {
+    console.log(11111111)
     if (formatHtml != "" && isVoicePaste) {
         document.execCommand('insertHTML', false, formatHtml + "<p><br></p>");
         event.preventDefault()
@@ -821,6 +824,7 @@ async function insertImg(urlStr) {
 
 //  
 document.onkeydown = function (event) {
+    console.log(11111111)
     if (window.event.keyCode == 13) {
         // 回车
         setFocusScroll()
