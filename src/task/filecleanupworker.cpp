@@ -188,7 +188,7 @@ void FileCleanupWorker::scanVoiceByHtml(const QString &htmlCode)
     //查找语音块
     while ((pos = rx.indexIn(htmlCode, pos)) != -1) {
         //获取语音路径
-        if (rxJson.indexIn(rx.cap(0))) {
+        if (rxJson.indexIn(rx.cap(0)) != -1) {
             removeVoicePathBySet(rxJson.cap(0));
         }
         pos += rx.matchedLength();

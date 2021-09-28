@@ -291,7 +291,7 @@ QStringList VNoteItem::getVoiceJsons() const
     //查找语音块
     while ((pos = rx.indexIn(htmlCode, pos)) != -1) {
         //获取语音json数据
-        if (rxJson.indexIn(rx.cap(0))) {
+        if (rxJson.indexIn(rx.cap(0)) != -1) {
             list << rxJson.cap(0).replace("&quot;", "\"");
         }
         pos += rx.matchedLength();

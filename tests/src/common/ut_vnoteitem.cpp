@@ -153,7 +153,7 @@ TEST_F(UT_VnoteItem, UT_VnoteItem_voiceCount_001)
     vnoteitem.htmlCode = "<div> </div>";
     EXPECT_FALSE(vnoteitem.voiceCount()) << "jsonkey is empty";
 
-    vnoteitem.htmlCode = "<div jsonkey=\"123\"> </div>";
+    vnoteitem.htmlCode = "<div jsonkey=\"{123}\"> </div>";
     EXPECT_TRUE(vnoteitem.voiceCount()) << "has jsonkey";
 }
 
