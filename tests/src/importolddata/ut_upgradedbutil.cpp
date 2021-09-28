@@ -19,6 +19,18 @@
 #include "ut_upgradedbutil.h"
 #include "upgradedbutil.h"
 #include "vnoteforlder.h"
+#include "db/vnotedbmanager.h"
+#include <stub.h>
+
+static bool stub_false()
+{
+    return false;
+}
+
+static bool stub_true()
+{
+    return true;
+}
 
 UT_UpgradeDbUtil::UT_UpgradeDbUtil()
 {
@@ -48,6 +60,15 @@ TEST_F(UT_UpgradeDbUtil, UT_UpgradeDbUtil_readUpgradeState_001)
 
 TEST_F(UT_UpgradeDbUtil, UT_UpgradeDbUtil_needUpdateOldDb_001)
 {
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, hasOldDataBase), stub_true);
+    EXPECT_TRUE(m_upgradedbutil->needUpdateOldDb(m_upgradedbutil->Loading));
+}
+
+TEST_F(UT_UpgradeDbUtil, UT_UpgradeDbUtil_needUpdateOldDb_002)
+{
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, hasOldDataBase), stub_false);
     EXPECT_FALSE(m_upgradedbutil->needUpdateOldDb(m_upgradedbutil->Loading));
 }
 
