@@ -452,6 +452,7 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsHideEditToolbar.connect(hideRightMenu);
         webobj.callJsClipboardDataChanged.connect(shearPlateChange);
         webobj.callJsSetVoicePlayBtnEnable.connect(playButColor);
+        webobj.callJsSelectAll.connect(selectAll);
 
         //通知QT层完成通信绑定
         webobj.jsCallChannleFinish();

@@ -319,7 +319,7 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
     case ActionManager::PictureSelectAll:
     case ActionManager::TxtSelectAll:
         //直接调用web端的全选事件
-        page()->triggerAction(QWebEnginePage::SelectAll);
+        emit JsContent::instance()->callJsSelectAll();
         break;
     case ActionManager::VoiceCopy:
     case ActionManager::PictureCopy:
