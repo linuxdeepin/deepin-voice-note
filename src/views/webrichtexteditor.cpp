@@ -493,7 +493,7 @@ void WebRichTextEditor::contextMenuEvent(QContextMenuEvent *e)
     QPoint globalPos = e->globalPos();
     QPoint pos = e->pos();
     //菜单y坐标为负数时，右键菜单显示在编辑区中间
-    if (globalPos.y() < 0) {
+    if (pos.y() < 0 || pos.y() > height()) {
         pos = rect().center();
         globalPos = mapToGlobal(pos);
     }
