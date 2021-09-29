@@ -343,7 +343,6 @@ function returnCopyFlag() {
 
 // 粘贴
 document.addEventListener('paste', function (event) {
-    console.log(11111111)
     if (formatHtml != "" && isVoicePaste) {
         document.execCommand('insertHTML', false, formatHtml + "<p><br></p>");
         event.preventDefault()
@@ -756,7 +755,7 @@ function setVoiceButColor(color, shdow) {
     $("#style").html(`
     .voiceBox .voicebtn {
         background-color:${color};
-        box-shadow: 0px 4px 6px 0px ${shdow}66; 
+        box-shadow: 0px 4px 6px 0px ${shdow}80; 
     } 
     .btn-default.active i {
         color:${color}!important
@@ -824,7 +823,6 @@ async function insertImg(urlStr) {
 
 //  
 document.onkeydown = function (event) {
-    console.log(11111111)
     if (window.event.keyCode == 13) {
         // 回车
         setFocusScroll()

@@ -4721,8 +4721,7 @@
             if (clipboardData && clipboardData.items && clipboardData.items.length) {
                 var item = lists.head(clipboardData.items);
                 if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
-
-                    this.context.invoke('editor.insertImagesOrCallback', [item.getAsFile()]);
+                    // this.context.invoke('editor.insertImagesOrCallback', [item.getAsFile()]);
                 }
                 this.context.invoke('editor.afterCommand');
             }
