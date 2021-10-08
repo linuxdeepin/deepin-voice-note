@@ -44,7 +44,25 @@ body {
     margin: 0 20px 0 20px;
     cursor: pointer;
     overflow: hidden;
-    box-shadow: 0px 4px 6px 0px #94c8fa80; 
+    box-shadow: 0px 4px 6px 0px #94c8fa80;
+}
+
+.voicebtn:hover::before {
+    content: "";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.voicebtn:active::before {
+    content: "";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .voicebtn.play {
@@ -135,7 +153,7 @@ body {
 
 .wifi-circle {
     position: absolute;
-    left: 0;
+    right: 0;
     top: 0;
 }
 

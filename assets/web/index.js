@@ -374,12 +374,13 @@ function isRangeVoice() {
     var testDiv = getSelectedRange();
     let childrenLength = $(testDiv).children().length
     let voiceLength = $(testDiv).find('.voiceBox').length
-    let imgLength = $(testDiv).find('img').length
 
     if (voiceLength == childrenLength && childrenLength != 0) {
         selectedRange.flag = 1
         selectedRange.info = $(testDiv).find('.voiceBox:first').attr('jsonKey')
-    } else if (imgLength == childrenLength && childrenLength == 1) {
+    } else if ($(testDiv).find('img').length == childrenLength
+        && childrenLength == 1
+        && $(testDiv).find('img').parent()[0].childNodes.length == 1) {
         selectedRange.flag = 0
         selectedRange.info = $(testDiv).find('img').attr('src')
     } else {
@@ -765,6 +766,9 @@ function setVoiceButColor(color, shdow) {
     }
     .btn-default i:active {
         color:${color}!important
+    }
+    .selectColor {
+        box-shadow: 0 0 0 1.5px ${color};
     }
     `)
 }

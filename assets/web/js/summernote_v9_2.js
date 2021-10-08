@@ -3295,7 +3295,8 @@
             // on paragraph: split paragraph
             if (splitRoot) {
                 // if it is an empty line with li
-                if (dom.isEmpty(splitRoot) && dom.isLi(splitRoot)) {
+                // dom.isEmpty(splitRoot)
+                if (!$(splitRoot).text() && !$(splitRoot).find('img').length && dom.isLi(splitRoot)) {
                     // toogle UL/OL and escape
                     this.bullet.toggleList(splitRoot.parentNode.nodeName);
                     return;
@@ -4549,6 +4550,7 @@
             if (rng) {
                 var spans = this.style.styleNodes(rng);
                 $$1(spans).css(target, value);
+                console.log(spans)
                 // [workaround] added styled bogus span for style
                 //  - also bogus character needed for cursor position
                 if (rng.isCollapsed()) {
@@ -6098,7 +6100,7 @@
                             $dropdown.find('.note-holder').each(function (idx, item) {
                                 var $holder = $$1(item);
                                 $holder.append(_this.ui.palette({
-                                    colors: _this.options.colors,
+                                    colors: backColor ? _this.options.colors : _this.options.foreColors,
                                     colorsName: _this.options.colorsName,
                                     eventName: $holder.data('event'),
                                     container: _this.options.container,
@@ -6132,10 +6134,10 @@
                             });
                         },
                         click: function (event) {
-
                             event.stopPropagation();
                             var $parent = $$1('.' + className);
                             var $button = $$1(event.target);
+                            $button = $button.hasClass('slopingside') ? $button.parent() : $button
                             var eventName = $button.data('event');
                             var value = $button.attr('data-value');
                             if (eventName === 'openPalette') {
@@ -6159,15 +6161,24 @@
 
                                 var $color = $button.closest('.note-color').find('.note-recent-color');
                                 var $currentButton = $button.closest('.note-color').find('.note-current-color-button');
+
+                                $button.parents('.note-color-palette').find('.note-color-btn').removeClass('selectColor')
+                                $button.addClass('selectColor')
                                 // $color.css(key, value);
                                 if (eventName == 'backColor') {
                                     $('.icon-backcolor .path6').css('color', value)
                                 } else if (eventName == 'foreColor') {
                                     $('.icon-forecolor .path1').css('color', value)
                                 }
-
+                                if (value == 'transparent') {
+                                    $('.icon-backcolor .path5').addClass('transparentColor')
+                                } else {
+                                    $('.icon-backcolor .path5').removeClass('transparentColor')
+                                }
                                 $currentButton.attr('data-' + eventName, value);
                                 _this.context.invoke('editor.' + eventName, value);
+                                // 隐藏调色板
+                                $('.note-popover').find('.note-color').removeClass('open')
                             }
                         }
                     }),
@@ -7670,6 +7681,13 @@
                 ['#F6989A', '#FFC395', '#FFE691', '#ABD7A0', '#9BC7CF', '#8EC7F3', '#B9A4DA', '#E1A2BE'],
                 ['#E50000', '#F78F12', '#F9C400', '#53A73A', '#337D8E', '#0086CC', '#6848AB', '#B4427D'],
                 ['#AE0000', '#C45E00', '#C69200', '#017D02', '#004B5C', '#005399', '#351578', '#000000'],
+
+            ],
+            foreColors: [
+                ['#000000', '#424242', '#636363', '#414D68', '#C0C6D4', '#D0C6CF', '#EFEFEF', '#FFFFFF'],
+                ['#F6989A', '#FFC395', '#FFE691', '#ABD7A0', '#9BC7CF', '#8EC7F3', '#B9A4DA', '#E1A2BE'],
+                ['#E50000', '#F78F12', '#F9C400', '#53A73A', '#337D8E', '#0086CC', '#6848AB', '#B4427D'],
+                ['#AE0000', '#C45E00', '#C69200', '#017D02', '#004B5C', '#005399', '#351578', '#800643'],
 
             ],
             colorButton: {

@@ -37,7 +37,7 @@
 
  .note-editor .note-toolbar, .note-popover .popover-content {
      display: inline-block;
-     padding: 5px 5px 5px 10px !important;
+     padding: 5px 10px 4px 10px !important;
      /* width: 318px; */
      height: 36px;
      background: rgba(247, 247, 247, 1);
@@ -171,8 +171,8 @@
      font-size: 12px;
  }
 
- .note-popover .popover-content .note-color-palette div .note-color-btn:hover, .panel-heading.note-toolbar .note-color-palette div .note-color-btn:hover {
-     border: 1px solid #FFF;
+ .selectColor {
+     border: 1px solid #FFF!important;
      /* outline: 1px outset #0883FB; */
      box-shadow: 0 0 0 1.5px #0883FB;
      transform: scale(1.08);
@@ -235,10 +235,7 @@
      height: 24px;
  }
 
- .note-current-fontsize {
-     margin-right: 2px;
-     /* color: rgba(65, 77, 104, 1) */
- }
+ .note-current-fontsize {}
 
  .note-forecolor {
      padding-right: 4px!important;
@@ -277,8 +274,8 @@
      overflow: hidden;
  }
 
- .fontSizeBut {
-     padding: 0 4px!important;
+ .fontsizeBut {
+     width: 38px;
  }
 
  .dropdown-fontsize {
@@ -321,4 +318,8 @@
      width: 0;
      height: 0px;
      vertical-align: bottom;
+ }
+
+ .transparentColor {
+     color: transparent!important;
  }
