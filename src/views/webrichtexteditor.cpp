@@ -34,7 +34,6 @@
 #include <DFileDialog>
 #include <DGuiApplicationHelper>
 
-#include <QEventLoop>
 #include <QClipboard>
 #include <QMimeData>
 #include <QDragEnterEvent>

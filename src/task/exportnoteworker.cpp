@@ -120,16 +120,7 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportText()
             if (m_exportName.isEmpty()) {
                 QString baseFileName = m_exportPath + "/" + noteData->noteTitle;
                 QString fileSuffix = ".txt";
-                int count = 1;
-                filePath = baseFileName + fileSuffix;
-                //文件已存在，获取新文件名，直到新文件名不存在
-                while (1) {
-                    QFile file(filePath);
-                    if (!file.exists()) {
-                        break;
-                    }
-                    filePath = baseFileName + "[" + QString::number(count++) + "]" + fileSuffix;
-                }
+                filePath = getExportFileName(baseFileName, fileSuffix);
             } else {
                 filePath = m_exportPath + "/" + m_exportName;
             }
@@ -225,19 +216,9 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportOneVoice(VNoteBlock *noteb
     ExportError error = ExportOK;
 
     if (noteblock && noteblock->blockType == VNoteBlock::Voice) {
-        QFileInfo targetFile(noteblock->ptrVoice->voicePath);
         QString baseFileName = m_exportPath + "/" + noteblock->ptrVoice->voiceTitle;
-        QString fileSuffix = "." + targetFile.suffix();
-        QString dstFileName = baseFileName + fileSuffix;
-        int count = 1;
-        //文件已存在，获取新文件名，直到新文件名不存在
-        while (1) {
-            QFile file(dstFileName);
-            if (!file.exists()) {
-                break;
-            }
-            dstFileName = baseFileName + "[" + QString::number(count++) + "]" + fileSuffix;
-        }
+        QString fileSuffix = ".mp3";
+        QString dstFileName = getExportFileName(baseFileName, fileSuffix);
         if (!QFile::copy(noteblock->ptrVoice->voicePath, dstFileName)) {
             error = Savefailed; //保存失败
         }
@@ -264,17 +245,8 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAsHtml()
         //没有指定保存名称，则设置默认名称为笔记标题
         if (m_exportName.isEmpty()) {
             QString baseFileName = m_exportPath + "/" + note->noteTitle;
-            int count = 1;
             QString fileSuffix = ".html";
-            filePath = baseFileName + fileSuffix;
-            //文件已存在，获取新文件名，直到新文件名不存在
-            while (1) {
-                QFile file(filePath);
-                if (!file.exists()) {
-                    break;
-                }
-                filePath = baseFileName + "[" + QString::number(count++) + "]" + fileSuffix;
-            }
+            filePath = getExportFileName(baseFileName, fileSuffix);
         } else {
             filePath = m_exportPath + "/" + m_exportName;
         }
@@ -287,4 +259,18 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAsHtml()
         }
     }
     return error;
+}
+
+QString ExportNoteWorker::getExportFileName(const QString &baseName, const QString &fileSuffix)
+{
+    QString filePath = baseName + fileSuffix;
+    int count = 1;
+    while (1) {
+        QFile file(filePath);
+        if (!file.exists()) {
+            break;
+        }
+        filePath = baseName + "[" + QString::number(count++) + "]" + fileSuffix;
+    }
+    return filePath;
 }

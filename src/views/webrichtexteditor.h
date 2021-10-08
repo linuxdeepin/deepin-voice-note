@@ -26,9 +26,6 @@
 #include <QObject>
 #include <QtWebChannel/QWebChannel>
 #include <QtWebEngineWidgets/QWebEngineView>
-#include <QWebEngineContextMenuData>
-#include <QOpenGLWidget>
-#include <QShortcut>
 
 struct VNoteItem;
 class VNoteRightMenu;
@@ -227,8 +224,6 @@ private:
     VNoteRightMenu *m_txtRightMenu {nullptr}; //文字右键菜单
 
     QScopedPointer<VNVoiceBlock> m_voiceBlock {nullptr}; //待另存的语音数据
-
-    QScopedPointer<QShortcut> m_stMenu; //Ctrl+m
 };
 
 #endif // WEBRICHTEXTEDITOR_H

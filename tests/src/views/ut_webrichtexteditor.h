@@ -25,6 +25,7 @@
 #include "gtest/gtest.h"
 #include <QTest>
 #include <QObject>
+#include <QWebEngineContextMenuData>
 
 class UT_WebRichTextEditor : public QObject
     , public ::testing::Test

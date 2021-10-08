@@ -70,6 +70,8 @@ protected:
     ExportError exportOneVoice(const QString &);
     //导出为HTML
     ExportError exportAsHtml();
+    //获取导出文件名，同名时创建副本
+    QString getExportFileName(const QString &baseName, const QString &fileSuffix);
 
     ExportType m_exportType {ExportNothing};
     QString m_exportPath {""};
