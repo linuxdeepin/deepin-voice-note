@@ -323,3 +323,7 @@
  .transparentColor {
      color: transparent!important;
  }
+
+ .backColorInhert {
+     background-color: inherit;
+ }

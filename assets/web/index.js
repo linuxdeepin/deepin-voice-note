@@ -455,7 +455,6 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsHideEditToolbar.connect(hideRightMenu);
         webobj.callJsClipboardDataChanged.connect(shearPlateChange);
         webobj.callJsSetVoicePlayBtnEnable.connect(playButColor);
-
         //通知QT层完成通信绑定
         webobj.jsCallChannleFinish();
         // 设置语言
@@ -559,7 +558,7 @@ function insertVoiceItem(text) {
     var str = '<p><br></p>' + tmpNode.innerHTML + '<p><br></p>';
 
     document.execCommand('insertHTML', false, str);
-    $('#summernote').summernote('editor.recordUndo')
+    // $('#summernote').summernote('editor.recordUndo')
 
     removeNullP()
     setFocusScroll()
@@ -721,12 +720,14 @@ function voicePlay(bIsPaly) {
  */
 function rightClick(e) {
     // isShowAir = false;
+    var testDiv = getSelectedRange();
+    let childrenLength = $(testDiv).children().length
+    let voiceLength = $(testDiv).find('.voiceBox').length
     if (e.which == 3) {
         $('.li').removeClass('active');
     }
     if (e.target.tagName == 'IMG') {
         let img = e.target
-        // img.focus();
         $('.note-editable ').blur()
         setSelectRange(img)
     } else if ($(e.target).hasClass('demo') || $(e.target).parents('.demo').length != 0) {
@@ -737,6 +738,19 @@ function rightClick(e) {
         }
         $('#summernote').summernote('airPopover.hide')
         setSelectRange($(e.target).parents('.voiceBox')[0])
+    } else if (voiceLength == childrenLength && childrenLength != 0) {
+        var selectionObj = window.getSelection();
+        var rangeObj = selectionObj.getRangeAt(0);
+        let div = document.createElement('div')
+        rangeObj.insertNode(div)
+        let $voice = $(div).next()
+        $voice.closest('.li').addClass('active')
+        if (bTransVoiceIsReady) {
+            activeTransVoice = $voice.closest('.li');
+        }
+        $('#summernote').summernote('airPopover.hide')
+        setSelectRange($voice.closest('.voiceBox')[0])
+        $(div).remove()
     }
     let info = isRangeVoice()
     webobj.jsCallPopupMenu(info.flag, info.info);
@@ -845,15 +859,6 @@ document.onkeydown = function (event) {
         }
     }
 
-}
-
-// 全选
-function selectAll() {
-    var sel = window.getSelection();
-    sel.removeAllRanges();
-    var range = document.createRange();
-    range.selectNodeContents(document.querySelector('.note-editable'));
-    sel.addRange(range);
 }
 
 // ctrl+b 添加记事本

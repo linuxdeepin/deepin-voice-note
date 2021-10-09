@@ -2821,6 +2821,7 @@
             }
             // Create new snapshot and push it to the end
             this.stack.push(this.makeSnapshot());
+            console.log(this.stack)
         };
         return History;
     }());
@@ -4116,6 +4117,7 @@
                     document.execCommand('foreColor', false, foreColor);
                 }
                 if (backColor) {
+                    console.log('backcolor')
                     document.execCommand('backColor', false, backColor);
                 }
             });
@@ -4548,9 +4550,13 @@
         Editor.prototype.fontStyling = function (target, value) {
             var rng = this.createRange();
             if (rng) {
+                // 字体大小
                 var spans = this.style.styleNodes(rng);
+                // 继承背景色
+                spans.forEach(item => {
+                    $(item).addClass('backColorInhert')
+                })
                 $$1(spans).css(target, value);
-                console.log(spans)
                 // [workaround] added styled bogus span for style
                 //  - also bogus character needed for cursor position
                 if (rng.isCollapsed()) {
@@ -6167,13 +6173,13 @@
                                 // $color.css(key, value);
                                 if (eventName == 'backColor') {
                                     $('.icon-backcolor .path6').css('color', value)
+                                    if (value == 'transparent') {
+                                        $('.icon-backcolor .path5').addClass('transparentColor')
+                                    } else {
+                                        $('.icon-backcolor .path5').removeClass('transparentColor')
+                                    }
                                 } else if (eventName == 'foreColor') {
                                     $('.icon-forecolor .path1').css('color', value)
-                                }
-                                if (value == 'transparent') {
-                                    $('.icon-backcolor .path5').addClass('transparentColor')
-                                } else {
-                                    $('.icon-backcolor .path5').removeClass('transparentColor')
                                 }
                                 $currentButton.attr('data-' + eventName, value);
                                 _this.context.invoke('editor.' + eventName, value);
