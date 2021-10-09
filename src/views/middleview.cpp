@@ -835,8 +835,11 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
                         //触发currentChanged信号，刷新详情页
                         setCurrentIndex(row);
                         selectionModel()->select(m_pSortViewFilter->index(row, 0), QItemSelectionModel::Select);
+                    } else {
+                        selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
+                        changeRightView();
                     }
-                    selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
+
                 }
                 //多选在上，shift+上
                 else {
@@ -871,8 +874,10 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
                         //触发currentChanged信号，刷新详情页
                         setCurrentIndex(row);
                         selectionModel()->select(m_pSortViewFilter->index(row, 0), QItemSelectionModel::Select);
+                    } else {
+                        selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
+                        changeRightView();
                     }
-                    selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
                 }
                 //多选在下，shift+下
                 else {
