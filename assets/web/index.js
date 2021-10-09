@@ -455,7 +455,6 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsHideEditToolbar.connect(hideRightMenu);
         webobj.callJsClipboardDataChanged.connect(shearPlateChange);
         webobj.callJsSetVoicePlayBtnEnable.connect(playButColor);
-        webobj.callJsSelectAll.connect(selectAll);
 
         //通知QT层完成通信绑定
         webobj.jsCallChannleFinish();
@@ -833,10 +832,6 @@ document.onkeydown = function (event) {
     } else if (event.ctrlKey && window.event.keyCode == 86) {
         // ctrl+v
         webobj.jsCallPaste(returnCopyFlag())
-        return false;
-    } else if (event.ctrlKey && window.event.keyCode == 65) {
-        // ctrl+a
-        selectAll()
         return false;
     } else if (window.event.keyCode == 8) {
         // backspace

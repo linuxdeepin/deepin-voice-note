@@ -316,10 +316,12 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
         break;
     case ActionManager::VoiceSelectAll:
     case ActionManager::PictureSelectAll:
-    case ActionManager::TxtSelectAll:
-        //直接调用web端的全选事件
-        emit JsContent::instance()->callJsSelectAll();
+    case ActionManager::TxtSelectAll: {
+        //模拟全选快捷键ctrl+A
+        QKeyEvent event(QEvent::KeyPress, Qt::Key_A, Qt::ControlModifier);
+        QApplication::sendEvent(focusProxy(), &event);
         break;
+    }
     case ActionManager::VoiceCopy:
     case ActionManager::PictureCopy:
     case ActionManager::TxtCopy:
