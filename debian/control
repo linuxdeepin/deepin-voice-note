@@ -6,7 +6,6 @@ Build-Depends:
  debhelper (>= 11),
  cmake,
  qttools5-dev-tools,
- libutf8proc-dev,
  qtbase5-dev,
  pkg-config,
  libsqlite3-dev,
@@ -20,6 +19,7 @@ Build-Depends:
  libgstreamer1.0-dev,
  libvlc-dev,
  libvlccore-dev,
+ libdw-dev,
  libgtest-dev
 Standards-Version: 4.1.3
 Homepage: <insert the upstream URL, if relevant>
