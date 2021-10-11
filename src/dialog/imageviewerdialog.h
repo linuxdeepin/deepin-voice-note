@@ -63,6 +63,8 @@ private:
 private:
     DLabel *m_imgLabel = nullptr; //图片显示控件
     DDialogCloseButton *m_closeButton; //关闭按钮控件
+    int m_imgWidth = 0; //图片实际宽度
+    int m_imgHeight = 0; //图片实际高度
 };
 
 #endif // DEEPIN_MANUAL_VIEW_WIDGETS_IMAGE_VIEWER_H
