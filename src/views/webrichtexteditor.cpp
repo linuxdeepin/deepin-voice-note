@@ -41,7 +41,6 @@
 #include <QApplication>
 #include <QStandardPaths>
 #include <QThreadPool>
-#include <QDesktopWidget>
 
 static const char webPage[] = WEB_PATH "/index.html";
 
@@ -511,7 +510,7 @@ void WebRichTextEditor::contextMenuEvent(QContextMenuEvent *e)
         //文字菜单
         showTxtMenu(globalPos);
         //显示编辑工具栏
-        onShowEditToolbar(pos);
+        onShowEditToolbar(mapFromGlobal(m_txtRightMenu->pos()));
         break;
     default:
         break;
@@ -592,14 +591,8 @@ void WebRichTextEditor::onShowEditToolbar(const QPoint &pos)
     if (menuPoint.y() < 100) { //工具栏显示在右键菜单下方
         menuPoint.setY(menuPoint.y() + 15 + m_txtRightMenu->height());
     } else {
-        int maxHeight = QApplication::desktop()->availableGeometry().height();
-        //窗口无法显示右键菜单时，菜单会自动调整左下角坐标=鼠标位置，工具栏显示在右键菜单上方
-        if (mapToGlobal(menuPoint).y() + m_txtRightMenu->height() > maxHeight) {
-            menuPoint.setY(menuPoint.y() - m_txtRightMenu->height() - 45);
-        } else {
-            //窗无口正常显示右键菜单时，菜单左上角坐标=鼠标位置，工具栏显示在右键菜单上方
-            menuPoint.setY(menuPoint.y() - 45);
-        }
+        //窗无口正常显示右键菜单时，菜单左上角坐标=鼠标位置，工具栏显示在右键菜单上方
+        menuPoint.setY(menuPoint.y() - 45);
     }
     //记录编辑工具栏的坐标位置
     m_editToolbarRect = QRect(menuPoint, QPoint(menuPoint.x() + 290, menuPoint.y() + 35));
