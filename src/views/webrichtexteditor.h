@@ -152,6 +152,7 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragLeaveEvent(QDragLeaveEvent *event) override;
     void dragMoveEvent(QDragMoveEvent *e) override;
+    bool eventFilter(QObject *o, QEvent *e) override;
 
 private:
     /**
@@ -217,6 +218,7 @@ private:
     QVariant m_menuJson = {};
     ImageViewerDialog *imgView {nullptr}; //
     QRect m_editToolbarRect; //编辑工具栏坐标
+    QPoint m_mouseClickPos {-1, -1}; //鼠标点击位置
 
     //右键菜单
     VNoteRightMenu *m_pictureRightMenu {nullptr}; //图片右键菜单

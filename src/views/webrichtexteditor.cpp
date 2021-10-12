@@ -69,7 +69,6 @@ void WebRichTextEditor::initWebView()
     page()->setWebChannel(channel);
     QFileInfo info(webPage);
     load(QUrl::fromLocalFile(info.absoluteFilePath()));
-    this->installEventFilter(this);
     page()->setBackgroundColor(DGuiApplicationHelper::instance()->applicationPalette().base().color());
 
     connect(content, &JsContent::textChange, this, &WebRichTextEditor::onTextChange);
@@ -80,6 +79,10 @@ void WebRichTextEditor::initWebView()
     connect(content, &JsContent::viewPictrue, this, &WebRichTextEditor::viewPicture);
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
             this, &WebRichTextEditor::onThemeChanged);
+
+    if (nullptr != focusProxy()) {
+        focusProxy()->installEventFilter(this);
+    }
 }
 
 void WebRichTextEditor::initRightMenu()
@@ -112,6 +115,8 @@ void WebRichTextEditor::initUpdateTimer()
 
 void WebRichTextEditor::initData(VNoteItem *data, const QString &reg, bool focus)
 {
+    //重置鼠标点击位置
+    m_mouseClickPos = QPoint(-1, -1);
     //富文本设置异步操作，解决笔记列表不实时刷新
     QTimer::singleShot(0, this, [=] {
         setData(data, reg);
@@ -654,8 +659,31 @@ void WebRichTextEditor::shortcutPopupMenu()
     if (2 == param.size()) {
         m_menuType = static_cast<Menu>(param["flag"].toInt());
         m_menuJson = param["info"];
-        //模拟发送菜单键事件
-        QKeyEvent event(QEvent::KeyPress, Qt::Key_Menu, Qt::NoModifier);
-        QApplication::sendEvent(focusProxy(), &event);
+        //根据光标位置显示菜单
+        if (m_mouseClickPos.x() < 0 || TxtMenu == m_menuType) {
+            //模拟发送菜单键事件
+            QKeyEvent event(QEvent::KeyPress, Qt::Key_Menu, Qt::NoModifier);
+            QApplication::sendEvent(focusProxy(), &event);
+            return;
+        }
+        //语音与图片菜单，根据鼠标选中图片或语音时的位置显示菜单
+        if (VoiceMenu == m_menuType) {
+            showVoiceMenu(m_mouseClickPos);
+        } else if (PictureMenu == m_menuType) {
+            showPictureMenu(m_mouseClickPos);
+        }
     }
+}
+
+bool WebRichTextEditor::eventFilter(QObject *o, QEvent *e)
+{
+    if (o == focusProxy()) {
+        if (e->type() == QEvent::MouseButtonRelease) {
+            QMouseEvent *event = dynamic_cast<QMouseEvent *>(e);
+            if (event) {
+                m_mouseClickPos = event->globalPos();
+            }
+        }
+    }
+    return QWebEngineView::eventFilter(o, e);
 }
