@@ -382,6 +382,8 @@ void VNoteMainWindow::initTitleBar()
 
     DWindowCloseButton *closeBtn = titlebar()->findChild<DWindowCloseButton *>("DTitlebarDWindowCloseButton");
     closeBtn->installEventFilter(this);
+    //改变标题栏焦点策略，解决键盘交互第一次显示"关于"窗口后ESC关闭窗口菜单按钮无焦点
+    titlebar()->setFocusPolicy(Qt::ClickFocus);
 }
 
 /**
