@@ -1734,7 +1734,6 @@ void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
 
     m_asrErrMeassage->setMessage(strMessage);
     m_asrErrMeassage->setVisible(true);
-    m_asrErrMeassage->setMinimumWidth(520);
     m_asrErrMeassage->setMinimumHeight(60);
     m_asrErrMeassage->setMaximumWidth(m_centerWidget->width());
     m_asrErrMeassage->adjustSize();
@@ -2316,6 +2315,10 @@ void VNoteMainWindow::onWebVoicePlay(const QVariant &json, bool bIsSame)
     if (!QFile::exists(m_currentPlayVoice->voicePath)) {
         //异步提示，防止阻塞前端事件
         QTimer::singleShot(0, this, [this] {
+            //正在播放时，停止播放
+            if (stateOperation->isPlaying()) {
+                m_recordBar->stopPlay();
+            }
             //弹出提示
             VNoteMessageDialog audioOutLimit(VNoteMessageDialog::VoicePathNoAvail);
             audioOutLimit.exec();

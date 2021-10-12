@@ -324,3 +324,8 @@ void VNoteRecordBar::onChangeTheme()
     palette.setColor(DPalette::Disabled, DPalette::Highlight, highColor);
     m_recordBtn->setPalette(palette);
 }
+
+void VNoteRecordBar::stopPlay()
+{
+    m_playPanel->onCloseBtnClicked();
+}

@@ -115,16 +115,12 @@ void FileCleanupWorker::fillPictureSet()
 /**
  * @brief FileCleanupWorker::scanAllNotes
  * 遍历所有的笔记
- * 添加遍历结果返回值防止因未成功加载数据库数据而产生误删
  * @return true: 遍历成功， false: 遍历失败
  */
 bool FileCleanupWorker::scanAllNotes()
 {
     //遍历笔记
     QList<VNOTE_ITEMS_MAP *> voiceItems = m_qspAllNotesMap->notes.values();
-    if (voiceItems.size() == 0) {
-        return false;
-    }
     for (VNOTE_ITEMS_MAP *voiceItem : voiceItems) {
         QList<VNoteItem *> notes = voiceItem->folderNotes.values();
         for (VNoteItem *note : notes) {

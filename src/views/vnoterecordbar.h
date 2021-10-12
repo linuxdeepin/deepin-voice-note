@@ -48,6 +48,8 @@ public:
      * @param bIsSame :此次播放的语音是否与上一次操作的语音相同
      */
     void playVoice(VNVoiceBlock *voiceData, bool bIsSame);
+    //停止播放
+    void stopPlay();
 
 private:
     //初始化设备检测
