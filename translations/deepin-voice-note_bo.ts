@@ -167,12 +167,12 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="310"/>
         <source>View</source>
-        <translation type="unfinished"/>
+        <translation>བཤར་ལྟ།</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="316"/>
         <source>Save as</source>
-        <translation type="unfinished"/>
+        <translation>གཞན་ཉར།</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="342"/>
@@ -242,7 +242,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="200"/>
         <source>Save as HTML</source>
-        <translation type="unfinished"/>
+        <translation>HTMLལ་ཉར་ཚགས་བྱེད་པ།</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="205"/>
@@ -251,7 +251,7 @@
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="359"/>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="361"/>
         <source>Save note</source>
-        <translation type="unfinished"/>
+        <translation>ཟིན་བྲིས་ཉར་ཚགས།</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="251"/>
@@ -346,7 +346,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="931"/>
         <source>Save note</source>
-        <translation type="unfinished"/>
+        <translation>ཟིན་བྲིས་ཉར་ཚགས།</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="932"/>
@@ -471,12 +471,12 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="864"/>
         <source>The voice conversion failed due to the poor network connection, please have a check</source>
-        <translation type="unfinished"/>
+        <translation>ད་ལྟ་དྲ་བ་ཡག་པོ་མེད་པས། སྐད་སྒྲས་འབྲི་མི་ཐུབ། དྲ་བ་ཤར་བགྲོད་ཡོང་བ་བྱེད་རོགས།</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="868"/>
         <source>Voice to text conversion failed</source>
-        <translation type="unfinished"/>
+        <translation>སྒྲ་ཡི་གེར་སྒྱུར་མི་ཐུབ།</translation>
     </message>
 </context>
 <context>
@@ -563,12 +563,12 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="162"/>
         <source>Save failed</source>
-        <translation type="unfinished"/>
+        <translation>ཉར་ཚགས་བྱེད་མི་ཐུབ།</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="166"/>
         <source>You do not have permission to save files there</source>
-        <translation type="unfinished"/>
+        <translation>ཁྱེད་ལ་ཡིག་ཆ་འདི་རིགས་འདིར་ཉར་དབང་མེད།</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="170"/>
@@ -602,57 +602,57 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/common/jscontent.cpp" line="138"/>
         <source>Font size</source>
-        <translation type="unfinished"/>
+        <translation>ཡིག་གཟུགས་ཆེ་ཆུང་།</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="139"/>
         <source>Font color</source>
-        <translation type="unfinished"/>
+        <translation>ཡི་གེའི་ཚོས་གཞི།</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="140"/>
         <source>Text highlight color</source>
-        <translation type="unfinished"/>
+        <translation>རྒྱབ་ལྗོངས་ཚོས་གཞི།</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="141"/>
         <source>Bold</source>
-        <translation type="unfinished"/>
+        <translation>སྦོམ་དུ་གཏོང་བ།</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="142"/>
         <source>Italic</source>
-        <translation type="unfinished"/>
+        <translation>གསེག་པ།</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="143"/>
         <source>Underline</source>
-        <translation type="unfinished"/>
+        <translation>འོག་ཐིག</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="144"/>
         <source>Strikethrough</source>
-        <translation type="unfinished"/>
+        <translation>བསུབ་ཐིག</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="145"/>
         <source>Bullets</source>
-        <translation type="unfinished"/>
+        <translation>གོ་རིམ་མེད་པའི་རེའུ་མིག</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="146"/>
         <source>Numbering</source>
-        <translation type="unfinished"/>
+        <translation>གོ་རིམ་ལྡན་པའི་རེའུ་མིག</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="147"/>
         <source>More colors</source>
-        <translation type="unfinished"/>
+        <translation>དེ་བས་མང་བའི་ཚོས་གཞི།</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="148"/>
         <source>Recent</source>
-        <translation type="unfinished"/>
+        <translation>ཉེ་དུས་བེད་སྤྱོད་བྱས་པ།</translation>
     </message>
 </context>
 </TS>

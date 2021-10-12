@@ -167,12 +167,12 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="310"/>
         <source>View</source>
-        <translation type="unfinished"/>
+        <translation>كۆرۈش</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="316"/>
         <source>Save as</source>
-        <translation type="unfinished"/>
+        <translation>باشقا ساقلاش</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="342"/>
@@ -242,7 +242,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="200"/>
         <source>Save as HTML</source>
-        <translation type="unfinished"/>
+        <translation>HTML شەكلىدە ساقلاش</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="205"/>
@@ -251,7 +251,7 @@
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="359"/>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="361"/>
         <source>Save note</source>
-        <translation type="unfinished"/>
+        <translation>خاتىرىنى ساقلاش</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="251"/>
@@ -346,7 +346,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="931"/>
         <source>Save note</source>
-        <translation type="unfinished"/>
+        <translation>خاتىرىنى ساقلاش</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="932"/>
@@ -471,12 +471,12 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="864"/>
         <source>The voice conversion failed due to the poor network connection, please have a check</source>
-        <translation type="unfinished"/>
+        <translation>نۆۋەتتىكى تور ھالىتى ناچار بولغاچقا، ئاۋازنى تېكىستكە ئايلاندۇرۇش مەغلۇپ بولدى. تورنىڭ راۋانلىقىغا كاپالەتلىك قىلىڭ</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="868"/>
         <source>Voice to text conversion failed</source>
-        <translation type="unfinished"/>
+        <translation>ئاۋازنى تېكىستكە ئايلاندۇرۇش مەغلۇپ بولدى</translation>
     </message>
 </context>
 <context>
@@ -563,12 +563,12 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="162"/>
         <source>Save failed</source>
-        <translation type="unfinished"/>
+        <translation>ساقلىيالمىدى</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="166"/>
         <source>You do not have permission to save files there</source>
-        <translation type="unfinished"/>
+        <translation>سىزنىڭ بۇ ئورۇنغا بۇ تۈردىكى ھۆججەت ساقلاش ھوقۇقىڭىز يوق</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="170"/>
@@ -602,57 +602,57 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/common/jscontent.cpp" line="138"/>
         <source>Font size</source>
-        <translation type="unfinished"/>
+        <translation>خەت رازمېرى</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="139"/>
         <source>Font color</source>
-        <translation type="unfinished"/>
+        <translation>خەت شەكلىنىڭ رەڭگى</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="140"/>
         <source>Text highlight color</source>
-        <translation type="unfinished"/>
+        <translation>ئارقا كۆرۈنۈش رەڭگى</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="141"/>
         <source>Bold</source>
-        <translation type="unfinished"/>
+        <translation>توم</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="142"/>
         <source>Italic</source>
-        <translation type="unfinished"/>
+        <translation>يانتۇ</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="143"/>
         <source>Underline</source>
-        <translation type="unfinished"/>
+        <translation>ئاستى سىزىق</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="144"/>
         <source>Strikethrough</source>
-        <translation type="unfinished"/>
+        <translation>ئۆچۈرۈش سىزىقى</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="145"/>
         <source>Bullets</source>
-        <translation type="unfinished"/>
+        <translation>تەرتىپسىز جەدۋەل</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="146"/>
         <source>Numbering</source>
-        <translation type="unfinished"/>
+        <translation>تەرتىپلىك جەدۋەل</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="147"/>
         <source>More colors</source>
-        <translation type="unfinished"/>
+        <translation>تېخىمۇ كۆپ رەڭ</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="148"/>
         <source>Recent</source>
-        <translation type="unfinished"/>
+        <translation>يېقىنقىلىرى</translation>
     </message>
 </context>
 </TS>

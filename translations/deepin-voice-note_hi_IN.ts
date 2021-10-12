@@ -167,12 +167,12 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="310"/>
         <source>View</source>
-        <translation type="unfinished"/>
+        <translation>देखें</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="316"/>
         <source>Save as</source>
-        <translation type="unfinished"/>
+        <translation>इस रूप में संचित करें</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="342"/>
@@ -242,7 +242,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="200"/>
         <source>Save as HTML</source>
-        <translation type="unfinished"/>
+        <translation>एचटीएमएल के रूप में संचित करें</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="205"/>
@@ -251,7 +251,7 @@
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="359"/>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="361"/>
         <source>Save note</source>
-        <translation type="unfinished"/>
+        <translation>नोट संचित करें</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="251"/>
@@ -346,7 +346,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="931"/>
         <source>Save note</source>
-        <translation type="unfinished"/>
+        <translation>नोट संचित करें</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="932"/>
@@ -471,12 +471,12 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="864"/>
         <source>The voice conversion failed due to the poor network connection, please have a check</source>
-        <translation type="unfinished"/>
+        <translation>नेटवर्क धीमा होने के कारण वाणी रूपांतरण विफल रहा, कृपया इसे जाँचें</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="868"/>
         <source>Voice to text conversion failed</source>
-        <translation type="unfinished"/>
+        <translation>वाणी से टेक्स्ट रूपांतरण विफल रहा</translation>
     </message>
 </context>
 <context>
@@ -563,12 +563,12 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="162"/>
         <source>Save failed</source>
-        <translation type="unfinished"/>
+        <translation>संचित करना विफल</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="166"/>
         <source>You do not have permission to save files there</source>
-        <translation type="unfinished"/>
+        <translation>आपके पास उस स्थान पर फाइल संचय हेतु अनुमति नहीं है</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="170"/>
@@ -602,57 +602,57 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/common/jscontent.cpp" line="138"/>
         <source>Font size</source>
-        <translation type="unfinished"/>
+        <translation>मुद्रलिपि आकार</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="139"/>
         <source>Font color</source>
-        <translation type="unfinished"/>
+        <translation>मुद्रलिपि रंग</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="140"/>
         <source>Text highlight color</source>
-        <translation type="unfinished"/>
+        <translation>चिन्हित टेक्स्ट का रंग</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="141"/>
         <source>Bold</source>
-        <translation type="unfinished"/>
+        <translation>मोटे शब्द</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="142"/>
         <source>Italic</source>
-        <translation type="unfinished"/>
+        <translation>तिरछे शब्द</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="143"/>
         <source>Underline</source>
-        <translation type="unfinished"/>
+        <translation>रेखांकित शब्द</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="144"/>
         <source>Strikethrough</source>
-        <translation type="unfinished"/>
+        <translation>मध्य से रेखांखित शब्द</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="145"/>
         <source>Bullets</source>
-        <translation type="unfinished"/>
+        <translation>बिंदु अनुक्रमित सूची</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="146"/>
         <source>Numbering</source>
-        <translation type="unfinished"/>
+        <translation>अंक अनुक्रमित सूची</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="147"/>
         <source>More colors</source>
-        <translation type="unfinished"/>
+        <translation>अधिक रंग</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="148"/>
         <source>Recent</source>
-        <translation type="unfinished"/>
+        <translation>हालिया</translation>
     </message>
 </context>
 </TS>
