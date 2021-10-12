@@ -2821,7 +2821,6 @@
             }
             // Create new snapshot and push it to the end
             this.stack.push(this.makeSnapshot());
-            console.log(this.stack)
         };
         return History;
     }());
@@ -3314,6 +3313,14 @@
                     li.innerHTML = '<br>'
                     $(splitRoot).closest('li').after(li)
                     nextPara = li;
+                } else if (splitRoot.tagName == 'LI' && $(splitRoot).find('.voiceBox').length) {
+                    var selectionObj = window.getSelection();
+                    var rangeObj = selectionObj.getRangeAt(0);
+                    let p = document.createElement('p')
+                    p.innerHTML = '<br>'
+                    rangeObj.insertNode(p)
+                    setFocus(p, 0)
+                    return;
                 }
                 else {
                     nextPara = dom.splitTree(splitRoot, rng.getStartPoint());
@@ -3940,8 +3947,9 @@
                         if (sCmd == "foreColor") {
                             document.execCommand('styleWithCSS', false, true);
                             document.execCommand('foreColor', false, value);
+                        } else if (sCmd == 'backColor') {
+                            document.execCommand("backColor", false, value == 'transparent' ? 'inherit' : value);
                         } else {
-
                             document.execCommand(sCmd, false, value);
                         }
 
@@ -4117,8 +4125,7 @@
                     document.execCommand('foreColor', false, foreColor);
                 }
                 if (backColor) {
-                    console.log('backcolor')
-                    document.execCommand('backColor', false, backColor);
+                    document.execCommand("backColor", false, backColor == 'transparent' ? 'inherit' : backColor);
                 }
             });
             /**
@@ -7735,54 +7742,54 @@
                     // 'CTRL+B': 'bold',
                     // 'CTRL+I': 'italic',
                     // 'CTRL+U': 'underline',
-                    'CTRL+SHIFT+S': 'strikethrough',
+                    // 'CTRL+SHIFT+S': 'strikethrough',
                     'CTRL+BACKSLASH': 'removeFormat',
-                    'CTRL+SHIFT+L': 'justifyLeft',
-                    'CTRL+SHIFT+E': 'justifyCenter',
-                    'CTRL+SHIFT+R': 'justifyRight',
-                    'CTRL+SHIFT+J': 'justifyFull',
+                    // 'CTRL+SHIFT+L': 'justifyLeft',
+                    // 'CTRL+SHIFT+E': 'justifyCenter',
+                    // 'CTRL+SHIFT+R': 'justifyRight',
+                    // 'CTRL+SHIFT+J': 'justifyFull',
                     'CTRL+SHIFT+NUM7': 'insertUnorderedList',
                     'CTRL+SHIFT+NUM8': 'insertOrderedList',
                     'CTRL+LEFTBRACKET': 'outdent',
                     'CTRL+RIGHTBRACKET': 'indent',
-                    'CTRL+NUM0': 'formatPara',
-                    'CTRL+NUM1': 'formatH1',
-                    'CTRL+NUM2': 'formatH2',
-                    'CTRL+NUM3': 'formatH3',
-                    'CTRL+NUM4': 'formatH4',
-                    'CTRL+NUM5': 'formatH5',
-                    'CTRL+NUM6': 'formatH6',
-                    'CTRL+ENTER': 'insertHorizontalRule',
-                    'CTRL+K': 'linkDialog.show'
+                    // 'CTRL+NUM0': 'formatPara',
+                    // 'CTRL+NUM1': 'formatH1',
+                    // 'CTRL+NUM2': 'formatH2',
+                    // 'CTRL+NUM3': 'formatH3',
+                    // 'CTRL+NUM4': 'formatH4',
+                    // 'CTRL+NUM5': 'formatH5',
+                    // 'CTRL+NUM6': 'formatH6',
+                    // 'CTRL+ENTER': 'insertHorizontalRule',
+                    // 'CTRL+K': 'linkDialog.show'
                 },
                 mac: {
-                    'ENTER': 'insertParagraph',
-                    'CMD+Z': 'undo',
-                    'CMD+SHIFT+Z': 'redo',
-                    'TAB': 'tab',
-                    'SHIFT+TAB': 'untab',
+                    // 'ENTER': 'insertParagraph',
+                    // 'CMD+Z': 'undo',
+                    // 'CMD+SHIFT+Z': 'redo',
+                    // 'TAB': 'tab',
+                    // 'SHIFT+TAB': 'untab',
                     // 'CMD+B': 'bold',
                     // 'CMD+I': 'italic',
                     // 'CMD+U': 'underline',
-                    'CMD+SHIFT+S': 'strikethrough',
-                    'CMD+BACKSLASH': 'removeFormat',
-                    'CMD+SHIFT+L': 'justifyLeft',
-                    'CMD+SHIFT+E': 'justifyCenter',
-                    'CMD+SHIFT+R': 'justifyRight',
-                    'CMD+SHIFT+J': 'justifyFull',
-                    'CMD+SHIFT+NUM7': 'insertUnorderedList',
-                    'CMD+SHIFT+NUM8': 'insertOrderedList',
-                    'CMD+LEFTBRACKET': 'outdent',
-                    'CMD+RIGHTBRACKET': 'indent',
-                    'CMD+NUM0': 'formatPara',
-                    'CMD+NUM1': 'formatH1',
-                    'CMD+NUM2': 'formatH2',
-                    'CMD+NUM3': 'formatH3',
-                    'CMD+NUM4': 'formatH4',
-                    'CMD+NUM5': 'formatH5',
-                    'CMD+NUM6': 'formatH6',
-                    'CMD+ENTER': 'insertHorizontalRule',
-                    'CMD+K': 'linkDialog.show'
+                    // 'CMD+SHIFT+S': 'strikethrough',
+                    // 'CMD+BACKSLASH': 'removeFormat',
+                    // 'CMD+SHIFT+L': 'justifyLeft',
+                    // 'CMD+SHIFT+E': 'justifyCenter',
+                    // 'CMD+SHIFT+R': 'justifyRight',
+                    // 'CMD+SHIFT+J': 'justifyFull',
+                    // 'CMD+SHIFT+NUM7': 'insertUnorderedList',
+                    // 'CMD+SHIFT+NUM8': 'insertOrderedList',
+                    // 'CMD+LEFTBRACKET': 'outdent',
+                    // 'CMD+RIGHTBRACKET': 'indent',
+                    // 'CMD+NUM0': 'formatPara',
+                    // 'CMD+NUM1': 'formatH1',
+                    // 'CMD+NUM2': 'formatH2',
+                    // 'CMD+NUM3': 'formatH3',
+                    // 'CMD+NUM4': 'formatH4',
+                    // 'CMD+NUM5': 'formatH5',
+                    // 'CMD+NUM6': 'formatH6',
+                    // 'CMD+ENTER': 'insertHorizontalRule',
+                    // 'CMD+K': 'linkDialog.show'
                 }
             },
             icons: {

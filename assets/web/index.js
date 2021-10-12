@@ -594,8 +594,8 @@ function toggleState(state) {
         voicePlay(false);
     }
     else {
-        activeVoice.removeClass('pause').addClass('play');
-        activeVoice.removeClass('now');
+        $('.voicebtn').removeClass('pause').addClass('play');
+        $('.voicebtn').removeClass('now');
         activeVoice = null;
         voicePlay(false);
     }
