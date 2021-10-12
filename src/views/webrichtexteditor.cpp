@@ -181,6 +181,8 @@ void WebRichTextEditor::unboundCurrentNoteData()
 {
     //停止更新定时器
     m_updateTimer->stop();
+    //手动更新
+    updateNote();
     //绑定数据设置为空
     m_noteData = nullptr;
 }

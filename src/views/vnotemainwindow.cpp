@@ -1310,7 +1310,8 @@ void VNoteMainWindow::addNotepad()
             newFolder->sortNumber = tmpFolder->sortNumber + 1;
             sortEnable = true;
         }
-
+        //添加记事本，解绑详情页数据
+        m_richTextEdit->unboundCurrentNoteData();
         m_leftView->addFolder(newFolder);
         m_leftView->sort();
 
@@ -1384,7 +1385,8 @@ void VNoteMainWindow::addNote()
 
         //Refresh the notes count of folder
         m_leftView->update(m_leftView->currentIndex());
-        m_richTextEdit->updateNote();
+        //解绑详情页绑定的笔记数据
+        m_richTextEdit->unboundCurrentNoteData();
         m_middleView->addRowAtHead(newNote);
     }
 }
