@@ -3949,7 +3949,10 @@
                             document.execCommand('foreColor', false, value);
                         } else if (sCmd == 'backColor') {
                             document.execCommand("backColor", false, value == 'transparent' ? 'inherit' : value);
-                        } else {
+                        } else if (sCmd == 'strikethrough' || sCmd == 'underline') {
+                            document.execCommand(sCmd, false);
+                        }
+                        else {
                             document.execCommand(sCmd, false, value);
                         }
 
@@ -6174,9 +6177,7 @@
 
                                 var $color = $button.closest('.note-color').find('.note-recent-color');
                                 var $currentButton = $button.closest('.note-color').find('.note-current-color-button');
-
-                                $button.parents('.note-color-palette').find('.note-color-btn').removeClass('selectColor')
-                                $button.addClass('selectColor')
+                                setSelectColorButton($button)
                                 // $color.css(key, value);
                                 if (eventName == 'backColor') {
                                     $('.icon-backcolor .path6').css('color', value)

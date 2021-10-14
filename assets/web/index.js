@@ -301,16 +301,6 @@ function copyVoice(event) {
         removeUlOl()
         // 主动触发change事件
         changeContent()
-
-    }
-    else if (event.type == 'cut' && getSelectedRange().innerHTML == document.querySelector('.note-editable').innerHTML) {
-        // 记录之前数据
-        $('#summernote').summernote('editor.recordUndo')
-        rangeObj.deleteContents()
-        // 主动触发change事件
-        changeContent()
-        event.preventDefault()
-        isVoicePaste = true
     }
     formatHtml = testDiv.innerHTML;
     if ($(testDiv).children().length == 1 && $(testDiv).children()[0].tagName != 'UL' && $(testDiv).find('.voiceBox').length != 0) {
@@ -343,6 +333,7 @@ function returnCopyFlag() {
 
 // 粘贴
 document.addEventListener('paste', function (event) {
+    console.log('paste')
     if (formatHtml != "" && isVoicePaste) {
         document.execCommand('insertHTML', false, formatHtml + "<p><br></p>");
         event.preventDefault()
@@ -361,6 +352,23 @@ function setFocusScroll() {
     }
 }
 
+// 记录当前选中语音
+function recordActiveVoice() {
+    var selectionObj = window.getSelection();
+    var rangeObj = selectionObj.getRangeAt(0);
+    let div = document.createElement('div')
+    rangeObj.insertNode(div)
+    let $voice = $(div).next()
+    $voice.closest('.li').addClass('active')
+    if (bTransVoiceIsReady) {
+        activeTransVoice = $voice.closest('.li');
+    }
+    $('#summernote').summernote('airPopover.hide')
+    setSelectRange($voice.closest('.voiceBox')[0])
+    $(div).remove()
+}
+
+
 /**
  * 判断选区类别
  * @date 2021-09-06
@@ -378,6 +386,7 @@ function isRangeVoice() {
     if (voiceLength == childrenLength && childrenLength != 0) {
         selectedRange.flag = 1
         selectedRange.info = $(testDiv).find('.voiceBox:first').attr('jsonKey')
+        recordActiveVoice()
     } else if ($(testDiv).find('img').length == childrenLength
         && childrenLength == 1
         && $(testDiv).find('img').parent()[0].childNodes.length == 1) {
@@ -531,10 +540,10 @@ function initData(text) {
  */
 function playButColor(status) {
     if (!status) {
-        setVoiceButColor(global_disableColor)
+        setVoiceButColor(global_disableColor, global_disableColor)
 
     } else {
-        setVoiceButColor(global_activeColor)
+        setVoiceButColor(global_activeColor, global_disableColor)
     }
 }
 
@@ -739,18 +748,7 @@ function rightClick(e) {
         $('#summernote').summernote('airPopover.hide')
         setSelectRange($(e.target).parents('.voiceBox')[0])
     } else if (voiceLength == childrenLength && childrenLength != 0) {
-        var selectionObj = window.getSelection();
-        var rangeObj = selectionObj.getRangeAt(0);
-        let div = document.createElement('div')
-        rangeObj.insertNode(div)
-        let $voice = $(div).next()
-        $voice.closest('.li').addClass('active')
-        if (bTransVoiceIsReady) {
-            activeTransVoice = $voice.closest('.li');
-        }
-        $('#summernote').summernote('airPopover.hide')
-        setSelectRange($voice.closest('.voiceBox')[0])
-        $(div).remove()
+        recordActiveVoice()
     }
     let info = isRangeVoice()
     webobj.jsCallPopupMenu(info.flag, info.info);
@@ -771,6 +769,9 @@ function setVoiceButColor(color, shdow) {
         background-color:${color};
         box-shadow: 0px 4px 6px 0px ${shdow}80; 
     } 
+    ::selection {
+        background: ${color}!important;
+    }
     .btn-default.active i {
         color:${color}!important
     }
@@ -783,6 +784,9 @@ function setVoiceButColor(color, shdow) {
     .selectColor {
         box-shadow: 0 0 0 1.5px ${color};
     }
+    .active {
+        background: ${color}80!important;
+    }
     `)
 }
 
@@ -793,6 +797,7 @@ function setVoiceButColor(color, shdow) {
  * @returns {any}
  */
 function changeColor(flag, activeColor, disableColor) {
+    console.log(flag)
     global_theme = flag
     global_activeColor = activeColor
     global_disableColor = disableColor
@@ -852,6 +857,10 @@ document.onkeydown = function (event) {
         if (getSelectedRange().innerHTML == document.querySelector('.note-editable').innerHTML) {
             $('.note-editable').html('<p><br></p>')
         }
+    } else if (event.ctrlKey && window.event.keyCode == 65) {
+        // ctrl+a
+        // 去除语音选中样式
+        $('.li').removeClass('active');
     } else if (window.event.keyCode == 46) {
         // delete
         if (getSelectedRange().innerHTML == document.querySelector('.note-editable').innerHTML) {
@@ -935,3 +944,14 @@ function setFocusColor(flag) {
 function returnCopyFlag() {
     return isVoicePaste
 }
+
+// 当前选中颜色active
+function setSelectColorButton($dom) {
+    $dom.parents('.note-color-palette').find('.note-color-btn').removeClass('selectColor')
+    $dom.addClass('selectColor')
+}
+
+// 默认选中
+setSelectColorButton($('[data-value="#414D68"]'))
+setSelectColorButton($('[data-value="transparent"]'))
+$('.icon-backcolor .path5').addClass('transparentColor')

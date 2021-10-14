@@ -33,7 +33,7 @@ body {
 }
 
 .active {
-    background: rgba(0, 129, 255, 0.5)!important;
+    background: rgba(0, 129, 255, 0.5);
 }
 
 .voicebtn {
@@ -94,24 +94,9 @@ body {
     line-height: 12px;
 }
 
-.demo::selection {
+.demo::selection, .lf::selection, .title::selection, .minute::selection, .time::selection {
     background: transparent!important;
-}
-
-.lf::selection {
-    background: transparent!important;
-}
-
-.title::selection {
-    background: transparent!important;
-}
-
-.minute::selection {
-    background: transparent!important;
-}
-
-.time::selection {
-    background: transparent!important;
+    color: inherit;
 }
 
 /* 字体大小固定 */
@@ -198,4 +183,8 @@ body {
 .noselect {
     user-select: none;
     padding: 5px 20px 10px 20px;
+}
+
+::selection {
+    color: #fff;
 }
