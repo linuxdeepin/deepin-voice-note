@@ -28,6 +28,8 @@
 #include <QDir>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QClipboard>
+#include <QMimeData>
 
 #include <DApplication>
 
@@ -44,6 +46,7 @@ JsContent *JsContent::instance()
 {
     if (jsContentInstance == nullptr) {
         jsContentInstance = new JsContent;
+        connect(QApplication::clipboard(), &QClipboard::dataChanged, jsContentInstance, &JsContent::callJsClipboardDataChanged);
     }
     return jsContentInstance;
 }
@@ -183,4 +186,22 @@ void JsContent::jsCallViewPicture(const QString &imagePath)
 void JsContent::jsCallCreateNote()
 {
     emit createNote();
+}
+
+void JsContent::jsCallSetClipData(const QString &text, const QString &html)
+{
+    QClipboard *clip = DApplication::clipboard();
+    if (nullptr != clip) {
+        //剪切板先断开与前端的通信
+        clip->disconnect(this);
+        //更新剪切板
+        QMimeData *data = new QMimeData;
+        //设置纯文本
+        data->setText(text);
+        //设置富文本
+        data->setHtml(html);
+        clip->setMimeData(data);
+        //剪切板重新建立与前端的通信
+        connect(QApplication::clipboard(), &QClipboard::dataChanged, this, &JsContent::callJsClipboardDataChanged);
+    }
 }

@@ -102,6 +102,7 @@ public slots:
     void jsCallPaste(bool isVoicePaste = false); //web前端调用后端，编辑区粘贴功能
     void jsCallViewPicture(const QString &imagePath); //web前端调用后端，进行图片预览
     void jsCallCreateNote(); //web前端调用后端，新建笔记
+    void jsCallSetClipData(const QString &text, const QString &html); //web前端调用后端，设置剪切板内容
     QString jsCallGetTranslation(); //web前端调用后端，获取翻译
 };
 

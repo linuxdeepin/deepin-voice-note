@@ -50,8 +50,6 @@ WebRichTextEditor::WebRichTextEditor(QWidget *parent)
     initWebView();
     initRightMenu();
     initUpdateTimer();
-
-    initConnections();
 }
 
 WebRichTextEditor::~WebRichTextEditor()
@@ -98,12 +96,6 @@ void WebRichTextEditor::initRightMenu()
             this, &WebRichTextEditor::onMenuActionClicked);
     //文本右键菜单隐藏隐藏编辑工具栏
     connect(m_txtRightMenu, &DMenu::aboutToHide, this, &WebRichTextEditor::onHideEditToolbar);
-}
-
-void WebRichTextEditor::initConnections()
-{
-    //剪贴板数据发生改变信号转发
-    connect(QApplication::clipboard(), &QClipboard::dataChanged, JsContent::instance(), &JsContent::callJsClipboardDataChanged);
 }
 
 void WebRichTextEditor::initUpdateTimer()

@@ -154,11 +154,6 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_initRightMenu_001)
     EXPECT_NE(nullptr, m_web->m_txtRightMenu);
 }
 
-TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_initConnections_001)
-{
-    m_web->initConnections();
-}
-
 TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_initUpdateTimer_001)
 {
     m_web->initUpdateTimer();

@@ -168,10 +168,6 @@ private:
      */
     void initRightMenu();
     /**
-     * @brief 初始化信号连接
-     */
-    void initConnections();
-    /**
      * @brief 文字菜单显示
      */
     void showTxtMenu(const QPoint &pos);
