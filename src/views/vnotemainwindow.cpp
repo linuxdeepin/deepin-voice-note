@@ -824,8 +824,8 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
     releaseHaltLock();
 
     if (stateOperation->isAppQuit()) {
-        release();
-        exit(0);
+        //退出程序
+        qApp->quit();
     }
 }
 
@@ -1024,8 +1024,8 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
             m_recordBar->stopRecord();
             event->ignore();
         } else {
-            release();
-            exit(0);
+            //退出程序
+            qApp->quit();
         }
     } else {
         event->ignore();
@@ -1789,7 +1789,6 @@ void VNoteMainWindow::onSystemDown(bool active)
 
             qInfo() << "System going down when recording, cancel it.";
         }
-
         releaseHaltLock();
     }
 }
@@ -1822,8 +1821,8 @@ void VNoteMainWindow::release()
     VTextSpeechAndTrManager::onStopTextToSpeech();
     m_richTextEdit->updateNote();
 
-    QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
     if (stateOperation->isVoice2Text()) {
+        QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
         releaseA2TManger->stopAsr();
     }
 }
