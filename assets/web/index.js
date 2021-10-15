@@ -305,6 +305,10 @@ function copyVoice(event) {
     formatHtml = testDiv.innerHTML;
     if ($(testDiv).children().length == 1 && $(testDiv).children()[0].tagName != 'UL' && $(testDiv).find('.voiceBox').length != 0) {
         formatHtml = '<p><br></p>' + formatHtml
+
+    }
+    if (isVoicePaste) {
+        webobj.jsCallSetClipData(selectionObj.toString(), formatHtml)
     }
 }
 
@@ -333,7 +337,6 @@ function returnCopyFlag() {
 
 // 粘贴
 document.addEventListener('paste', function (event) {
-    console.log('paste')
     if (formatHtml != "" && isVoicePaste) {
         document.execCommand('insertHTML', false, formatHtml + "<p><br></p>");
         event.preventDefault()
@@ -797,7 +800,6 @@ function setVoiceButColor(color, shdow) {
  * @returns {any}
  */
 function changeColor(flag, activeColor, disableColor) {
-    console.log(flag)
     global_theme = flag
     global_activeColor = activeColor
     global_disableColor = disableColor
