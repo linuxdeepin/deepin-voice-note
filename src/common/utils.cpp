@@ -307,9 +307,9 @@ bool Utils::pictureToBase64(QString imgPath, QString &base64)
     QBuffer buf(&ba);
     QFileInfo fileInfo(imgPath);
 
-    int maxLen = 512; //图片最大宽度和最大长度
-    int width = qMin(img.width(), maxLen);
-    int height = qMin(img.height(), maxLen);
+    //设置图片最大宽度
+    int width = qMin(img.width(), 712);
+    int height = img.height();
 
     //等比例缩放图片
     img.scaled(width, height, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(&buf, qPrintable(fileInfo.suffix()));
