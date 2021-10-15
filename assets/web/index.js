@@ -807,8 +807,6 @@ function changeColor(flag, activeColor, disableColor) {
 
     $('.dropdown-fontsize>li>a').hover(function (e) {
         $(this).css('background-color', activeColor);
-        // $(this).css('color', '#fff');
-
     }, function () {
         $('.dropdown-fontsize>li>a').css('background-color', 'transparent');
         if (flag == 1) {
@@ -820,7 +818,7 @@ function changeColor(flag, activeColor, disableColor) {
     if (flag == 1) {
         $('#dark').remove()
         $('.dropdown-fontsize>li>a').css('color', "black");
-    } else {
+    } else if (flag == 2 && !$('#dark').length) {
         $("head").append("<link>");
         var css = $("head").children(":last");
         css.attr({
@@ -830,7 +828,6 @@ function changeColor(flag, activeColor, disableColor) {
             href: "./css/dark.css"
         });
     }
-
 }
 
 /**
