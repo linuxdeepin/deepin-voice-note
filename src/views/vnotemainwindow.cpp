@@ -538,7 +538,10 @@ void VNoteMainWindow::initRightView()
 
     QVBoxLayout *rightHolderLayout = new QVBoxLayout(m_rightViewHolder);
     rightHolderLayout->setSpacing(0);
-    rightHolderLayout->setContentsMargins(0, 0, 10, 0);
+    //设置框布局的左右下边界为4
+    //右边界为防止QWebEngineView控件与应用边界为0时拉伸界面是出现黑边
+    //大小4为ui要求录音块左右下边界为10，录音块控件自带外边界6，组合为10
+    rightHolderLayout->setContentsMargins(4, 0, 4, 4);
 
     //TODO:
     //    Add record area code here
@@ -546,7 +549,8 @@ void VNoteMainWindow::initRightView()
     m_recordBarHolder->setFixedHeight(86);
     QVBoxLayout *recordBarHolderLayout = new QVBoxLayout(m_recordBarHolder);
     recordBarHolderLayout->setSpacing(0);
-    recordBarHolderLayout->setContentsMargins(4, 1, 4, 0);
+    //取消框布局自带的边界
+    recordBarHolderLayout->setContentsMargins(0, 0, 0, 0);
 
     m_recordBar = new VNoteRecordBar(m_recordBarHolder);
     m_recordBar->setBackgroundRole(DPalette::Base);
