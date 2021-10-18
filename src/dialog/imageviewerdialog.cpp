@@ -27,6 +27,7 @@
 #include <QDesktopWidget>
 #include <QShortcut>
 #include <QImageReader>
+#include <QPainterPath>
 
 static const int kBorderSize = 12;
 static const int kCloseBtnSize = 48;
