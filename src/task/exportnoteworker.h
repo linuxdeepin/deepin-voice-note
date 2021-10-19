@@ -72,6 +72,8 @@ protected:
     ExportError exportAsHtml();
     //获取导出文件名，同名时创建副本
     QString getExportFileName(const QString &baseName, const QString &fileSuffix);
+    //过滤文件名内容
+    QString filteredFileName(QString fileName);
 
     ExportType m_exportType {ExportNothing};
     QString m_exportPath {""};
