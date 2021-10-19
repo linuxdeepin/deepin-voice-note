@@ -195,3 +195,9 @@ TEST_F(UT_VNoteRecordBar, UT_VNoteRecordBar_volumeToolow_001)
     VNoteRecordBar vnoterecordbar;
     EXPECT_FALSE(vnoterecordbar.volumeToolow(1.1));
 }
+
+TEST_F(UT_VNoteRecordBar, UT_VNoteRecordBar_stopPlay_001)
+{
+    VNoteRecordBar vnoterecordbar;
+    vnoterecordbar.stopPlay();
+}

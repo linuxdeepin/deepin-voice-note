@@ -594,3 +594,10 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_setData_001)
 
     delete data;
 }
+
+TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_eventFilter_001)
+{
+    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonRelease, QPoint(0, 0), Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+    m_web->eventFilter(m_web->focusProxy(), event);
+    delete event;
+}

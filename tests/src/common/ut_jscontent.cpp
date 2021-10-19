@@ -95,3 +95,8 @@ TEST_F(UT_JsContent, UT_JsContent_jsCallCreateNote_001)
 {
     JsContent::instance()->jsCallCreateNote();
 }
+
+TEST_F(UT_JsContent, UT_JsContent_jsCallSetClipData_001)
+{
+    JsContent::instance()->jsCallSetClipData("", "");
+}
