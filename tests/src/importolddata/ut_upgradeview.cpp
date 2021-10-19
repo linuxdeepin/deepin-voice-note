@@ -49,7 +49,7 @@ TEST_F(UT_UpgradeView, UT_UpgradeView_setProgress_001)
 TEST_F(UT_UpgradeView, UT_UpgradeView_startUpgrade_001)
 {
     Stub stub;
-    stub.set(ADDR(QThreadPool, start), stub_void);
+    stub.set((void (QThreadPool::*)(QRunnable *, int))ADDR(QThreadPool, start), stub_void);
     UpgradeView upgradeview;
     upgradeview.startUpgrade();
 }
@@ -65,7 +65,7 @@ TEST_F(UT_UpgradeView, UT_UpgradeView_onDataReady_001)
 TEST_F(UT_UpgradeView, UT_UpgradeView_onDataReady_002)
 {
     Stub stub;
-    stub.set(ADDR(QThreadPool, start), stub_void);
+    stub.set((void (QThreadPool::*)(QRunnable *, int))ADDR(QThreadPool, start), stub_void);
     VNOTE_FOLDERS_MAP *qspNoteFoldersMap = new VNOTE_FOLDERS_MAP;
     VNoteFolder *folder = new VNoteFolder();
     qspNoteFoldersMap->folders.insert(1, folder);

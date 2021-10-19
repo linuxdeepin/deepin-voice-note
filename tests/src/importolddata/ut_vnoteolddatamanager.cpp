@@ -50,20 +50,6 @@ TEST_F(UT_VNoteOldDataManager, UT_VNoteOldDataManager_initOldDb_001)
     EXPECT_TRUE(nullptr != m_vnoteolddatamanager->m_oldDbManger);
 }
 
-TEST_F(UT_VNoteOldDataManager, UT_VNoteOldDataManager_reqDatas_001)
-{
-    Stub stub;
-    stub.set(ADDR(QThreadPool, start), stub_void);
-    m_vnoteolddatamanager->reqDatas();
-}
-
-TEST_F(UT_VNoteOldDataManager, UT_VNoteOldDataManager_doUpgrade_001)
-{
-    Stub stub;
-    stub.set(ADDR(QThreadPool, start), stub_void);
-    m_vnoteolddatamanager->doUpgrade();
-}
-
 TEST_F(UT_VNoteOldDataManager, UT_VNoteOldDataManager_onFinishLoad_001)
 {
     m_vnoteolddatamanager->onFinishLoad();

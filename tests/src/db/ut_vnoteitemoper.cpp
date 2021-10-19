@@ -108,7 +108,6 @@ TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_addNote_001)
     VNoteBlock *ptrBlock1 = tmpNote.newBlock(VNoteBlock::Text);
     tmpNote.addBlock(ptrBlock1);
     EXPECT_FALSE(m_vnoteitemoper->addNote(tmpNote));
-    VNoteItemOper op(&tmpNote);
 }
 
 TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_addNote_002)
@@ -123,7 +122,6 @@ TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_addNote_002)
     VNoteBlock *ptrBlock1 = tmpNote.newBlock(VNoteBlock::Text);
     tmpNote.addBlock(ptrBlock1);
     EXPECT_FALSE(m_vnoteitemoper->addNote(tmpNote));
-    VNoteItemOper op(&tmpNote);
 }
 
 TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_addNote_003)
@@ -137,8 +135,9 @@ TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_addNote_003)
     tmpNote.noteTitle = m_vnoteitemoper->getDefaultNoteName(tmpNote.folderId);
     VNoteBlock *ptrBlock1 = tmpNote.newBlock(VNoteBlock::Text);
     tmpNote.addBlock(ptrBlock1);
-    EXPECT_TRUE(m_vnoteitemoper->addNote(tmpNote));
-    VNoteItemOper op(&tmpNote);
+    VNoteItem *itemNote = m_vnoteitemoper->addNote(tmpNote);
+    EXPECT_TRUE(itemNote);
+    delete itemNote;
 }
 
 TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_deleteNote_001)
