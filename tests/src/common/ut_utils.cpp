@@ -137,3 +137,13 @@ TEST_F(UT_Utils, UT_Utils_isLoongsonPlatform_001)
 {
     EXPECT_FALSE(Utils::isLoongsonPlatform());
 }
+
+TEST_F(UT_Utils, UT_Utils_filteredFileName_001)
+{
+    EXPECT_EQ("123", Utils::filteredFileName("123"));
+    EXPECT_EQ("123", Utils::filteredFileName("123 \"'/\\[]:|<>+=;,?* "));
+    EXPECT_EQ("", Utils::filteredFileName("\"'/[]:|<  >+=;,?* "));
+    EXPECT_EQ("note", Utils::filteredFileName("\"'/[]:|<  >+=;,?* ", "note"));
+    EXPECT_EQ("qs", Utils::filteredFileName("\\q/s"));
+    EXPECT_EQ("d saf  sa", Utils::filteredFileName("d saf / sa"));
+}

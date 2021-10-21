@@ -336,3 +336,19 @@ bool Utils::isLoongsonPlatform()
     }
     return cpuModeName.contains("Loongson");
 }
+
+/**
+ * @brief filteredFileName
+ * 过滤不符合文件名规范的文件名内容，若过滤后结果为空则返回defaultName
+ * @param fileName 待过滤的文件名
+ * @return 过滤后的文件名
+ */
+QString Utils::filteredFileName(QString fileName, const QString &defaultName)
+{
+    //使用正则表达式除去不符合规范的字符并清理文件名两端的空白字符，中间的空白字符不做处理
+    QString name = fileName.replace(QRegExp("[\"\'\\[\\]\\\\/:|<>+=;,?*]"), "").trimmed();
+    if (name.isEmpty()) {
+        return defaultName;
+    }
+    return name;
+}

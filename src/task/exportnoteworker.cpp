@@ -23,6 +23,7 @@
 #include "common/vnoteitem.h"
 #include "common/metadataparser.h"
 #include "common/setting.h"
+#include "common/utils.h"
 
 #include <DLog>
 
@@ -118,7 +119,7 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportText()
             QString filePath = "";
             //没有指定保存名称，则设置默认名称为笔记标题
             if (m_exportName.isEmpty()) {
-                QString baseFileName = m_exportPath + "/" + filteredFileName(noteData->noteTitle);
+                QString baseFileName = m_exportPath + "/" + Utils::filteredFileName(noteData->noteTitle, "note");
                 QString fileSuffix = ".txt";
                 filePath = getExportFileName(baseFileName, fileSuffix);
             } else {
@@ -244,7 +245,7 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAsHtml()
         QString filePath = "";
         //没有指定保存名称，则设置默认名称为笔记标题
         if (m_exportName.isEmpty()) {
-            QString baseFileName = m_exportPath + "/" + filteredFileName(note->noteTitle);
+            QString baseFileName = m_exportPath + "/" + Utils::filteredFileName(note->noteTitle, "note");
             QString fileSuffix = ".html";
             filePath = getExportFileName(baseFileName, fileSuffix);
         } else {
@@ -270,23 +271,7 @@ QString ExportNoteWorker::getExportFileName(const QString &baseName, const QStri
         if (!file.exists()) {
             break;
         }
-        filePath = baseName + "（" + QString::number(count++) + "）" + fileSuffix;
+        filePath = baseName + "(" + QString::number(count++) + ")" + fileSuffix;
     }
     return filePath;
-}
-
-/**
- * @brief filteredFileName
- * 过滤不符合文件名规范的文件名内容，若过滤后结果为空则返回note
- * @param fileName 待过滤的文件名
- * @return 过滤后的文件名
- */
-QString ExportNoteWorker::filteredFileName(QString fileName)
-{
-    //使用正则表达式除去不符合规范的字符并清理文件名两端的空白字符，中间的空白字符不做处理
-    QString name = fileName.replace(QRegExp("[\"\'\\[\\]\\\\/:|<>+=;,?*]"), "").trimmed();
-    if (name.isEmpty()) {
-        return "note";
-    }
-    return name;
 }

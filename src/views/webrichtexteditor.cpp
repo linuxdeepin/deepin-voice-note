@@ -370,7 +370,7 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
 void WebRichTextEditor::savePictureAs()
 {
     QString originalPath = m_menuJson.toString(); //获取原图片路径
-    saveAsFile(originalPath, QStandardPaths::writableLocation(QStandardPaths::PicturesLocation));
+    saveAsFile(originalPath, QStandardPaths::writableLocation(QStandardPaths::PicturesLocation), "image");
 }
 
 /**
@@ -418,6 +418,10 @@ QString WebRichTextEditor::saveAsFile(const QString &originalPath, QString dirPa
     QString newPath = DFileDialog::getSaveFileName(this, "", dir, filter);
     if (newPath.isEmpty()) {
         return "";
+    }
+    //添加文件后缀
+    if (!newPath.endsWith(fileInfo.suffix())) {
+        newPath += ("." + fileInfo.suffix());
     }
 
     QFileInfo info(newPath);

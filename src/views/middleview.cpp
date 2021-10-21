@@ -27,6 +27,7 @@
 #include "common/actionmanager.h"
 #include "common/standarditemcommon.h"
 #include "common/vnoteitem.h"
+#include "common/utils.h"
 #include "task/exportnoteworker.h"
 #include "common/setting.h"
 #include "db/vnoteitemoper.h"
@@ -310,7 +311,7 @@ void MiddleView::saveAs(SaveAsType type)
         VNoteItem *note = getCurrVNotedata();
         //设置默认名称为笔记名称
         if (note) {
-            dialog.selectFile(note->noteTitle);
+            dialog.selectFile(Utils::filteredFileName(note->noteTitle));
         }
         if (QDialog::Rejected == dialog.exec()) {
             return;
@@ -334,13 +335,22 @@ void MiddleView::saveAs(SaveAsType type)
 
     ExportNoteWorker::ExportType exportType = ExportNoteWorker::ExportNothing;
     QString filter = dialog.selectedNameFilter();
-    //保存文件
+    //选择保存文件的类型并给加上后缀（部分版本文管不会自动加后缀）
     if (filterTypes.at(1) == filter) {
         exportType = ExportNoteWorker::ExportText;
+        if (!defaultName.isEmpty() && !defaultName.endsWith(".txt")) {
+            defaultName += ".txt";
+        }
     } else if (filterTypes.at(2) == filter) {
         exportType = ExportNoteWorker::ExportHtml;
+        if (!defaultName.isEmpty() && !defaultName.endsWith(".html")) {
+            defaultName += ".html";
+        }
     } else if (filterTypes.at(3) == filter) {
         exportType = ExportNoteWorker::ExportVoice;
+        if (!defaultName.isEmpty() && !defaultName.endsWith(".mp3")) {
+            defaultName += ".mp3";
+        }
     }
     ExportNoteWorker *exportWorker = new ExportNoteWorker(
         exportDir, exportType, noteDataList, defaultName);

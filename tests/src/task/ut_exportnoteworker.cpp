@@ -87,13 +87,3 @@ TEST_F(UT_ExportNoteWorker, UT_ExportNoteWorker_getExportFileName_001)
     ExportNoteWorker work("/test", ExportNoteWorker::ExportHtml, m_noteList);
     EXPECT_EQ("123.txt", work.getExportFileName("123", ".txt"));
 }
-
-TEST_F(UT_ExportNoteWorker, UT_ExportNoteWorker_filteredFileName_001)
-{
-    ExportNoteWorker work("/test", ExportNoteWorker::ExportHtml, m_noteList);
-    EXPECT_EQ("123", work.filteredFileName("123"));
-    EXPECT_EQ("123", work.filteredFileName("123 \"'/\\[]:|<>+=;,?* "));
-    EXPECT_EQ("note", work.filteredFileName("\"'/[]:|<  >+=;,?* "));
-    EXPECT_EQ("qs", work.filteredFileName("\\q/s"));
-    EXPECT_EQ("d saf  sa", work.filteredFileName("d saf / sa"));
-}
