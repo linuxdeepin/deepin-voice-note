@@ -78,6 +78,9 @@ var global_disableColor = ''
 var global_theme = 1
 var scrollHide = null  //滚动条隐藏定时器
 var isUlOrOl = false
+const airPopoverHeight = 44  //悬浮工具栏高度
+const airPopoverWidth = 320  //悬浮工具栏宽度
+
 
 var tooltipContent = {
     fontsize: '字号',

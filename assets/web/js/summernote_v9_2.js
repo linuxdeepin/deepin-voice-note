@@ -7111,12 +7111,14 @@
                     var bnd = func.rect2bnd(rect);
                     let winWidth = $(document).width()
                     let left = Math.max(bnd.left + bnd.width / 2 - 150, 0);
-                    let top = bnd.top + bnd.height - 60;
-                    if (winWidth - left < 320) {
-                        left = winWidth - 320
+                    let top = bnd.top - airPopoverHeight;
+                    // 左边距判断,显示区域宽度-距离左边距离<工具栏宽度
+                    if (winWidth - left < airPopoverWidth) {
+                        left = winWidth - airPopoverWidth
                     }
-                    if (top < 100) {
-                        top = top + 70
+                    // 上边距判断，工具栏上边距不小于34（tip高度，避免遮挡）
+                    if (top < 34) {
+                        top = bnd.top + bnd.height + 14
                     }
                     this.$popover.css({
                         display: 'block',
@@ -7132,16 +7134,21 @@
 
         };
 
+        /**
+         * 右键显示悬浮工具栏
+         * @date 2021-10-22
+         * @param {any} x 左边距
+         * @param {any} y 右边距
+         * @returns {any}
+         */
         AirPopover.prototype.rightUpdate = function (x, y) {
             var styleInfo = this.context.invoke('editor.currentStyle');
             var rect = lists.last(styleInfo.range.getClientRects());
-
             this.isShowOlUl(styleInfo)
-
             if (rect) {
                 let winWidth = $(document).width()
-                if (winWidth - x < 320) {
-                    x = winWidth - 320
+                if (winWidth - x < airPopoverWidth) {
+                    x = winWidth - airPopoverWidth
                 }
                 this.$popover.css({
                     display: 'block',
