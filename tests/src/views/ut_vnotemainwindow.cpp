@@ -143,11 +143,6 @@ TEST_F(UT_VNoteMainWindow, UT_VNoteMainWindow_holdHaltLock_001)
     EXPECT_FALSE(m_mainWindow->m_stackedWidget->currentIndex() != VNoteMainWindow::WndNoteShow);
 }
 
-TEST_F(UT_VNoteMainWindow, UT_VNoteMainWindow_delayInitTasks_001)
-{
-    m_mainWindow->delayInitTasks();
-}
-
 TEST_F(UT_VNoteMainWindow, UT_VNoteMainWindow_onVNoteSearch_001)
 {
     Stub stub;
