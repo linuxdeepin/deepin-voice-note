@@ -304,7 +304,10 @@ void ActionManager::initMenu()
             break;
         }
     }
-
+    //没有语音助手时，隐藏语音转文字菜单项
+    if (false == isAISrvAvailable) {
+        visibleAction(VoiceToText, false);
+    }
     //picture context menu
     QStringList pcitureMenuTexts;
     pcitureMenuTexts << DApplication::translate("NoteDetailContextMenu", "View")
