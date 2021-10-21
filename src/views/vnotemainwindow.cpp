@@ -546,7 +546,8 @@ void VNoteMainWindow::initRightView()
     //TODO:
     //    Add record area code here
     m_recordBarHolder = new QWidget(m_rightViewHolder);
-    m_recordBarHolder->setFixedHeight(86);
+    //78: 语音块显示区域高度为64px，语音控件阴影宽6px，上下阴影12px，合计78px
+    m_recordBarHolder->setFixedHeight(78);
     QVBoxLayout *recordBarHolderLayout = new QVBoxLayout(m_recordBarHolder);
     recordBarHolderLayout->setSpacing(0);
     //取消框布局自带的边界
