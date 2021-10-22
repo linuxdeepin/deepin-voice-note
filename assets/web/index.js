@@ -532,6 +532,7 @@ function initData(text) {
     })
 
     $('#summernote').summernote('code', html);
+    window.getSelection().empty()
     // 搜索功能
     webobj.jsCallSetDataFinsh();
     initFinish = true;
@@ -628,6 +629,7 @@ function setHtml(html) {
     }
     initFinish = false;
     $('#summernote').summernote('code', html);
+    window.getSelection().empty()
     initFinish = true;
     // 搜索功能
     webobj.jsCallSetDataFinsh();
