@@ -151,6 +151,8 @@ public:
     void visibleAction(ActionKind actionId, bool enable);
     //重置菜单项可用状态
     void resetCtxMenu(MenuType type, bool enable = true);
+    //隐藏/显示语音助手相关功能
+    void visibleAiActions(bool visible);
 
 protected:
     //初始化
@@ -166,6 +168,9 @@ protected:
     QScopedPointer<VNoteRightMenu> m_saveNoteContextMenu;
 
     QMap<ActionKind, QAction *> m_actionsMap;
+
+    //语音助手功能分割线
+    QAction *m_aiSeparator {nullptr};
 };
 
 #endif // ACTIONFACTORY_H

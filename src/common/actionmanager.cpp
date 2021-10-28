@@ -220,7 +220,6 @@ void ActionManager::initMenu()
         }
     }
 
-    bool isAISrvAvailable = OpsStateInterface::instance()->isAiSrvExist();
     //Notebook context menu
     QStringList notebookMenuTexts;
     notebookMenuTexts << DApplication::translate("NotebookContextMenu", "Rename")
@@ -304,10 +303,7 @@ void ActionManager::initMenu()
             break;
         }
     }
-    //没有语音助手时，隐藏语音转文字菜单项
-    if (false == isAISrvAvailable) {
-        visibleAction(VoiceToText, false);
-    }
+
     //picture context menu
     QStringList pcitureMenuTexts;
     pcitureMenuTexts << DApplication::translate("NoteDetailContextMenu", "View")
@@ -358,16 +354,22 @@ void ActionManager::initMenu()
 
         m_txtContextMenu->addAction(pAction);
         m_actionsMap.insert(static_cast<ActionKind>(txtMenuIdStart), pAction);
-        if (!isAISrvAvailable) {
-            if (txtMenuIdStart > TxtPaste) {
-                pAction->setVisible(false);
-            }
-        } else if (txtMenuIdStart == TxtPaste) {
-            m_txtContextMenu->addSeparator();
+        if (TxtPaste == txtMenuIdStart) {
+            m_aiSeparator = m_txtContextMenu->addSeparator();
         }
         txtMenuIdStart++;
         if (TxtMenuMax == txtMenuIdStart) {
             break;
         }
     }
+}
+
+void ActionManager::visibleAiActions(bool visible)
+{
+    visibleAction(VoiceToText, visible);
+    visibleAction(TxtSpeech, visible);
+    visibleAction(TxtStopreading, visible);
+    visibleAction(TxtDictation, visible);
+    visibleAction(TxtTranslate, visible);
+    m_aiSeparator->setVisible(visible);
 }
