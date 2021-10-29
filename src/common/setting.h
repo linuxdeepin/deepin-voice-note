@@ -55,7 +55,6 @@ class setting : public QObject
 {
     Q_OBJECT
 public:
-    explicit setting(QObject *parent = nullptr);
     //设置配置参数
     void setOption(const QString &key, const QVariant &value);
     //获取配置参数
@@ -64,6 +63,9 @@ public:
     DSettings *getSetting();
     //单例
     static setting *instance();
+
+protected:
+    setting();
 
 private:
     CustemBackend *m_backend {nullptr};

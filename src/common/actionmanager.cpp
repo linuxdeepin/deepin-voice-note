@@ -28,8 +28,6 @@
 
 #define MenuId "_menuid_"
 
-ActionManager *ActionManager::_instance = nullptr;
-
 /**
  * @brief ActionManager::ActionManager
  */
@@ -44,11 +42,8 @@ ActionManager::ActionManager()
  */
 ActionManager *ActionManager::Instance()
 {
-    if (nullptr == _instance) {
-        _instance = new ActionManager();
-    }
-
-    return _instance;
+    static ActionManager _instance;
+    return &_instance;
 }
 
 /**

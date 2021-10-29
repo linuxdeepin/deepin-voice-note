@@ -30,8 +30,6 @@
 
 DWIDGET_USE_NAMESPACE
 
-static setting *settinginstance = nullptr;
-
 /**
  * @brief GenerateSettingTranslate
  * 生成翻译文件
@@ -120,8 +118,7 @@ void CustemBackend::doSetOption(const QString &key, const QVariant &value)
  * @brief setting::setting
  * @param parent
  */
-setting::setting(QObject *parent)
-    : QObject(parent)
+setting::setting()
 {
     QString vnoteConfigBasePath =
         QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
@@ -175,8 +172,6 @@ DSettings *setting::getSetting()
  */
 setting *setting::instance()
 {
-    if (settinginstance == nullptr) {
-        settinginstance = new setting;
-    }
-    return settinginstance;
+    static setting _instance;
+    return &_instance;
 }

@@ -28,7 +28,6 @@ class JsContent : public QObject
 {
     Q_OBJECT
 public:
-    explicit JsContent(QObject *parent = nullptr);
     static JsContent *instance();
 
     /**
@@ -89,6 +88,9 @@ signals:
      * @brief 编辑区内容加载完成信号
      */
     void setDataFinsh();
+
+protected:
+    JsContent();
 
 public slots:
     /**

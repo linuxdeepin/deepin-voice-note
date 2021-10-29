@@ -24,8 +24,6 @@
 
 DCORE_USE_NAMESPACE
 
-static OpsStateInterface *objectInstance = nullptr;
-
 /**
  * @brief OpsStateInterface::OpsStateInterface
  */
@@ -114,8 +112,6 @@ bool OpsStateInterface::isAiSrvExist() const
  */
 OpsStateInterface *OpsStateInterface::instance()
 {
-    if (objectInstance == nullptr) {
-        objectInstance = new OpsStateInterface;
-    }
-    return objectInstance;
+    static OpsStateInterface _instance;
+    return &_instance;
 }

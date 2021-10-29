@@ -26,8 +26,6 @@
 class OpsStateInterface
 {
 public:
-    OpsStateInterface();
-
     enum {
         StateNone = 0,
         StateSearching,
@@ -57,6 +55,7 @@ public:
     bool isAiSrvExist() const;
 
 protected:
+    OpsStateInterface();
     quint64 m_states {StateNone};
 };
 

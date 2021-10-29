@@ -34,8 +34,6 @@ class ActionManager : public QObject
 {
     Q_OBJECT
 public:
-    ActionManager();
-
     static ActionManager *Instance();
 
     enum ActionKind {
@@ -155,17 +153,16 @@ public:
     void visibleAiActions(bool visible);
 
 protected:
+    ActionManager();
     //初始化
     void initMenu();
-
-    static ActionManager *_instance;
     //获取菜单指针
-    QScopedPointer<VNoteRightMenu> m_notebookContextMenu;
-    QScopedPointer<VNoteRightMenu> m_noteContextMenu;
-    QScopedPointer<VNoteRightMenu> m_voiceContextMenu;
-    QScopedPointer<VNoteRightMenu> m_pictureContextMenu;
-    QScopedPointer<VNoteRightMenu> m_txtContextMenu;
-    QScopedPointer<VNoteRightMenu> m_saveNoteContextMenu;
+    QScopedPointer<VNoteRightMenu, QScopedPointerDeleteLater> m_notebookContextMenu;
+    QScopedPointer<VNoteRightMenu, QScopedPointerDeleteLater> m_noteContextMenu;
+    QScopedPointer<VNoteRightMenu, QScopedPointerDeleteLater> m_voiceContextMenu;
+    QScopedPointer<VNoteRightMenu, QScopedPointerDeleteLater> m_pictureContextMenu;
+    QScopedPointer<VNoteRightMenu, QScopedPointerDeleteLater> m_txtContextMenu;
+    QScopedPointer<VNoteRightMenu, QScopedPointerDeleteLater> m_saveNoteContextMenu;
 
     QMap<ActionKind, QAction *> m_actionsMap;
 

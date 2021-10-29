@@ -35,20 +35,15 @@
 
 DWIDGET_USE_NAMESPACE
 
-static JsContent *jsContentInstance = nullptr;
-
-JsContent::JsContent(QObject *parent)
-    : QObject(parent)
+JsContent::JsContent()
 {
+    connect(QApplication::clipboard(), &QClipboard::dataChanged, this, &JsContent::callJsClipboardDataChanged);
 }
 
 JsContent *JsContent::instance()
 {
-    if (jsContentInstance == nullptr) {
-        jsContentInstance = new JsContent;
-        connect(QApplication::clipboard(), &QClipboard::dataChanged, jsContentInstance, &JsContent::callJsClipboardDataChanged);
-    }
-    return jsContentInstance;
+    static JsContent _instance;
+    return &_instance;
 }
 
 /**
