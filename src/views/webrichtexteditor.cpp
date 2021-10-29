@@ -109,16 +109,11 @@ void WebRichTextEditor::initData(VNoteItem *data, const QString &reg, bool focus
 {
     //重置鼠标点击位置
     m_mouseClickPos = QPoint(-1, -1);
+    m_setFocus = focus;
     //富文本设置异步操作，解决笔记列表不实时刷新
     QTimer::singleShot(0, this, [=] {
         setData(data, reg);
     });
-    //延时设置焦点，解决有焦点无光标问题
-    if (focus) {
-        QTimer::singleShot(100, this, [this] {
-            setFocus();
-        });
-    }
 }
 
 void WebRichTextEditor::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
@@ -199,6 +194,11 @@ void WebRichTextEditor::saveMenuParam(int type, const QVariant &json)
 
 void WebRichTextEditor::onSetDataFinsh()
 {
+    //数据加载完成,需要设置焦点时需要先清除焦点再重新设置，解决编辑器无光标问题
+    if (m_setFocus) {
+        clearFocus();
+        setFocus();
+    }
     //只有编辑区内容加载完成才能搜索
     if (!m_searchKey.isEmpty()) {
         findText(m_searchKey);

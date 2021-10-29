@@ -215,7 +215,7 @@ private:
     ImageViewerDialog *imgView {nullptr}; //
     QRect m_editToolbarRect; //编辑工具栏坐标
     QPoint m_mouseClickPos {-1, -1}; //鼠标点击位置
-
+    bool m_setFocus {false}; //是否设置焦点
     //右键菜单
     VNoteRightMenu *m_pictureRightMenu {nullptr}; //图片右键菜单
     VNoteRightMenu *m_voiceRightMenu {nullptr}; //语音右键菜单
