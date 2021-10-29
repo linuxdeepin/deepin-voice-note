@@ -194,6 +194,8 @@ void WebRichTextEditor::saveMenuParam(int type, const QVariant &json)
 
 void WebRichTextEditor::onSetDataFinsh()
 {
+    //清除选中
+    page()->triggerAction(QWebEnginePage::Unselect);
     //数据加载完成,需要设置焦点时需要先清除焦点再重新设置，解决编辑器无光标问题
     if (m_setFocus) {
         clearFocus();

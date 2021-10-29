@@ -215,6 +215,11 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_saveMenuParam_001)
 
 TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onSetDataFinsh_001)
 {
+    Stub stub;
+    typedef int (*fptr)();
+    fptr A_foo = (fptr)(&QWebEnginePage::triggerAction);
+    stub.set(ADDR(QWebEngineView, page), ADDR(UT_WebRichTextEditor, stub_page));
+    stub.set(A_foo, stub_WebRichTextEditor);
     m_web->m_searchKey = "";
     m_web->onSetDataFinsh();
 }
