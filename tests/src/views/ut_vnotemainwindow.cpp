@@ -147,6 +147,8 @@ TEST_F(UT_VNoteMainWindow, UT_VNoteMainWindow_onVNoteSearch_001)
 {
     Stub stub;
     stub.set(ADDR(QWidget, hasFocus), stub_int);
+    stub.set(ADDR(QWebEngineView, findText), stub_vnotemainwindow);
+
     m_mainWindow->onVNoteSearch();
 }
 
@@ -154,6 +156,7 @@ TEST_F(UT_VNoteMainWindow, UT_VNoteMainWindow_onVNoteSearch_002)
 {
     Stub stub;
     stub.set(ADDR(QWidget, hasFocus), stub_int);
+    stub.set(ADDR(QWebEngineView, findText), stub_vnotemainwindow);
     m_mainWindow->m_noteSearchEdit->setText("a");
     m_mainWindow->onVNoteSearch();
     EXPECT_EQ("a", m_mainWindow->m_searchKey);
@@ -163,6 +166,7 @@ TEST_F(UT_VNoteMainWindow, UT_VNoteMainWindow_onVNoteSearch_003)
 {
     Stub stub;
     stub.set(ADDR(QWidget, hasFocus), stub_int);
+    stub.set(ADDR(QWebEngineView, findText), stub_vnotemainwindow);
     m_mainWindow->m_noteSearchEdit->setText("a");
     m_mainWindow->m_searchKey = "a";
     m_mainWindow->onVNoteSearch();
@@ -170,6 +174,8 @@ TEST_F(UT_VNoteMainWindow, UT_VNoteMainWindow_onVNoteSearch_003)
 
 TEST_F(UT_VNoteMainWindow, UT_VNoteMainWindow_onVNoteSearchTextChange_001)
 {
+    Stub stub;
+    stub.set(ADDR(QWebEngineView, findText), stub_vnotemainwindow);
     m_mainWindow->onVNoteSearchTextChange("");
     EXPECT_EQ(OpsStateInterface::instance()->isSearching(), false);
 }
