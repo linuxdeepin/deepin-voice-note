@@ -44,7 +44,10 @@ int main(int argc, char *argv[])
     if (!QString(qgetenv("XDG_CURRENT_DESKTOP")).toLower().startsWith("deepin")) {
         setenv("XDG_CURRENT_DESKTOP", "Deepin", 1);
     }
-    //qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "7777");
+    //开启QWebEngineView的调试模式
+    if (2 == argc && "--debug" == QString(argv[1])) {
+        qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "7777");
+    }
     //龙芯机器配置,使得DApplication能正确加载QTWEBENGINE
     qputenv("DTK_FORCE_RASTER_WIDGETS", "FALSE");
 
