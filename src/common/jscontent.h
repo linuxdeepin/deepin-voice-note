@@ -69,8 +69,9 @@ signals:
      * @param theme : 主题类型，0 未知，1浅色主题，2深色主题，参考DGuiApplicationHelper::ColorType
      * @param activeHightColor : 系统活动高亮色
      * @param disableHightColor : 系统活动高亮色置灰颜色
+     * @param backgroundColer : 系统控件背景色
      */
-    void callJsSetTheme(int theme, QString activeHightColor, QString disableHightColor);
+    void callJsSetTheme(int theme, const QString &activeHightColor, const QString &disableHightColor, const QString &backgroundColer);
     void callJsClipboardDataChanged(); //剪切板数据发生改变信号
 
     void calllJsShowEditToolbar(int x, int y); //显示编辑工具栏

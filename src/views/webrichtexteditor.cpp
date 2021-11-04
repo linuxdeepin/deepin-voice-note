@@ -582,7 +582,7 @@ void WebRichTextEditor::onThemeChanged()
     page()->setBackgroundColor(dp.base().color());
     //获取系统主题类型
     DGuiApplicationHelper::ColorType theme = dAppHelper->themeType();
-    emit JsContent::instance()->callJsSetTheme(theme, activeHightColor, disableHightColor);
+    emit JsContent::instance()->callJsSetTheme(theme, activeHightColor, disableHightColor, dp.base().color().name());
 }
 
 void WebRichTextEditor::onShowEditToolbar(const QPoint &pos)
