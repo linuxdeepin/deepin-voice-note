@@ -76,6 +76,7 @@ var nowClickVoice = null
 var global_activeColor = ''
 var global_disableColor = ''
 var global_theme = 1
+var global_themeColor = 'transparent'  //主题色
 var scrollHide = null  //滚动条隐藏定时器
 var isUlOrOl = false
 const airPopoverHeight = 44  //悬浮工具栏高度
@@ -802,10 +803,11 @@ function setVoiceButColor(color, shdow) {
  * @param {any} flag 1浅色 2深色
  * @returns {any}
  */
-function changeColor(flag, activeColor, disableColor) {
+function changeColor(flag, activeColor, disableColor, backgroundColor) {
     global_theme = flag
     global_activeColor = activeColor
     global_disableColor = disableColor
+    global_themeColor = backgroundColor
     setVoiceButColor(global_activeColor, global_disableColor)
 
     $('.dropdown-fontsize>li>a').hover(function (e) {
@@ -818,6 +820,7 @@ function changeColor(flag, activeColor, disableColor) {
             $('.dropdown-fontsize>li>a').css('color', "rgba(197,207,224,1)");
         }
     })
+    $('body').css('background-color', global_themeColor)
     if (flag == 1) {
         $('#dark').remove()
         $('.dropdown-fontsize>li>a').css('color', "black");
@@ -923,7 +926,12 @@ $(document).scroll(function () {
         $('#scrollStyle').html(`
         body::-webkit-scrollbar-thumb {
         background-color:${global_theme == 1 ? "rgba(0, 0, 0, 0.30)" : "rgba(255, 255, 255, 0.20)"} ;
-        }`
+        }
+        /* 适配申威，触发重绘 */
+        html {
+            background-color: ${global_themeColor}fe;
+        }
+        `
         )
     }
 
