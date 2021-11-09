@@ -1,9 +1,10 @@
 body {
     padding: 0px;
-    line-height: 1.7;
+    line-height: 1.72;
     font-family: 'Helvetica';
     background-color: transparent;
     color: rgba(65, 77, 104, 1);
+    word-wrap: break-word;
     /* overflow-x: hidden; */
 }
 
@@ -19,12 +20,20 @@ body {
     vertical-align: bottom;
 }
 
+.lf {
+    margin: 2px 0 0 2px;
+    position: absolute;
+}
+
 .lr {
     float: right;
     margin: 0px 20px 0 0;
 }
 
 .li {
+    font-weight: normal!important;
+    font-style: normal!important;
+    text-decoration: none!important;
     background: rgba(0, 0, 0, 0.05);
     min-height: 30px;
     border-radius: 8px;

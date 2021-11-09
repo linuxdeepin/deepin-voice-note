@@ -3065,6 +3065,15 @@
             var selectionObj = window.getSelection();
             var rangeObj = selectionObj.getRangeAt(0);
             var paras = rng.nodes(dom.isPara, { includeAncestor: true });
+           
+            // 筛选LI标签
+            for (let i = 0; i <= paras.length; i++) {
+                if ($(paras[i]).parents('li').length) {
+                    paras.splice(i, 1);
+                    i--;
+                }
+            }
+
             var bookmark = rng.paraBookmark(paras);
             var clustereds = lists.clusterBy(paras, func.peq2('parentNode'));
             // 屏蔽语音文件、图片序列化
@@ -3308,12 +3317,14 @@
                     nextPara = splitRoot;
                     // if new line has content (not a line break)
                 }
-                else if (dom.isEmpty(splitRoot) && splitRoot.parentNode.tagName == 'LI' && $(splitRoot.parentNode).find('.voiceBox').length) {
+                else if (dom.isEmpty(splitRoot) && $(splitRoot).parents('li').length && $(splitRoot).parents('li').find('.voiceBox').length && !splitRoot.nextSibling) {
+                    // 没有下一个兄弟元素
                     let li = document.createElement('li')
                     li.innerHTML = '<br>'
                     $(splitRoot).closest('li').after(li)
                     nextPara = li;
-                } else if (splitRoot.tagName == 'LI' && $(splitRoot).find('.voiceBox').length) {
+                }
+                else if (splitRoot.tagName == 'LI' && $(splitRoot).find('.voiceBox').length) {
                     var selectionObj = window.getSelection();
                     var rangeObj = selectionObj.getRangeAt(0);
                     let p = document.createElement('p')
