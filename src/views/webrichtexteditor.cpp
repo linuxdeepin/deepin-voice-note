@@ -57,10 +57,13 @@ WebRichTextEditor::~WebRichTextEditor()
     if (imgView != nullptr) {
         delete imgView;
     }
+    m_webMutex.unlock();
 }
 
 void WebRichTextEditor::initWebView()
 {
+    //对后台调用web端行为加锁
+    m_webMutex.lock();
     QWebChannel *channel = new QWebChannel(this);
     JsContent *content = JsContent::instance();
     channel->registerObject("webobj", content);
@@ -74,6 +77,7 @@ void WebRichTextEditor::initWebView()
     connect(content, &JsContent::popupMenu, this, &WebRichTextEditor::saveMenuParam);
     connect(content, &JsContent::textPaste, this, &WebRichTextEditor::onPaste);
     connect(content, &JsContent::loadFinsh, this, &WebRichTextEditor::onThemeChanged);
+    connect(content, &JsContent::loadFinsh, this, &WebRichTextEditor::onLoadFinsh);
     connect(content, &JsContent::viewPictrue, this, &WebRichTextEditor::viewPicture);
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
             this, &WebRichTextEditor::onThemeChanged);
@@ -612,6 +616,16 @@ void WebRichTextEditor::onHideEditToolbar()
     }
 }
 
+/**
+ * @brief onLoadFinsh
+ * 与web端通信建立完成
+ */
+void WebRichTextEditor::onLoadFinsh()
+{
+    //解除对后台与web通信的锁
+    m_webMutex.unlock();
+}
+
 void WebRichTextEditor::setData(VNoteItem *data, const QString &reg)
 {
     //有焦点先隐藏编辑工具栏
@@ -635,11 +649,15 @@ void WebRichTextEditor::setData(VNoteItem *data, const QString &reg)
         m_updateTimer->stop();
         updateNote();
         m_noteData = data;
+        //对设置笔记内容行为加锁
+        m_webMutex.lock();
         if (data->htmlCode.isEmpty()) {
             emit JsContent::instance()->callJsInitData(data->metaDataRef().toString());
         } else {
             emit JsContent::instance()->callJsSetHtml(data->htmlCode);
         }
+        //解锁
+        m_webMutex.unlock();
         m_updateTimer->start();
     } else { //笔记相同时执行搜索
         findText(reg);

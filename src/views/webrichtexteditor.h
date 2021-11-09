@@ -26,6 +26,7 @@
 #include <QObject>
 #include <QtWebChannel/QWebChannel>
 #include <QtWebEngineWidgets/QWebEngineView>
+#include <QMutex>
 
 struct VNoteItem;
 class VNoteRightMenu;
@@ -144,6 +145,10 @@ public slots:
      * @brief 隐藏编辑工具栏
      */
     void onHideEditToolbar();
+    /**
+     * @brief 与web端通信建立完成
+     */
+    void onLoadFinsh();
 
 protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
@@ -220,6 +225,7 @@ private:
     VNoteRightMenu *m_pictureRightMenu {nullptr}; //图片右键菜单
     VNoteRightMenu *m_voiceRightMenu {nullptr}; //语音右键菜单
     VNoteRightMenu *m_txtRightMenu {nullptr}; //文字右键菜单
+    QMutex m_webMutex; //互斥锁，用于保证后台数据在web端加载完成后才将数据发送至web端
 
     QScopedPointer<VNVoiceBlock> m_voiceBlock {nullptr}; //待另存的语音数据
 };
