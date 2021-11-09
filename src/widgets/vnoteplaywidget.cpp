@@ -71,7 +71,8 @@ void VNotePlayWidget::initUI()
     sliderLayout->addWidget(m_slider, Qt::AlignTop);
     sliderLayout->setSpacing(0);
     m_sliderHover->setLayout(sliderLayout);
-    sliderLayout->setContentsMargins(0, 5, 0, 5);
+    //语音名和进度条上下边距
+    sliderLayout->setContentsMargins(0, 1, 0, 1);
     QHBoxLayout *mainLayout = new QHBoxLayout;
     mainLayout->addWidget(m_playerBtn);
     mainLayout->addWidget(m_sliderHover);
