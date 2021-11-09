@@ -1558,6 +1558,9 @@ void VNoteMainWindow::onNewNotebook()
     gettimeofday(&curret, nullptr);
 
     if (TM(lastPress, curret) > MIN_STKEY_RESP_TIME) {
+        //新建记事本，设置焦点为主窗口，防止焦点在标题栏造成标题栏按钮控件闪烁
+        m_stackedWidget->setFocus();
+
         addNotepad();
 
         UPT(lastPress, curret);
