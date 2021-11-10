@@ -3065,7 +3065,6 @@
             var selectionObj = window.getSelection();
             var rangeObj = selectionObj.getRangeAt(0);
             var paras = rng.nodes(dom.isPara, { includeAncestor: true });
-           
             // 筛选LI标签
             for (let i = 0; i <= paras.length; i++) {
                 if ($(paras[i]).parents('li').length) {
@@ -3961,6 +3960,7 @@
                         } else if (sCmd == 'backColor') {
                             document.execCommand("backColor", false, value == 'transparent' ? 'inherit' : value);
                         } else if (sCmd == 'strikethrough' || sCmd == 'underline') {
+                            document.execCommand('styleWithCSS', false, false);
                             document.execCommand(sCmd, false);
                         }
                         else {

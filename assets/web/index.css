@@ -197,3 +197,12 @@ body {
 ::selection {
     color: #fff;
 }
+
+u {
+    text-decoration-color: transparent!important;
+    border-bottom: 1px solid rgba(65, 77, 104, 1);
+}
+
+strike {
+    text-decoration-color: rgba(65, 77, 104, 1);
+}
