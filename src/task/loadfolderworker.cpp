@@ -47,6 +47,13 @@ void LoadFolderWorker::run()
     VNoteFolderOper folderOper;
     VNOTE_FOLDERS_MAP *foldersMap = folderOper.loadVNoteFolders();
 
+    //未加密的记事本手动加密
+    if (foldersMap->folders.size()) {
+        for (auto it : foldersMap->folders) {
+            folderOper.encryptVNoteFolder(it);
+        }
+    }
+
     gettimeofday(&end, nullptr);
 
     qDebug() << "LoadFolderWorker(ms):" << TM(start, end);

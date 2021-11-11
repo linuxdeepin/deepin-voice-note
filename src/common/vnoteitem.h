@@ -75,6 +75,8 @@ public:
     qint32 noteState {State::Normal};
     //是否置顶
     qint32 isTop {0};
+    //是否加密
+    qint32 encryption {0};
     //标题名称
     QString noteTitle {""};
     //富文本内容

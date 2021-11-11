@@ -64,6 +64,7 @@ public:
             create_time,
             modify_time,
             delete_time,
+            encrypt,
         };
 
         static const QStringList folderColumnsName;
@@ -81,6 +82,7 @@ public:
             modify_time,
             delete_time,
             is_top,
+            encrypt,
         };
 
         static const QStringList noteColumnsName;
@@ -240,6 +242,24 @@ class DelNoteDbVisitor : public DbVisitor
 {
 public:
     explicit DelNoteDbVisitor(QSqlDatabase &db, const void *inParam, void *result);
+
+    virtual bool prepareSqls() override;
+};
+
+//记事本加密
+class EncryptFolderDbVisitor : public DbVisitor
+{
+public:
+    explicit EncryptFolderDbVisitor(QSqlDatabase &db, const void *inParam, void *result);
+
+    virtual bool prepareSqls() override;
+};
+
+//笔记加密
+class EncryptNoteDbVisitor : public DbVisitor
+{
+public:
+    explicit EncryptNoteDbVisitor(QSqlDatabase &db, const void *inParam, void *result);
 
     virtual bool prepareSqls() override;
 };

@@ -55,6 +55,8 @@ public:
     bool deleteVNoteFolder(VNoteFolder *folder);
     //重命名记事本
     bool renameVNoteFolder(const QString &folderName);
+    //加密记事本
+    bool encryptVNoteFolder(VNoteFolder *folder);
 
 protected:
     VNoteFolder *m_folder {nullptr};

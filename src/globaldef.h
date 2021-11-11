@@ -56,6 +56,7 @@
 #define VNOTE_AUDIO_SELECT "base.audiosource.select"
 #define VNOTE_FOLDER_SORT "base.folder_sort.folder_sort_data"
 #define VNOTE_NOTEPAD_LIST_SHOW "base.notepadlist.show"
+#define VNOTE_NOTEPAD_ENCRYPTION_KEY "base.encryption.key"
 //********************************************
 
 //Time format
