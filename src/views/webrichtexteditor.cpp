@@ -57,13 +57,10 @@ WebRichTextEditor::~WebRichTextEditor()
     if (imgView != nullptr) {
         delete imgView;
     }
-    m_webMutex.unlock();
 }
 
 void WebRichTextEditor::initWebView()
 {
-    //对后台调用web端行为加锁
-    m_webMutex.lock();
     QWebChannel *channel = new QWebChannel(this);
     JsContent *content = JsContent::instance();
     channel->registerObject("webobj", content);
@@ -622,8 +619,15 @@ void WebRichTextEditor::onHideEditToolbar()
  */
 void WebRichTextEditor::onLoadFinsh()
 {
-    //解除对后台与web通信的锁
-    m_webMutex.unlock();
+    //再次设置笔记内容
+    if (m_noteData && !m_loadFinshSign) {
+        if (m_noteData->htmlCode.isEmpty()) {
+            emit JsContent::instance()->callJsInitData(m_noteData->metaDataRef().toString());
+        } else {
+            emit JsContent::instance()->callJsSetHtml(m_noteData->htmlCode);
+        }
+    }
+    m_loadFinshSign = true;
 }
 
 void WebRichTextEditor::setData(VNoteItem *data, const QString &reg)
@@ -649,15 +653,13 @@ void WebRichTextEditor::setData(VNoteItem *data, const QString &reg)
         m_updateTimer->stop();
         updateNote();
         m_noteData = data;
-        //对设置笔记内容行为加锁
-        m_webMutex.lock();
-        if (data->htmlCode.isEmpty()) {
-            emit JsContent::instance()->callJsInitData(data->metaDataRef().toString());
-        } else {
-            emit JsContent::instance()->callJsSetHtml(data->htmlCode);
+        if (m_loadFinshSign) {
+            if (data->htmlCode.isEmpty()) {
+                emit JsContent::instance()->callJsInitData(data->metaDataRef().toString());
+            } else {
+                emit JsContent::instance()->callJsSetHtml(data->htmlCode);
+            }
         }
-        //解锁
-        m_webMutex.unlock();
         m_updateTimer->start();
     } else { //笔记相同时执行搜索
         findText(reg);

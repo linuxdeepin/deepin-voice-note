@@ -26,7 +26,6 @@
 #include <QObject>
 #include <QtWebChannel/QWebChannel>
 #include <QtWebEngineWidgets/QWebEngineView>
-#include <QMutex>
 
 struct VNoteItem;
 class VNoteRightMenu;
@@ -225,7 +224,7 @@ private:
     VNoteRightMenu *m_pictureRightMenu {nullptr}; //图片右键菜单
     VNoteRightMenu *m_voiceRightMenu {nullptr}; //语音右键菜单
     VNoteRightMenu *m_txtRightMenu {nullptr}; //文字右键菜单
-    QMutex m_webMutex; //互斥锁，用于保证后台数据在web端加载完成后才将数据发送至web端
+    bool m_loadFinshSign = false; //后台与web通信连通标志 true: 连通， false: 未联通
 
     QScopedPointer<VNVoiceBlock> m_voiceBlock {nullptr}; //待另存的语音数据
 };
