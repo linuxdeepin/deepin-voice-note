@@ -10,6 +10,10 @@ strike {
     text-decoration-color: rgba(192, 198, 212, 1)!important;
 }
 
+strike[style="text-decoration-line: underline;"] {
+    border-bottom: 1px solid rgba(192, 198, 212, 1)!important;
+}
+
 .title, .time {
     color: rgba(192, 198, 212, 1)!important
 }
