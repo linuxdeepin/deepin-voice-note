@@ -1416,7 +1416,7 @@
     function splitNode(point, options) {
         var isSkipPaddingBlankHTML = options && options.isSkipPaddingBlankHTML;
         var isNotSplitEdgePoint = options && options.isNotSplitEdgePoint;
-        // edge case
+        // edge case 
         if (isEdgePoint(point) && (isText(point.node) || isNotSplitEdgePoint)) {
             if (isLeftEdgePoint(point)) {
                 return point.node;
@@ -1461,6 +1461,21 @@
         else if (ancestors.length === 1) {
             return splitNode(point, options);
         }
+
+        // 筛选有兄弟元素的父级元素
+        let parentiSbling = ancestors.find(item => item.parentNode.nextSibling).parentNode.nextSibling
+        let textNode = ''
+        if (parentiSbling.tagName !== 'P'
+            && parentiSbling.tagName !== 'LI'
+            && parentiSbling.nodeType == 1) {
+            textNode = parentiSbling.childNodes[0]
+            ancestors = listAncestor(textNode, func.eq(root));
+            point = {
+                node: textNode,
+                offset: 0
+            }
+        }
+
         return ancestors.reduce(function (node, parent) {
             if (node === point.node) {
                 node = splitNode(point, options);
