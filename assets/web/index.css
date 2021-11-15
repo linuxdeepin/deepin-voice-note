@@ -34,6 +34,7 @@ body {
     font-weight: normal!important;
     font-style: normal!important;
     text-decoration: none!important;
+    font-size: 14px;
     background: rgba(0, 0, 0, 0.05);
     min-height: 30px;
     border-radius: 8px;
