@@ -251,6 +251,9 @@ document.addEventListener('copy', copyVoice);
 // 语音剪切
 document.addEventListener('cut', copyVoice);
 
+
+
+
 // 语音复制功能
 function copyVoice(event) {
     isVoicePaste = false
@@ -269,7 +272,6 @@ function copyVoice(event) {
         $(docFragment).find('.voicebtn').removeClass('now');
         $(docFragment).find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four');
 
-        event.preventDefault()
         isVoicePaste = true
 
     }
@@ -278,7 +280,7 @@ function copyVoice(event) {
         return item.tagName == 'LI'
     })
     // 有序无序列表复制
-    if (isVoicePaste && isUlOrOl) {
+    if (isUlOrOl) {
         let tagName = rangeObj.commonAncestorContainer.tagName
         let box = document.createElement(tagName)
         docFragment = rangeObj.cloneContents();
@@ -291,42 +293,20 @@ function copyVoice(event) {
         testDiv.innerHTML = ''
         testDiv.appendChild(box)
     }
-    if (isVoicePaste && event.type == 'cut') {
-        // 记录之前数据
-        $('#summernote').summernote('editor.recordUndo')
-        rangeObj.deleteContents()
-        if (!isUlOrOl) {
-            let p = document.createElement('p');
-            p.innerHTML = '<br>'
-            rangeObj.insertNode(p)
-            // 设置焦点
-            setFocus(p, 0)
-        }
-        removeUlOl()
-        // 主动触发change事件
-        changeContent()
-    }
     formatHtml = testDiv.innerHTML;
     if ($(testDiv).children().length == 1 && $(testDiv).children()[0].tagName != 'UL' && $(testDiv).find('.voiceBox').length != 0) {
         formatHtml = '<p><br></p>' + formatHtml
 
     }
-    if (isVoicePaste) {
-        webobj.jsCallSetClipData(selectionObj.toString(), formatHtml)
+    webobj.jsCallSetClipData(selectionObj.toString().replace(/\n\n/g, '\n'), formatHtml)
+    if (event.type == 'cut') {
+        // 记录之前数据
+        $('#summernote').summernote('editor.recordUndo')
+        document.execCommand('delete', false);
+        // 主动触发change事件
+        changeContent()
     }
-}
-
-// 移除当前焦点所在行空ulol
-function removeUlOl() {
-    var sel = window.getSelection();
-    $(sel.focusNode).children().toArray().forEach(item => {
-        if (item.innerHTML == '') {
-            item.remove()
-        }
-    })
-    if (!$(sel.focusNode).children().length) {
-        sel.focusNode.remove()
-    }
+    event.preventDefault()
 }
 
 // 剪切板内容变化
@@ -586,12 +566,21 @@ function insertVoiceItem(text) {
  * @returns {any}
  */
 function removeNullP() {
+    $('ul').children().each((index, item) => {
+        if (item.tagName == 'P') {
+            $(item).remove();
+        }
+    })
+    $('ol').children().each((index, item) => {
+        if (item.tagName == 'P') {
+            $(item).remove();
+        }
+    })
     $('p').each((index, item) => {
         if (item.innerHTML === '') {
             $(item).remove();
         }
     })
-
 }
 
 /**
