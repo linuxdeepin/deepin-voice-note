@@ -45,6 +45,12 @@ endif()
 # 设置添加gocv相关信息的输出
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fprofile-arcs -ftest-coverage")
 
+#安全加固参数
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -z relro -z now -z noexecstack -pie")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -z relro -z now -z noexecstack -pie")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fstack-protector-all")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -fstack-protector-all")
+
 find_package(Qt5Test REQUIRED)
 find_package(GTest REQUIRED)
 find_package(Qt5Svg REQUIRED)
