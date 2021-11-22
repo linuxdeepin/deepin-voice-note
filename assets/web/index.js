@@ -335,7 +335,7 @@ function setFocusScroll() {
     let scrollTop = $(document).scrollTop()
     let viewY = $(window).height() + scrollTop
     if (focusY < scrollTop || focusY > viewY) {
-        $(document).scrollTop(focusY - $(window).height() + 16)
+        $(document).scrollTop(focusY - $(window).height())
     }
 }
 
@@ -477,7 +477,7 @@ function getCursortPosition(element) {
         let span = document.createElement('span');
         $(span).addClass('focusAddress')
         range.insertNode(span)
-        caretOffset = $(span).offset().top
+        caretOffset = $(span).offset().top + ($(span).css('fontSize').slice(0, -2) - 0) + 5
         $(span).remove()
     }
     return caretOffset;
