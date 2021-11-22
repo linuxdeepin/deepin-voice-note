@@ -308,7 +308,6 @@ void RightView::onTextEditTextChange()
  */
 void RightView::initData(VNoteItem *data, QString reg, bool fouse)
 {
-    this->setVisible(false);
     clearAllSelection();
 
     //数据相同时只更新搜索高亮
@@ -346,7 +345,6 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
 
     if (m_noteItemData == nullptr) {
         m_curItemWidget = nullptr;
-        this->setVisible(true);
         return;
     }
     //插入数据
@@ -394,7 +392,6 @@ void RightView::initData(VNoteItem *data, QString reg, bool fouse)
         m_curItemWidget->setFocus(m_selectWidget.contains(VoicePlugin));
         adjustVerticalScrollBar(m_curItemWidget, m_curItemWidget->height());
     }
-    this->setVisible(true);
 }
 
 /**
