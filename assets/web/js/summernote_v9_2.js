@@ -1461,20 +1461,28 @@
         else if (ancestors.length === 1) {
             return splitNode(point, options);
         }
-
         // 筛选有兄弟元素的父级元素
-        let isNextSibling = ancestors.find(item => item.parentNode.nextSibling)
-        if (isNextSibling) {
-            let parentiSbling = isNextSibling.parentNode.nextSibling
-            let textNode = ''
-            if (parentiSbling.tagName !== 'P'
-                && parentiSbling.tagName !== 'LI'
-                && parentiSbling.nodeType == 1) {
-                textNode = parentiSbling.childNodes[0]
-                ancestors = listAncestor(textNode, func.eq(root));
-                point = {
-                    node: textNode,
-                    offset: 0
+        if (ancestors.length > 2) {
+            let domList = ancestors.slice(0, ancestors.length - 1)
+            let ifHasNextSibling = domList.find(item => item.nextSibling)
+            if (ifHasNextSibling && point.offset != 0 && isRightEdgePoint(point)) {
+                let nestSibling = ifHasNextSibling.nextSibling
+                let textNode = ''
+                if (nestSibling.nodeType == 1) {
+                    textNode = nestSibling.childNodes[0]
+                    ancestors = listAncestor(textNode, func.eq(root));
+                    point = {
+                        node: textNode,
+                        offset: 0
+                    }
+                }
+                else if (nestSibling.nodeType == 3 && !nestSibling.data.match(/[\n\r]/g)) {
+                    textNode = nestSibling
+                    ancestors = listAncestor(textNode, func.eq(root));
+                    point = {
+                        node: textNode,
+                        offset: 0
+                    }
                 }
             }
         }
