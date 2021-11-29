@@ -851,6 +851,94 @@ document.onkeydown = function (event) {
         if (getSelectedRange().innerHTML == document.querySelector('.note-editable').innerHTML) {
             $('.note-editable').html('<p><br></p>')
         }
+        var selectionObj = window.getSelection();
+        let focusDom = selectionObj.extentNode
+        if ($(focusDom).closest('span').length
+            && $(focusDom).closest('span').html() !== '<br>'
+            && selectionObj.extentOffset == 0) {
+            if ($(focusDom).parents('li').length
+                && $(focusDom).parents('li').prev().length
+                && $(focusDom).parents('li').prev()[0].tagName == 'LI'
+                && !$(focusDom).parents('li').find('.voiceBox').length) {
+                // 父元素为LI
+                setBackspace(focusDom, "li")
+                return false
+            }
+            else if ($(focusDom).parents('p').length
+                && $(focusDom).parents('p').prev().length
+                && $(focusDom).parents('p').prev()[0].tagName == 'UL') {
+                // 父元素为P 上个元素为UL
+                setBackspace(focusDom, "p")
+                return false
+            }
+            else if ($(focusDom).parents('p').length
+                && $(focusDom).parents('p').prev().length
+                && $(focusDom).parents('p').prev()[0].tagName == 'OL') {
+                // 父元素为P 上个元素为OL
+                setBackspace(focusDom, "p")
+                return false
+            }
+        }
+    } else if (window.event.keyCode == 46) {
+        // delete
+        var selectionObj = window.getSelection();
+        let focusDom = selectionObj.extentNode
+        let domList = $(focusDom).parents()
+        let isHas = true
+        // 处理LI以内子元素
+        for (let i = 0; i < domList.length; i++) {
+            if (domList[i].tagName == 'LI') {
+                let nowItem = domList[i]
+                domList = domList.slice(0, i);
+                if (domList.length == 0) {
+                    domList.push(nowItem.firstChild)
+                }
+                break;
+            }
+        }
+        domList = domList.toArray()
+        // 判断是否有除br的以外的兄弟元素
+        for (let i = 0; i < domList.length; i++) {
+            if (domList[i].nextSibling) {
+                if (domList[i].nextSibling.nodeType == 3 || (domList[i].nextSibling.nodeType != 3 && !domList[i].nextSibling.innerHTML.match(/<br>/g))) {
+                    isHas = false;
+                    break;
+                } else if (domList[i].nextSibling.innerHTML.match(/<br>/g)) {
+                    $(domList[i].nextSibling).remove()
+                    isHas = true;
+                }
+            } else {
+                isHas = true;
+            }
+        }
+
+        if (selectionObj.extentOffset == focusDom.nodeValue.length && isHas) {
+            if ($(focusDom).parents('li').length
+                && $(focusDom).parents('li').next().length
+                && $(focusDom).parents('li').next()[0].tagName == 'LI'
+                && !$(focusDom).parents('li').find('.voiceBox').length
+                && $(focusDom).parents('li').next().children('span').length) {
+                // 下个元素为LI
+                setDelete(focusDom, "li")
+                return false
+            }
+            else if (!$(focusDom).parents('li').next().length
+                && $(focusDom).parents('ul').next().length
+                && $(focusDom).parents('ul').next()[0].tagName == 'P'
+                && $(focusDom).parents('ul').next().children('span').length) {
+                // 下个元素为P
+                setDelete(focusDom, "ul")
+                return false
+            }
+            else if (!$(focusDom).parents('li').next().length
+                && $(focusDom).parents('ol').next().length
+                && $(focusDom).parents('ol').next()[0].tagName == 'P'
+                && $(focusDom).parents('ol').next().children('span').length) {
+                // 下个元素为P 
+                setDelete(focusDom, "ol")
+                return false
+            }
+        }
     } else if (event.ctrlKey && window.event.keyCode == 65) {
         // ctrl+a
         // 去除语音选中样式
@@ -862,6 +950,44 @@ document.onkeydown = function (event) {
         }
     }
 
+}
+
+/**
+ * delete 改变元素位置
+ * @date 2021-11-25
+ * @param {dom} focusDom 焦点所在元素
+ * @param {string} name 父元素名
+ * @returns {any}
+ */
+function setDelete(focusDom, name) {
+    let nextDom = $(focusDom).closest(name).next()
+    if (name == 'li') {
+        $(focusDom).parents(name).append($(focusDom).parents('li').next())
+    } else {
+        $(focusDom).closest('li').append(nextDom)
+    }
+    nextDom.children(":first").unwrap()
+}
+
+/**
+ * backspace 改变元素位置
+ * @date 2021-11-25
+ * @param {dom} focusDom 焦点所在元素
+ * @param {string} name 父元素名
+ * @returns {any}
+ */
+function setBackspace(focusDom, name) {
+    if (name == 'li') {
+        $(focusDom).parents(name).prev().append($(focusDom).parents('li'))
+    } else {
+        $(focusDom).parents(name).prev().children(':last').append($(focusDom).parents(name))
+    }
+    let prevDom = $(focusDom).closest(name).prev()
+    if (prevDom.length && prevDom[0].tagName == "SPAN" && prevDom.html().match(/<br>/g)) {
+        prevDom.remove()
+    }
+    $(focusDom).parents(name).children(":first").unwrap()
+    setFocus($(focusDom).parent()[0], 0)
 }
 
 // ctrl+b 添加记事本
