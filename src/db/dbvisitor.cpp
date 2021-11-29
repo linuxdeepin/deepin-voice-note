@@ -28,7 +28,6 @@
 #include "common/vnoteforlder.h"
 #include "common/vnoteitem.h"
 #include "common/setting.h"
-#include "common/dataencryption.h"
 
 #include "db/vnotedbmanager.h"
 
@@ -74,12 +73,6 @@ const QStringList DbVisitor::DBSafer::saferColumnsName = {
     "create_time",
 };
 
-static DataEncryptor *getDataEncryptor()
-{
-    //从配置文件获取数据加密的密钥
-    static DataEncryptor encryptor(setting::instance()->getOption(VNOTE_NOTEPAD_ENCRYPTION_KEY).toString());
-    return &encryptor;
-}
 /**
  * @brief DbVisitor::DbVisitor
  * @param db 数据库对象
@@ -173,7 +166,7 @@ bool FolderQryDbVisitor::visitorData()
 
             folder->id = m_sqlQuery->value(DBFolder::folder_id).toInt();
             folder->category = m_sqlQuery->value(DBFolder::category_id).toInt();
-            folder->name = m_sqlQuery->value(DBFolder::folder_name).toString();
+            QVariant folderName = m_sqlQuery->value(DBFolder::folder_name);
             folder->defaultIcon = m_sqlQuery->value(DBFolder::default_icon).toInt();
             folder->iconPath = m_sqlQuery->value(DBFolder::icon_path).toString();
             folder->folder_state = m_sqlQuery->value(DBFolder::folder_state).toInt();
@@ -185,10 +178,7 @@ bool FolderQryDbVisitor::visitorData()
             folder->deleteTime = m_sqlQuery->value(DBFolder::delete_time).toDateTime();
             folder->encryption = m_sqlQuery->value(DBFolder::encrypt).toInt();
             //查询时，如果是加密数据，则需要解密
-            if (folder->encryption) {
-                folder->name = getDataEncryptor()->decodeString(folder->name);
-            }
-
+            folder->name = folder->encryption ? QByteArray::fromBase64(folderName.toByteArray()) : folderName.toString();
             //************Expand fileds begin**********
             //TODO:
             //    Add the expand fileds parse code here
@@ -253,14 +243,16 @@ bool NoteQryDbVisitor::visitorData()
             note->noteId = m_sqlQuery->value(DBNote::note_id).toInt();
             note->folderId = m_sqlQuery->value(DBNote::folder_id).toInt();
             note->noteType = m_sqlQuery->value(DBNote::note_type).toInt();
-            note->noteTitle = m_sqlQuery->value(DBNote::note_title).toString();
+            QVariant noteTitle = m_sqlQuery->value(DBNote::note_title);
             //Parse meta data
             QVariant metaData = m_sqlQuery->value(DBNote::meta_data);
 
             //查询时，如果是加密数据，则需要解密
             if (note->encryption) {
-                note->noteTitle = getDataEncryptor()->decodeString(note->noteTitle);
-                metaData = getDataEncryptor()->decodeString(metaData.toString());
+                note->noteTitle = QByteArray::fromBase64(noteTitle.toByteArray());
+                metaData = QByteArray::fromBase64(metaData.toByteArray());
+            } else {
+                note->noteTitle = noteTitle.toString();
             }
 
             note->setMetadata(metaData);
@@ -407,7 +399,7 @@ bool AddFolderDbVisitor::visitorData()
             results.newFolder->id = m_sqlQuery->value(DBFolder::folder_id).toInt();
             results.newFolder->category = m_sqlQuery->value(DBFolder::category_id).toInt();
             //新添加的记事本都是进行加密的，需要解密
-            results.newFolder->name = getDataEncryptor()->decodeString(m_sqlQuery->value(DBFolder::folder_name).toString());
+            results.newFolder->name = QByteArray::fromBase64(m_sqlQuery->value(DBFolder::folder_name).toByteArray());
             results.newFolder->defaultIcon = m_sqlQuery->value(DBFolder::default_icon).toInt();
             results.newFolder->iconPath = m_sqlQuery->value(DBFolder::icon_path).toString();
             results.newFolder->folder_state = m_sqlQuery->value(DBFolder::folder_state).toInt();
@@ -455,7 +447,7 @@ bool AddFolderDbVisitor::prepareSqls()
                           DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data(),
                           DBFolder::folderColumnsName[DBFolder::delete_time].toUtf8().data(),
                           DBFolder::folderColumnsName[DBFolder::encrypt].toUtf8().data(),
-                          getDataEncryptor()->encodeString(param.newFolder->name).toUtf8().data(),
+                          param.newFolder->name.toLocal8Bit().toBase64().data(),
                           param.newFolder->defaultIcon,
                           createTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
                           createTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
@@ -503,7 +495,7 @@ bool RenameFolderDbVisitor::prepareSqls()
         renameSql.sprintf(RENAME_FOLDERS_FMT,
                           VNoteDbManager::FOLDER_TABLE_NAME,
                           DBFolder::folderColumnsName[DBFolder::folder_name].toUtf8().data(),
-                          folder->encryption ? getDataEncryptor()->encodeString(sqlFolderName).toUtf8().data() : sqlFolderName.toUtf8().data(),
+                          folder->encryption ? sqlFolderName.toLocal8Bit().toBase64().data() : sqlFolderName.toUtf8().data(),
                           DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data(),
                           folder->modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
                           DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data(),
@@ -589,9 +581,9 @@ bool AddNoteDbVisitor::visitorData()
             note->noteType = m_sqlQuery->value(DBNote::note_type).toInt();
             note->encryption = m_sqlQuery->value(DBNote::encrypt).toInt();
             //新添加的笔记是加密的，需要解密
-            note->noteTitle = getDataEncryptor()->decodeString(m_sqlQuery->value(DBNote::note_title).toString());
+            note->noteTitle = QByteArray::fromBase64(m_sqlQuery->value(DBNote::note_title).toByteArray());
             //Parse meta data
-            QVariant metaData = getDataEncryptor()->decodeString(m_sqlQuery->value(DBNote::meta_data).toString());
+            QVariant metaData = QByteArray::fromBase64(m_sqlQuery->value(DBNote::meta_data).toByteArray());
 
             note->setMetadata(metaData);
             metaParser.parse(metaData, note);
@@ -656,8 +648,8 @@ bool AddNoteDbVisitor::prepareSqls()
                           DBNote::noteColumnsName[DBNote::encrypt].toUtf8().data(),
                           note->folderId,
                           note->noteType,
-                          getDataEncryptor()->encodeString(noteTitle).toUtf8().data(),
-                          getDataEncryptor()->encodeString(metaDataStr).toUtf8().data(),
+                          noteTitle.toLocal8Bit().toBase64().data(),
+                          metaDataStr.toLocal8Bit().toBase64().data(),
                           createTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
                           createTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
                           createTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
@@ -712,7 +704,7 @@ bool RenameNoteDbVisitor::prepareSqls()
                                   VNoteDbManager::NOTES_TABLE_NAME,
                                   DBNote::noteColumnsName[DBNote::note_title].toUtf8().data(),
                                   //如果笔记是加密的，则更新也需要加密数据
-                                  note->encryption ? getDataEncryptor()->encodeString(sqlTitle).toUtf8().data() : sqlTitle.toUtf8().data(),
+                                  note->encryption ? sqlTitle.toLocal8Bit().toBase64().data() : sqlTitle.toUtf8().data(),
                                   DBNote::noteColumnsName[DBNote::modify_time].toUtf8().data(),
                                   note->modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
                                   DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data(),
@@ -766,7 +758,7 @@ bool UpdateNoteDbVisitor::prepareSqls()
                                   VNoteDbManager::NOTES_TABLE_NAME,
                                   DBNote::noteColumnsName[DBNote::meta_data].toUtf8().data(),
                                   //如果笔记是加密的，则更新也需要加密数据
-                                  note->encryption ? getDataEncryptor()->encodeString(metaDataStr).toUtf8().data() : metaDataStr.toUtf8().data(),
+                                  note->encryption ? metaDataStr.toLocal8Bit().toBase64().data() : metaDataStr.toUtf8().data(),
                                   DBNote::noteColumnsName[DBNote::modify_time].toUtf8().data(),
                                   note->modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
                                   DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data(),
@@ -912,7 +904,7 @@ bool EncryptFolderDbVisitor::prepareSqls()
         encrySql.sprintf(ENCRYPT_FOLDER_FMT,
                          VNoteDbManager::FOLDER_TABLE_NAME,
                          DBFolder::folderColumnsName[DBFolder::folder_name].toUtf8().data(),
-                         getDataEncryptor()->encodeString(folder->name).toUtf8().data(),
+                         folder->name.toLocal8Bit().toBase64().data(),
                          DBFolder::folderColumnsName[DBFolder::encrypt].toUtf8().data(),
                          1,
                          DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data(),
@@ -937,9 +929,9 @@ bool EncryptNoteDbVisitor::prepareSqls()
         encrySql.sprintf(ENCRYPT_NOTE_FMT,
                          VNoteDbManager::NOTES_TABLE_NAME,
                          DBNote::noteColumnsName[DBNote::note_title].toUtf8().data(),
-                         getDataEncryptor()->encodeString(note->noteTitle).toUtf8().data(),
+                         note->noteTitle.toLocal8Bit().toBase64().data(),
                          DBNote::noteColumnsName[DBNote::meta_data].toUtf8().data(),
-                         getDataEncryptor()->encodeString(note->metaDataConstRef().toString()).toUtf8().data(),
+                         note->metaDataConstRef().toByteArray().toBase64().data(),
                          DBNote::noteColumnsName[DBNote::encrypt].toUtf8().data(),
                          1,
                          DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data(),
