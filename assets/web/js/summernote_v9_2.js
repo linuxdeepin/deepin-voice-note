@@ -4502,33 +4502,31 @@
             // 记录插入图片之前的操作
             this.history.recordUndo();
             var _this = this;
-            return createImage(src, param).then(function ($image) {
-                _this.beforeCommand();
-                if (typeof param === 'function') {
-                    param($image);
+            let $image = $(document.createElement('img'))
+            $image.appendTo(document.body).attr('src', src)
+            _this.beforeCommand();
+            if (typeof param === 'function') {
+                param($image);
+            }
+            else {
+                if (typeof param === 'string') {
+                    $image.attr('data-filename', param);
                 }
-                else {
-                    if (typeof param === 'string') {
-                        $image.attr('data-filename', param);
-                    }
+            }
+            $image.show();
+            range.create(_this.editable).insertNode($image[0]);
+            range.createFromNodeAfter($image[0]).select();
+
+            let voiceBoxList = document.querySelectorAll('.voiceBox')
+            voiceBoxList.forEach((item, index) => {
+                if ($(item).find('img').length != 0) {
+                    $(item).after($(item).clone().html())
+                    $(item).remove()
                 }
-                $image.show();
-                range.create(_this.editable).insertNode($image[0]);
-                range.createFromNodeAfter($image[0]).select();
+            })
 
-                let voiceBoxList = document.querySelectorAll('.voiceBox')
-                voiceBoxList.forEach((item, index) => {
-                    if ($(item).find('img').length != 0) {
-                        $(item).after($(item).clone().html())
-                        $(item).remove()
-                    }
-                })
-
-                _this.afterCommand();
-                setFocusScroll()
-            }).fail(function (e) {
-                _this.context.triggerEvent('image.upload.error', e);
-            });
+            _this.afterCommand();
+            setFocusScroll()
         };
         /**
          * insertImages
