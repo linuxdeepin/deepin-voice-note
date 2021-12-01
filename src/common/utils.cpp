@@ -352,3 +352,8 @@ QString Utils::filteredFileName(QString fileName, const QString &defaultName)
     }
     return name;
 }
+
+bool Utils::isWayland()
+{
+    return qApp->platformName() == "dwayland" || qApp->property("_d_isDwayland").toBool();
+}

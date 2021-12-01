@@ -60,4 +60,6 @@ public:
     static bool isLoongsonPlatform();
     //过滤文件名内容
     static QString filteredFileName(QString fileName, const QString &defaultName = "");
+    //判断是否wayland
+    static bool isWayland();
 };

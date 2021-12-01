@@ -380,8 +380,18 @@ void VNoteMainWindow::initTitleBar()
     QWidget::setTabOrder(titlebar(), m_viewChange); //设置title焦点传递的下一个控件
     QWidget::setTabOrder(m_viewChange, m_imgInsert); //设置焦点传递顺序
 
-    DWindowCloseButton *closeBtn = titlebar()->findChild<DWindowCloseButton *>("DTitlebarDWindowCloseButton");
-    closeBtn->installEventFilter(this);
+    //捕捉标题栏最右边控件事件
+    QObject *btn = nullptr;
+    if (Utils::isWayland()) {
+        //wayland 显示时控件为菜单按钮
+        btn = titlebar()->findChild<QObject *>("DTitlebarDWindowOptionButton");
+    } else {
+        //x11显示时控件为关闭按钮
+        btn = titlebar()->findChild<QObject *>("DTitlebarDWindowCloseButton");
+    }
+    if (nullptr != btn) {
+        btn->installEventFilter(this);
+    }
     //改变标题栏焦点策略，解决键盘交互第一次显示"关于"窗口后ESC关闭窗口菜单按钮无焦点
     titlebar()->setFocusPolicy(Qt::ClickFocus);
 }
@@ -1816,7 +1826,7 @@ void VNoteMainWindow::switchWidget(WindowType type)
 {
     bool searchEnable = type == WndNoteShow ? true : false;
     if (!searchEnable) {
-        titlebar()->setFocus(Qt::TabFocusReason);
+        setTitleBarTabFocus();
     }
     m_noteSearchEdit->setEnabled(searchEnable);
     m_viewChange->setEnabled(searchEnable); //设置记事本收起按钮禁用状态
@@ -1981,7 +1991,7 @@ void VNoteMainWindow::handleMultipleOption(int id)
  */
 void VNoteMainWindow::setTitleBarTabFocus(QKeyEvent *event)
 {
-    titlebar()->setFocus(Qt::TabFocusReason);
+    titlebar()->setFocus(Qt::MouseFocusReason);
     if (event != nullptr) {
         DWidget::keyPressEvent(event);
     }
