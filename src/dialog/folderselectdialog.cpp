@@ -22,6 +22,7 @@
 #include "views/leftviewdelegate.h"
 #include "views/leftviewsortfilter.h"
 #include "globaldef.h"
+#include "common/utils.h"
 
 #include <DApplication>
 #include <DApplicationHelper>
@@ -218,9 +219,15 @@ void FolderSelectDialog::initUI()
 
     QHBoxLayout *titleLayout = new QHBoxLayout();
     titleLayout->setSpacing(0);
-    titleLayout->setContentsMargins(10, 0, 0, 0);
     titleLayout->addStretch();
-    titleLayout->addSpacing(m_closeButton->width() / 3);
+    //wayland显示时调整布局隐藏关闭按钮
+    if (Utils::isWayland()) {
+        titleLayout->setContentsMargins(10, 0, 20, 0);
+        m_closeButton->setVisible(false);
+    } else {
+        titleLayout->setContentsMargins(10, 0, 0, 0);
+        titleLayout->addSpacing(m_closeButton->width() / 3);
+    }
 
     titleLayout->addWidget(m_labMove, 0, Qt::AlignCenter | Qt::AlignVCenter);
     titleLayout->addStretch();
