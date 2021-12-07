@@ -22,6 +22,8 @@
 #define JSCONTENT_H
 
 #include <QObject>
+#include <QClipboard>
+
 #include <QtWebEngineWidgets/qwebenginepage.h>
 
 class JsContent : public QObject
@@ -107,6 +109,10 @@ public slots:
     void jsCallCreateNote(); //web前端调用后端，新建笔记
     void jsCallSetClipData(const QString &text, const QString &html); //web前端调用后端，设置剪切板内容
     QString jsCallGetTranslation(); //web前端调用后端，获取翻译
+    void onClipChange(QClipboard::Mode mode);
+
+private:
+    const QMimeData *m_clipData {nullptr};
 };
 
 #endif // JSCONTENT_H

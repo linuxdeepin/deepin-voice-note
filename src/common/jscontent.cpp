@@ -37,7 +37,7 @@ DWIDGET_USE_NAMESPACE
 
 JsContent::JsContent()
 {
-    connect(QApplication::clipboard(), &QClipboard::dataChanged, this, &JsContent::callJsClipboardDataChanged);
+    connect(QApplication::clipboard(), &QClipboard::changed, this, &JsContent::onClipChange);
 }
 
 JsContent *JsContent::instance()
@@ -196,7 +196,15 @@ void JsContent::jsCallSetClipData(const QString &text, const QString &html)
         //设置富文本
         data->setHtml(html);
         clip->setMimeData(data);
+        m_clipData = data;
         //剪切板重新建立与前端的通信
-        connect(QApplication::clipboard(), &QClipboard::dataChanged, this, &JsContent::callJsClipboardDataChanged);
+        connect(QApplication::clipboard(), &QClipboard::changed, this, &JsContent::onClipChange);
+    }
+}
+
+void JsContent::onClipChange(QClipboard::Mode mode)
+{
+    if (QClipboard::Clipboard == mode && QApplication::clipboard()->mimeData() != m_clipData) {
+        emit callJsClipboardDataChanged();
     }
 }
