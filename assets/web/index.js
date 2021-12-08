@@ -651,7 +651,7 @@ function setVoiceText(text, flag) {
             $('.li').removeClass('active');
         }
         else {
-            activeTransVoice.find('.translate').html('<div class="noselect">' + text + '</div>');
+            activeTransVoice.find('.translate').html('<div class="noselect">' + text + '</div><div class="showTextBox">' + text + '</div>');
             bTransVoiceIsReady = false;
         }
     }
@@ -851,6 +851,11 @@ document.onkeydown = function (event) {
         if (getSelectedRange().innerHTML == document.querySelector('.note-editable').innerHTML) {
             $('.note-editable').html('<p><br></p>')
         }
+
+        // 移除行内样式的p元素
+        let styleStr = $('p[style="display: inline !important;"]')
+        styleStr.after(styleStr.html()).remove();
+
         var selectionObj = window.getSelection();
         let focusDom = selectionObj.extentNode
         if ($(focusDom).closest('span').length

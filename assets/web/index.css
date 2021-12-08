@@ -12,7 +12,7 @@ body {
     padding: 12px 0;
     border-radius: 10px;
     box-sizing: border-box;
-    background-color: transparent!important;
+    background-color: transparent !important;
 }
 
 .demo>div {
@@ -31,9 +31,9 @@ body {
 }
 
 .li {
-    font-weight: normal!important;
-    font-style: normal!important;
-    text-decoration: none!important;
+    font-weight: normal !important;
+    font-style: normal !important;
+    text-decoration: none !important;
     font-size: 14px;
     background: rgba(0, 0, 0, 0.05);
     min-height: 30px;
@@ -87,40 +87,40 @@ body {
 
 .title {
     color: rgba(0, 26, 46, 1);
-    font-size: 14px!important;
+    font-size: 14px !important;
     line-height: 16px;
 }
 
 .minute {
     color: rgba(138, 161, 180, 1);
-    font-size: 12px!important;
+    font-size: 12px !important;
     line-height: 12px;
     margin-top: 5px;
 }
 
 .time {
     color: rgba(65, 77, 104, 1);
-    font-size: 12px!important;
+    font-size: 12px !important;
     line-height: 12px;
 }
 
 .demo::selection, .lf::selection, .title::selection, .minute::selection, .time::selection {
-    background: transparent!important;
+    background: transparent !important;
     color: inherit;
 }
 
 /* 字体大小固定 */
 
 .title span {
-    font-size: 14px!important;
+    font-size: 14px !important;
 }
 
 .minute span {
-    font-size: 12px!important;
+    font-size: 12px !important;
 }
 
 .time span {
-    font-size: 12px!important;
+    font-size: 12px !important;
 }
 
 .padtop {
@@ -130,11 +130,13 @@ body {
 .translate {
     line-height: 20px;
     font-size: 12px;
+    position: relative;
 }
 
 .translate>div {
     text-align: center;
     /* padding: 10px 0; */
+    /* position: absolute; */
 }
 
 .icon {
@@ -193,6 +195,16 @@ body {
 .noselect {
     user-select: none;
     padding: 5px 20px 10px 20px;
+    visibility: hidden
+}
+
+.showTextBox {
+    position: absolute;
+    padding: 5px 20px 10px 20px;
+    user-select: none;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
 }
 
 ::selection {
@@ -200,7 +212,7 @@ body {
 }
 
 u {
-    text-decoration-color: transparent!important;
+    text-decoration-color: transparent !important;
     border-bottom: 1px solid rgba(65, 77, 104, 1);
 }
 
@@ -209,6 +221,10 @@ strike {
 }
 
 strike[style="text-decoration-line: underline;"] {
-    text-decoration-color: transparent!important;
+    text-decoration-color: transparent !important;
     border-bottom: 1px solid rgba(65, 77, 104, 1);
+}
+
+p[style="display: inline !important;"] {
+    display: block !important
 }
