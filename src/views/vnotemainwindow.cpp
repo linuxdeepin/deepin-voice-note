@@ -232,7 +232,11 @@ void VNoteMainWindow::changeRightView(bool isMultiple)
         }
         m_multipleSelectWidget->enableButtons(m_middleView->haveText(), m_middleView->haveVoice(), moveButtonEnable);
     } else {
-        m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
+        if (m_stackedRightMainWidget->currentWidget() == m_multipleSelectWidget) {
+            m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
+            //多选切换为详情页时，刷新数据
+            m_richTextEdit->initData(m_middleView->getCurrVNotedata(), m_searchKey);
+        }
         //恢复单选如果有笔记图片按钮可用
         if (nullptr != m_middleView->getCurrVNotedata()) {
             m_imgInsert->setDisabled(false);
