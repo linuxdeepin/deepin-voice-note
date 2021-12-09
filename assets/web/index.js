@@ -858,6 +858,10 @@ document.onkeydown = function (event) {
 
         var selectionObj = window.getSelection();
         let focusDom = selectionObj.extentNode
+        // 判断是选区还是光标
+        if (selectionObj.type != 'Caret') {
+            return
+        }
         if ($(focusDom).closest('span').length
             && $(focusDom).closest('span').html() !== '<br>'
             && selectionObj.extentOffset == 0) {
@@ -890,6 +894,10 @@ document.onkeydown = function (event) {
         let focusDom = selectionObj.extentNode
         let domList = $(focusDom).parents()
         let isHas = true
+        // 判断是选区还是光标
+        if (selectionObj.type != 'Caret') {
+            return
+        }
         // 处理LI以内子元素
         for (let i = 0; i < domList.length; i++) {
             if (domList[i].tagName == 'LI') {

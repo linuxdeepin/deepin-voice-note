@@ -5,7 +5,6 @@ body {
     background-color: transparent;
     color: rgba(65, 77, 104, 1);
     word-wrap: break-word;
-    /* overflow-x: hidden; */
 }
 
 .demo {
@@ -135,8 +134,7 @@ body {
 
 .translate>div {
     text-align: center;
-    /* padding: 10px 0; */
-    /* position: absolute; */
+    color: rgba(65, 77, 104, 1) !important;
 }
 
 .icon {
@@ -223,8 +221,4 @@ strike {
 strike[style="text-decoration-line: underline;"] {
     text-decoration-color: transparent !important;
     border-bottom: 1px solid rgba(65, 77, 104, 1);
-}
-
-p[style="display: inline !important;"] {
-    display: block !important
 }
