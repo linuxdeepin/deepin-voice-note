@@ -180,7 +180,7 @@ void VNoteBaseDialog::showEvent(QShowEvent *event)
     DAbstractDialog::showEvent(event);
 
     setAttribute(Qt::WA_Resized, false);
-
+    setFocus(Qt::PopupFocusReason);
     if (!testAttribute(Qt::WA_Resized)) {
         QSize size = sizeHint();
 
