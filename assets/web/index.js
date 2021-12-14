@@ -133,7 +133,7 @@ $('#summernote').summernote({
 // 监听窗口大小变化
 $(window).resize(function () {
     $('.note-editable').css('min-height', $(window).height())
-});
+}).resize();
 
 /**
  * 通知后台存储页面内容
