@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pt" version="2.0">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.0" language="pt">
 <context>
     <name>AppMain</name>
     <message>
@@ -637,7 +637,7 @@ Todas as notas nele incluídas serão eliminadas</translation>
     <message>
         <location filename="../src/common/jscontent.cpp" line="145"/>
         <source>Bullets</source>
-        <translation>Travessões</translation>
+        <translation>Lista de marcadores</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="146"/>

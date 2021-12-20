@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="cs" version="2.0">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.0" language="cs">
 <context>
     <name>AppMain</name>
     <message>
@@ -58,7 +58,7 @@
         <location filename="../src/dialog/folderselectdialog.cpp" line="244"/>
         <source>Cancel</source>
         <comment>button</comment>
-        <translation>Storno</translation>
+        <translation>Zrušit</translation>
     </message>
     <message>
         <location filename="../src/dialog/folderselectdialog.cpp" line="245"/>

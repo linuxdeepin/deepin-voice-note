@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="pl" version="2.0">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.0" language="pl">
 <context>
     <name>AppMain</name>
     <message>
@@ -192,7 +192,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="345"/>
         <source>Translate</source>
-        <translation>Tłumacz</translation>
+        <translation>Przetłumacz</translation>
     </message>
 </context>
 <context>
