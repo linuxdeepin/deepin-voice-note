@@ -22,7 +22,6 @@
 #ifndef VNOTERECORDBAR_H
 #define VNOTERECORDBAR_H
 
-#include <DAnchors>
 #include <DFloatingMessage>
 
 #include <QWidget>
@@ -102,7 +101,6 @@ protected:
     VNoteRecordWidget *m_recordPanel {nullptr};
     VNote2SIconButton *m_recordBtn {nullptr};
     QWidget *m_recordBtnHover {nullptr};
-    QScopedPointer<DAnchorsBase> m_recBtnAnchor;
 
     QString m_recordPath {""};
     int m_currentMode {0};
