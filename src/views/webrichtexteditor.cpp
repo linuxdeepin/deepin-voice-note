@@ -416,7 +416,7 @@ QString WebRichTextEditor::saveAsFile(const QString &originalPath, QString dirPa
     QFileInfo fileInfo(originalPath);
     QString filter = "*." + fileInfo.suffix();
     QString baseName = defalutName.isEmpty() ? fileInfo.baseName() : defalutName;
-    QString dir = QString("%1/%2").arg(dirPath).arg(baseName);
+    QString dir = QString("%1/%2").arg(dirPath).arg(baseName + "." + fileInfo.suffix());
     //获取需要保存的文件位置，默认路径为用户图片文件夹，默认文件名为原文件名
     QString newPath = DFileDialog::getSaveFileName(this, "", dir, filter);
     if (newPath.isEmpty()) {

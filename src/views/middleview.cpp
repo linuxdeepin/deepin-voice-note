@@ -311,7 +311,16 @@ void MiddleView::saveAs(SaveAsType type)
         VNoteItem *note = getCurrVNotedata();
         //设置默认名称为笔记名称
         if (note) {
-            dialog.selectFile(Utils::filteredFileName(note->noteTitle));
+            //获取文件后缀名
+            QString fileSuffix = "";
+            if (Html == type) {
+                fileSuffix = ".html";
+            } else if (Text == type) {
+                fileSuffix = ".txt";
+            } else if (Voice == type) {
+                fileSuffix = ".mp3";
+            }
+            dialog.selectFile(Utils::filteredFileName(note->noteTitle + fileSuffix));
         }
         if (QDialog::Rejected == dialog.exec()) {
             return;
