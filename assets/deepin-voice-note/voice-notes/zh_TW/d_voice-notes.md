@@ -23,7 +23,7 @@
 
 - 在語音記事本介面單擊 ![close_icon](../common/close_icon.svg)，關閉語音記事本。
 - 在任務欄右鍵單擊 ![deepin_voice_note](../common/deepin_voice_note.svg)，選擇 **全部關閉** 關閉語音記事本。
-- 在語音記事本介面單擊 ![icon_menu](../common/icon_menu.svg)，選擇 **離開** 關閉語音記事本。
+- 在語音記事本介面單擊 ![icon_menu](../common/icon_menu.svg)，選擇 **退出** 關閉語音記事本。
 
 ### 查看快捷鍵
 
@@ -197,8 +197,8 @@
 2. 單擊 **關於**。
 3. 查看語音記事本的版本和介紹。
 
-### 離開
+### 退出
 
 1. 在語音記事本介面，單擊 ![icon_menu](../common/icon_menu.svg) 。
-2. 單擊 **離開**。
+2. 單擊 **退出**。
 

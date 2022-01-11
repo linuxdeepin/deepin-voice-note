@@ -80,7 +80,7 @@
 #### 添加語音至筆記
 
 1. 在筆記列表中，選擇一個筆記。
-2. 在右側詳情頁內單擊錄音按鈕 ![record_normal](../common/record_normal.svg)，添加語音。
+2. 單擊錄音按鈕 ![record_normal](../common/record_normal.svg)，添加語音。
 3. 單擊完成按鈕 ![finish](../common/finish_normal.svg) 完成語音錄製。
    
    > ![notes](../common/notes.svg)說明：添加語音的過程中您可以單擊暫停按鈕 ![pause](../common/pause_red_normal.svg) 暫停錄音，再次單擊錄音按鈕 ![record_normal](../common/record_normal.svg) 繼續錄音。錄音的限制時長為60分鐘。
