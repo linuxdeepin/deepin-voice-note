@@ -737,7 +737,8 @@ void LeftView::dragEnterEvent(QDragEnterEvent *event)
         m_pItemDelegate->setDragState(true);
         this->update();
     }
-
+    DTreeView::dragEnterEvent(event);
+    setState(DraggingState);
     event->accept();
 }
 
