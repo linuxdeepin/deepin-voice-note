@@ -385,14 +385,8 @@ void VNoteMainWindow::initTitleBar()
     QWidget::setTabOrder(m_viewChange, m_imgInsert); //设置焦点传递顺序
 
     //捕捉标题栏最右边控件事件
-    QObject *btn = nullptr;
-    if (Utils::isWayland()) {
-        //wayland 显示时控件为菜单按钮
-        btn = titlebar()->findChild<QObject *>("DTitlebarDWindowOptionButton");
-    } else {
-        //x11显示时控件为关闭按钮
-        btn = titlebar()->findChild<QObject *>("DTitlebarDWindowCloseButton");
-    }
+    QObject *btn = titlebar()->findChild<QObject *>("DTitlebarDWindowCloseButton");
+
     if (nullptr != btn) {
         btn->installEventFilter(this);
     }

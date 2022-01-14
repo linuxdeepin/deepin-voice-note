@@ -88,11 +88,6 @@ void VNoteBaseDialog::initUI()
     mainLayout->addWidget(m_titleBar);
     mainLayout->addWidget(m_content);
     setLayout(mainLayout);
-
-    //wayland 隐藏关闭按钮
-    if (Utils::isWayland()) {
-        m_closeButton->setVisible(false);
-    }
 }
 
 /**
