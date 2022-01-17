@@ -631,6 +631,7 @@ function setVoiceText(text, flag) {
         if (flag) {
             $('.translate').html('')
             if (text) {
+                text = text.trim()
                 activeTransVoice.after('<p>' + text + '</p>');
                 webobj.jsCallTxtChange();
             }
