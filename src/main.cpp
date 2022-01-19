@@ -26,6 +26,8 @@
 #include "common/utils.h"
 
 #include <QDir>
+#include <QOpenGLContext>
+#include <QSurfaceFormat>
 
 #include <DApplication>
 #include <DApplicationSettings>
@@ -66,6 +68,25 @@ int main(int argc, char *argv[])
     if (!DPlatformWindowHandle::pluginVersion().isEmpty()) {
         app.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings, true);
     }
+
+    //设置opengl类型
+    QOpenGLContext ctx;
+    QSurfaceFormat fmt;
+    fmt.setRenderableType(QSurfaceFormat::OpenGL);
+    ctx.setFormat(fmt);
+    ctx.create();
+    if (!ctx.isValid()) {
+        fmt.setRenderableType(QSurfaceFormat::OpenGLES);
+        qInfo() << "set openGLES";
+    }
+    fmt.setDefaultFormat(fmt);
+    fmt.setProfile(QSurfaceFormat::CoreProfile);
+
+    //wayland 模式禁用gpu
+    if (Utils::isWayland()) {
+        qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-gpu");
+    }
+
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
     app.loadTranslator();
     app.setOrganizationName("deepin");
