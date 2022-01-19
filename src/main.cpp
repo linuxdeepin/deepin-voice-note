@@ -74,13 +74,11 @@ int main(int argc, char *argv[])
     QSurfaceFormat fmt;
     fmt.setRenderableType(QSurfaceFormat::OpenGL);
     ctx.setFormat(fmt);
-    ctx.create();
-    if (!ctx.isValid()) {
+    if (!ctx.create() || !ctx.isValid() || ctx.format().renderableType() != QSurfaceFormat::OpenGL) {
         fmt.setRenderableType(QSurfaceFormat::OpenGLES);
+        fmt.setDefaultFormat(fmt);
         qInfo() << "set openGLES";
     }
-    fmt.setDefaultFormat(fmt);
-    fmt.setProfile(QSurfaceFormat::CoreProfile);
 
     //wayland 模式禁用gpu
     if (Utils::isWayland()) {
