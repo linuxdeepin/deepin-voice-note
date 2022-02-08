@@ -46,15 +46,6 @@ void LoadNoteItemsWorker::run()
     VNoteItemOper notesOper;
     VNOTE_ALL_NOTES_MAP *notesMap = notesOper.loadAllVNotes();
 
-    //未加密的笔记手动加密
-    if (notesMap->notes.size()) {
-        for (auto it : notesMap->notes) {
-            for (auto it1 : it->folderNotes) {
-                notesOper.encryptVNoteNote(it1);
-            }
-        }
-    }
-
     gettimeofday(&end, nullptr);
 
     qDebug() << "LoadNoteItemsWorker(ms):" << TM(start, end);

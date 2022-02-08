@@ -283,17 +283,3 @@ QPixmap VNoteFolderOper::getDefaultIcon(qint32 index, IconsType type)
 {
     return VNoteDataManager::instance()->getDefaultIcon(index, type);
 }
-
-bool VNoteFolderOper::encryptVNoteFolder(VNoteFolder *folder)
-{
-    bool updateOK = false;
-    if (nullptr != folder && 0 == folder->encryption) {
-        EncryptFolderDbVisitor encryptFolder(VNoteDbManager::instance()->getVNoteDb(), folder, nullptr);
-        if (!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&encryptFolder))) {
-            updateOK = true;
-            folder->encryption = 1;
-        }
-    }
-
-    return updateOK;
-}

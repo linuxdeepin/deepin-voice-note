@@ -50,8 +50,6 @@ public:
     bool updateTop(int value);
     //更新folderid
     bool updateFolderId(VNoteItem *data);
-    //加密笔记
-    bool encryptVNoteNote(VNoteItem *data);
 
 protected:
     VNoteItem *m_note {nullptr};

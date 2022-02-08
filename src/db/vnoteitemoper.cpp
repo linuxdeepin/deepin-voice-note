@@ -331,16 +331,3 @@ bool VNoteItemOper::updateFolderId(VNoteItem *data)
     }
     return updateOK;
 }
-
-bool VNoteItemOper::encryptVNoteNote(VNoteItem *data)
-{
-    bool updateOK = false;
-    if (nullptr != data && 0 == data->encryption) {
-        EncryptNoteDbVisitor encryptNote(VNoteDbManager::instance()->getVNoteDb(), data, nullptr);
-        if (!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&encryptNote))) {
-            updateOK = true;
-            data->encryption = 1;
-        }
-    }
-    return updateOK;
-}
