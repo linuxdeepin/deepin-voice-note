@@ -483,6 +483,23 @@ function getCursortPosition(element) {
     return caretOffset;
 }
 
+/**
+ * 录音长度格式化
+ * @date 2022-02-09
+ * @param {any} millisecond  毫秒
+ * @returns {any} "00:00"
+ */
+function formatMillisecond(millisecond) {
+    if (millisecond < 1000) {
+        return '00:01'
+    } else if (millisecond < 3600000) {
+        var minutes = parseInt(millisecond / (1000 * 60));
+        var seconds = parseInt((millisecond % (1000 * 60)) / 1000);
+        return (minutes < 10 ? '0' + minutes : minutes) + ":" + (seconds < 10 ? '0' + seconds : seconds);
+    }
+    return "60:00";
+}
+
 //初始化数据 
 function initData(text) {
     initFinish = false;
@@ -507,6 +524,9 @@ function initData(text) {
         }
         //true: voice
         else {
+            if (!item.transSize) {
+                item.transSize = formatMillisecond(item.voiceSize)
+            }
             voiceHtml = transHtml(item, false);
             html += voiceHtml;
         }
