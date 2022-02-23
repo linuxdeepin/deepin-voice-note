@@ -306,13 +306,6 @@ void VNoteMainWindow::initShortcuts()
     m_stRecording->setAutoRepeat(false);
     connect(m_stRecording.get(), &QShortcut::activated, this, &VNoteMainWindow::onRecordShorcut);
 
-    //Save as Mp3
-    m_stSaveAsMp3.reset(new QShortcut(this));
-    m_stSaveAsMp3->setKey(Qt::CTRL + Qt::Key_P);
-    m_stSaveAsMp3->setContext(Qt::ApplicationShortcut);
-    m_stSaveAsMp3->setAutoRepeat(false);
-    connect(m_stSaveAsMp3.get(), &QShortcut::activated, this, &VNoteMainWindow::onSaveMp3Shortcut);
-
     //Save as Text
     m_stSaveAsText.reset(new QShortcut(this));
     m_stSaveAsText->setKey(Qt::CTRL + Qt::Key_S);
@@ -2256,13 +2249,6 @@ void VNoteMainWindow::onRecordShorcut()
     if (canDoShortcutAction()) {
         m_recordBar->onStartRecord();
     }
-}
-
-void VNoteMainWindow::onSaveMp3Shortcut()
-{
-    //    if (canDoShortcutAction()) {
-    //        m_rightView->saveMp3();
-    //    }
 }
 
 void VNoteMainWindow::onSaveNoteShortcut()

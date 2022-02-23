@@ -783,7 +783,6 @@ TEST_F(UT_VNoteMainWindow, UT_VNoteMainWindow_onShortcut_001)
     m_mainWindow->onAddNoteShortcut();
     m_mainWindow->onRenameNoteShortcut();
     m_mainWindow->onPlayPauseShortcut();
-    m_mainWindow->onSaveMp3Shortcut();
     m_mainWindow->onSaveNoteShortcut();
     m_mainWindow->onSaveVoicesShortcut();
 }
