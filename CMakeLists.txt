@@ -63,6 +63,11 @@ elseif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "mips64")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftree-vectorize -march=loongson3a -mhard-float -mno-micromips -mno-mips16 -flax-vector-conversions -mloongson-ext2 -mloongson-mmi -Wl,--as-need")
 endif ()
 
+if(CMAKE_COVERAGE_ARG STREQUAL "CMAKE_COVERAGE_ARG_ON")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -Wall -fprofile-arcs -ftest-coverage")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -fprofile-arcs -ftest-coverage")
+endif()
+
 #compile flags
 if (CMAKE_BUILD_TYPE MATCHES Debug)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
