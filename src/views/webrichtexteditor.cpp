@@ -47,6 +47,7 @@ static const char webPage[] = WEB_PATH "/index.html";
 WebRichTextEditor::WebRichTextEditor(QWidget *parent)
     : QWebEngineView(parent)
 {
+    initFontsInformation();
     initWebView();
     initRightMenu();
     initUpdateTimer();
@@ -79,9 +80,51 @@ void WebRichTextEditor::initWebView()
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
             this, &WebRichTextEditor::onThemeChanged);
 
+    connect(content, &JsContent::getfontinfo, this, &WebRichTextEditor::onSetFontListInfo);
+
     if (nullptr != focusProxy()) {
         focusProxy()->installEventFilter(this);
     }
+}
+
+void WebRichTextEditor::initFontsInformation()
+{
+    m_pDbusAppearance.reset(new Appearance(DEEPIN_DAEMON_APPEARANCE_PATH,
+                                           DEEPIN_DAEMON_APPEARANCE_INTERFACE,
+                                           QDBusConnection::sessionBus(), this));
+    //获取默认字体
+    QString defaultfont = m_pDbusAppearance->standardFont();
+    //获取字体列表
+    QDBusPendingReply<QString> font = m_pDbusAppearance.get()->List("standardfont");
+    QJsonArray array = QJsonDocument::fromJson(font.value().toLocal8Bit().data()).array();
+    QStringList list;
+    for (int i = 0; i != array.size(); i++) {
+        list << array.at(i).toString();
+    }
+    //获取带翻译的字体列表
+    QDBusPendingReply<QString> font1 = m_pDbusAppearance.get()->Show("standardfont", list);
+    QJsonArray arrayValue = QJsonDocument::fromJson(font1.value().toLocal8Bit().data()).array();
+    //列表格式转换
+    for (int i = 0; i != arrayValue.size(); i++) {
+        QJsonObject object = arrayValue.at(i).toObject();
+        object.insert("type", QJsonValue("standardfont"));
+        m_fontList << object["Name"].toString();
+        if (defaultfont == object["Id"].toString()) {
+            //根据id 获取带翻译的默认字体
+            m_FontDefault = object["Name"].toString();
+        }
+    }
+
+    // sort for display name
+    std::sort(m_fontList.begin(), m_fontList.end(), [ = ](const QString & obj1, const QString & obj2) {
+        QCollator qc;
+        return qc.compare(obj1, obj2) < 0;
+    });
+}
+
+void WebRichTextEditor::onSetFontListInfo()
+{
+    Q_EMIT JsContent::instance()->callJsSetFontList(m_fontList, m_FontDefault);
 }
 
 void WebRichTextEditor::initRightMenu()
@@ -590,7 +633,7 @@ void WebRichTextEditor::onShowEditToolbar(const QPoint &pos)
 {
     QPoint menuPoint = pos;
     menuPoint.setX(menuPoint.x() - 9);
-    int width = this->width() - menuPoint.x() - 320;
+    int width = this->width() - menuPoint.x() - 385;
     if (width < 0) {
         menuPoint.setX(menuPoint.x() + width);
     }

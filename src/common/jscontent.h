@@ -92,6 +92,15 @@ signals:
      */
     void setDataFinsh();
 
+    /**
+     * @author liuxinping  ut002764
+     * @brief  字体列表和默认字体信号发送web
+     * @param  list  字体列表
+     * @param  font  默认字体
+     */
+    void callJsSetFontList(const QStringList &list, const QString &font);
+    void getfontinfo();  //获取字体列表信息信号
+
 protected:
     JsContent();
 
@@ -101,7 +110,8 @@ public slots:
      */
     void jsCallSetDataFinsh();
     void jsCallTxtChange(); //web前端调用后端，通知数据变化
-    void jsCallChannleFinish(); //web前端调用后端，通知网页加载完成
+    void jsCallChannleFinish(); //web前端调用后端，通信建立完成
+    void jsCallSummernoteInitFinish();  //summernote 加载完成
     void jsCallPopupMenu(int type, const QVariant &json); //web前端调用后端，弹出右键菜单
     void jsCallPlayVoice(const QVariant &json, bool bIsSame); //web前端调用后端，播放语音
     void jsCallPaste(bool isVoicePaste = false); //web前端调用后端，编辑区粘贴功能

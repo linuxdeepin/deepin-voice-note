@@ -173,3 +173,9 @@ void VNoteMessageDialog::initMessage()
     } break;
     }
 }
+
+void VNoteMessageDialog::focusInEvent(QFocusEvent *event)
+{
+    VNoteBaseDialog::focusInEvent(event);
+    m_cancelBtn->setFocus();
+}

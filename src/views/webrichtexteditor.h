@@ -27,6 +27,17 @@
 #include <QtWebChannel/QWebChannel>
 #include <QtWebEngineWidgets/QWebEngineView>
 
+#include <QtDBus>
+#include <QDBusInterface>
+#include <com_deepin_daemon_appearance.h>
+
+
+//获取字号接口
+#define DEEPIN_DAEMON_APPEARANCE_PATH             "com.deepin.daemon.Appearance"
+#define DEEPIN_DAEMON_APPEARANCE_INTERFACE        "/com/deepin/daemon/Appearance"
+
+using Appearance = com::deepin::daemon::Appearance;
+
 struct VNoteItem;
 class VNoteRightMenu;
 class ImageViewerDialog;
@@ -149,6 +160,11 @@ public slots:
      */
     void onLoadFinsh();
 
+    /**
+     * @brief 传递字体信息
+     */
+    void onSetFontListInfo();
+
 protected:
     void contextMenuEvent(QContextMenuEvent *e) override;
     //拖拽事件
@@ -159,6 +175,12 @@ protected:
     bool eventFilter(QObject *o, QEvent *e) override;
 
 private:
+
+    /**
+     * @brief 初始化字体列表信息
+     */
+    void initFontsInformation();
+
     /**
      * @brief 初始化数据更新定时器
      */
@@ -227,6 +249,10 @@ private:
     bool m_loadFinshSign = false; //后台与web通信连通标志 true: 连通， false: 未联通
 
     QScopedPointer<VNVoiceBlock> m_voiceBlock {nullptr}; //待另存的语音数据
+    QScopedPointer<Appearance>  m_pDbusAppearance {nullptr};
+    QString                     m_FontDefault = "";        //默认字体
+    QStringList                 m_fontList;                //字体列表
+
 };
 
 #endif // WEBRICHTEXTEDITOR_H

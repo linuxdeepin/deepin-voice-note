@@ -115,6 +115,11 @@ void JsContent::jsCallTxtChange()
 
 void JsContent::jsCallChannleFinish()
 {
+    emit getfontinfo();
+}
+
+void JsContent::jsCallSummernoteInitFinish()
+{
     emit loadFinsh();
 }
 

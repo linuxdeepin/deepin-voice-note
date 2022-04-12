@@ -58,6 +58,14 @@ protected:
     void initMessage();
     //显示单按钮
     void setSingleButton(); //Need to be Optimzed
+
+    /**
+     * @author liuxinping  ut002764
+     * @brief  focusInEvent 重写
+     * @param
+     * @return
+     */
+    void focusInEvent(QFocusEvent *event) override;
 signals:
 
 public slots:
