@@ -670,7 +670,9 @@
         var originalWidth = $tester.css('fontFamily', testFontName).width();
         var width = $tester.css('fontFamily', fontName + ',' + testFontName).width();
         $tester.remove();
-        return originalWidth !== width;
+        // return originalWidth !== width;
+        // 取消没有效果就屏蔽功能，一直返回true
+        return true;
     }
     var userAgent = navigator.userAgent;
     var isMSIE = /MSIE|Trident/i.test(userAgent);
@@ -5485,9 +5487,9 @@
                 });
                 return _this.ui.buttonGroup([
                     _this.button({
-                        className: 'dropdown-toggle',
+                        className: 'dropdown-toggle fontnameBut',
                         contents: _this.ui.dropdownButtonContents('<span class="note-current-fontname"/>', _this.options),
-                        tooltip: _this.lang.font.name,
+                        tooltip: tooltipContent.fontname,
                         data: {
                             toggle: 'dropdown'
                         }
@@ -7148,8 +7150,8 @@
                     let left = Math.max(bnd.left + bnd.width / 2 - 150, 0);
                     let top = bnd.top - airPopoverHeight;
                     // 左边距判断,显示区域宽度-距离左边距离<工具栏宽度
-                    if (winWidth - left < airPopoverWidth) {
-                        left = winWidth - airPopoverWidth
+                    if (winWidth - left < airPopoverWidth + 10) {
+                        left = winWidth - airPopoverWidth - 10
                     }
                     // 上边距判断，工具栏上边距不小于34（tip高度，避免遮挡）
                     if (top < 34) {

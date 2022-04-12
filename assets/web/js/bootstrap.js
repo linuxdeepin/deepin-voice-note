@@ -788,6 +788,10 @@ if (typeof jQuery === 'undefined') {
 
       if (!$parent.hasClass('open')) return
 
+      // 重置滚动条
+      if($parent.find('.dropdown-fontname').length){       
+        document.querySelector('.dropdown-fontname').scrollTop = 0
+      }
       if (e && e.type == 'click' && /input|textarea/i.test(e.target.tagName) && $.contains($parent[0], e.target)) return
 
       $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))

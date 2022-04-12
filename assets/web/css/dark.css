@@ -1,21 +1,21 @@
 body {
-    color: rgba(192, 198, 212, 1)!important;
+    color: rgba(192, 198, 212, 1) !important;
 }
 
 u {
-    border-bottom: 1px solid rgba(192, 198, 212, 1)!important;
+    border-bottom: 1px solid rgba(192, 198, 212, 1) !important;
 }
 
 strike {
-    text-decoration-color: rgba(192, 198, 212, 1)!important;
+    text-decoration-color: rgba(192, 198, 212, 1) !important;
 }
 
 strike[style="text-decoration-line: underline;"] {
-    border-bottom: 1px solid rgba(192, 198, 212, 1)!important;
+    border-bottom: 1px solid rgba(192, 198, 212, 1) !important;
 }
 
 .title, .time {
-    color: rgba(192, 198, 212, 1)!important
+    color: rgba(192, 198, 212, 1) !important
 }
 
 .li {
@@ -23,33 +23,37 @@ strike[style="text-decoration-line: underline;"] {
 }
 
 .minute {
-    color: rgba(109, 124, 136, 1)!important
+    color: rgba(109, 124, 136, 1) !important
 }
 
 .note-popover .popover-content {
-    background: rgba(42, 42, 42, 1)!important
+    background: rgba(42, 42, 42, 1) !important
 }
 
 .tooltip-inner {
     color: rgba(192, 198, 212, 1);
-    background-color: rgba(42, 42, 42, 1)!important;
+    background-color: rgba(42, 42, 42, 1) !important;
     border: 1px solid rgba(0, 0, 0, 0.30);
 }
 
 .btn-default {
-    color: rgba(197, 207, 224, 1)!important
+    color: rgba(197, 207, 224, 1) !important
 }
 
 .dropdown-menu {
-    background: rgba(42, 42, 42, 0.98)!important
+    background: rgba(42, 42, 42, 0.98) !important
 }
 
 .colorFont {
-    color: rgba(192, 198, 212, 1)!important
+    color: rgba(192, 198, 212, 1) !important
 }
 
 .dropdown-fontsize li a {
-    color: rgba(192, 198, 212, 1)!important
+    color: rgba(192, 198, 212, 1) !important
+}
+
+.dropdown-fontname li a {
+    color: rgba(192, 198, 212, 1) !important
 }
 
 .wifi-symbol .first {
@@ -68,7 +72,7 @@ strike[style="text-decoration-line: underline;"] {
     background-image: url(../img/d4.svg);
 }
 
-.dropdown-fontsize>li>a {
+.dropdown-fontsize>li>a, .dropdown-fontname>li>a {
     color: rgba(197, 207, 224, 1)
 }
 
@@ -97,19 +101,21 @@ strike[style="text-decoration-line: underline;"] {
 }
 
 .btn-default:hover {
-    background-color: rgba(255, 255, 255, 0.05)!important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
 }
 
-body::-webkit-scrollbar-thumb:hover {
+body::-webkit-scrollbar-thumb:hover,
+.dropdown-fontname::-webkit-scrollbar-thumb:hover {
     background-color: rgba(255, 255, 255, .25);
     border-color: rgba(0, 0, 0, 0.1);
 }
 
-body::-webkit-scrollbar-thumb:active {
+body::-webkit-scrollbar-thumb:active,
+.dropdown-fontname::-webkit-scrollbar-thumb:active {
     background-color: rgba(255, 255, 255, .3);
     border-color: rgba(0, 0, 0, 0.1);
 }
 
 .translate>div {
-    color: rgba(192, 198, 212, 1)!important;
+    color: rgba(192, 198, 212, 1) !important;
 }

@@ -78,12 +78,14 @@ var global_disableColor = ''
 var global_theme = 1
 var global_themeColor = 'transparent'  //主题色
 var scrollHide = null  //滚动条隐藏定时器
+var scrollHideFont = null  //字体滚动条定时
 var isUlOrOl = false
 const airPopoverHeight = 44  //悬浮工具栏高度
-const airPopoverWidth = 320  //悬浮工具栏宽度
+const airPopoverWidth = 385  //悬浮工具栏宽度
 
-
+// 翻译列表
 var tooltipContent = {
+    fontname: '字体',
     fontsize: '字号',
     forecolor: '字体颜色',
     backcolor: '背景色',
@@ -96,6 +98,8 @@ var tooltipContent = {
     more: '更多颜色',
     recentlyUsed: '最近使用'
 }
+// 字体列表
+var global_fontList = []
 
 // 国际化
 function changeLang(tooltipContent) {
@@ -108,32 +112,93 @@ function changeLang(tooltipContent) {
     }
 }
 
-// 初始化summernote
-$('#summernote').summernote({
-    focus: true,
-    disableDragAndDrop: true,
-    lang: 'zh-CN',
-    popover: {
-        air: [
-            ['fontsize', ['fontsize']],
-            ['forecolor', ['forecolor']],
-            ['backcolor', ['backcolor']],
-            ['bold', ['bold']],
-            ['italic', ['italic']],
-            ['underline', ['underline']],
-            ['strikethrough', ['strikethrough']],
-            ['line'],
-            ['ul', ['ul']],
-            ['ol', ['ol']],
-        ],
-    },
-    airMode: true,
-});
 
-// 监听窗口大小变化
-$(window).resize(function () {
-    $('.note-editable').css('min-height', $(window).height())
-}).resize();
+/**
+ * 设置初始化字体
+ * @date 2022-04-12
+ * @param {string} initFontName 字体名
+ * @returns {any}
+ */
+function setInitFont(initFontName) {
+    $('body').css('font-family', initFontName)
+}
+
+// 建立通信
+new QWebChannel(qt.webChannelTransport,
+    function (channel) {
+        webobj = channel.objects.webobj;
+        //所有的c++ 调用js的接口都需要在此绑定格式，webobj.c++函数名（jscontent.cpp查看.connect(js处理函数)
+        //例如 webobj.c++fun.connect(jsfun)
+        webobj.callJsInitData.connect(initData);
+        webobj.callJsInsertVoice.connect(insertVoiceItem);
+        webobj.callJsSetPlayStatus.connect(toggleState);
+        webobj.callJsSetHtml.connect(setHtml);
+        webobj.callJsSetVoiceText.connect(setVoiceText);
+        webobj.callJsInsertImages.connect(insertImg);
+        webobj.callJsSetTheme.connect(changeColor);
+        webobj.calllJsShowEditToolbar.connect(showRightMenu);
+        webobj.callJsHideEditToolbar.connect(hideRightMenu);
+        webobj.callJsClipboardDataChanged.connect(shearPlateChange);
+        webobj.callJsSetVoicePlayBtnEnable.connect(playButColor);
+        webobj.callJsSetFontList.connect(setFontList);
+        //通知QT层完成通信绑定
+        webobj.jsCallChannleFinish();
+        // setFontList(global_fontList, "Unifont")
+    }
+)
+
+// 获取字体列表并初始化
+function setFontList(fontList, initFont) {
+    global_fontList = fontList;
+    setInitFont(initFont)
+    initSummernote()
+    // 通知QT，summernote初始化完成
+    webobj.jsCallSummernoteInitFinish()
+    // 获取翻译和字体列表后，再初始化summernote
+    webobj.jsCallGetTranslation(function (res) {
+        changeLang(JSON.parse(res))
+    })
+}
+
+// 初始化summernote
+function initSummernote() {
+    $('#summernote').summernote({
+        focus: true,
+        disableDragAndDrop: true,
+        lang: 'zh-CN',
+        popover: {
+            air: [
+                ['fontname', ['fontname']],
+                ['fontsize', ['fontsize']],
+                ['forecolor', ['forecolor']],
+                ['backcolor', ['backcolor']],
+                ['bold', ['bold']],
+                ['italic', ['italic']],
+                ['underline', ['underline']],
+                ['strikethrough', ['strikethrough']],
+                ['line'],
+                ['ul', ['ul']],
+                ['ol', ['ol']],
+            ],
+        },
+        fontNames: global_fontList,
+        airMode: true,
+    });
+    // 注册滚动事件
+    listenFontnameList()
+    // 默认选中
+    setSelectColorButton($('[data-value="#414D68"]'))
+    setSelectColorButton($('[data-value="transparent"]'))
+    $('.icon-backcolor .path5').addClass('transparentColor')
+
+    // 监听窗口大小变化
+    $(window).resize(function () {
+        $('.note-editable').css('min-height', $(window).height())
+    }).resize();
+}
+
+
+
 
 /**
  * 通知后台存储页面内容
@@ -435,31 +500,7 @@ function getActiveNote() {
     return retJson;
 }
 
-new QWebChannel(qt.webChannelTransport,
-    function (channel) {
-        webobj = channel.objects.webobj;
-        //所有的c++ 调用js的接口都需要在此绑定格式，webobj.c++函数名（jscontent.cpp查看.connect(js处理函数)
-        //例如 webobj.c++fun.connect(jsfun)
-        webobj.callJsInitData.connect(initData);
-        webobj.callJsInsertVoice.connect(insertVoiceItem);
-        webobj.callJsSetPlayStatus.connect(toggleState);
-        webobj.callJsSetHtml.connect(setHtml);
-        webobj.callJsSetVoiceText.connect(setVoiceText);
-        webobj.callJsInsertImages.connect(insertImg);
-        webobj.callJsSetTheme.connect(changeColor);
-        webobj.calllJsShowEditToolbar.connect(showRightMenu);
-        webobj.callJsHideEditToolbar.connect(hideRightMenu);
-        webobj.callJsClipboardDataChanged.connect(shearPlateChange);
-        webobj.callJsSetVoicePlayBtnEnable.connect(playButColor);
-        //通知QT层完成通信绑定
-        webobj.jsCallChannleFinish();
-        // 设置语言
-        webobj.jsCallGetTranslation(function (res) {
-            changeLang(JSON.parse(res))
-        })
 
-    }
-)
 
 /**
  * 获取光标Y轴位置
@@ -830,10 +871,21 @@ function changeColor(flag, activeColor, disableColor, backgroundColor) {
             $('.dropdown-fontsize>li>a').css('color', "rgba(197,207,224,1)");
         }
     })
+    $('.dropdown-fontname>li>a').hover(function (e) {
+        $(this).css('background-color', activeColor);
+    }, function () {
+        $('.dropdown-fontname>li>a').css('background-color', 'transparent');
+        if (flag == 1) {
+            $('.dropdown-fontname>li>a').css('color', "black");
+        } else {
+            $('.dropdown-fontname>li>a').css('color', "rgba(197,207,224,1)");
+        }
+    })
     $('body').css('background-color', global_themeColor)
     if (flag == 1) {
         $('#dark').remove()
         $('.dropdown-fontsize>li>a').css('color', "black");
+        $('.dropdown-fontname>li>a').css('color', "black");
     } else if (flag == 2 && !$('#dark').length) {
         $("head").append("<link>");
         var css = $("head").children(":last");
@@ -1089,6 +1141,38 @@ $(document).scroll(function () {
     }, 1500);
 });
 
+// 字体滚动条
+function listenFontnameList() {
+    $('.dropdown-fontname ').scroll(function () {
+        // 阻止内部滚动条到底后自动触发外部滚动
+        const scroll = document.querySelector('.dropdown-fontname')
+        // 当前滚动条距离底部还剩2px时
+        if (scroll.scrollHeight - (scroll.scrollTop + scroll.clientHeight) <= 2) {
+            // 定位到距离底部2px的位置
+            scroll.scrollTop = (scroll.scrollHeight - scroll.clientHeight - 2)
+        }
+
+        if (scrollHideFont) {
+            clearTimeout(scrollHideFont)
+            $('#scrollStyleFont').html(`
+        .dropdown-fontname::-webkit-scrollbar-thumb {
+        background-color:${global_theme == 1 ? "rgba(0, 0, 0, 0.30)" : "rgba(255, 255, 255, 0.20)"} ;
+        }
+        /* 适配申威，触发重绘 */
+        html {
+            background-color: ${global_themeColor}fe;
+        }
+        `
+            )
+        }
+
+        scrollHideFont = setTimeout(() => {
+            $('#scrollStyleFont').html('')
+        }, 1500);
+    });
+}
+
+
 /**
  * 改变光标颜色
  * @date 2021-09-09
@@ -1110,7 +1194,4 @@ function setSelectColorButton($dom) {
     $dom.addClass('selectColor')
 }
 
-// 默认选中
-setSelectColorButton($('[data-value="#414D68"]'))
-setSelectColorButton($('[data-value="transparent"]'))
-$('.icon-backcolor .path5').addClass('transparentColor')
+

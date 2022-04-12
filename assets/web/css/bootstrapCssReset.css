@@ -8,12 +8,12 @@
  }
 
  .arrow {
-     display: none!important;
+     display: none !important;
  }
 
  .btn-default {
      border-color: #fff !important;
-     outline: none!important;
+     outline: none !important;
  }
 
  .note-editor .note-toolbar>.note-btn-group, .note-popover .popover-content>.note-btn-group {
@@ -51,7 +51,7 @@
  }
 
  p {
-     margin: 0!important;
+     margin: 0 !important;
      word-wrap: break-word;
  }
 
@@ -82,7 +82,7 @@
  }
 
  .dropdown-toggle {
-     height: 24px!important;
+     height: 24px !important;
  }
 
  .note-current-color-button {
@@ -91,12 +91,12 @@
  }
 
  .note-color-fore .dropdown-toggle {
-     width: 24px!important;
+     width: 24px !important;
  }
 
  .tooltip-inner {
      border-radius: 8px;
-     background-color: #F0F2F4!important;
+     background-color: #F0F2F4 !important;
      color: #000;
      margin-bottom: 1px;
      overflow: hidden;
@@ -125,9 +125,9 @@
  /* 调色盘 */
 
  .note-color-btn {
-     margin: 5px 2px!important;
-     width: 22px!important;
-     height: 22px!important;
+     margin: 5px 2px !important;
+     width: 22px !important;
+     height: 22px !important;
      border: 1px solid rgba(0, 0, 0, 0.20);
      border-radius: 8px;
  }
@@ -148,7 +148,7 @@
 
  .note-palette {
      padding: 5px 10px;
-     margin: 0px!important;
+     margin: 0px !important;
  }
 
  .note-popover .popover-content .note-color .dropdown-menu .note-palette {
@@ -172,7 +172,7 @@
  }
 
  .selectColor {
-     border: 1px solid #FFF!important;
+     border: 1px solid #FFF !important;
      /* outline: 1px outset #0883FB; */
      box-shadow: 0 0 0 1.5px #0883FB;
      transform: scale(1.08);
@@ -191,13 +191,13 @@
  }
 
  .planButton button {
-     margin: 5px!important;
-     width: 43px!important;
+     margin: 5px !important;
+     width: 43px !important;
      height: 22px;
      opacity: 0.8;
      background: rgba(0, 0, 0, 0.10);
      border-radius: 8px;
-     outline: none!important;
+     outline: none !important;
  }
 
  .planPoa {
@@ -216,11 +216,11 @@
  /* hover事件 */
 
  .btn-default:active, .btn-default.active, .open>.dropdown-toggle.btn-default {
-     background-color: transparent!important;
+     background-color: transparent !important;
  }
 
  .btn-default:active:hover {
-     background-color: rgba(0, 0, 0, 0.1)!important;
+     background-color: rgba(0, 0, 0, 0.1) !important;
  }
 
  .btn-default {
@@ -228,7 +228,7 @@
  }
 
  .btn-default:hover {
-     background-color: rgba(0, 0, 0, 0.05)!important;
+     background-color: rgba(0, 0, 0, 0.05) !important;
  }
 
  .note-btn-group button {
@@ -236,15 +236,19 @@
  }
 
  .note-forecolor {
-     padding-right: 4px!important;
+     padding-right: 4px !important;
  }
 
  .note-fontsize button {
-     padding-bottom: 2px!important;
+     padding-bottom: 2px !important;
+ }
+
+ .note-fontname button {
+     padding-bottom: 2px !important;
  }
 
  .note-color-back .dropdown-toggle {
-     padding-bottom: 2px!important;
+     padding-bottom: 2px !important;
  }
 
  .note-editable {
@@ -252,8 +256,8 @@
  }
 
  .note-editable img {
-     padding: 4px!important;
-     max-width: 100%!important;
+     padding: 4px !important;
+     max-width: 100% !important;
  }
 
  .slopingside {
@@ -264,11 +268,11 @@
  }
 
  .note-backcolor .backColor-dropdown {
-     padding-right: 2px!important;
+     padding-right: 2px !important;
  }
 
  .heightNull {
-     height: 0px!important;
+     height: 0px !important;
      overflow: hidden;
  }
 
@@ -276,19 +280,44 @@
      width: 38px;
  }
 
+ .fontnameBut {
+     width: 78px;
+ }
+
  .dropdown-fontsize {
      overflow: hidden;
  }
 
- .dropdown-fontsize>li>a {
+ .dropdown-fontname {
+     overflow: hidden;
+     overflow-y: auto;
+     max-height: 300px;
+ }
+
+ .dropdown-fontsize>li>a,
+ .dropdown-fontname>li>a {
      width: 100%;
      height: 34px;
      line-height: 30px;
      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+     max-width: 240px !important;
  }
 
  .dropdown-fontsize>li:nth-last-child(1) a {
      border-bottom: none;
+ }
+
+ .dropdown-fontname>li:nth-last-child(1) a {
+     border-bottom: none;
+ }
+
+ .note-current-fontname {
+     display: inline-block;
+     vertical-align: middle;
+     width: 50px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
  }
 
  .note-popover .popover-content .dropdown-menu.note-check li a i {
@@ -296,9 +325,10 @@
      color: inherit;
  }
 
- .dropdown-fontsize>li>a:hover {
+ .dropdown-fontsize>li>a:hover,
+ .dropdown-fontname>li>a:hover {
      background-color: rgba(0, 0, 0, 0.05);
-     color: #fff!important;
+     color: #fff !important;
  }
 
  .btn-group.open .dropdown-toggle {
@@ -319,10 +349,9 @@
  }
 
  .transparentColor {
-     color: transparent!important;
+     color: transparent !important;
  }
 
  .backColorInhert {
      background-color: inherit;
  }
-
