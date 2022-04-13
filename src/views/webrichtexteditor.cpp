@@ -633,7 +633,7 @@ void WebRichTextEditor::onShowEditToolbar(const QPoint &pos)
 {
     QPoint menuPoint = pos;
     menuPoint.setX(menuPoint.x() - 9);
-    int width = this->width() - menuPoint.x() - 385;
+    int width = this->width() - menuPoint.x() - 395;
     if (width < 0) {
         menuPoint.setX(menuPoint.x() + width);
     }

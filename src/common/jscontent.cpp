@@ -138,6 +138,7 @@ QString JsContent::jsCallGetTranslation()
     static QJsonDocument doc;
     if (doc.isEmpty()) {
         QJsonObject object;
+        object.insert("fontname", DApplication::translate("web", "Font"));
         object.insert("fontsize", DApplication::translate("web", "Font size"));
         object.insert("forecolor", DApplication::translate("web", "Font color"));
         object.insert("backcolor", DApplication::translate("web", "Text highlight color"));
