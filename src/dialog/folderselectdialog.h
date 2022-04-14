@@ -97,9 +97,17 @@ protected:
     //连接槽函数
     void initConnections();
     //隐藏事件
-    void hideEvent(QHideEvent *event);
+    void hideEvent(QHideEvent *event) override;
     //主题切换刷新文本颜色
     void refreshTextColor(bool dark);
+
+    /**
+     * @author liuxinping  ut002764
+     * @brief  focusInEvent 重写焦点进入事件
+     * @param
+     * @return
+     */
+    void focusInEvent(QFocusEvent *event) override;
 
 private:
     DLabel *m_noteInfo {nullptr};

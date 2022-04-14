@@ -452,3 +452,10 @@ void FolderSelectDialog::hideEvent(QHideEvent *event)
     m_view->setFocus(Qt::MouseFocusReason);
     DAbstractDialog::hideEvent(event);
 }
+
+
+void FolderSelectDialog::focusInEvent(QFocusEvent *event)
+{
+    DAbstractDialog::focusInEvent(event);
+    m_cancelBtn->setFocus();
+}
