@@ -644,7 +644,7 @@ void WebRichTextEditor::onShowEditToolbar(const QPoint &pos)
         menuPoint.setY(menuPoint.y() - 45);
     }
     //记录编辑工具栏的坐标位置
-    m_editToolbarRect = QRect(menuPoint, QPoint(menuPoint.x() + 290, menuPoint.y() + 35));
+    m_editToolbarRect = QRect(menuPoint, QPoint(menuPoint.x() + 290 + 85, menuPoint.y() + 35));
     emit JsContent::instance()->calllJsShowEditToolbar(menuPoint.x(), menuPoint.y());
 }
 

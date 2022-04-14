@@ -561,7 +561,7 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onShowEditToolbar_001)
         menuPoint.setX(menuPoint.x() + width);
     }
     menuPoint.setY(menuPoint.y() + 15 + m_web->m_txtRightMenu->height());
-    EXPECT_EQ(QRect(menuPoint, QPoint(menuPoint.x() + 290, menuPoint.y() + 35)), m_web->m_editToolbarRect);
+    EXPECT_EQ(QRect(menuPoint, QPoint(menuPoint.x() + 290 + 85, menuPoint.y() + 35)), m_web->m_editToolbarRect);
 }
 
 TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onHideEditToolbar_001)
