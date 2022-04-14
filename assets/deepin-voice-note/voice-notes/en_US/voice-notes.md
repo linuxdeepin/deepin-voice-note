@@ -29,7 +29,7 @@ You can run, exit, and create a shortcut for Voice Notes in the following ways.
 
 On the Voice Notes interface, press **Ctrl** + **Shift** + **?** on the keyboard to view shortcuts. Proficiency in shortcuts will greatly improve your efficiency.
 
-![1|hotkey](fig/d_hotkey.png)
+![1|hotkey](fig/hotkey.png)
 
 ## Manage Notebooks
 
@@ -49,7 +49,7 @@ The notebook created will be automatically saved as **Note (n)**. You can rename
 3. Enter the file name.
 4. Click in the blank area on the interface, or press the **Enter** key on the keyboard to rename it.
 
-![0|rename](fig/d_rename.png)
+![0|rename](fig/rename.png)
 
 ### Delete Notebooks
 
@@ -64,14 +64,14 @@ The notebook created will be automatically saved as **Note (n)**. You can rename
 1. When a notebook is created in Voice Note, a text is also created by default. Click the ![add](../common/circlebutton_add2.svg) icon under the notes list to create more new notes.
 2. Right-click a notebook or note and select **New Note** to create a new note.
 
-![0|new](fig/d_create1.png)
+![0|new](fig/create1.png)
 
 #### Add Texts to Notes
 
 1. Select a note in the note list, place the cursor in the right column and click to enter the text notes.
-2. Select the texts and set the style (e.g. the font color and size) in the pop-up text toolbar.
+2. Select the texts and set the style (the font, color, size, etc.) in the pop-up text toolbar.
 
-![text_input](fig/d_txt_input.png)
+![text_input](fig/txt_input.png)
 
 #### Add Voices to Notes
 
@@ -83,7 +83,7 @@ The notebook created will be automatically saved as **Note (n)**. You can rename
 
 3. Click the![play_blue_normal](../common/play_blue_normal.svg) icon to listen to the playback after the recording is completed.
 
-![0|Recorder](fig/d_recorder2.png)
+![0|Recorder](fig/recorder2.png)
 
 #### Add Pictures to Notes
 
@@ -112,9 +112,9 @@ You can add pictures to notes in one of the following ways:
 Select a text note or multiple text notes with **Ctrl/Shift** in the notes list and move the notes as needed in the following ways:
 
 - Drag the notes to another notebook.
-- Right-click to select **Move**, select a notebook in the pop-up dialogue and click **Confirm** to move the text notes in the selected notebook.
+- Right-click to select **Move** to move the text notes in the selected notebook.
 
-![0|move](fig/d_move.png)
+![0|move](fig/move.png)
 
 ### Stick Notes on Top
 
@@ -135,7 +135,7 @@ Select a text note or multiple text notes with **Ctrl/Shift** in the notes list 
 > - If you select **Save as TXT**, only the text notes, the the recording time and duration of the voice notes are saved rather than the voice content and pictures in it. 
 > - If you select **Save as HTML**, only the text notes and pictures rather than the voice contents can be saved.
 
-![0|save](fig/d_save_notes.png)
+![0|save](fig/save_notes.png)
 
 ### Save Voice Recording
 
@@ -144,13 +144,13 @@ Select a text note or multiple text notes with **Ctrl/Shift** in the notes list 
 
 >![tips](../common/tips.svg) Tips:  You can also right-click a voice file in the voice notes and select **Save as MP3** to save it in the storage device.
 
-![0|save](fig/d_savevoice.png)
+![0|save](fig/savevoice.png)
 
 ### Convert Voices to Texts
 
 Right-click a voice file on the Voice Notes interface to select **Voice to Text** to convert the voice contents to texts.
 
-![0|save](fig/d_voicetotext.png)
+![0|save](fig/voicetotext.png)
 
  
 
@@ -200,34 +200,35 @@ On the main menu, you can set audio source, check privacy policy, switch window 
 ### Settings
 
 You can set up audio source from **Internal** and **Microphone** options.
-1. On the Voice Notes interface, click ![icon_menu](../common/icon_menu.svg).
-2. Set up audio source:
+1. Click ![icon_menu](../common/icon_menu.svg)on the Voice Notes interface.
+2. Set up the audio source:
    - Select **Internal** source, and only system built-in sound will be recorded. 
    - Select **Microphone** source, and only microphone sound will be recorded. 
 
 ### Privacy Policy
 
-1. On the Voice Notes interface, click ![icon_menu](../common/icon_menu.svg).
+1. Click ![icon_menu](../common/icon_menu.svg)on the Voice Notes interface.
 2. Click **Privacy Policy** to view the relevant content on privacy policies.
 
 
 ### Theme
 
-The window theme provides three theme types, namely Light Theme, Dark Theme, and System Theme.
-1. On the Voice Notes interface, click ![icon_menu](../common/icon_menu.svg).
+There are three window themes, namely Light Theme, Dark Theme, and System Theme.
+
+1. Click ![icon_menu](../common/icon_menu.svg)on the Voice Notes interface.
 2. Click **Theme** to select one theme.
 
 ### Help
 
-1. On the Voice Notes interface, click ![icon_menu](../common/icon_menu.svg).
+1. Click ![icon_menu](../common/icon_menu.svg)on the Voice Notes interface.
 2. Click **Help** to view the manual of Voice Notes.
 
 ### About
 
-1. On the Voice Notes interface, click ![icon_menu](../common/icon_menu.svg). 
+1. Click ![icon_menu](../common/icon_menu.svg)on the Voice Notes interface.
 2. Click **About** to view the version and introduction of Voice Notes.
 
 ### Exit
 
-1. On the Voice Notes interface, click ![icon_menu](../common/icon_menu.svg).
+1. Click ![icon_menu](../common/icon_menu.svg)on the Voice Notes interface.
 2. Click **Exit** to exit Voice Notes.
