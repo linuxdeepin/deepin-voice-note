@@ -9,7 +9,6 @@ Build-Depends:
  qtbase5-dev,
  pkg-config,
  libsqlite3-dev,
- qtbase5-private-dev,
  qtmultimedia5-dev,
  libglib2.0-dev,
  libdtkwidget-dev,
