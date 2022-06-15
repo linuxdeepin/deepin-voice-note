@@ -23,12 +23,12 @@
 #include <QObject>
 
 class VNoteFolderOper;
-class ut_vnotefolderoper_test : public QObject
+class UT_VNoteFolderOper : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnotefolderoper_test();
+    UT_VNoteFolderOper();
 
     virtual void SetUp() override;
     virtual void TearDown() override;

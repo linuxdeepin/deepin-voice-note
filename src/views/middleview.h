@@ -24,11 +24,11 @@
 
 #include "widgets/vnoterightmenu.h"
 
-#include <QDateTime>
-
 #include <DListView>
 #include <DMenu>
 #include <DLabel>
+
+#include <QDateTime>
 
 DWIDGET_USE_NAMESPACE
 class MiddleViewDelegate;
@@ -69,6 +69,14 @@ public:
         pressing = 1,
         moving = 2
     };
+    //另存为类型
+    enum SaveAsType {
+        Note = 0, //保存笔记
+        Text, //txt类型
+        Html, //html类型
+        Voice, //语音类型
+    };
+
     explicit MiddleView(QWidget *parent = nullptr);
     //设置搜索关键字
     void setSearchKey(const QString &key);
@@ -88,10 +96,8 @@ public:
     void setCurrentIndex(int index);
     //记事项重命名
     void editNote();
-    //导出文本
-    void saveAsText();
-    //到处语音
-    void saveRecords();
+    //另存为
+    void saveAs(SaveAsType);
     //关闭右键菜单
     void closeMenu();
     //获取记事项id
@@ -145,6 +151,8 @@ public slots:
     void onNoteChanged();
     //刷新窗口
     void onRefresh();
+    //文件导出完成
+    void onExportFinished(int err);
 
 protected:
     //鼠标事件

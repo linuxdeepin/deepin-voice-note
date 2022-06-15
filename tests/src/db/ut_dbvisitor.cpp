@@ -19,152 +19,182 @@
 #include "ut_dbvisitor.h"
 #include "dbvisitor.h"
 #include "vnotedbmanager.h"
+#include "common/vnoteitem.h"
+#include "common/vnoteforlder.h"
 
-ut_dbvisitor_test::ut_dbvisitor_test()
+UT_DbVisitor::UT_DbVisitor()
 {
 }
 
-TEST_F(ut_dbvisitor_test, visitorData)
+TEST_F(UT_DbVisitor, UT_DbVisitor_visitorData_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
-    FolderQryDbVisitor folderqrydbvisitor(db, nullptr, nullptr);
     dbvisitor = new FolderQryDbVisitor(db, nullptr, nullptr);
-    dbvisitor->prepareSqls();
-    dbvisitor->visitorData();
-    dbvisitor->sqlQuery();
-    dbvisitor->dbvSqls();
-    dbvisitor->extraData();
+    EXPECT_TRUE(dbvisitor->prepareSqls());
+    EXPECT_FALSE(dbvisitor->visitorData());
+    EXPECT_FALSE(nullptr == dbvisitor->sqlQuery());
+    EXPECT_FALSE(dbvisitor->dbvSqls().isEmpty());
+    EXPECT_FALSE(dbvisitor->extraData().data.flag);
     delete dbvisitor;
 }
 
-TEST_F(ut_dbvisitor_test, MaxIdFolderDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_AddNoteDbVisitor_001)
+{
+    DbVisitor *dbvisitor;
+    VNoteFolder *folder = new VNoteFolder;
+    VNoteItem *note = new VNoteItem();
+    note->setFolder(folder);
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
+    dbvisitor = new AddNoteDbVisitor(db, nullptr, nullptr);
+    dbvisitor->param.newNote = note;
+    EXPECT_FALSE(dbvisitor->visitorData());
+    EXPECT_TRUE(dbvisitor->prepareSqls());
+    EXPECT_FALSE(nullptr == dbvisitor->sqlQuery());
+    EXPECT_FALSE(dbvisitor->dbvSqls().isEmpty());
+    EXPECT_FALSE(dbvisitor->extraData().data.flag);
+    delete folder;
+    delete note;
+    delete dbvisitor;
+}
+
+TEST_F(UT_DbVisitor, UT_DbVisitor_MaxIdFolderDbVisitor_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
-    MaxIdFolderDbVisitor maxidfolderdbvisitor(db, nullptr, nullptr);
     dbvisitor = new MaxIdFolderDbVisitor(db, nullptr, nullptr);
-    dbvisitor->prepareSqls();
-    dbvisitor->visitorData();
+    EXPECT_TRUE(dbvisitor->prepareSqls());
+    EXPECT_FALSE(dbvisitor->visitorData());
     delete dbvisitor;
 }
 
-TEST_F(ut_dbvisitor_test, AddFolderDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_AddFolderDbVisitor_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
-    AddFolderDbVisitor addfolderdbvisitor(db, nullptr, nullptr);
     dbvisitor = new AddFolderDbVisitor(db, nullptr, nullptr);
-    dbvisitor->prepareSqls();
-    dbvisitor->visitorData();
+    EXPECT_FALSE(dbvisitor->prepareSqls());
+    EXPECT_FALSE(dbvisitor->visitorData());
     delete dbvisitor;
 }
 
-TEST_F(ut_dbvisitor_test, RenameFolderDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_RenameFolderDbVisitor_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
-    RenameFolderDbVisitor renamefolderdbvisitor(db, nullptr, nullptr);
     dbvisitor = new RenameFolderDbVisitor(db, nullptr, nullptr);
-    dbvisitor->prepareSqls();
-    dbvisitor->visitorData();
+    EXPECT_FALSE(dbvisitor->prepareSqls());
+    EXPECT_TRUE(dbvisitor->visitorData());
     delete dbvisitor;
 }
 
-TEST_F(ut_dbvisitor_test, DelFolderDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_DelFolderDbVisitor_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
-    DelFolderDbVisitor delfolderdbvisitor(db, nullptr, nullptr);
     dbvisitor = new DelFolderDbVisitor(db, nullptr, nullptr);
-    dbvisitor->prepareSqls();
-    dbvisitor->visitorData();
+    EXPECT_FALSE(dbvisitor->prepareSqls());
+    EXPECT_TRUE(dbvisitor->visitorData());
     delete dbvisitor;
 }
 
-TEST_F(ut_dbvisitor_test, NoteQryDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_DelFolderDbVisitor_002)
+{
+    VNoteFolder *folder = new VNoteFolder;
+    VNoteItem *note = new VNoteItem();
+    note->setFolder(folder);
+    DbVisitor *dbvisitor;
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
+    dbvisitor = new DelFolderDbVisitor(db, nullptr, nullptr);
+    dbvisitor->param.id = &note->folderId;
+    EXPECT_TRUE(dbvisitor->prepareSqls());
+    EXPECT_TRUE(dbvisitor->visitorData());
+    delete folder;
+    delete note;
+    delete dbvisitor;
+}
+
+TEST_F(UT_DbVisitor, UT_DbVisitor_NoteQryDbVisitor_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
-    NoteQryDbVisitor noteqrydbvisitor(db, nullptr, nullptr);
     dbvisitor = new NoteQryDbVisitor(db, nullptr, nullptr);
-    dbvisitor->prepareSqls();
-    dbvisitor->visitorData();
+    EXPECT_TRUE(dbvisitor->prepareSqls());
+    EXPECT_FALSE(dbvisitor->visitorData());
     delete dbvisitor;
 }
 
-//TEST_F(ut_dbvisitor_test, AddNoteDbVisitor)
-//{
-//    DbVisitor *dbvisitor;
-//    QSqlDatabase db=VNoteDbManager::instance()->getVNoteDb();
-//    AddNoteDbVisitor addnotedbvisitor(db, nullptr, nullptr);
-//    dbvisitor = new AddNoteDbVisitor(db, nullptr, nullptr);
-//    dbvisitor->prepareSqls();
-//    dbvisitor->visitorData();
-//}
-
-TEST_F(ut_dbvisitor_test, RenameNoteDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_RenameNoteDbVisitor_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
-    RenameNoteDbVisitor renamenotedbvisitor(db, nullptr, nullptr);
     dbvisitor = new RenameNoteDbVisitor(db, nullptr, nullptr);
-    dbvisitor->prepareSqls();
-    dbvisitor->visitorData();
+    EXPECT_FALSE(dbvisitor->prepareSqls());
+    EXPECT_TRUE(dbvisitor->visitorData());
     delete dbvisitor;
 }
 
-TEST_F(ut_dbvisitor_test, UpdateNoteDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_UpdateNoteDbVisitor_001)
 {
+    VNoteItem *note = new VNoteItem();
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
-    UpdateNoteDbVisitor updatenotedbvisitor(db, nullptr, nullptr);
     dbvisitor = new UpdateNoteDbVisitor(db, nullptr, nullptr);
-    dbvisitor->prepareSqls();
-    dbvisitor->visitorData();
+    dbvisitor->param.newNote = note;
+    EXPECT_TRUE(dbvisitor->prepareSqls());
+    EXPECT_TRUE(dbvisitor->visitorData());
+    delete note;
     delete dbvisitor;
 }
 
-TEST_F(ut_dbvisitor_test, DelNoteDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_UpdateNoteFolderIdDbVisitor_001)
+{
+    VNoteItem *note = new VNoteItem();
+    DbVisitor *dbvisitor;
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
+    dbvisitor = new UpdateNoteFolderIdDbVisitor(db, nullptr, nullptr);
+    dbvisitor->param.newNote = note;
+    EXPECT_TRUE(dbvisitor->prepareSqls());
+    EXPECT_TRUE(dbvisitor->visitorData());
+    delete note;
+    delete dbvisitor;
+}
+
+TEST_F(UT_DbVisitor, UT_DbVisitor_UpdateNoteTopDbVisitor_001)
+{
+    VNoteItem *note = new VNoteItem();
+    DbVisitor *dbvisitor;
+    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
+    dbvisitor = new UpdateNoteTopDbVisitor(db, nullptr, nullptr);
+    dbvisitor->param.newNote = note;
+    EXPECT_TRUE(dbvisitor->prepareSqls());
+    EXPECT_TRUE(dbvisitor->visitorData());
+    delete note;
+    delete dbvisitor;
+}
+
+TEST_F(UT_DbVisitor, UT_DbVisitor_DelNoteDbVisitor_001)
 {
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
-    DelNoteDbVisitor delnotedbvisitor(db, nullptr, nullptr);
     dbvisitor = new DelNoteDbVisitor(db, nullptr, nullptr);
-    dbvisitor->prepareSqls();
-    dbvisitor->visitorData();
+    EXPECT_FALSE(dbvisitor->prepareSqls());
+    EXPECT_TRUE(dbvisitor->visitorData());
     delete dbvisitor;
 }
 
-TEST_F(ut_dbvisitor_test, SaferQryDbVisitor)
+TEST_F(UT_DbVisitor, UT_DbVisitor_DelNoteDbVisitor_002)
 {
+    VNoteFolder *folder = new VNoteFolder;
+    VNoteItem *note = new VNoteItem();
+    note->setFolder(folder);
     DbVisitor *dbvisitor;
     QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
-    SaferQryDbVisitor saferqrydbvisitor(db, nullptr, nullptr);
-    dbvisitor = new SaferQryDbVisitor(db, nullptr, nullptr);
-    dbvisitor->prepareSqls();
-    dbvisitor->visitorData();
-    delete dbvisitor;
-}
-
-TEST_F(ut_dbvisitor_test, AddSaferDbVisitor)
-{
-    DbVisitor *dbvisitor;
-    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
-    AddSaferDbVisitor addsaferdbvisitor(db, nullptr, nullptr);
-    dbvisitor = new AddSaferDbVisitor(db, nullptr, nullptr);
-    dbvisitor->prepareSqls();
-    dbvisitor->visitorData();
-    delete dbvisitor;
-}
-
-TEST_F(ut_dbvisitor_test, DelSaferDbVisitor)
-{
-    DbVisitor *dbvisitor;
-    QSqlDatabase db = VNoteDbManager::instance()->getVNoteDb();
-    DelSaferDbVisitor delsaferdbvisitor(db, nullptr, nullptr);
-    dbvisitor = new DelSaferDbVisitor(db, nullptr, nullptr);
-    dbvisitor->prepareSqls();
-    dbvisitor->visitorData();
+    dbvisitor = new DelNoteDbVisitor(db, nullptr, nullptr);
+    dbvisitor->param.newNote = note;
+    EXPECT_TRUE(dbvisitor->prepareSqls());
+    EXPECT_TRUE(dbvisitor->visitorData());
+    delete folder;
+    delete note;
     delete dbvisitor;
 }

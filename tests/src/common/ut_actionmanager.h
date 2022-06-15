@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_actionmanager_test : public QObject
+class UT_ActionManager : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_actionmanager_test();
+    UT_ActionManager();
 };
 
 #endif // UT_ACTIONMANAGER_H

@@ -36,7 +36,7 @@
 #include "db/vnoteitemoper.h"
 
 #include <DApplication>
-
+#include <DWindowManagerHelper>
 #include <QMouseEvent>
 #include <QDebug>
 #include <QDrag>
@@ -54,7 +54,6 @@ LeftView::LeftView(QWidget *parent)
 {
     initModel();
     initDelegate();
-    initNotepadRoot();
     initMenu();
     initConnections();
     setContextMenuPolicy(Qt::NoContextMenu);
@@ -62,7 +61,6 @@ LeftView::LeftView(QWidget *parent)
     this->setDragDropMode(QAbstractItemView::DragDrop);
     this->setDropIndicatorShown(true);
     this->setAcceptDrops(true);
-    this->setContextMenuPolicy(Qt::NoContextMenu);
     viewport()->installEventFilter(this);
     this->installEventFilter(this);
 }
@@ -89,24 +87,17 @@ void LeftView::initDelegate()
 }
 
 /**
- * @brief LeftView::initNotepadRoot
+ * @brief LeftView::getNotepadRoot
+ * @return 记事本项父节点
  */
-void LeftView::initNotepadRoot()
+QStandardItem *LeftView::getNotepadRoot()
 {
     QStandardItem *pItem = m_pDataModel->item(0);
     if (pItem == nullptr) {
         pItem = StandardItemCommon::createStandardItem(nullptr, StandardItemCommon::NOTEPADROOT);
         m_pDataModel->insertRow(0, pItem);
     }
-}
-
-/**
- * @brief LeftView::getNotepadRoot
- * @return 记事本项父节点
- */
-QStandardItem *LeftView::getNotepadRoot()
-{
-    return m_pDataModel->item(0);
+    return pItem;
 }
 
 /**
@@ -230,6 +221,12 @@ void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
     if (!m_onlyCurItemMenuEnable) {
         DTreeView::mouseDoubleClickEvent(event);
     }
+
+    //左键双击事件
+    if (event->button() == Qt::LeftButton) {
+        if (indexAt(event->pos()) == currentIndex())
+            editFolder(); //在记事本列表双击左键进入重命名状态
+    }
 }
 
 /**
@@ -238,7 +235,6 @@ void LeftView::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void LeftView::mouseMoveEvent(QMouseEvent *event)
 {
-    Q_UNUSED(event);
     if (m_onlyCurItemMenuEnable) {
         return;
     }
@@ -741,7 +737,8 @@ void LeftView::dragEnterEvent(QDragEnterEvent *event)
         m_pItemDelegate->setDragState(true);
         this->update();
     }
-
+    DTreeView::dragEnterEvent(event);
+    setState(DraggingState);
     event->accept();
 }
 
@@ -860,7 +857,11 @@ void LeftView::triggerDragFolder()
         if (nullptr == m_MoveView) {
             m_MoveView = new MoveView(this);
         }
-        m_MoveView->setFixedSize(224, 91);
+        if (DWindowManagerHelper::instance()->hasComposite()) {
+            m_MoveView->setFixedSize(224, 91);
+        } else {
+            m_MoveView->setFixedSize(180, 36);
+        }
         m_MoveView->setFolder(folder);
         drag->setPixmap(m_MoveView->grab());
         drag->setMimeData(mimeData);

@@ -22,11 +22,11 @@
 #include "homepage.h"
 #include "common/utils.h"
 
-#include <QGridLayout>
-#include <QVBoxLayout>
-
 #include <DApplicationHelper>
 #include <DFontSizeManager>
+
+#include <QGridLayout>
+#include <QVBoxLayout>
 
 /**
  * @brief HomePage::HomePage

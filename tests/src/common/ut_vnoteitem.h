@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_vnoteitem_test : public QObject
+class UT_VnoteItem : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnoteitem_test();
+    UT_VnoteItem();
 };
 
 #endif // UT_VNOTEITEM_H

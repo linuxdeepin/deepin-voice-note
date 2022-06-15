@@ -20,11 +20,14 @@
 */
 #include "vnotemultiplechoiceoptionwidget.h"
 #include "globaldef.h"
+#include "common/utils.h"
 
 #include <DApplication>
+
 #include <QDebug>
 #include <QImageReader>
 #include <QKeyEvent>
+
 //多选操作页面
 const int m_iconWidth = 24;
 VnoteMultipleChoiceOptionWidget::VnoteMultipleChoiceOptionWidget(QWidget *parent)
@@ -47,7 +50,7 @@ void VnoteMultipleChoiceOptionWidget::initUi()
     QPixmap pixmap;
     QSize size(162, 156);
     reader.setFileName(QString(STAND_ICON_PAHT).append("detail_icon/detail_icon_note.svg"));
-    const qreal ratio = qApp->devicePixelRatio();
+    const qreal ratio = qGuiApp->devicePixelRatio();
     if (reader.canRead()) {
         reader.setScaledSize(size * ratio);
         pixmap = QPixmap::fromImage(reader.read());
@@ -163,7 +166,7 @@ void VnoteMultipleChoiceOptionWidget::initConnections()
             &VnoteMultipleChoiceOptionWidget::changeFromThemeType);
 
     //字体切换长度适应
-    connect(qApp, &DApplication::fontChanged, this, &VnoteMultipleChoiceOptionWidget::onFontChanged);
+    connect(qGuiApp, &QGuiApplication::fontChanged, this, &VnoteMultipleChoiceOptionWidget::onFontChanged);
 }
 
 /**
@@ -230,7 +233,7 @@ void VnoteMultipleChoiceOptionWidget::enableButtons(bool saveAsTxtButtonStatus, 
  * @param color
  */
 //获得svg
-QPixmap VnoteMultipleChoiceOptionWidget::setSvgColor(QString svgPath, QString color)
+QPixmap VnoteMultipleChoiceOptionWidget::setSvgColor(const QString &svgPath, const QString &color)
 {
     //设置图标颜色
     QString path = svgPath;
@@ -244,7 +247,7 @@ QPixmap VnoteMultipleChoiceOptionWidget::setSvgColor(QString svgPath, QString co
     setSVGBackColor(elem, "fill", color);
 
     //    int scaled =qApp->devicePixelRatio() == 1.25 ? 2 : 1;
-    double scaled = qApp->devicePixelRatio();
+    double scaled = qGuiApp->devicePixelRatio();
     QSvgRenderer svg_render(doc.toByteArray());
 
     QPixmap pixmap(QSize(24, 24) * scaled);
@@ -335,8 +338,8 @@ void VnoteMultipleChoiceOptionWidget::onFontChanged()
     m_deleteButton->setText(DApplication::translate("NotesContextMenu", "Delete"));
     m_deleteButton->setFixedHeight(m_iconWidth + 2);
     //    //计算参数
-    int iconWidth = qCeil(qApp->devicePixelRatio() * m_iconWidth) + 30;
-    int saveTextWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save as TXT")) + iconWidth;
+    int iconWidth = qCeil(qGuiApp->devicePixelRatio() * m_iconWidth) + 30;
+    int saveTextWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save note")) + iconWidth;
     int saveVoiceWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Save voice recording")) + iconWidth;
     int deleteButtonWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Delete")) + iconWidth;
     int moveButtonWidth = fontMetrics.width(DApplication::translate("NotesContextMenu", "Move")) + iconWidth;
@@ -347,15 +350,15 @@ void VnoteMultipleChoiceOptionWidget::onFontChanged()
     m_saveVoiceButton->setFixedSize(saveVoiceWidth, m_iconWidth + 2);
 
     if (m_saveTextButton->width() + m_saveVoiceButton->width() + m_deleteButton->width() + m_moveButton->width() <= width()) {
-        m_saveTextButton->setText(DApplication::translate("NotesContextMenu", "Save as TXT"));
+        m_saveTextButton->setText(DApplication::translate("NotesContextMenu", "Save note"));
         m_saveVoiceButton->setText(DApplication::translate("NotesContextMenu", "Save voice recording"));
     } else {
         int midWidth = (width() - m_deleteButton->width() - m_moveButton->width()) / 2;
         if (midWidth > 0 && m_saveTextButton->width() > midWidth) {
             m_saveTextButton->setFixedWidth(midWidth);
-            m_saveTextButton->setText(fontMetrics.elidedText(DApplication::translate("NotesContextMenu", "Save as TXT"), Qt::ElideRight, midWidth - iconWidth));
+            m_saveTextButton->setText(fontMetrics.elidedText(DApplication::translate("NotesContextMenu", "Save note"), Qt::ElideRight, midWidth - iconWidth));
         } else {
-            m_saveTextButton->setText(DApplication::translate("NotesContextMenu", "Save as TXT"));
+            m_saveTextButton->setText(DApplication::translate("NotesContextMenu", "Save note"));
         }
         saveVoiceWidth = width() - m_deleteButton->width() - m_moveButton->width() - m_saveTextButton->width() - 30;
         if (saveVoiceWidth > 0 && saveVoiceWidth < m_saveVoiceButton->width()) {
@@ -390,6 +393,10 @@ bool VnoteMultipleChoiceOptionWidget::eventFilter(QObject *o, QEvent *e)
         if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
             DToolButton *btn = dynamic_cast<DToolButton *>(o);
             btn->click();
+            return true;
+        }
+        if (o == m_deleteButton && keyEvent->key() == Qt::Key_Tab) {
+            Utils::setTitleBarTabFocus(keyEvent); //将焦点转移至标题栏下一个控件
             return true;
         }
     }

@@ -31,7 +31,7 @@ public:
     //获取所有记事项数据
     VNOTE_ALL_NOTES_MAP *loadAllVNotes();
     //修改名称
-    bool modifyNoteTitle(QString title);
+    bool modifyNoteTitle(const QString &title);
     //更新数据
     bool updateNote();
     //添加记事项

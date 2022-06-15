@@ -23,12 +23,12 @@
 #include <QObject>
 
 class VNoteRecordWidget;
-class ut_vnoterecordwidget_test : public QObject
+class UT_VNoteRecordWidget : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnoterecordwidget_test();
+    UT_VNoteRecordWidget();
 
     // Test interface
 protected:

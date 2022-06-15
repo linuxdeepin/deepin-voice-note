@@ -21,11 +21,11 @@
 #ifndef UPGRADEVIEW_H
 #define UPGRADEVIEW_H
 
-#include <QShowEvent>
-#include <QWidget>
-
 #include <DLabel>
 #include <DWaterProgress>
+
+#include <QShowEvent>
+#include <QWidget>
 
 DWIDGET_USE_NAMESPACE
 

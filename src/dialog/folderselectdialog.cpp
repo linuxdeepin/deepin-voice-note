@@ -23,13 +23,13 @@
 #include "views/leftviewsortfilter.h"
 #include "globaldef.h"
 
+#include <DApplication>
+#include <DApplicationHelper>
+
 #include <QVBoxLayout>
 #include <QDebug>
 #include <QMouseEvent>
 #include <QScrollBar>
-
-#include <DApplication>
-#include <DApplicationHelper>
 #include <QGraphicsOpacityEffect>
 
 FolderSelectView::FolderSelectView(QWidget *parent)
@@ -218,8 +218,8 @@ void FolderSelectDialog::initUI()
 
     QHBoxLayout *titleLayout = new QHBoxLayout();
     titleLayout->setSpacing(0);
-    titleLayout->setContentsMargins(10, 0, 0, 0);
     titleLayout->addStretch();
+    titleLayout->setContentsMargins(10, 0, 0, 0);
     titleLayout->addSpacing(m_closeButton->width() / 3);
 
     titleLayout->addWidget(m_labMove, 0, Qt::AlignCenter | Qt::AlignVCenter);
@@ -312,7 +312,7 @@ void FolderSelectDialog::initConnections()
         this->refreshTextColor(isDark);
     });
     //字体切换长度适应
-    connect(qApp, &DApplication::fontChanged, this, &FolderSelectDialog::onFontChanged);
+    connect(qGuiApp, &QGuiApplication::fontChanged, this, &FolderSelectDialog::onFontChanged);
 }
 
 /**
@@ -451,4 +451,11 @@ void FolderSelectDialog::hideEvent(QHideEvent *event)
     m_closeButton->setAttribute(Qt::WA_UnderMouse, false);
     m_view->setFocus(Qt::MouseFocusReason);
     DAbstractDialog::hideEvent(event);
+}
+
+
+void FolderSelectDialog::focusInEvent(QFocusEvent *event)
+{
+    DAbstractDialog::focusInEvent(event);
+    m_cancelBtn->setFocus();
 }

@@ -44,5 +44,13 @@
         <file>icons/deepin/builtin/circle_record.svg</file>
         <file>icons/deepin/builtin/record.svg</file>
         <file>icons/deepin/builtin/finish_record.svg</file>
+        <file>icons/deepin/builtin/dark/img_insert_normal.svg</file>
+        <file>icons/deepin/builtin/dark/img_insert_disable.svg</file>
+        <file>icons/deepin/builtin/light/img_insert_normal.svg</file>
+        <file>icons/deepin/builtin/light/img_insert_disable.svg</file>
+        <file>icons/deepin/builtin/light/view_change_hide.svg</file>
+        <file>icons/deepin/builtin/light/view_change_show.svg</file>
+        <file>icons/deepin/builtin/dark/view_change_show.svg</file>
+        <file>icons/deepin/builtin/dark/view_change_hide.svg</file>
     </qresource>
 </RCC>

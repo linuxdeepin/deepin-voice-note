@@ -23,112 +23,123 @@
 #include "globaldef.h"
 #include <DLog>
 
-ut_datatypedef_test::ut_datatypedef_test()
+UT_DataTypeDef::UT_DataTypeDef()
 {
 }
 
-TEST_F(ut_datatypedef_test, dataConstRef)
+TEST_F(UT_DataTypeDef, UT_DataTypeDef_dataConstRef_001)
 {
     VNOTE_DATAS vnote_datas;
     VNOTE_DATA_VECTOR vnote_data_vector;
-    ASSERT_TRUE(vnote_data_vector.size() == 0);
+    EXPECT_TRUE(vnote_data_vector.size() == 0);
 
     VNoteBlock *ptrBlock = nullptr;
     vnote_datas.datas.push_back(ptrBlock);
     vnote_data_vector = vnote_datas.dataConstRef();
-    ASSERT_FALSE(vnote_data_vector.size() == 0);
+    EXPECT_FALSE(vnote_data_vector.size() == 0);
 }
 
-TEST_F(ut_datatypedef_test, newBlock)
+TEST_F(UT_DataTypeDef, UT_DataTypeDef_newBlock_001)
 {
     VNOTE_DATAS vnote_datas;
     VNoteBlock *ptrBlock = nullptr;
     ptrBlock = vnote_datas.newBlock(1);
-    ASSERT_EQ(ptrBlock->blockType, VNoteBlock::Text);
+    EXPECT_EQ(ptrBlock->blockType, VNoteBlock::Text);
     vnote_datas.delBlock(ptrBlock);
     ptrBlock = vnote_datas.newBlock(2);
-    ASSERT_EQ(ptrBlock->blockType, VNoteBlock::Voice);
+    EXPECT_EQ(ptrBlock->blockType, VNoteBlock::Voice);
     vnote_datas.delBlock(ptrBlock);
 }
 
-TEST_F(ut_datatypedef_test, addBlock)
+TEST_F(UT_DataTypeDef, UT_DataTypeDef_addBlock_001)
 {
     VNOTE_DATAS vnote_datas;
     VNoteBlock *ptrBlock = vnote_datas.newBlock(1);
     vnote_datas.addBlock(ptrBlock);
-    ASSERT_NE(vnote_datas.datas.size(), 0);
+    EXPECT_NE(vnote_datas.datas.size(), 0);
 }
 
-TEST_F(ut_datatypedef_test, addBlock1)
+TEST_F(UT_DataTypeDef, UT_DataTypeDef_addBlock_002)
 {
     VNOTE_DATAS vnote_datas;
     VNoteBlock *ptrBlock = vnote_datas.newBlock(1);
     VNoteBlock *ptrBlock1 = vnote_datas.newBlock(2);
     vnote_datas.addBlock(ptrBlock);
     vnote_datas.addBlock(ptrBlock, ptrBlock1);
-    ASSERT_NE(vnote_datas.datas.size(), 0);
+    EXPECT_NE(vnote_datas.datas.size(), 0);
 
     VNoteBlock *ptrBlock2 = vnote_datas.newBlock(1);
     vnote_datas.addBlock(ptrBlock2, ptrBlock2);
-    ASSERT_NE(vnote_datas.datas.size(), 0);
+    EXPECT_NE(vnote_datas.datas.size(), 0);
 
     ptrBlock2 = nullptr;
     VNoteBlock *ptrBlock3 = vnote_datas.newBlock(2);
     vnote_datas.addBlock(ptrBlock2, ptrBlock3);
-    ASSERT_NE(vnote_datas.datas.size(), 0);
+    EXPECT_NE(vnote_datas.datas.size(), 0);
 }
 
-TEST_F(ut_datatypedef_test, delBlock)
+TEST_F(UT_DataTypeDef, UT_DataTypeDef_delBlock_001)
 {
     VNOTE_DATAS vnote_datas;
     VNoteBlock *ptrBlock = vnote_datas.newBlock(1);
     VNoteBlock *ptrBlock1 = vnote_datas.newBlock(2);
     vnote_datas.addBlock(ptrBlock);
     vnote_datas.addBlock(ptrBlock, ptrBlock1);
-    ASSERT_NE(vnote_datas.datas.size(), 0);
+    EXPECT_NE(vnote_datas.datas.size(), 0);
 
     vnote_datas.delBlock(ptrBlock);
-    ASSERT_NE(vnote_datas.datas.size(), 0);
+    EXPECT_NE(vnote_datas.datas.size(), 0);
 }
 
-TEST_F(ut_datatypedef_test, classifyAddBlk)
+TEST_F(UT_DataTypeDef, UT_DataTypeDef_classifyAddBlk_001)
 {
     VNOTE_DATAS vnote_datas;
     VNoteBlock *ptrBlock = vnote_datas.newBlock(2);
     ptrBlock->blockType = VNoteBlock::InValid;
     vnote_datas.classifyAddBlk(ptrBlock);
-    ASSERT_EQ(vnote_datas.datas.size(), 0);
+    EXPECT_EQ(vnote_datas.datas.size(), 0);
     vnote_datas.classifyDelBlk(ptrBlock);
     vnote_datas.delBlock(ptrBlock);
 }
 
-TEST_F(ut_datatypedef_test, classifyDelBlk)
+TEST_F(UT_DataTypeDef, UT_DataTypeDef_classifyDelBlk_001)
 {
     VNOTE_DATAS vnote_datas;
     VNoteBlock *ptrBlock = vnote_datas.newBlock(2);
     vnote_datas.classifyAddBlk(ptrBlock);
+    ASSERT_NE(0, vnote_datas.voiceBlocks.size()) << "add voice, size is 0";
+    EXPECT_TRUE(vnote_datas.voiceBlocks.contains(ptrBlock));
     vnote_datas.classifyDelBlk(ptrBlock);
+    EXPECT_FALSE(vnote_datas.voiceBlocks.contains(ptrBlock)) << "remove voice";
 
     ptrBlock->blockType = VNoteBlock::InValid;
     vnote_datas.classifyAddBlk(ptrBlock);
+    int voiceSize = vnote_datas.voiceBlocks.size();
+    int textSize = vnote_datas.textBlocks.size();
     vnote_datas.classifyDelBlk(ptrBlock);
+    EXPECT_EQ(voiceSize, vnote_datas.voiceBlocks.size());
+    EXPECT_EQ(textSize, vnote_datas.textBlocks.size());
     vnote_datas.delBlock(ptrBlock);
 }
 
-TEST_F(ut_datatypedef_test, isValid)
+TEST_F(UT_DataTypeDef, UT_DataTypeDef_isValid_001)
 {
     VDataSafer vdatasafer;
-    ASSERT_FALSE(vdatasafer.isValid());
+    ASSERT_FALSE(vdatasafer.isValid()) << "init";
+    vdatasafer.path = "/home";
+    vdatasafer.folder_id = 2;
+    vdatasafer.note_id = 3;
+    EXPECT_TRUE(vdatasafer.isValid()) << "true";
 }
 
-TEST_F(ut_datatypedef_test, setSaferType)
+TEST_F(UT_DataTypeDef, UT_DataTypeDef_setSaferType_001)
 {
     VDataSafer vdatasafer;
     vdatasafer.setSaferType(vdatasafer.Unsafe);
-    ASSERT_EQ(vdatasafer.saferType, vdatasafer.Unsafe);
+    EXPECT_EQ(vdatasafer.saferType, vdatasafer.Unsafe);
 }
 
-TEST_F(ut_datatypedef_test, qdebugout)
+TEST_F(UT_DataTypeDef, UT_DataTypeDef_qdebugout_001)
 {
     VDataSafer vdatasafer;
     vdatasafer.path = "test";
@@ -137,7 +148,7 @@ TEST_F(ut_datatypedef_test, qdebugout)
     qDebug() << "" << vdatasafer;
 }
 
-TEST_F(ut_datatypedef_test, TEST_VNOTE_FOLDERS_MAP)
+TEST_F(UT_DataTypeDef, UT_DataTypeDef_TEST_VNOTE_FOLDERS_MAP_001)
 {
     VNOTE_FOLDERS_MAP vnote_floders_map;
     VNoteFolder *vnotefloder = nullptr;
@@ -145,7 +156,7 @@ TEST_F(ut_datatypedef_test, TEST_VNOTE_FOLDERS_MAP)
     vnote_floders_map.autoRelease = true;
 }
 
-TEST_F(ut_datatypedef_test, TEST_VNOTE_ITEMS_MAP)
+TEST_F(UT_DataTypeDef, TUT_DataTypeDef_EST_VNOTE_ITEMS_MAP_001)
 {
     VNOTE_ITEMS_MAP vnote_items_map;
     VNoteItem *vnoteitem = nullptr;
@@ -153,7 +164,7 @@ TEST_F(ut_datatypedef_test, TEST_VNOTE_ITEMS_MAP)
     vnote_items_map.autoRelease = true;
 }
 
-TEST_F(ut_datatypedef_test, TEST_VNOTE_ALL_NOTES_MAP)
+TEST_F(UT_DataTypeDef, UT_DataTypeDef_TEST_VNOTE_ALL_NOTES_MAP_001)
 {
     VNOTE_ALL_NOTES_MAP vnote_all_notes_map;
     VNOTE_ITEMS_MAP *vnote_items_map = nullptr;

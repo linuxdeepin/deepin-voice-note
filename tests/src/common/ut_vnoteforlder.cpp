@@ -21,31 +21,31 @@
 #include "vnotedatamanager.h"
 #include <QtDebug>
 
-ut_vnoteforlder_test::ut_vnoteforlder_test()
+UT_VNoteFolder::UT_VNoteFolder()
 {
 }
 
-void ut_vnoteforlder_test::SetUp()
+void UT_VNoteFolder::SetUp()
 {
     m_vnoteforlder = VNoteDataManager::instance()->getNoteFolders()->folders[0];
 }
 
-void ut_vnoteforlder_test::TearDown()
+void UT_VNoteFolder::TearDown()
 {
     ;
 }
 
-TEST_F(ut_vnoteforlder_test, isValid)
+TEST_F(UT_VNoteFolder, UT_VNoteFolder_isValid_001)
 {
-    m_vnoteforlder->isValid();
+    EXPECT_EQ(true, m_vnoteforlder->isValid());
 }
 
-TEST_F(ut_vnoteforlder_test, maxNoteIdRef)
+TEST_F(UT_VNoteFolder, UT_VNoteFolder_maxNoteIdRef_001)
 {
-    m_vnoteforlder->maxNoteIdRef();
+    EXPECT_EQ(2, m_vnoteforlder->maxNoteIdRef());
 }
 
-TEST_F(ut_vnoteforlder_test, getNotesCount)
+TEST_F(UT_VNoteFolder, UT_VNoteFolder_getNotesCount_001)
 {
-    m_vnoteforlder->getNotesCount();
+    EXPECT_EQ(2, m_vnoteforlder->getNotesCount());
 }

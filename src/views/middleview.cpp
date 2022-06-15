@@ -27,20 +27,23 @@
 #include "common/actionmanager.h"
 #include "common/standarditemcommon.h"
 #include "common/vnoteitem.h"
+#include "common/utils.h"
 #include "task/exportnoteworker.h"
 #include "common/setting.h"
 #include "db/vnoteitemoper.h"
 #include "moveview.h"
+#include "dialog/vnotemessagedialog.h"
+
+#include <DApplication>
+#include <DFileDialog>
+#include <DLog>
+#include <DWindowManagerHelper>
 
 #include <QMouseEvent>
 #include <QVBoxLayout>
 #include <QScrollBar>
 #include <QDrag>
 #include <QMimeData>
-
-#include <DApplication>
-#include <DFileDialog>
-#include <DLog>
 
 /**
  * @brief MiddleView::MiddleView
@@ -244,6 +247,7 @@ qint32 MiddleView::rowCount() const
  */
 void MiddleView::setCurrentIndex(int index)
 {
+    initPositionStatus(index);
     DListView::setCurrentIndex(m_pSortViewFilter->index(index, 0));
 }
 
@@ -259,93 +263,109 @@ void MiddleView::editNote()
 }
 
 /**
- * @brief MiddleView::saveAsText
- * 导出文本
+ * @brief MiddleView::saveAs
+ * 笔记另存为，统一获取文件夹路径
  */
-void MiddleView::saveAsText()
+void MiddleView::saveAs(SaveAsType type)
 {
+    //获取选中的笔记
     QModelIndexList indexList = selectedIndexes();
-    qSort(indexList);
     QList<VNoteItem *> noteDataList;
     for (auto index : indexList) {
         VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
             StandardItemCommon::getStandardItemData(index));
-        //只需导出有文本内容的笔记
-        if (noteData->haveText()) {
-            noteDataList.append(noteData);
-        }
+        noteDataList.append(noteData);
     }
-    if (indexList.size()) {
-        //TODO:
-        //    Should check if this note is doing save action
 
-        DFileDialog dialog(this);
+    if (indexList.size() == 0) {
+        return;
+    }
+
+    //文件筛选类型
+    QStringList filterTypes {"TXT(*.txt);;HTML(*.html)", "TXT(*.txt)", "HTML(*.html)", "MP3(*.mp3)"};
+    DFileDialog dialog(this);
+    dialog.setNameFilter(filterTypes.at(type));
+    QString historyDir = "";
+    QString defaultName = "";
+    //获取默认路径
+    if (type == Voice) {
+        historyDir = setting::instance()->getOption(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
+    } else {
+        historyDir = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
+    }
+    if (historyDir.isEmpty()) {
+        historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    }
+    dialog.setDirectory(historyDir);
+    //多选或者语音时，选择文件夹
+    if (indexList.size() > 1 || type == Voice) {
         dialog.setFileMode(DFileDialog::DirectoryOnly);
         dialog.setLabelText(DFileDialog::Accept, DApplication::translate("MiddleView", "Save"));
-        dialog.setNameFilter("TXT(*.txt)");
-
-        QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
-        if (historyDir.isEmpty()) {
-            historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+        if (QDialog::Rejected == dialog.exec()) {
+            return;
         }
-        dialog.setDirectory(historyDir);
-
-        if (QDialog::Accepted == dialog.exec()) {
-            // save the directory string to config file.
-            setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, dialog.directoryUrl().toLocalFile());
-
-            QString exportDir = dialog.directoryUrl().toLocalFile();
-            ExportNoteWorker *exportWorker = new ExportNoteWorker(
-                exportDir, ExportNoteWorker::ExportText, noteDataList);
-            exportWorker->setAutoDelete(true);
-
-            QThreadPool::globalInstance()->start(exportWorker);
+    } else {
+        //单选笔记时，保存文件可指定名称
+        dialog.setFileMode(DFileDialog::AnyFile);
+        dialog.setAcceptMode(DFileDialog::AcceptSave);
+        VNoteItem *note = getCurrVNotedata();
+        //设置默认名称为笔记名称
+        if (note) {
+            //获取文件后缀名
+            QString fileSuffix = "";
+            if (Html == type) {
+                fileSuffix = ".html";
+            } else if (Text == type) {
+                fileSuffix = ".txt";
+            } else if (Voice == type) {
+                fileSuffix = ".mp3";
+            }
+            dialog.selectFile(Utils::filteredFileName(note->noteTitle + fileSuffix));
         }
-    }
-}
-
-/**
- * @brief MiddleView::saveRecords
- * 保存语音
- */
-void MiddleView::saveRecords()
-{
-    QModelIndexList indexList = selectedIndexes();
-    qSort(indexList);
-    QList<VNoteItem *> noteItemList;
-    for (auto index : indexList) {
-        VNoteItem *noteData = reinterpret_cast<VNoteItem *>(
-            StandardItemCommon::getStandardItemData(index));
-        noteItemList.append(noteData);
-    }
-    if (noteItemList.size()) {
-        //TODO:
-        //    Should check if this note is doing save action
-
-        DFileDialog dialog(this);
-        dialog.setFileMode(DFileDialog::DirectoryOnly);
-        dialog.setLabelText(DFileDialog::Accept, DApplication::translate("MiddleView", "Save"));
-        dialog.setNameFilter("MP3(*.mp3)");
-
-        QString historyDir = setting::instance()->getOption(VNOTE_EXPORT_VOICE_PATH_KEY).toString();
-        if (historyDir.isEmpty()) {
-            historyDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+        if (QDialog::Rejected == dialog.exec()) {
+            return;
         }
-        dialog.setDirectory(historyDir);
-
-        if (QDialog::Accepted == dialog.exec()) {
-            // save the directory string to config file.
-            setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, dialog.directoryUrl().toLocalFile());
-
-            QString exportDir = dialog.directoryUrl().toLocalFile();
-
-            ExportNoteWorker *exportWorker = new ExportNoteWorker(
-                exportDir, ExportNoteWorker::ExportAllVoice, noteItemList);
-            exportWorker->setAutoDelete(true);
-
-            QThreadPool::globalInstance()->start(exportWorker);
+        //获取文件名称
+        QList<QUrl> urls = dialog.selectedUrls();
+        if (!urls.size()) {
+            return;
+        }
+        defaultName = urls.value(0).fileName();
+        if (defaultName.isEmpty()) {
+            return;
         }
     }
+
+    //获取选择的文件夹路径
+    QString exportDir = dialog.directory().path();
+    if (exportDir.isEmpty()) {
+        return;
+    }
+
+    ExportNoteWorker::ExportType exportType = ExportNoteWorker::ExportNothing;
+    QString filter = dialog.selectedNameFilter();
+    //选择保存文件的类型并给加上后缀（部分版本文管不会自动加后缀）
+    if (filterTypes.at(1) == filter) {
+        exportType = ExportNoteWorker::ExportText;
+        if (!defaultName.isEmpty() && !defaultName.endsWith(".txt")) {
+            defaultName += ".txt";
+        }
+    } else if (filterTypes.at(2) == filter) {
+        exportType = ExportNoteWorker::ExportHtml;
+        if (!defaultName.isEmpty() && !defaultName.endsWith(".html")) {
+            defaultName += ".html";
+        }
+    } else if (filterTypes.at(3) == filter) {
+        exportType = ExportNoteWorker::ExportVoice;
+        if (!defaultName.isEmpty() && !defaultName.endsWith(".mp3")) {
+            defaultName += ".mp3";
+        }
+    }
+    ExportNoteWorker *exportWorker = new ExportNoteWorker(
+        exportDir, exportType, noteDataList, defaultName);
+    exportWorker->setAutoDelete(true);
+    connect(exportWorker, &ExportNoteWorker::exportFinished, this, &MiddleView::onExportFinished);
+    QThreadPool::globalInstance()->start(exportWorker);
 }
 
 /**
@@ -574,6 +594,12 @@ void MiddleView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (!m_onlyCurItemMenuEnable) {
         DListView::mouseDoubleClickEvent(event);
+    }
+
+    //左键双击事件
+    if (event->button() == Qt::LeftButton) {
+        if (indexAt(event->pos()) == currentIndex())
+            editNote(); //在笔记列表双击左键进入重命名状态
     }
 }
 
@@ -828,8 +854,11 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
                         //触发currentChanged信号，刷新详情页
                         setCurrentIndex(row);
                         selectionModel()->select(m_pSortViewFilter->index(row, 0), QItemSelectionModel::Select);
+                    } else {
+                        selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
+                        changeRightView();
                     }
-                    selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
+
                 }
                 //多选在上，shift+上
                 else {
@@ -864,8 +893,10 @@ void MiddleView::keyPressEvent(QKeyEvent *e)
                         //触发currentChanged信号，刷新详情页
                         setCurrentIndex(row);
                         selectionModel()->select(m_pSortViewFilter->index(row, 0), QItemSelectionModel::Select);
+                    } else {
+                        selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
+                        changeRightView();
                     }
-                    selectionModel()->select(m_pSortViewFilter->index(m_currentRow, 0), QItemSelectionModel::Select);
                 }
                 //多选在下，shift+下
                 else {
@@ -1148,7 +1179,11 @@ void MiddleView::triggerDragNote()
         m_MoveView->setNotesNumber(modelList.count());
         m_MoveView->setNoteList(noteDataList);
         //重设视图大小
-        m_MoveView->setFixedSize(282, 91);
+        if (DWindowManagerHelper::instance()->hasComposite()) {
+            m_MoveView->setFixedSize(282, 91);
+        } else {
+            m_MoveView->setFixedSize(240, 36);
+        }
         QPixmap pixmap = m_MoveView->grab();
         QDrag *drag = new QDrag(this);
         QMimeData *mimeData = new QMimeData;
@@ -1333,4 +1368,23 @@ void MiddleView::onRefresh()
 {
     update();
     emit requestRefresh();
+}
+
+/**
+ * @brief MiddleView::onExportFinished
+ * @param err
+ */
+void MiddleView::onExportFinished(int err)
+{
+    //保存文件失败
+    if (ExportNoteWorker::Savefailed == err) {
+        VNoteMessageDialog audioOutLimit(VNoteMessageDialog::SaveFailed);
+        audioOutLimit.exec();
+    }
+
+    //无权限
+    if (ExportNoteWorker::PathDenied == err) {
+        VNoteMessageDialog audioOutLimit(VNoteMessageDialog::NoPermission);
+        audioOutLimit.exec();
+    }
 }

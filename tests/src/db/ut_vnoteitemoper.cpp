@@ -23,12 +23,28 @@
 #include "vnoteforlder.h"
 #include "vnoteitemoper.h"
 #include "vnoteitem.h"
+#include <stub.h>
 
-ut_vnoteitemoper_test::ut_vnoteitemoper_test()
+static bool stub_true()
+{
+    return true;
+}
+
+static bool stub_false()
+{
+    return false;
+}
+
+static VNoteItem *stub_null()
+{
+    return nullptr;
+}
+
+UT_VNoteItemOper::UT_VNoteItemOper()
 {
 }
 
-void ut_vnoteitemoper_test::SetUp()
+void UT_VNoteItemOper::SetUp()
 {
     VNOTE_ALL_NOTES_MAP *notes = VNoteDataManager::instance()->getAllNotesInFolder();
     if (notes && !notes->notes.isEmpty()) {
@@ -41,57 +57,154 @@ void ut_vnoteitemoper_test::SetUp()
     m_vnoteitemoper = new VNoteItemOper(m_note);
 }
 
-void ut_vnoteitemoper_test::TearDown()
+void UT_VNoteItemOper::TearDown()
 {
     delete m_vnoteitemoper;
 }
 
-TEST_F(ut_vnoteitemoper_test, loadAllVNotes)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_loadAllVNotes_001)
 {
     VNOTE_ALL_NOTES_MAP *notes = m_vnoteitemoper->loadAllVNotes();
+    EXPECT_FALSE(nullptr == notes);
     delete notes;
 }
 
-TEST_F(ut_vnoteitemoper_test, modifyNoteTitle)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_modifyNoteTitle_001)
 {
-    m_vnoteitemoper->modifyNoteTitle("test");
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, updateData), stub_false);
+    EXPECT_FALSE(m_vnoteitemoper->modifyNoteTitle("test"));
 }
 
-TEST_F(ut_vnoteitemoper_test, updateNote)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_modifyNoteTitle_002)
 {
-    m_vnoteitemoper->updateNote();
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, updateData), stub_true);
+    EXPECT_TRUE(m_vnoteitemoper->modifyNoteTitle("test"));
 }
 
-TEST_F(ut_vnoteitemoper_test, addNote)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_updateNote_001)
 {
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, updateData), stub_false);
+    EXPECT_FALSE(m_vnoteitemoper->updateNote());
+}
+
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_updateNote_002)
+{
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, updateData), stub_true);
+    EXPECT_TRUE(m_vnoteitemoper->updateNote());
+}
+
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_addNote_001)
+{
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, insertData), stub_false);
     VNoteItem tmpNote;
     tmpNote.folderId = m_note->folderId;
     tmpNote.noteType = VNoteItem::VNT_Text;
     tmpNote.noteTitle = m_vnoteitemoper->getDefaultNoteName(tmpNote.folderId);
     VNoteBlock *ptrBlock1 = tmpNote.newBlock(VNoteBlock::Text);
     tmpNote.addBlock(ptrBlock1);
-    m_vnoteitemoper->addNote(tmpNote);
-    VNoteItemOper op(&tmpNote);
-    op.deleteNote();
+    EXPECT_FALSE(m_vnoteitemoper->addNote(tmpNote));
 }
 
-TEST_F(ut_vnoteitemoper_test, getDefaultVoiceName)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_addNote_002)
+{
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, insertData), stub_true);
+    stub.set(ADDR(VNoteDataManager, addNote), stub_null);
+    VNoteItem tmpNote;
+    tmpNote.folderId = m_note->folderId;
+    tmpNote.noteType = VNoteItem::VNT_Text;
+    tmpNote.noteTitle = m_vnoteitemoper->getDefaultNoteName(tmpNote.folderId);
+    VNoteBlock *ptrBlock1 = tmpNote.newBlock(VNoteBlock::Text);
+    tmpNote.addBlock(ptrBlock1);
+    EXPECT_FALSE(m_vnoteitemoper->addNote(tmpNote));
+}
+
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_addNote_003)
+{
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, insertData), stub_true);
+    stub.set(ADDR(VNoteDataManager, addNote), stub_true);
+    VNoteItem tmpNote;
+    tmpNote.folderId = m_note->folderId;
+    tmpNote.noteType = VNoteItem::VNT_Text;
+    tmpNote.noteTitle = m_vnoteitemoper->getDefaultNoteName(tmpNote.folderId);
+    VNoteBlock *ptrBlock1 = tmpNote.newBlock(VNoteBlock::Text);
+    tmpNote.addBlock(ptrBlock1);
+    VNoteItem *itemNote = m_vnoteitemoper->addNote(tmpNote);
+    EXPECT_TRUE(itemNote);
+    delete itemNote;
+}
+
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_deleteNote_001)
+{
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, deleteData), stub_false);
+    VNoteItem tmpNote;
+    tmpNote.folderId = m_note->folderId;
+    tmpNote.noteType = VNoteItem::VNT_Text;
+    tmpNote.noteTitle = m_vnoteitemoper->getDefaultNoteName(tmpNote.folderId);
+    VNoteItemOper op(&tmpNote);
+    EXPECT_FALSE(op.deleteNote());
+}
+
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_deleteNote_002)
+{
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, deleteData), stub_true);
+    VNoteItem tmpNote;
+    tmpNote.folderId = m_note->folderId;
+    tmpNote.noteType = VNoteItem::VNT_Text;
+    tmpNote.noteTitle = m_vnoteitemoper->getDefaultNoteName(tmpNote.folderId);
+    VNoteItemOper op(&tmpNote);
+    EXPECT_TRUE(op.deleteNote());
+}
+
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_getDefaultVoiceName_001)
 {
     m_vnoteitemoper->getDefaultVoiceName();
 }
 
-TEST_F(ut_vnoteitemoper_test, updateTop)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_updateTop_001)
 {
-    m_vnoteitemoper->updateTop(!m_note->isTop);
-    m_vnoteitemoper->updateTop(!m_note->isTop);
+    EXPECT_FALSE(m_vnoteitemoper->updateTop(m_note->isTop));
 }
 
-TEST_F(ut_vnoteitemoper_test, updateFolderId)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_updateTop_002)
 {
-    m_vnoteitemoper->updateFolderId(m_note);
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, updateData), stub_false);
+    EXPECT_FALSE(m_vnoteitemoper->updateTop(1));
+    EXPECT_EQ(0, m_vnoteitemoper->m_note->isTop);
 }
 
-TEST_F(ut_vnoteitemoper_test, getNote)
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_updateTop_003)
 {
-    m_vnoteitemoper->getNote(m_note->folderId, m_note->noteId);
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, updateData), stub_true);
+    EXPECT_TRUE(m_vnoteitemoper->updateTop(1));
+    EXPECT_EQ(1, m_vnoteitemoper->m_note->isTop);
+}
+
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_updateFolderId_001)
+{
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, updateData), stub_false);
+    EXPECT_FALSE(m_vnoteitemoper->updateFolderId(m_note));
+}
+
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_updateFolderId_002)
+{
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, updateData), stub_true);
+    EXPECT_TRUE(m_vnoteitemoper->updateFolderId(m_note));
+}
+
+TEST_F(UT_VNoteItemOper, UT_VNoteItemOper_getNote_001)
+{
+    EXPECT_TRUE(m_vnoteitemoper->getNote(m_note->folderId, m_note->noteId));
 }

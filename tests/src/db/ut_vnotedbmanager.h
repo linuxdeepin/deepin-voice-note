@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_vnotedbmanager_test : public QObject
+class UT_VNoteDbManager : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnotedbmanager_test();
+    UT_VNoteDbManager();
 };
 
 #endif // UT_VNOTEDBMANAGER_H

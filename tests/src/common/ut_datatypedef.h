@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_datatypedef_test : public QObject
+class UT_DataTypeDef : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_datatypedef_test();
+    UT_DataTypeDef();
 };
 
 #endif // UT_DATATYPEDEF_H

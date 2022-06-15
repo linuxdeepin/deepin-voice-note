@@ -104,6 +104,7 @@ protected:
     friend struct VNoteItem;
     friend class MetaDataParser;
     friend class ExportNoteWorker;
+    friend class FileCleanupWorker;
 };
 
 //新建录音时的缓存语音记录

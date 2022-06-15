@@ -21,10 +21,10 @@
 #include "gtest/gtest.h"
 
 class GstreamRecorder;
-class ut_gstreamrecorder_test : public ::testing::Test
+class UT_GstreamRecorder : public ::testing::Test
 {
 public:
-    ut_gstreamrecorder_test();
+    UT_GstreamRecorder();
 };
 
 #endif // UT_GSTREAMRECORDER_TEST_H

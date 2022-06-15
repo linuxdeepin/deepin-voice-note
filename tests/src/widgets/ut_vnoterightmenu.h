@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_vnoterightmenu_test : public QWidget
+class UT_VNoteRightMenu : public QWidget
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnoterightmenu_test();
+    UT_VNoteRightMenu();
 };
 
 #endif // UT_VNOTEICONBUTTON_H

@@ -19,92 +19,58 @@
 #include "ut_gstreamrecorder.h"
 #include "gstreamrecorder.h"
 #include "vnoterecordbar.h"
-#include "stub.h"
-#include <QDebug>
 
-static void stub_gstreamrecorde_common()
-{
-    qInfo() << "I am gstreamrecorder common stub";
-}
-
-ut_gstreamrecorder_test::ut_gstreamrecorder_test()
+UT_GstreamRecorder::UT_GstreamRecorder()
 {
 }
 
-TEST_F(ut_gstreamrecorder_test, createPipe)
+TEST_F(UT_GstreamRecorder, UT_GstreamRecorder_GetGstState_001)
 {
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, createPipe), stub_gstreamrecorde_common);
+    int state = -1;
+    int pending = -1;
     GstreamRecorder gstreamrecorder;
     gstreamrecorder.createPipe();
+    gstreamrecorder.GetGstState(&state, &pending);
+    EXPECT_NE(-1, state) << "state";
+    EXPECT_NE(-1, pending) << "pending";
 }
 
-TEST_F(ut_gstreamrecorder_test, GetGstState)
+TEST_F(UT_GstreamRecorder, UT_GstreamRecorder_pauseRecord_001)
 {
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, GetGstState), stub_gstreamrecorde_common);
     GstreamRecorder gstreamrecorder;
-    gstreamrecorder.GetGstState(nullptr, nullptr);
-}
-
-TEST_F(ut_gstreamrecorder_test, startRecord)
-{
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, startRecord), stub_gstreamrecorde_common);
-    GstreamRecorder gstreamrecorder;
-    gstreamrecorder.startRecord();
-}
-
-TEST_F(ut_gstreamrecorder_test, pauseRecord)
-{
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, pauseRecord), stub_gstreamrecorde_common);
-    GstreamRecorder gstreamrecorder;
+    gstreamrecorder.createPipe();
     gstreamrecorder.pauseRecord();
 }
 
-TEST_F(ut_gstreamrecorder_test, stopRecord)
+TEST_F(UT_GstreamRecorder, UT_GstreamRecorder_stopRecord_001)
 {
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, stopRecord), stub_gstreamrecorde_common);
     GstreamRecorder gstreamrecorder;
+    gstreamrecorder.createPipe();
     gstreamrecorder.stopRecord();
 }
 
-TEST_F(ut_gstreamrecorder_test, setDevice)
+TEST_F(UT_GstreamRecorder, UT_GstreamRecorder_setDevice_001)
 {
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, setDevice), stub_gstreamrecorde_common);
     GstreamRecorder gstreamrecorder;
-    gstreamrecorder.setDevice("");
+    gstreamrecorder.createPipe();
+    gstreamrecorder.m_currentDevice = "123";
+    gstreamrecorder.setDevice(QString("test"));
+    EXPECT_EQ("test", gstreamrecorder.m_currentDevice);
 }
 
-TEST_F(ut_gstreamrecorder_test, setStateToNull)
+TEST_F(UT_GstreamRecorder, UT_GstreamRecorder_setStateToNull_001)
 {
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, setStateToNull), stub_gstreamrecorde_common);
     GstreamRecorder gstreamrecorder;
+    gstreamrecorder.createPipe();
     gstreamrecorder.setStateToNull();
 }
 
-TEST_F(ut_gstreamrecorder_test, initFormat)
+TEST_F(UT_GstreamRecorder, UT_GstreamRecorder_initFormat)
 {
     GstreamRecorder gstreamrecorder;
     gstreamrecorder.initFormat();
-}
-
-TEST_F(ut_gstreamrecorder_test, doBusMessage)
-{
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, doBusMessage), stub_gstreamrecorde_common);
-    GstreamRecorder gstreamrecorder;
-    gstreamrecorder.doBusMessage(nullptr);
-}
-
-TEST_F(ut_gstreamrecorder_test, doBufferProbe)
-{
-    Stub stub;
-    stub.set(ADDR(GstreamRecorder, doBufferProbe), stub_gstreamrecorde_common);
-    GstreamRecorder gstreamrecorder;
-    gstreamrecorder.doBufferProbe(nullptr);
+    EXPECT_EQ(44100, gstreamrecorder.m_format.sampleRate()) << "code";
+    EXPECT_EQ(QAudioFormat::LittleEndian, gstreamrecorder.m_format.byteOrder()) << "byteOrder";
+    EXPECT_EQ(QAudioFormat::SignedInt, gstreamrecorder.m_format.sampleType()) << "sampleType";
+    EXPECT_EQ(16, gstreamrecorder.m_format.sampleSize()) << "sampleSize";
 }

@@ -19,11 +19,11 @@
 #include "ut_dbusvariant.h"
 #include "dbusvariant.h"
 
-ut_dbusvariant_test::ut_dbusvariant_test()
+UT_QDBusArgument::UT_QDBusArgument()
 {
 }
 
-TEST_F(ut_dbusvariant_test, testout)
+TEST_F(UT_QDBusArgument, UT_QDBusArgument_testout_001)
 {
     Inhibit inhibit;
     inhibit.what = "test";
@@ -34,10 +34,11 @@ TEST_F(ut_dbusvariant_test, testout)
     inhibit.pid = 2;
     QDBusArgument argument;
     argument << inhibit;
-    argument >> inhibit;
+    Inhibit inhibit2;
+    argument >> inhibit2;
 }
 
-TEST_F(ut_dbusvariant_test, UserInfo)
+TEST_F(UT_QDBusArgument, UT_QDBusArgument_UserInfo_001)
 {
     UserInfo userinfo;
     userinfo.pid = 1;
@@ -48,7 +49,7 @@ TEST_F(ut_dbusvariant_test, UserInfo)
     argument >> userinfo;
 }
 
-TEST_F(ut_dbusvariant_test, SeatInfo)
+TEST_F(UT_QDBusArgument, UT_QDBusArgument_SeatInfo_001)
 {
     SeatInfo seatinfo;
     seatinfo.id = "test";
@@ -58,7 +59,7 @@ TEST_F(ut_dbusvariant_test, SeatInfo)
     argument >> seatinfo;
 }
 
-TEST_F(ut_dbusvariant_test, SessionInfo)
+TEST_F(UT_QDBusArgument, UT_QDBusArgument_SessionInfo_001)
 {
     SessionInfo sessioninfo;
     sessioninfo.session = "test";

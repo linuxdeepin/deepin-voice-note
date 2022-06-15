@@ -24,11 +24,8 @@
 
 #include "common/datatypedef.h"
 #include "globaldef.h"
-
-#include <QShortcut>
-#include <QStandardItem>
-#include <QList>
-#include <QDBusPendingReply>
+#include "widgets/vnoteiconbutton.h"
+#include "common/vnoteitem.h"
 
 #include <DMainWindow>
 #include <DSearchEdit>
@@ -39,18 +36,21 @@
 #include <DFloatingButton>
 #include <DAnchors>
 #include <DFloatingMessage>
-#include <DScrollArea>
 #include <DMenu>
+
+#include <QShortcut>
+#include <QStandardItem>
+#include <QList>
+#include <QDBusPendingReply>
 
 DWIDGET_USE_NAMESPACE
 
-struct VNVoiceBlock;
 class VNoteRecordBar;
 class VNoteIconButton;
 class VNoteA2TManager;
 class LeftView;
 class MiddleView;
-class RightView;
+class WebRichTextEditor;
 class HomePage;
 class SplashView;
 class VoiceNoteItem;
@@ -154,8 +154,6 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     //窗口关闭
     void closeEvent(QCloseEvent *event) override;
-    //按键处理
-    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
     //事件过滤
     bool eventFilter(QObject *o, QEvent *e) override;
 
@@ -174,16 +172,10 @@ public slots:
     void onVNoteSearch();
     //搜索关键字改变
     void onVNoteSearchTextChange(const QString &text);
-    //调整详情页滚动条
-    void onCursorChange(int height, bool mouseMove);
     //开始录音
     void onStartRecord(const QString &path);
     //结束录音
     void onFinshRecord(const QString &voicePath, qint64 voiceSize);
-    //详情页播放事件处理
-    void onRightViewVoicePlay(VNVoiceBlock *voiceData);
-    //详情页暂停播放事件处理
-    void onRightViewVoicePause(VNVoiceBlock *voiceData);
     //播放窗口播放事件处理
     void onPlayPlugVoicePlay(VNVoiceBlock *voiceData);
     //播放窗口暂停播放事件处理
@@ -194,12 +186,8 @@ public slots:
     void onNewNotebook();
     //新建记事项
     void onNewNote();
-    //主题改变
-    void onChangeTheme();
-    //开始转文字
-    void onA2TStart(bool first = true);
-    //转写失败，重新转文字
-    void onA2TStartAgain();
+    //开始语音转文字
+    void onA2TStart(const VNVoiceBlock *voiceBlock);
     //转写错误
     void onA2TError(int error);
     //转写成功
@@ -226,6 +214,29 @@ public slots:
     void onDropNote(bool dropCancel);
     //响应多选详情页操作
     void handleMultipleOption(int id);
+    //快捷键
+    void onDeleteShortcut();
+    void onEscShortcut();
+    void onPoppuMenuShortcut();
+    void onAddNotepadShortcut();
+    void onReNameNotepadShortcut();
+    void onAddNoteShortcut();
+    void onRenameNoteShortcut();
+    void onPlayPauseShortcut();
+    void onRecordShorcut();
+    void onSaveNoteShortcut();
+    void onSaveVoicesShortcut();
+
+    //主题切换
+    void onThemeChanged();
+    //记事本列表显示或隐藏事件响应
+    void onViewChangeClicked();
+    //富文本编辑器插入图片
+    void onInsertImageToWebEditor();
+    //响应web前端语音播放控制
+    void onWebVoicePlay(const QVariant &json, bool bIsSame);
+    //当前编辑区内容搜索为空
+    void onWebSearchEmpty();
 
 private:
     //左侧列表视图操作相关
@@ -256,36 +267,30 @@ private:
     void release();
     //标题栏菜单项功能扩展
     void initMenuExtension();
+    //标题栏图标控件初始化
+    void initTitleIconButton();
     //刷新详情页显示
     void changeRightView(bool isMultiple);
     //设置tab焦点
     bool setTabFocus(QObject *obj, QKeyEvent *event);
     //设置标题栏关闭按钮下个控件tab焦点
     bool setTitleCloseButtonNext(QKeyEvent *event);
-    //设置标题栏下个控件tab焦点
-    bool setTitlebarNext(QKeyEvent *event);
     //设置笔记列表下个控件tab焦点
     bool setMiddleviewNext(QKeyEvent *event);
     //设置添加笔记按钮下个控件tab焦点
     bool setAddnoteButtonNext(QKeyEvent *event);
     //设置添加记事本按钮下个控件tab焦点
     bool setAddnotepadButtonNext(QKeyEvent *event);
+    //显示记事本列表
+    void showNotepadList();
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
-
-#ifdef TITLE_ACITON_PANEL
-    //titlebar actions
-    QWidget *m_actionPanel {nullptr};
-    DIconButton *m_addNewNoteBtn {nullptr};
-#endif
 
 #ifdef IMPORT_OLD_VERSION_DATA
     //*******Upgrade old Db code here only********
     bool m_fNeedUpgradeOldDb = false;
 #endif
-
-    DScrollArea *m_rightViewScrollArea {nullptr};
     //多选操作页面
     VnoteMultipleChoiceOptionWidget *m_multipleSelectWidget {nullptr};
     QStackedWidget *m_stackedRightMainWidget {nullptr};
@@ -299,13 +304,16 @@ private:
     DSplitter *m_mainWndSpliter {nullptr};
     LeftView *m_leftView {nullptr};
     MiddleView *m_middleView {nullptr};
-    RightView *m_rightView {nullptr};
+    WebRichTextEditor *m_richTextEdit {nullptr};
 
     DPushButton *m_addNotepadBtn {nullptr};
     DFloatingButton *m_addNoteBtn {nullptr};
 
     VNoteRecordBar *m_recordBar {nullptr};
     VNoteA2TManager *m_a2tManager {nullptr};
+
+    DIconButton *m_viewChange {nullptr}; //记事本列表收起控件
+    VNoteIconButton *m_imgInsert {nullptr}; //图片插入控件
 
     UpgradeView *m_upgradeView {nullptr};
     SplashView *m_splashView {nullptr};
@@ -314,6 +322,9 @@ private:
     bool m_rightViewHasFouse {true};
     bool m_showSearchEditMenu {false};
     bool m_needShowMax {false};
+    const VNVoiceBlock *m_voiceBlock {nullptr}; //语音数据
+
+    QScopedPointer<VNVoiceBlock> m_currentPlayVoice {nullptr};
 
     //Shortcuts key
     //*****************Shortcut key begin*********************
@@ -326,7 +337,6 @@ private:
     QScopedPointer<QShortcut> m_stPlayorPause; //Space
     QScopedPointer<QShortcut> m_stRecording; //Ctrl+R
     QScopedPointer<QShortcut> m_stVoice2Text; //Ctrl+W
-    QScopedPointer<QShortcut> m_stSaveAsMp3; //Ctrl+P
     QScopedPointer<QShortcut> m_stSaveAsText; //Ctrl+S
     QScopedPointer<QShortcut> m_stSaveVoices; //Ctrl+Y
     QScopedPointer<QShortcut> m_stDelete; //Delete
@@ -339,7 +349,6 @@ private:
     QString m_searchKey;
     DFloatingMessage *m_asrErrMeassage {nullptr};
     DFloatingMessage *m_pDeviceExceptionMsg {nullptr};
-    DPushButton *m_asrAgainBtn {nullptr};
     DMenu *m_menuExtension {nullptr};
     //Login session manager
     DBusLogin1Manager *m_pLogin1Manager {nullptr};

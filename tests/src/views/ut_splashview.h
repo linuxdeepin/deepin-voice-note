@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_splashview_test : public QObject
+class UT_SplashView : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_splashview_test();
+    UT_SplashView();
 };
 
 #endif // UT_SPLASHVIEW_H

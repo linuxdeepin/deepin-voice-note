@@ -44,6 +44,9 @@ public:
         AborteAsr,
         VolumeTooLow,
         CutNote,
+        SaveFailed, //保存失败
+        NoPermission, //无权限
+        VoicePathNoAvail, //语音路径无效
     };
 
 protected:
@@ -55,6 +58,14 @@ protected:
     void initMessage();
     //显示单按钮
     void setSingleButton(); //Need to be Optimzed
+
+    /**
+     * @author liuxinping  ut002764
+     * @brief  focusInEvent 重写
+     * @param
+     * @return
+     */
+    void focusInEvent(QFocusEvent *event) override;
 signals:
 
 public slots:

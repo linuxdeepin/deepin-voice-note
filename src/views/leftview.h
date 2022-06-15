@@ -136,8 +136,6 @@ private:
     void initDelegate();
     //初始化数据管理模块
     void initModel();
-    //初始化记事本项父节点
-    void initNotepadRoot();
     //初始化右键菜单
     void initMenu();
     //初始化连接

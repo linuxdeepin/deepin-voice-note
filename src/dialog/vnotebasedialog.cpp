@@ -21,11 +21,12 @@
 
 #include "dialog/vnotebasedialog.h"
 #include "globaldef.h"
+#include "common/utils.h"
+
+#include <DFontSizeManager>
 
 #include <QVBoxLayout>
 #include <QShowEvent>
-
-#include <DFontSizeManager>
 
 /**
  * @brief VNoteBaseDialog::VNoteBaseDialog
@@ -174,7 +175,7 @@ void VNoteBaseDialog::showEvent(QShowEvent *event)
     DAbstractDialog::showEvent(event);
 
     setAttribute(Qt::WA_Resized, false);
-
+    setFocus(Qt::PopupFocusReason);
     if (!testAttribute(Qt::WA_Resized)) {
         QSize size = sizeHint();
 

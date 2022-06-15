@@ -22,11 +22,10 @@
 #ifndef VNOTERECORDBAR_H
 #define VNOTERECORDBAR_H
 
+#include <DFloatingMessage>
+
 #include <QWidget>
 #include <QStackedLayout>
-
-#include <DAnchors>
-#include <DFloatingMessage>
 
 DWIDGET_USE_NAMESPACE
 class AudioWatcher;
@@ -42,16 +41,14 @@ public:
     explicit VNoteRecordBar(QWidget *parent = nullptr);
     //停止录音
     void stopRecord();
-    //快捷键暂停/继续语音播放
-    void playOrPauseVoice();
-    //播放语音
-    void playVoice(VNVoiceBlock *voiceData);
-    //暂停播放
-    void pauseVoice(VNVoiceBlock *voiceData);
+    /**
+     * @brief 播放语音
+     * @param voiceData :语音信息
+     * @param bIsSame :此次播放的语音是否与上一次操作的语音相同
+     */
+    void playVoice(VNVoiceBlock *voiceData, bool bIsSame);
     //停止播放
-    bool stopVoice(VNVoiceBlock *voiceData);
-    //获取当前播放语音数据
-    VNVoiceBlock *getVoiceData();
+    void stopPlay();
 
 private:
     //初始化设备检测
@@ -104,7 +101,6 @@ protected:
     VNoteRecordWidget *m_recordPanel {nullptr};
     VNote2SIconButton *m_recordBtn {nullptr};
     QWidget *m_recordBtnHover {nullptr};
-    QScopedPointer<DAnchorsBase> m_recBtnAnchor;
 
     QString m_recordPath {""};
     int m_currentMode {0};

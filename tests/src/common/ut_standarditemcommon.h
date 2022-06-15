@@ -24,12 +24,12 @@
 
 class StandardItemCommon;
 
-class ut_standarditemcommon_test : public QObject
+class UT_StandardItemCommon : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_standarditemcommon_test();
+    UT_StandardItemCommon();
 
     virtual void SetUp() override;
     virtual void TearDown() override;

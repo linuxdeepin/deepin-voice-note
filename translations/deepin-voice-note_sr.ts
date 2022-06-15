@@ -1,21 +1,21 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="sr" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="sr" version="2.0">
 <context>
     <name>AppMain</name>
     <message>
         <location filename="../src/common/vlcpalyer.cpp" line="54"/>
-        <location filename="../src/main.cpp" line="48"/>
-        <location filename="../src/main.cpp" line="49"/>
-        <location filename="../src/views/vnotemainwindow.cpp" line="771"/>
+        <location filename="../src/main.cpp" line="76"/>
+        <location filename="../src/main.cpp" line="77"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="605"/>
         <source>Voice Notes</source>
         <translation>Гласовна Бележница</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="50"/>
+        <location filename="../src/main.cpp" line="78"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
         <translation>Гласовна Бележница је лаган алат за прављење текстуалних белешки и гласовних записа.</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="772"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="606"/>
         <source>Recordings not saved</source>
         <translation>Снимци нису сачувани</translation>
     </message>
@@ -42,7 +42,7 @@
 <context>
     <name>DetailPage</name>
     <message>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="210"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="213"/>
         <source>%1 notes selected</source>
         <translation>%1 белешки/е је изабрано</translation>
     </message>
@@ -99,13 +99,12 @@
 <context>
     <name>MiddleView</name>
     <message>
-        <location filename="../src/views/middleview.cpp" line="284"/>
-        <location filename="../src/views/middleview.cpp" line="327"/>
+        <location filename="../src/views/middleview.cpp" line="276"/>
         <source>Save</source>
         <translation>Сачувај</translation>
     </message>
     <message>
-        <location filename="../src/views/middleview.cpp" line="1026"/>
+        <location filename="../src/views/middleview.cpp" line="1070"/>
         <source>No search results</source>
         <translation>Нема разултата претраге</translation>
     </message>
@@ -121,14 +120,87 @@
 <context>
     <name>NoteDetailContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="225"/>
+        <location filename="../src/common/actionmanager.cpp" line="282"/>
         <source>Save as MP3</source>
         <translation>Сачувај као MP3</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="226"/>
+        <location filename="../src/common/actionmanager.cpp" line="283"/>
         <source>Voice to Text</source>
         <translation>Глас у текст</translation>
+    </message>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="284"/>
+        <location filename="../src/common/actionmanager.cpp" line="311"/>
+        <location filename="../src/common/actionmanager.cpp" line="337"/>
+        <source>Delete</source>
+        <translation>Обриши</translation>
+    </message>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="285"/>
+        <location filename="../src/common/actionmanager.cpp" line="312"/>
+        <location filename="../src/common/actionmanager.cpp" line="338"/>
+        <source>Select all</source>
+        <translation>Изабери све</translation>
+    </message>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="286"/>
+        <location filename="../src/common/actionmanager.cpp" line="313"/>
+        <location filename="../src/common/actionmanager.cpp" line="339"/>
+        <source>Copy</source>
+        <translation>Копирај</translation>
+    </message>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="287"/>
+        <location filename="../src/common/actionmanager.cpp" line="314"/>
+        <location filename="../src/common/actionmanager.cpp" line="340"/>
+        <source>Cut</source>
+        <translation>Исеци</translation>
+    </message>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="288"/>
+        <location filename="../src/common/actionmanager.cpp" line="315"/>
+        <location filename="../src/common/actionmanager.cpp" line="341"/>
+        <source>Paste</source>
+        <translation>Убаци</translation>
+    </message>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="310"/>
+        <source>View</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="316"/>
+        <source>Save as</source>
+        <translation>Сачувај као</translation>
+    </message>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="342"/>
+        <source>Text to Speech</source>
+        <translation>Текст у говор</translation>
+    </message>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="343"/>
+        <source>Stop reading</source>
+        <translation>Заустави читање</translation>
+    </message>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="344"/>
+        <source>Speech to Text</source>
+        <translation>Говор у текст</translation>
+    </message>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="345"/>
+        <source>Translate</source>
+        <translation>Преведи</translation>
+    </message>
+</context>
+<context>
+    <name>NotebookContextMenu</name>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="226"/>
+        <source>Rename</source>
+        <translation>Преименуј</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="227"/>
@@ -137,59 +209,6 @@
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="228"/>
-        <source>Select all</source>
-        <translation>Изабери све</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="229"/>
-        <source>Copy</source>
-        <translation>Копирај</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="230"/>
-        <source>Cut</source>
-        <translation>Исеци</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="231"/>
-        <source>Paste</source>
-        <translation>Убаци</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="232"/>
-        <source>Text to Speech</source>
-        <translation>Текст у говор</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="233"/>
-        <source>Stop reading</source>
-        <translation>Заустави читање</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="234"/>
-        <source>Speech to Text</source>
-        <translation>Говор у текст</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="235"/>
-        <source>Translate</source>
-        <translation>Преведи</translation>
-    </message>
-</context>
-<context>
-    <name>NotebookContextMenu</name>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="176"/>
-        <source>Rename</source>
-        <translation>Преименуј</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="177"/>
-        <source>Delete</source>
-        <translation>Обриши</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="178"/>
         <source>New note</source>
         <translation>Нова белешка</translation>
     </message>
@@ -197,96 +216,87 @@
 <context>
     <name>NotesContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="196"/>
+        <location filename="../src/common/actionmanager.cpp" line="246"/>
         <source>Rename</source>
         <translation>Преименуј</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="198"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="333"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="342"/>
+        <location filename="../src/common/actionmanager.cpp" line="248"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="336"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="345"/>
         <source>Move</source>
         <translation>Премести</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="199"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="335"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="341"/>
+        <location filename="../src/common/actionmanager.cpp" line="249"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="338"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="344"/>
         <source>Delete</source>
         <translation>Обриши</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="200"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="339"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="350"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="356"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="358"/>
+        <location filename="../src/common/actionmanager.cpp" line="201"/>
         <source>Save as TXT</source>
         <translation>Сачувај као TXT</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="201"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="340"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="351"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="363"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="365"/>
+        <location filename="../src/common/actionmanager.cpp" line="200"/>
+        <source>Save as HTML</source>
+        <translation>Сачувај као HTML</translation>
+    </message>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="205"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="342"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="353"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="359"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="361"/>
+        <source>Save note</source>
+        <translation>Сачувај белешку</translation>
+    </message>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="251"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="343"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="354"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="366"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="368"/>
         <source>Save voice recording</source>
         <translation>Сачувај гласовни снимак</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="202"/>
+        <location filename="../src/common/actionmanager.cpp" line="252"/>
         <source>New note</source>
         <translation>Нова белешка</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1539"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1240"/>
         <source>Unstick</source>
         <translation>Одлепи</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1541"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1242"/>
         <source>Sticky on Top</source>
         <translation>Лепљиво на врху</translation>
     </message>
 </context>
 <context>
-    <name>RightView</name>
-    <message>
-        <location filename="../src/views/rightview.cpp" line="808"/>
-        <source>The voice note has been deleted</source>
-        <translation>Гласовна белешка је обрисана</translation>
-    </message>
-    <message>
-        <location filename="../src/views/rightview.cpp" line="815"/>
-        <source>OK</source>
-        <comment>button</comment>
-        <translation>У реду</translation>
-    </message>
-    <message>
-        <location filename="../src/views/rightview.cpp" line="1393"/>
-        <source>Save</source>
-        <translation>Сачувај</translation>
-    </message>
-</context>
-<context>
     <name>Setting</name>
     <message>
-        <location filename="../src/common/setting.cpp" line="40"/>
+        <location filename="../src/common/setting.cpp" line="41"/>
         <source>Basic</source>
         <translation>Основно</translation>
     </message>
     <message>
-        <location filename="../src/common/setting.cpp" line="41"/>
+        <location filename="../src/common/setting.cpp" line="42"/>
         <source>Audio Source</source>
         <translation>Аудио извор</translation>
     </message>
     <message>
-        <location filename="../src/common/setting.cpp" line="42"/>
+        <location filename="../src/common/setting.cpp" line="43"/>
         <source>Internal</source>
         <translation>Унутрашњи</translation>
     </message>
     <message>
-        <location filename="../src/common/setting.cpp" line="43"/>
+        <location filename="../src/common/setting.cpp" line="44"/>
         <source>Microphone</source>
         <translation>Микрофон</translation>
     </message>
@@ -294,97 +304,87 @@
 <context>
     <name>Shortcuts</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1140"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="902"/>
         <source>New notebook</source>
         <translation>Нова бележница</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1141"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="903"/>
         <source>Rename notebook</source>
         <translation>Преименуј бележницу</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1142"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="904"/>
         <source>Delete notebook</source>
         <translation>Обриши бележницу</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1164"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="926"/>
         <source>New note</source>
         <translation>Нова белешка</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1165"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="927"/>
         <source>Rename note</source>
         <translation>Преименуј белешку</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1166"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="928"/>
         <source>Delete note</source>
         <translation>Обриши белешку</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1167"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="929"/>
         <source>Play/Pause</source>
         <translation>Пусти/Паузирај</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1168"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="930"/>
         <source>Record voice</source>
         <translation>Сними глас</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1175"/>
-        <source>Voice to Text</source>
-        <translation>Глас у текст</translation>
+        <location filename="../src/views/vnotemainwindow.cpp" line="931"/>
+        <source>Save note</source>
+        <translation>Сачувај белешку</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1169"/>
-        <source>Save as MP3</source>
-        <translation>Сачувај као MP3</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1170"/>
-        <source>Save as TXT</source>
-        <translation>Сачувај као TXT</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1171"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="932"/>
         <source>Save recordings</source>
         <translation>Сачувај снимљено</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1195"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="952"/>
         <source>Select all</source>
         <translation>Изабери све</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1196"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="953"/>
         <source>Copy</source>
         <translation>Копирај</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1197"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="954"/>
         <source>Cut</source>
         <translation>Исеци</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1198"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="955"/>
         <source>Paste</source>
         <translation>Убаци</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1199"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="956"/>
         <source>Delete</source>
         <translation>Обриши</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1222"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="979"/>
         <source>Help</source>
         <translation>Помоћ</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1223"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="980"/>
         <source>Display shortcuts</source>
         <translation>Прикажи пречице</translation>
     </message>
@@ -392,22 +392,22 @@
 <context>
     <name>ShortcutsGroups</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1146"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="908"/>
         <source>Notebooks</source>
         <translation>Бележнице</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1179"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="936"/>
         <source>Notes</source>
         <translation>Белешке</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1203"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="960"/>
         <source>Edit</source>
         <translation>Уреди</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1227"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="984"/>
         <source>Settings</source>
         <translation>Подешавања</translation>
     </message>
@@ -423,17 +423,17 @@
 <context>
     <name>TitleBar</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="529"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="374"/>
         <source>Search</source>
         <translation>Претражи</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="2209"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1869"/>
         <source>Settings</source>
         <translation>Подешавања</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="2210"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1870"/>
         <source>Privacy Policy</source>
         <translation>Политика приватности</translation>
     </message>
@@ -449,17 +449,19 @@
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../src/common/utils.cpp" line="53"/>
+        <location filename="../src/common/utils.cpp" line="56"/>
+        <location filename="../tests/src/common/ut_utils.cpp" line="45"/>
+        <location filename="../tests/src/common/ut_utils.cpp" line="46"/>
         <source>1 min ago</source>
         <translation>Пре 1 мин.</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="55"/>
+        <location filename="../src/common/utils.cpp" line="58"/>
         <source>%1 mins ago</source>
         <translation>Пре %1  мин.</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="61"/>
+        <location filename="../src/common/utils.cpp" line="64"/>
         <source>Yesterday</source>
         <translation>Јуче</translation>
     </message>
@@ -467,25 +469,20 @@
 <context>
     <name>VNoteErrorMessage</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1095"/>
-        <source>The voice conversion failed due to the poor network connection. Do you want to try again?</source>
-        <translation>Претварање говора у текст није успело због лоше везе са мрежом, Поново покушати?</translation>
+        <location filename="../src/views/vnotemainwindow.cpp" line="864"/>
+        <source>The voice conversion failed due to the poor network connection, please have a check</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1100"/>
-        <source>The voice conversion failed. Do you want to try again?</source>
-        <translation>Претварање говора у текст није успело. Поново покушати?</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="2005"/>
-        <source>Try Again</source>
-        <translation>Покушај поново</translation>
+        <location filename="../src/views/vnotemainwindow.cpp" line="868"/>
+        <source>Voice to text conversion failed</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
     <name>VNoteMainWindow</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="614"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="467"/>
         <source>Create Notebook</source>
         <translation>Направи бележницу</translation>
     </message>
@@ -494,24 +491,28 @@
     <name>VNoteMessageDialog</name>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="53"/>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="35"/>
         <source>OK</source>
         <comment>button</comment>
         <translation>У реду</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="132"/>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="101"/>
         <source>Cancel</source>
         <comment>button</comment>
         <translation>Откажи</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="105"/>
         <source>Confirm</source>
         <comment>button</comment>
         <translation>Потврди</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="136"/>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="46"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
         <translation>Заиста желите да обришете ову бележницу?
@@ -519,49 +520,71 @@ All notes in it will be deleted</source>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="139"/>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="53"/>
         <source>Do you want to stop the current recording?</source>
         <translation>Желите да зауставите тренутно снимање?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="143"/>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="94"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
         <translation>Заиста желите да обришете %1 изабране/их белешки?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="145"/>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="88"/>
         <source>Are you sure you want to delete this note?</source>
         <translation>Заиста желите да обришете ову белешку?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="149"/>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="59"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
         <translation>Није могуће претворити ову гласовну белешку у текст. Тренутно нису подржани записи дужи од 20 мин.</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="153"/>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="66"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
         <translation>Претварање гласовне белешке у текст. Желите ли да зауставите?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="156"/>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="72"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
         <translation>Мала улазна јачина може узроковати лош снимак. Желите ли да наставите?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="159"/>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="79"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
         <translation>Припремљени снимци и претворени текст неће бити убачени. Желите ли да наставите?</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="162"/>
+        <source>Save failed</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="166"/>
+        <source>You do not have permission to save files there</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="170"/>
+        <source>The voice note has been deleted</source>
+        <translation>Гласовна белешка је обрисана</translation>
     </message>
 </context>
 <context>
     <name>VNoteRecordBar</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="2032"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1714"/>
         <source>Your audio recording device does not work.</source>
         <translation>Ваш уређај за снимање звука не ради.</translation>
     </message>
     <message>
-        <location filename="../src/views/vnoterecordbar.cpp" line="301"/>
+        <location filename="../src/views/vnoterecordbar.cpp" line="249"/>
         <source>No recording device detected</source>
         <translation>Није откривен уређај за снимање</translation>
     </message>
@@ -569,9 +592,67 @@ All notes in it will be deleted</source>
 <context>
     <name>VoiceNoteItem</name>
     <message>
-        <location filename="../src/views/voicenoteitem.cpp" line="222"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1657"/>
         <source>Converting voice to text</source>
         <translation>Претварање говора у текст</translation>
+    </message>
+</context>
+<context>
+    <name>web</name>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="138"/>
+        <source>Font size</source>
+        <translation>Величина фонта</translation>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="139"/>
+        <source>Font color</source>
+        <translation>Боја фонта</translation>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="140"/>
+        <source>Text highlight color</source>
+        <translation>Боја истицања текста</translation>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="141"/>
+        <source>Bold</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="142"/>
+        <source>Italic</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="143"/>
+        <source>Underline</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="144"/>
+        <source>Strikethrough</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="145"/>
+        <source>Bullets</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="146"/>
+        <source>Numbering</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="147"/>
+        <source>More colors</source>
+        <translation>Више боја</translation>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="148"/>
+        <source>Recent</source>
+        <translation>Недавно</translation>
     </message>
 </context>
 </TS>

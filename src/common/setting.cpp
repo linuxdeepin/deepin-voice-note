@@ -20,16 +20,15 @@
 */
 #include "setting.h"
 
+#include <DSettingsOption>
+#include <DApplication>
+
 #include <QStandardPaths>
 #include <QFileInfo>
 #include <QDir>
 #include <QDebug>
 
-#include <DSettingsOption>
-#include <DApplication>
 DWIDGET_USE_NAMESPACE
-
-static setting *settinginstance = nullptr;
 
 /**
  * @brief GenerateSettingTranslate
@@ -119,8 +118,7 @@ void CustemBackend::doSetOption(const QString &key, const QVariant &value)
  * @brief setting::setting
  * @param parent
  */
-setting::setting(QObject *parent)
-    : QObject(parent)
+setting::setting()
 {
     QString vnoteConfigBasePath =
         QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
@@ -174,8 +172,6 @@ DSettings *setting::getSetting()
  */
 setting *setting::instance()
 {
-    if (settinginstance == nullptr) {
-        settinginstance = new setting;
-    }
-    return settinginstance;
+    static setting _instance;
+    return &_instance;
 }

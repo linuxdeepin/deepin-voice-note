@@ -24,12 +24,12 @@
 
 struct VNoteFolder;
 
-class ut_vnoteforlder_test : public QObject
+class UT_VNoteFolder : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnoteforlder_test();
+    UT_VNoteFolder();
 
     virtual void SetUp() override;
     virtual void TearDown() override;

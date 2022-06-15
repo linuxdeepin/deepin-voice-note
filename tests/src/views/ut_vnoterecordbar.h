@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_vnoterecordbar_test : public QObject
+class UT_VNoteRecordBar : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnoterecordbar_test();
+    UT_VNoteRecordBar();
 };
 
 #endif // UT_VNOTERECORDBAR_H

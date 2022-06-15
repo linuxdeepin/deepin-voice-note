@@ -23,12 +23,12 @@
 #include <QObject>
 
 class VNoteOldDataManager;
-class ut_vnoteolddatamanager_test : public QObject
+class UT_VNoteOldDataManager : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnoteolddatamanager_test();
+    UT_VNoteOldDataManager();
 
     virtual void SetUp() override;
     virtual void TearDown() override;

@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_vnoteiconbutton_test : public QObject
+class UT_VNoteIconButton : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnoteiconbutton_test();
+    UT_VNoteIconButton();
 };
 
 #endif // UT_VNOTEICONBUTTON_H

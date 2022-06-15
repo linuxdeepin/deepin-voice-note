@@ -18,14 +18,14 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <DApplication>
+#include <DTextEdit>
+
 #include <QString>
 #include <QDateTime>
 #include <QPixmap>
 #include <QTextDocumentFragment>
 #include <QTextDocument>
-
-#include <DApplication>
-#include <DTextEdit>
 
 DWIDGET_USE_NAMESPACE
 
@@ -45,7 +45,7 @@ public:
     static int highTextEdit(QTextDocument *textDoc, const QString &searchKey,
                             const QColor &highColor, bool undo = false);
     //格式化录音时长
-    static QString formatMillisecond(qint64 millisecond, bool minValue = 1);
+    static QString formatMillisecond(qint64 millisecond, qint64 minValue = 1);
     //内存数据同步编辑器显示内容
     static void documentToBlock(VNoteBlock *block, const QTextDocument *doc);
     //编辑器同步内存数据
@@ -54,4 +54,12 @@ public:
     static void setDefaultColor(QTextDocument *srcDoc, const QColor &color);
     //设置标题栏tab焦点
     static void setTitleBarTabFocus(QKeyEvent *event);
+    //图片转base64
+    static bool pictureToBase64(QString imgPath, QString &base64);
+    //判断是否龙芯平台
+    static bool isLoongsonPlatform();
+    //过滤文件名内容
+    static QString filteredFileName(QString fileName, const QString &defaultName = "");
+    //判断是否wayland
+    static bool isWayland();
 };

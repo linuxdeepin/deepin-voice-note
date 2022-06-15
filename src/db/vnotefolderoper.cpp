@@ -26,11 +26,11 @@
 #include "db/dbvisitor.h"
 #include "globaldef.h"
 
+#include <DLog>
+
 #include <QVariant>
 #include <QObject>
 #include <QDateTime>
-
-#include <DLog>
 
 /**
  * @brief VNoteFolderOper::VNoteFolderOper
@@ -90,7 +90,7 @@ bool VNoteFolderOper::deleteVNoteFolder(VNoteFolder *folder)
  * @param folderName
  * @return true 成功
  */
-bool VNoteFolderOper::renameVNoteFolder(QString folderName)
+bool VNoteFolderOper::renameVNoteFolder(const QString &folderName)
 {
     bool isUpdateOK = true;
 

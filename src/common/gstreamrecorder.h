@@ -41,9 +41,9 @@ public:
     //停止录音
     void stopRecord();
     //设置录音设备名称
-    void setDevice(QString device);
+    void setDevice(const QString &device);
     //设置录音文件
-    void setOutputFile(QString path);
+    void setOutputFile(const QString &path);
     //处理gstreamer总线消息
     bool doBusMessage(GstMessage *message);
     //获取编码器的输入数据
@@ -59,8 +59,6 @@ Q_SIGNALS:
     void errorMsg(QString msg);
     //语音数据发生变化
     void audioBufferProbed(const QAudioBuffer &buffer);
-    //结束录音
-    void recordFinshed();
 
 private:
     //创建录音流水线通道

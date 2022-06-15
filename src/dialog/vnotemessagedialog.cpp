@@ -21,12 +21,12 @@
 
 #include "vnotemessagedialog.h"
 
-#include <QVBoxLayout>
-
 #include <DVerticalLine>
 #include <DApplication>
 #include <DFontSizeManager>
 #include <DApplicationHelper>
+
+#include <QVBoxLayout>
 
 /**
  * @brief VNoteMessageDialog::VNoteMessageDialog
@@ -157,6 +157,25 @@ void VNoteMessageDialog::initMessage()
     } break;
     case CutNote: {
         m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "The clipped recordings and converted text will not be pasted. Do you want to continue?"));
+    } break;
+    case SaveFailed: {
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "Save failed"));
+        setSingleButton(); //单按钮
+    } break;
+    case NoPermission: {
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "You do not have permission to save files there"));
+        setSingleButton(); //单按钮
+    } break;
+    case VoicePathNoAvail: {
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "The voice note has been deleted"));
+        setIconPixmap(QIcon::fromTheme("dialog-warning").pixmap(QSize(32, 32))); //设置图标
+        setSingleButton(); //单按钮
+    } break;
     }
-    }
+}
+
+void VNoteMessageDialog::focusInEvent(QFocusEvent *event)
+{
+    VNoteBaseDialog::focusInEvent(event);
+    m_cancelBtn->setFocus();
 }

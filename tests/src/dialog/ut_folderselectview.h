@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_folderselectview_test : public QObject
+class UT_FolderSelectView : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_folderselectview_test();
+    UT_FolderSelectView();
 };
 
 #endif //

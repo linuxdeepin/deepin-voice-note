@@ -6,12 +6,12 @@
 #include <QObject>
 
 class VnoteMultipleChoiceOptionWidget;
-class ut_vnotemultiplechoiceoptionwidget_test : public QObject
+class UT_VnoteMultipleChoiceOptionWidget : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnotemultiplechoiceoptionwidget_test();
+    UT_VnoteMultipleChoiceOptionWidget();
     virtual void SetUp() override;
     virtual void TearDown() override;
 

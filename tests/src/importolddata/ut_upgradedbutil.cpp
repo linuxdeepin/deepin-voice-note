@@ -19,52 +19,75 @@
 #include "ut_upgradedbutil.h"
 #include "upgradedbutil.h"
 #include "vnoteforlder.h"
+#include "db/vnotedbmanager.h"
+#include <stub.h>
 
-ut_upgradedbutil_test::ut_upgradedbutil_test()
+static bool stub_false()
+{
+    return false;
+}
+
+static bool stub_true()
+{
+    return true;
+}
+
+UT_UpgradeDbUtil::UT_UpgradeDbUtil()
 {
 }
 
-void ut_upgradedbutil_test::SetUp()
+void UT_UpgradeDbUtil::SetUp()
 {
     m_upgradedbutil = new UpgradeDbUtil;
 }
 
-void ut_upgradedbutil_test::TearDown()
+void UT_UpgradeDbUtil::TearDown()
 {
     delete m_upgradedbutil;
 }
 
-TEST_F(ut_upgradedbutil_test, saveUpgradeState)
+TEST_F(UT_UpgradeDbUtil, UT_UpgradeDbUtil_saveUpgradeState_001)
 {
     m_upgradedbutil->saveUpgradeState(m_upgradedbutil->Loading);
+    EXPECT_EQ(UpgradeDbUtil::Loading, m_upgradedbutil->readUpgradeState());
 }
 
-TEST_F(ut_upgradedbutil_test, readUpgradeState)
+TEST_F(UT_UpgradeDbUtil, UT_UpgradeDbUtil_readUpgradeState_001)
 {
-    m_upgradedbutil->readUpgradeState();
+    m_upgradedbutil->saveUpgradeState(m_upgradedbutil->Loading);
+    EXPECT_EQ(UpgradeDbUtil::Loading, m_upgradedbutil->readUpgradeState());
 }
 
-TEST_F(ut_upgradedbutil_test, needUpdateOldDb)
+TEST_F(UT_UpgradeDbUtil, UT_UpgradeDbUtil_needUpdateOldDb_001)
 {
-    m_upgradedbutil->needUpdateOldDb(m_upgradedbutil->Loading);
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, hasOldDataBase), stub_true);
+    EXPECT_TRUE(m_upgradedbutil->needUpdateOldDb(m_upgradedbutil->Loading));
 }
 
-TEST_F(ut_upgradedbutil_test, checkUpdateState)
+TEST_F(UT_UpgradeDbUtil, UT_UpgradeDbUtil_needUpdateOldDb_002)
+{
+    Stub stub;
+    stub.set(ADDR(VNoteDbManager, hasOldDataBase), stub_false);
+    EXPECT_FALSE(m_upgradedbutil->needUpdateOldDb(m_upgradedbutil->Loading));
+}
+
+TEST_F(UT_UpgradeDbUtil, UT_UpgradeDbUtil_checkUpdateState_001)
 {
     m_upgradedbutil->checkUpdateState(m_upgradedbutil->Processing);
 }
 
-TEST_F(ut_upgradedbutil_test, backUpOldDb)
+TEST_F(UT_UpgradeDbUtil, UT_UpgradeDbUtil_backUpOldDb_001)
 {
     m_upgradedbutil->backUpOldDb();
 }
 
-TEST_F(ut_upgradedbutil_test, clearVoices)
+TEST_F(UT_UpgradeDbUtil, UT_UpgradeDbUtil_clearVoices_001)
 {
     m_upgradedbutil->clearVoices();
 }
 
-TEST_F(ut_upgradedbutil_test, doFolderUpgrade)
+TEST_F(UT_UpgradeDbUtil, UT_UpgradeDbUtil_doFolderUpgrade_001)
 {
     VNoteFolder folder;
     folder.notesCount = 1;
@@ -77,7 +100,7 @@ TEST_F(ut_upgradedbutil_test, doFolderUpgrade)
     m_upgradedbutil->doFolderUpgrade(&folder);
 }
 
-TEST_F(ut_upgradedbutil_test, doFolderNoteUpgrade)
+TEST_F(UT_UpgradeDbUtil, UT_UpgradeDbUtil_doFolderNoteUpgrade_001)
 {
     m_upgradedbutil->doFolderNoteUpgrade(1, 1);
 }

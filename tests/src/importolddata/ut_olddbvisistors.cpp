@@ -18,19 +18,41 @@
 
 #include "ut_olddbvisistors.h"
 #include "olddbvisistors.h"
+#include "stub.h"
 
-ut_olddbvisistors_test::ut_olddbvisistors_test()
+static bool ret = true;
+
+bool stub_sql()
+{
+    if (ret == true) {
+        ret = false;
+        return true;
+    }
+    return ret;
+}
+
+UT_OldDBVisistors::UT_OldDBVisistors()
 {
 }
 
-TEST_F(ut_olddbvisistors_test, visitorData)
+TEST_F(UT_OldDBVisistors, UT_OldDBVisistors_visitorData_001)
 {
+    Stub stub1;
+    stub1.set(ADDR(QSqlQuery, next), stub_sql);
     QSqlDatabase db;
-    OldFolderQryDbVisitor oldfolderqrydbvisitor(db, nullptr, nullptr);
-    oldfolderqrydbvisitor.prepareSqls();
-    oldfolderqrydbvisitor.visitorData();
+    VNOTE_FOLDERS_MAP folders;
+    folders.autoRelease = true;
 
-    OldNoteQryDbVisitor oldnoteqrydbvisitor(db, nullptr, nullptr);
+    OldFolderQryDbVisitor oldfolderqrydbvisitor(db, nullptr, &folders);
+    oldfolderqrydbvisitor.prepareSqls();
+    EXPECT_FALSE(oldfolderqrydbvisitor.m_dbvSqls.isEmpty());
+    EXPECT_TRUE(oldfolderqrydbvisitor.visitorData());
+    VNOTE_ALL_NOTES_MAP notes;
+    notes.autoRelease = true;
+
+    ret = true;
+    OldNoteQryDbVisitor oldnoteqrydbvisitor(db, nullptr, &notes);
     oldnoteqrydbvisitor.prepareSqls();
-    oldnoteqrydbvisitor.visitorData();
+    EXPECT_FALSE(oldnoteqrydbvisitor.m_dbvSqls.isEmpty());
+    EXPECT_TRUE(oldnoteqrydbvisitor.visitorData());
 }

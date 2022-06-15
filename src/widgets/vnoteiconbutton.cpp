@@ -22,9 +22,9 @@
 #include "widgets/vnoteiconbutton.h"
 #include "globaldef.h"
 
-#include <QImageReader>
-
 #include <DLog>
+
+#include <QImageReader>
 
 /**
  * @brief VNoteIconButton::VNoteIconButton

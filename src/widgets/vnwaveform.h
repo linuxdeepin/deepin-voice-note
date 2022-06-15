@@ -22,9 +22,9 @@
 #ifndef VNWAVEFORM_H
 #define VNWAVEFORM_H
 
-#include <QAudioBuffer>
-
 #include <DFrame>
+
+#include <QAudioBuffer>
 
 DWIDGET_USE_NAMESPACE
 

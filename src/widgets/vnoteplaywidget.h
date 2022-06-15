@@ -43,18 +43,10 @@ class VNotePlayWidget : public DFloatingWidget
     Q_OBJECT
 public:
     explicit VNotePlayWidget(QWidget *parent = nullptr);
-    //绑定数据
-    void setVoiceBlock(VNVoiceBlock *voiceData);
-    //暂停播放
-    void pauseVideo();
     //播放
-    void playVideo();
-    //停止播放
-    void stopVideo();
+    void playVoice(VNVoiceBlock *voiceData, bool bIsSame);
     //获取状态
     VlcPalyer::VlcState getPlayerStatus();
-    //获取绑定的数据
-    VNVoiceBlock *getVoiceData();
 signals:
     void sigPlayVoice(VNVoiceBlock *voiceData);
     void sigPauseVoice(VNVoiceBlock *voiceData);
@@ -68,10 +60,6 @@ public slots:
     void onSliderReleased();
     //进度条移动
     void onSliderMove(int pos);
-    //播放
-    void onPlayBtnClicked();
-    //暂停
-    void onPauseBtnClicked();
     //播放/暂停
     void onPlayerBtnClicked();
     //播放结束，关闭播放窗口

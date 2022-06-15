@@ -22,12 +22,12 @@
 #include <QTest>
 #include <QObject>
 
-class ut_dbusvariant_test : public QObject
+class UT_QDBusArgument : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_dbusvariant_test();
+    UT_QDBusArgument();
 };
 
 #endif // UT_DBUSVARIANT_H

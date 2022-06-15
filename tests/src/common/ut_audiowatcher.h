@@ -21,10 +21,10 @@
 #include "gtest/gtest.h"
 class AudioWatcher;
 
-class ut_audiowatcher_test : public ::testing::Test
+class UT_AudioWatcher : public ::testing::Test
 {
 public:
-    ut_audiowatcher_test();
+    UT_AudioWatcher();
 
     // Test interface
 protected:

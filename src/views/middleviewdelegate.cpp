@@ -30,11 +30,11 @@
 
 #include "db/vnotefolderoper.h"
 
+#include <DApplicationHelper>
+
 #include <QLineEdit>
 #include <QPainter>
 #include <QPainterPath>
-
-#include <DApplicationHelper>
 #include <QDebug>
 
 static VNoteFolderOper FolderOper;

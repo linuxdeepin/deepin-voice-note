@@ -30,6 +30,28 @@
                             "default":""
                         }
                     ]
+                },
+                {
+                    "key":"notepadlist",
+                    "hide":true,
+                    "reset":false,
+                    "options":[
+                        {
+                            "key":"show",
+                            "default":true
+                        }
+                    ]
+                },
+                {
+                    "key":"encryption",
+                    "hide":true,
+                    "reset":false,
+                    "options":[
+                        {
+                            "key":"key",
+                            "default":"notes_encryption"
+                        }
+                    ]
                 }
             ]
         },

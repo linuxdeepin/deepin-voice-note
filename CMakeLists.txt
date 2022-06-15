@@ -54,17 +54,25 @@ set(CMAKE_CXX_FLAGS "-Wl,--as-need -fPIE")
 set(CMAKE_EXE_LINKER_FLAGS "-pie")
 set(CMAKE_CXX_FLAGS "-g")
 
+#安全编译参数
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstack-protector-strong -D_FORTITY_SOURCE=1 -z noexecstack -pie -fPIC -z lazy")
+
 if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "sw_64")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mieee")
 elseif (${CMAKE_SYSTEM_PROCESSOR} MATCHES "mips64")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftree-vectorize -march=loongson3a -mhard-float -mno-micromips -mno-mips16 -flax-vector-conversions -mloongson-ext2 -mloongson-mmi -Wl,--as-need")
 endif ()
 
+if(CMAKE_COVERAGE_ARG STREQUAL "CMAKE_COVERAGE_ARG_ON")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -Wall -fprofile-arcs -ftest-coverage")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -fprofile-arcs -ftest-coverage")
+endif()
+
 #compile flags
 if (CMAKE_BUILD_TYPE MATCHES Debug)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
-
+  add_definitions(-DWEB_PATH="${CMAKE_SOURCE_DIR}/assets/web")
   # Enable Qt builtin debug mode
   # add_definitions("-DQT_MESSAGELOGCONTEXT")
 else()
@@ -73,8 +81,15 @@ else()
   # -ffunction-sections
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O3 -Wl,-O1 -Wl,--gc-sections")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O3 -Wl,-O1 -Wl,--gc-sections")
+  add_definitions(-DWEB_PATH="${CMAKE_INSTALL_PREFIX}/share/deepin-voice-note/web")
   add_definitions(-DQT_NO_DEBUG_OUTPUT)
 endif()
+
+#安全加固参数
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -z relro -z now -z noexecstack -pie")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -z relro -z now -z noexecstack -pie")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fstack-protector-all")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -fstack-protector-all")
 
 #Generate the qm file
 #bash translate.sh
@@ -118,7 +133,7 @@ file(GLOB_RECURSE VNOTE_SRC ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
 # Find the library
 find_package(PkgConfig REQUIRED)
 find_package(Qt5Widgets REQUIRED)
-find_package(Qt5 COMPONENTS DBus Sql Multimedia REQUIRED)
+find_package(Qt5 COMPONENTS DBus Sql Multimedia WebEngineWidgets WebChannel REQUIRED)
 find_package(Qt5Gui REQUIRED)
 find_package(DtkWidget REQUIRED)
 find_package(DtkCore REQUIRED)
@@ -151,6 +166,8 @@ target_link_libraries(${APP_BIN_NAME}
     Qt5::DBus
     Qt5::Sql
     Qt5::Multimedia
+    Qt5::WebChannel
+    Qt5::WebEngineWidgets
     ${Qt5Svg_LIBRARIES}
     ${Qt5Xml_LIBRARIES}
 )
@@ -165,8 +182,12 @@ install(FILES ${APP_QM_FILES} DESTINATION share/deepin-voice-note/translations)
 install(FILES ${APP_DESKTOP} DESTINATION share/applications)
 install(FILES ${APP_CONFIG} DESTINATION share/deepin-voice-note)
 install(FILES ${APP_LOGO} DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps/)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/deepin-voice-note     DESTINATION /usr/share/deepin-manual/manual-assets/application/)
-
+if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "sw_64")
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/sw/deepin-voice-note     DESTINATION /usr/share/deepin-manual/manual-assets/application/)
+else()
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/deepin-voice-note     DESTINATION /usr/share/deepin-manual/manual-assets/application/)
+endif()
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/web    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/deepin-voice-note)
 #if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
-    add_subdirectory(tests)
+add_subdirectory(tests)
 #endif()

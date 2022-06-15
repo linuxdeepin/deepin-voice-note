@@ -19,21 +19,20 @@
 #include "ut_vnwaveform.h"
 #include "vnwaveform.h"
 
-ut_vnwaveform_test::ut_vnwaveform_test()
+UT_VNWaveform::UT_VNWaveform()
 {
-    VNWaveform vnwaveform;
-    vnwaveform.grab();
 }
 
-TEST_F(ut_vnwaveform_test, onAudioBufferProbed)
+TEST_F(UT_VNWaveform, UT_VNWaveform_onAudioBufferProbed_001)
 {
     VNWaveform vnwaveform;
     QAudioBuffer buffer;
     buffer.format().setSampleSize(16);
     vnwaveform.onAudioBufferProbed(buffer);
+    EXPECT_TRUE(vnwaveform.m_audioScaleSamples.isEmpty());
 }
 
-TEST_F(ut_vnwaveform_test, paintEvent)
+TEST_F(UT_VNWaveform, UT_VNWaveform_paintEvent_001)
 {
     VNWaveform vnwaveform;
     vnwaveform.m_audioScaleSamples.push_back(1.1);
@@ -41,20 +40,23 @@ TEST_F(ut_vnwaveform_test, paintEvent)
     vnwaveform.m_audioScaleSamples.push_back(1.3);
     vnwaveform.m_audioScaleSamples.push_back(1.4);
     vnwaveform.m_maxShowedSamples = 4;
-    vnwaveform.paintEvent(nullptr);
+    EXPECT_FALSE(vnwaveform.grab().isNull());
 }
 
-TEST_F(ut_vnwaveform_test, resizeEvent)
+TEST_F(UT_VNWaveform, UT_VNWaveform_resizeEvent_001)
 {
     VNWaveform vnwaveform;
     QSize size1(10, 12);
     QSize size2(5, 6);
     QResizeEvent *event = new QResizeEvent(size1, size2);
+    int maxShowedSamples = vnwaveform.m_maxShowedSamples;
     vnwaveform.resizeEvent(event);
+    EXPECT_TRUE(maxShowedSamples != vnwaveform.m_maxShowedSamples);
+
     delete event;
 }
 
-TEST_F(ut_vnwaveform_test, getBufferLevels)
+TEST_F(UT_VNWaveform, UT_VNWaveform_getBufferLevels_001)
 {
     VNWaveform vnwaveform;
     QAudioFormat audioformat;
@@ -99,7 +101,7 @@ TEST_F(ut_vnwaveform_test, getBufferLevels)
     vnwaveform.getBufferLevels(buffer6, scaleSamples, frameGain);
 }
 
-TEST_F(ut_vnwaveform_test, getPeakValue)
+TEST_F(UT_VNWaveform, UT_VNWaveform_getPeakValue_001)
 {
     VNWaveform vnwaveform;
     QAudioFormat audioformat;
@@ -109,7 +111,9 @@ TEST_F(ut_vnwaveform_test, getPeakValue)
     audioformat.setSampleRate(44100);
     //lamemp3enc 编码器插件格式为S16LE
     audioformat.setByteOrder(QAudioFormat::LittleEndian);
-    audioformat.setSampleType(QAudioFormat::Unknown);
+    audioformat.setSampleType(QAudioFormat::SignedInt);
     audioformat.setSampleSize(16);
-    vnwaveform.getPeakValue(audioformat);
+    EXPECT_EQ(SHRT_MAX, vnwaveform.getPeakValue(audioformat));
+    audioformat.setSampleSize(8);
+    EXPECT_EQ(CHAR_MAX, vnwaveform.getPeakValue(audioformat));
 }

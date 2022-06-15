@@ -21,7 +21,11 @@
 #ifndef VNOTEMULTIPLECHOICERIGHTWIDGET_H
 #define VNOTEMULTIPLECHOICERIGHTWIDGET_H
 
-#include <QWidget>
+#include <DToolButton>
+#include <DFontSizeManager>
+#include <DApplicationHelper>
+#include <DWidget>
+#include <DLabel>
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -29,12 +33,6 @@
 #include <QDomElement>
 #include <QSvgRenderer>
 #include <QFile>
-
-#include <DToolButton>
-#include <DFontSizeManager>
-#include <DApplicationHelper>
-#include <DWidget>
-#include <DLabel>
 
 DWIDGET_USE_NAMESPACE
 //多选操作页面
@@ -61,7 +59,7 @@ public:
 
 private:
     //获得svg
-    QPixmap setSvgColor(QString svgPath, QString color);
+    QPixmap setSvgColor(const QString &svgPath, const QString &color);
     //设置svg颜色属性
     void setSVGBackColor(QDomElement &elem, QString attr, QString val);
 signals:

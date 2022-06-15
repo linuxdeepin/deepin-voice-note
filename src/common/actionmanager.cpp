@@ -22,13 +22,11 @@
 #include "common/opsstateinterface.h"
 
 #include <DApplication>
-#include <QSignalMapper>
-
 #include <DLog>
 
-#define MenuId "_menuid_"
+#include <QSignalMapper>
 
-ActionManager *ActionManager::_instance = nullptr;
+#define MenuId "_menuid_"
 
 /**
  * @brief ActionManager::ActionManager
@@ -44,11 +42,8 @@ ActionManager::ActionManager()
  */
 ActionManager *ActionManager::Instance()
 {
-    if (nullptr == _instance) {
-        _instance = new ActionManager();
-    }
-
-    return _instance;
+    static ActionManager _instance;
+    return &_instance;
 }
 
 /**
@@ -70,12 +65,28 @@ VNoteRightMenu *ActionManager::noteContextMenu()
 }
 
 /**
- * @brief ActionManager::detialContextMenu
- * @return 详情页右键菜单
+ * @brief ActionManager::saveNoteContextMenu
+ * 获取记事项列表右键菜单的的二级菜单保存笔记右键菜单
+ * @return 保存笔记二级菜单
  */
-DMenu *ActionManager::detialContextMenu()
+VNoteRightMenu *ActionManager::saveNoteContextMenu()
 {
-    return m_detialContextMenu.get();
+    return m_saveNoteContextMenu.get();
+}
+
+VNoteRightMenu *ActionManager::voiceContextMenu()
+{
+    return m_voiceContextMenu.get();
+}
+
+VNoteRightMenu *ActionManager::pictureContextMenu()
+{
+    return m_pictureContextMenu.get();
+}
+
+VNoteRightMenu *ActionManager::txtContextMenu()
+{
+    return m_txtContextMenu.get();
 }
 
 /**
@@ -150,9 +161,18 @@ void ActionManager::resetCtxMenu(ActionManager::MenuType type, bool enable)
     } else if (MenuType::NoteCtxMenu == type) {
         startMenuId = NoteMenuBase;
         endMenuId = NoteMenuMax;
-    } else if (MenuType::NoteDetailCtxMenu == type) {
-        startMenuId = NoteDetailMenuBase;
-        endMenuId = NoteDetailMenuMax;
+    } else if (MenuType::VoiceCtxMenu == type) {
+        startMenuId = VoiceMenuBase;
+        endMenuId = VoiceMenuMax;
+    } else if (MenuType::PictureCtxMenu == type) {
+        startMenuId = PictureMenuBase;
+        endMenuId = PictureMenuMax;
+    } else if (MenuType::TxtCtxMenu == type) {
+        startMenuId = TxtMenuBase;
+        endMenuId = TxtMenuMax;
+    } else if (MenuType::SaveNoteCtxMenu == type) {
+        startMenuId = SaveNoteMenuBase;
+        endMenuId = SaveNoteMax;
     }
 
     QAction *pAction = nullptr;
@@ -170,7 +190,31 @@ void ActionManager::resetCtxMenu(ActionManager::MenuType type, bool enable)
  */
 void ActionManager::initMenu()
 {
-    bool isAISrvAvailable = OpsStateInterface::instance()->isAiSrvExist();
+    //保存笔记二级菜单项文案
+    QStringList saveNoteMenuTexts;
+    saveNoteMenuTexts << DApplication::translate("NotesContextMenu", "Save as HTML")
+                      << DApplication::translate("NotesContextMenu", "Save as TXT");
+
+    //初始化笔记右键菜单
+    VNoteRightMenu *saveNoteMenu = new VNoteRightMenu();
+    saveNoteMenu->setTitle(DApplication::translate("NotesContextMenu", "Save note"));
+    m_saveNoteContextMenu.reset(saveNoteMenu);
+    int saveNoteMenuIdStart = ActionKind::SaveNoteMenuBase;
+
+    //添加菜单选项
+    for (auto it : saveNoteMenuTexts) {
+        QAction *pAction = new QAction(it, m_saveNoteContextMenu.get());
+        pAction->setProperty(MenuId, saveNoteMenuIdStart);
+
+        m_saveNoteContextMenu->addAction(pAction);
+        m_actionsMap.insert(static_cast<ActionKind>(saveNoteMenuIdStart), pAction);
+
+        saveNoteMenuIdStart++;
+        if (SaveNoteMax == saveNoteMenuIdStart) {
+            break;
+        }
+    }
+
     //Notebook context menu
     QStringList notebookMenuTexts;
     notebookMenuTexts << DApplication::translate("NotebookContextMenu", "Rename")
@@ -197,7 +241,7 @@ void ActionManager::initMenu()
                   << DApplication::translate("NotesContextMenu", "")
                   << DApplication::translate("NotesContextMenu", "Move")
                   << DApplication::translate("NotesContextMenu", "Delete")
-                  << DApplication::translate("NotesContextMenu", "Save as TXT")
+                  << DApplication::translate("NotesContextMenu", "")
                   << DApplication::translate("NotesContextMenu", "Save voice recording")
                   << DApplication::translate("NotesContextMenu", "New note");
 
@@ -207,6 +251,13 @@ void ActionManager::initMenu()
     int noteMenuIdStart = ActionKind::NoteMenuBase;
 
     for (auto it : noteMenuTexts) {
+        //添加二级菜单
+        if (NoteSave == noteMenuIdStart) {
+            m_noteContextMenu->addMenu(m_saveNoteContextMenu.get());
+            noteMenuIdStart++;
+            continue;
+        }
+
         QAction *pAction = new QAction(it, m_noteContextMenu.get());
         pAction->setProperty(MenuId, noteMenuIdStart);
 
@@ -221,38 +272,99 @@ void ActionManager::initMenu()
     }
 
     //Voice context menu
-    QStringList noteDetailMenuTexts;
-    noteDetailMenuTexts << DApplication::translate("NoteDetailContextMenu", "Save as MP3")
-                        << DApplication::translate("NoteDetailContextMenu", "Voice to Text")
-                        << DApplication::translate("NoteDetailContextMenu", "Delete")
-                        << DApplication::translate("NoteDetailContextMenu", "Select all")
-                        << DApplication::translate("NoteDetailContextMenu", "Copy")
-                        << DApplication::translate("NoteDetailContextMenu", "Cut")
-                        << DApplication::translate("NoteDetailContextMenu", "Paste")
-                        << DApplication::translate("NoteDetailContextMenu", "Text to Speech")
-                        << DApplication::translate("NoteDetailContextMenu", "Stop reading")
-                        << DApplication::translate("NoteDetailContextMenu", "Speech to Text")
-                        << DApplication::translate("NoteDetailContextMenu", "Translate");
+    QStringList voiceMenuTexts;
+    voiceMenuTexts << DApplication::translate("NoteDetailContextMenu", "Save as MP3")
+                   << DApplication::translate("NoteDetailContextMenu", "Voice to Text")
+                   << DApplication::translate("NoteDetailContextMenu", "Delete")
+                   << DApplication::translate("NoteDetailContextMenu", "Select all")
+                   << DApplication::translate("NoteDetailContextMenu", "Copy")
+                   << DApplication::translate("NoteDetailContextMenu", "Cut")
+                   << DApplication::translate("NoteDetailContextMenu", "Paste");
 
-    //初始化详情页右键菜单
-    m_detialContextMenu.reset(new VNoteRightMenu());
+    //初始化语音文本右键菜单
+    m_voiceContextMenu.reset(new VNoteRightMenu());
 
-    int detailMenuIdStart = ActionKind::NoteDetailMenuBase;
+    int voiceMenuIdStart = ActionKind::VoiceMenuBase;
 
-    for (auto it : noteDetailMenuTexts) {
-        QAction *pAction = new QAction(it, m_detialContextMenu.get());
-        pAction->setProperty(MenuId, detailMenuIdStart);
+    for (auto it : voiceMenuTexts) {
+        QAction *pAction = new QAction(it, m_voiceContextMenu.get());
+        pAction->setProperty(MenuId, voiceMenuIdStart);
 
-        m_detialContextMenu->addAction(pAction);
-        m_actionsMap.insert(static_cast<ActionKind>(detailMenuIdStart), pAction);
-        if (!isAISrvAvailable) {
-            if (detailMenuIdStart == DetailVoice2Text
-                || detailMenuIdStart > DetailPaste) {
-                pAction->setVisible(false);
-            }
-        } else if (detailMenuIdStart == DetailPaste) {
-            m_detialContextMenu->addSeparator();
+        m_voiceContextMenu->addAction(pAction);
+        m_actionsMap.insert(static_cast<ActionKind>(voiceMenuIdStart), pAction);
+        voiceMenuIdStart++;
+
+        if (VoiceMenuMax == voiceMenuIdStart) {
+            break;
         }
-        detailMenuIdStart++;
     }
+
+    //picture context menu
+    QStringList pcitureMenuTexts;
+    pcitureMenuTexts << DApplication::translate("NoteDetailContextMenu", "View")
+                     << DApplication::translate("NoteDetailContextMenu", "Delete")
+                     << DApplication::translate("NoteDetailContextMenu", "Select all")
+                     << DApplication::translate("NoteDetailContextMenu", "Copy")
+                     << DApplication::translate("NoteDetailContextMenu", "Cut")
+                     << DApplication::translate("NoteDetailContextMenu", "Paste")
+                     << DApplication::translate("NoteDetailContextMenu", "Save as");
+
+    //初始化图片文本右键菜单
+    m_pictureContextMenu.reset(new VNoteRightMenu());
+
+    int pictureMenuIdStart = ActionKind::PictureMenuBase;
+
+    for (auto it : pcitureMenuTexts) {
+        QAction *pAction = new QAction(it, m_pictureContextMenu.get());
+        pAction->setProperty(MenuId, pictureMenuIdStart);
+
+        m_pictureContextMenu->addAction(pAction);
+        m_actionsMap.insert(static_cast<ActionKind>(pictureMenuIdStart), pAction);
+        pictureMenuIdStart++;
+        if (PictureMenuMax == pictureMenuIdStart) {
+            break;
+        }
+    }
+
+    //txt context menu
+    QStringList txtMenuTexts;
+    txtMenuTexts << DApplication::translate("NoteDetailContextMenu", "Delete")
+                 << DApplication::translate("NoteDetailContextMenu", "Select all")
+                 << DApplication::translate("NoteDetailContextMenu", "Copy")
+                 << DApplication::translate("NoteDetailContextMenu", "Cut")
+                 << DApplication::translate("NoteDetailContextMenu", "Paste")
+                 << DApplication::translate("NoteDetailContextMenu", "Text to Speech")
+                 << DApplication::translate("NoteDetailContextMenu", "Stop reading")
+                 << DApplication::translate("NoteDetailContextMenu", "Speech to Text")
+                 << DApplication::translate("NoteDetailContextMenu", "Translate");
+
+    //初始化文字文本右键菜单
+    m_txtContextMenu.reset(new VNoteRightMenu());
+
+    int txtMenuIdStart = ActionKind::TxtMenuBase;
+
+    for (auto it : txtMenuTexts) {
+        QAction *pAction = new QAction(it, m_txtContextMenu.get());
+        pAction->setProperty(MenuId, txtMenuIdStart);
+
+        m_txtContextMenu->addAction(pAction);
+        m_actionsMap.insert(static_cast<ActionKind>(txtMenuIdStart), pAction);
+        if (TxtPaste == txtMenuIdStart) {
+            m_aiSeparator = m_txtContextMenu->addSeparator();
+        }
+        txtMenuIdStart++;
+        if (TxtMenuMax == txtMenuIdStart) {
+            break;
+        }
+    }
+}
+
+void ActionManager::visibleAiActions(bool visible)
+{
+    visibleAction(VoiceToText, visible);
+    visibleAction(TxtSpeech, visible);
+    visibleAction(TxtStopreading, visible);
+    visibleAction(TxtDictation, visible);
+    visibleAction(TxtTranslate, visible);
+    m_aiSeparator->setVisible(visible);
 }

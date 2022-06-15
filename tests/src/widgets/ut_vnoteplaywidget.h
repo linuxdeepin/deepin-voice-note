@@ -23,20 +23,17 @@
 #include <QObject>
 
 class VNotePlayWidget;
-class ut_vnoteplaywidget_test : public QObject
+class UT_VNotePlayWidget : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnoteplaywidget_test();
-
+    UT_VNotePlayWidget();
+    VNotePlayWidget *m_vnoteplaywidget {nullptr};
     // Test interface
 protected:
     virtual void SetUp() override;
     virtual void TearDown() override;
-
-private:
-    VNotePlayWidget *m_vnoteplaywidget {nullptr};
 };
 
 #endif // UT_VNOTEPLAYWIDGET_H

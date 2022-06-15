@@ -24,29 +24,12 @@
 
 DCORE_USE_NAMESPACE
 
-static OpsStateInterface *objectInstance = nullptr;
-
 /**
  * @brief OpsStateInterface::OpsStateInterface
  */
 OpsStateInterface::OpsStateInterface()
 {
-    bool fAiServiceExist = false;
-    DSysInfo::UosEdition uosType = DSysInfo::uosEditionType();
-    switch (uosType) {
-    case DSysInfo::UosProfessional:
-    case DSysInfo::UosHome:
-        fAiServiceExist = true;
-        break;
-    default:
-        break;
-    }
-    QString systemInfo = QString("[%1-%2-%3]")
-                             .arg(DSysInfo::uosSystemName())
-                             .arg(DSysInfo::uosProductTypeName())
-                             .arg(DSysInfo::uosEditionName());
-    qInfo() << systemInfo << " IsAvailable use voice to text:" << fAiServiceExist;
-    operState(StateAISrvAvailable, fAiServiceExist);
+    ;
 }
 
 /**
@@ -129,8 +112,6 @@ bool OpsStateInterface::isAiSrvExist() const
  */
 OpsStateInterface *OpsStateInterface::instance()
 {
-    if (objectInstance == nullptr) {
-        objectInstance = new OpsStateInterface;
-    }
-    return objectInstance;
+    static OpsStateInterface _instance;
+    return &_instance;
 }

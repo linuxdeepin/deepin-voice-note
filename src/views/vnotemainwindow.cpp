@@ -22,30 +22,31 @@
 #include "views/vnotemainwindow.h"
 #include "views/leftview.h"
 #include "views/middleview.h"
-#include "views/rightview.h"
 #include "views/homepage.h"
 #include "views/splashview.h"
-#include "views/voicenoteitem.h"
 #include "views/middleviewsortfilter.h"
+#include "views/webrichtexteditor.h"
 
+#include "common/vtextspeechandtrmanager.h"
 #include "common/standarditemcommon.h"
 #include "common/vnotedatamanager.h"
 #include "common/vnotea2tmanager.h"
 #include "common/vnoteitem.h"
 #include "common/vnoteforlder.h"
 #include "common/actionmanager.h"
-#include "common/vnotedatasafefymanager.h"
+#include "common/metadataparser.h"
+
 #include "widgets/vnotemultiplechoiceoptionwidget.h"
 
 #include "common/utils.h"
 #include "common/actionmanager.h"
 #include "common/setting.h"
 #include "common/performancemonitor.h"
+#include "common/jscontent.h"
 
 #include "db/vnotefolderoper.h"
 #include "db/vnoteitemoper.h"
 #include "db/vnotedbmanager.h"
-#include "db/vnotesaferoper.h"
 
 #include "dbus/dbuslogin1manager.h"
 
@@ -53,6 +54,7 @@
 #include "views/vnoterecordbar.h"
 #include "widgets/vnoteiconbutton.h"
 #include "task/vnmainwnddelayinittask.h"
+#include "task/filecleanupworker.h"
 
 #ifdef IMPORT_OLD_VERSION_DATA
 #include "importolddata/upgradeview.h"
@@ -61,19 +63,20 @@
 
 #include "vnoteapplication.h"
 
-#include <QScrollBar>
-#include <QLocale>
-#include <QDesktopServices>
-
 #include <DApplication>
 #include <DToolButton>
-#include <DApplicationHelper>
+#include <DGuiApplicationHelper>
 #include <DFontSizeManager>
 #include <DLog>
 #include <DStatusBar>
 #include <DTitlebar>
 #include <DSettingsDialog>
 #include <DSysInfo>
+#include <DFileDialog>
+
+#include <QScrollBar>
+#include <QLocale>
+#include <QDesktopServices>
 
 static OpsStateInterface *stateOperation = nullptr;
 
@@ -153,19 +156,6 @@ void VNoteMainWindow::initConnections()
     connect(m_middleView, SIGNAL(currentChanged(const QModelIndex &)),
             this, SLOT(onVNoteChange(const QModelIndex &)));
 
-    connect(m_middleView, &MiddleView::requestRefresh,
-            m_rightView, &RightView::refreshVoiceCreateTime);
-
-    connect(m_rightView, &RightView::contentChanged,
-            m_middleView, &MiddleView::onNoteChanged);
-
-    connect(m_rightView, &RightView::sigVoicePlay,
-            this, &VNoteMainWindow::onRightViewVoicePlay);
-    connect(m_rightView, &RightView::sigVoicePause,
-            this, &VNoteMainWindow::onRightViewVoicePause);
-    connect(m_rightView, &RightView::sigCursorChange,
-            this, &VNoteMainWindow::onCursorChange);
-
     connect(m_addNotepadBtn, &DPushButton::clicked,
             this, &VNoteMainWindow::onNewNotebook);
 
@@ -190,9 +180,6 @@ void VNoteMainWindow::initConnections()
     connect(m_recordBar, &VNoteRecordBar::sigDeviceExceptionMsgClose,
             this, &VNoteMainWindow::closeDeviceExceptionErrMessage);
 
-    connect(DApplicationHelper::instance(), &DApplicationHelper::themeTypeChanged, this,
-            &VNoteMainWindow::onChangeTheme);
-
     //Bind all context menu states handler
     connect(ActionManager::Instance()->notebookContextMenu(), &DMenu::aboutToShow,
             this, &VNoteMainWindow::onMenuAbout2Show);
@@ -202,16 +189,26 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onMenuAbout2Show);
     connect(ActionManager::Instance()->noteContextMenu(), &DMenu::triggered,
             this, &VNoteMainWindow::onMenuAction);
-    connect(ActionManager::Instance()->detialContextMenu(), &DMenu::aboutToShow,
+    connect(ActionManager::Instance()->saveNoteContextMenu(), &DMenu::aboutToShow,
             this, &VNoteMainWindow::onMenuAbout2Show);
-    connect(ActionManager::Instance()->detialContextMenu(), &DMenu::triggered,
-            this, &VNoteMainWindow::onMenuAction);
     //处理笔记拖拽释放
     connect(m_leftView, &LeftView::dropNotesEnd, this, &VNoteMainWindow::onDropNote);
     //处理详情页刷新请求
     connect(m_middleView, &MiddleView::requestChangeRightView, this, &VNoteMainWindow::changeRightView);
     //处理详情页多选操作
     connect(m_multipleSelectWidget, &VnoteMultipleChoiceOptionWidget::requestMultipleOption, this, &VNoteMainWindow::handleMultipleOption);
+
+    connect(m_viewChange, &DIconButton::clicked, this, &VNoteMainWindow::onViewChangeClicked);
+    //关联图片插入按钮点击事件
+    connect(m_imgInsert, &VNoteIconButton::clicked, this, &VNoteMainWindow::onInsertImageToWebEditor);
+
+    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
+            this, &VNoteMainWindow::onThemeChanged);
+    connect(JsContent::instance(), &JsContent::playVoice, this, &VNoteMainWindow::onWebVoicePlay);
+    connect(m_richTextEdit, &WebRichTextEditor::currentSearchEmpty, this, &VNoteMainWindow::onWebSearchEmpty);
+    connect(m_richTextEdit, &WebRichTextEditor::contentChanged, m_middleView, &MiddleView::onNoteChanged, Qt::QueuedConnection);
+    //创建笔记
+    connect(JsContent::instance(), &JsContent::createNote, this, &VNoteMainWindow::onAddNoteShortcut, Qt::QueuedConnection);
 }
 
 /**
@@ -222,11 +219,11 @@ void VNoteMainWindow::changeRightView(bool isMultiple)
 {
     m_multipleSelectWidget->setNoteNumber(m_middleView->getSelectedCount());
     if (isMultiple) {
-        if (m_rightView->getIsNormalView()) {
+        if (m_stackedRightMainWidget->currentWidget() == m_rightViewHolder) {
             m_stackedRightMainWidget->setCurrentWidget(m_multipleSelectWidget);
-            m_rightView->setIsNormalView(false);
         }
-        //设置按钮是否置灰
+        //多选插入图片按钮禁用
+        m_imgInsert->setDisabled(true);
         bool moveButtonEnable = true;
         if (stateOperation->isVoice2Text()
             || stateOperation->isSearching()
@@ -235,9 +232,14 @@ void VNoteMainWindow::changeRightView(bool isMultiple)
         }
         m_multipleSelectWidget->enableButtons(m_middleView->haveText(), m_middleView->haveVoice(), moveButtonEnable);
     } else {
-        if (!m_rightView->getIsNormalView()) {
+        if (m_stackedRightMainWidget->currentWidget() == m_multipleSelectWidget) {
             m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
-            m_rightView->setIsNormalView(true);
+            //多选切换为详情页时，刷新数据
+            m_richTextEdit->initData(m_middleView->getCurrVNotedata(), m_searchKey);
+        }
+        //恢复单选如果有笔记图片按钮可用
+        if (nullptr != m_middleView->getCurrVNotedata()) {
+            m_imgInsert->setDisabled(false);
         }
     }
 }
@@ -251,31 +253,13 @@ void VNoteMainWindow::initShortcuts()
     m_stEsc->setKey(Qt::Key_Escape);
     m_stEsc->setContext(Qt::WidgetWithChildrenShortcut);
     m_stEsc->setAutoRepeat(false);
-
-    connect(m_stEsc.get(), &QShortcut::activated, this, [=] {
-        setTitleBarTabFocus();
-    });
+    connect(m_stEsc.get(), &QShortcut::activated, this, &VNoteMainWindow::onEscShortcut);
 
     m_stPopupMenu.reset(new QShortcut(this));
     m_stPopupMenu->setKey(Qt::ALT + Qt::Key_M);
     m_stPopupMenu->setContext(Qt::ApplicationShortcut);
     m_stPopupMenu->setAutoRepeat(false);
-
-    connect(m_stPopupMenu.get(), &QShortcut::activated, this, [this] {
-        if (m_leftView->hasFocus()) {
-            m_leftView->popupMenu();
-        } else if (m_middleView->hasFocus()) {
-            m_middleView->popupMenu();
-        } else if (m_noteSearchEdit->lineEdit()->hasFocus()) {
-            if (!m_showSearchEditMenu) {
-                QPoint pos(m_noteSearchEdit->pos());
-                QContextMenuEvent eve(QContextMenuEvent::Reason::Keyboard, pos, m_noteSearchEdit->mapToGlobal(pos));
-                m_showSearchEditMenu = QApplication::sendEvent(m_noteSearchEdit->lineEdit(), &eve);
-            }
-        } else {
-            m_rightView->popupMenu();
-        }
-    });
+    connect(m_stPopupMenu.get(), &QShortcut::activated, this, &VNoteMainWindow::onPoppuMenuShortcut);
 
     //*******************LeftView Shortcuts****************************
     //Add notebook
@@ -283,38 +267,14 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNotebook->setKey(Qt::CTRL + Qt::Key_N);
     m_stNewNotebook->setContext(Qt::ApplicationShortcut);
     m_stNewNotebook->setAutoRepeat(false);
-
-    connect(m_stNewNotebook.get(), &QShortcut::activated, this, [this] {
-        if (!(stateOperation->isRecording()
-              || stateOperation->isPlaying()
-              || stateOperation->isVoice2Text()
-              || stateOperation->isSearching())) {
-            onNewNotebook();
-
-            //If do shortcut in home page,need switch to note
-            //page after add new notebook.
-            if (!canDoShortcutAction()) {
-                switchWidget(WndNoteShow);
-            }
-        }
-    });
+    connect(m_stNewNotebook.get(), &QShortcut::activated, this, &VNoteMainWindow::onAddNotepadShortcut);
 
     //Rename notebook
     m_stRemNotebook.reset(new QShortcut(this));
     m_stRemNotebook->setKey(Qt::Key_F2);
     m_stRemNotebook->setContext(Qt::ApplicationShortcut);
     m_stRemNotebook->setAutoRepeat(false);
-
-    connect(m_stRemNotebook.get(), &QShortcut::activated, this, [this] {
-        //当前记事本是否正在编辑
-        bool isEditing = m_leftView->isPersistentEditorOpen(m_leftView->currentIndex());
-        //如果已在编辑状态，取消操作，解决重复快捷键警告信息
-        if (canDoShortcutAction()) {
-            if (!stateOperation->isSearching() && !isEditing) {
-                editNotepad();
-            }
-        }
-    });
+    connect(m_stRemNotebook.get(), &QShortcut::activated, this, &VNoteMainWindow::onReNameNotepadShortcut);
 
     //*******************MiddleView Shortcuts***************************
     //Add note
@@ -322,31 +282,14 @@ void VNoteMainWindow::initShortcuts()
     m_stNewNote->setKey(Qt::CTRL + Qt::Key_B);
     m_stNewNote->setContext(Qt::ApplicationShortcut);
     m_stNewNote->setAutoRepeat(false);
-
-    connect(m_stNewNote.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()
-            && !(stateOperation->isRecording()
-                 || stateOperation->isPlaying()
-                 || stateOperation->isVoice2Text()
-                 || stateOperation->isSearching())) {
-            onNewNote();
-        }
-    });
+    connect(m_stNewNote.get(), &QShortcut::activated, this, &VNoteMainWindow::onAddNoteShortcut);
 
     //Rename note
     m_stRemNote.reset(new QShortcut(this));
     m_stRemNote->setKey(Qt::Key_F3);
     m_stRemNote->setContext(Qt::ApplicationShortcut);
     m_stRemNote->setAutoRepeat(false);
-
-    connect(m_stRemNote.get(), &QShortcut::activated, this, [this] {
-        //当前笔记是否正在编辑
-        bool isEditing = m_middleView->isPersistentEditorOpen(m_middleView->currentIndex());
-        //如果已在编辑状态，取消操作，解决重复快捷键警告信息
-        if (canDoShortcutAction() && !isEditing) {
-            editNote();
-        }
-    });
+    connect(m_stRemNote.get(), &QShortcut::activated, this, &VNoteMainWindow::onRenameNoteShortcut);
 
     //*******************RightView Shortcuts*****************************
     //Play/Pause
@@ -354,142 +297,40 @@ void VNoteMainWindow::initShortcuts()
     m_stPlayorPause->setKey(Qt::Key_Space);
     m_stPlayorPause->setContext(Qt::ApplicationShortcut);
     m_stPlayorPause->setAutoRepeat(false);
-
-    connect(m_stPlayorPause.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
-            m_recordBar->playOrPauseVoice();
-        }
-    });
+    connect(m_stPlayorPause.get(), &QShortcut::activated, this, &VNoteMainWindow::onPlayPauseShortcut);
 
     //Add new recording
     m_stRecording.reset(new QShortcut(this));
     m_stRecording->setKey(Qt::CTRL + Qt::Key_R);
     m_stRecording->setContext(Qt::ApplicationShortcut);
     m_stRecording->setAutoRepeat(false);
-
-    connect(m_stRecording.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
-            m_recordBar->onStartRecord();
-        }
-    });
-
-    //Voice to Text
-    m_stVoice2Text.reset(new QShortcut(this));
-    m_stVoice2Text->setKey(Qt::CTRL + Qt::Key_W);
-    m_stVoice2Text->setContext(Qt::ApplicationShortcut);
-    m_stVoice2Text->setAutoRepeat(false);
-
-    connect(m_stVoice2Text.get(), &QShortcut::activated, this, [this] {
-        //Call method in rightview
-        if (canDoShortcutAction()) {
-            if (!stateOperation->isVoice2Text() && stateOperation->isAiSrvExist()) {
-                this->onA2TStart();
-            }
-        }
-    });
-
-    //Save as Mp3
-    m_stSaveAsMp3.reset(new QShortcut(this));
-    m_stSaveAsMp3->setKey(Qt::CTRL + Qt::Key_P);
-    m_stSaveAsMp3->setContext(Qt::ApplicationShortcut);
-    m_stSaveAsMp3->setAutoRepeat(false);
-
-    connect(m_stSaveAsMp3.get(), &QShortcut::activated, this, [this] {
-        //Call method in rightview
-        Q_UNUSED(this);
-        if (canDoShortcutAction()) {
-            m_rightView->saveMp3();
-        }
-    });
+    connect(m_stRecording.get(), &QShortcut::activated, this, &VNoteMainWindow::onRecordShorcut);
 
     //Save as Text
     m_stSaveAsText.reset(new QShortcut(this));
     m_stSaveAsText->setKey(Qt::CTRL + Qt::Key_S);
     m_stSaveAsText->setContext(Qt::ApplicationShortcut);
     m_stSaveAsText->setAutoRepeat(false);
-
-    connect(m_stSaveAsText.get(), &QShortcut::activated, this, [this] {
-        //多选笔记导出文本
-        if (canDoShortcutAction()) {
-            if (m_middleView->haveText()) {
-                m_middleView->saveAsText();
-            }
-        }
-    });
+    connect(m_stSaveAsText.get(), &QShortcut::activated, this, &VNoteMainWindow::onSaveNoteShortcut);
 
     //Save recordings
     m_stSaveVoices.reset(new QShortcut(this));
     m_stSaveVoices->setKey(Qt::CTRL + Qt::Key_Y);
     m_stSaveVoices->setContext(Qt::ApplicationShortcut);
     m_stSaveVoices->setAutoRepeat(false);
-
-    connect(m_stSaveVoices.get(), &QShortcut::activated, this, [this] {
-        //Call method in rightview
-        if (canDoShortcutAction()) {
-            //Can't save recording when do recording.
-            //多选笔记导出语音
-            if (!stateOperation->isRecording()) {
-                if (m_middleView->haveVoice()) {
-                    m_middleView->saveRecords();
-                }
-            }
-        }
-    });
+    connect(m_stSaveVoices.get(), &QShortcut::activated, this, &VNoteMainWindow::onSaveVoicesShortcut);
 
     //Notebook/Note/Detial delete key
     m_stDelete.reset(new QShortcut(this));
     m_stDelete->setKey(Qt::Key_Delete);
     m_stDelete->setContext(Qt::ApplicationShortcut);
     m_stDelete->setAutoRepeat(false);
-
-    connect(m_stDelete.get(), &QShortcut::activated, this, [this] {
-        if (canDoShortcutAction()) {
-            QAction *deleteAct = nullptr;
-
-            /*
-             * TODO:
-             *     We check focus here to choice what action we will
-             * take. Focus in leftview for delete notebook, in midlle
-             * view for delete note, in Rightview for delete note content.
-             * or do nothing.
-             * */
-            if (m_leftView->hasFocus()) {
-                if (!stateOperation->isRecording()
-                    && !stateOperation->isVoice2Text()
-                    && !stateOperation->isPlaying()) {
-                    deleteAct = ActionManager::Instance()->getActionById(
-                        ActionManager::NotebookDelete);
-                }
-            } else if (m_middleView->hasFocus()) {
-                if (!stateOperation->isRecording()
-                    && !stateOperation->isVoice2Text()
-                    && !stateOperation->isPlaying()
-                    && m_middleView->count() > 0) {
-                    deleteAct = ActionManager::Instance()->getActionById(
-                        ActionManager::NoteDelete);
-                }
-            } else if (m_rightView->hasFocus()) {
-                deleteAct = ActionManager::Instance()->getActionById(
-                    ActionManager::DetailDelete);
-            } else {
-                QPoint pos = m_rightViewHolder->mapFromGlobal(QCursor::pos());
-                if (m_rightViewHolder->rect().contains(pos)) {
-                    deleteAct = ActionManager::Instance()->getActionById(
-                        ActionManager::DetailDelete);
-                }
-            }
-
-            if (nullptr != deleteAct) {
-                deleteAct->triggered();
-            }
-        }
-    });
+    connect(m_stDelete.get(), &QShortcut::activated, this, &VNoteMainWindow::onDeleteShortcut);
 
     m_stPreviewShortcuts.reset(new QShortcut(this));
     m_stPreviewShortcuts->setKey(QString("Ctrl+Shift+/"));
     m_stPreviewShortcuts->setContext(Qt::ApplicationShortcut);
     m_stPreviewShortcuts->setAutoRepeat(false);
-
     connect(m_stPreviewShortcuts.get(), &QShortcut::activated,
             this, &VNoteMainWindow::onPreviewShortcut);
 }
@@ -504,33 +345,46 @@ void VNoteMainWindow::initTitleBar()
     // Add logo
     titlebar()->setIcon(QIcon::fromTheme(DEEPIN_VOICE_NOTE));
 
-#ifdef TITLE_ACITON_PANEL
-    //Add action buttons
-    m_actionPanel = new QWidget(this);
-
-    QHBoxLayout *actionPanelLayout = new QHBoxLayout(m_actionPanel);
-    actionPanelLayout->setSpacing(0);
-    actionPanelLayout->setContentsMargins(0, 0, 0, 0);
-
-    m_addNewNoteBtn = new DIconButton(m_actionPanel);
-    m_addNewNoteBtn->setFixedSize(QSize(36, 36));
-
-    actionPanelLayout->addSpacing(VNOTE_LEFTVIEW_W - 45);
-    actionPanelLayout->addWidget(m_addNewNoteBtn, Qt::AlignLeft);
-
-    titlebar()->addWidget(m_actionPanel, Qt::AlignLeft);
-#endif
     initMenuExtension();
     titlebar()->setMenu(m_menuExtension);
+
+    initTitleIconButton(); //初始化标题栏图标控件
+    //自定义标题栏中部控件的基控件
+    QWidget *titleWidget = new QWidget();
+    QHBoxLayout *titleLayout = new QHBoxLayout(titleWidget); //标题栏中部控件以横向列表展示
+    titleLayout->setSpacing(10);
+    titleLayout->addWidget(m_viewChange); //添加记事本列表收起控件按钮
+
+    //添加分割线
+    QFrame *line = new QFrame();
+    line->setFrameShape(QFrame::VLine);
+    line->setFrameShadow(QFrame::Plain);
+    line->setMaximumHeight(28);
+    titleLayout->addWidget(line);
+
+    titleLayout->addWidget(m_imgInsert); //添加图片插入控
+
     // Search note
     m_noteSearchEdit = new DSearchEdit(this);
     DFontSizeManager::instance()->bind(m_noteSearchEdit, DFontSizeManager::T6);
     m_noteSearchEdit->setFixedSize(QSize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H));
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
     m_noteSearchEdit->lineEdit()->installEventFilter(this);
-    titlebar()->addWidget(m_noteSearchEdit);
-    DWindowCloseButton *closeBtn = titlebar()->findChild<DWindowCloseButton *>("DTitlebarDWindowCloseButton");
-    closeBtn->installEventFilter(this);
+
+    titlebar()->addWidget(titleWidget, Qt::AlignLeft); //图标控件居左显示
+    titlebar()->addWidget(m_noteSearchEdit, Qt::AlignCenter); //将搜索框添加到标题栏居中显示
+
+    QWidget::setTabOrder(titlebar(), m_viewChange); //设置title焦点传递的下一个控件
+    QWidget::setTabOrder(m_viewChange, m_imgInsert); //设置焦点传递顺序
+
+    //捕捉标题栏最右边控件事件
+    QObject *btn = titlebar()->findChild<QObject *>("DTitlebarDWindowCloseButton");
+
+    if (nullptr != btn) {
+        btn->installEventFilter(this);
+    }
+    //改变标题栏焦点策略，解决键盘交互第一次显示"关于"窗口后ESC关闭窗口菜单按钮无焦点
+    titlebar()->setFocusPolicy(Qt::ClickFocus);
 }
 
 /**
@@ -577,6 +431,8 @@ void VNoteMainWindow::initMainView()
     switchWidget(defaultWnd);
     setCentralWidget(m_centerWidget);
     setTitlebarShadowEnabled(true);
+
+    showNotepadList();
 }
 
 /**
@@ -620,10 +476,6 @@ void VNoteMainWindow::initLeftView()
     btnLayout->setContentsMargins(10, 0, 10, 10);
     leftHolderLayout->addLayout(btnLayout, Qt::AlignHCenter);
     m_leftViewHolder->setLayout(leftHolderLayout);
-
-#ifdef VNOTE_LAYOUT_DEBUG
-    m_leftView->setStyleSheet("background: green");
-#endif
 }
 
 /**
@@ -660,10 +512,6 @@ void VNoteMainWindow::initMiddleView()
     middleHolderLayout->addWidget(m_middleView);
 
     m_middleViewHolder->setLayout(middleHolderLayout);
-
-#ifdef VNOTE_LAYOUT_DEBUG
-    m_middleView->setStyleSheet("background: green");
-#endif
 }
 
 /**
@@ -689,30 +537,31 @@ void VNoteMainWindow::initRightView()
     m_rightViewHolder->setBackgroundRole(DPalette::Base);
     m_rightViewHolder->setAutoFillBackground(true);
 
-    QVBoxLayout *rightHolderLayout = new QVBoxLayout;
+    QVBoxLayout *rightHolderLayout = new QVBoxLayout(m_rightViewHolder);
     rightHolderLayout->setSpacing(0);
-    rightHolderLayout->setContentsMargins(0, 15, 0, 3);
-
-    m_rightViewScrollArea = new DScrollArea(m_rightViewHolder);
-    m_rightView = new RightView(m_rightViewScrollArea);
-    m_rightView->installEventFilter(this);
-    m_rightViewScrollArea->setLineWidth(0);
-    m_rightViewScrollArea->setWidgetResizable(true);
-    m_rightViewScrollArea->setWidget(m_rightView);
-    rightHolderLayout->addWidget(m_rightViewScrollArea);
+    //设置框布局的左右下边界为4
+    //右边界为防止QWebEngineView控件与应用边界为0时拉伸界面是出现黑边
+    //大小4为ui要求录音块左右下边界为10，录音块控件自带外边界6，组合为10
+    rightHolderLayout->setContentsMargins(4, 0, 4, 4);
 
     //TODO:
     //    Add record area code here
     m_recordBarHolder = new QWidget(m_rightViewHolder);
-    m_recordBarHolder->setFixedHeight(86);
+    //78: 语音块显示区域高度为64px，语音控件阴影宽6px，上下阴影12px，合计78px
+    m_recordBarHolder->setFixedHeight(78);
     QVBoxLayout *recordBarHolderLayout = new QVBoxLayout(m_recordBarHolder);
     recordBarHolderLayout->setSpacing(0);
-    recordBarHolderLayout->setContentsMargins(4, 1, 4, 0);
+    //取消框布局自带的边界
+    recordBarHolderLayout->setContentsMargins(0, 0, 0, 0);
 
     m_recordBar = new VNoteRecordBar(m_recordBarHolder);
     m_recordBar->setBackgroundRole(DPalette::Base);
     m_recordBar->setAutoFillBackground(true);
     m_recordBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    m_richTextEdit = new WebRichTextEditor(m_rightViewHolder);
+    rightHolderLayout->addWidget(m_richTextEdit);
+    m_richTextEdit->installEventFilter(this);
 
     recordBarHolderLayout->addWidget(m_recordBar);
 
@@ -723,13 +572,6 @@ void VNoteMainWindow::initRightView()
     m_recordBar->setVisible(false);
     //初始化详情页面为当前笔记
     m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
-
-#ifdef VNOTE_LAYOUT_DEBUG
-    m_rightViewHolder->setStyleSheet("background: red");
-    m_rightViewScrollArea->setStyleSheet("background: blue");
-    m_recordBarHolder->setStyleSheet("background: yellow");
-    m_recordBar->setStyleSheet("background: yellow");
-#endif
 }
 
 /**
@@ -740,7 +582,7 @@ void VNoteMainWindow::initA2TManager()
     //audio to text manager
     m_a2tManager = new VNoteA2TManager(this);
 
-    //connect(m_rightView, &RightView::asrStart, this, &VNoteMainWindow::onA2TStart);
+    connect(m_richTextEdit, &WebRichTextEditor::asrStart, this, &VNoteMainWindow::onA2TStart);
     connect(m_a2tManager, &VNoteA2TManager::asrError, this, &VNoteMainWindow::onA2TError);
     connect(m_a2tManager, &VNoteA2TManager::asrSuccess, this, &VNoteMainWindow::onA2TSuccess);
 }
@@ -791,7 +633,14 @@ void VNoteMainWindow::releaseHaltLock()
  */
 void VNoteMainWindow::initDelayWork()
 {
-    ;
+    QDBusConnection connection = QDBusConnection::sessionBus();
+    QDBusConnectionInterface *bus = connection.interface();
+    bool isVailid = bus->isServiceRegistered("com.iflytek.aiassistant");
+    //没有语音助手时，不显示语音助手相关功能
+    if (!isVailid) {
+        ActionManager::Instance()->visibleAiActions(isVailid);
+    }
+    stateOperation->operState(OpsStateInterface::StateAISrvAvailable, isVailid);
 }
 
 /**
@@ -829,6 +678,13 @@ void VNoteMainWindow::onVNoteFoldersLoaded()
     }
 
     PerformanceMonitor::initializeAppFinish();
+
+    //注册文件清理工作
+    FileCleanupWorker *pFileCleanupWorker =
+        new FileCleanupWorker(VNoteDataManager::instance()->getAllNotesInFolder(), this);
+    pFileCleanupWorker->setAutoDelete(true);
+    pFileCleanupWorker->setObjectName("FileCleanupWorker");
+    QThreadPool::globalInstance()->start(pFileCleanupWorker);
 }
 
 /**
@@ -842,8 +698,15 @@ void VNoteMainWindow::onVNoteSearch()
             //搜索内容不为空，切换为单选详情页面
             changeRightView(false);
             setSpecialStatus(SearchStart);
-            m_searchKey = text;
-            loadSearchNotes(m_searchKey);
+            if (m_searchKey == text && m_stackedRightMainWidget->currentWidget() == m_richTextEdit) { //搜索关键字不变只更新当前笔记搜索
+                m_richTextEdit->searchText(m_searchKey);
+            } else {
+                m_searchKey = text;
+                //重新搜索之前先更新笔记内容
+                m_richTextEdit->updateNote();
+                //重新搜索
+                loadSearchNotes(m_searchKey);
+            }
         } else {
             setSpecialStatus(SearchEnd);
         }
@@ -870,15 +733,13 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
 {
     Q_UNUSED(previous);
 
-    if (m_asrErrMeassage) {
-        m_asrErrMeassage->setVisible(false);
-    }
     //记事本切换后刷新详情页
     changeRightView(false);
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
     if (!loadNotes(data)) {
         m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
-        m_rightView->initData(nullptr, m_searchKey, false);
+        m_richTextEdit->initData(nullptr, m_searchKey, false);
+        m_imgInsert->setDisabled(true);
         m_recordBar->setVisible(false);
     }
 }
@@ -954,24 +815,8 @@ void VNoteMainWindow::initEmptyFoldersView()
  */
 void VNoteMainWindow::onStartRecord(const QString &path)
 {
+    Q_UNUSED(path)
     setSpecialStatus(RecordStart);
-
-    //Add recording data safer.
-    VNoteItem *currentNote = m_middleView->getCurrVNotedata();
-
-    if (nullptr != currentNote && !path.isEmpty()) {
-        VDataSafer safer;
-        safer.setSaferType(VDataSafer::Safe);
-
-        safer.folder_id = currentNote->folderId;
-        safer.note_id = currentNote->noteId;
-        safer.path = path;
-
-        VNoteDataSafefyManager::instance()->doSafer(safer);
-    } else {
-        qCritical() << "UnSafe get currentNote data is null! Dangerous!!!" << path;
-    }
-
     //Hold shutdown locker
     holdHaltLock();
 }
@@ -984,27 +829,7 @@ void VNoteMainWindow::onStartRecord(const QString &path)
 void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
 {
     if (voiceSize >= 1000) {
-        m_rightView->insertVoiceItem(voicePath, voiceSize);
-
-        //Recording normal,remove the data safer.
-        VNoteItem *currentNote = m_middleView->getCurrVNotedata();
-
-        if (nullptr != currentNote && !voicePath.isEmpty()) {
-            VDataSafer safer;
-            safer.setSaferType(VDataSafer::Unsafe);
-
-            safer.folder_id = currentNote->folderId;
-            safer.note_id = currentNote->noteId;
-            safer.path = voicePath;
-            if (!stateOperation->isAppQuit()) {
-                VNoteDataSafefyManager::instance()->doSafer(safer);
-            } else { //需要关闭应用时,同步更新数据库
-                VNoteSaferOper saferOper;
-                saferOper.rmSafer(safer);
-            }
-        } else {
-            qCritical() << "UnSafe get currentNote data is null! Dangerous!!!";
-        }
+        m_richTextEdit->insertVoiceItem(voicePath, voiceSize);
     }
     setSpecialStatus(RecordEnd);
 
@@ -1012,114 +837,66 @@ void VNoteMainWindow::onFinshRecord(const QString &voicePath, qint64 voiceSize)
     releaseHaltLock();
 
     if (stateOperation->isAppQuit()) {
-        release();
-        exit(0);
+        //退出程序
+        qApp->quit();
     }
-}
-
-/**
- * @brief VNoteMainWindow::onChangeTheme
- */
-void VNoteMainWindow::onChangeTheme()
-{
-    ;
-}
-
-/**
- * @brief VNoteMainWindow::onA2TStartAgain
- */
-void VNoteMainWindow ::onA2TStartAgain()
-{
-    onA2TStart(false);
 }
 
 /**
  * @brief VNoteMainWindow::onA2TStart
- * @param first true第一次转文字
+ * @param voiceBlock 语音数据
  */
-void VNoteMainWindow::onA2TStart(bool first)
+void VNoteMainWindow::onA2TStart(const VNVoiceBlock *voiceBlock)
 {
-    if (m_asrErrMeassage) {
-        m_asrErrMeassage->setVisible(false);
+    m_voiceBlock = voiceBlock;
+
+    if (nullptr == m_voiceBlock) {
+        return;
     }
-
-    VoiceNoteItem *asrVoiceItem = nullptr;
-
-    if (first) {
-        DetailItemWidget *widget = m_rightView->getOnlyOneSelectVoice();
-        asrVoiceItem = static_cast<VoiceNoteItem *>(widget);
-        m_rightView->setCurVoiceAsr(asrVoiceItem);
+    //超过20分钟的语音不支持转文字
+    if (m_voiceBlock->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
+        VNoteMessageDialog audioOutLimit(
+            VNoteMessageDialog::AsrTimeLimit, this);
+        audioOutLimit.exec();
     } else {
-        asrVoiceItem = m_rightView->getCurVoiceAsr();
-        if (asrVoiceItem) {
-            if (m_rightView->getOnlyOneSelectVoice() != asrVoiceItem) {
-                m_rightView->setCurVoiceAsr(nullptr);
-                return;
-            }
-        }
-    }
-
-    if (asrVoiceItem && asrVoiceItem->getNoteBlock()->blockText.isEmpty()) {
-        VNVoiceBlock *data = asrVoiceItem->getNoteBlock()->ptrVoice;
-
-        if (nullptr != data) {
-            //Check whether the audio lenght out of 20 minutes
-            if (data->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
-                VNoteMessageDialog audioOutLimit(
-                    VNoteMessageDialog::AsrTimeLimit, this);
-
-                audioOutLimit.exec();
-            } else {
-                setSpecialStatus(VoiceToTextStart);
-                asrVoiceItem->showAsrStartWindow();
-                QTimer::singleShot(0, this, [this, data]() {
-                    m_a2tManager->startAsr(data->voicePath, data->voiceSize);
-                });
-            }
-        }
+        setSpecialStatus(VoiceToTextStart); //更新状态
+        QTimer::singleShot(0, this, [this]() {
+            m_a2tManager->startAsr(m_voiceBlock->voicePath, m_voiceBlock->voiceSize); //开始转文字
+        });
     }
 }
 
 /**
  * @brief VNoteMainWindow::onA2TError
+ * 语音转文字失败
  * @param error
  */
 void VNoteMainWindow::onA2TError(int error)
 {
-    VoiceNoteItem *asrVoiceItem = m_rightView->getCurVoiceAsr();
-    if (asrVoiceItem) {
-        asrVoiceItem->showAsrEndWindow("");
-    }
-    QString message = "";
+    emit JsContent::instance()->callJsSetVoiceText("", JsContent::AsrFlag::End);
+    QString message = ""; //错误信息提示语
     if (error == VNoteA2TManager::NetworkError) {
         message = DApplication::translate(
             "VNoteErrorMessage",
-            "The voice conversion failed due to the poor network connection. "
-            "Do you want to try again?");
+            "The voice conversion failed due to the poor network connection, please have a check");
     } else {
         message = DApplication::translate(
             "VNoteErrorMessage",
-            "The voice conversion failed. Do you want to try again?");
+            "Voice to text conversion failed");
     }
-    showAsrErrMessage(message);
-    setSpecialStatus(VoiceToTextEnd);
+    showAsrErrMessage(message); //显示错误信息
+    setSpecialStatus(VoiceToTextEnd); //更新状态
 }
 
 /**
  * @brief VNoteMainWindow::onA2TSuccess
- * @param text
+ * 语音转文字成功
+ * @param text 转写后的文本
  */
 void VNoteMainWindow::onA2TSuccess(const QString &text)
 {
-    VoiceNoteItem *asrVoiceItem = m_rightView->getCurVoiceAsr();
-    if (asrVoiceItem) {
-        m_rightView->clearAllSelection();
-        asrVoiceItem->getNoteBlock()->blockText = text;
-        asrVoiceItem->showAsrEndWindow(text);
-        m_rightView->updateData();
-    }
-    setSpecialStatus(VoiceToTextEnd);
-    m_rightView->setCurVoiceAsr(nullptr);
+    emit JsContent::instance()->callJsSetVoiceText(text, JsContent::AsrFlag::End); //将转写后的文本发送到web端
+    setSpecialStatus(VoiceToTextEnd); //更新状态
 }
 
 /**
@@ -1166,14 +943,9 @@ void VNoteMainWindow::onPreviewShortcut()
         {DApplication::translate("Shortcuts", "Delete note"), "Delete"},
         {DApplication::translate("Shortcuts", "Play/Pause"), "Space"},
         {DApplication::translate("Shortcuts", "Record voice"), "Ctrl+R"},
-        {DApplication::translate("Shortcuts", "Save as MP3"), "Ctrl+P"},
-        {DApplication::translate("Shortcuts", "Save as TXT"), "Ctrl+S"},
+        {DApplication::translate("Shortcuts", "Save note"), "Ctrl+S"},
         {DApplication::translate("Shortcuts", "Save recordings"), "Ctrl+Y"},
     };
-
-    if (stateOperation->isAiSrvExist()) {
-        shortcutNoteKeymap.insert(DApplication::translate("Shortcuts", "Voice to Text"), "Ctrl+W");
-    }
 
     QJsonObject noteJsonGroup;
     noteJsonGroup.insert("groupName", DApplication::translate("ShortcutsGroups", "Notes"));
@@ -1265,8 +1037,8 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
             m_recordBar->stopRecord();
             event->ignore();
         } else {
-            release();
-            exit(0);
+            //退出程序
+            qApp->quit();
         }
     } else {
         event->ignore();
@@ -1301,15 +1073,6 @@ void VNoteMainWindow::resizeEvent(QResizeEvent *event)
     }
 
     DMainWindow::resizeEvent(event);
-}
-
-/**
- * @brief VNoteMainWindow::keyPressEvent
- * @param event
- */
-void VNoteMainWindow::keyPressEvent(QKeyEvent *event)
-{
-    DMainWindow::keyPressEvent(event);
 }
 
 /**
@@ -1350,22 +1113,20 @@ bool VNoteMainWindow::checkIfNeedExit()
 void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 {
     Q_UNUSED(previous);
-    if (m_asrErrMeassage) {
-        m_asrErrMeassage->setVisible(false);
-    }
 
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
-
     if (data == nullptr || stateOperation->isSearching()) {
         m_recordBar->setVisible(false);
     } else {
         m_recordBar->setVisible(true);
     }
-
-    QScrollBar *bar = m_rightViewScrollArea->verticalScrollBar();
-    bar->setValue(bar->minimum());
-    m_rightView->initData(data, m_searchKey, m_rightViewHasFouse);
+    //多选笔记时不更新详情页内容
+    if (!m_middleView->isMultipleSelected()) {
+        m_richTextEdit->initData(data, m_searchKey, m_rightViewHasFouse);
+    }
+    //没有数据，插入图片按钮禁用
+    m_imgInsert->setDisabled(nullptr == data);
     m_rightViewHasFouse = false;
 }
 
@@ -1382,22 +1143,18 @@ void VNoteMainWindow::onMenuAction(QAction *action)
         break;
     case ActionManager::NotebookDelete: {
         VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteFolder, this);
-        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+        if (VNoteBaseDialog::Accepted == confirmDialog.exec()) {
             delNotepad();
-        });
-
-        confirmDialog.exec();
+        }
     } break;
     case ActionManager::NotebookAddNew:
         addNote();
         break;
     case ActionManager::NoteDelete: {
         VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this, m_middleView->getSelectedCount());
-        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+        if (VNoteBaseDialog::Accepted == confirmDialog.exec()) {
             delNote();
-        });
-
-        confirmDialog.exec();
+        }
     } break;
     case ActionManager::NoteAddNew:
         addNote();
@@ -1405,55 +1162,14 @@ void VNoteMainWindow::onMenuAction(QAction *action)
     case ActionManager::NoteRename:
         editNote();
         break;
-    case ActionManager::DetailDelete: {
-        int ret = m_rightView->showWarningDialog();
-        if (ret == 1) {
-            VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this);
-            connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
-                m_rightView->delSelectText();
-            });
-
-            confirmDialog.exec();
-        } else if (ret == 0) {
-            m_rightView->delSelectText();
-        }
-
-    } break;
-    case ActionManager::NoteSaveText: {
-        m_middleView->saveAsText();
-    } break;
-    case ActionManager::NoteSaveVoice: {
-        m_middleView->saveRecords();
-    } break;
-    case ActionManager::DetailVoice2Text:
-        onA2TStart();
+    case ActionManager::SaveNoteAsText:
+        m_middleView->saveAs(MiddleView::SaveAsType::Text);
         break;
-    case ActionManager::DetailSelectAll:
-        m_rightView->selectAllItem();
+    case ActionManager::SaveNoteAsHtml:
+        m_middleView->saveAs(MiddleView::SaveAsType::Html);
         break;
-    case ActionManager::DetailCopy:
-        m_rightView->copySelectText();
-        break;
-    case ActionManager::DetailPaste:
-        m_rightView->pasteText();
-        break;
-    case ActionManager::DetailCut:
-        m_rightView->cutSelectText();
-        break;
-    case ActionManager::DetailVoiceSave:
-        m_rightView->saveMp3();
-        break;
-    case ActionManager::DetailText2Speech:
-        VTextSpeechAndTrManager::onTextToSpeech();
-        break;
-    case ActionManager::DetailStopreading:
-        VTextSpeechAndTrManager::onStopTextToSpeech();
-        break;
-    case ActionManager::DetailSpeech2Text:
-        VTextSpeechAndTrManager::onSpeechToText();
-        break;
-    case ActionManager::DetailTranslate:
-        VTextSpeechAndTrManager::onTextTranslate();
+    case ActionManager::NoteSaveVoice:
+        m_middleView->saveAs(MiddleView::SaveAsType::Voice);
         break;
     case ActionManager::NoteTop:
         m_middleView->noteStickOnTop();
@@ -1489,12 +1205,17 @@ void VNoteMainWindow::onMenuAbout2Show()
     //ActionManager::Instance()->enableAction(ActionManager::NoteAddNew, false);
     DMenu *menu = static_cast<DMenu *>(sender());
     QAction *topAction = ActionManager::Instance()->getActionById(ActionManager::NoteTop);
+
     if (menu == ActionManager::Instance()->noteContextMenu()) {
+        //右键弹出先更新数据，避免数据不同步
+        m_richTextEdit->updateNote();
+
         bool notMultipleSelected = !m_middleView->isMultipleSelected();
         ActionManager::Instance()->visibleAction(ActionManager::NoteTop, notMultipleSelected);
         ActionManager::Instance()->visibleAction(ActionManager::NoteRename, notMultipleSelected);
 
         ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteCtxMenu);
+
         if (stateOperation->isPlaying()
             || stateOperation->isRecording()
             || stateOperation->isVoice2Text()
@@ -1518,20 +1239,16 @@ void VNoteMainWindow::onMenuAbout2Show()
             ActionManager::Instance()->enableAction(ActionManager::NoteMove, false);
         }
         if (m_middleView->isMultipleSelected()) {
-            if (!m_middleView->haveText()) {
-                ActionManager::Instance()->enableAction(ActionManager::NoteSaveText, false);
-            }
             if (!m_middleView->haveVoice()) {
                 ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
             }
+            //根据选中笔记是否有文本设置保存笔记二级菜单置灰状态
+            ActionManager::Instance()->saveNoteContextMenu()->setEnabled(m_middleView->haveText());
         } else {
             VNoteItem *currNoteData = m_middleView->getCurrVNotedata();
-
             if (nullptr != currNoteData) {
-                if (!currNoteData->haveText()) {
-                    ActionManager::Instance()->enableAction(ActionManager::NoteSaveText, false);
-                }
-
+                //根据当前笔记是否有文本设置保存笔记二级菜单置灰状态
+                ActionManager::Instance()->saveNoteContextMenu()->setEnabled(currNoteData->haveText());
                 if (!currNoteData->haveVoice()) {
                     ActionManager::Instance()->enableAction(ActionManager::NoteSaveVoice, false);
                 }
@@ -1608,7 +1325,8 @@ void VNoteMainWindow::addNotepad()
             newFolder->sortNumber = tmpFolder->sortNumber + 1;
             sortEnable = true;
         }
-
+        //添加记事本，解绑详情页数据
+        m_richTextEdit->unboundCurrentNoteData();
         m_leftView->addFolder(newFolder);
         m_leftView->sort();
 
@@ -1628,13 +1346,18 @@ void VNoteMainWindow::delNotepad()
 {
     VNoteFolder *data = m_leftView->removeFolder();
 
+    if (nullptr == data) {
+        return;
+    }
+
+    //删除记事本之前先解除详情页绑定的笔记数据
+    m_richTextEdit->unboundCurrentNoteData();
+
     // 判断当前删除的记事本的排序编号，如果不是-1，则将当前所有记事本的排序编号写入配置文件中
     if (-1 != data->sortNumber) {
         QString folderSortData = m_leftView->getFolderSort();
         setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
     }
-
-    m_rightView->removeCacheWidget(data);
 
     VNoteFolderOper folderOper(data);
     folderOper.deleteVNoteFolder(data);
@@ -1649,7 +1372,9 @@ void VNoteMainWindow::delNotepad()
  */
 void VNoteMainWindow::editNotepad()
 {
-    m_leftView->editFolder();
+    //只有在记事本列表可见的情况下进行记事本重命名操作
+    if (m_leftViewHolder->isVisible())
+        m_leftView->editFolder();
 }
 
 /**
@@ -1665,14 +1390,8 @@ void VNoteMainWindow::addNote()
         VNoteItem tmpNote;
         tmpNote.folderId = id;
         tmpNote.noteType = VNoteItem::VNT_Text;
-
-        //Add default text block
-        //Comment:
-        //    ptrBlock will be released when the data set is destroyed,
-        //so don't need release it here.
-        VNoteBlock *ptrBlock = tmpNote.newBlock(VNoteBlock::Text);
-        tmpNote.addBlock(ptrBlock);
-
+        //无内容时富文本为空白段落标签
+        tmpNote.htmlCode = "<p><br></p>";
         VNoteItemOper noteOper;
         //Get default note name in the folder
         tmpNote.noteTitle = noteOper.getDefaultNoteName(tmpNote.folderId);
@@ -1681,7 +1400,8 @@ void VNoteMainWindow::addNote()
 
         //Refresh the notes count of folder
         m_leftView->update(m_leftView->currentIndex());
-        m_rightView->saveNote();
+        //解绑详情页绑定的笔记数据
+        m_richTextEdit->unboundCurrentNoteData();
         m_middleView->addRowAtHead(newNote);
     }
 }
@@ -1707,8 +1427,9 @@ void VNoteMainWindow::delNote()
     QList<VNoteItem *> noteDataList = m_middleView->deleteCurrentRow();
 
     if (noteDataList.size()) {
+        //删除笔记之前先解除详情页绑定的笔记数据
+        m_richTextEdit->unboundCurrentNoteData();
         for (auto noteData : noteDataList) {
-            m_rightView->removeCacheWidget(noteData);
             VNoteItemOper noteOper(noteData);
             noteOper.deleteNote();
         }
@@ -1777,7 +1498,8 @@ int VNoteMainWindow::loadSearchNotes(const QString &key)
         if (m_middleView->rowCount() == 0) {
             m_middleView->setVisibleEmptySearch(true);
             m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
-            m_rightView->initData(nullptr, m_searchKey);
+            m_richTextEdit->initData(nullptr, m_searchKey);
+            m_imgInsert->setDisabled(true);
             m_recordBar->setVisible(false);
         } else {
             m_middleView->sortView(false);
@@ -1791,34 +1513,18 @@ int VNoteMainWindow::loadSearchNotes(const QString &key)
 }
 
 /**
- * @brief VNoteMainWindow::onRightViewVoicePlay
- * @param voiceData
- */
-void VNoteMainWindow::onRightViewVoicePlay(VNVoiceBlock *voiceData)
-{
-    setSpecialStatus(PlayVoiceStart);
-    m_recordBar->playVoice(voiceData);
-}
-
-/**
- * @brief VNoteMainWindow::onRightViewVoicePause
- * @param voiceData
- */
-void VNoteMainWindow::onRightViewVoicePause(VNVoiceBlock *voiceData)
-{
-    m_recordBar->pauseVoice(voiceData);
-}
-
-/**
  * @brief VNoteMainWindow::onPlayPlugVoicePlay
  * @param voiceData
  */
 void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
 {
-    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
-    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
-        voiceItem->showPauseBtn();
+    Q_UNUSED(voiceData)
+    //设置播放状态
+    if (!stateOperation->isPlaying()) {
+        setSpecialStatus(PlayVoiceStart);
     }
+    //更新web前端语音播放状态
+    emit JsContent::instance()->callJsSetPlayStatus(0);
 }
 
 /**
@@ -1827,10 +1533,9 @@ void VNoteMainWindow::onPlayPlugVoicePlay(VNVoiceBlock *voiceData)
  */
 void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
 {
-    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
-    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
-        voiceItem->showPlayBtn();
-    }
+    Q_UNUSED(voiceData)
+    //更新web前端语音暂停状态
+    emit JsContent::instance()->callJsSetPlayStatus(1);
 }
 
 /**
@@ -1839,13 +1544,8 @@ void VNoteMainWindow::onPlayPlugVoicePause(VNVoiceBlock *voiceData)
  */
 void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
 {
-    VoiceNoteItem *voiceItem = m_rightView->getCurVoicePlay();
-    if (voiceItem && voiceItem->getNoteBlock() == voiceData) {
-        voiceItem->showPlayBtn();
-    }
+    Q_UNUSED(voiceData)
     setSpecialStatus(PlayVoiceEnd);
-    m_rightView->setCurVoicePlay(nullptr);
-    m_rightView->setFocus();
 }
 
 /**
@@ -1859,6 +1559,9 @@ void VNoteMainWindow::onNewNotebook()
     gettimeofday(&curret, nullptr);
 
     if (TM(lastPress, curret) > MIN_STKEY_RESP_TIME) {
+        //新建记事本，设置焦点为主窗口，防止焦点在标题栏造成标题栏按钮控件闪烁
+        m_stackedWidget->setFocus();
+
         addNotepad();
 
         UPT(lastPress, curret);
@@ -1942,19 +1645,25 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_addNoteBtn->setDisabled(false);
         }
         stateOperation->operState(OpsStateInterface::StatePlaying, false);
+        //停止播放更新web前端语音停止状态
+        emit JsContent::instance()->callJsSetPlayStatus(2);
         break;
     case RecordStart:
         stateOperation->operState(OpsStateInterface::StateRecording, true);
+        //录音时设置播放按钮不可用
+        emit JsContent::instance()->callJsSetVoicePlayBtnEnable(false);
         m_noteSearchEdit->setEnabled(false);
         m_leftView->setOnlyCurItemMenuEnable(true);
         m_leftView->closeMenu();
         m_middleView->closeMenu();
         m_addNotepadBtn->setEnabled(false);
         m_middleView->setOnlyCurItemMenuEnable(true);
-        m_rightView->setEnablePlayBtn(false);
+        //m_rightView->setEnablePlayBtn(false);
         m_addNoteBtn->setDisabled(true);
         break;
     case RecordEnd:
+        //结束录音时设置播放按钮可用
+        emit JsContent::instance()->callJsSetVoicePlayBtnEnable(true);
         if (!stateOperation->isVoice2Text()) {
             m_noteSearchEdit->setEnabled(true);
             m_leftView->setOnlyCurItemMenuEnable(false);
@@ -1962,10 +1671,11 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_middleView->setOnlyCurItemMenuEnable(false);
             m_addNoteBtn->setDisabled(false);
         }
-        m_rightView->setEnablePlayBtn(true);
+        //m_rightView->setEnablePlayBtn(true);
         stateOperation->operState(OpsStateInterface::StateRecording, false);
         break;
     case VoiceToTextStart:
+        emit JsContent::instance()->callJsSetVoiceText(DApplication::translate("VoiceNoteItem", "Converting voice to text"), JsContent::AsrFlag::Start);
         stateOperation->operState(OpsStateInterface::StateVoice2Text, true);
         m_noteSearchEdit->setEnabled(false);
         m_leftView->setOnlyCurItemMenuEnable(true);
@@ -1974,7 +1684,6 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNoteBtn->setDisabled(true);
         m_leftView->closeMenu();
         m_middleView->closeMenu();
-        m_rightView->closeMenu();
         break;
     case VoiceToTextEnd:
         if (!stateOperation->isRecording() && !stateOperation->isPlaying()) {
@@ -1993,26 +1702,20 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
 
 /**
  * @brief VNoteMainWindow::initAsrErrMessage
+ * 初始化语音转文字失败提示框
  */
 void VNoteMainWindow::initAsrErrMessage()
 {
-    m_asrErrMeassage = new DFloatingMessage(DFloatingMessage::ResidentType,
+    //实例化为临时消息弹出
+    m_asrErrMeassage = new DFloatingMessage(DFloatingMessage::TransientType,
                                             m_centerWidget);
     QString iconPath = STAND_ICON_PAHT;
     iconPath.append("warning.svg");
     m_asrErrMeassage->setIcon(QIcon(iconPath));
-    m_asrAgainBtn = new DPushButton(m_asrErrMeassage);
-    m_asrAgainBtn->setText(DApplication::translate(
-        "VNoteErrorMessage",
-        "Try Again"));
-    m_asrAgainBtn->adjustSize();
-    connect(m_asrAgainBtn, &DPushButton::clicked,
-            this, &VNoteMainWindow::onA2TStartAgain);
     DWidget *m_widget = new DWidget(m_asrErrMeassage);
     QHBoxLayout *m_layout = new QHBoxLayout();
     m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->addStretch();
-    m_layout->addWidget(m_asrAgainBtn);
     m_widget->setLayout(m_layout);
     m_asrErrMeassage->setWidget(m_widget);
     m_asrErrMeassage->setVisible(false);
@@ -2047,7 +1750,6 @@ void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
 
     m_asrErrMeassage->setMessage(strMessage);
     m_asrErrMeassage->setVisible(true);
-    m_asrErrMeassage->setMinimumWidth(520);
     m_asrErrMeassage->setMinimumHeight(60);
     m_asrErrMeassage->setMaximumWidth(m_centerWidget->width());
     m_asrErrMeassage->adjustSize();
@@ -2103,31 +1805,7 @@ void VNoteMainWindow::onSystemDown(bool active)
 
             qInfo() << "System going down when recording, cancel it.";
         }
-
         releaseHaltLock();
-    }
-}
-
-/**
- * @brief VNoteMainWindow::onCursorChange
- * @param height
- * @param mouseMove true 鼠标拖动
- */
-void VNoteMainWindow::onCursorChange(int height, bool mouseMove)
-{
-    QScrollBar *bar = m_rightViewScrollArea->verticalScrollBar();
-    if (height > bar->value() + m_rightViewScrollArea->height()) {
-        int value = height - m_rightViewScrollArea->height();
-        if (!mouseMove) {
-            if (value > bar->maximum()) {
-                bar->setMaximum(value);
-            }
-        }
-        bar->setValue(value);
-    }
-    int value = bar->value();
-    if (value > height) {
-        bar->setValue(height);
     }
 }
 
@@ -2139,9 +1817,10 @@ void VNoteMainWindow::switchWidget(WindowType type)
 {
     bool searchEnable = type == WndNoteShow ? true : false;
     if (!searchEnable) {
-        titlebar()->setFocus(Qt::TabFocusReason);
+        setTitleBarTabFocus();
     }
     m_noteSearchEdit->setEnabled(searchEnable);
+    m_viewChange->setEnabled(searchEnable); //设置记事本收起按钮禁用状态
     m_stackedWidget->setCurrentIndex(type);
 }
 
@@ -2156,10 +1835,10 @@ void VNoteMainWindow::release()
     }
 
     VTextSpeechAndTrManager::onStopTextToSpeech();
-    m_rightView->saveNote();
+    m_richTextEdit->updateNote();
 
-    QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
     if (stateOperation->isVoice2Text()) {
+        QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);
         releaseA2TManger->stopAsr();
     }
 }
@@ -2216,6 +1895,24 @@ void VNoteMainWindow::initMenuExtension()
 }
 
 /**
+ * @brief VNoteMainWindow::initMenuExtension
+ * 初始化标题栏图标按钮
+ */
+void VNoteMainWindow::initTitleIconButton()
+{
+    m_viewChange = new DIconButton(this);
+    m_viewChange->setIconSize(QSize(36, 36));
+    m_viewChange->setFixedSize(QSize(36, 36));
+
+    m_imgInsert = new VNoteIconButton(this, "img_insert_normal.svg");
+    m_imgInsert->setIconSize(QSize(36, 36));
+    m_imgInsert->setFixedSize(QSize(36, 36));
+    m_imgInsert->SetDisableIcon("img_insert_disable.svg");
+    m_imgInsert->setSeparateThemIcons(true); //区分主题
+    m_imgInsert->setDisabled(true); //初始为禁用状态
+}
+
+/**
  * @brief MiddleView::onDropNote
  * @param dropCancel
  * 笔记拖拽结束
@@ -2263,19 +1960,18 @@ void VNoteMainWindow::handleMultipleOption(int id)
     } break;
     case ButtonValue::SaveAsTxT:
         //多选页面-保存TxT
-        m_middleView->saveAsText();
+        m_middleView->saveAs(MiddleView::SaveAsType::Note);
         break;
     case ButtonValue::SaveAsVoice:
         //多选页面-保存语音
-        m_middleView->saveRecords();
+        m_middleView->saveAs(MiddleView::SaveAsType::Voice);
         break;
     case ButtonValue::Delete:
         //多选页面-删除
         VNoteMessageDialog confirmDialog(VNoteMessageDialog::DeleteNote, this, m_middleView->getSelectedCount());
-        connect(&confirmDialog, &VNoteMessageDialog::accepted, this, [this]() {
+        if (VNoteBaseDialog::Accepted == confirmDialog.exec()) {
             delNote();
-        });
-        confirmDialog.exec();
+        }
         break;
     }
 }
@@ -2286,7 +1982,7 @@ void VNoteMainWindow::handleMultipleOption(int id)
  */
 void VNoteMainWindow::setTitleBarTabFocus(QKeyEvent *event)
 {
-    titlebar()->setFocus(Qt::TabFocusReason);
+    titlebar()->setFocus(Qt::MouseFocusReason);
     if (event != nullptr) {
         DWidget::keyPressEvent(event);
     }
@@ -2323,7 +2019,7 @@ bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
  */
 bool VNoteMainWindow::setTabFocus(QObject *obj, QKeyEvent *event)
 {
-    if (obj == m_rightView) {
+    if (obj == m_richTextEdit) {
         return true;
     } else if (obj == m_noteSearchEdit->lineEdit()) {
         return false;
@@ -2364,9 +2060,10 @@ bool VNoteMainWindow::setAddnotepadButtonNext(QKeyEvent *event)
 bool VNoteMainWindow::setAddnoteButtonNext(QKeyEvent *event)
 {
     if (m_middleView->rowCount() == 0) {
-        return setTitlebarNext(event);
+        setTitleBarTabFocus(event);
+        return true;
     }
-    if (m_rightView->getIsNormalView()) {
+    if (m_stackedRightMainWidget->currentWidget() == m_rightViewHolder) {
         m_recordBar->setFocus(Qt::TabFocusReason);
     } else {
         m_multipleSelectWidget->setFocus(Qt::TabFocusReason);
@@ -2382,32 +2079,25 @@ bool VNoteMainWindow::setAddnoteButtonNext(QKeyEvent *event)
  */
 bool VNoteMainWindow::setTitleCloseButtonNext(QKeyEvent *event)
 {
+    //搜索状态
     if (stateOperation->isSearching()) {
+        //搜索内容为空状态
         if (m_middleView->searchEmpty()) {
-            m_noteSearchEdit->lineEdit()->setFocus(Qt::TabFocusReason);
+            //焦点切换由第一个控件m_viewChange开始
+            m_viewChange->setFocus(Qt::TabFocusReason);
             return true;
         }
         m_middleView->setFocus(Qt::TabFocusReason);
         return true;
     }
-    m_stackedWidget->currentWidget()->setFocus();
-    DWidget::keyPressEvent(event);
-    return true;
-}
-
-/**
- * @brief VNoteMainWindow::setTitlebarNext
- * @param event
- * @return
- */
-bool VNoteMainWindow::setTitlebarNext(QKeyEvent *event)
-{
-    Q_UNUSED(event)
-    if (m_noteSearchEdit->isEnabled()) {
-        m_noteSearchEdit->lineEdit()->setFocus(Qt::TabFocusReason);
-    } else {
-        return false;
+    m_stackedWidget->currentWidget()->setFocus(Qt::TabFocusReason);
+    //当前记事本列表为隐藏笔记列表为显示状态
+    if (!m_leftViewHolder->isVisible()
+        && m_middleViewHolder->isVisible()) {
+        //进入笔记列表焦点获取优先级选择
+        return setAddnotepadButtonNext(event);
     }
+    DWidget::keyPressEvent(event);
     return true;
 }
 
@@ -2419,8 +2109,7 @@ bool VNoteMainWindow::setTitlebarNext(QKeyEvent *event)
 bool VNoteMainWindow::setMiddleviewNext(QKeyEvent *event)
 {
     if (stateOperation->isSearching()) {
-        m_rightView->setFocus(Qt::TabFocusReason);
-        DWidget::keyPressEvent(event);
+        m_richTextEdit->setFocus(Qt::TabFocusReason);
         return true;
     }
     if (stateOperation->isRecording() || stateOperation->isPlaying() || stateOperation->isVoice2Text()) {
@@ -2438,4 +2127,263 @@ bool VNoteMainWindow::setMiddleviewNext(QKeyEvent *event)
 bool VNoteMainWindow::needShowMax()
 {
     return m_needShowMax;
+}
+
+void VNoteMainWindow::onDeleteShortcut()
+{
+    if (canDoShortcutAction()) {
+        QAction *deleteAct = nullptr;
+
+        /*
+         * TODO:
+         *     We check focus here to choice what action we will
+         * take. Focus in leftview for delete notebook, in midlle
+         * view for delete note, in Rightview for delete note content.
+         * or do nothing.
+         * */
+        if (m_leftView->hasFocus()) {
+            if (!stateOperation->isRecording()
+                && !stateOperation->isVoice2Text()
+                && !stateOperation->isPlaying()) {
+                deleteAct = ActionManager::Instance()->getActionById(
+                    ActionManager::NotebookDelete);
+            }
+        } else if (m_middleView->hasFocus()) {
+            if (!stateOperation->isRecording()
+                && !stateOperation->isVoice2Text()
+                && !stateOperation->isPlaying()
+                && m_middleView->count() > 0) {
+                deleteAct = ActionManager::Instance()->getActionById(
+                    ActionManager::NoteDelete);
+            }
+        }
+        if (nullptr != deleteAct) {
+            deleteAct->triggered();
+        }
+    }
+}
+
+void VNoteMainWindow::onEscShortcut()
+{
+    setTitleBarTabFocus();
+}
+
+void VNoteMainWindow::onPoppuMenuShortcut()
+{
+    if (m_leftView->hasFocus()) {
+        m_leftView->popupMenu();
+    } else if (m_middleView->hasFocus()) {
+        m_middleView->popupMenu();
+    } else if (m_noteSearchEdit->lineEdit()->hasFocus()) {
+        if (!m_showSearchEditMenu) {
+            QPoint pos(m_noteSearchEdit->pos());
+            QContextMenuEvent eve(QContextMenuEvent::Reason::Keyboard, pos, m_noteSearchEdit->mapToGlobal(pos));
+            m_showSearchEditMenu = QApplication::sendEvent(m_noteSearchEdit->lineEdit(), &eve);
+        }
+    } else if (m_richTextEdit->hasFocus()) {
+        m_richTextEdit->shortcutPopupMenu();
+    }
+}
+
+void VNoteMainWindow::onAddNotepadShortcut()
+{
+    if (!(stateOperation->isRecording()
+          || stateOperation->isPlaying()
+          || stateOperation->isVoice2Text()
+          || stateOperation->isSearching())) {
+        onNewNotebook();
+
+        //If do shortcut in home page,need switch to note
+        //page after add new notebook.
+        if (!canDoShortcutAction()) {
+            switchWidget(WndNoteShow);
+        }
+    }
+}
+
+void VNoteMainWindow::onReNameNotepadShortcut()
+{
+    //当前记事本是否正在编辑
+    bool isEditing = m_leftView->isPersistentEditorOpen(m_leftView->currentIndex());
+    //如果已在编辑状态，取消操作，解决重复快捷键警告信息
+    if (canDoShortcutAction()) {
+        if (!stateOperation->isSearching() && !isEditing) {
+            editNotepad();
+        }
+    }
+}
+
+void VNoteMainWindow::onAddNoteShortcut()
+{
+    if (canDoShortcutAction()
+        && !(stateOperation->isRecording()
+             || stateOperation->isPlaying()
+             || stateOperation->isVoice2Text()
+             || stateOperation->isSearching())) {
+        onNewNote();
+    }
+}
+
+void VNoteMainWindow::onRenameNoteShortcut()
+{
+    //当前笔记是否正在编辑
+    bool isEditing = m_middleView->isPersistentEditorOpen(m_middleView->currentIndex());
+    //如果已在编辑状态，取消操作，解决重复快捷键警告信息
+    if (canDoShortcutAction() && !isEditing) {
+        editNote();
+    }
+}
+
+void VNoteMainWindow::onPlayPauseShortcut()
+{
+    if (canDoShortcutAction()) {
+        //只要播放状态下才能用快捷键控制播放/暂停
+        if (stateOperation->isPlaying()) {
+            m_recordBar->playVoice(m_currentPlayVoice.get(), true);
+        }
+    }
+}
+
+void VNoteMainWindow::onRecordShorcut()
+{
+    if (canDoShortcutAction()) {
+        m_recordBar->onStartRecord();
+    }
+}
+
+void VNoteMainWindow::onSaveNoteShortcut()
+{
+    //多选笔记导出文本
+    if (canDoShortcutAction()) {
+        if (m_middleView->haveText()) {
+            m_middleView->saveAs(MiddleView::SaveAsType::Note);
+        }
+    }
+}
+
+void VNoteMainWindow::onSaveVoicesShortcut()
+{
+    if (canDoShortcutAction()) {
+        //Can't save recording when do recording.
+        //多选笔记导出语音
+        if (!stateOperation->isRecording()) {
+            if (m_middleView->haveVoice()) {
+                m_middleView->saveAs(MiddleView::SaveAsType::Voice);
+            }
+        }
+    }
+}
+
+/**
+ * @brief VNoteMainWindow::onThemeChanged
+ * 主题切换响应槽
+ */
+void VNoteMainWindow::onThemeChanged()
+{
+    showNotepadList();
+}
+
+/**
+ * @brief VNoteMainWindow::onViewChangeClicked
+ * 记事本列表显示或隐藏事件响应
+ */
+void VNoteMainWindow::onViewChangeClicked()
+{
+    setting::instance()->setOption(VNOTE_NOTEPAD_LIST_SHOW, !setting::instance()->getOption(VNOTE_NOTEPAD_LIST_SHOW).toBool());
+    showNotepadList();
+}
+
+/**
+ * @brief 响应web前端语音播放控制
+ * @param json :语音数据
+ * @param bIsSame : 此次语音是否与上一次语音相同
+ */
+void VNoteMainWindow::onWebVoicePlay(const QVariant &json, bool bIsSame)
+{
+    //录音状态下不允许播放
+    if (stateOperation->isRecording()) {
+        qInfo() << "The recording cannot be played";
+        return;
+    }
+
+    //当前播放的语音为空时，此时bIsSame应该为false
+    if (m_currentPlayVoice.isNull() && true == bIsSame) {
+        qInfo() << "Parameter error";
+        bIsSame = false;
+    }
+
+    //不同语音则重新解析json文件
+    if (!bIsSame) {
+        m_currentPlayVoice.reset(new VNVoiceBlock);
+        MetaDataParser dataParser;
+        dataParser.parse(json, m_currentPlayVoice.get());
+    }
+
+    //文件不存在出现错误弹出并删除该语音文本
+    if (!QFile::exists(m_currentPlayVoice->voicePath)) {
+        //异步提示，防止阻塞前端事件
+        QTimer::singleShot(0, this, [this] {
+            //正在播放时，停止播放
+            if (stateOperation->isPlaying()) {
+                m_recordBar->stopPlay();
+            }
+            //弹出提示
+            VNoteMessageDialog audioOutLimit(VNoteMessageDialog::VoicePathNoAvail);
+            audioOutLimit.exec();
+            //删除语音文本
+            m_richTextEdit->deleteSelectText();
+        });
+        return;
+    }
+
+    m_recordBar->playVoice(m_currentPlayVoice.get(), bIsSame);
+}
+
+/**
+ * @brief 富文本编辑器插入图片
+ */
+void VNoteMainWindow::onInsertImageToWebEditor()
+{
+    QStringList filePaths = DFileDialog::getOpenFileNames(
+        this,
+        "",
+        QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
+        "Image file(*.jpg *.png *.bmp)");
+
+    if (JsContent::instance()->insertImages(filePaths)) {
+        m_richTextEdit->setFocus(); //插入成功，将焦点转移至编辑区
+    }
+}
+
+/**
+ * @brief 当前编辑区内容搜索为空
+ */
+void VNoteMainWindow::onWebSearchEmpty()
+{
+    //没有搜索到则从笔记列表删除当前笔记
+    m_middleView->setNextSelection();
+    m_middleView->deleteCurrentRow();
+    //没有笔记符合条件则提示搜索无结果
+    if (0 == m_middleView->rowCount()) {
+        m_middleView->setVisibleEmptySearch(true);
+    } else {
+        m_middleView->selectAfterRemoved();
+    }
+}
+
+void VNoteMainWindow::showNotepadList()
+{
+    //切换主题色/图标
+    DPalette appDp = DGuiApplicationHelper::instance()->applicationPalette();
+    bool visible = setting::instance()->getOption(VNOTE_NOTEPAD_LIST_SHOW).toBool();
+    if (visible) {
+        appDp.setBrush(DPalette::Light, appDp.color(DPalette::Active, DPalette::Highlight));
+        appDp.setBrush(DPalette::Dark, appDp.color(DPalette::Active, DPalette::Highlight));
+        m_viewChange->setIcon(Utils::loadSVG("view_change_show.svg", false));
+    } else {
+        m_viewChange->setIcon(Utils::loadSVG("view_change_hide.svg", false));
+    }
+    m_viewChange->setPalette(appDp);
+    //显示/隐藏笔记列表
+    m_leftViewHolder->setVisible(visible);
 }

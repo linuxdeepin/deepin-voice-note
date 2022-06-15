@@ -51,6 +51,8 @@ public:
     qint32 defaultIcon {0};
     //状态
     qint32 folder_state {State::Normal};
+    //是否加密
+    qint32 encryption {0};
     //记事本名称
     QString name;
     //图标路径

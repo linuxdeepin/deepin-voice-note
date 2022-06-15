@@ -32,17 +32,11 @@ class ExportNoteWorker : public VNTask
 {
     Q_OBJECT
 public:
-    explicit ExportNoteWorker(QString dirPath,
-                              int exportType,
-                              QList<VNoteItem *>noteList,
-                              VNoteBlock *block = nullptr,
-                              QObject *parent = nullptr);
-    enum {
+    enum ExportType {
         ExportNothing,
         ExportText,
-        ExportAllVoice,
-        ExportAll,
-        ExportOneVoice
+        ExportVoice,
+        ExportHtml, //导出为html
     };
 
     enum ExportError {
@@ -50,7 +44,14 @@ public:
         NoteInvalid,
         PathDenied,
         PathInvalid,
+        Savefailed, //保存失败
     };
+
+    explicit ExportNoteWorker(const QString &dirPath,
+                              ExportType exportType,
+                              const QList<VNoteItem *> &noteList,
+                              const QString &defaultName = "",
+                              QObject *parent = nullptr);
 
 signals:
     //导出完成信号
@@ -59,21 +60,24 @@ public slots:
 protected:
     virtual void run() override;
     //检查路径
-    int checkPath();
+    ExportError checkPath();
     //导出文本
-    int exportText();
+    ExportError exportText();
     //导出所有语音
-    int exportAllVoice();
-    //导出所有文本和语音
-    int exportAll();
-    //导出一个语音
-    int exportOneVoice(VNoteBlock *block);
-
-    int m_exportType {ExportNothing};
-    QString m_exportPath;
+    ExportError exportAllVoice();
     //导出语音
-    QList<VNoteItem *>m_noteList {nullptr};
-    VNoteBlock *m_noteblock {nullptr};
+    ExportError exportOneVoice(VNoteBlock *block);
+    ExportError exportOneVoice(const QString &);
+    //导出为HTML
+    ExportError exportAsHtml();
+    //获取导出文件名，同名时创建副本
+    QString getExportFileName(const QString &baseName, const QString &fileSuffix);
+
+    ExportType m_exportType {ExportNothing};
+    QString m_exportPath {""};
+    //默认导出名称
+    QString m_exportName {""};
+    QList<VNoteItem *> m_noteList {nullptr};
 };
 
 #endif // EXPORTNOTEWORKER_H

@@ -19,24 +19,24 @@
 #include "ut_homepage.h"
 #include "homepage.h"
 
-ut_homepage_test::ut_homepage_test()
+UT_HomePage::UT_HomePage()
 {
 }
 
-void ut_homepage_test::SetUp()
+void UT_HomePage::SetUp()
 {
     m_homepage = new HomePage;
 }
 
-void ut_homepage_test::TearDown()
+void UT_HomePage::TearDown()
 {
     delete m_homepage;
 }
 
-TEST_F(ut_homepage_test, eventFilter)
+TEST_F(UT_HomePage, UT_HomePage_eventFilter_001)
 {
     QKeyEvent keyTab(QEvent::KeyPress, Qt::Key_Tab, Qt::NoModifier);
-    m_homepage->eventFilter(nullptr, &keyTab);
+    EXPECT_TRUE(m_homepage->eventFilter(nullptr, &keyTab));
     QKeyEvent keyEnter(QEvent::KeyPress, Qt::Key_Enter, Qt::NoModifier);
-    m_homepage->eventFilter(nullptr, &keyEnter);
+    EXPECT_TRUE(m_homepage->eventFilter(nullptr, &keyEnter));
 }

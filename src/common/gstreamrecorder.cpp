@@ -21,7 +21,7 @@
 #include "gstreamrecorder.h"
 #include <DLog>
 
-static const QString mp3Encoder = "capsfilter caps=audio/x-raw,rate=44100,channels=2 ! lamemp3enc name=enc target=0 quality=2 ! xingmux ! id3mux";
+static const QString mp3Encoder = "capsfilter caps=audio/x-raw,rate=44100,channels=2 ! lamemp3enc name=enc target=1 cbr=true bitrate=192";
 
 /**
  * @brief bufferProbe
@@ -241,16 +241,7 @@ bool GstreamRecorder::startRecord()
 void GstreamRecorder::stopRecord()
 {
     if (m_pipeline) {
-        int state = -1;
-        int pending = -1;
-        GetGstState(&state, &pending);
-        if (state == GST_STATE_PAUSED) {
-            gst_element_set_state(m_pipeline, GST_STATE_PLAYING);
-        } else if (state != GST_STATE_PLAYING) {
-            emit recordFinshed();
-            return;
-        }
-        gst_element_send_event(m_pipeline, gst_event_new_eos());
+        setStateToNull();
     }
 }
 
@@ -274,7 +265,7 @@ void GstreamRecorder::pauseRecord()
  * @brief GstreamRecorder::setDevice
  * @param device 设备名称
  */
-void GstreamRecorder::setDevice(QString device)
+void GstreamRecorder::setDevice(const QString &device)
 {
     if (device != m_currentDevice) {
         m_currentDevice = device;
@@ -290,7 +281,7 @@ void GstreamRecorder::setDevice(QString device)
  * @brief GstreamRecorder::setOutputFile
  * @param path 录音文件路径
  */
-void GstreamRecorder::setOutputFile(QString path)
+void GstreamRecorder::setOutputFile(const QString &path)
 {
     m_outputFile = path;
     if (m_pipeline != nullptr) {
@@ -325,10 +316,6 @@ bool GstreamRecorder::doBusMessage(GstMessage *message)
             qCritical() << "Got pipeline error:" << errMsg;
             g_error_free(error);
         }
-        break;
-    }
-    case GST_MESSAGE_EOS: {
-        emit recordFinshed();
         break;
     }
     default:
@@ -388,7 +375,7 @@ void GstreamRecorder::bufferProbed()
  */
 void GstreamRecorder::setStateToNull()
 {
-    GstState cur_state, pending;
+    GstState cur_state = GST_STATE_NULL, pending = GST_STATE_NULL;
     gst_element_get_state(m_pipeline, &cur_state, &pending, 0);
     if (cur_state == GST_STATE_NULL) {
         if (pending != GST_STATE_VOID_PENDING) {

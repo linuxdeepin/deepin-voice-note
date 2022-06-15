@@ -24,12 +24,12 @@
 
 class VNoteItemOper;
 struct VNoteItem;
-class ut_vnoteitemoper_test : public QObject
+class UT_VNoteItemOper : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_vnoteitemoper_test();
+    UT_VNoteItemOper();
 
     virtual void SetUp() override;
     virtual void TearDown() override;

@@ -29,7 +29,7 @@
  * @param parent
  */
 VNote2SIconButton::VNote2SIconButton(
-    const QString normal, const QString press, QWidget *parent)
+    const QString &normal, const QString &press, QWidget *parent)
     : DFloatingButton(parent)
 {
     m_icons[Normal] = normal;

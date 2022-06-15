@@ -23,12 +23,12 @@
 #include <QObject>
 class DBusLogin1Manager;
 
-class ut_dbuslogin1manager_test : public QObject
+class UT_DBusLogin1Manager : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    ut_dbuslogin1manager_test();
+    UT_DBusLogin1Manager();
     virtual void SetUp() override;
     virtual void TearDown() override;
     DBusLogin1Manager *m_loginManager {nullptr};

@@ -32,17 +32,24 @@ set(CMAKE_SAFETYTEST "${CMAKE_SAFETYTEST_ARG}")
 if(CMAKE_SAFETYTEST STREQUAL "")
     set(CMAKE_SAFETYTEST "CMAKE_SAFETYTEST_ARG_OFF")
 endif()
-
+#安全编译参数
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstack-protector-strong -D_FORTITY_SOURCE=1 -z noexecstack -pie -fPIC -z lazy")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D${CMAKE_SAFETYTEST}")
 
 if(CMAKE_SAFETYTEST STREQUAL "CMAKE_SAFETYTEST_ARG_ON")
   #安全测试选项
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fsanitize=address -O2")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fsanitize=address -O2")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fsanitize=undefined,address -O2")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fsanitize=undefined,address -O2")
 endif()
 
 # 设置添加gocv相关信息的输出
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fprofile-arcs -ftest-coverage")
+
+#安全加固参数
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -z relro -z now -z noexecstack -pie")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -z relro -z now -z noexecstack -pie")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fstack-protector-all")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -fstack-protector-all")
 
 find_package(Qt5Test REQUIRED)
 find_package(GTest REQUIRED)
@@ -97,6 +104,8 @@ target_link_libraries(${PROJECT_NAME_TEST}
     Qt5::Sql
     Qt5::Multimedia
     Qt5::Test
+    Qt5::WebChannel
+    Qt5::WebEngineWidgets
     ${Qt5Svg_LIBRARIES}
     ${Qt5Xml_LIBRARIES}
 )
