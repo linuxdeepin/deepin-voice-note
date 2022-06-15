@@ -37,3 +37,4 @@ We encourage you to report issues and contribute changes
 ## License
 
 Deepin Voice Notes is licensed under [GPLv3](LICENSE) or any later version.
+
