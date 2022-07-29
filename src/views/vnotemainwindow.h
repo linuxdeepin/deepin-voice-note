@@ -308,6 +308,7 @@ private:
 
     DPushButton *m_addNotepadBtn {nullptr};
     DFloatingButton *m_addNoteBtn {nullptr};
+    DAnchorsBase *m_buttonAnchor {nullptr};
 
     VNoteRecordBar *m_recordBar {nullptr};
     VNoteA2TManager *m_a2tManager {nullptr};

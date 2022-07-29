@@ -443,7 +443,8 @@ void VNoteMainWindow::initLeftView()
     m_leftViewHolder = new QWidget(m_mainWndSpliter);
     m_leftViewHolder->setObjectName("leftMainLayoutHolder");
     m_leftViewHolder->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    m_leftViewHolder->setFixedWidth(VNOTE_LEFTVIEW_W);
+    m_leftViewHolder->setMinimumWidth(VNOTE_LEFTVIEW_MIN_W);
+    m_leftViewHolder->setMaximumWidth(VNOTE_LEFTVIEW_W);
     m_leftViewHolder->setBackgroundRole(DPalette::Base);
     m_leftViewHolder->setAutoFillBackground(true);
 
@@ -486,7 +487,8 @@ void VNoteMainWindow::initMiddleView()
     m_middleViewHolder = new QWidget(m_mainWndSpliter);
     m_middleViewHolder->setObjectName("middleMainLayoutHolder");
     m_middleViewHolder->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    m_middleViewHolder->setFixedWidth(VNOTE_MIDDLEVIEW_W);
+    m_middleViewHolder->setMaximumWidth(VNOTE_MIDDLEVIEW_W);
+    m_middleViewHolder->setMinimumWidth(VNOTE_MIDDLEVIEW_MIN_W);
     m_middleViewHolder->setBackgroundRole(DPalette::Base);
     m_middleViewHolder->setAutoFillBackground(true);
 
@@ -499,14 +501,15 @@ void VNoteMainWindow::initMiddleView()
     m_addNoteBtn->setFixedSize(QSize(54, 54));
     m_addNoteBtn->raise();
 
-    DAnchorsBase buttonAnchor(m_addNoteBtn);
-    buttonAnchor.setAnchor(Qt::AnchorLeft, m_middleView, Qt::AnchorLeft);
-    buttonAnchor.setAnchor(Qt::AnchorBottom, m_middleView, Qt::AnchorBottom);
-    buttonAnchor.setBottomMargin(6);
-    buttonAnchor.setLeftMargin(97);
+    m_buttonAnchor = new DAnchorsBase(m_addNoteBtn);
+    m_buttonAnchor->setAnchor(Qt::AnchorLeft, m_middleView, Qt::AnchorLeft);
+    m_buttonAnchor->setAnchor(Qt::AnchorBottom, m_middleView, Qt::AnchorBottom);
+    m_buttonAnchor->setBottomMargin(6);
+    m_buttonAnchor->setLeftMargin(97);
 
     m_middleView->installEventFilter(this);
     m_addNoteBtn->installEventFilter(this);
+    m_middleViewHolder->installEventFilter(this);
     // ToDo:
     //    Add Left view widget here
     middleHolderLayout->addWidget(m_middleView);
@@ -1996,6 +1999,12 @@ void VNoteMainWindow::setTitleBarTabFocus(QKeyEvent *event)
  */
 bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
 {
+    if (o == m_middleViewHolder && e->type() == QEvent::Resize) {
+        // 更新按钮位置
+        int position = (m_middleViewHolder->width() - m_addNoteBtn->width()) / 2 - 6;
+        m_buttonAnchor->setLeftMargin(position);
+        return true;
+    }
     if (e->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = dynamic_cast<QKeyEvent *>(e);
         if (keyEvent->key() == Qt::Key_Tab) {
