@@ -49,8 +49,8 @@ void VNoteApplication::activateWindow()
     if (nullptr == m_qspMainWnd.get()) {
         m_qspMainWnd.reset(new VNoteMainWindow());
 
-        m_qspMainWnd->setMinimumSize(DEFAULT_WINDOWS_WIDTH, DEFAULT_WINDOWS_HEIGHT);
-
+        m_qspMainWnd->setMinimumSize(MIN_WINDOWS_WIDTH, MIN_WINDOWS_HEIGHT);
+        m_qspMainWnd->resize(DEFAULT_WINDOWS_WIDTH, DEFAULT_WINDOWS_HEIGHT);
         QByteArray mainWindowSize = setting::instance()->getOption(VNOTE_MAINWND_SZ_KEY).toByteArray();
 
         if (!mainWindowSize.isEmpty()) {

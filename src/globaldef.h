@@ -27,17 +27,22 @@
 #define DEFAULT_WINDOWS_WIDTH 980
 #define DEFAULT_WINDOWS_HEIGHT 634
 
+#define MIN_WINDOWS_WIDTH 680
+#define MIN_WINDOWS_HEIGHT 300
+
 //TitleBar height
 #define VNOTE_TITLEBAR_HEIGHT 50
 
 //LeftView width
 #define VNOTE_LEFTVIEW_W 200
+#define VNOTE_LEFTVIEW_MIN_W 133
 
 //FolderSelectDialog Width
 #define VNOTE_SELECTDIALOG_W 448
 
 //MiddleView width
 #define VNOTE_MIDDLEVIEW_W 260
+#define VNOTE_MIDDLEVIEW_MIN_W 133
 
 //SearchEdit Size
 #define VNOTE_SEARCHBAR_H 36
