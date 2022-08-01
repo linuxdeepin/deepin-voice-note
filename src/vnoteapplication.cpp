@@ -6,6 +6,7 @@
 #include "vnoteapplication.h"
 #include "globaldef.h"
 #include "setting.h"
+#include "eventlogutils.h"
 
 #include <DWidgetUtil>
 #include <DGuiApplicationHelper>
@@ -13,6 +14,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QStandardPaths>
+#include <QJsonObject>
 
 /**
  * @brief VNoteApplication::VNoteApplication
@@ -47,6 +49,12 @@ void VNoteApplication::activateWindow()
         Dtk::Widget::moveToCenter(m_qspMainWnd.get());
 
         m_qspMainWnd->show();
+        QJsonObject obj{
+            {"tid", EventLogUtils::Start},
+            {"version", QCoreApplication::applicationVersion()},
+            {"mode", 1}
+        };
+        EventLogUtils::get().writeLogs(obj);
     } else {
         if (m_qspMainWnd->needShowMax()) {
             m_qspMainWnd->setWindowState(Qt::WindowMaximized);
