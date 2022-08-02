@@ -47,7 +47,7 @@
 //SearchEdit Size
 #define VNOTE_SEARCHBAR_H 36
 #define VNOTE_SEARCHBAR_W 350
-
+#define VNOTE_SEARCHBAR_MIN_W 250
 //StandIcon path
 #define STAND_ICON_PAHT ":/icons/deepin/builtin/"
 

@@ -367,7 +367,8 @@ void VNoteMainWindow::initTitleBar()
     // Search note
     m_noteSearchEdit = new DSearchEdit(this);
     DFontSizeManager::instance()->bind(m_noteSearchEdit, DFontSizeManager::T6);
-    m_noteSearchEdit->setFixedSize(QSize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H));
+    m_noteSearchEdit->setMaximumSize(QSize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H));
+    m_noteSearchEdit->setMinimumSize(QSize(VNOTE_SEARCHBAR_MIN_W, VNOTE_SEARCHBAR_H));
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
     m_noteSearchEdit->lineEdit()->installEventFilter(this);
 
@@ -1054,6 +1055,19 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
  */
 void VNoteMainWindow::resizeEvent(QResizeEvent *event)
 {
+
+    if(this->geometry().width() >= DEFAULT_WINDOWS_WIDTH) {
+        m_noteSearchEdit->resize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H);
+    } else if (this->geometry().width() <= MIN_WINDOWS_WIDTH) {
+        m_noteSearchEdit->resize(VNOTE_SEARCHBAR_MIN_W, VNOTE_SEARCHBAR_H);
+    } else {
+        double wMainWin = (this->geometry().width() * 1.0) / DEFAULT_WINDOWS_WIDTH;
+        int wsearch =VNOTE_SEARCHBAR_W * wMainWin;
+        m_noteSearchEdit->resize(wsearch , VNOTE_SEARCHBAR_H);
+    }
+
+    m_middleView->repaint();
+
     if (m_asrErrMeassage && m_asrErrMeassage->isVisible()) {
         int xPos = (m_centerWidget->width() - m_asrErrMeassage->width()) / 2;
         int yPos = m_centerWidget->height() - m_asrErrMeassage->height() - 5;
@@ -2003,6 +2017,7 @@ bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
         // 更新按钮位置
         int position = (m_middleViewHolder->width() - m_addNoteBtn->width()) / 2 - 6;
         m_buttonAnchor->setLeftMargin(position);
+        m_middleView->update();
         return true;
     }
     if (e->type() == QEvent::KeyPress) {
