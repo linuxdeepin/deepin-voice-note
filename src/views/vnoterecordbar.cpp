@@ -261,7 +261,9 @@ void VNoteRecordBar::onAudioDeviceChange(int mode)
                 emit sigDeviceExceptionMsgClose();
                 msgshow = false;
             }
-            m_recordBtn->setEnabled(true);
+//            m_recordBtn->setEnabled(true);
+            //根据 系统>控制中心>声音>设备管理>输入设备 中的使能情况设置按钮是否可用
+            m_recordBtn->setEnabled(m_audioWatcher->getDeviceEnable(static_cast<AudioWatcher::AudioMode>(m_currentMode)));
             m_recordBtn->setToolTip("");
             if (m_mainLayout->currentWidget() == m_recordPanel) {
                 stopRecord();
@@ -301,6 +303,8 @@ void VNoteRecordBar::initAudioWatcher()
             this, &VNoteRecordBar::onAudioDeviceChange);
     connect(m_audioWatcher, &AudioWatcher::sigVolumeChange,
             this, &VNoteRecordBar::onAudioVolumeChange);
+    connect(m_audioWatcher, &AudioWatcher::sigDeviceEnableChanged,
+            this, &VNoteRecordBar::onDeviceEnableChanged);
 }
 
 /**
@@ -323,6 +327,20 @@ void VNoteRecordBar::onChangeTheme()
     highColor.setAlphaF(0.4);
     palette.setColor(DPalette::Disabled, DPalette::Highlight, highColor);
     m_recordBtn->setPalette(palette);
+}
+
+/**
+ * @brief VNoteRecordBar::onDeviceEnableChanged
+ * 根据 系统>控制中心>声音>设备管理>输入设备 中的使能情况设置按钮是否可用
+ * @param mode
+ * @param enabled
+ */
+void VNoteRecordBar::onDeviceEnableChanged(int mode, bool enabled)
+{
+    qInfo() << "通过控制中心改变默认设备 "<< mode << "（输出设备:0 输入设备:1）使能状态！enalbed:" <<enabled;
+    if (m_currentMode == mode) {
+        m_recordBtn->setEnabled(enabled);
+    }
 }
 
 void VNoteRecordBar::stopPlay()
