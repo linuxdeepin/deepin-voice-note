@@ -37,6 +37,8 @@ public:
     double getVolume(AudioMode mode);
     //判断设备是否静音
     bool getMute(AudioMode mode);
+    //判断设备是否通过控制中心禁用
+    bool getDeviceEnable(AudioMode mode);
 signals:
     //音量改变信号
     void sigVolumeChange(AudioMode mode);
@@ -44,6 +46,8 @@ signals:
     void sigDeviceChange(AudioMode mode);
     //静音状态改变信号
     void sigMuteChanged(AudioMode mode);
+    //设备使能情况
+    void sigDeviceEnableChanged(AudioMode mode,bool enable);
 protected slots:
     //输入设备默认端口改变
     void onDefaultSourceActivePortChanged(AudioPort value);
@@ -61,6 +65,8 @@ protected slots:
     void onSourceMuteChanged(bool value);
     //默认输出设备静音状态改变
     void onSinkMuteChanged(bool value);
+    //控制中心中是否更改设备的使能状态
+    void onDeviceEnableState(QDBusMessage msg);
 
 private:
     //从参数文件中读取设备检测开启标志，无配置文件，默认开启
@@ -70,6 +76,9 @@ private:
     void initDeviceWacther();
     //连接相关槽函数
     void initConnections();
+
+    //更新控制中心中是否更改设备的使能状态
+    void updateDeviceEnabled(QString cardsStr,bool isEmitSig);
 
 private:
     const QString m_serviceName {"com.deepin.daemon.Audio"};
@@ -83,6 +92,16 @@ private:
     bool m_fNeedDeviceChecker {true};
     bool m_inAudioMute {false};
     bool m_outAudioMute {false};
+    /**
+      * @brief 默认输入设备是否使能
+      * 找出默认输入设备在 系统>控制中心>声音>设备管理>输入设备 中的使能情况
+      */
+    bool m_inIsEnable{false};
+    /**
+      * @brief 默认输出设备是否使能
+      * 找出默认输出设备在 系统>控制中心>声音>设备管理>输入设备 中的使能情况
+      */
+    bool m_outIsEnable{false};
 };
 
 #endif // AudioWatcher_H

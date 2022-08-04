@@ -59,12 +59,20 @@ void AudioWatcher::initDeviceWacther()
     m_outAudioPort = m_pDefaultSink->activePort();
     m_outAudioMute = m_pDefaultSink->mute();
 
-    qInfo() << "current input active port name:" << m_inAudioPort.name
+    qInfo() << "\nInput:"
+            << "\ncurrent input device path:" << m_pAudioInterface->defaultSource().path()
+            << "\ncurrent input active port name:" << m_inAudioPort.name
             << "\ncurrent input active port availability:" << m_inAudioPort.availability
             << "\ncurrent input device name:" << m_pDefaultSource->name()
+            << "\ncurrent input port count:" <<m_pDefaultSource->ports().count()
+            << "\nOutput:"
+            << "\ncurrent output device path:" << m_pAudioInterface->defaultSink().path()
             << "\ncurrent output active port name:" << m_outAudioPort.name
             << "\ncurrent output active port availability:" << m_outAudioPort.availability
-            << "\ncurrent output device name:" << m_pDefaultSink->name();
+            << "\ncurrent output device name:" << m_pDefaultSink->name()
+            << "\ncurrent output port count:" <<m_pDefaultSink->ports().count();
+
+    updateDeviceEnabled(m_pAudioInterface->cards(),false);
 }
 
 /**
@@ -87,6 +95,52 @@ void AudioWatcher::initConnections()
     connect(m_pDefaultSink.get(), SIGNAL(MuteChanged(bool)), this, SLOT(onSinkMuteChanged(bool)));
     connect(m_pDefaultSink.get(), SIGNAL(ActivePortChanged(AudioPort)),
             this, SLOT(onDefaultSinkActivePortChanged(AudioPort)));
+    //检测音频设备状态是否被改变
+    QDBusConnection::sessionBus().connect(m_serviceName,
+                                          "/com/deepin/daemon/Audio",
+                                          "org.freedesktop.DBus.Properties",
+                                          "PropertiesChanged",
+                                          "sa{sv}as",
+                                          this,
+                                          SLOT(onDeviceEnableState(QDBusMessage))
+                                          );
+}
+
+
+/**
+ * @brief AudioWatcher::updateDeviceEnabled 更新控制中心中是否更改设备的使能状态
+ * 调用时机
+ *  1.默认的输入或输出设备改变时需要更新下（不需要发信号）
+ *  2.控制中心更改设备的使能状态（需要发信号）
+ * @param cardsStr:设备信息
+ * @param isEmitSig:是否发信号
+ */
+void AudioWatcher::updateDeviceEnabled(QString cardsStr,bool isEmitSig)
+{
+    //所有声卡信息
+    QJsonDocument doc = QJsonDocument::fromJson(cardsStr.toUtf8());
+    QJsonArray cards = doc.array();
+    //遍历声卡，找出当前默认声卡对应的使能状态
+    foreach(QJsonValue card , cards){
+        //该声卡的所有端口
+        QJsonArray ports = card.toObject()["Ports"].toArray();
+        //qDebug() << "ports: " << ports;
+        //遍历所有端口，找出当前默认设备对应的端口并判断是否可用
+        foreach(QJsonValue port , ports){
+            QString portName = port.toObject()["Name"].toString();
+            //qDebug() << "portName: " << portName << "m_outAudioPort.name: " << m_outAudioPort.name << "m_inAudioPort.name: " <<m_inAudioPort.name ;
+            if(portName == m_outAudioPort.name){
+                m_outIsEnable = port.toObject()["Enabled"].toBool();
+                if(isEmitSig)
+                    sigDeviceEnableChanged(Internal,m_outIsEnable);
+            }
+            if(portName == m_inAudioPort.name){
+                m_inIsEnable = port.toObject()["Enabled"].toBool();
+                if(isEmitSig)
+                    sigDeviceEnableChanged(Micphone,m_inIsEnable);
+            }
+        }
+    }
 }
 
 /**
@@ -149,6 +203,7 @@ void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &value)
             << "\nactive port:" << m_inAudioPort.name << ";" << m_inAudioPort.availability
             << "\ndevice name:" << m_pDefaultSource->name();
 
+    updateDeviceEnabled(m_pAudioInterface->cards(),false);
     emit sigDeviceChange(Micphone);
 }
 
@@ -178,6 +233,7 @@ void AudioWatcher::onDefaultSinkChanaged(const QDBusObjectPath &value)
             << "\nactive port:" << m_outAudioPort.name << ";" << m_outAudioPort.availability
             << "\ndevice name:" << m_pDefaultSink->name();
 
+    updateDeviceEnabled(m_pAudioInterface->cards(),false);
     emit sigDeviceChange(Internal);
 }
 
@@ -224,6 +280,34 @@ void AudioWatcher::onSinkMuteChanged(bool value)
 }
 
 /**
+ * @brief AudioWatcher::onDeviceEnableState 控制中心改变默认设备使能状态
+ * @param msg
+ */
+void AudioWatcher::onDeviceEnableState(QDBusMessage msg)
+{
+    QList<QVariant> arguments = msg.arguments();
+    //参数固定长度
+    if (3 != arguments.count()) {
+        qWarning() << "从控制中心获取设备使能状态失败！参数长度不为3！参数长度:" <<arguments.count();
+        return;
+    }
+    //音频dbus服务接口
+    QString interfaceName = arguments.at(0).toString();
+    if("com.deepin.daemon.Audio" == interfaceName){
+        //被改变的属性
+        QVariantMap changedProps = qdbus_cast<QVariantMap>(arguments.at(1).value<QDBusArgument>());
+        QStringList keys =  changedProps.keys();
+        //qDebug() << "changedProps: " << changedProps;
+        foreach (const QString &prop, keys) {
+            if (prop == "CardsWithoutUnavailable") {
+                qInfo() << "控制中心改变默认设备使能状态！" << prop;
+                updateDeviceEnabled(changedProps[prop].toString(),true);
+            }
+        }
+    }
+}
+
+/**
  * @brief AudioWatcher::onSourceMuteChanged
  * @param value 当前静音状态
  */
@@ -242,14 +326,16 @@ QString AudioWatcher::getDeviceName(AudioMode mode)
 {
     QString device = "";
     if (mode == Internal) {
-        if (m_outAudioPort.availability != 1 || !m_fNeedDeviceChecker) {
+        //如果没有端口(m_pDefaultSource->ports().count()=0)，说明音声卡可能是虚拟的
+        if ((m_outAudioPort.availability != 1 || !m_fNeedDeviceChecker)&&m_pDefaultSink->ports().count()!=0) {
             device = m_pDefaultSink->name();
             if (!device.isEmpty() && !device.endsWith(".monitor")) {
                 device += ".monitor";
             }
         }
     } else {
-        if (m_inAudioPort.availability != 1 || !m_fNeedDeviceChecker) {
+        //如果没有端口(m_pDefaultSource->ports().count()=0)，说明音声卡可能是虚拟的
+        if ((m_inAudioPort.availability != 1 || !m_fNeedDeviceChecker)&&m_pDefaultSource->ports().count()!=0) {
             device = m_pDefaultSource->name();
             if (device.endsWith(".monitor") && m_fNeedDeviceChecker) {
                 device.clear();
@@ -277,6 +363,16 @@ double AudioWatcher::getVolume(AudioMode mode)
 bool AudioWatcher::getMute(AudioMode mode)
 {
     return mode != Internal ? m_inAudioMute : m_outAudioMute;
+}
+
+/**
+ * @brief AudioWatcher::getDeviceEnable
+ * @param mode
+ * @return 设备是否通过控制中心禁用
+ */
+bool AudioWatcher::getDeviceEnable(AudioWatcher::AudioMode mode)
+{
+    return mode != Internal ? m_inIsEnable : m_outIsEnable;
 }
 
 /**

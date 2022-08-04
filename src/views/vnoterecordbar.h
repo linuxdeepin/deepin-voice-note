@@ -88,6 +88,8 @@ public slots:
     //输入/输出设备切换
     void onAudioSelectChange(QVariant value);
     void onChangeTheme();
+    //控制中心中是否更改设备的使能状态
+    void onDeviceEnableChanged(int mode,bool enabled);
 
 protected:
     //事件过滤器
