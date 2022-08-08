@@ -77,7 +77,7 @@ void HomePage::initUi()
     layout->setRowStretch(2, 0);
     layout->setRowStretch(3, 0);
     layout->setRowStretch(4, 1);
-    layout->setContentsMargins(0, 0, 0, 70);
+    layout->setContentsMargins(0, 0, 0, 50);
 
     this->setLayout(layout);
 }
