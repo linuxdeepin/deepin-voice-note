@@ -2017,7 +2017,7 @@ bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
         // 更新按钮位置
         int position = (m_middleViewHolder->width() - m_addNoteBtn->width()) / 2 - 6;
         m_buttonAnchor->setLeftMargin(position);
-        m_middleView->update();
+        m_middleView->resize(m_middleViewHolder->width(), m_middleViewHolder->height());
         return true;
     }
     if (e->type() == QEvent::KeyPress) {

@@ -65,6 +65,7 @@ MiddleView::MiddleView(QWidget *parent)
     //启用多选
     this->setSelectionMode(QAbstractItemView::MultiSelection);
     this->installEventFilter(this);
+    this->setResizeMode(ResizeMode::Adjust);
 }
 
 /**
