@@ -268,7 +268,7 @@ QWidget *MiddleViewDelegate::createEditor(QWidget *parent, const QStyleOptionVie
     Q_UNUSED(index)
     QLineEdit *editBox = new QLineEdit(parent);
     editBox->setMaxLength(MAX_TITLE_LEN);
-    editBox->setFixedSize(parent->geometry().width() - 56, 38);
+    editBox->resize(parent->geometry().width() - 56, 38);
     editBox->installEventFilter(m_parentView);
     return editBox;
 }
@@ -327,6 +327,7 @@ void MiddleViewDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptio
                                               const QModelIndex &index) const
 {
     QLineEdit *edit = static_cast<QLineEdit *>(editor);
+    edit->resize(m_parentView->geometry().width() - 56, 38);
     if (m_searchKey.isEmpty() && index.isValid() && index.row() == 0) {
         VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
         if (data && data->isTop) {
@@ -426,7 +427,7 @@ void MiddleViewDelegate::paintNormalItem(QPainter *painter, const QStyleOptionVi
 
     } else {
         itemBaseRect = QRect(option.rect.x() + 10, option.rect.y() + 5,
-                             option.rect.width() - 20, option.rect.height() - 10);
+                             qMin(m_parentView->geometry().width(), option.rect.width()) - 20, option.rect.height() - 10);
     }
 
     painter->save();
@@ -487,7 +488,7 @@ void MiddleViewDelegate::paintSearchItem(QPainter *painter, const QStyleOptionVi
         return;
     }
     QRect paintRect(option.rect.x() + 10, option.rect.y() + 5,
-                    option.rect.width() - 20, option.rect.height() - 10);
+                    qMin(m_parentView->geometry().width(), option.rect.width()) - 20, option.rect.height() - 10);
     bool isSelect = false;
     painter->save();
     painter->setRenderHint(QPainter::Antialiasing, true);
