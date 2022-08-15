@@ -32,3 +32,4 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, gstreamer1.0-plugins-good, vlc-plugin-base, gstreamer1.0-pulseaudio
 Description: Voice Notes is a lightweight memo tool to make text notes and voice recordings
   Voice Notes is a simple memo software with texts and voice recordings. You are able to save the recordings as MP3 format or texts.
+Recommends: uos-reporter, deepin-event-log
