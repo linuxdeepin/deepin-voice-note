@@ -65,7 +65,7 @@ void VNote2SIconButton::setState(int state)
  */
 void VNote2SIconButton::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (rect().contains(event->pos()) && isEnabled()) {
+    if (event->button() == Qt::LeftButton && rect().contains(event->pos()) && isEnabled()) {
         if (Normal == m_state) {
             m_state = Press;
         } else {

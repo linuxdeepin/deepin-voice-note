@@ -333,6 +333,26 @@ void VNoteMainWindow::initShortcuts()
     m_stPreviewShortcuts->setAutoRepeat(false);
     connect(m_stPreviewShortcuts.get(), &QShortcut::activated,
             this, &VNoteMainWindow::onPreviewShortcut);
+
+    m_stVoice2Text.reset(new QShortcut(this));
+    m_stVoice2Text->setKey(QString("Ctrl+W"));
+    m_stVoice2Text->setContext(Qt::ApplicationShortcut);
+    m_stVoice2Text->setAutoRepeat(false);
+    connect(m_stVoice2Text.get(), &QShortcut::activated, this, [ = ] {
+        qDebug() << __FUNCTION__ << __LINE__;
+        //emit JsContent::instance()->callJsVoiceToOther(0);
+        //m_richTextEdit->onMenuActionClicked(ActionManager::Instance()->getActionById(ActionManager::VoiceToText));
+    });
+
+    m_stVoice2Mp3.reset(new QShortcut(this));
+    m_stVoice2Mp3->setKey(QString("Ctrl+P"));
+    m_stVoice2Mp3->setContext(Qt::ApplicationShortcut);
+    m_stVoice2Mp3->setAutoRepeat(false);
+    connect(m_stVoice2Mp3.get(), &QShortcut::activated, this, [ = ] {
+        qDebug() << __FUNCTION__ << __LINE__;
+        //emit JsContent::instance()->callJsVoiceToOther(1);
+        //m_richTextEdit->onMenuActionClicked(ActionManager::Instance()->getActionById(ActionManager::VoiceAsSave));
+    });
 }
 
 /**
