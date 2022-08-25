@@ -227,8 +227,9 @@ QString VNoteItemOper::getDefaultNoteName(qint64 folderId)
 
     QString defaultNoteName = DApplication::translate("DefaultName", "Text");
 
-    if (nullptr != folder) {
-        defaultNoteName += QString("%1").arg(folder->maxNoteIdRef() + 1);
+    // 文本， 文本1， 文本2
+    if (nullptr != folder && folder->maxNoteIdRef() != 0) {
+        defaultNoteName += QString("%1").arg(folder->maxNoteIdRef());
     }
 
     return defaultNoteName;
