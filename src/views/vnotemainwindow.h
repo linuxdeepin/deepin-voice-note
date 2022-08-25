@@ -338,6 +338,7 @@ private:
     QScopedPointer<QShortcut> m_stPlayorPause; //Space
     QScopedPointer<QShortcut> m_stRecording; //Ctrl+R
     QScopedPointer<QShortcut> m_stVoice2Text; //Ctrl+W
+    QScopedPointer<QShortcut> m_stVoice2Mp3; //Ctrl+P
     QScopedPointer<QShortcut> m_stSaveAsText; //Ctrl+S
     QScopedPointer<QShortcut> m_stSaveVoices; //Ctrl+Y
     QScopedPointer<QShortcut> m_stDelete; //Delete

@@ -5485,7 +5485,9 @@
                         }
                     }
                 });
-                return _this.ui.buttonGroup([
+                return _this.ui.buttonGroup({
+                    className: 'note-font-family-class',
+                    children:[
                     _this.button({
                         className: 'dropdown-toggle fontnameBut',
                         contents: _this.ui.dropdownButtonContents('<span class="note-current-fontname"/>', _this.options),
@@ -5503,10 +5505,12 @@
                         },
                         click: _this.context.createInvokeHandlerAndUpdateState('editor.fontName')
                     })
-                ]).render();
+                ]}).render();
             });
             this.context.memo('button.fontsize', function () {
-                return _this.ui.buttonGroup([
+                return _this.ui.buttonGroup({
+                    className: 'note-fontsize-class',
+                    children:[
                     _this.button({
                         className: 'dropdown-toggle fontsizeBut',
                         contents: _this.ui.dropdownButtonContents('<span class="note-current-fontsize"/>', _this.options),
@@ -5521,7 +5525,7 @@
                         items: _this.options.fontSizes,
                         click: _this.context.createInvokeHandlerAndUpdateState('editor.fontSize')
                     })
-                ]).render();
+                ]}).render();
             });
             this.context.memo('button.color', function () {
                 return _this.ui.buttonGroup({
@@ -7183,6 +7187,9 @@
             var rect = lists.last(styleInfo.range.getClientRects());
             this.isShowOlUl(styleInfo)
             if (rect) {
+                this.$popover.find('.note-color').removeClass('open')
+                this.$popover.find('.note-fontsize-class').removeClass('open')
+                this.$popover.find('.note-font-family-class').removeClass('open')
                 let winWidth = $(document).width()
                 if (winWidth - x < airPopoverWidth) {
                     x = winWidth - airPopoverWidth

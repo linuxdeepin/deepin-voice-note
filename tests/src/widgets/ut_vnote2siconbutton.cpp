@@ -36,7 +36,7 @@ TEST_F(UT_VNote2SIconButton, UT_VNote2SIconButton_mouseReleaseEvent_001)
 {
     VNote2SIconButton vnote2siconbutton("test", "test");
     QPointF localPos;
-    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
+    QMouseEvent *event = new QMouseEvent(QEvent::MouseButtonPress, localPos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
     int status = vnote2siconbutton.m_state;
     vnote2siconbutton.mouseReleaseEvent(event);
     EXPECT_TRUE(status != vnote2siconbutton.m_state);
