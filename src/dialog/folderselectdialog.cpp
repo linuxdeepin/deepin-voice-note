@@ -396,6 +396,13 @@ void FolderSelectDialog::onFontChanged()
     m_noteInfo->setText(itemInfo);
 }
 
+void FolderSelectDialog::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() != Qt::Key_Up && event->key() != Qt::Key_Down) {
+        event->ignore();
+    }
+}
+
 /**
  * @brief FolderSelectDialog::getSelectIndex
  * @return 选中的记事本
