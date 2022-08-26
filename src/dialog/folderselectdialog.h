@@ -92,6 +92,8 @@ public:
     void onFontChanged();
 
 protected:
+
+    void keyPressEvent(QKeyEvent *event) override;
     //初始化布局
     void initUI();
     //连接槽函数
