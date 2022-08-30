@@ -300,7 +300,7 @@ void MiddleView::saveAs(SaveAsType type)
     dialog.setDirectory(historyDir);
     //多选或者语音时，选择文件夹
     if (indexList.size() > 1 || type == Voice) {
-        dialog.setFileMode(DFileDialog::ExistingFile);
+        dialog.setFileMode(DFileDialog::Directory);
         dialog.setLabelText(DFileDialog::Accept, DApplication::translate("MiddleView", "Save"));
         if (QDialog::Rejected == dialog.exec()) {
             return;

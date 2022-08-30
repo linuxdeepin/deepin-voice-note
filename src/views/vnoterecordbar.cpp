@@ -211,18 +211,22 @@ void VNoteRecordBar::playVoice(VNVoiceBlock *voiceData, bool bIsSame)
  */
 void VNoteRecordBar::onAudioVolumeChange(int mode)
 {
+    static bool isShowDialog = false;
     if (m_mainLayout->currentWidget() == m_recordPanel
         && m_currentMode == mode) {
         double volume = m_audioWatcher->getVolume(
             static_cast<AudioWatcher::AudioMode>(mode));
         if (!m_showVolumeWanning) {
             m_showVolumeWanning = volumeToolow(volume);
-            if (m_showVolumeWanning) {
+            if (m_showVolumeWanning && isShowDialog == false) {
                 VNoteMessageDialog volumeLowDialog(VNoteMessageDialog::VolumeTooLow, this);
                 connect(&volumeLowDialog, &VNoteMessageDialog::rejected, this, [this]() {
                     stopRecord();
                 });
-
+                connect(&volumeLowDialog, &VNoteMessageDialog::finished, this, [ = ]() {
+                    isShowDialog = false;
+                });
+                isShowDialog = true;
                 volumeLowDialog.exec();
             }
         } else {
