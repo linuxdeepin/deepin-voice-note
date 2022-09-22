@@ -1,23 +1,7 @@
-/*
-* Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-*
-* Author:     liuyanga <liuyanga@uniontech.com>
-*
-* Maintainer: liuyanga <liuyanga@uniontech.com>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
+// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "views/vnotemainwindow.h"
 #include "views/leftview.h"
@@ -333,6 +317,26 @@ void VNoteMainWindow::initShortcuts()
     m_stPreviewShortcuts->setAutoRepeat(false);
     connect(m_stPreviewShortcuts.get(), &QShortcut::activated,
             this, &VNoteMainWindow::onPreviewShortcut);
+
+    m_stVoice2Text.reset(new QShortcut(this));
+    m_stVoice2Text->setKey(QString("Ctrl+W"));
+    m_stVoice2Text->setContext(Qt::ApplicationShortcut);
+    m_stVoice2Text->setAutoRepeat(false);
+    connect(m_stVoice2Text.get(), &QShortcut::activated, this, [ = ] {
+        qDebug() << __FUNCTION__ << __LINE__;
+        //emit JsContent::instance()->callJsVoiceToOther(0);
+        //m_richTextEdit->onMenuActionClicked(ActionManager::Instance()->getActionById(ActionManager::VoiceToText));
+    });
+
+    m_stVoice2Mp3.reset(new QShortcut(this));
+    m_stVoice2Mp3->setKey(QString("Ctrl+P"));
+    m_stVoice2Mp3->setContext(Qt::ApplicationShortcut);
+    m_stVoice2Mp3->setAutoRepeat(false);
+    connect(m_stVoice2Mp3.get(), &QShortcut::activated, this, [ = ] {
+        qDebug() << __FUNCTION__ << __LINE__;
+        //emit JsContent::instance()->callJsVoiceToOther(1);
+        //m_richTextEdit->onMenuActionClicked(ActionManager::Instance()->getActionById(ActionManager::VoiceAsSave));
+    });
 }
 
 /**

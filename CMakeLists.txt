@@ -44,15 +44,20 @@ endif()
 
 project(${APP_BIN_NAME})
 
+include(GNUInstallDirs)
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX /usr)
+endif ()
+
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-set(CMAKE_CXX_FLAGS "-Wl,--as-need -fPIE")
-set(CMAKE_EXE_LINKER_FLAGS "-pie")
-set(CMAKE_CXX_FLAGS "-g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--as-needed -fPIE")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pie")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 #安全编译参数
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstack-protector-strong -D_FORTITY_SOURCE=1 -z noexecstack -pie -fPIC -z lazy")
@@ -172,22 +177,22 @@ target_link_libraries(${APP_BIN_NAME}
     ${Qt5Xml_LIBRARIES}
 )
 
-set(CMAKE_INSTALL_PREFIX /usr)
-
 # Install files
-install(TARGETS deepin-voice-note DESTINATION bin)
+install(TARGETS deepin-voice-note DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 file(GLOB APP_QM_FILES "translations/*.qm")
-install(FILES ${APP_QM_FILES} DESTINATION share/deepin-voice-note/translations)
-install(FILES ${APP_DESKTOP} DESTINATION share/applications)
-install(FILES ${APP_CONFIG} DESTINATION share/deepin-voice-note)
-install(FILES ${APP_LOGO} DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps/)
+install(FILES ${APP_QM_FILES} DESTINATION ${CMAKE_INSTALL_DATADIR}/deepin-voice-note/translations)
+install(FILES ${APP_DESKTOP} DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+install(FILES ${APP_CONFIG} DESTINATION ${CMAKE_INSTALL_DATADIR}/deepin-voice-note)
+install(FILES ${APP_LOGO} DESTINATION  ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps/)
 if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "sw_64")
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/sw/deepin-voice-note     DESTINATION /usr/share/deepin-manual/manual-assets/application/)
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/sw/deepin-voice-note     DESTINATION ${CMAKE_INSTALL_DATADIR}/deepin-manual/manual-assets/application/)
 else()
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/deepin-voice-note     DESTINATION /usr/share/deepin-manual/manual-assets/application/)
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/deepin-voice-note     DESTINATION ${CMAKE_INSTALL_DATADIR}/deepin-manual/manual-assets/application/)
 endif()
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/web    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/deepin-voice-note)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/web    DESTINATION ${CMAKE_INSTALL_DATADIR}/deepin-voice-note)
 #if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
+if (CMAKE_BUILD_TYPE MATCHES Debug)
 add_subdirectory(tests)
+endif()
 #endif()

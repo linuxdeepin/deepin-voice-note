@@ -1,23 +1,7 @@
-/*
-* Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-*
-* Author:     liuyanga <liuyanga@uniontech.com>
-*
-* Maintainer: liuyanga <liuyanga@uniontech.com>
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
+// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "vnote2siconbutton.h"
 #include "common/utils.h"
@@ -65,7 +49,7 @@ void VNote2SIconButton::setState(int state)
  */
 void VNote2SIconButton::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (rect().contains(event->pos()) && isEnabled()) {
+    if (event->button() == Qt::LeftButton && rect().contains(event->pos()) && isEnabled()) {
         if (Normal == m_state) {
             m_state = Press;
         } else {
