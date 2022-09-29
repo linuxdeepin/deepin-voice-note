@@ -36,4 +36,4 @@ We encourage you to report issues and contribute changes
 
 ## 开源许可证
 
-Deepin Voice Notes 根据[GPL-3.0-or-later]（许可证）或任何更高版本获得许可。
+Deepin Voice Notes 根据[GPL-3.0-or-later](许可证).
