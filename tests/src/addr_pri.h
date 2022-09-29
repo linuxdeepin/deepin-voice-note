@@ -1,5 +1,4 @@
 // Copyright 2019 VW-Mobvoi Inc. All Rights Reserved.
-// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 

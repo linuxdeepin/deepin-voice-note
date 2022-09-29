@@ -36,4 +36,4 @@ We encourage you to report issues and contribute changes
 
 ## License
 
-Deepin Voice Notes is licensed under [GPLv3](LICENSE) or any later version.
+Deepin Voice Notes is licensed under [GPL-3.0-or-later](LICENSE) or any later version.
