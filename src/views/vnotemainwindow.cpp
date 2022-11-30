@@ -509,7 +509,7 @@ void VNoteMainWindow::initMiddleView()
     m_buttonAnchor = new DAnchorsBase(m_addNoteBtn);
     m_buttonAnchor->setAnchor(Qt::AnchorLeft, m_middleView, Qt::AnchorLeft);
     m_buttonAnchor->setAnchor(Qt::AnchorBottom, m_middleView, Qt::AnchorBottom);
-    m_buttonAnchor->setBottomMargin(6);
+    m_buttonAnchor->setBottomMargin(17);
     m_buttonAnchor->setLeftMargin(97);
 
     m_middleView->installEventFilter(this);
