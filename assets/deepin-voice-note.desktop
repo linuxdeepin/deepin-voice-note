@@ -1,13 +1,13 @@
 [Desktop Entry]
 Categories=Office;
 Comment=Voice Notes is a lightweight memo tool to make text notes and voice recordings.
-Exec=/usr/bin/deepin-voice-note %f
+Exec=deepin-voice-note %f
 GenericName=Voice Notes
 Icon=deepin-voice-note
 Name=Voice Notes
 StartupNotify=false
 Terminal=false
-TryExec=/usr/bin/deepin-voice-note
+TryExec=deepin-voice-note
 Type=Application
 X-Deepin-Vendor=user-custom
 Keywords=deepin-voice-note
