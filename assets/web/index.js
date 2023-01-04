@@ -335,7 +335,7 @@ function copyVoice(event) {
 
         $(docFragment).find('.voicebtn').removeClass('pause').addClass('play');
         $(docFragment).find('.voicebtn').removeClass('now');
-        $(docFragment).find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four');
+        $(docFragment).find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four').removeClass('fifth').removeClass('sixth').removeClass('seventh');
 
         isVoicePaste = true
 
@@ -472,7 +472,7 @@ function getHtml() {
     $cloneCode.find('.li').removeClass('active');
     $cloneCode.find('.voicebtn').removeClass('pause').addClass('play');
     $cloneCode.find('.voicebtn').removeClass('now');
-    $cloneCode.find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four');
+    $cloneCode.find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four').removeClass('fifth').removeClass('sixth').removeClass('seventh');
     $cloneCode.find('.translate').html("")
     return $cloneCode[0].innerHTML;
 }
@@ -751,7 +751,7 @@ function enableSummerNote() {
 // 录音播放控制， bIsPaly=ture 表示播放。
 function voicePlay(bIsPaly) {
     clearInterval(voiceIntervalObj);
-    $('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four');
+    $('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four').removeClass('fifth').removeClass('sixth').removeClass('seventh');
 
     if (bIsPaly) {
         var index = 0;
@@ -761,7 +761,7 @@ function voicePlay(bIsPaly) {
                 index++;
                 switch (index) {
                     case 1:
-                        voiceObj.removeClass('four').addClass('first');
+                        voiceObj.removeClass('seventh').addClass('first');
                         break;
                     case 2:
                         voiceObj.removeClass('first').addClass('second');
@@ -771,11 +771,20 @@ function voicePlay(bIsPaly) {
                         break;
                     case 4:
                         voiceObj.removeClass('third').addClass('four');
+                        break;
+                    case 5:
+                        voiceObj.removeClass('four').addClass('fifth');
+                        break;
+                    case 6:
+                        voiceObj.removeClass('fifth').addClass('sixth');
+                        break;
+                    case 7:
+                        voiceObj.removeClass('sixth').addClass('seventh');
                         index = 0;
                         break;
                 }
             }
-        }, 400);
+        }, 200);
     }
 }
 

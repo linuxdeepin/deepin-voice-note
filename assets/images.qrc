@@ -22,7 +22,9 @@
         <file>icons/deepin/builtin/light/play_voice3.svg</file>
         <file>icons/deepin/builtin/light/play_voice4.svg</file>
         <file>icons/deepin/builtin/play.svg</file>
+	    <file>icons/deepin/builtin/clear.svg</file>
         <file>icons/deepin/builtin/pause.svg</file>
+        <file>icons/deepin/builtin/pause_play.svg</file>
         <file>deepin-voice-note-setting.json</file>
         <file>icons/deepin/builtin/light/top.svg</file>
         <file>icons/deepin/builtin/dark/top.svg</file>
@@ -52,5 +54,13 @@
         <file>icons/deepin/builtin/light/view_change_show.svg</file>
         <file>icons/deepin/builtin/dark/view_change_show.svg</file>
         <file>icons/deepin/builtin/dark/view_change_hide.svg</file>
+        <file>icons/deepin/builtin/dark/image_show.svg</file>
+        <file>icons/deepin/builtin/dark/image.svg</file>
+        <file>icons/deepin/builtin/dark/sidebar_show.svg</file>
+        <file>icons/deepin/builtin/dark/sidebar.svg</file>
+        <file>icons/deepin/builtin/light/image_show.svg</file>
+        <file>icons/deepin/builtin/light/image.svg</file>
+        <file>icons/deepin/builtin/light/sidebar_show.svg</file>
+        <file>icons/deepin/builtin/light/sidebar.svg</file>
     </qresource>
 </RCC>

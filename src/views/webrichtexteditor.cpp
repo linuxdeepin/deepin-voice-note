@@ -1,8 +1,23 @@
-// Copyright (C) 2019 ~ 2019 UnionTech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
-//
-// SPDX-License-Identifier: GPL-3.0-or-later
-
+/*
+* Copyright (C) 2019 ~ 2019 UnionTech Software Technology Co.,Ltd.
+*
+* Author:     liuyanga <liuyanga@uniontech.com>
+*
+* Maintainer: liuyanga <liuyanga@uniontech.com>
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "webrichtexteditor.h"
 #include "common/jscontent.h"
 #include "common/actionmanager.h"
@@ -52,6 +67,7 @@ void WebRichTextEditor::initWebView()
     channel->registerObject("webobj", content);
     page()->setWebChannel(channel);
     QFileInfo info(webPage);
+    printf("%s \n", webPage);
     load(QUrl::fromLocalFile(info.absoluteFilePath()));
     page()->setBackgroundColor(DGuiApplicationHelper::instance()->applicationPalette().base().color());
 
@@ -74,37 +90,56 @@ void WebRichTextEditor::initWebView()
 
 void WebRichTextEditor::initFontsInformation()
 {
-    m_pDbusAppearance.reset(new Appearance(DEEPIN_DAEMON_APPEARANCE_PATH,
-                                           DEEPIN_DAEMON_APPEARANCE_INTERFACE,
-                                           QDBusConnection::sessionBus(), this));
-    //获取默认字体
-    QString defaultfont = m_pDbusAppearance->standardFont();
-    //获取字体列表
-    QDBusPendingReply<QString> font = m_pDbusAppearance.get()->List("standardfont");
-    QJsonArray array = QJsonDocument::fromJson(font.value().toLocal8Bit().data()).array();
-    QStringList list;
-    for (int i = 0; i != array.size(); i++) {
-        list << array.at(i).toString();
-    }
-    //获取带翻译的字体列表
-    QDBusPendingReply<QString> font1 = m_pDbusAppearance.get()->Show("standardfont", list);
-    QJsonArray arrayValue = QJsonDocument::fromJson(font1.value().toLocal8Bit().data()).array();
-    //列表格式转换
-    for (int i = 0; i != arrayValue.size(); i++) {
-        QJsonObject object = arrayValue.at(i).toObject();
-        object.insert("type", QJsonValue("standardfont"));
-        m_fontList << object["Name"].toString();
-        if (defaultfont == object["Id"].toString()) {
-            //根据id 获取带翻译的默认字体
-            m_FontDefault = object["Name"].toString();
-        }
-    }
+    // 初始化字体服务Dus接口
+    m_appearanceDBusInterface = new QDBusInterface(DEEPIN_DAEMON_APPEARANCE_SERVICE,
+                                                   DEEPIN_DAEMON_APPEARANCE_PATH,
+                                                   DEEPIN_DAEMON_APPEARANCE_INTERFACE,
+                                                   QDBusConnection::sessionBus());
+    if (m_appearanceDBusInterface->isValid()) {
+        qInfo() << "字体服务初始化成功！字体服务： " << DEEPIN_DAEMON_APPEARANCE_SERVICE << " 地址：" << DEEPIN_DAEMON_APPEARANCE_PATH << " 接口：" << DEEPIN_DAEMON_APPEARANCE_INTERFACE;
+        //获取默认字体
+        QString defaultfont = m_appearanceDBusInterface->property("StandardFont").value<QString>();
+        qInfo() << "默认字体: " << defaultfont;
+        //获取字体列表
+        QDBusPendingReply<QString> font = m_appearanceDBusInterface->call("List", "standardfont");
+        //qInfo() << "字体列表 font: " << font;
 
-    // sort for display name
-    std::sort(m_fontList.begin(), m_fontList.end(), [ = ](const QString & obj1, const QString & obj2) {
-        QCollator qc;
-        return qc.compare(obj1, obj2) < 0;
-    });
+        QJsonArray array = QJsonDocument::fromJson(font.value().toLocal8Bit().data()).array();
+        QStringList list;
+        for (int i = 0; i != array.size(); i++) {
+            list << array.at(i).toString();
+        }
+        qInfo() << "字体列表: " << list;
+
+        QList<QVariant> arg;
+        arg << "standardfont"
+            << list;
+        //获取带翻译的字体列表
+        QDBusPendingReply<QString> font1 = m_appearanceDBusInterface->callWithArgumentList(QDBus::AutoDetect,"Show", arg);
+
+        QJsonArray arrayValue = QJsonDocument::fromJson(font1.value().toLocal8Bit().data()).array();
+        qInfo() << "带翻译的字体列表: " << arrayValue;
+        //列表格式转换
+        for (int i = 0; i != arrayValue.size(); i++) {
+            QJsonObject object = arrayValue.at(i).toObject();
+            object.insert("type", QJsonValue("standardfont"));
+            m_fontList << object["Name"].toString();
+            if (defaultfont == object["Id"].toString()) {
+                //根据id 获取带翻译的默认字体
+                m_FontDefault = object["Name"].toString();
+            }
+        }
+        //qInfo() << "m_fontList: " << m_fontList;
+        //qInfo() << "m_FontDefault: " << m_FontDefault;
+
+        // sort for display name
+        std::sort(m_fontList.begin(), m_fontList.end(), [ = ](const QString & obj1, const QString & obj2) {
+            QCollator qc;
+            return qc.compare(obj1, obj2) < 0;
+        });
+    } else {
+        qWarning() << "初始化失败！字体服务 (" << DEEPIN_DAEMON_APPEARANCE_SERVICE << ") 不存在";
+    }
 }
 
 void WebRichTextEditor::onSetFontListInfo()
@@ -140,7 +175,7 @@ void WebRichTextEditor::initData(VNoteItem *data, const QString &reg, bool focus
     m_mouseClickPos = QPoint(-1, -1);
     m_setFocus = focus;
     //富文本设置异步操作，解决笔记列表不实时刷新
-    QTimer::singleShot(0, this, [=] {
+    QTimer::singleShot(0, this, [ = ] {
         setData(data, reg);
     });
 }
@@ -186,7 +221,7 @@ void WebRichTextEditor::updateNote()
 
 void WebRichTextEditor::searchText(const QString &searchKey)
 {
-    findText(searchKey, QWebEnginePage::FindFlags(), [=](const bool &result) {
+    findText(searchKey, QWebEnginePage::FindFlags(), [ = ](const bool & result) {
         if (result == false) {
             emit currentSearchEmpty();
         }

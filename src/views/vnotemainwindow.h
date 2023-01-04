@@ -1,7 +1,23 @@
-// Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
-//
-// SPDX-License-Identifier: GPL-3.0-or-later
+/*
+* Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
+*
+* Author:     liuyanga <liuyanga@uniontech.com>
+*
+* Maintainer: liuyanga <liuyanga@uniontech.com>
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #ifndef VNOTEMAINWINDOW_H
 #define VNOTEMAINWINDOW_H
@@ -9,6 +25,7 @@
 #include "common/datatypedef.h"
 #include "globaldef.h"
 #include "widgets/vnoteiconbutton.h"
+#include "widgets/vnotepushbutton.h"
 #include "common/vnoteitem.h"
 
 #include <DMainWindow>
@@ -222,6 +239,8 @@ public slots:
     //当前编辑区内容搜索为空
     void onWebSearchEmpty();
 
+    void onVNoteFolderRename(QString name);
+
 private:
     //左侧列表视图操作相关
     //添加记事本
@@ -267,6 +286,8 @@ private:
     bool setAddnotepadButtonNext(QKeyEvent *event);
     //显示记事本列表
     void showNotepadList();
+    //更新2栏显示笔记本名称
+    void updateFolderName(QString name = "");
 
 private:
     DSearchEdit *m_noteSearchEdit {nullptr};
@@ -284,6 +305,8 @@ private:
     QWidget *m_leftViewHolder {nullptr};
     QWidget *m_middleViewHolder {nullptr};
     QWidget *m_centerWidget {nullptr};
+    DLabel  *m_noteBookName {nullptr};
+    QString m_noteBookNameStr;
 
     DSplitter *m_mainWndSpliter {nullptr};
     LeftView *m_leftView {nullptr};
@@ -297,8 +320,8 @@ private:
     VNoteRecordBar *m_recordBar {nullptr};
     VNoteA2TManager *m_a2tManager {nullptr};
 
-    DIconButton *m_viewChange {nullptr}; //记事本列表收起控件
-    VNoteIconButton *m_imgInsert {nullptr}; //图片插入控件
+    VNotePushbutton *m_viewChange {nullptr}; //记事本列表收起控件
+    VNotePushbutton *m_imgInsert {nullptr}; //图片插入控件
 
     UpgradeView *m_upgradeView {nullptr};
     SplashView *m_splashView {nullptr};
@@ -322,7 +345,6 @@ private:
     QScopedPointer<QShortcut> m_stPlayorPause; //Space
     QScopedPointer<QShortcut> m_stRecording; //Ctrl+R
     QScopedPointer<QShortcut> m_stVoice2Text; //Ctrl+W
-    QScopedPointer<QShortcut> m_stVoice2Mp3; //Ctrl+P
     QScopedPointer<QShortcut> m_stSaveAsText; //Ctrl+S
     QScopedPointer<QShortcut> m_stSaveVoices; //Ctrl+Y
     QScopedPointer<QShortcut> m_stDelete; //Delete

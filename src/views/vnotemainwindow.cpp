@@ -1,7 +1,23 @@
-// Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
-//
-// SPDX-License-Identifier: GPL-3.0-or-later
+/*
+* Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
+*
+* Author:     liuyanga <liuyanga@uniontech.com>
+*
+* Maintainer: liuyanga <liuyanga@uniontech.com>
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "views/vnotemainwindow.h"
 #include "views/leftview.h"
@@ -37,6 +53,7 @@
 #include "dialog/vnotemessagedialog.h"
 #include "views/vnoterecordbar.h"
 #include "widgets/vnoteiconbutton.h"
+#include "widgets/vnotepushbutton.h"
 #include "task/vnmainwnddelayinittask.h"
 #include "task/filecleanupworker.h"
 
@@ -177,6 +194,7 @@ void VNoteMainWindow::initConnections()
             this, &VNoteMainWindow::onMenuAbout2Show);
     //处理笔记拖拽释放
     connect(m_leftView, &LeftView::dropNotesEnd, this, &VNoteMainWindow::onDropNote);
+    connect(m_leftView, &LeftView::renameVNoteFolder, this, &VNoteMainWindow::onVNoteFolderRename);
     //处理详情页刷新请求
     connect(m_middleView, &MiddleView::requestChangeRightView, this, &VNoteMainWindow::changeRightView);
     //处理详情页多选操作
@@ -317,26 +335,6 @@ void VNoteMainWindow::initShortcuts()
     m_stPreviewShortcuts->setAutoRepeat(false);
     connect(m_stPreviewShortcuts.get(), &QShortcut::activated,
             this, &VNoteMainWindow::onPreviewShortcut);
-
-    m_stVoice2Text.reset(new QShortcut(this));
-    m_stVoice2Text->setKey(QString("Ctrl+W"));
-    m_stVoice2Text->setContext(Qt::ApplicationShortcut);
-    m_stVoice2Text->setAutoRepeat(false);
-    connect(m_stVoice2Text.get(), &QShortcut::activated, this, [ = ] {
-        qDebug() << __FUNCTION__ << __LINE__;
-        //emit JsContent::instance()->callJsVoiceToOther(0);
-        //m_richTextEdit->onMenuActionClicked(ActionManager::Instance()->getActionById(ActionManager::VoiceToText));
-    });
-
-    m_stVoice2Mp3.reset(new QShortcut(this));
-    m_stVoice2Mp3->setKey(QString("Ctrl+P"));
-    m_stVoice2Mp3->setContext(Qt::ApplicationShortcut);
-    m_stVoice2Mp3->setAutoRepeat(false);
-    connect(m_stVoice2Mp3.get(), &QShortcut::activated, this, [ = ] {
-        qDebug() << __FUNCTION__ << __LINE__;
-        //emit JsContent::instance()->callJsVoiceToOther(1);
-        //m_richTextEdit->onMenuActionClicked(ActionManager::Instance()->getActionById(ActionManager::VoiceAsSave));
-    });
 }
 
 /**
@@ -359,15 +357,6 @@ void VNoteMainWindow::initTitleBar()
     titleLayout->setSpacing(10);
     titleLayout->addWidget(m_viewChange); //添加记事本列表收起控件按钮
 
-    //添加分割线
-    QFrame *line = new QFrame();
-    line->setFrameShape(QFrame::VLine);
-    line->setFrameShadow(QFrame::Plain);
-    line->setMaximumHeight(28);
-    titleLayout->addWidget(line);
-
-    titleLayout->addWidget(m_imgInsert); //添加图片插入控
-
     // Search note
     m_noteSearchEdit = new DSearchEdit(this);
     DFontSizeManager::instance()->bind(m_noteSearchEdit, DFontSizeManager::T6);
@@ -378,6 +367,7 @@ void VNoteMainWindow::initTitleBar()
 
     titlebar()->addWidget(titleWidget, Qt::AlignLeft); //图标控件居左显示
     titlebar()->addWidget(m_noteSearchEdit, Qt::AlignCenter); //将搜索框添加到标题栏居中显示
+    titlebar()->addWidget(m_imgInsert, Qt::AlignRight);
 
     QWidget::setTabOrder(titlebar(), m_viewChange); //设置title焦点传递的下一个控件
     QWidget::setTabOrder(m_viewChange, m_imgInsert); //设置焦点传递顺序
@@ -448,8 +438,8 @@ void VNoteMainWindow::initLeftView()
     m_leftViewHolder = new QWidget(m_mainWndSpliter);
     m_leftViewHolder->setObjectName("leftMainLayoutHolder");
     m_leftViewHolder->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    m_leftViewHolder->setMinimumWidth(VNOTE_LEFTVIEW_MIN_W);
     m_leftViewHolder->setMaximumWidth(VNOTE_LEFTVIEW_W);
+    m_leftViewHolder->setMinimumWidth(VNOTE_LEFTVIEW_MIN_W);
     m_leftViewHolder->setBackgroundRole(DPalette::Base);
     m_leftViewHolder->setAutoFillBackground(true);
 
@@ -491,7 +481,7 @@ void VNoteMainWindow::initMiddleView()
 {
     m_middleViewHolder = new QWidget(m_mainWndSpliter);
     m_middleViewHolder->setObjectName("middleMainLayoutHolder");
-    m_middleViewHolder->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    m_middleViewHolder->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     m_middleViewHolder->setMaximumWidth(VNOTE_MIDDLEVIEW_W);
     m_middleViewHolder->setMinimumWidth(VNOTE_MIDDLEVIEW_MIN_W);
     m_middleViewHolder->setBackgroundRole(DPalette::Base);
@@ -517,6 +507,13 @@ void VNoteMainWindow::initMiddleView()
     m_middleViewHolder->installEventFilter(this);
     // ToDo:
     //    Add Left view widget here
+    m_noteBookName = new DLabel(this);
+    DFontSizeManager::instance()->bind(m_noteBookName, DFontSizeManager::T4, QFont::Medium);
+    QVBoxLayout *labelLayout = new QVBoxLayout();
+    labelLayout->setMargin(10);
+    labelLayout->addWidget(m_noteBookName);
+
+    middleHolderLayout->addLayout(labelLayout);
     middleHolderLayout->addWidget(m_middleView);
 
     m_middleViewHolder->setLayout(middleHolderLayout);
@@ -759,12 +756,14 @@ void VNoteMainWindow::initSpliterView()
 {
     m_mainWndSpliter = new DSplitter(Qt::Horizontal, this);
     m_mainWndSpliter->setHandleWidth(2);
+    m_mainWndSpliter->setChildrenCollapsible(false);
 
     initLeftView();
     initMiddleView();
     initRightView();
 
     // Disable spliter drag & resize
+    /*
     QList<QWidget *> Children {m_middleViewHolder, m_stackedRightMainWidget};
 
     for (auto it : Children) {
@@ -774,6 +773,7 @@ void VNoteMainWindow::initSpliterView()
             handle->setDisabled(true);
         }
     }
+    */
 }
 
 #ifdef IMPORT_OLD_VERSION_DATA
@@ -1059,18 +1059,16 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
  */
 void VNoteMainWindow::resizeEvent(QResizeEvent *event)
 {
-
+    // 更新搜索框的大小
     if(this->geometry().width() >= DEFAULT_WINDOWS_WIDTH) {
         m_noteSearchEdit->resize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H);
     } else if (this->geometry().width() <= MIN_WINDOWS_WIDTH) {
         m_noteSearchEdit->resize(VNOTE_SEARCHBAR_MIN_W, VNOTE_SEARCHBAR_H);
     } else {
-        double wMainWin = (this->geometry().width() * 1.0) / DEFAULT_WINDOWS_WIDTH;
-        int wsearch =VNOTE_SEARCHBAR_W * wMainWin;
+        double wMainWin = ((this->geometry().width() - MIN_WINDOWS_WIDTH) * 1.0) / (DEFAULT_WINDOWS_WIDTH - MIN_WINDOWS_WIDTH);
+        int wsearch = static_cast<int>((VNOTE_SEARCHBAR_W - VNOTE_SEARCHBAR_MIN_W) * wMainWin) + VNOTE_SEARCHBAR_MIN_W;
         m_noteSearchEdit->resize(wsearch , VNOTE_SEARCHBAR_H);
     }
-
-    m_middleView->repaint();
 
     if (m_asrErrMeassage && m_asrErrMeassage->isVisible()) {
         int xPos = (m_centerWidget->width() - m_asrErrMeassage->width()) / 2;
@@ -1477,6 +1475,7 @@ int VNoteMainWindow::loadNotes(VNoteFolder *folder)
     m_middleView->setVisibleEmptySearch(false);
     if (folder) {
         m_middleView->setCurrentId(folder->id);
+        updateFolderName(folder->name);
         VNoteItemOper noteOper;
         VNOTE_ITEMS_MAP *notes = noteOper.getFolderNotes(folder->id);
         if (notes) {
@@ -1594,6 +1593,7 @@ void VNoteMainWindow::onNewNotebook()
  */
 void VNoteMainWindow::onNewNote()
 {
+    qDebug() << "==========" << m_addNoteBtn->geometry().topLeft();
     static struct timeval curret = {0, 0};
     static struct timeval lastPress = {0, 0};
 
@@ -1629,6 +1629,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_leftView->setEnabled(false);
             m_addNotepadBtn->setVisible(false);
             m_addNoteBtn->setVisible(false);
+            m_noteBookName->setVisible(false);
         }
         break;
     case SearchEnd:
@@ -1639,6 +1640,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_addNotepadBtn->setVisible(true);
             m_addNoteBtn->setVisible(true);
             m_noteSearchEdit->lineEdit()->setFocus();
+            m_noteBookName->setVisible(true);
             stateOperation->operState(OpsStateInterface::StateSearching, false);
             onVNoteFolderChange(m_leftView->restoreNotepadItem(), QModelIndex());
         }
@@ -1653,6 +1655,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNotepadBtn->setEnabled(false);
         m_middleView->setOnlyCurItemMenuEnable(true);
         m_addNoteBtn->setDisabled(true);
+        m_noteBookName->setDisabled(true);
         break;
     case PlayVoiceEnd:
         if (stateOperation->isSearching()) {
@@ -1664,6 +1667,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_addNotepadBtn->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
             m_addNoteBtn->setDisabled(false);
+            m_noteBookName->setDisabled(false);
         }
         stateOperation->operState(OpsStateInterface::StatePlaying, false);
         //停止播放更新web前端语音停止状态
@@ -1681,6 +1685,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_middleView->setOnlyCurItemMenuEnable(true);
         //m_rightView->setEnablePlayBtn(false);
         m_addNoteBtn->setDisabled(true);
+        m_noteBookName->setDisabled(true);
         break;
     case RecordEnd:
         //结束录音时设置播放按钮可用
@@ -1691,6 +1696,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_addNotepadBtn->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
             m_addNoteBtn->setDisabled(false);
+            m_noteBookName->setDisabled(false);
         }
         //m_rightView->setEnablePlayBtn(true);
         stateOperation->operState(OpsStateInterface::StateRecording, false);
@@ -1703,6 +1709,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
         m_addNotepadBtn->setEnabled(false);
         m_middleView->setOnlyCurItemMenuEnable(true);
         m_addNoteBtn->setDisabled(true);
+        m_noteBookName->setDisabled(true);
         m_leftView->closeMenu();
         m_middleView->closeMenu();
         break;
@@ -1713,6 +1720,7 @@ void VNoteMainWindow::setSpecialStatus(SpecialStatus status)
             m_addNotepadBtn->setEnabled(true);
             m_middleView->setOnlyCurItemMenuEnable(false);
             m_addNoteBtn->setDisabled(false);
+            m_noteBookName->setDisabled(false);
         }
         stateOperation->operState(OpsStateInterface::StateVoice2Text, false);
         break;
@@ -1921,15 +1929,15 @@ void VNoteMainWindow::initMenuExtension()
  */
 void VNoteMainWindow::initTitleIconButton()
 {
-    m_viewChange = new DIconButton(this);
+    m_viewChange = new VNotePushbutton(this);
     m_viewChange->setIconSize(QSize(36, 36));
     m_viewChange->setFixedSize(QSize(36, 36));
+    m_viewChange->setIcon(Utils::loadSVG("sidebar_show.svg", false));
 
-    m_imgInsert = new VNoteIconButton(this, "img_insert_normal.svg");
+    m_imgInsert = new VNotePushbutton(this);
     m_imgInsert->setIconSize(QSize(36, 36));
     m_imgInsert->setFixedSize(QSize(36, 36));
-    m_imgInsert->SetDisableIcon("img_insert_disable.svg");
-    m_imgInsert->setSeparateThemIcons(true); //区分主题
+    m_imgInsert->setIcon(Utils::loadSVG("image_show.svg", false));
     m_imgInsert->setDisabled(true); //初始为禁用状态
 }
 
@@ -2021,9 +2029,12 @@ bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
         // 更新按钮位置
         int position = (m_middleViewHolder->width() - m_addNoteBtn->width()) / 2 - 6;
         m_buttonAnchor->setLeftMargin(position);
-        m_middleView->resize(m_middleViewHolder->width(), m_middleViewHolder->height());
+        m_middleView->resize(m_middleViewHolder->width(), m_middleViewHolder->height() - m_noteBookName->height() - 20);
+        //qDebug() << m_middleViewHolder->geometry() << m_noteBookName->height() << m_noteBookName->geometry();
+        updateFolderName();
         return true;
     }
+
     if (e->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = dynamic_cast<QKeyEvent *>(e);
         if (keyEvent->key() == Qt::Key_Tab) {
@@ -2377,7 +2388,7 @@ void VNoteMainWindow::onInsertImageToWebEditor()
         "",
         QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
         "Image file(*.jpg *.png *.bmp)");
-
+    m_imgInsert->setChecked(false);
     if (JsContent::instance()->insertImages(filePaths)) {
         m_richTextEdit->setFocus(); //插入成功，将焦点转移至编辑区
     }
@@ -2398,6 +2409,31 @@ void VNoteMainWindow::onWebSearchEmpty()
         m_middleView->selectAfterRemoved();
     }
 }
+void VNoteMainWindow::onVNoteFolderRename(QString name)
+{
+    updateFolderName(name);
+}
+void VNoteMainWindow::updateFolderName(QString name)
+{
+    QString showText = name;
+    if (showText.isEmpty()) {
+        showText = m_noteBookNameStr;
+    } else {
+        m_noteBookNameStr = showText;
+    }
+    QFontMetrics fm(DFontSizeManager::instance()->t4());
+    int labelWidth = m_noteBookName->geometry().width();
+    int leftIndex = 1;
+    if (fm.boundingRect(showText).size().width() > labelWidth) {
+        for (;leftIndex < showText.size(); ++leftIndex) {
+            if (fm.boundingRect((showText.left(leftIndex) + "...")).size().width() >= labelWidth) {
+                break;
+            }
+        }
+        showText = showText.left(leftIndex - 1) + "...";
+    }
+    m_noteBookName->setText(showText);
+}
 
 void VNoteMainWindow::showNotepadList()
 {
@@ -2407,11 +2443,11 @@ void VNoteMainWindow::showNotepadList()
     if (visible) {
         appDp.setBrush(DPalette::Light, appDp.color(DPalette::Active, DPalette::Highlight));
         appDp.setBrush(DPalette::Dark, appDp.color(DPalette::Active, DPalette::Highlight));
-        m_viewChange->setIcon(Utils::loadSVG("view_change_show.svg", false));
+        //m_viewChange->setIcon(Utils::loadSVG("view_change_show.svg", false));
     } else {
-        m_viewChange->setIcon(Utils::loadSVG("view_change_hide.svg", false));
+        //m_viewChange->setIcon(Utils::loadSVG("view_change_hide.svg", false));
     }
-    m_viewChange->setPalette(appDp);
+    //m_viewChange->setPalette(appDp);
     //显示/隐藏笔记列表
     m_leftViewHolder->setVisible(visible);
 }

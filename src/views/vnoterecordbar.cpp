@@ -1,7 +1,23 @@
-// Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
-//
-// SPDX-License-Identifier: GPL-3.0-or-later
+/*
+* Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
+*
+* Author:     liuyanga <liuyanga@uniontech.com>
+*
+* Maintainer: liuyanga <liuyanga@uniontech.com>
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "vnoterecordbar.h"
 #include "globaldef.h"
@@ -249,9 +265,7 @@ void VNoteRecordBar::onAudioDeviceChange(int mode)
                 emit sigDeviceExceptionMsgClose();
                 msgshow = false;
             }
-//            m_recordBtn->setEnabled(true);
-            //根据 系统>控制中心>声音>设备管理>输入设备 中的使能情况设置按钮是否可用
-            m_recordBtn->setEnabled(m_audioWatcher->getDeviceEnable(static_cast<AudioWatcher::AudioMode>(m_currentMode)));
+            m_recordBtn->setEnabled(true);
             m_recordBtn->setToolTip("");
             if (m_mainLayout->currentWidget() == m_recordPanel) {
                 stopRecord();
@@ -291,8 +305,6 @@ void VNoteRecordBar::initAudioWatcher()
             this, &VNoteRecordBar::onAudioDeviceChange);
     connect(m_audioWatcher, &AudioWatcher::sigVolumeChange,
             this, &VNoteRecordBar::onAudioVolumeChange);
-    connect(m_audioWatcher, &AudioWatcher::sigDeviceEnableChanged,
-            this, &VNoteRecordBar::onDeviceEnableChanged);
 }
 
 /**
@@ -315,20 +327,6 @@ void VNoteRecordBar::onChangeTheme()
     highColor.setAlphaF(0.4);
     palette.setColor(DPalette::Disabled, DPalette::Highlight, highColor);
     m_recordBtn->setPalette(palette);
-}
-
-/**
- * @brief VNoteRecordBar::onDeviceEnableChanged
- * 根据 系统>控制中心>声音>设备管理>输入设备 中的使能情况设置按钮是否可用
- * @param mode
- * @param enabled
- */
-void VNoteRecordBar::onDeviceEnableChanged(int mode, bool enabled)
-{
-    qInfo() << "通过控制中心改变默认设备 "<< mode << "（输出设备:0 输入设备:1）使能状态！enalbed:" <<enabled;
-    if (m_currentMode == mode) {
-        m_recordBtn->setEnabled(enabled);
-    }
 }
 
 void VNoteRecordBar::stopPlay()

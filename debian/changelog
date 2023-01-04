@@ -1,3 +1,39 @@
+deepin-voice-note (6.0.6) unstable; urgency=medium
+
+  * New version 6.0.6
+
+ -- hemingyang <hemingyang@uniontech.com>  Mon, 3 Jan 2023 15:10:45 +0800
+
+deepin-voice-note (6.0.5) unstable; urgency=medium
+
+  * New version 6.0.5
+
+ -- wangcong <wangcong@uniontech.com>  Mon, 28 Nov 2022 17:42:45 +0800
+
+deepin-voice-note (6.0.4) unstable; urgency=medium
+
+  * New version 6.0.4
+
+ -- hemingyang <hemingyang@uniontech.com>  Tues, 08 Nov 2022 14:22:05 +0800
+
+deepin-voice-note (6.0.3) unstable; urgency=medium
+
+  * New version 6.0.3
+
+ -- hemingyang <hemingyang@uniontech.com>  Thur, 20 Sep 2022 14:41:05 +0800
+
+deepin-voice-note (6.0.2) unstable; urgency=medium
+
+  * New version 6.0.2
+
+ -- hemingyang <hemingyang@uniontech.com>  Thur, 15 Sep 2022 14:38:35 +0800
+
+deepin-voice-note (6.0.1) unstable; urgency=medium
+
+  * New version 6.0.1
+
+ -- hemingyang <hemingyang@uniontech.com>  Mon, 5 Sep 2022 14:38:35 +0800
+
 deepin-voice-note (1.0) unstable; urgency=medium
 
   * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
