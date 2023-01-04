@@ -57,19 +57,31 @@ strike[style="text-decoration-line: underline;"] {
 }
 
 .wifi-symbol .first {
-    background-image: url(../img/d1.svg);
+    background-image: url(../img/play_voice1.svg);
 }
 
 .wifi-symbol .second {
-    background-image: url(../img/d2.svg);
+    background-image: url(../img/play_voice2.svg);
 }
 
 .wifi-symbol .third {
-    background-image: url(../img/d3.svg);
+    background-image: url(../img/play_voice3.svg);
 }
 
 .wifi-symbol .four {
-    background-image: url(../img/d4.svg);
+    background-image: url(../img/play_voice4.svg);
+}
+
+.wifi-symbol .fifth {
+    background-image: url(../img/play_voice5.svg);
+}
+
+.wifi-symbol .sixth {
+    background-image: url(../img/play_voice6.svg);
+}
+
+.wifi-symbol .seventh {
+    background-image: url(../img/play_voice7.svg);
 }
 
 .dropdown-fontsize>li>a, .dropdown-fontname>li>a {

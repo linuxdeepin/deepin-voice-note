@@ -1,7 +1,23 @@
-// Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2022 UnionTech Software Technology Co., Ltd.
-//
-// SPDX-License-Identifier: GPL-3.0-or-later
+/*
+* Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
+*
+* Author:     liuyanga <liuyanga@uniontech.com>
+*
+* Maintainer: liuyanga <liuyanga@uniontech.com>
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "vnoteplaywidget.h"
 #include "vnote2siconbutton.h"
@@ -9,7 +25,9 @@
 #include "common/utils.h"
 
 #include <DDialogCloseButton>
-
+#include <DFontSizeManager>
+#include <DFloatingWidget>
+#include <DBlurEffectWidget>
 #include <QGridLayout>
 #include <QDebug>
 
@@ -20,6 +38,7 @@
 VNotePlayWidget::VNotePlayWidget(QWidget *parent)
     : DFloatingWidget(parent)
 {
+    //setFixedHeight(76);
     initUI();
     initPlayer();
     initConnection();
@@ -30,40 +49,65 @@ VNotePlayWidget::VNotePlayWidget(QWidget *parent)
  */
 void VNotePlayWidget::initUI()
 {
-    m_playerBtn = new VNote2SIconButton("play.svg", "pause.svg", this);
-    m_playerBtn->setIconSize(QSize(28, 28));
-    m_playerBtn->setFixedSize(QSize(48, 48));
+    m_playerBtn = new DIconButton(this);
+    m_playerBtn->setIcon(Utils::loadSVG("play.svg", true));
+    m_playerBtn->setIconSize(QSize(36, 36));
+    m_playerBtn->setFixedSize(QSize(36, 36));
+    m_playerBtn->setFlat(true);
+    m_playerBtn->setEnabledCircle(true);
 
     m_timeLab = new DLabel(this);
+    QFont timeLabFont;
+    timeLabFont.setPixelSize(10);
+    m_timeLab->setFont(timeLabFont);
     m_timeLab->setText("00:00/00:00");
-    m_timeLab->setFixedWidth(124);
+    m_timeLab->setFixedHeight(15);
+
     m_sliderHover = new DWidget(this);
-    m_nameLab = new DLabel(m_sliderHover);
-    m_nameLab->setContentsMargins(8, 0, 0, 0);
-    m_slider = new DSlider(Qt::Horizontal, m_sliderHover);
+    m_sliderHover->setStyleSheet("QWidget{background-color:#F3F3F3;border-radius:4px;}");
+    m_sliderHover->setFixedHeight(36);
+
+    m_nameLab = new DLabel(this);
+    QFont nameLabFont;
+    nameLabFont.setPixelSize(12);
+    m_nameLab->setFont(nameLabFont);
+    m_nameLab->setFixedHeight(17);
+
+    QHBoxLayout *t_blurAreaLayout = new QHBoxLayout(this);
+    t_blurAreaLayout->setContentsMargins(0, 0, 0, 0);
+    m_slider = new DSlider(Qt::Horizontal);
+    m_slider->setFixedHeight(40);
     m_slider->setMinimum(0);
     m_slider->setValue(0);
+    t_blurAreaLayout->addWidget(m_slider, 0, Qt::AlignVCenter);
+    m_sliderHover->setLayout(t_blurAreaLayout);
 
-    m_closeBtn = new DIconButton(DStyle::SP_CloseButton, this);
-    m_closeBtn->setIconSize(QSize(26, 26));
-    m_closeBtn->setFixedSize(QSize(26, 26));
+    m_closeBtn = new DIconButton(this);
+    m_closeBtn->setIcon(Utils::loadSVG("clear.svg", true));
+    m_closeBtn->setIconSize(QSize(22, 22));
+    m_closeBtn->setFixedSize(QSize(22, 22));
     m_closeBtn->setFlat(true);
     m_closeBtn->setEnabledCircle(true);
 
+    QHBoxLayout *labLayout = new QHBoxLayout;
+    labLayout->setContentsMargins(0, 0, 0, 0);
+    labLayout->addWidget(m_nameLab, 0, Qt::AlignLeft | Qt::AlignVCenter);
+    labLayout->addStretch();
+    labLayout->addWidget(m_timeLab, 0, Qt::AlignRight| Qt::AlignVCenter);
+
     QVBoxLayout *sliderLayout = new QVBoxLayout;
-    sliderLayout->addWidget(m_nameLab, Qt::AlignLeft);
-    sliderLayout->addWidget(m_slider, Qt::AlignTop);
-    sliderLayout->setSpacing(0);
-    m_sliderHover->setLayout(sliderLayout);
     //语音名和进度条上下边距
-    sliderLayout->setContentsMargins(0, 1, 0, 1);
+    sliderLayout->setContentsMargins(0, 0, 0, 0);
+    sliderLayout->addSpacing(2);
+    sliderLayout->addWidget(m_sliderHover, Qt::AlignTop);
+    sliderLayout->addLayout(labLayout, Qt::AlignBottom);
+
     QHBoxLayout *mainLayout = new QHBoxLayout;
-    mainLayout->addWidget(m_playerBtn);
-    mainLayout->addWidget(m_sliderHover);
-    mainLayout->addWidget(m_timeLab, 0, Qt::AlignLeft);
-    mainLayout->addWidget(m_closeBtn);
-    mainLayout->setContentsMargins(13, 0, 13, 0);
-    mainLayout->setSizeConstraint(QLayout::SetNoConstraint);
+    mainLayout->setContentsMargins(20, 9, 20, 7);
+    mainLayout->setSpacing(20);
+    mainLayout->addWidget(m_playerBtn, 0, Qt::AlignVCenter);
+    mainLayout->addLayout(sliderLayout);
+    mainLayout->addWidget(m_closeBtn, 0, Qt::AlignVCenter);
     this->setLayout(mainLayout);
     m_sliderHover->installEventFilter(this);
     m_slider->installEventFilter(this);
@@ -89,7 +133,7 @@ void VNotePlayWidget::initConnection()
     connect(m_player, &VlcPalyer::playEnd,
             this, &VNotePlayWidget::onCloseBtnClicked, Qt::QueuedConnection);
 
-    connect(m_playerBtn, &VNote2SIconButton::clicked,
+    connect(m_playerBtn, &DIconButton::clicked,
             this, &VNotePlayWidget::onPlayerBtnClicked);
 
     connect(m_closeBtn, &DIconButton::clicked,
@@ -203,11 +247,11 @@ bool VNotePlayWidget::eventFilter(QObject *o, QEvent *e)
         }
         return true;
     } else {
-        if (e->type() == QEvent::Enter) {
-            m_nameLab->setVisible(false);
-        } else if (e->type() == QEvent::Leave) {
-            m_nameLab->setVisible(true);
-        }
+//        if (e->type() == QEvent::Enter) {
+//            m_nameLab->setVisible(false);
+//        } else if (e->type() == QEvent::Leave) {
+//            m_nameLab->setVisible(true);
+//        }
     }
     return false;
 }
@@ -243,11 +287,11 @@ void VNotePlayWidget::playVoice(VNVoiceBlock *voiceData, bool bIsSame)
         VlcPalyer::VlcState status = getPlayerStatus();
         if (status == VlcPalyer::Playing) { //当前语音播放中则执行暂停操作
             m_player->pause();
-            m_playerBtn->setState(VNote2SIconButton::Normal); //当前语音暂停中则执行播放操作
+            m_playerBtn->setIcon(Utils::loadSVG("play.svg", true)); //当前语音暂停中则执行播放操作
             emit sigPauseVoice(m_voiceBlock);
         } else if (status == VlcPalyer::Paused) {
             m_player->play();
-            m_playerBtn->setState(VNote2SIconButton::Press);
+            m_playerBtn->setIcon(Utils::loadSVG("pause_play.svg", true));
             emit sigPlayVoice(m_voiceBlock);
         }
     } else if (nullptr != voiceData) { //与上一次语音不相同，重新播放语音
@@ -256,7 +300,7 @@ void VNotePlayWidget::playVoice(VNVoiceBlock *voiceData, bool bIsSame)
         m_player->setFilePath(m_voiceBlock->voicePath);
         m_nameLab->setText(voiceData->voiceTitle);
         m_timeLab->setText(Utils::formatMillisecond(0, 0) + "/" + Utils::formatMillisecond(voiceData->voiceSize));
-        m_playerBtn->setState(VNote2SIconButton::Press);
+        m_playerBtn->setIcon(Utils::loadSVG("pause_play.svg", true));
         m_player->play();
         emit sigPlayVoice(m_voiceBlock);
     } else {

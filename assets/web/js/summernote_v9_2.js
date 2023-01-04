@@ -2763,7 +2763,7 @@
             let editableClone = this.$editable.clone()
             $(editableClone).find('.voicebtn').removeClass('pause').addClass('play');
             $(editableClone).find('.voicebtn').removeClass('now');
-            $(editableClone).find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four');
+            $(editableClone).find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four').removeClass('fifth').removeClass('sixth').removeClass('seventh');
             $(editableClone).find(".translate").html('')
             return {
                 contents: $(editableClone).html(),
@@ -7187,7 +7187,7 @@
             var rect = lists.last(styleInfo.range.getClientRects());
             this.isShowOlUl(styleInfo)
             if (rect) {
-                this.$popover.find('.note-color').removeClass('open')
+                this.$popover.find('.note-color').removeClass('open');
                 this.$popover.find('.note-fontsize-class').removeClass('open')
                 this.$popover.find('.note-font-family-class').removeClass('open')
                 let winWidth = $(document).width()

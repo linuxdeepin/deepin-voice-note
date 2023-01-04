@@ -155,31 +155,50 @@ body {
 .wifi-symbol .first {
     background-image: url(./img/play_voice1.svg);
     background-size: contain;
-    width: 19px;
-    height: 17px;
+    width: 20px;
+    height: 20px;
 }
 
 .wifi-symbol .second {
     background-image: url(./img/play_voice2.svg);
     background-size: contain;
-    width: 19px;
-    height: 17px;
+    width: 20px;
+    height: 20px;
 }
 
 .wifi-symbol .third {
     background-image: url(./img/play_voice3.svg);
     background-size: contain;
-    width: 19px;
-    height: 17px;
+    width: 20px;
+    height: 20px;
 }
 
 .wifi-symbol .four {
     background-image: url(./img/play_voice4.svg);
     background-size: contain;
-    width: 19px;
-    height: 17px;
+    width: 20px;
+    height: 20px;
 }
 
+.wifi-symbol .fifth {
+    background-image: url(./img/play_voice5.svg);
+    background-size: contain;
+    width: 20px;
+    height: 20px;
+}
+
+.wifi-symbol .sixth {
+    background-image: url(./img/play_voice6.svg);
+    background-size: contain;
+    width: 20px;
+    height: 20px;
+}
+.wifi-symbol .seventh {
+    background-image: url(./img/play_voice7.svg);
+    background-size: contain;
+    width: 20px;
+    height: 20px;
+}
 @keyframes fadeInOut {
     0% {
         opacity: 0;
