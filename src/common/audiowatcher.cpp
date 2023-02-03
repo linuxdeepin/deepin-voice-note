@@ -14,6 +14,8 @@
 AudioWatcher::AudioWatcher(QObject *parent)
     : QObject(parent)
 {
+    qDebug() << __LINE__ << __FUNCTION__;
+    m_isVirtualMachineHw = isVirtualMachineHw();
     initWatcherCofing();
     initDeviceWacther();
     initConnections();
@@ -25,19 +27,19 @@ AudioWatcher::AudioWatcher(QObject *parent)
 void AudioWatcher::initDeviceWacther()
 {
     m_pAudioInterface.reset(new com::deepin::daemon::Audio(
-        m_serviceName,
-        "/com/deepin/daemon/Audio",
-        QDBusConnection::sessionBus(), this));
+                                m_serviceName,
+                                "/com/deepin/daemon/Audio",
+                                QDBusConnection::sessionBus(), this));
 
     m_pDefaultSink.reset(new com::deepin::daemon::audio::Sink(
-        m_serviceName,
-        m_pAudioInterface->defaultSink().path(),
-        QDBusConnection::sessionBus(), this));
+                             m_serviceName,
+                             m_pAudioInterface->defaultSink().path(),
+                             QDBusConnection::sessionBus(), this));
 
     m_pDefaultSource.reset(new com::deepin::daemon::audio::Source(
-        m_serviceName,
-        m_pAudioInterface->defaultSource().path(),
-        QDBusConnection::sessionBus(), this));
+                               m_serviceName,
+                               m_pAudioInterface->defaultSource().path(),
+                               QDBusConnection::sessionBus(), this));
 
     m_inAudioPortVolume = m_pDefaultSource->volume();
     m_inAudioPort = m_pDefaultSource->activePort();
@@ -51,15 +53,15 @@ void AudioWatcher::initDeviceWacther()
             << "\ncurrent input active port name:" << m_inAudioPort.name
             << "\ncurrent input active port availability:" << m_inAudioPort.availability
             << "\ncurrent input device name:" << m_pDefaultSource->name()
-            << "\ncurrent input port count:" <<m_pDefaultSource->ports().count()
+            << "\ncurrent input port count:" << m_pDefaultSource->ports().count()
             << "\nOutput:"
             << "\ncurrent output device path:" << m_pAudioInterface->defaultSink().path()
             << "\ncurrent output active port name:" << m_outAudioPort.name
             << "\ncurrent output active port availability:" << m_outAudioPort.availability
             << "\ncurrent output device name:" << m_pDefaultSink->name()
-            << "\ncurrent output port count:" <<m_pDefaultSink->ports().count();
+            << "\ncurrent output port count:" << m_pDefaultSink->ports().count();
 
-    updateDeviceEnabled(m_pAudioInterface->cards(),false);
+    updateDeviceEnabled(m_pAudioInterface->cards(), false);
 }
 
 /**
@@ -90,9 +92,107 @@ void AudioWatcher::initConnections()
                                           "sa{sv}as",
                                           this,
                                           SLOT(onDeviceEnableState(QDBusMessage))
-                                          );
+                                         );
 }
 
+/**
+ * @brief AudioWatcher::isVirtualMachineHw 判断当前环境是否是云平台
+ * @return false:不是云平台 true:是云平台
+ */
+bool AudioWatcher::isVirtualMachineHw()
+{
+    qDebug() << __LINE__ << __FUNCTION__ << "正在检测系统环境...";
+    bool isVirtualMachine = false;
+    QString reslut = vnSystemInfo();
+    qDebug() << "reslut: " << reslut;
+    if (reslut.isEmpty()) {
+        return isVirtualMachine;
+    }
+    QStringList fields;
+    fields <<  "KVM Virtual Machine";
+    fields <<  "QEMU";
+    fields <<  "HUAWEICLOUD";
+    foreach (QString field, fields) {
+        if (reslut.contains(field)) {
+            isVirtualMachine = true;
+            break;
+        }
+    }
+    qDebug() << __LINE__ << __FUNCTION__ << "是否是云平台？" << (isVirtualMachine ? "是" : "否") ;
+    qDebug() << __LINE__ << __FUNCTION__ << "检测完成" ;
+    return isVirtualMachine;
+}
+
+/**
+ * @brief AudioWatcher::vnSystemInfo 获取部分系统信息
+ * @return 系统信息
+ */
+QString AudioWatcher::vnSystemInfo()
+{
+
+    qDebug() << __LINE__ << __FUNCTION__ << "dmidecode命令查询...";
+    QStringList options;
+    options << QString(QStringLiteral("-c"));
+    options << QString(QStringLiteral("dmidecode | grep -PB 0 'Asset Tag|Product Name'"));
+    QProcess process;
+    process.start(QString(QStringLiteral("bash")), options);
+    process.waitForFinished();
+    process.waitForReadyRead();
+    QByteArray tempArray =  process.readAllStandardOutput();
+    char *charTemp = tempArray.data();
+    QString reslut = QString(QLatin1String(charTemp));
+    qDebug() << "command: " << options.join(" ");
+    qDebug() << "reslut: " << reslut;
+    process.close();
+    qDebug() << __LINE__ << __FUNCTION__ << "dmidecode命令查询结束";
+    if (!reslut.isEmpty()) {
+        return reslut;
+    }
+#if 0
+    //可以采用设备管理器提供的dbus接口获取对应的字段（此方式会形成依赖）
+    qDebug() << __LINE__ << __FUNCTION__ << "devicemanager服务查询...";
+    reslut.clear();
+    QDBusInterface devicemanagerInterface("com.deepin.devicemanager",
+                                          "/com/deepin/devicemanager",
+                                          "com.deepin.devicemanager",
+                                          QDBusConnection::systemBus());
+    if (devicemanagerInterface.isValid()) {
+        QList<QVariant> callCount;
+        QVariant arg = "dmidecode_1";
+        callCount << "dmidecode_1";
+        QVariant arg1 = "dmidecode_3";
+        callCount << "dmidecode_3";
+        foreach (QVariant arg, callCount) {
+            QDBusReply<QString> reply = devicemanagerInterface.call(QDBus::AutoDetect, "getInfo", arg);
+            if (reply.isValid()) {
+                QString tempReslut = reply.value();
+                //qDebug() << ">>>>>>>>>>> tempReslut: " << tempReslut;
+                if (tempReslut.contains("\n")) {
+                    tempReslut = tempReslut.replace("\t", "");
+                    QStringList tempList = tempReslut.split("\n");
+                    //qDebug() << ">>>>>>>>>>> tempList: " << tempList;
+                    foreach (QString tempStr, tempList) {
+                        //qDebug() << ">>>>>>>>>>> tempStr: " << tempStr;
+                        tempStr.append("\n");
+                        if (tempStr.contains("Product Name")) {
+                            reslut.append(tempStr);
+                        } else if (tempStr.contains("Manufacturer")) {
+                            reslut.append(tempStr);
+                        } else if (tempStr.contains("Asset Tag")) {
+                            reslut.append(tempStr);
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        qWarning() << "devicemanager service not available!!!";
+    }
+    qDebug() << "查询结果: " << reslut;
+    qDebug() << __LINE__ << __FUNCTION__ << "devicemanager服务查询结束";
+#endif
+    return reslut;
+}
 
 /**
  * @brief AudioWatcher::updateDeviceEnabled 更新控制中心中是否更改设备的使能状态
@@ -102,29 +202,29 @@ void AudioWatcher::initConnections()
  * @param cardsStr:设备信息
  * @param isEmitSig:是否发信号
  */
-void AudioWatcher::updateDeviceEnabled(QString cardsStr,bool isEmitSig)
+void AudioWatcher::updateDeviceEnabled(QString cardsStr, bool isEmitSig)
 {
     //所有声卡信息
     QJsonDocument doc = QJsonDocument::fromJson(cardsStr.toUtf8());
     QJsonArray cards = doc.array();
     //遍历声卡，找出当前默认声卡对应的使能状态
-    foreach(QJsonValue card , cards){
+    foreach (QJsonValue card, cards) {
         //该声卡的所有端口
         QJsonArray ports = card.toObject()["Ports"].toArray();
         //qDebug() << "ports: " << ports;
         //遍历所有端口，找出当前默认设备对应的端口并判断是否可用
-        foreach(QJsonValue port , ports){
+        foreach (QJsonValue port, ports) {
             QString portName = port.toObject()["Name"].toString();
             //qDebug() << "portName: " << portName << "m_outAudioPort.name: " << m_outAudioPort.name << "m_inAudioPort.name: " <<m_inAudioPort.name ;
-            if(portName == m_outAudioPort.name){
+            if (portName == m_outAudioPort.name) {
                 m_outIsEnable = port.toObject()["Enabled"].toBool();
-                if(isEmitSig)
-                    sigDeviceEnableChanged(Internal,m_outIsEnable);
+                if (isEmitSig)
+                    sigDeviceEnableChanged(Internal, m_outIsEnable);
             }
-            if(portName == m_inAudioPort.name){
+            if (portName == m_inAudioPort.name) {
                 m_inIsEnable = port.toObject()["Enabled"].toBool();
-                if(isEmitSig)
-                    sigDeviceEnableChanged(Micphone,m_inIsEnable);
+                if (isEmitSig)
+                    sigDeviceEnableChanged(Micphone, m_inIsEnable);
             }
         }
     }
@@ -175,9 +275,9 @@ void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &value)
             << "\ndevice name:" << m_pDefaultSource->name();
 
     m_pDefaultSource.reset(new com::deepin::daemon::audio::Source(
-        m_serviceName,
-        value.path(),
-        QDBusConnection::sessionBus(), this));
+                               m_serviceName,
+                               value.path(),
+                               QDBusConnection::sessionBus(), this));
     connect(m_pDefaultSource.get(), SIGNAL(VolumeChanged(double)), this, SLOT(onSourceVolumeChanged(double)));
     connect(m_pDefaultSource.get(), SIGNAL(MuteChanged(bool)), this, SLOT(onSourceMuteChanged(bool)));
     connect(m_pDefaultSource.get(), SIGNAL(ActivePortChanged(AudioPort)),
@@ -190,7 +290,7 @@ void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &value)
             << "\nactive port:" << m_inAudioPort.name << ";" << m_inAudioPort.availability
             << "\ndevice name:" << m_pDefaultSource->name();
 
-    updateDeviceEnabled(m_pAudioInterface->cards(),false);
+    updateDeviceEnabled(m_pAudioInterface->cards(), false);
     emit sigDeviceChange(Micphone);
 }
 
@@ -205,9 +305,9 @@ void AudioWatcher::onDefaultSinkChanaged(const QDBusObjectPath &value)
             << "\ndevice name:" << m_pDefaultSink->name();
 
     m_pDefaultSink.reset(new com::deepin::daemon::audio::Sink(
-        m_serviceName,
-        value.path(),
-        QDBusConnection::sessionBus(), this));
+                             m_serviceName,
+                             value.path(),
+                             QDBusConnection::sessionBus(), this));
     connect(m_pDefaultSink.get(), SIGNAL(VolumeChanged(double)), this, SLOT(onSinkVolumeChanged(double)));
     connect(m_pDefaultSink.get(), SIGNAL(MuteChanged(bool)), this, SLOT(onSinkMuteChanged(bool)));
     connect(m_pDefaultSink.get(), SIGNAL(ActivePortChanged(AudioPort)),
@@ -220,7 +320,7 @@ void AudioWatcher::onDefaultSinkChanaged(const QDBusObjectPath &value)
             << "\nactive port:" << m_outAudioPort.name << ";" << m_outAudioPort.availability
             << "\ndevice name:" << m_pDefaultSink->name();
 
-    updateDeviceEnabled(m_pAudioInterface->cards(),false);
+    updateDeviceEnabled(m_pAudioInterface->cards(), false);
     emit sigDeviceChange(Internal);
 }
 
@@ -275,12 +375,12 @@ void AudioWatcher::onDeviceEnableState(QDBusMessage msg)
     QList<QVariant> arguments = msg.arguments();
     //参数固定长度
     if (3 != arguments.count()) {
-        qWarning() << "从控制中心获取设备使能状态失败！参数长度不为3！参数长度:" <<arguments.count();
+        qWarning() << "从控制中心获取设备使能状态失败！参数长度不为3！参数长度:" << arguments.count();
         return;
     }
     //音频dbus服务接口
     QString interfaceName = arguments.at(0).toString();
-    if("com.deepin.daemon.Audio" == interfaceName){
+    if ("com.deepin.daemon.Audio" == interfaceName) {
         //被改变的属性
         QVariantMap changedProps = qdbus_cast<QVariantMap>(arguments.at(1).value<QDBusArgument>());
         QStringList keys =  changedProps.keys();
@@ -288,7 +388,7 @@ void AudioWatcher::onDeviceEnableState(QDBusMessage msg)
         foreach (const QString &prop, keys) {
             if (prop == "CardsWithoutUnavailable") {
                 qInfo() << "控制中心改变默认设备使能状态！" << prop;
-                updateDeviceEnabled(changedProps[prop].toString(),true);
+                updateDeviceEnabled(changedProps[prop].toString(), true);
             }
         }
     }
@@ -312,23 +412,36 @@ void AudioWatcher::onSourceMuteChanged(bool value)
 QString AudioWatcher::getDeviceName(AudioMode mode)
 {
     QString device = "";
+
     if (mode == Internal) {
+        qDebug() << __LINE__ << __FUNCTION__ << "Internal"
+                 << m_outAudioPort.availability << m_fNeedDeviceChecker
+                 << m_pDefaultSink->ports().count() << m_isVirtualMachineHw;
         //如果没有端口(m_pDefaultSource->ports().count()=0)，说明音声卡可能是虚拟的
-        if ((m_outAudioPort.availability != 1 || !m_fNeedDeviceChecker)&&m_pDefaultSink->ports().count()!=0) {
+        if ((m_outAudioPort.availability != 1 || !m_fNeedDeviceChecker) &&
+                (m_pDefaultSink->ports().count() != 0 || m_isVirtualMachineHw)) {
+            qDebug() << __LINE__ << __FUNCTION__ << "m_pDefaultSink->name(): " << m_pDefaultSink->name();
             device = m_pDefaultSink->name();
             if (!device.isEmpty() && !device.endsWith(".monitor")) {
                 device += ".monitor";
             }
         }
     } else {
+        qDebug() << __LINE__ << __FUNCTION__ << "Micphone"
+                 << m_inAudioPort.availability << m_fNeedDeviceChecker
+                 << m_pDefaultSource->ports().count() << m_isVirtualMachineHw;
         //如果没有端口(m_pDefaultSource->ports().count()=0)，说明音声卡可能是虚拟的
-        if ((m_inAudioPort.availability != 1 || !m_fNeedDeviceChecker)&&m_pDefaultSource->ports().count()!=0) {
+        if ((m_inAudioPort.availability != 1 || !m_fNeedDeviceChecker) &&
+                (m_pDefaultSource->ports().count() != 0 || m_isVirtualMachineHw)) {
+            qDebug() << __LINE__ << __FUNCTION__ << "m_pDefaultSource->name(): " << m_pDefaultSource->name();
             device = m_pDefaultSource->name();
             if (device.endsWith(".monitor") && m_fNeedDeviceChecker) {
                 device.clear();
             }
         }
     }
+    qDebug() << __LINE__ << __FUNCTION__ << "device: " << device;
+
     return device;
 }
 
@@ -359,7 +472,13 @@ bool AudioWatcher::getMute(AudioMode mode)
  */
 bool AudioWatcher::getDeviceEnable(AudioWatcher::AudioMode mode)
 {
-    return mode != Internal ? m_inIsEnable : m_outIsEnable;
+    //云平台的情况下是无法判断是否存在声卡的，采用(5.10.17)及以前的处理方式，默认都可用
+    if (m_isVirtualMachineHw) {
+        qDebug() << "云平台";
+        return true;
+    } else {
+        return mode != Internal ? m_inIsEnable : m_outIsEnable;
+    }
 }
 
 /**

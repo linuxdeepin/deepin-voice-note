@@ -227,11 +227,13 @@ void VNoteRecordBar::onAudioVolumeChange(int mode)
  */
 void VNoteRecordBar::onAudioDeviceChange(int mode)
 {
+    qDebug() << "mode: " << mode;
     if (m_currentMode == mode) {
         static bool msgshow = false;
         QString info = m_audioWatcher->getDeviceName(
             static_cast<AudioWatcher::AudioMode>(mode));
         if (info.isEmpty()) { //切换后的设备异常
+            qWarning() << "音频信息为空！！！";
             m_recordBtn->setEnabled(false);
             m_recordBtn->setToolTip(
                 DApplication::translate(
