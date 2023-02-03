@@ -16,7 +16,8 @@ class AudioWatcher : public QObject
     Q_OBJECT
 public:
     enum AudioMode { Internal,
-                     Micphone };
+                     Micphone
+                   };
     Q_ENUM(AudioMode)
     explicit AudioWatcher(QObject *parent = nullptr);
     //获取设备名称
@@ -35,7 +36,7 @@ signals:
     //静音状态改变信号
     void sigMuteChanged(AudioMode mode);
     //设备使能情况
-    void sigDeviceEnableChanged(AudioMode mode,bool enable);
+    void sigDeviceEnableChanged(AudioMode mode, bool enable);
 protected slots:
     //输入设备默认端口改变
     void onDefaultSourceActivePortChanged(AudioPort value);
@@ -64,9 +65,12 @@ private:
     void initDeviceWacther();
     //连接相关槽函数
     void initConnections();
-
+    //是否是云平台
+    bool isVirtualMachineHw();
+    //查询系统信息
+    QString vnSystemInfo();
     //更新控制中心中是否更改设备的使能状态
-    void updateDeviceEnabled(QString cardsStr,bool isEmitSig);
+    void updateDeviceEnabled(QString cardsStr, bool isEmitSig);
 
 private:
     const QString m_serviceName {"com.deepin.daemon.Audio"};
@@ -90,6 +94,8 @@ private:
       * 找出默认输出设备在 系统>控制中心>声音>设备管理>输入设备 中的使能情况
       */
     bool m_outIsEnable{false};
+
+    bool m_isVirtualMachineHw{false};
 };
 
 #endif // AudioWatcher_H
