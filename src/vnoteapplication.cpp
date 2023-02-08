@@ -74,6 +74,40 @@ VNoteMainWindow *VNoteApplication::mainWindow() const
     return m_qspMainWnd.get();
 }
 
+bool VNoteApplication::notify(QObject *obj, QEvent *event)
+{
+    if(event->type() == QEvent::KeyPress){
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if(keyEvent->modifiers() == (Qt::ShiftModifier | Qt::ControlModifier) && keyEvent->key() == Qt::Key_Z){
+            if(m_isChageKeyEvent){
+                qInfo() << "KeyPress(模拟): ctrl + shift + z";
+                return DApplication::notify(obj,event);
+            }else{
+                qInfo() << "KeyPress(主动): ctrl + shift + z";
+                return false;
+            }
+        }else if(keyEvent->modifiers() == Qt::ControlModifier && keyEvent->key() == Qt::Key_Y){
+            qInfo() << "KeyPress: ctrl + Y";
+            QKeyEvent tevent(QEvent::KeyPress,Qt::Key_Z,Qt::ShiftModifier | Qt::ControlModifier);
+            m_isChageKeyEvent = true;
+            return DApplication::notify(obj,&tevent);
+        }
+    }else if(event->type() == QEvent::KeyRelease){
+        QKeyEvent *key = static_cast<QKeyEvent*>(event);
+        if(key->modifiers() == (Qt::ShiftModifier | Qt::ControlModifier) && key->key() == Qt::Key_Z){
+            qInfo() << "KeyRelease: ctrl + shift + z";
+            m_isChageKeyEvent = false;
+            return DApplication::notify(obj,event);
+        }else if(key->modifiers() == Qt::ControlModifier && key->key() == Qt::Key_Y){
+            qInfo() << "KeyRelease: ctrl + Y";
+            QKeyEvent tevent(QEvent::KeyRelease,Qt::Key_Z,Qt::ShiftModifier | Qt::ControlModifier);
+            m_isChageKeyEvent = false;
+            return DApplication::notify(obj,&tevent);
+        }
+    }
+    return DApplication::notify(obj,event);
+}
+
 /**
  * @brief VNoteApplication::onNewProcessInstance
  * @param pid

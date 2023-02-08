@@ -25,6 +25,9 @@ public:
      * We can't get correct path when app's consturctor.
      * */
     VNoteMainWindow *mainWindow() const;
+
+    bool notify(QObject *obj,QEvent* event);
+
 signals:
 
 public slots:
@@ -37,6 +40,7 @@ protected:
 
 protected:
     QScopedPointer<VNoteMainWindow> m_qspMainWnd {nullptr};
+    bool m_isChageKeyEvent = false;
 };
 
 #endif // VNOTEAPPLICATION_H

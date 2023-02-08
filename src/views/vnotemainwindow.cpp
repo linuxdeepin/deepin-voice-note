@@ -212,8 +212,8 @@ void VNoteMainWindow::changeRightView(bool isMultiple)
         m_imgInsert->setDisabled(true);
         bool moveButtonEnable = true;
         if (stateOperation->isVoice2Text()
-            || stateOperation->isSearching()
-            || 1 == m_leftView->folderCount()) {
+                || stateOperation->isSearching()
+                || 1 == m_leftView->folderCount()) {
             moveButtonEnable = false;
         }
         m_multipleSelectWidget->enableButtons(m_middleView->haveText(), m_middleView->haveVoice(), moveButtonEnable);
@@ -301,7 +301,7 @@ void VNoteMainWindow::initShortcuts()
 
     //Save recordings
     m_stSaveVoices.reset(new QShortcut(this));
-    m_stSaveVoices->setKey(Qt::CTRL + Qt::Key_Y);
+    m_stSaveVoices->setKey(Qt::CTRL + Qt::Key_D);
     m_stSaveVoices->setContext(Qt::ApplicationShortcut);
     m_stSaveVoices->setAutoRepeat(false);
     connect(m_stSaveVoices.get(), &QShortcut::activated, this, &VNoteMainWindow::onSaveVoicesShortcut);
@@ -598,10 +598,10 @@ void VNoteMainWindow::initLogin1Manager()
 void VNoteMainWindow::holdHaltLock()
 {
     m_lockFd = m_pLogin1Manager->Inhibit(
-        "shutdown:sleep",
-        DApplication::translate("AppMain", "Voice Notes"),
-        DApplication::translate("AppMain", "Recordings not saved"),
-        "block");
+                   "shutdown:sleep",
+                   DApplication::translate("AppMain", "Voice Notes"),
+                   DApplication::translate("AppMain", "Recordings not saved"),
+                   "block");
 
     if (m_lockFd.isError()) {
         qCritical() << "Init login manager error:" << m_lockFd.error();
@@ -771,16 +771,16 @@ void VNoteMainWindow::initUpgradeView()
     m_upgradeView = new UpgradeView(this);
 
     connect(m_upgradeView, &UpgradeView::upgradeDone,
-            this, [this]() {
-                //Clear the flag after upgrade & and call
-                //the data loaded slot to refresh.
-                m_fNeedUpgradeOldDb = false;
+    this, [this]() {
+        //Clear the flag after upgrade & and call
+        //the data loaded slot to refresh.
+        m_fNeedUpgradeOldDb = false;
 
-                onVNoteFoldersLoaded();
+        onVNoteFoldersLoaded();
 
-                qInfo() << "upgrade success.";
-            },
-            Qt::QueuedConnection);
+        qInfo() << "upgrade success.";
+    },
+    Qt::QueuedConnection);
 }
 
 #endif
@@ -869,12 +869,12 @@ void VNoteMainWindow::onA2TError(int error)
     QString message = ""; //错误信息提示语
     if (error == VNoteA2TManager::NetworkError) {
         message = DApplication::translate(
-            "VNoteErrorMessage",
-            "The voice conversion failed due to the poor network connection, please have a check");
+                      "VNoteErrorMessage",
+                      "The voice conversion failed due to the poor network connection, please have a check");
     } else {
         message = DApplication::translate(
-            "VNoteErrorMessage",
-            "Voice to text conversion failed");
+                      "VNoteErrorMessage",
+                      "Voice to text conversion failed");
     }
     showAsrErrMessage(message); //显示错误信息
     setSpecialStatus(VoiceToTextEnd); //更新状态
@@ -916,7 +916,7 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray notebookJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutNotebookKeymap.begin();
-         it != shortcutNotebookKeymap.end(); ++it) {
+            it != shortcutNotebookKeymap.end(); ++it) {
         QJsonObject jsonItem;
         jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
@@ -936,7 +936,7 @@ void VNoteMainWindow::onPreviewShortcut()
         {DApplication::translate("Shortcuts", "Play/Pause"), "Space"},
         {DApplication::translate("Shortcuts", "Record voice"), "Ctrl+R"},
         {DApplication::translate("Shortcuts", "Save note"), "Ctrl+S"},
-        {DApplication::translate("Shortcuts", "Save recordings"), "Ctrl+Y"},
+        {DApplication::translate("Shortcuts", "Save recordings"), "Ctrl+D"},
     };
 
     QJsonObject noteJsonGroup;
@@ -944,7 +944,7 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray noteJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutNoteKeymap.begin();
-         it != shortcutNoteKeymap.end(); ++it) {
+            it != shortcutNoteKeymap.end(); ++it) {
         QJsonObject jsonItem;
         jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
@@ -968,7 +968,7 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray editJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutEditKeymap.begin();
-         it != shortcutEditKeymap.end(); ++it) {
+            it != shortcutEditKeymap.end(); ++it) {
         QJsonObject jsonItem;
         jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
@@ -992,7 +992,7 @@ void VNoteMainWindow::onPreviewShortcut()
     QJsonArray settingJsonItems;
 
     for (QMap<QString, QString>::iterator it = shortcutSettingKeymap.begin();
-         it != shortcutSettingKeymap.end(); ++it) {
+            it != shortcutSettingKeymap.end(); ++it) {
         QJsonObject jsonItem;
         jsonItem.insert("name", it.key());
         jsonItem.insert("value", it.value().replace("Meta", "Super"));
@@ -1044,7 +1044,7 @@ void VNoteMainWindow::closeEvent(QCloseEvent *event)
 void VNoteMainWindow::resizeEvent(QResizeEvent *event)
 {
     // 更新搜索框的大小
-    if(this->geometry().width() >= DEFAULT_WINDOWS_WIDTH) {
+    if (this->geometry().width() >= DEFAULT_WINDOWS_WIDTH) {
         m_noteSearchEdit->resize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H);
     } else if (this->geometry().width() <= MIN_WINDOWS_WIDTH) {
         m_noteSearchEdit->resize(VNOTE_SEARCHBAR_MIN_W, VNOTE_SEARCHBAR_H);
@@ -1091,12 +1091,12 @@ bool VNoteMainWindow::checkIfNeedExit()
     //Is audio converting to text
     if (stateOperation->isVoice2Text()) {
         pspMessageDialg.reset(new VNoteMessageDialog(
-            VNoteMessageDialog::AborteAsr,
-            this));
+                                  VNoteMessageDialog::AborteAsr,
+                                  this));
     } else if (stateOperation->isRecording()) { //Is recording
         pspMessageDialg.reset(new VNoteMessageDialog(
-            VNoteMessageDialog::AbortRecord,
-            this));
+                                  VNoteMessageDialog::AbortRecord,
+                                  this));
     }
 
     if (!pspMessageDialg.isNull()) {
@@ -1220,9 +1220,9 @@ void VNoteMainWindow::onMenuAbout2Show()
         ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NoteCtxMenu);
 
         if (stateOperation->isPlaying()
-            || stateOperation->isRecording()
-            || stateOperation->isVoice2Text()
-            || stateOperation->isSearching()) {
+                || stateOperation->isRecording()
+                || stateOperation->isVoice2Text()
+                || stateOperation->isSearching()) {
             ActionManager::Instance()->enableAction(ActionManager::NoteAddNew, false);
             if (!stateOperation->isSearching()) {
                 ActionManager::Instance()->enableAction(ActionManager::NoteDelete, false);
@@ -1266,8 +1266,8 @@ void VNoteMainWindow::onMenuAbout2Show()
         ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::NotebookCtxMenu);
 
         if (stateOperation->isPlaying()
-            || stateOperation->isRecording()
-            || stateOperation->isVoice2Text()) {
+                || stateOperation->isRecording()
+                || stateOperation->isVoice2Text()) {
             ActionManager::Instance()->enableAction(ActionManager::NotebookAddNew, false);
             ActionManager::Instance()->enableAction(ActionManager::NotebookDelete, false);
         }
@@ -2116,7 +2116,7 @@ bool VNoteMainWindow::setTitleCloseButtonNext(QKeyEvent *event)
     m_stackedWidget->currentWidget()->setFocus(Qt::TabFocusReason);
     //当前记事本列表为隐藏笔记列表为显示状态
     if (!m_leftViewHolder->isVisible()
-        && m_middleViewHolder->isVisible()) {
+            && m_middleViewHolder->isVisible()) {
         //进入笔记列表焦点获取优先级选择
         return setAddnotepadButtonNext(event);
     }
@@ -2166,18 +2166,18 @@ void VNoteMainWindow::onDeleteShortcut()
          * */
         if (m_leftView->hasFocus()) {
             if (!stateOperation->isRecording()
-                && !stateOperation->isVoice2Text()
-                && !stateOperation->isPlaying()) {
+                    && !stateOperation->isVoice2Text()
+                    && !stateOperation->isPlaying()) {
                 deleteAct = ActionManager::Instance()->getActionById(
-                    ActionManager::NotebookDelete);
+                                ActionManager::NotebookDelete);
             }
         } else if (m_middleView->hasFocus()) {
             if (!stateOperation->isRecording()
-                && !stateOperation->isVoice2Text()
-                && !stateOperation->isPlaying()
-                && m_middleView->count() > 0) {
+                    && !stateOperation->isVoice2Text()
+                    && !stateOperation->isPlaying()
+                    && m_middleView->count() > 0) {
                 deleteAct = ActionManager::Instance()->getActionById(
-                    ActionManager::NoteDelete);
+                                ActionManager::NoteDelete);
             }
         }
         if (nullptr != deleteAct) {
@@ -2211,9 +2211,9 @@ void VNoteMainWindow::onPoppuMenuShortcut()
 void VNoteMainWindow::onAddNotepadShortcut()
 {
     if (!(stateOperation->isRecording()
-          || stateOperation->isPlaying()
-          || stateOperation->isVoice2Text()
-          || stateOperation->isSearching())) {
+            || stateOperation->isPlaying()
+            || stateOperation->isVoice2Text()
+            || stateOperation->isSearching())) {
         onNewNotebook();
 
         //If do shortcut in home page,need switch to note
@@ -2239,10 +2239,10 @@ void VNoteMainWindow::onReNameNotepadShortcut()
 void VNoteMainWindow::onAddNoteShortcut()
 {
     if (canDoShortcutAction()
-        && !(stateOperation->isRecording()
-             || stateOperation->isPlaying()
-             || stateOperation->isVoice2Text()
-             || stateOperation->isSearching())) {
+            && !(stateOperation->isRecording()
+                 || stateOperation->isPlaying()
+                 || stateOperation->isVoice2Text()
+                 || stateOperation->isSearching())) {
         onNewNote();
     }
 }
@@ -2347,7 +2347,8 @@ void VNoteMainWindow::onWebVoicePlay(const QVariant &json, bool bIsSame)
         //异步提示，防止阻塞前端事件
         QTimer::singleShot(0, this, [this] {
             //正在播放时，停止播放
-            if (stateOperation->isPlaying()) {
+            if (stateOperation->isPlaying())
+            {
                 m_recordBar->stopPlay();
             }
             //弹出提示
@@ -2368,11 +2369,12 @@ void VNoteMainWindow::onWebVoicePlay(const QVariant &json, bool bIsSame)
 void VNoteMainWindow::onInsertImageToWebEditor()
 {
     QStringList filePaths = DFileDialog::getOpenFileNames(
-        this,
-        "",
-        QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
-        "Image file(*.jpg *.png *.bmp)");
+                this,
+                "",
+                QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
+                "Image file(*.jpg *.png *.bmp)");
     m_imgInsert->setChecked(false);
+
     if (JsContent::instance()->insertImages(filePaths)) {
         m_richTextEdit->setFocus(); //插入成功，将焦点转移至编辑区
     }
