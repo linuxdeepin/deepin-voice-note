@@ -976,6 +976,8 @@ void VNoteMainWindow::onPreviewShortcut()
         {DApplication::translate("Shortcuts", "Copy"), "Ctrl+C"},
         {DApplication::translate("Shortcuts", "Cut"), "Ctrl+X"},
         {DApplication::translate("Shortcuts", "Paste"), "Ctrl+V"},
+        {DApplication::translate("Shortcuts", "Undo"), "Ctrl+Z"},
+        {DApplication::translate("Shortcuts", "Redo"), "Ctrl+Y"},
         {DApplication::translate("Shortcuts", "Delete"), "Delete"},
     };
 
