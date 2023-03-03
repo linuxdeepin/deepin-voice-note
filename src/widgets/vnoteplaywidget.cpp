@@ -47,8 +47,11 @@ void VNotePlayWidget::initUI()
     m_timeLab->setText("00:00/00:00");
     m_timeLab->setFixedHeight(15);
 
-    m_sliderHover = new DWidget(this);
-    m_sliderHover->setStyleSheet("QWidget{background-color:#F3F3F3;border-radius:4px;}");
+    m_sliderHover = new DFrame(this);
+    DPalette pa = DApplicationHelper::instance()->palette(m_sliderHover);
+    QColor splitColor(0,0,0,13);
+    pa.setColor(DPalette::Base, splitColor);
+    m_sliderHover->setPalette(pa);
     m_sliderHover->setFixedHeight(36);
 
     m_nameLab = new DLabel(this);
@@ -60,6 +63,7 @@ void VNotePlayWidget::initUI()
     QHBoxLayout *t_blurAreaLayout = new QHBoxLayout(this);
     t_blurAreaLayout->setContentsMargins(0, 0, 0, 0);
     m_slider = new DSlider(Qt::Horizontal);
+
     m_slider->setFixedHeight(40);
     m_slider->setMinimum(0);
     m_slider->setValue(0);

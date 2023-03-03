@@ -13,6 +13,7 @@
 #include <DSlider>
 #include <DIconButton>
 #include <DWidget>
+#include <DFrame>
 
 DWIDGET_USE_NAMESPACE
 
@@ -64,7 +65,7 @@ private:
     DLabel *m_timeLab {nullptr};
     DLabel *m_nameLab {nullptr};
     DSlider *m_slider {nullptr};
-    DWidget *m_sliderHover {nullptr};
+    DFrame *m_sliderHover {nullptr};
     DIconButton *m_closeBtn {nullptr};
     VNVoiceBlock *m_voiceBlock {nullptr};
     VlcPalyer *m_player {nullptr};
