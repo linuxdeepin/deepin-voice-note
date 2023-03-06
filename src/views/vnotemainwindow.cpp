@@ -954,7 +954,7 @@ void VNoteMainWindow::onPreviewShortcut()
     noteJsonGroup.insert("groupItems", noteJsonItems);
     jsonGroups.append(noteJsonGroup);
     //******************************Edit***************************************************
-    QMap<QString, QString> shortcutEditKeymap = {
+    QList<QPair<QString, QString>> shortcutEditKeymap = {
         //Edit
         {DApplication::translate("Shortcuts", "Select all"), "Ctrl+A"},
         {DApplication::translate("Shortcuts", "Copy"), "Ctrl+C"},
@@ -969,11 +969,11 @@ void VNoteMainWindow::onPreviewShortcut()
     editJsonGroup.insert("groupName", DApplication::translate("ShortcutsGroups", "Edit"));
     QJsonArray editJsonItems;
 
-    for (QMap<QString, QString>::iterator it = shortcutEditKeymap.begin();
-            it != shortcutEditKeymap.end(); ++it) {
+    for (int i = 0; i < shortcutEditKeymap.count(); i++) {
         QJsonObject jsonItem;
-        jsonItem.insert("name", it.key());
-        jsonItem.insert("value", it.value().replace("Meta", "Super"));
+        jsonItem.insert("name", shortcutEditKeymap[i].first);
+        QString value = shortcutEditKeymap[i].second;
+        jsonItem.insert("value", value.replace("Meta", "Super"));
         editJsonItems.append(jsonItem);
     }
 
