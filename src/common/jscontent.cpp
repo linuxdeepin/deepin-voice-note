@@ -95,27 +95,37 @@ bool JsContent::insertImages(const QImage &image)
 
 void JsContent::jsCallTxtChange()
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     emit textChange();
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 void JsContent::jsCallChannleFinish()
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     emit getfontinfo();
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 void JsContent::jsCallSummernoteInitFinish()
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     emit loadFinsh();
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 void JsContent::jsCallPopupMenu(int type, const QVariant &json)
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     emit popupMenu(type, json);
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 void JsContent::jsCallPlayVoice(const QVariant &json, bool bIsSame)
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     emit playVoice(json, bIsSame);
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 QString JsContent::jsCallGetTranslation()
@@ -156,7 +166,9 @@ QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &funti
 
 void JsContent::jsCallSetDataFinsh()
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     emit setDataFinsh();
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 void JsContent::jsCallPaste(bool isVoicePaste)
@@ -171,7 +183,9 @@ void JsContent::jsCallViewPicture(const QString &imagePath)
 
 void JsContent::jsCallCreateNote()
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     emit createNote();
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 void JsContent::jsCallSetClipData(const QString &text, const QString &html)

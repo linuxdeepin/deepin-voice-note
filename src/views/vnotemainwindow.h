@@ -290,8 +290,8 @@ private:
     MiddleView *m_middleView {nullptr};
     WebRichTextEditor *m_richTextEdit {nullptr};
 
-    DPushButton *m_addNotepadBtn {nullptr};
-    DFloatingButton *m_addNoteBtn {nullptr};
+    DPushButton *m_addNotepadBtn {nullptr}; //新增记事本
+    DFloatingButton *m_addNoteBtn {nullptr};//新增笔记
     DAnchorsBase *m_buttonAnchor {nullptr};
 
     VNoteRecordBar *m_recordBar {nullptr};

@@ -363,6 +363,7 @@ QModelIndex LeftView::setDefaultNotepadItem()
  */
 void LeftView::addFolder(VNoteFolder *folder)
 {
+    qInfo() << __LINE__ << __func__ << "正在添加记事本...";
     if (nullptr != folder) {
         QStandardItem *pItem = StandardItemCommon::createStandardItem(
             folder, StandardItemCommon::NOTEPADITEM);
@@ -373,6 +374,7 @@ void LeftView::addFolder(VNoteFolder *folder)
         setCurrentIndex(index);
     }
     this->scrollToTop();
+    qInfo() << __LINE__ << __func__ << "已添加记事本";
 }
 
 /**
@@ -411,6 +413,7 @@ bool LeftView::eventFilter(QObject *o, QEvent *e)
  */
 void LeftView::appendFolder(VNoteFolder *folder)
 {
+    qInfo() << __LINE__ << __func__ << "正在追加记事本...";
     if (nullptr != folder) {
         QStandardItem *pItem = StandardItemCommon::createStandardItem(
             folder, StandardItemCommon::NOTEPADITEM);
@@ -421,6 +424,7 @@ void LeftView::appendFolder(VNoteFolder *folder)
             root->appendRow(pItem);
         }
     }
+    qInfo() << __LINE__ << __func__ << "已追加记事本";
 }
 
 /**

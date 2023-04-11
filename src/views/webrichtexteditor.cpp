@@ -49,6 +49,7 @@ void WebRichTextEditor::initWebView()
 {
     QWebChannel *channel = new QWebChannel(this);
     JsContent *content = JsContent::instance();
+    //将js 注册到QWebChannel
     channel->registerObject("webobj", content);
     page()->setWebChannel(channel);
     QFileInfo info(webPage);
@@ -141,7 +142,9 @@ void WebRichTextEditor::initData(VNoteItem *data, const QString &reg, bool focus
     m_setFocus = focus;
     //富文本设置异步操作，解决笔记列表不实时刷新
     QTimer::singleShot(0, this, [=] {
+        qInfo() << __LINE__ << __func__ << "start...";
         setData(data, reg);
+        qInfo() << __LINE__ << __func__ << "end";
     });
 }
 
@@ -169,6 +172,7 @@ void WebRichTextEditor::insertVoiceItem(const QString &voicePath, qint64 voiceSi
 
 void WebRichTextEditor::updateNote()
 {
+    //qInfo() << __LINE__ << __func__ << "start...";
     if (m_noteData) {
         if (m_textChange) {
             QVariant result = JsContent::instance()->callJsSynchronous(page(), QString("getHtml()"));
@@ -182,6 +186,7 @@ void WebRichTextEditor::updateNote()
             m_textChange = false;
         }
     }
+    //qInfo() << __LINE__ << __func__ << "end";
 }
 
 void WebRichTextEditor::searchText(const QString &searchKey)
@@ -195,12 +200,27 @@ void WebRichTextEditor::searchText(const QString &searchKey)
 
 void WebRichTextEditor::unboundCurrentNoteData()
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     //停止更新定时器
     m_updateTimer->stop();
     //手动更新
     updateNote();
     //绑定数据设置为空
     m_noteData = nullptr;
+    qInfo() << __LINE__ << __func__ << "end";
+}
+
+void WebRichTextEditor::unboundCurrentNoteData(VNoteItem *data)
+{
+    qInfo() << __LINE__ << __func__ << "start...";
+
+    if(data){
+        data->htmlCode = "<p><br></p>";
+        //将网页数据变成空白
+        JsContent::instance()->callJsSetHtml(data->htmlCode);
+
+    }
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 void WebRichTextEditor::onTextChange()
@@ -223,6 +243,7 @@ void WebRichTextEditor::saveMenuParam(int type, const QVariant &json)
 
 void WebRichTextEditor::onSetDataFinsh()
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     //清除选中
     page()->triggerAction(QWebEnginePage::Unselect);
     //数据加载完成,需要设置焦点时需要先清除焦点再重新设置，解决编辑器无光标问题
@@ -234,6 +255,7 @@ void WebRichTextEditor::onSetDataFinsh()
     if (!m_searchKey.isEmpty()) {
         findText(m_searchKey);
     }
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 void WebRichTextEditor::showTxtMenu(const QPoint &pos)
@@ -647,6 +669,7 @@ void WebRichTextEditor::onHideEditToolbar()
  */
 void WebRichTextEditor::onLoadFinsh()
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     //再次设置笔记内容
     if (m_noteData && !m_loadFinshSign) {
         if (m_noteData->htmlCode.isEmpty()) {
@@ -656,10 +679,12 @@ void WebRichTextEditor::onLoadFinsh()
         }
     }
     m_loadFinshSign = true;
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 void WebRichTextEditor::setData(VNoteItem *data, const QString &reg)
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     //有焦点先隐藏编辑工具栏
     if (hasFocus()) {
         emit JsContent::instance()->callJsHideEditToolbar();
@@ -692,6 +717,7 @@ void WebRichTextEditor::setData(VNoteItem *data, const QString &reg)
     } else { //笔记相同时执行搜索
         findText(reg);
     }
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 bool WebRichTextEditor::isVoicePaste()

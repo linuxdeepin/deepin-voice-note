@@ -69,6 +69,11 @@ public:
     void unboundCurrentNoteData();
 
     /**
+     * @brief 解除绑定的笔记数据
+     */
+    void unboundCurrentNoteData(VNoteItem* data);
+
+    /**
      * @brief 快捷键触发右键菜单
      */
     void shortcutPopupMenu();

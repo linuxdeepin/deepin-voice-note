@@ -201,6 +201,7 @@ void VNoteMainWindow::initConnections()
 //刷新详情页显示
 void VNoteMainWindow::changeRightView(bool isMultiple)
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     m_multipleSelectWidget->setNoteNumber(m_middleView->getSelectedCount());
     if (isMultiple) {
         if (m_stackedRightMainWidget->currentWidget() == m_rightViewHolder) {
@@ -226,6 +227,7 @@ void VNoteMainWindow::changeRightView(bool isMultiple)
             m_imgInsert->setDisabled(false);
         }
     }
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 /**
@@ -700,6 +702,7 @@ void VNoteMainWindow::onVNoteFoldersLoaded()
  */
 void VNoteMainWindow::onVNoteSearch()
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     if (m_noteSearchEdit->lineEdit()->hasFocus()) {
         QString text = m_noteSearchEdit->text();
         if (!text.isEmpty()) {
@@ -719,6 +722,7 @@ void VNoteMainWindow::onVNoteSearch()
             setSpecialStatus(SearchEnd);
         }
     }
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 /**
@@ -741,6 +745,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
 {
     Q_UNUSED(previous);
 
+    qInfo() << __LINE__ << __func__ << "start...";
     //记事本切换后刷新详情页
     changeRightView(false);
     VNoteFolder *data = static_cast<VNoteFolder *>(StandardItemCommon::getStandardItemData(current));
@@ -750,6 +755,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
         m_imgInsert->setDisabled(true);
         m_recordBar->setVisible(false);
     }
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 /**
@@ -1136,6 +1142,7 @@ bool VNoteMainWindow::checkIfNeedExit()
 void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
 {
     Q_UNUSED(previous);
+    qInfo() << __LINE__ << __func__ << "start...";
 
     QModelIndex index = m_middleView->currentIndex();
     VNoteItem *data = static_cast<VNoteItem *>(StandardItemCommon::getStandardItemData(index));
@@ -1146,11 +1153,15 @@ void VNoteMainWindow::onVNoteChange(const QModelIndex &previous)
     }
     //多选笔记时不更新详情页内容
     if (!m_middleView->isMultipleSelected()) {
+        if(!m_richTextEdit->isVisible()){
+            m_richTextEdit->setVisible(true);
+        }
         m_richTextEdit->initData(data, m_searchKey, m_rightViewHasFouse);
     }
     //没有数据，插入图片按钮禁用
     m_imgInsert->setDisabled(nullptr == data);
     m_rightViewHasFouse = false;
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 /**
@@ -1332,6 +1343,7 @@ int VNoteMainWindow::loadNotepads()
  */
 void VNoteMainWindow::addNotepad()
 {
+    qInfo() << __LINE__ << __func__ << "正在新增记事本...";
     VNoteFolder itemData;
     VNoteFolderOper folderOper;
     itemData.name = folderOper.getDefaultFolderName();
@@ -1360,6 +1372,7 @@ void VNoteMainWindow::addNotepad()
 
         addNote();
     }
+    qInfo() << __LINE__ << __func__ << "已新增记事本";
 }
 
 /**
@@ -1405,6 +1418,7 @@ void VNoteMainWindow::editNotepad()
  */
 void VNoteMainWindow::addNote()
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     m_middleView->clearSelection();
 
     qint64 id = m_middleView->getCurrentId();
@@ -1427,6 +1441,7 @@ void VNoteMainWindow::addNote()
         m_richTextEdit->unboundCurrentNoteData();
         m_middleView->addRowAtHead(newNote);
     }
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 /**
@@ -1443,6 +1458,7 @@ void VNoteMainWindow::editNote()
  */
 void VNoteMainWindow::delNote()
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
     //记录移除前位置
     m_middleView->setNextSelection();
@@ -1452,9 +1468,18 @@ void VNoteMainWindow::delNote()
     if (noteDataList.size()) {
         //删除笔记之前先解除详情页绑定的笔记数据
         m_richTextEdit->unboundCurrentNoteData();
+        qint32 noteId = 0;
+        qint64 folderId = 0;
         for (auto noteData : noteDataList) {
             VNoteItemOper noteOper(noteData);
-            noteOper.deleteNote();
+            noteId = noteData->noteId;
+            folderId = noteData->folderId;
+            m_richTextEdit->unboundCurrentNoteData(noteData);
+            if(noteOper.deleteNote()){
+                qInfo() << "删除成功！" << folderId << noteId;
+            }else{
+                qInfo() << "删除失败！";
+            }
         }
         //Refresh the middle view
         if (m_middleView->rowCount() <= 0 && stateOperation->isSearching()) {
@@ -1466,6 +1491,7 @@ void VNoteMainWindow::delNote()
     }
     //设置移除后选中
     m_middleView->selectAfterRemoved();
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 /**
@@ -1505,6 +1531,7 @@ int VNoteMainWindow::loadNotes(VNoteFolder *folder)
  */
 int VNoteMainWindow::loadSearchNotes(const QString &key)
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     m_middleView->clearAll();
     m_middleView->setSearchKey(key);
     VNOTE_ALL_NOTES_MAP *noteAll = VNoteDataManager::instance()->getAllNotesInFolder();
@@ -1532,6 +1559,7 @@ int VNoteMainWindow::loadSearchNotes(const QString &key)
         //刷新详情页-切换至当前笔记
         m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
     }
+    qInfo() << __LINE__ << __func__ << "end";
     return m_middleView->rowCount();
 }
 
@@ -1576,6 +1604,7 @@ void VNoteMainWindow::onPlayPlugVoiceStop(VNVoiceBlock *voiceData)
  */
 void VNoteMainWindow::onNewNotebook()
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     static struct timeval curret = {0, 0};
     static struct timeval lastPress = {0, 0};
 
@@ -1589,6 +1618,7 @@ void VNoteMainWindow::onNewNotebook()
 
         UPT(lastPress, curret);
     }
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 /**
@@ -1596,6 +1626,7 @@ void VNoteMainWindow::onNewNotebook()
  */
 void VNoteMainWindow::onNewNote()
 {
+    qInfo() << __LINE__ << __func__ << "start...";
     static struct timeval curret = {0, 0};
     static struct timeval lastPress = {0, 0};
 
@@ -1606,6 +1637,7 @@ void VNoteMainWindow::onNewNote()
 
         UPT(lastPress, curret);
     }
+    qInfo() << __LINE__ << __func__ << "end";
 }
 
 /**
