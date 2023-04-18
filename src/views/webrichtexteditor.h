@@ -16,9 +16,15 @@
 #include <QDBusInterface>
 
 //获取字号接口
+#ifdef OS_BUILD_V23
 #define DEEPIN_DAEMON_APPEARANCE_SERVICE          "org.deepin.dde.Appearance1"
 #define DEEPIN_DAEMON_APPEARANCE_PATH             "/org/deepin/dde/Appearance1"
 #define DEEPIN_DAEMON_APPEARANCE_INTERFACE        "org.deepin.dde.Appearance1"
+#else
+#define DEEPIN_DAEMON_APPEARANCE_SERVICE           "com.deepin.daemon.Appearance"
+#define DEEPIN_DAEMON_APPEARANCE_PATH              "/com/deepin/daemon/Appearance"
+#define DEEPIN_DAEMON_APPEARANCE_INTERFACE         "com.deepin.daemon.Appearance"
+#endif
 
 struct VNoteItem;
 class VNoteRightMenu;

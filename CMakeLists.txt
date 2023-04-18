@@ -98,6 +98,16 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -fstack-protector-all")
 #       sourcedir
 #       <projectname>.ts
 
+# 判断系统环境
+#file(STRINGS "/etc/os-version" MAJOR_STR REGEX "MajorVersion")
+execute_process(COMMAND cat /etc/os-version OUTPUT_VARIABLE OS_INFO_STR)
+string(REGEX MATCHALL "MajorVersion=[0-9]+" MAJOR_STR "${OS_INFO_STR}")
+string(REGEX MATCH "[0-9]+" MAJOR_VERSION "${MAJOR_STR}")
+if (MAJOR_VERSION MATCHES "23")
+    message("--------------------- OS_BUILD_V23 on")
+    add_definitions(-DOS_BUILD_V23)
+endif()
+
 execute_process(COMMAND bash
                     ${APP_TRANS_SCRIPT}
                     translations

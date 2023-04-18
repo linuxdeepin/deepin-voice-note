@@ -9,31 +9,39 @@
 #include <QObject>
 #include <QtDBus/QtDBus>
 
+#ifdef OS_BUILD_V23
 /**
  * @brief AudioService 音频服务名 org.deepin.dde.Audio1
  */
 const static QString AudioService = QStringLiteral("org.deepin.dde.Audio1");
-//const static QString AudioService = QStringLiteral("com.deepin.daemon.Audio");
+
 /**
  * @brief AudioPath 服务地址 /org/deepin/dde/Audio1
  */
 const static QString AudioPath = QStringLiteral("/org/deepin/dde/Audio1");
-//const static QString AudioPath = QStringLiteral("/com/deepin/daemon/Audio");
+
 /**
  * @brief AudioInterface 接口名称 org.deepin.dde.Audio1
  */
 const static QString AudioInterface = QStringLiteral("org.deepin.dde.Audio1");
-//const static QString AudioInterface = QStringLiteral("com.deepin.daemon.Audio");
+
 /**
  * @brief SinkInterface 音频输出接口名称 org.deepin.dde.Audio1.Sink
  */
 const static QString SinkInterface = QStringLiteral("org.deepin.dde.Audio1.Sink");
-//const static QString SinkInterface = QStringLiteral("com.deepin.daemon.Audio.Sink");
+
 /**
  * @brief SourceInterface 音频输入接口名称 org.deepin.dde.Audio1.Source
  */
 const static QString SourceInterface = QStringLiteral("org.deepin.dde.Audio1.Source");
-//const static QString SourceInterface = QStringLiteral("com.deepin.daemon.Audio.Source");
+
+#else
+const static QString AudioService = QStringLiteral("com.deepin.daemon.Audio");
+const static QString AudioPath = QStringLiteral("/com/deepin/daemon/Audio");
+const static QString AudioInterface = QStringLiteral("com.deepin.daemon.Audio");
+const static QString SinkInterface = QStringLiteral("com.deepin.daemon.Audio.Sink");
+const static QString SourceInterface = QStringLiteral("com.deepin.daemon.Audio.Source");
+#endif
 /**
  * @brief PropertiesInterface 属性接口名称 org.freedesktop.DBus.Properties
  */
@@ -42,6 +50,7 @@ const static QString PropertiesInterface = QStringLiteral("org.freedesktop.DBus.
  * @brief PropertiesChanged 属性改变信号
  */
 const static QString PropertiesChanged = QStringLiteral("PropertiesChanged");
+
 
 /**
  * @brief The AudioPort class 音频端口
