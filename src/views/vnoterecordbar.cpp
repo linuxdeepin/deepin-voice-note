@@ -46,7 +46,8 @@ void VNoteRecordBar::initUI()
 
     m_recordBtnHover = new DWidget(this);
     m_recordBtn = new VNote2SIconButton("circle_record.svg", "circle_record.svg", m_recordBtnHover);
-    m_recordBtn->setFlat(true);
+//    m_recordBtn->setFlat(false);
+    m_recordBtn->setFocusPolicy(Qt::FocusPolicy::NoFocus);
     m_recordBtn->setIconSize(QSize(34, 34));
     m_recordBtn->setFixedSize(QSize(54, 54));
     QGridLayout *recordBtnHoverLayout = new QGridLayout;
