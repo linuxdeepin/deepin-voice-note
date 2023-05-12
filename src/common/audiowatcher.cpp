@@ -37,10 +37,10 @@ void AudioWatcher::initDeviceWacther()
         m_defaultSinkPath = m_audioDBusInterface->property("DefaultSink").value<QDBusObjectPath>().path();
         initDefaultSinkDBusInterface();
         qInfo() << "current input active port name:" << m_inAudioPort.name
-                << "\ncurrent input active port availability:" << m_inAudioPort.availability
+                << "\ncurrent input active port availability(0 for Unknown, 1 for Not Available, 2 for Available.):" << m_inAudioPort.availability
                 << "\ncurrent input device name:" << defaultSourceName()
                 << "\ncurrent output active port name:" << m_outAudioPort.name
-                << "\ncurrent output active port availability:" << m_outAudioPort.availability
+                << "\ncurrent output active port availability(0 for Unknown, 1 for Not Available, 2 for Available.):" << m_outAudioPort.availability
                 << "\ncurrent output device name:" << defaultSinkName();
         //监听音频服务的属性改变
         QDBusConnection::sessionBus().connect(AudioService,
@@ -457,10 +457,10 @@ AudioPort AudioWatcher::defaultSourceActivePort()
                                     QDBusConnection::sessionBus());
 
     if (inter->isValid()) {
-        //qInfo() << "音频服务： "<< AudioService <<" 默认输入源地址"<< m_defaultSourcePath << " 属性接口："<< PropertiesInterface;
+        qInfo() << "音频服务： "<< AudioService <<" 默认输入源地址"<< m_defaultSourcePath << " 属性接口："<< PropertiesInterface;
         QDBusReply<QDBusVariant> reply = inter->call("Get", SourceInterface, "ActivePort");
         reply.value().variant().value<QDBusArgument>() >> port;
-        //qInfo() << "ActivePort:" << port;
+        qInfo() << __LINE__ << __func__ <<  "ActivePort:" << port;
     } else {
         qWarning() << "默认输入源地址 (" << m_defaultSourcePath << ") 不存在";
     }
@@ -512,10 +512,10 @@ AudioPort AudioWatcher::defaultSinkActivePort()
                                     QDBusConnection::sessionBus());
 
     if (inter->isValid()) {
-        //qInfo() << "音频服务： "<< AudioService <<" 默认输出源地址"<< m_defaultSinkPath << " 属性接口："<< PropertiesInterface;
-        QDBusReply<QDBusVariant> reply = inter->call("Get", SourceInterface, "ActivePort");
+        qInfo() << "音频服务： "<< AudioService <<" 默认输出源地址"<< m_defaultSinkPath << " 属性接口："<< PropertiesInterface;
+        QDBusReply<QDBusVariant> reply = inter->call("Get", SinkInterface, "ActivePort");
         reply.value().variant().value<QDBusArgument>() >> port;
-        //qInfo() << "ActivePort:" << port;
+        qInfo() << __LINE__ << __func__ <<  "ActivePort:" << port;
     } else {
         qWarning() << "默认输出源地址 (" << m_defaultSinkPath << ") 不存在";
     }
