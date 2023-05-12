@@ -232,7 +232,9 @@ void VNoteRecordBar::onAudioDeviceChange(int mode)
         static bool msgshow = false;
         QString info = m_audioWatcher->getDeviceName(
             static_cast<AudioWatcher::AudioMode>(mode));
+        qInfo() << __LINE__ << __func__ << "info: " << info;
         if (info.isEmpty()) { //切换后的设备异常
+            qInfo() << __LINE__ << __func__ << "音频设备异常,已禁用录制按钮";
             m_recordBtn->setEnabled(false);
             m_recordBtn->setToolTip(
                 DApplication::translate(
