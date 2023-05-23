@@ -2240,6 +2240,11 @@ void VNoteMainWindow::onReNameNotepadShortcut()
 
 void VNoteMainWindow::onAddNoteShortcut()
 {
+    // 焦点若在文本编辑区域，仅执行文本加粗操作，不新建文本笔记.
+    QWidget* focusWidget = this->focusWidget();
+    if (focusWidget && m_richTextEdit == focusWidget->parentWidget())
+        return;
+
     if (canDoShortcutAction()
             && !(stateOperation->isRecording()
                  || stateOperation->isPlaying()
