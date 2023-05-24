@@ -1,3 +1,10 @@
+deepin-voice-note (6.0.8) unstable; urgency=medium
+
+  * fix: Fix the issue of creating new text notes while using Ctrl+B bold text(Bug: 151155)
+  * chore: Update translations(Bug: 189815)
+
+ -- Deepin Packages Builder <packages@deepin.org>  Wed, 24 May 2023 15:22:15 +0800
+
 deepin-voice-note (6.0.7) unstable; urgency=medium
 
   * New version 6.0.7
