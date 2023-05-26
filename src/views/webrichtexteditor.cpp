@@ -686,6 +686,15 @@ void WebRichTextEditor::setData(VNoteItem *data, const QString &reg)
     }
 
     if (nullptr == data) {
+
+        // 清空js页面内容
+        emit JsContent::instance()->callJsSetHtml("");
+
+        // 开启100ms事件循环，保证js页面内容被刷新
+        QEventLoop eveLoop;
+        QTimer::singleShot(100, &eveLoop, SLOT(quit()));
+        eveLoop.exec();
+
         this->setVisible(false);
         //无数据时先保存之前数据
         updateNote();
