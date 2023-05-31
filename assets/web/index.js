@@ -82,6 +82,8 @@ var scrollHideFont = null  //字体滚动条定时
 var isUlOrOl = false
 const airPopoverHeight = 44  //悬浮工具栏高度
 const airPopoverWidth = 385  //悬浮工具栏宽度
+const airPopoverLeftMargin = 20 //悬浮工具栏距离编辑区左侧边距
+const airPopoverRightMargin = 15 //悬浮工具栏距离编辑区右侧边距
 
 // 翻译列表
 var tooltipContent = {
@@ -219,6 +221,30 @@ function changeContent(we, contents, $editable) {
             }
         }
         webobj.jsCallTxtChange();
+    }
+}
+
+/**
+ * 处理编辑页面大小改变事件
+ * @date 2023-05-30
+ * @param {any}
+ * @returns {any}
+ */
+window.onresize = function(){
+    updateAirPopoverPos()
+}
+
+/**
+ * 处理air-popover位置更新
+ * @date 2023-05-30
+ * @param {any} 
+ * @returns {any}
+ */
+function updateAirPopoverPos() {
+    if (!$('.note-air-popover').is(':hidden')) {
+        if (getSelectedRange().innerHTML != "") {
+            $('#summernote').summernote('airPopover.update')
+        }
     }
 }
 
