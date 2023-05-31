@@ -493,7 +493,7 @@
     /**
      * returns true if all of the values in the array pass the predicate truth test.
      * 通过条件返回true
-     * 
+     *
      */
     function all(array, pred) {
         for (var idx = 0, len = array.length; idx < len; idx++) {
@@ -1418,7 +1418,7 @@
     function splitNode(point, options) {
         var isSkipPaddingBlankHTML = options && options.isSkipPaddingBlankHTML;
         var isNotSplitEdgePoint = options && options.isNotSplitEdgePoint;
-        // edge case 
+        // edge case
         if (isEdgePoint(point) && (isText(point.node) || isNotSplitEdgePoint)) {
             if (isLeftEdgePoint(point)) {
                 return point.node;
@@ -7154,9 +7154,20 @@
                     let left = Math.max(bnd.left + bnd.width / 2 - 150, 0);
                     let top = bnd.top - airPopoverHeight;
                     // 左边距判断,显示区域宽度-距离左边距离<工具栏宽度
-                    if (winWidth - left < airPopoverWidth + 10) {
-                        left = winWidth - airPopoverWidth - 10
+                    if (winWidth - left < airPopoverWidth + airPopoverRightMargin) {
+                        left = winWidth - airPopoverWidth - airPopoverRightMargin
                     }
+
+                    // 根据UX意见，左边距最少20px
+                    if (left <= airPopoverLeftMargin) {
+                        // 当气泡工具栏显示不全时，让其紧贴编辑区左侧显示，
+                        // 以便能完整显示气泡工具栏内容
+                        if (left < -5)
+                            left = -5
+                        else
+                            left = airPopoverLeftMargin
+                    }
+
                     // 上边距判断，工具栏上边距不小于34（tip高度，避免遮挡）
                     if (top < 34) {
                         top = bnd.top + bnd.height + 14
