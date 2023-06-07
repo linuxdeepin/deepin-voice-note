@@ -7162,7 +7162,7 @@
                     if (left <= airPopoverLeftMargin) {
                         // 当气泡工具栏显示不全时，让其紧贴编辑区左侧显示，
                         // 以便能完整显示气泡工具栏内容
-                        if (left < -5)
+                        if (left <= 2)
                             left = -5
                         else
                             left = airPopoverLeftMargin
