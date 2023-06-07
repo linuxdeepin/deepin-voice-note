@@ -1,3 +1,8 @@
+deepin-voice-note (6.0.9) unstable; urgency=medium
+
+  * New version 6.0.9
+
+ -- wangcong <wangcong@uniontech.com>  Wed, 7 Jun 2023 10:03:45 +0800
 deepin-voice-note (6.0.8) unstable; urgency=medium
 
   * fix: Fix the issue of creating new text notes while using Ctrl+B bold text(Bug: 151155)
