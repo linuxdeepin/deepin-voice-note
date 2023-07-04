@@ -7,7 +7,11 @@
 #define LeftViewDelegate_H
 
 #include <DStyledItemDelegate>
+#include <DPalette>
+
 DWIDGET_USE_NAMESPACE
+DGUI_USE_NAMESPACE
+
 //记事本列表代理
 class LeftViewDelegate : public DStyledItemDelegate
 {
