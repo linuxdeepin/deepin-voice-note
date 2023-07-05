@@ -76,6 +76,10 @@ public:
      */
     void shortcutPopupMenu();
 
+    /**
+     * @brief 清空Js详情页内容
+     */
+    void clearJSContent();
 signals:
     /**
      * @brief 发送开始语音转文字的信号

@@ -7,10 +7,11 @@
 #define LEFTVIEWDELEGATE_H
 
 #include <DStyledItemDelegate>
-
+#include <DPalette>
 #include <QPixmap>
 
 DWIDGET_USE_NAMESPACE
+DGUI_USE_NAMESPACE
 
 struct VNoteItem;
 

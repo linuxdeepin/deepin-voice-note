@@ -1355,6 +1355,9 @@ void VNoteMainWindow::delNotepad()
         return;
     }
 
+    // 删除之前清空JS详情页内容
+    m_richTextEdit->clearJSContent();
+
     //删除记事本之前先解除详情页绑定的笔记数据
     m_richTextEdit->unboundCurrentNoteData();
 
@@ -1425,6 +1428,9 @@ void VNoteMainWindow::editNote()
  */
 void VNoteMainWindow::delNote()
 {
+    // 删除之前清空JS详情页内容
+    m_richTextEdit->clearJSContent();
+
     m_stackedRightMainWidget->setCurrentWidget(m_rightViewHolder);
     //记录移除前位置
     m_middleView->setNextSelection();
