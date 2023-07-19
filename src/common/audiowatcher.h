@@ -115,6 +115,8 @@ public:
     double getVolume(AudioMode mode);
     //判断设备是否静音
     bool getMute(AudioMode mode);
+    //判断设备是否通过控制中心禁用
+    bool getDeviceEnable(AudioMode mode);
 signals:
     //音量改变信号
     void sigVolumeChange(AudioMode mode);
@@ -122,6 +124,8 @@ signals:
     void sigDeviceChange(AudioMode mode);
     //静音状态改变信号
     void sigMuteChanged(AudioMode mode);
+    //设备使能情况
+    void sigDeviceEnableChanged(AudioMode mode, bool enable);
 protected slots:
     //输入设备默认端口改变
     void onDefaultSourceActivePortChanged(AudioPort value);
@@ -190,6 +194,12 @@ private:
     QString defaultSourceName();
 
     /**
+     * @brief defaultSourceName  音频dbus服务默认输入源端口
+     * @return
+     */
+    QList<AudioPort> defaultSourcePorts();
+
+    /**
      * @brief defaultSinkActivePort 音频dbus服务默认输出源的活跃端口
      * @return
      */
@@ -213,6 +223,18 @@ private:
      */
     QString defaultSinkName();
 
+    /**
+     * @brief defaultSourceName  音频dbus服务默认输出源端口
+     * @return
+     */
+    QList<AudioPort> defaultSinkPorts();
+
+    //是否是虚拟环境
+    bool isVirtualMachineHw();
+    //查询系统信息
+    QString vnSystemInfo();
+    //更新控制中心中是否更改设备的使能状态
+    void updateDeviceEnabled(const QString cardsStr, bool isEmitSig);
 private:
     /**
      * @brief 音频服务dbus接口
@@ -248,6 +270,22 @@ private:
     bool m_fNeedDeviceChecker {true};
     bool m_inAudioMute {false};
     bool m_outAudioMute {false};
+
+    /**
+      * @brief 默认输入设备是否使能
+      * 找出默认输入设备在 系统>控制中心>声音>设备管理>输入设备 中的使能情况
+      */
+    bool m_inIsEnable{false};
+    /**
+      * @brief 默认输出设备是否使能
+      * 找出默认输出设备在 系统>控制中心>声音>设备管理>输入设备 中的使能情况
+      */
+    bool m_outIsEnable{false};
+
+    /**
+      * @brief  是否是虚拟环境
+      */
+    bool m_isVirtualMachineHw{false};
 };
 
 #endif // AudioWatcher_H

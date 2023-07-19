@@ -14,9 +14,13 @@
 AudioWatcher::AudioWatcher(QObject *parent)
     : QObject(parent)
 {
+    qDebug() <<"正在初始化音频监听模块...";
+    m_isVirtualMachineHw = isVirtualMachineHw();
+    qInfo() << "Is Virtual Machine?" << m_isVirtualMachineHw;
     initWatcherCofing();
     initDeviceWacther();
     initConnections();
+    qDebug() <<"已初始化音频监听模块";
 }
 
 /**
@@ -36,12 +40,14 @@ void AudioWatcher::initDeviceWacther()
         initDefaultSourceDBusInterface();
         m_defaultSinkPath = m_audioDBusInterface->property("DefaultSink").value<QDBusObjectPath>().path();
         initDefaultSinkDBusInterface();
-        qInfo() << "current input active port name:" << m_inAudioPort.name
+        qInfo() << "\n**************** cunrrent default input or output active port **********************"
+                << "\ncurrent input active port name:" << m_inAudioPort.name
                 << "\ncurrent input active port availability(0 for Unknown, 1 for Not Available, 2 for Available.):" << m_inAudioPort.availability
                 << "\ncurrent input device name:" << defaultSourceName()
                 << "\ncurrent output active port name:" << m_outAudioPort.name
                 << "\ncurrent output active port availability(0 for Unknown, 1 for Not Available, 2 for Available.):" << m_outAudioPort.availability
-                << "\ncurrent output device name:" << defaultSinkName();
+                << "\ncurrent output device name:" << defaultSinkName()
+                << "\n***********************************************************************************";
         //监听音频服务的属性改变
         QDBusConnection::sessionBus().connect(AudioService,
                                               AudioPath,
@@ -51,6 +57,7 @@ void AudioWatcher::initDeviceWacther()
                                               this,
                                               SLOT(onDBusAudioPropertyChanged(QDBusMessage))
                                              );
+        updateDeviceEnabled(m_audioDBusInterface->property("Cards").value<QString>(), false);
     } else {
         qWarning() << "初始化失败！音频服务 (" << AudioService << ") 不存在";
     }
@@ -70,7 +77,106 @@ void AudioWatcher::initConnections()
                                           this,
                                           SLOT(onDBusAudioPropertyChanged(QDBusMessage))
                                          );
+
 }
+
+/**
+ * @brief AudioWatcher::isVirtualMachineHw 判断当前环境是否是虚拟环境
+ * @return false:不是虚拟环境 true:是虚拟环境
+ */
+bool AudioWatcher::isVirtualMachineHw()
+{
+    qDebug() << "正在检测系统环境...";
+    bool isVirtualMachine = false;
+    QString reslut = vnSystemInfo();
+    if (reslut.isEmpty()) {
+        return isVirtualMachine;
+    }
+    if (!reslut.contains("none")) {
+        isVirtualMachine = true;
+    }
+    qDebug() << "是否是虚拟环境？" << (isVirtualMachine ? "是" : "否") ;
+    qDebug() << "系统环境检测完成" ;
+    return isVirtualMachine;
+}
+
+/**
+ * @brief AudioWatcher::vnSystemInfo 获取部分系统信息
+ * @return 系统信息
+ */
+QString AudioWatcher::vnSystemInfo()
+{
+
+    qDebug() << "systemd-detect-virt命令查询...";
+    QProcess process;
+    process.start("systemd-detect-virt");
+    process.waitForFinished();
+    process.waitForReadyRead();
+    QByteArray tempArray =  process.readAllStandardOutput();
+    QString reslut = QString(QLatin1String( tempArray.data()));
+    qDebug() << "reslut: " << reslut;
+    process.close();
+    qDebug() << "systemd-detect-virt命令查询结束";
+    return reslut;
+}
+
+/**
+ * @brief AudioWatcher::updateDeviceEnabled 更新控制中心中是否更改设备的使能状态
+ * 调用时机
+ *  1.默认的输入或输出设备改变时需要更新下（不需要发信号）
+ *  2.控制中心更改设备的使能状态（需要发信号）
+ * @param cardsStr:设备信息
+ * @param isEmitSig:是否发信号
+ */
+void AudioWatcher::updateDeviceEnabled(const QString cardsStr, bool isEmitSig)
+{
+    //所有声卡信息
+    QJsonDocument doc = QJsonDocument::fromJson(cardsStr.toUtf8());
+    QJsonArray cards = doc.array();
+    if(cards.isEmpty()){
+        qWarning() << "Current Audio Cards is Empty!!!!";
+        return;
+    }else{
+        qInfo() << "Current Audio Cards: "<< cards;
+    }
+    //遍历声卡，找出当前默认声卡对应的使能状态
+    foreach (QJsonValue card, cards) {
+         //该声卡的所有端口
+        QJsonArray ports = card.toObject()["Ports"].toArray();
+        //qDebug() << "ports: " << ports;
+        //遍历所有端口，找出当前默认设备对应的端口并判断是否可用
+        foreach (QJsonValue port, ports) {
+            QString portName = port.toObject()["Name"].toString();
+            //qDebug() << "portName: " << portName << "m_outAudioPort.name: " << m_outAudioPort.name << "m_inAudioPort.name: " <<m_inAudioPort.name ;
+            if (portName == m_outAudioPort.name) {
+                if(port.toObject().contains("Enabled")){
+                    m_outIsEnable = port.toObject()["Enabled"].toBool();
+                    qDebug() << "m_outAudioPort.name: " << m_outAudioPort.name << ", m_outIsEnable: " <<m_outIsEnable;
+                }else{
+                    m_outIsEnable = m_outAudioPort.availability == 2? true : false;
+                    qWarning() << "current audio out port (" << m_outAudioPort.name << ")is not exist 'Enabled' !!!!";
+                }
+                qInfo() << "current audio out port is enable" << m_outIsEnable;
+                if (isEmitSig)
+                    sigDeviceEnableChanged(Internal, m_outIsEnable);
+            }
+            if (portName == m_inAudioPort.name) {
+                if(port.toObject().contains("Enabled"))
+                {
+                    m_inIsEnable = port.toObject()["Enabled"].toBool();
+                    qDebug() << "m_inAudioPort.name: " << m_inAudioPort.name << ", m_inIsEnable: " <<m_inIsEnable;
+                }else{
+                    m_inIsEnable = m_inAudioPort.availability == 2? true : false;
+                    qWarning() << "current audio in port (" << m_inAudioPort.name << ")is not exist 'Enabled' !!!!";
+                }
+                qInfo() << "current audio in port is enable" << m_inIsEnable;
+                if (isEmitSig)
+                    sigDeviceEnableChanged(Micphone, m_inIsEnable);
+            }
+        }
+    }
+}
+
 //初始化音频dbus服务默认输入源的接口
 void AudioWatcher::initDefaultSourceDBusInterface()
 {
@@ -158,6 +264,10 @@ void AudioWatcher::onDBusAudioPropertyChanged(QDBusMessage msg)
                 //默认输出源地址改变
                 const QDBusObjectPath &defaultSinkePath = qvariant_cast<QDBusObjectPath>(changedProps[prop]);
                 onDefaultSinkChanaged(defaultSinkePath);
+            }else if (prop == "CardsWithoutUnavailable") {
+                //控制中心中是否更改设备的使能状态
+                qInfo() << "控制中心改变默认设备使能状态！" << prop;
+                updateDeviceEnabled(changedProps[prop].toString(), true);
             }
         }
     } else if (interfaceName == SourceInterface) {
@@ -365,14 +475,18 @@ QString AudioWatcher::getDeviceName(AudioMode mode)
 {
     QString device = "";
     if (mode == Internal) {
-        if (m_outAudioPort.availability != 1 || !m_fNeedDeviceChecker) {
+        if ((m_outAudioPort.availability != 1 || !m_fNeedDeviceChecker) &&
+                (defaultSinkPorts().count() != 0 || m_isVirtualMachineHw)) {
+            //if (m_outAudioPort.availability != 1 || !m_fNeedDeviceChecker) {
             device = defaultSinkName();
             if (!device.isEmpty() && !device.endsWith(".monitor")) {
                 device += ".monitor";
             }
         }
     } else {
-        if (m_inAudioPort.availability != 1 || !m_fNeedDeviceChecker) {
+        if ((m_inAudioPort.availability != 1 || !m_fNeedDeviceChecker) &&
+                (defaultSourcePorts().count() != 0 || m_isVirtualMachineHw)) {
+            //if (m_inAudioPort.availability != 1 || !m_fNeedDeviceChecker) {
             device = defaultSourceName();
             if (device.endsWith(".monitor") && m_fNeedDeviceChecker) {
                 device.clear();
@@ -400,6 +514,22 @@ double AudioWatcher::getVolume(AudioMode mode)
 bool AudioWatcher::getMute(AudioMode mode)
 {
     return mode != Internal ? m_inAudioMute : m_outAudioMute;
+}
+
+/**
+ * @brief AudioWatcher::getDeviceEnable
+ * @param mode
+ * @return 设备是否通过控制中心禁用
+ */
+bool AudioWatcher::getDeviceEnable(AudioWatcher::AudioMode mode)
+{
+    //虚拟环境的情况下是无法判断是否存在声卡的，采用(5.10.17)及以前的处理方式，默认都可用
+    if (m_isVirtualMachineHw && m_audioDBusInterface->property("Cards").value<QString>().isEmpty()) {
+        qDebug() << "虚拟环境且Cards为空";
+        return true;
+    } else {
+        return mode != Internal ? m_inIsEnable : m_outIsEnable;
+    }
 }
 
 /**
@@ -460,7 +590,7 @@ AudioPort AudioWatcher::defaultSourceActivePort()
         qInfo() << "音频服务： "<< AudioService <<" 默认输入源地址"<< m_defaultSourcePath << " 属性接口："<< PropertiesInterface;
         QDBusReply<QDBusVariant> reply = inter->call("Get", SourceInterface, "ActivePort");
         reply.value().variant().value<QDBusArgument>() >> port;
-        qInfo() << __LINE__ << __func__ <<  "ActivePort:" << port;
+        qInfo() << "默认输入源的ActivePort:" << port;
     } else {
         qWarning() << "默认输入源地址 (" << m_defaultSourcePath << ") 不存在";
     }
@@ -502,6 +632,26 @@ QString AudioWatcher::defaultSourceName()
     }
 }
 
+QList<AudioPort> AudioWatcher::defaultSourcePorts()
+{
+    QList<AudioPort> ports;
+    auto inter = new QDBusInterface(AudioService,
+                                    m_defaultSourcePath,
+                                    PropertiesInterface,
+                                    QDBusConnection::sessionBus());
+
+    if (inter->isValid()) {
+        QDBusReply<QDBusVariant> reply = inter->call("Get", SourceInterface, "Ports");
+        reply.value().variant().value<QDBusArgument>() >> ports;
+        qInfo() << "Current Audio Source Ports Size:"<<ports.size() << "Ports" << ports;
+    } else {
+        qInfo() << "Current Audio Source Ports is nullptr or invalid";
+    }
+    delete inter;
+    inter = nullptr;
+    return ports;
+}
+
 //音频dbus服务默认输出源的活跃端口
 AudioPort AudioWatcher::defaultSinkActivePort()
 {
@@ -515,7 +665,7 @@ AudioPort AudioWatcher::defaultSinkActivePort()
         qInfo() << "音频服务： "<< AudioService <<" 默认输出源地址"<< m_defaultSinkPath << " 属性接口："<< PropertiesInterface;
         QDBusReply<QDBusVariant> reply = inter->call("Get", SinkInterface, "ActivePort");
         reply.value().variant().value<QDBusArgument>() >> port;
-        qInfo() << __LINE__ << __func__ <<  "ActivePort:" << port;
+        qInfo() << "默认输出源的ActivePort:" << port;
     } else {
         qWarning() << "默认输出源地址 (" << m_defaultSinkPath << ") 不存在";
     }
@@ -555,4 +705,25 @@ QString AudioWatcher::defaultSinkName()
         qInfo() << __FUNCTION__ << __LINE__ << "m_defaultSinkDBusInterface is nullptr or invalid";
         return "";
     }
+}
+
+QList<AudioPort> AudioWatcher::defaultSinkPorts()
+{
+    QList<AudioPort> ports;
+    auto inter = new QDBusInterface(AudioService,
+                                    m_defaultSinkPath,
+                                    PropertiesInterface,
+                                    QDBusConnection::sessionBus());
+
+    if (inter->isValid()) {
+        qInfo() << "音频服务： "<< AudioService <<" 默认输出源地址"<< m_defaultSinkPath << " 属性接口："<< PropertiesInterface;
+        QDBusReply<QDBusVariant> reply = inter->call("Get", SinkInterface, "Ports");
+        reply.value().variant().value<QDBusArgument>() >> ports;
+        qInfo() << "Current Audio Sink Ports Size:"<< ports.size() << "Ports" << ports;
+    } else {
+        qInfo() << "Current Audio Sink Ports is nullptr or invalid";
+    }
+    delete inter;
+    inter = nullptr;
+    return ports;
 }
