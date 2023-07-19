@@ -32,10 +32,16 @@ static const char webPage[] = WEB_PATH "/index.html";
 WebRichTextEditor::WebRichTextEditor(QWidget *parent)
     : QWebEngineView(parent)
 {
+    qDebug() << "Initializing the rich text editor...";
+    qDebug() << "Initializing font information...";
     initFontsInformation();
+    qDebug() << "Initializing the Rich Text page...";
     initWebView();
+    qDebug() << "Initializing the right-click menu...";
     initRightMenu();
+    qDebug() << "Initializing the timing updater...";
     initUpdateTimer();
+    qDebug() << "The rich text editor has been initialized";
 }
 
 WebRichTextEditor::~WebRichTextEditor()
@@ -52,7 +58,7 @@ void WebRichTextEditor::initWebView()
     channel->registerObject("webobj", content);
     page()->setWebChannel(channel);
     QFileInfo info(webPage);
-    printf("%s \n", webPage);
+    //printf("%s \n", webPage);
     load(QUrl::fromLocalFile(info.absoluteFilePath()));
     page()->setBackgroundColor(DGuiApplicationHelper::instance()->applicationPalette().base().color());
 
@@ -84,7 +90,7 @@ void WebRichTextEditor::initFontsInformation()
         qInfo() << "字体服务初始化成功！字体服务： " << DEEPIN_DAEMON_APPEARANCE_SERVICE << " 地址：" << DEEPIN_DAEMON_APPEARANCE_PATH << " 接口：" << DEEPIN_DAEMON_APPEARANCE_INTERFACE;
         //获取默认字体
         QString defaultfont = m_appearanceDBusInterface->property("StandardFont").value<QString>();
-        qInfo() << "默认字体: " << defaultfont;
+        //qInfo() << "默认字体: " << defaultfont;
         //获取字体列表
         QDBusPendingReply<QString> font = m_appearanceDBusInterface->call("List", "standardfont");
         //qInfo() << "字体列表 font: " << font;
@@ -94,7 +100,7 @@ void WebRichTextEditor::initFontsInformation()
         for (int i = 0; i != array.size(); i++) {
             list << array.at(i).toString();
         }
-        qInfo() << "字体列表: " << list;
+        //qInfo() << "字体列表: " << list;
 
         QList<QVariant> arg;
         arg << "standardfont"
@@ -103,7 +109,7 @@ void WebRichTextEditor::initFontsInformation()
         QDBusPendingReply<QString> font1 = m_appearanceDBusInterface->callWithArgumentList(QDBus::AutoDetect,"Show", arg);
 
         QJsonArray arrayValue = QJsonDocument::fromJson(font1.value().toLocal8Bit().data()).array();
-        qInfo() << "带翻译的字体列表: " << arrayValue;
+        //qInfo() << "带翻译的字体列表: " << arrayValue;
         //列表格式转换
         for (int i = 0; i != arrayValue.size(); i++) {
             QJsonObject object = arrayValue.at(i).toObject();
@@ -117,6 +123,7 @@ void WebRichTextEditor::initFontsInformation()
         //qInfo() << "m_fontList: " << m_fontList;
         //qInfo() << "m_FontDefault: " << m_FontDefault;
 
+        qInfo() << "带翻译的默认字体: " << m_FontDefault;
         // sort for display name
         std::sort(m_fontList.begin(), m_fontList.end(), [ = ](const QString & obj1, const QString & obj2) {
             QCollator qc;

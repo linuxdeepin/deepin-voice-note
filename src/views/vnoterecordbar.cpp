@@ -228,13 +228,15 @@ void VNoteRecordBar::onAudioVolumeChange(int mode)
  */
 void VNoteRecordBar::onAudioDeviceChange(int mode)
 {
+    qDebug() <<"Current record auido mode(system:0,mic:1):" << m_currentMode <<  " Change record audio mode(system:0,mic:1): " << mode;
     if (m_currentMode == mode) {
         static bool msgshow = false;
         QString info = m_audioWatcher->getDeviceName(
             static_cast<AudioWatcher::AudioMode>(mode));
-        qInfo() << __LINE__ << __func__ << "info: " << info;
+        qInfo() << "Current Audio Device Name: " << info;
         if (info.isEmpty()) { //切换后的设备异常
             qInfo() << __LINE__ << __func__ << "音频设备异常,已禁用录制按钮";
+            qInfo() << "录制按钮是否可点击？" << false;
             m_recordBtn->setEnabled(false);
             m_recordBtn->setToolTip(
                 DApplication::translate(
@@ -252,7 +254,11 @@ void VNoteRecordBar::onAudioDeviceChange(int mode)
                 emit sigDeviceExceptionMsgClose();
                 msgshow = false;
             }
-            m_recordBtn->setEnabled(true);
+            //            m_recordBtn->setEnabled(true);
+            //根据 系统>控制中心>声音>设备管理>输入设备 中的使能情况设置按钮是否可用
+            bool isEnable = m_audioWatcher->getDeviceEnable(static_cast<AudioWatcher::AudioMode>(m_currentMode));
+            qInfo() << "录制按钮是否可点击？" << isEnable;
+            m_recordBtn->setEnabled(isEnable);
             m_recordBtn->setToolTip("");
             if (m_mainLayout->currentWidget() == m_recordPanel) {
                 stopRecord();
@@ -292,6 +298,8 @@ void VNoteRecordBar::initAudioWatcher()
             this, &VNoteRecordBar::onAudioDeviceChange);
     connect(m_audioWatcher, &AudioWatcher::sigVolumeChange,
             this, &VNoteRecordBar::onAudioVolumeChange);
+    connect(m_audioWatcher, &AudioWatcher::sigDeviceEnableChanged,
+                this, &VNoteRecordBar::onDeviceEnableChanged);
 }
 
 /**
@@ -314,6 +322,21 @@ void VNoteRecordBar::onChangeTheme()
     highColor.setAlphaF(0.4);
     palette.setColor(DPalette::Disabled, DPalette::Highlight, highColor);
     m_recordBtn->setPalette(palette);
+}
+
+/**
+ * @brief VNoteRecordBar::onDeviceEnableChanged
+ * 根据 系统>控制中心>声音>设备管理>输入设备 中的使能情况设置按钮是否可用
+ * @param mode
+ * @param enabled
+ */
+void VNoteRecordBar::onDeviceEnableChanged(int mode, bool enabled)
+{
+    qInfo() << "通过控制中心改变默认设备 "<< mode << "（输出设备:0 输入设备:1）使能状态！enalbed:" <<enabled;
+    if (m_currentMode == mode) {
+        qInfo() << "录制按钮是否可点击？" << enabled;
+        m_recordBtn->setEnabled(enabled);
+    }
 }
 
 void VNoteRecordBar::stopPlay()
