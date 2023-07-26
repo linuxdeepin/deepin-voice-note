@@ -524,8 +524,9 @@ bool AudioWatcher::getMute(AudioMode mode)
 bool AudioWatcher::getDeviceEnable(AudioWatcher::AudioMode mode)
 {
     //虚拟环境的情况下是无法判断是否存在声卡的，采用(5.10.17)及以前的处理方式，默认都可用
-    if (m_isVirtualMachineHw && m_audioDBusInterface->property("Cards").value<QString>().isEmpty()) {
-        qDebug() << "虚拟环境且Cards为空";
+    QString cards = m_audioDBusInterface->property("Cards").value<QString>();
+    if (m_isVirtualMachineHw && (cards.isEmpty() || cards.toLower() == "null")) {
+        qInfo() << "虚拟环境且Cards为空";
         return true;
     } else {
         return mode != Internal ? m_inIsEnable : m_outIsEnable;
