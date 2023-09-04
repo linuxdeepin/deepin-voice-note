@@ -57,7 +57,8 @@ void AudioWatcher::initDeviceWacther()
                                               this,
                                               SLOT(onDBusAudioPropertyChanged(QDBusMessage))
                                              );
-        updateDeviceEnabled(m_audioDBusInterface->property("Cards").value<QString>(), false);
+        //updateDeviceEnabled(m_audioDBusInterface->property("Cards").value<QString>(), false);
+        updateDeviceEnabled(m_audioDBusInterface->property("CardsWithoutUnavailable").value<QString>(), false);
     } else {
         qWarning() << "初始化失败！音频服务 (" << AudioService << ") 不存在";
     }
@@ -139,6 +140,8 @@ void AudioWatcher::updateDeviceEnabled(const QString cardsStr, bool isEmitSig)
     }else{
         qInfo() << "Current Audio Cards: "<< cards;
     }
+    m_outAuidoPorts.clear();
+    m_inAuidoPorts.clear();
     //遍历声卡，找出当前默认声卡对应的使能状态
     foreach (QJsonValue card, cards) {
          //该声卡的所有端口
@@ -148,33 +151,63 @@ void AudioWatcher::updateDeviceEnabled(const QString cardsStr, bool isEmitSig)
         foreach (QJsonValue port, ports) {
             QString portName = port.toObject()["Name"].toString();
             //qDebug() << "portName: " << portName << "m_outAudioPort.name: " << m_outAudioPort.name << "m_inAudioPort.name: " <<m_inAudioPort.name ;
-            if (portName == m_outAudioPort.name) {
-                if(port.toObject().contains("Enabled")){
-                    m_outIsEnable = port.toObject()["Enabled"].toBool();
-                    qDebug() << "m_outAudioPort.name: " << m_outAudioPort.name << ", m_outIsEnable: " <<m_outIsEnable;
-                }else{
-                    m_outIsEnable = m_outAudioPort.availability == 2? true : false;
-                    qWarning() << "current audio out port (" << m_outAudioPort.name << ")is not exist 'Enabled' !!!!";
-                }
-                qInfo() << "current audio out port is enable" << m_outIsEnable;
-                if (isEmitSig)
-                    sigDeviceEnableChanged(Internal, m_outIsEnable);
+            bool isEnable = false;
+            AudioPort audioPort;
+            audioPort.name = portName;
+            audioPort.description = port.toObject()["Description"].toString();
+            if(port.toObject().contains("Enabled")){
+                isEnable = port.toObject()["Enabled"].toBool();
+                //qDebug() << "audioPort.name: " << audioPort.name << ", isEnable: " <<isEnable;
             }
-            if (portName == m_inAudioPort.name) {
-                if(port.toObject().contains("Enabled"))
-                {
-                    m_inIsEnable = port.toObject()["Enabled"].toBool();
-                    qDebug() << "m_inAudioPort.name: " << m_inAudioPort.name << ", m_inIsEnable: " <<m_inIsEnable;
-                }else{
-                    m_inIsEnable = m_inAudioPort.availability == 2? true : false;
-                    qWarning() << "current audio in port (" << m_inAudioPort.name << ")is not exist 'Enabled' !!!!";
+            audioPort.availability = isEnable? 2:1;
+            if(port.toObject().contains("Direction")){
+                if(port.toObject()["Direction"].toInt() == 1 && isEnable){
+                    m_outAuidoPorts.append(audioPort);
+                }else if(port.toObject()["Direction"].toInt() == 2 && isEnable){
+                    m_inAuidoPorts.append(audioPort);
                 }
-                qInfo() << "current audio in port is enable" << m_inIsEnable;
-                if (isEmitSig)
-                    sigDeviceEnableChanged(Micphone, m_inIsEnable);
             }
         }
     }
+    m_inAudioPort = currentAuidoPort(m_inAuidoPorts,Micphone);
+    m_inIsEnable = m_inAudioPort.availability == 2? true : false;
+    if (isEmitSig)
+        sigDeviceEnableChanged(Micphone, m_inIsEnable);
+    m_outAudioPort = currentAuidoPort(m_outAuidoPorts,Internal);
+    m_outIsEnable = m_outAudioPort.availability == 2? true : false;
+    if (isEmitSig)
+        sigDeviceEnableChanged(Internal, m_outIsEnable);
+
+    qInfo() << "current select in audioPort: "<< m_inAudioPort << ",is enable:" << m_inIsEnable;
+    qInfo() << "current select out audioPort: "<< m_outAudioPort << ",is enable:" << m_outIsEnable;
+}
+
+AudioPort AudioWatcher::currentAuidoPort(const QList<AudioPort> &auidoPorts,AudioMode audioMode)
+{
+    AudioPort currentAudioPort;
+    if(auidoPorts.count()){
+        //遍历 当前所有可用的输入或输出端口
+        foreach (AudioPort audioPort, auidoPorts) {
+            //判断defaultSource或defaultSink的活跃端口是不是当前可用的端口
+            AudioPort defaultAudioPort;
+            if(audioMode == AudioMode::Internal){
+                defaultAudioPort = defaultSinkActivePort();
+            }else{
+                defaultAudioPort = defaultSourceActivePort();
+            }
+            if(audioPort.name ==  defaultAudioPort.name){
+                currentAudioPort = defaultAudioPort;
+                break;
+            }else{
+                currentAudioPort = audioPort;
+            }
+        }
+    }else{
+        currentAudioPort.name = "null";
+        currentAudioPort.description = "null";
+        currentAudioPort.availability = 0;
+    }
+    return currentAudioPort;
 }
 
 //初始化音频dbus服务默认输入源的接口
@@ -244,7 +277,7 @@ void AudioWatcher::initDefaultSinkDBusInterface()
 void AudioWatcher::onDBusAudioPropertyChanged(QDBusMessage msg)
 {
     QList<QVariant> arguments = msg.arguments();
-    //qInfo() << "arguments" << arguments;
+    //qInfo() << "arguments" << arguments << arguments.count();
     //参数固定长度
     if (3 != arguments.count()) {
         qWarning() << "参数长度不为3！ 参数: " << arguments;
@@ -529,6 +562,9 @@ bool AudioWatcher::getDeviceEnable(AudioWatcher::AudioMode mode)
         qInfo() << "虚拟环境且Cards为空";
         return true;
     } else {
+        qInfo() << "Current Mode: " << mode
+                << "Input Device Enable: " << m_inIsEnable
+                << "Output Device Enable:" << m_outIsEnable;
         return mode != Internal ? m_inIsEnable : m_outIsEnable;
     }
 }

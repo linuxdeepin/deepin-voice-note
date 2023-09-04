@@ -235,6 +235,14 @@ private:
     QString vnSystemInfo();
     //更新控制中心中是否更改设备的使能状态
     void updateDeviceEnabled(const QString cardsStr, bool isEmitSig);
+
+    /**
+     * @brief currentAuidoPort 从可用的audio ports当中选择一个可用的port，作为当前的port
+     * @param auidoPorts
+     * @param audioMode
+     * @return
+     */
+    AudioPort currentAuidoPort(const QList<AudioPort> &auidoPorts,AudioMode audioMode);
 private:
     /**
      * @brief 音频服务dbus接口
@@ -263,13 +271,31 @@ private:
      */
     QString m_defaultSinkPath;
 
+    /**
+     * @brief m_outAudioPort 当前的输出端口
+     * 注意：存在一种情况defaultSink的活跃端口不是当前端口
+     */
     AudioPort m_outAudioPort;
+    /**
+     * @brief m_inAudioPort 当前的输入端口
+     * 注意：存在一种情况defaultSource的活跃端口不是当前端口
+     */
     AudioPort m_inAudioPort;
     double m_outAudioPortVolume = 0.0;
     double m_inAudioPortVolume = 0.0;
     bool m_fNeedDeviceChecker {true};
     bool m_inAudioMute {false};
     bool m_outAudioMute {false};
+
+    /**
+     * @brief m_inAuidoPorts 当前所有可用的输出端口
+     */
+    QList<AudioPort> m_outAuidoPorts;
+
+    /**
+     * @brief m_inAuidoPorts 当前所有可用的输入端口
+     */
+    QList<AudioPort> m_inAuidoPorts;
 
     /**
       * @brief 默认输入设备是否使能
