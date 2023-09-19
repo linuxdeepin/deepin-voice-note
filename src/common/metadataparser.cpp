@@ -9,6 +9,10 @@
 
 #include <DLog>
 
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+
 /**
  * @brief MetaDataParser::MetaDataParser
  */

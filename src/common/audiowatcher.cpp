@@ -311,7 +311,8 @@ void AudioWatcher::onDBusAudioPropertyChanged(QDBusMessage msg)
             if (prop == QStringLiteral("Volume")) {
                 //默认输入源音量改变
                 double inAudioPortVolume = qvariant_cast<double>(changedProps[prop]);
-                if (abs(m_inAudioPortVolume - inAudioPortVolume) <= 0.000001) {
+                qDebug() << "当前音量: " << inAudioPortVolume << "，上一次音量: " << m_inAudioPortVolume;
+                if (abs(m_inAudioPortVolume - inAudioPortVolume) >= 0.000001) {
                     qInfo() << "默认输入源音量改变:" <<  m_inAudioPortVolume << " To " << inAudioPortVolume;
                     onSourceVolumeChanged(inAudioPortVolume);
                 }
@@ -343,7 +344,7 @@ void AudioWatcher::onDBusAudioPropertyChanged(QDBusMessage msg)
             if (prop == QStringLiteral("Volume")) {
                 //默认输出源音量改变
                 double outAudioPortVolume = qvariant_cast<double>(changedProps[prop]);
-                if (abs(m_outAudioPortVolume - outAudioPortVolume) <= 0.000001) {
+                if (abs(m_outAudioPortVolume - outAudioPortVolume) >= 0.000001) {
                     qInfo() << "默认输出源音量改变:" <<  m_outAudioPortVolume << " To " << outAudioPortVolume;
                     onSourceVolumeChanged(outAudioPortVolume);
                 }
