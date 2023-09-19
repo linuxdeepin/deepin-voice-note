@@ -13,6 +13,9 @@
 #include <QMap>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 /*
 Eg: meta-data format
