@@ -13,6 +13,7 @@
 #include <QDir>
 #include <QOpenGLContext>
 #include <QSurfaceFormat>
+#include <QStandardPaths>
 
 #include <DApplication>
 #include <DApplicationSettings>
