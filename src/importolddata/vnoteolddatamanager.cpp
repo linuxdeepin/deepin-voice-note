@@ -8,6 +8,8 @@
 
 #include <DLog>
 
+#include <QThreadPool>
+
 VNoteOldDataManager *VNoteOldDataManager::_instance = nullptr;
 VNoteDbManager *VNoteOldDataManager::m_oldDbManger = nullptr;
 

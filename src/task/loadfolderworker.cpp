@@ -39,7 +39,7 @@ void LoadFolderWorker::run()
     //TODO:
     //    Add load folder code here
 
-    qDebug() << __FUNCTION__ << " load folders ok:" << foldersMap << " thread id:" << QThread::currentThreadId();
+    qDebug() << __FUNCTION__ << " load folders ok:" << foldersMap/* << " thread id:" << QThread::currentThreadId()*/;
 
     emit onFoldersLoaded(foldersMap);
 }

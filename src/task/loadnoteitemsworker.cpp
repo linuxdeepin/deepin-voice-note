@@ -38,7 +38,7 @@ void LoadNoteItemsWorker::run()
     //TODO:
     //    Add load folder code here
 
-    qDebug() << __FUNCTION__ << " load all notes ok:" << notesMap->notes.size() << " thread id:" << QThread::currentThreadId();
+    qDebug() << __FUNCTION__ << " load all notes ok:" << notesMap->notes.size() /*<< " thread id:" << QThread::currentThreadId()*/;
 
     emit onAllNotesLoaded(notesMap);
 }
