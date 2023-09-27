@@ -9,6 +9,8 @@
 
 #include <DLog>
 
+#include <QThread>
+
 /**
  * @brief LoadNoteItemsWorker::LoadNoteItemsWorker
  * @param parent

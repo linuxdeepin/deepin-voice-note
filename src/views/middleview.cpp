@@ -28,6 +28,8 @@
 #include <QScrollBar>
 #include <QDrag>
 #include <QMimeData>
+#include <QStandardPaths>
+#include <QThreadPool>
 
 /**
  * @brief MiddleView::MiddleView
