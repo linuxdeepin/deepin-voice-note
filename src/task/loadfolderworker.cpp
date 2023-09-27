@@ -10,6 +10,8 @@
 
 #include <DLog>
 
+#include <QThread>
+
 /**
  * @brief LoadFolderWorker::LoadFolderWorker
  * @param parent

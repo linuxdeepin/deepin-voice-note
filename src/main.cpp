@@ -14,6 +14,7 @@
 #include <QOpenGLContext>
 #include <QSurfaceFormat>
 #include <QStandardPaths>
+#include <QLibraryInfo>
 
 #include <DApplication>
 #include <DApplicationSettings>
