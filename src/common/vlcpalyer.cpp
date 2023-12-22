@@ -151,7 +151,7 @@ void VlcPalyer::play()
     }
 #else
     qInfo() << "Current play engine status: " << player->state();
-    if(player->state() == PlayerEngine::CoreState::Paused){
+    if(player->state() == PlayerEngine::CoreState::Paused && !m_isChangePlayFile){
         qInfo() << "Pause start: " << videoUrl;
         player->pauseResume();
     }else{
