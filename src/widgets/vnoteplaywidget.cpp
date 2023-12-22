@@ -151,6 +151,7 @@ void VNotePlayWidget::onVoicePlayPosChange(qint64 pos)
  */
 void VNotePlayWidget::onCloseBtnClicked()
 {
+    qDebug() << "Click close button!";
     m_slider->setValue(0);
     m_player->stop();
     m_sliderReleased = true;
@@ -191,8 +192,13 @@ void VNotePlayWidget::onSliderReleased()
 void VNotePlayWidget::onSliderMove(int pos)
 {
     if (m_voiceBlock) {
+#ifdef MPV_PLAYENGINE
+        qint64 tmpPos = pos*1000 > m_voiceBlock->voiceSize ? m_voiceBlock->voiceSize : pos*1000;
+#else
         qint64 tmpPos = pos > m_voiceBlock->voiceSize ? m_voiceBlock->voiceSize : pos;
+#endif
         m_timeLab->setText(Utils::formatMillisecond(tmpPos, 0) + "/" + Utils::formatMillisecond(m_voiceBlock->voiceSize));
+        //qDebug() << "Current play time: " << m_timeLab->text();
     }
 
     if (m_sliderReleased == true) {
@@ -260,6 +266,7 @@ VlcPalyer::VlcState VNotePlayWidget::getPlayerStatus()
 void VNotePlayWidget::onDurationChanged(qint64 duration)
 {
     if (duration && m_slider->maximum() != duration) {
+        qInfo() << "Get total audio duration changed! (duration: " << duration<< ")";
         m_slider->setMaximum(static_cast<int>(duration));
     }
 }
@@ -272,6 +279,7 @@ void VNotePlayWidget::onPlayerBtnClicked()
 void VNotePlayWidget::playVoice(VNVoiceBlock *voiceData, bool bIsSame)
 {
     if (bIsSame && nullptr != m_voiceBlock) { //与上一次语音相同，执行继续/暂停操作
+        qInfo() << "As with the last voice, continue/pause";
         VlcPalyer::VlcState status = getPlayerStatus();
         if (status == VlcPalyer::Playing) { //当前语音播放中则执行暂停操作
             m_player->pause();
@@ -283,8 +291,10 @@ void VNotePlayWidget::playVoice(VNVoiceBlock *voiceData, bool bIsSame)
             emit sigPlayVoice(m_voiceBlock);
         }
     } else if (nullptr != voiceData) { //与上一次语音不相同，重新播放语音
+        qInfo() << "Different from the last voice, play the voice again";
         m_slider->setValue(0);
         m_voiceBlock = voiceData;
+        m_player->setChangePlayFile(true);
         m_player->setFilePath(m_voiceBlock->voicePath);
         m_nameLab->setText(voiceData->voiceTitle);
         m_timeLab->setText(Utils::formatMillisecond(0, 0) + "/" + Utils::formatMillisecond(voiceData->voiceSize));
