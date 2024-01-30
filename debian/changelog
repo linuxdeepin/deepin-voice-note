@@ -1,3 +1,9 @@
+deepin-voice-note (6.0.17) unstable; urgency=medium
+
+  * add build-dep deepin-desktop-base.
+
+ -- LiChengGang <lichenggang@uniontech.com>  Tue, 30 Jan 2024 16:08:20 +0800
+
 deepin-voice-note (6.0.16) unstable; urgency=medium
 
   * New version 6.0.16.
