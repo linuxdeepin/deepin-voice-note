@@ -23,7 +23,8 @@ Build-Depends:
  qtwebengine5-dev,
  libgtest-dev,
  libffmpegthumbnailer-dev,
- libdmr-dev
+ libdmr-dev,
+ deepin-desktop-base
 Standards-Version: 4.1.3
 Homepage: <insert the upstream URL, if relevant>
 #Vcs-Browser: https://salsa.debian.org/debian/voice-note
