@@ -350,7 +350,7 @@ void VNoteMainWindow::initTitleBar()
     m_noteSearchEdit->lineEdit()->installEventFilter(this);
 
     titlebar()->addWidget(titleWidget, Qt::AlignLeft); //图标控件居左显示
-    titlebar()->addWidget(m_noteSearchEdit, Qt::AlignCenter); //将搜索框添加到标题栏居中显示
+    titlebar()->addWidget(m_noteSearchEdit/*, Qt::AlignCenter*/); //将搜索框添加到标题栏居中显示
     titlebar()->addWidget(m_imgInsert, Qt::AlignRight);
 
     QWidget::setTabOrder(titlebar(), m_viewChange); //设置title焦点传递的下一个控件
@@ -731,6 +731,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
         m_imgInsert->setDisabled(true);
         m_recordBar->setVisible(false);
     }
+    m_buttonAnchor->setBottomMargin(7);
 }
 
 /**
@@ -1921,16 +1922,20 @@ void VNoteMainWindow::initMenuExtension()
  */
 void VNoteMainWindow::initTitleIconButton()
 {
-    m_viewChange = new VNotePushbutton(this);
+    m_viewChange = new DToolButton(this);
     m_viewChange->setIconSize(QSize(36, 36));
     m_viewChange->setFixedSize(QSize(36, 36));
-    m_viewChange->setIcon(Utils::loadSVG("sidebar_show.svg", false));
+//    m_viewChange->setIcon(Utils::loadSVG("sidebar_show.svg", false));
+    m_viewChange->setIcon(QIcon::fromTheme("dvn_sidebar"));
+    m_viewChange->setCheckable(true);
 
-    m_imgInsert = new VNotePushbutton(this);
+    m_imgInsert = new DToolButton(this);
     m_imgInsert->setIconSize(QSize(36, 36));
     m_imgInsert->setFixedSize(QSize(36, 36));
-    m_imgInsert->setIcon(Utils::loadSVG("image_show.svg", false));
+//    m_imgInsert->setIcon(Utils::loadSVG("image_show.svg", false));
+    m_imgInsert->setIcon(QIcon::fromTheme("dvn_image"));
     m_imgInsert->setDisabled(true); //初始为禁用状态
+    m_imgInsert->setCheckable(false); //初始为禁用状态
 }
 
 /**
@@ -2022,6 +2027,7 @@ bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
         int position = (m_middleViewHolder->width() - m_addNoteBtn->width()) / 2 - 6;
         m_buttonAnchor->setLeftMargin(position);
         m_middleView->resize(m_middleViewHolder->width(), m_middleViewHolder->height() - m_noteBookName->height() - 20);
+        m_buttonAnchor->setBottomMargin(17);
         //qDebug() << m_middleViewHolder->geometry() << m_noteBookName->height() << m_noteBookName->geometry();
         updateFolderName();
         return true;
@@ -2038,6 +2044,18 @@ bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
     }
     if (o == m_noteSearchEdit->lineEdit() && e->type() == QEvent::FocusIn) {
         m_showSearchEditMenu = false;
+    }
+    if(o == m_noteSearchEdit->lineEdit() && QEvent::Move == e->type()){
+        // 触发搜索框移动事件时需要，更新搜索框的大小
+        if (this->geometry().width() >= DEFAULT_WINDOWS_WIDTH) {
+            m_noteSearchEdit->resize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H);
+        } else if (this->geometry().width() <= MIN_WINDOWS_WIDTH) {
+            m_noteSearchEdit->resize(VNOTE_SEARCHBAR_MIN_W, VNOTE_SEARCHBAR_H);
+        } else {
+            double wMainWin = ((this->geometry().width() - MIN_WINDOWS_WIDTH) * 1.0) / (DEFAULT_WINDOWS_WIDTH - MIN_WINDOWS_WIDTH);
+            int wsearch = static_cast<int>((VNOTE_SEARCHBAR_W - VNOTE_SEARCHBAR_MIN_W) * wMainWin) + VNOTE_SEARCHBAR_MIN_W;
+            m_noteSearchEdit->resize(wsearch , VNOTE_SEARCHBAR_H);
+        }
     }
     return false;
 }
@@ -2386,11 +2404,11 @@ void VNoteMainWindow::onInsertImageToWebEditor()
                 "",
                 QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
                 "Image file(*.jpg *.png *.bmp)");
-    m_imgInsert->setChecked(false);
 
     if (JsContent::instance()->insertImages(filePaths)) {
         m_richTextEdit->setFocus(); //插入成功，将焦点转移至编辑区
     }
+//    m_imgInsert->setChecked(false);
 }
 
 /**
@@ -2443,7 +2461,9 @@ void VNoteMainWindow::showNotepadList()
         appDp.setBrush(DPalette::Light, appDp.color(DPalette::Active, DPalette::Highlight));
         appDp.setBrush(DPalette::Dark, appDp.color(DPalette::Active, DPalette::Highlight));
         //m_viewChange->setIcon(Utils::loadSVG("view_change_show.svg", false));
+        m_viewChange->setChecked(true);
     } else {
+        m_viewChange->setChecked(false);
         //m_viewChange->setIcon(Utils::loadSVG("view_change_hide.svg", false));
     }
     //m_viewChange->setPalette(appDp);
