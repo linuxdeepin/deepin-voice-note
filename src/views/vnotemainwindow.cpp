@@ -341,16 +341,20 @@ void VNoteMainWindow::initTitleBar()
     titleLayout->setSpacing(10);
     titleLayout->addWidget(m_viewChange); //添加记事本列表收起控件按钮
 
+    QWidget *m_searchWidget = new QWidget();
     // Search note
-    m_noteSearchEdit = new DSearchEdit(this);
+    m_noteSearchEdit = new DSearchEdit(m_searchWidget);
+    QHBoxLayout *searchLayout = new QHBoxLayout(m_searchWidget); //标题栏中部控件以横向列表展示
+
     DFontSizeManager::instance()->bind(m_noteSearchEdit, DFontSizeManager::T6);
     m_noteSearchEdit->setMaximumSize(QSize(VNOTE_SEARCHBAR_W, VNOTE_SEARCHBAR_H));
     m_noteSearchEdit->setMinimumSize(QSize(VNOTE_SEARCHBAR_MIN_W, VNOTE_SEARCHBAR_H));
     m_noteSearchEdit->setPlaceHolder(DApplication::translate("TitleBar", "Search"));
     m_noteSearchEdit->lineEdit()->installEventFilter(this);
+    searchLayout->addWidget(m_noteSearchEdit);
 
     titlebar()->addWidget(titleWidget, Qt::AlignLeft); //图标控件居左显示
-    titlebar()->addWidget(m_noteSearchEdit, Qt::AlignCenter); //将搜索框添加到标题栏居中显示
+    titlebar()->addWidget(m_searchWidget/*, Qt::AlignCenter*/); //将搜索框添加到标题栏居中显示
     titlebar()->addWidget(m_imgInsert, Qt::AlignRight);
 
     QWidget::setTabOrder(titlebar(), m_viewChange); //设置title焦点传递的下一个控件
@@ -731,6 +735,7 @@ void VNoteMainWindow::onVNoteFolderChange(const QModelIndex &current, const QMod
         m_imgInsert->setDisabled(true);
         m_recordBar->setVisible(false);
     }
+    m_buttonAnchor->setBottomMargin(7);
 }
 
 /**
@@ -2022,6 +2027,7 @@ bool VNoteMainWindow::eventFilter(QObject *o, QEvent *e)
         int position = (m_middleViewHolder->width() - m_addNoteBtn->width()) / 2 - 6;
         m_buttonAnchor->setLeftMargin(position);
         m_middleView->resize(m_middleViewHolder->width(), m_middleViewHolder->height() - m_noteBookName->height() - 20);
+        m_buttonAnchor->setBottomMargin(17);
         //qDebug() << m_middleViewHolder->geometry() << m_noteBookName->height() << m_noteBookName->geometry();
         updateFolderName();
         return true;
@@ -2381,12 +2387,12 @@ void VNoteMainWindow::onWebVoicePlay(const QVariant &json, bool bIsSame)
  */
 void VNoteMainWindow::onInsertImageToWebEditor()
 {
+    m_imgInsert->setChecked(false);
     QStringList filePaths = DFileDialog::getOpenFileNames(
                 this,
                 "",
                 QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
                 "Image file(*.jpg *.png *.bmp)");
-    m_imgInsert->setChecked(false);
 
     if (JsContent::instance()->insertImages(filePaths)) {
         m_richTextEdit->setFocus(); //插入成功，将焦点转移至编辑区
