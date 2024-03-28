@@ -22,7 +22,7 @@
         <file>icons/deepin/builtin/light/play_voice3.svg</file>
         <file>icons/deepin/builtin/light/play_voice4.svg</file>
         <file>icons/deepin/builtin/play.svg</file>
-	    <file>icons/deepin/builtin/clear.svg</file>
+	 <file>icons/deepin/builtin/clear.svg</file>
         <file>icons/deepin/builtin/pause.svg</file>
         <file>icons/deepin/builtin/pause_play.svg</file>
         <file>deepin-voice-note-setting.json</file>
@@ -62,5 +62,19 @@
         <file>icons/deepin/builtin/light/image.svg</file>
         <file>icons/deepin/builtin/light/sidebar_show.svg</file>
         <file>icons/deepin/builtin/light/sidebar.svg</file>
+    </qresource>
+    <qresource prefix="/icons/deepin/builtin/dark">
+        <file>texts/dvn_sidebar_32px.svg</file>
+        <file>texts/dvn_image_32px.svg</file>
+        <file>texts/dvn_clear_32px.svg</file>
+        <file>texts/dvn_pauseplay_32px.svg</file>
+        <file>texts/dvn_play_32px.svg</file>
+    </qresource>
+    <qresource prefix="/icons/deepin/builtin/light">
+        <file>texts/dvn_sidebar_32px.svg</file>
+        <file>texts/dvn_image_32px.svg</file>
+        <file>texts/dvn_clear_32px.svg</file>
+        <file>texts/dvn_pauseplay_32px.svg</file>
+        <file>texts/dvn_play_32px.svg</file>
     </qresource>
 </RCC>
