@@ -29,6 +29,9 @@ DWIDGET_USE_NAMESPACE
 
 int main(int argc, char *argv[])
 {
+    // Task 326583 不参与合成器崩溃重连
+    unsetenv("QT_WAYLAND_RECONNECT");
+
     PerformanceMonitor::initializeAppStart();
     if (!QString(qgetenv("XDG_CURRENT_DESKTOP")).toLower().startsWith("deepin")) {
         setenv("XDG_CURRENT_DESKTOP", "Deepin", 1);
