@@ -1,3 +1,11 @@
+deepin-voice-note (6.0.18) unstable; urgency=medium
+
+  * fix: Fix voice notepad UI problem (Bug: 244879)
+  * fix: Fix UI problem of dark theme playback control (Bug: 244955)
+  * fix: Does not participate in wayland crash reconnection (Bug: 248535)
+
+ -- renbin <renbin@uniontech.com>  Wed, 03 Apr 2024 16:20:20 +0800
+
 deepin-voice-note (6.0.17) unstable; urgency=medium
 
   * add build-dep deepin-desktop-base.
