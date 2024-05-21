@@ -205,7 +205,7 @@ AudioPort AudioWatcher::currentAuidoPort(const QList<AudioPort> &auidoPorts,Audi
     }else{
         currentAudioPort.name = "null";
         currentAudioPort.description = "null";
-        currentAudioPort.availability = 0;
+        currentAudioPort.availability = 1;
     }
     return currentAudioPort;
 }
