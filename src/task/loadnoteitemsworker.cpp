@@ -7,7 +7,7 @@
 #include "db/vnoteitemoper.h"
 #include "globaldef.h"
 
-#include <DLog>
+// #include <DLog>
 
 #include <QThread>
 

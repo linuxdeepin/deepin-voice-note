@@ -3,16 +3,17 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include <DApplication>
-#include <DTextEdit>
+// #include <DApplication>
+// #include <DTextEdit>
 
 #include <QString>
 #include <QDateTime>
 #include <QPixmap>
 #include <QTextDocumentFragment>
 #include <QTextDocument>
+#include <QKeyEvent>
 
-DWIDGET_USE_NAMESPACE
+// DWIDGET_USE_NAMESPACE
 
 class VNoteBlock;
 
@@ -23,7 +24,7 @@ public:
     //格式化时间
     static QString convertDateTime(const QDateTime &dateTime);
     //加载图标
-    static QPixmap renderSVG(const QString &filePath, const QSize &size, DApplication *pApp);
+    // static QPixmap renderSVG(const QString &filePath, const QSize &size, DApplication *pApp);
     //加载图标
     static QPixmap loadSVG(const QString &fileName, bool fCommon = false);
     //编辑器内容高亮

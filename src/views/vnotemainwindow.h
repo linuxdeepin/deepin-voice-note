@@ -27,7 +27,7 @@
 #include <QStandardItem>
 #include <QList>
 #include <QDBusPendingReply>
-#include <DToolButton>
+
 DWIDGET_USE_NAMESPACE
 
 class VNoteRecordBar;
@@ -304,8 +304,8 @@ private:
     VNoteRecordBar *m_recordBar {nullptr};
     VNoteA2TManager *m_a2tManager {nullptr};
 
-    DToolButton *m_viewChange {nullptr}; //记事本列表收起控件
-    DToolButton *m_imgInsert {nullptr}; //图片插入控件
+    VNotePushbutton *m_viewChange {nullptr}; //记事本列表收起控件
+    VNotePushbutton *m_imgInsert {nullptr}; //图片插入控件
 
     UpgradeView *m_upgradeView {nullptr};
     SplashView *m_splashView {nullptr};
