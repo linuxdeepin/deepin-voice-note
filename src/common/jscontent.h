@@ -9,7 +9,8 @@
 #include <QObject>
 #include <QClipboard>
 
-#include <QtWebEngineWidgets/qwebenginepage.h>
+// #include <QtWebEngineWidgets/qwebenginepage.h>
+#include <QWebEnginePage>
 
 class JsContent : public QObject
 {
@@ -38,6 +39,8 @@ public:
      * @brief 插入图片
      */
     bool insertImages(const QImage &image);
+
+    QString webPath();
 
 signals:
     void callJsInitData(const QString &jsonData); //调用web前端，设置json格式数据

@@ -6,7 +6,7 @@
 #include "vnoteforlder.h"
 #include "common/vnotedatamanager.h"
 
-#include <DLog>
+// #include <DLog>
 
 /**
  * @brief VNoteFolder::VNoteFolder
@@ -65,10 +65,10 @@ qint32 VNoteFolder::getNotesCount()
  */
 VNOTE_ITEMS_MAP *VNoteFolder::getNotes()
 {
-    if (Q_UNLIKELY(nullptr == notes)) {
-        VNOTE_ITEMS_MAP *folderNotes = VNoteDataManager::instance()->getFolderNotes(id);
-        notes = folderNotes;
-    }
+    // if (Q_UNLIKELY(nullptr == notes)) {
+    //     VNOTE_ITEMS_MAP *folderNotes = VNoteDataManager::instance()->getFolderNotes(id);
+    //     notes = folderNotes;
+    // }
 
     return notes;
 }

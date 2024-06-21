@@ -11,7 +11,7 @@
 #include "db/dbvisitor.h"
 #include "globaldef.h"
 
-#include <DLog>
+// #include <DLog>
 
 #include <QVariant>
 #include <QObject>
@@ -47,10 +47,10 @@ bool VNoteFolderOper::deleteVNoteFolder(qint64 folderId)
     DelFolderDbVisitor delFolderVisitor(
         VNoteDbManager::instance()->getVNoteDb(), &folderId, nullptr);
 
-    if (VNoteDbManager::instance()->deleteData(&delFolderVisitor)) {
-        delOK = true;
-        QScopedPointer<VNoteFolder> release(VNoteDataManager::instance()->delFolder(folderId));
-    }
+    // if (VNoteDbManager::instance()->deleteData(&delFolderVisitor)) {
+    //     delOK = true;
+    //     QScopedPointer<VNoteFolder> release(VNoteDataManager::instance()->delFolder(folderId));
+    // }
 
     return delOK;
 }
@@ -88,12 +88,12 @@ bool VNoteFolderOper::renameVNoteFolder(const QString &folderName)
 
         RenameFolderDbVisitor renameFolderVisitor(VNoteDbManager::instance()->getVNoteDb(), m_folder, nullptr);
 
-        if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameFolderVisitor))) {
-            m_folder->name = oldFolderName;
-            m_folder->modifyTime = oldModifyTime;
+        // if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameFolderVisitor))) {
+        //     m_folder->name = oldFolderName;
+        //     m_folder->modifyTime = oldModifyTime;
 
-            isUpdateOK = false;
-        }
+        //     isUpdateOK = false;
+        // }
     }
 
     return isUpdateOK;
@@ -133,31 +133,31 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
 
     AddFolderDbVisitor addFolderVisitor(VNoteDbManager::instance()->getVNoteDb(), &folder, newFolder);
 
-    if (VNoteDbManager::instance()->insertData(&addFolderVisitor)) {
-        //TODO:
-        //    DbVisitor can update any feilds here  db return all feilds
-        //of new record. Just load icon here
-        newFolder->UI.icon = VNoteDataManager::instance()->getDefaultIcon(
-            newFolder->defaultIcon, IconsType::DefaultIcon);
-        newFolder->UI.grayIcon = VNoteDataManager::instance()->getDefaultIcon(
-            newFolder->defaultIcon, IconsType::DefaultGrayIcon);
+    // if (VNoteDbManager::instance()->insertData(&addFolderVisitor)) {
+    //     //TODO:
+    //     //    DbVisitor can update any feilds here  db return all feilds
+    //     //of new record. Just load icon here
+    //     newFolder->UI.icon = VNoteDataManager::instance()->getDefaultIcon(
+    //         newFolder->defaultIcon, IconsType::DefaultIcon);
+    //     newFolder->UI.grayIcon = VNoteDataManager::instance()->getDefaultIcon(
+    //         newFolder->defaultIcon, IconsType::DefaultGrayIcon);
 
-        VNoteDataManager::instance()->addFolder(newFolder);
+    //     VNoteDataManager::instance()->addFolder(newFolder);
 
-        qInfo() << "New folder:" << newFolder->id
-                << "Name:" << newFolder->name
-                << "Create time:" << newFolder->createTime
-                << "Modify time:" << newFolder->modifyTime;
-    } else {
-        qCritical() << "Add folder failed:"
-                    << "New folder:" << newFolder->id
-                    << "Name:" << newFolder->name
-                    << "Create time:" << newFolder->createTime
-                    << "Modify time:" << newFolder->modifyTime;
+    //     qInfo() << "New folder:" << newFolder->id
+    //             << "Name:" << newFolder->name
+    //             << "Create time:" << newFolder->createTime
+    //             << "Modify time:" << newFolder->modifyTime;
+    // } else {
+    //     qCritical() << "Add folder failed:"
+    //                 << "New folder:" << newFolder->id
+    //                 << "Name:" << newFolder->name
+    //                 << "Create time:" << newFolder->createTime
+    //                 << "Modify time:" << newFolder->modifyTime;
 
-        QScopedPointer<VNoteFolder> autoRelease(newFolder);
-        newFolder = nullptr;
-    }
+    //     QScopedPointer<VNoteFolder> autoRelease(newFolder);
+    //     newFolder = nullptr;
+    // }
 
     return newFolder;
 }
@@ -169,9 +169,10 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
  */
 VNoteFolder *VNoteFolderOper::getFolder(qint64 folderId)
 {
-    VNoteFolder *folder = VNoteDataManager::instance()->getFolder(folderId);
+    // VNoteFolder *folder = VNoteDataManager::instance()->getFolder(folderId);
 
-    return folder;
+    // return folder;
+    return nullptr;
 }
 
 /**
@@ -180,7 +181,8 @@ VNoteFolder *VNoteFolderOper::getFolder(qint64 folderId)
  */
 qint32 VNoteFolderOper::getFoldersCount()
 {
-    return VNoteDataManager::instance()->folderCount();
+    return 0;
+    // return VNoteDataManager::instance()->folderCount();
 }
 
 /**
@@ -190,15 +192,16 @@ qint32 VNoteFolderOper::getFoldersCount()
  */
 qint32 VNoteFolderOper::getNotesCount(qint64 folderId)
 {
-    VNOTE_ITEMS_MAP *notesInFollder = VNoteDataManager::instance()->getFolderNotes(folderId);
+    return 0;
+    // VNOTE_ITEMS_MAP *notesInFollder = VNoteDataManager::instance()->getFolderNotes(folderId);
 
-    qint32 notesCount = 0;
+    // qint32 notesCount = 0;
 
-    if (nullptr != notesInFollder) {
-        notesCount = notesInFollder->folderNotes.size();
-    }
+    // if (nullptr != notesInFollder) {
+    //     notesCount = notesInFollder->folderNotes.size();
+    // }
 
-    return notesCount;
+    // return notesCount;
 }
 
 /**
@@ -227,21 +230,22 @@ QString VNoteFolderOper::getDefaultFolderName()
     //may be separate data for different category in future.
     //We query the max id every time now, need optimize when
     //category feature is added.
-    QString defaultFolderName = DApplication::translate("DefaultName", "Notebook");
+    // QString defaultFolderName = DApplication::translate("DefaultName", "Notebook");
 
-    qint64 foldersCount = VNoteDataManager::instance()->folderCount();
-    MaxIdFolderDbVisitor folderIdVisitor(VNoteDbManager::instance()->getVNoteDb(), nullptr, &foldersCount);
+    // qint64 foldersCount = VNoteDataManager::instance()->folderCount();
+    // MaxIdFolderDbVisitor folderIdVisitor(VNoteDbManager::instance()->getVNoteDb(), nullptr, &foldersCount);
 
-    //Need reset the folder table id if data are empty.
-    if (foldersCount == 0) {
-        folderIdVisitor.extraData().data.flag = true;
-    }
+    // //Need reset the folder table id if data are empty.
+    // if (foldersCount == 0) {
+    //     folderIdVisitor.extraData().data.flag = true;
+    // }
 
-    if (VNoteDbManager::instance()->queryData(&folderIdVisitor)) {
-        defaultFolderName += QString("%1").arg(foldersCount + 1);
-    }
+    // if (VNoteDbManager::instance()->queryData(&folderIdVisitor)) {
+    //     defaultFolderName += QString("%1").arg(foldersCount + 1);
+    // }
 
-    return defaultFolderName;
+    // return defaultFolderName;
+    return QString();
 }
 
 /**
@@ -253,9 +257,10 @@ qint32 VNoteFolderOper::getDefaultIcon()
     const int defalutIconCnt = 10;
 
     QTime time = QTime::currentTime();
-    qsrand(static_cast<uint>(time.msec() + time.second() * 1000));
+    // qsrand(static_cast<uint>(time.msec() + time.second() * 1000));
 
-    return (qrand() % defalutIconCnt);
+    // return (qrand() % defalutIconCnt);
+    return 0;
 }
 
 /**
@@ -266,5 +271,6 @@ qint32 VNoteFolderOper::getDefaultIcon()
  */
 QPixmap VNoteFolderOper::getDefaultIcon(qint32 index, IconsType type)
 {
-    return VNoteDataManager::instance()->getDefaultIcon(index, type);
+    return QPixmap();
+    // return VNoteDataManager::instance()->getDefaultIcon(index, type);
 }

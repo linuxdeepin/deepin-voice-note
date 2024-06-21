@@ -15,10 +15,10 @@
 #include <QJsonObject>
 #include <QClipboard>
 #include <QMimeData>
-
-#include <DApplication>
-
-DWIDGET_USE_NAMESPACE
+#include <QDateTime>
+#include <QImage>
+#include <QDebug>
+#include <QApplication>
 
 JsContent::JsContent()
 {
@@ -93,6 +93,11 @@ bool JsContent::insertImages(const QImage &image)
     return true;
 }
 
+QString JsContent::webPath()
+{
+    return WEB_PATH "/index.html";
+}
+
 void JsContent::jsCallTxtChange()
 {
     emit textChange();
@@ -121,22 +126,22 @@ void JsContent::jsCallPlayVoice(const QVariant &json, bool bIsSame)
 QString JsContent::jsCallGetTranslation()
 {
     static QJsonDocument doc;
-    if (doc.isEmpty()) {
-        QJsonObject object;
-        object.insert("fontname", DApplication::translate("web", "Font"));
-        object.insert("fontsize", DApplication::translate("web", "Font size"));
-        object.insert("forecolor", DApplication::translate("web", "Font color"));
-        object.insert("backcolor", DApplication::translate("web", "Text highlight color"));
-        object.insert("bold", DApplication::translate("web", "Bold"));
-        object.insert("italic", DApplication::translate("web", "Italic"));
-        object.insert("underline", DApplication::translate("web", "Underline"));
-        object.insert("strikethrough", DApplication::translate("web", "Strikethrough"));
-        object.insert("ul", DApplication::translate("web", "Bullets"));
-        object.insert("ol", DApplication::translate("web", "Numbering"));
-        object.insert("more", DApplication::translate("web", "More colors"));
-        object.insert("recentlyUsed", DApplication::translate("web", "Recent"));
-        doc.setObject(object);
-    }
+    // if (doc.isEmpty()) {
+    //     QJsonObject object;
+    //     object.insert("fontname", DApplication::translate("web", "Font"));
+    //     object.insert("fontsize", DApplication::translate("web", "Font size"));
+    //     object.insert("forecolor", DApplication::translate("web", "Font color"));
+    //     object.insert("backcolor", DApplication::translate("web", "Text highlight color"));
+    //     object.insert("bold", DApplication::translate("web", "Bold"));
+    //     object.insert("italic", DApplication::translate("web", "Italic"));
+    //     object.insert("underline", DApplication::translate("web", "Underline"));
+    //     object.insert("strikethrough", DApplication::translate("web", "Strikethrough"));
+    //     object.insert("ul", DApplication::translate("web", "Bullets"));
+    //     object.insert("ol", DApplication::translate("web", "Numbering"));
+    //     object.insert("more", DApplication::translate("web", "More colors"));
+    //     object.insert("recentlyUsed", DApplication::translate("web", "Recent"));
+    //     doc.setObject(object);
+    // }
     return doc.toJson(QJsonDocument::Compact);
 }
 
@@ -176,7 +181,7 @@ void JsContent::jsCallCreateNote()
 
 void JsContent::jsCallSetClipData(const QString &text, const QString &html)
 {
-    QClipboard *clip = DApplication::clipboard();
+    QClipboard *clip = QApplication::clipboard();
     if (nullptr != clip) {
         //剪切板先断开与前端的通信
         clip->disconnect(this);

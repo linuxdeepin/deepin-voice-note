@@ -6,12 +6,12 @@
 #include "vnoteitem.h"
 #include "common/utils.h"
 
-#include <DLog>
-#include <DGuiApplicationHelper>
+// #include <DLog>
+// #include <DGuiApplicationHelper>
 
 #include <QFile>
 #include <QFileInfo>
-#include <QRegExp>
+// #include <QRegExp>
 
 //导出为html文件时的头部部分
 static const QString htmlHead =
@@ -242,11 +242,11 @@ bool VNoteItem::haveVoice() const
         return datas.voiceBlocks.size() > 0;
     }
     //匹配语音块标签的正则表达式
-    QRegExp rx("<div.+jsonkey.+>");
-    rx.setMinimal(true); //最小匹配
-    if (rx.indexIn(htmlCode) == -1) {
-        return false;
-    }
+    // QRegExp rx("<div.+jsonkey.+>");
+    // rx.setMinimal(true); //最小匹配
+    // if (rx.indexIn(htmlCode) == -1) {
+    //     return false;
+    // }
     return true;
 }
 
@@ -296,21 +296,21 @@ qint32 VNoteItem::voiceCount() const
 QStringList VNoteItem::getVoiceJsons() const
 {
     //匹配语音块标签的正则表达式
-    QRegExp rx("<div.+jsonkey.+>");
-    rx.setMinimal(true); //最小匹配
+    // QRegExp rx("<div.+jsonkey.+>");
+    // rx.setMinimal(true); //最小匹配
     //匹配语音json数据的正则表达式
-    QRegExp rxJson("\\{.*\\}");
-    rxJson.setMinimal(true); //最小匹配
+    // QRegExp rxJson("\\{.*\\}");
+    // rxJson.setMinimal(true); //最小匹配
     QStringList list;
-    int pos = 0;
-    //查找语音块
-    while ((pos = rx.indexIn(htmlCode, pos)) != -1) {
-        //获取语音json数据
-        if (rxJson.indexIn(rx.cap(0)) != -1) {
-            list << rxJson.cap(0).replace("&quot;", "\"");
-        }
-        pos += rx.matchedLength();
-    }
+    // int pos = 0;
+    // //查找语音块
+    // while ((pos = rx.indexIn(htmlCode, pos)) != -1) {
+    //     //获取语音json数据
+    //     if (rxJson.indexIn(rx.cap(0)) != -1) {
+    //         list << rxJson.cap(0).replace("&quot;", "\"");
+    //     }
+    //     pos += rx.matchedLength();
+    // }
     return list;
 }
 
@@ -324,47 +324,47 @@ QString VNoteItem::getFullHtml() const
     //html字符串
     QString html = htmlHead;
 
-    DPalette dp = DGuiApplicationHelper::instance()->applicationPalette();
+    // DPalette dp = DGuiApplicationHelper::instance()->applicationPalette();
     //获取系统高亮色
-    QString activeHightColor = dp.color(DPalette::Active, DPalette::Highlight).name();
+    // QString activeHightColor = dp.color(DPalette::Active, DPalette::Highlight).name();
     //替换颜色
-    html.replace("#00a48a", activeHightColor);
+    // html.replace("#00a48a", activeHightColor);
 
     html.append("<body> <div class=\"note-editable\" contenteditable=\"false\">");
     //匹配图片块标签的正则表达式
-    QRegExp rx("<img.+src=.+>");
-    rx.setMinimal(true); //最小匹配
+    // QRegExp rx("<img.+src=.+>");
+    // rx.setMinimal(true); //最小匹配
     //匹配本地图片路径的正则表达式（图片位置限制在images文件夹，后缀限制为a-z长度为3到4位）
-    QRegExp rxPath("(/\\S+)+/images/[\\w\\-]+\\.[a-z]{3,4}");
-    rxPath.setMinimal(false); //最大匹配
+    // QRegExp rxPath("(/\\S+)+/images/[\\w\\-]+\\.[a-z]{3,4}");
+    // rxPath.setMinimal(false); //最大匹配
     int pos = 0;
     int last = 0;
     //查找语音块
-    while ((last = rx.indexIn(htmlCode, pos)) != -1) {
-        html.append(htmlCode.mid(pos, last - pos));
-        pos = last;
-        //图片标签
-        QString imgLabel = rx.cap(0);
-        if ((last = rxPath.indexIn(imgLabel)) == -1) {
-            //不存在路径
-            html.append(imgLabel);
-        } else {
-            //转换图片
-            QString base64 = "";
-            if (!Utils::pictureToBase64(rxPath.cap(0), base64)) {
-                //无效图片路径
-                html.append(imgLabel);
-            } else {
-                //图片路径转换为base64编码
-                html.append(imgLabel.mid(0, last))
-                    .append(base64)
-                    .append(imgLabel.mid(last + rxPath.matchedLength(), imgLabel.size() - last - rxPath.matchedLength()));
-            }
-        }
-        pos += rx.matchedLength();
-    }
-    //html文件添加尾部
-    html.append(htmlCode.mid(pos, htmlCode.size() - pos)).append("</div> </body> </html>");
+    // while ((last = rx.indexIn(htmlCode, pos)) != -1) {
+    //     html.append(htmlCode.mid(pos, last - pos));
+    //     pos = last;
+    //     //图片标签
+    //     QString imgLabel = rx.cap(0);
+    //     if ((last = rxPath.indexIn(imgLabel)) == -1) {
+    //         //不存在路径
+    //         html.append(imgLabel);
+    //     } else {
+    //         //转换图片
+    //         QString base64 = "";
+    //         if (!Utils::pictureToBase64(rxPath.cap(0), base64)) {
+    //             //无效图片路径
+    //             html.append(imgLabel);
+    //         } else {
+    //             //图片路径转换为base64编码
+    //             html.append(imgLabel.mid(0, last))
+    //                 .append(base64)
+    //                 .append(imgLabel.mid(last + rxPath.matchedLength(), imgLabel.size() - last - rxPath.matchedLength()));
+    //         }
+    //     }
+    //     pos += rx.matchedLength();
+    // }
+    // //html文件添加尾部
+    // html.append(htmlCode.mid(pos, htmlCode.size() - pos)).append("</div> </body> </html>");
     return html;
 }
 

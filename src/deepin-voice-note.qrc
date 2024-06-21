@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>gui/mainwindow/MainWindow.qml</file>
+        <file>gui/mainwindow/FolderListView.qml</file>
+        <file>gui/mainwindow/ItemListView.qml</file>
+        <file>gui/mainwindow/WebEngineView.qml</file>
+    </qresource>
+</RCC>

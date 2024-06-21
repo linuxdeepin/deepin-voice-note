@@ -7,14 +7,14 @@
 #include "vnotefolderoper.h"
 #include "vnotedbmanager.h"
 #include "globaldef.h"
-#include "common/metadataparser.h"
+// #include "common/metadataparser.h"
 #include "common/vnoteitem.h"
 #include "common/vnoteforlder.h"
 #include "common/vnotedatamanager.h"
 #include "db/dbvisitor.h"
 
-#include <DLog>
-#include <DApplication>
+// #include <DLog>
+// #include <DApplication>
 
 /**
  * @brief VNoteItemOper::VNoteItemOper
@@ -72,12 +72,12 @@ bool VNoteItemOper::modifyNoteTitle(const QString &title)
         RenameNoteDbVisitor renameNoteVisitor(
             VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
 
-        if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameNoteVisitor))) {
-            m_note->noteTitle = oldTitle;
-            m_note->modifyTime = oldModifyTime;
+        // if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameNoteVisitor))) {
+        //     m_note->noteTitle = oldTitle;
+        //     m_note->modifyTime = oldModifyTime;
 
-            isUpdateOK = false;
-        }
+        //     isUpdateOK = false;
+        // }
     }
 
     return isUpdateOK;
@@ -97,9 +97,9 @@ bool VNoteItemOper::updateNote()
         QDateTime oldModifyTime = m_note->modifyTime;
 
         //Prepare meta data
-        MetaDataParser metaParser;
+        // MetaDataParser metaParser;
 
-        metaParser.makeMetaData(m_note, m_note->metaDataRef());
+        // metaParser.makeMetaData(m_note, m_note->metaDataRef());
 
         m_note->modifyTime = QDateTime::currentDateTime();
 
@@ -111,12 +111,12 @@ bool VNoteItemOper::updateNote()
         UpdateNoteDbVisitor updateNoteVisitor(
             VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
 
-        if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
-            m_note->setMetadata(oldMetaData);
-            m_note->modifyTime = oldModifyTime;
+        // if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
+        //     m_note->setMetadata(oldMetaData);
+        //     m_note->modifyTime = oldModifyTime;
 
-            isUpdateOK = false;
-        }
+        //     isUpdateOK = false;
+        // }
     }
 
     return isUpdateOK;
@@ -139,43 +139,43 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
     note.setFolder(folder);
 
     //Prepare meta data
-    MetaDataParser metaParser;
+    // MetaDataParser metaParser;
     QVariant metaData;
-    metaParser.makeMetaData(&note, note.metaDataRef());
+    // metaParser.makeMetaData(&note, note.metaDataRef());
 
     VNoteItem *newNote = new VNoteItem();
     AddNoteDbVisitor addNoteVisitor(VNoteDbManager::instance()->getVNoteDb(), &note, newNote);
 
-    if (VNoteDbManager::instance()->insertData(&addNoteVisitor)) {
-        if (Q_UNLIKELY(nullptr == VNoteDataManager::instance()->addNote(newNote))) {
-            qInfo() << "Add to datamanager failed:"
-                    << "New Note:" << newNote->noteId
-                    << "Folder ID:" << newNote->folderId
-                    << "Note type:" << newNote->noteType
-                    << "Create time:" << newNote->createTime
-                    << "Modify time:" << newNote->modifyTime;
-            //Add to DataManager failed, release it
-            QScopedPointer<VNoteItem> autoRelease(newNote);
-            newNote = nullptr;
+    // if (VNoteDbManager::instance()->insertData(&addNoteVisitor)) {
+    //     if (Q_UNLIKELY(nullptr == VNoteDataManager::instance()->addNote(newNote))) {
+    //         qInfo() << "Add to datamanager failed:"
+    //                 << "New Note:" << newNote->noteId
+    //                 << "Folder ID:" << newNote->folderId
+    //                 << "Note type:" << newNote->noteType
+    //                 << "Create time:" << newNote->createTime
+    //                 << "Modify time:" << newNote->modifyTime;
+    //         //Add to DataManager failed, release it
+    //         QScopedPointer<VNoteItem> autoRelease(newNote);
+    //         newNote = nullptr;
 
-            //We don't need rollback the maxnoteid here
-            //because data aready in the database.
-            //folder->maxNoteIdRef()--
-            //Should never reach here
-        }
-    } else {
-        qCritical() << "New Note:" << newNote->noteId
-                    << "Folder ID:" << newNote->folderId
-                    << "Note type:" << newNote->noteType
-                    << "Create time:" << newNote->createTime
-                    << "Modify time:" << newNote->modifyTime;
+    //         //We don't need rollback the maxnoteid here
+    //         //because data aready in the database.
+    //         //folder->maxNoteIdRef()--
+    //         //Should never reach here
+    //     }
+    // } else {
+    //     qCritical() << "New Note:" << newNote->noteId
+    //                 << "Folder ID:" << newNote->folderId
+    //                 << "Note type:" << newNote->noteType
+    //                 << "Create time:" << newNote->createTime
+    //                 << "Modify time:" << newNote->modifyTime;
 
-        QScopedPointer<VNoteItem> autoRelease(newNote);
-        newNote = nullptr;
+    //     QScopedPointer<VNoteItem> autoRelease(newNote);
+    //     newNote = nullptr;
 
-        //Rollback the id if fialed
-        folder->maxNoteIdRef()--;
-    }
+    //     //Rollback the id if fialed
+    //     folder->maxNoteIdRef()--;
+    // }
 
     return newNote;
 }
@@ -188,7 +188,8 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
  */
 VNoteItem *VNoteItemOper::getNote(qint64 folderId, qint32 noteId)
 {
-    return VNoteDataManager::instance()->getNote(folderId, noteId);
+    return nullptr;
+    // return VNoteDataManager::instance()->getNote(folderId, noteId);
 }
 
 /**
@@ -198,7 +199,8 @@ VNoteItem *VNoteItemOper::getNote(qint64 folderId, qint32 noteId)
  */
 VNOTE_ITEMS_MAP *VNoteItemOper::getFolderNotes(qint64 folderId)
 {
-    return VNoteDataManager::instance()->getFolderNotes(folderId);
+    return nullptr;
+    // return VNoteDataManager::instance()->getFolderNotes(folderId);
 }
 
 /**
@@ -208,15 +210,16 @@ VNOTE_ITEMS_MAP *VNoteItemOper::getFolderNotes(qint64 folderId)
  */
 QString VNoteItemOper::getDefaultNoteName(qint64 folderId)
 {
-    VNoteFolder *folder = VNoteDataManager::instance()->getFolder(folderId);
+    return QString();
+    // VNoteFolder *folder = VNoteDataManager::instance()->getFolder(folderId);
 
-    QString defaultNoteName = DApplication::translate("DefaultName", "Text");
+    // QString defaultNoteName = DApplication::translate("DefaultName", "Text");
 
-    if (nullptr != folder && folder->maxNoteIdRef() != 0) {
-        defaultNoteName += QString("%1").arg(folder->maxNoteIdRef());
-    }
+    // if (nullptr != folder && folder->maxNoteIdRef() != 0) {
+    //     defaultNoteName += QString("%1").arg(folder->maxNoteIdRef());
+    // }
 
-    return defaultNoteName;
+    // return defaultNoteName;
 }
 
 /**
@@ -225,13 +228,14 @@ QString VNoteItemOper::getDefaultNoteName(qint64 folderId)
  */
 QString VNoteItemOper::getDefaultVoiceName() const
 {
-    QString defaultVoiceName = DApplication::translate("DefaultName", "Voice");
+    return QString();
+    // QString defaultVoiceName = DApplication::translate("DefaultName", "Voice");
 
-    if (nullptr != m_note) {
-        defaultVoiceName += QString("%1").arg(m_note->maxVoiceIdRef() + 1);
-    }
+    // if (nullptr != m_note) {
+    //     defaultVoiceName += QString("%1").arg(m_note->maxVoiceIdRef() + 1);
+    // }
 
-    return defaultVoiceName;
+    // return defaultVoiceName;
 }
 
 /**
@@ -261,15 +265,15 @@ bool VNoteItemOper::deleteNote()
 
         DelNoteDbVisitor delNoteVisitor(VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
 
-        if (Q_LIKELY(VNoteDbManager::instance()->deleteData(&delNoteVisitor))) {
-            //Release note Object
-            QScopedPointer<VNoteItem> autoRelease(VNoteDataManager::instance()->delNote(m_note->folderId, m_note->noteId));
+        // if (Q_LIKELY(VNoteDbManager::instance()->deleteData(&delNoteVisitor))) {
+        //     //Release note Object
+        //     QScopedPointer<VNoteItem> autoRelease(VNoteDataManager::instance()->delNote(m_note->folderId, m_note->noteId));
 
-            delOK = true;
-        } else {
-            //Update failed rollback.
-            folder->maxNoteIdRef() = folderNoteCount;
-        }
+        //     delOK = true;
+        // } else {
+        //     //Update failed rollback.
+        //     folder->maxNoteIdRef() = folderNoteCount;
+        // }
 
         return delOK;
     }
@@ -291,11 +295,11 @@ bool VNoteItemOper::updateTop(int value)
         }
         m_note->isTop = value;
         UpdateNoteTopDbVisitor updateNoteVisitor(VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
-        if (!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
-            updateOK = true;
-        } else {
-            m_note->isTop = !value;
-        }
+        // if (!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
+        //     updateOK = true;
+        // } else {
+        //     m_note->isTop = !value;
+        // }
     }
     return updateOK;
 }
@@ -310,9 +314,9 @@ bool VNoteItemOper::updateFolderId(VNoteItem *data)
     bool updateOK = false;
     if (nullptr != data) {
         UpdateNoteFolderIdDbVisitor updateNoteVisitor(VNoteDbManager::instance()->getVNoteDb(), data, nullptr);
-        if (!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
-            updateOK = true;
-        }
+        // if (!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
+        //     updateOK = true;
+        // }
     }
     return updateOK;
 }

@@ -94,15 +94,15 @@ public:
 
     QSqlDatabase &getVNoteDb();
     //执行插入操作
-    bool insertData(DbVisitor *visitor /*in/out*/);
+    // bool insertData(DbVisitor *visitor /*in/out*/);
     //执行更新操作
-    bool updateData(DbVisitor *visitor /*in/out*/);
+    // bool updateData(DbVisitor *visitor /*in/out*/);
     //执行查询操作
     bool queryData(DbVisitor *visitor /*in/out*/);
     //执行删除操作
-    bool deleteData(DbVisitor *visitor /*in/out*/);
+    // bool deleteData(DbVisitor *visitor /*in/out*/);
     //是否存在老记事本数据库
-    static bool hasOldDataBase();
+    // static bool hasOldDataBase();
 signals:
 
 public slots:
@@ -115,7 +115,7 @@ protected:
 
 protected:
     QSqlDatabase m_vnoteDB;
-    //    QScopedPointer<QSqlQuery> m_sqlQuery;
+//     //    QScopedPointer<QSqlQuery> m_sqlQuery;
 
     QMutex m_dbLock;
     bool m_isDbInitOK {false};

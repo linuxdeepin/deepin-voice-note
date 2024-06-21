@@ -8,14 +8,14 @@
 #include "task/loadfolderworker.h"
 #include "task/loadnoteitemsworker.h"
 #include "task/loadiconsworker.h"
-#include "vnoteforlder.h"
-#include "vnoteitem.h"
+// #include "vnoteforlder.h"
+// #include "vnoteitem.h"
 
-#include <DLog>
+// #include <DLog>
 
 #include <QThreadPool>
 
-DCORE_USE_NAMESPACE
+// DCORE_USE_NAMESPACE
 
 VNoteDataManager *VNoteDataManager::_instance = nullptr;
 
@@ -26,6 +26,9 @@ VNoteDataManager *VNoteDataManager::_instance = nullptr;
 VNoteDataManager::VNoteDataManager(QObject *parent)
     : QObject(parent)
 {
+    // reqNoteDefIcons();
+    // reqNoteFolders();
+    // reqNoteItems();
 }
 
 /**
@@ -54,309 +57,309 @@ VNOTE_FOLDERS_MAP *VNoteDataManager::getNoteFolders()
     return m_qspNoteFoldersMap.get();
 }
 
-/**
- * @brief VNoteDataManager::addFolder
- * @param folder
- * @return 处理后完整的数据
- */
-VNoteFolder *VNoteDataManager::addFolder(VNoteFolder *folder)
-{
-    VNoteFolder *retFlder = nullptr;
-
-    if (nullptr != folder) {
-        m_qspNoteFoldersMap->lock.lockForWrite();
-
-        VNOTE_FOLDERS_DATA_MAP::iterator it = m_qspNoteFoldersMap->folders.find(folder->id);
-
-        if (it == m_qspNoteFoldersMap->folders.end()) {
-            m_qspNoteFoldersMap->folders.insert(folder->id, folder);
-        } else {
-            QScopedPointer<VNoteFolder> release(*it);
-
-            m_qspNoteFoldersMap->folders.remove(folder->id);
-            m_qspNoteFoldersMap->folders.insert(folder->id, folder);
-        }
-
-        m_qspNoteFoldersMap->lock.unlock();
-
-        retFlder = folder;
-    }
-
-    return retFlder;
-}
-
-/**
- * @brief VNoteDataManager::getFolder
- * @param folderId
- * @return  记事本数据
- */
-VNoteFolder *VNoteDataManager::getFolder(qint64 folderId)
-{
-    VNoteFolder *retFlder = nullptr;
-
-    m_qspNoteFoldersMap->lock.lockForRead();
-
-    VNOTE_FOLDERS_DATA_MAP::iterator it = m_qspNoteFoldersMap->folders.find(folderId);
-
-    if (it != m_qspNoteFoldersMap->folders.end()) {
-        retFlder = *it;
-    }
-
-    m_qspNoteFoldersMap->lock.unlock();
-
-    return retFlder;
-}
-
-/**
- * @brief VNoteDataManager::delFolder
- * @param folderId
- * @return 移除的记事本数据
- */
-VNoteFolder *VNoteDataManager::delFolder(qint64 folderId)
-{
-    VNoteFolder *retFlder = nullptr;
-
-    m_qspNoteFoldersMap->lock.lockForWrite();
+// /**
+//  * @brief VNoteDataManager::addFolder
+//  * @param folder
+//  * @return 处理后完整的数据
+//  */
+// VNoteFolder *VNoteDataManager::addFolder(VNoteFolder *folder)
+// {
+//     VNoteFolder *retFlder = nullptr;
+
+//     if (nullptr != folder) {
+//         m_qspNoteFoldersMap->lock.lockForWrite();
+
+//         VNOTE_FOLDERS_DATA_MAP::iterator it = m_qspNoteFoldersMap->folders.find(folder->id);
+
+//         if (it == m_qspNoteFoldersMap->folders.end()) {
+//             m_qspNoteFoldersMap->folders.insert(folder->id, folder);
+//         } else {
+//             QScopedPointer<VNoteFolder> release(*it);
+
+//             m_qspNoteFoldersMap->folders.remove(folder->id);
+//             m_qspNoteFoldersMap->folders.insert(folder->id, folder);
+//         }
+
+//         m_qspNoteFoldersMap->lock.unlock();
+
+//         retFlder = folder;
+//     }
+
+//     return retFlder;
+// }
+
+// /**
+//  * @brief VNoteDataManager::getFolder
+//  * @param folderId
+//  * @return  记事本数据
+//  */
+// VNoteFolder *VNoteDataManager::getFolder(qint64 folderId)
+// {
+//     VNoteFolder *retFlder = nullptr;
+
+//     m_qspNoteFoldersMap->lock.lockForRead();
+
+//     VNOTE_FOLDERS_DATA_MAP::iterator it = m_qspNoteFoldersMap->folders.find(folderId);
+
+//     if (it != m_qspNoteFoldersMap->folders.end()) {
+//         retFlder = *it;
+//     }
+
+//     m_qspNoteFoldersMap->lock.unlock();
+
+//     return retFlder;
+// }
+
+// /**
+//  * @brief VNoteDataManager::delFolder
+//  * @param folderId
+//  * @return 移除的记事本数据
+//  */
+// VNoteFolder *VNoteDataManager::delFolder(qint64 folderId)
+// {
+//     VNoteFolder *retFlder = nullptr;
+
+//     m_qspNoteFoldersMap->lock.lockForWrite();
 
-    //Find the folder first. if can't find, may some goes to wrong
-    VNOTE_FOLDERS_DATA_MAP::iterator itFolder = m_qspNoteFoldersMap->folders.find(folderId);
+//     //Find the folder first. if can't find, may some goes to wrong
+//     VNOTE_FOLDERS_DATA_MAP::iterator itFolder = m_qspNoteFoldersMap->folders.find(folderId);
 
-    if (itFolder != m_qspNoteFoldersMap->folders.end()) {
-        //Get notes lock ,release all notes in the folder
-        m_qspAllNotesMap->lock.lockForWrite();
+//     if (itFolder != m_qspNoteFoldersMap->folders.end()) {
+//         //Get notes lock ,release all notes in the folder
+//         m_qspAllNotesMap->lock.lockForWrite();
 
-        VNOTE_ALL_NOTES_DATA_MAP::iterator itNote = m_qspAllNotesMap->notes.find(folderId);
+//         VNOTE_ALL_NOTES_DATA_MAP::iterator itNote = m_qspAllNotesMap->notes.find(folderId);
 
-        if (itNote != m_qspAllNotesMap->notes.end()) {
-            VNOTE_ITEMS_MAP *itemsMap = itNote.value();
-            m_qspAllNotesMap->notes.erase(itNote);
-            QScopedPointer<VNOTE_ITEMS_MAP> foldersMap(itemsMap);
-
-            //Remove voice files in the folder
-            for (auto it : foldersMap->folderNotes) {
-                it->delNoteData();
-            }
-        }
+//         if (itNote != m_qspAllNotesMap->notes.end()) {
+//             VNOTE_ITEMS_MAP *itemsMap = itNote.value();
+//             m_qspAllNotesMap->notes.erase(itNote);
+//             QScopedPointer<VNOTE_ITEMS_MAP> foldersMap(itemsMap);
+
+//             //Remove voice files in the folder
+//             for (auto it : foldersMap->folderNotes) {
+//                 it->delNoteData();
+//             }
+//         }
 
-        //All note released. unlock
-        m_qspAllNotesMap->lock.unlock();
+//         //All note released. unlock
+//         m_qspAllNotesMap->lock.unlock();
 
-        retFlder = *itFolder;
-        m_qspNoteFoldersMap->folders.erase(itFolder);
-    }
+//         retFlder = *itFolder;
+//         m_qspNoteFoldersMap->folders.erase(itFolder);
+//     }
 
-    m_qspNoteFoldersMap->lock.unlock();
+//     m_qspNoteFoldersMap->lock.unlock();
 
-    return retFlder;
-}
+//     return retFlder;
+// }
 
-/**
- * @brief VNoteDataManager::folderCount
- * @return 记事本数量
- */
-qint32 VNoteDataManager::folderCount()
-{
-    m_qspNoteFoldersMap->lock.lockForRead();
-    int count = m_qspNoteFoldersMap->folders.size();
-    m_qspNoteFoldersMap->lock.unlock();
+// /**
+//  * @brief VNoteDataManager::folderCount
+//  * @return 记事本数量
+//  */
+// qint32 VNoteDataManager::folderCount()
+// {
+//     m_qspNoteFoldersMap->lock.lockForRead();
+//     int count = m_qspNoteFoldersMap->folders.size();
+//     m_qspNoteFoldersMap->lock.unlock();
 
-    return count;
-}
+//     return count;
+// }
 
-/**
- * @brief VNoteDataManager::addNote
- * @param note 记事项
- * @return 处理后完整的记事项数据
- */
-VNoteItem *VNoteDataManager::addNote(VNoteItem *note)
-{
-    VNoteItem *retNote = nullptr;
-
-    if (nullptr != note) {
-        m_qspAllNotesMap->lock.lockForWrite();
+// /**
+//  * @brief VNoteDataManager::addNote
+//  * @param note 记事项
+//  * @return 处理后完整的记事项数据
+//  */
+// VNoteItem *VNoteDataManager::addNote(VNoteItem *note)
+// {
+//     VNoteItem *retNote = nullptr;
+
+//     if (nullptr != note) {
+//         m_qspAllNotesMap->lock.lockForWrite();
 
-        //Find the folder first. if can't find, may some goes to wrong
-        VNOTE_ALL_NOTES_DATA_MAP::iterator it = m_qspAllNotesMap->notes.find(note->folderId);
+//         //Find the folder first. if can't find, may some goes to wrong
+//         VNOTE_ALL_NOTES_DATA_MAP::iterator it = m_qspAllNotesMap->notes.find(note->folderId);
 
-        if (it != m_qspAllNotesMap->notes.end()) {
-            VNOTE_ITEMS_MAP *notesInFolder = *it;
+//         if (it != m_qspAllNotesMap->notes.end()) {
+//             VNOTE_ITEMS_MAP *notesInFolder = *it;
 
-            Q_ASSERT(nullptr != notesInFolder);
+//             Q_ASSERT(nullptr != notesInFolder);
 
-            //TODO:
-            //    Need lock the folder first,for muti-thread operation.
-            //But new maybe not necessary
-            notesInFolder->lock.lockForWrite();
+//             //TODO:
+//             //    Need lock the folder first,for muti-thread operation.
+//             //But new maybe not necessary
+//             notesInFolder->lock.lockForWrite();
 
-            //Find if alreay exist same id note
-            VNOTE_ITEMS_DATA_MAP::iterator noteIter = notesInFolder->folderNotes.find(note->noteId);
+//             //Find if alreay exist same id note
+//             VNOTE_ITEMS_DATA_MAP::iterator noteIter = notesInFolder->folderNotes.find(note->noteId);
 
-            if (noteIter == notesInFolder->folderNotes.end()) {
-                notesInFolder->folderNotes.insert(note->noteId, note);
-            } else {
-                //Release old and insert new
-                QScopedPointer<VNoteItem> release(*noteIter);
+//             if (noteIter == notesInFolder->folderNotes.end()) {
+//                 notesInFolder->folderNotes.insert(note->noteId, note);
+//             } else {
+//                 //Release old and insert new
+//                 QScopedPointer<VNoteItem> release(*noteIter);
 
-                notesInFolder->folderNotes.remove(note->noteId);
-                notesInFolder->folderNotes.insert(note->noteId, note);
-            }
+//                 notesInFolder->folderNotes.remove(note->noteId);
+//                 notesInFolder->folderNotes.insert(note->noteId, note);
+//             }
 
-            notesInFolder->lock.unlock();
-        } else {
-            qInfo() << __FUNCTION__ << "Add note failed: the folder don't exist:" << note->folderId;
+//             notesInFolder->lock.unlock();
+//         } else {
+//             qInfo() << __FUNCTION__ << "Add note failed: the folder don't exist:" << note->folderId;
 
-            VNOTE_ITEMS_MAP *folderNotes = new VNOTE_ITEMS_MAP();
+//             VNOTE_ITEMS_MAP *folderNotes = new VNOTE_ITEMS_MAP();
 
-            //Set release flag true in data manager
-            folderNotes->autoRelease = true;
+//             //Set release flag true in data manager
+//             folderNotes->autoRelease = true;
 
-            folderNotes->folderNotes.insert(note->noteId, note);
-            m_qspAllNotesMap->notes.insert(note->folderId, folderNotes);
-        }
+//             folderNotes->folderNotes.insert(note->noteId, note);
+//             m_qspAllNotesMap->notes.insert(note->folderId, folderNotes);
+//         }
 
-        m_qspAllNotesMap->lock.unlock();
+//         m_qspAllNotesMap->lock.unlock();
 
-        retNote = note;
-    }
+//         retNote = note;
+//     }
 
-    return retNote;
-}
+//     return retNote;
+// }
 
-/**
- * @brief VNoteDataManager::getNote
- * @param folderId
- * @param noteId
- * @return 记事项数据
- */
-VNoteItem *VNoteDataManager::getNote(qint64 folderId, qint32 noteId)
-{
-    VNoteItem *retNote = nullptr;
+// /**
+//  * @brief VNoteDataManager::getNote
+//  * @param folderId
+//  * @param noteId
+//  * @return 记事项数据
+//  */
+// VNoteItem *VNoteDataManager::getNote(qint64 folderId, qint32 noteId)
+// {
+//     VNoteItem *retNote = nullptr;
 
-    m_qspAllNotesMap->lock.lockForRead();
+//     m_qspAllNotesMap->lock.lockForRead();
 
-    //Find the folder first. if can't find, may some goes to wrong
-    VNOTE_ALL_NOTES_DATA_MAP::iterator it = m_qspAllNotesMap->notes.find(folderId);
-
-    if (it != m_qspAllNotesMap->notes.end()) {
-        VNOTE_ITEMS_MAP *notesInFolder = *it;
-
-        Q_ASSERT(nullptr != notesInFolder);
+//     //Find the folder first. if can't find, may some goes to wrong
+//     VNOTE_ALL_NOTES_DATA_MAP::iterator it = m_qspAllNotesMap->notes.find(folderId);
+
+//     if (it != m_qspAllNotesMap->notes.end()) {
+//         VNOTE_ITEMS_MAP *notesInFolder = *it;
+
+//         Q_ASSERT(nullptr != notesInFolder);
 
-        //TODO:
-        //    Need lock the folder first,for muti-thread operation.
-        //But new maybe not necessary
-        notesInFolder->lock.lockForRead();
+//         //TODO:
+//         //    Need lock the folder first,for muti-thread operation.
+//         //But new maybe not necessary
+//         notesInFolder->lock.lockForRead();
 
-        //Find the note
-        VNOTE_ITEMS_DATA_MAP::iterator noteIter = notesInFolder->folderNotes.find(noteId);
-
-        if (noteIter != notesInFolder->folderNotes.end()) {
-            retNote = *noteIter;
-        }
-
-        notesInFolder->lock.unlock();
-    } else {
-        qCritical() << __FUNCTION__ << "Get note failed: the folder don't exist:" << folderId;
-    }
-
-    m_qspAllNotesMap->lock.unlock();
-
-    return retNote;
-}
-
-/**
- * @brief VNoteDataManager::delNote
- * @param folderId
- * @param noteId
- * @return 移除的记事项数据
- */
-VNoteItem *VNoteDataManager::delNote(qint64 folderId, qint32 noteId)
-{
-    VNoteItem *retNote = nullptr;
-
-    m_qspAllNotesMap->lock.lockForWrite();
-
-    //Find the folder first. if can't find, may some goes to wrong
-    VNOTE_ALL_NOTES_DATA_MAP::iterator it = m_qspAllNotesMap->notes.find(folderId);
-
-    if (it != m_qspAllNotesMap->notes.end()) {
-        VNOTE_ITEMS_MAP *notesInFolder = *it;
-
-        Q_ASSERT(nullptr != notesInFolder);
-
-        //TODO:
-        //    Need lock the folder first,for muti-thread operation.
-        //But new maybe not necessary
-        notesInFolder->lock.lockForWrite();
-
-        //Find the note
-        VNOTE_ITEMS_DATA_MAP::iterator noteIter = notesInFolder->folderNotes.find(noteId);
-
-        if (noteIter != notesInFolder->folderNotes.end()) {
-            retNote = *noteIter;
-            notesInFolder->folderNotes.erase(noteIter);
-
-            //Remove voice file of voice note
-            retNote->delNoteData();
-        }
-
-        notesInFolder->lock.unlock();
-    } else {
-        qCritical() << __FUNCTION__ << "Delete note failed: the folder don't exist:" << folderId;
-    }
-
-    m_qspAllNotesMap->lock.unlock();
-
-    return retNote;
-}
-
-/**
- * @brief VNoteDataManager::folderNotesCount
- * @param folderId
- * @return 记事项数量
- */
-qint32 VNoteDataManager::folderNotesCount(qint64 folderId)
-{
-    qint32 notesCount = 0;
-
-    VNOTE_ITEMS_MAP *folderNotes = getFolderNotes(folderId);
-
-    if (nullptr != folderNotes) {
-        folderNotes->lock.lockForRead();
-        notesCount = folderNotes->folderNotes.count();
-        folderNotes->lock.unlock();
-    }
-
-    return notesCount;
-}
-
-/**
- * @brief VNoteDataManager::getFolderNotes
- * @param folderId
- * @return 记事本所有的记事项数据
- */
-VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
-{
-    VNOTE_ITEMS_MAP *folderNotes = nullptr;
-
-    m_qspAllNotesMap->lock.lockForRead();
-
-    //Find the folder first. if can't find, may some goes to wrong
-    VNOTE_ALL_NOTES_DATA_MAP::iterator it = m_qspAllNotesMap->notes.find(folderId);
-
-    if (it != m_qspAllNotesMap->notes.end()) {
-        folderNotes = *it;
-    } else {
-        //       qInfo() << __FUNCTION__ << "Get note failed: the folder don't exist:" << folderId;
-        folderNotes = new VNOTE_ITEMS_MAP();
-        folderNotes->autoRelease = true;
-        m_qspAllNotesMap->notes.insert(folderId, folderNotes);
-    }
-
-    m_qspAllNotesMap->lock.unlock();
-
-    return folderNotes;
-}
+//         //Find the note
+//         VNOTE_ITEMS_DATA_MAP::iterator noteIter = notesInFolder->folderNotes.find(noteId);
+
+//         if (noteIter != notesInFolder->folderNotes.end()) {
+//             retNote = *noteIter;
+//         }
+
+//         notesInFolder->lock.unlock();
+//     } else {
+//         qCritical() << __FUNCTION__ << "Get note failed: the folder don't exist:" << folderId;
+//     }
+
+//     m_qspAllNotesMap->lock.unlock();
+
+//     return retNote;
+// }
+
+// /**
+//  * @brief VNoteDataManager::delNote
+//  * @param folderId
+//  * @param noteId
+//  * @return 移除的记事项数据
+//  */
+// VNoteItem *VNoteDataManager::delNote(qint64 folderId, qint32 noteId)
+// {
+//     VNoteItem *retNote = nullptr;
+
+//     m_qspAllNotesMap->lock.lockForWrite();
+
+//     //Find the folder first. if can't find, may some goes to wrong
+//     VNOTE_ALL_NOTES_DATA_MAP::iterator it = m_qspAllNotesMap->notes.find(folderId);
+
+//     if (it != m_qspAllNotesMap->notes.end()) {
+//         VNOTE_ITEMS_MAP *notesInFolder = *it;
+
+//         Q_ASSERT(nullptr != notesInFolder);
+
+//         //TODO:
+//         //    Need lock the folder first,for muti-thread operation.
+//         //But new maybe not necessary
+//         notesInFolder->lock.lockForWrite();
+
+//         //Find the note
+//         VNOTE_ITEMS_DATA_MAP::iterator noteIter = notesInFolder->folderNotes.find(noteId);
+
+//         if (noteIter != notesInFolder->folderNotes.end()) {
+//             retNote = *noteIter;
+//             notesInFolder->folderNotes.erase(noteIter);
+
+//             //Remove voice file of voice note
+//             retNote->delNoteData();
+//         }
+
+//         notesInFolder->lock.unlock();
+//     } else {
+//         qCritical() << __FUNCTION__ << "Delete note failed: the folder don't exist:" << folderId;
+//     }
+
+//     m_qspAllNotesMap->lock.unlock();
+
+//     return retNote;
+// }
+
+// /**
+//  * @brief VNoteDataManager::folderNotesCount
+//  * @param folderId
+//  * @return 记事项数量
+//  */
+// qint32 VNoteDataManager::folderNotesCount(qint64 folderId)
+// {
+//     qint32 notesCount = 0;
+
+//     VNOTE_ITEMS_MAP *folderNotes = getFolderNotes(folderId);
+
+//     if (nullptr != folderNotes) {
+//         folderNotes->lock.lockForRead();
+//         notesCount = folderNotes->folderNotes.count();
+//         folderNotes->lock.unlock();
+//     }
+
+//     return notesCount;
+// }
+
+// /**
+//  * @brief VNoteDataManager::getFolderNotes
+//  * @param folderId
+//  * @return 记事本所有的记事项数据
+//  */
+// VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
+// {
+//     VNOTE_ITEMS_MAP *folderNotes = nullptr;
+
+//     m_qspAllNotesMap->lock.lockForRead();
+
+//     //Find the folder first. if can't find, may some goes to wrong
+//     VNOTE_ALL_NOTES_DATA_MAP::iterator it = m_qspAllNotesMap->notes.find(folderId);
+
+//     if (it != m_qspAllNotesMap->notes.end()) {
+//         folderNotes = *it;
+//     } else {
+//         //       qInfo() << __FUNCTION__ << "Get note failed: the folder don't exist:" << folderId;
+//         folderNotes = new VNOTE_ITEMS_MAP();
+//         folderNotes->autoRelease = true;
+//         m_qspAllNotesMap->notes.insert(folderId, folderNotes);
+//     }
+
+//     m_qspAllNotesMap->lock.unlock();
+
+//     return folderNotes;
+// }
 
 /**
  * @brief VNoteDataManager::getDefaultIcon
@@ -366,16 +369,17 @@ VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
  */
 QPixmap VNoteDataManager::getDefaultIcon(qint32 index, IconsType type)
 {
-    m_iconLock.lockForRead();
-    if (index < 1 || index > m_defaultIcons[type].size()) {
-        index = 0;
-    }
+    return QPixmap();
+    // m_iconLock.lockForRead();
+    // if (index < 1 || index > m_defaultIcons[type].size()) {
+    //     index = 0;
+    // }
 
-    QPixmap icon = m_defaultIcons[type].at(index);
+    // QPixmap icon = m_defaultIcons[type].at(index);
 
-    m_iconLock.unlock();
+    // m_iconLock.unlock();
 
-    return icon;
+    // return icon;
 }
 
 /**
@@ -437,14 +441,14 @@ void VNoteDataManager::reqNoteItems()
     }
 }
 
-/**
- * @brief VNoteDataManager::getAllNotesInFolder
- * @return 所有记事本的记事项数据
- */
-VNOTE_ALL_NOTES_MAP *VNoteDataManager::getAllNotesInFolder()
-{
-    return m_qspAllNotesMap.get();
-}
+// /**
+//  * @brief VNoteDataManager::getAllNotesInFolder
+//  * @return 所有记事本的记事项数据
+//  */
+// VNOTE_ALL_NOTES_MAP *VNoteDataManager::getAllNotesInFolder()
+// {
+//     return m_qspAllNotesMap.get();
+// }
 
 /**
  * @brief VNoteDataManager::onFoldersLoaded
@@ -479,9 +483,9 @@ void VNoteDataManager::onFoldersLoaded(VNOTE_FOLDERS_MAP *foldesMap)
     //Set folder data ready flag
     m_fDataState |= DataState::FolderDataReady;
 
-    emit onNoteFoldersLoaded();
+    emit noteFoldersLoaded();
 
-    //Send data ready signal if data ready
+    // Send data ready signal if data ready
     if (isAllDatasReady()) {
         emit onAllDatasReady();
     }
