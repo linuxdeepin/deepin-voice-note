@@ -27,20 +27,12 @@
 #include <signal.h>
 #include <unistd.h>
 
-QObject *jsContent_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
-{
-    Q_UNUSED(engine)
-    Q_UNUSED(scriptEngine)
-
-    return JsContent::instance();
-}
-
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    VNoteMainManager mainManager;
-    mainManager.initQMLRegister();
+    qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "7777");
+    VNoteMainManager::instance()->initQMLRegister();
     QtWebEngineQuick::initialize();
 
     QQmlApplicationEngine engine;
@@ -51,7 +43,7 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);   
     engine.load(url);
-    mainManager.init();
+    VNoteMainManager::instance()->initNote();
 
     return app.exec();
 }

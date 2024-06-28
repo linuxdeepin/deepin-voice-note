@@ -40,7 +40,7 @@ public:
      */
     bool insertImages(const QImage &image);
 
-    QString webPath();
+    Q_INVOKABLE QString webPath();
 
 signals:
     void callJsInitData(const QString &jsonData); //调用web前端，设置json格式数据

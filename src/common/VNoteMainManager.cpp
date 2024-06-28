@@ -8,14 +8,27 @@
 #include "vnoteitem.h"
 #include "vnoteitemoper.h"
 #include "VNoteMainManager.h"
+#include "jscontent.h"
+#include "webrichetextmanager.h"
+
+#include <QQmlApplicationEngine>
+#include <QtWebEngineQuick/qtwebenginequickglobal.h>
 
 VNoteMainManager::VNoteMainManager()
 {
 
 }
 
-VNoteMainManager::init()
+//写一个单例模式的类
+VNoteMainManager *VNoteMainManager::instance()
 {
+    static VNoteMainManager instance;
+    return &instance;
+}
+
+void VNoteMainManager::initNote()
+{
+    m_richTextManager = new WebRichTextManager();
     initData();
     initConnections();
 }
@@ -33,9 +46,25 @@ void VNoteMainManager::initConnections()
         this, &VNoteMainManager::onVNoteFoldersLoaded);
 }
 
+QObject *jsContent_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine)
+    Q_UNUSED(scriptEngine)
+
+    return JsContent::instance();
+}
+
+QObject *mainManager_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine)
+    Q_UNUSED(scriptEngine)
+
+    return VNoteMainManager::instance();
+}
+
 void VNoteMainManager::initQMLRegister()
 {
-    qmlRegisterType<VNoteMainManager>("VNote", 1, 0, "VNoteMainWindow");
+    qmlRegisterSingletonType<VNoteMainManager>("VNote", 1, 0, "VNoteMainManager", mainManager_provider);
     qmlRegisterSingletonType<JsContent>("VNote", 1, 0, "Webobj", jsContent_provider);
 }
 
@@ -107,6 +136,7 @@ void VNoteMainManager::vNoteFloderChanged(const int &index)
         folders->lock.lockForRead();
 
         VNoteFolder *folder = folders->folders.value(index+1);
+        m_currentFolderIndex = folder->id;
         if (!loadNotes(folder)) {
         }
 
@@ -117,6 +147,7 @@ void VNoteMainManager::vNoteFloderChanged(const int &index)
 void VNoteMainManager::vNoteChanged(const int &index)
 {
     VNoteItem *data = m_noteItems.at(index);
+    m_richTextManager->initData(data, "");
     // if (data == nullptr || stateOperation->isSearching()) {
     //     m_recordBar->setVisible(false);
     // } else {
@@ -148,7 +179,6 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
         if (notes) {
             notes->lock.lockForRead();
             for (auto it : notes->folderNotes) {
-                // m_middleView->appendRow(it);
                 QVariantMap data;
                 data.insert("name", it->noteTitle);
                 data.insert("time", it->modifyTime);
@@ -165,4 +195,57 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
         emit updateNotes(notesDataList);
     }
     return notesCount;
+}
+
+void VNoteMainManager::createNote()
+{
+    if (m_currentFolderIndex == -1)
+        return;
+    VNoteItem tmpNote;
+    tmpNote.folderId = m_currentFolderIndex;
+    tmpNote.noteType = VNoteItem::VNT_Text;
+    tmpNote.htmlCode = "<p><br></p>";
+    VNoteItemOper noteOper;
+    //Get default note name in the folder
+    tmpNote.noteTitle = noteOper.getDefaultNoteName(tmpNote.folderId);
+
+    VNoteItem *newNote = noteOper.addNote(tmpNote);
+
+    //Refresh the notes count of folder
+    // m_leftView->update(m_leftView->currentIndex());
+    //解绑详情页绑定的笔记数据
+    // m_richTextManager->unboundCurrentNoteData();
+    // m_middleView->addRowAtHead(newNote);
+    m_noteItems.append(newNote);
+    QVariantMap data;
+    data.insert("name", newNote->noteTitle);
+    data.insert("time", newNote->modifyTime);
+    emit addNoteAtHead(data);
+}
+
+void VNoteMainManager::deleteNote(const QList<int> &index)
+{
+    // 删除之前清空JS详情页内容
+    m_richTextManager->clearJSContent();
+    qWarning() << "deleteNote index:" << index;
+
+    QList<VNoteItem*> noteDataList;
+    for (int i = 0; i < index.size(); i++) {
+        VNoteItem *note = m_noteItems.at(index.at(i));
+        noteDataList.append(note);
+        m_noteItems.removeAt(index.at(i));
+    }
+
+    if (noteDataList.size()) {
+        //删除笔记之前先解除详情页绑定的笔记数据
+        // m_richTextEdit->unboundCurrentNoteData();
+        for (auto noteData : noteDataList) {
+            VNoteItemOper noteOper(noteData);
+            noteOper.deleteNote();
+        }
+        //Refresh the middle view
+        // if (m_middleView->rowCount() <= 0 && stateOperation->isSearching()) {
+        //     m_middleView->setVisibleEmptySearch(true);
+        // }
+    }
 }

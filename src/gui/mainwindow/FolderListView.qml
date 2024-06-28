@@ -20,12 +20,14 @@ Item {
 
     ListView {
         anchors.fill: parent
+        property var lastCurrentIndex: -1
         id: folderListView
         model: folderModel
         delegate: Rectangle {
             width: parent.width
             height: itemHeight
-            color: "white"
+            radius: 6
+            color: index === folderListView.currentIndex ? "#33000000" : "white"
             Text {
                 text: model.name
                 anchors.centerIn: parent
@@ -35,17 +37,31 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
+                    if (folderListView.lastCurrentIndex != -1) {
+                        if (folderListView.itemAtIndex(folderListView.lastCurrentIndex)) {
+                            folderListView.itemAtIndex(folderListView.lastCurrentIndex).color = "white"
+                        }
+                    }
+
                     folderListView.currentIndex = index
+                    parent.color = "#33000000"
+                    folderListView.lastCurrentIndex = index
                 }
                 onEntered: {
-                    parent.color = "red"
+                    if (folderListView.currentIndex == index) {
+                        return
+                    }
+                    parent.color = "#1A000000"
                 }
                 onExited: {
+                    if (folderListView.currentIndex == index) {
+                        return
+                    }
                     parent.color = "white"
                 }
             }
         }
-        onCurrentItemChanged: {
+        onCurrentItemChanged: {            
             var index = folderListView.currentIndex
             itemChanged(index, folderModel.get(index).name) // 发出 itemChanged 信号
         }
