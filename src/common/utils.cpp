@@ -6,9 +6,9 @@
 #include "utils.h"
 #include "globaldef.h"
 #include "vnoteitem.h"
-#include "vnoteapplication.h"
+// #include "vnoteapplication.h"
 
-#include <DGuiApplicationHelper>
+// #include <DGuiApplicationHelper>
 
 #include <QImageReader>
 #include <QIcon>
@@ -37,16 +37,16 @@ QString Utils::convertDateTime(const QDateTime &dateTime)
         qint64 offsetSec = dateTime.secsTo(QDateTime::currentDateTime());
         if (offsetSec < 3600) {
             offsetSec /= 60;
-            if (offsetSec <= 1) {
-                disptime = DApplication::translate("Utils", "1 min ago");
-            } else {
-                disptime = DApplication::translate("Utils", "%1 mins ago").arg(offsetSec);
-            }
+            // if (offsetSec <= 1) {
+            //     disptime = DApplication::translate("Utils", "1 min ago");
+            // } else {
+            //     disptime = DApplication::translate("Utils", "%1 mins ago").arg(offsetSec);
+            // }
         } else {
             disptime = dateTime.toString("hh:mm");
         }
     } else if (1 == offset) {
-        disptime = DApplication::translate("Utils", "Yesterday") + " " + dateTime.toString("hh:mm");
+        // disptime = DApplication::translate("Utils", "Yesterday") + " " + dateTime.toString("hh:mm");
     } else if (folerDate.year() == currDateTime.year()) {
         //不跨年 其他时间：MM-DD（例如：9-27）；
         disptime = dateTime.toString("MM-dd");
@@ -65,25 +65,25 @@ QString Utils::convertDateTime(const QDateTime &dateTime)
  * @param pApp
  * @return 加载的图标
  */
-QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplication *pApp)
-{
-    QImageReader reader;
-    QPixmap pixmap;
+// QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplication *pApp)
+// {
+//     QImageReader reader;
+//     QPixmap pixmap;
 
-    reader.setFileName(filePath);
+//     reader.setFileName(filePath);
 
-    if (reader.canRead()) {
-        // const qreal ratio = qApp->devicePixelRatio();
-        const qreal ratio = pApp->devicePixelRatio();
-        reader.setScaledSize(size * ratio);
-        pixmap = QPixmap::fromImage(reader.read());
-        pixmap.setDevicePixelRatio(ratio);
-    } else {
-        pixmap.load(filePath);
-    }
+//     if (reader.canRead()) {
+//         // const qreal ratio = qApp->devicePixelRatio();
+//         const qreal ratio = pApp->devicePixelRatio();
+//         reader.setScaledSize(size * ratio);
+//         pixmap = QPixmap::fromImage(reader.read());
+//         pixmap.setDevicePixelRatio(ratio);
+//     } else {
+//         pixmap.load(filePath);
+//     }
 
-    return pixmap;
-}
+//     return pixmap;
+// }
 
 /**
  * @brief Utils::loadSVG
@@ -93,38 +93,38 @@ QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplicatio
  */
 QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
 {
-    DGuiApplicationHelper::ColorType theme =
-        DGuiApplicationHelper::instance()->themeType();
+    // DGuiApplicationHelper::ColorType theme =
+    //     DGuiApplicationHelper::instance()->themeType();
 
     QString iconPath(STAND_ICON_PAHT);
 
-    if (!fCommon) {
-        if (DGuiApplicationHelper::ColorType::LightType == theme) {
+    // if (!fCommon) {
+    //     if (DGuiApplicationHelper::ColorType::LightType == theme) {
             iconPath += QString("light/");
-        } else {
-            iconPath += QString("dark/");
-        }
-    }
+    //     } else {
+    //         iconPath += QString("dark/");
+    //     }
+    // }
 
     iconPath += fileName;
 
     qreal ratio = 1.0;
 
-    const qreal devicePixelRatio = qGuiApp->devicePixelRatio();
+    // const qreal devicePixelRatio = qGuiApp->devicePixelRatio();
 
     QPixmap pixmap;
 
-    if (!qFuzzyCompare(ratio, devicePixelRatio)) {
-        QImageReader reader;
-        reader.setFileName(qt_findAtNxFile(iconPath, devicePixelRatio, &ratio));
-        if (reader.canRead()) {
-            reader.setScaledSize(reader.size() * (devicePixelRatio / ratio));
-            pixmap = QPixmap::fromImage(reader.read());
-            pixmap.setDevicePixelRatio(devicePixelRatio);
-        }
-    } else {
+    // if (!qFuzzyCompare(ratio, devicePixelRatio)) {
+    //     QImageReader reader;
+    //     reader.setFileName(qt_findAtNxFile(iconPath, devicePixelRatio, &ratio));
+    //     if (reader.canRead()) {
+    //         reader.setScaledSize(reader.size() * (devicePixelRatio / ratio));
+    //         pixmap = QPixmap::fromImage(reader.read());
+    //         pixmap.setDevicePixelRatio(devicePixelRatio);
+    //     }
+    // } else {
         pixmap.load(iconPath);
-    }
+    // }
 
     return pixmap;
 }
@@ -184,9 +184,9 @@ QString Utils::formatMillisecond(qint64 millisecond, qint64 minValue)
     if (curSecond < minValue) {
         curSecond = minValue;
     }
-    if (curSecond < 3600) {
-        return QDateTime::fromTime_t(static_cast<uint>(curSecond)).toUTC().toString("mm:ss");
-    }
+    // if (curSecond < 3600) {
+    //     return QDateTime::fromTime_t(static_cast<uint>(curSecond)).toUTC().toString("mm:ss");
+    // }
 
     return QString("60:00");
 }
@@ -263,13 +263,13 @@ void Utils::setDefaultColor(QTextDocument *srcDoc, const QColor &color)
  */
 void Utils::setTitleBarTabFocus(QKeyEvent *event)
 {
-    VNoteApplication *app = dynamic_cast<VNoteApplication *>(qGuiApp);
-    if (app) {
-        VNoteMainWindow *wnd = app->mainWindow();
-        if (wnd) {
-            wnd->setTitleBarTabFocus(event);
-        }
-    }
+    // VNoteApplication *app = dynamic_cast<VNoteApplication *>(qGuiApp);
+    // if (app) {
+    //     VNoteMainWindow *wnd = app->mainWindow();
+    //     if (wnd) {
+    //         wnd->setTitleBarTabFocus(event);
+    //     }
+    // }
 }
 
 /**
@@ -331,14 +331,16 @@ bool Utils::isLoongsonPlatform()
 QString Utils::filteredFileName(QString fileName, const QString &defaultName)
 {
     //使用正则表达式除去不符合规范的字符并清理文件名两端的空白字符，中间的空白字符不做处理
-    QString name = fileName.replace(QRegExp("[\"\'\\[\\]\\\\/:|<>+=;,?*]"), "").trimmed();
-    if (name.isEmpty()) {
-        return defaultName;
-    }
-    return name;
+    // QString name = fileName.replace(QRegExp("[\"\'\\[\\]\\\\/:|<>+=;,?*]"), "").trimmed();
+    // if (name.isEmpty()) {
+    //     return defaultName;
+    // }
+    // return name;
+    return QString();
 }
 
 bool Utils::isWayland()
 {
-    return qApp->platformName() == "dwayland" || qApp->property("_d_isDwayland").toBool();
+    return false;
+    // return qApp->platformName() == "dwayland" || qApp->property("_d_isDwayland").toBool();
 }

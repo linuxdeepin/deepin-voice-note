@@ -11,11 +11,9 @@
 #include "vnoteforlder.h"
 #include "vnoteitem.h"
 
-#include <DLog>
-
 #include <QThreadPool>
 
-DCORE_USE_NAMESPACE
+// DCORE_USE_NAMESPACE
 
 VNoteDataManager *VNoteDataManager::_instance = nullptr;
 
@@ -366,16 +364,17 @@ VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
  */
 QPixmap VNoteDataManager::getDefaultIcon(qint32 index, IconsType type)
 {
-    m_iconLock.lockForRead();
-    if (index < 1 || index > m_defaultIcons[type].size()) {
-        index = 0;
-    }
+    return QPixmap();
+    // m_iconLock.lockForRead();
+    // if (index < 1 || index > m_defaultIcons[type].size()) {
+    //     index = 0;
+    // }
 
-    QPixmap icon = m_defaultIcons[type].at(index);
+    // QPixmap icon = m_defaultIcons[type].at(index);
 
-    m_iconLock.unlock();
+    // m_iconLock.unlock();
 
-    return icon;
+    // return icon;
 }
 
 /**
@@ -479,9 +478,9 @@ void VNoteDataManager::onFoldersLoaded(VNOTE_FOLDERS_MAP *foldesMap)
     //Set folder data ready flag
     m_fDataState |= DataState::FolderDataReady;
 
-    emit onNoteFoldersLoaded();
+    emit noteFoldersLoaded();
 
-    //Send data ready signal if data ready
+    // Send data ready signal if data ready
     if (isAllDatasReady()) {
         emit onAllDatasReady();
     }

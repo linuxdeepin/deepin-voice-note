@@ -7,8 +7,6 @@
 #include "vnoteitem.h"
 #include "common/utils.h"
 
-#include <DLog>
-
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>

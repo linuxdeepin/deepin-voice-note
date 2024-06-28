@@ -34,8 +34,7 @@ VNotePlayWidget::VNotePlayWidget(QWidget *parent)
 void VNotePlayWidget::initUI()
 {
     m_playerBtn = new DIconButton(this);
-//    m_playerBtn->setIcon(Utils::loadSVG("play.svg", true));
-    m_playerBtn->setIcon(QIcon::fromTheme("dvn_play"));
+    m_playerBtn->setIcon(Utils::loadSVG("play.svg", true));
     m_playerBtn->setIconSize(QSize(36, 36));
     m_playerBtn->setFixedSize(QSize(36, 36));
     m_playerBtn->setFlat(true);
@@ -72,8 +71,7 @@ void VNotePlayWidget::initUI()
     m_sliderHover->setLayout(t_blurAreaLayout);
 
     m_closeBtn = new DIconButton(this);
-    //m_closeBtn->setIcon(Utils::loadSVG("clear.svg", true));
-    m_closeBtn->setIcon(QIcon::fromTheme("dvn_clear"));
+    m_closeBtn->setIcon(Utils::loadSVG("clear.svg", true));
     m_closeBtn->setIconSize(QSize(22, 22));
     m_closeBtn->setFixedSize(QSize(22, 22));
     m_closeBtn->setFlat(true);
@@ -285,13 +283,11 @@ void VNotePlayWidget::playVoice(VNVoiceBlock *voiceData, bool bIsSame)
         VlcPalyer::VlcState status = getPlayerStatus();
         if (status == VlcPalyer::Playing) { //当前语音播放中则执行暂停操作
             m_player->pause();
-            //m_playerBtn->setIcon(Utils::loadSVG("play.svg", true)); //当前语音暂停中则执行播放操作
-            m_playerBtn->setIcon(QIcon::fromTheme("dvn_play")); //当前语音暂停中则执行播放操作
+            m_playerBtn->setIcon(Utils::loadSVG("play.svg", true)); //当前语音暂停中则执行播放操作
             emit sigPauseVoice(m_voiceBlock);
         } else if (status == VlcPalyer::Paused) {
             m_player->play();
-            //m_playerBtn->setIcon(Utils::loadSVG("pause_play.svg", true));
-            m_playerBtn->setIcon(QIcon::fromTheme("dvn_pauseplay"));
+            m_playerBtn->setIcon(Utils::loadSVG("pause_play.svg", true));
             emit sigPlayVoice(m_voiceBlock);
         }
     } else if (nullptr != voiceData) { //与上一次语音不相同，重新播放语音
@@ -302,8 +298,7 @@ void VNotePlayWidget::playVoice(VNVoiceBlock *voiceData, bool bIsSame)
         m_player->setFilePath(m_voiceBlock->voicePath);
         m_nameLab->setText(voiceData->voiceTitle);
         m_timeLab->setText(Utils::formatMillisecond(0, 0) + "/" + Utils::formatMillisecond(voiceData->voiceSize));
-        //m_playerBtn->setIcon(Utils::loadSVG("pause_play.svg", true));
-        m_playerBtn->setIcon(QIcon::fromTheme("dvn_pauseplay"));
+        m_playerBtn->setIcon(Utils::loadSVG("pause_play.svg", true));
         m_player->play();
         emit sigPlayVoice(m_voiceBlock);
     } else {

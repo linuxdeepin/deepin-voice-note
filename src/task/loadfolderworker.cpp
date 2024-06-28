@@ -8,7 +8,7 @@
 #include "db/vnotefolderoper.h"
 #include "globaldef.h"
 
-#include <DLog>
+// #include <DLog>
 
 #include <QThread>
 
