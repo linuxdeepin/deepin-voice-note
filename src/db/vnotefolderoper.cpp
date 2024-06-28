@@ -88,12 +88,12 @@ bool VNoteFolderOper::renameVNoteFolder(const QString &folderName)
 
         RenameFolderDbVisitor renameFolderVisitor(VNoteDbManager::instance()->getVNoteDb(), m_folder, nullptr);
 
-        // if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameFolderVisitor))) {
-        //     m_folder->name = oldFolderName;
-        //     m_folder->modifyTime = oldModifyTime;
+        if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameFolderVisitor))) {
+            m_folder->name = oldFolderName;
+            m_folder->modifyTime = oldModifyTime;
 
-        //     isUpdateOK = false;
-        // }
+            isUpdateOK = false;
+        }
     }
 
     return isUpdateOK;
@@ -169,10 +169,9 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
  */
 VNoteFolder *VNoteFolderOper::getFolder(qint64 folderId)
 {
-    // VNoteFolder *folder = VNoteDataManager::instance()->getFolder(folderId);
+    VNoteFolder *folder = VNoteDataManager::instance()->getFolder(folderId);
 
-    // return folder;
-    return nullptr;
+    return folder;
 }
 
 /**
@@ -181,8 +180,7 @@ VNoteFolder *VNoteFolderOper::getFolder(qint64 folderId)
  */
 qint32 VNoteFolderOper::getFoldersCount()
 {
-    return 0;
-    // return VNoteDataManager::instance()->folderCount();
+    return VNoteDataManager::instance()->folderCount();
 }
 
 /**
@@ -192,16 +190,15 @@ qint32 VNoteFolderOper::getFoldersCount()
  */
 qint32 VNoteFolderOper::getNotesCount(qint64 folderId)
 {
-    return 0;
-    // VNOTE_ITEMS_MAP *notesInFollder = VNoteDataManager::instance()->getFolderNotes(folderId);
+    VNOTE_ITEMS_MAP *notesInFollder = VNoteDataManager::instance()->getFolderNotes(folderId);
 
-    // qint32 notesCount = 0;
+    qint32 notesCount = 0;
 
-    // if (nullptr != notesInFollder) {
-    //     notesCount = notesInFollder->folderNotes.size();
-    // }
+    if (nullptr != notesInFollder) {
+        notesCount = notesInFollder->folderNotes.size();
+    }
 
-    // return notesCount;
+    return notesCount;
 }
 
 /**

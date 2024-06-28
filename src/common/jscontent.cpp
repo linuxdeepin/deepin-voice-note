@@ -95,7 +95,7 @@ bool JsContent::insertImages(const QImage &image)
 
 QString JsContent::webPath()
 {
-    return WEB_PATH "/index.html";
+    return "file://" WEB_PATH "/index.html";
 }
 
 void JsContent::jsCallTxtChange()

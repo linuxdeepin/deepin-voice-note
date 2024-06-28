@@ -28,8 +28,8 @@ public:
 
     //获取所有记事本数据
     VNOTE_FOLDERS_MAP *getNoteFolders();
-//     //获取所有记事项数据
-//     VNOTE_ALL_NOTES_MAP *getAllNotesInFolder();
+    //获取所有记事项数据
+    VNOTE_ALL_NOTES_MAP *getAllNotesInFolder();
     //加载默认图标
     void reqNoteDefIcons();
     //加载记事本数据
@@ -51,24 +51,24 @@ public slots:
     void onAllNotesLoaded(VNOTE_ALL_NOTES_MAP *notesMap);
 
 protected:
-//     //添加一个记事本
-//     VNoteFolder *addFolder(VNoteFolder *folder);
-//     //获取记事本数据
-//     VNoteFolder *getFolder(qint64 folderId);
-//     //删除一个记事本
-//     VNoteFolder *delFolder(qint64 folderId);
-//     //获取记事本数量
-//     qint32 folderCount();
-//     //添加一个记事项
-//     VNoteItem *addNote(VNoteItem *note);
-//     //获取一个记事项
-//     VNoteItem *getNote(qint64 folderId, qint32 noteId);
-//     //删除记事项
-//     VNoteItem *delNote(qint64 folderId, qint32 noteId);
-//     //获取一个记事本的记事项个数
-//     qint32 folderNotesCount(qint64 folderId);
-//     //获取一个记事本的所有记事项数据
-//     VNOTE_ITEMS_MAP *getFolderNotes(qint64 folderId);
+    //添加一个记事本
+    VNoteFolder *addFolder(VNoteFolder *folder);
+    //获取记事本数据
+    VNoteFolder *getFolder(qint64 folderId);
+    //删除一个记事本
+    VNoteFolder *delFolder(qint64 folderId);
+    //获取记事本数量
+    qint32 folderCount();
+    //添加一个记事项
+    VNoteItem *addNote(VNoteItem *note);
+    //获取一个记事项
+    VNoteItem *getNote(qint64 folderId, qint32 noteId);
+    //删除记事项
+    VNoteItem *delNote(qint64 folderId, qint32 noteId);
+    //获取一个记事本的记事项个数
+    qint32 folderNotesCount(qint64 folderId);
+    //获取一个记事本的所有记事项数据
+    VNOTE_ITEMS_MAP *getFolderNotes(qint64 folderId);
     //获取记事本图标
     QPixmap getDefaultIcon(qint32 index, IconsType type);
 

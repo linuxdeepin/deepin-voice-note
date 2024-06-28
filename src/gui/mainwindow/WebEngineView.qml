@@ -17,14 +17,14 @@ Item {
         anchors.fill: parent
 
         WebChannel {
-            id: webChannel
+            id: noteWebChannel
         }
 
         Component.onCompleted: {
-            webChannel.registerObject("webobj", Webobj);
-            webView.webChannel = webChannel
-            var webPage = webobj.webPath()
-            webView.url = Qt.resolvedUrl(webPage)
+            noteWebChannel.registerObject("webobj", Webobj);
+            // console.log("registerObject ret: " + ret)
+            webView.webChannel = noteWebChannel
+            webView.url = Qt.resolvedUrl(Webobj.webPath())
         }
     }
 }

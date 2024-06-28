@@ -27,29 +27,30 @@ ApplicationWindow {
     DWindow.alphaBufferSize: 8
     flags: Qt.Window | Qt.WindowMinMaxButtonsHint | Qt.WindowCloseButtonHint | Qt.WindowTitleHint
 
-    VNoteMainWindow {
-        id: vnote
-
+    Connections {
         function handleFinishedFolderLoad(foldersData) {
-            console.log("finished folder load")
+            console.warn("finished folder load")
             for (var i = 0; i < foldersData.length; i++) {
                 folderListView.model.append({name: foldersData[i].name, color: "red"})
             }
         }
 
         function handleUpdateNoteList(notesData) {
-            console.log("update note list")
+            console.warn("update note list")
             itemListView.model.clear()
             for (var i = 0; i < notesData.length; i++) {
                 itemListView.model.append({name: notesData[i].name, color: "red"})
             }
         }
-
-        onFinishedFolderLoad : {
+        target: VNoteMainManager
+        onFinishedFolderLoad: {
             handleFinishedFolderLoad(foldersData)
         }
         onUpdateNotes : {
             handleUpdateNoteList(notesData)
+        }
+        onAddNoteAtHead : {
+            itemListView.model.insert(0, {name: noteData.name, color: "red"})
         }
     }
 
@@ -87,16 +88,16 @@ ApplicationWindow {
 
                     onItemChanged: {
                         label.text = name
-                        vnote.vNoteFloderChanged(index)
+                        VNoteMainManager.vNoteFloderChanged(index)
                     }
                 }
                 Button {
                     id: button
                     width: parent.width
                     height: createFolderBtnHeight
-                    text: "Create Notebook"
+                    text: qsTr("Create Notebook")
                     onClicked: {
-                        folderListView.model.append({"name": "123123", "color": "red"});
+                        VNoteMainManager.createNote()
                     }
                 }
             }
@@ -126,15 +127,10 @@ ApplicationWindow {
             id: middeleBgArea
             width: leftViewWidth
             height: windowMiniHeight
-            color: DTK.themeType === ApplicationHelper.LightType ? Qt.rgba(1, 1, 1, 0.9)
-                                                                      : Qt.rgba(16.0/255.0, 16.0/255.0, 16.0/255.0, 0.85)
-            Rectangle {
-                width: 1
-                height: parent.height
-                anchors.right: parent.right
-                color: DTK.themeType === ApplicationHelper.LightType ? "#eee7e7e7"
-                                                                     : "#ee252525"
-            }
+            // color: DTK.themeType === ApplicationHelper.LightType ? Qt.rgba(1, 1, 1, 0.9)
+            //                                                           : Qt.rgba(16.0/255.0, 16.0/255.0, 16.0/255.0, 0.85)
+            color: Qt.rgba(0, 0, 0, 0.05)
+
             Column {
                 width: parent.width
                 height: parent.height
@@ -152,7 +148,8 @@ ApplicationWindow {
                     height: parent.height - label.height
 
                     onNoteItemChanged : {
-                        vnote.vNoteChanged(index)
+                        console.warn("note item changed")
+                        VNoteMainManager.vNoteChanged(index)
                     }
                 }
             }
