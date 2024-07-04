@@ -346,7 +346,7 @@ void AudioWatcher::onDBusAudioPropertyChanged(QDBusMessage msg)
                 double outAudioPortVolume = qvariant_cast<double>(changedProps[prop]);
                 if (abs(m_outAudioPortVolume - outAudioPortVolume) >= 0.000001) {
                     qInfo() << "默认输出源音量改变:" <<  m_outAudioPortVolume << " To " << outAudioPortVolume;
-                    onSourceVolumeChanged(outAudioPortVolume);
+                    m_outAudioPortVolume = outAudioPortVolume;
                 }
             } else if (prop == QStringLiteral("Mute")) {
                 //默认输出源静音状态
