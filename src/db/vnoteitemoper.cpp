@@ -291,11 +291,11 @@ bool VNoteItemOper::updateTop(int value)
         }
         m_note->isTop = value;
         UpdateNoteTopDbVisitor updateNoteVisitor(VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
-        // if (!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
-        //     updateOK = true;
-        // } else {
-        //     m_note->isTop = !value;
-        // }
+        if (!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
+            updateOK = true;
+        } else {
+            m_note->isTop = !value;
+        }
     }
     return updateOK;
 }

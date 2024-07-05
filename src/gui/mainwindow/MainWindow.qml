@@ -29,17 +29,16 @@ ApplicationWindow {
 
     Connections {
         function handleFinishedFolderLoad(foldersData) {
-            console.warn("finished folder load")
             for (var i = 0; i < foldersData.length; i++) {
                 folderListView.model.append({name: foldersData[i].name, color: "red"})
             }
         }
 
         function handleUpdateNoteList(notesData) {
-            console.warn("update note list")
             itemListView.model.clear()
             for (var i = 0; i < notesData.length; i++) {
-                itemListView.model.append({name: notesData[i].name, color: "red"})
+                var itemIsTop = notesData[i].isTop ? "top" : "normal"
+                itemListView.model.append({name: notesData[i].name, color: "red", isTop: itemIsTop})
             }
         }
         target: VNoteMainManager
@@ -101,6 +100,15 @@ ApplicationWindow {
                     }
                 }
             }
+            Connections {
+                target: itemListView
+                onMouseChanged: {
+                    folderListView.updateItems(mousePosX, mousePosY)
+                }
+                onDropRelease: {
+                    folderListView.dropItems(itemListView.selectedNoteItem)
+                }
+            }
         }
         Rectangle {
             id: leftDragHandle
@@ -144,11 +152,11 @@ ApplicationWindow {
                 }
                 ItemListView {
                     id: itemListView
+                    z: 1000
                     width: parent.width
                     height: parent.height - label.height
 
                     onNoteItemChanged : {
-                        console.warn("note item changed")
                         VNoteMainManager.vNoteChanged(index)
                     }
                 }
@@ -177,6 +185,7 @@ ApplicationWindow {
         }
         Rectangle {
             id: rightBgArea
+            z: 500
             width: windowMiniWidth - leftBgArea.width
             height: windowMiniHeight
             color: Qt.rgba(0, 0, 0, 0.01)
@@ -196,6 +205,7 @@ ApplicationWindow {
 
                 WebEngineView {
                     id: webEngineView
+                    z: 400
                     width: parent.width
                     height: parent.height - label.height
                 }
