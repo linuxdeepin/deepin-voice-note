@@ -7,6 +7,8 @@
 #define VNOTEMAINMANAGER_H
 
 #include "vnotedatamanager.h"
+#include "vnoteforlder.h"
+#include "vnoteitem.h"
 
 #include <QVariantMap>
 
@@ -15,6 +17,14 @@ class VNoteMainManager : public QObject
 {
     Q_OBJECT
 public:
+    enum SaveAsType {
+        Note = 0, //保存笔记
+        Text, //txt类型
+        Html, //html类型
+        Voice, //语音类型
+    };
+    Q_ENUM(SaveAsType)
+
     static VNoteMainManager* instance();
     void initNote();
     void initQMLRegister();
@@ -23,6 +33,13 @@ public:
     Q_INVOKABLE void vNoteChanged(const int &index);
     Q_INVOKABLE void createNote();
     Q_INVOKABLE void deleteNote(const QList<int> &index);
+    Q_INVOKABLE void moveNotes(const QVariantList &index, const int &folderIndex);
+    Q_INVOKABLE void saveAs(const QVariantList &index, const QString &path, const SaveAsType type = Note);
+    Q_INVOKABLE void updateTop(const int &index, const bool &top);
+    Q_INVOKABLE bool getTop();
+    Q_INVOKABLE void updateOrder(const QVariantList &order);
+    
+    
 
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);
@@ -31,6 +48,7 @@ signals:
 
 private slots:
     void onVNoteFoldersLoaded();
+    void onExportFinished(int err);
 
 private:
     VNoteMainManager();
@@ -39,8 +57,12 @@ private:
     int loadNotepads();
     int loadNotes(VNoteFolder *folder);
 
+    VNoteFolder* getFloderByIndex(const int &index);
+    VNoteItem* getNoteByIndex(const int &index);
+
 private:
     int m_currentFolderIndex {-1};
+    int m_currentHasTop {0};
     QList<VNoteItem*> m_noteItems;
     WebRichTextManager *m_richTextManager {nullptr};
 };

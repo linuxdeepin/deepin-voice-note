@@ -14,6 +14,7 @@ endif()
 list(APPEND RESOURCES ${CMAKE_PROJECT_NAME}.qrc)
 
 find_package(Qt6 6.6 REQUIRED COMPONENTS Core Widgets Quick DBus Sql WebEngineQuick)
+find_package(Dtk6 COMPONENTS Core Widget Gui REQUIRED)
 
 find_package(PkgConfig REQUIRED)
 
@@ -40,6 +41,9 @@ target_link_libraries(${BIN_NAME} PRIVATE
     Qt6::DBus
     Qt6::Sql
     Qt6::WebEngineQuick
+    Dtk6::Core
+    Dtk6::Gui
+    Dtk6::Widget
 )
 
 # Add install rule

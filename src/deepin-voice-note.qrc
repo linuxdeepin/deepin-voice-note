@@ -5,6 +5,8 @@
         <file>gui/mainwindow/FolderListView.qml</file>
         <file>gui/mainwindow/ItemListView.qml</file>
         <file>gui/mainwindow/WebEngineView.qml</file>
+        <file>gui/dialog/MoveDialog.qml</file>
+        <file>gui/drag/DragControl.qml</file>
         <file>web/index.html</file>
         <file>web/index.css</file>
         <file>web/index.js</file>
