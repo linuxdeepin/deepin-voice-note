@@ -31,13 +31,16 @@ public:
 
     Q_INVOKABLE void vNoteFloderChanged(const int &index);
     Q_INVOKABLE void vNoteChanged(const int &index);
+    Q_INVOKABLE void vNoteCreateFolder();
+    Q_INVOKABLE void vNoteDeleteFolder(const int &index);
     Q_INVOKABLE void createNote();
     Q_INVOKABLE void deleteNote(const QList<int> &index);
     Q_INVOKABLE void moveNotes(const QVariantList &index, const int &folderIndex);
     Q_INVOKABLE void saveAs(const QVariantList &index, const QString &path, const SaveAsType type = Note);
     Q_INVOKABLE void updateTop(const int &index, const bool &top);
     Q_INVOKABLE bool getTop();
-    Q_INVOKABLE void updateOrder(const QVariantList &order);
+    Q_INVOKABLE void updateSort(const int &src, const int &dst);
+    Q_INVOKABLE void renameFolder(const int &index, const QString &name);
     
     
 
@@ -45,6 +48,7 @@ signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);
     void updateNotes(const QList<QVariantMap> &notesData);
     void addNoteAtHead(const QVariantMap &noteData);
+    void addFolderFinished(const QVariantMap &folderData);
 
 private slots:
     void onVNoteFoldersLoaded();
@@ -64,6 +68,7 @@ private:
     int m_currentFolderIndex {-1};
     int m_currentHasTop {0};
     QList<VNoteItem*> m_noteItems;
+    QStringList m_folderSort;
     WebRichTextManager *m_richTextManager {nullptr};
 };
 

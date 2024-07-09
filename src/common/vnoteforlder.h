@@ -27,8 +27,8 @@ public:
         Deleted,
     };
     //id
-    //类别，保留字段，暂时未用
     qint64 id {INVALID_ID};
+    //类别，保留字段，暂时未用
     qint32 category {0};
     //记事项个数
     qint64 notesCount {0};

@@ -30,7 +30,7 @@ ApplicationWindow {
     Connections {
         function handleFinishedFolderLoad(foldersData) {
             for (var i = 0; i < foldersData.length; i++) {
-                folderListView.model.append({name: foldersData[i].name, color: "red"})
+                folderListView.model.append({name: foldersData[i].name, count: foldersData[i].notesCount})
             }
         }
 
@@ -96,7 +96,7 @@ ApplicationWindow {
                     height: createFolderBtnHeight
                     text: qsTr("Create Notebook")
                     onClicked: {
-                        VNoteMainManager.createNote()
+                        folderListView.addFolder()
                     }
                 }
             }

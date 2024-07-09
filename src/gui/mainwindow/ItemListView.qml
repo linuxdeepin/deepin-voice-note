@@ -126,7 +126,6 @@ Item {
                 }
             }
             MouseArea {
-                // enabled: false
                 id : noteItemMouseArea
                 anchors.fill: parent
                 drag.target: this
