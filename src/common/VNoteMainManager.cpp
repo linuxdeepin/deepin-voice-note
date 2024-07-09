@@ -5,6 +5,7 @@
 
 #include "datatypedef.h"
 #include "vnoteitemoper.h"
+#include "vnotefolderoper.h"
 #include "VNoteMainManager.h"
 #include "jscontent.h"
 #include "webrichetextmanager.h"
@@ -31,14 +32,15 @@ VNoteMainManager *VNoteMainManager::instance()
 void VNoteMainManager::initNote()
 {
     m_richTextManager = new WebRichTextManager();
-    initData();
     initConnections();
+    initData();
 }
 
 void VNoteMainManager::initData()
 {
     VNoteDataManager::instance()->reqNoteDefIcons();
     VNoteDataManager::instance()->reqNoteFolders();
+    QThread::msleep(200);
     VNoteDataManager::instance()->reqNoteItems();
 }
 
@@ -107,6 +109,7 @@ int VNoteMainManager::loadNotepads()
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
     QVariant value = setting::instance()->getOption(VNOTE_FOLDER_SORT);
     QStringList tmpsortFolders = value.toString().split(",");
+    m_folderSort = tmpsortFolders;
 
     int folderCount = 0;
 
@@ -119,7 +122,7 @@ int VNoteMainManager::loadNotepads()
             int tmpIndexCount = tmpsortFolders.indexOf(QString::number(folder->id));
             QVariantMap data;
             data.insert("name", folder->name);
-            data.insert("notesCount", folder->notesCount);
+            data.insert("notesCount", QString::number(folder->getNotesCount()));
             data.insert("icon", folder->UI.icon);
             data.insert("grayIcon", folder->UI.grayIcon);
             if (tmpIndexCount != -1)
@@ -133,7 +136,7 @@ int VNoteMainManager::loadNotepads()
         //将foldersDataList按照sortNumber排序
         std::sort(foldersDataList.begin(), foldersDataList.end(),
                   [](const QVariantMap &a, const QVariantMap &b) {
-                      return a["sortNumber"].toInt() < b["sortNumber"].toInt();
+            return a["sortNumber"].toInt() > b["sortNumber"].toInt();
                   });
         emit finishedFolderLoad(foldersDataList);
     }
@@ -147,12 +150,62 @@ void VNoteMainManager::vNoteFloderChanged(const int &index)
     if (folders) {
         folders->lock.lockForRead();
 
-        VNoteFolder *folder = folders->folders.value(index+1);
+        VNoteFolder *folder = getFloderByIndex(index);
         m_currentFolderIndex = folder->id;
         if (!loadNotes(folder)) {
         }
 
         folders->lock.unlock();
+    }
+}
+
+void VNoteMainManager::vNoteCreateFolder()
+{
+    VNoteFolder itemData;
+    VNoteFolderOper folderOper;
+    itemData.name = folderOper.getDefaultFolderName();
+
+    VNoteFolder *newFolder = folderOper.addFolder(itemData);
+
+    if (newFolder) {
+        bool sortEnable = false;
+        VNoteFolder *tmpFolder = getFloderByIndex(0);
+        if (tmpFolder && -1 != tmpFolder->sortNumber) {
+            newFolder->sortNumber = tmpFolder->sortNumber + 1;
+            sortEnable = true;
+        }
+        
+        m_folderSort.insert(0, QString::number(newFolder->id));
+
+        if (sortEnable) {
+            QString folderSortData = m_folderSort.join(",");
+            setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
+        }
+
+        m_currentFolderIndex = newFolder->id;
+        VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
+        QVariantMap data;
+        data.insert("name", newFolder->name);
+        data.insert("notesCount", "1");
+        data.insert("icon", newFolder->UI.icon);
+        data.insert("grayIcon", newFolder->UI.grayIcon);
+        data.insert("sortNumber", folders->folders.size());
+        addFolderFinished(data);
+    }
+}
+
+void VNoteMainManager::vNoteDeleteFolder(const int &index)
+{
+    VNoteFolder *folder = getFloderByIndex(index);
+
+    int listIndex = m_folderSort.indexOf(QString::number(folder->id));
+    if (-1 != listIndex)
+        m_folderSort.removeAt(listIndex);
+
+    setting::instance()->setOption(VNOTE_FOLDER_SORT, m_folderSort.join(","));
+    if (folder) {
+        VNoteFolderOper folderOper(folder);
+        folderOper.deleteVNoteFolder(folder);
     }
 }
 
@@ -287,10 +340,17 @@ VNoteFolder* VNoteMainManager::getFloderByIndex(const int &index)
     if (folders) {
         folders->lock.lockForRead();
 
-        VNoteFolder *folder = folders->folders.value(index+1);
-
-        folders->lock.unlock();
-        return folder;
+        if (index > m_folderSort.count())
+            return nullptr;
+        int folderId = m_folderSort.at(index).toInt();
+        //根据id查找folder
+        for (auto it : folders->folders) {
+            if (it->id == folderId) {
+                folders->lock.unlock();
+                return it;
+                break;
+            }
+        }
     }
     return nullptr;
 }
@@ -385,11 +445,20 @@ bool VNoteMainManager::getTop()
     return m_currentHasTop;
 }
 
-void VNoteMainManager::updateOrder(const QVariantList &order)
+void VNoteMainManager::updateSort(const int &src, const int &dst)
 {
-    QString folderSortData;
-    foreach (auto i, order) {
-        folderSortData += QString::number(i.toInt()) + ",";
+    QString tmp = m_folderSort.at(src);
+    m_folderSort.removeAt(src);
+    m_folderSort.insert(dst, tmp);
+    setting::instance()->setOption(VNOTE_FOLDER_SORT, m_folderSort.join(","));
+}
+
+void VNoteMainManager::renameFolder(const int &index, const QString &name)
+{
+    qWarning() << "11111111111" << name;
+    VNoteFolder *folder = getFloderByIndex(index);
+    if (folder && name != folder->name) {
+        VNoteFolderOper folderOper(folder);
+        folderOper.renameVNoteFolder(name);
     }
-    setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
 }

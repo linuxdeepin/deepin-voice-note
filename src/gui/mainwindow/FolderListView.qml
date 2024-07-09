@@ -4,6 +4,8 @@
 
 import QtQuick 2.15
 import QtQuick.Window 2.15
+import QtQuick.Layouts 1.1
+import org.deepin.dtk
 
 import VNote 1.0
 import "../drag/"
@@ -77,11 +79,38 @@ Item {
         currentDropIndex = -1;
     }
 
+    function addFolder() {
+        VNoteMainManager.vNoteCreateFolder()
+    }
+
+    function renameFolder(index, isRename) {
+        var item = folderListView.itemAtIndex(index)
+        item.folderNameLabel.visible = !isRename
+        item.folderCountLabel.visible = !isRename
+        item.renameLine.visible = isRename
+    }
+
+    Connections {
+        target: VNoteMainManager
+        onAddFolderFinished: {
+            folderListView.model.insert(0, {name: folderData.name, count: folderData.notesCount})
+
+            if (folderListView.itemAtIndex(folderListView.currentIndex + 1)) {
+                folderListView.itemAtIndex(folderListView.currentIndex + 1).backgroundColor = "white"
+            }
+
+            folderListView.currentIndex = 0
+            folderListView.lastCurrentIndex = 0
+            VNoteMainManager.createNote()
+        }
+    }
+
     ListView {
         id: folderListView
         anchors.fill: parent
         property var lastCurrentIndex: -1
         property int dropIndex: -1
+        property var contextIndex: -1
         model: folderModel
         function indexAt(mousePosX, mousePosY) {
             var pos = mapFromGlobal(mousePosX, mousePosY)
@@ -106,28 +135,120 @@ Item {
                 color: backgroundColor
                 radius: 6
             }
-            Text {
-                text: model.name
-                anchors.centerIn: parent
-                font.pixelSize: 14
+            RowLayout {
+                id: rowlayout
+                anchors.fill: parent
+                property int imageWidth: 16
+                spacing: 10
+                Layout.fillWidth: true
+                anchors.left: parent.left
+                anchors.leftMargin: 10
+                anchors.right: parent.right
+                anchors.rightMargin: 10
+                Rectangle {
+                    width: 16
+                    height: 16
+                    radius: 8
+                    anchors.top: parent.top
+                    anchors.topMargin: 7
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 7
+                    Image {
+                        id: _image
+                        smooth: true
+                        visible: false
+                        width: 16
+                        height: 16
+                        source: "file:///home/V23/Desktop/123.jpg"
+                        fillMode: Image.PreserveAspectCrop
+                        antialiasing: true
+                    }
+                    Rectangle { //矩形
+                        id: _mask
+                        width: 16
+                        height: 16
+                        radius: 8
+                        color: "red"
+                        visible: false  //不可见
+                        smooth: true
+                        antialiasing: true
+                    }
+
+                    OpacityMask {
+                        id: mask_image
+                        anchors.fill: _image
+                        source: _image
+                        maskSource: _mask    //用作遮罩的项目
+                        visible: true
+                        antialiasing: true
+                    }
+                }
+                LineEdit {
+                    id: renameLine
+                    anchors.fill: parent
+                    visible: false
+                    text: model.name
+                    onFocusChanged: {
+                        folderMouseArea.enabled = false;
+                        if (focus) {
+                            focus = true
+                            selectAll();
+                        } else {
+                            folderMouseArea.enabled = true;
+                            deselect();
+                            visible = false
+                            folderNameLabel.visible = true
+                            folderCountLabel.visible = true
+                        }
+                    }
+                }
+                Label {
+                    id: folderNameLabel
+                    text: model.name
+                    visible: true
+                    horizontalAlignment: Text.AlignLeft
+                    verticalAlignment: Text.AlignVCenter
+                    font.pixelSize: 14
+                }
+                Label {
+                    id: folderCountLabel
+                    text: model.count
+                    width: 30
+                    visible: true
+                    horizontalAlignment: Text.AlignRight
+                    verticalAlignment: Text.AlignVCenter
+                    font.pixelSize: 14
+                }
             }
             MouseArea {
                 id: folderMouseArea
                 anchors.fill: parent
                 drag.target: this
                 hoverEnabled: true
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
                 property bool held: false
                 onClicked: {
-                    if (folderListView.lastCurrentIndex != -1) {
-                        if (folderListView.itemAtIndex(folderListView.lastCurrentIndex)) {
-                            folderListView.itemAtIndex(folderListView.lastCurrentIndex).backgroundColor = "white"
+                    if (mouse.button === Qt.RightButton) {
+                        folderListView.contextIndex = index
+                        folderItemContextMenu.popup()
+                    } else {
+                        if (folderListView.lastCurrentIndex != -1) {
+                            if (folderListView.itemAtIndex(folderListView.lastCurrentIndex)) {
+                                folderListView.itemAtIndex(folderListView.lastCurrentIndex).backgroundColor = "white"
+                            }
                         }
-                    }
 
-                    folderListView.currentIndex = index
-                    parent.backgroundColor = "#33000000"
-                    folderListView.lastCurrentIndex = index
+                        folderListView.currentIndex = index
+                        parent.backgroundColor = "#33000000"
+                        folderListView.lastCurrentIndex = index
+                    }
                 }
+                onDoubleClicked: {
+                    console.log("111111111111111")
+                    // renameLine.select(0, renameLine.text.length)
+                    // renameLine.focus = true
+                }
+
                 onEntered: {
                     if (folderListView.currentIndex == index) {
                         return
@@ -154,14 +275,10 @@ Item {
                                 folderListView.dropIndex -= 1
                             }
                             if (folderListView.dropIndex != index) {
+                                var tmpIndex = index
                                 folderModel.move(index, folderListView.dropIndex, 1);
+                                VNoteMainManager.updateSort(tmpIndex, folderListView.dropIndex)
                             }
-                            var orderList = []
-                            // for (var i = 0; i < folderModel.count; i++) {
-                            //     console.log("sortNumber is:", folderModel.get(i).sortNumber)
-                            //     orderList.push(folderModel.get(i).sortNumber)
-                            // }
-                            // VNoteMainManager.updateOrder(orderList)
                         }
                     }
                 }
@@ -185,9 +302,63 @@ Item {
                     }
                 }
             }
+            Menu {
+                id: folderItemContextMenu
+                MenuItem {
+                    text: qsTr("Rename")
+                    onTriggered: {
+                        // renameFolder(folderListView.contextIndex, true)
+                        folderNameLabel.visible = false
+                        folderCountLabel.visible = false
+                        renameLine.visible = true
+                        renameLine.focus = true
+                    }
+                }
+                MenuItem {
+                    text: qsTr("Delete")
+                    onTriggered: {
+                        VNoteMainManager.vNoteDeleteFolder(folderListView.contextIndex)
+                        folderModel.remove(folderListView.contextIndex)
+                        if (folderListView.contextIndex === 0) {
+                            folderListView.currentIndex = 0
+                        }
+                    }
+                }
+                MenuItem {
+                    text: qsTr("New Note")
+                    onTriggered: {
+                        addFolder()
+                    }
+                }
+            }
+            Keys.onPressed: {
+                switch (event.key)
+                {
+                case Qt.Key_Enter:
+                case Qt.Key_Return:
+                    var lastName = model.name
+                    if (lastName != renameLine.text) {
+                        VNoteMainManager.renameFolder(index, renameLine.text)
+                        model.name = renameLine.text
+                        renameLine.visible = false
+                        folderNameLabel.visible = true
+                        folderCountLabel.visible = true
+                    }
+                    break;
+                case Qt.Key_Escape:
+                    console.log("esc")
+                    break;
+                default:
+                    break;
+                }
+            }
         }
-        onCurrentItemChanged: {            
+        onCurrentItemChanged: {
             var index = folderListView.currentIndex
+            // if (folderListView.itemAtIndex(folderListView.lastCurrentIndex).renameLine) {
+            //     renameFolder(folderListView.lastCurrentIndex, true)
+            // }
+
             itemChanged(index, folderModel.get(index).name) // 发出 itemChanged 信号
         }
     }
