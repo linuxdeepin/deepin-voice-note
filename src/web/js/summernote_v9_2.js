@@ -6069,7 +6069,7 @@
             }
             $dimensionDisplay.html(dim.c + ' x ' + dim.r);
         };
-        //背景
+        // 背景 调色板按钮，前景色和背景色
         Buttons.prototype.colorPalette = function (className, tooltip, backColor, foreColor) {
             var _this = this;
             let colorPoption = {
@@ -6077,7 +6077,7 @@
                 children: [
                     this.buttonColor({
                         className: 'note-current-color-button backcolorBut',
-                        contents: this.ui.icon(this.options.icons.backcolor),
+                        contents: backColor ? this.ui.icon(this.options.icons.backcolor) : _this.ui.icon(this.options.icons.forecolor),
                         tooltip: tooltip,
                         click: function (e) {
                             var $button = $$1(e.currentTarget);
@@ -6115,18 +6115,19 @@
                         }
                     }),
                     this.button({
-                        className: backColor ? "dropdown-toggle backColor-dropdown moreBut" : "dropdown-toggle forecolorBut",
-                        contents: backColor ? this.ui.dropdownButtonContents('', this.options) : _this.ui.icon(this.options.icons.forecolor),
+                        className: backColor ? "dropdown-toggle backColor-dropdown moreBut" : "dropdown-toggle foreColor-dropdown forecolorBut",
+                        contents: this.ui.dropdownButtonContents('', this.options),
                         tooltip: backColor ? tooltipContent.more : tooltipContent.forecolor,
                         data: {
                             toggle: 'dropdown'
                         }
                     }),
+                    // 屏蔽自定义调色板
                     this.ui.dropdown({
                         items: (backColor ? [
                             '<div class="note-palette">',
                             '  <div class="note-holder" data-event="backColor"/>',
-                            '  <div class="colorFont recentlyUsedBut">',
+                            '  <!--div class="colorFont recentlyUsedBut">',
                             tooltipContent.recentlyUsed,
                             '  </div>',
                             '  <div class="note-holder-custom" id="backColorPalette" data-event="backColor"/>',
@@ -6135,13 +6136,13 @@
                             '      <img data-event="openPalette" data-value="backColorPicker" src="./img/plan.svg" alt="">',
                             '    </button>',
                             '    <input type="color" id="backColorPicker" class="note-btn note-color-select-btn" value="' + this.options.colorButton.backColor + '" data-event="backColorPalette">',
-                            '  </div>',
+                            '  </div-->',
                             '</div>',
                         ].join('') : '') +
                             (foreColor ? [
                                 '<div class="note-palette">',
                                 '  <div class="note-holder" data-event="foreColor"/>',
-                                '  <div class="colorFont recentlyUsedBut">',
+                                '  <!--div class="colorFont recentlyUsedBut">',
                                 tooltipContent.recentlyUsed,
                                 '  </div>',
                                 '  <div class="note-holder-custom" id="foreColorPalette" data-event="foreColor"/>',
@@ -6150,20 +6151,22 @@
                                 '      <img data-event="openPalette" data-value="foreColorPicker" src="./img/plan.svg" alt="">',
                                 '    </button>',
                                 '    <input type="color" id="foreColorPicker" class="note-btn note-color-select-btn" value="' + this.options.colorButton.foreColor + '" data-event="foreColorPalette">',
-                                '  </div>',
+                                '  </div-->',
                                 '</div>',
                             ].join('') : ''),
                         callback: function ($dropdown) {
                             $dropdown.find('.note-holder').each(function (idx, item) {
                                 var $holder = $$1(item);
                                 $holder.append(_this.ui.palette({
-                                    colors: backColor ? _this.options.colors : _this.options.foreColors,
+                                    // 前景色/背景色使用不同列表
+                                    colors: backColor ? _this.options.simpleLightBackColors : _this.options.simpleLightForeColors,
                                     colorsName: _this.options.colorsName,
                                     eventName: $holder.data('event'),
                                     container: _this.options.container,
 
                                 }).render());
                             });
+
                             /* TODO: do we have to record recent custom colors within cookies? */
                             var customColors = [
                                 ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF',],
@@ -6239,9 +6242,10 @@
                     }),
                 ]
             }
-            if (foreColor) {
-                colorPoption.children.shift()
-            }
+            // 屏蔽布局的调整
+            // if (foreColor) {
+            //     colorPoption.children.shift()
+            // }
             return this.ui.buttonGroup(colorPoption).render();
         };
         return Buttons;
@@ -7219,6 +7223,48 @@
             this.$popover.find('.note-color').removeClass('open')
             this.$popover.hide();
         };
+
+        /*！
+         * 按不同主题风格更新下拉菜单可选颜色，遍历设置颜色按钮样式属性和值
+         * 通过 $('#summernote').summernote('airPopover.updateColorPalette', [true|false]); 调用
+         * @param {any} isDarkTheme 是否深色主题
+         */
+        AirPopover.prototype.updateColorPalette = function (isDarkTheme) {
+            var curForeColors = isDarkTheme ? this.options.simpleDarkForeColors
+                                            : this.options.simpleLightForeColors;
+            if (0 == curForeColors.length) {
+                return;
+            }
+            var curForeColorsColumns = curForeColors[0].length;
+
+            // 前景色
+            var foreColorBtn = this.$popover.find('.note-color-fore');
+            foreColorBtn.find('.note-color-btn').each(function (idx) {
+                var row = Math.floor(idx / curForeColorsColumns);
+                var column = idx % curForeColorsColumns;
+                var curColor = curForeColors[row][column];
+                $(this).attr("style", "background-color:" + curColor);
+                $(this).attr("data-value", curColor);
+            });
+        
+            var curBackColors = isDarkTheme ? this.options.simpleDarkBackColors 
+                                            : this.options.simpleLightBackColors;
+            if (0 == curBackColors.length) {
+                return;
+            }
+            var curBackColorsColumns = curBackColors[0].length;
+
+            // 背景色
+            var backColorBtn = this.$popover.find('.note-color-back');
+            backColorBtn.find('.note-color-btn').each(function (idx) {
+                var row = Math.floor(idx / curBackColorsColumns);
+                var column = idx % curBackColorsColumns;
+                var curColor = curBackColors[row][column];
+                $(this).attr("style", "background-color:" + curColor);
+                $(this).attr("data-value", curColor);
+            });
+        };
+
         return AirPopover;
     }());
 
@@ -7764,7 +7810,23 @@
                 ['#F6989A', '#FFC395', '#FFE691', '#ABD7A0', '#9BC7CF', '#8EC7F3', '#B9A4DA', '#E1A2BE'],
                 ['#E50000', '#F78F12', '#F9C400', '#53A73A', '#337D8E', '#0086CC', '#6848AB', '#B4427D'],
                 ['#AE0000', '#C45E00', '#C69200', '#017D02', '#004B5C', '#005399', '#351578', '#800643'],
-
+            ],
+            // 不同主题下的前景色/背景色
+            simpleLightForeColors: [
+                ['#000000', '#9EA4AA', '#1804FF', '#0164FF', '#33AECB'],
+                ['#00AA49', '#AE07E3', '#CD233E', '#EC8000', '#87450D'],
+            ],
+            simpleLightBackColors: [
+                ['#FFFFFF33', '#FFD70033', '#FEAF4033', '#6DFF0033', '#86C96A33'],
+                ['#72E4FF33', '#82B2FF33', '#A35EFF33', '#D9657733', '#C0C0C033'],
+            ],
+            simpleDarkForeColors: [
+                ['#DCDCDC', '#8D9398', '#B19DFF', '#4D92FF', '#70C6DA'],
+                ['#66CC91', '#D683F1', '#D74F64', '#EF9933', '#FBD767'],
+            ],
+            simpleDarkBackColors: [
+                ['#232323', '#FBD40033', '#FF940033', '#A8FF6633', '#70FF3333'],
+                ['#66E4FF33', '#3381FF33', '#C599FF33', '#F87C8F33', '#FFFFFF33'],
             ],
             colorButton: {
                 foreColor: '#414D68',

@@ -16,7 +16,8 @@
      outline: none !important;
  }
 
- .note-editor .note-toolbar>.note-btn-group, .note-popover .popover-content>.note-btn-group {
+ .note-editor .note-toolbar>.note-btn-group,
+ .note-popover .popover-content>.note-btn-group {
      margin-top: 0;
      margin-left: 1px;
      margin-right: 1px;
@@ -26,24 +27,20 @@
      background-color: #E1E3E5;
  }
 
- .btn:active, .btn.active {
-     box-shadow: none;
- }
-
  .btn-default {
      background-color: transparent;
      border: none;
  }
 
- .note-editor .note-toolbar, .note-popover .popover-content {
+ .note-editor .note-toolbar,
+ .note-popover .popover-content {
      display: inline-block;
-     padding: 5px 10px 4px 10px !important;
-     /* width: 318px; */
-     height: 36px;
-     background: rgba(247, 247, 247, 1);
-     border: 1px solid rgba(0, 0, 0, 0.05);
-     border-radius: 8px;
-     box-shadow: 0px 6px 20px 0px rgba(0, 0, 0, 0.20);
+     padding: 4px 10px 4px 10px !important;
+     height: 40px;
+     background: rgba(245, 245, 245, 1);
+     border: 1px solid rgba(0, 0, 0, 0.04);
+     border-radius: 12px;
+     box-shadow: 0px 6px 20px 0px rgba(0, 0, 0, 0.1);
  }
 
  .panel-default>.panel-heading {
@@ -71,27 +68,24 @@
      padding: 0 10px;
  }
 
- .btn-sm, .btn-group-sm>.btn {
+ .btn-sm,
+ .btn-group-sm>.btn {
      padding: 0px !important;
      border-radius: 6px;
  }
 
  .note-popover .popover-content .note-color .dropdown-toggle {
      width: auto;
-     height: 24px;
+     height: 30px;
  }
 
  .dropdown-toggle {
-     height: 24px !important;
+     height: 30px !important;
  }
 
  .note-current-color-button {
      padding-right: 0px !important;
-     width: 24px;
- }
-
- .note-color-fore .dropdown-toggle {
-     width: 24px !important;
+     width: 30px;
  }
 
  .tooltip-inner {
@@ -137,11 +131,11 @@
  }
 
  .dropdown-menu {
-     background: rgba(247, 247, 247, 0.98);
-     width: 233px;
-     border: 1px solid rgba(0, 0, 0, 0.05);
-     border-radius: 18px;
-     box-shadow: 0px -6px 20px 0px rgba(0, 0, 0, 0.20);
+     background: rgba(238, 238, 238, 1);
+     width: 153px;
+     border: 1px solid rgba(255, 255, 255, 0.1);
+     border-radius: 12px;
+     box-shadow: 0px 6px 16px 0px rgba(0, 0, 0, 0.20);
      top: 135%;
      left: -12px;
  }
@@ -152,7 +146,7 @@
  }
 
  .note-popover .popover-content .note-color .dropdown-menu .note-palette {
-     width: 233px;
+     width: 153px;
  }
 
  .note-popover .popover-content .note-color .dropdown-menu .note-palette .note-color-row {
@@ -204,7 +198,8 @@
      height: 250px;
  }
 
- ol, ul {
+ ol,
+ ul {
      margin-bottom: 0px;
      padding-left: 20px;
  }
@@ -213,26 +208,37 @@
      width: 50px;
  }
 
- /* hover事件 */
+ /* 默认 button 按键:  hover事件, 按下事件 */
 
- .btn-default:active, .btn-default.active, .open>.dropdown-toggle.btn-default {
-     background-color: transparent !important;
+
+ .btn:active,
+ .btn.active {
+    box-shadow: 0px -1px 0px 0px rgba(0, 0, 0, 0.1) inset !important;
  }
 
- .btn-default:active:hover {
+
+ .btn-default {
+    color: rgb(83, 96, 118);
+ }
+
+ .btn-default:active,
+ .btn-default.active,
+ .open>.dropdown-toggle.btn-default {
      background-color: rgba(0, 0, 0, 0.1) !important;
  }
 
- .btn-default {
-     color: rgb(83, 96, 118);
+ .btn-default:hover:active {
+     background-color: rgba(0, 0, 0, 0.2) !important;
+     box-shadow: none;
  }
 
- .btn-default:hover {
-     background-color: rgba(0, 0, 0, 0.05) !important;
- }
-
+ /* 浮动工具栏按钮 */
  .note-btn-group button {
-     height: 24px;
+     height: 30px;
+ }
+
+ .note-btn-group .note-btn {
+     width: 30px;
  }
 
  .note-forecolor {
@@ -267,7 +273,8 @@
      transform: rotate(45deg);
  }
 
- .note-backcolor .backColor-dropdown {
+ .note-backcolor .backColor-dropdown,
+ .note-forecolor .foreColor-dropdown {
      padding-right: 2px !important;
  }
 
@@ -276,22 +283,16 @@
      overflow: hidden;
  }
 
- .fontsizeBut {
-     width: 38px;
- }
-
- .fontnameBut {
-     width: 78px;
- }
-
  .dropdown-fontsize {
      overflow: hidden;
+     width: 96px;
  }
 
  .dropdown-fontname {
      overflow: hidden;
      overflow-y: auto;
      max-height: 300px;
+     min-width: 220px !important;
  }
 
  .dropdown-fontsize>li>a,
@@ -299,7 +300,6 @@
      width: 100%;
      height: 34px;
      line-height: 30px;
-     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
      max-width: 240px !important;
  }
 
@@ -335,7 +335,8 @@
      box-shadow: none;
  }
 
- .note-editor .note-toolbar>.note-btn-group, .note-popover .popover-content>.note-line {
+ .note-editor .note-toolbar>.note-btn-group,
+ .note-popover .popover-content>.note-line {
      margin-right: 2px;
      margin-left: 2px;
      height: 18px;
@@ -355,3 +356,20 @@
  .backColorInhert {
      background-color: inherit;
  }
+
+
+ /* 定制组件，浮动工具栏 */
+ .popover {
+    max-width: none;
+ }
+
+ .fontsizeBut {
+    width: 40px !important;
+    height: 30px;
+ }
+
+ .fontnameBut {
+    width: 74px !important;
+    height: 30px;
+ }
+ 
