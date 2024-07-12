@@ -70,10 +70,12 @@ int main(int argc, char *argv[])
         qInfo() << "set openGLES";
     }
 
+    QString strWebEngineArgs = "--single-process";
     //wayland 模式禁用gpu
     if (Utils::isWayland()) {
-        qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-gpu");
+        strWebEngineArgs += " --disable-gpu";
     }
+    qputenv("QTWEBENGINE_CHROMIUM_FLAGS", strWebEngineArgs.toLocal8Bit());
 
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
     app.loadTranslator();
@@ -90,8 +92,8 @@ int main(int argc, char *argv[])
 
     DGuiApplicationHelper::instance()->setSingleInstanceInterval(-1);
     if (!DGuiApplicationHelper::instance()->setSingleInstance(
-            app.applicationName(),
-            DGuiApplicationHelper::UserScope)) {
+                app.applicationName(),
+                DGuiApplicationHelper::UserScope)) {
         return 0;
     }
 
