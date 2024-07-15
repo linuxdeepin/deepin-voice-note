@@ -168,10 +168,12 @@ function initSummernote() {
         focus: true,
         disableDragAndDrop: true,
         lang: 'zh-CN',
+        // 浮动工具栏
         popover: {
             air: [
                 ['fontname', ['fontname']],
                 ['fontsize', ['fontsize']],
+                ['line'],
                 ['forecolor', ['forecolor']],
                 ['backcolor', ['backcolor']],
                 ['bold', ['bold']],
@@ -935,6 +937,9 @@ function changeColor(flag, activeColor, disableColor, backgroundColor) {
             href: "./css/dark.css"
         });
     }
+
+    // 设置下拉菜单调色板
+    $('#summernote').summernote('airPopover.updateColorPalette', global_theme == 2);
 }
 
 /**

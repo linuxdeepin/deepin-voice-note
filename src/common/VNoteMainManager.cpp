@@ -12,6 +12,7 @@
 #include "setting.h"
 #include "task/exportnoteworker.h"
 #include "globaldef.h"
+#include "webenginehandler.h"
 
 #include <QThreadPool>
 #include <QQmlApplicationEngine>
@@ -19,10 +20,9 @@
 
 VNoteMainManager::VNoteMainManager()
 {
-
 }
 
-//写一个单例模式的类
+// 写一个单例模式的类
 VNoteMainManager *VNoteMainManager::instance()
 {
     static VNoteMainManager instance;
@@ -47,7 +47,7 @@ void VNoteMainManager::initData()
 void VNoteMainManager::initConnections()
 {
     connect(VNoteDataManager::instance(), &VNoteDataManager::onAllDatasReady,
-        this, &VNoteMainManager::onVNoteFoldersLoaded);
+            this, &VNoteMainManager::onVNoteFoldersLoaded);
 }
 
 QObject *jsContent_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
@@ -70,34 +70,36 @@ void VNoteMainManager::initQMLRegister()
 {
     qmlRegisterSingletonType<VNoteMainManager>("VNote", 1, 0, "VNoteMainManager", mainManager_provider);
     qmlRegisterSingletonType<JsContent>("VNote", 1, 0, "Webobj", jsContent_provider);
+
+    qmlRegisterType<WebEngineHandler>("VNote", 1, 0, "WebEngineHandler");
 }
 
 void VNoteMainManager::onVNoteFoldersLoaded()
 {
-// #ifdef IMPORT_OLD_VERSION_DATA
-//     if (m_fNeedUpgradeOldDb) {
-//         //Start upgrade if all components are ready.
-//         m_upgradeView->startUpgrade();
-//         return;
-//     }
-// #endif
+    // #ifdef IMPORT_OLD_VERSION_DATA
+    //     if (m_fNeedUpgradeOldDb) {
+    //         //Start upgrade if all components are ready.
+    //         m_upgradeView->startUpgrade();
+    //         return;
+    //     }
+    // #endif
 
-    //If have folders show note view,else show
-    //default home page
+    // If have folders show note view,else show
+    // default home page
     if (loadNotepads() > 0) {
-    //     switchWidget(WndNoteShow);
-    // } else {
-    //     switchWidget(WndHomePage);
+        //     switchWidget(WndNoteShow);
+        // } else {
+        //     switchWidget(WndHomePage);
     }
 
-//     PerformanceMonitor::initializeAppFinish();
+    //     PerformanceMonitor::initializeAppFinish();
 
-//     //注册文件清理工作
-//     FileCleanupWorker *pFileCleanupWorker =
-//         new FileCleanupWorker(VNoteDataManager::instance()->getAllNotesInFolder(), this);
-//     pFileCleanupWorker->setAutoDelete(true);
-//     pFileCleanupWorker->setObjectName("FileCleanupWorker");
-//     QThreadPool::globalInstance()->start(pFileCleanupWorker);
+    //     //注册文件清理工作
+    //     FileCleanupWorker *pFileCleanupWorker =
+    //         new FileCleanupWorker(VNoteDataManager::instance()->getAllNotesInFolder(), this);
+    //     pFileCleanupWorker->setAutoDelete(true);
+    //     pFileCleanupWorker->setObjectName("FileCleanupWorker");
+    //     QThreadPool::globalInstance()->start(pFileCleanupWorker);
 }
 
 /**
@@ -133,7 +135,7 @@ int VNoteMainManager::loadNotepads()
         }
 
         folders->lock.unlock();
-        //将foldersDataList按照sortNumber排序
+        // 将foldersDataList按照sortNumber排序
         std::sort(foldersDataList.begin(), foldersDataList.end(),
                   [](const QVariantMap &a, const QVariantMap &b) {
             return a["sortNumber"].toInt() > b["sortNumber"].toInt();
@@ -150,7 +152,7 @@ void VNoteMainManager::vNoteFloderChanged(const int &index)
     if (folders) {
         folders->lock.lockForRead();
 
-        VNoteFolder *folder = getFloderByIndex(index);
+        VNoteFolder *folder = folders->folders.value(index + 1);
         m_currentFolderIndex = folder->id;
         if (!loadNotes(folder)) {
         }
@@ -220,7 +222,7 @@ void VNoteMainManager::vNoteChanged(const int &index)
     // } else {
     //     m_recordBar->setVisible(true);
     // }
-    //多选笔记时不更新详情页内容
+    // 多选笔记时不更新详情页内容
     // if (!m_middleView->isMultipleSelected()) {
     //     m_richTextEdit->initData(data, m_searchKey, m_rightViewHasFouse);
     // }
@@ -259,9 +261,9 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
             }
             notes->lock.unlock();
 
-            //Sort the view & set focus on first item
-            // m_middleView->onNoteChanged();
-            // m_middleView->setCurrentIndex(0);
+            // Sort the view & set focus on first item
+            //  m_middleView->onNoteChanged();
+            //  m_middleView->setCurrentIndex(0);
         }
         emit updateNotes(notesDataList);
     }
@@ -277,16 +279,16 @@ void VNoteMainManager::createNote()
     tmpNote.noteType = VNoteItem::VNT_Text;
     tmpNote.htmlCode = "<p><br></p>";
     VNoteItemOper noteOper;
-    //Get default note name in the folder
+    // Get default note name in the folder
     tmpNote.noteTitle = noteOper.getDefaultNoteName(tmpNote.folderId);
 
     VNoteItem *newNote = noteOper.addNote(tmpNote);
 
-    //Refresh the notes count of folder
-    // m_leftView->update(m_leftView->currentIndex());
-    //解绑详情页绑定的笔记数据
-    // m_richTextManager->unboundCurrentNoteData();
-    // m_middleView->addRowAtHead(newNote);
+    // Refresh the notes count of folder
+    //  m_leftView->update(m_leftView->currentIndex());
+    // 解绑详情页绑定的笔记数据
+    //  m_richTextManager->unboundCurrentNoteData();
+    //  m_middleView->addRowAtHead(newNote);
     m_noteItems.append(newNote);
     QVariantMap data;
     data.insert("name", newNote->noteTitle);
@@ -320,7 +322,7 @@ void VNoteMainManager::saveAs(const QVariantList &index, const QString &path, Sa
         break;
     case Voice:
         exportType = ExportNoteWorker::ExportVoice;
-        //通过qt获取当前时间并转换为字符串
+        // 通过qt获取当前时间并转换为字符串
         QDateTime now = QDateTime::currentDateTime();
         QString timeStr = now.toString("yyyyMMddhhmmss");
         defaultName = timeStr + ".mp3";
@@ -328,34 +330,27 @@ void VNoteMainManager::saveAs(const QVariantList &index, const QString &path, Sa
     }
 
     ExportNoteWorker *exportWorker = new ExportNoteWorker(
-    path, exportType, noteDataList, defaultName);
+            path, exportType, noteDataList, defaultName);
     exportWorker->setAutoDelete(true);
     connect(exportWorker, &ExportNoteWorker::exportFinished, this, &VNoteMainManager::onExportFinished);
     QThreadPool::globalInstance()->start(exportWorker);
 }
 
-VNoteFolder* VNoteMainManager::getFloderByIndex(const int &index)
+VNoteFolder *VNoteMainManager::getFloderByIndex(const int &index)
 {
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
     if (folders) {
         folders->lock.lockForRead();
 
-        if (index > m_folderSort.count())
-            return nullptr;
-        int folderId = m_folderSort.at(index).toInt();
-        //根据id查找folder
-        for (auto it : folders->folders) {
-            if (it->id == folderId) {
-                folders->lock.unlock();
-                return it;
-                break;
-            }
-        }
+        VNoteFolder *folder = folders->folders.value(index + 1);
+
+        folders->lock.unlock();
+        return folder;
     }
     return nullptr;
 }
 
-VNoteItem* VNoteMainManager::getNoteByIndex(const int &index)
+VNoteItem *VNoteMainManager::getNoteByIndex(const int &index)
 {
     if (index < 0 || index >= m_noteItems.size()) {
         return nullptr;
@@ -369,7 +364,7 @@ void VNoteMainManager::deleteNote(const QList<int> &index)
     m_richTextManager->clearJSContent();
     qWarning() << "deleteNote index:" << index;
 
-    QList<VNoteItem*> noteDataList;
+    QList<VNoteItem *> noteDataList;
     for (int i = 0; i < index.size(); i++) {
         VNoteItem *note = m_noteItems.at(index.at(i));
         noteDataList.append(note);
@@ -379,16 +374,16 @@ void VNoteMainManager::deleteNote(const QList<int> &index)
     }
 
     if (noteDataList.size()) {
-        //删除笔记之前先解除详情页绑定的笔记数据
-        // m_richTextEdit->unboundCurrentNoteData();
+        // 删除笔记之前先解除详情页绑定的笔记数据
+        //  m_richTextEdit->unboundCurrentNoteData();
         for (auto noteData : noteDataList) {
             VNoteItemOper noteOper(noteData);
             noteOper.deleteNote();
         }
-        //Refresh the middle view
-        // if (m_middleView->rowCount() <= 0 && stateOperation->isSearching()) {
-        //     m_middleView->setVisibleEmptySearch(true);
-        // }
+        // Refresh the middle view
+        //  if (m_middleView->rowCount() <= 0 && stateOperation->isSearching()) {
+        //      m_middleView->setVisibleEmptySearch(true);
+        //  }
     }
 }
 
@@ -426,7 +421,7 @@ void VNoteMainManager::moveNotes(const QVariantList &index, const int &folderInd
 
 void VNoteMainManager::updateTop(const int &index, const bool &top)
 {
-    VNoteItem* note = getNoteByIndex(index);
+    VNoteItem *note = getNoteByIndex(index);
     if (note == nullptr || note->isTop == top)
         return;
     VNoteItemOper noteOper(note);
@@ -437,7 +432,7 @@ void VNoteMainManager::updateTop(const int &index, const bool &top)
 void VNoteMainManager::onExportFinished(int err)
 {
     Q_UNUSED(err)
-    //TODO:提示保存成功
+    // TODO:提示保存成功
 }
 
 bool VNoteMainManager::getTop()
