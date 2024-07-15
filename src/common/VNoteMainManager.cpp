@@ -17,6 +17,7 @@
 #include <QThreadPool>
 #include <QQmlApplicationEngine>
 #include <QtWebEngineQuick/qtwebenginequickglobal.h>
+#include <QStringList>
 
 VNoteMainManager::VNoteMainManager()
 {
@@ -109,9 +110,12 @@ void VNoteMainManager::onVNoteFoldersLoaded()
 int VNoteMainManager::loadNotepads()
 {
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
-    QVariant value = setting::instance()->getOption(VNOTE_FOLDER_SORT);
-    QStringList tmpsortFolders = value.toString().split(",");
-    m_folderSort = tmpsortFolders;
+    QStringList tmpsortFolders;
+    QString value = setting::instance()->getOption(VNOTE_FOLDER_SORT).toString();
+    if (!value.isEmpty()) {
+        tmpsortFolders = value.split(",");
+        m_folderSort = tmpsortFolders;
+    }
 
     int folderCount = 0;
 
@@ -119,6 +123,7 @@ int VNoteMainManager::loadNotepads()
         folders->lock.lockForRead();
         folderCount = folders->folders.size();
 
+        int index = folderCount;
         QList<QVariantMap> foldersDataList;
         foreach (VNoteFolder *folder, folders->folders) {
             int tmpIndexCount = tmpsortFolders.indexOf(QString::number(folder->id));
@@ -127,18 +132,23 @@ int VNoteMainManager::loadNotepads()
             data.insert("notesCount", QString::number(folder->getNotesCount()));
             data.insert("icon", folder->UI.icon);
             data.insert("grayIcon", folder->UI.grayIcon);
-            if (tmpIndexCount != -1)
-                folder->sortNumber = folderCount - tmpIndexCount;
+            if (tmpIndexCount != -1) {
+                folder->sortNumber = tmpIndexCount;
+            } else {
+                folder->sortNumber = index;
+                m_folderSort.append(QString::number(index));
+            }
             data.insert("sortNumber", folder->sortNumber);
 
             foldersDataList.append(data);
+            index--;
         }
 
         folders->lock.unlock();
         // 将foldersDataList按照sortNumber排序
         std::sort(foldersDataList.begin(), foldersDataList.end(),
                   [](const QVariantMap &a, const QVariantMap &b) {
-            return a["sortNumber"].toInt() > b["sortNumber"].toInt();
+            return a["sortNumber"].toInt() < b["sortNumber"].toInt();
                   });
         emit finishedFolderLoad(foldersDataList);
     }
@@ -148,16 +158,11 @@ int VNoteMainManager::loadNotepads()
 
 void VNoteMainManager::vNoteFloderChanged(const int &index)
 {
-    VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
-    if (folders) {
-        folders->lock.lockForRead();
-
-        VNoteFolder *folder = folders->folders.value(index + 1);
+    VNoteFolder *folder = getFloderByIndex(index);
+    if (folder) {
         m_currentFolderIndex = folder->id;
         if (!loadNotes(folder)) {
         }
-
-        folders->lock.unlock();
     }
 }
 
@@ -169,20 +174,11 @@ void VNoteMainManager::vNoteCreateFolder()
 
     VNoteFolder *newFolder = folderOper.addFolder(itemData);
 
-    if (newFolder) {
-        bool sortEnable = false;
-        VNoteFolder *tmpFolder = getFloderByIndex(0);
-        if (tmpFolder && -1 != tmpFolder->sortNumber) {
-            newFolder->sortNumber = tmpFolder->sortNumber + 1;
-            sortEnable = true;
-        }
-        
+    if (newFolder) {     
         m_folderSort.insert(0, QString::number(newFolder->id));
 
-        if (sortEnable) {
-            QString folderSortData = m_folderSort.join(",");
-            setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
-        }
+        QString folderSortData = m_folderSort.join(",");
+        setting::instance()->setOption(VNOTE_FOLDER_SORT, folderSortData);
 
         m_currentFolderIndex = newFolder->id;
         VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
@@ -339,11 +335,11 @@ void VNoteMainManager::saveAs(const QVariantList &index, const QString &path, Sa
 VNoteFolder *VNoteMainManager::getFloderByIndex(const int &index)
 {
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
+    int tmpIndex = m_folderSort.at(index).toInt();
     if (folders) {
         folders->lock.lockForRead();
 
-        VNoteFolder *folder = folders->folders.value(index + 1);
-
+        VNoteFolder *folder = folders->folders.value(tmpIndex);
         folders->lock.unlock();
         return folder;
     }
