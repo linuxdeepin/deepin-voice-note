@@ -183,7 +183,7 @@
     var icon = function (iconClassName, tagName) {
 
         if (iconClassName == 'icon-backcolor') {
-            return `<i class="icon-backcolor"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span></i>`
+            return `<i class="icon-backcolor"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>`
         } else if (iconClassName == 'icon-forecolor') {
             return `<i class="icon-forecolor"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>`
         }
@@ -6224,12 +6224,7 @@
                                 setSelectColorButton($button)
                                 // $color.css(key, value);
                                 if (eventName == 'backColor') {
-                                    $('.icon-backcolor .path6').css('color', value)
-                                    if (value == 'transparent') {
-                                        $('.icon-backcolor .path5').addClass('transparentColor')
-                                    } else {
-                                        $('.icon-backcolor .path5').removeClass('transparentColor')
-                                    }
+                                    $('.icon-backcolor .path1').css('color', value)
                                 } else if (eventName == 'foreColor') {
                                     $('.icon-forecolor .path1').css('color', value)
                                 }
@@ -7227,12 +7222,13 @@
         /*！
          * 按不同主题风格更新下拉菜单可选颜色，遍历设置颜色按钮样式属性和值
          * 通过 $('#summernote').summernote('airPopover.updateColorPalette', [true|false]); 调用
-         * @param {any} isDarkTheme 是否深色主题
+         * @param {bool} isDarkTheme 是否深色主题
          */
         AirPopover.prototype.updateColorPalette = function (isDarkTheme) {
             var curForeColors = isDarkTheme ? this.options.simpleDarkForeColors
                                             : this.options.simpleLightForeColors;
             if (0 == curForeColors.length) {
+                console.warn("Not found foreground color palette!");
                 return;
             }
             var curForeColorsColumns = curForeColors[0].length;
@@ -7246,10 +7242,14 @@
                 $(this).attr("style", "background-color:" + curColor);
                 $(this).attr("data-value", curColor);
             });
+            // 更新当前选中色
+            var selectColor = $('.note-forecolor .selectColor').css('background-color')
+            $('.icon-forecolor .path1').css('color', selectColor)
         
             var curBackColors = isDarkTheme ? this.options.simpleDarkBackColors 
                                             : this.options.simpleLightBackColors;
             if (0 == curBackColors.length) {
+                console.warn("Not found background color palette!");
                 return;
             }
             var curBackColorsColumns = curBackColors[0].length;
@@ -7263,6 +7263,9 @@
                 $(this).attr("style", "background-color:" + curColor);
                 $(this).attr("data-value", curColor);
             });
+            // 更新当前选中色
+            var selectColor = $('.note-backcolor .selectColor').css('background-color')
+            $('.icon-backcolor .path1').css('color', selectColor)
         };
 
         return AirPopover;
