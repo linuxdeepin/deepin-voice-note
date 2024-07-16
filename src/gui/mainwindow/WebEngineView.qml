@@ -26,13 +26,79 @@ Item {
             // 隐藏浮动工具栏
             Webobj.calllJsShowEditToolbar(0, 0);
         }
+        onContextMenuRequested: req => {
+            // 响应右键菜单，处理完成后 handler 抛出 requestShowMenu() 信号
+            handler.onContextMenuRequested(req);
+        }
 
         WebEngineHandler {
+            id: handler
+
         }
 
         WebChannel {
             id: noteWebChannel
 
+        }
+    }
+
+    Loader {
+        asynchronous: true
+
+        VNoteRightMenu {
+            id: picturCtxMenu
+
+            menuType: ActionManager.PictureCtxMenu
+
+            Connections {
+                target: handler
+
+                onRequestShowMenu: (type, pos) => {
+                    if (type === WebEngineHandler.PictureMenu) {
+                        picturCtxMenu.popup(pos);
+                    }
+                }
+            }
+        }
+    }
+
+    Loader {
+        asynchronous: true
+
+        VNoteRightMenu {
+            id: voiceCtxMenu
+
+            menuType: ActionManager.VoiceCtxMenu
+
+            Connections {
+                target: handler
+
+                onRequestShowMenu: (type, pos) => {
+                    if (type === WebEngineHandler.VoiceMenu) {
+                        voiceCtxMenu.popup(pos);
+                    }
+                }
+            }
+        }
+    }
+
+    Loader {
+        asynchronous: true
+
+        VNoteRightMenu {
+            id: txtCtxMenu
+
+            menuType: ActionManager.TxtCtxMenu
+
+            Connections {
+                target: handler
+
+                onRequestShowMenu: (type, pos) => {
+                    if (type === WebEngineHandler.TxtMenu) {
+                        txtCtxMenu.popup(pos);
+                    }
+                }
+            }
         }
     }
 }

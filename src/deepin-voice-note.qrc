@@ -56,5 +56,6 @@
         <file>web/js/summernote_v9_2.js</file>
         <file>web/js/summernote-zh-CN.js</file>
         <file>deepin-voice-note-setting.json</file>
+        <file>gui/mainwindow/VNoteRightMenu.qml</file>
     </qresource>
 </RCC>
