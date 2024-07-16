@@ -13,6 +13,7 @@
 #include "task/exportnoteworker.h"
 #include "globaldef.h"
 #include "webenginehandler.h"
+#include "actionmanager.h"
 
 #include <QThreadPool>
 #include <QQmlApplicationEngine>
@@ -67,10 +68,20 @@ QObject *mainManager_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
     return VNoteMainManager::instance();
 }
 
+QObject *actionManager_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine)
+    Q_UNUSED(scriptEngine)
+
+    return ActionManager::instance();
+}
+
 void VNoteMainManager::initQMLRegister()
 {
     qmlRegisterSingletonType<VNoteMainManager>("VNote", 1, 0, "VNoteMainManager", mainManager_provider);
     qmlRegisterSingletonType<JsContent>("VNote", 1, 0, "Webobj", jsContent_provider);
+    // 菜单项管理
+    qmlRegisterSingletonType<ActionManager>("VNote", 1, 0, "ActionManager", actionManager_provider);
 
     qmlRegisterType<WebEngineHandler>("VNote", 1, 0, "WebEngineHandler");
 }
@@ -148,7 +159,7 @@ int VNoteMainManager::loadNotepads()
         // 将foldersDataList按照sortNumber排序
         std::sort(foldersDataList.begin(), foldersDataList.end(),
                   [](const QVariantMap &a, const QVariantMap &b) {
-            return a["sortNumber"].toInt() < b["sortNumber"].toInt();
+                      return a["sortNumber"].toInt() < b["sortNumber"].toInt();
                   });
         emit finishedFolderLoad(foldersDataList);
     }
@@ -174,7 +185,7 @@ void VNoteMainManager::vNoteCreateFolder()
 
     VNoteFolder *newFolder = folderOper.addFolder(itemData);
 
-    if (newFolder) {     
+    if (newFolder) {
         m_folderSort.insert(0, QString::number(newFolder->id));
 
         QString folderSortData = m_folderSort.join(",");
