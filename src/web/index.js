@@ -190,10 +190,11 @@ function initSummernote() {
     });
     // 注册滚动事件
     listenFontnameList()
-    // 默认选中
-    setSelectColorButton($('[data-value="#414D68"]'))
-    setSelectColorButton($('[data-value="transparent"]'))
-    $('.icon-backcolor .path5').addClass('transparentColor')
+    // 默认选中前景色和背景色
+    setSelectColorButton($('[data-value="#000000"]'))
+    setSelectColorButton($('[data-value="#FFFFFF33"]'))
+    var selectColor = $('.note-backcolor .selectColor').css('background-color')
+    $('.icon-backcolor .path1').css('color', selectColor)
 
     // 监听窗口大小变化
     $(window).resize(function () {

@@ -1,7 +1,7 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?obg9cb');
-  src:  url('fonts/icomoon.eot?obg9cb#iefix') format('embedded-opentype'),
+  src: url('fonts/icomoon.eot?obg9cb');
+  src: url('fonts/icomoon.eot?obg9cb#iefix') format('embedded-opentype'),
     url('fonts/icomoon.ttf?obg9cb') format('truetype'),
     url('fonts/icomoon.woff?obg9cb') format('woff'),
     url('fonts/icomoon.svg?obg9cb#icomoon') format('svg');
@@ -10,7 +10,8 @@
   font-display: block;
 }
 
-[class^="icon-"], [class*=" icon-"] {
+[class^="icon-"],
+[class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'icomoon' !important;
   speak: never;
@@ -19,48 +20,11 @@
   font-variant: normal;
   text-transform: none;
   line-height: 1;
-  font-size: 24px;
+  font-size: 16px;
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   /* color: rgb(83, 96, 118); */
-}
-
-.icon-backcolor .path1:before {
-  content: "\e900";
-}
-
-.icon-backcolor .path2:before {
-  content: "\e901";
-  margin-left: -1em;
-}
-
-.icon-backcolor .path3:before {
-  content: "\e902";
-  margin-left: -1em;
-}
-
-.icon-backcolor .path4:before {
-  content: "\e903";
-  margin-left: -1em;
-}
-
-.icon-backcolor .path5 {
-  color: rgb(0, 0, 0, .1);
-}
-
-.icon-backcolor .path5:before {
-  content: "\e904";
-  margin-left: -1em;
-}
-
-.icon-backcolor .path6 {
-  color: transparent;
-}
-
-.icon-backcolor .path6:before {
-  content: "\e905";
-  margin-left: -1em;
 }
 
 .icon-bold:before {
@@ -68,8 +32,9 @@
 }
 
 .icon-down {
-  padding-left: 3px;
+  padding-left: 5px;
   font-size: 10px;
+  font-weight: bold;
 }
 
 .icon-down:before {
@@ -97,15 +62,15 @@
 }
 
 .icon-forecolor {
-  font-size: 22px;
-}
-
-.icon-backcolor {
-  font-size: 22px;
+  font-size: 16px;
 }
 
 .icon-forecolor .path1:before {
-  content: "\e90d";
+  content: "\e905";
+}
+
+.icon-forecolor .path1 {
+  color: #414D68;
 }
 
 .icon-forecolor .path2 {
@@ -113,15 +78,37 @@
 }
 
 .icon-forecolor .path2:before {
-  content: "\e90e";
+  content: "\e904";
   margin-left: -1em;
-}
-
-.icon-forecolor .path1 {
-  color: #414D68;
 }
 
 .icon-forecolor .path3:before {
   content: "\e90f";
+  margin-left: -1em;
+}
+
+.icon-backcolor {
+  font-size: 16px;
+}
+
+.icon-backcolor .path1:before {
+  content: "\e905";
+}
+
+.icon-backcolor .path1 {
+  color: #414D68;
+}
+
+.icon-backcolor .path2 {
+  color: rgb(0, 0, 0, .1);
+}
+
+.icon-backcolor .path2:before {
+  content: "\e904";
+  margin-left: -1em;
+}
+
+.icon-backcolor .path3:before {
+  content: "\e903";
   margin-left: -1em;
 }
