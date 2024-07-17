@@ -14,6 +14,7 @@
 #include "globaldef.h"
 #include "webenginehandler.h"
 #include "actionmanager.h"
+#include "utils.h"
 
 #include <QThreadPool>
 #include <QQmlApplicationEngine>
@@ -141,8 +142,7 @@ int VNoteMainManager::loadNotepads()
             QVariantMap data;
             data.insert("name", folder->name);
             data.insert("notesCount", QString::number(folder->getNotesCount()));
-            data.insert("icon", folder->UI.icon);
-            data.insert("grayIcon", folder->UI.grayIcon);
+            data.insert("icon", QString::number(folder->defaultIcon));
             if (tmpIndexCount != -1) {
                 folder->sortNumber = tmpIndexCount;
             } else {
@@ -196,8 +196,7 @@ void VNoteMainManager::vNoteCreateFolder()
         QVariantMap data;
         data.insert("name", newFolder->name);
         data.insert("notesCount", "1");
-        data.insert("icon", newFolder->UI.icon);
-        data.insert("grayIcon", newFolder->UI.grayIcon);
+        data.insert("icon", QString::number(newFolder->defaultIcon));
         data.insert("sortNumber", folders->folders.size());
         addFolderFinished(data);
     }
@@ -258,8 +257,10 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
             for (auto it : notes->folderNotes) {
                 QVariantMap data;
                 data.insert("name", it->noteTitle);
-                data.insert("time", it->modifyTime);
+                data.insert("time", Utils::convertDateTime(it->modifyTime));
                 data.insert("isTop", it->isTop);
+                data.insert("icon", QString::number(folder->defaultIcon));
+                data.insert("folderName", folder->name);
                 notesDataList.append(data);
                 m_noteItems.append(it);
                 if (it->isTop)
@@ -275,6 +276,13 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
         emit updateNotes(notesDataList);
     }
     return notesCount;
+}
+
+QList<QVariantMap> VNoteMainManager::sortNoteList(const QList<QVariantMap> &dataList)
+{
+    QList<QVariantMap> sortList;
+    //TODO: 对笔记重新排序
+    return sortList;
 }
 
 void VNoteMainManager::createNote()
@@ -463,4 +471,44 @@ void VNoteMainManager::renameFolder(const int &index, const QString &name)
         VNoteFolderOper folderOper(folder);
         folderOper.renameVNoteFolder(name);
     }
+}
+
+void VNoteMainManager::vNoteSearch(const QString &text)
+{
+    if (!text.isEmpty()) {
+        if (m_searchText == text) {
+            return;
+        } else {
+            m_searchText = text;
+            loadSearchNotes(text);
+        }
+    }
+}
+
+int VNoteMainManager::loadSearchNotes(const QString &key)
+{
+    VNOTE_ALL_NOTES_MAP *noteAll = VNoteDataManager::instance()->getAllNotesInFolder();
+    QList<QVariantMap> notesDataList;    
+    if (noteAll) {
+        noteAll->lock.lockForRead();
+        for (auto &foldeNotes : noteAll->notes) {
+            for (auto note : foldeNotes->folderNotes) {
+                if (note->search(key)) {
+                    QVariantMap data;
+                    data.insert("name", note->noteTitle);
+                    data.insert("time", note->modifyTime);
+                    data.insert("isTop", note->isTop);
+                    data.insert("folderId", note->folderId);
+                    notesDataList.append(data);
+                }
+            }
+        }
+        noteAll->lock.unlock();
+        if (notesDataList.size() == 0) {
+            emit noSearchResult();
+        } else {
+            //TODO:有搜索结果
+        }
+    }
+    return notesDataList.size();
 }
