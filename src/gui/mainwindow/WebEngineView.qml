@@ -4,41 +4,52 @@
 
 import QtQuick 2.15
 import QtQuick.Window 2.15
-import QtQuick.Controls
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
 import QtWebChannel 1.15
 import QtWebEngine 1.15
+import org.deepin.dtk 1.0
 import VNote 1.0
 
 Item {
     visible: true
 
-    WebEngineView {
-        id: webView
-
+    ColumnLayout {
+        id: columnLayout
         anchors.fill: parent
-
-        Component.onCompleted: {
-            noteWebChannel.registerObject("webobj", Webobj);
-            // console.log("registerObject ret: " + ret)
-            webView.webChannel = noteWebChannel;
-            webView.url = Qt.resolvedUrl(Webobj.webPath());
-
-            // 隐藏浮动工具栏
-            Webobj.calllJsShowEditToolbar(0, 0);
+        TitleBar {
+            id: title
+            Layout.fillWidth: true
+            height: 40
         }
         onContextMenuRequested: req => {
             // 响应右键菜单，处理完成后 handler 抛出 requestShowMenu() 信号
             handler.onContextMenuRequested(req);
         }
-
         WebEngineHandler {
             id: handler
 
-        }
+            // anchors.fill: parent
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-        WebChannel {
-            id: noteWebChannel
+            Component.onCompleted: {
+                noteWebChannel.registerObject("webobj", Webobj);
+                // console.log("registerObject ret: " + ret)
+                webView.webChannel = noteWebChannel;
+                webView.url = Qt.resolvedUrl(Webobj.webPath());
 
+                // 隐藏浮动工具栏
+                Webobj.calllJsShowEditToolbar(0, 0);
+            }
+
+            WebEngineHandler {
+            }
+
+            WebChannel {
+                id: noteWebChannel
+
+            }
         }
     }
 

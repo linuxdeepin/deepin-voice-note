@@ -6,6 +6,7 @@
 #include "common/vnotedatamanager.h"
 #include "common/VNoteMainManager.h"
 #include "common/jscontent.h"
+#include "common/imageprovider.h"
 
 #include <QQmlApplicationEngine>
 #include <QScopedPointer>
@@ -34,9 +35,11 @@ int main(int argc, char *argv[])
     qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "7777");
     VNoteMainManager::instance()->initQMLRegister();
     QtWebEngineQuick::initialize();
+    ImageProvider* imageProvider = ImageProvider::instance();
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
+    engine.addImageProvider("Provider", imageProvider);
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)
