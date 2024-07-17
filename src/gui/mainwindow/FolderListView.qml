@@ -93,7 +93,7 @@ Item {
     Connections {
         target: VNoteMainManager
         onAddFolderFinished: {
-            folderListView.model.insert(0, {name: folderData.name, count: folderData.notesCount})
+            folderListView.model.insert(0, {name: folderData.name, count: folderData.notesCount, icon: folderData.icon})
 
             if (folderListView.itemAtIndex(folderListView.currentIndex + 1)) {
                 folderListView.itemAtIndex(folderListView.currentIndex + 1).backgroundColor = "white"
@@ -141,25 +141,18 @@ Item {
                 property int imageWidth: 16
                 spacing: 10
                 Layout.fillWidth: true
-                anchors.left: parent.left
-                anchors.leftMargin: 10
-                anchors.right: parent.right
-                anchors.rightMargin: 10
                 Rectangle {
                     width: 16
                     height: 16
                     radius: 8
-                    anchors.top: parent.top
-                    anchors.topMargin: 7
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 7
+                    Layout.leftMargin: 10
                     Image {
                         id: _image
                         smooth: true
                         visible: false
                         width: 16
                         height: 16
-                        source: "file:///home/V23/Desktop/123.jpg"
+                        source: "image://Provider/" + model.icon
                         fillMode: Image.PreserveAspectCrop
                         antialiasing: true
                     }
@@ -185,7 +178,8 @@ Item {
                 }
                 LineEdit {
                     id: renameLine
-                    anchors.fill: parent
+                    Layout.fillWidth: true
+                    height: 26
                     visible: false
                     text: model.name
                     onFocusChanged: {
@@ -204,6 +198,7 @@ Item {
                 }
                 Label {
                     id: folderNameLabel
+                    Layout.fillWidth: true
                     text: model.name
                     visible: true
                     horizontalAlignment: Text.AlignLeft
@@ -212,6 +207,7 @@ Item {
                 }
                 Label {
                     id: folderCountLabel
+                    Layout.rightMargin: 10
                     text: model.count
                     width: 30
                     visible: true

@@ -57,5 +57,15 @@
         <file>web/js/summernote-zh-CN.js</file>
         <file>deepin-voice-note-setting.json</file>
         <file>gui/mainwindow/VNoteRightMenu.qml</file>
+        <file>icon/default_folder_icons/1.svg</file>
+        <file>icon/default_folder_icons/10.svg</file>
+        <file>icon/default_folder_icons/2.svg</file>
+        <file>icon/default_folder_icons/3.svg</file>
+        <file>icon/default_folder_icons/4.svg</file>
+        <file>icon/default_folder_icons/5.svg</file>
+        <file>icon/default_folder_icons/6.svg</file>
+        <file>icon/default_folder_icons/7.svg</file>
+        <file>icon/default_folder_icons/8.svg</file>
+        <file>icon/default_folder_icons/9.svg</file>
     </qresource>
 </RCC>

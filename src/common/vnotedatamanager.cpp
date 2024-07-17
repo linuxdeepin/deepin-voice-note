@@ -364,17 +364,16 @@ VNOTE_ITEMS_MAP *VNoteDataManager::getFolderNotes(qint64 folderId)
  */
 QPixmap VNoteDataManager::getDefaultIcon(qint32 index, IconsType type)
 {
-    return QPixmap();
-    // m_iconLock.lockForRead();
-    // if (index < 1 || index > m_defaultIcons[type].size()) {
-    //     index = 0;
-    // }
+    m_iconLock.lockForRead();
+    if (index < 1 || index > m_defaultIcons[type].size()) {
+        index = 0;
+    }
 
-    // QPixmap icon = m_defaultIcons[type].at(index);
+    QPixmap icon = m_defaultIcons[type].at(index);
 
-    // m_iconLock.unlock();
+    m_iconLock.unlock();
 
-    // return icon;
+    return icon;
 }
 
 /**

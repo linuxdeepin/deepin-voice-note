@@ -15,14 +15,16 @@ import org.deepin.dtk 1.0
 import VNote 1.0
 
 Item {
-    property int noteItemHeight: 50
     width: 640
     height: 480
     visible: true
 
     property var selectedNoteItem: []
     property var itemSpacing: 6
+    property bool isSearch: false
     property alias model: itemModel
+    property alias searchLoader: noSearchResultsLoader
+    property alias view: itemListView
     property var saveFilters: ["TXT(*.txt);;HTML(*.html)", "TXT(*.txt)", "HTML(*.html)", "MP3(*.mp3)"]
 
     signal noteItemChanged(int index)
@@ -50,6 +52,7 @@ Item {
             id: fileDialog
             title: qsTr("Save As")
             currentFile: "file:///" + selectedNoteItem[0].name
+            // currentFile: Url.fromLocalFile(selectedNoteItem[0].name)
             fileMode: FileDialog.SaveFile
             currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
             nameFilters: saveFilters[saveType]
@@ -80,6 +83,41 @@ Item {
         }
     }
 
+    Loader {
+        id: noSearchResultsLoader
+        active: false
+        asynchronous: true
+        sourceComponent: Rectangle {
+            id: noSearchResultsRect
+            width: itemListView.width
+            height: itemListView.height
+            color: "transparent"
+            visible: false
+            Component.onCompleted: {
+                noSearchResultsRect.visible = true
+                itemListView.visible = false
+            }
+            Text {
+                anchors.centerIn: parent
+                text: qsTr("No search results")
+                font.pixelSize: 14
+                color: "#B3000000"
+            }
+        }
+    }
+
+    Connections {
+        target: VNoteMainManager
+        onNoSearchResult: {
+            if (!noSearchResultsLoader.active) {
+                noSearchResultsLoader.active = true
+            } else {
+                noSearchResultsLoader.item.visible = true
+                itemListView.visible = false
+            }
+        }
+    }
+
     ListView {
         id: itemListView
         anchors.fill: parent
@@ -87,42 +125,116 @@ Item {
         property var lastCurrentIndex: -1
         property var contextIndex: -1
         spacing: itemSpacing
+        visible: true
         delegate: Rectangle {
+            property bool isRename: false
             width: parent.width
-            height: noteItemHeight
+            height: isSearch ? 67 : 50
             property alias setNameColor: noteNameLabel.color
             property alias setTimeColor: timeLabel.color
+            property alias renameFocus: renameLine.focus
             property color nameColor: "black"
             property color timeColor: "#7F000000"
             
             color: "white"
             radius: 6
 
-            Column {
-                anchors.top: parent.top
-                // anchors.topMargin: 8
-                anchors.left: parent.left
+            ColumnLayout {
+                id: itemLayout
+                anchors.fill: parent
+                anchors.topMargin: 8
+                anchors.bottomMargin: 8
                 anchors.leftMargin: 10
-                anchors.right: parent.right
                 anchors.rightMargin: 10
-                anchors.bottom: parent.bottom
-                // anchors.bottomMargin: 8
-                spacing: 1
+                spacing: isRename ? 7 : 1
                 Label {
                     id: noteNameLabel
                     width: parent.width
+                    height: 18
+                    visible: !isRename
                     horizontalAlignment: Text.AlignHLeft
                     text: model.name
                     color: nameColor
-                    font.pixelSize: 20
+                    font.pixelSize: 14
                 }
                 Label {
                     id: timeLabel
                     width: parent.width
+                    height: 15
+                    visible: !isRename
                     horizontalAlignment: Text.AlignHLeft
-                    text: model.name
+                    text: model.time
                     color: timeColor
                     font.pixelSize: 10
+                }
+                LineEdit {
+                    id: renameLine
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    Layout.topMargin: isRename ? 4 : 0
+                    visible: isRename
+                    text: model.name
+                    onFocusChanged: {
+                        noteItemMouseArea.enabled = false;
+                        if (focus) {
+                            focus = true
+                            selectAll();
+                        } else {
+                            noteItemMouseArea.enabled = true;
+                            deselect();
+                            visible = false
+                            noteNameLabel.visible = true
+                            timeLabel.visible = true
+                        }
+                    }
+                }
+                RowLayout {
+                    id: rowlayout
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    visible: isSearch
+                    Rectangle {
+                        width: 16
+                        height: 16
+                        radius: 8
+                        Image {
+                            id: _image
+                            smooth: true
+                            visible: false
+                            width: 16
+                            height: 16
+                            source: "image://Provider/" + model.icon
+                            fillMode: Image.PreserveAspectCrop
+                            antialiasing: true
+                        }
+                        Rectangle { //矩形
+                            id: _mask
+                            width: 16
+                            height: 16
+                            radius: 8
+                            color: "red"
+                            visible: false  //不可见
+                            smooth: true
+                            antialiasing: true
+                        }
+
+                        OpacityMask {
+                            id: mask_image
+                            anchors.fill: _image
+                            source: _image
+                            maskSource: _mask    //用作遮罩的项目
+                            visible: true
+                            antialiasing: true
+                        }
+                    }
+                    Label {
+                        id: folderNameLabel
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignLeft
+                        text: model.folderName
+                        font.pixelSize: 10
+                    }
                 }
             }
             MouseArea {
@@ -169,6 +281,7 @@ Item {
                                 if (itemListView.lastCurrentIndex != -1) {
                                     if (itemListView.itemAtIndex(itemListView.lastCurrentIndex)) {
                                         var lastItem = itemListView.itemAtIndex(itemListView.lastCurrentIndex)
+                                        lastItem.isRename = false
                                         lastItem.color = "white"
                                         lastItem.setNameColor = "black"
                                         lastItem.setTimeColor = "#7F000000"
@@ -263,6 +376,12 @@ Item {
             MenuItem {
                 text: qsTr("Rename")
                 onTriggered: {
+                    var currentItem = itemListView.itemAtIndex(itemListView.contextIndex)
+                    console.log("Current item:", currentItem)
+                    if (currentItem) {
+                        currentItem.isRename = true
+                        currentItem.renameFocus = true
+                    }
                 }
             }
             MenuItem {
