@@ -11,6 +11,7 @@
 #include <QPixmap>
 #include <QTextDocumentFragment>
 #include <QTextDocument>
+#include <QKeyEvent>
 
 DWIDGET_USE_NAMESPACE
 

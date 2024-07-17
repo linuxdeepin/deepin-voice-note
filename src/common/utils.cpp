@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "globaldef.h"
 #include "vnoteitem.h"
-#include "vnoteapplication.h"
+// #include "vnoteapplication.h"
 
 #include <DGuiApplicationHelper>
 
@@ -184,9 +184,9 @@ QString Utils::formatMillisecond(qint64 millisecond, qint64 minValue)
     if (curSecond < minValue) {
         curSecond = minValue;
     }
-    if (curSecond < 3600) {
-        return QDateTime::fromTime_t(static_cast<uint>(curSecond)).toUTC().toString("mm:ss");
-    }
+    // if (curSecond < 3600) {
+    //     return QDateTime::fromTime_t(static_cast<uint>(curSecond)).toUTC().toString("mm:ss");
+    // }
 
     return QString("60:00");
 }
@@ -208,13 +208,13 @@ void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
         while (true) {
             for (it = currentBlock.begin(); !(it.atEnd());) {
                 QTextFragment currentFragment = it.fragment();
-                //                QTextImageFormat newImageFormat = currentFragment.charFormat().toImageFormat();
-                //                if (newImageFormat.isValid()) {
-                //                    int pos = currentFragment.position();
-                //                    qDebug() << "image block:" << pos <<"url;" << newImageFormat.name();
-                //                    ++it;
-                //                    continue;
-                //                }
+                               QTextImageFormat newImageFormat = currentFragment.charFormat().toImageFormat();
+                               if (newImageFormat.isValid()) {
+                                   int pos = currentFragment.position();
+                                   qDebug() << "image block:" << pos <<"url;" << newImageFormat.name();
+                                   ++it;
+                                   continue;
+                               }
                 if (currentFragment.isValid()) {
                     ++it;
                     block->blockText.append(currentFragment.text());
@@ -263,13 +263,13 @@ void Utils::setDefaultColor(QTextDocument *srcDoc, const QColor &color)
  */
 void Utils::setTitleBarTabFocus(QKeyEvent *event)
 {
-    VNoteApplication *app = dynamic_cast<VNoteApplication *>(qGuiApp);
-    if (app) {
-        VNoteMainWindow *wnd = app->mainWindow();
-        if (wnd) {
-            wnd->setTitleBarTabFocus(event);
-        }
-    }
+    // VNoteApplication *app = dynamic_cast<VNoteApplication *>(qGuiApp);
+    // if (app) {
+    //     VNoteMainWindow *wnd = app->mainWindow();
+    //     if (wnd) {
+    //         wnd->setTitleBarTabFocus(event);
+    //     }
+    // }
 }
 
 /**
@@ -331,14 +331,16 @@ bool Utils::isLoongsonPlatform()
 QString Utils::filteredFileName(QString fileName, const QString &defaultName)
 {
     //使用正则表达式除去不符合规范的字符并清理文件名两端的空白字符，中间的空白字符不做处理
-    QString name = fileName.replace(QRegExp("[\"\'\\[\\]\\\\/:|<>+=;,?*]"), "").trimmed();
-    if (name.isEmpty()) {
-        return defaultName;
-    }
-    return name;
+    // QString name = fileName.replace(QRegExp("[\"\'\\[\\]\\\\/:|<>+=;,?*]"), "").trimmed();
+    // if (name.isEmpty()) {
+    //     return defaultName;
+    // }
+    // return name;
+    return QString();
 }
 
 bool Utils::isWayland()
 {
-    return qApp->platformName() == "dwayland" || qApp->property("_d_isDwayland").toBool();
+    return false;
+    // return qApp->platformName() == "dwayland" || qApp->property("_d_isDwayland").toBool();
 }

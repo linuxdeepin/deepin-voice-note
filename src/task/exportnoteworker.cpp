@@ -6,11 +6,11 @@
 #include "exportnoteworker.h"
 #include "globaldef.h"
 #include "common/vnoteitem.h"
-#include "common/metadataparser.h"
-#include "common/setting.h"
+// #include "common/metadataparser.h"
+// #include "common/setting.h"
 #include "common/utils.h"
 
-#include <DLog>
+// #include <DLog>
 
 #include <QDir>
 #include <QDateTime>
@@ -45,18 +45,18 @@ void ExportNoteWorker::run()
     ExportError error = checkPath();
 
     if (ExportOK == error) {
-        if (ExportText == m_exportType) {
-            error = exportText();
-            setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, m_exportPath);
-        } else if (ExportVoice == m_exportType) {
-            error = exportAllVoice();
-            setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, m_exportPath);
-        } else if (ExportHtml == m_exportType) {
-            error = exportAsHtml();
-            setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, m_exportPath);
-        }
+        // if (ExportText == m_exportType) {
+        //     error = exportText();
+        //     setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, m_exportPath);
+        // } else if (ExportVoice == m_exportType) {
+        //     error = exportAllVoice();
+        //     setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, m_exportPath);
+        // } else if (ExportHtml == m_exportType) {
+        //     error = exportAsHtml();
+        //     setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, m_exportPath);
+        // }
     } else {
-        qCritical() << "Export note error: m_exportType=" << m_exportType;
+        // qCritical() << "Export note error: m_exportType=" << m_exportType;
     }
 
     emit exportFinished(error);
@@ -184,11 +184,11 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAllVoice()
 ExportNoteWorker::ExportError ExportNoteWorker::exportOneVoice(const QString &json)
 {
     VNVoiceBlock voiceBlock;
-    MetaDataParser dataParser;
-    //解析json数据
-    if (dataParser.parse(json, &voiceBlock)) {
-        return exportOneVoice(&voiceBlock);
-    }
+    // MetaDataParser dataParser;
+    // //解析json数据
+    // if (dataParser.parse(json, &voiceBlock)) {
+    //     return exportOneVoice(&voiceBlock);
+    // }
     return NoteInvalid;
 }
 

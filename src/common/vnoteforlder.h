@@ -50,13 +50,6 @@ public:
     QDateTime deleteTime;
     //排序编号
     qint32 sortNumber {-1};
-
-    struct {
-        //正常图标
-        QPixmap icon;
-        //置灰图标
-        QPixmap grayIcon;
-    } UI;
     //获取记事项最大id
     qint32 &maxNoteIdRef();
     //获取记事项个数
