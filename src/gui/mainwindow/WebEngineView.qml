@@ -16,18 +16,16 @@ Item {
 
     ColumnLayout {
         id: columnLayout
+
         anchors.fill: parent
         TitleBar {
             id: title
             Layout.fillWidth: true
             height: 40
         }
-        onContextMenuRequested: req => {
-            // 响应右键菜单，处理完成后 handler 抛出 requestShowMenu() 信号
-            handler.onContextMenuRequested(req);
-        }
-        WebEngineHandler {
-            id: handler
+
+        WebEngineView {
+            id: webView
 
             // anchors.fill: parent
             Layout.fillWidth: true
@@ -42,8 +40,13 @@ Item {
                 // 隐藏浮动工具栏
                 Webobj.calllJsShowEditToolbar(0, 0);
             }
+            onContextMenuRequested: req => {
+                // 响应右键菜单，处理完成后 handler 抛出 requestShowMenu() 信号
+                handler.onContextMenuRequested(req);
+            }
 
             WebEngineHandler {
+                id: handler
             }
 
             WebChannel {

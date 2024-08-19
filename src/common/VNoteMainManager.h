@@ -41,6 +41,9 @@ public:
     Q_INVOKABLE bool getTop();
     Q_INVOKABLE void updateSort(const int &src, const int &dst);
     Q_INVOKABLE void renameFolder(const int &index, const QString &name);
+    Q_INVOKABLE QList<QVariantMap> sortNoteList(const QList<QVariantMap> &dataList);
+    Q_INVOKABLE void vNoteSearch(const QString &text);
+    Q_INVOKABLE int loadSearchNotes(const QString &key);
     
     
 
@@ -49,6 +52,7 @@ signals:
     void updateNotes(const QList<QVariantMap> &notesData);
     void addNoteAtHead(const QVariantMap &noteData);
     void addFolderFinished(const QVariantMap &folderData);
+    void noSearchResult();
 
 private slots:
     void onVNoteFoldersLoaded();
@@ -70,6 +74,7 @@ private:
     QList<VNoteItem*> m_noteItems;
     QStringList m_folderSort;
     WebRichTextManager *m_richTextManager {nullptr};
+    QString m_searchText;
 };
 
 #endif // VNOTEMAINMANAGER_H
