@@ -44,8 +44,6 @@ public:
     Q_INVOKABLE QList<QVariantMap> sortNoteList(const QList<QVariantMap> &dataList);
     Q_INVOKABLE void vNoteSearch(const QString &text);
     Q_INVOKABLE int loadSearchNotes(const QString &key);
-    
-    
 
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);
@@ -53,6 +51,7 @@ signals:
     void addNoteAtHead(const QVariantMap &noteData);
     void addFolderFinished(const QVariantMap &folderData);
     void noSearchResult();
+    void searchFinished(const QList<QVariantMap> &notesData, const QString &key);
 
 private slots:
     void onVNoteFoldersLoaded();
@@ -66,6 +65,7 @@ private:
     int loadNotes(VNoteFolder *folder);
 
     VNoteFolder* getFloderByIndex(const int &index);
+    VNoteFolder* getFloderById(const int &id);
     VNoteItem* getNoteByIndex(const int &index);
 
 private:

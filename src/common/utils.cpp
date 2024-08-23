@@ -17,6 +17,7 @@
 #include <QBuffer>
 #include <QFileInfo>
 #include <QProcess>
+#include <QTextDocumentFragment>
 
 Utils::Utils()
 {
@@ -343,4 +344,12 @@ bool Utils::isWayland()
 {
     return false;
     // return qApp->platformName() == "dwayland" || qApp->property("_d_isDwayland").toBool();
+}
+
+QString Utils::createRichText(const QString &title, const QString &key)
+{
+    QString highLightText = "<span style=\"color: #0058de;\">" + key + "</span>";
+    QString editTitle(title);
+    QString newText = editTitle.replace(key, highLightText);
+    return newText;
 }

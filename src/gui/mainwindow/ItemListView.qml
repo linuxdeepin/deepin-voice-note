@@ -20,7 +20,7 @@ Item {
     visible: true
 
     property var selectedNoteItem: []
-    property var itemSpacing: 6
+    property int itemSpacing: 6
     property bool isSearch: false
     property alias model: itemModel
     property alias searchLoader: noSearchResultsLoader
@@ -107,6 +107,14 @@ Item {
     }
 
     Connections {
+        function handleUpdateNoteList(notesData) {
+            itemModel.clear()
+            for (var i = 0; i < notesData.length; i++) {
+                var itemIsTop = notesData[i].isTop ? "top" : "normal"
+                itemModel.append({name: notesData[i].name, time: notesData[i].time, isTop: itemIsTop,
+                                 icon: notesData[i].icon, folderName: notesData[i].folderName})
+            }
+        }
         target: VNoteMainManager
         onNoSearchResult: {
             if (!noSearchResultsLoader.active) {
@@ -115,6 +123,15 @@ Item {
                 noSearchResultsLoader.item.visible = true
                 itemListView.visible = false
             }
+        }
+        onSearchFinished: {
+            if (noSearchResultsLoader.active && noSearchResultsLoader.item.visible) {
+                noSearchResultsLoader.item.visible = false
+                itemListView.visible = true
+            }
+
+            isSearch = true
+            handleUpdateNoteList(notesData)
         }
     }
 
@@ -154,6 +171,7 @@ Item {
                     visible: !isRename
                     horizontalAlignment: Text.AlignHLeft
                     text: model.name
+                    // text: "<p><color=#ff0000ff>colorfully</color></p>"
                     color: nameColor
                     font.pixelSize: 14
                 }
