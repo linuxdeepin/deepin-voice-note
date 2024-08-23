@@ -67,5 +67,7 @@
         <file>icon/default_folder_icons/7.svg</file>
         <file>icon/default_folder_icons/8.svg</file>
         <file>icon/default_folder_icons/9.svg</file>
+        <file>gui/mainwindow/InitialInterface.qml</file>
+        <file>icon/no_content.dci</file>
     </qresource>
 </RCC>

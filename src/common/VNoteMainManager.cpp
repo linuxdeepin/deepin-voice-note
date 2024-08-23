@@ -365,6 +365,26 @@ VNoteFolder *VNoteMainManager::getFloderByIndex(const int &index)
     return nullptr;
 }
 
+VNoteFolder *VNoteMainManager::getFloderById(const int &id)
+{
+    VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
+    if (folders) {
+        folders->lock.lockForRead();
+
+        QMap<qint64, VNoteFolder *>::iterator itor;
+        for(itor = folders->folders.begin(); itor != folders->folders.end(); ++itor) {
+            VNoteFolder *folder = itor.value();
+            if (folder->id == id) {
+                folders->lock.unlock();
+                return folder;
+            }
+        }
+
+        folders->lock.unlock();
+    }
+    return nullptr;
+}
+
 VNoteItem *VNoteMainManager::getNoteByIndex(const int &index)
 {
     if (index < 0 || index >= m_noteItems.size()) {
@@ -495,10 +515,12 @@ int VNoteMainManager::loadSearchNotes(const QString &key)
             for (auto note : foldeNotes->folderNotes) {
                 if (note->search(key)) {
                     QVariantMap data;
-                    data.insert("name", note->noteTitle);
-                    data.insert("time", note->modifyTime);
-                    data.insert("isTop", note->isTop);
-                    data.insert("folderId", note->folderId);
+                    data.insert("name", Utils::createRichText(note->noteTitle, key));
+                    data.insert("time", Utils::convertDateTime(note->modifyTime));
+                    data.insert("isTop", QString::number(note->isTop));
+                    VNoteFolder *folder = getFloderById(note->folderId);
+                    data.insert("folderName", folder->name);
+                    data.insert("icon", QString::number(folder->defaultIcon));
                     notesDataList.append(data);
                 }
             }
@@ -508,6 +530,7 @@ int VNoteMainManager::loadSearchNotes(const QString &key)
             emit noSearchResult();
         } else {
             //TODO:有搜索结果
+            emit searchFinished(notesDataList, key);
         }
     }
     return notesDataList.size();

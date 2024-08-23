@@ -112,6 +112,7 @@ Item {
         property int dropIndex: -1
         property var contextIndex: -1
         model: folderModel
+        enabled: parent.enabled
         function indexAt(mousePosX, mousePosY) {
             var pos = mapFromGlobal(mousePosX, mousePosY)
             var startY = itemHeight * 0.5
@@ -127,6 +128,7 @@ Item {
         delegate: Item {
             width: parent.width
             height: itemHeight
+            enabled: folderListView.enabled
             property color backgroundColor: index === folderListView.currentIndex ? "#33000000" : "white"
             
             Rectangle {
@@ -221,6 +223,7 @@ Item {
                 anchors.fill: parent
                 drag.target: this
                 hoverEnabled: true
+                enabled: parent.enabled
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 property bool held: false
                 onClicked: {

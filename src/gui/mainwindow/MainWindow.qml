@@ -44,6 +44,9 @@ ApplicationWindow {
         }
         target: VNoteMainManager
         onFinishedFolderLoad: {
+            if (foldersData.length > 0)
+                initRect.visible = false
+            initiaInterface.loadFinished(foldersData.length > 0)
             handleFinishedFolderLoad(foldersData)
         }
         onUpdateNotes : {
@@ -54,6 +57,15 @@ ApplicationWindow {
         }
         onNoSearchResult: {
             label.visible = false
+            folderListView.opacity = 0.4
+            folderListView.enabled = false
+            createFolderButton.enabled = false
+        }
+        onSearchFinished: {
+            label.visible = false
+            folderListView.opacity = 0.4
+            folderListView.enabled = false
+            createFolderButton.enabled = false
         }
     }
 
@@ -102,7 +114,7 @@ ApplicationWindow {
                     }
                 }
                 Button {
-                    id: button
+                    id: createFolderButton
                     Layout.fillWidth: true
                     Layout.preferredHeight: createFolderBtnHeight
                     text: qsTr("Create Notebook")
@@ -165,9 +177,15 @@ ApplicationWindow {
                     Connections {
                         function onClicked(mouse) {
                             search.focus = false
-                            itemListView.searchLoader.item.visible = false
+                            if (itemListView.searchLoader.active) {
+                                itemListView.searchLoader.item.visible = false
+                            }
                             itemListView.view.visible = true
                             label.visible = true
+                            folderListView.opacity = 1
+                            folderListView.enabled = true
+                            createFolderButton.enabled = true
+                            itemListView.isSearch = false
                         }
                         target: search.clearButton.item
                     }
@@ -236,6 +254,30 @@ ApplicationWindow {
                     Layout.fillHeight: true
                 }
             }
+        }
+    }
+
+    Rectangle {
+        id: initRect
+        anchors.fill: parent
+
+        ColumnLayout {
+            anchors.fill: parent
+
+            InitialInterface {
+                id: initiaInterface
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+        }
+
+        Connections {
+            onCreateFolder: {
+                folderListView.addFolder()
+                initRect.visible = false
+            }
+
+            target: initiaInterface
         }
     }
 }
