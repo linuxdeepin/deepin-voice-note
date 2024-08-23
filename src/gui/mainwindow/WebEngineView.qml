@@ -9,6 +9,7 @@ import QtQuick.Layouts 1.15
 import QtWebChannel 1.15
 import QtWebEngine 1.15
 import org.deepin.dtk 1.0
+
 import VNote 1.0
 
 Item {
@@ -16,7 +17,7 @@ Item {
 
     ColumnLayout {
         id: columnLayout
-
+        spacing: 0
         anchors.fill: parent
         TitleBar {
             id: title
