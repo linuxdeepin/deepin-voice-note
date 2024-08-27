@@ -27,19 +27,8 @@
         <file>web/css/reset.css</file>
         <file>web/css/style.css</file>
         <file>web/css/summernote.css</file>
-        <file>web/img/d1.svg</file>
-        <file>web/img/d2.svg</file>
-        <file>web/img/d3.svg</file>
-        <file>web/img/d4.svg</file>
         <file>web/img/pause.svg</file>
         <file>web/img/plan.svg</file>
-        <file>web/img/play_voice1.svg</file>
-        <file>web/img/play_voice2.svg</file>
-        <file>web/img/play_voice3.svg</file>
-        <file>web/img/play_voice4.svg</file>
-        <file>web/img/play_voice5.svg</file>
-        <file>web/img/play_voice6.svg</file>
-        <file>web/img/play_voice7.svg</file>
         <file>web/img/play.svg</file>
         <file>web/js/bootstrap.js</file>
         <file>web/js/handlebars.js</file>
@@ -48,5 +37,16 @@
         <file>web/js/qwebchannel.js</file>
         <file>web/js/summernote_v9_2.js</file>
         <file>web/js/summernote-zh-CN.js</file>
+        <file>web/img/audio_file_play/Hover/Light.svg</file>
+        <file>web/img/audio_file_play/Hover/Dark.svg</file>
+        <file>web/img/audio_file_play/Normal/Light.svg</file>
+        <file>web/img/audio_file_play/Normal/Dark.svg</file>
+        <file>web/img/audio_file_play/Pressed/Light.svg</file>
+        <file>web/img/audio_file_play/Pressed/Dark.svg</file>
+        <file>web/img/audio_file_playing_pause/Normal.svg</file>
+        <file>web/img/audio_file_playing_play/Normal.svg</file>
+        <file>web/img/playbar_pause/Normal.svg</file>
+        <file>web/img/playbar_pause_close/Normal.svg</file>
+        <file>web/img/playbar_play/Normal.svg</file>
     </qresource>
 </RCC>

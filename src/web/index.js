@@ -18,6 +18,8 @@ $('#summernote').on('summernote.change', changeContent);
 var h5Tpl = `
     <div class="li voiceBox" contenteditable="false" jsonKey="{{jsonValue}}">
         <div class='voiceInfoBox'>
+
+        <!-- 进度条teste -->
             <div class="demo" >              
                 <div class="voicebtn play"></div>
                 <div class="lf">
@@ -41,6 +43,7 @@ var h5Tpl = `
     <p>{{text}}</p>
     {{/if}}
     `;
+
 // 语音插入模板
 var nodeTpl = `
         <div class='voiceInfoBox'>
@@ -63,13 +66,72 @@ var nodeTpl = `
             </div>
         </div>`;
 
+// 语言播放模板
+var voicePlayBackTemplate = `
+    <!-- 语音播放控件 -->
+    <div class="voicePlayback" id="voicePlayback">
+        <div class="left">
+            <div class="voiceBtn"></div>
+            <div class="title">{{title}}</div>
+        </div>
+        <!-- 音频进度条 音频 step 单位 s ; range 单位 ms -->
+        <input class="progressBar" type="range" min="0" max="{{voiceSize}}" step="1000" value="0" id="progressRange"
+            onchange="onProgressChange()" oninput="onProgressInput()">
+        <div class="right">
+            <!-- 语音进度/长度字段，默认显示长度 -->
+            <div class="timeField">
+                <div class="timePassed">00:00/</div>
+                <div class="timeTotal">{{transSize}}</div>
+            </div>
+            <!-- 语音转文字 -->
+            <div class="voiceToTextLabel">
+                <div class="voiceToTextIcon"></div>
+                <div class="waitingText">正在转为文字</div>
+            </div>
+            <div class="closePlaybackBarBtn"></div>
+        </div>
+    </div>`;
+
+// 悬浮语音播放控件，文档唯一
+var airVoicePlayBackTemplate = `
+    <div class="airVoicePlayback" id="airVoicePlayback">
+        ${voicePlayBackTemplate}
+    </div>`;
+
+var h5TplV2 = `
+    <div class="li voiceBox" contenteditable="false" jsonKey="{{jsonValue}}">
+        <div class='voiceInfoBox'>
+            ${voicePlayBackTemplate}
+            <!-- 语音转文字显示控件 -->
+            <div class="translate">
+            </div>
+        </div>
+    </div>
+    {{#if text}}
+    <p>{{text}}</p>
+    {{/if}}
+    `;
+
+var nodeTplV2 = `
+    <div class='voiceInfoBox'>
+        ${voicePlayBackTemplate}
+        <!-- 语音转文字显示控件 -->
+        <div class="translate">
+        </div>
+    </div>`;
+
 var formatHtml = ''
 var webobj;    //js与qt通信对象
+var progressBarDraging = false; // 进度条拖动状态
+var activePlayback = null;  //当前播放的语音对象
+var airVoicePlayback = null;  //悬浮播放对象
+
+var activeVoiceToText = null;  //当前执行语音转文字对象
+
 var activeVoice = null;  //当前正操作的语音对象
 var activeTransVoice = null;  //执行语音转文字对象
 var bTransVoiceIsReady = true;  //语音转文字是否准备好
 var initFinish = false;
-var voiceIntervalObj;    //语音播放动画定时器对象
 var isVoicePaste = false
 var isShowAir = true
 var nowClickVoice = null
@@ -143,6 +205,8 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsClipboardDataChanged.connect(shearPlateChange);
         webobj.callJsSetVoicePlayBtnEnable.connect(playButColor);
         webobj.callJsSetFontList.connect(setFontList);
+
+        webobj.callJsVoicePlayProgressChanged.connect(updateProgressBar);
         //通知QT层完成通信绑定
         webobj.jsCallChannleFinish();
         // setFontList(global_fontList, "Unifont")
@@ -200,6 +264,9 @@ function initSummernote() {
     $(window).resize(function () {
         $('.note-editable').css('min-height', $(window).height())
     }).resize();
+
+    // 添加悬浮语音播放控件
+    addAirVoicePlayback();
 }
 
 
@@ -233,7 +300,7 @@ function changeContent(we, contents, $editable) {
  * @param {any}
  * @returns {any}
  */
-window.onresize = function(){
+window.onresize = function () {
     updateAirPopoverPos()
 }
 
@@ -479,17 +546,33 @@ function isRangeVoice() {
     return selectedRange
 }
 
-//播放
-$('body').on('click', '.voicebtn', function (e) {
-    // e.stopPropagation();
+/**
+ * 播放按钮点击时触发
+ */
+$('body').on('click', '.voiceBtn', function (e) {
+    var curPlayback = $(this).parents('.voicePlayback:first');
+    // 点击浮动窗口时视同点击焦点音频播放控件
+    if (curPlayback.is(airVoicePlayback)) {
+        curPlayback = activePlayback;
+    }
     var curVoice = $(this).parents('.li:first');
     var jsonString = curVoice.attr('jsonKey');
-    var bIsSame = $(this).hasClass('now');
-    var curBtn = $(this);
-    $('.voicebtn').removeClass('now');
-    activeVoice = curBtn;
-    activeVoice.addClass('now');
+    var bIsSame = curPlayback.hasClass('now');
 
+    // 不同，更新当前播放控件；暂停设置等待后端处理完成后 -> callJsSetPlayStatus()
+    if (!bIsSame) {
+        if (null !== activePlayback && activePlayback.hasClass('now')) {
+            // 移除之前控件的状态，重置样式
+            activePlayback.removeClass('now').removeClass('play').removeClass('pause');
+        }
+        curPlayback.addClass('now');
+        activePlayback = curPlayback;
+
+        // 重置悬浮工具栏状态
+        resetAirVoicePlayback();
+    }
+
+    // 后端播放处理，等待后端开始播放音频数据 -> callJsSetPlayStatus()
     webobj.jsCallPlayVoice(jsonString, bIsSame, function (state) {
         //TODO 录音错误处理
     });
@@ -501,8 +584,11 @@ function getHtml() {
     $cloneCode.find('.li').removeClass('active');
     $cloneCode.find('.voicebtn').removeClass('pause').addClass('play');
     $cloneCode.find('.voicebtn').removeClass('now');
+    $cloneCode.find('.voicePlayback').removeClass('now').removeClass('play').removeClass('pause').removeClass('voiceToText');
     $cloneCode.find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four').removeClass('fifth').removeClass('sixth').removeClass('seventh');
-    $cloneCode.find('.translate').html("")
+    $cloneCode.find('.translate').html("");
+    // 移除悬浮工具栏
+    $cloneCode.find('.airVoicePlayback').removeClass('active').html("");
     return $cloneCode[0].innerHTML;
 }
 
@@ -560,7 +646,9 @@ function getCursortPosition(element) {
  * @returns {any} "00:00"
  */
 function formatMillisecond(millisecond) {
-    if (millisecond < 1000) {
+    if (0 == millisecond) {
+        return '00:00'
+    } else if (millisecond < 1000) {
         return '00:01'
     } else if (millisecond < 3600000) {
         var minutes = parseInt(millisecond / (1000 * 60));
@@ -678,26 +766,40 @@ function removeNullP() {
 }
 
 /**
+ * 更新语音播放控件状态
+ * @param {jquery object} playback 语音播放控件 voicePlayback
+ * @param {int} state 0,播放中，1暂停中，2.结束播放
+ */
+function updatePlayBackState(playback, state) {
+    if (null === playback) {
+        console.warn('No active voice playback object');
+        return;
+    }
+
+    if (state == '0') {     
+        playback.removeClass('pause');
+        playback.addClass('play');
+    } else if (state == '1') {
+        playback.addClass('pause');
+    } else {
+        // 重置状态
+        var progressBar = playback.find('.progressBar').get(0);
+        progressBar.value = 0;
+        updateProgressBarValue(progressBar, progressBar.value);
+
+        playback.removeClass('play').removeClass('pause');
+    }
+}
+
+/**
  * 切换播放状态
  * @date 2021-08-19
  * @param {string} state 0,播放中，1暂停中，2.结束播放
  * @returns {any}
  */
 function toggleState(state) {
-    if (state == '0') {
-        $('.voicebtn').removeClass('pause').addClass('play');
-        activeVoice.removeClass('play').addClass('pause');
-        voicePlay(true);
-    } else if (state == '1') {
-        activeVoice.removeClass('pause').addClass('play');
-        voicePlay(false);
-    }
-    else {
-        $('.voicebtn').removeClass('pause').addClass('play');
-        $('.voicebtn').removeClass('now');
-        activeVoice = null;
-        voicePlay(false);
-    }
+    updatePlayBackState(activePlayback, state);
+    updatePlayBackState(airVoicePlayback, state);
 }
 
 /**
@@ -762,10 +864,9 @@ function transHtml(json, flag) {
     json.jsonValue = strJson;
     var template;
     if (flag) {
-        template = Handlebars.compile(nodeTpl);
-    }
-    else {
-        template = Handlebars.compile(h5Tpl);
+        template = Handlebars.compile(nodeTplV2);
+    } else {
+        template = Handlebars.compile(h5TplV2);
     }
     var retHtml = template(json);
     return retHtml;
@@ -778,46 +879,6 @@ function enableSummerNote() {
     }
     else {
         $('#summernote').summernote('enable');
-    }
-}
-
-// 录音播放控制， bIsPaly=ture 表示播放。
-function voicePlay(bIsPaly) {
-    clearInterval(voiceIntervalObj);
-    $('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four').removeClass('fifth').removeClass('sixth').removeClass('seventh');
-
-    if (bIsPaly) {
-        var index = 0;
-        voiceIntervalObj = setInterval(function () {
-            if (activeVoice && activeVoice.hasClass('pause')) {
-                var voiceObj = activeVoice.parent().find('.wifi-circle');
-                index++;
-                switch (index) {
-                    case 1:
-                        voiceObj.removeClass('seventh').addClass('first');
-                        break;
-                    case 2:
-                        voiceObj.removeClass('first').addClass('second');
-                        break;
-                    case 3:
-                        voiceObj.removeClass('second').addClass('third');
-                        break;
-                    case 4:
-                        voiceObj.removeClass('third').addClass('four');
-                        break;
-                    case 5:
-                        voiceObj.removeClass('four').addClass('fifth');
-                        break;
-                    case 6:
-                        voiceObj.removeClass('fifth').addClass('sixth');
-                        break;
-                    case 7:
-                        voiceObj.removeClass('sixth').addClass('seventh');
-                        index = 0;
-                        break;
-                }
-            }
-        }, 200);
     }
 }
 
@@ -866,7 +927,7 @@ function rightClick(e) {
 function setVoiceButColor(color, shdow) {
     $("#style").html(`
     .voiceBox .voicebtn {
-        background-color:${color};
+        background-color: ${color};
         box-shadow: 0px 4px 6px 0px ${shdow}80; 
     } 
     ::selection {
@@ -886,6 +947,10 @@ function setVoiceButColor(color, shdow) {
     }
     .active {
         background: ${color}80!important;
+    }
+
+    :root {
+        --highlightColor: ${color};
     }
     `)
 }
@@ -924,11 +989,13 @@ function changeColor(flag, activeColor, disableColor, backgroundColor) {
         }
     })
     $('body').css('background-color', global_themeColor)
-    if (flag == 1) {
+    if (flag == 1) {        
+        $('body').removeClass('dark');
         $('#dark').remove()
         $('.dropdown-fontsize>li>a').css('color', "black");
         $('.dropdown-fontname>li>a').css('color', "black");
     } else if (flag == 2 && !$('#dark').length) {
+        $('body').addClass('dark');
         $("head").append("<link>");
         var css = $("head").children(":last");
         css.attr({
@@ -1239,4 +1306,138 @@ function setSelectColorButton($dom) {
     $dom.addClass('selectColor')
 }
 
+/***** 以下为语音播放相关函数 *****/
 
+function setAirVoicePlaybackVisible(visible) {
+    if (visible) {
+        airVoicePlayback.parents('.airVoicePlaybackContainer').fadeIn(366);
+    } else {
+        airVoicePlayback.parents('.airVoicePlaybackContainer').fadeOut(366);
+    }
+}
+
+/*
+ * 点击悬浮语音播放控件关闭按钮，停止播放，重置语音状态
+ */
+$('body').on('click', '.closePlaybackBarBtn', function (e) {
+    webobj.jsCallPlayVoiceStop();
+    setAirVoicePlaybackVisible(false);
+})
+
+/**
+ * 检测当前语音播放控件是否在可视范围内，若在可视范围内，则更新浮动窗口状态
+ */
+function checkVoicePlaybackViewport() {
+    if (null === activePlayback || !activePlayback.hasClass('play')) {
+        return;
+    }
+
+    // 获取原生 DOM 对象
+    var rect = activePlayback.get(0).getBoundingClientRect();
+
+    var inViewport = Boolean(
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+
+    setAirVoicePlaybackVisible(!inViewport);
+}
+
+window.addEventListener('scroll', checkVoicePlaybackViewport)
+window.addEventListener('resize', checkVoicePlaybackViewport)
+
+function resetAirVoicePlayback() {
+    if (null === activePlayback) {
+        return;
+    }
+
+    // 重置时当前voicePlayback一定在可视范围内
+    setAirVoicePlaybackVisible(false);
+
+    // 同步数据
+    airVoicePlayback.find('.title').text(activePlayback.find('.title').text());
+    airVoicePlayback.find('.timeTotal').text(activePlayback.find('.timeTotal').text());
+    airVoicePlayback.find('.progressBar').get(0).max = parseFloat(activePlayback.find('.progressBar').get(0).max);
+}
+
+/**
+ * 添加悬浮的语音播放控件
+ */
+function addAirVoicePlayback() {
+    var airEle = document.createElement('div');
+    airEle.className = 'airVoicePlaybackContainer';
+    airEle.innerHTML = airVoicePlayBackTemplate;
+    $('#summernote').after(airEle);
+
+    airVoicePlayback = $(airEle).find('.voicePlayback');
+    $(airEle).hide();
+}
+
+/**
+ * 当前进度条数值被手动拖拽，释放时触发
+ */
+function onProgressChange() {
+    const target = event.target
+    updateProgressBarValue(target, target.value);
+    progressBarDraging = false;
+
+    // 手动触发进度变更
+    webobj.jsCallVoiceProgressChange(target.value);
+}
+
+/**
+ * 当前进度条输入变更时触发
+ */
+function onProgressInput() {
+    progressBarDraging = true;
+    updateProgressBarValue(event.target, event.target.value);
+}
+
+/**
+ * 后端通知前端，语音播放进度变更时触发，更新进度条样式
+ * @param {int} value 当前已播放进度值 ms
+ */
+function updateProgressBar(value) {
+    if (progressBarDraging) {
+        return;
+    }
+
+    if (null !== activePlayback && activePlayback.hasClass('now')) {
+        var progressBar = activePlayback.find('.progressBar').get(0);
+        // 按秒进位
+        progressBar.value = (value / 1000) * 1000;
+        updateProgressBarValue(progressBar, progressBar.value);
+
+        // 同步更新浮动窗口进度条
+        var airProgressBar = airVoicePlayback.find('.progressBar').get(0);
+        airProgressBar.value = progressBar.value;
+        updateProgressBarValue(airProgressBar, progressBar.value);
+    }
+}
+
+/**
+ * 语音播放进度tick变更时触发，更新进度条样式
+ * @param {dom} target 进度条对象
+ * @param {int} value 当前进度tick值 ms
+ */
+function updateProgressBarValue(target, value) {
+    if (0 == target.max) {
+        console.error('updateProgressBar error: max is 0');
+        return;
+    }
+
+    const ratio = (parseFloat(value) / parseFloat(target.max)) * 100;
+    // 设置自定义属性以控制伪元素的进度条宽度
+    target.style.setProperty('--progressValue', `${ratio}%`);
+
+    // 更新实时进度时间
+    var timePassed = formatMillisecond(value) + '/';
+    $(activePlayback).find('.timePassed').text(timePassed);
+    $(airVoicePlayback).find('.timePassed').text(timePassed);
+
+    console.warn('updateProgressBarValue', value, target.max, ratio);
+}
+
+/***** 语音播放相关函数 end *****/
