@@ -2,12 +2,13 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "webenginehandler.h"
+#include "web_engine_handler.h"
 #include "jscontent.h"
 #include "metadataparser.h"
 #include "vnoteitem.h"
 #include "actionmanager.h"
 #include "vtextspeechandtrmanager.h"
+#include "voice_player_handler.h"
 
 #include <QCursor>
 #include <QDBusInterface>
@@ -25,13 +26,13 @@
 
 // 获取字号接口
 #ifdef OS_BUILD_V23
-#    define DEEPIN_DAEMON_APPEARANCE_SERVICE "org.deepin.dde.Appearance1"
-#    define DEEPIN_DAEMON_APPEARANCE_PATH "/org/deepin/dde/Appearance1"
-#    define DEEPIN_DAEMON_APPEARANCE_INTERFACE "org.deepin.dde.Appearance1"
+#define DEEPIN_DAEMON_APPEARANCE_SERVICE "org.deepin.dde.Appearance1"
+#define DEEPIN_DAEMON_APPEARANCE_PATH "/org/deepin/dde/Appearance1"
+#define DEEPIN_DAEMON_APPEARANCE_INTERFACE "org.deepin.dde.Appearance1"
 #else
-#    define DEEPIN_DAEMON_APPEARANCE_SERVICE "com.deepin.daemon.Appearance"
-#    define DEEPIN_DAEMON_APPEARANCE_PATH "/com/deepin/daemon/Appearance"
-#    define DEEPIN_DAEMON_APPEARANCE_INTERFACE "com.deepin.daemon.Appearance"
+#define DEEPIN_DAEMON_APPEARANCE_SERVICE "com.deepin.daemon.Appearance"
+#define DEEPIN_DAEMON_APPEARANCE_PATH "/com/deepin/daemon/Appearance"
+#define DEEPIN_DAEMON_APPEARANCE_INTERFACE "com.deepin.daemon.Appearance"
 #endif
 
 DGUI_USE_NAMESPACE
@@ -44,12 +45,14 @@ DGUI_USE_NAMESPACE
 
 WebEngineHandler::WebEngineHandler(QObject *parent)
     : QObject { parent }
+    , voicePlayerHandler(new VoicePlayerHandler(this))
 {
     initFontsInformation();
     connectWebContent();
 
-    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged,
-            this, &WebEngineHandler::onThemeChanged);
+    connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged, this, &WebEngineHandler::onThemeChanged);
+    //
+    connect(ActionManager::instance(), &ActionManager::actionTriggered, this, &WebEngineHandler::onMenuClicked);
 }
 
 /**
@@ -63,9 +66,8 @@ void WebEngineHandler::initFontsInformation()
                                                    DEEPIN_DAEMON_APPEARANCE_INTERFACE,
                                                    QDBusConnection::sessionBus());
     if (m_appearanceDBusInterface->isValid()) {
-        qInfo() << "字体服务初始化成功！字体服务： " << DEEPIN_DAEMON_APPEARANCE_SERVICE
-                << " 地址：" << DEEPIN_DAEMON_APPEARANCE_PATH
-                << " 接口：" << DEEPIN_DAEMON_APPEARANCE_INTERFACE;
+        qInfo() << "字体服务初始化成功！字体服务： " << DEEPIN_DAEMON_APPEARANCE_SERVICE << " 地址："
+                << DEEPIN_DAEMON_APPEARANCE_PATH << " 接口：" << DEEPIN_DAEMON_APPEARANCE_INTERFACE;
         // 获取默认字体
         QString defaultfont = m_appearanceDBusInterface->property("StandardFont").value<QString>();
         // 获取字体列表
@@ -129,18 +131,46 @@ void WebEngineHandler::connectWebContent()
 void WebEngineHandler::onContextMenuRequested(QWebEngineContextMenuRequest *request)
 {
     switch (menuType) {
-    case VoiceMenu: {
-        processVoiceMenuRequest(request);
-    } break;
-    case PictureMenu: {
-        Q_EMIT requestShowMenu(menuType, request->position());
-    } break;
-    case TxtMenu: {
-        processTextMenuRequest(request);
-    } break;
-    default:
-        break;
+        case VoiceMenu: {
+            processVoiceMenuRequest(request);
+        } break;
+        case PictureMenu: {
+            Q_EMIT requestShowMenu(menuType, request->position());
+        } break;
+        case TxtMenu: {
+            processTextMenuRequest(request);
+        } break;
+        default:
+            break;
     }
+}
+
+/**
+   @brief 插入音频文件， \a voicePath 为音频文件路径， \a voiceSize 为音频的长度，单位 ms
+ */
+void WebEngineHandler::onInsertVoiceItem(const QString &voicePath, quint64 voiceSize)
+{
+    qWarning() << "insert voice item";
+
+    VNVoiceBlock data;
+    data.ptrVoice->voiceSize = voiceSize;
+    data.ptrVoice->voicePath = voicePath;
+    data.ptrVoice->createTime = QDateTime::currentDateTime();
+    data.ptrVoice->voiceTitle = data.ptrVoice->createTime.toString("yyyyMMdd hh.mm.ss");
+
+    MetaDataParser parse;
+    QVariant value;
+    parse.makeMetaData(&data, value);
+
+    // 关闭应用时，需要同步插入语音并进行后台更新
+    if (OpsStateInterface::instance()->isAppQuit()) {
+        // TODO: 完善同步退出处理
+        // JsContent::instance()->callJsSynchronous(page(), QString("insertVoiceItem('%1')").arg(value.toString()));
+        //     m_textChange = true;
+        //     update();
+        // return;
+    }
+    emit JsContent::instance()->callJsInsertVoice(value.toString());
 }
 
 /**
@@ -160,13 +190,31 @@ void WebEngineHandler::onThemeChanged()
     emit JsContent::instance()->callJsSetTheme(theme, activeHightColor, disableHightColor, dp.base().color().name());
 }
 
-/*!
- * \brief 接收 web 弹出菜单类型 \a menuType 及数据 \a json
+/**
+ * @brief 接收 web 弹出菜单类型 \a menuType 及数据 \a json
  */
 void WebEngineHandler::onSaveMenuParam(int type, const QVariant &json)
 {
     menuType = static_cast<Menu>(type);
     menuJson = json;
+}
+
+/**
+   @brief 右键菜单点击时触发，根据不同动作类型 \a kind 执行对应操作
+ */
+void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
+{
+    switch (kind) {
+        case ActionManager::VoiceAsSave:
+            // TODO 本地测试：
+            // onInsertVoiceItem("test.mp3", 12850);
+            break;
+        case ActionManager::VoiceToText:
+            Q_EMIT asrStart(voiceBlock);
+            break;
+        default:
+            break;
+    }
 }
 
 /*!
@@ -205,9 +253,9 @@ void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *req
  */
 void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *request)
 {
-    ActionManager::instance()->resetCtxMenu(ActionManager::MenuType::TxtCtxMenu, false);   // 重置菜单选项
-    bool isAlSrvAvailabel = OpsStateInterface::instance()->isAiSrvExist();   // 获取语音服务是否可用
-    bool TTSisWorking = VTextSpeechAndTrManager::isTextToSpeechInWorking();   // 获取语音服务是否正在朗读
+    ActionManager::instance()->resetCtxMenu(ActionManager::MenuType::TxtCtxMenu, false);  // 重置菜单选项
+    bool isAlSrvAvailabel = OpsStateInterface::instance()->isAiSrvExist();                // 获取语音服务是否可用
+    bool TTSisWorking = VTextSpeechAndTrManager::isTextToSpeechInWorking();               // 获取语音服务是否正在朗读
     // 设置语音服务选项状态
     if (isAlSrvAvailabel) {
         if (TTSisWorking) {

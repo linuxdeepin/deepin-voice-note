@@ -1,0 +1,278 @@
+/**
+ * @brief 用于语音记事本 语音播放控件 的样式设计
+ * @detail 包含了语音播放进度条、播放按钮、暂停按钮、音量调节按钮等样式设计
+ *         以及语音播放进度条下方的语音转文字内容
+ * @code
+ *      <div class="voiceInfoBox">
+ *          <div class="voicePlayback"></div>
+ *          <div class="translate"></div>
+ *      </div>         
+ * @endcode
+ * 
+ * 播放状态主要由 voicePlayback 控制，包含 now play pause voiceToText 状态
+ * @list
+ *  @li now 当前激活的控件，全局状态唯一，标识当前激活状态的控件
+ *  @li play 播放状态
+ *  @li pause 暂停状态 配合 play 使用，标识此时播放处于暂停状态
+ *  @li voiceToText 语音转文字状态，状态独占且唯一，此时音频不再响应播放按钮的点击事件
+ * @endlist
+ *
+ * 语音转文字标识会写入 voiceInfoBox 增加 containText 状态，此时已生成语音转文字内容
+ */
+
+:root {
+    /* 默认高亮色 */
+    --highlightColor: rgb(0, 91, 255);
+}
+
+.voicePlayback {
+    height: 42px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 12px;
+    /* 深色模式背景配置位于 dark.css */
+    background-color: rgba(245, 245, 245, 0.5);
+}
+
+.voicePlayback .voiceBtn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    will-change: transform;
+}
+
+.voicebtn:hover::before {
+    content: "";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.voicebtn:active::before {
+    content: "";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+
+/* 语音进度条 */
+.voicePlayback input[type="range"] {
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 50%;
+    height: 24px;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    background: repeating-linear-gradient(to right,
+            #BFC0C0,
+            #BFC0C0 2px,
+            transparent 2px,
+            transparent 3px);
+    background-repeat: no-repeat;
+    background-size: 100% 2px;
+    background-position: center;
+    /* 用于调整伪元素属性的动态变量 */
+    --progressValue: 0%;
+}
+
+.voicePlayback input[type="range"]::-webkit-slider-runnable-track {
+    width: 100px;
+    height: 2px;
+    position: horizontal;
+    /* 需要适配活动色 */
+    background: repeating-linear-gradient(to right,
+            var(--highlightColor),
+            var(--highlightColor) 2px,
+            transparent 2px,
+            transparent 3px);
+    background-repeat: no-repeat;
+    background-size: var(--progressValue);
+    border: none;
+    border-radius: 0;
+}
+
+.voicePlayback input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    background: rgb(77, 77, 77);
+    /* 外阴影和内阴影 */
+    box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5),
+        0px -1px 0px 0px rgba(0, 0, 0, 0.2) inset;
+    border-radius: 4px;
+    transform: translateY(-7px);
+    cursor: pointer;
+}
+
+.voicePlayback input[type="range"]:focus {
+    outline: none;
+}
+
+.voicePlayback .left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 10px;
+    /* 最小宽度，保证不被折叠 */
+    min-width: 160px;
+}
+
+.voicePlayback .left .title {
+    font-size: 14px;
+    color: black;
+}
+
+.voicePlayback .right {
+    margin-right: 10px;
+    justify-content: right;
+    align-items: center;
+    display: flex;
+    min-width: 100px;
+    user-select: none;
+}
+
+/********** 悬浮语言播放控件 **********/
+.airVoicePlaybackContainer {
+    position: fixed;
+    bottom: 0;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    /* 尽量占满空间，少的10px是由于滚动条 */
+    width: calc(100% - 10px);
+    /* 保证悬浮控件在其他控件之上 */
+    z-index: 1000;
+}
+
+.airVoicePlaybackContainer::before {
+    content: '';
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    background-size: cover;
+    filter: blur(20px);
+    z-index: -1;
+}
+
+.airVoicePlaybackContainer .voicePlayback {
+    background-color: #F8F8F8;
+    box-shadow: 0px 4px 8px 0px rgb(0, 0, 0, 0.1);
+}
+
+.airVoicePlaybackContainer .voicePlayback .right {
+    min-width: 120px;
+}
+
+.voicePlayback .closePlaybackBarBtn {
+    display: none;
+}
+
+.airVoicePlaybackContainer .closePlaybackBarBtn {
+    margin-left: 10px;
+    align-items: horizontal;
+    display: block;
+    width: 16px;
+    height: 16px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+/********** 状态控制，不同状态下各组件显示 **********/
+.voicePlayback .timeField {
+    display: flex;
+}
+
+.voicePlayback .progressBar,
+.voicePlayback .timePassed,
+.voicePlayback .voiceToTextLabel {
+    display: none;
+}
+
+.voicePlayback.play .progressBar,
+.voicePlayback.play .timePassed {
+    display: flex;
+}
+
+.voicePlayback.play .voiceToTextLabel {
+    display: none;
+}
+
+.voicePlayback.voiceToText .timeField {
+    display: none;
+}
+
+.voicePlayback.voiceToText .voiceToTextLabel {
+    display: flex;
+}
+
+.voiceInfoBox.containText .voicePlayback {
+    border-radius: 12px 12px 0px 0px;
+}
+
+.voiceInfoBox.containText .translate {
+    border-radius: 0px 0px 12px 12px;
+}
+
+
+/********** 状态控制，不同状态下各组件图标 **********/
+/* 默认状态的播放按钮 */
+.voicePlayback .voiceBtn {
+    background-image: url('../img/audio_file_play/Normal/Light.svg');
+}
+
+.body.dark .voicePlayback .voiceBtn {
+    background-image: url('../img/audio_file_play/Normal/Dark.svg');
+}
+
+.voicePlayback .voiceBtn:hover {
+    background-image: url('../img/audio_file_play/Hover/Light.svg');
+}
+
+.body.dark .voicePlayback .voiceBtn:hover {
+    background-image: url('../img/audio_file_play/Hover/Dark.svg');
+}
+
+.voicePlayback .voiceBtn:active {
+    background-image: url('../img/audio_file_play/Pressed/Light.svg');
+}
+
+.body.dark .voicePlayback .voiceBtn:active {
+    background-image: url('../img/audio_file_play/Pressed/Dark.svg');
+}
+
+/* 播放状态的播放暂停按钮 */
+.voicePlayback.play .voiceBtn {
+    background-image: url('../img/audio_file_playing_pause/Normal.svg');
+}
+
+.voicePlayback.pause .voiceBtn {
+    background-image: url('../img/audio_file_playing_play/Normal.svg');
+}
+
+/* 悬浮播放控件 */
+.airVoicePlaybackContainer .voicePlayback.play .voiceBtn {
+    background-image: url('../img/playbar_pause/Normal.svg');
+}
+
+.airVoicePlaybackContainer .voicePlayback .voiceBtn,
+.airVoicePlaybackContainer .voicePlayback.pause .voiceBtn {
+    background-image: url('../img/playbar_play/Normal.svg');
+}
+
+.airVoicePlaybackContainer .closePlaybackBarBtn {
+    background-image: url('../img/playbar_pause_close/Normal.svg');
+}

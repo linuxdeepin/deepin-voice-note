@@ -12,9 +12,10 @@
 #include "setting.h"
 #include "task/exportnoteworker.h"
 #include "globaldef.h"
-#include "webenginehandler.h"
 #include "actionmanager.h"
 #include "utils.h"
+#include "handler/web_engine_handler.h"
+#include "handler/voice_player_handler.h"
 
 #include <QThreadPool>
 #include <QQmlApplicationEngine>
@@ -84,7 +85,9 @@ void VNoteMainManager::initQMLRegister()
     // 菜单项管理
     qmlRegisterSingletonType<ActionManager>("VNote", 1, 0, "ActionManager", actionManager_provider);
 
+    // QML组件访问后端调用
     qmlRegisterType<WebEngineHandler>("VNote", 1, 0, "WebEngineHandler");
+    qmlRegisterType<VoicePlayerHandler>("VNote", 1, 0, "VoicePlayerHandler");
 }
 
 void VNoteMainManager::onVNoteFoldersLoaded()

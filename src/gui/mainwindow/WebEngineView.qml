@@ -10,7 +10,6 @@ import QtWebChannel 1.15
 import QtWebEngine 1.15
 import Qt.labs.platform
 import org.deepin.dtk 1.0
-
 import VNote 1.0
 
 Item {
@@ -18,18 +17,24 @@ Item {
 
     ColumnLayout {
         id: columnLayout
-        spacing: 0
+
         anchors.fill: parent
-        WindowTitleBar {
+        spacing: 0
+
+        TitleBar {
             id: title
+
+            Layout.fillWidth: true
+            height: 40
         }
 
         WebEngineView {
             id: webView
 
+            Layout.fillHeight: true
+
             // anchors.fill: parent
             Layout.fillWidth: true
-            Layout.fillHeight: true
 
             Component.onCompleted: {
                 noteWebChannel.registerObject("webobj", Webobj);
@@ -44,9 +49,14 @@ Item {
                 // 响应右键菜单，处理完成后 handler 抛出 requestShowMenu() 信号
                 handler.onContextMenuRequested(req);
             }
+            onJavaScriptConsoleMessage: {
+                // 调试使用，打印控制台输出
+                console.debug("--- from web: ", message, sourceID, lineNumber);
+            }
 
             WebEngineHandler {
                 id: handler
+
             }
 
             WebChannel {
