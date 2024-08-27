@@ -31,6 +31,7 @@ aux_source_directory(./common ALLSOURCE)
 aux_source_directory(./db ALLSOURCE)
 aux_source_directory(./gui ALLSOURCE)
 aux_source_directory(./task ALLSOURCE)
+aux_source_directory(./handler ALLSOURCE)
 
 add_executable(${BIN_NAME} ${ALLSOURCE} ${RESOURCES})
 
@@ -45,6 +46,19 @@ target_link_libraries(${BIN_NAME} PRIVATE
     Dtk6::Gui
     Dtk6::Widget
 )
+
+if(SUPPROT_DMR)
+    add_definitions(-DMPV_PLAYENGINE)
+
+    message("-- Build with libdmr")
+else()
+    pkg_check_modules(LIBVLC REQUIRED libvlc)
+    include_directories(${LIBVLC_INCLUDE_DIRS})
+    target_link_libraries(${BIN_NAME} PRIVATE ${LIBVLC_LIBRARIES})
+
+    message("-- Build with libvlc, found:" ${LIBVLC_FOUND})
+endif()
+
 
 # Add install rule
 install(TARGETS ${BIN_NAME} DESTINATION ${APP_BIN_INSTALL_DIR})

@@ -145,6 +145,23 @@ QString JsContent::jsCallGetTranslation()
     return doc.toJson(QJsonDocument::Compact);
 }
 
+/**
+   @brief Js前端调用停止播放
+ */
+void JsContent::jsCallPlayVoiceStop()
+{
+    Q_EMIT playVoiceStop();
+}
+
+/**
+   @brief 变更播放进度，仅在手动拖拽进度条时触发
+   @param progressMs 拖拽后的进度毫秒(ms)值
+ */
+void JsContent::jsCallVoiceProgressChange(qint64 progressMs)
+{
+    Q_EMIT playVoiceProgressChange(progressMs);
+}
+
 QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &funtion)
 {
     QVariant synResult;

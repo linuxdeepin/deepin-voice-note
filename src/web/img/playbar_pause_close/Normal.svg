@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>D/playbar_pause_close/Normal</title>
+    <g id="D/playbar_pause_close/Normal" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" fill-opacity="0.7">
+        <g id="DTK/按钮/工具按钮/IconButton-Light" fill="#000000" fill-rule="nonzero">
+            <g id="ICON" transform="translate(3.5, 3.5)">
+                <polygon id="路径" points="9 0.75 5.24925 4.49925 9 8.25 8.25 9 4.49925 5.24925 0.75 9 0 8.25 3.74925 4.49925 8.38429373e-14 0.75 0.75 2.56239089e-13 4.49925 3.74925 8.25 0"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>
