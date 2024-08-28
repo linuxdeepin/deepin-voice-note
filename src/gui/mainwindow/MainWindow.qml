@@ -39,7 +39,7 @@ ApplicationWindow {
             for (var i = 0; i < notesData.length; i++) {
                 var itemIsTop = notesData[i].isTop ? "top" : "normal"
                 itemListView.model.append({name: notesData[i].name, time: notesData[i].time, isTop: itemIsTop,
-                                              icon: notesData[i].icon, folderName: notesData[i].folderName})
+                                              icon: notesData[i].icon, folderName: notesData[i].folderName, noteId: notesData[i].noteId})
             }
         }
         target: VNoteMainManager
@@ -67,6 +67,15 @@ ApplicationWindow {
             folderListView.enabled = false
             createFolderButton.enabled = false
         }
+        onMoveFinished: {
+            console.warn("----------", index, srcFolderIndex, dstFolderIndex)
+            console.warn(folderListView.model.get(srcFolderIndex).count)
+            folderListView.model.get(srcFolderIndex).count = (Number(folderListView.model.get(srcFolderIndex).count) - index.length).toString()
+            folderListView.model.get(dstFolderIndex).count = (Number(folderListView.model.get(dstFolderIndex).count) + index.length).toString()
+            for (var i = 0; i < index.length; i++) {
+                itemListView.model.remove(index[i])
+            }
+        }
     }
 
     IconLabel {
@@ -79,15 +88,32 @@ ApplicationWindow {
         z: 100
     }
 
+    ToolButton {
+        id: twoColumnModeBtn
+        icon.name: "topleft"
+        icon.width: 30
+        icon.height: 30
+        width: 30
+        height: 30
+        x: 50
+        y: 5
+        z: 100
+
+        onClicked: {
+            toggleTwoColumnMode()
+        }
+    }
+
     RowLayout {
         id: rowLayout
         anchors.fill: parent
+        spacing: 0
 
         Rectangle {
             id: leftBgArea
             Layout.preferredWidth: leftViewWidth
-            Layout.fillHeight: true
-            color: DTK.themeType === ApplicationHelper.LightType ? Qt.rgba(1, 1, 1, 0.9)
+            Layout.fillHeight: true//#F2F6F8
+            color: DTK.themeType === ApplicationHelper.LightType ? Qt.rgba(242/255, 246/255, 248/255, 1)
                                                                   : Qt.rgba(16.0/255.0, 16.0/255.0, 16.0/255.0, 0.85)
             Rectangle {
                 width: 1
@@ -112,6 +138,9 @@ ApplicationWindow {
                         label.text = name
                         VNoteMainManager.vNoteFloderChanged(index)
                     }
+                    onFolderEmpty: {
+                        initRect.visible = true
+                    }
                 }
                 Button {
                     id: createFolderButton
@@ -131,13 +160,16 @@ ApplicationWindow {
                 onDropRelease: {
                     folderListView.dropItems(itemListView.selectedNoteItem)
                 }
+                onMulChoices: {
+                    webEngineView.toggleMultCho(choices)
+                }
             }
         }
         Rectangle {
             id: leftDragHandle
             Layout.preferredWidth: 5
             Layout.fillHeight: true
-            color: "transparent"
+            color: middeleBgArea.color
             MouseArea {
                 anchors.fill: parent
                 cursorShape: Qt.SizeHorCursor
@@ -176,6 +208,7 @@ ApplicationWindow {
                     }
                     Connections {
                         function onClicked(mouse) {
+                            folderListView.toggleSearch(false)
                             search.focus = false
                             if (itemListView.searchLoader.active) {
                                 itemListView.searchLoader.item.visible = false
@@ -202,6 +235,7 @@ ApplicationWindow {
                     id: itemListView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    moveToFolderDialog.folderModel: folderListView.model
 
                     onNoteItemChanged : {
                         VNoteMainManager.vNoteChanged(index)
@@ -213,7 +247,7 @@ ApplicationWindow {
             id: rightDragHandle
             Layout.preferredWidth: 5
             Layout.fillHeight: true
-            color: "transparent"
+            color: middeleBgArea.color
             MouseArea {
                 anchors.fill: parent
                 cursorShape: Qt.SizeHorCursor
@@ -278,6 +312,73 @@ ApplicationWindow {
             }
 
             target: initiaInterface
+        }
+    }
+
+    ParallelAnimation {
+        id: hideLeftArea
+        NumberAnimation {
+            target: leftBgArea
+            property: "width"
+            from: leftBgArea.width
+            to: 0
+            duration: 200
+        }
+        NumberAnimation {
+            target: middeleBgArea
+            property: "x"
+            from: leftViewWidth + 5
+            to: 0
+            duration: 200
+        }
+        NumberAnimation {
+            target: middeleBgArea
+            property: "width"
+            from: leftViewWidth
+            to: 260
+            duration: 200
+        }
+        onFinished: {
+            leftBgArea.visible = false
+        }
+        onStarted: {
+            leftDragHandle.visible = false
+        }
+    }
+    ParallelAnimation {
+        id: showLeftArea
+        NumberAnimation {
+            target: leftBgArea
+            property: "width"
+            from: 0
+            to: leftViewWidth
+            duration: 200
+        }
+        NumberAnimation {
+            target: middeleBgArea
+            property: "x"
+            from: 0
+            to: leftViewWidth + 5
+            duration: 200
+        }
+        NumberAnimation {
+            target: middeleBgArea
+            property: "width"
+            from: 260
+            to: leftViewWidth
+            duration: 200
+        }
+    }
+
+
+    function toggleTwoColumnMode() {
+        if (leftBgArea.visible === false) {
+            //TODO: 这加个动画
+            leftBgArea.visible = true
+            leftDragHandle.visible = true
+            showLeftArea.start()
+        } else {
+            hideLeftArea.start()
         }
     }
 }

@@ -8,6 +8,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtWebChannel 1.15
 import QtWebEngine 1.15
+import Qt.labs.platform
 import org.deepin.dtk 1.0
 
 import VNote 1.0
@@ -19,10 +20,8 @@ Item {
         id: columnLayout
         spacing: 0
         anchors.fill: parent
-        TitleBar {
+        WindowTitleBar {
             id: title
-            Layout.fillWidth: true
-            height: 40
         }
 
         WebEngineView {
@@ -53,6 +52,17 @@ Item {
             WebChannel {
                 id: noteWebChannel
 
+            }
+        }
+
+        Loader {
+            id: multipleChoicesLoader
+            Layout.fillWidth: parent.width
+            Layout.fillHeight: parent.height
+            visible: false
+
+            sourceComponent: MultipleChoices {
+                anchors.fill: parent
             }
         }
     }
@@ -114,6 +124,60 @@ Item {
                     }
                 }
             }
+        }
+    }
+
+    Loader {
+        id: selectImgLoader
+        active: false
+        asynchronous: true
+        sourceComponent: FileDialog {
+            id: fileDialog
+            fileMode: FileDialog.OpenFiles
+            nameFilters: ["Image file(*.jpg *.png *.bmp)"]
+            folder: StandardPaths.writableLocation(StandardPaths.PicturesLocation)
+            Component.onCompleted: {
+                fileDialog.open()
+            }
+            onAccepted: {
+                if (fileDialog.files.length > 0) {
+                    Webobj.callJsInsertImages(fileDialog.files);
+                }
+            }
+        }
+    }
+
+    Connections {
+        target: title
+
+        onCreateNote: {
+            VNoteMainManager.createNote()
+        }
+        onStartRecording: {
+            console.warn("--------------")
+        }
+        onInsertImage: {
+            if (!selectImgLoader.active) {
+                selectImgLoader.active = true
+            } else {
+                selectImgLoader.item.open()
+            }
+        }
+    }
+
+    function toggleMultCho(choices) {
+        if (choices > 1) {
+            webView.visible = false
+            if (!multipleChoicesLoader.active) {
+                multipleChoicesLoader.active = true
+            }
+            multipleChoicesLoader.visible = true
+            multipleChoicesLoader.item.visible = true
+            multipleChoicesLoader.item.selectSize = choices
+        } else {
+            multipleChoicesLoader.visible = false
+            webView.visible = true
+            multipleChoicesLoader.item.visible = false
         }
     }
 }

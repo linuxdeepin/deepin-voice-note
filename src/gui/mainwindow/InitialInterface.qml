@@ -39,6 +39,7 @@ Item {
         Text {
             id: description
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            wrapMode: Text.WordWrap
             text: qsTr("After creating a new notepad, you can start recording voice and text")
         }
 
@@ -55,10 +56,7 @@ Item {
     }
 
     function loadFinished(hasFile) {
-        if (hasFile) {
-            rootWindow.visible = false
-        } else {
-            isLoad = false
-        }
+        isLoad = false
+        rootWindow.visible = !hasFile
     }
     }
