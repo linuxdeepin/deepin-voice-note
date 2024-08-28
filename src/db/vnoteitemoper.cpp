@@ -310,9 +310,9 @@ bool VNoteItemOper::updateFolderId(VNoteItem *data)
     bool updateOK = false;
     if (nullptr != data) {
         UpdateNoteFolderIdDbVisitor updateNoteVisitor(VNoteDbManager::instance()->getVNoteDb(), data, nullptr);
-        // if (!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
-        //     updateOK = true;
-        // }
+        if (!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
+            updateOK = true;
+        }
     }
     return updateOK;
 }
