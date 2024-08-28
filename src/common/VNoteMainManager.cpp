@@ -237,6 +237,26 @@ void VNoteMainManager::vNoteChanged(const int &index)
     // m_rightViewHasFouse = false;
 }
 
+struct NoteCompare {
+    bool operator()(const QVariantMap &a, const QVariantMap &b) const {
+        // 比较 isTop 字段
+        bool aIsTop = a.value("isTop").toBool();
+        bool bIsTop = b.value("isTop").toBool();
+
+        if (aIsTop != bIsTop) {
+            // 如果 isTop 不相同，则 isTop 为 true 的排在前面
+            return aIsTop > bIsTop;
+        } else {
+            // 如果 isTop 相同，则根据 modifyTime 排序
+            QDateTime aModifyTime = QDateTime::fromString(a.value("time").toString(), "yyyy-MM-dd hh:mm:ss");
+            QDateTime bModifyTime = QDateTime::fromString(b.value("time").toString(), "yyyy-MM-dd hh:mm:ss");
+
+            // 对于相同 isTop 的笔记，按照最近修改时间降序排列
+            return aModifyTime > bModifyTime;
+        }
+    }
+};
+
 /**
  * @brief VNoteMainManager::loadNotes
  * @param folder
@@ -261,13 +281,17 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
                 data.insert("isTop", it->isTop);
                 data.insert("icon", QString::number(folder->defaultIcon));
                 data.insert("folderName", folder->name);
+                data.insert("noteId", it->noteId);
                 notesDataList.append(data);
                 m_noteItems.append(it);
-                if (it->isTop)
+                if (it->isTop) {
                     m_currentHasTop++;
+                }
                 notesCount++;
             }
             notes->lock.unlock();
+
+            std::sort(notesDataList.begin(), notesDataList.end(), NoteCompare());
 
             // Sort the view & set focus on first item
             //  m_middleView->onNoteChanged();
@@ -282,6 +306,9 @@ QList<QVariantMap> VNoteMainManager::sortNoteList(const QList<QVariantMap> &data
 {
     QList<QVariantMap> sortList;
     //TODO: 对笔记重新排序
+    foreach (auto item, sortList) {
+
+    }
     return sortList;
 }
 
@@ -307,7 +334,9 @@ void VNoteMainManager::createNote()
     m_noteItems.append(newNote);
     QVariantMap data;
     data.insert("name", newNote->noteTitle);
-    data.insert("time", newNote->modifyTime);
+    data.insert("time", Utils::convertDateTime(newNote->modifyTime));
+    data.insert("isTop", QString::number(newNote->isTop));
+    data.insert("noteId", newNote->noteId);
     emit addNoteAtHead(data);
 }
 
@@ -385,6 +414,27 @@ VNoteFolder *VNoteMainManager::getFloderById(const int &id)
     return nullptr;
 }
 
+int VNoteMainManager::getFloderIndexById(const int &id)
+{
+    VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
+    for (int i = 0; i < m_folderSort.size(); i++) {
+        int tmpIndex = m_folderSort.at(i).toInt();
+        VNoteFolder *folder = folders->folders.value(tmpIndex);
+        if (folder->id == id)
+            return i;
+    }
+    return -1;
+}
+
+VNoteItem *VNoteMainManager::getNoteById(const int &id)
+{
+    foreach (auto item, m_noteItems) {
+        if (item->noteId == id)
+            return item;
+    }
+    return nullptr;
+}
+
 VNoteItem *VNoteMainManager::getNoteByIndex(const int &index)
 {
     if (index < 0 || index >= m_noteItems.size()) {
@@ -436,6 +486,7 @@ void VNoteMainManager::moveNotes(const QVariantList &index, const int &folderInd
     VNoteItemOper noteOper;
     VNOTE_ITEMS_MAP *srcNotes = noteOper.getFolderNotes(item->folderId);
     VNOTE_ITEMS_MAP *destNotes = noteOper.getFolderNotes(folder->id);
+    int srcIndex = getFloderIndexById(item->folderId);
     foreach (auto i, index) {
         VNoteItem *note = getNoteByIndex(i.toInt());
         if (note->isTop)
@@ -452,16 +503,32 @@ void VNoteMainManager::moveNotes(const QVariantList &index, const int &folderInd
         noteOper.updateFolderId(note);
     }
     folder->maxNoteIdRef() += index.size();
+    emit moveFinished(index, srcIndex, folderIndex);
 }
 
-void VNoteMainManager::updateTop(const int &index, const bool &top)
+void VNoteMainManager::updateTop(const int &id, const bool &top)
 {
-    VNoteItem *note = getNoteByIndex(index);
+    VNoteItem *note = getNoteById(id);
     if (note == nullptr || note->isTop == top)
         return;
     VNoteItemOper noteOper(note);
     noteOper.updateTop(top);
     m_currentHasTop = top ? m_currentHasTop + 1 : m_currentHasTop - 1;
+
+    QList<QVariantMap> notesDataList;
+    for (auto it : m_noteItems) {
+        QVariantMap data;
+        data.insert("name", it->noteTitle);
+        data.insert("time", Utils::convertDateTime(it->modifyTime));
+        data.insert("isTop", it->isTop);
+        VNoteFolder *folder = getFloderById(it->folderId);
+        data.insert("icon", QString::number(folder->defaultIcon));
+        data.insert("folderName", folder->name);
+        data.insert("noteId", it->noteId);
+        notesDataList.append(data);
+    }
+    std::sort(notesDataList.begin(), notesDataList.end(), NoteCompare());
+    emit updateNotes(notesDataList);
 }
 
 void VNoteMainManager::onExportFinished(int err)
@@ -485,7 +552,6 @@ void VNoteMainManager::updateSort(const int &src, const int &dst)
 
 void VNoteMainManager::renameFolder(const int &index, const QString &name)
 {
-    qWarning() << "11111111111" << name;
     VNoteFolder *folder = getFloderByIndex(index);
     if (folder && name != folder->name) {
         VNoteFolderOper folderOper(folder);

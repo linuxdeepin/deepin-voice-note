@@ -21,15 +21,19 @@ Item {
 
     property var selectedNoteItem: []
     property int itemSpacing: 6
+    property int selectSize: 1
+    property int topSize: 0
     property bool isSearch: false
     property alias model: itemModel
     property alias searchLoader: noSearchResultsLoader
     property alias view: itemListView
+    property alias moveToFolderDialog: dialogWindow
     property var saveFilters: ["TXT(*.txt);;HTML(*.html)", "TXT(*.txt)", "HTML(*.html)", "MP3(*.mp3)"]
 
     signal noteItemChanged(int index)
     signal mouseChanged(int mousePosX, int mousePosY)
     signal dropRelease()
+    signal mulChoices(int choices)
 
     ListModel {
         id: itemModel
@@ -37,6 +41,10 @@ Item {
 
     MoveDialog {
         id: dialogWindow
+
+        onMoveToFolder: {
+            VNoteMainManager.moveNotes(selectedNoteItem, index)
+        }
     }
 
     DragControl {
@@ -112,7 +120,7 @@ Item {
             for (var i = 0; i < notesData.length; i++) {
                 var itemIsTop = notesData[i].isTop ? "top" : "normal"
                 itemModel.append({name: notesData[i].name, time: notesData[i].time, isTop: itemIsTop,
-                                 icon: notesData[i].icon, folderName: notesData[i].folderName})
+                                 icon: notesData[i].icon, folderName: notesData[i].folderName, noteId: notesData[i].noteId})
             }
         }
         target: VNoteMainManager
@@ -275,11 +283,13 @@ Item {
                             case Qt.ControlModifier:
                                 if (selectedNoteItem.indexOf(index) != -1) {
                                     selectedNoteItem.splice(selectedNoteItem.indexOf(index), 1)
+                                    selectSize = selectSize - 1
                                     itemListView.itemAtIndex(index).color = "white"
                                     noteNameLabel.color = "black"
                                     timeLabel.color = "#7F000000"
                                 } else {
                                     selectedNoteItem.push(index)
+                                    selectSize = selectSize + 1
                                     itemListView.itemAtIndex(index).color = "#FF1F6EE7"
                                     noteNameLabel.color = "white"
                                     timeLabel.color = "#7FFFFFFF"
@@ -290,6 +300,7 @@ Item {
                                 var endIndex = Math.max(index, itemListView.lastCurrentIndex)
                                 for (var i = startIndex; i <= endIndex; i++) {
                                     selectedNoteItem.push(i)
+                                    selectSize = selectSize + 1
                                     itemListView.itemAtIndex(i).color = "#FF1F6EE7"
                                     noteNameLabel.color = "white"
                                     timeLabel.color = "#7FFFFFFF"
@@ -314,6 +325,7 @@ Item {
                                 selectedNoteItem = []
                                 var item = itemListView.model.get(index)
                                 selectedNoteItem.push(index)
+                                selectSize = 1
                                 itemListView.currentIndex = index
                                 parent.color = "#FF1F6EE7"
                                 noteNameLabel.color = "white"
@@ -340,6 +352,7 @@ Item {
                             itemModel.remove(selectedNoteItem[i])
                         }
                         selectedNoteItem = []
+                        selectSize = 1
                         itemListView.lastCurrentIndex = -1
                         parent.color = "white"
                         noteNameLabel.color = "black"
@@ -373,14 +386,14 @@ Item {
                 height: section == "top" ? 16 : 10
                 color: "transparent"
                 Text {
-                    visible: section == "top"
+                    visible: section == "top" && !isSearch
                     anchors.left: parent.left
                     text: qsTr("Sticky Notes")
                     font.pixelSize: 12
                     color: "#b3000000"
                 }
                 Rectangle {
-                    visible: section != "top" && VNoteMainManager.getTop()
+                    visible: section != "top" && VNoteMainManager.getTop() && !isSearch
                     anchors.centerIn: parent
                     width: parent.width
                     height: 1
@@ -403,13 +416,13 @@ Item {
                 }
             }
             MenuItem {
-                text: qsTr("Sticky on Top")
+                text: itemModel.get(itemListView.contextIndex).isTop === "top" ? qsTr("untop") : qsTr("Top")
                 onTriggered: {
                     var setTop = true;
                     if (itemModel.get(itemListView.contextIndex).isTop === "top") {
                         setTop = false;
                     }
-                    VNoteMainManager.updateTop(itemListView.contextIndex, setTop)
+                    VNoteMainManager.updateTop(itemModel.get(itemListView.contextIndex).noteId, setTop)
                 }
             }
             MenuItem {
@@ -475,5 +488,9 @@ Item {
             var index = itemListView.currentIndex
             noteItemChanged(index)
         }
+    }
+
+    onSelectSizeChanged: {
+        mulChoices(selectSize)
     }
 }

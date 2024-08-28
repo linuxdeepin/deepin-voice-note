@@ -37,7 +37,7 @@ public:
     Q_INVOKABLE void deleteNote(const QList<int> &index);
     Q_INVOKABLE void moveNotes(const QVariantList &index, const int &folderIndex);
     Q_INVOKABLE void saveAs(const QVariantList &index, const QString &path, const SaveAsType type = Note);
-    Q_INVOKABLE void updateTop(const int &index, const bool &top);
+    Q_INVOKABLE void updateTop(const int &id, const bool &top);
     Q_INVOKABLE bool getTop();
     Q_INVOKABLE void updateSort(const int &src, const int &dst);
     Q_INVOKABLE void renameFolder(const int &index, const QString &name);
@@ -52,6 +52,7 @@ signals:
     void addFolderFinished(const QVariantMap &folderData);
     void noSearchResult();
     void searchFinished(const QList<QVariantMap> &notesData, const QString &key);
+    void moveFinished(const QVariantList &index, const int &srcFolderIndex, const int &dstFolderIndex);
 
 private slots:
     void onVNoteFoldersLoaded();
@@ -66,6 +67,8 @@ private:
 
     VNoteFolder* getFloderByIndex(const int &index);
     VNoteFolder* getFloderById(const int &id);
+    int getFloderIndexById(const int &id);
+    VNoteItem* getNoteById(const int &id);
     VNoteItem* getNoteByIndex(const int &index);
 
 private:

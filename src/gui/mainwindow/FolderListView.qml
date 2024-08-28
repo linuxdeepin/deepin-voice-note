@@ -18,6 +18,7 @@ Item {
     height: listHeight
     visible: true
     signal itemChanged(int index, string name)
+    signal folderEmpty()
 
     property alias model: folderListView.model
     property int lastDropIndex: -1
@@ -90,6 +91,13 @@ Item {
         item.renameLine.visible = isRename
     }
 
+    function toggleSearch(isSearch) {
+        if (!isSearch) {
+            var index = folderListView.currentIndex
+            itemChanged(index, folderModel.get(index).name) // 发出 itemChanged 信号
+        }
+    }
+
     Connections {
         target: VNoteMainManager
         onAddFolderFinished: {
@@ -113,6 +121,7 @@ Item {
         property var contextIndex: -1
         model: folderModel
         enabled: parent.enabled
+        clip: true
         function indexAt(mousePosX, mousePosY) {
             var pos = mapFromGlobal(mousePosX, mousePosY)
             var startY = itemHeight * 0.5
@@ -317,6 +326,8 @@ Item {
                     text: qsTr("Delete")
                     onTriggered: {
                         VNoteMainManager.vNoteDeleteFolder(folderListView.contextIndex)
+                        if (folderModel.count === 1)
+                            folderEmpty()
                         folderModel.remove(folderListView.contextIndex)
                         if (folderListView.contextIndex === 0) {
                             folderListView.currentIndex = 0
