@@ -86,11 +86,22 @@ var voicePlayBackTemplate = `
             <!-- 语音转文字 -->
             <div class="voiceToTextLabel">
                 <div class="voiceToTextIcon"></div>
-                <div class="waitingText">正在转为文字</div>
+                <div class="translatingLabel">{{translatingLabel}}</div>
             </div>
             <div class="closePlaybackBarBtn"></div>
         </div>
     </div>`;
+
+// 语音转文本模板 
+// noAirPopover 用于框选此 div 内容时不显示浮动编辑工具栏
+var translateTextContentTemplate = ` 
+    <div class="translateHeader">
+        <div class="translateIcon"></div>
+        <div class="translateLabel">{{translateLabel}}</div>
+        <div class="foldBtn"></div>
+    </div>
+    <div class="translateText noAirPopover">{{translateText}}</div>
+    `;
 
 // 悬浮语音播放控件，文档唯一
 var airVoicePlayBackTemplate = `
@@ -98,37 +109,29 @@ var airVoicePlayBackTemplate = `
         ${voicePlayBackTemplate}
     </div>`;
 
-var h5TplV2 = `
-    <div class="li voiceBox" contenteditable="false" jsonKey="{{jsonValue}}">
-        <div class='voiceInfoBox'>
-            ${voicePlayBackTemplate}
-            <!-- 语音转文字显示控件 -->
-            <div class="translate">
-            </div>
-        </div>
-    </div>
-    {{#if text}}
-    <p>{{text}}</p>
-    {{/if}}
-    `;
-
 var nodeTplV2 = `
-    <div class='voiceInfoBox'>
+    <!-- 语音播放/转文本控件 Version2 -->
+    <div class='voiceInfoBox version2'>
         ${voicePlayBackTemplate}
         <!-- 语音转文字显示控件 -->
         <div class="translate">
         </div>
     </div>`;
 
+var h5TplV2 = `
+    <div class="li voiceBox" contenteditable="false" jsonKey="{{jsonValue}}">
+        ${nodeTplV2}
+    </div>
+    {{#if text}}
+    <p>{{text}}</p>
+    {{/if}}
+    `;
+
 var formatHtml = ''
 var webobj;    //js与qt通信对象
 var progressBarDraging = false; // 进度条拖动状态
 var activePlayback = null;  //当前播放的语音对象
 var airVoicePlayback = null;  //悬浮播放对象
-
-var activeVoiceToText = null;  //当前执行语音转文字对象
-
-var activeVoice = null;  //当前正操作的语音对象
 var activeTransVoice = null;  //执行语音转文字对象
 var bTransVoiceIsReady = true;  //语音转文字是否准备好
 var initFinish = false;
@@ -162,6 +165,12 @@ var tooltipContent = {
     more: '更多颜色',
     recentlyUsed: '最近使用'
 }
+// 动态翻译内容
+var divTranslateContent = {
+    translatingLabel: '正在转为文字',
+    translateLabel: '语音转文字'
+}
+
 // 字体列表
 var global_fontList = []
 
@@ -176,6 +185,11 @@ function changeLang(tooltipContent) {
     }
 }
 
+function changeDivTextLang(divTranslateContent) {
+    for (let item in divTranslateContent) {
+        $(`${item}`).html(divTranslateContent[item]);
+    }
+}
 
 /**
  * 设置初始化字体
@@ -223,6 +237,10 @@ function setFontList(fontList, initFont) {
     // 获取翻译和字体列表后，再初始化summernote
     webobj.jsCallGetTranslation(function (res) {
         changeLang(JSON.parse(res))
+    })
+    webobj.jsCallDivTextTranslation(function (res) {
+        divTranslateContent = JSON.parse(res)
+        changeDivTextLang(divTranslateContent)
     })
 }
 
@@ -428,10 +446,13 @@ function copyVoice(event) {
     if ($(docFragment).find('.voiceBox').length != 0) {
         $(docFragment).find('.translate').html('')
         $(docFragment).find('.voiceBox').removeClass('active')
-
+        // V1
         $(docFragment).find('.voicebtn').removeClass('pause').addClass('play');
         $(docFragment).find('.voicebtn').removeClass('now');
         $(docFragment).find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four').removeClass('fifth').removeClass('sixth').removeClass('seventh');
+        // V2
+        $(docFragment).find('.voicePlayback').removeClass('now').removeClass('play').removeClass('pause').removeClass('voiceToText');
+        $(docFragment).find('.voiceInfoBox').removeClass('containText');
 
         isVoicePaste = true
 
@@ -584,9 +605,11 @@ function getHtml() {
     $cloneCode.find('.li').removeClass('active');
     $cloneCode.find('.voicebtn').removeClass('pause').addClass('play');
     $cloneCode.find('.voicebtn').removeClass('now');
-    $cloneCode.find('.voicePlayback').removeClass('now').removeClass('play').removeClass('pause').removeClass('voiceToText');
     $cloneCode.find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four').removeClass('fifth').removeClass('sixth').removeClass('seventh');
     $cloneCode.find('.translate').html("");
+    // V2
+    $cloneCode.find('.voicePlayback').removeClass('now').removeClass('play').removeClass('pause').removeClass('voiceToText');
+    $cloneCode.find('.voiceInfoBox').removeClass('containText');
     // 移除悬浮工具栏
     $cloneCode.find('.airVoicePlayback').removeClass('active').html("");
     return $cloneCode[0].innerHTML;
@@ -776,7 +799,7 @@ function updatePlayBackState(playback, state) {
         return;
     }
 
-    if (state == '0') {     
+    if (state == '0') {
         playback.removeClass('pause');
         playback.addClass('play');
     } else if (state == '1') {
@@ -788,6 +811,11 @@ function updatePlayBackState(playback, state) {
         updateProgressBarValue(progressBar, progressBar.value);
 
         playback.removeClass('play').removeClass('pause');
+
+        // 播放结束，关闭悬浮播放控件
+        if (playback.is(airVoicePlayback)) {
+            setAirVoicePlaybackVisible(false);
+        }
     }
 }
 
@@ -814,6 +842,10 @@ function setHtml(html) {
     }
     initFinish = false;
     $('#summernote').summernote('code', html);
+
+    // TODO: 实验性功能，替换 HTML 文本中的语音控件版本，不涉及数据的变更
+    replaceVoiceToVersion2();
+
     initFinish = true;
     // 搜索功能
     webobj.jsCallSetDataFinsh();
@@ -821,22 +853,46 @@ function setHtml(html) {
     $('#summernote').summernote('editor.resetRecord')
 }
 
-//设置录音转文字内容 flag: 0: 转换过程中 提示性文本（＂正在转文字中＂)１:结果 文本,空代表转失败了
+/**
+ * 设置录音转文字内容
+ * @param {string} text 转换文本内容，文本为空代表转失败了
+ * @param {boolean} flag 0: 转换过程中 提示性文本（＂正在转文字中＂) １: 结果
+ */
 function setVoiceText(text, flag) {
     if (activeTransVoice) {
         if (flag) {
-            $('.translate').html('')
+            // 需求/设计调整：不再直接追加转换文本到文件
+            // if (text) {
+            //     text = text.trim()
+            //     activeTransVoice.after('<p>' + text + '</p>');
+            //     webobj.jsCallTxtChange();
+            // }
+
             if (text) {
-                text = text.trim()
-                activeTransVoice.after('<p>' + text + '</p>');
-                webobj.jsCallTxtChange();
+                var translate = activeTransVoice.find('.translate');
+                // 转Json数据绑定到模板
+                var jsonData = {
+                    translateLabel: divTranslateContent.translateLabel,
+                    translateText: text
+                }
+                var textBindDataHandle = Handlebars.compile(translateTextContentTemplate);
+                const translateTexthtml = textBindDataHandle(jsonData);
+                translate.html(translateTexthtml);
+
+                activeTransVoice.find('.voiceInfoBox').addClass('containText');
+                translate.find('.translateHeader').addClass('unfold');
+                translate.hide();
+                translate.slideDown('fast');
             }
+
             //将转文字文本写到json属性里
             var jsonValue = activeTransVoice.attr('jsonKey');
             var jsonObj = JSON.parse(jsonValue);
             jsonObj.text = text;
             activeTransVoice.attr('jsonKey', JSON.stringify(jsonObj));
 
+            // 复位 
+            activeTransVoice.find('.voicePlayback').removeClass('voiceToText');
             webobj.jsCallTxtChange();
             activeTransVoice = null;
             bTransVoiceIsReady = true;
@@ -848,14 +904,21 @@ function setVoiceText(text, flag) {
             $('.li').removeClass('active');
         }
         else {
-            activeTransVoice.find('.translate').html('<div class="noselect">' + text + '</div><div class="showTextBox">' + text + '</div>');
-            bTransVoiceIsReady = false;
+            var voiceInfoBox = activeTransVoice.find('.voiceInfoBox');
+            if (!voiceInfoBox.hasClass('containText')) {
+                // 设置语音转换中标识，已有文本不再进行转换
+                activeTransVoice.find('.voicePlayback').addClass('voiceToText');
+                bTransVoiceIsReady = false;
+            }
         }
     }
 }
 
 //json串拼接成对应html串 flag==》》 false: h5串  true：node串
 function transHtml(json, flag) {
+    // 设置翻译提示 div 文本内容
+    json.translatingLabel = divTranslateContent.translatingLabel;
+
     let createTime = json.createTime.slice(0, 16)
     createTime = createTime.replace(/-/g, `/`)
     json.createTime = createTime
@@ -874,7 +937,7 @@ function transHtml(json, flag) {
 
 //设置summerNote编辑状态 
 function enableSummerNote() {
-    if (activeVoice || (activeTransVoice && !bTransVoiceIsReady)) {
+    if (activePlayback || (activeTransVoice && !bTransVoiceIsReady)) {
         $('#summernote').summernote('disable');
     }
     else {
@@ -949,6 +1012,10 @@ function setVoiceButColor(color, shdow) {
         background: ${color}80!important;
     }
 
+    .li:active .translateText::selection {
+        background-color: none !important;
+    }    
+
     :root {
         --highlightColor: ${color};
     }
@@ -989,7 +1056,7 @@ function changeColor(flag, activeColor, disableColor, backgroundColor) {
         }
     })
     $('body').css('background-color', global_themeColor)
-    if (flag == 1) {        
+    if (flag == 1) {
         $('body').removeClass('dark');
         $('#dark').remove()
         $('.dropdown-fontsize>li>a').css('color', "black");
@@ -1308,6 +1375,29 @@ function setSelectColorButton($dom) {
 
 /***** 以下为语音播放相关函数 *****/
 
+/**
+ * 替换语音控件为 Version2 版本，数据不会变更，继续使用原有 html 记录的 json 数据。
+ */
+function replaceVoiceToVersion2() {
+    $('.voiceInfoBox:not(.version2)').each(function (index, item) {
+        var jsonKeyString = $(item).parents('.voiceBox:first').attr('jsonKey');
+        if (!jsonKeyString) {
+            return;
+        }
+
+        var originJsonData = JSON.parse(jsonKeyString);
+        originJsonData.translatingLabel = divTranslateContent.translatingLabel;
+
+        var htmlBindDataHandle = Handlebars.compile(nodeTplV2);
+        const newVoiceInfoBoxHtml = htmlBindDataHandle(originJsonData);
+        $(item).replaceWith(newVoiceInfoBoxHtml);
+    });
+}
+
+/**
+ * 切换悬浮语音播放控件显示状态
+ * @param {boolean} visible 是否显示
+ */
 function setAirVoicePlaybackVisible(visible) {
     if (visible) {
         airVoicePlayback.parents('.airVoicePlaybackContainer').fadeIn(366);
@@ -1321,7 +1411,6 @@ function setAirVoicePlaybackVisible(visible) {
  */
 $('body').on('click', '.closePlaybackBarBtn', function (e) {
     webobj.jsCallPlayVoiceStop();
-    setAirVoicePlaybackVisible(false);
 })
 
 /**
@@ -1436,8 +1525,36 @@ function updateProgressBarValue(target, value) {
     var timePassed = formatMillisecond(value) + '/';
     $(activePlayback).find('.timePassed').text(timePassed);
     $(airVoicePlayback).find('.timePassed').text(timePassed);
-
-    console.warn('updateProgressBarValue', value, target.max, ratio);
 }
 
 /***** 语音播放相关函数 end *****/
+
+/***** 以下为语音转文本相关函数 *****/
+
+/**
+ * 点击语音转文本标题，切换语音转文本展开/折叠状态
+ */
+$('body').on('click', '.translateHeader', function (e) {
+    var target = $(e.target);
+    if (target.hasClass('translateHeader')) {
+        toggleVoiceToTextState(target);
+    } else {
+        toggleVoiceToTextState(target.parents('.translateHeader:first'));
+    }
+})
+
+function toggleVoiceToTextState(translateHeader) {
+    if (!translateHeader) {
+        return;
+    }
+
+    if (translateHeader.hasClass('unfold')) {
+        translateHeader.removeClass('unfold');
+        translateHeader.next('.translateText').slideUp('fast');
+    } else {
+        translateHeader.addClass('unfold');
+        translateHeader.next('.translateText').slideDown('fast');
+    }
+}
+
+/***** 语音转文本相关函数 end *****/

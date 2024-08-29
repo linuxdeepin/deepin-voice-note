@@ -7145,6 +7145,13 @@
                 || selStr == '') {
                 return this.hide();
             }
+
+            // 语音转文字('.translateText')字段的文本被选中，不显示浮动编辑工具栏
+            const activeTextarea = window.getSelection().anchorNode.parentNode;
+            if ($(activeTextarea).hasClass('noAirPopover')) {
+                return this.hide();
+            }
+
             if (styleInfo.range && !styleInfo.range.isCollapsed()) {
                 var rect = lists.last(styleInfo.range.getClientRects());
                 if (rect) {
