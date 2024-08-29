@@ -41,11 +41,11 @@ bool JsContent::insertImages(QStringList filePaths)
 {
     int count = 0;
     QStringList paths;
-    //获取文件夹路径
+    // 获取文件夹路径
     QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/images";
-    //创建文件夹
+    // 创建文件夹
     QDir().mkdir(dirPath);
-    //获取时间戳
+    // 获取时间戳
     QDateTime currentDateTime = QDateTime::currentDateTime();
     QString date = currentDateTime.toString("yyyyMMddhhmmss");
 
@@ -55,7 +55,7 @@ bool JsContent::insertImages(QStringList filePaths)
         if (!(suffix == "jpg" || suffix == "png" || suffix == "bmp")) {
             continue;
         }
-        //创建文件路径
+        // 创建文件路径
         QString newPath = QString("%1/%2_%3.%4").arg(dirPath).arg(date).arg(++count).arg(suffix);
         if (QFile::copy(path, newPath)) {
             paths.push_back(newPath);
@@ -76,16 +76,16 @@ bool JsContent::insertImages(QStringList filePaths)
  */
 bool JsContent::insertImages(const QImage &image)
 {
-    //获取文件夹路径
+    // 获取文件夹路径
     QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/images";
-    //创建文件夹
+    // 创建文件夹
     QDir().mkdir(dirPath);
-    //保存文件，文件名为当前年月日时分秒
+    // 保存文件，文件名为当前年月日时分秒
     QDateTime currentDateTime = QDateTime::currentDateTime();
     QString fileName = currentDateTime.toString("yyyyMMddhhmmss.png");
     QString imgPath = dirPath + "/" + fileName;
 
-    //保存文件
+    // 保存文件
     if (!image.save(imgPath)) {
         return false;
     }
@@ -126,22 +126,37 @@ void JsContent::jsCallPlayVoice(const QVariant &json, bool bIsSame)
 QString JsContent::jsCallGetTranslation()
 {
     static QJsonDocument doc;
-    // if (doc.isEmpty()) {
-    //     QJsonObject object;
-    //     object.insert("fontname", DApplication::translate("web", "Font"));
-    //     object.insert("fontsize", DApplication::translate("web", "Font size"));
-    //     object.insert("forecolor", DApplication::translate("web", "Font color"));
-    //     object.insert("backcolor", DApplication::translate("web", "Text highlight color"));
-    //     object.insert("bold", DApplication::translate("web", "Bold"));
-    //     object.insert("italic", DApplication::translate("web", "Italic"));
-    //     object.insert("underline", DApplication::translate("web", "Underline"));
-    //     object.insert("strikethrough", DApplication::translate("web", "Strikethrough"));
-    //     object.insert("ul", DApplication::translate("web", "Bullets"));
-    //     object.insert("ol", DApplication::translate("web", "Numbering"));
-    //     object.insert("more", DApplication::translate("web", "More colors"));
-    //     object.insert("recentlyUsed", DApplication::translate("web", "Recent"));
-    //     doc.setObject(object);
-    // }
+    if (doc.isEmpty()) {
+        QJsonObject object;
+        object.insert("fontname", QApplication::translate("web", "Font"));
+        object.insert("fontsize", QApplication::translate("web", "Font size"));
+        object.insert("forecolor", QApplication::translate("web", "Font color"));
+        object.insert("backcolor", QApplication::translate("web", "Text highlight color"));
+        object.insert("bold", QApplication::translate("web", "Bold"));
+        object.insert("italic", QApplication::translate("web", "Italic"));
+        object.insert("underline", QApplication::translate("web", "Underline"));
+        object.insert("strikethrough", QApplication::translate("web", "Strikethrough"));
+        object.insert("ul", QApplication::translate("web", "Bullets"));
+        object.insert("ol", QApplication::translate("web", "Numbering"));
+        object.insert("more", QApplication::translate("web", "More colors"));
+        object.insert("recentlyUsed", QApplication::translate("web", "Recent"));
+        doc.setObject(object);
+    }
+    return doc.toJson(QJsonDocument::Compact);
+}
+
+/**
+   @return Js前端调用返回部分 HTML DOM 节点展示需要的翻译文本
+ */
+QString JsContent::jsCallDivTextTranslation()
+{
+    static QJsonDocument doc;
+    if (doc.isEmpty()) {
+        QJsonObject object;
+        object.insert("translateLabel", QApplication::translate("web", "Voice To Text"));
+        object.insert("translatingLabel", QApplication::translate("web", "Converting voice to text"));
+        doc.setObject(object);
+    }
     return doc.toJson(QJsonDocument::Compact);
 }
 
@@ -200,17 +215,17 @@ void JsContent::jsCallSetClipData(const QString &text, const QString &html)
 {
     QClipboard *clip = QApplication::clipboard();
     if (nullptr != clip) {
-        //剪切板先断开与前端的通信
+        // 剪切板先断开与前端的通信
         clip->disconnect(this);
-        //更新剪切板
+        // 更新剪切板
         QMimeData *data = new QMimeData;
-        //设置纯文本
+        // 设置纯文本
         data->setText(text);
-        //设置富文本
+        // 设置富文本
         data->setHtml(html);
         clip->setMimeData(data);
         m_clipData = data;
-        //剪切板重新建立与前端的通信
+        // 剪切板重新建立与前端的通信
         connect(QApplication::clipboard(), &QClipboard::changed, this, &JsContent::onClipChange);
     }
 }

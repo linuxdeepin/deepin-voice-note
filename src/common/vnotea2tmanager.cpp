@@ -93,8 +93,9 @@ void VNoteA2TManager::startAsr(QString filePath, qint64 fileDuration, QString sr
     // }
 
     // TODO: local test
-    QTimer::singleShot(500, [this]()
-                       { Q_EMIT this->asrSuccess("Simulate video to text."); });
+    QTimer::singleShot(1000, [this]()
+                       { Q_EMIT this->asrSuccess("在V23的基础上进一步改进，获得体验和视觉上的提升，整体上会获得较大的提升。根据对目前设"
+                                                 "计趋势的把握，未来的UI设计会不可避免的增加很多3D元素，在视觉层级上会表达的更加突出。"); });
 }
 
 /**

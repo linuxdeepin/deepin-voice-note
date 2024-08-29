@@ -16,6 +16,7 @@ class QWebEngineContextMenuRequest;
 
 class VNVoiceBlock;
 class VoicePlayerHandler;
+class VoiceToTextHandler;
 
 class WebEngineHandler : public QObject
 {
@@ -34,8 +35,6 @@ public:
 Q_SIGNALS:
     // 请求右键菜单
     void requestShowMenu(Menu type, const QPoint &pos);
-    // 开始语音转文字
-    void asrStart(const QSharedPointer<VNVoiceBlock> voiceBlock);
 
 public Q_SLOTS:
     // for qml
@@ -57,14 +56,15 @@ private:
     void processTextMenuRequest(QWebEngineContextMenuRequest *request);
 
 private:
-    VoicePlayerHandler *voicePlayerHandler { nullptr };
+    VoicePlayerHandler *m_voicePlayerHandler { nullptr };
+    VoiceToTextHandler *m_voiceToTextHandler { nullptr };
 
     QRect m_editToolbarRect;
 
     Menu menuType { MaxMenu };  // 菜单类型
     QVariant menuJson;          // 菜单数据
 
-    QSharedPointer<VNVoiceBlock> voiceBlock { nullptr };  // 待另存的语音数据
+    QSharedPointer<VNVoiceBlock> m_voiceBlock { nullptr };  // 待另存的语音数据
 
     // 音频服务dbus接口 (org.deepin.dde.Audio)
     QDBusInterface *m_appearanceDBusInterface { nullptr };
