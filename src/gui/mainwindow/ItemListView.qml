@@ -29,11 +29,13 @@ Item {
     property alias view: itemListView
     property alias moveToFolderDialog: dialogWindow
     property var saveFilters: ["TXT(*.txt);;HTML(*.html)", "TXT(*.txt)", "HTML(*.html)", "MP3(*.mp3)"]
+    property int selectIndex: 0
 
     signal noteItemChanged(int index)
     signal mouseChanged(int mousePosX, int mousePosY)
     signal dropRelease()
     signal mulChoices(int choices)
+    signal deleteNotes(int number)
 
     ListModel {
         id: itemModel
@@ -147,7 +149,7 @@ Item {
         id: itemListView
         anchors.fill: parent
         model: itemModel
-        property var lastCurrentIndex: -1
+        property var lastCurrentIndex: 0
         property var contextIndex: -1
         spacing: itemSpacing
         visible: true
@@ -155,13 +157,10 @@ Item {
             property bool isRename: false
             width: parent.width
             height: isSearch ? 67 : 50
-            property alias setNameColor: noteNameLabel.color
-            property alias setTimeColor: timeLabel.color
             property alias renameFocus: renameLine.focus
-            property color nameColor: "black"
-            property color timeColor: "#7F000000"
+            property bool isSelected: selectIndex === index
             
-            color: "white"
+            color: isSelected ? "#FF1F6EE7" : "white"
             radius: 6
 
             ColumnLayout {
@@ -179,8 +178,7 @@ Item {
                     visible: !isRename
                     horizontalAlignment: Text.AlignHLeft
                     text: model.name
-                    // text: "<p><color=#ff0000ff>colorfully</color></p>"
-                    color: nameColor
+                    color: isSelected ? "white" : "black"
                     font.pixelSize: 14
                 }
                 Label {
@@ -190,7 +188,7 @@ Item {
                     visible: !isRename
                     horizontalAlignment: Text.AlignHLeft
                     text: model.time
-                    color: timeColor
+                    color: isSelected ? "#7FFFFFFF" : "#7F000000"
                     font.pixelSize: 10
                 }
                 LineEdit {
@@ -259,6 +257,7 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignLeft
                         text: model.folderName
+                        color: isSelected ? "#7FFFFFFF" : "#7F000000"
                         font.pixelSize: 10
                     }
                 }
@@ -270,66 +269,65 @@ Item {
                 property bool held: false
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 onClicked: {
+                    selectIndex = -1
                     if (mouse.button === Qt.RightButton) {
-                        // if (selectedNoteItem.length === 1) {
-                            itemListView.contextIndex = index
-                            noteContextMenu.popup()
-                        // }
+                        itemListView.contextIndex = index
+                        if (itemListView.itemAtIndex(itemListView.lastCurrentIndex)) {
+                            var lastItem = itemListView.itemAtIndex(itemListView.lastCurrentIndex)
+                            lastItem.isRename = false
+                            lastItem.isSelected = false
+                        }
+                        for (var j = 0; j < selectedNoteItem.length; j++) {
+                            var item = itemListView.itemAtIndex(selectedNoteItem[j])
+                            item.isSelected = false
+                        }
+                        selectedNoteItem = []
+                        selectedNoteItem.push(index)
+                        itemListView.itemAtIndex(index).isSelected = true
+                        selectSize = 1
+                        itemListView.currentIndex = index
+                        itemListView.lastCurrentIndex = index
+                        noteContextMenu.popup()
                     } else {
-                        if (itemListView.currentIndex === index) {
+                        if (itemListView.currentIndex === index && selectedNoteItem.length === 1) {
                             return;
                         }
                         switch (mouse.modifiers) {
                             case Qt.ControlModifier:
                                 if (selectedNoteItem.indexOf(index) != -1) {
+                                    itemListView.itemAtIndex(index).isSelected = false
                                     selectedNoteItem.splice(selectedNoteItem.indexOf(index), 1)
                                     selectSize = selectSize - 1
-                                    itemListView.itemAtIndex(index).color = "white"
-                                    noteNameLabel.color = "black"
-                                    timeLabel.color = "#7F000000"
                                 } else {
+                                    itemListView.itemAtIndex(index).isSelected = true
                                     selectedNoteItem.push(index)
                                     selectSize = selectSize + 1
-                                    itemListView.itemAtIndex(index).color = "#FF1F6EE7"
-                                    noteNameLabel.color = "white"
-                                    timeLabel.color = "#7FFFFFFF"
                                 }
                             break;
                             case Qt.ShiftModifier:
                                 var startIndex = Math.min(index, itemListView.lastCurrentIndex)
                                 var endIndex = Math.max(index, itemListView.lastCurrentIndex)
                                 for (var i = startIndex; i <= endIndex; i++) {
+                                    itemListView.itemAtIndex(i).isSelected = true
                                     selectedNoteItem.push(i)
                                     selectSize = selectSize + 1
-                                    itemListView.itemAtIndex(i).color = "#FF1F6EE7"
-                                    noteNameLabel.color = "white"
-                                    timeLabel.color = "#7FFFFFFF"
                                 }
                             break;
                             default:
-                                if (itemListView.lastCurrentIndex != -1) {
-                                    if (itemListView.itemAtIndex(itemListView.lastCurrentIndex)) {
-                                        var lastItem = itemListView.itemAtIndex(itemListView.lastCurrentIndex)
-                                        lastItem.isRename = false
-                                        lastItem.color = "white"
-                                        lastItem.setNameColor = "black"
-                                        lastItem.setTimeColor = "#7F000000"
-                                    }
+                                if (itemListView.itemAtIndex(itemListView.lastCurrentIndex)) {
+                                    var lastSelectItem = itemListView.itemAtIndex(itemListView.lastCurrentIndex)
+                                    lastSelectItem.isRename = false
+                                    lastSelectItem.isSelected = false
                                 }
-                                for (var i = 0; i < selectedNoteItem.length; i++) {
-                                    var item = itemListView.itemAtIndex(selectedNoteItem[i])
-                                    item.color = "white"
-                                    item.setNameColor = "black"
-                                    item.setTimeColor = "#7F000000"
+                                for (var m = 0; m < selectedNoteItem.length; m++) {
+                                    var selectItem = itemListView.itemAtIndex(selectedNoteItem[m])
+                                    selectItem.isSelected = false
                                 }
                                 selectedNoteItem = []
-                                var item = itemListView.model.get(index)
                                 selectedNoteItem.push(index)
+                                itemListView.itemAtIndex(index).isSelected = true
                                 selectSize = 1
                                 itemListView.currentIndex = index
-                                parent.color = "#FF1F6EE7"
-                                noteNameLabel.color = "white"
-                                timeLabel.color = "#7FFFFFFF"
                                 itemListView.lastCurrentIndex = index
                             break;
                         }
@@ -354,9 +352,6 @@ Item {
                         selectedNoteItem = []
                         selectSize = 1
                         itemListView.lastCurrentIndex = -1
-                        parent.color = "white"
-                        noteNameLabel.color = "black"
-                        timeLabel.color = "#7F000000"
                     }
                     held = false
                     dragControl.visible = false
@@ -434,9 +429,26 @@ Item {
             MenuItem {
                 text: qsTr("Delete")
                 onTriggered: {
-                    itemModel.remove(itemListView.contextIndex)
-                    var indexList = [itemListView.contextIndex]
-                    VNoteMainManager.deleteNote(indexList)
+                    if (selectedNoteItem.length > 1) {
+                        var delList = sortAndDeduplicate(selectedNoteItem)
+                        //TODO: 弹出对话框
+                        for (var i = 0; i < delList.length; i++)
+                            itemModel.remove(delList[i])
+                        VNoteMainManager.deleteNote(delList)
+                        deleteNotes(selectedNoteItem.length)
+                    } else {
+                        itemModel.remove(itemListView.contextIndex)
+                        var indexList = [itemListView.contextIndex]
+                        VNoteMainManager.deleteNote(indexList)
+                        deleteNotes(1)
+                        if (itemModel.count <= itemListView.contextIndex) {
+                            itemListView.itemAtIndex(itemModel.count-1).isSelected = true
+                            selectedNoteItem = [itemModel.count-1]
+                            selectSize = 1
+                        } else {
+                            itemListView.itemAtIndex(itemListView.contextIndex).isSelected = true
+                        }
+                    }
                 }
             }
             Menu {
@@ -483,6 +495,15 @@ Item {
                     VNoteMainManager.createNote()
                 }
             }
+        }
+        function sortAndDeduplicate(arr) {
+            // Convert to integers and remove duplicates using a Set
+            var uniqueInts = [...new Set(arr)].map(Number);
+
+            // Sort the array in descending order
+            uniqueInts.sort(function(a, b) { return b - a; });
+
+            return uniqueInts;
         }
         onCurrentItemChanged: {
             var index = itemListView.currentIndex

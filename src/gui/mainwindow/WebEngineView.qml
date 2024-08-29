@@ -19,11 +19,8 @@ Item {
         id: columnLayout
 
         anchors.fill: parent
-        spacing: 0
-
-        TitleBar {
+        WindowTitleBar {
             id: title
-
             Layout.fillWidth: true
             height: 40
         }
