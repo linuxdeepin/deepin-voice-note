@@ -4755,6 +4755,16 @@
         Editor.prototype.empty = function () {
             this.context.invoke('code', dom.emptyPara);
         };
+        /**
+         * Remove current select contents.
+         */
+        Editor.prototype.deleteContents = function () {
+            this.history.recordUndo();
+            var _this = this;
+            _this.beforeCommand();
+            _this.createRange().deleteContents();
+            _this.afterCommand();
+        };
         return Editor;
     }());
 
