@@ -13,6 +13,22 @@ import org.deepin.dtk 1.0
 import VNote 1.0
 
 Item {
+    function toggleMultCho(choices) {
+        if (choices > 1) {
+            webView.visible = false;
+            if (!multipleChoicesLoader.active) {
+                multipleChoicesLoader.active = true;
+            }
+            multipleChoicesLoader.visible = true;
+            multipleChoicesLoader.item.visible = true;
+            multipleChoicesLoader.item.selectSize = choices;
+        } else {
+            multipleChoicesLoader.visible = false;
+            webView.visible = true;
+            multipleChoicesLoader.item.visible = false;
+        }
+    }
+
     visible: true
 
     ColumnLayout {
@@ -54,6 +70,16 @@ Item {
             WebEngineHandler {
                 id: handler
 
+                target: webView
+
+                onRequesetCallJsSynchronous: func => {
+                    webView.runJavaScript(func, function (result) {
+                            onCallJsResult(result);
+                        });
+                }
+                onTriggerWebAction: action => {
+                    webView.triggerWebAction(action);
+                }
             }
 
             WebChannel {
@@ -64,8 +90,9 @@ Item {
 
         Loader {
             id: multipleChoicesLoader
-            Layout.fillWidth: parent.width
+
             Layout.fillHeight: parent.height
+            Layout.fillWidth: parent.width
             visible: false
 
             sourceComponent: MultipleChoices {
@@ -136,15 +163,19 @@ Item {
 
     Loader {
         id: selectImgLoader
+
         active: false
         asynchronous: true
+
         sourceComponent: FileDialog {
             id: fileDialog
+
             fileMode: FileDialog.OpenFiles
-            nameFilters: ["Image file(*.jpg *.png *.bmp)"]
             folder: StandardPaths.writableLocation(StandardPaths.PicturesLocation)
+            nameFilters: ["Image file(*.jpg *.png *.bmp)"]
+
             Component.onCompleted: {
-                fileDialog.open()
+                fileDialog.open();
             }
             onAccepted: {
                 if (fileDialog.files.length > 0) {
@@ -158,33 +189,17 @@ Item {
         target: title
 
         onCreateNote: {
-            VNoteMainManager.createNote()
-        }
-        onStartRecording: {
-            console.warn("--------------")
+            VNoteMainManager.createNote();
         }
         onInsertImage: {
             if (!selectImgLoader.active) {
-                selectImgLoader.active = true
+                selectImgLoader.active = true;
             } else {
-                selectImgLoader.item.open()
+                selectImgLoader.item.open();
             }
         }
-    }
-
-    function toggleMultCho(choices) {
-        if (choices > 1) {
-            webView.visible = false
-            if (!multipleChoicesLoader.active) {
-                multipleChoicesLoader.active = true
-            }
-            multipleChoicesLoader.visible = true
-            multipleChoicesLoader.item.visible = true
-            multipleChoicesLoader.item.selectSize = choices
-        } else {
-            multipleChoicesLoader.visible = false
-            webView.visible = true
-            multipleChoicesLoader.item.visible = false
+        onStartRecording: {
+            console.warn("--------------");
         }
     }
 }

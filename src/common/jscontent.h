@@ -68,8 +68,8 @@ signals:
     void callJsHideEditToolbar(); //隐藏编辑工具栏
     void callJsSetVoicePlayBtnEnable(bool enable); //设置播放按钮是否可用
 
-    // 通知前端播放进度变更
-    void callJsVoicePlayProgressChanged(int progressMs);
+    void callJsVoicePlayProgressChanged(int progressMs);    // 通知前端播放进度变更
+    void callJsDeleteSelection();                           // 通知前端删除当前选中内容
 
     void textPaste(bool isVoicePaste); //粘贴信号
     void textChange();

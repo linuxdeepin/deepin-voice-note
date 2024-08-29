@@ -221,6 +221,7 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsSetFontList.connect(setFontList);
 
         webobj.callJsVoicePlayProgressChanged.connect(updateProgressBar);
+        webobj.callJsDeleteSelection.connect(deleteSelection);
         //通知QT层完成通信绑定
         webobj.jsCallChannleFinish();
         // setFontList(global_fontList, "Unifont")
@@ -1371,6 +1372,13 @@ function returnCopyFlag() {
 function setSelectColorButton($dom) {
     $dom.parents('.note-color-palette').find('.note-color-btn').removeClass('selectColor')
     $dom.addClass('selectColor')
+}
+
+/**
+ * 删除当前选中文本
+ */
+function deleteSelection() {
+    $('#summernote').summernote('editor.deleteContents');
 }
 
 /***** 以下为语音播放相关函数 *****/
