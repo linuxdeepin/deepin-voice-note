@@ -41,14 +41,13 @@ public:
     Q_INVOKABLE bool getTop();
     Q_INVOKABLE void updateSort(const int &src, const int &dst);
     Q_INVOKABLE void renameFolder(const int &index, const QString &name);
-    Q_INVOKABLE QList<QVariantMap> sortNoteList(const QList<QVariantMap> &dataList);
     Q_INVOKABLE void vNoteSearch(const QString &text);
     Q_INVOKABLE int loadSearchNotes(const QString &key);
 
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);
     void updateNotes(const QList<QVariantMap> &notesData);
-    void addNoteAtHead(const QVariantMap &noteData);
+    void addNoteAtHead(const QList<QVariantMap> &notesData);
     void addFolderFinished(const QVariantMap &folderData);
     void noSearchResult();
     void searchFinished(const QList<QVariantMap> &notesData, const QString &key);

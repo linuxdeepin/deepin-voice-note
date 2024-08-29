@@ -41,7 +41,23 @@ ApplicationWindow {
                 itemListView.model.append({name: notesData[i].name, time: notesData[i].time, isTop: itemIsTop,
                                               icon: notesData[i].icon, folderName: notesData[i].folderName, noteId: notesData[i].noteId})
             }
+            itemListView.selectIndex = 0
         }
+
+        function handleaddNote(notesData) {
+            itemListView.model.clear()
+            var selectIndex = -1
+            for (var i = 0; i < notesData.length; i++) {
+                var itemIsTop = notesData[i].isTop ? "top" : "normal"
+                itemListView.model.append({name: notesData[i].name, time: notesData[i].time, isTop: itemIsTop,
+                                              icon: notesData[i].icon, folderName: notesData[i].folderName, noteId: notesData[i].noteId})
+                if (selectIndex === -1 && !notesData[i].isTop)
+                    selectIndex = i
+            }
+            itemListView.selectIndex = selectIndex
+            folderListView.addNote(1)
+        }
+
         target: VNoteMainManager
         onFinishedFolderLoad: {
             if (foldersData.length > 0)
@@ -53,7 +69,7 @@ ApplicationWindow {
             handleUpdateNoteList(notesData)
         }
         onAddNoteAtHead : {
-            itemListView.model.insert(0, {name: noteData.name, time: noteData.time})
+            handleaddNote(notesData)
         }
         onNoSearchResult: {
             label.visible = false
@@ -68,8 +84,6 @@ ApplicationWindow {
             createFolderButton.enabled = false
         }
         onMoveFinished: {
-            console.warn("----------", index, srcFolderIndex, dstFolderIndex)
-            console.warn(folderListView.model.get(srcFolderIndex).count)
             folderListView.model.get(srcFolderIndex).count = (Number(folderListView.model.get(srcFolderIndex).count) - index.length).toString()
             folderListView.model.get(dstFolderIndex).count = (Number(folderListView.model.get(dstFolderIndex).count) + index.length).toString()
             for (var i = 0; i < index.length; i++) {
@@ -162,6 +176,9 @@ ApplicationWindow {
                 }
                 onMulChoices: {
                     webEngineView.toggleMultCho(choices)
+                }
+                onDeleteNotes: {
+                    folderListView.delNote(number)
                 }
             }
         }
