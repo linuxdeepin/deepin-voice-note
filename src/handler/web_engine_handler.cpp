@@ -11,9 +11,11 @@
 #include "voice_player_handler.h"
 #include "voice_to_text_handler.h"
 
+#include <QApplication>
 #include <QCursor>
 #include <QDBusInterface>
 #include <QDBusPendingReply>
+#include <QKeyEvent>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -21,6 +23,7 @@
 #include <QFile>
 #include <QTimer>
 #include <QCursor>
+#include <QMimeData>
 #include <QWebEngineContextMenuRequest>
 
 #include <dguiapplicationhelper.h>
@@ -55,6 +58,48 @@ WebEngineHandler::WebEngineHandler(QObject *parent)
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged, this, &WebEngineHandler::onThemeChanged);
     //
     connect(ActionManager::instance(), &ActionManager::actionTriggered, this, &WebEngineHandler::onMenuClicked);
+}
+
+QObject *WebEngineHandler::target() const
+{
+    return m_targetWebEngine;
+}
+
+void WebEngineHandler::setTarget(QObject *targetWebEngine)
+{
+    if (targetWebEngine != m_targetWebEngine) {
+        m_targetWebEngine = targetWebEngine;
+        Q_EMIT targetChanged();
+    }
+}
+
+/**
+   @return 通过 WebEngineView (qml) 调用 js 函数 \a function ，
+    通过事件循环等待 onCallJsResult() 接收返回值。
+ */
+QVariant WebEngineHandler::callJsSynchronous(const QString &function)
+{
+    if (m_callJsLoop.isRunning()) {
+        qCritical() << "reentrant call js function!";
+        return {};
+    }
+
+    m_callJsResult.clear();
+    if (target()) {
+        Q_EMIT requesetCallJsSynchronous(function);
+        m_callJsLoop.exec();
+    }
+
+    return m_callJsResult;
+}
+
+/**
+   @brief 等待 callJsSynchronous() js 函数调用完成
+ */
+void WebEngineHandler::onCallJsResult(const QVariant &result)
+{
+    m_callJsResult = result;
+    m_callJsLoop.exit();
 }
 
 /**
@@ -125,6 +170,7 @@ void WebEngineHandler::connectWebContent()
     });
 
     connect(JsContent::instance(), &JsContent::popupMenu, this, &WebEngineHandler::onSaveMenuParam);
+    connect(JsContent::instance(), &JsContent::textPaste, this, &WebEngineHandler::onPaste);
 }
 
 /*!
@@ -208,12 +254,94 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
 {
     switch (kind) {
         case ActionManager::VoiceAsSave:
+            // 另存语音
+            // saveMP3As();
             break;
         case ActionManager::VoiceToText:
             m_voiceToTextHandler->setAudioToText(m_voiceBlock);
             break;
+        case ActionManager::VoiceDelete:
+        case ActionManager::PictureDelete:
+        case ActionManager::TxtDelete:
+            // 调用 js 删除选中文本
+            Q_EMIT JsContent::instance()->callJsDeleteSelection();
+            break;
+        case ActionManager::VoiceSelectAll:
+        case ActionManager::PictureSelectAll:
+        case ActionManager::TxtSelectAll: {
+            // 模拟全选快捷键ctrl+A
+            Q_EMIT triggerWebAction(QWebEnginePage::SelectAll);
+            break;
+        }
+        case ActionManager::VoiceCopy:
+        case ActionManager::PictureCopy:
+        case ActionManager::TxtCopy:
+            // 直接调用web端的复制事件
+            Q_EMIT triggerWebAction(QWebEnginePage::Copy);
+            break;
+        case ActionManager::VoiceCut:
+        case ActionManager::PictureCut:
+        case ActionManager::TxtCut:
+            // 直接调用web端的剪切事件
+            Q_EMIT triggerWebAction(QWebEnginePage::Cut);
+            break;
+        case ActionManager::VoicePaste:
+        case ActionManager::PicturePaste:
+        case ActionManager::TxtPaste:
+            // 粘贴事件，从剪贴板获取数据
+            onPaste(isVoicePaste());
+            break;
+        case ActionManager::PictureView:
+            // 查看图片
+            // viewPicture(m_menuJson.toString());
+            break;
+        case ActionManager::PictureSaveAs:
+            // 另存图片
+            // savePictureAs();
+            break;
+        case ActionManager::TxtSpeech:
+            VTextSpeechAndTrManager::onTextToSpeech();
+            break;
+        case ActionManager::TxtStopreading:
+            VTextSpeechAndTrManager::onStopTextToSpeech();
+            break;
+        case ActionManager::TxtDictation:
+            VTextSpeechAndTrManager::onSpeechToText();
+            break;
+        case ActionManager::TxtTranslate:
+            VTextSpeechAndTrManager::onTextTranslate();
+            break;
         default:
             break;
+    }
+}
+
+/**
+   @brief 拷贝剪贴内容，\a isVoice 标识音频数据，仅在语音记事本内使用，因此使用js前端的拷贝
+    处理，其他类型(图片/文本)可通过剪贴版导入。
+ */
+void WebEngineHandler::onPaste(bool isVoice)
+{
+    if (isVoice) {
+        Q_EMIT triggerWebAction(QWebEnginePage::Paste);
+        return;
+    }
+
+    // 获取剪贴板信息
+    QClipboard *clipboard = QApplication::clipboard();
+    const QMimeData *mimeData = clipboard->mimeData();
+    // 存在文件url
+    if (mimeData->hasUrls()) {
+        QStringList paths;
+        for (auto url : mimeData->urls()) {
+            paths.push_back(url.path());
+        }
+        JsContent::instance()->insertImages(paths);
+    } else if (mimeData->hasImage()) {
+        JsContent::instance()->insertImages(qvariant_cast<QImage>(mimeData->imageData()));
+    } else {
+        // 无图片文件，直接调用web端的粘贴事件
+        Q_EMIT triggerWebAction(QWebEnginePage::Paste);
     }
 }
 
@@ -306,4 +434,13 @@ void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *requ
 
     // 请求界面弹出右键菜单
     Q_EMIT requestShowMenu(TxtMenu, request->position());
+}
+
+/**
+   @return 返回当前拷贝数据是否包含录音
+ */
+bool WebEngineHandler::isVoicePaste()
+{
+    // 调用web前端接口
+    return callJsSynchronous("returnCopyFlag()").toBool();
 }
