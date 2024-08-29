@@ -36,7 +36,7 @@ Item {
         var pos = mapFromGlobal(mousePosX, mousePosY)
         if (pos.x < 0 || pos.x > listWidth) {
             if (lastDropIndex != -1 && lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
-                folderListView.itemAtIndex(lastDropIndex).backgroundColor = "white"
+                folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent"
             }
             lastDropIndex = -1;
             return;
@@ -46,7 +46,7 @@ Item {
         var index = Math.floor(pos.y / itemHeight)
         if (index < 0 || index >= folderModel.count) {
             if (lastDropIndex != -1 && lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
-                folderListView.itemAtIndex(lastDropIndex).backgroundColor = "white"
+                folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent"
             }
             currentDropIndex = -1;
             return;
@@ -54,7 +54,7 @@ Item {
         currentDropIndex = index
         if (index != lastDropIndex) {
             if (lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
-                folderListView.itemAtIndex(lastDropIndex).backgroundColor = "white"
+                folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent"
             }
             lastDropIndex = index;
             if (index === folderListView.currentIndex)  {
@@ -74,7 +74,7 @@ Item {
             VNoteMainManager.moveNotes(selectedNoteItem, currentDropIndex)
         }
         if (lastDropIndex != -1 && lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
-            folderListView.itemAtIndex(lastDropIndex).backgroundColor = "white"
+            folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent"
         }
         lastDropIndex = -1;
         currentDropIndex = -1;
@@ -98,13 +98,17 @@ Item {
         }
     }
 
+    function getCurrentFolder() {
+        return folderListView.model.get(folderListView.currentIndex)
+    }
+
     Connections {
         target: VNoteMainManager
         onAddFolderFinished: {
             folderListView.model.insert(0, {name: folderData.name, count: folderData.notesCount, icon: folderData.icon})
 
             if (folderListView.itemAtIndex(folderListView.currentIndex + 1)) {
-                folderListView.itemAtIndex(folderListView.currentIndex + 1).backgroundColor = "white"
+                folderListView.itemAtIndex(folderListView.currentIndex + 1).backgroundColor = "transparent"
             }
 
             folderListView.currentIndex = 0
@@ -138,7 +142,7 @@ Item {
             width: parent.width
             height: itemHeight
             enabled: folderListView.enabled
-            property color backgroundColor: index === folderListView.currentIndex ? "#33000000" : "white"
+            property color backgroundColor: index === folderListView.currentIndex ? "#33000000" : "transparent"
             
             Rectangle {
                 id: rect
@@ -242,7 +246,7 @@ Item {
                     } else {
                         if (folderListView.lastCurrentIndex != -1) {
                             if (folderListView.itemAtIndex(folderListView.lastCurrentIndex)) {
-                                folderListView.itemAtIndex(folderListView.lastCurrentIndex).backgroundColor = "white"
+                                folderListView.itemAtIndex(folderListView.lastCurrentIndex).backgroundColor = "transparent"
                             }
                         }
 
@@ -267,7 +271,7 @@ Item {
                     if (folderListView.currentIndex == index) {
                         return
                     }
-                    parent.backgroundColor = "white"
+                    parent.backgroundColor = "transparent"
                 }
                 onPressed: {
                     held = true
@@ -315,7 +319,6 @@ Item {
                 MenuItem {
                     text: qsTr("Rename")
                     onTriggered: {
-                        // renameFolder(folderListView.contextIndex, true)
                         folderNameLabel.visible = false
                         folderCountLabel.visible = false
                         renameLine.visible = true
@@ -370,6 +373,19 @@ Item {
             // }
 
             itemChanged(index, folderModel.get(index).name) // 发出 itemChanged 信号
+        }
+    }
+    function addNote(size) {
+        var cout = model.get(folderListView.currentIndex).count
+        model.get(folderListView.currentIndex).count = (Number(cout) + size).toString()
+    }
+    function delNote(size) {
+        var cout = model.get(folderListView.currentIndex).count
+        var new_cout = Number(cout) - size
+        if (new_cout <= 0) {
+            //TODO: 删除记事本
+        } else {
+            model.get(folderListView.currentIndex).count = new_cout.toString()
         }
     }
 }
