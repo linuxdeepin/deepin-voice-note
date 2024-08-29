@@ -17,7 +17,7 @@
  *  @li voiceToText 语音转文字状态，状态独占且唯一，此时音频不再响应播放按钮的点击事件
  * @endlist
  *
- * 语音转文字标识会写入 voiceInfoBox 增加 containText 状态，此时已生成语音转文字内容
+ * 语音转文字标识会写入 translate 增加 containText 状态，此时已生成语音转文字内容
  */
 
 :root {
@@ -191,6 +191,85 @@
     background-repeat: no-repeat;
 }
 
+/*********** 语音转文字内容控件 **********/
+
+.voiceToTextLabel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.voiceToTextLabel .voiceToTextIcon {
+    width: 18px;
+    height: 18px;
+    color: red;
+    /* 使用 mask 以实现动态颜色 */
+    -webkit-mask: url(../img/spinner/spinner.svg) no-repeat center/cover;
+    mask: url(../img/spinner/spinner.svg) no-repeat center/cover;
+    background-color: var(--highlightColor);
+    animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.voiceToTextLabel .translatingLabel {
+    margin-left: 5px;
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--highlightColor);
+    user-select: none;
+}
+
+.translateHeader {
+    width: calc(100% - 32);
+    height: 30px;
+    margin-left: 16px;
+    margin-right: 16px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+}
+
+.translateHeader .translateIcon {
+    width: 14px;
+    height: 14px;
+    background-image: url('../img/voice_to_text/Normal.svg');
+    background-size: contain;
+}
+
+.translateHeader .translateLabel {
+    margin-left: 13px;
+    font-size: 12px;
+    user-select: none;
+}
+
+.translateHeader .foldBtn {
+    /* 用于flex下控件中间间距 */
+    margin-left: auto;
+    width: 16px;
+    height: 16px;
+    background-size: contain;
+}
+
+.voiceInfoBox .translateText {
+    font-size: 14px;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 12px;
+    text-align: left;
+    user-select: contain;
+}
+
 /********** 状态控制，不同状态下各组件显示 **********/
 .voicePlayback .timeField {
     display: flex;
@@ -223,7 +302,13 @@
     border-radius: 12px 12px 0px 0px;
 }
 
+.voiceInfoBox .translate {
+    display: none;
+}
+
 .voiceInfoBox.containText .translate {
+    display: flex;
+    flex-direction: column;
     border-radius: 0px 0px 12px 12px;
 }
 
@@ -275,4 +360,13 @@
 
 .airVoicePlaybackContainer .closePlaybackBarBtn {
     background-image: url('../img/playbar_pause_close/Normal.svg');
+}
+
+/* 语音转文字控件 */
+.translateHeader .foldBtn {
+    background-image: url('../img/unfold/Normal.svg');
+}
+
+.translateHeader.unfold .foldBtn {
+    background-image: url('../img/fold/Normal.svg');
 }

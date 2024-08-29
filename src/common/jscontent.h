@@ -112,6 +112,7 @@ public slots:
     void jsCallCreateNote(); //web前端调用后端，新建笔记
     void jsCallSetClipData(const QString &text, const QString &html); //web前端调用后端，设置剪切板内容
     QString jsCallGetTranslation(); //web前端调用后端，获取翻译
+    QString jsCallDivTextTranslation(); // web前端调用后端，获取动态组件翻译
     void jsCallPlayVoiceStop();  // web前端调用后端，停止播放
     void jsCallVoiceProgressChange(qint64 progressMs);  // web前端调用后端，变更播放进度
     void onClipChange(QClipboard::Mode mode);

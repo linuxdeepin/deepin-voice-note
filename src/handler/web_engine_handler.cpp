@@ -9,6 +9,7 @@
 #include "actionmanager.h"
 #include "vtextspeechandtrmanager.h"
 #include "voice_player_handler.h"
+#include "voice_to_text_handler.h"
 
 #include <QCursor>
 #include <QDBusInterface>
@@ -45,7 +46,8 @@ DGUI_USE_NAMESPACE
 
 WebEngineHandler::WebEngineHandler(QObject *parent)
     : QObject { parent }
-    , voicePlayerHandler(new VoicePlayerHandler(this))
+    , m_voicePlayerHandler(new VoicePlayerHandler(this))
+    , m_voiceToTextHandler(new VoiceToTextHandler(this))
 {
     initFontsInformation();
     connectWebContent();
@@ -206,11 +208,9 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
 {
     switch (kind) {
         case ActionManager::VoiceAsSave:
-            // TODO 本地测试：
-            // onInsertVoiceItem("test.mp3", 12850);
             break;
         case ActionManager::VoiceToText:
-            Q_EMIT asrStart(voiceBlock);
+            m_voiceToTextHandler->setAudioToText(m_voiceBlock);
             break;
         default:
             break;
@@ -222,15 +222,15 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
  */
 void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *request)
 {
-    voiceBlock.reset(new VNVoiceBlock);
+    m_voiceBlock.reset(new VNVoiceBlock);
     MetaDataParser dataParser;
     // 解析json数据
-    if (!dataParser.parse(menuJson, voiceBlock.get())) {
+    if (!dataParser.parse(menuJson, m_voiceBlock.get())) {
         return;
     }
 
     // 语音文件不存在使用弹出提示
-    if (!QFile(voiceBlock->voicePath).exists()) {
+    if (!QFile(m_voiceBlock->voicePath).exists()) {
         // 异步操作，防止阻塞前端事件
         QTimer::singleShot(0, this, [this] {
             // TODO

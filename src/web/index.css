@@ -1,3 +1,9 @@
+:root {
+    /* 默认高亮色 */
+    --highlightColor: rgb(0, 91, 255);
+    --backgroundColor: #FFFFFF;
+}
+
 body {
     padding: 0px;
     line-height: 1.72;

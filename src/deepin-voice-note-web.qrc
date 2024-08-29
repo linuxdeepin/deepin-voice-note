@@ -48,5 +48,9 @@
         <file>web/img/playbar_pause/Normal.svg</file>
         <file>web/img/playbar_pause_close/Normal.svg</file>
         <file>web/img/playbar_play/Normal.svg</file>
+        <file>web/img/fold/Normal.svg</file>
+        <file>web/img/unfold/Normal.svg</file>
+        <file>web/img/spinner/spinner_white.svg</file>
+        <file>web/img/spinner/spinner.svg</file>
     </qresource>
 </RCC>
