@@ -24,6 +24,7 @@ include_directories(./dbusservice)
 include_directories(./gui)
 include_directories(./common)
 include_directories(./db)
+include_directories(./handler)
 
 aux_source_directory(./ ALLSOURCE)
 aux_source_directory(./dbusservice ALLSOURCE)

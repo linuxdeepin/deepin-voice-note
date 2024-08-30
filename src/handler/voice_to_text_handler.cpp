@@ -33,7 +33,8 @@ void VoiceToTextHandler::setAudioToText(const QSharedPointer<VNVoiceBlock> &voic
 
     // 超过20分钟的语音不支持转文字
     if (m_voiceBlock->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
-        // TODO(renbin): 弹窗提示
+        // 弹窗提示
+        Q_EMIT audioLengthLimit();
         return;
     } else {
         onA2TStart();

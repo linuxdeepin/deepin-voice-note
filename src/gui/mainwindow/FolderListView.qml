@@ -9,6 +9,7 @@ import org.deepin.dtk
 
 import VNote 1.0
 import "../drag/"
+import "../dialog/"
 
 Item {
     property int itemHeight: 30
@@ -30,6 +31,11 @@ Item {
 
     DragControl {
         id: dragControl
+    }
+
+    VNoteMessageDialogLoader {
+        id: messageDialogLoader
+
     }
 
     function updateItems(mousePosX, mousePosY) {
@@ -328,13 +334,17 @@ Item {
                 MenuItem {
                     text: qsTr("Delete")
                     onTriggered: {
-                        VNoteMainManager.vNoteDeleteFolder(folderListView.contextIndex)
-                        if (folderModel.count === 1)
-                            folderEmpty()
-                        folderModel.remove(folderListView.contextIndex)
-                        if (folderListView.contextIndex === 0) {
-                            folderListView.currentIndex = 0
-                        }
+                        messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteFolder, ret => {
+                            if (ret) {
+                                VNoteMainManager.vNoteDeleteFolder(folderListView.contextIndex)
+                                if (folderModel.count === 1)
+                                    folderEmpty()
+                                folderModel.remove(folderListView.contextIndex)
+                                if (folderListView.contextIndex === 0) {
+                                    folderListView.currentIndex = 0
+                                }
+                            }
+                        })
                     }
                 }
                 MenuItem {

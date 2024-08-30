@@ -13,6 +13,8 @@
 #include <QEventLoop>
 #include <QWebEnginePage>
 
+#include "vnote_message_dialog_handler.h"
+
 class QDBusInterface;
 class QWebEngineContextMenuRequest;
 
@@ -49,6 +51,9 @@ Q_SIGNALS:
     void requesetCallJsSynchronous(const QString &func);
     // 触发 web 常用文本操作
     void triggerWebAction(QWebEnginePage::WebAction action);
+
+    // 请求弹出提示对话框
+    void requestMessageDialog(VNoteMessageDialogHandler::MessageType type);
 
 public Q_SLOTS:
     // for qml

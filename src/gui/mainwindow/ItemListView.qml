@@ -49,6 +49,11 @@ Item {
         }
     }
 
+    VNoteMessageDialogLoader {
+        id: messageDialogLoader
+
+    }
+
     DragControl {
         id: dragControl
     }
@@ -429,26 +434,32 @@ Item {
             MenuItem {
                 text: qsTr("Delete")
                 onTriggered: {
-                    if (selectedNoteItem.length > 1) {
-                        var delList = sortAndDeduplicate(selectedNoteItem)
-                        //TODO: 弹出对话框
-                        for (var i = 0; i < delList.length; i++)
-                            itemModel.remove(delList[i])
-                        VNoteMainManager.deleteNote(delList)
-                        deleteNotes(selectedNoteItem.length)
-                    } else {
-                        itemModel.remove(itemListView.contextIndex)
-                        var indexList = [itemListView.contextIndex]
-                        VNoteMainManager.deleteNote(indexList)
-                        deleteNotes(1)
-                        if (itemModel.count <= itemListView.contextIndex) {
-                            itemListView.itemAtIndex(itemModel.count-1).isSelected = true
-                            selectedNoteItem = [itemModel.count-1]
-                            selectSize = 1
-                        } else {
-                            itemListView.itemAtIndex(itemListView.contextIndex).isSelected = true
+                    messageDialogLoader.messageData = selectedNoteItem.length;
+                    messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteNote, ret => {
+                        if (!ret) {
+                            return;
                         }
-                    }
+
+                        if (selectedNoteItem.length > 1) {
+                            var delList = sortAndDeduplicate(selectedNoteItem)
+                            for (var i = 0; i < delList.length; i++)
+                                itemModel.remove(delList[i])
+                            VNoteMainManager.deleteNote(delList)
+                            deleteNotes(selectedNoteItem.length)
+                        } else {
+                            itemModel.remove(itemListView.contextIndex)
+                            var indexList = [itemListView.contextIndex]
+                            VNoteMainManager.deleteNote(indexList)
+                            deleteNotes(1)
+                            if (itemModel.count <= itemListView.contextIndex) {
+                                itemListView.itemAtIndex(itemModel.count-1).isSelected = true
+                                selectedNoteItem = [itemModel.count-1]
+                                selectSize = 1
+                            } else {
+                                itemListView.itemAtIndex(itemListView.contextIndex).isSelected = true
+                            }
+                        }
+                    });
                 }
             }
             Menu {
