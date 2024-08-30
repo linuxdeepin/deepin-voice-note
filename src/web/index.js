@@ -990,6 +990,10 @@ function rightClick(e) {
  */
 function setVoiceButColor(color, shdow) {
     $("#style").html(`
+    :root {
+        --highlightColor: ${color};
+    }
+
     .voiceBox .voicebtn {
         background-color: ${color};
         box-shadow: 0px 4px 6px 0px ${shdow}80; 
@@ -1016,10 +1020,6 @@ function setVoiceButColor(color, shdow) {
     .li:active .translateText::selection {
         background-color: none !important;
     }    
-
-    :root {
-        --highlightColor: ${color};
-    }
     `)
 }
 
@@ -1027,6 +1027,9 @@ function setVoiceButColor(color, shdow) {
  * 深色浅色变换
  * @date 2021-08-19
  * @param {any} flag 1浅色 2深色
+ * @param {any} activeColor 选中颜色
+ * @param {any} disableColor 禁用颜色
+ * @param {any} backgroundColor 现在背景色主要由 qml 组件和 web 前端 css 共同实现，但在 sw 下保留兼容设置
  * @returns {any}
  */
 function changeColor(flag, activeColor, disableColor, backgroundColor) {
@@ -1056,7 +1059,7 @@ function changeColor(flag, activeColor, disableColor, backgroundColor) {
             $('.dropdown-fontname>li>a').css('color', "rgba(197,207,224,1)");
         }
     })
-    $('body').css('background-color', global_themeColor)
+
     if (flag == 1) {
         $('body').removeClass('dark');
         $('#dark').remove()

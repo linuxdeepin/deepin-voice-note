@@ -233,11 +233,12 @@ void WebEngineHandler::onThemeChanged()
     // 获取系统高亮色
     QString activeHightColor = dp.color(DPalette::Active, DPalette::Highlight).name();
     QString disableHightColor = dp.color(DPalette::Disabled, DPalette::Highlight).name();
-    // TODO
-    // page()->setBackgroundColor(dp.base().color());
     // 获取系统主题类型
     DGuiApplicationHelper::ColorType theme = dAppHelper->themeType();
-    emit JsContent::instance()->callJsSetTheme(theme, activeHightColor, disableHightColor, dp.base().color().name());
+
+    QString backgroundColor = DGuiApplicationHelper::LightType == theme ? "#FBFCFD" : "#090A17";
+    // 现在背景色主要由 qml 组件和 web 前端 css 共同实现，但在 sw 下保留兼容设置
+    emit JsContent::instance()->callJsSetTheme(theme, activeHightColor, disableHightColor, backgroundColor);
 }
 
 /**
