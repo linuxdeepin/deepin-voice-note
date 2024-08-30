@@ -15,7 +15,7 @@
 #include "actionmanager.h"
 #include "utils.h"
 #include "handler/web_engine_handler.h"
-#include "handler/voice_player_handler.h"
+#include "handler/vnote_message_dialog_handler.h"
 
 #include <QThreadPool>
 #include <QQmlApplicationEngine>
@@ -87,7 +87,7 @@ void VNoteMainManager::initQMLRegister()
 
     // QML组件访问后端调用
     qmlRegisterType<WebEngineHandler>("VNote", 1, 0, "WebEngineHandler");
-    qmlRegisterType<VoicePlayerHandler>("VNote", 1, 0, "VoicePlayerHandler");
+    qmlRegisterType<VNoteMessageDialogHandler>("VNote", 1, 0, "VNoteMessageDialogHandler");
 }
 
 void VNoteMainManager::onVNoteFoldersLoaded()

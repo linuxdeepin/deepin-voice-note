@@ -19,6 +19,8 @@ public:
 
     void setAudioToText(const QSharedPointer<VNVoiceBlock> &voiceBlock);
 
+    Q_SIGNAL void audioLengthLimit();
+
 private:
     void onA2TStart();
     Q_SLOT void onA2TError(int error);
