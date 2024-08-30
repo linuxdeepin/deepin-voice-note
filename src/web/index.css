@@ -1,14 +1,14 @@
 :root {
-    /* 默认高亮色 */
+    --color: rgba(65, 77, 104, 1);
     --highlightColor: rgb(0, 91, 255);
-    --backgroundColor: #FFFFFF;
+    --backgroundColor: rgba(255, 255,255, 0.7);
 }
 
 body {
     padding: 0px;
     line-height: 1.72;
     font-family: 'Helvetica';
-    background-color: transparent;
+    background-color: var(--backgroundColor);
     color: rgba(65, 77, 104, 1);
     word-wrap: break-word;
 }

@@ -48,9 +48,9 @@ Item {
             id: webView
 
             Layout.fillHeight: true
-
-            // anchors.fill: parent
             Layout.fillWidth: true
+            // 设置基础背景颜色，和 web 前端共同实现背景色
+            backgroundColor: DTK.themeType === ApplicationHelper.LightType ? "white" : "black"
 
             Component.onCompleted: {
                 noteWebChannel.registerObject("webobj", Webobj);
