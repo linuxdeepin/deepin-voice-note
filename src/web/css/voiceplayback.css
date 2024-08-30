@@ -20,11 +20,6 @@
  * 语音转文字标识会写入 translate 增加 containText 状态，此时已生成语音转文字内容
  */
 
-:root {
-    /* 默认高亮色 */
-    --highlightColor: rgb(0, 91, 255);
-}
-
 .voicePlayback {
     height: 42px;
     width: 100%;
@@ -33,7 +28,7 @@
     justify-content: space-between;
     border-radius: 12px;
     /* 深色模式背景配置位于 dark.css */
-    background-color: rgba(245, 245, 245, 0.5);
+    /* background-color: rgba(245, 245, 245, 0.5); */
 }
 
 .voicePlayback .voiceBtn {
@@ -43,6 +38,7 @@
     background-size: contain;
     background-repeat: no-repeat;
     will-change: transform;
+    background-color: none;
 }
 
 .voicebtn:hover::before {
@@ -202,7 +198,6 @@
 .voiceToTextLabel .voiceToTextIcon {
     width: 18px;
     height: 18px;
-    color: red;
     /* 使用 mask 以实现动态颜色 */
     -webkit-mask: url(../img/spinner/spinner.svg) no-repeat center/cover;
     mask: url(../img/spinner/spinner.svg) no-repeat center/cover;
@@ -243,7 +238,10 @@
 .translateHeader .translateIcon {
     width: 14px;
     height: 14px;
-    background-image: url('../img/voice_to_text/Normal.svg');
+    background-image: none;
+    background-color: var(--color);
+    -webkit-mask: url('../img/voice_to_text/Normal.svg') no-repeat center/cover;
+    mask: url('../img/voice_to_text/Normal.svg') no-repeat center/cover;
     background-size: contain;
 }
 
@@ -310,6 +308,7 @@
     display: flex;
     flex-direction: column;
     border-radius: 0px 0px 12px 12px;
+    border-top: 1px solid var(--backgroundColor);
 }
 
 
@@ -341,32 +340,53 @@
 
 /* 播放状态的播放暂停按钮 */
 .voicePlayback.play .voiceBtn {
-    background-image: url('../img/audio_file_playing_pause/Normal.svg');
+    background-image: none;
+    background-color: var(--color);
+    -webkit-mask: url('../img/audio_file_playing_pause/Normal.svg') no-repeat center/cover;
+    mask: url('../img/audio_file_playing_pause/Normal.svg') no-repeat center/cover;
 }
 
 .voicePlayback.pause .voiceBtn {
-    background-image: url('../img/audio_file_playing_play/Normal.svg');
+    background-image: none;
+    background-color: var(--color);
+    -webkit-mask: url('../img/audio_file_playing_play/Normal.svg') no-repeat center/cover;
+    mask: url('../img/audio_file_playing_play/Normal.svg') no-repeat center/cover;
 }
 
 /* 悬浮播放控件 */
 .airVoicePlaybackContainer .voicePlayback.play .voiceBtn {
-    background-image: url('../img/playbar_pause/Normal.svg');
+    background-image: none;
+    background-color: var(--color);
+    -webkit-mask: url('../img/playbar_pause/Normal.svg') no-repeat center/cover;
+    mask: url('../img/playbar_pause_close/Normal.svg') no-repeat center/cover;
 }
 
 .airVoicePlaybackContainer .voicePlayback .voiceBtn,
 .airVoicePlaybackContainer .voicePlayback.pause .voiceBtn {
-    background-image: url('../img/playbar_play/Normal.svg');
+    background-image: none;
+    background-color: var(--color);
+    -webkit-mask: url('../img/playbar_play/Normal.svg') no-repeat center/cover;
+    mask: url('../img/playbar_pause_close/Normal.svg') no-repeat center/cover;
 }
 
 .airVoicePlaybackContainer .closePlaybackBarBtn {
-    background-image: url('../img/playbar_pause_close/Normal.svg');
+    background-image: none;
+    background-color: var(--color);
+    -webkit-mask: url('../img/playbar_pause_close/Normal.svg') no-repeat center/cover;
+    mask: url('../img/playbar_pause_close/Normal.svg') no-repeat center/cover;
 }
 
 /* 语音转文字控件 */
 .translateHeader .foldBtn {
-    background-image: url('../img/unfold/Normal.svg');
+    background-image: none;
+    background-color: var(--color);
+    -webkit-mask: url('../img/unfold/Normal.svg') no-repeat center/cover;
+    mask: url('../img/unfold/Normal.svg') no-repeat center/cover;
 }
 
 .translateHeader.unfold .foldBtn {
-    background-image: url('../img/fold/Normal.svg');
+    background-image: none;
+    background-color: var(--color);
+    -webkit-mask: url('../img/fold/Normal.svg') no-repeat center/cover;
+    mask: url('../img/fold/Normal.svg') no-repeat center/cover;
 }
