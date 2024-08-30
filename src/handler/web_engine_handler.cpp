@@ -56,8 +56,12 @@ WebEngineHandler::WebEngineHandler(QObject *parent)
     connectWebContent();
 
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::themeTypeChanged, this, &WebEngineHandler::onThemeChanged);
-    //
+
     connect(ActionManager::instance(), &ActionManager::actionTriggered, this, &WebEngineHandler::onMenuClicked);
+
+    connect(m_voiceToTextHandler, &VoiceToTextHandler::audioLengthLimit, this, [this]() {
+        Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::AsrTimeLimit);
+    });
 }
 
 QObject *WebEngineHandler::target() const
@@ -213,10 +217,8 @@ void WebEngineHandler::onInsertVoiceItem(const QString &voicePath, quint64 voice
     // 关闭应用时，需要同步插入语音并进行后台更新
     if (OpsStateInterface::instance()->isAppQuit()) {
         // TODO: 完善同步退出处理
-        // JsContent::instance()->callJsSynchronous(page(), QString("insertVoiceItem('%1')").arg(value.toString()));
-        //     m_textChange = true;
-        //     update();
-        // return;
+        callJsSynchronous(QString("insertVoiceItem('%1')").arg(value.toString()));
+        return;
     }
     emit JsContent::instance()->callJsInsertVoice(value.toString());
 }
@@ -268,11 +270,10 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
             break;
         case ActionManager::VoiceSelectAll:
         case ActionManager::PictureSelectAll:
-        case ActionManager::TxtSelectAll: {
+        case ActionManager::TxtSelectAll:
             // 模拟全选快捷键ctrl+A
             Q_EMIT triggerWebAction(QWebEnginePage::SelectAll);
             break;
-        }
         case ActionManager::VoiceCopy:
         case ActionManager::PictureCopy:
         case ActionManager::TxtCopy:
@@ -361,11 +362,9 @@ void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *req
     if (!QFile(m_voiceBlock->voicePath).exists()) {
         // 异步操作，防止阻塞前端事件
         QTimer::singleShot(0, this, [this] {
-            // TODO
-            // VNoteMessageDialog audioOutLimit(VNoteMessageDialog::VoicePathNoAvail);
-            // audioOutLimit.exec();
-            // 删除语音文本
-            // deleteSelectText();
+            Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::VoicePathNoAvail);
+            // 调用 js 删除删除语音文本
+            Q_EMIT JsContent::instance()->callJsDeleteSelection();
         });
         return;
     }

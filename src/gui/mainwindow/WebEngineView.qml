@@ -11,6 +11,7 @@ import QtWebEngine 1.15
 import Qt.labs.platform
 import org.deepin.dtk 1.0
 import VNote 1.0
+import "../dialog"
 
 Item {
     function toggleMultCho(choices) {
@@ -35,8 +36,10 @@ Item {
         id: columnLayout
 
         anchors.fill: parent
+
         WindowTitleBar {
             id: title
+
             Layout.fillWidth: true
             height: 40
         }
@@ -77,6 +80,10 @@ Item {
                             onCallJsResult(result);
                         });
                 }
+                onRequestMessageDialog: type => {
+                    // 触发创建提示对话框
+                    messageDialogLoader.showDialog(type);
+                }
                 onTriggerWebAction: action => {
                     webView.triggerWebAction(action);
                 }
@@ -99,6 +106,11 @@ Item {
                 anchors.fill: parent
             }
         }
+    }
+
+    VNoteMessageDialogLoader {
+        id: messageDialogLoader
+
     }
 
     Loader {

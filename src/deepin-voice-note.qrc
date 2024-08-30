@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/">        
+    <qresource prefix="/">
         <file>deepin-voice-note-setting.json</file>
         <file>icon/default_folder_icons/1.svg</file>
         <file>icon/default_folder_icons/10.svg</file>
@@ -29,5 +29,6 @@
         <file>dsg/icons/img.dci</file>
         <file>icon/multiple_choice.dci</file>
         <file>dsg/icons/new_note.dci</file>
+        <file>gui/dialog/VNoteMessageDialogLoader.qml</file>
     </qresource>
 </RCC>
