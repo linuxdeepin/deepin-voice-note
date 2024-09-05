@@ -65,6 +65,8 @@ signals:
     void callJsHideEditToolbar(); //隐藏编辑工具栏
     void callJsSetVoicePlayBtnEnable(bool enable); //设置播放按钮是否可用
 
+    void callJsPasteHtml(const QString &html); //处理粘贴语音类数据
+
     void textPaste(bool isVoicePaste); //粘贴信号
     void textChange();
     void loadFinsh();

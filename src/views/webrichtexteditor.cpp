@@ -534,6 +534,14 @@ void WebRichTextEditor::onPaste(bool isVoicePaste)
     //获取剪贴板信息
     QClipboard *clipboard = QApplication::clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
+
+    //识别语音类数据
+    auto html = mimeData->html();
+    if (html.contains(QRegularExpression("<div class=\"[^\"]*voiceBox"))) {
+        JsContent::instance()->callJsPasteHtml(html);
+        return;
+    }
+
     //存在文件url
     if (mimeData->hasUrls()) {
         QStringList paths;

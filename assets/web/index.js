@@ -143,6 +143,7 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsClipboardDataChanged.connect(shearPlateChange);
         webobj.callJsSetVoicePlayBtnEnable.connect(playButColor);
         webobj.callJsSetFontList.connect(setFontList);
+        webobj.callJsPasteHtml.connect(pasteHtmlFrom);
         //通知QT层完成通信绑定
         webobj.jsCallChannleFinish();
         // setFontList(global_fontList, "Unifont")
@@ -408,6 +409,16 @@ function shearPlateChange() {
 // 复制标志
 function returnCopyFlag() {
     return isVoicePaste
+}
+
+function pasteHtmlFrom(html) {
+    if (html != "") {
+        document.execCommand('insertHTML', false, html + "<p><br></p>");
+        event.preventDefault()
+    }
+
+    setFocusScroll()
+    removeNullP()
 }
 
 // 粘贴
