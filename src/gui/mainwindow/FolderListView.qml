@@ -6,64 +6,96 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Layouts 1.1
 import org.deepin.dtk
-
 import VNote 1.0
 import "../drag/"
 import "../dialog/"
 
 Item {
-    property int itemHeight: 30
-    property int listWidth: 200
-    property int listHeight: 700
-    width: listWidth
-    height: listHeight
-    visible: true
-    signal itemChanged(int index, string name)
-    signal folderEmpty()
-
-    property alias model: folderListView.model
-    property int lastDropIndex: -1
     property int currentDropIndex: -1
+    property int itemHeight: 30
+    property int lastDropIndex: -1
+    property int listHeight: 700
+    property int listWidth: 200
+    property alias model: folderListView.model
 
-    ListModel {
-        id: folderModel
+    signal folderEmpty
+    signal itemChanged(int index, string name)
+
+    function addFolder() {
+        VNoteMainManager.vNoteCreateFolder();
     }
 
-    DragControl {
-        id: dragControl
+    function addNote(size) {
+        var cout = model.get(folderListView.currentIndex).count;
+        model.get(folderListView.currentIndex).count = (Number(cout) + size).toString();
     }
 
-    VNoteMessageDialogLoader {
-        id: messageDialogLoader
+    function delNote(size) {
+        var cout = model.get(folderListView.currentIndex).count;
+        var new_cout = Number(cout) - size;
+        if (new_cout <= 0)
+        //TODO: 删除记事本
+        {
+        } else {
+            model.get(folderListView.currentIndex).count = new_cout.toString();
+        }
+    }
 
+    function dropItems(selectedNoteItem) {
+        if (currentDropIndex != -1) {
+            VNoteMainManager.moveNotes(selectedNoteItem, currentDropIndex);
+        }
+        if (lastDropIndex != -1 && lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
+            folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent";
+        }
+        lastDropIndex = -1;
+        currentDropIndex = -1;
+    }
+
+    function getCurrentFolder() {
+        return folderListView.model.get(folderListView.currentIndex);
+    }
+
+    function renameFolder(index, isRename) {
+        var item = folderListView.itemAtIndex(index);
+        item.folderNameLabel.visible = !isRename;
+        item.folderCountLabel.visible = !isRename;
+        item.renameLine.visible = isRename;
+    }
+
+    function toggleSearch(isSearch) {
+        if (!isSearch) {
+            var index = folderListView.currentIndex;
+            itemChanged(index, folderModel.get(index).name); // 发出 itemChanged 信号
+        }
     }
 
     function updateItems(mousePosX, mousePosY) {
-        var pos = mapFromGlobal(mousePosX, mousePosY)
+        var pos = mapFromGlobal(mousePosX, mousePosY);
         if (pos.x < 0 || pos.x > listWidth) {
             if (lastDropIndex != -1 && lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
-                folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent"
+                folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent";
             }
             lastDropIndex = -1;
             return;
         }
         //判断当前鼠标所在的行
-        var startY = pos.y - 50 > 0? pos.y - 50 : 0
-        var index = Math.floor(pos.y / itemHeight)
+        var startY = pos.y - 50 > 0 ? pos.y - 50 : 0;
+        var index = Math.floor(pos.y / itemHeight);
         if (index < 0 || index >= folderModel.count) {
             if (lastDropIndex != -1 && lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
-                folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent"
+                folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent";
             }
             currentDropIndex = -1;
             return;
         }
-        currentDropIndex = index
+        currentDropIndex = index;
         if (index != lastDropIndex) {
             if (lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
-                folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent"
+                folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent";
             }
             lastDropIndex = index;
-            if (index === folderListView.currentIndex)  {
+            if (index === folderListView.currentIndex) {
                 return;
             }
         } else {
@@ -71,331 +103,340 @@ Item {
         }
         //更新当前行的颜色
         if (folderListView.itemAtIndex(index)) {
-            folderListView.itemAtIndex(index).backgroundColor = "#1A000000"
+            folderListView.itemAtIndex(index).backgroundColor = "#1A000000";
         }
     }
 
-    function dropItems(selectedNoteItem) {
-        if (currentDropIndex != -1) {
-            VNoteMainManager.moveNotes(selectedNoteItem, currentDropIndex)
-        }
-        if (lastDropIndex != -1 && lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
-            folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent"
-        }
-        lastDropIndex = -1;
-        currentDropIndex = -1;
+    height: listHeight
+    visible: true
+    width: listWidth
+
+    ListModel {
+        id: folderModel
+
     }
 
-    function addFolder() {
-        VNoteMainManager.vNoteCreateFolder()
+    DragControl {
+        id: dragControl
+
     }
 
-    function renameFolder(index, isRename) {
-        var item = folderListView.itemAtIndex(index)
-        item.folderNameLabel.visible = !isRename
-        item.folderCountLabel.visible = !isRename
-        item.renameLine.visible = isRename
-    }
+    VNoteMessageDialogLoader {
+        id: messageDialogLoader
 
-    function toggleSearch(isSearch) {
-        if (!isSearch) {
-            var index = folderListView.currentIndex
-            itemChanged(index, folderModel.get(index).name) // 发出 itemChanged 信号
-        }
-    }
-
-    function getCurrentFolder() {
-        return folderListView.model.get(folderListView.currentIndex)
     }
 
     Connections {
         target: VNoteMainManager
+
         onAddFolderFinished: {
-            folderListView.model.insert(0, {name: folderData.name, count: folderData.notesCount, icon: folderData.icon})
-
+            folderListView.model.insert(0, {
+                    name: folderData.name,
+                    count: folderData.notesCount,
+                    icon: folderData.icon
+                });
             if (folderListView.itemAtIndex(folderListView.currentIndex + 1)) {
-                folderListView.itemAtIndex(folderListView.currentIndex + 1).backgroundColor = "transparent"
+                folderListView.itemAtIndex(folderListView.currentIndex + 1).backgroundColor = "transparent";
             }
-
-            folderListView.currentIndex = 0
-            folderListView.lastCurrentIndex = 0
-            VNoteMainManager.createNote()
+            folderListView.currentIndex = 0;
+            folderListView.lastCurrentIndex = 0;
+            VNoteMainManager.createNote();
         }
     }
 
     ListView {
         id: folderListView
-        anchors.fill: parent
-        property var lastCurrentIndex: -1
-        property int dropIndex: -1
+
         property var contextIndex: -1
-        model: folderModel
-        enabled: parent.enabled
-        clip: true
+        property int dropIndex: -1
+        property var lastCurrentIndex: -1
+
         function indexAt(mousePosX, mousePosY) {
-            var pos = mapFromGlobal(mousePosX, mousePosY)
-            var startY = itemHeight * 0.5
-            var index = Math.floor((pos.y - startY) / itemHeight) + 1
+            var pos = mapFromGlobal(mousePosX, mousePosY);
+            var startY = itemHeight * 0.5;
+            var index = Math.floor((pos.y - startY) / itemHeight) + 1;
             if (index < 0) {
                 index = 0;
             }
             if (index >= folderModel.count) {
                 index = folderModel.count;
             }
-            dropIndex = index
+            dropIndex = index;
         }
+
+        anchors.fill: parent
+        clip: true
+        enabled: parent.enabled
+        model: folderModel
+
         delegate: Item {
-            width: parent.width
-            height: itemHeight
-            enabled: folderListView.enabled
             property color backgroundColor: index === folderListView.currentIndex ? "#33000000" : "transparent"
-            
-            Rectangle {
-                id: rect
-                anchors.fill: parent
-                color: backgroundColor
-                radius: 6
-            }
-            RowLayout {
-                id: rowlayout
-                anchors.fill: parent
-                property int imageWidth: 16
-                spacing: 10
-                Layout.fillWidth: true
-                Rectangle {
-                    width: 16
-                    height: 16
-                    radius: 8
-                    Layout.leftMargin: 10
-                    Image {
-                        id: _image
-                        smooth: true
-                        visible: false
-                        width: 16
-                        height: 16
-                        source: "image://Provider/" + model.icon
-                        fillMode: Image.PreserveAspectCrop
-                        antialiasing: true
-                    }
-                    Rectangle { //矩形
-                        id: _mask
-                        width: 16
-                        height: 16
-                        radius: 8
-                        color: "red"
-                        visible: false  //不可见
-                        smooth: true
-                        antialiasing: true
-                    }
 
-                    OpacityMask {
-                        id: mask_image
-                        anchors.fill: _image
-                        source: _image
-                        maskSource: _mask    //用作遮罩的项目
-                        visible: true
-                        antialiasing: true
-                    }
-                }
-                LineEdit {
-                    id: renameLine
-                    Layout.fillWidth: true
-                    height: 26
-                    visible: false
-                    text: model.name
-                    onFocusChanged: {
-                        folderMouseArea.enabled = false;
-                        if (focus) {
-                            focus = true
-                            selectAll();
-                        } else {
-                            folderMouseArea.enabled = true;
-                            deselect();
-                            visible = false
-                            folderNameLabel.visible = true
-                            folderCountLabel.visible = true
-                        }
-                    }
-                }
-                Label {
-                    id: folderNameLabel
-                    Layout.fillWidth: true
-                    text: model.name
-                    visible: true
-                    horizontalAlignment: Text.AlignLeft
-                    verticalAlignment: Text.AlignVCenter
-                    font.pixelSize: 14
-                }
-                Label {
-                    id: folderCountLabel
-                    Layout.rightMargin: 10
-                    text: model.count
-                    width: 30
-                    visible: true
-                    horizontalAlignment: Text.AlignRight
-                    verticalAlignment: Text.AlignVCenter
-                    font.pixelSize: 14
-                }
-            }
-            MouseArea {
-                id: folderMouseArea
-                anchors.fill: parent
-                drag.target: this
-                hoverEnabled: true
-                enabled: parent.enabled
-                acceptedButtons: Qt.LeftButton | Qt.RightButton
-                property bool held: false
-                onClicked: {
-                    if (mouse.button === Qt.RightButton) {
-                        folderListView.contextIndex = index
-                        folderItemContextMenu.popup()
-                    } else {
-                        if (folderListView.lastCurrentIndex != -1) {
-                            if (folderListView.itemAtIndex(folderListView.lastCurrentIndex)) {
-                                folderListView.itemAtIndex(folderListView.lastCurrentIndex).backgroundColor = "transparent"
-                            }
-                        }
+            enabled: folderListView.enabled
+            height: itemHeight
+            width: parent.width
 
-                        folderListView.currentIndex = index
-                        parent.backgroundColor = "#33000000"
-                        folderListView.lastCurrentIndex = index
-                    }
-                }
-                onDoubleClicked: {
-                    console.log("111111111111111")
-                    // renameLine.select(0, renameLine.text.length)
-                    // renameLine.focus = true
-                }
-
-                onEntered: {
-                    if (folderListView.currentIndex == index) {
-                        return
-                    }
-                    parent.backgroundColor = "#1A000000"
-                }
-                onExited: {
-                    if (folderListView.currentIndex == index) {
-                        return
-                    }
-                    parent.backgroundColor = "transparent"
-                }
-                onPressed: {
-                    held = true
-                    dragControl.isFolder = true
-                }
-                onReleased: {
-                    if (held) {
-                        held = false
-                        dragControl.visible = false
-                        dragControl.imageSource = ""
-                        if (folderListView.dropIndex != -1) {
-                            if (folderListView.dropIndex > index) {
-                                folderListView.dropIndex -= 1
-                            }
-                            if (folderListView.dropIndex != index) {
-                                var tmpIndex = index
-                                folderModel.move(index, folderListView.dropIndex, 1);
-                                VNoteMainManager.updateSort(tmpIndex, folderListView.dropIndex)
-                            }
-                        }
-                    }
-                }
-                onPositionChanged: {
-                    if (held) {
-                        if (held && folderModel.get(folderListView.currentIndex)) {
-                            if (dragControl.imageSource === "") {
-                                parent.grabToImage(function(result) {
-                                    dragControl.imageSource = result.url
-                                })
-                            }
-                            var globPos = mapToGlobal(mouse.x, mouse.y)
-                            dragControl.itemNumber = 1
-                            dragControl.visible = true
-                            dragControl.x = globPos.x
-                            dragControl.y = globPos.y
-                            folderListView.indexAt(globPos.x, globPos.y)
-                        } else {
-                            dragControl.visible = false
-                        }
-                    }
-                }
-            }
-            Menu {
-                id: folderItemContextMenu
-                MenuItem {
-                    text: qsTr("Rename")
-                    onTriggered: {
-                        folderNameLabel.visible = false
-                        folderCountLabel.visible = false
-                        renameLine.visible = true
-                        renameLine.focus = true
-                    }
-                }
-                MenuItem {
-                    text: qsTr("Delete")
-                    onTriggered: {
-                        messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteFolder, ret => {
-                            if (ret) {
-                                VNoteMainManager.vNoteDeleteFolder(folderListView.contextIndex)
-                                if (folderModel.count === 1)
-                                    folderEmpty()
-                                folderModel.remove(folderListView.contextIndex)
-                                if (folderListView.contextIndex === 0) {
-                                    folderListView.currentIndex = 0
-                                }
-                            }
-                        })
-                    }
-                }
-                MenuItem {
-                    text: qsTr("New Note")
-                    onTriggered: {
-                        addFolder()
-                    }
-                }
-            }
             Keys.onPressed: {
-                switch (event.key)
-                {
+                switch (event.key) {
                 case Qt.Key_Enter:
                 case Qt.Key_Return:
-                    var lastName = model.name
+                    var lastName = model.name;
                     if (lastName != renameLine.text) {
-                        VNoteMainManager.renameFolder(index, renameLine.text)
-                        model.name = renameLine.text
-                        renameLine.visible = false
-                        folderNameLabel.visible = true
-                        folderCountLabel.visible = true
+                        VNoteMainManager.renameFolder(index, renameLine.text);
+                        model.name = renameLine.text;
+                        renameLine.visible = false;
+                        folderNameLabel.visible = true;
+                        folderCountLabel.visible = true;
                     }
                     break;
                 case Qt.Key_Escape:
-                    console.log("esc")
+                    console.log("esc");
                     break;
                 default:
                     break;
                 }
             }
+
+            Rectangle {
+                id: rect
+
+                anchors.fill: parent
+                color: backgroundColor
+                radius: 6
+            }
+
+            RowLayout {
+                id: rowlayout
+
+                property int imageWidth: 16
+
+                Layout.fillWidth: true
+                anchors.fill: parent
+                spacing: 10
+
+                Rectangle {
+                    Layout.leftMargin: 10
+                    height: 16
+                    radius: 8
+                    width: 16
+
+                    Image {
+                        id: _image
+
+                        antialiasing: true
+                        fillMode: Image.PreserveAspectCrop
+                        height: 16
+                        smooth: true
+                        source: "image://Provider/" + model.icon
+                        visible: false
+                        width: 16
+                    }
+
+                    Rectangle {
+                        //矩形
+                        id: _mask
+
+                        antialiasing: true
+                        color: "red"
+                        height: 16
+                        radius: 8
+                        smooth: true
+                        visible: false  //不可见
+                        width: 16
+                    }
+
+                    OpacityMask {
+                        id: mask_image
+
+                        anchors.fill: _image
+                        antialiasing: true
+                        maskSource: _mask    //用作遮罩的项目
+                        source: _image
+                        visible: true
+                    }
+                }
+
+                LineEdit {
+                    id: renameLine
+
+                    Layout.fillWidth: true
+                    height: 26
+                    text: model.name
+                    visible: false
+
+                    onFocusChanged: {
+                        folderMouseArea.enabled = false;
+                        if (focus) {
+                            focus = true;
+                            selectAll();
+                        } else {
+                            folderMouseArea.enabled = true;
+                            deselect();
+                            visible = false;
+                            folderNameLabel.visible = true;
+                            folderCountLabel.visible = true;
+                        }
+                    }
+                }
+
+                Label {
+                    id: folderNameLabel
+
+                    Layout.fillWidth: true
+                    font.pixelSize: 14
+                    horizontalAlignment: Text.AlignLeft
+                    text: model.name
+                    verticalAlignment: Text.AlignVCenter
+                    visible: true
+                }
+
+                Label {
+                    id: folderCountLabel
+
+                    Layout.rightMargin: 10
+                    font.pixelSize: 14
+                    horizontalAlignment: Text.AlignRight
+                    text: model.count
+                    verticalAlignment: Text.AlignVCenter
+                    visible: true
+                    width: 30
+                }
+            }
+
+            MouseArea {
+                id: folderMouseArea
+
+                property bool held: false
+
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                anchors.fill: parent
+                drag.target: this
+                enabled: parent.enabled
+                hoverEnabled: true
+
+                onClicked: {
+                    if (mouse.button === Qt.RightButton) {
+                        folderListView.contextIndex = index;
+                        folderItemContextMenu.popup();
+                    } else {
+                        if (folderListView.lastCurrentIndex != -1) {
+                            if (folderListView.itemAtIndex(folderListView.lastCurrentIndex)) {
+                                folderListView.itemAtIndex(folderListView.lastCurrentIndex).backgroundColor = "transparent";
+                            }
+                        }
+                        folderListView.currentIndex = index;
+                        parent.backgroundColor = "#33000000";
+                        folderListView.lastCurrentIndex = index;
+                    }
+                }
+                onDoubleClicked:
+                // renameLine.select(0, renameLine.text.length)
+                // renameLine.focus = true
+                {
+                }
+                onEntered: {
+                    if (folderListView.currentIndex == index) {
+                        return;
+                    }
+                    parent.backgroundColor = "#1A000000";
+                }
+                onExited: {
+                    if (folderListView.currentIndex == index) {
+                        return;
+                    }
+                    parent.backgroundColor = "transparent";
+                }
+                onPositionChanged: {
+                    if (held) {
+                        if (held && folderModel.get(folderListView.currentIndex)) {
+                            if (dragControl.imageSource === "") {
+                                parent.grabToImage(function (result) {
+                                        dragControl.imageSource = result.url;
+                                    });
+                            }
+                            var globPos = mapToGlobal(mouse.x, mouse.y);
+                            dragControl.itemNumber = 1;
+                            dragControl.visible = true;
+                            dragControl.x = globPos.x;
+                            dragControl.y = globPos.y;
+                            folderListView.indexAt(globPos.x, globPos.y);
+                        } else {
+                            dragControl.visible = false;
+                        }
+                    }
+                }
+                onPressed: {
+                    held = true;
+                    dragControl.isFolder = true;
+                }
+                onReleased: {
+                    if (held) {
+                        held = false;
+                        dragControl.visible = false;
+                        dragControl.imageSource = "";
+                        if (folderListView.dropIndex != -1) {
+                            if (folderListView.dropIndex > index) {
+                                folderListView.dropIndex -= 1;
+                            }
+                            if (folderListView.dropIndex != index) {
+                                var tmpIndex = index;
+                                folderModel.move(index, folderListView.dropIndex, 1);
+                                VNoteMainManager.updateSort(tmpIndex, folderListView.dropIndex);
+                            }
+                        }
+                    }
+                }
+            }
+
+            Menu {
+                id: folderItemContextMenu
+
+                MenuItem {
+                    text: qsTr("Rename")
+
+                    onTriggered: {
+                        folderNameLabel.visible = false;
+                        folderCountLabel.visible = false;
+                        renameLine.visible = true;
+                        renameLine.focus = true;
+                    }
+                }
+
+                MenuItem {
+                    text: qsTr("Delete")
+
+                    onTriggered: {
+                        messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteFolder, ret => {
+                                if (ret) {
+                                    VNoteMainManager.vNoteDeleteFolder(folderListView.contextIndex);
+                                    if (folderModel.count === 1)
+                                        folderEmpty();
+                                    folderModel.remove(folderListView.contextIndex);
+                                    if (folderListView.contextIndex === 0) {
+                                        folderListView.currentIndex = 0;
+                                    }
+                                }
+                            });
+                    }
+                }
+
+                MenuItem {
+                    text: qsTr("New Note")
+
+                    onTriggered: {
+                        addFolder();
+                    }
+                }
+            }
         }
+
         onCurrentItemChanged: {
-            var index = folderListView.currentIndex
+            var index = folderListView.currentIndex;
             // if (folderListView.itemAtIndex(folderListView.lastCurrentIndex).renameLine) {
             //     renameFolder(folderListView.lastCurrentIndex, true)
             // }
 
-            itemChanged(index, folderModel.get(index).name) // 发出 itemChanged 信号
-        }
-    }
-    function addNote(size) {
-        var cout = model.get(folderListView.currentIndex).count
-        model.get(folderListView.currentIndex).count = (Number(cout) + size).toString()
-    }
-    function delNote(size) {
-        var cout = model.get(folderListView.currentIndex).count
-        var new_cout = Number(cout) - size
-        if (new_cout <= 0) {
-            //TODO: 删除记事本
-        } else {
-            model.get(folderListView.currentIndex).count = new_cout.toString()
+            itemChanged(index, folderModel.get(index).name); // 发出 itemChanged 信号
         }
     }
 }

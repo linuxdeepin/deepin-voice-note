@@ -69,12 +69,12 @@ bool VNoteItemOper::modifyNoteTitle(const QString &title)
         RenameNoteDbVisitor renameNoteVisitor(
             VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
 
-        // if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameNoteVisitor))) {
-        //     m_note->noteTitle = oldTitle;
-        //     m_note->modifyTime = oldModifyTime;
+        if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameNoteVisitor))) {
+            m_note->noteTitle = oldTitle;
+            m_note->modifyTime = oldModifyTime;
 
-        //     isUpdateOK = false;
-        // }
+            isUpdateOK = false;
+        }
     }
 
     return isUpdateOK;
@@ -94,9 +94,9 @@ bool VNoteItemOper::updateNote()
         QDateTime oldModifyTime = m_note->modifyTime;
 
         //Prepare meta data
-        // MetaDataParser metaParser;
+        MetaDataParser metaParser;
 
-        // metaParser.makeMetaData(m_note, m_note->metaDataRef());
+        metaParser.makeMetaData(m_note, m_note->metaDataRef());
 
         m_note->modifyTime = QDateTime::currentDateTime();
 
@@ -108,12 +108,12 @@ bool VNoteItemOper::updateNote()
         UpdateNoteDbVisitor updateNoteVisitor(
             VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
 
-        // if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
-        //     m_note->setMetadata(oldMetaData);
-        //     m_note->modifyTime = oldModifyTime;
+        if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
+            m_note->setMetadata(oldMetaData);
+            m_note->modifyTime = oldModifyTime;
 
-        //     isUpdateOK = false;
-        // }
+            isUpdateOK = false;
+        }
     }
 
     return isUpdateOK;
@@ -185,8 +185,7 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
  */
 VNoteItem *VNoteItemOper::getNote(qint64 folderId, qint32 noteId)
 {
-    return nullptr;
-    // return VNoteDataManager::instance()->getNote(folderId, noteId);
+    return VNoteDataManager::instance()->getNote(folderId, noteId);
 }
 
 /**

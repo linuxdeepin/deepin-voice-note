@@ -6,11 +6,11 @@
 #include "exportnoteworker.h"
 #include "globaldef.h"
 #include "common/vnoteitem.h"
-// #include "common/metadataparser.h"
-// #include "common/setting.h"
+#include "common/metadataparser.h"
+#include "common/setting.h"
 #include "common/utils.h"
 
-// #include <DLog>
+#include <DLog>
 
 #include <QDir>
 #include <QDateTime>
@@ -45,18 +45,18 @@ void ExportNoteWorker::run()
     ExportError error = checkPath();
 
     if (ExportOK == error) {
-        // if (ExportText == m_exportType) {
-        //     error = exportText();
-        //     setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, m_exportPath);
-        // } else if (ExportVoice == m_exportType) {
-        //     error = exportAllVoice();
-        //     setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, m_exportPath);
-        // } else if (ExportHtml == m_exportType) {
-        //     error = exportAsHtml();
-        //     setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, m_exportPath);
-        // }
+        if (ExportText == m_exportType) {
+            error = exportText();
+            setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, m_exportPath);
+        } else if (ExportVoice == m_exportType) {
+            error = exportAllVoice();
+            setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, m_exportPath);
+        } else if (ExportHtml == m_exportType) {
+            error = exportAsHtml();
+            setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, m_exportPath);
+        }
     } else {
-        // qCritical() << "Export note error: m_exportType=" << m_exportType;
+        qCritical() << "Export note error: m_exportType=" << m_exportType;
     }
 
     emit exportFinished(error);
@@ -73,11 +73,12 @@ ExportNoteWorker::ExportError ExportNoteWorker::checkPath()
     QFileInfo exportDir(m_exportPath);
 
     if (!m_exportPath.isEmpty()) {
-        if (!exportDir.exists()) {
+        QFileInfo dir(exportDir.absolutePath());
+        if (!dir.exists()) {
             if (!QDir().mkpath(m_exportPath)) {
                 error = PathDenied;
             }
-        } else if (!exportDir.isWritable()) {
+        } else if (!dir.isWritable()) {
             error = PathDenied;
         }
     } else {
@@ -108,7 +109,7 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportText()
                 QString fileSuffix = ".txt";
                 filePath = getExportFileName(baseFileName, fileSuffix);
             } else {
-                filePath = m_exportPath + "/" + m_exportName;
+                filePath = m_exportPath;
             }
             QFile out(filePath);
             if (!out.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -184,11 +185,11 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAllVoice()
 ExportNoteWorker::ExportError ExportNoteWorker::exportOneVoice(const QString &json)
 {
     VNVoiceBlock voiceBlock;
-    // MetaDataParser dataParser;
-    // //解析json数据
-    // if (dataParser.parse(json, &voiceBlock)) {
-    //     return exportOneVoice(&voiceBlock);
-    // }
+    MetaDataParser dataParser;
+    //解析json数据
+    if (dataParser.parse(json, &voiceBlock)) {
+        return exportOneVoice(&voiceBlock);
+    }
     return NoteInvalid;
 }
 
@@ -234,7 +235,7 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAsHtml()
             QString fileSuffix = ".html";
             filePath = getExportFileName(baseFileName, fileSuffix);
         } else {
-            filePath = m_exportPath + "/" + m_exportName;
+            filePath = m_exportPath;
         }
         QFile out(filePath);
         if (!out.open(QIODevice::WriteOnly | QIODevice::Text)) {

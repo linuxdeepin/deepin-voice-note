@@ -13,7 +13,7 @@ endif()
 
 list(APPEND RESOURCES ${CMAKE_PROJECT_NAME}.qrc deepin-voice-note-web.qrc)
 
-find_package(Qt6 6.6 REQUIRED COMPONENTS Core Widgets Quick DBus Sql WebEngineQuick)
+find_package(Qt6 6.6 REQUIRED COMPONENTS Core Widgets Quick DBus Sql WebEngineQuick Multimedia)
 find_package(Dtk6 COMPONENTS Core Widget Gui REQUIRED)
 
 find_package(PkgConfig REQUIRED)
@@ -25,6 +25,7 @@ include_directories(./gui)
 include_directories(./common)
 include_directories(./db)
 include_directories(./handler)
+include_directories(./audio)
 
 aux_source_directory(./ ALLSOURCE)
 aux_source_directory(./dbusservice ALLSOURCE)
@@ -33,6 +34,7 @@ aux_source_directory(./db ALLSOURCE)
 aux_source_directory(./gui ALLSOURCE)
 aux_source_directory(./task ALLSOURCE)
 aux_source_directory(./handler ALLSOURCE)
+aux_source_directory(./audio ALLSOURCE)
 
 add_executable(${BIN_NAME} ${ALLSOURCE} ${RESOURCES})
 
@@ -43,6 +45,7 @@ target_link_libraries(${BIN_NAME} PRIVATE
     Qt6::DBus
     Qt6::Sql
     Qt6::WebEngineQuick
+    Qt6::Multimedia
     Dtk6::Core
     Dtk6::Gui
     Dtk6::Widget
@@ -59,7 +62,9 @@ else()
 
     message("-- Build with libvlc, found:" ${LIBVLC_FOUND})
 endif()
-
+pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
+include_directories(${GSTREAMER_INCLUDE_DIRS})
+target_link_libraries(${BIN_NAME} PRIVATE ${GSTREAMER_LIBRARIES})
 
 # Add install rule
 install(TARGETS ${BIN_NAME} DESTINATION ${APP_BIN_INSTALL_DIR})

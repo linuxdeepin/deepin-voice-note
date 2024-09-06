@@ -42,20 +42,26 @@ public:
     Q_INVOKABLE void updateSort(const int &src, const int &dst);
     Q_INVOKABLE void renameFolder(const int &index, const QString &name);
     Q_INVOKABLE void vNoteSearch(const QString &text);
+    Q_INVOKABLE void updateNoteWithResult(const QString &result);
     Q_INVOKABLE int loadSearchNotes(const QString &key);
+    Q_INVOKABLE int loadAudioSource();
+    Q_INVOKABLE void changeAudioSource(const int &source);
+    Q_INVOKABLE void insertImages(const QStringList &filePaths);
 
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);
-    void updateNotes(const QList<QVariantMap> &notesData);
+    void updateNotes(const QList<QVariantMap> &notesData, const int &selectIndex);
     void addNoteAtHead(const QList<QVariantMap> &notesData);
     void addFolderFinished(const QVariantMap &folderData);
     void noSearchResult();
     void searchFinished(const QList<QVariantMap> &notesData, const QString &key);
     void moveFinished(const QVariantList &index, const int &srcFolderIndex, const int &dstFolderIndex);
+    void needUpdateNote();
 
 private slots:
     void onVNoteFoldersLoaded();
     void onExportFinished(int err);
+    void onNoteChanged();
 
 private:
     VNoteMainManager();
@@ -63,15 +69,18 @@ private:
     void initConnections();
     int loadNotepads();
     int loadNotes(VNoteFolder *folder);
+    void insertVoice(const QString &path, qint64 size);
+    void loadSettings();
 
     VNoteFolder* getFloderByIndex(const int &index);
     VNoteFolder* getFloderById(const int &id);
     int getFloderIndexById(const int &id);
     VNoteItem* getNoteById(const int &id);
-    VNoteItem* getNoteByIndex(const int &index);
+    VNoteItem* deleteNoteById(const int &id);
 
 private:
     int m_currentFolderIndex {-1};
+    int m_currentNoteId {-1};
     int m_currentHasTop {0};
     QList<VNoteItem*> m_noteItems;
     QStringList m_folderSort;

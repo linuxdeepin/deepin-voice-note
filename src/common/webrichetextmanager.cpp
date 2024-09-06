@@ -1,6 +1,7 @@
 #include "webrichetextmanager.h"
 #include "jscontent.h"
 #include "db/vnoteitemoper.h"
+#include "metadataparser.h"
 
 #include <QTimer>
 #include <QEventLoop>
@@ -8,7 +9,8 @@
 WebRichTextManager::WebRichTextManager(QObject *parent)
 : QObject(parent)
 {
-
+    initUpdateTimer();
+    initConnect();
 }
 
 void WebRichTextManager::initData(VNoteItem *data, const QString reg, bool focus)
@@ -22,31 +24,63 @@ void WebRichTextManager::initData(VNoteItem *data, const QString reg, bool focus
     });
 }
 
+void WebRichTextManager::initConnect()
+{
+    connect(JsContent::instance(), &JsContent::textChange, this, [=](){
+        m_textChange = true;
+        emit noteTextChanged();
+    });
+}
+
 void WebRichTextManager::setData(VNoteItem *data, const QString reg)
 {
+    m_updateTimer->stop();
     //设置富文本内容
     if (data->htmlCode.isEmpty()) {
         emit JsContent::instance()->callJsInitData(data->metaDataRef().toString());
     } else {
         emit JsContent::instance()->callJsSetHtml(data->htmlCode);
     }
+    m_updateTimer->start();
+}
+
+void WebRichTextManager::initUpdateTimer()
+{
+    m_updateTimer = new QTimer(this);
+    m_updateTimer->setInterval(1000);
+    connect(m_updateTimer, &QTimer::timeout, this, &WebRichTextManager::updateNote);
 }
 
 void WebRichTextManager::updateNote()
 {
-    // if (m_noteData) {
-    //     if (m_textChange) {
-    //         QVariant result = JsContent::instance()->callJsSynchronous(page(), QString("getHtml()"));
-    //         if (result.isValid()) {
-    //             m_noteData->htmlCode = result.toString();
-    //             VNoteItemOper noteOps(m_noteData);
-    //             if (!noteOps.updateNote()) {
-    //                 qInfo() << "Save note error";
-    //             }
-    //         }
-    //         m_textChange = false;
-    //     }
-    // }
+    if (m_textChange) {
+        emit needUpdateNote();
+    }
+}
+
+void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &result)
+{
+    data->htmlCode = result;
+    VNoteItemOper noteOps(data);
+    if (!noteOps.updateNote()) {
+        qInfo() << "Save note error";
+    }
+    m_textChange = false;
+}
+
+void WebRichTextManager::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
+{
+    VNVoiceBlock data;
+    data.ptrVoice->voiceSize = voiceSize;
+    data.ptrVoice->voicePath = voicePath;
+    data.ptrVoice->createTime = QDateTime::currentDateTime();
+    data.ptrVoice->voiceTitle = data.ptrVoice->createTime.toString("yyyyMMdd hh.mm.ss");
+
+    MetaDataParser parse;
+    QVariant value;
+    parse.makeMetaData(&data, value);
+
+    emit JsContent::instance()->callJsInsertVoice(value.toString());
 }
 
 /**

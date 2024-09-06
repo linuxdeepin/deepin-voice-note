@@ -30,5 +30,10 @@
         <file>icon/multiple_choice.dci</file>
         <file>dsg/icons/new_note.dci</file>
         <file>gui/dialog/VNoteMessageDialogLoader.qml</file>
+        <file>gui/mainwindow/RecordingView.qml</file>
+        <file>dsg/icons/recording_pause.dci</file>
+        <file>dsg/icons/recording_stop.dci</file>
+        <file>dsg/icons/recording_start.dci</file>
+        <file>gui/dialog/SettingDialog.qml</file>
     </qresource>
 </RCC>

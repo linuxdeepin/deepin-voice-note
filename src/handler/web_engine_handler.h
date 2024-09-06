@@ -12,6 +12,7 @@
 #include <QRect>
 #include <QEventLoop>
 #include <QWebEnginePage>
+#include <QTimer>
 
 #include "vnote_message_dialog_handler.h"
 
@@ -54,6 +55,8 @@ Q_SIGNALS:
 
     // 请求弹出提示对话框
     void requestMessageDialog(VNoteMessageDialogHandler::MessageType type);
+
+    void loadRichText();
 
 public Q_SLOTS:
     // for qml
