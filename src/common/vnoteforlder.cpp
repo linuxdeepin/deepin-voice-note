@@ -5,9 +5,8 @@
 
 #include "vnoteforlder.h"
 #include "common/vnotedatamanager.h"
-#include "db/vnoteitemoper.h"
 
-// #include <DLog>
+#include <DLog>
 
 /**
  * @brief VNoteFolder::VNoteFolder

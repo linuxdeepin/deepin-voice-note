@@ -93,7 +93,7 @@ public:
     };
 
     QSqlDatabase &getVNoteDb();
-    // 执行插入操作
+    //执行插入操作
     bool insertData(DbVisitor *visitor /*in/out*/);
     //执行更新操作
     bool updateData(DbVisitor *visitor /*in/out*/);
@@ -115,7 +115,7 @@ protected:
 
 protected:
     QSqlDatabase m_vnoteDB;
-//     //    QScopedPointer<QSqlQuery> m_sqlQuery;
+    //    QScopedPointer<QSqlQuery> m_sqlQuery;
 
     QMutex m_dbLock;
     bool m_isDbInitOK {false};

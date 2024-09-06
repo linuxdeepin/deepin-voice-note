@@ -8,7 +8,7 @@
 #include "common/vnoteitem.h"
 #include "globaldef.h"
 
-// #include <DLog>
+#include <DLog>
 
 /**
  * @brief VNOTE_FOLDERS_MAP::~VNOTE_FOLDERS_MAP

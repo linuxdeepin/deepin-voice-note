@@ -8,9 +8,6 @@
 
 #include <QPixmap>
 #include <QPainter>
-#include <DSvgRenderer>
-
-DGUI_USE_NAMESPACE
 
 QVector<QPixmap> VNoteDataManager::m_defaultIcons[IconsType::MaxIconsType];
 QReadWriteLock VNoteDataManager::m_iconLock;
@@ -53,12 +50,11 @@ QPixmap LoadIconsWorker::greyPix(QPixmap pix)
  */
 void LoadIconsWorker::run()
 {
-    QString defaultIconPathFmt(":/icon/default_folder_icons/%1.svg");
+    QString defaultIconPathFmt(":/icons/deepin/builtin/default_folder_icons/%1.svg");
 
     for (int i = 0; i < DEFAULTICONS_COUNT; i++) {
         QString iconPath = defaultIconPathFmt.arg(i + 1);
-        DSvgRenderer svg(iconPath);
-        QPixmap bitmap(QPixmap::fromImage(svg.toImage(svg.defaultSize())));
+        QPixmap bitmap(iconPath);
         VNoteDataManager::m_defaultIcons[IconsType::DefaultIcon].push_back(bitmap);
         VNoteDataManager::m_defaultIcons[IconsType::DefaultGrayIcon].push_back(greyPix(bitmap));
     }

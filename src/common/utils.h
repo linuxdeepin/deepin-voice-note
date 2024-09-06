@@ -11,7 +11,6 @@
 #include <QPixmap>
 #include <QTextDocumentFragment>
 #include <QTextDocument>
-#include <QKeyEvent>
 
 DWIDGET_USE_NAMESPACE
 
@@ -48,6 +47,4 @@ public:
     static QString filteredFileName(QString fileName, const QString &defaultName = "");
     //判断是否wayland
     static bool isWayland();
-    //搜索结果标题处理
-    static QString createRichText(const QString &title, const QString &key);
 };

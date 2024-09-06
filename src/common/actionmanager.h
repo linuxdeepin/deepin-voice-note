@@ -1,32 +1,39 @@
-// SPDX-FileCopyrightText: 2024 UnionTech Software Technology Co., Ltd.
+// Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
+// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef ACTIONMANAGER_H
-#define ACTIONMANAGER_H
+#ifndef ACTIONFACTORY_H
+#define ACTIONFACTORY_H
+
+#include "widgets/vnoterightmenu.h"
+
+#include <DMenu>
 
 #include <QObject>
-#include <QPointer>
 #include <QMap>
+
+DWIDGET_USE_NAMESPACE
 
 class ActionManager : public QObject
 {
     Q_OBJECT
 public:
-    // 右键菜单类型
+    static ActionManager *Instance();
+
     enum ActionKind {
         Invalid = 0,
-        // Notepad
+        //Notepad
         NotebookMenuBase,
         NotebookRename = NotebookMenuBase,
         NotebookDelete,
         NotebookAddNew,
-        // Add notebook menu item begin {
+        //Add notebook menu item begin {
 
-        // Add notebook menu item end }
+        //Add notebook menu item end }
         NotebookMenuMax,
 
-        // notes
+        //notes
         NoteMenuBase,
         NoteRename = NoteMenuBase,
         NoteTop,
@@ -34,14 +41,13 @@ public:
         NoteDelete,
         NoteSave,
         NoteSaveVoice,
-        NoteSeparator,
         NoteAddNew,
-        // Add note menu item begin {
+        //Add note menu item begin {
 
-        // Add note menu item end }
+        //Add note menu item end }
         NoteMenuMax,
 
-        // Voice
+        //Voice
         VoiceMenuBase,
         VoiceAsSave = VoiceMenuBase,
         VoiceToText,
@@ -50,12 +56,12 @@ public:
         VoiceCopy,
         VoiceCut,
         VoicePaste,
-        // Add voice menu item begin {
+        //Add voice menu item begin {
 
-        // Add voice menu item end }
+        //Add voice menu item end }
         VoiceMenuMax,
 
-        // pciture
+        //pciture
         PictureMenuBase,
         PictureView = PictureMenuBase,
         PictureDelete,
@@ -64,12 +70,12 @@ public:
         PictureCut,
         PicturePaste,
         PictureSaveAs,
-        // Add pciture menu item begin {
+        //Add pciture menu item begin {
 
-        // Add pciture menu item end }
+        //Add pciture menu item end }
         PictureMenuMax,
 
-        // txt
+        //txt
         TxtMenuBase,
         TxtDelete = TxtMenuBase,
         TxtSelectAll,
@@ -77,19 +83,18 @@ public:
         TxtCut,
         TxtPaste,
 
-        TxtSeparator,   // 分割线
         TxtSpeech,
         TxtStopreading,
         TxtDictation,
         TxtTranslate,
-        // Add Txt menu item begin {
+        //Add Txt menu item begin {
 
-        // Add Txt menu item end }
+        //Add Txt menu item end }
         TxtMenuMax,
 
         SaveNoteMenuBase,
-        SaveNoteAsHtml = SaveNoteMenuBase,   // 保存为HTML
-        SaveNoteAsText,   // 保存为txt
+        SaveNoteAsHtml = SaveNoteMenuBase, //保存为HTML
+        SaveNoteAsText, //保存为txt
         SaveNoteMax,
 
         MenuMaxId
@@ -97,75 +102,57 @@ public:
 
     Q_ENUM(ActionKind)
 
-    // Menu types
+    //Menu types
     enum MenuType {
-        UnknownMenu,
         NotebookCtxMenu,
         NoteCtxMenu,
         VoiceCtxMenu,
         PictureCtxMenu,
         TxtCtxMenu,
-        SaveNoteCtxMenu,   // 保存笔记二级菜单
+        SaveNoteCtxMenu, //保存笔记二级菜单
     };
     Q_ENUM(MenuType)
+    //获取记事本列表右键菜单
+    VNoteRightMenu *notebookContextMenu();
+    //获取记事项列表右键菜单
+    VNoteRightMenu *noteContextMenu();
+    //获取记事项列表右键菜单的的二级菜单保存笔记菜单
+    VNoteRightMenu *saveNoteContextMenu();
+    //获取语音文本右键菜单
+    VNoteRightMenu *voiceContextMenu();
+    //获取图片文本右键菜单
+    VNoteRightMenu *pictureContextMenu();
+    //获取文字文本右键菜单
+    VNoteRightMenu *txtContextMenu();
+    //获取菜单项ID
+    ActionKind getActionKind(QAction *action);
+    //获取菜单项
+    QAction *getActionById(ActionKind id);
+    //设置菜单项是否可用
+    void enableAction(ActionKind actionId, bool enable);
+    //设置菜单项是否可见
+    void visibleAction(ActionKind actionId, bool enable);
+    //重置菜单项可用状态
+    void resetCtxMenu(MenuType type, bool enable = true);
+    //隐藏/显示语音助手相关功能
+    void visibleAiActions(bool visible);
 
-    enum ComponentType {
-        MenuItemComponent,
-        MenuComponent,
-        MenuSeparatorComponent,
-    };
-    Q_ENUM(ComponentType)
-
-    static ActionManager *instance();
-
-    // 获取菜单项对应的 QML 组件
-    Q_INVOKABLE QObject *getActionById(ActionKind id);
-
-    // 设置菜单项是否可用
-    Q_INVOKABLE void enableAction(ActionKind actionId, bool enable);
-    // 设置菜单项是否可见
-    Q_INVOKABLE void visibleAction(ActionKind actionId, bool visible);
-    // 重置菜单项可用状态
-    Q_INVOKABLE void resetCtxMenu(MenuType type, bool enable = true);
-
-    // 隐藏/显示语音助手相关功能
-    Q_INVOKABLE void visibleAiActions(bool visible);
-
-    // 动作被触发
-    Q_SIGNAL void actionTriggered(ActionKind actionId);
-
-    // \internal 内部使用
-    // 用于获取菜单项详细参数
-    Q_INVOKABLE QString actionText(ActionKind id);
-    Q_INVOKABLE ComponentType actionCompType(ActionKind id);
-    // 获取子菜单项
-    Q_INVOKABLE QList<ActionKind> childActions(ActionKind id);
-    // 用于 QML 组件初始化和标记动作触发
-    Q_INVOKABLE void setActionObject(ActionKind id, QObject *obj);
-    Q_SLOT void actionTriggerFromQuick(ActionKind actionId);
-
-private:
-    explicit ActionManager(QObject *parent = nullptr);
+protected:
+    ActionManager();
+    //初始化
     void initMenu();
+    //获取菜单指针
+    QScopedPointer<VNoteRightMenu, QScopedPointerDeleteLater> m_notebookContextMenu;
+    QScopedPointer<VNoteRightMenu, QScopedPointerDeleteLater> m_noteContextMenu;
+    QScopedPointer<VNoteRightMenu, QScopedPointerDeleteLater> m_voiceContextMenu;
+    QScopedPointer<VNoteRightMenu, QScopedPointerDeleteLater> m_pictureContextMenu;
+    QScopedPointer<VNoteRightMenu, QScopedPointerDeleteLater> m_txtContextMenu;
+    QScopedPointer<VNoteRightMenu, QScopedPointerDeleteLater> m_saveNoteContextMenu;
 
-private:
-    // 菜单动作信息 后续按需增加快捷键等属性
-    struct ActionMeta
-    {
-        ActionKind id;
-        QString text;
-        ComponentType type = MenuItemComponent;
-        QPointer<QObject> qmlObject { nullptr };   // 和 QML 组件通信
+    QMap<ActionKind, QAction *> m_actionsMap;
 
-        ActionMeta() = default;
-        ActionMeta(ActionKind i, const QString &tex, ComponentType t = MenuItemComponent)
-            : id(i), text(tex), type(t) { }
-    };
-    using ActionPtr = QSharedPointer<ActionMeta>;
-    QMap<ActionKind, ActionPtr> metaData;   // 菜单项信息
-    QMap<ActionKind, QList<ActionKind>> childActionMap;   // 子菜单项信息
-
-    Q_DISABLE_COPY(ActionManager)
+    //语音助手功能分割线
+    QAction *m_aiSeparator {nullptr};
 };
 
-#endif   // ACTIONMANAGER_H
+#endif // ACTIONFACTORY_H

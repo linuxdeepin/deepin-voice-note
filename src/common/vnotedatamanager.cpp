@@ -11,9 +11,11 @@
 #include "vnoteforlder.h"
 #include "vnoteitem.h"
 
+#include <DLog>
+
 #include <QThreadPool>
 
-// DCORE_USE_NAMESPACE
+DCORE_USE_NAMESPACE
 
 VNoteDataManager *VNoteDataManager::_instance = nullptr;
 
@@ -477,9 +479,9 @@ void VNoteDataManager::onFoldersLoaded(VNOTE_FOLDERS_MAP *foldesMap)
     //Set folder data ready flag
     m_fDataState |= DataState::FolderDataReady;
 
-    emit noteFoldersLoaded();
+    emit onNoteFoldersLoaded();
 
-    // Send data ready signal if data ready
+    //Send data ready signal if data ready
     if (isAllDatasReady()) {
         emit onAllDatasReady();
     }

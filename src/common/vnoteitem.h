@@ -8,14 +8,14 @@
 
 #include "common/datatypedef.h"
 
-// #include <DWidget>
+#include <DWidget>
 
 #include <QDateTime>
 #include <QTextCursor>
 #include <QTextDocumentFragment>
 #include <QTextDocument>
 
-// DWIDGET_USE_NAMESPACE
+DWIDGET_USE_NAMESPACE
 
 struct VNoteBlock;
 struct VNoteFolder;

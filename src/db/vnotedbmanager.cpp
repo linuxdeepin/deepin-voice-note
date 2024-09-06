@@ -7,6 +7,8 @@
 #include "db/dbvisitor.h"
 #include "globaldef.h"
 
+#include <DLog>
+
 #include <QStandardPaths>
 #include <QDir>
 #include <QFile>

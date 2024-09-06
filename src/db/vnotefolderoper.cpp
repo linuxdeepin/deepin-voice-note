@@ -11,14 +11,11 @@
 #include "db/dbvisitor.h"
 #include "globaldef.h"
 
+#include <DLog>
+
 #include <QVariant>
 #include <QObject>
 #include <QDateTime>
-#include <QRandomGenerator>
-
-#include <DApplication>
-
-DWIDGET_USE_NAMESPACE
 
 /**
  * @brief VNoteFolderOper::VNoteFolderOper
@@ -131,13 +128,20 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
 {
     //Initialize
     folder.defaultIcon = getDefaultIcon();
-    qWarning() << "default icon index is:" << folder.defaultIcon;
 
     VNoteFolder *newFolder = new VNoteFolder();
 
     AddFolderDbVisitor addFolderVisitor(VNoteDbManager::instance()->getVNoteDb(), &folder, newFolder);
 
     if (VNoteDbManager::instance()->insertData(&addFolderVisitor)) {
+        //TODO:
+        //    DbVisitor can update any feilds here  db return all feilds
+        //of new record. Just load icon here
+        newFolder->UI.icon = VNoteDataManager::instance()->getDefaultIcon(
+            newFolder->defaultIcon, IconsType::DefaultIcon);
+        newFolder->UI.grayIcon = VNoteDataManager::instance()->getDefaultIcon(
+            newFolder->defaultIcon, IconsType::DefaultGrayIcon);
+
         VNoteDataManager::instance()->addFolder(newFolder);
 
         qInfo() << "New folder:" << newFolder->id
@@ -247,7 +251,11 @@ QString VNoteFolderOper::getDefaultFolderName()
 qint32 VNoteFolderOper::getDefaultIcon()
 {
     const int defalutIconCnt = 10;
-    return (QRandomGenerator::global()->bounded(0,defalutIconCnt));
+
+    QTime time = QTime::currentTime();
+    qsrand(static_cast<uint>(time.msec() + time.second() * 1000));
+
+    return (qrand() % defalutIconCnt);
 }
 
 /**

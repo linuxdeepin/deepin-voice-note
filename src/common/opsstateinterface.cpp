@@ -4,10 +4,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "opsstateinterface.h"
-// #include <DSysInfo>
-// #include <DLog>
+#include <DSysInfo>
+#include <DLog>
 
-// DCORE_USE_NAMESPACE
+DCORE_USE_NAMESPACE
 
 /**
  * @brief OpsStateInterface::OpsStateInterface
@@ -33,7 +33,7 @@ void OpsStateInterface::operState(int type, bool isSet)
             m_states &= (~(1 << shift));
         }
     } else {
-        // qCritical() << "Operation error:Invalid opsType =" << type;
+        qCritical() << "Operation error:Invalid opsType =" << type;
     }
 }
 

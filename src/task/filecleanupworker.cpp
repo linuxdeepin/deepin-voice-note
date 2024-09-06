@@ -159,21 +159,21 @@ void FileCleanupWorker::removePicturePathBySet(const QString &path)
 void FileCleanupWorker::scanVoiceByHtml(const QString &htmlCode)
 {
     //匹配语音块标签的正则表达式
-    // QRegExp rx("<div.+jsonkey.+>");
-    // rx.setMinimal(true); //最小匹配
+    QRegExp rx("<div.+jsonkey.+>");
+    rx.setMinimal(true); //最小匹配
     //匹配语音路径的正则表达式
-    // QRegExp rxJson("(/\\S+)+/voicenote/[\\w\\-]+\\.mp3");
-    // rxJson.setMinimal(false); //最大匹配
+    QRegExp rxJson("(/\\S+)+/voicenote/[\\w\\-]+\\.mp3");
+    rxJson.setMinimal(false); //最大匹配
     QStringList list;
     int pos = 0;
     //查找语音块
-    // while ((pos = rx.indexIn(htmlCode, pos)) != -1) {
-    //     //获取语音路径
-    //     if (rxJson.indexIn(rx.cap(0)) != -1) {
-    //         removeVoicePathBySet(rxJson.cap(0));
-    //     }
-    //     pos += rx.matchedLength();
-    // }
+    while ((pos = rx.indexIn(htmlCode, pos)) != -1) {
+        //获取语音路径
+        if (rxJson.indexIn(rx.cap(0)) != -1) {
+            removeVoicePathBySet(rxJson.cap(0));
+        }
+        pos += rx.matchedLength();
+    }
 }
 
 /**
@@ -184,20 +184,20 @@ void FileCleanupWorker::scanVoiceByHtml(const QString &htmlCode)
 void FileCleanupWorker::scanPictureByHtml(const QString &htmlCode)
 {
     //匹配图片块标签的正则表达式
-    // QRegExp rx("<img.+src=.+>");
-    // rx.setMinimal(true); //最小匹配
+    QRegExp rx("<img.+src=.+>");
+    rx.setMinimal(true); //最小匹配
     //匹配本地图片路径的正则表达式（图片位置限制在images文件夹，后缀限制为a-z长度为3到4位）
-    // QRegExp rxPath("(/\\S+)+/images/[\\w\\-]+\\.[a-z]{3,4}");
-    // rxPath.setMinimal(false); //最大匹配
+    QRegExp rxPath("(/\\S+)+/images/[\\w\\-]+\\.[a-z]{3,4}");
+    rxPath.setMinimal(false); //最大匹配
     int pos = 0;
     //查找图片块
-    // while ((pos = rx.indexIn(htmlCode, pos)) != -1) {
-    //     //获取图片路径
-    //     if (rxPath.indexIn(rx.cap(0)) != -1) {
-    //         removePicturePathBySet(rxPath.cap(0));
-    //     }
-    //     pos += rx.matchedLength();
-    // }
+    while ((pos = rx.indexIn(htmlCode, pos)) != -1) {
+        //获取图片路径
+        if (rxPath.indexIn(rx.cap(0)) != -1) {
+            removePicturePathBySet(rxPath.cap(0));
+        }
+        pos += rx.matchedLength();
+    }
 }
 
 /**

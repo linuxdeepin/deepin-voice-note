@@ -5,32 +5,26 @@ Maintainer: deepin <packages@deepin.com>
 Build-Depends:
  debhelper (>= 11),
  cmake,
+ qttools5-dev-tools,
  libutf8proc-dev,
- qt6-base-dev,
- qt6-tools-dev-tools,
- qt6-declarative-dev,
- qt6-webchannel-dev,
- qt6-webengine-dev,
+ qtbase5-dev,
  pkg-config,
  libsqlite3-dev,
+ qtmultimedia5-dev,
  libglib2.0-dev,
- libdtk6core-dev,
- libdtk6core-bin,
- libdtk6gui-dev,
- libdtk6declarative-dev,
- libdtk6widget-dev,
+ libdtkwidget-dev,
+ libdtkwidget5-bin,
+ libdtkcore5-bin,
  libdframeworkdbus-dev,
  libgstreamer1.0-dev,
  libvlc-dev,
  libvlccore-dev,
+ libqt5webchannel5-dev,
+ qtwebengine5-dev,
  libgtest-dev,
  libffmpegthumbnailer-dev,
  libdmr-dev,
- deepin-desktop-base,
-# qml modules
- qml6-module-qtquick-dialogs,
- qml6-module-qtwebchannel,
- qml6-module-qtwebengine
+ deepin-desktop-base
 Standards-Version: 4.1.3
 Homepage: <insert the upstream URL, if relevant>
 #Vcs-Browser: https://salsa.debian.org/debian/voice-note
@@ -38,13 +32,7 @@ Homepage: <insert the upstream URL, if relevant>
 
 Package: deepin-voice-note
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends},
- gstreamer1.0-plugins-good,
- vlc-plugin-base,
- gstreamer1.0-pulseaudio,
- qml6-module-qtquick-dialogs,
- qml6-module-qtwebchannel,
- qml6-module-qtwebengine
+Depends: ${shlibs:Depends}, ${misc:Depends}, gstreamer1.0-plugins-good, vlc-plugin-base, gstreamer1.0-pulseaudio
 Recommends: uos-reporter, deepin-event-log
 Description: Voice Notes is a lightweight memo tool to make text notes and voice recordings
   Voice Notes is a simple memo software with texts and voice recordings. You are able to save the recordings as MP3 format or texts.

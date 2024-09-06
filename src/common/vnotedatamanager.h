@@ -9,7 +9,6 @@
 #include "datatypedef.h"
 
 #include <QObject>
-#include <QPixmap>
 
 class LoadFolderWorker;
 class LoadNoteItemsWorker;
@@ -38,7 +37,7 @@ public:
     void reqNoteItems();
 signals:
     //记事本数据加载完成
-    void noteFoldersLoaded();
+    void onNoteFoldersLoaded();
     //记事项数据加载完成
     void onNoteItemsLoaded();
     //所有数据加载完成

@@ -1,7 +1,0 @@
-# complie
-build/
-CMakeLists.txt.user
-
-# cache
-.vscode
-.cache

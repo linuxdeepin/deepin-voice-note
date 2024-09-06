@@ -7,7 +7,7 @@
 #define VNMAINWNDDELAYINITTASK_H
 
 #include "vntask.h"
-// #include "views/vnotemainwindow.h"
+#include "views/vnotemainwindow.h"
 
 #include <QObject>
 
@@ -17,7 +17,7 @@ class VNMainWndDelayInitTask : public VNTask
 {
     Q_OBJECT
 public:
-    explicit VNMainWndDelayInitTask(/* VNoteMainWindow *pMainWnd, */ QObject *parent = nullptr);
+    explicit VNMainWndDelayInitTask(VNoteMainWindow *pMainWnd, QObject *parent = nullptr);
 
 signals:
 

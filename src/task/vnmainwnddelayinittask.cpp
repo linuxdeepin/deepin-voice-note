@@ -4,16 +4,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "vnmainwnddelayinittask.h"
-// #include "views/vnotemainwindow.h"
+#include "views/vnotemainwindow.h"
 
 /**
  * @brief VNMainWndDelayInitTask::VNMainWndDelayInitTask
  * @param pMainWnd 主窗口
  * @param parent
  */
-VNMainWndDelayInitTask::VNMainWndDelayInitTask(/*VNoteMainWindow *pMainWnd, */ QObject *parent)
+VNMainWndDelayInitTask::VNMainWndDelayInitTask(VNoteMainWindow *pMainWnd, QObject *parent)
     : VNTask(parent)
-    // , m_pMainWnd(pMainWnd)
+    , m_pMainWnd(pMainWnd)
 {
 }
 
@@ -24,6 +24,6 @@ void VNMainWndDelayInitTask::run()
 {
     if (nullptr != m_pMainWnd) {
         //Delay initialize work
-        // m_pMainWnd->initDelayWork();
+        m_pMainWnd->initDelayWork();
     }
 }

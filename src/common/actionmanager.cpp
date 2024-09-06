@@ -1,142 +1,141 @@
-// SPDX-FileCopyrightText: 2024 UnionTech Software Technology Co., Ltd.
+// Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
+// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "actionmanager.h"
+#include "common/opsstateinterface.h"
 
-#include <QVariant>
-#include <QCoreApplication>
+#include <DApplication>
+#include <DLog>
 
-// 用于动态设置 QML 组件的属性
-const char EnabledProperty[] = "enabled";
-const char VisibleProperty[] = "visible";
+#include <QSignalMapper>
 
-/*!
- * \class ActionManager
- * \brief 动作项管理，结合 QML 组件 VNoteRightMenu 使用
- *  ActionManager 管理动作项元信息，通过 VNoteRightMenu 设置的不同菜单类型 MenuType
- *  动态创建菜单项，并支持通过信号抛出按键点击事件。
- * \warning 单个菜单类型仅能同时存在一个菜单实例
+#define MenuId "_menuid_"
+
+/**
+ * @brief ActionManager::ActionManager
  */
-
-ActionManager::ActionManager(QObject *parent)
-    : QObject { parent }
+ActionManager::ActionManager()
 {
     initMenu();
 }
 
-ActionManager *ActionManager::instance()
+/**
+ * @brief ActionManager::Instance
+ * @return 单例对象
+ */
+ActionManager *ActionManager::Instance()
 {
-    static ActionManager ins;
-    return &ins;
+    static ActionManager _instance;
+    return &_instance;
 }
 
-/*!
- * \brief 初始化菜单项元信息，含菜单项的标识和默认显示文本
+/**
+ * @brief ActionManager::notebookContextMenu
+ * @return 记事本右键菜单
  */
-void ActionManager::initMenu()
+VNoteRightMenu *ActionManager::notebookContextMenu()
 {
-    static auto makeAction = [this](ActionKind id, const QString &text, ComponentType type = MenuItemComponent) -> ActionPtr {
-        ActionPtr meta = ActionPtr::create(id, text, type);
-        metaData.insert(id, meta);
-        return meta;
-    };
-
-    // NotebookCtxMenu 记事本页面右键菜单
-    makeAction(NotebookRename, QCoreApplication::translate("NotebookContextMenu", "Rename"));
-    makeAction(NotebookDelete, QCoreApplication::translate("NotebookContextMenu", "Delete"));
-    makeAction(NotebookAddNew, QCoreApplication::translate("NotebookContextMenu", "Newnote"));
-
-    // NoteCtxMenu 笔记本页面右键菜单
-    makeAction(NoteRename, QCoreApplication::translate("NotesContextMenu", "Rename"));
-    makeAction(NoteTop, QCoreApplication::translate("NotesContextMenu", "Sticky on Top"));
-    makeAction(NoteMove, QCoreApplication::translate("NotesContextMenu", "Move"));
-    makeAction(NoteDelete, QCoreApplication::translate("NotesContextMenu", "Delete"));
-    makeAction(NoteSave, QCoreApplication::translate("NotesContextMenu", "Save note"), MenuComponent);
-    makeAction(NoteSaveVoice, QCoreApplication::translate("NotesContextMenu", "Savevoicerecording"));
-    makeAction(NoteSeparator, {}, MenuSeparatorComponent);
-    makeAction(NoteAddNew, QCoreApplication::translate("NotesContextMenu", "Newnote"));
-
-    // SaveNoteCtxMenu 保存笔记二级菜单项文案
-    makeAction(SaveNoteAsHtml, QCoreApplication::translate("NotesContextMenu", "Save as HTML"));
-    makeAction(SaveNoteAsText, QCoreApplication::translate("NotesContextMenu", "Save as TXT"));
-    // 设置子菜单项信息
-    childActionMap.insert(NoteSave, { SaveNoteAsHtml, SaveNoteAsText });
-
-    // VoiceCtxMenu 初始化语音文本右键菜单
-    makeAction(VoiceAsSave, QCoreApplication::translate("NoteDetailContextMenu", "SaveasMP3"));
-    makeAction(VoiceToText, QCoreApplication::translate("NoteDetailContextMenu", "VoicetoText"));
-    makeAction(VoiceDelete, QCoreApplication::translate("NoteDetailContextMenu", "Delete"));
-    makeAction(VoiceSelectAll, QCoreApplication::translate("NoteDetailContextMenu", "Selectall"));
-    makeAction(VoiceCopy, QCoreApplication::translate("NoteDetailContextMenu", "Copy"));
-    makeAction(VoiceCut, QCoreApplication::translate("NoteDetailContextMenu", "Cut"));
-    makeAction(VoicePaste, QCoreApplication::translate("NoteDetailContextMenu", "Paste"));
-
-    // PictureCtxMenu 初始化图片文本右键菜单
-    makeAction(PictureView, QCoreApplication::translate("NoteDetailContextMenu", "View"));
-    makeAction(PictureDelete, QCoreApplication::translate("NoteDetailContextMenu", "Delete"));
-    makeAction(PictureSelectAll, QCoreApplication::translate("NoteDetailContextMenu", "Selectall"));
-    makeAction(PictureCopy, QCoreApplication::translate("NoteDetailContextMenu", "Copy"));
-    makeAction(PictureCut, QCoreApplication::translate("NoteDetailContextMenu", "Cut"));
-    makeAction(PicturePaste, QCoreApplication::translate("NoteDetailContextMenu", "Paste"));
-    makeAction(PictureSaveAs, QCoreApplication::translate("NoteDetailContextMenu", "Saveas"));
-
-    // TxtCtxMenu 初始化文字文本右键菜单
-    makeAction(TxtDelete, QCoreApplication::translate("NoteDetailContextMenu", "Delete"));
-    makeAction(TxtSelectAll, QCoreApplication::translate("NoteDetailContextMenu", "Selectall"));
-    makeAction(TxtCopy, QCoreApplication::translate("NoteDetailContextMenu", "Copy"));
-    makeAction(TxtCut, QCoreApplication::translate("NoteDetailContextMenu", "Cut"));
-    makeAction(TxtPaste, QCoreApplication::translate("NoteDetailContextMenu", "Paste"));
-    makeAction(TxtSeparator, {}, MenuSeparatorComponent);
-    makeAction(TxtSpeech, QCoreApplication::translate("NoteDetailContextMenu", "TexttoSpeech"));
-    makeAction(TxtStopreading, QCoreApplication::translate("NoteDetailContextMenu", "Stopreading"));
-    makeAction(TxtDictation, QCoreApplication::translate("NoteDetailContextMenu", "SpeechtoText"));
-    makeAction(TxtTranslate, QCoreApplication::translate("NoteDetailContextMenu", "Translate"));
+    return m_notebookContextMenu.get();
 }
 
-/*!
- * \return 获取菜单项 \a id 对应的 QML 组件
+/**
+ * @brief ActionManager::noteContextMenu
+ * @return 记事项右键菜单
  */
-QObject *ActionManager::getActionById(ActionKind id)
+VNoteRightMenu *ActionManager::noteContextMenu()
 {
-    auto ptr = metaData.value(id);
-    return ptr ? ptr->qmlObject : nullptr;
+    return m_noteContextMenu.get();
 }
 
-/*!
- * \brief 设置动作项 \a actionId 使能属性为 \a enable
+/**
+ * @brief ActionManager::saveNoteContextMenu
+ * 获取记事项列表右键菜单的的二级菜单保存笔记右键菜单
+ * @return 保存笔记二级菜单
  */
-void ActionManager::enableAction(ActionKind actionId, bool enable)
+VNoteRightMenu *ActionManager::saveNoteContextMenu()
 {
-    if (!metaData.contains(actionId)) {
-        return;
+    return m_saveNoteContextMenu.get();
+}
+
+VNoteRightMenu *ActionManager::voiceContextMenu()
+{
+    return m_voiceContextMenu.get();
+}
+
+VNoteRightMenu *ActionManager::pictureContextMenu()
+{
+    return m_pictureContextMenu.get();
+}
+
+VNoteRightMenu *ActionManager::txtContextMenu()
+{
+    return m_txtContextMenu.get();
+}
+
+/**
+ * @brief ActionManager::getActionKind
+ * @param action 菜单项
+ * @return id
+ */
+ActionManager::ActionKind ActionManager::getActionKind(QAction *action)
+{
+    return action->property(MenuId).value<ActionKind>();
+}
+
+/**
+ * @brief ActionManager::getActionById
+ * @param id
+ * @return 菜单项
+ */
+QAction *ActionManager::getActionById(ActionManager::ActionKind id)
+{
+    QAction *menuAction = nullptr;
+
+    QMap<ActionKind, QAction *>::iterator it = m_actionsMap.find(id);
+
+    if (it != m_actionsMap.end()) {
+        menuAction = *it;
     }
 
-    auto ptr = metaData.value(actionId);
-    if (ptr && ptr->qmlObject) {
-        ptr->qmlObject->setProperty(EnabledProperty, QVariant(enable));
-    }
+    return menuAction;
 }
 
-/*!
- * \brief 设置动作项 \a actionId 显示属性为 \a visible
+/**
+ * @brief ActionManager::enableAction
+ * @param actionId
+ * @param enable true 可用
  */
-void ActionManager::visibleAction(ActionKind actionId, bool visible)
+void ActionManager::enableAction(ActionManager::ActionKind actionId, bool enable)
 {
-    if (!metaData.contains(actionId)) {
-        return;
-    }
+    QMap<ActionKind, QAction *>::iterator it = m_actionsMap.find(actionId);
 
-    auto ptr = metaData.value(actionId);
-    if (ptr && ptr->qmlObject) {
-        ptr->qmlObject->setProperty(VisibleProperty, QVariant(visible));
+    if (it != m_actionsMap.end()) {
+        (*it)->setEnabled(enable);
     }
 }
 
-/*!
- * \brief 设置 \a type 类型菜单的使能属性为 \a enable
+/**
+ * @brief ActionManager::visibleAction
+ * @param actionId
+ * @param enable true显示
  */
-void ActionManager::resetCtxMenu(MenuType type, bool enable)
+void ActionManager::visibleAction(ActionManager::ActionKind actionId, bool enable)
+{
+    QMap<ActionKind, QAction *>::iterator it = m_actionsMap.find(actionId);
+
+    if (it != m_actionsMap.end()) {
+        (*it)->setVisible(enable);
+    }
+}
+
+/**
+ * @brief ActionManager::resetCtxMenu
+ * @param type 右键菜单类型
+ * @param enable true可用
+ */
+void ActionManager::resetCtxMenu(ActionManager::MenuType type, bool enable)
 {
     int startMenuId = MenuMaxId;
     int endMenuId = MenuMaxId;
@@ -161,17 +160,190 @@ void ActionManager::resetCtxMenu(MenuType type, bool enable)
         endMenuId = SaveNoteMax;
     }
 
-    for (; startMenuId < endMenuId; ++startMenuId) {
-        auto ptr = metaData.value(static_cast<ActionKind>(startMenuId));
-        if (ptr && ptr->qmlObject) {
-            ptr->qmlObject->setProperty(EnabledProperty, enable);
+    QAction *pAction = nullptr;
+
+    for (; startMenuId < endMenuId; startMenuId++) {
+        pAction = m_actionsMap[static_cast<ActionKind>(startMenuId)];
+
+        if (nullptr != pAction) {
+            pAction->setEnabled(enable);
+        }
+    }
+}
+/**
+ * @brief ActionManager::initMenu
+ */
+void ActionManager::initMenu()
+{
+    //保存笔记二级菜单项文案
+    QStringList saveNoteMenuTexts;
+    saveNoteMenuTexts << DApplication::translate("NotesContextMenu", "Save as HTML")
+                      << DApplication::translate("NotesContextMenu", "Save as TXT");
+
+    //初始化笔记右键菜单
+    VNoteRightMenu *saveNoteMenu = new VNoteRightMenu();
+    saveNoteMenu->setTitle(DApplication::translate("NotesContextMenu", "Save note"));
+    m_saveNoteContextMenu.reset(saveNoteMenu);
+    int saveNoteMenuIdStart = ActionKind::SaveNoteMenuBase;
+
+    //添加菜单选项
+    for (auto it : saveNoteMenuTexts) {
+        QAction *pAction = new QAction(it, m_saveNoteContextMenu.get());
+        pAction->setProperty(MenuId, saveNoteMenuIdStart);
+
+        m_saveNoteContextMenu->addAction(pAction);
+        m_actionsMap.insert(static_cast<ActionKind>(saveNoteMenuIdStart), pAction);
+
+        saveNoteMenuIdStart++;
+        if (SaveNoteMax == saveNoteMenuIdStart) {
+            break;
+        }
+    }
+
+    //Notebook context menu
+    QStringList notebookMenuTexts;
+    notebookMenuTexts << DApplication::translate("NotebookContextMenu", "Rename")
+                      << DApplication::translate("NotebookContextMenu", "Delete")
+                      << DApplication::translate("NotebookContextMenu", "New note");
+    //初始化记事本右键菜单
+    m_notebookContextMenu.reset(new VNoteRightMenu());
+
+    int notebookMenuIdStart = ActionKind::NotebookMenuBase;
+
+    for (auto it : notebookMenuTexts) {
+        QAction *pAction = new QAction(it, m_notebookContextMenu.get());
+        pAction->setProperty(MenuId, notebookMenuIdStart);
+
+        m_notebookContextMenu->addAction(pAction);
+        m_actionsMap.insert(static_cast<ActionKind>(notebookMenuIdStart), pAction);
+
+        notebookMenuIdStart++;
+    }
+
+    //Note context menu
+    QStringList noteMenuTexts;
+    noteMenuTexts << DApplication::translate("NotesContextMenu", "Rename")
+                  << DApplication::translate("NotesContextMenu", "")
+                  << DApplication::translate("NotesContextMenu", "Move")
+                  << DApplication::translate("NotesContextMenu", "Delete")
+                  << DApplication::translate("NotesContextMenu", "")
+                  << DApplication::translate("NotesContextMenu", "Save voice recording")
+                  << DApplication::translate("NotesContextMenu", "New note");
+
+    //初始化笔记右键菜单
+    m_noteContextMenu.reset(new VNoteRightMenu());
+
+    int noteMenuIdStart = ActionKind::NoteMenuBase;
+
+    for (auto it : noteMenuTexts) {
+        //添加二级菜单
+        if (NoteSave == noteMenuIdStart) {
+            m_noteContextMenu->addMenu(m_saveNoteContextMenu.get());
+            noteMenuIdStart++;
+            continue;
+        }
+
+        QAction *pAction = new QAction(it, m_noteContextMenu.get());
+        pAction->setProperty(MenuId, noteMenuIdStart);
+
+        m_noteContextMenu->addAction(pAction);
+        m_actionsMap.insert(static_cast<ActionKind>(noteMenuIdStart), pAction);
+
+        noteMenuIdStart++;
+
+        if (noteMenuIdStart == NoteAddNew) {
+            m_noteContextMenu->addSeparator();
+        }
+    }
+
+    //Voice context menu
+    QStringList voiceMenuTexts;
+    voiceMenuTexts << DApplication::translate("NoteDetailContextMenu", "Save as MP3")
+                   << DApplication::translate("NoteDetailContextMenu", "Voice to Text")
+                   << DApplication::translate("NoteDetailContextMenu", "Delete")
+                   << DApplication::translate("NoteDetailContextMenu", "Select all")
+                   << DApplication::translate("NoteDetailContextMenu", "Copy")
+                   << DApplication::translate("NoteDetailContextMenu", "Cut")
+                   << DApplication::translate("NoteDetailContextMenu", "Paste");
+
+    //初始化语音文本右键菜单
+    m_voiceContextMenu.reset(new VNoteRightMenu());
+
+    int voiceMenuIdStart = ActionKind::VoiceMenuBase;
+
+    for (auto it : voiceMenuTexts) {
+        QAction *pAction = new QAction(it, m_voiceContextMenu.get());
+        pAction->setProperty(MenuId, voiceMenuIdStart);
+
+        m_voiceContextMenu->addAction(pAction);
+        m_actionsMap.insert(static_cast<ActionKind>(voiceMenuIdStart), pAction);
+        voiceMenuIdStart++;
+
+        if (VoiceMenuMax == voiceMenuIdStart) {
+            break;
+        }
+    }
+
+    //picture context menu
+    QStringList pcitureMenuTexts;
+    pcitureMenuTexts << DApplication::translate("NoteDetailContextMenu", "View")
+                     << DApplication::translate("NoteDetailContextMenu", "Delete")
+                     << DApplication::translate("NoteDetailContextMenu", "Select all")
+                     << DApplication::translate("NoteDetailContextMenu", "Copy")
+                     << DApplication::translate("NoteDetailContextMenu", "Cut")
+                     << DApplication::translate("NoteDetailContextMenu", "Paste")
+                     << DApplication::translate("NoteDetailContextMenu", "Save as");
+
+    //初始化图片文本右键菜单
+    m_pictureContextMenu.reset(new VNoteRightMenu());
+
+    int pictureMenuIdStart = ActionKind::PictureMenuBase;
+
+    for (auto it : pcitureMenuTexts) {
+        QAction *pAction = new QAction(it, m_pictureContextMenu.get());
+        pAction->setProperty(MenuId, pictureMenuIdStart);
+
+        m_pictureContextMenu->addAction(pAction);
+        m_actionsMap.insert(static_cast<ActionKind>(pictureMenuIdStart), pAction);
+        pictureMenuIdStart++;
+        if (PictureMenuMax == pictureMenuIdStart) {
+            break;
+        }
+    }
+
+    //txt context menu
+    QStringList txtMenuTexts;
+    txtMenuTexts << DApplication::translate("NoteDetailContextMenu", "Delete")
+                 << DApplication::translate("NoteDetailContextMenu", "Select all")
+                 << DApplication::translate("NoteDetailContextMenu", "Copy")
+                 << DApplication::translate("NoteDetailContextMenu", "Cut")
+                 << DApplication::translate("NoteDetailContextMenu", "Paste")
+                 << DApplication::translate("NoteDetailContextMenu", "Text to Speech")
+                 << DApplication::translate("NoteDetailContextMenu", "Stop reading")
+                 << DApplication::translate("NoteDetailContextMenu", "Speech to Text")
+                 << DApplication::translate("NoteDetailContextMenu", "Translate");
+
+    //初始化文字文本右键菜单
+    m_txtContextMenu.reset(new VNoteRightMenu());
+
+    int txtMenuIdStart = ActionKind::TxtMenuBase;
+
+    for (auto it : txtMenuTexts) {
+        QAction *pAction = new QAction(it, m_txtContextMenu.get());
+        pAction->setProperty(MenuId, txtMenuIdStart);
+
+        m_txtContextMenu->addAction(pAction);
+        m_actionsMap.insert(static_cast<ActionKind>(txtMenuIdStart), pAction);
+        if (TxtPaste == txtMenuIdStart) {
+            m_aiSeparator = m_txtContextMenu->addSeparator();
+        }
+        txtMenuIdStart++;
+        if (TxtMenuMax == txtMenuIdStart) {
+            break;
         }
     }
 }
 
-/*!
- * \brief 设置 AI 相关动作项目显示属性为 \a visible
- */
 void ActionManager::visibleAiActions(bool visible)
 {
     visibleAction(VoiceToText, visible);
@@ -179,58 +351,5 @@ void ActionManager::visibleAiActions(bool visible)
     visibleAction(TxtStopreading, visible);
     visibleAction(TxtDictation, visible);
     visibleAction(TxtTranslate, visible);
-    visibleAction(TxtSeparator, visible);
-}
-
-/*!
- * \brief 使用 model 同样需要多次查询，减少使用中间类，因此直接通过接口访问而没有使用
- *      QAbstractListModel 设计
- * \return 返回动作项 \a id 对应的文本
- */
-QString ActionManager::actionText(ActionKind id)
-{
-    auto ptr = metaData.value(id);
-    return ptr ? ptr->text : QString();
-}
-
-/*!
- * \return 返回动作项 \a id 对应的 QML 组件类型
- */
-ActionManager::ComponentType ActionManager::actionCompType(ActionKind id)
-{
-    auto ptr = metaData.value(id);
-    return ptr ? ptr->type : MenuItemComponent;
-}
-
-/*!
- * \brief 返回菜单项 \a id 的子菜单项列表
- */
-QList<ActionManager::ActionKind> ActionManager::childActions(ActionKind id)
-{
-    return childActionMap.value(id);
-}
-
-/*!
- * \brief 设置动作项 \a id 对应的 QML 组件
- */
-void ActionManager::setActionObject(ActionKind id, QObject *obj)
-{
-    auto ptr = metaData.value(id);
-    if (ptr) {
-        if (ptr->qmlObject) {
-            qCritical() << "Duplicate qml objects, create multiple menus of the same type?" << id << ptr->qmlObject;
-        }
-        // 不能同时创建多个相同类型菜单
-        Q_ASSERT_X(!ptr->qmlObject, "Set action qml object",
-                   "Duplicate qml objects, create multiple menus of the same type?");
-        ptr->qmlObject = obj;
-    }
-}
-
-/*!
- * \brief QML 组件触发动作项
- */
-void ActionManager::actionTriggerFromQuick(ActionKind actionId)
-{
-    Q_EMIT actionTriggered(actionId);
+    m_aiSeparator->setVisible(visible);
 }
