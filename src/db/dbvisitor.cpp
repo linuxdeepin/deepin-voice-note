@@ -12,11 +12,11 @@
 #include "common/vnotedatamanager.h"
 #include "common/vnoteforlder.h"
 #include "common/vnoteitem.h"
-#include "common/setting.h"
+// #include "common/setting.h"
 
 #include "db/vnotedbmanager.h"
 
-#include <DLog>
+// #include <DLog>
 
 #include <QVariant>
 
@@ -169,11 +169,6 @@ bool FolderQryDbVisitor::visitorData()
             //    Add the expand fileds parse code here
 
             //************Expand fileds end************
-
-            //Get default icon image
-            folder->UI.icon = VNoteDataManager::instance()->getDefaultIcon(folder->defaultIcon, IconsType::DefaultIcon);
-            folder->UI.grayIcon = VNoteDataManager::instance()->getDefaultIcon(folder->defaultIcon, IconsType::DefaultGrayIcon);
-
             results.folders->folders.insert(folder->id, folder);
         }
     }
@@ -187,10 +182,8 @@ bool FolderQryDbVisitor::visitorData()
  */
 bool FolderQryDbVisitor::prepareSqls()
 {
-    static constexpr char const *QUERY_FOLDERS_FMT = "SELECT * FROM %s  ORDER BY %s DESC ;";
-
-    QString querySql;
-    querySql.sprintf(QUERY_FOLDERS_FMT, VNoteDbManager::FOLDER_TABLE_NAME, DBFolder::folderColumnsName[DBFolder::create_time].toUtf8().data());
+    QString querySql = QString("SELECT * FROM %1  ORDER BY %2 DESC ;").arg(VNoteDbManager::FOLDER_TABLE_NAME)
+                           .arg(DBFolder::folderColumnsName[DBFolder::create_time].toUtf8().data());
 
     m_dbvSqls.append(querySql);
 
@@ -286,10 +279,7 @@ bool NoteQryDbVisitor::visitorData()
  */
 bool NoteQryDbVisitor::prepareSqls()
 {
-    static constexpr char const *QUERY_NOTES_FMT = "SELECT * FROM %s ORDER BY %s;";
-
-    QString querySql;
-    querySql.sprintf(QUERY_NOTES_FMT, VNoteDbManager::NOTES_TABLE_NAME, DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data());
+    QString querySql = QString("SELECT * FROM %1 ORDER BY %2;").arg(VNoteDbManager::NOTES_TABLE_NAME).arg(DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data());
 
     m_dbvSqls.append(querySql);
 
@@ -342,16 +332,14 @@ bool MaxIdFolderDbVisitor::prepareSqls()
     //SQLITE related:
     //    primary key table name : SQLITE_SEQUENCE
     //    max primary key feild  : SEQ
-    static constexpr char const *QUERY_DEFNAME_FMT = "SELECT SEQ FROM SQLITE_SEQUENCE where NAME='%s';";
-    QString querySql;
-    querySql.sprintf(QUERY_DEFNAME_FMT, VNoteDbManager::FOLDER_TABLE_NAME);
+    QString querySql = QString("SELECT SEQ FROM SQLITE_SEQUENCE where NAME='%1';").arg(VNoteDbManager::FOLDER_TABLE_NAME);
 
     m_dbvSqls.append(querySql);
 
     if (m_extraData.data.flag) {
-        QString resetFolderIdSql;
-        static constexpr char const *RESET_FOLDER_ID = "UPDATE SQLITE_SEQUENCE SET SEQ=%s where NAME='%s';";
-        resetFolderIdSql.sprintf(RESET_FOLDER_ID, QString("%1").arg(0).toUtf8().data(), VNoteDbManager::FOLDER_TABLE_NAME);
+        QString resetFolderIdSql = QString("UPDATE SQLITE_SEQUENCE SET SEQ=%1 where NAME='%2';")
+        .arg(QString("%1").arg(0).toUtf8().data())
+        .arg(VNoteDbManager::FOLDER_TABLE_NAME);
         m_dbvSqls.append(resetFolderIdSql);
     }
 
@@ -412,9 +400,6 @@ bool AddFolderDbVisitor::prepareSqls()
 {
     bool fPrepareOK = true;
     if (nullptr != param.newFolder) {
-        static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s,%s,%s,%s,%s) VALUES ('%s', %d, '%s', '%s', '%s', %d);";
-        static constexpr char const *NEWREC_FMT = "SELECT * FROM %s ORDER BY %s DESC LIMIT 1;";
-
         //Check&Init the create time parameter
         //create/modify/delete time are same for new folder
         QDateTime createTime = param.newFolder->createTime;
@@ -422,24 +407,22 @@ bool AddFolderDbVisitor::prepareSqls()
             createTime = QDateTime::currentDateTime();
         }
 
-        QString insertSql;
-        insertSql.sprintf(INSERT_FMT,
-                          VNoteDbManager::FOLDER_TABLE_NAME,
-                          DBFolder::folderColumnsName[DBFolder::folder_name].toUtf8().data(),
-                          DBFolder::folderColumnsName[DBFolder::default_icon].toUtf8().data(),
-                          DBFolder::folderColumnsName[DBFolder::create_time].toUtf8().data(),
-                          DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data(),
-                          DBFolder::folderColumnsName[DBFolder::delete_time].toUtf8().data(),
-                          DBFolder::folderColumnsName[DBFolder::encrypt].toUtf8().data(),
-                          param.newFolder->name.toUtf8().data(),
-                          param.newFolder->defaultIcon,
-                          createTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
-                          createTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
-                          createTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
-                          0);
+        QString insertSql = QString("INSERT INTO %1 (%2,%3,%4,%5,%6,%7) VALUES ('%8', %9, '%10', '%11', '%12', %13);")
+        .arg(VNoteDbManager::FOLDER_TABLE_NAME)
+        .arg(DBFolder::folderColumnsName[DBFolder::folder_name].toUtf8().data())
+        .arg(DBFolder::folderColumnsName[DBFolder::default_icon].toUtf8().data())
+        .arg(DBFolder::folderColumnsName[DBFolder::create_time].toUtf8().data())
+        .arg(DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data())
+        .arg(DBFolder::folderColumnsName[DBFolder::delete_time].toUtf8().data())
+        .arg(DBFolder::folderColumnsName[DBFolder::encrypt].toUtf8().data())
+        .arg(param.newFolder->name.toUtf8().data())
+        .arg(param.newFolder->defaultIcon)
+        .arg(createTime.toString(VNOTE_TIME_FMT).toUtf8().data())
+        .arg(createTime.toString(VNOTE_TIME_FMT).toUtf8().data())
+        .arg(createTime.toString(VNOTE_TIME_FMT).toUtf8().data())
+        .arg(0);
 
-        QString queryNewRec;
-        queryNewRec.sprintf(NEWREC_FMT, VNoteDbManager::FOLDER_TABLE_NAME, DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data());
+        QString queryNewRec = QString("SELECT * FROM %1 ORDER BY %2 DESC LIMIT 1;").arg(VNoteDbManager::FOLDER_TABLE_NAME).arg(DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data());
 
         m_dbvSqls.append(insertSql);
         m_dbvSqls.append(queryNewRec);
@@ -470,20 +453,17 @@ bool RenameFolderDbVisitor::prepareSqls()
     bool fPrepareOK = true;
     const VNoteFolder *folder = param.newFolder;
     if (nullptr != folder) {
-        static constexpr char const *RENAME_FOLDERS_FMT = "UPDATE %s SET %s='%s', %s='%s' WHERE %s=%s;";
         QString sqlFolderName = folder->name;
         checkSqlStr(sqlFolderName);
 
-        QString renameSql;
-
-        renameSql.sprintf(RENAME_FOLDERS_FMT,
-                          VNoteDbManager::FOLDER_TABLE_NAME,
-                          DBFolder::folderColumnsName[DBFolder::folder_name].toUtf8().data(),
-                          folder->encryption ? sqlFolderName.toLocal8Bit().toBase64().data() : sqlFolderName.toUtf8().data(),
-                          DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data(),
-                          folder->modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
-                          DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data(),
-                          QString("%1").arg(folder->id).toUtf8().data());
+        QString renameSql = QString("UPDATE %1 SET %2='%3', %4='%5' WHERE %6=%7;")
+        .arg(VNoteDbManager::FOLDER_TABLE_NAME)
+        .arg(DBFolder::folderColumnsName[DBFolder::folder_name].toUtf8().data())
+        .arg(folder->encryption ? sqlFolderName.toLocal8Bit().toBase64().data() : sqlFolderName.toUtf8().data())
+        .arg(DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data())
+        .arg(folder->modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data())
+        .arg(DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data())
+        .arg(QString("%1").arg(folder->id).toUtf8().data());
 
         m_dbvSqls.append(renameSql);
     } else {
@@ -513,16 +493,16 @@ bool DelFolderDbVisitor::prepareSqls()
     bool fPrepareOK = true;
 
     if (nullptr != param.id) {
-        static constexpr char const *DEL_FOLDER_FMT = "DELETE FROM %s WHERE %s=%s;";
-        static constexpr char const *DEL_FNOTE_FMT = "DELETE FROM %s WHERE %s=%s;";
         qint64 folderId = *param.id;
-        QString deleteFolderSql;
+        QString deleteFolderSql = QString("DELETE FROM %1 WHERE %2=%3;")
+        .arg(VNoteDbManager::FOLDER_TABLE_NAME)
+        .arg(DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data())
+        .arg(QString("%1").arg(folderId).toUtf8().data());
 
-        deleteFolderSql.sprintf(DEL_FOLDER_FMT, VNoteDbManager::FOLDER_TABLE_NAME, DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data(), QString("%1").arg(folderId).toUtf8().data());
-
-        QString deleteNotesSql;
-
-        deleteNotesSql.sprintf(DEL_FNOTE_FMT, VNoteDbManager::NOTES_TABLE_NAME, DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data(), QString("%1").arg(folderId).toUtf8().data());
+        QString deleteNotesSql = QString("DELETE FROM %1 WHERE %2=%3;")
+        .arg(VNoteDbManager::NOTES_TABLE_NAME)
+        .arg(DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data())
+        .arg(QString("%1").arg(folderId).toUtf8().data());
 
         m_dbvSqls.append(deleteFolderSql);
         m_dbvSqls.append(deleteNotesSql);
@@ -601,10 +581,6 @@ bool AddNoteDbVisitor::prepareSqls()
     const VNoteItem *note = param.newNote;
 
     if ((nullptr != note) && (nullptr != folder)) {
-        static constexpr char const *INSERT_FMT = "INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s) VALUES (%lld,%d,'%s','%s','%s','%s','%s',%d);";
-        static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s,%s='%s' WHERE %s=%s;";
-        static constexpr char const *NEWREC_FMT = "SELECT * FROM %s WHERE %s=%s ORDER BY %s DESC LIMIT 1;";
-
         //Check&Init the create time parameter
         //create/modify/delete time are same for new note
         QDateTime createTime = param.newNote->createTime;
@@ -617,33 +593,39 @@ bool AddNoteDbVisitor::prepareSqls()
         QString noteTitle = note->noteTitle;
         checkSqlStr(noteTitle);
 
-        QString insertSql;
+        QString insertSql = QString("INSERT INTO %1 (%2,%3,%4,%5,%6,%7,%8,%9) VALUES (%10,%11,'%12','%13','%14','%15','%16',%17);")
+        .arg(VNoteDbManager::NOTES_TABLE_NAME)
+        .arg(DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data())
+        .arg(DBNote::noteColumnsName[DBNote::note_type].toUtf8().data())
+        .arg(DBNote::noteColumnsName[DBNote::note_title].toUtf8().data())
+        .arg(DBNote::noteColumnsName[DBNote::meta_data].toUtf8().data())
+        .arg(DBNote::noteColumnsName[DBNote::create_time].toUtf8().data())
+        .arg(DBNote::noteColumnsName[DBNote::modify_time].toUtf8().data())
+        .arg(DBNote::noteColumnsName[DBNote::delete_time].toUtf8().data())
+        .arg(DBNote::noteColumnsName[DBNote::encrypt].toUtf8().data())
+        .arg(note->folderId)
+        .arg(note->noteType)
+        .arg(noteTitle.toUtf8().data())
+        .arg(metaDataStr.toUtf8().data())
+        .arg(createTime.toString(VNOTE_TIME_FMT).toUtf8().data())
+        .arg(createTime.toString(VNOTE_TIME_FMT).toUtf8().data())
+        .arg(createTime.toString(VNOTE_TIME_FMT).toUtf8().data())
+        .arg(0);
 
-        insertSql.sprintf(INSERT_FMT,
-                          VNoteDbManager::NOTES_TABLE_NAME,
-                          DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data(),
-                          DBNote::noteColumnsName[DBNote::note_type].toUtf8().data(),
-                          DBNote::noteColumnsName[DBNote::note_title].toUtf8().data(),
-                          DBNote::noteColumnsName[DBNote::meta_data].toUtf8().data(),
-                          DBNote::noteColumnsName[DBNote::create_time].toUtf8().data(),
-                          DBNote::noteColumnsName[DBNote::modify_time].toUtf8().data(),
-                          DBNote::noteColumnsName[DBNote::delete_time].toUtf8().data(),
-                          DBNote::noteColumnsName[DBNote::encrypt].toUtf8().data(),
-                          note->folderId,
-                          note->noteType,
-                          noteTitle.toUtf8().data(),
-                          metaDataStr.toUtf8().data(),
-                          createTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
-                          createTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
-                          createTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
-                          0);
+        QString updateSql = QString("UPDATE %1 SET %2=%3,%4='%5' WHERE %6=%7;")
+        .arg(VNoteDbManager::FOLDER_TABLE_NAME)
+        .arg(DBFolder::folderColumnsName[DBFolder::max_noteid].toUtf8().data())
+        .arg(QString("%1").arg(param.newNote->folder()->maxNoteIdRef()).toUtf8().data())
+        .arg(DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data())
+        .arg(createTime.toString(VNOTE_TIME_FMT).toUtf8().data())
+        .arg(DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data())
+        .arg(QString("%1").arg(note->folderId).toUtf8().data());
 
-        QString updateSql;
-
-        updateSql.sprintf(UPDATE_FOLDER_TIME, VNoteDbManager::FOLDER_TABLE_NAME, DBFolder::folderColumnsName[DBFolder::max_noteid].toUtf8().data(), QString("%1").arg(param.newNote->folder()->maxNoteIdRef()).toUtf8().data(), DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data(), createTime.toString(VNOTE_TIME_FMT).toUtf8().data(), DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data(), QString("%1").arg(note->folderId).toUtf8().data());
-
-        QString queryNewRec;
-        queryNewRec.sprintf(NEWREC_FMT, VNoteDbManager::NOTES_TABLE_NAME, DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data(), QString("%1").arg(note->folderId).toUtf8().data(), DBNote::noteColumnsName[DBNote::note_id].toUtf8().data());
+        QString queryNewRec = QString("SELECT * FROM %1 WHERE %2=%3 ORDER BY %4 DESC LIMIT 1;")
+        .arg(VNoteDbManager::NOTES_TABLE_NAME)
+        .arg(DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data())
+        .arg(QString("%1").arg(note->folderId).toUtf8().data())
+        .arg(DBNote::noteColumnsName[DBNote::note_id].toUtf8().data());
 
         m_dbvSqls.append(insertSql);
         m_dbvSqls.append(updateSql);
@@ -676,29 +658,27 @@ bool RenameNoteDbVisitor::prepareSqls()
     const VNoteItem *note = param.newNote;
 
     if (nullptr != note) {
-        static constexpr char const *MODIFY_NOTETEXT_FMT = "UPDATE %s SET %s='%s', %s='%s' WHERE %s=%lld AND %s=%d;";
-        static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s='%s' WHERE %s=%s;";
-
         QString sqlTitle = note->noteTitle;
         checkSqlStr(sqlTitle);
 
-        QString modifyNoteTextSql;
-        modifyNoteTextSql.sprintf(MODIFY_NOTETEXT_FMT,
-                                  VNoteDbManager::NOTES_TABLE_NAME,
-                                  DBNote::noteColumnsName[DBNote::note_title].toUtf8().data(),
-                                  //如果笔记是加密的，则更新也需要加密数据
-                                  note->encryption ? sqlTitle.toLocal8Bit().toBase64().data() : sqlTitle.toUtf8().data(),
-                                  DBNote::noteColumnsName[DBNote::modify_time].toUtf8().data(),
-                                  note->modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
-                                  DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data(),
-                                  note->folderId,
-                                  DBNote::noteColumnsName[DBNote::note_id].toUtf8().data(),
-                                  note->noteId);
+        QString modifyNoteTextSql = QString("UPDATE %1 SET %2='%3', %4='%5' WHERE %6=%7 AND %8=%9;")
+        .arg(VNoteDbManager::NOTES_TABLE_NAME)
+        .arg(DBNote::noteColumnsName[DBNote::note_title].toUtf8().data())
+        .arg(note->encryption ? sqlTitle.toLocal8Bit().toBase64().data() : sqlTitle.toUtf8().data())
+        .arg(DBNote::noteColumnsName[DBNote::modify_time].toUtf8().data())
+        .arg(note->modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data())
+        .arg(DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data())
+        .arg(note->folderId)
+        .arg(DBNote::noteColumnsName[DBNote::note_id].toUtf8().data())
+        .arg(note->noteId);
 
-        QString updateSql;
         QDateTime modifyTime = QDateTime::currentDateTime();
-
-        updateSql.sprintf(UPDATE_FOLDER_TIME, VNoteDbManager::FOLDER_TABLE_NAME, DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data(), modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data(), DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data(), QString("%1").arg(note->folderId).toUtf8().data());
+        QString updateSql = QString("UPDATE %1 SET %2=%3 WHERE %4=%5;")
+        .arg(VNoteDbManager::FOLDER_TABLE_NAME)
+        .arg(DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data())
+        .arg(modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data())
+        .arg(DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data())
+        .arg(QString("%1").arg(note->folderId).toUtf8().data());
 
         m_dbvSqls.append(modifyNoteTextSql);
         m_dbvSqls.append(updateSql);
@@ -730,29 +710,27 @@ bool UpdateNoteDbVisitor::prepareSqls()
     const VNoteItem *note = param.newNote;
 
     if (nullptr != note) {
-        static constexpr char const *MODIFY_NOTETEXT_FMT = "UPDATE %s SET %s='%s', %s='%s' WHERE %s=%lld AND %s=%d;";
-        static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s='%s' WHERE %s=%s;";
-
         QString metaDataStr = note->metaDataConstRef().toString();
         checkSqlStr(metaDataStr);
 
-        QString modifyNoteTextSql;
-        modifyNoteTextSql.sprintf(MODIFY_NOTETEXT_FMT,
-                                  VNoteDbManager::NOTES_TABLE_NAME,
-                                  DBNote::noteColumnsName[DBNote::meta_data].toUtf8().data(),
-                                  //如果笔记是加密的，则更新也需要加密数据
-                                  note->encryption ? metaDataStr.toLocal8Bit().toBase64().data() : metaDataStr.toUtf8().data(),
-                                  DBNote::noteColumnsName[DBNote::modify_time].toUtf8().data(),
-                                  note->modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
-                                  DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data(),
-                                  note->folderId,
-                                  DBNote::noteColumnsName[DBNote::note_id].toUtf8().data(),
-                                  note->noteId);
+        QString modifyNoteTextSql = QString("UPDATE %1 SET %2='%3', %4='%5' WHERE %6=%7 AND %8=%9;")
+        .arg(VNoteDbManager::NOTES_TABLE_NAME)
+        .arg(DBNote::noteColumnsName[DBNote::meta_data].toUtf8().data())
+        .arg(note->encryption ? metaDataStr.toLocal8Bit().toBase64().data() : metaDataStr.toUtf8().data())
+        .arg(DBNote::noteColumnsName[DBNote::modify_time].toUtf8().data())
+        .arg(note->modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data())
+        .arg(DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data())
+        .arg(note->folderId)
+        .arg(DBNote::noteColumnsName[DBNote::note_id].toUtf8().data())
+        .arg(note->noteId);
 
-        QString updateSql;
         QDateTime modifyTime = QDateTime::currentDateTime();
-
-        updateSql.sprintf(UPDATE_FOLDER_TIME, VNoteDbManager::FOLDER_TABLE_NAME, DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data(), modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data(), DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data(), QString("%1").arg(note->folderId).toUtf8().data());
+        QString updateSql = QString("UPDATE %1 SET %2='%3' WHERE %4=%5;")
+        .arg(VNoteDbManager::FOLDER_TABLE_NAME)
+        .arg(DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data())
+        .arg(modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data())
+        .arg(DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data())
+        .arg(QString("%1").arg(note->folderId).toUtf8().data());
 
         m_dbvSqls.append(modifyNoteTextSql);
         m_dbvSqls.append(updateSql);
@@ -782,14 +760,12 @@ bool UpdateNoteTopDbVisitor::prepareSqls()
     bool fPrepareOK = true;
     const VNoteItem *note = param.newNote;
     if (note != nullptr) {
-        static constexpr char const *UPDATE_NOTE_TOP = "UPDATE %s SET %s=%d WHERE %s=%d;";
-        QString updateSql;
-        updateSql.sprintf(UPDATE_NOTE_TOP,
-                          VNoteDbManager::NOTES_TABLE_NAME,
-                          DBNote::noteColumnsName[DBNote::is_top].toUtf8().data(),
-                          note->isTop,
-                          DBNote::noteColumnsName[DBNote::note_id].toUtf8().data(),
-                          note->noteId);
+        QString updateSql = QString("UPDATE %1 SET %2=%3 WHERE %4=%5;")
+        .arg(VNoteDbManager::NOTES_TABLE_NAME)
+        .arg(DBNote::noteColumnsName[DBNote::is_top].toUtf8().data())
+        .arg(note->isTop)
+        .arg(DBNote::noteColumnsName[DBNote::note_id].toUtf8().data())
+        .arg(note->noteId);
         m_dbvSqls.append(updateSql);
     } else {
         fPrepareOK = false;
@@ -817,14 +793,12 @@ bool UpdateNoteFolderIdDbVisitor::prepareSqls()
     bool fPrepareOK = true;
     const VNoteItem *note = param.newNote;
     if (note != nullptr) {
-        static constexpr char const *UPDATE_NOTE_FOLDERID = "UPDATE %s SET %s=%lld WHERE %s=%d;";
-        QString updateSql;
-        updateSql.sprintf(UPDATE_NOTE_FOLDERID,
-                          VNoteDbManager::NOTES_TABLE_NAME,
-                          DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data(),
-                          note->folderId,
-                          DBNote::noteColumnsName[DBNote::note_id].toUtf8().data(),
-                          note->noteId);
+        QString updateSql = QString("UPDATE %1 SET %2=%3 WHERE %4=%5;")
+        .arg(VNoteDbManager::NOTES_TABLE_NAME)
+        .arg(DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data())
+        .arg(note->folderId)
+        .arg(DBNote::noteColumnsName[DBNote::note_id].toUtf8().data())
+        .arg(note->noteId);
         m_dbvSqls.append(updateSql);
     } else {
         fPrepareOK = false;
@@ -852,17 +826,22 @@ bool DelNoteDbVisitor::prepareSqls()
     bool fPrepareOK = true;
     const VNoteItem *note = param.newNote;
     if (nullptr != note && nullptr != note->folder()) {
-        static constexpr char const *DEL_NOTE_FMT = "DELETE FROM %s WHERE %s=%s AND %s=%s;";
-        static constexpr char const *UPDATE_FOLDER_TIME = "UPDATE %s SET %s=%s, %s='%s' WHERE %s=%s;";
+        QString deleteSql = QString("DELETE FROM %1 WHERE %2=%3 AND %4=%5;")
+        .arg(VNoteDbManager::NOTES_TABLE_NAME)
+        .arg(DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data())
+        .arg(QString("%1").arg(note->folderId).toUtf8().data())
+        .arg(DBNote::noteColumnsName[DBNote::note_id].toUtf8().data())
+        .arg(QString("%1").arg(note->noteId).toUtf8().data());
 
-        QString deleteSql;
-
-        deleteSql.sprintf(DEL_NOTE_FMT, VNoteDbManager::NOTES_TABLE_NAME, DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data(), QString("%1").arg(note->folderId).toUtf8().data(), DBNote::noteColumnsName[DBNote::note_id].toUtf8().data(), QString("%1").arg(note->noteId).toUtf8().data());
-
-        QString updateSql;
         QDateTime modifyTime = QDateTime::currentDateTime();
-
-        updateSql.sprintf(UPDATE_FOLDER_TIME, VNoteDbManager::FOLDER_TABLE_NAME, DBFolder::folderColumnsName[DBFolder::max_noteid].toUtf8().data(), QString("%1").arg(note->folder()->maxNoteIdRef()).toUtf8().data(), DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data(), modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data(), DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data(), QString("%1").arg(note->folderId).toUtf8().data());
+        QString updateSql = QString("UPDATE %1 SET %2=%3, %4='%5' WHERE %6=%7;")
+        .arg(VNoteDbManager::FOLDER_TABLE_NAME)
+        .arg(DBFolder::folderColumnsName[DBFolder::max_noteid].toUtf8().data())
+        .arg(QString("%1").arg(note->folder()->maxNoteIdRef()).toUtf8().data())
+        .arg(DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data())
+        .arg(modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data())
+        .arg(DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data())
+        .arg(QString("%1").arg(note->folderId).toUtf8().data());
 
         m_dbvSqls.append(deleteSql);
         m_dbvSqls.append(updateSql);

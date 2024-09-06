@@ -9,7 +9,8 @@
 #include <QObject>
 #include <QClipboard>
 
-#include <QtWebEngineWidgets/qwebenginepage.h>
+// #include <QtWebEngineWidgets/qwebenginepage.h>
+#include <QWebEnginePage>
 
 class JsContent : public QObject
 {
@@ -39,6 +40,8 @@ public:
      */
     bool insertImages(const QImage &image);
 
+    Q_INVOKABLE QString webPath();
+
 signals:
     void callJsInitData(const QString &jsonData); //调用web前端，设置json格式数据
     void callJsSetHtml(const QString &html); //调用web前端，设置html格式数据
@@ -65,11 +68,16 @@ signals:
     void callJsHideEditToolbar(); //隐藏编辑工具栏
     void callJsSetVoicePlayBtnEnable(bool enable); //设置播放按钮是否可用
 
+    void callJsVoicePlayProgressChanged(int progressMs);    // 通知前端播放进度变更
+    void callJsDeleteSelection();                           // 通知前端删除当前选中内容
+
     void textPaste(bool isVoicePaste); //粘贴信号
     void textChange();
     void loadFinsh();
     void popupMenu(int type, const QVariant &json);
     void playVoice(const QVariant &json, bool bIsSame);
+    void playVoiceStop();
+    void playVoiceProgressChange(qint64 progressMs);
     void viewPictrue(const QString &imagePath);
     void createNote();
     /**
@@ -104,6 +112,9 @@ public slots:
     void jsCallCreateNote(); //web前端调用后端，新建笔记
     void jsCallSetClipData(const QString &text, const QString &html); //web前端调用后端，设置剪切板内容
     QString jsCallGetTranslation(); //web前端调用后端，获取翻译
+    QString jsCallDivTextTranslation(); // web前端调用后端，获取动态组件翻译
+    void jsCallPlayVoiceStop();  // web前端调用后端，停止播放
+    void jsCallVoiceProgressChange(qint64 progressMs);  // web前端调用后端，变更播放进度
     void onClipChange(QClipboard::Mode mode);
 
 private:

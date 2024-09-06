@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>D/playbar_pause/Normal</title>
+    <g id="D/playbar_pause/Normal" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="DTK/按钮/工具按钮/IconButton-Light" transform="translate(4, 4)" fill="#000000" fill-rule="nonzero">
+            <g id="ICON" transform="translate(3, 1)">
+                <path d="M1,0 L2,0 C2.55228475,-1.01453063e-16 3,0.44771525 3,1 L3,13 C3,13.5522847 2.55228475,14 2,14 L1,14 C0.44771525,14 6.76353751e-17,13.5522847 0,13 L0,1 C-6.76353751e-17,0.44771525 0.44771525,1.01453063e-16 1,0 Z M8,0 L9,0 C9.55228475,-1.01453063e-16 10,0.44771525 10,1 L10,13 C10,13.5522847 9.55228475,14 9,14 L8,14 C7.44771525,14 7,13.5522847 7,13 L7,1 C7,0.44771525 7.44771525,1.01453063e-16 8,0 Z" id="形状结合"></path>
+            </g>
+        </g>
+    </g>
+</svg>

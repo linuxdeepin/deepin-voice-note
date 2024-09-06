@@ -13,9 +13,6 @@
 #include "common/vnotedatamanager.h"
 #include "db/dbvisitor.h"
 
-#include <DLog>
-#include <DApplication>
-
 /**
  * @brief VNoteItemOper::VNoteItemOper
  * @param note 操作对象
@@ -72,12 +69,12 @@ bool VNoteItemOper::modifyNoteTitle(const QString &title)
         RenameNoteDbVisitor renameNoteVisitor(
             VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
 
-        if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameNoteVisitor))) {
-            m_note->noteTitle = oldTitle;
-            m_note->modifyTime = oldModifyTime;
+        // if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameNoteVisitor))) {
+        //     m_note->noteTitle = oldTitle;
+        //     m_note->modifyTime = oldModifyTime;
 
-            isUpdateOK = false;
-        }
+        //     isUpdateOK = false;
+        // }
     }
 
     return isUpdateOK;
@@ -97,9 +94,9 @@ bool VNoteItemOper::updateNote()
         QDateTime oldModifyTime = m_note->modifyTime;
 
         //Prepare meta data
-        MetaDataParser metaParser;
+        // MetaDataParser metaParser;
 
-        metaParser.makeMetaData(m_note, m_note->metaDataRef());
+        // metaParser.makeMetaData(m_note, m_note->metaDataRef());
 
         m_note->modifyTime = QDateTime::currentDateTime();
 
@@ -111,12 +108,12 @@ bool VNoteItemOper::updateNote()
         UpdateNoteDbVisitor updateNoteVisitor(
             VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
 
-        if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
-            m_note->setMetadata(oldMetaData);
-            m_note->modifyTime = oldModifyTime;
+        // if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
+        //     m_note->setMetadata(oldMetaData);
+        //     m_note->modifyTime = oldModifyTime;
 
-            isUpdateOK = false;
-        }
+        //     isUpdateOK = false;
+        // }
     }
 
     return isUpdateOK;
@@ -188,7 +185,8 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
  */
 VNoteItem *VNoteItemOper::getNote(qint64 folderId, qint32 noteId)
 {
-    return VNoteDataManager::instance()->getNote(folderId, noteId);
+    return nullptr;
+    // return VNoteDataManager::instance()->getNote(folderId, noteId);
 }
 
 /**
@@ -210,7 +208,8 @@ QString VNoteItemOper::getDefaultNoteName(qint64 folderId)
 {
     VNoteFolder *folder = VNoteDataManager::instance()->getFolder(folderId);
 
-    QString defaultNoteName = DApplication::translate("DefaultName", "Text");
+    // QString defaultNoteName = DApplication::translate("DefaultName", "Text");
+    QString defaultNoteName = "Text";
 
     if (nullptr != folder && folder->maxNoteIdRef() != 0) {
         defaultNoteName += QString("%1").arg(folder->maxNoteIdRef());
@@ -225,13 +224,14 @@ QString VNoteItemOper::getDefaultNoteName(qint64 folderId)
  */
 QString VNoteItemOper::getDefaultVoiceName() const
 {
-    QString defaultVoiceName = DApplication::translate("DefaultName", "Voice");
+    return QString();
+    // QString defaultVoiceName = DApplication::translate("DefaultName", "Voice");
 
-    if (nullptr != m_note) {
-        defaultVoiceName += QString("%1").arg(m_note->maxVoiceIdRef() + 1);
-    }
+    // if (nullptr != m_note) {
+    //     defaultVoiceName += QString("%1").arg(m_note->maxVoiceIdRef() + 1);
+    // }
 
-    return defaultVoiceName;
+    // return defaultVoiceName;
 }
 
 /**
