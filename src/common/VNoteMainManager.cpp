@@ -16,11 +16,15 @@
 #include "utils.h"
 #include "handler/web_engine_handler.h"
 #include "handler/vnote_message_dialog_handler.h"
+#include "handler/voice_recoder_handler.h"
 
 #include <QThreadPool>
 #include <QQmlApplicationEngine>
 #include <QtWebEngineQuick/qtwebenginequickglobal.h>
 #include <QStringList>
+#include <QStandardPaths>
+#include <QFileInfo>
+#include <QDir>
 
 VNoteMainManager::VNoteMainManager()
 {
@@ -52,6 +56,9 @@ void VNoteMainManager::initConnections()
 {
     connect(VNoteDataManager::instance(), &VNoteDataManager::onAllDatasReady,
             this, &VNoteMainManager::onVNoteFoldersLoaded);
+    connect(m_richTextManager, &WebRichTextManager::needUpdateNote, this, &VNoteMainManager::needUpdateNote);
+    connect(m_richTextManager, &WebRichTextManager::noteTextChanged, this, &VNoteMainManager::onNoteChanged, Qt::QueuedConnection);
+    connect(VoiceRecoderHandler::instance(), &VoiceRecoderHandler::finishedRecod, this, &VNoteMainManager::insertVoice);
 }
 
 QObject *jsContent_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
@@ -78,6 +85,14 @@ QObject *actionManager_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
     return ActionManager::instance();
 }
 
+QObject *voiceRecoder_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine)
+    Q_UNUSED(scriptEngine)
+
+    return VoiceRecoderHandler::instance();
+}
+
 void VNoteMainManager::initQMLRegister()
 {
     qmlRegisterSingletonType<VNoteMainManager>("VNote", 1, 0, "VNoteMainManager", mainManager_provider);
@@ -88,6 +103,7 @@ void VNoteMainManager::initQMLRegister()
     // QML组件访问后端调用
     qmlRegisterType<WebEngineHandler>("VNote", 1, 0, "WebEngineHandler");
     qmlRegisterType<VNoteMessageDialogHandler>("VNote", 1, 0, "VNoteMessageDialogHandler");
+    qmlRegisterSingletonType<VoiceRecoderHandler>("VNote", 1, 0, "VoiceRecoderHandler", voiceRecoder_provider);
 }
 
 void VNoteMainManager::onVNoteFoldersLoaded()
@@ -143,16 +159,16 @@ int VNoteMainManager::loadNotepads()
         foreach (VNoteFolder *folder, folders->folders) {
             int tmpIndexCount = tmpsortFolders.indexOf(QString::number(folder->id));
             QVariantMap data;
-            data.insert("name", folder->name);
-            data.insert("notesCount", QString::number(folder->getNotesCount()));
-            data.insert("icon", QString::number(folder->defaultIcon));
+            data.insert(FOLDER_NAME_KEY, folder->name);
+            data.insert(FOLDER_COUNT_KEY, QString::number(folder->getNotesCount()));
+            data.insert(FOLDER_ICON_KEY, QString::number(folder->defaultIcon));
             if (tmpIndexCount != -1) {
                 folder->sortNumber = tmpIndexCount;
             } else {
                 folder->sortNumber = index;
                 m_folderSort.append(QString::number(index));
             }
-            data.insert("sortNumber", folder->sortNumber);
+            data.insert(FOLDER_SORT_KEY, folder->sortNumber);
 
             foldersDataList.append(data);
             index--;
@@ -162,7 +178,7 @@ int VNoteMainManager::loadNotepads()
         // 将foldersDataList按照sortNumber排序
         std::sort(foldersDataList.begin(), foldersDataList.end(),
                   [](const QVariantMap &a, const QVariantMap &b) {
-                      return a["sortNumber"].toInt() < b["sortNumber"].toInt();
+                      return a[FOLDER_SORT_KEY].toInt() < b[FOLDER_SORT_KEY].toInt();
                   });
         emit finishedFolderLoad(foldersDataList);
     }
@@ -197,10 +213,10 @@ void VNoteMainManager::vNoteCreateFolder()
         m_currentFolderIndex = newFolder->id;
         VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
         QVariantMap data;
-        data.insert("name", newFolder->name);
-        data.insert("notesCount", "1");
-        data.insert("icon", QString::number(newFolder->defaultIcon));
-        data.insert("sortNumber", folders->folders.size());
+        data.insert(FOLDER_NAME_KEY, newFolder->name);
+        data.insert(FOLDER_COUNT_KEY, "0");
+        data.insert(FOLDER_ICON_KEY, QString::number(newFolder->defaultIcon));
+        data.insert(FOLDER_SORT_KEY, folders->folders.size());
         addFolderFinished(data);
     }
 }
@@ -222,9 +238,10 @@ void VNoteMainManager::vNoteDeleteFolder(const int &index)
 
 void VNoteMainManager::vNoteChanged(const int &index)
 {
-    if (index < 0 || index >= m_noteItems.size())
+    if (index < 0)
         return;
-    VNoteItem *data = m_noteItems.at(index);
+    m_currentNoteId = index;
+    VNoteItem *data = getNoteById(m_currentNoteId);
     m_richTextManager->initData(data, "");
     // if (data == nullptr || stateOperation->isSearching()) {
     //     m_recordBar->setVisible(false);
@@ -243,16 +260,16 @@ void VNoteMainManager::vNoteChanged(const int &index)
 struct NoteCompare {
     bool operator()(const QVariantMap &a, const QVariantMap &b) const {
         // 比较 isTop 字段
-        bool aIsTop = a.value("isTop").toBool();
-        bool bIsTop = b.value("isTop").toBool();
+        bool aIsTop = a.value(NOTE_ISTOP_KEY).toBool();
+        bool bIsTop = b.value(NOTE_ISTOP_KEY).toBool();
 
         if (aIsTop != bIsTop) {
             // 如果 isTop 不相同，则 isTop 为 true 的排在前面
             return aIsTop > bIsTop;
         } else {
             // 如果 isTop 相同，则根据 modifyTime 排序
-            QDateTime aModifyTime = QDateTime::fromString(a.value("modifyTime").toString(), "yyyy-MM-dd hh:mm:ss");
-            QDateTime bModifyTime = QDateTime::fromString(b.value("modifyTime").toString(), "yyyy-MM-dd hh:mm:ss");
+            QDateTime aModifyTime = QDateTime::fromString(a.value(NOTE_MODIFY_TIME_KEY).toString(), "yyyy-MM-dd hh:mm:ss");
+            QDateTime bModifyTime = QDateTime::fromString(b.value(NOTE_MODIFY_TIME_KEY).toString(), "yyyy-MM-dd hh:mm:ss");
 
             // 对于相同 isTop 的笔记，按照最近修改时间降序排列
             return aModifyTime > bModifyTime;
@@ -279,13 +296,13 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
             notes->lock.lockForRead();
             for (auto it : notes->folderNotes) {
                 QVariantMap data;
-                data.insert("name", it->noteTitle);
-                data.insert("time", Utils::convertDateTime(it->modifyTime));
-                data.insert("modifyTime", it->modifyTime.toString("yyyy-MM-dd hh:mm:ss"));
-                data.insert("isTop", it->isTop);
-                data.insert("icon", QString::number(folder->defaultIcon));
-                data.insert("folderName", folder->name);
-                data.insert("noteId", it->noteId);
+                data.insert(NOTE_NAME_KEY, it->noteTitle);
+                data.insert(NOTE_TIME_KEY, Utils::convertDateTime(it->modifyTime));
+                data.insert(NOTE_MODIFY_TIME_KEY, it->modifyTime.toString("yyyy-MM-dd hh:mm:ss"));
+                data.insert(NOTE_ISTOP_KEY, it->isTop);
+                data.insert(NOTE_FOLDER_ICON_KEY, QString::number(folder->defaultIcon));
+                data.insert(NOTE_FOLDER_NAME_KEY, folder->name);
+                data.insert(NOTE_ID_KEY, it->noteId);
                 notesDataList.append(data);
                 m_noteItems.append(it);
                 if (it->isTop) {
@@ -296,14 +313,20 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
             notes->lock.unlock();
 
             std::sort(notesDataList.begin(), notesDataList.end(), NoteCompare());
-
-            // Sort the view & set focus on first item
-            //  m_middleView->onNoteChanged();
-            //  m_middleView->setCurrentIndex(0);
         }
-        emit updateNotes(notesDataList);
+        if (!notesDataList.isEmpty()) {
+            m_currentNoteId = notesDataList.first().value("noteId").toInt();
+            vNoteChanged(m_currentNoteId);
+        } else
+            m_currentNoteId = -1;
+        emit updateNotes(notesDataList, 0);
     }
     return notesCount;
+}
+
+void VNoteMainManager::insertVoice(const QString &path, qint64 size)
+{
+    m_richTextManager->insertVoiceItem(path, size);
 }
 
 void VNoteMainManager::createNote()
@@ -319,23 +342,25 @@ void VNoteMainManager::createNote()
     tmpNote.noteTitle = noteOper.getDefaultNoteName(tmpNote.folderId);
 
     VNoteItem *newNote = noteOper.addNote(tmpNote);
+    m_currentNoteId = newNote->noteId;
 
     m_noteItems.append(newNote);
     QList<QVariantMap> notesDataList;
     for (auto it : m_noteItems) {
         QVariantMap data;
-        data.insert("name", it->noteTitle);
-        data.insert("time", Utils::convertDateTime(it->modifyTime));
-        data.insert("modifyTime", it->modifyTime.toString("yyyy-MM-dd hh:mm:ss"));
-        data.insert("isTop", it->isTop);
+        data.insert(NOTE_NAME_KEY, it->noteTitle);
+        data.insert(NOTE_TIME_KEY, Utils::convertDateTime(it->modifyTime));
+        data.insert(NOTE_MODIFY_TIME_KEY, it->modifyTime.toString("yyyy-MM-dd hh:mm:ss"));
+        data.insert(NOTE_ISTOP_KEY, it->isTop);
         VNoteFolder *folder = getFloderById(it->folderId);
-        data.insert("icon", QString::number(folder->defaultIcon));
-        data.insert("folderName", folder->name);
-        data.insert("noteId", it->noteId);
+        data.insert(NOTE_FOLDER_ICON_KEY, QString::number(folder->defaultIcon));
+        data.insert(NOTE_FOLDER_NAME_KEY, folder->name);
+        data.insert(NOTE_ID_KEY, it->noteId);
         notesDataList.append(data);
     }
     std::sort(notesDataList.begin(), notesDataList.end(), NoteCompare());
     emit addNoteAtHead(notesDataList);
+    m_richTextManager->clearJSContent();
 }
 
 void VNoteMainManager::saveAs(const QVariantList &index, const QString &path, SaveAsType type)
@@ -345,22 +370,21 @@ void VNoteMainManager::saveAs(const QVariantList &index, const QString &path, Sa
     for (auto i : index) {
         if (!i.isValid())
             continue;
-        VNoteItem *noteData = m_noteItems.at(i.toInt());
+        VNoteItem *noteData = getNoteById(i.toInt());
         noteDataList.append(noteData);
     }
     if (noteDataList.size() == 0)
         return;
 
-    QString historyDir = "";
     QString defaultName = "";
     switch (type) {
     case Html:
         exportType = ExportNoteWorker::ExportHtml;
-        defaultName = QUrl(path).fileName() + ".html";
+        defaultName = QUrl(path).fileName();
         break;
     case Text:
         exportType = ExportNoteWorker::ExportText;
-        defaultName = QUrl(path).fileName() + ".text";
+        defaultName = QUrl(path).fileName();
         break;
     case Voice:
         exportType = ExportNoteWorker::ExportVoice;
@@ -372,7 +396,7 @@ void VNoteMainManager::saveAs(const QVariantList &index, const QString &path, Sa
     }
 
     ExportNoteWorker *exportWorker = new ExportNoteWorker(
-            path, exportType, noteDataList, defaultName);
+            QUrl(path).path(), exportType, noteDataList, defaultName);
     exportWorker->setAutoDelete(true);
     connect(exportWorker, &ExportNoteWorker::exportFinished, this, &VNoteMainManager::onExportFinished);
     QThreadPool::globalInstance()->start(exportWorker);
@@ -433,27 +457,28 @@ VNoteItem *VNoteMainManager::getNoteById(const int &id)
     return nullptr;
 }
 
-VNoteItem *VNoteMainManager::getNoteByIndex(const int &index)
+VNoteItem *VNoteMainManager::deleteNoteById(const int &id)
 {
-    if (index < 0 || index >= m_noteItems.size()) {
-        return nullptr;
+    foreach (auto item, m_noteItems) {
+        if (item->noteId == id) {
+            m_noteItems.removeOne(item);
+            return item;
+        }
     }
-    return m_noteItems.at(index);
+    return nullptr;
 }
 
 void VNoteMainManager::deleteNote(const QList<int> &index)
 {
     // 删除之前清空JS详情页内容
     m_richTextManager->clearJSContent();
-    qWarning() << "deleteNote index:" << index;
-
     QList<VNoteItem *> noteDataList;
     for (int i = 0; i < index.size(); i++) {
-        VNoteItem *note = m_noteItems.at(index.at(i));
+        VNoteItem *note = getNoteById(index.at(i));
         noteDataList.append(note);
-        if (m_noteItems.at(index.at(i))->isTop)
+        if (note->isTop)
             m_currentHasTop--;
-        m_noteItems.removeAt(index.at(i));
+        m_noteItems.removeOne(note);
     }
 
     if (noteDataList.size()) {
@@ -478,7 +503,7 @@ void VNoteMainManager::moveNotes(const QVariantList &index, const int &folderInd
     VNoteFolder *folder = getFloderByIndex(folderIndex);
     if (!index.at(0).isValid())
         return;
-    VNoteItem *item = getNoteByIndex(index.at(0).toInt());
+    VNoteItem *item = getNoteById(index.at(0).toInt());
     if (folder == nullptr || item == nullptr || item->folderId == folder->id)
         return;
     VNoteItemOper noteOper;
@@ -486,7 +511,7 @@ void VNoteMainManager::moveNotes(const QVariantList &index, const int &folderInd
     VNOTE_ITEMS_MAP *destNotes = noteOper.getFolderNotes(folder->id);
     int srcIndex = getFloderIndexById(item->folderId);
     foreach (auto i, index) {
-        VNoteItem *note = getNoteByIndex(i.toInt());
+        VNoteItem *note = getNoteById(i.toInt());
         if (note->isTop)
             m_currentHasTop--;
         srcNotes->lock.lockForWrite();
@@ -516,24 +541,53 @@ void VNoteMainManager::updateTop(const int &id, const bool &top)
     QList<QVariantMap> notesDataList;
     for (auto it : m_noteItems) {
         QVariantMap data;
-        data.insert("name", it->noteTitle);
-        data.insert("time", Utils::convertDateTime(it->modifyTime));
-        data.insert("modifyTime", it->modifyTime.toString("yyyy-MM-dd hh:mm:ss"));
-        data.insert("isTop", it->isTop);
+        data.insert(NOTE_NAME_KEY, it->noteTitle);
+        data.insert(NOTE_TIME_KEY, Utils::convertDateTime(it->modifyTime));
+        data.insert(NOTE_MODIFY_TIME_KEY, it->modifyTime.toString("yyyy-MM-dd hh:mm:ss"));
+        data.insert(NOTE_ISTOP_KEY, it->isTop);
         VNoteFolder *folder = getFloderById(it->folderId);
-        data.insert("icon", QString::number(folder->defaultIcon));
-        data.insert("folderName", folder->name);
-        data.insert("noteId", it->noteId);
+        data.insert(NOTE_FOLDER_ICON_KEY, QString::number(folder->defaultIcon));
+        data.insert(NOTE_FOLDER_NAME_KEY, folder->name);
+        data.insert(NOTE_ID_KEY, it->noteId);
         notesDataList.append(data);
     }
     std::sort(notesDataList.begin(), notesDataList.end(), NoteCompare());
-    emit updateNotes(notesDataList);
+    auto it = std::find_if(notesDataList.begin(), notesDataList.end(), [id](const QVariantMap &item)->bool {
+        return item.value("noteId").toInt() == id;
+    });
+    emit updateNotes(notesDataList, std::distance(notesDataList.begin(), it));
 }
 
 void VNoteMainManager::onExportFinished(int err)
 {
     Q_UNUSED(err)
     // TODO:提示保存成功
+}
+
+void VNoteMainManager::onNoteChanged()
+{
+    VNoteItem *note = getNoteById(m_currentNoteId);
+    note->modifyTime = QDateTime::currentDateTime();
+
+    QList<QVariantMap> notesDataList;
+    for (auto it : m_noteItems) {
+        QVariantMap data;
+        data.insert(NOTE_NAME_KEY, it->noteTitle);
+        data.insert(NOTE_TIME_KEY, Utils::convertDateTime(it->modifyTime));
+        data.insert(NOTE_MODIFY_TIME_KEY, it->modifyTime.toString("yyyy-MM-dd hh:mm:ss"));
+        data.insert(NOTE_ISTOP_KEY, it->isTop);
+        VNoteFolder *folder = getFloderById(it->folderId);
+        data.insert(NOTE_FOLDER_ICON_KEY, QString::number(folder->defaultIcon));
+        data.insert(NOTE_FOLDER_NAME_KEY, folder->name);
+        data.insert(NOTE_ID_KEY, it->noteId);
+        notesDataList.append(data);
+    }
+    std::sort(notesDataList.begin(), notesDataList.end(), NoteCompare());
+    qint32 id = note->noteId;
+    auto it = std::find_if(notesDataList.begin(), notesDataList.end(), [id](const QVariantMap &item)->bool {
+        return item.value(NOTE_ID_KEY).toInt() == id;
+    });
+    emit updateNotes(notesDataList, std::distance(notesDataList.begin(), it));
 }
 
 bool VNoteMainManager::getTop()
@@ -570,6 +624,11 @@ void VNoteMainManager::vNoteSearch(const QString &text)
     }
 }
 
+void VNoteMainManager::updateNoteWithResult(const QString &result)
+{
+    m_richTextManager->onUpdateNoteWithResult(getNoteById(m_currentNoteId), result);
+}
+
 int VNoteMainManager::loadSearchNotes(const QString &key)
 {
     VNOTE_ALL_NOTES_MAP *noteAll = VNoteDataManager::instance()->getAllNotesInFolder();
@@ -580,12 +639,12 @@ int VNoteMainManager::loadSearchNotes(const QString &key)
             for (auto note : foldeNotes->folderNotes) {
                 if (note->search(key)) {
                     QVariantMap data;
-                    data.insert("name", Utils::createRichText(note->noteTitle, key));
-                    data.insert("time", Utils::convertDateTime(note->modifyTime));
-                    data.insert("isTop", QString::number(note->isTop));
+                    data.insert(NOTE_NAME_KEY, Utils::createRichText(note->noteTitle, key));
+                    data.insert(NOTE_TIME_KEY, Utils::convertDateTime(note->modifyTime));
+                    data.insert(NOTE_ISTOP_KEY, QString::number(note->isTop));
                     VNoteFolder *folder = getFloderById(note->folderId);
-                    data.insert("folderName", folder->name);
-                    data.insert("icon", QString::number(folder->defaultIcon));
+                    data.insert(NOTE_FOLDER_NAME_KEY, folder->name);
+                    data.insert(NOTE_FOLDER_ICON_KEY, QString::number(folder->defaultIcon));
                     notesDataList.append(data);
                 }
             }
@@ -599,4 +658,43 @@ int VNoteMainManager::loadSearchNotes(const QString &key)
         }
     }
     return notesDataList.size();
+}
+
+int VNoteMainManager::loadAudioSource()
+{
+    return setting::instance()->getOption(VNOTE_AUDIO_SELECT).toInt();
+}
+
+void VNoteMainManager::changeAudioSource(const int &source)
+{
+    setting::instance()->setOption(VNOTE_AUDIO_SELECT, QVariant(source));
+    VoiceRecoderHandler::instance()->changeMode(source);
+}
+
+void VNoteMainManager::insertImages(const QStringList &filePaths)
+{
+    int count = 0;
+    QStringList paths;
+    //获取文件夹路径
+    QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/images";
+    //创建文件夹
+    QDir().mkdir(dirPath);
+    //获取时间戳
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+    QString date = currentDateTime.toString("yyyyMMddhhmmss");
+
+    for (auto path : filePaths.toList()) {
+        QFileInfo fileInfo(path);
+        QString suffix = fileInfo.suffix();
+        if (!(suffix == "jpg" || suffix == "png" || suffix == "bmp")) {
+            continue;
+        }
+        //创建文件路径
+        QString newPath = QString("%1/%2_%3.%4").arg(dirPath).arg(date).arg(++count).arg(suffix);
+        if (QFile::copy(QUrl(path).toLocalFile(), newPath)) {
+            paths.push_back(newPath);
+        }
+    }
+    if (!paths.isEmpty())
+        JsContent::instance()->callJsInsertImages(paths);
 }

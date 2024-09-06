@@ -14,6 +14,8 @@ import VNote 1.0
 import "../dialog"
 
 Item {
+    id: rootItem
+
     function toggleMultCho(choices) {
         if (choices > 1) {
             webView.visible = false;
@@ -75,6 +77,11 @@ Item {
 
                 target: webView
 
+                onLoadRichText: {
+                    VNoteMainManager.vNoteChanged(itemListView.model.get(0).noteId);
+                    itemListView.selectedNoteItem = [0];
+                    itemListView.selectSize = 1;
+                }
                 onRequesetCallJsSynchronous: func => {
                     webView.runJavaScript(func, function (result) {
                             onCallJsResult(result);
@@ -191,9 +198,45 @@ Item {
             }
             onAccepted: {
                 if (fileDialog.files.length > 0) {
-                    Webobj.callJsInsertImages(fileDialog.files);
+                    VNoteMainManager.insertImages(fileDialog.files);
                 }
             }
+        }
+    }
+
+    Loader {
+        id: recorderViewLoader
+
+        function onPauseRecording() {
+            VoiceRecoderHandler.pauseRecoder();
+        }
+
+        function onStopRecording() {
+            VoiceRecoderHandler.stopRecoder();
+            title.recorderBtnEnable = true;
+        }
+
+        active: false
+        anchors.bottom: rootItem.bottom
+        anchors.bottomMargin: 10
+        anchors.horizontalCenter: rootItem.horizontalCenter
+        asynchronous: true
+        height: 42
+        width: 364
+
+        sourceComponent: RecordingView {
+            id: recordingBar
+
+            anchors.fill: parent
+
+            Component.onCompleted: {
+                recordingBar.visible = true;
+            }
+        }
+
+        onLoaded: {
+            recorderViewLoader.item.pauseRecording.connect(onPauseRecording);
+            recorderViewLoader.item.stopRecording.connect(onStopRecording);
         }
     }
 
@@ -211,7 +254,31 @@ Item {
             }
         }
         onStartRecording: {
-            console.warn("--------------");
+            if (!recorderViewLoader.active) {
+                recorderViewLoader.active = true;
+            } else {
+                recorderViewLoader.item.visible = true;
+            }
+            VoiceRecoderHandler.startRecoder();
+            title.recorderBtnEnable = false;
+        }
+    }
+
+    Connections {
+        target: VNoteMainManager
+
+        onNeedUpdateNote: {
+            webView.runJavaScript("getHtml()", function (result) {
+                    VNoteMainManager.updateNoteWithResult(result);
+                });
+        }
+    }
+
+    Connections {
+        target: VoiceRecoderHandler
+
+        onUpdateRecorderTime: {
+            recorderViewLoader.item.time = time;
         }
     }
 }

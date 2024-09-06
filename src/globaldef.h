@@ -50,6 +50,19 @@
 #define VNOTE_NOTEPAD_ENCRYPTION_KEY "base.encryption.key"
 //********************************************
 
+#define NOTE_NAME_KEY "name"
+#define NOTE_TIME_KEY "time"
+#define NOTE_MODIFY_TIME_KEY "modifyTime"
+#define NOTE_ISTOP_KEY "isTop"
+#define NOTE_FOLDER_ICON_KEY "icon"
+#define NOTE_FOLDER_NAME_KEY "folderName"
+#define NOTE_ID_KEY "noteId"
+
+#define FOLDER_NAME_KEY "name"
+#define FOLDER_COUNT_KEY "notesCount"
+#define FOLDER_ICON_KEY "icon"
+#define FOLDER_SORT_KEY "sortNumber"
+
 //Time format
 #define VNOTE_TIME_FMT "yyyy-MM-dd HH:mm:ss.zzz"
 
