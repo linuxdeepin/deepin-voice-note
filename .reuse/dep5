@@ -44,7 +44,7 @@ Copyright: UnionTech Software Technology Co., Ltd.
 License: CC-BY-4.0
 
 # assets
-Files: assets/*
+Files: assets/* src/web/img/* src/web/css/* src/icon/* src/dsg/*
 Copyright: None
 License: LGPL-3.0-or-later
 
@@ -54,9 +54,31 @@ Copyright: UnionTech Software Technology Co., Ltd.
 License: LGPL-3.0-or-later
 
 # src
-Files: src/*.h src/*.cpp  src/*.c  src/*.hpp
+Files: src/*.h src/*.cpp  src/*.c  src/*.hpp src/*.qml src/*.js
 Copyright: UnionTech Software Technology Co., Ltd.
 License: GPL-3.0-or-later
+
+# js
+Files: src/web/js/bootstap.js
+Copyright: 2011-2015 Twitter, Inc.
+License: MIT
+
+Files: src/web/js/jquery.js
+Copyright: JS Foundation and other contributors
+License: MIT
+
+Files: src/web/js/summernote_v9_2.js
+Copyright: 2013- Alan Hong. and other contributors
+License: MIT
+
+Files: src/web/js/handlebars.js
+Copyright: 2011-2014 by Yehuda Katz
+License: MIT
+
+Files: src/web/qwebchannel.js
+Copyright: 2016 The Qt Company Ltd.
+           2014 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com, author Milian Wolff <milian.wolff@kdab.com>
+License: BSD-3-Clause
 
 # tests
 Files: tests/*
