@@ -139,6 +139,10 @@
     user-select: none;
 }
 
+.voicePlayback .right .timeField {
+    font-size: 12px;
+}
+
 /********** 悬浮语言播放控件 **********/
 .airVoicePlaybackContainer {
     position: fixed;
