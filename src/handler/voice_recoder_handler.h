@@ -31,6 +31,7 @@ signals:
     void finishedRecod(const QString &path, qint64 voiceSize);
     void recoderDurationChange(qint64 duation);
     void updateRecorderTime(const QVariant &time);
+    void updateWave(qreal max);
 
 private:
     VoiceRecoderHandler();

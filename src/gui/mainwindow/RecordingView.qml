@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Layouts
 import org.deepin.dtk 1.0
+import VNote 1.0
 
 Item {
     id: rootItem
@@ -26,12 +27,11 @@ Item {
 
     RowLayout {
         anchors.fill: parent
-        spacing: 10
+        spacing: 0
 
         ToolButton {
             id: pauseBtn
 
-            Layout.leftMargin: 10
             height: rootItem.height
             icon.height: iconSize
             icon.name: "recording_pause"
@@ -44,7 +44,10 @@ Item {
             }
         }
 
-        Rectangle {
+        RecordingCurves {
+            id: curves
+
+            height: 24
             width: 180
         }
 
@@ -52,12 +55,12 @@ Item {
             id: duation
 
             text: time
+            width: 66
         }
 
         ToolButton {
             id: stopBtn
 
-            Layout.rightMargin: 10
             height: rootItem.height
             icon.height: iconSize
             icon.name: "recording_stop"
@@ -68,6 +71,14 @@ Item {
                 stopRecording();
                 rootItem.visible = false;
             }
+        }
+    }
+
+    Connections {
+        target: VoiceRecoderHandler
+
+        onUpdateWave: {
+            curves.updateVolume(max);
         }
     }
 }
