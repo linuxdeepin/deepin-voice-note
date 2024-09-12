@@ -115,4 +115,17 @@ void VoiceRecoderHandler::onAudioBufferProbed(const QAudioBuffer &buffer)
         if (msec > (60 * 60 * 1000))
             stopRecoder();
     }
+    qreal maxValue = -100;
+    for (int i = 0; i < buffer.frameCount(); i++) {
+        qreal averageValue = 0;
+        int channel = buffer.format().channelCount();
+        for (int j = 0; j < channel; ++j) {
+            averageValue += qAbs(qreal(buffer.constData<qint16>()[i * channel + j]));
+        }
+        averageValue = (averageValue) / channel;
+        if (maxValue < averageValue)
+            maxValue = averageValue;
+    }
+    maxValue = maxValue / 10000;
+    updateWave(maxValue);
 }

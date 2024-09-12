@@ -17,6 +17,7 @@
 #include "handler/web_engine_handler.h"
 #include "handler/vnote_message_dialog_handler.h"
 #include "handler/voice_recoder_handler.h"
+#include "audio/recording_curves.h"
 
 #include <QThreadPool>
 #include <QQmlApplicationEngine>
@@ -104,6 +105,8 @@ void VNoteMainManager::initQMLRegister()
     qmlRegisterType<WebEngineHandler>("VNote", 1, 0, "WebEngineHandler");
     qmlRegisterType<VNoteMessageDialogHandler>("VNote", 1, 0, "VNoteMessageDialogHandler");
     qmlRegisterSingletonType<VoiceRecoderHandler>("VNote", 1, 0, "VoiceRecoderHandler", voiceRecoder_provider);
+
+    qmlRegisterType<RecordingCurves>("VNote", 1, 0, "RecordingCurves");
 }
 
 void VNoteMainManager::onVNoteFoldersLoaded()
