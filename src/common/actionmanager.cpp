@@ -64,8 +64,8 @@ void ActionManager::initMenu()
     childActionMap.insert(NoteSave, { SaveNoteAsHtml, SaveNoteAsText });
 
     // VoiceCtxMenu 初始化语音文本右键菜单
-    makeAction(VoiceAsSave, QCoreApplication::translate("NoteDetailContextMenu", "SaveasMP3"));
-    makeAction(VoiceToText, QCoreApplication::translate("NoteDetailContextMenu", "VoicetoText"));
+    makeAction(VoiceAsSave, QCoreApplication::translate("NoteDetailContextMenu", "Save as MP3"));
+    makeAction(VoiceToText, QCoreApplication::translate("NoteDetailContextMenu", "Voice to Text"));
     makeAction(VoiceDelete, QCoreApplication::translate("NoteDetailContextMenu", "Delete"));
     makeAction(VoiceSelectAll, QCoreApplication::translate("NoteDetailContextMenu", "Selectall"));
     makeAction(VoiceCopy, QCoreApplication::translate("NoteDetailContextMenu", "Copy"));
