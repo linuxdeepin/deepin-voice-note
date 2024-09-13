@@ -551,8 +551,8 @@ Item {
                     text: qsTr("Save as HTML")
 
                     onTriggered: {
+                        fileDialogLoader.saveType = VNoteMainManager.Html;
                         if (!fileDialogLoader.active) {
-                            fileDialogLoader.saveType = VNoteMainManager.Html;
                             fileDialogLoader.active = true;
                         } else {
                             fileDialogLoader.item.open();
@@ -564,8 +564,8 @@ Item {
                     text: qsTr("Save as TXT")
 
                     onTriggered: {
+                        fileDialogLoader.saveType = VNoteMainManager.Text;
                         if (!fileDialogLoader.active) {
-                            fileDialogLoader.saveType = VNoteMainManager.Text;
                             fileDialogLoader.active = true;
                         } else {
                             fileDialogLoader.item.open();

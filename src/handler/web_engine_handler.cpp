@@ -25,6 +25,8 @@
 #include <QCursor>
 #include <QMimeData>
 #include <QWebEngineContextMenuRequest>
+#include <QFileDialog>
+#include <QStandardPaths>
 
 #include <dguiapplicationhelper.h>
 
@@ -259,7 +261,8 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
     switch (kind) {
         case ActionManager::VoiceAsSave:
             // 另存语音
-            // saveMP3As();
+            if (!saveMP3())
+                Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::SaveFailed);
             break;
         case ActionManager::VoiceToText:
             m_voiceToTextHandler->setAudioToText(m_voiceBlock);
@@ -444,4 +447,21 @@ bool WebEngineHandler::isVoicePaste()
 {
     // 调用web前端接口
     return callJsSynchronous("returnCopyFlag()").toBool();
+}
+
+bool WebEngineHandler::saveMP3()
+{
+    if (!m_voiceBlock)
+        return false;
+    QString defaultName = QStandardPaths::writableLocation(QStandardPaths::MusicLocation) + "/" + m_voiceBlock.get()->voiceTitle + ".mp3";
+    QString fileName = QFileDialog::getSaveFileName(0, tr("save as MP3"), defaultName, "*.mp3");
+    if (!fileName.isEmpty()) {
+        QFileInfo fileInfo(fileName);
+        QDir dir = fileInfo.absoluteDir();
+        if (!dir.exists())
+            return false;
+        QFile tmpFile(m_voiceBlock.get()->voicePath);
+        return tmpFile.copy(fileName);
+    }
+    return true;
 }

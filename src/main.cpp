@@ -17,6 +17,7 @@
 #include <QDBusReply>
 
 #include <QGuiApplication>
+#include <QApplication>
 #include <QCommandLineParser>
 
 #include <QQmlApplicationEngine>
@@ -30,7 +31,7 @@
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "7777");
     VNoteMainManager::instance()->initQMLRegister();

@@ -79,6 +79,8 @@ private:
 
     bool isVoicePaste();
 
+    bool saveMP3();
+
 private:
     QObject *m_targetWebEngine { nullptr };  // 关联的 qml WebEngineView
 
