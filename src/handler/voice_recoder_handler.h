@@ -9,7 +9,7 @@ class QAudioBuffer;
 class VoiceRecoderHandler: public QObject
 {
     Q_OBJECT
-    Q_ENUMS(SkinStyle)
+    Q_ENUMS(RecoderType)
 public:
     enum RecoderType
     {
@@ -26,12 +26,16 @@ public:
     Q_INVOKABLE void setAudioDevice(const QString &device);
     Q_INVOKABLE void changeMode(const int &mode);
 
+public slots:
+    void onDeviceEnableChanged(int mode, bool enabled);
+
 signals:
     void recoderStateChange(RecoderType type);
     void finishedRecod(const QString &path, qint64 voiceSize);
     void recoderDurationChange(qint64 duation);
     void updateRecorderTime(const QVariant &time);
     void updateWave(qreal max);
+    void updateRecordBtnState(bool enable);
 
 private:
     VoiceRecoderHandler();

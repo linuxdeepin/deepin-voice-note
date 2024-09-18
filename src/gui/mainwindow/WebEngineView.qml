@@ -277,6 +277,12 @@ Item {
     Connections {
         target: VoiceRecoderHandler
 
+        onRecoderStateChange: {
+            recorderViewLoader.item.isRecording = (VoiceRecoderHandler.getRecoderType() === VoiceRecoderHandler.Recording);
+        }
+        onUpdateRecordBtnState: {
+            title.recorderBtnEnable = enable;
+        }
         onUpdateRecorderTime: {
             recorderViewLoader.item.time = time;
         }

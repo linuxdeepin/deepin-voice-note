@@ -130,6 +130,7 @@ public:
 
     // 隐藏/显示语音助手相关功能
     Q_INVOKABLE void visibleAiActions(bool visible);
+    Q_INVOKABLE void visibleMulChoicesActions(bool visible);
 
     // 动作被触发
     Q_SIGNAL void actionTriggered(ActionKind actionId);
