@@ -8,6 +8,7 @@ VoiceRecoderHandler::VoiceRecoderHandler() {
     initAudioWatcher();
 }
 
+
 VoiceRecoderHandler *VoiceRecoderHandler::instance()
 {
     static VoiceRecoderHandler voiceHandler;

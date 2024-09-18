@@ -41,6 +41,7 @@ public:
     Q_INVOKABLE bool getTop();
     Q_INVOKABLE void updateSort(const int &src, const int &dst);
     Q_INVOKABLE void renameFolder(const int &index, const QString &name);
+    Q_INVOKABLE void renameNote(const int &index, const QString &newName);
     Q_INVOKABLE void vNoteSearch(const QString &text);
     Q_INVOKABLE void updateNoteWithResult(const QString &result);
     Q_INVOKABLE int loadSearchNotes(const QString &key);

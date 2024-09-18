@@ -194,6 +194,9 @@ ApplicationWindow {
                         itemListView.selectSize = 1;
                         VNoteMainManager.vNoteFloderChanged(index);
                     }
+                    onUpdateFolderName: {
+                        label.text = name;
+                    }
                 }
 
                 Button {
@@ -273,7 +276,7 @@ ApplicationWindow {
 
                     Keys.onPressed: {
                         if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
-                            VNoteMainManager.vNoteSearch(text);
+                            VNoteMainManager.loadSearchNotes(text);
                         }
                     }
 
