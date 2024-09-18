@@ -203,7 +203,6 @@ Item {
         delegate: Rectangle {
             property bool isRename: false
             property bool isSelected: false
-            property alias renameFocus: renameLine.focus
 
             color: isSelected ? "#FF1F6EE7" : "white"
             height: isSearch ? 67 : 50
@@ -211,13 +210,18 @@ Item {
             width: itemListView.width
 
             Component.onCompleted: {
-                // console.warn("--- create view item", this, model.name, isSelected);
                 isSelected = (selectedNoteItem.indexOf(index) !== -1);
             }
-
-            // onIsSelectedChanged: {
-            //     console.warn("---", this, model.name, isSelected);
-            // }
+            Keys.onPressed: {
+                if (isRename) {
+                    if (event.key === Qt.Key_Escape) {
+                        renameLine.text = model.name;
+                        isRename = false;
+                    } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
+                        isRename = false;
+                    }
+                }
+            }
 
             ColumnLayout {
                 id: itemLayout
@@ -258,21 +262,25 @@ Item {
 
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    Layout.topMargin: isRename ? 4 : 0
+                    focus: isRename
                     text: model.name
                     visible: isRename
+
+                    backgroundColor: Palette {
+                        normal: Qt.rgba(1, 1, 1, 0.85)
+                        normalDark: Qt.rgba(1, 1, 1, 0.85)
+                    }
 
                     onFocusChanged: {
                         noteItemMouseArea.enabled = false;
                         if (focus) {
-                            focus = true;
                             selectAll();
                         } else {
+                            if (text.length !== 0 && text !== model.name) {
+                                model.name = text;
+                                VNoteMainManager.renameNote(model.noteId, text);
+                            }
                             noteItemMouseArea.enabled = true;
-                            deselect();
-                            visible = false;
-                            noteNameLabel.visible = true;
-                            timeLabel.visible = true;
                         }
                     }
                 }
@@ -411,6 +419,9 @@ Item {
                         }
                     }
                 }
+                onDoubleClicked: {
+                    itemListView.itemAtIndex(index).isRename = true;
+                }
                 onPositionChanged: {
                     if (held && itemModel.get(selectedNoteItem[0])) {
                         var globPos = mapToGlobal(mouse.x, mouse.y);
@@ -485,10 +496,8 @@ Item {
 
                 onTriggered: {
                     var currentItem = itemListView.itemAtIndex(itemListView.contextIndex);
-                    console.log("Current item:", currentItem);
                     if (currentItem) {
                         currentItem.isRename = true;
-                        currentItem.renameFocus = true;
                     }
                 }
             }

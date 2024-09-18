@@ -615,6 +615,15 @@ void VNoteMainManager::renameFolder(const int &index, const QString &name)
     }
 }
 
+void VNoteMainManager::renameNote(const int &index, const QString &newName)
+{
+    VNoteItem *item = getNoteById(index);
+    if (item && !newName.isEmpty() && newName != item->noteTitle) {
+        VNoteItemOper noteOps(item);
+        noteOps.modifyNoteTitle(newName);
+    }
+}
+
 void VNoteMainManager::vNoteSearch(const QString &text)
 {
     if (!text.isEmpty()) {
@@ -634,6 +643,8 @@ void VNoteMainManager::updateNoteWithResult(const QString &result)
 
 int VNoteMainManager::loadSearchNotes(const QString &key)
 {
+    if (key.isEmpty())
+        return -1;
     VNOTE_ALL_NOTES_MAP *noteAll = VNoteDataManager::instance()->getAllNotesInFolder();
     QList<QVariantMap> notesDataList;    
     if (noteAll) {
@@ -645,6 +656,7 @@ int VNoteMainManager::loadSearchNotes(const QString &key)
                     data.insert(NOTE_NAME_KEY, Utils::createRichText(note->noteTitle, key));
                     data.insert(NOTE_TIME_KEY, Utils::convertDateTime(note->modifyTime));
                     data.insert(NOTE_ISTOP_KEY, QString::number(note->isTop));
+                    data.insert(NOTE_ID_KEY, note->noteId);
                     VNoteFolder *folder = getFloderById(note->folderId);
                     data.insert(NOTE_FOLDER_NAME_KEY, folder->name);
                     data.insert(NOTE_FOLDER_ICON_KEY, QString::number(folder->defaultIcon));

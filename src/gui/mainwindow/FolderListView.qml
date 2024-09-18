@@ -20,6 +20,7 @@ Item {
 
     signal folderEmpty
     signal itemChanged(int index, string name)
+    signal updateFolderName(string name)
 
     function addFolder() {
         VNoteMainManager.vNoteCreateFolder();
@@ -54,13 +55,6 @@ Item {
 
     function getCurrentFolder() {
         return folderListView.model.get(folderListView.currentIndex);
-    }
-
-    function renameFolder(index, isRename) {
-        var item = folderListView.itemAtIndex(index);
-        item.folderNameLabel.visible = !isRename;
-        item.folderCountLabel.visible = !isRename;
-        item.renameLine.visible = isRename;
     }
 
     function toggleSearch(isSearch) {
@@ -169,40 +163,36 @@ Item {
         enabled: parent.enabled
         model: folderModel
 
-        delegate: Item {
-            property color backgroundColor: index === folderListView.currentIndex ? "#33000000" : "transparent"
+        delegate: Rectangle {
+            id: rootItem
 
+            property bool isHovered: false
+            property bool isRename: false
+
+            color: index === folderListView.currentIndex ? "#33000000" : (isHovered ? "#1A000000" : "transparent")
             enabled: folderListView.enabled
             height: itemHeight
+            radius: 6
             width: parent.width
 
             Keys.onPressed: {
                 switch (event.key) {
                 case Qt.Key_Enter:
                 case Qt.Key_Return:
-                    var lastName = model.name;
-                    if (lastName != renameLine.text) {
-                        VNoteMainManager.renameFolder(index, renameLine.text);
-                        model.name = renameLine.text;
-                        renameLine.visible = false;
-                        folderNameLabel.visible = true;
-                        folderCountLabel.visible = true;
+                    var newName = renameLine.text;
+                    if (newName.length !== 0 && newName !== model.text) {
+                        VNoteMainManager.renameFolder(index, newName);
+                        model.name = newName;
+                        updateFolderName(newName);
                     }
+                    isRename = false;
                     break;
                 case Qt.Key_Escape:
-                    console.log("esc");
+                    isRename = false;
                     break;
                 default:
                     break;
                 }
-            }
-
-            Rectangle {
-                id: rect
-
-                anchors.fill: parent
-                color: backgroundColor
-                radius: 6
             }
 
             RowLayout {
@@ -260,21 +250,27 @@ Item {
                     id: renameLine
 
                     Layout.fillWidth: true
-                    height: 26
+                    Layout.rightMargin: 5
+                    bottomPadding: 0
+                    focus: rootItem.isRename
+                    implicitHeight: 24
                     text: model.name
-                    visible: false
+                    topPadding: 0
+                    visible: rootItem.isRename
+                    z: 20
+
+                    backgroundColor: Palette {
+                        normal: Qt.rgba(1, 1, 1, 0.85)
+                        normalDark: Qt.rgba(1, 1, 1, 0.85)
+                    }
 
                     onFocusChanged: {
                         folderMouseArea.enabled = false;
                         if (focus) {
-                            focus = true;
                             selectAll();
                         } else {
                             folderMouseArea.enabled = true;
                             deselect();
-                            visible = false;
-                            folderNameLabel.visible = true;
-                            folderCountLabel.visible = true;
                         }
                     }
                 }
@@ -287,7 +283,7 @@ Item {
                     horizontalAlignment: Text.AlignLeft
                     text: model.name
                     verticalAlignment: Text.AlignVCenter
-                    visible: true
+                    visible: !rootItem.isRename
                 }
 
                 Label {
@@ -298,7 +294,7 @@ Item {
                     horizontalAlignment: Text.AlignRight
                     text: model.count
                     verticalAlignment: Text.AlignVCenter
-                    visible: true
+                    visible: !rootItem.isRename
                     width: 30
                 }
             }
@@ -315,36 +311,32 @@ Item {
                 hoverEnabled: true
 
                 onClicked: {
+                    if (folderListView.itemAtIndex(folderListView.lastCurrentIndex)) {
+                        folderListView.itemAtIndex(folderListView.lastCurrentIndex).isRename = false;
+                    }
                     if (mouse.button === Qt.RightButton) {
                         folderListView.contextIndex = index;
                         folderItemContextMenu.popup();
                     } else {
-                        if (folderListView.lastCurrentIndex != -1) {
-                            if (folderListView.itemAtIndex(folderListView.lastCurrentIndex)) {
-                                folderListView.itemAtIndex(folderListView.lastCurrentIndex).backgroundColor = "transparent";
-                            }
-                        }
                         folderListView.currentIndex = index;
-                        parent.backgroundColor = "#33000000";
                         folderListView.lastCurrentIndex = index;
                     }
+                    rootItem.isHovered = false;
                 }
-                onDoubleClicked:
-                // renameLine.select(0, renameLine.text.length)
-                // renameLine.focus = true
-                {
+                onDoubleClicked: {
+                    folderListView.itemAtIndex(folderListView.currentIndex).isRename = true;
                 }
                 onEntered: {
                     if (folderListView.currentIndex == index) {
                         return;
                     }
-                    parent.backgroundColor = "#1A000000";
+                    parent.isHovered = true;
                 }
                 onExited: {
                     if (folderListView.currentIndex == index) {
                         return;
                     }
-                    parent.backgroundColor = "transparent";
+                    parent.isHovered = false;
                 }
                 onPositionChanged: {
                     if (held) {
@@ -395,10 +387,7 @@ Item {
                     text: qsTr("Rename")
 
                     onTriggered: {
-                        folderNameLabel.visible = false;
-                        folderCountLabel.visible = false;
-                        renameLine.visible = true;
-                        renameLine.focus = true;
+                        folderListView.itemAtIndex(folderListView.currentIndex).isRename = true;
                     }
                 }
 
@@ -432,10 +421,6 @@ Item {
 
         onCurrentItemChanged: {
             var index = folderListView.currentIndex;
-            // if (folderListView.itemAtIndex(folderListView.lastCurrentIndex).renameLine) {
-            //     renameFolder(folderListView.lastCurrentIndex, true)
-            // }
-
             itemChanged(index, folderModel.get(index).name); // 发出 itemChanged 信号
         }
     }
