@@ -713,3 +713,16 @@ void VNoteMainManager::insertImages(const QStringList &filePaths)
     if (!paths.isEmpty())
         JsContent::instance()->callJsInsertImages(paths);
 }
+
+void VNoteMainManager::checkNoteVoice(const QVariantList &index)
+{
+    foreach (auto id, index) {
+        int noteIndex = id.toInt();
+        VNoteItem *item = getNoteById(noteIndex);
+        if (item->haveVoice()) {
+            ActionManager::instance()->enableAction(ActionManager::NoteSaveVoice, true);
+            return;
+        }
+    }
+    ActionManager::instance()->enableAction(ActionManager::NoteSaveVoice, false);
+}

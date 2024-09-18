@@ -53,9 +53,9 @@ void ActionManager::initMenu()
     makeAction(NoteMove, QCoreApplication::translate("NotesContextMenu", "Move"));
     makeAction(NoteDelete, QCoreApplication::translate("NotesContextMenu", "Delete"));
     makeAction(NoteSave, QCoreApplication::translate("NotesContextMenu", "Save note"), MenuComponent);
-    makeAction(NoteSaveVoice, QCoreApplication::translate("NotesContextMenu", "Savevoicerecording"));
+    makeAction(NoteSaveVoice, QCoreApplication::translate("NotesContextMenu", "Save voice recording"));
     makeAction(NoteSeparator, {}, MenuSeparatorComponent);
-    makeAction(NoteAddNew, QCoreApplication::translate("NotesContextMenu", "Newnote"));
+    makeAction(NoteAddNew, QCoreApplication::translate("NotesContextMenu", "New note"));
 
     // SaveNoteCtxMenu 保存笔记二级菜单项文案
     makeAction(SaveNoteAsHtml, QCoreApplication::translate("NotesContextMenu", "Save as HTML"));
@@ -180,6 +180,13 @@ void ActionManager::visibleAiActions(bool visible)
     visibleAction(TxtDictation, visible);
     visibleAction(TxtTranslate, visible);
     visibleAction(TxtSeparator, visible);
+}
+
+void ActionManager::visibleMulChoicesActions(bool visible)
+{
+    visibleAction(NoteRename, visible);
+    visibleAction(NoteTop, visible);
+    enableAction(NoteSaveVoice, visible);
 }
 
 /*!

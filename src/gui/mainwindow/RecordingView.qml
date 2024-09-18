@@ -8,7 +8,8 @@ Item {
     id: rootItem
 
     property int iconSize: 24
-    property string time: "00:00:00"
+    property bool isRecording: true
+    property string time: "00:00"
 
     signal pauseRecording
     signal stopRecording
@@ -34,7 +35,7 @@ Item {
 
             height: rootItem.height
             icon.height: iconSize
-            icon.name: "recording_pause"
+            icon.name: isRecording ? "recording_pause" : "recording_start"
             icon.width: iconSize
             spacing: 0
             width: rootItem.height

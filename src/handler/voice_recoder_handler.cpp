@@ -57,6 +57,7 @@ void VoiceRecoderHandler::pauseRecoder()
         m_audioRecoder->startRecord();
         m_type = RecoderType::Recording;
     }
+    emit recoderStateChange(m_type);
 }
 
 void VoiceRecoderHandler::setAudioDevice(const QString &device)
@@ -68,6 +69,13 @@ void VoiceRecoderHandler::changeMode(const int &mode)
 {
     m_currentMode = mode;
     onAudioDeviceChange(m_currentMode);
+}
+
+void VoiceRecoderHandler::onDeviceEnableChanged(int mode, bool enabled)
+{
+    if (m_currentMode == mode) {
+        emit updateRecordBtnState(enabled);
+    }
 }
 
 void VoiceRecoderHandler::intRecoder()
@@ -89,6 +97,7 @@ void VoiceRecoderHandler::initRecordPath()
 void VoiceRecoderHandler::initAudioWatcher()
 {
     m_audioWatcher = new AudioWatcher(this);
+    connect(m_audioWatcher, &AudioWatcher::sigDeviceEnableChanged, this, &VoiceRecoderHandler::onDeviceEnableChanged);
 }
 
 void VoiceRecoderHandler::onAudioDeviceChange(int mode)

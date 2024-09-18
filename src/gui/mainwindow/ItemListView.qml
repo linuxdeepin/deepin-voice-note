@@ -142,6 +142,92 @@ Item {
         }
     }
 
+    VNoteRightMenu {
+        id: noteCtxMenu
+
+        menuType: ActionManager.NoteCtxMenu
+
+        onActionTrigger: actionId => {
+            switch (actionId) {
+            case ActionManager.NoteRename:
+                var currentItem = itemListView.itemAtIndex(itemListView.contextIndex);
+                if (currentItem) {
+                    currentItem.isRename = true;
+                }
+                break;
+            case ActionManager.NoteTop:
+                var setTop = true;
+                if (itemModel.get(itemListView.contextIndex).isTop === "top") {
+                    setTop = false;
+                }
+                VNoteMainManager.updateTop(itemModel.get(itemListView.contextIndex).noteId, setTop);
+                var topItem = ActionManager.getActionById(actionId);
+                topItem.text = setTop ? qsTr("Unpin") : qsTr("Sticky on Top");
+                break;
+            case ActionManager.NoteMove:
+                dialogWindow.show();
+                break;
+            case ActionManager.NoteDelete:
+                messageDialogLoader.messageData = selectedNoteItem.length;
+                messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteNote, ret => {
+                        if (!ret) {
+                            return;
+                        }
+                        var delList = itemListView.sortAndDeduplicate(selectedNoteItem);
+                        var delIdList = [];
+                        for (var i = 0; i < delList.length; i++) {
+                            delIdList.push(itemModel.get(delList[i]).noteId);
+                            itemModel.remove(delList[i]);
+                        }
+                        VNoteMainManager.deleteNote(delIdList);
+                        deleteNotes(selectedNoteItem.length);
+                        if (itemModel.count <= itemListView.contextIndex) {
+                            itemListView.itemAtIndex(itemModel.count - 1).isSelected = true;
+                            selectedNoteItem = [itemModel.count - 1];
+                            noteItemChanged(itemModel.get(itemModel.count - 1).noteId);
+                        } else {
+                            itemListView.itemAtIndex(itemListView.contextIndex).isSelected = true;
+                            noteItemChanged(itemModel.get(itemListView.contextIndex).noteId);
+                        }
+                    });
+                break;
+            case ActionManager.SaveNoteAsText:
+                onTriggered: {
+                    fileDialogLoader.saveType = VNoteMainManager.Text;
+                    if (!fileDialogLoader.active) {
+                        fileDialogLoader.active = true;
+                    } else {
+                        fileDialogLoader.item.open();
+                    }
+                }
+                break;
+            case ActionManager.SaveNoteAsHtml:
+                onTriggered: {
+                    fileDialogLoader.saveType = VNoteMainManager.Html;
+                    if (!fileDialogLoader.active) {
+                        fileDialogLoader.active = true;
+                    } else {
+                        fileDialogLoader.item.open();
+                    }
+                }
+                break;
+            case ActionManager.NoteSaveVoice:
+                if (!folderDialogLoader.active) {
+                    folderDialogLoader.saveType = VNoteMainManager.Voice;
+                    folderDialogLoader.active = true;
+                } else {
+                    folderDialogLoader.item.open();
+                }
+                break;
+            case ActionManager.NoteAddNew:
+                VNoteMainManager.createNote();
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
     Connections {
         function handleUpdateNoteList(notesData) {
             itemModel.clear();
@@ -357,23 +443,30 @@ Item {
 
                 onClicked: {
                     if (mouse.button === Qt.RightButton) {
-                        itemListView.contextIndex = index;
-                        if (itemListView.itemAtIndex(itemListView.lastCurrentIndex)) {
-                            var lastItem = itemListView.itemAtIndex(itemListView.lastCurrentIndex);
-                            lastItem.isRename = false;
-                            lastItem.isSelected = false;
-                        }
-                        for (var j = 0; j < selectedNoteItem.length; j++) {
-                            var item = itemListView.itemAtIndex(selectedNoteItem[j]);
+                        if (selectedNoteItem.length > 1) {
+                            ActionManager.visibleMulChoicesActions(false);
+                        } else {
+                            if (itemListView.itemAtIndex(itemListView.lastCurrentIndex)) {
+                                var lastItem = itemListView.itemAtIndex(itemListView.lastCurrentIndex);
+                                lastItem.isRename = false;
+                                lastItem.isSelected = false;
+                            }
+                            var item = itemListView.itemAtIndex(selectedNoteItem[0]);
                             item.isSelected = false;
+                            selectedNoteItem = [index];
+                            selectSize = 1;
+                            itemListView.itemAtIndex(index).isSelected = true;
+                            itemListView.currentIndex = index;
+                            itemListView.lastCurrentIndex = index;
+                            itemListView.contextIndex = index;
+                            ActionManager.visibleMulChoicesActions(true);
                         }
-                        selectedNoteItem = [index];
-                        selectSize = 1;
-                        itemListView.itemAtIndex(index).isSelected = true;
-                        itemListView.currentIndex = index;
-                        itemListView.lastCurrentIndex = index;
-                        noteItemChanged(Number(itemModel.get(index).noteId));
-                        noteContextMenu.popup();
+                        var list = [];
+                        for (var i = 0; i < selectedNoteItem.length; i++) {
+                            list.push(itemModel.get(selectedNoteItem[i]).noteId);
+                        }
+                        VNoteMainManager.checkNoteVoice(list);
+                        noteCtxMenu.popup();
                     } else {
                         if (itemListView.currentIndex === index && selectedNoteItem.length === 1) {
                             return;
@@ -484,126 +577,6 @@ Item {
                     height: 1
                     visible: section != "top" && VNoteMainManager.getTop() && !isSearch
                     width: parent.width
-                }
-            }
-        }
-
-        Menu {
-            id: noteContextMenu
-
-            MenuItem {
-                text: qsTr("Rename")
-
-                onTriggered: {
-                    var currentItem = itemListView.itemAtIndex(itemListView.contextIndex);
-                    if (currentItem) {
-                        currentItem.isRename = true;
-                    }
-                }
-            }
-
-            MenuItem {
-                text: itemModel.get(itemListView.contextIndex).isTop === "top" ? qsTr("untop") : qsTr("Top")
-
-                onTriggered: {
-                    var setTop = true;
-                    if (itemModel.get(itemListView.contextIndex).isTop === "top") {
-                        setTop = false;
-                    }
-                    VNoteMainManager.updateTop(itemModel.get(itemListView.contextIndex).noteId, setTop);
-                }
-            }
-
-            MenuItem {
-                text: qsTr("Move")
-
-                onTriggered: {
-                    dialogWindow.show();
-                }
-            }
-
-            MenuItem {
-                text: qsTr("Delete")
-
-                onTriggered: {
-                    messageDialogLoader.messageData = selectedNoteItem.length;
-                    messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteNote, ret => {
-                            if (!ret) {
-                                return;
-                            }
-                            var delList = itemListView.sortAndDeduplicate(selectedNoteItem);
-                            var delIdList = [];
-                            for (var i = 0; i < delList.length; i++) {
-                                delIdList.push(itemModel.get(delList[i]).noteId);
-                                itemModel.remove(delList[i]);
-                            }
-                            VNoteMainManager.deleteNote(delIdList);
-                            deleteNotes(selectedNoteItem.length);
-                            if (itemModel.count <= itemListView.contextIndex) {
-                                itemListView.itemAtIndex(itemModel.count - 1).isSelected = true;
-                                selectedNoteItem = [itemModel.count - 1];
-                                noteItemChanged(itemModel.get(itemModel.count - 1).noteId);
-                            } else {
-                                itemListView.itemAtIndex(itemListView.contextIndex).isSelected = true;
-                                noteItemChanged(itemModel.get(itemListView.contextIndex).noteId);
-                            }
-                        });
-                }
-            }
-
-            Menu {
-                id: saveNoteSubMenu
-
-                title: qsTr("Save note")
-
-                MenuItem {
-                    text: qsTr("Save as HTML")
-
-                    onTriggered: {
-                        fileDialogLoader.saveType = VNoteMainManager.Html;
-                        if (!fileDialogLoader.active) {
-                            fileDialogLoader.active = true;
-                        } else {
-                            fileDialogLoader.item.open();
-                        }
-                    }
-                }
-
-                MenuItem {
-                    text: qsTr("Save as TXT")
-
-                    onTriggered: {
-                        fileDialogLoader.saveType = VNoteMainManager.Text;
-                        if (!fileDialogLoader.active) {
-                            fileDialogLoader.active = true;
-                        } else {
-                            fileDialogLoader.item.open();
-                        }
-                    }
-                }
-            }
-
-            MenuItem {
-                text: qsTr("Save recordings")
-
-                onTriggered: {
-                    if (!folderDialogLoader.active) {
-                        folderDialogLoader.saveType = VNoteMainManager.Voice;
-                        folderDialogLoader.active = true;
-                    } else {
-                        folderDialogLoader.item.open();
-                    }
-                }
-            }
-
-            MenuSeparator {
-            }
-
-            MenuItem {
-                text: qsTr("New note")
-
-                onTriggered: {
-                    VNoteMainManager.createNote();
                 }
             }
         }

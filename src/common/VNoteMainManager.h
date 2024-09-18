@@ -48,6 +48,7 @@ public:
     Q_INVOKABLE int loadAudioSource();
     Q_INVOKABLE void changeAudioSource(const int &source);
     Q_INVOKABLE void insertImages(const QStringList &filePaths);
+    Q_INVOKABLE void checkNoteVoice(const QVariantList &index);
 
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);
