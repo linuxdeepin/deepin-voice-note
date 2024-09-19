@@ -109,7 +109,11 @@ Item {
                 folderDialog.open();
             }
             onAccepted: {
-                VNoteMainManager.saveAs(selectedNoteItem, folderDialog.selectedFolder, saveType);
+                var list = [];
+                for (var i = 0; i < selectedNoteItem.length; i++) {
+                    list.push(itemModel.get(selectedNoteItem[i]).noteId);
+                }
+                VNoteMainManager.saveAs(list, folderDialog.selectedFolder, saveType);
             }
         }
     }
