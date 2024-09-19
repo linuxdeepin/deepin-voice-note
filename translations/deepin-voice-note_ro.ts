@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="ro">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="ro">
 <context>
     <name>AppMain</name>
     <message>
@@ -169,12 +167,12 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="289"/>
         <source>View</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="295"/>
         <source>Save as</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="321"/>
@@ -220,7 +218,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="180"/>
         <source>Save as HTML</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="181"/>
@@ -234,7 +232,7 @@
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="344"/>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="346"/>
         <source>Save note</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="225"/>
@@ -348,7 +346,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="938"/>
         <source>Save note</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="939"/>
@@ -378,12 +376,12 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="963"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
         <source>Redo</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
@@ -480,7 +478,7 @@
     <message>
         <location filename="../tests/src/common/ut_utils.cpp" line="33"/>
         <source>2 mins ago</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -488,12 +486,12 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="871"/>
         <source>The voice conversion failed due to the poor network connection, please have a check</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="875"/>
         <source>Voice to text conversion failed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -581,13 +579,13 @@ Toate înregistrările vor fi șterse</translation>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="106"/>
         <source>Save failed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="150"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="111"/>
         <source>You do not have permission to save files there</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="154"/>
@@ -622,62 +620,62 @@ Toate înregistrările vor fi șterse</translation>
     <message>
         <location filename="../src/common/jscontent.cpp" line="126"/>
         <source>Font</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="127"/>
         <source>Font size</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="128"/>
         <source>Font color</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="129"/>
         <source>Text highlight color</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="130"/>
         <source>Bold</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="131"/>
         <source>Italic</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="132"/>
         <source>Underline</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="133"/>
         <source>Strikethrough</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="134"/>
         <source>Bullets</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="135"/>
         <source>Numbering</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="136"/>
         <source>More colors</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="137"/>
         <source>Recent</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
