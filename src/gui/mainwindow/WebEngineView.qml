@@ -272,6 +272,9 @@ Item {
                     VNoteMainManager.updateNoteWithResult(result);
                 });
         }
+        onUpdateRichTextSearch: key => {
+            webView.findText(key);
+        }
     }
 
     Connections {

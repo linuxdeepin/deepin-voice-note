@@ -269,30 +269,41 @@ ApplicationWindow {
                 SearchEdit {
                     id: search
 
+                    function exitSearch() {
+                        folderListView.toggleSearch(false);
+                        search.focus = false;
+                        if (itemListView.searchLoader.active) {
+                            itemListView.searchLoader.item.visible = false;
+                        }
+                        itemListView.view.visible = true;
+                        label.visible = true;
+                        folderListView.opacity = 1;
+                        folderListView.enabled = true;
+                        createFolderButton.enabled = true;
+                        itemListView.isSearch = false;
+                        VNoteMainManager.clearSearch();
+                    }
+
                     Layout.fillWidth: true
                     Layout.preferredHeight: 30
                     Layout.topMargin: 8
                     placeholder: qsTr("Search")
 
                     Keys.onPressed: {
+                        if (text.length === 0)
+                            return;
                         if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
-                            VNoteMainManager.loadSearchNotes(text);
+                            VNoteMainManager.vNoteSearch(text);
                         }
+                    }
+                    onTextChanged: {
+                        if (text.length === 0)
+                            exitSearch();
                     }
 
                     Connections {
                         function onClicked(mouse) {
-                            folderListView.toggleSearch(false);
-                            search.focus = false;
-                            if (itemListView.searchLoader.active) {
-                                itemListView.searchLoader.item.visible = false;
-                            }
-                            itemListView.view.visible = true;
-                            label.visible = true;
-                            folderListView.opacity = 1;
-                            folderListView.enabled = true;
-                            createFolderButton.enabled = true;
-                            itemListView.isSearch = false;
+                            search.exitSearch();
                         }
 
                         target: search.clearButton.item

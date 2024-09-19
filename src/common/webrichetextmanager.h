@@ -33,6 +33,7 @@ public slots:
 signals:
     void needUpdateNote();
     void noteTextChanged();
+    void updateSearch();
 
 private:
     void setData(VNoteItem *data, const QString reg);
