@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="it">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="it">
 <context>
     <name>AppMain</name>
     <message>
@@ -379,12 +377,12 @@ Localizzazione italiana a cura di Massimo A. Carofano.</translation>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="963"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Annulla</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
         <source>Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripeti</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
@@ -481,7 +479,7 @@ Localizzazione italiana a cura di Massimo A. Carofano.</translation>
     <message>
         <location filename="../tests/src/common/ut_utils.cpp" line="33"/>
         <source>2 mins ago</source>
-        <translation type="unfinished"></translation>
+        <translation>2 minuti fa</translation>
     </message>
 </context>
 <context>
