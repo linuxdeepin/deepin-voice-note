@@ -302,22 +302,18 @@ qint32 VNoteItem::voiceCount() const
  */
 QStringList VNoteItem::getVoiceJsons() const
 {
-    //匹配语音块标签的正则表达式
-    // QRegExp rx("<div.+jsonkey.+>");
-    // rx.setMinimal(true); //最小匹配
-    //匹配语音json数据的正则表达式
-    // QRegExp rxJson("\\{.*\\}");
-    // rxJson.setMinimal(true); //最小匹配
+    QRegularExpression rx("<div.+jsonkey.+>");
+    QRegularExpression rxJson("\\{.*\\}");
     QStringList list;
-    // int pos = 0;
-    // //查找语音块
-    // while ((pos = rx.indexIn(htmlCode, pos)) != -1) {
-    //     //获取语音json数据
-    //     if (rxJson.indexIn(rx.cap(0)) != -1) {
-    //         list << rxJson.cap(0).replace("&quot;", "\"");
-    //     }
-    //     pos += rx.matchedLength();
-    // }
+    QRegularExpressionMatchIterator iter = rx.globalMatch(htmlCode);
+    while (iter.hasNext()) {
+        QRegularExpressionMatch match = iter.next();
+        QString word = match.captured();
+        QRegularExpressionMatch jsonMatch = rxJson.match(word);
+        if (jsonMatch.capturedStart(0) != -1) {
+            list << jsonMatch.captured(0).replace("&quot;", "\"");
+        }
+    }
     return list;
 }
 
