@@ -42,6 +42,7 @@ void WebRichTextManager::setData(VNoteItem *data, const QString reg)
         emit JsContent::instance()->callJsSetHtml(data->htmlCode);
     }
     m_updateTimer->start();
+    emit updateSearch();
 }
 
 void WebRichTextManager::initUpdateTimer()
@@ -116,5 +117,4 @@ void WebRichTextManager::clearJSContent()
 
 void WebRichTextManager::onSetDataFinsh()
 {
-
 }

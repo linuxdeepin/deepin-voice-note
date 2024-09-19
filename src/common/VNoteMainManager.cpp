@@ -59,6 +59,7 @@ void VNoteMainManager::initConnections()
             this, &VNoteMainManager::onVNoteFoldersLoaded);
     connect(m_richTextManager, &WebRichTextManager::needUpdateNote, this, &VNoteMainManager::needUpdateNote);
     connect(m_richTextManager, &WebRichTextManager::noteTextChanged, this, &VNoteMainManager::onNoteChanged, Qt::QueuedConnection);
+    connect(m_richTextManager, &WebRichTextManager::updateSearch, this, &VNoteMainManager::updateSearch);
     connect(VoiceRecoderHandler::instance(), &VoiceRecoderHandler::finishedRecod, this, &VNoteMainManager::insertVoice);
 }
 
@@ -593,6 +594,13 @@ void VNoteMainManager::onNoteChanged()
     emit updateNotes(notesDataList, std::distance(notesDataList.begin(), it));
 }
 
+void VNoteMainManager::updateSearch()
+{
+    if (m_searchText.isEmpty())
+        return;
+    emit updateRichTextSearch(m_searchText);
+}
+
 bool VNoteMainManager::getTop()
 {
     return m_currentHasTop;
@@ -627,12 +635,11 @@ void VNoteMainManager::renameNote(const int &index, const QString &newName)
 void VNoteMainManager::vNoteSearch(const QString &text)
 {
     if (!text.isEmpty()) {
-        if (m_searchText == text) {
-            return;
-        } else {
+        if (m_searchText != text) {
             m_searchText = text;
             loadSearchNotes(text);
         }
+        updateSearch();
     }
 }
 
@@ -725,4 +732,9 @@ void VNoteMainManager::checkNoteVoice(const QVariantList &index)
         }
     }
     ActionManager::instance()->enableAction(ActionManager::NoteSaveVoice, false);
+}
+
+void VNoteMainManager::clearSearch()
+{
+    m_searchText = "";
 }

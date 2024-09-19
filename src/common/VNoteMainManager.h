@@ -49,6 +49,7 @@ public:
     Q_INVOKABLE void changeAudioSource(const int &source);
     Q_INVOKABLE void insertImages(const QStringList &filePaths);
     Q_INVOKABLE void checkNoteVoice(const QVariantList &index);
+    Q_INVOKABLE void clearSearch();
 
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);
@@ -59,11 +60,13 @@ signals:
     void searchFinished(const QList<QVariantMap> &notesData, const QString &key);
     void moveFinished(const QVariantList &index, const int &srcFolderIndex, const int &dstFolderIndex);
     void needUpdateNote();
+    void updateRichTextSearch(const QString &key);
 
 private slots:
     void onVNoteFoldersLoaded();
     void onExportFinished(int err);
     void onNoteChanged();
+    void updateSearch();
 
 private:
     VNoteMainManager();
