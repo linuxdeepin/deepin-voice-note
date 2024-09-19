@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="ca">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="ca">
 <context>
     <name>AppMain</name>
     <message>
@@ -378,12 +376,12 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="963"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Desfés</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
         <source>Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>Refés</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
@@ -480,7 +478,7 @@
     <message>
         <location filename="../tests/src/common/ut_utils.cpp" line="33"/>
         <source>2 mins ago</source>
-        <translation type="unfinished"></translation>
+        <translation>fa 2 minuts</translation>
     </message>
 </context>
 <context>
