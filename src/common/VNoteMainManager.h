@@ -50,6 +50,7 @@ public:
     Q_INVOKABLE void insertImages(const QStringList &filePaths);
     Q_INVOKABLE void checkNoteVoice(const QVariantList &index);
     Q_INVOKABLE void clearSearch();
+    Q_INVOKABLE void preViewShortcut(const QPointF &point);
 
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);

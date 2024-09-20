@@ -37,6 +37,33 @@ ApplicationWindow {
     minimumWidth: windowMiniWidth
     visible: true
     width: windowMiniWidth
+    x: Screen.width / 2 - width / 2
+    y: Screen.height / 2 - height / 2
+
+    Shortcuts {
+        id: shortcuts
+
+        enabled: rootWindow.active
+
+        onCreateFolder: {
+            VNoteMainManager.vNoteCreateFolder();
+        }
+        onCreateNote: {
+            VNoteMainManager.createNote();
+        }
+        onRenameFolder: {
+            folderListView.renameCurrentItem();
+        }
+        onRenameNote: {
+            itemListView.renameCurrentItem();
+        }
+        onShowShortCutView: {
+            VNoteMainManager.preViewShortcut(Qt.point(rootWindow.x + rootWindow.width / 2, rootWindow.y + rootWindow.height / 2));
+        }
+        onStartRecording: {
+            webEngineView.startRecording();
+        }
+    }
 
     Connections {
         function handleFinishedFolderLoad(foldersData) {

@@ -16,6 +16,16 @@ import "../dialog"
 Item {
     id: rootItem
 
+    function startRecording() {
+        if (!recorderViewLoader.active) {
+            recorderViewLoader.active = true;
+        } else {
+            recorderViewLoader.item.visible = true;
+        }
+        VoiceRecoderHandler.startRecoder();
+        title.recorderBtnEnable = false;
+    }
+
     function toggleMultCho(choices) {
         if (choices > 1) {
             webView.visible = false;
@@ -254,13 +264,7 @@ Item {
             }
         }
         onStartRecording: {
-            if (!recorderViewLoader.active) {
-                recorderViewLoader.active = true;
-            } else {
-                recorderViewLoader.item.visible = true;
-            }
-            VoiceRecoderHandler.startRecoder();
-            title.recorderBtnEnable = false;
+            startRecording();
         }
     }
 
