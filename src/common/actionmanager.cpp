@@ -45,7 +45,7 @@ void ActionManager::initMenu()
     // NotebookCtxMenu 记事本页面右键菜单
     makeAction(NotebookRename, QCoreApplication::translate("NotebookContextMenu", "Rename"));
     makeAction(NotebookDelete, QCoreApplication::translate("NotebookContextMenu", "Delete"));
-    makeAction(NotebookAddNew, QCoreApplication::translate("NotebookContextMenu", "Newnote"));
+    makeAction(NotebookAddNew, QCoreApplication::translate("NotebookContextMenu", "New note"));
 
     // NoteCtxMenu 笔记本页面右键菜单
     makeAction(NoteRename, QCoreApplication::translate("NotesContextMenu", "Rename"));
@@ -67,7 +67,7 @@ void ActionManager::initMenu()
     makeAction(VoiceAsSave, QCoreApplication::translate("NoteDetailContextMenu", "Save as MP3"));
     makeAction(VoiceToText, QCoreApplication::translate("NoteDetailContextMenu", "Voice to Text"));
     makeAction(VoiceDelete, QCoreApplication::translate("NoteDetailContextMenu", "Delete"));
-    makeAction(VoiceSelectAll, QCoreApplication::translate("NoteDetailContextMenu", "Selectall"));
+    makeAction(VoiceSelectAll, QCoreApplication::translate("NoteDetailContextMenu", "Select all"));
     makeAction(VoiceCopy, QCoreApplication::translate("NoteDetailContextMenu", "Copy"));
     makeAction(VoiceCut, QCoreApplication::translate("NoteDetailContextMenu", "Cut"));
     makeAction(VoicePaste, QCoreApplication::translate("NoteDetailContextMenu", "Paste"));
@@ -75,22 +75,22 @@ void ActionManager::initMenu()
     // PictureCtxMenu 初始化图片文本右键菜单
     makeAction(PictureView, QCoreApplication::translate("NoteDetailContextMenu", "View"));
     makeAction(PictureDelete, QCoreApplication::translate("NoteDetailContextMenu", "Delete"));
-    makeAction(PictureSelectAll, QCoreApplication::translate("NoteDetailContextMenu", "Selectall"));
+    makeAction(PictureSelectAll, QCoreApplication::translate("NoteDetailContextMenu", "Select all"));
     makeAction(PictureCopy, QCoreApplication::translate("NoteDetailContextMenu", "Copy"));
     makeAction(PictureCut, QCoreApplication::translate("NoteDetailContextMenu", "Cut"));
     makeAction(PicturePaste, QCoreApplication::translate("NoteDetailContextMenu", "Paste"));
-    makeAction(PictureSaveAs, QCoreApplication::translate("NoteDetailContextMenu", "Saveas"));
+    makeAction(PictureSaveAs, QCoreApplication::translate("NoteDetailContextMenu", "Save as"));
 
     // TxtCtxMenu 初始化文字文本右键菜单
     makeAction(TxtDelete, QCoreApplication::translate("NoteDetailContextMenu", "Delete"));
-    makeAction(TxtSelectAll, QCoreApplication::translate("NoteDetailContextMenu", "Selectall"));
+    makeAction(TxtSelectAll, QCoreApplication::translate("NoteDetailContextMenu", "Select all"));
     makeAction(TxtCopy, QCoreApplication::translate("NoteDetailContextMenu", "Copy"));
     makeAction(TxtCut, QCoreApplication::translate("NoteDetailContextMenu", "Cut"));
     makeAction(TxtPaste, QCoreApplication::translate("NoteDetailContextMenu", "Paste"));
     makeAction(TxtSeparator, {}, MenuSeparatorComponent);
-    makeAction(TxtSpeech, QCoreApplication::translate("NoteDetailContextMenu", "TexttoSpeech"));
-    makeAction(TxtStopreading, QCoreApplication::translate("NoteDetailContextMenu", "Stopreading"));
-    makeAction(TxtDictation, QCoreApplication::translate("NoteDetailContextMenu", "SpeechtoText"));
+    makeAction(TxtSpeech, QCoreApplication::translate("NoteDetailContextMenu", "Text to Speech"));
+    makeAction(TxtStopreading, QCoreApplication::translate("NoteDetailContextMenu", "Stop reading"));
+    makeAction(TxtDictation, QCoreApplication::translate("NoteDetailContextMenu", "Speech to Text"));
     makeAction(TxtTranslate, QCoreApplication::translate("NoteDetailContextMenu", "Translate"));
 }
 

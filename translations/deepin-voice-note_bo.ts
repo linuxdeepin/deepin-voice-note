@@ -4,195 +4,197 @@
 <context>
     <name>AppMain</name>
     <message>
-        <location filename="../src/common/vlcpalyer.cpp" line="39"/>
-        <location filename="../src/main.cpp" line="79"/>
-        <location filename="../src/main.cpp" line="80"/>
-        <location filename="../src/views/vnotemainwindow.cpp" line="602"/>
+        <location filename="../src/common/vlcplayer.cpp" line="43"/>
         <source>Voice Notes</source>
         <translation>སྒྲའི་ཟིན་དེབ།</translation>
-    </message>
-    <message>
-        <location filename="../src/main.cpp" line="81"/>
-        <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation>སྒྲའི་ཟིན་དེབ་ནི་ཡི་གེའི་ཟིན་ཐོ་དང་སྒྲ་ཕབ་ཟིན་ཐོ་མཁོ་འདོན་བྱེད་པའི་ཐོ་འགོད་ཡོ་བྱད་ཆུང་གྲས་ཤིག་རེད།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="603"/>
-        <source>Recordings not saved</source>
-        <translation>སྒྲ་བཅུག་ཉར་མེད།</translation>
     </message>
 </context>
 <context>
     <name>DefaultName</name>
     <message>
-        <location filename="../src/db/vnotefolderoper.cpp" line="230"/>
+        <location filename="../src/db/vnotefolderoper.cpp" line="226"/>
         <source>Notebook</source>
         <translation>ཟིན་དེབ།</translation>
     </message>
     <message>
-        <location filename="../src/db/vnoteitemoper.cpp" line="213"/>
-        <source>Text</source>
-        <translation>ཡིག་ཆ། </translation>
-    </message>
-    <message>
-        <location filename="../src/db/vnoteitemoper.cpp" line="228"/>
         <location filename="../src/importolddata/olddbvisistors.cpp" line="139"/>
         <source>Voice</source>
         <translation>སྒྲ།</translation>
     </message>
 </context>
 <context>
-    <name>DetailPage</name>
+    <name>FolderListView</name>
     <message>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="198"/>
-        <source>%1 notes selected</source>
-        <translation>ཟིན་བྲིས་%1 བདམས་པ།</translation>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="403"/>
+        <source>Rename</source>
+        <translation type="unfinished">མིང་བསྐྱར་དུ་བཏགས་པ།</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="411"/>
+        <source>Delete</source>
+        <translation type="unfinished">སུབ་པ།</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="429"/>
+        <source>New Note</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>FolderSelectDialog</name>
+    <name>InitialInterface</name>
     <message>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="202"/>
-        <source>Move Notes</source>
-        <translation>སྤོ་རུང་ཟིན་དེབ།</translation>
+        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="43"/>
+        <source>After creating a new notepad, you can start recording voice and text</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="229"/>
-        <source>Cancel</source>
-        <comment>button</comment>
-        <translation>འདོར་བ།</translation>
-    </message>
-    <message>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="230"/>
-        <source>Confirm</source>
-        <comment>button</comment>
-        <translation>གཏན་འཁེལ།</translation>
-    </message>
-</context>
-<context>
-    <name>HomePage</name>
-    <message>
-        <location filename="../src/views/homepage.cpp" line="32"/>
+        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="50"/>
         <source>Create Notebook</source>
-        <translation>ཟིན་དེབ་གསར་པ། </translation>
-    </message>
-    <message>
-        <location filename="../src/views/homepage.cpp" line="44"/>
-        <source>Create a notebook to start recording voice and making notes</source>
-        <translation>ཟིན་དེབ་གསར་བཟོ་བྱས་རྗེས་སྒྲ་དང་ཡི་གེ་ཐོ་འགོད་བྱེད་ཆོག</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>LeftView</name>
+    <name>ItemListView</name>
     <message>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="365"/>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="379"/>
-        <source>Move %1 notes (%2, ...) to:</source>
-        <translation>སྤོ་བ%1གི་དབྱངས་རྟགས(%2, ...)ནས</translation>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="106"/>
+        <source>Save As</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="366"/>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="369"/>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="377"/>
-        <source>Move the note &quot;%1&quot; to:</source>
-        <translation>ཟིན་དེབ་%1 ་་་་་སྤོ་བ།</translation>
-    </message>
-</context>
-<context>
-    <name>MiddleView</name>
-    <message>
-        <location filename="../src/views/middleview.cpp" line="289"/>
-        <source>Save</source>
-        <translation>ཉར་བ།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/middleview.cpp" line="1043"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="144"/>
         <source>No search results</source>
-        <translation>འཚོལ་ཞིབ་བྱས་འབྲས་མེད།</translation>
+        <translation type="unfinished">འཚོལ་ཞིབ་བྱས་འབྲས་མེད།</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="169"/>
+        <source>Unpin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="169"/>
+        <source>Sticky on Top</source>
+        <translation type="unfinished">སྟེང་དུ་འཇོག </translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="574"/>
+        <source>Sticky Notes</source>
+        <translation type="unfinished">སྟེང་དུ་བཞག་ཟིན།</translation>
     </message>
 </context>
 <context>
-    <name>MiddleViewDelegate</name>
+    <name>MainWindow</name>
     <message>
-        <location filename="../src/views/middleviewdelegate.cpp" line="438"/>
-        <source>Sticky Notes</source>
-        <translation>སྟེང་དུ་བཞག་ཟིན།</translation>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="207"/>
+        <source>Create Notebook</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="290"/>
+        <source>Search</source>
+        <translation type="unfinished">འཚོལ་ཞིབ། </translation>
+    </message>
+</context>
+<context>
+    <name>MoveDialog</name>
+    <message>
+        <location filename="../src/gui/dialog/MoveDialog.qml" line="26"/>
+        <source>move note to:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/dialog/MoveDialog.qml" line="101"/>
+        <source>Cancel</source>
+        <translation type="unfinished">འདོར་བ།</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/dialog/MoveDialog.qml" line="110"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MultipleChoices</name>
+    <message>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="29"/>
+        <source>%1 note selected</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>NoteDetailContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="261"/>
+        <location filename="../src/common/actionmanager.cpp" line="67"/>
         <source>Save as MP3</source>
         <translation>MP3ལྟར་ཉར་བ།</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="262"/>
+        <location filename="../src/common/actionmanager.cpp" line="68"/>
         <source>Voice to Text</source>
         <translation>སྒྲ་ཡི་གེར་བསྒྱུར་བ།</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="263"/>
-        <location filename="../src/common/actionmanager.cpp" line="290"/>
-        <location filename="../src/common/actionmanager.cpp" line="316"/>
+        <location filename="../src/common/actionmanager.cpp" line="69"/>
+        <location filename="../src/common/actionmanager.cpp" line="77"/>
+        <location filename="../src/common/actionmanager.cpp" line="85"/>
         <source>Delete</source>
         <translation>སུབ་པ།</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="264"/>
-        <location filename="../src/common/actionmanager.cpp" line="291"/>
-        <location filename="../src/common/actionmanager.cpp" line="317"/>
+        <location filename="../src/common/actionmanager.cpp" line="70"/>
+        <location filename="../src/common/actionmanager.cpp" line="78"/>
+        <location filename="../src/common/actionmanager.cpp" line="86"/>
         <source>Select all</source>
-        <translation>ཡོངས་འདེམས།</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="265"/>
-        <location filename="../src/common/actionmanager.cpp" line="292"/>
-        <location filename="../src/common/actionmanager.cpp" line="318"/>
+        <location filename="../src/common/actionmanager.cpp" line="71"/>
+        <location filename="../src/common/actionmanager.cpp" line="79"/>
+        <location filename="../src/common/actionmanager.cpp" line="87"/>
         <source>Copy</source>
         <translation>པར་སློག</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="266"/>
-        <location filename="../src/common/actionmanager.cpp" line="293"/>
-        <location filename="../src/common/actionmanager.cpp" line="319"/>
+        <location filename="../src/common/actionmanager.cpp" line="72"/>
+        <location filename="../src/common/actionmanager.cpp" line="80"/>
+        <location filename="../src/common/actionmanager.cpp" line="88"/>
         <source>Cut</source>
         <translation>དྲས་གཏུབ།</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="267"/>
-        <location filename="../src/common/actionmanager.cpp" line="294"/>
-        <location filename="../src/common/actionmanager.cpp" line="320"/>
+        <location filename="../src/common/actionmanager.cpp" line="73"/>
+        <location filename="../src/common/actionmanager.cpp" line="81"/>
+        <location filename="../src/common/actionmanager.cpp" line="89"/>
         <source>Paste</source>
         <translation>སྦྱར་བ།</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="289"/>
+        <location filename="../src/common/actionmanager.cpp" line="76"/>
         <source>View</source>
         <translation>བཤར་ལྟ།</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="295"/>
+        <location filename="../src/common/actionmanager.cpp" line="82"/>
         <source>Save as</source>
-        <translation>གཞན་ཉར།</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="321"/>
+        <location filename="../src/common/actionmanager.cpp" line="91"/>
         <source>Text to Speech</source>
-        <translation>སྒྲ་ཀློག་པ།</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="322"/>
+        <location filename="../src/common/actionmanager.cpp" line="92"/>
         <source>Stop reading</source>
-        <translation>ཀློག་མཚམས་འཇོག་པ།</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="323"/>
+        <location filename="../src/common/actionmanager.cpp" line="93"/>
         <source>Speech to Text</source>
-        <translation>སྒྲའི་དཔོད་བྲིས།</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="324"/>
+        <location filename="../src/common/actionmanager.cpp" line="94"/>
         <source>Translate</source>
         <translation>ཡིག་ཆའི་ཡིག་བསྒྱུར།</translation>
     </message>
@@ -200,82 +202,65 @@
 <context>
     <name>NotebookContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="205"/>
+        <location filename="../src/common/actionmanager.cpp" line="46"/>
         <source>Rename</source>
         <translation>མིང་བསྐྱར་དུ་བཏགས་པ།</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="206"/>
+        <location filename="../src/common/actionmanager.cpp" line="47"/>
         <source>Delete</source>
         <translation>སུབ་པ།</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="207"/>
+        <location filename="../src/common/actionmanager.cpp" line="48"/>
         <source>New note</source>
-        <translation>འབྲི་དེབ་གསར་བཟོ།</translation>
+        <translation type="unfinished">འབྲི་དེབ་གསར་བཟོ།</translation>
     </message>
 </context>
 <context>
     <name>NotesContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="180"/>
+        <location filename="../src/common/actionmanager.cpp" line="61"/>
         <source>Save as HTML</source>
         <translation>HTMLལ་ཉར་ཚགས་བྱེད་པ།</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="181"/>
+        <location filename="../src/common/actionmanager.cpp" line="62"/>
         <source>Save as TXT</source>
         <translation>TXTལྟར་ཉར་བ། </translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="185"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="327"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="338"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="344"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="346"/>
+        <location filename="../src/common/actionmanager.cpp" line="55"/>
         <source>Save note</source>
         <translation>ཟིན་བྲིས་ཉར་ཚགས།</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="225"/>
+        <location filename="../src/common/actionmanager.cpp" line="51"/>
         <source>Rename</source>
         <translation>མིང་བསྐྱར་དུ་བཏགས་པ།</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="227"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="321"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="330"/>
+        <location filename="../src/common/actionmanager.cpp" line="53"/>
         <source>Move</source>
         <translation>སྤོ་རུང་།</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="228"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="323"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="329"/>
+        <location filename="../src/common/actionmanager.cpp" line="54"/>
         <source>Delete</source>
         <translation>སུབ་པ།</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="230"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="328"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="339"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="351"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="353"/>
+        <location filename="../src/common/actionmanager.cpp" line="56"/>
         <source>Save voice recording</source>
         <translation>སྒྲ་ཉར་བ།</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="231"/>
+        <location filename="../src/common/actionmanager.cpp" line="58"/>
         <source>New note</source>
         <translation>འབྲི་དེབ་གསར་བཟོ།</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1261"/>
-        <source>Unstick</source>
-        <translation>སྟེང་དུ་མི་འཇོག </translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1263"/>
+        <location filename="../src/common/actionmanager.cpp" line="52"/>
         <source>Sticky on Top</source>
         <translation>སྟེང་དུ་འཇོག </translation>
     </message>
@@ -304,150 +289,26 @@
     </message>
 </context>
 <context>
-    <name>Shortcuts</name>
+    <name>SettingDialog</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="909"/>
-        <source>New notebook</source>
-        <translation>ཟིན་ཐོ་གསར་སྐྲུན།</translation>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="27"/>
+        <source>Basic</source>
+        <translation type="unfinished">རྨང་གཞིའི་སྒྲིག་འགོད།</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="910"/>
-        <source>Rename notebook</source>
-        <translation>ཟིན་དེབ་ཀྱི་མིང་བསྐྱར་དུ་བཏགས་པ།</translation>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="32"/>
+        <source>Audio Source</source>
+        <translation type="unfinished">སྒྲའི་ཡོང་ཁུངས།</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="911"/>
-        <source>Delete notebook</source>
-        <translation>ཟིན་ཐོ་སུབ་པ།</translation>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="55"/>
+        <source>Internal</source>
+        <translation type="unfinished">མ་ལག་གི་སྒྲ།</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="933"/>
-        <source>New note</source>
-        <translation>འབྲི་དེབ་གསར་སྐྲུན།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="934"/>
-        <source>Rename note</source>
-        <translation>ཟིན་ཐོའི་མིང་བསྐྱར་དུ་བཏགས་པ།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="935"/>
-        <source>Delete note</source>
-        <translation>ཟིན་ཐོ་སུབ་པ།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="936"/>
-        <source>Play/Pause</source>
-        <translation>གཏོང་བ།/སྐབས་སྡོད</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="937"/>
-        <source>Record voice</source>
-        <translation>སྒྲ་འཇུག</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="938"/>
-        <source>Save note</source>
-        <translation>ཟིན་བྲིས་ཉར་ཚགས།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="939"/>
-        <source>Save recordings</source>
-        <translation>སྒྲ་ཉར་བ།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="959"/>
-        <source>Select all</source>
-        <translation>ཡོངས་འདེམས།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="960"/>
-        <source>Copy</source>
-        <translation>པར་སློག</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="961"/>
-        <source>Cut</source>
-        <translation>དྲས་གཏུབ།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="962"/>
-        <source>Paste</source>
-        <translation>སྦྱར་བ།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="963"/>
-        <source>Undo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
-        <source>Redo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
-        <source>Delete</source>
-        <translation>སུབ་པ།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="988"/>
-        <source>Help</source>
-        <translation>རོགས་རམ།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="989"/>
-        <source>Display shortcuts</source>
-        <translation>མྱུར་མཐེབ་མངོན་པ།</translation>
-    </message>
-</context>
-<context>
-    <name>ShortcutsGroups</name>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="915"/>
-        <source>Notebooks</source>
-        <translation>ཟིན་བྲིས་དེབ།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="943"/>
-        <source>Notes</source>
-        <translation>འབྲི་དེབ།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="969"/>
-        <source>Edit</source>
-        <translation>རྩོམ་སྒྲིག</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="993"/>
-        <source>Settings</source>
-        <translation>སྒྲིག་འགོད།</translation>
-    </message>
-</context>
-<context>
-    <name>SplashView</name>
-    <message>
-        <location filename="../src/views/splashview.cpp" line="30"/>
-        <source>Loading...</source>
-        <translation>སྣོན་འཇུག་བཞིན་པ།</translation>
-    </message>
-</context>
-<context>
-    <name>TitleBar</name>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="349"/>
-        <source>Search</source>
-        <translation>འཚོལ་ཞིབ། </translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1903"/>
-        <source>Settings</source>
-        <translation>སྒྲིག་འགོད།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1904"/>
-        <source>Privacy Policy</source>
-        <translation>གསང་དོན་སྲིད་ཇུས།</translation>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="64"/>
+        <source>Microphone</source>
+        <translation type="unfinished">སྒྲ་དུང་གི་སྒྲ</translation>
     </message>
 </context>
 <context>
@@ -461,18 +322,18 @@
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../src/common/utils.cpp" line="41"/>
+        <location filename="../src/common/utils.cpp" line="42"/>
         <location filename="../tests/src/common/ut_utils.cpp" line="32"/>
         <source>1 min ago</source>
         <translation>སྐར་མ་1གོང་ལ།</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="43"/>
+        <location filename="../src/common/utils.cpp" line="44"/>
         <source>%1 mins ago</source>
         <translation>སྐར་མ་%1གོང་ལ།</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="49"/>
+        <location filename="../src/common/utils.cpp" line="50"/>
         <location filename="../tests/src/common/ut_utils.cpp" line="37"/>
         <source>Yesterday</source>
         <translation>སང་ཉིན།</translation>
@@ -484,51 +345,26 @@
     </message>
 </context>
 <context>
-    <name>VNoteErrorMessage</name>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="871"/>
-        <source>The voice conversion failed due to the poor network connection, please have a check</source>
-        <translation>ད་ལྟ་དྲ་བ་ཡག་པོ་མེད་པས། སྐད་སྒྲས་འབྲི་མི་ཐུབ། དྲ་བ་ཤར་བགྲོད་ཡོང་བ་བྱེད་རོགས།</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="875"/>
-        <source>Voice to text conversion failed</source>
-        <translation>སྒྲ་ཡི་གེར་སྒྱུར་མི་ཐུབ།</translation>
-    </message>
-</context>
-<context>
-    <name>VNoteMainWindow</name>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="450"/>
-        <source>Create Notebook</source>
-        <translation>ཟིན་ཐོ་གསར་པ། </translation>
-    </message>
-</context>
-<context>
     <name>VNoteMessageDialog</name>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="37"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="28"/>
         <source>OK</source>
         <comment>button</comment>
         <translation>གཏན་འཁེལ།</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="116"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="94"/>
         <source>Cancel</source>
         <comment>button</comment>
         <translation>འདོར་བ།</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="117"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="98"/>
         <source>Confirm</source>
         <comment>button</comment>
         <translation>གཏན་འཁེལ།</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="120"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="39"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
@@ -536,148 +372,254 @@ All notes in it will be deleted</source>
 ཡོད་པའི་ཟིན་ཐོ་ཚང་མ་སུབ་སྲིད།</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="123"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="46"/>
         <source>Do you want to stop the current recording?</source>
         <translation>སྒྲ་འཇུག་བཞིན་ཡོད་པས། མཚམས་འཇོག་བྱེད་དམ།</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="127"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="87"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
         <translation>ཁྱོད་ཀྱིས་བདམས་ཡོད་པའི་ཟིན་བྲིས་%1 བསུབ་རྒྱུ་ཡིན་པ་གཏན་ཁེལ་ལམ།</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="129"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="81"/>
         <source>Are you sure you want to delete this note?</source>
         <translation>ཁྱེད་ཀྱིས་ཟིན་ཐོ་འདི་དངོས་གནས་སུབ་བམ།</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="52"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
         <translation>སྐད་སྒྲའི་ཟིན་ཐོ་འདི་ཡི་གེར་སྒྱུར་ཐབས་མེད། ད་ལྟ་སྐར་མ་20ནང་ཚུད་ཀྱི་སྐད་སྒྲ་གཅིག་པུར་རྒྱབ་སྐྱོར་ཐུབ།</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="137"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="59"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
         <translation>སྐད་སྒྲའི་ཟིན་ཐོ་ཡི་གེར་སྒྱུར་བཞིན་ཡོད་པས། ཁ་རྒྱག་གམ།</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="140"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="65"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
         <translation>མ་ལག་ནང་འཇུག་སྐད་སྒྲ་ཆུང་བས་སྐྲ་འཇུག་པར་ཤུགས་རྐྱེན་ཐེབས་སྲིད། མུ་མཐུད་སྒྲ་འཇུག་བྱེད་དམ།</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="143"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="72"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
         <translation>སྐད་སྒྲའི་ཟིན་ཐོ་ཡི་གེར་སྒྱུར་བ་དེ་དྲས་རྗེས་སྦྱར་མི་ཐུབ་པས། མུ་མཐུད་ཡིན་ནམ།</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="106"/>
         <source>Save failed</source>
         <translation>ཉར་ཚགས་བྱེད་མི་ཐུབ།</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="150"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="111"/>
         <source>You do not have permission to save files there</source>
         <translation>ཁྱེད་ལ་ཡིག་ཆ་འདི་རིགས་འདིར་ཉར་དབང་མེད།</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="154"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="116"/>
         <source>The voice note has been deleted</source>
         <translation>སྒྲའི་ཟིན་ཐོ་འདི་སུབ་ཚར།</translation>
     </message>
 </context>
 <context>
-    <name>VNoteRecordBar</name>
+    <name>VNoteMessageDialogHandler</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1750"/>
-        <source>Your audio recording device does not work.</source>
-        <translation>ཁྱེད་ཀྱི་སྒྲ་འཇུག་སྒིག་ཆས་སྐྱོན་ཡོད་པས། སྒྲ་འཇུག་ཐབས་མེད། </translation>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="97"/>
+        <source>Are you sure you want to delete this notebook?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/views/vnoterecordbar.cpp" line="240"/>
-        <source>No recording device detected</source>
-        <translation>སྒྲ་འཇུག་སྒྲིག་ཆས་བཤེར་འཇལ་མི་ཐུབ།</translation>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="99"/>
+        <source>Do you want to stop the current recording?</source>
+        <translation type="unfinished">སྒྲ་འཇུག་བཞིན་ཡོད་པས། མཚམས་འཇོག་བྱེད་དམ།</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="103"/>
+        <source>Are you sure you want to delete the selected %1 notes?</source>
+        <translation type="unfinished">ཁྱོད་ཀྱིས་བདམས་ཡོད་པའི་ཟིན་བྲིས་%1 བསུབ་རྒྱུ་ཡིན་པ་གཏན་ཁེལ་ལམ།</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="107"/>
+        <source>Are you sure you want to delete this note?</source>
+        <translation type="unfinished">ཁྱེད་ཀྱིས་ཟིན་ཐོ་འདི་དངོས་གནས་སུབ་བམ།</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="110"/>
+        <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
+        <translation type="unfinished">སྐད་སྒྲའི་ཟིན་ཐོ་འདི་ཡི་གེར་སྒྱུར་ཐབས་མེད། ད་ལྟ་སྐར་མ་20ནང་ཚུད་ཀྱི་སྐད་སྒྲ་གཅིག་པུར་རྒྱབ་སྐྱོར་ཐུབ།</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="114"/>
+        <source>Converting a voice note now. Do you want to stop it?</source>
+        <translation type="unfinished">སྐད་སྒྲའི་ཟིན་ཐོ་ཡི་གེར་སྒྱུར་བཞིན་ཡོད་པས། ཁ་རྒྱག་གམ།</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="116"/>
+        <source>The low input volume may result in bad recordings. Do you want to continue?</source>
+        <translation type="unfinished">མ་ལག་ནང་འཇུག་སྐད་སྒྲ་ཆུང་བས་སྐྲ་འཇུག་པར་ཤུགས་རྐྱེན་ཐེབས་སྲིད། མུ་མཐུད་སྒྲ་འཇུག་བྱེད་དམ།</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="119"/>
+        <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
+        <translation type="unfinished">སྐད་སྒྲའི་ཟིན་ཐོ་ཡི་གེར་སྒྱུར་བ་དེ་དྲས་རྗེས་སྦྱར་མི་ཐུབ་པས། མུ་མཐུད་ཡིན་ནམ།</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="123"/>
+        <source>Save failed</source>
+        <translation type="unfinished">ཉར་ཚགས་བྱེད་མི་ཐུབ།</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="125"/>
+        <source>You do not have permission to save files there</source>
+        <translation type="unfinished">ཁྱེད་ལ་ཡིག་ཆ་འདི་རིགས་འདིར་ཉར་དབང་མེད།</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="127"/>
+        <source>The voice note has been deleted</source>
+        <translation type="unfinished">སྒྲའི་ཟིན་ཐོ་འདི་སུབ་ཚར།</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="139"/>
+        <source>All notes in it will be deleted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="152"/>
+        <source>Delete</source>
+        <translation type="unfinished">སུབ་པ།</translation>
     </message>
 </context>
 <context>
-    <name>VoiceNoteItem</name>
+    <name>VNoteMessageDialogLoader</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1691"/>
-        <source>Converting voice to text</source>
-        <translation>ཡི་གེར་སྒྱུར་བཞིན་ཡོད།</translation>
+        <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="150"/>
+        <source>Cancel</source>
+        <translation type="unfinished">འདོར་བ།</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="183"/>
+        <source>Confirm</source>
+        <translation type="unfinished">གཏན་འཁེལ།</translation>
+    </message>
+</context>
+<context>
+    <name>WebEngineHandler</name>
+    <message>
+        <location filename="../src/handler/web_engine_handler.cpp" line="457"/>
+        <source>save as MP3</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WindowTitleBar</name>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="27"/>
+        <source>Settings</source>
+        <translation type="unfinished">སྒྲིག་འགོད།</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="53"/>
+        <source>Music is a local music player with beautiful design and simple functions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="55"/>
+        <source>Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="56"/>
+        <source>Version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="92"/>
+        <source>Previous page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="112"/>
+        <source>Start recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="127"/>
+        <source>Insert picture</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>web</name>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="126"/>
+        <location filename="../src/common/jscontent.cpp" line="131"/>
         <source>Font</source>
         <translation>ཡིག་གཟུགས།</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="127"/>
+        <location filename="../src/common/jscontent.cpp" line="132"/>
         <source>Font size</source>
         <translation>ཡིག་གཟུགས་ཆེ་ཆུང་།</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="128"/>
+        <location filename="../src/common/jscontent.cpp" line="133"/>
         <source>Font color</source>
         <translation>ཡི་གེའི་ཚོས་གཞི།</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="129"/>
+        <location filename="../src/common/jscontent.cpp" line="134"/>
         <source>Text highlight color</source>
         <translation>རྒྱབ་ལྗོངས་ཚོས་གཞི།</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="130"/>
+        <location filename="../src/common/jscontent.cpp" line="135"/>
         <source>Bold</source>
         <translation>སྦོམ་དུ་གཏོང་བ།</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="131"/>
+        <location filename="../src/common/jscontent.cpp" line="136"/>
         <source>Italic</source>
         <translation>གསེག་པ།</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="132"/>
+        <location filename="../src/common/jscontent.cpp" line="137"/>
         <source>Underline</source>
         <translation>འོག་ཐིག</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="133"/>
+        <location filename="../src/common/jscontent.cpp" line="138"/>
         <source>Strikethrough</source>
         <translation>བསུབ་ཐིག</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="134"/>
+        <location filename="../src/common/jscontent.cpp" line="139"/>
         <source>Bullets</source>
         <translation>གོ་རིམ་མེད་པའི་རེའུ་མིག</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="135"/>
+        <location filename="../src/common/jscontent.cpp" line="140"/>
         <source>Numbering</source>
         <translation>གོ་རིམ་ལྡན་པའི་རེའུ་མིག</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="136"/>
+        <location filename="../src/common/jscontent.cpp" line="141"/>
         <source>More colors</source>
         <translation>དེ་བས་མང་བའི་ཚོས་གཞི།</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="137"/>
+        <location filename="../src/common/jscontent.cpp" line="142"/>
         <source>Recent</source>
         <translation>ཉེ་དུས་བེད་སྤྱོད་བྱས་པ།</translation>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="156"/>
+        <source>Voice To Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="157"/>
+        <source>Converting voice to text</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

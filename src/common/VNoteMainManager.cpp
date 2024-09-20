@@ -26,6 +26,10 @@
 #include <QStandardPaths>
 #include <QFileInfo>
 #include <QDir>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QProcess>
 
 VNoteMainManager::VNoteMainManager()
 {
@@ -737,4 +741,125 @@ void VNoteMainManager::checkNoteVoice(const QVariantList &index)
 void VNoteMainManager::clearSearch()
 {
     m_searchText = "";
+}
+
+void VNoteMainManager::preViewShortcut(const QPointF &point)
+{
+    QJsonObject shortcutObj;
+    QJsonArray jsonGroups;
+
+    //******************************Notebooks**************************************************
+    QMap<QString, QString> shortcutNotebookKeymap = {
+                                                     //Notebook
+                                                     {DApplication::translate("Shortcuts", "New notebook"), "Ctrl+N"},
+                                                     {DApplication::translate("Shortcuts", "Rename notebook"), "F2"},
+                                                     {DApplication::translate("Shortcuts", "Delete notebook"), "Delete"},
+                                                     };
+
+    QJsonObject notebookJsonGroup;
+    notebookJsonGroup.insert("groupName", DApplication::translate("ShortcutsGroups", "Notebooks"));
+    QJsonArray notebookJsonItems;
+
+    for (QMap<QString, QString>::iterator it = shortcutNotebookKeymap.begin();
+         it != shortcutNotebookKeymap.end(); ++it) {
+        QJsonObject jsonItem;
+        jsonItem.insert("name", it.key());
+        jsonItem.insert("value", it.value().replace("Meta", "Super"));
+        notebookJsonItems.append(jsonItem);
+    }
+
+    notebookJsonGroup.insert("groupItems", notebookJsonItems);
+    jsonGroups.append(notebookJsonGroup);
+
+    //******************************Notes**************************************************
+
+    QMap<QString, QString> shortcutNoteKeymap = {
+                                                 //Note
+                                                 {DApplication::translate("Shortcuts", "New note"), "Ctrl+B"},
+                                                 {DApplication::translate("Shortcuts", "Rename note"), "F3"},
+                                                 {DApplication::translate("Shortcuts", "Delete note"), "Delete"},
+                                                 {DApplication::translate("Shortcuts", "Play/Pause"), "Space"},
+                                                 {DApplication::translate("Shortcuts", "Record voice"), "Ctrl+R"},
+                                                 {DApplication::translate("Shortcuts", "Save note"), "Ctrl+S"},
+                                                 {DApplication::translate("Shortcuts", "Save recordings"), "Ctrl+D"},
+                                                 };
+
+    QJsonObject noteJsonGroup;
+    noteJsonGroup.insert("groupName", DApplication::translate("ShortcutsGroups", "Notes"));
+    QJsonArray noteJsonItems;
+
+    for (QMap<QString, QString>::iterator it = shortcutNoteKeymap.begin();
+         it != shortcutNoteKeymap.end(); ++it) {
+        QJsonObject jsonItem;
+        jsonItem.insert("name", it.key());
+        jsonItem.insert("value", it.value().replace("Meta", "Super"));
+        noteJsonItems.append(jsonItem);
+    }
+
+    noteJsonGroup.insert("groupItems", noteJsonItems);
+    jsonGroups.append(noteJsonGroup);
+    //******************************Edit***************************************************
+    QList<QPair<QString, QString>> shortcutEditKeymap = {
+                                                         //Edit
+                                                         {DApplication::translate("Shortcuts", "Select all"), "Ctrl+A"},
+                                                         {DApplication::translate("Shortcuts", "Copy"), "Ctrl+C"},
+                                                         {DApplication::translate("Shortcuts", "Cut"), "Ctrl+X"},
+                                                         {DApplication::translate("Shortcuts", "Paste"), "Ctrl+V"},
+                                                         {DApplication::translate("Shortcuts", "Undo"), "Ctrl+Z"},
+                                                         {DApplication::translate("Shortcuts", "Redo"), "Ctrl+Y"},
+                                                         {DApplication::translate("Shortcuts", "Delete"), "Delete"},
+                                                         };
+
+    QJsonObject editJsonGroup;
+    editJsonGroup.insert("groupName", DApplication::translate("ShortcutsGroups", "Edit"));
+    QJsonArray editJsonItems;
+
+    for (int i = 0; i < shortcutEditKeymap.count(); i++) {
+        QJsonObject jsonItem;
+        jsonItem.insert("name", shortcutEditKeymap[i].first);
+        QString value = shortcutEditKeymap[i].second;
+        jsonItem.insert("value", value.replace("Meta", "Super"));
+        editJsonItems.append(jsonItem);
+    }
+
+    editJsonGroup.insert("groupItems", editJsonItems);
+    jsonGroups.append(editJsonGroup);
+    //******************************Setting************************************************
+    QMap<QString, QString> shortcutSettingKeymap = {
+                                                    //Setting
+                                                    //        {DApplication::translate("Shortcuts","Close window"),         "Alt+F4"},
+                                                    //        {DApplication::translate("Shortcuts","Resize window"),        "Ctrl+Alt+F"},
+                                                    //        {DApplication::translate("Shortcuts","Find"),                 "Ctrl+F"},
+                                                    {DApplication::translate("Shortcuts", "Help"), "F1"},
+                                                    {DApplication::translate("Shortcuts", "Display shortcuts"), "Ctrl+Shift+?"},
+                                                    };
+
+    QJsonObject settingJsonGroup;
+    settingJsonGroup.insert("groupName", DApplication::translate("ShortcutsGroups", "Settings"));
+    QJsonArray settingJsonItems;
+
+    for (QMap<QString, QString>::iterator it = shortcutSettingKeymap.begin();
+         it != shortcutSettingKeymap.end(); ++it) {
+        QJsonObject jsonItem;
+        jsonItem.insert("name", it.key());
+        jsonItem.insert("value", it.value().replace("Meta", "Super"));
+        settingJsonItems.append(jsonItem);
+    }
+
+    settingJsonGroup.insert("groupItems", settingJsonItems);
+    jsonGroups.append(settingJsonGroup);
+
+    shortcutObj.insert("shortcut", jsonGroups);
+
+    QJsonDocument doc(shortcutObj);
+
+    QStringList shortcutString;
+    QString param1 = "-j=" + QString(doc.toJson().data());
+    QString param2 = "-p=" + QString::number(point.x()) + "," + QString::number(point.y());
+    shortcutString << param1 << param2;
+
+    QProcess *shortcutViewProcess = new QProcess(this);
+    shortcutViewProcess->startDetached("deepin-shortcut-viewer", shortcutString);
+
+    connect(shortcutViewProcess, SIGNAL(finished(int)), shortcutViewProcess, SLOT(deleteLater()));
 }

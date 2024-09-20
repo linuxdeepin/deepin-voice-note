@@ -30,6 +30,12 @@ Item {
     signal mulChoices(int choices)
     signal noteItemChanged(int index)
 
+    function renameCurrentItem() {
+        if (selectedNoteItem.length !== 1)
+            return;
+        itemListView.itemAtIndex(selectedNoteItem[0]).isRename = true;
+    }
+
     height: 480
     visible: true
     width: 640

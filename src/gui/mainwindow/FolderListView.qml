@@ -57,6 +57,10 @@ Item {
         return folderListView.model.get(folderListView.currentIndex);
     }
 
+    function renameCurrentItem() {
+        folderListView.currentItem.isRename = true;
+    }
+
     function toggleSearch(isSearch) {
         if (!isSearch) {
             var index = folderListView.currentIndex;
@@ -129,13 +133,22 @@ Item {
                     count: folderData.notesCount,
                     icon: folderData.icon
                 });
-            if (folderListView.itemAtIndex(folderListView.currentIndex + 1)) {
-                folderListView.itemAtIndex(folderListView.currentIndex + 1).backgroundColor = "transparent";
-            }
             folderListView.currentIndex = 0;
             folderListView.lastCurrentIndex = 0;
             VNoteMainManager.createNote();
+            if (folderListView.itemAtIndex(folderListView.currentIndex + 1)) {
+                folderListView.itemAtIndex(folderListView.currentIndex + 1).backgroundColor = "transparent";
+            }
         }
+    }
+
+    Rectangle {
+        id: dropLine
+
+        color: "#0058DE"
+        implicitHeight: 3
+        implicitWidth: folderListView.width
+        visible: false
     }
 
     ListView {
@@ -156,6 +169,12 @@ Item {
                 index = folderModel.count;
             }
             dropIndex = index;
+            dropLine.visible = true;
+            if (folderListView.itemAtIndex(dropIndex)) {
+                dropLine.y = folderListView.itemAtIndex(dropIndex).y;
+            } else {
+                dropLine.y = folderListView.itemAtIndex(dropIndex - 1).y + folderListView.itemAtIndex(dropIndex - 1).height;
+            }
         }
 
         anchors.fill: parent
@@ -364,6 +383,7 @@ Item {
                 onReleased: {
                     if (held) {
                         held = false;
+                        dropLine.visible = false;
                         dragControl.visible = false;
                         dragControl.imageSource = "";
                         if (folderListView.dropIndex != -1) {

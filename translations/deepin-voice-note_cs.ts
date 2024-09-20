@@ -4,195 +4,197 @@
 <context>
     <name>AppMain</name>
     <message>
-        <location filename="../src/common/vlcpalyer.cpp" line="39"/>
-        <location filename="../src/main.cpp" line="79"/>
-        <location filename="../src/main.cpp" line="80"/>
-        <location filename="../src/views/vnotemainwindow.cpp" line="602"/>
+        <location filename="../src/common/vlcplayer.cpp" line="43"/>
         <source>Voice Notes</source>
         <translation>Hlasové poznámky</translation>
-    </message>
-    <message>
-        <location filename="../src/main.cpp" line="81"/>
-        <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation>Hlasové poznámky jsou nástrojem pro pořizování textových poznámek a hlasových nahrávek.</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="603"/>
-        <source>Recordings not saved</source>
-        <translation>Nahrávky neuloženy</translation>
     </message>
 </context>
 <context>
     <name>DefaultName</name>
     <message>
-        <location filename="../src/db/vnotefolderoper.cpp" line="230"/>
+        <location filename="../src/db/vnotefolderoper.cpp" line="226"/>
         <source>Notebook</source>
         <translation>Zápisník</translation>
     </message>
     <message>
-        <location filename="../src/db/vnoteitemoper.cpp" line="213"/>
-        <source>Text</source>
-        <translation>Text</translation>
-    </message>
-    <message>
-        <location filename="../src/db/vnoteitemoper.cpp" line="228"/>
         <location filename="../src/importolddata/olddbvisistors.cpp" line="139"/>
         <source>Voice</source>
         <translation>Hlas</translation>
     </message>
 </context>
 <context>
-    <name>DetailPage</name>
+    <name>FolderListView</name>
     <message>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="198"/>
-        <source>%1 notes selected</source>
-        <translation>Vybráno %1 poznámek</translation>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="403"/>
+        <source>Rename</source>
+        <translation type="unfinished">Přejmenovat</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="411"/>
+        <source>Delete</source>
+        <translation type="unfinished">Smazat</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="429"/>
+        <source>New Note</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>FolderSelectDialog</name>
+    <name>InitialInterface</name>
     <message>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="202"/>
-        <source>Move Notes</source>
-        <translation>Přesunout poznámky</translation>
+        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="43"/>
+        <source>After creating a new notepad, you can start recording voice and text</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="229"/>
-        <source>Cancel</source>
-        <comment>button</comment>
-        <translation>Zrušit</translation>
-    </message>
-    <message>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="230"/>
-        <source>Confirm</source>
-        <comment>button</comment>
-        <translation>Potvrdit</translation>
-    </message>
-</context>
-<context>
-    <name>HomePage</name>
-    <message>
-        <location filename="../src/views/homepage.cpp" line="32"/>
+        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="50"/>
         <source>Create Notebook</source>
-        <translation>Vytvořit zápisník</translation>
-    </message>
-    <message>
-        <location filename="../src/views/homepage.cpp" line="44"/>
-        <source>Create a notebook to start recording voice and making notes</source>
-        <translation>Vytvořit zápisník pro zahájení nahrávání hlasu a dělání poznámek</translation>
+        <translation type="unfinished">Vytvořit zápisník</translation>
     </message>
 </context>
 <context>
-    <name>LeftView</name>
+    <name>ItemListView</name>
     <message>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="365"/>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="379"/>
-        <source>Move %1 notes (%2, ...) to:</source>
-        <translation>Přesunout %1 poznámek (%2, …) do:</translation>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="106"/>
+        <source>Save As</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="366"/>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="369"/>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="377"/>
-        <source>Move the note &quot;%1&quot; to:</source>
-        <translation>Přesunout poznámku „%1“ do:</translation>
-    </message>
-</context>
-<context>
-    <name>MiddleView</name>
-    <message>
-        <location filename="../src/views/middleview.cpp" line="289"/>
-        <source>Save</source>
-        <translation>Uložit</translation>
-    </message>
-    <message>
-        <location filename="../src/views/middleview.cpp" line="1043"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="144"/>
         <source>No search results</source>
-        <translation>Nic nenalezeno</translation>
+        <translation type="unfinished">Nic nenalezeno</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="169"/>
+        <source>Unpin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="169"/>
+        <source>Sticky on Top</source>
+        <translation type="unfinished">Zůstává na začátku</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="574"/>
+        <source>Sticky Notes</source>
+        <translation type="unfinished">Lepítka s poznámkami</translation>
     </message>
 </context>
 <context>
-    <name>MiddleViewDelegate</name>
+    <name>MainWindow</name>
     <message>
-        <location filename="../src/views/middleviewdelegate.cpp" line="438"/>
-        <source>Sticky Notes</source>
-        <translation>Lepítka s poznámkami</translation>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="207"/>
+        <source>Create Notebook</source>
+        <translation type="unfinished">Vytvořit zápisník</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="290"/>
+        <source>Search</source>
+        <translation type="unfinished">Hledat</translation>
+    </message>
+</context>
+<context>
+    <name>MoveDialog</name>
+    <message>
+        <location filename="../src/gui/dialog/MoveDialog.qml" line="26"/>
+        <source>move note to:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/dialog/MoveDialog.qml" line="101"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Zrušit</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/dialog/MoveDialog.qml" line="110"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MultipleChoices</name>
+    <message>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="29"/>
+        <source>%1 note selected</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>NoteDetailContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="261"/>
+        <location filename="../src/common/actionmanager.cpp" line="67"/>
         <source>Save as MP3</source>
         <translation>Uložit jako MP3</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="262"/>
+        <location filename="../src/common/actionmanager.cpp" line="68"/>
         <source>Voice to Text</source>
         <translation>Hlas na text</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="263"/>
-        <location filename="../src/common/actionmanager.cpp" line="290"/>
-        <location filename="../src/common/actionmanager.cpp" line="316"/>
+        <location filename="../src/common/actionmanager.cpp" line="69"/>
+        <location filename="../src/common/actionmanager.cpp" line="77"/>
+        <location filename="../src/common/actionmanager.cpp" line="85"/>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="264"/>
-        <location filename="../src/common/actionmanager.cpp" line="291"/>
-        <location filename="../src/common/actionmanager.cpp" line="317"/>
+        <location filename="../src/common/actionmanager.cpp" line="70"/>
+        <location filename="../src/common/actionmanager.cpp" line="78"/>
+        <location filename="../src/common/actionmanager.cpp" line="86"/>
         <source>Select all</source>
-        <translation>Vybrat vše</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="265"/>
-        <location filename="../src/common/actionmanager.cpp" line="292"/>
-        <location filename="../src/common/actionmanager.cpp" line="318"/>
+        <location filename="../src/common/actionmanager.cpp" line="71"/>
+        <location filename="../src/common/actionmanager.cpp" line="79"/>
+        <location filename="../src/common/actionmanager.cpp" line="87"/>
         <source>Copy</source>
         <translation>Kopírovat</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="266"/>
-        <location filename="../src/common/actionmanager.cpp" line="293"/>
-        <location filename="../src/common/actionmanager.cpp" line="319"/>
+        <location filename="../src/common/actionmanager.cpp" line="72"/>
+        <location filename="../src/common/actionmanager.cpp" line="80"/>
+        <location filename="../src/common/actionmanager.cpp" line="88"/>
         <source>Cut</source>
         <translation>Vyjmout</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="267"/>
-        <location filename="../src/common/actionmanager.cpp" line="294"/>
-        <location filename="../src/common/actionmanager.cpp" line="320"/>
+        <location filename="../src/common/actionmanager.cpp" line="73"/>
+        <location filename="../src/common/actionmanager.cpp" line="81"/>
+        <location filename="../src/common/actionmanager.cpp" line="89"/>
         <source>Paste</source>
         <translation>Vložit</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="289"/>
+        <location filename="../src/common/actionmanager.cpp" line="76"/>
         <source>View</source>
         <translation>Zobrazit</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="295"/>
+        <location filename="../src/common/actionmanager.cpp" line="82"/>
         <source>Save as</source>
-        <translation>Uložit jako</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="321"/>
+        <location filename="../src/common/actionmanager.cpp" line="91"/>
         <source>Text to Speech</source>
-        <translation>Text na řeč</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="322"/>
+        <location filename="../src/common/actionmanager.cpp" line="92"/>
         <source>Stop reading</source>
-        <translation>Přestat předčítat</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="323"/>
+        <location filename="../src/common/actionmanager.cpp" line="93"/>
         <source>Speech to Text</source>
-        <translation>Řeč na text</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="324"/>
+        <location filename="../src/common/actionmanager.cpp" line="94"/>
         <source>Translate</source>
         <translation>Přeložit</translation>
     </message>
@@ -200,82 +202,65 @@
 <context>
     <name>NotebookContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="205"/>
+        <location filename="../src/common/actionmanager.cpp" line="46"/>
         <source>Rename</source>
         <translation>Přejmenovat</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="206"/>
+        <location filename="../src/common/actionmanager.cpp" line="47"/>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="207"/>
+        <location filename="../src/common/actionmanager.cpp" line="48"/>
         <source>New note</source>
-        <translation>Nová poznámka</translation>
+        <translation type="unfinished">Nová poznámka</translation>
     </message>
 </context>
 <context>
     <name>NotesContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="180"/>
+        <location filename="../src/common/actionmanager.cpp" line="61"/>
         <source>Save as HTML</source>
         <translation>Uložit jako HTML</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="181"/>
+        <location filename="../src/common/actionmanager.cpp" line="62"/>
         <source>Save as TXT</source>
         <translation>Uložit jako TXT</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="185"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="327"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="338"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="344"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="346"/>
+        <location filename="../src/common/actionmanager.cpp" line="55"/>
         <source>Save note</source>
         <translation>Uložit poznámku</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="225"/>
+        <location filename="../src/common/actionmanager.cpp" line="51"/>
         <source>Rename</source>
         <translation>Přejmenovat</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="227"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="321"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="330"/>
+        <location filename="../src/common/actionmanager.cpp" line="53"/>
         <source>Move</source>
         <translation>Přesunout</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="228"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="323"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="329"/>
+        <location filename="../src/common/actionmanager.cpp" line="54"/>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="230"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="328"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="339"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="351"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="353"/>
+        <location filename="../src/common/actionmanager.cpp" line="56"/>
         <source>Save voice recording</source>
         <translation>Uložit hlasovou nahrávku</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="231"/>
+        <location filename="../src/common/actionmanager.cpp" line="58"/>
         <source>New note</source>
         <translation>Nová poznámka</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1261"/>
-        <source>Unstick</source>
-        <translation>Odlepit</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1263"/>
+        <location filename="../src/common/actionmanager.cpp" line="52"/>
         <source>Sticky on Top</source>
         <translation>Zůstává na začátku</translation>
     </message>
@@ -304,150 +289,26 @@
     </message>
 </context>
 <context>
-    <name>Shortcuts</name>
+    <name>SettingDialog</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="909"/>
-        <source>New notebook</source>
-        <translation>Nový zápisník</translation>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="27"/>
+        <source>Basic</source>
+        <translation type="unfinished">Základní</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="910"/>
-        <source>Rename notebook</source>
-        <translation>Přejmenovat zápisník</translation>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="32"/>
+        <source>Audio Source</source>
+        <translation type="unfinished">Zdroj zvuku</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="911"/>
-        <source>Delete notebook</source>
-        <translation>Smazat zápisník</translation>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="55"/>
+        <source>Internal</source>
+        <translation type="unfinished">Interní</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="933"/>
-        <source>New note</source>
-        <translation>Nová poznámka</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="934"/>
-        <source>Rename note</source>
-        <translation>Přejmenovat poznámku</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="935"/>
-        <source>Delete note</source>
-        <translation>Smazat poznámku</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="936"/>
-        <source>Play/Pause</source>
-        <translation>Přehrát/pozastavit</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="937"/>
-        <source>Record voice</source>
-        <translation>Nahrát hlas</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="938"/>
-        <source>Save note</source>
-        <translation>Uložit poznámku</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="939"/>
-        <source>Save recordings</source>
-        <translation>Uložit nahrávky</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="959"/>
-        <source>Select all</source>
-        <translation>Vybrat vše</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="960"/>
-        <source>Copy</source>
-        <translation>Zkopírovat</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="961"/>
-        <source>Cut</source>
-        <translation>Vyjmout</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="962"/>
-        <source>Paste</source>
-        <translation>Vložit</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="963"/>
-        <source>Undo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
-        <source>Redo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
-        <source>Delete</source>
-        <translation>Smazat</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="988"/>
-        <source>Help</source>
-        <translation>Nápověda</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="989"/>
-        <source>Display shortcuts</source>
-        <translation>Zobrazit zkratky</translation>
-    </message>
-</context>
-<context>
-    <name>ShortcutsGroups</name>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="915"/>
-        <source>Notebooks</source>
-        <translation>Zápisníky</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="943"/>
-        <source>Notes</source>
-        <translation>Poznámky</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="969"/>
-        <source>Edit</source>
-        <translation>Upravit</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="993"/>
-        <source>Settings</source>
-        <translation>Nastavení</translation>
-    </message>
-</context>
-<context>
-    <name>SplashView</name>
-    <message>
-        <location filename="../src/views/splashview.cpp" line="30"/>
-        <source>Loading...</source>
-        <translation>Načítání…</translation>
-    </message>
-</context>
-<context>
-    <name>TitleBar</name>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="349"/>
-        <source>Search</source>
-        <translation>Hledat</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1903"/>
-        <source>Settings</source>
-        <translation>Nastavení</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1904"/>
-        <source>Privacy Policy</source>
-        <translation>Zásady ochrany soukromí</translation>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="64"/>
+        <source>Microphone</source>
+        <translation type="unfinished">Mikrofon</translation>
     </message>
 </context>
 <context>
@@ -461,18 +322,18 @@
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../src/common/utils.cpp" line="41"/>
+        <location filename="../src/common/utils.cpp" line="42"/>
         <location filename="../tests/src/common/ut_utils.cpp" line="32"/>
         <source>1 min ago</source>
         <translation>Před 1 minutou</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="43"/>
+        <location filename="../src/common/utils.cpp" line="44"/>
         <source>%1 mins ago</source>
         <translation>Před %1 minutami</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="49"/>
+        <location filename="../src/common/utils.cpp" line="50"/>
         <location filename="../tests/src/common/ut_utils.cpp" line="37"/>
         <source>Yesterday</source>
         <translation>Včera</translation>
@@ -484,51 +345,26 @@
     </message>
 </context>
 <context>
-    <name>VNoteErrorMessage</name>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="871"/>
-        <source>The voice conversion failed due to the poor network connection, please have a check</source>
-        <translation>Hlas se nepodařilo převést kvůli špatnému síťovému spojení – zkontrolujte ho</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="875"/>
-        <source>Voice to text conversion failed</source>
-        <translation>Převod hlasu na text se nezdařil</translation>
-    </message>
-</context>
-<context>
-    <name>VNoteMainWindow</name>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="450"/>
-        <source>Create Notebook</source>
-        <translation>Vytvořit zápisník</translation>
-    </message>
-</context>
-<context>
     <name>VNoteMessageDialog</name>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="37"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="28"/>
         <source>OK</source>
         <comment>button</comment>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="116"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="94"/>
         <source>Cancel</source>
         <comment>button</comment>
         <translation>Zrušit</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="117"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="98"/>
         <source>Confirm</source>
         <comment>button</comment>
         <translation>Potvrdit</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="120"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="39"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
@@ -536,148 +372,254 @@ All notes in it will be deleted</source>
 Veškeré poznámky v něm budou smazány</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="123"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="46"/>
         <source>Do you want to stop the current recording?</source>
         <translation>Chcete právě probíhající nahrávání zastavit?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="127"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="87"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
         <translation>Opravdu chcete smazat označených %1 poznámek?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="129"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="81"/>
         <source>Are you sure you want to delete this note?</source>
         <translation>Opravdu chcete tuto poznámku smazat?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="52"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
         <translation>Tuto hlasovou poznámku nelze převést, protože poznámky delší než 20 minut nejsou v současnosti podporovány.</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="137"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="59"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
         <translation>Nyní se probíhá převod hlasové poznámky. Chcete ho zastavit?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="140"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="65"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
         <translation>Příliš tichá vstupní hlasitost může mít za následek špatné nahrávky. Chcete pokračovat?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="143"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="72"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
         <translation>Sestříhané nahrávky a převedený text nebudou vloženy. Chcete pokračovat?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="106"/>
         <source>Save failed</source>
         <translation>Uložení se nezdařilo</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="150"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="111"/>
         <source>You do not have permission to save files there</source>
         <translation>Nemáte oprávnění ukládat tam soubory</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="154"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="116"/>
         <source>The voice note has been deleted</source>
         <translation>Hlasová poznámka byla smazána</translation>
     </message>
 </context>
 <context>
-    <name>VNoteRecordBar</name>
+    <name>VNoteMessageDialogHandler</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1750"/>
-        <source>Your audio recording device does not work.</source>
-        <translation>Zařízení pro nahrávání zvuku nefunguje.</translation>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="97"/>
+        <source>Are you sure you want to delete this notebook?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/views/vnoterecordbar.cpp" line="240"/>
-        <source>No recording device detected</source>
-        <translation>Nezjištěno žádné zařízení pro nahrávání zvuku</translation>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="99"/>
+        <source>Do you want to stop the current recording?</source>
+        <translation type="unfinished">Chcete právě probíhající nahrávání zastavit?</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="103"/>
+        <source>Are you sure you want to delete the selected %1 notes?</source>
+        <translation type="unfinished">Opravdu chcete smazat označených %1 poznámek?</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="107"/>
+        <source>Are you sure you want to delete this note?</source>
+        <translation type="unfinished">Opravdu chcete tuto poznámku smazat?</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="110"/>
+        <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
+        <translation type="unfinished">Tuto hlasovou poznámku nelze převést, protože poznámky delší než 20 minut nejsou v současnosti podporovány.</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="114"/>
+        <source>Converting a voice note now. Do you want to stop it?</source>
+        <translation type="unfinished">Nyní se probíhá převod hlasové poznámky. Chcete ho zastavit?</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="116"/>
+        <source>The low input volume may result in bad recordings. Do you want to continue?</source>
+        <translation type="unfinished">Příliš tichá vstupní hlasitost může mít za následek špatné nahrávky. Chcete pokračovat?</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="119"/>
+        <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
+        <translation type="unfinished">Sestříhané nahrávky a převedený text nebudou vloženy. Chcete pokračovat?</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="123"/>
+        <source>Save failed</source>
+        <translation type="unfinished">Uložení se nezdařilo</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="125"/>
+        <source>You do not have permission to save files there</source>
+        <translation type="unfinished">Nemáte oprávnění ukládat tam soubory</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="127"/>
+        <source>The voice note has been deleted</source>
+        <translation type="unfinished">Hlasová poznámka byla smazána</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="139"/>
+        <source>All notes in it will be deleted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="152"/>
+        <source>Delete</source>
+        <translation type="unfinished">Smazat</translation>
     </message>
 </context>
 <context>
-    <name>VoiceNoteItem</name>
+    <name>VNoteMessageDialogLoader</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1691"/>
-        <source>Converting voice to text</source>
-        <translation>Převádění hlasu na text</translation>
+        <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="150"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Zrušit</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="183"/>
+        <source>Confirm</source>
+        <translation type="unfinished">Potvrdit</translation>
+    </message>
+</context>
+<context>
+    <name>WebEngineHandler</name>
+    <message>
+        <location filename="../src/handler/web_engine_handler.cpp" line="457"/>
+        <source>save as MP3</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>WindowTitleBar</name>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="27"/>
+        <source>Settings</source>
+        <translation type="unfinished">Nastavení</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="53"/>
+        <source>Music is a local music player with beautiful design and simple functions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="55"/>
+        <source>Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="56"/>
+        <source>Version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="92"/>
+        <source>Previous page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="112"/>
+        <source>Start recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="127"/>
+        <source>Insert picture</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>web</name>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="126"/>
+        <location filename="../src/common/jscontent.cpp" line="131"/>
         <source>Font</source>
         <translation>Písmo</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="127"/>
+        <location filename="../src/common/jscontent.cpp" line="132"/>
         <source>Font size</source>
         <translation>Velikost písma</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="128"/>
+        <location filename="../src/common/jscontent.cpp" line="133"/>
         <source>Font color</source>
         <translation>Barva písma</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="129"/>
+        <location filename="../src/common/jscontent.cpp" line="134"/>
         <source>Text highlight color</source>
         <translation>Barva zvýraznění písma</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="130"/>
+        <location filename="../src/common/jscontent.cpp" line="135"/>
         <source>Bold</source>
         <translation>Tučné</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="131"/>
+        <location filename="../src/common/jscontent.cpp" line="136"/>
         <source>Italic</source>
         <translation>Skloněné</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="132"/>
+        <location filename="../src/common/jscontent.cpp" line="137"/>
         <source>Underline</source>
         <translation>Podtržené</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="133"/>
+        <location filename="../src/common/jscontent.cpp" line="138"/>
         <source>Strikethrough</source>
         <translation>Přeškrnuté</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="134"/>
+        <location filename="../src/common/jscontent.cpp" line="139"/>
         <source>Bullets</source>
         <translation>Odrážky</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="135"/>
+        <location filename="../src/common/jscontent.cpp" line="140"/>
         <source>Numbering</source>
         <translation>Číslování</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="136"/>
+        <location filename="../src/common/jscontent.cpp" line="141"/>
         <source>More colors</source>
         <translation>Další barvy</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="137"/>
+        <location filename="../src/common/jscontent.cpp" line="142"/>
         <source>Recent</source>
         <translation>Nedávné</translation>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="156"/>
+        <source>Voice To Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="157"/>
+        <source>Converting voice to text</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
