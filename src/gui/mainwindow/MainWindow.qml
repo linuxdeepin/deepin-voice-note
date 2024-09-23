@@ -20,7 +20,6 @@ ApplicationWindow {
 
     function toggleTwoColumnMode() {
         if (leftBgArea.visible === false) {
-            //TODO: 这加个动画
             leftBgArea.visible = true;
             leftDragHandle.visible = true;
             showLeftArea.start();
@@ -311,6 +310,8 @@ ApplicationWindow {
                 SearchEdit {
                     id: search
 
+                    property int offect: 0
+
                     function exitSearch() {
                         folderListView.toggleSearch(false);
                         search.focus = false;
@@ -327,6 +328,7 @@ ApplicationWindow {
                     }
 
                     Layout.fillWidth: true
+                    Layout.leftMargin: offect
                     Layout.preferredHeight: 30
                     Layout.topMargin: 8
                     placeholder: qsTr("Search")
@@ -504,6 +506,15 @@ ApplicationWindow {
             target: middeleBgArea
             to: 260
         }
+
+        NumberAnimation {
+            duration: 200
+            easing.type: Easing.InOutQuad
+            from: 0
+            property: "offect"
+            target: search
+            to: 85
+        }
     }
 
     ParallelAnimation {
@@ -531,6 +542,15 @@ ApplicationWindow {
             property: "width"
             target: middeleBgArea
             to: leftViewWidth
+        }
+
+        NumberAnimation {
+            duration: 200
+            easing.type: Easing.InOutQuad
+            from: 85
+            property: "offect"
+            target: search
+            to: 0
         }
     }
 }
