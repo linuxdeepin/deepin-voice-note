@@ -25,17 +25,17 @@
 <context>
     <name>FolderListView</name>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="403"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="409"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="411"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="417"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="429"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="435"/>
         <source>New Note</source>
         <translation>新建笔记</translation>
     </message>
@@ -56,28 +56,28 @@
 <context>
     <name>ItemListView</name>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="106"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="138"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="165"/>
         <source>Save As</source>
         <translation>保存笔记</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="144"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="203"/>
         <source>No search results</source>
         <translation>无搜索结果</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="169"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="228"/>
         <source>Unpin</source>
         <translation>取消置顶</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="169"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="228"/>
         <source>Sticky on Top</source>
         <translation>置顶</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="574"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="591"/>
         <source>Sticky Notes</source>
         <translation>已置顶</translation>
     </message>
@@ -85,12 +85,12 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="207"/>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="244"/>
         <source>Create Notebook</source>
         <translation>新建记事本</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="290"/>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="334"/>
         <source>Search</source>
         <translation>搜索</translation>
     </message>
@@ -116,9 +116,29 @@
 <context>
     <name>MultipleChoices</name>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="29"/>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="36"/>
         <source>%1 note selected</source>
         <translation>已选择%1个笔记</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="53"/>
+        <source>Move</source>
+        <translation>移动</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="64"/>
+        <source>Save Note</source>
+        <translation>保存笔记</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="75"/>
+        <source>Save Voice</source>
+        <translation>保存语音</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="86"/>
+        <source>Delete</source>
+        <translation>删除</translation>
     </message>
 </context>
 <context>
@@ -309,6 +329,127 @@
         <location filename="../src/gui/dialog/SettingDialog.qml" line="64"/>
         <source>Microphone</source>
         <translation>麦克风声音</translation>
+    </message>
+</context>
+<context>
+    <name>Shortcuts</name>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="754"/>
+        <source>New notebook</source>
+        <translation>新建记事本</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="755"/>
+        <source>Rename notebook</source>
+        <translation>重命名记事本</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="756"/>
+        <source>Delete notebook</source>
+        <translation>删除记事本</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="778"/>
+        <source>New note</source>
+        <translation>新建笔记</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="779"/>
+        <source>Rename note</source>
+        <translation>重命名笔记</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="780"/>
+        <source>Delete note</source>
+        <translation>删除笔记</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="781"/>
+        <source>Play/Pause</source>
+        <translation>播放/暂停</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="782"/>
+        <source>Record voice</source>
+        <translation>录音</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="783"/>
+        <source>Save note</source>
+        <translation>保存笔记</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="784"/>
+        <source>Save recordings</source>
+        <translation>保存语音</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="804"/>
+        <source>Select all</source>
+        <translation>全选</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="805"/>
+        <source>Copy</source>
+        <translation>复制</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="806"/>
+        <source>Cut</source>
+        <translation>剪切</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="807"/>
+        <source>Paste</source>
+        <translation>粘贴</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="808"/>
+        <source>Undo</source>
+        <translation>撤销</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="809"/>
+        <source>Redo</source>
+        <translation>重做</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="810"/>
+        <source>Delete</source>
+        <translation>删除</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="833"/>
+        <source>Help</source>
+        <translation>帮助</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="834"/>
+        <source>Display shortcuts</source>
+        <translation>显示快捷键</translation>
+    </message>
+</context>
+<context>
+    <name>ShortcutsGroups</name>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="760"/>
+        <source>Notebooks</source>
+        <translation>记事本</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="788"/>
+        <source>Notes</source>
+        <translation>笔记</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="814"/>
+        <source>Edit</source>
+        <translation>编辑</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="838"/>
+        <source>Settings</source>
+        <translation>设置</translation>
     </message>
 </context>
 <context>
@@ -514,37 +655,37 @@ All notes in it will be deleted</source>
 <context>
     <name>WindowTitleBar</name>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="27"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="28"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="53"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="54"/>
         <source>Music is a local music player with beautiful design and simple functions.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="55"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="56"/>
         <source>Music</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="56"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="57"/>
         <source>Version:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="92"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="87"/>
         <source>Previous page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="112"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="115"/>
         <source>Start recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="127"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="130"/>
         <source>Insert picture</source>
         <translation type="unfinished"></translation>
     </message>
