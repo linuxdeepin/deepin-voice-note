@@ -25,17 +25,17 @@
 <context>
     <name>FolderListView</name>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="403"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="409"/>
         <source>Rename</source>
         <translation type="unfinished">Renomear</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="411"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="417"/>
         <source>Delete</source>
         <translation type="unfinished">Eliminar</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="429"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="435"/>
         <source>New Note</source>
         <translation type="unfinished"></translation>
     </message>
@@ -56,28 +56,28 @@
 <context>
     <name>ItemListView</name>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="106"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="138"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="165"/>
         <source>Save As</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="144"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="203"/>
         <source>No search results</source>
         <translation type="unfinished">Sen resultados para a busca</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="169"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="228"/>
         <source>Unpin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="169"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="228"/>
         <source>Sticky on Top</source>
         <translation type="unfinished">Fixar enrriba</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="574"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="591"/>
         <source>Sticky Notes</source>
         <translation type="unfinished">Notas pegañentas</translation>
     </message>
@@ -85,12 +85,12 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="207"/>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="244"/>
         <source>Create Notebook</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="290"/>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="334"/>
         <source>Search</source>
         <translation type="unfinished">Buscar</translation>
     </message>
@@ -116,9 +116,29 @@
 <context>
     <name>MultipleChoices</name>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="29"/>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="36"/>
         <source>%1 note selected</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="53"/>
+        <source>Move</source>
+        <translation type="unfinished">Mover</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="64"/>
+        <source>Save Note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="75"/>
+        <source>Save Voice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="86"/>
+        <source>Delete</source>
+        <translation type="unfinished">Eliminar</translation>
     </message>
 </context>
 <context>
@@ -309,6 +329,127 @@
         <location filename="../src/gui/dialog/SettingDialog.qml" line="64"/>
         <source>Microphone</source>
         <translation type="unfinished">Micrófono</translation>
+    </message>
+</context>
+<context>
+    <name>Shortcuts</name>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="754"/>
+        <source>New notebook</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="755"/>
+        <source>Rename notebook</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="756"/>
+        <source>Delete notebook</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="778"/>
+        <source>New note</source>
+        <translation type="unfinished">Nova nota</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="779"/>
+        <source>Rename note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="780"/>
+        <source>Delete note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="781"/>
+        <source>Play/Pause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="782"/>
+        <source>Record voice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="783"/>
+        <source>Save note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="784"/>
+        <source>Save recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="804"/>
+        <source>Select all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="805"/>
+        <source>Copy</source>
+        <translation type="unfinished">Copiar</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="806"/>
+        <source>Cut</source>
+        <translation type="unfinished">Cortar</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="807"/>
+        <source>Paste</source>
+        <translation type="unfinished">Pegar</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="808"/>
+        <source>Undo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="809"/>
+        <source>Redo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="810"/>
+        <source>Delete</source>
+        <translation type="unfinished">Eliminar</translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="833"/>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="834"/>
+        <source>Display shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ShortcutsGroups</name>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="760"/>
+        <source>Notebooks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="788"/>
+        <source>Notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="814"/>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/VNoteMainManager.cpp" line="838"/>
+        <source>Settings</source>
+        <translation type="unfinished">Axustes</translation>
     </message>
 </context>
 <context>
@@ -514,37 +655,37 @@ Eliminaranse todas as notas</translation>
 <context>
     <name>WindowTitleBar</name>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="27"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="28"/>
         <source>Settings</source>
         <translation type="unfinished">Axustes</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="53"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="54"/>
         <source>Music is a local music player with beautiful design and simple functions.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="55"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="56"/>
         <source>Music</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="56"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="57"/>
         <source>Version:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="92"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="87"/>
         <source>Previous page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="112"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="115"/>
         <source>Start recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="127"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="130"/>
         <source>Insert picture</source>
         <translation type="unfinished"></translation>
     </message>
