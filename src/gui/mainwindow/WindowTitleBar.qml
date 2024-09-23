@@ -15,6 +15,7 @@ TitleBar {
     Layout.fillWidth: true
     content: titleBarContent
     height: 40
+    width: 100
 
     menu: Menu {
         width: 200
