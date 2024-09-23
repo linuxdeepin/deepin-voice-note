@@ -53,7 +53,11 @@ Item {
         id: dialogWindow
 
         onMoveToFolder: {
-            VNoteMainManager.moveNotes(selectedNoteItem, index);
+            var indexList = [];
+            for (var i = 0; i < selectedNoteItem.length; i++) {
+                indexList.push(itemModel.get(selectedNoteItem[i]).noteId);
+            }
+            VNoteMainManager.moveNotes(indexList, index);
         }
     }
 
@@ -543,20 +547,7 @@ Item {
                 }
                 onReleased: {
                     if (held && dragControl.visible && mouse.button === Qt.LeftButton) {
-                        if (mouse.x < 0 || mouse.x > parent.width || mouse.y < 0 || mouse.y > parent.height) {
-                            held = false;
-                            dragControl.visible = false;
-                            return;
-                        }
                         dropRelease();
-                        //从model中删除选中的item
-                        for (var i = 0; i < selectedNoteItem.length; i++) {
-                            var item = itemModel.get(selectedNoteItem[i]);
-                            itemModel.remove(selectedNoteItem[i]);
-                        }
-                        selectedNoteItem = [];
-                        selectSize = 0;
-                        itemListView.lastCurrentIndex = -1;
                     }
                     held = false;
                     dragControl.visible = false;

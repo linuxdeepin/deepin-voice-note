@@ -47,7 +47,7 @@ Item {
             VNoteMainManager.moveNotes(selectedNoteItem, currentDropIndex);
         }
         if (lastDropIndex != -1 && lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
-            folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent";
+            folderListView.itemAtIndex(lastDropIndex).isHovered = false;
         }
         lastDropIndex = -1;
         currentDropIndex = -1;
@@ -71,8 +71,10 @@ Item {
     function updateItems(mousePosX, mousePosY) {
         var pos = mapFromGlobal(mousePosX, mousePosY);
         if (pos.x < 0 || pos.x > listWidth) {
+            if (currentDropIndex != -1)
+                currentDropIndex = -1;
             if (lastDropIndex != -1 && lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
-                folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent";
+                folderListView.itemAtIndex(lastDropIndex).isHovered = false;
             }
             lastDropIndex = -1;
             return;
@@ -82,7 +84,7 @@ Item {
         var index = Math.floor(pos.y / itemHeight);
         if (index < 0 || index >= folderModel.count) {
             if (lastDropIndex != -1 && lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
-                folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent";
+                folderListView.itemAtIndex(lastDropIndex).isHovered = false;
             }
             currentDropIndex = -1;
             return;
@@ -90,7 +92,7 @@ Item {
         currentDropIndex = index;
         if (index != lastDropIndex) {
             if (lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
-                folderListView.itemAtIndex(lastDropIndex).backgroundColor = "transparent";
+                folderListView.itemAtIndex(lastDropIndex).isHovered = false;
             }
             lastDropIndex = index;
             if (index === folderListView.currentIndex) {
@@ -101,7 +103,7 @@ Item {
         }
         //更新当前行的颜色
         if (folderListView.itemAtIndex(index)) {
-            folderListView.itemAtIndex(index).backgroundColor = "#1A000000";
+            folderListView.itemAtIndex(index).isHovered = true;
         }
     }
 
@@ -137,7 +139,7 @@ Item {
             folderListView.lastCurrentIndex = 0;
             VNoteMainManager.createNote();
             if (folderListView.itemAtIndex(folderListView.currentIndex + 1)) {
-                folderListView.itemAtIndex(folderListView.currentIndex + 1).backgroundColor = "transparent";
+                folderListView.itemAtIndex(folderListView.currentIndex + 1).isHovered = false;
             }
         }
     }

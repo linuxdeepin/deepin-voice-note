@@ -128,9 +128,20 @@ ApplicationWindow {
         onMoveFinished: {
             folderListView.model.get(srcFolderIndex).count = (Number(folderListView.model.get(srcFolderIndex).count) - index.length).toString();
             folderListView.model.get(dstFolderIndex).count = (Number(folderListView.model.get(dstFolderIndex).count) + index.length).toString();
-            for (var i = 0; i < index.length; i++) {
-                itemListView.model.remove(index[i]);
+            var minIndex = itemListView.selectedNoteItem[0];
+            for (var i = 0; i < itemListView.selectedNoteItem.length; i++) {
+                if (itemListView.selectedNoteItem[i] < minIndex)
+                    minIndex = itemListView.selectedNoteItem[i];
+                itemListView.model.remove(itemListView.selectedNoteItem[i]);
             }
+            itemListView.selectedNoteItem = [];
+            if (!itemListView.view.itemAtIndex(minIndex)) {
+                minIndex = itemListView.model.count - 1;
+            }
+            itemListView.selectedNoteItem.push(minIndex);
+            itemListView.view.itemAtIndex(minIndex).isSelected = true;
+            itemListView.selectSize = 1;
+            VNoteMainManager.vNoteChanged(itemListView.model.get(minIndex).noteId);
         }
         onNoSearchResult: {
             label.visible = false;
@@ -246,7 +257,11 @@ ApplicationWindow {
                     folderListView.delNote(number);
                 }
                 onDropRelease: {
-                    folderListView.dropItems(itemListView.selectedNoteItem);
+                    var indexList = [];
+                    for (var i = 0; i < itemListView.selectedNoteItem.length; i++) {
+                        indexList.push(itemListView.model.get(itemListView.selectedNoteItem[i]).noteId);
+                    }
+                    folderListView.dropItems(indexList);
                 }
                 onMouseChanged: {
                     folderListView.updateItems(mousePosX, mousePosY);
