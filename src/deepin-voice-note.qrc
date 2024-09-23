@@ -36,5 +36,9 @@
         <file>dsg/icons/recording_start.dci</file>
         <file>gui/dialog/SettingDialog.qml</file>
         <file>gui/mainwindow/Shortcuts.qml</file>
+        <file>dsg/icons/delete.dci</file>
+        <file>dsg/icons/move_note.dci</file>
+        <file>dsg/icons/save_audio.dci</file>
+        <file>dsg/icons/save_note.dci</file>
     </qresource>
 </RCC>

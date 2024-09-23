@@ -13,6 +13,8 @@ import org.deepin.dtk 1.0
 import VNote 1.0
 
 Item {
+    id: rootItem
+
     property bool isSearch: false
     property int itemSpacing: 6
     property alias model: itemModel
@@ -29,6 +31,53 @@ Item {
     signal mouseChanged(int mousePosX, int mousePosY)
     signal mulChoices(int choices)
     signal noteItemChanged(int index)
+
+    function onDeleteNote() {
+        messageDialogLoader.messageData = selectedNoteItem.length;
+        messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteNote, ret => {
+                if (!ret) {
+                    return;
+                }
+                var delList = itemListView.sortAndDeduplicate(selectedNoteItem);
+                var delIdList = [];
+                for (var i = 0; i < delList.length; i++) {
+                    delIdList.push(itemModel.get(delList[i]).noteId);
+                    itemModel.remove(delList[i]);
+                }
+                VNoteMainManager.deleteNote(delIdList);
+                deleteNotes(selectedNoteItem.length);
+                if (itemModel.count <= itemListView.contextIndex) {
+                    itemListView.itemAtIndex(itemModel.count - 1).isSelected = true;
+                    selectedNoteItem = [itemModel.count - 1];
+                    noteItemChanged(itemModel.get(itemModel.count - 1).noteId);
+                } else {
+                    itemListView.itemAtIndex(itemListView.contextIndex).isSelected = true;
+                    noteItemChanged(itemModel.get(itemListView.contextIndex).noteId);
+                }
+            });
+    }
+
+    function onMoveNote() {
+        dialogWindow.show();
+    }
+
+    function onSaveAudio() {
+        if (!folderDialogLoader.active) {
+            folderDialogLoader.saveType = VNoteMainManager.Voice;
+            folderDialogLoader.active = true;
+        } else {
+            folderDialogLoader.item.open();
+        }
+    }
+
+    function onSaveNote() {
+        fileDialogLoader.saveType = VNoteMainManager.Text;
+        if (!fileDialogLoader.active) {
+            fileDialogLoader.active = true;
+        } else {
+            fileDialogLoader.item.open();
+        }
+    }
 
     function renameCurrentItem() {
         if (selectedNoteItem.length !== 1)
@@ -182,37 +231,11 @@ Item {
                 dialogWindow.show();
                 break;
             case ActionManager.NoteDelete:
-                messageDialogLoader.messageData = selectedNoteItem.length;
-                messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteNote, ret => {
-                        if (!ret) {
-                            return;
-                        }
-                        var delList = itemListView.sortAndDeduplicate(selectedNoteItem);
-                        var delIdList = [];
-                        for (var i = 0; i < delList.length; i++) {
-                            delIdList.push(itemModel.get(delList[i]).noteId);
-                            itemModel.remove(delList[i]);
-                        }
-                        VNoteMainManager.deleteNote(delIdList);
-                        deleteNotes(selectedNoteItem.length);
-                        if (itemModel.count <= itemListView.contextIndex) {
-                            itemListView.itemAtIndex(itemModel.count - 1).isSelected = true;
-                            selectedNoteItem = [itemModel.count - 1];
-                            noteItemChanged(itemModel.get(itemModel.count - 1).noteId);
-                        } else {
-                            itemListView.itemAtIndex(itemListView.contextIndex).isSelected = true;
-                            noteItemChanged(itemModel.get(itemListView.contextIndex).noteId);
-                        }
-                    });
+                rootItem.onDeleteNote();
                 break;
             case ActionManager.SaveNoteAsText:
                 onTriggered: {
-                    fileDialogLoader.saveType = VNoteMainManager.Text;
-                    if (!fileDialogLoader.active) {
-                        fileDialogLoader.active = true;
-                    } else {
-                        fileDialogLoader.item.open();
-                    }
+                    rootItem.onSaveNote();
                 }
                 break;
             case ActionManager.SaveNoteAsHtml:
@@ -226,12 +249,7 @@ Item {
                 }
                 break;
             case ActionManager.NoteSaveVoice:
-                if (!folderDialogLoader.active) {
-                    folderDialogLoader.saveType = VNoteMainManager.Voice;
-                    folderDialogLoader.active = true;
-                } else {
-                    folderDialogLoader.item.open();
-                }
+                rootItem.onSaveAudio();
                 break;
             case ActionManager.NoteAddNew:
                 VNoteMainManager.createNote();
@@ -498,6 +516,8 @@ Item {
                             }
                             break;
                         case Qt.ShiftModifier:
+                            selectedNoteItem = [];
+                            selectSize = 0;
                             var startIndex = Math.min(index, itemListView.lastCurrentIndex);
                             var endIndex = Math.max(index, itemListView.lastCurrentIndex);
                             for (var i = startIndex; i <= endIndex; i++) {
