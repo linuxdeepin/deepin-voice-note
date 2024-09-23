@@ -427,6 +427,19 @@ ApplicationWindow {
 
                     Layout.fillHeight: true
                     Layout.fillWidth: true
+
+                    onDeleteNote: {
+                        itemListView.onDeleteNote();
+                    }
+                    onMoveNote: {
+                        itemListView.onMoveNote();
+                    }
+                    onSaveAudio: {
+                        itemListView.onSaveAudio();
+                    }
+                    onSaveNote: {
+                        itemListView.onSaveNote();
+                    }
                 }
             }
         }

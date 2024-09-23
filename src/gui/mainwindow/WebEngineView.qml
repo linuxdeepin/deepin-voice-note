@@ -16,6 +16,11 @@ import "../dialog"
 Item {
     id: rootItem
 
+    signal deleteNote
+    signal moveNote
+    signal saveAudio
+    signal saveNote
+
     function startRecording() {
         if (!recorderViewLoader.active) {
             recorderViewLoader.active = true;
@@ -121,6 +126,19 @@ Item {
 
             sourceComponent: MultipleChoices {
                 anchors.fill: parent
+
+                onDeleteNote: {
+                    rootItem.deleteNote();
+                }
+                onMoveNote: {
+                    rootItem.moveNote();
+                }
+                onSaveAudio: {
+                    rootItem.saveAudio();
+                }
+                onSaveNote: {
+                    rootItem.saveNote();
+                }
             }
         }
     }

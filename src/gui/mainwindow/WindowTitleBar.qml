@@ -69,6 +69,24 @@ TitleBar {
 
     }
 
+    ToolButton {
+        id: newNoteBtn
+
+        anchors.left: titleBar.left
+        anchors.leftMargin: 10
+        anchors.verticalCenter: titleBar.verticalCenter
+        hoverEnabled: true
+        icon.name: "new_note"
+
+        onClicked: {
+            createNote();
+        }
+
+        ToolTip {
+            text: qsTr("Previous page")
+        }
+    }
+
     Component {
         id: titleBarContent
 
@@ -76,22 +94,6 @@ TitleBar {
             id: titleRowLayout
 
             anchors.fill: parent
-
-            ToolButton {
-                id: newNoteBtn
-
-                Layout.alignment: Qt.AlignLeft
-                hoverEnabled: true
-                icon.name: "new_note"
-
-                onClicked: {
-                    createNote();
-                }
-
-                ToolTip {
-                    text: qsTr("Previous page")
-                }
-            }
 
             Item {
                 Layout.fillWidth: true

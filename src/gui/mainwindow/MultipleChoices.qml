@@ -2,43 +2,93 @@ import QtQuick 2.15
 import QtQuick.Layouts
 import org.deepin.dtk 1.0
 
-
 Item {
     id: rootWindow
+
     property int selectSize: 0
+
+    signal deleteNote
+    signal moveNote
+    signal saveAudio
+    signal saveNote
+
     visible: false
 
     Rectangle {
         anchors.fill: parent
 
         ColumnLayout {
-            anchors.centerIn: parent
-            Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.fillWidth: true
+            anchors.centerIn: parent
 
             Image {
                 id: image
+
                 Layout.alignment: Qt.AlignHCenter
                 source: "qrc:/icon/multiple_choice.dci"
             }
 
             Text {
                 id: description
+
                 Layout.alignment: Qt.AlignHCenter
-                wrapMode: Text.WordWrap
                 text: qsTr("%1 note selected").arg(selectSize)
+                wrapMode: Text.WordWrap
             }
 
             FloatingPanel {
-                implicitWidth: 188
+                Layout.topMargin: 20
                 implicitHeight: 52
+                implicitWidth: 188
                 radius: 6
+
                 contentItem: RowLayout {
                     spacing: 0
-                    ToolButton { icon.name: "action_newfolder"; text: "文件夹"; implicitWidth: 40; implicitHeight: 40 }
-                    ToolButton { icon.name: "action_copy"; text: "复制"; implicitWidth: 40; implicitHeight: 40 }
-                    ToolButton { icon.name: "action_share"; text: "分享"; implicitWidth: 40; implicitHeight: 40 }
-                    ToolButton { icon.name: "action_compress"; text: "压缩"; implicitWidth: 40; implicitHeight: 40 }
+
+                    ToolButton {
+                        icon.name: "move_note"
+                        implicitHeight: 40
+                        implicitWidth: 40
+                        text: qsTr("Move")
+
+                        onClicked: {
+                            moveNote();
+                        }
+                    }
+
+                    ToolButton {
+                        icon.name: "save_note"
+                        implicitHeight: 40
+                        implicitWidth: 40
+                        text: qsTr("Save Note")
+
+                        onClicked: {
+                            saveNote();
+                        }
+                    }
+
+                    ToolButton {
+                        icon.name: "save_audio"
+                        implicitHeight: 40
+                        implicitWidth: 40
+                        text: qsTr("Save Voice")
+
+                        onClicked: {
+                            saveAudio();
+                        }
+                    }
+
+                    ToolButton {
+                        icon.name: "delete"
+                        implicitHeight: 40
+                        implicitWidth: 40
+                        text: qsTr("Delete")
+
+                        onClicked: {
+                            deleteNote();
+                        }
+                    }
                 }
             }
         }
