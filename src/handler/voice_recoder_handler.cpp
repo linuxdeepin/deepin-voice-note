@@ -108,9 +108,11 @@ void VoiceRecoderHandler::onAudioDeviceChange(int mode)
         qInfo() << "Current Audio Device Name: " << info;
         if (info.isEmpty()) {
             stopRecoder();
+            updateRecordBtnState(false);
         } else {
             bool isEnable = m_audioWatcher->getDeviceEnable(static_cast<AudioWatcher::AudioMode>(m_currentMode));
             stopRecoder();
+            updateRecordBtnState(isEnable);
         }
     }
 }

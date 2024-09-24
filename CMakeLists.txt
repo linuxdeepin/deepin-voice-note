@@ -15,6 +15,7 @@ endif()
 set(APP_RES_DIR "assets")
 set(APP_DESKTOP "${APP_RES_DIR}/deepin-voice-note.desktop")
 set(APP_CONFIG "${APP_RES_DIR}/deepin-voice-note.conf")
+set(APP_TRANS_SCRIPT "${APP_RES_DIR}/translate_generation.sh")
 set(APP_LOGO "${APP_RES_DIR}/icons/deepin/builtin/deepin-voice-note.svg")
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
@@ -22,6 +23,14 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
 else()
     add_definitions(-DWEB_PATH="${CMAKE_INSTALL_PREFIX}/share/deepin-voice-note/web")
 endif()
+
+execute_process(COMMAND bash
+                    ${APP_TRANS_SCRIPT}
+                    translations
+                    ${APP_TS_UPDATE}
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src
+                    ${APP_BIN_NAME}
+                    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/")
 
 # 加速编译优化参数
 # if (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "mips64")
