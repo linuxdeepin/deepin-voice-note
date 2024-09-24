@@ -23,31 +23,37 @@
 #include <QQmlApplicationEngine>
 #include <QtWebEngineQuick/qtwebenginequickglobal.h>
 
+#include <DApplication>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
 
+DWIDGET_USE_NAMESPACE
+
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    DApplication *app = new DApplication(argc, argv);
 
     qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "7777");
     VNoteMainManager::instance()->initQMLRegister();
     QtWebEngineQuick::initialize();
     ImageProvider* imageProvider = ImageProvider::instance();
 
+    app->loadTranslator();
+
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     engine.addImageProvider("Provider", imageProvider);
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     &app, [url](QObject *obj, const QUrl &objUrl) {
+                     app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);   
     engine.load(url);
     VNoteMainManager::instance()->initNote();
 
-    return app.exec();
+    return app->exec();
 }

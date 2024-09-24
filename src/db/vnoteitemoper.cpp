@@ -3,6 +3,8 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+#include <DApplication>
+
 #include "vnoteitemoper.h"
 #include "vnotefolderoper.h"
 #include "vnotedbmanager.h"
@@ -12,6 +14,8 @@
 #include "common/vnoteforlder.h"
 #include "common/vnotedatamanager.h"
 #include "db/dbvisitor.h"
+
+DWIDGET_USE_NAMESPACE
 
 /**
  * @brief VNoteItemOper::VNoteItemOper
@@ -207,8 +211,7 @@ QString VNoteItemOper::getDefaultNoteName(qint64 folderId)
 {
     VNoteFolder *folder = VNoteDataManager::instance()->getFolder(folderId);
 
-    // QString defaultNoteName = DApplication::translate("DefaultName", "Text");
-    QString defaultNoteName = "Text";
+    QString defaultNoteName = DApplication::translate("DefaultName", "Text");
 
     if (nullptr != folder && folder->maxNoteIdRef() != 0) {
         defaultNoteName += QString("%1").arg(folder->maxNoteIdRef());
