@@ -12,6 +12,11 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
+set(APP_RES_DIR "assets")
+set(APP_DESKTOP "${APP_RES_DIR}/deepin-voice-note.desktop")
+set(APP_CONFIG "${APP_RES_DIR}/deepin-voice-note.conf")
+set(APP_LOGO "${APP_RES_DIR}/icons/deepin/builtin/deepin-voice-note.svg")
+
 if (CMAKE_BUILD_TYPE MATCHES Debug)
     add_definitions(-DWEB_PATH="${CMAKE_SOURCE_DIR}/src/web")
 else()
@@ -39,6 +44,13 @@ configure_file(${PROJECT_SOURCE_DIR}/config.h.in ${PROJECT_BINARY_DIR}/config.h 
 
 # Application
 add_subdirectory(src)
+
+file(GLOB APP_QM_FILES "translations/*.qm")
+install(FILES ${APP_QM_FILES} DESTINATION share/deepin-voice-note/translations)
+install(FILES ${APP_DESKTOP} DESTINATION share/applications)
+install(FILES ${APP_CONFIG} DESTINATION share/deepin-voice-note)
+install(FILES ${APP_LOGO} DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps/)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/web    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/deepin-voice-note)
 
 # Unit Tests
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")

@@ -21,6 +21,11 @@
         <source>Voice</source>
         <translation>ئۈن</translation>
     </message>
+    <message>
+        <location filename="../src/db/vnoteitemoper.cpp" line="215"/>
+        <source>Text</source>
+        <translation>تېكىست</translation>
+    </message>
 </context>
 <context>
     <name>FolderListView</name>

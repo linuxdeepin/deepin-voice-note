@@ -21,6 +21,11 @@
         <source>Voice</source>
         <translation>སྒྲ།</translation>
     </message>
+    <message>
+        <location filename="../src/db/vnoteitemoper.cpp" line="215"/>
+        <source>Text</source>
+        <translation>ཡིག་ཆ།</translation>
+    </message>
 </context>
 <context>
     <name>FolderListView</name>
