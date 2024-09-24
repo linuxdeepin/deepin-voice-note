@@ -24,6 +24,7 @@
 #include <QtWebEngineQuick/qtwebenginequickglobal.h>
 
 #include <DApplication>
+#include <DGuiApplicationHelper>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,6 +37,13 @@ DWIDGET_USE_NAMESPACE
 int main(int argc, char *argv[])
 {
     DApplication *app = new DApplication(argc, argv);
+
+    DGuiApplicationHelper::instance()->setSingleInstanceInterval(-1);
+    if (!DGuiApplicationHelper::instance()->setSingleInstance(
+            app->applicationName(),
+            DGuiApplicationHelper::UserScope)) {
+        return 0;
+    }
 
     qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "7777");
     VNoteMainManager::instance()->initQMLRegister();

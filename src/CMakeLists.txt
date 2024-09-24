@@ -66,16 +66,5 @@ pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
 include_directories(${GSTREAMER_INCLUDE_DIRS})
 target_link_libraries(${BIN_NAME} PRIVATE ${GSTREAMER_LIBRARIES})
 
-file(GLOB TS LIST_DIRECTORIES false ${PROJECT_SOURCE_DIR}/translations/${BIN_NAME}*.ts)
-set_source_files_properties(${TS}
-    PROPERTIES OUTPUT_LOCATION ${PROJECT_SOURCE_DIR}/translations)
-set(translate ${PROJECT_SOURCE_DIR}/translations)
-
-if (NOT (${CMAKE_BUILD_TYPE} MATCHES "Debug"))
-    qt6_add_translation(QM_FILES ${TS})
-else()
-    qt6_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${TS} OPTIONS -source-language en_US -no-obsolete)
-endif ()
-
 # Add install rule
 install(TARGETS ${BIN_NAME} DESTINATION ${APP_BIN_INSTALL_DIR})
