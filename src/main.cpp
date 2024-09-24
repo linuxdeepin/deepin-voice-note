@@ -25,6 +25,7 @@
 
 #include <DApplication>
 #include <DGuiApplicationHelper>
+#include <DLog>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,6 +34,7 @@
 #include <unistd.h>
 
 DWIDGET_USE_NAMESPACE
+DCORE_USE_NAMESPACE
 
 int main(int argc, char *argv[])
 {
@@ -62,6 +64,9 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);   
     engine.load(url);
     VNoteMainManager::instance()->initNote();
+
+    DLogManager::registerConsoleAppender();
+    DLogManager::registerFileAppender();
 
     return app->exec();
 }
