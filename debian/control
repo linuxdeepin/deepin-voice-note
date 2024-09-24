@@ -12,7 +12,7 @@ Build-Depends:
  qt6-webchannel-dev,
  qt6-webengine-dev,
  qt6-multimedia-dev,
- qtchooser,
+ qt6-l10n-tools,
  pkg-config,
  libsqlite3-dev,
  libglib2.0-dev,
