@@ -11,6 +11,8 @@ Build-Depends:
  qt6-declarative-dev,
  qt6-webchannel-dev,
  qt6-webengine-dev,
+ qt6-multimedia-dev,
+ qtchooser,
  pkg-config,
  libsqlite3-dev,
  libglib2.0-dev,

@@ -13,7 +13,7 @@ endif()
 
 list(APPEND RESOURCES ${CMAKE_PROJECT_NAME}.qrc deepin-voice-note-web.qrc)
 
-find_package(Qt6 6.6 REQUIRED COMPONENTS Core Widgets Quick DBus Sql WebEngineQuick Multimedia LinguistTools)
+find_package(Qt6 6.6 REQUIRED COMPONENTS Core Widgets Quick DBus Sql WebEngineQuick Multimedia)
 find_package(Dtk6 COMPONENTS Core Widget Gui REQUIRED)
 
 find_package(PkgConfig REQUIRED)

@@ -26,5 +26,5 @@ ts_list=(`ls ${translations_dir}/*.ts`)
 for ts in "${ts_list[@]}"
 do
     printf "\nprocess ${ts}\n"
-    lrelease "${ts}"
+    /usr/bin/lrelease "${ts}"
 done
