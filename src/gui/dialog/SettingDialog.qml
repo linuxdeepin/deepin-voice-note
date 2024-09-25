@@ -31,6 +31,10 @@ Settings.SettingsDialog {
                     key: audioSource
                     name: qsTr("Audio Source")
 
+                    background: Settings.ContentBackground {
+                        color: palette.base
+                    }
+
                     Settings.SettingsOption {
                         id: source
 
@@ -71,7 +75,4 @@ Settings.SettingsDialog {
             ]
         }
     ]
-    header: DialogTitleBar {
-        enableInWindowBlendBlur: false
-    }
 }

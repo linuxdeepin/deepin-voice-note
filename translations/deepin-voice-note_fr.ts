@@ -22,7 +22,7 @@
         <translation>Voix</translation>
     </message>
     <message>
-        <location filename="../src/db/vnoteitemoper.cpp" line="215"/>
+        <location filename="../src/db/vnoteitemoper.cpp" line="214"/>
         <source>Text</source>
         <translation type="unfinished"></translation>
     </message>
@@ -30,17 +30,17 @@
 <context>
     <name>FolderListView</name>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="409"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="410"/>
         <source>Rename</source>
         <translation type="unfinished">Renommer</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="417"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="418"/>
         <source>Delete</source>
         <translation type="unfinished">Supprimer</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="435"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="436"/>
         <source>New Note</source>
         <translation type="unfinished"></translation>
     </message>
@@ -90,12 +90,12 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="244"/>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="246"/>
         <source>Create Notebook</source>
         <translation type="unfinished">Créer un carnet de notes</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="334"/>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="341"/>
         <source>Search</source>
         <translation type="unfinished">Rechercher</translation>
     </message>
@@ -126,22 +126,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="53"/>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="55"/>
         <source>Move</source>
         <translation type="unfinished">Déplacer</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="64"/>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="67"/>
         <source>Save Note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="75"/>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="78"/>
         <source>Save Voice</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="86"/>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="89"/>
         <source>Delete</source>
         <translation type="unfinished">Supprimer</translation>
     </message>
@@ -326,12 +326,12 @@
         <translation type="unfinished">Source audio</translation>
     </message>
     <message>
-        <location filename="../src/gui/dialog/SettingDialog.qml" line="55"/>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="59"/>
         <source>Internal</source>
         <translation type="unfinished">Interne</translation>
     </message>
     <message>
-        <location filename="../src/gui/dialog/SettingDialog.qml" line="64"/>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="68"/>
         <source>Microphone</source>
         <translation type="unfinished">Microphone</translation>
     </message>
@@ -660,37 +660,42 @@ Toutes les notes qu&apos;il contient seront supprimées</translation>
 <context>
     <name>WindowTitleBar</name>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="28"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="29"/>
         <source>Settings</source>
         <translation type="unfinished">Paramètres</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="54"/>
-        <source>Music is a local music player with beautiful design and simple functions.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="56"/>
-        <source>Music</source>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="55"/>
+        <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="57"/>
+        <source>Voice Note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="58"/>
         <source>Version:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="87"/>
-        <source>Previous page</source>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="88"/>
+        <source>Create Note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="115"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="127"/>
         <source>Start recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="130"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="127"/>
+        <source>No recording device detected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="145"/>
         <source>Insert picture</source>
         <translation type="unfinished"></translation>
     </message>

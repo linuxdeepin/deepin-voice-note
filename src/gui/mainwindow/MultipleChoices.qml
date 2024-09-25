@@ -38,6 +38,8 @@ Item {
             }
 
             FloatingPanel {
+                property int fontSize: 6
+
                 Layout.topMargin: 20
                 implicitHeight: 52
                 implicitWidth: 188
@@ -58,6 +60,7 @@ Item {
                     }
 
                     ToolButton {
+                        font: DTK.fontManager.t12
                         icon.name: "save_note"
                         implicitHeight: 40
                         implicitWidth: 40

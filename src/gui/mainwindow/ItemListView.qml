@@ -210,6 +210,14 @@ Item {
 
         menuType: ActionManager.NoteCtxMenu
 
+        onAboutToShow: {
+            var setTop = true;
+            if (itemModel.get(itemListView.contextIndex).isTop === "top") {
+                setTop = false;
+            }
+            var topItem = ActionManager.getActionById(ActionManager.NoteTop);
+            topItem.text = setTop ? qsTr("Sticky on Top") : qsTr("Unpin");
+        }
         onActionTrigger: actionId => {
             switch (actionId) {
             case ActionManager.NoteRename:
@@ -224,8 +232,6 @@ Item {
                     setTop = false;
                 }
                 VNoteMainManager.updateTop(itemModel.get(itemListView.contextIndex).noteId, setTop);
-                var topItem = ActionManager.getActionById(actionId);
-                topItem.text = setTop ? qsTr("Unpin") : qsTr("Sticky on Top");
                 break;
             case ActionManager.NoteMove:
                 dialogWindow.show();
@@ -319,6 +325,8 @@ Item {
         visible: true
 
         delegate: Rectangle {
+            id: rootItemDelegate
+
             property bool isRename: false
             property bool isSelected: false
 
@@ -339,6 +347,9 @@ Item {
                         isRename = false;
                     }
                 }
+            }
+            onIsRenameChanged: {
+                renameLine.forceActiveFocus();
             }
 
             ColumnLayout {
@@ -380,18 +391,17 @@ Item {
 
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    focus: isRename
                     text: model.name
-                    visible: isRename
+                    visible: rootItemDelegate.isRename
 
                     backgroundColor: Palette {
                         normal: Qt.rgba(1, 1, 1, 0.85)
                         normalDark: Qt.rgba(1, 1, 1, 0.85)
                     }
 
-                    onFocusChanged: {
+                    onActiveFocusChanged: {
                         noteItemMouseArea.enabled = false;
-                        if (focus) {
+                        if (activeFocus) {
                             selectAll();
                         } else {
                             if (text.length !== 0 && text !== model.name) {
@@ -399,6 +409,7 @@ Item {
                                 VNoteMainManager.renameNote(model.noteId, text);
                             }
                             noteItemMouseArea.enabled = true;
+                            rootItemDelegate.isRename = false;
                         }
                     }
                 }

@@ -15,8 +15,8 @@ ApplicationWindow {
 
     property int createFolderBtnHeight: 40
     property int leftViewWidth: 200
-    property int windowMiniHeight: 680
-    property int windowMiniWidth: 1070
+    property int windowMiniHeight: 300
+    property int windowMiniWidth: 680
 
     function toggleTwoColumnMode() {
         if (leftBgArea.visible === false) {
@@ -31,11 +31,11 @@ ApplicationWindow {
     DWindow.alphaBufferSize: 8
     DWindow.enabled: true
     flags: Qt.Window | Qt.WindowMinMaxButtonsHint | Qt.WindowCloseButtonHint | Qt.WindowTitleHint
-    height: windowMiniHeight
+    height: 680
     minimumHeight: windowMiniHeight
     minimumWidth: windowMiniWidth
     visible: true
-    width: windowMiniWidth
+    width: 1070
     x: Screen.width / 2 - width / 2
     y: Screen.height / 2 - height / 2
 
@@ -147,6 +147,8 @@ ApplicationWindow {
             folderListView.opacity = 0.4;
             folderListView.enabled = false;
             createFolderButton.enabled = false;
+            webEngineView.webVisible = false;
+            webEngineView.noSearchResult = true;
         }
         onSearchFinished: {
             label.visible = false;
@@ -200,7 +202,7 @@ ApplicationWindow {
 
             Layout.fillHeight: true//#F2F6F8
             Layout.preferredWidth: leftViewWidth
-            color: DTK.themeType === ApplicationHelper.LightType ? Qt.rgba(242 / 255, 246 / 255, 248 / 255, 1) : Qt.rgba(16.0 / 255.0, 16.0 / 255.0, 16.0 / 255.0, 0.85)
+            color: DTK.themeType === ApplicationHelper.LightType ? "#EBF6FF" : "#101010"
 
             Rectangle {
                 anchors.right: parent.right
@@ -224,6 +226,7 @@ ApplicationWindow {
 
                     onFolderEmpty: {
                         initRect.visible = true;
+                        initiaInterface.loadFinished(false);
                     }
                     onItemChanged: {
                         label.text = name;
@@ -282,12 +285,14 @@ ApplicationWindow {
                 anchors.fill: parent
                 cursorShape: Qt.SizeHorCursor
                 drag.axis: Drag.XAxis
+                drag.maximumX: 200
+                drag.minimumX: 130
                 drag.target: leftDragHandle
 
                 onPositionChanged: {
                     if (drag.active) {
-                        var newWidth = leftDragHandle.x + leftDragHandle.width - leftBgArea.x;
-                        if (newWidth >= 100 && newWidth <= 400) {
+                        var newWidth = leftDragHandle.x;
+                        if (newWidth >= 130 && newWidth <= 200) {
                             leftBgArea.Layout.preferredWidth = newWidth;
                             rightBgArea.Layout.preferredWidth = rowLayout.width - leftBgArea.width - leftDragHandle.width;
                         }
@@ -301,11 +306,12 @@ ApplicationWindow {
 
             Layout.fillHeight: true
             Layout.preferredWidth: leftViewWidth
-            color: Qt.rgba(0, 0, 0, 0.05)
+            color: DTK.themeType === ApplicationHelper.LightType ? "#F1F5F8" : "#D9000000"
 
             ColumnLayout {
                 Layout.topMargin: 7
                 anchors.fill: parent
+                spacing: 15
 
                 SearchEdit {
                     id: search
@@ -324,6 +330,8 @@ ApplicationWindow {
                         folderListView.enabled = true;
                         createFolderButton.enabled = true;
                         itemListView.isSearch = false;
+                        webEngineView.webVisible = true;
+                        webEngineView.noSearchResult = false;
                         VNoteMainManager.clearSearch();
                     }
 
@@ -386,18 +394,24 @@ ApplicationWindow {
             color: middeleBgArea.color
 
             MouseArea {
+                id: rightMouseArea
+
                 anchors.fill: parent
                 cursorShape: Qt.SizeHorCursor
                 drag.axis: Drag.XAxis
+                drag.maximumX: 400
+                drag.minimumX: 260
                 drag.target: rightDragHandle
 
                 onPositionChanged: {
                     if (drag.active) {
-                        var newWidth = rightDragHandle.x + rightDragHandle.width - middeleBgArea.x;
-                        if (newWidth >= 100 && newWidth <= 400) {
+                        var newWidth = rightDragHandle.x - middeleBgArea.x;
+                        if (newWidth >= 130 && newWidth <= 200) {
                             middeleBgArea.Layout.preferredWidth = newWidth;
-                            rightBgArea.Layout.preferredWidth = rowLayout.width - middeleBgArea.width - rightDragHandle.width;
+                        } else {
+                            leftBgArea.Layout.preferredWidth = rightDragHandle.x - leftDragHandle.width - middeleBgArea.width;
                         }
+                        rightBgArea.Layout.preferredWidth = rowLayout.width - middeleBgArea.width - rightDragHandle.width;
                     }
                 }
             }

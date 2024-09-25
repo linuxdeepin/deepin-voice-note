@@ -7,6 +7,7 @@ TitleBar {
     id: titleBar
 
     property bool recorderBtnEnable: true
+    property bool recordingHover: false
 
     signal createNote
     signal insertImage
@@ -50,10 +51,10 @@ TitleBar {
 
         AboutAction {
             aboutDialog: AboutDialog {
-                companyLogo: globalVariant.appIconName
-                description: qsTr("Music is a local music player with beautiful design and simple functions.")
-                productIcon: globalVariant.appIconName
-                productName: qsTr("Music")
+                companyLogo: "deepin-voice-note"
+                description: qsTr("Voice Notes is a lightweight memo tool to make text notes and voice recordings.")
+                productIcon: "deepin-voice-note"
+                productName: qsTr("Voice Note")
                 version: qsTr("Version:") + "%1".arg(Qt.application.version)
                 websiteLink: DTK.deepinWebsiteLink
                 websiteName: DTK.deepinWebsiteName
@@ -84,52 +85,65 @@ TitleBar {
         }
 
         ToolTip {
-            text: qsTr("Previous page")
+            text: qsTr("Create Note")
+            visible: newNoteBtn.hovered
         }
     }
 
-    Component {
-        id: titleBarContent
+    Rectangle {
+        id: maskRect
 
-        RowLayout {
-            id: titleRowLayout
+        anchors.fill: recordBtn
+        color: "transparent"
+        visible: !recordBtn.enabled
 
-            anchors.fill: parent
+        MouseArea {
+            hoverEnabled: true
 
-            Item {
-                Layout.fillWidth: true
+            onEntered: {
+                recordingHover = true;
             }
-
-            ToolButton {
-                id: recordBtn
-
-                enabled: recorderBtnEnable
-                hoverEnabled: true
-                icon.name: "record"
-
-                onClicked: {
-                    startRecording();
-                }
-
-                ToolTip {
-                    text: qsTr("Start recording")
-                }
+            onExited: {
+                recordingHover = false;
             }
+        }
+    }
 
-            ToolButton {
-                id: insImgBtn
+    ToolButton {
+        id: recordBtn
 
-                hoverEnabled: true
-                icon.name: "img"
+        anchors.right: insImgBtn.left
+        anchors.rightMargin: 6
+        anchors.verticalCenter: titleBar.verticalCenter
+        enabled: recorderBtnEnable
+        hoverEnabled: true
+        icon.name: "record"
 
-                onClicked: {
-                    insertImage();
-                }
+        onClicked: {
+            startRecording();
+        }
 
-                ToolTip {
-                    text: qsTr("Insert picture")
-                }
-            }
+        ToolTip {
+            text: recordBtn.enabled ? qsTr("Start recording") : qsTr("No recording device detected")
+            visible: recordBtn.hovered || recordingHover
+        }
+    }
+
+    ToolButton {
+        id: insImgBtn
+
+        anchors.verticalCenter: titleBar.verticalCenter
+        hoverEnabled: true
+        icon.name: "img"
+        x: titleBar.__includedAreaX - recordBtn.width - 10
+
+        onClicked: {
+            insertImage();
+        }
+
+        ToolTip {
+            text: qsTr("Insert picture")
+            visible: insImgBtn.hovered
         }
     }
 }
