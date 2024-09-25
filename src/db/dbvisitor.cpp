@@ -673,7 +673,7 @@ bool RenameNoteDbVisitor::prepareSqls()
         .arg(note->noteId);
 
         QDateTime modifyTime = QDateTime::currentDateTime();
-        QString updateSql = QString("UPDATE %1 SET %2=%3 WHERE %4=%5;")
+        QString updateSql = QString("UPDATE %1 SET %2='%3' WHERE %4=%5;")
         .arg(VNoteDbManager::FOLDER_TABLE_NAME)
         .arg(DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data())
         .arg(modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data())

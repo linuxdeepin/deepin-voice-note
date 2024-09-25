@@ -52,6 +52,7 @@ void ActionManager::initMenu()
     makeAction(NoteTop, QCoreApplication::translate("NotesContextMenu", "Sticky on Top"));
     makeAction(NoteMove, QCoreApplication::translate("NotesContextMenu", "Move"));
     makeAction(NoteDelete, QCoreApplication::translate("NotesContextMenu", "Delete"));
+    makeAction(NoteSeparator, {}, MenuSeparatorComponent);
     makeAction(NoteSave, QCoreApplication::translate("NotesContextMenu", "Save note"), MenuComponent);
     makeAction(NoteSaveVoice, QCoreApplication::translate("NotesContextMenu", "Save voice recording"));
     makeAction(NoteSeparator, {}, MenuSeparatorComponent);

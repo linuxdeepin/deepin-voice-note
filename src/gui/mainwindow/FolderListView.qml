@@ -215,6 +215,9 @@ Item {
                     break;
                 }
             }
+            onIsRenameChanged: {
+                renameLine.forceActiveFocus();
+            }
 
             RowLayout {
                 id: rowlayout
@@ -273,7 +276,6 @@ Item {
                     Layout.fillWidth: true
                     Layout.rightMargin: 5
                     bottomPadding: 0
-                    focus: rootItem.isRename
                     implicitHeight: 24
                     text: model.name
                     topPadding: 0
@@ -285,13 +287,18 @@ Item {
                         normalDark: Qt.rgba(1, 1, 1, 0.85)
                     }
 
-                    onFocusChanged: {
+                    onActiveFocusChanged: {
                         folderMouseArea.enabled = false;
-                        if (focus) {
+                        if (activeFocus) {
                             selectAll();
                         } else {
+                            if (text.length !== 0 && text !== model.name) {
+                                model.name = text;
+                                VNoteMainManager.renameFolder(index, text);
+                            }
                             folderMouseArea.enabled = true;
                             deselect();
+                            rootItem.isRename = false;
                         }
                     }
                 }
@@ -300,6 +307,7 @@ Item {
                     id: folderNameLabel
 
                     Layout.fillWidth: true
+                    elide: Text.ElideRight
                     font.pixelSize: 14
                     horizontalAlignment: Text.AlignLeft
                     text: model.name

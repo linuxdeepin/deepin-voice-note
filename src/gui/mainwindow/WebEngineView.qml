@@ -16,6 +16,9 @@ import "../dialog"
 Item {
     id: rootItem
 
+    property bool noSearchResult: false
+    property bool webVisible: true
+
     signal deleteNote
     signal moveNote
     signal saveAudio
@@ -33,7 +36,7 @@ Item {
 
     function toggleMultCho(choices) {
         if (choices > 1) {
-            webView.visible = false;
+            webVisible = false;
             if (!multipleChoicesLoader.active) {
                 multipleChoicesLoader.active = true;
             }
@@ -42,7 +45,7 @@ Item {
             multipleChoicesLoader.item.selectSize = choices;
         } else {
             multipleChoicesLoader.visible = false;
-            webView.visible = true;
+            webVisible = true;
             multipleChoicesLoader.item.visible = false;
         }
     }
@@ -61,6 +64,24 @@ Item {
             height: 40
         }
 
+        Rectangle {
+            id: noSearchRect
+
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            // 设置基础背景颜色，和 web 前端共同实现背景色
+            color: webView.backgroundColor
+            visible: noSearchResult
+
+            IconLabel {
+                id: noSearchIcon
+
+                anchors.centerIn: noSearchRect
+                icon.source: "qrc:/dsg/icons/search_no_results.dci"
+                visible: noSearchResult
+            }
+        }
+
         WebEngineView {
             id: webView
 
@@ -68,6 +89,7 @@ Item {
             Layout.fillWidth: true
             // 设置基础背景颜色，和 web 前端共同实现背景色
             backgroundColor: DTK.themeType === ApplicationHelper.LightType ? "white" : "black"
+            visible: webVisible
 
             Component.onCompleted: {
                 noteWebChannel.registerObject("webobj", Webobj);
