@@ -658,7 +658,8 @@ int VNoteMainManager::loadSearchNotes(const QString &key)
     if (key.isEmpty())
         return -1;
     VNOTE_ALL_NOTES_MAP *noteAll = VNoteDataManager::instance()->getAllNotesInFolder();
-    QList<QVariantMap> notesDataList;    
+    QList<QVariantMap> notesDataList;
+    m_noteItems.clear();
     if (noteAll) {
         noteAll->lock.lockForRead();
         for (auto &foldeNotes : noteAll->notes) {
@@ -673,6 +674,7 @@ int VNoteMainManager::loadSearchNotes(const QString &key)
                     data.insert(NOTE_FOLDER_NAME_KEY, folder->name);
                     data.insert(NOTE_FOLDER_ICON_KEY, QString::number(folder->defaultIcon));
                     notesDataList.append(data);
+                    m_noteItems.append(note);
                 }
             }
         }
