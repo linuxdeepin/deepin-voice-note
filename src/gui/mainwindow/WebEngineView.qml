@@ -37,6 +37,7 @@ Item {
     function toggleMultCho(choices) {
         if (choices > 1) {
             webVisible = false;
+            webRect.visible = false;
             if (!multipleChoicesLoader.active) {
                 multipleChoicesLoader.active = true;
             }
@@ -46,6 +47,7 @@ Item {
         } else {
             multipleChoicesLoader.visible = false;
             webVisible = true;
+            webRect.visible = true;
             multipleChoicesLoader.item.visible = false;
         }
     }
@@ -84,6 +86,8 @@ Item {
         }
 
         Rectangle {
+            id: webRect
+
             Layout.fillHeight: true
             Layout.fillWidth: true
             color: "transparent"

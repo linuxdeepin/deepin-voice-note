@@ -60,10 +60,11 @@ Item {
                     }
 
                     ToolButton {
-                        font: DTK.fontManager.t12
                         icon.name: "save_note"
                         implicitHeight: 40
-                        implicitWidth: 40
+                        implicitWidth: 48
+                        leftPadding: 0
+                        rightPadding: 0
                         text: qsTr("Save Note")
 
                         onClicked: {
@@ -74,7 +75,9 @@ Item {
                     ToolButton {
                         icon.name: "save_audio"
                         implicitHeight: 40
-                        implicitWidth: 40
+                        implicitWidth: 48
+                        leftPadding: 0
+                        rightPadding: 0
                         text: qsTr("Save Voice")
 
                         onClicked: {
