@@ -313,6 +313,8 @@ Item {
                             if (text.length !== 0 && text !== model.name) {
                                 model.name = text;
                                 VNoteMainManager.renameFolder(index, text);
+                            } else {
+                                renameLine.text = model.name;
                             }
                             folderMouseArea.enabled = true;
                             deselect();

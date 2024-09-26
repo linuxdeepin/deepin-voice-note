@@ -422,6 +422,8 @@ Item {
                             if (text.length !== 0 && text !== model.name) {
                                 model.name = text;
                                 VNoteMainManager.renameNote(model.noteId, text);
+                            } else {
+                                renameLine.text = model.text;
                             }
                             noteItemMouseArea.enabled = true;
                             rootItemDelegate.isRename = false;

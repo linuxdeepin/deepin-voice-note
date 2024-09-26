@@ -200,9 +200,11 @@ ApplicationWindow {
     IconLabel {
         id: appImage
 
-        height: 20
+        height: 30
+        icon.height: 20
         icon.name: "deepin-voice-note"
-        width: 20
+        icon.width: 20
+        width: 30
         x: 10
         y: 10
         z: 100
@@ -217,7 +219,7 @@ ApplicationWindow {
         icon.width: 30
         width: 30
         x: 50
-        y: 5
+        y: 10
         z: 100
 
         onClicked: {
@@ -378,7 +380,7 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     Layout.leftMargin: offect
                     Layout.preferredHeight: 30
-                    Layout.topMargin: 8
+                    Layout.topMargin: 12
                     placeholder: qsTr("Search")
 
                     Keys.onPressed: {
