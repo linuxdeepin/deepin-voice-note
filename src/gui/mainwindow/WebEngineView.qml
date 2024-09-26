@@ -62,6 +62,7 @@ Item {
 
             Layout.fillWidth: true
             height: 40
+            imageBtnEnable: webVisible
         }
 
         Rectangle {
@@ -82,60 +83,65 @@ Item {
             }
         }
 
-        WebEngineView {
-            id: webView
-
+        Rectangle {
             Layout.fillHeight: true
             Layout.fillWidth: true
-            // 设置基础背景颜色，和 web 前端共同实现背景色
-            backgroundColor: DTK.themeType === ApplicationHelper.LightType ? "white" : "black"
-            visible: webVisible
+            color: "transparent"
 
-            Component.onCompleted: {
-                noteWebChannel.registerObject("webobj", Webobj);
-                // console.log("registerObject ret: " + ret)
-                webView.webChannel = noteWebChannel;
-                webView.url = Qt.resolvedUrl(Webobj.webPath());
+            WebEngineView {
+                id: webView
 
-                // 隐藏浮动工具栏
-                Webobj.calllJsShowEditToolbar(0, 0);
-            }
-            onContextMenuRequested: req => {
-                // 响应右键菜单，处理完成后 handler 抛出 requestShowMenu() 信号
-                handler.onContextMenuRequested(req);
-            }
-            onJavaScriptConsoleMessage: {
-                // 调试使用，打印控制台输出
-                console.debug("--- from web: ", message, sourceID, lineNumber);
-            }
+                anchors.fill: parent
+                // 设置基础背景颜色，和 web 前端共同实现背景色
+                backgroundColor: DTK.themeType === ApplicationHelper.LightType ? "white" : "black"
+                visible: webVisible
 
-            WebEngineHandler {
-                id: handler
+                Component.onCompleted: {
+                    noteWebChannel.registerObject("webobj", Webobj);
+                    // console.log("registerObject ret: " + ret)
+                    webView.webChannel = noteWebChannel;
+                    webView.url = Qt.resolvedUrl(Webobj.webPath());
 
-                target: webView
-
-                onLoadRichText: {
-                    VNoteMainManager.vNoteChanged(itemListView.model.get(0).noteId);
-                    itemListView.selectedNoteItem = [0];
-                    itemListView.selectSize = 1;
+                    // 隐藏浮动工具栏
+                    Webobj.calllJsShowEditToolbar(0, 0);
                 }
-                onRequesetCallJsSynchronous: func => {
-                    webView.runJavaScript(func, function (result) {
-                            onCallJsResult(result);
-                        });
+                onContextMenuRequested: req => {
+                    // 响应右键菜单，处理完成后 handler 抛出 requestShowMenu() 信号
+                    handler.onContextMenuRequested(req);
                 }
-                onRequestMessageDialog: type => {
-                    // 触发创建提示对话框
-                    messageDialogLoader.showDialog(type);
+                onJavaScriptConsoleMessage: {
+                    // 调试使用，打印控制台输出
+                    console.debug("--- from web: ", message, sourceID, lineNumber);
                 }
-                onTriggerWebAction: action => {
-                    webView.triggerWebAction(action);
-                }
-            }
 
-            WebChannel {
-                id: noteWebChannel
+                WebEngineHandler {
+                    id: handler
 
+                    target: webView
+
+                    onLoadRichText: {
+                        VNoteMainManager.vNoteChanged(itemListView.model.get(0).noteId);
+                        itemListView.selectedNoteItem = [0];
+                        itemListView.selectSize = 1;
+                    }
+                    onRequesetCallJsSynchronous: func => {
+                        webView.runJavaScript(func, function (result) {
+                                onCallJsResult(result);
+                            });
+                    }
+                    onRequestMessageDialog: type => {
+                        // 触发创建提示对话框
+                        messageDialogLoader.showDialog(type);
+                    }
+                    onTriggerWebAction: action => {
+                        webView.triggerWebAction(action);
+                    }
+                }
+
+                WebChannel {
+                    id: noteWebChannel
+
+                }
             }
         }
 

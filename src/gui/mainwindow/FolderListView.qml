@@ -11,6 +11,8 @@ import "../drag/"
 import "../dialog/"
 
 Item {
+    id: root
+
     property int currentDropIndex: -1
     property int itemHeight: 30
     property int lastDropIndex: -1
@@ -18,6 +20,7 @@ Item {
     property int listWidth: 200
     property alias model: folderListView.model
 
+    signal emptyItemList(bool isEmpty)
     signal folderEmpty
     signal itemChanged(int index, string name)
     signal updateFolderName(string name)
@@ -29,17 +32,14 @@ Item {
     function addNote(size) {
         var cout = model.get(folderListView.currentIndex).count;
         model.get(folderListView.currentIndex).count = (Number(cout) + size).toString();
+        root.emptyItemList(false);
     }
 
     function delNote(size) {
         var cout = model.get(folderListView.currentIndex).count;
         var new_cout = Number(cout) - size;
-        if (new_cout <= 0)
-        //TODO: 删除记事本
-        {
-        } else {
-            model.get(folderListView.currentIndex).count = new_cout.toString();
-        }
+        root.emptyItemList(new_cout <= 0);
+        model.get(folderListView.currentIndex).count = new_cout.toString();
     }
 
     function dropItems(selectedNoteItem) {
@@ -111,6 +111,23 @@ Item {
     visible: true
     width: listWidth
 
+    Component.onCompleted: {
+        root.forceActiveFocus();
+    }
+    Keys.onDeletePressed: {
+        messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteFolder, ret => {
+                if (ret) {
+                    VNoteMainManager.vNoteDeleteFolder(folderListView.currentIndex);
+                    if (folderModel.count === 1)
+                        folderEmpty();
+                    folderModel.remove(folderListView.currentIndex);
+                    if (folderListView.currentIndex === 0) {
+                        folderListView.currentIndex = 0;
+                    }
+                }
+            });
+    }
+
     ListModel {
         id: folderModel
 
@@ -141,6 +158,7 @@ Item {
             if (folderListView.itemAtIndex(folderListView.currentIndex + 1)) {
                 folderListView.itemAtIndex(folderListView.currentIndex + 1).isHovered = false;
             }
+            root.forceActiveFocus();
         }
     }
 
@@ -340,6 +358,7 @@ Item {
                 hoverEnabled: true
 
                 onClicked: {
+                    root.forceActiveFocus();
                     if (folderListView.itemAtIndex(folderListView.lastCurrentIndex)) {
                         folderListView.itemAtIndex(folderListView.lastCurrentIndex).isRename = false;
                     }
@@ -452,6 +471,15 @@ Item {
         onCurrentItemChanged: {
             var index = folderListView.currentIndex;
             itemChanged(index, folderModel.get(index).name); // 发出 itemChanged 信号
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            propagateComposedEvents: true
+
+            onPressed: {
+                root.forceActiveFocus();
+            }
         }
     }
 }

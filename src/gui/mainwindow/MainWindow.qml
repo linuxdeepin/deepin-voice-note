@@ -15,6 +15,8 @@ ApplicationWindow {
 
     property int createFolderBtnHeight: 40
     property int leftViewWidth: 200
+    property int tmpLeftAreaWidth: 200
+    property int tmpWebViewWidth: 0
     property int windowMiniHeight: 300
     property int windowMiniWidth: 680
 
@@ -77,6 +79,11 @@ ApplicationWindow {
 
         function handleUpdateNoteList(notesData) {
             itemListView.model.clear();
+            if (notesData.length === 0) {
+                webEngineView.webVisible = false;
+            } else {
+                webEngineView.webVisible = true;
+            }
             for (var i = 0; i < notesData.length; i++) {
                 var itemIsTop = notesData[i].isTop ? "top" : "normal";
                 itemListView.model.append({
@@ -109,6 +116,7 @@ ApplicationWindow {
             itemListView.selectedNoteItem = [getSelect];
             itemListView.selectSize = 1;
             folderListView.addNote(1);
+            itemListView.forceActiveFocus();
         }
 
         target: VNoteMainManager
@@ -117,8 +125,9 @@ ApplicationWindow {
             handleaddNote(notesData);
         }
         onFinishedFolderLoad: {
-            if (foldersData.length > 0)
+            if (foldersData.length > 0) {
                 initRect.visible = false;
+            }
             initiaInterface.loadFinished(foldersData.length > 0);
             handleFinishedFolderLoad(foldersData);
             itemListView.selectedNoteItem = [0];
@@ -134,6 +143,11 @@ ApplicationWindow {
                 itemListView.model.remove(itemListView.selectedNoteItem[i]);
             }
             itemListView.selectedNoteItem = [];
+            if (Number(folderListView.model.get(srcFolderIndex).count) === 0) {
+                webEngineView.webVisible = false;
+            } else {
+                webEngineView.webVisible = true;
+            }
             if (!itemListView.view.itemAtIndex(minIndex)) {
                 minIndex = itemListView.model.count - 1;
             }
@@ -204,18 +218,11 @@ ApplicationWindow {
             Layout.preferredWidth: leftViewWidth
             color: DTK.themeType === ApplicationHelper.LightType ? "#EBF6FF" : "#101010"
 
-            Rectangle {
-                anchors.right: parent.right
-                color: DTK.themeType === ApplicationHelper.LightType ? "#eee7e7e7" : "#ee252525"
-                height: parent.height
-                width: 1
-            }
-
             ColumnLayout {
                 anchors.bottomMargin: 10
                 anchors.fill: parent
                 anchors.leftMargin: 10
-                anchors.rightMargin: 10
+                anchors.rightMargin: 5
                 anchors.topMargin: 50
 
                 FolderListView {
@@ -224,6 +231,9 @@ ApplicationWindow {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
 
+                    onEmptyItemList: isEmpty => {
+                        webEngineView.webVisible = !isEmpty;
+                    }
                     onFolderEmpty: {
                         initRect.visible = true;
                         initiaInterface.loadFinished(false);
@@ -279,7 +289,14 @@ ApplicationWindow {
 
             Layout.fillHeight: true
             Layout.preferredWidth: 5
-            color: middeleBgArea.color
+            color: leftBgArea.color
+
+            Rectangle {
+                anchors.right: parent.right
+                color: DTK.themeType === ApplicationHelper.LightType ? "#eee7e7e7" : "#ee252525"
+                height: parent.height
+                width: 1
+            }
 
             MouseArea {
                 anchors.fill: parent
@@ -294,6 +311,7 @@ ApplicationWindow {
                         var newWidth = leftDragHandle.x;
                         if (newWidth >= 130 && newWidth <= 200) {
                             leftBgArea.Layout.preferredWidth = newWidth;
+                            tmpLeftAreaWidth = newWidth;
                             rightBgArea.Layout.preferredWidth = rowLayout.width - leftBgArea.width - leftDragHandle.width;
                         }
                     }
@@ -311,6 +329,8 @@ ApplicationWindow {
             ColumnLayout {
                 Layout.topMargin: 7
                 anchors.fill: parent
+                anchors.leftMargin: 10
+                anchors.rightMargin: 5
                 spacing: 15
 
                 SearchEdit {
@@ -410,6 +430,7 @@ ApplicationWindow {
                             middeleBgArea.Layout.preferredWidth = newWidth;
                         } else {
                             leftBgArea.Layout.preferredWidth = rightDragHandle.x - leftDragHandle.width - middeleBgArea.width;
+                            tmpLeftAreaWidth = leftBgArea.Layout.preferredWidth;
                         }
                         rightBgArea.Layout.preferredWidth = rowLayout.width - middeleBgArea.width - rightDragHandle.width;
                     }
@@ -495,6 +516,7 @@ ApplicationWindow {
         }
         onStarted: {
             leftDragHandle.visible = false;
+            tmpWebViewWidth = rightBgArea.width;
         }
 
         NumberAnimation {
@@ -507,7 +529,7 @@ ApplicationWindow {
 
         NumberAnimation {
             duration: 200
-            from: leftViewWidth + 5
+            from: leftBgArea.width + leftDragHandle.width
             property: "x"
             target: middeleBgArea
             to: 0
@@ -515,10 +537,18 @@ ApplicationWindow {
 
         NumberAnimation {
             duration: 200
-            from: leftViewWidth
+            from: leftBgArea.width + leftDragHandle.width + middeleBgArea.width + rightDragHandle.width
+            property: "x"
+            target: rightBgArea
+            to: middeleBgArea.width + rightDragHandle.width
+        }
+
+        NumberAnimation {
+            duration: 200
+            from: tmpWebViewWidth
             property: "width"
-            target: middeleBgArea
-            to: 260
+            target: webEngineView
+            to: middeleBgArea.width + rightDragHandle.width + tmpWebViewWidth
         }
 
         NumberAnimation {
@@ -539,7 +569,7 @@ ApplicationWindow {
             from: 0
             property: "width"
             target: leftBgArea
-            to: leftViewWidth
+            to: tmpLeftAreaWidth
         }
 
         NumberAnimation {
@@ -547,15 +577,23 @@ ApplicationWindow {
             from: 0
             property: "x"
             target: middeleBgArea
-            to: leftViewWidth + 5
+            to: tmpLeftAreaWidth + 5
         }
 
         NumberAnimation {
             duration: 200
-            from: 260
+            from: middeleBgArea.width + rightDragHandle.width
+            property: "x"
+            target: rightBgArea
+            to: tmpLeftAreaWidth + 5 + middeleBgArea.width + rightDragHandle.width
+        }
+
+        NumberAnimation {
+            duration: 200
+            from: middeleBgArea.width + rightDragHandle.width + tmpWebViewWidth
             property: "width"
-            target: middeleBgArea
-            to: leftViewWidth
+            target: rightBgArea
+            to: tmpWebViewWidth
         }
 
         NumberAnimation {

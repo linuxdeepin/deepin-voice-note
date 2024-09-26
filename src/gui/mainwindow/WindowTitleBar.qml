@@ -6,6 +6,7 @@ import org.deepin.dtk 1.0
 TitleBar {
     id: titleBar
 
+    property bool imageBtnEnable: true
     property bool recorderBtnEnable: true
     property bool recordingHover: false
 
@@ -14,7 +15,6 @@ TitleBar {
     signal startRecording
 
     Layout.fillWidth: true
-    content: titleBarContent
     height: 40
     width: 100
 
@@ -115,7 +115,7 @@ TitleBar {
         anchors.right: insImgBtn.left
         anchors.rightMargin: 6
         anchors.verticalCenter: titleBar.verticalCenter
-        enabled: recorderBtnEnable
+        enabled: recorderBtnEnable && imageBtnEnable
         hoverEnabled: true
         icon.name: "record"
 
@@ -133,6 +133,7 @@ TitleBar {
         id: insImgBtn
 
         anchors.verticalCenter: titleBar.verticalCenter
+        enabled: imageBtnEnable
         hoverEnabled: true
         icon.name: "img"
         x: titleBar.__includedAreaX - recordBtn.width - 10
