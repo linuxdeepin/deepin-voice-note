@@ -28,6 +28,7 @@ Item {
 
     signal deleteNotes(int number)
     signal dropRelease
+    signal emptyItemList
     signal mouseChanged(int mousePosX, int mousePosY)
     signal mulChoices(int choices)
     signal noteItemChanged(int index)
@@ -58,6 +59,13 @@ Item {
     }
 
     function onMoveNote() {
+        var desText = "";
+        if (selectedNoteItem.length > 1) {
+            desText = qsTr("move ") + selectedNoteItem.length + qsTr(" notes to :");
+        } else {
+            desText = qsTr("move ") + itemModel.get(itemListView.contextIndex).name + qsTr(" note to :");
+        }
+        dialogWindow.name = desText;
         dialogWindow.show();
     }
 
@@ -89,6 +97,9 @@ Item {
     visible: true
     width: 640
 
+    Keys.onDeletePressed: {
+        rootItem.onDeleteNote();
+    }
     onSelectSizeChanged: {
         mulChoices(selectSize);
     }
@@ -234,7 +245,7 @@ Item {
                 VNoteMainManager.updateTop(itemModel.get(itemListView.contextIndex).noteId, setTop);
                 break;
             case ActionManager.NoteMove:
-                dialogWindow.show();
+                onMoveNote();
                 break;
             case ActionManager.NoteDelete:
                 rootItem.onDeleteNote();
@@ -345,6 +356,10 @@ Item {
                         isRename = false;
                     } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
                         isRename = false;
+                    }
+                } else {
+                    if (event.key === Qt.key_delete) {
+                        rootItem.onDeleteNote();
                     }
                 }
             }
@@ -485,6 +500,7 @@ Item {
                 drag.target: this
 
                 onClicked: {
+                    rootItem.forceActiveFocus();
                     if (mouse.button === Qt.RightButton) {
                         if (selectedNoteItem.length > 1) {
                             ActionManager.visibleMulChoicesActions(false);
@@ -583,6 +599,15 @@ Item {
                     held = false;
                     dragControl.visible = false;
                 }
+            }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            propagateComposedEvents: true
+
+            onPressed: {
+                rootItem.forceActiveFocus();
             }
         }
 

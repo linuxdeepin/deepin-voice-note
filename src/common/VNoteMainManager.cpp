@@ -520,6 +520,7 @@ void VNoteMainManager::moveNotes(const QVariantList &index, const int &folderInd
     int srcIndex = getFloderIndexById(item->folderId);
     foreach (auto i, index) {
         VNoteItem *note = getNoteById(i.toInt());
+        m_noteItems.removeOne(note);
         if (note->isTop)
             m_currentHasTop--;
         srcNotes->lock.lockForWrite();

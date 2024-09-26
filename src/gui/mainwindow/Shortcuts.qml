@@ -59,15 +59,6 @@ Item {
     }
 
     Shortcut {
-        id: deleteShort
-
-        sequence: "Delete"
-
-        onActivated: {
-        }
-    }
-
-    Shortcut {
         id: ctrl_N
 
         sequence: "Ctrl+N"
