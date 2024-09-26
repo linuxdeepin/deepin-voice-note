@@ -38,8 +38,11 @@ ApplicationWindow {
     minimumWidth: windowMiniWidth
     visible: true
     width: 1070
-    x: Screen.width / 2 - width / 2
-    y: Screen.height / 2 - height / 2
+
+    Component.onCompleted: {
+        x = Screen.width / 2 - width / 2;
+        y = Screen.height / 2 - height / 2;
+    }
 
     Shortcuts {
         id: shortcuts
@@ -331,7 +334,7 @@ ApplicationWindow {
                 anchors.fill: parent
                 anchors.leftMargin: 10
                 anchors.rightMargin: 5
-                spacing: 15
+                spacing: 10
 
                 SearchEdit {
                     id: search
@@ -386,7 +389,8 @@ ApplicationWindow {
                     id: label
 
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 40
+                    Layout.preferredHeight: 18
+                    Layout.topMargin: 5
                     color: "#BB000000"
                     font.pixelSize: 16
                     text: ""
