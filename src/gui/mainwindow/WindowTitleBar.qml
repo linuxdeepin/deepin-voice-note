@@ -14,9 +14,8 @@ TitleBar {
     signal insertImage
     signal startRecording
 
-    Layout.fillWidth: true
     height: 40
-    width: 100
+    width: 0
 
     menu: Menu {
         width: 200

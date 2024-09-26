@@ -54,6 +54,10 @@ Item {
 
     visible: true
 
+    onNoSearchResultChanged: {
+        webRect.visible = !noSearchResult;
+    }
+
     ColumnLayout {
         id: columnLayout
 
@@ -63,7 +67,6 @@ Item {
             id: title
 
             Layout.fillWidth: true
-            height: 40
             imageBtnEnable: webVisible
         }
 

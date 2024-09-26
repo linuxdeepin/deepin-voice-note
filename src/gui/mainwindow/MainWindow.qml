@@ -17,6 +17,7 @@ ApplicationWindow {
     property int leftViewWidth: 200
     property int tmpLeftAreaWidth: 200
     property int tmpWebViewWidth: 0
+    property int tmprightDragX: 0
     property int windowMiniHeight: 300
     property int windowMiniWidth: 680
 
@@ -42,6 +43,22 @@ ApplicationWindow {
     Component.onCompleted: {
         x = Screen.width / 2 - width / 2;
         y = Screen.height / 2 - height / 2;
+    }
+    onWidthChanged: {
+        if (width < 820) {
+            var rigthX = tmprightDragX - (820 - width);
+            if (rigthX < 260 || tmprightDragX < rigthX)
+                return;
+            rightDragHandle.x = rigthX;
+            var newWidth = rightDragHandle.x - middeleBgArea.x;
+            if (newWidth >= 130 && newWidth <= 200) {
+                middeleBgArea.Layout.preferredWidth = newWidth;
+            } else {
+                leftBgArea.Layout.preferredWidth = rightDragHandle.x - leftDragHandle.width - middeleBgArea.width;
+                tmpLeftAreaWidth = leftBgArea.Layout.preferredWidth;
+            }
+            rightBgArea.Layout.preferredWidth = rowLayout.width - middeleBgArea.width - rightDragHandle.width;
+        }
     }
 
     Shortcuts {
@@ -391,7 +408,7 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 18
                     Layout.topMargin: 5
-                    color: "#BB000000"
+                    color: DTK.themeType === ApplicationHelper.LightType ? "#BB000000" : "#BBFFFFFF"
                     font.pixelSize: 16
                     text: ""
                 }
@@ -417,6 +434,10 @@ ApplicationWindow {
             Layout.preferredWidth: 5
             color: middeleBgArea.color
 
+            Component.onCompleted: {
+                tmprightDragX = rightDragHandle.x;
+            }
+
             MouseArea {
                 id: rightMouseArea
 
@@ -429,6 +450,7 @@ ApplicationWindow {
 
                 onPositionChanged: {
                     if (drag.active) {
+                        tmprightDragX = rightDragHandle.x;
                         var newWidth = rightDragHandle.x - middeleBgArea.x;
                         if (newWidth >= 130 && newWidth <= 200) {
                             middeleBgArea.Layout.preferredWidth = newWidth;

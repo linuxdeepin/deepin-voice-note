@@ -60,6 +60,11 @@ install(FILES ${APP_DESKTOP} DESTINATION share/applications)
 install(FILES ${APP_CONFIG} DESTINATION share/deepin-voice-note)
 install(FILES ${APP_LOGO} DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps/)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/web    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/deepin-voice-note)
+if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "sw_64")
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/sw/deepin-voice-note     DESTINATION /usr/share/deepin-manual/manual-assets/application/)
+else()
+    install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/deepin-voice-note     DESTINATION /usr/share/deepin-manual/manual-assets/application/)
+endif()
 
 # Unit Tests
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
