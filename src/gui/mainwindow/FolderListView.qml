@@ -198,6 +198,7 @@ Item {
         }
 
         anchors.fill: parent
+        boundsBehavior: Flickable.StopAtBounds
         clip: true
         enabled: parent.enabled
         model: folderModel
@@ -207,6 +208,7 @@ Item {
 
             property bool isHovered: false
             property bool isRename: false
+            property var startMove: [-1, -1]
 
             color: index === folderListView.currentIndex ? "#33000000" : (isHovered ? "#1A000000" : "transparent")
             enabled: folderListView.enabled
@@ -389,29 +391,36 @@ Item {
                     parent.isHovered = false;
                 }
                 onPositionChanged: {
-                    if (held) {
-                        if (held && folderModel.get(folderListView.currentIndex)) {
-                            if (dragControl.imageSource === "") {
-                                parent.grabToImage(function (result) {
-                                        dragControl.imageSource = result.url;
-                                    });
-                            }
-                            var globPos = mapToGlobal(mouse.x, mouse.y);
-                            dragControl.itemNumber = 1;
-                            dragControl.visible = true;
-                            dragControl.x = globPos.x;
-                            dragControl.y = globPos.y;
-                            folderListView.indexAt(globPos.x, globPos.y);
+                    if (!held) {
+                        if ((startMove[0] !== -1 || startMove[1] !== -1) && ((Math.abs(mouse.x - startMove[0]) > 5) || (Math.abs(mouse.y - startMove[1]) > 5))) {
+                            dragControl.isFolder = true;
+                            held = true;
                         } else {
-                            dragControl.visible = false;
+                            return;
                         }
+                    }
+                    if (held && folderModel.get(folderListView.currentIndex)) {
+                        if (dragControl.imageSource === "") {
+                            parent.grabToImage(function (result) {
+                                    dragControl.imageSource = result.url;
+                                });
+                        }
+                        var globPos = mapToGlobal(mouse.x, mouse.y);
+                        dragControl.itemNumber = 1;
+                        dragControl.visible = true;
+                        dragControl.x = globPos.x;
+                        dragControl.y = globPos.y;
+                        folderListView.indexAt(globPos.x, globPos.y);
+                    } else {
+                        dragControl.visible = false;
                     }
                 }
                 onPressed: {
-                    held = true;
-                    dragControl.isFolder = true;
+                    startMove[0] = mouse.x;
+                    startMove[1] = mouse.y;
                 }
                 onReleased: {
+                    startMove = [-1, -1];
                     if (held) {
                         held = false;
                         dropLine.visible = false;
@@ -481,6 +490,7 @@ Item {
 
             onPressed: {
                 root.forceActiveFocus();
+                mouse.accepted = false;
             }
         }
     }
