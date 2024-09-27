@@ -139,6 +139,12 @@ ApplicationWindow {
             itemListView.forceActiveFocus();
         }
 
+        function sortDescending(array) {
+            return array.slice().sort(function (a, b) {
+                    return b - a; // 进行降序排序
+                });
+        }
+
         target: VNoteMainManager
 
         onAddNoteAtHead: {
@@ -156,11 +162,10 @@ ApplicationWindow {
         onMoveFinished: {
             folderListView.model.get(srcFolderIndex).count = (Number(folderListView.model.get(srcFolderIndex).count) - index.length).toString();
             folderListView.model.get(dstFolderIndex).count = (Number(folderListView.model.get(dstFolderIndex).count) + index.length).toString();
-            var minIndex = itemListView.selectedNoteItem[0];
-            for (var i = 0; i < itemListView.selectedNoteItem.length; i++) {
-                if (itemListView.selectedNoteItem[i] < minIndex)
-                    minIndex = itemListView.selectedNoteItem[i];
-                itemListView.model.remove(itemListView.selectedNoteItem[i]);
+            var sortedArray = sortDescending(itemListView.selectedNoteItem);
+            var minIndex = sortedArray[sortedArray.length - 1];
+            for (var i = 0; i < sortedArray.length; i++) {
+                itemListView.model.remove(sortedArray[i]);
             }
             itemListView.selectedNoteItem = [];
             if (Number(folderListView.model.get(srcFolderIndex).count) === 0) {
