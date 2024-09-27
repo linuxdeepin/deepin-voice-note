@@ -8,6 +8,8 @@
 #include "common/jscontent.h"
 #include "common/imageprovider.h"
 
+#include "config.h"
+
 #include <QQmlApplicationEngine>
 #include <QScopedPointer>
 #include <QQmlContext>
@@ -46,6 +48,10 @@ int main(int argc, char *argv[])
             DGuiApplicationHelper::UserScope)) {
         return 0;
     }
+
+    app->setOrganizationName("deepin");
+    app->setApplicationName("deepin-voice-note");
+    app->setApplicationVersion(VERSION);
 
     qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "7777");
     VNoteMainManager::instance()->initQMLRegister();

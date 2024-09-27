@@ -54,7 +54,7 @@ TitleBar {
                 description: qsTr("Voice Notes is a lightweight memo tool to make text notes and voice recordings.")
                 productIcon: "deepin-voice-note"
                 productName: qsTr("Voice Note")
-                version: qsTr("Version:") + "%1".arg(Qt.application.version)
+                version: Qt.application.version
                 websiteLink: DTK.deepinWebsiteLink
                 websiteName: DTK.deepinWebsiteName
 

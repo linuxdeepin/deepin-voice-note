@@ -331,6 +331,8 @@ Item {
         }
 
         anchors.fill: parent
+        boundsBehavior: Flickable.StopAtBounds
+        clip: true
         model: itemModel
         spacing: itemSpacing
         visible: true
@@ -340,6 +342,7 @@ Item {
 
             property bool isRename: false
             property bool isSelected: false
+            property var startMove: [-1, -1]
 
             color: isSelected ? "#FF1F6EE7" : "white"
             height: isSearch ? 67 : 50
@@ -502,7 +505,6 @@ Item {
                 drag.target: this
 
                 onClicked: {
-                    rootItem.forceActiveFocus();
                     if (mouse.button === Qt.RightButton) {
                         if (selectedNoteItem.length > 1) {
                             ActionManager.visibleMulChoicesActions(false);
@@ -579,7 +581,14 @@ Item {
                     itemListView.itemAtIndex(index).isRename = true;
                 }
                 onPositionChanged: {
-                    if (held && itemModel.get(selectedNoteItem[0])) {
+                    if (!held) {
+                        if ((startMove[0] !== -1 || startMove[1] !== -1) && ((Math.abs(mouse.x - startMove[0]) > 5) || (Math.abs(mouse.y - startMove[1]) > 5))) {
+                            held = true;
+                        } else {
+                            return;
+                        }
+                    }
+                    if (itemModel.get(selectedNoteItem[0])) {
                         var globPos = mapToGlobal(mouse.x, mouse.y);
                         dragControl.itemNumber = selectedNoteItem.length;
                         dragControl.itemText = itemModel.get(selectedNoteItem[0]).name;
@@ -592,9 +601,11 @@ Item {
                     }
                 }
                 onPressed: {
-                    held = true;
+                    startMove[0] = mouse.x;
+                    startMove[1] = mouse.y;
                 }
                 onReleased: {
+                    startMove = [-1, -1];
                     if (held && dragControl.visible && mouse.button === Qt.LeftButton) {
                         dropRelease();
                     }
@@ -610,6 +621,7 @@ Item {
 
             onPressed: {
                 rootItem.forceActiveFocus();
+                mouse.accepted = false;
             }
         }
 
