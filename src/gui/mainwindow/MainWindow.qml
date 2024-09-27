@@ -320,7 +320,7 @@ ApplicationWindow {
 
             Rectangle {
                 anchors.right: parent.right
-                color: DTK.themeType === ApplicationHelper.LightType ? "#eee7e7e7" : "#ee252525"
+                color: DTK.themeType === ApplicationHelper.LightType ? "#eee7e7e7" : "#151A3A"
                 height: parent.height
                 width: 1
             }

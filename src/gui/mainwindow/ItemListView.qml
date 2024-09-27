@@ -344,7 +344,7 @@ Item {
             property bool isSelected: false
             property var startMove: [-1, -1]
 
-            color: isSelected ? "#FF1F6EE7" : "white"
+            color: isSelected ? "#FF1F6EE7" : (DTK.themeType === ApplicationHelper.LightType ? "white" : "#212944")
             height: isSearch ? 67 : 50
             radius: 6
             width: itemListView.width
@@ -357,8 +357,10 @@ Item {
                     if (event.key === Qt.Key_Escape) {
                         renameLine.text = model.name;
                         isRename = false;
+                        rootItem.forceActiveFocus();
                     } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
                         isRename = false;
+                        rootItem.forceActiveFocus();
                     }
                 } else {
                     if (event.key === Qt.key_delete) {
@@ -383,7 +385,7 @@ Item {
                 Label {
                     id: noteNameLabel
 
-                    color: isSelected ? "white" : "black"
+                    color: isSelected ? "white" : (DTK.themeType === ApplicationHelper.LightType ? "black" : "white")
                     font.pixelSize: 14
                     height: 18
                     horizontalAlignment: Text.AlignHLeft
@@ -395,7 +397,7 @@ Item {
                 Label {
                     id: timeLabel
 
-                    color: isSelected ? "#7FFFFFFF" : "#7F000000"
+                    color: isSelected ? "#7FFFFFFF" : (DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF")
                     font.pixelSize: 10
                     height: 15
                     horizontalAlignment: Text.AlignHLeft
@@ -426,7 +428,7 @@ Item {
                                 model.name = text;
                                 VNoteMainManager.renameNote(model.noteId, text);
                             } else {
-                                renameLine.text = model.text;
+                                renameLine.text = model.name;
                             }
                             noteItemMouseArea.enabled = true;
                             rootItemDelegate.isRename = false;
