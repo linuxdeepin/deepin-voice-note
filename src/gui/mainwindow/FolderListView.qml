@@ -227,6 +227,7 @@ Item {
                         updateFolderName(newName);
                     }
                     isRename = false;
+                    root.forceActiveFocus();
                     break;
                 case Qt.Key_Escape:
                     isRename = false;

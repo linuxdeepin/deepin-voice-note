@@ -635,6 +635,7 @@ void VNoteMainManager::renameNote(const int &index, const QString &newName)
         VNoteItemOper noteOps(item);
         noteOps.modifyNoteTitle(newName);
     }
+    onNoteChanged();
 }
 
 void VNoteMainManager::vNoteSearch(const QString &text)
