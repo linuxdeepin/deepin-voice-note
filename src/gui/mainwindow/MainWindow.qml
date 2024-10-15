@@ -14,7 +14,12 @@ ApplicationWindow {
     id: rootWindow
 
     property int createFolderBtnHeight: 40
+    property int leftAreaMaxWidth: 300
+    property int leftAreaMinWidth: 140
     property int leftViewWidth: 200
+    property int middleAreaMinWidth: 200
+    property bool needHideSearch: false
+    property int rightAreaMinWidth: 340
     property int tmpLeftAreaWidth: 200
     property int tmpWebViewWidth: 0
     property int tmprightDragX: 0
@@ -45,19 +50,14 @@ ApplicationWindow {
         y = Screen.height / 2 - height / 2;
     }
     onWidthChanged: {
-        if (width < 820) {
-            var rigthX = tmprightDragX - (820 - width);
-            if (rigthX < 260 || tmprightDragX < rigthX)
-                return;
-            rightDragHandle.x = rigthX;
-            var newWidth = rightDragHandle.x - middeleBgArea.x;
-            if (newWidth >= 130 && newWidth <= 200) {
-                middeleBgArea.Layout.preferredWidth = newWidth;
+        if (rightBgArea.width < rightAreaMinWidth) {
+            var reduce = rightAreaMinWidth - rightBgArea.width;
+            if (middleBgArea.width > middleAreaMinWidth) {
+                middleBgArea.Layout.preferredWidth = middleBgArea.width - reduce;
             } else {
-                leftBgArea.Layout.preferredWidth = rightDragHandle.x - leftDragHandle.width - middeleBgArea.width;
-                tmpLeftAreaWidth = leftBgArea.Layout.preferredWidth;
+                leftBgArea.Layout.preferredWidth = leftBgArea.width - reduce;
             }
-            rightBgArea.Layout.preferredWidth = rowLayout.width - middeleBgArea.width - rightDragHandle.width;
+            rightBgArea.width = rightAreaMinWidth;
         }
     }
 
@@ -222,6 +222,7 @@ ApplicationWindow {
         icon.height: 30
         icon.name: "topleft"
         icon.width: 30
+        visible: !(needHideSearch && search.visible) || leftBgArea.visible
         width: 30
         x: 50
         y: 10
@@ -329,29 +330,51 @@ ApplicationWindow {
                 anchors.fill: parent
                 cursorShape: Qt.SizeHorCursor
                 drag.axis: Drag.XAxis
-                drag.maximumX: 200
-                drag.minimumX: 130
+                drag.maximumX: rootWindow.width > (leftAreaMaxWidth + middleAreaMinWidth + rightAreaMinWidth - leftDragHandle.width) ? leftAreaMaxWidth : rootWindow.width - (middleAreaMinWidth + rightAreaMinWidth)
+                drag.minimumX: leftAreaMinWidth
                 drag.target: leftDragHandle
 
                 onPositionChanged: {
                     if (drag.active) {
                         var newWidth = leftDragHandle.x;
-                        if (newWidth >= 130 && newWidth <= 200) {
-                            leftBgArea.Layout.preferredWidth = newWidth;
-                            tmpLeftAreaWidth = newWidth;
-                            rightBgArea.Layout.preferredWidth = rowLayout.width - leftBgArea.width - leftDragHandle.width;
+                        if (newWidth >= leftBgArea.width) {
+                            var shrinkWidth = newWidth - leftBgArea.width;
+                            if ((middleBgArea.width + rightDragHandle.width) > middleAreaMinWidth) {
+                                middleBgArea.Layout.preferredWidth = middleBgArea.width - shrinkWidth;
+                            } else {
+                                rightBgArea.Layout.preferredWidth = rightBgArea.width - shrinkWidth;
+                            }
+                        } else {
+                            var middleShrinkWidth = leftBgArea.width - newWidth;
+                            middleBgArea.Layout.preferredWidth = middleBgArea.width + middleShrinkWidth;
                         }
+                        leftBgArea.Layout.preferredWidth = newWidth;
+                        tmpLeftAreaWidth = newWidth;
                     }
                 }
             }
         }
 
         Rectangle {
-            id: middeleBgArea
+            id: middleBgArea
 
             Layout.fillHeight: true
             Layout.preferredWidth: leftViewWidth
             color: DTK.themeType === ApplicationHelper.LightType ? "#F1F5F8" : "#D9000000"
+
+            onWidthChanged: {
+                if (!leftBgArea.visible) {
+                    if (width >= 240) {
+                        search.visible = true;
+                        needHideSearch = false;
+                        search.offect = 85;
+                    } else {
+                        search.visible = false;
+                        needHideSearch = true;
+                        search.offect = 50;
+                    }
+                }
+            }
 
             ColumnLayout {
                 Layout.topMargin: 7
@@ -359,6 +382,22 @@ ApplicationWindow {
                 anchors.leftMargin: 10
                 anchors.rightMargin: 5
                 spacing: 10
+
+                ToolButton {
+                    Layout.alignment: Text.AlignRight
+                    Layout.rightMargin: 10
+                    Layout.topMargin: 10
+                    height: 30
+                    icon.name: "search"
+                    visible: !search.visible
+                    width: 30
+
+                    onClicked: {
+                        search.visible = true;
+                        search.offect = 50;
+                        search.forceActiveFocus();
+                    }
+                }
 
                 SearchEdit {
                     id: search
@@ -380,6 +419,8 @@ ApplicationWindow {
                         webEngineView.webVisible = true;
                         webEngineView.noSearchResult = false;
                         VNoteMainManager.clearSearch();
+                        if (needHideSearch)
+                            search.visible = false;
                     }
 
                     Layout.fillWidth: true
@@ -394,6 +435,10 @@ ApplicationWindow {
                         if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
                             VNoteMainManager.vNoteSearch(text);
                         }
+                    }
+                    onActiveFocusChanged: {
+                        if (!activeFocus && needHideSearch)
+                            search.visible = false;
                     }
                     onTextChanged: {
                         if (text.length === 0)
@@ -439,7 +484,7 @@ ApplicationWindow {
 
             Layout.fillHeight: true
             Layout.preferredWidth: 5
-            color: middeleBgArea.color
+            color: middleBgArea.color
 
             Component.onCompleted: {
                 tmprightDragX = rightDragHandle.x;
@@ -451,21 +496,27 @@ ApplicationWindow {
                 anchors.fill: parent
                 cursorShape: Qt.SizeHorCursor
                 drag.axis: Drag.XAxis
-                drag.maximumX: 400
-                drag.minimumX: 260
+                drag.maximumX: leftBgArea.visible ? ((rootWindow.width - leftBgArea.width) > (middleAreaMinWidth + rightAreaMinWidth) ? rootWindow.width - rightAreaMinWidth : (rootWindow.width - rightAreaMinWidth)) : (rootWindow.width - rightAreaMinWidth)
+                drag.minimumX: leftBgArea.visible ? (leftAreaMinWidth + middleAreaMinWidth) : (middleAreaMinWidth - rightDragHandle.width)
                 drag.target: rightDragHandle
 
                 onPositionChanged: {
                     if (drag.active) {
                         tmprightDragX = rightDragHandle.x;
-                        var newWidth = rightDragHandle.x - middeleBgArea.x;
-                        if (newWidth >= 130 && newWidth <= 200) {
-                            middeleBgArea.Layout.preferredWidth = newWidth;
+                        var newWidth = rightDragHandle.x - middleBgArea.x;
+                        if (newWidth < (middleAreaMinWidth - rightDragHandle.width)) {
+                            middleBgArea.Layout.preferredWidth = middleAreaMinWidth - rightDragHandle.width;
+                            var shrinkWidth = middleAreaMinWidth - newWidth - rightDragHandle.width;
+                            leftBgArea.Layout.preferredWidth = leftBgArea.width - shrinkWidth - leftDragHandle.width;
+                            tmpLeftAreaWidth = leftBgArea.width;
                         } else {
-                            leftBgArea.Layout.preferredWidth = rightDragHandle.x - leftDragHandle.width - middeleBgArea.width;
-                            tmpLeftAreaWidth = leftBgArea.Layout.preferredWidth;
+                            middleBgArea.Layout.preferredWidth = newWidth;
                         }
-                        rightBgArea.Layout.preferredWidth = rowLayout.width - middeleBgArea.width - rightDragHandle.width;
+                        rightBgArea.Layout.preferredWidth = rowLayout.width - middleBgArea.width - rightDragHandle.width;
+                        tmpWebViewWidth = rightBgArea.width;
+                        if (search.activeFocus) {
+                            middleBgArea.forceActiveFocus();
+                        }
                     }
                 }
             }
@@ -546,8 +597,14 @@ ApplicationWindow {
 
         onFinished: {
             leftBgArea.visible = false;
+            tmprightDragX = middleBgArea.width;
         }
         onStarted: {
+            needHideSearch = false;
+            if (middleBgArea.width < 240) {
+                needHideSearch = true;
+                search.visible = false;
+            }
             leftDragHandle.visible = false;
             tmpWebViewWidth = rightBgArea.width;
         }
@@ -564,16 +621,16 @@ ApplicationWindow {
             duration: 200
             from: leftBgArea.width + leftDragHandle.width
             property: "x"
-            target: middeleBgArea
+            target: middleBgArea
             to: 0
         }
 
         NumberAnimation {
             duration: 200
-            from: leftBgArea.width + leftDragHandle.width + middeleBgArea.width + rightDragHandle.width
+            from: rightBgArea.x
             property: "x"
             target: rightBgArea
-            to: middeleBgArea.width + rightDragHandle.width
+            to: rightBgArea.x - tmpLeftAreaWidth - rightDragHandle.width
         }
 
         NumberAnimation {
@@ -581,7 +638,7 @@ ApplicationWindow {
             from: tmpWebViewWidth
             property: "width"
             target: webEngineView
-            to: middeleBgArea.width + rightDragHandle.width + tmpWebViewWidth
+            to: tmpLeftAreaWidth + rightDragHandle.width + tmpWebViewWidth
         }
 
         NumberAnimation {
@@ -597,6 +654,26 @@ ApplicationWindow {
     ParallelAnimation {
         id: showLeftArea
 
+        property int currentMiddleWidth: 0
+        property int currentRightX: 0
+        property int tmpOffect: 0
+
+        onFinished: {
+            search.visible = true;
+            leftDragHandle.x = leftBgArea.width;
+            rightDragHandle.x = middleBgArea.x + middleBgArea.width;
+            tmpWebViewWidth = rightBgArea.width;
+        }
+        onStarted: {
+            currentRightX = rightBgArea.x;
+            currentMiddleWidth = middleBgArea.width;
+            if (rightBgArea.width > (rightAreaMinWidth + tmpLeftAreaWidth)) {
+                showLeftArea.tmpOffect = middleBgArea.width + rightDragHandle.width;
+            } else {
+                showLeftArea.tmpOffect = middleBgArea.width - (rightAreaMinWidth + tmpLeftAreaWidth - rightBgArea.width);
+            }
+        }
+
         NumberAnimation {
             duration: 200
             from: 0
@@ -609,21 +686,29 @@ ApplicationWindow {
             duration: 200
             from: 0
             property: "x"
-            target: middeleBgArea
-            to: tmpLeftAreaWidth + 5
+            target: middleBgArea
+            to: tmpLeftAreaWidth + rightDragHandle.width
         }
 
         NumberAnimation {
             duration: 200
-            from: middeleBgArea.width + rightDragHandle.width
+            from: currentMiddleWidth
+            property: "width"
+            target: middleBgArea
+            to: showLeftArea.tmpOffect
+        }
+
+        NumberAnimation {
+            duration: 200
+            from: showLeftArea.currentRightX
             property: "x"
             target: rightBgArea
-            to: tmpLeftAreaWidth + 5 + middeleBgArea.width + rightDragHandle.width
+            to: showLeftArea.tmpOffect + tmpLeftAreaWidth + rightDragHandle.width
         }
 
         NumberAnimation {
             duration: 200
-            from: middeleBgArea.width + rightDragHandle.width + tmpWebViewWidth
+            from: rightBgArea.width
             property: "width"
             target: rightBgArea
             to: tmpWebViewWidth
