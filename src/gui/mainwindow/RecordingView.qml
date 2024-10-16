@@ -18,6 +18,10 @@ Item {
     implicitWidth: 364
     visible: false
 
+    onVisibleChanged: {
+        curves.startRecording();
+    }
+
     Rectangle {
         anchors.fill: parent
         border.color: "#0A000000"
@@ -42,6 +46,7 @@ Item {
 
             onClicked: {
                 pauseRecording();
+                curves.pauseRecording();
             }
         }
 
@@ -69,8 +74,10 @@ Item {
             width: rootItem.height
 
             onClicked: {
+                curves.stopRecording();
                 stopRecording();
                 rootItem.visible = false;
+                time = "00:00";
             }
         }
     }

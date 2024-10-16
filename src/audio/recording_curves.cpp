@@ -3,13 +3,11 @@
 #include <QLinearGradient>
 
 RecordingCurves::RecordingCurves(QQuickItem *parent)
-    :QQuickPaintedItem(parent)
+    : QQuickPaintedItem(parent)
+    , m_timer(new QTimer(this))
 {
-    m_pointList << QPointF(0,12) << QPointF(13,18) << QPointF(25,20) << QPointF(36,7) << QPointF(57,-4) << QPointF(75,-4) << QPointF(90,12)
-                << QPointF(105,28) << QPointF(121,28) << QPointF(139,16) << QPointF(154,3) << QPointF(167,5) << QPointF(180,12);
-    foreach (QPointF point, m_pointList) {
-        m_volumeList.append(QPointF(point.x(), 12));
-    }
+    m_timer->setInterval(1000 / 45);
+    connect(m_timer, &QTimer::timeout, this, &RecordingCurves::updateCurves);
 }
 
 RecordingCurves::~RecordingCurves()
@@ -17,77 +15,44 @@ RecordingCurves::~RecordingCurves()
 
 }
 
-void RecordingCurves::updatePoint(const int &index, const QString &direction)
-{
-    if (index < 0 || index > 12)
-        return;
-    QPointF point = m_pointList.at(index);
-    if (direction == "up")
-        point.setY(point.y()-1);
-    else if (direction == "down")
-        point.setY(point.y()+1);
-    else if (direction == "left")
-        point.setX(point.x()-1);
-    else if (direction == "right")
-        point.setX(point.x()+1);
-
-    m_pointList.removeAt(index);
-    m_pointList.insert(index, point);
-    update();
-}
-
-void RecordingCurves::togglePointShow()
-{
-    m_isShowPoint = !m_isShowPoint;
-    update();
-}
-
 void RecordingCurves::updateVolume(const double &gain)
 {
     m_gain = gain;
-    m_volumeList.clear();
-    for (int i = 0; i < m_pointList.size(); ++i) {
-        QPointF p = m_pointList[i];
-        p.setY(12 + ((p.y() - 12) * m_gain));
-        m_volumeList.append(p);
-    }
     update();
 }
 
-// 计算组合数 C(n, k)
-qreal RecordingCurves::qBinomialCoefficient(int n, int k) {
-    qreal result = 1;
-    for (int i = 0; i < k; ++i) {
-        result *= (n - i);
-        result /= (i + 1);
-    }
-    return result;
+void RecordingCurves::startRecording()
+{
+    m_timer->start();
 }
 
-QPointF RecordingCurves::bezierPoint(qreal t, const QList<QPointF> &points) {
-    int n = points.size() - 1;
-    QPointF point(0, 0);
-    for (int i = 0; i <= n; ++i) {
-        qreal coeff = qPow(1 - t, n - i) * qPow(t, i) * qBinomialCoefficient(n, i);
-        point += points[i] * coeff;
+void RecordingCurves::stopRecording()
+{
+    m_timer->stop();
+    m_phase = 0.0;
+}
+
+void RecordingCurves::pauseRecording()
+{
+    if (m_timer->isActive()) {
+        m_gain = 0.0;
+        m_timer->stop();
+    } else {
+        m_timer->start();
     }
-    return point;
+}
+
+void RecordingCurves::updateCurves()
+{
+    m_phase += M_PI;
+    if (m_phase > 170*M_PI)
+        m_phase = 0;
+    update();
 }
 
 void RecordingCurves::paint(QPainter *painter)
 {
     painter->setRenderHint(QPainter::Antialiasing);
-
-    // 绘制控制点及其连线
-    if (m_isShowPoint) {
-        painter->setPen(Qt::red);
-        for (int i = 0; i < m_pointList.size(); ++i) {
-            painter->drawEllipse(m_pointList[i], 5, 5);
-            if (i > 0) {
-                painter->drawLine(m_pointList[i - 1], m_pointList[i]);
-            }
-        }
-    }
 
     auto rect = boundingRect();
     QLinearGradient gradient(rect.topLeft(), rect.topRight());
@@ -95,32 +60,33 @@ void RecordingCurves::paint(QPainter *painter)
     gradient.setColorAt(0.51, QColor(255, 0, 0));
     gradient.setColorAt(1, QColor(254, 143, 143));
 
-    int steps = 100;
-    QPointF lastPoint(0, 0);
-    QPointF lastBackPoint(0, 0);
-    QList<QLineF> lines;
-    QList<QLineF> backLines;
-    for (int i = 0; i <= steps; ++i) {
-        qreal t = i / static_cast<qreal>(steps);
-        QPointF point = bezierPoint(t, m_volumeList);
-        QPointF backPoint(point.x(), 24-point.y());
-        if (i > 0) {
-            lines.append(QLineF(lastPoint, point));
-            backLines.append(QLineF(lastBackPoint, backPoint));
-        }
-        lastPoint = point;
-        lastBackPoint = backPoint;
+    double width = this->width();
+    double height = this->height();
+
+    QVector<QPointF> points;
+    QVector<QPointF> backPoints;
+
+    for (double x = 0; x <= width; x += 1.0) {
+        double ySin = std::sin((2 * (x-m_phase)) / width * 2 * M_PI);
+        double a = pow(x - width / 2, 2);
+        double b = -4 / (width * width);
+        double yPara = a * b + 1;
+        double pointY = ySin * yPara * height * m_gain / 2.0;
+        double mappedY = (height/2) - pointY;
+        double mappedYNeg = (height/2) - (-pointY);
+        points.append(QPointF(x, mappedY));
+        backPoints.append(QPointF(x, mappedYNeg));
     }
 
     painter->setPen(QColor(255, 200, 200));
-    painter->drawLines(backLines);
+    painter->drawPolyline(backPoints.constData(), backPoints.size());
 
     QPen shadows;
     shadows.setColor(QColor(255, 1, 1, 15));
     shadows.setWidth(4);
     painter->setPen(shadows);
-    painter->drawLines(lines);
+    painter->drawPolyline(points.constData(), points.size());
 
     painter->setPen(QPen(QBrush(gradient), 1));
-    painter->drawLines(lines);
+    painter->drawPolyline(points.constData(), points.size());
 }
