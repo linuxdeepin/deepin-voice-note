@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QQuickPaintedItem>
 #include <QPainter>
+#include <QTimer>
 
 class RecordingCurves : public QQuickPaintedItem
 {
@@ -12,21 +13,22 @@ public:
     RecordingCurves(QQuickItem *parent = 0);
     ~RecordingCurves();
 
-    Q_INVOKABLE void updatePoint(const int &index, const QString &direction);
-    Q_INVOKABLE void togglePointShow();
     Q_INVOKABLE void updateVolume(const double &gain);
+    Q_INVOKABLE void startRecording();
+    Q_INVOKABLE void stopRecording();
+    Q_INVOKABLE void pauseRecording();
 public:
     void paint(QPainter *painter);
 
-private:
-    qreal qBinomialCoefficient(int n, int k);
-    QPointF bezierPoint(qreal t, const QList<QPointF> &points);
+private slots:
+    void updateCurves();
 
 private:
     QList<QPointF> m_pointList;
     QList<QPointF> m_volumeList;
     double m_gain {0.0};
-    bool m_isShowPoint {false};
+    double m_phase;
+    QTimer *m_timer;
 };
 
 #endif // RECORDINGCURVES_H
