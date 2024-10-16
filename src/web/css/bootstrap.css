@@ -3727,6 +3727,7 @@ tbody.collapse.in {
 .btn-group-vertical > .btn {
   position: relative;
   float: left;
+  color: rgba(0, 0, 0, 0.7);
 }
 .btn-group > .btn:hover,
 .btn-group-vertical > .btn:hover,

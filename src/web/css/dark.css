@@ -82,7 +82,7 @@ strike[style="text-decoration-line: underline;"] {
 
 .note-editor .note-toolbar>.note-btn-group,
 .note-popover .popover-content>.note-line {
-    border: 0.5px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .note-popover .popover-content .note-color-palette div .note-color-btn {
@@ -111,6 +111,14 @@ body::-webkit-scrollbar-thumb:active,
 
 .translate>div {
     color: rgba(192, 198, 212, 1) !important;
+}
+
+.fontsizeBut .note-current-fontsize {
+    color: rgba(255, 255, 255, 1);
+}
+
+.fontnameBut .note-current-fontname {
+    color: rgba(255, 255, 255, 1);
 }
 
 /********** 悬浮语言播放控件 **********/
