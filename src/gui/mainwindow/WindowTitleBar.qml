@@ -21,6 +21,11 @@ TitleBar {
     background: Rectangle {
         color: DTK.themeType === ApplicationHelper.LightType ? "white" : "black"
     }
+    content: Item {
+        Component.onCompleted: {
+            parent.Layout.leftMargin = 0;
+        }
+    }
     menu: Menu {
         width: 200
         x: 0
