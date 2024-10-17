@@ -14,9 +14,13 @@ TitleBar {
     signal insertImage
     signal startRecording
 
+    enableInWindowBlendBlur: false
     height: 40
     width: 0
 
+    background: Rectangle {
+        color: DTK.themeType === ApplicationHelper.LightType ? "white" : "black"
+    }
     menu: Menu {
         width: 200
         x: 0

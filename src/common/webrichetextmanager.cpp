@@ -30,6 +30,10 @@ void WebRichTextManager::initConnect()
         m_textChange = true;
         emit noteTextChanged();
     });
+
+    connect(JsContent::instance(), &JsContent::scrollTopChange, this, [=](bool isTop){
+        emit scrollChange(isTop);
+    });
 }
 
 void WebRichTextManager::setData(VNoteItem *data, const QString reg)

@@ -1305,6 +1305,9 @@ function resetScroll() {
 
 // 监听滚动事件
 $(document).scroll(function () {
+    var scrollTopDistance = $(document).scrollTop();
+    webobj.jsCallScrollChange(scrollTopDistance);
+
     if (scrollHide) {
         clearTimeout(scrollHide)
         $('#scrollStyle').html(`

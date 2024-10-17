@@ -62,6 +62,7 @@ signals:
     void moveFinished(const QVariantList &index, const int &srcFolderIndex, const int &dstFolderIndex);
     void needUpdateNote();
     void updateRichTextSearch(const QString &key);
+    void scrollChange(const bool &isTop);
 
 private slots:
     void onVNoteFoldersLoaded();

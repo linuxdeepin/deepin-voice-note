@@ -24,9 +24,9 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        border.color: "#0A000000"
+        border.color: DTK.themeType === ApplicationHelper.LightType ? "#0A000000" : "#19FFFFFF"
         border.width: 1
-        color: "#7FF4F4F4"
+        color: DTK.themeType === ApplicationHelper.LightType ? "#7FF4F4F4" : "#0A0A10"
         radius: 12
     }
 
@@ -57,7 +57,7 @@ Item {
             width: 180
         }
 
-        Text {
+        Label {
             id: duation
 
             text: time

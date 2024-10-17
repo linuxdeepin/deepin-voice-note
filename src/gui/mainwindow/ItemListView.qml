@@ -344,7 +344,7 @@ Item {
             property bool isSelected: false
             property var startMove: [-1, -1]
 
-            color: isSelected ? "#FF1F6EE7" : (DTK.themeType === ApplicationHelper.LightType ? "white" : "#212944")
+            color: isSelected ? (rootItem.activeFocus ? "#FF1F6EE7" : (DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF")) : (DTK.themeType === ApplicationHelper.LightType ? "white" : "#202944")
             height: isSearch ? 67 : 50
             radius: 6
             width: itemListView.width
@@ -385,7 +385,7 @@ Item {
                 Label {
                     id: noteNameLabel
 
-                    color: isSelected ? "white" : (DTK.themeType === ApplicationHelper.LightType ? "black" : "white")
+                    color: DTK.themeType === ApplicationHelper.LightType ? (isSelected ? (rootItem.activeFocus ? "white" : "black") : "black") : "white"
                     font.pixelSize: 14
                     height: 18
                     horizontalAlignment: Text.AlignHLeft
@@ -397,7 +397,7 @@ Item {
                 Label {
                     id: timeLabel
 
-                    color: isSelected ? "#7FFFFFFF" : (DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF")
+                    color: isSelected ? (rootItem.activeFocus ? "#7FFFFFFF" : DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF") : (DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF")
                     font.pixelSize: 10
                     height: 15
                     horizontalAlignment: Text.AlignHLeft

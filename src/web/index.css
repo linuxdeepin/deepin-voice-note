@@ -9,7 +9,7 @@ body {
     line-height: 1.72;
     font-family: 'Helvetica';
     background-color: var(--backgroundColor);
-    color: rgba(65, 77, 104, 1);
+    color: rgba(0, 0, 0, 1);
     word-wrap: break-word;
 }
 
