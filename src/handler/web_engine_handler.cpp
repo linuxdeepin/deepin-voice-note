@@ -171,8 +171,6 @@ void WebEngineHandler::connectWebContent()
 
     connect(JsContent::instance(), &JsContent::loadFinsh, this, [this]() {
         Q_EMIT loadRichText();
-        // Test
-        DGuiApplicationHelper::instance()->setPaletteType(DGuiApplicationHelper::LightType);
         onThemeChanged();
     });
 
