@@ -322,24 +322,12 @@
     background-image: url('../img/audio_file_play/Normal/Light.svg');
 }
 
-.body.dark .voicePlayback .voiceBtn {
-    background-image: url('../img/audio_file_play/Normal/Dark.svg');
-}
-
 .voicePlayback .voiceBtn:hover {
     background-image: url('../img/audio_file_play/Hover/Light.svg');
 }
 
-.body.dark .voicePlayback .voiceBtn:hover {
-    background-image: url('../img/audio_file_play/Hover/Dark.svg');
-}
-
 .voicePlayback .voiceBtn:active {
     background-image: url('../img/audio_file_play/Pressed/Light.svg');
-}
-
-.body.dark .voicePlayback .voiceBtn:active {
-    background-image: url('../img/audio_file_play/Pressed/Dark.svg');
 }
 
 /* 播放状态的播放暂停按钮 */

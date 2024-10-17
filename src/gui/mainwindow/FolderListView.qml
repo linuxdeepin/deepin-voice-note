@@ -210,7 +210,7 @@ Item {
             property bool isRename: false
             property var startMove: [-1, -1]
 
-            color: index === folderListView.currentIndex ? "#33000000" : (isHovered ? "#1A000000" : "transparent")
+            color: index === folderListView.currentIndex ? (root.activeFocus ? "#1F6DE4" : DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF") : (isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
             enabled: folderListView.enabled
             height: itemHeight
             radius: 6
@@ -231,6 +231,7 @@ Item {
                     break;
                 case Qt.Key_Escape:
                     isRename = false;
+                    root.forceActiveFocus();
                     break;
                 default:
                     break;
@@ -330,6 +331,7 @@ Item {
                     id: folderNameLabel
 
                     Layout.fillWidth: true
+                    color: index === folderListView.currentIndex ? (root.activeFocus ? "white" : (DTK.themeType === ApplicationHelper.LightType ? "black" : "#B2FFFFFF")) : (DTK.themeType === ApplicationHelper.LightType ? "black" : "#B2FFFFFF")
                     elide: Text.ElideRight
                     font.pixelSize: 14
                     horizontalAlignment: Text.AlignLeft
@@ -342,6 +344,7 @@ Item {
                     id: folderCountLabel
 
                     Layout.rightMargin: 10
+                    color: folderNameLabel.color
                     font.pixelSize: 14
                     horizontalAlignment: Text.AlignRight
                     text: model.count

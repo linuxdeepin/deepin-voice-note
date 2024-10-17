@@ -244,7 +244,7 @@ ApplicationWindow {
 
             Layout.fillHeight: true//#F2F6F8
             Layout.preferredWidth: leftViewWidth
-            color: DTK.themeType === ApplicationHelper.LightType ? "#EBF6FF" : "#101010"
+            color: DTK.themeType === ApplicationHelper.LightType ? "#EBF6FF" : "#2E1F60"
 
             ColumnLayout {
                 anchors.bottomMargin: 10
@@ -360,7 +360,7 @@ ApplicationWindow {
 
             Layout.fillHeight: true
             Layout.preferredWidth: leftViewWidth
-            color: DTK.themeType === ApplicationHelper.LightType ? "#F1F5F8" : "#D9000000"
+            color: DTK.themeType === ApplicationHelper.LightType ? "#F1F5F8" : "#14183A"
 
             onWidthChanged: {
                 if (!leftBgArea.visible) {

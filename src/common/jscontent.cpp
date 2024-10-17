@@ -160,6 +160,11 @@ QString JsContent::jsCallDivTextTranslation()
     return doc.toJson(QJsonDocument::Compact);
 }
 
+void JsContent::jsCallScrollChange(int scrollTop)
+{
+    emit scrollTopChange(scrollTop == 0);
+}
+
 /**
    @brief Js前端调用停止播放
  */

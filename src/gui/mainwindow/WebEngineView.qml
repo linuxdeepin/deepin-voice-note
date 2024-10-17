@@ -16,6 +16,7 @@ import "../dialog"
 Item {
     id: rootItem
 
+    property bool hasScroll: false
     property bool noSearchResult: false
     property bool webVisible: true
 
@@ -62,6 +63,7 @@ Item {
         id: columnLayout
 
         anchors.fill: parent
+        spacing: 0
 
         WindowTitleBar {
             id: title
@@ -149,6 +151,14 @@ Item {
                     id: noteWebChannel
 
                 }
+            }
+
+            Rectangle {
+                anchors.top: webRect.top
+                border.width: 0
+                color: hasScroll ? (DTK.themeType === ApplicationHelper.LightType ? "#0C000000" : "#0CFFFFFF") : "transparent"
+                height: 1
+                width: parent.width
             }
         }
 
@@ -328,6 +338,9 @@ Item {
             webView.runJavaScript("getHtml()", function (result) {
                     VNoteMainManager.updateNoteWithResult(result);
                 });
+        }
+        onScrollChange: isTop => {
+            hasScroll = !isTop;
         }
         onUpdateRichTextSearch: key => {
             webView.findText(key);
