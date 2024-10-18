@@ -344,7 +344,7 @@ Item {
             property bool isSelected: false
             property var startMove: [-1, -1]
 
-            color: isSelected ? (rootItem.activeFocus ? "#FF1F6EE7" : (DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF")) : (DTK.themeType === ApplicationHelper.LightType ? "white" : "#202944")
+            color: isSelected ? (rootItem.activeFocus ? "#FF1F6EE7" : (DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF")) : (DTK.themeType === ApplicationHelper.LightType ? "white" : "#0CFFFFFF")
             height: isSearch ? 67 : 50
             radius: 6
             width: itemListView.width

@@ -333,7 +333,6 @@ Item {
                     Layout.fillWidth: true
                     color: index === folderListView.currentIndex ? (root.activeFocus ? "white" : (DTK.themeType === ApplicationHelper.LightType ? "black" : "#B2FFFFFF")) : (DTK.themeType === ApplicationHelper.LightType ? "black" : "#B2FFFFFF")
                     elide: Text.ElideRight
-                    font.pixelSize: 14
                     horizontalAlignment: Text.AlignLeft
                     text: model.name
                     verticalAlignment: Text.AlignVCenter
@@ -345,7 +344,6 @@ Item {
 
                     Layout.rightMargin: 10
                     color: folderNameLabel.color
-                    font.pixelSize: 14
                     horizontalAlignment: Text.AlignRight
                     text: model.count
                     verticalAlignment: Text.AlignVCenter
