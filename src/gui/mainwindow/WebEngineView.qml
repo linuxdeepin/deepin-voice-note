@@ -156,7 +156,7 @@ Item {
             Rectangle {
                 anchors.top: webRect.top
                 border.width: 0
-                color: hasScroll ? (DTK.themeType === ApplicationHelper.LightType ? "#0C000000" : "#0CFFFFFF") : "transparent"
+                color: hasScroll ? (DTK.themeType === ApplicationHelper.LightType ? "#0C000000" : "#19FFFFFF") : "transparent"
                 height: 1
                 width: parent.width
             }

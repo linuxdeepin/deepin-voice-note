@@ -1,11 +1,11 @@
 :root {
     --color: rgba(192, 198, 212, 1);
-    --backgroundColor: #090917;
+    --backgroundColor: #000;
 }
 
 body {
     color: rgba(192, 198, 212, 1) !important;
-    background-color: #090917 !important;
+    background-color: #000 !important;
 }
 
 u {
