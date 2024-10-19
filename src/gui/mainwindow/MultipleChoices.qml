@@ -16,6 +16,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
+        color: DTK.themeType === ApplicationHelper.LightType ? "white" : "#242424"
 
         ColumnLayout {
             Layout.fillHeight: true
@@ -29,7 +30,7 @@ Item {
                 source: "qrc:/icon/multiple_choice.dci"
             }
 
-            Text {
+            Label {
                 id: description
 
                 Layout.alignment: Qt.AlignHCenter
