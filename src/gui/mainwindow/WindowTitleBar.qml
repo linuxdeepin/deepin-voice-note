@@ -12,6 +12,7 @@ TitleBar {
 
     signal createNote
     signal insertImage
+    signal openPrivacy
     signal startRecording
 
     enableInWindowBlendBlur: false
@@ -19,7 +20,7 @@ TitleBar {
     width: 0
 
     background: Rectangle {
-        color: DTK.themeType === ApplicationHelper.LightType ? "white" : "black"
+        color: DTK.themeType === ApplicationHelper.LightType ? "white" : "#242424"
     }
     content: Item {
         Component.onCompleted: {
@@ -41,6 +42,16 @@ TitleBar {
                     settingDlgLoader.setSource("../dialog/SettingDialog.qml");
                 if (settingDlgLoader.status === Loader.Ready)
                     settingDlgLoader.item.show();
+            }
+        }
+
+        MenuItem {
+            id: privacyBtn
+
+            text: qsTr("Privacy Policy")
+
+            onTriggered: {
+                openPrivacy();
             }
         }
 

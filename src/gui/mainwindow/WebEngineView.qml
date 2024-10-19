@@ -156,7 +156,7 @@ Item {
             Rectangle {
                 anchors.top: webRect.top
                 border.width: 0
-                color: hasScroll ? (DTK.themeType === ApplicationHelper.LightType ? "#0C000000" : "#19FFFFFF") : "transparent"
+                color: hasScroll ? (DTK.themeType === ApplicationHelper.LightType ? "#14000000" : "#66000000") : "transparent"
                 height: 1
                 width: parent.width
             }
@@ -325,6 +325,9 @@ Item {
             } else {
                 selectImgLoader.item.open();
             }
+        }
+        onOpenPrivacy: {
+            VNoteMainManager.showPrivacy();
         }
         onStartRecording: {
             startRecording();

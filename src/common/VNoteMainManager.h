@@ -51,6 +51,7 @@ public:
     Q_INVOKABLE void checkNoteVoice(const QVariantList &index);
     Q_INVOKABLE void clearSearch();
     Q_INVOKABLE void preViewShortcut(const QPointF &point);
+    Q_INVOKABLE void showPrivacy();
 
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);

@@ -15,11 +15,11 @@ ApplicationWindow {
 
     property int createFolderBtnHeight: 40
     property int leftAreaMaxWidth: 300
-    property int leftAreaMinWidth: 140
+    property int leftAreaMinWidth: 100
     property int leftViewWidth: 200
-    property int middleAreaMinWidth: 200
+    property int middleAreaMinWidth: 190
     property bool needHideSearch: false
-    property int rightAreaMinWidth: 340
+    property int rightAreaMinWidth: 390
     property int tmpLeftAreaWidth: 200
     property int tmpWebViewWidth: 0
     property int tmprightDragX: 0
@@ -337,6 +337,10 @@ ApplicationWindow {
                 onPositionChanged: {
                     if (drag.active) {
                         var newWidth = leftDragHandle.x;
+                        if (newWidth > 115)
+                            folderListView.isCountShow = true;
+                        else
+                            folderListView.isCountShow = false;
                         if (newWidth >= leftBgArea.width) {
                             var shrinkWidth = newWidth - leftBgArea.width;
                             if ((middleBgArea.width + rightDragHandle.width) > middleAreaMinWidth) {
