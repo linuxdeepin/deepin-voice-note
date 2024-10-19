@@ -30,6 +30,9 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QProcess>
+#include <QDesktopServices>
+
+#include <DSysInfo>
 
 VNoteMainManager::VNoteMainManager()
 {
@@ -867,4 +870,26 @@ void VNoteMainManager::preViewShortcut(const QPointF &point)
     shortcutViewProcess->startDetached("deepin-shortcut-viewer", shortcutString);
 
     connect(shortcutViewProcess, SIGNAL(finished(int)), shortcutViewProcess, SLOT(deleteLater()));
+}
+
+void VNoteMainManager::showPrivacy()
+{
+    QString url = "";
+    QLocale locale;
+    QLocale::Country country = locale.country();
+    bool isCommunityEdition = DSysInfo::isCommunityEdition();
+    if (country == QLocale::China) {
+        if (isCommunityEdition) {
+            url = "https://www.deepin.org/zh/agreement/privacy/";
+        } else {
+            url = "https://www.uniontech.com/agreement/privacy-cn";
+        }
+    } else {
+        if (isCommunityEdition) {
+            url = "https://www.deepin.org/en/agreement/privacy/";
+        } else {
+            url = "https://www.uniontech.com/agreement/privacy-en";
+        }
+    }
+    QDesktopServices::openUrl(url);
 }

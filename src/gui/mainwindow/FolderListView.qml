@@ -14,6 +14,7 @@ Item {
     id: root
 
     property int currentDropIndex: -1
+    property bool isCountShow: true
     property int itemHeight: 30
     property int lastDropIndex: -1
     property int listHeight: 700
@@ -347,7 +348,7 @@ Item {
                     horizontalAlignment: Text.AlignRight
                     text: model.count
                     verticalAlignment: Text.AlignVCenter
-                    visible: !rootItem.isRename
+                    visible: !rootItem.isRename && isCountShow
                     width: 30
                 }
             }
