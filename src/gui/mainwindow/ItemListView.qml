@@ -26,6 +26,7 @@ Item {
     property int topSize: 0
     property alias view: itemListView
 
+    signal deleteFinished
     signal deleteNotes(int number)
     signal dropRelease
     signal emptyItemList
@@ -35,26 +36,33 @@ Item {
 
     function onDeleteNote() {
         messageDialogLoader.messageData = selectedNoteItem.length;
+        if (messageDialogLoader.active) {
+            messageDialogLoader.item.show();
+        }
         messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteNote, ret => {
                 if (!ret) {
                     return;
                 }
                 var delList = itemListView.sortAndDeduplicate(selectedNoteItem);
                 var delIdList = [];
+                var deleIndex = Number.MAX_SAFE_INTEGER;
                 for (var i = 0; i < delList.length; i++) {
                     delIdList.push(itemModel.get(delList[i]).noteId);
                     itemModel.remove(delList[i]);
+                    if (selectedNoteItem[i] < deleIndex)
+                        deleIndex = selectedNoteItem[i];
                 }
                 VNoteMainManager.deleteNote(delIdList);
                 deleteNotes(selectedNoteItem.length);
-                if (itemModel.count <= itemListView.contextIndex) {
+                if (itemModel.count <= deleIndex) {
                     itemListView.itemAtIndex(itemModel.count - 1).isSelected = true;
                     selectedNoteItem = [itemModel.count - 1];
                     noteItemChanged(itemModel.get(itemModel.count - 1).noteId);
                 } else {
-                    itemListView.itemAtIndex(itemListView.contextIndex).isSelected = true;
-                    noteItemChanged(itemModel.get(itemListView.contextIndex).noteId);
+                    itemListView.itemAtIndex(deleIndex).isSelected = true;
+                    noteItemChanged(itemModel.get(deleIndex).noteId);
                 }
+                deleteFinished();
             });
     }
 
