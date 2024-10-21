@@ -369,12 +369,11 @@ Item {
                     if (folderListView.itemAtIndex(folderListView.lastCurrentIndex)) {
                         folderListView.itemAtIndex(folderListView.lastCurrentIndex).isRename = false;
                     }
+                    folderListView.currentIndex = index;
+                    folderListView.lastCurrentIndex = index;
                     if (mouse.button === Qt.RightButton) {
                         folderListView.contextIndex = index;
                         folderItemContextMenu.popup();
-                    } else {
-                        folderListView.currentIndex = index;
-                        folderListView.lastCurrentIndex = index;
                     }
                     rootItem.isHovered = false;
                 }
@@ -476,7 +475,7 @@ Item {
                     text: qsTr("New Note")
 
                     onTriggered: {
-                        addFolder();
+                        VNoteMainManager.createNote();
                     }
                 }
             }
