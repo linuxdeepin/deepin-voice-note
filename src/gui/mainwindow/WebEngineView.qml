@@ -17,6 +17,7 @@ Item {
     id: rootItem
 
     property bool hasScroll: false
+    property bool isRecording: false
     property bool noSearchResult: false
     property bool webVisible: true
 
@@ -31,8 +32,13 @@ Item {
         } else {
             recorderViewLoader.item.visible = true;
         }
+        isRecording = true;
         VoiceRecoderHandler.startRecoder();
         title.recorderBtnEnable = false;
+    }
+
+    function stopAndClose() {
+        recorderViewLoader.item.stop();
     }
 
     function toggleMultCho(choices) {
@@ -285,6 +291,7 @@ Item {
         }
 
         function onStopRecording() {
+            isRecording = false;
             VoiceRecoderHandler.stopRecoder();
             title.recorderBtnEnable = true;
         }

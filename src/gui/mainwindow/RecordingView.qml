@@ -14,6 +14,13 @@ Item {
     signal pauseRecording
     signal stopRecording
 
+    function stop() {
+        curves.stopRecording();
+        stopRecording();
+        rootItem.visible = false;
+        time = "00:00";
+    }
+
     implicitHeight: 42
     implicitWidth: 364
     visible: false
@@ -74,10 +81,7 @@ Item {
             width: rootItem.height
 
             onClicked: {
-                curves.stopRecording();
-                stopRecording();
-                rootItem.visible = false;
-                time = "00:00";
+                stop();
             }
         }
     }
