@@ -476,6 +476,9 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     moveToFolderDialog.folderModel: folderListView.model
 
+                    onDeleteFinished: {
+                        webEngineView.toggleMultCho(1);
+                    }
                     onNoteItemChanged: {
                         VNoteMainManager.vNoteChanged(index);
                     }
