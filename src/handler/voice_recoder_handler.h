@@ -25,6 +25,7 @@ public:
     Q_INVOKABLE void pauseRecoder();
     Q_INVOKABLE void setAudioDevice(const QString &device);
     Q_INVOKABLE void changeMode(const int &mode);
+    Q_INVOKABLE void confirmStartRecoder();
 
 public slots:
     void onDeviceEnableChanged(int mode, bool enabled);
@@ -36,6 +37,7 @@ signals:
     void updateRecorderTime(const QVariant &time);
     void updateWave(qreal max);
     void updateRecordBtnState(bool enable);
+    void volumeTooLow(bool isLow);
 
 private:
     VoiceRecoderHandler();
@@ -43,6 +45,8 @@ private:
     void intRecoder();
     void initRecordPath();
     void initAudioWatcher();
+
+    bool checkVolume();
 
 private slots:
     void onAudioDeviceChange(int mode);

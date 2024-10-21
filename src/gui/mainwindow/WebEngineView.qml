@@ -33,7 +33,6 @@ Item {
             recorderViewLoader.item.visible = true;
         }
         isRecording = true;
-        VoiceRecoderHandler.startRecoder();
         title.recorderBtnEnable = false;
     }
 
@@ -337,7 +336,7 @@ Item {
             VNoteMainManager.showPrivacy();
         }
         onStartRecording: {
-            startRecording();
+            VoiceRecoderHandler.startRecoder();
         }
     }
 
@@ -368,6 +367,18 @@ Item {
         }
         onUpdateRecorderTime: {
             recorderViewLoader.item.time = time;
+        }
+        onVolumeTooLow: isLow => {
+            if (isLow) {
+                messageDialogLoader.showDialog(VNoteMessageDialogHandler.VolumeTooLow, ret => {
+                        if (ret) {
+                            startRecording();
+                            VoiceRecoderHandler.confirmStartRecoder();
+                        }
+                    });
+            } else {
+                startRecording();
+            }
         }
     }
 }
