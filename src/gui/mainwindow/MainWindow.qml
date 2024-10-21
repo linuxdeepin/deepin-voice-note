@@ -9,11 +9,13 @@ import org.deepin.dtk
 import Qt.labs.platform
 import QtQuick.Controls
 import VNote 1.0
+import "../dialog"
 
 ApplicationWindow {
     id: rootWindow
 
     property int createFolderBtnHeight: 40
+    property bool isRecording: webEngineView.isRecording
     property int leftAreaMaxWidth: 300
     property int leftAreaMinWidth: 100
     property int leftViewWidth: 200
@@ -49,6 +51,17 @@ ApplicationWindow {
         x = Screen.width / 2 - width / 2;
         y = Screen.height / 2 - height / 2;
     }
+    onClosing: {
+        if (isRecording) {
+            close.accepted = false;
+            messageDialogLoader.showDialog(VNoteMessageDialogHandler.AbortRecord, ret => {
+                    if (ret) {
+                        webEngineView.stopAndClose();
+                        delayTimer.start();
+                    }
+                });
+        }
+    }
     onWidthChanged: {
         if (rightBgArea.width < rightAreaMinWidth) {
             var reduce = rightAreaMinWidth - rightBgArea.width;
@@ -58,6 +71,18 @@ ApplicationWindow {
                 leftBgArea.Layout.preferredWidth = leftBgArea.width - reduce;
             }
             rightBgArea.width = rightAreaMinWidth;
+        }
+    }
+
+    Timer {
+        id: delayTimer
+
+        interval: 500
+        repeat: false
+        running: false
+
+        onTriggered: {
+            rootWindow.close();
         }
     }
 
@@ -84,6 +109,11 @@ ApplicationWindow {
         onStartRecording: {
             webEngineView.startRecording();
         }
+    }
+
+    VNoteMessageDialogLoader {
+        id: messageDialogLoader
+
     }
 
     Connections {
