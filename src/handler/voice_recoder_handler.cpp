@@ -22,20 +22,12 @@ VoiceRecoderHandler::RecoderType VoiceRecoderHandler::getRecoderType()
 
 void VoiceRecoderHandler::startRecoder()
 {
-    m_audioRecoder->setDevice(m_audioWatcher->getDeviceName(static_cast<AudioWatcher::AudioMode>(m_currentMode)));
-    QString fileName = QDateTime::currentDateTime().toString("yyyyMMddhhmmss") + ".mp3";
-
-    initRecordPath();
-    m_recordMsec = 0;
-    m_recordPath = m_recordDir + fileName;
-    m_audioRecoder->setOutputFile(m_recordPath);
-    bool ret = m_audioRecoder->startRecord();
-    if (!ret) {
-        m_type = RecoderType::Idle;
-        stopRecoder();
+    if (!checkVolume()) {
+        confirmStartRecoder();
+        emit volumeTooLow(false);
     } else {
-        m_type = RecoderType::Recording;
-        emit recoderStateChange(m_type);
+        qInfo() << "Volume less than 20%";
+        emit volumeTooLow(true);
     }
 }
 
@@ -98,6 +90,32 @@ void VoiceRecoderHandler::initAudioWatcher()
 {
     m_audioWatcher = new AudioWatcher(this);
     connect(m_audioWatcher, &AudioWatcher::sigDeviceEnableChanged, this, &VoiceRecoderHandler::onDeviceEnableChanged);
+}
+
+bool VoiceRecoderHandler::checkVolume()
+{
+    double volume = m_audioWatcher->getVolume(
+        static_cast<AudioWatcher::AudioMode>(m_currentMode));
+    return (volume - 0.2 < 0.0) ? true : false;
+}
+
+void VoiceRecoderHandler::confirmStartRecoder()
+{
+    m_audioRecoder->setDevice(m_audioWatcher->getDeviceName(static_cast<AudioWatcher::AudioMode>(m_currentMode)));
+    QString fileName = QDateTime::currentDateTime().toString("yyyyMMddhhmmss") + ".mp3";
+
+    initRecordPath();
+    m_recordMsec = 0;
+    m_recordPath = m_recordDir + fileName;
+    m_audioRecoder->setOutputFile(m_recordPath);
+    bool ret = m_audioRecoder->startRecord();
+    if (!ret) {
+        m_type = RecoderType::Idle;
+        stopRecoder();
+    } else {
+        m_type = RecoderType::Recording;
+        emit recoderStateChange(m_type);
+    }
 }
 
 void VoiceRecoderHandler::onAudioDeviceChange(int mode)

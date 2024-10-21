@@ -265,12 +265,12 @@ void AudioWatcher::onDBusAudioPropertyChanged(QDBusMessage msg)
             if (prop == QStringLiteral("Volume")) {
                 double outAudioPortVolume = qvariant_cast<double>(changedProps[prop]);
                 if (abs(m_outAudioPortVolume - outAudioPortVolume) >= 0.000001) {
-                    onSourceVolumeChanged(outAudioPortVolume);
+                    onSinkVolumeChanged(outAudioPortVolume);
                 }
             } else if (prop == QStringLiteral("Mute")) {
                 const bool outAudioMute = qvariant_cast<bool>(changedProps[prop]);
                 if (m_outAudioMute != outAudioMute) {
-                    onSourceMuteChanged(outAudioMute);
+                    onSinkMuteChanged(outAudioMute);
                 }
             } else if (prop == QStringLiteral("ActivePort")) {
                 const AudioPort outAudioPort = defaultSinkActivePort();
