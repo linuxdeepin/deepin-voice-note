@@ -93,7 +93,7 @@
         <location filename="../src/dialog/folderselectdialog.cpp" line="369"/>
         <location filename="../src/dialog/folderselectdialog.cpp" line="377"/>
         <source>Move the note &quot;%1&quot; to:</source>
-        <translation>Shpjere shënimin &quot;%1&quot; te:</translation>
+        <translation>Shpjere shënimin “%1” te:</translation>
     </message>
 </context>
 <context>
@@ -283,7 +283,7 @@
     <message>
         <location filename="../src/common/setting.cpp" line="24"/>
         <source>Basic</source>
-        <translation>Bazë</translation>
+        <translation>Elementar</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="25"/>
