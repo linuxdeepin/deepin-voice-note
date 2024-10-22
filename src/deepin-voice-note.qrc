@@ -41,5 +41,6 @@
         <file>dsg/icons/save_audio.dci</file>
         <file>dsg/icons/save_note.dci</file>
         <file>dsg/icons/search_no_results.dci</file>
+        <file>gui/dialog/ViewPictureDialog.qml</file>
     </qresource>
 </RCC>
