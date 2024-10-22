@@ -150,6 +150,13 @@ Item {
                     onTriggerWebAction: action => {
                         webView.triggerWebAction(action);
                     }
+                    onViewPicture: filePath => {
+                        viewPictureLoader.path = filePath;
+                        if (!viewPictureLoader.active)
+                            viewPictureLoader.active = true;
+                        else
+                            viewPictureLoader.item.show();
+                    }
                 }
 
                 WebChannel {
@@ -196,6 +203,25 @@ Item {
     VNoteMessageDialogLoader {
         id: messageDialogLoader
 
+    }
+
+    Loader {
+        id: viewPictureLoader
+
+        property string path: ""
+
+        asynchronous: true
+
+        sourceComponent: ViewPictureDialog {
+            id: viewPictureWindow
+
+            filePath: path
+        }
+
+        onActiveChanged: {
+            if (active)
+                viewPictureWindow.show();
+        }
     }
 
     Loader {

@@ -176,6 +176,7 @@ void WebEngineHandler::connectWebContent()
 
     connect(JsContent::instance(), &JsContent::popupMenu, this, &WebEngineHandler::onSaveMenuParam);
     connect(JsContent::instance(), &JsContent::textPaste, this, &WebEngineHandler::onPaste);
+    connect(JsContent::instance(), &JsContent::viewPictrue, this, &WebEngineHandler::viewPicture);
 }
 
 /*!
@@ -297,7 +298,7 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
             break;
         case ActionManager::PictureView:
             // 查看图片
-            // viewPicture(m_menuJson.toString());
+            Q_EMIT viewPicture(menuJson.toString());
             break;
         case ActionManager::PictureSaveAs:
             // 另存图片

@@ -58,6 +58,8 @@ Q_SIGNALS:
 
     void loadRichText();
 
+    void viewPicture(const QString &filePath);
+
 public Q_SLOTS:
     // for qml
     void onCallJsResult(const QVariant &result);
