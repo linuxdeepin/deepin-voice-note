@@ -80,6 +80,8 @@ private:
     bool isVoicePaste();
 
     bool saveMP3();
+    void savePictureAs();
+    QString saveAsFile(const QString &originalPath, QString dirPath, const QString &defalutName);
 
 private:
     QObject *m_targetWebEngine { nullptr };  // 关联的 qml WebEngineView
