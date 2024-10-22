@@ -6086,7 +6086,7 @@
                 className: 'note-color ' + className,
                 children: [
                     this.buttonColor({
-                        className: 'note-current-color-button backcolorBut',
+                        className: 'note-current-color-button ' + (className === 'note-color-fore' ? 'forecolorBut' : 'backcolorBut'),
                         contents: backColor ? this.ui.icon(this.options.icons.backcolor) : _this.ui.icon(this.options.icons.forecolor),
                         tooltip: tooltip,
                         click: function (e) {
@@ -6125,9 +6125,9 @@
                         }
                     }),
                     this.button({
-                        className: backColor ? "dropdown-toggle backColor-dropdown moreBut" : "dropdown-toggle foreColor-dropdown forecolorBut",
+                        className: "dropdown-toggle backColor-dropdown moreBut",
                         contents: this.ui.dropdownButtonContents('', this.options),
-                        tooltip: backColor ? tooltipContent.more : tooltipContent.forecolor,
+                        tooltip: tooltipContent.more,
                         data: {
                             toggle: 'dropdown'
                         }
