@@ -301,7 +301,7 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
             break;
         case ActionManager::PictureSaveAs:
             // 另存图片
-            // savePictureAs();
+            savePictureAs();
             break;
         case ActionManager::TxtSpeech:
             VTextSpeechAndTrManager::onTextToSpeech();
@@ -462,4 +462,58 @@ bool WebEngineHandler::saveMP3()
         return tmpFile.copy(fileName);
     }
     return true;
+}
+
+void WebEngineHandler::savePictureAs()
+{
+    QString originalPath = menuJson.toString(); //获取原图片路径
+    saveAsFile(originalPath, QStandardPaths::writableLocation(QStandardPaths::PicturesLocation), "image");
+}
+
+QString WebEngineHandler::saveAsFile(const QString &originalPath, QString dirPath, const QString &defalutName)
+{
+    //存储文件夹默认为桌面
+    if (dirPath.isEmpty()) {
+        dirPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    }
+
+    QFileInfo fileInfo(originalPath);
+    QString filter = "*." + fileInfo.suffix();
+    QString baseName = defalutName.isEmpty() ? fileInfo.baseName() : defalutName;
+    QString dir = QString("%1/%2").arg(dirPath).arg(baseName + "." + fileInfo.suffix());
+    //获取需要保存的文件位置，默认路径为用户图片文件夹，默认文件名为原文件名
+    QString newPath = QFileDialog::getSaveFileName(0, "", dir, filter);
+    if (newPath.isEmpty()) {
+        return "";
+    }
+    //添加文件后缀
+    if (!newPath.endsWith(fileInfo.suffix())) {
+        newPath += ("." + fileInfo.suffix());
+    }
+
+    QFileInfo info(newPath);
+
+    if (!QFileInfo(info.dir().path()).isWritable()) {
+        //文件夹没有写权限
+        emit requestMessageDialog(VNoteMessageDialogHandler::NoPermission);
+        return "";
+    }
+    if (info.exists()) {
+        //文件已存在，删除原文件
+        if (!info.isWritable()) {
+            //文件没有写权限
+            // VNoteMessageDialog audioOutLimit(VNoteMessageDialog::NoPermission);
+            emit requestMessageDialog(VNoteMessageDialogHandler::NoPermission);
+            return "";
+        }
+        QFile::remove(newPath);
+    }
+
+    //复制文件
+    if (!QFile::copy(originalPath, newPath)) {
+        emit requestMessageDialog(VNoteMessageDialogHandler::SaveFailed);
+        qCritical() << "copy failed:" << originalPath << ";" << newPath;
+        return "";
+    }
+    return newPath;
 }
