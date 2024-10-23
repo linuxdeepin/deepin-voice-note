@@ -1079,6 +1079,8 @@ function changeColor(flag, activeColor, disableColor, backgroundColor) {
 
     // 设置下拉菜单调色板
     $('#summernote').summernote('airPopover.updateColorPalette', global_theme == 2);
+    // change text foreground color and background color with theme
+    switchTextColor(global_theme == 2);
 }
 
 /**
@@ -1572,3 +1574,36 @@ function toggleVoiceToTextState(translateHeader) {
 }
 
 /***** 语音转文本相关函数 end *****/
+
+function exchangeTextColor(oldForeColors, newForeColors, oldBackColors, newBackColors) {
+    document.querySelectorAll('.note-editable span').forEach(function (item) {
+        if (item.style.color) {
+            var index = oldForeColors.indexOf(item.style.color);
+            if (index >= 0 && index < newForeColors.length) {
+                item.style.color = newForeColors[index];
+            }
+        }
+
+        if (item.style.backgroundColor) {
+            var backIndex = oldBackColors.indexOf(item.style.backgroundColor);
+            if (backIndex >= 0 && backIndex < newBackColors.length) {
+                item.style.backgroundColor = newBackColors[backIndex];
+            }
+        }
+    });
+}
+
+/**
+ * @brief Change text background/foreground color when switching themes
+ */
+function switchTextColor(isDarkTheme) { 
+    var options = $('#summernote').data('summernote').options;
+
+    if(isDarkTheme) {
+        exchangeTextColor(options.simpleLightForeColors.flat(), options.simpleDarkForeColors.flat(),
+                          options.simpleLightBackColors.flat(), options.simpleDarkBackColors.flat());
+    } else {
+        exchangeTextColor(options.simpleDarkForeColors.flat(), options.simpleLightForeColors.flat(), 
+                          options.simpleDarkBackColors.flat(), options.simpleLightBackColors.flat());
+    }
+}

@@ -253,6 +253,7 @@ ul {
     border: 1px solid red;
     width: 20px;
     transform: rotate(45deg);
+    display: none;    /* TODO: remove slash, impl later */
 }
 
 .note-backcolor .backColor-dropdown,
