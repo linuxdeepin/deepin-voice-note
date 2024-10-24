@@ -128,6 +128,16 @@ Item {
                     console.debug("--- from web: ", message, sourceID, lineNumber);
                 }
 
+                DropArea {
+                    anchors.fill: parent
+
+                    onDropped: {
+                        if (drop.hasUrls) {
+                            VNoteMainManager.insertImages(drop.urls);
+                        }
+                    }
+                }
+
                 WebEngineHandler {
                     id: handler
 
