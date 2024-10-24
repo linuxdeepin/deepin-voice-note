@@ -6,7 +6,7 @@ Item {
 
     signal createFolder
     signal createNote
-    signal playPause
+    signal playPauseVoice
     signal renameFolder
     signal renameNote
     signal saveNote
@@ -104,7 +104,7 @@ Item {
         sequence: "Space"
 
         onActivated: {
-            playPause();
+            playPauseVoice();
         }
     }
 

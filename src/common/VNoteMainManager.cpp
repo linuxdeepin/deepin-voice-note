@@ -893,3 +893,8 @@ void VNoteMainManager::showPrivacy()
     }
     QDesktopServices::openUrl(url);
 }
+
+void VNoteMainManager::resumeVoicePlayer()
+{
+    JsContent::instance()->jsCallPlayVoice("", true);
+}

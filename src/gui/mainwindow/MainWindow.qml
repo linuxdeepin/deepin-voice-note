@@ -97,6 +97,9 @@ ApplicationWindow {
         onCreateNote: {
             VNoteMainManager.createNote();
         }
+        onPlayPauseVoice: {
+            VNoteMainManager.resumeVoicePlayer();
+        }
         onRenameFolder: {
             folderListView.renameCurrentItem();
         }
