@@ -613,7 +613,7 @@
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="107"/>
         <source>Create Note</source>
-        <translation>新建 筆記</translation>
+        <translation>新建筆記</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="146"/>
