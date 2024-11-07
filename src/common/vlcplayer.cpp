@@ -7,7 +7,49 @@
 #include <vlc/vlc.h>
 #include <vlc/libvlc_media.h>
 
+#include <QLibrary>
+
 #include <DApplication>
+
+typedef libvlc_event_manager_t* (*voice_libvlc_media_player_event_manager) ( libvlc_media_player_t *p_mi );
+typedef void (*voice_libvlc_event_detach)( libvlc_event_manager_t *p_event_manager, libvlc_event_type_t i_event_type, libvlc_callback_t f_callback, void *p_user_data );
+typedef libvlc_media_t * (*voice_libvlc_media_player_get_media)( libvlc_media_player_t *p_mi );
+typedef void (*voice_libvlc_media_release)( libvlc_media_t *p_md );
+typedef void (*voice_libvlc_media_player_release)( libvlc_media_player_t *p_mi );
+typedef void (*voice_libvlc_release)( libvlc_instance_t *p_instance );
+typedef libvlc_instance_t * (*voice_libvlc_new)( int argc , const char *const *argv );
+typedef int (*voice_libvlc_event_attach)( libvlc_event_manager_t *p_event_manager, libvlc_event_type_t i_event_type, libvlc_callback_t f_callback, void *user_data );
+typedef void (*voice_libvlc_set_user_agent)( libvlc_instance_t *p_instance, const char *name, const char *http );
+typedef libvlc_media_t *(*voice_libvlc_media_new_path)( libvlc_instance_t *p_instance, const char *path );
+typedef int (*voice_libvlc_media_player_play) ( libvlc_media_player_t *p_mi );
+typedef void (*voice_libvlc_set_app_id)( libvlc_instance_t *p_instance, const char *id, const char *version, const char *icon );
+typedef libvlc_media_player_t * (*voice_libvlc_media_player_new)( libvlc_instance_t *p_libvlc_instance );
+typedef int (*voice_libvlc_media_player_set_role)(libvlc_media_player_t *p_mi, unsigned role);
+typedef void (*voice_libvlc_media_player_set_media)( libvlc_media_player_t *p_mi, libvlc_media_t *p_md );
+typedef void (*voice_libvlc_media_player_pause) ( libvlc_media_player_t *p_mi );
+typedef void (*voice_libvlc_media_player_stop) ( libvlc_media_player_t *p_mi );
+typedef void (*voice_libvlc_media_player_set_time)( libvlc_media_player_t *p_mi, libvlc_time_t i_time );
+typedef libvlc_state_t (*voice_libvlc_media_player_get_state)( libvlc_media_player_t *p_mi );
+
+voice_libvlc_media_player_event_manager g_voice_libvlc_media_player_event_manager = nullptr;
+voice_libvlc_event_detach g_voice_libvlc_event_detach = nullptr;
+voice_libvlc_media_player_get_media g_voice_libvlc_media_player_get_media = nullptr;
+voice_libvlc_media_release g_voice_libvlc_media_release = nullptr;
+voice_libvlc_media_player_release g_voice_libvlc_media_player_release = nullptr;
+voice_libvlc_release g_voice_libvlc_release = nullptr;
+voice_libvlc_new g_voice_libvlc_new = nullptr;
+voice_libvlc_event_attach g_voice_libvlc_event_attach = nullptr;
+voice_libvlc_set_user_agent g_voice_libvlc_set_user_agent = nullptr;
+voice_libvlc_media_new_path g_voice_libvlc_media_new_path = nullptr;
+voice_libvlc_media_player_play g_voice_libvlc_media_player_play = nullptr;
+voice_libvlc_set_app_id g_voice_libvlc_set_app_id = nullptr;
+voice_libvlc_media_player_new g_voice_libvlc_media_player_new = nullptr;
+voice_libvlc_media_player_set_role g_voice_libvlc_media_player_set_role = nullptr;
+voice_libvlc_media_player_set_media g_voice_libvlc_media_player_set_media = nullptr;
+voice_libvlc_media_player_pause g_voice_libvlc_media_player_pause = nullptr;
+voice_libvlc_media_player_stop g_voice_libvlc_media_player_stop = nullptr;
+voice_libvlc_media_player_set_time g_voice_libvlc_media_player_set_time = nullptr;
+voice_libvlc_media_player_get_state g_voice_libvlc_media_player_get_state = nullptr;
 
 DWIDGET_USE_NAMESPACE
 /**
@@ -15,7 +57,7 @@ DWIDGET_USE_NAMESPACE
  * @param parent
  */
 VlcPlayer::VlcPlayer(QObject *parent)
-    : QObject(parent)
+    : VoicePlayerBase(parent)
 {
 #ifdef MPV_PLAYENGINE
     init();
@@ -39,14 +81,14 @@ void VlcPlayer::init()
     qInfo() << "The current play engine is vlc";
     if (m_vlcInst == nullptr)
     {
-        m_vlcInst = libvlc_new(0, nullptr);
-        libvlc_set_user_agent(m_vlcInst, DApplication::translate("AppMain", "Voice Notes").toUtf8().constData(), "");
-        libvlc_set_app_id(m_vlcInst, "", "", "deepin-voice-note");
+        m_vlcInst = g_voice_libvlc_new(0, nullptr);
+        g_voice_libvlc_set_user_agent(m_vlcInst, DApplication::translate("AppMain", "Voice Notes").toUtf8().constData(), "");
+        g_voice_libvlc_set_app_id(m_vlcInst, "", "", "deepin-voice-note");
     }
     if (m_vlcPlayer == nullptr)
     {
-        m_vlcPlayer = libvlc_media_player_new(m_vlcInst);
-        libvlc_media_player_set_role(m_vlcPlayer, libvlc_role_None);
+        m_vlcPlayer = g_voice_libvlc_media_player_new(m_vlcInst);
+        g_voice_libvlc_media_player_set_role(m_vlcPlayer, libvlc_role_None);
         attachEvent();
     }
 #else
@@ -70,17 +112,17 @@ void VlcPlayer::deinit()
     if (m_vlcPlayer)
     {
         detachEvent();
-        libvlc_media_t *media = libvlc_media_player_get_media(m_vlcPlayer);
+        libvlc_media_t *media = g_voice_libvlc_media_player_get_media(m_vlcPlayer);
         if (media)
         {
-            libvlc_media_release(media);
+            g_voice_libvlc_media_release(media);
         }
-        libvlc_media_player_release(m_vlcPlayer);
+        g_voice_libvlc_media_player_release(m_vlcPlayer);
         m_vlcPlayer = nullptr;
     }
     if (m_vlcInst)
     {
-        libvlc_release(m_vlcInst);
+        g_voice_libvlc_release(m_vlcInst);
         m_vlcInst = nullptr;
     }
 #else
@@ -95,18 +137,46 @@ void VlcPlayer::deinit()
 #endif
 }
 
+bool VlcPlayer::initVlcPlayer()
+{
+    QLibrary library("libvlc.so.5");
+    if (!library.load())
+        return false;
+
+    g_voice_libvlc_media_player_event_manager = (voice_libvlc_media_player_event_manager)library.resolve("libvlc_media_player_event_manager");
+    g_voice_libvlc_event_detach = (voice_libvlc_event_detach)library.resolve("libvlc_event_detach");
+    g_voice_libvlc_media_player_get_media = (voice_libvlc_media_player_get_media)library.resolve("libvlc_media_player_get_media");
+    g_voice_libvlc_media_release = (voice_libvlc_media_release)library.resolve("libvlc_media_release");
+    g_voice_libvlc_media_player_release = (voice_libvlc_media_player_release)library.resolve("libvlc_media_player_release");
+    g_voice_libvlc_release = (voice_libvlc_release)library.resolve("libvlc_release");
+    g_voice_libvlc_new = (voice_libvlc_new)library.resolve("libvlc_new");
+    g_voice_libvlc_event_attach = (voice_libvlc_event_attach)library.resolve("libvlc_event_attach");
+    g_voice_libvlc_set_user_agent = (voice_libvlc_set_user_agent)library.resolve("libvlc_set_user_agent");
+    g_voice_libvlc_media_new_path = (voice_libvlc_media_new_path)library.resolve("libvlc_media_new_path");
+    g_voice_libvlc_media_player_play = (voice_libvlc_media_player_play)library.resolve("libvlc_media_player_play");
+    g_voice_libvlc_set_app_id = (voice_libvlc_set_app_id)library.resolve("libvlc_set_app_id");
+    g_voice_libvlc_media_player_new = (voice_libvlc_media_player_new)library.resolve("libvlc_media_player_new");
+    g_voice_libvlc_media_player_set_role = (voice_libvlc_media_player_set_role)library.resolve("libvlc_media_player_set_role");
+    g_voice_libvlc_media_player_set_media = (voice_libvlc_media_player_set_media)library.resolve("libvlc_media_player_set_media");
+    g_voice_libvlc_media_player_pause = (voice_libvlc_media_player_pause)library.resolve("libvlc_media_player_pause");
+    g_voice_libvlc_media_player_stop = (voice_libvlc_media_player_stop)library.resolve("libvlc_media_player_stop");
+    g_voice_libvlc_media_player_set_time = (voice_libvlc_media_player_set_time)library.resolve("libvlc_media_player_set_time");
+    g_voice_libvlc_media_player_get_state = (voice_libvlc_media_player_get_state)library.resolve("libvlc_media_player_get_state");
+    return true;
+}
+
 #ifndef MPV_PLAYENGINE
 /**
  * @brief VlcPlayer::attachEvent
  */
 void VlcPlayer::attachEvent()
 {
-    libvlc_event_manager_t *vlc_evt_man = libvlc_media_player_event_manager(m_vlcPlayer);
+    libvlc_event_manager_t *vlc_evt_man = g_voice_libvlc_media_player_event_manager(m_vlcPlayer);
     if (vlc_evt_man)
     {
-        libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerEndReached, handleEvent, this);
-        libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerTimeChanged, handleEvent, this);
-        libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerLengthChanged, handleEvent, this);
+        g_voice_libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerEndReached, handleEvent, this);
+        g_voice_libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerTimeChanged, handleEvent, this);
+        g_voice_libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerLengthChanged, handleEvent, this);
     }
 }
 
@@ -115,12 +185,12 @@ void VlcPlayer::attachEvent()
  */
 void VlcPlayer::detachEvent()
 {
-    libvlc_event_manager_t *vlc_evt_man = libvlc_media_player_event_manager(m_vlcPlayer);
+    libvlc_event_manager_t *vlc_evt_man = g_voice_libvlc_media_player_event_manager(m_vlcPlayer);
     if (vlc_evt_man)
     {
-        libvlc_event_detach(vlc_evt_man, libvlc_MediaPlayerEndReached, handleEvent, this);
-        libvlc_event_detach(vlc_evt_man, libvlc_MediaPlayerTimeChanged, handleEvent, this);
-        libvlc_event_detach(vlc_evt_man, libvlc_MediaPlayerLengthChanged, handleEvent, this);
+        g_voice_libvlc_event_detach(vlc_evt_man, libvlc_MediaPlayerEndReached, handleEvent, this);
+        g_voice_libvlc_event_detach(vlc_evt_man, libvlc_MediaPlayerTimeChanged, handleEvent, this);
+        g_voice_libvlc_event_detach(vlc_evt_man, libvlc_MediaPlayerLengthChanged, handleEvent, this);
     }
 }
 #endif
@@ -134,11 +204,11 @@ void VlcPlayer::setFilePath(QString path)
     qDebug() << "Current playback file: " << path;
 #ifndef MPV_PLAYENGINE
     init();
-    libvlc_media_t *media = libvlc_media_new_path(m_vlcInst, path.toLatin1().constData());
+    libvlc_media_t *media = g_voice_libvlc_media_new_path(m_vlcInst, path.toLatin1().constData());
     if (media)
     {
-        libvlc_media_player_set_media(m_vlcPlayer, media);
-        libvlc_media_release(media);
+        g_voice_libvlc_media_player_set_media(m_vlcPlayer, media);
+        g_voice_libvlc_media_release(media);
     }
 #else
     if (player->isPlayableFile(path))
@@ -157,7 +227,7 @@ void VlcPlayer::play()
 #ifndef MPV_PLAYENGINE
     if (m_vlcPlayer)
     {
-        qInfo() << "libvlc play ret:" << libvlc_media_player_play(m_vlcPlayer);
+        qInfo() << "libvlc play ret:" << g_voice_libvlc_media_player_play(m_vlcPlayer);
     }
 #else
     qInfo() << "Current play engine status: " << player->state();
@@ -184,7 +254,7 @@ void VlcPlayer::pause()
 #ifndef MPV_PLAYENGINE
     if (m_vlcPlayer)
     {
-        libvlc_media_player_pause(m_vlcPlayer);
+        g_voice_libvlc_media_player_pause(m_vlcPlayer);
     }
 #else
     player->pauseResume();
@@ -200,7 +270,7 @@ void VlcPlayer::stop()
 #ifndef MPV_PLAYENGINE
     if (m_vlcPlayer)
     {
-        libvlc_media_player_stop(m_vlcPlayer);
+        g_voice_libvlc_media_player_stop(m_vlcPlayer);
     }
 #else
     player->stop();
@@ -279,7 +349,7 @@ void VlcPlayer::setPosition(qint64 pos)
 #ifndef MPV_PLAYENGINE
     if (m_vlcPlayer)
     {
-        libvlc_media_player_set_time(m_vlcPlayer, pos);
+        g_voice_libvlc_media_player_set_time(m_vlcPlayer, pos);
     }
 #else
     player->seekAbsolute(pos);
@@ -290,13 +360,13 @@ void VlcPlayer::setPosition(qint64 pos)
  * @brief VlcPlayer::getState
  * @return 状态
  */
-VlcPlayer::VlcState VlcPlayer::getState()
+VoicePlayerBase::PlayerState VlcPlayer::getState()
 {
     VlcPlayer::VlcState state = None;
 #ifndef MPV_PLAYENGINE
     if (m_vlcPlayer)
     {
-        state = static_cast<VlcPlayer::VlcState>(libvlc_media_player_get_state(m_vlcPlayer));
+        state = static_cast<VlcPlayer::VlcState>(g_voice_libvlc_media_player_get_state(m_vlcPlayer));
     }
     qInfo() << "Gets the current audio status.(status: " << state << ")";
 #else
@@ -314,7 +384,7 @@ VlcPlayer::VlcState VlcPlayer::getState()
         state = VlcPlayer::VlcState::Paused;
     }
 #endif
-    return state;
+    return (VoicePlayerBase::PlayerState)state;
 }
 
 void VlcPlayer::setChangePlayFile(bool flag)

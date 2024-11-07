@@ -5,10 +5,13 @@
 #include "voice_player_handler.h"
 
 #include <QFile>
+#include <QDir>
+#include <QLibraryInfo>
 #include <QDebug>
 
 #include "vnoteitem.h"
 #include "common/vlcplayer.h"
+#include "common/qtplayer.h"
 #include "common/metadataparser.h"
 #include "common/jscontent.h"
 
@@ -23,8 +26,8 @@ const int kTickMilliseconds = 1000;
  */
 VoicePlayerHandler::VoicePlayerHandler(QObject *parent)
     : QObject { parent }
-    , m_player(new VlcPlayer(this))
 {
+    initPlayer();
     // 绑定 Js 前端的控制
     connect(JsContent::instance(), &JsContent::playVoice, this, &VoicePlayerHandler::playVoice);
     connect(JsContent::instance(), &JsContent::playVoiceStop, this, &VoicePlayerHandler::onStop);
@@ -32,9 +35,9 @@ VoicePlayerHandler::VoicePlayerHandler(QObject *parent)
     connect(this, &VoicePlayerHandler::playStatusChanged, JsContent::instance(), &JsContent::callJsSetPlayStatus);
     connect(this, &VoicePlayerHandler::playPositionChanged, JsContent::instance(), &JsContent::callJsVoicePlayProgressChanged);
 
-    connect(m_player, &VlcPlayer::playEnd, this, [this]() { Q_EMIT playStatusChanged(End); });
-    connect(m_player, &VlcPlayer::durationChanged, this, &VoicePlayerHandler::playDurationChanged);
-    connect(m_player, &VlcPlayer::positionChanged, this, &VoicePlayerHandler::playPositionChanged);
+    connect(m_player, &VoicePlayerBase::playEnd, this, [this]() { Q_EMIT playStatusChanged(End); });
+    connect(m_player, &VoicePlayerBase::durationChanged, this, &VoicePlayerHandler::playDurationChanged);
+    connect(m_player, &VoicePlayerBase::positionChanged, this, &VoicePlayerHandler::playPositionChanged);
 }
 
 void VoicePlayerHandler::playVoice(const QVariant &json, bool bIsSame)
@@ -79,9 +82,32 @@ void VoicePlayerHandler::playVoiceImpl(bool bIsSame)
     }
 }
 
+void VoicePlayerHandler::initPlayer()
+{
+    QString strlib = "libvlc.so";
+    QDir dir;
+    QString path  = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
+    dir.setPath(path);
+    QStringList list = dir.entryList(QStringList() << (strlib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
+    if (list.contains(strlib)) {
+        m_player = new VlcPlayer(this);
+        bool successed = static_cast<VlcPlayer*>(m_player)->initVlcPlayer();
+        if (!successed) {
+            qInfo() << "VLC player initialization failed, QT player is used";
+            delete m_player;
+            m_player = nullptr;
+
+            m_player = new QtPlayer(this);
+        }
+    } else {
+        qInfo() << "VLC player is missing, use QT player";
+        m_player = new QtPlayer(this);
+    }
+}
+
 void VoicePlayerHandler::onPlay()
 {
-    if (VlcPlayer::Playing != m_player->getState()) {
+    if (VoicePlayerBase::Playing != m_player->getState()) {
         m_player->play();
         Q_EMIT playStatusChanged(Playing);
     }
@@ -89,8 +115,8 @@ void VoicePlayerHandler::onPlay()
 
 void VoicePlayerHandler::onStop()
 {
-    const VlcPlayer::VlcState state = m_player->getState();
-    if (VlcPlayer::Playing == state || VlcPlayer::Paused == state) {
+    const VoicePlayerBase::PlayerState state = m_player->getState();
+    if (VoicePlayerBase::Playing == state || VoicePlayerBase::Paused == state) {
         m_player->stop();
         Q_EMIT playStatusChanged(End);
     }
@@ -98,19 +124,19 @@ void VoicePlayerHandler::onStop()
 
 void VoicePlayerHandler::onToggleStateChange()
 {
-    const VlcPlayer::VlcState state = m_player->getState();
+    const VoicePlayerBase::PlayerState state = m_player->getState();
     switch (state) {
-        case VlcPlayer::Playing:
+        case VoicePlayerBase::Playing:
             m_player->pause();
             Q_EMIT playStatusChanged(Paused);
             break;
-        case VlcPlayer::Paused:
+        case VoicePlayerBase::Paused:
             m_player->play();
             Q_EMIT playStatusChanged(Playing);
             break;
-        case VlcPlayer::Stopped:
+        case VoicePlayerBase::Stopped:
             Q_FALLTHROUGH();
-        case VlcPlayer::Ended:
+        case VoicePlayerBase::Ended:
             // 重新播放时需要设置文件
             m_player->setChangePlayFile(true);
             m_player->setFilePath(m_voiceBlock->voicePath);
@@ -124,8 +150,8 @@ void VoicePlayerHandler::onToggleStateChange()
 
 void VoicePlayerHandler::setPlayPosition(qint64 ms)
 {
-    const VlcPlayer::VlcState state = m_player->getState();
-    if (VlcPlayer::Playing == state || VlcPlayer::Paused == state) {
+    const VoicePlayerBase::PlayerState state = m_player->getState();
+    if (VoicePlayerBase::Playing == state || VoicePlayerBase::Paused == state) {
         m_player->setPosition(ms);
     }
 }
