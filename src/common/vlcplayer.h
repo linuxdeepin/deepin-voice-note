@@ -8,6 +8,7 @@
 // #define MPV_PLAYENGINE  ///MPV播放引擎 通过是否定义该宏，来切换采用vlc或者libdmr来播放音频
 
 #include <QObject>
+#include "voiceplayerbase.h"
 #ifdef MPV_PLAYENGINE
 #include <player_widget.h>
 #include <player_engine.h>
@@ -18,7 +19,7 @@ struct libvlc_instance_t;
 struct libvlc_media_player_t;
 struct libvlc_event_t;
 
-class VlcPlayer : public QObject
+class VlcPlayer : public VoicePlayerBase
 {
     Q_OBJECT
 public:
@@ -47,15 +48,10 @@ public:
     // 停止
     void stop();
     // 获取状态
-    VlcState getState();
+    PlayerState getState();
     void setChangePlayFile(bool flag);
-signals:
-    // 总时长改变
-    void durationChanged(qint64 duration);
-    // 播放位置改变，单位:毫秒
-    void positionChanged(qint64 position);
-    // 播放完成
-    void playEnd();
+    bool initVlcPlayer();
+
 public slots:
 #ifdef MPV_PLAYENGINE
     void onGetCurrentPosition();

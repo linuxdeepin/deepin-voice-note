@@ -9,7 +9,7 @@
 #include <QSharedPointer>
 
 class VNVoiceBlock;
-class VlcPlayer;
+class VoicePlayerBase;
 
 class VoicePlayerHandler : public QObject
 {
@@ -37,9 +37,10 @@ public:
 
 private:
     void playVoiceImpl(bool bIsSame);
+    void initPlayer();
 
 private:
-    VlcPlayer *m_player { nullptr };
+    VoicePlayerBase *m_player { nullptr };
     QSharedPointer<VNVoiceBlock> m_voiceBlock;
 };
 
