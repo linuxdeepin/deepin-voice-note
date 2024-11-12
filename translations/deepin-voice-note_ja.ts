@@ -127,7 +127,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="262"/>
         <source>Voice to Text</source>
-        <translation type="unfinished"/>
+        <translation>音声から文字へ変換</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="263"/>
@@ -177,12 +177,12 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="321"/>
         <source>Text to Speech</source>
-        <translation type="unfinished"/>
+        <translation>文字から音声へ変換</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="322"/>
         <source>Stop reading</source>
-        <translation type="unfinished"/>
+        <translation>読み上げを停止</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="323"/>
@@ -260,7 +260,7 @@
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="351"/>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="353"/>
         <source>Save voice recording</source>
-        <translation type="unfinished"/>
+        <translation>音声録音を保存</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="231"/>
@@ -283,12 +283,12 @@
     <message>
         <location filename="../src/common/setting.cpp" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"/>
+        <translation>基本</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="25"/>
         <source>Audio Source</source>
-        <translation type="unfinished"/>
+        <translation>音声ソース</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="26"/>
