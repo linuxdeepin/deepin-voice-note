@@ -114,7 +114,7 @@
     <message>
         <location filename="../src/views/middleviewdelegate.cpp" line="438"/>
         <source>Sticky Notes</source>
-        <translation>付箋</translation>
+        <translation>固定したノート</translation>
     </message>
 </context>
 <context>
@@ -237,21 +237,21 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="225"/>
         <source>Rename</source>
-        <translation type="unfinished"/>
+        <translation>名前の変更</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="227"/>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="321"/>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="330"/>
         <source>Move</source>
-        <translation type="unfinished"/>
+        <translation>移動</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="228"/>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="323"/>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="329"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>削除</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="230"/>
@@ -265,17 +265,17 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="231"/>
         <source>New note</source>
-        <translation type="unfinished"/>
+        <translation>新しいノート</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1261"/>
         <source>Unstick</source>
-        <translation type="unfinished"/>
+        <translation>固定解除</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1263"/>
         <source>Sticky on Top</source>
-        <translation type="unfinished"/>
+        <translation>上部に固定</translation>
     </message>
 </context>
 <context>
@@ -298,7 +298,7 @@
     <message>
         <location filename="../src/common/setting.cpp" line="27"/>
         <source>Microphone</source>
-        <translation type="unfinished"/>
+        <translation>マイク</translation>
     </message>
 </context>
 <context>
@@ -306,52 +306,52 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="909"/>
         <source>New notebook</source>
-        <translation type="unfinished"/>
+        <translation>新しいノートブック</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="910"/>
         <source>Rename notebook</source>
-        <translation type="unfinished"/>
+        <translation>ノートブックの名前を変更</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="911"/>
         <source>Delete notebook</source>
-        <translation type="unfinished"/>
+        <translation>ノートブックを削除</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="933"/>
         <source>New note</source>
-        <translation type="unfinished"/>
+        <translation>新しいノート</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="934"/>
         <source>Rename note</source>
-        <translation type="unfinished"/>
+        <translation>ノートの名前を変更</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="935"/>
         <source>Delete note</source>
-        <translation type="unfinished"/>
+        <translation>ノートを削除</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="936"/>
         <source>Play/Pause</source>
-        <translation type="unfinished"/>
+        <translation>再生/一時停止</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="937"/>
         <source>Record voice</source>
-        <translation type="unfinished"/>
+        <translation>音声を録音</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="938"/>
         <source>Save note</source>
-        <translation type="unfinished"/>
+        <translation>ノートを保存</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="939"/>
         <source>Save recordings</source>
-        <translation type="unfinished"/>
+        <translation>録音を保存</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="959"/>
@@ -386,17 +386,17 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>削除</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="988"/>
         <source>Help</source>
-        <translation type="unfinished"/>
+        <translation>ヘルプ</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="989"/>
         <source>Display shortcuts</source>
-        <translation type="unfinished"/>
+        <translation>ショートカットを表示</translation>
     </message>
 </context>
 <context>
@@ -404,12 +404,12 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="915"/>
         <source>Notebooks</source>
-        <translation type="unfinished"/>
+        <translation>ノートブック</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="943"/>
         <source>Notes</source>
-        <translation type="unfinished"/>
+        <translation>ノート</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="969"/>
