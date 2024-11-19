@@ -329,6 +329,7 @@ Item {
             isRecording = false;
             VoiceRecoderHandler.stopRecoder();
             title.recorderBtnEnable = true;
+            title.isRecording = false;
         }
 
         active: false

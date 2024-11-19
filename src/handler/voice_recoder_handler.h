@@ -60,7 +60,7 @@ private:
     QString m_recordDir {""};
     QString m_recordPath {""};
     qint64 m_recordMsec {0};
-    int m_currentMode {0};
+    int m_currentMode {1};
 };
 
 #endif // VOICERECODERHANDLER_H
