@@ -9,6 +9,7 @@ TitleBar {
     property bool imageBtnEnable: true
     property bool recorderBtnEnable: true
     property bool recordingHover: false
+    property bool isRecording: false
 
     signal createNote
     signal insertImage
@@ -140,11 +141,12 @@ TitleBar {
 
         onClicked: {
             startRecording();
+            isRecording = true;
         }
 
         ToolTip {
             text: recordBtn.enabled ? qsTr("Start recording") : qsTr("No recording device detected")
-            visible: recordBtn.hovered || recordingHover
+            visible: (recordBtn.hovered || recordingHover) && !isRecording
         }
     }
 
