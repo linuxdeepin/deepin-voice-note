@@ -675,7 +675,7 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../src/common/jscontent.cpp" line="137"/>
         <source>Recent</source>
-        <translation>Recentes</translation>
+        <translation>Recente</translation>
     </message>
 </context>
 </TS>
