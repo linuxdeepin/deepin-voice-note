@@ -130,6 +130,31 @@ ApplicationWindow {
             }
         }
 
+        function handleUpdateNote(noteId, time) {
+            var currentIndex = -1;
+            var topSize = 0;
+            var topNote = false;
+            for (var i = 0; i < itemListView.model.count; i++) {
+                var note = itemListView.model.get(i);
+                if (note.isTop === "top")
+                    ++topSize;
+                if (note.noteId === noteId) {
+                    note.time = time;
+                    currentIndex = i;
+                    topNote = (note.isTop === "top");
+                }
+            }
+            if (topNote) {
+                if (currentIndex !== 0)
+                    itemListView.model.move(currentIndex, 0, 1);
+                return 0;
+            } else {
+                if (currentIndex !== topSize)
+                    itemListView.model.move(currentIndex, topSize, 1);
+                return topSize;
+            }
+        }
+
         function handleUpdateNoteList(notesData) {
             itemListView.model.clear();
             if (notesData.length === 0) {
@@ -150,23 +175,30 @@ ApplicationWindow {
             }
         }
 
-        function handleaddNote(notesData) {
-            itemListView.model.clear();
-            var getSelect = -1;
-            for (var i = 0; i < notesData.length; i++) {
-                var itemIsTop = notesData[i].isTop ? "top" : "normal";
-                itemListView.model.append({
-                        name: notesData[i].name,
-                        time: notesData[i].time,
-                        isTop: itemIsTop,
-                        icon: notesData[i].icon,
-                        folderName: notesData[i].folderName,
-                        noteId: notesData[i].noteId
-                    });
-                if (getSelect === -1 && !notesData[i].isTop)
-                    getSelect = i;
+        function handleaddNote(noteData) {
+            for (var i = 0; i < itemListView.selectedNoteItem.length; i++) {
+                var item = itemListView.view.itemAtIndex(itemListView.selectedNoteItem[i]);
+                if (item)
+                    item.isSelected = false;
             }
-            itemListView.selectedNoteItem = [getSelect];
+            var topSize = 0;
+            for (var j = 0; j < itemListView.model.count; j++) {
+                var note = itemListView.model.get(j);
+                if (note.isTop === "top")
+                    ++topSize;
+                else
+                    break;
+            }
+            var itemIsTop = noteData.isTop ? "top" : "normal";
+            itemListView.model.insert(topSize, {
+                    name: noteData.name,
+                    time: noteData.time,
+                    isTop: itemIsTop,
+                    icon: noteData.icon,
+                    folderName: noteData.folderName,
+                    noteId: noteData.noteId
+                });
+            itemListView.selectedNoteItem = [topSize];
             itemListView.selectSize = 1;
             folderListView.addNote(1);
             itemListView.forceActiveFocus();
@@ -181,7 +213,7 @@ ApplicationWindow {
         target: VNoteMainManager
 
         onAddNoteAtHead: {
-            handleaddNote(notesData);
+            handleaddNote(noteData);
         }
         onFinishedFolderLoad: {
             if (foldersData.length > 0) {
@@ -227,6 +259,11 @@ ApplicationWindow {
             folderListView.opacity = 0.4;
             folderListView.enabled = false;
             createFolderButton.enabled = false;
+        }
+        onUpdateEditNote: {
+            var currentIndex = handleUpdateNote(noteId, time);
+            itemListView.selectedNoteItem = [currentIndex];
+            itemListView.selectSize = 1;
         }
         onUpdateNotes: {
             handleUpdateNoteList(notesData);
