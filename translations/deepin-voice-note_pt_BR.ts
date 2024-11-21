@@ -127,7 +127,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="262"/>
         <source>Voice to Text</source>
-        <translation>Voz para Texto</translation>
+        <translation>Voz para texto</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="263"/>
