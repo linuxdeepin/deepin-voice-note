@@ -62,6 +62,7 @@ Item {
                     itemListView.itemAtIndex(deleIndex).isSelected = true;
                     noteItemChanged(itemModel.get(deleIndex).noteId);
                 }
+                gc();
                 deleteFinished();
             });
     }

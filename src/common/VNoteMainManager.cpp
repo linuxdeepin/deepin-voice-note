@@ -357,21 +357,18 @@ void VNoteMainManager::createNote()
     m_currentNoteId = newNote->noteId;
 
     m_noteItems.append(newNote);
-    QList<QVariantMap> notesDataList;
-    for (auto it : m_noteItems) {
-        QVariantMap data;
-        data.insert(NOTE_NAME_KEY, it->noteTitle);
-        data.insert(NOTE_TIME_KEY, Utils::convertDateTime(it->modifyTime));
-        data.insert(NOTE_MODIFY_TIME_KEY, it->modifyTime.toString("yyyy-MM-dd hh:mm:ss"));
-        data.insert(NOTE_ISTOP_KEY, it->isTop);
-        VNoteFolder *folder = getFloderById(it->folderId);
-        data.insert(NOTE_FOLDER_ICON_KEY, QString::number(folder->defaultIcon));
-        data.insert(NOTE_FOLDER_NAME_KEY, folder->name);
-        data.insert(NOTE_ID_KEY, it->noteId);
-        notesDataList.append(data);
-    }
-    std::sort(notesDataList.begin(), notesDataList.end(), NoteCompare());
-    emit addNoteAtHead(notesDataList);
+
+    QVariantMap data;
+    data.insert(NOTE_NAME_KEY, newNote->noteTitle);
+    data.insert(NOTE_TIME_KEY, Utils::convertDateTime(newNote->modifyTime));
+    data.insert(NOTE_MODIFY_TIME_KEY, newNote->modifyTime.toString("yyyy-MM-dd hh:mm:ss"));
+    data.insert(NOTE_ISTOP_KEY, newNote->isTop);
+    VNoteFolder *folder = getFloderById(newNote->folderId);
+    data.insert(NOTE_FOLDER_ICON_KEY, QString::number(folder->defaultIcon));
+    data.insert(NOTE_FOLDER_NAME_KEY, folder->name);
+    data.insert(NOTE_ID_KEY, newNote->noteId);
+
+    emit addNoteAtHead(data);
     m_richTextManager->clearJSContent();
 }
 
@@ -581,26 +578,7 @@ void VNoteMainManager::onNoteChanged()
 {
     VNoteItem *note = getNoteById(m_currentNoteId);
     note->modifyTime = QDateTime::currentDateTime();
-
-    QList<QVariantMap> notesDataList;
-    for (auto it : m_noteItems) {
-        QVariantMap data;
-        data.insert(NOTE_NAME_KEY, it->noteTitle);
-        data.insert(NOTE_TIME_KEY, Utils::convertDateTime(it->modifyTime));
-        data.insert(NOTE_MODIFY_TIME_KEY, it->modifyTime.toString("yyyy-MM-dd hh:mm:ss"));
-        data.insert(NOTE_ISTOP_KEY, it->isTop);
-        VNoteFolder *folder = getFloderById(it->folderId);
-        data.insert(NOTE_FOLDER_ICON_KEY, QString::number(folder->defaultIcon));
-        data.insert(NOTE_FOLDER_NAME_KEY, folder->name);
-        data.insert(NOTE_ID_KEY, it->noteId);
-        notesDataList.append(data);
-    }
-    std::sort(notesDataList.begin(), notesDataList.end(), NoteCompare());
-    qint32 id = note->noteId;
-    auto it = std::find_if(notesDataList.begin(), notesDataList.end(), [id](const QVariantMap &item)->bool {
-        return item.value(NOTE_ID_KEY).toInt() == id;
-    });
-    emit updateNotes(notesDataList, std::distance(notesDataList.begin(), it));
+    emit updateEditNote(m_currentNoteId, Utils::convertDateTime(note->modifyTime));
 }
 
 void VNoteMainManager::updateSearch()

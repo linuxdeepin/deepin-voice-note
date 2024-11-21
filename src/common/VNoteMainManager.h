@@ -57,7 +57,7 @@ public:
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);
     void updateNotes(const QList<QVariantMap> &notesData, const int &selectIndex);
-    void addNoteAtHead(const QList<QVariantMap> &notesData);
+    void addNoteAtHead(const QVariantMap &noteData);
     void addFolderFinished(const QVariantMap &folderData);
     void noSearchResult();
     void searchFinished(const QList<QVariantMap> &notesData, const QString &key);
@@ -65,6 +65,7 @@ signals:
     void needUpdateNote();
     void updateRichTextSearch(const QString &key);
     void scrollChange(const bool &isTop);
+    void updateEditNote(const int &noteId, const QString &time);
 
 private slots:
     void onVNoteFoldersLoaded();
