@@ -1,5 +1,7 @@
 #include "qtplayer.h"
 
+#include <QDebug>
+
 QtPlayer::QtPlayer(QObject *parent)
     : VoicePlayerBase(parent)
 {
