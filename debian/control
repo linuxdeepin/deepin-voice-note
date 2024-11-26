@@ -43,6 +43,7 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
  gstreamer1.0-plugins-good,
  gstreamer1.0-pulseaudio,
+ libqt6webenginecore6-bin,
  qml6-module-qtquick-dialogs,
  qml6-module-qtwebchannel,
  qml6-module-qtwebengine
