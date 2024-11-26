@@ -140,7 +140,7 @@ var isShowAir = true
 var nowClickVoice = null
 var global_activeColor = ''
 var global_disableColor = ''
-var global_theme = 1
+var global_theme = 1    // theme type 1:light 2:dark
 var global_themeColor = 'transparent'  //主题色
 var scrollHide = null  //滚动条隐藏定时器
 var scrollHideFont = null  //字体滚动条定时
@@ -852,6 +852,9 @@ function setHtml(html) {
     webobj.jsCallSetDataFinsh();
     resetScroll()
     $('#summernote').summernote('editor.resetRecord')
+
+    // We need call once at init, ensure the foreground color / background color is correct.
+    switchTextColor(global_theme == 2)
 }
 
 /**
