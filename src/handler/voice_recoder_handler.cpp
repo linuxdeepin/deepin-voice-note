@@ -2,6 +2,7 @@
 #include "audio/gstreamrecorder.h"
 #include "audio/audio_watcher.h"
 #include "utils.h"
+#include "opsstateinterface.h"
 
 VoiceRecoderHandler::VoiceRecoderHandler() {
     intRecoder();
@@ -37,6 +38,7 @@ void VoiceRecoderHandler::stopRecoder()
     if (m_type != RecoderType::Idle) {
         emit finishedRecod(m_recordPath, m_recordMsec);
         m_type = RecoderType::Idle;
+        OpsStateInterface::instance()->operState(OpsStateInterface::StateRecording, false);
     }
 }
 
@@ -114,6 +116,7 @@ void VoiceRecoderHandler::confirmStartRecoder()
         stopRecoder();
     } else {
         m_type = RecoderType::Recording;
+        OpsStateInterface::instance()->operState(OpsStateInterface::StateRecording, true);
         emit recoderStateChange(m_type);
     }
 }

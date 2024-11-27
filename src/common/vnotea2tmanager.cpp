@@ -3,9 +3,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "vnotea2tmanager.h"
+#include "opsstateinterface.h"
 
 #include <DSysInfo>
 
+#include <QDBusInterface>
 #include <QDBusError>
 #include <QJsonParseError>
 
@@ -14,6 +16,7 @@
 DCORE_USE_NAMESPACE
 
 // TODO(renbin): 替换新接口
+QTimer *timer;
 
 /**
  * @brief VNoteA2TManager::VNoteA2TManager
@@ -22,6 +25,7 @@ DCORE_USE_NAMESPACE
 VNoteA2TManager::VNoteA2TManager(QObject *parent)
     : QObject(parent)
 {
+    initSession();
 }
 
 /**
@@ -49,6 +53,18 @@ int VNoteA2TManager::initSession()
     // connect(m_asrInterface.get(), &com::iflytek::aiservice::asr::onNotify,
     //         this, &VNoteA2TManager::onNotify);
 
+    timer = new QTimer;
+    timer->setSingleShot(true);
+    timer->setInterval(10000);
+    connect(timer, &QTimer::timeout, [=](){
+        emit asrError(AudioOther);
+        OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, false);
+    });
+    bool ret = QDBusConnection::sessionBus().connect("com.iflytek.aiassistant", "/aiassistant/deepinmain",
+                                          "com.iflytek.aiassistant.mainWindow", "onNotify", this, SLOT(onNotify(QString)));
+    if (!ret)
+        errorCode = -1;
+
     return errorCode;
 }
 
@@ -61,11 +77,12 @@ int VNoteA2TManager::initSession()
  */
 void VNoteA2TManager::startAsr(QString filePath, qint64 fileDuration, QString srcLanguage, QString targetLanguage)
 {
-    int ret = initSession();
-    if (ret != 0)
+    QDBusInterface asrInterface("com.iflytek.aiassistant", "/aiassistant/deepinmain",
+                                "com.iflytek.aiassistant.mainWindow");
+    if (!asrInterface.isValid())
     {
         emit asrError(AudioOther);
-        qInfo() << "createSession->errorCode=" << ret;
+        qWarning() << qPrintable(QDBusConnection::sessionBus().lastError().message());
         return;
     }
 
@@ -84,18 +101,17 @@ void VNoteA2TManager::startAsr(QString filePath, qint64 fileDuration, QString sr
         param.insert("targetLanguage", targetLanguage);
     }
 
-    // QString retStr = m_asrInterface->startAsr(param);
+    QDBusMessage retMessage = asrInterface.call(QLatin1String("startAsr"), param);
+    QString retStr = retMessage.arguments().at(0).value<QString>();
 
-    // if (retStr != CODE_SUCCESS) {
-    //     asrMsg error;
-    //     error.code = retStr;
-    //     emit asrError(getErrorCode(error));
-    // }
-
-    // TODO: local test
-    QTimer::singleShot(1000, [this]()
-                       { Q_EMIT this->asrSuccess("在V23的基础上进一步改进，获得体验和视觉上的提升，整体上会获得较大的提升。根据对目前设"
-                                                 "计趋势的把握，未来的UI设计会不可避免的增加很多3D元素，在视觉层级上会表达的更加突出。"); });
+    if (retStr != CODE_SUCCESS) {
+        asrMsg error;
+        error.code = retStr;
+        emit asrError(getErrorCode(error));
+    } else {
+        OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, true);
+        timer->start();
+    }
 }
 
 /**
@@ -116,6 +132,9 @@ void VNoteA2TManager::onNotify(const QString &msg)
 
     asrJsonParser(msg, asrData);
 
+    if (timer->isActive())
+        timer->stop();
+    OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, false);
     qInfo() << "msg:" << msg;
 
     if (CODE_SUCCESS == asrData.code)

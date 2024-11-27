@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QDBusReply>
 #include <QDBusConnection>
+#include <QDBusInterface>
 #include <QProcess>
 
 static bool isSpeeching = false;
@@ -97,8 +98,11 @@ bool VTextSpeechAndTrManager::getTransEnable()
  */
 void VTextSpeechAndTrManager::onTextToSpeech()
 {
-    QProcess::startDetached("dbus-send  --print-reply --dest=com.iflytek.aiassistant /aiassistant/deepinmain com.iflytek.aiassistant.mainWindow.TextToSpeech");
-    isSpeeching = true;
+    QDBusInterface interface("com.iflytek.aiassistant", "/aiassistant/deepinmain", "com.iflytek.aiassistant.mainWindow");
+    if (interface.isValid()) {
+        interface.asyncCall("TextToSpeech");
+        isSpeeching = true;
+    }
 }
 
 /**
@@ -107,8 +111,11 @@ void VTextSpeechAndTrManager::onTextToSpeech()
 void VTextSpeechAndTrManager::onStopTextToSpeech()
 {
     if (isSpeeching) {
-        QProcess::startDetached("dbus-send  --print-reply --dest=com.iflytek.aiassistant /aiassistant/tts com.iflytek.aiassistant.tts.stopTTSDirectly");
-        isSpeeching = false;
+        QDBusInterface interface("com.iflytek.aiassistant", "/aiassistant/tts", "com.iflytek.aiassistant.tts");
+        if (interface.isValid()) {
+            interface.asyncCall("stopTTSDirectly");
+            isSpeeching = false;
+        }
     }
 }
 
@@ -117,7 +124,10 @@ void VTextSpeechAndTrManager::onStopTextToSpeech()
  */
 void VTextSpeechAndTrManager::onSpeechToText()
 {
-    QProcess::startDetached("dbus-send  --print-reply --dest=com.iflytek.aiassistant /aiassistant/deepinmain com.iflytek.aiassistant.mainWindow.SpeechToText");
+    QDBusInterface interface("com.iflytek.aiassistant", "/aiassistant/deepinmain", "com.iflytek.aiassistant.mainWindow");
+    if (interface.isValid()) {
+        interface.asyncCall("SpeechToText");
+    }
 }
 
 /**

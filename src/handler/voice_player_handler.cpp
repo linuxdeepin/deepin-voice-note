@@ -14,6 +14,7 @@
 #include "common/qtplayer.h"
 #include "common/metadataparser.h"
 #include "common/jscontent.h"
+#include "opsstateinterface.h"
 
 // 进度条刻度，按秒进位
 const int kTickMilliseconds = 1000;
@@ -109,6 +110,7 @@ void VoicePlayerHandler::onPlay()
 {
     if (VoicePlayerBase::Playing != m_player->getState()) {
         m_player->play();
+        OpsStateInterface::instance()->operState(OpsStateInterface::StatePlaying, true);
         Q_EMIT playStatusChanged(Playing);
     }
 }
@@ -118,6 +120,7 @@ void VoicePlayerHandler::onStop()
     const VoicePlayerBase::PlayerState state = m_player->getState();
     if (VoicePlayerBase::Playing == state || VoicePlayerBase::Paused == state) {
         m_player->stop();
+        OpsStateInterface::instance()->operState(OpsStateInterface::StatePlaying, false);
         Q_EMIT playStatusChanged(End);
     }
 }

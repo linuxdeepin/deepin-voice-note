@@ -313,9 +313,9 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
         case ActionManager::TxtDictation:
             VTextSpeechAndTrManager::onSpeechToText();
             break;
-        case ActionManager::TxtTranslate:
-            VTextSpeechAndTrManager::onTextTranslate();
-            break;
+        // case ActionManager::TxtTranslate:
+        //     VTextSpeechAndTrManager::onTextTranslate();
+        //     break;
         default:
             break;
     }
@@ -411,9 +411,9 @@ void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *requ
     if (flags.testFlag(QWebEngineContextMenuRequest::CanCopy)) {
         ActionManager::instance()->enableAction(ActionManager::TxtCopy, true);
         if (isAlSrvAvailabel) {
-            if (VTextSpeechAndTrManager::getTransEnable()) {
-                ActionManager::instance()->enableAction(ActionManager::TxtTranslate, true);
-            }
+            // if (VTextSpeechAndTrManager::getTransEnable()) {
+            //     ActionManager::instance()->enableAction(ActionManager::TxtTranslate, true);
+            // }
             if (!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()) {
                 ActionManager::instance()->enableAction(ActionManager::TxtSpeech, true);
             }
