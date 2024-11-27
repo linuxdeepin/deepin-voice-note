@@ -92,7 +92,7 @@ void ActionManager::initMenu()
     makeAction(TxtSpeech, QCoreApplication::translate("NoteDetailContextMenu", "Text to Speech"));
     makeAction(TxtStopreading, QCoreApplication::translate("NoteDetailContextMenu", "Stop reading"));
     makeAction(TxtDictation, QCoreApplication::translate("NoteDetailContextMenu", "Speech to Text"));
-    makeAction(TxtTranslate, QCoreApplication::translate("NoteDetailContextMenu", "Translate"));
+    // makeAction(TxtTranslate, QCoreApplication::translate("NoteDetailContextMenu", "Translate"));
 }
 
 /*!
@@ -179,7 +179,7 @@ void ActionManager::visibleAiActions(bool visible)
     visibleAction(TxtSpeech, visible);
     visibleAction(TxtStopreading, visible);
     visibleAction(TxtDictation, visible);
-    visibleAction(TxtTranslate, visible);
+    // visibleAction(TxtTranslate, visible);
     visibleAction(TxtSeparator, visible);
 }
 

@@ -4,8 +4,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "opsstateinterface.h"
+#include <QDBusConnectionInterface>
+#include <QDBusInterface>
 // #include <DSysInfo>
-// #include <DLog>
+#include <DLog>
 
 // DCORE_USE_NAMESPACE
 
@@ -14,7 +16,12 @@
  */
 OpsStateInterface::OpsStateInterface()
 {
-    ;
+    QDBusConnection connection = QDBusConnection::sessionBus();
+    if (connection.isConnected()) {
+        bool reply = connection.interface()->isServiceRegistered("com.iflytek.aiassistant").value();
+        if (reply)
+            operState(StateAISrvAvailable, true);
+    }
 }
 
 /**
@@ -33,7 +40,7 @@ void OpsStateInterface::operState(int type, bool isSet)
             m_states &= (~(1 << shift));
         }
     } else {
-        // qCritical() << "Operation error:Invalid opsType =" << type;
+        qCritical() << "Operation error:Invalid opsType =" << type;
     }
 }
 
