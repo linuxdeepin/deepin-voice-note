@@ -1631,14 +1631,55 @@ function exchangeTextColor(oldForeColors, newForeColors, oldBackColors, newBackC
 /**
  * @brief Change text background/foreground color when switching themes
  */
-function switchTextColor(isDarkTheme) { 
+function switchTextColor(isDarkTheme) {
     var options = $('#summernote').data('summernote').options;
 
-    if(isDarkTheme) {
+    if (isDarkTheme) {
         exchangeTextColor(options.simpleLightForeColors.flat(), options.simpleDarkForeColors.flat(),
-                          options.simpleLightBackColors.flat(), options.simpleDarkBackColors.flat());
+            options.simpleLightBackColors.flat(), options.simpleDarkBackColors.flat());
     } else {
-        exchangeTextColor(options.simpleDarkForeColors.flat(), options.simpleLightForeColors.flat(), 
-                          options.simpleDarkBackColors.flat(), options.simpleLightBackColors.flat());
+        exchangeTextColor(options.simpleDarkForeColors.flat(), options.simpleLightForeColors.flat(),
+            options.simpleDarkBackColors.flat(), options.simpleLightBackColors.flat());
     }
 }
+
+/**
+ * @brief When you click the drop-down menu, adjust the display position
+ * according to the available height of the window.
+ */
+$('body').on('click', '.dropdown-toggle', function (e) {
+    const clickedItem = this;
+    const parentItem = clickedItem.parentElement;
+    const needClose = parentItem.classList.contains('open');
+
+    const menuItem = clickedItem.nextElementSibling;
+    if (menuItem && menuItem.classList.contains('dropdown-menu')) {
+        if (needClose) {
+            // reset css config
+            menuItem.style.top = '135%';
+            return;
+        }
+        // temporarily set display to block to get the height of the menu
+        menuItem.classList.add('show');
+
+        var dropdownRect = clickedItem.getBoundingClientRect();
+        var menuRect = menuItem.getBoundingClientRect();
+        var belowSpace = window.innerHeight - dropdownRect.bottom;
+        // the margin with dropdown button and menu
+        var offset = 1.35 * dropdownRect.height;
+        // top below great than bottom below, bottom below cannot show whole menu
+        var showTop = (dropdownRect.top > belowSpace);
+        if (belowSpace > (menuRect.height + offset)) {
+            showTop = false;
+        }
+
+        // reset display to none
+        menuItem.classList.remove('show');
+
+        if (showTop) {
+            menuItem.style.top = '-' + (menuRect.height + 20) + 'px';
+        } else {
+            menuItem.style.top = '135%';
+        }
+    }
+})
