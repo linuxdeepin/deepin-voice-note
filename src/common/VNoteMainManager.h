@@ -53,6 +53,7 @@ public:
     Q_INVOKABLE void preViewShortcut(const QPointF &point);
     Q_INVOKABLE void showPrivacy();
     Q_INVOKABLE void resumeVoicePlayer();
+    Q_INVOKABLE void forceExit();
 
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);

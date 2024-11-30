@@ -82,7 +82,7 @@ ApplicationWindow {
         running: false
 
         onTriggered: {
-            rootWindow.close();
+            VNoteMainManager.foreceExit();
         }
     }
 

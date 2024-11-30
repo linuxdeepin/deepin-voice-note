@@ -876,3 +876,9 @@ void VNoteMainManager::resumeVoicePlayer()
 {
     JsContent::instance()->jsCallPlayVoice("", true);
 }
+
+void VNoteMainManager::forceExit()
+{
+    QApplication::exit(0);
+    _Exit(0);
+}
