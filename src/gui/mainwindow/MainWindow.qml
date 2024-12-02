@@ -60,6 +60,8 @@ ApplicationWindow {
                         delayTimer.start();
                     }
                 });
+        } else {
+            VNoteMainManager.forceExit();
         }
     }
     onWidthChanged: {
@@ -82,7 +84,7 @@ ApplicationWindow {
         running: false
 
         onTriggered: {
-            VNoteMainManager.foreceExit();
+            VNoteMainManager.forceExit();
         }
     }
 
