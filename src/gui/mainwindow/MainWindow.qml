@@ -55,11 +55,11 @@ ApplicationWindow {
         if (isRecording) {
             close.accepted = false;
             messageDialogLoader.showDialog(VNoteMessageDialogHandler.AbortRecord, ret => {
-                    if (ret) {
-                        webEngineView.stopAndClose();
-                        delayTimer.start();
-                    }
-                });
+                if (ret) {
+                    webEngineView.stopAndClose();
+                    delayTimer.start();
+                }
+            });
         } else {
             VNoteMainManager.forceExit();
         }
@@ -125,10 +125,10 @@ ApplicationWindow {
         function handleFinishedFolderLoad(foldersData) {
             for (var i = 0; i < foldersData.length; i++) {
                 folderListView.model.append({
-                        name: foldersData[i].name,
-                        count: foldersData[i].notesCount,
-                        icon: foldersData[i].icon
-                    });
+                    name: foldersData[i].name,
+                    count: foldersData[i].notesCount,
+                    icon: foldersData[i].icon
+                });
             }
         }
 
@@ -167,13 +167,13 @@ ApplicationWindow {
             for (var i = 0; i < notesData.length; i++) {
                 var itemIsTop = notesData[i].isTop ? "top" : "normal";
                 itemListView.model.append({
-                        name: notesData[i].name,
-                        time: notesData[i].time,
-                        isTop: itemIsTop,
-                        icon: notesData[i].icon,
-                        folderName: notesData[i].folderName,
-                        noteId: notesData[i].noteId
-                    });
+                    name: notesData[i].name,
+                    time: notesData[i].time,
+                    isTop: itemIsTop,
+                    icon: notesData[i].icon,
+                    folderName: notesData[i].folderName,
+                    noteId: notesData[i].noteId
+                });
             }
         }
 
@@ -193,13 +193,13 @@ ApplicationWindow {
             }
             var itemIsTop = noteData.isTop ? "top" : "normal";
             itemListView.model.insert(topSize, {
-                    name: noteData.name,
-                    time: noteData.time,
-                    isTop: itemIsTop,
-                    icon: noteData.icon,
-                    folderName: noteData.folderName,
-                    noteId: noteData.noteId
-                });
+                name: noteData.name,
+                time: noteData.time,
+                isTop: itemIsTop,
+                icon: noteData.icon,
+                folderName: noteData.folderName,
+                noteId: noteData.noteId
+            });
             itemListView.selectedNoteItem = [topSize];
             itemListView.selectSize = 1;
             folderListView.addNote(1);
@@ -208,12 +208,17 @@ ApplicationWindow {
 
         function sortDescending(array) {
             return array.slice().sort(function (a, b) {
-                    return b - a; // 进行降序排序
-                });
+                return b - a; // 进行降序排序
+            });
         }
 
         target: VNoteMainManager
 
+        onAddFolderFinished: {
+            if (initRect.visible) {
+                initRect.visible = false;
+            }
+        }
         onAddNoteAtHead: {
             handleaddNote(noteData);
         }
