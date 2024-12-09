@@ -305,11 +305,6 @@ Item {
                     visible: rootItem.isRename
                     z: 20
 
-                    backgroundColor: Palette {
-                        normal: Qt.rgba(1, 1, 1, 0.85)
-                        normalDark: Qt.rgba(1, 1, 1, 0.85)
-                    }
-
                     onActiveFocusChanged: {
                         folderMouseArea.enabled = false;
                         if (activeFocus) {

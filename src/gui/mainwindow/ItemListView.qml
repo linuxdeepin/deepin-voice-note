@@ -423,11 +423,6 @@ Item {
                     text: model.name
                     visible: rootItemDelegate.isRename
 
-                    backgroundColor: Palette {
-                        normal: Qt.rgba(1, 1, 1, 0.85)
-                        normalDark: Qt.rgba(1, 1, 1, 0.85)
-                    }
-
                     onActiveFocusChanged: {
                         noteItemMouseArea.enabled = false;
                         if (activeFocus) {
