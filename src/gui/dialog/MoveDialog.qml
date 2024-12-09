@@ -45,8 +45,9 @@ DialogWindow {
             ScrollBar.vertical: ScrollBar {
             }
             delegate: ItemDelegate {
-                backgroundVisible: index % 2 === 0
+                backgroundVisible: true
                 height: 30
+                normalBackgroundVisible: index % 2 === 0
                 spacing: 8
                 width: 336
 
