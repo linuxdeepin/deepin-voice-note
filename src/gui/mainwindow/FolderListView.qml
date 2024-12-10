@@ -82,12 +82,13 @@ Item {
         }
         //判断当前鼠标所在的行
         var startY = pos.y - 50 > 0 ? pos.y - 50 : 0;
-        var index = Math.floor(pos.y / itemHeight);
+        var index = Math.floor((pos.y + (verticalScrollBar.position * folderModel.count * itemHeight)) / itemHeight);
         if (index < 0 || index >= folderModel.count) {
             if (lastDropIndex != -1 && lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
                 folderListView.itemAtIndex(lastDropIndex).isHovered = false;
             }
             currentDropIndex = -1;
+            lastDropIndex = -1;
             return;
         }
         currentDropIndex = index;
@@ -117,16 +118,16 @@ Item {
     }
     Keys.onDeletePressed: {
         messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteFolder, ret => {
-                if (ret) {
-                    VNoteMainManager.vNoteDeleteFolder(folderListView.currentIndex);
-                    if (folderModel.count === 1)
-                        folderEmpty();
-                    folderModel.remove(folderListView.currentIndex);
-                    if (folderListView.currentIndex === 0) {
-                        folderListView.currentIndex = 0;
-                    }
+            if (ret) {
+                VNoteMainManager.vNoteDeleteFolder(folderListView.currentIndex);
+                if (folderModel.count === 1)
+                    folderEmpty();
+                folderModel.remove(folderListView.currentIndex);
+                if (folderListView.currentIndex === 0) {
+                    folderListView.currentIndex = 0;
                 }
-            });
+            }
+        });
     }
 
     ListModel {
@@ -149,10 +150,10 @@ Item {
 
         onAddFolderFinished: {
             folderListView.model.insert(0, {
-                    name: folderData.name,
-                    count: folderData.notesCount,
-                    icon: folderData.icon
-                });
+                name: folderData.name,
+                count: folderData.notesCount,
+                icon: folderData.icon
+            });
             folderListView.currentIndex = 0;
             folderListView.lastCurrentIndex = 0;
             VNoteMainManager.createNote();
@@ -182,7 +183,7 @@ Item {
         function indexAt(mousePosX, mousePosY) {
             var pos = mapFromGlobal(mousePosX, mousePosY);
             var startY = itemHeight * 0.5;
-            var index = Math.floor((pos.y - startY) / itemHeight) + 1;
+            var index = Math.floor((pos.y - startY + (verticalScrollBar.position * folderModel.count * itemHeight)) / itemHeight) + 1;
             if (index < 0) {
                 index = 0;
             }
@@ -204,6 +205,10 @@ Item {
         enabled: parent.enabled
         model: folderModel
 
+        ScrollBar.vertical: ScrollBar {
+            id: verticalScrollBar
+
+        }
         delegate: Rectangle {
             id: rootItem
 
@@ -404,8 +409,8 @@ Item {
                     if (held && folderModel.get(folderListView.currentIndex)) {
                         if (dragControl.imageSource === "") {
                             parent.grabToImage(function (result) {
-                                    dragControl.imageSource = result.url;
-                                });
+                                dragControl.imageSource = result.url;
+                            });
                         }
                         var globPos = mapToGlobal(mouse.x, mouse.y);
                         dragControl.itemNumber = 1;
@@ -458,16 +463,16 @@ Item {
 
                     onTriggered: {
                         messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteFolder, ret => {
-                                if (ret) {
-                                    VNoteMainManager.vNoteDeleteFolder(folderListView.contextIndex);
-                                    if (folderModel.count === 1)
-                                        folderEmpty();
-                                    folderModel.remove(folderListView.contextIndex);
-                                    if (folderListView.contextIndex === 0) {
-                                        folderListView.currentIndex = 0;
-                                    }
+                            if (ret) {
+                                VNoteMainManager.vNoteDeleteFolder(folderListView.contextIndex);
+                                if (folderModel.count === 1)
+                                    folderEmpty();
+                                folderModel.remove(folderListView.contextIndex);
+                                if (folderListView.contextIndex === 0) {
+                                    folderListView.currentIndex = 0;
                                 }
-                            });
+                            }
+                        });
                     }
                 }
 
