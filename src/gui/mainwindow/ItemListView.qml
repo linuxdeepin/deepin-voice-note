@@ -40,31 +40,31 @@ Item {
             messageDialogLoader.item.show();
         }
         messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteNote, ret => {
-                if (!ret) {
-                    return;
-                }
-                var delList = itemListView.sortAndDeduplicate(selectedNoteItem);
-                var delIdList = [];
-                var deleIndex = Number.MAX_SAFE_INTEGER;
-                for (var i = 0; i < delList.length; i++) {
-                    delIdList.push(itemModel.get(delList[i]).noteId);
-                    itemModel.remove(delList[i]);
-                    if (selectedNoteItem[i] < deleIndex)
-                        deleIndex = selectedNoteItem[i];
-                }
-                VNoteMainManager.deleteNote(delIdList);
-                deleteNotes(selectedNoteItem.length);
-                if (itemModel.count <= deleIndex) {
-                    itemListView.itemAtIndex(itemModel.count - 1).isSelected = true;
-                    selectedNoteItem = [itemModel.count - 1];
-                    noteItemChanged(itemModel.get(itemModel.count - 1).noteId);
-                } else {
-                    itemListView.itemAtIndex(deleIndex).isSelected = true;
-                    noteItemChanged(itemModel.get(deleIndex).noteId);
-                }
-                gc();
-                deleteFinished();
-            });
+            if (!ret) {
+                return;
+            }
+            var delList = itemListView.sortAndDeduplicate(selectedNoteItem);
+            var delIdList = [];
+            var deleIndex = Number.MAX_SAFE_INTEGER;
+            for (var i = 0; i < delList.length; i++) {
+                delIdList.push(itemModel.get(delList[i]).noteId);
+                itemModel.remove(delList[i]);
+                if (selectedNoteItem[i] < deleIndex)
+                    deleIndex = selectedNoteItem[i];
+            }
+            VNoteMainManager.deleteNote(delIdList);
+            deleteNotes(selectedNoteItem.length);
+            if (itemModel.count <= deleIndex) {
+                itemListView.itemAtIndex(itemModel.count - 1).isSelected = true;
+                selectedNoteItem = [itemModel.count - 1];
+                noteItemChanged(itemModel.get(itemModel.count - 1).noteId);
+            } else {
+                itemListView.itemAtIndex(deleIndex).isSelected = true;
+                noteItemChanged(itemModel.get(deleIndex).noteId);
+            }
+            gc();
+            deleteFinished();
+        });
     }
 
     function onMoveNote() {
@@ -292,13 +292,13 @@ Item {
             for (var i = 0; i < notesData.length; i++) {
                 var itemIsTop = notesData[i].isTop ? "top" : "normal";
                 itemModel.append({
-                        name: notesData[i].name,
-                        time: notesData[i].time,
-                        isTop: itemIsTop,
-                        icon: notesData[i].icon,
-                        folderName: notesData[i].folderName,
-                        noteId: notesData[i].noteId
-                    });
+                    name: notesData[i].name,
+                    time: notesData[i].time,
+                    isTop: itemIsTop,
+                    icon: notesData[i].icon,
+                    folderName: notesData[i].folderName,
+                    noteId: notesData[i].noteId
+                });
             }
         }
 
@@ -319,6 +319,9 @@ Item {
             }
             isSearch = true;
             handleUpdateNoteList(notesData);
+            selectedNoteItem = [0];
+            noteItemChanged(notesData[0].noteId);
+            selectSize = 1;
         }
     }
 
@@ -334,8 +337,8 @@ Item {
 
             // Sort the array in descending order
             uniqueInts.sort(function (a, b) {
-                    return b - a;
-                });
+                return b - a;
+            });
             return uniqueInts;
         }
 
