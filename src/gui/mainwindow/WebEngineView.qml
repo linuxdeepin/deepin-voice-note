@@ -26,6 +26,10 @@ Item {
     signal saveAudio
     signal saveNote
 
+    function copy() {
+        webView.triggerWebAction(5);
+    }
+
     function startRecording() {
         if (!recorderViewLoader.active) {
             recorderViewLoader.active = true;
@@ -150,8 +154,8 @@ Item {
                     }
                     onRequesetCallJsSynchronous: func => {
                         webView.runJavaScript(func, function (result) {
-                                onCallJsResult(result);
-                            });
+                            onCallJsResult(result);
+                        });
                     }
                     onRequestMessageDialog: type => {
                         // 触发创建提示对话框
@@ -382,8 +386,8 @@ Item {
 
         onNeedUpdateNote: {
             webView.runJavaScript("getHtml()", function (result) {
-                    VNoteMainManager.updateNoteWithResult(result);
-                });
+                VNoteMainManager.updateNoteWithResult(result);
+            });
         }
         onScrollChange: isTop => {
             hasScroll = !isTop;
@@ -408,11 +412,11 @@ Item {
         onVolumeTooLow: isLow => {
             if (isLow) {
                 messageDialogLoader.showDialog(VNoteMessageDialogHandler.VolumeTooLow, ret => {
-                        if (ret) {
-                            startRecording();
-                            VoiceRecoderHandler.confirmStartRecoder();
-                        }
-                    });
+                    if (ret) {
+                        startRecording();
+                        VoiceRecoderHandler.confirmStartRecoder();
+                    }
+                });
             } else {
                 startRecording();
             }
