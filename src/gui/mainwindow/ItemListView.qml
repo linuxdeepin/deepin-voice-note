@@ -628,6 +628,15 @@ Item {
                 }
             }
         }
+        footer: Component {
+            id: footerComponent
+
+            Rectangle {
+                color: "transparent"
+                height: 10
+                width: itemListView.width
+            }
+        }
 
         MouseArea {
             anchors.fill: parent
