@@ -93,6 +93,9 @@ ApplicationWindow {
 
         enabled: rootWindow.active
 
+        onCopy: {
+            webEngineView.copy();
+        }
         onCreateFolder: {
             VNoteMainManager.vNoteCreateFolder();
         }

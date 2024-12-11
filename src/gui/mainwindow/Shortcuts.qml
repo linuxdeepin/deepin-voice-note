@@ -4,6 +4,7 @@ import org.deepin.dtk 1.0 as D
 Item {
     id: item
 
+    signal copy
     signal createFolder
     signal createNote
     signal playPauseVoice
@@ -123,8 +124,7 @@ Item {
 
         sequence: "Ctrl+A"
 
-        onActivated: {
-        }
+        onActivated: {}
     }
 
     Shortcut {
@@ -133,6 +133,7 @@ Item {
         sequence: "Ctrl+C"
 
         onActivated: {
+            copy();
         }
     }
 
@@ -141,8 +142,7 @@ Item {
 
         sequence: "Ctrl+X"
 
-        onActivated: {
-        }
+        onActivated: {}
     }
 
     Shortcut {
@@ -150,8 +150,7 @@ Item {
 
         sequence: "Ctrl+V"
 
-        onActivated: {
-        }
+        onActivated: {}
     }
 
     Shortcut {
@@ -159,8 +158,7 @@ Item {
 
         sequence: "Ctrl+Z"
 
-        onActivated: {
-        }
+        onActivated: {}
     }
 
     Shortcut {
@@ -168,7 +166,6 @@ Item {
 
         sequence: "Ctrl+Y"
 
-        onActivated: {
-        }
+        onActivated: {}
     }
 }
