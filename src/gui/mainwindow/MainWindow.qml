@@ -18,11 +18,12 @@ ApplicationWindow {
     property bool isRecording: webEngineView.isRecording
     property int leftAreaMaxWidth: 300
     property int leftAreaMinWidth: 100
-    property int leftViewWidth: 200
+    property int leftViewWidth: 220
     property int middleAreaMinWidth: 190
+    property int middleViewWidth: 260
     property bool needHideSearch: false
     property int rightAreaMinWidth: 390
-    property int tmpLeftAreaWidth: 200
+    property int tmpLeftAreaWidth: 220
     property int tmpWebViewWidth: 0
     property int tmprightDragX: 0
     property int windowMiniHeight: 300
@@ -45,7 +46,7 @@ ApplicationWindow {
     minimumHeight: windowMiniHeight
     minimumWidth: windowMiniWidth
     visible: true
-    width: 1070
+    width: 1096
 
     Component.onCompleted: {
         x = Screen.width / 2 - width / 2;
@@ -323,7 +324,7 @@ ApplicationWindow {
             id: leftBgArea
 
             Layout.fillHeight: true//#F2F6F8
-            Layout.preferredWidth: leftViewWidth
+            Layout.preferredWidth: leftViewWidth - leftDragHandle.width
             color: DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#101010"
 
             ColumnLayout {
@@ -443,7 +444,7 @@ ApplicationWindow {
             id: middleBgArea
 
             Layout.fillHeight: true
-            Layout.preferredWidth: leftViewWidth
+            Layout.preferredWidth: middleViewWidth - rightDragHandle.width
             color: DTK.themeType === ApplicationHelper.LightType ? "#F8F8F8" : "#181818"
 
             onWidthChanged: {
