@@ -94,7 +94,7 @@ Item {
                 id: noSearchIcon
 
                 anchors.centerIn: noSearchRect
-                icon.source: "qrc:/dsg/icons/search_no_results.dci"
+                icon.name: "search_no_results"
                 visible: noSearchResult
             }
         }

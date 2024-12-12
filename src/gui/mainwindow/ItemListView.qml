@@ -216,10 +216,9 @@ Item {
                 itemListView.visible = false;
             }
 
-            Text {
+            Label {
                 anchors.centerIn: parent
-                color: "#B3000000"
-                font.pixelSize: 14
+                font: DTK.fontManager.t6
                 text: qsTr("No search results")
             }
         }
