@@ -7,12 +7,12 @@
         <location filename="../src/main.cpp" line="80"/>
         <location filename="../src/views/vnotemainwindow.cpp" line="602"/>
         <source>Voice Notes</source>
-        <translation>الملاحظات صوتية</translation>
+        <translation>ملاحظات الصوت</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="81"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation>الملاحظات الصوتية هي أداة مذكرة خفيفة لعمل الملاحظات النصية والتسجيلات الصوتية.</translation>
+        <translation>ملاحظات الصوت عبارة عن أداة ملاحظة خفيفة الوزن لإنشاء ملاحظات نصية وتسجيلات صوتية.</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="603"/>
@@ -25,18 +25,18 @@
     <message>
         <location filename="../src/db/vnotefolderoper.cpp" line="230"/>
         <source>Notebook</source>
-        <translation>دفتر ملاحظات</translation>
+        <translation>دفتر الملاحظات</translation>
     </message>
     <message>
         <location filename="../src/db/vnoteitemoper.cpp" line="213"/>
         <source>Text</source>
-        <translation>نص</translation>
+        <translation>النص</translation>
     </message>
     <message>
         <location filename="../src/db/vnoteitemoper.cpp" line="228"/>
         <location filename="../src/importolddata/olddbvisistors.cpp" line="139"/>
         <source>Voice</source>
-        <translation>صوت</translation>
+        <translation>الصوت</translation>
     </message>
 </context>
 <context>
@@ -44,7 +44,7 @@
     <message>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="198"/>
         <source>%1 notes selected</source>
-        <translation>تم تحديد الملاحظة (الملاحظتين /الملاحظات) 1%</translation>
+        <translation>%1 ملاحظة مختارة</translation>
     </message>
 </context>
 <context>
@@ -77,7 +77,7 @@
     <message>
         <location filename="../src/views/homepage.cpp" line="44"/>
         <source>Create a notebook to start recording voice and making notes</source>
-        <translation>أنشئ دفتر ملاحظات لبدء تسجيل الصوت وتدوين الملاحظات</translation>
+        <translation>إنشاء دفتر ملاحظات لبدء تسجيل الصوت وتدوين الملاحظات</translation>
     </message>
 </context>
 <context>
@@ -86,14 +86,14 @@
         <location filename="../src/dialog/folderselectdialog.cpp" line="365"/>
         <location filename="../src/dialog/folderselectdialog.cpp" line="379"/>
         <source>Move %1 notes (%2, ...) to:</source>
-        <translation>نقل الملاحظتين / الملاحظات 1% (2% ، ...) إلى:</translation>
+        <translation>نقل %1 ملاحظة (%2,...) إلى:</translation>
     </message>
     <message>
         <location filename="../src/dialog/folderselectdialog.cpp" line="366"/>
         <location filename="../src/dialog/folderselectdialog.cpp" line="369"/>
         <location filename="../src/dialog/folderselectdialog.cpp" line="377"/>
         <source>Move the note &quot;%1&quot; to:</source>
-        <translation>نقل الملاحظة 1% إلى: </translation>
+        <translation>نقل الملاحظة &quot;%1&quot; إلى:</translation>
     </message>
 </context>
 <context>
@@ -106,7 +106,7 @@
     <message>
         <location filename="../src/views/middleview.cpp" line="1043"/>
         <source>No search results</source>
-        <translation>لا نتائج للبحث</translation>
+        <translation>لم يتم العثور على نتائج البحث</translation>
     </message>
 </context>
 <context>
@@ -114,7 +114,7 @@
     <message>
         <location filename="../src/views/middleviewdelegate.cpp" line="438"/>
         <source>Sticky Notes</source>
-        <translation>الملاحظات اللاصقة</translation>
+        <translation>ملاحظات لاصقة</translation>
     </message>
 </context>
 <context>
@@ -122,12 +122,12 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="261"/>
         <source>Save as MP3</source>
-        <translation>حفظ بتنسيق MP3</translation>
+        <translation>حفظ كملف MP3</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="262"/>
         <source>Voice to Text</source>
-        <translation>صوت إلى نص</translation>
+        <translation>الصوت إلى نص</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="263"/>
@@ -141,7 +141,7 @@
         <location filename="../src/common/actionmanager.cpp" line="291"/>
         <location filename="../src/common/actionmanager.cpp" line="317"/>
         <source>Select all</source>
-        <translation>اختيار الكل</translation>
+        <translation>تحديد الكل</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="265"/>
@@ -177,22 +177,22 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="321"/>
         <source>Text to Speech</source>
-        <translation>تحويل النص إلى كلام</translation>
+        <translation>الترجمة إلى كلام</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="322"/>
         <source>Stop reading</source>
-        <translation>توقف عن القراءة</translation>
+        <translation>إيقاف القراءة</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="323"/>
         <source>Speech to Text</source>
-        <translation>تحويل الكلام إلى نص</translation>
+        <translation>التحدث إلى النص</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="324"/>
         <source>Translate</source>
-        <translation>ترجم</translation>
+        <translation>ترجمة</translation>
     </message>
 </context>
 <context>
@@ -210,7 +210,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="207"/>
         <source>New note</source>
-        <translation>ملاحظة جديدة</translation>
+        <translation>مذكرة جديدة</translation>
     </message>
 </context>
 <context>
@@ -218,12 +218,12 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="180"/>
         <source>Save as HTML</source>
-        <translation>حفظ بتنسيق HTML </translation>
+        <translation>حفظ كـ HTML</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="181"/>
         <source>Save as TXT</source>
-        <translation>حفظ بتنسيق TXT</translation>
+        <translation>حفظ كـ TXT</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="185"/>
@@ -244,7 +244,7 @@
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="321"/>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="330"/>
         <source>Move</source>
-        <translation>نقل</translation>
+        <translation>تحرك</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="228"/>
@@ -265,17 +265,17 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="231"/>
         <source>New note</source>
-        <translation>ملاحظة جديدة</translation>
+        <translation>مذكرة جديدة</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1261"/>
         <source>Unstick</source>
-        <translation>إلغاء اللزق</translation>
+        <translation>إزالة الربط</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1263"/>
         <source>Sticky on Top</source>
-        <translation>إلزاقة بالمقدمة</translation>
+        <translation>الربط في الأعلى</translation>
     </message>
 </context>
 <context>
@@ -283,7 +283,7 @@
     <message>
         <location filename="../src/common/setting.cpp" line="24"/>
         <source>Basic</source>
-        <translation>أساسي</translation>
+        <translation>الأساسي</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="25"/>
@@ -293,12 +293,12 @@
     <message>
         <location filename="../src/common/setting.cpp" line="26"/>
         <source>Internal</source>
-        <translation>داخلي</translation>
+        <translation>الداخلي</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="27"/>
         <source>Microphone</source>
-        <translation>السماعة</translation>
+        <translation>الميكروفون</translation>
     </message>
 </context>
 <context>
@@ -306,17 +306,17 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="909"/>
         <source>New notebook</source>
-        <translation>دفتر ملاحظات جديد</translation>
+        <translation>مجلد جديد</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="910"/>
         <source>Rename notebook</source>
-        <translation>اعادة تسمية دفتر الملاحظات</translation>
+        <translation>إعادة تسمية المجلد</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="911"/>
         <source>Delete notebook</source>
-        <translation>حذف دفتر الملاحظات</translation>
+        <translation>حذف المجلد</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="933"/>
@@ -635,12 +635,12 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/common/jscontent.cpp" line="129"/>
         <source>Text highlight color</source>
-        <translation>لون تمييز النص</translation>
+        <translation>لون الإطار</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="130"/>
         <source>Bold</source>
-        <translation>غامق</translation>
+        <translation>سميك</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="131"/>
@@ -650,32 +650,32 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/common/jscontent.cpp" line="132"/>
         <source>Underline</source>
-        <translation>تسطير</translation>
+        <translation> تحت خط</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="133"/>
         <source>Strikethrough</source>
-        <translation>شطب</translation>
+        <translation>خط مقطوع</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="134"/>
         <source>Bullets</source>
-        <translation>تنقيط</translation>
+        <translation> نقاط</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="135"/>
         <source>Numbering</source>
-        <translation>ترقيم</translation>
+        <translation>رقم</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="136"/>
         <source>More colors</source>
-        <translation>المزيد من الألوان</translation>
+        <translation>أكثر الألوان</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="137"/>
         <source>Recent</source>
-        <translation>مؤخراً</translation>
+        <translation>المؤخر</translation>
     </message>
 </context>
 </TS>
