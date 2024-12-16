@@ -23,6 +23,7 @@ Item {
 
     signal deleteNote
     signal moveNote
+    signal openSetting
     signal saveAudio
     signal saveNote
 
@@ -79,6 +80,10 @@ Item {
 
             Layout.fillWidth: true
             imageBtnEnable: webVisible
+
+            onTitleOpenSetting: {
+                rootItem.openSetting();
+            }
         }
 
         Rectangle {
@@ -372,9 +377,6 @@ Item {
             } else {
                 selectImgLoader.item.open();
             }
-        }
-        onOpenPrivacy: {
-            VNoteMainManager.showPrivacy();
         }
         onStartRecording: {
             VoiceRecoderHandler.startRecoder();

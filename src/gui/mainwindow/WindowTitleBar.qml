@@ -2,19 +2,20 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Layouts
 import org.deepin.dtk 1.0
+import VNote 1.0
 
 TitleBar {
     id: titleBar
 
     property bool imageBtnEnable: true
+    property bool isRecording: false
     property bool recorderBtnEnable: true
     property bool recordingHover: false
-    property bool isRecording: false
 
     signal createNote
     signal insertImage
-    signal openPrivacy
     signal startRecording
+    signal titleOpenSetting
 
     enableInWindowBlendBlur: false
     height: 40
@@ -28,67 +29,15 @@ TitleBar {
             parent.Layout.leftMargin = 0;
         }
     }
-    menu: Menu {
-        width: 200
-        x: 0
-        y: 0
+    menu: TitleBarMenu {
+        id: tMenu
 
-        MenuItem {
-            id: settingsControl
-
-            text: qsTr("Settings")
-
-            onTriggered: {
-                if (settingDlgLoader.status === Loader.Null)
-                    settingDlgLoader.setSource("../dialog/SettingDialog.qml");
-                if (settingDlgLoader.status === Loader.Ready)
-                    settingDlgLoader.item.show();
-            }
+        onOpenPrivacy: {
+            VNoteMainManager.showPrivacy();
         }
-
-        MenuItem {
-            id: privacyBtn
-
-            text: qsTr("Privacy Policy")
-
-            onTriggered: {
-                openPrivacy();
-            }
+        onOpenSetting: {
+            titleBar.titleOpenSetting();
         }
-
-        MenuSeparator {
-        }
-
-        ThemeMenu {
-            width: 200
-        }
-
-        MenuSeparator {
-        }
-
-        HelpAction {
-        }
-
-        AboutAction {
-            aboutDialog: AboutDialog {
-                companyLogo: "deepin-voice-note"
-                description: qsTr("Voice Notes is a lightweight memo tool to make text notes and voice recordings.")
-                productIcon: "deepin-voice-note"
-                productName: qsTr("Voice Note")
-                version: Qt.application.version
-                websiteLink: DTK.deepinWebsiteLink
-                websiteName: DTK.deepinWebsiteName
-
-                header: DialogTitleBar {
-                    enableInWindowBlendBlur: false
-                }
-            }
-        }
-    }
-
-    Loader {
-        id: settingDlgLoader
-
     }
 
     ToolButton {
