@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Layouts
 import org.deepin.dtk 1.0
+import VNote 1.0
 
 Item {
     id: rootWindow
@@ -8,6 +9,7 @@ Item {
     property bool isLoad: true
 
     signal createFolder
+    signal titleOpenSetting
 
     function loadFinished(hasFile) {
         isLoad = false;
@@ -26,6 +28,20 @@ Item {
         Layout.fillWidth: true
         anchors.top: rootWindow.top
         height: 40
+
+        menu: TitleBarMenu {
+            onOpenPrivacy: {
+                VNoteMainManager.showPrivacy();
+            }
+            onOpenSetting: {
+                rootWindow.titleOpenSetting();
+            }
+        }
+    }
+
+    Rectangle {
+        anchors.fill: rootWindow
+        color: DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#101010"
     }
 
     ColumnLayout {
@@ -43,7 +59,7 @@ Item {
             width: 168
         }
 
-        Text {
+        Label {
             id: description
 
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter

@@ -125,6 +125,11 @@ ApplicationWindow {
 
     }
 
+    Loader {
+        id: settingDlgLoader
+
+    }
+
     Connections {
         function handleFinishedFolderLoad(foldersData) {
             for (var i = 0; i < foldersData.length; i++) {
@@ -643,6 +648,12 @@ ApplicationWindow {
                     onMoveNote: {
                         itemListView.onMoveNote();
                     }
+                    onOpenSetting: {
+                        if (settingDlgLoader.status === Loader.Null)
+                            settingDlgLoader.setSource("../dialog/SettingDialog.qml");
+                        if (settingDlgLoader.status === Loader.Ready)
+                            settingDlgLoader.item.show();
+                    }
                     onSaveAudio: {
                         itemListView.onSaveAudio();
                     }
@@ -667,6 +678,13 @@ ApplicationWindow {
 
                 Layout.fillHeight: true
                 Layout.fillWidth: true
+
+                onTitleOpenSetting: {
+                    if (settingDlgLoader.status === Loader.Null)
+                        settingDlgLoader.setSource("../dialog/SettingDialog.qml");
+                    if (settingDlgLoader.status === Loader.Ready)
+                        settingDlgLoader.item.show();
+                }
             }
         }
 
