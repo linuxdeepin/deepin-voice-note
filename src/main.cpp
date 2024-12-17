@@ -48,6 +48,8 @@ int main(int argc, char *argv[])
             DGuiApplicationHelper::UserScope)) {
         return 0;
     }
+    //TODO: The DTK theme color is initialized abnormally, and the application is temporarily circumvented
+    DGuiApplicationHelper::instance()->paletteType();
 
     app->setOrganizationName("deepin");
     app->setApplicationName("deepin-voice-note");
