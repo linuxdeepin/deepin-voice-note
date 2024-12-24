@@ -14,7 +14,6 @@ Item {
     id: root
 
     property int currentDropIndex: -1
-    property bool isCountShow: true
     property int itemHeight: 30
     property int lastDropIndex: -1
     property int listHeight: 700
@@ -215,6 +214,7 @@ Item {
             property bool isHovered: false
             property bool isRename: false
             property var startMove: [-1, -1]
+            property bool tooltipVisible: false
 
             color: index === folderListView.currentIndex ? (root.activeFocus ? "#1F6DE4" : DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF") : (isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
             enabled: folderListView.enabled
@@ -245,6 +245,13 @@ Item {
             }
             onIsRenameChanged: {
                 renameLine.forceActiveFocus();
+            }
+
+            ToolTip {
+                id: folderItemTip
+
+                text: model.name
+                visible: tooltipVisible
             }
 
             RowLayout {
@@ -353,7 +360,7 @@ Item {
                     horizontalAlignment: Text.AlignRight
                     text: model.count
                     verticalAlignment: Text.AlignVCenter
-                    visible: !rootItem.isRename && isCountShow
+                    visible: !rootItem.isRename
                     width: 30
                 }
             }
@@ -371,6 +378,7 @@ Item {
 
                 onClicked: {
                     root.forceActiveFocus();
+                    tooltipVisible = false;
                     if (folderListView.itemAtIndex(folderListView.lastCurrentIndex)) {
                         folderListView.itemAtIndex(folderListView.lastCurrentIndex).isRename = false;
                     }
@@ -386,12 +394,14 @@ Item {
                     folderListView.itemAtIndex(folderListView.currentIndex).isRename = true;
                 }
                 onEntered: {
+                    tooltipVisible = true;
                     if (folderListView.currentIndex == index) {
                         return;
                     }
                     parent.isHovered = true;
                 }
                 onExited: {
+                    tooltipVisible = false;
                     if (folderListView.currentIndex == index) {
                         return;
                     }
