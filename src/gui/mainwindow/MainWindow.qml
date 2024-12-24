@@ -292,9 +292,9 @@ ApplicationWindow {
         id: appImage
 
         height: 30
-        icon.height: 20
+        icon.height: 30
         icon.name: "deepin-voice-note"
-        icon.width: 20
+        icon.width: 30
         width: 30
         x: 10
         y: 10
