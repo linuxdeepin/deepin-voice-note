@@ -351,6 +351,7 @@ Item {
         delegate: Rectangle {
             id: rootItemDelegate
 
+            property bool hovered: false
             property bool isRename: false
             property bool isSelected: false
             property var startMove: [-1, -1]
@@ -396,25 +397,34 @@ Item {
                 Label {
                     id: noteNameLabel
 
+                    // width: parent.width - 10
+                    Layout.fillWidth: true
                     color: DTK.themeType === ApplicationHelper.LightType ? (isSelected ? (rootItem.activeFocus ? "white" : "black") : "black") : "white"
-                    font.pixelSize: 14
+                    elide: Text.ElideRight
+                    font: DTK.fontManager.t6
                     height: 18
                     horizontalAlignment: Text.AlignHLeft
                     text: model.name
                     visible: !isRename
-                    width: parent.width
                 }
 
                 Label {
                     id: timeLabel
 
+                    Layout.fillWidth: true
                     color: isSelected ? (rootItem.activeFocus ? "#7FFFFFFF" : DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF") : (DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF")
                     font.pixelSize: 10
                     height: 15
                     horizontalAlignment: Text.AlignHLeft
                     text: model.time
                     visible: !isRename
-                    width: parent.width
+                }
+
+                ToolTip {
+                    id: itemNameTip
+
+                    text: model.name
+                    visible: rootItemDelegate.hovered
                 }
 
                 LineEdit {
@@ -516,6 +526,7 @@ Item {
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 anchors.fill: parent
                 drag.target: this
+                hoverEnabled: true
 
                 onClicked: {
                     if (mouse.button === Qt.RightButton) {
@@ -592,6 +603,12 @@ Item {
                 }
                 onDoubleClicked: {
                     itemListView.itemAtIndex(index).isRename = true;
+                }
+                onEntered: {
+                    rootItemDelegate.hovered = true;
+                }
+                onExited: {
+                    rootItemDelegate.hovered = false;
                 }
                 onPositionChanged: {
                     if (!held) {
