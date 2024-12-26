@@ -27,7 +27,7 @@ ApplicationWindow {
     property int tmpWebViewWidth: 0
     property int tmprightDragX: 0
     property int windowMiniHeight: 300
-    property int windowMiniWidth: 680
+    property int windowMiniWidth: 685
 
     function toggleTwoColumnMode() {
         if (leftBgArea.visible === false) {
@@ -42,7 +42,7 @@ ApplicationWindow {
     DWindow.alphaBufferSize: 8
     DWindow.enabled: true
     flags: Qt.Window | Qt.WindowMinMaxButtonsHint | Qt.WindowCloseButtonHint | Qt.WindowTitleHint
-    height: 680
+    height: 681
     minimumHeight: windowMiniHeight
     minimumWidth: windowMiniWidth
     visible: true
@@ -586,7 +586,7 @@ ApplicationWindow {
                 cursorShape: Qt.SizeHorCursor
                 drag.axis: Drag.XAxis
                 drag.maximumX: leftBgArea.visible ? ((rootWindow.width - leftBgArea.width) > (middleAreaMinWidth + rightAreaMinWidth) ? rootWindow.width - rightAreaMinWidth : (rootWindow.width - rightAreaMinWidth)) : (rootWindow.width - rightAreaMinWidth)
-                drag.minimumX: leftBgArea.visible ? (leftAreaMinWidth + middleAreaMinWidth) : (middleAreaMinWidth - rightDragHandle.width)
+                drag.minimumX: leftBgArea.visible ? (leftAreaMinWidth + middleAreaMinWidth + leftDragHandle.width) : (middleAreaMinWidth - rightDragHandle.width)
                 drag.target: rightDragHandle
 
                 onPositionChanged: {

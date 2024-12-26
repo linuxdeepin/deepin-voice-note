@@ -87,6 +87,19 @@ Item {
         }
 
         Rectangle {
+            id: line
+
+            Layout.fillWidth: true
+            antialiasing: false
+            border.pixelAligned: false
+            border.width: 0
+            // color: DTK.themeType === ApplicationHelper.LightType ? "white" : "black"
+            color: hasScroll ? (DTK.themeType === ApplicationHelper.LightType ? "#14000000" : "#66000000") : DTK.themeType === ApplicationHelper.LightType ? "white" : "#242424"
+            // height: hasScroll ? 1 / Screen.devicePixelRatio : 1
+            height: 1
+        }
+
+        Rectangle {
             id: noSearchRect
 
             Layout.fillHeight: true
@@ -182,14 +195,6 @@ Item {
                     id: noteWebChannel
 
                 }
-            }
-
-            Rectangle {
-                anchors.top: webRect.top
-                border.width: 0
-                color: hasScroll ? (DTK.themeType === ApplicationHelper.LightType ? "#14000000" : "#66000000") : "transparent"
-                height: 1
-                width: parent.width
             }
         }
 
