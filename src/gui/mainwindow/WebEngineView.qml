@@ -87,19 +87,6 @@ Item {
         }
 
         Rectangle {
-            id: line
-
-            Layout.fillWidth: true
-            antialiasing: false
-            border.pixelAligned: false
-            border.width: 0
-            // color: DTK.themeType === ApplicationHelper.LightType ? "white" : "black"
-            color: hasScroll ? (DTK.themeType === ApplicationHelper.LightType ? "#14000000" : "#66000000") : DTK.themeType === ApplicationHelper.LightType ? "white" : "#242424"
-            // height: hasScroll ? 1 / Screen.devicePixelRatio : 1
-            height: 1
-        }
-
-        Rectangle {
             id: noSearchRect
 
             Layout.fillHeight: true
@@ -222,6 +209,15 @@ Item {
                 }
             }
         }
+    }
+
+    Rectangle {
+        id: line
+
+        color: hasScroll ? (DTK.themeType === ApplicationHelper.LightType ? "#14000000" : "#66000000") : DTK.themeType === ApplicationHelper.LightType ? "white" : "#242424"
+        height: 1 / Screen.devicePixelRatio
+        width: webRect.width
+        y: 50
     }
 
     VNoteMessageDialogLoader {
