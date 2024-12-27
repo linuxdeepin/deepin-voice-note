@@ -1,3 +1,12 @@
+deepin-voice-note (6.5.10) unstable; urgency=medium
+
+  * fix: Fixed the display issue(Bug: 297107)
+  * fix: Fixed sidebar issues(Bug: 297145)
+  * fix: Fixed the font blur issue(Bug: 297093)
+  * fix: Fixed the issue of separator pixels(Bug: 297087)
+
+ -- renbin <renbin@uniontech.com>  Fri, 27 Dec 2024 10:55:13 +0800
+
 deepin-voice-note (6.5.9) unstable; urgency=medium
 
   * chore: New version 6.5.9.
