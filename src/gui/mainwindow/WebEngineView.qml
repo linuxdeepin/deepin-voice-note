@@ -95,11 +95,12 @@ Item {
             color: webView.backgroundColor
             visible: noSearchResult
 
-            IconLabel {
+            DciIcon {
                 id: noSearchIcon
 
                 anchors.centerIn: noSearchRect
-                icon.name: "search_no_results"
+                name: "search_no_results"
+                theme: DTK.themeType
                 visible: noSearchResult
             }
         }
@@ -344,11 +345,10 @@ Item {
 
         active: false
         anchors.bottom: rootItem.bottom
-        anchors.bottomMargin: 10
         anchors.horizontalCenter: rootItem.horizontalCenter
         asynchronous: true
-        height: 42
-        width: 364
+        height: 70
+        width: rootItem.width
 
         sourceComponent: RecordingView {
             id: recordingBar

@@ -605,7 +605,8 @@ Item {
                     itemListView.itemAtIndex(index).isRename = true;
                 }
                 onEntered: {
-                    rootItemDelegate.hovered = true;
+                    if (noteNameLabel.implicitWidth > noteNameLabel.width)
+                        rootItemDelegate.hovered = true;
                 }
                 onExited: {
                     rootItemDelegate.hovered = false;

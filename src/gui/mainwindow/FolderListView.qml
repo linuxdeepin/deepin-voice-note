@@ -394,10 +394,12 @@ Item {
                     folderListView.itemAtIndex(folderListView.currentIndex).isRename = true;
                 }
                 onEntered: {
-                    tooltipVisible = true;
+                    if (folderNameLabel.implicitWidth > folderNameLabel.width)
+                        tooltipVisible = true;
                     if (folderListView.currentIndex == index) {
                         return;
                     }
+
                     parent.isHovered = true;
                 }
                 onExited: {

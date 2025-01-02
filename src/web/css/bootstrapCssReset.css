@@ -115,7 +115,7 @@ p {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     box-shadow: 0px 6px 16px 0px rgba(0, 0, 0, 0.20);
-    top: 135%;
+    top: 115%;
     left: -12px;
 }
 
@@ -136,6 +136,26 @@ p {
     border-color: rgba(0, 0, 0, 0.2);
     /* border: none; */
     outline: none;
+}
+
+.note-color-back .note-color-palette .note-color-btn {
+    position: relative;
+}
+
+.note-color-back .note-color-palette .note-color-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 110%;
+    height: 1px;
+    background-color: transparent;
+    transform: translate(-50%, -50%) rotate(135deg);
+    pointer-events: none; /* 确保斜线不会影响按钮的点击事件 */
+}
+
+.note-color-back .note-color-palette .note-color-row:first-child .note-color-btn:first-child::before {
+    background-color: #00000040;
 }
 
 .colorFont {
@@ -241,6 +261,7 @@ ul {
 
 .note-editable {
     padding: 20px 20px 0 30px;
+    padding-bottom: 50px;
 }
 
 .note-editable img {
@@ -297,6 +318,11 @@ ul {
 .note-popover .popover-content .dropdown-menu.note-check li a i {
     padding-right: 5px;
     color: inherit;
+}
+
+.note-air-popover {
+    max-width: 100% !important;
+    margin: 0 auto !important;
 }
 
 .dropdown-fontsize>li>a:hover,

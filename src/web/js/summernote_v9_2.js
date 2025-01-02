@@ -7262,8 +7262,8 @@
             // 更新当前选中色
             var selectColor = $('.note-forecolor .selectColor').css('background-color')
             $('.icon-forecolor .path1').css('color', selectColor)
-        
-            var curBackColors = isDarkTheme ? this.options.simpleDarkBackColors 
+
+            var curBackColors = isDarkTheme ? this.options.simpleDarkBackColors
                                             : this.options.simpleLightBackColors;
             if (0 == curBackColors.length) {
                 console.warn("Not found background color palette!");

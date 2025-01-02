@@ -7,9 +7,10 @@ import VNote 1.0
 Item {
     id: rootItem
 
-    property int iconSize: 24
+    property int btnSize: 30
+    property int iconSize: 72
     property bool isRecording: true
-    property string time: "00:00"
+    property string time: "00:00:00"
 
     signal pauseRecording
     signal stopRecording
@@ -18,11 +19,10 @@ Item {
         curves.stopRecording();
         stopRecording();
         rootItem.visible = false;
-        time = "00:00";
+        time = "00:00:00";
     }
 
-    implicitHeight: 42
-    implicitWidth: 364
+    implicitHeight: 70
     visible: false
 
     onVisibleChanged: {
@@ -30,26 +30,54 @@ Item {
     }
 
     Rectangle {
+        id: backRectangle
+
         anchors.fill: parent
+
+        gradient: Gradient {
+            GradientStop {
+                color: DTK.themeType === ApplicationHelper.LightType ? "#19FFFFFF" : "#19242424"
+                position: 0.0
+            }
+
+            GradientStop {
+                color: DTK.themeType === ApplicationHelper.LightType ? "white" : "#242424"
+                position: 0.3
+            }
+        }
+    }
+
+    Rectangle {
+        id: back
+
+        anchors.bottom: backRectangle.bottom
+        anchors.bottomMargin: 10
+        anchors.horizontalCenter: parent.horizontalCenter
         border.color: DTK.themeType === ApplicationHelper.LightType ? "#0A000000" : "#19FFFFFF"
         border.width: 1
         color: DTK.themeType === ApplicationHelper.LightType ? "#7FF4F4F4" : "#0A0A10"
+        implicitHeight: 42
+        implicitWidth: 364
         radius: 12
     }
 
     RowLayout {
-        anchors.fill: parent
-        spacing: 0
+        anchors.centerIn: back
+        implicitHeight: 42
+        implicitWidth: 364
+        spacing: 10
 
         ToolButton {
             id: pauseBtn
 
-            height: rootItem.height
             icon.height: iconSize
             icon.name: isRecording ? "recording_pause" : "recording_start"
             icon.width: iconSize
-            spacing: 0
-            width: rootItem.height
+            implicitHeight: btnSize
+            implicitWidth: btnSize
+
+            background: Item {
+            }
 
             onClicked: {
                 pauseRecording();
@@ -74,11 +102,14 @@ Item {
         ToolButton {
             id: stopBtn
 
-            height: rootItem.height
             icon.height: iconSize
             icon.name: "recording_stop"
             icon.width: iconSize
-            width: rootItem.height
+            implicitHeight: btnSize
+            implicitWidth: btnSize
+
+            background: Item {
+            }
 
             onClicked: {
                 stop();

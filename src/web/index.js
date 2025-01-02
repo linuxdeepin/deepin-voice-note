@@ -148,7 +148,7 @@ var isUlOrOl = false
 const airPopoverHeight = 44  //悬浮工具栏高度
 const airPopoverWidth = 385  //悬浮工具栏宽度
 const airPopoverLeftMargin = 20 //悬浮工具栏距离编辑区左侧边距
-const airPopoverRightMargin = 15 //悬浮工具栏距离编辑区右侧边距
+const airPopoverRightMargin = 35 //悬浮工具栏距离编辑区右侧边距
 
 // 翻译列表
 var tooltipContent = {
@@ -1656,7 +1656,7 @@ $('body').on('click', '.dropdown-toggle', function (e) {
     if (menuItem && menuItem.classList.contains('dropdown-menu')) {
         if (needClose) {
             // reset css config
-            menuItem.style.top = '135%';
+            menuItem.style.top = '115%';
             return;
         }
         // temporarily set display to block to get the height of the menu
@@ -1677,9 +1677,9 @@ $('body').on('click', '.dropdown-toggle', function (e) {
         menuItem.classList.remove('show');
 
         if (showTop) {
-            menuItem.style.top = '-' + (menuRect.height + 20) + 'px';
+            menuItem.style.top = '-' + (menuRect.height + 10) + 'px';
         } else {
-            menuItem.style.top = '135%';
+            menuItem.style.top = '115%';
         }
     }
 })

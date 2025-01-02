@@ -89,6 +89,10 @@ strike[style="text-decoration-line: underline;"] {
     border-color: rgba(255, 255, 255, 0.2);
 }
 
+.note-color-back .note-color-palette .note-color-row:first-child .note-color-btn:first-child::before {
+    background-color: rgba(255, 255, 255, 0.2);;
+}
+
 .planButton button {
     background: rgba(255, 255, 255, 0.10);
 }
