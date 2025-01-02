@@ -186,10 +186,10 @@ QString Utils::formatMillisecond(qint64 millisecond, qint64 minValue)
         curSecond = minValue;
     }
     if (curSecond < 3600) {
-        return QDateTime::fromSecsSinceEpoch(static_cast<qint64>(curSecond)).toUTC().toString("mm:ss");
+        return QDateTime::fromSecsSinceEpoch(static_cast<qint64>(curSecond)).toUTC().toString("hh:mm:ss");
     }
 
-    return QString("60:00");
+    return QString("60:00:00");
 }
 
 /**
