@@ -5,13 +5,74 @@
 
 #include "vtextspeechandtrmanager.h"
 
+#include <mutex>
+
 #include <QDebug>
 #include <QDBusReply>
 #include <QDBusConnection>
 #include <QDBusInterface>
+#include <QDBusConnectionInterface>
 #include <QProcess>
+#include <QThreadPool>
+#include <QStandardPaths>
 
-static bool isSpeeching = false;
+static const QString kUosAiBin = "uos-ai-assistant";
+
+VTextSpeechAndTrManager::VTextSpeechAndTrManager(QObject *parent) {}
+
+VTextSpeechAndTrManager *VTextSpeechAndTrManager::instance()
+{
+    static VTextSpeechAndTrManager ins;
+    return &ins;
+}
+
+void VTextSpeechAndTrManager::checkUosAiExists()
+{
+    static std::once_flag kAiFlag;
+    std::call_once(kAiFlag, [this]() {
+        auto initFunc = []() {
+            QDBusConnection connection = QDBusConnection::sessionBus();
+            QDBusConnectionInterface *bus = connection.interface();
+            Status status = Disable;
+
+            if (bus->isServiceRegistered("com.iflytek.aiassistant")) {
+                status = Enable;
+            }
+
+            if (Enable != status) {
+                // Check if install uos-ai
+                if (QStandardPaths::findExecutable(kUosAiBin).isEmpty()) {
+                    status = NotInstalled;
+                }
+
+                // Try to start uos-ai
+                if (NotInstalled != status) {
+                    QProcess process;
+                    process.setProgram(kUosAiBin);
+                    qint64 pid = 0;
+                    if (process.startDetached(&pid)) {
+                        status = Enable;
+                    }
+
+                    qInfo() << QString("Ai service not register, try to start %1, ret: %2, pid: %3")
+                                   .arg(kUosAiBin)
+                                   .arg(Enable == status)
+                                   .arg(pid);
+                } else {
+                    qInfo() << QString("Ai service not register, not found %1").arg(kUosAiBin);
+                }
+            }
+
+            // call on non-gui thread, so queued connection.
+            auto ins = VTextSpeechAndTrManager::instance();
+            QMetaObject::invokeMethod(
+                ins, [status, ins]() { ins->m_status = status; }, Qt::QueuedConnection);
+        };
+
+        // run on non-gui thread.
+        QThreadPool::globalInstance()->start(std::move(initFunc), QThread::TimeCriticalPriority);
+    });
+}
 
 /**
  * @brief VTextSpeechAndTrManager::isTextToSpeechInWorking
@@ -19,21 +80,19 @@ static bool isSpeeching = false;
  */
 bool VTextSpeechAndTrManager::isTextToSpeechInWorking()
 {
-    if (isSpeeching) {
-        QDBusMessage stopReadingMsg = QDBusMessage::createMethodCall("com.iflytek.aiassistant",
-                                                                     "/aiassistant/tts",
-                                                                     "com.iflytek.aiassistant.tts",
-                                                                     "isTTSInWorking");
+    if (m_isSpeeching) {
+        QDBusMessage stopReadingMsg = QDBusMessage::createMethodCall(
+            "com.iflytek.aiassistant", "/aiassistant/tts", "com.iflytek.aiassistant.tts", "isTTSInWorking");
 
         QDBusReply<bool> stopReadingStateRet = QDBusConnection::sessionBus().call(stopReadingMsg, QDBus::BlockWithGui);
         if (stopReadingStateRet.isValid()) {
-            isSpeeching = stopReadingStateRet.value();
+            m_isSpeeching = stopReadingStateRet.value();
         } else {
-            isSpeeching = false;
+            m_isSpeeching = false;
         }
     }
 
-    return isSpeeching;
+    return m_isSpeeching;
 }
 
 /**
@@ -42,10 +101,8 @@ bool VTextSpeechAndTrManager::isTextToSpeechInWorking()
  */
 bool VTextSpeechAndTrManager::getTextToSpeechEnable()
 {
-    QDBusMessage voiceReadingMsg = QDBusMessage::createMethodCall("com.iflytek.aiassistant",
-                                                                  "/aiassistant/tts",
-                                                                  "com.iflytek.aiassistant.tts",
-                                                                  "getTTSEnable");
+    QDBusMessage voiceReadingMsg = QDBusMessage::createMethodCall(
+        "com.iflytek.aiassistant", "/aiassistant/tts", "com.iflytek.aiassistant.tts", "getTTSEnable");
 
     QDBusReply<bool> voiceReadingStateRet = QDBusConnection::sessionBus().call(voiceReadingMsg, QDBus::BlockWithGui);
     if (voiceReadingStateRet.isValid()) {
@@ -61,10 +118,8 @@ bool VTextSpeechAndTrManager::getTextToSpeechEnable()
  */
 bool VTextSpeechAndTrManager::getSpeechToTextEnable()
 {
-    QDBusMessage dictationMsg = QDBusMessage::createMethodCall("com.iflytek.aiassistant",
-                                                               "/aiassistant/iat",
-                                                               "com.iflytek.aiassistant.iat",
-                                                               "getIatEnable");
+    QDBusMessage dictationMsg = QDBusMessage::createMethodCall(
+        "com.iflytek.aiassistant", "/aiassistant/iat", "com.iflytek.aiassistant.iat", "getIatEnable");
 
     QDBusReply<bool> dictationStateRet = QDBusConnection::sessionBus().call(dictationMsg, QDBus::BlockWithGui);
     if (dictationStateRet.isValid()) {
@@ -80,10 +135,8 @@ bool VTextSpeechAndTrManager::getSpeechToTextEnable()
  */
 bool VTextSpeechAndTrManager::getTransEnable()
 {
-    QDBusMessage translateReadingMsg = QDBusMessage::createMethodCall("com.iflytek.aiassistant",
-                                                                      "/aiassistant/trans",
-                                                                      "com.iflytek.aiassistant.trans",
-                                                                      "getTransEnable");
+    QDBusMessage translateReadingMsg = QDBusMessage::createMethodCall(
+        "com.iflytek.aiassistant", "/aiassistant/trans", "com.iflytek.aiassistant.trans", "getTransEnable");
 
     QDBusReply<bool> translateStateRet = QDBusConnection::sessionBus().call(translateReadingMsg, QDBus::BlockWithGui);
     if (translateStateRet.isValid()) {
@@ -96,44 +149,104 @@ bool VTextSpeechAndTrManager::getTransEnable()
 /**
  * @brief VTextSpeechAndTrManager::onTextToSpeech
  */
-void VTextSpeechAndTrManager::onTextToSpeech()
+VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::onTextToSpeech()
 {
-    QDBusInterface interface("com.iflytek.aiassistant", "/aiassistant/deepinmain", "com.iflytek.aiassistant.mainWindow");
-    if (interface.isValid()) {
-        interface.asyncCall("TextToSpeech");
-        isSpeeching = true;
+    if (Enable != status()) {
+        return status();
     }
+
+    if (!getTextToSpeechEnable()) {
+        return NoOutputDevice;
+    }
+
+    QDBusInterface interface("com.iflytek.aiassistant", "/aiassistant/deepinmain", "com.iflytek.aiassistant.mainWindow");
+    if (!interface.isValid()) {
+        return Failed;
+    }
+
+    // check if speech now
+    if (isTextToSpeechInWorking()) {
+        onStopTextToSpeech();
+    }
+
+    interface.asyncCall("TextToSpeech");
+    m_isSpeeching = true;
+    return Success;
 }
 
 /**
  * @brief VTextSpeechAndTrManager::onStopTextToSpeech
  */
-void VTextSpeechAndTrManager::onStopTextToSpeech()
+VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::onStopTextToSpeech()
 {
-    if (isSpeeching) {
-        QDBusInterface interface("com.iflytek.aiassistant", "/aiassistant/tts", "com.iflytek.aiassistant.tts");
-        if (interface.isValid()) {
-            interface.asyncCall("stopTTSDirectly");
-            isSpeeching = false;
-        }
+    if (Enable != status()) {
+        return status();
     }
+
+    if (m_isSpeeching) {
+        QDBusInterface interface("com.iflytek.aiassistant", "/aiassistant/tts", "com.iflytek.aiassistant.tts");
+        if (!interface.isValid()) {
+            return Failed;
+        }
+
+        interface.asyncCall("stopTTSDirectly");
+        m_isSpeeching = false;
+    }
+
+    return Success;
 }
 
 /**
  * @brief VTextSpeechAndTrManager::onSpeechToText
  */
-void VTextSpeechAndTrManager::onSpeechToText()
+VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::onSpeechToText()
 {
-    QDBusInterface interface("com.iflytek.aiassistant", "/aiassistant/deepinmain", "com.iflytek.aiassistant.mainWindow");
-    if (interface.isValid()) {
-        interface.asyncCall("SpeechToText");
+    if (Enable != status()) {
+        return status();
     }
+
+    if (!getSpeechToTextEnable()) {
+        return NoInputDevice;
+    }
+
+    QDBusInterface interface("com.iflytek.aiassistant", "/aiassistant/deepinmain", "com.iflytek.aiassistant.mainWindow");
+    if (!interface.isValid()) {
+        return Failed;
+    }
+
+    interface.asyncCall("SpeechToText");
+    return Success;
 }
 
 /**
  * @brief VTextSpeechAndTrManager::onTextTranslate
  */
-void VTextSpeechAndTrManager::onTextTranslate()
+VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::onTextTranslate()
 {
-    QProcess::startDetached("dbus-send  --print-reply --dest=com.iflytek.aiassistant /aiassistant/deepinmain com.iflytek.aiassistant.mainWindow.TextToTranslate");
+    if (Enable != status()) {
+        return status();
+    }
+
+    if (!getTransEnable()) {
+        return Failed;
+    }
+
+    QProcess::startDetached("dbus-send  --print-reply --dest=com.iflytek.aiassistant /aiassistant/deepinmain "
+                            "com.iflytek.aiassistant.mainWindow.TextToTranslate");
+
+    return Success;
+}
+
+QString VTextSpeechAndTrManager::errorString(Status status)
+{
+    switch (status) {
+        case NotInstalled:
+            return QObject::tr("Please install 'UOS AI' from the App Store before using");
+        case NoInputDevice:
+            return QObject::tr("No audio input device detected. Please check and try again");
+        case NoOutputDevice:
+            return QObject::tr("No audio output device detected. Please check and try again");
+        default:
+            return "Unknown error";
+    }
 }

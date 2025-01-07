@@ -16,12 +16,7 @@
  */
 OpsStateInterface::OpsStateInterface()
 {
-    QDBusConnection connection = QDBusConnection::sessionBus();
-    if (connection.isConnected()) {
-        bool reply = connection.interface()->isServiceRegistered("com.iflytek.aiassistant").value();
-        if (reply)
-            operState(StateAISrvAvailable, true);
-    }
+    operState(StateAISrvAvailable, true);
 }
 
 /**

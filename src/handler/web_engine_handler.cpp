@@ -50,7 +50,7 @@ DGUI_USE_NAMESPACE
  */
 
 WebEngineHandler::WebEngineHandler(QObject *parent)
-    : QObject { parent }
+    : QObject{parent}
     , m_voicePlayerHandler(new VoicePlayerHandler(this))
     , m_voiceToTextHandler(new VoiceToTextHandler(this))
 {
@@ -304,15 +304,27 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
             // 另存图片
             savePictureAs();
             break;
-        case ActionManager::TxtSpeech:
-            VTextSpeechAndTrManager::onTextToSpeech();
+        case ActionManager::TxtSpeech: {
+            auto status = VTextSpeechAndTrManager::instance()->onTextToSpeech();
+            if (VTextSpeechAndTrManager::Success != status) {
+                Q_EMIT popupToast(VTextSpeechAndTrManager::instance()->errorString(status), status);
+            }
             break;
-        case ActionManager::TxtStopreading:
-            VTextSpeechAndTrManager::onStopTextToSpeech();
+        }
+        case ActionManager::TxtStopreading: {
+            auto status = VTextSpeechAndTrManager::instance()->onStopTextToSpeech();
+            if (VTextSpeechAndTrManager::Success != status) {
+                Q_EMIT popupToast(VTextSpeechAndTrManager::instance()->errorString(status), status);
+            }
             break;
-        case ActionManager::TxtDictation:
-            VTextSpeechAndTrManager::onSpeechToText();
+        }
+        case ActionManager::TxtDictation: {
+            auto status = VTextSpeechAndTrManager::instance()->onSpeechToText();
+            if (VTextSpeechAndTrManager::Success != status) {
+                Q_EMIT popupToast(VTextSpeechAndTrManager::instance()->errorString(status), status);
+            }
             break;
+        }
         // case ActionManager::TxtTranslate:
         //     VTextSpeechAndTrManager::onTextTranslate();
         //     break;
@@ -385,19 +397,9 @@ void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *req
 void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *request)
 {
     ActionManager::instance()->resetCtxMenu(ActionManager::MenuType::TxtCtxMenu, false);  // 重置菜单选项
-    bool isAlSrvAvailabel = OpsStateInterface::instance()->isAiSrvExist();                // 获取语音服务是否可用
-    bool TTSisWorking = VTextSpeechAndTrManager::isTextToSpeechInWorking();               // 获取语音服务是否正在朗读
-    // 设置语音服务选项状态
-    if (isAlSrvAvailabel) {
-        if (TTSisWorking) {
-            ActionManager::instance()->visibleAction(ActionManager::TxtStopreading, true);
-            ActionManager::instance()->visibleAction(ActionManager::TxtSpeech, false);
-            ActionManager::instance()->enableAction(ActionManager::TxtStopreading, true);
-        } else {
-            ActionManager::instance()->visibleAction(ActionManager::TxtStopreading, false);
-            ActionManager::instance()->visibleAction(ActionManager::TxtSpeech, true);
-        }
-    }
+
+    // TASK-37707: Disable now
+    ActionManager::instance()->visibleAction(ActionManager::TxtStopreading, false);
 
     // 获取web端编辑标志
     QWebEngineContextMenuRequest::EditFlags flags = request->editFlags();
@@ -410,14 +412,11 @@ void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *requ
     // 可复制
     if (flags.testFlag(QWebEngineContextMenuRequest::CanCopy)) {
         ActionManager::instance()->enableAction(ActionManager::TxtCopy, true);
-        if (isAlSrvAvailabel) {
-            // if (VTextSpeechAndTrManager::getTransEnable()) {
-            //     ActionManager::instance()->enableAction(ActionManager::TxtTranslate, true);
-            // }
-            if (!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()) {
-                ActionManager::instance()->enableAction(ActionManager::TxtSpeech, true);
-            }
-        }
+
+        // if (VTextSpeechAndTrManager::getTransEnable()) {
+        //     ActionManager::instance()->enableAction(ActionManager::TxtTranslate, true);
+        // }
+        ActionManager::instance()->enableAction(ActionManager::TxtSpeech, true);
     }
     // 可剪切
     if (flags.testFlag(QWebEngineContextMenuRequest::CanCut)) {
@@ -430,9 +429,7 @@ void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *requ
     // 可粘贴
     if (flags.testFlag(QWebEngineContextMenuRequest::CanPaste)) {
         ActionManager::instance()->enableAction(ActionManager::TxtPaste, true);
-        if (!TTSisWorking && VTextSpeechAndTrManager::getSpeechToTextEnable()) {
-            ActionManager::instance()->enableAction(ActionManager::TxtDictation, true);
-        }
+        ActionManager::instance()->enableAction(ActionManager::TxtDictation, true);
     }
 
     // 请求界面弹出右键菜单
@@ -452,7 +449,8 @@ bool WebEngineHandler::saveMP3()
 {
     if (!m_voiceBlock)
         return false;
-    QString defaultName = QStandardPaths::writableLocation(QStandardPaths::MusicLocation) + "/" + m_voiceBlock.get()->voiceTitle + ".mp3";
+    QString defaultName =
+        QStandardPaths::writableLocation(QStandardPaths::MusicLocation) + "/" + m_voiceBlock.get()->voiceTitle + ".mp3";
     QString fileName = QFileDialog::getSaveFileName(0, tr("save as MP3"), defaultName, "*.mp3");
     if (!fileName.isEmpty()) {
         QFileInfo fileInfo(fileName);
@@ -467,13 +465,13 @@ bool WebEngineHandler::saveMP3()
 
 void WebEngineHandler::savePictureAs()
 {
-    QString originalPath = menuJson.toString(); //获取原图片路径
+    QString originalPath = menuJson.toString();  // 获取原图片路径
     saveAsFile(originalPath, QStandardPaths::writableLocation(QStandardPaths::PicturesLocation), "image");
 }
 
 QString WebEngineHandler::saveAsFile(const QString &originalPath, QString dirPath, const QString &defalutName)
 {
-    //存储文件夹默认为桌面
+    // 存储文件夹默认为桌面
     if (dirPath.isEmpty()) {
         dirPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     }
@@ -482,12 +480,12 @@ QString WebEngineHandler::saveAsFile(const QString &originalPath, QString dirPat
     QString filter = "*." + fileInfo.suffix();
     QString baseName = defalutName.isEmpty() ? fileInfo.baseName() : defalutName;
     QString dir = QString("%1/%2").arg(dirPath).arg(baseName + "." + fileInfo.suffix());
-    //获取需要保存的文件位置，默认路径为用户图片文件夹，默认文件名为原文件名
+    // 获取需要保存的文件位置，默认路径为用户图片文件夹，默认文件名为原文件名
     QString newPath = QFileDialog::getSaveFileName(0, "", dir, filter);
     if (newPath.isEmpty()) {
         return "";
     }
-    //添加文件后缀
+    // 添加文件后缀
     if (!newPath.endsWith(fileInfo.suffix())) {
         newPath += ("." + fileInfo.suffix());
     }
@@ -495,22 +493,22 @@ QString WebEngineHandler::saveAsFile(const QString &originalPath, QString dirPat
     QFileInfo info(newPath);
 
     if (!QFileInfo(info.dir().path()).isWritable()) {
-        //文件夹没有写权限
+        // 文件夹没有写权限
         emit requestMessageDialog(VNoteMessageDialogHandler::NoPermission);
         return "";
     }
     if (info.exists()) {
-        //文件已存在，删除原文件
+        // 文件已存在，删除原文件
         if (!info.isWritable()) {
-            //文件没有写权限
-            // VNoteMessageDialog audioOutLimit(VNoteMessageDialog::NoPermission);
+            // 文件没有写权限
+            //  VNoteMessageDialog audioOutLimit(VNoteMessageDialog::NoPermission);
             emit requestMessageDialog(VNoteMessageDialogHandler::NoPermission);
             return "";
         }
         QFile::remove(newPath);
     }
 
-    //复制文件
+    // 复制文件
     if (!QFile::copy(originalPath, newPath)) {
         emit requestMessageDialog(VNoteMessageDialogHandler::SaveFailed);
         qCritical() << "copy failed:" << originalPath << ";" << newPath;

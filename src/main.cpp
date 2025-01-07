@@ -7,6 +7,7 @@
 #include "common/VNoteMainManager.h"
 #include "common/jscontent.h"
 #include "common/imageprovider.h"
+#include "common/vtextspeechandtrmanager.h"
 
 #include "config.h"
 
@@ -43,12 +44,10 @@ int main(int argc, char *argv[])
     DApplication *app = new DApplication(argc, argv);
 
     DGuiApplicationHelper::instance()->setSingleInstanceInterval(-1);
-    if (!DGuiApplicationHelper::instance()->setSingleInstance(
-            app->applicationName(),
-            DGuiApplicationHelper::UserScope)) {
+    if (!DGuiApplicationHelper::instance()->setSingleInstance(app->applicationName(), DGuiApplicationHelper::UserScope)) {
         return 0;
     }
-    //TODO: The DTK theme color is initialized abnormally, and the application is temporarily circumvented
+    // TODO: The DTK theme color is initialized abnormally, and the application is temporarily circumvented
     DGuiApplicationHelper::instance()->paletteType();
 
     app->setOrganizationName("deepin");
@@ -58,23 +57,28 @@ int main(int argc, char *argv[])
     qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "7777");
     VNoteMainManager::instance()->initQMLRegister();
     QtWebEngineQuick::initialize();
-    ImageProvider* imageProvider = ImageProvider::instance();
+    ImageProvider *imageProvider = ImageProvider::instance();
 
     app->loadTranslator();
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     engine.addImageProvider("Provider", imageProvider);
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     app, [url](QObject *obj, const QUrl &objUrl) {
-        if (!obj && url == objUrl)
-            QCoreApplication::exit(-1);
-    }, Qt::QueuedConnection);   
+    QObject::connect(
+        &engine,
+        &QQmlApplicationEngine::objectCreated,
+        app,
+        [url](QObject *obj, const QUrl &objUrl) {
+            if (!obj && url == objUrl)
+                QCoreApplication::exit(-1);
+        },
+        Qt::QueuedConnection);
     engine.load(url);
     VNoteMainManager::instance()->initNote();
 
     DLogManager::registerConsoleAppender();
     DLogManager::registerFileAppender();
 
+    VTextSpeechAndTrManager::instance()->checkUosAiExists();
     return app->exec();
 }
