@@ -30,17 +30,17 @@
 <context>
     <name>FolderListView</name>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="454"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="466"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="462"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="474"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="480"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="492"/>
         <source>New Note</source>
         <translation>新建笔记</translation>
     </message>
@@ -48,12 +48,12 @@
 <context>
     <name>InitialInterface</name>
     <message>
-        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="60"/>
+        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="66"/>
         <source>After creating a new notepad, you can start recording voice and text</source>
         <translation>新建一个记事本后，可以开始记录语音及文字</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="67"/>
+        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="73"/>
         <source>Create Notebook</source>
         <translation>新建记事本</translation>
     </message>
@@ -98,7 +98,7 @@
         <translation>置顶</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="663"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="681"/>
         <source>Sticky Notes</source>
         <translation>已置顶</translation>
     </message>
@@ -106,12 +106,12 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="366"/>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="371"/>
         <source>Create Notebook</source>
         <translation>新建记事本</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="515"/>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="516"/>
         <source>Search</source>
         <translation>搜索</translation>
     </message>
@@ -302,6 +302,24 @@
     </message>
 </context>
 <context>
+    <name>QObject</name>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="244"/>
+        <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
+        <translation>请前往应用商店安装“UOS AI”后再使用</translation>
+    </message>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="246"/>
+        <source>No audio input device detected. Please check and try again</source>
+        <translation>未检测到音频输入设备，请检查后重试</translation>
+    </message>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="248"/>
+        <source>No audio output device detected. Please check and try again</source>
+        <translation>未检测到音频输出设备，请检查后重试</translation>
+    </message>
+</context>
+<context>
     <name>Setting</name>
     <message>
         <location filename="../src/common/setting.cpp" line="24"/>
@@ -471,22 +489,22 @@
 <context>
     <name>TitleBarMenu</name>
     <message>
-        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="15"/>
+        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="16"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="28"/>
+        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="30"/>
         <source>Privacy Policy</source>
         <translation>隐私政策</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="51"/>
+        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="53"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
         <translation>语音记事本是一款提供文本记事、语音录音记录的轻量级记事工具。</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="53"/>
+        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="55"/>
         <source>Voice Note</source>
         <translation>语音记事本</translation>
     </message>
@@ -601,7 +619,7 @@
 <context>
     <name>WebEngineHandler</name>
     <message>
-        <location filename="../src/handler/web_engine_handler.cpp" line="456"/>
+        <location filename="../src/handler/web_engine_handler.cpp" line="454"/>
         <source>save as MP3</source>
         <translation>保存为MP3</translation>
     </message>
@@ -609,22 +627,22 @@
 <context>
     <name>WindowTitleBar</name>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="64"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="57"/>
         <source>Create Note</source>
         <translation>新建笔记</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="104"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="97"/>
         <source>Start recording</source>
         <translation>开始录音</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="104"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="97"/>
         <source>No recording device detected</source>
         <translation>未检测到录音设备</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="123"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="116"/>
         <source>Insert picture</source>
         <translation>插入图片</translation>
     </message>

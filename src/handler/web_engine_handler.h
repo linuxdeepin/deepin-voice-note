@@ -60,6 +60,8 @@ Q_SIGNALS:
 
     void viewPicture(const QString &filePath);
 
+    void popupToast(const QString &message, int msgId);
+
 public Q_SLOTS:
     // for qml
     void onCallJsResult(const QVariant &result);

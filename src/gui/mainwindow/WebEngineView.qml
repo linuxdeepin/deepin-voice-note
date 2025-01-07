@@ -177,6 +177,9 @@ Item {
                         else
                             viewPictureLoader.item.show();
                     }
+                    onPopupToast: (message, msgId) => {
+                        DTK.sendMessage(webView, message, "icon_warning", 4000, msgId)
+                    }
                 }
 
                 WebChannel {

@@ -1,30 +1,61 @@
-// Copyright (C) 2019 ~ 2020 Deepin Technology Co., Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2019-2025 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef VTEXTSPEECHANDTRMANAGER_H
 #define VTEXTSPEECHANDTRMANAGER_H
 
-class VTextSpeechAndTrManager
+#include <QObject>
+
+class VTextSpeechAndTrManager : public QObject
 {
+    Q_OBJECT
+
 public:
-    // 检测是否在朗读文本
-    static bool isTextToSpeechInWorking();
-    // 检测语音朗读开关是否打开
-    static bool getTextToSpeechEnable();
-    // 检测语音听写开关是否打开
-    static bool getSpeechToTextEnable();
-    // 检测文本翻译开关是否打开
-    static bool getTransEnable();
+    static VTextSpeechAndTrManager *instance();
+
+    enum Status {
+        Disable,
+        Enable,
+
+        NotInstalled,
+        NoInputDevice,
+        NoOutputDevice,
+
+        Success = Enable,
+        Failed = Disable,
+    };
+
+    inline Status status() const { return m_status; }
+    inline bool valid() const { return Enable == m_status; }
+    void checkUosAiExists();
+
     // 语音朗读
-    static void onTextToSpeech();
+    Status onTextToSpeech();
     // 停止语音朗读
-    static void onStopTextToSpeech();
+    Status onStopTextToSpeech();
     // 语音听写
-    static void onSpeechToText();
+    Status onSpeechToText();
     // 文本翻译
-    static void onTextTranslate();
+    Status onTextTranslate();
+
+    QString errorString(Status status);
+
+private:
+    explicit VTextSpeechAndTrManager(QObject *parent = nullptr);
+    ~VTextSpeechAndTrManager() override = default;
+
+    // 检测是否在朗读文本
+    bool isTextToSpeechInWorking();
+    // 检测语音朗读开关是否打开
+    bool getTextToSpeechEnable();
+    // 检测语音听写开关是否打开
+    bool getSpeechToTextEnable();
+    // 检测文本翻译开关是否打开
+    bool getTransEnable();
+
+    bool m_isSpeeching{false};
+    Status m_status{NotInstalled};
 };
 
-#endif // VTEXTSPEECHANDTRMANAGER_H
+#endif  // VTEXTSPEECHANDTRMANAGER_H
