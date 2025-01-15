@@ -307,21 +307,30 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
         case ActionManager::TxtSpeech: {
             auto status = VTextSpeechAndTrManager::instance()->onTextToSpeech();
             if (VTextSpeechAndTrManager::Success != status) {
-                Q_EMIT popupToast(VTextSpeechAndTrManager::instance()->errorString(status), status);
+                QString errString = VTextSpeechAndTrManager::instance()->errorString(status);
+                if (!errString.isEmpty()) {
+                    Q_EMIT popupToast(errString, status);
+                }
             }
             break;
         }
         case ActionManager::TxtStopreading: {
             auto status = VTextSpeechAndTrManager::instance()->onStopTextToSpeech();
             if (VTextSpeechAndTrManager::Success != status) {
-                Q_EMIT popupToast(VTextSpeechAndTrManager::instance()->errorString(status), status);
+                QString errString = VTextSpeechAndTrManager::instance()->errorString(status);
+                if (!errString.isEmpty()) {
+                    Q_EMIT popupToast(errString, status);
+                }
             }
             break;
         }
         case ActionManager::TxtDictation: {
             auto status = VTextSpeechAndTrManager::instance()->onSpeechToText();
             if (VTextSpeechAndTrManager::Success != status) {
-                Q_EMIT popupToast(VTextSpeechAndTrManager::instance()->errorString(status), status);
+                QString errString = VTextSpeechAndTrManager::instance()->errorString(status);
+                if (!errString.isEmpty()) {
+                    Q_EMIT popupToast(errString, status);
+                }
             }
             break;
         }

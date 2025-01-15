@@ -6,6 +6,9 @@
 #define VTEXTSPEECHANDTRMANAGER_H
 
 #include <QObject>
+#include <QSharedPointer>
+
+class QDBusInterface;
 
 class VTextSpeechAndTrManager : public QObject
 {
@@ -19,6 +22,7 @@ public:
         Enable,
 
         NotInstalled,
+        NoUserAgreement,    // whether the user agrees to the user agreement.
         NoInputDevice,
         NoOutputDevice,
 
@@ -54,8 +58,15 @@ private:
     // 检测文本翻译开关是否打开
     bool getTransEnable();
 
+    Status checkValid();
+
+    static Status copilotInstalled(const QSharedPointer<QDBusInterface> &copilot);
+    static Status isCopilotEnabled(const QSharedPointer<QDBusInterface> &copilot);
+    static Status launchCopilotChat(const QSharedPointer<QDBusInterface> &copilot);
+
     bool m_isSpeeching{false};
     Status m_status{NotInstalled};
+    QSharedPointer<QDBusInterface> m_copilot;
 };
 
 #endif  // VTEXTSPEECHANDTRMANAGER_H
