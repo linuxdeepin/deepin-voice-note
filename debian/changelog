@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.13) unstable; urgency=medium
+
+  * fix: cannot launch copilot page on first start (#179)(Bug: 300535)
+
+ -- renbin <renbin@uniontech.com>  Thu, 16 Jan 2025 17:07:56 +0800
+
 deepin-voice-note (6.5.12) unstable; urgency=medium
 
   * chore: New version 6.5.12.
