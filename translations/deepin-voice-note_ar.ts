@@ -665,12 +665,12 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/common/jscontent.cpp" line="135"/>
         <source>Numbering</source>
-        <translation>رقم</translation>
+        <translation>ترقيم</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="136"/>
         <source>More colors</source>
-        <translation>أكثر الألوان</translation>
+        <translation>المزيد من الألوان</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="137"/>
