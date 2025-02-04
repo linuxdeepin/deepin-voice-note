@@ -7,12 +7,12 @@
         <location filename="../src/main.cpp" line="80"/>
         <location filename="../src/views/vnotemainwindow.cpp" line="602"/>
         <source>Voice Notes</source>
-        <translation>Voice Notes</translation>
+        <translation>ボイスノート</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="81"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation>Voice Notesは、テキストノートと音声録音ができる軽量なメモツールです。</translation>
+        <translation>ボイスノートは、テキストノートと音声録音ができる軽量なメモツールです。</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="603"/>
