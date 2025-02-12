@@ -1098,47 +1098,73 @@ async function insertImg(urlStr) {
     })
 }
 
-//  
+/**
+ * trigger play/pause voice when key space / return / enter down
+ */
+function triggerPlayPauseVoice(event) {
+    var currentLi = $('.li.active');
+    if (currentLi.length > 0) {
+        event.preventDefault();
+        var info = isRangeVoice();
+        if (info.flag == 1) {
+            var curPlayback = currentLi.first().find('.voicePlayback');
+            // 点击浮动窗口时视同点击焦点音频播放控件
+            if (curPlayback.is(airVoicePlayback)) {
+                curPlayback = activePlayback;
+            }
+            var jsonString = currentLi.attr('jsonKey');
+            var bIsSame = curPlayback.hasClass('now');
+
+            if (!bIsSame) {
+                if (null !== activePlayback && activePlayback.hasClass('now')) {
+                    // 移除之前控件的状态，重置样式
+                    activePlayback.removeClass('now').removeClass('play').removeClass('pause');
+                }
+                curPlayback.addClass('now');
+                activePlayback = curPlayback;
+
+                // 重置悬浮工具栏状态
+                resetAirVoicePlayback();
+            }
+
+            // 后端播放处理，等待后端开始播放音频数据 -> callJsSetPlayStatus()
+            webobj.jsCallPlayVoice(jsonString, bIsSame, function (state) {
+                //TODO 录音错误处理
+            });
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Capture keydown event on capture phase
+ */
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter' || event.keyCode === 13) {
+        triggerPlayPauseVoice(event)
+    }
+}, true); // Key: The third parameter is set to true, indicating the capture phase
+
+/**
+ * Capture keydown event on propagation phase
+ */
 document.onkeydown = function (event) {
     if (window.event.keyCode == 13) {
-        // 回车
+        // key enter or return
         setFocusScroll()
+
     } else if (event.ctrlKey && window.event.keyCode == 86) {
         // ctrl+v
         webobj.jsCallPaste(returnCopyFlag())
         return false;
+
     } else if (window.event.keyCode == 32) {
-        var currentLi = $('.li.active');
-        if (currentLi.length > 0) {
-            event.preventDefault();
-            var info = isRangeVoice();
-            if (info.flag == 1) {
-                var curPlayback = currentLi.first().find('.voicePlayback');
-                // 点击浮动窗口时视同点击焦点音频播放控件
-                if (curPlayback.is(airVoicePlayback)) {
-                    curPlayback = activePlayback;
-                }
-                var jsonString = currentLi.attr('jsonKey');
-                var bIsSame = curPlayback.hasClass('now');
+        // space
+        triggerPlayPauseVoice(event);
 
-                if (!bIsSame) {
-                    if (null !== activePlayback && activePlayback.hasClass('now')) {
-                        // 移除之前控件的状态，重置样式
-                        activePlayback.removeClass('now').removeClass('play').removeClass('pause');
-                    }
-                    curPlayback.addClass('now');
-                    activePlayback = curPlayback;
-
-                    // 重置悬浮工具栏状态
-                    resetAirVoicePlayback();
-                }
-
-                // 后端播放处理，等待后端开始播放音频数据 -> callJsSetPlayStatus()
-                webobj.jsCallPlayVoice(jsonString, bIsSame, function (state) {
-                    //TODO 录音错误处理
-                });
-            }
-        }
     } else if (window.event.keyCode == 8) {
         // backspace
         if (getSelectedRange().innerHTML == document.querySelector('.note-editable').innerHTML) {
