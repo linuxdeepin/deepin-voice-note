@@ -14,6 +14,7 @@ Item {
     id: root
 
     property int currentDropIndex: -1
+    property bool isPlay: false
     property int itemHeight: 30
     property int lastDropIndex: -1
     property int listHeight: 700
@@ -201,7 +202,7 @@ Item {
         anchors.fill: parent
         boundsBehavior: Flickable.StopAtBounds
         clip: true
-        enabled: parent.enabled
+        enabled: parent.enabled && !isPlay
         model: folderModel
 
         ScrollBar.vertical: ScrollBar {

@@ -24,6 +24,7 @@ Item {
     signal deleteNote
     signal moveNote
     signal openSetting
+    signal playStateChange(bool state)
     signal saveAudio
     signal saveNote
 
@@ -158,6 +159,13 @@ Item {
                         itemListView.selectedNoteItem = [0];
                         itemListView.selectSize = 1;
                     }
+                    onPlayingVoice: isPlay => {
+                        playStateChange(isPlay);
+                        title.isPlaying = isPlay;
+                    }
+                    onPopupToast: (message, msgId) => {
+                        DTK.sendMessage(webView, message, "icon_warning", 4000, msgId);
+                    }
                     onRequesetCallJsSynchronous: func => {
                         webView.runJavaScript(func, function (result) {
                             onCallJsResult(result);
@@ -176,9 +184,6 @@ Item {
                             viewPictureLoader.active = true;
                         else
                             viewPictureLoader.item.show();
-                    }
-                    onPopupToast: (message, msgId) => {
-                        DTK.sendMessage(webView, message, "icon_warning", 4000, msgId)
                     }
                 }
 
