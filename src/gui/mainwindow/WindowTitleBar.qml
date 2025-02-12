@@ -8,6 +8,7 @@ TitleBar {
     id: titleBar
 
     property bool imageBtnEnable: true
+    property bool isPlaying: false
     property bool isRecording: false
     property bool recorderBtnEnable: true
     property bool recordingHover: false
@@ -46,6 +47,7 @@ TitleBar {
         anchors.left: titleBar.left
         anchors.leftMargin: 10
         anchors.verticalCenter: titleBar.verticalCenter
+        enabled: !isPlaying
         hoverEnabled: true
         icon.name: "new_note"
 
@@ -84,7 +86,7 @@ TitleBar {
         anchors.right: insImgBtn.left
         anchors.rightMargin: 6
         anchors.verticalCenter: titleBar.verticalCenter
-        enabled: recorderBtnEnable && imageBtnEnable
+        enabled: recorderBtnEnable && imageBtnEnable && !isPlaying
         hoverEnabled: true
         icon.name: "record"
 

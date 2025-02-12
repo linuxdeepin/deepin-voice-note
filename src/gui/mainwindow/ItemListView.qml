@@ -15,6 +15,7 @@ import VNote 1.0
 Item {
     id: rootItem
 
+    property bool isPlay: false
     property bool isSearch: false
     property int itemSpacing: 6
     property alias model: itemModel
@@ -344,6 +345,7 @@ Item {
         anchors.fill: parent
         boundsBehavior: Flickable.StopAtBounds
         clip: true
+        enabled: !isPlay
         model: itemModel
         spacing: itemSpacing
         visible: true

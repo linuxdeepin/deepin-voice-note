@@ -62,6 +62,8 @@ Q_SIGNALS:
 
     void popupToast(const QString &message, int msgId);
 
+    void playingVoice(bool isPlay);
+
 public Q_SLOTS:
     // for qml
     void onCallJsResult(const QVariant &result);

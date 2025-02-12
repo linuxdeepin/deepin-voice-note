@@ -650,6 +650,12 @@ ApplicationWindow {
                         if (settingDlgLoader.status === Loader.Ready)
                             settingDlgLoader.item.show();
                     }
+                    onPlayStateChange: state => {
+                        folderListView.isPlay = state;
+                        itemListView.isPlay = state;
+                        createFolderButton.enabled = !state;
+                        search.enabled = !state;
+                    }
                     onSaveAudio: {
                         itemListView.onSaveAudio();
                     }
