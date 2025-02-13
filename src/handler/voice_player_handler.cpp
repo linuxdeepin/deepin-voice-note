@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QDir>
 #include <QLibraryInfo>
+#include <QLibrary>
 #include <QDebug>
 
 #include "vnoteitem.h"
@@ -90,7 +91,10 @@ void VoicePlayerHandler::initPlayer()
     QString path  = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
     dir.setPath(path);
     QStringList list = dir.entryList(QStringList() << (strlib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
-    if (list.contains(strlib)) {
+
+    QLibrary library("libvlc.so.5");
+    bool found = list.contains(strlib) || library.load();
+    if (found) {
         m_player = new VlcPlayer(this);
         bool successed = static_cast<VlcPlayer*>(m_player)->initVlcPlayer();
         if (!successed) {
