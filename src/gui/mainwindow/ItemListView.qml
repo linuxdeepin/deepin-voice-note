@@ -219,6 +219,7 @@ Item {
 
             Label {
                 anchors.centerIn: parent
+                color: DTK.themeType === ApplicationHelper.LightType ? "#66000000" : "#66ffffff"
                 font: DTK.fontManager.t6
                 text: qsTr("No search results")
             }
