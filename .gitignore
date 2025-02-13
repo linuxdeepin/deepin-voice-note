@@ -5,3 +5,10 @@ CMakeLists.txt.user
 # cache
 .vscode
 .cache
+
+translations/*.qm
+
+#linglong building dir
+linglong
+build
+*.log
