@@ -369,6 +369,7 @@ void VNoteMainManager::createNote()
     data.insert(NOTE_ID_KEY, newNote->noteId);
 
     emit addNoteAtHead(data);
+    m_richTextManager->initData(newNote, "");
     m_richTextManager->clearJSContent();
 }
 
