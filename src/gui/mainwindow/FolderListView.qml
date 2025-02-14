@@ -62,6 +62,28 @@ Item {
         folderListView.currentItem.isRename = true;
     }
 
+    function rollDown() {
+        if (!scrollTimer.isUp && scrollTimer.running)
+            return;
+        if (folderListView.contentY + folderListView.height < folderListView.contentHeight) {
+            scrollTimer.isUp = false;
+            scrollTimer.running = true;
+        }
+    }
+
+    function rollStop() {
+        scrollTimer.running = false;
+    }
+
+    function rollUp() {
+        if (scrollTimer.isUp && scrollTimer.running)
+            return;
+        if (folderListView.contentY > 0) {
+            scrollTimer.isUp = true;
+            scrollTimer.running = true;
+        }
+    }
+
     function toggleSearch(isSearch) {
         if (!isSearch) {
             var index = folderListView.currentIndex;
@@ -143,6 +165,34 @@ Item {
     VNoteMessageDialogLoader {
         id: messageDialogLoader
 
+    }
+
+    Timer {
+        id: scrollTimer
+
+        property bool isUp: true
+
+        interval: 100
+        repeat: true
+        running: false
+
+        onTriggered: {
+            if (isUp) {
+                if (folderListView.contentY <= 0) {
+                    running = false;
+                    folderListView.contentY = 0;
+                    return;
+                }
+                folderListView.contentY -= 10;
+            } else {
+                if (folderListView.contentY + folderListView.height >= folderListView.contentHeight) {
+                    running = false;
+                    folderListView.contentY = folderListView.contentHeight - folderListView.height;
+                    return;
+                }
+                folderListView.contentY += 10;
+            }
+        }
     }
 
     Connections {

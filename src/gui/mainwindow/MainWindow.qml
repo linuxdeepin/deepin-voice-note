@@ -390,6 +390,14 @@ ApplicationWindow {
                     folderListView.dropItems(indexList);
                 }
                 onMouseChanged: {
+                    if (mousePosY < rootWindow.y) {
+                        folderListView.rollUp();
+                    } else if (mousePosY > rootWindow.y + rootWindow.height) {
+                        folderListView.rollDown();
+                    } else {
+                        folderListView.rollStop();
+                    }
+
                     folderListView.updateItems(mousePosX, mousePosY);
                 }
                 onMulChoices: {
