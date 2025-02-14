@@ -637,6 +637,7 @@ ApplicationWindow {
 
                     Layout.fillHeight: true
                     Layout.fillWidth: true
+                    initialVisible: initRect.visible
 
                     onDeleteNote: {
                         itemListView.onDeleteNote();

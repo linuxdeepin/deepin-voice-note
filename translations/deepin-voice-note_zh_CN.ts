@@ -540,7 +540,7 @@
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="97"/>
         <source>Are you sure you want to delete this notebook?</source>
-        <translation>您确定删除这个笔记本么？</translation>
+        <translation>您确定删除这个记事本么？</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="99"/>

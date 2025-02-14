@@ -27,6 +27,8 @@
 #include <QWebEngineContextMenuRequest>
 #include <QFileDialog>
 #include <QStandardPaths>
+#include <QMediaDevices>
+#include <QAudioDevice>
 
 #include <dguiapplicationhelper.h>
 
@@ -312,6 +314,14 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
             savePictureAs();
             break;
         case ActionManager::TxtSpeech: {
+            QList<QAudioDevice> outputDevices = QMediaDevices::audioOutputs();
+            if (outputDevices.isEmpty()) {
+                QString errString = VTextSpeechAndTrManager::instance()->errorString(VTextSpeechAndTrManager::NoOutputDevice);
+                if (!errString.isEmpty()) {
+                    Q_EMIT popupToast(errString, VTextSpeechAndTrManager::NoOutputDevice);
+                }
+                break;
+            }
             auto status = VTextSpeechAndTrManager::instance()->onTextToSpeech();
             if (VTextSpeechAndTrManager::Success != status) {
                 QString errString = VTextSpeechAndTrManager::instance()->errorString(status);

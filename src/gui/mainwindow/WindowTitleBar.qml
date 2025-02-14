@@ -8,6 +8,7 @@ TitleBar {
     id: titleBar
 
     property bool imageBtnEnable: true
+    property bool isInitialInterface: true
     property bool isPlaying: false
     property bool isRecording: false
     property bool recorderBtnEnable: true
@@ -48,7 +49,7 @@ TitleBar {
         anchors.leftMargin: 10
         anchors.verticalCenter: titleBar.verticalCenter
         enabled: !isPlaying
-        hoverEnabled: true
+        hoverEnabled: !isInitialInterface
         icon.name: "new_note"
 
         onClicked: {
@@ -87,7 +88,7 @@ TitleBar {
         anchors.rightMargin: 6
         anchors.verticalCenter: titleBar.verticalCenter
         enabled: recorderBtnEnable && imageBtnEnable && !isPlaying
-        hoverEnabled: true
+        hoverEnabled: !isInitialInterface
         icon.name: "record"
 
         onClicked: {
@@ -97,7 +98,7 @@ TitleBar {
 
         ToolTip {
             text: recordBtn.enabled ? qsTr("Start recording") : qsTr("No recording device detected")
-            visible: (recordBtn.hovered || recordingHover) && !isRecording
+            visible: (recordBtn.hovered || recordingHover) && !isRecording && !isInitialInterface
         }
     }
 
@@ -106,7 +107,7 @@ TitleBar {
 
         anchors.verticalCenter: titleBar.verticalCenter
         enabled: imageBtnEnable
-        hoverEnabled: true
+        hoverEnabled: !isInitialInterface
         icon.name: "img"
         x: titleBar.__includedAreaX - recordBtn.width - 10
 

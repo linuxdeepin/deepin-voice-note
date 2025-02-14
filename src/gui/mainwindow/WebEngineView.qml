@@ -17,6 +17,7 @@ Item {
     id: rootItem
 
     property bool hasScroll: false
+    property bool initialVisible: false
     property bool isRecording: false
     property bool noSearchResult: false
     property bool webVisible: true
@@ -81,6 +82,7 @@ Item {
 
             Layout.fillWidth: true
             imageBtnEnable: webVisible
+            isInitialInterface: initialVisible
 
             onTitleOpenSetting: {
                 rootItem.openSetting();
