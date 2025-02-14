@@ -135,6 +135,9 @@ Item {
                 onContextMenuRequested: req => {
                     // 响应右键菜单，处理完成后 handler 抛出 requestShowMenu() 信号
                     handler.onContextMenuRequested(req);
+
+                    // prevent a default context menu from showing up
+                    req.accepted = true
                 }
                 onJavaScriptConsoleMessage: {
                     // 调试使用，打印控制台输出
