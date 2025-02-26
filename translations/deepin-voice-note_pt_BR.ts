@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="pt_BR">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="pt_BR">
 <context>
     <name>AppMain</name>
     <message>
@@ -129,7 +127,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="262"/>
         <source>Voice to Text</source>
-        <translation>Voz para Texto</translation>
+        <translation>Voz para texto</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="263"/>
@@ -378,12 +376,12 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="963"/>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Desfazer</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
         <source>Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>Refazer</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
@@ -480,7 +478,7 @@
     <message>
         <location filename="../tests/src/common/ut_utils.cpp" line="33"/>
         <source>2 mins ago</source>
-        <translation type="unfinished"></translation>
+        <translation>2 minutos atrás</translation>
     </message>
 </context>
 <context>
@@ -677,7 +675,7 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../src/common/jscontent.cpp" line="137"/>
         <source>Recent</source>
-        <translation>Recentes</translation>
+        <translation>Recente</translation>
     </message>
 </context>
 </TS>
