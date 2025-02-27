@@ -7,7 +7,7 @@ version: '1'
 package:
   id: org.deepin.voice.note
   name: deepin-voice.note
-  version: 6.5.14.1
+  version: 6.5.16.1
   kind: app
   description: |
     voice note for deepin os
