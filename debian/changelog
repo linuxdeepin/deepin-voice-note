@@ -1,3 +1,10 @@
+deepin-voice-note (6.5.17) unstable; urgency=medium
+
+  * fix: can not record voice(Bug: 305495)
+  * fix: crash on play voice
+
+ -- renbin <renbin@uniontech.com>  Fri, 28 Feb 2025 11:49:46 +0800
+
 deepin-voice-note (6.5.16) unstable; urgency=medium
 
   * chore: New version 6.5.16.
