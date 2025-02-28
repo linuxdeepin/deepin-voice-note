@@ -353,3 +353,8 @@ QString Utils::createRichText(const QString &title, const QString &key)
     QString newText = editTitle.replace(key, highLightText);
     return newText;
 }
+
+bool Utils::inLinglongEnv()
+{
+    return !qgetenv("LINGLONG_APPID").isEmpty();
+}

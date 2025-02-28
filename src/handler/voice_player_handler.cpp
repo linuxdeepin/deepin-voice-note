@@ -15,6 +15,7 @@
 #include "common/qtplayer.h"
 #include "common/metadataparser.h"
 #include "common/jscontent.h"
+#include "common/utils.h"
 #include "opsstateinterface.h"
 
 // 进度条刻度，按秒进位
@@ -86,14 +87,19 @@ void VoicePlayerHandler::playVoiceImpl(bool bIsSame)
 
 void VoicePlayerHandler::initPlayer()
 {
-    QString strlib = "libvlc.so";
-    QDir dir;
-    QString path  = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
-    dir.setPath(path);
-    QStringList list = dir.entryList(QStringList() << (strlib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
+    bool found = false;
+    // Using Qt player in linglong environment
+    if (!Utils::inLinglongEnv()) {
+        QString strlib = "libvlc.so";
+        QDir dir;
+        QString path  = QLibraryInfo::location(QLibraryInfo::LibrariesPath);
+        dir.setPath(path);
+        QStringList list = dir.entryList(QStringList() << (strlib + "*"), QDir::NoDotAndDotDot | QDir::Files); //filter name with strlib
 
-    QLibrary library("libvlc.so.5");
-    bool found = list.contains(strlib) || library.load();
+        QLibrary library("libvlc.so.5");
+        found = list.contains(strlib) || library.load();
+    }
+
     if (found) {
         m_player = new VlcPlayer(this);
         bool successed = static_cast<VlcPlayer*>(m_player)->initVlcPlayer();
