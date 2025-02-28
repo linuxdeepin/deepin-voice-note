@@ -45,6 +45,11 @@ gboolean GstBusMessageCb(GstBus *bus, GstMessage *msg, void *userdata)
 GstreamRecorder::GstreamRecorder(QObject *parent)
     : QObject(parent)
 {
+    // check if current in linglong, update GST_PLUGIN_PATH
+    if (!qgetenv("LINGLONG_APPID").isEmpty()) {
+        qputenv("GST_PLUGIN_PATH", QByteArray(INSTALL_LIB_PATH) + QByteArray("/gstreamer-1.0"));
+    }
+
     gst_init(nullptr, nullptr);
 }
 
