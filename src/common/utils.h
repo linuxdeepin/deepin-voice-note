@@ -50,4 +50,6 @@ public:
     static bool isWayland();
     //搜索结果标题处理
     static QString createRichText(const QString &title, const QString &key);
+    // Check if current in linglong environment
+    static bool inLinglongEnv();
 };

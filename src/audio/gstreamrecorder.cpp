@@ -4,6 +4,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "gstreamrecorder.h"
+#include "common/utils.h"
+
 #include <DLog>
 
 static const QString mp3Encoder = "capsfilter caps=audio/x-raw,rate=44100,channels=2 ! lamemp3enc name=enc target=1 cbr=true bitrate=192";
@@ -46,7 +48,7 @@ GstreamRecorder::GstreamRecorder(QObject *parent)
     : QObject(parent)
 {
     // check if current in linglong, update GST_PLUGIN_PATH
-    if (!qgetenv("LINGLONG_APPID").isEmpty()) {
+    if (Utils::inLinglongEnv()) {
         qputenv("GST_PLUGIN_PATH", QByteArray(INSTALL_LIB_PATH) + QByteArray("/gstreamer-1.0"));
     }
 
