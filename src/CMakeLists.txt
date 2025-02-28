@@ -11,6 +11,9 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DQT_QML_DEBUG_NO_WARNING)
 endif()
 
+# using for linglnog
+add_definitions(-DINSTALL_LIB_PATH="${CMAKE_INSTALL_LIBDIR}")
+
 list(APPEND RESOURCES ${CMAKE_PROJECT_NAME}.qrc deepin-voice-note-web.qrc)
 
 find_package(Qt6 6.6 REQUIRED COMPONENTS Core Widgets Quick DBus Sql WebEngineQuick Multimedia)

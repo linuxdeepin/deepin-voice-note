@@ -39,6 +39,11 @@ build: |
     libvlc.so
     libffmpegthumbnailer.so
     libdeepin-event-log.so
+    gstreamer-1.0/libgstcoreelements.so
+    gstreamer-1.0/libgstlame.so
+    gstreamer-1.0/libgstpulseaudio.so
+    gstreamer-1.0/libgstaudioconvert.so
+    gstreamer-1.0/libgstaudioresample.so
   )
 
   # 生成.install 文件
@@ -48,6 +53,10 @@ sources:
   # linglong:gen_deb_source sources loong64 https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release/ beige main community
   # linglong:gen_deb_source install libdtk6gui-dev, libdtk6widget-dev, qt6-svg-dev, qt6-tools-dev, qt6-tools-dev-tools, qt6-base-dev, qt6-base-dev-tools, qt6-base-private-dev, qt6-l10n-tools, qt6-webengine-dev, qt6-5compat-dev
   # linglong:gen_deb_source install libsqlite3-dev, libglib2.0-dev, libvlc-dev, libvlccore-dev, libgstreamer-plugins-base1.0-dev, libgstreamer1.0-dev, libffmpegthumbnailer-dev, libdmr-dev
+  # linglong:gen_deb_source install gstreamer1.0-plugins-good, gstreamer1.0-pulseaudio
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/a/adduser/adduser_3.131-1deepin2_all.deb
+    digest: 7165c1918cafcb0e026649217b0ae58a77a143a6b39650313cdfc29fd1087492
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/q/qt6-tools/assistant-qt6_6.8.0-0deepin3_loong64.deb
     digest: f6ff5fd88f299cfe07c0c808da8795d6ba4a6add35435dde5be1a64a4403de0d
@@ -64,11 +73,38 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/b/bzip2/bzip2_1.0.8-deepin1_loong64.deb
     digest: 08d9f48f571bc206fe4e30a27e535a3a086b9dedba4a5f5055e898ff0dbea7a6
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/d/dbus/dbus-bin_1.14.10-3_loong64.deb
+    digest: ce3e9d3d45cdbf7b95c18d4a5f897ee5394e658b06f2f2f489b1305d675b0781
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/d/dbus-broker/dbus-broker_29-3_loong64.deb
+    digest: c32fa99bec894b1be78e1a8a8c5ac0206a3962b750aa9338387297e240b9db71
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/d/dbus/dbus-daemon_1.14.10-3_loong64.deb
+    digest: d45f96544cf9704e415fed35a36c1ed4ba2693f76ab464f71e8ef0370b5ca749
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/d/dbus/dbus-session-bus-common_1.14.10-3_all.deb
+    digest: 2f9dc2fb500df63edb46c3121e6540d838047e3a9e9c5ec0cbe05649b7da3f30
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/d/dbus/dbus-system-bus-common_1.14.10-3_all.deb
+    digest: 2768fa6a52a3a0162988d735bd2cc7af849d3984fa9567c50092176ca36f9aa8
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/d/dbus/dbus-user-session_1.14.10-3_loong64.deb
+    digest: 4c9515d14bdb22c1064e839e35c5235b56ca0c06253e95fbd36032e361e7f841
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/d/dconf/dconf-gsettings-backend_0.40.0-2_loong64.deb
+    digest: 9a60bb442283f963ee7067aabd5591d7a100003ca4b01f19130509d4e4b1145f
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/d/dconf/dconf-service_0.40.0-2_loong64.deb
+    digest: b363f4660223cc03a32118194cb895f40bf489d20bbfe2cf165cf44fff0f9240
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/d/debconf/debconf_1.5.79-deepin_all.deb
     digest: ded6aaa7927ae27337ceb23d49391b4c7ec460a00ba692020e8f4e28388f345f
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/q/qt6-tools/designer-qt6_6.8.0-0deepin3_loong64.deb
     digest: eab43bf5b5365d2839d6c319aa489eb239a581d8fadc3132920645bf20948a70
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/l/lvm2/dmsetup_1.02.196-1_loong64.deb
+    digest: 792f98739028972db9cc4b178abeb01f1ca2e267713313eedcc1d8fce01ffd46
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/d/dpkg/dpkg-dev_1.22.6deepin3_all.deb
     digest: 52e7455da433b7e412afeec3848d3f6371a857653aea02d1a6e080db446f51d9
@@ -121,14 +157,44 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libg/libgudev/gir1.2-gudev-1.0_238-2deepin1_loong64.deb
     digest: df1346b7d3f97770fe21c1d05024d3d9583cfd1d4dd3da3036f8a306419eb1a1
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/g/glib-networking/glib-networking-common_2.78.0-1_all.deb
+    digest: 94bfaef9228159f8a2f366b9962e5bd82c9ddb53228b161d62c6f5d48ecf1c3c
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/g/glib-networking/glib-networking-services_2.78.0-1_loong64.deb
+    digest: cac2038581c8e79e1d77222b2bc658572c5bda68ec2a84f2850928534d7a899c
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/g/glib-networking/glib-networking_2.78.0-1_loong64.deb
+    digest: 388e3237a15d2e4b1e7a685f569dcbc4583f0f271650262ecae55508308ee0f6
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/g/gsettings-desktop-schemas/gsettings-desktop-schemas_47.1-1_all.deb
+    digest: f87ebb3a3d4d6557f779dd83909a6aa79282e7085aacf756fcc828bae36526eb
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/g/gst-plugins-base1.0/gstreamer1.0-plugins-base_1.24.6-1_loong64.deb
+    digest: b2947d22f29389df7a80459fe217a3520482ceacec395be445ce33f6ffaeaa24
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/g/gst-plugins-good1.0/gstreamer1.0-plugins-good_1.24.6-1deepin1+rb1_loong64.deb
+    digest: 2cc1604714f1bbd30f6e7fb01d10c83791050e25e65efb05d18ec1b20f854431
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/g/gst-plugins-good1.0/gstreamer1.0-pulseaudio_1.24.6-1deepin1+rb1_loong64.deb
+    digest: 431ad6c4d1abbb6bead765827777538cdca01964ee25ec6441b5b6195caa61f5
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/i/init-system-helpers/init-system-helpers_1.66_all.deb
+    digest: 60bb52a4118d514e4d480707329a798ae21d135a96ddb9811d7e6bd0e7f2101f
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/i/iso-codes/iso-codes_4.16.0-1_all.deb
     digest: acd8d976f1a757da000d9ea9405fdf80194a6275fc93fc472e1df1dfa5b301a5
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/a/aalib/libaa1_1.4p5-50_loong64.deb
+    digest: 1cd24d52494e8ea394cb0f232b3ddc5a0eaa02f2a9db7dbe3b254de2c98ebf3e
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/a/acl/libacl1_2.3.1-1_loong64.deb
     digest: 6a5d883c7ca1fb96e88290e5f80f2310b83e190d02133676ef19fcce44b5fc39
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/a/aom/libaom3_3.9.1-1_loong64.deb
     digest: 22bc30a8ead069539d5cad4100b0141198b3871fdcd5253189c5bfcffd14cced
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/a/apparmor/libapparmor1_3.0.13-2_loong64.deb
+    digest: e36a3df3b4edc54926271c4efb8cd9070de991d40ba4b23a7462ab1296148e91
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/liba/libarchive/libarchive13_3.7.2-1deepin1_loong64.deb
     digest: c24133d467efd52fca411565f9b1cba091f07b54bdbf835dd4322aae952d0c8f
@@ -150,6 +216,12 @@ sources:
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/a/attr/libattr1_2.5.1-1_loong64.deb
     digest: 405e34b981984b1e6d04b5093fdaa36013459af4687c62c3a7dbdd0b42766ecb
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/a/audit/libaudit-common_3.1.2-2_all.deb
+    digest: 5fcb4f437655bbe179c280be56fdc879d317f6ea6f3a6b865c9fa01a314fc8ca
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/a/audit/libaudit1_3.1.2-2_loong64.deb
+    digest: 542edb61c1447f4154b176659618cf97ca7aa6799a2dd5322ba20e32336e368e
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/a/avahi/libavahi-client3_0.8-5_loong64.deb
     digest: 9ccbd93fc9d06c9ddf2b4fa7a399f4695576f80624ce1742ecce86de1b31006e
@@ -232,6 +304,9 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/c/cairo/libcairo2_1.18.0-1_loong64.deb
     digest: 79927555f9e79d6b0f2e4b533853b67fea7cabb9f3fece9ff7a87684508222f1
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libc/libcap-ng/libcap-ng0_0.8.4-2deepin1_loong64.deb
+    digest: 8273873be5fb356e98e3200f0666ebc6a4568e46f6457f0e14acbf9d844d1a82
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libc/libcap2/libcap2-bin_2.66-5_loong64.deb
     digest: 0e334137263dbb4c2bbaa2aa6cab9bff8ad40125f2f7ed1dd562c6e4e6ec0ebc
   - kind: file
@@ -246,6 +321,9 @@ sources:
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libc/libcdio/libcdio19_2.1.0-4_loong64.deb
     digest: 4f1824f239de11b4c4cdf184fcb467f4d6ab34acea25d26a92c79a9b26a4e873
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/c/cdparanoia/libcdparanoia0_3.10.2+debian-14_loong64.deb
+    digest: 071fa98d030e6fde5e8be3dd95cff2bc719e017aa94f8ae9d3d4b2c4f59aac2e
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/c/chromaprint/libchromaprint1_1.5.1-4deepin0_loong64.deb
     digest: 23c1612c4842c5ea3315b25e15d859301a5f925f439fc377b3b989d1473d142c
@@ -270,6 +348,9 @@ sources:
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libx/libxcrypt/libcrypt1_4.4.36-5_loong64.deb
     digest: a9dcd576d5cd80ada64381a1727a3116545e93cf447f59c7414d1777e2993fec
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/c/cryptsetup/libcryptsetup12_2.7.5-1deepin2_loong64.deb
+    digest: e1336bb3d22c37afc57bab108791e409f30c5333bdc7e01f2ac0f6d37735f2df
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/b/binutils/libctf-nobfd0_2.41-6deepin4_loong64.deb
     digest: 2865f6e5b84a2b879e3a28a2a9596658be420fe428903b5a99426a299d5d75f3
@@ -304,6 +385,9 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libd/libdc1394/libdc1394-25_2.2.6-4_loong64.deb
     digest: 49187cc551a3bb2bacad56903348d9863a799b4df8dec284f35f18c18bc8f8ec
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/d/dconf/libdconf1_0.40.0-2_loong64.deb
+    digest: cc045f5e127c57d0e051177ce11347f3c46f20c345786f2082f6cf11ec00ff31
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libd/libdecor-0/libdecor-0-0_0.1.1-2deepin0_loong64.deb
     digest: a55bfbfa4b51851b1cd6ae396f889a63a931a78eaaecc540bc42abcca03dbaf3
   - kind: file
@@ -312,6 +396,9 @@ sources:
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libd/libdeflate/libdeflate0_1.18-1_loong64.deb
     digest: 1b60dc1dbbef61987759b5254d408edbd7d653e28b94f857de22578b0ca62dae
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/l/lvm2/libdevmapper1.02.1_1.02.196-1_loong64.deb
+    digest: 9ec120245c4830c0eb000d2047b58e5efd04c42c538a8f76d441e25abff57ab8
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/d/deepin-movie-reborn/libdmr-dev_6.0.10_loong64.deb
     digest: 865e5ec867d50230baef60b177943986f715f115ce7add5b2f679435df334f1e
@@ -385,6 +472,9 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/d/dtkwidget/libdtkwidget5_5.7.5_loong64.deb
     digest: c1bfd6954fa4498712c1299080e0610646452a3ee8d215c1b9a824efa7274e33
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libd/libdv/libdv4_1.0.0-14_loong64.deb
+    digest: 4dd720fa2ac6f19a13001f815186fbf55e002caca8d1b25ee7ec2959b732630d
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libd/libdvdnav/libdvdnav4_6.1.1-1_loong64.deb
     digest: 34fadb59f4bd3cb13ecee20d70f5b9882d21e2416a9ddf27135373fb6437c1e2
   - kind: file
@@ -421,6 +511,9 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/e/expat/libexpat1_2.5.0-2_loong64.deb
     digest: 845317fb7d0fdc029f3aa98c870826391b9bdb530c6aee296fd1671ed5dd8429
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/u/util-linux/libfdisk1_2.39.3-6deepin1_loong64.deb
+    digest: 90cdc402705bd60eceee7c4f3063f5e962ce62732f2e980f71767c6b6d55ad0d
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libf/libffi/libffi-dev_3.4.6-1_loong64.deb
     digest: 864ef36cd80bc0a9fadbdafca5a5ef05ff92458f945bc1c20753d7635d8f17b7
   - kind: file
@@ -432,6 +525,9 @@ sources:
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/f/ffmpegthumbnailer/libffmpegthumbnailer4v5_2.2.2+git20220218+dfsg-2deepin0_loong64.deb
     digest: a7db6ba0bdb19eba45a01ffee174164abf3daeb95b51ab4d800f1128e9f88782
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libf/libfile-find-rule-perl/libfile-find-rule-perl_0.34-1_all.deb
+    digest: 8ebc94473bf3381e34408415da523e390c2fb3be418f3c298deb6bc82373ded5
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/f/flac/libflac8_1.3.3-2_loong64.deb
     digest: 88b83d3414a7170f0e4ed2ba671b9cc45e5b376f3481a8154b094148a75f2fb3
@@ -553,6 +649,9 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libg/libgpg-error/libgpg-error0_1.47-3_loong64.deb
     digest: 432b4819ad1edb46e6d8116596212dbc3a82d0d34c93c3574ded8db352188c8c
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/g/gpm/libgpm2_1.20.7-9_loong64.deb
+    digest: d6e713e40df887e5b6608bbfc747d3355e4c46669974bc7cf11198429f19b90d
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/g/graphite2/libgraphite2-3_1.3.14-2_loong64.deb
     digest: 3fc95b46c6dc87a3991386255c381d00c68a6ae6bfb4390ccb05f8cc61949331
   - kind: file
@@ -649,6 +748,9 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libj/libjpeg-turbo/libjpeg62-turbo_2.1.5-2_loong64.deb
     digest: 47df0f4474b4722b6a741b7c8b33057f38f58245efa92c176abd489665e92c1f
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/j/json-c/libjson-c5_0.17-1_loong64.deb
+    digest: 2978e7ce51b13758c61ad11b5961c50b91ba6c779edf08a0c4fbb56b5c2aa99a
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/j/jpeg-xl/libjxl0.7_0.7.0-10.2deepin0_loong64.deb
     digest: ff74443d44dd44adb4aba8829d58bb89ad9bc7bcb934b5bd7f7b578fc86b9f73
   - kind: file
@@ -657,6 +759,9 @@ sources:
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/k/keyutils/libkeyutils1_1.6.3-3.1_loong64.deb
     digest: 0f7646fd6ba7bcf29756eac9b72ce2b03ad5de6d90e131ce0ab97e51f1da29ab
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/k/kmod/libkmod2_30+20230601-2.1_loong64.deb
+    digest: 500ef5f0d6bfa0ee386b8300bf8f4daf6ca984e2d3866e16c91affc006d82f31
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/k/krb5/libkrb5-3_1.20.1-5_loong64.deb
     digest: 071d32ffb73b3feca3d9135ec6109730728b20f40dc194abb24d3f4506c964ef
@@ -742,11 +847,17 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libm/libmysofa/libmysofa1_1.2.1~dfsg0-1_loong64.deb
     digest: af51c3ea198343b87345b6699d46a0610d20bc9d6064d15ef51125edc5972d08
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/n/ncurses/libncurses6_6.4-4_loong64.deb
+    digest: 97027cacc48e63b806ca0903d726499afd5e05d1f07e5dde9c27a26d543ba277
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/n/ncurses/libncursesw6_6.4-4_loong64.deb
     digest: 4db1ea7ab75ab8e38d6ea0e9c408766dd8328c84ded9e53aae7f6bba29e8e7e7
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/n/nettle/libnettle8_3.7.3-1_loong64.deb
     digest: b49e593029d91c73f2240ffb5f129e3a47f613aadbf8ab5f50d592b2a5abdc98
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/n/nghttp2/libnghttp2-14_1.59.0-1deepin0_loong64.deb
+    digest: 73c2009828b2dbd6d42c3d6f2c48f38b6c0ba6887c71bf4bf10e997d4072ca08
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/n/norm/libnorm1_1.5.9+dfsg-2_loong64.deb
     digest: b8ccd5bf943ded55cccdc92d59c8abb35a1fb65fc3425ebe35670d37b7bdad6f
@@ -763,6 +874,9 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/n/nss/libnss3_3.105-2_loong64.deb
     digest: 4b1bd5b0e058d5ca0741f52307ff0d09404d1ff98770b3b1eecdc55c576c65d8
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libn/libnumber-compare-perl/libnumber-compare-perl_0.03-2_all.deb
+    digest: c37a63d53d982b9596a8e498e9ef95cf07cc245eaa2a8df8fc8546e82511fa7c
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libo/libogg/libogg0_1.3.5-3_loong64.deb
     digest: 45f908be81e813e6326426acd4c5675adac085383a93bf5b87bee2942a2152bd
   - kind: file
@@ -771,6 +885,12 @@ sources:
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/o/openal-soft/libopenal1_1.19.1-2_loong64.deb
     digest: 7ac233c2f743368fa3db292a6c04a824dbf1bc4817cb40f49fd457b96d51f33e
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/o/opencore-amr/libopencore-amrnb0_0.1.5-1_loong64.deb
+    digest: 34cd9ed4991403b3d7bfbb65d4ffae68964f8b6f748a87dac9e0489164f8ae61
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/o/opencore-amr/libopencore-amrwb0_0.1.5-1_loong64.deb
+    digest: 44ed8e5eb2ce6ee9c56af00c27ce64a2985ae1311de35dc9417b9fc30faa6ccc
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libg/libglvnd/libopengl-dev_1.7.0-1_loong64.deb
     digest: 72259f4ed0b1127c554e3747b8763fc18659dc5178fc2fe32ada313357c1802a
@@ -798,6 +918,21 @@ sources:
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/p/p11-kit/libp11-kit0_0.25.5-2_loong64.deb
     digest: 75dc180effd2912fd0a127952cc27c52ff0e900d7c8b79f3bb4b0d1ac1a120e3
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/p/pam/libpam-modules-bin_1.5.3-7_loong64.deb
+    digest: 5dc50dd145785e30648e42fb91db3f31b806735e7b10a968c48d7d7375847715
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/p/pam/libpam-modules_1.5.3-7_loong64.deb
+    digest: cf7355e65a3df43639cdbed9d796ad620f979f24e6050fab418d48e604a91f76
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/p/pam/libpam-runtime_1.5.3-7_all.deb
+    digest: 28a2789917401d06fff5c31991bf27fc808626c5c086219df63cfe1acf978b97
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/s/systemd/libpam-systemd_255.2-4deepin3_loong64.deb
+    digest: 903e7f690c7704363c521d1958327375f364bdac0acb00c988bb04d27226c656
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/p/pam/libpam0g_1.5.3-7_loong64.deb
+    digest: 2bd2b109cdeda454a9d61ee61d06e9c39a1ef0296d891f40549c44dfcb0573ca
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/p/pango1.0/libpango-1.0-0_1.52.2+ds-1_loong64.deb
     digest: c1e53075721790fad6dadb0f0c6f85da39b2e127374424a63ac010d4d7972f74
@@ -864,6 +999,9 @@ sources:
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libp/libproxy/libproxy1v5_0.4.18-1.2deepin0_loong64.deb
     digest: 8c5d37ea50aeb08f936ee1e57b5f295cbc5d76690d92c265b26fbf0e14e687c6
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libp/libpsl/libpsl5_0.21.0-1.2_loong64.deb
+    digest: 48076d0b45bdee001ab7b435296ab05853ab64402092af005e07437dcc838640
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libp/libpthread-stubs/libpthread-stubs0-dev_0.4-1_loong64.deb
     digest: 9d68b88d2e9de4c313b75ec6ebd8df51105856bf8998470dc7faf770308ddc40
@@ -1078,6 +1216,12 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libs/libselinux/libselinux1_3.5-1deepin2_loong64.deb
     digest: a19a49923398b268c9f2f8e45bca89a70779d5b1b788f9f295e428e731868fe6
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libs/libsemanage/libsemanage-common_3.5-1deepin1_all.deb
+    digest: c4fe4277d3df3d1bbf39083659701e5f4f9857e612ef7f1185e45eedc8f27047
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libs/libsemanage/libsemanage2_3.5-1deepin1_loong64.deb
+    digest: 606d01201a53c510d39f94b0ad8b6c13b4feb636a5686168693734c0e4ac4d23
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/l/lm-sensors/libsensors-config_3.6.0-7_all.deb
     digest: 164115506dfd335f26101e76cb49e2162b0440398ccf2d0c969ebc465dfd7867
   - kind: file
@@ -1105,6 +1249,9 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/s/shine/libshine3_3.1.1-2_loong64.deb
     digest: 83ec46f7ce2381f484401aa33d7540cfd954f5064ab2c3372ba55f67c9204b8a
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libs/libshout/libshout3_2.4.5-1_loong64.deb
+    digest: ddebd087753d10be88c37df1728fe46ef5fb4c95489dee75908f14ecbf039961
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libs/libsixel/libsixel1_1.8.6-2_loong64.deb
     digest: 13880034d44ecaedf746798b519ef820249667f5c7ecf9f55a5215ba1e54d008
   - kind: file
@@ -1113,6 +1260,9 @@ sources:
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libs/libsm/libsm6_1.2.3-1_loong64.deb
     digest: 9af2780f0816a5e2c10bbbe3abb974ba236ecf0beef15a49040433889c678847
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/u/util-linux/libsmartcols1_2.39.3-6deepin1_loong64.deb
+    digest: 969dc944c0756c7947ed13d8e8f658d3fc2fb7d98e4120f871a0dccfbead211d
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/s/snappy/libsnappy1v5_1.2.1-1_loong64.deb
     digest: 037f2de80f65e4491772282c5c45bc286cca8a804f4141f55bd146b1dba20ccc
@@ -1128,6 +1278,12 @@ sources:
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/s/sord/libsord-0-0_0.16.14+git221008-1_loong64.deb
     digest: 0ffa187ef4755909e7306c416ef177f3bb28b70c2509a558b9dee95f9e6c62f2
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libs/libsoup3/libsoup-3.0-0_3.4.3-1_loong64.deb
+    digest: df3d8356aabb2cf1c24733e9e3410babc7948e3bbfa71a79269523d5502131c4
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libs/libsoup3/libsoup-3.0-common_3.4.3-1_all.deb
+    digest: 1591543d840396ea47f24a2b3287dabc0a50eeb085e07f0807cd99a4ca992f13
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libs/libsoxr/libsoxr0_0.1.3-4_loong64.deb
     digest: bb803883ea5a502ae59c3ee986680ce3612863406469d327009684d7377b27cc
@@ -1177,11 +1333,23 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/f/ffmpeg/libswscale7_6.1.1-2deepin0_loong64.deb
     digest: 0dea4074d37171a31a99d1f773b67f88ed06d6027597da7c5cebae6352d8b478
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/s/systemd/libsystemd-shared_255.2-4deepin3_loong64.deb
+    digest: 462f4ee8d24e0b29122f2c1760e170514e029bac843ce39286922ba38a96d331
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/s/systemd/libsystemd0_255.2-4deepin3_loong64.deb
     digest: 00df4db71c335976879e8d9dbe2ec14f1fd13a7cfce8973e6b22e6a3a7cc2fc8
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/t/taglib/libtag1v5-vanilla_1.12-1deepin0_loong64.deb
+    digest: d2688537a91f78d0b816045d583542bd5bb41bf4ef6e10d49672f4bbcf639997
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/t/taglib/libtag1v5_1.12-1deepin0_loong64.deb
+    digest: 68acfd7d231bdd51d3e2f0e37c54710572b6685e153f11434ab9024f20ae3492
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libt/libtasn1-6/libtasn1-6_4.18.0-4_loong64.deb
     digest: 75dde4d8be25c4d18dcf4e27dffff588fabf9c2b365b3c22b2cbd12af97d90b3
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libt/libtext-glob-perl/libtext-glob-perl_0.11-2_all.deb
+    digest: 2e8cf563b486b56b4c875db16a37e5e24168085510b8bfd167efc8367cdcad1f
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libt/libthai/libthai-data_0.1.29-1_all.deb
     digest: 3a87af58b0b3becac7062da11264d083cd68190e7dd421c2cbd00da8841cfa25
@@ -1240,6 +1408,12 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/u/util-linux/libuuid1_2.39.3-6deepin1_loong64.deb
     digest: 48c616dfb3a357311ea0507bf7c43740e66a2eb1f85027c116a3f7f20067f4e8
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/v/v4l-utils/libv4l-0_1.26.1-3deepin0_loong64.deb
+    digest: 68d52092e2d82cd186685595f9e3c86f90a66d19663f947689d5075c9201ab66
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/v/v4l-utils/libv4lconvert0_1.26.1-3deepin0_loong64.deb
+    digest: ad4e08b6ff92f3606f862af7bfa8c95212c6a9edede97cea053ca8e26d63ad40
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libv/libva/libva-drm2_2.20.0-2_loong64.deb
     digest: bbbdab85f21232ec1d4f1522042a0870fbdc5561814169b40702b4652b65816b
   - kind: file
@@ -1257,6 +1431,9 @@ sources:
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libv/libvidstab/libvidstab1.1_1.1.0-deepin1_loong64.deb
     digest: 2426d25458a68233bce71e89668c2a8a521388f606e526e85188c562760249b6
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libv/libvisual/libvisual-0.4-0_0.4.0-17_loong64.deb
+    digest: 97007ac71560cc816fdd320dc72c46d3c28ae760a5f00d84740c811fa2b48daf
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/v/vlc/libvlc-dev_3.0.21-2_loong64.deb
     digest: c365e788813bad597aa9bbd07c2eba472c7f5b4ef3421da41ac003c0a9c03caa
@@ -1296,6 +1473,9 @@ sources:
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/libw/libwacom/libwacom2_1.12-1_loong64.deb
     digest: 87c13b7db15b7c19111c5af081825d48550cd48c351e3c5ddfac976939bd67b1
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/w/wavpack/libwavpack1_5.4.0-1_loong64.deb
+    digest: ed3e1e06ecb13233f836c2c7796f75f5f539ee428554dcc167f1aff10dcb3a7c
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/w/wayland/libwayland-bin_1.23.0-1_loong64.deb
     digest: 7cbb3b24e28e53fdffc09dbb235c88a5fdd550fc08e590479674d1ef91b5dc09
@@ -1540,11 +1720,17 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/m/mime-support/mime-support_3.66_all.deb
     digest: 20294deda4378616c2b48614ee226731ec09663c3497c35a467e8ea5fa03f16a
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/u/util-linux/mount_2.39.3-6deepin1_loong64.deb
+    digest: 6f3233bf2f3c875d3b13a34fcd085bb3841267cba0454b98a259a23dde204a27
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/n/netbase/netbase_6.4_all.deb
     digest: 5fd05a5d63864b96453ba55a4c5efa287b8e7e53fbd833e7a944e066d30e1eb1
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/o/ocl-icd/ocl-icd-libopencl1_2.2.14-3_loong64.deb
     digest: 8569bcf5afca194968c0e49c3a71fbf106bdb5f6281db535142a5b8ea1a46e18
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/s/shadow/passwd_4.14+dfsg1-0deepin4_loong64.deb
+    digest: 0c6ae6318d0dbae5474e029a0c8e24bb168ef12fc34a5152c68eed0d32eff7f5
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/p/patch/patch_2.7.6-7_loong64.deb
     digest: 713a6fe43f8c66f410ed5eca4b57361868d6da0f05e2ef9f7300f7fe524ee2e5
@@ -1675,11 +1861,23 @@ sources:
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/s/shared-mime-info/shared-mime-info_2.2-1_loong64.deb
     digest: a0cd2345f1c869975ba98b8ead9048f32746d72966162472ce531ae48ecb0e9e
   - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/s/systemd/systemd-dev_255.2-4deepin3_all.deb
+    digest: 04adbe93c28391ba986f20b138a0396c74f0c8be52f59141e0a64d375a27ed43
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/s/systemd/systemd-sysv_255.2-4deepin3_loong64.deb
+    digest: 991f7697219f6f9d1c68c364627b591b7bf0f783aff6dc96b22311484bfac9b6
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/s/systemd/systemd_255.2-4deepin3_loong64.deb
+    digest: c9e7d02158da5760c03bf749ce2d7bc53702ac296f19d4d3d2af2310e5b3adfb
+  - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/t/tar/tar_1.35+dfsg-3_loong64.deb
     digest: 48cc0cc32829c68c7b58e74f141fe552f9a3f5c9e6da77ad54184530debc0cff
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/t/tzdata/tzdata_2023d-1deepin1_all.deb
     digest: fe503c524801260208482a1dfc061e79c2a7450111dd90f88ed40d70ac935832
+  - kind: file
+    url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/u/usrmerge/usrmerge_38_all.deb
+    digest: fdc636985788b18a04cd15941a111fb2a73d3b56cf58c689b918345e6f003161
   - kind: file
     url: https://ci.deepin.com/repo/deepin/deepin-community/backup/23-release//pool/main/u/util-linux/uuid-dev_2.39.3-6deepin1_loong64.deb
     digest: 54727a76b166231d74f5116fc6732bf97ac9aa2ee8f8b49bbf0ee5b8358c5483
