@@ -1,3 +1,10 @@
+deepin-voice-note (6.5.18) unstable; urgency=medium
+
+  * tag v6.5.18
+  * update linglong env
+
+ -- re2zero <yangwu@uniontech.com>  Thu, 06 Mar 2025 13:08:20 +0800
+
 deepin-voice-note (6.5.17) unstable; urgency=medium
 
   * fix: can not record voice(Bug: 305495)
