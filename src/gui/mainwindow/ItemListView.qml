@@ -238,6 +238,8 @@ Item {
             }
             var topItem = ActionManager.getActionById(ActionManager.NoteTop);
             topItem.text = setTop ? qsTr("Sticky on Top") : qsTr("Unpin");
+
+            ActionManager.enableVoicePlayActions(!isPlay);
         }
         onActionTrigger: actionId => {
             switch (actionId) {
@@ -346,7 +348,6 @@ Item {
         anchors.fill: parent
         boundsBehavior: Flickable.StopAtBounds
         clip: true
-        enabled: !isPlay
         model: itemModel
         spacing: itemSpacing
         visible: true
@@ -360,6 +361,7 @@ Item {
             property var startMove: [-1, -1]
 
             color: isSelected ? (rootItem.activeFocus ? "#FF1F6EE7" : (DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF")) : (DTK.themeType === ApplicationHelper.LightType ? "white" : "#0CFFFFFF")
+            enabled: !isPlay || itemListView.currentIndex === index
             height: isSearch ? 67 : 50
             radius: 6
             width: itemListView.width

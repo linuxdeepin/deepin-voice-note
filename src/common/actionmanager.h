@@ -132,6 +132,9 @@ public:
     Q_INVOKABLE void visibleAiActions(bool visible);
     Q_INVOKABLE void visibleMulChoicesActions(bool visible);
 
+    //失能语音播放中相关功能
+    Q_INVOKABLE void enableVoicePlayActions(bool enable);
+
     // 动作被触发
     Q_SIGNAL void actionTriggered(ActionKind actionId);
 

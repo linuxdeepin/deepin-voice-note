@@ -190,6 +190,13 @@ void ActionManager::visibleMulChoicesActions(bool visible)
     enableAction(NoteSaveVoice, visible);
 }
 
+void ActionManager::enableVoicePlayActions(bool enable)
+{
+    enableAction(NoteMove, enable);
+    enableAction(NoteDelete, enable);
+    enableAction(NoteAddNew, enable);
+}
+
 /*!
  * \brief 使用 model 同样需要多次查询，减少使用中间类，因此直接通过接口访问而没有使用
  *      QAbstractListModel 设计
