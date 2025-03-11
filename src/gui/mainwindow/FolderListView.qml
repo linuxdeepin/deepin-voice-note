@@ -252,7 +252,7 @@ Item {
         anchors.fill: parent
         boundsBehavior: Flickable.StopAtBounds
         clip: true
-        enabled: parent.enabled && !isPlay
+        enabled: parent.enabled
         model: folderModel
 
         ScrollBar.vertical: ScrollBar {
@@ -268,7 +268,7 @@ Item {
             property bool tooltipVisible: false
 
             color: index === folderListView.currentIndex ? (root.activeFocus ? "#1F6DE4" : DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF") : (isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
-            enabled: folderListView.enabled
+            enabled: !isPlay || index === folderListView.currentIndex
             height: itemHeight
             radius: 6
             width: parent.width
@@ -522,6 +522,7 @@ Item {
                 }
 
                 MenuItem {
+                    enabled: !isPlay
                     text: qsTr("Delete")
 
                     onTriggered: {
@@ -540,6 +541,7 @@ Item {
                 }
 
                 MenuItem {
+                    enabled: !isPlay
                     text: qsTr("New Note")
 
                     onTriggered: {
