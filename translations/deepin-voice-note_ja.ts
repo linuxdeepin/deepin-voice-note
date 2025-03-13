@@ -187,7 +187,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="323"/>
         <source>Speech to Text</source>
-        <translation type="unfinished"/>
+        <translation>音声入力</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="324"/>
@@ -293,7 +293,7 @@
     <message>
         <location filename="../src/common/setting.cpp" line="26"/>
         <source>Internal</source>
-        <translation type="unfinished"/>
+        <translation>内蔵</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="27"/>
@@ -537,37 +537,37 @@ All notes in it will be deleted</source>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="123"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="46"/>
         <source>Do you want to stop the current recording?</source>
-        <translation type="unfinished"/>
+        <translation>現在の録音を停止してもよろしいですか?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="127"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="87"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
+        <translation>選択された%1件のノートを削除してもよろしいですか?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="129"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="81"/>
         <source>Are you sure you want to delete this note?</source>
-        <translation type="unfinished"/>
+        <translation>このノートを削除してもよろしいですか?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="52"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
-        <translation type="unfinished"/>
+        <translation>このボイスノートを変換できませんでした。現在20分を超えるものは対応していません。</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="137"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="59"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
-        <translation type="unfinished"/>
+        <translation>ボイスノートを変換しています。停止してもよろしいですか?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="140"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="65"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
-        <translation type="unfinished"/>
+        <translation>入力音量が低いと結果に影響する場合があります。このまま続行しますか?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="143"/>
@@ -579,19 +579,19 @@ All notes in it will be deleted</source>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="106"/>
         <source>Save failed</source>
-        <translation type="unfinished"/>
+        <translation>保存できませんでした</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="150"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="111"/>
         <source>You do not have permission to save files there</source>
-        <translation type="unfinished"/>
+        <translation>この場所にファイルを保存する権限がありません</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="154"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="116"/>
         <source>The voice note has been deleted</source>
-        <translation type="unfinished"/>
+        <translation>ボイスノートが削除されました</translation>
     </message>
 </context>
 <context>
@@ -612,7 +612,7 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1691"/>
         <source>Converting voice to text</source>
-        <translation type="unfinished"/>
+        <translation>音声からテキストに変換しています</translation>
     </message>
 </context>
 <context>
