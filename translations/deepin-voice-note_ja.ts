@@ -573,7 +573,7 @@ All notes in it will be deleted</source>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="143"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="72"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
-        <translation type="unfinished"/>
+        <translation>クリップされた録音と変換されたテキストは貼り付けられません。 続行しますか?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
@@ -599,12 +599,12 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1750"/>
         <source>Your audio recording device does not work.</source>
-        <translation type="unfinished"/>
+        <translation>録音デバイスが動作していません。</translation>
     </message>
     <message>
         <location filename="../src/views/vnoterecordbar.cpp" line="240"/>
         <source>No recording device detected</source>
-        <translation type="unfinished"/>
+        <translation>録音デバイスが検出されませんでした</translation>
     </message>
 </context>
 <context>
