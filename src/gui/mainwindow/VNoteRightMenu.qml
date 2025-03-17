@@ -23,9 +23,9 @@ Menu {
         }
         var actionText = ActionManager.actionText(actionId);
         var menu = menuCreator.createObject(parent, {
-                menuId: actionId,
-                title: actionText
-            });
+            menuId: actionId,
+            title: actionText
+        });
         parent.addMenu(menu);
         ActionManager.setActionObject(actionId, menu);
 
@@ -40,9 +40,9 @@ Menu {
     function addCustomMenuItem(actionId, parent) {
         var actionText = ActionManager.actionText(actionId);
         var menuItem = menuItemCreator.createObject(parent, {
-                menuId: actionId,
-                text: actionText
-            });
+            menuId: actionId,
+            text: actionText
+        });
         parent.addItem(menuItem);
         ActionManager.setActionObject(actionId, menuItem);
     }
@@ -53,8 +53,8 @@ Menu {
             return;
         }
         var menuSeparator = menuSeparatorCreator.createObject(parent, {
-                menuId: actionId
-            });
+            menuId: actionId
+        });
         parent.addItem(menuSeparator);
         ActionManager.setActionObject(actionId, menuSeparator);
     }

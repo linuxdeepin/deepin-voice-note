@@ -53,6 +53,7 @@ ApplicationWindow {
         y = Screen.height / 2 - height / 2;
     }
     onClosing: {
+        webEngineView.stopTTS();
         if (isRecording) {
             close.accepted = false;
             messageDialogLoader.showDialog(VNoteMessageDialogHandler.AbortRecord, ret => {

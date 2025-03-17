@@ -47,6 +47,10 @@ Item {
         recorderViewLoader.item.stop();
     }
 
+    function stopTTS() {
+        ActionManager.actionTriggerFromQuick(37);
+    }
+
     function toggleMultCho(choices) {
         if (choices > 1) {
             webVisible = false;
@@ -137,7 +141,7 @@ Item {
                     handler.onContextMenuRequested(req);
 
                     // prevent a default context menu from showing up
-                    req.accepted = true
+                    req.accepted = true;
                 }
                 onJavaScriptConsoleMessage: {
                     // 调试使用，打印控制台输出
