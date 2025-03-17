@@ -211,6 +211,7 @@ ApplicationWindow {
             });
             itemListView.selectedNoteItem = [topSize];
             itemListView.selectSize = 1;
+            itemListView.changeCurrentIndex(topSize);
             folderListView.addNote(1);
             itemListView.forceActiveFocus();
         }
@@ -285,6 +286,7 @@ ApplicationWindow {
             handleUpdateNoteList(notesData);
             itemListView.selectedNoteItem = [selectIndex];
             itemListView.selectSize = 1;
+            itemListView.changeCurrentIndex(selectIndex);
         }
     }
 
