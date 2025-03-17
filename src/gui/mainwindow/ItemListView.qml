@@ -35,6 +35,10 @@ Item {
     signal mulChoices(int choices)
     signal noteItemChanged(int index)
 
+    function changeCurrentIndex(index) {
+        itemListView.currentIndex = index;
+    }
+
     function onDeleteNote() {
         messageDialogLoader.messageData = selectedNoteItem.length;
         if (messageDialogLoader.active) {
