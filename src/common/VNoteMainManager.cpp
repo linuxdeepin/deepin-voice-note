@@ -14,6 +14,7 @@
 #include "globaldef.h"
 #include "actionmanager.h"
 #include "utils.h"
+#include "vtextspeechandtrmanager.h"
 #include "handler/web_engine_handler.h"
 #include "handler/vnote_message_dialog_handler.h"
 #include "handler/voice_recoder_handler.h"
@@ -880,6 +881,13 @@ void VNoteMainManager::resumeVoicePlayer()
 
 void VNoteMainManager::forceExit()
 {
+    VTextSpeechAndTrManager::instance()->onStopTextToSpeech();
     QApplication::exit(0);
     _Exit(0);
+}
+
+bool VNoteMainManager::isVoiceToText()
+{
+    bool aa = OpsStateInterface::instance()->isVoice2Text();
+    return aa;
 }

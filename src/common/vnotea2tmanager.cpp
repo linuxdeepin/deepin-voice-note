@@ -55,7 +55,7 @@ int VNoteA2TManager::initSession()
 
     timer = new QTimer;
     timer->setSingleShot(true);
-    timer->setInterval(10000);
+    timer->setInterval(100000);
     connect(timer, &QTimer::timeout, [=](){
         emit asrError(AudioOther);
         OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, false);
