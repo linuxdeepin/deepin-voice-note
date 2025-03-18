@@ -53,7 +53,7 @@ ApplicationWindow {
         y = Screen.height / 2 - height / 2;
     }
     onClosing: {
-        webEngineView.stopTTS();
+        close.accepted = false;
         if (isRecording) {
             close.accepted = false;
             messageDialogLoader.showDialog(VNoteMessageDialogHandler.AbortRecord, ret => {
@@ -63,7 +63,14 @@ ApplicationWindow {
                 }
             });
         } else {
-            VNoteMainManager.forceExit();
+            if (VNoteMainManager.isVoiceToText()) {
+                messageDialogLoader.showDialog(VNoteMessageDialogHandler.AborteAsr, ret => {
+                    if (ret) {
+                        VNoteMainManager.forceExit();
+                    }
+                });
+            } else
+                VNoteMainManager.forceExit();
         }
     }
     onWidthChanged: {

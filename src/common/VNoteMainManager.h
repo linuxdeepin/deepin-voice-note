@@ -54,6 +54,7 @@ public:
     Q_INVOKABLE void showPrivacy();
     Q_INVOKABLE void resumeVoicePlayer();
     Q_INVOKABLE void forceExit();
+    Q_INVOKABLE bool isVoiceToText();
 
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);
