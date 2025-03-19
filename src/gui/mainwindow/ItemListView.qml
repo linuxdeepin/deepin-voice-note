@@ -669,7 +669,18 @@ Item {
             propagateComposedEvents: true
 
             onPressed: {
-                rootItem.forceActiveFocus();
+                var index = itemListView.currentIndex;
+                var item = itemListView.itemAtIndex(index);
+                if (item.isRename) {
+                    var clickX = mouse.x;
+                    var clickY = mouse.y;
+                    var localPoint = item.mapFromItem(parent, clickX, clickY);
+                    if (!item.contains(localPoint)) {
+                        rootItem.forceActiveFocus();
+                    }
+                } else {
+                    rootItem.forceActiveFocus();
+                }
                 mouse.accepted = false;
             }
         }

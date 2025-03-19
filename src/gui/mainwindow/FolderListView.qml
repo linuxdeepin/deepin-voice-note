@@ -366,7 +366,7 @@ Item {
                     text: model.name
                     topPadding: 0
                     visible: rootItem.isRename
-                    z: 20
+                    z: 100
 
                     backgroundColor: Palette {
                         normal: Qt.rgba(1, 1, 1, 0.85)
@@ -561,7 +561,19 @@ Item {
             propagateComposedEvents: true
 
             onPressed: {
-                root.forceActiveFocus();
+                var index = folderListView.currentIndex;
+                var item = folderListView.itemAtIndex(index);
+                if (item.isRename) {
+                    var clickX = mouse.x;
+                    var clickY = mouse.y;
+                    var localPoint = item.mapFromItem(parent, clickX, clickY);
+                    if (!item.contains(localPoint)) {
+                        root.forceActiveFocus();
+                    }
+                } else {
+                    root.forceActiveFocus();
+                }
+
                 mouse.accepted = false;
             }
         }
