@@ -66,6 +66,9 @@ WebEngineHandler::WebEngineHandler(QObject *parent)
     connect(m_voiceToTextHandler, &VoiceToTextHandler::audioLengthLimit, this, [this]() {
         Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::AsrTimeLimit);
     });
+    connect(m_voiceToTextHandler, &VoiceToTextHandler::noNetworkConnection, this, [this]() {
+            Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::NoNetwork);
+    });
     connect(m_voicePlayerHandler, &VoicePlayerHandler::playStatusChanged, this, [=](VoicePlayerHandler::PlayState state){
         if (state == VoicePlayerHandler::PlayState::End) {
             Q_EMIT playingVoice(false);
