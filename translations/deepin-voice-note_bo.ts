@@ -30,17 +30,17 @@
 <context>
     <name>FolderListView</name>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="454"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="517"/>
         <source>Rename</source>
         <translation>མིང་བསྐྱར་དུ་བཏགས་པ།</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="462"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="526"/>
         <source>Delete</source>
         <translation>སུབ་པ།</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="480"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="545"/>
         <source>New Note</source>
         <translation>འབྲི་དེབ་གསར་བཟོ།</translation>
     </message>
@@ -48,12 +48,12 @@
 <context>
     <name>InitialInterface</name>
     <message>
-        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="60"/>
+        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="66"/>
         <source>After creating a new notepad, you can start recording voice and text</source>
         <translation>ཟིན་བྲིས་གསར་པ་བཏོད་རྗེས་ཁྱེད་ཀྱིས་སྐད་བརྡ་དང་ཡིག་སྙོར་ཕབ་ལེན་བྱེད་འགོ་བརྩམས་ཆོག</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="67"/>
+        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="73"/>
         <source>Create Notebook</source>
         <translation>གསར་གཏོད་བྱ་དགོས།ཟིན་དེབ།</translation>
     </message>
@@ -61,44 +61,44 @@
 <context>
     <name>ItemListView</name>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="73"/>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="75"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="78"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="80"/>
         <source>move </source>
         <translation>གནས་སྤོ་བ། </translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="73"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="78"/>
         <source> notes to :</source>
         <translation> ཟིན་བྲིས་རེ་རེ་བཞིན་དུ་འགོད་དགོས།:</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="75"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="80"/>
         <source> note to :</source>
         <translation> ཟིན་བྲིས་སུ་བཀོད་པ།:</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="158"/>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="185"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="163"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="190"/>
         <source>Save As</source>
         <translation>ཟིན་བྲིས་ཉར་ཚགས།</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="222"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="228"/>
         <source>No search results</source>
         <translation>འཚོལ་ཞིབ་བྱས་འབྲས་མེད།</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="238"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="244"/>
         <source>Unpin</source>
         <translation>གཏན་འཇགས་མེད་པར་བཟོ་དགོས།</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="238"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="244"/>
         <source>Sticky on Top</source>
         <translation>སྟེང་དུ་འཇོག</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="663"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="690"/>
         <source>Sticky Notes</source>
         <translation>སྟེང་དུ་བཞག་ཟིན།</translation>
     </message>
@@ -106,12 +106,12 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="366"/>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="381"/>
         <source>Create Notebook</source>
         <translation>གསར་གཏོད་བྱ་དགོས།ཟིན་དེབ།</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="515"/>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="534"/>
         <source>Search</source>
         <translation>འཚོལ་ཞིབ།</translation>
     </message>
@@ -302,6 +302,30 @@
     </message>
 </context>
 <context>
+    <name>QObject</name>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="230"/>
+        <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="232"/>
+        <source>No audio input device detected. Please check and try again</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="234"/>
+        <source>No audio output device detected. Please check and try again</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="56"/>
+        <location filename="../src/main.cpp" line="57"/>
+        <source>deepin-voice-note</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Setting</name>
     <message>
         <location filename="../src/common/setting.cpp" line="24"/>
@@ -350,97 +374,97 @@
 <context>
     <name>Shortcuts</name>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="740"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="742"/>
         <source>New notebook</source>
         <translation>གསར་དུ་བཀོད་པའི་མ་ཡིག</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="741"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="743"/>
         <source>Rename notebook</source>
         <translation>མིང་རྟགས་འགོད་པའི་རྩ་བ་བསྐྱར་དུ་བཏགས་པ།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="742"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="744"/>
         <source>Delete notebook</source>
         <translation>ཟིན་བྲིས་འགོད་དེབ་བསུབ་དགོས།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="764"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="766"/>
         <source>New note</source>
         <translation>འབྲི་དེབ་གསར་བཟོ།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="765"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="767"/>
         <source>Rename note</source>
         <translation>ཟིན་བྲིས་ལ་མིང་བཏགས་པ།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="766"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="768"/>
         <source>Delete note</source>
         <translation>ཟིན་བྲིས་སུབ་དགོས།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="767"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="769"/>
         <source>Play/Pause</source>
         <translation>ཁྱབ་གཏོང་བཅས་བྱ་དགོས།/གནས་སྐབས་མཚམས་འཇོག་དགོས།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="768"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="770"/>
         <source>Record voice</source>
         <translation>སྒྲ་ཕབ་པ།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="769"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="771"/>
         <source>Save note</source>
         <translation>ཟིན་བྲིས་ཉར་ཚགས།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="770"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="772"/>
         <source>Save recordings</source>
         <translation>སྐད་གདངས་ཉར་ཚགས་བྱེད་པ།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="790"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="792"/>
         <source>Select all</source>
         <translation>ཡོངས་རྫོགས་འདེམས་བསྐོ་བྱ་དགོས</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="791"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="793"/>
         <source>Copy</source>
         <translation>པར་སློག</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="792"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="794"/>
         <source>Cut</source>
         <translation>དྲས་གཏུབ།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="793"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="795"/>
         <source>Paste</source>
         <translation>སྦྱར་བ།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="794"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="796"/>
         <source>Undo</source>
         <translation>ཕྱིར་འཐེན་བྱ།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="795"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="797"/>
         <source>Redo</source>
         <translation>བསྐྱར་དུ་བསྒྲུབ་དགོས།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="796"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="798"/>
         <source>Delete</source>
         <translation>སུབ་པ།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="819"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="821"/>
         <source>Help</source>
         <translation>རོགས་རམ་བྱེད་དགོས།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="820"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="822"/>
         <source>Display shortcuts</source>
         <translation>མགྱོགས་མྱུར་གྱི་མཐེབ་བཀྱག་མངོན་པ།</translation>
     </message>
@@ -448,22 +472,22 @@
 <context>
     <name>ShortcutsGroups</name>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="746"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="748"/>
         <source>Notebooks</source>
         <translation>ཟིན་དེབ།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="774"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="776"/>
         <source>Notes</source>
         <translation>ཟིན་བྲིས།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="800"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="802"/>
         <source>Edit</source>
         <translation>རྩོམ་སྒྲིག་པ།</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="824"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="826"/>
         <source>Settings</source>
         <translation>སྒྲིག་འགོད།</translation>
     </message>
@@ -471,22 +495,22 @@
 <context>
     <name>TitleBarMenu</name>
     <message>
-        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="15"/>
+        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="16"/>
         <source>Settings</source>
         <translation>སྒྲིག་འགོད།</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="28"/>
+        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="30"/>
         <source>Privacy Policy</source>
         <translation>གསང་དོན་སྲིད་ཇུས།</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="51"/>
+        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="53"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
         <translation>སྐད་ཆའི་ཟིན་ཐོ་ནི་ཚད་ཡང་བའི་བརྗེད་ཐོའི་ཡོ་བྱད་ཅིག་ཡིན་པ་དང་། རྩོམ་ཡིག་གི་ཟིན་བྲིས་དང་སྒྲ་ཕབ་བཟོ་བར་སྤྱོད་དགོས།.</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="53"/>
+        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="55"/>
         <source>Voice Note</source>
         <translation>སྒྲའི་ཟིན་དེབ།</translation>
     </message>
@@ -575,12 +599,17 @@
         <translation>སྒྲའི་ཟིན་ཐོ་འདི་སུབ་ཚར།</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="139"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="129"/>
+        <source>The voice conversion failed due to the poor network connection, please have a check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="141"/>
         <source>All notes in it will be deleted</source>
         <translation>དེའི་ནང་གི་ཟིན་བྲིས་ཚང་མ་བསུབ་རྒྱུ་རེད།</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="152"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="154"/>
         <source>Delete</source>
         <translation>སུབ་པ།</translation>
     </message>
@@ -601,7 +630,7 @@
 <context>
     <name>WebEngineHandler</name>
     <message>
-        <location filename="../src/handler/web_engine_handler.cpp" line="456"/>
+        <location filename="../src/handler/web_engine_handler.cpp" line="483"/>
         <source>save as MP3</source>
         <translation>གཞན་ཞིག་MP3དུ་ཉར་ཚགས་བྱས་ཡོད།</translation>
     </message>
@@ -609,22 +638,22 @@
 <context>
     <name>WindowTitleBar</name>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="64"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="60"/>
         <source>Create Note</source>
         <translation>གསར་གཏོད་བྱ་དགོས།ཟིན་དེབ།</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="104"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
         <source>Start recording</source>
         <translation>སྒྲ་ཕབ་བྱེད་འགོ་ཚུགས་པ།</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="104"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
         <source>No recording device detected</source>
         <translation>སྒྲ་ཕབ་སྒྲིག་ཆས་ལ་ཞིབ་དཔྱད་ཚད་ལེན་མ་བྱས་པ།</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="123"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="119"/>
         <source>Insert picture</source>
         <translation>པར་རིས་ནང་འཇུག་པ།</translation>
     </message>

@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     ImageProvider *imageProvider = ImageProvider::instance();
 
     app->loadTranslator();
-
+    app->setApplicationDisplayName(QObject::tr("deepin-voice-note"));
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     engine.addImageProvider("Provider", imageProvider);
