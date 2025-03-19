@@ -20,9 +20,11 @@ public:
     void setAudioToText(const QSharedPointer<VNVoiceBlock> &voiceBlock);
 
     Q_SIGNAL void audioLengthLimit();
+    Q_SIGNAL void noNetworkConnection();
 
 private:
     void onA2TStart();
+    bool checkNetworkState();
     Q_SLOT void onA2TError(int error);
     Q_SLOT void onA2TSuccess(const QString &text);
 

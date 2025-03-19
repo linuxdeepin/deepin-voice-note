@@ -125,6 +125,8 @@ QString VNoteMessageDialogHandler::initMainMessage() const
             return QApplication::translate("VNoteMessageDialogHandler", "You do not have permission to save files there");
         case VoicePathNoAvail:
             return QApplication::translate("VNoteMessageDialogHandler", "The voice note has been deleted");
+        case NoNetwork:
+            return QApplication::translate("VNoteMessageDialogHandler", "The voice conversion failed due to the poor network connection, please have a check");
         default:
             break;
     }

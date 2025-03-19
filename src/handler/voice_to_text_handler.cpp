@@ -5,6 +5,7 @@
 #include "voice_to_text_handler.h"
 
 #include <QTimer>
+#include <QDBusInterface>
 
 #include "globaldef.h"
 #include "common/vnoteitem.h"
@@ -31,6 +32,11 @@ void VoiceToTextHandler::setAudioToText(const QSharedPointer<VNVoiceBlock> &voic
         return;
     }
 
+    if (!checkNetworkState()) {
+        Q_EMIT noNetworkConnection();
+        return;
+    }
+
     // 超过20分钟的语音不支持转文字
     if (m_voiceBlock->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
         // 弹窗提示
@@ -46,6 +52,23 @@ void VoiceToTextHandler::onA2TStart()
     OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, true);
     Q_EMIT JsContent::instance()->callJsSetVoiceText(QString(""), JsContent::AsrFlag::Start);
     QTimer::singleShot(0, this, [this]() { m_a2tManager->startAsr(m_voiceBlock->voicePath, m_voiceBlock->voiceSize); });
+}
+
+bool VoiceToTextHandler::checkNetworkState()
+{
+    QDBusInterface network("org.deepin.dde.Network1", "/org/deepin/dde/Network1",
+                           "org.deepin.dde.Network1");
+
+    if (!network.isValid()) {
+        qWarning() << "Failed to obtain the network status DBUS";
+        return false;
+    }
+
+    QVariant ret = network.property("State");
+    if (ret.toInt() != 70) {
+        return false;
+    }
+    return true;
 }
 
 void VoiceToTextHandler::onA2TError(int error)
