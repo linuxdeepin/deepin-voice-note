@@ -35,6 +35,7 @@ signals:
     void noteTextChanged();
     void updateSearch();
     void scrollChange(const bool &isTop);
+    void finishedUpdateNote();
 
 private:
     void setData(VNoteItem *data, const QString reg);

@@ -69,6 +69,7 @@ void VNoteMainManager::initConnections()
     connect(m_richTextManager, &WebRichTextManager::noteTextChanged, this, &VNoteMainManager::onNoteChanged, Qt::QueuedConnection);
     connect(m_richTextManager, &WebRichTextManager::updateSearch, this, &VNoteMainManager::updateSearch);
     connect(m_richTextManager, &WebRichTextManager::scrollChange, this, &VNoteMainManager::scrollChange);
+    connect(m_richTextManager, &WebRichTextManager::finishedUpdateNote, this, &VNoteMainManager::exitWithSave);
     connect(VoiceRecoderHandler::instance(), &VoiceRecoderHandler::finishedRecod, this, &VNoteMainManager::insertVoice);
 }
 
@@ -590,6 +591,12 @@ void VNoteMainManager::updateSearch()
     emit updateRichTextSearch(m_searchText);
 }
 
+void VNoteMainManager::exitWithSave()
+{
+    if (m_eventloop.isRunning())
+        m_eventloop.quit();
+}
+
 bool VNoteMainManager::getTop()
 {
     return m_currentHasTop;
@@ -879,8 +886,14 @@ void VNoteMainManager::resumeVoicePlayer()
     JsContent::instance()->jsCallPlayVoice("", true);
 }
 
-void VNoteMainManager::forceExit()
+void VNoteMainManager::forceExit(bool needWait)
 {
+    if (needWait) {
+        QTimer::singleShot(2000, this, [=]{
+            m_eventloop.quit();
+        });
+        m_eventloop.exec();
+    }
     VTextSpeechAndTrManager::instance()->onStopTextToSpeech();
     QApplication::exit(0);
     _Exit(0);

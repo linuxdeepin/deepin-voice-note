@@ -59,7 +59,7 @@ ApplicationWindow {
             messageDialogLoader.showDialog(VNoteMessageDialogHandler.AbortRecord, ret => {
                 if (ret) {
                     webEngineView.stopAndClose();
-                    delayTimer.start();
+                    VNoteMainManager.forceExit(true);
                 }
             });
         } else {
@@ -82,18 +82,6 @@ ApplicationWindow {
                 leftBgArea.Layout.preferredWidth = leftBgArea.width - reduce;
             }
             rightBgArea.width = rightAreaMinWidth;
-        }
-    }
-
-    Timer {
-        id: delayTimer
-
-        interval: 500
-        repeat: false
-        running: false
-
-        onTriggered: {
-            VNoteMainManager.forceExit();
         }
     }
 

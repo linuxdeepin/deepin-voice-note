@@ -11,6 +11,7 @@
 #include "vnoteitem.h"
 
 #include <QVariantMap>
+#include <QEventLoop>
 
 class WebRichTextManager;
 class VNoteMainManager : public QObject
@@ -53,7 +54,7 @@ public:
     Q_INVOKABLE void preViewShortcut(const QPointF &point);
     Q_INVOKABLE void showPrivacy();
     Q_INVOKABLE void resumeVoicePlayer();
-    Q_INVOKABLE void forceExit();
+    Q_INVOKABLE void forceExit(bool needWait = false);
     Q_INVOKABLE bool isVoiceToText();
 
 signals:
@@ -74,6 +75,7 @@ private slots:
     void onExportFinished(int err);
     void onNoteChanged();
     void updateSearch();
+    void exitWithSave();
 
 private:
     VNoteMainManager();
@@ -98,6 +100,7 @@ private:
     QStringList m_folderSort;
     WebRichTextManager *m_richTextManager {nullptr};
     QString m_searchText;
+    QEventLoop m_eventloop;
 };
 
 #endif // VNOTEMAINMANAGER_H
