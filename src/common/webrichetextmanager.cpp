@@ -71,6 +71,7 @@ void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &
         qInfo() << "Save note error";
     }
     m_textChange = false;
+    emit finishedUpdateNote();
 }
 
 void WebRichTextManager::insertVoiceItem(const QString &voicePath, qint64 voiceSize)

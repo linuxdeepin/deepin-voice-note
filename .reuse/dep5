@@ -14,7 +14,7 @@ Copyright: None
 License: CC0-1.0
 
 # xml toml json conf yaml sh
-Files:  *.toml *.json *conf *.yaml *.sh
+Files:  *.toml *.json *conf *.yaml *.sh *.in
 Copyright: None
 License: CC0-1.0
 
@@ -44,7 +44,7 @@ Copyright: UnionTech Software Technology Co., Ltd.
 License: CC-BY-4.0
 
 # assets
-Files: assets/* src/web/img/* src/web/css/* src/icon/* src/dsg/*
+Files: assets/* src/web/img/* src/web/css/* src/icon/* src/dsg/* src/web/*.css src/web/*.html
 Copyright: None
 License: LGPL-3.0-or-later
 
