@@ -4,7 +4,7 @@ Voice Notes is a simple memo software with texts and voice recordings. You are a
 
 ## Dependencies
 
-Build-Depends:debhelper (>= 11),cmake,qttools5-dev-tools,libutf8proc-dev,qtbase5-dev,pkg-config,libsqlite3-dev,qtbase5-private-dev,libglib2.0-dev,libdtkwidget-dev,libdtkwidget5-bin,libdtkcore5-bin,libdframeworkdbus-dev,libgstreamer1.0-dev,libvlc-dev,libvlccore-dev,libgtest-dev
+Build-Depends:debhelper (>= 11),cmake,qttools5-dev-tools,libutf8proc-dev,qtbase5-dev,pkg-config,libsqlite3-dev,qtbase5-private-dev,libglib2.0-dev,libdtkwidget-dev,libdtkwidget5-bin,libdtkcore5-bin,libgstreamer1.0-dev,libvlc-dev,libvlccore-dev,libgtest-dev
 
 #### Build
 - mkdir build

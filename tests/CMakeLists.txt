@@ -78,7 +78,6 @@ target_include_directories(${PROJECT_NAME_TEST} PUBLIC ${DtkWidget_INCLUDE_DIRS}
 target_link_libraries(${PROJECT_NAME_TEST}
     ${DtkWidget_LIBRARIES}
     ${DtkCore_LIBRARIES}
-    ${DFrameworkdbus_LIBRARIES}
     ${GSTREAMER_LIBRARIES}
     ${LIBVLC_LIBRARIES}
     ${GTEST_LIBRARYS}

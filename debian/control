@@ -21,7 +21,6 @@ Build-Depends:
  libdtk6gui-dev,
  libdtk6declarative-dev,
  libdtk6widget-dev,
- libdframeworkdbus-dev,
  libgstreamer1.0-dev,
  libvlc-dev,
  libvlccore-dev,
