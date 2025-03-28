@@ -1,3 +1,9 @@
+deepin-voice-note (6.0.19) unstable; urgency=medium
+
+  * chore: Bump version to 6.0.19
+
+ -- re2zero <yangwu@uniontech.com>  Fri, 28 Mar 2025 09:58:44 +0800
+
 deepin-voice-note (6.0.18) unstable; urgency=medium
 
   * fix: Fix voice notepad UI problem (Bug: 244879)
