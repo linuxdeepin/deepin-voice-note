@@ -5,7 +5,7 @@
 
 #ifndef VLCPALYER_H
 #define VLCPALYER_H
-#define MPV_PLAYENGINE  ///MPV播放引擎 通过是否定义该宏，来切换采用vlc或者libdmr来播放音频
+//#define MPV_PLAYENGINE  ///MPV播放引擎 通过是否定义该宏，来切换采用vlc或者libdmr来播放音频
 
 #include <QObject>
 #ifdef MPV_PLAYENGINE

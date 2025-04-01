@@ -21,7 +21,6 @@ Build-Depends:
  qtwebengine5-dev,
  libgtest-dev,
  libffmpegthumbnailer-dev,
- libdmr-dev (< 6.5.0),
  deepin-desktop-base
 Standards-Version: 4.1.3
 Homepage: <insert the upstream URL, if relevant>
