@@ -103,10 +103,9 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -fstack-protector-all")
 execute_process(COMMAND cat /etc/os-version OUTPUT_VARIABLE OS_INFO_STR)
 string(REGEX MATCHALL "MajorVersion=[0-9]+" MAJOR_STR "${OS_INFO_STR}")
 string(REGEX MATCH "[0-9]+" MAJOR_VERSION "${MAJOR_STR}")
-if (MAJOR_VERSION MATCHES "23")
-    message("--------------------- OS_BUILD_V23 on")
-    add_definitions(-DOS_BUILD_V23)
-endif()
+
+add_definitions(-DOS_BUILD_V23)
+
 
 execute_process(COMMAND bash
                     ${APP_TRANS_SCRIPT}
@@ -157,13 +156,11 @@ include_directories(${LIBVLC_INCLUDE_DIRS})
 include_directories(${Qt5Gui_PRIVATE_INCLUDE_DIRS})
 include_directories(${Qt5Svg_INCLUDE_DIRS})
 include_directories(${Qt5Xml_INCLUDE_DIRS})
-pkg_search_module(libdmr REQUIRED libdmr)
-
 # Tell CMake to create the executable
 add_executable(${PROJECT_NAME} ${VNOTE_SRC} ${APP_QRC})
 
 target_include_directories(${APP_BIN_NAME}
-    PUBLIC ${DtkWidget_INCLUDE_DIRS} ${OBJECT_BINARY_DIR} ${libdmr_INCLUDE_DIRS})
+    PUBLIC ${DtkWidget_INCLUDE_DIRS} ${OBJECT_BINARY_DIR})
 
 target_link_libraries(${APP_BIN_NAME}
     ${DtkWidget_LIBRARIES}
@@ -181,7 +178,6 @@ target_link_libraries(${APP_BIN_NAME}
     Qt5::WebEngineWidgets
     ${Qt5Svg_LIBRARIES}
     ${Qt5Xml_LIBRARIES}
-    ${libdmr_LIBRARIES}
 )
 
 set(CMAKE_INSTALL_PREFIX /usr)
