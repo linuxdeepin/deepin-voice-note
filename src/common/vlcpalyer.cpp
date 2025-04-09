@@ -295,7 +295,7 @@ VlcPalyer::VlcState VlcPalyer::getState()
 
 void VlcPalyer::setChangePlayFile(bool flag)
 {
-#ifndef MPV_PLAYENGINE    
+#ifdef MPV_PLAYENGINE    
     m_isChangePlayFile = flag;
 #endif    
 }
