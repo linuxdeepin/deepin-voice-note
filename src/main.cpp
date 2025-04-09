@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
     }
     //龙芯机器配置,使得DApplication能正确加载QTWEBENGINE
     qputenv("DTK_FORCE_RASTER_WIDGETS", "FALSE");
+    qputenv("DTK_USE_SEMAPHORE_SINGLEINSTANCE", "1");
 
 #ifdef __sw_64__
     qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--no-sandbox");
@@ -73,10 +74,10 @@ int main(int argc, char *argv[])
     QString strWebEngineArgs = "--single-process";
     //wayland 模式禁用gpu
     if (Utils::isWayland()) {
-        strWebEngineArgs += " --disable-gpu";
+        QString strWebEngineArgs =" --disable-gpu";
+        qputenv("QTWEBENGINE_CHROMIUM_FLAGS", strWebEngineArgs.toLocal8Bit());
     }
-    qputenv("QTWEBENGINE_CHROMIUM_FLAGS", strWebEngineArgs.toLocal8Bit());
-
+    
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
     app.loadTranslator();
     app.setOrganizationName("deepin");
