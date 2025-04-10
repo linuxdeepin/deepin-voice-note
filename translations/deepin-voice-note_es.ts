@@ -543,7 +543,7 @@ Todas las notas en él serán borradas</translation>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="127"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="87"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation>¿Estás seguro de que quieres borrar las %1 notas seleccionadas?</translation>
+        <translation>¿Está seguro de que quiere borrar las %1 notas seleccionadas?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="129"/>
