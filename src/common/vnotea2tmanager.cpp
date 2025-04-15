@@ -9,6 +9,8 @@
 
 #include <QDBusError>
 
+#include <QJsonDocument>
+
 DCORE_USE_NAMESPACE
 
 /**
