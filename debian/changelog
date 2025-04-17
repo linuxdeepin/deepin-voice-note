@@ -1,3 +1,9 @@
+deepin-voice-note (6.0.19.3) unstable; urgency=medium
+
+  *add  libqt5sql5-sqlite 
+
+ -- Liu zheng <liuzheng@uniontech.com>  Thu, 17 Apr 2025 15:17:54 +0800
+
 deepin-voice-note (6.0.19.2) unstable; urgency=medium
 
   * New tag
