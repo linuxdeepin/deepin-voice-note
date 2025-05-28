@@ -15,6 +15,8 @@
 
 #include <DLog>
 
+DCORE_USE_NAMESPACE
+
 const QString UpgradeDbUtil::UPGRADE_STATE = "old.UpgradeDb/importOldDbState";
 
 /**
@@ -22,6 +24,7 @@ const QString UpgradeDbUtil::UPGRADE_STATE = "old.UpgradeDb/importOldDbState";
  */
 UpgradeDbUtil::UpgradeDbUtil()
 {
+    qDebug() << "Creating UpgradeDbUtil instance";
 }
 
 /**
@@ -30,6 +33,7 @@ UpgradeDbUtil::UpgradeDbUtil()
  */
 void UpgradeDbUtil::saveUpgradeState(int state)
 {
+    qDebug() << "Saving upgrade state:" << state;
     setting::instance()->setOption(UPGRADE_STATE, state);
 }
 
@@ -58,15 +62,22 @@ bool UpgradeDbUtil::needUpdateOldDb(int state)
      the update state is don't UpdateDone condition
      are arrived
     */
+    qDebug() << "Checking if old database needs update, current state:" << state;
     bool fNeedUpdate = false;
     bool fHaveOldDb = VNoteDbManager::hasOldDataBase();
 
+    qDebug() << "Old database exists:" << fHaveOldDb;
+
     if (fHaveOldDb) {
+        qDebug() << "Initializing old database";
         VNoteOldDataManager::instance()->initOldDb();
     }
 
     if (fHaveOldDb && (state != UpdateDone)) {
         fNeedUpdate = true;
+        qInfo() << "Database update required - old database exists and not in UpdateDone state";
+    } else {
+        qDebug() << "No database update required";
     }
 
     return fNeedUpdate;
@@ -78,8 +89,9 @@ bool UpgradeDbUtil::needUpdateOldDb(int state)
  */
 void UpgradeDbUtil::checkUpdateState(int state)
 {
+    qDebug() << "Checking update state:" << state;
     if (state == Processing) {
-        qInfo() << "Upgrade old database exception dectected.";
+        qWarning() << "Upgrade old database exception detected";
 
         QString vnoteDatabasePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
                                     + QDir::separator()
@@ -88,10 +100,13 @@ void UpgradeDbUtil::checkUpdateState(int state)
         QFileInfo dbFileInfo(vnoteDatabasePath);
 
         if (dbFileInfo.exists()) {
+            qDebug() << "Removing exception database file:" << vnoteDatabasePath;
             QFile dbFile(vnoteDatabasePath);
 
             if (!dbFile.remove()) {
-                qInfo() << "Remove exception db error:" << dbFile.errorString();
+                qWarning() << "Failed to remove exception database:" << dbFile.errorString();
+            } else {
+                qInfo() << "Successfully removed exception database";
             }
         }
     }
@@ -102,27 +117,36 @@ void UpgradeDbUtil::checkUpdateState(int state)
  */
 void UpgradeDbUtil::backUpOldDb()
 {
+    qDebug() << "Starting old database backup";
     QString vnoteDatabasePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
                                 + QDir::separator();
 
     QString oldDbName = DEEPIN_VOICE_NOTE + QString(".db");
+    QString backupPath = vnoteDatabasePath + ".backup/";
 
-    QFileInfo backupDir(vnoteDatabasePath + ".backup/");
+    qDebug() << "Backup path:" << backupPath;
+    QFileInfo backupDir(backupPath);
 
     if (!backupDir.exists()) {
+        qDebug() << "Creating backup directory";
         QDir().mkdir(backupDir.filePath());
     }
 
     QFileInfo dbFileInfo(vnoteDatabasePath + oldDbName);
 
     if (dbFileInfo.exists()) {
+        qDebug() << "Found old database file:" << dbFileInfo.filePath();
         QDir(backupDir.filePath()).remove(backupDir.filePath() + QDir::separator() + oldDbName);
 
         QFile oldDBFile(dbFileInfo.filePath());
 
         if (!oldDBFile.rename(backupDir.filePath() + QDir::separator() + oldDbName)) {
-            qInfo() << "Backup old database failed." << oldDBFile.errorString();
+            qWarning() << "Failed to backup old database:" << oldDBFile.errorString();
+        } else {
+            qInfo() << "Successfully backed up old database to:" << backupDir.filePath() + QDir::separator() + oldDbName;
         }
+    } else {
+        qDebug() << "No old database file found to backup";
     }
 }
 
@@ -131,17 +155,21 @@ void UpgradeDbUtil::backUpOldDb()
  */
 void UpgradeDbUtil::clearVoices()
 {
+    qDebug() << "Starting old voices cleanup";
     QDir oldVoiceDir(QStandardPaths::standardLocations(
                          QStandardPaths::DocumentsLocation)
                          .first()
                      + QDir::separator() + "voicenote/");
 
     if (oldVoiceDir.exists()) {
+        qDebug() << "Found old voice directory:" << oldVoiceDir.path();
         if (!oldVoiceDir.removeRecursively()) {
-            qInfo() << "Clear old voices failed!";
+            qWarning() << "Failed to clear old voices directory";
         } else {
-            qInfo() << "Clear old voices done!";
+            qInfo() << "Successfully cleared old voices directory";
         }
+    } else {
+        qDebug() << "No old voice directory found";
     }
 }
 
@@ -151,15 +179,19 @@ void UpgradeDbUtil::clearVoices()
  */
 void UpgradeDbUtil::doFolderUpgrade(VNoteFolder *folder)
 {
-    qInfo() << "" << folder;
-
+    qDebug() << "Starting folder upgrade for folder:" << (folder ? folder->name : "null");
     if (nullptr != folder) {
         VNoteFolderOper folderOper;
         VNoteFolder *newVersionFolder = folderOper.addFolder(*folder);
 
         if (nullptr != newVersionFolder) {
+            qInfo() << "Successfully created new folder:" << newVersionFolder->name << "ID:" << newVersionFolder->id;
             doFolderNoteUpgrade(newVersionFolder->id, folder->id);
+        } else {
+            qWarning() << "Failed to create new folder for:" << folder->name;
         }
+    } else {
+        qWarning() << "Cannot upgrade null folder";
     }
 }
 
@@ -176,6 +208,7 @@ void UpgradeDbUtil::doFolderNoteUpgrade(qint64 newFolderId, qint64 oldFolderId)
 
     //Create audio dir if doesn't exist.
     if (!QFileInfo(appAudioPath).exists()) {
+        qDebug() << "Creating audio directory - Path: " << appAudioPath;
         QDir().mkdir(appAudioPath);
     }
 
@@ -202,18 +235,20 @@ void UpgradeDbUtil::doFolderNoteUpgrade(qint64 newFolderId, qint64 oldFolderId)
 
                     if (nullptr != ptrBlock && !ptrBlock->ptrVoice->voicePath.isEmpty()) {
                         QFileInfo oldFileInfo(ptrBlock->ptrVoice->voicePath);
+                        qDebug() << "Found voice file:" << oldFileInfo.filePath();
 
                         QString newVoiceName =
                             ptrBlock->ptrVoice->createTime.toString("yyyyMMddhhmmss") + QString(".mp3");
 
                         QString targetPath = appAudioPath + newVoiceName;
+                        qDebug() << "Copying voice to:" << targetPath;
 
                         QFile oldFile(ptrBlock->ptrVoice->voicePath);
 
                         if (!oldFile.copy(targetPath)) {
-                            qInfo() << "Copy file failed:" << targetPath
-                                    << " error:" << oldFile.errorString();
+                            qWarning() << "Failed to copy voice file:" << oldFile.errorString();
                         } else {
+                            qInfo() << "Successfully copied voice file to:" << targetPath;
                             ptrBlock->ptrVoice->voicePath = targetPath;
                         }
                     }

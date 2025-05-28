@@ -45,6 +45,7 @@ bool VNoteFolderOper::isNoteItemLoaded()
  */
 bool VNoteFolderOper::deleteVNoteFolder(qint64 folderId)
 {
+    qDebug() << "Deleting folder with ID:" << folderId;
     bool delOK = false;
 
     DelFolderDbVisitor delFolderVisitor(
@@ -53,6 +54,9 @@ bool VNoteFolderOper::deleteVNoteFolder(qint64 folderId)
     if (VNoteDbManager::instance()->deleteData(&delFolderVisitor)) {
         delOK = true;
         QScopedPointer<VNoteFolder> release(VNoteDataManager::instance()->delFolder(folderId));
+        qInfo() << "Successfully deleted folder:" << folderId;
+    } else {
+        qWarning() << "Failed to delete folder:" << folderId;
     }
 
     return delOK;
@@ -65,9 +69,12 @@ bool VNoteFolderOper::deleteVNoteFolder(qint64 folderId)
  */
 bool VNoteFolderOper::deleteVNoteFolder(VNoteFolder *folder)
 {
+    qDebug() << "Deleting folder:" << (folder ? folder->name : "null");
     bool delOK = true;
     if (nullptr != folder) {
         delOK = deleteVNoteFolder(folder->id);
+    } else {
+        qWarning() << "Cannot delete null folder";
     }
 
     return delOK;
@@ -80,6 +87,7 @@ bool VNoteFolderOper::deleteVNoteFolder(VNoteFolder *folder)
  */
 bool VNoteFolderOper::renameVNoteFolder(const QString &folderName)
 {
+    qDebug() << "Renaming folder to:" << folderName;
     bool isUpdateOK = true;
 
     if (nullptr != m_folder) {
@@ -92,11 +100,16 @@ bool VNoteFolderOper::renameVNoteFolder(const QString &folderName)
         RenameFolderDbVisitor renameFolderVisitor(VNoteDbManager::instance()->getVNoteDb(), m_folder, nullptr);
 
         if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameFolderVisitor))) {
+            qWarning() << "Failed to rename folder from" << oldFolderName << "to" << folderName;
             m_folder->name = oldFolderName;
             m_folder->modifyTime = oldModifyTime;
-
             isUpdateOK = false;
+        } else {
+            qInfo() << "Successfully renamed folder from" << oldFolderName << "to" << folderName;
         }
+    } else {
+        qWarning() << "Cannot rename null folder";
+        isUpdateOK = false;
     }
 
     return isUpdateOK;
@@ -108,6 +121,7 @@ bool VNoteFolderOper::renameVNoteFolder(const QString &folderName)
  */
 VNOTE_FOLDERS_MAP *VNoteFolderOper::loadVNoteFolders()
 {
+    qDebug() << "Loading all note folders";
     VNOTE_FOLDERS_MAP *foldersMap = new VNOTE_FOLDERS_MAP();
 
     //DataManager should set autoRelease flag
@@ -116,7 +130,9 @@ VNOTE_FOLDERS_MAP *VNoteFolderOper::loadVNoteFolders()
     FolderQryDbVisitor folderVisitor(VNoteDbManager::instance()->getVNoteDb(), nullptr, foldersMap);
 
     if (!VNoteDbManager::instance()->queryData(&folderVisitor)) {
-        qCritical() << "Query failed!";
+        qCritical() << "Failed to query folders";
+    } else {
+        qInfo() << "Successfully loaded" << foldersMap->folders.size() << "folders";
     }
 
     return foldersMap;
@@ -129,9 +145,11 @@ VNOTE_FOLDERS_MAP *VNoteFolderOper::loadVNoteFolders()
  */
 VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
 {
+    qDebug() << "Adding new folder:" << folder.name;
+    
     //Initialize
     folder.defaultIcon = getDefaultIcon();
-    qWarning() << "default icon index is:" << folder.defaultIcon;
+    qDebug() << "Using default icon index:" << folder.defaultIcon;
 
     VNoteFolder *newFolder = new VNoteFolder();
 
@@ -140,13 +158,14 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
     if (VNoteDbManager::instance()->insertData(&addFolderVisitor)) {
         VNoteDataManager::instance()->addFolder(newFolder);
 
-        qInfo() << "New folder:" << newFolder->id
+        qInfo() << "Successfully added new folder:"
+                << "ID:" << newFolder->id
                 << "Name:" << newFolder->name
                 << "Create time:" << newFolder->createTime
                 << "Modify time:" << newFolder->modifyTime;
     } else {
-        qCritical() << "Add folder failed:"
-                    << "New folder:" << newFolder->id
+        qCritical() << "Failed to add folder:"
+                    << "ID:" << newFolder->id
                     << "Name:" << newFolder->name
                     << "Create time:" << newFolder->createTime
                     << "Modify time:" << newFolder->modifyTime;
@@ -186,12 +205,16 @@ qint32 VNoteFolderOper::getFoldersCount()
  */
 qint32 VNoteFolderOper::getNotesCount(qint64 folderId)
 {
+    qDebug() << "Getting notes count for folder:" << folderId;
     VNOTE_ITEMS_MAP *notesInFollder = VNoteDataManager::instance()->getFolderNotes(folderId);
 
     qint32 notesCount = 0;
 
     if (nullptr != notesInFollder) {
         notesCount = notesInFollder->folderNotes.size();
+        qDebug() << "Found" << notesCount << "notes in folder:" << folderId;
+    } else {
+        qDebug() << "No notes found in folder:" << folderId;
     }
 
     return notesCount;
@@ -230,11 +253,15 @@ QString VNoteFolderOper::getDefaultFolderName()
 
     //Need reset the folder table id if data are empty.
     if (foldersCount == 0) {
+        qDebug() << "No existing folders, will reset folder table ID";
         folderIdVisitor.extraData().data.flag = true;
     }
 
     if (VNoteDbManager::instance()->queryData(&folderIdVisitor)) {
         defaultFolderName += QString("%1").arg(foldersCount + 1);
+        qDebug() << "Generated default folder name:" << defaultFolderName;
+    } else {
+        qWarning() << "Failed to generate default folder name";
     }
 
     return defaultFolderName;

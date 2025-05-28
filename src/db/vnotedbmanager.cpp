@@ -271,7 +271,7 @@ int VNoteDbManager::initVNoteDb(bool fOldDB)
 
     if (!dbDir.exists()) {
         QDir(dbDir.filePath()).mkdir(dbDir.filePath());
-        qInfo() << "Create vnote db directory:" << vnoteDatabasePath;
+        qInfo() << "Created vnote db directory:" << vnoteDatabasePath;
     }
 
     QString vnoteDatebaseName = DEEPIN_VOICE_NOTE
@@ -282,27 +282,32 @@ int VNoteDbManager::initVNoteDb(bool fOldDB)
     }
 
     QString vnoteDbFullPath = dbDir.filePath() + vnoteDatebaseName;
+    qDebug() << "Database path:" << vnoteDbFullPath;
 
     if (QSqlDatabase::contains(vnoteDatebaseName)) {
+        qDebug() << "Using existing database connection:" << vnoteDatebaseName;
         m_vnoteDB = QSqlDatabase::database(vnoteDatebaseName);
     } else {
+        qDebug() << "Creating new database connection:" << vnoteDatebaseName;
         m_vnoteDB = QSqlDatabase::addDatabase("QSQLITE", vnoteDatebaseName);
         m_vnoteDB.setDatabaseName(vnoteDbFullPath);
     }
 
     if (!m_vnoteDB.open()) {
-        qCritical() << "Open database failed:" << m_vnoteDB.lastError().text();
-
+        qCritical() << "Failed to open database:" << vnoteDbFullPath
+                    << "Error:" << m_vnoteDB.lastError().text();
         return -1;
     }
 
-    qInfo() << "Database opened:" << vnoteDbFullPath;
+    qInfo() << "Database opened successfully:" << vnoteDbFullPath;
 
     if (!fOldDB) {
+        qDebug() << "Creating tables if needed";
         createTablesIfNeed();
     }
 
     m_isDbInitOK = true;
+    qInfo() << "Database initialization completed successfully";
 
     return 0;
 }
@@ -312,15 +317,20 @@ int VNoteDbManager::initVNoteDb(bool fOldDB)
  */
 void VNoteDbManager::createTablesIfNeed()
 {
+    qDebug() << "Creating database tables if needed";
     QStringList createTableSqls = QString(CREATETABLE_FMT).split(";");
 
     QScopedPointer<QSqlQuery> sqlQuery(new QSqlQuery(m_vnoteDB));
 
     for (auto it : createTableSqls) {
         if (!it.trimmed().isEmpty()) {
+            qDebug() << "Executing create table SQL:" << it;
             if (!sqlQuery->exec(it)) {
-                qCritical() << it << "init tables failed error: " << sqlQuery->lastError().text();
+                qCritical() << "Failed to create table:" << it 
+                            << "Error:" << sqlQuery->lastError().text();
             }
         }
     }
+    
+    qDebug() << "Table creation completed";
 }

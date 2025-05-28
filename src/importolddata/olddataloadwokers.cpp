@@ -24,6 +24,7 @@ OldDataLoadTask::OldDataLoadTask(QObject *parent)
  */
 void OldDataLoadTask::run()
 {
+    qInfo() << "Starting old data load task";
     VNOTE_FOLDERS_MAP *foldersMap = new VNOTE_FOLDERS_MAP();
     VNoteOldDataManager::instance()->m_qspNoteFoldersMap.reset(foldersMap);
 
@@ -34,6 +35,8 @@ void OldDataLoadTask::run()
 
     if (!VNoteDbManager::instance()->queryData(&folderVisitor)) {
         qCritical() << "Query old folder failed!";
+    } else {
+        qInfo() << "Successfully queried old folders, count:" << foldersMap->folders.count();
     }
 
     VNOTE_ALL_NOTES_MAP *notesMap = new VNOTE_ALL_NOTES_MAP();
@@ -46,8 +49,11 @@ void OldDataLoadTask::run()
 
     if (!VNoteDbManager::instance()->queryData(&noteVisitor)) {
         qCritical() << "Query old notes failed!";
+    } else {
+        qInfo() << "Successfully queried old notes, count:" << notesMap->notes.count();
     }
 
+    qInfo() << "Old data load task completed";
     emit finishLoad();
 }
 
@@ -65,7 +71,9 @@ OldDataUpgradeTask::OldDataUpgradeTask(QObject *parent)
  */
 void OldDataUpgradeTask::run()
 {
+    qInfo() << "Starting old data upgrade task";
     int folderCount = VNoteOldDataManager::instance()->folders()->folders.count();
+    qDebug() << "Total folders to upgrade:" << folderCount;
     int progress = 0;
 
     int index = 1;
@@ -83,5 +91,6 @@ void OldDataUpgradeTask::run()
         index++;
     }
 
+    qInfo() << "Old data upgrade task completed";
     emit finishUpgrade();
 }

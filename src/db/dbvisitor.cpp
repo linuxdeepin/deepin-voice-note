@@ -19,6 +19,7 @@
 // #include <DLog>
 
 #include <QVariant>
+#include <QDebug>
 
 const QStringList DbVisitor::DBFolder::folderColumnsName = {
     "folder_id",
@@ -169,6 +170,7 @@ bool FolderQryDbVisitor::visitorData()
             //    Add the expand fileds parse code here
 
             //************Expand fileds end************
+            qDebug() << "Found folder:" << folder->name << "ID:" << folder->id;
             results.folders->folders.insert(folder->id, folder);
         }
     }
@@ -266,6 +268,7 @@ bool NoteQryDbVisitor::visitorData()
 
                 folderNotes->folderNotes.insert(note->noteId, note);
                 results.notes->notes.insert(note->folderId, folderNotes);
+                qDebug() << "Created new folder notes map for folder:" << note->folderId;
             }
         }
     }
@@ -385,6 +388,7 @@ bool AddFolderDbVisitor::visitorData()
 
             //************Expand fileds end************
 
+            qDebug() << "Added new folder:" << results.newFolder->name << "ID:" << results.newFolder->id;
             break;
         }
     }
@@ -453,6 +457,7 @@ bool RenameFolderDbVisitor::prepareSqls()
     bool fPrepareOK = true;
     const VNoteFolder *folder = param.newFolder;
     if (nullptr != folder) {
+        qDebug() << "Preparing rename folder SQL for folder:" << folder->name << "ID:" << folder->id;
         QString sqlFolderName = folder->name;
         checkSqlStr(sqlFolderName);
 
@@ -467,6 +472,7 @@ bool RenameFolderDbVisitor::prepareSqls()
 
         m_dbvSqls.append(renameSql);
     } else {
+        qWarning() << "Failed to prepare rename folder SQL: Invalid folder";
         fPrepareOK = false;
     }
 
@@ -494,6 +500,8 @@ bool DelFolderDbVisitor::prepareSqls()
 
     if (nullptr != param.id) {
         qint64 folderId = *param.id;
+        qDebug() << "Preparing delete folder SQL for folder ID:" << folderId;
+
         QString deleteFolderSql = QString("DELETE FROM %1 WHERE %2=%3;")
         .arg(VNoteDbManager::FOLDER_TABLE_NAME)
         .arg(DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data())
@@ -507,6 +515,7 @@ bool DelFolderDbVisitor::prepareSqls()
         m_dbvSqls.append(deleteFolderSql);
         m_dbvSqls.append(deleteNotesSql);
     } else {
+        qWarning() << "Failed to prepare delete folder SQL: Invalid folder ID";
         fPrepareOK = false;
     }
 
@@ -563,6 +572,7 @@ bool AddNoteDbVisitor::visitorData()
 
             //************Expand fileds end************
 
+            qDebug() << "Added new note:" << note->noteTitle << "ID:" << note->noteId << "in folder:" << note->folderId;
             break;
         }
     }
@@ -658,6 +668,7 @@ bool RenameNoteDbVisitor::prepareSqls()
     const VNoteItem *note = param.newNote;
 
     if (nullptr != note) {
+        qDebug() << "Preparing rename note SQL for note:" << note->noteTitle << "ID:" << note->noteId;
         QString sqlTitle = note->noteTitle;
         checkSqlStr(sqlTitle);
 
@@ -683,6 +694,7 @@ bool RenameNoteDbVisitor::prepareSqls()
         m_dbvSqls.append(modifyNoteTextSql);
         m_dbvSqls.append(updateSql);
     } else {
+        qWarning() << "Failed to prepare rename note SQL: Invalid note";
         fPrepareOK = false;
     }
 
@@ -710,6 +722,7 @@ bool UpdateNoteDbVisitor::prepareSqls()
     const VNoteItem *note = param.newNote;
 
     if (nullptr != note) {
+        qDebug() << "Preparing update note SQL for note:" << note->noteTitle << "ID:" << note->noteId;
         QString metaDataStr = note->metaDataConstRef().toString();
         checkSqlStr(metaDataStr);
 
@@ -735,6 +748,7 @@ bool UpdateNoteDbVisitor::prepareSqls()
         m_dbvSqls.append(modifyNoteTextSql);
         m_dbvSqls.append(updateSql);
     } else {
+        qWarning() << "Failed to prepare update note SQL: Invalid note";
         fPrepareOK = false;
     }
 
@@ -760,6 +774,7 @@ bool UpdateNoteTopDbVisitor::prepareSqls()
     bool fPrepareOK = true;
     const VNoteItem *note = param.newNote;
     if (note != nullptr) {
+        qDebug() << "Preparing update note top status SQL for note:" << note->noteTitle << "ID:" << note->noteId << "top:" << note->isTop;
         QString updateSql = QString("UPDATE %1 SET %2=%3 WHERE %4=%5;")
         .arg(VNoteDbManager::NOTES_TABLE_NAME)
         .arg(DBNote::noteColumnsName[DBNote::is_top].toUtf8().data())
@@ -768,6 +783,7 @@ bool UpdateNoteTopDbVisitor::prepareSqls()
         .arg(note->noteId);
         m_dbvSqls.append(updateSql);
     } else {
+        qWarning() << "Failed to prepare update note top status SQL: Invalid note";
         fPrepareOK = false;
     }
     return fPrepareOK;
@@ -793,6 +809,7 @@ bool UpdateNoteFolderIdDbVisitor::prepareSqls()
     bool fPrepareOK = true;
     const VNoteItem *note = param.newNote;
     if (note != nullptr) {
+        qDebug() << "Preparing update note folder ID SQL for note:" << note->noteTitle << "ID:" << note->noteId << "new folder ID:" << note->folderId;
         QString updateSql = QString("UPDATE %1 SET %2=%3 WHERE %4=%5;")
         .arg(VNoteDbManager::NOTES_TABLE_NAME)
         .arg(DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data())
@@ -801,6 +818,7 @@ bool UpdateNoteFolderIdDbVisitor::prepareSqls()
         .arg(note->noteId);
         m_dbvSqls.append(updateSql);
     } else {
+        qWarning() << "Failed to prepare update note folder ID SQL: Invalid note";
         fPrepareOK = false;
     }
     return fPrepareOK;
@@ -826,6 +844,7 @@ bool DelNoteDbVisitor::prepareSqls()
     bool fPrepareOK = true;
     const VNoteItem *note = param.newNote;
     if (nullptr != note && nullptr != note->folder()) {
+        qDebug() << "Preparing delete note SQL for note:" << note->noteTitle << "ID:" << note->noteId << "in folder:" << note->folderId;
         QString deleteSql = QString("DELETE FROM %1 WHERE %2=%3 AND %4=%5;")
         .arg(VNoteDbManager::NOTES_TABLE_NAME)
         .arg(DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data())
@@ -846,6 +865,7 @@ bool DelNoteDbVisitor::prepareSqls()
         m_dbvSqls.append(deleteSql);
         m_dbvSqls.append(updateSql);
     } else {
+        qWarning() << "Failed to prepare delete note SQL: Invalid note or folder";
         fPrepareOK = false;
     }
 
