@@ -77,16 +77,17 @@ void UpgradeView::onDataReady()
 {
     int foldersCount = VNoteOldDataManager::instance()->folders()->folders.count();
 
-    qInfo() << "Old data ready-->folders:" << foldersCount;
-    qInfo() << "Begin upgrade old data to new version";
+    qInfo() << "Old data ready - Found" << foldersCount << "folders";
+    qInfo() << "Beginning upgrade of old data to new version";
 
     if (foldersCount > 0) {
+        qDebug() << "Starting data upgrade process";
         //Update the upgrade state to Processing.
         UpgradeDbUtil::saveUpgradeState(UpgradeDbUtil::Processing);
 
         VNoteOldDataManager::instance()->doUpgrade();
     } else {
-        qInfo() << "There is no data in old database...stop upgrade.";
+        qInfo() << "No data found in old database - skipping upgrade";
         //Update the upgrade state to UpdateDone if no data available.
         UpgradeDbUtil::saveUpgradeState(UpgradeDbUtil::UpdateDone);
 
@@ -99,7 +100,7 @@ void UpgradeView::onDataReady()
  */
 void UpgradeView::onUpgradeFinish()
 {
-    qInfo() << "End upgrade old data to new version.";
+    qInfo() << "Database upgrade process completed";
 
     //Update the upgrade state
     UpgradeDbUtil::saveUpgradeState(UpgradeDbUtil::UpdateDone);

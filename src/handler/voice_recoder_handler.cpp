@@ -9,7 +9,6 @@ VoiceRecoderHandler::VoiceRecoderHandler() {
     initAudioWatcher();
 }
 
-
 VoiceRecoderHandler *VoiceRecoderHandler::instance()
 {
     static VoiceRecoderHandler voiceHandler;
@@ -23,34 +22,44 @@ VoiceRecoderHandler::RecoderType VoiceRecoderHandler::getRecoderType()
 
 void VoiceRecoderHandler::startRecoder()
 {
+    qDebug() << "Starting voice recorder";
     if (!checkVolume()) {
+        qDebug() << "Volume check passed, confirming start";
         confirmStartRecoder();
         emit volumeTooLow(false);
     } else {
-        qInfo() << "Volume less than 20%";
+        qWarning() << "Volume too low (less than 20%)";
         emit volumeTooLow(true);
     }
 }
 
 void VoiceRecoderHandler::stopRecoder()
 {
+    qDebug() << "Stopping voice recorder";
     m_audioRecoder->stopRecord();
     if (m_type != RecoderType::Idle) {
+        qInfo() << "Recording finished, duration:" << m_recordMsec << "ms, path:" << m_recordPath;
         emit finishedRecod(m_recordPath, m_recordMsec);
         m_type = RecoderType::Idle;
         OpsStateInterface::instance()->operState(OpsStateInterface::StateRecording, false);
+    } else {
+        qDebug() << "Recorder already idle";
     }
 }
 
 void VoiceRecoderHandler::pauseRecoder()
 {
+    qDebug() << "Toggling recorder pause state, current type:" << m_type;
     if (m_type == RecoderType::Recording) {
+        qDebug() << "Pausing recording";
         m_audioRecoder->pauseRecord();
         m_type = RecoderType::Paused;
     } else {
+        qDebug() << "Resuming recording";
         m_audioRecoder->startRecord();
         m_type = RecoderType::Recording;
     }
+    qInfo() << "Recorder state changed to:" << m_type;
     emit recoderStateChange(m_type);
 }
 
@@ -80,12 +89,15 @@ void VoiceRecoderHandler::intRecoder()
 
 void VoiceRecoderHandler::initRecordPath()
 {
+    qDebug() << "Initializing recording path";
     m_recordDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     m_recordDir += "/voicenote/";
     QDir dir(m_recordDir);
     if (!dir.exists()) {
+        qDebug() << "Creating recording directory:" << m_recordDir;
         dir.mkdir(m_recordDir);
     }
+    qInfo() << "Recording path initialized:" << m_recordDir;
 }
 
 void VoiceRecoderHandler::initAudioWatcher()
@@ -103,18 +115,23 @@ bool VoiceRecoderHandler::checkVolume()
 
 void VoiceRecoderHandler::confirmStartRecoder()
 {
+    qDebug() << "Confirming start of recording";
     m_audioRecoder->setDevice(m_audioWatcher->getDeviceName(static_cast<AudioWatcher::AudioMode>(m_currentMode)));
     QString fileName = QDateTime::currentDateTime().toString("yyyyMMddhhmmss") + ".mp3";
 
     initRecordPath();
     m_recordMsec = 0;
     m_recordPath = m_recordDir + fileName;
+    qDebug() << "Setting output file:" << m_recordPath;
     m_audioRecoder->setOutputFile(m_recordPath);
+    
     bool ret = m_audioRecoder->startRecord();
     if (!ret) {
+        qWarning() << "Failed to start recording";
         m_type = RecoderType::Idle;
         stopRecoder();
     } else {
+        qInfo() << "Recording started successfully";
         m_type = RecoderType::Recording;
         OpsStateInterface::instance()->operState(OpsStateInterface::StateRecording, true);
         emit recoderStateChange(m_type);
@@ -123,15 +140,19 @@ void VoiceRecoderHandler::confirmStartRecoder()
 
 void VoiceRecoderHandler::onAudioDeviceChange(int mode)
 {
+    qDebug() << "Audio device changed, mode:" << mode;
     if (m_currentMode == mode) {
         QString info = m_audioWatcher->getDeviceName(
             static_cast<AudioWatcher::AudioMode>(mode));
-        qInfo() << "Current Audio Device Name: " << info;
+        qInfo() << "Current audio device:" << info;
+        
         if (info.isEmpty()) {
+            qWarning() << "No audio device available";
             stopRecoder();
             updateRecordBtnState(false);
         } else {
             bool isEnable = m_audioWatcher->getDeviceEnable(static_cast<AudioWatcher::AudioMode>(m_currentMode));
+            qDebug() << "Device enabled state:" << isEnable;
             stopRecoder();
             updateRecordBtnState(isEnable);
         }
@@ -144,10 +165,14 @@ void VoiceRecoderHandler::onAudioBufferProbed(const QAudioBuffer &buffer)
     if (m_recordMsec != msec) {
         m_recordMsec = msec;
         QString strTime = Utils::formatMillisecond(msec, 0);
+        qDebug() << "Recording time updated:" << strTime;
         emit updateRecorderTime(strTime);
-        if (msec > (60 * 60 * 1000))
+        if (msec > (60 * 60 * 1000)) {
+            qInfo() << "Recording reached maximum duration (1 hour), stopping";
             stopRecoder();
+        }
     }
+    
     qreal maxValue = -100;
     for (int i = 0; i < buffer.frameCount(); i++) {
         qreal averageValue = 0;

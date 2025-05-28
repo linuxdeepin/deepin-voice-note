@@ -32,6 +32,7 @@ VNoteItemOper::VNoteItemOper(VNoteItem *note)
  */
 VNOTE_ALL_NOTES_MAP *VNoteItemOper::loadAllVNotes()
 {
+    qDebug() << "Loading all notes";
     VNOTE_ALL_NOTES_MAP *notesMap = new VNOTE_ALL_NOTES_MAP();
 
     //DataManager data should set autoRelease flag
@@ -46,8 +47,9 @@ VNOTE_ALL_NOTES_MAP *VNoteItemOper::loadAllVNotes()
 
     if (VNoteDbManager::instance()->queryData(&noteVisitor)) {
         gettimeofday(&end, nullptr);
-
-        qDebug() << "queryData(ms):" << TM(start, end);
+        qInfo() << "Successfully loaded all notes, query time:" << TM(start, end) << "ms";
+    } else {
+        qWarning() << "Failed to load notes";
     }
 
     return notesMap;
@@ -60,6 +62,7 @@ VNOTE_ALL_NOTES_MAP *VNoteItemOper::loadAllVNotes()
  */
 bool VNoteItemOper::modifyNoteTitle(const QString &title)
 {
+    qDebug() << "Modifying note title to:" << title;
     bool isUpdateOK = true;
 
     if (nullptr != m_note) {
@@ -74,10 +77,12 @@ bool VNoteItemOper::modifyNoteTitle(const QString &title)
             VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
 
         if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&renameNoteVisitor))) {
+            qWarning() << "Failed to rename note from" << oldTitle << "to" << title;
             m_note->noteTitle = oldTitle;
             m_note->modifyTime = oldModifyTime;
-
             isUpdateOK = false;
+        } else {
+            qInfo() << "Successfully renamed note from" << oldTitle << "to" << title;
         }
     }
 
@@ -90,6 +95,7 @@ bool VNoteItemOper::modifyNoteTitle(const QString &title)
  */
 bool VNoteItemOper::updateNote()
 {
+    qDebug() << "Updating note:" << (m_note ? m_note->noteTitle : "null");
     bool isUpdateOK = true;
 
     if (nullptr != m_note) {
@@ -106,6 +112,7 @@ bool VNoteItemOper::updateNote()
 
         //Reset the max voice id when no voice file.
         if (!m_note->haveVoice()) {
+            qDebug() << "Resetting max voice ID as note has no voice files";
             m_note->maxVoiceIdRef() = 0;
         }
 
@@ -113,10 +120,12 @@ bool VNoteItemOper::updateNote()
             VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
 
         if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
+            qWarning() << "Failed to update note:" << m_note->noteTitle;
             m_note->setMetadata(oldMetaData);
             m_note->modifyTime = oldModifyTime;
-
             isUpdateOK = false;
+        } else {
+            qInfo() << "Successfully updated note:" << m_note->noteTitle;
         }
     }
 
@@ -130,6 +139,7 @@ bool VNoteItemOper::updateNote()
  */
 VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
 {
+    qDebug() << "Adding new note to folder:" << note.folderId;
     VNoteFolderOper folderOps;
     VNoteFolder *folder = folderOps.getFolder(note.folderId);
 
@@ -149,10 +159,10 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
 
     if (VNoteDbManager::instance()->insertData(&addNoteVisitor)) {
         if (Q_UNLIKELY(nullptr == VNoteDataManager::instance()->addNote(newNote))) {
-            qInfo() << "Add to datamanager failed:"
-                    << "New Note:" << newNote->noteId
+            qWarning() << "Failed to add note to datamanager:"
+                    << "ID:" << newNote->noteId
                     << "Folder ID:" << newNote->folderId
-                    << "Note type:" << newNote->noteType
+                    << "Type:" << newNote->noteType
                     << "Create time:" << newNote->createTime
                     << "Modify time:" << newNote->modifyTime;
             //Add to DataManager failed, release it
@@ -165,9 +175,10 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
             //Should never reach here
         }
     } else {
-        qCritical() << "New Note:" << newNote->noteId
+        qCritical() << "Failed to add note to database:"
+                    << "ID:" << newNote->noteId
                     << "Folder ID:" << newNote->folderId
-                    << "Note type:" << newNote->noteType
+                    << "Type:" << newNote->noteType
                     << "Create time:" << newNote->createTime
                     << "Modify time:" << newNote->modifyTime;
 
@@ -209,12 +220,16 @@ VNOTE_ITEMS_MAP *VNoteItemOper::getFolderNotes(qint64 folderId)
  */
 QString VNoteItemOper::getDefaultNoteName(qint64 folderId)
 {
+    qDebug() << "Getting default note name for folder:" << folderId;
     VNoteFolder *folder = VNoteDataManager::instance()->getFolder(folderId);
 
     QString defaultNoteName = DApplication::translate("DefaultName", "Text");
 
     if (nullptr != folder && folder->maxNoteIdRef() != 0) {
         defaultNoteName += QString("%1").arg(folder->maxNoteIdRef());
+        qDebug() << "Generated default note name:" << defaultNoteName;
+    } else {
+        qDebug() << "Using base default note name:" << defaultNoteName;
     }
 
     return defaultNoteName;
@@ -242,12 +257,14 @@ QString VNoteItemOper::getDefaultVoiceName() const
  */
 bool VNoteItemOper::deleteNote()
 {
+    qDebug() << "Deleting note:" << (m_note ? m_note->noteTitle : "null");
     bool delOK = false;
 
     if (nullptr != m_note) {
         VNoteFolder *folder = m_note->folder();
 
         if (nullptr == folder) {
+            qDebug() << "Note folder not set, retrieving folder:" << m_note->folderId;
             VNoteFolderOper folderOps;
             folder = folderOps.getFolder(m_note->folderId);
             m_note->setFolder(folder);
@@ -258,6 +275,7 @@ bool VNoteItemOper::deleteNote()
         //Reset the max note id when folder empty.
         int folderNoteCount = folder->getNotesCount();
         if (Q_UNLIKELY(folderNoteCount == 1)) {
+            qDebug() << "Last note in folder, resetting max note ID";
             folder->maxNoteIdRef() = 0;
         }
 
@@ -266,14 +284,15 @@ bool VNoteItemOper::deleteNote()
         if (Q_LIKELY(VNoteDbManager::instance()->deleteData(&delNoteVisitor))) {
             //Release note Object
             QScopedPointer<VNoteItem> autoRelease(VNoteDataManager::instance()->delNote(m_note->folderId, m_note->noteId));
-
+            qInfo() << "Successfully deleted note:" << m_note->noteTitle;
             delOK = true;
         } else {
+            qWarning() << "Failed to delete note:" << m_note->noteTitle;
             //Update failed rollback.
             folder->maxNoteIdRef() = folderNoteCount;
         }
-
-        return delOK;
+    } else {
+        qWarning() << "Cannot delete null note";
     }
 
     return delOK;
@@ -286,18 +305,24 @@ bool VNoteItemOper::deleteNote()
  */
 bool VNoteItemOper::updateTop(int value)
 {
+    qDebug() << "Updating note top status to:" << value;
     bool updateOK = false;
     if (nullptr != m_note) {
         if (m_note->isTop == value) {
+            qDebug() << "Note already has requested top status:" << value;
             return updateOK;
         }
         m_note->isTop = value;
         UpdateNoteTopDbVisitor updateNoteVisitor(VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
         if (!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
+            qInfo() << "Successfully updated note top status to:" << value;
             updateOK = true;
         } else {
+            qWarning() << "Failed to update note top status";
             m_note->isTop = !value;
         }
+    } else {
+        qWarning() << "Cannot update top status for null note";
     }
     return updateOK;
 }
@@ -309,12 +334,18 @@ bool VNoteItemOper::updateTop(int value)
  */
 bool VNoteItemOper::updateFolderId(VNoteItem *data)
 {
+    qDebug() << "Updating note folder ID";
     bool updateOK = false;
     if (nullptr != data) {
         UpdateNoteFolderIdDbVisitor updateNoteVisitor(VNoteDbManager::instance()->getVNoteDb(), data, nullptr);
         if (!Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
+            qInfo() << "Successfully updated note folder ID to:" << data->folderId;
             updateOK = true;
+        } else {
+            qWarning() << "Failed to update note folder ID";
         }
+    } else {
+        qWarning() << "Cannot update folder ID for null note";
     }
     return updateOK;
 }

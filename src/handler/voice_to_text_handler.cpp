@@ -27,22 +27,27 @@ VoiceToTextHandler::VoiceToTextHandler(QObject *parent)
 
 void VoiceToTextHandler::setAudioToText(const QSharedPointer<VNVoiceBlock> &voiceBlock)
 {
+    qDebug() << "Setting audio for text conversion";
     m_voiceBlock = voiceBlock;
     if (!m_voiceBlock) {
+        qWarning() << "Voice block is null";
         return;
     }
 
     if (!checkNetworkState()) {
+        qWarning() << "No network connection available";
         Q_EMIT noNetworkConnection();
         return;
     }
 
     // 超过20分钟的语音不支持转文字
     if (m_voiceBlock->voiceSize > MAX_A2T_AUDIO_LEN_MS) {
+        qWarning() << "Audio length exceeds limit:" << m_voiceBlock->voiceSize << "ms (max:" << MAX_A2T_AUDIO_LEN_MS << "ms)";
         // 弹窗提示
         Q_EMIT audioLengthLimit();
         return;
     } else {
+        qDebug() << "Starting audio to text conversion for file:" << m_voiceBlock->voicePath;
         onA2TStart();
     }
 }
@@ -56,6 +61,7 @@ void VoiceToTextHandler::onA2TStart()
 
 bool VoiceToTextHandler::checkNetworkState()
 {
+    qDebug() << "Checking network state";
     QDBusInterface network("org.deepin.dde.Network1", "/org/deepin/dde/Network1",
                            "org.deepin.dde.Network1");
 
@@ -65,10 +71,9 @@ bool VoiceToTextHandler::checkNetworkState()
     }
 
     QVariant ret = network.property("State");
-    if (ret.toInt() != 70) {
-        return false;
-    }
-    return true;
+    bool isConnected = (ret.toInt() == 70);
+    qDebug() << "Network state:" << (isConnected ? "Connected" : "Disconnected");
+    return isConnected;
 }
 
 void VoiceToTextHandler::onA2TError(int error)
