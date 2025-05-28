@@ -6,6 +6,7 @@
 
 #include <QVariant>
 #include <QCoreApplication>
+#include <QDebug>
 
 // 用于动态设置 QML 组件的属性
 const char EnabledProperty[] = "enabled";
@@ -110,6 +111,7 @@ QObject *ActionManager::getActionById(ActionKind id)
 void ActionManager::enableAction(ActionKind actionId, bool enable)
 {
     if (!metaData.contains(actionId)) {
+        qWarning() << "Attempted to enable non-existent action:" << actionId;
         return;
     }
 
@@ -125,6 +127,7 @@ void ActionManager::enableAction(ActionKind actionId, bool enable)
 void ActionManager::visibleAction(ActionKind actionId, bool visible)
 {
     if (!metaData.contains(actionId)) {
+        qWarning() << "Attempted to change visibility of non-existent action:" << actionId;
         return;
     }
 
@@ -139,6 +142,7 @@ void ActionManager::visibleAction(ActionKind actionId, bool visible)
  */
 void ActionManager::resetCtxMenu(MenuType type, bool enable)
 {
+    qDebug() << "Resetting context menu type:" << type << "to enabled:" << enable;
     int startMenuId = MenuMaxId;
     int endMenuId = MenuMaxId;
 
@@ -175,16 +179,17 @@ void ActionManager::resetCtxMenu(MenuType type, bool enable)
  */
 void ActionManager::visibleAiActions(bool visible)
 {
+    qDebug() << "Setting AI actions visibility to:" << visible;
     visibleAction(VoiceToText, visible);
     visibleAction(TxtSpeech, visible);
     visibleAction(TxtStopreading, visible);
     visibleAction(TxtDictation, visible);
-    // visibleAction(TxtTranslate, visible);
     visibleAction(TxtSeparator, visible);
 }
 
 void ActionManager::visibleMulChoicesActions(bool visible)
 {
+    qDebug() << "Setting multiple choice actions visibility to:" << visible;
     visibleAction(NoteRename, visible);
     visibleAction(NoteTop, visible);
     enableAction(NoteSaveVoice, visible);
@@ -192,6 +197,7 @@ void ActionManager::visibleMulChoicesActions(bool visible)
 
 void ActionManager::enableVoicePlayActions(bool enable)
 {
+    qDebug() << "Setting voice play actions enabled state to:" << enable;
     enableAction(NoteMove, enable);
     enableAction(NoteDelete, enable);
     enableAction(NoteAddNew, enable);
@@ -233,12 +239,17 @@ void ActionManager::setActionObject(ActionKind id, QObject *obj)
     auto ptr = metaData.value(id);
     if (ptr) {
         if (ptr->qmlObject) {
-            qCritical() << "Duplicate qml objects, create multiple menus of the same type?" << id << ptr->qmlObject;
+            qCritical() << "Duplicate QML object detected for action:" << id 
+                        << "Existing object:" << ptr->qmlObject 
+                        << "New object:" << obj;
         }
         // 不能同时创建多个相同类型菜单
         Q_ASSERT_X(!ptr->qmlObject, "Set action qml object",
                    "Duplicate qml objects, create multiple menus of the same type?");
         ptr->qmlObject = obj;
+        qDebug() << "Set QML object for action:" << id;
+    } else {
+        qWarning() << "Attempted to set QML object for non-existent action:" << id;
     }
 }
 
@@ -247,5 +258,6 @@ void ActionManager::setActionObject(ActionKind id, QObject *obj)
  */
 void ActionManager::actionTriggerFromQuick(ActionKind actionId)
 {
+    qDebug() << "Action triggered from QML:" << actionId;
     Q_EMIT actionTriggered(actionId);
 }

@@ -31,11 +31,14 @@ void OpsStateInterface::operState(int type, bool isSet)
     if (shift > StateNone && shift < StateMax) {
         if (isSet) {
             m_states |= (1 << shift);
+            qDebug() << "Setting state" << type << "to true";
         } else {
             m_states &= (~(1 << shift));
+            qDebug() << "Setting state" << type << "to false";
         }
     } else {
-        qCritical() << "Operation error:Invalid opsType =" << type;
+        qCritical() << "Operation error: Invalid opsType =" << type 
+                   << " (must be between" << StateNone << "and" << StateMax << ")";
     }
 }
 

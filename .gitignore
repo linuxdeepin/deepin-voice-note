@@ -12,3 +12,8 @@ translations/*.qm
 linglong
 build
 *.log
+.vscode
+.cursor
+
+.cursorindexingignore
+.specstory

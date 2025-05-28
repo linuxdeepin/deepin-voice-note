@@ -47,12 +47,15 @@ gboolean GstBusMessageCb(GstBus *bus, GstMessage *msg, void *userdata)
 GstreamRecorder::GstreamRecorder(QObject *parent)
     : QObject(parent)
 {
+    qDebug() << "Initializing GstreamRecorder...";
     // check if current in linglong, update GST_PLUGIN_PATH
     if (Utils::inLinglongEnv()) {
         qputenv("GST_PLUGIN_PATH", QByteArray(INSTALL_LIB_PATH) + QByteArray("/gstreamer-1.0"));
+        qDebug() << "Running in Linglong environment, updated GST_PLUGIN_PATH";
     }
 
     gst_init(nullptr, nullptr);
+    qDebug() << "GStreamer initialized successfully";
 }
 
 /**
@@ -61,6 +64,7 @@ GstreamRecorder::GstreamRecorder(QObject *parent)
  */
 bool GstreamRecorder::createPipe()
 {
+    qDebug() << "Creating GStreamer pipeline...";
     GstElement *audioSrc = nullptr; //声音采集设备
     GstElement *audioResample = nullptr; //重采样
     GstElement *audioConvert = nullptr; //格式转换
@@ -75,11 +79,12 @@ bool GstreamRecorder::createPipe()
     do {
         audioSrc = gst_element_factory_make("pulsesrc", "audioSrc");
         if (audioSrc == nullptr) {
-            qCritical() << "audioSrc make error";
+            qCritical() << "Failed to create audio source element (pulsesrc)";
             break;
         }
         if (!m_currentDevice.isEmpty()) {
             g_object_set(reinterpret_cast<gpointer *>(audioSrc), "device", m_currentDevice.toLatin1().data(), nullptr);
+            qDebug() << "Set audio source device to:" << m_currentDevice;
         }
 
         //       audiowebrtcdsp= gst_element_factory_make("webrtcdsp","audiowebrtcdsp");
@@ -96,45 +101,48 @@ bool GstreamRecorder::createPipe()
 
         audioResample = gst_element_factory_make("audioresample", nullptr);
         if (audioResample == nullptr) {
-            qCritical() << "audioResample make error";
+            qCritical() << "Failed to create audio resample element";
             break;
         }
         audioConvert = gst_element_factory_make("audioconvert", "audioconvert");
         if (audioConvert == nullptr) {
-            qCritical() << "audioConvert make error";
+            qCritical() << "Failed to create audio convert element";
             break;
         }
         audioQueue = gst_element_factory_make("queue", "audioqueue");
         if (audioQueue == nullptr) {
-            qCritical() << "audioQueue make error";
+            qCritical() << "Failed to create audio queue element";
             break;
         }
         audioEncoder = gst_parse_bin_from_description(mp3Encoder.toLatin1().constData(),
                                                       true, nullptr);
         if (audioEncoder == nullptr) {
-            qCritical() << "audioEncoder make error";
+            qCritical() << "Failed to create audio encoder element with description:" << mp3Encoder;
             break;
         }
         GstPad *pad = gst_element_get_static_pad(audioEncoder, "sink");
         if (pad) {
             gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, bufferProbe, this, nullptr);
             gst_object_unref(pad);
+            qDebug() << "Added buffer probe to encoder sink pad";
         } else {
-            qCritical() << "sink pad make error";
+            qCritical() << "Failed to get encoder sink pad";
             break;
         }
         audioOutput = gst_element_factory_make("filesink", "filesink");
         if (audioOutput == nullptr) {
-            qCritical() << "audioOutput make error";
+            qCritical() << "Failed to create file sink element";
             break;
         }
         if (!m_outputFile.isEmpty()) {
             g_object_set(reinterpret_cast<gpointer *>(audioOutput), "location", m_outputFile.toLatin1().constData(), nullptr);
+            qDebug() << "Set output file to:" << m_outputFile;
         }
         m_pipeline = gst_pipeline_new("deepin-voice-note");
         GstBus *bus = gst_pipeline_get_bus(reinterpret_cast<GstPipeline *>(m_pipeline));
         gst_bus_add_watch(bus, GstBusMessageCb, this);
         gst_object_unref(bus);
+        qDebug() << "Created pipeline and added bus watch";
 
         gst_bin_add_many(reinterpret_cast<GstBin *>(m_pipeline), audioSrc,
                          /*audiowebrtcdsp,audiowebrtcechoprobe,*/
@@ -147,12 +155,14 @@ bool GstreamRecorder::createPipe()
                                    audioOutput, nullptr)) {
             objectUnref(m_pipeline);
             m_pipeline = nullptr;
-            qCritical() << "gst_element_link_many error";
+            qCritical() << "Failed to link pipeline elements";
             return success;
         }
+        qDebug() << "Successfully linked all pipeline elements";
         success = true;
     } while (!success);
     if (!success) {
+        qWarning() << "Pipeline creation failed, cleaning up elements";
         objectUnref(audioSrc);
         objectUnref(audioResample);
         objectUnref(audioConvert);
@@ -170,9 +180,11 @@ bool GstreamRecorder::createPipe()
  */
 void GstreamRecorder::deinit()
 {
+    qDebug() << "Deinitializing GstreamRecorder...";
     stopRecord();
     objectUnref(m_pipeline);
     gst_deinit();
+    qDebug() << "GstreamRecorder deinitialized";
 }
 
 /**
@@ -204,10 +216,14 @@ void GstreamRecorder::GetGstState(int *state, int *pending)
  */
 bool GstreamRecorder::startRecord()
 {
-    if (m_pipeline == nullptr && !createPipe())
+    qDebug() << "Starting recording...";
+    if (m_pipeline == nullptr && !createPipe()) {
+        qCritical() << "Failed to create pipeline for recording";
         return false;
+    }
 
     if (!m_format.isValid()) {
+        qDebug() << "Initializing audio format";
         initFormat();
     }
 
@@ -215,15 +231,18 @@ bool GstreamRecorder::startRecord()
     int pending = -1;
     GetGstState(&state, &pending);
     if (state == GST_STATE_PLAYING) {
+        qDebug() << "Pipeline already in playing state";
         return true;
     } else if (state == GST_STATE_PAUSED) {
+        qDebug() << "Resuming from paused state";
         gst_element_set_state(m_pipeline, GST_STATE_PLAYING);
         return true;
     }
     if (gst_element_set_state(m_pipeline, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
-        qCritical() << "start error";
+        qCritical() << "Failed to set pipeline to playing state";
         return false;
     }
+    qDebug() << "Recording started successfully";
     return true;
 }
 
@@ -232,8 +251,10 @@ bool GstreamRecorder::startRecord()
  */
 void GstreamRecorder::stopRecord()
 {
+    qDebug() << "Stopping recording...";
     if (m_pipeline) {
         setStateToNull();
+        qDebug() << "Recording stopped";
     }
 }
 
@@ -242,6 +263,7 @@ void GstreamRecorder::stopRecord()
  */
 void GstreamRecorder::pauseRecord()
 {
+    qDebug() << "Pausing recording...";
     if (m_pipeline != nullptr) {
         int state = -1;
         int pending = -1;
@@ -249,6 +271,7 @@ void GstreamRecorder::pauseRecord()
 
         if (state == GST_STATE_PLAYING) {
             gst_element_set_state(m_pipeline, GST_STATE_PAUSED);
+            qDebug() << "Recording paused";
         }
     }
 }
@@ -260,12 +283,12 @@ void GstreamRecorder::pauseRecord()
 void GstreamRecorder::setDevice(const QString &device)
 {
     if (device != m_currentDevice) {
+        qDebug() << "Changing audio device from" << m_currentDevice << "to" << device;
         m_currentDevice = device;
         if (m_pipeline != nullptr) {
             GstElement *audioSrc = gst_bin_get_by_name(reinterpret_cast<GstBin *>(m_pipeline), "audioSrc");
             g_object_set(reinterpret_cast<gpointer *>(audioSrc), "device", device.toLatin1().data(), nullptr);
         }
-        qInfo() << device;
     }
 }
 
@@ -275,6 +298,7 @@ void GstreamRecorder::setDevice(const QString &device)
  */
 void GstreamRecorder::setOutputFile(const QString &path)
 {
+    qDebug() << "Setting output file to:" << path;
     m_outputFile = path;
     if (m_pipeline != nullptr) {
         GstElement *audioSink = gst_bin_get_by_name(reinterpret_cast<GstBin *>(m_pipeline), "filesink");
@@ -299,13 +323,14 @@ bool GstreamRecorder::doBusMessage(GstMessage *message)
         gst_message_parse_error(message, &error, &dbg);
 
         if (dbg) {
+            qDebug() << "Debug info:" << dbg;
             g_free(dbg);
         }
 
         if (error) {
             QString errMsg = error->message;
             emit errorMsg(errMsg);
-            qCritical() << "Got pipeline error:" << errMsg;
+            qCritical() << "Pipeline error:" << errMsg;
             g_error_free(error);
         }
         break;
@@ -334,6 +359,7 @@ bool GstreamRecorder::doBufferProbe(GstBuffer *buffer)
             data = QByteArray(reinterpret_cast<const char *>(info.data),
                               static_cast<int>(info.size));
             gst_buffer_unmap(buffer, &info);
+            qDebug() << "Processed audio buffer at position:" << position << "ms, size:" << data.size() << "bytes";
         } else {
             return true;
         }
@@ -367,6 +393,7 @@ void GstreamRecorder::bufferProbed()
  */
 void GstreamRecorder::setStateToNull()
 {
+    qDebug() << "Setting pipeline state to NULL...";
     GstState cur_state = GST_STATE_NULL, pending = GST_STATE_NULL;
     gst_element_get_state(m_pipeline, &cur_state, &pending, 0);
     if (cur_state == GST_STATE_NULL) {
@@ -378,6 +405,7 @@ void GstreamRecorder::setStateToNull()
     gst_element_set_state(m_pipeline, GST_STATE_READY);
     gst_element_get_state(m_pipeline, nullptr, nullptr, static_cast<GstClockTime>(-1));
     gst_element_set_state(m_pipeline, GST_STATE_NULL);
+    qDebug() << "Pipeline state set to NULL";
 }
 
 /**
@@ -385,11 +413,16 @@ void GstreamRecorder::setStateToNull()
  */
 void GstreamRecorder::initFormat()
 {
+    qDebug() << "Initializing audio format...";
     //通道，采样率
     m_format.setChannelCount(2);
     m_format.setSampleRate(44100);
     //lamemp3enc 编码器插件格式为S16LE
     m_format.setSampleFormat(QAudioFormat::Int16);
+    qDebug() << "Audio format initialized:"
+             << "\n  - Channels:" << m_format.channelCount()
+             << "\n  - Sample rate:" << m_format.sampleRate()
+             << "\n  - Sample format:" << m_format.sampleFormat();
 }
 /**
  * @brief GstreamRecorder::objectUnref
