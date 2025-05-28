@@ -38,11 +38,14 @@ void WebRichTextManager::initConnect()
 
 void WebRichTextManager::setData(VNoteItem *data, const QString reg)
 {
+    qDebug() << "Setting rich text data";
     m_updateTimer->stop();
     //设置富文本内容
     if (data->htmlCode.isEmpty()) {
+        qDebug() << "Initializing with metadata";
         emit JsContent::instance()->callJsInitData(data->metaDataRef().toString());
     } else {
+        qDebug() << "Setting HTML content";
         emit JsContent::instance()->callJsSetHtml(data->htmlCode);
     }
     m_updateTimer->start();
@@ -65,10 +68,13 @@ void WebRichTextManager::updateNote()
 
 void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &result)
 {
+    qDebug() << "Updating note with result";
     data->htmlCode = result;
     VNoteItemOper noteOps(data);
     if (!noteOps.updateNote()) {
-        qInfo() << "Save note error";
+        qWarning() << "Failed to save note";
+    } else {
+        qDebug() << "Note saved successfully";
     }
     m_textChange = false;
     emit finishedUpdateNote();
@@ -76,6 +82,7 @@ void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &
 
 void WebRichTextManager::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
 {
+    qDebug() << "Inserting voice item, path:" << voicePath << "size:" << voiceSize;
     VNVoiceBlock data;
     data.ptrVoice->voiceSize = voiceSize;
     data.ptrVoice->voicePath = voicePath;
@@ -87,6 +94,7 @@ void WebRichTextManager::insertVoiceItem(const QString &voicePath, qint64 voiceS
     parse.makeMetaData(&data, value);
 
     emit JsContent::instance()->callJsInsertVoice(value.toString());
+    qDebug() << "Voice item inserted successfully";
 }
 
 /**
@@ -95,11 +103,14 @@ void WebRichTextManager::insertVoiceItem(const QString &voicePath, qint64 voiceS
  */
 void WebRichTextManager::onLoadFinsh()
 {
+    qDebug() << "Web communication established";
     //再次设置笔记内容
     if (m_noteData && !m_loadFinshSign) {
         if (m_noteData->htmlCode.isEmpty()) {
+            qDebug() << "Initializing with metadata after load";
             emit JsContent::instance()->callJsInitData(m_noteData->metaDataRef().toString());
         } else {
+            qDebug() << "Setting HTML content after load";
             emit JsContent::instance()->callJsSetHtml(m_noteData->htmlCode);
         }
     }
@@ -108,16 +119,16 @@ void WebRichTextManager::onLoadFinsh()
 
 void WebRichTextManager::clearJSContent()
 {
-    // if (this->isVisible()) {
-        connect(JsContent::instance(), &JsContent::setDataFinsh, this, &WebRichTextManager::onSetDataFinsh);
-        emit JsContent::instance()->callJsSetHtml("");
+    qDebug() << "Clearing JS content";
+    connect(JsContent::instance(), &JsContent::setDataFinsh, this, &WebRichTextManager::onSetDataFinsh);
+    emit JsContent::instance()->callJsSetHtml("");
 
-        // 开启100ms事件循环，保证js页面内容被刷新
-        QEventLoop eveLoop;
-        QTimer::singleShot(100, &eveLoop, SLOT(quit()));
-        eveLoop.exec();
-        disconnect(JsContent::instance(), &JsContent::setDataFinsh, this, &WebRichTextManager::onSetDataFinsh);
-    // }
+    // 开启100ms事件循环，保证js页面内容被刷新
+    QEventLoop eveLoop;
+    QTimer::singleShot(100, &eveLoop, SLOT(quit()));
+    eveLoop.exec();
+    disconnect(JsContent::instance(), &JsContent::setDataFinsh, this, &WebRichTextManager::onSetDataFinsh);
+    qDebug() << "JS content cleared";
 }
 
 void WebRichTextManager::onSetDataFinsh()

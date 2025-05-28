@@ -16,13 +16,14 @@
 VNOTE_FOLDERS_MAP::~VNOTE_FOLDERS_MAP()
 {
     if (autoRelease) {
-        qInfo() << __FUNCTION__ << "Auto release folders";
+        qDebug() << "Auto releasing" << folders.size() << "folders";
 
         for (auto it : folders) {
             delete reinterpret_cast<VNoteFolder *>(it);
         }
 
         folders.clear();
+        qDebug() << "All folders released";
     }
 }
 
@@ -32,13 +33,14 @@ VNOTE_FOLDERS_MAP::~VNOTE_FOLDERS_MAP()
 VNOTE_ITEMS_MAP::~VNOTE_ITEMS_MAP()
 {
     if (autoRelease) {
-        qInfo() << __FUNCTION__ << "Auto release folder notes";
+        qDebug() << "Auto releasing" << folderNotes.size() << "notes from folder";
 
         for (auto it : folderNotes) {
             delete reinterpret_cast<VNoteItem *>(it);
         }
 
         folderNotes.clear();
+        qDebug() << "All folder notes released";
     }
 }
 
@@ -48,13 +50,14 @@ VNOTE_ITEMS_MAP::~VNOTE_ITEMS_MAP()
 VNOTE_ALL_NOTES_MAP::~VNOTE_ALL_NOTES_MAP()
 {
     if (autoRelease) {
-        qInfo() << __FUNCTION__ << "Auto release all notes in folders ";
+        qDebug() << "Auto releasing all notes from" << notes.size() << "folders";
 
         for (auto it : notes) {
             delete reinterpret_cast<VNOTE_ITEMS_MAP *>(it);
         }
 
         notes.clear();
+        qDebug() << "All notes released";
     }
 }
 
@@ -63,9 +66,11 @@ VNOTE_ALL_NOTES_MAP::~VNOTE_ALL_NOTES_MAP()
  */
 VNOTE_DATAS::~VNOTE_DATAS()
 {
+    qDebug() << "Releasing" << datas.size() << "data blocks";
     for (auto it : datas) {
         delete it;
     }
+    qDebug() << "All data blocks released";
 }
 
 /**
@@ -88,8 +93,12 @@ VNoteBlock *VNOTE_DATAS::newBlock(int type)
 
     if (type == VNoteBlock::Text) {
         ptrBlock = new VNTextBlock();
+        qDebug() << "Created new text block";
     } else if (type == VNoteBlock::Voice) {
         ptrBlock = new VNVoiceBlock();
+        qDebug() << "Created new voice block";
+    } else {
+        qWarning() << "Attempted to create block with unknown type:" << type;
     }
 
     return ptrBlock;
@@ -124,8 +133,8 @@ void VNOTE_DATAS::addBlock(VNoteBlock *before, VNoteBlock *block)
             datas.insert(index + 1, block);
         } else {
             datas.append(block);
-            qInfo() << "Block not in datas:" << before
-                    << " append at end:" << block;
+            qWarning() << "Block not found in datas:" << before 
+                      << "appending new block at end:" << block;
         }
     } else {
         datas.insert(0, block);
@@ -145,6 +154,8 @@ void VNOTE_DATAS::delBlock(VNoteBlock *block)
 
     if (index != -1) {
         datas.remove(index);
+    } else {
+        qWarning() << "Block not found in datas for deletion:" << block;
     }
 
     //Remove the block from classification data set
@@ -161,10 +172,12 @@ void VNOTE_DATAS::classifyAddBlk(VNoteBlock *block)
 {
     if (VNoteBlock::Text == block->getType()) {
         textBlocks.push_back(block);
+        qDebug() << "Added text block to text blocks collection";
     } else if (VNoteBlock::Voice == block->getType()) {
         voiceBlocks.push_back(block);
+        qDebug() << "Added voice block to voice blocks collection";
     } else {
-        qCritical() << __FUNCTION__ << "Unknown VNoteBlock type " << block->getType();
+        qCritical() << "Unknown VNoteBlock type:" << block->getType();
     }
 }
 
@@ -177,17 +190,23 @@ void VNOTE_DATAS::classifyDelBlk(VNoteBlock *block)
     if (VNoteBlock::Text == block->getType()) {
         int index = textBlocks.indexOf(block);
 
-        if (textBlocks.indexOf(block) != -1) {
+        if (index != -1) {
             textBlocks.remove(index);
+            qDebug() << "Removed text block from text blocks collection at index" << index;
+        } else {
+            qWarning() << "Text block not found in text blocks collection:" << block;
         }
     } else if (VNoteBlock::Voice == block->getType()) {
         int index = voiceBlocks.indexOf(block);
 
-        if (voiceBlocks.indexOf(block) != -1) {
+        if (index != -1) {
             voiceBlocks.remove(index);
+            qDebug() << "Removed voice block from voice blocks collection at index" << index;
+        } else {
+            qWarning() << "Voice block not found in voice blocks collection:" << block;
         }
     } else {
-        qCritical() << __FUNCTION__ << "Unknown VNoteBlock type " << block->getType();
+        qCritical() << "Unknown VNoteBlock type:" << block->getType();
     }
 
     //Don't need delete the block anymore,

@@ -16,6 +16,7 @@
  */
 MetaDataParser::MetaDataParser()
 {
+    qDebug() << "Initializing MetaDataParser";
 }
 
 /**
@@ -39,9 +40,11 @@ void MetaDataParser::parse(const QVariant &metaData, VNoteItem *noteData)
  */
 bool MetaDataParser::parse(const QVariant &metaData, VNoteBlock *blockData)
 {
+    qDebug() << "Starting metadata parsing for block";
     QJsonDocument noteDoc = QJsonDocument::fromJson(metaData.toByteArray());
     //不是可解析的json字符串
     if (noteDoc.toJson().isEmpty()) {
+        qWarning() << "Invalid JSON data received for block parsing";
         return false;
     }
     QJsonObject note = noteDoc.object();
@@ -50,6 +53,7 @@ bool MetaDataParser::parse(const QVariant &metaData, VNoteBlock *blockData)
 
     //不是需要的解析类型
     if (VNoteBlock::InValid == noteType) {
+        qWarning() << "Invalid block type received:" << noteType;
         return false;
     }
     blockData->blockType = noteType;
@@ -65,8 +69,14 @@ bool MetaDataParser::parse(const QVariant &metaData, VNoteBlock *blockData)
         blockData->ptrVoice->voiceSize = note.value(m_jsonNodeNameMap[NVoiceSize]).toInt(0);
         blockData->ptrVoice->createTime = QDateTime::fromString(
             note.value(m_jsonNodeNameMap[NCreateTime]).toString(), VNOTE_TIME_FMT);
+        qDebug() << "Parsed voice block:"
+                 << "\n  - Title:" << blockData->ptrVoice->voiceTitle
+                 << "\n  - Path:" << blockData->ptrVoice->voicePath
+                 << "\n  - Size:" << blockData->ptrVoice->voiceSize
+                 << "\n  - State:" << blockData->ptrVoice->state;
     } else {
         //其他类型
+        qWarning() << "Unsupported block type:" << noteType;
         return false;
     }
     return true;
@@ -87,6 +97,7 @@ void MetaDataParser::makeMetaData(VNoteItem *noteData, QVariant &metaData)
 
 void MetaDataParser::makeMetaData(const VNoteBlock *blockData, QVariant &metaData)
 {
+    qDebug() << "Starting metadata generation for block";
     QJsonDocument noteDoc;
     QJsonObject note;
     qint32 noteType = blockData->blockType;
@@ -94,6 +105,8 @@ void MetaDataParser::makeMetaData(const VNoteBlock *blockData, QVariant &metaDat
         note.insert(m_jsonNodeNameMap[NDataType], blockData->blockType);
         if (VNoteBlock::Text == noteType) {
             note.insert(m_jsonNodeNameMap[NText], blockData->ptrText->blockText);
+            qDebug() << "Generated metadata for text block with content length:" 
+                     << blockData->ptrText->blockText.length();
         } else if (VNoteBlock::Voice == noteType) {
             note.insert(m_jsonNodeNameMap[NText], blockData->ptrVoice->blockText);
             note.insert(m_jsonNodeNameMap[NTitle], blockData->ptrVoice->voiceTitle);
@@ -103,7 +116,13 @@ void MetaDataParser::makeMetaData(const VNoteBlock *blockData, QVariant &metaDat
             note.insert(m_jsonNodeNameMap[NCreateTime],
                         blockData->ptrVoice->createTime.toString(VNOTE_TIME_FMT));
             note.insert(m_jsonNodeNameMap[NFormatSize], Utils::formatMillisecond(blockData->ptrVoice->voiceSize));
+            qDebug() << "Generated metadata for voice block:"
+                     << "\n  - Title:" << blockData->ptrVoice->voiceTitle
+                     << "\n  - Path:" << blockData->ptrVoice->voicePath
+                     << "\n  - Size:" << blockData->ptrVoice->voiceSize;
         }
+    } else {
+        qWarning() << "Attempted to generate metadata for invalid block type";
     }
     noteDoc.setObject(note);
     metaData = noteDoc.toJson(QJsonDocument::Compact);
@@ -114,16 +133,17 @@ void MetaDataParser::makeMetaData(const VNoteBlock *blockData, QVariant &metaDat
 void MetaDataParser::xmlParse(const QVariant &metaData, VNoteItem *noteData)
 {
     Q_ASSERT(nullptr != noteData);
+    qDebug() << "Starting XML metadata parsing";
 
     QXmlStreamReader xmlStreamReader(metaData.toString());
 
     while (xmlStreamReader.readNextStartElement()) {
         if (m_xmlNodeNameMap[NRootNode] == xmlStreamReader.name()) {
             xmlParseRoot(xmlStreamReader, noteData);
-
         } else if (m_xmlNodeNameMap[NItemNode] == xmlStreamReader.name()) {
             xmlParseNoteItem(xmlStreamReader, noteData);
         } else {
+            qDebug() << "Skipping unknown XML element:" << xmlStreamReader.name();
             xmlStreamReader.skipCurrentElement();
         }
     }
@@ -132,6 +152,7 @@ void MetaDataParser::xmlParse(const QVariant &metaData, VNoteItem *noteData)
 void MetaDataParser::xmlMakeMetadata(const VNoteItem *noteData, QVariant &metaData)
 {
     Q_ASSERT(nullptr != noteData);
+    qDebug() << "Starting XML metadata generation";
 
     QString strMetaData = metaData.toString();
     QXmlStreamWriter xmlStreamWriter(&strMetaData);
@@ -171,8 +192,7 @@ void MetaDataParser::xmlMakeMetadata(const VNoteItem *noteData, QVariant &metaDa
 
                 xmlStreamWriter.writeEndElement();
             } else {
-                //Must never reach here
-                qInfo() << "Invalid VoiceBlock:" << it->getType();
+                qWarning() << "Invalid block type encountered:" << it->getType();
             }
         }
     }
@@ -181,10 +201,12 @@ void MetaDataParser::xmlMakeMetadata(const VNoteItem *noteData, QVariant &metaDa
     xmlStreamWriter.writeEndDocument();
 
     metaData = strMetaData;
+    qDebug() << "XML metadata generation completed";
 }
 
 void MetaDataParser::xmlParseRoot(QXmlStreamReader &xmlSRead, VNoteItem *noteData)
 {
+    qDebug() << "Parsing XML root element";
     QXmlStreamAttributes noteItemCountAttr = xmlSRead.attributes();
 
     if (noteItemCountAttr.hasAttribute(m_xmlNodeNameMap[NItemCountAttr])) {
@@ -194,6 +216,7 @@ void MetaDataParser::xmlParseRoot(QXmlStreamReader &xmlSRead, VNoteItem *noteDat
 
     if (noteItemCountAttr.hasAttribute(m_xmlNodeNameMap[NVoiceMaxIdAttr])) {
         noteData->maxVoiceIdRef() = noteItemCountAttr.value(m_xmlNodeNameMap[NVoiceMaxIdAttr]).toInt();
+        qDebug() << "Set max voice ID to:" << noteData->maxVoiceIdRef();
     }
 }
 
@@ -205,6 +228,7 @@ void MetaDataParser::xmlParseNoteItem(QXmlStreamReader &xmlSRead, VNoteItem *not
 
     if (noteItemTypeAttr.hasAttribute(m_xmlNodeNameMap[NItemTypeAttr])) {
         noteItemType = noteItemTypeAttr.value(m_xmlNodeNameMap[NItemTypeAttr]).toInt();
+        qDebug() << "Parsing note item of type:" << noteItemType;
     }
 
     if (noteItemType != VNoteBlock::InValid) {
@@ -240,6 +264,9 @@ void MetaDataParser::xmlParseNoteItem(QXmlStreamReader &xmlSRead, VNoteItem *not
 
         //Parse note item end
         noteData->datas.addBlock(ptrBlock);
+        qDebug() << "Added parsed block to note data";
+    } else {
+        qWarning() << "Invalid note item type encountered";
     }
 }
 
@@ -254,6 +281,7 @@ void MetaDataParser::xmlParseNoteItem(QXmlStreamReader &xmlSRead, VNoteItem *not
 void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*out*/)
 {
     Q_ASSERT(nullptr != noteData);
+    qDebug() << "Starting JSON metadata parsing";
 
     QJsonDocument noteDoc = QJsonDocument::fromJson(metaData.toByteArray());
 
@@ -262,16 +290,19 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*o
 
     if (note.contains(m_jsonNodeNameMap[NHtmlCode])) {
         noteData->htmlCode = note.value(m_jsonNodeNameMap[NHtmlCode]).toString();
+        qDebug() << "Found HTML code with length:" << noteData->htmlCode.length();
         return;
     }
 
     //Get default voice max id
     if (note.contains(m_jsonNodeNameMap[NVoiceMaxId])) {
         noteData->maxVoiceIdRef() = note.value(m_jsonNodeNameMap[NVoiceMaxId]).toInt(0);
+        qDebug() << "Set max voice ID to:" << noteData->maxVoiceIdRef();
     }
 
     if (note.contains(m_jsonNodeNameMap[NDatas])) {
         noteDatas = note.value(m_jsonNodeNameMap[NDatas]).toArray();
+        qDebug() << "Found" << noteDatas.size() << "data blocks to parse";
     }
 
     //Parse the note datas
@@ -283,6 +314,7 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*o
         int noteType = noteItem.value(m_jsonNodeNameMap[NDataType]).toInt(VNoteBlock::InValid);
 
         if (VNoteBlock::InValid != noteType) {
+            qDebug() << "Parsing block of type:" << noteType;
             //Allocate block
             ptrBlock = noteData->datas.newBlock(noteType);
 
@@ -299,8 +331,11 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*o
             }
 
             noteData->datas.addBlock(ptrBlock);
+        } else {
+            qWarning() << "Invalid block type encountered:" << noteType;
         }
     }
+    qDebug() << "JSON metadata parsing completed";
 }
 
 /**
@@ -311,6 +346,7 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*o
 void MetaDataParser::jsonMakeMetadata(VNoteItem *noteData, QVariant &metaData)
 {
     Q_ASSERT(nullptr != noteData);
+    qDebug() << "Starting JSON metadata generation";
 
     QJsonDocument noteDoc;
 
@@ -320,6 +356,7 @@ void MetaDataParser::jsonMakeMetadata(VNoteItem *noteData, QVariant &metaData)
     bool htmlIsEmpty = noteData->htmlCode.isEmpty();
     QList<VNoteBlock *> delBlocks;
 
+    qDebug() << "Processing" << noteCount << "data blocks";
     for (auto it : noteData->datas.datas) {
         int noteType = it->getType();
 
@@ -344,11 +381,14 @@ void MetaDataParser::jsonMakeMetadata(VNoteItem *noteData, QVariant &metaData)
             }
 
             noteDatas.append(noteItem);
+        } else {
+            qWarning() << "Invalid block type encountered:" << noteType;
         }
     }
 
     if (!htmlIsEmpty) {
         note.insert(m_jsonNodeNameMap[NHtmlCode], noteData->htmlCode);
+        qDebug() << "Including HTML code with length:" << noteData->htmlCode.length();
         for (auto it : delBlocks) {
             noteData->delBlock(it);
         }
@@ -359,9 +399,8 @@ void MetaDataParser::jsonMakeMetadata(VNoteItem *noteData, QVariant &metaData)
     }
     noteDoc.setObject(note);
 
-    //qDebug() << noteDoc.toJson();
-
     metaData = noteDoc.toJson(QJsonDocument::Compact);
+    qDebug() << "JSON metadata generation completed";
 }
 
 #endif

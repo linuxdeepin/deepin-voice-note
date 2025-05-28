@@ -9,6 +9,7 @@
 // #include "vnoteapplication.h"
 
 #include <DGuiApplicationHelper>
+#include <DLog>
 
 #include <QImageReader>
 #include <QIcon>
@@ -34,6 +35,9 @@ QString Utils::convertDateTime(const QDateTime &dateTime)
     QDate folerDate = dateTime.date();
     QString disptime;
     qint64 offset = folerDate.daysTo(currDateTime);
+    
+    qDebug() << "Converting date time:" << dateTime.toString() << "offset days:" << offset;
+    
     if (0 == offset) {
         qint64 offsetSec = dateTime.secsTo(QDateTime::currentDateTime());
         if (offsetSec < 3600) {
@@ -43,17 +47,22 @@ QString Utils::convertDateTime(const QDateTime &dateTime)
             } else {
                 disptime = DApplication::translate("Utils", "%1 mins ago").arg(offsetSec);
             }
+            qDebug() << "Time is" << offsetSec << "minutes ago";
         } else {
             disptime = dateTime.toString("hh:mm");
+            qDebug() << "Time is today at" << disptime;
         }
     } else if (1 == offset) {
         disptime = DApplication::translate("Utils", "Yesterday") + " " + dateTime.toString("hh:mm");
+        qDebug() << "Time is yesterday at" << dateTime.toString("hh:mm");
     } else if (folerDate.year() == currDateTime.year()) {
         //不跨年 其他时间：MM-DD（例如：9-27）；
         disptime = dateTime.toString("MM-dd");
+        qDebug() << "Time is this year on" << disptime;
     } else {
         //跨年:YYYY-MM-DD（例如2018-9-26）；
         disptime = dateTime.toString("yyyy-MM-dd");
+        qDebug() << "Time is on" << disptime;
     }
 
     return disptime;
@@ -68,6 +77,8 @@ QString Utils::convertDateTime(const QDateTime &dateTime)
  */
 QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplication *pApp)
 {
+    qDebug() << "Rendering SVG:" << filePath << "with size:" << size;
+    
     QImageReader reader;
     QPixmap pixmap;
 
@@ -79,7 +90,9 @@ QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplicatio
         reader.setScaledSize(size * ratio);
         pixmap = QPixmap::fromImage(reader.read());
         pixmap.setDevicePixelRatio(ratio);
+        qDebug() << "SVG rendered successfully with ratio:" << ratio;
     } else {
+        qWarning() << "Failed to read SVG file:" << filePath;
         pixmap.load(filePath);
     }
 
@@ -94,6 +107,8 @@ QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplicatio
  */
 QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
 {
+    qDebug() << "Loading SVG:" << fileName << "common:" << fCommon;
+    
     DGuiApplicationHelper::ColorType theme =
         DGuiApplicationHelper::instance()->themeType();
 
@@ -108,6 +123,7 @@ QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
     }
 
     iconPath += fileName;
+    qDebug() << "Full icon path:" << iconPath;
 
     qreal ratio = 1.0;
 
@@ -122,9 +138,13 @@ QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
             reader.setScaledSize(reader.size() * (devicePixelRatio / ratio));
             pixmap = QPixmap::fromImage(reader.read());
             pixmap.setDevicePixelRatio(devicePixelRatio);
+            qDebug() << "SVG loaded with device pixel ratio:" << devicePixelRatio;
+        } else {
+            qWarning() << "Failed to read SVG file:" << iconPath;
         }
     } else {
         pixmap.load(iconPath);
+        qDebug() << "SVG loaded with default ratio";
     }
 
     return pixmap;
@@ -141,10 +161,13 @@ QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
 int Utils::highTextEdit(QTextDocument *textDoc, const QString &searchKey,
                         const QColor &highColor, bool undo)
 {
+    qDebug() << "Highlighting text with key:" << searchKey << "color:" << highColor.name() << "undo:" << undo;
+    
     int findCount = 0;
     int len = searchKey.length();
     if (undo == true) {
         textDoc->undo();
+        qDebug() << "Undid previous operation";
     }
     if (len != 0) {
         QTextCursor highlightCursor(textDoc);
@@ -168,6 +191,7 @@ int Utils::highTextEdit(QTextDocument *textDoc, const QString &searchKey,
             }
         }
         cursor.endEditBlock();
+        qDebug() << "Found" << findCount << "matches";
     }
 
     return findCount;
@@ -181,14 +205,18 @@ int Utils::highTextEdit(QTextDocument *textDoc, const QString &searchKey,
  */
 QString Utils::formatMillisecond(qint64 millisecond, qint64 minValue)
 {
+    qDebug() << "Formatting millisecond:" << millisecond << "min value:" << minValue;
+    
     qint64 curSecond = millisecond / 1000;
     if (curSecond < minValue) {
         curSecond = minValue;
+        qDebug() << "Adjusted to minimum value:" << minValue;
     }
     if (curSecond < 3600) {
         return QDateTime::fromSecsSinceEpoch(static_cast<qint64>(curSecond)).toUTC().toString("hh:mm:ss");
     }
 
+    qDebug() << "Time exceeds 1 hour, returning maximum value";
     return QString("60:00:00");
 }
 
@@ -199,6 +227,8 @@ QString Utils::formatMillisecond(qint64 millisecond, qint64 minValue)
  */
 void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
 {
+    qDebug() << "Converting document to block";
+    
     if (block != nullptr) {
         block->blockText = "";
     }
@@ -212,7 +242,7 @@ void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
                                QTextImageFormat newImageFormat = currentFragment.charFormat().toImageFormat();
                                if (newImageFormat.isValid()) {
                                    int pos = currentFragment.position();
-                                   qDebug() << "image block:" << pos <<"url;" << newImageFormat.name();
+                                   qDebug() << "Found image at position:" << pos << "url:" << newImageFormat.name();
                                    ++it;
                                    continue;
                                }
@@ -228,6 +258,7 @@ void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
 
             block->blockText.append('\n');
         }
+        qDebug() << "Document converted to block, text length:" << block->blockText.length();
     }
 }
 
@@ -238,8 +269,11 @@ void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
  */
 void Utils::blockToDocument(const VNoteBlock *block, QTextDocument *doc)
 {
+    qDebug() << "Converting block to document";
+    
     if (block && doc) {
         doc->setPlainText(block->blockText);
+        qDebug() << "Block converted to document, text length:" << block->blockText.length();
     }
 }
 
@@ -250,6 +284,8 @@ void Utils::blockToDocument(const VNoteBlock *block, QTextDocument *doc)
  */
 void Utils::setDefaultColor(QTextDocument *srcDoc, const QColor &color)
 {
+    qDebug() << "Setting default color:" << color.name();
+    
     QTextCursor cursor(srcDoc);
     cursor.movePosition(QTextCursor::Start);
     cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
@@ -282,10 +318,13 @@ void Utils::setTitleBarTabFocus(QKeyEvent *event)
  */
 bool Utils::pictureToBase64(QString imgPath, QString &base64)
 {
+    qDebug() << "Converting picture to base64:" << imgPath;
+    
     //加载图片，目前的参考格式为（bmp, jpg, png, jpeg, gif, ico）
     QImage img(imgPath, "bmp, jpg, png, jpeg, gif, ico");
     //非本地文件返回空字符串
     if (img.isNull()) {
+        qWarning() << "Failed to load image:" << imgPath;
         return false;
     }
 
@@ -296,16 +335,20 @@ bool Utils::pictureToBase64(QString imgPath, QString &base64)
     //设置图片最大宽度
     int width = qMin(img.width(), 712);
     int height = img.height();
+    qDebug() << "Image dimensions:" << width << "x" << height;
 
     //等比例缩放图片
     img.scaled(width, height, Qt::KeepAspectRatio, Qt::SmoothTransformation).save(&buf, qPrintable(fileInfo.suffix()));
     //图片转base64
     base64 = QString("data:image/%1;base64," + ba.toBase64()).arg(fileInfo.suffix());
+    qDebug() << "Image converted to base64, size:" << base64.length();
     return true;
 }
 
 bool Utils::isLoongsonPlatform()
 {
+    qDebug() << "Checking if platform is Loongson";
+    
     static QString cpuModeName = "";
     if (cpuModeName.isEmpty()) {
         QProcess process;
@@ -315,9 +358,11 @@ bool Utils::isLoongsonPlatform()
             QString result = process.readAllStandardOutput();
             if (result.contains("Loongson")) {
                 cpuModeName = "Loongson";
+                qDebug() << "Platform is Loongson";
                 return true;
             }
             cpuModeName = "other";
+            qDebug() << "Platform is not Loongson";
         }
     }
     return cpuModeName.contains("Loongson");
@@ -331,6 +376,7 @@ bool Utils::isLoongsonPlatform()
  */
 QString Utils::filteredFileName(QString fileName, const QString &defaultName)
 {
+    qDebug() << "Filtering file name:" << fileName << "default:" << defaultName;
     //使用正则表达式除去不符合规范的字符并清理文件名两端的空白字符，中间的空白字符不做处理
     // QString name = fileName.replace(QRegExp("[\"\'\\[\\]\\\\/:|<>+=;,?*]"), "").trimmed();
     // if (name.isEmpty()) {

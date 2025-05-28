@@ -59,6 +59,7 @@ DWIDGET_USE_NAMESPACE
 VlcPlayer::VlcPlayer(QObject *parent)
     : VoicePlayerBase(parent)
 {
+    qDebug() << "Initializing VlcPlayer";
 #ifdef MPV_PLAYENGINE
     init();
 #endif
@@ -69,6 +70,7 @@ VlcPlayer::VlcPlayer(QObject *parent)
  */
 VlcPlayer::~VlcPlayer()
 {
+    qDebug() << "Destroying VlcPlayer";
     deinit();
 }
 
@@ -78,7 +80,7 @@ VlcPlayer::~VlcPlayer()
 void VlcPlayer::init()
 {
 #ifndef MPV_PLAYENGINE
-    qInfo() << "The current play engine is vlc";
+    qInfo() << "Initializing VLC player engine";
     if (m_vlcInst == nullptr)
     {
         m_vlcInst = g_voice_libvlc_new(0, nullptr);
@@ -92,7 +94,7 @@ void VlcPlayer::init()
         attachEvent();
     }
 #else
-    qInfo() << "The current play engine is mpv";
+    qInfo() << "Initializing MPV player engine";
     setlocale(LC_NUMERIC, "C");
     player = new dmr::PlayerEngine(nullptr);
     player->hide();
@@ -100,6 +102,7 @@ void VlcPlayer::init()
     connect(player, &dmr::PlayerEngine::elapsedChanged, this, &VlcPlayer::onGetCurrentPosition);
     connect(player, &dmr::PlayerEngine::stateChanged, this, &VlcPlayer::onGetState);
     connect(player, &dmr::PlayerEngine::fileLoaded, this, &VlcPlayer::onGetduration);
+    qDebug() << "MPV player initialized successfully";
 #endif
 }
 
@@ -108,41 +111,53 @@ void VlcPlayer::init()
  */
 void VlcPlayer::deinit()
 {
+    qDebug() << "Deinitializing player";
 #ifndef MPV_PLAYENGINE
     if (m_vlcPlayer)
     {
+        qDebug() << "Detaching VLC events";
         detachEvent();
         libvlc_media_t *media = g_voice_libvlc_media_player_get_media(m_vlcPlayer);
         if (media)
         {
             g_voice_libvlc_media_release(media);
+            qDebug() << "Released VLC media";
         }
         g_voice_libvlc_media_player_release(m_vlcPlayer);
         m_vlcPlayer = nullptr;
+        qDebug() << "Released VLC player";
     }
     if (m_vlcInst)
     {
         g_voice_libvlc_release(m_vlcInst);
         m_vlcInst = nullptr;
+        qDebug() << "Released VLC instance";
     }
 #else
     if (player != nullptr)
     {
+        qDebug() << "Cleaning up MPV player";
         player->hide();
         disconnect(player, &dmr::PlayerEngine::elapsedChanged, this, &VlcPlayer::onGetCurrentPosition);
         disconnect(player, &dmr::PlayerEngine::stateChanged, this, &VlcPlayer::onGetState);
         disconnect(player, &dmr::PlayerEngine::fileLoaded, this, &VlcPlayer::onGetduration);
         player->deleteLater();
+        qDebug() << "MPV player cleanup completed";
     }
 #endif
 }
 
 bool VlcPlayer::initVlcPlayer()
 {
+    qDebug() << "Initializing VLC player library";
     QLibrary library("libvlc.so.5");
-    if (!library.load())
+    if (!library.load()) {
+        qWarning() << "Failed to load libvlc.so.5";
         return false;
+    }
+    qDebug() << "VLC library loaded successfully";
 
+    // Resolve all function pointers
     g_voice_libvlc_media_player_event_manager = (voice_libvlc_media_player_event_manager)library.resolve("libvlc_media_player_event_manager");
     g_voice_libvlc_event_detach = (voice_libvlc_event_detach)library.resolve("libvlc_event_detach");
     g_voice_libvlc_media_player_get_media = (voice_libvlc_media_player_get_media)library.resolve("libvlc_media_player_get_media");
@@ -162,6 +177,8 @@ bool VlcPlayer::initVlcPlayer()
     g_voice_libvlc_media_player_stop = (voice_libvlc_media_player_stop)library.resolve("libvlc_media_player_stop");
     g_voice_libvlc_media_player_set_time = (voice_libvlc_media_player_set_time)library.resolve("libvlc_media_player_set_time");
     g_voice_libvlc_media_player_get_state = (voice_libvlc_media_player_get_state)library.resolve("libvlc_media_player_get_state");
+
+    qDebug() << "All VLC function pointers resolved successfully";
     return true;
 }
 
@@ -171,12 +188,16 @@ bool VlcPlayer::initVlcPlayer()
  */
 void VlcPlayer::attachEvent()
 {
+    qDebug() << "Attaching VLC events";
     libvlc_event_manager_t *vlc_evt_man = g_voice_libvlc_media_player_event_manager(m_vlcPlayer);
     if (vlc_evt_man)
     {
         g_voice_libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerEndReached, handleEvent, this);
         g_voice_libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerTimeChanged, handleEvent, this);
         g_voice_libvlc_event_attach(vlc_evt_man, libvlc_MediaPlayerLengthChanged, handleEvent, this);
+        qDebug() << "VLC events attached successfully";
+    } else {
+        qWarning() << "Failed to get VLC event manager";
     }
 }
 
@@ -185,12 +206,16 @@ void VlcPlayer::attachEvent()
  */
 void VlcPlayer::detachEvent()
 {
+    qDebug() << "Detaching VLC events";
     libvlc_event_manager_t *vlc_evt_man = g_voice_libvlc_media_player_event_manager(m_vlcPlayer);
     if (vlc_evt_man)
     {
         g_voice_libvlc_event_detach(vlc_evt_man, libvlc_MediaPlayerEndReached, handleEvent, this);
         g_voice_libvlc_event_detach(vlc_evt_man, libvlc_MediaPlayerTimeChanged, handleEvent, this);
         g_voice_libvlc_event_detach(vlc_evt_man, libvlc_MediaPlayerLengthChanged, handleEvent, this);
+        qDebug() << "VLC events detached successfully";
+    } else {
+        qWarning() << "Failed to get VLC event manager for detach";
     }
 }
 #endif
@@ -201,7 +226,7 @@ void VlcPlayer::detachEvent()
  */
 void VlcPlayer::setFilePath(QString path)
 {
-    qDebug() << "Current playback file: " << path;
+    qDebug() << "Setting media file path:" << path;
 #ifndef MPV_PLAYENGINE
     init();
     libvlc_media_t *media = g_voice_libvlc_media_new_path(m_vlcInst, path.toLatin1().constData());
@@ -209,11 +234,17 @@ void VlcPlayer::setFilePath(QString path)
     {
         g_voice_libvlc_media_player_set_media(m_vlcPlayer, media);
         g_voice_libvlc_media_release(media);
+        qDebug() << "Media file set successfully";
+    } else {
+        qWarning() << "Failed to create media from path:" << path;
     }
 #else
     if (player->isPlayableFile(path))
     {
         videoUrl = QUrl::fromLocalFile(path);
+        qDebug() << "MPV playable file set:" << path;
+    } else {
+        qWarning() << "File is not playable by MPV:" << path;
     }
 #endif
 }
@@ -223,22 +254,25 @@ void VlcPlayer::setFilePath(QString path)
  */
 void VlcPlayer::play()
 {
-    qInfo() << "Start playing audio";
+    qInfo() << "Starting playback";
 #ifndef MPV_PLAYENGINE
     if (m_vlcPlayer)
     {
-        qInfo() << "libvlc play ret:" << g_voice_libvlc_media_player_play(m_vlcPlayer);
+        int ret = g_voice_libvlc_media_player_play(m_vlcPlayer);
+        qDebug() << "VLC play result:" << ret;
+    } else {
+        qWarning() << "VLC player not initialized";
     }
 #else
-    qInfo() << "Current play engine status: " << player->state();
+    qDebug() << "MPV player state:" << player->state();
     if (player->state() == PlayerEngine::CoreState::Paused && !m_isChangePlayFile)
     {
-        qInfo() << "Pause start: " << videoUrl;
+        qDebug() << "Resuming paused playback:" << videoUrl;
         player->pauseResume();
     }
     else
     {
-        qInfo() << "Play new audio: " << videoUrl;
+        qDebug() << "Starting new playback:" << videoUrl;
         player->addPlayFile(videoUrl);
         player->playByName(videoUrl);
     }
@@ -250,14 +284,18 @@ void VlcPlayer::play()
  */
 void VlcPlayer::pause()
 {
-    qInfo() << "Pause play";
+    qInfo() << "Pausing playback";
 #ifndef MPV_PLAYENGINE
     if (m_vlcPlayer)
     {
         g_voice_libvlc_media_player_pause(m_vlcPlayer);
+        qDebug() << "VLC playback paused";
+    } else {
+        qWarning() << "VLC player not initialized";
     }
 #else
     player->pauseResume();
+    qDebug() << "MPV playback paused";
 #endif
 }
 
@@ -266,14 +304,18 @@ void VlcPlayer::pause()
  */
 void VlcPlayer::stop()
 {
-    qInfo() << "Stop playing";
+    qInfo() << "Stopping playback";
 #ifndef MPV_PLAYENGINE
     if (m_vlcPlayer)
     {
         g_voice_libvlc_media_player_stop(m_vlcPlayer);
+        qDebug() << "VLC playback stopped";
+    } else {
+        qWarning() << "VLC player not initialized";
     }
 #else
     player->stop();
+    qDebug() << "MPV playback stopped";
 #endif
 }
 #ifdef MPV_PLAYENGINE
@@ -291,20 +333,21 @@ void VlcPlayer::onGetCurrentPosition()
  */
 void VlcPlayer::onGetState()
 {
-    qInfo() << "Change the current audio playback status!(status: " << player->state() << ")";
+    qDebug() << "Player state changed:" << player->state();
     if (player->state() == PlayerEngine::CoreState::Idle && !m_isChangePlayFile)
     {
-        qInfo() << "The current audio playback is complete! (status: " << player->state() << ")";
+        qInfo() << "Playback completed";
         emit playEnd();
     }
     else if (player->state() == PlayerEngine::CoreState::Playing && m_isChangePlayFile)
     {
         m_isChangePlayFile = false;
+        qDebug() << "Playback resumed after file change";
     }
 }
 void VlcPlayer::onGetduration()
 {
-    qInfo() << "Total audio duration changed! (duration: " << player->duration() << ")";
+    qDebug() << "Duration changed:" << player->duration();
     emit durationChanged(player->duration());
 }
 #endif
@@ -322,18 +365,19 @@ void VlcPlayer::handleEvent(const libvlc_event_t *event, void *data)
     switch (event->type)
     {
     case libvlc_MediaPlayerEndReached:
-        qInfo() << "The current audio playback is complete!";
+        qInfo() << "Playback completed";
         emit userData->playEnd();
         break;
     case libvlc_MediaPlayerTimeChanged:
-        qInfo() << "The current play position has changed!";
+        qDebug() << "Position changed:" << event->u.media_player_time_changed.new_time;
         emit userData->positionChanged(event->u.media_player_time_changed.new_time);
         break;
     case libvlc_MediaPlayerLengthChanged:
-        qInfo() << "Total audio duration changed!";
+        qDebug() << "Duration changed:" << event->u.media_duration_changed.new_duration;
         emit userData->durationChanged(event->u.media_duration_changed.new_duration);
         break;
     default:
+        qDebug() << "Unhandled VLC event type:" << event->type;
         break;
     }
 }
@@ -345,14 +389,18 @@ void VlcPlayer::handleEvent(const libvlc_event_t *event, void *data)
  */
 void VlcPlayer::setPosition(qint64 pos)
 {
-    qInfo() << "Set the current audio playback position.(pos: " << pos << ")";
+    qDebug() << "Setting position:" << pos;
 #ifndef MPV_PLAYENGINE
     if (m_vlcPlayer)
     {
         g_voice_libvlc_media_player_set_time(m_vlcPlayer, pos);
+        qDebug() << "VLC position set successfully";
+    } else {
+        qWarning() << "VLC player not initialized";
     }
 #else
     player->seekAbsolute(pos);
+    qDebug() << "MPV position set successfully";
 #endif
 }
 
@@ -367,10 +415,12 @@ VoicePlayerBase::PlayerState VlcPlayer::getState()
     if (m_vlcPlayer)
     {
         state = static_cast<VlcPlayer::VlcState>(g_voice_libvlc_media_player_get_state(m_vlcPlayer));
+        qDebug() << "VLC player state:" << state;
+    } else {
+        qWarning() << "VLC player not initialized";
     }
-    qInfo() << "Gets the current audio status.(status: " << state << ")";
 #else
-    qInfo() << "Gets the current audio status.(status: " << player->state() << ")";
+    qDebug() << "MPV player state:" << player->state();
     if (player->state() == PlayerEngine::CoreState::Idle)
     {
         state = VlcPlayer::VlcState::Stopped;

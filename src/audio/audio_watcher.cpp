@@ -3,10 +3,12 @@
 AudioWatcher::AudioWatcher(QObject *parent)
     : QObject(parent)
 {
+    qDebug() << "Initializing AudioWatcher...";
     m_isVirtualMachineHw = isVirtualMachineHw();
     initWatcherCofing();
     initDeviceWacther();
     initConnections();
+    qDebug() << "AudioWatcher initialization completed";
 }
 
 /**
@@ -14,6 +16,7 @@ AudioWatcher::AudioWatcher(QObject *parent)
  */
 void AudioWatcher::initDeviceWacther()
 {
+    qDebug() << "Initializing audio device watcher...";
     m_audioDBusInterface = new QDBusInterface(AudioService,
                                               AudioPath,
                                               AudioInterface,
@@ -41,7 +44,7 @@ void AudioWatcher::initDeviceWacther()
                                               );
         updateDeviceEnabled(m_audioDBusInterface->property("CardsWithoutUnavailable").value<QString>(), false);
     } else {
-        qWarning() << "Initialization failed！Audio Services (" << AudioService << ") does not exist";
+        qCritical() << "Failed to initialize audio service. Audio service (" << AudioService << ") does not exist";
     }
 }
 
@@ -98,6 +101,8 @@ void AudioWatcher::updateDeviceEnabled(const QString cardsStr, bool isEmitSig)
     }else{
         qInfo() << "Current Audio Cards: "<< cards;
     }
+    qInfo() << "Updating audio device status. Found" << cards.size() << "audio cards";
+    
     m_outAuidoPorts.clear();
     m_inAuidoPorts.clear();
     foreach (QJsonValue card, cards) {
@@ -130,8 +135,13 @@ void AudioWatcher::updateDeviceEnabled(const QString cardsStr, bool isEmitSig)
     if (isEmitSig)
         sigDeviceEnableChanged(Internal, m_outIsEnable);
 
-    qInfo() << "current select in audioPort: "<< m_inAudioPort << ",is enable:" << m_inIsEnable;
-    qInfo() << "current select out audioPort: "<< m_outAudioPort << ",is enable:" << m_outIsEnable;
+    qInfo() << "Audio device status updated:"
+            << "\nInput device:"
+            << "\n  - Selected port:" << m_inAudioPort.name
+            << "\n  - Enabled:" << m_inIsEnable
+            << "\nOutput device:"
+            << "\n  - Selected port:" << m_outAudioPort.name
+            << "\n  - Enabled:" << m_outIsEnable;
 }
 
 AudioPort AudioWatcher::currentAuidoPort(const QList<AudioPort> &auidoPorts,AudioMode audioMode)
@@ -219,20 +229,26 @@ void AudioWatcher::onDBusAudioPropertyChanged(QDBusMessage msg)
 {
     QList<QVariant> arguments = msg.arguments();
     if (3 != arguments.count()) {
+        qWarning() << "Invalid DBus message received: incorrect argument count";
         return;
     }
     QString interfaceName = msg.arguments().at(0).toString();
+    qInfo() << "Audio property changed on interface:" << interfaceName;
+    
     if (interfaceName == AudioInterface) {
         QVariantMap changedProps = qdbus_cast<QVariantMap>(arguments.at(1).value<QDBusArgument>());
         QStringList keys =  changedProps.keys();
         foreach (const QString &prop, keys) {
             if (prop == QStringLiteral("DefaultSource")) {
                 const QDBusObjectPath &defaultSourcePath = qvariant_cast<QDBusObjectPath>(changedProps[prop]);
+                qDebug() << "Default audio source changed to:" << defaultSourcePath.path();
                 onDefaultSourceChanaged(defaultSourcePath);
             } else if (prop == QStringLiteral("DefaultSink")) {
                 const QDBusObjectPath &defaultSinkePath = qvariant_cast<QDBusObjectPath>(changedProps[prop]);
+                qDebug() << "Default audio sink changed to:" << defaultSinkePath.path();
                 onDefaultSinkChanaged(defaultSinkePath);
             }else if (prop == "CardsWithoutUnavailable") {
+                qDebug() << "Audio cards configuration changed";
                 updateDeviceEnabled(changedProps[prop].toString(), true);
             }
         }
@@ -284,6 +300,7 @@ void AudioWatcher::onDBusAudioPropertyChanged(QDBusMessage msg)
 
 void AudioWatcher::onSourceVolumeChanged(double value)
 {
+    qDebug() << "Input device volume changed from" << m_inAudioPortVolume << "to" << value;
     m_inAudioPortVolume = value;
     AudioPort activePort = defaultSourceActivePort();
     if (m_inAudioPort.name == activePort.name) {
@@ -295,6 +312,7 @@ void AudioWatcher::onSourceVolumeChanged(double value)
 
 void AudioWatcher::onSinkVolumeChanged(double value)
 {
+    qDebug() << "Output device volume changed from" << m_outAudioPortVolume << "to" << value;
     m_outAudioPortVolume = value;
     AudioPort activePort = defaultSinkActivePort();
     if (m_outAudioPort.name == activePort.name) {
@@ -364,12 +382,14 @@ void AudioWatcher::onDefaultSourceActivePortChanged(AudioPort value)
 
 void AudioWatcher::onSinkMuteChanged(bool value)
 {
+    qDebug() << "Output device mute state changed to:" << value;
     m_outAudioMute = value;
     emit sigMuteChanged(Internal);
 }
 
 void AudioWatcher::onSourceMuteChanged(bool value)
 {
+    qDebug() << "Input device mute state changed to:" << value;
     m_inAudioMute = value;
     emit sigMuteChanged(Micphone);
 }

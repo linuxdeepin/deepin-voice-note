@@ -65,6 +65,7 @@ static const QString htmlHead =
  */
 VNoteItem::VNoteItem()
 {
+    qDebug() << "Creating new VNoteItem";
 }
 
 /**
@@ -73,10 +74,9 @@ VNoteItem::VNoteItem()
  */
 bool VNoteItem::isValid()
 {
-    return (noteId > INVALID_ID
-            && folderId > INVALID_ID)
-               ? true
-               : false;
+    bool valid = (noteId > INVALID_ID && folderId > INVALID_ID);
+    qDebug() << "Checking note validity - ID:" << noteId << "Folder ID:" << folderId << "Valid:" << valid;
+    return valid;
 }
 
 /**
@@ -97,21 +97,27 @@ void VNoteItem::delNoteData()
  */
 bool VNoteItem::search(const QString &keyword)
 {
+    qDebug() << "Searching for keyword:" << keyword << "in note ID:" << noteId;
     bool fContainKeyword = false;
 
     //If title contain keyword,don't
     //need search data anymore.
     if (noteTitle.contains(keyword, Qt::CaseInsensitive)) {
+        qDebug() << "Keyword found in note title";
         fContainKeyword = true;
     } else {
         if (!htmlCode.isEmpty()) { //富文本内容查找
+            qDebug() << "Searching in rich text content";
             QTextDocument doc;
             doc.setHtml(htmlCode);
             fContainKeyword = doc.toPlainText().contains(keyword, Qt::CaseInsensitive);
+            qDebug() << "Rich text search result:" << fContainKeyword;
         } else {
+            qDebug() << "Searching in data blocks";
             //Need search data blocks in note
             for (auto it : datas.datas) {
                 if (it->blockText.contains(keyword, Qt::CaseInsensitive)) {
+                    qDebug() << "Keyword found in block type:" << it->getType();
                     fContainKeyword = true;
                     break;
                 }
@@ -245,16 +251,16 @@ void VNoteItem::delBlock(VNoteBlock *block)
  */
 bool VNoteItem::haveVoice() const
 {
+    qDebug() << "Checking for voice content in note ID:" << noteId;
     if (htmlCode.isEmpty()) {
         return datas.voiceBlocks.size() > 0;
     }
     //匹配语音块标签的正则表达式
     QRegularExpression rx("<div.+jsonkey.+>");
     QRegularExpressionMatch match = rx.match(htmlCode);
-    if (!match.hasMatch()) {
-        return false;
-    }
-    return true;
+    bool hasVoice = match.hasMatch();
+    qDebug() << "Rich text format - Has voice:" << hasVoice;
+    return hasVoice;
 }
 
 /**
@@ -263,11 +269,11 @@ bool VNoteItem::haveVoice() const
  */
 bool VNoteItem::haveText() const
 {
+    qDebug() << "Checking for text content in note ID:" << noteId;
     if (!htmlCode.isEmpty()) { //富文本文本内容判断
-        if (htmlCode == "<p><br></p>") {
-            return false;
-        }
-        return true;
+        bool hasText = (htmlCode != "<p><br></p>");
+        qDebug() << "Rich text format - Has text:" << hasText;
+        return hasText;
     }
 
     bool fHaveText = false;
@@ -277,7 +283,7 @@ bool VNoteItem::haveText() const
             break;
         }
     }
-
+    qDebug() << "Legacy format - Has text:" << fHaveText;
     return fHaveText;
 }
 
@@ -287,6 +293,7 @@ bool VNoteItem::haveText() const
  */
 qint32 VNoteItem::voiceCount() const
 {
+    qDebug() << "Getting voice count for note ID:" << noteId;
     //老版本
     if (htmlCode.isEmpty()) {
         return datas.voiceBlocks.size();
@@ -302,6 +309,7 @@ qint32 VNoteItem::voiceCount() const
  */
 QStringList VNoteItem::getVoiceJsons() const
 {
+    qDebug() << "Getting voice JSONs for note ID:" << noteId;
     QRegularExpression rx("<div.+jsonkey.+>");
     QRegularExpression rxJson("\\{.*\\}");
     QStringList list;
@@ -314,6 +322,7 @@ QStringList VNoteItem::getVoiceJsons() const
             list << jsonMatch.captured(0).replace("&quot;", "\"");
         }
     }
+    qDebug() << "Found" << list.size() << "voice JSONs";
     return list;
 }
 
@@ -324,6 +333,7 @@ QStringList VNoteItem::getVoiceJsons() const
  */
 QString VNoteItem::getFullHtml() const
 {
+    qDebug() << "Generating full HTML for note ID:" << noteId;
     //html字符串
     QString html = htmlHead;
 
@@ -343,6 +353,7 @@ QString VNoteItem::getFullHtml() const
     //查找语音块
     QRegularExpressionMatch voiceMatch = rx.match(htmlCode);
     if (voiceMatch.hasMatch()) {
+        qDebug() << "Processing voice blocks in HTML";
         while ((last = voiceMatch.capturedStart(pos)) != -1) {
             html.append(htmlCode.mid(pos, last - pos));
             pos = last;
@@ -355,6 +366,7 @@ QString VNoteItem::getFullHtml() const
                 last = voicePathMatch.capturedStart();
                 QString base64 = "";
                 if (!Utils::pictureToBase64(voicePathMatch.captured(0), base64)) {
+                    qWarning() << "Failed to convert image to base64:" << voicePathMatch.captured(0);
                     html.append(imgLabel);
                 } else {
                     html.append(imgLabel.mid(0, last))
@@ -367,6 +379,7 @@ QString VNoteItem::getFullHtml() const
     }
     //html文件添加尾部
     html.append(htmlCode.mid(pos, htmlCode.size() - pos)).append("</div> </body> </html>");
+    qDebug() << "HTML generation completed";
     return html;
 }
 
@@ -424,6 +437,7 @@ VNTextBlock::VNTextBlock()
 
 VNTextBlock::~VNTextBlock()
 {
+    qDebug() << "Destroying text block";
 }
 
 /**
@@ -448,6 +462,7 @@ VNVoiceBlock::VNVoiceBlock()
 
 VNVoiceBlock::~VNVoiceBlock()
 {
+    qDebug() << "Destroying voice block";
 }
 
 /**
@@ -455,13 +470,13 @@ VNVoiceBlock::~VNVoiceBlock()
  */
 void VNVoiceBlock::releaseSpecificData()
 {
-    //TODO:
-    //    Add voice specific operation code here:
-    qInfo() << "Remove file:" << voicePath;
-
+    qDebug() << "Releasing voice block specific data for path:" << voicePath;
     QFileInfo fileInfo(voicePath);
 
     if (fileInfo.exists()) {
-        QFile::remove(voicePath);
+        bool removed = QFile::remove(voicePath);
+        qDebug() << "Voice file removal" << (removed ? "successful" : "failed");
+    } else {
+        qDebug() << "Voice file does not exist:" << voicePath;
     }
 }

@@ -39,6 +39,7 @@ JsContent *JsContent::instance()
  */
 bool JsContent::insertImages(QStringList filePaths)
 {
+    qDebug() << "Attempting to insert" << filePaths.size() << "images";
     int count = 0;
     QStringList paths;
     // 获取文件夹路径
@@ -53,17 +54,23 @@ bool JsContent::insertImages(QStringList filePaths)
         QFileInfo fileInfo(path);
         QString suffix = fileInfo.suffix();
         if (!(suffix == "jpg" || suffix == "png" || suffix == "bmp")) {
+            qWarning() << "Skipping unsupported image format:" << suffix << "from path:" << path;
             continue;
         }
         // 创建文件路径
         QString newPath = QString("%1/%2_%3.%4").arg(dirPath).arg(date).arg(++count).arg(suffix);
         if (QFile::copy(path, newPath)) {
             paths.push_back(newPath);
+            qDebug() << "Successfully copied image to:" << newPath;
+        } else {
+            qWarning() << "Failed to copy image from:" << path << "to:" << newPath;
         }
     }
     if (paths.size() == 0) {
+        qWarning() << "No valid images were processed";
         return false;
     }
+    qDebug() << "Emitting callJsInsertImages with" << paths.size() << "images";
     emit callJsInsertImages(paths);
     return true;
 }
@@ -76,6 +83,7 @@ bool JsContent::insertImages(QStringList filePaths)
  */
 bool JsContent::insertImages(const QImage &image)
 {
+    qDebug() << "Attempting to insert single image";
     // 获取文件夹路径
     QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/images";
     // 创建文件夹
@@ -87,8 +95,10 @@ bool JsContent::insertImages(const QImage &image)
 
     // 保存文件
     if (!image.save(imgPath)) {
+        qWarning() << "Failed to save image to:" << imgPath;
         return false;
     }
+    qDebug() << "Successfully saved image to:" << imgPath;
     emit callJsInsertImages(QStringList(imgPath));
     return true;
 }
@@ -125,6 +135,7 @@ void JsContent::jsCallPlayVoice(const QVariant &json, bool bIsSame)
 
 QString JsContent::jsCallGetTranslation()
 {
+    qDebug() << "Translation data requested from JavaScript";
     static QJsonDocument doc;
     if (doc.isEmpty()) {
         QJsonObject object;
@@ -141,6 +152,7 @@ QString JsContent::jsCallGetTranslation()
         object.insert("more", QApplication::translate("web", "More colors"));
         object.insert("recentlyUsed", QApplication::translate("web", "Recent"));
         doc.setObject(object);
+        qDebug() << "Translation data initialized";
     }
     return doc.toJson(QJsonDocument::Compact);
 }
@@ -150,12 +162,14 @@ QString JsContent::jsCallGetTranslation()
  */
 QString JsContent::jsCallDivTextTranslation()
 {
+    qDebug() << "Div text translation requested from JavaScript";
     static QJsonDocument doc;
     if (doc.isEmpty()) {
         QJsonObject object;
         object.insert("translateLabel", QApplication::translate("web", "Voice To Text"));
         object.insert("translatingLabel", QApplication::translate("web", "Converting voice to text"));
         doc.setObject(object);
+        qDebug() << "Div text translation data initialized";
     }
     return doc.toJson(QJsonDocument::Compact);
 }
@@ -184,6 +198,7 @@ void JsContent::jsCallVoiceProgressChange(qint64 progressMs)
 
 QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &funtion)
 {
+    qDebug() << "Executing synchronous JavaScript function";
     QVariant synResult;
     QEventLoop synLoop;
     if (page) {
@@ -192,6 +207,9 @@ QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &funti
             synLoop.quit();
         });
         synLoop.exec();
+        qDebug() << "Synchronous JavaScript execution completed";
+    } else {
+        qWarning() << "Attempted to execute JavaScript on null page";
     }
     return synResult;
 }
@@ -218,6 +236,7 @@ void JsContent::jsCallCreateNote()
 
 void JsContent::jsCallSetClipData(const QString &text, const QString &html)
 {
+    qDebug() << "Setting clipboard data from JavaScript";
     QClipboard *clip = QApplication::clipboard();
     if (nullptr != clip) {
         // 剪切板先断开与前端的通信
@@ -232,12 +251,16 @@ void JsContent::jsCallSetClipData(const QString &text, const QString &html)
         m_clipData = data;
         // 剪切板重新建立与前端的通信
         connect(QApplication::clipboard(), &QClipboard::changed, this, &JsContent::onClipChange);
+        qDebug() << "Clipboard data updated successfully";
+    } else {
+        qWarning() << "Failed to access clipboard";
     }
 }
 
 void JsContent::onClipChange(QClipboard::Mode mode)
 {
     if (QClipboard::Clipboard == mode && QApplication::clipboard()->mimeData() != m_clipData) {
+        qDebug() << "Clipboard content changed externally";
         emit callJsClipboardDataChanged();
     }
 }
