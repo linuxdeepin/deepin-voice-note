@@ -113,10 +113,69 @@ bool VoiceRecoderHandler::checkVolume()
     return (volume - 0.2 < 0.0) ? true : false;
 }
 
+// 通过脚本获取默认音源输入信息。只有获取的是所给的降噪字段的时候才使用，其他依然走dbus的方式
+QString VoiceRecoderHandler::tryGetMicNameFromPactl() const
+{
+    QProcess process;
+    QString commandOutput;
+
+    qInfo() << "Attempting to get default source via 'pactl get-default-source'";
+    process.start("pactl", QStringList() << "get-default-source");
+
+    if (!process.waitForStarted(500)) {
+        qWarning() << "'pactl get-default-source' failed to start:" << process.errorString()
+        << "(Error type: " << process.error() << ")";
+        return QString();
+    }
+
+    if (!process.waitForFinished(1000)) {
+        qWarning() << "'pactl get-default-source' command timed out. Killing process.";
+        process.kill();
+        process.waitForFinished(500);
+        return QString();
+    }
+
+    commandOutput = process.readAllStandardOutput().trimmed();
+
+    if (process.exitStatus() != QProcess::NormalExit || process.exitCode() != 0) {
+        qWarning() << "'pactl get-default-source' execution failed.";
+        qWarning() << "  Exit Status:" << process.exitStatus();
+        qWarning() << "  Exit Code  :" << process.exitCode();
+        qWarning() << "  Stdout     :" << commandOutput;
+        qWarning() << "  Stderr     :" << process.readAllStandardError().trimmed();
+        return QString();
+    }
+
+    if (commandOutput.isEmpty()) {
+        qWarning() << "'pactl get-default-source' returned empty output.";
+        return QString();
+    }
+
+    if (commandOutput.endsWith(".monitor")) {
+        qWarning() << "Default source from 'pactl get-default-source' is a monitor source ("
+                   << commandOutput << "). This is usually not a microphone. Will attempt D-Bus fallback.";
+        return QString(); // Returning empty to trigger fallback
+    }
+
+    qInfo() << "Successfully obtained default microphone from 'pactl get-default-source':" << commandOutput;
+    return commandOutput;
+}
+
+QString VoiceRecoderHandler::getDefaultMicDeviceName() const
+{
+    QString defaultName = tryGetMicNameFromPactl();
+
+    if (defaultName != "echo-cancel-source") {
+        defaultName = m_audioWatcher->getDeviceName(static_cast<AudioWatcher::AudioMode>(m_currentMode));
+    }
+
+    return defaultName;
+}
+
 void VoiceRecoderHandler::confirmStartRecoder()
 {
     qDebug() << "Confirming start of recording";
-    m_audioRecoder->setDevice(m_audioWatcher->getDeviceName(static_cast<AudioWatcher::AudioMode>(m_currentMode)));
+    m_audioRecoder->setDevice(getDefaultMicDeviceName());
     QString fileName = QDateTime::currentDateTime().toString("yyyyMMddhhmmss") + ".mp3";
 
     initRecordPath();

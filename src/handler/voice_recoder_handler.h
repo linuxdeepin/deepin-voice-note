@@ -47,7 +47,9 @@ private:
     void initAudioWatcher();
 
     bool checkVolume();
-
+    QString tryGetMicNameFromPactl() const;
+    QString getDefaultMicDeviceName() const;
+    
 private slots:
     void onAudioDeviceChange(int mode);
     void onAudioBufferProbed(const QAudioBuffer &buffer);
