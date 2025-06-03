@@ -127,7 +127,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="262"/>
         <source>Voice to Text</source>
-        <translation>音声から文字へ変換</translation>
+        <translation>音声文字変換</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="263"/>
@@ -177,7 +177,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="321"/>
         <source>Text to Speech</source>
-        <translation>文字から音声へ変換</translation>
+        <translation>読み上げる</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="322"/>
