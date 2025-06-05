@@ -9,6 +9,7 @@
 #include <QObject>
 #include <QMutex>
 #include <QAudioBuffer>
+#include <QAudioFormat>
 
 #include <gst/gst.h>
 
@@ -36,7 +37,7 @@ public:
     void setStateToNull();
 
     void initFormat();
-private slots:
+private Q_SLOTS:
     //处理编码器的输入数据
     void bufferProbed();
 Q_SIGNALS:

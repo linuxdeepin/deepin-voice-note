@@ -8,6 +8,15 @@ AudioWatcher::AudioWatcher(QObject *parent)
     initWatcherCofing();
     initDeviceWacther();
     initConnections();
+
+    // 初始获取 ReduceNoise 状态 (使用更简洁的property()方法)
+    if (m_audioDBusInterface->isValid()) {
+        m_isReduceNoise = m_audioDBusInterface->property("ReduceNoise").value<bool>();
+        qInfo() << "Initial ReduceNoise state:" << m_isReduceNoise;
+    } else {
+        qWarning() << "Failed to get initial ReduceNoise state: m_audioDBusInterface is invalid.";
+    }
+
     qDebug() << "AudioWatcher initialization completed";
 }
 
@@ -250,6 +259,13 @@ void AudioWatcher::onDBusAudioPropertyChanged(QDBusMessage msg)
             }else if (prop == "CardsWithoutUnavailable") {
                 qDebug() << "Audio cards configuration changed";
                 updateDeviceEnabled(changedProps[prop].toString(), true);
+            } else if (prop == QStringLiteral("ReduceNoise")) {
+                bool newReduceNoiseState = qvariant_cast<bool>(changedProps[prop]);
+                if (m_isReduceNoise != newReduceNoiseState) {
+                    m_isReduceNoise = newReduceNoiseState;
+                    qInfo() << "ReduceNoise state changed to:" << m_isReduceNoise;
+                    emit sigReduceNoiseChanged(m_isReduceNoise);
+                }
             }
         }
     } else if (interfaceName == SourceInterface) {

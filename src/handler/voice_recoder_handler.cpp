@@ -3,8 +3,11 @@
 #include "audio/audio_watcher.h"
 #include "utils.h"
 #include "opsstateinterface.h"
+#include <QMediaDevices>
+#include <QAudioDevice>
 
 VoiceRecoderHandler::VoiceRecoderHandler() {
+    m_mediaDevices = new QMediaDevices(this);
     intRecoder();
     initAudioWatcher();
 }
@@ -104,6 +107,7 @@ void VoiceRecoderHandler::initAudioWatcher()
 {
     m_audioWatcher = new AudioWatcher(this);
     connect(m_audioWatcher, &AudioWatcher::sigDeviceEnableChanged, this, &VoiceRecoderHandler::onDeviceEnableChanged);
+    connect(m_audioWatcher, &AudioWatcher::sigReduceNoiseChanged, this, &VoiceRecoderHandler::onReduceNoiseChanged);
 }
 
 bool VoiceRecoderHandler::checkVolume()
@@ -163,12 +167,19 @@ QString VoiceRecoderHandler::tryGetMicNameFromPactl() const
 
 QString VoiceRecoderHandler::getDefaultMicDeviceName() const
 {
-    QString defaultName = tryGetMicNameFromPactl();
+    QString defaultName;
 
-    if (defaultName != "echo-cancel-source") {
-        defaultName = m_audioWatcher->getDeviceName(static_cast<AudioWatcher::AudioMode>(m_currentMode));
+    // 只有当m_currentMode是麦克风模式时，才尝试使用pactl获取默认音源
+    if (static_cast<AudioWatcher::AudioMode>(m_currentMode) == AudioWatcher::Micphone) {
+        defaultName = tryGetMicNameFromPactl();
+        if (defaultName != "echo-cancel-source") {
+            // 如果pactl获取到有效且非降噪字段，则使用它
+            return defaultName;
+        }
     }
 
+    // 否则，回退到使用m_audioWatcher获取设备名称
+    defaultName = m_audioWatcher->getDeviceName(static_cast<AudioWatcher::AudioMode>(m_currentMode));
     return defaultName;
 }
 
@@ -245,4 +256,9 @@ void VoiceRecoderHandler::onAudioBufferProbed(const QAudioBuffer &buffer)
     }
     maxValue = maxValue / 10000;
     updateWave(maxValue);
+}
+
+void VoiceRecoderHandler::onReduceNoiseChanged(bool reduceNoiseChanged)
+{
+    onAudioDeviceChange(m_currentMode);
 }

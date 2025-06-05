@@ -83,6 +83,7 @@ signals:
     void sigDeviceChange(AudioMode mode);
     void sigMuteChanged(AudioMode mode);
     void sigDeviceEnableChanged(AudioMode mode, bool enable);
+    void sigReduceNoiseChanged(bool reduceNoiseChanged);
 protected slots:
     void onDefaultSourceActivePortChanged(AudioPort value);
     void onDefaultSinkActivePortChanged(AudioPort value);
@@ -133,6 +134,7 @@ private:
     bool m_inIsEnable{false};
     bool m_outIsEnable{false};
     bool m_isVirtualMachineHw{false};
+    bool m_isReduceNoise {false};
 };
 
 #endif // AUDIOWATCHER_H
