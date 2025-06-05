@@ -2,6 +2,8 @@
 #define VOICERECODERHANDLER_H
 
 #include <QObject>
+#include <QMediaDevices>
+#include <QAudioDevice>
 
 class GstreamRecorder;
 class AudioWatcher;
@@ -53,10 +55,11 @@ private:
 private slots:
     void onAudioDeviceChange(int mode);
     void onAudioBufferProbed(const QAudioBuffer &buffer);
-
+    void onReduceNoiseChanged(bool reduceNoiseChanged);
 private:
     GstreamRecorder *m_audioRecoder;
     AudioWatcher *m_audioWatcher;
+    QMediaDevices *m_mediaDevices;
     RecoderType m_type;
 
     QString m_recordDir {""};
