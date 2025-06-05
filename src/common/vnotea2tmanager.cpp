@@ -10,6 +10,7 @@
 #include <QDBusInterface>
 #include <QDBusError>
 #include <QJsonParseError>
+#include <QJsonDocument>
 
 #include <QTimer>
 
