@@ -2,9 +2,10 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import QtQuick
-import QtQuick.Controls
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 import VNote 1.0
+import org.deepin.dtk 1.0
 
 // 动态创建不同类型的右键菜单
 Menu {

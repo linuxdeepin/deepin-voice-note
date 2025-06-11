@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "loadfolderworker.h"
+#include <QDebug>
 #include "common/vnoteforlder.h"
 #include "db/vnotefolderoper.h"
 #include "globaldef.h"

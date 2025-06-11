@@ -9,6 +9,8 @@
 #include <QPixmap>
 #include <QPainter>
 #include <DSvgRenderer>
+#include <QImage>
+#include <QDebug>
 
 DGUI_USE_NAMESPACE
 
@@ -35,6 +37,48 @@ LoadIconsWorker::LoadIconsWorker(QObject *parent)
  */
 QPixmap LoadIconsWorker::greyPix(QPixmap pix)
 {
+    // 输入验证
+    if (pix.isNull() || pix.size().isEmpty()) {
+        qWarning() << "LoadIconsWorker::greyPix: Invalid input pixmap";
+        return QPixmap();
+    }
+
+#ifdef __mips64
+    // MIPS64 特殊处理：避免 QPainter 相关的内存对齐问题
+    qDebug() << "Using MIPS64-specific greyPix implementation";
+    
+    // 转换为 QImage 进行处理
+    QImage image = pix.toImage();
+    if (image.isNull()) {
+        qWarning() << "Failed to convert QPixmap to QImage";
+        return pix; // 返回原图像作为后备
+    }
+    
+    // 确保图像格式兼容
+    if (image.format() != QImage::Format_ARGB32_Premultiplied) {
+        image = image.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    }
+    
+    // 手动处理像素以应用灰度效果
+    int width = image.width();
+    int height = image.height();
+    
+    for (int y = 0; y < height; ++y) {
+        QRgb *line = reinterpret_cast<QRgb*>(image.scanLine(y));
+        for (int x = 0; x < width; ++x) {
+            QRgb pixel = line[x];
+            int alpha = qAlpha(pixel);
+            
+            // 应用灰度效果，降低透明度
+            int newAlpha = alpha * 64 / 255; // 相当于原来的 QColor(0, 0, 0, 64) 效果
+            line[x] = qRgba(qRed(pixel), qGreen(pixel), qBlue(pixel), newAlpha);
+        }
+    }
+    
+    return QPixmap::fromImage(image);
+    
+#else
+    // 非 MIPS64 架构使用原来的实现
     QPixmap temp(pix.size());
     temp.fill(Qt::transparent);
 
@@ -46,6 +90,7 @@ QPixmap LoadIconsWorker::greyPix(QPixmap pix)
     iconPainer.end();
 
     return temp;
+#endif
 }
 
 /**

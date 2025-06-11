@@ -1,13 +1,21 @@
 #include "voice_recoder_handler.h"
 #include "audio/gstreamrecorder.h"
 #include "audio/audio_watcher.h"
-#include "utils.h"
+#include "common/utils.h"
+#include <QAudioBuffer>
 #include "opsstateinterface.h"
+// 条件编译：根据 Qt 版本包含不同的音频设备头文件
+#ifdef USE_QT5
+#include <QAudioDeviceInfo>
+#else
 #include <QMediaDevices>
 #include <QAudioDevice>
+#endif
 
 VoiceRecoderHandler::VoiceRecoderHandler() {
+#ifndef USE_QT5
     m_mediaDevices = new QMediaDevices(this);
+#endif
     intRecoder();
     initAudioWatcher();
 }

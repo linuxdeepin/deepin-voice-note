@@ -11,13 +11,23 @@
 #include <QObject>
 #include <QRect>
 #include <QEventLoop>
+
+// 条件编译：根据 Qt 版本包含不同的 WebEngine 头文件
+#ifdef USE_QT5
+#include <QtWebEngineWidgets/QWebEnginePage>
+#include <QWebEngineContextMenuData>
+#else
 #include <QWebEnginePage>
+#endif
+
 #include <QTimer>
 
 #include "vnote_message_dialog_handler.h"
 
 class QDBusInterface;
+#ifndef USE_QT5
 class QWebEngineContextMenuRequest;
+#endif
 
 class VNVoiceBlock;
 class VoicePlayerHandler;
@@ -67,7 +77,12 @@ Q_SIGNALS:
 public Q_SLOTS:
     // for qml
     void onCallJsResult(const QVariant &result);
+    // 条件编译：根据 Qt 版本使用不同的上下文菜单请求处理
+#ifdef USE_QT5
+    void onContextMenuRequested(QObject *request);
+#else
     void onContextMenuRequested(QWebEngineContextMenuRequest *request);
+#endif
     void onInsertVoiceItem(const QString &voicePath, quint64 voiceSize);
 
     // for c++
@@ -80,8 +95,15 @@ private:
     void initFontsInformation();
     void connectWebContent();
 
+    // 条件编译：根据 Qt 版本使用不同的上下文菜单请求处理
+#ifdef USE_QT5
+    void processVoiceMenuRequest(QObject *request);
+    void processTextMenuRequest(QObject *request);
+#else
     void processVoiceMenuRequest(QWebEngineContextMenuRequest *request);
     void processTextMenuRequest(QWebEngineContextMenuRequest *request);
+    void processPictureMenuRequest(QWebEngineContextMenuRequest *request);
+#endif
 
     bool isVoicePaste();
 

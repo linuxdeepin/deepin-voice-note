@@ -2,8 +2,13 @@
 #define VOICERECODERHANDLER_H
 
 #include <QObject>
+// 条件编译：根据 Qt 版本包含不同的音频设备头文件
+#ifdef USE_QT5
+#include <QAudioDeviceInfo>
+#else
 #include <QMediaDevices>
 #include <QAudioDevice>
+#endif
 
 class GstreamRecorder;
 class AudioWatcher;
@@ -59,7 +64,9 @@ private slots:
 private:
     GstreamRecorder *m_audioRecoder;
     AudioWatcher *m_audioWatcher;
+#ifndef USE_QT5
     QMediaDevices *m_mediaDevices;
+#endif
     RecoderType m_type;
 
     QString m_recordDir {""};

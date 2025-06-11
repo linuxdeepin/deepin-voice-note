@@ -16,8 +16,17 @@ add_definitions(-DINSTALL_LIB_PATH="${CMAKE_INSTALL_LIBDIR}")
 
 list(APPEND RESOURCES ${CMAKE_PROJECT_NAME}.qrc deepin-voice-note-web.qrc)
 
-find_package(Qt6 6.6 REQUIRED COMPONENTS Core Widgets Quick DBus Sql WebEngineQuick Multimedia)
-find_package(Dtk6 COMPONENTS Core Widget Gui REQUIRED)
+# 检测架构并选择对应的 Qt 版本
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "mips.*")
+    message(STATUS "Building for MIPS architecture, using Qt5")
+    add_definitions(-DUSE_QT5)
+    find_package(Qt5 5.15 REQUIRED COMPONENTS Core Widgets Quick DBus Sql WebEngine WebEngineWidgets Multimedia)
+    find_package(Dtk COMPONENTS Core Widget Gui REQUIRED)
+else()
+    message(STATUS "Building for Non-MIPS architecture, using Qt6")
+    find_package(Qt6 6.6 REQUIRED COMPONENTS Core Widgets Quick DBus Sql WebEngineQuick Multimedia)
+    find_package(Dtk6 COMPONENTS Core Widget Gui REQUIRED)
+endif()
 
 find_package(PkgConfig REQUIRED)
 
@@ -41,18 +50,35 @@ aux_source_directory(./audio ALLSOURCE)
 
 add_executable(${BIN_NAME} ${ALLSOURCE} ${RESOURCES})
 
-target_link_libraries(${BIN_NAME} PRIVATE
-    Qt6::Core
-    Qt6::Widgets
-    Qt6::Quick
-    Qt6::DBus
-    Qt6::Sql
-    Qt6::WebEngineQuick
-    Qt6::Multimedia
-    Dtk6::Core
-    Dtk6::Gui
-    Dtk6::Widget
-)
+# 根据架构链接不同的 Qt 库
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "mips.*")
+    target_link_libraries(${BIN_NAME} PRIVATE
+        Qt5::Core
+        Qt5::Widgets
+        Qt5::Quick
+        Qt5::DBus
+        Qt5::Sql
+        Qt5::WebEngine
+        Qt5::WebEngineWidgets
+        Qt5::Multimedia
+        Dtk::Core
+        Dtk::Gui
+        Dtk::Widget
+    )
+else()
+    target_link_libraries(${BIN_NAME} PRIVATE
+        Qt6::Core
+        Qt6::Widgets
+        Qt6::Quick
+        Qt6::DBus
+        Qt6::Sql
+        Qt6::WebEngineQuick
+        Qt6::Multimedia
+        Dtk6::Core
+        Dtk6::Gui
+        Dtk6::Widget
+    )
+endif()
 
 if(SUPPROT_DMR)
     add_definitions(-DMPV_PLAYENGINE)

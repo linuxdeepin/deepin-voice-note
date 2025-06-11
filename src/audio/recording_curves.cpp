@@ -1,5 +1,8 @@
 #include "recording_curves.h"
 
+#include <QPainter>
+#include <cmath>
+#include <QtMath>
 #include <QLinearGradient>
 
 RecordingCurves::RecordingCurves(QQuickItem *parent)
@@ -70,7 +73,7 @@ void RecordingCurves::paint(QPainter *painter)
 
     for (double x = 0; x <= width; x += 1.0) {
         double ySin = std::sin((2 * (x-m_phase)) / width * 2 * M_PI);
-        double a = pow(x - width / 2, 2);
+        double a = std::pow(x - width / 2, 2);
         double b = -4 / (width * width);
         double yPara = a * b + 1;
         double pointY = ySin * yPara * height * m_gain / 2.0;
@@ -89,6 +92,16 @@ void RecordingCurves::paint(QPainter *painter)
     painter->setPen(shadows);
     painter->drawPolyline(points.constData(), points.size());
 
+#ifdef __mips64
+    // MIPS64 架构：避免直接使用 QLinearGradient 构造 QBrush
+    // 分步创建以避免内存对齐问题
+    QBrush gradientBrush;
+    gradientBrush = QBrush(gradient);
+    QPen gradientPen(gradientBrush, 1);
+    painter->setPen(gradientPen);
+#else
+    // 非 MIPS64 架构使用原始方法
     painter->setPen(QPen(QBrush(gradient), 1));
+#endif
     painter->drawPolyline(points.constData(), points.size());
 }

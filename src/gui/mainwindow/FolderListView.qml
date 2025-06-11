@@ -5,10 +5,10 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Layouts 1.1
-import org.deepin.dtk
 import VNote 1.0
 import "../drag/"
 import "../dialog/"
+import org.deepin.dtk 1.0
 
 Item {
     id: root

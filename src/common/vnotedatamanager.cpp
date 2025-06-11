@@ -12,6 +12,7 @@
 #include "vnoteitem.h"
 
 #include <QThreadPool>
+#include <QDebug>
 
 // DCORE_USE_NAMESPACE
 
@@ -426,9 +427,9 @@ bool VNoteDataManager::isAllDatasReady() const
  */
 void VNoteDataManager::reqNoteDefIcons()
 {
-    LoadIconsWorker *iconLoadWorker = new LoadIconsWorker(); //
+    // 重新启用图标加载，使用修复后的 MIPS64 兼容版本
+    LoadIconsWorker *iconLoadWorker = new LoadIconsWorker();
     iconLoadWorker->setAutoDelete(true);
-
     QThreadPool::globalInstance()->start(iconLoadWorker, QThread::TimeCriticalPriority);
 }
 

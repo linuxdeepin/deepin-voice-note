@@ -7,6 +7,7 @@
 #include "common/vnoteforlder.h"
 #include "common/vnoteitem.h"
 #include "globaldef.h"
+#include <QDebug>
 
 // #include <DLog>
 

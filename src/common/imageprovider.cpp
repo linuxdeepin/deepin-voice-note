@@ -3,8 +3,11 @@
 
 ImageProvider *ImageProvider::instance()
 {
-    static ImageProvider imageProvider(ImageType::Pixmap);
-    return &imageProvider;
+    static ImageProvider *imageProvider = nullptr;
+    if (!imageProvider) {
+        imageProvider = new ImageProvider(ImageType::Pixmap);
+    }
+    return imageProvider;
 }
 
 QImage ImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
