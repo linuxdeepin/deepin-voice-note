@@ -30,6 +30,8 @@ void RecordingCurves::stopRecording()
 {
     m_timer->stop();
     m_phase = 0.0;
+    m_gain = 0.0;  // 添加这一行，重置增益为0
+    update();
 }
 
 void RecordingCurves::pauseRecording()

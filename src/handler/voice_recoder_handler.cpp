@@ -45,6 +45,7 @@ void VoiceRecoderHandler::stopRecoder()
         emit finishedRecod(m_recordPath, m_recordMsec);
         m_type = RecoderType::Idle;
         OpsStateInterface::instance()->operState(OpsStateInterface::StateRecording, false);
+        updateWave(0.0);
     } else {
         qDebug() << "Recorder already idle";
     }
@@ -220,11 +221,13 @@ void VoiceRecoderHandler::onAudioDeviceChange(int mode)
             qWarning() << "No audio device available";
             stopRecoder();
             updateRecordBtnState(false);
+            updateWave(0.0);
         } else {
             bool isEnable = m_audioWatcher->getDeviceEnable(static_cast<AudioWatcher::AudioMode>(m_currentMode));
             qDebug() << "Device enabled state:" << isEnable;
             stopRecoder();
             updateRecordBtnState(isEnable);
+            updateWave(0.0);
         }
     }
 }
