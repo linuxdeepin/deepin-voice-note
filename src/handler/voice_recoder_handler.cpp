@@ -38,7 +38,7 @@ void VoiceRecoderHandler::startRecoder()
 
 void VoiceRecoderHandler::stopRecoder()
 {
-    qDebug() << "Stopping voice recorder";
+    qDebug() << "Stopping voice recorder, current file:" << m_recordPath;
     m_audioRecoder->stopRecord();
     if (m_type != RecoderType::Idle) {
         qInfo() << "Recording finished, duration:" << m_recordMsec << "ms, path:" << m_recordPath;
@@ -188,7 +188,8 @@ void VoiceRecoderHandler::confirmStartRecoder()
 {
     qDebug() << "Confirming start of recording";
     m_audioRecoder->setDevice(getDefaultMicDeviceName());
-    QString fileName = QDateTime::currentDateTime().toString("yyyyMMddhhmmss") + ".mp3";
+    // 将文件名控制更加精细，避免文件名冲突
+    QString fileName = QDateTime::currentDateTime().toString("yyyyMMddhhmmsszzz") + ".mp3";
 
     initRecordPath();
     m_recordMsec = 0;
@@ -211,6 +212,9 @@ void VoiceRecoderHandler::confirmStartRecoder()
 
 void VoiceRecoderHandler::onAudioDeviceChange(int mode)
 {
+    qCritical() << "=== onAudioDeviceChange验证 === 音频设备变化，模式:" << mode;
+    qCritical() << "当前录音状态:" << m_type;
+    
     qDebug() << "Audio device changed, mode:" << mode;
     if (m_currentMode == mode) {
         QString info = m_audioWatcher->getDeviceName(
@@ -225,8 +229,14 @@ void VoiceRecoderHandler::onAudioDeviceChange(int mode)
         } else {
             bool isEnable = m_audioWatcher->getDeviceEnable(static_cast<AudioWatcher::AudioMode>(m_currentMode));
             qDebug() << "Device enabled state:" << isEnable;
-            stopRecoder();
+            
+            // 如果正在录音，需要完全停止录音并通知UI关闭界面
+            if (m_type != RecoderType::Idle) {
+                stopRecoder();
+                emit recoderStateChange(RecoderType::Idle);
+            }
             updateRecordBtnState(isEnable);
+            // 此时停止也需要将波形曲线归零，否则可能会在停止录制之后，波形曲线依然显示
             updateWave(0.0);
         }
     }
