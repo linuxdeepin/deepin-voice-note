@@ -7,6 +7,7 @@
 #include "common/utils.h"
 
 #include <DLog>
+#include <unistd.h>  // for sync()
 
 static const QString mp3Encoder = "capsfilter caps=audio/x-raw,rate=44100,channels=2 ! lamemp3enc name=enc target=1 cbr=true bitrate=192";
 
@@ -251,13 +252,27 @@ bool GstreamRecorder::startRecord()
  */
 void GstreamRecorder::stopRecord()
 {
-    qDebug() << "Stopping recording...";
     if (m_pipeline) {
+        
+        // 发送EOS事件并等待其处理完成，确保所有数据都被正确写入文件
+        // 这样可以避免录音数据丢失或文件损坏的问题
+        gst_element_send_event(m_pipeline, gst_event_new_eos());
+        
+        GstBus *bus = gst_element_get_bus(m_pipeline);
+        if (bus) {
+            GstMessage *msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE, GST_MESSAGE_EOS); 
+            if (msg) {
+                gst_message_unref(msg);
+            } else {
+            }
+            gst_object_unref(bus);
+        }
+        // 保存文件，防止数据丢失, 因为在通过降噪停止之后，需要将上一次的文件完整保存并重新开启通道，否则下一次录制将依然在上一次的通道中工作
+        // 导致录制的内容始终都是最后一次的
+        sync();
         setStateToNull();
-        qDebug() << "Recording stopped";
     }
 }
-
 /**
  * @brief GstreamRecorder::pauseRecord
  */
@@ -299,11 +314,26 @@ void GstreamRecorder::setDevice(const QString &device)
 void GstreamRecorder::setOutputFile(const QString &path)
 {
     qDebug() << "Setting output file to:" << path;
-    m_outputFile = path;
-    if (m_pipeline != nullptr) {
-        GstElement *audioSink = gst_bin_get_by_name(reinterpret_cast<GstBin *>(m_pipeline), "filesink");
-        g_object_set(reinterpret_cast<gpointer *>(audioSink), "location", m_outputFile.toLatin1().constData(), nullptr);
+    
+    // 如果管道已存在且要设置不同的输出文件，必须销毁旧管道
+    if (m_pipeline != nullptr && m_outputFile != path) {
+        qDebug() << "=== Pipeline Reuse Fix === Detected new output file, destroying old pipeline";
+        qDebug() << "Previous output file:" << m_outputFile; 
+        qDebug() << "New output file:" << path;
+        
+        // 销毁旧管道以避免filesink location修改问题
+        qDebug() << "Destroying existing pipeline to avoid filesink location modification";
+        gst_object_unref(m_pipeline);
+        m_pipeline = nullptr;
+        qDebug() << "Old pipeline destroyed, will create new pipeline for next recording";
+    } else if (m_pipeline != nullptr) {
+        qDebug() << "Pipeline exists but output file is same, no need to rebuild";
+    } else {
+        qDebug() << "Pipeline does not exist, will create new one on next recording";
     }
+    
+    // 更新输出文件路径
+    m_outputFile = path;
 }
 
 /**

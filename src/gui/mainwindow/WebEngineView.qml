@@ -421,7 +421,27 @@ Item {
         target: VoiceRecoderHandler
 
         onRecoderStateChange: {
-            recorderViewLoader.item.isRecording = (VoiceRecoderHandler.getRecoderType() === VoiceRecoderHandler.Recording);
+            var currentType = VoiceRecoderHandler.getRecoderType();
+            if (recorderViewLoader.item) {
+                recorderViewLoader.item.isRecording = (currentType === VoiceRecoderHandler.Recording);
+            }
+            
+            // 当录音状态变为Idle时，完全关闭录音界面并重置状态
+            if (currentType === VoiceRecoderHandler.Idle) {
+                isRecording = false;
+                title.recorderBtnEnable = true;
+                title.isRecording = false;
+                
+                // 完全关闭录音界面
+                if (recorderViewLoader.active && recorderViewLoader.item) {
+                    recorderViewLoader.item.visible = false;
+                    recorderViewLoader.item.time = "00:00:00";
+                }
+                // 延迟销毁Loader以确保动画完成
+                Qt.callLater(function() {
+                    recorderViewLoader.active = false;
+                });
+            }
         }
         onUpdateRecordBtnState: {
             title.recorderBtnEnable = enable;
