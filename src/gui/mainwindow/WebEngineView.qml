@@ -7,11 +7,13 @@ import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtWebChannel 1.15
-import QtWebEngine 1.15
-import Qt.labs.platform
-import org.deepin.dtk 1.0
+// Use Qt5 version 1.10 for compatibility with both Qt5 and Qt6
+// Qt6 is backward compatible with Qt5 import syntax
+import QtWebEngine 1.10
+import Qt.labs.platform 1.1
 import VNote 1.0
 import "../dialog"
+import org.deepin.dtk 1.0
 
 Item {
     id: rootItem
@@ -137,10 +139,27 @@ Item {
                     Webobj.calllJsShowEditToolbar(0, 0);
                 }
                 onContextMenuRequested: req => {
-                    // 响应右键菜单，处理完成后 handler 抛出 requestShowMenu() 信号
-                    handler.onContextMenuRequested(req);
+                    // 仅当菜单是文本类型时，我们才在QML层根据上下文标记(editFlags)更新状态
+                    // 这是为了精确修复Qt5下文本菜单状态不更新的问题
+                    if (handler.menuTypeFromJs === WebEngineHandler.TxtMenu) {
+                        var flags = req.editFlags
+                        ActionManager.resetCtxMenu(ActionManager.TxtCtxMenu, false) // false表示禁用全部，然后逐一启用
+                        ActionManager.enableAction(ActionManager.TxtSelectAll, (flags & 1) !== 0)
+                        ActionManager.enableAction(ActionManager.TxtCopy, (flags & 2) !== 0)
+                        ActionManager.enableAction(ActionManager.TxtCut, (flags & 4) !== 0)
+                        ActionManager.enableAction(ActionManager.TxtPaste, (flags & 8) !== 0)
+                        ActionManager.enableAction(ActionManager.TxtDelete, (flags & 16) !== 0)
+                        // 只有能复制时，才能朗读
+                        ActionManager.enableAction(ActionManager.TxtSpeech, (flags & 2) !== 0)
+                        // 只有能粘贴时，才能听写
+                        ActionManager.enableAction(ActionManager.TxtDictation, (flags & 8) !== 0)
+                    }
 
-                    // prevent a default context menu from showing up
+                    // 对于所有菜单类型，都调用C++的处理器
+                    // C++将处理特殊逻辑(如解析语音路径)并最终弹出菜单
+                    handler.onContextMenuRequested(req)
+
+                    // 阻止默认菜单弹出
                     req.accepted = true;
                 }
                 onJavaScriptConsoleMessage: {
@@ -270,6 +289,12 @@ Item {
 
             menuType: ActionManager.PictureCtxMenu
 
+            onAboutToShow: {
+                // 对于图片菜单，我们恢复原始逻辑：在菜单显示前，重置所有项目为可用
+                // C++后端会处理图片路径等特殊逻辑
+                ActionManager.resetCtxMenu(ActionManager.PictureCtxMenu, true);
+            }
+
             Connections {
                 target: handler
 
@@ -290,6 +315,14 @@ Item {
 
             menuType: ActionManager.VoiceCtxMenu
 
+            onAboutToShow: {
+                // 对于语音菜单，恢复原始逻辑：重置所有项目为可用，
+                // 并根据全局状态单独设置"语音转文字"的可用性
+                ActionManager.resetCtxMenu(ActionManager.VoiceCtxMenu, true);
+                var isConverting = VNoteMainManager.isVoiceToText();
+                ActionManager.enableAction(ActionManager.VoiceToText, !isConverting);
+            }
+
             Connections {
                 target: handler
 
@@ -309,6 +342,11 @@ Item {
             id: txtCtxMenu
 
             menuType: ActionManager.TxtCtxMenu
+
+            onAboutToShow: {
+                // 文本菜单的状态现在完全由 onContextMenuRequested 处理，
+                // 此处不再需要任何逻辑。
+            }
 
             Connections {
                 target: handler

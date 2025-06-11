@@ -9,8 +9,12 @@
 #include <QObject>
 #include <QClipboard>
 
-// #include <QtWebEngineWidgets/qwebenginepage.h>
+// 条件编译：根据 Qt 版本包含不同的 WebEngine 头文件
+#ifdef USE_QT5
+#include <QtWebEngineWidgets/QWebEnginePage>
+#else
 #include <QWebEnginePage>
+#endif
 
 class JsContent : public QObject
 {

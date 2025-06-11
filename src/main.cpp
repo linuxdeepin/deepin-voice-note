@@ -22,9 +22,14 @@
 #include <QGuiApplication>
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QTimer>
 
-#include <QQmlApplicationEngine>
+// 条件编译：根据 Qt 版本包含不同的 WebEngine 头文件
+#ifdef USE_QT5
+#include <QtWebEngine/QtWebEngine>
+#else
 #include <QtWebEngineQuick/qtwebenginequickglobal.h>
+#endif
 
 #include <DApplication>
 #include <DGuiApplicationHelper>
@@ -41,15 +46,34 @@ DCORE_USE_NAMESPACE
 
 int main(int argc, char *argv[])
 {
+#ifdef __mips64
+    // MIPS64 特殊处理：设置环境变量以避免 DTK 配置系统的线程问题
+    qputenv("DTK_DISABLE_DCONFIG_CACHE", "1");
+    qputenv("DTK_FORCE_SYNC_DCONFIG", "1");
+    qDebug() << "MIPS64: Applied DTK configuration workarounds";
+#endif
+
     DApplication *app = new DApplication(argc, argv);
 
     qInfo() << "Starting deepin-voice-note application...";
     
+#ifdef __mips64
+    // MIPS64: 延迟单实例检查，避免早期的线程问题
+    QTimer::singleShot(100, [app]() {
+        DGuiApplicationHelper::instance()->setSingleInstanceInterval(-1);
+        if (!DGuiApplicationHelper::instance()->setSingleInstance(app->applicationName(), DGuiApplicationHelper::UserScope)) {
+            qWarning() << "Another instance of deepin-voice-note is already running";
+            QCoreApplication::exit(0);
+        }
+    });
+#else
     DGuiApplicationHelper::instance()->setSingleInstanceInterval(-1);
     if (!DGuiApplicationHelper::instance()->setSingleInstance(app->applicationName(), DGuiApplicationHelper::UserScope)) {
         qWarning() << "Another instance of deepin-voice-note is already running";
         return 0;
     }
+#endif
+
     // TODO: The DTK theme color is initialized abnormally, and the application is temporarily circumvented
     DGuiApplicationHelper::instance()->paletteType();
 
@@ -60,7 +84,14 @@ int main(int argc, char *argv[])
 
     qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "7777");
     VNoteMainManager::instance()->initQMLRegister();
+    
+    // 条件编译：根据 Qt 版本使用不同的 WebEngine 初始化方法
+#ifdef USE_QT5
+    QtWebEngine::initialize();
+#else
     QtWebEngineQuick::initialize();
+#endif
+    
     ImageProvider *imageProvider = ImageProvider::instance();
     qInfo() << "QML and WebEngine initialized successfully";
 

@@ -7,8 +7,16 @@ QtPlayer::QtPlayer(QObject *parent)
 {
     qInfo() << "Initializing QtPlayer";
     m_player = new QMediaPlayer(this);
+    
+#ifdef USE_QT5
+    // Qt5 版本：QAudioOutput 构造函数需要 QAudioFormat 参数
+    m_audioOutput = new QAudioOutput(QAudioFormat(), this);
+#else
+    // Qt6 版本：QAudioOutput 构造函数只需要 parent 参数
     m_audioOutput = new QAudioOutput(this);
     m_player->setAudioOutput(m_audioOutput);
+#endif
+    
     initConnection();
 }
 
@@ -30,7 +38,13 @@ QtPlayer::~QtPlayer()
 void QtPlayer::setFilePath(QString path)
 {
     qDebug() << "Setting media file path:" << path;
+#ifdef USE_QT5
+    // Qt5 版本使用 setMedia
+    m_player->setMedia(QUrl(path));
+#else
+    // Qt6 版本使用 setSource
     m_player->setSource(QUrl(path));
+#endif
 }
 
 void QtPlayer::setPosition(qint64 pos)
@@ -62,6 +76,28 @@ VoicePlayerBase::PlayerState QtPlayer::getState()
         return VoicePlayerBase::PlayerState::Ended;
     }
     
+#ifdef USE_QT5
+    // Qt5 版本使用 state() 方法
+    QMediaPlayer::State playState = m_player->state();
+    switch(playState) {
+    case QMediaPlayer::PlayingState:
+        state = VoicePlayerBase::PlayerState::Playing;
+        qDebug() << "Player state: Playing";
+        break;
+    case QMediaPlayer::PausedState:
+        state = VoicePlayerBase::PlayerState::Paused;
+        qDebug() << "Player state: Paused";
+        break;
+    case QMediaPlayer::StoppedState:
+        state = VoicePlayerBase::PlayerState::Stopped;
+        qDebug() << "Player state: Stopped";
+        break;
+    default:
+        qDebug() << "Player state: Unknown";
+        break;
+    }
+#else
+    // Qt6 版本使用 playbackState() 方法
     QMediaPlayer::PlaybackState playState = m_player->playbackState();
     switch(playState) {
     case QMediaPlayer::PlayingState:
@@ -80,6 +116,7 @@ VoicePlayerBase::PlayerState QtPlayer::getState()
         qDebug() << "Player state: Unknown";
         break;
     }
+#endif
     return state;
 }
 

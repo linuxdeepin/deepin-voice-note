@@ -1,7 +1,7 @@
 import QtQuick 2.15
-import QtQuick.Layouts
-import org.deepin.dtk 1.0
+import QtQuick.Layouts 1.15
 import VNote 1.0
+import org.deepin.dtk 1.0
 
 Item {
     id: rootWindow

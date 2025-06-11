@@ -6,6 +6,7 @@
 #include "loadnoteitemsworker.h"
 #include "db/vnoteitemoper.h"
 #include "globaldef.h"
+#include <QDebug>
 
 // #include <DLog>
 

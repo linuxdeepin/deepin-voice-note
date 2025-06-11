@@ -7,6 +7,8 @@
 #include "common/utils.h"
 
 #include <DLog>
+#include <cmath>
+#include <QtMath>
 #include <unistd.h>  // for sync()
 
 static const QString mp3Encoder = "capsfilter caps=audio/x-raw,rate=44100,channels=2 ! lamemp3enc name=enc target=1 cbr=true bitrate=192";
@@ -448,11 +450,23 @@ void GstreamRecorder::initFormat()
     m_format.setChannelCount(2);
     m_format.setSampleRate(44100);
     //lamemp3enc 编码器插件格式为S16LE
+#ifdef USE_QT5
+    m_format.setSampleSize(16);
+    m_format.setSampleType(QAudioFormat::SignedInt);
+    m_format.setByteOrder(QAudioFormat::LittleEndian);
+    m_format.setCodec("audio/pcm");
+#else
     m_format.setSampleFormat(QAudioFormat::Int16);
+#endif
     qDebug() << "Audio format initialized:"
              << "\n  - Channels:" << m_format.channelCount()
              << "\n  - Sample rate:" << m_format.sampleRate()
+#ifdef USE_QT5
+             << "\n  - Sample size:" << m_format.sampleSize()
+             << "\n  - Sample type:" << m_format.sampleType();
+#else
              << "\n  - Sample format:" << m_format.sampleFormat();
+#endif
 }
 /**
  * @brief GstreamRecorder::objectUnref

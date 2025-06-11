@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import QtQuick
-import QtQuick.Layouts
-import QtQuick.Window
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Window 2.15
 import org.deepin.dtk 1.0
 
 DialogWindow {
@@ -47,9 +47,18 @@ DialogWindow {
             delegate: ItemDelegate {
                 backgroundVisible: true
                 height: 30
-                normalBackgroundVisible: index % 2 === 0
                 spacing: 8
                 width: 336
+
+                // 条件设置normalBackgroundVisible属性，仅在支持的DTK版本中使用
+                Component.onCompleted: {
+                    if (DTK.majorVersion >= 6) {
+                        // 在DTK 6.x中可能支持此属性
+                        if (typeof normalBackgroundVisible !== "undefined") {
+                            normalBackgroundVisible = index % 2 === 0;
+                        }
+                    }
+                }
 
                 onClicked: {
                     dialog.index = index;

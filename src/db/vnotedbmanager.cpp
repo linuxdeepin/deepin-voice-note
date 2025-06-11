@@ -6,6 +6,7 @@
 #include "db/vnotedbmanager.h"
 #include "db/dbvisitor.h"
 #include "globaldef.h"
+#include <QDebug>
 
 #include <QStandardPaths>
 #include <QDir>

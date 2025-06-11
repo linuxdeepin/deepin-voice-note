@@ -2,14 +2,14 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import QtQuick
-import QtQuick.Window
-import QtQuick.Layouts
-import org.deepin.dtk
-import Qt.labs.platform
-import QtQuick.Controls
+import QtQuick 2.15
+import QtQuick.Window 2.15
+import QtQuick.Layouts 1.15
+import Qt.labs.platform 1.1
+import QtQuick.Controls 2.15
 import VNote 1.0
 import "../dialog"
+import org.deepin.dtk 1.0
 
 ApplicationWindow {
     id: rootWindow
@@ -51,6 +51,7 @@ ApplicationWindow {
     Component.onCompleted: {
         x = Screen.width / 2 - width / 2;
         y = Screen.height / 2 - height / 2;
+        checkAndCreateDataPath();
     }
     onClosing: {
         close.accepted = false;
@@ -299,21 +300,34 @@ ApplicationWindow {
         z: 100
     }
 
-    ToolButton {
+    Item {
         id: twoColumnModeBtn
-
-        height: 30
-        icon.height: 30
-        icon.name: "topleft"
-        icon.width: 30
-        visible: !(needHideSearch && search.visible) || leftBgArea.visible
         width: 30
+        height: 30
         x: 50
         y: 10
         z: 100
+        visible: !(needHideSearch && search.visible) || leftBgArea.visible
 
-        onClicked: {
-            toggleTwoColumnMode();
+        DciIcon {
+            anchors.fill: parent
+            name: "topleft"
+        }
+
+        Rectangle {
+            anchors.fill: parent
+            radius: 4
+            color: "black"
+            opacity: mouseArea.hovered ? 0.1 : 0
+        }
+
+        MouseArea {
+            id: mouseArea
+            anchors.fill: parent
+            hoverEnabled: true
+            onClicked: {
+                toggleTwoColumnMode();
+            }
         }
     }
 
@@ -839,3 +853,4 @@ ApplicationWindow {
         }
     }
 }
+

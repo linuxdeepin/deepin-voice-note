@@ -2,8 +2,16 @@
 #define QTPLAYER_H
 
 #include <QObject>
+
+// 条件编译：根据 Qt 版本包含不同的头文件
+#ifdef USE_QT5
 #include <QMediaPlayer>
 #include <QAudioOutput>
+#include <QAudioFormat>
+#else
+#include <QMediaPlayer>
+#include <QAudioOutput>
+#endif
 
 #include "voiceplayerbase.h"
 

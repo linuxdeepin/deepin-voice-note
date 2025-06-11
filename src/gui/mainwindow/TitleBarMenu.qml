@@ -1,6 +1,6 @@
-import QtQuick
-import org.deepin.dtk 1.0
+import QtQuick 2.15
 import VNote 1.0
+import org.deepin.dtk 1.0
 
 Menu {
     signal openPrivacy

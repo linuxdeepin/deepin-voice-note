@@ -10,6 +10,7 @@ class ImageProvider : public QQuickImageProvider
 {
 public:
     static ImageProvider* instance();
+    virtual ~ImageProvider() = default;
 
     QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
     QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize);

@@ -19,6 +19,10 @@
 #include <QImage>
 #include <QDebug>
 #include <QApplication>
+// 条件编译：Qt5 需要包含 functional 头文件
+#ifdef USE_QT5
+#include <functional>
+#endif
 
 JsContent::JsContent()
 {
@@ -202,10 +206,20 @@ QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &funti
     QVariant synResult;
     QEventLoop synLoop;
     if (page) {
+#ifdef USE_QT5
+        // Qt5 中使用 std::function 作为回调
+        std::function<void(const QVariant&)> callback = [&synResult, &synLoop](const QVariant &result) {
+            synResult = result;
+            synLoop.quit();
+        };
+        page->runJavaScript(funtion, callback);
+#else
+        // Qt6 中使用 QWebEngineCallback
         page->runJavaScript(funtion, [&](const QVariant &result) {
             synResult = result;
             synLoop.quit();
         });
+#endif
         synLoop.exec();
         qDebug() << "Synchronous JavaScript execution completed";
     } else {

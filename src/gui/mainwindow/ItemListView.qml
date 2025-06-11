@@ -6,11 +6,12 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
-import QtQuick.Dialogs
+import QtWebChannel 1.15
+import Qt.labs.platform 1.1  // 提供Qt5/Qt6兼容的FileDialog
 import "../dialog/"
 import "../drag/"
-import org.deepin.dtk 1.0
 import VNote 1.0
+import org.deepin.dtk 1.0
 
 Item {
     id: rootItem
@@ -156,13 +157,36 @@ Item {
         sourceComponent: FileDialog {
             id: fileDialog
 
-            currentFile: "file:///" + itemModel.get(selectedNoteItem[0]).name
-            currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+            title: qsTr("Save As")
             fileMode: FileDialog.SaveFile
             nameFilters: saveFilters[saveType]
-            title: qsTr("Save As")
 
+            // Qt5 uses 'folder', Qt6 uses 'currentFolder'
+            // Try to set both properties to ensure compatibility
+            property url initialFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+            
             Component.onCompleted: {
+                // Set folder property for Qt5 compatibility
+                try {
+                    fileDialog.folder = initialFolder;
+                } catch (e) {
+                    console.log("folder property not available, trying currentFolder");
+                }
+                
+                // Set currentFolder property for Qt6 compatibility
+                try {
+                    fileDialog.currentFolder = initialFolder;
+                } catch (e) {
+                    console.log("currentFolder property not available, using folder");
+                }
+                
+                // Set currentFile for compatibility (optional, for real-time file selection tracking)
+                try {
+                    fileDialog.currentFile = "";
+                } catch (e) {
+                    console.log("currentFile property not available");
+                }
+                
                 fileDialog.open();
             }
             onAccepted: {
@@ -170,7 +194,16 @@ Item {
                 for (var i = 0; i < selectedNoteItem.length; i++) {
                     idList.push(itemModel.get(selectedNoteItem[0]).noteId);
                 }
-                VNoteMainManager.saveAs(idList, fileDialog.selectedFile, saveType);
+                
+                // Qt5 uses fileUrl, Qt6 uses selectedFile
+                var selectedFileUrl;
+                try {
+                    selectedFileUrl = fileDialog.selectedFile || fileDialog.fileUrl;
+                } catch (e) {
+                    selectedFileUrl = fileDialog.fileUrl || fileDialog.selectedFile;
+                }
+                
+                VNoteMainManager.saveAs(idList, selectedFileUrl, saveType);
             }
         }
     }
@@ -186,10 +219,26 @@ Item {
         sourceComponent: FolderDialog {
             id: folderDialog
 
-            currentFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
             title: qsTr("Save As")
+            
+            // Qt5 uses 'folder', Qt6 uses 'currentFolder'
+            property url initialFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
 
             Component.onCompleted: {
+                // Set folder property for Qt5 compatibility
+                try {
+                    folderDialog.folder = initialFolder;
+                } catch (e) {
+                    console.log("folder property not available for FolderDialog, trying currentFolder");
+                }
+                
+                // Set currentFolder property for Qt6 compatibility
+                try {
+                    folderDialog.currentFolder = initialFolder;
+                } catch (e) {
+                    console.log("currentFolder property not available for FolderDialog, using folder");
+                }
+                
                 folderDialog.open();
             }
             onAccepted: {
@@ -197,6 +246,8 @@ Item {
                 for (var i = 0; i < selectedNoteItem.length; i++) {
                     list.push(itemModel.get(selectedNoteItem[i]).noteId);
                 }
+                
+                // Qt5 and Qt6 both use selectedFolder for FolderDialog
                 VNoteMainManager.saveAs(list, folderDialog.selectedFolder, saveType);
             }
         }

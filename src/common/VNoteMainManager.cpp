@@ -22,7 +22,10 @@
 
 #include <QThreadPool>
 #include <QQmlApplicationEngine>
+// 条件编译：根据 Qt 版本包含不同的 WebEngine 头文件
+#ifndef USE_QT5
 #include <QtWebEngineQuick/qtwebenginequickglobal.h>
+#endif
 #include <QStringList>
 #include <QStandardPaths>
 #include <QFileInfo>
@@ -751,7 +754,7 @@ void VNoteMainManager::insertImages(const QStringList &filePaths)
     QDateTime currentDateTime = QDateTime::currentDateTime();
     QString date = currentDateTime.toString("yyyyMMddhhmmss");
 
-    for (auto path : filePaths.toList()) {
+    for (auto path : filePaths) {
         QFileInfo fileInfo(path);
         QString suffix = fileInfo.suffix();
         if (!(suffix == "jpg" || suffix == "png" || suffix == "bmp")) {

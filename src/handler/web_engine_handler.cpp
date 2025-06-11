@@ -24,11 +24,20 @@
 #include <QTimer>
 #include <QCursor>
 #include <QMimeData>
+// 条件编译：QWebEngineContextMenuRequest 只在 Qt6 中存在
+#ifndef USE_QT5
 #include <QWebEngineContextMenuRequest>
+#endif
 #include <QFileDialog>
 #include <QStandardPaths>
+// 条件编译：根据 Qt 版本包含不同的音频设备头文件
+#ifdef USE_QT5
+#include <QAudioDeviceInfo>
+#include <QAudio>
+#else
 #include <QMediaDevices>
 #include <QAudioDevice>
+#endif
 
 #include <dguiapplicationhelper.h>
 
@@ -197,22 +206,49 @@ void WebEngineHandler::connectWebContent()
 /*!
  * \brief 处理右键菜单请求 \a request , 完成后抛出 requestShowMenu() 信号
  */
+#ifdef USE_QT5
+void WebEngineHandler::onContextMenuRequested(QObject *request)
+{
+    // 从 QObject* 中安全地获取属性
+    const QPoint pos = request->property("position").toPoint();
+
+    switch (menuType) {
+    case VoiceMenu: {
+        processVoiceMenuRequest(request);
+        break;
+    }
+    case PictureMenu: {
+        // 图片菜单的逻辑很简单，直接弹出
+        Q_EMIT requestShowMenu(menuType, pos);
+        break;
+    }
+    case TxtMenu: {
+        // 文本菜单的状态已由QML处理，这里调用C++是为了处理未来可能的特殊逻辑
+        processTextMenuRequest(request);
+        break;
+    }
+    default:
+        break;
+    }
+}
+#else
 void WebEngineHandler::onContextMenuRequested(QWebEngineContextMenuRequest *request)
 {
     switch (menuType) {
-        case VoiceMenu: {
-            processVoiceMenuRequest(request);
-        } break;
-        case PictureMenu: {
-            Q_EMIT requestShowMenu(menuType, request->position());
-        } break;
-        case TxtMenu: {
-            processTextMenuRequest(request);
-        } break;
-        default:
-            break;
+    case VoiceMenu: {
+        processVoiceMenuRequest(request);
+    } break;
+    case PictureMenu: {
+        Q_EMIT requestShowMenu(menuType, request->position());
+    } break;
+    case TxtMenu: {
+        processTextMenuRequest(request);
+    } break;
+    default:
+        break;
     }
 }
+#endif
 
 /**
    @brief 插入音频文件， \a voicePath 为音频文件路径， \a voiceSize 为音频的长度，单位 ms
@@ -323,6 +359,18 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
             savePictureAs();
             break;
         case ActionManager::TxtSpeech: {
+#ifdef USE_QT5
+            // Qt5 中使用 QAudioDeviceInfo 检查音频输出设备
+            QList<QAudioDeviceInfo> outputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
+            if (outputDevices.isEmpty()) {
+                qWarning() << "No audio output devices available";
+                QString errString = VTextSpeechAndTrManager::instance()->errorString(VTextSpeechAndTrManager::NoOutputDevice);
+                if (!errString.isEmpty()) {
+                    Q_EMIT popupToast(errString, VTextSpeechAndTrManager::NoOutputDevice);
+                }
+                break;
+            }
+#else
             QList<QAudioDevice> outputDevices = QMediaDevices::audioOutputs();
             if (outputDevices.isEmpty()) {
                 qWarning() << "No audio output devices available";
@@ -332,6 +380,7 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
                 }
                 break;
             }
+#endif
             auto status = VTextSpeechAndTrManager::instance()->onTextToSpeech();
             if (VTextSpeechAndTrManager::Success != status) {
                 qWarning() << "Text to speech failed with status:" << status;
@@ -406,6 +455,34 @@ void WebEngineHandler::onPaste(bool isVoice)
 /*!
  * \brief 处理语音菜单请求 \a request
  */
+#ifdef USE_QT5
+void WebEngineHandler::processVoiceMenuRequest(QObject *request)
+{
+    m_voiceBlock.reset(new VNVoiceBlock);
+    MetaDataParser dataParser;
+    // 解析json数据
+    if (!dataParser.parse(menuJson, m_voiceBlock.get())) {
+        return;
+    }
+
+    // 语音文件不存在使用弹出提示
+    if (!QFile(m_voiceBlock->voicePath).exists()) {
+        // 异步操作，防止阻塞前端事件
+        QTimer::singleShot(0, this, [this] {
+            Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::VoicePathNoAvail);
+            // 调用 js 删除删除语音文本
+            Q_EMIT JsContent::instance()->callJsDeleteSelection();
+        });
+        return;
+    }
+
+    // 如果当前有语音处于转换状态就将语音转文字选项置灰 (此逻辑已移至QML onAboutToShow，此处为兜底)
+    ActionManager::instance()->enableAction(ActionManager::VoiceToText, !OpsStateInterface::instance()->isVoice2Text());
+    // 请求界面弹出右键菜单
+    const QPoint pos = request->property("position").toPoint();
+    Q_EMIT requestShowMenu(VoiceMenu, pos);
+}
+#else
 void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *request)
 {
     m_voiceBlock.reset(new VNVoiceBlock);
@@ -431,19 +508,53 @@ void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *req
     // 请求界面弹出右键菜单
     Q_EMIT requestShowMenu(VoiceMenu, request->position());
 }
+#endif
 
 /*!
  * \brief 处理文本菜单请求 \a request
  */
+#ifdef USE_QT5
+void WebEngineHandler::processTextMenuRequest(QObject *request)
+{
+    // 此处的逻辑是"兜底"，主要逻辑已由QML实现，以确保在所有情况下状态正确
+    const int intFlags = request->property("editFlags").toInt();
+    auto flags = static_cast<QWebEngineContextMenuData::EditFlags>(intFlags);
+
+    ActionManager::instance()->resetCtxMenu(ActionManager::MenuType::TxtCtxMenu, false); // 重置菜单选项
+
+    ActionManager::instance()->visibleAction(ActionManager::TxtStopreading, false);
+
+    // 设置普通菜单项状态
+    if (flags.testFlag(QWebEngineContextMenuData::CanSelectAll)) {
+        ActionManager::instance()->enableAction(ActionManager::TxtSelectAll, true);
+    }
+    if (flags.testFlag(QWebEngineContextMenuData::CanCopy)) {
+        ActionManager::instance()->enableAction(ActionManager::TxtCopy, true);
+        ActionManager::instance()->enableAction(ActionManager::TxtSpeech, true);
+    }
+    if (flags.testFlag(QWebEngineContextMenuData::CanCut)) {
+        ActionManager::instance()->enableAction(ActionManager::TxtCut, true);
+    }
+    if (flags.testFlag(QWebEngineContextMenuData::CanDelete)) {
+        ActionManager::instance()->enableAction(ActionManager::TxtDelete, true);
+    }
+    if (flags.testFlag(QWebEngineContextMenuData::CanPaste)) {
+        ActionManager::instance()->enableAction(ActionManager::TxtPaste, true);
+        ActionManager::instance()->enableAction(ActionManager::TxtDictation, true);
+    }
+
+    const QPoint pos = request->property("position").toPoint();
+    Q_EMIT requestShowMenu(TxtMenu, pos);
+}
+#else
 void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *request)
 {
-    ActionManager::instance()->resetCtxMenu(ActionManager::MenuType::TxtCtxMenu, false);  // 重置菜单选项
+    ActionManager::instance()->resetCtxMenu(ActionManager::MenuType::TxtCtxMenu, false); // 重置菜单选项
 
     // TASK-37707: Disable now
     ActionManager::instance()->visibleAction(ActionManager::TxtStopreading, false);
 
-    // 获取web端编辑标志
-    QWebEngineContextMenuRequest::EditFlags flags = request->editFlags();
+    auto flags = request->editFlags();
 
     // 设置普通菜单项状态
     // 可全选
@@ -453,10 +564,6 @@ void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *requ
     // 可复制
     if (flags.testFlag(QWebEngineContextMenuRequest::CanCopy)) {
         ActionManager::instance()->enableAction(ActionManager::TxtCopy, true);
-
-        // if (VTextSpeechAndTrManager::getTransEnable()) {
-        //     ActionManager::instance()->enableAction(ActionManager::TxtTranslate, true);
-        // }
         ActionManager::instance()->enableAction(ActionManager::TxtSpeech, true);
     }
     // 可剪切
@@ -476,6 +583,45 @@ void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *requ
     // 请求界面弹出右键菜单
     Q_EMIT requestShowMenu(TxtMenu, request->position());
 }
+#endif
+
+/*!
+ * \brief 处理图片菜单请求
+ */
+#ifdef USE_QT5
+// Qt5 下图片菜单直接由 onContextMenuRequested 发出信号，无需单独的 process 函数
+#else
+void WebEngineHandler::processPictureMenuRequest(QWebEngineContextMenuRequest *request)
+{
+    ActionManager::instance()->resetCtxMenu(ActionManager::MenuType::PictureCtxMenu, true);
+
+    auto flags = request->editFlags();
+
+    // 设置普通菜单项状态
+    // 可全选
+    if (flags.testFlag(QWebEngineContextMenuRequest::CanSelectAll)) {
+        ActionManager::instance()->enableAction(ActionManager::PictureSelectAll, true);
+    }
+    // 可复制
+    if (flags.testFlag(QWebEngineContextMenuRequest::CanCopy)) {
+        ActionManager::instance()->enableAction(ActionManager::PictureCopy, true);
+    }
+    // 可剪切
+    if (flags.testFlag(QWebEngineContextMenuRequest::CanCut)) {
+        ActionManager::instance()->enableAction(ActionManager::PictureCut, true);
+    }
+    // 可删除
+    if (flags.testFlag(QWebEngineContextMenuRequest::CanDelete)) {
+        ActionManager::instance()->enableAction(ActionManager::PictureDelete, true);
+    }
+    // 可粘贴
+    if (flags.testFlag(QWebEngineContextMenuRequest::CanPaste)) {
+        ActionManager::instance()->enableAction(ActionManager::PicturePaste, true);
+    }
+
+    Q_EMIT requestShowMenu(PictureMenu, request->position());
+}
+#endif
 
 /**
    @return 返回当前拷贝数据是否包含录音
