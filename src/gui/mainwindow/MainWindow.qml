@@ -300,34 +300,21 @@ ApplicationWindow {
         z: 100
     }
 
-    Item {
+    ToolButton {
         id: twoColumnModeBtn
-        width: 30
+
         height: 30
+        icon.height: 30
+        icon.name: "topleft"
+        icon.width: 30
+        visible: !(needHideSearch && search.visible) || leftBgArea.visible
+        width: 30
         x: 50
         y: 10
         z: 100
-        visible: !(needHideSearch && search.visible) || leftBgArea.visible
 
-        DciIcon {
-            anchors.fill: parent
-            name: "topleft"
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            radius: 4
-            color: "black"
-            opacity: mouseArea.hovered ? 0.1 : 0
-        }
-
-        MouseArea {
-            id: mouseArea
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: {
-                toggleTwoColumnMode();
-            }
+        onClicked: {
+            toggleTwoColumnMode();
         }
     }
 
