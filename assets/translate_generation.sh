@@ -26,5 +26,10 @@ ts_list=(`ls ${translations_dir}/*.ts`)
 for ts in "${ts_list[@]}"
 do
     printf "\nprocess ${ts}\n"
-    /usr/lib/qt6/bin/lrelease "${ts}"
+    # 根据QT版本选择lrelease命令
+    if [ "$QT_VERSION_MAJOR" -eq 6 ]; then
+        /usr/lib/qt6/bin/lrelease "${ts}"
+    else
+        lrelease "${ts}"
+    fi
 done
