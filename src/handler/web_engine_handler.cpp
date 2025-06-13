@@ -40,17 +40,21 @@
 #endif
 
 #include <dguiapplicationhelper.h>
+#include <DSysInfo>
 
 // 获取字号接口
-#ifdef OS_BUILD_V23
-#define DEEPIN_DAEMON_APPEARANCE_SERVICE "org.deepin.dde.Appearance1"
-#define DEEPIN_DAEMON_APPEARANCE_PATH "/org/deepin/dde/Appearance1"
-#define DEEPIN_DAEMON_APPEARANCE_INTERFACE "org.deepin.dde.Appearance1"
-#else
-#define DEEPIN_DAEMON_APPEARANCE_SERVICE "com.deepin.daemon.Appearance"
-#define DEEPIN_DAEMON_APPEARANCE_PATH "/com/deepin/daemon/Appearance"
-#define DEEPIN_DAEMON_APPEARANCE_INTERFACE "com.deepin.daemon.Appearance"
-#endif
+const QString APPEARANCE_SERVICE_V23 = "org.deepin.dde.Appearance1";
+const QString APPEARANCE_PATH_V23 = "/org/deepin/dde/Appearance1";
+const QString APPEARANCE_INTERFACE_V23 = "org.deepin.dde.Appearance1";
+
+const QString APPEARANCE_SERVICE_V20 = "com.deepin.daemon.Appearance";
+const QString APPEARANCE_PATH_V20 = "/com/deepin/daemon/Appearance";
+const QString APPEARANCE_INTERFACE_V20 = "com.deepin.daemon.Appearance";
+
+inline bool isV20() { return Dtk::Core::DSysInfo::majorVersion() == "20"; }
+const QString DEEPIN_DAEMON_APPEARANCE_SERVICE = isV20() ? APPEARANCE_SERVICE_V20 : APPEARANCE_SERVICE_V23;
+const QString DEEPIN_DAEMON_APPEARANCE_PATH = isV20() ? APPEARANCE_PATH_V20 : APPEARANCE_PATH_V23;
+const QString DEEPIN_DAEMON_APPEARANCE_INTERFACE = isV20() ? APPEARANCE_INTERFACE_V20 : APPEARANCE_INTERFACE_V23;
 
 DGUI_USE_NAMESPACE
 
