@@ -579,7 +579,7 @@ Todas las notas en él serán borradas</translation>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="106"/>
         <source>Save failed</source>
-        <translation>El guardado falló</translation>
+        <translation>Error al guardar</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="150"/>
