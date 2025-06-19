@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.25) unstable; urgency=medium
+
+  * chore: Update dman's resources
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Thu, 19 Jun 2025 15:15:56 +0800
+
 deepin-voice-note (6.5.24) unstable; urgency=medium
 
   * fix: noise reduction recording exception
