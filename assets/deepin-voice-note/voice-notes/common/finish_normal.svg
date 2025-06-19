@@ -1,28 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="60px" height="60px" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 56.2 (81672) - https://sketch.com -->
-    <title>finish_normal</title>
-    <desc>Created with Sketch.</desc>
-    <defs>
-        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
-            <stop stop-color="#FD5E5E" offset="0%"></stop>
-            <stop stop-color="#ED5656" offset="100%"></stop>
-        </linearGradient>
-        <circle id="path-2" cx="30" cy="30" r="20"></circle>
-        <filter x="-27.5%" y="-17.5%" width="155.0%" height="155.0%" filterUnits="objectBoundingBox" id="filter-3">
-            <feOffset dx="0" dy="4" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
-            <feGaussianBlur stdDeviation="3" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
-            <feColorMatrix values="0 0 0 0 0.97254902   0 0 0 0 0.17254902   0 0 0 0 0.277440324  0 0 0 0.4 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
-        </filter>
-    </defs>
-    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="按钮状态" transform="translate(-662.000000, -128.000000)">
-            <g id="finish_normal" transform="translate(662.000000, 128.000000)">
-                <g id="Oval">
-                    <use fill="black" fill-opacity="1" filter="url(#filter-3)" xlink:href="#path-2"></use>
-                    <use fill="url(#linearGradient-1)" fill-rule="evenodd" xlink:href="#path-2"></use>
-                </g>
-                <path d="M29.0978273,31.6965835 L33,24.9378222 C33.5522847,23.9812369 34.7754656,23.6534866 35.7320508,24.2057714 C36.6886361,24.7580561 37.0163864,25.9812369 36.4641016,26.9378222 L31.4641016,35.5980762 C31.1023866,36.224585 30.4528905,36.5813549 29.7789903,36.5978141 C29.2289632,36.6829895 28.6464121,36.5394304 28.1865468,36.1535575 L23.5902801,32.2968319 C22.7441308,31.5868283 22.6337629,30.3253171 23.3437665,29.4791678 C24.05377,28.6330184 25.3152812,28.5226505 26.1614306,29.2326541 L29.0978273,31.6965835 Z" id="Combined-Shape" fill="#FFFFFF"></path>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>结束录音</title>
+    <g id="语音记事本" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="画框" transform="translate(-103, -91)" fill-rule="nonzero">
+            <g id="结束录音" transform="translate(103, 91)">
+                <path d="M12,0 C18.627417,0 24,5.372583 24,12 C24,18.627417 18.627417,24 12,24 C5.372583,24 0,18.627417 0,12 C0,5.372583 5.372583,0 12,0 Z M12,1 C5.92486775,1 1,5.92486775 1,12 C1,18.0751322 5.92486775,23 12,23 C18.0751322,23 23,18.0751322 23,12 C23,5.92486775 18.0751322,1 12,1 Z" id="椭圆形" fill-opacity="0.7" fill="#000000"></path>
+                <path d="M9.2819426,8 L14.7180574,8 C15.1638168,8 15.3254599,8.04641281 15.4884229,8.13356635 C15.6513858,8.2207199 15.7792801,8.34861419 15.8664336,8.51157715 C15.9535872,8.67454011 16,8.83618323 16,9.2819426 L16,14.7180574 C16,15.1638168 15.9535872,15.3254599 15.8664336,15.4884229 C15.7792801,15.6513858 15.6513858,15.7792801 15.4884229,15.8664336 C15.3254599,15.9535872 15.1638168,16 14.7180574,16 L9.2819426,16 C8.83618323,16 8.67454011,15.9535872 8.51157715,15.8664336 C8.34861419,15.7792801 8.2207199,15.6513858 8.13356635,15.4884229 C8.04641281,15.3254599 8,15.1638168 8,14.7180574 L8,9.2819426 C8,8.83618323 8.04641281,8.67454011 8.13356635,8.51157715 C8.2207199,8.34861419 8.34861419,8.2207199 8.51157715,8.13356635 C8.67454011,8.04641281 8.83618323,8 9.2819426,8 Z" id="矩形" fill="#FF0101"></path>
             </g>
         </g>
     </g>
