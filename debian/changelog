@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.26) unstable; urgency=medium
+
+  * fix: Enable qml6-module-qtquick-controls2 and qml6-module-qtquick-templates2 for MIPS architecture
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Fri, 20 Jun 2025 11:06:24 +0800
+
 deepin-voice-note (6.5.25) unstable; urgency=medium
 
   * chore: Update dman's resources
