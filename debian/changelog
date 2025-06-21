@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.28) unstable; urgency=medium
+
+  * fix: Update lrelease command detection for Qt6 compatibility
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Sat, 21 Jun 2025 15:47:20 +0800
+
 deepin-voice-note (6.5.27) unstable; urgency=medium
 
   * fix: Adjust MIPS architecture dependencies in debian/control
