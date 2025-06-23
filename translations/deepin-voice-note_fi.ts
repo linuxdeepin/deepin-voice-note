@@ -504,7 +504,7 @@
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="53"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation>Puhemuistio on kevyt työkalu, jolla voit tehdä muistiinpanot tekstinä tai puheena.</translation>
+        <translation>Puhemuistio työkalulla voit tehdä muistiinpanot puheena ja tekstinä.</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="55"/>
@@ -810,7 +810,7 @@ Kaikki siinä olevat muistiinpanot poistetaan</translation>
     <message>
         <location filename="../src/common/jscontent.cpp" line="174"/>
         <source>Converting voice to text</source>
-        <translation type="unfinished"/>
+        <translation>Muunnetaan puhetta tekstiksi</translation>
     </message>
 </context>
 </TS>
