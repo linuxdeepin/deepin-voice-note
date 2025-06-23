@@ -30,17 +30,17 @@
     <message>
         <location filename="../src/gui/mainwindow/FolderListView.qml" line="517"/>
         <source>Rename</source>
-        <translation type="unfinished"/>
+        <translation>Nimeä</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/FolderListView.qml" line="526"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Poista</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/FolderListView.qml" line="545"/>
         <source>New Note</source>
-        <translation type="unfinished"/>
+        <translation>Uusi muistiinpano</translation>
     </message>
 </context>
 <context>
@@ -48,12 +48,12 @@
     <message>
         <location filename="../src/gui/mainwindow/InitialInterface.qml" line="66"/>
         <source>After creating a new notepad, you can start recording voice and text</source>
-        <translation type="unfinished"/>
+        <translation>Kun olet luonut uuden muistikirjan, voit tallentaa ääntä ja tekstiä</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/InitialInterface.qml" line="73"/>
         <source>Create Notebook</source>
-        <translation type="unfinished"/>
+        <translation>Luo muistikirja</translation>
     </message>
 </context>
 <context>
@@ -62,28 +62,28 @@
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="81"/>
         <source>move </source>
-        <translation type="unfinished"/>
+        <translation>siirrä</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
         <source> notes to :</source>
-        <translation type="unfinished"/>
+        <translation> muistiinpanot :</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="81"/>
         <source> note to :</source>
-        <translation type="unfinished"/>
+        <translation> muistiinpano :</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="160"/>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="222"/>
         <source>Save As</source>
-        <translation type="unfinished"/>
+        <translation>Tallenna nimellä</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="279"/>
         <source>No search results</source>
-        <translation type="unfinished"/>
+        <translation>Ei hakutuloksia</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
