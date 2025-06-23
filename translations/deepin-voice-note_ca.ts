@@ -30,17 +30,17 @@
     <message>
         <location filename="../src/gui/mainwindow/FolderListView.qml" line="517"/>
         <source>Rename</source>
-        <translation type="unfinished"/>
+        <translation>Canvia&apos;n el nom</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/FolderListView.qml" line="526"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Elimina</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/FolderListView.qml" line="545"/>
         <source>New Note</source>
-        <translation type="unfinished"/>
+        <translation>Nota nova</translation>
     </message>
 </context>
 <context>
@@ -48,12 +48,12 @@
     <message>
         <location filename="../src/gui/mainwindow/InitialInterface.qml" line="66"/>
         <source>After creating a new notepad, you can start recording voice and text</source>
-        <translation type="unfinished"/>
+        <translation>Després de crear un quadern nou, podeu començar a gravar veu i text.</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/InitialInterface.qml" line="73"/>
         <source>Create Notebook</source>
-        <translation type="unfinished"/>
+        <translation>Crea un quadern</translation>
     </message>
 </context>
 <context>
@@ -62,43 +62,43 @@
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="81"/>
         <source>move </source>
-        <translation type="unfinished"/>
+        <translation>mou</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
         <source> notes to :</source>
-        <translation type="unfinished"/>
+        <translation>notes per a:</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="81"/>
         <source> note to :</source>
-        <translation type="unfinished"/>
+        <translation>nota per a:</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="160"/>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="222"/>
         <source>Save As</source>
-        <translation type="unfinished"/>
+        <translation>Desa-ho com a</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="279"/>
         <source>No search results</source>
-        <translation type="unfinished"/>
+        <translation>No hi ha cap resultat de la cerca.</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
         <source>Unpin</source>
-        <translation type="unfinished"/>
+        <translation>Desenganxa</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
         <source>Sticky on Top</source>
-        <translation type="unfinished"/>
+        <translation>Les adhesives a dalt</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="752"/>
         <source>Sticky Notes</source>
-        <translation type="unfinished"/>
+        <translation>Notes adhesives</translation>
     </message>
 </context>
 <context>
@@ -106,12 +106,12 @@
     <message>
         <location filename="../src/gui/mainwindow/MainWindow.qml" line="370"/>
         <source>Create Notebook</source>
-        <translation type="unfinished"/>
+        <translation>Crea un quadern</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MainWindow.qml" line="523"/>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Cerca</translation>
     </message>
 </context>
 <context>
@@ -119,17 +119,17 @@
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="24"/>
         <source>Move Note</source>
-        <translation type="unfinished"/>
+        <translation>Mou la nota</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="136"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Cancel·la</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="153"/>
         <source>Ok</source>
-        <translation type="unfinished"/>
+        <translation>D&apos;acord</translation>
     </message>
 </context>
 <context>
@@ -137,27 +137,27 @@
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="37"/>
         <source>%1 note selected</source>
-        <translation type="unfinished"/>
+        <translation>%1 nota seleccionada</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="56"/>
         <source>Move</source>
-        <translation type="unfinished"/>
+        <translation>Mou</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="69"/>
         <source>Save Note</source>
-        <translation type="unfinished"/>
+        <translation>Desa la nota</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="82"/>
         <source>Save Voice</source>
-        <translation type="unfinished"/>
+        <translation>Desa la nota de veu</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="93"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Elimina</translation>
     </message>
 </context>
 <context>
@@ -304,22 +304,22 @@
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="261"/>
         <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
-        <translation type="unfinished"/>
+        <translation>Si us plau, instal·leu UOS AI des de la Botiga d&apos;aplicacions abans.</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="263"/>
         <source>No audio input device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>No s&apos;ha detectat cap dispositiu d&apos;entrada d&apos;àudio. Si us plau, comproveu-ho i torneu-ho a provar.</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="265"/>
         <source>No audio output device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>No s&apos;ha detectat cap dispositiu de sortida d&apos;àudio. Si us plau, comproveu-ho i torneu-ho a provar.</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="99"/>
         <source>deepin-voice-note</source>
-        <translation type="unfinished"/>
+        <translation>Nota de veu del Deepin</translation>
     </message>
 </context>
 <context>
