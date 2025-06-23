@@ -673,7 +673,7 @@ Kaikki siinä olevat muistiinpanot poistetaan</translation>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="125"/>
         <source>You do not have permission to save files there</source>
-        <translation type="unfinished"/>
+        <translation>Sinulla ei ole oikeuksia siihen tallentaa tiedostoja</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="127"/>
@@ -683,17 +683,17 @@ Kaikki siinä olevat muistiinpanot poistetaan</translation>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="129"/>
         <source>The voice conversion failed due to the poor network connection, please have a check</source>
-        <translation type="unfinished"/>
+        <translation>Muuntaminen epäonnistui heikon verkkoyhteyden vuoksi, tarkista yhteys</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="141"/>
         <source>All notes in it will be deleted</source>
-        <translation type="unfinished"/>
+        <translation>Kaikki siinä olevat muistiinpanot poistetaan</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="154"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Poista</translation>
     </message>
 </context>
 <context>
@@ -701,12 +701,12 @@ Kaikki siinä olevat muistiinpanot poistetaan</translation>
     <message>
         <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="150"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Peru</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="183"/>
         <source>Confirm</source>
-        <translation type="unfinished"/>
+        <translation>Vahvista</translation>
     </message>
 </context>
 <context>
@@ -714,7 +714,7 @@ Kaikki siinä olevat muistiinpanot poistetaan</translation>
     <message>
         <location filename="../src/handler/web_engine_handler.cpp" line="647"/>
         <source>save as MP3</source>
-        <translation type="unfinished"/>
+        <translation>tallenna mp3-tiedostona</translation>
     </message>
 </context>
 <context>
@@ -722,22 +722,22 @@ Kaikki siinä olevat muistiinpanot poistetaan</translation>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="60"/>
         <source>Create Note</source>
-        <translation type="unfinished"/>
+        <translation>Luo muistiinpano</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
         <source>Start recording</source>
-        <translation type="unfinished"/>
+        <translation>Aloita tallennus</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
         <source>No recording device detected</source>
-        <translation type="unfinished"/>
+        <translation>Äänilaitetta ei havaittu</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="119"/>
         <source>Insert picture</source>
-        <translation type="unfinished"/>
+        <translation>Lisää kuva</translation>
     </message>
 </context>
 <context>
@@ -805,7 +805,7 @@ Kaikki siinä olevat muistiinpanot poistetaan</translation>
     <message>
         <location filename="../src/common/jscontent.cpp" line="173"/>
         <source>Voice To Text</source>
-        <translation type="unfinished"/>
+        <translation>Puhe tekstiksi</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="174"/>
