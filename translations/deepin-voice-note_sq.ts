@@ -4,7 +4,7 @@
 <context>
     <name>AppMain</name>
     <message>
-        <location filename="../src/common/vlcplayer.cpp" line="85"/>
+        <location filename="../src/common/vlcplayer.cpp" line="87"/>
         <source>Voice Notes</source>
         <translation>Shënime Zanore</translation>
     </message>
@@ -12,7 +12,7 @@
 <context>
     <name>DefaultName</name>
     <message>
-        <location filename="../src/db/vnotefolderoper.cpp" line="226"/>
+        <location filename="../src/db/vnotefolderoper.cpp" line="249"/>
         <source>Notebook</source>
         <translation>Bllok Shënimesh</translation>
     </message>
@@ -22,7 +22,7 @@
         <translation>Zë</translation>
     </message>
     <message>
-        <location filename="../src/db/vnoteitemoper.cpp" line="214"/>
+        <location filename="../src/db/vnoteitemoper.cpp" line="226"/>
         <source>Text</source>
         <translation type="unfinished"></translation>
     </message>
@@ -61,44 +61,44 @@
 <context>
     <name>ItemListView</name>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="78"/>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="80"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="81"/>
         <source>move </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="78"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
         <source> notes to :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="80"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="81"/>
         <source> note to :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="163"/>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="190"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="160"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="222"/>
         <source>Save As</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="228"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="279"/>
         <source>No search results</source>
         <translation type="unfinished">S’ka përfundime kërkimi</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="244"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
         <source>Unpin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="244"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
         <source>Sticky on Top</source>
         <translation type="unfinished">Ngjite në Krye</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="690"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="752"/>
         <source>Sticky Notes</source>
         <translation type="unfinished">Shënime Ngjitëse</translation>
     </message>
@@ -106,12 +106,12 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="381"/>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="370"/>
         <source>Create Notebook</source>
         <translation type="unfinished">Krijoni Bllok Shënimesh</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="534"/>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="523"/>
         <source>Search</source>
         <translation type="unfinished">Kërko</translation>
     </message>
@@ -124,12 +124,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/dialog/MoveDialog.qml" line="127"/>
+        <location filename="../src/gui/dialog/MoveDialog.qml" line="136"/>
         <source>Cancel</source>
         <translation type="unfinished">Anuloje</translation>
     </message>
     <message>
-        <location filename="../src/gui/dialog/MoveDialog.qml" line="144"/>
+        <location filename="../src/gui/dialog/MoveDialog.qml" line="153"/>
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
@@ -165,72 +165,72 @@
 <context>
     <name>NoteDetailContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="68"/>
+        <location filename="../src/common/actionmanager.cpp" line="69"/>
         <source>Save as MP3</source>
         <translation>Ruaje si MP3</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="69"/>
+        <location filename="../src/common/actionmanager.cpp" line="70"/>
         <source>Voice to Text</source>
         <translation>Nga Zë në Tekst</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="70"/>
-        <location filename="../src/common/actionmanager.cpp" line="78"/>
-        <location filename="../src/common/actionmanager.cpp" line="86"/>
-        <source>Delete</source>
-        <translation>Fshije</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="71"/>
         <location filename="../src/common/actionmanager.cpp" line="79"/>
         <location filename="../src/common/actionmanager.cpp" line="87"/>
-        <source>Select all</source>
-        <translation type="unfinished"></translation>
+        <source>Delete</source>
+        <translation>Fshije</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="72"/>
         <location filename="../src/common/actionmanager.cpp" line="80"/>
         <location filename="../src/common/actionmanager.cpp" line="88"/>
-        <source>Copy</source>
-        <translation>Kopjoje</translation>
+        <source>Select all</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="73"/>
         <location filename="../src/common/actionmanager.cpp" line="81"/>
         <location filename="../src/common/actionmanager.cpp" line="89"/>
-        <source>Cut</source>
-        <translation>Prije</translation>
+        <source>Copy</source>
+        <translation>Kopjoje</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="74"/>
         <location filename="../src/common/actionmanager.cpp" line="82"/>
         <location filename="../src/common/actionmanager.cpp" line="90"/>
+        <source>Cut</source>
+        <translation>Prije</translation>
+    </message>
+    <message>
+        <location filename="../src/common/actionmanager.cpp" line="75"/>
+        <location filename="../src/common/actionmanager.cpp" line="83"/>
+        <location filename="../src/common/actionmanager.cpp" line="91"/>
         <source>Paste</source>
         <translation>Ngjite</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="77"/>
+        <location filename="../src/common/actionmanager.cpp" line="78"/>
         <source>View</source>
         <translation>Shiheni</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="83"/>
+        <location filename="../src/common/actionmanager.cpp" line="84"/>
         <source>Save as</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="92"/>
+        <location filename="../src/common/actionmanager.cpp" line="93"/>
         <source>Text to Speech</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="93"/>
+        <location filename="../src/common/actionmanager.cpp" line="94"/>
         <source>Stop reading</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="94"/>
+        <location filename="../src/common/actionmanager.cpp" line="95"/>
         <source>Speech to Text</source>
         <translation type="unfinished"></translation>
     </message>
@@ -238,17 +238,17 @@
 <context>
     <name>NotebookContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="46"/>
+        <location filename="../src/common/actionmanager.cpp" line="47"/>
         <source>Rename</source>
         <translation>Riemërtojeni</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="47"/>
+        <location filename="../src/common/actionmanager.cpp" line="48"/>
         <source>Delete</source>
         <translation>Fshije</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="48"/>
+        <location filename="../src/common/actionmanager.cpp" line="49"/>
         <source>New note</source>
         <translation type="unfinished">Shënim i ri</translation>
     </message>
@@ -256,47 +256,47 @@
 <context>
     <name>NotesContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="62"/>
+        <location filename="../src/common/actionmanager.cpp" line="63"/>
         <source>Save as HTML</source>
         <translation>Ruaje si HTML</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="63"/>
+        <location filename="../src/common/actionmanager.cpp" line="64"/>
         <source>Save as TXT</source>
         <translation>Ruaje si TXT</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="56"/>
+        <location filename="../src/common/actionmanager.cpp" line="57"/>
         <source>Save note</source>
         <translation>Ruani shënim</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="51"/>
+        <location filename="../src/common/actionmanager.cpp" line="52"/>
         <source>Rename</source>
         <translation>Riemërtojeni</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="53"/>
+        <location filename="../src/common/actionmanager.cpp" line="54"/>
         <source>Move</source>
         <translation>Lëvize</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="54"/>
+        <location filename="../src/common/actionmanager.cpp" line="55"/>
         <source>Delete</source>
         <translation>Fshije</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="57"/>
+        <location filename="../src/common/actionmanager.cpp" line="58"/>
         <source>Save voice recording</source>
         <translation>Ruaje incizimin zanor</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="59"/>
+        <location filename="../src/common/actionmanager.cpp" line="60"/>
         <source>New note</source>
         <translation>Shënim i ri</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="52"/>
+        <location filename="../src/common/actionmanager.cpp" line="53"/>
         <source>Sticky on Top</source>
         <translation>Ngjite në Krye</translation>
     </message>
@@ -304,23 +304,22 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="230"/>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="261"/>
         <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="232"/>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="263"/>
         <source>No audio input device detected. Please check and try again</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="234"/>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="265"/>
         <source>No audio output device detected. Please check and try again</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="56"/>
-        <location filename="../src/main.cpp" line="57"/>
+        <location filename="../src/main.cpp" line="99"/>
         <source>deepin-voice-note</source>
         <translation type="unfinished"></translation>
     </message>
@@ -374,97 +373,97 @@
 <context>
     <name>Shortcuts</name>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="742"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="804"/>
         <source>New notebook</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="743"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="805"/>
         <source>Rename notebook</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="744"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="806"/>
         <source>Delete notebook</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="766"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="828"/>
         <source>New note</source>
         <translation type="unfinished">Shënim i ri</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="767"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="829"/>
         <source>Rename note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="768"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="830"/>
         <source>Delete note</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="769"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="831"/>
         <source>Play/Pause</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="770"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="832"/>
         <source>Record voice</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="771"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="833"/>
         <source>Save note</source>
         <translation type="unfinished">Ruani shënim</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="772"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="834"/>
         <source>Save recordings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="792"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="854"/>
         <source>Select all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="793"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="855"/>
         <source>Copy</source>
         <translation type="unfinished">Kopjoje</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="794"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="856"/>
         <source>Cut</source>
         <translation type="unfinished">Prije</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="795"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="857"/>
         <source>Paste</source>
         <translation type="unfinished">Ngjite</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="796"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="858"/>
         <source>Undo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="797"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="859"/>
         <source>Redo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="798"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="860"/>
         <source>Delete</source>
         <translation type="unfinished">Fshije</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="821"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="883"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="822"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="884"/>
         <source>Display shortcuts</source>
         <translation type="unfinished"></translation>
     </message>
@@ -472,22 +471,22 @@
 <context>
     <name>ShortcutsGroups</name>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="748"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="810"/>
         <source>Notebooks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="776"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="838"/>
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="802"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="864"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="826"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="888"/>
         <source>Settings</source>
         <translation type="unfinished">Rregullime</translation>
     </message>
@@ -526,19 +525,103 @@
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../src/common/utils.cpp" line="42"/>
+        <location filename="../src/common/utils.cpp" line="46"/>
+        <location filename="../tests/src/common/ut_utils.cpp" line="32"/>
         <source>1 min ago</source>
         <translation>1 minutë më parë</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="44"/>
+        <location filename="../src/common/utils.cpp" line="48"/>
         <source>%1 mins ago</source>
         <translation>%1 minuta më parë</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="50"/>
+        <location filename="../src/common/utils.cpp" line="56"/>
+        <location filename="../tests/src/common/ut_utils.cpp" line="37"/>
         <source>Yesterday</source>
         <translation>Dje</translation>
+    </message>
+    <message>
+        <location filename="../tests/src/common/ut_utils.cpp" line="33"/>
+        <source>2 mins ago</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>VNoteMessageDialog</name>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="28"/>
+        <source>OK</source>
+        <comment>button</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="39"/>
+        <source>Are you sure you want to delete this notebook?
+All notes in it will be deleted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="46"/>
+        <source>Do you want to stop the current recording?</source>
+        <translation type="unfinished">Doni të ndalet incizimi i tanishëm?</translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="52"/>
+        <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
+        <translation type="unfinished">S’mund të shndërrohet ky shënim zanor, ngaqë, hëpërhë, s’mbulohen shënime mbi 20 minuta.</translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="59"/>
+        <source>Converting a voice note now. Do you want to stop it?</source>
+        <translation type="unfinished">Po shndërrohet një shënim zanor. Doni të ndalet?</translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="65"/>
+        <source>The low input volume may result in bad recordings. Do you want to continue?</source>
+        <translation type="unfinished">Volumi i ulët në hyrje mund të sjellë incizime të këqija. Doni të vazhdohet?</translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="72"/>
+        <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
+        <translation type="unfinished">Incizimet e prera dhe teksti i shndërruar nuk do të ngjiten. Doni të vazhdohet?</translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="81"/>
+        <source>Are you sure you want to delete this note?</source>
+        <translation type="unfinished">Jeni i sigurt se doni të fshihet ky shënim?</translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="87"/>
+        <source>Are you sure you want to delete the selected %1 notes?</source>
+        <translation type="unfinished">Jeni i sigurt se doni të fshihen %1 shënimet e përzgjedhura?</translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="94"/>
+        <source>Cancel</source>
+        <comment>button</comment>
+        <translation type="unfinished">Anuloje</translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="98"/>
+        <source>Confirm</source>
+        <comment>button</comment>
+        <translation type="unfinished">Ripohojeni</translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="106"/>
+        <source>Save failed</source>
+        <translation type="unfinished">Ruajtja dështoi</translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="111"/>
+        <source>You do not have permission to save files there</source>
+        <translation type="unfinished">S’keni leje të ruani kartela këtu</translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="116"/>
+        <source>The voice note has been deleted</source>
+        <translation type="unfinished">Shënimi zanor u fshi</translation>
     </message>
 </context>
 <context>
@@ -630,7 +713,7 @@
 <context>
     <name>WebEngineHandler</name>
     <message>
-        <location filename="../src/handler/web_engine_handler.cpp" line="483"/>
+        <location filename="../src/handler/web_engine_handler.cpp" line="647"/>
         <source>save as MP3</source>
         <translation type="unfinished"></translation>
     </message>
@@ -661,72 +744,72 @@
 <context>
     <name>web</name>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="131"/>
+        <location filename="../src/common/jscontent.cpp" line="146"/>
         <source>Font</source>
         <translation>Shkronja</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="132"/>
+        <location filename="../src/common/jscontent.cpp" line="147"/>
         <source>Font size</source>
         <translation>Madhësi shkronjash</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="133"/>
+        <location filename="../src/common/jscontent.cpp" line="148"/>
         <source>Font color</source>
         <translation>Ngjyrë shkronjash</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="134"/>
+        <location filename="../src/common/jscontent.cpp" line="149"/>
         <source>Text highlight color</source>
         <translation>Ngjyrë theksimi teksti</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="135"/>
+        <location filename="../src/common/jscontent.cpp" line="150"/>
         <source>Bold</source>
         <translation>Të trasha</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="136"/>
+        <location filename="../src/common/jscontent.cpp" line="151"/>
         <source>Italic</source>
         <translation>Të pjerrëta</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="137"/>
+        <location filename="../src/common/jscontent.cpp" line="152"/>
         <source>Underline</source>
         <translation>Të nënvijëzuara</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="138"/>
+        <location filename="../src/common/jscontent.cpp" line="153"/>
         <source>Strikethrough</source>
         <translation>Hequrvije</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="139"/>
+        <location filename="../src/common/jscontent.cpp" line="154"/>
         <source>Bullets</source>
         <translation>Toptha</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="140"/>
+        <location filename="../src/common/jscontent.cpp" line="155"/>
         <source>Numbering</source>
         <translation>E numërtuar</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="141"/>
+        <location filename="../src/common/jscontent.cpp" line="156"/>
         <source>More colors</source>
         <translation>Më tepër ngjyra</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="142"/>
+        <location filename="../src/common/jscontent.cpp" line="157"/>
         <source>Recent</source>
         <translation>Së fundi</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="156"/>
+        <location filename="../src/common/jscontent.cpp" line="173"/>
         <source>Voice To Text</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="157"/>
+        <location filename="../src/common/jscontent.cpp" line="174"/>
         <source>Converting voice to text</source>
         <translation type="unfinished"></translation>
     </message>
