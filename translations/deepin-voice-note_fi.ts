@@ -583,17 +583,17 @@ Kaikki siinä olevat muistiinpanot poistetaan</translation>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="72"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
-        <translation>Leikatut tallenteet ja muunnettua tekstiä ei liitetä. Haluatko jatkaa?</translation>
+        <translation>Leikattuja tallenteita ja muunnettua tekstiä ei liitetä. Haluatko jatkaa?</translation>
     </message>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="81"/>
         <source>Are you sure you want to delete this note?</source>
-        <translation>Haluatko varmasti poistaa tämän merkinnän?</translation>
+        <translation>Haluatko poistaa tämän muistiinpanon?</translation>
     </message>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="87"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation>Haluatko varmasti poistaa %1 merkintää?</translation>
+        <translation>Haluatko poistaa %1 muistiinpanoa?</translation>
     </message>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="94"/>
@@ -638,12 +638,12 @@ Kaikki siinä olevat muistiinpanot poistetaan</translation>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="103"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
+        <translation>Haluatko poistaa %1 muistiinpanoa?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="107"/>
         <source>Are you sure you want to delete this note?</source>
-        <translation type="unfinished"/>
+        <translation>Haluatko poistaa tämän muistiinpanon?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="110"/>
@@ -658,17 +658,17 @@ Kaikki siinä olevat muistiinpanot poistetaan</translation>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="116"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
-        <translation type="unfinished"/>
+        <translation>Alhainen äänenvoimakkuus voi johtaa huonoon äänenlaatuun. Haluatko jatkaa?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="119"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
-        <translation type="unfinished"/>
+        <translation>Leikattuja tallenteita ja muunnettua tekstiä ei liitetä. Haluatko jatkaa?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="123"/>
         <source>Save failed</source>
-        <translation type="unfinished"/>
+        <translation>Tallennus epäonnistui</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="125"/>
