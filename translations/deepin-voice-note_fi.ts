@@ -88,17 +88,17 @@
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
         <source>Unpin</source>
-        <translation type="unfinished"/>
+        <translation>Irrota</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
         <source>Sticky on Top</source>
-        <translation type="unfinished"/>
+        <translation>Päälimmäinen</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="752"/>
         <source>Sticky Notes</source>
-        <translation type="unfinished"/>
+        <translation>Muistilaput</translation>
     </message>
 </context>
 <context>
@@ -106,12 +106,12 @@
     <message>
         <location filename="../src/gui/mainwindow/MainWindow.qml" line="370"/>
         <source>Create Notebook</source>
-        <translation type="unfinished"/>
+        <translation>Luo muistikirja</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MainWindow.qml" line="523"/>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Etsi</translation>
     </message>
 </context>
 <context>
@@ -119,17 +119,17 @@
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="24"/>
         <source>Move Note</source>
-        <translation type="unfinished"/>
+        <translation>Siirrä muistiinpano</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="136"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Peru</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="153"/>
         <source>Ok</source>
-        <translation type="unfinished"/>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -137,27 +137,27 @@
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="37"/>
         <source>%1 note selected</source>
-        <translation type="unfinished"/>
+        <translation>%1 muistiinpanoa valittuna</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="56"/>
         <source>Move</source>
-        <translation type="unfinished"/>
+        <translation>Siirrä</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="69"/>
         <source>Save Note</source>
-        <translation type="unfinished"/>
+        <translation>Tallenna muistiinpano</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="82"/>
         <source>Save Voice</source>
-        <translation type="unfinished"/>
+        <translation>Tallenna ääni</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="93"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Poista</translation>
     </message>
 </context>
 <context>
@@ -304,12 +304,12 @@
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="261"/>
         <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
-        <translation type="unfinished"/>
+        <translation>Asenna &quot;UOS AI&quot; App Storesta ennen käyttöä</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="263"/>
         <source>No audio input device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>Äänilaitetta ei havaittu. Tarkista ja yritä uudelleen</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="265"/>
