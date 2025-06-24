@@ -314,12 +314,12 @@
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="265"/>
         <source>No audio output device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>Kein Audioeingabegerät gefunden. Bitte überprüfen und erneut versuchen</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="99"/>
         <source>deepin-voice-note</source>
-        <translation type="unfinished"/>
+        <translation>deepin-voice-note</translation>
     </message>
 </context>
 <context>
@@ -494,22 +494,22 @@
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="16"/>
         <source>Settings</source>
-        <translation type="unfinished"/>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="30"/>
         <source>Privacy Policy</source>
-        <translation type="unfinished"/>
+        <translation>Datenschutzerklärung</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="53"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation type="unfinished"/>
+        <translation>Voice Notes ist ein kompaktes Notizwerkzeug zum Erstellen von Text- und Sprachnotizen.</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="55"/>
         <source>Voice Note</source>
-        <translation type="unfinished"/>
+        <translation>Sprachnotiz</translation>
     </message>
 </context>
 <context>
@@ -628,72 +628,72 @@ Alle Notizen darin werden gelöscht</translation>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="97"/>
         <source>Are you sure you want to delete this notebook?</source>
-        <translation type="unfinished"/>
+        <translation>Sind Sie sicher, dass Sie dieses Notizbuch löschen möchten?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="99"/>
         <source>Do you want to stop the current recording?</source>
-        <translation type="unfinished"/>
+        <translation>Möchten Sie die aktuelle Aufnahme stoppen?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="103"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
+        <translation>Sind Sie sicher, dass Sie die ausgewählten %1 Notizen löschen möchten?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="107"/>
         <source>Are you sure you want to delete this note?</source>
-        <translation type="unfinished"/>
+        <translation>Sind Sie sicher, dass Sie diese Notiz löschen möchten?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="110"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
-        <translation type="unfinished"/>
+        <translation>Diese Sprachnotiz kann nicht konvertiert werden, da Notizen über 20 Minuten derzeit nicht unterstützt werden.</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="114"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
-        <translation type="unfinished"/>
+        <translation>Eine Sprachnotiz wird gerade konvertiert. Möchten Sie es stoppen?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="116"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
-        <translation type="unfinished"/>
+        <translation>Die geringe Eingangslautstärke kann zu schlechten Aufnahmen führen. Wollen Sie weitermachen?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="119"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
-        <translation type="unfinished"/>
+        <translation>Die geschnittenen Aufnahmen und der konvertierte Text werden nicht eingefügt. Wollen Sie fortfahren?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="123"/>
         <source>Save failed</source>
-        <translation type="unfinished"/>
+        <translation>Speichern fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="125"/>
         <source>You do not have permission to save files there</source>
-        <translation type="unfinished"/>
+        <translation>Sie haben nicht die Berechtigung, um dort Dateien zu speichern</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="127"/>
         <source>The voice note has been deleted</source>
-        <translation type="unfinished"/>
+        <translation>Die Sprachnotiz wurde gelöscht</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="129"/>
         <source>The voice conversion failed due to the poor network connection, please have a check</source>
-        <translation type="unfinished"/>
+        <translation>Die Sprachkonvertierung ist aufgrund der schlechten Netzwerkverbindung fehlgeschlagen, bitte überprüfen Sie das</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="141"/>
         <source>All notes in it will be deleted</source>
-        <translation type="unfinished"/>
+        <translation>Alle Notizen darin werden gelöscht</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="154"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Löschen</translation>
     </message>
 </context>
 <context>
@@ -701,12 +701,12 @@ Alle Notizen darin werden gelöscht</translation>
     <message>
         <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="150"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="183"/>
         <source>Confirm</source>
-        <translation type="unfinished"/>
+        <translation>Bestätigen</translation>
     </message>
 </context>
 <context>
@@ -714,7 +714,7 @@ Alle Notizen darin werden gelöscht</translation>
     <message>
         <location filename="../src/handler/web_engine_handler.cpp" line="647"/>
         <source>save as MP3</source>
-        <translation type="unfinished"/>
+        <translation>als MP3 speichern</translation>
     </message>
 </context>
 <context>
@@ -722,22 +722,22 @@ Alle Notizen darin werden gelöscht</translation>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="60"/>
         <source>Create Note</source>
-        <translation type="unfinished"/>
+        <translation>Notiz erstellen</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
         <source>Start recording</source>
-        <translation type="unfinished"/>
+        <translation>Aufnahme starten</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
         <source>No recording device detected</source>
-        <translation type="unfinished"/>
+        <translation>Kein Aufnahmegerät erkannt</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="119"/>
         <source>Insert picture</source>
-        <translation type="unfinished"/>
+        <translation>Bild einfügen</translation>
     </message>
 </context>
 <context>
@@ -805,12 +805,12 @@ Alle Notizen darin werden gelöscht</translation>
     <message>
         <location filename="../src/common/jscontent.cpp" line="173"/>
         <source>Voice To Text</source>
-        <translation type="unfinished"/>
+        <translation>Sprache zu Text</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="174"/>
         <source>Converting voice to text</source>
-        <translation type="unfinished"/>
+        <translation>Sprache wird in Text konvertiert</translation>
     </message>
 </context>
 </TS>
