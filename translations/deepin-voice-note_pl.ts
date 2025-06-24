@@ -504,12 +504,12 @@
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="53"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation type="unfinished"/>
+        <translation>Notatki głosowe to lekkie i przyjazne w użyciu narzędzie do zapisywania notatek i nagrań głosowych.</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="55"/>
         <source>Voice Note</source>
-        <translation type="unfinished"/>
+        <translation>Notatki głosowe</translation>
     </message>
 </context>
 <context>
@@ -628,57 +628,57 @@ Wszystkie zawarte w nim notatki zostaną usunięte</translation>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="97"/>
         <source>Are you sure you want to delete this notebook?</source>
-        <translation type="unfinished"/>
+        <translation>Czy na pewno chcesz usunąć notatnik?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="99"/>
         <source>Do you want to stop the current recording?</source>
-        <translation type="unfinished"/>
+        <translation>Zatrzymać nagrywanie?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="103"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
+        <translation>Czy na pewno chcesz usunąć %1 notatek?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="107"/>
         <source>Are you sure you want to delete this note?</source>
-        <translation type="unfinished"/>
+        <translation>Czy na pewno chcesz usunąć notatkę?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="110"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
-        <translation type="unfinished"/>
+        <translation>Nie można skonwertować tej notatki, ponieważ nagrania powyżej 20 minut nie są wspierane.</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="114"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
-        <translation type="unfinished"/>
+        <translation>Konwertowanie notatki głosowej. Czy chcesz zatrzymać?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="116"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
-        <translation type="unfinished"/>
+        <translation>Niski poziom głośności mikrofonu może skutkować złym nagraniem. Czy chcesz kontynuować?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="119"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
-        <translation type="unfinished"/>
+        <translation>Przycięte nagrania i przekonwertowany tekst nie zostaną wklejone. Czy chcesz kontynuować?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="123"/>
         <source>Save failed</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się zapisać</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="125"/>
         <source>You do not have permission to save files there</source>
-        <translation type="unfinished"/>
+        <translation>Nie posiadasz uprawnień do zapisu plików tutaj</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="127"/>
         <source>The voice note has been deleted</source>
-        <translation type="unfinished"/>
+        <translation>Notatka głosowa została usunięta</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="129"/>
