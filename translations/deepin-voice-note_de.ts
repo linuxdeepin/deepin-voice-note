@@ -30,17 +30,17 @@
     <message>
         <location filename="../src/gui/mainwindow/FolderListView.qml" line="517"/>
         <source>Rename</source>
-        <translation type="unfinished"/>
+        <translation>Umbenennen</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/FolderListView.qml" line="526"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Löschen</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/FolderListView.qml" line="545"/>
         <source>New Note</source>
-        <translation type="unfinished"/>
+        <translation>Neue Notiz</translation>
     </message>
 </context>
 <context>
@@ -48,12 +48,12 @@
     <message>
         <location filename="../src/gui/mainwindow/InitialInterface.qml" line="66"/>
         <source>After creating a new notepad, you can start recording voice and text</source>
-        <translation type="unfinished"/>
+        <translation>Wenn Sie einen neuen Notizzettel erstellt haben, können Sie mit Sprachaufnahme und Texteingabe beginnen</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/InitialInterface.qml" line="73"/>
         <source>Create Notebook</source>
-        <translation type="unfinished"/>
+        <translation>Notizbuch erstellen</translation>
     </message>
 </context>
 <context>
@@ -62,43 +62,43 @@
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="81"/>
         <source>move </source>
-        <translation type="unfinished"/>
+        <translation>verschieben</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
         <source> notes to :</source>
-        <translation type="unfinished"/>
+        <translation>Notizen nach:</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="81"/>
         <source> note to :</source>
-        <translation type="unfinished"/>
+        <translation>Notiz nach:</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="160"/>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="222"/>
         <source>Save As</source>
-        <translation type="unfinished"/>
+        <translation>Speichern als</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="279"/>
         <source>No search results</source>
-        <translation type="unfinished"/>
+        <translation>Keine Suchergebnisse</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
         <source>Unpin</source>
-        <translation type="unfinished"/>
+        <translation>ablösen</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
         <source>Sticky on Top</source>
-        <translation type="unfinished"/>
+        <translation>Oben anhaftend</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="752"/>
         <source>Sticky Notes</source>
-        <translation type="unfinished"/>
+        <translation>Haftnotizen</translation>
     </message>
 </context>
 <context>
@@ -106,12 +106,12 @@
     <message>
         <location filename="../src/gui/mainwindow/MainWindow.qml" line="370"/>
         <source>Create Notebook</source>
-        <translation type="unfinished"/>
+        <translation>Notizbuch erstellen</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MainWindow.qml" line="523"/>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Suchen</translation>
     </message>
 </context>
 <context>
@@ -119,17 +119,17 @@
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="24"/>
         <source>Move Note</source>
-        <translation type="unfinished"/>
+        <translation>Notiz verschieben</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="136"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="153"/>
         <source>Ok</source>
-        <translation type="unfinished"/>
+        <translation>O.K.</translation>
     </message>
 </context>
 <context>
