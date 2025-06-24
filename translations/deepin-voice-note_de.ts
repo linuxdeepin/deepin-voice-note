@@ -137,27 +137,27 @@
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="37"/>
         <source>%1 note selected</source>
-        <translation type="unfinished"/>
+        <translation>%1 Notiz ausgewählt</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="56"/>
         <source>Move</source>
-        <translation type="unfinished"/>
+        <translation>Verschieben</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="69"/>
         <source>Save Note</source>
-        <translation type="unfinished"/>
+        <translation>Notiz speichern</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="82"/>
         <source>Save Voice</source>
-        <translation type="unfinished"/>
+        <translation>Sprache speichern</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="93"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Löschen</translation>
     </message>
 </context>
 <context>
@@ -304,12 +304,12 @@
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="261"/>
         <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
-        <translation type="unfinished"/>
+        <translation>Bitte installieren Sie &apos;UOS AI&apos; aus dem AppStore vor dem Verwenden</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="263"/>
         <source>No audio input device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>Keine Audioeingabegerät gefunden. Bitte überprüfen und erneut versuchen</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="265"/>
@@ -350,22 +350,22 @@
     <message>
         <location filename="../src/gui/dialog/SettingDialog.qml" line="27"/>
         <source>Basic</source>
-        <translation type="unfinished"/>
+        <translation>Grundlegend</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/SettingDialog.qml" line="32"/>
         <source>Audio Source</source>
-        <translation type="unfinished"/>
+        <translation>Audioquelle</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/SettingDialog.qml" line="59"/>
         <source>Internal</source>
-        <translation type="unfinished"/>
+        <translation>Intern</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/SettingDialog.qml" line="68"/>
         <source>Microphone</source>
-        <translation type="unfinished"/>
+        <translation>Mikrofon</translation>
     </message>
 </context>
 <context>
