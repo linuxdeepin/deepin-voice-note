@@ -1,4 +1,4 @@
-# 語音記事本 | deepin-voice-note
+# 語音記事本|deepin-voice-note|
 
 ## 概述
 

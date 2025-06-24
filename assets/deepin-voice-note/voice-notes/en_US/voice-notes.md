@@ -1,4 +1,4 @@
-# Voice Notes | deepin-voice-note
+# Voice Notes|deepin-voice-note|
 
 ## Overview
 
