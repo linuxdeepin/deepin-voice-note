@@ -732,12 +732,12 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
         <source>No recording device detected</source>
-        <translation type="unfinished"/>
+        <translation>Не виявлено жодного записувального пристрою</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="119"/>
         <source>Insert picture</source>
-        <translation type="unfinished"/>
+        <translation>Вставити зображення</translation>
     </message>
 </context>
 <context>
@@ -805,12 +805,12 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/common/jscontent.cpp" line="173"/>
         <source>Voice To Text</source>
-        <translation type="unfinished"/>
+        <translation>Перетворити на текст</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="174"/>
         <source>Converting voice to text</source>
-        <translation type="unfinished"/>
+        <translation>Перетворюємо звукові дані на текст</translation>
     </message>
 </context>
 </TS>
