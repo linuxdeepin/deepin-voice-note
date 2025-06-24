@@ -304,22 +304,22 @@
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="261"/>
         <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
-        <translation type="unfinished"/>
+        <translation>Najpierw zainstaluj aplikację &apos;UOS AI&apos; ze sklepu App Store</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="263"/>
         <source>No audio input device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się znaleźć mikrofonu. Sprawdź i spróbuj ponownie.</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="265"/>
         <source>No audio output device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się znaleźć urządzenia wyjściowego. Sprawdź i spróbuj ponownie.</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="99"/>
         <source>deepin-voice-note</source>
-        <translation type="unfinished"/>
+        <translation>deepin-voice-note</translation>
     </message>
 </context>
 <context>
@@ -350,22 +350,22 @@
     <message>
         <location filename="../src/gui/dialog/SettingDialog.qml" line="27"/>
         <source>Basic</source>
-        <translation type="unfinished"/>
+        <translation>Podstawowe</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/SettingDialog.qml" line="32"/>
         <source>Audio Source</source>
-        <translation type="unfinished"/>
+        <translation>Źródło dźwięku</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/SettingDialog.qml" line="59"/>
         <source>Internal</source>
-        <translation type="unfinished"/>
+        <translation>Wewnętrzne</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/SettingDialog.qml" line="68"/>
         <source>Microphone</source>
-        <translation type="unfinished"/>
+        <translation>Mikrofon</translation>
     </message>
 </context>
 <context>
@@ -494,12 +494,12 @@
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="16"/>
         <source>Settings</source>
-        <translation type="unfinished"/>
+        <translation>Ustawienia</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="30"/>
         <source>Privacy Policy</source>
-        <translation type="unfinished"/>
+        <translation>Polityka prywatności</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="53"/>
