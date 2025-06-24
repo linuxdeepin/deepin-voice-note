@@ -688,12 +688,12 @@ Todas las notas en él serán borradas</translation>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="141"/>
         <source>All notes in it will be deleted</source>
-        <translation type="unfinished"/>
+        <translation>Se eliminarán todas las notas.</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="154"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Borrar</translation>
     </message>
 </context>
 <context>
@@ -701,12 +701,12 @@ Todas las notas en él serán borradas</translation>
     <message>
         <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="150"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="183"/>
         <source>Confirm</source>
-        <translation type="unfinished"/>
+        <translation>Confirmar</translation>
     </message>
 </context>
 <context>
@@ -714,7 +714,7 @@ Todas las notas en él serán borradas</translation>
     <message>
         <location filename="../src/handler/web_engine_handler.cpp" line="647"/>
         <source>save as MP3</source>
-        <translation type="unfinished"/>
+        <translation>Guardar como MP3</translation>
     </message>
 </context>
 <context>
@@ -722,22 +722,22 @@ Todas las notas en él serán borradas</translation>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="60"/>
         <source>Create Note</source>
-        <translation type="unfinished"/>
+        <translation>Crear nota</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
         <source>Start recording</source>
-        <translation type="unfinished"/>
+        <translation>Iniciar grabación</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
         <source>No recording device detected</source>
-        <translation type="unfinished"/>
+        <translation>No se detectó dispositivo de grabación</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="119"/>
         <source>Insert picture</source>
-        <translation type="unfinished"/>
+        <translation>Insertar imagen</translation>
     </message>
 </context>
 <context>
@@ -805,12 +805,12 @@ Todas las notas en él serán borradas</translation>
     <message>
         <location filename="../src/common/jscontent.cpp" line="173"/>
         <source>Voice To Text</source>
-        <translation type="unfinished"/>
+        <translation>Voz a texto</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="174"/>
         <source>Converting voice to text</source>
-        <translation type="unfinished"/>
+        <translation>Convirtiendo voz a texto</translation>
     </message>
 </context>
 </TS>
