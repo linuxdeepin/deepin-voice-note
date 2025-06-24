@@ -98,7 +98,7 @@
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="752"/>
         <source>Sticky Notes</source>
-        <translation type="unfinished"/>
+        <translation>Notas fijadas</translation>
     </message>
 </context>
 <context>
@@ -106,12 +106,12 @@
     <message>
         <location filename="../src/gui/mainwindow/MainWindow.qml" line="370"/>
         <source>Create Notebook</source>
-        <translation type="unfinished"/>
+        <translation>Crear cuaderno</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MainWindow.qml" line="523"/>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Buscar</translation>
     </message>
 </context>
 <context>
@@ -119,17 +119,17 @@
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="24"/>
         <source>Move Note</source>
-        <translation type="unfinished"/>
+        <translation>Mover nota</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="136"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="153"/>
         <source>Ok</source>
-        <translation type="unfinished"/>
+        <translation>Aceptar</translation>
     </message>
 </context>
 <context>
@@ -137,27 +137,27 @@
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="37"/>
         <source>%1 note selected</source>
-        <translation type="unfinished"/>
+        <translation>%1 nota seleccionada</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="56"/>
         <source>Move</source>
-        <translation type="unfinished"/>
+        <translation>Mover</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="69"/>
         <source>Save Note</source>
-        <translation type="unfinished"/>
+        <translation>Guardar nota</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="82"/>
         <source>Save Voice</source>
-        <translation type="unfinished"/>
+        <translation>Guardar voz</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="93"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Borrar</translation>
     </message>
 </context>
 <context>
@@ -304,17 +304,17 @@
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="261"/>
         <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
-        <translation type="unfinished"/>
+        <translation>Instale &apos;UOS IA&apos; desde la tienda antes de usar</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="263"/>
         <source>No audio input device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>No se detecto ningún dispositivo de entrada de audio. compruébelo y vuelva a intentar.</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="265"/>
         <source>No audio output device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>No se detecto ningún dispositivo de salida de audio. compruébelo y vuelva a intentar.</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="99"/>
