@@ -48,7 +48,7 @@
     <message>
         <location filename="../src/gui/mainwindow/InitialInterface.qml" line="66"/>
         <source>After creating a new notepad, you can start recording voice and text</source>
-        <translation>Utwórz nową notatkę, aby rozpocząć nagrywanie mowy i zmieniać ją na tekst</translation>
+        <translation>Utwórz nowy notatnik, aby rozpocząć nagrywanie głosu i zmienianie go na tekst</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/InitialInterface.qml" line="73"/>
@@ -683,17 +683,17 @@ Wszystkie zawarte w nim notatki zostaną usunięte</translation>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="129"/>
         <source>The voice conversion failed due to the poor network connection, please have a check</source>
-        <translation type="unfinished"/>
+        <translation>Nie udało się skonwertować głosu z powodu słabego połączenia sieciowego. Sprawdź swoje połączenie.</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="141"/>
         <source>All notes in it will be deleted</source>
-        <translation type="unfinished"/>
+        <translation>Wszystkie notatki w nim zostaną usunięte</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="154"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Usuń</translation>
     </message>
 </context>
 <context>
@@ -701,12 +701,12 @@ Wszystkie zawarte w nim notatki zostaną usunięte</translation>
     <message>
         <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="150"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Anuluj</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="183"/>
         <source>Confirm</source>
-        <translation type="unfinished"/>
+        <translation>Potwierdź</translation>
     </message>
 </context>
 <context>
@@ -714,7 +714,7 @@ Wszystkie zawarte w nim notatki zostaną usunięte</translation>
     <message>
         <location filename="../src/handler/web_engine_handler.cpp" line="647"/>
         <source>save as MP3</source>
-        <translation type="unfinished"/>
+        <translation>Zapisz jako MP3</translation>
     </message>
 </context>
 <context>
@@ -722,22 +722,22 @@ Wszystkie zawarte w nim notatki zostaną usunięte</translation>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="60"/>
         <source>Create Note</source>
-        <translation type="unfinished"/>
+        <translation>Utwórz notatkę</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
         <source>Start recording</source>
-        <translation type="unfinished"/>
+        <translation>Rozpocznij nagrywanie</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
         <source>No recording device detected</source>
-        <translation type="unfinished"/>
+        <translation>Nie wykryto urządzenia nagrywającego</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="119"/>
         <source>Insert picture</source>
-        <translation type="unfinished"/>
+        <translation>Dodaj zdjęcie</translation>
     </message>
 </context>
 <context>
@@ -805,12 +805,12 @@ Wszystkie zawarte w nim notatki zostaną usunięte</translation>
     <message>
         <location filename="../src/common/jscontent.cpp" line="173"/>
         <source>Voice To Text</source>
-        <translation type="unfinished"/>
+        <translation>Głos na tekst</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="174"/>
         <source>Converting voice to text</source>
-        <translation type="unfinished"/>
+        <translation>Konwertuję głos na tekst</translation>
     </message>
 </context>
 </TS>
