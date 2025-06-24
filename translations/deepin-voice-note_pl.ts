@@ -93,12 +93,12 @@
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
         <source>Sticky on Top</source>
-        <translation type="unfinished"/>
+        <translation>Przypnij na górze</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="752"/>
         <source>Sticky Notes</source>
-        <translation type="unfinished"/>
+        <translation>Przyczepione notatki</translation>
     </message>
 </context>
 <context>
@@ -106,12 +106,12 @@
     <message>
         <location filename="../src/gui/mainwindow/MainWindow.qml" line="370"/>
         <source>Create Notebook</source>
-        <translation type="unfinished"/>
+        <translation>Utwórz notatnik</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MainWindow.qml" line="523"/>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Szukaj</translation>
     </message>
 </context>
 <context>
@@ -119,17 +119,17 @@
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="24"/>
         <source>Move Note</source>
-        <translation type="unfinished"/>
+        <translation>Przenieś notatkę</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="136"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Anuluj</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="153"/>
         <source>Ok</source>
-        <translation type="unfinished"/>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
@@ -137,27 +137,27 @@
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="37"/>
         <source>%1 note selected</source>
-        <translation type="unfinished"/>
+        <translation>Zaznaczono %1 notatek</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="56"/>
         <source>Move</source>
-        <translation type="unfinished"/>
+        <translation>Przenieś</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="69"/>
         <source>Save Note</source>
-        <translation type="unfinished"/>
+        <translation>Zapisz notatkę</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="82"/>
         <source>Save Voice</source>
-        <translation type="unfinished"/>
+        <translation>Zapisz nagranie</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="93"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Usuń</translation>
     </message>
 </context>
 <context>
