@@ -143,7 +143,7 @@ public:
     Q_INVOKABLE QString actionText(ActionKind id);
     Q_INVOKABLE ComponentType actionCompType(ActionKind id);
     // 获取子菜单项
-    Q_INVOKABLE QList<ActionKind> childActions(ActionKind id);
+    Q_INVOKABLE QVariantList childActions(ActionKind id);
     // 用于 QML 组件初始化和标记动作触发
     Q_INVOKABLE void setActionObject(ActionKind id, QObject *obj);
     Q_SLOT void actionTriggerFromQuick(ActionKind actionId);

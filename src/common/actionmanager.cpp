@@ -226,9 +226,14 @@ ActionManager::ComponentType ActionManager::actionCompType(ActionKind id)
 /*!
  * \brief 返回菜单项 \a id 的子菜单项列表
  */
-QList<ActionManager::ActionKind> ActionManager::childActions(ActionKind id)
+QVariantList ActionManager::childActions(ActionKind id)
 {
-    return childActionMap.value(id);
+    QList<ActionKind> children = childActionMap.value(id);
+    QVariantList result;
+    for (ActionKind child : children) {
+        result.append(static_cast<int>(child));
+    }
+    return result;
 }
 
 /*!
