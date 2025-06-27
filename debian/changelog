@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.33) unstable; urgency=medium
+
+  * chore: New version 6.5.33.
+
+ -- xiepengfei <xiepengfei@uniontech.com>  Fri, 27 Jun 2025 18:05:24 +0800
+
 deepin-voice-note (6.5.32) unstable; urgency=medium
 
   * fix: Change childActions return type to QVariantList
