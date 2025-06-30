@@ -304,17 +304,17 @@
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="261"/>
         <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
-        <translation type="unfinished"/>
+        <translation>Instale o ‘UOS AI’ na Loja de Aplicativos antes de usar</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="263"/>
         <source>No audio input device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>Nenhum dispositivo de entrada de áudio detectado. Verifique e tente novamente</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="265"/>
         <source>No audio output device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>Nenhum dispositivo de saída de áudio detectado. Verifique e tente novamente</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="99"/>
@@ -714,7 +714,7 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../src/handler/web_engine_handler.cpp" line="647"/>
         <source>save as MP3</source>
-        <translation>Salvar como MP3</translation>
+        <translation>Salvar como .mp3</translation>
     </message>
 </context>
 <context>
@@ -805,12 +805,12 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../src/common/jscontent.cpp" line="173"/>
         <source>Voice To Text</source>
-        <translation type="unfinished"/>
+        <translation>Voz para texto</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="174"/>
         <source>Converting voice to text</source>
-        <translation type="unfinished"/>
+        <translation>Convertendo voz em texto</translation>
     </message>
 </context>
 </TS>
