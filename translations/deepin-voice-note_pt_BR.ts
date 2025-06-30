@@ -568,7 +568,7 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="52"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
-        <translation>Não é possível converter esta nota de voz; pois, atualmente não há suporte para notas com mais de 20 minutos.</translation>
+        <translation>Impossível converter esta nota de voz, pois notas com mais de 20 minutos não são suportadas no momento.</translation>
     </message>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="59"/>
@@ -578,12 +578,12 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="65"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
-        <translation>O volume baixo de entrada pode resultar em gravações ruins. Continuar?</translation>
+        <translation>O volume de entrada está baixo e isso pode afetar a qualidade da gravação. Continuar?</translation>
     </message>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="72"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
-        <translation>As gravações recortadas e o texto convertido não serão colados. Continuar?</translation>
+        <translation>As gravações interrompidas e o texto convertido não serão colados. Continuar?</translation>
     </message>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="81"/>
@@ -658,12 +658,12 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="116"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
-        <translation>O volume de entrada baixo pode resultar em gravações ruins. Continuar?</translation>
+        <translation>O volume de entrada está baixo e isso pode afetar a qualidade da gravação. Continuar?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="119"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
-        <translation>As gravações cortadas e o texto convertido não serão colados. Continuar?</translation>
+        <translation>As gravações interrompidas e o texto convertido não serão colados. Continuar?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="123"/>
