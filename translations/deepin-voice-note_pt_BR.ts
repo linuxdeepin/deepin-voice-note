@@ -30,17 +30,17 @@
     <message>
         <location filename="../src/gui/mainwindow/FolderListView.qml" line="517"/>
         <source>Rename</source>
-        <translation type="unfinished"/>
+        <translation>Renomear</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/FolderListView.qml" line="526"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Excluir</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/FolderListView.qml" line="545"/>
         <source>New Note</source>
-        <translation type="unfinished"/>
+        <translation>Nova nota</translation>
     </message>
 </context>
 <context>
@@ -62,7 +62,7 @@
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="81"/>
         <source>move </source>
-        <translation type="unfinished"/>
+        <translation>Mover</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
@@ -78,12 +78,12 @@
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="160"/>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="222"/>
         <source>Save As</source>
-        <translation type="unfinished"/>
+        <translation>Salvar como</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="279"/>
         <source>No search results</source>
-        <translation type="unfinished"/>
+        <translation>Nenhum resultado encontrado</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
@@ -111,7 +111,7 @@
     <message>
         <location filename="../src/gui/mainwindow/MainWindow.qml" line="523"/>
         <source>Search</source>
-        <translation type="unfinished"/>
+        <translation>Pesquisar</translation>
     </message>
 </context>
 <context>
@@ -124,12 +124,12 @@
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="136"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/MoveDialog.qml" line="153"/>
         <source>Ok</source>
-        <translation type="unfinished"/>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
@@ -142,7 +142,7 @@
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="56"/>
         <source>Move</source>
-        <translation type="unfinished"/>
+        <translation>Mover</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="69"/>
