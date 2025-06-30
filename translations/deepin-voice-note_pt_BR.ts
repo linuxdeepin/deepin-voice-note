@@ -12,7 +12,7 @@
     <message>
         <location filename="../src/db/vnotefolderoper.cpp" line="249"/>
         <source>Notebook</source>
-        <translation>Bloco de Notas</translation>
+        <translation>Bloco de notas</translation>
     </message>
     <message>
         <location filename="../src/importolddata/olddbvisistors.cpp" line="139"/>
@@ -210,7 +210,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="78"/>
         <source>View</source>
-        <translation>Ver</translation>
+        <translation>Exibir</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="84"/>
@@ -220,17 +220,17 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="93"/>
         <source>Text to Speech</source>
-        <translation>Texto para Fala</translation>
+        <translation>Texto para fala</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="94"/>
         <source>Stop reading</source>
-        <translation>Parar a leitura</translation>
+        <translation>Interromper leitura</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="95"/>
         <source>Speech to Text</source>
-        <translation>Fala para Texto</translation>
+        <translation>Fala para texto</translation>
     </message>
 </context>
 <context>
@@ -471,7 +471,7 @@
     <message>
         <location filename="../src/common/VNoteMainManager.cpp" line="810"/>
         <source>Notebooks</source>
-        <translation>Blocos de Notas</translation>
+        <translation>Blocos de notas</translation>
     </message>
     <message>
         <location filename="../src/common/VNoteMainManager.cpp" line="838"/>
