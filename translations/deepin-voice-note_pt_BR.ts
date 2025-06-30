@@ -137,7 +137,7 @@
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="37"/>
         <source>%1 note selected</source>
-        <translation type="unfinished"/>
+        <translation>%1 nota selecionada</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="56"/>
@@ -147,12 +147,12 @@
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="69"/>
         <source>Save Note</source>
-        <translation type="unfinished"/>
+        <translation>Salvar nota</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="82"/>
         <source>Save Voice</source>
-        <translation type="unfinished"/>
+        <translation>Salvar voz</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="93"/>
@@ -355,7 +355,7 @@
     <message>
         <location filename="../src/gui/dialog/SettingDialog.qml" line="32"/>
         <source>Audio Source</source>
-        <translation type="unfinished"/>
+        <translation>Fonte de áudio</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/SettingDialog.qml" line="59"/>
@@ -509,7 +509,7 @@
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="55"/>
         <source>Voice Note</source>
-        <translation type="unfinished"/>
+        <translation>Nota de Voz</translation>
     </message>
 </context>
 <context>
@@ -668,7 +668,7 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="123"/>
         <source>Save failed</source>
-        <translation type="unfinished"/>
+        <translation>O salvamento falhou</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="125"/>
@@ -714,7 +714,7 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../src/handler/web_engine_handler.cpp" line="647"/>
         <source>save as MP3</source>
-        <translation type="unfinished"/>
+        <translation>Salvar como MP3</translation>
     </message>
 </context>
 <context>
@@ -722,22 +722,22 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="60"/>
         <source>Create Note</source>
-        <translation type="unfinished"/>
+        <translation>Criar nota</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
         <source>Start recording</source>
-        <translation type="unfinished"/>
+        <translation>Iniciar gravação</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
         <source>No recording device detected</source>
-        <translation type="unfinished"/>
+        <translation>Nenhum dispositivo de gravação detectado</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="119"/>
         <source>Insert picture</source>
-        <translation type="unfinished"/>
+        <translation>Inserir imagem</translation>
     </message>
 </context>
 <context>
