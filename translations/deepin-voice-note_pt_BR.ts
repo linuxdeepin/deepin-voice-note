@@ -504,7 +504,7 @@
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="53"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation type="unfinished"/>
+        <translation>Notas de Voz é uma ferramenta leve para criar anotações de texto e gravações de voz</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="55"/>
@@ -628,32 +628,32 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="97"/>
         <source>Are you sure you want to delete this notebook?</source>
-        <translation type="unfinished"/>
+        <translation>Excluir este bloco de notas?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="99"/>
         <source>Do you want to stop the current recording?</source>
-        <translation type="unfinished"/>
+        <translation>Interromper a gravação atual?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="103"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
+        <translation>Excluir as %1 notas selecionadas?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="107"/>
         <source>Are you sure you want to delete this note?</source>
-        <translation type="unfinished"/>
+        <translation>Excluir esta nota?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="110"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
-        <translation type="unfinished"/>
+        <translation>Impossível converter esta nota de voz, pois notas com mais de 20 minutos não são suportadas no momento.</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="114"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
-        <translation type="unfinished"/>
+        <translation>Convertendo uma nota de voz. Interromper?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="116"/>
