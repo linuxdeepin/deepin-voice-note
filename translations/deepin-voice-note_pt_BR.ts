@@ -286,7 +286,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="58"/>
         <source>Save voice recording</source>
-        <translation>Salvar as gravações de voz</translation>
+        <translation>Salvar gravação de voz</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="60"/>
@@ -332,7 +332,7 @@
     <message>
         <location filename="../src/common/setting.cpp" line="25"/>
         <source>Audio Source</source>
-        <translation>Fonte de Áudio</translation>
+        <translation>Fonte de áudio</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="26"/>
@@ -403,7 +403,7 @@
     <message>
         <location filename="../src/common/VNoteMainManager.cpp" line="831"/>
         <source>Play/Pause</source>
-        <translation>Reproduzir/Pausar</translation>
+        <translation>Reproduzir / Pausar</translation>
     </message>
     <message>
         <location filename="../src/common/VNoteMainManager.cpp" line="832"/>
@@ -563,7 +563,7 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="46"/>
         <source>Do you want to stop the current recording?</source>
-        <translation>Parar a gravação atual?</translation>
+        <translation>Interromper a gravação atual?</translation>
     </message>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="52"/>
@@ -573,7 +573,7 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="59"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
-        <translation>Convertendo uma nota de voz. Parar?</translation>
+        <translation>Convertendo uma nota de voz. Interromper?</translation>
     </message>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="65"/>
@@ -615,7 +615,7 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="111"/>
         <source>You do not have permission to save files there</source>
-        <translation>Você não tem permissão para salvar arquivos lá</translation>
+        <translation>Você não tem permissão para salvar arquivos neste local</translation>
     </message>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="116"/>
@@ -780,17 +780,17 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../src/common/jscontent.cpp" line="153"/>
         <source>Strikethrough</source>
-        <translation>Riscado</translation>
+        <translation>Tachado</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="154"/>
         <source>Bullets</source>
-        <translation>Lista com marcadores</translation>
+        <translation>Marcadores</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="155"/>
         <source>Numbering</source>
-        <translation>Lista numerada</translation>
+        <translation>Numeração</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="156"/>
