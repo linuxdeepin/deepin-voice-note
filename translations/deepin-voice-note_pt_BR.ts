@@ -165,7 +165,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="69"/>
         <source>Save as MP3</source>
-        <translation>Salvar como MP3</translation>
+        <translation>Salvar como .mp3</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="70"/>
@@ -610,7 +610,7 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="106"/>
         <source>Save failed</source>
-        <translation>Falha ao salvar</translation>
+        <translation>O salvamento falhou</translation>
     </message>
     <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="111"/>
@@ -658,12 +658,12 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="116"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
-        <translation type="unfinished"/>
+        <translation>O volume de entrada baixo pode resultar em gravações ruins. Continuar?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="119"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
-        <translation type="unfinished"/>
+        <translation>As gravações cortadas e o texto convertido não serão colados. Continuar?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="123"/>
@@ -673,22 +673,22 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="125"/>
         <source>You do not have permission to save files there</source>
-        <translation type="unfinished"/>
+        <translation>Você não tem permissão para salvar arquivos neste local</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="127"/>
         <source>The voice note has been deleted</source>
-        <translation type="unfinished"/>
+        <translation>A nota de voz foi excluída</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="129"/>
         <source>The voice conversion failed due to the poor network connection, please have a check</source>
-        <translation type="unfinished"/>
+        <translation>A conversão da voz falhou devido à conexão de rede instável. Verifique a conexão</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="141"/>
         <source>All notes in it will be deleted</source>
-        <translation type="unfinished"/>
+        <translation>Todas as notas nele contidas serão excluídas</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="154"/>
