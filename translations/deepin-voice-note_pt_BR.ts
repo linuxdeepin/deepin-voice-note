@@ -48,12 +48,12 @@
     <message>
         <location filename="../src/gui/mainwindow/InitialInterface.qml" line="66"/>
         <source>After creating a new notepad, you can start recording voice and text</source>
-        <translation type="unfinished"/>
+        <translation>Após criar um novo bloco de notas, você pode começar a gravar voz e texto</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/InitialInterface.qml" line="73"/>
         <source>Create Notebook</source>
-        <translation type="unfinished"/>
+        <translation>Criar bloco de notas</translation>
     </message>
 </context>
 <context>
@@ -106,7 +106,7 @@
     <message>
         <location filename="../src/gui/mainwindow/MainWindow.qml" line="370"/>
         <source>Create Notebook</source>
-        <translation type="unfinished"/>
+        <translation>Criar bloco de notas</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/MainWindow.qml" line="523"/>
@@ -157,7 +157,7 @@
     <message>
         <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="93"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Excluir</translation>
     </message>
 </context>
 <context>
@@ -365,7 +365,7 @@
     <message>
         <location filename="../src/gui/dialog/SettingDialog.qml" line="68"/>
         <source>Microphone</source>
-        <translation type="unfinished"/>
+        <translation>Microfone</translation>
     </message>
 </context>
 <context>
@@ -494,12 +494,12 @@
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="16"/>
         <source>Settings</source>
-        <translation type="unfinished"/>
+        <translation>Configurações</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="30"/>
         <source>Privacy Policy</source>
-        <translation type="unfinished"/>
+        <translation>Política de Privacidade</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="53"/>
@@ -693,7 +693,7 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="154"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Excluir</translation>
     </message>
 </context>
 <context>
@@ -701,12 +701,12 @@ Todas as notas nele contidas serão excluídas</translation>
     <message>
         <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="150"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="183"/>
         <source>Confirm</source>
-        <translation type="unfinished"/>
+        <translation>Confirmar</translation>
     </message>
 </context>
 <context>
