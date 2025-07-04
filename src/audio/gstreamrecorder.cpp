@@ -255,26 +255,53 @@ bool GstreamRecorder::startRecord()
 void GstreamRecorder::stopRecord()
 {
     if (m_pipeline) {
+        qDebug() << "Stopping recording...";
+        
+        // 获取当前管道状态
+        int state = -1;
+        int pending = -1;
+        GetGstState(&state, &pending);
+        qDebug() << "Current pipeline state:" << state << "pending:" << pending;
+        
+        // 如果管道处于暂停状态，需要先恢复播放才能正确处理EOS事件
+        // 否则EOS事件无法传播到下游元素，会导致无限等待
+        if (state == GST_STATE_PAUSED) {
+            qDebug() << "Pipeline is paused, resuming to playing state for proper EOS handling";
+            gst_element_set_state(m_pipeline, GST_STATE_PLAYING);
+            
+            // 等待状态转换完成
+            GstStateChangeReturn ret = gst_element_get_state(m_pipeline, nullptr, nullptr, GST_SECOND);
+            if (ret == GST_STATE_CHANGE_FAILURE) {
+                qWarning() << "Failed to resume pipeline from paused state";
+            } else {
+                qDebug() << "Successfully resumed pipeline from paused state";
+            }
+        }
         
         // 发送EOS事件并等待其处理完成，确保所有数据都被正确写入文件
         // 这样可以避免录音数据丢失或文件损坏的问题
+        qDebug() << "Sending EOS event to pipeline";
         gst_element_send_event(m_pipeline, gst_event_new_eos());
         
         GstBus *bus = gst_element_get_bus(m_pipeline);
         if (bus) {
-            GstMessage *msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE, GST_MESSAGE_EOS); 
+            // 使用5秒超时而不是无限等待，避免死锁
+            GstClockTime timeout = 5 * GST_SECOND;
+            GstMessage *msg = gst_bus_timed_pop_filtered(bus, timeout, GST_MESSAGE_EOS);
             if (msg) {
+                qDebug() << "Received EOS message successfully";
                 gst_message_unref(msg);
             } else {
+                qWarning() << "Timeout waiting for EOS message, proceeding anyway";
             }
             gst_object_unref(bus);
         }
-        // 保存文件，防止数据丢失, 因为在通过降噪停止之后，需要将上一次的文件完整保存并重新开启通道，否则下一次录制将依然在上一次的通道中工作
-        // 导致录制的内容始终都是最后一次的
+        
         sync();
         setStateToNull();
     }
 }
+
 /**
  * @brief GstreamRecorder::pauseRecord
  */
@@ -468,6 +495,7 @@ void GstreamRecorder::initFormat()
              << "\n  - Sample format:" << m_format.sampleFormat();
 #endif
 }
+
 /**
  * @brief GstreamRecorder::objectUnref
  * @param object 处理对象
