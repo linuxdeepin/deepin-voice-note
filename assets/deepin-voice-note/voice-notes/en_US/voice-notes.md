@@ -156,9 +156,8 @@ Right-click a voice file on the Voice Notes interface to select **Voice to Text*
 
 ### Covert Texts to Speech
 
-1. Go to **Control Center** > **Assistive Tools**, and enable **Text to Speech**.
-2. Select a paragraph of text on the Voice Notes interface, and right-click to select **Text to Speech**. The text selected will be converted to speech and read accordingly. 
-3. In the Text to Speech mode, right-click to select **Stop reading** or click ![icon](../common/read.png) to stop reading.
+1. Select a paragraph of texts. Right-click it and select **Text to Speech**. The texts selected will be broadcast.
+1. During playback, you can stop the **Text to Speech** by clicking the close button on the reading control.
 
  >![notes](../common/notes.svg) Notes:
  >- When no text is selected, **Text to Speech** is grayed out and inoperable. 
@@ -168,18 +167,10 @@ Right-click a voice file on the Voice Notes interface to select **Voice to Text*
 
 ### Convert Speech to Texts
 
-1. Go to **Control Center** > **Assistive Tools**. Enable **Speech to Text**, and select **Language**.
-2. In the text input box on the Voice Notes interface, right-click and select **Speech to Text**. Now you can input audios via microphone, and the translated text will be edited and displayed in the text input box. 
-3. In the Speech to Text mode, click the the blank area on the Voice Notes interface to stop text editing and display. 
+1. In the text editor area, right-click and select **Speech to Text**. Input speech through the microphone to insert transcribed text at the cursor position.
+2. During dictation, you can stop **Speech to Text**  by clicking the close button on the dictation control.
 
 > ![tips](../common/tips.svg) Tips: You can enable **Speech to Text** while recording audios. 
-
-### Translate Text Notes
-
-1. Go to **Control Center** > **Assistive Tools**. Enable **Translation**, and select the **Language** option from **en-cn** or **cn-en**.
-2. Select a paragraph of text on the Voice Notes interface, and right-click to select **Translate**. The text selected will be translated to target language.
-
-> ![notes](../common/notes.svg) Notes: Only when an audio file is selected, **Translate** is inoperable; if the audio file selected contains voice-to-text content, **Translate** can be operated.
 
 
 ### Delete Notes
