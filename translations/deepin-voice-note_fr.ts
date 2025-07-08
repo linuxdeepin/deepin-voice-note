@@ -30,17 +30,17 @@
     <message>
         <location filename="../src/gui/mainwindow/FolderListView.qml" line="517"/>
         <source>Rename</source>
-        <translation type="unfinished"/>
+        <translation>Renommer</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/FolderListView.qml" line="526"/>
         <source>Delete</source>
-        <translation type="unfinished"/>
+        <translation>Supprimer</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/FolderListView.qml" line="545"/>
         <source>New Note</source>
-        <translation type="unfinished"/>
+        <translation>Nouvelle note</translation>
     </message>
 </context>
 <context>
@@ -48,12 +48,12 @@
     <message>
         <location filename="../src/gui/mainwindow/InitialInterface.qml" line="66"/>
         <source>After creating a new notepad, you can start recording voice and text</source>
-        <translation type="unfinished"/>
+        <translation>Après avoir créé un nouveau bloc-notes, vous pouvez commencer à enregistrer de la voix et du texte.</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/InitialInterface.qml" line="73"/>
         <source>Create Notebook</source>
-        <translation type="unfinished"/>
+        <translation>Créer un bloc-notes</translation>
     </message>
 </context>
 <context>
@@ -62,7 +62,7 @@
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="81"/>
         <source>move </source>
-        <translation type="unfinished"/>
+        <translation>déplacer</translation>
     </message>
     <message>
         <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
