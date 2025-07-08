@@ -181,7 +181,7 @@ QString VoiceRecoderHandler::getDefaultMicDeviceName() const
     // 只有当m_currentMode是麦克风模式时，才尝试使用pactl获取默认音源
     if (static_cast<AudioWatcher::AudioMode>(m_currentMode) == AudioWatcher::Micphone) {
         defaultName = tryGetMicNameFromPactl();
-        if (defaultName != "echo-cancel-source") {
+        if (defaultName == "echo-cancel-source") {
             // 如果pactl获取到有效且非降噪字段，则使用它
             return defaultName;
         }
