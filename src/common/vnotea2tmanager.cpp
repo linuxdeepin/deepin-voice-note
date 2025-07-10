@@ -8,6 +8,14 @@
 #include <DSysInfo>
 
 #include <QDBusError>
+#include <QDBusConnection>
+#include <QDBusObjectPath>
+#include <QDBusReply>
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QVariantMap>
+#include <QApplication>
+#include <QDebug>
 
 DCORE_USE_NAMESPACE
 
@@ -17,7 +25,78 @@ DCORE_USE_NAMESPACE
  */
 VNoteA2TManager::VNoteA2TManager(QObject *parent)
     : QObject(parent)
+    , m_useNewInterface(false)
 {
+}
+
+/**
+ * @brief VNoteA2TManager::tryInitNewInterface
+ * @return 是否成功初始化新接口
+ */
+bool VNoteA2TManager::tryInitNewInterface()
+{
+    m_newAsrInterface.reset(new QDBusInterface("com.iflytek.aiassistant",
+                                              "/aiassistant/deepinmain",
+                                              "com.iflytek.aiassistant.mainWindow",
+                                              QDBusConnection::sessionBus()));
+    
+    if (m_newAsrInterface->isValid()) {
+        // 连接信号
+        QDBusConnection::sessionBus().connect("com.iflytek.aiassistant",
+                                             "/aiassistant/deepinmain",
+                                             "com.iflytek.aiassistant.mainWindow",
+                                             "onNotify",
+                                             this,
+                                             SLOT(onNotify(QString)));
+        return true;
+    }
+    
+    return false;
+}
+
+/**
+ * @brief VNoteA2TManager::tryInitOldInterface
+ * @return 是否成功初始化旧接口
+ */
+bool VNoteA2TManager::tryInitOldInterface()
+{
+    m_session.reset(new QDBusInterface("com.iflytek.aiservice",
+                                      "/",
+                                      "com.iflytek.aiservice.session",
+                                      QDBusConnection::sessionBus()));
+    
+    if (!m_session->isValid()) {
+        return false;
+    }
+    
+    const QString ability("asr");
+    const QString appName = qApp->applicationName();
+    
+    // 调用 createSession 方法
+    QDBusReply<QDBusObjectPath> reply = m_session->call("createSession", appName, ability);
+    if (!reply.isValid()) {
+        return false;
+    }
+    
+    QDBusObjectPath sessionPath = reply.value();
+    
+    m_asrInterface.reset(new QDBusInterface("com.iflytek.aiservice",
+                                           sessionPath.path(),
+                                           "com.iflytek.aiservice.asr",
+                                           QDBusConnection::sessionBus()));
+    
+    if (m_asrInterface->isValid()) {
+        // 连接信号
+        QDBusConnection::sessionBus().connect("com.iflytek.aiservice",
+                                             sessionPath.path(),
+                                             "com.iflytek.aiservice.asr",
+                                             "onNotify",
+                                             this,
+                                             SLOT(onNotify(QString)));
+        return true;
+    }
+    
+    return false;
 }
 
 /**
@@ -26,26 +105,23 @@ VNoteA2TManager::VNoteA2TManager(QObject *parent)
  */
 int VNoteA2TManager::initSession()
 {
-    m_session.reset(new com::iflytek::aiservice::session(
-        "com.iflytek.aiservice",
-        "/",
-        QDBusConnection::sessionBus()));
-
-    const QString ability("asr");
-    const QString appName = qApp->applicationName();
-    int errorCode = -1;
-
-    QDBusObjectPath qdPath = m_session->createSession(appName, ability, errorCode);
-
-    m_asrInterface.reset(new com::iflytek::aiservice::asr(
-        "com.iflytek.aiservice",
-        qdPath.path(),
-        QDBusConnection::sessionBus()));
-
-    connect(m_asrInterface.get(), &com::iflytek::aiservice::asr::onNotify,
-            this, &VNoteA2TManager::onNotify);
-
-    return errorCode;
+    // 优先尝试新接口
+    if (tryInitNewInterface()) {
+        m_useNewInterface = true;
+        qInfo() << "Initialized new interface (com.iflytek.aiassistant) successfully";
+        return 0;
+    }
+    
+    // 新接口不可用，尝试旧接口
+    if (tryInitOldInterface()) {
+        m_useNewInterface = false;
+        qInfo() << "Initialized old interface (com.iflytek.aiservice) successfully";
+        return 0;
+    }
+    
+    // 两个接口都不可用
+    qWarning() << "Failed to initialize both new and old interfaces";
+    return -1;
 }
 
 /**
@@ -63,12 +139,11 @@ void VNoteA2TManager::startAsr(QString filePath,
     int ret = initSession();
     if (ret != 0) {
         emit asrError(AudioOther);
-        qInfo() << "createSession->errorCode=" << ret;
+        qInfo() << "initSession failed, errorCode=" << ret;
         return;
     }
 
     QVariantMap param;
-
     param.insert("filePath", filePath);
     param.insert("fileDuration", fileDuration);
 
@@ -80,7 +155,46 @@ void VNoteA2TManager::startAsr(QString filePath,
         param.insert("targetLanguage", targetLanguage);
     }
 
-    QString retStr = m_asrInterface->startAsr(param);
+    QString retStr;
+    
+    // 尝试新接口
+    if (m_useNewInterface && m_newAsrInterface) {
+        qInfo() << "Using new interface (com.iflytek.aiassistant) for startAsr";
+        QDBusReply<QString> reply = m_newAsrInterface->call("startAsr", param);
+        if (reply.isValid()) {
+            retStr = reply.value();
+        } else if (reply.error().type() == QDBusError::UnknownMethod) {
+            // 新接口方法不存在，切换到旧接口
+            qInfo() << "New interface doesn't support startAsr method, switching to old interface";
+            m_useNewInterface = false;
+            if (!tryInitOldInterface()) {
+                emit asrError(AudioOther);
+                return;
+            }
+        } else {
+            qWarning() << "New interface startAsr call failed:" << reply.error().message();
+            emit asrError(AudioOther);
+            return;
+        }
+    }
+    
+    // 使用旧接口
+    if (!m_useNewInterface && m_asrInterface) {
+        qInfo() << "Using old interface (com.iflytek.aiservice) for startAsr";
+        QDBusReply<QString> reply = m_asrInterface->call("startAsr", param);
+        if (reply.isValid()) {
+            retStr = reply.value();
+        } else {
+            qWarning() << "Old interface startAsr call failed:" << reply.error().message();
+            emit asrError(AudioOther);
+            return;
+        }
+    }
+    
+    if (retStr.isEmpty()) {
+        emit asrError(AudioOther);
+        return;
+    }
 
     if (retStr != CODE_SUCCESS) {
         asrMsg error;
@@ -94,7 +208,23 @@ void VNoteA2TManager::startAsr(QString filePath,
  */
 void VNoteA2TManager::stopAsr()
 {
-    m_asrInterface->stopAsr();
+    // 尝试新接口
+    if (m_useNewInterface && m_newAsrInterface) {
+        qInfo() << "Using new interface (com.iflytek.aiassistant) for stopAsr";
+        QDBusReply<void> reply = m_newAsrInterface->call("stopAsr");
+        if (!reply.isValid() && reply.error().type() == QDBusError::UnknownMethod) {
+            qInfo() << "New interface doesn't support stopAsr method, switching to old interface";
+            m_useNewInterface = false;
+        } else if (!reply.isValid()) {
+            qWarning() << "New interface stopAsr call failed:" << reply.error().message();
+        }
+    }
+    
+    // 使用旧接口
+    if (!m_useNewInterface && m_asrInterface) {
+        qInfo() << "Using old interface (com.iflytek.aiservice) for stopAsr";
+        m_asrInterface->call("stopAsr");
+    }
 }
 
 /**
