@@ -7,9 +7,9 @@
 #define VNOTEA2TMANAGER_H
 
 #include <QObject>
+#include <QDBusInterface>
+#include <QScopedPointer>
 
-#include <com_iflytek_aiservice_session.h>
-#include <com_iflytek_aiservice_asr.h>
 struct asrMsg {
     QString code;
     QString descInfo;
@@ -68,6 +68,10 @@ protected:
     ErrorCode getErrorCode(const asrMsg &asrData);
     //初始化语音转写模块，初始化相关dbus连接
     int initSession();
+    //检查并初始化新接口
+    bool tryInitNewInterface();
+    //检查并初始化旧接口
+    bool tryInitOldInterface();
 
 protected:
     //XunFei message code string
@@ -94,8 +98,15 @@ protected:
         XF_other = 99,
     };
 
-    QScopedPointer<com::iflytek::aiservice::session> m_session;
-    QScopedPointer<com::iflytek::aiservice::asr> m_asrInterface;
+    // 新接口相关
+    QScopedPointer<QDBusInterface> m_newAsrInterface;
+    
+    // 旧接口相关
+    QScopedPointer<QDBusInterface> m_session;
+    QScopedPointer<QDBusInterface> m_asrInterface;
+    
+    // 接口类型标识
+    bool m_useNewInterface;
 };
 
 #endif // VNOTEA2TMANAGER_H
