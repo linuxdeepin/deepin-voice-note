@@ -270,14 +270,9 @@ void WebRichTextEditor::showTxtMenu(const QPoint &pos)
     bool TTSisWorking = VTextSpeechAndTrManager::isTextToSpeechInWorking(); //获取语音服务是否正在朗读
     //设置语音服务选项状态
     if (isAlSrvAvailabel) {
-        if (TTSisWorking) {
-            ActionManager::Instance()->visibleAction(ActionManager::TxtStopreading, true);
-            ActionManager::Instance()->visibleAction(ActionManager::TxtSpeech, false);
-            ActionManager::Instance()->enableAction(ActionManager::TxtStopreading, true);
-        } else {
-            ActionManager::Instance()->visibleAction(ActionManager::TxtStopreading, false);
-            ActionManager::Instance()->visibleAction(ActionManager::TxtSpeech, true);
-        }
+        // 统一显示"语音朗读"选项，不显示"停止朗读"
+        ActionManager::Instance()->visibleAction(ActionManager::TxtStopreading, false);
+        ActionManager::Instance()->visibleAction(ActionManager::TxtSpeech, true);
     }
     //获取web端编辑标志
     QWebEngineContextMenuData::EditFlags flags = page()->contextMenuData().editFlags();
@@ -290,7 +285,8 @@ void WebRichTextEditor::showTxtMenu(const QPoint &pos)
     if (flags.testFlag(QWebEngineContextMenuData::CanCopy)) {
         ActionManager::Instance()->enableAction(ActionManager::TxtCopy, true);
         if (isAlSrvAvailabel) {
-            if (!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()) {
+            // 无论是否在朗读中，都启用语音朗读功能
+            if (VTextSpeechAndTrManager::getTextToSpeechEnable()) {
                 ActionManager::Instance()->enableAction(ActionManager::TxtSpeech, true);
             }
         }
@@ -402,6 +398,10 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
         savePictureAs();
         break;
     case ActionManager::TxtSpeech:
+        // 如果正在朗读，先停止当前朗读，然后开始朗读新选中的文字
+        if (VTextSpeechAndTrManager::isTextToSpeechInWorking()) {
+            VTextSpeechAndTrManager::onStopTextToSpeech();
+        }
         VTextSpeechAndTrManager::onTextToSpeech();
         break;
     case ActionManager::TxtStopreading:

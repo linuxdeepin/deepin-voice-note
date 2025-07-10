@@ -347,7 +347,6 @@ void ActionManager::visibleAiActions(bool visible)
 {
     visibleAction(VoiceToText, visible);
     visibleAction(TxtSpeech, visible);
-    visibleAction(TxtStopreading, visible);
     visibleAction(TxtDictation, visible);
     m_aiSeparator->setVisible(visible);
 }
