@@ -319,7 +319,6 @@ void ActionManager::initMenu()
                  << DApplication::translate("NoteDetailContextMenu", "Cut")
                  << DApplication::translate("NoteDetailContextMenu", "Paste")
                  << DApplication::translate("NoteDetailContextMenu", "Text to Speech")
-                 << DApplication::translate("NoteDetailContextMenu", "Stop reading")
                  << DApplication::translate("NoteDetailContextMenu", "Speech to Text");
 
     //初始化文字文本右键菜单

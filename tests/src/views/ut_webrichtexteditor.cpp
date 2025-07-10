@@ -231,7 +231,6 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_showTxtMenu_002)
     stub.set(ADDR(QWebEngineContextMenuData, editFlags), stub_editFlags);
     OpsStateInterface::instance()->m_states |= (1 << OpsStateInterface::StateAISrvAvailable);
     m_web->showTxtMenu(QPoint());
-    EXPECT_FALSE(ActionManager::Instance()->getActionById(ActionManager::TxtStopreading)->isVisible()) << "TxtStopreading";
     EXPECT_TRUE(ActionManager::Instance()->getActionById(ActionManager::TxtSpeech)->isVisible()) << "TxtSpeech";
 }
 
@@ -244,8 +243,7 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_showTxtMenu_003)
     stub.set(ADDR(VTextSpeechAndTrManager, isTextToSpeechInWorking), stub_int);
     OpsStateInterface::instance()->m_states |= (1 << OpsStateInterface::StateAISrvAvailable);
     m_web->showTxtMenu(QPoint());
-    // 现在无论是否在朗读中，都显示TxtSpeech，不显示TxtStopreading
-    EXPECT_FALSE(ActionManager::Instance()->getActionById(ActionManager::TxtStopreading)->isVisible()) << "TxtStopreading";
+    // 现在显示TxtSpeech
     EXPECT_TRUE(ActionManager::Instance()->getActionById(ActionManager::TxtSpeech)->isVisible()) << "TxtSpeech";
 }
 
