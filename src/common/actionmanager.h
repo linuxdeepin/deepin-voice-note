@@ -84,7 +84,6 @@ public:
         TxtPaste,
 
         TxtSpeech,
-        TxtStopreading,
         TxtDictation,
         //Add Txt menu item begin {
 

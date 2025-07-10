@@ -270,8 +270,7 @@ void WebRichTextEditor::showTxtMenu(const QPoint &pos)
     bool TTSisWorking = VTextSpeechAndTrManager::isTextToSpeechInWorking(); //获取语音服务是否正在朗读
     //设置语音服务选项状态
     if (isAlSrvAvailabel) {
-        // 统一显示"语音朗读"选项，不显示"停止朗读"
-        ActionManager::Instance()->visibleAction(ActionManager::TxtStopreading, false);
+        // 显示"语音朗读"选项
         ActionManager::Instance()->visibleAction(ActionManager::TxtSpeech, true);
     }
     //获取web端编辑标志
@@ -403,9 +402,6 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
             VTextSpeechAndTrManager::onStopTextToSpeech();
         }
         VTextSpeechAndTrManager::onTextToSpeech();
-        break;
-    case ActionManager::TxtStopreading:
-        VTextSpeechAndTrManager::onStopTextToSpeech();
         break;
     case ActionManager::TxtDictation:
         VTextSpeechAndTrManager::onSpeechToText();
