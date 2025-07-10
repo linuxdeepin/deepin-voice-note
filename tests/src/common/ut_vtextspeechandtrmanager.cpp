@@ -30,11 +30,6 @@ TEST_F(UT_VTextSpeechAndTrManager, UT_VTextSpeechAndTrManager_getSpeechToTextEna
     m_vtextspeechandtrmanager->getSpeechToTextEnable();
 }
 
-TEST_F(UT_VTextSpeechAndTrManager, UT_VTextSpeechAndTrManager_getTransEnable_001)
-{
-    m_vtextspeechandtrmanager->getTransEnable();
-}
-
 TEST_F(UT_VTextSpeechAndTrManager, UT_VTextSpeechAndTrManager_onTextToSpeech_001)
 {
     m_vtextspeechandtrmanager->onTextToSpeech();
@@ -50,9 +45,4 @@ TEST_F(UT_VTextSpeechAndTrManager, UT_VTextSpeechAndTrManager_isTextToSpeechInWo
 TEST_F(UT_VTextSpeechAndTrManager, UT_VTextSpeechAndTrManager_onSpeechToText_001)
 {
     m_vtextspeechandtrmanager->onSpeechToText();
-}
-
-TEST_F(UT_VTextSpeechAndTrManager, UT_VTextSpeechAndTrManager_onTextTranslate_001)
-{
-    m_vtextspeechandtrmanager->onTextTranslate();
 }

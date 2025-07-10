@@ -86,7 +86,6 @@ public:
         TxtSpeech,
         TxtStopreading,
         TxtDictation,
-        TxtTranslate,
         //Add Txt menu item begin {
 
         //Add Txt menu item end }

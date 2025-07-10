@@ -290,9 +290,6 @@ void WebRichTextEditor::showTxtMenu(const QPoint &pos)
     if (flags.testFlag(QWebEngineContextMenuData::CanCopy)) {
         ActionManager::Instance()->enableAction(ActionManager::TxtCopy, true);
         if (isAlSrvAvailabel) {
-            if (VTextSpeechAndTrManager::getTransEnable()) {
-                ActionManager::Instance()->enableAction(ActionManager::TxtTranslate, true);
-            }
             if (!TTSisWorking && VTextSpeechAndTrManager::getTextToSpeechEnable()) {
                 ActionManager::Instance()->enableAction(ActionManager::TxtSpeech, true);
             }
@@ -412,9 +409,6 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
         break;
     case ActionManager::TxtDictation:
         VTextSpeechAndTrManager::onSpeechToText();
-        break;
-    case ActionManager::TxtTranslate:
-        VTextSpeechAndTrManager::onTextTranslate();
         break;
     default:
         break;

@@ -353,9 +353,6 @@ TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_onMenuActionClicked_001)
 
     pAction = actionManager.getActionById(ActionManager::TxtDictation);
     m_web->onMenuActionClicked(pAction);
-
-    pAction = actionManager.getActionById(ActionManager::TxtTranslate);
-    m_web->onMenuActionClicked(pAction);
 }
 
 TEST_F(UT_WebRichTextEditor, UT_WebRichTextEditor_savePictureAs_001)

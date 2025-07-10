@@ -15,16 +15,12 @@ public:
     static bool getTextToSpeechEnable();
     // 检测语音听写开关是否打开
     static bool getSpeechToTextEnable();
-    // 检测文本翻译开关是否打开
-    static bool getTransEnable();
     // 语音朗读
     static void onTextToSpeech();
     // 停止语音朗读
     static void onStopTextToSpeech();
     // 语音听写
     static void onSpeechToText();
-    // 文本翻译
-    static void onTextTranslate();
 };
 
 #endif // VTEXTSPEECHANDTRMANAGER_H

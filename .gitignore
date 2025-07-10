@@ -1,0 +1,70 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+.qmake.stash
+*.cmake
+CMakeLists.txt.user*
+CMakeFiles
+CMakeCache.txt
+compile_commands.json
+moc_*
+mocs_*
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Executables
+*.exe
+*.out
+*.app
+Makefile
+Makefile.*
+*.Debug
+*.Release
+*.rc
+*.zip
+
+debug
+release
+build*
+
+*.pro.user
+*.pro.user*
+*.qm
+*.autosave
+
+vendor/include/*
+vendor/lib/*
+
+NUL
+
+# Documents
+doc/html/*
+# vscode
+.vscode
+
+# deepin-IDE
+.unioncode
+
+# debhelper-build-stamp
+
+.debhelper
+*.deb
+*.dsc
+*.build
+*.buildinfo
+*.changes
+*.tar.gz
+*.log
+*.substvars
+
+.cursor/*
+.cache/*
