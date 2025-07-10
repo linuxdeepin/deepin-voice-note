@@ -74,25 +74,6 @@ bool VTextSpeechAndTrManager::getSpeechToTextEnable()
 }
 
 /**
- * @brief VTextSpeechAndTrManager::getTransEnable
- * @return true 翻译功能可用
- */
-bool VTextSpeechAndTrManager::getTransEnable()
-{
-    QDBusMessage translateReadingMsg = QDBusMessage::createMethodCall("com.iflytek.aiassistant",
-                                                                      "/aiassistant/trans",
-                                                                      "com.iflytek.aiassistant.trans",
-                                                                      "getTransEnable");
-
-    QDBusReply<bool> translateStateRet = QDBusConnection::sessionBus().call(translateReadingMsg, QDBus::BlockWithGui);
-    if (translateStateRet.isValid()) {
-        return translateStateRet.value();
-    } else {
-        return false;
-    }
-}
-
-/**
  * @brief VTextSpeechAndTrManager::onTextToSpeech
  */
 void VTextSpeechAndTrManager::onTextToSpeech()
@@ -118,12 +99,4 @@ void VTextSpeechAndTrManager::onStopTextToSpeech()
 void VTextSpeechAndTrManager::onSpeechToText()
 {
     QProcess::startDetached("dbus-send  --print-reply --dest=com.iflytek.aiassistant /aiassistant/deepinmain com.iflytek.aiassistant.mainWindow.SpeechToText");
-}
-
-/**
- * @brief VTextSpeechAndTrManager::onTextTranslate
- */
-void VTextSpeechAndTrManager::onTextTranslate()
-{
-    QProcess::startDetached("dbus-send  --print-reply --dest=com.iflytek.aiassistant /aiassistant/deepinmain com.iflytek.aiassistant.mainWindow.TextToTranslate");
 }

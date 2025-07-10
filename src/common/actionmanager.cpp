@@ -320,8 +320,7 @@ void ActionManager::initMenu()
                  << DApplication::translate("NoteDetailContextMenu", "Paste")
                  << DApplication::translate("NoteDetailContextMenu", "Text to Speech")
                  << DApplication::translate("NoteDetailContextMenu", "Stop reading")
-                 << DApplication::translate("NoteDetailContextMenu", "Speech to Text")
-                 << DApplication::translate("NoteDetailContextMenu", "Translate");
+                 << DApplication::translate("NoteDetailContextMenu", "Speech to Text");
 
     //初始化文字文本右键菜单
     m_txtContextMenu.reset(new VNoteRightMenu());
@@ -350,6 +349,5 @@ void ActionManager::visibleAiActions(bool visible)
     visibleAction(TxtSpeech, visible);
     visibleAction(TxtStopreading, visible);
     visibleAction(TxtDictation, visible);
-    visibleAction(TxtTranslate, visible);
     m_aiSeparator->setVisible(visible);
 }
