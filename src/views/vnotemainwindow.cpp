@@ -193,6 +193,7 @@ void VNoteMainWindow::initConnections()
     connect(JsContent::instance(), &JsContent::playVoice, this, &VNoteMainWindow::onWebVoicePlay);
     connect(m_richTextEdit, &WebRichTextEditor::currentSearchEmpty, this, &VNoteMainWindow::onWebSearchEmpty);
     connect(m_richTextEdit, &WebRichTextEditor::contentChanged, m_middleView, &MiddleView::onNoteChanged, Qt::QueuedConnection);
+    connect(m_richTextEdit, &WebRichTextEditor::popupToast, this, &VNoteMainWindow::showToastMessage);
     //创建笔记
     connect(JsContent::instance(), &JsContent::createNote, this, &VNoteMainWindow::onAddNoteShortcut, Qt::QueuedConnection);
 }
@@ -624,12 +625,11 @@ void VNoteMainWindow::initDelayWork()
 {
     QDBusConnection connection = QDBusConnection::sessionBus();
     QDBusConnectionInterface *bus = connection.interface();
+    //没有语音助手时，依然需要显示语音助手相关功能
     bool isVailid = bus->isServiceRegistered("com.iflytek.aiassistant");
-    //没有语音助手时，不显示语音助手相关功能
-    if (!isVailid) {
-        ActionManager::Instance()->visibleAiActions(isVailid);
-    }
-    stateOperation->operState(OpsStateInterface::StateAISrvAvailable, isVailid);
+    qInfo() << "initDelayWork isVailid" << isVailid;
+    ActionManager::Instance()->visibleAiActions(true);
+    stateOperation->operState(OpsStateInterface::StateAISrvAvailable, true);
 }
 
 /**
@@ -1814,6 +1814,41 @@ void VNoteMainWindow::closeDeviceExceptionErrMessage()
 }
 
 /**
+ * @brief VNoteMainWindow::showToastMessage
+ * @param message
+ * @param status
+ */
+void VNoteMainWindow::showToastMessage(const QString &message, int status)
+{
+    Q_UNUSED(status)
+    
+    if (m_toastMessage == nullptr) {
+        m_toastMessage = new DFloatingMessage(DFloatingMessage::TransientType, m_centerWidget);
+        QString iconPath = STAND_ICON_PAHT;
+        iconPath.append("warning.svg");
+        m_toastMessage->setIcon(QIcon(iconPath));
+        DWidget *widget = new DWidget(m_toastMessage);
+        QHBoxLayout *layout = new QHBoxLayout();
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->addStretch();
+        widget->setLayout(layout);
+        m_toastMessage->setWidget(widget);
+        m_toastMessage->setVisible(false);
+    }
+
+    m_toastMessage->setMessage(message);
+    m_toastMessage->setVisible(true);
+    m_toastMessage->setMinimumHeight(60);
+    m_toastMessage->setMaximumWidth(m_centerWidget->width());
+    m_toastMessage->adjustSize();
+
+    int xPos = (m_centerWidget->width() - m_toastMessage->width()) / 2;
+    int yPos = m_centerWidget->height() - m_toastMessage->height() - 5;
+
+    m_toastMessage->move(xPos, yPos);
+}
+
+/**
  * @brief VNoteMainWindow::onSystemDown
  * @param active
  */
@@ -1856,7 +1891,10 @@ void VNoteMainWindow::release()
         setting::instance()->setOption(VNOTE_MAINWND_SZ_KEY, saveGeometry());
     }
 
-    VTextSpeechAndTrManager::onStopTextToSpeech();
+    auto stopStatus = VTextSpeechAndTrManager::instance()->onStopTextToSpeech();
+    if (VTextSpeechAndTrManager::Success != stopStatus) {
+        qWarning() << "Stop text to speech failed with status:" << stopStatus;
+    }
     m_richTextEdit->updateNote();
 
     if (stateOperation->isVoice2Text()) {

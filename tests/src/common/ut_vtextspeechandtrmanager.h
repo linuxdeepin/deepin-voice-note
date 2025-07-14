@@ -22,7 +22,7 @@ public:
     virtual void TearDown() override;
 
 protected:
-    VTextSpeechAndTrManager *m_vtextspeechandtrmanager {nullptr};
+    // 使用单例模式，无需成员变量
 };
 
 #endif // UT_VTEXTSPEECHANDTRMANAGER_H
