@@ -2,233 +2,185 @@
 <context>
     <name>AppMain</name>
     <message>
-        <location filename="../src/common/vlcplayer.cpp" line="87"/>
+        <location filename="../src/common/vlcpalyer.cpp" line="43"/>
+        <location filename="../src/main.cpp" line="86"/>
+        <location filename="../src/main.cpp" line="87"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="603"/>
         <source>Voice Notes</source>
         <translation>Garsinia kalėjimai</translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="88"/>
+        <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
+        <translation>Garsinia kalėjimai yra puikus mėnesio darbų instrumentas, skirtas sukurti tekstinius darbus ir garsinius kalėjimus.</translation>
+    </message>
+    <message>
+        <location filename="../src/views/vnotemainwindow.cpp" line="604"/>
+        <source>Recordings not saved</source>
+        <translation>Kalėjimai nepasikartavo</translation>
     </message>
 </context>
 <context>
     <name>DefaultName</name>
     <message>
-        <location filename="../src/db/vnotefolderoper.cpp" line="249"/>
+        <location filename="../src/db/vnotefolderoper.cpp" line="230"/>
         <source>Notebook</source>
         <translation>Kalendorius</translation>
     </message>
     <message>
+        <location filename="../src/db/vnoteitemoper.cpp" line="213"/>
+        <source>Text</source>
+        <translation>Tekstas</translation>
+    </message>
+    <message>
+        <location filename="../src/db/vnoteitemoper.cpp" line="228"/>
         <location filename="../src/importolddata/olddbvisistors.cpp" line="139"/>
         <source>Voice</source>
         <translation>Garsis</translation>
     </message>
+</context>
+<context>
+    <name>DetailPage</name>
     <message>
-        <location filename="../src/db/vnoteitemoper.cpp" line="226"/>
-        <source>Text</source>
-        <translation>Tekstas</translation>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="198"/>
+        <source>%1 notes selected</source>
+        <translation>%1 kalėjimai pažymėti</translation>
     </message>
 </context>
 <context>
-    <name>FolderListView</name>
+    <name>FolderSelectDialog</name>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="517"/>
-        <source>Rename</source>
-        <translation type="unfinished"/>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="202"/>
+        <source>Move Notes</source>
+        <translation>Perkelti kalėjimus</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="526"/>
-        <source>Delete</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="545"/>
-        <source>New Note</source>
-        <translation type="unfinished"/>
-    </message>
-</context>
-<context>
-    <name>InitialInterface</name>
-    <message>
-        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="66"/>
-        <source>After creating a new notepad, you can start recording voice and text</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="73"/>
-        <source>Create Notebook</source>
-        <translation type="unfinished"/>
-    </message>
-</context>
-<context>
-    <name>ItemListView</name>
-    <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="81"/>
-        <source>move </source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
-        <source> notes to :</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="81"/>
-        <source> note to :</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="160"/>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="222"/>
-        <source>Save As</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="279"/>
-        <source>No search results</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
-        <source>Unpin</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
-        <source>Sticky on Top</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="752"/>
-        <source>Sticky Notes</source>
-        <translation type="unfinished"/>
-    </message>
-</context>
-<context>
-    <name>MainWindow</name>
-    <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="370"/>
-        <source>Create Notebook</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="523"/>
-        <source>Search</source>
-        <translation type="unfinished"/>
-    </message>
-</context>
-<context>
-    <name>MoveDialog</name>
-    <message>
-        <location filename="../src/gui/dialog/MoveDialog.qml" line="24"/>
-        <source>Move Note</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/dialog/MoveDialog.qml" line="136"/>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="229"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <comment>button</comment>
+        <translation>Atšaukti</translation>
     </message>
     <message>
-        <location filename="../src/gui/dialog/MoveDialog.qml" line="153"/>
-        <source>Ok</source>
-        <translation type="unfinished"/>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="230"/>
+        <source>Confirm</source>
+        <comment>button</comment>
+        <translation>Patvirtinti</translation>
     </message>
 </context>
 <context>
-    <name>MultipleChoices</name>
+    <name>HomePage</name>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="37"/>
-        <source>%1 note selected</source>
-        <translation type="unfinished"/>
+        <location filename="../src/views/homepage.cpp" line="32"/>
+        <source>Create Notebook</source>
+        <translation>Sukurti kalendorių</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="56"/>
-        <source>Move</source>
-        <translation type="unfinished"/>
+        <location filename="../src/views/homepage.cpp" line="44"/>
+        <source>Create a notebook to start recording voice and making notes</source>
+        <translation>Sukurkite kalendorių, kad pradėtumėte garsinį kalėjimą ir sukurti darbus.</translation>
+    </message>
+</context>
+<context>
+    <name>LeftView</name>
+    <message>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="365"/>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="379"/>
+        <source>Move %1 notes (%2, ...) to:</source>
+        <translation>Perkelti %1 kalėjimus (%2, ... ) į:</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="69"/>
-        <source>Save Note</source>
-        <translation type="unfinished"/>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="366"/>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="369"/>
+        <location filename="../src/dialog/folderselectdialog.cpp" line="377"/>
+        <source>Move the note &quot;%1&quot; to:</source>
+        <translation>Perkelti darbą &quot;%1&quot; į:</translation>
+    </message>
+</context>
+<context>
+    <name>MiddleView</name>
+    <message>
+        <location filename="../src/views/middleview.cpp" line="291"/>
+        <source>Save</source>
+        <translation>Išsaugoti</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="82"/>
-        <source>Save Voice</source>
-        <translation type="unfinished"/>
+        <location filename="../src/views/middleview.cpp" line="1045"/>
+        <source>No search results</source>
+        <translation>Nerasta rezultatų</translation>
     </message>
+</context>
+<context>
+    <name>MiddleViewDelegate</name>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="93"/>
-        <source>Delete</source>
-        <translation type="unfinished"/>
+        <location filename="../src/views/middleviewdelegate.cpp" line="438"/>
+        <source>Sticky Notes</source>
+        <translation>Išlipti darbai</translation>
     </message>
 </context>
 <context>
     <name>NoteDetailContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="69"/>
+        <location filename="../src/common/actionmanager.cpp" line="261"/>
         <source>Save as MP3</source>
         <translation>Išsaugoti kaip MP3</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="70"/>
+        <location filename="../src/common/actionmanager.cpp" line="262"/>
         <source>Voice to Text</source>
         <translation>Garsis į tekstą</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="71"/>
-        <location filename="../src/common/actionmanager.cpp" line="79"/>
-        <location filename="../src/common/actionmanager.cpp" line="87"/>
+        <location filename="../src/common/actionmanager.cpp" line="263"/>
+        <location filename="../src/common/actionmanager.cpp" line="290"/>
+        <location filename="../src/common/actionmanager.cpp" line="316"/>
         <source>Delete</source>
         <translation>Ištrinti</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="72"/>
-        <location filename="../src/common/actionmanager.cpp" line="80"/>
-        <location filename="../src/common/actionmanager.cpp" line="88"/>
+        <location filename="../src/common/actionmanager.cpp" line="264"/>
+        <location filename="../src/common/actionmanager.cpp" line="291"/>
+        <location filename="../src/common/actionmanager.cpp" line="317"/>
         <source>Select all</source>
         <translation>Pažymėti viską</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="73"/>
-        <location filename="../src/common/actionmanager.cpp" line="81"/>
-        <location filename="../src/common/actionmanager.cpp" line="89"/>
+        <location filename="../src/common/actionmanager.cpp" line="265"/>
+        <location filename="../src/common/actionmanager.cpp" line="292"/>
+        <location filename="../src/common/actionmanager.cpp" line="318"/>
         <source>Copy</source>
         <translation>Kopijuoti</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="74"/>
-        <location filename="../src/common/actionmanager.cpp" line="82"/>
-        <location filename="../src/common/actionmanager.cpp" line="90"/>
+        <location filename="../src/common/actionmanager.cpp" line="266"/>
+        <location filename="../src/common/actionmanager.cpp" line="293"/>
+        <location filename="../src/common/actionmanager.cpp" line="319"/>
         <source>Cut</source>
         <translation>Iškirpti</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="75"/>
-        <location filename="../src/common/actionmanager.cpp" line="83"/>
-        <location filename="../src/common/actionmanager.cpp" line="91"/>
+        <location filename="../src/common/actionmanager.cpp" line="267"/>
+        <location filename="../src/common/actionmanager.cpp" line="294"/>
+        <location filename="../src/common/actionmanager.cpp" line="320"/>
         <source>Paste</source>
         <translation>Įklijuoti</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="78"/>
+        <location filename="../src/common/actionmanager.cpp" line="289"/>
         <source>View</source>
         <translation>Peržiūrėti</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="84"/>
+        <location filename="../src/common/actionmanager.cpp" line="295"/>
         <source>Save as</source>
         <translation>Saugykite kaip</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="93"/>
+        <location filename="../src/common/actionmanager.cpp" line="321"/>
         <source>Text to Speech</source>
         <translation>Teksto į žodžius</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="94"/>
-        <source>Stop reading</source>
-        <translation>Žymeklio pabaiga</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="95"/>
+        <location filename="../src/common/actionmanager.cpp" line="322"/>
         <source>Speech to Text</source>
         <translation>Žodžių į tekstą</translation>
     </message>
@@ -236,17 +188,17 @@
 <context>
     <name>NotebookContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="47"/>
+        <location filename="../src/common/actionmanager.cpp" line="205"/>
         <source>Rename</source>
         <translation>Pervadinti</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="48"/>
+        <location filename="../src/common/actionmanager.cpp" line="206"/>
         <source>Delete</source>
         <translation>Ištrinti</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="49"/>
+        <location filename="../src/common/actionmanager.cpp" line="207"/>
         <source>New note</source>
         <translation>Nauja žurnalų eilutė</translation>
     </message>
@@ -254,47 +206,64 @@
 <context>
     <name>NotesContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="63"/>
+        <location filename="../src/common/actionmanager.cpp" line="180"/>
         <source>Save as HTML</source>
         <translation>Saugoti kaip HTML</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="64"/>
+        <location filename="../src/common/actionmanager.cpp" line="181"/>
         <source>Save as TXT</source>
         <translation>Saugoti kaip TXT</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="57"/>
+        <location filename="../src/common/actionmanager.cpp" line="185"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="327"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="338"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="344"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="346"/>
         <source>Save note</source>
         <translation>Išsaugoti žurnalų eilutę</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="52"/>
+        <location filename="../src/common/actionmanager.cpp" line="225"/>
         <source>Rename</source>
         <translation>Pervadinti</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="54"/>
+        <location filename="../src/common/actionmanager.cpp" line="227"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="321"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="330"/>
         <source>Move</source>
         <translation>Perkelti</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="55"/>
+        <location filename="../src/common/actionmanager.cpp" line="228"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="323"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="329"/>
         <source>Delete</source>
         <translation>Ištrinti</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="58"/>
+        <location filename="../src/common/actionmanager.cpp" line="230"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="328"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="339"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="351"/>
+        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="353"/>
         <source>Save voice recording</source>
         <translation>Išsaugoti garsų įrašymą</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="60"/>
+        <location filename="../src/common/actionmanager.cpp" line="231"/>
         <source>New note</source>
         <translation>Nauja žurnalų eilutė</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="53"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1262"/>
+        <source>Unstick</source>
+        <translation>Išjungti priklausymą</translation>
+    </message>
+    <message>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1264"/>
         <source>Sticky on Top</source>
         <translation>Nagrinėjamas viršuje</translation>
     </message>
@@ -302,23 +271,18 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="261"/>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="220"/>
         <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="263"/>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="222"/>
         <source>No audio input device detected. Please check and try again</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="265"/>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="224"/>
         <source>No audio output device detected. Please check and try again</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/main.cpp" line="99"/>
-        <source>deepin-voice-note</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -346,122 +310,99 @@
     </message>
 </context>
 <context>
-    <name>SettingDialog</name>
-    <message>
-        <location filename="../src/gui/dialog/SettingDialog.qml" line="27"/>
-        <source>Basic</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/dialog/SettingDialog.qml" line="32"/>
-        <source>Audio Source</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/dialog/SettingDialog.qml" line="59"/>
-        <source>Internal</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/dialog/SettingDialog.qml" line="68"/>
-        <source>Microphone</source>
-        <translation type="unfinished"/>
-    </message>
-</context>
-<context>
     <name>Shortcuts</name>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="804"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="910"/>
         <source>New notebook</source>
         <translation>Naujas žurnalas</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="805"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="911"/>
         <source>Rename notebook</source>
         <translation>Pervadinti žurnalą</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="806"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="912"/>
         <source>Delete notebook</source>
         <translation>Ištrinti žurnalą</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="828"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="934"/>
         <source>New note</source>
         <translation>Naujųsios įrašas</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="829"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="935"/>
         <source>Rename note</source>
         <translation>Pvz., pakeisti įrašą</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="830"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="936"/>
         <source>Delete note</source>
         <translation>Ištrinti įrašą</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="831"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="937"/>
         <source>Play/Pause</source>
         <translation>Rasme/Pauzė</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="832"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="938"/>
         <source>Record voice</source>
         <translation>Rinkti garsą</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="833"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="939"/>
         <source>Save note</source>
         <translation>Saugoti įrašą</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="834"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="940"/>
         <source>Save recordings</source>
         <translation>Saugoti rinkimus</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="854"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="960"/>
         <source>Select all</source>
         <translation>Pasirinkti viską</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="855"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="961"/>
         <source>Copy</source>
         <translation>Kopijuoti</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="856"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="962"/>
         <source>Cut</source>
         <translation>Ištrinti</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="857"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="963"/>
         <source>Paste</source>
         <translation>Įdėti</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="858"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
         <source>Undo</source>
         <translation>Atšaukti</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="859"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
         <source>Redo</source>
         <translation>Pakartoti</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="860"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="966"/>
         <source>Delete</source>
         <translation>Ištrinti</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="883"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="989"/>
         <source>Help</source>
         <translation>Pagalba</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="884"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="990"/>
         <source>Display shortcuts</source>
         <translation>Rodyti atshauktus mygtukus</translation>
     </message>
@@ -469,47 +410,50 @@
 <context>
     <name>ShortcutsGroups</name>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="810"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="916"/>
         <source>Notebooks</source>
         <translation>Pastabos bukliukai</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="838"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="944"/>
         <source>Notes</source>
         <translation>Pastabos</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="864"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="970"/>
         <source>Edit</source>
         <translation>Redaguoti</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="888"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="994"/>
         <source>Settings</source>
         <translation>Nustatymai</translation>
     </message>
 </context>
 <context>
-    <name>TitleBarMenu</name>
+    <name>SplashView</name>
     <message>
-        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="16"/>
+        <location filename="../src/views/splashview.cpp" line="30"/>
+        <source>Loading...</source>
+        <translation>Loeja...</translation>
+    </message>
+</context>
+<context>
+    <name>TitleBar</name>
+    <message>
+        <location filename="../src/views/vnotemainwindow.cpp" line="350"/>
+        <source>Search</source>
+        <translation>Paieška</translation>
+    </message>
+    <message>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1948"/>
         <source>Settings</source>
-        <translation type="unfinished"/>
+        <translation>Nustatymai</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="30"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1949"/>
         <source>Privacy Policy</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="53"/>
-        <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="55"/>
-        <source>Voice Note</source>
-        <translation type="unfinished"/>
+        <translation>Privatumo politika</translation>
     </message>
 </context>
 <context>
@@ -523,293 +467,201 @@
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../src/common/utils.cpp" line="46"/>
-        <location filename="../tests/src/common/ut_utils.cpp" line="32"/>
+        <location filename="../src/common/utils.cpp" line="41"/>
         <source>1 min ago</source>
         <translation>1 minutelėše</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="48"/>
+        <location filename="../src/common/utils.cpp" line="43"/>
         <source>%1 mins ago</source>
         <translation>%1 minutėseše</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="56"/>
-        <location filename="../tests/src/common/ut_utils.cpp" line="37"/>
+        <location filename="../src/common/utils.cpp" line="49"/>
         <source>Yesterday</source>
         <translation>Vakar</translation>
     </message>
+</context>
+<context>
+    <name>VNoteErrorMessage</name>
     <message>
-        <location filename="../tests/src/common/ut_utils.cpp" line="33"/>
-        <source>2 mins ago</source>
-        <translation>2 minutėseše</translation>
+        <location filename="../src/views/vnotemainwindow.cpp" line="872"/>
+        <source>The voice conversion failed due to the poor network connection, please have a check</source>
+        <translation>Garsos konvertavimas nepavyko dėl netinkamo tinklo ryšio, patikrink</translation>
+    </message>
+    <message>
+        <location filename="../src/views/vnotemainwindow.cpp" line="876"/>
+        <source>Voice to text conversion failed</source>
+        <translation>Garsas į tekstą konvertavimas nepavyko</translation>
+    </message>
+</context>
+<context>
+    <name>VNoteMainWindow</name>
+    <message>
+        <location filename="../src/views/vnotemainwindow.cpp" line="451"/>
+        <source>Create Notebook</source>
+        <translation>Sukurti mėnesio ataskaitą</translation>
     </message>
 </context>
 <context>
     <name>VNoteMessageDialog</name>
     <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="28"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="37"/>
         <source>OK</source>
         <comment>button</comment>
         <translation>Gerai</translation>
     </message>
     <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="39"/>
-        <source>Are you sure you want to delete this notebook?
-All notes in it will be deleted</source>
-        <translation>Ar tikrai norite ištrinti šį mėnesį ataskaitą? Visos jų žurnalai bus ištrinti</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="46"/>
-        <source>Do you want to stop the current recording?</source>
-        <translation>Ar norite sustabdyti dabartinį transkriptavimą? </translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="52"/>
-        <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
-        <translation>Neįmanoma konvertuoti šio garsio žurnalo, nes dabar nepalaikomi žurnalai ilgiau nei 20 minutes.</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="59"/>
-        <source>Converting a voice note now. Do you want to stop it?</source>
-        <translation>Šiuo metu konvertuojama garsio žurnalas. Ar norite jį sustabdyti? </translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="65"/>
-        <source>The low input volume may result in bad recordings. Do you want to continue?</source>
-        <translation>Nelyginis įvesties lygis gali sukelti netinkamą transkriptavimą. Ar norite tęsti? </translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="72"/>
-        <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
-        <translation>Garas transkriptavimas ir konvertuotas tekstas nebus įklijuotos. Ar norite tęsti? </translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="81"/>
-        <source>Are you sure you want to delete this note?</source>
-        <translation>Ar tikrai norite ištrinti šį žurnalą? </translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="87"/>
-        <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation>Ar tikrai norite ištrinti pasirinktus %1 žurnalus? </translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="94"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="116"/>
         <source>Cancel</source>
         <comment>button</comment>
         <translation>Atšaukti</translation>
     </message>
     <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="98"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="117"/>
         <source>Confirm</source>
         <comment>button</comment>
         <translation>Patvirtinti</translation>
     </message>
     <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="106"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="120"/>
+        <source>Are you sure you want to delete this notebook?
+All notes in it will be deleted</source>
+        <translation>Ar tikrai norite ištrinti šį mėnesį ataskaitą? Visos jų žurnalai bus ištrinti</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="123"/>
+        <source>Do you want to stop the current recording?</source>
+        <translation>Ar norite sustabdyti dabartinį transkriptavimą? </translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="127"/>
+        <source>Are you sure you want to delete the selected %1 notes?</source>
+        <translation>Ar tikrai norite ištrinti pasirinktus %1 žurnalus? </translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="129"/>
+        <source>Are you sure you want to delete this note?</source>
+        <translation>Ar tikrai norite ištrinti šį žurnalą? </translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
+        <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
+        <translation>Neįmanoma konvertuoti šio garsio žurnalo, nes dabar nepalaikomi žurnalai ilgiau nei 20 minutes.</translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="137"/>
+        <source>Converting a voice note now. Do you want to stop it?</source>
+        <translation>Šiuo metu konvertuojama garsio žurnalas. Ar norite jį sustabdyti? </translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="140"/>
+        <source>The low input volume may result in bad recordings. Do you want to continue?</source>
+        <translation>Nelyginis įvesties lygis gali sukelti netinkamą transkriptavimą. Ar norite tęsti? </translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="143"/>
+        <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
+        <translation>Garas transkriptavimas ir konvertuotas tekstas nebus įklijuotos. Ar norite tęsti? </translation>
+    </message>
+    <message>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
         <source>Save failed</source>
         <translation>Saugojimas nepavyko</translation>
     </message>
     <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="111"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="150"/>
         <source>You do not have permission to save files there</source>
         <translation>Nėra leidimo saugoti failus toliau</translation>
     </message>
     <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="116"/>
+        <location filename="../src/dialog/vnotemessagedialog.cpp" line="154"/>
         <source>The voice note has been deleted</source>
         <translation>Garsasis žurnalas buvo ištrintas</translation>
     </message>
 </context>
 <context>
-    <name>VNoteMessageDialogHandler</name>
+    <name>VNoteRecordBar</name>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="97"/>
-        <source>Are you sure you want to delete this notebook?</source>
-        <translation type="unfinished"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1757"/>
+        <source>Your audio recording device does not work.</source>
+        <translation>Audio transkriptavimo įrenginys nemdra.</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="99"/>
-        <source>Do you want to stop the current recording?</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="103"/>
-        <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="107"/>
-        <source>Are you sure you want to delete this note?</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="110"/>
-        <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="114"/>
-        <source>Converting a voice note now. Do you want to stop it?</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="116"/>
-        <source>The low input volume may result in bad recordings. Do you want to continue?</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="119"/>
-        <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="123"/>
-        <source>Save failed</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="125"/>
-        <source>You do not have permission to save files there</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="127"/>
-        <source>The voice note has been deleted</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="129"/>
-        <source>The voice conversion failed due to the poor network connection, please have a check</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="141"/>
-        <source>All notes in it will be deleted</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="154"/>
-        <source>Delete</source>
-        <translation type="unfinished"/>
-    </message>
-</context>
-<context>
-    <name>VNoteMessageDialogLoader</name>
-    <message>
-        <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="150"/>
-        <source>Cancel</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="183"/>
-        <source>Confirm</source>
-        <translation type="unfinished"/>
-    </message>
-</context>
-<context>
-    <name>WebEngineHandler</name>
-    <message>
-        <location filename="../src/handler/web_engine_handler.cpp" line="647"/>
-        <source>save as MP3</source>
-        <translation type="unfinished"/>
-    </message>
-</context>
-<context>
-    <name>WindowTitleBar</name>
-    <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="60"/>
-        <source>Create Note</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
-        <source>Start recording</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
+        <location filename="../src/views/vnoterecordbar.cpp" line="242"/>
         <source>No recording device detected</source>
-        <translation type="unfinished"/>
+        <translation>Neaptikta transkriptavimo įrenginio</translation>
     </message>
+</context>
+<context>
+    <name>VoiceNoteItem</name>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="119"/>
-        <source>Insert picture</source>
-        <translation type="unfinished"/>
+        <location filename="../src/views/vnotemainwindow.cpp" line="1698"/>
+        <source>Converting voice to text</source>
+        <translation>Konvertuojama garsas į tekstą</translation>
     </message>
 </context>
 <context>
     <name>web</name>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="146"/>
+        <location filename="../src/common/jscontent.cpp" line="126"/>
         <source>Font</source>
         <translation>Raktai</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="147"/>
+        <location filename="../src/common/jscontent.cpp" line="127"/>
         <source>Font size</source>
         <translation>Raktinis dydis</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="148"/>
+        <location filename="../src/common/jscontent.cpp" line="128"/>
         <source>Font color</source>
         <translation>Raktinė spalva</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="149"/>
+        <location filename="../src/common/jscontent.cpp" line="129"/>
         <source>Text highlight color</source>
         <translation>Teksto pažymėjimo spalva</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="150"/>
+        <location filename="../src/common/jscontent.cpp" line="130"/>
         <source>Bold</source>
         <translation>Tinklas</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="151"/>
+        <location filename="../src/common/jscontent.cpp" line="131"/>
         <source>Italic</source>
         <translation>Kursyv</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="152"/>
+        <location filename="../src/common/jscontent.cpp" line="132"/>
         <source>Underline</source>
         <translation>Apdalykštė linija</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="153"/>
+        <location filename="../src/common/jscontent.cpp" line="133"/>
         <source>Strikethrough</source>
         <translation>Ištrintas tekstas</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="154"/>
+        <location filename="../src/common/jscontent.cpp" line="134"/>
         <source>Bullets</source>
         <translation>Karpai</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="155"/>
+        <location filename="../src/common/jscontent.cpp" line="135"/>
         <source>Numbering</source>
         <translation>Numeravimas</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="156"/>
+        <location filename="../src/common/jscontent.cpp" line="136"/>
         <source>More colors</source>
         <translation>Daugiau spalvų</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="157"/>
+        <location filename="../src/common/jscontent.cpp" line="137"/>
         <source>Recent</source>
         <translation>Naujausios</translation>
-    </message>
-    <message>
-        <location filename="../src/common/jscontent.cpp" line="173"/>
-        <source>Voice To Text</source>
-        <translation type="unfinished"/>
-    </message>
-    <message>
-        <location filename="../src/common/jscontent.cpp" line="174"/>
-        <source>Converting voice to text</source>
-        <translation type="unfinished"/>
     </message>
 </context>
 </TS>
