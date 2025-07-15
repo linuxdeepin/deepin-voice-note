@@ -97,6 +97,13 @@ signals:
      */
     void contentChanged();
 
+    /**
+     * @brief 弹出Toast消息
+     * @param message 消息内容
+     * @param status 状态码
+     */
+    void popupToast(const QString &message, int status);
+
 public slots:
     /**
     * @brief 编辑区内容变化

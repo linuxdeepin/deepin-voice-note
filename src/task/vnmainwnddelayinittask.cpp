@@ -5,6 +5,8 @@
 
 #include "vnmainwnddelayinittask.h"
 #include "views/vnotemainwindow.h"
+#include "common/vtextspeechandtrmanager.h"
+#include "common/opsstateinterface.h"
 #include <QDBusInterface>
 #include <QDBusReply>
 
@@ -25,18 +27,13 @@ VNMainWndDelayInitTask::VNMainWndDelayInitTask(VNoteMainWindow *pMainWnd, QObjec
 void VNMainWndDelayInitTask::run()
 {
     if (nullptr != m_pMainWnd) {
-        // 直接尝试调用 DBus 接口Add commentMore actions
-        QDBusInterface aiInterface("com.iflytek.aiassistant",
-                                 "/aiassistant/deepinmain",
-                                 "org.freedesktop.DBus.Introspectable");
-
-        QDBusReply<QString> reply = aiInterface.call("Introspect");
-        if (reply.isValid()) {
-            qInfo() << "com.iflytek.aiassistant service is available.";
-        } else {
-            qInfo() << "Failed to connect to com.iflytek.aiassistant: " << reply.error().message();
-        }
-        //Delay initialize work
+        // 激活ai dbus 服务
+        qInfo() << "Starting AI service activation...";
+        
+        // 1. 检查 UOS AI 服务是否存在并激活
+        VTextSpeechAndTrManager::instance()->getTextToSpeechEnable();
+        
+        // 延时初始化主窗口
         m_pMainWnd->initDelayWork();
     }
 }

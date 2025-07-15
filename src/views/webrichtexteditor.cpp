@@ -267,7 +267,7 @@ void WebRichTextEditor::showTxtMenu(const QPoint &pos)
 {
     ActionManager::Instance()->resetCtxMenu(ActionManager::MenuType::TxtCtxMenu, false); //重置菜单选项
     bool isAlSrvAvailabel = OpsStateInterface::instance()->isAiSrvExist(); //获取语音服务是否可用
-    bool TTSisWorking = VTextSpeechAndTrManager::isTextToSpeechInWorking(); //获取语音服务是否正在朗读
+    bool TTSisWorking = VTextSpeechAndTrManager::instance()->isTextToSpeechInWorking(); //获取语音服务是否正在朗读
     //设置语音服务选项状态
     if (isAlSrvAvailabel) {
         // 显示"语音朗读"选项
@@ -285,9 +285,7 @@ void WebRichTextEditor::showTxtMenu(const QPoint &pos)
         ActionManager::Instance()->enableAction(ActionManager::TxtCopy, true);
         if (isAlSrvAvailabel) {
             // 无论是否在朗读中，都启用语音朗读功能
-            if (VTextSpeechAndTrManager::getTextToSpeechEnable()) {
-                ActionManager::Instance()->enableAction(ActionManager::TxtSpeech, true);
-            }
+            ActionManager::Instance()->enableAction(ActionManager::TxtSpeech, true);
         }
     }
     //可剪切
@@ -301,7 +299,7 @@ void WebRichTextEditor::showTxtMenu(const QPoint &pos)
     //可粘贴
     if (flags.testFlag(QWebEngineContextMenuData::CanPaste)) {
         ActionManager::Instance()->enableAction(ActionManager::TxtPaste, true);
-        if (!TTSisWorking && VTextSpeechAndTrManager::getSpeechToTextEnable()) {
+        if (!TTSisWorking) {
             ActionManager::Instance()->enableAction(ActionManager::TxtDictation, true);
         }
     }
@@ -396,16 +394,35 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
         //另存图片
         savePictureAs();
         break;
-    case ActionManager::TxtSpeech:
+    case ActionManager::TxtSpeech: {
         // 如果正在朗读，先停止当前朗读，然后开始朗读新选中的文字
-        if (VTextSpeechAndTrManager::isTextToSpeechInWorking()) {
-            VTextSpeechAndTrManager::onStopTextToSpeech();
+        if (VTextSpeechAndTrManager::instance()->isTextToSpeechInWorking()) {
+            auto stopStatus = VTextSpeechAndTrManager::instance()->onStopTextToSpeech();
+            if (VTextSpeechAndTrManager::Success != stopStatus) {
+                qWarning() << "Stop text to speech failed with status:" << stopStatus;
+            }
         }
-        VTextSpeechAndTrManager::onTextToSpeech();
+        auto status = VTextSpeechAndTrManager::instance()->onTextToSpeech();
+        if (VTextSpeechAndTrManager::Success != status) {
+            qWarning() << "Text to speech failed with status:" << status;
+            QString errString = VTextSpeechAndTrManager::instance()->errorString(status);
+            if (!errString.isEmpty()) {
+                Q_EMIT popupToast(errString, status);
+            }
+        }
         break;
-    case ActionManager::TxtDictation:
-        VTextSpeechAndTrManager::onSpeechToText();
+    }
+    case ActionManager::TxtDictation: {
+        auto status = VTextSpeechAndTrManager::instance()->onSpeechToText();
+        if (VTextSpeechAndTrManager::Success != status) {
+            qWarning() << "Speech to text failed with status:" << status;
+            QString errString = VTextSpeechAndTrManager::instance()->errorString(status);
+            if (!errString.isEmpty()) {
+                Q_EMIT popupToast(errString, status);
+            }
+        }
         break;
+    }
     default:
         break;
     }

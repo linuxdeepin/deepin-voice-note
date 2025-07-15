@@ -189,6 +189,8 @@ public slots:
     void showDeviceExceptionErrMessage();
     //关闭设备异常提示框
     void closeDeviceExceptionErrMessage();
+    //显示Toast消息
+    void showToastMessage(const QString &message, int status);
     //System shutdon
     void onSystemDown(bool active);
     //打开隐私政策
@@ -341,6 +343,7 @@ private:
     QString m_searchKey;
     DFloatingMessage *m_asrErrMeassage {nullptr};
     DFloatingMessage *m_pDeviceExceptionMsg {nullptr};
+    DFloatingMessage *m_toastMessage {nullptr};
     DMenu *m_menuExtension {nullptr};
     //Login session manager
     DBusLogin1Manager *m_pLogin1Manager {nullptr};
