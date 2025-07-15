@@ -2,213 +2,251 @@
 <context>
     <name>AppMain</name>
     <message>
-        <location filename="../src/common/vlcpalyer.cpp" line="39"/>
-        <location filename="../src/main.cpp" line="79"/>
-        <location filename="../src/main.cpp" line="80"/>
-        <location filename="../src/views/vnotemainwindow.cpp" line="602"/>
+        <location filename="../src/common/vlcplayer.cpp" line="87"/>
         <source>Voice Notes</source>
         <translation>Memorecorder</translation>
-    </message>
-    <message>
-        <location filename="../src/main.cpp" line="81"/>
-        <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation>Met Memorecorder kun je eenvoudig memo&apos;s opnemen en aantekeningen maken.</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="603"/>
-        <source>Recordings not saved</source>
-        <translation>Opnames niet opgeslagen</translation>
     </message>
 </context>
 <context>
     <name>DefaultName</name>
     <message>
-        <location filename="../src/db/vnotefolderoper.cpp" line="230"/>
+        <location filename="../src/db/vnotefolderoper.cpp" line="249"/>
         <source>Notebook</source>
         <translation>Notitieboek</translation>
     </message>
     <message>
-        <location filename="../src/db/vnoteitemoper.cpp" line="213"/>
-        <source>Text</source>
-        <translation>Tekst</translation>
-    </message>
-    <message>
-        <location filename="../src/db/vnoteitemoper.cpp" line="228"/>
         <location filename="../src/importolddata/olddbvisistors.cpp" line="139"/>
         <source>Voice</source>
         <translation>Memo</translation>
     </message>
-</context>
-<context>
-    <name>DetailPage</name>
     <message>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="198"/>
-        <source>%1 notes selected</source>
-        <translation>%1 aantekeningen geselecteerd</translation>
+        <location filename="../src/db/vnoteitemoper.cpp" line="226"/>
+        <source>Text</source>
+        <translation>Tekst</translation>
     </message>
 </context>
 <context>
-    <name>FolderSelectDialog</name>
+    <name>FolderListView</name>
     <message>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="202"/>
-        <source>Move Notes</source>
-        <translation>Memo&apos;s verplaatsen</translation>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="517"/>
+        <source>Rename</source>
+        <translation>Naam wijzigen</translation>
     </message>
     <message>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="229"/>
-        <source>Cancel</source>
-        <comment>button</comment>
-        <translation>Annuleren</translation>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="526"/>
+        <source>Delete</source>
+        <translation>Verwijderen</translation>
     </message>
     <message>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="230"/>
-        <source>Confirm</source>
-        <comment>button</comment>
-        <translation>Ja</translation>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="545"/>
+        <source>New Note</source>
+        <translation>Nieuwe memo</translation>
     </message>
 </context>
 <context>
-    <name>HomePage</name>
+    <name>InitialInterface</name>
     <message>
-        <location filename="../src/views/homepage.cpp" line="32"/>
+        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="66"/>
+        <source>After creating a new notepad, you can start recording voice and text</source>
+        <translation>Na het maken van een notitieboek kun je spraak- en tekstmemo&apos;s maken</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/InitialInterface.qml" line="73"/>
         <source>Create Notebook</source>
         <translation>Notitieboek maken</translation>
     </message>
-    <message>
-        <location filename="../src/views/homepage.cpp" line="44"/>
-        <source>Create a notebook to start recording voice and making notes</source>
-        <translation>Maak een notitieboek om memo&apos;s op te nemen en aantekeningen te maken</translation>
-    </message>
 </context>
 <context>
-    <name>LeftView</name>
+    <name>ItemListView</name>
     <message>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="365"/>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="379"/>
-        <source>Move %1 notes (%2, ...) to:</source>
-        <translation>%1 memo&apos;s (%2, …) verplaatsen naar:</translation>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="81"/>
+        <source>move </source>
+        <translation>verplaats</translation>
     </message>
     <message>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="366"/>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="369"/>
-        <location filename="../src/dialog/folderselectdialog.cpp" line="377"/>
-        <source>Move the note &quot;%1&quot; to:</source>
-        <translation>‘%1’ verplaatsen naar:</translation>
-    </message>
-</context>
-<context>
-    <name>MiddleView</name>
-    <message>
-        <location filename="../src/views/middleview.cpp" line="289"/>
-        <source>Save</source>
-        <translation>Opslaan</translation>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
+        <source> notes to :</source>
+        <translation>memo&apos;s naar:</translation>
     </message>
     <message>
-        <location filename="../src/views/middleview.cpp" line="1043"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="81"/>
+        <source> note to :</source>
+        <translation>memo naar:</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="160"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="222"/>
+        <source>Save As</source>
+        <translation>Opslaan als</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="279"/>
         <source>No search results</source>
         <translation>Geen zoekresultaten</translation>
     </message>
-</context>
-<context>
-    <name>MiddleViewDelegate</name>
     <message>
-        <location filename="../src/views/middleviewdelegate.cpp" line="438"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
+        <source>Unpin</source>
+        <translation>Losmaken</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
+        <source>Sticky on Top</source>
+        <translation>Vastzetten aan bovenkant</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="752"/>
         <source>Sticky Notes</source>
         <translation>Vastgezette memo&apos;s</translation>
     </message>
 </context>
 <context>
+    <name>MainWindow</name>
+    <message>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="370"/>
+        <source>Create Notebook</source>
+        <translation>Notitieboek maken</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="523"/>
+        <source>Search</source>
+        <translation>Zoeken</translation>
+    </message>
+</context>
+<context>
+    <name>MoveDialog</name>
+    <message>
+        <location filename="../src/gui/dialog/MoveDialog.qml" line="24"/>
+        <source>Move Note</source>
+        <translation>Memo verplaatsen</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/dialog/MoveDialog.qml" line="136"/>
+        <source>Cancel</source>
+        <translation>Annuleren</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/dialog/MoveDialog.qml" line="153"/>
+        <source>Ok</source>
+        <translation>Oké</translation>
+    </message>
+</context>
+<context>
+    <name>MultipleChoices</name>
+    <message>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="37"/>
+        <source>%1 note selected</source>
+        <translation>%1 memo geselecteerd</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="56"/>
+        <source>Move</source>
+        <translation>Verplaatsen</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="69"/>
+        <source>Save Note</source>
+        <translation>Memo opslaan</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="82"/>
+        <source>Save Voice</source>
+        <translation>Spraakmemo opslaan</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="93"/>
+        <source>Delete</source>
+        <translation>Verwijderen</translation>
+    </message>
+</context>
+<context>
     <name>NoteDetailContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="261"/>
+        <location filename="../src/common/actionmanager.cpp" line="69"/>
         <source>Save as MP3</source>
         <translation>Opslaan als mp3-bestand</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="262"/>
+        <location filename="../src/common/actionmanager.cpp" line="70"/>
         <source>Voice to Text</source>
         <translation>Spraak-naar-tekst</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="263"/>
-        <location filename="../src/common/actionmanager.cpp" line="290"/>
-        <location filename="../src/common/actionmanager.cpp" line="316"/>
+        <location filename="../src/common/actionmanager.cpp" line="71"/>
+        <location filename="../src/common/actionmanager.cpp" line="79"/>
+        <location filename="../src/common/actionmanager.cpp" line="87"/>
         <source>Delete</source>
         <translation>Verwijderen</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="264"/>
-        <location filename="../src/common/actionmanager.cpp" line="291"/>
-        <location filename="../src/common/actionmanager.cpp" line="317"/>
+        <location filename="../src/common/actionmanager.cpp" line="72"/>
+        <location filename="../src/common/actionmanager.cpp" line="80"/>
+        <location filename="../src/common/actionmanager.cpp" line="88"/>
         <source>Select all</source>
         <translation>Alles selecteren</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="265"/>
-        <location filename="../src/common/actionmanager.cpp" line="292"/>
-        <location filename="../src/common/actionmanager.cpp" line="318"/>
+        <location filename="../src/common/actionmanager.cpp" line="73"/>
+        <location filename="../src/common/actionmanager.cpp" line="81"/>
+        <location filename="../src/common/actionmanager.cpp" line="89"/>
         <source>Copy</source>
         <translation>Kopiëren</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="266"/>
-        <location filename="../src/common/actionmanager.cpp" line="293"/>
-        <location filename="../src/common/actionmanager.cpp" line="319"/>
+        <location filename="../src/common/actionmanager.cpp" line="74"/>
+        <location filename="../src/common/actionmanager.cpp" line="82"/>
+        <location filename="../src/common/actionmanager.cpp" line="90"/>
         <source>Cut</source>
         <translation>Knippen</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="267"/>
-        <location filename="../src/common/actionmanager.cpp" line="294"/>
-        <location filename="../src/common/actionmanager.cpp" line="320"/>
+        <location filename="../src/common/actionmanager.cpp" line="75"/>
+        <location filename="../src/common/actionmanager.cpp" line="83"/>
+        <location filename="../src/common/actionmanager.cpp" line="91"/>
         <source>Paste</source>
         <translation>Plakken</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="289"/>
+        <location filename="../src/common/actionmanager.cpp" line="78"/>
         <source>View</source>
         <translation>Bekijken</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="295"/>
+        <location filename="../src/common/actionmanager.cpp" line="84"/>
         <source>Save as</source>
         <translation>Opslaan als</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="321"/>
+        <location filename="../src/common/actionmanager.cpp" line="93"/>
         <source>Text to Speech</source>
         <translation>Tekst-naar-spraak</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="322"/>
+        <location filename="../src/common/actionmanager.cpp" line="94"/>
         <source>Stop reading</source>
         <translation>Stoppen met voorlezen</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="323"/>
+        <location filename="../src/common/actionmanager.cpp" line="95"/>
         <source>Speech to Text</source>
         <translation>Spraak-naar-tekst</translation>
-    </message>
-    <message>
-        <location filename="../src/common/actionmanager.cpp" line="324"/>
-        <source>Translate</source>
-        <translation>Vertalen</translation>
     </message>
 </context>
 <context>
     <name>NotebookContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="205"/>
+        <location filename="../src/common/actionmanager.cpp" line="47"/>
         <source>Rename</source>
         <translation>Naam wijzigen</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="206"/>
+        <location filename="../src/common/actionmanager.cpp" line="48"/>
         <source>Delete</source>
         <translation>Verwijderen</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="207"/>
+        <location filename="../src/common/actionmanager.cpp" line="49"/>
         <source>New note</source>
         <translation>Nieuwe memo</translation>
     </message>
@@ -216,66 +254,72 @@
 <context>
     <name>NotesContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="180"/>
+        <location filename="../src/common/actionmanager.cpp" line="63"/>
         <source>Save as HTML</source>
         <translation>Opslaan als html-bestand</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="181"/>
+        <location filename="../src/common/actionmanager.cpp" line="64"/>
         <source>Save as TXT</source>
         <translation>Opslaan als tekstbestand</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="185"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="327"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="338"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="344"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="346"/>
+        <location filename="../src/common/actionmanager.cpp" line="57"/>
         <source>Save note</source>
         <translation>Memo opslaan</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="225"/>
+        <location filename="../src/common/actionmanager.cpp" line="52"/>
         <source>Rename</source>
         <translation>Naam wijzigen</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="227"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="321"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="330"/>
+        <location filename="../src/common/actionmanager.cpp" line="54"/>
         <source>Move</source>
         <translation>Verplaatsen</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="228"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="323"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="329"/>
+        <location filename="../src/common/actionmanager.cpp" line="55"/>
         <source>Delete</source>
         <translation>Verwijderen</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="230"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="328"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="339"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="351"/>
-        <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="353"/>
+        <location filename="../src/common/actionmanager.cpp" line="58"/>
         <source>Save voice recording</source>
         <translation>Memo opslaan</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="231"/>
+        <location filename="../src/common/actionmanager.cpp" line="60"/>
         <source>New note</source>
         <translation>Nieuwe memo</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1261"/>
-        <source>Unstick</source>
-        <translation>Losmaken</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1263"/>
+        <location filename="../src/common/actionmanager.cpp" line="53"/>
         <source>Sticky on Top</source>
         <translation>Vastzetten aan bovenkant</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="261"/>
+        <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
+        <translation>Installeer UOS AI via de appwinkel om deze functie te kunnen gebruiken</translation>
+    </message>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="263"/>
+        <source>No audio input device detected. Please check and try again</source>
+        <translation>Er is geen invoerapparaat aangetroffen. Controleer je apparaat en probeer het opnieuw.</translation>
+    </message>
+    <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="265"/>
+        <source>No audio output device detected. Please check and try again</source>
+        <translation>Er is geen uitvoerapparaat aangetroffen. Controleer je apparaat en probeer het opnieuw.</translation>
+    </message>
+    <message>
+        <location filename="../src/main.cpp" line="99"/>
+        <source>deepin-voice-note</source>
+        <translation>deepin-voice-note</translation>
     </message>
 </context>
 <context>
@@ -302,99 +346,122 @@
     </message>
 </context>
 <context>
+    <name>SettingDialog</name>
+    <message>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="27"/>
+        <source>Basic</source>
+        <translation>Algemeen</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="32"/>
+        <source>Audio Source</source>
+        <translation>Audiobron</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="59"/>
+        <source>Internal</source>
+        <translation>Intern</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="68"/>
+        <source>Microphone</source>
+        <translation>Microfoon</translation>
+    </message>
+</context>
+<context>
     <name>Shortcuts</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="909"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="804"/>
         <source>New notebook</source>
         <translation>Notitieboek maken</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="910"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="805"/>
         <source>Rename notebook</source>
         <translation>Naam wijzigen</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="911"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="806"/>
         <source>Delete notebook</source>
         <translation>Notitieboek verwijderen</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="933"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="828"/>
         <source>New note</source>
         <translation>Nieuwe memo</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="934"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="829"/>
         <source>Rename note</source>
         <translation>Memonaam wijzigen</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="935"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="830"/>
         <source>Delete note</source>
         <translation>Memo verwijderen</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="936"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="831"/>
         <source>Play/Pause</source>
         <translation>Afspelen/Pauzeren</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="937"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="832"/>
         <source>Record voice</source>
         <translation>Memo maken</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="938"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="833"/>
         <source>Save note</source>
         <translation>Memo opslaan</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="939"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="834"/>
         <source>Save recordings</source>
         <translation>Memo&apos;s opslaan</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="959"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="854"/>
         <source>Select all</source>
         <translation>Alles selecteren</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="960"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="855"/>
         <source>Copy</source>
         <translation>Kopiëren</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="961"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="856"/>
         <source>Cut</source>
         <translation>Knippen</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="962"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="857"/>
         <source>Paste</source>
         <translation>Plakken</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="963"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="858"/>
         <source>Undo</source>
         <translation>Ongedaan maken</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="859"/>
         <source>Redo</source>
         <translation>Opnieuw uitvoeren</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="860"/>
         <source>Delete</source>
         <translation>Verwijderen</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="988"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="883"/>
         <source>Help</source>
         <translation>Hulp</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="989"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="884"/>
         <source>Display shortcuts</source>
         <translation>Sneltoetsen tonen</translation>
     </message>
@@ -402,50 +469,47 @@
 <context>
     <name>ShortcutsGroups</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="915"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="810"/>
         <source>Notebooks</source>
         <translation>Notitieboeken</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="943"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="838"/>
         <source>Notes</source>
         <translation>Memo&apos;s</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="969"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="864"/>
         <source>Edit</source>
         <translation>Bewerken</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="993"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="888"/>
         <source>Settings</source>
         <translation>Instellingen</translation>
     </message>
 </context>
 <context>
-    <name>SplashView</name>
+    <name>TitleBarMenu</name>
     <message>
-        <location filename="../src/views/splashview.cpp" line="30"/>
-        <source>Loading...</source>
-        <translation>Bezig met laden…</translation>
-    </message>
-</context>
-<context>
-    <name>TitleBar</name>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="349"/>
-        <source>Search</source>
-        <translation>Zoeken</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1903"/>
+        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="16"/>
         <source>Settings</source>
         <translation>Instellingen</translation>
     </message>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1904"/>
+        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="30"/>
         <source>Privacy Policy</source>
         <translation>Privacybeleid</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="53"/>
+        <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
+        <translation>Met Memorecorder kun je eenvoudig memo&apos;s opnemen en aantekeningen maken.</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="55"/>
+        <source>Voice Note</source>
+        <translation>Memorecorder</translation>
     </message>
 </context>
 <context>
@@ -459,18 +523,18 @@
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../src/common/utils.cpp" line="41"/>
+        <location filename="../src/common/utils.cpp" line="46"/>
         <location filename="../tests/src/common/ut_utils.cpp" line="32"/>
         <source>1 min ago</source>
         <translation>1 min geleden</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="43"/>
+        <location filename="../src/common/utils.cpp" line="48"/>
         <source>%1 mins ago</source>
         <translation>%1 min geleden</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="49"/>
+        <location filename="../src/common/utils.cpp" line="56"/>
         <location filename="../tests/src/common/ut_utils.cpp" line="37"/>
         <source>Yesterday</source>
         <translation>Gisteren</translation>
@@ -482,51 +546,14 @@
     </message>
 </context>
 <context>
-    <name>VNoteErrorMessage</name>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="871"/>
-        <source>The voice conversion failed due to the poor network connection, please have a check</source>
-        <translation>Het omzetten is mislukt omdat je internetverbinding zwak is. Wil je het opnieuw proberen?</translation>
-    </message>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="875"/>
-        <source>Voice to text conversion failed</source>
-        <translation>Omzetten mislukt</translation>
-    </message>
-</context>
-<context>
-    <name>VNoteMainWindow</name>
-    <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="450"/>
-        <source>Create Notebook</source>
-        <translation>Notitieboek maken</translation>
-    </message>
-</context>
-<context>
     <name>VNoteMessageDialog</name>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="37"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="28"/>
         <source>OK</source>
         <comment>button</comment>
         <translation>Oké</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="116"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="94"/>
-        <source>Cancel</source>
-        <comment>button</comment>
-        <translation>Annuleren</translation>
-    </message>
-    <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="117"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="98"/>
-        <source>Confirm</source>
-        <comment>button</comment>
-        <translation>Ja</translation>
-    </message>
-    <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="120"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="39"/>
         <source>Are you sure you want to delete this notebook?
 All notes in it will be deleted</source>
@@ -534,148 +561,256 @@ All notes in it will be deleted</source>
 Alle bijbehorende memo&apos;s worden eveneens verwijderd.</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="123"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="46"/>
         <source>Do you want to stop the current recording?</source>
         <translation>Wil je de huidige opname afbreken?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="127"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="87"/>
-        <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation>Weet je zeker dat je de %1 geselecteerde aantekeningen wilt verwijderen?</translation>
-    </message>
-    <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="129"/>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="81"/>
-        <source>Are you sure you want to delete this note?</source>
-        <translation>Weet je zeker dat je deze memo wilt verwijderen?</translation>
-    </message>
-    <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="133"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="52"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
         <translation>Deze memo kan niet worden omgezet omdat memo&apos;s van 20 minuten of langer momenteel niet worden ondersteund.</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="137"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="59"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
         <translation>De memo wordt momenteel omgezet. Wil je dit proces afbreken?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="140"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="65"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
         <translation>Het invoervolume is laag, wat kan leiden tot slechte opnames. Weet je zeker dat je wilt doorgaan?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="143"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="72"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
         <translation>De geknipte memo&apos;s en omgezette tekst worden niet geplakt. Weet je zeker dat je wilt doorgaan?</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="81"/>
+        <source>Are you sure you want to delete this note?</source>
+        <translation>Weet je zeker dat je deze memo wilt verwijderen?</translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="87"/>
+        <source>Are you sure you want to delete the selected %1 notes?</source>
+        <translation>Weet je zeker dat je de %1 geselecteerde aantekeningen wilt verwijderen?</translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="94"/>
+        <source>Cancel</source>
+        <comment>button</comment>
+        <translation>Annuleren</translation>
+    </message>
+    <message>
+        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="98"/>
+        <source>Confirm</source>
+        <comment>button</comment>
+        <translation>Ja</translation>
+    </message>
+    <message>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="106"/>
         <source>Save failed</source>
         <translation>Opslaan mislukt</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="150"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="111"/>
         <source>You do not have permission to save files there</source>
         <translation>Je bent niet bevoegd om hier bestanden op te slaan</translation>
     </message>
     <message>
-        <location filename="../src/dialog/vnotemessagedialog.cpp" line="154"/>
         <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="116"/>
         <source>The voice note has been deleted</source>
         <translation>De memo is verwijderd</translation>
     </message>
 </context>
 <context>
-    <name>VNoteRecordBar</name>
+    <name>VNoteMessageDialogHandler</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1750"/>
-        <source>Your audio recording device does not work.</source>
-        <translation>Je opnameapparaat werkt niet.</translation>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="97"/>
+        <source>Are you sure you want to delete this notebook?</source>
+        <translation>Weet je zeker dat je dit notitieboek wilt verwijderen?</translation>
     </message>
     <message>
-        <location filename="../src/views/vnoterecordbar.cpp" line="240"/>
-        <source>No recording device detected</source>
-        <translation>Geen opnameapparaat aangetroffen</translation>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="99"/>
+        <source>Do you want to stop the current recording?</source>
+        <translation>Wil je de huidige opname afbreken?</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="103"/>
+        <source>Are you sure you want to delete the selected %1 notes?</source>
+        <translation>Weet je zeker dat je de %1 geselecteerde memo&apos;s wilt verwijderen?</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="107"/>
+        <source>Are you sure you want to delete this note?</source>
+        <translation>Weet je zeker dat je deze memo wilt verwijderen?</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="110"/>
+        <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
+        <translation>Deze memo kan niet worden omgezet, omdat memo&apos;s van 20 minuten of langer momenteel niet worden ondersteund.</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="114"/>
+        <source>Converting a voice note now. Do you want to stop it?</source>
+        <translation>De memo wordt momenteel omgezet. Wil je dit proces afbreken?</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="116"/>
+        <source>The low input volume may result in bad recordings. Do you want to continue?</source>
+        <translation>Het invoervolume is laag, wat kan leiden tot slechte opnames. Weet je zeker dat je wilt doorgaan?</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="119"/>
+        <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
+        <translation>De geknipte memo&apos;s en omgezette tekst worden niet geplakt. Weet je zeker dat je wilt doorgaan?</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="123"/>
+        <source>Save failed</source>
+        <translation>Opslaan mislukt</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="125"/>
+        <source>You do not have permission to save files there</source>
+        <translation>Je bent niet bevoegd om hier bestanden op te slaan</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="127"/>
+        <source>The voice note has been deleted</source>
+        <translation>De spraakmemo is verwijderd</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="129"/>
+        <source>The voice conversion failed due to the poor network connection, please have a check</source>
+        <translation>Het omzetten is mislukt, omdat je internetverbinding zwak is. Wil je het opnieuw proberen?</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="141"/>
+        <source>All notes in it will be deleted</source>
+        <translation>Alle bijbehorende memo&apos;s worden eveneens verwijderd</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="154"/>
+        <source>Delete</source>
+        <translation>Verwijderen</translation>
     </message>
 </context>
 <context>
-    <name>VoiceNoteItem</name>
+    <name>VNoteMessageDialogLoader</name>
     <message>
-        <location filename="../src/views/vnotemainwindow.cpp" line="1691"/>
-        <source>Converting voice to text</source>
-        <translation>Bezig met omzetten…</translation>
+        <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="150"/>
+        <source>Cancel</source>
+        <translation>Annuleren</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/dialog/VNoteMessageDialogLoader.qml" line="183"/>
+        <source>Confirm</source>
+        <translation>Ja</translation>
+    </message>
+</context>
+<context>
+    <name>WebEngineHandler</name>
+    <message>
+        <location filename="../src/handler/web_engine_handler.cpp" line="647"/>
+        <source>save as MP3</source>
+        <translation>Opslaan als mp3-bestand</translation>
+    </message>
+</context>
+<context>
+    <name>WindowTitleBar</name>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="60"/>
+        <source>Create Note</source>
+        <translation>Memo maken</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
+        <source>Start recording</source>
+        <translation>Opname starten</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
+        <source>No recording device detected</source>
+        <translation>Geen opnameapparaat aangetroffen</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="119"/>
+        <source>Insert picture</source>
+        <translation>Afbeelding invoegen</translation>
     </message>
 </context>
 <context>
     <name>web</name>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="126"/>
+        <location filename="../src/common/jscontent.cpp" line="146"/>
         <source>Font</source>
         <translation>Lettertype</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="127"/>
+        <location filename="../src/common/jscontent.cpp" line="147"/>
         <source>Font size</source>
         <translation>Tekstgrootte</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="128"/>
+        <location filename="../src/common/jscontent.cpp" line="148"/>
         <source>Font color</source>
         <translation>Tekstkleur</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="129"/>
+        <location filename="../src/common/jscontent.cpp" line="149"/>
         <source>Text highlight color</source>
         <translation>Markeerkleur</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="130"/>
+        <location filename="../src/common/jscontent.cpp" line="150"/>
         <source>Bold</source>
         <translation>Vetgedrukt</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="131"/>
+        <location filename="../src/common/jscontent.cpp" line="151"/>
         <source>Italic</source>
         <translation>Cunsief</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="132"/>
+        <location filename="../src/common/jscontent.cpp" line="152"/>
         <source>Underline</source>
         <translation>Onderstrepen</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="133"/>
+        <location filename="../src/common/jscontent.cpp" line="153"/>
         <source>Strikethrough</source>
         <translation>Doorhalen</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="134"/>
+        <location filename="../src/common/jscontent.cpp" line="154"/>
         <source>Bullets</source>
         <translation>Ongenummerde lijst</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="135"/>
+        <location filename="../src/common/jscontent.cpp" line="155"/>
         <source>Numbering</source>
         <translation>Genummerde lijst</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="136"/>
+        <location filename="../src/common/jscontent.cpp" line="156"/>
         <source>More colors</source>
         <translation>Meer kleuren</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="137"/>
+        <location filename="../src/common/jscontent.cpp" line="157"/>
         <source>Recent</source>
         <translation>Recent</translation>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="173"/>
+        <source>Voice To Text</source>
+        <translation>Spraak-naar-tekst</translation>
+    </message>
+    <message>
+        <location filename="../src/common/jscontent.cpp" line="174"/>
+        <source>Converting voice to text</source>
+        <translation>Bezig met omzetten…</translation>
     </message>
 </context>
 </TS>
