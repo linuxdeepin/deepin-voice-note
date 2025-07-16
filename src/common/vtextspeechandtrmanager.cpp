@@ -233,10 +233,20 @@ VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::checkValid()
     qDebug() << "Checking UOS AI validity, current status:" << m_status;
     switch (m_status) {
         case NotInstalled:
-            m_status = copilotInstalled(m_copilot);
-            if (Enable != m_status) {
-                qWarning() << "UOS AI not installed";
-                break;
+            // 通过检测getSpeechToTextEnable接口是否可以调用来判断是否安装
+            {
+                QDBusMessage dictationMsg =
+                    QDBusMessage::createMethodCall(kFlytekService, "/aiassistant/iat", "com.iflytek.aiassistant.iat", "getIatEnable");
+                QDBusReply<bool> dictationStateRet = QDBusConnection::sessionBus().call(dictationMsg, QDBus::BlockWithGui);
+
+                if (dictationStateRet.isValid()) {
+                    qInfo() << "Speech-to-text interface callable, UOS AI considered installed";
+                    m_status = Enable;
+                } else {
+                    qWarning() << "Speech-to-text interface not callable, UOS AI not installed:" << dictationStateRet.error().message();
+                    m_status = NotInstalled;
+                    break;
+                }
             }
             break;
             //Q_FALLTHROUGH();
