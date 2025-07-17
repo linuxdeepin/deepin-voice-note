@@ -67,7 +67,7 @@
 2. 點選詳細資訊區輸入文字。
 3. 選中文字使用格式工具：字型、大小、顏色、粗體等。
 
-![0|txtinput](fig/txtinput.png)
+![0|txtinput](fig/txt_input.png)
 
 #### 新增語音至筆記
 
