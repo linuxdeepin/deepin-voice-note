@@ -273,17 +273,17 @@
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="220"/>
         <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
-        <translation type="unfinished"/>
+        <translation>Veuillez installer « UOS AI » depuis l&apos;App Store avant utilisation.</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="222"/>
         <source>No audio input device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>Aucun périphérique d&apos;entrée audio n&apos;a été détecté. Veuillez vérifier et réessayer.</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="224"/>
         <source>No audio output device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>Aucun périphérique de sortie audio n&apos;a été détecté. Veuillez vérifier et réessayer.</translation>
     </message>
 </context>
 <context>
