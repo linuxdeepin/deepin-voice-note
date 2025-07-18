@@ -167,7 +167,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="289"/>
         <source>View</source>
-        <translation type="unfinished"/>
+        <translation>Pregledaj</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="295"/>
@@ -384,12 +384,12 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
         <source>Undo</source>
-        <translation type="unfinished"/>
+        <translation>Poništi</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
         <source>Redo</source>
-        <translation type="unfinished"/>
+        <translation>Učini ponovo</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="966"/>
@@ -492,7 +492,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="876"/>
         <source>Voice to text conversion failed</source>
-        <translation type="unfinished"/>
+        <translation>Konverzija iz govora u tekst nije uspela</translation>
     </message>
 </context>
 <context>
@@ -607,7 +607,7 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/common/jscontent.cpp" line="126"/>
         <source>Font</source>
-        <translation type="unfinished"/>
+        <translation>Font</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="127"/>
@@ -627,22 +627,22 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/common/jscontent.cpp" line="130"/>
         <source>Bold</source>
-        <translation type="unfinished"/>
+        <translation>Podebljano</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="131"/>
         <source>Italic</source>
-        <translation type="unfinished"/>
+        <translation>Kurziv</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="132"/>
         <source>Underline</source>
-        <translation type="unfinished"/>
+        <translation>Podcrtano</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="133"/>
         <source>Strikethrough</source>
-        <translation type="unfinished"/>
+        <translation>Križice</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="134"/>
