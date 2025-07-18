@@ -384,12 +384,12 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
         <source>Undo</source>
-        <translation type="unfinished"/>
+        <translation>Desfazer</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
         <source>Redo</source>
-        <translation type="unfinished"/>
+        <translation>Refazer</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="966"/>
