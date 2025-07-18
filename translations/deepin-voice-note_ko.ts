@@ -44,7 +44,7 @@
     <message>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="198"/>
         <source>%1 notes selected</source>
-        <translation type="unfinished"/>
+        <translation>%1개의 노트가 선택되었습니다.</translation>
     </message>
 </context>
 <context>
@@ -52,7 +52,7 @@
     <message>
         <location filename="../src/dialog/folderselectdialog.cpp" line="202"/>
         <source>Move Notes</source>
-        <translation type="unfinished"/>
+        <translation>노트 이동</translation>
     </message>
     <message>
         <location filename="../src/dialog/folderselectdialog.cpp" line="229"/>
@@ -86,14 +86,14 @@
         <location filename="../src/dialog/folderselectdialog.cpp" line="365"/>
         <location filename="../src/dialog/folderselectdialog.cpp" line="379"/>
         <source>Move %1 notes (%2, ...) to:</source>
-        <translation type="unfinished"/>
+        <translation>%1개의 노트 (%2, ...) 를 어디로 이동할까요?:</translation>
     </message>
     <message>
         <location filename="../src/dialog/folderselectdialog.cpp" line="366"/>
         <location filename="../src/dialog/folderselectdialog.cpp" line="369"/>
         <location filename="../src/dialog/folderselectdialog.cpp" line="377"/>
         <source>Move the note &quot;%1&quot; to:</source>
-        <translation type="unfinished"/>
+        <translation> &quot;%1&quot; 노트를 어디로 이동할까요?:</translation>
     </message>
 </context>
 <context>
@@ -167,22 +167,22 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="289"/>
         <source>View</source>
-        <translation type="unfinished"/>
+        <translation>보기</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="295"/>
         <source>Save as</source>
-        <translation type="unfinished"/>
+        <translation>다른 이름으로 저장</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="321"/>
         <source>Text to Speech</source>
-        <translation type="unfinished"/>
+        <translation>텍스트 음성 변환</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="322"/>
         <source>Speech to Text</source>
-        <translation type="unfinished"/>
+        <translation>음성 텍스트 변환</translation>
     </message>
 </context>
 <context>
@@ -208,7 +208,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="180"/>
         <source>Save as HTML</source>
-        <translation type="unfinished"/>
+        <translation>HTML 형식으로 저장</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="181"/>
@@ -222,7 +222,7 @@
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="344"/>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="346"/>
         <source>Save note</source>
-        <translation type="unfinished"/>
+        <translation>노트 저장</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="225"/>
@@ -234,7 +234,7 @@
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="321"/>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="330"/>
         <source>Move</source>
-        <translation type="unfinished"/>
+        <translation>이동</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="228"/>
@@ -265,7 +265,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1264"/>
         <source>Sticky on Top</source>
-        <translation type="unfinished"/>
+        <translation>고정 최상단</translation>
     </message>
 </context>
 <context>
@@ -291,22 +291,22 @@
     <message>
         <location filename="../src/common/setting.cpp" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished"/>
+        <translation>기본</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="25"/>
         <source>Audio Source</source>
-        <translation type="unfinished"/>
+        <translation>오디오 원본</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="26"/>
         <source>Internal</source>
-        <translation type="unfinished"/>
+        <translation>내장</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="27"/>
         <source>Microphone</source>
-        <translation type="unfinished"/>
+        <translation>마이크</translation>
     </message>
 </context>
 <context>
@@ -354,7 +354,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="939"/>
         <source>Save note</source>
-        <translation type="unfinished"/>
+        <translation>노트 저장하기</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="940"/>
@@ -384,12 +384,12 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
         <source>Undo</source>
-        <translation type="unfinished"/>
+        <translation>실행 취소</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
         <source>Redo</source>
-        <translation type="unfinished"/>
+        <translation>다시 실행</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="966"/>
@@ -492,7 +492,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="876"/>
         <source>Voice to text conversion failed</source>
-        <translation type="unfinished"/>
+        <translation>음성 텍스트 변환 실패</translation>
     </message>
 </context>
 <context>
@@ -538,7 +538,7 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="127"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished"/>
+        <translation>선택한 %1개의 노트를 삭제하시겠습니까?</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="129"/>
@@ -568,12 +568,12 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
         <source>Save failed</source>
-        <translation type="unfinished"/>
+        <translation>저장 실패</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="150"/>
         <source>You do not have permission to save files there</source>
-        <translation type="unfinished"/>
+        <translation>해당 경로에 파일을 저장할 권한이 없습니다</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="154"/>
@@ -607,47 +607,47 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/common/jscontent.cpp" line="126"/>
         <source>Font</source>
-        <translation type="unfinished"/>
+        <translation>폰트</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="127"/>
         <source>Font size</source>
-        <translation type="unfinished"/>
+        <translation>폰트 크기</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="128"/>
         <source>Font color</source>
-        <translation type="unfinished"/>
+        <translation>폰트 색상</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="129"/>
         <source>Text highlight color</source>
-        <translation type="unfinished"/>
+        <translation>텍스트 강조 색상</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="130"/>
         <source>Bold</source>
-        <translation type="unfinished"/>
+        <translation>볼드</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="131"/>
         <source>Italic</source>
-        <translation type="unfinished"/>
+        <translation>이탤릭</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="132"/>
         <source>Underline</source>
-        <translation type="unfinished"/>
+        <translation>언더라인</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="133"/>
         <source>Strikethrough</source>
-        <translation type="unfinished"/>
+        <translation>스트라이크</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="134"/>
         <source>Bullets</source>
-        <translation type="unfinished"/>
+        <translation> bullets</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="135"/>
@@ -657,12 +657,12 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/common/jscontent.cpp" line="136"/>
         <source>More colors</source>
-        <translation type="unfinished"/>
+        <translation>더 많은 색상</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="137"/>
         <source>Recent</source>
-        <translation type="unfinished"/>
+        <translation>최근</translation>
     </message>
 </context>
 </TS>
