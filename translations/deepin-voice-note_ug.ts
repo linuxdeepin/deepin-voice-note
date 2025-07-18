@@ -273,17 +273,17 @@
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="220"/>
         <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
-        <translation type="unfinished"/>
+        <translation>ئۇچۇرلارنى كۆرۈش ئۈچۈن، ئالدى بىلەن &apos;UOS AI&apos; نى ئەپ بازىسىدىن ئورنىتىڭ</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="222"/>
         <source>No audio input device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>ئوتتۇرىغا كەلتۈرۈلگەن ئاۋاز كىرىش دەۋىسسىسى تاپыلمىدى. تەكشۈرۈپ قايتا سىناڭ</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="224"/>
         <source>No audio output device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>ئوتتۇرىغا كەلتۈرۈلگەن ئاۋاز چىقىش دەۋىسسىسى تاپыلمىدى. تەكشۈرۈپ قايتا سىناڭ</translation>
     </message>
 </context>
 <context>
