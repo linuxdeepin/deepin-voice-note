@@ -489,7 +489,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="872"/>
         <source>The voice conversion failed due to the poor network connection, please have a check</source>
-        <translation>当前网络状态差，语音转写失败，请确保网络畅通</translation>
+        <translation>网络异常，转写失败</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="876"/>
