@@ -384,12 +384,12 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
         <source>Undo</source>
-        <translation type="unfinished"/>
+        <translation>उndo</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
         <source>Redo</source>
-        <translation type="unfinished"/>
+        <translation>Reudo</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="966"/>
@@ -607,7 +607,7 @@ All notes in it will be deleted</source>
     <message>
         <location filename="../src/common/jscontent.cpp" line="126"/>
         <source>Font</source>
-        <translation type="unfinished"/>
+        <translation>फ़ॉन्ट</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="127"/>
