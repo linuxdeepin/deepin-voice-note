@@ -12,7 +12,7 @@
     <message>
         <location filename="../src/main.cpp" line="88"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation type="unfinished"/>
+        <translation>Voice Notes je laganik alat za bilješke i snimanje glasovnih zapisa.</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="604"/>
@@ -52,7 +52,7 @@
     <message>
         <location filename="../src/dialog/folderselectdialog.cpp" line="202"/>
         <source>Move Notes</source>
-        <translation type="unfinished"/>
+        <translation>Pomakni bilješke</translation>
     </message>
     <message>
         <location filename="../src/dialog/folderselectdialog.cpp" line="229"/>
@@ -86,14 +86,14 @@
         <location filename="../src/dialog/folderselectdialog.cpp" line="365"/>
         <location filename="../src/dialog/folderselectdialog.cpp" line="379"/>
         <source>Move %1 notes (%2, ...) to:</source>
-        <translation type="unfinished"/>
+        <translation>Pomakni %1 bilješke (%2, ...) na:</translation>
     </message>
     <message>
         <location filename="../src/dialog/folderselectdialog.cpp" line="366"/>
         <location filename="../src/dialog/folderselectdialog.cpp" line="369"/>
         <location filename="../src/dialog/folderselectdialog.cpp" line="377"/>
         <source>Move the note &quot;%1&quot; to:</source>
-        <translation type="unfinished"/>
+        <translation>Pomakni bilješku &quot;%1&quot; na:</translation>
     </message>
 </context>
 <context>
@@ -167,12 +167,12 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="289"/>
         <source>View</source>
-        <translation type="unfinished"/>
+        <translation>Pregledaj</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="295"/>
         <source>Save as</source>
-        <translation type="unfinished"/>
+        <translation>Spremi kao</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="321"/>
@@ -208,7 +208,7 @@
     <message>
         <location filename="../src/common/actionmanager.cpp" line="180"/>
         <source>Save as HTML</source>
-        <translation type="unfinished"/>
+        <translation>Spremi kao HTML</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="181"/>
@@ -222,7 +222,7 @@
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="344"/>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="346"/>
         <source>Save note</source>
-        <translation type="unfinished"/>
+        <translation>Spremi bilješku</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="225"/>
@@ -234,7 +234,7 @@
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="321"/>
         <location filename="../src/widgets/vnotemultiplechoiceoptionwidget.cpp" line="330"/>
         <source>Move</source>
-        <translation type="unfinished"/>
+        <translation>Pomakni</translation>
     </message>
     <message>
         <location filename="../src/common/actionmanager.cpp" line="228"/>
@@ -260,7 +260,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1262"/>
         <source>Unstick</source>
-        <translation type="unfinished"/>
+        <translation>Otkači</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1264"/>
@@ -301,7 +301,7 @@
     <message>
         <location filename="../src/common/setting.cpp" line="26"/>
         <source>Internal</source>
-        <translation type="unfinished"/>
+        <translation>Unutarnji</translation>
     </message>
     <message>
         <location filename="../src/common/setting.cpp" line="27"/>
@@ -354,7 +354,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="939"/>
         <source>Save note</source>
-        <translation type="unfinished"/>
+        <translation>Spremi bilješku</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="940"/>
@@ -384,12 +384,12 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="964"/>
         <source>Undo</source>
-        <translation type="unfinished"/>
+        <translation>Poništi</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="965"/>
         <source>Redo</source>
-        <translation type="unfinished"/>
+        <translation>Uradji ponovno</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="966"/>
@@ -453,7 +453,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="1949"/>
         <source>Privacy Policy</source>
-        <translation type="unfinished"/>
+        <translation>Politika privatnosti</translation>
     </message>
 </context>
 <context>
@@ -469,12 +469,12 @@
     <message>
         <location filename="../src/common/utils.cpp" line="41"/>
         <source>1 min ago</source>
-        <translation type="unfinished"/>
+        <translation>Prije 1 minuti</translation>
     </message>
     <message>
         <location filename="../src/common/utils.cpp" line="43"/>
         <source>%1 mins ago</source>
-        <translation type="unfinished"/>
+        <translation>&apos;Prije %1 minuta&apos;</translation>
     </message>
     <message>
         <location filename="../src/common/utils.cpp" line="49"/>
@@ -492,7 +492,7 @@
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="876"/>
         <source>Voice to text conversion failed</source>
-        <translation type="unfinished"/>
+        <translation>Konverzija iz glasa u tekst nije uspjela</translation>
     </message>
 </context>
 <context>
@@ -568,7 +568,7 @@ Sve će bilješke biti izbrisane</translation>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="146"/>
         <source>Save failed</source>
-        <translation type="unfinished"/>
+        <translation>Spremanje nije uspelo</translation>
     </message>
     <message>
         <location filename="../src/dialog/vnotemessagedialog.cpp" line="150"/>
@@ -612,17 +612,17 @@ Sve će bilješke biti izbrisane</translation>
     <message>
         <location filename="../src/common/jscontent.cpp" line="127"/>
         <source>Font size</source>
-        <translation type="unfinished"/>
+        <translation>Veličina pisma</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="128"/>
         <source>Font color</source>
-        <translation type="unfinished"/>
+        <translation>Boja pisma</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="129"/>
         <source>Text highlight color</source>
-        <translation type="unfinished"/>
+        <translation>Boja istaknute teksta</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="130"/>
@@ -642,27 +642,27 @@ Sve će bilješke biti izbrisane</translation>
     <message>
         <location filename="../src/common/jscontent.cpp" line="133"/>
         <source>Strikethrough</source>
-        <translation type="unfinished"/>
+        <translation>Križice</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="134"/>
         <source>Bullets</source>
-        <translation type="unfinished"/>
+        <translation>Tačkasti spisak</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="135"/>
         <source>Numbering</source>
-        <translation type="unfinished"/>
+        <translation>Brojanje</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="136"/>
         <source>More colors</source>
-        <translation type="unfinished"/>
+        <translation>Još boja</translation>
     </message>
     <message>
         <location filename="../src/common/jscontent.cpp" line="137"/>
         <source>Recent</source>
-        <translation type="unfinished"/>
+        <translation>Nedavni</translation>
     </message>
 </context>
 </TS>
