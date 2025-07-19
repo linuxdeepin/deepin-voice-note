@@ -12,7 +12,7 @@
     <message>
         <location filename="../src/main.cpp" line="88"/>
         <source>Voice Notes is a lightweight memo tool to make text notes and voice recordings.</source>
-        <translation>O Notas de Voz é uma ferramenta para se fazer anotações de texto e gravações de voz.</translation>
+        <translation>Notas de Voz é uma ferramenta para anotações, para criar notas de texto e gravações de voz.</translation>
     </message>
     <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="604"/>
