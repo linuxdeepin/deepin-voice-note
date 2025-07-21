@@ -1773,6 +1773,7 @@ void VNoteMainWindow::showAsrErrMessage(const QString &strMessage)
     m_asrErrMeassage->setMessage(strMessage);
     m_asrErrMeassage->setVisible(true);
     m_asrErrMeassage->setMinimumHeight(60);
+    m_asrErrMeassage->setMinimumWidth(200);
     m_asrErrMeassage->setMaximumWidth(m_centerWidget->width());
     m_asrErrMeassage->adjustSize();
 
