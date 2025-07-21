@@ -492,6 +492,11 @@
         <translation>网络异常，转写失败</translation>
     </message>
     <message>
+        <location filename="../src/views/vnotemainwindow.cpp" line="878"/>
+        <source>Voice to text conversion timed out, please try again</source>
+        <translation>转写超时，请重试</translation>
+    </message>
+    <message>
         <location filename="../src/views/vnotemainwindow.cpp" line="876"/>
         <source>Voice to text conversion failed</source>
         <translation>语音转文字失败</translation>

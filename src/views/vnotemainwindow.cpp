@@ -872,6 +872,10 @@ void VNoteMainWindow::onA2TError(int error)
         message = DApplication::translate(
                       "VNoteErrorMessage",
                       "The voice conversion failed due to the poor network connection, please have a check");
+    } else if (error == VNoteA2TManager::TimeoutError) {
+        message = DApplication::translate(
+                      "VNoteErrorMessage",
+                      "Voice to text conversion timed out, please try again");
     } else {
         message = DApplication::translate(
                       "VNoteErrorMessage",
