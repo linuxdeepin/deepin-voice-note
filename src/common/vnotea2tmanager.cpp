@@ -27,6 +27,9 @@ VNoteA2TManager::VNoteA2TManager(QObject *parent)
     : QObject(parent)
     , m_useNewInterface(false)
 {
+    // 初始化超时定时器
+    m_timeoutTimer.setSingleShot(true);
+    connect(&m_timeoutTimer, &QTimer::timeout, this, &VNoteA2TManager::onTimeout);
 }
 
 /**
@@ -200,7 +203,12 @@ void VNoteA2TManager::startAsr(QString filePath,
         asrMsg error;
         error.code = retStr;
         emit asrError(getErrorCode(error));
+        return;
     }
+    
+    // 启动超时定时器
+    qInfo() << "Starting ASR timeout timer for" << ASR_TIMEOUT_MS << "ms";
+    m_timeoutTimer.start(ASR_TIMEOUT_MS);
 }
 
 /**
@@ -233,6 +241,12 @@ void VNoteA2TManager::stopAsr()
  */
 void VNoteA2TManager::onNotify(const QString &msg)
 {
+    // 停止超时定时器
+    if (m_timeoutTimer.isActive()) {
+        m_timeoutTimer.stop();
+        qInfo() << "ASR timeout timer stopped due to notification received";
+    }
+    
     asrMsg asrData;
 
     asrJsonParser(msg, asrData);
@@ -326,6 +340,8 @@ VNoteA2TManager::ErrorCode VNoteA2TManager::getErrorCode(const asrMsg &asrData)
         } //End switch failType
     } else if (CODE_NETWORK == asrData.code) {
         error = NetworkError;
+    } else if (CODE_TIMEOUT == asrData.code) {
+        error = TimeoutError;
     } else {
         //TODO:
         //    Now we don't care this error,may be handle
@@ -333,4 +349,19 @@ VNoteA2TManager::ErrorCode VNoteA2TManager::getErrorCode(const asrMsg &asrData)
         error = DontCareError;
     }
     return error;
+}
+
+/**
+ * @brief VNoteA2TManager::onTimeout
+ * 超时处理函数
+ */
+void VNoteA2TManager::onTimeout()
+{
+    qWarning() << "ASR operation timed out after" << ASR_TIMEOUT_MS << "ms";
+    
+    // 停止ASR操作
+    stopAsr();
+    
+    // 发送超时错误信号
+    emit asrError(TimeoutError);
 }

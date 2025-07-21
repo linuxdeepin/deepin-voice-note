@@ -9,6 +9,7 @@
 #include <QObject>
 #include <QDBusInterface>
 #include <QScopedPointer>
+#include <QTimer>
 
 struct asrMsg {
     QString code;
@@ -50,6 +51,7 @@ public:
         AudioOther, //其他
         NetworkError, //网络错误
         DontCareError,
+        TimeoutError, //超时错误
     };
 
 signals:
@@ -60,6 +62,8 @@ signals:
 public slots:
     //转写过程中，信息处理
     void onNotify(const QString &msg);
+    //超时处理
+    void onTimeout();
 
 protected:
     //转写信息解析
@@ -77,6 +81,7 @@ protected:
     //XunFei message code string
     const QString CODE_SUCCESS {"000000"};
     const QString CODE_NETWORK {"900003"};
+    const QString CODE_TIMEOUT {"900004"}; // 超时错误码
 
     //XunFei state code
     enum State {
@@ -98,6 +103,9 @@ protected:
         XF_other = 99,
     };
 
+    // 超时时间常量 (毫秒)
+    static const int ASR_TIMEOUT_MS = 60000; // 1分钟超时
+
     // 新接口相关
     QScopedPointer<QDBusInterface> m_newAsrInterface;
     
@@ -107,6 +115,9 @@ protected:
     
     // 接口类型标识
     bool m_useNewInterface;
+    
+    // 超时定时器
+    QTimer m_timeoutTimer;
 };
 
 #endif // VNOTEA2TMANAGER_H
