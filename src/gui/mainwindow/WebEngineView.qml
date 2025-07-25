@@ -213,6 +213,12 @@ Item {
                         else
                             viewPictureLoader.item.show();
                     }
+                    onSaveAudio: {
+                        rootItem.saveAudio();
+                    }
+                    onCreateNote: {
+                        VNoteMainManager.createNote();
+                    }
                 }
 
                 WebChannel {

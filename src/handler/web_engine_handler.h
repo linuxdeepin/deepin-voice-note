@@ -74,6 +74,9 @@ Q_SIGNALS:
 
     void playingVoice(bool isPlay);
 
+    void saveAudio();
+    void createNote();
+
 public Q_SLOTS:
     // for qml
     void onCallJsResult(const QVariant &result);

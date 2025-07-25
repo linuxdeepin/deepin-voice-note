@@ -115,6 +115,12 @@ ApplicationWindow {
         onStartRecording: {
             webEngineView.startRecording();
         }
+        onSaveNote: {
+            itemListView.onSaveNote();
+        }
+        onSaveVoice: {
+            itemListView.onSaveAudio();
+        }
     }
 
     VNoteMessageDialogLoader {
