@@ -94,11 +94,20 @@ Item {
     }
 
     function onSaveNote() {
-        fileDialogLoader.saveType = VNoteMainManager.Text;
-        if (!fileDialogLoader.active) {
-            fileDialogLoader.active = true;
+        if (selectedNoteItem.length > 1) {
+            folderDialogLoader.saveType = VNoteMainManager.Text;
+            if (!folderDialogLoader.active) {
+                folderDialogLoader.active = true;
+            } else {
+                folderDialogLoader.item.open();
+            }
         } else {
-            fileDialogLoader.item.open();
+            fileDialogLoader.saveType = VNoteMainManager.Text;
+            if (!fileDialogLoader.active) {
+                fileDialogLoader.active = true;
+            } else {
+                fileDialogLoader.item.open();
+            }
         }
     }
 
@@ -192,17 +201,25 @@ Item {
             onAccepted: {
                 var idList = [];
                 for (var i = 0; i < selectedNoteItem.length; i++) {
-                    idList.push(itemModel.get(selectedNoteItem[0]).noteId);
+                    idList.push(itemModel.get(selectedNoteItem[i]).noteId);
                 }
                 
-                // Qt5 uses fileUrl, Qt6 uses selectedFile
                 var selectedFileUrl;
-                try {
-                    selectedFileUrl = fileDialog.selectedFile || fileDialog.fileUrl;
-                } catch (e) {
-                    selectedFileUrl = fileDialog.fileUrl || fileDialog.selectedFile;
+                
+                if (typeof fileDialog.selectedFile !== 'undefined' && fileDialog.selectedFile) {
+                    selectedFileUrl = fileDialog.selectedFile;
+                } 
+                else if (typeof fileDialog.fileUrl !== 'undefined' && fileDialog.fileUrl) {
+                    selectedFileUrl = fileDialog.fileUrl;
+                }
+                else if (typeof fileDialog.currentFile !== 'undefined' && fileDialog.currentFile) {
+                    selectedFileUrl = fileDialog.currentFile;
                 }
                 
+                if (!selectedFileUrl || selectedFileUrl.toString().length === 0) {
+                    return;
+                }
+
                 VNoteMainManager.saveAs(idList, selectedFileUrl, saveType);
             }
         }
@@ -247,8 +264,23 @@ Item {
                     list.push(itemModel.get(selectedNoteItem[i]).noteId);
                 }
                 
-                // Qt5 and Qt6 both use selectedFolder for FolderDialog
-                VNoteMainManager.saveAs(list, folderDialog.selectedFolder, saveType);
+                var selectedFolderUrl;
+                
+                if (typeof folderDialog.selectedFolder !== 'undefined' && folderDialog.selectedFolder) {
+                    selectedFolderUrl = folderDialog.selectedFolder;
+                }
+                else if (typeof folderDialog.currentFolder !== 'undefined' && folderDialog.currentFolder) {
+                    selectedFolderUrl = folderDialog.currentFolder;
+                }
+                else if (typeof folderDialog.folder !== 'undefined' && folderDialog.folder) {
+                    selectedFolderUrl = folderDialog.folder;
+                }
+                
+                if (!selectedFolderUrl || selectedFolderUrl.toString().length === 0) {
+                    return;
+                }
+                
+                VNoteMainManager.saveAs(list, selectedFolderUrl, saveType);
             }
         }
     }
@@ -318,17 +350,24 @@ Item {
                 rootItem.onDeleteNote();
                 break;
             case ActionManager.SaveNoteAsText:
-                onTriggered: {
-                    rootItem.onSaveNote();
-                }
+                rootItem.onSaveNote();
                 break;
             case ActionManager.SaveNoteAsHtml:
                 onTriggered: {
-                    fileDialogLoader.saveType = VNoteMainManager.Html;
-                    if (!fileDialogLoader.active) {
-                        fileDialogLoader.active = true;
+                    if (selectedNoteItem.length > 1) {
+                        folderDialogLoader.saveType = VNoteMainManager.Html;
+                        if (!folderDialogLoader.active) {
+                            folderDialogLoader.active = true;
+                        } else {
+                            folderDialogLoader.item.open();
+                        }
                     } else {
-                        fileDialogLoader.item.open();
+                        fileDialogLoader.saveType = VNoteMainManager.Html;
+                        if (!fileDialogLoader.active) {
+                            fileDialogLoader.active = true;
+                        } else {
+                            fileDialogLoader.item.open();
+                        }
                     }
                 }
                 break;

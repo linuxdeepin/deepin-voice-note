@@ -410,18 +410,27 @@ void VNoteMainManager::saveAs(const QVariantList &index, const QString &path, Sa
     }
 
     QString defaultName = "";
+    QString urlPath = QUrl(path).path();
+    QFileInfo pathInfo(urlPath);
+    
+    bool isDirectory = pathInfo.isDir() || urlPath.endsWith('/') || QUrl(path).fileName().isEmpty();
+    qDebug() << "Path analysis - isDirectory:" << isDirectory << "pathInfo.isDir():" << pathInfo.isDir();
+    
     switch (type) {
     case Html:
         exportType = ExportNoteWorker::ExportHtml;
-        defaultName = QUrl(path).fileName();
+        if (!isDirectory && noteDataList.size() == 1) {
+            defaultName = QUrl(path).fileName();
+        }
         break;
     case Text:
         exportType = ExportNoteWorker::ExportText;
-        defaultName = QUrl(path).fileName();
+        if (!isDirectory && noteDataList.size() == 1) {
+            defaultName = QUrl(path).fileName();
+        }
         break;
     case Voice:
         exportType = ExportNoteWorker::ExportVoice;
-        // 通过qt获取当前时间并转换为字符串
         QDateTime now = QDateTime::currentDateTime();
         QString timeStr = now.toString("yyyyMMddhhmmss");
         defaultName = timeStr + ".mp3";
@@ -903,9 +912,11 @@ void VNoteMainManager::preViewShortcut(const QPointF &point)
 
     QJsonDocument doc(shortcutObj);
 
+    QPoint pos(static_cast<int>(point.x()), static_cast<int>(point.y()));
+    
     QStringList shortcutString;
     QString param1 = "-j=" + QString(doc.toJson().data());
-    QString param2 = "-p=" + QString::number(point.x()) + "," + QString::number(point.y());
+    QString param2 = "-p=" + QString::number(pos.x()) + "," + QString::number(pos.y());
     shortcutString << param1 << param2;
 
     QProcess *shortcutViewProcess = new QProcess(this);
