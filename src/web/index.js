@@ -1323,9 +1323,12 @@ function setBackspace(focusDom, name) {
 }
 
 // ctrl+b 添加记事本
+// ctrl+d 保存录音
 document.onkeyup = function (event) {
     if (event.ctrlKey && window.event.keyCode == 66) {
         webobj.jsCallCreateNote()
+    } else if (event.ctrlKey && window.event.keyCode == 68) {
+        webobj.jsCallSaveAudio()
     }
 }
 

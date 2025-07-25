@@ -205,6 +205,8 @@ void WebEngineHandler::connectWebContent()
     connect(JsContent::instance(), &JsContent::popupMenu, this, &WebEngineHandler::onSaveMenuParam);
     connect(JsContent::instance(), &JsContent::textPaste, this, &WebEngineHandler::onPaste);
     connect(JsContent::instance(), &JsContent::viewPictrue, this, &WebEngineHandler::viewPicture);
+    connect(JsContent::instance(), &JsContent::saveAudio, this, &WebEngineHandler::saveAudio);
+    connect(JsContent::instance(), &JsContent::createNote, this, &WebEngineHandler::createNote);
 }
 
 /*!

@@ -248,6 +248,11 @@ void JsContent::jsCallCreateNote()
     emit createNote();
 }
 
+void JsContent::jsCallSaveAudio()
+{
+    emit saveAudio();
+}
+
 void JsContent::jsCallSetClipData(const QString &text, const QString &html)
 {
     qDebug() << "Setting clipboard data from JavaScript";
