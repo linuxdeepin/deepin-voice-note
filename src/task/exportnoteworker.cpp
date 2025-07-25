@@ -115,7 +115,8 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportText()
             }
             QString filePath = "";
             //没有指定保存名称，则设置默认名称为笔记标题
-            if (m_exportName.isEmpty()) {
+            QFileInfo pathInfo(m_exportPath);
+            if (pathInfo.isDir() || m_exportPath.endsWith('/') || m_exportName.isEmpty()) {
                 QString baseFileName = m_exportPath + "/" + Utils::filteredFileName(noteData->noteTitle, "note");
                 QString fileSuffix = ".txt";
                 filePath = getExportFileName(baseFileName, fileSuffix);
@@ -259,11 +260,12 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAsHtml()
         }
         QString filePath = "";
         //没有指定保存名称，则设置默认名称为笔记标题
-        if (m_exportName.isEmpty()) {
+        QFileInfo pathInfo(m_exportPath);
+        if (pathInfo.isDir() || m_exportPath.endsWith('/') || m_exportName.isEmpty()) {
             QString baseFileName = m_exportPath + "/" + Utils::filteredFileName(note->noteTitle, "note");
             QString fileSuffix = ".html";
             filePath = getExportFileName(baseFileName, fileSuffix);
-        } else {
+        } else {            
             filePath = m_exportPath;
         }
         QFile out(filePath);
@@ -275,6 +277,7 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAsHtml()
             qWarning() << "Failed to write HTML content to file:" << filePath;
             return Savefailed; //保存失败
         }
+        out.close();  
     }
     return error;
 }
