@@ -103,11 +103,8 @@ Item {
             }
         } else {
             fileDialogLoader.saveType = VNoteMainManager.Text;
-            if (!fileDialogLoader.active) {
-                fileDialogLoader.active = true;
-            } else {
-                fileDialogLoader.item.open();
-            }
+            fileDialogLoader.active = false;
+            fileDialogLoader.active = true;
         }
     }
 
@@ -189,9 +186,22 @@ Item {
                     console.log("currentFolder property not available, using folder");
                 }
                 
-                // Set currentFile for compatibility (optional, for real-time file selection tracking)
+                var defaultFileName = "";
+                if (selectedNoteItem.length > 0 && itemModel.get(selectedNoteItem[0])) {
+                    defaultFileName = itemModel.get(selectedNoteItem[0]).name;
+                    if (saveType === VNoteMainManager.Text && !defaultFileName.toLowerCase().endsWith('.txt')) {
+                        defaultFileName += '.txt';
+                    } else if (saveType === VNoteMainManager.Html && !defaultFileName.toLowerCase().endsWith('.html')) {
+                        defaultFileName += '.html';
+                    }
+                }
+                
                 try {
-                    fileDialog.currentFile = "";
+                    if (defaultFileName) {
+                        fileDialog.currentFile = Qt.resolvedUrl(initialFolder + "/" + defaultFileName);
+                    } else {
+                        fileDialog.currentFile = "";
+                    }
                 } catch (e) {
                     console.log("currentFile property not available");
                 }
@@ -363,11 +373,8 @@ Item {
                         }
                     } else {
                         fileDialogLoader.saveType = VNoteMainManager.Html;
-                        if (!fileDialogLoader.active) {
-                            fileDialogLoader.active = true;
-                        } else {
-                            fileDialogLoader.item.open();
-                        }
+                        fileDialogLoader.active = false;
+                        fileDialogLoader.active = true;
                     }
                 }
                 break;
