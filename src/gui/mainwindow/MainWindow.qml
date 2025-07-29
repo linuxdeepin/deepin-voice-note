@@ -279,6 +279,8 @@ ApplicationWindow {
             folderListView.opacity = 0.4;
             folderListView.enabled = false;
             createFolderButton.enabled = false;
+            webEngineView.webVisible = true;
+            webEngineView.noSearchResult = false;
         }
         onUpdateEditNote: {
             var currentIndex = handleUpdateNote(noteId, time);
