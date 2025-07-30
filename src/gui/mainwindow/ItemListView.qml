@@ -470,7 +470,7 @@ Item {
             Component.onCompleted: {
                 isSelected = (selectedNoteItem.indexOf(index) !== -1);
             }
-            Keys.onPressed: {
+            Keys.onPressed: function(event) {
                 if (isRename) {
                     if (event.key === Qt.Key_Escape) {
                         renameLine.text = model.name;
@@ -717,7 +717,7 @@ Item {
                 onExited: {
                     rootItemDelegate.hovered = false;
                 }
-                onPositionChanged: {
+                onPositionChanged: function(mouse) {
                     if (!held) {
                         if ((startMove[0] !== -1 || startMove[1] !== -1) && ((Math.abs(mouse.x - startMove[0]) > 5) || (Math.abs(mouse.y - startMove[1]) > 5))) {
                             held = true;
@@ -737,11 +737,11 @@ Item {
                         dragControl.visible = false;
                     }
                 }
-                onPressed: {
+                onPressed: function(mouse) {
                     startMove[0] = mouse.x;
                     startMove[1] = mouse.y;
                 }
-                onReleased: {
+                onReleased: function(mouse) {
                     startMove = [-1, -1];
                     if (held && dragControl.visible && mouse.button === Qt.LeftButton) {
                         dropRelease();

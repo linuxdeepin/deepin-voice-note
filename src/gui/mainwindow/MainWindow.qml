@@ -53,7 +53,7 @@ ApplicationWindow {
         y = Screen.height / 2 - height / 2;
         checkAndCreateDataPath();
     }
-    onClosing: {
+    onClosing: function(close) {
         close.accepted = false;
         if (isRecording) {
             close.accepted = false;
@@ -368,6 +368,15 @@ ApplicationWindow {
                     onUpdateFolderName: {
                         label.text = name;
                     }
+                    onMouseChanged: function(mousePosX, mousePosY) {
+                        if (mousePosY < rootWindow.y) {
+                            folderListView.rollUp();
+                        } else if (mousePosY > rootWindow.y + rootWindow.height) {
+                            folderListView.rollDown();
+                        } else {
+                            folderListView.rollStop();
+                        }
+                    }
                 }
 
                 Button {
@@ -396,7 +405,7 @@ ApplicationWindow {
                     }
                     folderListView.dropItems(indexList);
                 }
-                onMouseChanged: {
+                onMouseChanged: function(mousePosX, mousePosY) {
                     if (mousePosY < rootWindow.y) {
                         folderListView.rollUp();
                     } else if (mousePosY > rootWindow.y + rootWindow.height) {
@@ -530,7 +539,7 @@ ApplicationWindow {
                     Layout.topMargin: 12
                     placeholder: qsTr("Search")
 
-                    Keys.onPressed: {
+                    Keys.onPressed: function(event) {
                         if (text.length === 0)
                             return;
                         if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
