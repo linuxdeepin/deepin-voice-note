@@ -312,9 +312,9 @@ ApplicationWindow {
         id: twoColumnModeBtn
 
         height: 30
-        icon.height: 30
-        icon.name: "topleft"
-        icon.width: 30
+        icon.height: 14
+        icon.name: "sidebar"
+        icon.width: 14
         visible: !(needHideSearch && search.visible) || leftBgArea.visible
         width: 30
         x: 50
