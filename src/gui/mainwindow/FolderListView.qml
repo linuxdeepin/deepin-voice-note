@@ -24,6 +24,7 @@ Item {
     signal emptyItemList(bool isEmpty)
     signal folderEmpty
     signal itemChanged(int index, string name)
+    signal mouseChanged(int mousePosX, int mousePosY)
     signal updateFolderName(string name)
 
     function addFolder() {
@@ -243,9 +244,9 @@ Item {
             dropIndex = index;
             dropLine.visible = true;
             if (folderListView.itemAtIndex(dropIndex)) {
-                dropLine.y = folderListView.itemAtIndex(dropIndex).y;
+                dropLine.y = folderListView.itemAtIndex(dropIndex).y - folderListView.contentY;
             } else {
-                dropLine.y = folderListView.itemAtIndex(dropIndex - 1).y + folderListView.itemAtIndex(dropIndex - 1).height;
+                dropLine.y = folderListView.itemAtIndex(dropIndex - 1).y + folderListView.itemAtIndex(dropIndex - 1).height - folderListView.contentY;
             }
         }
 
@@ -273,7 +274,7 @@ Item {
             radius: 6
             width: parent.width
 
-            Keys.onPressed: {
+            Keys.onPressed: function(event) {
                 switch (event.key) {
                 case Qt.Key_Enter:
                 case Qt.Key_Return:
@@ -427,7 +428,7 @@ Item {
                 enabled: parent.enabled
                 hoverEnabled: true
 
-                onClicked: {
+                onClicked: function(mouse) {
                     root.forceActiveFocus();
                     tooltipVisible = false;
                     if (folderListView.itemAtIndex(folderListView.lastCurrentIndex)) {
@@ -460,7 +461,7 @@ Item {
                     }
                     parent.isHovered = false;
                 }
-                onPositionChanged: {
+                onPositionChanged: function(mouse) {
                     if (!held) {
                         if ((startMove[0] !== -1 || startMove[1] !== -1) && ((Math.abs(mouse.x - startMove[0]) > 5) || (Math.abs(mouse.y - startMove[1]) > 5))) {
                             dragControl.isFolder = true;
@@ -481,11 +482,12 @@ Item {
                         dragControl.x = globPos.x;
                         dragControl.y = globPos.y;
                         folderListView.indexAt(globPos.x, globPos.y);
+                        mouseChanged(globPos.x, globPos.y);
                     } else {
                         dragControl.visible = false;
                     }
                 }
-                onPressed: {
+                onPressed: function(mouse) {
                     startMove[0] = mouse.x;
                     startMove[1] = mouse.y;
                 }
@@ -560,7 +562,7 @@ Item {
             anchors.fill: parent
             propagateComposedEvents: true
 
-            onPressed: {
+            onPressed: function(mouse) {
                 var index = folderListView.currentIndex;
                 var item = folderListView.itemAtIndex(index);
                 if (item.isRename) {

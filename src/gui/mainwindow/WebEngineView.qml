@@ -170,7 +170,7 @@ Item {
                 DropArea {
                     anchors.fill: parent
 
-                    onDropped: {
+                    onDropped: function(drop) {
                         if (drop.hasUrls) {
                             VNoteMainManager.insertImages(drop.urls);
                         }
