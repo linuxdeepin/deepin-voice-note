@@ -273,6 +273,8 @@ ApplicationWindow {
             createFolderButton.enabled = false;
             webEngineView.webVisible = false;
             webEngineView.noSearchResult = true;
+            webEngineView.titleBar.isSearching = true;
+            itemListView.isSearching = true;
         }
         onSearchFinished: {
             label.visible = false;
@@ -281,6 +283,8 @@ ApplicationWindow {
             createFolderButton.enabled = false;
             webEngineView.webVisible = true;
             webEngineView.noSearchResult = false;
+            webEngineView.titleBar.isSearching = true;
+            itemListView.isSearching = true;
         }
         onUpdateEditNote: {
             var currentIndex = handleUpdateNote(noteId, time);
@@ -526,8 +530,10 @@ ApplicationWindow {
                         folderListView.enabled = true;
                         createFolderButton.enabled = true;
                         itemListView.isSearch = false;
+                        itemListView.isSearching = false;
                         webEngineView.webVisible = true;
                         webEngineView.noSearchResult = false;
+                        webEngineView.titleBar.isSearching = false;
                         VNoteMainManager.clearSearch();
                         if (needHideSearch)
                             search.visible = false;

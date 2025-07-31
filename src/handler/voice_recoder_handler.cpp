@@ -2,6 +2,7 @@
 #include "audio/gstreamrecorder.h"
 #include "audio/audio_watcher.h"
 #include "common/utils.h"
+#include "common/VNoteMainManager.h"
 #include <QAudioBuffer>
 #include "opsstateinterface.h"
 // 条件编译：根据 Qt 版本包含不同的音频设备头文件
@@ -33,6 +34,11 @@ VoiceRecoderHandler::RecoderType VoiceRecoderHandler::getRecoderType()
 
 void VoiceRecoderHandler::startRecoder()
 {
+    if (VNoteMainManager::instance()->isInSearchMode()) {
+        qDebug() << "Cannot start recording while in search mode";
+        return;
+    }
+    
     qDebug() << "Starting voice recorder";
     if (!checkVolume()) {
         qDebug() << "Volume check passed, confirming start";

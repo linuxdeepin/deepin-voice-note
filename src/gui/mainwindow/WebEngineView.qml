@@ -23,6 +23,7 @@ Item {
     property bool isRecording: false
     property bool noSearchResult: false
     property bool webVisible: true
+    property alias titleBar: title
 
     signal deleteNote
     signal moveNote
@@ -36,6 +37,11 @@ Item {
     }
 
     function startRecording() {
+        if (VNoteMainManager.isInSearchMode()) {
+            console.log("Cannot show recording UI while in search mode");
+            return;
+        }
+        
         if (!recorderViewLoader.active) {
             recorderViewLoader.active = true;
         } else {
