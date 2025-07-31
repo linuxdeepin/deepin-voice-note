@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.36) unstable; urgency=medium
+
+  * chore: update changelog
+
+ -- xiepengfei <xiepengfei@uniontech.com>  Thu, 31 Jul 2025 19:19:31 +0800
+
 deepin-voice-note (6.5.35) unstable; urgency=medium
 
   * chore: update the help manual
