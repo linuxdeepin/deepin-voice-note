@@ -1,0 +1,30 @@
+{
+    "magic": "dsg.config.meta",
+    "version": "1.0",
+    "contents": {
+        "QT_QPA_PLATFORM_CONFIG": {
+            "value": "",
+            "serial": 0,
+            "flags": [
+                "global"
+            ],
+            "name": "QT_QPA_PLATFORM_CONFIG",
+            "name[zh_CN]": "QT_QPA_PLATFORM参数设置",
+            "description": "不同平台配置QT_QPA_PLATFORM的参数",
+            "permissions": "readwrite",
+            "visibility": "private"
+        },
+        "QT_XCB_GL_INTEGRATION_CONFIG": {
+            "value": "",
+            "serial": 0,
+            "flags": [
+                "global"
+            ],
+            "name": "QT_XCB_GL_INTEGRATION_CONFIG",
+            "name[zh_CN]": "QT_XCB_GL_INTEGRATION参数设置",
+            "description": "opengl加速配置",
+            "permissions": "readwrite",
+            "visibility": "private"
+        }
+    }
+}

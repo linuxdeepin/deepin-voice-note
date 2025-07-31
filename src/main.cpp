@@ -23,12 +23,35 @@
 #include <DLog>
 #include <DWidgetUtil>
 #include <DPlatformWindowHandle>
+#ifdef DTKCORE_CLASS_DConfigFile
+#include <DConfig>
+#endif
 
 DCORE_USE_NAMESPACE
 DWIDGET_USE_NAMESPACE
 
 int main(int argc, char *argv[])
 {
+#ifdef DTKCORE_CLASS_DConfigFile
+    DConfig *dconfig = DConfig::create("org.deepin.deepin-voice-note","org.deepin.deepin-voice-note");
+
+    if(dconfig && dconfig->isValid() && dconfig->keyList().contains("QT_QPA_PLATFORM_CONFIG")){
+        QString QT_QPA_PLATFORM = dconfig->value("QT_QPA_PLATFORM_CONFIG").toString();
+
+        qWarning() << "QT_QPA_PLATFORM_CONFIG value is: " << QT_QPA_PLATFORM;
+        if (!QT_QPA_PLATFORM.isEmpty()) {
+            qputenv("QT_QPA_PLATFORM", QT_QPA_PLATFORM.toUtf8());
+        }
+    }
+
+    if (dconfig && dconfig->isValid() && dconfig->keyList().contains("QT_XCB_GL_INTEGRATION_CONFIG")) {
+        QString QT_XCB_GL_INTEGRATION = dconfig->value("QT_XCB_GL_INTEGRATION_CONFIG").toString();
+        qWarning() << "QT_XCB_GL_INTEGRATION_CONFIG value is: " << QT_XCB_GL_INTEGRATION;
+        if (!QT_XCB_GL_INTEGRATION.isEmpty()) {
+            qputenv("QT_XCB_GL_INTEGRATION", QT_XCB_GL_INTEGRATION.toUtf8());
+        }
+    }
+#endif
     // Task 326583 不参与合成器崩溃重连
     unsetenv("QT_WAYLAND_RECONNECT");
 
