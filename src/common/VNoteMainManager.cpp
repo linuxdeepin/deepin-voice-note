@@ -360,6 +360,11 @@ void VNoteMainManager::insertVoice(const QString &path, qint64 size)
 
 void VNoteMainManager::createNote()
 {
+    if (!m_searchText.isEmpty()) {
+        qDebug() << "Cannot create note while in search mode";
+        return;
+    }
+    
     if (m_currentFolderIndex == -1) {
         qWarning() << "Cannot create note: No current folder selected";
         return;
@@ -800,6 +805,11 @@ void VNoteMainManager::checkNoteVoice(const QVariantList &index)
 void VNoteMainManager::clearSearch()
 {
     m_searchText = "";
+}
+
+bool VNoteMainManager::isInSearchMode() const
+{
+    return !m_searchText.isEmpty();
 }
 
 void VNoteMainManager::preViewShortcut(const QPointF &point)

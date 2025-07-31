@@ -18,6 +18,7 @@ Item {
 
     property bool isPlay: false
     property bool isSearch: false
+    property bool isSearching: false
     property int itemSpacing: 6
     property alias model: itemModel
     property alias moveToFolderDialog: dialogWindow
@@ -337,6 +338,17 @@ Item {
             topItem.text = setTop ? qsTr("Sticky on Top") : qsTr("Unpin");
 
             ActionManager.enableVoicePlayActions(!isPlay);
+            
+            // 在搜索状态下禁用移动、置顶和新建笔记选项
+            if (isSearching) {
+                ActionManager.enableAction(ActionManager.NoteMove, false);
+                ActionManager.enableAction(ActionManager.NoteTop, false);
+                ActionManager.enableAction(ActionManager.NoteAddNew, false);
+            } else {
+                ActionManager.enableAction(ActionManager.NoteMove, true);
+                ActionManager.enableAction(ActionManager.NoteTop, true);
+                ActionManager.enableAction(ActionManager.NoteAddNew, true);
+            }
         }
         onActionTrigger: actionId => {
             switch (actionId) {
