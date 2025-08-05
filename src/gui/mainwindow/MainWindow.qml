@@ -101,18 +101,34 @@ ApplicationWindow {
             VNoteMainManager.createNote();
         }
         onPlayPauseVoice: {
+            if (initRect.visible) {
+                console.log("No notes available, cannot play/pause voice");
+                return;
+            }
             VNoteMainManager.resumeVoicePlayer();
         }
         onRenameFolder: {
+            if (initRect.visible) {
+                console.log("No notes available, cannot rename folder");
+                return;
+            }
             folderListView.renameCurrentItem();
         }
         onRenameNote: {
+            if (initRect.visible) {
+                console.log("No notes available, cannot rename note");
+                return;
+            }
             itemListView.renameCurrentItem();
         }
         onShowShortCutView: {
             VNoteMainManager.preViewShortcut(Qt.point(rootWindow.x + rootWindow.width / 2, rootWindow.y + rootWindow.height / 2));
         }
         onStartRecording: {
+            if (initRect.visible) {
+                console.log("No notes available, cannot start recording");
+                return;
+            }
             webEngineView.startRecording();
         }
         onSaveNote: {
@@ -355,6 +371,7 @@ ApplicationWindow {
 
                     Layout.fillHeight: true
                     Layout.fillWidth: true
+                    webVisible: initRect.visible
 
                     onEmptyItemList: isEmpty => {
                         webEngineView.webVisible = !isEmpty;
@@ -587,6 +604,7 @@ ApplicationWindow {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     moveToFolderDialog.folderModel: folderListView.model
+                    webVisible: initRect.visible
 
                     onDeleteFinished: {
                         webEngineView.toggleMultCho(1);
