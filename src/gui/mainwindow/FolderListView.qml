@@ -20,6 +20,7 @@ Item {
     property int listHeight: 700
     property int listWidth: 200
     property alias model: folderListView.model
+    property bool webVisible: true
 
     signal emptyItemList(bool isEmpty)
     signal folderEmpty
@@ -140,6 +141,11 @@ Item {
         root.forceActiveFocus();
     }
     Keys.onDeletePressed: {
+        if (webVisible) {
+            console.log("No notes available, cannot delete folder");
+            return;
+        }
+        
         messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteFolder, ret => {
             if (ret) {
                 VNoteMainManager.vNoteDeleteFolder(folderListView.currentIndex);
@@ -528,6 +534,11 @@ Item {
                     text: qsTr("Delete")
 
                     onTriggered: {
+                        if (webVisible) {
+                            console.log("No notes available, cannot delete folder");
+                            return;
+                        }
+                        
                         messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteFolder, ret => {
                             if (ret) {
                                 VNoteMainManager.vNoteDeleteFolder(folderListView.contextIndex);

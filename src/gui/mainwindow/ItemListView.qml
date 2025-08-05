@@ -28,6 +28,7 @@ Item {
     property var selectedNoteItem: []
     property int topSize: 0
     property alias view: itemListView
+    property bool webVisible: true
 
     signal deleteFinished
     signal deleteNotes(int number)
@@ -42,6 +43,11 @@ Item {
     }
 
     function onDeleteNote() {
+        if (webVisible) {
+            console.log("No notes available, cannot delete");
+            return;
+        }
+        
         messageDialogLoader.messageData = selectedNoteItem.length;
         if (messageDialogLoader.active) {
             messageDialogLoader.item.show();
@@ -75,6 +81,11 @@ Item {
     }
 
     function onMoveNote() {
+        if (webVisible) {
+            console.log("No notes available, cannot move");
+            return;
+        }
+        
         var desText = "";
         if (selectedNoteItem.length > 1) {
             desText = qsTr("move ") + selectedNoteItem.length + qsTr(" notes to :");
@@ -86,6 +97,11 @@ Item {
     }
 
     function onSaveAudio() {
+        if (webVisible) {
+            console.log("No notes available, cannot save audio");
+            return;
+        }
+        
         if (!folderDialogLoader.active) {
             folderDialogLoader.saveType = VNoteMainManager.Voice;
             folderDialogLoader.active = true;
@@ -95,6 +111,11 @@ Item {
     }
 
     function onSaveNote() {
+        if (webVisible) {
+            console.log("No notes available, cannot save note");
+            return;
+        }
+        
         if (selectedNoteItem.length > 1) {
             folderDialogLoader.saveType = VNoteMainManager.Text;
             if (!folderDialogLoader.active) {
@@ -120,6 +141,10 @@ Item {
     width: 640
 
     Keys.onDeletePressed: {
+        if (webVisible) {
+            console.log("No notes available, cannot delete");
+            return;
+        }
         rootItem.onDeleteNote();
     }
     onSelectSizeChanged: {
@@ -351,6 +376,12 @@ Item {
             }
         }
         onActionTrigger: actionId => {
+            // 检查是否有笔记内容，如果处于初始界面则不执行操作
+            if (webVisible) {
+                console.log("No notes available, cannot perform menu action:", actionId);
+                return;
+            }
+            
             switch (actionId) {
             case ActionManager.NoteRename:
                 var currentItem = itemListView.itemAtIndex(itemListView.contextIndex);
@@ -494,6 +525,10 @@ Item {
                     }
                 } else {
                     if (event.key === Qt.key_delete) {
+                        if (webVisible) {
+                            console.log("No notes available, cannot delete");
+                            return;
+                        }
                         rootItem.onDeleteNote();
                     }
                 }
