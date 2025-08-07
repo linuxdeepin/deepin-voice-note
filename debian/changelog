@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.37) unstable; urgency=medium
+
+  * chore: Add new Lao translation file
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Thu, 07 Aug 2025 16:09:16 +0800
+
 deepin-voice-note (6.5.36) unstable; urgency=medium
 
   * chore: update changelog
