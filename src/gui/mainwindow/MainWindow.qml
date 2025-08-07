@@ -112,6 +112,7 @@ ApplicationWindow {
                 console.log("No notes available, cannot rename folder");
                 return;
             }
+            itemListView.cancelRename();
             folderListView.renameCurrentItem();
         }
         onRenameNote: {
@@ -119,6 +120,7 @@ ApplicationWindow {
                 console.log("No notes available, cannot rename note");
                 return;
             }
+            folderListView.cancelRename();
             itemListView.renameCurrentItem();
         }
         onShowShortCutView: {

@@ -136,6 +136,15 @@ Item {
         itemListView.itemAtIndex(selectedNoteItem[0]).isRename = true;
     }
 
+    function cancelRename() {
+        for (var i = 0; i < itemListView.count; i++) {
+            var item = itemListView.itemAtIndex(i);
+            if (item && item.isRename) {
+                item.isRename = false;
+            }
+        }
+    }
+
     height: 480
     visible: true
     width: 640
