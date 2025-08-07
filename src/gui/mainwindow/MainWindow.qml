@@ -130,6 +130,7 @@ ApplicationWindow {
                 return;
             }
             webEngineView.startRecording();
+            VoiceRecoderHandler.startRecoder();
         }
         onSaveNote: {
             itemListView.onSaveNote();
