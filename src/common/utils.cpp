@@ -18,6 +18,7 @@
 #include <QBuffer>
 #include <QFileInfo>
 #include <QProcess>
+#include <QTextDocument>
 #include <QTextDocumentFragment>
 
 Utils::Utils()
@@ -398,6 +399,16 @@ QString Utils::createRichText(const QString &title, const QString &key)
     QString editTitle(title);
     QString newText = editTitle.replace(key, highLightText);
     return newText;
+}
+
+QString Utils::stripHtmlTags(const QString &htmlText)
+{
+    qDebug() << "Stripping HTML tags from text:" << htmlText;
+    QTextDocument doc;
+    doc.setHtml(htmlText);
+    QString plainText = doc.toPlainText();
+    qDebug() << "Converted to plain text:" << plainText;
+    return plainText;
 }
 
 bool Utils::inLinglongEnv()
