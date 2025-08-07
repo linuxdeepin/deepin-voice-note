@@ -77,7 +77,12 @@ void VNWaveform::paintEvent(QPaintEvent *event)
     const QColor endColor(1, 121, 255);
 
     for (int i = 0; (i < m_audioScaleSamples.size() && i < m_maxShowedSamples); i++) {
-        qreal scaler = qSqrt(m_audioScaleSamples[i]) / m_frameGain;
+        qreal scaler = 0.0;
+        // 类似linein的方式，在没有真实输入的情况下，因为电流等原因导致的接近0的微小音频也会引起波动
+        // 用户不希望此种场景造成波动，所以设定了阈值，超过阈值再绘制波动即可
+        if (m_frameGain > 2 * m_defaultGain) {
+            scaler = qSqrt(m_audioScaleSamples[i]) / m_frameGain;
+        }
 
         qreal waveHeight = scaler * height();
 
