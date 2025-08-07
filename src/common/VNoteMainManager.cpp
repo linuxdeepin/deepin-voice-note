@@ -689,6 +689,20 @@ void VNoteMainManager::renameNote(const int &index, const QString &newName)
     onNoteChanged();
 }
 
+QString VNoteMainManager::getNotePlainTitle(const int &noteId)
+{
+    qDebug() << "Getting plain title for note ID:" << noteId;
+    VNoteItem *item = getNoteById(noteId);
+    if (item) {
+        QString plainTitle = Utils::stripHtmlTags(item->noteTitle);
+        qDebug() << "Plain title for note ID" << noteId << ":" << plainTitle;
+        return plainTitle;
+    } else {
+        qWarning() << "Note not found for ID:" << noteId;
+        return QString();
+    }
+}
+
 void VNoteMainManager::vNoteSearch(const QString &text)
 {
     if (!text.isEmpty()) {
