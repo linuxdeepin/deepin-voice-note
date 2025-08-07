@@ -564,6 +564,10 @@ ApplicationWindow {
                     placeholder: qsTr("Search")
 
                     Keys.onPressed: function(event) {
+                        if (event.key === Qt.Key_Escape) {
+                            exitSearch();
+                            return;
+                        }
                         if (text.length === 0)
                             return;
                         if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
@@ -571,12 +575,35 @@ ApplicationWindow {
                         }
                     }
                     onActiveFocusChanged: {
-                        if (!activeFocus && needHideSearch)
-                            search.visible = false;
+                        if (!activeFocus) {
+                            var inSearchResultMode = itemListView.isSearch || itemListView.isSearching || webEngineView.titleBar.isSearching;
+                            
+                            if (!inSearchResultMode && text.length > 0) {
+                                text = "";
+                            }
+                            
+                            if (needHideSearch)
+                                search.visible = false;
+                        }
                     }
                     onTextChanged: {
-                        if (text.length === 0)
-                            exitSearch();
+                        if (text.length === 0) {
+                            folderListView.toggleSearch(false);
+                            if (itemListView.searchLoader.active) {
+                                itemListView.searchLoader.item.visible = false;
+                            }
+                            itemListView.view.visible = true;
+                            label.visible = true;
+                            folderListView.opacity = 1;
+                            folderListView.enabled = true;
+                            createFolderButton.enabled = true;
+                            itemListView.isSearch = false;
+                            itemListView.isSearching = false;
+                            webEngineView.webVisible = true;
+                            webEngineView.noSearchResult = false;
+                            webEngineView.titleBar.isSearching = false;
+                            VNoteMainManager.clearSearch();
+                        }
                     }
 
                     Connections {
