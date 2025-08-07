@@ -55,6 +55,10 @@ void VNoteMainManager::initNote()
     m_richTextManager = new WebRichTextManager();
     initConnections();
     initData();
+
+    int savedAudioSource = loadAudioSource();
+    qInfo() << "Loading saved audio source setting:" << savedAudioSource;
+    VoiceRecoderHandler::instance()->changeMode(savedAudioSource);
 }
 
 void VNoteMainManager::initData()
