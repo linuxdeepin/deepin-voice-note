@@ -879,7 +879,7 @@ void VNoteMainManager::preViewShortcut(const QPointF &point)
                                                          {DApplication::translate("Shortcuts", "Cut"), "Ctrl+X"},
                                                          {DApplication::translate("Shortcuts", "Paste"), "Ctrl+V"},
                                                          {DApplication::translate("Shortcuts", "Undo"), "Ctrl+Z"},
-                                                         {DApplication::translate("Shortcuts", "Redo"), "Ctrl+Y"},
+                                                         {DApplication::translate("Shortcuts", "Redo"), "Ctrl+Shift+Z"},
                                                          {DApplication::translate("Shortcuts", "Delete"), "Delete"},
                                                          };
 
@@ -987,4 +987,33 @@ bool VNoteMainManager::isVoiceToText()
     bool result = OpsStateInterface::instance()->isVoice2Text();
     qDebug() << "Voice to text status:" << result;
     return result;
+}
+
+QString VNoteMainManager::getSavedTextPath()
+{
+    QString savedPath = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
+    qDebug() << "Retrieved saved path (unified):" << savedPath;
+    return savedPath;
+}
+
+QString VNoteMainManager::getSavedVoicePath()
+{
+    QString savedPath = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
+    qDebug() << "Retrieved saved path (unified):" << savedPath;
+    return savedPath;
+}
+
+void VNoteMainManager::saveUserSelectedPath(const QString &path, const SaveAsType type)
+{
+    qDebug() << "Saving user selected path:" << path << "for type:" << type;
+    
+    QString dirPath = path;
+    QFileInfo pathInfo(path);
+    if (pathInfo.isFile() || (!pathInfo.exists() && !path.endsWith('/') && path.contains('.'))) {
+        dirPath = pathInfo.absolutePath();
+        qDebug() << "Extracted directory path:" << dirPath << "from file path:" << path;
+    }
+    
+    setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, dirPath);
+    qDebug() << "Saved unified export directory to settings:" << dirPath;
 }

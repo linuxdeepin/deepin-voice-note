@@ -57,6 +57,9 @@ public:
     Q_INVOKABLE void resumeVoicePlayer();
     Q_INVOKABLE void forceExit(bool needWait = false);
     Q_INVOKABLE bool isVoiceToText();
+    Q_INVOKABLE QString getSavedTextPath();
+    Q_INVOKABLE QString getSavedVoicePath();
+    Q_INVOKABLE void saveUserSelectedPath(const QString &path, const SaveAsType type);
 
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);

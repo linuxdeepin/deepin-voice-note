@@ -46,19 +46,25 @@ void ExportNoteWorker::run()
     ExportError error = checkPath();
 
     if (ExportOK == error) {
+        QString dirPath = m_exportPath;
+        QFileInfo pathInfo(m_exportPath);
+        if (pathInfo.isFile() || (!pathInfo.exists() && !m_exportPath.endsWith('/'))) {
+            dirPath = pathInfo.absolutePath();
+        }
+        
         if (ExportText == m_exportType) {
             qDebug() << "Starting text export";
             error = exportText();
-            setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, m_exportPath);
         } else if (ExportVoice == m_exportType) {
             qDebug() << "Starting voice export";
             error = exportAllVoice();
-            setting::instance()->setOption(VNOTE_EXPORT_VOICE_PATH_KEY, m_exportPath);
         } else if (ExportHtml == m_exportType) {
             qDebug() << "Starting HTML export";
             error = exportAsHtml();
-            setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, m_exportPath);
         }
+        
+        setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, dirPath);
+        qDebug() << "Saved unified export directory to settings:" << dirPath;
     } else {
         qCritical() << "Export path check failed - Error:" << error;
     }
