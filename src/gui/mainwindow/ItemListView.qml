@@ -193,9 +193,20 @@ Item {
             fileMode: FileDialog.SaveFile
             nameFilters: saveFilters[saveType]
 
-            // Qt5 uses 'folder', Qt6 uses 'currentFolder'
-            // Try to set both properties to ensure compatibility
-            property url initialFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+            property url initialFolder: {
+                var savedPath = "";
+                if (saveType === VNoteMainManager.Text || saveType === VNoteMainManager.Html) {
+                    savedPath = VNoteMainManager.getSavedTextPath();
+                } else if (saveType === VNoteMainManager.Voice) {
+                    savedPath = VNoteMainManager.getSavedVoicePath();
+                }
+                
+                if (savedPath && savedPath.length > 0) {
+                    return "file://" + savedPath;
+                } else {
+                    return StandardPaths.standardLocations(StandardPaths.DesktopLocation)[0];
+                }
+            }
             
             Component.onCompleted: {
                 // Set folder property for Qt5 compatibility
@@ -256,6 +267,27 @@ Item {
                     return;
                 }
 
+                var fileUrl = selectedFileUrl.toString();
+                var folderPath = "";
+                if (typeof fileDialog.folder !== 'undefined' && fileDialog.folder) {
+                    folderPath = fileDialog.folder.toString();
+                } else if (typeof fileDialog.currentFolder !== 'undefined' && fileDialog.currentFolder) {
+                    folderPath = fileDialog.currentFolder.toString();
+                }
+                
+                if (!folderPath) {
+                    if (fileUrl.startsWith("file://")) {
+                        fileUrl = fileUrl.substring(7);
+                    }
+                    folderPath = fileUrl.substring(0, fileUrl.lastIndexOf('/'));
+                } else {
+                    if (folderPath.startsWith("file://")) {
+                        folderPath = folderPath.substring(7);
+                    }
+                }
+                
+                VNoteMainManager.saveUserSelectedPath(folderPath, saveType);
+
                 VNoteMainManager.saveAs(idList, selectedFileUrl, saveType);
             }
         }
@@ -274,8 +306,20 @@ Item {
 
             title: qsTr("Save As")
             
-            // Qt5 uses 'folder', Qt6 uses 'currentFolder'
-            property url initialFolder: StandardPaths.standardLocations(StandardPaths.PicturesLocation)[0]
+            property url initialFolder: {
+                var savedPath = "";
+                if (saveType === VNoteMainManager.Text || saveType === VNoteMainManager.Html) {
+                    savedPath = VNoteMainManager.getSavedTextPath();
+                } else if (saveType === VNoteMainManager.Voice) {
+                    savedPath = VNoteMainManager.getSavedVoicePath();
+                }
+                
+                if (savedPath && savedPath.length > 0) {
+                    return "file://" + savedPath;
+                } else {
+                    return StandardPaths.standardLocations(StandardPaths.DesktopLocation)[0];
+                }
+            }
 
             Component.onCompleted: {
                 // Set folder property for Qt5 compatibility
@@ -315,6 +359,12 @@ Item {
                 if (!selectedFolderUrl || selectedFolderUrl.toString().length === 0) {
                     return;
                 }
+                
+                var folderPath = selectedFolderUrl.toString();
+                if (folderPath.startsWith("file://")) {
+                    folderPath = folderPath.substring(7);
+                }
+                VNoteMainManager.saveUserSelectedPath(folderPath, saveType);
                 
                 VNoteMainManager.saveAs(list, selectedFolderUrl, saveType);
             }
