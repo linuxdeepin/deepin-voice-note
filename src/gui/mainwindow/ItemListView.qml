@@ -596,13 +596,16 @@ Item {
                     onActiveFocusChanged: {
                         noteItemMouseArea.enabled = false;
                         if (activeFocus) {
+                            if (isSearch) {
+                                text = VNoteMainManager.getNotePlainTitle(model.noteId);
+                            }
                             selectAll();
                         } else {
-                            if (text.length !== 0 && text !== model.name) {
-                                model.name = text;
+                            var originalTitle = isSearch ? VNoteMainManager.getNotePlainTitle(model.noteId) : model.name;
+                            if (text.length !== 0 && text !== originalTitle) {
                                 VNoteMainManager.renameNote(model.noteId, text);
                             } else {
-                                renameLine.text = model.name;
+                                renameLine.text = originalTitle;
                             }
                             noteItemMouseArea.enabled = true;
                             rootItemDelegate.isRename = false;

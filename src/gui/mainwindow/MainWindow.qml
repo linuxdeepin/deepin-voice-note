@@ -112,6 +112,11 @@ ApplicationWindow {
                 console.log("No notes available, cannot rename folder");
                 return;
             }
+            var inSearchResultMode = itemListView.isSearch || itemListView.isSearching || webEngineView.titleBar.isSearching;
+            if (inSearchResultMode) {
+                console.log("Cannot rename folder in search mode");
+                return;
+            }
             folderListView.renameCurrentItem();
         }
         onRenameNote: {

@@ -50,6 +50,8 @@ public:
     static bool isWayland();
     //搜索结果标题处理
     static QString createRichText(const QString &title, const QString &key);
+    //去除HTML标签，将富文本转换为纯文本
+    static QString stripHtmlTags(const QString &htmlText);
     // Check if current in linglong environment
     static bool inLinglongEnv();
 };
