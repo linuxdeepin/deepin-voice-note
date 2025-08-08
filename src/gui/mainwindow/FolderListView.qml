@@ -64,6 +64,15 @@ Item {
         folderListView.currentItem.isRename = true;
     }
 
+    function cancelRename() {
+        for (var i = 0; i < folderListView.count; i++) {
+            var item = folderListView.itemAtIndex(i);
+            if (item && item.isRename) {
+                item.isRename = false;
+            }
+        }
+    }
+
     function rollDown() {
         if (!scrollTimer.isUp && scrollTimer.running)
             return;
