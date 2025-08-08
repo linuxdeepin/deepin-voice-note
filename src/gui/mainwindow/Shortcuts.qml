@@ -162,9 +162,9 @@ Item {
     }
 
     Shortcut {
-        id: ctrl_Y
+        id: ctrl_Shift_Z
 
-        sequence: "Ctrl+Y"
+        sequence: "Ctrl+Shift+Z"
 
         onActivated: {}
     }

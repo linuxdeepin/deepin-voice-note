@@ -10,6 +10,8 @@
 #include "vtextspeechandtrmanager.h"
 #include "voice_player_handler.h"
 #include "voice_to_text_handler.h"
+#include "setting.h"
+#include "globaldef.h"
 
 #include <QApplication>
 #include <QCursor>
@@ -644,7 +646,16 @@ bool WebEngineHandler::saveMP3()
         qWarning() << "No voice block available for saving";
         return false;
     }
-    QString defaultName = QStandardPaths::writableLocation(QStandardPaths::MusicLocation) + "/" + m_voiceBlock.get()->voiceTitle + ".mp3";
+    
+    QString savedPath = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
+    QString defaultDir;
+    if (!savedPath.isEmpty()) {
+        defaultDir = savedPath;
+    } else {
+        defaultDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    }
+    
+    QString defaultName = defaultDir + "/" + m_voiceBlock.get()->voiceTitle + ".mp3";
     qDebug() << "Saving MP3 with default name:" << defaultName;
     QString fileName = QFileDialog::getSaveFileName(0, tr("save as MP3"), defaultName, "*.mp3");
     if (!fileName.isEmpty()) {
@@ -654,6 +665,10 @@ bool WebEngineHandler::saveMP3()
             qWarning() << "Target directory does not exist:" << dir.path();
             return false;
         }
+        
+        setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, dir.path());
+        qDebug() << "Saved unified export path to settings:" << dir.path();
+        
         QFile tmpFile(m_voiceBlock.get()->voicePath);
         return tmpFile.copy(fileName);
     }
