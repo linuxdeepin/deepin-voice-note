@@ -773,7 +773,7 @@ void VNoteMainManager::changeAudioSource(const int &source)
     VoiceRecoderHandler::instance()->changeMode(source);
 }
 
-void VNoteMainManager::insertImages(const QStringList &filePaths)
+void VNoteMainManager::insertImages(const QList<QUrl> &filePaths)
 {
     qDebug() << "Inserting" << filePaths.size() << "images";
     int count = 0;
@@ -787,7 +787,8 @@ void VNoteMainManager::insertImages(const QStringList &filePaths)
     QString date = currentDateTime.toString("yyyyMMddhhmmss");
 
     for (auto path : filePaths) {
-        QFileInfo fileInfo(path);
+        QString localPath = path.toLocalFile();
+        QFileInfo fileInfo(localPath);
         QString suffix = fileInfo.suffix();
         if (!(suffix == "jpg" || suffix == "png" || suffix == "bmp")) {
             qWarning() << "Unsupported image format:" << suffix;
