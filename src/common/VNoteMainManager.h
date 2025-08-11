@@ -49,7 +49,7 @@ public:
     Q_INVOKABLE int loadSearchNotes(const QString &key);
     Q_INVOKABLE int loadAudioSource();
     Q_INVOKABLE void changeAudioSource(const int &source);
-    Q_INVOKABLE void insertImages(const QStringList &filePaths);
+    Q_INVOKABLE void insertImages(const QList<QUrl> &filePaths);
     Q_INVOKABLE void checkNoteVoice(const QVariantList &index);
     Q_INVOKABLE void clearSearch();
     Q_INVOKABLE bool isInSearchMode() const;
