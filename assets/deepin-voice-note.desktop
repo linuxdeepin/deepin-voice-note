@@ -30,6 +30,7 @@ Comment[hi_IN]=वाणी नोट्स, टेक्स्ट नोट्�
 Comment[hu]=A Hangjegyzetek egy könnyű jegyzeteszköz szöveges jegyzetek és hangfelvételek készítéséhez.
 Comment[it]=Note Vocali è uno strumento di memo leggero per creare note di testo e registrazioni vocali. Localizzazione italiana a cura di Massimo A. Carofano.
 Comment[ko]=음성 메모는 텍스트 노트 및 음성 녹음을 할 수있는 경량 메모 도구입니다.
+Comment[lo]=ບັນທຶກສຽງແມ່ນເຄື່ອງມືບັນທຶກຄວາມຈຳທີ່ເບົາສຳລັບສ້າງບັນທຶກຂໍ້ຄວາມ ແລະ ບັນທຶກສຽງ
 Comment[ms]=Nota Suara ialah sebuah alat memo ringkas dan pantas yang dapat membuat nota teks dan rakaman suara.
 Comment[ne]=भ्वाईस नोटहरू पाठ नोटहरू र भ्वाईस रेकर्डि। बनाउन हल्का मोटो मेमो उपकरण हो।
 Comment[nl]=Met Memorecorder kun je eenvoudig memo's opnemen en aantekeningen maken.
@@ -62,6 +63,7 @@ GenericName[hi_IN]=वाणी नोट्स
 GenericName[hu]=Hangjegyzetek
 GenericName[it]=Note Vocali
 GenericName[ko]=음성 메모
+GenericName[lo]=ບັນທຶກສຽງ
 GenericName[ms]=Nota Suara
 GenericName[ne]=भ्वाइस नोटहरू
 GenericName[nl]=Memorecorder
@@ -94,6 +96,7 @@ Name[hi_IN]=वाणी नोट्स
 Name[hu]=Hangjegyzetek
 Name[it]=Note Vocali
 Name[ko]=음성 메모
+Name[lo]=ບັນທຶກສຽງ
 Name[ms]=Nota Suara
 Name[ne]=भ्वाइस नोटहरू
 Name[nl]=Memorecorder
