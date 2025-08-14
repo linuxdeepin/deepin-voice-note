@@ -975,6 +975,14 @@ function rightClick(e) {
         }
         $('#summernote').summernote('airPopover.hide')
         setSelectRange($(e.target).parents('.voiceBox')[0])
+    } else if ($(e.target).closest('.voicePlayback').length != 0) {
+        // 适配新版语音控件(Version2)的右键：选中语音并弹出语音菜单
+        $(e.target).closest('.li').addClass('active');
+        if (bTransVoiceIsReady) {
+            activeTransVoice = $(e.target).closest('.li:first');
+        }
+        $('#summernote').summernote('airPopover.hide');
+        setSelectRange($(e.target).closest('.voiceBox')[0]);
     } else if (voiceLength == childrenLength && childrenLength != 0) {
         recordActiveVoice()
     }
