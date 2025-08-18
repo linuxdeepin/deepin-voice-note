@@ -14,6 +14,7 @@ Item {
     signal saveVoice
     signal showShortCutView
     signal startRecording
+    signal showJsContextMenu
 
     Shortcut {
         id: ctrl_F1
@@ -151,6 +152,16 @@ Item {
         sequence: "Ctrl+V"
 
         onActivated: {}
+    }
+
+    Shortcut {
+        id: alt_M
+
+        sequence: "Alt+M"
+
+        onActivated: {
+            showJsContextMenu();
+        }
     }
 
     Shortcut {

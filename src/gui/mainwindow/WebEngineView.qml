@@ -36,6 +36,104 @@ Item {
         webView.triggerWebAction(5);
     }
 
+    function showJsContextMenu() {
+        // 仅在编辑区可见时尝试弹出；是否在编辑器内由JS自行判断
+        if (webVisible) {
+            // 汇总选区类型、必要信息、以及光标/元素坐标
+            var js = "(function(){\n" +
+                     "  function isInsideEditable(node){\n" +
+                     "    var el = node && (node.nodeType === 1 ? node : node.parentElement);\n" +
+                     "    return !!(el && el.closest && el.closest('.note-editable'));\n" +
+                     "  }\n" +
+                     "  var sel = window.getSelection();\n" +
+                     "  if(!sel || sel.rangeCount === 0){ return null; }\n" +
+                     "  var range = sel.getRangeAt(0);\n" +
+                     "  var collapsed = range.collapsed;\n" +
+                     "  var inEditable = isInsideEditable(range.commonAncestorContainer || sel.anchorNode);\n" +
+                     "  var hasSelection = !collapsed && sel.toString().length > 0;\n" +
+                     "  var flags = {\n" +
+                     "    canSelectAll: !!inEditable,\n" +
+                     "    canCopy: hasSelection,\n" +
+                     "    canCut: hasSelection && inEditable,\n" +
+                     "    canDelete: hasSelection && inEditable,\n" +
+                     "    canPaste: !!inEditable\n" +
+                     "  };\n" +
+                     "  // 若不在可编辑区内，直接返回空\n" +
+                     "  if (!inEditable) { return null; }\n" +
+                     "  // 先判断是否为语音/图片选区\n" +
+                     "  var kind = 2;\n" +
+                     "  var info = '';\n" +
+                     "  try {\n" +
+                     "    var selected = window.isRangeVoice && window.isRangeVoice();\n" +
+                     "    if (selected && typeof selected.flag === 'number') {\n" +
+                     "      kind = selected.flag;\n" +
+                     "      info = selected.info || '';\n" +
+                     "    }\n" +
+                     "  } catch(e) {}\n" +
+                     "  var rect = null;\n" +
+                     "  if (kind === 0) {\n" +
+                     "    // 图片：取选区中的第一张图片的矩形\n" +
+                     "    var testDiv = (function(){ var s=window.getSelection(); var r=s.getRangeAt(0); var f=r.cloneContents(); var d=document.createElement('div'); d.appendChild(f); return d; })();\n" +
+                     "    var img = testDiv.querySelector('img');\n" +
+                     "    if (img) rect = img.getBoundingClientRect();\n" +
+                     "  } else if (kind === 1) {\n" +
+                     "    // 语音：优先取当前激活语音块的位置\n" +
+                     "    var voice = document.querySelector('.li.active .voiceBox') || document.querySelector('.voiceBox');\n" +
+                     "    if (voice) rect = voice.getBoundingClientRect();\n" +
+                     "  }\n" +
+                     "  if (!rect) {\n" +
+                     "    if (collapsed) {\n" +
+                     "      var span = document.createElement('span');\n" +
+                     "      span.textContent = '\\u200b';\n" +
+                     "      range.insertNode(span);\n" +
+                     "      rect = span.getBoundingClientRect();\n" +
+                     "      span.parentNode && span.parentNode.removeChild(span);\n" +
+                     "    } else {\n" +
+                     "      rect = range.getBoundingClientRect();\n" +
+                     "    }\n" +
+                     "  }\n" +
+                     "  if (!rect) return null;\n" +
+                     "  return { type: kind, json: info, x: Math.round(rect.left), y: Math.round(rect.bottom), flags: flags };\n" +
+                     "})()";
+            webView.runJavaScript(js, function(result) {
+                if (!result) {
+                    // 回退：弹出文本菜单于编辑区中心
+                    ActionManager.resetCtxMenu(ActionManager.TxtCtxMenu, true);
+                    var fx = Math.max(4, Math.floor(webView.width / 2));
+                    var fy = Math.max(4, Math.floor(webView.height / 2));
+                    txtCtxMenu.popup(Qt.point(fx, fy));
+                    return;
+                }
+                var px = Math.max(4, Math.min(webView.width - 4, result.x));
+                var py = Math.max(4, Math.min(webView.height - 4, result.y));
+                if (result.type === 0) {
+                    // 图片菜单
+                    handler.onSaveMenuParam(0, result.json);
+                    picturCtxMenu.popup(Qt.point(px, py));
+                    return;
+                }
+                if (result.type === 1) {
+                    // 语音菜单
+                    handler.onSaveMenuParam(1, result.json);
+                    voiceCtxMenu.popup(Qt.point(px, py));
+                    return;
+                }
+                // 文本菜单：根据 flags 设置可用性
+                ActionManager.resetCtxMenu(ActionManager.TxtCtxMenu, false);
+                if (result.flags) {
+                    ActionManager.enableAction(ActionManager.TxtSelectAll, !!result.flags.canSelectAll);
+                    ActionManager.enableAction(ActionManager.TxtCopy, !!result.flags.canCopy);
+                    ActionManager.enableAction(ActionManager.TxtCut, !!result.flags.canCut);
+                    ActionManager.enableAction(ActionManager.TxtPaste, !!result.flags.canPaste);
+                    ActionManager.enableAction(ActionManager.TxtDelete, !!result.flags.canDelete);
+                    ActionManager.enableAction(ActionManager.TxtSpeech, !!result.flags.canCopy);
+                    ActionManager.enableAction(ActionManager.TxtDictation, !!result.flags.canPaste);
+                }
+                txtCtxMenu.popup(Qt.point(px, py));
+            });
+        }
+    }
+
     function startRecording() {
         if (VNoteMainManager.isInSearchMode()) {
             console.log("Cannot show recording UI while in search mode");

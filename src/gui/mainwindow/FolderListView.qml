@@ -73,6 +73,17 @@ Item {
         }
     }
 
+    function showContextMenuOnCurrentItem() {
+        // 在当前选中项位置弹出文件夹右键菜单
+        if (folderListView.currentIndex < 0 || folderListView.currentIndex >= folderListView.count)
+            return;
+        var item = folderListView.itemAtIndex(folderListView.currentIndex);
+        if (!item)
+            return;
+        folderListView.contextIndex = folderListView.currentIndex;
+        item.openContextMenuAt(item.width / 2, item.height);
+    }
+
     function rollDown() {
         if (!scrollTimer.isUp && scrollTimer.running)
             return;
@@ -569,6 +580,15 @@ Item {
                     onTriggered: {
                         VNoteMainManager.createNote();
                     }
+                }
+            }
+
+            function openContextMenuAt(x, y) {
+                // 使用 QtQuick Controls 2 Menu 的重载：popup(item, x, y)
+                try {
+                    folderItemContextMenu.popup(rootItem, x, y);
+                } catch (e) {
+                    folderItemContextMenu.popup();
                 }
             }
         }
