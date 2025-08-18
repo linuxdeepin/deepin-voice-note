@@ -145,6 +145,27 @@ Item {
         }
     }
 
+    function showContextMenuOnCurrentItem() {
+        // 在当前选中项位置弹出笔记右键菜单
+        if (selectedNoteItem.length === 0)
+            return;
+        // 保持与右键逻辑一致：刷新 contextIndex、检查语音可用性
+        itemListView.contextIndex = selectedNoteItem[0];
+        var list = [];
+        for (var i = 0; i < selectedNoteItem.length; i++) {
+            list.push(itemModel.get(selectedNoteItem[i]).noteId);
+        }
+        VNoteMainManager.checkNoteVoice(list);
+        var item = itemListView.itemAtIndex(itemListView.contextIndex);
+        if (!item)
+            return;
+        try {
+            noteCtxMenu.popup(item, item.width / 2, item.height);
+        } catch (e) {
+            noteCtxMenu.popup();
+        }
+    }
+
     height: 480
     visible: true
     width: 640

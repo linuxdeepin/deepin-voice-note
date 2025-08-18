@@ -145,6 +145,22 @@ ApplicationWindow {
         onSaveVoice: {
             itemListView.onSaveAudio();
         }
+        onShowJsContextMenu: {
+            if (!rootWindow.active) return;
+            // 根据焦点分发：笔记列表 > 文件夹列表 > 编辑区
+            if (itemListView.activeFocus) {
+                itemListView.showContextMenuOnCurrentItem();
+                return;
+            }
+            if (folderListView.activeFocus) {
+                folderListView.showContextMenuOnCurrentItem();
+                return;
+            }
+            if (webEngineView.webVisible) {
+                webEngineView.showJsContextMenu();
+                return;
+            }
+        }
     }
 
     VNoteMessageDialogLoader {
