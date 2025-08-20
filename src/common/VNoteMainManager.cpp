@@ -681,8 +681,15 @@ void VNoteMainManager::renameNote(const int &index, const QString &newName)
     VNoteItem *item = getNoteById(index);
     if (item && !newName.isEmpty() && newName != item->noteTitle) {
         VNoteItemOper noteOps(item);
-        noteOps.modifyNoteTitle(newName);
-        qDebug() << "Note renamed successfully";
+        if (noteOps.modifyNoteTitle(newName)) {
+            qDebug() << "Note renamed successfully, reloading current folder";
+            VNoteFolder *currentFolder = getFloderById(m_currentFolderIndex);
+            if (currentFolder) {
+                loadNotes(currentFolder);
+            }
+        } else {
+            qWarning() << "Failed to rename note";
+        }
     } else {
         qWarning() << "Invalid note rename operation";
     }
