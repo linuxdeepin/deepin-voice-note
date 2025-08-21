@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.39) unstable; urgency=medium
+
+  * fix: Enhance note renaming functionality
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Thu, 21 Aug 2025 17:35:15 +0800
+
 deepin-voice-note (6.5.38) unstable; urgency=medium
 
   * chore: Update desktop file translations
