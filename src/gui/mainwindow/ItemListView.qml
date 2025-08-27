@@ -746,7 +746,7 @@ Item {
 
                         Layout.fillHeight: true
                         Layout.fillWidth: true
-                        color: isSelected ? "#7FFFFFFF" : "#7F000000"
+                        color: isSelected ? (rootItem.activeFocus ? "#7FFFFFFF" : DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF") : (DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF")
                         font.pixelSize: 10
                         horizontalAlignment: Text.AlignLeft
                         text: model.folderName
