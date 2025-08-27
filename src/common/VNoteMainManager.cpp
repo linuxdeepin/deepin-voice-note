@@ -713,11 +713,10 @@ QString VNoteMainManager::getNotePlainTitle(const int &noteId)
 void VNoteMainManager::vNoteSearch(const QString &text)
 {
     if (!text.isEmpty()) {
-        if (m_searchText != text) {
-            qDebug() << "Starting new search with text:" << text;
-            m_searchText = text;
-            loadSearchNotes(text);
-        }
+        // 当当前的输入文本和前一次相同的时候，回车也需要触发操作，否则笔记有变更无法及时更新搜索结果
+        qDebug() << "Starting search with text:" << text;
+        m_searchText = text;
+        loadSearchNotes(text);
         updateSearch();
     } else {
         qDebug() << "Search text is empty";
