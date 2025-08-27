@@ -639,6 +639,15 @@ function getActiveNote() {
     return retJson;
 }
 
+/**
+ * 检查当前笔记是否包含录音条目
+ * @return {boolean} 是否包含录音条目
+ */
+function hasVoice() {
+    // 检查页面中是否存在语音块元素
+    return $('.voiceBox').length > 0;
+}
+
 
 
 /**
@@ -1160,6 +1169,19 @@ document.addEventListener('keydown', function (event) {
  * Capture keydown event on propagation phase
  */
 document.onkeydown = function (event) {
+    // 检查是否按下Ctrl+D组合键，如果是则阻止默认行为并直接触发保存录音
+    if (event.ctrlKey && window.event.keyCode == 68) {
+        // ctrl+d
+        event.preventDefault();
+        // 只有当前笔记中有录音条目时才触发保存操作
+        if (hasVoice()) {
+            webobj.jsCallSaveAudio();
+        } else {
+            console.log("当前笔记中没有录音条目，不执行保存操作");
+        }
+        return false;
+    }
+    
     if (window.event.keyCode == 13) {
         // key enter or return
         setFocusScroll()
@@ -1335,9 +1357,11 @@ function setBackspace(focusDom, name) {
 document.onkeyup = function (event) {
     if (event.ctrlKey && window.event.keyCode == 66) {
         webobj.jsCallCreateNote()
-    } else if (event.ctrlKey && window.event.keyCode == 68) {
-        webobj.jsCallSaveAudio()
     }
+    // 注释掉这里的Ctrl+D处理，因为我们已经在keydown事件中处理了
+    // else if (event.ctrlKey && window.event.keyCode == 68) {
+    //     webobj.jsCallSaveAudio()
+    // }
 }
 
 // 图片双击预览

@@ -143,7 +143,28 @@ ApplicationWindow {
             itemListView.onSaveNote();
         }
         onSaveVoice: {
-            itemListView.onSaveAudio();
+            // 检查是否有笔记可以保存
+            if (initRect.visible) {
+                console.warn("当前没有打开任何笔记本，不执行保存操作");
+                return;
+            }
+            
+            // 检查笔记列表是否为空
+            if (itemListView.model.count === 0) {
+                console.warn("当前笔记列表为空，不执行保存操作");
+                return;
+            }
+            
+            // 使用WebEngineView组件提供的方法检查当前笔记是否包含录音条目
+            webEngineView.checkHasVoiceContent(function(hasVoice) {
+                if (hasVoice) {
+                    // 将焦点设置回笔记编辑区域，确保保存操作正确执行
+                    webEngineView.forceActiveFocus();
+                    itemListView.onSaveAudio();
+                } else {
+                    console.warn("当前笔记中没有录音条目，不执行保存操作");
+                }
+            });
         }
         onShowJsContextMenu: {
             if (!rootWindow.active) return;

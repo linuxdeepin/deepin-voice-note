@@ -156,6 +156,18 @@ Item {
     function stopTTS() {
         ActionManager.actionTriggerFromQuick(37);
     }
+    
+    // 检查当前笔记是否包含录音条目
+    function checkHasVoiceContent(callback) {
+        if (!webVisible || !webView) {
+            callback(false);
+            return;
+        }
+        
+        webView.runJavaScript("hasVoice()", function(result) {
+            callback(result);
+        });
+    }
 
     function toggleMultCho(choices) {
         if (choices > 1) {
