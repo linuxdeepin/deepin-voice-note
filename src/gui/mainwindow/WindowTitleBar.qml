@@ -21,7 +21,7 @@ TitleBar {
     signal titleOpenSetting
 
     enableInWindowBlendBlur: false
-    height: 40
+    height: 50
     width: 0
 
     background: Rectangle {
