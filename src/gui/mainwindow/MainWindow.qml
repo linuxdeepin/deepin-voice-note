@@ -363,13 +363,13 @@ ApplicationWindow {
     IconLabel {
         id: appImage
 
-        height: 30
-        icon.height: 30
+        height: 36
+        icon.height: 36
         icon.name: "deepin-voice-note"
-        icon.width: 30
-        width: 30
+        icon.width: 36
+        width: 36
         x: 10
-        y: 10
+        y: 7
         z: 100
     }
 
@@ -377,12 +377,12 @@ ApplicationWindow {
         id: twoColumnModeBtn
 
         height: 30
-        icon.height: 14
+        icon.height: 16
         icon.name: "sidebar"
-        icon.width: 14
+        icon.width: 16
         visible: !(needHideSearch && search.visible) || leftBgArea.visible
         width: 30
-        x: 50
+        x: 66
         y: 10
         z: 100
 
