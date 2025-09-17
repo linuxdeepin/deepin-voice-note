@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.41) unstable; urgency=medium
+
+  * chore: Update linglong base and runtime
+
+ -- wangrong <wangrong@uniontech.com>  Wed, 17 Sep 2025 13:34:44 +0800
+
 deepin-voice-note (6.5.40) unstable; urgency=medium
 
   * fix: Improve color handling in ItemListView based on focus and theme type
