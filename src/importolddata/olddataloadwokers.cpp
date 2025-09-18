@@ -17,6 +17,7 @@
 OldDataLoadTask::OldDataLoadTask(QObject *parent)
     : VNTask(parent)
 {
+    qInfo() << "OldDataLoadTask constructor called";
 }
 
 /**
@@ -64,6 +65,7 @@ void OldDataLoadTask::run()
 OldDataUpgradeTask::OldDataUpgradeTask(QObject *parent)
     : VNTask(parent)
 {
+    qInfo() << "OldDataUpgradeTask constructor called";
 }
 
 /**

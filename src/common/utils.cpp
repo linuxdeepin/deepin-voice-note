@@ -23,6 +23,7 @@
 
 Utils::Utils()
 {
+    qInfo() << "Utils constructor called";
 }
 
 /**
@@ -32,6 +33,7 @@ Utils::Utils()
  */
 QString Utils::convertDateTime(const QDateTime &dateTime)
 {
+    qInfo() << "Converting date time:" << dateTime.toString();
     QDate currDateTime = QDate::currentDate();
     QDate folerDate = dateTime.date();
     QString disptime;
@@ -40,12 +42,14 @@ QString Utils::convertDateTime(const QDateTime &dateTime)
     qDebug() << "Converting date time:" << dateTime.toString() << "offset days:" << offset;
     
     if (0 == offset) {
+        qInfo() << "Offset is 0";
         qint64 offsetSec = dateTime.secsTo(QDateTime::currentDateTime());
         if (offsetSec < 3600) {
             offsetSec /= 60;
             if (offsetSec <= 1) {
                 disptime = DApplication::translate("Utils", "1 min ago");
             } else {
+                qInfo() << "Offset is greater than 1 minute";
                 disptime = DApplication::translate("Utils", "%1 mins ago").arg(offsetSec);
             }
             qDebug() << "Time is" << offsetSec << "minutes ago";
@@ -86,6 +90,7 @@ QPixmap Utils::renderSVG(const QString &filePath, const QSize &size, DApplicatio
     reader.setFileName(filePath);
 
     if (reader.canRead()) {
+        qInfo() << "SVG can read";
         // const qreal ratio = qApp->devicePixelRatio();
         const qreal ratio = pApp->devicePixelRatio();
         reader.setScaledSize(size * ratio);
@@ -133,9 +138,11 @@ QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
     QPixmap pixmap;
 
     if (!qFuzzyCompare(ratio, devicePixelRatio)) {
+        qInfo() << "Device pixel ratio is not the same";
         QImageReader reader;
         reader.setFileName(qt_findAtNxFile(iconPath, devicePixelRatio, &ratio));
         if (reader.canRead()) {
+            qInfo() << "SVG can read";
             reader.setScaledSize(reader.size() * (devicePixelRatio / ratio));
             pixmap = QPixmap::fromImage(reader.read());
             pixmap.setDevicePixelRatio(devicePixelRatio);
@@ -144,6 +151,7 @@ QPixmap Utils::loadSVG(const QString &fileName, bool fCommon)
             qWarning() << "Failed to read SVG file:" << iconPath;
         }
     } else {
+        qInfo() << "Device pixel ratio is the same";
         pixmap.load(iconPath);
         qDebug() << "SVG loaded with default ratio";
     }
@@ -167,10 +175,11 @@ int Utils::highTextEdit(QTextDocument *textDoc, const QString &searchKey,
     int findCount = 0;
     int len = searchKey.length();
     if (undo == true) {
+        qInfo() << "Undoing previous operation";
         textDoc->undo();
-        qDebug() << "Undid previous operation";
     }
     if (len != 0) {
+        qInfo() << "Searching for text";
         QTextCursor highlightCursor(textDoc);
         QTextCursor cursor(textDoc);
 
@@ -231,10 +240,12 @@ void Utils::documentToBlock(VNoteBlock *block, const QTextDocument *doc)
     qDebug() << "Converting document to block";
     
     if (block != nullptr) {
+        qInfo() << "Block is not nullptr";
         block->blockText = "";
     }
 
     if (doc != nullptr) {
+        qInfo() << "Doc is not nullptr";
         QTextBlock currentBlock = doc->begin();
         QTextBlock::iterator it;
         while (true) {
@@ -301,6 +312,7 @@ void Utils::setDefaultColor(QTextDocument *srcDoc, const QColor &color)
  */
 void Utils::setTitleBarTabFocus(QKeyEvent *event)
 {
+    // qInfo() << "Setting title bar tab focus";
     // VNoteApplication *app = dynamic_cast<VNoteApplication *>(qGuiApp);
     // if (app) {
     //     VNoteMainWindow *wnd = app->mainWindow();
@@ -389,6 +401,7 @@ QString Utils::filteredFileName(QString fileName, const QString &defaultName)
 
 bool Utils::isWayland()
 {
+    // qInfo() << "Checking if platform is Wayland";
     return false;
     // return qApp->platformName() == "dwayland" || qApp->property("_d_isDwayland").toBool();
 }
@@ -413,5 +426,6 @@ QString Utils::stripHtmlTags(const QString &htmlText)
 
 bool Utils::inLinglongEnv()
 {
+    // qInfo() << "Checking if in Linglong environment";
     return !qgetenv("LINGLONG_APPID").isEmpty();
 }

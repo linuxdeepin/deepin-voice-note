@@ -5,16 +5,20 @@
 
 #include <QTimer>
 #include <QEventLoop>
+#include <QDebug>
 
 WebRichTextManager::WebRichTextManager(QObject *parent)
 : QObject(parent)
 {
+    qInfo() << "WebRichTextManager constructor called";
     initUpdateTimer();
     initConnect();
+    qInfo() << "WebRichTextManager constructor finished";
 }
 
 void WebRichTextManager::initData(VNoteItem *data, const QString reg, bool focus)
 {
+    qInfo() << "Initializing data for note ID:" << (data ? data->noteId : -1);
     //重置鼠标点击位置
     m_mouseClickPos = QPoint(-1, -1);
     m_setFocus = focus;
@@ -22,10 +26,12 @@ void WebRichTextManager::initData(VNoteItem *data, const QString reg, bool focus
     QTimer::singleShot(50, this, [ = ] {
         setData(data, reg);
     });
+    qInfo() << "Data initialization finished";
 }
 
 void WebRichTextManager::initConnect()
 {
+    qInfo() << "Initializing connections";
     connect(JsContent::instance(), &JsContent::textChange, this, [=](){
         m_textChange = true;
         emit noteTextChanged();
@@ -34,6 +40,7 @@ void WebRichTextManager::initConnect()
     connect(JsContent::instance(), &JsContent::scrollTopChange, this, [=](bool isTop){
         emit scrollChange(isTop);
     });
+    qInfo() << "Connections initialized";
 }
 
 void WebRichTextManager::setData(VNoteItem *data, const QString reg)
@@ -50,20 +57,25 @@ void WebRichTextManager::setData(VNoteItem *data, const QString reg)
     }
     m_updateTimer->start();
     emit updateSearch();
+    qInfo() << "Rich text data setting finished";
 }
 
 void WebRichTextManager::initUpdateTimer()
 {
+    qInfo() << "Initializing update timer";
     m_updateTimer = new QTimer(this);
     m_updateTimer->setInterval(1000);
     connect(m_updateTimer, &QTimer::timeout, this, &WebRichTextManager::updateNote);
+    qInfo() << "Update timer initialized";
 }
 
 void WebRichTextManager::updateNote()
 {
+    qInfo() << "Updating note, text change flag:" << m_textChange;
     if (m_textChange) {
         emit needUpdateNote();
     }
+    qInfo() << "Note update finished";
 }
 
 void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &result)
@@ -78,6 +90,7 @@ void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &
     }
     m_textChange = false;
     emit finishedUpdateNote();
+    qInfo() << "Note update with result finished";
 }
 
 void WebRichTextManager::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
@@ -115,6 +128,7 @@ void WebRichTextManager::onLoadFinsh()
         }
     }
     m_loadFinshSign = true;
+    qInfo() << "Web communication establishment handling finished";
 }
 
 void WebRichTextManager::clearJSContent()
@@ -133,4 +147,5 @@ void WebRichTextManager::clearJSContent()
 
 void WebRichTextManager::onSetDataFinsh()
 {
+    qInfo() << "Set data finished";
 }

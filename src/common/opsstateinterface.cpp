@@ -16,7 +16,9 @@
  */
 OpsStateInterface::OpsStateInterface()
 {
+    // qInfo() << "OpsStateInterface constructor called";
     operState(StateAISrvAvailable, true);
+    // qInfo() << "OpsStateInterface constructor finished";
 }
 
 /**
@@ -26,20 +28,22 @@ OpsStateInterface::OpsStateInterface()
  */
 void OpsStateInterface::operState(int type, bool isSet)
 {
+    // qInfo() << "Operating state, type:" << type << "isSet:" << isSet;
     quint8 shift = static_cast<quint8>(type);
 
     if (shift > StateNone && shift < StateMax) {
         if (isSet) {
             m_states |= (1 << shift);
-            qDebug() << "Setting state" << type << "to true";
+            // qDebug() << "Setting state" << type << "to true";
         } else {
             m_states &= (~(1 << shift));
-            qDebug() << "Setting state" << type << "to false";
+            // qDebug() << "Setting state" << type << "to false";
         }
     } else {
         qCritical() << "Operation error: Invalid opsType =" << type 
                    << " (must be between" << StateNone << "and" << StateMax << ")";
     }
+    // qInfo() << "State operation finished";
 }
 
 /**
@@ -48,6 +52,7 @@ void OpsStateInterface::operState(int type, bool isSet)
  */
 bool OpsStateInterface::isSearching() const
 {
+    // qInfo() << "Checking if searching";
     return (m_states & (1 << StateSearching));
 }
 
@@ -57,6 +62,7 @@ bool OpsStateInterface::isSearching() const
  */
 bool OpsStateInterface::isRecording() const
 {
+    // qInfo() << "Checking if recording";
     return (m_states & (1 << StateRecording));
 }
 
@@ -66,6 +72,7 @@ bool OpsStateInterface::isRecording() const
  */
 bool OpsStateInterface::isPlaying() const
 {
+    // qInfo() << "Checking if playing";
     return (m_states & (1 << StatePlaying));
 }
 
@@ -75,6 +82,7 @@ bool OpsStateInterface::isPlaying() const
  */
 bool OpsStateInterface::isVoice2Text() const
 {
+    // qInfo() << "Checking if voice to text";
     return (m_states & (1 << StateVoice2Text));
 }
 
@@ -84,6 +92,7 @@ bool OpsStateInterface::isVoice2Text() const
  */
 bool OpsStateInterface::isAppQuit() const
 {
+    // qInfo() << "Checking if app quit";
     return (m_states & (1 << StateAppQuit));
 }
 
@@ -93,6 +102,7 @@ bool OpsStateInterface::isAppQuit() const
  */
 bool OpsStateInterface::isAiSrvExist() const
 {
+    // qInfo() << "Checking if AI service exists";
     return (m_states & (1 << StateAISrvAvailable));
 }
 
@@ -102,6 +112,7 @@ bool OpsStateInterface::isAiSrvExist() const
  */
 OpsStateInterface *OpsStateInterface::instance()
 {
+    // qInfo() << "OpsStateInterface instance requested";
     static OpsStateInterface _instance;
     return &_instance;
 }

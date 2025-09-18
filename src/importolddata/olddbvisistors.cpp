@@ -10,6 +10,7 @@
 
 #include <DLog>
 #include <DApplication>
+#include <QDebug>
 
 /**
  * @brief OldFolderQryDbVisitor::OldFolderQryDbVisitor
@@ -20,6 +21,7 @@
 OldFolderQryDbVisitor::OldFolderQryDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
+    qInfo() << "OldFolderQryDbVisitor constructor called";
 }
 
 /**
@@ -28,9 +30,11 @@ OldFolderQryDbVisitor::OldFolderQryDbVisitor(QSqlDatabase &db, const void *inPar
  */
 bool OldFolderQryDbVisitor::visitorData()
 {
+    qInfo() << "Visiting old folder query data";
     bool isOK = false;
 
     if (nullptr != results.folders) {
+        qInfo() << "results.folders is not nullptr";
         isOK = true;
 
         enum OldFolder {
@@ -65,6 +69,7 @@ bool OldFolderQryDbVisitor::visitorData()
         }
     }
 
+    qInfo() << "Old folder query data visit finished, result:" << isOK;
     return isOK;
 }
 
@@ -74,6 +79,7 @@ bool OldFolderQryDbVisitor::visitorData()
  */
 bool OldFolderQryDbVisitor::prepareSqls()
 {
+    qInfo() << "Preparing old folder query SQL statements";
     //Query old folder data;
     QString querySql("SELECT id, name, create_time FROM folder;");
 
@@ -91,6 +97,7 @@ bool OldFolderQryDbVisitor::prepareSqls()
 OldNoteQryDbVisitor::OldNoteQryDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
+    qInfo() << "OldNoteQryDbVisitor constructor called";
 }
 
 /**
@@ -99,9 +106,11 @@ OldNoteQryDbVisitor::OldNoteQryDbVisitor(QSqlDatabase &db, const void *inParam, 
  */
 bool OldNoteQryDbVisitor::visitorData()
 {
+    qInfo() << "Visiting old note query data";
     bool isOK = false;
 
     if (nullptr != results.notes) {
+        qInfo() << "results.notes is not nullptr";
         isOK = true;
 
         enum OldNote {
@@ -181,6 +190,7 @@ bool OldNoteQryDbVisitor::visitorData()
         }
     }
 
+    qInfo() << "Old note query data visit finished, result:" << isOK;
     return isOK;
 }
 
@@ -190,6 +200,7 @@ bool OldNoteQryDbVisitor::visitorData()
  */
 bool OldNoteQryDbVisitor::prepareSqls()
 {
+    qInfo() << "Preparing old note query SQL statements";
     //Query old notes data
     QString querySql("SELECT id, folder_id, note_type, content_text, content_path, voice_time, create_time FROM note;");
 

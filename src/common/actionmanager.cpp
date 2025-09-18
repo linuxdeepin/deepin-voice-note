@@ -23,11 +23,14 @@ const char VisibleProperty[] = "visible";
 ActionManager::ActionManager(QObject *parent)
     : QObject { parent }
 {
+    qInfo() << "ActionManager constructor called";
     initMenu();
+    qInfo() << "ActionManager constructor finished";
 }
 
 ActionManager *ActionManager::instance()
 {
+    // qInfo() << "ActionManager instance requested";
     static ActionManager ins;
     return &ins;
 }
@@ -37,6 +40,7 @@ ActionManager *ActionManager::instance()
  */
 void ActionManager::initMenu()
 {
+    qInfo() << "Initializing menu";
     static auto makeAction = [this](ActionKind id, const QString &text, ComponentType type = MenuItemComponent) -> ActionPtr {
         ActionPtr meta = ActionPtr::create(id, text, type);
         metaData.insert(id, meta);
@@ -94,6 +98,8 @@ void ActionManager::initMenu()
     makeAction(TxtStopreading, QCoreApplication::translate("NoteDetailContextMenu", "Stop reading"));
     makeAction(TxtDictation, QCoreApplication::translate("NoteDetailContextMenu", "Speech to Text"));
     // makeAction(TxtTranslate, QCoreApplication::translate("NoteDetailContextMenu", "Translate"));
+
+    qInfo() << "Menu initialization finished";
 }
 
 /*!
@@ -101,7 +107,9 @@ void ActionManager::initMenu()
  */
 QObject *ActionManager::getActionById(ActionKind id)
 {
+    qInfo() << "Getting action by ID:" << id;
     auto ptr = metaData.value(id);
+    qInfo() << "Action retrieval finished, found:" << (ptr ? "yes" : "no");
     return ptr ? ptr->qmlObject : nullptr;
 }
 
@@ -110,6 +118,7 @@ QObject *ActionManager::getActionById(ActionKind id)
  */
 void ActionManager::enableAction(ActionKind actionId, bool enable)
 {
+    qInfo() << "Enabling action ID:" << actionId << "to:" << enable;
     if (!metaData.contains(actionId)) {
         qWarning() << "Attempted to enable non-existent action:" << actionId;
         return;
@@ -119,6 +128,7 @@ void ActionManager::enableAction(ActionKind actionId, bool enable)
     if (ptr && ptr->qmlObject) {
         ptr->qmlObject->setProperty(EnabledProperty, QVariant(enable));
     }
+    qInfo() << "Action enabling finished";
 }
 
 /*!
@@ -126,6 +136,7 @@ void ActionManager::enableAction(ActionKind actionId, bool enable)
  */
 void ActionManager::visibleAction(ActionKind actionId, bool visible)
 {
+    qInfo() << "Setting action visibility, ID:" << actionId << "to:" << visible;
     if (!metaData.contains(actionId)) {
         qWarning() << "Attempted to change visibility of non-existent action:" << actionId;
         return;
@@ -135,6 +146,7 @@ void ActionManager::visibleAction(ActionKind actionId, bool visible)
     if (ptr && ptr->qmlObject) {
         ptr->qmlObject->setProperty(VisibleProperty, QVariant(visible));
     }
+    qInfo() << "Action visibility setting finished";
 }
 
 /*!
@@ -147,21 +159,27 @@ void ActionManager::resetCtxMenu(MenuType type, bool enable)
     int endMenuId = MenuMaxId;
 
     if (MenuType::NotebookCtxMenu == type) {
+        qInfo() << "Resetting notebook context menu";
         startMenuId = NotebookMenuBase;
         endMenuId = NotebookMenuMax;
     } else if (MenuType::NoteCtxMenu == type) {
+        qInfo() << "Resetting note context menu";
         startMenuId = NoteMenuBase;
         endMenuId = NoteMenuMax;
     } else if (MenuType::VoiceCtxMenu == type) {
+        qInfo() << "Resetting voice context menu";
         startMenuId = VoiceMenuBase;
         endMenuId = VoiceMenuMax;
     } else if (MenuType::PictureCtxMenu == type) {
+        qInfo() << "Resetting picture context menu";
         startMenuId = PictureMenuBase;
         endMenuId = PictureMenuMax;
     } else if (MenuType::TxtCtxMenu == type) {
+        qInfo() << "Resetting text context menu";
         startMenuId = TxtMenuBase;
         endMenuId = TxtMenuMax;
     } else if (MenuType::SaveNoteCtxMenu == type) {
+        qInfo() << "Resetting save note context menu";
         startMenuId = SaveNoteMenuBase;
         endMenuId = SaveNoteMax;
     }
@@ -172,6 +190,7 @@ void ActionManager::resetCtxMenu(MenuType type, bool enable)
             ptr->qmlObject->setProperty(EnabledProperty, enable);
         }
     }
+    qInfo() << "Context menu reset finished";
 }
 
 /*!
@@ -185,14 +204,16 @@ void ActionManager::visibleAiActions(bool visible)
     visibleAction(TxtStopreading, visible);
     visibleAction(TxtDictation, visible);
     visibleAction(TxtSeparator, visible);
+    qInfo() << "AI actions visibility setting finished";
 }
 
 void ActionManager::visibleMulChoicesActions(bool visible)
 {
-    qDebug() << "Setting multiple choice actions visibility to:" << visible;
+    qInfo() << "Setting multiple choice actions visibility to:" << visible;
     visibleAction(NoteRename, visible);
     visibleAction(NoteTop, visible);
     enableAction(NoteSaveVoice, visible);
+    qInfo() << "Multiple choice actions visibility setting finished";
 }
 
 void ActionManager::enableVoicePlayActions(bool enable)
@@ -201,6 +222,7 @@ void ActionManager::enableVoicePlayActions(bool enable)
     enableAction(NoteMove, enable);
     enableAction(NoteDelete, enable);
     enableAction(NoteAddNew, enable);
+    qInfo() << "Voice play actions enabled state setting finished";
 }
 
 /*!
@@ -210,6 +232,7 @@ void ActionManager::enableVoicePlayActions(bool enable)
  */
 QString ActionManager::actionText(ActionKind id)
 {
+    qInfo() << "Getting action text for ID:" << id;
     auto ptr = metaData.value(id);
     return ptr ? ptr->text : QString();
 }
@@ -219,6 +242,7 @@ QString ActionManager::actionText(ActionKind id)
  */
 ActionManager::ComponentType ActionManager::actionCompType(ActionKind id)
 {
+    qInfo() << "Getting action component type for ID:" << id;
     auto ptr = metaData.value(id);
     return ptr ? ptr->type : MenuItemComponent;
 }
@@ -228,11 +252,13 @@ ActionManager::ComponentType ActionManager::actionCompType(ActionKind id)
  */
 QVariantList ActionManager::childActions(ActionKind id)
 {
+    qInfo() << "Getting child actions for ID:" << id;
     QList<ActionKind> children = childActionMap.value(id);
     QVariantList result;
     for (ActionKind child : children) {
         result.append(static_cast<int>(child));
     }
+    qInfo() << "Child actions retrieval finished, count:" << result.size();
     return result;
 }
 
@@ -241,6 +267,7 @@ QVariantList ActionManager::childActions(ActionKind id)
  */
 void ActionManager::setActionObject(ActionKind id, QObject *obj)
 {
+    qInfo() << "Setting action object for ID:" << id;
     auto ptr = metaData.value(id);
     if (ptr) {
         if (ptr->qmlObject) {
@@ -256,6 +283,7 @@ void ActionManager::setActionObject(ActionKind id, QObject *obj)
     } else {
         qWarning() << "Attempted to set QML object for non-existent action:" << id;
     }
+    qInfo() << "Action object setting finished";
 }
 
 /*!
@@ -265,4 +293,5 @@ void ActionManager::actionTriggerFromQuick(ActionKind actionId)
 {
     qDebug() << "Action triggered from QML:" << actionId;
     Q_EMIT actionTriggered(actionId);
+    qInfo() << "Action trigger handling finished";
 }

@@ -4,59 +4,75 @@
 #include <cmath>
 #include <QtMath>
 #include <QLinearGradient>
+#include <QDebug>
 
 RecordingCurves::RecordingCurves(QQuickItem *parent)
     : QQuickPaintedItem(parent)
     , m_timer(new QTimer(this))
 {
+    qInfo() << "RecordingCurves constructor called";
     m_timer->setInterval(1000 / 45);
     connect(m_timer, &QTimer::timeout, this, &RecordingCurves::updateCurves);
+    qInfo() << "RecordingCurves constructor finished";
 }
 
 RecordingCurves::~RecordingCurves()
 {
-
+    // qInfo() << "RecordingCurves destructor called";
 }
 
 void RecordingCurves::updateVolume(const double &gain)
 {
+    qInfo() << "updateVolume called with gain:" << gain;
     m_gain = gain;
     update();
+    qInfo() << "updateVolume finished";
 }
 
 void RecordingCurves::startRecording()
 {
+    qInfo() << "startRecording called";
     m_timer->start();
+    qInfo() << "startRecording finished";
 }
 
 void RecordingCurves::stopRecording()
 {
+    qInfo() << "stopRecording called";
     m_timer->stop();
     m_phase = 0.0;
     m_gain = 0.0;  // 添加这一行，重置增益为0
     update();
+    qInfo() << "stopRecording finished";
 }
 
 void RecordingCurves::pauseRecording()
 {
+    qInfo() << "pauseRecording called, timer active:" << m_timer->isActive();
     if (m_timer->isActive()) {
         m_gain = 0.0;
         m_timer->stop();
+        qInfo() << "Recording paused";
     } else {
         m_timer->start();
+        qInfo() << "Recording resumed";
     }
+    qInfo() << "pauseRecording finished";
 }
 
 void RecordingCurves::updateCurves()
 {
+    qInfo() << "updateCurves called";
     m_phase += M_PI;
     if (m_phase > 170*M_PI)
         m_phase = 0;
     update();
+    qInfo() << "updateCurves finished";
 }
 
 void RecordingCurves::paint(QPainter *painter)
 {
+    // qInfo() << "paint called";
     painter->setRenderHint(QPainter::Antialiasing);
 
     auto rect = boundingRect();
@@ -104,4 +120,5 @@ void RecordingCurves::paint(QPainter *painter)
     painter->setPen(QPen(QBrush(gradient), 1));
 #endif
     painter->drawPolyline(points.constData(), points.size());
+    // qInfo() << "paint finished";
 }

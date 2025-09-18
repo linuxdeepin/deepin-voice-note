@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "vntask.h"
+#include <QDebug>
 
 /**
  * @brief VNTask::VNTask
@@ -13,4 +14,5 @@ VNTask::VNTask(QObject *parent)
     : QObject(parent)
     , QRunnable()
 {
+    // qInfo() << "VNTask constructor called";
 }

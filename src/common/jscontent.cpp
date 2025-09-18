@@ -26,11 +26,14 @@
 
 JsContent::JsContent()
 {
+    qInfo() << "JsContent constructor called";
     connect(QApplication::clipboard(), &QClipboard::changed, this, &JsContent::onClipChange);
+    qInfo() << "JsContent constructor finished";
 }
 
 JsContent *JsContent::instance()
 {
+    // qInfo() << "JsContent instance requested";
     static JsContent _instance;
     return &_instance;
 }
@@ -76,6 +79,7 @@ bool JsContent::insertImages(QStringList filePaths)
     }
     qDebug() << "Emitting callJsInsertImages with" << paths.size() << "images";
     emit callJsInsertImages(paths);
+    qInfo() << "Image insertion finished";
     return true;
 }
 
@@ -104,41 +108,56 @@ bool JsContent::insertImages(const QImage &image)
     }
     qDebug() << "Successfully saved image to:" << imgPath;
     emit callJsInsertImages(QStringList(imgPath));
+    qInfo() << "Single image insertion finished";
     return true;
 }
 
 QString JsContent::webPath()
 {
-    return "file://" WEB_PATH "/index.html";
+    qInfo() << "Getting web path";
+    QString path = "file://" WEB_PATH "/index.html";
+    qInfo() << "Web path retrieved";
+    return path;
 }
 
 void JsContent::jsCallTxtChange()
 {
+    qInfo() << "Text change called from JavaScript";
     emit textChange();
+    qInfo() << "Text change handling finished";
 }
 
 void JsContent::jsCallChannleFinish()
 {
+    qInfo() << "Channel finish called from JavaScript";
     emit getfontinfo();
+    qInfo() << "Channel finish handling finished";
 }
 
 void JsContent::jsCallSummernoteInitFinish()
 {
+    qInfo() << "Summernote init finish called from JavaScript";
     emit loadFinsh();
+    qInfo() << "Summernote init finish handling finished";
 }
 
 void JsContent::jsCallPopupMenu(int type, const QVariant &json)
 {
+    qInfo() << "Popup menu called from JavaScript, type:" << type;
     emit popupMenu(type, json);
+    qInfo() << "Popup menu handling finished";
 }
 
 void JsContent::jsCallPlayVoice(const QVariant &json, bool bIsSame)
 {
+    qInfo() << "Play voice called from JavaScript, isSame:" << bIsSame;
     emit playVoice(json, bIsSame);
+    qInfo() << "Play voice handling finished";
 }
 
 QString JsContent::jsCallGetTranslation()
 {
+    qInfo() << "Translation data requested from JavaScript";
     qDebug() << "Translation data requested from JavaScript";
     static QJsonDocument doc;
     if (doc.isEmpty()) {
@@ -158,7 +177,9 @@ QString JsContent::jsCallGetTranslation()
         doc.setObject(object);
         qDebug() << "Translation data initialized";
     }
-    return doc.toJson(QJsonDocument::Compact);
+    QString result = doc.toJson(QJsonDocument::Compact);
+    qInfo() << "Translation data retrieval finished";
+    return result;
 }
 
 /**
@@ -180,7 +201,9 @@ QString JsContent::jsCallDivTextTranslation()
 
 void JsContent::jsCallScrollChange(int scrollTop)
 {
+    qInfo() << "Scroll change called from JavaScript, scrollTop:" << scrollTop;
     emit scrollTopChange(scrollTop == 0);
+    qInfo() << "Scroll change handling finished";
 }
 
 /**
@@ -188,7 +211,9 @@ void JsContent::jsCallScrollChange(int scrollTop)
  */
 void JsContent::jsCallPlayVoiceStop()
 {
+    qInfo() << "Play voice stop called from JavaScript";
     Q_EMIT playVoiceStop();
+    qInfo() << "Play voice stop handling finished";
 }
 
 /**
@@ -197,7 +222,9 @@ void JsContent::jsCallPlayVoiceStop()
  */
 void JsContent::jsCallVoiceProgressChange(qint64 progressMs)
 {
+    qInfo() << "Voice progress change called from JavaScript, progressMs:" << progressMs;
     Q_EMIT playVoiceProgressChange(progressMs);
+    qInfo() << "Voice progress change handling finished";
 }
 
 QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &funtion)
@@ -225,32 +252,43 @@ QVariant JsContent::callJsSynchronous(QWebEnginePage *page, const QString &funti
     } else {
         qWarning() << "Attempted to execute JavaScript on null page";
     }
+    qInfo() << "Synchronous JavaScript execution finished";
     return synResult;
 }
 
 void JsContent::jsCallSetDataFinsh()
 {
+    qInfo() << "Set data finish called from JavaScript";
     emit setDataFinsh();
+    qInfo() << "Set data finish handling finished";
 }
 
 void JsContent::jsCallPaste(bool isVoicePaste)
 {
+    qInfo() << "Paste called from JavaScript, isVoicePaste:" << isVoicePaste;
     emit textPaste(isVoicePaste);
+    qInfo() << "Paste handling finished";
 }
 
 void JsContent::jsCallViewPicture(const QString &imagePath)
 {
+    qInfo() << "View picture called from JavaScript, imagePath:" << imagePath;
     emit viewPictrue(imagePath);
+    qInfo() << "View picture handling finished";
 }
 
 void JsContent::jsCallCreateNote()
 {
+    qInfo() << "Create note called from JavaScript";
     emit createNote();
+    qInfo() << "Create note handling finished";
 }
 
 void JsContent::jsCallSaveAudio()
 {
+    qInfo() << "Save audio called from JavaScript";
     emit saveAudio();
+    qInfo() << "Save audio handling finished";
 }
 
 void JsContent::jsCallSetClipData(const QString &text, const QString &html)
@@ -274,12 +312,15 @@ void JsContent::jsCallSetClipData(const QString &text, const QString &html)
     } else {
         qWarning() << "Failed to access clipboard";
     }
+    qInfo() << "Clipboard data setting finished";
 }
 
 void JsContent::onClipChange(QClipboard::Mode mode)
 {
+    qInfo() << "Clipboard change detected, mode:" << mode;
     if (QClipboard::Clipboard == mode && QApplication::clipboard()->mimeData() != m_clipData) {
         qDebug() << "Clipboard content changed externally";
         emit callJsClipboardDataChanged();
     }
+    qInfo() << "Clipboard change handling finished";
 }

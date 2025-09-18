@@ -27,6 +27,7 @@ DWIDGET_USE_NAMESPACE
 VNoteFolderOper::VNoteFolderOper(VNoteFolder *folder)
     : m_folder(folder)
 {
+    qInfo() << "VNoteFolderOper constructor called";
 }
 
 /**
@@ -35,6 +36,7 @@ VNoteFolderOper::VNoteFolderOper(VNoteFolder *folder)
  */
 bool VNoteFolderOper::isNoteItemLoaded()
 {
+    // qInfo() << "VNoteFolderOper isNoteItemLoaded called";
     return (m_folder) ? m_folder->fIsDataLoaded : false;
 }
 
@@ -91,6 +93,7 @@ bool VNoteFolderOper::renameVNoteFolder(const QString &folderName)
     bool isUpdateOK = true;
 
     if (nullptr != m_folder) {
+        qInfo() << "Renaming folder to:" << folderName;
         QString oldFolderName = m_folder->name;
         QDateTime oldModifyTime = m_folder->modifyTime;
 
@@ -184,6 +187,7 @@ VNoteFolder *VNoteFolderOper::addFolder(VNoteFolder &folder)
  */
 VNoteFolder *VNoteFolderOper::getFolder(qint64 folderId)
 {
+    // qInfo() << "Getting folder:" << folderId;
     VNoteFolder *folder = VNoteDataManager::instance()->getFolder(folderId);
 
     return folder;
@@ -195,6 +199,7 @@ VNoteFolder *VNoteFolderOper::getFolder(qint64 folderId)
  */
 qint32 VNoteFolderOper::getFoldersCount()
 {
+    // qInfo() << "Getting folders count";
     return VNoteDataManager::instance()->folderCount();
 }
 
@@ -226,9 +231,11 @@ qint32 VNoteFolderOper::getNotesCount(qint64 folderId)
  */
 qint32 VNoteFolderOper::getNotesCount()
 {
+    qInfo() << "Getting notes count";
     qint32 notesCount = 0;
 
     if (m_folder != nullptr) {
+        qInfo() << "Getting notes count for folder:" << m_folder->id;
         notesCount = getNotesCount(m_folder->id);
     }
 
@@ -241,6 +248,7 @@ qint32 VNoteFolderOper::getNotesCount()
  */
 QString VNoteFolderOper::getDefaultFolderName()
 {
+    qInfo() << "Getting default folder name";
     //TODO:
     //    The default folder is auto-increment, and
     //may be separate data for different category in future.
@@ -273,6 +281,7 @@ QString VNoteFolderOper::getDefaultFolderName()
  */
 qint32 VNoteFolderOper::getDefaultIcon()
 {
+    // qInfo() << "Getting default icon";
     const int defalutIconCnt = 10;
     return (QRandomGenerator::global()->bounded(0,defalutIconCnt));
 }
@@ -285,5 +294,6 @@ qint32 VNoteFolderOper::getDefaultIcon()
  */
 QPixmap VNoteFolderOper::getDefaultIcon(qint32 index, IconsType type)
 {
+    // qInfo() << "Getting default icon:" << index << "type:" << type;
     return VNoteDataManager::instance()->getDefaultIcon(index, type);
 }
