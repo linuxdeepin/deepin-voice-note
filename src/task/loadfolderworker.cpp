@@ -20,6 +20,7 @@
 LoadFolderWorker::LoadFolderWorker(QObject *parent)
     : VNTask(parent)
 {
+    qInfo() << "LoadFolderWorker constructor called";
 }
 
 /**
@@ -27,6 +28,7 @@ LoadFolderWorker::LoadFolderWorker(QObject *parent)
  */
 void LoadFolderWorker::run()
 {
+    qInfo() << "LoadFolderWorker run called";
     static struct timeval start, backups, end;
 
     gettimeofday(&start, nullptr);

@@ -5,6 +5,7 @@
 
 #include "vnmainwnddelayinittask.h"
 // #include "views/vnotemainwindow.h"
+#include <QDebug>
 
 /**
  * @brief VNMainWndDelayInitTask::VNMainWndDelayInitTask
@@ -15,6 +16,7 @@ VNMainWndDelayInitTask::VNMainWndDelayInitTask(/*VNoteMainWindow *pMainWnd, */ Q
     : VNTask(parent)
     // , m_pMainWnd(pMainWnd)
 {
+    // qInfo() << "VNMainWndDelayInitTask constructor called";
 }
 
 /**
@@ -22,8 +24,11 @@ VNMainWndDelayInitTask::VNMainWndDelayInitTask(/*VNoteMainWindow *pMainWnd, */ Q
  */
 void VNMainWndDelayInitTask::run()
 {
+    // qInfo() << "Running VNMainWndDelayInitTask";
     if (nullptr != m_pMainWnd) {
+        // qInfo() << "m_pMainWnd is not nullptr";
         //Delay initialize work
         // m_pMainWnd->initDelayWork();
     }
+    // qInfo() << "VNMainWndDelayInitTask run finished";
 }

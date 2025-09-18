@@ -17,3 +17,6 @@ build
 
 .cursorindexingignore
 .specstory
+.aider*
+.claude/
+.spec-workflow/

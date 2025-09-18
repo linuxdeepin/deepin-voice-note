@@ -15,6 +15,7 @@
 #include <DLog>
 
 #include <QVBoxLayout>
+#include <QDebug>
 
 /**
  * @brief UpgradeView::UpgradeView
@@ -23,6 +24,7 @@
 UpgradeView::UpgradeView(QWidget *parent)
     : QWidget(parent)
 {
+    qInfo() << "UpgradeView constructor called";
     setAutoFillBackground(true);
 
     m_waterProgress = new DWaterProgress(this);
@@ -48,6 +50,7 @@ UpgradeView::UpgradeView(QWidget *parent)
     vbox->addStretch();
 
     initConnections();
+    qInfo() << "UpgradeView constructor finished";
 }
 
 /**
@@ -55,10 +58,12 @@ UpgradeView::UpgradeView(QWidget *parent)
  */
 void UpgradeView::startUpgrade()
 {
+    qInfo() << "Starting upgrade process";
     //Update the upgrade state to loading data
     UpgradeDbUtil::saveUpgradeState(UpgradeDbUtil::Loading);
 
     VNoteOldDataManager::instance()->reqDatas();
+    qInfo() << "Upgrade process start request sent";
 }
 
 /**
@@ -67,7 +72,9 @@ void UpgradeView::startUpgrade()
  */
 void UpgradeView::setProgress(int progress)
 {
+    qInfo() << "Setting progress to:" << progress;
     m_waterProgress->setValue(progress);
+    qInfo() << "Progress setting finished";
 }
 
 /**
@@ -75,6 +82,7 @@ void UpgradeView::setProgress(int progress)
  */
 void UpgradeView::onDataReady()
 {
+    qInfo() << "Old data is ready";
     int foldersCount = VNoteOldDataManager::instance()->folders()->folders.count();
 
     qInfo() << "Old data ready - Found" << foldersCount << "folders";
@@ -93,6 +101,7 @@ void UpgradeView::onDataReady()
 
         VNoteOldDataManager::instance()->upgradeFinish();
     }
+    qInfo() << "Data ready handling finished";
 }
 
 /**
@@ -117,6 +126,7 @@ void UpgradeView::onUpgradeFinish()
     setProgress(100);
 
     emit upgradeDone();
+    qInfo() << "Upgrade finish handling completed";
 }
 
 /**
@@ -124,7 +134,9 @@ void UpgradeView::onUpgradeFinish()
  */
 void UpgradeView::initConnections()
 {
+    qInfo() << "Initializing upgrade view connections";
     connect(VNoteOldDataManager::instance(), &VNoteOldDataManager::dataReady, this, &UpgradeView::onDataReady);
     connect(VNoteOldDataManager::instance(), &VNoteOldDataManager::progressValue, this, &UpgradeView::setProgress, Qt::QueuedConnection);
     connect(VNoteOldDataManager::instance(), &VNoteOldDataManager::upgradeFinish, this, &UpgradeView::onUpgradeFinish, Qt::QueuedConnection);
+    qInfo() << "Upgrade view connections initialized";
 }

@@ -114,6 +114,7 @@ void VNoteA2TManager::startAsr(QString filePath, qint64 fileDuration, QString sr
  */
 void VNoteA2TManager::stopAsr()
 {
+    qInfo() << "Stopping ASR";
     // m_asrInterface->stopAsr();
 }
 
@@ -135,24 +136,29 @@ void VNoteA2TManager::onNotify(const QString &msg)
 
     if (CODE_SUCCESS == asrData.code)
     {
+        qInfo() << "ASR success";
         if (XF_finish == asrData.status)
         {
+            qInfo() << "ASR finish";
             // Finish convertion
             emit asrSuccess(asrData.text);
         }
         else if (XF_fail == asrData.status)
         {
+            qInfo() << "ASR failed";
             // Failed convertion
             emit asrError(getErrorCode(asrData));
         }
         else
         {
+            qInfo() << "ASR other";
             // We ingore other state BCS we don't
             //  care about it
         }
     }
     else
     {
+        qInfo() << "ASR error";
         emit asrError(getErrorCode(asrData));
     }
 }
@@ -170,30 +176,36 @@ void VNoteA2TManager::asrJsonParser(const QString &msg, asrMsg &asrData)
 
     if (QJsonParseError::NoError == error.error)
     {
+        qInfo() << "ASR JSON message is valid";
         QVariantMap map = doc.toVariant().toMap();
 
         if (map.contains("code"))
         {
+            qInfo() << "ASR code is valid";
             asrData.code = map["code"].toString();
         }
 
         if (map.contains("descInfo"))
         {
+            qInfo() << "ASR descInfo is valid";
             asrData.descInfo = map["descInfo"].toString();
         }
 
         if (map.contains("failType"))
         {
+            qInfo() << "ASR failType is valid";
             asrData.failType = map["failType"].toInt();
         }
 
         if (map.contains("status"))
         {
+            qInfo() << "ASR status is valid";
             asrData.status = map["status"].toInt();
         }
 
         if (map.contains("text"))
         {
+            qInfo() << "ASR text is valid";
             asrData.text = map["text"].toString();
         }
         qDebug() << "JSON parsed successfully, code:" << asrData.code << "status:" << asrData.status;
@@ -214,6 +226,7 @@ VNoteA2TManager::ErrorCode VNoteA2TManager::getErrorCode(const asrMsg &asrData)
 
     if (CODE_SUCCESS == asrData.code && XF_fail == asrData.status)
     {
+        qWarning() << "ASR failed";
         switch (asrData.failType)
         {
         case XF_upload:

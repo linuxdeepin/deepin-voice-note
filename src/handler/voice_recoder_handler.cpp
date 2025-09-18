@@ -12,28 +12,34 @@
 #include <QMediaDevices>
 #include <QAudioDevice>
 #endif
+#include <QDebug>
 
 VoiceRecoderHandler::VoiceRecoderHandler() {
+    qInfo() << "VoiceRecoderHandler constructor called";
 #ifndef USE_QT5
     m_mediaDevices = new QMediaDevices(this);
 #endif
     intRecoder();
     initAudioWatcher();
+    qInfo() << "VoiceRecoderHandler constructor finished";
 }
 
 VoiceRecoderHandler *VoiceRecoderHandler::instance()
 {
+    // qInfo() << "VoiceRecoderHandler instance requested";
     static VoiceRecoderHandler voiceHandler;
     return &voiceHandler;
 }
 
 VoiceRecoderHandler::RecoderType VoiceRecoderHandler::getRecoderType()
 {
+    // qInfo() << "Getting recorder type:" << m_type;
     return m_type;
 }
 
 void VoiceRecoderHandler::startRecoder()
 {
+    qInfo() << "Starting voice recorder";
     if (VNoteMainManager::instance()->isInSearchMode()) {
         qDebug() << "Cannot start recording while in search mode";
         return;
@@ -48,6 +54,7 @@ void VoiceRecoderHandler::startRecoder()
         qWarning() << "Volume too low (less than 20%)";
         emit volumeTooLow(true);
     }
+    qInfo() << "Voice recorder start finished";
 }
 
 void VoiceRecoderHandler::stopRecoder()
@@ -63,6 +70,7 @@ void VoiceRecoderHandler::stopRecoder()
     } else {
         qDebug() << "Recorder already idle";
     }
+    qInfo() << "Voice recorder stop finished";
 }
 
 void VoiceRecoderHandler::pauseRecoder()
@@ -83,26 +91,33 @@ void VoiceRecoderHandler::pauseRecoder()
 
 void VoiceRecoderHandler::setAudioDevice(const QString &device)
 {
-
+    qInfo() << "Setting audio device to:" << device;
 }
 
 void VoiceRecoderHandler::changeMode(const int &mode)
 {
+    qInfo() << "Changing mode to:" << mode;
     m_currentMode = mode;
     onAudioDeviceChange(m_currentMode);
+    qInfo() << "Mode change finished";
 }
 
 void VoiceRecoderHandler::onDeviceEnableChanged(int mode, bool enabled)
 {
+    qInfo() << "Device enable state changed, mode:" << mode << "enabled:" << enabled;
     if (m_currentMode == mode) {
+        qInfo() << "mode is equal to current mode";
         emit updateRecordBtnState(enabled);
     }
+    qInfo() << "Device enable state change handling finished";
 }
 
 void VoiceRecoderHandler::intRecoder()
 {
+    qInfo() << "Initializing recorder";
     m_audioRecoder = new GstreamRecorder(this);
     connect(m_audioRecoder, &GstreamRecorder::audioBufferProbed, this, &VoiceRecoderHandler::onAudioBufferProbed);
+    qInfo() << "Recorder initialization finished";
 }
 
 void VoiceRecoderHandler::initRecordPath()
@@ -120,13 +135,16 @@ void VoiceRecoderHandler::initRecordPath()
 
 void VoiceRecoderHandler::initAudioWatcher()
 {
+    qInfo() << "Initializing audio watcher";
     m_audioWatcher = new AudioWatcher(this);
     connect(m_audioWatcher, &AudioWatcher::sigDeviceEnableChanged, this, &VoiceRecoderHandler::onDeviceEnableChanged);
     connect(m_audioWatcher, &AudioWatcher::sigReduceNoiseChanged, this, &VoiceRecoderHandler::onReduceNoiseChanged);
+    qInfo() << "Audio watcher initialization finished";
 }
 
 bool VoiceRecoderHandler::checkVolume()
 {
+    qInfo() << "Checking volume for mode:" << m_currentMode;
     double volume = m_audioWatcher->getVolume(
         static_cast<AudioWatcher::AudioMode>(m_currentMode));
     return (volume - 0.2 < 0.0) ? true : false;
@@ -135,6 +153,7 @@ bool VoiceRecoderHandler::checkVolume()
 // 通过脚本获取默认音源输入信息。只有获取的是所给的降噪字段的时候才使用，其他依然走dbus的方式
 QString VoiceRecoderHandler::tryGetMicNameFromPactl() const
 {
+    qInfo() << "Attempting to get default source via 'pactl get-default-source'";
     QProcess process;
     QString commandOutput;
 
@@ -182,6 +201,7 @@ QString VoiceRecoderHandler::tryGetMicNameFromPactl() const
 
 QString VoiceRecoderHandler::getDefaultMicDeviceName() const
 {
+    qInfo() << "Getting default mic device name";
     QString defaultName;
 
     // 只有当m_currentMode是麦克风模式时，才尝试使用pactl获取默认音源
@@ -189,12 +209,14 @@ QString VoiceRecoderHandler::getDefaultMicDeviceName() const
         defaultName = tryGetMicNameFromPactl();
         if (defaultName == "echo-cancel-source") {
             // 如果pactl获取到有效且非降噪字段，则使用它
+            qInfo() << "Default mic device name retrieval finished";
             return defaultName;
         }
     }
 
     // 否则，回退到使用m_audioWatcher获取设备名称
     defaultName = m_audioWatcher->getDeviceName(static_cast<AudioWatcher::AudioMode>(m_currentMode));
+    qInfo() << "Default mic device name retrieval finished";
     return defaultName;
 }
 
@@ -222,12 +244,14 @@ void VoiceRecoderHandler::confirmStartRecoder()
         OpsStateInterface::instance()->operState(OpsStateInterface::StateRecording, true);
         emit recoderStateChange(m_type);
     }
+    qInfo() << "Recording confirmation finished";
 }
 
 void VoiceRecoderHandler::onAudioDeviceChange(int mode)
 {
-    qCritical() << "=== onAudioDeviceChange验证 === 音频设备变化，模式:" << mode;
-    qCritical() << "当前录音状态:" << m_type;
+    qInfo() << "Audio device changed, mode:" << mode;
+    // qCritical() << "=== onAudioDeviceChange验证 === 音频设备变化，模式:" << mode;
+    // qCritical() << "当前录音状态:" << m_type;
     
     qDebug() << "Audio device changed, mode:" << mode;
     if (m_currentMode == mode) {
@@ -254,10 +278,12 @@ void VoiceRecoderHandler::onAudioDeviceChange(int mode)
             updateWave(0.0);
         }
     }
+    qInfo() << "Audio device change handling finished";
 }
 
 void VoiceRecoderHandler::onAudioBufferProbed(const QAudioBuffer &buffer)
 {
+    qInfo() << "Audio buffer probed";
     qint64 msec = buffer.startTime();
     if (m_recordMsec != msec) {
         m_recordMsec = msec;
@@ -283,9 +309,12 @@ void VoiceRecoderHandler::onAudioBufferProbed(const QAudioBuffer &buffer)
     }
     maxValue = maxValue / 10000;
     updateWave(maxValue);
+    qInfo() << "Audio buffer probe handling finished";
 }
 
 void VoiceRecoderHandler::onReduceNoiseChanged(bool reduceNoiseChanged)
 {
+    qInfo() << "Reduce noise changed to:" << reduceNoiseChanged;
     onAudioDeviceChange(m_currentMode);
+    qInfo() << "Reduce noise change handling finished";
 }

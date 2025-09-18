@@ -19,6 +19,7 @@
 LoadNoteItemsWorker::LoadNoteItemsWorker(QObject *parent)
     : VNTask(parent)
 {
+    qInfo() << "LoadNoteItemsWorker constructor called";
 }
 
 /**
@@ -26,6 +27,7 @@ LoadNoteItemsWorker::LoadNoteItemsWorker(QObject *parent)
  */
 void LoadNoteItemsWorker::run()
 {
+    qInfo() << "LoadNoteItemsWorker run called";
     static struct timeval start, backups, end;
 
     gettimeofday(&start, nullptr);

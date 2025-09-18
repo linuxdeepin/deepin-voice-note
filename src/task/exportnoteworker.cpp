@@ -16,6 +16,7 @@
 #include <QDateTime>
 #include <QFile>
 #include <QFileInfo>
+#include <QDebug>
 
 /**
  * @brief ExportNoteWorker::ExportNoteWorker
@@ -34,6 +35,9 @@ ExportNoteWorker::ExportNoteWorker(const QString &dirPath, ExportType exportType
     //笔记列表
     , m_noteList(noteList)
 {
+    qInfo() << "ExportNoteWorker constructor called with export type:" << exportType 
+            << "path:" << dirPath << "default name:" << defaultName 
+            << "note count:" << noteList.size();
 }
 
 /**
@@ -71,6 +75,7 @@ void ExportNoteWorker::run()
 
     qInfo() << "Export operation completed - Result:" << error;
     emit exportFinished(error);
+    qInfo() << "Export operation finished signal emitted";
 }
 
 /**
@@ -85,6 +90,7 @@ ExportNoteWorker::ExportError ExportNoteWorker::checkPath()
     QFileInfo exportDir(m_exportPath);
 
     if (!m_exportPath.isEmpty()) {
+        qInfo() << "m_exportPath is not empty";
         QFileInfo dir(exportDir.absolutePath());
         if (!dir.exists()) {
             qDebug() << "Creating export directory:" << m_exportPath;
@@ -101,6 +107,7 @@ ExportNoteWorker::ExportError ExportNoteWorker::checkPath()
         error = PathInvalid;
     }
 
+    qInfo() << "Export path check finished, result:" << error;
     return error;
 }
 
@@ -111,9 +118,11 @@ ExportNoteWorker::ExportError ExportNoteWorker::checkPath()
  */
 ExportNoteWorker::ExportError ExportNoteWorker::exportText()
 {
+    qInfo() << "Exporting text, note count:" << m_noteList.size();
     ExportError error = ExportOK;
     //存在note
     if (m_noteList.size()) {
+        qInfo() << "m_noteList is not empty";
         for (auto noteData : m_noteList) {
             if (!noteData->haveText()) {
                 qDebug() << "Skipping note without text content";
@@ -156,6 +165,7 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportText()
         qWarning() << "No notes to export";
         error = NoteInvalid;
     }
+    qInfo() << "Text export finished, result:" << error;
     return error;
 }
 
@@ -166,9 +176,11 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportText()
  */
 ExportNoteWorker::ExportError ExportNoteWorker::exportAllVoice()
 {
+    qInfo() << "Exporting all voice, note count:" << m_noteList.size();
     ExportError error = ExportOK;
     //存在note
     if (m_noteList.size()) {
+        qInfo() << "m_noteList is not empty";
         for (auto noteData : m_noteList) {
             if (!noteData->haveVoice()) {
                 qDebug() << "Skipping note without voice content";
@@ -202,6 +214,7 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAllVoice()
         error = NoteInvalid;
     }
 
+    qInfo() << "All voice export finished, result:" << error;
     return error;
 }
 
@@ -213,12 +226,15 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAllVoice()
  */
 ExportNoteWorker::ExportError ExportNoteWorker::exportOneVoice(const QString &json)
 {
+    qInfo() << "Exporting one voice from JSON";
     VNVoiceBlock voiceBlock;
     MetaDataParser dataParser;
     //解析json数据
     if (dataParser.parse(json, &voiceBlock)) {
+        qInfo() << "Voice export from JSON success";
         return exportOneVoice(&voiceBlock);
     }
+    qInfo() << "Voice export from JSON failed, invalid data";
     return NoteInvalid;
 }
 
@@ -233,6 +249,7 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportOneVoice(VNoteBlock *noteb
     ExportError error = ExportOK;
 
     if (noteblock && noteblock->blockType == VNoteBlock::Voice) {
+        qInfo() << "noteblock is not nullptr and noteblock->blockType is Voice";
         QString baseFileName = m_exportPath + "/" + noteblock->ptrVoice->voiceTitle;
         QString fileSuffix = ".mp3";
         QString dstFileName = getExportFileName(baseFileName, fileSuffix);
@@ -248,6 +265,7 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportOneVoice(VNoteBlock *noteb
         error = NoteInvalid;
     }
 
+    qInfo() << "Voice block export finished, result:" << error;
     return error;
 }
 
@@ -258,6 +276,7 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportOneVoice(VNoteBlock *noteb
  */
 ExportNoteWorker::ExportError ExportNoteWorker::exportAsHtml()
 {
+    qInfo() << "Exporting as HTML, note count:" << m_noteList.size();
     ExportError error = ExportOK;
     for (auto note : m_noteList) {
         if (!note->haveText()) {
@@ -285,6 +304,7 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAsHtml()
         }
         out.close();  
     }
+    qInfo() << "HTML export finished, result:" << error;
     return error;
 }
 
@@ -300,5 +320,6 @@ QString ExportNoteWorker::getExportFileName(const QString &baseName, const QStri
         }
         filePath = baseName + "(" + QString::number(count++) + ")" + fileSuffix;
     }
+    qInfo() << "Generated unique filename:" << filePath;
     return filePath;
 }

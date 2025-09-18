@@ -68,6 +68,7 @@ const QStringList DbVisitor::DBSafer::saferColumnsName = {
 DbVisitor::DbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : m_sqlQuery(new QSqlQuery(db))
 {
+    // qInfo() << "DbVisitor constructor called";
     param.ptr = inParam;
     results.ptr = result;
 }
@@ -77,6 +78,7 @@ DbVisitor::DbVisitor(QSqlDatabase &db, const void *inParam, void *result)
  */
 DbVisitor::~DbVisitor()
 {
+    // qInfo() << "DbVisitor destructor called";
 }
 
 /**
@@ -85,6 +87,7 @@ DbVisitor::~DbVisitor()
  */
 bool DbVisitor::visitorData()
 {
+    // qInfo() << "Visiting data";
     // Default do nothing
     return true;
 }
@@ -95,6 +98,7 @@ bool DbVisitor::visitorData()
  */
 QSqlQuery *DbVisitor::sqlQuery()
 {
+    // qInfo() << "Getting SQL query object";
     return m_sqlQuery.get();
 }
 
@@ -104,6 +108,7 @@ QSqlQuery *DbVisitor::sqlQuery()
  */
 const QStringList &DbVisitor::dbvSqls()
 {
+    // qInfo() << "Getting database SQL statements";
     return m_dbvSqls;
 }
 
@@ -113,6 +118,7 @@ const QStringList &DbVisitor::dbvSqls()
  */
 DbVisitor::ExtraData &DbVisitor::extraData()
 {
+    // qInfo() << "Getting extra data";
     return m_extraData;
 }
 
@@ -122,7 +128,9 @@ DbVisitor::ExtraData &DbVisitor::extraData()
  */
 void DbVisitor::checkSqlStr(QString &sql)
 {
+    // qInfo() << "Checking SQL string";
     sql.replace("'", "''");
+    // qInfo() << "SQL string check finished";
 }
 
 /**
@@ -134,6 +142,7 @@ void DbVisitor::checkSqlStr(QString &sql)
 FolderQryDbVisitor::FolderQryDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
+    // qInfo() << "FolderQryDbVisitor constructor called";
 }
 
 /**
@@ -142,6 +151,7 @@ FolderQryDbVisitor::FolderQryDbVisitor(QSqlDatabase &db, const void *inParam, vo
  */
 bool FolderQryDbVisitor::visitorData()
 {
+    // qInfo() << "Visiting folder query data";
     bool isOK = false;
 
     if (nullptr != results.folders) {
@@ -175,6 +185,7 @@ bool FolderQryDbVisitor::visitorData()
         }
     }
 
+    // qInfo() << "Folder query data visit finished, result:" << isOK;
     return isOK;
 }
 
@@ -184,6 +195,7 @@ bool FolderQryDbVisitor::visitorData()
  */
 bool FolderQryDbVisitor::prepareSqls()
 {
+    // qInfo() << "Preparing der query SQL statements";
     QString querySql = QString("SELECT * FROM %1  ORDER BY %2 DESC ;").arg(VNoteDbManager::FOLDER_TABLE_NAME)
                            .arg(DBFolder::folderColumnsName[DBFolder::create_time].toUtf8().data());
 
@@ -201,6 +213,7 @@ bool FolderQryDbVisitor::prepareSqls()
 NoteQryDbVisitor::NoteQryDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
+    // qInfo() << "NoteQryDbVisitor constructor called";
 }
 
 /**
@@ -209,6 +222,7 @@ NoteQryDbVisitor::NoteQryDbVisitor(QSqlDatabase &db, const void *inParam, void *
  */
 bool NoteQryDbVisitor::visitorData()
 {
+    // qInfo() << "Visiting note query data";
     bool isOK = false;
 
     if (nullptr != results.notes) {
@@ -273,6 +287,7 @@ bool NoteQryDbVisitor::visitorData()
         }
     }
 
+    // qInfo() << "Note query data visit finished, result:" << isOK;
     return isOK;
 }
 
@@ -282,6 +297,7 @@ bool NoteQryDbVisitor::visitorData()
  */
 bool NoteQryDbVisitor::prepareSqls()
 {
+    // qInfo() << "Preparing note query SQL statements";
     QString querySql = QString("SELECT * FROM %1 ORDER BY %2;").arg(VNoteDbManager::NOTES_TABLE_NAME).arg(DBNote::noteColumnsName[DBNote::folder_id].toUtf8().data());
 
     m_dbvSqls.append(querySql);
@@ -298,6 +314,7 @@ bool NoteQryDbVisitor::prepareSqls()
 MaxIdFolderDbVisitor::MaxIdFolderDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
+    // qInfo() << "MaxIdFolderDbVisitor constructor called";
 }
 
 /**
@@ -306,6 +323,7 @@ MaxIdFolderDbVisitor::MaxIdFolderDbVisitor(QSqlDatabase &db, const void *inParam
  */
 bool MaxIdFolderDbVisitor::visitorData()
 {
+    // qInfo() << "Visiting max ID folder data";
     bool isOK = false;
 
     if (nullptr != results.id) {
@@ -317,6 +335,7 @@ bool MaxIdFolderDbVisitor::visitorData()
         }
     }
 
+    // qInfo() << "Max ID folder data visit finished, result:" << isOK;
     return isOK;
 }
 
@@ -326,6 +345,7 @@ bool MaxIdFolderDbVisitor::visitorData()
  */
 bool MaxIdFolderDbVisitor::prepareSqls()
 {
+    // qInfo() << "Preparing max ID folder SQL statements";
     //TODO:
     //    The default folder is auto-increment, and
     //may be separate data for different category in future.
@@ -358,6 +378,7 @@ bool MaxIdFolderDbVisitor::prepareSqls()
 AddFolderDbVisitor::AddFolderDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
+    // qInfo() << "AddFolderDbVisitor constructor called";
 }
 
 /**
@@ -366,6 +387,7 @@ AddFolderDbVisitor::AddFolderDbVisitor(QSqlDatabase &db, const void *inParam, vo
  */
 bool AddFolderDbVisitor::visitorData()
 {
+    // qInfo() << "Visiting add folder data";
     bool isOK = false;
 
     if (nullptr != results.newFolder) {
@@ -393,6 +415,7 @@ bool AddFolderDbVisitor::visitorData()
         }
     }
 
+    // qInfo() << "Add folder data visit finished, result:" << isOK;
     return isOK;
 }
 
@@ -402,6 +425,7 @@ bool AddFolderDbVisitor::visitorData()
  */
 bool AddFolderDbVisitor::prepareSqls()
 {
+    // qInfo() << "Preparing add folder SQL statements";
     bool fPrepareOK = true;
     if (nullptr != param.newFolder) {
         //Check&Init the create time parameter
@@ -434,6 +458,7 @@ bool AddFolderDbVisitor::prepareSqls()
         fPrepareOK = false;
     }
 
+    // qInfo() << "Add folder SQL statements preparation finished, result:" << fPrepareOK;
     return fPrepareOK;
 }
 
@@ -446,6 +471,7 @@ bool AddFolderDbVisitor::prepareSqls()
 RenameFolderDbVisitor::RenameFolderDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
+    // qInfo() << "RenameFolderDbVisitor constructor called";
 }
 
 /**
@@ -454,6 +480,7 @@ RenameFolderDbVisitor::RenameFolderDbVisitor(QSqlDatabase &db, const void *inPar
  */
 bool RenameFolderDbVisitor::prepareSqls()
 {
+    // qInfo() << "Preparing rename folder SQL statements";
     bool fPrepareOK = true;
     const VNoteFolder *folder = param.newFolder;
     if (nullptr != folder) {
@@ -476,6 +503,7 @@ bool RenameFolderDbVisitor::prepareSqls()
         fPrepareOK = false;
     }
 
+    // qInfo() << "Rename folder SQL statements preparation finished, result:" << fPrepareOK;
     return fPrepareOK;
 }
 
@@ -488,6 +516,7 @@ bool RenameFolderDbVisitor::prepareSqls()
 DelFolderDbVisitor::DelFolderDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
+    // qInfo() << "DelFolderDbVisitor constructor called";
 }
 
 /**
@@ -496,6 +525,7 @@ DelFolderDbVisitor::DelFolderDbVisitor(QSqlDatabase &db, const void *inParam, vo
  */
 bool DelFolderDbVisitor::prepareSqls()
 {
+    // qInfo() << "Preparing delete folder SQL statements";
     bool fPrepareOK = true;
 
     if (nullptr != param.id) {
@@ -519,6 +549,7 @@ bool DelFolderDbVisitor::prepareSqls()
         fPrepareOK = false;
     }
 
+    // qInfo() << "Delete folder SQL statements preparation finished, result:" << fPrepareOK;
     return fPrepareOK;
 }
 
@@ -531,6 +562,7 @@ bool DelFolderDbVisitor::prepareSqls()
 AddNoteDbVisitor::AddNoteDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
+    // qInfo() << "AddNoteDbVisitor constructor called";
 }
 
 /**
@@ -539,6 +571,7 @@ AddNoteDbVisitor::AddNoteDbVisitor(QSqlDatabase &db, const void *inParam, void *
  */
 bool AddNoteDbVisitor::visitorData()
 {
+    // qInfo() << "Visiting add note data";
     bool isOK = false;
 
     if (nullptr != results.newNote) {
@@ -577,6 +610,7 @@ bool AddNoteDbVisitor::visitorData()
         }
     }
 
+    // qInfo() << "Add note data visit finished, result:" << isOK;
     return isOK;
 }
 
@@ -586,6 +620,7 @@ bool AddNoteDbVisitor::visitorData()
  */
 bool AddNoteDbVisitor::prepareSqls()
 {
+    // qInfo() << "Preparing add note SQL statements";
     bool fPrepareOK = true;
     const VNoteFolder *folder = param.newNote->folder();
     const VNoteItem *note = param.newNote;
@@ -644,6 +679,7 @@ bool AddNoteDbVisitor::prepareSqls()
         fPrepareOK = false;
     }
 
+    // qInfo() << "Add note SQL statements preparation finished, result:" << fPrepareOK;
     return fPrepareOK;
 }
 
@@ -656,6 +692,7 @@ bool AddNoteDbVisitor::prepareSqls()
 RenameNoteDbVisitor::RenameNoteDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
+    // qInfo() << "RenameNoteDbVisitor constructor called";
 }
 
 /**
@@ -664,6 +701,7 @@ RenameNoteDbVisitor::RenameNoteDbVisitor(QSqlDatabase &db, const void *inParam, 
  */
 bool RenameNoteDbVisitor::prepareSqls()
 {
+    // qInfo() << "Preparing rename note SQL statements";
     bool fPrepareOK = true;
     const VNoteItem *note = param.newNote;
 
@@ -698,6 +736,7 @@ bool RenameNoteDbVisitor::prepareSqls()
         fPrepareOK = false;
     }
 
+    // qInfo() << "Rename note SQL statements preparation finished, result:" << fPrepareOK;
     return fPrepareOK;
 }
 
@@ -710,6 +749,7 @@ bool RenameNoteDbVisitor::prepareSqls()
 UpdateNoteDbVisitor::UpdateNoteDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
+    // qInfo() << "UpdateNoteDbVisitor constructor called";
 }
 
 /**
@@ -718,6 +758,7 @@ UpdateNoteDbVisitor::UpdateNoteDbVisitor(QSqlDatabase &db, const void *inParam, 
  */
 bool UpdateNoteDbVisitor::prepareSqls()
 {
+    // qInfo() << "Preparing update note SQL statements";
     bool fPrepareOK = true;
     const VNoteItem *note = param.newNote;
 
@@ -752,6 +793,7 @@ bool UpdateNoteDbVisitor::prepareSqls()
         fPrepareOK = false;
     }
 
+    // qInfo() << "Update note SQL statements preparation finished, result:" << fPrepareOK;
     return fPrepareOK;
 }
 
@@ -764,6 +806,7 @@ bool UpdateNoteDbVisitor::prepareSqls()
 UpdateNoteTopDbVisitor::UpdateNoteTopDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
+    // qInfo() << "UpdateNoteTopDbVisitor constructor called";
 }
 
 /**
@@ -771,6 +814,7 @@ UpdateNoteTopDbVisitor::UpdateNoteTopDbVisitor(QSqlDatabase &db, const void *inP
  */
 bool UpdateNoteTopDbVisitor::prepareSqls()
 {
+    // qInfo() << "Preparing update note top status SQL statements";
     bool fPrepareOK = true;
     const VNoteItem *note = param.newNote;
     if (note != nullptr) {
@@ -786,6 +830,7 @@ bool UpdateNoteTopDbVisitor::prepareSqls()
         qWarning() << "Failed to prepare update note top status SQL: Invalid note";
         fPrepareOK = false;
     }
+    // qInfo() << "Update note top status SQL statements preparation finished, result:" << fPrepareOK;
     return fPrepareOK;
 }
 
@@ -798,6 +843,7 @@ bool UpdateNoteTopDbVisitor::prepareSqls()
 UpdateNoteFolderIdDbVisitor::UpdateNoteFolderIdDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
+    // qInfo() << "UpdateNoteFolderIdDbVisitor constructor called";
 }
 
 /**
@@ -806,6 +852,7 @@ UpdateNoteFolderIdDbVisitor::UpdateNoteFolderIdDbVisitor(QSqlDatabase &db, const
  */
 bool UpdateNoteFolderIdDbVisitor::prepareSqls()
 {
+    // qInfo() << "Preparing update note folder ID SQL statements";
     bool fPrepareOK = true;
     const VNoteItem *note = param.newNote;
     if (note != nullptr) {
@@ -821,6 +868,7 @@ bool UpdateNoteFolderIdDbVisitor::prepareSqls()
         qWarning() << "Failed to prepare update note folder ID SQL: Invalid note";
         fPrepareOK = false;
     }
+    // qInfo() << "Update note folder ID SQL statements preparation finished, result:" << fPrepareOK;
     return fPrepareOK;
 }
 
@@ -833,6 +881,7 @@ bool UpdateNoteFolderIdDbVisitor::prepareSqls()
 DelNoteDbVisitor::DelNoteDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
     : DbVisitor(db, inParam, result)
 {
+    // qInfo() << "DelNoteDbVisitor constructor called";
 }
 
 /**
@@ -841,6 +890,7 @@ DelNoteDbVisitor::DelNoteDbVisitor(QSqlDatabase &db, const void *inParam, void *
  */
 bool DelNoteDbVisitor::prepareSqls()
 {
+    // qInfo() << "Preparing delete note SQL statements";
     bool fPrepareOK = true;
     const VNoteItem *note = param.newNote;
     if (nullptr != note && nullptr != note->folder()) {
@@ -869,5 +919,6 @@ bool DelNoteDbVisitor::prepareSqls()
         fPrepareOK = false;
     }
 
+    // qInfo() << "Delete note SQL statements preparation finished, result:" << fPrepareOK;
     return fPrepareOK;
 }

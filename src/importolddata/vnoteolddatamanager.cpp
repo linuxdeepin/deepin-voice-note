@@ -9,6 +9,7 @@
 #include <DLog>
 
 #include <QThreadPool>
+#include <QDebug>
 
 VNoteOldDataManager *VNoteOldDataManager::_instance = nullptr;
 VNoteDbManager *VNoteOldDataManager::m_oldDbManger = nullptr;
@@ -20,6 +21,7 @@ VNoteDbManager *VNoteOldDataManager::m_oldDbManger = nullptr;
 VNoteOldDataManager::VNoteOldDataManager(QObject *parent)
     : QObject(parent)
 {
+    qInfo() << "VNoteOldDataManager constructor called";
 }
 
 /**
@@ -28,7 +30,9 @@ VNoteOldDataManager::VNoteOldDataManager(QObject *parent)
  */
 VNoteOldDataManager *VNoteOldDataManager::instance()
 {
+    // qInfo() << "VNoteOldDataManager instance requested";
     if (nullptr == _instance) {
+        // qInfo() << "VNoteOldDataManager instance is nullptr, creating new instance";
         _instance = new VNoteOldDataManager();
     }
 
@@ -40,13 +44,16 @@ VNoteOldDataManager *VNoteOldDataManager::instance()
  */
 void VNoteOldDataManager::releaseInstance()
 {
+    // qInfo() << "Releasing VNoteOldDataManager instance";
     if (nullptr != _instance) {
+        // qInfo() << "VNoteOldDataManager instance is not nullptr, deleting old database manager";
         delete m_oldDbManger;
         m_oldDbManger = nullptr;
 
         delete _instance;
         _instance = nullptr;
     }
+    // qInfo() << "VNoteOldDataManager instance released";
 }
 
 /**
@@ -55,6 +62,7 @@ void VNoteOldDataManager::releaseInstance()
  */
 VNOTE_FOLDERS_MAP *VNoteOldDataManager::folders()
 {
+    // qInfo() << "Getting folders data";
     return m_qspNoteFoldersMap.get();
 }
 
@@ -64,6 +72,7 @@ VNOTE_FOLDERS_MAP *VNoteOldDataManager::folders()
  */
 VNOTE_ALL_NOTES_MAP *VNoteOldDataManager::allNotes()
 {
+    // qInfo() << "Getting all notes data";
     return m_qspAllNotes.get();
 }
 
@@ -72,9 +81,11 @@ VNOTE_ALL_NOTES_MAP *VNoteOldDataManager::allNotes()
  */
 void VNoteOldDataManager::initOldDb()
 {
+    qInfo() << "Initializing old database";
     //Init old database when create data manager
     //Bcs data manager depends on db.
     m_oldDbManger = new VNoteDbManager(true, this);
+    qInfo() << "Old database initialization finished";
 }
 
 /**
@@ -82,12 +93,14 @@ void VNoteOldDataManager::initOldDb()
  */
 void VNoteOldDataManager::reqDatas()
 {
+    qInfo() << "Requesting old data";
     OldDataLoadTask *pOldDataLoadTask = new OldDataLoadTask();
     pOldDataLoadTask->setAutoDelete(true);
 
     connect(pOldDataLoadTask, &OldDataLoadTask::finishLoad, this, &VNoteOldDataManager::onFinishLoad);
 
     QThreadPool::globalInstance()->start(pOldDataLoadTask);
+    qInfo() << "Old data request sent";
 }
 
 /**
@@ -95,6 +108,7 @@ void VNoteOldDataManager::reqDatas()
  */
 void VNoteOldDataManager::doUpgrade()
 {
+    qInfo() << "Starting data upgrade";
     OldDataUpgradeTask *pOldDataUpgradeTask = new OldDataUpgradeTask();
     pOldDataUpgradeTask->setAutoDelete(true);
 
@@ -102,6 +116,7 @@ void VNoteOldDataManager::doUpgrade()
     connect(pOldDataUpgradeTask, &OldDataUpgradeTask::progressValue, this, &VNoteOldDataManager::onProgress);
 
     QThreadPool::globalInstance()->start(pOldDataUpgradeTask);
+    qInfo() << "Data upgrade task started";
 }
 
 /**
@@ -109,8 +124,10 @@ void VNoteOldDataManager::doUpgrade()
  */
 void VNoteOldDataManager::onFinishLoad()
 {
+    qInfo() << "Old data loading finished";
     //Just notify data ready.
     emit dataReady();
+    qInfo() << "Data ready signal emitted";
 }
 
 /**
@@ -118,7 +135,9 @@ void VNoteOldDataManager::onFinishLoad()
  */
 void VNoteOldDataManager::onFinishUpgrade()
 {
+    qInfo() << "Data upgrade finished";
     emit upgradeFinish();
+    qInfo() << "Upgrade finish signal emitted";
 }
 
 /**
@@ -127,5 +146,7 @@ void VNoteOldDataManager::onFinishUpgrade()
  */
 void VNoteOldDataManager::onProgress(int value)
 {
+    qInfo() << "Upgrade progress:" << value;
     emit progressValue(value);
+    qInfo() << "Progress value signal emitted";
 }

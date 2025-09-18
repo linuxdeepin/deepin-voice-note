@@ -43,6 +43,7 @@
 
 #include <dguiapplicationhelper.h>
 #include <DSysInfo>
+#include <QDebug>
 
 // 获取字号接口
 const QString APPEARANCE_SERVICE_V23 = "org.deepin.dde.Appearance1";
@@ -71,6 +72,7 @@ WebEngineHandler::WebEngineHandler(QObject *parent)
     , m_voicePlayerHandler(new VoicePlayerHandler(this))
     , m_voiceToTextHandler(new VoiceToTextHandler(this))
 {
+    qInfo() << "WebEngineHandler constructor called";
     initFontsInformation();
     connectWebContent();
 
@@ -91,19 +93,24 @@ WebEngineHandler::WebEngineHandler(QObject *parent)
             Q_EMIT playingVoice(true);
         }
     });
+    qInfo() << "WebEngineHandler constructor finished";
 }
 
 QObject *WebEngineHandler::target() const
 {
+    // qInfo() << "Getting target web engine";
     return m_targetWebEngine;
 }
 
 void WebEngineHandler::setTarget(QObject *targetWebEngine)
 {
+    qInfo() << "Setting target web engine";
     if (targetWebEngine != m_targetWebEngine) {
+        qInfo() << "targetWebEngine is not equal to m_targetWebEngine";
         m_targetWebEngine = targetWebEngine;
         Q_EMIT targetChanged();
     }
+    qInfo() << "Target web engine setting finished";
 }
 
 /**
@@ -112,6 +119,7 @@ void WebEngineHandler::setTarget(QObject *targetWebEngine)
  */
 QVariant WebEngineHandler::callJsSynchronous(const QString &function)
 {
+    qInfo() << "Calling JS function synchronously:" << function;
     if (m_callJsLoop.isRunning()) {
         qCritical() << "reentrant call js function!";
         return {};
@@ -123,6 +131,7 @@ QVariant WebEngineHandler::callJsSynchronous(const QString &function)
         m_callJsLoop.exec();
     }
 
+    qInfo() << "JS function call finished";
     return m_callJsResult;
 }
 
@@ -131,8 +140,10 @@ QVariant WebEngineHandler::callJsSynchronous(const QString &function)
  */
 void WebEngineHandler::onCallJsResult(const QVariant &result)
 {
+    qInfo() << "JS call result received";
     m_callJsResult = result;
     m_callJsLoop.exit();
+    qInfo() << "JS call result handling finished";
 }
 
 /**
@@ -188,6 +199,7 @@ void WebEngineHandler::initFontsInformation()
     } else {
         qWarning() << "Font service initialization failed. Service:" << DEEPIN_DAEMON_APPEARANCE_SERVICE << "not found";
     }
+    qInfo() << "Fonts information initialization finished";
 }
 
 /*!
@@ -195,6 +207,7 @@ void WebEngineHandler::initFontsInformation()
  */
 void WebEngineHandler::connectWebContent()
 {
+    qInfo() << "Connecting web content";
     connect(JsContent::instance(), &JsContent::getfontinfo, this, [this]() {
         Q_EMIT JsContent::instance()->callJsSetFontList(m_fontList, m_defaultFont);
     });
@@ -209,6 +222,7 @@ void WebEngineHandler::connectWebContent()
     connect(JsContent::instance(), &JsContent::viewPictrue, this, &WebEngineHandler::viewPicture);
     connect(JsContent::instance(), &JsContent::saveAudio, this, &WebEngineHandler::saveAudio);
     connect(JsContent::instance(), &JsContent::createNote, this, &WebEngineHandler::createNote);
+    qInfo() << "Web content connection finished";
 }
 
 /*!
@@ -217,6 +231,7 @@ void WebEngineHandler::connectWebContent()
 #ifdef USE_QT5
 void WebEngineHandler::onContextMenuRequested(QObject *request)
 {
+    qInfo() << "Context menu requested";
     // 从 QObject* 中安全地获取属性
     const QPoint pos = request->property("position").toPoint();
 
@@ -238,10 +253,12 @@ void WebEngineHandler::onContextMenuRequested(QObject *request)
     default:
         break;
     }
+    qInfo() << "Context menu request handling finished";
 }
 #else
 void WebEngineHandler::onContextMenuRequested(QWebEngineContextMenuRequest *request)
 {
+    qInfo() << "Context menu requested";
     switch (menuType) {
     case VoiceMenu: {
         processVoiceMenuRequest(request);
@@ -255,6 +272,7 @@ void WebEngineHandler::onContextMenuRequested(QWebEngineContextMenuRequest *requ
     default:
         break;
     }
+    qInfo() << "Context menu request handling finished";
 }
 #endif
 
@@ -282,6 +300,7 @@ void WebEngineHandler::onInsertVoiceItem(const QString &voicePath, quint64 voice
         return;
     }
     emit JsContent::instance()->callJsInsertVoice(value.toString());
+    qInfo() << "Voice item insertion finished";
 }
 
 /**
@@ -301,6 +320,7 @@ void WebEngineHandler::onThemeChanged()
     QString backgroundColor = DGuiApplicationHelper::LightType == theme ? "#FBFCFD" : "#090A17";
     // 现在背景色主要由 qml 组件和 web 前端 css 共同实现，但在 sw 下保留兼容设置
     emit JsContent::instance()->callJsSetTheme(theme, activeHightColor, disableHightColor, backgroundColor);
+    qInfo() << "Theme change handling finished";
 }
 
 /**
@@ -308,8 +328,10 @@ void WebEngineHandler::onThemeChanged()
  */
 void WebEngineHandler::onSaveMenuParam(int type, const QVariant &json)
 {
+    qInfo() << "Saving menu parameter, type:" << type;
     menuType = static_cast<Menu>(type);
     menuJson = json;
+    qInfo() << "Menu parameter saving finished";
 }
 
 /**
@@ -317,6 +339,7 @@ void WebEngineHandler::onSaveMenuParam(int type, const QVariant &json)
  */
 void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
 {
+    qInfo() << "Menu clicked, kind:" << kind;
     switch (kind) {
         case ActionManager::VoiceAsSave:
             // 另存语音
@@ -425,6 +448,7 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
         default:
             break;
     }
+    qInfo() << "Menu click handling finished";
 }
 
 /**
@@ -435,6 +459,7 @@ void WebEngineHandler::onPaste(bool isVoice)
 {
     qDebug() << "Paste operation requested, isVoice:" << isVoice;
     if (isVoice) {
+        qInfo() << "Paste operation requested, isVoice is true";
         Q_EMIT triggerWebAction(QWebEnginePage::Paste);
         return;
     }
@@ -444,6 +469,7 @@ void WebEngineHandler::onPaste(bool isVoice)
     const QMimeData *mimeData = clipboard->mimeData();
     // 存在文件url
     if (mimeData->hasUrls()) {
+        qInfo() << "mimeData has urls";
         QStringList paths;
         for (auto url : mimeData->urls()) {
             paths.push_back(url.path());
@@ -458,6 +484,7 @@ void WebEngineHandler::onPaste(bool isVoice)
         qDebug() << "Pasting text content";
         Q_EMIT triggerWebAction(QWebEnginePage::Paste);
     }
+    qInfo() << "Paste operation finished";
 }
 
 /*!
@@ -466,6 +493,7 @@ void WebEngineHandler::onPaste(bool isVoice)
 #ifdef USE_QT5
 void WebEngineHandler::processVoiceMenuRequest(QObject *request)
 {
+    qInfo() << "Processing voice menu request";
     m_voiceBlock.reset(new VNVoiceBlock);
     MetaDataParser dataParser;
     // 解析json数据
@@ -489,19 +517,23 @@ void WebEngineHandler::processVoiceMenuRequest(QObject *request)
     // 请求界面弹出右键菜单
     const QPoint pos = request->property("position").toPoint();
     Q_EMIT requestShowMenu(VoiceMenu, pos);
+    qInfo() << "Voice menu request processing finished";
 }
 #else
 void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *request)
 {
+    qInfo() << "Processing voice menu request";
     m_voiceBlock.reset(new VNVoiceBlock);
     MetaDataParser dataParser;
     // 解析json数据
     if (!dataParser.parse(menuJson, m_voiceBlock.get())) {
+        qInfo() << "Failed to parse menu json";
         return;
     }
 
     // 语音文件不存在使用弹出提示
     if (!QFile(m_voiceBlock->voicePath).exists()) {
+        qInfo() << "Voice file does not exist";
         // 异步操作，防止阻塞前端事件
         QTimer::singleShot(0, this, [this] {
             Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::VoicePathNoAvail);
@@ -515,6 +547,7 @@ void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *req
     ActionManager::instance()->enableAction(ActionManager::VoiceToText, !OpsStateInterface::instance()->isVoice2Text());
     // 请求界面弹出右键菜单
     Q_EMIT requestShowMenu(VoiceMenu, request->position());
+    qInfo() << "Voice menu request processing finished";
 }
 #endif
 
@@ -524,6 +557,7 @@ void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *req
 #ifdef USE_QT5
 void WebEngineHandler::processTextMenuRequest(QObject *request)
 {
+    qInfo() << "Processing text menu request";
     // 此处的逻辑是"兜底"，主要逻辑已由QML实现，以确保在所有情况下状态正确
     const int intFlags = request->property("editFlags").toInt();
     auto flags = static_cast<QWebEngineContextMenuData::EditFlags>(intFlags);
@@ -534,29 +568,36 @@ void WebEngineHandler::processTextMenuRequest(QObject *request)
 
     // 设置普通菜单项状态
     if (flags.testFlag(QWebEngineContextMenuData::CanSelectAll)) {
+        qInfo() << "flags has CanSelectAll";
         ActionManager::instance()->enableAction(ActionManager::TxtSelectAll, true);
     }
     if (flags.testFlag(QWebEngineContextMenuData::CanCopy)) {
+        qInfo() << "flags has CanCopy";
         ActionManager::instance()->enableAction(ActionManager::TxtCopy, true);
         ActionManager::instance()->enableAction(ActionManager::TxtSpeech, true);
     }
     if (flags.testFlag(QWebEngineContextMenuData::CanCut)) {
+        qInfo() << "flags has CanCut";
         ActionManager::instance()->enableAction(ActionManager::TxtCut, true);
     }
     if (flags.testFlag(QWebEngineContextMenuData::CanDelete)) {
+        qInfo() << "flags has CanDelete";
         ActionManager::instance()->enableAction(ActionManager::TxtDelete, true);
     }
     if (flags.testFlag(QWebEngineContextMenuData::CanPaste)) {
+        qInfo() << "flags has CanPaste";
         ActionManager::instance()->enableAction(ActionManager::TxtPaste, true);
         ActionManager::instance()->enableAction(ActionManager::TxtDictation, true);
     }
 
     const QPoint pos = request->property("position").toPoint();
     Q_EMIT requestShowMenu(TxtMenu, pos);
+    qInfo() << "Text menu request processing finished";
 }
 #else
 void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *request)
 {
+    qInfo() << "Processing text menu request";
     ActionManager::instance()->resetCtxMenu(ActionManager::MenuType::TxtCtxMenu, false); // 重置菜单选项
 
     // TASK-37707: Disable now
@@ -567,29 +608,35 @@ void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *requ
     // 设置普通菜单项状态
     // 可全选
     if (flags.testFlag(QWebEngineContextMenuRequest::CanSelectAll)) {
+        qInfo() << "flags has CanSelectAll";
         ActionManager::instance()->enableAction(ActionManager::TxtSelectAll, true);
     }
     // 可复制
     if (flags.testFlag(QWebEngineContextMenuRequest::CanCopy)) {
+        qInfo() << "flags has CanCopy";
         ActionManager::instance()->enableAction(ActionManager::TxtCopy, true);
         ActionManager::instance()->enableAction(ActionManager::TxtSpeech, true);
     }
     // 可剪切
     if (flags.testFlag(QWebEngineContextMenuRequest::CanCut)) {
+        qInfo() << "flags has CanCut";
         ActionManager::instance()->enableAction(ActionManager::TxtCut, true);
     }
     // 可删除
     if (flags.testFlag(QWebEngineContextMenuRequest::CanDelete)) {
+        qInfo() << "flags has CanDelete";
         ActionManager::instance()->enableAction(ActionManager::TxtDelete, true);
     }
     // 可粘贴
     if (flags.testFlag(QWebEngineContextMenuRequest::CanPaste)) {
+        qInfo() << "flags has CanPaste";
         ActionManager::instance()->enableAction(ActionManager::TxtPaste, true);
         ActionManager::instance()->enableAction(ActionManager::TxtDictation, true);
     }
 
     // 请求界面弹出右键菜单
     Q_EMIT requestShowMenu(TxtMenu, request->position());
+    qInfo() << "Text menu request processing finished";
 }
 #endif
 
@@ -601,6 +648,7 @@ void WebEngineHandler::processTextMenuRequest(QWebEngineContextMenuRequest *requ
 #else
 void WebEngineHandler::processPictureMenuRequest(QWebEngineContextMenuRequest *request)
 {
+    qInfo() << "Processing picture menu request";
     ActionManager::instance()->resetCtxMenu(ActionManager::MenuType::PictureCtxMenu, true);
 
     auto flags = request->editFlags();
@@ -608,26 +656,32 @@ void WebEngineHandler::processPictureMenuRequest(QWebEngineContextMenuRequest *r
     // 设置普通菜单项状态
     // 可全选
     if (flags.testFlag(QWebEngineContextMenuRequest::CanSelectAll)) {
+        qInfo() << "flags has CanSelectAll";
         ActionManager::instance()->enableAction(ActionManager::PictureSelectAll, true);
     }
     // 可复制
     if (flags.testFlag(QWebEngineContextMenuRequest::CanCopy)) {
+        qInfo() << "flags has CanCopy";
         ActionManager::instance()->enableAction(ActionManager::PictureCopy, true);
     }
     // 可剪切
     if (flags.testFlag(QWebEngineContextMenuRequest::CanCut)) {
+        qInfo() << "flags has CanCut";
         ActionManager::instance()->enableAction(ActionManager::PictureCut, true);
     }
     // 可删除
     if (flags.testFlag(QWebEngineContextMenuRequest::CanDelete)) {
+        qInfo() << "flags has CanDelete";
         ActionManager::instance()->enableAction(ActionManager::PictureDelete, true);
     }
     // 可粘贴
     if (flags.testFlag(QWebEngineContextMenuRequest::CanPaste)) {
+        qInfo() << "flags has CanPaste";
         ActionManager::instance()->enableAction(ActionManager::PicturePaste, true);
     }
 
     Q_EMIT requestShowMenu(PictureMenu, request->position());
+    qInfo() << "Picture menu request processing finished";
 }
 #endif
 
@@ -636,12 +690,14 @@ void WebEngineHandler::processPictureMenuRequest(QWebEngineContextMenuRequest *r
  */
 bool WebEngineHandler::isVoicePaste()
 {
+    qInfo() << "Checking if voice paste";
     // 调用web前端接口
     return callJsSynchronous("returnCopyFlag()").toBool();
 }
 
 bool WebEngineHandler::saveMP3()
 {
+    qInfo() << "Saving MP3";
     if (!m_voiceBlock) {
         qWarning() << "No voice block available for saving";
         return false;
@@ -650,8 +706,10 @@ bool WebEngineHandler::saveMP3()
     QString savedPath = setting::instance()->getOption(VNOTE_EXPORT_TEXT_PATH_KEY).toString();
     QString defaultDir;
     if (!savedPath.isEmpty()) {
+        qInfo() << "savedPath is not empty";
         defaultDir = savedPath;
     } else {
+        qInfo() << "savedPath is empty";
         defaultDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     }
     
@@ -659,6 +717,7 @@ bool WebEngineHandler::saveMP3()
     qDebug() << "Saving MP3 with default name:" << defaultName;
     QString fileName = QFileDialog::getSaveFileName(0, tr("save as MP3"), defaultName, "*.mp3");
     if (!fileName.isEmpty()) {
+        qInfo() << "fileName is not empty";
         QFileInfo fileInfo(fileName);
         QDir dir = fileInfo.absoluteDir();
         if (!dir.exists()) {
@@ -672,13 +731,16 @@ bool WebEngineHandler::saveMP3()
         QFile tmpFile(m_voiceBlock.get()->voicePath);
         return tmpFile.copy(fileName);
     }
+    qInfo() << "MP3 saving finished, result is true";
     return true;
 }
 
 void WebEngineHandler::savePictureAs()
 {
+    qInfo() << "Saving picture as";
     QString originalPath = menuJson.toString();  // 获取原图片路径
     saveAsFile(originalPath, QStandardPaths::writableLocation(QStandardPaths::PicturesLocation), "image");
+    qInfo() << "Picture saving finished";
 }
 
 QString WebEngineHandler::saveAsFile(const QString &originalPath, QString dirPath, const QString &defalutName)
@@ -686,6 +748,7 @@ QString WebEngineHandler::saveAsFile(const QString &originalPath, QString dirPat
     // 存储文件夹默认为桌面
     qDebug() << "Saving file, original path:" << originalPath << "default name:" << defalutName;
     if (dirPath.isEmpty()) {
+        qInfo() << "dirPath is empty";
         dirPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
     }
 
@@ -701,6 +764,7 @@ QString WebEngineHandler::saveAsFile(const QString &originalPath, QString dirPat
     }
     // 添加文件后缀
     if (!newPath.endsWith(fileInfo.suffix())) {
+        qInfo() << "newPath does not end with fileInfo.suffix";
         newPath += ("." + fileInfo.suffix());
     }
 
@@ -711,6 +775,7 @@ QString WebEngineHandler::saveAsFile(const QString &originalPath, QString dirPat
         return "";
     }
     if (info.exists()) {
+        qInfo() << "File already exists";
         // 文件已存在，删除原文件
         if (!info.isWritable()) {
             qWarning() << "No write permission for file:" << newPath;

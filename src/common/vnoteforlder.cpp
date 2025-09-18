@@ -6,6 +6,7 @@
 #include "vnoteforlder.h"
 #include "common/vnotedatamanager.h"
 #include "db/vnoteitemoper.h"
+#include <QDebug>
 
 // #include <DLog>
 
@@ -14,6 +15,7 @@
  */
 VNoteFolder::VNoteFolder()
 {
+    qInfo() << "VNoteFolder constructor called";
 }
 
 /**
@@ -21,6 +23,7 @@ VNoteFolder::VNoteFolder()
  */
 VNoteFolder::~VNoteFolder()
 {
+    // qInfo() << "VNoteFolder destructor called";
 }
 
 /**
@@ -29,6 +32,7 @@ VNoteFolder::~VNoteFolder()
  */
 bool VNoteFolder::isValid()
 {
+    // qInfo() << "Checking if folder is valid, id:" << id;
     return (id > INVALID_ID) ? true : false;
 }
 
@@ -38,6 +42,7 @@ bool VNoteFolder::isValid()
  */
 qint32 &VNoteFolder::maxNoteIdRef()
 {
+    // qInfo() << "Getting max note ID reference";
     return maxNoteId;
 }
 
@@ -47,16 +52,19 @@ qint32 &VNoteFolder::maxNoteIdRef()
  */
 qint32 VNoteFolder::getNotesCount()
 {
+    // qInfo() << "Getting notes count";
     int nCount = 0;
 
     VNOTE_ITEMS_MAP *folderNotes = getNotes();
 
     if (Q_LIKELY(nullptr != folderNotes)) {
+        qInfo() << "folderNotes is not nullptr";
         folderNotes->lock.lockForRead();
         nCount = folderNotes->folderNotes.count();
         folderNotes->lock.unlock();
     }
 
+    qInfo() << "Notes count retrieval finished, count:" << nCount;
     return nCount;
 }
 
@@ -66,10 +74,13 @@ qint32 VNoteFolder::getNotesCount()
  */
 VNOTE_ITEMS_MAP *VNoteFolder::getNotes()
 {
+    qInfo() << "Getting notes";
     if (Q_UNLIKELY(nullptr == notes)) {
+        qInfo() << "notes is nullptr";
         VNOTE_ITEMS_MAP *folderNotes = VNoteDataManager::instance()->getFolderNotes(id);
         notes = folderNotes;
     }
 
+    qInfo() << "Notes retrieval finished";
     return notes;
 }

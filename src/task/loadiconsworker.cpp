@@ -24,6 +24,7 @@ QReadWriteLock VNoteDataManager::m_iconLock;
 LoadIconsWorker::LoadIconsWorker(QObject *parent)
     : VNTask(parent)
 {
+    qInfo() << "LoadIconsWorker constructor called";
     //Hold the lock at constructor, this can void
     //other thread acess the icons before that being
     //loaded.
@@ -37,6 +38,7 @@ LoadIconsWorker::LoadIconsWorker(QObject *parent)
  */
 QPixmap LoadIconsWorker::greyPix(QPixmap pix)
 {
+    qInfo() << "LoadIconsWorker greyPix called";
     // 输入验证
     if (pix.isNull() || pix.size().isEmpty()) {
         qWarning() << "LoadIconsWorker::greyPix: Invalid input pixmap";

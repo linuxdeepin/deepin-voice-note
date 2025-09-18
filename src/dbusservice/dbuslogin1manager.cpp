@@ -15,6 +15,7 @@
  */
 
 #include "dbuslogin1manager.h"
+#include <QDebug>
 
 /*
  * Implementation of interface class DBusLogin1Manager
@@ -23,14 +24,18 @@
 DBusLogin1Manager::DBusLogin1Manager(const QString &service, const QString &path, const QDBusConnection &connection, QObject *parent)
     : QDBusAbstractInterface(service, path, staticInterfaceName(), connection, parent)
 {
+    // qInfo() << "DBusLogin1Manager constructor called with service:" << service << "path:" << path;
     QDBusConnection::systemBus().connect(this->service(), this->path(), "org.freedesktop.DBus.Properties", "PropertiesChanged", "sa{sv}as", this, SLOT(__propertyChanged__(QDBusMessage)));
     Inhibit::registerMetaType();
     UserInfo::registerMetaType();
     SeatInfo::registerMetaType();
     SessionInfo::registerMetaType();
+    // qInfo() << "DBusLogin1Manager constructor finished";
 }
 
 DBusLogin1Manager::~DBusLogin1Manager()
 {
+    // qInfo() << "DBusLogin1Manager destructor called";
     QDBusConnection::systemBus().disconnect(this->service(), this->path(), "org.freedesktop.DBus.Properties", "PropertiesChanged", "sa{sv}as", this, SLOT(__propertyChanged__(QDBusMessage)));
+    // qInfo() << "DBusLogin1Manager destructor finished";
 }

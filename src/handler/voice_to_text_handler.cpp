@@ -21,6 +21,7 @@ VoiceToTextHandler::VoiceToTextHandler(QObject *parent)
     : QObject { parent }
     , m_a2tManager(new VNoteA2TManager(this))
 {
+    qInfo() << "VoiceToTextHandler constructor called";
     connect(m_a2tManager, &VNoteA2TManager::asrError, this, &VoiceToTextHandler::onA2TError);
     connect(m_a2tManager, &VNoteA2TManager::asrSuccess, this, &VoiceToTextHandler::onA2TSuccess);
 }
@@ -54,6 +55,7 @@ void VoiceToTextHandler::setAudioToText(const QSharedPointer<VNVoiceBlock> &voic
 
 void VoiceToTextHandler::onA2TStart()
 {
+    qInfo() << "VoiceToTextHandler onA2TStart called";
     OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, true);
     Q_EMIT JsContent::instance()->callJsSetVoiceText(QString(""), JsContent::AsrFlag::Start);
     QTimer::singleShot(0, this, [this]() { m_a2tManager->startAsr(m_voiceBlock->voicePath, m_voiceBlock->voiceSize); });
@@ -78,6 +80,7 @@ bool VoiceToTextHandler::checkNetworkState()
 
 void VoiceToTextHandler::onA2TError(int error)
 {
+    qInfo() << "VoiceToTextHandler onA2TError called";
     // TODO(renbin): 弹窗提示
     Q_EMIT JsContent::instance()->callJsSetVoiceText("", JsContent::AsrFlag::End);
     OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, false);
@@ -85,6 +88,7 @@ void VoiceToTextHandler::onA2TError(int error)
 
 void VoiceToTextHandler::onA2TSuccess(const QString &text)
 {
+    qInfo() << "VoiceToTextHandler onA2TSuccess called";
     Q_EMIT JsContent::instance()->callJsSetVoiceText(text, JsContent::AsrFlag::End);
     OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, false);
 }

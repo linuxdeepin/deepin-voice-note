@@ -74,6 +74,7 @@ VNoteItem::VNoteItem()
  */
 bool VNoteItem::isValid()
 {
+    qInfo() << "Checking note validity - ID:" << noteId << "Folder ID:" << folderId;
     bool valid = (noteId > INVALID_ID && folderId > INVALID_ID);
     qDebug() << "Checking note validity - ID:" << noteId << "Folder ID:" << folderId << "Valid:" << valid;
     return valid;
@@ -84,10 +85,12 @@ bool VNoteItem::isValid()
  */
 void VNoteItem::delNoteData()
 {
+    qInfo() << "Deleting note data for note ID:" << noteId;
     //Clear note attachments
     for (auto it : datas.datas) {
         it->releaseSpecificData();
     }
+    qInfo() << "Note data deletion finished";
 }
 
 /**
@@ -125,6 +128,7 @@ bool VNoteItem::search(const QString &keyword)
         }
     }
 
+    qInfo() << "Search finished, result:" << fContainKeyword;
     return fContainKeyword;
 }
 
@@ -141,7 +145,9 @@ bool VNoteItem::search(const QString &keyword)
  */
 void VNoteItem::setMetadata(const QVariant &meta)
 {
+    qInfo() << "Setting metadata for note ID:" << noteId;
     metaData = meta;
+    qInfo() << "Metadata setting finished";
 }
 
 /**
@@ -150,7 +156,9 @@ void VNoteItem::setMetadata(const QVariant &meta)
  */
 void VNoteItem::setFolder(VNoteFolder *folder)
 {
+    qInfo() << "Setting folder for note ID:" << noteId;
     ownFolder = folder;
+    qInfo() << "Folder setting finished";
 }
 
 /**
@@ -159,6 +167,7 @@ void VNoteItem::setFolder(VNoteFolder *folder)
  */
 VNoteFolder *VNoteItem::folder() const
 {
+    // qInfo() << "Getting folder for note ID:" << noteId;
     return ownFolder;
 }
 
@@ -168,6 +177,7 @@ VNoteFolder *VNoteItem::folder() const
  */
 QVariant &VNoteItem::metaDataRef()
 {
+    // qInfo() << "Getting metadata reference for note ID:" << noteId;
     return metaData;
 }
 
@@ -177,6 +187,7 @@ QVariant &VNoteItem::metaDataRef()
  */
 const QVariant &VNoteItem::metaDataConstRef() const
 {
+    // qInfo() << "Getting const metadata reference for note ID:" << noteId;
     return metaData;
 }
 
@@ -186,6 +197,7 @@ const QVariant &VNoteItem::metaDataConstRef() const
  */
 qint32 &VNoteItem::maxVoiceIdRef()
 {
+    // qInfo() << "Getting max voice ID reference for note ID:" << noteId;
     return maxVoiceId;
 }
 
@@ -195,6 +207,7 @@ qint32 &VNoteItem::maxVoiceIdRef()
  */
 qint32 VNoteItem::voiceMaxId() const
 {
+    // qInfo() << "Getting voice max ID for note ID:" << noteId;
     return maxVoiceId;
 }
 
@@ -205,6 +218,7 @@ qint32 VNoteItem::voiceMaxId() const
  */
 VNoteBlock *VNoteItem::newBlock(int type)
 {
+    // qInfo() << "Creating new block of type:" << type << "for note ID:" << noteId;
     return datas.newBlock(type);
 }
 
@@ -214,11 +228,13 @@ VNoteBlock *VNoteItem::newBlock(int type)
  */
 void VNoteItem::addBlock(VNoteBlock *block)
 {
+    qInfo() << "Adding block to note ID:" << noteId << "block type:" << block->getType();
     if (VNoteBlock::Voice == block->getType()) {
         maxVoiceId++;
     }
 
     datas.addBlock(block);
+    qInfo() << "Block addition finished";
 }
 
 /**
@@ -228,11 +244,13 @@ void VNoteItem::addBlock(VNoteBlock *block)
  */
 void VNoteItem::addBlock(VNoteBlock *before, VNoteBlock *block)
 {
+    qInfo() << "Adding block before another block to note ID:" << noteId << "block type:" << block->getType();
     if (VNoteBlock::Voice == block->getType()) {
         maxVoiceId++;
     }
 
     datas.addBlock(before, block);
+    qInfo() << "Block addition finished";
 }
 
 /**
@@ -241,7 +259,9 @@ void VNoteItem::addBlock(VNoteBlock *before, VNoteBlock *block)
  */
 void VNoteItem::delBlock(VNoteBlock *block)
 {
+    qInfo() << "Deleting block from note ID:" << noteId << "block type:" << block->getType();
     datas.delBlock(block);
+    qInfo() << "Block deletion finished";
 }
 
 /**
@@ -253,7 +273,9 @@ bool VNoteItem::haveVoice() const
 {
     qDebug() << "Checking for voice content in note ID:" << noteId;
     if (htmlCode.isEmpty()) {
-        return datas.voiceBlocks.size() > 0;
+        bool hasVoice = datas.voiceBlocks.size() > 0;
+        qInfo() << "Voice content check finished, result:" << hasVoice;
+        return hasVoice;
     }
     //匹配语音块标签的正则表达式
     QRegularExpression rx("<div.+jsonkey.+>");
@@ -296,10 +318,14 @@ qint32 VNoteItem::voiceCount() const
     qDebug() << "Getting voice count for note ID:" << noteId;
     //老版本
     if (htmlCode.isEmpty()) {
-        return datas.voiceBlocks.size();
+        qint32 count = datas.voiceBlocks.size();
+        qInfo() << "Voice count retrieval finished, count:" << count;
+        return count;
     }
     //新富文本版本
-    return getVoiceJsons().size();
+    qint32 count = getVoiceJsons().size();
+    qInfo() << "Voice count retrieval finished, count:" << count;
+    return count;
 }
 
 /**
@@ -408,6 +434,7 @@ QDebug &operator<<(QDebug &out, VNoteItem &noteItem)
 VNoteBlock::VNoteBlock(qint32 type)
     : blockType(type)
 {
+    // qInfo() << "Creating VNoteBlock of type:" << type;
     ptrBlock = this;
 }
 
@@ -416,6 +443,7 @@ VNoteBlock::VNoteBlock(qint32 type)
  */
 VNoteBlock::~VNoteBlock()
 {
+    // qInfo() << "Destroying VNoteBlock";
 }
 
 /**
@@ -424,6 +452,7 @@ VNoteBlock::~VNoteBlock()
  */
 qint32 VNoteBlock::getType()
 {
+    // qInfo() << "Getting block type:" << blockType;
     return blockType;
 }
 
@@ -433,11 +462,12 @@ qint32 VNoteBlock::getType()
 VNTextBlock::VNTextBlock()
     : VNoteBlock(Text)
 {
+    // qInfo() << "Creating VNTextBlock";
 }
 
 VNTextBlock::~VNTextBlock()
 {
-    qDebug() << "Destroying text block";
+    // qDebug() << "Destroying text block";
 }
 
 /**
@@ -445,10 +475,12 @@ VNTextBlock::~VNTextBlock()
  */
 void VNTextBlock::releaseSpecificData()
 {
+    // qInfo() << "Releasing text block specific data";
     //TODO:
     //    Add text specific operation code here.
     //
     //Do nothing for text now.
+    // qInfo() << "Text block specific data release finished";
 }
 
 /**
@@ -457,12 +489,13 @@ void VNTextBlock::releaseSpecificData()
 VNVoiceBlock::VNVoiceBlock()
     : VNoteBlock(Voice)
 {
+    // qInfo() << "Creating VNVoiceBlock";
     blockType = Voice;
 }
 
 VNVoiceBlock::~VNVoiceBlock()
 {
-    qDebug() << "Destroying voice block";
+    // qDebug() << "Destroying voice block";
 }
 
 /**

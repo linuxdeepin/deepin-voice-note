@@ -31,6 +31,7 @@ void AudioWatcher::initDeviceWacther()
                                               AudioInterface,
                                               QDBusConnection::sessionBus());
     if (m_audioDBusInterface->isValid()) {
+        qInfo() << "m_audioDBusInterface is valid";
         m_defaultSourcePath = m_audioDBusInterface->property("DefaultSource").value<QDBusObjectPath>().path();
         initDefaultSourceDBusInterface();
         m_defaultSinkPath = m_audioDBusInterface->property("DefaultSink").value<QDBusObjectPath>().path();
@@ -75,12 +76,15 @@ void AudioWatcher::initConnections()
 
 bool AudioWatcher::isVirtualMachineHw()
 {
+    qInfo() << "Checking if virtual machine hardware";
     bool isVirtualMachine = false;
     QString reslut = vnSystemInfo();
     if (reslut.isEmpty()) {
+        qInfo() << "reslut is empty";
         return isVirtualMachine;
     }
     if (!reslut.contains("none")) {
+        qInfo() << "reslut contains none";
         isVirtualMachine = true;
     }
     return isVirtualMachine;
@@ -88,7 +92,7 @@ bool AudioWatcher::isVirtualMachineHw()
 
 QString AudioWatcher::vnSystemInfo()
 {
-
+    qInfo() << "Getting system information";
     QProcess process;
     process.start("systemd-detect-virt");
     process.waitForFinished();
@@ -97,11 +101,13 @@ QString AudioWatcher::vnSystemInfo()
     QString reslut = QString(QLatin1String( tempArray.data()));
     qDebug() << "reslut: " << reslut;
     process.close();
+    qInfo() << "System information:" << reslut;
     return reslut;
 }
 
 void AudioWatcher::updateDeviceEnabled(const QString cardsStr, bool isEmitSig)
 {
+    qInfo() << "Updating audio device status";
     QJsonDocument doc = QJsonDocument::fromJson(cardsStr.toUtf8());
     QJsonArray cards = doc.array();
     if(cards.isEmpty()){
@@ -155,8 +161,10 @@ void AudioWatcher::updateDeviceEnabled(const QString cardsStr, bool isEmitSig)
 
 AudioPort AudioWatcher::currentAuidoPort(const QList<AudioPort> &auidoPorts,AudioMode audioMode)
 {
+    qInfo() << "Getting current audio port";
     AudioPort currentAudioPort;
     if(auidoPorts.count()){
+        qInfo() << "auidoPorts is not empty";
         foreach (AudioPort audioPort, auidoPorts) {
             AudioPort defaultAudioPort;
             if(audioMode == AudioMode::Internal){
@@ -172,16 +180,20 @@ AudioPort AudioWatcher::currentAuidoPort(const QList<AudioPort> &auidoPorts,Audi
             }
         }
     }else{
+        qInfo() << "auidoPorts is empty";
         currentAudioPort.name = "null";
         currentAudioPort.description = "null";
         currentAudioPort.availability = 1;
     }
+    qInfo() << "Current audio port:" << currentAudioPort.name;
     return currentAudioPort;
 }
 
 void AudioWatcher::initDefaultSourceDBusInterface()
 {
+    qInfo() << "Initializing default source DBus interface";
     if (m_defaultSourceDBusInterface) {
+        qInfo() << "m_defaultSourceDBusInterface is not nullptr";
         delete m_defaultSourceDBusInterface;
         m_defaultSourceDBusInterface = nullptr;
     }
@@ -190,6 +202,7 @@ void AudioWatcher::initDefaultSourceDBusInterface()
                                                       SourceInterface,
                                                       QDBusConnection::sessionBus());
     if (m_defaultSourceDBusInterface->isValid()) {
+        qInfo() << "m_defaultSourceDBusInterface is valid";
         m_inAudioPortVolume = defaultSourceVolume();
         m_inAudioPort = defaultSourceActivePort();
         m_inAudioMute = defaultSourceMute();
@@ -204,11 +217,14 @@ void AudioWatcher::initDefaultSourceDBusInterface()
     } else {
         qWarning() << "Default audio input source initialization failed！By default, the source address is entered (" << m_defaultSourcePath << ") does not exist";
     }
+    qInfo() << "Default audio input source initialization finished";
 }
 
 void AudioWatcher::initDefaultSinkDBusInterface()
 {
+    qInfo() << "Initializing default sink DBus interface";
     if (m_defaultSinkDBusInterface) {
+        qInfo() << "m_defaultSinkDBusInterface is not nullptr";
         delete m_defaultSinkDBusInterface;
         m_defaultSinkDBusInterface = nullptr;
     }
@@ -217,6 +233,7 @@ void AudioWatcher::initDefaultSinkDBusInterface()
                                                     SinkInterface,
                                                     QDBusConnection::sessionBus());
     if (m_defaultSinkDBusInterface->isValid()) {
+        qInfo() << "m_defaultSinkDBusInterface is valid";
         m_outAudioPortVolume = defaultSinkVolume();
         m_outAudioPort = defaultSinkActivePort();
         m_outAudioMute = defaultSinkMute();
@@ -232,10 +249,12 @@ void AudioWatcher::initDefaultSinkDBusInterface()
     } else {
         qWarning() << "Default audio output source initialization failed！The default output source address (" << m_defaultSinkPath << ") does not exist";
     }
+    qInfo() << "Default audio output source initialization finished";
 }
 
 void AudioWatcher::onDBusAudioPropertyChanged(QDBusMessage msg)
 {
+    qInfo() << "Audio property changed";
     QList<QVariant> arguments = msg.arguments();
     if (3 != arguments.count()) {
         qWarning() << "Invalid DBus message received: incorrect argument count";
@@ -245,6 +264,7 @@ void AudioWatcher::onDBusAudioPropertyChanged(QDBusMessage msg)
     qInfo() << "Audio property changed on interface:" << interfaceName;
     
     if (interfaceName == AudioInterface) {
+        qInfo() << "Audio property changed on interface:" << interfaceName;
         QVariantMap changedProps = qdbus_cast<QVariantMap>(arguments.at(1).value<QDBusArgument>());
         QStringList keys =  changedProps.keys();
         foreach (const QString &prop, keys) {
@@ -269,6 +289,7 @@ void AudioWatcher::onDBusAudioPropertyChanged(QDBusMessage msg)
             }
         }
     } else if (interfaceName == SourceInterface) {
+        qInfo() << "Audio property changed on interface:" << interfaceName;
         QVariantMap changedProps = qdbus_cast<QVariantMap>(arguments.at(1).value<QDBusArgument>());
         QStringList keys =  changedProps.keys();
         foreach (const QString &prop, keys) {
@@ -291,6 +312,7 @@ void AudioWatcher::onDBusAudioPropertyChanged(QDBusMessage msg)
             }
         }
     } else if (interfaceName == SinkInterface) {
+        qInfo() << "Audio property changed on interface:" << interfaceName;
         QVariantMap changedProps = qdbus_cast<QVariantMap>(arguments.at(1).value<QDBusArgument>());
         QStringList keys =  changedProps.keys();
         foreach (const QString &prop, keys) {
@@ -312,6 +334,7 @@ void AudioWatcher::onDBusAudioPropertyChanged(QDBusMessage msg)
             }
         }
     }
+    qInfo() << "Audio property changed on interface:" << interfaceName << "finished";
 }
 
 void AudioWatcher::onSourceVolumeChanged(double value)
@@ -320,10 +343,13 @@ void AudioWatcher::onSourceVolumeChanged(double value)
     m_inAudioPortVolume = value;
     AudioPort activePort = defaultSourceActivePort();
     if (m_inAudioPort.name == activePort.name) {
+        qInfo() << "Input device volume changed from" << m_inAudioPortVolume << "to" << value << "and active port is the same";
         emit sigVolumeChange(Micphone);
     } else {
+        qInfo() << "Input device volume changed from" << m_inAudioPortVolume << "to" << value << "and active port is not the same";
         m_inAudioPort = activePort;
     }
+    qInfo() << "Input device volume changed finished";
 }
 
 void AudioWatcher::onSinkVolumeChanged(double value)
@@ -332,15 +358,20 @@ void AudioWatcher::onSinkVolumeChanged(double value)
     m_outAudioPortVolume = value;
     AudioPort activePort = defaultSinkActivePort();
     if (m_outAudioPort.name == activePort.name) {
+        qInfo() << "Output device volume changed from" << m_outAudioPortVolume << "to" << value << "and active port is the same";
         emit sigVolumeChange(Internal);
     } else {
+        qInfo() << "Output device volume changed from" << m_outAudioPortVolume << "to" << value << "and active port is not the same";
         m_outAudioPort = activePort;
     }
+    qInfo() << "Output device volume changed finished";
 }
 
 void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &defaultSourcePath)
 {
+    qInfo() << "Default audio input source changed to:" << defaultSourcePath.path();
     if (m_defaultSourcePath != defaultSourcePath.path()) {
+        qInfo() << "default source path is not the same";
         QDBusConnection::sessionBus().disconnect(AudioService,
                                                  m_defaultSourcePath,
                                                  PropertiesInterface,
@@ -353,11 +384,14 @@ void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &defaultSourceP
         initDefaultSourceDBusInterface();
         emit sigDeviceChange(Micphone);
     }
+    qInfo() << "Default audio input source changed finished";
 }
 
 void AudioWatcher::onDefaultSinkChanaged(const QDBusObjectPath &defaultSinkePath)
 {
+    qInfo() << "Default audio output source changed to:" << defaultSinkePath.path();
     if (m_defaultSinkPath != defaultSinkePath.path()) {
+        qInfo() << "default sink path is not the same";
         QDBusConnection::sessionBus().disconnect(AudioService,
                                                  m_defaultSinkPath,
                                                  PropertiesInterface,
@@ -370,6 +404,7 @@ void AudioWatcher::onDefaultSinkChanaged(const QDBusObjectPath &defaultSinkePath
         initDefaultSinkDBusInterface();
         emit sigDeviceChange(Internal);
     }
+    qInfo() << "Default audio output source changed finished";
 }
 
 void AudioWatcher::onDefaultSinkActivePortChanged(AudioPort value)
@@ -412,8 +447,10 @@ void AudioWatcher::onSourceMuteChanged(bool value)
 
 QString AudioWatcher::getDeviceName(AudioMode mode)
 {
+    qInfo() << "Getting device name";
     QString device = "";
     if (mode == Internal) {
+        qInfo() << "Getting output device name";
         if ((m_outAudioPort.availability != 1 || !m_fNeedDeviceChecker) &&
             (defaultSinkPorts().count() != 0 || m_isVirtualMachineHw)) {
             device = defaultSinkName();
@@ -422,6 +459,7 @@ QString AudioWatcher::getDeviceName(AudioMode mode)
             }
         }
     } else {
+        qInfo() << "Getting input device name";
         if ((m_inAudioPort.availability != 1 || !m_fNeedDeviceChecker) &&
             (defaultSourcePorts().count() != 0 || m_isVirtualMachineHw)) {
             device = defaultSourceName();
@@ -430,25 +468,31 @@ QString AudioWatcher::getDeviceName(AudioMode mode)
             }
         }
     }
+    qInfo() << "Device name:" << device;
     return device;
 }
 
 double AudioWatcher::getVolume(AudioMode mode)
 {
+    qInfo() << "Getting volume";
     return mode != Internal ? m_inAudioPortVolume : m_outAudioPortVolume;
 }
 
 bool AudioWatcher::getMute(AudioMode mode)
 {
+    qInfo() << "Getting mute";
     return mode != Internal ? m_inAudioMute : m_outAudioMute;
 }
 
 bool AudioWatcher::getDeviceEnable(AudioWatcher::AudioMode mode)
 {
+    qInfo() << "Getting device enable";
     QString cards = m_audioDBusInterface->property("Cards").value<QString>();
     if (m_isVirtualMachineHw && (cards.isEmpty() || cards.toLower() == "null")) {
+        qInfo() << "Device enable is true";
         return true;
     } else {
+        qInfo() << "Device enable is false";
         return mode != Internal ? m_inIsEnable : m_outIsEnable;
     }
 }
@@ -458,6 +502,7 @@ bool AudioWatcher::getDeviceEnable(AudioWatcher::AudioMode mode)
  */
 void AudioWatcher::initWatcherCofing()
 {
+    qInfo() << "Initializing watcher config";
     //TODO:
     //    Both App & Backend may be integrate the
     //config file,and /etc's priority is higher than
@@ -476,6 +521,7 @@ void AudioWatcher::initWatcherCofing()
         QFileInfo watcherConfig(configFileName);
 
         if (watcherConfig.exists()) {
+            qInfo() << "Device watcher config exists:" << configFileName;
             QSettings watcherSettings(configFileName, QSettings::Format::IniFormat);
 
             //Default need device watcher
@@ -500,6 +546,7 @@ void AudioWatcher::initWatcherCofing()
 
 AudioPort AudioWatcher::defaultSourceActivePort()
 {
+    qInfo() << "Getting default source active port";
     AudioPort port;
     auto inter = new QDBusInterface(AudioService,
                                     m_defaultSourcePath,
@@ -507,6 +554,7 @@ AudioPort AudioWatcher::defaultSourceActivePort()
                                     QDBusConnection::sessionBus());
 
     if (inter->isValid()) {
+        qInfo() << "Default source active port is valid";
         QDBusReply<QDBusVariant> reply = inter->call("Get", SourceInterface, "ActivePort");
         reply.value().variant().value<QDBusArgument>() >> port;
     } else {
@@ -519,7 +567,9 @@ AudioPort AudioWatcher::defaultSourceActivePort()
 
 double AudioWatcher::defaultSourceVolume()
 {
+    qInfo() << "Getting default source volume";
     if (m_defaultSourceDBusInterface && m_defaultSourceDBusInterface->isValid()) {
+        qInfo() << "Default source volume is valid";
         return m_defaultSourceDBusInterface->property("Volume").value<double>();
     } else {
         qInfo() << __FUNCTION__ << __LINE__ << "m_defaultSourceDBusInterface is nullptr or invalid";
@@ -529,7 +579,9 @@ double AudioWatcher::defaultSourceVolume()
 
 bool AudioWatcher::defaultSourceMute()
 {
+    qInfo() << "Getting default source mute";
     if (m_defaultSourceDBusInterface && m_defaultSourceDBusInterface->isValid()) {
+        qInfo() << "Default source mute is valid";
         return m_defaultSourceDBusInterface->property("Mute").value<bool>();
     } else {
         qInfo() << __FUNCTION__ << __LINE__ << "m_defaultSourceDBusInterface is nullptr or invalid";
@@ -539,7 +591,9 @@ bool AudioWatcher::defaultSourceMute()
 
 QString AudioWatcher::defaultSourceName()
 {
+    qInfo() << "Getting default source name";
     if (m_defaultSourceDBusInterface && m_defaultSourceDBusInterface->isValid()) {
+        qInfo() << "Default source name is valid";
         return m_defaultSourceDBusInterface->property("Name").value<QString>();
     } else {
         qInfo() << __FUNCTION__ << __LINE__ << "m_defaultSourceDBusInterface is nullptr or invalid";
@@ -549,6 +603,7 @@ QString AudioWatcher::defaultSourceName()
 
 QList<AudioPort> AudioWatcher::defaultSourcePorts()
 {
+    qInfo() << "Getting default source ports";
     QList<AudioPort> ports;
     auto inter = new QDBusInterface(AudioService,
                                     m_defaultSourcePath,
@@ -556,6 +611,7 @@ QList<AudioPort> AudioWatcher::defaultSourcePorts()
                                     QDBusConnection::sessionBus());
 
     if (inter->isValid()) {
+        qInfo() << "Default source ports is valid";
         QDBusReply<QDBusVariant> reply = inter->call("Get", SourceInterface, "Ports");
         reply.value().variant().value<QDBusArgument>() >> ports;
         qInfo() << "Current Audio Source Ports Size:"<<ports.size() << "Ports" << ports;
@@ -569,6 +625,7 @@ QList<AudioPort> AudioWatcher::defaultSourcePorts()
 
 AudioPort AudioWatcher::defaultSinkActivePort()
 {
+    qInfo() << "Getting default sink active port";
     AudioPort port;
     auto inter = new QDBusInterface(AudioService,
                                     m_defaultSinkPath,
@@ -576,6 +633,7 @@ AudioPort AudioWatcher::defaultSinkActivePort()
                                     QDBusConnection::sessionBus());
 
     if (inter->isValid()) {
+        qInfo() << "Default sink active port is valid";
         QDBusReply<QDBusVariant> reply = inter->call("Get", SinkInterface, "ActivePort");
         reply.value().variant().value<QDBusArgument>() >> port;
     } else {
@@ -588,7 +646,9 @@ AudioPort AudioWatcher::defaultSinkActivePort()
 
 double AudioWatcher::defaultSinkVolume()
 {
+    qInfo() << "Getting default sink volume";
     if (m_defaultSinkDBusInterface && m_defaultSinkDBusInterface->isValid()) {
+        qInfo() << "Default sink volume is valid";
         return m_defaultSinkDBusInterface->property("Volume").value<double>();
     } else {
         qInfo() << __FUNCTION__ << __LINE__ << "m_defaultSinkDBusInterface is nullptr or invalid";
@@ -598,7 +658,9 @@ double AudioWatcher::defaultSinkVolume()
 
 bool AudioWatcher::defaultSinkMute()
 {
+    qInfo() << "Getting default sink mute";
     if (m_defaultSinkDBusInterface && m_defaultSinkDBusInterface->isValid()) {
+        qInfo() << "Default sink mute is valid";
         return m_defaultSinkDBusInterface->property("Mute").value<bool>();
     } else {
         qInfo() << __FUNCTION__ << __LINE__ << "m_defaultSinkDBusInterface is nullptr or invalid";
@@ -608,7 +670,9 @@ bool AudioWatcher::defaultSinkMute()
 
 QString AudioWatcher::defaultSinkName()
 {
+    qInfo() << "Getting default sink name";
     if (m_defaultSinkDBusInterface && m_defaultSinkDBusInterface->isValid()) {
+        qInfo() << "Default sink name is valid";
         return m_defaultSinkDBusInterface->property("Name").value<QString>();
     } else {
         qInfo() << __FUNCTION__ << __LINE__ << "m_defaultSinkDBusInterface is nullptr or invalid";
@@ -618,6 +682,7 @@ QString AudioWatcher::defaultSinkName()
 
 QList<AudioPort> AudioWatcher::defaultSinkPorts()
 {
+    qInfo() << "Getting default sink ports";
     QList<AudioPort> ports;
     auto inter = new QDBusInterface(AudioService,
                                     m_defaultSinkPath,
@@ -625,6 +690,7 @@ QList<AudioPort> AudioWatcher::defaultSinkPorts()
                                     QDBusConnection::sessionBus());
 
     if (inter->isValid()) {
+        qInfo() << "Default sink ports is valid";
         QDBusReply<QDBusVariant> reply = inter->call("Get", SinkInterface, "Ports");
         reply.value().variant().value<QDBusArgument>() >> ports;
         qInfo() << "Current Audio Sink Ports Size:"<< ports.size() << "Ports" << ports;
