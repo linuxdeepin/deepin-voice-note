@@ -66,6 +66,7 @@ void VoiceRecoderHandler::stopRecoder()
         emit finishedRecod(m_recordPath, m_recordMsec);
         m_type = RecoderType::Idle;
         OpsStateInterface::instance()->operState(OpsStateInterface::StateRecording, false);
+        emit recoderStateChange(m_type); 
         updateWave(0.0);
     } else {
         qDebug() << "Recorder already idle";

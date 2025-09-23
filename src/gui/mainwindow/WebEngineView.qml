@@ -21,6 +21,7 @@ Item {
     property bool hasScroll: false
     property bool initialVisible: false
     property bool isRecording: false
+    property bool isRecordingAudio: false 
     property bool noSearchResult: false
     property bool webVisible: true
     property alias titleBar: title
@@ -205,6 +206,7 @@ Item {
             Layout.fillWidth: true
             imageBtnEnable: webVisible
             isInitialInterface: initialVisible
+            isRecordingAudio: rootItem.isRecordingAudio 
 
             onTitleOpenSetting: {
                 rootItem.openSetting();
