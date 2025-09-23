@@ -11,6 +11,7 @@ TitleBar {
     property bool isInitialInterface: true
     property bool isPlaying: false
     property bool isRecording: false
+    property bool isRecordingAudio: false  
     property bool isSearching: false
     property bool recorderBtnEnable: true
     property bool recordingHover: false
@@ -49,7 +50,7 @@ TitleBar {
         anchors.left: titleBar.left
         anchors.leftMargin: 10
         anchors.verticalCenter: titleBar.verticalCenter
-        enabled: !isPlaying && !isSearching
+        enabled: !isPlaying && !isSearching && !isRecordingAudio
         hoverEnabled: !isInitialInterface
         icon.name: "new_note"
 

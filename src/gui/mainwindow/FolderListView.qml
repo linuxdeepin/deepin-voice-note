@@ -15,6 +15,7 @@ Item {
 
     property int currentDropIndex: -1
     property bool isPlay: false
+    property bool isRecordingAudio: false 
     property int itemHeight: 30
     property int lastDropIndex: -1
     property int listHeight: 700
@@ -574,7 +575,7 @@ Item {
                 }
 
                 MenuItem {
-                    enabled: !isPlay
+                    enabled: !isPlay && !isRecordingAudio 
                     text: qsTr("New Note")
 
                     onTriggered: {

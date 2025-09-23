@@ -16,6 +16,7 @@ ApplicationWindow {
 
     property int createFolderBtnHeight: 40
     property bool isRecording: webEngineView.isRecording
+    property bool isRecordingAudio: false
     property int leftAreaMaxWidth: 300
     property int leftAreaMinWidth: 125
     property int leftViewWidth: 220
@@ -98,6 +99,11 @@ ApplicationWindow {
             VNoteMainManager.vNoteCreateFolder();
         }
         onCreateNote: {
+            // 录音时不允许创建笔记
+            if (isRecordingAudio) {
+                console.log("Cannot create note while recording audio");
+                return;
+            }
             VNoteMainManager.createNote();
         }
         onPlayPauseVoice: {
@@ -360,30 +366,48 @@ ApplicationWindow {
         }
     }
 
+    // 添加录音状态监听
+    Connections {
+        target: VoiceRecoderHandler
+
+        onRecoderStateChange: function(type) {
+            isRecordingAudio = (type === VoiceRecoderHandler.Recording);
+            console.log("MainWindow: Recording state changed to:", type, "isRecordingAudio:", isRecordingAudio);
+        }
+    }
+
     IconLabel {
         id: appImage
 
-        height: 36
-        icon.height: 36
+        anchors {
+            top: parent.top
+            topMargin: 7
+            left: parent.left
+            leftMargin: 10
+        }
+        height: 32
+        icon.height: 32
         icon.name: "deepin-voice-note"
-        icon.width: 36
-        width: 36
-        x: 10
-        y: 7
+        icon.width: 32
+        width: 32
         z: 100
     }
 
     ToolButton {
         id: twoColumnModeBtn
 
+        anchors {
+            top: parent.top
+            topMargin: 10
+            left: appImage.right
+            leftMargin: 19
+        }
         height: 30
         icon.height: 16
         icon.name: "sidebar"
         icon.width: 16
         visible: !(needHideSearch && search.visible) || leftBgArea.visible
         width: 30
-        x: 66
-        y: 10
         z: 100
 
         onClicked: {
@@ -417,6 +441,7 @@ ApplicationWindow {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     webVisible: initRect.visible
+                    isRecordingAudio: rootWindow.isRecordingAudio  // 传递录音状态
 
                     onEmptyItemList: isEmpty => {
                         webEngineView.webVisible = !isEmpty;
@@ -450,6 +475,7 @@ ApplicationWindow {
 
                     Layout.fillWidth: true
                     Layout.preferredHeight: createFolderBtnHeight
+                    enabled: !isRecordingAudio  // 录音时禁用
                     text: qsTr("Create Notebook")
 
                     onClicked: {
@@ -590,7 +616,7 @@ ApplicationWindow {
                         label.visible = true;
                         folderListView.opacity = 1;
                         folderListView.enabled = true;
-                        createFolderButton.enabled = true;
+                        createFolderButton.enabled = !isRecordingAudio;  // 考虑录音状态
                         itemListView.isSearch = false;
                         itemListView.isSearching = false;
                         webEngineView.webVisible = true;
@@ -605,6 +631,7 @@ ApplicationWindow {
                     Layout.leftMargin: offect
                     Layout.preferredHeight: 30
                     Layout.topMargin: 12
+                    enabled: !isRecordingAudio  // 录音时禁用搜索框
                     placeholder: qsTr("Search")
 
                     Keys.onPressed: function(event) {
@@ -758,6 +785,7 @@ ApplicationWindow {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     initialVisible: initRect.visible
+                    isRecordingAudio: rootWindow.isRecordingAudio
 
                     onDeleteNote: {
                         itemListView.onDeleteNote();
