@@ -142,8 +142,10 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
     qDebug() << "Adding new note to folder:" << note.folderId;
     VNoteFolderOper folderOps;
     VNoteFolder *folder = folderOps.getFolder(note.folderId);
-
-    Q_ASSERT(nullptr != folder);
+    if (Q_UNLIKELY(folder == nullptr)) {
+        qWarning() << "Cannot add note: folder not found for ID:" << note.folderId;
+        return nullptr;
+    }
 
     folder->maxNoteIdRef()++;
 
