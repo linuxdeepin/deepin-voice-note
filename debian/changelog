@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.42) unstable; urgency=medium
+
+  * fix: Enhance note creation process with folder validation
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Thu, 25 Sep 2025 14:46:27 +0800
+
 deepin-voice-note (6.5.41) unstable; urgency=medium
 
   * chore: Update linglong base and runtime
