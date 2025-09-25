@@ -404,6 +404,11 @@ void VNoteMainManager::createNote()
         qWarning() << "Cannot create note: No current folder selected";
         return;
     }
+    VNoteFolder *currentFolder = getFloderById(m_currentFolderIndex);
+    if (currentFolder == nullptr) {
+        qWarning() << "Cannot create note: Current folder not found for ID:" << m_currentFolderIndex;
+        return;
+    }
     qDebug() << "Creating new note in folder ID:" << m_currentFolderIndex;
     VNoteItem tmpNote;
     tmpNote.folderId = m_currentFolderIndex;
@@ -414,6 +419,10 @@ void VNoteMainManager::createNote()
     tmpNote.noteTitle = noteOper.getDefaultNoteName(tmpNote.folderId);
 
     VNoteItem *newNote = noteOper.addNote(tmpNote);
+    if (newNote == nullptr) {
+        qWarning() << "Create note failed: addNote returned null";
+        return;
+    }
     m_currentNoteId = newNote->noteId;
 
     m_noteItems.append(newNote);
@@ -423,9 +432,8 @@ void VNoteMainManager::createNote()
     data.insert(NOTE_TIME_KEY, Utils::convertDateTime(newNote->modifyTime));
     data.insert(NOTE_MODIFY_TIME_KEY, newNote->modifyTime.toString("yyyy-MM-dd hh:mm:ss"));
     data.insert(NOTE_ISTOP_KEY, newNote->isTop);
-    VNoteFolder *folder = getFloderById(newNote->folderId);
-    data.insert(NOTE_FOLDER_ICON_KEY, QString::number(folder->defaultIcon));
-    data.insert(NOTE_FOLDER_NAME_KEY, folder->name);
+    data.insert(NOTE_FOLDER_ICON_KEY, QString::number(currentFolder->defaultIcon));
+    data.insert(NOTE_FOLDER_NAME_KEY, currentFolder->name);
     data.insert(NOTE_ID_KEY, newNote->noteId);
 
     emit addNoteAtHead(data);
