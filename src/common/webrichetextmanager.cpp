@@ -22,9 +22,24 @@ void WebRichTextManager::initData(VNoteItem *data, const QString reg, bool focus
     //重置鼠标点击位置
     m_mouseClickPos = QPoint(-1, -1);
     m_setFocus = focus;
+    // 若数据为空，清空页面并返回，避免后续异步回调空指针
+    if (!data) {
+        qWarning() << "initData called with null data, clearing JS content";
+        m_noteData = nullptr;
+        if (m_updateTimer) m_updateTimer->stop();
+        clearJSContent();
+        return;
+    }
+    // 保存当前数据供 onLoadFinsh 以及异步回调使用
+    m_noteData = data;
     //富文本设置异步操作，解决笔记列表不实时刷新
-    QTimer::singleShot(50, this, [ = ] {
-        setData(data, reg);
+    QTimer::singleShot(50, this, [this, reg] {
+        // 使用成员 m_noteData 避免捕获过期指针
+        if (!m_noteData) {
+            qWarning() << "Deferred setData skipped due to null m_noteData";
+            return;
+        }
+        setData(m_noteData, reg);
     });
     qInfo() << "Data initialization finished";
 }
@@ -46,6 +61,11 @@ void WebRichTextManager::initConnect()
 void WebRichTextManager::setData(VNoteItem *data, const QString reg)
 {
     qDebug() << "Setting rich text data";
+    if (!data) {
+        qWarning() << "setData called with null data, skip";
+        return;
+    }
+    m_noteData = data;
     m_updateTimer->stop();
     //设置富文本内容
     if (data->htmlCode.isEmpty()) {
@@ -81,6 +101,10 @@ void WebRichTextManager::updateNote()
 void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &result)
 {
     qDebug() << "Updating note with result";
+    if (!data) {
+        qWarning() << "onUpdateNoteWithResult called with null data, skip";
+        return;
+    }
     data->htmlCode = result;
     VNoteItemOper noteOps(data);
     if (!noteOps.updateNote()) {

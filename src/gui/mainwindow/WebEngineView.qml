@@ -257,6 +257,11 @@ Item {
                     Webobj.calllJsShowEditToolbar(0, 0);
                 }
                 onContextMenuRequested: req => {
+                    // 初始页可见或编辑器不可见时，屏蔽右键菜单
+                    if (initialVisible || !webVisible) {
+                        req.accepted = true;
+                        return;
+                    }
                     // 仅当菜单是文本类型时，我们才在QML层根据上下文标记(editFlags)更新状态
                     // 这是为了精确修复Qt5下文本菜单状态不更新的问题
                     if (handler.menuTypeFromJs === WebEngineHandler.TxtMenu) {
@@ -335,7 +340,9 @@ Item {
                         rootItem.saveAudio();
                     }
                     onCreateNote: {
-                        VNoteMainManager.createNote();
+                        if (!initialVisible) {
+                            VNoteMainManager.createNote();
+                        }
                     }
                 }
 
@@ -549,7 +556,9 @@ Item {
         target: title
 
         onCreateNote: {
-            VNoteMainManager.createNote();
+            if (!initialVisible) {
+                VNoteMainManager.createNote();
+            }
         }
         onInsertImage: {
             if (!selectImgLoader.active) {

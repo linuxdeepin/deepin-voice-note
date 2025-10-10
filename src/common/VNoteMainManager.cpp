@@ -250,6 +250,16 @@ void VNoteMainManager::vNoteFloderChanged(const int &index)
 void VNoteMainManager::vNoteCreateFolder()
 {
     qDebug() << "Creating new folder";
+    // 录音中禁止创建记事本
+    if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording) {
+        qWarning() << "Cannot create notebook while recording";
+        return;
+    }
+    // 播放中禁止创建记事本
+    if (OpsStateInterface::instance()->isPlaying()) {
+        qWarning() << "Cannot create notebook while playing";
+        return;
+    }
     VNoteFolder itemData;
     VNoteFolderOper folderOper;
     itemData.name = folderOper.getDefaultFolderName();
@@ -309,6 +319,12 @@ void VNoteMainManager::vNoteChanged(const int &index)
     qDebug() << "Changing to note index:" << index;
     m_currentNoteId = index;
     VNoteItem *data = getNoteById(m_currentNoteId);
+    if (!data) {
+        qWarning() << "vNoteChanged resolved to null note, skipping initData";
+        // 清空编辑区避免残留
+        m_richTextManager->initData(nullptr, "");
+        return;
+    }
     m_richTextManager->initData(data, "");
     qDebug() << "Note change completed";
 }
@@ -400,6 +416,18 @@ void VNoteMainManager::createNote()
         return;
     }
     
+    // 录音中禁止创建笔记
+    if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording) {
+        qWarning() << "Cannot create note while recording";
+        return;
+    }
+
+    // 播放中禁止创建笔记
+    if (OpsStateInterface::instance()->isPlaying()) {
+        qWarning() << "Cannot create note while playing";
+        return;
+    }
+
     if (m_currentFolderIndex == -1) {
         qWarning() << "Cannot create note: No current folder selected";
         return;
@@ -687,6 +715,10 @@ void VNoteMainManager::onNoteChanged()
 {
     qInfo() << "Note changed, updating modification time";
     VNoteItem *note = getNoteById(m_currentNoteId);
+    if (!note) {
+        qWarning() << "onNoteChanged: current note not found, id=" << m_currentNoteId << ", skip";
+        return;
+    }
     note->modifyTime = QDateTime::currentDateTime();
     emit updateEditNote(m_currentNoteId, Utils::convertDateTime(note->modifyTime));
     qInfo() << "Note change handling finished";
