@@ -4,6 +4,11 @@ import org.deepin.dtk 1.0 as D
 Item {
     id: item
 
+
+    property bool blockCreateKeys: false
+    // 初始页面仅允许 Ctrl+N / F1，其它快捷键全部禁用
+    property bool initialOnlyCreateFolder: false
+
     signal copy
     signal createFolder
     signal createNote
@@ -31,6 +36,7 @@ Item {
 
     Shortcut {
         id: ctrl_Shift_H
+        enabled: !item.initialOnlyCreateFolder
 
         //快捷键界面
         sequence: "Ctrl+Shift+/"
@@ -42,6 +48,7 @@ Item {
 
     Shortcut {
         id: ctrl_S
+        enabled: !item.initialOnlyCreateFolder
 
         sequence: "Ctrl+S"
 
@@ -52,6 +59,7 @@ Item {
 
     Shortcut {
         id: ctrl_D
+        enabled: !item.initialOnlyCreateFolder
 
         sequence: "Ctrl+D"
 
@@ -65,6 +73,8 @@ Item {
 
         sequence: "Ctrl+N"
 
+        enabled: !item.blockCreateKeys
+
         onActivated: {
             createFolder();
         }
@@ -72,6 +82,7 @@ Item {
 
     Shortcut {
         id: rename
+        enabled: !item.initialOnlyCreateFolder
 
         sequence: "F2"
 
@@ -82,6 +93,7 @@ Item {
 
     Shortcut {
         id: renameNoteShort
+        enabled: !item.initialOnlyCreateFolder
 
         sequence: "F3"
 
@@ -92,6 +104,7 @@ Item {
 
     Shortcut {
         id: ctrl_R
+        enabled: !item.initialOnlyCreateFolder
 
         sequence: "Ctrl+R"
 
@@ -102,6 +115,7 @@ Item {
 
     Shortcut {
         id: playPause
+        enabled: !item.initialOnlyCreateFolder
 
         sequence: "Space"
 
@@ -115,6 +129,8 @@ Item {
 
         sequence: "Ctrl+B"
 
+        enabled: !item.blockCreateKeys && !item.initialOnlyCreateFolder
+
         onActivated: {
             createNote();
         }
@@ -125,6 +141,7 @@ Item {
 
         sequence: "Ctrl+A"
 
+        enabled: !item.initialOnlyCreateFolder
         onActivated: {}
     }
 
@@ -133,6 +150,7 @@ Item {
 
         sequence: "Ctrl+C"
 
+        enabled: !item.initialOnlyCreateFolder
         onActivated: {
             copy();
         }
@@ -143,6 +161,7 @@ Item {
 
         sequence: "Ctrl+X"
 
+        enabled: !item.initialOnlyCreateFolder
         onActivated: {}
     }
 
@@ -151,6 +170,7 @@ Item {
 
         sequence: "Ctrl+V"
 
+        enabled: !item.initialOnlyCreateFolder
         onActivated: {}
     }
 
@@ -159,6 +179,7 @@ Item {
 
         sequence: "Alt+M"
 
+        enabled: !item.initialOnlyCreateFolder
         onActivated: {
             showJsContextMenu();
         }
@@ -169,6 +190,7 @@ Item {
 
         sequence: "Ctrl+Z"
 
+        enabled: !item.initialOnlyCreateFolder
         onActivated: {}
     }
 
@@ -177,6 +199,7 @@ Item {
 
         sequence: "Ctrl+Shift+Z"
 
+        enabled: !item.initialOnlyCreateFolder
         onActivated: {}
     }
 }

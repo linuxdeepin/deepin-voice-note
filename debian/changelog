@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.43) unstable; urgency=medium
+
+  * fix: Implement restrictions on note and folder creation during audio recording and playback
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Fri, 10 Oct 2025 15:04:33 +0800
+
 deepin-voice-note (6.5.42) unstable; urgency=medium
 
   * fix: Enhance note creation process with folder validation

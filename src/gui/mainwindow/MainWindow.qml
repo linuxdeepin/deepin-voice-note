@@ -92,16 +92,29 @@ ApplicationWindow {
 
         enabled: rootWindow.active
 
+        blockCreateKeys: (isRecordingAudio || webEngineView.titleBar.isPlaying)
+        initialOnlyCreateFolder: initRect.visible
+
         onCopy: {
             webEngineView.copy();
         }
         onCreateFolder: {
+            // 录音或播放时不允许创建记事本
+            if (isRecordingAudio || folderListView.isPlay) {
+                console.log("Cannot create notebook while recording or playing");
+                return;
+            }
             VNoteMainManager.vNoteCreateFolder();
         }
         onCreateNote: {
+            // 初始页面可见时，屏蔽 Ctrl+B
+            if (initRect.visible) {
+                console.warn("Cannot create note on initial page");
+                return;
+            }
             // 录音时不允许创建笔记
-            if (isRecordingAudio) {
-                console.log("Cannot create note while recording audio");
+            if (isRecordingAudio || folderListView.isPlay) {
+                console.log("Cannot create note while recording or playing audio");
                 return;
             }
             VNoteMainManager.createNote();
@@ -475,7 +488,7 @@ ApplicationWindow {
 
                     Layout.fillWidth: true
                     Layout.preferredHeight: createFolderBtnHeight
-                    enabled: !isRecordingAudio  // 录音时禁用
+                    enabled: !isRecordingAudio && !folderListView.isPlay  // 录音或播放时禁用
                     text: qsTr("Create Notebook")
 
                     onClicked: {
@@ -616,7 +629,6 @@ ApplicationWindow {
                         label.visible = true;
                         folderListView.opacity = 1;
                         folderListView.enabled = true;
-                        createFolderButton.enabled = !isRecordingAudio;  // 考虑录音状态
                         itemListView.isSearch = false;
                         itemListView.isSearching = false;
                         webEngineView.webVisible = true;
@@ -631,7 +643,7 @@ ApplicationWindow {
                     Layout.leftMargin: offect
                     Layout.preferredHeight: 30
                     Layout.topMargin: 12
-                    enabled: !isRecordingAudio  // 录音时禁用搜索框
+                    enabled: !isRecordingAudio && !folderListView.isPlay  // 录音或播放时禁用搜索框
                     placeholder: qsTr("Search")
 
                     Keys.onPressed: function(event) {
@@ -667,7 +679,6 @@ ApplicationWindow {
                             label.visible = true;
                             folderListView.opacity = 1;
                             folderListView.enabled = true;
-                            createFolderButton.enabled = true;
                             itemListView.isSearch = false;
                             itemListView.isSearching = false;
                             webEngineView.webVisible = true;
@@ -802,8 +813,6 @@ ApplicationWindow {
                     onPlayStateChange: state => {
                         folderListView.isPlay = state;
                         itemListView.isPlay = state;
-                        createFolderButton.enabled = !state;
-                        search.enabled = !state;
                     }
                     onSaveAudio: {
                         itemListView.onSaveAudio();

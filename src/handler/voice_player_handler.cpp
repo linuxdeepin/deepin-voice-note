@@ -38,7 +38,10 @@ VoicePlayerHandler::VoicePlayerHandler(QObject *parent)
     connect(this, &VoicePlayerHandler::playStatusChanged, JsContent::instance(), &JsContent::callJsSetPlayStatus);
     connect(this, &VoicePlayerHandler::playPositionChanged, JsContent::instance(), &JsContent::callJsVoicePlayProgressChanged);
 
-    connect(m_player, &VoicePlayerBase::playEnd, this, [this]() { Q_EMIT playStatusChanged(End); });
+    connect(m_player, &VoicePlayerBase::playEnd, this, [this]() {
+        OpsStateInterface::instance()->operState(OpsStateInterface::StatePlaying, false);
+        Q_EMIT playStatusChanged(End);
+    });
     connect(m_player, &VoicePlayerBase::durationChanged, this, &VoicePlayerHandler::playDurationChanged);
     connect(m_player, &VoicePlayerBase::positionChanged, this, &VoicePlayerHandler::playPositionChanged);
 }
@@ -176,6 +179,7 @@ void VoicePlayerHandler::onToggleStateChange()
             m_player->setChangePlayFile(true);
             m_player->setFilePath(m_voiceBlock->voicePath);
             m_player->play();
+            OpsStateInterface::instance()->operState(OpsStateInterface::StatePlaying, true);
             Q_EMIT playStatusChanged(Playing);
             qInfo() << "Voice playback restarted";
             break;
