@@ -290,6 +290,12 @@ void VNoteMainManager::vNoteCreateFolder()
 void VNoteMainManager::vNoteDeleteFolder(const int &index)
 {
     qDebug() << "Deleting folder at index:" << index;
+    // 录音或播放中禁止删除
+    if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording
+        || OpsStateInterface::instance()->isPlaying()) {
+        qWarning() << "Cannot delete folder while recording or playing";
+        return;
+    }
     VNoteFolder *folder = getFloderByIndex(index);
 
     int listIndex = m_folderSort.indexOf(QString::number(folder->id));
@@ -603,6 +609,12 @@ void VNoteMainManager::deleteNote(const QList<int> &index)
 {
     // 删除之前清空JS详情页内容
     qDebug() << "Deleting" << index.size() << "notes";
+    // 录音或播放中禁止删除
+    if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording
+        || OpsStateInterface::instance()->isPlaying()) {
+        qWarning() << "Cannot delete note while recording or playing";
+        return;
+    }
     m_richTextManager->clearJSContent();
     QList<VNoteItem *> noteDataList;
     for (int i = 0; i < index.size(); i++) {

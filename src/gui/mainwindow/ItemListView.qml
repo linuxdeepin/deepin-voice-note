@@ -17,6 +17,7 @@ Item {
     id: rootItem
 
     property bool isPlay: false
+    property bool isRecordingAudio: false
     property bool isSearch: false
     property bool isSearching: false
     property int itemSpacing: 6
@@ -171,7 +172,7 @@ Item {
     width: 640
 
     Keys.onDeletePressed: {
-        if (webVisible) {
+        if (webVisible || isRecordingAudio || isPlay) {
             console.log("No notes available, cannot delete");
             return;
         }
@@ -443,6 +444,8 @@ Item {
             topItem.text = setTop ? qsTr("Sticky on Top") : qsTr("Unpin");
 
             ActionManager.enableVoicePlayActions(!isPlay);
+            // 录音或播放中禁用删除
+            ActionManager.enableAction(ActionManager.NoteDelete, !isRecordingAudio && !isPlay);
             
             // 在搜索状态下禁用移动、置顶和新建笔记选项
             if (isSearching) {
