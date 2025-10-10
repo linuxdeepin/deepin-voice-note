@@ -162,7 +162,7 @@ Item {
         root.forceActiveFocus();
     }
     Keys.onDeletePressed: {
-        if (webVisible) {
+        if (webVisible || isRecordingAudio || isPlay) {
             console.log("No notes available, cannot delete folder");
             return;
         }
@@ -551,7 +551,7 @@ Item {
                 }
 
                 MenuItem {
-                    enabled: !isPlay
+                    enabled: !isPlay && !isRecordingAudio
                     text: qsTr("Delete")
 
                     onTriggered: {

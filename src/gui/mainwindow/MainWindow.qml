@@ -715,6 +715,7 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     moveToFolderDialog.folderModel: folderListView.model
                     webVisible: initRect.visible
+                    isRecordingAudio: rootWindow.isRecordingAudio
 
                     onDeleteFinished: {
                         webEngineView.toggleMultCho(1);
