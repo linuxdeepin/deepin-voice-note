@@ -921,15 +921,32 @@ Item {
 
             delegate: Rectangle {
                 color: "transparent"
-                height: section == "top" ? 16 : 10
+                height: section == "top" ? (18) : 16
                 width: parent.width
 
-                Text {
+                RowLayout {
                     anchors.left: parent.left
-                    color: "#b3000000"
-                    font.pixelSize: 12
-                    text: qsTr("Sticky Notes")
+                    anchors.top: parent.top
+                    spacing: 4
                     visible: section == "top" && !isSearch
+                    
+                    // 置顶图标
+                    Image {
+                        id: sectionPinIcon
+                        
+                        Layout.preferredWidth: 12
+                        Layout.preferredHeight: 12
+                        source: "qrc:/dsg/icons/pin_top.dci"
+                        fillMode: Image.PreserveAspectFit
+                        smooth: true
+                        antialiasing: true
+                    }
+                    
+                    Text {
+                        color: "#b3000000"
+                        font.pixelSize: 12
+                        text: qsTr("Sticky Notes")
+                    }
                 }
 
                 Rectangle {
