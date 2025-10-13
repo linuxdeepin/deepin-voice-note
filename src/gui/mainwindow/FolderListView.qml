@@ -282,6 +282,7 @@ Item {
         clip: true
         enabled: parent.enabled
         model: folderModel
+        opacity: isRecordingAudio ? 0.5 : 1.0  // 录音时置灰
 
         ScrollBar.vertical: ScrollBar {
             id: verticalScrollBar
@@ -456,6 +457,12 @@ Item {
                 hoverEnabled: true
 
                 onClicked: function(mouse) {
+                    // 录音时禁用文件夹切换
+                    if (isRecordingAudio) {
+                        console.log("Cannot switch folder while recording audio");
+                        return;
+                    }
+                    
                     root.forceActiveFocus();
                     tooltipVisible = false;
                     if (folderListView.itemAtIndex(folderListView.lastCurrentIndex)) {
@@ -464,12 +471,22 @@ Item {
                     folderListView.currentIndex = index;
                     folderListView.lastCurrentIndex = index;
                     if (mouse.button === Qt.RightButton) {
+                        // 录音时禁用文件夹右键菜单
+                        if (isRecordingAudio) {
+                            console.log("Cannot show folder context menu while recording audio");
+                            return;
+                        }
                         folderListView.contextIndex = index;
                         folderItemContextMenu.popup();
                     }
                     rootItem.isHovered = false;
                 }
                 onDoubleClicked: {
+                    // 录音时禁用双击重命名
+                    if (isRecordingAudio) {
+                        console.log("Cannot rename folder while recording audio");
+                        return;
+                    }
                     folderListView.itemAtIndex(folderListView.currentIndex).isRename = true;
                 }
                 onEntered: {
