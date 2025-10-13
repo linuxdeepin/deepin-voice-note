@@ -257,7 +257,12 @@ Item {
                 
                 var defaultFileName = "";
                 if (selectedNoteItem.length > 0 && itemModel.get(selectedNoteItem[0])) {
-                    defaultFileName = itemModel.get(selectedNoteItem[0]).name;
+                    // 在搜索模式下使用纯文本标题，避免HTML标签出现在文件名中
+                    if (isSearch) {
+                        defaultFileName = VNoteMainManager.getNotePlainTitle(itemModel.get(selectedNoteItem[0]).noteId);
+                    } else {
+                        defaultFileName = itemModel.get(selectedNoteItem[0]).name;
+                    }
                     if (saveType === VNoteMainManager.Text && !defaultFileName.toLowerCase().endsWith('.txt')) {
                         defaultFileName += '.txt';
                     } else if (saveType === VNoteMainManager.Html && !defaultFileName.toLowerCase().endsWith('.html')) {
