@@ -443,7 +443,7 @@ Item {
             var topItem = ActionManager.getActionById(ActionManager.NoteTop);
             topItem.text = setTop ? qsTr("Sticky on Top") : qsTr("Unpin");
 
-            ActionManager.enableVoicePlayActions(!isPlay);
+            ActionManager.enableVoicePlayActions(!isPlay && !isRecordingAudio);
             // 录音或播放中禁用删除
             ActionManager.enableAction(ActionManager.NoteDelete, !isRecordingAudio && !isPlay);
             
@@ -453,9 +453,20 @@ Item {
                 ActionManager.enableAction(ActionManager.NoteTop, false);
                 ActionManager.enableAction(ActionManager.NoteAddNew, false);
             } else {
-                ActionManager.enableAction(ActionManager.NoteMove, true);
-                ActionManager.enableAction(ActionManager.NoteTop, true);
-                ActionManager.enableAction(ActionManager.NoteAddNew, true);
+                ActionManager.enableAction(ActionManager.NoteMove, !isRecordingAudio);
+                ActionManager.enableAction(ActionManager.NoteTop, !isRecordingAudio);
+                ActionManager.enableAction(ActionManager.NoteAddNew, !isRecordingAudio);
+            }
+            
+            // 录音时禁用其他菜单选项
+            if (isRecordingAudio) {
+                ActionManager.enableAction(ActionManager.NoteRename, false);
+                ActionManager.enableAction(ActionManager.SaveNoteAsText, false);
+                ActionManager.enableAction(ActionManager.SaveNoteAsHtml, false);
+            } else {
+                ActionManager.enableAction(ActionManager.NoteRename, true);
+                ActionManager.enableAction(ActionManager.SaveNoteAsText, true);
+                ActionManager.enableAction(ActionManager.SaveNoteAsHtml, true);
             }
         }
         onActionTrigger: actionId => {
@@ -578,6 +589,7 @@ Item {
         model: itemModel
         spacing: itemSpacing
         visible: true
+        opacity: isRecordingAudio ? 0.5 : 1.0  // 录音时置灰
 
         delegate: Rectangle {
             id: rootItemDelegate
@@ -769,6 +781,12 @@ Item {
 
                 onClicked: {
                     if (mouse.button === Qt.RightButton) {
+                        // 录音时只允许当前选中笔记的右键菜单
+                        if (isRecordingAudio && selectedNoteItem.indexOf(index) === -1) {
+                            console.log("Cannot show context menu for non-selected note while recording audio");
+                            return;
+                        }
+                        
                         if (selectedNoteItem.length > 1) {
                             ActionManager.visibleMulChoicesActions(false);
                         } else {
@@ -794,6 +812,12 @@ Item {
                         VNoteMainManager.checkNoteVoice(list);
                         noteCtxMenu.popup();
                     } else {
+                        // 录音时禁用笔记切换
+                        if (isRecordingAudio) {
+                            console.log("Cannot switch note while recording audio");
+                            return;
+                        }
+                        
                         if (itemListView.currentIndex === index && selectedNoteItem.length === 1) {
                             return;
                         }
@@ -841,6 +865,11 @@ Item {
                     }
                 }
                 onDoubleClicked: {
+                    // 录音时禁用双击重命名
+                    if (isRecordingAudio) {
+                        console.log("Cannot rename note while recording audio");
+                        return;
+                    }
                     itemListView.itemAtIndex(index).isRename = true;
                 }
                 onEntered: {
