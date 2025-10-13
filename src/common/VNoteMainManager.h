@@ -67,6 +67,7 @@ signals:
     void updateNotes(const QList<QVariantMap> &notesData, const int &selectIndex);
     void addNoteAtHead(const QVariantMap &noteData);
     void addFolderFinished(const QVariantMap &folderData);
+    void notesDeleted(const QVariantMap &folderIdToDeletedCount);
     void noSearchResult();
     void searchFinished(const QList<QVariantMap> &notesData, const QString &key);
     void moveFinished(const QVariantList &index, const int &srcFolderIndex, const int &dstFolderIndex);

@@ -204,6 +204,7 @@ int VNoteMainManager::loadNotepads()
             data.insert(FOLDER_NAME_KEY, folder->name);
             data.insert(FOLDER_COUNT_KEY, QString::number(folder->getNotesCount()));
             data.insert(FOLDER_ICON_KEY, QString::number(folder->defaultIcon));
+            data.insert(FOLDER_ID_KEY, folder->id);
             if (tmpIndexCount != -1) {
                 folder->sortNumber = tmpIndexCount;
             } else {
@@ -626,11 +627,25 @@ void VNoteMainManager::deleteNote(const QList<int> &index)
     }
 
     if (noteDataList.size()) {
-        qDebug() << "Processing deletion of" << noteDataList.size() << "notes";
+        qWarning() << "Processing deletion of" << noteDataList.size() << "notes";
+        // track deleted count per folder id for UI sync (e.g. search mode)
+        QMap<int, int> folderIdToDeletedCount;
         for (auto noteData : noteDataList) {
+            // 在删除前先保存folderId，避免删除后访问已释放内存
+            int folderId = noteData->folderId;
+            qWarning() << "Deleting note from folder ID:" << folderId;
             VNoteItemOper noteOper(noteData);
             noteOper.deleteNote();
+            folderIdToDeletedCount[folderId] += 1;
         }
+        // Convert QMap to QVariantMap for QML compatibility
+        QVariantMap variantMap;
+        for (auto it = folderIdToDeletedCount.begin(); it != folderIdToDeletedCount.end(); ++it) {
+            variantMap[QString::number(it.key())] = it.value();
+            qWarning() << "Folder ID" << it.key() << "deleted count:" << it.value();
+        }
+        qWarning() << "Emitting notesDeleted signal with" << variantMap.size() << "folders";
+        emit notesDeleted(variantMap);
     } else {
         qWarning() << "No notes to delete";
     }
