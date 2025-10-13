@@ -18,6 +18,11 @@
 #include <QBuffer>
 #include <QFileInfo>
 #include <QProcess>
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#include <QRegularExpression>
+#else
+#include <QRegExp>
+#endif
 #include <QTextDocument>
 #include <QTextDocumentFragment>
 
@@ -391,12 +396,15 @@ QString Utils::filteredFileName(QString fileName, const QString &defaultName)
 {
     qDebug() << "Filtering file name:" << fileName << "default:" << defaultName;
     //使用正则表达式除去不符合规范的字符并清理文件名两端的空白字符，中间的空白字符不做处理
-    // QString name = fileName.replace(QRegExp("[\"\'\\[\\]\\\\/:|<>+=;,?*]"), "").trimmed();
-    // if (name.isEmpty()) {
-    //     return defaultName;
-    // }
-    // return name;
-    return QString();
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    QString name = fileName.replace(QRegularExpression("[\"\'\\[\\]\\\\/:|<>+=;,?*]"), "").trimmed();
+#else
+    QString name = fileName.replace(QRegExp("[\"\'\\[\\]\\\\/:|<>+=;,?*]"), "").trimmed();
+#endif
+    if (name.isEmpty()) {
+        return defaultName;
+    }
+    return name;
 }
 
 bool Utils::isWayland()
