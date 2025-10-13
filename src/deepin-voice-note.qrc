@@ -24,6 +24,7 @@
         <file>gui/mainwindow/WebEngineView.qml</file>
         <file>gui/mainwindow/WindowTitleBar.qml</file>
         <file>gui/mainwindow/MultipleChoices.qml</file>
+        <file>dsg/icons/pin_top.dci</file>
         <file>dsg/icons/sidebar.dci</file>
         <file>dsg/icons/record.dci</file>
         <file>dsg/icons/img.dci</file>
