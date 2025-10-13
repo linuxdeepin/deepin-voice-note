@@ -219,7 +219,8 @@ ApplicationWindow {
                 folderListView.model.append({
                     name: foldersData[i].name,
                     count: foldersData[i].notesCount,
-                    icon: foldersData[i].icon
+                    icon: foldersData[i].icon,
+                    folderId: foldersData[i].folderId
                 });
             }
         }
@@ -314,6 +315,20 @@ ApplicationWindow {
         }
         onAddNoteAtHead: {
             handleaddNote(noteData);
+        }
+        onNotesDeleted: {
+            
+            for (var i = 0; i < folderListView.model.count; i++) {
+                var folder = folderListView.model.get(i);
+                var fidStr = folder.folderId.toString();
+                var dec = folderIdToDeletedCount[fidStr];
+                if (dec !== undefined) {
+                    var oldCount = Number(folder.count);
+                    var newCount = oldCount - Number(dec);
+                    folder.count = newCount.toString();
+                    console.log("QML: Updated folder", folder.name, "count from", oldCount, "to", newCount);
+                }
+            }
         }
         onFinishedFolderLoad: {
             if (foldersData.length > 0) {
@@ -501,7 +516,7 @@ ApplicationWindow {
                 target: itemListView
 
                 onDeleteNotes: {
-                    folderListView.delNote(number);
+                    // 数量更新统一依赖后端 onNotesDeleted(folderId->count)
                 }
                 onDropRelease: {
                     var indexList = [];

@@ -62,6 +62,7 @@
 #define FOLDER_COUNT_KEY "notesCount"
 #define FOLDER_ICON_KEY "icon"
 #define FOLDER_SORT_KEY "sortNumber"
+#define FOLDER_ID_KEY "folderId"
 
 //Time format
 #define VNOTE_TIME_FMT "yyyy-MM-dd HH:mm:ss.zzz"
