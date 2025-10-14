@@ -339,7 +339,7 @@ ApplicationWindow {
             itemListView.selectedNoteItem = [0];
             itemListView.selectSize = 1;
         }
-        onMoveFinished: {
+        onMoveFinished: function(index, srcFolderIndex, dstFolderIndex) {
             folderListView.model.get(srcFolderIndex).count = (Number(folderListView.model.get(srcFolderIndex).count) - index.length).toString();
             folderListView.model.get(dstFolderIndex).count = (Number(folderListView.model.get(dstFolderIndex).count) + index.length).toString();
             var sortedArray = sortDescending(itemListView.selectedNoteItem);
@@ -353,13 +353,26 @@ ApplicationWindow {
             } else {
                 webEngineView.webVisible = true;
             }
-            if (!itemListView.view.itemAtIndex(minIndex)) {
-                minIndex = itemListView.model.count - 1;
+            // 使用 model.count / model.get 来判定有效索引，避免 view.itemAtIndex 的不确定性
+            var count = itemListView.model.count;
+            if (count <= 0) {
+                itemListView.selectedNoteItem = [];
+                itemListView.selectSize = 0;
+                return;
+            }
+            if (minIndex < 0 || minIndex >= count) {
+                minIndex = count - 1;
+            }
+            var modelItem = itemListView.model.get(minIndex);
+            if (!modelItem) {
+                minIndex = count - 1;
+                modelItem = itemListView.model.get(minIndex);
             }
             itemListView.selectedNoteItem.push(minIndex);
-            itemListView.view.itemAtIndex(minIndex).isSelected = true;
+            var delegate = itemListView.view.itemAtIndex(minIndex);
+            if (delegate) delegate.isSelected = true;
             itemListView.selectSize = 1;
-            VNoteMainManager.vNoteChanged(itemListView.model.get(minIndex).noteId);
+            VNoteMainManager.vNoteChanged(modelItem.noteId);
         }
         onNoSearchResult: {
             label.visible = false;
