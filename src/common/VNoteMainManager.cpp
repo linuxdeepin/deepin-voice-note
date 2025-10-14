@@ -968,6 +968,25 @@ void VNoteMainManager::checkNoteVoice(const QVariantList &index)
     qInfo() << "Note voice check finished";
 }
 
+void VNoteMainManager::checkNoteText(const QVariantList &index)
+{
+    qInfo() << "Checking note text for" << index.size() << "notes";
+    foreach (auto id, index) {
+        int noteIndex = id.toInt();
+        VNoteItem *item = getNoteById(noteIndex);
+        if (item && item->haveText()) {
+            ActionManager::instance()->enableAction(ActionManager::NoteSave, true);
+            ActionManager::instance()->enableAction(ActionManager::SaveNoteAsText, true);
+            ActionManager::instance()->enableAction(ActionManager::SaveNoteAsHtml, true);
+            return;
+        }
+    }
+    ActionManager::instance()->enableAction(ActionManager::NoteSave, false);
+    ActionManager::instance()->enableAction(ActionManager::SaveNoteAsText, false);
+    ActionManager::instance()->enableAction(ActionManager::SaveNoteAsHtml, false);
+    qInfo() << "Note text check finished";
+}
+
 void VNoteMainManager::clearSearch()
 {
     // qInfo() << "Clearing search";

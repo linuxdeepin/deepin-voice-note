@@ -150,13 +150,14 @@ Item {
         // 在当前选中项位置弹出笔记右键菜单
         if (selectedNoteItem.length === 0)
             return;
-        // 保持与右键逻辑一致：刷新 contextIndex、检查语音可用性
+        // 保持与右键逻辑一致：刷新 contextIndex、检查语音可用性和文本内容
         itemListView.contextIndex = selectedNoteItem[0];
         var list = [];
         for (var i = 0; i < selectedNoteItem.length; i++) {
             list.push(itemModel.get(selectedNoteItem[i]).noteId);
         }
         VNoteMainManager.checkNoteVoice(list);
+        VNoteMainManager.checkNoteText(list);
         var item = itemListView.itemAtIndex(itemListView.contextIndex);
         if (!item)
             return;
@@ -453,20 +454,15 @@ Item {
                 ActionManager.enableAction(ActionManager.NoteTop, false);
                 ActionManager.enableAction(ActionManager.NoteAddNew, false);
             } else {
-                ActionManager.enableAction(ActionManager.NoteMove, !isRecordingAudio);
-                ActionManager.enableAction(ActionManager.NoteTop, !isRecordingAudio);
-                ActionManager.enableAction(ActionManager.NoteAddNew, !isRecordingAudio);
+                // 录音或播放时禁用移动、置顶和新建
+                ActionManager.enableAction(ActionManager.NoteMove, !isRecordingAudio && !isPlay);
+                ActionManager.enableAction(ActionManager.NoteTop, !isRecordingAudio && !isPlay);
+                ActionManager.enableAction(ActionManager.NoteAddNew, !isRecordingAudio && !isPlay);
             }
             
-            // 录音时禁用其他菜单选项
+            // 录音时保存语音菜单置灰，但重命名和保存笔记保持可用
             if (isRecordingAudio) {
-                ActionManager.enableAction(ActionManager.NoteRename, false);
-                ActionManager.enableAction(ActionManager.SaveNoteAsText, false);
-                ActionManager.enableAction(ActionManager.SaveNoteAsHtml, false);
-            } else {
-                ActionManager.enableAction(ActionManager.NoteRename, true);
-                ActionManager.enableAction(ActionManager.SaveNoteAsText, true);
-                ActionManager.enableAction(ActionManager.SaveNoteAsHtml, true);
+                ActionManager.enableAction(ActionManager.NoteSaveVoice, false);
             }
         }
         onActionTrigger: actionId => {
@@ -810,6 +806,7 @@ Item {
                             list.push(itemModel.get(selectedNoteItem[i]).noteId);
                         }
                         VNoteMainManager.checkNoteVoice(list);
+                        VNoteMainManager.checkNoteText(list);
                         noteCtxMenu.popup();
                     } else {
                         // 录音时禁用笔记切换
@@ -865,11 +862,7 @@ Item {
                     }
                 }
                 onDoubleClicked: {
-                    // 录音时禁用双击重命名
-                    if (isRecordingAudio) {
-                        console.log("Cannot rename note while recording audio");
-                        return;
-                    }
+                    // 录音时允许双击重命名
                     itemListView.itemAtIndex(index).isRename = true;
                 }
                 onEntered: {
