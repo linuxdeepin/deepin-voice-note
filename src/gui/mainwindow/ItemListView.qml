@@ -830,16 +830,22 @@ Item {
                         }
                         
                         if (itemListView.currentIndex === index && selectedNoteItem.length === 1) {
-                            return;
+                            var curDelegate = itemListView.itemAtIndex(index);
+                            if (curDelegate && curDelegate.isSelected) {
+                                console.warn("ListView.onClicked: early return");
+                                return;
+                            }
                         }
                         switch (mouse.modifiers) {
                         case Qt.ControlModifier:
                             if (selectedNoteItem.indexOf(index) != -1) {
-                                itemListView.itemAtIndex(index).isSelected = false;
+                                var existed = itemListView.itemAtIndex(index);
+                                if (existed) existed.isSelected = false;
                                 selectedNoteItem.splice(selectedNoteItem.indexOf(index), 1);
                                 selectSize--;
                             } else {
-                                itemListView.itemAtIndex(index).isSelected = true;
+                                var exist2 = itemListView.itemAtIndex(index);
+                                if (exist2) exist2.isSelected = true;
                                 selectedNoteItem.push(index);
                                 selectSize++;
                             }
@@ -850,7 +856,8 @@ Item {
                             var startIndex = Math.min(index, itemListView.lastCurrentIndex);
                             var endIndex = Math.max(index, itemListView.lastCurrentIndex);
                             for (var i = startIndex; i <= endIndex; i++) {
-                                itemListView.itemAtIndex(i).isSelected = true;
+                                var d = itemListView.itemAtIndex(i);
+                                if (d) d.isSelected = true;
                                 selectedNoteItem.push(i);
                                 selectSize++;
                             }
@@ -863,14 +870,16 @@ Item {
                             }
                             for (var m = 0; m < selectedNoteItem.length; m++) {
                                 var selectItem = itemListView.itemAtIndex(selectedNoteItem[m]);
-                                selectItem.isSelected = false;
+                                if (selectItem) selectItem.isSelected = false;
                             }
                             selectedNoteItem = [index];
                             selectSize = 1;
-                            itemListView.itemAtIndex(index).isSelected = true;
+                            var newDelegate = itemListView.itemAtIndex(index);
+                            if (newDelegate) newDelegate.isSelected = true;
                             itemListView.currentIndex = index;
                             itemListView.lastCurrentIndex = index;
                             noteItemChanged(Number(itemModel.get(index).noteId));
+                            
                             break;
                         }
                     }
