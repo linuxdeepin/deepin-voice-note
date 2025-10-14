@@ -1639,6 +1639,74 @@ function updateProgressBarValue(target, value) {
     $(airVoicePlayback).find('.timePassed').text(timePassed);
 }
 
+/***** 在语音播放控件内区分拖拽语义：进度条区域拖动 -> 调整进度；其他区域 -> 保持原有行为 *****/
+function getClientPos(e) {
+    var oe = e.originalEvent || e;
+    if (oe.touches && oe.touches.length) {
+        return { x: oe.touches[0].clientX, y: oe.touches[0].clientY };
+    }
+    return { x: oe.clientX, y: oe.clientY };
+}
+
+function seekProgressByClientX(progressBar, clientX) {
+    var rect = progressBar.getBoundingClientRect();
+    var ratio = (clientX - rect.left) / rect.width;
+    if (isNaN(ratio)) {
+        return;
+    }
+    ratio = Math.max(0, Math.min(1, ratio));
+    var max = parseFloat(progressBar.max || 0);
+    if (max <= 0) {
+        return;
+    }
+    var value = ratio * max;
+    // 以秒为步进，和原有 step=1000 保持一致
+    progressBar.value = Math.round(value / 1000) * 1000;
+    updateProgressBarValue(progressBar, progressBar.value);
+}
+
+// 在 voicePlayback 内监听起始事件；若点击在 progressBar 可视区域内，则进入进度拖拽模式
+$('body').on('mousedown pointerdown touchstart', '.voicePlayback', function (e) {
+    var progressBar = $(this).find('.progressBar').get(0);
+    if (!progressBar) {
+        return;
+    }
+    var pos = getClientPos(e);
+    var rect = progressBar.getBoundingClientRect();
+    var inside = (pos.x >= rect.left && pos.x <= rect.right && pos.y >= rect.top && pos.y <= rect.bottom);
+    if (!inside) {
+        // 非进度条区域：保持原有选中/拖拽语义
+        return;
+    }
+
+    // 进度条区域：改为进度拖拽语义
+    e.preventDefault();
+    e.stopPropagation();
+
+    progressBarDraging = true;
+    seekProgressByClientX(progressBar, pos.x);
+
+    var move = function (ev) {
+        var p = getClientPos(ev);
+        seekProgressByClientX(progressBar, p.x);
+        if (ev.preventDefault) ev.preventDefault();
+    };
+    var up = function (ev) {
+        var p2 = getClientPos(ev);
+        seekProgressByClientX(progressBar, p2.x);
+        progressBarDraging = false;
+        if (typeof webobj !== 'undefined' && webobj && webobj.jsCallVoiceProgressChange) {
+            webobj.jsCallVoiceProgressChange(progressBar.value);
+        }
+        $(window).off('mousemove pointermove touchmove', move);
+        $(window).off('mouseup pointerup touchend', up);
+        if (ev.preventDefault) ev.preventDefault();
+    };
+
+    $(window).on('mousemove pointermove touchmove', move);
+    $(window).on('mouseup pointerup touchend', up);
+});
+
 /***** 语音播放相关函数 end *****/
 
 /***** 以下为语音转文本相关函数 *****/
