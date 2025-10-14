@@ -76,6 +76,7 @@ signals:
     void updateRichTextSearch(const QString &key);
     void scrollChange(const bool &isTop);
     void updateEditNote(const int &noteId, const QString &time);
+    void noteTitleChanged(const int &noteId, const QString &newTitle);
 
 private slots:
     void onVNoteFoldersLoaded();

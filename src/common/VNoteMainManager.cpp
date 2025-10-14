@@ -809,10 +809,19 @@ void VNoteMainManager::renameNote(const int &index, const QString &newName)
         qInfo() << "rename note!";
         VNoteItemOper noteOps(item);
         if (noteOps.modifyNoteTitle(newName)) {
-            qDebug() << "Note renamed successfully, reloading current folder";
-            VNoteFolder *currentFolder = getFloderById(m_currentFolderIndex);
-            if (currentFolder) {
-                loadNotes(currentFolder);
+            qDebug() << "Note renamed successfully";
+            // 播放中不重新加载列表，避免中断播放状态
+            if (!OpsStateInterface::instance()->isPlaying()) {
+                qDebug() << "Not playing, reloading current folder";
+                VNoteFolder *currentFolder = getFloderById(m_currentFolderIndex);
+                if (currentFolder) {
+                    loadNotes(currentFolder);
+                }
+            } else {
+                qDebug() << "Playing audio, skip reloading to preserve play state";
+                // 更新标题
+                item->noteTitle = newName;
+                emit noteTitleChanged(index, newName);
             }
         } else {
             qWarning() << "Failed to rename note";
