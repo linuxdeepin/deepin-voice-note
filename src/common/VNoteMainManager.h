@@ -51,6 +51,7 @@ public:
     Q_INVOKABLE void changeAudioSource(const int &source);
     Q_INVOKABLE void insertImages(const QList<QUrl> &filePaths);
     Q_INVOKABLE void checkNoteVoice(const QVariantList &index);
+    Q_INVOKABLE void checkNoteText(const QVariantList &index);
     Q_INVOKABLE void clearSearch();
     Q_INVOKABLE bool isInSearchMode() const;
     Q_INVOKABLE void preViewShortcut(const QPointF &point);
