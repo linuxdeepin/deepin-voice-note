@@ -560,6 +560,15 @@ Item {
             noteItemChanged(notesData[0].noteId);
             selectSize = 1;
         }
+        onNoteTitleChanged: function(noteId, newTitle) {
+            for (var i = 0; i < itemModel.count; i++) {
+                if (itemModel.get(i).noteId === noteId) {
+                    itemModel.set(i, { "name": newTitle });
+                    console.log("Updated note title in list without reload, noteId:", noteId);
+                    break;
+                }
+            }
+        }
     }
 
     ListView {
