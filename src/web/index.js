@@ -69,13 +69,13 @@ var nodeTpl = `
 // 语言播放模板
 var voicePlayBackTemplate = `
     <!-- 语音播放控件 -->
-    <div class="voicePlayback" id="voicePlayback">
+    <div class="voicePlayback">
         <div class="left">
             <div class="voiceBtn"></div>
             <div class="title">{{title}}</div>
         </div>
         <!-- 音频进度条 音频 step 单位 s ; range 单位 ms -->
-        <input class="progressBar" type="range" min="0" max="{{voiceSize}}" step="1000" value="0" id="progressRange"
+        <input class="progressBar" type="range" min="0" max="{{voiceSize}}" step="1000" value="0"
             onchange="onProgressChange()" oninput="onProgressInput()">
         <div class="right">
             <!-- 语音进度/长度字段，默认显示长度 -->
@@ -119,7 +119,7 @@ var nodeTplV2 = `
     </div>`;
 
 var h5TplV2 = `
-    <div class="li voiceBox" contenteditable="false" jsonKey="{{jsonValue}}">
+    <div class="li voiceBox" contenteditable="false" draggable="true" jsonKey="{{jsonValue}}">
         ${nodeTplV2}
     </div>
     {{#if text}}
@@ -286,6 +286,10 @@ function initSummernote() {
 
     // 添加悬浮语音播放控件
     addAirVoicePlayback();
+    // 初始化录音块拖拽（仅交换数据与模板，不让浏览器复制内联样式）
+    initVoiceDragAndDrop();
+    // 移除 Summernote 的覆盖式 dropzone，避免拦截 drop 事件
+    $('.note-dropzone').remove();
 }
 
 
@@ -761,6 +765,7 @@ function insertVoiceItem(text) {
     var oA = document.createElement('div');
     oA.className = 'li voiceBox';
     oA.contentEditable = false;
+    oA.setAttribute('draggable', 'true');
     oA.setAttribute('jsonKey', text);
     oA.innerHTML = voiceHtml;
 
@@ -773,6 +778,7 @@ function insertVoiceItem(text) {
 
     removeNullP()
     setFocusScroll()
+    ensureVoiceBoxesDraggable();
 }
 
 /**
@@ -855,6 +861,7 @@ function setHtml(html) {
 
     // TODO: 实验性功能，替换 HTML 文本中的语音控件版本，不涉及数据的变更
     replaceVoiceToVersion2();
+    ensureVoiceBoxesDraggable();
 
     initFinish = true;
     // 搜索功能
@@ -948,6 +955,11 @@ function transHtml(json, flag) {
     return retHtml;
 }
 
+// 保证从历史/替换渲染回来的 voiceBox 都具有 draggable 属性
+function ensureVoiceBoxesDraggable() {
+    $('.voiceBox').attr('draggable', 'true');
+}
+
 //设置summerNote编辑状态 
 function enableSummerNote() {
     if (activePlayback || (activeTransVoice && !bTransVoiceIsReady)) {
@@ -1014,7 +1026,7 @@ function setVoiceButColor(color, shdow) {
         --highlightColor: ${color};
     }
 
-    .voiceBox .voicebtn {
+    .voiceBox .voiceBtn {
         background-color: ${color};
         box-shadow: 0px 4px 6px 0px ${shdow}80; 
     } 
@@ -1101,6 +1113,93 @@ function changeColor(flag, activeColor, disableColor, backgroundColor) {
     $('#summernote').summernote('airPopover.updateColorPalette', global_theme == 2);
     // change text foreground color and background color with theme
     switchTextColor(global_theme == 2);
+}
+
+/**
+ * 录音块拖拽（语义级交换）：
+ * - 仅允许在 .voiceBox 与 .voiceBox 之间拖拽
+ * - 阻止浏览器默认的 HTML 片段拖拽复制行为
+ * - 交换双方的 jsonKey，并用模板重渲染各自的内部结构
+ * - 保留容器节点与属性（包括 draggable/contenteditable 等），避免事件与状态丢失
+ */
+function initVoiceDragAndDrop() {
+    var dragSrc = null;
+
+    // 监听编辑区内任意节点的 dragstart，归一到最近的 voiceBox 作为拖拽源
+    $('body').on('dragstart', '.note-editable *', function (e) {
+        var vb = $(e.target).closest('.voiceBox').get(0);
+        if (!vb) return;
+        dragSrc = vb;
+        var dt = e.originalEvent.dataTransfer;
+        if (dt) {
+            dt.effectAllowed = 'move';
+            dt.setData('text/plain', 'VOICEBOX');
+        }
+    });
+
+    // 允许在编辑区内的任意子节点上方放置，使用 closest 命中 voiceBox
+    // 允许在编辑区任意位置拖拽经过，不强制要求命中 voiceBox
+    $('body').on('dragenter dragover', '.note-editable, .voiceBox', function (e) {
+        if (!dragSrc) return;
+        e.preventDefault();
+        var dt = e.originalEvent.dataTransfer;
+        if (dt) dt.dropEffect = 'move';
+    });
+
+
+    $('body').on('drop', '.note-editable, .voiceBox', function (e) {
+        if (!dragSrc) return;
+        // 首先尝试命中目标块
+        var dstBox = $(e.target).closest('.voiceBox').get(0);
+        // 若未命中目标块，则按鼠标 Y 坐标选择最近的 voiceBox
+        if (!dstBox) {
+            var clientY = (e.originalEvent && (e.originalEvent.clientY || (e.originalEvent.touches && e.originalEvent.touches[0] && e.originalEvent.touches[0].clientY))) || 0;
+            var nearest = null;
+            var minDist = Infinity;
+            $('.note-editable .voiceBox').each(function () {
+                var rect = this.getBoundingClientRect();
+                var mid = (rect.top + rect.bottom) / 2;
+                var dist = Math.abs(clientY - mid);
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearest = this;
+                }
+            });
+            dstBox = nearest;
+        }
+        if (!dstBox) { dragSrc = null; return; }
+        e.preventDefault();
+
+        if (dragSrc === dstBox) { dragSrc = null; return; }
+
+        // 只交换 jsonKey 与内部渲染，保留容器节点
+        var srcJson = $(dragSrc).attr('jsonKey');
+        var dstJson = $(dstBox).attr('jsonKey');
+
+        function renderVoiceBox(container, jsonStr) {
+            var json = JSON.parse(jsonStr);
+            var html = transHtml(json, true);
+            $(container).attr('jsonKey', jsonStr);
+            // 覆盖容器内部（voiceInfoBox + translate），保持容器属性不变
+            $(container).html(html);
+        }
+
+        renderVoiceBox(dragSrc, dstJson);
+        renderVoiceBox(dstBox, srcJson);
+
+        // 状态复位
+        $(dragSrc).find('.voicePlayback').removeClass('now play pause voiceToText');
+        $(dstBox).find('.voicePlayback').removeClass('now play pause voiceToText');
+        activePlayback = null;
+        enableSummerNote();
+        ensureVoiceBoxesDraggable();
+
+        dragSrc = null;
+    });
+
+    $('body').on('dragend', '.voiceBox', function () {
+        dragSrc = null;
+    });
 }
 
 /**
