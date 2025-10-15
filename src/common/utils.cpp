@@ -25,6 +25,8 @@
 #endif
 #include <QTextDocument>
 #include <QTextDocumentFragment>
+#include <QDBusInterface>
+#include <QDBusConnection>
 
 Utils::Utils()
 {
@@ -436,4 +438,111 @@ bool Utils::inLinglongEnv()
 {
     // qInfo() << "Checking if in Linglong environment";
     return !qgetenv("LINGLONG_APPID").isEmpty();
+}
+
+bool Utils::checkOsBuildValid(const QString& str)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+    static QRegularExpression regex("^[1-9A-Z][1-9A-Z][0-9A-Z][1-9A-Z][1-9A-Z](\\.\\w+)*$");
+    return regex.match(str).hasMatch();
+#else
+    static QRegExp regex("^[1-9A-Z][1-9A-Z][0-9A-Z][1-9A-Z][1-9A-Z](\\.\\w+)*$");
+    return regex.exactMatch(str);
+#endif
+}
+
+DSysInfo::UosEdition Utils::uosEditionType()
+{
+    static DSysInfo::UosEdition cachedEdition = DSysInfo::UosEdition::UosEditionUnknown;
+    static bool hasQueried = false;
+    if (hasQueried)
+        return cachedEdition;
+
+    QDBusInterface interface("org.deepin.dde.SystemInfo1",
+                            "/org/deepin/dde/SystemInfo1",
+                            "org.deepin.dde.SystemInfo1",
+                            QDBusConnection::sessionBus());
+
+    if(!interface.isValid()) {
+        hasQueried = true;
+        return cachedEdition;
+    }
+
+    QVariant osBuild = interface.property("OsBuild");
+    if(!osBuild.isValid()) {
+        hasQueried = true;
+        return cachedEdition;
+    }
+
+    const QString buildType = osBuild.toString();
+    if(buildType.isEmpty()) {
+        hasQueried = true;
+        return cachedEdition;
+    }
+
+    const QStringList parts = buildType.split(".");
+    if(parts.size() != 3) {
+        hasQueried = true;
+        return cachedEdition;
+    }
+
+    cachedEdition = parseOsBuildType(parts[0]);
+    hasQueried = true;
+    return cachedEdition;
+}
+
+DSysInfo::UosEdition Utils::parseOsBuildType(const QString & osBuild)
+{
+    if (!checkOsBuildValid(osBuild)) {
+        return DSysInfo::UosEdition::UosEditionUnknown;
+    }
+
+    int uosType = osBuild[1].digitValue();
+    int uosEditType = osBuild[3].digitValue();
+
+    if(uosType == 1) {
+        switch (uosEditType) {
+        case 1:
+            return DSysInfo::UosEdition::UosProfessional;
+        case 2:
+        case 7:
+            return DSysInfo::UosEdition::UosHome;
+        case 3:
+            return DSysInfo::UosEdition::UosCommunity;
+        case 4:
+        case 9:
+            return DSysInfo::UosEdition::UosMilitary;
+        case 5:
+            return DSysInfo::UosEdition::UosDeviceEdition;
+        case 6:
+            return DSysInfo::UosEdition::UosEducation;
+        default:
+            break;
+        }
+    } else if(uosType == 2) {
+        switch (uosEditType) {
+        case 1:
+            return DSysInfo::UosEdition::UosEnterprise;
+        case 2:
+            return DSysInfo::UosEdition::UosEnterpriseC;
+        case 3:
+            return DSysInfo::UosEdition::UosEuler;
+        case 4:
+        case 9:
+            return DSysInfo::UosEdition::UosMilitaryS;
+        case 5:
+            return DSysInfo::UosEdition::UosDeviceEdition;
+        default:
+            break;
+        }
+    } else if (uosType == 3) {
+        return DSysInfo::UosEdition::UosEnterprise;
+    }
+
+    return DSysInfo::UosEdition::UosEditionUnknown;
+}
+
+bool Utils::isCommunityEdition()
+{
+    return uosEditionType() == DSysInfo::UosEdition::UosCommunity;
 }
