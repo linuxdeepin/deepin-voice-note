@@ -12,8 +12,10 @@
 #include <QTextDocumentFragment>
 #include <QTextDocument>
 #include <QKeyEvent>
+#include <DSysInfo>
 
 DWIDGET_USE_NAMESPACE
+DCORE_USE_NAMESPACE
 
 class VNoteBlock;
 
@@ -54,4 +56,10 @@ public:
     static QString stripHtmlTags(const QString &htmlText);
     // Check if current in linglong environment
     static bool inLinglongEnv();
+
+    // UOS edition detection via DBus OsBuild (fallback from provided reference)
+    static DSysInfo::UosEdition uosEditionType();
+    static DSysInfo::UosEdition parseOsBuildType(const QString &osBuild);
+    static bool checkOsBuildValid(const QString &str);
+    static bool isCommunityEdition();
 };

@@ -1140,7 +1140,7 @@ void VNoteMainManager::showPrivacy()
     QString url = "";
     QLocale locale;
     QLocale::Country country = locale.country();
-    bool isCommunityEdition = DSysInfo::isCommunityEdition();
+    bool isCommunityEdition = Utils::isCommunityEdition();
     if (country == QLocale::China) {
         if (isCommunityEdition) {
             url = "https://www.deepin.org/zh/agreement/privacy/";
