@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.45) unstable; urgency=medium
+
+  * fix: Implement UOS edition detection and validation methods
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Thu, 16 Oct 2025 19:33:51 +0800
+
 deepin-voice-note (6.5.44) unstable; urgency=medium
 
   * fix: Implement restrictions on note and folder deletion during audio recording and playback
