@@ -676,10 +676,14 @@ ApplicationWindow {
 
                     Layout.fillWidth: true
                     Layout.leftMargin: offect
-                    Layout.preferredHeight: 30
+                    Layout.preferredHeight: (DTK.fontManager.t6.pixelSize > 18)
+                                           ? Math.max(36, Math.ceil(DTK.fontManager.t6.pixelSize * 1.6))
+                                           : 30
                     Layout.topMargin: 12
                     enabled: !isRecordingAudio && !folderListView.isPlay  // 录音或播放时禁用搜索框
                     placeholder: qsTr("Search")
+                    topPadding: 0
+                    bottomPadding: 0
 
                     Keys.onPressed: function(event) {
                         if (event.key === Qt.Key_Escape) {

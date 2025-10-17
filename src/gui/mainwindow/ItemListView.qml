@@ -662,7 +662,19 @@ Item {
 
             color: isSelected ? (rootItem.activeFocus ? "#FF1F6EE7" : (DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF")) : (DTK.themeType === ApplicationHelper.LightType ? "white" : "#0CFFFFFF")
             enabled: !isPlay || itemListView.currentIndex === index
-            height: isSearch ? 67 : 50
+            // 列表项高度始终使用非重命名的计算方式，重命名时高度保持不变
+            height: (function() {
+                var topM = 8;
+                var bottomM = 8;
+                var gap = 1; 
+                var titleH = Math.ceil(noteNameLabel.implicitHeight);
+                var timeH = Math.ceil(timeLabel.implicitHeight);
+                var searchRowH = isSearch ? Math.max(16, Math.ceil(folderNameLabel.implicitHeight)) : 0;
+                var gapCount = isSearch ? 2 : 1; 
+                var content = topM + titleH + gap * gapCount + timeH + (isSearch ? searchRowH : 0) + bottomM;
+                var baseMin = isSearch ? 67 : 50;
+                return Math.max(baseMin, content);
+            })()
             radius: 6
             width: itemListView.width
 
@@ -711,7 +723,7 @@ Item {
                     color: DTK.themeType === ApplicationHelper.LightType ? (isSelected ? (rootItem.activeFocus ? "white" : "black") : "black") : "white"
                     elide: Text.ElideRight
                     font: DTK.fontManager.t6
-                    height: 18
+                    height: implicitHeight
                     horizontalAlignment: Text.AlignHLeft
                     text: model.name
                     visible: !isRename
@@ -723,7 +735,7 @@ Item {
                     Layout.fillWidth: true
                     color: isSelected ? (rootItem.activeFocus ? "#7FFFFFFF" : DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF") : (DTK.themeType === ApplicationHelper.LightType ? "#7F000000" : "#7FFFFFFF")
                     font.pixelSize: 10
-                    height: 15
+                    height: implicitHeight
                     horizontalAlignment: Text.AlignHLeft
                     text: model.time
                     visible: !isRename
@@ -739,8 +751,38 @@ Item {
                 LineEdit {
                     id: renameLine
 
-                    Layout.fillHeight: true
+                    Layout.fillHeight: false
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 100  
+                    Layout.maximumWidth: itemListView.width - 12  
+                    Layout.leftMargin: 6 - 10  // = -4
+                    Layout.rightMargin: 6 - 10 // = -4
+                    Layout.topMargin: isSearch ? 6 : (10 - 8)  
+                    Layout.bottomMargin: isSearch ? 0 : (10 - 8)  
+                    font: DTK.fontManager.t6
+                    leftPadding: 6
+                    rightPadding: 30 
+                    topPadding: 4
+                    bottomPadding: 4
+                    implicitHeight: Math.max(30, Math.ceil(font.pixelSize * 1.6))
+                    Layout.preferredHeight: (function() {
+                        var itemH = rootItemDelegate.height;
+                        var outerTop = 8, outerBottom = 8;
+                        if (isSearch) {
+                            // 搜索模式：需要为下方的文件夹行预留空间
+                            var topM = 6 - 8;  // 搜索时上边距
+                            var afterGap = 7;  // 与下方间距
+                            var searchRowH = Math.max(16, Math.ceil(folderNameLabel.implicitHeight));
+                            var available = itemH - (outerTop + outerBottom + topM + afterGap + searchRowH);
+                            return Math.min(implicitHeight, Math.max(30, available));
+                        } else {
+                            // 非搜索模式：在固定列表项高度内适应，考虑上下边距
+                            var topM = 10 - 8;     // 非搜索时上边距
+                            var bottomM = 10 - 8;  // 非搜索时下边距
+                            var available = itemH - (outerTop + outerBottom + topM + bottomM);
+                            return Math.min(implicitHeight, Math.max(30, available));
+                        }
+                    })()
                     text: model.name
                     visible: rootItemDelegate.isRename
 
