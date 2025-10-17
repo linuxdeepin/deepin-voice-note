@@ -5,8 +5,9 @@ import QtQuick.Controls 2.15
 import VNote 1.0
 import org.deepin.dtk 1.0
 
-Item {
+FocusScope {
     id: rootItem
+    focus: visible
 
     property int btnSize: 30
     property int iconSize: 72
@@ -28,6 +29,7 @@ Item {
 
     onVisibleChanged: {
         curves.startRecording();
+        pauseBtn.forceActiveFocus();
     }
 
     Rectangle {
@@ -76,6 +78,9 @@ Item {
             icon.width: iconSize
             implicitHeight: btnSize
             implicitWidth: btnSize
+            activeFocusOnTab: true
+            KeyNavigation.tab: stopBtn
+            KeyNavigation.backtab: stopBtn
 
             background: Item {
             }
@@ -108,6 +113,9 @@ Item {
             icon.width: iconSize
             implicitHeight: btnSize
             implicitWidth: btnSize
+            activeFocusOnTab: true
+            KeyNavigation.tab: pauseBtn
+            KeyNavigation.backtab: pauseBtn
 
             background: Item {
             }
@@ -115,6 +123,22 @@ Item {
             onClicked: {
                 stop();
             }
+        }
+    }
+
+    MouseArea {
+        anchors.fill: back
+        onPressed: function(mouse) {
+            var p1 = pauseBtn.mapFromItem(this, mouse.x, mouse.y);
+            var p2 = stopBtn.mapFromItem(this, mouse.x, mouse.y);
+            var onPause = pauseBtn.contains(p1);
+            var onStop = stopBtn.contains(p2);
+            if (onPause || onStop) {
+                mouse.accepted = false;
+                return;
+            }
+            rootItem.forceActiveFocus();
+            mouse.accepted = true;
         }
     }
 

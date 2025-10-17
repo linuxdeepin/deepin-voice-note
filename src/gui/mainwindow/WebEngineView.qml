@@ -517,6 +517,7 @@ Item {
 
     Loader {
         id: recorderViewLoader
+            z: 1000
 
         function onPauseRecording() {
             VoiceRecoderHandler.pauseRecoder();
@@ -549,6 +550,7 @@ Item {
         onLoaded: {
             recorderViewLoader.item.pauseRecording.connect(onPauseRecording);
             recorderViewLoader.item.stopRecording.connect(onStopRecording);
+            recorderViewLoader.item.forceActiveFocus();
         }
     }
 
