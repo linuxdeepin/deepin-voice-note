@@ -273,17 +273,17 @@
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="220"/>
         <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
-        <translation type="unfinished"/>
+        <translation>Ju lutemi, instaloni “UOS AI” nga App Store para përdorimit</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="222"/>
         <source>No audio input device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>S’u pikas pajisje audio në hyrje. Ju lutemi, kontrollojeni dhe riprovoni</translation>
     </message>
     <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="224"/>
         <source>No audio output device detected. Please check and try again</source>
-        <translation type="unfinished"/>
+        <translation>S’u pikas pajisje audio në dalje. Ju lutemi, kontrollojeni dhe riprovoni</translation>
     </message>
 </context>
 <context>
