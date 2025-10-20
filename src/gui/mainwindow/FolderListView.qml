@@ -230,7 +230,8 @@ Item {
             folderListView.model.insert(0, {
                 name: folderData.name,
                 count: folderData.notesCount,
-                icon: folderData.icon
+                icon: folderData.icon,
+                folderId: folderData.folderId
             });
             folderListView.currentIndex = 0;
             folderListView.lastCurrentIndex = 0;
