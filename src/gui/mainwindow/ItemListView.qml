@@ -172,12 +172,63 @@ Item {
     visible: true
     width: 640
 
-    Keys.onDeletePressed: {
-        if (webVisible || isRecordingAudio || isPlay) {
-            console.log("No notes available, cannot delete");
-            return;
+    Keys.onPressed: function(event) {
+        switch (event.key) {
+         case Qt.Key_Up:
+             if (itemListView.count > 0) {
+                 // 取消之前选中项的选中状态
+                 if (selectedNoteItem.length === 1) {
+                     var prevItem = itemListView.itemAtIndex(selectedNoteItem[0]);
+                     if (prevItem) prevItem.isSelected = false;
+                 }
+                 // 循环切换：如果在第一项，跳到最后一项；否则向上移动
+                 if (itemListView.currentIndex <= 0) {
+                     itemListView.currentIndex = itemListView.count - 1;
+                 } else {
+                     itemListView.currentIndex--;
+                 }
+                 var newItem = itemListView.itemAtIndex(itemListView.currentIndex);
+                 if (newItem) {
+                     newItem.isSelected = true;
+                     selectedNoteItem = [itemListView.currentIndex];
+                     noteItemChanged(itemModel.get(itemListView.currentIndex).noteId);
+                 }
+             }
+             event.accepted = true;
+             break;
+         case Qt.Key_Down:
+             if (itemListView.count > 0) {
+                 // 取消之前选中项的选中状态
+                 if (selectedNoteItem.length === 1) {
+                     var prevItem = itemListView.itemAtIndex(selectedNoteItem[0]);
+                     if (prevItem) prevItem.isSelected = false;
+                 }
+                 // 循环切换：如果在最后一项，跳到第一项；否则向下移动
+                 if (itemListView.currentIndex >= itemListView.count - 1) {
+                     itemListView.currentIndex = 0;
+                 } else {
+                     itemListView.currentIndex++;
+                 }
+                 var newItem = itemListView.itemAtIndex(itemListView.currentIndex);
+                 if (newItem) {
+                     newItem.isSelected = true;
+                     selectedNoteItem = [itemListView.currentIndex];
+                     noteItemChanged(itemModel.get(itemListView.currentIndex).noteId);
+                 }
+             }
+             event.accepted = true;
+             break;
+        case Qt.Key_Delete:
+            if (webVisible || isRecordingAudio || isPlay) {
+                console.log("No notes available, cannot delete");
+                return;
+            }
+            rootItem.onDeleteNote();
+            event.accepted = true;
+            break;
+        default:
+            break;
         }
-        rootItem.onDeleteNote();
     }
     onSelectSizeChanged: {
         mulChoices(selectSize);
