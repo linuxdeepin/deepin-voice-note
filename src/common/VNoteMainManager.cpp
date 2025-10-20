@@ -374,6 +374,7 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
         VNoteItemOper noteOper;
         VNOTE_ITEMS_MAP *notes = noteOper.getFolderNotes(folder->id);
         QList<QVariantMap> notesDataList;
+        const int preferredNoteId = m_currentNoteId;
         if (notes) {
             qInfo() << "notes is not nullptr";
             notes->lock.lockForRead();
@@ -397,13 +398,25 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
 
             std::sort(notesDataList.begin(), notesDataList.end(), NoteCompare());
         }
+        int selectIndex = 0;
         if (!notesDataList.isEmpty()) {
             qInfo() << "notesDataList is not empty";
-            m_currentNoteId = notesDataList.first().value("noteId").toInt();
-            vNoteChanged(m_currentNoteId);
-        } else
+            if (preferredNoteId > 0) {
+                for (int i = 0; i < notesDataList.size(); ++i) {
+                    if (notesDataList[i].value("noteId").toInt() == preferredNoteId) {
+                        selectIndex = i;
+                        break;
+                    }
+                }
+            }
+            if (preferredNoteId <= 0) {
+                m_currentNoteId = notesDataList.first().value("noteId").toInt();
+                vNoteChanged(m_currentNoteId);
+            }
+        } else {
             m_currentNoteId = -1;
-        emit updateNotes(notesDataList, 0);
+        }
+        emit updateNotes(notesDataList, selectIndex);
     }
     qInfo() << "Notes loading finished, count:" << notesCount;
     return notesCount;
