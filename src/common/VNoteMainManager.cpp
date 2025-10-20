@@ -281,6 +281,7 @@ void VNoteMainManager::vNoteCreateFolder()
         data.insert(FOLDER_COUNT_KEY, "0");
         data.insert(FOLDER_ICON_KEY, QString::number(newFolder->defaultIcon));
         data.insert(FOLDER_SORT_KEY, folders->folders.size());
+        data.insert(FOLDER_ID_KEY, newFolder->id);
         addFolderFinished(data);
     } else {
         qWarning() << "Failed to create new folder";
