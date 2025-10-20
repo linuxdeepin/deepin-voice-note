@@ -672,6 +672,8 @@ ApplicationWindow {
                             search.visible = false;
                     }
 
+
+
                     Layout.fillWidth: true
                     Layout.leftMargin: offect
                     Layout.preferredHeight: 30

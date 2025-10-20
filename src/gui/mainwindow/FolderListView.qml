@@ -165,23 +165,52 @@ Item {
     Component.onCompleted: {
         root.forceActiveFocus();
     }
-    Keys.onDeletePressed: {
-        if (webVisible || isRecordingAudio || isPlay) {
-            console.log("No notes available, cannot delete folder");
-            return;
-        }
-        
-        messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteFolder, ret => {
-            if (ret) {
-                VNoteMainManager.vNoteDeleteFolder(folderListView.currentIndex);
-                if (folderModel.count === 1)
-                    folderEmpty();
-                folderModel.remove(folderListView.currentIndex);
-                if (folderListView.currentIndex === 0) {
-                    folderListView.currentIndex = 0;
+    Keys.onPressed: function(event) {
+        switch (event.key) {
+        case Qt.Key_Up:
+            if (folderListView.count > 0) {
+                // 循环切换：如果在第一项，跳到最后一项；否则向上移动
+                if (folderListView.currentIndex <= 0) {
+                    folderListView.currentIndex = folderListView.count - 1;
+                } else {
+                    folderListView.currentIndex--;
                 }
             }
-        });
+            event.accepted = true;
+            break;
+        case Qt.Key_Down:
+            if (folderListView.count > 0) {
+                // 循环切换：如果在最后一项，跳到第一项；否则向下移动
+                if (folderListView.currentIndex >= folderListView.count - 1) {
+                    folderListView.currentIndex = 0;
+                } else {
+                    folderListView.currentIndex++;
+                }
+            }
+            event.accepted = true;
+            break;
+        case Qt.Key_Delete:
+            if (webVisible || isRecordingAudio || isPlay) {
+                console.log("No notes available, cannot delete folder");
+                return;
+            }
+            
+            messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteFolder, ret => {
+                if (ret) {
+                    VNoteMainManager.vNoteDeleteFolder(folderListView.currentIndex);
+                    if (folderModel.count === 1)
+                        folderEmpty();
+                    folderModel.remove(folderListView.currentIndex);
+                    if (folderListView.currentIndex === 0) {
+                        folderListView.currentIndex = 0;
+                    }
+                }
+            });
+            event.accepted = true;
+            break;
+        default:
+            break;
+        }
     }
 
     ListModel {
