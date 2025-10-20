@@ -103,8 +103,8 @@ Item {
             return;
         }
         
+        folderDialogLoader.saveType = VNoteMainManager.Voice;
         if (!folderDialogLoader.active) {
-            folderDialogLoader.saveType = VNoteMainManager.Voice;
             folderDialogLoader.active = true;
         } else {
             folderDialogLoader.item.open();
