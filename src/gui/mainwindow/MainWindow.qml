@@ -532,6 +532,10 @@ ApplicationWindow {
                     // 数量更新统一依赖后端 onNotesDeleted(folderId->count)
                 }
                 onDropRelease: {
+                    if (rootWindow.isRecordingAudio || webEngineView.titleBar.isPlaying || folderListView.isPlay) {
+                        console.log("MainWindow: Drop ignored while recording or playing");
+                        return;
+                    }
                     var indexList = [];
                     for (var i = 0; i < itemListView.selectedNoteItem.length; i++) {
                         indexList.push(itemListView.model.get(itemListView.selectedNoteItem[i]).noteId);

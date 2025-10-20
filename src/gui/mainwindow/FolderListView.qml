@@ -47,7 +47,11 @@ Item {
     }
 
     function dropItems(selectedNoteItem) {
-        if (currentDropIndex != -1) {
+        if (isRecordingAudio) {
+            console.log("FolderListView: dropItems ignored while recording");
+        } else if (isPlay) {
+            console.log("FolderListView: dropItems ignored while playing");
+        } else if (currentDropIndex != -1) {
             VNoteMainManager.moveNotes(selectedNoteItem, currentDropIndex);
         }
         if (lastDropIndex != -1 && lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
