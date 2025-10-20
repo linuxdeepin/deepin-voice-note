@@ -896,6 +896,12 @@ Item {
                     rootItemDelegate.hovered = false;
                 }
                 onPositionChanged: function(mouse) {
+                    // 录音或播放时不启动拖拽，避免后续 dropRelease 链路
+                    if (isRecordingAudio || isPlay) {
+                        held = false;
+                        dragControl.visible = false;
+                        return;
+                    }
                     if (!held) {
                         if ((startMove[0] !== -1 || startMove[1] !== -1) && ((Math.abs(mouse.x - startMove[0]) > 5) || (Math.abs(mouse.y - startMove[1]) > 5))) {
                             held = true;
@@ -920,6 +926,12 @@ Item {
                     startMove[1] = mouse.y;
                 }
                 onReleased: function(mouse) {
+                    if (isRecordingAudio || isPlay) {
+                        startMove = [-1, -1];
+                        held = false;
+                        dragControl.visible = false;
+                        return;
+                    }
                     startMove = [-1, -1];
                     if (held && dragControl.visible && mouse.button === Qt.LeftButton) {
                         dropRelease();
