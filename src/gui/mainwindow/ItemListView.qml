@@ -68,7 +68,11 @@ Item {
             }
             VNoteMainManager.deleteNote(delIdList);
             deleteNotes(selectedNoteItem.length);
-            if (itemModel.count <= deleIndex) {
+            if (itemModel.count === 0) {
+                selectedNoteItem = [];
+                selectSize = 0;
+                emptyItemList();
+            } else if (itemModel.count <= deleIndex) {
                 itemListView.itemAtIndex(itemModel.count - 1).isSelected = true;
                 selectedNoteItem = [itemModel.count - 1];
                 noteItemChanged(itemModel.get(itemModel.count - 1).noteId);
@@ -765,6 +769,7 @@ Item {
                     topPadding: 4
                     bottomPadding: 4
                     implicitHeight: Math.max(30, Math.ceil(font.pixelSize * 1.6))
+                    maximumLength: 64
                     Layout.preferredHeight: (function() {
                         var itemH = rootItemDelegate.height;
                         var outerTop = 8, outerBottom = 8;
