@@ -430,6 +430,7 @@ Item {
                     Layout.rightMargin: 5
                     bottomPadding: 0
                     implicitHeight: 24
+                    maximumLength: 64
                     text: model.name
                     topPadding: 0
                     visible: rootItem.isRename

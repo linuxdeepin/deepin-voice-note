@@ -760,6 +760,9 @@ ApplicationWindow {
                     onDeleteFinished: {
                         webEngineView.toggleMultCho(1);
                     }
+                    onEmptyItemList: {
+                        webEngineView.webVisible = false;
+                    }
                     onNoteItemChanged: {
                         VNoteMainManager.vNoteChanged(index);
                     }
