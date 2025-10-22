@@ -426,8 +426,24 @@ function removeSelectRange(dom) {
 }
 
 // 取消选中样式
-$('body').on('click', function () {
+$('body').on('click', function (e) {
     $('.li').removeClass('active');
+    if ($(e.target).closest('.voiceBox').length == 0 && 
+        $(e.target).closest('.voicePlayback').length == 0 &&
+        !$(e.target).hasClass('demo') && 
+        $(e.target).parents('.demo').length == 0) {
+        try {
+            var sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                var range = sel.getRangeAt(0);
+                var fragment = range.cloneContents();
+                if ($(fragment).find('.voiceBox').length > 0) {
+                    sel.removeAllRanges();
+                }
+            }
+        } catch (e) {
+        }
+    }
 })
 
 // 语音复制
@@ -1005,7 +1021,14 @@ function rightClick(e) {
         $('#summernote').summernote('airPopover.hide');
         setSelectRange($(e.target).closest('.voiceBox')[0]);
     } else if (voiceLength == childrenLength && childrenLength != 0) {
-        recordActiveVoice()
+        // selection中只有语音块，但右键点击位置不在语音块上，说明是旧的selection，需要清除
+        if ($(e.target).closest('.voiceBox').length == 0) {
+            // 点击的不是语音块，清除旧选区，让getSelectedRange()返回空内容
+            window.getSelection().removeAllRanges();
+        } else {
+            // 点击的确实是语音块，记录它
+            recordActiveVoice()
+        }
     }
     let info = isRangeVoice()
     webobj.jsCallPopupMenu(info.flag, info.info);
@@ -1296,6 +1319,17 @@ document.onkeydown = function (event) {
 
     } else if (window.event.keyCode == 8) {
         // backspace
+        // 检查是否选中了语音块
+        var testDiv = getSelectedRange();
+        if ($(testDiv).find('.voiceBox').length == $(testDiv).children().length && $(testDiv).children().length != 0) {
+            if (activePlayback && activePlayback.hasClass('play')) {
+                console.log("Cannot delete voice while playing");
+                return false;
+            }
+            deleteSelection();
+            return false;
+        }
+        
         if (getSelectedRange().innerHTML == document.querySelector('.note-editable').innerHTML) {
             $('.note-editable').html('<p><br></p>')
         }
@@ -1338,6 +1372,19 @@ document.onkeydown = function (event) {
         }
     } else if (window.event.keyCode == 46) {
         // delete
+        // 检查是否选中了语音块
+        var testDiv = getSelectedRange();
+        if ($(testDiv).find('.voiceBox').length == $(testDiv).children().length && $(testDiv).children().length != 0) {
+            // 选中的是语音块，检查是否有语音正在播放
+            if (activePlayback && activePlayback.hasClass('play')) {
+                console.log("Cannot delete voice while playing");
+                return false;
+            }
+            // 没有播放，允许删除
+            deleteSelection();
+            return false;
+        }
+        
         var selectionObj = window.getSelection();
         let focusDom = selectionObj.extentNode
         let domList = $(focusDom).parents()
