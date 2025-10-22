@@ -657,6 +657,7 @@ ApplicationWindow {
                         label.visible = true;
                         folderListView.opacity = 1;
                         folderListView.enabled = true;
+                        createFolderButton.enabled = !isRecordingAudio && !folderListView.isPlay;
                         itemListView.isSearch = false;
                         itemListView.isSearching = false;
                         webEngineView.webVisible = true;
@@ -707,6 +708,7 @@ ApplicationWindow {
                             label.visible = true;
                             folderListView.opacity = 1;
                             folderListView.enabled = true;
+                            createFolderButton.enabled = !isRecordingAudio && !folderListView.isPlay;
                             itemListView.isSearch = false;
                             itemListView.isSearching = false;
                             webEngineView.webVisible = true;
