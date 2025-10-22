@@ -300,6 +300,7 @@ Item {
             property bool isRename: false
             property var startMove: [-1, -1]
             property bool tooltipVisible: false
+            property bool cancelRename: false
 
             color: index === folderListView.currentIndex ? (root.activeFocus ? "#1F6DE4" : DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF") : (isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
             enabled: !isPlay || index === folderListView.currentIndex
@@ -317,10 +318,13 @@ Item {
                         model.name = newName;
                         updateFolderName(newName);
                     }
+                    cancelRename = false;
                     isRename = false;
                     root.forceActiveFocus();
                     break;
                 case Qt.Key_Escape:
+                    cancelRename = true;
+                    renameLine.text = model.name;
                     isRename = false;
                     root.forceActiveFocus();
                     break;
@@ -412,12 +416,13 @@ Item {
                         if (activeFocus) {
                             selectAll();
                         } else {
-                            if (text.length !== 0 && text !== model.name) {
+                            if (!rootItem.cancelRename && text.length !== 0 && text !== model.name) {
                                 model.name = text;
                                 VNoteMainManager.renameFolder(index, text);
                             } else {
                                 renameLine.text = model.name;
                             }
+                            rootItem.cancelRename = false;
                             folderMouseArea.enabled = true;
                             deselect();
                             rootItem.isRename = false;
