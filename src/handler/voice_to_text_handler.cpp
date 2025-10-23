@@ -64,17 +64,19 @@ void VoiceToTextHandler::onA2TStart()
 bool VoiceToTextHandler::checkNetworkState()
 {
     qDebug() << "Checking network state";
-    QDBusInterface network("org.deepin.dde.Network1", "/org/deepin/dde/Network1",
-                           "org.deepin.dde.Network1");
+    QDBusInterface network("org.freedesktop.NetworkManager",
+                           "/org/freedesktop/NetworkManager",
+                           "org.freedesktop.NetworkManager",
+                           QDBusConnection::systemBus());
 
     if (!network.isValid()) {
-        qWarning() << "Failed to obtain the network status DBUS";
+        qWarning() << "Failed to obtain the network status from NetworkManager D-Bus";
         return false;
     }
 
     QVariant ret = network.property("State");
     bool isConnected = (ret.toInt() == 70);
-    qDebug() << "Network state:" << (isConnected ? "Connected" : "Disconnected");
+    qDebug() << "Network state:" << ret.toInt() << (isConnected ? "Connected" : "Disconnected");
     return isConnected;
 }
 
