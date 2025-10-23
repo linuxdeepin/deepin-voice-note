@@ -91,11 +91,11 @@ void WebRichTextManager::initUpdateTimer()
 
 void WebRichTextManager::updateNote()
 {
-    qInfo() << "Updating note, text change flag:" << m_textChange;
+    // qInfo() << "Updating note, text change flag:" << m_textChange;
     if (m_textChange) {
         emit needUpdateNote();
     }
-    qInfo() << "Note update finished";
+    // qInfo() << "Note update finished";
 }
 
 void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &result)

@@ -4,6 +4,7 @@
 #include "common/utils.h"
 #include "common/VNoteMainManager.h"
 #include <QAudioBuffer>
+#include <QTimer>
 #include "opsstateinterface.h"
 // 条件编译：根据 Qt 版本包含不同的音频设备头文件
 #ifdef USE_QT5
@@ -284,15 +285,15 @@ void VoiceRecoderHandler::onAudioDeviceChange(int mode)
 
 void VoiceRecoderHandler::onAudioBufferProbed(const QAudioBuffer &buffer)
 {
-    qInfo() << "Audio buffer probed";
+    // qInfo() << "Audio buffer probed";
     qint64 msec = buffer.startTime();
     if (m_recordMsec != msec) {
         m_recordMsec = msec;
         QString strTime = Utils::formatMillisecond(msec, 0);
-        qDebug() << "Recording time updated:" << strTime;
+        // qDebug() << "Recording time updated:" << strTime;
         emit updateRecorderTime(strTime);
         if (msec > (60 * 60 * 1000)) {
-            qInfo() << "Recording reached maximum duration (1 hour), stopping";
+            // qInfo() << "Recording reached maximum duration (1 hour), stopping";
             stopRecoder();
         }
     }
@@ -310,12 +311,20 @@ void VoiceRecoderHandler::onAudioBufferProbed(const QAudioBuffer &buffer)
     }
     maxValue = maxValue / 10000;
     updateWave(maxValue);
-    qInfo() << "Audio buffer probe handling finished";
+    // qInfo() << "Audio buffer probe handling finished";
 }
 
 void VoiceRecoderHandler::onReduceNoiseChanged(bool reduceNoiseChanged)
 {
-    qInfo() << "Reduce noise changed to:" << reduceNoiseChanged;
-    onAudioDeviceChange(m_currentMode);
-    qInfo() << "Reduce noise change handling finished";
+
+    if (m_type != RecoderType::Idle) {
+        stopRecoder();
+        emit recoderStateChange(RecoderType::Idle);
+        updateWave(0.0);
+    }
+
+    QTimer::singleShot(200, this, [this]() {
+        QString deviceName = m_audioWatcher->getDeviceName(static_cast<AudioWatcher::AudioMode>(m_currentMode));
+        updateRecordBtnState(!deviceName.isEmpty());
+    });
 }
