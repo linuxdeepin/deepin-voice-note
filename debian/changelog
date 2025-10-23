@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.46) unstable; urgency=medium
+
+  * fix bugs.
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Thu, 23 Oct 2025 18:41:19 +0800
+
 deepin-voice-note (6.5.45) unstable; urgency=medium
 
   * fix: Implement UOS edition detection and validation methods
