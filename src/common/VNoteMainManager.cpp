@@ -401,20 +401,26 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
         int selectIndex = 0;
         if (!notesDataList.isEmpty()) {
             qInfo() << "notesDataList is not empty";
+            bool foundPreferredNote = false;
             if (preferredNoteId > 0) {
                 for (int i = 0; i < notesDataList.size(); ++i) {
                     if (notesDataList[i].value("noteId").toInt() == preferredNoteId) {
                         selectIndex = i;
+                        foundPreferredNote = true;
                         break;
                     }
                 }
             }
-            if (preferredNoteId <= 0) {
-                m_currentNoteId = notesDataList.first().value("noteId").toInt();
-                vNoteChanged(m_currentNoteId);
+            if (!foundPreferredNote) {
+                selectIndex = 0;
             }
+            m_currentNoteId = notesDataList[selectIndex].value("noteId").toInt();
+            vNoteChanged(m_currentNoteId);
+            qDebug() << "Switched to note ID:" << m_currentNoteId << "at index:" << selectIndex;
         } else {
             m_currentNoteId = -1;
+            // 清空富文本编辑器
+            m_richTextManager->initData(nullptr, "");
         }
         emit updateNotes(notesDataList, selectIndex);
     }
