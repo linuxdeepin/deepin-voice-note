@@ -664,7 +664,7 @@ Item {
             property bool isSelected: false
             property var startMove: [-1, -1]
 
-            color: isSelected ? (rootItem.activeFocus ? "#FF1F6EE7" : (DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF")) : (DTK.themeType === ApplicationHelper.LightType ? "white" : "#0CFFFFFF")
+            color: isSelected ? (rootItem.activeFocus ? palette.highlight : (DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF")) : (DTK.themeType === ApplicationHelper.LightType ? "white" : "#0CFFFFFF")
             enabled: !isPlay || itemListView.currentIndex === index
             // 列表项高度始终使用非重命名的计算方式，重命名时高度保持不变
             height: (function() {
@@ -724,7 +724,7 @@ Item {
 
                     // width: parent.width - 10
                     Layout.fillWidth: true
-                    color: DTK.themeType === ApplicationHelper.LightType ? (isSelected ? (rootItem.activeFocus ? "white" : "black") : "black") : "white"
+                    color: DTK.themeType === ApplicationHelper.LightType ? (isSelected ? (rootItem.activeFocus ? palette.highlightedText : "black") : "black") : "white"
                     elide: Text.ElideRight
                     font: DTK.fontManager.t6
                     height: implicitHeight
