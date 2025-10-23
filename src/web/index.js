@@ -313,6 +313,18 @@ function changeContent(we, contents, $editable) {
                 $('#summernote').summernote('airPopover.hide')
             }
         }
+        // 清理撤销后可能残留的临时CSS状态类
+        // summernote的undo可能恢复了包含'now'、'play'等临时状态的HTML
+        $('.voicePlayback').each(function() {
+            var $playback = $(this);           
+            if (activePlayback === null || 
+                !activePlayback.length || 
+                !$playback.is(activePlayback) ||
+                !$.contains(document.documentElement, activePlayback[0])) {
+                $playback.removeClass('now').removeClass('play').removeClass('pause');
+            }
+        });
+        
         webobj.jsCallTxtChange();
     }
 }
@@ -600,6 +612,14 @@ $('body').on('click', '.voiceBtn', function (e) {
     var curVoice = $(this).parents('.li:first');
     var jsonString = curVoice.attr('jsonKey');
     var bIsSame = curPlayback.hasClass('now');
+    var isActivePlaybackValid = (null !== activePlayback && 
+                                  activePlayback.length > 0 && 
+                                  $.contains(document.documentElement, activePlayback[0]));
+    
+    if (!isActivePlaybackValid && activePlayback !== null) {
+        activePlayback = null;
+        bIsSame = false; 
+    }
 
     // 不同，更新当前播放控件；暂停设置等待后端处理完成后 -> callJsSetPlayStatus()
     if (!bIsSame) {
@@ -609,7 +629,6 @@ $('body').on('click', '.voiceBtn', function (e) {
         }
         curPlayback.addClass('now');
         activePlayback = curPlayback;
-
         // 重置悬浮工具栏状态
         resetAirVoicePlayback();
     }
@@ -831,6 +850,10 @@ function updatePlayBackState(playback, state) {
         return;
     }
 
+    if (playback.length === 0 || !$.contains(document.documentElement, playback[0])) {
+        return;
+    }
+
     if (state == '0') {
         playback.removeClass('pause');
         playback.addClass('play');
@@ -839,6 +862,9 @@ function updatePlayBackState(playback, state) {
     } else {
         // 重置状态
         var progressBar = playback.find('.progressBar').get(0);
+        if (!progressBar) {
+            return;
+        }
         progressBar.value = 0;
         updateProgressBarValue(progressBar, progressBar.value);
 
@@ -1752,15 +1778,24 @@ function updateProgressBar(value) {
     }
 
     if (null !== activePlayback && activePlayback.hasClass('now')) {
+        if (!$.contains(document.documentElement, activePlayback[0])) {
+            activePlayback = null;
+            return;
+        }
         var progressBar = activePlayback.find('.progressBar').get(0);
+        if (!progressBar) {
+            return;
+        }
         // 按秒进位
         progressBar.value = (value / 1000) * 1000;
         updateProgressBarValue(progressBar, progressBar.value);
 
         // 同步更新浮动窗口进度条
         var airProgressBar = airVoicePlayback.find('.progressBar').get(0);
-        airProgressBar.value = progressBar.value;
-        updateProgressBarValue(airProgressBar, progressBar.value);
+        if (airProgressBar) {
+            airProgressBar.value = progressBar.value;
+            updateProgressBarValue(airProgressBar, progressBar.value);
+        }
     }
 }
 
