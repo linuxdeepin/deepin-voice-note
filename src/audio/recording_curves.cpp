@@ -23,10 +23,10 @@ RecordingCurves::~RecordingCurves()
 
 void RecordingCurves::updateVolume(const double &gain)
 {
-    qInfo() << "updateVolume called with gain:" << gain;
+    // qInfo() << "updateVolume called with gain:" << gain;
     m_gain = gain;
     update();
-    qInfo() << "updateVolume finished";
+    // qInfo() << "updateVolume finished";
 }
 
 void RecordingCurves::startRecording()
@@ -62,12 +62,12 @@ void RecordingCurves::pauseRecording()
 
 void RecordingCurves::updateCurves()
 {
-    qInfo() << "updateCurves called";
+    // qInfo() << "updateCurves called";
     m_phase += M_PI;
     if (m_phase > 170*M_PI)
         m_phase = 0;
     update();
-    qInfo() << "updateCurves finished";
+    // qInfo() << "updateCurves finished";
 }
 
 void RecordingCurves::paint(QPainter *painter)
