@@ -5617,7 +5617,7 @@
                     className: 'ulBut',
                     contents: _this.ui.icon(_this.options.icons.unorderedlist),
                     tooltip: tooltipContent.ul,
-                    click: _this.context.createInvokeHandler('editor.insertUnorderedList')
+                    click: _this.context.createInvokeHandlerAndUpdateState('editor.insertUnorderedList')
                 }).render();
             });
             this.context.memo('button.ol', function () {
@@ -5625,7 +5625,7 @@
                     className: 'olBut',
                     contents: _this.ui.icon(_this.options.icons.orderedlist),
                     tooltip: tooltipContent.ol,
-                    click: _this.context.createInvokeHandler('editor.insertOrderedList')
+                    click: _this.context.createInvokeHandlerAndUpdateState('editor.insertOrderedList')
                 }).render();
             });
             var justifyLeft = this.button({
@@ -5990,6 +5990,12 @@
                 },
                 '.note-btn-strikethrough': function () {
                     return styleInfo['font-strikethrough'] === 'strikethrough';
+                },
+                '.ulBut': function () {
+                    return styleInfo['list-style'] === 'unordered';
+                },
+                '.olBut': function () {
+                    return styleInfo['list-style'] === 'ordered';
                 }
             });
             if (styleInfo['font-family']) {
