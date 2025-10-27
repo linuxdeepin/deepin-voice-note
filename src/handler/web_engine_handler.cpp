@@ -728,8 +728,22 @@ bool WebEngineHandler::saveMP3()
         setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, dir.path());
         qDebug() << "Saved unified export path to settings:" << dir.path();
         
+        // 如果目标文件已存在，先删除它（因为 QFile::copy 不会覆盖已存在的文件）
+        // 用户已经在 getSaveFileName 对话框中确认覆盖
+        if (QFile::exists(fileName)) {
+            qDebug() << "Target file exists, removing it before copy:" << fileName;
+            if (!QFile::remove(fileName)) {
+                qWarning() << "Failed to remove existing file:" << fileName;
+                return false;
+            }
+        }
+        
         QFile tmpFile(m_voiceBlock.get()->voicePath);
-        return tmpFile.copy(fileName);
+        bool copyResult = tmpFile.copy(fileName);
+        if (!copyResult) {
+            qWarning() << "Failed to copy voice file from:" << m_voiceBlock.get()->voicePath << "to:" << fileName;
+        }
+        return copyResult;
     }
     qInfo() << "MP3 saving finished, result is true";
     return true;
