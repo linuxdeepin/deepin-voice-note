@@ -142,6 +142,7 @@ var global_activeColor = ''
 var global_disableColor = ''
 var global_theme = 1    // theme type 1:light 2:dark
 var global_themeColor = 'transparent'  //主题色
+var global_isRecording = false  // 录音状态标志
 var scrollHide = null  //滚动条隐藏定时器
 var scrollHideFont = null  //字体滚动条定时
 var isUlOrOl = false
@@ -604,6 +605,12 @@ function isRangeVoice() {
  * 播放按钮点击时触发
  */
 $('body').on('click', '.voiceBtn', function (e) {
+    // 录音时禁止播放语音
+    if (global_isRecording) {
+        console.log("Cannot play voice while recording");
+        return;
+    }
+    
     var curPlayback = $(this).parents('.voicePlayback:first');
     // 点击浮动窗口时视同点击焦点音频播放控件
     if (curPlayback.is(airVoicePlayback)) {
@@ -780,6 +787,10 @@ function initData(text) {
  * @returns {any}
  */
 function playButColor(status) {
+    // 更新录音状态（启用时不录音，禁用时在录音）
+    global_isRecording = !status;
+    console.log("playButColor: status=" + status + ", global_isRecording=" + global_isRecording);
+    
     if (!status) {
         setVoiceButColor(global_disableColor, global_disableColor)
 
@@ -1070,6 +1081,9 @@ function rightClick(e) {
  * @returns {any}
  */
 function setVoiceButColor(color, shdow) {
+    // 判断是否为禁用状态（颜色和阴影都是禁用色）
+    var isDisabled = (color === global_disableColor && shdow === global_disableColor);
+    
     $("#style").html(`
     :root {
         --highlightColor: ${color};
@@ -1077,7 +1091,8 @@ function setVoiceButColor(color, shdow) {
 
     .voiceBox .voiceBtn {
         background-color: ${color};
-        box-shadow: 0px 4px 6px 0px ${shdow}80; 
+        box-shadow: 0px 4px 6px 0px ${shdow}80;
+        ${isDisabled ? 'filter: grayscale(100%) opacity(0.5);' : ''}
     } 
     ::selection {
         background: ${color}!important;
@@ -1118,7 +1133,12 @@ function changeColor(flag, activeColor, disableColor, backgroundColor) {
     global_activeColor = activeColor
     global_disableColor = disableColor
     global_themeColor = backgroundColor
-    setVoiceButColor(global_activeColor, global_disableColor)
+    // 根据录音状态设置按钮颜色：录音时置灰，非录音时正常
+    if (global_isRecording) {
+        setVoiceButColor(global_disableColor, global_disableColor)
+    } else {
+        setVoiceButColor(global_activeColor, global_disableColor)
+    }
 
     $('.dropdown-fontsize>li>a').hover(function (e) {
         $(this).css('background-color', activeColor);

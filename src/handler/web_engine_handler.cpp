@@ -10,6 +10,7 @@
 #include "vtextspeechandtrmanager.h"
 #include "voice_player_handler.h"
 #include "voice_to_text_handler.h"
+#include "voice_recoder_handler.h"
 #include "setting.h"
 #include "globaldef.h"
 
@@ -93,6 +94,17 @@ WebEngineHandler::WebEngineHandler(QObject *parent)
             Q_EMIT playingVoice(true);
         }
     });
+    
+    // 监听录音状态变化，控制编辑器中语音播放按钮的启用/禁用
+    connect(VoiceRecoderHandler::instance(), &VoiceRecoderHandler::recoderStateChange, this, 
+            [](VoiceRecoderHandler::RecoderType type) {
+        qInfo() << "WebEngineHandler: Recording state changed to:" << type;
+        // 录音时禁用播放按钮，非录音时启用
+        bool enablePlayButton = (type != VoiceRecoderHandler::Recording);
+        qInfo() << "WebEngineHandler: Setting voice play button enable to:" << enablePlayButton;
+        Q_EMIT JsContent::instance()->callJsSetVoicePlayBtnEnable(enablePlayButton);
+    });
+    
     qInfo() << "WebEngineHandler constructor finished";
 }
 
