@@ -316,7 +316,6 @@ Item {
         clip: true
         enabled: parent.enabled
         model: folderModel
-        opacity: isRecordingAudio ? 0.5 : 1.0  // 录音时置灰
 
         ScrollBar.vertical: ScrollBar {
             id: verticalScrollBar
@@ -330,6 +329,9 @@ Item {
             property var startMove: [-1, -1]
             property bool tooltipVisible: false
             property bool cancelRename: false
+            
+            // 录音时：当前文件夹保持正常显示，其他文件夹置灰
+            opacity: (isRecordingAudio && index !== folderListView.currentIndex) ? 0.5 : 1.0
 
             color: index === folderListView.currentIndex ? (root.activeFocus ? palette.highlight : DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF") : (isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
             enabled: !isPlay || index === folderListView.currentIndex
