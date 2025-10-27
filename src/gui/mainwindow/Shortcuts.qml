@@ -8,6 +8,8 @@ Item {
     property bool blockCreateKeys: false
     // 初始页面仅允许 Ctrl+N / F1，其它快捷键全部禁用
     property bool initialOnlyCreateFolder: false
+    // 录音过程中禁用录音快捷键，避免重复启动录音导致崩溃
+    property bool blockRecordingKey: false
 
     signal copy
     signal createFolder
@@ -104,7 +106,7 @@ Item {
 
     Shortcut {
         id: ctrl_R
-        enabled: !item.initialOnlyCreateFolder
+        enabled: !item.initialOnlyCreateFolder && !item.blockRecordingKey
 
         sequence: "Ctrl+R"
 

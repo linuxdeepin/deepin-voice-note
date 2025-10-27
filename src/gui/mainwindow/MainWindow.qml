@@ -93,6 +93,7 @@ ApplicationWindow {
         enabled: rootWindow.active
 
         blockCreateKeys: (isRecordingAudio || webEngineView.titleBar.isPlaying)
+        blockRecordingKey: isRecordingAudio
         initialOnlyCreateFolder: initRect.visible
 
         onCopy: {
