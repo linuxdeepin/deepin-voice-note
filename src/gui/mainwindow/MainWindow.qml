@@ -662,7 +662,8 @@ ApplicationWindow {
                         folderListView.enabled = true;
                         itemListView.isSearch = false;
                         itemListView.isSearching = false;
-                        webEngineView.webVisible = true;
+                        // 退出搜索时，只有当前记事本有笔记时才显示富文本编辑器
+                        webEngineView.webVisible = (itemListView.model.count > 0);
                         webEngineView.noSearchResult = false;
                         webEngineView.titleBar.isSearching = false;
                         VNoteMainManager.clearSearch();
@@ -718,7 +719,8 @@ ApplicationWindow {
                             folderListView.enabled = true;
                             itemListView.isSearch = false;
                             itemListView.isSearching = false;
-                            webEngineView.webVisible = true;
+                            // 清空搜索文本时，只有当前记事本有笔记时才显示富文本编辑器
+                            webEngineView.webVisible = (itemListView.model.count > 0);
                             webEngineView.noSearchResult = false;
                             webEngineView.titleBar.isSearching = false;
                             VNoteMainManager.clearSearch();
@@ -755,7 +757,10 @@ ApplicationWindow {
                     isRecordingAudio: rootWindow.isRecordingAudio
 
                     onDeleteFinished: {
-                        webEngineView.toggleMultCho(1);
+                        // 只有当列表不为空时才调用 toggleMultCho，避免覆盖 emptyItemList 设置的 webVisible = false
+                        if (itemListView.model.count > 0) {
+                            webEngineView.toggleMultCho(1);
+                        }
                     }
                     onEmptyItemList: {
                         webEngineView.webVisible = false;
