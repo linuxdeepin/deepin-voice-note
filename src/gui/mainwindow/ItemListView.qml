@@ -514,13 +514,13 @@ Item {
                 ActionManager.enableAction(ActionManager.NoteTop, false);
                 ActionManager.enableAction(ActionManager.NoteAddNew, false);
             } else {
-                // 录音或播放时禁用移动、置顶和新建
+                // 录音或播放时禁用移动和新建（会影响当前笔记），但置顶保持可用
                 ActionManager.enableAction(ActionManager.NoteMove, !isRecordingAudio && !isPlay);
-                ActionManager.enableAction(ActionManager.NoteTop, !isRecordingAudio && !isPlay);
+                ActionManager.enableAction(ActionManager.NoteTop, true);  // 置顶是轻量操作，始终可用
                 ActionManager.enableAction(ActionManager.NoteAddNew, !isRecordingAudio && !isPlay);
             }
             
-            // 录音时保存语音菜单置灰，但重命名和保存笔记保持可用
+            // 录音时保存语音菜单置灰，但重命名、置顶和保存笔记保持可用
             if (isRecordingAudio) {
                 ActionManager.enableAction(ActionManager.NoteSaveVoice, false);
             }
