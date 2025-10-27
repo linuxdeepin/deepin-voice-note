@@ -831,7 +831,7 @@ void VNoteMainManager::renameNote(const int &index, const QString &newName)
         if (noteOps.modifyNoteTitle(newName)) {
             qDebug() << "Note renamed successfully";
             // 播放中不重新加载列表，避免中断播放状态
-            if (!OpsStateInterface::instance()->isPlaying()) {
+            if (!OpsStateInterface::instance()->isPlaying() && !isInSearchMode()) {
                 qDebug() << "Not playing, reloading current folder";
                 VNoteFolder *currentFolder = getFloderById(m_currentFolderIndex);
                 if (currentFolder) {
