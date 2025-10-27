@@ -379,7 +379,6 @@ ApplicationWindow {
             label.visible = false;
             folderListView.opacity = 0.4;
             folderListView.enabled = false;
-            createFolderButton.enabled = false;
             webEngineView.webVisible = false;
             webEngineView.noSearchResult = true;
             webEngineView.titleBar.isSearching = true;
@@ -389,7 +388,6 @@ ApplicationWindow {
             label.visible = false;
             folderListView.opacity = 0.4;
             folderListView.enabled = false;
-            createFolderButton.enabled = false;
             webEngineView.webVisible = true;
             webEngineView.noSearchResult = false;
             webEngineView.titleBar.isSearching = true;
@@ -517,7 +515,7 @@ ApplicationWindow {
 
                     Layout.fillWidth: true
                     Layout.preferredHeight: createFolderBtnHeight
-                    enabled: !isRecordingAudio && !folderListView.isPlay  // 录音或播放时禁用
+                    enabled: !isRecordingAudio && !folderListView.isPlay && !webEngineView.titleBar.isSearching
                     text: qsTr("Create Notebook")
 
                     onClicked: {
@@ -662,7 +660,6 @@ ApplicationWindow {
                         label.visible = true;
                         folderListView.opacity = 1;
                         folderListView.enabled = true;
-                        createFolderButton.enabled = !isRecordingAudio && !folderListView.isPlay;
                         itemListView.isSearch = false;
                         itemListView.isSearching = false;
                         webEngineView.webVisible = true;
@@ -719,7 +716,6 @@ ApplicationWindow {
                             label.visible = true;
                             folderListView.opacity = 1;
                             folderListView.enabled = true;
-                            createFolderButton.enabled = !isRecordingAudio && !folderListView.isPlay;
                             itemListView.isSearch = false;
                             itemListView.isSearching = false;
                             webEngineView.webVisible = true;
