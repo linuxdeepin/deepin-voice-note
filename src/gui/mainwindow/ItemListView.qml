@@ -654,7 +654,6 @@ Item {
         model: itemModel
         spacing: itemSpacing
         visible: true
-        opacity: isRecordingAudio ? 0.5 : 1.0  // 录音时置灰
 
         delegate: Rectangle {
             id: rootItemDelegate
@@ -666,6 +665,8 @@ Item {
 
             color: isSelected ? (rootItem.activeFocus ? palette.highlight : (DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF")) : (DTK.themeType === ApplicationHelper.LightType ? "white" : "#0CFFFFFF")
             enabled: !isPlay || itemListView.currentIndex === index
+            // 录音时：当前项保持正常显示，其他项置灰
+            opacity: (isRecordingAudio && index !== itemListView.currentIndex) ? 0.5 : 1.0
             // 列表项高度始终使用非重命名的计算方式，重命名时高度保持不变
             height: (function() {
                 var topM = 8;
