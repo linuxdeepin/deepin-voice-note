@@ -500,9 +500,16 @@ ApplicationWindow {
                         label.text = name;
                     }
                     onMouseChanged: function(mousePosX, mousePosY) {
-                        if (mousePosY < rootWindow.y) {
+                        // 获取 leftBgArea 的全局位置
+                        var leftAreaY = leftBgArea.mapToGlobal(0, 0).y;
+                        // folderListView 在 ColumnLayout 中，ColumnLayout 有 topMargin: 50
+                        var folderListTop = leftAreaY + 50;
+                        var folderListBottom = folderListTop + folderListView.height;
+                        
+                        // 判断滚动条件
+                        if (mousePosY < folderListTop) {
                             folderListView.rollUp();
-                        } else if (mousePosY > rootWindow.y + rootWindow.height) {
+                        } else if (mousePosY > folderListBottom) {
                             folderListView.rollDown();
                         } else {
                             folderListView.rollStop();
@@ -542,9 +549,16 @@ ApplicationWindow {
                     folderListView.dropItems(indexList);
                 }
                 onMouseChanged: function(mousePosX, mousePosY) {
-                    if (mousePosY < rootWindow.y) {
+                    // 获取 leftBgArea 的全局位置
+                    var leftAreaY = leftBgArea.mapToGlobal(0, 0).y;
+                    // folderListView 在 ColumnLayout 中，ColumnLayout 有 topMargin: 50
+                    var folderListTop = leftAreaY + 50;
+                    var folderListBottom = folderListTop + folderListView.height;
+                    
+                    // 判断滚动条件
+                    if (mousePosY < folderListTop) {
                         folderListView.rollUp();
-                    } else if (mousePosY > rootWindow.y + rootWindow.height) {
+                    } else if (mousePosY > folderListBottom) {
                         folderListView.rollDown();
                     } else {
                         folderListView.rollStop();
