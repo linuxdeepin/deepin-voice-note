@@ -264,12 +264,22 @@
 }
 
 .voiceInfoBox .translateText {
-    font-size: 14px;
     margin-left: 20px;
     margin-right: 20px;
     margin-bottom: 12px;
+    font-size: 14px;
     text-align: left;
-    user-select: contain;
+    white-space: pre-wrap;
+    word-break: break-word;
+    cursor: text;
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+/* translateText 选中效果 */
+.voiceInfoBox .translateText::selection {
+    background: rgba(0, 129, 255, 0.3);
+    color: inherit;
 }
 
 /********** 状态控制，不同状态下各组件显示 **********/

@@ -119,7 +119,7 @@ var nodeTplV2 = `
     </div>`;
 
 var h5TplV2 = `
-    <div class="li voiceBox" contenteditable="false" draggable="true" jsonKey="{{jsonValue}}">
+    <div class="li voiceBox" draggable="true" jsonKey="{{jsonValue}}">
         ${nodeTplV2}
     </div>
     {{#if text}}
@@ -361,6 +361,11 @@ function isNoteNull() {
 
 //点击选中录音
 $('body').on('click', '.li', function (e) {
+    // 如果点击的是 translateText，不选中语音块，让用户选择文本
+    if ($(e.target).closest('.translateText').length > 0) {
+        return;
+    }
+    
     e.stopPropagation();
     $('.li').removeClass('active');
     setSelectRange(this)
@@ -371,6 +376,45 @@ $('body').on('click', '.li', function (e) {
 $('body').on('click', '.translate', function (e) {
     // 阻止冒泡
     e.stopPropagation();
+})
+
+// voiceBox 和 translateText 阻止编辑但允许选择
+$('body').on('keydown keypress input', '.voiceBox, .translateText', function (e) {
+    // 只允许选择和复制，阻止所有编辑
+    if ((e.ctrlKey || e.metaKey) && (e.keyCode === 67 || e.keyCode === 65)) {
+        // Ctrl+C / Ctrl+A 允许
+        return true;
+    }
+    e.preventDefault();
+    return false;
+})
+
+$('body').on('paste drop', '.voiceBox, .translateText', function (e) {
+    e.preventDefault();
+    return false;
+})
+
+// translateText 的鼠标和拖拽事件：禁止拖拽整个 voiceBox，允许文本选择
+$('body').on('mousedown', '.translateText', function (e) {
+    // 阻止冒泡到 .li，避免选中整个语音块
+    e.stopPropagation();
+    
+    // 临时禁用父元素的 draggable 属性，让文本可以被选择
+    var $voiceBox = $(this).closest('.voiceBox');
+    $voiceBox.attr('draggable', 'false');
+})
+
+// 鼠标释放时恢复 draggable
+$('body').on('mouseup', '.translateText', function (e) {
+    var $voiceBox = $(this).closest('.voiceBox');
+    $voiceBox.attr('draggable', 'true');
+})
+
+// 阻止 translateText 触发 dragstart（防止拖拽整个语音块）
+$('body').on('dragstart', '.translateText', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
 })
 
 /**
@@ -1113,8 +1157,14 @@ function setVoiceButColor(color, shdow) {
         background: ${color}80!important;
     }
 
-    .li:active .translateText::selection {
-        background-color: none !important;
+    .li .translateText::selection {
+        background: ${color}40 !important;
+        color: inherit;
+    }
+    
+    .li.active .translateText::selection {
+        background: ${color}60 !important;
+        color: inherit;
     }    
     `)
 }
@@ -1389,6 +1439,34 @@ document.onkeydown = function (event) {
         // 判断是选区还是光标
         if (selectionObj.type != 'Caret') {
             return
+        }
+        
+        // 检查光标前面是否是语音块（从普通文本向语音块删除）
+        if (selectionObj.anchorOffset === 0 && focusDom.nodeType === 3) {
+            var $parent = $(focusDom).parent();
+            var $prevElement = $parent.prev();
+            
+            // 如果前一个元素是语音块
+            if ($prevElement.hasClass('voiceBox')) {
+                if (activePlayback && activePlayback.hasClass('play')) {
+                    console.log("Cannot delete voice while playing");
+                    return false;
+                }
+                setSelectRange($prevElement[0]);
+                deleteSelection();
+                return false;
+            }
+            
+            // 如果父元素的前一个元素是语音块
+            if ($parent.is('p') && $parent.prev().hasClass('voiceBox')) {
+                if (activePlayback && activePlayback.hasClass('play')) {
+                    console.log("Cannot delete voice while playing");
+                    return false;
+                }
+                setSelectRange($parent.prev()[0]);
+                deleteSelection();
+                return false;
+            }
         }
         if ($(focusDom).closest('span').length
             && $(focusDom).closest('span').html() !== '<br>'
