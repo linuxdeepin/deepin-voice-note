@@ -681,6 +681,8 @@ ApplicationWindow {
                         webEngineView.noSearchResult = false;
                         webEngineView.titleBar.isSearching = false;
                         VNoteMainManager.clearSearch();
+                        // 退出搜索时清空输入框
+                        search.text = "";
                         if (needHideSearch)
                             search.visible = false;
                     }
@@ -711,13 +713,11 @@ ApplicationWindow {
                     }
                     onActiveFocusChanged: {
                         if (!activeFocus) {
-                            var inSearchResultMode = itemListView.isSearch || itemListView.isSearching || webEngineView.titleBar.isSearching;
+                            // 失去焦点时，保留用户输入的文本，不自动清空
+                            // 用户输入内容后可能只是暂时切换焦点，不应该清空已输入的内容
+                            // 清空操作应该由用户主动触发（点击清空按钮或按ESC）
                             
-                            if (!inSearchResultMode && text.length > 0) {
-                                text = "";
-                            }
-                            
-                            if (needHideSearch)
+                            if (needHideSearch && text.length === 0)
                                 search.visible = false;
                         }
                     }
