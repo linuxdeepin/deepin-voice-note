@@ -360,7 +360,7 @@
     background-image: none;
     background-color: var(--color);
     -webkit-mask: url('../img/playbar_pause/Normal.svg') no-repeat center/cover;
-    mask: url('../img/playbar_pause_close/Normal.svg') no-repeat center/cover;
+    mask: url('../img/playbar_pause/Normal.svg') no-repeat center/cover;
 }
 
 .airVoicePlaybackContainer .voicePlayback .voiceBtn,
@@ -368,7 +368,7 @@
     background-image: none;
     background-color: var(--color);
     -webkit-mask: url('../img/playbar_play/Normal.svg') no-repeat center/cover;
-    mask: url('../img/playbar_pause_close/Normal.svg') no-repeat center/cover;
+    mask: url('../img/playbar_play/Normal.svg') no-repeat center/cover;
 }
 
 .airVoicePlaybackContainer .closePlaybackBarBtn {
