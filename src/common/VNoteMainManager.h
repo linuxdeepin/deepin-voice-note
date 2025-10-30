@@ -14,6 +14,8 @@
 #include <QEventLoop>
 
 class WebRichTextManager;
+class VoiceNoteDBusService;
+
 class VNoteMainManager : public QObject
 {
     Q_OBJECT
@@ -30,8 +32,15 @@ public:
     void initNote();
     void initQMLRegister();
 
+    // D-Bus 和内部使用的公共接口
+    VNoteFolder* getFloderByIndex(const int &index);
+    VNoteFolder* getFloderById(const int &id);
+    int getFloderIndexById(const int &id);
+    VNoteItem* getNoteById(const int &id);
+
     Q_INVOKABLE void vNoteFloderChanged(const int &index);
     Q_INVOKABLE void vNoteChanged(const int &index);
+    void vNoteChangedWithUIUpdate(const int &noteId);
     Q_INVOKABLE void vNoteCreateFolder();
     Q_INVOKABLE void vNoteDeleteFolder(const int &index);
     Q_INVOKABLE void createNote();
@@ -66,6 +75,7 @@ public:
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);
     void updateNotes(const QList<QVariantMap> &notesData, const int &selectIndex);
+    void selectNoteByIndex(const int &selectIndex);
     void addNoteAtHead(const QVariantMap &noteData);
     void addFolderFinished(const QVariantMap &folderData);
     void notesDeleted(const QVariantMap &folderIdToDeletedCount);
@@ -95,10 +105,6 @@ private:
     void insertVoice(const QString &path, qint64 size);
     void loadSettings();
 
-    VNoteFolder* getFloderByIndex(const int &index);
-    VNoteFolder* getFloderById(const int &id);
-    int getFloderIndexById(const int &id);
-    VNoteItem* getNoteById(const int &id);
     VNoteItem* deleteNoteById(const int &id);
 
 private:
@@ -108,6 +114,7 @@ private:
     QList<VNoteItem*> m_noteItems;
     QStringList m_folderSort;
     WebRichTextManager *m_richTextManager {nullptr};
+    VoiceNoteDBusService *m_dbusService {nullptr};
     QString m_searchText;
     QEventLoop m_eventloop;
 };

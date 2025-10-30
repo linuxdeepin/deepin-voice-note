@@ -43,6 +43,21 @@ Item {
         itemListView.currentIndex = index;
     }
 
+    function selectNoteItem(index) {
+        // 清除之前的选中状态
+        for (var m = 0; m < selectedNoteItem.length; m++) {
+            var selectItem = itemListView.itemAtIndex(selectedNoteItem[m]);
+            if (selectItem) selectItem.isSelected = false;
+        }
+        // 设置新的选中状态
+        selectedNoteItem = [index];
+        selectSize = 1;
+        var newDelegate = itemListView.itemAtIndex(index);
+        if (newDelegate) newDelegate.isSelected = true;
+        itemListView.currentIndex = index;
+        itemListView.lastCurrentIndex = index;
+    }
+
     function onDeleteNote() {
         if (webVisible) {
             console.log("No notes available, cannot delete");
