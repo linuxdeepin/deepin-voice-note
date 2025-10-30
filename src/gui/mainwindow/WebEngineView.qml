@@ -386,6 +386,8 @@ Item {
         height: 1 / Screen.devicePixelRatio
         width: webRect.width
         y: 50
+        // 当富文本不可见时隐藏分隔线，避免显示白色缝隙
+        visible: webVisible
     }
 
     VNoteMessageDialogLoader {
