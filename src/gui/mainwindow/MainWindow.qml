@@ -403,6 +403,9 @@ ApplicationWindow {
             itemListView.selectSize = 1;
             itemListView.changeCurrentIndex(selectIndex);
         }
+        onSelectNoteByIndex: function(selectIndex) {
+            itemListView.selectNoteItem(selectIndex);
+        }
     }
 
     // 添加录音状态监听

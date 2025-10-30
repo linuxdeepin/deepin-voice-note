@@ -1,0 +1,18 @@
+<!-- SPDX-FileCopyrightText: 2025 UnionTech Software Technology Co., Ltd. -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="org.deepin.voicenote">
+    <method name="GetNotesList">
+      <arg name="notesList" type="s" direction="out"/>
+      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QString"/>
+    </method>
+    <method name="RecordVoice">
+      <arg name="folderId" type="i" direction="in"/>
+      <arg name="noteId" type="i" direction="in"/>
+      <arg name="success" type="b" direction="out"/>
+    </method>
+  </interface>
+</node>
+

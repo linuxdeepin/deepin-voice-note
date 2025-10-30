@@ -41,6 +41,7 @@ include_directories(./audio)
 
 aux_source_directory(./ ALLSOURCE)
 aux_source_directory(./dbusservice ALLSOURCE)
+aux_source_directory(./dbus ALLSOURCE)
 aux_source_directory(./common ALLSOURCE)
 aux_source_directory(./db ALLSOURCE)
 aux_source_directory(./gui ALLSOURCE)

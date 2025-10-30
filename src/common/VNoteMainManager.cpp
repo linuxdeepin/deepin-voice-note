@@ -19,6 +19,7 @@
 #include "handler/vnote_message_dialog_handler.h"
 #include "handler/voice_recoder_handler.h"
 #include "audio/recording_curves.h"
+#include "dbus/VoiceNoteDBusService.h"
 
 #include <QThreadPool>
 #include <QQmlApplicationEngine>
@@ -62,6 +63,10 @@ void VNoteMainManager::initNote()
     int savedAudioSource = loadAudioSource();
     qInfo() << "Loading saved audio source setting:" << savedAudioSource;
     VoiceRecoderHandler::instance()->changeMode(savedAudioSource);
+
+    m_dbusService = new VoiceNoteDBusService(this);
+    m_dbusService->initDBusService();
+    
     qInfo() << "Note manager initialization finished";
 }
 
@@ -209,7 +214,7 @@ int VNoteMainManager::loadNotepads()
                 folder->sortNumber = tmpIndexCount;
             } else {
                 folder->sortNumber = index;
-                m_folderSort.append(QString::number(index));
+                m_folderSort.append(QString::number(folder->id));
             }
             data.insert(FOLDER_SORT_KEY, folder->sortNumber);
 
@@ -337,6 +342,18 @@ void VNoteMainManager::vNoteChanged(const int &index)
     qDebug() << "Note change completed";
 }
 
+void VNoteMainManager::vNoteChangedWithUIUpdate(const int &noteId)
+{
+    vNoteChanged(noteId);
+    
+    for (int i = 0; i < m_noteItems.size(); ++i) {
+        if (m_noteItems[i]->noteId == noteId) {
+            emit selectNoteByIndex(i);
+            break;
+        }
+    }
+}
+
 struct NoteCompare {
     bool operator()(const QVariantMap &a, const QVariantMap &b) const {
         // 比较 isTop 字段
@@ -399,6 +416,7 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
             std::sort(notesDataList.begin(), notesDataList.end(), NoteCompare());
         }
         int selectIndex = 0;
+        bool noteFound = false;
         if (!notesDataList.isEmpty()) {
             qInfo() << "notesDataList is not empty";
             bool foundPreferredNote = false;

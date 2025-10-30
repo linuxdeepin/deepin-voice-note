@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.deepin.voicenote
+Exec=deepin-voice-note
+
