@@ -413,14 +413,12 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
             }
             if (!foundPreferredNote) {
                 selectIndex = 0;
+                m_currentNoteId = notesDataList[selectIndex].value("noteId").toInt();
+                vNoteChanged(m_currentNoteId);
+                qDebug() << "Switched to note ID:" << m_currentNoteId << "at index:" << selectIndex;
             }
-            m_currentNoteId = notesDataList[selectIndex].value("noteId").toInt();
-            vNoteChanged(m_currentNoteId);
-            qDebug() << "Switched to note ID:" << m_currentNoteId << "at index:" << selectIndex;
         } else {
             m_currentNoteId = -1;
-            // 清空富文本编辑器
-            m_richTextManager->initData(nullptr, "");
         }
         emit updateNotes(notesDataList, selectIndex);
     }
