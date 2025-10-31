@@ -100,7 +100,7 @@ TitleBar {
 
         ToolTip {
             text: recordBtn.enabled ? qsTr("Start recording") : qsTr("No recording device detected")
-            visible: (recordBtn.hovered || recordingHover) && !isRecording && !isInitialInterface
+            visible: (recordBtn.hovered || recordingHover) && !isRecording && !isPlaying && !isInitialInterface
         }
     }
 
