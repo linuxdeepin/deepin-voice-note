@@ -179,6 +179,23 @@
 
 .voicePlayback .closePlaybackBarBtn {
     display: none;
+    margin-left: 10px;
+    align-items: horizontal;
+    width: 16px;
+    height: 16px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+/* 播放或暂停时显示关闭按钮 */
+.voicePlayback.play .closePlaybackBarBtn,
+.voicePlayback.pause .closePlaybackBarBtn {
+    display: block;
+    background-image: none;
+    background-color: var(--color);
+    -webkit-mask: url('../img/playbar_pause_close/Normal.svg') no-repeat center/cover;
+    mask: url('../img/playbar_pause_close/Normal.svg') no-repeat center/cover;
 }
 
 .airVoicePlaybackContainer .closePlaybackBarBtn {
