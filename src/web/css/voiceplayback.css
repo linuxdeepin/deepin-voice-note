@@ -365,11 +365,23 @@
     mask: url('../img/audio_file_playing_pause/Normal.svg') no-repeat center/cover;
 }
 
+.voicePlayback.play .voiceBtn:hover,
+.voicePlayback.play .voiceBtn:active {
+    background-image: none;
+    background-color: var(--color);
+}
+
 .voicePlayback.pause .voiceBtn {
     background-image: none;
     background-color: var(--color);
     -webkit-mask: url('../img/audio_file_playing_play/Normal.svg') no-repeat center/cover;
     mask: url('../img/audio_file_playing_play/Normal.svg') no-repeat center/cover;
+}
+
+.voicePlayback.pause .voiceBtn:hover,
+.voicePlayback.pause .voiceBtn:active {
+    background-image: none;
+    background-color: var(--color);
 }
 
 /* 悬浮播放控件 */
