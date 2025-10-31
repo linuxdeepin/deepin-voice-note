@@ -63,7 +63,13 @@ Menu {
         }
     }
 
-    QuitAction {
-        onTriggered: VNoteMainManager.forceExit()
+    MenuItem {
+        text: qsTr("Exit")
+        onTriggered: {
+            var win = ApplicationWindow.window;
+            if (win) {
+                win.close();
+            }
+        }
     }
 }
