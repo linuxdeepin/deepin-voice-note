@@ -139,6 +139,8 @@ var isVoicePaste = false
 var isShowAir = true
 var nowClickVoice = null
 var global_activeColor = ''
+var lastRightClickX = 0;  // 保存右键点击的X坐标
+var lastRightClickY = 0;  // 保存右键点击的Y坐标
 var global_disableColor = ''
 var global_theme = 1    // theme type 1:light 2:dark
 var global_themeColor = 'transparent'  //主题色
@@ -1074,6 +1076,10 @@ function enableSummerNote() {
  * @returns {any} 
  */
 function rightClick(e) {
+    // 保存右键点击位置
+    lastRightClickX = e.clientX;
+    lastRightClickY = e.clientY;
+    
     // isShowAir = false;
     var testDiv = getSelectedRange();
     let childrenLength = $(testDiv).children().length
@@ -1117,6 +1123,69 @@ function rightClick(e) {
     // e.preventDefault()
 }
 
+/**
+ * 接收QML传来的菜单位置，计算并显示工具栏
+ */
+function setMenuPosition(menuX, menuY, menuWidth, menuHeight) {
+    console.log("收到菜单位置: x=" + menuX + ", y=" + menuY + ", w=" + menuWidth + ", h=" + menuHeight);
+    console.log("右键点击位置: x=" + lastRightClickX + ", y=" + lastRightClickY);
+    
+    var winWidth = $(window).width();
+    var winHeight = $(window).height();
+    var scrollLeft = $(document).scrollLeft();
+    var scrollTop = $(document).scrollTop();
+    
+    // 获取工具栏实际尺寸
+    var $airPopover = $('.note-air-popover');
+    var toolbarHeight = $airPopover.outerHeight() || 44;
+    var toolbarWidth = $airPopover.outerWidth() || 385;
+    
+    var spacing = 10;  // 固定间距
+    
+    console.log("工具栏尺寸: w=" + toolbarWidth + ", h=" + toolbarHeight);
+    console.log("窗口尺寸: w=" + winWidth + ", h=" + winHeight);
+    
+    // 计算菜单到顶部和底部的距离
+    var menuTopDistance = menuY;
+    var menuBottomDistance = winHeight - (menuY + menuHeight);
+    
+    console.log("菜单顶部距离: " + menuTopDistance + ", 底部距离: " + menuBottomDistance);
+    
+    // 计算工具栏X坐标（以点击位置为基准，确保不超出边界）
+    var toolbarX = lastRightClickX;
+    if (toolbarX + toolbarWidth > winWidth) {
+        toolbarX = winWidth - toolbarWidth - 10;
+    }
+    if (toolbarX < 10) {
+        toolbarX = 10;
+    }
+    
+    // 计算工具栏Y坐标
+    var toolbarY;
+    if (menuTopDistance >= toolbarHeight + spacing) {
+        // 菜单上方空间足够，放在上方
+        toolbarY = menuY - toolbarHeight - spacing;
+        console.log("工具栏放在菜单上方");
+    } else if (menuBottomDistance >= toolbarHeight + spacing) {
+        // 菜单下方空间足够，放在下方
+        toolbarY = menuY + menuHeight + spacing;
+        console.log("工具栏放在菜单下方");
+    } else {
+        // 上下都不够，放在空间更大的一侧
+        if (menuTopDistance > menuBottomDistance) {
+            toolbarY = 10;  // 贴顶
+            console.log("工具栏贴顶");
+        } else {
+            toolbarY = winHeight - toolbarHeight - 10;  // 贴底
+            console.log("工具栏贴底");
+        }
+    }
+    
+    console.log("最终工具栏位置: x=" + toolbarX + ", y=" + toolbarY);
+    
+    // 显示工具栏（转换为文档坐标）
+    showRightMenu(toolbarX + scrollLeft, toolbarY + scrollTop);
+}
 
 /**
  * 设置活动色

@@ -483,6 +483,31 @@ Item {
                 // 此处不再需要任何逻辑。
             }
 
+            onOpened: {
+                // 菜单已经打开并定位好，获取真实位置
+                Qt.callLater(function() {
+                    var menuX = txtCtxMenu.x;
+                    var menuY = txtCtxMenu.y;
+                    var menuWidth = txtCtxMenu.width;
+                    var menuHeight = txtCtxMenu.height;
+                    
+                    console.log("QML菜单位置: x=" + menuX + ", y=" + menuY + ", w=" + menuWidth + ", h=" + menuHeight);
+                    
+                    // 传递给JavaScript
+                    if (webView && menuWidth > 0 && menuHeight > 0) {
+                        var webViewPos = webView.mapToItem(null, 0, 0);
+                        var relativeX = menuX - webViewPos.x;
+                        var relativeY = menuY - webViewPos.y;
+                        
+                        console.log("转换为webView相对位置: x=" + relativeX + ", y=" + relativeY);
+                        
+                        var jsCode = "if(typeof setMenuPosition === 'function') setMenuPosition(" + 
+                                     relativeX + ", " + relativeY + ", " + menuWidth + ", " + menuHeight + ");";
+                        webView.runJavaScript(jsCode);
+                    }
+                });
+            }
+
             Connections {
                 target: handler
 
