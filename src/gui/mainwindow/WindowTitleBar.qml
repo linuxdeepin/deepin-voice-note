@@ -3,6 +3,7 @@ import QtQuick.Window 2.15
 import QtQuick.Layouts 1.15
 import VNote 1.0
 import org.deepin.dtk 1.0
+import "../" as VNoteComponents
 
 TitleBar {
     id: titleBar
@@ -44,7 +45,7 @@ TitleBar {
         }
     }
 
-    ToolButton {
+    VNoteComponents.VNoteToolButton {
         id: newNoteBtn
 
         anchors.left: titleBar.left
@@ -83,7 +84,7 @@ TitleBar {
         }
     }
 
-    ToolButton {
+    VNoteComponents.VNoteToolButton {
         id: recordBtn
 
         anchors.right: insImgBtn.left
@@ -104,7 +105,7 @@ TitleBar {
         }
     }
 
-    ToolButton {
+    VNoteComponents.VNoteToolButton {
         id: insImgBtn
 
         anchors.verticalCenter: titleBar.verticalCenter

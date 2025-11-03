@@ -6,6 +6,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Window 2.15
 import org.deepin.dtk 1.0
+import "../" as VNoteComponents
 
 DialogWindow {
     id: dialog
@@ -131,7 +132,7 @@ DialogWindow {
             Layout.fillWidth: true
             Layout.topMargin: 10
 
-            Button {
+            VNoteComponents.VNoteButton {
                 Layout.preferredWidth: 171
                 text: qsTr("Cancel")
 

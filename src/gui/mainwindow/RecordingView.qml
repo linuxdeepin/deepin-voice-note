@@ -4,6 +4,7 @@ import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 import VNote 1.0
 import org.deepin.dtk 1.0
+import "../" as VNoteComponents
 
 FocusScope {
     id: rootItem
@@ -70,7 +71,7 @@ FocusScope {
         implicitWidth: 364
         spacing: 10
 
-        ToolButton {
+        VNoteComponents.VNoteToolButton {
             id: pauseBtn
 
             icon.height: iconSize
@@ -78,7 +79,6 @@ FocusScope {
             icon.width: iconSize
             implicitHeight: btnSize
             implicitWidth: btnSize
-            activeFocusOnTab: true
             KeyNavigation.tab: stopBtn
             KeyNavigation.backtab: stopBtn
 
@@ -105,7 +105,7 @@ FocusScope {
             width: 66
         }
 
-        ToolButton {
+        VNoteComponents.VNoteToolButton {
             id: stopBtn
 
             icon.height: iconSize
@@ -113,7 +113,6 @@ FocusScope {
             icon.width: iconSize
             implicitHeight: btnSize
             implicitWidth: btnSize
-            activeFocusOnTab: true
             KeyNavigation.tab: pauseBtn
             KeyNavigation.backtab: pauseBtn
 
