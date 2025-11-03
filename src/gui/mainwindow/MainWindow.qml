@@ -8,6 +8,7 @@ import QtQuick.Layouts 1.15
 import Qt.labs.platform 1.1
 import QtQuick.Controls 2.15
 import VNote 1.0
+import "../" as VNoteComponents
 import "../dialog"
 import org.deepin.dtk 1.0
 
@@ -433,7 +434,7 @@ ApplicationWindow {
         z: 100
     }
 
-    ToolButton {
+    VNoteComponents.VNoteToolButton {
         id: twoColumnModeBtn
 
         anchors {
@@ -517,7 +518,7 @@ ApplicationWindow {
                     }
                 }
 
-                Button {
+                VNoteComponents.VNoteButton {
                     id: createFolderButton
 
                     Layout.fillWidth: true
@@ -643,7 +644,7 @@ ApplicationWindow {
                 anchors.rightMargin: 5
                 spacing: 10
 
-                ToolButton {
+                VNoteComponents.VNoteToolButton {
                     Layout.alignment: Text.AlignRight
                     Layout.rightMargin: 10
                     Layout.topMargin: 10

@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import org.deepin.dtk 1.0
+import "../" as VNoteComponents
 
 Item {
     id: rootWindow
@@ -49,7 +50,7 @@ Item {
                 contentItem: RowLayout {
                     spacing: 0
 
-                    ToolButton {
+                    VNoteComponents.VNoteToolButton {
                         icon.name: "move_note"
                         implicitHeight: 40
                         implicitWidth: 40
@@ -60,7 +61,7 @@ Item {
                         }
                     }
 
-                    ToolButton {
+                    VNoteComponents.VNoteToolButton {
                         icon.name: "save_note"
                         implicitHeight: 40
                         implicitWidth: 48
@@ -73,7 +74,7 @@ Item {
                         }
                     }
 
-                    ToolButton {
+                    VNoteComponents.VNoteToolButton {
                         icon.name: "save_audio"
                         implicitHeight: 40
                         implicitWidth: 48
@@ -86,7 +87,7 @@ Item {
                         }
                     }
 
-                    ToolButton {
+                    VNoteComponents.VNoteToolButton {
                         icon.name: "delete"
                         implicitHeight: 40
                         implicitWidth: 40
