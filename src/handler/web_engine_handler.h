@@ -61,7 +61,12 @@ Q_SIGNALS:
     // 请求同步调用Js函数
     void requesetCallJsSynchronous(const QString &func);
     // 触发 web 常用文本操作
+    // Qt5 修复：枚举传递到 QML 会变成 undefined，需要使用 int
+#ifdef USE_QT5
+    void triggerWebAction(int action);
+#else
     void triggerWebAction(QWebEnginePage::WebAction action);
+#endif
 
     // 请求弹出提示对话框
     void requestMessageDialog(VNoteMessageDialogHandler::MessageType type);
