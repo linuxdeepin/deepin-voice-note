@@ -373,19 +373,31 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
         case ActionManager::PictureSelectAll:
         case ActionManager::TxtSelectAll:
             // 模拟全选快捷键ctrl+A
+#ifdef USE_QT5
+            Q_EMIT triggerWebAction((int)QWebEnginePage::SelectAll);
+#else
             Q_EMIT triggerWebAction(QWebEnginePage::SelectAll);
+#endif
             break;
         case ActionManager::VoiceCopy:
         case ActionManager::PictureCopy:
         case ActionManager::TxtCopy:
             // 直接调用web端的复制事件
+#ifdef USE_QT5
+            Q_EMIT triggerWebAction((int)QWebEnginePage::Copy);
+#else
             Q_EMIT triggerWebAction(QWebEnginePage::Copy);
+#endif
             break;
         case ActionManager::VoiceCut:
         case ActionManager::PictureCut:
         case ActionManager::TxtCut:
             // 直接调用web端的剪切事件
+#ifdef USE_QT5
+            Q_EMIT triggerWebAction((int)QWebEnginePage::Cut);
+#else
             Q_EMIT triggerWebAction(QWebEnginePage::Cut);
+#endif
             break;
         case ActionManager::VoicePaste:
         case ActionManager::PicturePaste:
@@ -472,13 +484,18 @@ void WebEngineHandler::onPaste(bool isVoice)
     qDebug() << "Paste operation requested, isVoice:" << isVoice;
     if (isVoice) {
         qInfo() << "Paste operation requested, isVoice is true";
+#ifdef USE_QT5
+        Q_EMIT triggerWebAction((int)QWebEnginePage::Paste);
+#else
         Q_EMIT triggerWebAction(QWebEnginePage::Paste);
+#endif
         return;
     }
 
     // 获取剪贴板信息
     QClipboard *clipboard = QApplication::clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
+    
     // 存在文件url
     if (mimeData->hasUrls()) {
         qInfo() << "mimeData has urls";
@@ -494,7 +511,11 @@ void WebEngineHandler::onPaste(bool isVoice)
     } else {
         // 无图片文件，直接调用web端的粘贴事件
         qDebug() << "Pasting text content";
+#ifdef USE_QT5
+        Q_EMIT triggerWebAction((int)QWebEnginePage::Paste);
+#else
         Q_EMIT triggerWebAction(QWebEnginePage::Paste);
+#endif
     }
     qInfo() << "Paste operation finished";
 }
