@@ -1406,6 +1406,13 @@ async function insertImg(urlStr) {
  * trigger play/pause voice when key space / return / enter down
  */
 function triggerPlayPauseVoice(event) {
+    // 录音时禁止播放语音
+    if (global_isRecording) {
+        console.log("Cannot play voice while recording (triggered by keyboard)");
+        event.preventDefault();  // 阻止Enter/Space键的默认行为，防止删除选中内容
+        return false;
+    }
+    
     var currentLi = $('.li.active');
     if (currentLi.length > 0) {
         event.preventDefault();
