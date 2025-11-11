@@ -13,6 +13,7 @@
 #include "voice_recoder_handler.h"
 #include "setting.h"
 #include "globaldef.h"
+#include "common/utils.h"
 
 #include <QApplication>
 #include <QCursor>
@@ -59,6 +60,7 @@ inline bool isV20() { return Dtk::Core::DSysInfo::majorVersion() == "20"; }
 const QString DEEPIN_DAEMON_APPEARANCE_SERVICE = isV20() ? APPEARANCE_SERVICE_V20 : APPEARANCE_SERVICE_V23;
 const QString DEEPIN_DAEMON_APPEARANCE_PATH = isV20() ? APPEARANCE_PATH_V20 : APPEARANCE_PATH_V23;
 const QString DEEPIN_DAEMON_APPEARANCE_INTERFACE = isV20() ? APPEARANCE_INTERFACE_V20 : APPEARANCE_INTERFACE_V23;
+
 
 DGUI_USE_NAMESPACE
 
@@ -291,13 +293,15 @@ void WebEngineHandler::onContextMenuRequested(QWebEngineContextMenuRequest *requ
 /**
    @brief 插入音频文件， \a voicePath 为音频文件路径， \a voiceSize 为音频的长度，单位 ms
  */
+
 void WebEngineHandler::onInsertVoiceItem(const QString &voicePath, quint64 voiceSize)
 {
     qDebug() << "Inserting voice item, path:" << voicePath << "size:" << voiceSize << "ms";
 
     VNVoiceBlock data;
     data.ptrVoice->voiceSize = voiceSize;
-    data.ptrVoice->voicePath = voicePath;
+    // 存储相对路径：AppData/voicenote/ -> voicenote/...
+    data.ptrVoice->voicePath = Utils::makeVoiceRelative(voicePath);
     data.ptrVoice->createTime = QDateTime::currentDateTime();
     data.ptrVoice->voiceTitle = data.ptrVoice->createTime.toString("yyyyMMdd hh.mm.ss");
 

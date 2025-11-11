@@ -62,4 +62,6 @@ public:
     static DSysInfo::UosEdition parseOsBuildType(const QString &osBuild);
     static bool checkOsBuildValid(const QString &str);
     static bool isCommunityEdition();
+    // 将音频绝对路径转换为相对路径（AppData/voicenote/... -> voicenote/...）
+    static QString makeVoiceRelative(const QString &voicePath);
 };
