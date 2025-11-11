@@ -204,10 +204,28 @@ function setInitFont(initFontName) {
     $('body').css('font-family', initFontName)
 }
 
+// 全局变量：存储 AppData 基准路径，仅用于编辑区内图片/音频路径转换
+var globalAppDataBase = null;
+
 // 建立通信
 new QWebChannel(qt.webChannelTransport,
     function (channel) {
         webobj = channel.objects.webobj;
+        // 获取 AppData 路径，用于编辑区内资源路径转换
+        if (webobj && webobj.jsCallGetAppDataPath) {
+            webobj.jsCallGetAppDataPath(function (res) {
+                try {
+                    if (res && typeof res === 'string') {
+                        globalAppDataBase = ('' + res).replace(/\\+/g, '/');
+                        if (globalAppDataBase.length > 0 && globalAppDataBase[globalAppDataBase.length - 1] !== '/') {
+                            globalAppDataBase += '/';
+                        }
+                    }
+                } catch (e) {
+                    console.error('get AppData path failed:', e);
+                }
+            });
+        }
         //所有的c++ 调用js的接口都需要在此绑定格式，webobj.c++函数名（jscontent.cpp查看.connect(js处理函数)
         //例如 webobj.c++fun.connect(jsfun)
         webobj.callJsInitData.connect(initData);
@@ -705,6 +723,49 @@ function getHtml() {
     $cloneCode.find('.voiceInfoBox').removeClass('containText');
     // 移除悬浮工具栏
     $cloneCode.find('.airVoicePlayback').removeClass('active').html("");
+    
+    // 确保图片保存为相对路径
+    $cloneCode.find('img').each(function () {
+        var $img = $(this);
+        var relPath = $img.attr('data-rel-path');
+        if (relPath) {
+            $img.attr('src', relPath);
+            $img.removeAttr('data-rel-path');
+        } else {
+            // 如果没有 data-rel-path，尝试从当前 src 提取相对路径
+            var src = $img.attr('src') || '';
+            if (src.indexOf('images/') >= 0) {
+                var idx = src.lastIndexOf('images/');
+                if (idx >= 0) {
+                    $img.attr('src', src.substring(idx));
+                }
+            }
+        }
+    });
+    
+    // 确保音频 JSON 中 voicePath 保存为相对路径
+    $cloneCode.find('.voiceBox[jsonKey]').each(function () {
+        try {
+            var jsonStr = $(this).attr('jsonKey');
+            if (!jsonStr) return;
+            var json = JSON.parse(jsonStr);
+            if (json.voicePath) {
+                // 如果是绝对路径，转换为相对路径
+                var vp = json.voicePath.replace(/\\/g, '/');
+                if (vp.indexOf('voicenote/') >= 0) {
+                    var idx = vp.lastIndexOf('voicenote/');
+                    json.voicePath = vp.substring(idx);
+                } else if (vp.indexOf('/voicenote/') >= 0) {
+                    var idx = vp.lastIndexOf('/voicenote/');
+                    json.voicePath = 'voicenote/' + vp.substring(idx + '/voicenote/'.length);
+                }
+                $(this).attr('jsonKey', JSON.stringify(json));
+            }
+        } catch (e) {
+            console.error('process voice jsonKey failed:', e);
+        }
+    });
+    
     return $cloneCode[0].innerHTML;
 }
 
@@ -957,6 +1018,25 @@ function setHtml(html) {
     }
     initFinish = false;
     $('#summernote').summernote('code', html);
+
+    // 将图片相对路径转换为绝对路径用于显示（仅处理编辑区内的资源）
+    if (globalAppDataBase) {
+        $('.note-editable img').each(function () {
+            var $img = $(this);
+            var src = $img.attr('src') || '';
+            // 如果是相对路径 images/xxx，转换为绝对路径显示
+            if (src.indexOf('images/') === 0 || (src.indexOf('/images/') > 0 && !src.startsWith('file://') && !src.startsWith('http'))) {
+                var relPath = src.indexOf('images/') >= 0 ? src.substring(src.lastIndexOf('images/')) : src;
+                try {
+                    var absUrl = new URL(relPath, globalAppDataBase).href;
+                    $img.attr('src', absUrl);
+                    $img.attr('data-rel-path', relPath);
+                } catch (e) {
+                    // 转换失败，保持原样
+                }
+            }
+        });
+    }
 
     // TODO: 实验性功能，替换 HTML 文本中的语音控件版本，不涉及数据的变更
     replaceVoiceToVersion2();
@@ -1397,8 +1477,22 @@ function initVoiceDragAndDrop() {
  * @returns {any}
  */
 async function insertImg(urlStr) {
-    urlStr.forEach((item, index) => {
-        $("#summernote").summernote('insertImage', item, 'img');
+    // 后端已发送相对路径 images/xxx，显示时转换为绝对路径，保存时保持相对路径
+    urlStr.forEach((item) => {
+        var relPath = ('' + item).replace(/\\/g, '/');
+        // 显示时使用绝对路径
+        var displayUrl = relPath;
+        if (globalAppDataBase && relPath.indexOf('images/') === 0) {
+            try {
+                displayUrl = new URL(relPath, globalAppDataBase).href;
+            } catch (e) {
+                displayUrl = relPath;
+            }
+        }
+        $("#summernote").summernote('insertImage', displayUrl, function ($image) {
+            // 保存相对路径到 data 属性，保存 HTML 时使用
+            $image.attr('data-rel-path', relPath);
+        });
     })
 }
 

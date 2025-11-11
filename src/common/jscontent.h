@@ -45,6 +45,8 @@ public:
     bool insertImages(const QImage &image);
 
     Q_INVOKABLE QString webPath();
+    // 提供前端 AppData 基准路径：file://{AppData}/
+    Q_INVOKABLE QString jsCallGetAppDataPath();
 
 signals:
     void callJsInitData(const QString &jsonData); //调用web前端，设置json格式数据

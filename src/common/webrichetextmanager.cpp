@@ -2,10 +2,15 @@
 #include "jscontent.h"
 #include "db/vnoteitemoper.h"
 #include "metadataparser.h"
+#include "common/utils.h"
 
 #include <QTimer>
 #include <QEventLoop>
 #include <QDebug>
+#include <QStandardPaths>
+#include <QDir>
+#include <QUrl>
+
 
 WebRichTextManager::WebRichTextManager(QObject *parent)
 : QObject(parent)
@@ -122,7 +127,8 @@ void WebRichTextManager::insertVoiceItem(const QString &voicePath, qint64 voiceS
     qDebug() << "Inserting voice item, path:" << voicePath << "size:" << voiceSize;
     VNVoiceBlock data;
     data.ptrVoice->voiceSize = voiceSize;
-    data.ptrVoice->voicePath = voicePath;
+    // 存储相对路径：AppData/voicenote/ -> voicenote/...
+    data.ptrVoice->voicePath = Utils::makeVoiceRelative(voicePath);
     data.ptrVoice->createTime = QDateTime::currentDateTime();
     data.ptrVoice->voiceTitle = data.ptrVoice->createTime.toString("yyyyMMdd hh.mm.ss");
 

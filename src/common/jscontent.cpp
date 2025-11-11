@@ -67,8 +67,9 @@ bool JsContent::insertImages(QStringList filePaths)
         // 创建文件路径
         QString newPath = QString("%1/%2_%3.%4").arg(dirPath).arg(date).arg(++count).arg(suffix);
         if (QFile::copy(path, newPath)) {
-            paths.push_back(newPath);
-            qDebug() << "Successfully copied image to:" << newPath;
+            QString fileName = QString("%1_%2.%3").arg(date).arg(count).arg(suffix);
+            paths.push_back(QString("images/") + fileName);
+            qDebug() << "Successfully copied image to:" << newPath << "sending relative path:" << paths.last();
         } else {
             qWarning() << "Failed to copy image from:" << path << "to:" << newPath;
         }
@@ -107,7 +108,8 @@ bool JsContent::insertImages(const QImage &image)
         return false;
     }
     qDebug() << "Successfully saved image to:" << imgPath;
-    emit callJsInsertImages(QStringList(imgPath));
+    // 转换为相对路径发送给前端（images/xxx）
+    emit callJsInsertImages(QStringList(QString("images/") + fileName));
     qInfo() << "Single image insertion finished";
     return true;
 }
@@ -118,6 +120,30 @@ QString JsContent::webPath()
     QString path = "file://" WEB_PATH "/index.html";
     qInfo() << "Web path retrieved";
     return path;
+}
+
+QString JsContent::jsCallGetAppDataPath()
+{
+    const QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (appDataPath.isEmpty()) {
+        qWarning() << "Provide AppData base path to JS failed: empty AppData path";
+        return QString();
+    }
+    QDir dir(appDataPath);
+    if (!dir.exists()) {
+        if (!dir.mkpath(".")) {
+            qWarning() << "Provide AppData base path to JS failed: mkpath failed for" << appDataPath;
+            return QString();
+        }
+    }
+    QString basePath = QDir::toNativeSeparators(dir.absolutePath());
+    if (!basePath.endsWith(QDir::separator())) {
+        basePath += QDir::separator();
+    }
+    QUrl url = QUrl::fromLocalFile(basePath);
+    const QString urlStr = url.toString();
+    qInfo() << "Provide AppData base path to JS:" << urlStr;
+    return urlStr;
 }
 
 void JsContent::jsCallTxtChange()

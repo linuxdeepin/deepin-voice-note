@@ -27,6 +27,8 @@
 #include <QTextDocumentFragment>
 #include <QDBusInterface>
 #include <QDBusConnection>
+#include <QDir>
+#include <QStandardPaths>
 
 Utils::Utils()
 {
@@ -545,4 +547,17 @@ DSysInfo::UosEdition Utils::parseOsBuildType(const QString & osBuild)
 bool Utils::isCommunityEdition()
 {
     return uosEditionType() == DSysInfo::UosEdition::UosCommunity;
+}
+
+QString Utils::makeVoiceRelative(const QString &voicePath)
+{
+    const QString appData = QDir::toNativeSeparators(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+    if (appData.isEmpty())
+        return voicePath;
+    const QString v = QDir::toNativeSeparators(voicePath);
+    const QString voiceRoot = QDir::toNativeSeparators(QDir::cleanPath(QDir(appData).filePath(QStringLiteral("voicenote"))));
+    const QString voiceRootWithSep = voiceRoot.endsWith(QDir::separator()) ? voiceRoot : voiceRoot + QDir::separator();
+    if (v.startsWith(voiceRootWithSep))
+        return QStringLiteral("voicenote/") + v.mid(voiceRootWithSep.size());
+    return voicePath;
 }
