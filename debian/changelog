@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.49) unstable; urgency=medium
+
+  * fix: Add jsCallGetAppDataPath method and enhance voice path handling
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Thu, 13 Nov 2025 20:28:48 +0800
+
 deepin-voice-note (6.5.48) unstable; urgency=medium
 
   * fix bugs. 
