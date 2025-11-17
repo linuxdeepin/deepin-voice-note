@@ -538,8 +538,13 @@ void WebEngineHandler::processVoiceMenuRequest(QObject *request)
         return;
     }
 
+    // 展开相对路径为绝对路径，避免误判
+    if (m_voiceBlock && !m_voiceBlock->voicePath.isEmpty()) {
+        m_voiceBlock->voicePath = Utils::makeVoiceAbsolute(m_voiceBlock->voicePath);
+    }
+
     // 语音文件不存在使用弹出提示
-    if (!QFile(m_voiceBlock->voicePath).exists()) {
+    if (!QFile::exists(m_voiceBlock->voicePath)) {
         // 异步操作，防止阻塞前端事件
         QTimer::singleShot(0, this, [this] {
             Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::VoicePathNoAvail);
@@ -568,8 +573,13 @@ void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *req
         return;
     }
 
+    // 展开相对路径为绝对路径，避免误判
+    if (m_voiceBlock && !m_voiceBlock->voicePath.isEmpty()) {
+        m_voiceBlock->voicePath = Utils::makeVoiceAbsolute(m_voiceBlock->voicePath);
+    }
+
     // 语音文件不存在使用弹出提示
-    if (!QFile(m_voiceBlock->voicePath).exists()) {
+    if (!QFile::exists(m_voiceBlock->voicePath)) {
         qInfo() << "Voice file does not exist";
         // 异步操作，防止阻塞前端事件
         QTimer::singleShot(0, this, [this] {
