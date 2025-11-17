@@ -107,6 +107,8 @@ public slots:
     void jsCallSetClipData(const QString &text, const QString &html); //web前端调用后端，设置剪切板内容
     QString jsCallGetTranslation(); //web前端调用后端，获取翻译
     void onClipChange(QClipboard::Mode mode);
+    // 提供前端 AppData 基准路径：file://{AppData}/
+    QString jsCallGetAppDataPath();
 
 private:
     const QMimeData *m_clipData {nullptr};

@@ -58,7 +58,9 @@ bool JsContent::insertImages(QStringList filePaths)
         //创建文件路径
         QString newPath = QString("%1/%2_%3.%4").arg(dirPath).arg(date).arg(++count).arg(suffix);
         if (QFile::copy(path, newPath)) {
-            paths.push_back(newPath);
+            QString fileName = QString("%1_%2.%3").arg(date).arg(count).arg(suffix);
+            paths.push_back(QString("images/") + fileName);
+            qDebug() << "Successfully copied image to:" << newPath << "sending relative path:" << paths.last();
         }
     }
     if (paths.size() == 0) {
@@ -89,7 +91,8 @@ bool JsContent::insertImages(const QImage &image)
     if (!image.save(imgPath)) {
         return false;
     }
-    emit callJsInsertImages(QStringList(imgPath));
+    // 转换为相对路径发送给前端（images/xxx）
+    emit callJsInsertImages(QStringList(QString("images/") + fileName));
     return true;
 }
 
@@ -198,4 +201,34 @@ void JsContent::onClipChange(QClipboard::Mode mode)
     if (QClipboard::Clipboard == mode && QApplication::clipboard()->mimeData() != m_clipData) {
         emit callJsClipboardDataChanged();
     }
+}
+
+QString JsContent::jsCallGetAppDataPath()
+{
+    const QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (appDataPath.isEmpty()) {
+        qWarning() << "Provide AppData base path to JS failed: empty AppData path";
+        return QString();
+    }
+
+    // 增加路径验证
+    QDir dir(appDataPath);
+    if (!dir.exists()) {
+        if (!dir.mkpath(".")) {
+            qWarning() << "Provide AppData base path to JS failed: mkpath failed for" << appDataPath;
+            return QString();
+        }
+    }
+
+    // 使用QDir::cleanPath规范化路径
+    QString basePath = QDir::cleanPath(dir.absolutePath());
+    if (!basePath.endsWith(QDir::separator())) {
+        basePath += QDir::separator();
+    }
+
+    // 增加URL编码，防止特殊字符问题
+    QUrl url = QUrl::fromLocalFile(basePath);
+    const QString urlStr = url.toString(QUrl::EncodeSpaces);
+    qInfo() << "Provide AppData base path to JS:" << urlStr;
+    return urlStr;
 }

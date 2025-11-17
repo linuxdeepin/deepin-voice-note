@@ -388,7 +388,7 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
         break;
     case ActionManager::PictureView:
         //查看图片
-        viewPicture(m_menuJson.toString());
+        viewPicture(m_menuJson.toString().replace("file://", ""));
         break;
     case ActionManager::PictureSaveAs:
         //另存图片
@@ -434,7 +434,7 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
  */
 void WebRichTextEditor::savePictureAs()
 {
-    QString originalPath = m_menuJson.toString(); //获取原图片路径
+    QString originalPath = m_menuJson.toString().replace("file://", ""); //获取原图片路径
     saveAsFile(originalPath, QStandardPaths::writableLocation(QStandardPaths::PicturesLocation), "image");
 }
 
