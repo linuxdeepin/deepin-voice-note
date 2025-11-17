@@ -13,6 +13,50 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
+// 将音频绝对路径转换为相对路径（AppData/voicenote/... -> voicenote/...）
+static QString makeVoiceRelative(const QString &voicePath)
+{
+    const QString appData = QDir::toNativeSeparators(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+    if (appData.isEmpty())
+        return voicePath;
+    const QString v = QDir::toNativeSeparators(voicePath);
+    const QString voiceRoot = QDir::toNativeSeparators(QDir::cleanPath(QDir(appData).filePath(QStringLiteral("voicenote"))));
+    const QString voiceRootWithSep = voiceRoot.endsWith(QDir::separator()) ? voiceRoot : voiceRoot + QDir::separator();
+    if (v.startsWith(voiceRootWithSep)) {
+        const QString outPath = QStringLiteral("voicenote/") + v.mid(voiceRootWithSep.size());
+        qInfo() << voicePath << "=>" << outPath;
+        return outPath;
+    }
+
+    qInfo() << voicePath << "=>" << voicePath;
+    return voicePath;
+}
+
+// voicePath 为相对路径时，转换为绝对路径
+static QString expandVoiceToAbsolute(const QString &voicePath)
+{
+    const QUrl url(voicePath);
+    if (url.isValid() && !url.scheme().isEmpty()) {
+        qInfo() << voicePath << "=>" << voicePath;
+        return voicePath;
+    }
+
+    const QString vNative = QDir::toNativeSeparators(voicePath);
+    if (QDir::isAbsolutePath(vNative)) {
+        qInfo() << voicePath << "=>" << vNative;
+        return vNative;
+    }
+
+    const QString appData = QDir::toNativeSeparators(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+    if (appData.isEmpty()) {
+        return voicePath;
+    }
+
+    const QString vNative1 = QDir::toNativeSeparators(QDir::cleanPath(appData + QDir::separator() + vNative));
+    qInfo() << voicePath << "=>" << vNative1;
+    return vNative1;
+}
+
 /**
  * @brief MetaDataParser::MetaDataParser
  */
@@ -64,6 +108,10 @@ bool MetaDataParser::parse(const QVariant &metaData, VNoteBlock *blockData)
         blockData->ptrVoice->voiceTitle = note.value(m_jsonNodeNameMap[NTitle]).toString();
         blockData->ptrVoice->state = note.value(m_jsonNodeNameMap[NState]).toBool(false);
         blockData->ptrVoice->voicePath = note.value(m_jsonNodeNameMap[NVoicePath]).toString();
+        // JSON中存储的路径是相对路径，需要转换为绝对路径
+        if (!blockData->ptrVoice->voicePath.isEmpty()) {
+            blockData->ptrVoice->voicePath = expandVoiceToAbsolute(blockData->ptrVoice->voicePath);
+        }
         blockData->ptrVoice->voiceSize = note.value(m_jsonNodeNameMap[NVoiceSize]).toInt(0);
         blockData->ptrVoice->createTime = QDateTime::fromString(
             note.value(m_jsonNodeNameMap[NCreateTime]).toString(), VNOTE_TIME_FMT);
@@ -100,7 +148,9 @@ void MetaDataParser::makeMetaData(const VNoteBlock *blockData, QVariant &metaDat
             note.insert(m_jsonNodeNameMap[NText], blockData->ptrVoice->blockText);
             note.insert(m_jsonNodeNameMap[NTitle], blockData->ptrVoice->voiceTitle);
             note.insert(m_jsonNodeNameMap[NState], blockData->ptrVoice->state);
-            note.insert(m_jsonNodeNameMap[NVoicePath], blockData->ptrVoice->voicePath);
+            // 使用相对路径存入JSON
+            QString voicePathRelative = makeVoiceRelative(blockData->ptrVoice->voicePath);
+            note.insert(m_jsonNodeNameMap[NVoicePath], voicePathRelative);
             note.insert(m_jsonNodeNameMap[NVoiceSize], blockData->ptrVoice->voiceSize);
             note.insert(m_jsonNodeNameMap[NCreateTime],
                         blockData->ptrVoice->createTime.toString(VNOTE_TIME_FMT));
@@ -295,6 +345,10 @@ void MetaDataParser::jsonParse(const QVariant &metaData, VNoteItem *noteData /*o
                 ptrBlock->ptrVoice->voiceTitle = noteItem.value(m_jsonNodeNameMap[NTitle]).toString();
                 ptrBlock->ptrVoice->state = noteItem.value(m_jsonNodeNameMap[NState]).toBool(false);
                 ptrBlock->ptrVoice->voicePath = noteItem.value(m_jsonNodeNameMap[NVoicePath]).toString();
+                // JSON中存储的路径是相对路径，需要转换为绝对路径
+                if (!ptrBlock->ptrVoice->voicePath.isEmpty()) {
+                    ptrBlock->ptrVoice->voicePath = expandVoiceToAbsolute(ptrBlock->ptrVoice->voicePath);
+                }
                 ptrBlock->ptrVoice->voiceSize = noteItem.value(m_jsonNodeNameMap[NVoiceSize]).toInt(0);
                 ptrBlock->ptrVoice->createTime = QDateTime::fromString(
                     noteItem.value(m_jsonNodeNameMap[NCreateTime]).toString(), VNOTE_TIME_FMT);
@@ -339,7 +393,9 @@ void MetaDataParser::jsonMakeMetadata(VNoteItem *noteData, QVariant &metaData)
                 noteItem.insert(m_jsonNodeNameMap[NText], it->ptrVoice->blockText);
                 noteItem.insert(m_jsonNodeNameMap[NTitle], it->ptrVoice->voiceTitle);
                 noteItem.insert(m_jsonNodeNameMap[NState], it->ptrVoice->state);
-                noteItem.insert(m_jsonNodeNameMap[NVoicePath], it->ptrVoice->voicePath);
+                // 使用相对路径存入JSON
+                QString voicePathRelative = makeVoiceRelative(it->ptrVoice->voicePath);
+                noteItem.insert(m_jsonNodeNameMap[NVoicePath], voicePathRelative);
                 noteItem.insert(m_jsonNodeNameMap[NVoiceSize], it->ptrVoice->voiceSize);
                 noteItem.insert(m_jsonNodeNameMap[NCreateTime],
                                 it->ptrVoice->createTime.toString(VNOTE_TIME_FMT));

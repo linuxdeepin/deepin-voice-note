@@ -40,8 +40,17 @@ void FileCleanupWorker::run()
 void FileCleanupWorker::cleanVoice()
 {
     for (QString path : m_voiceSet) {
-        if (!QFile::remove(path)) {
-            qCritical() << "remove file " << path << " failed!";
+        qInfo() << "remove voice:" << path;
+        // 增加文件存在性检查
+        if (!QFile::exists(path)) {
+            qWarning() << "File does not exist:" << path;
+            continue;
+        }
+
+        // 增加权限检查
+        QFile file(path);
+        if (!file.remove()) {
+            qCritical() << "remove file" << path << "failed:" << file.errorString();
         }
     }
 }
@@ -53,6 +62,7 @@ void FileCleanupWorker::cleanVoice()
 void FileCleanupWorker::cleanPicture()
 {
     for (QString path : m_pictureSet) {
+        qInfo() << "remove picture:" << path;
         if (!QFile::remove(path)) {
             qCritical() << "remove file " << path << " failed!";
         }
@@ -158,11 +168,12 @@ void FileCleanupWorker::removePicturePathBySet(const QString &path)
  */
 void FileCleanupWorker::scanVoiceByHtml(const QString &htmlCode)
 {
+    QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/";
     //匹配语音块标签的正则表达式
     QRegExp rx("<div.+jsonkey.+>");
     rx.setMinimal(true); //最小匹配
     //匹配语音路径的正则表达式
-    QRegExp rxJson("(/\\S+)+/voicenote/[\\w\\-]+\\.mp3");
+    QRegExp rxJson("voicenote/[\\w\\-]+\\.mp3");
     rxJson.setMinimal(false); //最大匹配
     QStringList list;
     int pos = 0;
@@ -170,7 +181,9 @@ void FileCleanupWorker::scanVoiceByHtml(const QString &htmlCode)
     while ((pos = rx.indexIn(htmlCode, pos)) != -1) {
         //获取语音路径
         if (rxJson.indexIn(rx.cap(0)) != -1) {
-            removeVoicePathBySet(rxJson.cap(0));
+            QString path = dirPath + rxJson.cap(0);
+            qInfo() << "find voice in html:" << path;
+            removeVoicePathBySet(path);
         }
         pos += rx.matchedLength();
     }
@@ -183,18 +196,21 @@ void FileCleanupWorker::scanVoiceByHtml(const QString &htmlCode)
  */
 void FileCleanupWorker::scanPictureByHtml(const QString &htmlCode)
 {
+    QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/";
     //匹配图片块标签的正则表达式
     QRegExp rx("<img.+src=.+>");
     rx.setMinimal(true); //最小匹配
     //匹配本地图片路径的正则表达式（图片位置限制在images文件夹，后缀限制为a-z长度为3到4位）
-    QRegExp rxPath("(/\\S+)+/images/[\\w\\-]+\\.[a-z]{3,4}");
+    QRegExp rxPath("images/[\\w\\-]+\\.[a-z]{3,4}");
     rxPath.setMinimal(false); //最大匹配
     int pos = 0;
     //查找图片块
     while ((pos = rx.indexIn(htmlCode, pos)) != -1) {
         //获取图片路径
         if (rxPath.indexIn(rx.cap(0)) != -1) {
-            removePicturePathBySet(rxPath.cap(0));
+            QString path = dirPath + rxPath.cap(0);
+            qInfo() << "find picture in html:" << path;
+            removePicturePathBySet(path);
         }
         pos += rx.matchedLength();
     }
