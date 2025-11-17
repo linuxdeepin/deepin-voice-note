@@ -253,9 +253,10 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportOneVoice(VNoteBlock *noteb
         QString baseFileName = m_exportPath + "/" + noteblock->ptrVoice->voiceTitle;
         QString fileSuffix = ".mp3";
         QString dstFileName = getExportFileName(baseFileName, fileSuffix);
-        qDebug() << "Copying voice file to:" << dstFileName;
-        if (!QFile::copy(noteblock->ptrVoice->voicePath, dstFileName)) {
-            qWarning() << "Failed to copy voice file from:" << noteblock->ptrVoice->voicePath;
+        const QString srcPath = Utils::makeVoiceAbsolute(noteblock->ptrVoice->voicePath);
+        qDebug() << "Copying voice file from:" << srcPath << "to:" << dstFileName;
+        if (!QFile::copy(srcPath, dstFileName)) {
+            qWarning() << "Failed to copy voice file from:" << srcPath;
             error = Savefailed; //保存失败
         } else {
             qInfo() << "Successfully exported voice to:" << dstFileName;

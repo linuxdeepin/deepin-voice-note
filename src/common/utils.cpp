@@ -35,6 +35,20 @@ Utils::Utils()
     qInfo() << "Utils constructor called";
 }
 
+QString Utils::makeVoiceAbsolute(const QString &voicePath)
+{
+    const QUrl url(voicePath);
+    if (url.isValid() && !url.scheme().isEmpty())
+        return voicePath;
+    const QString vNative = QDir::toNativeSeparators(voicePath);
+    if (QDir::isAbsolutePath(vNative))
+        return vNative;
+    const QString appData = QDir::toNativeSeparators(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+    if (appData.isEmpty())
+        return voicePath;
+    return QDir::toNativeSeparators(QDir::cleanPath(appData + QDir::separator() + vNative));
+}
+
 /**
  * @brief Utils::convertDateTime
  * @param dateTime 时间

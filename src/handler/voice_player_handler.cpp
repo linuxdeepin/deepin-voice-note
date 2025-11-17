@@ -11,25 +11,6 @@
 #include <QLibrary>
 #include <QDebug>
 #include <QUrl>
-namespace {
-// voicePath 为相对路径时，转换为绝对路径
-static inline QString expandVoiceToAbsolute(const QString &voicePath)
-{
-    const QUrl url(voicePath);
-    if (url.isValid() && !url.scheme().isEmpty()) {
-        return voicePath;
-    }
-    const QString vNative = QDir::toNativeSeparators(voicePath);
-    if (QDir::isAbsolutePath(vNative)) {
-        return vNative;
-    }
-    const QString appData = QDir::toNativeSeparators(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
-    if (appData.isEmpty()) {
-        return voicePath;
-    }
-    return QDir::toNativeSeparators(QDir::cleanPath(appData + QDir::separator() + vNative));
-}
-}
 
 #include "vnoteitem.h"
 #include "common/vlcplayer.h"
@@ -83,7 +64,7 @@ void VoicePlayerHandler::playVoice(const QVariant &json, bool bIsSame)
         parser.parse(json, m_voiceBlock.get());
         // 展开相对路径为绝对路径，便于实际播放
         if (m_voiceBlock && !m_voiceBlock->voicePath.isEmpty()) {
-            m_voiceBlock->voicePath = expandVoiceToAbsolute(m_voiceBlock->voicePath);
+            m_voiceBlock->voicePath = Utils::makeVoiceAbsolute(m_voiceBlock->voicePath);
         }
     }
 

@@ -64,4 +64,6 @@ public:
     static bool isCommunityEdition();
     // 将音频绝对路径转换为相对路径（AppData/voicenote/... -> voicenote/...）
     static QString makeVoiceRelative(const QString &voicePath);
+    // 将音频相对路径转换为绝对路径（voicenote/... -> AppData/voicenote/...），若已为绝对/URL则原样返回
+    static QString makeVoiceAbsolute(const QString &voicePath);
 };
