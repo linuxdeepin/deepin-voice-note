@@ -10,6 +10,8 @@ Item {
     property bool initialOnlyCreateFolder: false
     // 录音过程中禁用录音快捷键，避免重复启动录音导致崩溃
     property bool blockRecordingKey: false
+    // 录音状态，用于禁用播放快捷键
+    property bool isRecordingAudio: false
 
     signal copy
     signal createFolder
@@ -115,16 +117,8 @@ Item {
         }
     }
 
-    Shortcut {
-        id: playPause
-        enabled: !item.initialOnlyCreateFolder
-
-        sequence: "Space"
-
-        onActivated: {
-            playPauseVoice();
-        }
-    }
+    // 移除全局空格键快捷键，让JavaScript层独自处理语音播放/暂停
+    // JavaScript层已经有完整的录音状态检查和选中状态检查逻辑
 
     Shortcut {
         id: ctrl_B
