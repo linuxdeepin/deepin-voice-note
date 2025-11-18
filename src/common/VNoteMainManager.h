@@ -77,6 +77,7 @@ signals:
     void scrollChange(const bool &isTop);
     void updateEditNote(const int &noteId, const QString &time);
     void noteTitleChanged(const int &noteId, const QString &newTitle);
+    void saveVoiceStateChanged(bool enabled);
 
 private slots:
     void onVNoteFoldersLoaded();

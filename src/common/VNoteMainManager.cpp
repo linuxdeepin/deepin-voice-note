@@ -983,16 +983,18 @@ void VNoteMainManager::insertImages(const QList<QUrl> &filePaths)
 void VNoteMainManager::checkNoteVoice(const QVariantList &index)
 {
     qInfo() << "Checking note voice for" << index.size() << "notes";
+    bool hasVoice = false;
     foreach (auto id, index) {
         int noteIndex = id.toInt();
         VNoteItem *item = getNoteById(noteIndex);
         if (item->haveVoice()) {
-            ActionManager::instance()->enableAction(ActionManager::NoteSaveVoice, true);
-            return;
+            hasVoice = true;
+            break;
         }
     }
-    ActionManager::instance()->enableAction(ActionManager::NoteSaveVoice, false);
-    qInfo() << "Note voice check finished";
+    ActionManager::instance()->enableAction(ActionManager::NoteSaveVoice, hasVoice);
+    emit saveVoiceStateChanged(hasVoice);
+    qInfo() << "Note voice check finished, hasVoice:" << hasVoice;
 }
 
 void VNoteMainManager::checkNoteText(const QVariantList &index)

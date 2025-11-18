@@ -664,4 +664,14 @@ Item {
             }
         }
     }
+
+    Connections {
+        target: VNoteMainManager
+
+        onSaveVoiceStateChanged: enabled => {
+            if (multipleChoicesLoader.active && multipleChoicesLoader.item) {
+                multipleChoicesLoader.item.setSaveVoiceEnabled(enabled);
+            }
+        }
+    }
 }
