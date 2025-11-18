@@ -7,6 +7,7 @@ Item {
     id: rootWindow
 
     property int selectSize: 0
+    property bool saveVoiceEnabled: true
 
     signal deleteNote
     signal moveNote
@@ -14,6 +15,10 @@ Item {
     signal saveNote
 
     visible: false
+
+    function setSaveVoiceEnabled(enabled) {
+        saveVoiceEnabled = enabled;
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -81,6 +86,7 @@ Item {
                         leftPadding: 0
                         rightPadding: 0
                         text: qsTr("Save Voice")
+                        enabled: saveVoiceEnabled
 
                         onClicked: {
                             saveAudio();
