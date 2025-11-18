@@ -1016,9 +1016,11 @@ void VNoteMainManager::checkNoteText(const QVariantList &index)
 
 void VNoteMainManager::clearSearch()
 {
-    // qInfo() << "Clearing search";
+    qInfo() << "Clearing search";
     m_searchText = "";
-    // qInfo() << "Search cleared";
+    // 发出信号清除搜索高亮
+    emit updateRichTextSearch("");
+    qInfo() << "Search cleared";
 }
 
 bool VNoteMainManager::isInSearchMode() const
