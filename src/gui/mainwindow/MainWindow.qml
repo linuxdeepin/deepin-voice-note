@@ -121,13 +121,7 @@ ApplicationWindow {
             }
             VNoteMainManager.createNote();
         }
-        onPlayPauseVoice: {
-            if (initRect.visible) {
-                console.log("No notes available, cannot play/pause voice");
-                return;
-            }
-            VNoteMainManager.resumeVoicePlayer();
-        }
+
         onRenameFolder: {
             if (initRect.visible) {
                 console.log("No notes available, cannot rename folder");
