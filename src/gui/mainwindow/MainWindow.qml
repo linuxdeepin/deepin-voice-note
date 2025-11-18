@@ -93,7 +93,11 @@ ApplicationWindow {
 
         enabled: rootWindow.active
 
-        blockCreateKeys: (isRecordingAudio || webEngineView.titleBar.isPlaying)
+        blockCreateKeys: {
+            var shouldBlock = (isRecordingAudio || webEngineView.titleBar.isPlaying || itemListView.isSearch || itemListView.isSearching || webEngineView.titleBar.isSearching);
+            console.warn("blockCreateKeys:", shouldBlock, "- isRecordingAudio:", isRecordingAudio, "isPlaying:", webEngineView.titleBar.isPlaying, "isSearch:", itemListView.isSearch, "isSearching:", itemListView.isSearching, "titleBar.isSearching:", webEngineView.titleBar.isSearching);
+            return shouldBlock;
+        }
         blockRecordingKey: isRecordingAudio
         initialOnlyCreateFolder: initRect.visible
 
