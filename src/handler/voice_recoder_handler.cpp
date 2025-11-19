@@ -328,3 +328,15 @@ void VoiceRecoderHandler::onReduceNoiseChanged(bool reduceNoiseChanged)
         updateRecordBtnState(!deviceName.isEmpty());
     });
 }
+
+bool VoiceRecoderHandler::hasAudioOutputDevice()
+{
+    qDebug() << "Checking audio output device availability using AudioWatcher";
+    return m_audioWatcher ? m_audioWatcher->hasAudioOutputDevice() : false;
+}
+
+bool VoiceRecoderHandler::hasAudioInputDevice()
+{
+    qDebug() << "Checking audio input device availability using AudioWatcher";
+    return m_audioWatcher ? m_audioWatcher->hasAudioInputDevice() : false;
+}

@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "vtextspeechandtrmanager.h"
+#include "../handler/voice_recoder_handler.h"
 
 #include <mutex>
 
@@ -92,6 +93,14 @@ bool VTextSpeechAndTrManager::isTextToSpeechInWorking()
 bool VTextSpeechAndTrManager::getTextToSpeechEnable()
 {
     qDebug() << "Checking text-to-speech enable status";
+    
+    // 首先检查音频输出设备是否存在
+    VoiceRecoderHandler *voiceHandler = VoiceRecoderHandler::instance();
+    if (voiceHandler && !voiceHandler->hasAudioOutputDevice()) {
+        qWarning() << "Text-to-speech disabled: No audio output device available";
+        return false;
+    }
+    
     QDBusMessage voiceReadingMsg =
         QDBusMessage::createMethodCall(kCopilotService, "/aiassistant/tts", "com.iflytek.aiassistant.tts", "getTTSEnable");
 
@@ -112,6 +121,14 @@ bool VTextSpeechAndTrManager::getTextToSpeechEnable()
 bool VTextSpeechAndTrManager::getSpeechToTextEnable()
 {
     qDebug() << "Checking speech-to-text enable status";
+    
+    // 首先检查音频输入设备是否存在
+    VoiceRecoderHandler *voiceHandler = VoiceRecoderHandler::instance();
+    if (voiceHandler && !voiceHandler->hasAudioInputDevice()) {
+        qWarning() << "Speech-to-text disabled: No audio input device available";
+        return false;
+    }
+    
     QDBusMessage dictationMsg =
         QDBusMessage::createMethodCall(kCopilotService, "/aiassistant/iat", "com.iflytek.aiassistant.iat", "getIatEnable");
 

@@ -33,6 +33,8 @@ public:
     Q_INVOKABLE void setAudioDevice(const QString &device);
     Q_INVOKABLE void changeMode(const int &mode);
     Q_INVOKABLE void confirmStartRecoder();
+    Q_INVOKABLE bool hasAudioOutputDevice();
+    Q_INVOKABLE bool hasAudioInputDevice();
 
 public slots:
     void onDeviceEnableChanged(int mode, bool enabled);
