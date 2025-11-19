@@ -489,12 +489,23 @@ bool AudioWatcher::getDeviceEnable(AudioWatcher::AudioMode mode)
     qInfo() << "Getting device enable";
     QString cards = m_audioDBusInterface->property("Cards").value<QString>();
     if (m_isVirtualMachineHw && (cards.isEmpty() || cards.toLower() == "null")) {
-        qInfo() << "Device enable is true";
+        qInfo() << "Device enable is true (virtual machine)";
         return true;
     } else {
-        qInfo() << "Device enable is false";
-        return mode != Internal ? m_inIsEnable : m_outIsEnable;
+        bool hasDevice = (mode == Internal) ? m_outIsEnable : m_inIsEnable;
+        qInfo() << "Device enable for mode" << mode << ":" << hasDevice;
+        return hasDevice;
     }
+}
+
+bool AudioWatcher::hasAudioOutputDevice() const
+{
+    return m_outIsEnable;
+}
+
+bool AudioWatcher::hasAudioInputDevice() const
+{
+    return m_inIsEnable;
 }
 
 /**

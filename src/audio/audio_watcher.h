@@ -78,6 +78,9 @@ public:
     double getVolume(AudioMode mode);
     bool getMute(AudioMode mode);
     bool getDeviceEnable(AudioMode mode);
+    
+    bool hasAudioOutputDevice() const;
+    bool hasAudioInputDevice() const;
 signals:
     void sigVolumeChange(AudioMode mode);
     void sigDeviceChange(AudioMode mode);
