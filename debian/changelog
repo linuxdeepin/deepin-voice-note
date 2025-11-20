@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.50) unstable; urgency=medium
+
+  * fix: Improve audio output device detection for TTS and STT functionality
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Thu, 20 Nov 2025 18:51:42 +0800
+
 deepin-voice-note (6.5.49) unstable; urgency=medium
 
   * fix: Add jsCallGetAppDataPath method and enhance voice path handling
