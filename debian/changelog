@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.51) unstable; urgency=medium
+
+  * fix: Prevent crash on repeated audio recording shortcut and improve recording state handling
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Thu, 27 Nov 2025 19:15:39 +0800
+
 deepin-voice-note (6.5.50) unstable; urgency=medium
 
   * fix: Improve audio output device detection for TTS and STT functionality
