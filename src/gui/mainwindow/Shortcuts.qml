@@ -108,12 +108,22 @@ Item {
 
     Shortcut {
         id: ctrl_R
-        enabled: !item.initialOnlyCreateFolder && !item.blockRecordingKey
+        // 初始页面、录音中或显式要求屏蔽录音快捷键时，均不响应 Ctrl+R
+        enabled: !item.initialOnlyCreateFolder && !rootWindow.isRecordingAudio && !item.blockRecordingKey
 
         sequence: "Ctrl+R"
 
         onActivated: {
-            startRecording();
+            console.warn("Ctrl+R activated - initialOnlyCreateFolder:", item.initialOnlyCreateFolder,
+                         "isRecordingAudio:", rootWindow.isRecordingAudio,
+                         "blockRecordingKey:", item.blockRecordingKey);
+
+            // 双重保护：只在未录音时启动录音，录音过程中不响应
+            if (!rootWindow.isRecordingAudio) {
+                startRecording();
+            } else {
+                console.warn("Ctrl+R ignored: recording is already in progress");
+            }
         }
     }
 

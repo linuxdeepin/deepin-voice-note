@@ -185,8 +185,14 @@ void GstreamRecorder::deinit()
 {
     qDebug() << "Deinitializing GstreamRecorder...";
     stopRecord();
-    objectUnref(m_pipeline);
-    gst_deinit();
+
+    // 确保管道状态切换到 NULL 再释放，避免 GStreamer 在 PLAYING 状态析构元素
+    if (m_pipeline) {
+        setStateToNull();
+        objectUnref(m_pipeline);
+        m_pipeline = nullptr;
+    }
+
     qDebug() << "GstreamRecorder deinitialized";
 }
 
@@ -352,8 +358,14 @@ void GstreamRecorder::setOutputFile(const QString &path)
         
         // 销毁旧管道以避免filesink location修改问题
         qDebug() << "Destroying existing pipeline to avoid filesink location modification";
-        gst_object_unref(m_pipeline);
-        m_pipeline = nullptr;
+
+        // 完成了正常的 EOS 处理和文件写入，这里只做快速清理：
+        // 确保管道处于 NULL 状态后再 unref，避免 GStreamer 在 PLAYING 状态析构元素。
+        if (m_pipeline) {
+            setStateToNull();
+            objectUnref(m_pipeline);
+            m_pipeline = nullptr;
+        }
         qDebug() << "Old pipeline destroyed, will create new pipeline for next recording";
     } else if (m_pipeline != nullptr) {
         qDebug() << "Pipeline exists but output file is same, no need to rebuild";
