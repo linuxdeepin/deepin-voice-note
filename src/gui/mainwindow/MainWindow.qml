@@ -98,7 +98,10 @@ ApplicationWindow {
             console.warn("blockCreateKeys:", shouldBlock, "- isRecordingAudio:", isRecordingAudio, "isPlaying:", webEngineView.titleBar.isPlaying, "isSearch:", itemListView.isSearch, "isSearching:", itemListView.isSearching, "titleBar.isSearching:", webEngineView.titleBar.isSearching);
             return shouldBlock;
         }
+        // 与右上录音按钮同条件：按钮不可用或正在播放时禁用 Ctrl+R
         blockRecordingKey: isRecordingAudio
+                           || webEngineView.titleBar.isPlaying
+                           || !webEngineView.titleBar.recordBtnEnabled
         initialOnlyCreateFolder: initRect.visible
 
         onCopy: {

@@ -16,6 +16,7 @@ TitleBar {
     property bool isSearching: false
     property bool recorderBtnEnable: true
     property bool recordingHover: false
+    property bool recordBtnEnabled: recordBtn.enabled
 
     signal createNote
     signal insertImage

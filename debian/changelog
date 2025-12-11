@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.52) UNRELEASED; urgency=medium
+
+  * feat: Integrate D-Bus service for voice note management 
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Thu, 11 Dec 2025 20:42:46 +0800
+
 deepin-voice-note (6.5.51) unstable; urgency=medium
 
   * fix: Prevent crash on repeated audio recording shortcut and improve recording state handling
