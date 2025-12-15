@@ -17,6 +17,8 @@
 #include <QStandardPaths>
 #include <QtConcurrent>
 
+#include "audiowatcher.h"
+
 static const QString kUosAiBin = "uos-ai-assistant";
 static const QString kCopilotService = "com.deepin.copilot";
 static const QString kCopilotPath = "/com/deepin/copilot";
@@ -93,6 +95,12 @@ bool VTextSpeechAndTrManager::isTextToSpeechInWorking()
 bool VTextSpeechAndTrManager::getTextToSpeechEnable()
 {
     qDebug() << "Checking text-to-speech enable status";
+    // 首先检查音频输出设备是否存在
+    if (!AudioWatcher::hasAudioOutputDevice()) {
+        qWarning() << "Text-to-speech disabled: No audio output device available";
+        return false;
+    }
+
     QDBusMessage voiceReadingMsg =
         QDBusMessage::createMethodCall(kFlytekService, "/aiassistant/tts", "com.iflytek.aiassistant.tts", "getTTSEnable");
 
@@ -113,6 +121,12 @@ bool VTextSpeechAndTrManager::getTextToSpeechEnable()
 bool VTextSpeechAndTrManager::getSpeechToTextEnable()
 {
     qDebug() << "Checking speech-to-text enable status";
+    // 首先检查音频输入设备是否存在
+    if (!AudioWatcher::hasAudioInputDevice()) {
+        qWarning() << "Speech-to-text disabled: No audio input device available";
+        return false;
+    }
+
     QDBusMessage dictationMsg =
         QDBusMessage::createMethodCall(kFlytekService, "/aiassistant/iat", "com.iflytek.aiassistant.iat", "getIatEnable");
 

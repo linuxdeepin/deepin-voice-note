@@ -117,6 +117,10 @@ public:
     bool getMute(AudioMode mode);
     //判断设备是否通过控制中心禁用
     bool getDeviceEnable(AudioMode mode);
+    // 查询是否有音频输出设备
+    static bool hasAudioOutputDevice();
+    // 查询是否有音频输入设备
+    static bool hasAudioInputDevice();
 signals:
     //音量改变信号
     void sigVolumeChange(AudioMode mode);
@@ -301,12 +305,12 @@ private:
       * @brief 默认输入设备是否使能
       * 找出默认输入设备在 系统>控制中心>声音>设备管理>输入设备 中的使能情况
       */
-    bool m_inIsEnable{false};
+    static bool kInIsEnable;
     /**
       * @brief 默认输出设备是否使能
       * 找出默认输出设备在 系统>控制中心>声音>设备管理>输入设备 中的使能情况
       */
-    bool m_outIsEnable{false};
+    static bool kOutIsEnable;
 
     /**
       * @brief  是否是虚拟环境

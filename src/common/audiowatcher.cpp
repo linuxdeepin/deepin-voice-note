@@ -7,6 +7,10 @@
 #include "globaldef.h"
 
 #include <DLog>
+
+bool AudioWatcher::kInIsEnable  = false;
+bool AudioWatcher::kOutIsEnable = false;
+
 /**
  * @brief AudioWatcher::AudioWatcher
  * @param parent 父类
@@ -170,16 +174,16 @@ void AudioWatcher::updateDeviceEnabled(const QString cardsStr, bool isEmitSig)
         }
     }
     m_inAudioPort = currentAuidoPort(m_inAuidoPorts,Micphone);
-    m_inIsEnable = (m_inAudioPort.availability == 2 || m_inAudioPort.availability == 0)? true : false;
+    kInIsEnable = (m_inAudioPort.availability == 2 || m_inAudioPort.availability == 0)? true : false;
     if (isEmitSig)
-        sigDeviceEnableChanged(Micphone, m_inIsEnable);
+        sigDeviceEnableChanged(Micphone, kInIsEnable);
     m_outAudioPort = currentAuidoPort(m_outAuidoPorts,Internal);
-    m_outIsEnable = (m_outAudioPort.availability == 2 || m_inAudioPort.availability == 0)? true : false;
+    kOutIsEnable = (m_outAudioPort.availability == 2 || m_outAudioPort.availability == 0)? true : false;
     if (isEmitSig)
-        sigDeviceEnableChanged(Internal, m_outIsEnable);
+        sigDeviceEnableChanged(Internal, kOutIsEnable);
 
-    qInfo() << "current select in audioPort: "<< m_inAudioPort << ",is enable:" << m_inIsEnable;
-    qInfo() << "current select out audioPort: "<< m_outAudioPort << ",is enable:" << m_outIsEnable;
+    qInfo() << "current select in audioPort: "<< m_inAudioPort << ",is enable:" << kInIsEnable;
+    qInfo() << "current select out audioPort: "<< m_outAudioPort << ",is enable:" << kOutIsEnable;
 }
 
 AudioPort AudioWatcher::currentAuidoPort(const QList<AudioPort> &auidoPorts,AudioMode audioMode)
@@ -564,10 +568,20 @@ bool AudioWatcher::getDeviceEnable(AudioWatcher::AudioMode mode)
         return true;
     } else {
         qInfo() << "Current Mode: " << mode
-                << "Input Device Enable: " << m_inIsEnable
-                << "Output Device Enable:" << m_outIsEnable;
-        return mode != Internal ? m_inIsEnable : m_outIsEnable;
+                << "Input Device Enable: " << kInIsEnable
+                << "Output Device Enable:" << kOutIsEnable;
+        return mode != Internal ? kInIsEnable : kOutIsEnable;
     }
+}
+
+bool AudioWatcher::hasAudioOutputDevice()
+{
+    return kOutIsEnable;
+}
+
+bool AudioWatcher::hasAudioInputDevice()
+{
+    return kInIsEnable;
 }
 
 /**
