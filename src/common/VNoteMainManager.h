@@ -88,6 +88,7 @@ signals:
     void updateEditNote(const int &noteId, const QString &time);
     void noteTitleChanged(const int &noteId, const QString &newTitle);
     void saveVoiceStateChanged(bool enabled);
+    void voiceToTextStateChanged(bool isConverting);
 
 private slots:
     void onVNoteFoldersLoaded();
