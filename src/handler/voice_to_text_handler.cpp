@@ -11,6 +11,7 @@
 #include "common/vnoteitem.h"
 #include "common/vnotea2tmanager.h"
 #include "common/jscontent.h"
+#include "common/VNoteMainManager.h"
 #include "opsstateinterface.h"
 
 /**
@@ -57,6 +58,7 @@ void VoiceToTextHandler::onA2TStart()
 {
     qInfo() << "VoiceToTextHandler onA2TStart called";
     OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, true);
+    emit VNoteMainManager::instance()->voiceToTextStateChanged(true);
     Q_EMIT JsContent::instance()->callJsSetVoiceText(QString(""), JsContent::AsrFlag::Start);
     QTimer::singleShot(0, this, [this]() { m_a2tManager->startAsr(m_voiceBlock->voicePath, m_voiceBlock->voiceSize); });
 }
@@ -86,6 +88,7 @@ void VoiceToTextHandler::onA2TError(int error)
     // TODO(renbin): 弹窗提示
     Q_EMIT JsContent::instance()->callJsSetVoiceText("", JsContent::AsrFlag::End);
     OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, false);
+    emit VNoteMainManager::instance()->voiceToTextStateChanged(false);
 }
 
 void VoiceToTextHandler::onA2TSuccess(const QString &text)
@@ -93,4 +96,5 @@ void VoiceToTextHandler::onA2TSuccess(const QString &text)
     qInfo() << "VoiceToTextHandler onA2TSuccess called";
     Q_EMIT JsContent::instance()->callJsSetVoiceText(text, JsContent::AsrFlag::End);
     OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, false);
+    emit VNoteMainManager::instance()->voiceToTextStateChanged(false);
 }

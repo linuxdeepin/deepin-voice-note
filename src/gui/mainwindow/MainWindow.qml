@@ -18,6 +18,7 @@ ApplicationWindow {
     property int createFolderBtnHeight: 40
     property bool isRecording: webEngineView.isRecording
     property bool isRecordingAudio: false
+    property bool isVoiceToText: false
     property int leftAreaMaxWidth: 300
     property int leftAreaMinWidth: 125
     property int leftViewWidth: 220
@@ -94,8 +95,7 @@ ApplicationWindow {
         enabled: rootWindow.active
 
         blockCreateKeys: {
-            var shouldBlock = (isRecordingAudio || webEngineView.titleBar.isPlaying || itemListView.isSearch || itemListView.isSearching || webEngineView.titleBar.isSearching);
-            console.warn("blockCreateKeys:", shouldBlock, "- isRecordingAudio:", isRecordingAudio, "isPlaying:", webEngineView.titleBar.isPlaying, "isSearch:", itemListView.isSearch, "isSearching:", itemListView.isSearching, "titleBar.isSearching:", webEngineView.titleBar.isSearching);
+            var shouldBlock = (isRecordingAudio || webEngineView.titleBar.isPlaying || itemListView.isSearch || itemListView.isSearching || webEngineView.titleBar.isSearching || isVoiceToText);
             return shouldBlock;
         }
         // 与右上录音按钮同条件：按钮不可用或正在播放时禁用 Ctrl+R
@@ -408,6 +408,9 @@ ApplicationWindow {
         }
         onSelectNoteByIndex: function(selectIndex) {
             itemListView.selectNoteItem(selectIndex);
+        }
+        onVoiceToTextStateChanged: function(isConverting) {
+            isVoiceToText = isConverting;
         }
     }
 
