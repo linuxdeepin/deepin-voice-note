@@ -610,7 +610,8 @@ Item {
                 }
 
                 MenuItem {
-                    enabled: !isPlay && !isRecordingAudio
+                    id: deleteMenuItem
+                    enabled: !root.isPlay && !root.isRecordingAudio
                     text: qsTr("Delete")
 
                     onTriggered: {
@@ -634,7 +635,8 @@ Item {
                 }
 
                 MenuItem {
-                    enabled: !isPlay && !isRecordingAudio 
+                    id: newNoteMenuItem
+                    enabled: !root.isPlay && !root.isRecordingAudio 
                     text: qsTr("New Note")
 
                     onTriggered: {
