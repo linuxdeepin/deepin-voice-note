@@ -146,7 +146,8 @@ void AudioWatcher::updateDeviceEnabled(const QString cardsStr, bool isEmitSig)
     if (isEmitSig)
         sigDeviceEnableChanged(Micphone, m_inIsEnable);
     m_outAudioPort = currentAuidoPort(m_outAuidoPorts,Internal);
-    m_outIsEnable = (m_outAudioPort.availability == 2 || m_inAudioPort.availability == 0)? true : false;
+    // 此时应该使用 m_outAudioPort.availability 来判断是否启用
+    m_outIsEnable = (m_outAudioPort.availability == 2 || m_outAudioPort.availability == 0)? true : false;
     if (isEmitSig)
         sigDeviceEnableChanged(Internal, m_outIsEnable);
 
