@@ -419,7 +419,8 @@ ApplicationWindow {
         target: VoiceRecoderHandler
 
         onRecoderStateChange: function(type) {
-            isRecordingAudio = (type === VoiceRecoderHandler.Recording);
+            // 录音中或录音暂停时都视为"正在录音"状态，禁用相关操作
+            isRecordingAudio = (type === VoiceRecoderHandler.Recording || type === VoiceRecoderHandler.Paused);
             console.log("MainWindow: Recording state changed to:", type, "isRecordingAudio:", isRecordingAudio);
         }
     }
