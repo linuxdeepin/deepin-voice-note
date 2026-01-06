@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.53) unstable; urgency=medium
+
+  * fix: Update message display and toolbar behavior in WebEngineView.qml and index.js
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Tue, 06 Jan 2026 17:14:07 +0800
+
 deepin-voice-note (6.5.52) UNRELEASED; urgency=medium
 
   * feat: Integrate D-Bus service for voice note management 
