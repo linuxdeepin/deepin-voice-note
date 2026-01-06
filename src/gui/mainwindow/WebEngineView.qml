@@ -508,6 +508,11 @@ Item {
                 });
             }
 
+            onClosed: {
+                // 菜单关闭时隐藏悬浮工具栏
+                Webobj.callJsHideEditToolbar();
+            }
+
             Connections {
                 target: handler
 

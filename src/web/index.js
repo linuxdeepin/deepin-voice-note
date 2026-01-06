@@ -1263,8 +1263,8 @@ function setMenuPosition(menuX, menuY, menuWidth, menuHeight) {
     
     console.log("最终工具栏位置: x=" + toolbarX + ", y=" + toolbarY);
     
-    // 显示工具栏（转换为文档坐标）
-    showRightMenu(toolbarX + scrollLeft, toolbarY + scrollTop);
+    // 显示工具栏（传入视口坐标，rightUpdate 内部会添加滚动偏移）
+    showRightMenu(toolbarX, toolbarY);
 }
 
 /**
