@@ -323,12 +323,24 @@ bool GstreamRecorder::doBufferProbe(GstBuffer *buffer)
                        : -1;
         QByteArray data;
         GstMapInfo info;
-        if (gst_buffer_map(buffer, &info, GST_MAP_READ)) {
-            data = QByteArray(reinterpret_cast<const char *>(info.data),
-                              static_cast<int>(info.size));
-            gst_buffer_unmap(buffer, &info);
+        // 大部分声卡在录音初期会有pop音，所以我们在500ms内的音频数据，做静音处理，规避之
+        if (position <= 500) {
+            if (gst_buffer_map(buffer, &info, GST_MAP_READWRITE)) {
+                qInfo() << "clear buffer data, position:" << position << "ms";
+                memset(info.data, 0, info.size);
+                data = QByteArray(static_cast<int>(info.size), 0);
+                gst_buffer_unmap(buffer, &info);
+            } else {
+                return true;
+            }
         } else {
-            return true;
+            if (gst_buffer_map(buffer, &info, GST_MAP_READ)) {
+                data = QByteArray(reinterpret_cast<const char *>(info.data),
+                                static_cast<int>(info.size));
+                gst_buffer_unmap(buffer, &info);
+            } else {
+                return true;
+            }
         }
 
         QMutexLocker locker(&m_bufferMutex);
