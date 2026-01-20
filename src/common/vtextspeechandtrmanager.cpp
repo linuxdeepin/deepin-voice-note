@@ -122,22 +122,32 @@ bool VTextSpeechAndTrManager::getSpeechToTextEnable()
 {
     qDebug() << "Checking speech-to-text enable status";
     // 首先检查音频输入设备是否存在
-    if (!AudioWatcher::hasAudioInputDevice()) {
-        qWarning() << "Speech-to-text disabled: No audio input device available";
-        return false;
+    QDBusMessage msg = QDBusMessage::createMethodCall("com.deepin.daemon.Audio",
+                                                      "/com/deepin/daemon/Audio",
+                                                      "org.freedesktop.DBus.Properties",
+                                                      "Get");
+    msg << QString("com.deepin.daemon.Audio") << QString("CardsWithoutUnavailable");
+
+    QDBusReply<QVariant> reply = QDBusConnection::sessionBus().call(msg);
+    if (reply.isValid()) {
+        QJsonDocument doc = QJsonDocument::fromJson(reply.value().toByteArray());
+        QJsonArray cards = doc.array();
+
+        // 检查是否有启用的输出设备 (Direction=2)
+        for (const QJsonValue &cardValue : cards) {
+            QJsonObject card = cardValue.toObject();
+            QJsonArray ports = card["Ports"].toArray();
+
+            for (const QJsonValue &portValue : ports) {
+                QJsonObject port = portValue.toObject();
+                if (port["Direction"].toInt() == 2 && port["Enabled"].toBool()) {
+                    return true; // 找到启用的输入设备
+                }
+            }
+        }
     }
 
-    QDBusMessage dictationMsg =
-        QDBusMessage::createMethodCall(kFlytekService, "/aiassistant/iat", "com.iflytek.aiassistant.iat", "getIatEnable");
-
-    QDBusReply<bool> dictationStateRet = QDBusConnection::sessionBus().call(dictationMsg, QDBus::BlockWithGui);
-    if (dictationStateRet.isValid()) {
-        qDebug() << "Speech-to-text enabled:" << dictationStateRet.value();
-        return dictationStateRet.value();
-    } else {
-        qWarning() << "Failed to get speech-to-text enable status:" << dictationStateRet.error().message();
-        return false;
-    }
+    return false;
 }
 
 /**
