@@ -53,6 +53,10 @@ int main(int argc, char *argv[])
     qDebug() << "MIPS64: Applied DTK configuration workarounds";
 #endif
 
+#ifdef __sw_64__
+    qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--js-flags=--jitless");
+#endif
+
     DApplication *app = new DApplication(argc, argv);
 
     qInfo() << "Starting deepin-voice-note application...";
