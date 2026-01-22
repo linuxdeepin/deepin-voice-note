@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.54) unstable; urgency=medium
+
+  * fix: Add environment variable for Chromium flags on SW-64 architecture
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Thu, 22 Jan 2026 18:56:38 +0800
+
 deepin-voice-note (6.5.53) unstable; urgency=medium
 
   * fix: Update message display and toolbar behavior in WebEngineView.qml and index.js
