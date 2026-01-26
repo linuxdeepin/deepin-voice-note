@@ -113,6 +113,11 @@ ApplicationWindow {
                 console.log("Cannot create notebook while recording or playing");
                 return;
             }
+            // 语音转文字时不允许创建记事本（会自动创建笔记，导致转文字结果丢失）
+            if (isVoiceToText) {
+                console.log("Cannot create notebook while voice to text is in progress");
+                return;
+            }
             VNoteMainManager.vNoteCreateFolder();
         }
         onCreateNote: {
@@ -124,6 +129,11 @@ ApplicationWindow {
             // 录音时不允许创建笔记
             if (isRecordingAudio || folderListView.isPlay) {
                 console.log("Cannot create note while recording or playing audio");
+                return;
+            }
+            // 语音转文字时不允许创建笔记，避免转文字结果丢失
+            if (isVoiceToText) {
+                console.log("Cannot create note while voice to text is in progress");
                 return;
             }
             VNoteMainManager.createNote();
@@ -491,6 +501,7 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     webVisible: initRect.visible
                     isRecordingAudio: rootWindow.isRecordingAudio  // 传递录音状态
+                    isVoiceToText: rootWindow.isVoiceToText  // 传递语音转文字状态
 
                     onEmptyItemList: isEmpty => {
                         webEngineView.webVisible = !isEmpty;
@@ -866,6 +877,7 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     initialVisible: initRect.visible
                     isRecordingAudio: rootWindow.isRecordingAudio
+                    isVoiceToText: rootWindow.isVoiceToText  // 传递语音转文字状态
 
                     onDeleteNote: {
                         itemListView.onDeleteNote();

@@ -58,6 +58,14 @@ signals:
      * @param flag 转写标志 参数说明依据AsrFlag枚举
      */
     void callJsSetVoiceText(const QString &text, int asrflag);
+
+    /**
+     * @brief 调用web前端，通过 voicePath 设置语音转文字结果
+     * @param voicePath 语音文件路径（用于定位语音元素）
+     * @param text 文本
+     * @param asrflag 转写标志
+     */
+    void callJsSetVoiceTextByPath(const QString &voicePath, const QString &text, int asrflag);
     void callJsInsertImages(const QStringList &images); //调用web前端，插入图片
     void callJsSetPlayStatus(int status); //调用web前端, 设置播放状态，0播放中，1暂停中 2.结束播放
     /**

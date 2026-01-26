@@ -72,6 +72,19 @@ public:
     Q_INVOKABLE QString getSavedVoicePath();
     Q_INVOKABLE void saveUserSelectedPath(const QString &path, const SaveAsType type);
 
+    /**
+     * @brief 获取当前笔记 ID
+     */
+    Q_INVOKABLE int currentNoteId() const;
+
+    /**
+     * @brief 在指定笔记的 HTML 中插入语音转文字结果
+     * @param noteId 笔记 ID
+     * @param voicePath 语音文件路径（用于定位语音元素）
+     * @param text 转换结果文本
+     */
+    void insertVoiceTextToNote(int noteId, const QString &voicePath, const QString &text);
+
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);
     void updateNotes(const QList<QVariantMap> &notesData, const int &selectIndex);
@@ -89,6 +102,10 @@ signals:
     void noteTitleChanged(const int &noteId, const QString &newTitle);
     void saveVoiceStateChanged(bool enabled);
     void voiceToTextStateChanged(bool isConverting);
+    /**
+     * @brief 笔记数据已更新信号（用于刷新编辑器）
+     */
+    void noteDataUpdated(int noteId);
 
 private slots:
     void onVNoteFoldersLoaded();

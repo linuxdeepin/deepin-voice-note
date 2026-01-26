@@ -233,6 +233,7 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsSetPlayStatus.connect(toggleState);
         webobj.callJsSetHtml.connect(setHtml);
         webobj.callJsSetVoiceText.connect(setVoiceText);
+        webobj.callJsSetVoiceTextByPath.connect(setVoiceTextByPath);
         webobj.callJsInsertImages.connect(insertImg);
         webobj.callJsSetTheme.connect(changeColor);
         webobj.calllJsShowEditToolbar.connect(showRightMenu);
@@ -1042,6 +1043,9 @@ function setHtml(html) {
     replaceVoiceToVersion2();
     ensureVoiceBoxesDraggable();
 
+    // 恢复已保存的语音转文字结果
+    restoreVoiceTextFromJsonKey();
+
     initFinish = true;
     // 搜索功能
     webobj.jsCallSetDataFinsh();
@@ -1103,13 +1107,77 @@ function setVoiceText(text, flag) {
             $('.li').removeClass('active');
         }
         else {
-            var voiceInfoBox = activeTransVoice.find('.voiceInfoBox');
-            if (!voiceInfoBox.hasClass('containText')) {
-                // 设置语音转换中标识，已有文本不再进行转换
-                activeTransVoice.find('.voicePlayback').addClass('voiceToText');
-                bTransVoiceIsReady = false;
-            }
+            // 设置语音转换中标识（无论是否已有文本，重新转换都显示转圈状态）
+            activeTransVoice.find('.voicePlayback').addClass('voiceToText');
+            bTransVoiceIsReady = false;
         }
+    }
+}
+
+/**
+ * 通过 voicePath 设置语音转文字结果（支持笔记切换场景）
+ * @param {string} voicePath 语音文件路径（用于定位语音元素）
+ * @param {string} text 转换文本内容
+ * @param {number} flag 0: 转换过程中 1: 结果
+ */
+function setVoiceTextByPath(voicePath, text, flag) {
+    var $voiceBox = null;
+
+    // 通过 voicePath 查找语音元素
+    $('.voiceBox').each(function() {
+        try {
+            var jsonKey = $(this).attr('jsonKey');
+            if (jsonKey) {
+                var json = JSON.parse(jsonKey);
+                // 支持完整路径匹配或文件名匹配
+                if (json.voicePath === voicePath || 
+                    (json.voicePath && voicePath && 
+                     json.voicePath.split('/').pop() === voicePath.split('/').pop())) {
+                    $voiceBox = $(this);
+                    return false; // break
+                }
+            }
+        } catch (e) {
+            console.log('Error parsing jsonKey:', e);
+        }
+    });
+
+    if (!$voiceBox) {
+        console.log('Voice element not found for path:', voicePath);
+        return;
+    }
+
+    if (flag) {
+        // flag=1: 转换完成，显示结果
+        if (text) {
+            var translate = $voiceBox.find('.translate');
+            var jsonData = {
+                translateLabel: divTranslateContent.translateLabel,
+                translateText: text
+            }
+            var textBindDataHandle = Handlebars.compile(translateTextContentTemplate);
+            const translateTexthtml = textBindDataHandle(jsonData);
+            translate.html(translateTexthtml);
+
+            $voiceBox.find('.voiceInfoBox').addClass('containText');
+            translate.find('.translateHeader').addClass('unfold');
+            translate.hide();
+            translate.slideDown('fast');
+        }
+
+        // 更新 jsonKey 中的 text 字段
+        var jsonValue = $voiceBox.attr('jsonKey');
+        var jsonObj = JSON.parse(jsonValue);
+        jsonObj.text = text;
+        $voiceBox.attr('jsonKey', JSON.stringify(jsonObj));
+
+        // 移除转换中状态
+        $voiceBox.find('.voicePlayback').removeClass('voiceToText');
+
+        webobj.jsCallTxtChange();
+    } else {
+        // flag=0: 转换中，显示转换中状态（无论是否已有文本，重新转换都显示转圈状态）
+        $voiceBox.find('.voicePlayback').addClass('voiceToText');
     }
 }
 
@@ -1137,6 +1205,62 @@ function transHtml(json, flag) {
 // 保证从历史/替换渲染回来的 voiceBox 都具有 draggable 属性
 function ensureVoiceBoxesDraggable() {
     $('.voiceBox').attr('draggable', 'true');
+}
+
+/**
+ * 恢复已保存的语音转文字结果
+ * 遍历所有语音元素，检查 jsonKey 中是否有 text 字段，
+ * 如果有则渲染到 .translate 区域，并恢复展开/收起状态
+ */
+function restoreVoiceTextFromJsonKey() {
+    $('.voiceBox').each(function() {
+        var $voiceBox = $(this);
+        var translate = $voiceBox.find('.translate');
+        
+        // 如果 .translate 区域已经有内容，跳过
+        if (translate.children().length > 0) {
+            return;
+        }
+        
+        try {
+            var jsonKey = $voiceBox.attr('jsonKey');
+            if (jsonKey) {
+                var json = JSON.parse(jsonKey);
+                // 检查是否有已保存的转换结果
+                if (json.text && json.text.trim()) {
+                    // 渲染转换结果到 .translate 区域
+                    var jsonData = {
+                        translateLabel: divTranslateContent.translateLabel,
+                        translateText: json.text
+                    };
+                    var textBindDataHandle = Handlebars.compile(translateTextContentTemplate);
+                    var translateTextHtml = textBindDataHandle(jsonData);
+                    translate.html(translateTextHtml);
+                    
+                    // 设置已有文本的样式
+                    $voiceBox.find('.voiceInfoBox').addClass('containText');
+                    
+                    // 恢复展开/收起状态（默认展开，除非明确设置为收起）
+                    var translateHeader = translate.find('.translateHeader');
+                    var translateText = translate.find('.translateText');
+                    
+                    if (json.translateUnfold === false) {
+                        // 收起状态
+                        translateHeader.removeClass('unfold');
+                        translateText.hide();
+                    } else {
+                        // 展开状态（默认）
+                        translateHeader.addClass('unfold');
+                        translateText.show();
+                    }
+                    
+                    console.log('Restored voice text for:', json.voicePath, 'unfold:', json.translateUnfold !== false);
+                }
+            }
+        } catch (e) {
+            console.log('Error restoring voice text:', e);
+        }
+    });
 }
 
 //设置summerNote编辑状态 
@@ -2177,12 +2301,34 @@ function toggleVoiceToTextState(translateHeader) {
         return;
     }
 
+    // 找到对应的 voiceBox 元素
+    var $voiceBox = translateHeader.closest('.voiceBox');
+    var isUnfold;
+
     if (translateHeader.hasClass('unfold')) {
         translateHeader.removeClass('unfold');
         translateHeader.next('.translateText').slideUp('fast');
+        isUnfold = false;
     } else {
         translateHeader.addClass('unfold');
         translateHeader.next('.translateText').slideDown('fast');
+        isUnfold = true;
+    }
+
+    // 保存展开/收起状态到 jsonKey
+    if ($voiceBox.length > 0) {
+        try {
+            var jsonKey = $voiceBox.attr('jsonKey');
+            if (jsonKey) {
+                var json = JSON.parse(jsonKey);
+                json.translateUnfold = isUnfold;
+                $voiceBox.attr('jsonKey', JSON.stringify(json));
+                // 触发内容变更以保存
+                webobj.jsCallTxtChange();
+            }
+        } catch (e) {
+            console.log('Error saving fold state:', e);
+        }
     }
 }
 
