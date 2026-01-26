@@ -31,6 +31,10 @@ private:
 private:
     VNoteA2TManager *m_a2tManager { nullptr };
     QSharedPointer<VNVoiceBlock> m_voiceBlock;
+
+    // 记录发起转换请求时的上下文，用于切换笔记后仍能正确处理结果
+    int m_originalNoteId {-1};     // 原始笔记 ID
+    QString m_originalVoicePath;   // 语音文件路径
 };
 
 #endif  // VOICETOTEXTHANDLER_H

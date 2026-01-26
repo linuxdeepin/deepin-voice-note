@@ -3,6 +3,7 @@
 #include "db/vnoteitemoper.h"
 #include "metadataparser.h"
 #include "common/utils.h"
+#include "handler/voice_to_text_task_manager.h"
 
 #include <QTimer>
 #include <QEventLoop>
@@ -82,6 +83,36 @@ void WebRichTextManager::setData(VNoteItem *data, const QString reg)
     }
     m_updateTimer->start();
     emit updateSearch();
+
+    // 检查该笔记是否有转换任务，恢复相应状态
+    int noteId = data->noteId;
+    QTimer::singleShot(500, this, [noteId]() {
+        auto tasks = VoiceToTextTaskManager::instance()->getTasksForNote(noteId);
+        for (const auto &task : tasks) {
+            if (task.status == VoiceToTextTask::Converting) {
+                // 任务还在进行中，显示转换中状态
+                qInfo() << "Restoring voice-to-text converting status for:" << task.voicePath;
+                emit JsContent::instance()->callJsSetVoiceTextByPath(
+                    task.voicePath, QString(), JsContent::AsrFlag::Start);
+            } else if (task.status == VoiceToTextTask::Completed && !task.resultText.isEmpty()) {
+                // 任务已完成且有结果，确保结果显示（可能 insertVoiceTextToNote 已更新 HTML，
+                // 但 JS 端 restoreVoiceTextFromJsonKey 可能没正确恢复）
+                qInfo() << "Task completed, ensuring result is displayed for:" << task.voicePath;
+                emit JsContent::instance()->callJsSetVoiceTextByPath(
+                    task.voicePath, task.resultText, JsContent::AsrFlag::End);
+                // 移除已处理的任务
+                VoiceToTextTaskManager::instance()->removeTask(task.voicePath);
+            } else if (task.status == VoiceToTextTask::Failed) {
+                // 任务失败，移除转换中状态
+                qInfo() << "Task failed, removing converting status for:" << task.voicePath;
+                emit JsContent::instance()->callJsSetVoiceTextByPath(
+                    task.voicePath, QString(), JsContent::AsrFlag::End);
+                // 移除已处理的任务
+                VoiceToTextTaskManager::instance()->removeTask(task.voicePath);
+            }
+        }
+    });
+
     qInfo() << "Rich text data setting finished";
 }
 

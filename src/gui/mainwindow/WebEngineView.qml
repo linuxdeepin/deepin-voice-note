@@ -21,7 +21,8 @@ Item {
     property bool hasScroll: false
     property bool initialVisible: false
     property bool isRecording: false
-    property bool isRecordingAudio: false 
+    property bool isRecordingAudio: false
+    property bool isVoiceToText: false
     property bool noSearchResult: false
     property bool webVisible: true
     property alias titleBar: title
@@ -340,7 +341,7 @@ Item {
                         rootItem.saveAudio();
                     }
                     onCreateNote: {
-                        if (!initialVisible) {
+                        if (!initialVisible && !rootItem.isVoiceToText) {
                             VNoteMainManager.createNote();
                         }
                     }
@@ -592,7 +593,7 @@ Item {
         target: title
 
         onCreateNote: {
-            if (!initialVisible) {
+            if (!initialVisible && !rootItem.isVoiceToText) {
                 VNoteMainManager.createNote();
             }
         }

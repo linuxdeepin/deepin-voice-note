@@ -34,6 +34,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QFileInfo>
 #include <QProcess>
 #include <QDesktopServices>
 #include <QDebug>
@@ -1258,4 +1259,104 @@ void VNoteMainManager::saveUserSelectedPath(const QString &path, const SaveAsTyp
     
     setting::instance()->setOption(VNOTE_EXPORT_TEXT_PATH_KEY, dirPath);
     qDebug() << "Saved unified export directory to settings:" << dirPath;
+}
+
+int VNoteMainManager::currentNoteId() const
+{
+    return m_currentNoteId;
+}
+
+void VNoteMainManager::insertVoiceTextToNote(int noteId, const QString &voicePath, const QString &text)
+{
+    qInfo() << "insertVoiceTextToNote called, noteId:" << noteId 
+            << "voicePath:" << voicePath << "text length:" << text.length();
+
+    VNoteItem *note = getNoteById(noteId);
+    if (!note) {
+        qWarning() << "Note not found:" << noteId;
+        return;
+    }
+
+    QString html = note->htmlCode;
+    if (html.isEmpty()) {
+        qWarning() << "Note htmlCode is empty:" << noteId;
+        return;
+    }
+
+    // 在 HTML 中查找对应的语音元素
+    // jsonKey 属性中包含 voicePath，需要找到并更新 text 字段
+    // 格式如：jsonKey="{&quot;voicePath&quot;:&quot;/path/to/voice.mp3&quot;, ...}"
+
+    // 提取文件名用于匹配（因为 HTML 中可能只存储了文件名）
+    QString voiceFileName = QFileInfo(voicePath).fileName();
+
+    // 查找包含该 voicePath 的 jsonKey
+    // 由于 HTML 中的 JSON 是经过转义的，需要处理 &quot;
+    int jsonKeyStart = -1;
+    int searchPos = 0;
+
+    while (true) {
+        int pos = html.indexOf("jsonKey=", searchPos);
+        if (pos == -1) break;
+
+        // 找到 jsonKey 的值
+        int valueStart = html.indexOf('"', pos + 8);
+        if (valueStart == -1) break;
+        int valueEnd = html.indexOf('"', valueStart + 1);
+        if (valueEnd == -1) break;
+
+        QString jsonKeyValue = html.mid(valueStart + 1, valueEnd - valueStart - 1);
+
+        // 检查是否包含目标 voicePath
+        if (jsonKeyValue.contains(voiceFileName)) {
+            jsonKeyStart = valueStart + 1;
+
+            // 解码 HTML 实体
+            QString decodedJson = jsonKeyValue;
+            decodedJson.replace("&quot;", "\"");
+            decodedJson.replace("&amp;", "&");
+
+            // 解析 JSON
+            QJsonDocument doc = QJsonDocument::fromJson(decodedJson.toUtf8());
+            if (!doc.isNull() && doc.isObject()) {
+                QJsonObject obj = doc.object();
+
+                // 验证 voicePath 匹配
+                QString storedPath = obj.value("voicePath").toString();
+                if (storedPath == voicePath || storedPath.endsWith(voiceFileName)) {
+                    // 添加或更新 text 字段
+                    obj["text"] = text;
+
+                    // 编码回 HTML
+                    QString newJsonKey = QString::fromUtf8(QJsonDocument(obj).toJson(QJsonDocument::Compact));
+                    newJsonKey.replace("\"", "&quot;");
+                    newJsonKey.replace("&", "&amp;");
+                    // 修正：&amp; 替换应该在 &quot; 之前，否则会把 &quot; 中的 & 也替换
+                    // 重新处理
+                    QString properJson = QString::fromUtf8(QJsonDocument(obj).toJson(QJsonDocument::Compact));
+                    properJson.replace("&", "&amp;");
+                    properJson.replace("\"", "&quot;");
+
+                    // 替换原来的 jsonKey 值
+                    html.replace(valueStart + 1, valueEnd - valueStart - 1, properJson);
+
+                    qInfo() << "Updated jsonKey with voice text for note:" << noteId;
+                    break;
+                }
+            }
+        }
+        searchPos = valueEnd + 1;
+    }
+
+    // 保存到数据库
+    note->htmlCode = html;
+    note->modifyTime = QDateTime::currentDateTime();
+
+    VNoteItemOper noteOper(note);
+    if (noteOper.updateNote()) {
+        qInfo() << "Voice text saved to note:" << noteId;
+        emit noteDataUpdated(noteId);
+    } else {
+        qWarning() << "Failed to save voice text to note:" << noteId;
+    }
 }
