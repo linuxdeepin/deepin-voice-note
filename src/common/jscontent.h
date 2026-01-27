@@ -84,6 +84,7 @@ signals:
 
     void callJsVoicePlayProgressChanged(int progressMs);    // 通知前端播放进度变更
     void callJsDeleteSelection();                           // 通知前端删除当前选中内容
+    void callJsSelectAll();                                  // 通知前端执行全选操作
 
     void textPaste(bool isVoicePaste); //粘贴信号
     void textChange();

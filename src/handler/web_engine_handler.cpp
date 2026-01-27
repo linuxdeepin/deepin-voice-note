@@ -379,12 +379,8 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
         case ActionManager::VoiceSelectAll:
         case ActionManager::PictureSelectAll:
         case ActionManager::TxtSelectAll:
-            // 模拟全选快捷键ctrl+A
-#ifdef USE_QT5
-            Q_EMIT triggerWebAction((int)QWebEnginePage::SelectAll);
-#else
-            Q_EMIT triggerWebAction(QWebEnginePage::SelectAll);
-#endif
+            // 调用 js 实现全选，支持 translateText 区域
+            Q_EMIT JsContent::instance()->callJsSelectAll();
             break;
         case ActionManager::VoiceCopy:
         case ActionManager::PictureCopy:
