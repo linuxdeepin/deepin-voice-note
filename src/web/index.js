@@ -923,12 +923,29 @@ function insertVoiceItem(text) {
     oA.setAttribute('jsonKey', text);
     oA.innerHTML = voiceHtml;
 
-    var tmpNode = document.createElement("div");
-    tmpNode.appendChild(oA.cloneNode(true));
-    var str = '<p><br></p>' + tmpNode.innerHTML + '<p><br></p>';
-
-    document.execCommand('insertHTML', false, str);
-    // $('#summernote').summernote('editor.recordUndo')
+    // 检查是否有选中的 voiceBox（通过 .active class 判断，和右键菜单逻辑一致）
+    var $activeVoiceBox = $('.voiceBox.active');
+    if ($activeVoiceBox.length > 0) {
+        // 有选中的 voiceBox，用 DOM 操作在它后面插入（保证一致：都不替换）
+        var pBefore = document.createElement('p');
+        pBefore.innerHTML = '<br>';
+        var pAfter = document.createElement('p');
+        pAfter.innerHTML = '<br>';
+        
+        // 在 active 的 voiceBox 后面插入
+        $activeVoiceBox.after(pBefore);
+        $(pBefore).after(oA);
+        $(oA).after(pAfter);
+        
+        // 清除选中状态
+        $activeVoiceBox.removeClass('active');
+    } else {
+        // 没有选中 voiceBox，用原来的 execCommand 在光标位置插入
+        var tmpNode = document.createElement("div");
+        tmpNode.appendChild(oA.cloneNode(true));
+        var str = '<p><br></p>' + tmpNode.innerHTML + '<p><br></p>';
+        document.execCommand('insertHTML', false, str);
+    }
 
     removeNullP()
     setFocusScroll()
