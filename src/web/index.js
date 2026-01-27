@@ -252,6 +252,7 @@ new QWebChannel(qt.webChannelTransport,
 
         webobj.callJsVoicePlayProgressChanged.connect(updateProgressBar);
         webobj.callJsDeleteSelection.connect(deleteSelection);
+        webobj.callJsSelectAll.connect(selectAllText);
         //通知QT层完成通信绑定
         webobj.jsCallChannleFinish();
         // setFontList(global_fontList, "Unifont")
@@ -677,9 +678,21 @@ function isRangeVoice() {
     let childrenLength = $(testDiv).children().length
     let voiceLength = $(testDiv).find('.voiceBox').length
 
+    // 检查选区是否是语音块的内容（当 setSelectRange 选中 .voiceBox 时，
+    // cloneContents 会克隆其子节点，所以需要检查 .voiceInfoBox）
+    let isVoiceContent = $(testDiv).children('.voiceInfoBox').length > 0;
+
     if (voiceLength == childrenLength && childrenLength != 0) {
         selectedRange.flag = 1
         selectedRange.info = $(testDiv).find('.voiceBox:first').attr('jsonKey')
+        recordActiveVoice()
+    } else if (isVoiceContent) {
+        // 选区是语音块的内容（包含 .voiceInfoBox），属于语音菜单
+        selectedRange.flag = 1
+        // 从 activeTransVoice 获取 jsonKey
+        if (activeTransVoice) {
+            selectedRange.info = activeTransVoice.attr('jsonKey')
+        }
         recordActiveVoice()
     } else if ($(testDiv).find('img').length == childrenLength
         && childrenLength == 1
@@ -1391,6 +1404,18 @@ function rightClick(e) {
         }
         $('#summernote').summernote('airPopover.hide');
         setSelectRange($(e.target).closest('.voiceBox')[0]);
+    } else if ($(e.target).closest('.translateHeader').length != 0) {
+        // 点击在"语音转文本"标题行区域，弹出语音菜单
+        $(e.target).closest('.li').addClass('active');
+        if (bTransVoiceIsReady) {
+            activeTransVoice = $(e.target).closest('.li:first');
+        }
+        $('#summernote').summernote('airPopover.hide');
+        setSelectRange($(e.target).closest('.voiceBox')[0]);
+    } else if ($(e.target).closest('.translateText').length != 0) {
+        // 点击在转写文字区域，弹出文字菜单，不改变选区
+        // 文字菜单由 isRangeVoice() 返回 flag=2 触发
+        $('#summernote').summernote('airPopover.hide');
     } else if (voiceLength == childrenLength && childrenLength != 0) {
         // selection中只有语音块，但右键点击位置不在语音块上，说明是旧的selection，需要清除
         if ($(e.target).closest('.voiceBox').length == 0) {
@@ -2030,6 +2055,24 @@ $('body').on('click', 'img', function (e) {
  * @returns {any}
  */
 function showRightMenu(x, y) {
+    // 检查当前选区是否仅在 .translateText 或 .voiceBox 区域内
+    // 如果是，则不显示悬浮编辑工具栏
+    var selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+        var range = selection.getRangeAt(0);
+        var container = range.commonAncestorContainer;
+        // 如果是文本节点，获取其父元素
+        if (container.nodeType === Node.TEXT_NODE) {
+            container = container.parentNode;
+        }
+        // 检查是否在 .translateText 或 .voiceBox 内
+        var $container = $(container);
+        if ($container.closest('.translateText').length > 0 || 
+            $container.closest('.voiceBox').length > 0) {
+            console.log("在 translateText/voiceBox 区域，不显示悬浮工具栏");
+            return;
+        }
+    }
     $('#summernote').summernote('airPopover.rightUpdate', x, y)
 }
 
@@ -2127,6 +2170,41 @@ function setSelectColorButton($dom) {
  */
 function deleteSelection() {
     $('#summernote').summernote('editor.deleteContents');
+}
+
+/**
+ * 全选操作
+ * 根据右键点击位置智能判断：
+ * - 如果在 .translateText 区域，则选中该区域的文字
+ * - 否则选中整个编辑区
+ */
+function selectAllText() {
+    // 根据保存的右键点击位置查找元素
+    var elementAtClick = document.elementFromPoint(lastRightClickX, lastRightClickY);
+    
+    // 检查是否点击在 translateText 区域
+    var $translateText = $(elementAtClick).closest('.translateText');
+    
+    if ($translateText.length > 0) {
+        // 选中 translateText 区域的所有文字
+        var range = document.createRange();
+        range.selectNodeContents($translateText[0]);
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        console.log("全选: translateText 区域");
+    } else {
+        // 选中整个编辑区
+        var $editable = $('.note-editable');
+        if ($editable.length > 0) {
+            var range = document.createRange();
+            range.selectNodeContents($editable[0]);
+            var selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            console.log("全选: 整个编辑区");
+        }
+    }
 }
 
 /***** 以下为语音播放相关函数 *****/
