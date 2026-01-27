@@ -50,14 +50,16 @@ void VoiceToTextHandler::setAudioToText(const QSharedPointer<VNVoiceBlock> &voic
         Q_EMIT audioLengthLimit();
         return;
     } else {
-        // 记录发起转换时的上下文（笔记ID 和 语音路径）
+        // 记录发起转换时的上下文
         m_originalNoteId = VNoteMainManager::instance()->currentNoteId();
+        m_originalVoiceId = m_voiceBlock->voiceId;
         m_originalVoicePath = m_voiceBlock->voicePath;
 
-        // 注册到任务管理器
-        VoiceToTextTaskManager::instance()->addTask(m_originalNoteId, m_originalVoicePath);
+        // 注册到任务管理器（使用 voiceId 作为唯一标识）
+        VoiceToTextTaskManager::instance()->addTask(m_originalNoteId, m_originalVoiceId);
 
-        qDebug() << "Starting audio to text conversion for file:" << m_voiceBlock->voicePath
+        qDebug() << "Starting audio to text conversion, voiceId:" << m_originalVoiceId
+                 << "voicePath:" << m_originalVoicePath
                  << "noteId:" << m_originalNoteId;
         onA2TStart();
     }
@@ -65,10 +67,11 @@ void VoiceToTextHandler::setAudioToText(const QSharedPointer<VNVoiceBlock> &voic
 
 void VoiceToTextHandler::onA2TStart()
 {
-    qInfo() << "VoiceToTextHandler onA2TStart called";
+    qInfo() << "VoiceToTextHandler onA2TStart called, voiceId:" << m_originalVoiceId;
     OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, true);
     emit VNoteMainManager::instance()->voiceToTextStateChanged(true);
-    Q_EMIT JsContent::instance()->callJsSetVoiceText(QString(""), JsContent::AsrFlag::Start);
+    // 使用 voiceId 精确定位语音块，显示转换中状态
+    Q_EMIT JsContent::instance()->callJsSetVoiceTextByPath(m_originalVoiceId, QString(""), JsContent::AsrFlag::Start);
     QTimer::singleShot(0, this, [this]() { m_a2tManager->startAsr(m_voiceBlock->voicePath, m_voiceBlock->voiceSize); });
 }
 
@@ -95,17 +98,17 @@ void VoiceToTextHandler::onA2TError(int error)
 {
     qInfo() << "VoiceToTextHandler onA2TError called, error:" << error;
 
-    // 更新任务管理器状态
-    VoiceToTextTaskManager::instance()->setTaskResult(m_originalVoicePath, QString(), false);
+    // 更新任务管理器状态（使用 voiceId）
+    VoiceToTextTaskManager::instance()->setTaskResult(m_originalVoiceId, QString(), false);
 
     // 检查当前笔记是否是发起转换的笔记
     int currentNoteId = VNoteMainManager::instance()->currentNoteId();
     if (currentNoteId == m_originalNoteId) {
-        // 当前在原始笔记，通过 JS 更新 UI
-        Q_EMIT JsContent::instance()->callJsSetVoiceText("", JsContent::AsrFlag::End);
+        // 当前在原始笔记，通过 voiceId 更新 UI
+        Q_EMIT JsContent::instance()->callJsSetVoiceTextByPath(m_originalVoiceId, "", JsContent::AsrFlag::End);
     } else {
-        // 已切换到其他笔记，通过 voicePath 更新（如果用户切回时恢复）
-        Q_EMIT JsContent::instance()->callJsSetVoiceTextByPath(m_originalVoicePath, "", JsContent::AsrFlag::End);
+        // 已切换到其他笔记，通过 voiceId 更新（用户切回时会恢复）
+        Q_EMIT JsContent::instance()->callJsSetVoiceTextByPath(m_originalVoiceId, "", JsContent::AsrFlag::End);
     }
 
     OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, false);
@@ -116,21 +119,20 @@ void VoiceToTextHandler::onA2TSuccess(const QString &text)
 {
     qInfo() << "VoiceToTextHandler onA2TSuccess called, text length:" << text.length();
 
-    // 更新任务管理器状态
-    VoiceToTextTaskManager::instance()->setTaskResult(m_originalVoicePath, text, true);
+    // 更新任务管理器状态（使用 voiceId）
+    VoiceToTextTaskManager::instance()->setTaskResult(m_originalVoiceId, text, true);
 
     // 检查当前笔记是否是发起转换的笔记
     int currentNoteId = VNoteMainManager::instance()->currentNoteId();
 
     if (currentNoteId == m_originalNoteId) {
-        // 当前在原始笔记，走现有 JS 插入逻辑
-        Q_EMIT JsContent::instance()->callJsSetVoiceText(text, JsContent::AsrFlag::End);
+        // 当前在原始笔记，通过 voiceId 精确定位语音块更新 UI
+        Q_EMIT JsContent::instance()->callJsSetVoiceTextByPath(m_originalVoiceId, text, JsContent::AsrFlag::End);
     } else {
         // 已切换到其他笔记，在 C++ 层直接修改原始笔记的 HTML
         qInfo() << "Note switched during conversion, saving result to original note:"
                 << m_originalNoteId << "current note:" << currentNoteId;
-        VNoteMainManager::instance()->insertVoiceTextToNote(
-            m_originalNoteId, m_originalVoicePath, text);
+        VNoteMainManager::instance()->insertVoiceTextToNote(m_originalNoteId, m_originalVoiceId, text);
     }
 
     OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, false);

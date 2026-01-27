@@ -65,11 +65,13 @@ bool MetaDataParser::parse(const QVariant &metaData, VNoteBlock *blockData)
         blockData->ptrVoice->blockText = note.value(m_jsonNodeNameMap[NText]).toString();
         blockData->ptrVoice->voiceTitle = note.value(m_jsonNodeNameMap[NTitle]).toString();
         blockData->ptrVoice->state = note.value(m_jsonNodeNameMap[NState]).toBool(false);
+        blockData->ptrVoice->voiceId = note.value(m_jsonNodeNameMap[NVoiceId]).toString();
         blockData->ptrVoice->voicePath = note.value(m_jsonNodeNameMap[NVoicePath]).toString();
         blockData->ptrVoice->voiceSize = note.value(m_jsonNodeNameMap[NVoiceSize]).toInt(0);
         blockData->ptrVoice->createTime = QDateTime::fromString(
             note.value(m_jsonNodeNameMap[NCreateTime]).toString(), VNOTE_TIME_FMT);
         qDebug() << "Parsed voice block:"
+                 << "\n  - VoiceId:" << blockData->ptrVoice->voiceId
                  << "\n  - Title:" << blockData->ptrVoice->voiceTitle
                  << "\n  - Path:" << blockData->ptrVoice->voicePath
                  << "\n  - Size:" << blockData->ptrVoice->voiceSize
@@ -111,12 +113,14 @@ void MetaDataParser::makeMetaData(const VNoteBlock *blockData, QVariant &metaDat
             note.insert(m_jsonNodeNameMap[NText], blockData->ptrVoice->blockText);
             note.insert(m_jsonNodeNameMap[NTitle], blockData->ptrVoice->voiceTitle);
             note.insert(m_jsonNodeNameMap[NState], blockData->ptrVoice->state);
+            note.insert(m_jsonNodeNameMap[NVoiceId], blockData->ptrVoice->voiceId);
             note.insert(m_jsonNodeNameMap[NVoicePath], blockData->ptrVoice->voicePath);
             note.insert(m_jsonNodeNameMap[NVoiceSize], blockData->ptrVoice->voiceSize);
             note.insert(m_jsonNodeNameMap[NCreateTime],
                         blockData->ptrVoice->createTime.toString(VNOTE_TIME_FMT));
             note.insert(m_jsonNodeNameMap[NFormatSize], Utils::formatMillisecond(blockData->ptrVoice->voiceSize));
             qDebug() << "Generated metadata for voice block:"
+                     << "\n  - VoiceId:" << blockData->ptrVoice->voiceId
                      << "\n  - Title:" << blockData->ptrVoice->voiceTitle
                      << "\n  - Path:" << blockData->ptrVoice->voicePath
                      << "\n  - Size:" << blockData->ptrVoice->voiceSize;

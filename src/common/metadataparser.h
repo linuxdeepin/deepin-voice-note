@@ -87,6 +87,7 @@ public:
         NText,
         NTitle,
         NState,
+        NVoiceId,       
         NVoicePath,
         NVoiceSize,
         NCreateTime,
@@ -137,6 +138,7 @@ protected:
         {NText, "text"},
         {NTitle, "title"},
         {NState, "state"}, // State: 1 for audio to text done, 0 for have not done
+        {NVoiceId, "voiceId"},       // 语音块唯一标识（UUID）
         {NVoicePath, "voicePath"},
         {NVoiceSize, "voiceSize"},
         {NCreateTime, "createTime"},

@@ -21,7 +21,7 @@ struct VoiceToTextTask {
     };
 
     int noteId {-1};           // 笔记 ID
-    QString voicePath;         // 语音文件路径（唯一标识）
+    QString voiceId;           // 语音块唯一标识（UUID）- 作为任务的唯一 key
     Status status {Pending};   // 转换状态
     QString resultText;        // 转换结果
     QDateTime startTime;       // 开始时间
@@ -31,7 +31,7 @@ struct VoiceToTextTask {
  * @brief 语音转文字任务管理器
  * 
  * 管理多个语音转文字任务，支持：
- * 1. 跟踪每个语音的转换状态
+ * 1. 跟踪每个语音的转换状态（通过 voiceId 唯一标识）
  * 2. 在笔记切换后仍能正确处理转换结果
  * 3. 查询特定笔记的转换任务
  */
@@ -44,24 +44,24 @@ public:
     /**
      * @brief 添加转换任务
      * @param noteId 发起转换的笔记 ID
-     * @param voicePath 语音文件路径
+     * @param voiceId 语音块唯一标识（UUID）
      */
-    void addTask(int noteId, const QString &voicePath);
+    void addTask(int noteId, const QString &voiceId);
 
     /**
      * @brief 获取任务
-     * @param voicePath 语音文件路径
+     * @param voiceId 语音块唯一标识
      * @return 任务指针，不存在返回 nullptr
      */
-    VoiceToTextTask* getTask(const QString &voicePath);
+    VoiceToTextTask* getTask(const QString &voiceId);
 
     /**
      * @brief 设置任务结果
-     * @param voicePath 语音文件路径
+     * @param voiceId 语音块唯一标识
      * @param text 转换结果文本
      * @param success 是否成功
      */
-    void setTaskResult(const QString &voicePath, const QString &text, bool success);
+    void setTaskResult(const QString &voiceId, const QString &text, bool success);
 
     /**
      * @brief 获取笔记的所有进行中任务
@@ -77,29 +77,29 @@ public:
 
     /**
      * @brief 移除已完成的任务（可选，用于清理）
-     * @param voicePath 语音文件路径
+     * @param voiceId 语音块唯一标识
      */
-    void removeTask(const QString &voicePath);
+    void removeTask(const QString &voiceId);
 
 signals:
     /**
      * @brief 任务状态变化信号
      */
-    void taskStatusChanged(const QString &voicePath, VoiceToTextTask::Status status);
+    void taskStatusChanged(const QString &voiceId, VoiceToTextTask::Status status);
 
     /**
      * @brief 任务完成信号（用于通知后续处理）
      * @param noteId 笔记 ID
-     * @param voicePath 语音文件路径
+     * @param voiceId 语音块唯一标识
      * @param text 转换结果
      * @param success 是否成功
      */
-    void taskCompleted(int noteId, const QString &voicePath, const QString &text, bool success);
+    void taskCompleted(int noteId, const QString &voiceId, const QString &text, bool success);
 
 private:
     explicit VoiceToTextTaskManager(QObject *parent = nullptr);
 
-    QMap<QString, VoiceToTextTask> m_tasks;  // voicePath -> Task
+    QMap<QString, VoiceToTextTask> m_tasks;  // voiceId -> Task
 };
 
 #endif  // VOICETOTEXTTASKMANAGER_H
