@@ -11,6 +11,7 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QUrl>
+#include <QUuid>
 
 
 WebRichTextManager::WebRichTextManager(QObject *parent)
@@ -90,25 +91,24 @@ void WebRichTextManager::setData(VNoteItem *data, const QString reg)
         auto tasks = VoiceToTextTaskManager::instance()->getTasksForNote(noteId);
         for (const auto &task : tasks) {
             if (task.status == VoiceToTextTask::Converting) {
-                // 任务还在进行中，显示转换中状态
-                qInfo() << "Restoring voice-to-text converting status for:" << task.voicePath;
+                // 任务还在进行中，显示转换中状态（使用 voiceId 定位）
+                qInfo() << "Restoring voice-to-text converting status for voiceId:" << task.voiceId;
                 emit JsContent::instance()->callJsSetVoiceTextByPath(
-                    task.voicePath, QString(), JsContent::AsrFlag::Start);
+                    task.voiceId, QString(), JsContent::AsrFlag::Start);
             } else if (task.status == VoiceToTextTask::Completed && !task.resultText.isEmpty()) {
-                // 任务已完成且有结果，确保结果显示（可能 insertVoiceTextToNote 已更新 HTML，
-                // 但 JS 端 restoreVoiceTextFromJsonKey 可能没正确恢复）
-                qInfo() << "Task completed, ensuring result is displayed for:" << task.voicePath;
+                // 任务已完成且有结果，确保结果显示
+                qInfo() << "Task completed, ensuring result is displayed for voiceId:" << task.voiceId;
                 emit JsContent::instance()->callJsSetVoiceTextByPath(
-                    task.voicePath, task.resultText, JsContent::AsrFlag::End);
+                    task.voiceId, task.resultText, JsContent::AsrFlag::End);
                 // 移除已处理的任务
-                VoiceToTextTaskManager::instance()->removeTask(task.voicePath);
+                VoiceToTextTaskManager::instance()->removeTask(task.voiceId);
             } else if (task.status == VoiceToTextTask::Failed) {
                 // 任务失败，移除转换中状态
-                qInfo() << "Task failed, removing converting status for:" << task.voicePath;
+                qInfo() << "Task failed, removing converting status for voiceId:" << task.voiceId;
                 emit JsContent::instance()->callJsSetVoiceTextByPath(
-                    task.voicePath, QString(), JsContent::AsrFlag::End);
+                    task.voiceId, QString(), JsContent::AsrFlag::End);
                 // 移除已处理的任务
-                VoiceToTextTaskManager::instance()->removeTask(task.voicePath);
+                VoiceToTextTaskManager::instance()->removeTask(task.voiceId);
             }
         }
     });
@@ -162,13 +162,15 @@ void WebRichTextManager::insertVoiceItem(const QString &voicePath, qint64 voiceS
     data.ptrVoice->voicePath = Utils::makeVoiceRelative(voicePath);
     data.ptrVoice->createTime = QDateTime::currentDateTime();
     data.ptrVoice->voiceTitle = data.ptrVoice->createTime.toString("yyyyMMdd hh.mm.ss");
+    // 为新录音生成唯一标识（UUID）
+    data.ptrVoice->voiceId = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
     MetaDataParser parse;
     QVariant value;
     parse.makeMetaData(&data, value);
 
     emit JsContent::instance()->callJsInsertVoice(value.toString());
-    qDebug() << "Voice item inserted successfully";
+    qDebug() << "Voice item inserted successfully, voiceId:" << data.ptrVoice->voiceId;
 }
 
 /**

@@ -34,7 +34,8 @@ private:
 
     // 记录发起转换请求时的上下文，用于切换笔记后仍能正确处理结果
     int m_originalNoteId {-1};     // 原始笔记 ID
-    QString m_originalVoicePath;   // 语音文件路径
+    QString m_originalVoiceId;     // 语音块唯一标识（UUID）- 用于任务管理和定位
+    QString m_originalVoicePath;   // 语音文件路径 - 仅用于语音播放
 };
 
 #endif  // VOICETOTEXTHANDLER_H

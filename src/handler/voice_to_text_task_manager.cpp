@@ -17,50 +17,50 @@ VoiceToTextTaskManager* VoiceToTextTaskManager::instance()
     return &instance;
 }
 
-void VoiceToTextTaskManager::addTask(int noteId, const QString &voicePath)
+void VoiceToTextTaskManager::addTask(int noteId, const QString &voiceId)
 {
-    if (voicePath.isEmpty()) {
-        qWarning() << "Cannot add task with empty voice path";
+    if (voiceId.isEmpty()) {
+        qWarning() << "Cannot add task with empty voiceId";
         return;
     }
 
     VoiceToTextTask task;
     task.noteId = noteId;
-    task.voicePath = voicePath;
+    task.voiceId = voiceId;
     task.status = VoiceToTextTask::Converting;
     task.startTime = QDateTime::currentDateTime();
 
-    m_tasks[voicePath] = task;
+    m_tasks[voiceId] = task;
 
-    qInfo() << "Added voice-to-text task:" << voicePath << "for note:" << noteId;
-    emit taskStatusChanged(voicePath, VoiceToTextTask::Converting);
+    qInfo() << "Added voice-to-text task, voiceId:" << voiceId << "noteId:" << noteId;
+    emit taskStatusChanged(voiceId, VoiceToTextTask::Converting);
 }
 
-VoiceToTextTask* VoiceToTextTaskManager::getTask(const QString &voicePath)
+VoiceToTextTask* VoiceToTextTaskManager::getTask(const QString &voiceId)
 {
-    if (m_tasks.contains(voicePath)) {
-        return &m_tasks[voicePath];
+    if (m_tasks.contains(voiceId)) {
+        return &m_tasks[voiceId];
     }
     return nullptr;
 }
 
-void VoiceToTextTaskManager::setTaskResult(const QString &voicePath, const QString &text, bool success)
+void VoiceToTextTaskManager::setTaskResult(const QString &voiceId, const QString &text, bool success)
 {
-    if (!m_tasks.contains(voicePath)) {
-        qWarning() << "Task not found for voice path:" << voicePath;
+    if (!m_tasks.contains(voiceId)) {
+        qWarning() << "Task not found for voiceId:" << voiceId;
         return;
     }
 
-    VoiceToTextTask &task = m_tasks[voicePath];
+    VoiceToTextTask &task = m_tasks[voiceId];
     task.status = success ? VoiceToTextTask::Completed : VoiceToTextTask::Failed;
     task.resultText = text;
 
-    qInfo() << "Task result set for:" << voicePath 
+    qInfo() << "Task result set, voiceId:" << voiceId 
             << "success:" << success 
             << "text length:" << text.length();
 
-    emit taskStatusChanged(voicePath, task.status);
-    emit taskCompleted(task.noteId, voicePath, text, success);
+    emit taskStatusChanged(voiceId, task.status);
+    emit taskCompleted(task.noteId, voiceId, text, success);
 }
 
 QList<VoiceToTextTask> VoiceToTextTaskManager::getTasksForNote(int noteId) const
@@ -84,9 +84,9 @@ bool VoiceToTextTaskManager::hasActiveTask() const
     return false;
 }
 
-void VoiceToTextTaskManager::removeTask(const QString &voicePath)
+void VoiceToTextTaskManager::removeTask(const QString &voiceId)
 {
-    if (m_tasks.remove(voicePath) > 0) {
-        qDebug() << "Removed task for voice path:" << voicePath;
+    if (m_tasks.remove(voiceId) > 0) {
+        qDebug() << "Removed task for voiceId:" << voiceId;
     }
 }

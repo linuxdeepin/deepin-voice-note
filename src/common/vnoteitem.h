@@ -162,6 +162,7 @@ struct VNVoiceBlock : public VNoteBlock {
     virtual ~VNVoiceBlock() override;
     virtual void releaseSpecificData() override;
 
+    QString voiceId {""};       // 语音块唯一标识（UUID）
     QString voicePath {""};
     qint64 voiceSize {0};
     QString voiceTitle {""};

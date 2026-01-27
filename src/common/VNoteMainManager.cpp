@@ -1266,10 +1266,10 @@ int VNoteMainManager::currentNoteId() const
     return m_currentNoteId;
 }
 
-void VNoteMainManager::insertVoiceTextToNote(int noteId, const QString &voicePath, const QString &text)
+void VNoteMainManager::insertVoiceTextToNote(int noteId, const QString &voiceId, const QString &text)
 {
     qInfo() << "insertVoiceTextToNote called, noteId:" << noteId 
-            << "voicePath:" << voicePath << "text length:" << text.length();
+            << "voiceId:" << voiceId << "text length:" << text.length();
 
     VNoteItem *note = getNoteById(noteId);
     if (!note) {
@@ -1284,16 +1284,13 @@ void VNoteMainManager::insertVoiceTextToNote(int noteId, const QString &voicePat
     }
 
     // 在 HTML 中查找对应的语音元素
-    // jsonKey 属性中包含 voicePath，需要找到并更新 text 字段
-    // 格式如：jsonKey="{&quot;voicePath&quot;:&quot;/path/to/voice.mp3&quot;, ...}"
+    // jsonKey 属性中包含 voiceId，需要找到并更新 text 字段
+    // 格式如：jsonKey="{&quot;voiceId&quot;:&quot;uuid&quot;, ...}"
 
-    // 提取文件名用于匹配（因为 HTML 中可能只存储了文件名）
-    QString voiceFileName = QFileInfo(voicePath).fileName();
-
-    // 查找包含该 voicePath 的 jsonKey
+    // 查找包含该 voiceId 的 jsonKey
     // 由于 HTML 中的 JSON 是经过转义的，需要处理 &quot;
-    int jsonKeyStart = -1;
     int searchPos = 0;
+    bool found = false;
 
     while (true) {
         int pos = html.indexOf("jsonKey=", searchPos);
@@ -1307,10 +1304,8 @@ void VNoteMainManager::insertVoiceTextToNote(int noteId, const QString &voicePat
 
         QString jsonKeyValue = html.mid(valueStart + 1, valueEnd - valueStart - 1);
 
-        // 检查是否包含目标 voicePath
-        if (jsonKeyValue.contains(voiceFileName)) {
-            jsonKeyStart = valueStart + 1;
-
+        // 检查是否包含目标 voiceId
+        if (jsonKeyValue.contains(voiceId)) {
             // 解码 HTML 实体
             QString decodedJson = jsonKeyValue;
             decodedJson.replace("&quot;", "\"");
@@ -1321,18 +1316,13 @@ void VNoteMainManager::insertVoiceTextToNote(int noteId, const QString &voicePat
             if (!doc.isNull() && doc.isObject()) {
                 QJsonObject obj = doc.object();
 
-                // 验证 voicePath 匹配
-                QString storedPath = obj.value("voicePath").toString();
-                if (storedPath == voicePath || storedPath.endsWith(voiceFileName)) {
+                // 验证 voiceId 匹配
+                QString storedVoiceId = obj.value("voiceId").toString();
+                if (storedVoiceId == voiceId) {
                     // 添加或更新 text 字段
                     obj["text"] = text;
 
-                    // 编码回 HTML
-                    QString newJsonKey = QString::fromUtf8(QJsonDocument(obj).toJson(QJsonDocument::Compact));
-                    newJsonKey.replace("\"", "&quot;");
-                    newJsonKey.replace("&", "&amp;");
-                    // 修正：&amp; 替换应该在 &quot; 之前，否则会把 &quot; 中的 & 也替换
-                    // 重新处理
+                    // 编码回 HTML（先替换 & 再替换 "）
                     QString properJson = QString::fromUtf8(QJsonDocument(obj).toJson(QJsonDocument::Compact));
                     properJson.replace("&", "&amp;");
                     properJson.replace("\"", "&quot;");
@@ -1340,12 +1330,18 @@ void VNoteMainManager::insertVoiceTextToNote(int noteId, const QString &voicePat
                     // 替换原来的 jsonKey 值
                     html.replace(valueStart + 1, valueEnd - valueStart - 1, properJson);
 
-                    qInfo() << "Updated jsonKey with voice text for note:" << noteId;
+                    qInfo() << "Updated jsonKey with voice text for note:" << noteId << "voiceId:" << voiceId;
+                    found = true;
                     break;
                 }
             }
         }
         searchPos = valueEnd + 1;
+    }
+
+    if (!found) {
+        qWarning() << "Voice element not found in note HTML, voiceId:" << voiceId;
+        return;
     }
 
     // 保存到数据库

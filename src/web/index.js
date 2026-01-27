@@ -177,6 +177,14 @@ var divTranslateContent = {
 // 字体列表
 var global_fontList = []
 
+/**
+ * 生成 UUID v4
+ * @returns {string} UUID 字符串
+ */
+function generateUUID() {
+    return crypto.randomUUID();
+}
+
 // 国际化
 function changeLang(tooltipContent) {
     for (let item in tooltipContent) {
@@ -553,6 +561,24 @@ function copyVoice(event) {
         $(docFragment).find('.voicePlayback').removeClass('now').removeClass('play').removeClass('pause').removeClass('voiceToText');
         $(docFragment).find('.voiceInfoBox').removeClass('containText');
 
+        // 为复制的语音块生成新的 voiceId，避免与原语音块冲突
+        $(docFragment).find('.voiceBox').each(function() {
+            try {
+                var jsonKey = $(this).attr('jsonKey');
+                if (jsonKey) {
+                    var json = JSON.parse(jsonKey);
+                    // 生成新的 voiceId
+                    json.voiceId = generateUUID();
+                    // 清除已有的转文字结果
+                    delete json.text;
+                    delete json.translateUnfold;
+                    $(this).attr('jsonKey', JSON.stringify(json));
+                }
+            } catch (e) {
+                console.log('Error updating voiceId on copy:', e);
+            }
+        });
+
         isVoicePaste = true
 
     }
@@ -876,6 +902,10 @@ function initData(text) {
             if (!item.transSize) {
                 item.transSize = formatMillisecond(item.voiceSize)
             }
+            // 确保语音块有唯一 voiceId
+            if (!item.voiceId) {
+                item.voiceId = generateUUID();
+            }
             voiceHtml = transHtml(item, false);
             html += voiceHtml;
         }
@@ -1059,11 +1089,21 @@ function setHtml(html) {
     // TODO: 实验性功能，替换 HTML 文本中的语音控件版本，不涉及数据的变更
     replaceVoiceToVersion2();
     ensureVoiceBoxesDraggable();
+    
+    // 确保所有语音块都有唯一的 voiceId
+    var voiceIdUpdated = ensureAllVoiceBoxesHaveId();
 
     // 恢复已保存的语音转文字结果
     restoreVoiceTextFromJsonKey();
 
     initFinish = true;
+    
+    // 如果 voiceId 有更新，需要保存到数据库
+    if (voiceIdUpdated && webobj) {
+        console.log('VoiceId updated, triggering save...');
+        webobj.jsCallTxtChange();
+    }
+    
     // 搜索功能
     webobj.jsCallSetDataFinsh();
     resetScroll()
@@ -1132,24 +1172,21 @@ function setVoiceText(text, flag) {
 }
 
 /**
- * 通过 voicePath 设置语音转文字结果（支持笔记切换场景）
- * @param {string} voicePath 语音文件路径（用于定位语音元素）
+ * 通过 voiceId 设置语音转文字结果（支持笔记切换场景）
+ * @param {string} voiceId 语音块唯一标识（UUID）
  * @param {string} text 转换文本内容
  * @param {number} flag 0: 转换过程中 1: 结果
  */
-function setVoiceTextByPath(voicePath, text, flag) {
+function setVoiceTextByPath(voiceId, text, flag) {
     var $voiceBox = null;
 
-    // 通过 voicePath 查找语音元素
+    // 通过 voiceId 查找语音元素
     $('.voiceBox').each(function() {
         try {
             var jsonKey = $(this).attr('jsonKey');
             if (jsonKey) {
                 var json = JSON.parse(jsonKey);
-                // 支持完整路径匹配或文件名匹配
-                if (json.voicePath === voicePath || 
-                    (json.voicePath && voicePath && 
-                     json.voicePath.split('/').pop() === voicePath.split('/').pop())) {
+                if (json.voiceId === voiceId) {
                     $voiceBox = $(this);
                     return false; // break
                 }
@@ -1160,7 +1197,7 @@ function setVoiceTextByPath(voicePath, text, flag) {
     });
 
     if (!$voiceBox) {
-        console.log('Voice element not found for path:', voicePath);
+        console.log('Voice element not found for voiceId:', voiceId);
         return;
     }
 
@@ -1196,6 +1233,32 @@ function setVoiceTextByPath(voicePath, text, flag) {
         // flag=0: 转换中，显示转换中状态（无论是否已有文本，重新转换都显示转圈状态）
         $voiceBox.find('.voicePlayback').addClass('voiceToText');
     }
+}
+
+/**
+ * 确保所有语音块都有唯一的 voiceId
+ * 用于兼容没有 voiceId 的旧数据
+ * @returns {boolean} 是否有数据被更新
+ */
+function ensureAllVoiceBoxesHaveId() {
+    var needSave = false;
+    $('.voiceBox').each(function() {
+        try {
+            var jsonKey = $(this).attr('jsonKey');
+            if (jsonKey) {
+                var json = JSON.parse(jsonKey);
+                if (!json.voiceId) {
+                    json.voiceId = generateUUID();
+                    $(this).attr('jsonKey', JSON.stringify(json));
+                    needSave = true;
+                    console.log('Generated voiceId for voice:', json.voicePath, '->', json.voiceId);
+                }
+            }
+        } catch (e) {
+            console.log('Error ensuring voiceId:', e);
+        }
+    });
+    return needSave;
 }
 
 //json串拼接成对应html串 flag==》》 false: h5串  true：node串

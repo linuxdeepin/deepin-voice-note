@@ -28,6 +28,7 @@
 #include <QTimer>
 #include <QCursor>
 #include <QMimeData>
+#include <QUuid>
 // 条件编译：QWebEngineContextMenuRequest 只在 Qt6 中存在
 #ifndef USE_QT5
 #include <QWebEngineContextMenuRequest>
@@ -304,6 +305,8 @@ void WebEngineHandler::onInsertVoiceItem(const QString &voicePath, quint64 voice
     data.ptrVoice->voicePath = Utils::makeVoiceRelative(voicePath);
     data.ptrVoice->createTime = QDateTime::currentDateTime();
     data.ptrVoice->voiceTitle = data.ptrVoice->createTime.toString("yyyyMMdd hh.mm.ss");
+    // 为新录音生成唯一标识（UUID）
+    data.ptrVoice->voiceId = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
     MetaDataParser parse;
     QVariant value;

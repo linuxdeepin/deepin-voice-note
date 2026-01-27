@@ -80,10 +80,10 @@ public:
     /**
      * @brief 在指定笔记的 HTML 中插入语音转文字结果
      * @param noteId 笔记 ID
-     * @param voicePath 语音文件路径（用于定位语音元素）
+     * @param voiceId 语音块唯一标识（UUID，用于精确定位语音元素）
      * @param text 转换结果文本
      */
-    void insertVoiceTextToNote(int noteId, const QString &voicePath, const QString &text);
+    void insertVoiceTextToNote(int noteId, const QString &voiceId, const QString &text);
 
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);
