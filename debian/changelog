@@ -1,3 +1,13 @@
+deepin-voice-note (6.5.55) unstable; urgency=medium
+
+  * fix: Implement select all functionality in JavaScript and C++ layers
+  * feat: Introduce voiceId for enhanced voice block management
+  * fix: Improve voice item insertion logic in index.js
+  * fix: Enhance voice-to-text functionality and UI integration
+  * chore: Update compiler flags for security enhancements
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Thu, 05 Feb 2026 19:51:28 +0800
+
 deepin-voice-note (6.5.54) unstable; urgency=medium
 
   * fix: Add environment variable for Chromium flags on SW-64 architecture
