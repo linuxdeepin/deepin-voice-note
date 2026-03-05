@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.56) unstable; urgency=medium
+
+  * chore: Unify linglong.yaml
+
+ -- wangrong <wangrong@uniontech.com>  Thu, 05 Mar 2026 20:42:47 +0800
+
 deepin-voice-note (6.5.55) unstable; urgency=medium
 
   * fix: Implement select all functionality in JavaScript and C++ layers
