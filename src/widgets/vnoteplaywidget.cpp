@@ -180,9 +180,8 @@ void VNotePlayWidget::onSliderReleased()
         if (pos >= m_slider->maximum()) {
             onCloseBtnClicked();
         } else {
-            if (m_player->getState() == VlcPalyer::Playing) {
-                m_player->setPosition(pos);
-            }
+            // 播放和暂停时，都需要跳转位置，否则体验不好
+            m_player->setPosition(pos);
         }
     }
 }
