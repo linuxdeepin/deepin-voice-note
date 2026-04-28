@@ -1,4 +1,4 @@
-// Copyright (C) 2019 ~ 2019 UnionTech Software Technology Co.,Ltd.
+// Copyright (C) 2019 - 2026 UnionTech Software Technology Co.,Ltd.
 // SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -600,7 +600,26 @@ void WebRichTextEditor::contextMenuEvent(QContextMenuEvent *e)
  */
 void WebRichTextEditor::dragEnterEvent(QDragEnterEvent *event)
 {
-    event->acceptProposedAction();
+    // 只接受图片文件的拖拽（jpg, png, bmp）
+    if (event->mimeData()->hasUrls()) {
+        bool hasValidImage = false;
+        for (const auto &url : event->mimeData()->urls()) {
+            QString suffix = QFileInfo(url.path()).suffix().toLower();
+            if (suffix == "jpg" || suffix == "png" || suffix == "bmp") {
+                hasValidImage = true;
+                break;
+            }
+        }
+        if (hasValidImage) {
+            event->acceptProposedAction();
+        } else {
+            event->ignore();
+        }
+    } else if (event->mimeData()->hasImage()) {
+        event->acceptProposedAction();
+    } else {
+        event->ignore();
+    }
 }
 
 /**
@@ -620,7 +639,26 @@ void WebRichTextEditor::dragLeaveEvent(QDragLeaveEvent *event)
  */
 void WebRichTextEditor::dragMoveEvent(QDragMoveEvent *e)
 {
-    Q_UNUSED(e);
+    // 只接受图片文件的拖拽（jpg, png, bmp）
+    if (e->mimeData()->hasUrls()) {
+        bool hasValidImage = false;
+        for (const auto &url : e->mimeData()->urls()) {
+            QString suffix = QFileInfo(url.path()).suffix().toLower();
+            if (suffix == "jpg" || suffix == "png" || suffix == "bmp") {
+                hasValidImage = true;
+                break;
+            }
+        }
+        if (hasValidImage) {
+            e->acceptProposedAction();
+        } else {
+            e->ignore();
+        }
+    } else if (e->mimeData()->hasImage()) {
+        e->acceptProposedAction();
+    } else {
+        e->ignore();
+    }
 }
 
 void WebRichTextEditor::dropEvent(QDropEvent *event)
