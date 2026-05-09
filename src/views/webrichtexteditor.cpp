@@ -388,7 +388,7 @@ void WebRichTextEditor::onMenuActionClicked(QAction *action)
         break;
     case ActionManager::PictureView:
         //查看图片
-        viewPicture(m_menuJson.toString().replace("file://", ""));
+        viewPicture(m_menuJson.toString());
         break;
     case ActionManager::PictureSaveAs:
         //另存图片
@@ -528,8 +528,9 @@ void WebRichTextEditor::viewPicture(const QString &filePath)
     if (imgView == nullptr) {
         imgView = new ImageViewerDialog(this);
     }
-    //加载图片并显示
-    imgView->open(filePath);
+    //加载图片并显示 兼容编辑区图片src为file://绝对URL的情况
+    QString path = filePath.startsWith("file://") ? filePath.mid(7) : filePath;
+    imgView->open(path);
 }
 
 void WebRichTextEditor::onPaste(bool isVoicePaste)
