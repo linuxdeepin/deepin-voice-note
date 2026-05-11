@@ -9,9 +9,11 @@
 #include <DLog>
 #include <DGuiApplicationHelper>
 
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QRegExp>
+#include <QStandardPaths>
 
 //导出为html文件时的头部部分
 static const QString htmlHead =
@@ -334,9 +336,11 @@ QString VNoteItem::getFullHtml() const
     //匹配图片块标签的正则表达式
     QRegExp rx("<img.+src=.+>");
     rx.setMinimal(true); //最小匹配
-    //匹配本地图片路径的正则表达式（图片位置限制在images文件夹，后缀限制为a-z长度为3到4位）
-    QRegExp rxPath("(/\\S+)+/images/[\\w\\-]+\\.[a-z]{3,4}");
+    //匹配图片路径的正则表达式：兼容绝对路径和相对路径（images/xxx.png）
+    QRegExp rxPath("(/[^/\\s]+)+/images/[\\w\\-]+\\.[a-z]{3,4}|images/[\\w\\-]+\\.[a-z]{3,4}");
     rxPath.setMinimal(false); //最大匹配
+    //AppData基准路径，用于将相对路径还原为绝对路径
+    static const QString appDataBase = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     int pos = 0;
     int last = 0;
     //查找语音块
@@ -350,15 +354,25 @@ QString VNoteItem::getFullHtml() const
             html.append(imgLabel);
         } else {
             //转换图片
-            QString base64 = "";
-            if (!Utils::pictureToBase64(rxPath.cap(0), base64)) {
-                //无效图片路径
+            QString matchedPath = rxPath.cap(0);
+            QString absolutePath = matchedPath.startsWith("/")
+                ? matchedPath
+                : appDataBase + "/" + matchedPath;
+            absolutePath = QDir::cleanPath(absolutePath);
+            //路径遍历防护：规范化后路径必须在AppData目录下
+            if (!absolutePath.startsWith(appDataBase)) {
                 html.append(imgLabel);
             } else {
-                //图片路径转换为base64编码
-                html.append(imgLabel.mid(0, last))
-                    .append(base64)
-                    .append(imgLabel.mid(last + rxPath.matchedLength(), imgLabel.size() - last - rxPath.matchedLength()));
+                QString base64 = "";
+                if (!Utils::pictureToBase64(absolutePath, base64)) {
+                    //无效图片路径
+                    html.append(imgLabel);
+                } else {
+                    //图片路径转换为base64编码
+                    html.append(imgLabel.mid(0, last))
+                        .append(base64)
+                        .append(imgLabel.mid(last + rxPath.matchedLength(), imgLabel.size() - last - rxPath.matchedLength()));
+                }
             }
         }
         pos += rx.matchedLength();
