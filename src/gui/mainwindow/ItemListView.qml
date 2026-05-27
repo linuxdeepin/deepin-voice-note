@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2024-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -16,6 +16,7 @@ import org.deepin.dtk 1.0
 Item {
     id: rootItem
 
+    property bool isDragging: false
     property bool isPlay: false
     property bool isRecordingAudio: false
     property bool isSearch: false
@@ -238,7 +239,7 @@ Item {
              event.accepted = true;
              break;
         case Qt.Key_Delete:
-            if (webVisible || isRecordingAudio || isPlay) {
+            if (rootItem.isDragging || webVisible || isRecordingAudio || isPlay) {
                 console.log("No notes available, cannot delete");
                 return;
             }
@@ -897,6 +898,8 @@ Item {
                 id: noteItemMouseArea
 
                 property bool held: false
+
+                onHeldChanged: rootItem.isDragging = held
 
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 anchors.fill: parent

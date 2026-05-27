@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -92,7 +92,7 @@ ApplicationWindow {
     Shortcuts {
         id: shortcuts
 
-        enabled: rootWindow.active
+        enabled: rootWindow.active && !itemListView.isDragging && !folderListView.isDragging
 
         blockCreateKeys: {
             var shouldBlock = (isRecordingAudio || webEngineView.titleBar.isPlaying || itemListView.isSearch || itemListView.isSearching || webEngineView.titleBar.isSearching || isVoiceToText);
@@ -103,6 +103,7 @@ ApplicationWindow {
                            || webEngineView.titleBar.isPlaying
                            || !webEngineView.titleBar.recordBtnEnabled
         initialOnlyCreateFolder: initRect.visible
+        isDragging: itemListView.isDragging || folderListView.isDragging
 
         onCopy: {
             webEngineView.copy();

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2024-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -14,6 +14,7 @@ Item {
     id: root
 
     property int currentDropIndex: -1
+    property bool isDragging: false
     property bool isPlay: false
     property bool isRecordingAudio: false
     property bool isVoiceToText: false
@@ -191,7 +192,7 @@ Item {
             event.accepted = true;
             break;
         case Qt.Key_Delete:
-            if (webVisible || isRecordingAudio || isPlay) {
+            if (root.isDragging || webVisible || isRecordingAudio || isPlay) {
                 console.log("No notes available, cannot delete folder");
                 return;
             }
@@ -492,6 +493,8 @@ Item {
                 id: folderMouseArea
 
                 property bool held: false
+
+                onHeldChanged: root.isDragging = held
 
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 anchors.fill: parent
