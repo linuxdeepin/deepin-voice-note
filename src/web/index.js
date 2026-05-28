@@ -2076,9 +2076,27 @@ function showRightMenu(x, y) {
     $('#summernote').summernote('airPopover.rightUpdate', x, y)
 }
 
-// 右键隐藏悬浮工具栏
+// 悬浮工具栏延迟隐藏定时器（QML菜单关闭时启动，工具栏按钮点击时取消）
+var hideToolbarTimer = null;
+
+// 监听悬浮工具栏按钮的mousedown事件
+// e.preventDefault() 阻止浏览器默认行为（移动选区/焦点到按钮位置）
+// 同时取消延迟隐藏定时器，防止工具栏被误隐藏
+$(document).on('mousedown', '.note-air-popover .note-btn', function(e) {
+    e.preventDefault();
+    if (hideToolbarTimer) {
+        clearTimeout(hideToolbarTimer);
+        hideToolbarTimer = null;
+    }
+});
+
+// 右键隐藏悬浮工具栏（延迟执行，给工具栏按钮点击事件取消的机会）
 function hideRightMenu() {
-    $('#summernote').summernote('airPopover.hide')
+    if (hideToolbarTimer) clearTimeout(hideToolbarTimer);
+    hideToolbarTimer = setTimeout(function() {
+        $('#summernote').summernote('airPopover.hide');
+        hideToolbarTimer = null;
+    }, 300);
 }
 
 // 重置滚动条
