@@ -4256,6 +4256,7 @@
             }).on('mouseup', function (event) {
                 if (event.which !== 3) {
                     _this.context.triggerEvent('mouseup', event);
+                    _this.history.recordUndo();
                 }
             }).on('scroll', function (event) {
                 _this.context.triggerEvent('scroll', event);
