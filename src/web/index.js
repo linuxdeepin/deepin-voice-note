@@ -339,7 +339,7 @@ function changeContent(we, contents, $editable) {
         $('.note-editable').html('<p><br></p>')
     }
     if (webobj && initFinish) {
-        if (!$('.note-air-popover').is(':hidden')) {
+        if (!$('.note-air-popover').is(':hidden') && !toolbarButtonClicked) {
             if (getSelectedRange().innerHTML == "") {
                 $('#summernote').summernote('airPopover.hide')
             }
@@ -2078,20 +2078,30 @@ function showRightMenu(x, y) {
 
 // 悬浮工具栏延迟隐藏定时器（QML菜单关闭时启动，工具栏按钮点击时取消）
 var hideToolbarTimer = null;
+var toolbarButtonClicked = false;
 
 // 监听悬浮工具栏按钮的mousedown事件
 // e.preventDefault() 阻止浏览器默认行为（移动选区/焦点到按钮位置）
 // 同时取消延迟隐藏定时器，防止工具栏被误隐藏
 $(document).on('mousedown', '.note-air-popover .note-btn', function(e) {
     e.preventDefault();
+    toolbarButtonClicked = true;
     if (hideToolbarTimer) {
         clearTimeout(hideToolbarTimer);
         hideToolbarTimer = null;
     }
 });
 
+$(document).on('click', '.note-air-popover .note-btn', function(e) {
+    setTimeout(function() { toolbarButtonClicked = false; }, 100);
+});
+
 // 右键隐藏悬浮工具栏（延迟执行，给工具栏按钮点击事件取消的机会）
 function hideRightMenu() {
+    if (toolbarButtonClicked) {
+        toolbarButtonClicked = false;
+        return;
+    }
     if (hideToolbarTimer) clearTimeout(hideToolbarTimer);
     hideToolbarTimer = setTimeout(function() {
         $('#summernote').summernote('airPopover.hide');
