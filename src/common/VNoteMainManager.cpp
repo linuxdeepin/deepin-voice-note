@@ -1006,7 +1006,7 @@ void VNoteMainManager::checkNoteVoice(const QVariantList &index)
     foreach (auto id, index) {
         int noteIndex = id.toInt();
         VNoteItem *item = getNoteById(noteIndex);
-        if (item->haveVoice()) {
+        if (item && item->haveVoice()) {
             hasVoice = true;
             break;
         }

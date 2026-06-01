@@ -252,6 +252,14 @@ Item {
     }
     onSelectSizeChanged: {
         mulChoices(selectSize);
+        if (selectSize > 1) {
+            var list = [];
+            for (var i = 0; i < selectedNoteItem.length; i++) {
+                list.push(itemModel.get(selectedNoteItem[i]).noteId);
+            }
+            VNoteMainManager.checkNoteVoice(list);
+            VNoteMainManager.checkNoteText(list);
+        }
     }
 
     ListModel {
