@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -11,13 +11,15 @@ DialogWindow {
     id: dialog
 
     property alias folderModel: folderList.model
-    property int index: -1
+    property int index: 0
     property string name
 
     signal moveToFolder(int index)
 
     height: 365
     width: 370
+
+    onVisibleChanged: if (visible) index = 0
 
     header: DialogTitleBar {
         enableInWindowBlendBlur: true
@@ -60,8 +62,13 @@ DialogWindow {
                     }
                 }
 
-                onClicked: {
-                    dialog.index = index;
+                onClicked: dialog.index = index
+
+                background: Rectangle {
+                    radius: 6
+                    color: index === dialog.index
+                        ? (DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF")
+                        : "transparent"
                 }
 
                 // text: model.name
