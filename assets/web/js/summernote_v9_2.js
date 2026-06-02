@@ -2965,14 +2965,24 @@
             var styleInfo = this.fromNode($cont);
             // document.queryCommandState for toggle state
             // [workaround] prevent Firefox nsresult: "0x80004005 (NS_ERROR_FAILURE)"
+            // [workaround] 对下划线和删除线，先检查DOM中是否存在格式标签，作为按钮状态的权威依据
+            var hasUnderline = false;
+            var hasStrikethrough = false;
+            var node = rng.sc;
+            var checkNode = node.nodeType === 3 ? node.parentNode : node;
+            while (checkNode && checkNode.nodeType === 1) {
+                if (checkNode.tagName === 'U') hasUnderline = true;
+                if (checkNode.tagName === 'STRIKE' || checkNode.tagName === 'S') hasStrikethrough = true;
+                checkNode = checkNode.parentNode;
+            }
             try {
                 styleInfo = $$1.extend(styleInfo, {
                     'font-bold': document.queryCommandState('bold') ? 'bold' : 'normal',
                     'font-italic': document.queryCommandState('italic') ? 'italic' : 'normal',
-                    'font-underline': document.queryCommandState('underline') ? 'underline' : 'normal',
+                    'font-underline': hasUnderline ? 'underline' : (document.queryCommandState('underline') ? 'underline' : 'normal'),
                     'font-subscript': document.queryCommandState('subscript') ? 'subscript' : 'normal',
                     'font-superscript': document.queryCommandState('superscript') ? 'superscript' : 'normal',
-                    'font-strikethrough': document.queryCommandState('strikethrough') ? 'strikethrough' : 'normal',
+                    'font-strikethrough': hasStrikethrough ? 'strikethrough' : (document.queryCommandState('strikethrough') ? 'strikethrough' : 'normal'),
                     'font-family': document.queryCommandValue('fontname') || styleInfo['font-family']
                 });
             }
@@ -3989,7 +3999,77 @@
                             document.execCommand("backColor", false, value == 'transparent' ? 'inherit' : value);
                         } else if (sCmd == 'strikethrough' || sCmd == 'underline') {
                             document.execCommand('styleWithCSS', false, false);
-                            document.execCommand(sCmd, false);
+                            if (range.collapsed) {
+                                var wantOff = false;
+                                try { wantOff = document.queryCommandState(sCmd); } catch (e) {}
+                                var otherCmd = sCmd === 'underline' ? 'strikethrough' : 'underline';
+                                var otherState = false;
+                                try { otherState = document.queryCommandState(otherCmd); } catch (e) {}
+
+                                if (wantOff) {
+                                    // toggle OFF: 查找光标是否在格式标签内
+                                    var formatTag = sCmd === 'underline' ? 'U' : 'STRIKE';
+                                    var container = range.startContainer;
+                                    var formatEl = null;
+                                    var checkNode = container.nodeType === 3 ? container.parentNode : container;
+                                    while (checkNode && checkNode.nodeType === 1) {
+                                        if (checkNode.tagName === formatTag || (sCmd === 'strikethrough' && checkNode.tagName === 'S')) {
+                                            formatEl = checkNode;
+                                            break;
+                                        }
+                                        if ($$1(checkNode).hasClass('note-editable')) break;
+                                        checkNode = checkNode.parentNode;
+                                    }
+                                    if (formatEl) {
+                                        // 光标在格式标签内，移动光标到标签外
+                                        var parent = formatEl.parentNode;
+                                        var fIdx = Array.prototype.indexOf.call(parent.childNodes, formatEl);
+                                        if (formatEl.textContent.trim() === '') {
+                                            $(formatEl).remove();
+                                            try {
+                                                var nr = document.createRange();
+                                                if (parent.childNodes.length === 0) {
+                                                    nr.setStart(parent, 0);
+                                                } else if (fIdx >= parent.childNodes.length) {
+                                                    nr.setStart(parent, parent.childNodes.length);
+                                                } else {
+                                                    var target = parent.childNodes[fIdx];
+                                                    nr.setStart(target.nodeType === 3 ? target : parent,
+                                                        target.nodeType === 3 ? 0 : fIdx);
+                                                }
+                                                nr.collapse(true);
+                                                sel.removeAllRanges();
+                                                sel.addRange(nr);
+                                            } catch (e) {}
+                                        } else {
+                                            var anchor = document.createTextNode('​');
+                                            var ns = formatEl.nextSibling;
+                                            if (ns) parent.insertBefore(anchor, ns);
+                                            else parent.appendChild(anchor);
+                                            try {
+                                                var nr = document.createRange();
+                                                nr.setStart(anchor, 1);
+                                                nr.collapse(true);
+                                                sel.removeAllRanges();
+                                                sel.addRange(nr);
+                                            } catch (e) {}
+                                        }
+                                    }
+                                    // 重新同步内部状态：先清除当前，再恢复另一个
+                                    try {
+                                        var curState = document.queryCommandState(sCmd);
+                                        if (curState) document.execCommand(sCmd, false);
+                                    } catch (e) {}
+                                    try {
+                                        var curOther = document.queryCommandState(otherCmd);
+                                        if (curOther !== otherState) document.execCommand(otherCmd, false);
+                                    } catch (e) {}
+                                } else {
+                                    document.execCommand(sCmd, false);
+                                }
+                            } else {
+                                document.execCommand(sCmd, false);
+                            }
                         }
                         else {
                             document.execCommand(sCmd, false, value);

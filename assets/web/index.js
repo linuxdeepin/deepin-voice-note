@@ -569,6 +569,15 @@ function getHtml() {
             console.error('process voice jsonKey failed:', e);
         }
     });
+    // 清理格式切换产生的零宽空格锚点
+    $cloneCode.find('*').addBack().contents().filter(function() {
+        if (this.nodeType === 3 && /​/.test(this.textContent)) {
+            this.textContent = this.textContent.replace(/​/g, '');
+            if (this.textContent === '') {
+                this.parentNode.removeChild(this);
+            }
+        }
+    });
     return $cloneCode[0].innerHTML;
 }
 
