@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2025 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -51,6 +51,22 @@ bool VoiceNoteDBusService::initDBusService()
     qInfo() << "  Object: /org/deepin/voicenote";
     
     return true;
+}
+
+void VoiceNoteDBusService::ActivateWindow()
+{
+    qInfo() << "D-Bus: ActivateWindow called";
+
+    auto windows = qApp->topLevelWindows();
+    if (!windows.isEmpty()) {
+        QWindow *window = windows.first();
+        window->showNormal();
+        window->raise();
+        window->requestActivate();
+        qInfo() << "  Window activated successfully";
+    } else {
+        qWarning() << "  No top-level windows found";
+    }
 }
 
 QString VoiceNoteDBusService::GetNotesList()

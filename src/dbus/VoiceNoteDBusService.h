@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2025 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -25,6 +25,9 @@ public slots:
 
     // D-Bus接口2: 录音
     bool RecordVoice(int folderId, int noteId);
+
+    // D-Bus接口3: 激活窗口（从最小化恢复并显示到前台）
+    void ActivateWindow();
 };
 
 #endif // VOICENOTEDBUSSERVICE_H

@@ -1,5 +1,5 @@
-// Copyright (C) 2020 ~ 2020 Deepin Technology Co., Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// Copyright (C) 2020 - 2026 Deepin Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -44,6 +44,20 @@
 DWIDGET_USE_NAMESPACE
 DCORE_USE_NAMESPACE
 
+static void activateExistingInstanceViaDBus()
+{
+    QDBusInterface iface("org.deepin.voicenote",
+                         "/org/deepin/voicenote",
+                         "org.deepin.voicenote",
+                         QDBusConnection::sessionBus());
+    if (iface.isValid()) {
+        qInfo() << "Calling ActivateWindow on existing instance via D-Bus";
+        iface.asyncCall("ActivateWindow");
+    } else {
+        qWarning() << "D-Bus interface not available:" << QDBusConnection::sessionBus().lastError().message();
+    }
+}
+
 int main(int argc, char *argv[])
 {
 #ifdef __mips64
@@ -67,6 +81,7 @@ int main(int argc, char *argv[])
         DGuiApplicationHelper::instance()->setSingleInstanceInterval(-1);
         if (!DGuiApplicationHelper::instance()->setSingleInstance(app->applicationName(), DGuiApplicationHelper::UserScope)) {
             qWarning() << "Another instance of deepin-voice-note is already running";
+            activateExistingInstanceViaDBus();
             QCoreApplication::exit(0);
         }
     });
@@ -74,6 +89,7 @@ int main(int argc, char *argv[])
     DGuiApplicationHelper::instance()->setSingleInstanceInterval(-1);
     if (!DGuiApplicationHelper::instance()->setSingleInstance(app->applicationName(), DGuiApplicationHelper::UserScope)) {
         qWarning() << "Another instance of deepin-voice-note is already running";
+        activateExistingInstanceViaDBus();
         return 0;
     }
 #endif
