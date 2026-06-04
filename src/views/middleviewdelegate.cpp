@@ -371,20 +371,9 @@ void MiddleViewDelegate::paintItemBase(QPainter *painter, const QStyleOptionView
                 painter->fillPath(path, painter->brush());
                 painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
             } else {
-                // 计算是否是底部Item
-                int h = m_parentView->geometry().height() - 54 - 6;
-                if (rect.y() <= h && (rect.y() + rect.height()) >= h) {
-                    QLinearGradient linearGradient(QPoint(rect.x(), rect.y()), QPoint(rect.x(), rect.y() + rect.height()));
-                    linearGradient.setColorAt(0.1, option.palette.color(DPalette::Normal, DPalette::Highlight));
-                    linearGradient.setColorAt(1, Qt::white);
-                    painter->setBrush(QBrush(linearGradient));
-                    painter->fillPath(path, painter->brush());
-                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
-                } else {
-                    painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
-                    painter->fillPath(path, painter->brush());
-                    painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
-                }
+                painter->setBrush(QBrush(m_parentPb.color(DPalette::Normal, DPalette::ItemBackground)));
+                painter->fillPath(path, painter->brush());
+                painter->setPen(QPen(m_parentPb.color(DPalette::Normal, DPalette::WindowText)));
             }
         }
     }
