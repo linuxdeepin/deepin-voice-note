@@ -1,3 +1,15 @@
+deepin-voice-note (6.5.58) unstable; urgency=medium
+
+  * fix(dbus): activate existing window on repeated launch
+  * fix: select first notebook by default in move note dialog
+  * fix(multi-select): disable save voice button when no voice in selected notes
+  * fix(editor): record undo snapshot on mouseup to preserve cursor position
+  * fix(editor): prevent floating toolbar from hiding on button click
+  * fix(editor): prevent floating toolbar from hiding on button click
+  * fix: block keyboard shortcuts during drag-and-drop operations
+
+ -- xiepengfei <xiepengfei@uniontech.com>  Thu, 04 Jun 2026 21:19:59 +0800
+
 deepin-voice-note (6.5.57) unstable; urgency=medium
 
   * chore: bump version to 6.5.57
