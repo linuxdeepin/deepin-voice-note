@@ -523,6 +523,10 @@ void VNoteMainManager::saveAs(const QVariantList &index, const QString &path, Sa
         if (!i.isValid())
             continue;
         VNoteItem *noteData = getNoteById(i.toInt());
+        if (noteData == nullptr) {
+            qWarning() << "Failed to get note by ID:" << i.toInt() << ", skipping";
+            continue;
+        }
         noteDataList.append(noteData);
     }
     if (noteDataList.size() == 0) {
