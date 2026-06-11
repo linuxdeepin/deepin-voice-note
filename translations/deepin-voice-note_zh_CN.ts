@@ -12,17 +12,17 @@
 <context>
     <name>DefaultName</name>
     <message>
-        <location filename="../src/db/vnotefolderoper.cpp" line="249"/>
+        <location filename="../src/db/vnotefolderoper.cpp" line="257"/>
         <source>Notebook</source>
         <translation>记事本</translation>
     </message>
     <message>
-        <location filename="../src/importolddata/olddbvisistors.cpp" line="139"/>
+        <location filename="../src/importolddata/olddbvisistors.cpp" line="148"/>
         <source>Voice</source>
         <translation>语音</translation>
     </message>
     <message>
-        <location filename="../src/db/vnoteitemoper.cpp" line="226"/>
+        <location filename="../src/db/vnoteitemoper.cpp" line="228"/>
         <source>Text</source>
         <translation>文本</translation>
     </message>
@@ -30,17 +30,17 @@
 <context>
     <name>FolderListView</name>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="517"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="609"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="526"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="619"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/FolderListView.qml" line="545"/>
+        <location filename="../src/gui/mainwindow/FolderListView.qml" line="644"/>
         <source>New Note</source>
         <translation>新建笔记</translation>
     </message>
@@ -61,42 +61,44 @@
 <context>
     <name>ItemListView</name>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="112"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="114"/>
         <source>move </source>
         <translation>移动 </translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="79"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="112"/>
         <source> notes to :</source>
         <translation> 个笔记到：</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="81"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="114"/>
         <source> note to :</source>
         <translation> 笔记到：</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="160"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="303"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="423"/>
         <source>Save As</source>
         <translation>保存笔记</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="279"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="513"/>
         <source>No search results</source>
         <translation>无搜索结果</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="529"/>
         <source>Unpin</source>
         <translation>取消置顶</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="295"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="529"/>
         <source>Sticky on Top</source>
         <translation>置顶</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/ItemListView.qml" line="752"/>
+        <location filename="../src/gui/mainwindow/ItemListView.qml" line="1130"/>
         <source>Sticky Notes</source>
         <translation>已置顶</translation>
     </message>
@@ -104,12 +106,12 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="370"/>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="547"/>
         <source>Create Notebook</source>
         <translation>新建记事本</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MainWindow.qml" line="523"/>
+        <location filename="../src/gui/mainwindow/MainWindow.qml" line="720"/>
         <source>Search</source>
         <translation>搜索</translation>
     </message>
@@ -117,17 +119,17 @@
 <context>
     <name>MoveDialog</name>
     <message>
-        <location filename="../src/gui/dialog/MoveDialog.qml" line="24"/>
+        <location filename="../src/gui/dialog/MoveDialog.qml" line="27"/>
         <source>Move Note</source>
         <translation>移动笔记</translation>
     </message>
     <message>
-        <location filename="../src/gui/dialog/MoveDialog.qml" line="136"/>
+        <location filename="../src/gui/dialog/MoveDialog.qml" line="144"/>
         <source>Cancel</source>
         <translation>取 消</translation>
     </message>
     <message>
-        <location filename="../src/gui/dialog/MoveDialog.qml" line="153"/>
+        <location filename="../src/gui/dialog/MoveDialog.qml" line="161"/>
         <source>Ok</source>
         <translation>确定</translation>
     </message>
@@ -135,27 +137,27 @@
 <context>
     <name>MultipleChoices</name>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="37"/>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="43"/>
         <source>%1 note selected</source>
         <translation>已选择%1个笔记</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="56"/>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="62"/>
         <source>Move</source>
         <translation>移动</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="69"/>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="75"/>
         <source>Save Note</source>
         <translation>保存笔记</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="82"/>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="88"/>
         <source>Save Voice</source>
         <translation>保存语音</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="93"/>
+        <location filename="../src/gui/mainwindow/MultipleChoices.qml" line="100"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
@@ -163,62 +165,72 @@
 <context>
     <name>NoteDetailContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="69"/>
+        <location filename="../src/common/actionmanager.cpp" line="73"/>
         <source>Save as MP3</source>
         <translation>保存为MP3</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="70"/>
+        <location filename="../src/common/actionmanager.cpp" line="74"/>
         <source>Voice to Text</source>
         <translation>语音转文字</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="71"/>
+        <location filename="../src/common/actionmanager.cpp" line="75"/>
+        <location filename="../src/common/actionmanager.cpp" line="83"/>
+        <location filename="../src/common/actionmanager.cpp" line="91"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="72"/>
+        <location filename="../src/common/actionmanager.cpp" line="76"/>
+        <location filename="../src/common/actionmanager.cpp" line="84"/>
+        <location filename="../src/common/actionmanager.cpp" line="92"/>
         <source>Select all</source>
         <translation>全选</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="73"/>
+        <location filename="../src/common/actionmanager.cpp" line="77"/>
+        <location filename="../src/common/actionmanager.cpp" line="85"/>
+        <location filename="../src/common/actionmanager.cpp" line="93"/>
         <source>Copy</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="74"/>
+        <location filename="../src/common/actionmanager.cpp" line="78"/>
+        <location filename="../src/common/actionmanager.cpp" line="86"/>
+        <location filename="../src/common/actionmanager.cpp" line="94"/>
         <source>Cut</source>
         <translation>剪切</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="75"/>
+        <location filename="../src/common/actionmanager.cpp" line="79"/>
+        <location filename="../src/common/actionmanager.cpp" line="87"/>
+        <location filename="../src/common/actionmanager.cpp" line="95"/>
         <source>Paste</source>
         <translation>粘贴</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="78"/>
+        <location filename="../src/common/actionmanager.cpp" line="82"/>
         <source>View</source>
         <translation>查看</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="84"/>
+        <location filename="../src/common/actionmanager.cpp" line="88"/>
         <source>Save as</source>
         <translation>保存为</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="93"/>
+        <location filename="../src/common/actionmanager.cpp" line="97"/>
         <source>Text to Speech</source>
         <translation>语音朗读</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="94"/>
+        <location filename="../src/common/actionmanager.cpp" line="98"/>
         <source>Stop reading</source>
         <translation>停止朗读</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="95"/>
+        <location filename="../src/common/actionmanager.cpp" line="99"/>
         <source>Speech to Text</source>
         <translation>语音听写</translation>
     </message>
@@ -226,17 +238,17 @@
 <context>
     <name>NotebookContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="47"/>
+        <location filename="../src/common/actionmanager.cpp" line="51"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="48"/>
+        <location filename="../src/common/actionmanager.cpp" line="52"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="49"/>
+        <location filename="../src/common/actionmanager.cpp" line="53"/>
         <source>New note</source>
         <translation>新建笔记</translation>
     </message>
@@ -244,47 +256,47 @@
 <context>
     <name>NotesContextMenu</name>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="63"/>
+        <location filename="../src/common/actionmanager.cpp" line="67"/>
         <source>Save as HTML</source>
         <translation>保存为HTML</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="64"/>
+        <location filename="../src/common/actionmanager.cpp" line="68"/>
         <source>Save as TXT</source>
         <translation>保存为TXT</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="57"/>
+        <location filename="../src/common/actionmanager.cpp" line="61"/>
         <source>Save note</source>
         <translation>保存笔记</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="52"/>
+        <location filename="../src/common/actionmanager.cpp" line="56"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="54"/>
+        <location filename="../src/common/actionmanager.cpp" line="58"/>
         <source>Move</source>
         <translation>移动</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="55"/>
+        <location filename="../src/common/actionmanager.cpp" line="59"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="58"/>
+        <location filename="../src/common/actionmanager.cpp" line="62"/>
         <source>Save voice recording</source>
         <translation>保存语音</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="60"/>
+        <location filename="../src/common/actionmanager.cpp" line="64"/>
         <source>New note</source>
         <translation>新建笔记</translation>
     </message>
     <message>
-        <location filename="../src/common/actionmanager.cpp" line="53"/>
+        <location filename="../src/common/actionmanager.cpp" line="57"/>
         <source>Sticky on Top</source>
         <translation>置顶</translation>
     </message>
@@ -292,22 +304,22 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="261"/>
-        <source>Please install 'UOS AI' from the App Store before using</source>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="278"/>
+        <source>Please install &apos;UOS AI&apos; from the App Store before using</source>
         <translation>请前往应用商店安装“UOS AI”后再使用</translation>
     </message>
     <message>
-        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="263"/>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="280"/>
         <source>No audio input device detected. Please check and try again</source>
         <translation>未检测到音频输入设备，请检查后重试</translation>
     </message>
     <message>
-        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="265"/>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="282"/>
         <source>No audio output device detected. Please check and try again</source>
         <translation>未检测到音频输出设备，请检查后重试</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="99"/>
+        <location filename="../src/main.cpp" line="119"/>
         <source>deepin-voice-note</source>
         <translation>语音记事本</translation>
     </message>
@@ -315,22 +327,22 @@
 <context>
     <name>Setting</name>
     <message>
-        <location filename="../src/common/setting.cpp" line="24"/>
+        <location filename="../src/common/setting.cpp" line="25"/>
         <source>Basic</source>
         <translation>基础设置</translation>
     </message>
     <message>
-        <location filename="../src/common/setting.cpp" line="25"/>
+        <location filename="../src/common/setting.cpp" line="26"/>
         <source>Audio Source</source>
         <translation>声音来源</translation>
     </message>
     <message>
-        <location filename="../src/common/setting.cpp" line="26"/>
+        <location filename="../src/common/setting.cpp" line="27"/>
         <source>Internal</source>
         <translation>系统声音</translation>
     </message>
     <message>
-        <location filename="../src/common/setting.cpp" line="27"/>
+        <location filename="../src/common/setting.cpp" line="28"/>
         <source>Microphone</source>
         <translation>麦克风声音</translation>
     </message>
@@ -338,22 +350,27 @@
 <context>
     <name>SettingDialog</name>
     <message>
-        <location filename="../src/gui/dialog/SettingDialog.qml" line="27"/>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="33"/>
+        <source>Restore Defaults</source>
+        <translation>恢复默认</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="45"/>
         <source>Basic</source>
         <translation>基础设置</translation>
     </message>
     <message>
-        <location filename="../src/gui/dialog/SettingDialog.qml" line="32"/>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="50"/>
         <source>Audio Source</source>
         <translation>声音来源</translation>
     </message>
     <message>
-        <location filename="../src/gui/dialog/SettingDialog.qml" line="59"/>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="78"/>
         <source>Internal</source>
         <translation>系统声音</translation>
     </message>
     <message>
-        <location filename="../src/gui/dialog/SettingDialog.qml" line="68"/>
+        <location filename="../src/gui/dialog/SettingDialog.qml" line="87"/>
         <source>Microphone</source>
         <translation>麦克风声音</translation>
     </message>
@@ -361,97 +378,97 @@
 <context>
     <name>Shortcuts</name>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="804"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1066"/>
         <source>New notebook</source>
         <translation>新建记事本</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="805"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1067"/>
         <source>Rename notebook</source>
         <translation>重命名记事本</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="806"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1068"/>
         <source>Delete notebook</source>
         <translation>删除记事本</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="828"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1090"/>
         <source>New note</source>
         <translation>新建笔记</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="829"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1091"/>
         <source>Rename note</source>
         <translation>重命名笔记</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="830"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1092"/>
         <source>Delete note</source>
         <translation>删除笔记</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="831"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1093"/>
         <source>Play/Pause</source>
         <translation>播放/暂停</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="832"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1094"/>
         <source>Record voice</source>
         <translation>录音</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="833"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1095"/>
         <source>Save note</source>
         <translation>保存笔记</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="834"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1096"/>
         <source>Save recordings</source>
         <translation>保存语音</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="854"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1116"/>
         <source>Select all</source>
         <translation>全选</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="855"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1117"/>
         <source>Copy</source>
         <translation>复制</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="856"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1118"/>
         <source>Cut</source>
         <translation>剪切</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="857"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1119"/>
         <source>Paste</source>
         <translation>粘贴</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="858"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1120"/>
         <source>Undo</source>
         <translation>撤销</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="859"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1121"/>
         <source>Redo</source>
         <translation>重做</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="860"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1122"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="883"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1145"/>
         <source>Help</source>
         <translation>帮助</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="884"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1146"/>
         <source>Display shortcuts</source>
         <translation>显示快捷键</translation>
     </message>
@@ -459,22 +476,22 @@
 <context>
     <name>ShortcutsGroups</name>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="810"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1072"/>
         <source>Notebooks</source>
         <translation>记事本</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="838"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1100"/>
         <source>Notes</source>
         <translation>笔记</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="864"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1126"/>
         <source>Edit</source>
         <translation>编辑</translation>
     </message>
     <message>
-        <location filename="../src/common/VNoteMainManager.cpp" line="888"/>
+        <location filename="../src/common/VNoteMainManager.cpp" line="1150"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
@@ -501,11 +518,16 @@
         <source>Voice Note</source>
         <translation>语音记事本</translation>
     </message>
+    <message>
+        <location filename="../src/gui/mainwindow/TitleBarMenu.qml" line="67"/>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>UpgradeView</name>
     <message>
-        <location filename="../src/importolddata/upgradeview.cpp" line="35"/>
+        <location filename="../src/importolddata/upgradeview.cpp" line="37"/>
         <source>Importing notes from the old version, please wait...</source>
         <translation>因产品升级正在导入数据，请稍候...</translation>
     </message>
@@ -513,173 +535,90 @@
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../src/common/utils.cpp" line="46"/>
+        <location filename="../src/common/utils.cpp" line="73"/>
         <source>1 min ago</source>
         <translation>1分钟前</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="48"/>
+        <location filename="../src/common/utils.cpp" line="76"/>
         <source>%1 mins ago</source>
         <translation>%1分钟前</translation>
     </message>
     <message>
-        <location filename="../src/common/utils.cpp" line="56"/>
+        <location filename="../src/common/utils.cpp" line="84"/>
         <source>Yesterday</source>
         <translation>昨天</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/common/ut_utils.cpp" line="33"/>
-        <source>2 mins ago</source>
-        <translation>2分钟前</translation>
-    </message>
-</context>
-<context>
-    <name>VNoteMessageDialog</name>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="28"/>
-        <source>OK</source>
-        <comment>button</comment>
-        <translation>确定</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="39"/>
-        <source>Are you sure you want to delete this notebook?
-All notes in it will be deleted</source>
-        <translation>您确定要删除这个笔记本吗？
-其中的所有笔记都将被删除</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="46"/>
-        <source>Do you want to stop the current recording?</source>
-        <translation type="unfinished">当前录音中，是否停止录音？</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="52"/>
-        <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
-        <translation type="unfinished">无法转写此条语音笔记，暂仅支持20分钟内的语音笔记。</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="59"/>
-        <source>Converting a voice note now. Do you want to stop it?</source>
-        <translation type="unfinished">当前有语音笔记正在转写中，是否确定关闭？</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="65"/>
-        <source>The low input volume may result in bad recordings. Do you want to continue?</source>
-        <translation type="unfinished">当前系统输入音量低，可能影响录音效果。是否继续录音？</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="72"/>
-        <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
-        <translation type="unfinished">语音笔记以及转写文字剪切后不能粘贴，是否继续？</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="81"/>
-        <source>Are you sure you want to delete this note?</source>
-        <translation type="unfinished">您确定要删除这条笔记吗？</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="87"/>
-        <source>Are you sure you want to delete the selected %1 notes?</source>
-        <translation type="unfinished">您确定要删除选中的%1条笔记吗？</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="94"/>
-        <source>Cancel</source>
-        <comment>button</comment>
-        <translation type="unfinished">取 消</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="98"/>
-        <source>Confirm</source>
-        <comment>button</comment>
-        <translation type="unfinished">确 定</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="106"/>
-        <source>Save failed</source>
-        <translation type="unfinished">保存失败</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="111"/>
-        <source>You do not have permission to save files there</source>
-        <translation type="unfinished">您没有权限在此位置保存这类文件</translation>
-    </message>
-    <message>
-        <location filename="../tests/src/dialog/ut_vnotemessagedialog.cpp" line="116"/>
-        <source>The voice note has been deleted</source>
-        <translation type="unfinished">该语音笔记已被删除</translation>
     </message>
 </context>
 <context>
     <name>VNoteMessageDialogHandler</name>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="97"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="113"/>
         <source>Are you sure you want to delete this notebook?</source>
         <translation>您确定删除这个记事本么？</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="99"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="115"/>
         <source>Do you want to stop the current recording?</source>
         <translation>当前录音中，是否停止录音？</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="103"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="119"/>
         <source>Are you sure you want to delete the selected %1 notes?</source>
         <translation>您确定要删除选中的%1条笔记吗？</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="107"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="123"/>
         <source>Are you sure you want to delete this note?</source>
         <translation>您确定要删除这条笔记吗？</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="110"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="126"/>
         <source>Cannot convert this voice note, as notes over 20 minutes are not supported at present.</source>
         <translation>无法转写此条语音笔记，暂仅支持20分钟内的语音笔记。</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="114"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="130"/>
         <source>Converting a voice note now. Do you want to stop it?</source>
         <translation>当前有语音笔记正在转写中，是否确定关闭？</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="116"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="132"/>
         <source>The low input volume may result in bad recordings. Do you want to continue?</source>
         <translation>当前系统输入音量低，可能影响录音效果。是否继续录音？</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="119"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="135"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
         <translation>语音笔记以及转写文字剪切后不能粘贴，是否继续？</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="123"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="139"/>
         <source>Save failed</source>
         <translation>保存失败</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="125"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="141"/>
         <source>You do not have permission to save files there</source>
         <translation>您没有权限在此位置保存这类文件</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="127"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="143"/>
         <source>The voice note has been deleted</source>
         <translation>该语音笔记已被删除</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="129"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="145"/>
         <source>The voice conversion failed due to the poor network connection, please have a check</source>
         <translation>当前网络状态差，语音转写失败，请确保网络畅通</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="141"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="159"/>
         <source>All notes in it will be deleted</source>
         <translation>包含的所有笔记将被删除</translation>
     </message>
     <message>
-        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="154"/>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="174"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
@@ -700,7 +639,7 @@ All notes in it will be deleted</source>
 <context>
     <name>WebEngineHandler</name>
     <message>
-        <location filename="../src/handler/web_engine_handler.cpp" line="647"/>
+        <location filename="../src/handler/web_engine_handler.cpp" line="764"/>
         <source>save as MP3</source>
         <translation>保存为MP3</translation>
     </message>
@@ -708,22 +647,22 @@ All notes in it will be deleted</source>
 <context>
     <name>WindowTitleBar</name>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="60"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="64"/>
         <source>Create Note</source>
         <translation>新建笔记</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="104"/>
         <source>Start recording</source>
         <translation>开始录音</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="100"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="104"/>
         <source>No recording device detected</source>
         <translation>未检测到录音设备</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="119"/>
+        <location filename="../src/gui/mainwindow/WindowTitleBar.qml" line="123"/>
         <source>Insert picture</source>
         <translation>插入图片</translation>
     </message>
@@ -731,72 +670,72 @@ All notes in it will be deleted</source>
 <context>
     <name>web</name>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="146"/>
+        <location filename="../src/common/jscontent.cpp" line="191"/>
         <source>Font</source>
         <translation>字体</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="147"/>
+        <location filename="../src/common/jscontent.cpp" line="192"/>
         <source>Font size</source>
         <translation>字号</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="148"/>
+        <location filename="../src/common/jscontent.cpp" line="193"/>
         <source>Font color</source>
         <translation>字体颜色</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="149"/>
+        <location filename="../src/common/jscontent.cpp" line="194"/>
         <source>Text highlight color</source>
         <translation>背景色</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="150"/>
+        <location filename="../src/common/jscontent.cpp" line="195"/>
         <source>Bold</source>
         <translation>加粗</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="151"/>
+        <location filename="../src/common/jscontent.cpp" line="196"/>
         <source>Italic</source>
         <translation>斜体</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="152"/>
+        <location filename="../src/common/jscontent.cpp" line="197"/>
         <source>Underline</source>
         <translation>下划线</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="153"/>
+        <location filename="../src/common/jscontent.cpp" line="198"/>
         <source>Strikethrough</source>
         <translation>删除线</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="154"/>
+        <location filename="../src/common/jscontent.cpp" line="199"/>
         <source>Bullets</source>
         <translation>无序列表</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="155"/>
+        <location filename="../src/common/jscontent.cpp" line="200"/>
         <source>Numbering</source>
         <translation>有序列表</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="156"/>
+        <location filename="../src/common/jscontent.cpp" line="201"/>
         <source>More colors</source>
         <translation>更多颜色</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="157"/>
+        <location filename="../src/common/jscontent.cpp" line="202"/>
         <source>Recent</source>
         <translation>最近使用</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="173"/>
+        <location filename="../src/common/jscontent.cpp" line="220"/>
         <source>Voice To Text</source>
         <translation>语音转文本</translation>
     </message>
     <message>
-        <location filename="../src/common/jscontent.cpp" line="174"/>
+        <location filename="../src/common/jscontent.cpp" line="221"/>
         <source>Converting voice to text</source>
         <translation>正在转为文字</translation>
     </message>
