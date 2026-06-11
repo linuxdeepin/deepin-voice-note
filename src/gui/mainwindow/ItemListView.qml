@@ -679,6 +679,9 @@ Item {
         spacing: itemSpacing
         visible: true
 
+        ScrollBar.vertical: ScrollBar {
+        }
+
         delegate: Rectangle {
             id: rootItemDelegate
 
