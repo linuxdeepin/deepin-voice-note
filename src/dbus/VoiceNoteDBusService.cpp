@@ -32,25 +32,45 @@ VoiceNoteDBusService::~VoiceNoteDBusService()
 bool VoiceNoteDBusService::initDBusService()
 {
     qInfo() << "Initializing D-Bus service";
-    
+
     QDBusConnection connection = QDBusConnection::sessionBus();
-    
+
     if (!connection.registerService("org.deepin.voicenote")) {
         qWarning() << "Failed to register D-Bus service:" << connection.lastError().message();
         return false;
     }
-    
-    if (!connection.registerObject("/org/deepin/voicenote", this, 
+
+    if (!connection.registerObject("/org/deepin/voicenote", this,
                                    QDBusConnection::ExportAllSlots)) {
         qWarning() << "Failed to register D-Bus object:" << connection.lastError().message();
         return false;
     }
-    
+
     qInfo() << "  D-Bus service registered successfully";
     qInfo() << "  Service: org.deepin.voicenote";
     qInfo() << "  Object: /org/deepin/voicenote";
-    
+
+    trackMainWindowState();
+
     return true;
+}
+
+void VoiceNoteDBusService::trackMainWindowState()
+{
+    auto windows = qApp->topLevelWindows();
+    if (windows.isEmpty())
+        return;
+
+    QWindow *window = windows.first();
+    // 记录初始状态
+    m_wasMaximized = (window->windowState() & Qt::WindowMaximized);
+
+    connect(window, &QWindow::windowStateChanged, this, [this](Qt::WindowState newState) {
+        // 最小化时不更新记录，保留之前的状态供恢复时使用
+        if (newState != Qt::WindowMinimized) {
+            m_wasMaximized = (newState & Qt::WindowMaximized);
+        }
+    });
 }
 
 void VoiceNoteDBusService::ActivateWindow()
@@ -60,12 +80,17 @@ void VoiceNoteDBusService::ActivateWindow()
     auto windows = qApp->topLevelWindows();
     if (!windows.isEmpty()) {
         QWindow *window = windows.first();
-        window->showNormal();
+        qWarning() << "[ActivateWindow] m_wasMaximized:" << m_wasMaximized
+                   << " windowState:" << window->windowState();
+        if (m_wasMaximized) {
+            window->showMaximized();
+        } else {
+            window->showNormal();
+        }
         window->raise();
         window->requestActivate();
-        qInfo() << "  Window activated successfully";
     } else {
-        qWarning() << "  No top-level windows found";
+        qWarning() << "[ActivateWindow] No top-level windows found";
     }
 }
 
