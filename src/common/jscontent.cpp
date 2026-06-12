@@ -1,4 +1,4 @@
-// Copyright (C) 2019 ~ 2019 UnionTech Software Technology Co.,Ltd.
+// Copyright (C) 2019-2026 UnionTech Software Technology Co., Ltd.
 // SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -343,10 +343,10 @@ void JsContent::jsCallSetClipData(const QString &text, const QString &html)
 
 void JsContent::onClipChange(QClipboard::Mode mode)
 {
-    qInfo() << "Clipboard change detected, mode:" << mode;
+    qDebug() << "Clipboard change detected, mode:" << mode;
     if (QClipboard::Clipboard == mode && QApplication::clipboard()->mimeData() != m_clipData) {
         qDebug() << "Clipboard content changed externally";
         emit callJsClipboardDataChanged();
     }
-    qInfo() << "Clipboard change handling finished";
+    qDebug() << "Clipboard change handling finished";
 }

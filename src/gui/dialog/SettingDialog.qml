@@ -12,7 +12,8 @@ import org.deepin.dtk 1.0
 Settings.SettingsDialog {
     id: control
 
-    flags: Qt.WindowCloseButtonHint | Qt.WindowStaysOnTopHint
+    flags: Qt.Window | Qt.WindowCloseButtonHint
+    modality: Qt.WindowModal
     height: 548
     width: 664
 
