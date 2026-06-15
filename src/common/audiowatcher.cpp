@@ -1,5 +1,5 @@
 // Copyright (C) 2019 ~ 2020 Deepin Technology Co., Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -41,9 +41,17 @@ void AudioWatcher::initDeviceWacther()
     if (m_audioDBusInterface->isValid()) {
         qInfo() << "音频服务初始化成功！音频服务： " << AudioService << " 地址：" << AudioPath << " 接口：" << AudioInterface;
         m_defaultSourcePath = m_audioDBusInterface->property("DefaultSource").value<QDBusObjectPath>().path();
-        initDefaultSourceDBusInterface();
+        if (!m_defaultSourcePath.isEmpty() && m_defaultSourcePath != "/") {
+            initDefaultSourceDBusInterface();
+        } else {
+            qWarning() << "DefaultSource path is invalid:" << m_defaultSourcePath;
+        }
         m_defaultSinkPath = m_audioDBusInterface->property("DefaultSink").value<QDBusObjectPath>().path();
-        initDefaultSinkDBusInterface();
+        if (!m_defaultSinkPath.isEmpty() && m_defaultSinkPath != "/") {
+            initDefaultSinkDBusInterface();
+        } else {
+            qWarning() << "DefaultSink path is invalid:" << m_defaultSinkPath;
+        }
         qInfo() << "\n**************** cunrrent default input or output active port **********************"
                 << "\ncurrent input active port name:" << m_inAudioPort.name
                 << "\ncurrent input active port availability(0 for Unknown, 1 for Not Available, 2 for Available.):" << m_inAudioPort.availability
@@ -412,8 +420,9 @@ void AudioWatcher::onSinkVolumeChanged(double value)
  */
 void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &defaultSourcePath)
 {
-    if (m_defaultSourcePath != defaultSourcePath.path()) {
-        qInfo() << "默认输入源地址改变:" <<  m_defaultSourcePath << " To " << defaultSourcePath.path();
+    const QString newPath = defaultSourcePath.path();
+    if (m_defaultSourcePath != newPath) {
+        qInfo() << "默认输入源地址改变:" <<  m_defaultSourcePath << " To " << newPath;
         QDBusConnection::sessionBus().disconnect(AudioService,
                                                  m_defaultSourcePath,
                                                  PropertiesInterface,
@@ -422,9 +431,12 @@ void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &defaultSourceP
                                                  this,
                                                  SLOT(onDBusAudioPropertyChanged(QDBusMessage))
                                                 );
-        m_defaultSourcePath = defaultSourcePath.path();
-        //重新初始化默认输入源接口
-        initDefaultSourceDBusInterface();
+        m_defaultSourcePath = newPath;
+        if (!newPath.isEmpty() && newPath != "/") {
+            initDefaultSourceDBusInterface();
+        } else {
+            qWarning() << "DefaultSource path changed to invalid:" << newPath;
+        }
         emit sigDeviceChange(Micphone);
     }
 }
@@ -435,8 +447,9 @@ void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &defaultSourceP
  */
 void AudioWatcher::onDefaultSinkChanaged(const QDBusObjectPath &defaultSinkePath)
 {
-    if (m_defaultSinkPath != defaultSinkePath.path()) {
-        qInfo() << "默认输出源地址改变:" <<  m_defaultSinkPath << " To " << defaultSinkePath.path();
+    const QString newPath = defaultSinkePath.path();
+    if (m_defaultSinkPath != newPath) {
+        qInfo() << "默认输出源地址改变:" <<  m_defaultSinkPath << " To " << newPath;
         QDBusConnection::sessionBus().disconnect(AudioService,
                                                  m_defaultSinkPath,
                                                  PropertiesInterface,
@@ -445,9 +458,12 @@ void AudioWatcher::onDefaultSinkChanaged(const QDBusObjectPath &defaultSinkePath
                                                  this,
                                                  SLOT(onDBusAudioPropertyChanged(QDBusMessage))
                                                 );
-        m_defaultSinkPath = defaultSinkePath.path();
-        //重新初始化默认输出源接口
-        initDefaultSinkDBusInterface();
+        m_defaultSinkPath = newPath;
+        if (!newPath.isEmpty() && newPath != "/") {
+            initDefaultSinkDBusInterface();
+        } else {
+            qWarning() << "DefaultSink path changed to invalid:" << newPath;
+        }
         emit sigDeviceChange(Internal);
     }
 }
