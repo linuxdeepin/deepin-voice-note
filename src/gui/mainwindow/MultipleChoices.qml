@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2024-2026 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import org.deepin.dtk 1.0
@@ -7,6 +10,8 @@ Item {
     id: rootWindow
 
     property int selectSize: 0
+    property bool deleteEnabled: true
+    property bool moveEnabled: true
     property bool saveVoiceEnabled: true
 
     signal deleteNote
@@ -18,6 +23,11 @@ Item {
 
     function setSaveVoiceEnabled(enabled) {
         saveVoiceEnabled = enabled;
+    }
+
+    function setOperationEnabled(move, del) {
+        moveEnabled = move;
+        deleteEnabled = del;
     }
 
     Rectangle {
@@ -59,6 +69,7 @@ Item {
                         icon.name: "move_note"
                         implicitHeight: 40
                         implicitWidth: 40
+                        enabled: moveEnabled
                         text: qsTr("Move")
 
                         onClicked: {
@@ -97,6 +108,7 @@ Item {
                         icon.name: "delete"
                         implicitHeight: 40
                         implicitWidth: 40
+                        enabled: deleteEnabled
                         text: qsTr("Delete")
 
                         onClicked: {

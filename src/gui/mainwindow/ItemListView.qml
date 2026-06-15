@@ -21,6 +21,7 @@ Item {
     property bool isRecordingAudio: false
     property bool isSearch: false
     property bool isSearching: false
+    property bool isVoiceToText: false
     property int itemSpacing: 6
     property alias model: itemModel
     property alias moveToFolderDialog: dialogWindow
@@ -60,7 +61,7 @@ Item {
     }
 
     function onDeleteNote() {
-        if (webVisible) {
+        if (webVisible || isVoiceToText) {
             console.log("No notes available, cannot delete");
             return;
         }
@@ -78,12 +79,15 @@ Item {
             var deleIndex = Number.MAX_SAFE_INTEGER;
             for (var i = 0; i < delList.length; i++) {
                 delIdList.push(itemModel.get(delList[i]).noteId);
-                itemModel.remove(delList[i]);
-                if (selectedNoteItem[i] < deleIndex)
-                    deleIndex = selectedNoteItem[i];
+                if (delList[i] < deleIndex)
+                    deleIndex = delList[i];
             }
-            VNoteMainManager.deleteNote(delIdList);
-            deleteNotes(selectedNoteItem.length);
+            if (!VNoteMainManager.deleteNote(delIdList))
+                return;
+            for (var j = 0; j < delList.length; j++) {
+                itemModel.remove(delList[j]);
+            }
+            deleteNotes(delList.length);
             if (itemModel.count === 0) {
                 selectedNoteItem = [];
                 selectSize = 0;
@@ -102,7 +106,7 @@ Item {
     }
 
     function onMoveNote() {
-        if (webVisible) {
+        if (webVisible || isVoiceToText) {
             console.log("No notes available, cannot move");
             return;
         }
@@ -239,7 +243,7 @@ Item {
              event.accepted = true;
              break;
         case Qt.Key_Delete:
-            if (rootItem.isDragging || webVisible || isRecordingAudio || isPlay) {
+            if (rootItem.isDragging || webVisible || isRecordingAudio || isPlay || isVoiceToText) {
                 console.log("No notes available, cannot delete");
                 return;
             }
@@ -271,6 +275,10 @@ Item {
         id: dialogWindow
 
         onMoveToFolder: {
+            if (isVoiceToText) {
+                console.log("Cannot move note while voice to text is in progress");
+                return;
+            }
             var indexList = [];
             for (var i = 0; i < selectedNoteItem.length; i++) {
                 indexList.push(itemModel.get(selectedNoteItem[i]).noteId);
@@ -529,8 +537,8 @@ Item {
             topItem.text = setTop ? qsTr("Sticky on Top") : qsTr("Unpin");
 
             ActionManager.enableVoicePlayActions(!isPlay && !isRecordingAudio);
-            // 录音或播放中禁用删除
-            ActionManager.enableAction(ActionManager.NoteDelete, !isRecordingAudio && !isPlay);
+            // 录音、播放或语音转文字中禁用删除
+            ActionManager.enableAction(ActionManager.NoteDelete, !isRecordingAudio && !isPlay && !isVoiceToText);
             
             // 在搜索状态下禁用移动、置顶和新建笔记选项
             if (isSearching) {
@@ -538,10 +546,10 @@ Item {
                 ActionManager.enableAction(ActionManager.NoteTop, false);
                 ActionManager.enableAction(ActionManager.NoteAddNew, false);
             } else {
-                // 录音或播放时禁用移动和新建（会影响当前笔记），但置顶保持可用
-                ActionManager.enableAction(ActionManager.NoteMove, !isRecordingAudio && !isPlay);
+                // 录音、播放或语音转文字时禁用移动和新建（会影响当前笔记），但置顶保持可用
+                ActionManager.enableAction(ActionManager.NoteMove, !isRecordingAudio && !isPlay && !isVoiceToText);
                 ActionManager.enableAction(ActionManager.NoteTop, true);  // 置顶是轻量操作，始终可用
-                ActionManager.enableAction(ActionManager.NoteAddNew, !isRecordingAudio && !isPlay);
+                ActionManager.enableAction(ActionManager.NoteAddNew, !isRecordingAudio && !isPlay && !isVoiceToText);
             }
             
             // 录音时保存语音菜单置灰，但重命名、置顶和保存笔记保持可用

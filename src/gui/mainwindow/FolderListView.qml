@@ -53,6 +53,8 @@ Item {
             console.log("FolderListView: dropItems ignored while recording");
         } else if (isPlay) {
             console.log("FolderListView: dropItems ignored while playing");
+        } else if (isVoiceToText) {
+            console.log("FolderListView: dropItems ignored while voice to text is in progress");
         } else if (currentDropIndex != -1) {
             VNoteMainManager.moveNotes(selectedNoteItem, currentDropIndex);
         }
@@ -192,14 +194,15 @@ Item {
             event.accepted = true;
             break;
         case Qt.Key_Delete:
-            if (root.isDragging || webVisible || isRecordingAudio || isPlay) {
+            if (root.isDragging || webVisible || isRecordingAudio || isPlay || isVoiceToText) {
                 console.log("No notes available, cannot delete folder");
                 return;
             }
             
             messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteFolder, ret => {
                 if (ret) {
-                    VNoteMainManager.vNoteDeleteFolder(folderListView.currentIndex);
+                    if (!VNoteMainManager.vNoteDeleteFolder(folderListView.currentIndex))
+                        return;
                     if (folderModel.count === 1)
                         folderEmpty();
                     folderModel.remove(folderListView.currentIndex);
@@ -615,18 +618,19 @@ Item {
 
                 MenuItem {
                     id: deleteMenuItem
-                    enabled: !root.isPlay && !root.isRecordingAudio
+                    enabled: !root.isPlay && !root.isRecordingAudio && !root.isVoiceToText
                     text: qsTr("Delete")
 
                     onTriggered: {
-                        if (webVisible) {
+                        if (webVisible || root.isVoiceToText) {
                             console.log("No notes available, cannot delete folder");
                             return;
                         }
                         
                         messageDialogLoader.showDialog(VNoteMessageDialogHandler.DeleteFolder, ret => {
                             if (ret) {
-                                VNoteMainManager.vNoteDeleteFolder(folderListView.contextIndex);
+                                if (!VNoteMainManager.vNoteDeleteFolder(folderListView.contextIndex))
+                                    return;
                                 if (folderModel.count === 1)
                                     folderEmpty();
                                 folderModel.remove(folderListView.contextIndex);

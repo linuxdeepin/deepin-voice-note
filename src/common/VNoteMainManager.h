@@ -1,5 +1,5 @@
-// Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// Copyright (C) 2019 ~ 2026 Uniontech Software Technology Co.,Ltd.
+// SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -42,9 +42,9 @@ public:
     Q_INVOKABLE void vNoteChanged(const int &index);
     void vNoteChangedWithUIUpdate(const int &noteId);
     Q_INVOKABLE void vNoteCreateFolder();
-    Q_INVOKABLE void vNoteDeleteFolder(const int &index);
+    Q_INVOKABLE bool vNoteDeleteFolder(const int &index);
     Q_INVOKABLE void createNote();
-    Q_INVOKABLE void deleteNote(const QList<int> &index);
+    Q_INVOKABLE bool deleteNote(const QList<int> &index);
     Q_INVOKABLE void moveNotes(const QVariantList &index, const int &folderIndex);
     Q_INVOKABLE void saveAs(const QVariantList &index, const QString &path, const SaveAsType type = Note);
     Q_INVOKABLE void updateTop(const int &id, const bool &top);
@@ -122,6 +122,8 @@ private:
     int loadNotes(VNoteFolder *folder);
     void insertVoice(const QString &path, qint64 size);
     void loadSettings();
+    bool hasActiveVoiceToTextTaskForNote(int noteId) const;
+    bool hasActiveVoiceToTextTaskInFolder(qint64 folderId) const;
 
     VNoteItem* deleteNoteById(const int &id);
 

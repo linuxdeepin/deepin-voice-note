@@ -390,8 +390,6 @@ ApplicationWindow {
         }
         onNoSearchResult: {
             label.visible = false;
-            folderListView.opacity = 0.4;
-            folderListView.enabled = false;
             webEngineView.webVisible = false;
             webEngineView.noSearchResult = true;
             webEngineView.titleBar.isSearching = true;
@@ -399,8 +397,6 @@ ApplicationWindow {
         }
         onSearchFinished: {
             label.visible = false;
-            folderListView.opacity = 0.4;
-            folderListView.enabled = false;
             webEngineView.webVisible = true;
             webEngineView.noSearchResult = false;
             webEngineView.titleBar.isSearching = true;
@@ -500,6 +496,8 @@ ApplicationWindow {
 
                     Layout.fillHeight: true
                     Layout.fillWidth: true
+                    enabled: !rootWindow.isVoiceToText && !itemListView.isSearching && !webEngineView.titleBar.isSearching
+                    opacity: enabled ? 1.0 : 0.4
                     webVisible: initRect.visible
                     isRecordingAudio: rootWindow.isRecordingAudio  // 传递录音状态
                     isVoiceToText: rootWindow.isVoiceToText  // 传递语音转文字状态
@@ -543,7 +541,7 @@ ApplicationWindow {
 
                     Layout.fillWidth: true
                     Layout.preferredHeight: createFolderBtnHeight
-                    enabled: !isRecordingAudio && !folderListView.isPlay && !webEngineView.titleBar.isSearching
+                    enabled: !isRecordingAudio && !folderListView.isPlay && !webEngineView.titleBar.isSearching && !rootWindow.isVoiceToText
                     text: qsTr("Create Notebook")
 
                     onClicked: {
@@ -559,8 +557,8 @@ ApplicationWindow {
                     // 数量更新统一依赖后端 onNotesDeleted(folderId->count)
                 }
                 onDropRelease: {
-                    if (rootWindow.isRecordingAudio || webEngineView.titleBar.isPlaying || folderListView.isPlay) {
-                        console.log("MainWindow: Drop ignored while recording or playing");
+                    if (rootWindow.isRecordingAudio || webEngineView.titleBar.isPlaying || folderListView.isPlay || rootWindow.isVoiceToText) {
+                        console.log("MainWindow: Drop ignored while recording, playing or voice to text");
                         return;
                     }
                     var indexList = [];
@@ -693,8 +691,6 @@ ApplicationWindow {
                         }
                         itemListView.view.visible = true;
                         label.visible = true;
-                        folderListView.opacity = 1;
-                        folderListView.enabled = true;
                         itemListView.isSearch = false;
                         itemListView.isSearching = false;
                         // 退出搜索时，只有当前记事本有笔记时才显示富文本编辑器
@@ -716,7 +712,7 @@ ApplicationWindow {
                                            ? Math.max(36, Math.ceil(DTK.fontManager.t6.pixelSize * 1.6))
                                            : 30
                     Layout.topMargin: 12
-                    enabled: !isRecordingAudio && !folderListView.isPlay  // 录音或播放时禁用搜索框
+                    enabled: !isRecordingAudio && !folderListView.isPlay && !rootWindow.isVoiceToText
                     placeholder: qsTr("Search")
                     topPadding: 0
                     bottomPadding: 0
@@ -750,8 +746,6 @@ ApplicationWindow {
                             }
                             itemListView.view.visible = true;
                             label.visible = true;
-                            folderListView.opacity = 1;
-                            folderListView.enabled = true;
                             itemListView.isSearch = false;
                             itemListView.isSearching = false;
                             // 清空搜索文本时，只有当前记事本有笔记时才显示富文本编辑器
@@ -787,9 +781,12 @@ ApplicationWindow {
 
                     Layout.fillHeight: true
                     Layout.fillWidth: true
+                    enabled: !rootWindow.isVoiceToText
+                    opacity: enabled ? 1.0 : 0.4
                     moveToFolderDialog.folderModel: folderListView.model
                     webVisible: initRect.visible
                     isRecordingAudio: rootWindow.isRecordingAudio
+                    isVoiceToText: rootWindow.isVoiceToText
 
                     onDeleteFinished: {
                         // 只有当列表不为空时才调用 toggleMultCho，避免覆盖 emptyItemList 设置的 webVisible = false
@@ -1072,4 +1069,3 @@ ApplicationWindow {
         }
     }
 }
-

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2024-2026 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Layouts 1.15
@@ -14,6 +17,7 @@ TitleBar {
     property bool isRecording: false
     property bool isRecordingAudio: false  
     property bool isSearching: false
+    property bool isVoiceToText: false
     property bool recorderBtnEnable: true
     property bool recordingHover: false
     property bool recordBtnEnabled: recordBtn.enabled
@@ -52,7 +56,7 @@ TitleBar {
         anchors.left: titleBar.left
         anchors.leftMargin: 10
         anchors.verticalCenter: titleBar.verticalCenter
-        enabled: !isPlaying && !isSearching && !isRecordingAudio
+        enabled: !isPlaying && !isSearching && !isRecordingAudio && !isVoiceToText
         hoverEnabled: !isInitialInterface
         icon.name: "new_note"
 

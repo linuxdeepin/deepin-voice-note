@@ -1,5 +1,5 @@
-// Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// Copyright (C) 2019 ~ 2026 Uniontech Software Technology Co.,Ltd.
+// SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -18,6 +18,7 @@
 #include "handler/web_engine_handler.h"
 #include "handler/vnote_message_dialog_handler.h"
 #include "handler/voice_recoder_handler.h"
+#include "handler/voice_to_text_task_manager.h"
 #include "audio/recording_curves.h"
 #include "dbus/VoiceNoteDBusService.h"
 
@@ -295,16 +296,25 @@ void VNoteMainManager::vNoteCreateFolder()
     qInfo() << "Folder creation finished";
 }
 
-void VNoteMainManager::vNoteDeleteFolder(const int &index)
+bool VNoteMainManager::vNoteDeleteFolder(const int &index)
 {
     qDebug() << "Deleting folder at index:" << index;
     // 录音或播放中禁止删除
     if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording
         || OpsStateInterface::instance()->isPlaying()) {
         qWarning() << "Cannot delete folder while recording or playing";
-        return;
+        return false;
     }
     VNoteFolder *folder = getFloderByIndex(index);
+    if (!folder) {
+        qWarning() << "Invalid folder index for deletion:" << index;
+        return false;
+    }
+
+    if (hasActiveVoiceToTextTaskInFolder(folder->id)) {
+        qWarning() << "Cannot delete folder while voice-to-text is converting, folder ID:" << folder->id;
+        return false;
+    }
 
     int listIndex = m_folderSort.indexOf(QString::number(folder->id));
     if (-1 != listIndex) {
@@ -313,14 +323,11 @@ void VNoteMainManager::vNoteDeleteFolder(const int &index)
     }
 
     setting::instance()->setOption(VNOTE_FOLDER_SORT, m_folderSort.join(","));
-    if (folder) {
-        VNoteFolderOper folderOper(folder);
-        folderOper.deleteVNoteFolder(folder);
-        qDebug() << "Folder deleted successfully";
-    } else {
-        qWarning() << "Invalid folder index for deletion:" << index;
-    }
+    VNoteFolderOper folderOper(folder);
+    folderOper.deleteVNoteFolder(folder);
+    qDebug() << "Folder deleted successfully";
     qInfo() << "Folder deletion finished";
+    return true;
 }
 
 void VNoteMainManager::vNoteChanged(const int &index)
@@ -577,6 +584,11 @@ void VNoteMainManager::saveAs(const QVariantList &index, const QString &path, Sa
 VNoteFolder *VNoteMainManager::getFloderByIndex(const int &index)
 {
     qInfo() << "Getting folder by index:" << index;
+    if (index < 0 || index >= m_folderSort.size()) {
+        qWarning() << "Invalid folder index:" << index;
+        return nullptr;
+    }
+
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
     int tmpIndex = m_folderSort.at(index).toInt();
     if (folders) {
@@ -647,7 +659,7 @@ VNoteItem *VNoteMainManager::deleteNoteById(const int &id)
     return nullptr;
 }
 
-void VNoteMainManager::deleteNote(const QList<int> &index)
+bool VNoteMainManager::deleteNote(const QList<int> &index)
 {
     // 删除之前清空JS详情页内容
     qDebug() << "Deleting" << index.size() << "notes";
@@ -655,12 +667,23 @@ void VNoteMainManager::deleteNote(const QList<int> &index)
     if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording
         || OpsStateInterface::instance()->isPlaying()) {
         qWarning() << "Cannot delete note while recording or playing";
-        return;
+        return false;
     }
+    for (int noteId : index) {
+        if (hasActiveVoiceToTextTaskForNote(noteId)) {
+            qWarning() << "Cannot delete note while voice-to-text is converting, note ID:" << noteId;
+            return false;
+        }
+    }
+
     m_richTextManager->clearJSContent();
     QList<VNoteItem *> noteDataList;
     for (int i = 0; i < index.size(); i++) {
         VNoteItem *note = getNoteById(index.at(i));
+        if (!note) {
+            qWarning() << "Failed to get note by ID for deletion:" << index.at(i);
+            continue;
+        }
         noteDataList.append(note);
         if (note->isTop)
             m_currentHasTop--;
@@ -689,15 +712,64 @@ void VNoteMainManager::deleteNote(const QList<int> &index)
         emit notesDeleted(variantMap);
     } else {
         qWarning() << "No notes to delete";
+        return false;
     }
     qInfo() << "Note deletion finished";
+    return true;
+}
+
+bool VNoteMainManager::hasActiveVoiceToTextTaskForNote(int noteId) const
+{
+    const QList<VoiceToTextTask> tasks = VoiceToTextTaskManager::instance()->getTasksForNote(noteId);
+    for (const auto &task : tasks) {
+        if (task.status == VoiceToTextTask::Converting) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool VNoteMainManager::hasActiveVoiceToTextTaskInFolder(qint64 folderId) const
+{
+    VNOTE_ALL_NOTES_MAP *noteAll = VNoteDataManager::instance()->getAllNotesInFolder();
+    if (!noteAll) {
+        return false;
+    }
+
+    noteAll->lock.lockForRead();
+    auto folderIt = noteAll->notes.constFind(folderId);
+    if (folderIt == noteAll->notes.constEnd() || !folderIt.value()) {
+        noteAll->lock.unlock();
+        return false;
+    }
+
+    VNOTE_ITEMS_MAP *folderNotes = folderIt.value();
+    folderNotes->lock.lockForRead();
+    bool hasActiveTask = false;
+    for (auto note : folderNotes->folderNotes) {
+        if (note && hasActiveVoiceToTextTaskForNote(note->noteId)) {
+            hasActiveTask = true;
+            break;
+        }
+    }
+    folderNotes->lock.unlock();
+    noteAll->lock.unlock();
+
+    return hasActiveTask;
 }
 
 void VNoteMainManager::moveNotes(const QVariantList &index, const int &folderIndex)
 {
     qDebug() << "Moving" << index.size() << "notes to folder index:" << folderIndex;
+    for (const QVariant &noteId : index) {
+        if (hasActiveVoiceToTextTaskForNote(noteId.toInt())) {
+            qWarning() << "Cannot move note while voice-to-text is converting, note ID:" << noteId.toInt();
+            return;
+        }
+    }
+
     VNOTE_FOLDERS_MAP *folders = VNoteDataManager::instance()->getNoteFolders();
-    if (index.isEmpty() || folderIndex < 0 || folderIndex >= folders->folders.size()) {
+    if (!folders || index.isEmpty() || folderIndex < 0 || folderIndex >= folders->folders.size()) {
         qWarning() << "Invalid move parameters";
         return;
     }

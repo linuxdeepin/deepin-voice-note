@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2024-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -181,6 +181,7 @@ Item {
             multipleChoicesLoader.visible = true;
             multipleChoicesLoader.item.visible = true;
             multipleChoicesLoader.item.selectSize = choices;
+            multipleChoicesLoader.item.setOperationEnabled(!rootItem.isVoiceToText, !rootItem.isVoiceToText);
         } else {
             multipleChoicesLoader.visible = false;
             webVisible = true;
@@ -208,6 +209,7 @@ Item {
             imageBtnEnable: webVisible
             isInitialInterface: initialVisible
             isRecordingAudio: rootItem.isRecordingAudio 
+            isVoiceToText: rootItem.isVoiceToText
 
             onTitleOpenSetting: {
                 rootItem.openSetting();
@@ -677,6 +679,11 @@ Item {
         onSaveVoiceStateChanged: enabled => {
             if (multipleChoicesLoader.active && multipleChoicesLoader.item) {
                 multipleChoicesLoader.item.setSaveVoiceEnabled(enabled);
+            }
+        }
+        onVoiceToTextStateChanged: isConverting => {
+            if (multipleChoicesLoader.active && multipleChoicesLoader.item) {
+                multipleChoicesLoader.item.setOperationEnabled(!isConverting, !isConverting);
             }
         }
     }
