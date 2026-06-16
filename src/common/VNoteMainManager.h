@@ -10,8 +10,8 @@
 #include "vnoteforlder.h"
 #include "vnoteitem.h"
 
-#include <QVariantMap>
 #include <QEventLoop>
+#include <QVariantMap>
 
 class WebRichTextManager;
 class VoiceNoteDBusService;
@@ -55,6 +55,7 @@ public:
     Q_INVOKABLE QString getNotePlainTitle(const int &noteId);
     Q_INVOKABLE void vNoteSearch(const QString &text);
     Q_INVOKABLE void updateNoteWithResult(const QString &result);
+    Q_INVOKABLE void updateNoteWithResultForNote(int noteId, const QString &result);
     Q_INVOKABLE int loadSearchNotes(const QString &key);
     Q_INVOKABLE int loadAudioSource();
     Q_INVOKABLE void changeAudioSource(const int &source);
@@ -102,7 +103,7 @@ signals:
     void noSearchResult();
     void searchFinished(const QList<QVariantMap> &notesData, const QString &key);
     void moveFinished(const QVariantList &index, const int &srcFolderIndex, const int &dstFolderIndex);
-    void needUpdateNote();
+    void needUpdateNote(int noteId);
     void updateRichTextSearch(const QString &key);
     void scrollChange(const bool &isTop);
     void updateEditNote(const int &noteId, const QString &time);
@@ -119,9 +120,15 @@ private slots:
     void onExportFinished(int err);
     void onNoteChanged();
     void updateSearch();
-    void exitWithSave();
+    void onRichTextSaveFinished();
 
 private:
+    enum class PendingAction {
+        None,
+        SwitchNote,
+        CreateNote
+    };
+
     VNoteMainManager();
     void initData();
     void initConnections();
@@ -131,6 +138,9 @@ private:
     void loadSettings();
     bool hasActiveVoiceToTextTaskForNote(int noteId) const;
     bool hasActiveVoiceToTextTaskInFolder(qint64 folderId) const;
+    bool saveCurrentNoteBeforeAction(PendingAction action, int noteId = -1);
+    void doSwitchNote(int noteId);
+    void doCreateNote();
 
     VNoteItem* deleteNoteById(const int &id);
 
@@ -144,6 +154,8 @@ private:
     VoiceNoteDBusService *m_dbusService {nullptr};
     QString m_searchText;
     QEventLoop m_eventloop;
+    PendingAction m_pendingAction {PendingAction::None};
+    int m_pendingNoteId {-1};
 };
 
 #endif // VNOTEMAINMANAGER_H

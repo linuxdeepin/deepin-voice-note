@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
 #include "webrichetextmanager.h"
 #include "jscontent.h"
 #include "db/vnoteitemoper.h"
@@ -56,6 +59,8 @@ void WebRichTextManager::initConnect()
     qInfo() << "Initializing connections";
     connect(JsContent::instance(), &JsContent::textChange, this, [=](){
         m_textChange = true;
+        m_textChangeNoteId = m_noteData ? m_noteData->noteId : -1;
+        ++m_textChangeSerial;
         emit noteTextChanged();
     });
 
@@ -129,9 +134,35 @@ void WebRichTextManager::updateNote()
 {
     // qInfo() << "Updating note, text change flag:" << m_textChange;
     if (m_textChange) {
-        emit needUpdateNote();
+        if (m_updateInProgress) {
+            return;
+        }
+        m_updateInProgress = true;
+        m_updateRequestNoteId = m_textChangeNoteId;
+        m_updateRequestSerial = m_textChangeSerial;
+        emit needUpdateNote(m_updateRequestNoteId);
     }
     // qInfo() << "Note update finished";
+}
+
+bool WebRichTextManager::hasPendingTextChange() const
+{
+    return m_textChange;
+}
+
+int WebRichTextManager::pendingTextChangeNoteId() const
+{
+    return m_textChangeNoteId;
+}
+
+int WebRichTextManager::currentNoteId() const
+{
+    return m_noteData ? m_noteData->noteId : -1;
+}
+
+void WebRichTextManager::requestUpdateNoteNow()
+{
+    updateNote();
 }
 
 void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &result)
@@ -139,16 +170,27 @@ void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &
     qDebug() << "Updating note with result";
     if (!data) {
         qWarning() << "onUpdateNoteWithResult called with null data, skip";
+        m_updateInProgress = false;
+        m_updateRequestNoteId = -1;
+        m_updateRequestSerial = 0;
+        emit finishedUpdateNote();
         return;
     }
     data->htmlCode = result;
     VNoteItemOper noteOps(data);
-    if (!noteOps.updateNote()) {
+    const bool updateOk = noteOps.updateNote();
+    if (!updateOk) {
         qWarning() << "Failed to save note";
     } else {
         qDebug() << "Note saved successfully";
     }
-    m_textChange = false;
+    if (updateOk && data->noteId == m_textChangeNoteId && m_updateRequestSerial == m_textChangeSerial) {
+        m_textChange = false;
+        m_textChangeNoteId = -1;
+    }
+    m_updateInProgress = false;
+    m_updateRequestNoteId = -1;
+    m_updateRequestSerial = 0;
     emit finishedUpdateNote();
     qInfo() << "Note update with result finished";
 }

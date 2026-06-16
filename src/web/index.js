@@ -215,6 +215,28 @@ function setInitFont(initFontName) {
 // 全局变量：存储 AppData 基准路径，仅用于编辑区内图片/音频路径转换
 var globalAppDataBase = null;
 
+function appImageRelPath(path) {
+    var normalized = (path || '').replace(/\\/g, '/');
+    if (normalized.indexOf('images/') === 0) {
+        return normalized;
+    }
+    if (globalAppDataBase && normalized.indexOf(globalAppDataBase + 'images/') === 0) {
+        return normalized.substring(globalAppDataBase.length);
+    }
+    return '';
+}
+
+function appImageUrl(relPath) {
+    if (!globalAppDataBase || relPath.indexOf('images/') !== 0) {
+        return '';
+    }
+    try {
+        return new URL(relPath, globalAppDataBase).href;
+    } catch (e) {
+        return '';
+    }
+}
+
 // 建立通信
 new QWebChannel(qt.webChannelTransport,
     function (channel) {
@@ -635,6 +657,9 @@ document.addEventListener('paste', function (event) {
     }
     setFocusScroll()
     removeNullP()
+    if (webobj && initFinish) {
+        webobj.jsCallTxtChange();
+    }
 });
 
 // 页面滚动到光标位置
@@ -767,19 +792,10 @@ function getHtml() {
     // 确保图片保存为相对路径
     $cloneCode.find('img').each(function () {
         var $img = $(this);
-        var relPath = $img.attr('data-rel-path');
+        var relPath = appImageRelPath($img.attr('data-rel-path')) || appImageRelPath($img.attr('src'));
         if (relPath) {
             $img.attr('src', relPath);
             $img.removeAttr('data-rel-path');
-        } else {
-            // 如果没有 data-rel-path，尝试从当前 src 提取相对路径
-            var src = $img.attr('src') || '';
-            if (src.indexOf('images/') >= 0) {
-                var idx = src.lastIndexOf('images/');
-                if (idx >= 0) {
-                    $img.attr('src', src.substring(idx));
-                }
-            }
         }
     });
     
@@ -1084,17 +1100,11 @@ function setHtml(html) {
     if (globalAppDataBase) {
         $('.note-editable img').each(function () {
             var $img = $(this);
-            var src = $img.attr('src') || '';
-            // 如果是相对路径 images/xxx，转换为绝对路径显示
-            if (src.indexOf('images/') === 0 || (src.indexOf('/images/') > 0 && !src.startsWith('file://') && !src.startsWith('http'))) {
-                var relPath = src.indexOf('images/') >= 0 ? src.substring(src.lastIndexOf('images/')) : src;
-                try {
-                    var absUrl = new URL(relPath, globalAppDataBase).href;
-                    $img.attr('src', absUrl);
-                    $img.attr('data-rel-path', relPath);
-                } catch (e) {
-                    // 转换失败，保持原样
-                }
+            var relPath = appImageRelPath($img.attr('src'));
+            var absUrl = relPath ? appImageUrl(relPath) : '';
+            if (absUrl) {
+                $img.attr('src', absUrl);
+                $img.attr('data-rel-path', relPath);
             }
         });
     }
@@ -1708,19 +1718,22 @@ function initVoiceDragAndDrop() {
 async function insertImg(urlStr) {
     // 后端已发送相对路径 images/xxx，显示时转换为绝对路径，保存时保持相对路径
     urlStr.forEach((item) => {
-        var relPath = ('' + item).replace(/\\/g, '/');
+        var rawPath = ('' + item).replace(/\\/g, '/');
+        var relPath = appImageRelPath(rawPath);
         // 显示时使用绝对路径
-        var displayUrl = relPath;
-        if (globalAppDataBase && relPath.indexOf('images/') === 0) {
-            try {
-                displayUrl = new URL(relPath, globalAppDataBase).href;
-            } catch (e) {
-                displayUrl = relPath;
-            }
+        var displayUrl = relPath || rawPath;
+        var appDataUrl = relPath ? appImageUrl(relPath) : '';
+        if (appDataUrl) {
+            displayUrl = appDataUrl;
         }
         $("#summernote").summernote('insertImage', displayUrl, function ($image) {
             // 保存相对路径到 data 属性，保存 HTML 时使用
-            $image.attr('data-rel-path', relPath);
+            if (relPath) {
+                $image.attr('data-rel-path', relPath);
+            }
+            if (webobj && initFinish) {
+                webobj.jsCallTxtChange();
+            }
         });
     })
 }

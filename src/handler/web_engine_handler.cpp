@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2024 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -24,11 +24,13 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QCollator>
+#include <QDir>
 #include <QFile>
 #include <QTimer>
 #include <QCursor>
 #include <QMimeData>
 #include <QUuid>
+#include <QUrl>
 // 条件编译：QWebEngineContextMenuRequest 只在 Qt6 中存在
 #ifndef USE_QT5
 #include <QWebEngineContextMenuRequest>
@@ -64,6 +66,43 @@ const QString DEEPIN_DAEMON_APPEARANCE_INTERFACE = isV20() ? APPEARANCE_INTERFAC
 
 
 DGUI_USE_NAMESPACE
+
+namespace {
+
+QString normalizePicturePath(const QString &path)
+{
+    QString localPath = path;
+    const QUrl url(path);
+    if (url.isLocalFile()) {
+        localPath = url.toLocalFile();
+    }
+
+    const QString normalized = QDir::cleanPath(QDir::fromNativeSeparators(localPath));
+    QString result;
+    const QDir appDataDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+    const QString appImageRoot = QDir::cleanPath(appDataDir.filePath(QStringLiteral("images")));
+    const QString appImageRootWithSep = appImageRoot + QStringLiteral("/");
+
+    if (normalized.startsWith(QStringLiteral("images/"))) {
+        result = QDir::cleanPath(appDataDir.filePath(normalized));
+    } else {
+        if (normalized.startsWith(appImageRootWithSep)) {
+            result = normalized;
+        } else {
+            const QString webImageRoot = QDir::fromNativeSeparators(QStringLiteral(WEB_PATH) + QStringLiteral("/images/"));
+            if (normalized.startsWith(webImageRoot)) {
+                result = QDir::cleanPath(QDir(appImageRoot).filePath(normalized.mid(webImageRoot.size())));
+            }
+        }
+    }
+
+    if (!result.startsWith(appImageRootWithSep)) {
+        return QString();
+    }
+    return result;
+}
+
+}
 
 /*!
  * \class WebEngineHandler
@@ -408,10 +447,12 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
             // 粘贴事件，从剪贴板获取数据
             onPaste(isVoicePaste());
             break;
-        case ActionManager::PictureView:
+        case ActionManager::PictureView: {
             // 查看图片
-            Q_EMIT viewPicture(menuJson.toString());
+            const QString normalizedPath = normalizePicturePath(menuJson.toString());
+            Q_EMIT viewPicture(normalizedPath);
             break;
+        }
         case ActionManager::PictureSaveAs:
             // 另存图片
             savePictureAs();

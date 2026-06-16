@@ -39,6 +39,8 @@
 #include <QProcess>
 #include <QDesktopServices>
 #include <QDebug>
+#include <QImageReader>
+#include <QTimer>
 
 #include <DSysInfo>
 
@@ -91,7 +93,7 @@ void VNoteMainManager::initConnections()
     connect(m_richTextManager, &WebRichTextManager::noteTextChanged, this, &VNoteMainManager::onNoteChanged, Qt::QueuedConnection);
     connect(m_richTextManager, &WebRichTextManager::updateSearch, this, &VNoteMainManager::updateSearch);
     connect(m_richTextManager, &WebRichTextManager::scrollChange, this, &VNoteMainManager::scrollChange);
-    connect(m_richTextManager, &WebRichTextManager::finishedUpdateNote, this, &VNoteMainManager::exitWithSave);
+    connect(m_richTextManager, &WebRichTextManager::finishedUpdateNote, this, &VNoteMainManager::onRichTextSaveFinished);
     connect(VoiceRecoderHandler::instance(), &VoiceRecoderHandler::finishedRecod, this, &VNoteMainManager::insertVoice);
     qInfo() << "Connections initialized";
 }
@@ -337,8 +339,16 @@ void VNoteMainManager::vNoteChanged(const int &index)
         qWarning() << "Invalid note index:" << index;
         return;
     }
-    qDebug() << "Changing to note index:" << index;
-    m_currentNoteId = index;
+    if (index != m_currentNoteId && !saveCurrentNoteBeforeAction(PendingAction::SwitchNote, index)) {
+        return;
+    }
+    doSwitchNote(index);
+}
+
+void VNoteMainManager::doSwitchNote(int noteId)
+{
+    qDebug() << "Changing to note index:" << noteId;
+    m_currentNoteId = noteId;
     VNoteItem *data = getNoteById(m_currentNoteId);
     if (!data) {
         qWarning() << "vNoteChanged resolved to null note, skipping initData";
@@ -483,6 +493,14 @@ void VNoteMainManager::createNote()
         qWarning() << "Cannot create note: No current folder selected";
         return;
     }
+    if (!saveCurrentNoteBeforeAction(PendingAction::CreateNote)) {
+        return;
+    }
+    doCreateNote();
+}
+
+void VNoteMainManager::doCreateNote()
+{
     VNoteFolder *currentFolder = getFloderById(m_currentFolderIndex);
     if (currentFolder == nullptr) {
         qWarning() << "Cannot create note: Current folder not found for ID:" << m_currentFolderIndex;
@@ -854,13 +872,17 @@ void VNoteMainManager::onExportFinished(int err)
 void VNoteMainManager::onNoteChanged()
 {
     qInfo() << "Note changed, updating modification time";
-    VNoteItem *note = getNoteById(m_currentNoteId);
+    int changedNoteId = m_richTextManager ? m_richTextManager->pendingTextChangeNoteId() : -1;
+    if (changedNoteId < 0) {
+        changedNoteId = m_currentNoteId;
+    }
+    VNoteItem *note = getNoteById(changedNoteId);
     if (!note) {
-        qWarning() << "onNoteChanged: current note not found, id=" << m_currentNoteId << ", skip";
+        qWarning() << "onNoteChanged: changed note not found, id=" << changedNoteId << ", current=" << m_currentNoteId << ", skip";
         return;
     }
     note->modifyTime = QDateTime::currentDateTime();
-    emit updateEditNote(m_currentNoteId, Utils::convertDateTime(note->modifyTime));
+    emit updateEditNote(changedNoteId, Utils::convertDateTime(note->modifyTime));
     qInfo() << "Note change handling finished";
 }
 
@@ -876,12 +898,51 @@ void VNoteMainManager::updateSearch()
     qInfo() << "Search update finished";
 }
 
-void VNoteMainManager::exitWithSave()
+void VNoteMainManager::onRichTextSaveFinished()
 {
-    qInfo() << "Exiting with save";
-    if (m_eventloop.isRunning())
-        m_eventloop.quit();
-    qInfo() << "Exit with save finished";
+    if (m_pendingAction == PendingAction::None) {
+        return;
+    }
+
+    if (m_richTextManager && m_richTextManager->hasPendingTextChange()) {
+        qWarning() << "Pending note action canceled because rich text save did not finish successfully";
+        m_pendingAction = PendingAction::None;
+        m_pendingNoteId = -1;
+        return;
+    }
+
+    const PendingAction action = m_pendingAction;
+    const int noteId = m_pendingNoteId;
+    m_pendingAction = PendingAction::None;
+    m_pendingNoteId = -1;
+
+    if (action == PendingAction::SwitchNote) {
+        doSwitchNote(noteId);
+    } else if (action == PendingAction::CreateNote) {
+        doCreateNote();
+    }
+}
+
+bool VNoteMainManager::saveCurrentNoteBeforeAction(PendingAction action, int noteId)
+{
+    if (!m_richTextManager || !m_richTextManager->hasPendingTextChange()) {
+        return true;
+    }
+
+    const int pendingNoteId = m_richTextManager->pendingTextChangeNoteId();
+    const int richTextNoteId = m_richTextManager->currentNoteId();
+    if (pendingNoteId < 0 || pendingNoteId != richTextNoteId) {
+        return false;
+    }
+
+    if (m_pendingAction != PendingAction::None) {
+        return false;
+    }
+
+    m_pendingAction = action;
+    m_pendingNoteId = noteId;
+    m_richTextManager->requestUpdateNoteNow();
+    return false;
 }
 
 bool VNoteMainManager::getTop()
@@ -978,8 +1039,14 @@ void VNoteMainManager::vNoteSearch(const QString &text)
 void VNoteMainManager::updateNoteWithResult(const QString &result)
 {
     qInfo() << "Updating note with result";
-    m_richTextManager->onUpdateNoteWithResult(getNoteById(m_currentNoteId), result);
+    updateNoteWithResultForNote(m_currentNoteId, result);
     qInfo() << "Note update with result finished";
+}
+
+void VNoteMainManager::updateNoteWithResultForNote(int noteId, const QString &result)
+{
+    VNoteItem *note = getNoteById(noteId);
+    m_richTextManager->onUpdateNoteWithResult(note, result);
 }
 
 int VNoteMainManager::loadSearchNotes(const QString &key)
@@ -1053,17 +1120,37 @@ void VNoteMainManager::insertImages(const QList<QUrl> &filePaths)
     QString date = currentDateTime.toString("yyyyMMddhhmmss");
 
     for (auto path : filePaths) {
-        QString localPath = path.toLocalFile();
+        if (!path.isLocalFile()) {
+            qWarning() << "Unsupported non-local image URL:" << path;
+            continue;
+        }
+        QString localPath = QDir::cleanPath(path.toLocalFile());
         QFileInfo fileInfo(localPath);
-        QString suffix = fileInfo.suffix();
-        if (!(suffix == "jpg" || suffix == "png" || suffix == "bmp")) {
-            qWarning() << "Unsupported image format:" << suffix;
+        if (!fileInfo.exists() || !fileInfo.isFile()) {
+            qWarning() << "Image file does not exist or is not a file:" << localPath;
+            continue;
+        }
+        QImageReader imageReader(localPath);
+        if (!imageReader.canRead()) {
+            qWarning() << "Invalid image file:" << localPath;
+            continue;
+        }
+        QString suffix = fileInfo.suffix().toLower();
+        if (suffix.isEmpty()) {
+            suffix = QString::fromLatin1(imageReader.format()).toLower();
+        }
+        if (suffix == QStringLiteral("jpeg")) {
+            suffix = QStringLiteral("jpg");
+        }
+        if (suffix.isEmpty()) {
+            qWarning() << "Unsupported image format:" << localPath;
             continue;
         }
         //创建文件路径
         QString newPath = QString("%1/%2_%3.%4").arg(dirPath).arg(date).arg(++count).arg(suffix);
-        if (QFile::copy(QUrl(path).toLocalFile(), newPath)) {
-            paths.push_back(newPath);
+        if (QFile::copy(localPath, newPath)) {
+            const QString fileName = QString("%1_%2.%3").arg(date).arg(count).arg(suffix);
+            paths.push_back(QString("images/") + fileName);
         }
     }
     if (!paths.isEmpty()) {

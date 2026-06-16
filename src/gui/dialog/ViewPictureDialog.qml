@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
@@ -8,6 +11,15 @@ Window {
     id: root
 
     property string filePath: ""
+    readonly property string imageSource: {
+        if (filePath.length === 0) {
+            return "";
+        }
+        if (filePath.indexOf("file://") === 0 || filePath.indexOf("qrc:/") === 0) {
+            return filePath;
+        }
+        return "file://" + filePath;
+    }
 
     color: "transparent"
     flags: Qt.FramelessWindowHint
@@ -34,7 +46,7 @@ Window {
 
         anchors.centerIn: backRect
         fillMode: Image.PreserveAspectFit
-        source: "file:///" + filePath
+        source: root.imageSource
         z: 100
 
         onStatusChanged: {

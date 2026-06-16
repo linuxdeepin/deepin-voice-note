@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
 #ifndef WEBRICHTEXTMANAGER_H
 #define WEBRICHTEXTMANAGER_H
 
@@ -18,6 +21,10 @@ public:
     void clearJSContent();
 
     void initUpdateTimer();
+    bool hasPendingTextChange() const;
+    int pendingTextChangeNoteId() const;
+    int currentNoteId() const;
+    void requestUpdateNoteNow();
 
 public slots:
     void onLoadFinsh();
@@ -31,7 +38,7 @@ public slots:
     void insertVoiceItem(const QString &voicePath, qint64 voiceSize);
 
 signals:
-    void needUpdateNote();
+    void needUpdateNote(int noteId);
     void noteTextChanged();
     void updateSearch();
     void scrollChange(const bool &isTop);
@@ -45,6 +52,11 @@ private:
     QTimer *m_updateTimer {nullptr};
 
     bool m_textChange {false};
+    int m_textChangeNoteId {-1};
+    bool m_updateInProgress {false};
+    int m_updateRequestNoteId {-1};
+    quint64 m_textChangeSerial {0};
+    quint64 m_updateRequestSerial {0};
     QPoint m_mouseClickPos {-1, -1}; //鼠标点击位置
     bool m_setFocus {false}; //是否设置焦点
     //右键菜单

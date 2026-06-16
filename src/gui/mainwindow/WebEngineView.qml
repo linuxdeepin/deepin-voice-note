@@ -614,9 +614,10 @@ Item {
     Connections {
         target: VNoteMainManager
 
-        onNeedUpdateNote: {
+        onNeedUpdateNote: function(noteId) {
+            var requestNoteId = noteId;
             webView.runJavaScript("getHtml()", function (result) {
-                VNoteMainManager.updateNoteWithResult(result);
+                VNoteMainManager.updateNoteWithResultForNote(requestNoteId, result);
             });
         }
         onScrollChange: isTop => {
