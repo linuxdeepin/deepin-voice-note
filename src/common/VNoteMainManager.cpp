@@ -534,8 +534,7 @@ void VNoteMainManager::doCreateNote()
     data.insert(NOTE_ID_KEY, newNote->noteId);
 
     emit addNoteAtHead(data);
-    m_richTextManager->initData(newNote, "");
-    m_richTextManager->clearJSContent();
+    m_richTextManager->initData(newNote, "", true);
     qInfo() << "Note creation finished";
 }
 

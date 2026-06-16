@@ -67,6 +67,7 @@ void WebRichTextManager::initConnect()
     connect(JsContent::instance(), &JsContent::scrollTopChange, this, [=](bool isTop){
         emit scrollChange(isTop);
     });
+    connect(JsContent::instance(), &JsContent::setDataFinsh, this, &WebRichTextManager::onSetDataFinsh);
     qInfo() << "Connections initialized";
 }
 
@@ -239,18 +240,22 @@ void WebRichTextManager::onLoadFinsh()
 void WebRichTextManager::clearJSContent()
 {
     qDebug() << "Clearing JS content";
-    connect(JsContent::instance(), &JsContent::setDataFinsh, this, &WebRichTextManager::onSetDataFinsh);
     emit JsContent::instance()->callJsSetHtml("");
 
     // 开启100ms事件循环，保证js页面内容被刷新
     QEventLoop eveLoop;
     QTimer::singleShot(100, &eveLoop, SLOT(quit()));
     eveLoop.exec();
-    disconnect(JsContent::instance(), &JsContent::setDataFinsh, this, &WebRichTextManager::onSetDataFinsh);
     qDebug() << "JS content cleared";
 }
 
 void WebRichTextManager::onSetDataFinsh()
 {
     qInfo() << "Set data finished";
+    if (!m_setFocus) {
+        return;
+    }
+
+    m_setFocus = false;
+    emit JsContent::instance()->callJsFocusEditor();
 }

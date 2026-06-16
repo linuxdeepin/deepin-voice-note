@@ -1,5 +1,4 @@
-// Copyright (C) 2019 ~ 2019 UnionTech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2019-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -81,6 +80,7 @@ signals:
     void calllJsShowEditToolbar(int x, int y); //显示编辑工具栏
     void callJsHideEditToolbar(); //隐藏编辑工具栏
     void callJsSetVoicePlayBtnEnable(bool enable); //设置播放按钮是否可用
+    void callJsFocusEditor(); //聚焦富文本编辑器
 
     void callJsVoicePlayProgressChanged(int progressMs);    // 通知前端播放进度变更
     void callJsDeleteSelection();                           // 通知前端删除当前选中内容

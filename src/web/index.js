@@ -270,6 +270,7 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsHideEditToolbar.connect(hideRightMenu);
         webobj.callJsClipboardDataChanged.connect(shearPlateChange);
         webobj.callJsSetVoicePlayBtnEnable.connect(playButColor);
+        webobj.callJsFocusEditor.connect(focusEditor);
         webobj.callJsSetFontList.connect(setFontList);
 
         webobj.callJsVoicePlayProgressChanged.connect(updateProgressBar);
@@ -941,10 +942,9 @@ function initData(text) {
     })
 
     $('#summernote').summernote('code', html);
-    // 搜索功能
-    webobj.jsCallSetDataFinsh();
     initFinish = true;
     $('#summernote').summernote('editor.resetRecord')
+    webobj.jsCallSetDataFinsh();
 }
 
 /**
@@ -964,6 +964,10 @@ function playButColor(status) {
     } else {
         setVoiceButColor(global_activeColor, global_disableColor)
     }
+}
+
+function focusEditor() {
+    $('#summernote').summernote('editor.focus')
 }
 
 //录音插入数据
@@ -1127,13 +1131,12 @@ function setHtml(html) {
         webobj.jsCallTxtChange();
     }
     
-    // 搜索功能
-    webobj.jsCallSetDataFinsh();
     resetScroll()
     $('#summernote').summernote('editor.resetRecord')
 
     // We need call once at init, ensure the foreground color / background color is correct.
     switchTextColor(global_theme == 2)
+    webobj.jsCallSetDataFinsh();
 }
 
 /**

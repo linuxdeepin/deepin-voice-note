@@ -38,6 +38,10 @@ Item {
         webView.triggerWebAction(5);
     }
 
+    function focusWebView() {
+        webView.forceActiveFocus();
+    }
+
     function showJsContextMenu() {
         // 仅在编辑区可见时尝试弹出；是否在编辑器内由JS自行判断
         if (webVisible) {

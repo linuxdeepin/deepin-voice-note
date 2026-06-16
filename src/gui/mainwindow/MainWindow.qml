@@ -336,7 +336,7 @@ ApplicationWindow {
             itemListView.selectSize = 1;
             itemListView.changeCurrentIndex(topSize);
             folderListView.addNote(1);
-            itemListView.forceActiveFocus();
+            webEngineView.focusWebView();
         }
 
         function sortDescending(array) {
