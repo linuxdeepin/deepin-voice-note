@@ -78,6 +78,13 @@ public:
     Q_INVOKABLE int currentNoteId() const;
 
     /**
+     * @brief 检查指定笔记是否有文本内容
+     * @param noteId 笔记 ID
+     * @return true 有文本内容，false 无文本内容
+     */
+    Q_INVOKABLE bool hasNoteText(int noteId);
+
+    /**
      * @brief 在指定笔记的 HTML 中插入语音转文字结果
      * @param noteId 笔记 ID
      * @param voiceId 语音块唯一标识（UUID，用于精确定位语音元素）

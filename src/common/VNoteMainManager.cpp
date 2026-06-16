@@ -1126,6 +1126,15 @@ bool VNoteMainManager::isInSearchMode() const
     return !m_searchText.isEmpty();
 }
 
+bool VNoteMainManager::hasNoteText(int noteId)
+{
+    VNoteItem *item = getNoteById(noteId);
+    if (item) {
+        return item->haveText();
+    }
+    return false;
+}
+
 void VNoteMainManager::preViewShortcut(const QPointF &point)
 {
     // qInfo() << "Previewing shortcut at point:" << point.x() << "," << point.y();

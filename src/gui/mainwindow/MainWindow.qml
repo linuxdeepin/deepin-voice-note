@@ -173,6 +173,31 @@ ApplicationWindow {
             VoiceRecoderHandler.startRecoder();
         }
         onSaveNote: {
+            // 检查是否有笔记可以保存
+            if (initRect.visible) {
+                console.warn("当前没有打开任何笔记本，不执行保存操作");
+                return;
+            }
+
+            // 检查笔记列表是否为空
+            if (itemListView.model.count === 0) {
+                console.warn("当前笔记列表为空，不执行保存操作");
+                return;
+            }
+
+            // 检查当前笔记ID是否有效
+            var currentNoteId = VNoteMainManager.currentNoteId();
+            if (currentNoteId <= 0) {
+                console.warn("当前没有选中的笔记，不执行保存操作");
+                return;
+            }
+
+            // Ctrl+S 保存为 txt，只检查是否有文本内容，与右键菜单逻辑保持一致
+            if (!VNoteMainManager.hasNoteText(currentNoteId)) {
+                console.warn("当前笔记没有文本内容，不执行保存操作");
+                return;
+            }
+
             itemListView.onSaveNote();
         }
         onSaveVoice: {
