@@ -374,21 +374,24 @@ void VNoteMainManager::vNoteChangedWithUIUpdate(const int &noteId)
 
 struct NoteCompare {
     bool operator()(const QVariantMap &a, const QVariantMap &b) const {
-        // 比较 isTop 字段
+        // 置顶笔记排在普通笔记前面
         bool aIsTop = a.value(NOTE_ISTOP_KEY).toBool();
         bool bIsTop = b.value(NOTE_ISTOP_KEY).toBool();
 
         if (aIsTop != bIsTop) {
-            // 如果 isTop 不相同，则 isTop 为 true 的排在前面
             return aIsTop > bIsTop;
-        } else {
-            // 如果 isTop 相同，则根据 modifyTime 排序
-            QDateTime aModifyTime = QDateTime::fromString(a.value(NOTE_MODIFY_TIME_KEY).toString(), "yyyy-MM-dd hh:mm:ss");
-            QDateTime bModifyTime = QDateTime::fromString(b.value(NOTE_MODIFY_TIME_KEY).toString(), "yyyy-MM-dd hh:mm:ss");
+        }
 
-            // 对于相同 isTop 的笔记，按照最近修改时间降序排列
+        // 相同置顶状态下，按最近修改时间降序排列
+        QDateTime aModifyTime = QDateTime::fromString(a.value(NOTE_MODIFY_TIME_KEY).toString(), "yyyy-MM-dd hh:mm:ss");
+        QDateTime bModifyTime = QDateTime::fromString(b.value(NOTE_MODIFY_TIME_KEY).toString(), "yyyy-MM-dd hh:mm:ss");
+
+        if (aModifyTime != bModifyTime) {
             return aModifyTime > bModifyTime;
         }
+
+        // 修改时间相同时，按笔记ID降序避免同秒创建的笔记顺序不稳定
+        return a.value(NOTE_ID_KEY).toInt() > b.value(NOTE_ID_KEY).toInt();
     }
 };
 
@@ -852,7 +855,9 @@ void VNoteMainManager::updateTop(const int &id, const bool &top)
         data.insert(NOTE_ID_KEY, it->noteId);
         notesDataList.append(data);
     }
+
     std::sort(notesDataList.begin(), notesDataList.end(), NoteCompare());
+
     auto it = std::find_if(notesDataList.begin(), notesDataList.end(), [id](const QVariantMap &item)->bool {
         return item.value("noteId").toInt() == id;
     });
