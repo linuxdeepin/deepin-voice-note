@@ -47,30 +47,17 @@ DialogWindow {
 
             ScrollBar.vertical: ScrollBar {
             }
-            delegate: ItemDelegate {
-                backgroundVisible: true
+            delegate: Rectangle {
+                id: folderItem
+
+                property bool isHovered: false
+
+                color: index === dialog.index
+                    ? palette.highlight
+                    : (isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
                 height: 30
-                spacing: 8
+                radius: 6
                 width: 336
-
-                // 条件设置normalBackgroundVisible属性，仅在支持的DTK版本中使用
-                Component.onCompleted: {
-                    if (DTK.majorVersion >= 6) {
-                        // 在DTK 6.x中可能支持此属性
-                        if (typeof normalBackgroundVisible !== "undefined") {
-                            normalBackgroundVisible = index % 2 === 0;
-                        }
-                    }
-                }
-
-                onClicked: dialog.index = index
-
-                background: Rectangle {
-                    radius: 6
-                    color: index === dialog.index
-                        ? (DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF")
-                        : "transparent"
-                }
 
                 // text: model.name
                 RowLayout {
@@ -124,10 +111,26 @@ DialogWindow {
 
                         Layout.alignment: Qt.AlignVCenter
                         Layout.fillWidth: true
+                        color: index === dialog.index ? palette.highlightedText : DTK.palette.windowText
                         font.pixelSize: 14
                         horizontalAlignment: Text.AlignLeft
                         text: model.name
                         verticalAlignment: Text.AlignVCenter
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+
+                    onClicked: {
+                        dialog.index = index;
+                    }
+                    onEntered: {
+                        folderItem.isHovered = true;
+                    }
+                    onExited: {
+                        folderItem.isHovered = false;
                     }
                 }
             }
