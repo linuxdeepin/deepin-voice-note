@@ -96,7 +96,7 @@ Item {
     function rollDown() {
         if (!scrollTimer.isUp && scrollTimer.running)
             return;
-        if (folderListView.contentY + folderListView.height < folderListView.contentHeight) {
+        if (folderListView.contentY < folderListView.bottomContentY()) {
             scrollTimer.isUp = false;
             scrollTimer.running = true;
         }
@@ -109,7 +109,7 @@ Item {
     function rollUp() {
         if (scrollTimer.isUp && scrollTimer.running)
             return;
-        if (folderListView.contentY > 0) {
+        if (folderListView.contentY > folderListView.topContentY()) {
             scrollTimer.isUp = true;
             scrollTimer.running = true;
         }
@@ -123,20 +123,24 @@ Item {
     }
 
     function updateItems(mousePosX, mousePosY) {
+        folderListView.lastDragMouseX = mousePosX;
+        folderListView.lastDragMouseY = mousePosY;
+        folderListView.sortingFolder = false;
         var pos = mapFromGlobal(mousePosX, mousePosY);
         if (pos.x < 0 || pos.x > listWidth) {
             if (currentDropIndex != -1)
                 currentDropIndex = -1;
+            folderListView.hoverIndex = -1;
             if (lastDropIndex != -1 && lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
                 folderListView.itemAtIndex(lastDropIndex).isHovered = false;
             }
             lastDropIndex = -1;
             return;
         }
-        //判断当前鼠标所在的行
-        var startY = pos.y - 50 > 0 ? pos.y - 50 : 0;
-        var index = Math.floor((pos.y + (verticalScrollBar.position * folderModel.count * itemHeight)) / itemHeight);
+        // 判断当前鼠标所在的行，使用真实内容偏移避免自动滚动时目标行错位
+        var index = Math.floor((pos.y + folderListView.contentY - folderListView.topContentY()) / itemHeight);
         if (index < 0 || index >= folderModel.count) {
+            folderListView.hoverIndex = -1;
             if (lastDropIndex != -1 && lastDropIndex != folderListView.currentIndex && folderListView.itemAtIndex(lastDropIndex)) {
                 folderListView.itemAtIndex(lastDropIndex).isHovered = false;
             }
@@ -151,12 +155,14 @@ Item {
             }
             lastDropIndex = index;
             if (index === folderListView.currentIndex) {
+                folderListView.hoverIndex = -1;
                 return;
             }
         } else {
             return;
         }
         //更新当前行的颜色
+        folderListView.hoverIndex = index;
         if (folderListView.itemAtIndex(index)) {
             folderListView.itemAtIndex(index).isHovered = true;
         }
@@ -244,19 +250,25 @@ Item {
 
         onTriggered: {
             if (isUp) {
-                if (folderListView.contentY <= 0) {
+                var topY = folderListView.topContentY();
+                if (folderListView.contentY <= topY) {
                     running = false;
-                    folderListView.contentY = 0;
+                    folderListView.contentY = topY;
+                    folderListView.refreshDragTargetAfterScroll();
                     return;
                 }
-                folderListView.contentY -= 10;
+                folderListView.contentY = Math.max(topY, folderListView.contentY - 10);
+                folderListView.refreshDragTargetAfterScroll();
             } else {
-                if (folderListView.contentY + folderListView.height >= folderListView.contentHeight) {
+                var bottomY = folderListView.bottomContentY();
+                if (folderListView.contentY >= bottomY) {
                     running = false;
-                    folderListView.contentY = folderListView.contentHeight - folderListView.height;
+                    folderListView.contentY = bottomY;
+                    folderListView.refreshDragTargetAfterScroll();
                     return;
                 }
-                folderListView.contentY += 10;
+                folderListView.contentY = Math.min(bottomY, folderListView.contentY + 10);
+                folderListView.refreshDragTargetAfterScroll();
             }
         }
     }
@@ -295,12 +307,78 @@ Item {
 
         property var contextIndex: -1
         property int dropIndex: -1
+        property int hoverIndex: -1
+        property int lastDragMouseX: -1
+        property int lastDragMouseY: -1
         property var lastCurrentIndex: -1
+        property var dragSourceFolderId: -1
+        property bool sortingFolder: false
+
+        function topContentY() {
+            return originY;
+        }
+
+        function bottomContentY() {
+            return Math.max(topContentY(), originY + contentHeight - height);
+        }
+
+        function indexOfFolderId(folderId) {
+            for (var i = 0; i < folderModel.count; i++) {
+                if (folderModel.get(i).folderId === folderId)
+                    return i;
+            }
+            return -1;
+        }
+
+        function clearDragState() {
+            scrollTimer.running = false;
+            dropLine.visible = false;
+            dropIndex = -1;
+            currentDropIndex = -1;
+            hoverIndex = -1;
+            lastDragMouseX = -1;
+            lastDragMouseY = -1;
+            dragSourceFolderId = -1;
+            sortingFolder = false;
+            if (lastDropIndex !== -1) {
+                var item = itemAtIndex(lastDropIndex);
+                if (item)
+                    item.isHovered = false;
+            }
+            lastDropIndex = -1;
+            dragControl.visible = false;
+            dragControl.imageSource = "";
+        }
+
+        function refreshDragTargetAfterScroll() {
+            if (lastDragMouseX < 0 || lastDragMouseY < 0)
+                return;
+
+            if (sortingFolder) {
+                indexAt(lastDragMouseX, lastDragMouseY);
+            } else if (currentDropIndex !== -1 || lastDropIndex !== -1) {
+                root.updateItems(lastDragMouseX, lastDragMouseY);
+            }
+        }
+
+        function updateDropLinePosition(lineY) {
+            var maxY = Math.max(0, height - dropLine.implicitHeight);
+            dropLine.y = Math.max(0, Math.min(lineY, maxY));
+            dropLine.visible = true;
+        }
 
         function indexAt(mousePosX, mousePosY) {
+            lastDragMouseX = mousePosX;
+            lastDragMouseY = mousePosY;
+            sortingFolder = true;
+            if (folderModel.count === 0) {
+                dropIndex = -1;
+                dropLine.visible = false;
+                return;
+            }
             var pos = mapFromGlobal(mousePosX, mousePosY);
             var startY = itemHeight * 0.5;
-            var index = Math.floor((pos.y - startY + (verticalScrollBar.position * folderModel.count * itemHeight)) / itemHeight) + 1;
+            var index = Math.floor((pos.y - startY + contentY - topContentY()) / itemHeight) + 1;
             if (index < 0) {
                 index = 0;
             }
@@ -308,12 +386,7 @@ Item {
                 index = folderModel.count;
             }
             dropIndex = index;
-            dropLine.visible = true;
-            if (folderListView.itemAtIndex(dropIndex)) {
-                dropLine.y = folderListView.itemAtIndex(dropIndex).y - folderListView.contentY;
-            } else {
-                dropLine.y = folderListView.itemAtIndex(dropIndex - 1).y + folderListView.itemAtIndex(dropIndex - 1).height - folderListView.contentY;
-            }
+            updateDropLinePosition(topContentY() + index * itemHeight - contentY);
         }
 
         anchors.fill: parent
@@ -338,7 +411,7 @@ Item {
             // 录音时：当前文件夹保持正常显示，其他文件夹置灰
             opacity: (isRecordingAudio && index !== folderListView.currentIndex) ? 0.5 : 1.0
 
-            color: index === folderListView.currentIndex ? (root.activeFocus ? palette.highlight : DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF") : (isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
+            color: index === folderListView.currentIndex ? (root.activeFocus ? palette.highlight : DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF") : (folderListView.hoverIndex === index || isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
             enabled: !isPlay || index === folderListView.currentIndex
             height: itemHeight
             radius: 6
@@ -371,7 +444,6 @@ Item {
             onIsRenameChanged: {
                 renameLine.forceActiveFocus();
             }
-
             ToolTip {
                 id: folderItemTip
 
@@ -583,25 +655,43 @@ Item {
                 onPressed: function(mouse) {
                     startMove[0] = mouse.x;
                     startMove[1] = mouse.y;
+                    folderListView.dragSourceFolderId = model.folderId;
                 }
                 onReleased: {
                     startMove = [-1, -1];
                     if (held) {
                         held = false;
-                        dropLine.visible = false;
-                        dragControl.visible = false;
-                        dragControl.imageSource = "";
                         if (folderListView.dropIndex != -1) {
-                            if (folderListView.dropIndex > index) {
-                                folderListView.dropIndex -= 1;
+                            var sourceIndex = folderListView.indexOfFolderId(folderListView.dragSourceFolderId);
+                            if (sourceIndex === -1) {
+                                folderListView.clearDragState();
+                                return;
                             }
-                            if (folderListView.dropIndex != index) {
-                                var tmpIndex = index;
-                                folderModel.move(index, folderListView.dropIndex, 1);
-                                VNoteMainManager.updateSort(tmpIndex, folderListView.dropIndex);
+                            var targetIndex = folderListView.dropIndex;
+                            var currentFolderId = folderListView.currentIndex >= 0 && folderListView.currentIndex < folderModel.count
+                                    ? folderModel.get(folderListView.currentIndex).folderId : -1;
+                            if (targetIndex > sourceIndex) {
+                                targetIndex -= 1;
+                            }
+                            if (targetIndex != sourceIndex) {
+                                folderModel.move(sourceIndex, targetIndex, 1);
+                                folderListView.positionViewAtIndex(targetIndex, ListView.Contain);
+                                var currentIndexAfterMove = folderListView.indexOfFolderId(currentFolderId);
+                                if (currentIndexAfterMove !== -1) {
+                                    folderListView.currentIndex = currentIndexAfterMove;
+                                    folderListView.lastCurrentIndex = currentIndexAfterMove;
+                                    folderListView.contextIndex = currentIndexAfterMove;
+                                }
+                                VNoteMainManager.updateSort(sourceIndex, targetIndex);
                             }
                         }
+                        folderListView.clearDragState();
                     }
+                }
+                onCanceled: {
+                    startMove = [-1, -1];
+                    held = false;
+                    folderListView.clearDragState();
                 }
             }
 
