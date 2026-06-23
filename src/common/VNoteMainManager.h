@@ -59,6 +59,7 @@ public:
     Q_INVOKABLE int loadSearchNotes(const QString &key);
     Q_INVOKABLE int loadAudioSource();
     Q_INVOKABLE void changeAudioSource(const int &source);
+    Q_INVOKABLE bool canInsertImages(const QList<QUrl> &filePaths) const;
     Q_INVOKABLE void insertImages(const QList<QUrl> &filePaths);
     Q_INVOKABLE void checkNoteVoice(const QVariantList &index);
     Q_INVOKABLE void checkNoteText(const QVariantList &index);

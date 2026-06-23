@@ -1110,6 +1110,28 @@ void VNoteMainManager::changeAudioSource(const int &source)
     VoiceRecoderHandler::instance()->changeMode(source);
 }
 
+bool VNoteMainManager::canInsertImages(const QList<QUrl> &filePaths) const
+{
+    if (filePaths.isEmpty())
+        return false;
+
+    for (const QUrl &path : filePaths) {
+        if (!path.isLocalFile())
+            return false;
+
+        const QString localPath = QDir::cleanPath(path.toLocalFile());
+        const QFileInfo fileInfo(localPath);
+        if (!fileInfo.exists() || !fileInfo.isFile())
+            return false;
+
+        QImageReader imageReader(localPath);
+        if (!imageReader.canRead())
+            return false;
+    }
+
+    return true;
+}
+
 void VNoteMainManager::insertImages(const QList<QUrl> &filePaths)
 {
     qDebug() << "Inserting" << filePaths.size() << "images";

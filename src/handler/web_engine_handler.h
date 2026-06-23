@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2024-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -11,6 +11,7 @@
 #include <QObject>
 #include <QRect>
 #include <QEventLoop>
+#include <QUrl>
 
 // 条件编译：根据 Qt 版本包含不同的 WebEngine 头文件
 #ifdef USE_QT5
@@ -99,6 +100,9 @@ public Q_SLOTS:
     void onMenuClicked(ActionManager::ActionKind kind);
     void onPaste(bool isVoice);
 
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
+
 private:
     void initFontsInformation();
     void connectWebContent();
@@ -137,6 +141,9 @@ private:
 
     QStringList m_fontList;  // 字体列表
     QString m_defaultFont;   // 默认字体
+
+    QList<QUrl> m_dragImageCheckUrls;
+    bool m_dragCanInsertImages { false };
 
     QVariant m_callJsResult;  // js 函数调用返回值
     QEventLoop m_callJsLoop;  // js 函数调用等待

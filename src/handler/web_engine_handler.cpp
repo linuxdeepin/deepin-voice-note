@@ -14,6 +14,7 @@
 #include "setting.h"
 #include "globaldef.h"
 #include "common/utils.h"
+#include "common/VNoteMainManager.h"
 
 #include <QApplication>
 #include <QCursor>
@@ -25,7 +26,9 @@
 #include <QJsonObject>
 #include <QCollator>
 #include <QDir>
+#include <QDropEvent>
 #include <QFile>
+#include <QFileInfo>
 #include <QTimer>
 #include <QCursor>
 #include <QMimeData>
@@ -161,10 +164,72 @@ void WebEngineHandler::setTarget(QObject *targetWebEngine)
     qInfo() << "Setting target web engine";
     if (targetWebEngine != m_targetWebEngine) {
         qInfo() << "targetWebEngine is not equal to m_targetWebEngine";
+        if (m_targetWebEngine)
+            m_targetWebEngine->removeEventFilter(this);
         m_targetWebEngine = targetWebEngine;
+        if (m_targetWebEngine)
+            m_targetWebEngine->installEventFilter(this);
         Q_EMIT targetChanged();
     }
     qInfo() << "Target web engine setting finished";
+}
+
+bool WebEngineHandler::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == m_targetWebEngine) {
+        switch (event->type()) {
+        case QEvent::DragEnter: {
+            auto *dropEvent = static_cast<QDropEvent *>(event);
+            const QMimeData *mimeData = dropEvent->mimeData();
+            m_dragImageCheckUrls = mimeData && mimeData->hasUrls() ? mimeData->urls() : QList<QUrl>();
+            m_dragCanInsertImages = !m_dragImageCheckUrls.isEmpty() && VNoteMainManager::instance()->canInsertImages(m_dragImageCheckUrls);
+            if (!m_dragImageCheckUrls.isEmpty() && !m_dragCanInsertImages) {
+                dropEvent->setDropAction(Qt::IgnoreAction);
+                dropEvent->ignore();
+                return true;
+            }
+            break;
+        }
+        case QEvent::DragMove: {
+            auto *dropEvent = static_cast<QDropEvent *>(event);
+            const QMimeData *mimeData = dropEvent->mimeData();
+            if (mimeData && mimeData->hasUrls()) {
+                const QList<QUrl> urls = mimeData->urls();
+                if (urls != m_dragImageCheckUrls) {
+                    m_dragImageCheckUrls = urls;
+                    m_dragCanInsertImages = VNoteMainManager::instance()->canInsertImages(m_dragImageCheckUrls);
+                }
+                if (!m_dragCanInsertImages) {
+                    dropEvent->setDropAction(Qt::IgnoreAction);
+                    dropEvent->ignore();
+                    return true;
+                }
+            }
+            break;
+        }
+        case QEvent::Drop: {
+            auto *dropEvent = static_cast<QDropEvent *>(event);
+            const QMimeData *mimeData = dropEvent->mimeData();
+            const bool canInsertImages = mimeData && mimeData->hasUrls() && VNoteMainManager::instance()->canInsertImages(mimeData->urls());
+            m_dragImageCheckUrls.clear();
+            m_dragCanInsertImages = false;
+            if (mimeData && mimeData->hasUrls() && !canInsertImages) {
+                dropEvent->setDropAction(Qt::IgnoreAction);
+                dropEvent->ignore();
+                return true;
+            }
+            break;
+        }
+        case QEvent::DragLeave:
+            m_dragImageCheckUrls.clear();
+            m_dragCanInsertImages = false;
+            break;
+        default:
+            break;
+        }
+    }
+
+    return QObject::eventFilter(watched, event);
 }
 
 /**
