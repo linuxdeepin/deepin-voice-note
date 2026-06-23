@@ -510,6 +510,8 @@ ApplicationWindow {
             color: DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#101010"
 
             ColumnLayout {
+                id: leftColumnLayout
+
                 anchors.bottomMargin: 10
                 anchors.fill: parent
                 anchors.leftMargin: 10
@@ -523,6 +525,8 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     enabled: !rootWindow.isVoiceToText && !itemListView.isSearching && !webEngineView.titleBar.isSearching
                     opacity: enabled ? 1.0 : 0.4
+                    scrollBarParent: scrollBarOverlay
+                    scrollBarRightOffset: 10
                     webVisible: initRect.visible
                     isRecordingAudio: rootWindow.isRecordingAudio  // 传递录音状态
                     isVoiceToText: rootWindow.isVoiceToText  // 传递语音转文字状态
@@ -925,6 +929,52 @@ ApplicationWindow {
                         itemListView.onSaveNote();
                     }
                 }
+            }
+        }
+    }
+
+    Item {
+        id: scrollBarOverlay
+
+        function updateGeometry() {
+            y = folderListView.mapToItem(parent, 0, 0).y;
+        }
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        clip: true
+        height: folderListView.height
+        visible: leftBgArea.visible
+        z: 50
+
+        Component.onCompleted: Qt.callLater(updateGeometry)
+        onHeightChanged: Qt.callLater(updateGeometry)
+        onVisibleChanged: Qt.callLater(updateGeometry)
+
+        Connections {
+            target: folderListView
+
+            function onHeightChanged() {
+                Qt.callLater(scrollBarOverlay.updateGeometry);
+            }
+            function onYChanged() {
+                Qt.callLater(scrollBarOverlay.updateGeometry);
+            }
+        }
+
+        Connections {
+            target: leftBgArea
+
+            function onYChanged() {
+                Qt.callLater(scrollBarOverlay.updateGeometry);
+            }
+        }
+
+        Connections {
+            target: leftColumnLayout
+
+            function onYChanged() {
+                Qt.callLater(scrollBarOverlay.updateGeometry);
             }
         }
     }
