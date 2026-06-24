@@ -2886,7 +2886,7 @@
          * @return {Object}
          */
         Style.prototype.fromNode = function ($node) {
-            var properties = ['font-family', 'font-size', 'text-align', 'list-style-type', 'line-height'];
+            var properties = ['font-family', 'font-size', 'text-align', 'list-style-type', 'line-height', 'color', 'background-color'];
             var styleInfo = this.jQueryCSS($node, properties) || {};
             styleInfo['font-size'] = parseInt(styleInfo['font-size'], 10);
             return styleInfo;
@@ -6035,6 +6035,53 @@
                     var isChecked = ($$1(item).data('value') + '') === (lineHeight_1 + '');
                     _this.className = isChecked ? 'checked' : '';
                 });
+            }
+            this.updateCurrentColorButton($cont, '.note-color-fore', 'foreColor', styleInfo['color']);
+            this.updateCurrentColorButton($cont, '.note-color-back', 'backColor', styleInfo['background-color']);
+        };
+        Buttons.prototype.normalizeColor = function (color) {
+            if (!color) {
+                return '';
+            }
+            var value = (color + '').trim().toLowerCase().replace(/\s*,\s*/g, ', ');
+            if (value === 'transparent' || /^rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*0(\.0+)?\s*\)$/.test(value)) {
+                return 'transparent';
+            }
+            return value;
+        };
+        Buttons.prototype.updateCurrentColorButton = function ($container, groupSelector, eventName, color) {
+            var _this = this;
+            var normalizedColor = this.normalizeColor(color);
+            if (!normalizedColor) {
+                return;
+            }
+
+            var $group = $container.find(groupSelector);
+            if (!$group.length) {
+                return;
+            }
+
+            var $matchedButton = $$1();
+            var $colorBtns = $group.find('.note-color-btn');
+            $colorBtns.each(function (idx, item) {
+                var $item = $$1(item);
+                if (_this.normalizeColor($item.attr('data-value')) === normalizedColor) {
+                    $matchedButton = $item;
+                    return false;
+                }
+            });
+
+            $colorBtns.removeClass('selectColor');
+            if ($matchedButton.length) {
+                $matchedButton.addClass('selectColor');
+            }
+
+            var $currentButton = $group.find('.note-current-color-button');
+            $currentButton.attr('data-' + eventName, normalizedColor);
+            if (eventName === 'foreColor') {
+                $group.find('.icon-forecolor .path1').css('color', normalizedColor);
+            } else if (eventName === 'backColor') {
+                $group.find('.icon-backcolor .path1').css('color', normalizedColor);
             }
         };
         Buttons.prototype.updateBtnStates = function ($container, infos) {
