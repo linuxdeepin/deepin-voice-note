@@ -27,6 +27,91 @@ Item {
     property bool webVisible: true
     property alias titleBar: title
 
+    Timer {
+        id: txtMenuToolbarTimer
+        interval: 50
+        repeat: false
+        property int retryCount: 0
+        readonly property int maxRetries: 8
+        onTriggered: rootItem.passTxtMenuToToolbar(txtCtxMenu, retryCount)
+    }
+
+    // 累加可见子项 implicitHeight/height（来自 DTK 布局，不用硬编码行高）
+    function txtMenuItemsHeight(menu) {
+        var sum = 0;
+        for (var i = 0; i < menu.count; ++i) {
+            var item = menu.itemAt(i);
+            if (!item || item.visible === false) {
+                continue;
+            }
+            var itemH = item.height > 0 ? item.height : item.implicitHeight;
+            if (itemH > 0) {
+                sum += itemH;
+            }
+        }
+        return sum;
+    }
+
+    function txtMenuEffectiveHeight(menu) {
+        var height = menu.height;
+        var itemsH = txtMenuItemsHeight(menu);
+        height = Math.max(height, itemsH);
+        height = Math.max(height, menu.implicitHeight);
+        if (menu.contentItem) {
+            height = Math.max(height, menu.contentItem.height);
+            height = Math.max(height, menu.contentItem.implicitHeight);
+        }
+        return height;
+    }
+
+    // menu.height 常为占位值；与可见子项总高度偏差大则视为未就绪
+    function isTxtMenuHeightReady(menu) {
+        var height = menu.height;
+        if (height <= 0 || !menu.visible) {
+            return false;
+        }
+        var itemsH = txtMenuItemsHeight(menu);
+        if (itemsH > 0 && height < itemsH * 0.85) {
+            return false;
+        }
+        return true;
+    }
+
+    function toJsInt(value) {
+        var n = Math.round(Number(value));
+        return isFinite(n) ? n : 0;
+    }
+
+    function passTxtMenuToToolbar(menu, retryCount) {
+        if (!menu.visible || !webView) {
+            return;
+        }
+
+        var menuWidth = menu.width > 0 ? menu.width : menu.implicitWidth;
+        var menuHeight = txtMenuEffectiveHeight(menu);
+
+        if (!isTxtMenuHeightReady(menu) && retryCount < txtMenuToolbarTimer.maxRetries) {
+            txtMenuToolbarTimer.retryCount = retryCount + 1;
+            txtMenuToolbarTimer.start();
+            return;
+        }
+
+        var webViewPos = webView.mapToItem(null, 0, 0);
+        var safeX = toJsInt(menu.x - webViewPos.x);
+        var safeY = toJsInt(menu.y - webViewPos.y);
+        var safeW = toJsInt(menuWidth);
+        var safeH = toJsInt(menuHeight);
+
+        if (safeW <= 0 || safeH <= 0) {
+            return;
+        }
+
+        webView.runJavaScript(
+            "if(typeof setMenuPosition === 'function') setMenuPosition("
+            + safeX + ", " + safeY + ", "
+            + safeW + ", " + safeH + ");");
+    }
+
     signal deleteNote
     signal moveNote
     signal openSetting
@@ -507,33 +592,18 @@ Item {
             }
 
             onOpened: {
-                // 菜单已经打开并定位好，获取真实位置
+                txtMenuToolbarTimer.stop();
+                txtMenuToolbarTimer.retryCount = 0;
                 Qt.callLater(function() {
-                    var menuX = txtCtxMenu.x;
-                    var menuY = txtCtxMenu.y;
-                    var menuWidth = txtCtxMenu.width;
-                    var menuHeight = txtCtxMenu.height;
-                    
-                    console.log("QML菜单位置: x=" + menuX + ", y=" + menuY + ", w=" + menuWidth + ", h=" + menuHeight);
-                    
-                    // 传递给JavaScript
-                    if (webView && menuWidth > 0 && menuHeight > 0) {
-                        var webViewPos = webView.mapToItem(null, 0, 0);
-                        var relativeX = menuX - webViewPos.x;
-                        var relativeY = menuY - webViewPos.y;
-                        
-                        console.log("转换为webView相对位置: x=" + relativeX + ", y=" + relativeY);
-                        
-                        var jsCode = "if(typeof setMenuPosition === 'function') setMenuPosition(" + 
-                                     relativeX + ", " + relativeY + ", " + menuWidth + ", " + menuHeight + ");";
-                        webView.runJavaScript(jsCode);
-                    }
+                    rootItem.passTxtMenuToToolbar(txtCtxMenu, 0);
                 });
             }
 
             onClosed: {
-                // 菜单关闭时隐藏悬浮工具栏
-                Webobj.callJsHideEditToolbar();
+                txtMenuToolbarTimer.stop();
+                // 菜单关闭不隐藏工具栏，仅解除定位锁定（b80965d 原始行为）
+                webView.runJavaScript(
+                    "if(typeof restoreAirPopoverTooltipPlacement === 'function') restoreAirPopoverTooltipPlacement();");
             }
 
             Connections {

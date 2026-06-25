@@ -7190,6 +7190,9 @@
             }
         };
         AirPopover.prototype.update = function () {
+            if (typeof contextMenuToolbarActive !== 'undefined' && contextMenuToolbarActive) {
+                return;
+            }
             var styleInfo = this.context.invoke('editor.currentStyle');
             let selStr = window.getSelection().toString();
             this.isShowOlUl(styleInfo)
@@ -7259,24 +7262,32 @@
          */
         AirPopover.prototype.rightUpdate = function (x, y) {
             var styleInfo = this.context.invoke('editor.currentStyle');
-            var rect = lists.last(styleInfo.range.getClientRects());
-            this.isShowOlUl(styleInfo)
-            if (rect) {
-                this.$popover.find('.note-color').removeClass('open');
-                this.$popover.find('.note-fontsize-class').removeClass('open')
-                this.$popover.find('.note-font-family-class').removeClass('open')
-                let winWidth = $(document).width()
-                if (winWidth - x < airPopoverWidth) {
-                    x = winWidth - airPopoverWidth
+            var hasRange = !!(styleInfo && styleInfo.range);
+            try {
+                if (hasRange) {
+                    this.isShowOlUl(styleInfo);
                 }
-                this.$popover.css({
-                    display: 'block',
-                    left: x + $(document).scrollLeft(),
-                    top: y + $(document).scrollTop()
-                });
+            } catch (e) {
+                // isShowOlUl 依赖选区，右键菜单场景下可能无有效 range
+            }
+            this.$popover.find('.note-color').removeClass('open');
+            this.$popover.find('.note-fontsize-class').removeClass('open')
+            this.$popover.find('.note-font-family-class').removeClass('open')
+            let winWidth = $(document).width()
+            if (winWidth - x < airPopoverWidth) {
+                x = winWidth - airPopoverWidth
+            }
+            var finalLeft = x + $(document).scrollLeft();
+            var finalTop = y + $(document).scrollTop();
+            this.$popover.css({
+                display: 'block',
+                left: finalLeft,
+                top: finalTop
+            });
+            this.$popover.show();
+            if (hasRange) {
                 this.context.invoke('buttons.updateCurrentStyle', this.$popover);
             }
-
         };
 
         AirPopover.prototype.hide = function () {

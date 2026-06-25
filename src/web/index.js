@@ -137,6 +137,7 @@ var bTransVoiceIsReady = true;  //语音转文字是否准备好
 var initFinish = false;
 var isVoicePaste = false
 var isShowAir = true
+var contextMenuToolbarActive = false // 右键菜单期间禁止 airPopover.update 覆盖定位
 var nowClickVoice = null
 var global_activeColor = ''
 var lastRightClickX = 0;  // 保存右键点击的X坐标
@@ -152,6 +153,7 @@ const airPopoverHeight = 44  //悬浮工具栏高度
 const airPopoverWidth = 385  //悬浮工具栏宽度
 const airPopoverLeftMargin = 20 //悬浮工具栏距离编辑区左侧边距
 const airPopoverRightMargin = 35 //悬浮工具栏距离编辑区右侧边距
+const airPopoverMenuSpacing = 10 // 工具栏与右键菜单间距
 
 // 翻译列表
 var tooltipContent = {
@@ -1440,40 +1442,51 @@ function rightClick(e) {
         }
     }
     let info = isRangeVoice()
+    if (info.flag === 2) {
+        // 文本菜单弹出前先隐藏工具栏，待菜单位置确定后再重新定位显示
+        contextMenuToolbarActive = true;
+        $('#summernote').summernote('airPopover.hide');
+    }
     webobj.jsCallPopupMenu(info.flag, info.info);
     // 阻止默认右键事件
     // e.preventDefault()
+}
+
+function setAirPopoverTooltipPlacement(placement) {
+    $('.note-air-popover .note-btn, .note-air-popover .note-color-btn').each(function () {
+        var $btn = $(this);
+        $btn.attr('data-placement', placement);
+        var tip = $btn.data('bs.tooltip');
+        if (tip) {
+            tip.options.placement = placement;
+        }
+    });
+}
+
+function restoreAirPopoverTooltipPlacement() {
+    setAirPopoverTooltipPlacement('top');
+    contextMenuToolbarActive = false;
 }
 
 /**
  * 接收QML传来的菜单位置，计算并显示工具栏
  */
 function setMenuPosition(menuX, menuY, menuWidth, menuHeight) {
-    console.log("收到菜单位置: x=" + menuX + ", y=" + menuY + ", w=" + menuWidth + ", h=" + menuHeight);
-    console.log("右键点击位置: x=" + lastRightClickX + ", y=" + lastRightClickY);
-    
+    if (menuX <= 0 && lastRightClickX > 0) {
+        menuX = lastRightClickX;
+    }
+    if (menuY <= 0 && lastRightClickY > 0) {
+        menuY = lastRightClickY;
+    }
+
     var winWidth = $(window).width();
     var winHeight = $(window).height();
-    var scrollLeft = $(document).scrollLeft();
-    var scrollTop = $(document).scrollTop();
-    
-    // 获取工具栏实际尺寸
+
     var $airPopover = $('.note-air-popover');
-    var toolbarHeight = $airPopover.outerHeight() || 44;
-    var toolbarWidth = $airPopover.outerWidth() || 385;
-    
-    var spacing = 10;  // 固定间距
-    
-    console.log("工具栏尺寸: w=" + toolbarWidth + ", h=" + toolbarHeight);
-    console.log("窗口尺寸: w=" + winWidth + ", h=" + winHeight);
-    
-    // 计算菜单到顶部和底部的距离
-    var menuTopDistance = menuY;
-    var menuBottomDistance = winHeight - (menuY + menuHeight);
-    
-    console.log("菜单顶部距离: " + menuTopDistance + ", 底部距离: " + menuBottomDistance);
-    
-    // 计算工具栏X坐标（以点击位置为基准，确保不超出边界）
+    var toolbarHeight = $airPopover.outerHeight() || airPopoverHeight;
+    var toolbarWidth = $airPopover.outerWidth() || airPopoverWidth;
+    var spacing = airPopoverMenuSpacing;
+
     var toolbarX = lastRightClickX;
     if (toolbarX + toolbarWidth > winWidth) {
         toolbarX = winWidth - toolbarWidth - 10;
@@ -1481,31 +1494,38 @@ function setMenuPosition(menuX, menuY, menuWidth, menuHeight) {
     if (toolbarX < 10) {
         toolbarX = 10;
     }
-    
-    // 计算工具栏Y坐标
+
     var toolbarY;
-    if (menuTopDistance >= toolbarHeight + spacing) {
-        // 菜单上方空间足够，放在上方
-        toolbarY = menuY - toolbarHeight - spacing;
-        console.log("工具栏放在菜单上方");
-    } else if (menuBottomDistance >= toolbarHeight + spacing) {
-        // 菜单下方空间足够，放在下方
-        toolbarY = menuY + menuHeight + spacing;
-        console.log("工具栏放在菜单下方");
+    var toolbarBelowMenu = false;
+
+    if (menuHeight <= 0) {
+        toolbarY = menuY + spacing;
+        toolbarBelowMenu = true;
     } else {
-        // 上下都不够，放在空间更大的一侧
-        if (menuTopDistance > menuBottomDistance) {
-            toolbarY = 10;  // 贴顶
-            console.log("工具栏贴顶");
+        var menuTopDistance = menuY;
+        var menuBottomDistance = winHeight - (menuY + menuHeight);
+
+        if (menuTopDistance >= toolbarHeight + spacing) {
+            toolbarY = menuY - toolbarHeight - spacing;
+        } else if (menuBottomDistance >= toolbarHeight + spacing) {
+            toolbarY = menuY + menuHeight + spacing;
+            toolbarBelowMenu = true;
+        } else if (menuTopDistance > menuBottomDistance) {
+            toolbarY = 10;
         } else {
-            toolbarY = winHeight - toolbarHeight - 10;  // 贴底
-            console.log("工具栏贴底");
+            toolbarY = winHeight - toolbarHeight - 10;
+            toolbarBelowMenu = true;
         }
     }
-    
-    console.log("最终工具栏位置: x=" + toolbarX + ", y=" + toolbarY);
-    
-    // 显示工具栏（传入视口坐标，rightUpdate 内部会添加滚动偏移）
+
+    contextMenuToolbarActive = true;
+    setAirPopoverTooltipPlacement(toolbarBelowMenu ? 'bottom' : 'top');
+    $('.note-air-popover .note-btn, .note-air-popover .note-color-btn').each(function () {
+        var tip = $(this).data('bs.tooltip');
+        if (tip) {
+            $(this).tooltip('hide');
+        }
+    });
     showRightMenu(toolbarX, toolbarY);
 }
 
@@ -2083,46 +2103,35 @@ function showRightMenu(x, y) {
         }
         // 检查是否在 .translateText 或 .voiceBox 内
         var $container = $(container);
-        if ($container.closest('.translateText').length > 0 || 
+        if ($container.closest('.translateText').length > 0 ||
             $container.closest('.voiceBox').length > 0) {
-            console.log("在 translateText/voiceBox 区域，不显示悬浮工具栏");
             return;
         }
     }
-    $('#summernote').summernote('airPopover.rightUpdate', x, y)
+    $('#summernote').summernote('airPopover.rightUpdate', x, y);
 }
 
-// 悬浮工具栏延迟隐藏定时器（QML菜单关闭时启动，工具栏按钮点击时取消）
-var hideToolbarTimer = null;
 var toolbarButtonClicked = false;
 
-// 监听悬浮工具栏按钮的mousedown事件
-// e.preventDefault() 阻止浏览器默认行为（移动选区/焦点到按钮位置）
-// 同时取消延迟隐藏定时器，防止工具栏被误隐藏
-$(document).on('mousedown', '.note-air-popover .note-btn', function(e) {
-    e.preventDefault();
+// 点击工具栏时置位，供 changeContent / hideRightMenu 避免误隐藏
+$(document).on('mousedown', '.note-air-popover, .note-air-popover *', function (e) {
     toolbarButtonClicked = true;
-    if (hideToolbarTimer) {
-        clearTimeout(hideToolbarTimer);
-        hideToolbarTimer = null;
+    if ($(e.target).closest('.note-btn').length) {
+        e.preventDefault();
     }
 });
 
-$(document).on('click', '.note-air-popover .note-btn', function(e) {
-    setTimeout(function() { toolbarButtonClicked = false; }, 100);
+$(document).on('click', '.note-air-popover, .note-air-popover *', function (e) {
+    setTimeout(function () { toolbarButtonClicked = false; }, 100);
 });
 
-// 右键隐藏悬浮工具栏（延迟执行，给工具栏按钮点击事件取消的机会）
 function hideRightMenu() {
     if (toolbarButtonClicked) {
         toolbarButtonClicked = false;
         return;
     }
-    if (hideToolbarTimer) clearTimeout(hideToolbarTimer);
-    hideToolbarTimer = setTimeout(function() {
-        $('#summernote').summernote('airPopover.hide');
-        hideToolbarTimer = null;
-    }, 300);
+    $('#summernote').summernote('airPopover.hide');
+    restoreAirPopoverTooltipPlacement();
 }
 
 // 重置滚动条
