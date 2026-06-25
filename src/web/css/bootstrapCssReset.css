@@ -1,3 +1,11 @@
+/* 对齐 DTK Menu（FlowStyle: radius=12, item.radius=6, padding=6, topPadding=8, item.height=30） */
+:root {
+    --vn-menu-radius: 12px;
+    --vn-menu-item-radius: 6px;
+    --vn-menu-padding: 8px 6px;
+    --vn-menu-item-height: 30px;
+}
+
 /* 浮动工具栏 */
 .popover {
     background-color: transparent;
@@ -26,7 +34,7 @@
     height: auto;
     background: rgba(245, 245, 245, 1);
     border: 1px solid rgba(0, 0, 0, 0.04);
-    border-radius: 12px;
+    border-radius: var(--vn-menu-radius);
     box-shadow: 0px 6px 20px 0px rgba(0, 0, 0, 0.1);
 }
 
@@ -113,7 +121,7 @@ p {
     background: rgba(238, 238, 238, 1);
     width: 153px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
+    border-radius: var(--vn-menu-radius);
     box-shadow: 0px 6px 16px 0px rgba(0, 0, 0, 0.20);
     top: 115%;
     left: -12px;
@@ -289,7 +297,9 @@ ul {
 
 .dropdown-fontsize {
     overflow: hidden;
+    overflow-y: auto;
     width: 96px;
+    padding: var(--vn-menu-padding);
 }
 
 .dropdown-fontname {
@@ -297,14 +307,26 @@ ul {
     overflow-y: auto;
     max-height: 300px;
     min-width: 220px !important;
+    padding: var(--vn-menu-padding);
+}
+
+.dropdown-fontsize>li,
+.dropdown-fontname>li {
+    width: 100%;
 }
 
 .dropdown-fontsize>li>a,
 .dropdown-fontname>li>a {
+    display: block;
+    box-sizing: border-box;
     width: 100%;
-    height: 34px;
-    line-height: 30px;
-    max-width: 240px !important;
+    height: var(--vn-menu-item-height);
+    line-height: var(--vn-menu-item-height);
+    max-width: none !important;
+    margin: 0;
+    padding: 0 10px;
+    border-radius: var(--vn-menu-item-radius);
+    color: var(--vn-menu-item-fg, inherit);
 }
 
 .dropdown-fontsize>li:nth-last-child(1) a {
@@ -318,6 +340,11 @@ ul {
 .note-popover .popover-content .dropdown-menu.note-check li a i {
     padding-right: 5px;
     color: inherit;
+    visibility: hidden;
+}
+
+.note-popover .popover-content .dropdown-menu.note-check li a.checked i {
+    visibility: visible;
 }
 
 .note-air-popover {
@@ -325,9 +352,16 @@ ul {
     margin: 0 auto !important;
 }
 
+/* hover / 选中：主题色底 + 白字，对齐 DTK 菜单样式 */
 .dropdown-fontsize>li>a:hover,
-.dropdown-fontname>li>a:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+.dropdown-fontname>li>a:hover,
+.dropdown-fontsize>li>a.checked,
+.dropdown-fontname>li>a.checked,
+.note-popover .popover-content .dropdown-fontsize>li>a:hover,
+.note-popover .popover-content .dropdown-fontname>li>a:hover,
+.note-popover .popover-content .dropdown-fontsize>li>a.checked,
+.note-popover .popover-content .dropdown-fontname>li>a.checked {
+    background-color: var(--vn-menu-hover-bg, rgba(0, 0, 0, 0.08));
     color: #fff !important;
 }
 
@@ -410,19 +444,19 @@ ul {
 .btn-sm,
 .btn-group-sm>.btn {
     padding: 0px !important;
-    border-radius: 6px;
+    border-radius: var(--vn-menu-item-radius);
 }
 
 /* 新UI设计，按钮和下拉菜单均有圆角，覆盖原始样式 */
 .btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
-    border-top-right-radius: 6px;
-    border-bottom-right-radius: 6px;
+    border-top-right-radius: var(--vn-menu-item-radius);
+    border-bottom-right-radius: var(--vn-menu-item-radius);
 }
 
 .btn-group>.btn:last-child:not(:first-child),
 .btn-group>.dropdown-toggle:not(:first-child) {
-    border-top-left-radius: 6px;
-    border-bottom-left-radius: 6px;
+    border-top-left-radius: var(--vn-menu-item-radius);
+    border-bottom-left-radius: var(--vn-menu-item-radius);
 }
 
 /***** 字体名称/大小按钮 End *****/

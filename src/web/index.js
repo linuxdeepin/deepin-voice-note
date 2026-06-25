@@ -147,7 +147,6 @@ var global_theme = 1    // theme type 1:light 2:dark
 var global_themeColor = 'transparent'  //主题色
 var global_isRecording = false  // 录音状态标志
 var scrollHide = null  //滚动条隐藏定时器
-var scrollHideFont = null  //字体滚动条定时
 var isUlOrOl = false
 const airPopoverHeight = 44  //悬浮工具栏高度
 const airPopoverWidth = 385  //悬浮工具栏宽度
@@ -1601,32 +1600,15 @@ function changeColor(flag, activeColor, disableColor, backgroundColor) {
         setVoiceButColor(global_activeColor, global_disableColor)
     }
 
-    $('.dropdown-fontsize>li>a').hover(function (e) {
-        $(this).css('background-color', activeColor);
-    }, function () {
-        $('.dropdown-fontsize>li>a').css('background-color', 'transparent');
-        if (flag == 1) {
-            $('.dropdown-fontsize>li>a').css('color', "black");
-        } else {
-            $('.dropdown-fontsize>li>a').css('color', "rgba(197,207,224,1)");
-        }
-    })
-    $('.dropdown-fontname>li>a').hover(function (e) {
-        $(this).css('background-color', activeColor);
-    }, function () {
-        $('.dropdown-fontname>li>a').css('background-color', 'transparent');
-        if (flag == 1) {
-            $('.dropdown-fontname>li>a').css('color', "black");
-        } else {
-            $('.dropdown-fontname>li>a').css('color', "rgba(197,207,224,1)");
-        }
-    })
+    var menuItemFg = flag == 1 ? 'black' : 'rgba(197,207,224,1)';
+    var scrollbarThumb = flag == 1 ? 'rgba(0, 0, 0, 0.30)' : 'rgba(255, 255, 255, 0.20)';
+    document.documentElement.style.setProperty('--vn-menu-hover-bg', activeColor);
+    document.documentElement.style.setProperty('--vn-menu-item-fg', menuItemFg);
+    document.documentElement.style.setProperty('--vn-fontlist-scrollbar-thumb', scrollbarThumb);
 
     if (flag == 1) {
         $('body').removeClass('dark');
         $('#dark').remove()
-        $('.dropdown-fontsize>li>a').css('color', "black");
-        $('.dropdown-fontname>li>a').css('color', "black");
     } else if (flag == 2 && !$('#dark').length) {
         $('body').addClass('dark');
         $("head").append("<link>");
@@ -2165,7 +2147,6 @@ $(document).scroll(function () {
     }, 1500);
 });
 
-// 字体滚动条
 function listenFontnameList() {
     $('.dropdown-fontname ').scroll(function () {
         // 阻止内部滚动条到底后自动触发外部滚动
@@ -2175,24 +2156,6 @@ function listenFontnameList() {
             // 定位到距离底部2px的位置
             scroll.scrollTop = (scroll.scrollHeight - scroll.clientHeight - 2)
         }
-
-        if (scrollHideFont) {
-            clearTimeout(scrollHideFont)
-            $('#scrollStyleFont').html(`
-        .dropdown-fontname::-webkit-scrollbar-thumb {
-        background-color:${global_theme == 1 ? "rgba(0, 0, 0, 0.30)" : "rgba(255, 255, 255, 0.20)"} ;
-        }
-        /* 适配申威，触发重绘 */
-        html {
-            background-color: ${global_themeColor}fe;
-        }
-        `
-            )
-        }
-
-        scrollHideFont = setTimeout(() => {
-            $('#scrollStyleFont').html('')
-        }, 1500);
     });
 }
 

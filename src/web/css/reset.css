@@ -20,10 +20,17 @@ body::-webkit-scrollbar-thumb,
 .dropdown-fontname::-webkit-scrollbar-thumb {
     border-radius: 5px;
     border-style: dashed;
-    background-color: rgba(255, 255, 255, 0.0);
     border-color: transparent;
     border-width: 2px;
     background-clip: padding-box;
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.0);
+}
+
+.dropdown-fontname::-webkit-scrollbar-thumb {
+    background-color: var(--vn-fontlist-scrollbar-thumb, rgba(0, 0, 0, 0.25));
 }
 
 body::-webkit-scrollbar-thumb:hover,
