@@ -191,6 +191,9 @@ strike[style="text-decoration-line: underline;"] {
     border-bottom: 1px solid rgba(65, 77, 104, 1);
 }
 
+/* 位图字体（如文泉驿点阵正黑、Unifont）无粗体变体，font-weight:bold 不产生视觉变化。
+   使用零模糊 text-shadow 偏移像素合成加粗效果，不影响矢量字体的正常粗体渲染。
+   注意：此规则仅限编辑器内容区域，零模糊不产生额外合成层，无性能影响。 */
 .note-editable b, .note-editable strong {
     text-shadow: 0.5px 0 0 currentColor;
 }
