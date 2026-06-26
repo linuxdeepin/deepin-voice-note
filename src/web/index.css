@@ -190,3 +190,7 @@ strike[style="text-decoration-line: underline;"] {
     text-decoration-color: transparent !important;
     border-bottom: 1px solid rgba(65, 77, 104, 1);
 }
+
+.note-editable b, .note-editable strong {
+    text-shadow: 0.5px 0 0 currentColor;
+}
