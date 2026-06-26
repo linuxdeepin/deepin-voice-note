@@ -20,7 +20,7 @@ DialogWindow {
     height: 365
     width: 370
 
-    onVisibleChanged: if (visible) index = 0
+    onVisibleChanged: if (visible) folderList.currentIndex = 0
 
     header: DialogTitleBar {
         enableInWindowBlendBlur: true
@@ -41,9 +41,15 @@ DialogWindow {
         ListView {
             id: folderList
 
+            activeFocusOnTab: true
             clip: true
             height: 226
+            keyNavigationEnabled: true
             width: 348
+
+            // currentIndex 作为选中项的唯一来源，同步给 dialog.index，
+            // 使 Tab 可聚焦列表、上/下方向键可切换记事本
+            onCurrentIndexChanged: dialog.index = currentIndex
 
             ScrollBar.vertical: ScrollBar {
             }
@@ -124,7 +130,7 @@ DialogWindow {
                     hoverEnabled: true
 
                     onClicked: {
-                        dialog.index = index;
+                        folderList.currentIndex = index;
                     }
                     onEntered: {
                         folderItem.isHovered = true;
