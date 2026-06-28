@@ -904,7 +904,14 @@ bool WebEngineHandler::saveMP3()
 void WebEngineHandler::savePictureAs()
 {
     qInfo() << "Saving picture as";
-    QString originalPath = menuJson.toString();  // 获取原图片路径
+    // web端图片src为相对/web路径，需先解析为磁盘真实路径，否则复制失败
+    QString originalPath = normalizePicturePath(menuJson.toString());
+    if (originalPath.isEmpty()) {
+        // 路径无法解析，提示保存失败，避免执行注定失败的复制
+        qWarning() << "Failed to normalize picture path:" << menuJson.toString();
+        Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::SaveFailed);
+        return;
+    }
     saveAsFile(originalPath, QStandardPaths::writableLocation(QStandardPaths::PicturesLocation), "image");
     qInfo() << "Picture saving finished";
 }
