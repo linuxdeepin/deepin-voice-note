@@ -25,6 +25,8 @@ Item {
     property int itemSpacing: 6
     property alias model: itemModel
     property alias moveToFolderDialog: dialogWindow
+    property var sourceFolderModel
+    property int currentFolderIndex: -1
     property var saveFilters: ["TXT(*.txt);;HTML(*.html)", "TXT(*.txt)", "HTML(*.html)", "MP3(*.mp3)"]
     property alias searchLoader: noSearchResultsLoader
     property int selectSize: 0
@@ -56,6 +58,15 @@ Item {
             }
         }
         return indexes;
+    }
+
+    function clearRenameState() {
+        forceActiveFocus();
+        for (var i = 0; i < itemModel.count; i++) {
+            var item = itemListView.itemAtIndex(i);
+            if (item)
+                item.isRename = false;
+        }
     }
 
     function selectNoteItem(index) {
@@ -94,17 +105,23 @@ Item {
             if (!ret) {
                 return;
             }
+            clearRenameState();
             var delList = itemListView.sortAndDeduplicate(validSelectedNoteIndexes());
             var delIdList = [];
             var deleIndex = Number.MAX_SAFE_INTEGER;
             for (var i = 0; i < delList.length; i++) {
-                delIdList.push(itemModel.get(delList[i]).noteId);
+                var deleteItem = itemModel.get(delList[i]);
+                if (!deleteItem)
+                    continue;
+                delIdList.push(deleteItem.noteId);
                 if (delList[i] < deleIndex)
                     deleIndex = delList[i];
             }
+            if (delIdList.length === 0)
+                return;
             if (!VNoteMainManager.deleteNote(delIdList))
                 return;
-            for (var j = 0; j < delList.length; j++) {
+            for (var j = delList.length - 1; j >= 0; j--) {
                 itemModel.remove(delList[j]);
             }
             deleteNotes(delList.length);
@@ -135,6 +152,24 @@ Item {
         });
     }
 
+    function refreshMoveFolderModel() {
+        moveFolderModel.clear();
+        if (!sourceFolderModel)
+            return;
+
+        for (var i = 0; i < sourceFolderModel.count; i++) {
+            if (i === currentFolderIndex)
+                continue;
+
+            var folder = sourceFolderModel.get(i);
+            moveFolderModel.append({
+                name: folder.name,
+                icon: folder.icon,
+                folderIndex: i
+            });
+        }
+    }
+
     function onMoveNote() {
         if (webVisible || isVoiceToText) {
             console.log("No notes available, cannot move");
@@ -144,6 +179,13 @@ Item {
         var validIndexes = validSelectedNoteIndexes();
         if (validIndexes.length === 0)
             return;
+
+        refreshMoveFolderModel();
+        if (moveFolderModel.count === 0) {
+            console.log("No other notebook available to move to");
+            return;
+        }
+        clearRenameState();
         
         var desText = "";
         if (validIndexes.length > 1) {
@@ -328,8 +370,15 @@ Item {
 
     }
 
+    ListModel {
+        id: moveFolderModel
+
+    }
+
     MoveDialog {
         id: dialogWindow
+
+        folderModel: moveFolderModel
 
         onMoveToFolder: {
             if (isVoiceToText) {
@@ -339,9 +388,14 @@ Item {
             var indexList = [];
             var validIndexes = validSelectedNoteIndexes();
             for (var i = 0; i < validIndexes.length; i++) {
-                indexList.push(itemModel.get(validIndexes[i]).noteId);
+                var moveItem = itemModel.get(validIndexes[i]);
+                if (moveItem)
+                    indexList.push(moveItem.noteId);
             }
-            VNoteMainManager.moveNotes(indexList, index);
+            if (indexList.length === 0)
+                return;
+            var folderIndex = moveFolderModel.get(index).folderIndex;
+            VNoteMainManager.moveNotes(indexList, folderIndex);
         }
     }
 
@@ -1105,7 +1159,9 @@ Item {
                 }
                 onDoubleClicked: {
                     // 录音时允许双击重命名
-                    itemListView.itemAtIndex(index).isRename = true;
+                    var renameItem = itemListView.itemAtIndex(index);
+                    if (renameItem)
+                        renameItem.isRename = true;
                 }
                 onEntered: {
                     if (noteNameLabel.implicitWidth > noteNameLabel.width)
