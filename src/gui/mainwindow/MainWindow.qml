@@ -812,7 +812,8 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     enabled: !rootWindow.isVoiceToText
                     opacity: enabled ? 1.0 : 0.4
-                    moveToFolderDialog.folderModel: folderListView.model
+                    sourceFolderModel: folderListView.model
+                    currentFolderIndex: folderListView.currentFolderIndex
                     webVisible: initRect.visible
                     isRecordingAudio: rootWindow.isRecordingAudio
                     isVoiceToText: rootWindow.isVoiceToText

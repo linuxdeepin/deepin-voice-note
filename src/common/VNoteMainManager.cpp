@@ -807,9 +807,17 @@ void VNoteMainManager::moveNotes(const QVariantList &index, const int &folderInd
     VNoteItemOper noteOper;
     VNOTE_ITEMS_MAP *srcNotes = noteOper.getFolderNotes(item->folderId);
     VNOTE_ITEMS_MAP *destNotes = noteOper.getFolderNotes(folder->id);
+    if (!srcNotes || !destNotes) {
+        qWarning() << "Invalid move operation, source or destination notes map is null";
+        return;
+    }
     int srcIndex = getFloderIndexById(item->folderId);
     foreach (auto i, index) {
         VNoteItem *note = getNoteById(i.toInt());
+        if (!note) {
+            qWarning() << "Skipping invalid note during move, note ID:" << i.toInt();
+            continue;
+        }
         m_noteItems.removeOne(note);
         if (note->isTop)
             m_currentHasTop--;

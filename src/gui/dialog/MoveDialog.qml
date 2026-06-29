@@ -65,7 +65,6 @@ DialogWindow {
                 radius: 6
                 width: 336
 
-                // text: model.name
                 RowLayout {
                     anchors.fill: parent
                     anchors.leftMargin: 8
@@ -89,7 +88,6 @@ DialogWindow {
                         }
 
                         Rectangle {
-                            //矩形
                             id: _mask
 
                             antialiasing: true
@@ -97,7 +95,7 @@ DialogWindow {
                             height: 16
                             radius: 8
                             smooth: true
-                            visible: false  //不可见
+                            visible: false
                             width: 16
                         }
 
@@ -106,7 +104,7 @@ DialogWindow {
 
                             anchors.fill: _image
                             antialiasing: true
-                            maskSource: _mask    //用作遮罩的项目
+                            maskSource: _mask
                             source: _image
                             visible: true
                         }

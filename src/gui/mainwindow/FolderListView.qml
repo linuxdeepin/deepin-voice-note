@@ -23,6 +23,7 @@ Item {
     property int listHeight: 700
     property int listWidth: 200
     property alias model: folderListView.model
+    property alias currentFolderIndex: folderListView.currentIndex
     property Item scrollBarParent: null
     property int scrollBarRightOffset: 0
     property bool webVisible: true
