@@ -314,11 +314,6 @@ ApplicationWindow {
         }
 
         function handleaddNote(noteData) {
-            for (var i = 0; i < itemListView.selectedNoteItem.length; i++) {
-                var item = itemListView.view.itemAtIndex(itemListView.selectedNoteItem[i]);
-                if (item)
-                    item.isSelected = false;
-            }
             var topSize = 0;
             for (var j = 0; j < itemListView.model.count; j++) {
                 var note = itemListView.model.get(j);
@@ -411,9 +406,7 @@ ApplicationWindow {
                 minIndex = count - 1;
                 modelItem = itemListView.model.get(minIndex);
             }
-            itemListView.selectedNoteItem.push(minIndex);
-            var delegate = itemListView.view.itemAtIndex(minIndex);
-            if (delegate) delegate.isSelected = true;
+            itemListView.selectedNoteItem = [minIndex];
             itemListView.selectSize = 1;
             VNoteMainManager.vNoteChanged(modelItem.noteId);
         }

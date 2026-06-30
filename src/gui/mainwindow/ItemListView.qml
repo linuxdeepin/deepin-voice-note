@@ -73,16 +73,8 @@ Item {
         if (index < 0 || index >= itemModel.count)
             return;
 
-        // 清除之前的选中状态
-        for (var m = 0; m < selectedNoteItem.length; m++) {
-            var selectItem = itemListView.itemAtIndex(selectedNoteItem[m]);
-            if (selectItem) selectItem.isSelected = false;
-        }
-        // 设置新的选中状态
         selectedNoteItem = [index];
         selectSize = 1;
-        var newDelegate = itemListView.itemAtIndex(index);
-        if (newDelegate) newDelegate.isSelected = true;
         itemListView.currentIndex = index;
         itemListView.lastCurrentIndex = index;
     }
@@ -121,26 +113,27 @@ Item {
                 return;
             if (!VNoteMainManager.deleteNote(delIdList))
                 return;
-            for (var j = delList.length - 1; j >= 0; j--) {
-                itemModel.remove(delList[j]);
+            var delIdMap = {};
+            for (var k = 0; k < delIdList.length; ++k)
+                delIdMap[delIdList[k]] = true;
+            for (var j = itemModel.count - 1; j >= 0; --j) {
+                var note = itemModel.get(j);
+                if (note && delIdMap[note.noteId])
+                    itemModel.remove(j);
             }
-            deleteNotes(delList.length);
+            deleteNotes(delIdList.length);
             if (itemModel.count === 0) {
                 selectedNoteItem = [];
                 selectSize = 0;
                 emptyItemList();
             } else if (itemModel.count <= deleIndex) {
                 var newIndex = itemModel.count - 1;
-                var newItem = itemListView.itemAtIndex(newIndex);
-                if (newItem) newItem.isSelected = true;
                 selectedNoteItem = [newIndex];
                 selectSize = 1;
                 itemListView.currentIndex = newIndex;
                 itemListView.lastCurrentIndex = newIndex;
                 noteItemChanged(itemModel.get(newIndex).noteId);
             } else {
-                var nextItem = itemListView.itemAtIndex(deleIndex);
-                if (nextItem) nextItem.isSelected = true;
                 selectedNoteItem = [deleIndex];
                 selectSize = 1;
                 itemListView.currentIndex = deleIndex;
@@ -290,47 +283,27 @@ Item {
         switch (event.key) {
          case Qt.Key_Up:
              if (itemListView.count > 0) {
-                // 取消之前选中项的选中状态
-                for (var i = 0; i < selectedNoteItem.length; i++) {
-                    var prevItem = itemListView.itemAtIndex(selectedNoteItem[i]);
-                    if (prevItem) prevItem.isSelected = false;
-                }
-                 // 循环切换：如果在第一项，跳到最后一项；否则向上移动
                  if (itemListView.currentIndex <= 0) {
                      itemListView.currentIndex = itemListView.count - 1;
                  } else {
                      itemListView.currentIndex--;
                  }
-                 var newItem = itemListView.itemAtIndex(itemListView.currentIndex);
-                 if (newItem) {
-                     newItem.isSelected = true;
-                     selectedNoteItem = [itemListView.currentIndex];
-                     selectSize = 1;
-                     noteItemChanged(itemModel.get(itemListView.currentIndex).noteId);
-                 }
+                 selectedNoteItem = [itemListView.currentIndex];
+                 selectSize = 1;
+                 noteItemChanged(itemModel.get(itemListView.currentIndex).noteId);
              }
              event.accepted = true;
              break;
          case Qt.Key_Down:
              if (itemListView.count > 0) {
-                // 取消之前选中项的选中状态
-                for (var j = 0; j < selectedNoteItem.length; j++) {
-                    var prevItem = itemListView.itemAtIndex(selectedNoteItem[j]);
-                    if (prevItem) prevItem.isSelected = false;
-                }
-                 // 循环切换：如果在最后一项，跳到第一项；否则向下移动
                  if (itemListView.currentIndex >= itemListView.count - 1) {
                      itemListView.currentIndex = 0;
                  } else {
                      itemListView.currentIndex++;
                  }
-                 var newItem = itemListView.itemAtIndex(itemListView.currentIndex);
-                 if (newItem) {
-                     newItem.isSelected = true;
-                     selectedNoteItem = [itemListView.currentIndex];
-                     selectSize = 1;
-                     noteItemChanged(itemModel.get(itemListView.currentIndex).noteId);
-                 }
+                 selectedNoteItem = [itemListView.currentIndex];
+                 selectSize = 1;
+                 noteItemChanged(itemModel.get(itemListView.currentIndex).noteId);
              }
              event.accepted = true;
              break;
@@ -821,7 +794,7 @@ Item {
 
             property bool hovered: false
             property bool isRename: false
-            property bool isSelected: false
+            property bool isSelected: selectedNoteItem.indexOf(index) !== -1
             property var startMove: [-1, -1]
 
             color: isSelected ? (rootItem.activeFocus ? palette.highlight : (DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF")) : (DTK.themeType === ApplicationHelper.LightType ? "white" : "#0CFFFFFF")
@@ -844,9 +817,6 @@ Item {
             radius: 6
             width: itemListView.width
 
-            Component.onCompleted: {
-                isSelected = (selectedNoteItem.indexOf(index) !== -1);
-            }
             Keys.onPressed: function(event) {
                 if (isRename) {
                     if (event.key === Qt.Key_Escape) {
@@ -1063,19 +1033,10 @@ Item {
                         if (selectedIndexes.length > 1) {
                             ActionManager.visibleMulChoicesActions(false);
                         } else {
-                            if (itemListView.itemAtIndex(itemListView.lastCurrentIndex)) {
-                                var lastItem = itemListView.itemAtIndex(itemListView.lastCurrentIndex);
-                                lastItem.isRename = false;
-                                lastItem.isSelected = false;
-                            }
-                            if (selectedIndexes.length === 1) {
-                                var item = itemListView.itemAtIndex(selectedIndexes[0]);
-                                if (item) item.isSelected = false;
-                            }
+                            if (itemListView.itemAtIndex(itemListView.lastCurrentIndex))
+                                itemListView.itemAtIndex(itemListView.lastCurrentIndex).isRename = false;
                             selectedNoteItem = [index];
                             selectSize = 1;
-                            var currentItem = itemListView.itemAtIndex(index);
-                            if (currentItem) currentItem.isSelected = true;
                             itemListView.currentIndex = index;
                             itemListView.lastCurrentIndex = index;
                             itemListView.contextIndex = index;
@@ -1105,54 +1066,38 @@ Item {
                         }
                         switch (mouse.modifiers) {
                         case Qt.ControlModifier:
-                            if (selectedNoteItem.indexOf(index) != -1) {
-                                var existed = itemListView.itemAtIndex(index);
-                                if (existed) existed.isSelected = false;
-                                selectedNoteItem.splice(selectedNoteItem.indexOf(index), 1);
+                            var nextSelection = selectedNoteItem.slice();
+                            var pos = nextSelection.indexOf(index);
+                            if (pos != -1) {
+                                nextSelection.splice(pos, 1);
                                 selectSize--;
                             } else {
-                                var exist2 = itemListView.itemAtIndex(index);
-                                if (exist2) exist2.isSelected = true;
-                                selectedNoteItem.push(index);
+                                nextSelection.push(index);
                                 selectSize++;
                             }
+                            selectedNoteItem = nextSelection;
                             break;
                         case Qt.ShiftModifier:
-                            for (var n = 0; n < selectedNoteItem.length; n++) {
-                                var oldSelectItem = itemListView.itemAtIndex(selectedNoteItem[n]);
-                                if (oldSelectItem) oldSelectItem.isSelected = false;
-                            }
-                            selectedNoteItem = [];
                             var anchorIndex = Math.max(0, Math.min(itemListView.lastCurrentIndex, itemModel.count - 1));
                             var targetIndex = Math.max(0, Math.min(index, itemModel.count - 1));
                             var startIndex = Math.min(targetIndex, anchorIndex);
                             var endIndex = Math.max(targetIndex, anchorIndex);
-                            for (var i = startIndex; i <= endIndex; i++) {
-                                var d = itemListView.itemAtIndex(i);
-                                if (d) d.isSelected = true;
-                                selectedNoteItem.push(i);
-                            }
+                            var rangeSelection = [];
+                            for (var i = startIndex; i <= endIndex; i++)
+                                rangeSelection.push(i);
+                            selectedNoteItem = rangeSelection;
                             itemListView.lastCurrentIndex = anchorIndex;
-                            selectSize = selectedNoteItem.length;
+                            selectSize = rangeSelection.length;
                             break;
                         default:
-                            if (itemListView.itemAtIndex(itemListView.lastCurrentIndex)) {
-                                var lastSelectItem = itemListView.itemAtIndex(itemListView.lastCurrentIndex);
-                                lastSelectItem.isRename = false;
-                                lastSelectItem.isSelected = false;
-                            }
-                            for (var m = 0; m < selectedNoteItem.length; m++) {
-                                var selectItem = itemListView.itemAtIndex(selectedNoteItem[m]);
-                                if (selectItem) selectItem.isSelected = false;
-                            }
+                            if (itemListView.itemAtIndex(itemListView.lastCurrentIndex))
+                                itemListView.itemAtIndex(itemListView.lastCurrentIndex).isRename = false;
                             selectedNoteItem = [index];
                             selectSize = 1;
-                            var newDelegate = itemListView.itemAtIndex(index);
-                            if (newDelegate) newDelegate.isSelected = true;
                             itemListView.currentIndex = index;
                             itemListView.lastCurrentIndex = index;
                             noteItemChanged(Number(itemModel.get(index).noteId));
-                            
+
                             break;
                         }
                     }
