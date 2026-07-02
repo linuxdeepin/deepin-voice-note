@@ -640,6 +640,7 @@ Item {
 
                     Layout.rightMargin: 10
                     color: folderNameLabel.color
+                    font.pixelSize: 12
                     horizontalAlignment: Text.AlignRight
                     text: model.count
                     verticalAlignment: Text.AlignVCenter
