@@ -817,6 +817,21 @@ Item {
             radius: 6
             width: itemListView.width
 
+            // 与 DccItemBackground 一致：卡片底部 1px 淡阴影
+            BoxShadow {
+                anchors.fill: parent
+                cornerRadius: rootItemDelegate.radius
+                hollow: true
+                shadowBlur: 0
+                shadowColor: DTK.themeType === ApplicationHelper.LightType ? Qt.rgba(0, 0, 0, 0.05)
+                                                                           : Qt.rgba(0, 0, 0, 0.3)
+                shadowOffsetX: 0
+                shadowOffsetY: 1
+                spread: 0
+                visible: !rootItemDelegate.isSelected
+                z: -1
+            }
+
             Keys.onPressed: function(event) {
                 if (isRename) {
                     if (event.key === Qt.Key_Escape) {

@@ -15,7 +15,7 @@ import org.deepin.dtk 1.0
 ApplicationWindow {
     id: rootWindow
 
-    property int createFolderBtnHeight: 40
+    property int createFolderBtnHeight: 30
     property bool isRecording: webEngineView.isRecording
     property bool isRecordingAudio: false
     property bool isVoiceToText: false
@@ -44,6 +44,7 @@ ApplicationWindow {
 
     DWindow.alphaBufferSize: 8
     DWindow.enabled: true
+    color: "transparent"
     flags: Qt.Window | Qt.WindowMinMaxButtonsHint | Qt.WindowCloseButtonHint | Qt.WindowTitleHint
     height: 681
     minimumHeight: windowMiniHeight
@@ -493,18 +494,26 @@ ApplicationWindow {
         }
     }
 
+    // 全窗级毛玻璃：左侧文件夹栏 + 笔记列表区域透明可见，列表项保持实色卡片
+    VNoteComponents.SidebarBlurBackground {
+        anchors.fill: parent
+        windowControl: rootWindow
+        z: 0
+    }
+
     RowLayout {
         id: rowLayout
 
+        z: 1
         anchors.fill: parent
         spacing: 0
 
         Rectangle {
             id: leftBgArea
 
-            Layout.fillHeight: true//#F2F6F8
+            Layout.fillHeight: true
             Layout.preferredWidth: leftViewWidth - leftDragHandle.width
-            color: DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#101010"
+            color: "transparent"
 
             ColumnLayout {
                 id: leftColumnLayout
@@ -622,7 +631,7 @@ ApplicationWindow {
 
             Layout.fillHeight: true
             Layout.preferredWidth: 5
-            color: leftBgArea.color
+            color: "transparent"
 
             Rectangle {
                 anchors.right: parent.right
@@ -665,7 +674,8 @@ ApplicationWindow {
 
             Layout.fillHeight: true
             Layout.preferredWidth: middleViewWidth - rightDragHandle.width
-            color: DTK.themeType === ApplicationHelper.LightType ? "#F8F8F8" : "#181818"
+            color: DTK.themeType === ApplicationHelper.LightType ? Qt.rgba(248 / 255, 248 / 255, 248 / 255, 0.95)
+                                                                   : Qt.rgba(24 / 255, 24 / 255, 24 / 255, 0.95)
 
             onWidthChanged: {
                 if (!leftBgArea.visible) {
@@ -881,18 +891,7 @@ ApplicationWindow {
 
             Layout.fillHeight: true
             Layout.fillWidth: true
-            color: Qt.rgba(0, 0, 0, 0.01)
-
-            BoxShadow {
-                anchors.fill: rightBgArea
-                cornerRadius: rightBgArea.radius
-                hollow: true
-                shadowBlur: 10
-                shadowColor: Qt.rgba(0, 0, 0, 0.05)
-                shadowOffsetX: 0
-                shadowOffsetY: 4
-                spread: 0
-            }
+            color: DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#242424"
 
             ColumnLayout {
                 anchors.fill: parent
