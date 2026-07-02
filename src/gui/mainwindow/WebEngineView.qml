@@ -298,6 +298,14 @@ Item {
             Layout.minimumHeight: 50
             Layout.maximumHeight: 50
 
+            // 透明窗口下仅标题栏区域遮挡毛玻璃，沿用窗口 palette 底色（非 TitleBar 强制白底）
+            Rectangle {
+                anchors.fill: parent
+                color: Window.window ? Window.window.palette.window
+                                      : (DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#242424")
+                z: -1
+            }
+
             WindowTitleBar {
                 id: title
 
@@ -337,7 +345,7 @@ Item {
 
             Layout.fillHeight: true
             Layout.fillWidth: true
-            color: "transparent"
+            color: DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#242424"
 
             WebEngineView {
                 id: webView

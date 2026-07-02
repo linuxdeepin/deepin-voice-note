@@ -891,7 +891,18 @@ ApplicationWindow {
 
             Layout.fillHeight: true
             Layout.fillWidth: true
-            color: DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#242424"
+            color: Qt.rgba(0, 0, 0, 0.01)
+
+            BoxShadow {
+                anchors.fill: rightBgArea
+                cornerRadius: rightBgArea.radius
+                hollow: true
+                shadowBlur: 10
+                shadowColor: Qt.rgba(0, 0, 0, 0.05)
+                shadowOffsetX: 0
+                shadowOffsetY: 4
+                spread: 0
+            }
 
             ColumnLayout {
                 anchors.fill: parent

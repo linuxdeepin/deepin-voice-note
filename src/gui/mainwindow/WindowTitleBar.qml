@@ -28,6 +28,7 @@ TitleBar {
     signal titleOpenSetting
 
     enableInWindowBlendBlur: false
+    separatorVisible: false
 
     anchors.fill: parent
 
