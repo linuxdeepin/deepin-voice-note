@@ -692,6 +692,8 @@ ApplicationWindow {
             }
 
             ColumnLayout {
+                id: middleColumnLayout
+
                 Layout.topMargin: 7
                 anchors.fill: parent
                 anchors.leftMargin: 10
@@ -821,6 +823,8 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     enabled: !rootWindow.isVoiceToText
                     opacity: enabled ? 1.0 : 0.4
+                    scrollBarParent: itemScrollBarOverlay
+                    scrollBarRightOffset: 10
                     sourceFolderModel: folderListView.model
                     currentFolderIndex: folderListView.currentFolderIndex
                     webVisible: initRect.visible
@@ -985,6 +989,52 @@ ApplicationWindow {
 
             function onYChanged() {
                 Qt.callLater(scrollBarOverlay.updateGeometry);
+            }
+        }
+    }
+
+    Item {
+        id: itemScrollBarOverlay
+
+        function updateGeometry() {
+            y = itemListView.mapToItem(parent, 0, 0).y;
+        }
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        clip: true
+        height: itemListView.height
+        visible: middleBgArea.visible
+        z: 50
+
+        Component.onCompleted: Qt.callLater(updateGeometry)
+        onHeightChanged: Qt.callLater(updateGeometry)
+        onVisibleChanged: Qt.callLater(updateGeometry)
+
+        Connections {
+            target: itemListView
+
+            function onHeightChanged() {
+                Qt.callLater(itemScrollBarOverlay.updateGeometry);
+            }
+            function onYChanged() {
+                Qt.callLater(itemScrollBarOverlay.updateGeometry);
+            }
+        }
+
+        Connections {
+            target: middleBgArea
+
+            function onYChanged() {
+                Qt.callLater(itemScrollBarOverlay.updateGeometry);
+            }
+        }
+
+        Connections {
+            target: middleColumnLayout
+
+            function onYChanged() {
+                Qt.callLater(itemScrollBarOverlay.updateGeometry);
             }
         }
     }

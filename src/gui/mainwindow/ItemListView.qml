@@ -34,6 +34,8 @@ Item {
     property int topSize: 0
     property alias view: itemListView
     property bool webVisible: true
+    property Item scrollBarParent: null
+    property int scrollBarRightOffset: 0
 
     signal deleteFinished
     signal deleteNotes(int number)
@@ -787,6 +789,57 @@ Item {
         visible: true
 
         ScrollBar.vertical: ScrollBar {
+            id: verticalScrollBar
+
+            function updateGeometry() {
+                if (!parent)
+                    return;
+
+                x = rootItem.mapToItem(parent, rootItem.width + rootItem.scrollBarRightOffset - width, 0).x;
+                y = rootItem.scrollBarParent ? 0 : rootItem.mapToItem(parent, 0, 0).y;
+                height = rootItem.scrollBarParent ? parent.height : itemListView.height;
+            }
+
+            parent: rootItem.scrollBarParent ? rootItem.scrollBarParent : itemListView
+
+            Component.onCompleted: Qt.callLater(updateGeometry)
+            onParentChanged: Qt.callLater(updateGeometry)
+            onWidthChanged: Qt.callLater(updateGeometry)
+
+            Connections {
+                target: rootItem
+
+                function onHeightChanged() {
+                    Qt.callLater(verticalScrollBar.updateGeometry);
+                }
+                function onWidthChanged() {
+                    Qt.callLater(verticalScrollBar.updateGeometry);
+                }
+                function onXChanged() {
+                    Qt.callLater(verticalScrollBar.updateGeometry);
+                }
+                function onYChanged() {
+                    Qt.callLater(verticalScrollBar.updateGeometry);
+                }
+            }
+
+            Connections {
+                enabled: !!rootItem.scrollBarParent
+                target: rootItem.scrollBarParent
+
+                function onHeightChanged() {
+                    Qt.callLater(verticalScrollBar.updateGeometry);
+                }
+                function onWidthChanged() {
+                    Qt.callLater(verticalScrollBar.updateGeometry);
+                }
+                function onXChanged() {
+                    Qt.callLater(verticalScrollBar.updateGeometry);
+                }
+                function onYChanged() {
+                    Qt.callLater(verticalScrollBar.updateGeometry);
+                }
+            }
         }
 
         delegate: Rectangle {
