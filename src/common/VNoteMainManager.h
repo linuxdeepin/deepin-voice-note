@@ -55,7 +55,9 @@ public:
     Q_INVOKABLE QString getNotePlainTitle(const int &noteId);
     Q_INVOKABLE void vNoteSearch(const QString &text);
     Q_INVOKABLE void updateNoteWithResult(const QString &result);
-    Q_INVOKABLE void updateNoteWithResultForNote(int noteId, const QString &result);
+    Q_INVOKABLE void updateNoteWithResultForNote(int noteId, quint64 serial, const QString &result);
+    Q_INVOKABLE quint64 currentTextChangeSerial() const;
+    Q_INVOKABLE void flushNoteWithResultForNote(int noteId, quint64 serial, const QString &result);
     Q_INVOKABLE int loadSearchNotes(const QString &key);
     Q_INVOKABLE int loadAudioSource();
     Q_INVOKABLE void changeAudioSource(const int &source);
@@ -104,7 +106,7 @@ signals:
     void noSearchResult();
     void searchFinished(const QList<QVariantMap> &notesData, const QString &key);
     void moveFinished(const QVariantList &index, const int &srcFolderIndex, const int &dstFolderIndex);
-    void needUpdateNote(int noteId);
+    void needUpdateNote(int noteId, quint64 serial);
     void updateRichTextSearch(const QString &key);
     void scrollChange(const bool &isTop);
     void updateEditNote(const int &noteId, const QString &time);

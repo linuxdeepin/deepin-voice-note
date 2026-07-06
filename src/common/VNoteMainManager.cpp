@@ -1051,14 +1051,25 @@ void VNoteMainManager::vNoteSearch(const QString &text)
 void VNoteMainManager::updateNoteWithResult(const QString &result)
 {
     qInfo() << "Updating note with result";
-    updateNoteWithResultForNote(m_currentNoteId, result);
+    updateNoteWithResultForNote(m_currentNoteId, currentTextChangeSerial(), result);
     qInfo() << "Note update with result finished";
 }
 
-void VNoteMainManager::updateNoteWithResultForNote(int noteId, const QString &result)
+void VNoteMainManager::updateNoteWithResultForNote(int noteId, quint64 serial, const QString &result)
 {
     VNoteItem *note = getNoteById(noteId);
-    m_richTextManager->onUpdateNoteWithResult(note, result);
+    m_richTextManager->onUpdateNoteWithResult(note, serial, result);
+}
+
+quint64 VNoteMainManager::currentTextChangeSerial() const
+{
+    return m_richTextManager ? m_richTextManager->currentTextChangeSerial() : 0;
+}
+
+void VNoteMainManager::flushNoteWithResultForNote(int noteId, quint64 serial, const QString &result)
+{
+    VNoteItem *note = getNoteById(noteId);
+    m_richTextManager->flushNoteWithResult(note, serial, result);
 }
 
 int VNoteMainManager::loadSearchNotes(const QString &key)

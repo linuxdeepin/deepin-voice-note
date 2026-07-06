@@ -24,7 +24,9 @@ public:
     bool hasPendingTextChange() const;
     int pendingTextChangeNoteId() const;
     int currentNoteId() const;
+    quint64 currentTextChangeSerial() const;
     void requestUpdateNoteNow();
+    void flushNoteWithResult(VNoteItem *data, quint64 serial, const QString &result);
 
 public slots:
     void onLoadFinsh();
@@ -33,12 +35,12 @@ public slots:
 
     void updateNote();
 
-    void onUpdateNoteWithResult(VNoteItem *data, const QString &result);
+    void onUpdateNoteWithResult(VNoteItem *data, quint64 serial, const QString &result);
 
     void insertVoiceItem(const QString &voicePath, qint64 voiceSize);
 
 signals:
-    void needUpdateNote(int noteId);
+    void needUpdateNote(int noteId, quint64 serial);
     void noteTextChanged();
     void updateSearch();
     void scrollChange(const bool &isTop);
@@ -46,6 +48,8 @@ signals:
 
 private:
     void setData(VNoteItem *data, const QString reg);
+    bool saveNoteWithResult(VNoteItem *data, const QString &result);
+    bool clearTextChangeState(int noteId, quint64 serial);
 
 private:
     VNoteItem *m_noteData {nullptr};

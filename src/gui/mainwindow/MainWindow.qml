@@ -193,13 +193,16 @@ ApplicationWindow {
                 return;
             }
 
-            // Ctrl+S 保存为 txt，只检查是否有文本内容，与右键菜单逻辑保持一致
-            if (!VNoteMainManager.hasNoteText(currentNoteId)) {
-                console.warn("当前笔记没有文本内容，不执行保存操作");
-                return;
-            }
+            webEngineView.flushCurrentNote(function() {
+                // Ctrl+S 保存为 txt，只检查是否有文本内容，与右键菜单逻辑保持一致
+                currentNoteId = VNoteMainManager.currentNoteId();
+                if (!VNoteMainManager.hasNoteText(currentNoteId)) {
+                    console.warn("当前笔记没有文本内容，不执行保存操作");
+                    return;
+                }
 
-            itemListView.onSaveNote();
+                itemListView.onSaveNote();
+            });
         }
         onSaveVoice: {
             // JS keydown 已处理；避免 async Loader item 尚未就绪时被二次 open()
@@ -843,6 +846,11 @@ ApplicationWindow {
                     onNoteItemChanged: {
                         VNoteMainManager.vNoteChanged(index);
                     }
+                    onRequestNoteContextMenu: function(noteIds, popupIndex, popupX, popupY) {
+                        webEngineView.flushCurrentNote(function() {
+                            itemListView.popupNoteContextMenu(noteIds, popupIndex, popupX, popupY);
+                        });
+                    }
                 }
             }
         }
@@ -940,7 +948,9 @@ ApplicationWindow {
                         itemListView.onSaveAudio();
                     }
                     onSaveNote: {
-                        itemListView.onSaveNote();
+                        webEngineView.flushCurrentNote(function() {
+                            itemListView.onSaveNote();
+                        });
                     }
                 }
             }

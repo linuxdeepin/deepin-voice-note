@@ -141,7 +141,7 @@ void WebRichTextManager::updateNote()
         m_updateInProgress = true;
         m_updateRequestNoteId = m_textChangeNoteId;
         m_updateRequestSerial = m_textChangeSerial;
-        emit needUpdateNote(m_updateRequestNoteId);
+        emit needUpdateNote(m_updateRequestNoteId, m_updateRequestSerial);
     }
     // qInfo() << "Note update finished";
 }
@@ -161,12 +161,37 @@ int WebRichTextManager::currentNoteId() const
     return m_noteData ? m_noteData->noteId : -1;
 }
 
+quint64 WebRichTextManager::currentTextChangeSerial() const
+{
+    return m_textChangeSerial;
+}
+
 void WebRichTextManager::requestUpdateNoteNow()
 {
     updateNote();
 }
 
-void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &result)
+bool WebRichTextManager::saveNoteWithResult(VNoteItem *data, const QString &result)
+{
+    if (!data) {
+        return false;
+    }
+    if (data->htmlCode == result) {
+        return true;
+    }
+
+    data->htmlCode = result;
+    VNoteItemOper noteOps(data);
+    const bool updateOk = noteOps.updateNote();
+    if (!updateOk) {
+        qWarning() << "Failed to save note";
+    } else {
+        qDebug() << "Note saved successfully";
+    }
+    return updateOk;
+}
+
+void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, quint64 serial, const QString &result)
 {
     qDebug() << "Updating note with result";
     if (!data) {
@@ -177,15 +202,33 @@ void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &
         emit finishedUpdateNote();
         return;
     }
-    data->htmlCode = result;
-    VNoteItemOper noteOps(data);
-    const bool updateOk = noteOps.updateNote();
-    if (!updateOk) {
-        qWarning() << "Failed to save note";
-    } else {
-        qDebug() << "Note saved successfully";
+
+    if (data->noteId != m_updateRequestNoteId || serial != m_updateRequestSerial) {
+        qWarning() << "Discard stale note update result, noteId:" << data->noteId
+                   << "serial:" << serial
+                   << "requestNoteId:" << m_updateRequestNoteId
+                   << "requestSerial:" << m_updateRequestSerial;
+        m_updateInProgress = false;
+        m_updateRequestNoteId = -1;
+        m_updateRequestSerial = 0;
+        emit finishedUpdateNote();
+        return;
     }
-    if (updateOk && data->noteId == m_textChangeNoteId && m_updateRequestSerial == m_textChangeSerial) {
+
+    if (data->noteId != m_textChangeNoteId || serial != m_textChangeSerial) {
+        qWarning() << "Discard outdated note update result, noteId:" << data->noteId
+                   << "serial:" << serial
+                   << "textChangeNoteId:" << m_textChangeNoteId
+                   << "textChangeSerial:" << m_textChangeSerial;
+        m_updateInProgress = false;
+        m_updateRequestNoteId = -1;
+        m_updateRequestSerial = 0;
+        emit finishedUpdateNote();
+        return;
+    }
+
+    const bool updateOk = saveNoteWithResult(data, result);
+    if (updateOk) {
         m_textChange = false;
         m_textChangeNoteId = -1;
     }
@@ -194,6 +237,37 @@ void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &
     m_updateRequestSerial = 0;
     emit finishedUpdateNote();
     qInfo() << "Note update with result finished";
+}
+
+bool WebRichTextManager::clearTextChangeState(int noteId, quint64 serial)
+{
+    bool clearedUpdateRequest = false;
+
+    if (noteId == m_textChangeNoteId && serial == m_textChangeSerial) {
+        m_textChange = false;
+        m_textChangeNoteId = -1;
+    }
+    if (noteId == m_updateRequestNoteId && serial == m_updateRequestSerial) {
+        m_updateInProgress = false;
+        m_updateRequestNoteId = -1;
+        m_updateRequestSerial = 0;
+        clearedUpdateRequest = true;
+    }
+
+    return clearedUpdateRequest;
+}
+
+void WebRichTextManager::flushNoteWithResult(VNoteItem *data, quint64 serial, const QString &result)
+{
+    if (!data) {
+        return;
+    }
+
+    if (saveNoteWithResult(data, result)) {
+        if (clearTextChangeState(data->noteId, serial)) {
+            emit finishedUpdateNote();
+        }
+    }
 }
 
 void WebRichTextManager::insertVoiceItem(const QString &voicePath, qint64 voiceSize)
