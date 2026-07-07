@@ -9,6 +9,7 @@ import VNote 1.0
 import "../drag/"
 import "../dialog/"
 import org.deepin.dtk 1.0
+import org.deepin.dtk.style 1.0 as DS
 
 Item {
     id: root
@@ -18,7 +19,8 @@ Item {
     property bool isPlay: false
     property bool isRecordingAudio: false
     property bool isVoiceToText: false
-    property int itemHeight: 30
+    readonly property int itemVerticalPadding: (DS.Style.control.padding - DS.Style.control.borderWidth) * 2
+    property int itemHeight: Math.max(30, folderItemFontMetrics.height + itemVerticalPadding)
     property int lastDropIndex: -1
     property int listHeight: 700
     property int listWidth: 200
@@ -33,6 +35,10 @@ Item {
     signal itemChanged(int index, string name)
     signal mouseChanged(int mousePosX, int mousePosY)
     signal updateFolderName(string name)
+
+    FontMetrics {
+        id: folderItemFontMetrics
+    }
 
     function addFolder() {
         VNoteMainManager.vNoteCreateFolder();
@@ -451,6 +457,7 @@ Item {
             opacity: (isRecordingAudio && index !== folderListView.currentIndex) ? 0.5 : 1.0
 
             color: index === folderListView.currentIndex ? (root.activeFocus ? palette.highlight : DTK.themeType === ApplicationHelper.LightType ? "#33000000" : "#33FFFFFF") : (folderListView.hoverIndex === index || isHovered ? (DTK.themeType === ApplicationHelper.LightType ? "#1A000000" : "#1AFFFFFF") : "transparent")
+            clip: true
             enabled: !isPlay || index === folderListView.currentIndex
             height: itemHeight
             radius: 6
@@ -582,6 +589,8 @@ Item {
                     id: folderNameLabel
 
                     Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.alignment: Qt.AlignVCenter
                     color: index === folderListView.currentIndex ? (root.activeFocus ? palette.highlightedText : (DTK.themeType === ApplicationHelper.LightType ? "black" : "#B2FFFFFF")) : (DTK.themeType === ApplicationHelper.LightType ? "black" : "#B2FFFFFF")
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignLeft
@@ -593,6 +602,7 @@ Item {
                 Label {
                     id: folderCountLabel
 
+                    Layout.alignment: Qt.AlignVCenter
                     Layout.rightMargin: 10
                     color: folderNameLabel.color
                     font.pixelSize: 12

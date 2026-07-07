@@ -1222,12 +1222,17 @@ Item {
 
             delegate: Rectangle {
                 color: "transparent"
-                height: section == "top" ? (18) : 16
+                height: section == "top" ? Math.max(18, Math.ceil(sectionStickyFontMetrics.height) + 6) : 16
                 width: parent.width
+
+                FontMetrics {
+                    id: sectionStickyFontMetrics
+                    font.pixelSize: 12
+                }
 
                 RowLayout {
                     anchors.left: parent.left
-                    anchors.top: parent.top
+                    anchors.verticalCenter: parent.verticalCenter
                     spacing: 4
                     visible: section == "top" && !isSearch
                     
@@ -1246,6 +1251,7 @@ Item {
                     Text {
                         color: "#b3000000"
                         font.pixelSize: 12
+                        verticalAlignment: Text.AlignVCenter
                         text: qsTr("Sticky Notes")
                     }
                 }
