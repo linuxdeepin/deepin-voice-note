@@ -59,6 +59,7 @@ TitleBar {
         anchors.verticalCenter: titleBar.verticalCenter
         enabled: !isPlaying && !isSearching && !isRecordingAudio && !isVoiceToText
         hoverEnabled: !isInitialInterface
+        visible: recordBtn.x > x + width
         icon.height: 16
         icon.name: "new_note"
         icon.width: 16

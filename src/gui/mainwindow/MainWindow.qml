@@ -32,10 +32,21 @@ ApplicationWindow {
     property int windowMiniHeight: 300
     property int windowMiniWidth: 685
 
+    function collapsedSearchOffset() {
+        // offect 是 ColumnLayout 内的 leftMargin，需要减去 ColumnLayout 本身的 leftMargin
+        return twoColumnModeBtn.x + twoColumnModeBtn.width + 8 - middleColumnLayout.anchors.leftMargin;
+    }
+
     function toggleTwoColumnMode() {
-        if (leftBgArea.visible === false) {
+        if (hideLeftArea.running) {
+            hideLeftArea.stop();
             leftBgArea.visible = true;
             leftDragHandle.visible = true;
+            showLeftArea.start();
+        } else if (showLeftArea.running) {
+            showLeftArea.stop();
+            hideLeftArea.start();
+        } else if (leftBgArea.visible === false) {
             showLeftArea.start();
         } else {
             hideLeftArea.start();
@@ -81,12 +92,12 @@ ApplicationWindow {
     onWidthChanged: {
         if (rightBgArea.width < rightAreaMinWidth) {
             var reduce = rightAreaMinWidth - rightBgArea.width;
-            if (middleBgArea.width > middleAreaMinWidth) {
-                middleBgArea.Layout.preferredWidth = middleBgArea.width - reduce;
-            } else {
-                leftBgArea.Layout.preferredWidth = leftBgArea.width - reduce;
+            if (middleBgArea.width - reduce >= middleAreaMinWidth - rightDragHandle.width) {
+                middleBgArea.width -= reduce;
+            } else if (leftBgArea.visible) {
+                leftBgArea.width -= reduce;
+                tmpLeftAreaWidth = leftBgArea.width;
             }
-            rightBgArea.width = rightAreaMinWidth;
         }
     }
 
@@ -501,18 +512,18 @@ ApplicationWindow {
         z: 0
     }
 
-    RowLayout {
+    Item {
         id: rowLayout
 
         z: 1
         anchors.fill: parent
-        spacing: 0
 
         Rectangle {
             id: leftBgArea
 
-            Layout.fillHeight: true
-            Layout.preferredWidth: leftViewWidth - leftDragHandle.width
+            height: parent.height
+            width: leftViewWidth - 5
+            clip: true
             color: "transparent"
 
             ColumnLayout {
@@ -532,7 +543,7 @@ ApplicationWindow {
                     enabled: !rootWindow.isVoiceToText && !itemListView.isSearching && !webEngineView.titleBar.isSearching
                     opacity: enabled ? 1.0 : 0.4
                     scrollBarParent: scrollBarOverlay
-                    scrollBarRightOffset: 10
+                    scrollBarRightAnchor: leftDragHandle.x + leftDragHandle.width - 3
                     webVisible: initRect.visible
                     isRecordingAudio: rootWindow.isRecordingAudio  // 传递录音状态
                     isVoiceToText: rootWindow.isVoiceToText  // 传递语音转文字状态
@@ -629,8 +640,9 @@ ApplicationWindow {
         Rectangle {
             id: leftDragHandle
 
-            Layout.fillHeight: true
-            Layout.preferredWidth: 5
+            x: leftBgArea.width
+            height: parent.height
+            width: 5
             color: "transparent"
 
             Rectangle {
@@ -641,30 +653,33 @@ ApplicationWindow {
             }
 
             MouseArea {
+                property real pressGlobalX: 0
+
                 anchors.fill: parent
                 cursorShape: Qt.SizeHorCursor
-                drag.axis: Drag.XAxis
-                drag.maximumX: rootWindow.width > (leftAreaMaxWidth + middleAreaMinWidth + rightAreaMinWidth - leftDragHandle.width) ? leftAreaMaxWidth : rootWindow.width - (middleAreaMinWidth + rightAreaMinWidth)
-                drag.minimumX: leftAreaMinWidth
-                drag.target: leftDragHandle
 
-                onPositionChanged: {
-                    if (drag.active) {
-                        var newWidth = leftDragHandle.x;
-                        if (newWidth >= leftBgArea.width) {
-                            var shrinkWidth = newWidth - leftBgArea.width;
-                            if ((middleBgArea.width + rightDragHandle.width) > middleAreaMinWidth) {
-                                middleBgArea.Layout.preferredWidth = middleBgArea.width - shrinkWidth;
-                            } else {
-                                rightBgArea.Layout.preferredWidth = rightBgArea.width - shrinkWidth;
-                            }
-                        } else {
-                            var middleShrinkWidth = leftBgArea.width - newWidth;
-                            middleBgArea.Layout.preferredWidth = middleBgArea.width + middleShrinkWidth;
+                onPressed: function(mouse) {
+                    pressGlobalX = mapToItem(null, mouse.x, 0).x;
+                }
+                onPositionChanged: function(mouse) {
+                    if (!pressed) return;
+                    var globalX = mapToItem(null, mouse.x, 0).x;
+                    var delta = globalX - pressGlobalX;
+                    pressGlobalX = globalX;
+
+                    var maxX = rootWindow.width > (leftAreaMaxWidth + middleAreaMinWidth + rightAreaMinWidth - leftDragHandle.width) ? leftAreaMaxWidth : rootWindow.width - (middleAreaMinWidth + rightAreaMinWidth);
+                    var newWidth = Math.max(leftAreaMinWidth, Math.min(maxX, leftBgArea.width + delta));
+                    var actualDelta = newWidth - leftBgArea.width;
+
+                    if (actualDelta > 0) {
+                        if ((middleBgArea.width + rightDragHandle.width) > middleAreaMinWidth) {
+                            middleBgArea.width -= actualDelta;
                         }
-                        leftBgArea.Layout.preferredWidth = newWidth;
-                        tmpLeftAreaWidth = newWidth;
+                    } else if (actualDelta < 0) {
+                        middleBgArea.width -= actualDelta;
                     }
+                    leftBgArea.width = newWidth;
+                    tmpLeftAreaWidth = newWidth;
                 }
             }
         }
@@ -672,8 +687,10 @@ ApplicationWindow {
         Rectangle {
             id: middleBgArea
 
-            Layout.fillHeight: true
-            Layout.preferredWidth: middleViewWidth - rightDragHandle.width
+            x: leftBgArea.width + leftDragHandle.width
+            height: parent.height
+            width: middleViewWidth - 5
+            clip: true
             color: DTK.themeType === ApplicationHelper.LightType ? Qt.rgba(248 / 255, 248 / 255, 248 / 255, 0.95)
                                                                    : Qt.rgba(24 / 255, 24 / 255, 24 / 255, 0.95)
 
@@ -682,7 +699,7 @@ ApplicationWindow {
                     if (width >= 240) {
                         search.visible = true;
                         needHideSearch = false;
-                        search.offect = 85;
+                        search.offect = collapsedSearchOffset();
                     } else {
                         search.visible = false;
                         needHideSearch = true;
@@ -694,7 +711,6 @@ ApplicationWindow {
             ColumnLayout {
                 id: middleColumnLayout
 
-                Layout.topMargin: 7
                 anchors.fill: parent
                 anchors.leftMargin: 10
                 anchors.rightMargin: 5
@@ -702,10 +718,13 @@ ApplicationWindow {
 
                 VNoteComponents.VNoteToolButton {
                     Layout.alignment: Text.AlignRight
+                    Layout.preferredHeight: 30
+                    Layout.preferredWidth: 30
                     Layout.rightMargin: 10
                     Layout.topMargin: 10
+                    display: AbstractButton.IconOnly
                     icon.height: 16
-                    icon.name: "search"
+                    icon.name: "action_search"
                     icon.width: 16
                     height: 30
                     width: 30
@@ -713,7 +732,7 @@ ApplicationWindow {
 
                     onClicked: {
                         search.visible = true;
-                        search.offect = 50;
+                        search.offect = leftBgArea.visible ? 50 : collapsedSearchOffset();
                         search.forceActiveFocus();
                     }
                 }
@@ -824,7 +843,7 @@ ApplicationWindow {
                     enabled: !rootWindow.isVoiceToText
                     opacity: enabled ? 1.0 : 0.4
                     scrollBarParent: itemScrollBarOverlay
-                    scrollBarRightOffset: 10
+                    scrollBarRightAnchor: rightDragHandle.x + rightDragHandle.width - 2
                     sourceFolderModel: folderListView.model
                     currentFolderIndex: folderListView.currentFolderIndex
                     webVisible: initRect.visible
@@ -850,8 +869,9 @@ ApplicationWindow {
         Rectangle {
             id: rightDragHandle
 
-            Layout.fillHeight: true
-            Layout.preferredWidth: 5
+            x: middleBgArea.x + middleBgArea.width
+            height: parent.height
+            width: 5
             color: middleBgArea.color
 
             Component.onCompleted: {
@@ -861,30 +881,38 @@ ApplicationWindow {
             MouseArea {
                 id: rightMouseArea
 
+                property real pressGlobalX: 0
+
                 anchors.fill: parent
                 cursorShape: Qt.SizeHorCursor
-                drag.axis: Drag.XAxis
-                drag.maximumX: leftBgArea.visible ? ((rootWindow.width - leftBgArea.width) > (middleAreaMinWidth + rightAreaMinWidth) ? rootWindow.width - rightAreaMinWidth : (rootWindow.width - rightAreaMinWidth)) : (rootWindow.width - rightAreaMinWidth)
-                drag.minimumX: leftBgArea.visible ? (leftAreaMinWidth + middleAreaMinWidth + leftDragHandle.width) : (middleAreaMinWidth - rightDragHandle.width)
-                drag.target: rightDragHandle
 
-                onPositionChanged: {
-                    if (drag.active) {
-                        tmprightDragX = rightDragHandle.x;
-                        var newWidth = rightDragHandle.x - middleBgArea.x;
-                        if (newWidth < (middleAreaMinWidth - rightDragHandle.width)) {
-                            middleBgArea.Layout.preferredWidth = middleAreaMinWidth - rightDragHandle.width;
-                            var shrinkWidth = middleAreaMinWidth - newWidth - rightDragHandle.width;
-                            leftBgArea.Layout.preferredWidth = leftBgArea.width - shrinkWidth - leftDragHandle.width;
-                            tmpLeftAreaWidth = leftBgArea.width;
-                        } else {
-                            middleBgArea.Layout.preferredWidth = newWidth;
-                        }
-                        rightBgArea.Layout.preferredWidth = rowLayout.width - middleBgArea.width - rightDragHandle.width;
-                        tmpWebViewWidth = rightBgArea.width;
-                        if (search.activeFocus) {
-                            middleBgArea.forceActiveFocus();
-                        }
+                onPressed: function(mouse) {
+                    pressGlobalX = mapToItem(null, mouse.x, 0).x;
+                }
+                onPositionChanged: function(mouse) {
+                    if (!pressed) return;
+                    var globalX = mapToItem(null, mouse.x, 0).x;
+                    var delta = globalX - pressGlobalX;
+                    pressGlobalX = globalX;
+
+                    var maxX = rootWindow.width - rightAreaMinWidth;
+                    var minX = leftBgArea.visible ? (leftAreaMinWidth + middleAreaMinWidth + leftDragHandle.width) : (middleAreaMinWidth - rightDragHandle.width);
+                    var targetHandleX = rightDragHandle.x + delta;
+                    targetHandleX = Math.max(minX, Math.min(maxX, targetHandleX));
+
+                    var newMiddleWidth = targetHandleX - middleBgArea.x;
+                    if (newMiddleWidth < (middleAreaMinWidth - rightDragHandle.width)) {
+                        var shrinkWidth = middleAreaMinWidth - newMiddleWidth - rightDragHandle.width;
+                        middleBgArea.width = middleAreaMinWidth - rightDragHandle.width;
+                        leftBgArea.width = leftBgArea.width - shrinkWidth;
+                        tmpLeftAreaWidth = leftBgArea.width;
+                    } else {
+                        middleBgArea.width = newMiddleWidth;
+                    }
+                    tmprightDragX = middleBgArea.width;
+                    tmpWebViewWidth = rightBgArea.width;
+                    if (search.activeFocus) {
+                        middleBgArea.forceActiveFocus();
                     }
                 }
             }
@@ -893,8 +921,9 @@ ApplicationWindow {
         Rectangle {
             id: rightBgArea
 
-            Layout.fillHeight: true
-            Layout.fillWidth: true
+            x: rightDragHandle.x + rightDragHandle.width
+            height: parent.height
+            width: parent.width - x
             color: Qt.rgba(0, 0, 0, 0.01)
 
             BoxShadow {
@@ -1037,6 +1066,22 @@ ApplicationWindow {
                 Qt.callLater(itemScrollBarOverlay.updateGeometry);
             }
         }
+
+        Connections {
+            target: hideLeftArea
+
+            function onFinished() {
+                Qt.callLater(itemScrollBarOverlay.updateGeometry);
+            }
+        }
+
+        Connections {
+            target: showLeftArea
+
+            function onFinished() {
+                Qt.callLater(itemScrollBarOverlay.updateGeometry);
+            }
+        }
     }
 
     Rectangle {
@@ -1075,22 +1120,23 @@ ApplicationWindow {
     ParallelAnimation {
         id: hideLeftArea
 
-        onFinished: {
-            leftBgArea.visible = false;
-            tmprightDragX = middleBgArea.width;
-        }
         onStarted: {
             needHideSearch = false;
             if (middleBgArea.width < 240) {
                 needHideSearch = true;
                 search.visible = false;
             }
-            leftDragHandle.visible = false;
             tmpWebViewWidth = rightBgArea.width;
+        }
+        onFinished: {
+            leftBgArea.visible = false;
+            leftDragHandle.visible = false;
+            tmprightDragX = middleBgArea.width;
         }
 
         NumberAnimation {
-            duration: 200
+            duration: 300
+            easing.type: Easing.OutCubic
             from: leftBgArea.width
             property: "width"
             target: leftBgArea
@@ -1098,106 +1144,80 @@ ApplicationWindow {
         }
 
         NumberAnimation {
-            duration: 200
-            from: leftBgArea.width + leftDragHandle.width
-            property: "x"
-            target: middleBgArea
+            duration: 300
+            easing.type: Easing.OutCubic
+            from: leftDragHandle.width
+            property: "width"
+            target: leftDragHandle
             to: 0
         }
 
         NumberAnimation {
-            duration: 200
-            from: rightBgArea.x
-            property: "x"
-            target: rightBgArea
-            to: rightBgArea.x - tmpLeftAreaWidth - rightDragHandle.width
-        }
-
-        NumberAnimation {
-            duration: 200
-            from: tmpWebViewWidth
-            property: "width"
-            target: webEngineView
-            to: tmpLeftAreaWidth + rightDragHandle.width + tmpWebViewWidth
-        }
-
-        NumberAnimation {
-            duration: 200
-            easing.type: Easing.InOutQuad
-            from: 0
+            duration: 300
+            easing.type: Easing.OutCubic
+            from: search.offect
             property: "offect"
             target: search
-            to: 85
+            to: collapsedSearchOffset()
         }
     }
 
     ParallelAnimation {
         id: showLeftArea
 
-        property int currentMiddleWidth: 0
-        property int currentRightX: 0
-        property int tmpOffect: 0
+        property int targetMiddleWidth: 0
 
+        onStarted: {
+            leftBgArea.visible = true;
+            leftDragHandle.visible = true;
+
+            var totalNeeded = tmpLeftAreaWidth + 5 + middleBgArea.width + rightDragHandle.width;
+            var rightAvailable = rowLayout.width - totalNeeded;
+            if (rightAvailable < rightAreaMinWidth) {
+                var deficit = rightAreaMinWidth - rightAvailable;
+                targetMiddleWidth = Math.max(middleAreaMinWidth - rightDragHandle.width,
+                                             middleBgArea.width - deficit);
+            } else {
+                targetMiddleWidth = middleBgArea.width;
+            }
+        }
         onFinished: {
             search.visible = true;
-            leftDragHandle.x = leftBgArea.width;
-            rightDragHandle.x = middleBgArea.x + middleBgArea.width;
+            search.offect = 0;
             tmpWebViewWidth = rightBgArea.width;
-        }
-        onStarted: {
-            currentRightX = rightBgArea.x;
-            currentMiddleWidth = middleBgArea.width;
-            if (rightBgArea.width > (rightAreaMinWidth + tmpLeftAreaWidth)) {
-                showLeftArea.tmpOffect = middleBgArea.width + rightDragHandle.width;
-            } else {
-                showLeftArea.tmpOffect = middleBgArea.width - (rightAreaMinWidth + tmpLeftAreaWidth - rightBgArea.width);
-            }
         }
 
         NumberAnimation {
-            duration: 200
-            from: 0
+            duration: 300
+            easing.type: Easing.OutCubic
+            from: leftBgArea.width
             property: "width"
             target: leftBgArea
             to: tmpLeftAreaWidth
         }
 
         NumberAnimation {
-            duration: 200
-            from: 0
-            property: "x"
-            target: middleBgArea
-            to: tmpLeftAreaWidth + rightDragHandle.width
+            duration: 300
+            easing.type: Easing.OutCubic
+            from: leftDragHandle.width
+            property: "width"
+            target: leftDragHandle
+            to: 5
         }
 
         NumberAnimation {
-            duration: 200
-            from: currentMiddleWidth
+            duration: 300
+            easing.type: Easing.OutCubic
+            from: middleBgArea.width
             property: "width"
             target: middleBgArea
-            to: showLeftArea.tmpOffect
+            to: showLeftArea.targetMiddleWidth
         }
 
         NumberAnimation {
-            duration: 200
-            from: showLeftArea.currentRightX
-            property: "x"
-            target: rightBgArea
-            to: showLeftArea.tmpOffect + tmpLeftAreaWidth + rightDragHandle.width
-        }
-
-        NumberAnimation {
-            duration: 200
-            from: rightBgArea.width
-            property: "width"
-            target: rightBgArea
-            to: tmpWebViewWidth
-        }
-
-        NumberAnimation {
-            duration: 200
-            easing.type: Easing.InOutQuad
-            from: 85
+            duration: 300
+            easing.type: Easing.OutCubic
+            from: search.offect
             property: "offect"
             target: search
             to: 0
