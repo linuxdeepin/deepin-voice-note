@@ -326,6 +326,14 @@ ApplicationWindow {
         }
 
         function handleaddNote(noteData) {
+            var noteFolderId = Number(noteData.folderId);
+            var currentFolder = folderListView.getCurrentFolder();
+            var isCurrentFolder = currentFolder && Number(currentFolder.folderId) === noteFolderId;
+            if (!isCurrentFolder) {
+                adjustFolderCountById(noteFolderId, 1);
+                return;
+            }
+
             var topSize = 0;
             for (var j = 0; j < itemListView.model.count; j++) {
                 var note = itemListView.model.get(j);
@@ -356,6 +364,39 @@ ApplicationWindow {
             });
         }
 
+
+        function updateFolderCountsById(folderIdToCount) {
+            for (var i = 0; i < folderListView.model.count; i++) {
+                var folder = folderListView.model.get(i);
+                var fidStr = folder.folderId.toString();
+                var newCount = folderIdToCount[fidStr];
+                if (newCount !== undefined) {
+                    folder.count = Number(newCount).toString();
+                }
+            }
+        }
+
+        function folderCountById(folderId) {
+            for (var i = 0; i < folderListView.model.count; i++) {
+                var folder = folderListView.model.get(i);
+                if (Number(folder.folderId) === Number(folderId))
+                    return Number(folder.count);
+            }
+            return 0;
+        }
+
+
+        function adjustFolderCountById(folderId, delta) {
+            for (var i = 0; i < folderListView.model.count; i++) {
+                var folder = folderListView.model.get(i);
+                if (Number(folder.folderId) === Number(folderId)) {
+                    folder.count = (Number(folder.count) + Number(delta)).toString();
+                    return true;
+                }
+            }
+            return false;
+        }
+
         target: VNoteMainManager
 
         onAddFolderFinished: {
@@ -381,24 +422,35 @@ ApplicationWindow {
             }
         }
         onFinishedFolderLoad: {
-            if (foldersData.length > 0) {
-                initRect.visible = false;
+            var hasFolders = foldersData.length > 0;
+            initRect.visible = !hasFolders;
+            initiaInterface.loadFinished(hasFolders);
+
+            if (hasFolders) {
+                handleFinishedFolderLoad(foldersData);
+                itemListView.selectedNoteItem = [0];
+                itemListView.selectSize = 1;
+                return;
             }
-            initiaInterface.loadFinished(foldersData.length > 0);
-            handleFinishedFolderLoad(foldersData);
-            itemListView.selectedNoteItem = [0];
-            itemListView.selectSize = 1;
+
+            folderListView.model.clear();
+            folderListView.currentFolderIndex = -1;
+            itemListView.model.clear();
+            itemListView.selectedNoteItem = [];
+            itemListView.selectSize = 0;
+            itemListView.changeCurrentIndex(-1);
+            label.text = "";
+            webEngineView.webVisible = false;
         }
-        onMoveFinished: function(index, srcFolderIndex, dstFolderIndex) {
-            folderListView.model.get(srcFolderIndex).count = (Number(folderListView.model.get(srcFolderIndex).count) - index.length).toString();
-            folderListView.model.get(dstFolderIndex).count = (Number(folderListView.model.get(dstFolderIndex).count) + index.length).toString();
+        onMoveFinishedByFolderId: function(noteIds, srcFolderId, dstFolderId, folderIdToCount) {
+            updateFolderCountsById(folderIdToCount);
             var sortedArray = sortDescending(itemListView.selectedNoteItem);
             var minIndex = sortedArray[sortedArray.length - 1];
             for (var i = 0; i < sortedArray.length; i++) {
                 itemListView.model.remove(sortedArray[i]);
             }
             itemListView.selectedNoteItem = [];
-            if (Number(folderListView.model.get(srcFolderIndex).count) === 0) {
+            if (folderCountById(srcFolderId) === 0) {
                 webEngineView.webVisible = false;
             } else {
                 webEngineView.webVisible = true;
@@ -554,12 +606,21 @@ ApplicationWindow {
                     onFolderEmpty: {
                         initRect.visible = true;
                         initiaInterface.loadFinished(false);
+                        label.text = "";
+                        itemListView.model.clear();
+                        itemListView.selectedNoteItem = [];
+                        itemListView.selectSize = 0;
+                        itemListView.changeCurrentIndex(-1);
+                        webEngineView.webVisible = false;
                     }
                     onItemChanged: {
                         label.text = name;
                         itemListView.selectedNoteItem = [0];
                         itemListView.selectSize = 1;
-                        VNoteMainManager.vNoteFloderChanged(index);
+                        if (index >= 0 && index < folderListView.model.count) {
+                            var folderId = folderListView.model.get(index).folderId;
+                            VNoteMainManager.vNoteFloderChangedById(folderId);
+                        }
                     }
                     onUpdateFolderName: {
                         label.text = name;
@@ -1088,6 +1149,7 @@ ApplicationWindow {
         id: initRect
 
         anchors.fill: parent
+        z: 200
 
         ColumnLayout {
             anchors.fill: parent
