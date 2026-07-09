@@ -7,7 +7,7 @@ version: '1'
 package:
   id: org.deepin.voice.note
   name: deepin-voice-note
-  version: 6.5.60.1
+  version: 6.5.61.1
   kind: app
   description: 4
     voice note for deepin os
@@ -16,7 +16,7 @@ command:
   - deepin-voice-note
 
 base: org.deepin.base/25.2.2
-runtime: org.deepin.runtime.webengine/25.2.2
+runtime: org.deepin.runtime.webengine/6.7.0
 
 build: |
   apt -y install --download-only libdtk6gui-dev libdtk6widget-dev qt6-svg-dev qt6-tools-dev qt6-tools-dev-tools qt6-base-dev qt6-base-dev-tools qt6-base-private-dev qt6-l10n-tools qt6-webengine-dev qt6-5compat-dev

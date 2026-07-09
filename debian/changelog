@@ -1,3 +1,34 @@
+deepin-voice-note (6.5.61) unstable; urgency=medium
+
+  * chore: Update version to 6.5.61
+  * fix(vnote): use folder ids for notebook operations
+  * fix(vnote): fix Tibetan text overflow in notebook list headers
+  * fix(vnote): refactor three-column layout and sidebar animations
+  * fix(vnote): overlay note list scrollbar like folder list
+  * fix(vnote): set notebook list count label font size to 12px
+  * fix(vnote): fix title bar background and menu hover at 1.25 scale
+  * fix(vnote): add sidebar frosted glass and note card bottom shadow
+  * fix(vnote): unify toolbar button hover style with control center
+  * fix(vnote): bind note selection state for reliable multi-delete
+  * fix: prevent double onSaveAudio dispatch when ctrl+d pressed in editor
+  * fix: enable keyboard navigation in move note dialog
+  * fix: resolve image path before right-click save as
+  * fix(MoveDialog): exclude current notebook from move dialog list
+  * fix(editor): add CSS comment explaining text-shadow synthetic bold rationale
+  * fix(editor): add synthetic bold via text-shadow for bitmap fonts
+  * fix(editor): align floating toolbar dropdown with DTK menu style
+  * fix(editor): position floating toolbar with text context menu
+  * fix(editor): sync rich text color toolbar state
+  * fix(editor): reject unsupported file drag into rich text
+  * fix(folder): correct folder scrollbar position
+  * fix(folder): improve folder drag auto-scroll feedback
+  * fix(folder): correct folder drag auto-scroll sorting
+  * fix(desktop): add trailing semicolon to Keywords field
+  * fix(vnote): keep note order stable after pinning
+  * fix(vnote): keep multi-selection count in sync
+
+ -- zhanghongyuan <zhanghongyuan@uniontech.com>  Thu, 09 Jul 2026 14:37:48 +0800
+
 deepin-voice-note (6.5.60) unstable; urgency=medium
 
   * fix(vnote): keep move dialog item states consistent
