@@ -160,7 +160,7 @@ Item {
             moveFolderModel.append({
                 name: folder.name,
                 icon: folder.icon,
-                folderIndex: i
+                folderId: folder.folderId
             });
         }
     }
@@ -369,8 +369,8 @@ Item {
             }
             if (indexList.length === 0)
                 return;
-            var folderIndex = moveFolderModel.get(index).folderIndex;
-            VNoteMainManager.moveNotes(indexList, folderIndex);
+            var folderId = moveFolderModel.get(index).folderId;
+            VNoteMainManager.moveNotesToFolderId(indexList, folderId);
         }
     }
 
