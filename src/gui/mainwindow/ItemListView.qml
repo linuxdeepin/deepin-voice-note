@@ -1091,14 +1091,12 @@ Item {
                         case Qt.ControlModifier:
                             var nextSelection = selectedNoteItem.slice();
                             var pos = nextSelection.indexOf(index);
-                            if (pos != -1) {
+                            if (pos != -1)
                                 nextSelection.splice(pos, 1);
-                                selectSize--;
-                            } else {
+                            else
                                 nextSelection.push(index);
-                                selectSize++;
-                            }
                             selectedNoteItem = nextSelection;
+                            selectSize = validSelectedNoteIndexes().length;
                             break;
                         case Qt.ShiftModifier:
                             var anchorIndex = Math.max(0, Math.min(itemListView.lastCurrentIndex, itemModel.count - 1));
