@@ -9,7 +9,7 @@ package:
   name: deepin-voice-note
   version: 6.5.62.1
   kind: app
-  description: 4
+  description: |
     voice note for deepin os
 
 command:
