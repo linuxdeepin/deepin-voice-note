@@ -1,0 +1,142 @@
+name: 快捷键验证_suite
+app: deepin-voice-note
+description: ''
+module: 快捷键验证
+tags: []
+fast_fail: false
+env_check: []
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+suites:
+- id: case_1635259_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_press
+    key: f1
+  - action: keyboard_hot_key
+    key: ctrl+shift+/
+  - action: keyboard_hot_key
+    key: ctrl+n
+  - action: keyboard_hot_key
+    key: ctrl+b
+  - action: keyboard_hot_key
+    key: ctrl+r
+  - action: keyboard_hot_key
+    key: ctrl+s
+  - action: keyboard_hot_key
+    key: ctrl+y
+  assert_steps:
+  - action: assert_window
+  - action: assert_window
+  - action: assert_element
+    selector:
+      role: label
+      name: 记事本1
+  - action: assert_window
+  - action: assert_window
+  - action: assert_window
+  - action: assert_window
+- id: case_1624611_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_hot_key
+    key: ctrl+shift+/
+  assert_steps:
+  - action: assert_window
+- id: case_1635281_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_hot_key
+    key: ctrl+r
+  - action: keyboard_hot_key
+    key: ctrl+y
+  assert_steps:
+  - action: assert_window
+- id: case_1635279_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_hot_key
+    key: ctrl+y
+  assert_steps:
+  - action: assert_window
+- id: case_1635277_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_hot_key
+    key: ctrl+s
+  assert_steps:
+  - action: assert_window
+- id: case_1635271_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_press
+    key: f2
+  assert_steps:
+  - action: assert_window
+- id: case_1635265_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_press
+    key: delete
+  assert_steps:
+  - action: assert_window
+- id: case_1635263_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_press
+    key: delete
+  assert_steps:
+  - action: assert_window
+- id: case_1635261_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_hot_key
+    key: ctrl+r
+  - action: keyboard_hot_key
+    key: ctrl+n
+  assert_steps:
+  - action: assert_window
+- id: case_1635037_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_hot_key
+    key: ctrl+r
+  - action: dtk_main_menu
+    items:
+    - 退出
+  assert_steps:
+  - action: assert_window
+- id: case_1676398_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_main_menu
+    items:
+    - 退出
+  assert_steps:
+  - action: assert_window
+teardown:
+- action: session_stop

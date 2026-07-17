@@ -1,0 +1,60 @@
+metadata:
+  source: cases_raw.yaml
+  generated_at: '2026-07-17T12:00:00'
+  description: Non-GUI test cases that CANNOT be tested via AT-SPI
+  total: 18
+cases:
+  - id: case_1676385
+    name: 从启动器打开应用
+    reason: "非GUI: 涉及启动器(Launcher)桌面应用的点击操作，不属于语音记事本自身AT-SPI树范围"
+  - id: case_1676383
+    name: 验证可以正常启动应用(桌面)
+    reason: "非GUI: 涉及发送到桌面、双击桌面图标操作，属于系统桌面层"
+  - id: case_1676381
+    name: 验证可以正常启动应用(任务栏)
+    reason: "非GUI: 涉及发送到任务栏、点击任务栏图标操作，属于系统Dock层"
+  - id: case_1634833
+    name: 终端输入命令启动应用
+    reason: "非GUI: 需要打开深度终端并输入命令，属于终端操作"
+  - id: case_1634831
+    name: 验证可以正常启动应用(综合)
+    reason: "非GUI: 包含启动器、桌面、任务栏多种系统层操作，不属于应用AT-SPI树范围"
+  - id: case_1634835
+    name: 快捷键启动应用
+    reason: "非GUI: 需要在控制中心添加应用快捷键，属于系统控制中心操作"
+  - id: case_1678993
+    name: 音量检测
+    reason: "非GUI: 需要打开控制中心调节系统音量，属于系统控制中心操作"
+  - id: case_1676591
+    name: 检测录音设备
+    reason: "非GUI: 涉及物理录音设备的插拔操作，无法通过AT-SPI模拟"
+  - id: case_1873465
+    name: 语音转文字-自动唤醒UOS AI（非首次使用AI能力）
+    reason: "非GUI: 需要终端执行ps -ef |grep uos-ai检查进程，属于终端/系统进程检查"
+  - id: case_1873463
+    name: 语音听写-自动唤醒UOS AI（非首次使用AI能力）
+    reason: "非GUI: 需要终端执行ps -ef |grep uos-ai检查进程，属于终端/系统进程检查"
+  - id: case_1873461
+    name: 语音朗读-自动唤醒UOS AI（非首次使用AI能力）
+    reason: "非GUI: 需要终端执行ps -ef |grep uos-ai检查进程，属于终端/系统进程检查"
+  - id: case_1634941
+    name: 保存的文本笔记可在其他客户端正常打开
+    reason: "非GUI: 需要在Windows系统、手机端、微信等外部平台验证，属于跨平台验证"
+  - id: case_1635303
+    name: 切换系统语言查看语音记事本各个界面显示
+    reason: "非GUI: 需要切换系统语言(英文、繁体中文、维语、藏语等)，属于系统设置操作"
+  - id: case_1635305
+    name: 切换字体大小查看语音记事本各个界面显示
+    reason: "非GUI: 需要切换系统字体大小(最大/最小)，属于系统设置操作"
+  - id: case_1634829
+    name: 详情页输入不同字符组合在不同字体大小下的显示
+    reason: "非GUI: 需要切换系统字体字号验证显示效果，属于系统设置操作"
+  - id: case_1676205
+    name: 设置字体统一
+    reason: "非GUI: 需要修改系统标准字体并重启应用，属于系统设置操作"
+  - id: case_1635051
+    name: 录音时进行强制关机/重启/注销/待机/休眠操作
+    reason: "非GUI: 涉及系统级电源操作(关机/重启/注销/待机/休眠/锁屏/切换用户)，无法通过AT-SPI执行"
+  - id: case_1635045
+    name: 录音设备异常进行录音
+    reason: "非GUI: 涉及物理录音设备的插拔操作，无法通过AT-SPI模拟"

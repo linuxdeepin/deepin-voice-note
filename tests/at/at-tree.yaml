@@ -1,0 +1,203 @@
+version: '1.0'
+app: deepin-voice-note
+tree:
+- role: frame
+  name: ''
+  object_name: ''
+  accessible_id: ''
+  description: ''
+  actions: []
+  index_in_parent: 0
+  states:
+  - active
+  - enabled
+  - sensitive
+  - showing
+  - visible
+  source: runtime
+  children:
+  - role: button
+    name: 新建记事本
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 4
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    - showing
+    - visible
+    source: runtime
+    id: n3
+    state_labels: &id001 []
+    class_name: ''
+  - role: label
+    name: 记事本1
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - SetFocus
+    index_in_parent: 7
+    states:
+    - enabled
+    - focusable
+    - read_only
+    - sensitive
+    - showing
+    - visible
+    source: runtime
+    id: n6
+    state_labels: *id001
+    class_name: ''
+  - role: label
+    name: 已选择0个笔记
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - SetFocus
+    index_in_parent: 20
+    states:
+    - enabled
+    - focusable
+    - read_only
+    - sensitive
+    source: runtime
+    id: n16
+    state_labels: *id001
+    class_name: ''
+  - role: label
+    name: 新建一个记事本后，可以开始记录语音及文字
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - SetFocus
+    index_in_parent: 29
+    states:
+    - enabled
+    - focusable
+    - read_only
+    - sensitive
+    source: runtime
+    id: n23
+    state_labels: *id001
+    class_name: ''
+  - role: button
+    name: 新建记事本
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 30
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+    id: n24
+    state_labels: *id001
+    class_name: ''
+  id: n0
+  state_labels: *id001
+  class_name: ''
+- role: frame
+  name: ''
+  object_name: ''
+  accessible_id: ''
+  description: ''
+  actions: []
+  index_in_parent: 2
+  states:
+  - enabled
+  - sensitive
+  source: runtime
+  children:
+  - role: label
+    name: 移动笔记
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - SetFocus
+    index_in_parent: 1
+    states:
+    - enabled
+    - focusable
+    - read_only
+    - sensitive
+    source: runtime
+    id: n27
+    state_labels: *id001
+    class_name: ''
+  - role: button
+    name: 取 消
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 6
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+    id: n31
+    state_labels: *id001
+    class_name: ''
+  - role: button
+    name: 确定
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 7
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+    id: n32
+    state_labels: *id001
+    class_name: ''
+  id: n26
+  state_labels: *id001
+  class_name: ''
+- role: frame
+  name: ''
+  object_name: ''
+  accessible_id: ''
+  description: ''
+  actions: []
+  index_in_parent: 4
+  states:
+  - enabled
+  - sensitive
+  source: runtime
+  children: []
+  id: n34
+  state_labels: *id001
+  class_name: ''
+- id: ''
+  name: UpgradeView
+  role: panel
+  object_name: UpgradeView
+  accessible_id: ''
+  source: static
+  class_name: UpgradeView
+  description: ''
+  actions: []
+  index_in_parent: -1
+  states: []
+  state_labels: *id001

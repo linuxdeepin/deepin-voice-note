@@ -1,0 +1,913 @@
+---
+class_name: LoadFolderWorker
+source_file: src/task/loadfolderworker.cpp
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: LoadFolderWorker
+source_file: src/task/loadfolderworker.h
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: LoadIconsWorker
+source_file: src/task/loadiconsworker.cpp
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: LoadIconsWorker
+source_file: src/task/loadiconsworker.h
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: LoadNoteItemsWorker
+source_file: src/task/loadnoteitemsworker.cpp
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: LoadNoteItemsWorker
+source_file: src/task/loadnoteitemsworker.h
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNMainWndDelayInitTask
+source_file: src/task/vnmainwnddelayinittask.cpp
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNMainWndDelayInitTask
+source_file: src/task/vnmainwnddelayinittask.h
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNTask
+source_file: src/task/vntask.cpp
+base_classes:
+- QObject
+- QRunnable
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNTask
+source_file: src/task/vntask.h
+base_classes:
+- QObject
+- QRunnable
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: LoadFolderWorker
+source_file: src/task/loadfolderworker.cpp
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: LoadFolderWorker
+source_file: src/task/loadfolderworker.h
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: LoadIconsWorker
+source_file: src/task/loadiconsworker.cpp
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: LoadIconsWorker
+source_file: src/task/loadiconsworker.h
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: LoadNoteItemsWorker
+source_file: src/task/loadnoteitemsworker.cpp
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: LoadNoteItemsWorker
+source_file: src/task/loadnoteitemsworker.h
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNMainWndDelayInitTask
+source_file: src/task/vnmainwnddelayinittask.cpp
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNMainWndDelayInitTask
+source_file: src/task/vnmainwnddelayinittask.h
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNTask
+source_file: src/task/vntask.cpp
+base_classes:
+- QObject
+- QRunnable
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNTask
+source_file: src/task/vntask.h
+base_classes:
+- QObject
+- QRunnable
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VoicePlayerBase
+source_file: src/common/voiceplayerbase.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VoicePlayerBase
+source_file: src/common/voiceplayerbase.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VTextSpeechAndTrManager
+source_file: src/common/vtextspeechandtrmanager.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VTextSpeechAndTrManager
+source_file: src/common/vtextspeechandtrmanager.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: WebRichTextManager
+source_file: src/common/webrichetextmanager.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: WebRichTextManager
+source_file: src/common/webrichetextmanager.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: FolderQryDbVisitor
+source_file: src/db/dbvisitor.cpp
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: MaxIdFolderDbVisitor
+source_file: src/db/dbvisitor.cpp
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: AddFolderDbVisitor
+source_file: src/db/dbvisitor.cpp
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: RenameFolderDbVisitor
+source_file: src/db/dbvisitor.cpp
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: DelFolderDbVisitor
+source_file: src/db/dbvisitor.cpp
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: NoteQryDbVisitor
+source_file: src/db/dbvisitor.cpp
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: AddNoteDbVisitor
+source_file: src/db/dbvisitor.cpp
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: RenameNoteDbVisitor
+source_file: src/db/dbvisitor.cpp
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: UpdateNoteDbVisitor
+source_file: src/db/dbvisitor.cpp
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: UpdateNoteTopDbVisitor
+source_file: src/db/dbvisitor.cpp
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: UpdateNoteFolderIdDbVisitor
+source_file: src/db/dbvisitor.cpp
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: DelNoteDbVisitor
+source_file: src/db/dbvisitor.cpp
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: FolderQryDbVisitor
+source_file: src/db/dbvisitor.h
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: MaxIdFolderDbVisitor
+source_file: src/db/dbvisitor.h
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: AddFolderDbVisitor
+source_file: src/db/dbvisitor.h
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: RenameFolderDbVisitor
+source_file: src/db/dbvisitor.h
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: DelFolderDbVisitor
+source_file: src/db/dbvisitor.h
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: NoteQryDbVisitor
+source_file: src/db/dbvisitor.h
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: AddNoteDbVisitor
+source_file: src/db/dbvisitor.h
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: RenameNoteDbVisitor
+source_file: src/db/dbvisitor.h
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: UpdateNoteDbVisitor
+source_file: src/db/dbvisitor.h
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: UpdateNoteTopDbVisitor
+source_file: src/db/dbvisitor.h
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: UpdateNoteFolderIdDbVisitor
+source_file: src/db/dbvisitor.h
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: DelNoteDbVisitor
+source_file: src/db/dbvisitor.h
+base_classes:
+- DbVisitor
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNoteDbManager
+source_file: src/db/vnotedbmanager.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: JsContent
+source_file: src/common/jscontent.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: JsContent
+source_file: src/common/jscontent.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: QtPlayer
+source_file: src/common/qtplayer.cpp
+base_classes:
+- VoicePlayerBase
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: QtPlayer
+source_file: src/common/qtplayer.h
+base_classes:
+- VoicePlayerBase
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: CustemBackend
+source_file: src/common/setting.cpp
+base_classes:
+- DSettingsBackend
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: setting
+source_file: src/common/setting.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: CustemBackend
+source_file: src/common/setting.h
+base_classes:
+- DSettingsBackend
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: setting
+source_file: src/common/setting.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VoicePlayerHandler
+source_file: src/handler/voice_player_handler.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VoiceRecoderHandler
+source_file: src/handler/voice_recoder_handler.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VoiceRecoderHandler
+source_file: src/handler/voice_recoder_handler.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VoiceToTextHandler
+source_file: src/handler/voice_to_text_handler.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VoiceToTextHandler
+source_file: src/handler/voice_to_text_handler.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VoiceToTextTaskManager
+source_file: src/handler/voice_to_text_task_manager.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VoiceToTextTaskManager
+source_file: src/handler/voice_to_text_task_manager.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: WebEngineHandler
+source_file: src/handler/web_engine_handler.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: WebEngineHandler
+source_file: src/handler/web_engine_handler.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: UpgradeView
+source_file: src/importolddata/upgradeview.cpp
+base_classes:
+- QWidget
+is_ui_widget: true
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: UpgradeView
+source_file: src/importolddata/upgradeview.h
+base_classes:
+- QWidget
+is_ui_widget: true
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNoteOldDataManager
+source_file: src/importolddata/vnoteolddatamanager.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNoteOldDataManager
+source_file: src/importolddata/vnoteolddatamanager.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: ExportNoteWorker
+source_file: src/task/exportnoteworker.cpp
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: ExportNoteWorker
+source_file: src/task/exportnoteworker.h
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: FileCleanupWorker
+source_file: src/task/filecleanupworker.cpp
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: FileCleanupWorker
+source_file: src/task/filecleanupworker.h
+base_classes:
+- VNTask
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VlcPlayer
+source_file: src/common/vlcplayer.cpp
+base_classes:
+- VoicePlayerBase
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VlcPlayer
+source_file: src/common/vlcplayer.h
+base_classes:
+- VoicePlayerBase
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNoteA2TManager
+source_file: src/common/vnotea2tmanager.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNoteA2TManager
+source_file: src/common/vnotea2tmanager.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNoteDataManager
+source_file: src/common/vnotedatamanager.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNoteDataManager
+source_file: src/common/vnotedatamanager.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNTextBlock
+source_file: src/common/vnoteitem.cpp
+base_classes:
+- VNoteBlock
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNVoiceBlock
+source_file: src/common/vnoteitem.cpp
+base_classes:
+- VNoteBlock
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNTextBlock
+source_file: src/common/vnoteitem.h
+base_classes:
+- VNoteBlock
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNVoiceBlock
+source_file: src/common/vnoteitem.h
+base_classes:
+- VNoteBlock
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: AudioWatcher
+source_file: src/audio/audio_watcher.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: AudioWatcher
+source_file: src/audio/audio_watcher.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: GstreamRecorder
+source_file: src/audio/gstreamrecorder.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: GstreamRecorder
+source_file: src/audio/gstreamrecorder.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNoteMainManager
+source_file: src/common/VNoteMainManager.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNoteMainManager
+source_file: src/common/VNoteMainManager.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: ActionManager
+source_file: src/common/actionmanager.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: ActionManager
+source_file: src/common/actionmanager.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VoiceNoteDBusService
+source_file: src/dbus/VoiceNoteDBusService.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VoiceNoteDBusService
+source_file: src/dbus/VoiceNoteDBusService.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: DBusLogin1Manager
+source_file: src/dbusservice/dbuslogin1manager.cpp
+base_classes:
+- QDBusAbstractInterface
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: DBusLogin1Manager
+source_file: src/dbusservice/dbuslogin1manager.h
+base_classes:
+- QDBusAbstractInterface
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNoteMessageDialogHandler
+source_file: src/handler/vnote_message_dialog_handler.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VNoteMessageDialogHandler
+source_file: src/handler/vnote_message_dialog_handler.h
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []
+---
+class_name: VoicePlayerHandler
+source_file: src/handler/voice_player_handler.cpp
+base_classes:
+- QObject
+is_ui_widget: false
+object_names: []
+accessible_names: []
+dtk_instantiations: []

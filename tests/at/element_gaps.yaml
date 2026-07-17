@@ -1,0 +1,85 @@
+# Element Gaps - Elements missing accessible_id or accessible_name
+# Generated from at-tree.yaml runtime dump + source code static analysis
+# These elements need setAccessibleName() in the application source code
+
+runtime_gaps:
+  - id: n0
+    role: frame
+    name: ''
+    class_name: ''
+    note: '主窗口frame无name，DTK窗口通常由AT-SPI registered name标识'
+    suggestion: '设置 Accessible.name 为 "语音记事本"'
+  - id: n26
+    role: frame
+    name: ''
+    class_name: ''
+    note: '移动笔记弹窗frame无name'
+    suggestion: '设置 Accessible.name 为 "移动笔记"'
+  - id: n34
+    role: frame
+    name: ''
+    class_name: ''
+    note: '空对话框frame无name'
+    suggestion: '确认用途后设置对应Accessible.name'
+
+static_gaps:
+  - object_name: twoColumnModeBtn
+    class_name: VNoteToolButton
+    qml_file: src/gui/mainwindow/WindowTitleBar.qml
+    suggestion: 'toggleSidebar'
+    note: '侧栏收起/展开按钮，无Accessible.name'
+  - object_name: newNoteBtn
+    class_name: VNoteToolButton
+    qml_file: src/gui/mainwindow/WindowTitleBar.qml
+    suggestion: 'newNote'
+    note: '新建笔记按钮，无Accessible.name'
+  - object_name: recordBtn
+    class_name: VNoteToolButton
+    qml_file: src/gui/mainwindow/WindowTitleBar.qml
+    suggestion: 'record'
+    note: '录音按钮，无Accessible.name'
+  - object_name: insImgBtn
+    class_name: VNoteToolButton
+    qml_file: src/gui/mainwindow/WindowTitleBar.qml
+    suggestion: 'insertImage'
+    note: '插入图片按钮，无Accessible.name'
+  - object_name: search
+    class_name: SearchEdit
+    qml_file: src/gui/mainwindow/WindowTitleBar.qml
+    suggestion: 'search'
+    note: '搜索输入框，无Accessible.name'
+  - object_name: pauseBtn
+    class_name: VNoteToolButton
+    qml_file: src/gui/mainwindow/RecordingView.qml
+    suggestion: 'pauseRecording'
+    note: '录音暂停按钮，无Accessible.name'
+  - object_name: stopBtn
+    class_name: VNoteToolButton
+    qml_file: src/gui/mainwindow/RecordingView.qml
+    suggestion: 'stopRecording'
+    note: '录音停止按钮，无Accessible.name'
+  - object_name: ''
+    class_name: VNoteToolButton (multi-select toolbar)
+    qml_file: src/gui/mainwindow/MultipleChoices.qml
+    suggestion: 'moveNote/saveNote/saveVoice/delete'
+    note: '多选工具栏4个按钮均无Accessible.name'
+  - object_name: ''
+    class_name: Rectangle (ItemListView delegate)
+    qml_file: src/gui/mainwindow/ItemListView.qml
+    suggestion: 'noteItem'
+    note: '笔记列表项delegate无Accessible.name，无法通过AT-SPI区分各笔记'
+  - object_name: ''
+    class_name: Rectangle (FolderListView delegate)
+    qml_file: src/gui/mainwindow/FolderListView.qml
+    suggestion: 'folderItem'
+    note: '记事本列表项delegate无Accessible.name，无法通过AT-SPI区分各记事本'
+  - object_name: ''
+    class_name: QQuickWebEngineView
+    qml_file: src/gui/mainwindow/WebEngineView.qml
+    suggestion: 'editor'
+    note: '编辑区WebEngineView无Accessible.name'
+  - object_name: ''
+    class_name: RadioButton
+    qml_file: src/gui/dialog/SettingDialog.qml
+    suggestion: 'audioSourceInternal/audioSourceMicrophone'
+    note: '设置弹窗单选按钮无Accessible.name'

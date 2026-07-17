@@ -1,0 +1,73 @@
+name: 主菜单_suite
+app: deepin-voice-note
+description: ''
+module: 主菜单
+tags: []
+fast_fail: false
+env_check: []
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+suites:
+- id: case_1676365_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_hot_key
+    key: alt
+  assert_steps:
+  - action: assert_window
+- id: case_1676457_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_main_menu
+    items:
+    - 主题
+    - 浅色
+  - action: dtk_main_menu
+    items:
+    - 主题
+    - 深色
+  - action: dtk_main_menu
+    items:
+    - 主题
+    - 跟随系统
+  assert_steps:
+  - action: assert_window
+  - action: assert_window
+  - action: assert_window
+- id: case_1676455_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_press
+    key: f1
+  assert_steps:
+  - action: assert_window
+- id: case_1676453_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_main_menu
+    items:
+    - 关于
+  assert_steps:
+  - action: assert_window
+- id: case_1676451_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_main_menu
+    items:
+    - 退出
+  assert_steps:
+  - action: assert_process_not_running
+teardown:
+- action: session_stop

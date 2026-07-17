@@ -1,0 +1,524 @@
+version: '1.0'
+app: deepin-voice-note
+type: runtime
+tree:
+- role: frame
+  name: ''
+  object_name: ''
+  accessible_id: ''
+  description: ''
+  actions: []
+  index_in_parent: 0
+  states:
+  - active
+  - enabled
+  - sensitive
+  - showing
+  - visible
+  source: runtime
+  children:
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 0
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    - showing
+    - visible
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 2
+    states:
+    - checked
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+  - role: button
+    name: 新建记事本
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 4
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    - showing
+    - visible
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 5
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+  - role: text
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - SetFocus
+    index_in_parent: 6
+    states:
+    - editable
+    - enabled
+    - focusable
+    - sensitive
+    - showing
+    - visible
+    source: runtime
+  - role: label
+    name: 记事本1
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - SetFocus
+    index_in_parent: 7
+    states:
+    - enabled
+    - focusable
+    - read_only
+    - sensitive
+    - showing
+    - visible
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 9
+    states:
+    - checked
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 11
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    - showing
+    - visible
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 12
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    - showing
+    - visible
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 13
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 14
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    - showing
+    - visible
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 15
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    - showing
+    - visible
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 16
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    - showing
+    - visible
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 17
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    - showing
+    - visible
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 18
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    - showing
+    - visible
+    source: runtime
+  - role: label
+    name: 已选择0个笔记
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - SetFocus
+    index_in_parent: 20
+    states:
+    - enabled
+    - focusable
+    - read_only
+    - sensitive
+    source: runtime
+  - role: label
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - SetFocus
+    index_in_parent: 23
+    states:
+    - enabled
+    - focusable
+    - read_only
+    - sensitive
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 24
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 25
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 26
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 27
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 28
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+  - role: label
+    name: 新建一个记事本后，可以开始记录语音及文字
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - SetFocus
+    index_in_parent: 29
+    states:
+    - enabled
+    - focusable
+    - read_only
+    - sensitive
+    source: runtime
+  - role: button
+    name: 新建记事本
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 30
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+- role: frame
+  name: ''
+  object_name: ''
+  accessible_id: ''
+  description: ''
+  actions: []
+  index_in_parent: 1
+  states:
+  - enabled
+  - sensitive
+  source: runtime
+- role: frame
+  name: ''
+  object_name: ''
+  accessible_id: ''
+  description: ''
+  actions: []
+  index_in_parent: 2
+  states:
+  - enabled
+  - sensitive
+  source: runtime
+  children:
+  - role: label
+    name: 移动笔记
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - SetFocus
+    index_in_parent: 1
+    states:
+    - enabled
+    - focusable
+    - read_only
+    - sensitive
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 2
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+  - role: label
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - SetFocus
+    index_in_parent: 3
+    states:
+    - enabled
+    - focusable
+    - read_only
+    - sensitive
+    source: runtime
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 4
+    states:
+    - checked
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+  - role: button
+    name: 取 消
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 6
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+  - role: button
+    name: 确定
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 7
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime
+- role: frame
+  name: ''
+  object_name: ''
+  accessible_id: ''
+  description: ''
+  actions: []
+  index_in_parent: 3
+  states:
+  - enabled
+  - sensitive
+  source: runtime
+- role: frame
+  name: ''
+  object_name: ''
+  accessible_id: ''
+  description: ''
+  actions: []
+  index_in_parent: 4
+  states:
+  - enabled
+  - sensitive
+  source: runtime
+  children:
+  - role: button
+    name: ''
+    object_name: ''
+    accessible_id: ''
+    description: ''
+    actions:
+    - Press
+    - SetFocus
+    index_in_parent: 0
+    states:
+    - enabled
+    - focusable
+    - sensitive
+    source: runtime

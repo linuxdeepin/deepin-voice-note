@@ -1,0 +1,386 @@
+name: 笔记管理_suite
+app: deepin-voice-note
+description: ''
+module: 笔记管理
+tags: []
+fast_fail: false
+env_check: []
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+suites:
+- id: case_1634891_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_context_menu
+    selector:
+      role: label
+      name: 记事本1
+    items:
+    - 新建笔记
+  - action: keyboard_hot_key
+    key: ctrl+b
+  assert_steps:
+  - action: assert_window
+  - action: assert_window
+- id: case_1634923_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_context_menu
+    selector:
+      ref: noteListItem
+    items:
+    - 重命名
+  - action: keyboard_type
+    text: 重命名笔记
+  - action: keyboard_press
+    key: enter
+  assert_steps:
+  - action: assert_element
+    selector:
+      ref: noteListItem
+- id: case_1676351_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_context_menu
+    selector:
+      ref: noteListItem
+    items:
+    - 重命名
+  - action: keyboard_type
+    text: F3重命名测试
+  - action: keyboard_press
+    key: enter
+  assert_steps:
+  - action: assert_element
+    selector:
+      ref: noteListItem
+- id: case_1634499_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_press
+    key: f3
+  - action: keyboard_type
+    text: 快捷键笔记名
+  - action: keyboard_press
+    key: enter
+  assert_steps:
+  - action: assert_element
+    selector:
+      ref: noteListItem
+- id: case_1634927_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_context_menu
+    selector:
+      ref: noteListItem
+    items:
+    - 重命名
+  - action: keyboard_hot_key
+    key: ctrl+a
+  - action: keyboard_press
+    key: delete
+  - action: keyboard_press
+    key: enter
+  assert_steps:
+  - action: assert_element
+    selector:
+      ref: noteListItem
+- id: case_1634913_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_context_menu
+    selector:
+      ref: noteListItem
+    items:
+    - 重命名
+  - action: keyboard_press
+    key: enter
+  assert_steps:
+  - action: assert_element
+    selector:
+      ref: noteListItem
+- id: case_1634915_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_context_menu
+    selector:
+      ref: noteListItem
+    items:
+    - 重命名
+  - action: keyboard_type
+    text: ' '
+  - action: keyboard_press
+    key: enter
+  assert_steps:
+  - action: assert_element
+    selector:
+      ref: noteListItem
+- id: case_1634911_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_context_menu
+    selector:
+      ref: noteListItem
+    items:
+    - 重命名
+  - action: keyboard_type
+    text: 笔记abc123
+  - action: keyboard_press
+    key: enter
+  assert_steps:
+  - action: assert_element
+    selector:
+      ref: noteListItem
+- id: case_1634919_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_context_menu
+    selector:
+      ref: noteListItem
+    items:
+    - 重命名
+  - action: keyboard_type
+    text: 取消测试
+  - action: keyboard_press
+    key: escape
+  assert_steps:
+  - action: assert_element
+    selector:
+      ref: noteListItem
+- id: case_1634921_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_context_menu
+    selector:
+      ref: noteListItem
+    items:
+    - 重命名
+  - action: keyboard_type
+    text: 文本1
+  - action: keyboard_press
+    key: enter
+  assert_steps:
+  - action: assert_window
+- id: case_1634917_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_context_menu
+    selector:
+      ref: noteListItem
+    items:
+    - 重命名
+  - action: keyboard_type
+    text: 超过六十四位的笔记名称测试超过六十四位限制验证超过六十四位
+  - action: keyboard_press
+    key: enter
+  assert_steps:
+  - action: assert_element
+    selector:
+      ref: noteListItem
+- id: case_1634925_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_context_menu
+    selector:
+      ref: noteListItem
+    items:
+    - 重命名
+  - action: keyboard_type
+    text: 笔记qypg名称
+  - action: keyboard_press
+    key: enter
+  assert_steps:
+  - action: assert_element
+    selector:
+      ref: noteListItem
+- id: case_1676349_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: dtk_context_menu
+    selector:
+      ref: noteListItem
+    items:
+    - 删除
+  assert_steps:
+  - action: assert_element
+    selector:
+      role: dialog
+      name: ''
+- id: case_1676419_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_hot_key
+    key: alt+m
+  - action: keyboard_press
+    key: down
+  - action: keyboard_press
+    key: enter
+  assert_steps:
+  - action: assert_element
+    selector:
+      role: dialog
+      name: ''
+- id: case_1676465_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_hot_key
+    key: alt+m
+  - action: keyboard_press
+    key: down
+  - action: keyboard_press
+    key: enter
+  - action: keyboard_hot_key
+    key: alt+m
+  - action: keyboard_press
+    key: down
+  - action: keyboard_press
+    key: enter
+  assert_steps:
+  - action: assert_window
+  - action: assert_window
+- id: case_1676413_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_hot_key
+    key: alt+m
+  - action: keyboard_press
+    key: down
+  - action: keyboard_press
+    key: enter
+  assert_steps:
+  - action: assert_window
+- id: case_1676415_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_hot_key
+    key: alt+m
+  - action: keyboard_press
+    key: down
+  - action: keyboard_press
+    key: enter
+  assert_steps:
+  - action: assert_element
+    selector:
+      role: dialog
+      name: ''
+- id: case_1676417_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_hot_key
+    key: alt+m
+  - action: keyboard_press
+    key: down
+  - action: keyboard_press
+    key: enter
+  assert_steps:
+  - action: assert_element
+    selector:
+      role: dialog
+      name: ''
+- id: case_1676421_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_hot_key
+    key: alt+m
+  - action: keyboard_press
+    key: down
+  - action: keyboard_press
+    key: enter
+  - action: element_action
+    selector:
+      role: button
+      name: 确定
+    do: click
+  assert_steps:
+  - action: assert_element
+    selector:
+      role: dialog
+      name: ''
+  - action: assert_window
+- id: case_1676403_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_press
+    key: tab
+  assert_steps:
+  - action: assert_window
+- id: case_1676395_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_press
+    key: tab
+  assert_steps:
+  - action: assert_window
+- id: case_1676401_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_press
+    key: tab
+  assert_steps:
+  - action: assert_window
+- id: case_1676399_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_press
+    key: tab
+  assert_steps:
+  - action: assert_window
+- id: case_1676397_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_press
+    key: tab
+  assert_steps:
+  - action: assert_window
+teardown:
+- action: session_stop

@@ -1,0 +1,61 @@
+elements:
+  新建记事本:
+    role: button
+    name: 新建记事本
+  记事本1:
+    role: label
+    name: 记事本1
+  记事本2:
+    role: label
+    name: 记事本2
+  测试记事本A:
+    role: label
+    name: 测试记事本A
+  快捷键重命名:
+    role: label
+    name: 快捷键重命名
+  正常命名:
+    role: label
+    name: 正常命名
+  测试abc123:
+    role: label
+    name: 测试abc123
+  名称qypg测试:
+    role: label
+    name: 名称qypg测试
+  确定:
+    role: button
+    name: 确定
+  n0:
+    name: ''
+    role: frame
+  n3:
+    name: 新建记事本
+    role: button
+  n6:
+    name: 记事本1
+    role: label
+  n16:
+    name: 已选择0个笔记
+    role: label
+  n23:
+    name: 新建一个记事本后，可以开始记录语音及文字
+    role: label
+  n24:
+    name: 新建记事本
+    role: button
+  n26:
+    name: ''
+    role: frame
+  n27:
+    name: 移动笔记
+    role: label
+  n31:
+    name: 取 消
+    role: button
+  n32:
+    name: 确定
+    role: button
+  n34:
+    name: ''
+    role: frame

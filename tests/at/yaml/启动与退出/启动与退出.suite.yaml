@@ -1,0 +1,42 @@
+name: 启动与退出_suite
+app: deepin-voice-note
+description: ''
+module: 启动与退出
+tags: []
+fast_fail: false
+env_check: []
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+suites:
+- id: case_1634837_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_hot_key
+    key: ctrl+n
+  assert_steps:
+  - action: assert_window_count
+    expected: 1
+- id: case_1634839_s1
+  name: 启动应用
+  description: ''
+  tags: []
+  steps:
+  - action: element_action
+    selector:
+      role: button
+      name: 新建记事本
+    do: click
+  - action: element_action
+    selector:
+      role: button
+      name: 新建记事本
+    do: click
+  assert_steps:
+  - action: assert_window
+  - action: assert_window
+teardown:
+- action: session_stop

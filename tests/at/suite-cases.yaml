@@ -1,0 +1,2455 @@
+metadata:
+  source: cases_raw.yaml
+  generated_at: '2026-07-17T12:00:00'
+  description: GUI test cases organized into suites by interface area
+  total_cases: 248
+  total_suites: 18
+suites:
+  - suite_id: S01_startup_exit
+    name: 启动与退出
+    测试界面: 主窗口/标题栏
+    测试功能: 应用启动、单窗口模式、关闭退出
+    cases:
+      - id: case_1634837
+        name: 仅支持单个窗口开启
+        测试界面: 主窗口
+        测试功能: 单实例验证
+        前置条件: 应用已启动
+        AT元素引用: [n0]
+        steps:
+          - step_type: action
+            description: 再次启动deepin-voice-note
+          - step_type: assert
+            description: 只显示一个窗口，不会打开第二个窗口
+      - id: case_1634839
+        name: 首次使用语音记事本应用，新建记事本
+        测试界面: 主窗口/记事本列表
+        测试功能: 首次使用新建记事本
+        前置条件: 应用首次启动，无任何记事本
+        AT元素引用: [n23, n24, n3, n6]
+        steps:
+          - step_type: action
+            description: 点击右侧空状态"新建记事本"按钮
+          - step_type: assert
+            description: 正常新建记事本，记事本名称默认显示为"记事本"
+          - step_type: action
+            description: 点击左侧底部"新建记事本"按钮
+          - step_type: assert
+            description: 正常新建第二个记事本
+
+  - suite_id: S02_titlebar_window
+    name: 标题栏与窗口操作
+    测试界面: 标题栏
+    测试功能: 最小化、最大化、关闭、侧栏收起
+    cases:
+      - id: case_1676573
+        name: 主界面显示
+        测试界面: 主窗口
+        测试功能: 主界面控件布局检查
+        前置条件: 应用已启动
+        AT元素引用: [n0, n3]
+        steps:
+          - step_type: assert
+            description: 记事本主界面已打开
+        status: unsupported
+        reason: "QML应用大部分控件无AT-SPI名称，标题栏各按钮(列表缩放/搜索框/新建文本/语音记录/图片/主菜单/最小化/最大化/关闭)无法通过AT-SPI定位"
+      - id: case_1676449
+        name: 最小化
+        测试界面: 标题栏
+        测试功能: 最小化窗口
+        前置条件: 应用已启动
+        AT元素引用: [n0]
+        steps:
+          - step_type: action
+            description: 点击标题栏最小化按钮
+          - step_type: assert
+            description: 语音记事本被最小化
+        status: unsupported
+        reason: "最小化按钮无AT-SPI名称，且恢复操作需Dock交互"
+      - id: case_1676447
+        name: 最大化
+        测试界面: 标题栏
+        测试功能: 最大化窗口
+        前置条件: 应用已启动
+        AT元素引用: [n0]
+        steps:
+          - step_type: action
+            description: 点击右上角最大化按钮
+          - step_type: assert
+            description: 最大化显示语音记事本
+        status: unsupported
+        reason: "最大化按钮无AT-SPI名称，无法通过AT-SPI定位"
+      - id: case_1676445
+        name: 关闭主界面
+        测试界面: 标题栏
+        测试功能: 关闭应用
+        前置条件: 应用已启动
+        AT元素引用: [n0]
+        steps:
+          - step_type: action
+            description: 点击工具栏右上角关闭按钮
+          - step_type: assert
+            description: 退出应用
+        status: unsupported
+        reason: "关闭按钮无AT-SPI名称，可通过dtk_main_menu退出替代"
+      - id: case_1635223
+        name: 关闭主界面(1050)
+        测试界面: 标题栏
+        测试功能: 关闭应用
+        前置条件: 应用已启动
+        AT元素引用: [n0]
+        status: unsupported
+        reason: "与case_1676445重复，关闭按钮无AT-SPI名称"
+      - id: case_1625247
+        name: 关闭主界面(1050标题栏)
+        测试界面: 标题栏
+        测试功能: 关闭应用
+        前置条件: 应用已启动
+        status: unsupported
+        reason: "与case_1676445重复"
+      - id: case_1676379
+        name: 收起/展开记事本列表
+        测试界面: 标题栏
+        测试功能: 侧栏切换
+        前置条件: 应用已启动且存在记事本
+        AT元素引用: [sidebarToggleBtn]
+        steps:
+          - step_type: action
+            description: 点击标题栏侧栏切换按钮
+          - step_type: assert
+            description: 记事本列表收起
+          - step_type: action
+            description: 再次点击侧栏切换按钮
+          - step_type: assert
+            description: 记事本列表展开
+        needs_accessible_name: true
+        reason: "sidebarToggleBtn无AT-SPI名称，needs_accessible_name"
+
+  - suite_id: S03_main_menu
+    name: 主菜单操作
+    测试界面: 标题栏主菜单
+    测试功能: 设置、隐私政策、主题、帮助、关于、退出
+    cases:
+      - id: case_1676365
+        name: 主菜单布局
+        测试界面: 主菜单
+        测试功能: 主菜单项验证
+        前置条件: 应用已启动
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 打开主菜单(Alt键)
+          - step_type: assert
+            description: 主菜单包含：设置、隐私政策、主题、帮助、关于、退出
+      - id: case_1676457
+        name: 主题
+        测试界面: 主菜单
+        测试功能: 切换浅色/深色/跟随系统主题
+        前置条件: 应用已启动
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 打开主菜单
+            action: dtk_main_menu
+            items: ["主题"]
+          - step_type: action
+            description: 选择"浅色主题"
+            action: dtk_main_menu
+            items: ["主题", "浅色"]
+          - step_type: assert
+            description: 成功切换为浅色主题
+          - step_type: action
+            description: 选择"深色主题"
+            action: dtk_main_menu
+            items: ["主题", "深色"]
+          - step_type: assert
+            description: 成功切换为深色主题
+          - step_type: action
+            description: 选择"跟随系统"
+            action: dtk_main_menu
+            items: ["主题", "跟随系统"]
+          - step_type: assert
+            description: 成功切换为跟随系统
+      - id: case_1676455
+        name: 帮助
+        测试界面: 主菜单
+        测试功能: 打开帮助手册
+        前置条件: 应用已启动
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 按F1打开帮助
+            action: keyboard_press
+            key: F1
+          - step_type: assert
+            description: 正常唤出帮助手册
+          - step_type: action
+            description: 通过主菜单打开帮助
+            action: dtk_main_menu
+            items: ["帮助"]
+          - step_type: assert
+            description: 正常唤出帮助手册
+      - id: case_1676453
+        name: 关于
+        测试界面: 主菜单
+        测试功能: 打开关于界面
+        前置条件: 应用已启动
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 打开主菜单选择"关于"
+            action: dtk_main_menu
+            items: ["关于"]
+          - step_type: assert
+            description: 出现语音记事本关于界面
+      - id: case_1676451
+        name: 退出
+        测试界面: 主菜单
+        测试功能: 退出应用
+        前置条件: 应用已启动
+        AT元素引用: [n0]
+        steps:
+          - step_type: action
+            description: 打开主菜单选择"退出"
+            action: dtk_main_menu
+            items: ["退出"]
+          - step_type: assert
+            description: 退出应用，窗口消失
+      - id: case_1676363
+        name: 设置
+        测试界面: 设置弹窗
+        测试功能: 音频源设置(内置/麦克风)
+        前置条件: 应用已启动
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 打开主菜单选择"设置"
+            action: dtk_main_menu
+            items: ["设置"]
+          - step_type: assert
+            description: 声音来源默认选中麦克风
+        status: unsupported
+        reason: "设置弹窗中的单选按钮(settingDialogInternal/settingDialogMicrophone)无AT-SPI名称，无法通过AT-SPI定位"
+      - id: case_1676361
+        name: 隐私政策
+        测试界面: 主菜单
+        测试功能: 打开隐私政策网页
+        前置条件: 应用已启动
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 打开主菜单选择"隐私政策"
+            action: dtk_main_menu
+            items: ["隐私政策"]
+          - step_type: assert
+            description: 打开浏览器跳转到隐私政策页面
+        status: unsupported
+        reason: "需要切换系统语言验证中英文URL，且需要验证浏览器跳转"
+
+  - suite_id: S04_notebook_mgmt
+    name: 记事本管理
+    测试界面: 左侧记事本列表
+    测试功能: 新建、重命名、删除记事本、拖拽排序
+    cases:
+      - id: case_1625243
+        name: 新建记事本
+        测试界面: 记事本列表
+        测试功能: 通过按钮和快捷键新建记事本
+        前置条件: 应用已启动
+        AT元素引用: [n3, n24]
+        steps:
+          - step_type: action
+            description: 点击左侧底部"新建记事本"按钮
+            action: element_action
+            selector: {role: "button", name: "新建记事本"}
+          - step_type: assert
+            description: 成功新建记事本
+          - step_type: action
+            description: 按Ctrl+N新建记事本
+            action: keyboard_hot_key
+            keys: [Ctrl, N]
+          - step_type: assert
+            description: 成功新建第二个记事本
+      - id: case_1676423
+        name: 焦点在新建记事本按钮，按回车键新建
+        测试界面: 记事本列表
+        测试功能: Tab+Enter新建记事本
+        前置条件: 应用已启动
+        AT元素引用: [n3, n24]
+        steps:
+          - step_type: action
+            description: Tab键切换焦点至新建记事本按钮，按回车
+            action: keyboard_press
+            key: Tab
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 新建记事本
+      - id: case_1625233
+        name: 重命名记事本-正向流程
+        测试界面: 记事本列表
+        测试功能: 右键/F2/双击重命名记事本
+        前置条件: 存在记事本
+        AT元素引用: [n6]
+        steps:
+          - step_type: action
+            description: 右键记事本选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "记事本1"}
+            items: ["重命名"]
+          - step_type: action
+            description: 输入新名称
+            action: keyboard_type
+            text: "测试记事本A"
+          - step_type: action
+            description: 按回车确认
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 成功重命名
+      - id: case_1676429
+        name: 重命名记事本-通过快捷键操作
+        测试界面: 记事本列表
+        测试功能: Alt+M右键菜单+F2重命名
+        前置条件: 存在记事本
+        AT元素引用: [n6]
+        steps:
+          - step_type: action
+            description: Tab键切换焦点至记事本
+            action: keyboard_press
+            key: Tab
+          - step_type: action
+            description: 按Alt+M打开右键菜单
+            action: keyboard_hot_key
+            keys: [Alt, M]
+          - step_type: action
+            description: 选中"重命名"，按回车
+          - step_type: action
+            description: 输入新名称，按回车
+            action: keyboard_type
+            text: "快捷键重命名"
+          - step_type: assert
+            description: 正常完成记事本重命名
+      - id: case_1634853
+        name: 记事本命名规则-正向流程
+        测试界面: 记事本列表
+        测试功能: 重命名记事本
+        前置条件: 存在记事本
+        AT元素引用: [n6]
+        steps:
+          - step_type: action
+            description: 右键记事本选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "记事本1"}
+            items: ["重命名"]
+          - step_type: action
+            description: 输入新名称
+            action: keyboard_type
+            text: "正常命名测试"
+          - step_type: action
+            description: 按回车确认
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 成功重命名
+      - id: case_1634857
+        name: 记事本命名规则-清空原来的名称
+        测试界面: 记事本列表
+        测试功能: 清空名称后回车
+        前置条件: 存在记事本
+        AT元素引用: [n6]
+        steps:
+          - step_type: action
+            description: 右键记事本选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "记事本1"}
+            items: ["重命名"]
+          - step_type: action
+            description: 清空名称后按回车
+            action: keyboard_hot_key
+            keys: [Ctrl, A]
+          - step_type: action
+            description: 按Delete清空
+            action: keyboard_press
+            key: Delete
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 记事本名称为未修改前的名称
+      - id: case_1634843
+        name: 记事本命名规则-不输入任何字符
+        测试界面: 记事本列表
+        测试功能: 不输入字符直接保存
+        前置条件: 存在记事本
+        AT元素引用: [n6]
+        steps:
+          - step_type: action
+            description: 右键记事本选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "记事本1"}
+            items: ["重命名"]
+          - step_type: action
+            description: 不输入任何字符，按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 记事本名称不变
+      - id: case_1634845
+        name: 记事本命名规则-输入空格
+        测试界面: 记事本列表
+        测试功能: 输入空格重命名
+        前置条件: 存在记事本
+        AT元素引用: [n6]
+        steps:
+          - step_type: action
+            description: 右键记事本选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "记事本1"}
+            items: ["重命名"]
+          - step_type: action
+            description: 输入空格，按回车
+            action: keyboard_type
+            text: "  "
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 正常重命名记事本无异常
+      - id: case_1634841
+        name: 记事本命名规则-输入中英数字特殊字符
+        测试界面: 记事本列表
+        测试功能: 混合字符重命名
+        前置条件: 存在记事本
+        AT元素引用: [n6]
+        steps:
+          - step_type: action
+            description: 右键记事本选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "记事本1"}
+            items: ["重命名"]
+          - step_type: action
+            description: 输入混合字符
+            action: keyboard_type
+            text: "测试abc123<>"
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 成功重命名
+      - id: case_1634849
+        name: 记事本命名规则-按ESC取消
+        测试界面: 记事本列表
+        测试功能: ESC取消重命名
+        前置条件: 存在记事本
+        AT元素引用: [n6]
+        steps:
+          - step_type: action
+            description: 右键记事本选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "记事本1"}
+            items: ["重命名"]
+          - step_type: action
+            description: 输入字符
+            action: keyboard_type
+            text: "取消测试"
+          - step_type: action
+            description: 按ESC取消
+            action: keyboard_press
+            key: Escape
+          - step_type: assert
+            description: 取消重命名
+      - id: case_1634851
+        name: 记事本命名规则-输入重复名称
+        测试界面: 记事本列表
+        测试功能: 重命名为已存在名称
+        前置条件: 存在至少两个记事本
+        AT元素引用: [n6]
+        steps:
+          - step_type: action
+            description: 右键记事本选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "记事本1"}
+            items: ["重命名"]
+          - step_type: action
+            description: 输入与另一记事本相同的名称
+            action: keyboard_type
+            text: "记事本1"
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 正常重命名无异常
+      - id: case_1634855
+        name: 记事本命名规则-输入特殊字符(qypg)
+        测试界面: 记事本列表
+        测试功能: 含下延字符重命名
+        前置条件: 存在记事本
+        AT元素引用: [n6]
+        steps:
+          - step_type: action
+            description: 右键记事本选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "记事本1"}
+            items: ["重命名"]
+          - step_type: action
+            description: 输入含qypg的名称
+            action: keyboard_type
+            text: "测试qypg名称"
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 记事本名称显示正常无截断
+      - id: case_1676427
+        name: 删除记事本-通过快捷键操作
+        测试界面: 记事本列表
+        测试功能: Alt+M右键菜单删除记事本
+        前置条件: 存在至少两个记事本
+        AT元素引用: [n6]
+        steps:
+          - step_type: action
+            description: Tab键切换焦点至记事本
+            action: keyboard_press
+            key: Tab
+          - step_type: action
+            description: 按Alt+M打开右键菜单
+            action: keyboard_hot_key
+            keys: [Alt, M]
+          - step_type: action
+            description: 选中"删除"，按回车
+          - step_type: assert
+            description: 弹出删除确认提示框
+      - id: case_1676425
+        name: 通过记事本右键菜单新建笔记
+        测试界面: 记事本列表
+        测试功能: 右键记事本新建笔记
+        前置条件: 存在记事本
+        AT元素引用: [n6]
+        steps:
+          - step_type: action
+            description: 右键记事本选择"新建笔记"
+            action: dtk_context_menu
+            selector: {role: "label", name: "记事本1"}
+            items: ["新建笔记"]
+          - step_type: assert
+            description: 正常在该记事本下新建笔记
+      - id: case_1634863
+        name: 记事本列表按照新建时间排序
+        测试界面: 记事本列表
+        测试功能: 验证排序
+        前置条件: 存在多个记事本
+        AT元素引用: [n6]
+        steps:
+          - step_type: action
+            description: 新建记事本
+            action: element_action
+            selector: {role: "button", name: "新建记事本"}
+          - step_type: assert
+            description: 新建记事本显示在第一位
+      - id: case_1634865
+        name: 记事本列表超出一屏
+        测试界面: 记事本列表
+        测试功能: 列表滚动
+        前置条件: 记事本数量超出一屏
+        AT元素引用: [n6]
+        steps:
+          - step_type: assert
+            description: 记事本列表显示正常，可上下滑动查看
+        status: unsupported
+        reason: "QML列表滚动操作无法通过AT-SPI可靠执行"
+      - id: case_1634861
+        name: 左侧头像的获取
+        测试界面: 记事本列表
+        测试功能: 随机头像分配
+        前置条件: 存在记事本
+        AT元素引用: [n6]
+        steps:
+          - step_type: assert
+            description: 每个记事本显示随机头像
+        status: unsupported
+        reason: "头像为QML渲染元素，无AT-SPI节点，无法验证头像显示"
+
+  - suite_id: S05_note_mgmt
+    name: 笔记管理
+    测试界面: 中间笔记列表
+    测试功能: 新建、重命名、删除、置顶、移动笔记、多选
+    cases:
+      - id: case_1634891
+        name: 新建文本笔记
+        测试界面: 笔记列表
+        测试功能: 多种方式新建笔记
+        前置条件: 存在记事本
+        AT元素引用: [n6]
+        steps:
+          - step_type: action
+            description: 右键记事本选择新建笔记
+            action: dtk_context_menu
+            selector: {role: "label", name: "记事本1"}
+            items: ["新建笔记"]
+          - step_type: assert
+            description: 正常新建文本笔记，详情页显示输入光标
+          - step_type: action
+            description: 按Ctrl+B新建笔记
+            action: keyboard_hot_key
+            keys: [Ctrl, B]
+          - step_type: assert
+            description: 正常新建文本笔记
+      - id: case_1634893
+        name: 新建笔记最新新建排在最上方
+        测试界面: 笔记列表
+        测试功能: 新建笔记排序
+        前置条件: 存在记事本
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: 连续新建两个笔记
+            action: keyboard_hot_key
+            keys: [Ctrl, B]
+          - step_type: assert
+            description: 最新新建的排在最上方
+        needs_accessible_name: true
+      - id: case_1676411
+        name: 焦点在新建笔记按钮，按回车键新建笔记
+        测试界面: 笔记列表
+        测试功能: Tab+Enter新建笔记
+        前置条件: 存在记事本
+        AT元素引用: [newNoteBtn]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: Tab键切换焦点至新建笔记按钮，按回车
+          - step_type: assert
+            description: 新建笔记
+        status: unsupported
+        reason: "newNoteBtn无AT-SPI名称，Tab键无法可靠定位"
+      - id: case_1634923
+        name: 重命名文本笔记-正向流程
+        测试界面: 笔记列表
+        测试功能: 重命名笔记
+        前置条件: 存在笔记
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: 右键笔记选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "文本"}
+            items: ["重命名"]
+          - step_type: action
+            description: 输入新名称
+            action: keyboard_type
+            text: "重命名笔记"
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 成功重命名
+      - id: case_1676351
+        name: 按回车键完成重命名文本笔记
+        测试界面: 笔记列表
+        测试功能: 右键/F3/双击重命名
+        前置条件: 存在笔记
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: 右键笔记选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "文本"}
+            items: ["重命名"]
+          - step_type: action
+            description: 输入新名称
+            action: keyboard_type
+            text: "F3重命名测试"
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 成功重命名
+      - id: case_1634499
+        name: 重命名笔记-通过快捷键操作
+        测试界面: 笔记列表
+        测试功能: Alt+M右键菜单重命名
+        前置条件: 存在笔记
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: Tab键切换焦点至笔记，Alt+M打开右键菜单
+          - step_type: action
+            description: 选中"重命名"，按回车
+          - step_type: action
+            description: 输入新名称，按回车
+            action: keyboard_type
+            text: "快捷键笔记名"
+          - step_type: assert
+            description: 正常完成笔记重命名
+      - id: case_1634927
+        name: 重命名文本笔记-清空输入框
+        测试界面: 笔记列表
+        测试功能: 清空名称后回车
+        前置条件: 存在笔记
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: 右键笔记选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "文本"}
+            items: ["重命名"]
+          - step_type: action
+            description: 清空后按回车
+            action: keyboard_hot_key
+            keys: [Ctrl, A]
+          - step_type: action
+            description: 按Delete清空
+            action: keyboard_press
+            key: Delete
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 笔记名称为未修改前的名称
+      - id: case_1634913
+        name: 重命名文本笔记-不输入任何字符
+        测试界面: 笔记列表
+        测试功能: 不输入字符直接保存
+        前置条件: 存在笔记
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: 右键笔记选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "文本"}
+            items: ["重命名"]
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 笔记名称不变
+      - id: case_1634915
+        name: 重命名文本笔记-输入空格
+        测试界面: 笔记列表
+        测试功能: 空格重命名
+        前置条件: 存在笔记
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: 右键笔记选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "文本"}
+            items: ["重命名"]
+          - step_type: action
+            description: 输入空格
+            action: keyboard_type
+            text: "  "
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 正常重命名无异常
+      - id: case_1634911
+        name: 重命名文本笔记-包含中英数字特殊符号
+        测试界面: 笔记列表
+        测试功能: 混合字符重命名
+        前置条件: 存在笔记
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: 右键笔记选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "文本"}
+            items: ["重命名"]
+          - step_type: action
+            description: 输入混合字符
+            action: keyboard_type
+            text: "笔记abc123<>"
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 成功重命名
+      - id: case_1634919
+        name: 重命名文本笔记-按ESC取消
+        测试界面: 笔记列表
+        测试功能: ESC取消重命名
+        前置条件: 存在笔记
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: 右键笔记选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "文本"}
+            items: ["重命名"]
+          - step_type: action
+            description: 输入字符
+            action: keyboard_type
+            text: "取消测试"
+          - step_type: action
+            description: 按ESC
+            action: keyboard_press
+            key: Escape
+          - step_type: assert
+            description: 取消重命名
+      - id: case_1634921
+        name: 重命名文本笔记-输入重复笔记名称
+        测试界面: 笔记列表
+        测试功能: 重命名为已存在名称
+        前置条件: 存在至少两个笔记
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: 右键笔记选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "文本"}
+            items: ["重命名"]
+          - step_type: action
+            description: 输入与另一笔记相同的名称
+            action: keyboard_type
+            text: "文本1"
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 正常重命名无异常
+      - id: case_1634917
+        name: 重命名文本笔记-输入字符超过64位
+        测试界面: 笔记列表
+        测试功能: 超长名称限制
+        前置条件: 存在笔记
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: 右键笔记选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "文本"}
+            items: ["重命名"]
+          - step_type: action
+            description: 输入超过64位字符
+            action: keyboard_type
+            text: "超过六十四位的笔记名称测试超过六十四位限制验证超过六十四位"
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 限制输入64位字符
+      - id: case_1634925
+        name: 重命名文本笔记-包含特殊字符(qypg)
+        测试界面: 笔记列表
+        测试功能: 含下延字符重命名
+        前置条件: 存在笔记
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: 右键笔记选择重命名
+            action: dtk_context_menu
+            selector: {role: "label", name: "文本"}
+            items: ["重命名"]
+          - step_type: action
+            description: 输入含qypg的名称
+            action: keyboard_type
+            text: "笔记qypg名称"
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 名称显示正常无截断
+      - id: case_1676349
+        name: 删除文本笔记
+        测试界面: 笔记列表
+        测试功能: 右键/Delete删除笔记
+        前置条件: 存在至少两个笔记
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: 右键笔记选择删除
+            action: dtk_context_menu
+            selector: {role: "label", name: "文本"}
+            items: ["删除"]
+          - step_type: assert
+            description: 弹出删除确认提示框
+      - id: case_1676419
+        name: 删除笔记-通过快捷键操作
+        测试界面: 笔记列表
+        测试功能: Alt+M右键菜单删除笔记
+        前置条件: 存在至少两个笔记
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: Tab切换焦点至笔记，Alt+M打开右键菜单
+          - step_type: action
+            description: 选中"删除"，按回车
+          - step_type: assert
+            description: 弹出删除确认提示框
+      - id: case_1676465
+        name: 置顶/取消置顶笔记
+        测试界面: 笔记列表
+        测试功能: 置顶/取消置顶
+        前置条件: 存在至少两个笔记
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: Tab键切换焦点至笔记，Alt+M打开右键菜单
+          - step_type: action
+            description: 选中"置顶"，按回车
+          - step_type: assert
+            description: 成功置顶选中笔记
+          - step_type: action
+            description: 再次Alt+M，选中"取消置顶"，按回车
+          - step_type: assert
+            description: 成功取消置顶
+      - id: case_1676413
+        name: 通过笔记右键菜单新建笔记
+        测试界面: 笔记列表
+        测试功能: 右键笔记新建
+        前置条件: 存在笔记
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: Tab切换焦点至笔记，Alt+M打开右键菜单
+          - step_type: action
+            description: 选中"新建笔记"，按回车
+          - step_type: assert
+            description: 新建笔记
+      - id: case_1676415
+        name: 保存语音
+        测试界面: 笔记列表
+        测试功能: 右键菜单保存语音
+        前置条件: 笔记中存在语音记录
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: Tab切换焦点至笔记，Alt+M打开右键菜单
+          - step_type: action
+            description: 选中"保存语音"，按回车
+          - step_type: assert
+            description: 弹出保存窗口
+      - id: case_1676417
+        name: 保存为TXT
+        测试界面: 笔记列表
+        测试功能: 右键菜单保存为TXT
+        前置条件: 笔记中有文字内容
+        AT元素引用: [noteListItem]
+        steps:
+          - step_type: action
+            description: Tab切换焦点至笔记，Alt+M打开右键菜单
+          - step_type: action
+            description: 选中"保存笔记">"保存为TXT"，按回车
+          - step_type: assert
+            description: 弹出保存窗口
+      - id: case_1676421
+        name: 移动笔记
+        测试界面: 笔记列表/移动弹窗
+        测试功能: 右键菜单移动笔记
+        前置条件: 存在至少两个记事本，笔记列表有笔记
+        AT元素引用: [noteListItem, n26, n27, n31, n32]
+        steps:
+          - step_type: action
+            description: Tab切换焦点至笔记，Alt+M打开右键菜单
+          - step_type: action
+            description: 选中"移动"，按回车
+          - step_type: assert
+            description: 打开移动选择弹窗
+          - step_type: action
+            description: Tab键切换焦点至确定按钮，按回车
+            action: element_action
+            selector: {role: "button", name: "确定"}
+          - step_type: assert
+            description: 正常移动笔记
+      - id: case_1676403
+        name: 删除弹窗Tab键操作
+        测试界面: 删除确认弹窗
+        测试功能: Tab键在弹窗中切换
+        前置条件: 触发删除确认弹窗
+        AT元素引用: [n31, n32]
+        steps:
+          - step_type: action
+            description: 按Tab键切换焦点
+            action: keyboard_press
+            key: Tab
+          - step_type: assert
+            description: 焦点按 X关闭->取消->确定 顺序切换
+      - id: case_1676395
+        name: 移动选择弹窗Tab键操作
+        测试界面: 移动弹窗
+        测试功能: Tab键在弹窗中切换
+        前置条件: 触发移动选择弹窗
+        AT元素引用: [n26, n27, n31, n32]
+        steps:
+          - step_type: action
+            description: 按Tab键切换焦点
+            action: keyboard_press
+            key: Tab
+          - step_type: assert
+            description: 焦点按 X关闭->记事本列表->取消->确定 顺序切换
+
+  - suite_id: S06_detail_page
+    name: 详情页编辑
+    测试界面: 右侧详情编辑区
+    测试功能: 文本输入、编辑、撤销重做
+    cases:
+      - id: case_1634959
+        name: 编辑文字内容
+        测试界面: 详情编辑区
+        测试功能: 文本添加/删除/复制/剪切/粘贴
+        前置条件: 存在笔记且已选中
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 点击详情页文本区域
+            action: mouse_click
+            selector: {ref: editorWebEngine}
+          - step_type: action
+            description: 输入文字
+            action: keyboard_type
+            text: "测试文本内容"
+          - step_type: assert
+            description: 可以正常添加文字
+      - id: case_1634957
+        name: 输入内容键入空格、Tab
+        测试界面: 详情编辑区
+        测试功能: 特殊字符输入
+        前置条件: 存在笔记且已选中
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 输入内容
+            action: keyboard_type
+            text: "测试内容"
+          - step_type: action
+            description: 按空格
+            action: keyboard_press
+            key: space
+          - step_type: action
+            description: 按Tab
+            action: keyboard_press
+            key: Tab
+          - step_type: assert
+            description: 输入内容显示正常
+      - id: case_1634955
+        name: 输入内容键入回车
+        测试界面: 详情编辑区
+        测试功能: 回车换行
+        前置条件: 存在笔记且已选中
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 输入内容
+            action: keyboard_type
+            text: "测试换行"
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 详情页输入内容显示正常
+      - id: case_1634953
+        name: 输入内容含中英数字特殊字符
+        测试界面: 详情编辑区
+        测试功能: 混合字符输入
+        前置条件: 存在笔记且已选中
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 输入混合字符
+            action: keyboard_type
+            text: "中文abc123<>{}[]"
+          - step_type: assert
+            description: 输入内容显示正常
+      - id: case_1676405
+        name: 详情页文本编辑操作(快捷键)
+        测试界面: 详情编辑区
+        测试功能: 全选/复制/剪切/粘贴/删除
+        前置条件: 存在笔记且有文字内容
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: Alt+M，选中"全选"，按回车
+          - step_type: action
+            description: Alt+M，选中"复制"，按回车
+          - step_type: action
+            description: Alt+M，选中"粘贴"，按回车
+          - step_type: assert
+            description: 可以正常全选、复制和粘贴
+      - id: case_1634977
+        name: 详情页右键操作-全选/复制/剪切/粘贴/删除
+        测试界面: 详情编辑区
+        测试功能: 右键菜单编辑操作
+        前置条件: 存在笔记且有文字内容
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 右键详情页空白处
+            action: dtk_context_menu
+            selector: {ref: editorWebEngine}
+            items: ["全选"]
+          - step_type: action
+            description: 右键选择复制
+            action: dtk_context_menu
+            selector: {ref: editorWebEngine}
+            items: ["复制"]
+          - step_type: action
+            description: 右键选择粘贴
+            action: dtk_context_menu
+            selector: {ref: editorWebEngine}
+            items: ["粘贴"]
+          - step_type: assert
+            description: 正常完成全选、复制、粘贴操作
+      - id: case_1634969
+        name: 详情页右键空白处菜单
+        测试界面: 详情编辑区
+        测试功能: 空白处右键菜单项验证
+        前置条件: 新建笔记无内容
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 右键详情页空白处
+            action: dtk_context_menu
+            selector: {ref: editorWebEngine}
+          - step_type: assert
+            description: 弹出右键菜单，除粘贴外其余菜单均置灰
+      - id: case_1676393
+        name: 编辑区Delete键删除光标后文本
+        测试界面: 详情编辑区
+        测试功能: Delete键删除
+        前置条件: 编辑区有文字内容
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 按Delete键
+            action: keyboard_press
+            key: Delete
+          - step_type: assert
+            description: 删除光标后面一个字符
+      - id: case_1676391
+        name: 选中内容按Delete键删除
+        测试界面: 详情编辑区
+        测试功能: 选中后Delete删除
+        前置条件: 编辑区有文字内容
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 全选内容，按Delete
+            action: keyboard_hot_key
+            keys: [Ctrl, A]
+          - step_type: action
+            description: 按Delete
+            action: keyboard_press
+            key: Delete
+          - step_type: assert
+            description: 删除选中内容
+      - id: case_1676389
+        name: Backspace删除光标前文本
+        测试界面: 详情编辑区
+        测试功能: Backspace键删除
+        前置条件: 编辑区有文字内容
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 按Backspace
+            action: keyboard_press
+            key: BackSpace
+          - step_type: assert
+            description: 删除光标前面一个字符
+      - id: case_1676387
+        name: 选中内容按Backspace删除
+        测试界面: 详情编辑区
+        测试功能: 选中后Backspace删除
+        前置条件: 编辑区有文字内容
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 全选内容，按Backspace
+            action: keyboard_hot_key
+            keys: [Ctrl, A]
+          - step_type: action
+            description: 按Backspace
+            action: keyboard_press
+            key: BackSpace
+          - step_type: assert
+            description: 删除选中内容
+      - id: case_1676215
+        name: Ctrl+Z撤销和Ctrl+Shift+Z重做-文本编辑
+        测试界面: 详情编辑区
+        测试功能: 撤销/重做
+        前置条件: 编辑区有文字内容
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 编辑文字后按Ctrl+Z
+            action: keyboard_hot_key
+            keys: [Ctrl, Z]
+          - step_type: assert
+            description: 撤销上一次编辑
+          - step_type: action
+            description: 按Ctrl+Shift+Z
+            action: keyboard_hot_key
+            keys: [Ctrl, Shift, Z]
+          - step_type: assert
+            description: 恢复撤销的编辑
+      - id: case_1676213
+        name: Ctrl+Z撤销和Ctrl+Shift+Z重做-导入/删除图片
+        测试界面: 详情编辑区
+        测试功能: 撤销/重做图片操作
+        前置条件: 编辑区有图片
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 删除图片后按Ctrl+Z
+            action: keyboard_hot_key
+            keys: [Ctrl, Z]
+          - step_type: assert
+            description: 撤销删除
+      - id: case_1676211
+        name: Ctrl+Z撤销和Ctrl+Shift+Z重做-保存/删除录音
+        测试界面: 详情编辑区
+        测试功能: 撤销/重做录音操作
+        前置条件: 编辑区有语音记录
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 删除语音笔记后按Ctrl+Z
+            action: keyboard_hot_key
+            keys: [Ctrl, Z]
+          - step_type: assert
+            description: 撤销删除
+      - id: case_1634903
+        name: 切换记事本查看笔记列表默认选中第一条
+        测试界面: 笔记列表/详情页
+        测试功能: 切换记事本后笔记默认选中
+        前置条件: 存在多个记事本
+        AT元素引用: [n6, noteListItem]
+        steps:
+          - step_type: action
+            description: 点击另一个记事本
+            action: element_action
+            selector: {role: "label", name: "记事本1"}
+          - step_type: assert
+            description: 默认选中第一条文本笔记
+      - id: case_1634907
+        name: 切换笔记详情页同步切换
+        测试界面: 笔记列表/详情页
+        测试功能: 笔记切换同步
+        前置条件: 存在多个笔记
+        AT元素引用: [noteListItem]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 点击另一个笔记
+          - step_type: assert
+            description: 详情页同步切换为对应笔记内容
+      - id: case_1624639
+        name: 全选详情编辑区内容切换记事本笔记取消全选
+        测试界面: 详情编辑区
+        测试功能: 全选后切换取消全选
+        前置条件: 存在多个笔记
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: Ctrl+A全选
+            action: keyboard_hot_key
+            keys: [Ctrl, A]
+          - step_type: action
+            description: 切换到另一个笔记
+          - step_type: assert
+            description: 取消全选，显示对应笔记内容
+
+  - suite_id: S07_recording
+    name: 录音功能
+    测试界面: 标题栏/录音悬浮栏
+    测试功能: 开始/暂停/完成录音、录音中操作
+    cases:
+      - id: case_1676409
+        name: 焦点在录音按钮按回车键开始录音
+        测试界面: 标题栏/录音悬浮栏
+        测试功能: Tab+Enter录音流程
+        前置条件: 存在笔记
+        AT元素引用: [recordBtn, pauseBtn, stopBtn]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: Tab键切换焦点至录音按钮，按回车
+          - step_type: assert
+            description: 开始录音
+          - step_type: action
+            description: Tab键切换焦点至暂停按钮，按回车
+          - step_type: assert
+            description: 暂停录音
+          - step_type: action
+            description: Tab键切换焦点至完成按钮，按回车
+          - step_type: assert
+            description: 完成录音
+        status: unsupported
+        reason: "recordBtn/pauseBtn/stopBtn均无AT-SPI名称，Tab键无法定位"
+      - id: case_1676299
+        name: 录音过程中暂停录音
+        测试界面: 录音悬浮栏
+        测试功能: 暂停/继续录音
+        前置条件: 存在笔记
+        AT元素引用: [recordBtn, pauseBtn, stopBtn]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 按Ctrl+R开始录音
+            action: keyboard_hot_key
+            keys: [Ctrl, R]
+          - step_type: action
+            description: 短暂停顿后按Ctrl+R暂停
+          - step_type: assert
+            description: 录音被暂停
+          - step_type: action
+            description: 继续录音
+          - step_type: assert
+            description: 录音继续
+        status: unsupported
+        reason: "录音/暂停/完成按钮无AT-SPI名称，无法定位点击"
+      - id: case_1676297
+        name: 录音被暂停后完成录音
+        测试界面: 录音悬浮栏
+        测试功能: 暂停后完成
+        前置条件: 存在笔记
+        AT元素引用: [pauseBtn, stopBtn]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "录音悬浮栏按钮无AT-SPI名称"
+      - id: case_1676295
+        name: 录音进行过程中完成录音
+        测试界面: 录音悬浮栏
+        测试功能: 直接完成录音
+        前置条件: 存在笔记
+        AT元素引用: [recordBtn, stopBtn]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "录音/完成按钮无AT-SPI名称"
+      - id: case_1634995
+        name: 录音过程中暂停录音(102x)
+        测试界面: 录音悬浮栏
+        测试功能: 暂停/继续
+        前置条件: 存在笔记
+        AT元素引用: [recordBtn, pauseBtn, stopBtn]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "与case_1676299重复"
+      - id: case_1634997
+        name: 录音被暂停后完成录音(102x)
+        测试界面: 录音悬浮栏
+        status: unsupported
+        reason: "与case_1676297重复"
+      - id: case_1634999
+        name: 录音进行过程中完成录音(102x)
+        测试界面: 录音悬浮栏
+        status: unsupported
+        reason: "与case_1676295重复"
+      - id: case_1635037
+        name: 关闭应用终止录音
+        测试界面: 录音中
+        测试功能: 录音中退出提示
+        前置条件: 正在录音
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 录音中通过主菜单退出
+            action: dtk_main_menu
+            items: ["退出"]
+          - step_type: assert
+            description: 提示正在录音中，选择终止后退出
+      - id: case_1676399
+        name: 录音过程中关闭应用提示窗口Tab键操作
+        测试界面: 录音中退出弹窗
+        测试功能: Tab键切换
+        前置条件: 录音中触发退出弹窗
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 按Tab键切换焦点
+          - step_type: assert
+            description: 焦点按 X关闭->取消->确定 顺序切换
+      - id: case_1676401
+        name: 输入音量低提示窗Tab键操作
+        测试界面: 音量低提示弹窗
+        测试功能: Tab键切换
+        前置条件: 触发音量低提示弹窗
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 按Tab键切换焦点
+          - step_type: assert
+            description: 焦点按 X关闭->取消->确定 顺序切换
+      - id: case_1676287
+        name: 语音右键菜单项验证
+        测试界面: 详情编辑区
+        测试功能: 语音笔记右键菜单
+        前置条件: 详情页有语音笔记
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 右键语音笔记
+            action: dtk_context_menu
+            selector: {ref: editorWebEngine}
+          - step_type: assert
+            description: 菜单显示：保存为MP3、语音转文字、删除、全选、复制、剪切、粘贴；不显示语音朗读、语音听写、文本翻译
+        status: unsupported
+        reason: "语音笔记在QtWebEngine中，右键定位不可靠"
+
+  - suite_id: S08_playback
+    name: 语音播放
+    测试界面: 语音播放插件
+    测试功能: 播放/暂停、进度条、播放中操作
+    cases:
+      - id: case_1676291
+        name: 播放/暂停播放录音
+        测试界面: 语音笔记播放按钮
+        测试功能: 播放/暂停切换
+        前置条件: 存在语音笔记
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "播放/暂停按钮在QtWebEngine内，无AT-SPI节点"
+      - id: case_1676289
+        name: 播放/暂停播放-通过Space快捷键
+        测试界面: 语音播放
+        测试功能: Space播放/暂停
+        前置条件: 正在播放录音
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 按Space暂停播放
+            action: keyboard_press
+            key: space
+          - step_type: assert
+            description: 回放语音暂停
+          - step_type: action
+            description: 再次按Space
+            action: keyboard_press
+            key: space
+          - step_type: assert
+            description: 回放语音继续播放
+        status: unsupported
+        reason: "Space键需要焦点在播放插件上，但播放插件无AT-SPI名称无法定位焦点"
+      - id: case_1676407
+        name: 播放插件暂停/继续/关闭操作
+        测试界面: 语音播放插件
+        测试功能: Tab键切换播放控件
+        前置条件: 正在播放录音
+        AT元素引用: []
+        status: unsupported
+        reason: "播放插件按钮无AT-SPI名称"
+      - id: case_1635057
+        name: 播放/暂停播放录音(102x)
+        测试界面: 语音播放
+        status: unsupported
+        reason: "与case_1676291重复"
+      - id: case_1635063
+        name: 点击进度条改变播放进度
+        测试界面: 语音播放插件
+        测试功能: 进度条拖拽
+        前置条件: 正在播放录音
+        AT元素引用: []
+        status: unsupported
+        reason: "进度条为QML渲染元素，无AT-SPI节点，无法点击或拖拽"
+      - id: case_1635061
+        name: 拖动进度条至起始端/最末端
+        测试界面: 语音播放插件
+        status: unsupported
+        reason: "进度条无AT-SPI节点"
+      - id: case_1635059
+        name: 拖动进度条至指定位置
+        测试界面: 语音播放插件
+        status: unsupported
+        reason: "进度条无AT-SPI节点"
+      - id: case_1635085
+        name: 播放过程中放大/缩小/最小化窗口
+        测试界面: 标题栏
+        测试功能: 播放中窗口操作
+        前置条件: 正在播放录音
+        AT元素引用: [n0]
+        status: unsupported
+        reason: "最大化/最小化按钮无AT-SPI名称"
+      - id: case_1635081
+        name: 播放过程中点击其他录音播放按钮
+        测试界面: 语音笔记列表
+        测试功能: 切换播放
+        前置条件: 存在多条语音笔记
+        AT元素引用: []
+        status: unsupported
+        reason: "语音播放按钮在QtWebEngine内，无AT-SPI节点"
+      - id: case_1635079
+        name: 播放过程中右键当前文本笔记
+        测试界面: 笔记列表
+        测试功能: 播放中右键菜单验证
+        前置条件: 正在播放录音
+        AT元素引用: [noteListItem]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+
+  - suite_id: S09_context_menu
+    name: 右键菜单操作
+    测试界面: 各区域右键菜单
+    测试功能: 笔记/记事本/文本/语音/图片右键菜单
+    cases:
+      - id: case_1676285
+        name: 右键语音笔记保存为MP3
+        测试界面: 详情编辑区
+        测试功能: 语音右键保存MP3
+        前置条件: 详情页有语音笔记
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 右键语音笔记，选择保存为MP3
+            action: dtk_context_menu
+            selector: {ref: editorWebEngine}
+            items: ["保存为MP3"]
+          - step_type: assert
+            description: 默认保存到桌面
+        status: unsupported
+        reason: "语音笔记在QtWebEngine中，右键定位不可靠"
+      - id: case_1635101
+        name: 右键语音笔记保存为MP3(102x)
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "与case_1676285重复"
+      - id: case_1676279
+        name: 复制语音笔记
+        测试界面: 详情编辑区
+        测试功能: 语音右键复制粘贴
+        前置条件: 详情页有语音笔记
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "语音笔记在QtWebEngine中"
+      - id: case_1676277
+        name: 剪切语音笔记
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "语音笔记在QtWebEngine中"
+      - id: case_1676347
+        name: 保存为HTML
+        测试界面: 笔记右键菜单
+        测试功能: 保存笔记为HTML
+        前置条件: 笔记中有内容
+        AT元素引用: [noteListItem]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 右键文本笔记，选择保存笔记>保存为HTML
+            action: dtk_context_menu
+            selector: {ref: noteListItem}
+            items: ["保存笔记", "保存为HTML"]
+          - step_type: assert
+            description: 弹出保存窗口
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1676345
+        name: 保存为TXT
+        测试界面: 笔记右键菜单
+        测试功能: 保存笔记为TXT
+        前置条件: 笔记中有文字内容
+        AT元素引用: [noteListItem]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 右键文本笔记，选择保存笔记>保存为TXT
+            action: dtk_context_menu
+            selector: {ref: noteListItem}
+            items: ["保存笔记", "保存为TXT"]
+          - step_type: assert
+            description: 弹出保存窗口
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1676343
+        name: 保存语音
+        测试界面: 笔记右键菜单
+        测试功能: 保存语音
+        前置条件: 笔记中有语音记录
+        AT元素引用: [noteListItem]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1676441
+        name: 删除语音记事项同步删除转写文案
+        测试界面: 详情编辑区
+        测试功能: 删除语音同时删除转写文案
+        前置条件: 有语音转文字记录
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "语音笔记在QtWebEngine中"
+      - id: case_1676439
+        name: 转写文案不支持编辑只支持复制
+        测试界面: 详情编辑区
+        测试功能: 转写文案编辑限制
+        前置条件: 有语音转文字记录
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "转写文案在QtWebEngine中"
+      - id: case_1676227
+        name: 删除图片
+        测试界面: 详情编辑区
+        测试功能: 右键删除图片
+        前置条件: 编辑区有图片
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "图片在QtWebEngine中，右键定位不可靠"
+      - id: case_1676225
+        name: 复制图片
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "图片在QtWebEngine中"
+      - id: case_1676223
+        name: 剪切图片
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "图片在QtWebEngine中"
+      - id: case_1676221
+        name: 另存为图片
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "图片在QtWebEngine中"
+      - id: case_1676229
+        name: 查看导入图片
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "图片在QtWebEngine中"
+      - id: case_1676219
+        name: 编辑区空白右键菜单
+        测试界面: 详情编辑区
+        测试功能: 空白处右键菜单
+        前置条件: 存在笔记
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 右键编辑区空白处
+            action: dtk_context_menu
+            selector: {ref: editorWebEngine}
+          - step_type: assert
+            description: 弹出右键菜单含：删除、全选、复制、剪切、粘贴、语音朗读、语音听写
+        status: unsupported
+        reason: "editorWebEngine无AT-SPI名称，右键定位不可靠"
+
+  - suite_id: S10_search
+    name: 搜索功能
+    测试界面: 标题栏搜索框
+    测试功能: 关键字搜索、搜索结果操作
+    cases:
+      - id: case_1635181
+        name: 搜索框输入关键字按Enter显示搜索结果
+        测试界面: 搜索框
+        测试功能: 基本搜索
+        前置条件: 存在笔记内容
+        AT元素引用: [searchEdit]
+        needs_accessible_name: true
+        steps:
+          - step_type: action
+            description: 输入搜索关键字
+            action: keyboard_type
+            text: "测试"
+          - step_type: action
+            description: 按回车
+            action: keyboard_press
+            key: Return
+          - step_type: assert
+            description: 正常显示搜索结果
+        status: unsupported
+        reason: "searchEdit搜索框无AT-SPI名称，无法定位"
+      - id: case_1676375
+        name: 搜索关键字仅匹配记事本
+        测试界面: 搜索框
+        测试功能: 记事本名搜索无结果
+        前置条件: 存在记事本
+        AT元素引用: [searchEdit]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "搜索框无AT-SPI名称"
+      - id: case_1676371
+        name: 搜索关键字匹配文本笔记
+        测试界面: 搜索框
+        测试功能: 笔记名搜索
+        前置条件: 存在笔记
+        AT元素引用: [searchEdit]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "搜索框无AT-SPI名称"
+      - id: case_1676369
+        name: 搜索关键字匹配详情页文本
+        测试界面: 搜索框
+        测试功能: 详情页文本搜索
+        前置条件: 笔记详情页有特定文本
+        AT元素引用: [searchEdit]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "搜索框无AT-SPI名称"
+      - id: case_1635179
+        name: 输入特殊字符搜索
+        测试界面: 搜索框
+        测试功能: 特殊字符搜索
+        前置条件: 无
+        AT元素引用: [searchEdit]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "搜索框无AT-SPI名称"
+      - id: case_1635209
+        name: 调整窗口大小搜索框大小不变
+        测试界面: 标题栏
+        测试功能: 搜索框固定大小
+        前置条件: 无
+        AT元素引用: [searchEdit]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "搜索框无AT-SPI名称，窗口大小调整按钮也无AT-SPI名称"
+
+  - suite_id: S11_shortcuts
+    name: 快捷键测试
+    测试界面: 全局
+    测试功能: 各快捷键功能验证
+    cases:
+      - id: case_1635259
+        name: 验证快捷键功能正常实现
+        测试界面: 全局
+        测试功能: 全量快捷键验证
+        前置条件: 应用已启动且存在笔记
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 按F1
+            action: keyboard_press
+            key: F1
+          - step_type: assert
+            description: 打开帮助
+          - step_type: action
+            description: 按Ctrl+Shift+?/ (快捷键预览)
+            action: keyboard_hot_key
+            keys: [Ctrl, Shift, Slash]
+          - step_type: assert
+            description: 显示快捷键预览
+          - step_type: action
+            description: 按Ctrl+N
+            action: keyboard_hot_key
+            keys: [Ctrl, N]
+          - step_type: assert
+            description: 新建记事本
+          - step_type: action
+            description: 按Ctrl+B
+            action: keyboard_hot_key
+            keys: [Ctrl, B]
+          - step_type: assert
+            description: 新建笔记
+          - step_type: action
+            description: 按Ctrl+R
+            action: keyboard_hot_key
+            keys: [Ctrl, R]
+          - step_type: assert
+            description: 开始录音
+          - step_type: action
+            description: 按Ctrl+S
+            action: keyboard_hot_key
+            keys: [Ctrl, S]
+          - step_type: assert
+            description: 保存为TXT
+          - step_type: action
+            description: 按Ctrl+Y
+            action: keyboard_hot_key
+            keys: [Ctrl, Y]
+          - step_type: assert
+            description: 保存语音
+      - id: case_1624611
+        name: 快捷键预览显示正常
+        测试界面: 全局
+        测试功能: Ctrl+Shift+/显示快捷键
+        前置条件: 应用已启动
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 按Ctrl+Shift+/
+            action: keyboard_hot_key
+            keys: [Ctrl, Shift, Slash]
+          - step_type: assert
+            description: 快捷键预览界面显示正确
+      - id: case_1635281
+        name: 录音中无法使用Ctrl+Y
+        测试界面: 全局
+        测试功能: 录音中快捷键禁用
+        前置条件: 正在录音
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 录音中按Ctrl+Y
+            action: keyboard_hot_key
+            keys: [Ctrl, Y]
+          - step_type: assert
+            description: Ctrl+Y快捷键禁用，无闪退
+      - id: case_1635279
+        name: 语音记录空无法使用Ctrl+Y
+        测试界面: 全局
+        测试功能: 无语音时快捷键禁用
+        前置条件: 笔记中无语音记录
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 按Ctrl+Y
+            action: keyboard_hot_key
+            keys: [Ctrl, Y]
+          - step_type: assert
+            description: 快捷键禁用，无闪退
+      - id: case_1635277
+        name: 文字记录空使用Ctrl+S
+        测试界面: 全局
+        测试功能: 无文字时快捷键禁用
+        前置条件: 笔记中无文字
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 按Ctrl+S
+            action: keyboard_hot_key
+            keys: [Ctrl, S]
+          - step_type: assert
+            description: 快捷键禁用，无闪退
+      - id: case_1635271
+        name: 搜索结果界面无法使用F2
+        测试界面: 搜索结果
+        测试功能: 搜索中F2禁用
+        前置条件: 处于搜索结果界面
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 搜索状态下按F2
+            action: keyboard_press
+            key: F2
+          - step_type: assert
+            description: F2禁用
+      - id: case_1635265
+        name: 录音转文字回放过程中使用Delete
+        测试界面: 全局
+        测试功能: 特殊状态下Delete键
+        前置条件: 正在语音转文字
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 语音转写中点击笔记，按Delete
+            action: keyboard_press
+            key: Delete
+          - step_type: assert
+            description: Delete键无反应
+      - id: case_1635263
+        name: 空白页使用Delete快捷键
+        测试界面: 全局
+        测试功能: 空白页Delete
+        前置条件: 无任何记事本
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 空白页按Delete
+            action: keyboard_press
+            key: Delete
+          - step_type: assert
+            description: 无任何作用，无闪退
+      - id: case_1635261
+        name: 录音/转文字/回放/搜索中不可以通过Ctrl+N
+        测试界面: 全局
+        测试功能: 特殊状态下Ctrl+N禁用
+        前置条件: 正在录音/转文字/回放/搜索
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 录音中按Ctrl+N
+            action: keyboard_hot_key
+            keys: [Ctrl, N]
+          - step_type: assert
+            description: 无法新建记事本，无闪退
+
+  - suite_id: S12_text_format
+    name: 文本格式化
+    测试界面: 详情编辑区悬浮工具栏
+    测试功能: 加粗/斜体/下划线/删除线/字号/字体颜色/背景色/列表/字体
+    cases:
+      - id: case_1676269
+        name: 加粗和取消加粗
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮气泡工具栏为QML组件，所有按钮均无AT-SPI名称"
+      - id: case_1676267
+        name: 输入光标加粗和取消加粗
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676263
+        name: 设置/取消斜体
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676261
+        name: 选中文本设置/取消下划线
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676259
+        name: 输入光标设置/取消下划线
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676257
+        name: 设置/取消删除线
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676255
+        name: 输入光标设置/取消删除线
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676253
+        name: 设置字号
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676251
+        name: 输入光标设置字号
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676249
+        name: 设置字体颜色
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676247
+        name: 输入光标设置字体颜色
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676245
+        name: 设置背景色
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676243
+        name: 输入光标设置背景色
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676241
+        name: 有序列表
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676239
+        name: 输入光标有序列表
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676237
+        name: 无序列表
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676235
+        name: 输入光标无序列表
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676209
+        name: 设置字体
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676207
+        name: 无字体设置字体
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1671115
+        name: 文本工具状态
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676275
+        name: 选中文本弹出悬浮气泡工具栏
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676273
+        name: 取消选中文本悬浮气泡工具栏消失
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "悬浮工具栏无AT-SPI名称"
+      - id: case_1676271
+        name: 鼠标移入控件显示hover效果
+        测试界面: 悬浮工具栏
+        status: unsupported
+        reason: "hover效果为视觉检查，无法通过AT-SPI验证"
+
+  - suite_id: S13_image
+    name: 图片操作
+    测试界面: 详情编辑区
+    测试功能: 插入/拖拽/粘贴/查看图片
+    cases:
+      - id: case_1676377
+        name: 插入图片显示在编辑区光标位置
+        测试界面: 详情编辑区
+        测试功能: 通过按钮插入图片
+        前置条件: 存在笔记
+        AT元素引用: [insImgBtn, editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "insImgBtn和editorWebEngine均无AT-SPI名称"
+      - id: case_1676233
+        name: 拖拽图片至编辑区
+        测试界面: 详情编辑区
+        测试功能: 拖拽导入图片
+        前置条件: 无
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "拖拽操作无法通过AT-SPI执行"
+      - id: case_1676231
+        name: 粘贴图片至编辑区
+        测试界面: 详情编辑区
+        测试功能: 粘贴导入图片
+        前置条件: 剪贴板有图片
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "editorWebEngine无AT-SPI名称"
+
+  - suite_id: S14_voice_ai
+    name: 语音AI功能
+    测试界面: 详情编辑区
+    测试功能: 语音朗读/听写/转文字
+    cases:
+      - id: case_1676463
+        name: 语音朗读-通过快捷键操作
+        测试界面: 详情编辑区
+        测试功能: Alt+M语音朗读
+        前置条件: 详情页有文字内容
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "需要选中文字后通过右键菜单操作，editorWebEngine无AT-SPI名称"
+      - id: case_1676459
+        name: 语音听写-通过快捷键操作
+        测试界面: 详情编辑区
+        测试功能: Alt+M语音听写
+        前置条件: 存在笔记
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "editorWebEngine无AT-SPI名称，语音听写依赖UOS AI外部应用"
+      - id: case_1873475
+        name: 语音朗读-全选文字
+        测试界面: 详情编辑区
+        测试功能: 全选后语音朗读
+        前置条件: 详情页有文字内容
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "editorWebEngine无AT-SPI名称，语音朗读依赖UOS AI"
+      - id: case_1873451
+        name: 重复选择语音朗读
+        测试界面: 详情编辑区
+        测试功能: 重复朗读切换
+        前置条件: 详情页有文字内容
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "依赖UOS AI外部应用"
+      - id: case_1873455
+        name: 语音朗读-音频设备缺失
+        测试界面: 详情编辑区
+        测试功能: 无音频设备提示
+        前置条件: 无音频输出设备
+        AT元素引用: []
+        status: unsupported
+        reason: "需要物理移除音频设备"
+      - id: case_1873469
+        name: 语音听写-自动唤醒UOS AI(首次)
+        测试界面: 详情编辑区
+        测试功能: 首次使用AI自动唤醒
+        前置条件: 无
+        AT元素引用: []
+        status: unsupported
+        reason: "依赖UOS AI外部应用，无法控制首次/非首次状态"
+      - id: case_1873467
+        name: 语音朗读-自动唤醒UOS AI(首次)
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "依赖UOS AI外部应用"
+      - id: case_1676435
+        name: 网络正常语音转文字
+        测试界面: 详情编辑区
+        测试功能: 语音转文字正常流程
+        前置条件: 详情页有语音笔记
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "依赖网络AI服务，editorWebEngine无AT-SPI名称"
+      - id: case_1679637
+        name: 网络不正常语音转文字
+        测试界面: 详情编辑区
+        测试功能: 网络异常提示
+        前置条件: 详情页有语音笔记，网络断开
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "需要控制网络状态"
+      - id: case_1679613
+        name: 语音转文字-折叠
+        测试界面: 详情编辑区
+        测试功能: 转写文案折叠/展开
+        前置条件: 有语音转文字记录
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "转写文案折叠按钮在QtWebEngine中"
+      - id: case_1676397
+        name: 语音转文字过程中关闭应用提示窗口
+        测试界面: 退出弹窗
+        测试功能: 转文字中退出提示
+        前置条件: 正在语音转文字
+        AT元素引用: []
+        steps:
+          - step_type: action
+            description: 语音转写中通过主菜单退出
+            action: dtk_main_menu
+            items: ["退出"]
+          - step_type: assert
+            description: 提示当前正在转写中
+
+  - suite_id: S15_multiselect
+    name: 多选操作
+    测试界面: 笔记列表
+    测试功能: Ctrl/Shift多选、批量操作
+    cases:
+      - id: case_1676335
+        name: Ctrl多选笔记
+        测试界面: 笔记列表
+        测试功能: Ctrl点击多选
+        前置条件: 存在多个笔记
+        AT元素引用: [noteListItem]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称，Ctrl+Click操作无法可靠执行"
+      - id: case_1676333
+        name: Ctrl取消选中笔记
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1676331
+        name: Shift范围选笔记
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1676329
+        name: Shift已选笔记范围重选
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1676327
+        name: 多选状态下点击"移动"按钮
+        测试界面: 笔记列表/移动弹窗
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1676319
+        name: 多选状态下点击"删除"按钮
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1676317
+        name: 多选状态下右键"移动"
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1676315
+        name: 多选状态下右键"删除"
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1676313
+        name: 多选状态下右键"保存为HTML"
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1676311
+        name: 多选状态下右键"保存为TXT"
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1676309
+        name: 多选状态下右键"保存语音"
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+
+  - suite_id: S16_dragdrop
+    name: 拖拽操作
+    测试界面: 记事本列表/笔记列表
+    测试功能: 鼠标拖拽移动
+    cases:
+      - id: case_1676355
+        name: 记事本不超过一屏鼠标移动位置
+        测试界面: 记事本列表
+        测试功能: 拖拽排序
+        前置条件: 记事本列表不超过一屏
+        AT元素引用: [n6]
+        status: unsupported
+        reason: "拖拽操作无法通过AT-SPI可靠执行"
+      - id: case_1676353
+        name: 记事本超过一屏鼠标移动位置
+        测试界面: 记事本列表
+        status: unsupported
+        reason: "拖拽操作无法通过AT-SPI执行"
+      - id: case_1676337
+        name: 鼠标移动笔记至其他记事本
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "拖拽操作无法通过AT-SPI执行"
+      - id: case_1676431
+        name: 多选状态下批量移动
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "拖拽操作无法通过AT-SPI执行"
+      - id: case_1676307
+        name: 多选状态下鼠标批量移动
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "拖拽操作无法通过AT-SPI执行"
+      - id: case_1634719
+        name: 移动记事本过程中快捷键操作
+        测试界面: 记事本列表
+        status: unsupported
+        reason: "拖拽+快捷键组合无法通过AT-SPI执行"
+
+  - suite_id: S17_visual_check
+    name: 纯视觉检查
+    测试界面: 各界面
+    测试功能: UI布局、显示效果验证
+    cases:
+      - id: case_1676579
+        name: 语音文件显示
+        测试界面: 详情编辑区
+        测试功能: 语音文件显示验证
+        status: unsupported
+        reason: "纯视觉检查，无法通过AT-SPI验证显示效果"
+      - id: case_1676293
+        name: 语音笔记显示
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "纯视觉检查"
+      - id: case_1635053
+        name: 语音笔记显示(102x)
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "与case_1676293重复"
+      - id: case_1635055
+        name: 语音笔记时间显示
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "纯视觉检查，时间显示格式验证"
+      - id: case_1634909
+        name: 笔记列表时间显示
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "纯视觉检查"
+      - id: case_1634993
+        name: 录音过程中的界面布局(102x)
+        测试界面: 录音悬浮栏
+        status: unsupported
+        reason: "纯视觉检查，录音悬浮栏无AT-SPI节点"
+      - id: case_1676301
+        name: 录音过程中的界面布局
+        测试界面: 录音悬浮栏
+        status: unsupported
+        reason: "与case_1634993重复"
+      - id: case_1676303
+        name: 录音按钮固定显示
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "纯视觉检查"
+      - id: case_1634991
+        name: 录音按钮固定显示(102x)
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "与case_1676303重复"
+      - id: case_1635003
+        name: 录音时长统计分钟级
+        测试界面: 录音悬浮栏
+        status: unsupported
+        reason: "录音悬浮栏无AT-SPI节点"
+      - id: case_1635001
+        name: 录音时长统计小时级
+        测试界面: 录音悬浮栏
+        status: unsupported
+        reason: "录音悬浮栏无AT-SPI节点"
+      - id: case_1634905
+        name: 重启应用查看笔记列表默认选中第一条
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "需要重启应用，笔记列表项无AT-SPI名称"
+      - id: case_1634901
+        name: 新建笔记超过一页
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1634961
+        name: 最大化/默认/拖拽调整窗口查看详情页
+        测试界面: 标题栏/详情页
+        status: unsupported
+        reason: "窗口操作按钮无AT-SPI名称"
+      - id: case_1634963
+        name: 输入文字过程中切换窗口大小
+        测试界面: 标题栏
+        status: unsupported
+        reason: "窗口操作按钮无AT-SPI名称"
+      - id: case_1673449
+        name: 去掉文本翻译
+        测试界面: 详情编辑区
+        测试功能: 右键菜单不含文本翻译
+        前置条件: 编辑区有内容
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "editorWebEngine无AT-SPI名称"
+
+  - suite_id: S18_recording_scenarios
+    name: 录音场景测试
+    测试界面: 全局
+    测试功能: 录音中各种操作场景
+    cases:
+      - id: case_1635035
+        name: 录音过程中放大/缩小/最小化窗口
+        测试界面: 标题栏
+        测试功能: 录音中窗口操作
+        前置条件: 正在录音
+        AT元素引用: [n0]
+        status: unsupported
+        reason: "窗口操作按钮无AT-SPI名称"
+      - id: case_1635033
+        name: 录音过程中编辑当前文本笔记
+        测试界面: 详情编辑区
+        测试功能: 录音中编辑
+        前置条件: 正在录音
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "editorWebEngine无AT-SPI名称"
+      - id: case_1635031
+        name: 录音过程中语音转文字操作
+        测试界面: 详情编辑区
+        测试功能: 录音中转文字
+        前置条件: 正在录音且有语音笔记
+        AT元素引用: [editorWebEngine]
+        needs_accessible_name: true
+        status: unsupported
+        reason: "依赖AI服务，editorWebEngine无AT-SPI名称"
+      - id: case_1635029
+        name: 录音过程中保存为MP3
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "语音笔记在QtWebEngine中"
+      - id: case_1635027
+        name: 录音过程中删除语音笔记
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "语音笔记在QtWebEngine中"
+      - id: case_1635025
+        name: 录音过程中右键当前文本笔记
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1635023
+        name: 录音过程中右键其他文本笔记
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1635021
+        name: 录音过程中新建文本笔记
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "新建笔记按钮无AT-SPI名称"
+      - id: case_1635011
+        name: 录音过程中播放录音
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "播放按钮在QtWebEngine中"
+      - id: case_1635089
+        name: 录音并保存对应笔记排序
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1635087
+        name: 播放过程中删除当前语音笔记
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "语音笔记在QtWebEngine中"
+      - id: case_1635083
+        name: 播放过程中编辑当前文本笔记
+        测试界面: 详情编辑区
+        status: unsupported
+        reason: "editorWebEngine无AT-SPI名称"
+      - id: case_1635079
+        name: 播放过程中右键当前文本笔记
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1635077
+        name: 播放过程中右键其他文本笔记
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "笔记列表项无AT-SPI名称"
+      - id: case_1635075
+        name: 播放过程中新建文本笔记
+        测试界面: 笔记列表
+        status: unsupported
+        reason: "新建笔记按钮无AT-SPI名称"
+      - id: case_1635073
+        name: 播放过程中右键当前记事本
+        测试界面: 记事本列表
+        status: unsupported
+        reason: "记事本右键操作在播放状态下受限"
+      - id: case_1635071
+        name: 播放过程中右键其他记事本
+        测试界面: 记事本列表
+        status: unsupported
+        reason: "记事本在播放状态下置灰"
+      - id: case_1635069
+        name: 播放过程中新建记事本
+        测试界面: 记事本列表
+        status: unsupported
+        reason: "新建记事本按钮无AT-SPI名称，播放中置灰"
+      - id: case_1635067
+        name: 播放过程中切换记事本
+        测试界面: 记事本列表
+        status: unsupported
+        reason: "播放中记事本区域置灰"

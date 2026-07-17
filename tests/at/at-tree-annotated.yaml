@@ -1,0 +1,241 @@
+version: '1.0'
+app: deepin-voice-note
+metadata:
+  generated_at: '2026-07-17T11:10:00'
+  source: at-tree.yaml (runtime dump)
+  annotation_status: draft
+tree:
+  - role: frame
+    name: ''
+    id: n0
+    source: runtime
+    classification: container
+    comment: 'GUI位置: 主窗口框架 | 功能: 应用主窗口，包含左侧记事本列表、中间笔记列表、右侧详情编辑区'
+    annotation_status: draft
+    children:
+      - role: button
+        name: 新建记事本
+        id: n3
+        source: runtime
+        classification: interactive
+        comment: 'GUI位置: 左侧记事本列表底部的"新建记事本"按钮 | 功能: 创建新的记事本(文件夹)'
+        annotation_status: draft
+        needs_accessible_name: false
+      - role: label
+        name: 记事本1
+        id: n6
+        source: runtime
+        classification: interactive
+        comment: 'GUI位置: 左侧记事本列表中的记事本项目 | 功能: 显示记事本名称，支持右键菜单(重命名/删除/新建笔记)、双击重命名、拖拽排序'
+        annotation_status: draft
+        needs_accessible_name: false
+      - role: label
+        name: 已选择0个笔记
+        id: n16
+        source: runtime
+        classification: informational
+        comment: 'GUI位置: 中间笔记列表上方/多选工具栏 | 功能: 显示当前选中的笔记数量'
+        annotation_status: draft
+        needs_accessible_name: false
+      - role: label
+        name: 新建一个记事本后，可以开始记录语音及文字
+        id: n23
+        source: runtime
+        classification: informational
+        comment: 'GUI位置: 右侧详情编辑区空状态提示文本 | 功能: 提示用户新建记事本后可以开始记录'
+        annotation_status: draft
+        needs_accessible_name: false
+      - role: button
+        name: 新建记事本
+        id: n24
+        source: runtime
+        classification: interactive
+        comment: 'GUI位置: 右侧详情区空状态的"新建记事本"按钮 | 功能: 创建新的记事本(文件夹)'
+        annotation_status: draft
+        needs_accessible_name: false
+  - role: frame
+    name: ''
+    id: n26
+    source: runtime
+    classification: container
+    comment: 'GUI位置: 移动笔记弹窗对话框 | 功能: 选择目标记事本以移动笔记'
+    annotation_status: draft
+    children:
+      - role: label
+        name: 移动笔记
+        id: n27
+        source: runtime
+        classification: informational
+        comment: 'GUI位置: 移动笔记弹窗标题 | 功能: 对话框标题文字'
+        annotation_status: draft
+        needs_accessible_name: false
+      - role: button
+        name: 取 消
+        id: n31
+        source: runtime
+        classification: interactive
+        comment: 'GUI位置: 移动笔记弹窗左下角取消按钮 | 功能: 取消移动操作，关闭弹窗'
+        annotation_status: draft
+        needs_accessible_name: false
+      - role: button
+        name: 确定
+        id: n32
+        source: runtime
+        classification: interactive
+        comment: 'GUI位置: 移动笔记弹窗右下角确定按钮 | 功能: 确认移动笔记到选中的记事本'
+        annotation_status: draft
+        needs_accessible_name: false
+  - role: frame
+    name: ''
+    id: n34
+    source: runtime
+    classification: container
+    comment: 'GUI位置: 空对话框frame | 功能: 可能是初始界面或隐藏的对话框容器'
+    annotation_status: draft
+  - role: panel
+    name: UpgradeView
+    object_name: UpgradeView
+    id: ''
+    source: static
+    classification: informational
+    comment: 'GUI位置: 升级视图面板 | 功能: 数据迁移进度显示(从旧版本升级时)'
+    annotation_status: draft
+    needs_accessible_name: false
+
+static_elements:
+  - element_id: sidebarToggleBtn
+    name: ''
+    object_name: twoColumnModeBtn
+    classification: interactive
+    comment: 'GUI位置: 标题栏左侧收起/展开按钮 | 功能: 切换左侧记事本列表的显示/隐藏'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '切换侧栏'
+  - element_id: newNoteBtn
+    name: ''
+    object_name: newNoteBtn
+    classification: interactive
+    comment: 'GUI位置: 标题栏工具栏"新建笔记"按钮 | 功能: 在当前记事本中新建一条笔记'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '新建笔记'
+  - element_id: recordBtn
+    name: ''
+    object_name: recordBtn
+    classification: interactive
+    comment: 'GUI位置: 标题栏工具栏"录音"按钮 | 功能: 开始/停止录音'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '录音'
+  - element_id: insImgBtn
+    name: ''
+    object_name: insImgBtn
+    classification: interactive
+    comment: 'GUI位置: 标题栏工具栏"插入图片"按钮 | 功能: 打开文件选择器插入图片到编辑区'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '插入图片'
+  - element_id: searchBtn
+    name: ''
+    object_name: ''
+    classification: interactive
+    comment: 'GUI位置: 标题栏工具栏搜索按钮 | 功能: 切换搜索框显示'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '搜索'
+  - element_id: searchEdit
+    name: ''
+    object_name: search
+    classification: interactive
+    comment: 'GUI位置: 标题栏搜索输入框 | 功能: 输入关键词搜索笔记，按Enter执行搜索'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '搜索'
+  - element_id: pauseBtn
+    name: ''
+    object_name: pauseBtn
+    classification: interactive
+    comment: 'GUI位置: 底部录音悬浮栏暂停按钮 | 功能: 暂停/继续录音'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '暂停录音'
+  - element_id: stopBtn
+    name: ''
+    object_name: stopBtn
+    classification: interactive
+    comment: 'GUI位置: 底部录音悬浮栏停止按钮 | 功能: 停止录音并保存'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '停止录音'
+  - element_id: multiSelectMoveBtn
+    name: ''
+    object_name: ''
+    classification: interactive
+    comment: 'GUI位置: 多选状态下悬浮工具栏移动按钮 | 功能: 打开移动笔记对话框'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '移动'
+  - element_id: multiSelectSaveNoteBtn
+    name: ''
+    object_name: ''
+    classification: interactive
+    comment: 'GUI位置: 多选状态下悬浮工具栏保存笔记按钮 | 功能: 保存选中的笔记'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '保存笔记'
+  - element_id: multiSelectSaveVoiceBtn
+    name: ''
+    object_name: ''
+    classification: interactive
+    comment: 'GUI位置: 多选状态下悬浮工具栏保存语音按钮 | 功能: 保存选中的语音'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '保存语音'
+  - element_id: multiSelectDeleteBtn
+    name: ''
+    object_name: ''
+    classification: interactive
+    comment: 'GUI位置: 多选状态下悬浮工具栏删除按钮 | 功能: 删除选中的笔记'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '删除'
+  - element_id: noteListItem
+    name: ''
+    object_name: ''
+    classification: interactive
+    comment: 'GUI位置: 中间笔记列表中的笔记项 | 功能: 显示笔记标题和时间，支持单击选中、Ctrl多选、Shift范围选、右键菜单、双击重命名、拖拽移动'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '笔记项'
+  - element_id: editorWebEngine
+    name: ''
+    object_name: ''
+    classification: interactive
+    comment: 'GUI位置: 右侧详情页富文本编辑区(QtWebEngine) | 功能: 编辑笔记文本内容，支持插入图片、录音、富文本格式'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '编辑区'
+  - element_id: settingDialogInternal
+    name: ''
+    object_name: ''
+    classification: interactive
+    comment: 'GUI位置: 设置弹窗中的"内置"单选按钮 | 功能: 设置音频源为内置'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '内置音频源'
+  - element_id: settingDialogMicrophone
+    name: ''
+    object_name: ''
+    classification: interactive
+    comment: 'GUI位置: 设置弹窗中的"麦克风"单选按钮 | 功能: 设置音频源为麦克风'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '麦克风音频源'
+  - element_id: settingDialogRestoreBtn
+    name: ''
+    object_name: ''
+    classification: interactive
+    comment: 'GUI位置: 设置弹窗中的"恢复默认"按钮 | 功能: 恢复音频源默认设置'
+    annotation_status: draft
+    needs_accessible_name: true
+    accessible_name_suggestion: '恢复默认'

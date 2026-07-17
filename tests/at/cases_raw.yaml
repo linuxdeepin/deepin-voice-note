@@ -1,0 +1,6463 @@
+metadata:
+  generated_at: '2026-07-17T10:58:34.631617'
+  source: 统信桌面操作系统 V25-语音记事本用例.xlsx
+cases:
+- id: case_2017105
+  name: 【UI检查】常用工具UI检查
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本(#110609)
+  description: 【UI检查】常用工具UI检查
+  status: active
+  reason: ''
+  steps:
+  - step_type: assert
+    description: 1. 打开任意常用工具，检查UI界面
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. UI显示正常
+    needs_accessible_name: false
+- id: case_1884375
+  name: 【玲珑】【语音记事本】语音记事本基本功能验证
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本(#110609)
+  description: 【玲珑】【语音记事本】语音记事本基本功能验证
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 打开语音记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 检查新建记事本、新建笔记、录音、语音播放等主要功能
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 打开成功
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 功能正常
+    needs_accessible_name: false
+- id: case_1873475
+  name: 语音朗读-全选文字
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 语音朗读-全选文字
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 进入笔记，鼠标右键全选，再次鼠标右键，点击语音朗读
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 进入笔记，快捷键ctrl+a，鼠标右键，点击语音朗读
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 开始朗读所有内容
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 开始朗读所有内容
+    needs_accessible_name: false
+- id: case_1873469
+  name: 语音听写-自动唤醒UOS AI（首次使用AI能力）
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 语音听写-自动唤醒UOS AI（首次使用AI能力）
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 进入笔记，鼠标右键，点击语音听写
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 自动打开UOS-AI窗口
+    needs_accessible_name: false
+- id: case_1873467
+  name: 语音朗读-自动唤醒UOS AI（首次使用AI能力）
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 语音朗读-自动唤醒UOS AI（首次使用AI能力）
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选择一段文字，鼠标右键，点击语音朗读
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 自动打开UOS-AI窗口
+    needs_accessible_name: false
+- id: case_1873465
+  name: 语音转文字-自动唤醒UOS AI（非首次使用AI能力）
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 语音转文字-自动唤醒UOS AI（非首次使用AI能力）
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 进入笔记，选择录音音频，鼠标右键，点击语音转文字
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 终端输入ps -ef |grep uos-ai，查看进行
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 显示正在转文字
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 存在uos-ai的进程
+    needs_accessible_name: false
+- id: case_1873463
+  name: 语音听写-自动唤醒UOS AI（非首次使用AI能力）
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 语音听写-自动唤醒UOS AI（非首次使用AI能力）
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 进入笔记，鼠标右键，点击语音听写
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 终端输入ps -ef |grep uos-ai，查看进行
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 显示麦克风小图标
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 存在uos-ai的进程
+    needs_accessible_name: false
+- id: case_1873461
+  name: 语音朗读-自动唤醒UOS AI（非首次使用AI能力）
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 语音朗读-自动唤醒UOS AI（非首次使用AI能力）
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选择一段文字，鼠标右键，点击语音朗读
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 终端输入ps -ef |grep uos-ai，查看进行
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 开始朗读选择的文字
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 存在uos-ai的进程
+    needs_accessible_name: false
+- id: case_1873455
+  name: 语音朗读-音频设备缺失
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 语音朗读-音频设备缺失
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选择一段文字，鼠标右键，点击语音朗读
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 提示未检测到音频输出设备，请检查后重试
+    needs_accessible_name: false
+- id: case_1873451
+  name: 重复选择语音朗读
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 重复选择语音朗读
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选择一段文字，鼠标右键，点击语音朗读
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 朗读过程中，重新选择一段文字，鼠标右键，点击语音朗读
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 重复步骤2多次
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 开始朗读选择的文字
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 开始朗读重新选择的这段文字
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 每次都朗读重新选择的文字
+    needs_accessible_name: false
+- id: case_1873449
+  name: 去掉文本翻译
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 去掉文本翻译
+  status: active
+  reason: ''
+  steps:
+  - step_type: assert
+    description: 1. 在笔记正文处，鼠标右键，检查是否显示文本翻译菜单
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 不显示文本翻译菜单
+    needs_accessible_name: false
+- id: case_1681115
+  name: V25语音记事本-文本工具状态
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25语音记事本-文本工具状态
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 打开文本文件，左击拖动鼠标选择一段文字
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 从左到右依次显示文本选项
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 点击 字体-字号-字体颜色-文本高亮均 可下拉选项
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 点击 加粗-斜体-下划线-删除线-无序列表-有序列表 按钮均可用
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 将语音记事本变成最小窗口模式，选中文字后浮现文本工具
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 下方自动浮现出文本工具
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 字体-字号-字体颜色-文本高亮-加粗-斜体-下划线-删除线-无序列表-有续列表
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 选择后相关文本属性发生相应变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 选择后相关文本属性发生相应变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 文本工具自动折行适应窗口
+    needs_accessible_name: false
+- id: case_1680885
+  name: V25语音记事本- 语音转文字-编辑
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25语音记事本- 语音转文字-编辑
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 展开已有的语音转文字的记录，尝试光标选中后修改或者删除
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 展开已有的语音转文字的记录，尝试光标选中内容后点击右键复制
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 发现无法修改
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 可实现复制粘贴
+    needs_accessible_name: false
+- id: case_1679637
+  name: V25语音记事本 -网络不正常，无法正常进行语音转文字操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25语音记事本 -网络不正常，无法正常进行语音转文字操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 断开网络连接，点击右键语音转文字
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 网络连接正常后，点击右键语音转文字
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 显示“当前网络状况差，语音转写失败，请确保网络通畅”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 可正常开始语音转文字
+    needs_accessible_name: false
+- id: case_1679613
+  name: V25语音记事本- 语音转文字-折叠
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25语音记事本- 语音转文字-折叠
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击该“语音转文字”所在行右侧 向下箭头
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击该“语音转文字”所在行右侧 向上箭头
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 可展开显示该条语音所转文字
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 可折叠该条语音所转文字
+    needs_accessible_name: false
+- id: case_1678993
+  name: V25 语音记事本- 音量检测
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 语音记事本- 音量检测
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 打开控制中心调节系统音量
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 打开语音记事本，点击录音开始录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 点击“取消”
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 点击“确定”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 可成功调节，调节至低音量
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出对话框 “系统音量低，可能影响当前录音，是否继续录音”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 暂停录音
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 继续录音
+    needs_accessible_name: false
+- id: case_1676591
+  name: V25 语音记事本- 检测录音设备
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 语音记事本- 检测录音设备
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 启动器打开语音记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 无任何录音设备接入/可用，点击页面顶部偏右的“录音”按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 打开/插入录音设备，点击“录音按钮”
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 录音过程中关闭/禁用录音设备，点击页面顶部偏右的“录音”按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 语音记事本已打开
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 显示暗灰色字体“未检测到录音设备”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 开始正常录音
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 录音暂停，“录音”按钮显示暗灰色字体“未检测到录音设备”
+    needs_accessible_name: false
+- id: case_1676579
+  name: V25语音记事本-语音文件显示
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25语音记事本-语音文件显示
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击记事本中的文件
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 查看语音文件
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 在视野中播放语音文件
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 在视野外播放语音文件
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 语音开始播放
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 语音文件不展示录音日期（因为与语音文件名重复）
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 不展示语音播放浮动工具栏（正常内嵌在文本内容区域）
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 底部出现浮动工具栏，显示当前正在播放的语音文件
+    needs_accessible_name: false
+- id: case_1676573
+  name: V25语音记事本-主界面显示
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25语音记事本-主界面显示
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 启动器打开语音记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 查看界面最顶端各个控件
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 任意点击各个控件
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 记事本主界面已打开
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 从左到右依次显示为 “语音记事本图标” “列表缩放” “搜索框” "新建文本" “语音记录”  “图片” “主菜单” “最小化”
+      “最大化” “关闭”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 各个控件均可用
+    needs_accessible_name: false
+- id: case_1676465
+  name: 置顶/取消置顶笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 置顶/取消置顶笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. Tab键切换焦点至笔记，通过上/下方向键选中指定笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Alt+M
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 通过上/下方向键，选中“置顶”，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 按Alt+M，通过上/下方向键，选中“取消置顶”，按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 选中笔记显示变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 展开右键菜单
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 成功置顶选中笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 成功取消置顶选中笔记
+    needs_accessible_name: false
+- id: case_1676463
+  name: 语音朗读-通过快捷键操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 语音朗读-通过快捷键操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 按Alt+M，通过上/下方向键，选中“语音朗读”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 该选项可被选中
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 语音朗读选中文本内容
+    needs_accessible_name: false
+- id: case_1676459
+  name: 语音听写-通过快捷键操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 语音听写-通过快捷键操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. Tab键切换焦点至详情页
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Alt+M，通过上/下方向键，选中“语音听写”，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 语音输入
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 可切换至详情页
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 开启听写功能
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 详情页输入语音文字
+    needs_accessible_name: false
+- id: case_1676457
+  name: 主题
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 主题
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击右上角工具栏菜单按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 点击主题，分别切换主题为：浅色主题、深色主题、跟随系统，查看语音记事本各个界面显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 工具栏可点开
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 成功切换主题，各个界面显示正常（备注：编辑区适配深色主题，用户修改字体颜色导致字体无法看清这类现象不做处理）
+    needs_accessible_name: false
+- id: case_1676455
+  name: 帮助
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 帮助
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击右上角工具栏菜单按钮，点击帮助
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 键入F1
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 核对简体中文、英文、繁体中文（香港）、正体中文语言下，语音记事本帮助手册的文案
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 正常唤出帮助手册
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常唤出帮助手册
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常显示语音记事本相关功能介绍和对应截图
+    needs_accessible_name: false
+- id: case_1676453
+  name: 关于
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 关于
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击工具栏菜单按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“关于”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 工具栏菜单可打开
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 出现语音记事本关于界面，该界面介绍录音的版本、说明
+    needs_accessible_name: false
+- id: case_1676451
+  name: 退出
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 退出
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击工具栏菜单按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“退出”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 点击后弹出工具栏菜单
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 退出应用
+    needs_accessible_name: false
+- id: case_1676449
+  name: 最小化
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 最小化
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击界面工具栏右上角的“-”图标
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 再次点击dock上的语音记事本应用图标
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 语音记事本被最小化，界面被隐藏
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 语音记事本窗口显示为默认窗口大小，界面重新展示
+    needs_accessible_name: false
+- id: case_1676447
+  name: 最大化
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 最大化
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击右上角“最大化”按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 最大化显示语音记事本
+    needs_accessible_name: false
+- id: case_1676445
+  name: 关闭主界面
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 关闭主界面
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击工具栏右上角的“x”图标
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 退出应用
+    needs_accessible_name: false
+- id: case_1676441
+  name: 删除语音记事项，同步删除语音转写文案内容
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 删除语音记事项，同步删除语音转写文案内容
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 删除转写文案对应录音记录
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 正常删除录音记录，转写文案同时被删除
+    needs_accessible_name: false
+- id: case_1676439
+  name: 转写文案不支持编辑功能，只支持复制
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 转写文案不支持编辑功能，只支持复制
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选中转写文案部分文字，右键选择复制，任意文字编辑界面，右键鼠标“粘贴”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 选中转写文案部分文字,Ctrl+C复制，任意文字编辑界面，右键鼠标“粘贴”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 被选择文案可正常复制和粘贴
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 被选择文案可正常复制和粘贴
+    needs_accessible_name: false
+- id: case_1676435
+  name: V25语音记事本 -网络正常，可正常进行语音转文字操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25语音记事本 -网络正常，可正常进行语音转文字操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键语音记录
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 选择“语音转文字”进行语音转文字操作，文件超过20分钟
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 选择“语音转文字”进行语音转文字操作，文件未超过20分钟
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 完成语音转文字操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出下拉列表
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 无法转写此条语音笔记，仅仅支持20分钟以内的语音笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 当条语音记事项显示提示：“正在转为文字”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 转写成功，定位此条记录，在当前区域内展示转写文案
+    needs_accessible_name: false
+- id: case_1676433
+  name: 左侧头像的获取
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 左侧头像的获取
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 新建一个记事
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 查看左侧显示头像
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 新建多个记事本（超过一页）
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 查看记事本头像显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 记事本已创建
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 显示记事本头像
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 创建成功，成功翻页
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 头像来源于系统内置的10个头像，在新建记事本的时候随机选
+    needs_accessible_name: false
+  - step_type: assert
+    description: 取1个头像
+    needs_accessible_name: false
+- id: case_1676431
+  name: 多选状态下，使用鼠标批量移动
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 多选状态下，使用鼠标批量移动
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 通过Ctrl键/shift键同时选中多个笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 拖拽笔记至最顶部记事本上，松手
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 拖拽笔记至最底部记事本上，松手
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 拖拽笔记至其他任一语音记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常移动笔记至顶部记事本无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常移动笔记至底部记事本无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 正常移动笔记至指定记事本无异常
+    needs_accessible_name: false
+- id: case_1676429
+  name: 重命名记事本-通过快捷键操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 重命名记事本-通过快捷键操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. Tab键切换焦点至记事本，通过上/下方向键选中指定记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Alt+M
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 通过上/下方向键，选中“重命名”，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 输入任意字符，按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 笔记本选中
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 展开右键菜单
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 进入重命名输入框
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 正常完成记事本重命名
+    needs_accessible_name: false
+- id: case_1676427
+  name: 删除记事本-通过快捷键操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 删除记事本-通过快捷键操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. Tab键切换焦点至记事本，通过上/下方向键选中指定记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Alt+M
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 通过上/下方向键，选中“删除”
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 选中记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 展开右键菜单
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 删除可选中
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 弹出删除确认提示框
+    needs_accessible_name: false
+- id: case_1676425
+  name: 通过记事本右键菜单新建笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 通过记事本右键菜单新建笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. Tab键切换焦点至记事本，通过上/下方向键选中指定记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Alt+M
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 通过上/下方向键，选中“新建笔记”
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 记事本已选中
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 展开右键菜单
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 可选中新建笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 正常在该记事本下新建笔记
+    needs_accessible_name: false
+- id: case_1676423
+  name: 焦点在“新建记事本”按钮，按回车键新建记事本
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 焦点在“新建记事本”按钮，按回车键新建记事本
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 空白页，通过Tab键切换焦点至“新建记事本”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 存在记事本情况下，通过Tab键切换焦点至“新建记事本”按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 切换成功
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 新建记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 切换成功
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 新建记事本
+    needs_accessible_name: false
+- id: case_1676421
+  name: V25 语音记事本-移动笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 语音记事本-移动笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. Tab键切换焦点至“笔记”，通过上/下方向键选中指定笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Alt+M
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 通过上/下方向键，选中“移动”，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 按Tab键切换移动弹窗按钮焦点
+    needs_accessible_name: false
+  - step_type: action
+    description: 备注：同时check笔记多选状态下的移动操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 选中笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 展开右键菜单
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 打开移动选择弹窗，弹窗中默认选中第一个记事本，使用Tab键将焦点切至记事本列表条目，可以通过上/下方向键选择指定记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 切换顺序：X关闭按钮--->记事本列表选中条目--->取消--->确定，按回车键可以执行焦点所在按钮功能
+    needs_accessible_name: false
+- id: case_1676419
+  name: 删除笔记-通过快捷键操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 删除笔记-通过快捷键操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. Tab键切换焦点至“笔记”，通过上/下方向键选中指定笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Alt+M
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 通过上/下方向键，选中“删除”，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 备注：同时check笔记多选状态下的删除操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 选中笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 调出属性
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 弹出删除确认提示框
+    needs_accessible_name: false
+- id: case_1676417
+  name: 保存为TXT
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 保存为TXT
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. Tab键切换焦点至“笔记”，通过上/下方向键选中指定笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Alt+M
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 通过上/下方向键，选中“保存为TXT”，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 备注：同时check笔记多选状态下的保存为TXT操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 选中笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 调出功能项
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 弹出文管保存窗口，选择保存路径后确定，可以正常保存文本笔记至指定路径
+    needs_accessible_name: false
+- id: case_1676415
+  name: 保存语音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 保存语音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. Tab键切换焦点至“笔记”，通过上/下方向键选中指定笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Alt+M
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 通过上/下方向键，选中“保存语音”，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 备注：同时check笔记多选状态下的保存语音操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 选中笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 调出功能选项
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 弹出文管保存窗口，选择保存路径后确定，可以正常保存语音笔记至指定路径
+    needs_accessible_name: false
+- id: case_1676413
+  name: 通过笔记右键菜单新建笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 通过笔记右键菜单新建笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. Tab键切换焦点至“笔记”，通过上/下方向键选中指定笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Alt+M
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 通过上/下方向键，选中“新建笔记”，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 备注：同时check笔记多选状态下的新建笔记操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 选中笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 调出功能选项
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 新建笔记
+    needs_accessible_name: false
+- id: case_1676411
+  name: 焦点在新建笔记+按钮，按回车键新建笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 焦点在新建笔记+按钮，按回车键新建笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. Tab键切换焦点至新建笔记+按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 切换成功
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 新建笔记
+    needs_accessible_name: false
+- id: case_1676409
+  name: 焦点在录音按钮，按回车键开始录音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 焦点在录音按钮，按回车键开始录音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. Tab键切换焦点至录音按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按tab键，切换焦点至暂停录音按钮，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 按Tab键，切换焦点至完成录音按钮，按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 切换成功
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 开始录音
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 暂停录音
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 继续录音
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 完成录音，生成语音笔记
+    needs_accessible_name: false
+- id: case_1676407
+  name: 焦点在语音播放插件，按回车键进行暂停/继续回放语音、关闭语音播放插件操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 焦点在语音播放插件，按回车键进行暂停/继续回放语音、关闭语音播放插件操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 回放语音笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 切换焦点至播放插件暂停按钮上，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 切换焦点至播放插件关闭按钮上，按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 进入回放语音界面
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 暂停回放语音笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 继续回放语音笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 关闭播放插件，显示为录音按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 备注：Tab键可切换焦点至调节进度按钮上，可以通过左、右方向键调节回放进度
+    needs_accessible_name: false
+- id: case_1676405
+  name: 详情页文本编辑操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 详情页文本编辑操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. Tab键切换焦点至详情页
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Alt+M，通过上/下方向键，选中“全选”，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按Alt+M，通过上/下方向键，选中“复制”，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. Tab键切换焦点至详情页，显示输入光标，按Alt+M，通过上/下方向键，选中“粘贴”，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 重复步骤1~2，按Alt+M，通过上/下方向键，选中“剪切”，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 6. Tab键切换焦点至详情页，显示输入光标，按Alt+M，通过上/下方向键，选中“粘贴”，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 7. Tab键切换焦点至详情页，按Alt+M，通过上/下方向键，选中“全选”
+    needs_accessible_name: false
+  - step_type: action
+    description: 8. 按Alt+M，通过上/下方向键，选中“删除”，按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 切换成功
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 全部选中
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 完成复制
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 可以正常进行全选、复制和粘贴操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 选中剪切
+    needs_accessible_name: false
+  - step_type: assert
+    description: 6. 可以正常进行全选、剪切和粘贴操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: 7. 实现全选
+    needs_accessible_name: false
+  - step_type: assert
+    description: 8. 正常删除选中内容（备注：若全选对象中包含语音笔记，按回车键会先弹出删除确认提示窗）
+    needs_accessible_name: false
+- id: case_1676403
+  name: 删除弹窗Tab键操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 删除弹窗Tab键操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: assert
+    description: 1. 删除记事本，弹出删除确认提示窗口
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Tab键进行切换
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 删除笔记，弹出删除确认提示窗口
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 按Tab键进行切换
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 删除语音笔记，弹出删除确认提示窗口
+    needs_accessible_name: false
+  - step_type: action
+    description: 6. 按Tab键进行切换
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出确认框
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 切换顺序依次为：X关闭按钮--->取消--->确定，按回车键执行焦点所在按钮操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 弹出确认框
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 切换顺序依次为：X关闭按钮--->取消--->确定，按回车键执行焦点所在按钮操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 弹出确认框
+    needs_accessible_name: false
+  - step_type: assert
+    description: 6. 切换顺序依次为：X关闭按钮--->取消--->确定，按回车键执行焦点所在按钮操作
+    needs_accessible_name: false
+- id: case_1676401
+  name: 输入音量低提示窗Tab键操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 输入音量低提示窗Tab键操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Tab键进行切换
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出音量低于20%提示窗口
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 切换顺序依次为：X关闭按钮--->取消--->确定，按回车键执行焦点所在按钮操作
+    needs_accessible_name: false
+- id: case_1676399
+  name: 录音过程中关闭应用，提示窗口Tab键操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 录音过程中关闭应用，提示窗口Tab键操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 关闭/退出应用
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按Tab键进行切换
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 有录音按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出录音中提示窗口
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 切换顺序依次为：X关闭按钮--->取消--->确定，按回车键执行焦点所在按钮操作
+    needs_accessible_name: false
+- id: case_1676397
+  name: 语音转文字过程中关闭应用，提示窗口Tab键操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 语音转文字过程中关闭应用，提示窗口Tab键操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 语音转文字过程中
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 关闭/退出应用
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按Tab键进行切换
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出当前语音正在转写中提示窗口
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 切换顺序依次为：X关闭按钮--->取消--->确定，按回车键执行焦点所在按钮操作
+    needs_accessible_name: false
+- id: case_1676395
+  name: 移动选择弹窗Tab键操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 移动选择弹窗Tab键操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键笔记，选择“移动”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Tab键进行切换
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出移动选择弹窗
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 切换顺序依次为：X关闭按钮--->记事本列表选中条目--->取消--->确定，按回车键执行焦点所在按钮操作
+    needs_accessible_name: false
+- id: case_1676393
+  name: 编辑区支持delete键删除编辑光标后面的文本
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 编辑区支持delete键删除编辑光标后面的文本
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 按Delete键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 每按一下delete，删除编辑光标后面一个字符，长按连续删除
+    needs_accessible_name: false
+- id: case_1676391
+  name: 选中编辑区内容，按Delete键删除选中内容
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 选中编辑区内容，按Delete键删除选中内容
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选中编辑区文本内容，按delete键
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 选中编辑区文本内容和语音笔记，按delete键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 删除选中文本内容
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 删除语音笔记
+    needs_accessible_name: false
+- id: case_1676389
+  name: 编辑光标前面有文本，每按一下backspace，删除编辑光标前面一个字符，长按连续删除
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 编辑光标前面有文本，每按一下backspace，删除编辑光标前面一个字符，长按连续删除
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 按backspace键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 每按一下backspace，删除编辑光标前面一个字符，长按连续删除
+    needs_accessible_name: false
+- id: case_1676387
+  name: 选中编辑区内容，按backspace，仅删除选中文本内容，语音可以被删除
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 选中编辑区内容，按backspace，仅删除选中文本内容，语音可以被删除
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选中编辑区文本内容，按backspace键
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 选中编辑区文本内容和语音笔记，按backspace键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 删除选中文本内容
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 删除语音笔记
+    needs_accessible_name: false
+- id: case_1676385
+  name: 从启动器打开应用
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 从启动器打开应用
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击启动器语音记事本应用
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键启动器语音记事本，选择"打开"
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 正常打开语音记事本应用无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常打开语音记事本应用无异常
+    needs_accessible_name: false
+- id: case_1676383
+  name: 验证可以正常启动应用
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 验证可以正常启动应用
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键启动器语音记事本，发送到桌面
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 双击桌面语音记事本应用
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 右键桌面语音记事本应用，选择"打开"
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 发送成功
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 打开语音记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 打开语音记事本
+    needs_accessible_name: false
+- id: case_1676381
+  name: 验证可以正常启动应用
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 验证可以正常启动应用
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键启动器语音记事本，发送到任务栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击任务栏语音记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 右键任务栏语音记事本，选择"打开"
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 已发送至任务栏
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 打开语音记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 打开语音记事本
+    needs_accessible_name: false
+- id: case_1676379
+  name: 点击收起按钮，收起/展开记事本列表
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 点击收起按钮，收起/展开记事本列表
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 打开语音记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击标题栏记事本收起按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 再次点击标题栏记事本收起按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 标题栏收起记事本按钮显示与UI一致
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 记事本列表收起，笔记列表移至最左侧，编辑区域相应扩大，标题栏记事本收起按钮显示与UI一致
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 展开记事本列表，笔记列表和编辑区域恢复至初始化样式，标题栏记事本按钮显示与UI一致
+    needs_accessible_name: false
+- id: case_1676377
+  name: 插入图片显示在编辑区输入焦点所在位置
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 插入图片显示在编辑区输入焦点所在位置
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 打开语音记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击详情编辑区任一位置
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 点击标题栏插入图片按钮，选择任意图片插入
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 应用已打开
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 光标在所选区域
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 图片正常插入步骤2焦点所在区域
+    needs_accessible_name: false
+- id: case_1676375
+  name: V25-语音记事本 搜索关键字仅匹配记事本
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25-语音记事本 搜索关键字仅匹配记事本
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 输入搜索关键字仅匹配记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 正常输入匹配信息
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 无搜素结果（同UI效果图），无记事本处于选中状态
+    needs_accessible_name: false
+- id: case_1676373
+  name: V25 -语音记事本 搜索关键字不匹配文本笔记和详情页文本内容
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 -语音记事本 搜索关键字不匹配文本笔记和详情页文本内容
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 输入搜索关键字不匹配文本笔记和详情页文本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 正常输入信息
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 无搜素结果（同UI效果图），无记事本处于选中状态
+    needs_accessible_name: false
+- id: case_1676371
+  name: V25-语音记事本 搜索关键字匹配文本笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25-语音记事本 搜索关键字匹配文本笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 输入搜索关键字仅匹配文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 正常信息输入
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 显示搜索到的文本笔记，搜索匹配关键字高亮显示，无记事本处于选中状态
+    needs_accessible_name: false
+  - step_type: assert
+    description: 备注：关键词显示样式调整成插件自带的样式
+    needs_accessible_name: false
+- id: case_1676369
+  name: V25-语音记事本 搜索关键字匹配详情页文本
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25-语音记事本 搜索关键字匹配详情页文本
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 输入搜索关键字匹配详情页文本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 正常输入信息
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 显示搜索结果，搜索匹配关键字高亮显示，无记事本处于选中状态
+    needs_accessible_name: false
+  - step_type: assert
+    description: 备注：关键词显示样式调整成插件自带的样式
+    needs_accessible_name: false
+- id: case_1676365
+  name: 主菜单布局
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 主菜单布局
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 启用语音记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击工具栏菜单按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 正常打开语音记事本应用
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 展开主菜单，主菜单从上到下依次为：设置、隐私政策、主题、帮助、关于、退出；
+    needs_accessible_name: false
+- id: case_1676363
+  name: 设置
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 设置
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击工具栏菜单“设置”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击录音按钮，输入声音，保存录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 3  回放步骤2语音笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 声音来源默认选中麦克风声音
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常录音和回放录音
+    needs_accessible_name: false
+- id: case_1676361
+  name: 隐私政策
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 隐私政策
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 默认系统语言简体中文下，点击主菜单“隐私政策”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 切换系统语言为英文，点击主菜单“隐私政策”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 中文操作系统时，跳转到：https://www.uniontech.com/agreement/privacy-cn
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 非中文操作系统时，跳转到：https://www.uniontech.com/agreement/privacy-en
+    needs_accessible_name: false
+- id: case_1676355
+  name: 记事本列表不超过一屏，使用鼠标移动记事本位置（顶端、中间、底端）
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 记事本列表不超过一屏，使用鼠标移动记事本位置（顶端、中间、底端）
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 左键单击记事本列表中任一记事本不松手
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 分别拖动记事本至记事本列表顶端、中间和底端
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 记事本处于被选中状态
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常改变记事本位置无异常
+    needs_accessible_name: false
+- id: case_1676353
+  name: 记事本列表超过一屏，使用鼠标移动记事本位置（顶端、中间、底端）
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 记事本列表超过一屏，使用鼠标移动记事本位置（顶端、中间、底端）
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 左键单击记事本列表中任一记事本不松手
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 分别拖动记事本至记事本列表顶端、中间和底端
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 记事本处于被选中状态
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常改变记事本位置无异常
+    needs_accessible_name: false
+- id: case_1676351
+  name: 按回车键完成重命名文本笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 按回车键完成重命名文本笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键任意文本笔记，选择“重命名”，输入字符，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 焦点在文本笔记，按F3，输入字符，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 鼠标左键双击文本笔记，输入字符，按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 成功重命名
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 当前焦点所在文本笔记显示重命名状态，可以输入字符重命名笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 当前焦点所在文本笔记显示重命名状态，可以输入字符重命名笔记
+    needs_accessible_name: false
+- id: case_1676349
+  name: 删除文本笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 删除文本笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键笔记列表任一文本笔记，选择删除
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击弹窗X按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 重复步骤1,点击弹窗“取消”按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 重复步骤1,点击弹窗“确定”按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 焦点在文本笔记，按Delete键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出删除确认提示框
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 关闭删除确认提示框，取消删除
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 关闭删除确认提示框，取消删除
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 正常删除笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 弹出文本笔记删除确认提示窗口，可正常进行删除和取消删除操作
+    needs_accessible_name: false
+- id: case_1676347
+  name: 详情页包含语音笔记+编辑和未编辑的文本内容+语音转文字+图片，保存为HTML
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 详情页包含语音笔记+编辑和未编辑的文本内容+语音转文字+图片，保存为HTML
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 鼠标右键文本笔记，点击“保存笔记”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“保存为HTML”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 确认保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 打开保存的HTML文件查看
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 重复步骤1～2,更改保存路径，确认保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出两个选项，保存为HTML/保存为TXT
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出文本对话框
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常保存为HTML，默认保存在桌面
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 笔记中内容均正常保存和显示在HTML文件中
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 正常保存HTML至指定位置
+    needs_accessible_name: false
+- id: case_1676345
+  name: 详情页包含语音笔记+编辑和未编辑的文本内容+语音转文字+图片，保存为TXT
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 详情页包含语音笔记+编辑和未编辑的文本内容+语音转文字+图片，保存为TXT
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键文本笔记，点击“保存笔记”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“保存为TXT”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 确认保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 打开保存的TXT文档查看
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 按Ctrl+S
+    needs_accessible_name: false
+  - step_type: assert
+    description: 6. 重复步骤1～2,更改保存路径，确认保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出选项保存为TXT/保存为HTML
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出文管窗口
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常保存为TXT，默认保存在桌面
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 可以正常打开和查看保存的TXT文档，文档中显示详情页所有文本内容
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 弹出文管窗口，可选择保存路径正常保存为TXT
+    needs_accessible_name: false
+  - step_type: assert
+    description: 6. 正常保存TXT至指定位置
+    needs_accessible_name: false
+  - step_type: assert
+    description: 备注：将笔记保存为TXT格式时，会保存语音笔记相关文本信息属正常现象
+    needs_accessible_name: false
+- id: case_1676343
+  name: 保存语音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 保存语音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“保存语音”，完成保存
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按Ctrl+Y
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 列出相关选项
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常保存语音，默认保存在桌面
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 弹出文管保存窗口，可选择保存路径保存语音笔记
+    needs_accessible_name: false
+- id: case_1676341
+  name: 新建笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 新建笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键笔记列表任一笔记，选择新建笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 左侧记事本列表，右键任一记事本，选择新建笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按Ctrl+B
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 正常新建一个文本笔记，详情页面显示输入光标，用户可以进行编辑
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常新建一个文本笔记，详情页面显示输入光标，用户可以进行编辑
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常新建一个文本笔记，详情页面显示输入光标，用户可以进行编辑
+    needs_accessible_name: false
+- id: case_1676337
+  name: 使用鼠标移动笔记本至其他记事本
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 使用鼠标移动笔记本至其他记事本
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 左键单击笔记列表中任意一条笔记不松手
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 拖拽笔记至最顶部记事本上，松手
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 拖拽笔记至最底部记事本上，松手
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 拖拽笔记至其他任一语音记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 选中的笔记一直处于选中状态
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常移动笔记至顶部记事本无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常移动笔记至底部记事本无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 正常移动笔记至指定记事本无异常
+    needs_accessible_name: false
+- id: case_1676335
+  name: V25 语音记事本 鼠标点击选中任意笔记，按住ctrl键，点击笔记列表其他笔记，松开ctrl键
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 语音记事本 鼠标点击选中任意笔记，按住ctrl键，点击笔记列表其他笔记，松开ctrl键
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 鼠标点击选中任意笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按住Ctrl键，点击笔记列表其他笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 重复步骤2
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 松开Ctrl键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 笔记被选中，显示变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 笔记其他列表被选中
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 笔记其他列表被选中
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 点击的笔记处于选中状态无异常
+    needs_accessible_name: false
+- id: case_1676333
+  name: V25 语音记事本- 多选状态下，按住ctrl键，点击已选中的任意笔记取消选中
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 语音记事本- 多选状态下，按住ctrl键，点击已选中的任意笔记取消选中
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 鼠标点击选中任意笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按住Ctrl键，点击笔记列表其他笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 重复步骤2
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 按住Ctrl键，点击已选中的笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 选中笔记颜色显示变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 其他笔记显示选中
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 其他笔记显示选中
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 选中的笔记取消选中
+    needs_accessible_name: false
+- id: case_1676331
+  name: V25-语音记事本 鼠标点击选中任意笔记，按住shift键，点击笔记列表其他笔记，松开shift键
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25-语音记事本 鼠标点击选中任意笔记，按住shift键，点击笔记列表其他笔记，松开shift键
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 鼠标点击选中任意笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按住shift键，点击笔记列表其他笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 松开shift键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 选中该笔记，显示颜色发生变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 其他笔记也被选中
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 原焦点位笔记和本次点击的笔记及二者之间的全部笔记均处于选中状态
+    needs_accessible_name: false
+- id: case_1676329
+  name: V25 语音记事本-多选状态下，按住shift键，点击已选中的任意笔记，保持选择原焦点位笔记和本次点击的笔记及二者之间的全部笔记，不在此范围的已选笔记则取消选中
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 语音记事本-多选状态下，按住shift键，点击已选中的任意笔记，保持选择原焦点位笔记和本次点击的笔记及二者之间的全部笔记，不在此范围的已选笔记则取消选中
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 鼠标点击选中任意笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按住shift键，点击笔记列表其他笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 继续按住shift键，点击任一已选中的笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 笔记已选中
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 显示同时选中其他笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 原焦点笔记和本次点击的笔记以及二者之间的全部笔记处于选中状态，不在此范围的已选笔记取消选中
+    needs_accessible_name: false
+- id: case_1676327
+  name: V25 -语音记事本 多选状态下，点击详情页“移动”按钮
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 -语音记事本 多选状态下，点击详情页“移动”按钮
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 通过Ctrl键/Shift键同时选中多个笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击详情页“移动”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 选择记事本，确定移动
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 选中笔记显示变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出对话框选择移动目的地
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常移动所有选中笔记至指定记事本无异常
+    needs_accessible_name: false
+- id: case_1676325
+  name: V25 -语音记事本  多选状态下，点击详情页保存笔记按钮，保存为HTML
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 -语音记事本  多选状态下，点击详情页保存笔记按钮，保存为HTML
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 通过Ctrl键/Shift键同时选中多个笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击详情页“保存笔记”，选择保存格式为HTML
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 笔记选中，显示变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出文本对话框选择保存目的地和文件名
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 以HTML格式正常保存所有笔记中的内容无异常
+    needs_accessible_name: false
+- id: case_1676323
+  name: V25 -语音记事本 多选状态下，点击详情页“保存笔记”按钮，保存为TXT
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 -语音记事本 多选状态下，点击详情页“保存笔记”按钮，保存为TXT
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 通过Ctrl键/Shift键同时选中多个笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击详情页“保存笔记”，保存格式选择TXT
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 笔记已选中，显示变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出文本对话框选择保存地址和文件名
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 以TXT格式正常保存所有笔记中的文本笔记无异常
+    needs_accessible_name: false
+- id: case_1676321
+  name: V25 -语音记事本 多选状态下，点击详情页“保存语音”按钮
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 -语音记事本 多选状态下，点击详情页“保存语音”按钮
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 通过Ctrl键/Shift键同时选中多个笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击详情页“保存语音”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 笔记已选中，显示变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出对话框选择保存目的地和文件名
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常保存所有笔记中的语音笔记无异常
+    needs_accessible_name: false
+- id: case_1676319
+  name: V25 -语音记事本 多选状态下，点击详情页“删除”按钮
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 -语音记事本 多选状态下，点击详情页“删除”按钮
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 通过Ctrl键/Shift键同时选中多个笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击详情页“删除”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 确认删除
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 选中笔记显示变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出对话框“您是否要删除选中的？条记录”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常删除所有笔记无异常
+    needs_accessible_name: false
+- id: case_1676317
+  name: V25 语音记事本-多选状态下，右键菜单“移动”
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 语音记事本-多选状态下，右键菜单“移动”
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 通过Ctrl键/shift键同时选中多个笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键鼠标，选择“移动”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 选择记事本，确定移动
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 被选中笔记显示颜色变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 显示移动笔记对话框
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常移动所有选中笔记至指定记事本无异常
+    needs_accessible_name: false
+- id: case_1676315
+  name: V25 语音记事本-多选状态下，右键菜单“删除”
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 语音记事本-多选状态下，右键菜单“删除”
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 通过Ctrl键/shift键同时选中多个笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键鼠标，选择“删除”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 确认删除
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 笔记已选中，显示颜色发生变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出对话框“您确定要删除选中的？ 条笔记”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常删除所有选中笔记无异常
+    needs_accessible_name: false
+- id: case_1676313
+  name: V25 语音记事本-多选状态下，右键菜单“保存为HTML”
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 语音记事本-多选状态下，右键菜单“保存为HTML”
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 通过Ctrl键/shift键同时选中多个笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键鼠标，点击“保存笔记”，选择“保存为HTML”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 多个笔记被选中，显示发生变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出文本对话框选择保存地和保存的名字
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常保存所有笔记内容无异常
+    needs_accessible_name: false
+- id: case_1676311
+  name: V25 语音记事本-多选状态下，右键菜单“保存为TXT”
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 语音记事本-多选状态下，右键菜单“保存为TXT”
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 通过Ctrl键/shift键同时选中多个笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键鼠标，点击“保存笔记”，选择“保存为TXT”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 笔记已被选中，显示颜色发生变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出文本对话框选择保存地和文件名
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常保存所有笔记中的文本笔记无异常
+    needs_accessible_name: false
+- id: case_1676309
+  name: V25 语音记事本-多选状态下，右键菜单“保存语音”
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 语音记事本-多选状态下，右键菜单“保存语音”
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 通过Ctrl键/shift键同时选中多个笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键鼠标，选择“保存语音”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 选中笔记显示颜色发生变化
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出文本对话框选择保存地址和文件名
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常保存所有笔记中的语音笔记无异常
+    needs_accessible_name: false
+- id: case_1676307
+  name: V25 语音记事本-多选状态下，使用鼠标批量移动
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 语音记事本-多选状态下，使用鼠标批量移动
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 通过Ctrl键/shift键同时选中多个笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 拖拽选中笔记至其他记事本上
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 松手
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 被移动的笔记条目显示待移动状态，显示示意多条笔记的小图标跟随鼠标移动
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 高亮显示鼠标指针当前停留的记事本列表
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 笔记正常移至新所属记事本
+    needs_accessible_name: false
+- id: case_1676303
+  name: 录音按钮固定显示
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 录音按钮固定显示
+  status: active
+  reason: ''
+  steps:
+  - step_type: assert
+    description: 1. 新建文本笔记，查看文本笔记详情页录音按钮显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 步骤1详情页中添加文字/语音记录超过一页，查看详情页录音按钮显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 新建成功，录音按钮依旧在顶端显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 录音按钮正常显示在最顶端
+    needs_accessible_name: false
+- id: case_1676301
+  name: 录音过程中的界面布局
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 录音过程中的界面布局
+  status: active
+  reason: ''
+  steps:
+  - step_type: assert
+    description: 1. 点击录音按钮，开始录音，查看正在录音界面的布局
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Ctrl+R
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 录音界面从左到右依次为：暂停按钮、录音记录波形展示、录制时间、完成按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 开始录音
+    needs_accessible_name: false
+- id: case_1676299
+  name: V25语音记事本-录音过程中暂停录音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25语音记事本-录音过程中暂停录音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 在录制声音的过程中点击暂停按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 点击继续按钮开始录音
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 开始录制声音
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 录音被暂停，同时暂停按钮变为暂停的红色圆形按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 录音继续，按钮变成红色的（||），动画效果不用记录波形，采用类似语音助手的动画效果
+    needs_accessible_name: false
+- id: case_1676297
+  name: 录音被暂停后完成录音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 录音被暂停后完成录音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 在录音过程中点击暂停按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 点击完成按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 录音开始
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 录音被暂停,按钮显示与UI效果图一致
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 会停止录音，记录列表正常显示该录音记录，并自动保存录音文件到~/.local/share/deepin/deepin-voice-note目录下
+    needs_accessible_name: false
+- id: case_1676295
+  name: 录音进行过程中完成录音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 录音进行过程中完成录音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 在录音过程中点击完成按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 录音开始
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 录音结束，记录列表正常显示该录音记录，并且录音文件被自动保存到系统后台的 ~/.local/share/deepin/deepin-voice-note目录下
+    needs_accessible_name: false
+- id: case_1676293
+  name: 语音笔记显示
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 语音笔记显示
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 录音
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 完成录音，查看语音笔记显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 点击页面右上的录音按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 语音笔记从左向右依次显示为：播放按钮、语音笔记名称、创建时间
+    needs_accessible_name: false
+- id: case_1676291
+  name: 播放/暂停播放录音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 播放/暂停播放录音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击语音笔记播放按钮播放
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击播放插件暂停按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 点击语音笔记播放按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 点击语音笔记暂停按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 点击播放插件播放按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 按钮可点击
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 播放插件和语音笔记均显示为播放按钮，语音暂停回放
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 播放插件和语音笔记均显示为暂停按钮，语音继续回放
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 播放插件和语音笔记均显示为播放按钮，语音暂停回放
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 播放插件和语音笔记均显示为暂停按钮，语音继续回放，完成语音回放，播放插件消失，显示录音按钮
+    needs_accessible_name: false
+- id: case_1676289
+  name: 播放/暂停播放录音-通过space快捷键操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 播放/暂停播放录音-通过space快捷键操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击语音笔记播放，按Space空格键
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 再次按Space空格键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 回放语音暂停
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 回放语音继续播放
+    needs_accessible_name: false
+- id: case_1676287
+  name: V25语音记事本-语音右键菜单
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25语音记事本-语音右键菜单
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键语音记录
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 右键菜单显示“保存为MP3”、“语音转文字”、“删除”、“全选”、“复制”、“剪切”、“粘贴”，不显示“语音朗读”、“语音听写”、“文本翻译”
+    needs_accessible_name: false
+- id: case_1676285
+  name: 右键语音笔记，保存为MP3
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 右键语音笔记，保存为MP3
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键语音记录
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“保存为MP3”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 点击保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出功能选项
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 默认保存到桌面，保存文件名称和格式不可修改
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常保存语音记录至桌面无异常
+    needs_accessible_name: false
+- id: case_1676279
+  name: 复制语音笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 复制语音笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键语音笔记，复制
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 编辑区任意位置粘贴步骤1复制内容
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 可选中复制项
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常复制粘贴语音笔记至指定位置
+    needs_accessible_name: false
+- id: case_1676277
+  name: 剪切语音笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 剪切语音笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键语音笔记，剪切
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 编辑区任意位置粘贴步骤1剪切内容
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 不会弹出剪切确认提示窗口
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常剪切粘贴语音笔记至指定位置
+    needs_accessible_name: false
+- id: case_1676275
+  name: 选中文本，弹出悬浮气泡工具栏
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 选中文本，弹出悬浮气泡工具栏
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选中文本笔记内容
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 选中语音转文字
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出悬浮气泡工具栏，工具栏显示无遮挡、截断等异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出悬浮气泡工具栏，工具栏显示无遮挡、截断等异常
+    needs_accessible_name: false
+- id: case_1676273
+  name: 取消选中文本，悬浮气泡工具栏消失
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 取消选中文本，悬浮气泡工具栏消失
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选中编辑区文本内容
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击任意区域取消选中文本
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 显示悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 悬浮气泡工具栏消失
+    needs_accessible_name: false
+- id: case_1676271
+  name: 鼠标移入控件显示hover效果及对应控件名称
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 鼠标移入控件显示hover效果及对应控件名称
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选中详情页编辑区文本/详情编辑区显示输入光标时右键菜单
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 鼠标移至悬浮气泡工具栏各个控件按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 光标停留处动态闪烁
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 控件显示hover效果以及对应控件名称
+    needs_accessible_name: false
+- id: case_1676269
+  name: 选中文本进行加粗和取消加粗
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 选中文本进行加粗和取消加粗
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选中详情编辑区文本弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“加粗”控件
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 再次点击“加粗”控件
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 自动浮现出工具栏
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 选中“加粗”控件，选中文本加粗，后面输入的文本也显示加粗
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 取消选中“加粗”控件，选中文本取消加粗，后面加入的文本取消加粗
+    needs_accessible_name: false
+- id: case_1676267
+  name: 显示输入光标，加粗和取消加粗
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 显示输入光标，加粗和取消加粗
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 详情编辑区显示输入光标，右键鼠标弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“加粗”控件，输入任意字符
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 右键鼠标，再次点击“加粗”控件，输入字符
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 浮现出工具栏
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 选中“加粗”控件，悬浮气泡工具栏消失，新输入字符加粗
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 取消选中“加粗”控件，悬浮气泡工具栏消失，新输入字符取消加粗
+    needs_accessible_name: false
+- id: case_1676263
+  name: 显示输入光标，设置/取消设置斜体
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 显示输入光标，设置/取消设置斜体
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 详情编辑区显示输入光标，右键鼠标弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“斜体”控件，输入任意字符
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 右键鼠标，再次点击“斜体”控件，输入字符
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 工具栏浮现
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 选中“斜体”控件，悬浮气泡工具栏消失，新输入字符显示斜体
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 取消选中“斜体”控件，悬浮气泡工具栏消失，新输入字符恢复为normal
+    needs_accessible_name: false
+- id: case_1676261
+  name: 选中文本设置/取消设置下划线
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 选中文本设置/取消设置下划线
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选中详情编辑区文本弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“下划线”控件
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 再次点击“下划线”控件
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 工具栏浮现
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 选中“下划线”控件，选中文本显示下划线，后面输入的文本也显示下划线
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 取消选中“下划线”控件，选中文本不显示下划线，，后面输入的文本也不显示下划线
+    needs_accessible_name: false
+- id: case_1676259
+  name: 显示输入光标，设置/取消设置下划线
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 显示输入光标，设置/取消设置下划线
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 详情编辑区显示输入光标，右键鼠标弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“下划线”控件，输入任意字符
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 右键鼠标，再次点击“下划线”控件，输入字符
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 工具栏浮现
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 选中“下划线”控件，悬浮气泡工具栏消失，新输入字符显示下划线
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 取消选中“下划线”控件，悬浮气泡工具栏消失，新输入字符不显示下划线
+    needs_accessible_name: false
+- id: case_1676257
+  name: 选中文本设置/取消设置删除线
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 选中文本设置/取消设置删除线
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选中详情编辑区文本弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“删除线”控件
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 再次点击“删除线”控件
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 工具栏浮现
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 选中“删除线”控件，选中文本显示删除线
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 取消选中“删除线”控件，选中文本不显示删除线
+    needs_accessible_name: false
+- id: case_1676255
+  name: 显示输入光标，设置/取消设置删除线
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 显示输入光标，设置/取消设置删除线
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 详情编辑区显示输入光标，右键鼠标弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“删除线”控件，输入任意字符
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 右键鼠标，再次点击“删除线”控件，输入字符
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 工具栏浮现
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 选中“删除线”控件，悬浮气泡工具栏消失，新输入字符显示删除线
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 取消选中“删除线”控件，悬浮气泡工具栏消失，新输入字符不显示删除线
+    needs_accessible_name: false
+- id: case_1676253
+  name: 选中文本设置字号
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 选中文本设置字号
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选中详情编辑区文本弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“字号”控件
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 选择任意字号
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 工具栏浮现
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 显示字号下拉菜单，字号默认14
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 控件显示新设置的字号，选中文本显示为设置的字号大小，后面输入的文本也显示为设置的字号大小
+    needs_accessible_name: false
+- id: case_1676251
+  name: 显示输入光标，设置字号
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 显示输入光标，设置字号
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 详情编辑区显示输入光标，右键鼠标弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“字号”控件
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 选择任意字号
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 输入任意字符
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 工具栏浮现
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 显示字号下拉菜单，字号默认14
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 控件显示新设置的字号
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 输入字符显示为设置的字号大小
+    needs_accessible_name: false
+- id: case_1676249
+  name: V25 语音记事本 选中文本设置字体颜色
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: V25 语音记事本 选中文本设置字体颜色
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选中详情编辑区文本弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“字体颜色”控件
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 选择任意颜色
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 若当前颜色在色板无对应颜色，此时改变颜色
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 工具栏自动弹出
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 显示色板，字体颜色默认为黑色
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 控件显示新设置的字体颜色，选中文本显示为设置的字体颜色，后面输入的文本也显示为设置的字体颜色
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 颜色会切换为选择的颜色，而无法回退为原颜色
+    needs_accessible_name: false
+- id: case_1676247
+  name: 显示输入光标，设置字体颜色
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 显示输入光标，设置字体颜色
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 详情编辑区显示输入光标，右键鼠标弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“字体颜色”控件
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 选择任意颜色
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 输入任意字符
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 显示色板，字体颜色默认为黑色
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 控件显示新设置的字体颜色
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 输入字符显示为设置的字体颜色
+    needs_accessible_name: false
+- id: case_1676245
+  name: 选中文本设置背景色
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 选中文本设置背景色
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选中详情编辑区文本弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“背景色”控件
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 选择任意颜色
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 工具栏浮现
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 显示色板，默认为无填充
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 控件显示新设置的背景色，选中文本显示为设置的背景色，后面输入的文本也显示为设置的背景色
+    needs_accessible_name: false
+- id: case_1676243
+  name: 显示输入光标，设置背景色
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 显示输入光标，设置背景色
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 详情编辑区显示输入光标，右键鼠标弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“背景色”控件
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 选择任意颜色
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 输入任意字符
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 工具栏浮现
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 显示色板，背景色默认为无填充
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 控件显示新设置的背景色
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 输入字符显示为设置的背景色
+    needs_accessible_name: false
+- id: case_1676241
+  name: 选中文本，点击有序列表
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 选中文本，点击有序列表
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选中详情编辑区文本弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“有序列表”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 再次点击“有序列表”
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. “有序列表”控件处于选中状态，选中文本每一行的开头按数字1、2、3......顺序显示编号
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. “有序列表”控件取消选中，不显示编号
+    needs_accessible_name: false
+- id: case_1676239
+  name: 显示输入光标，点击有序列表
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 显示输入光标，点击有序列表
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 详情编辑区显示输入光标，右键鼠标弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“有序列表”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 不输入任何文本，按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 工具栏浮现
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 焦点所在行开头显示编号
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 换行并继承上一行顺序显示编号（即上一行显示编号1,该行就显示编号2）
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 换行，编号取消，删除该行编号
+    needs_accessible_name: false
+- id: case_1676237
+  name: 选中文本，点击无序列表
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 选中文本，点击无序列表
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 选中详情编辑区文本弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“无序列表”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 再次点击“无序列表”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 工具栏浮现
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. “无序列表”控件处于选中状态，选中文本每一行的开头显示实心黑点圆
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. “无序列表”控件取消选中，不显示实心黑点圆
+    needs_accessible_name: false
+- id: case_1676235
+  name: 显示输入光标，点击无序列表
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 显示输入光标，点击无序列表
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 详情编辑区显示输入光标，右键鼠标弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“无序列表”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 不输入任何文本，按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 工具栏浮现
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 焦点所在行开头显示实心黑点圆
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 换行并继承上一行顺序显示编号
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 换行，编号取消，删除该行编号
+    needs_accessible_name: false
+- id: case_1676233
+  name: 导入图片 -- 拖拽图片至编辑区
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 导入图片 -- 拖拽图片至编辑区
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 打开语音记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 拖拽图片至编辑区
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 记事本可正常打开
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 编辑区显示该图片
+    needs_accessible_name: false
+- id: case_1676231
+  name: 导入图片---粘贴图片至编辑区
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 导入图片---粘贴图片至编辑区
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 复制图片
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 打开语音记事本，编辑区右键鼠标，选择“粘贴”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 完成复制
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 编辑区显示该图片
+    needs_accessible_name: false
+- id: case_1676229
+  name: 查看导入图片
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 查看导入图片
+  status: active
+  reason: ''
+  steps:
+  - step_type: assert
+    description: 1. 右键编辑区图片，点击“查看”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 双击编辑区图片
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 预览查看图片
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 预览查看图片
+    needs_accessible_name: false
+- id: case_1676227
+  name: 详情页右键菜单操作---删除图片
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 详情页右键菜单操作---删除图片
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 鼠标右键详情编辑区图片
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“删除”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 鼠标点击图片，按Delete键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出右键菜单：“查看”、“删除”、“全选”、“复制”、“剪切”、“粘贴”、“另存为”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 删除图片
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 删除图片
+    needs_accessible_name: false
+- id: case_1676225
+  name: 详情页右键菜单操作---复制图片
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 详情页右键菜单操作---复制图片
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 鼠标右键详情编辑区图片
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“复制”，鼠标右键任意编辑区，选择“粘贴”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 鼠标点击图片，按Ctrl+C键,任意编辑区，按Ctrl+V
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出右键菜单：“查看”、“删除”、“全选”、“复制”、“剪切”、“粘贴”、“另存为”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 粘贴复制图片
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 粘贴复制图片
+    needs_accessible_name: false
+- id: case_1676223
+  name: 详情页右键菜单操作---剪切图片
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 详情页右键菜单操作---剪切图片
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 鼠标右键详情编辑区图片
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“剪切”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 鼠标右键任意编辑区，选择“粘贴”
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 鼠标点击图片，按Ctrl+X键
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 任意编辑区，按Ctrl+V
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出右键菜单：“查看”、“删除”、“全选”、“复制”、“剪切”、“粘贴”、“另存为”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 图片被剪切
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 粘贴剪切图片
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 图片被剪切
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 粘贴剪切图片
+    needs_accessible_name: false
+- id: case_1676221
+  name: 详情页右键菜单操作---保存图片
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 详情页右键菜单操作---保存图片
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 鼠标右键详情编辑区图片
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“另存为”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出右键菜单：“查看”、“删除”、“全选”、“复制”、“剪切”、“粘贴”、“另存为”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出文管窗口，导出的图片名称默认为：image，可修改,确定保存，正常保存图片至指定路径
+    needs_accessible_name: false
+- id: case_1676219
+  name: 详情页右键菜单操作---编辑区空白，右键菜单
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 详情页右键菜单操作---编辑区空白，右键菜单
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 鼠标右键详情编辑区
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“粘贴”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 点击“语音听写”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出右键菜单：“删除”、“全选”、“复制”、“剪切”、“粘贴”、“语音朗读”、“语音听写”、“文本翻译”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 粘贴剪贴板内容
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 弹出语音输入弹窗，可以语音输入文字
+    needs_accessible_name: false
+- id: case_1676217
+  name: 详情页右键菜单操作---不选中任何内容，右键菜单
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 详情页右键菜单操作---不选中任何内容，右键菜单
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 鼠标右键详情编辑区
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“粘贴”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 点击“语音听写”
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 点击“全选”
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 右键鼠标
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出右键菜单：“删除”、“全选”、“复制”、“剪切”、“粘贴”、“语音朗读”、“语音听写”、“文本翻译”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 粘贴剪贴板内容
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 弹出语音输入弹窗，可以语音输入文字
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 全选编辑区内容
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 弹出右键菜单：“删除”、“全选”、“复制”、“剪切”、“粘贴”、“语音朗读”、“语音听写”、“文本翻译”
+    needs_accessible_name: false
+- id: case_1676215
+  name: Ctrl+Z撤销和Ctrl+Shift+Z重做功能验证---文本编辑
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: Ctrl+Z撤销和Ctrl+Shift+Z重做功能验证---文本编辑
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 编辑详情编辑区：进行添加文字/删除文字/剪切文字/复制文字操作
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Ctrl+Z
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按Ctrl+Shift+Z
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 完成对应的文件编辑
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 撤销上一次编辑
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 恢复撤销的编辑
+    needs_accessible_name: false
+- id: case_1676213
+  name: Ctrl+Z撤销和Ctrl+Shift+Z重做功能验证---导入/删除图片
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: Ctrl+Z撤销和Ctrl+Shift+Z重做功能验证---导入/删除图片
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 编辑详情编辑区：导入图片/删除图片
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Ctrl+Z
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按Ctrl+Shift+Z
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 完成文件的相关编辑
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 撤销上一次编辑
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 恢复撤销的编辑
+    needs_accessible_name: false
+- id: case_1676211
+  name: Ctrl+Z撤销和Ctrl+Shift+Z重做功能验证---保存/删除录音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: Ctrl+Z撤销和Ctrl+Shift+Z重做功能验证---保存/删除录音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 编辑详情编辑区：录音并保存录音/删除语音笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Ctrl+Z
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按Ctrl+Shift+Z
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 完成对应的编辑操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 撤销上一次编辑
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 恢复撤销的编辑
+    needs_accessible_name: false
+- id: case_1676209
+  name: 编辑区有字体-设置字体
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 编辑区有字体-设置字体
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 双击编辑区文字，或在选中文字
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击字体
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 点击选中任意字体
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出字体下拉框
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 字体下拉框消失，悬浮气泡框和当前内容都显示成正确的字体
+    needs_accessible_name: false
+- id: case_1676207
+  name: 编辑区无字体-设置字体
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 编辑区无字体-设置字体
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 编辑区输入光标右击
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击字体
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 点击选中字体
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 弹出悬浮气泡工具栏
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出字体下拉框
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 字体下拉框消失，悬浮气泡框和当前内容都显示成正确的字体，再次输入内容字体为当前设置的字体
+    needs_accessible_name: false
+- id: case_1676205
+  name: 设置字体统一
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本V25(#117769)
+  description: 设置字体统一
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 修改系统标准字体
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 重启应用在编辑区右击
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 系统字体改变
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 弹出悬浮气泡框，字体默认显示与系统字体一致
+    needs_accessible_name: false
+- id: case_1635305
+  name: 切换字体大小查看语音记事本各个界面显示
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/兼容性测试(#115105)
+  description: 切换字体大小查看语音记事本各个界面显示
+  status: active
+  reason: ''
+  steps:
+  - step_type: assert
+    description: 1. 切换字体大小分别为最大、最小，打开语音记事本，查看各个界面显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 正常显示无异常
+    needs_accessible_name: false
+- id: case_1635303
+  name: 切换系统语言查看语音记事本各个界面显示
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/兼容性测试(#115105)
+  description: 切换系统语言查看语音记事本各个界面显示
+  status: active
+  reason: ''
+  steps:
+  - step_type: assert
+    description: 1. 切换系统语言为英文，打开语音记事本，查看各个界面显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 切换系统语言为繁体中文（香港），打开语音记事本，查看各个界面显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 切换系统语言为正体中文，打开语音记事本，查看各个界面显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 切换系统语言为维语，打开语音记事本，查看各个界面显示（1040需求新增）
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 切换系统语言为藏语，打开语音记事本，查看各个界面显示（1040需求新增）
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 正常显示无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常显示无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常显示无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 正常显示无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 正常显示无异常
+    needs_accessible_name: false
+- id: case_1635301
+  name: 连续新建和删除文本笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/压力测试(#115107)
+  description: 连续新建和删除文本笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 新建文本笔记，重复新建文本笔记20次
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 删除文本笔记，重复删除文本笔记20次
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 正常新建文本笔记无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常删除文本笔记无异常
+    needs_accessible_name: false
+- id: case_1635299
+  name: 连续新建和删除记事本
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/压力测试(#115107)
+  description: 连续新建和删除记事本
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 新建记事本，重复新建记事本20次
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 删除记事本，重复删除记事本20次
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 正常新建记事本无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常删除记事本无异常
+    needs_accessible_name: false
+- id: case_1635281
+  name: 录音过程中，无法使用Ctrl+Y保存语音快捷键
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/快捷键使用(#115113)
+  description: 录音过程中，无法使用Ctrl+Y保存语音快捷键
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音按钮录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 录音过程中，按Ctrl+Y快捷键
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. Ctrl+Y快捷键禁用，无应用闪退等异常
+    needs_accessible_name: false
+- id: case_1635279
+  name: 语音记录空，无法使用Ctrl+Y保存语音快捷键
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/快捷键使用(#115113)
+  description: 语音记录空，无法使用Ctrl+Y保存语音快捷键
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 无语音笔记,按Ctrl+Y快捷键
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 搜索结果界面无语音笔记，按Ctrl+Y快捷键
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 1~2.Ctrl+Y快捷键禁用，无应用闪退等异常
+    needs_accessible_name: false
+- id: case_1635277
+  name: 文字记录为空，使用Ctrl+S保存为TXT快捷键
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/快捷键使用(#115113)
+  description: 文字记录为空，使用Ctrl+S保存为TXT快捷键
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 无文字记录,按Ctrl+S快捷键
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 搜索结果界面无文字记录，按Ctrl+S快捷键
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 1~2.Ctrl+S快捷键禁用，无应用闪退等异常
+    needs_accessible_name: false
+- id: case_1635271
+  name: 搜索结果界面，无法使用F2重命名记事本快捷键
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/快捷键使用(#115113)
+  description: 搜索结果界面，无法使用F2重命名记事本快捷键
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 搜索框输入任意关键字进行搜索
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按F2快捷键重命名记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 搜索结果界面，记事本区域不处于选中状态，F2禁用
+    needs_accessible_name: false
+- id: case_1635265
+  name: 录音、语音转文字、回放录音过程过程中使用Delete快捷键
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/快捷键使用(#115113)
+  description: 录音、语音转文字、回放录音过程过程中使用Delete快捷键
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击语音记录菜单按钮进行语音转文字操作
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 语音转写文字过程鼠标点击当前记事本，按Delete快捷键
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 语音转写文字过程鼠标点击当前文本笔记，按Delete快捷键
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 语音转写文字过程鼠标点击当前正在转写文字的语音笔记，按Delete快捷键
+    needs_accessible_name: false
+  - step_type: action
+    description: 备注：录音、回放录音过程中同时需要覆盖步骤2~3的测试
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '3.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 2~3.按Delete快捷键无反应，不会出现闪退等等异常
+    needs_accessible_name: false
+- id: case_1635263
+  name: 空白页使用Delete快捷键
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/快捷键使用(#115113)
+  description: 空白页使用Delete快捷键
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 删除所有记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Delete键
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 空白页的情况下按Delete键，无任何作用，不会有应用闪退等异常出现
+    needs_accessible_name: false
+- id: case_1635261
+  name: 录音、语音转文字、回放录音过程中以及搜索结果界面不可以通过Ctrl+N新建记事本
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/快捷键使用(#115113)
+  description: 录音、语音转文字、回放录音过程中以及搜索结果界面不可以通过Ctrl+N新建记事本
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音按钮录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 录音过程中，按Ctrl+N键进行新建记事本操作
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 完成录音，进行语音转文字操作
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 语音转文字过程中，按Ctrl+N键进行新建记事本操作
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 回放录音过程中，按Ctrl+N键进行新建记事本操作
+    needs_accessible_name: false
+  - step_type: action
+    description: 6. 搜索框输入关键字进行搜索，按Ctrl+N键进行新建记事本操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '3.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '4.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '5.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 6. 2~6.无法新建记事本，不会有闪退等异常出现
+    needs_accessible_name: false
+- id: case_1635259
+  name: 验证快捷键功能正常实现
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/快捷键使用(#115113)
+  description: 验证快捷键功能正常实现
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 打开应用，分别输入下面快捷键：
+    needs_accessible_name: false
+  - step_type: action
+    description: a.F1
+    needs_accessible_name: false
+  - step_type: action
+    description: b.Ctrl+Shift+?
+    needs_accessible_name: false
+  - step_type: action
+    description: c.Ctrl+N
+    needs_accessible_name: false
+  - step_type: action
+    description: d.Delete
+    needs_accessible_name: false
+  - step_type: action
+    description: e.F2
+    needs_accessible_name: false
+  - step_type: action
+    description: f.Space
+    needs_accessible_name: false
+  - step_type: action
+    description: g.Ctrl+A、Ctrl+C、Ctrl+X、Ctrl+V、Delete
+    needs_accessible_name: false
+  - step_type: action
+    description: h.Ctrl+R
+    needs_accessible_name: false
+  - step_type: action
+    description: i.Ctrl+B
+    needs_accessible_name: false
+  - step_type: action
+    description: j.F3
+    needs_accessible_name: false
+  - step_type: action
+    description: k.Delete
+    needs_accessible_name: false
+  - step_type: action
+    description: l.Ctrl+W
+    needs_accessible_name: false
+  - step_type: action
+    description: n.Ctrl+P
+    needs_accessible_name: false
+  - step_type: action
+    description: o.Ctrl+S
+    needs_accessible_name: false
+  - step_type: action
+    description: p.Ctrl+Y
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 快捷键功能可以正常实现：
+    needs_accessible_name: false
+  - step_type: assert
+    description: a.帮助
+    needs_accessible_name: false
+  - step_type: assert
+    description: b.显示快捷键预览
+    needs_accessible_name: false
+  - step_type: assert
+    description: c.新建记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: d.删除记事本/笔记/语音笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: e.重命名记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: f.语音记事项播放/暂停
+    needs_accessible_name: false
+  - step_type: assert
+    description: g.全选、复制、剪切、粘贴、删除文字
+    needs_accessible_name: false
+  - step_type: assert
+    description: h.录音
+    needs_accessible_name: false
+  - step_type: assert
+    description: i.新建笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: j.重命名笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: k.删除笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: m.语音转文字
+    needs_accessible_name: false
+  - step_type: assert
+    description: n.保存为MP3
+    needs_accessible_name: false
+  - step_type: assert
+    description: o.保存为TXT
+    needs_accessible_name: false
+  - step_type: assert
+    description: p.保存语音
+    needs_accessible_name: false
+- id: case_1635223
+  name: '[003]关闭主界面'
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/工具栏(#115117)
+  description: '[003]关闭主界面'
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击工具栏右上角的“x”图标
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 退出应用
+    needs_accessible_name: false
+- id: case_1635209
+  name: 调整应用窗口大小，搜索框大小不变
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/搜索功能(#115119)
+  description: 调整应用窗口大小，搜索框大小不变
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 最大化显示应用
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 还原应用大小
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 拖拽应用窗口调整应用大小
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 1～3.搜索框大小保持不变
+    needs_accessible_name: false
+- id: case_1635203
+  name: 搜索结果界面，删除所有匹配项
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/搜索功能(#115119)
+  description: 搜索结果界面，删除所有匹配项
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 搜索有结果
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 删除所有文本笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 显示无搜索结果
+    needs_accessible_name: false
+  - step_type: assert
+    description: 备注：只有详情页匹配搜索关键字时，搜索详情页匹配项不会更新搜索结果
+    needs_accessible_name: false
+- id: case_1635197
+  name: 搜索结果展示界面右键文本笔记新建笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/搜索功能(#115119)
+  description: 搜索结果展示界面右键文本笔记新建笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 搜索有结果
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键搜索结果界面文本笔记，新建笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. “新建笔记”菜单置灰不可用
+    needs_accessible_name: false
+- id: case_1635195
+  name: 搜索结果展示界面右键文本笔记保存语音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/搜索功能(#115119)
+  description: 搜索结果展示界面右键文本笔记保存语音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 搜索有结果
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键搜索结果界面文本笔记，保存语音
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常保存语音无异常
+    needs_accessible_name: false
+- id: case_1635193
+  name: 搜索结果展示界面右键文本笔记保存为TXT
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/搜索功能(#115119)
+  description: 搜索结果展示界面右键文本笔记保存为TXT
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 搜索有结果
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键搜索结果界面文本笔记，保存为TXT
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常进行保存为TXT操作无异常
+    needs_accessible_name: false
+- id: case_1635191
+  name: 搜索结果展示界面右键文本笔记删除文本笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/搜索功能(#115119)
+  description: 搜索结果展示界面右键文本笔记删除文本笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 搜索有结果
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键搜索结果界面文本笔记，删除文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 右键搜索结果界面文本笔记，删除所有文本笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 搜索结果界面正常删除文本笔记无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 删除所有文本笔记，显示“无搜索结果”
+    needs_accessible_name: false
+- id: case_1635189
+  name: 搜索结果展示界面右键文本笔记重命名文本笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/搜索功能(#115119)
+  description: 搜索结果展示界面右键文本笔记重命名文本笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 搜索有结果
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键搜索结果界面文本笔记，重命名文本笔记，重命名与搜索关键字匹配
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 右键搜索结果界面文本笔记，重命名文本笔记，重命名与搜索关键字不匹配
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常重命名文本笔记，与搜索关键字匹配部分，文字高亮显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常重命名文本笔记，重命名与搜索关键字不匹配，不会有文字高亮显示
+    needs_accessible_name: false
+- id: case_1635187
+  name: 搜索结果展示界面右键记事本
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/搜索功能(#115119)
+  description: 搜索结果展示界面右键记事本
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 输入搜索关键字，搜索无结果
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 输入搜索关键字，搜索有结果
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 右键记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 记事本区域置灰，无选中状态，右键无反应
+    needs_accessible_name: false
+  - step_type: assert
+    description: '3.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 记事本区域置灰，无选中状态，右键无反应
+    needs_accessible_name: false
+- id: case_1635185
+  name: 搜索结果展示界面添加语音记事项
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/搜索功能(#115119)
+  description: 搜索结果展示界面添加语音记事项
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 输入搜索关键字匹配文本笔记/详情页文本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 搜索结果界面录音
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 搜索结果界面不显示录音按钮
+    needs_accessible_name: false
+- id: case_1635183
+  name: 搜索只针对文本笔记列表和详情页的文本，记事本列表不在搜索范围内
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/搜索功能(#115119)
+  description: 搜索只针对文本笔记列表和详情页的文本，记事本列表不在搜索范围内
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 输入搜索关键字仅匹配记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 输入搜索关键字不匹配记事本、文本笔记和详情页文本
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 输入搜索关键字仅匹配文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 输入搜索关键字仅匹配详情页文本
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 输入搜索关键字匹配文本笔记&详情页文本
+    needs_accessible_name: false
+  - step_type: action
+    description: 6. 输入搜索关键字仅匹配语音转写文字
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 无搜素结果（同UI效果图），无记事本处于选中状态
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 无搜素结果（同UI效果图），无记事本处于选中状态
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 显示搜索到的文本笔记，搜索匹配关键字高亮显示，无记事本处于选中状态
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 显示搜索到的文本详情及其详情所在文本笔记，详情页高亮显示搜素匹配关键字，无记事本处于选中状态
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 显示搜索结果，搜索匹配关键字高亮显示，无记事本处于选中状态
+    needs_accessible_name: false
+  - step_type: assert
+    description: 6. 语音转文字不支持搜索，无搜素结果（同UI效果图），无记事本处于选中状态
+    needs_accessible_name: false
+- id: case_1635181
+  name: 搜索框输入关键字，按Enter键显示搜索结果
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/搜索功能(#115119)
+  description: 搜索框输入关键字，按Enter键显示搜索结果
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 在搜索框输入关键字，按Enter键
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 清空搜索框中关键字
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 正常显示搜索结果，符合搜索条件的字段蓝色高亮显示（PS：记事本列表不在搜索范围内，没有选中状态）
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 返回之前状态（注意：搜索框也恢复为默认状态）
+    needs_accessible_name: false
+- id: case_1635179
+  name: 输入特殊字符搜索
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/搜索功能(#115119)
+  description: 输入特殊字符搜索
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 搜索框分别输入~、！、@、#、$、￥、%、^、&、*、.、<、>、？、/、\、[、]等等进行搜索
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 1.实时显示搜索结果无异常
+    needs_accessible_name: false
+- id: case_1635101
+  name: 右键语音笔记，保存为MP3
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 右键语音笔记，保存为MP3
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键语音记录
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“保存为MP3”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 点击保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 默认保存到桌面，保存文件名称和格式不可修改
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常保存语音记录至桌面无异常
+    needs_accessible_name: false
+- id: case_1635089
+  name: 播放过程中保存当前语音笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 播放过程中保存当前语音笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音回放
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键语音记录进行保存为MP3操作（保存当前回放记录&保存其他记录均需测试）
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常进行保存操作，录音回放无异常
+    needs_accessible_name: false
+- id: case_1635087
+  name: 播放过程中删除当前语音笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 播放过程中删除当前语音笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音回放
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键其他语音记录进行删除操作
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 右键当前回放记录进行删除操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常删除记录，录音继续回放无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常删除记录，录音继续正常回放
+    needs_accessible_name: false
+- id: case_1635085
+  name: 播放过程中放大/缩小/最小化应用窗口
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 播放过程中放大/缩小/最小化应用窗口
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音回放
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 进行最大化和还原应用窗口操作
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 进行最小化窗口操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 2&3.录音继续回放无异常
+    needs_accessible_name: false
+- id: case_1635083
+  name: 播放过程中编辑当前文本笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 播放过程中编辑当前文本笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 回放录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 编辑详情页文本笔记：进行删除、添加、复制、剪切、粘贴文字等等操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 可以正常编辑文字，回放录音无异常
+    needs_accessible_name: false
+- id: case_1635081
+  name: 播放过程中点击其他录音播放按钮
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 播放过程中点击其他录音播放按钮
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 完成语音添加
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 播放语音记录
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 播放其他录音记录
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常播放录音，步骤2语音停止播放
+    needs_accessible_name: false
+- id: case_1635079
+  name: 播放过程中右键当前文本笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 播放过程中右键当前文本笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音回放
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 鼠标右键当前文本笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 可重命名，可保存为TXT，可保存语音；删除和新建笔记置灰
+    needs_accessible_name: false
+- id: case_1635077
+  name: 播放过程中右键其他文本笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 播放过程中右键其他文本笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音回放
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 鼠标右键其他文本笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 文本笔记区域置灰，右键其他文本笔记无作用，不会弹出菜单
+    needs_accessible_name: false
+- id: case_1635075
+  name: 播放过程中新建文本笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 播放过程中新建文本笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音回放
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击文本笔记列表“+”按钮新建文本笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 回放录音过程中“+”按钮置灰无法使用
+    needs_accessible_name: false
+- id: case_1635073
+  name: 播放过程中右键当前记事本
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 播放过程中右键当前记事本
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音回放
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键当前记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 右键当前记事本，可进行重命名操作，删除和新建笔记菜单置灰不可用，重命名当前记事本，录音回放继续进行无异常
+    needs_accessible_name: false
+- id: case_1635071
+  name: 播放过程中右键其他记事本
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 播放过程中右键其他记事本
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音回放
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键其他记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 右键其他记事本无作用，录音回放继续进行无异常
+    needs_accessible_name: false
+- id: case_1635069
+  name: 播放过程中新建记事本
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 播放过程中新建记事本
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音回放
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击新建记事本按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 记事本区域置灰，无法新建记事本，录音回放继续进行无异常
+    needs_accessible_name: false
+- id: case_1635067
+  name: 播放过程中切换记事本
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 播放过程中切换记事本
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音回放
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击其他记事本进入
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 记事本区域置灰，无法进入其他记事本，录音回放继续进行无异常
+    needs_accessible_name: false
+- id: case_1635063
+  name: 点击进度条任意位置改变播放进度
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 点击进度条任意位置改变播放进度
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 完成语音添加
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 播放语音记录，点击进度条任意位置
+    needs_accessible_name: false
+  - step_type: action
+    description: 备注：最大化窗口和默认应用窗口下均需Check；重点Check长录音记录（超过20分钟的录音记录）
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 进度正常跳转至对应位置，继续回放录音无异常
+    needs_accessible_name: false
+- id: case_1635061
+  name: 拖动进度条至起始端/最末端
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 拖动进度条至起始端/最末端
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 完成语音添加
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 播放语音记录，拖动进度条至最末端
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 播放语音记录，拖动进度条至起始端
+    needs_accessible_name: false
+  - step_type: action
+    description: 备注：最大化窗口和默认应用窗口下均需Check；重点Check长录音记录（超过20分钟的录音记录）
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 语音记录结束播放无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常拖动进度条至起始端，语音记录继续正常播放无异常
+    needs_accessible_name: false
+- id: case_1635059
+  name: 回放录音，左右拖动进度条至指定位置
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 回放录音，左右拖动进度条至指定位置
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 完成语音添加
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 播放语音记录，左右拖动语音播放位置
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 暂停播放语音，所有拖动语音播放位置，播放语音
+    needs_accessible_name: false
+  - step_type: action
+    description: 备注：最大化窗口和默认应用窗口下均需Check；重点Check长录音记录（超过20分钟的录音记录）
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 2&3.可以正常左右拖动进度条至指定位置，播放无异常
+    needs_accessible_name: false
+- id: case_1635057
+  name: 播放/暂停播放录音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 播放/暂停播放录音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击语音笔记播放按钮播放
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击播放插件暂停按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 点击语音笔记播放按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 点击语音笔记暂停按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 点击播放插件播放按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 6. 点击播放按钮，完成语音回放
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 播放插件和语音笔记均显示为播放按钮，语音暂停回放
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 播放插件和语音笔记均显示为暂停按钮，语音继续回放
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 播放插件和语音笔记均显示为播放按钮，语音暂停回放
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 播放插件和语音笔记均显示为暂停按钮，语音继续回放
+    needs_accessible_name: false
+  - step_type: assert
+    description: 6. 完成语音回放，播放插件消失，显示录音按钮
+    needs_accessible_name: false
+- id: case_1635055
+  name: 语音笔记时间显示
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 语音笔记时间显示
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 完成录音，不超过1小时
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 完成录音，超过一小时
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 昨天新建的语音笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 非今天、昨天建立的语音笔记，且该语音笔记建立时间不超过1年
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 非今天、昨天建立的语音笔记，且该语音笔记建立时间超过1年
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 对应语音记录时间显示为x分钟前
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 对应语音记录时间显示为hh：mm
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 昨天编辑的语音笔记显示为：昨天/前天hh：mm
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 对应语音记录时间显示为MM-DD（例如：09-27）
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 对应语音记录时间显示为YYYY-MM-DD（例如2019-09-26）
+    needs_accessible_name: false
+- id: case_1635053
+  name: 语音笔记显示
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 语音笔记显示
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 录音
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 完成录音，查看语音笔记显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 语音笔记从左向右依次显示为：播放按钮、语音笔记名称（语音、语音1、语音2...）、录制时间、语音笔记时长
+    needs_accessible_name: false
+- id: case_1635051
+  name: 录音时进行强制关机/重启/注销/待机/休眠操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音时进行强制关机/重启/注销/待机/休眠操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音按钮录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 录音过程中进行强制关机/重启/注销/待机/休眠操作
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 录音过程中进行锁屏/切换用户
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 提示“录音未保存”，程序阻止关机
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 唤醒屏幕/返回原来用户界面，录音继续正常进行无异常
+    needs_accessible_name: false
+- id: case_1635045
+  name: 录音设备异常进行录音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音设备异常进行录音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 录音过程中拔掉输入设备
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 提示“您的录音设备异常，无法录制语音。”结束并自动保存之前录音
+    needs_accessible_name: false
+- id: case_1635037
+  name: 关闭应用或其他情况需终止录音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 关闭应用或其他情况需终止录音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击工具栏菜单按钮，选中退出
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 重复步骤1，点击“X”关闭按钮退出应用
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 提示当前正在录音中，是否终止录音，选择终止，退出应用，保存已录制语音文件
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 提示当前正在录音中，是否终止录音，选择终止，退出应用，保存已录制语音文件
+    needs_accessible_name: false
+- id: case_1635035
+  name: 录音过程中放大/缩小/最小化应用窗口
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音过程中放大/缩小/最小化应用窗口
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音按钮录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 放大/缩小/最小化应用窗口
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常放大/缩小/最小化应用窗口，录音继续正常进行无异常
+    needs_accessible_name: false
+- id: case_1635033
+  name: 录音过程中编辑当前文本笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音过程中编辑当前文本笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音按钮录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 对详情界面文本笔记进行编辑：删除、增加文字，剪切、复制、粘贴文字等等
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常编辑文字，录音继续正常进行无异常
+    needs_accessible_name: false
+- id: case_1635031
+  name: 录音过程中进行语音转文字操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音过程中进行语音转文字操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音按钮录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键详情界面任意语音笔记，进行语音转文字操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常完成语音转文字操作，录音继续无异常
+    needs_accessible_name: false
+- id: case_1635029
+  name: 录音过程中右键语音笔记保存为MP3
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音过程中右键语音笔记保存为MP3
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音按钮录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键详情界面任意语音笔记，保存为MP3
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常保存语音笔记，录音继续无异常
+    needs_accessible_name: false
+- id: case_1635027
+  name: 录音过程中删除语音笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音过程中删除语音笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音按钮录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键详情界面任意语音笔记，删除语音笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 语音笔记被删除，录音继续无异常
+    needs_accessible_name: false
+- id: case_1635025
+  name: 录音过程中右键当前文本笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音过程中右键当前文本笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音按钮录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 鼠标右键当前文本笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 右键菜单可重命名和保存为TXT；删除、保存语音和新建笔记按钮置灰
+    needs_accessible_name: false
+- id: case_1635023
+  name: 录音过程中右键其他文本笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音过程中右键其他文本笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音按钮录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 鼠标右键其他文本笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 录音中文本笔记区域置灰，鼠标右键其他文本笔记无作用
+    needs_accessible_name: false
+- id: case_1635021
+  name: 录音过程中新建文本笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音过程中新建文本笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音按钮录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击文本笔记区域“+”按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 录音过程中“+”按钮置灰，无法新建文本笔记
+    needs_accessible_name: false
+- id: case_1635011
+  name: 录音过程中播放录音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音过程中播放录音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击语音添加按钮进行录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 录音过程中点击任一录音记录播放录音
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 录音正常，录音过程中，其他语音记录播放按钮置灰不可用，无法进行播放录音操作
+    needs_accessible_name: false
+- id: case_1635003
+  name: 录音时长统计分级别
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音时长统计分级别
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 录音超过1分钟，点击完成按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 录音记录时长显示**：**
+    needs_accessible_name: false
+- id: case_1635001
+  name: 录音时长统计小时级别
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音时长统计小时级别
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 录音超过1小时
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 录音记录满1小时自动保存，录音记录时长显示60：00
+    needs_accessible_name: false
+- id: case_1634999
+  name: 录音进行过程中完成录音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音进行过程中完成录音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 在录音过程中点击完成按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 录音开始
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 录音结束，记录列表正常显示该录音记录，并且录音文件被自动保存到系统后台的 ~/.local/share/deepin/deepin-voice-note目录下
+    needs_accessible_name: false
+- id: case_1634997
+  name: 录音被暂停后完成录音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音被暂停后完成录音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 在录音过程中点击暂停按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 点击完成按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 录音开始
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 录音被暂停,按钮显示与UI效果图一致
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 会停止录音，记录列表正常显示该录音记录，并自动保存录音文件到~/.local/share/deepin/deepin-voice-note目录下
+    needs_accessible_name: false
+- id: case_1634995
+  name: 录音过程中暂停录音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音过程中暂停录音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击录音
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 在录制声音的过程中点击暂停按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 点击继续按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 开始录制声音
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 录音被暂停，同时暂停按钮变为开始录音按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 录音继续
+    needs_accessible_name: false
+- id: case_1634993
+  name: 录音过程中的界面布局
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音过程中的界面布局
+  status: active
+  reason: ''
+  steps:
+  - step_type: assert
+    description: 1. 点击录音按钮，开始录音，查看正在录音界面的布局
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 录音界面从左到右依次为：暂停按钮、录音记录波形展示、录制时间、完成按钮
+    needs_accessible_name: false
+- id: case_1634991
+  name: 录音按钮固定显示
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/语音笔记(#115123)
+  description: 录音按钮固定显示
+  status: active
+  reason: ''
+  steps:
+  - step_type: assert
+    description: 1. 新建文本笔记，查看文本笔记详情页录音按钮显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 步骤1详情页中添加文字/语音记录超过一页，查看详情页录音按钮显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 1~2.录音按钮正常显示在最右端详情页底端无异常
+    needs_accessible_name: false
+- id: case_1634977
+  name: 详情页右键鼠标操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 详情页右键鼠标操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键详情页空白处，全选
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 分别进行复制、剪切和粘贴操作
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 重复步骤1，删除
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 2.正常粘贴复制和剪切内容
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 3.删除选中内容无异常
+    needs_accessible_name: false
+- id: case_1634975
+  name: 详情页右键鼠标操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 详情页右键鼠标操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 移动鼠标，选中单个语音笔记，右键鼠标
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键单个语音笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 1~2.菜单一致，可以正常进行语音转文字、保存为MP3、删除、全选操作
+    needs_accessible_name: false
+- id: case_1634973
+  name: 详情页右键鼠标操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 详情页右键鼠标操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 详情页鼠标右键详情页空白处
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 全选，右键鼠标，选择剪切
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 重复步骤1，全选，选择删除
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 2.提示“您选择的语音笔记以及转写文字剪切后不能粘贴，是否继续？”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 3.正常删除无异常
+    needs_accessible_name: false
+- id: case_1634971
+  name: 详情页右键鼠标操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 详情页右键鼠标操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 详情页鼠标右键详情页空白处
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 全选，右键鼠标，选择剪切
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 重复步骤1，全选，右键鼠标，选择保存为MP3
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 重复步骤1，全选，右键鼠标，选择语音转文字
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 移动鼠标选中单个语音笔记，进行步骤2~4操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 2.提示“您选择的语音笔记以及转写文字剪切后不能粘贴，是否继续？”
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 3.正常保存为MP3无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 4.正常进行语音转文字无异常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 5.结果同2~4
+    needs_accessible_name: false
+- id: case_1634969
+  name: 详情页右键鼠标操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 详情页右键鼠标操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 空白页右键鼠标
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 1.弹出右键菜单，除“粘贴”菜单，其余菜单均置灰
+    needs_accessible_name: false
+- id: case_1634963
+  name: 输入文字过程中进行最大化/默认窗口切换
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 输入文字过程中进行最大化/默认窗口切换
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 详情页输入文字
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 最大化显示窗口，继续输入文字
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 恢复默认窗口大小，继续输入文字
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 1~3.可以正常输入文字，界面显示正常
+    needs_accessible_name: false
+- id: case_1634961
+  name: 最大化/默认显示应用窗口、拖拽调整窗口大小，查看详情页显示
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 最大化/默认显示应用窗口、拖拽调整窗口大小，查看详情页显示
+  status: active
+  reason: ''
+  steps:
+  - step_type: assert
+    description: 1. 点击工具栏“最大化”窗口按钮，查看界面显示
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 恢复默认窗口大小
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 拖拽调整窗口大小
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 回放语音笔记，重复步骤1~3
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '3.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 界面显示正常，文字记录、语音插件及其转写文案跟着等比例变大变小
+    needs_accessible_name: false
+- id: case_1634959
+  name: 点击文本笔记详情页的文本区域编辑文字内容
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 点击文本笔记详情页的文本区域编辑文字内容
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击文本笔记详情界面
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 增加/删除文字
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 选择文字进行剪切、复制、粘贴操作
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 清空所有文字
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 可以正常进行添加和删除文字操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 可以正常进行剪切、复制、粘贴操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 清空所有文字无异常
+    needs_accessible_name: false
+- id: case_1634957
+  name: 文本笔记详情页输入内容键入空格、Tab
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 文本笔记详情页输入内容键入空格、Tab
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 新建笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 在详情页输入任意内容
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按空格键后输入内容
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 按Tab键输入内容
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '3.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 详情页输入内容显示正常，空格、Tab在详情中显示正常
+    needs_accessible_name: false
+- id: case_1634955
+  name: 文本笔记详情页输入内容键入回车
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 文本笔记详情页输入内容键入回车
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 新建笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 在详情页输入任意内容
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按回车
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 重复步骤2~3，是详情页输入内容超过一页
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '3.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 详情页输入内容显示正常，可滚动鼠标查看所有输入内容
+    needs_accessible_name: false
+- id: case_1634953
+  name: 文本笔记详情页输入内容含中文、英文、数字、特殊字符（&lt;、&gt;...）等等
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 文本笔记详情页输入内容含中文、英文、数字、特殊字符（&lt;、&gt;...）等等
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 新建笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 在详情页输入内容，输入内容含：中文、英文、数字、特殊字符（<、>...）等等
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 详情页输入内容显示正常，无内容丢失等异常出现
+    needs_accessible_name: false
+- id: case_1634951
+  name: 重命名笔记，对应文本笔记移至最上方，对应文本笔记时间显示为重命名时间
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 重命名笔记，对应文本笔记移至最上方，对应文本笔记时间显示为重命名时间
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键文本笔记（非第一条）
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 重命名文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 完成重命名
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 3.对应文本笔记移至第一条，对应文本笔记时间显示为重命名时间
+    needs_accessible_name: false
+- id: case_1634949
+  name: 修改保存路径进行保存语音操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 修改保存路径进行保存语音操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 鼠标右键当前文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 选择保存语音
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 更改保存路径/右键鼠标新建文件夹，打开新建文件夹，保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 3.正常保存当前文本笔记中所有语音笔记至指定文件夹
+    needs_accessible_name: false
+- id: case_1634947
+  name: 右键文本笔记，保存语音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 右键文本笔记，保存语音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“保存语音”，完成保存
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 重复步骤1~2
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 覆盖保存无异常
+    needs_accessible_name: false
+- id: case_1634945
+  name: 右键文本笔记，保存语音
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 右键文本笔记，保存语音
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“保存语音”
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 语音笔记中所有语音笔记正常保存无异常
+    needs_accessible_name: false
+- id: case_1634941
+  name: 保存的文本笔记可在其他客户端正常打开
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 保存的文本笔记可在其他客户端正常打开
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 选择“保存为TXT”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. Windows系统、手机端、微信打开步骤2保存的txt文件
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 可以正常打开文件
+    needs_accessible_name: false
+- id: case_1634939
+  name: 更改保存路径进行保存
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 更改保存路径进行保存
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 选择“保存为TXT”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 修改保存路径，点击“保存”
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常保存文本笔记至指定路径，文件可正常打开查看
+    needs_accessible_name: false
+- id: case_1634933
+  name: 默认保存至桌面
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 默认保存至桌面
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 选择“保存为TXT”，点击“保存”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 重复进行步骤2操作
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 打开步骤2~3保存的TXT文档
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '3.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 可以正常打开和查看保存的TXT文档
+    needs_accessible_name: false
+- id: case_1634931
+  name: 文本笔记为空，保存为TXT
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 文本笔记为空，保存为TXT
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 选择“保存为TXT”
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. “保存为TXT”置灰，无法进行保存操作
+    needs_accessible_name: false
+- id: case_1634927
+  name: 重命名文本笔记-清空输入框
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 重命名文本笔记-清空输入框
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键文本笔记，选择重命名
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 清空文本笔记旧名称后，按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 文本笔记名称为未修改前的名称
+    needs_accessible_name: false
+- id: case_1634925
+  name: 重命名文本笔记-包含特殊字符
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 重命名文本笔记-包含特殊字符
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 默认字体大小下，重命名文本笔记，记事本名称含“q、y、p、g”等
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 切换字体为最大，重命名文本笔记，记事本名称含“q、y、p、g”等
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 1~2.文本笔记名称显示正常，无截断等异常
+    needs_accessible_name: false
+- id: case_1634923
+  name: 重命名文本笔记-正向流程
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 重命名文本笔记-正向流程
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键任意文本笔记，选择“重命名”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 输入字符
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 成功重命名
+    needs_accessible_name: false
+- id: case_1634921
+  name: 重命名文本笔记-输入重复笔记名称
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 重命名文本笔记-输入重复笔记名称
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键任意文本笔记，选择“重命名”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 输入文本笔记名称与其他文本笔记名称重复，保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常重命名文本笔记无异常
+    needs_accessible_name: false
+- id: case_1634919
+  name: 重命名文本笔记-按esc取消重命名
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 重命名文本笔记-按esc取消重命名
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键任意文本笔记，选择“重命名”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 输入字符
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按ESC键
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 取消重命名
+    needs_accessible_name: false
+- id: case_1634917
+  name: 重命名文本笔记-输入字符超过64位
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 重命名文本笔记-输入字符超过64位
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键任意文本笔记，选择“重命名”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 输入字符超过64位保存
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 输入64位字符保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 限制输入64位字符，超过无法输入
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常保存命名，文本笔记名称单行显示，超出部分…代替
+    needs_accessible_name: false
+- id: case_1634915
+  name: 重命名文本笔记-输入空格
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 重命名文本笔记-输入空格
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键任意文本笔记，选择“重命名”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 输入空格
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常重命名文本笔记无异常
+    needs_accessible_name: false
+- id: case_1634913
+  name: 重命名文本笔记-不输入任何字符
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 重命名文本笔记-不输入任何字符
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键任意文本笔记，选择“重命名”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 不输入任何字符，保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 文本笔记名称不变
+    needs_accessible_name: false
+- id: case_1634911
+  name: 重命名文本笔记-包含中、英、数字、特殊符号
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 重命名文本笔记-包含中、英、数字、特殊符号
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键任意文本笔记，选择“重命名”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 输入字符包含中文、字母、数字、特殊符号“<”等等，保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 成功重命名，文本笔记名称显示正常
+    needs_accessible_name: false
+- id: case_1634909
+  name: 笔记列表时间显示
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 笔记列表时间显示
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 新建文本笔记，不超过1小时
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 新建文本笔记，超过一小时
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 昨天新建的文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 非今天、昨天和前天建立的文本笔记，且该文本笔记建立时间不超过1年
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 非今天、昨天和前天建立的文本笔记，且该文本笔记建立时间超过1年
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 显示为x分钟前
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 显示为hh：mm
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 昨天编辑的文本笔记显示为：昨天hh：mm
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 显示为MM-DD（例如：09-27）
+    needs_accessible_name: false
+  - step_type: assert
+    description: 5. 显示为YYYY-MM-DD（例如2019-09-26）
+    needs_accessible_name: false
+- id: case_1634907
+  name: 切换笔记，详情页同步切换
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 切换笔记，详情页同步切换
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 打开应用
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 点击各个文本笔记进入查看
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 详情页同步切换为对应文本笔记中的内容
+    needs_accessible_name: false
+- id: case_1634905
+  name: 重启应用查看笔记列表默认选中第一条
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 重启应用查看笔记列表默认选中第一条
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 打开应用
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 任意记事本中，点击文本笔记查看（非第一条）
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 重启应用，查看步骤2记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 记事本中默认选中第一条文本笔记，详情界面同步显示第一条文本笔记中的内容
+    needs_accessible_name: false
+- id: case_1634903
+  name: 切换记事本查看笔记列表默认选中第一条
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 切换记事本查看笔记列表默认选中第一条
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 打开应用
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击各个记事本进入
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 任意记事本中，点击文本笔记查看（非第一条）
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 进入其他记事本后，再次返回步骤3记事本中
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 每个记事本默认选中第一条文本笔记，详情界面同步显示第一条文本笔记中的内容
+    needs_accessible_name: false
+  - step_type: assert
+    description: '3.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 该记事本中变为默认选中第一条文本笔记，详情界面同步显示第一条文本笔记中的内容
+    needs_accessible_name: false
+- id: case_1634901
+  name: 新建笔记超过一页
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 新建笔记超过一页
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 新建笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 重复进行步骤1操作，新建笔记超过一页
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 上下滑动查看文本笔记列表
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 新建文本笔记超过一页，显示正常
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 可以正常上下滑动查看文本笔记
+    needs_accessible_name: false
+- id: case_1634899
+  name: 删除语音记录，对应文本笔记移至最上方，对应文本笔记时间显示为删除语音记录时间
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 删除语音记录，对应文本笔记移至最上方，对应文本笔记时间显示为删除语音记录时间
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 进入任意文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键语音笔记删除
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 对应文本笔记移至最上方，对应文本笔记时间显示为删除语音记录时间
+    needs_accessible_name: false
+  - step_type: assert
+    description: 备注：该文本笔记对应的记事本排序不会变化，记事本仍然按新建记事本时间排序
+    needs_accessible_name: false
+- id: case_1634897
+  name: 录音并保存录音，对应文本笔记移至最上方，对应文本笔记时间显示为保存语音笔记时间
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 录音并保存录音，对应文本笔记移至最上方，对应文本笔记时间显示为保存语音笔记时间
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 进入任意文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击录音按钮录音，完成录音
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 对应文本笔记移至最上方，对应文本笔记时间显示为保存语音笔记时间
+    needs_accessible_name: false
+  - step_type: assert
+    description: 备注：该文本笔记对应的记事本排序不会变化，记事本仍然按新建记事本时间排序
+    needs_accessible_name: false
+- id: case_1634895
+  name: 编辑文字笔记，对应文本笔记移至最上方，对应文本笔记时间显示为最新编辑时间
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 编辑文字笔记，对应文本笔记移至最上方，对应文本笔记时间显示为最新编辑时间
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 进入任意文本笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 对已存在的文字记录进行编辑（删除文字、添加文字、剪切、复制、粘贴...）
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 重命名笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 2~3.对应文本笔记移至最上方，对应文本笔记时间显示为最新编辑时间
+    needs_accessible_name: false
+  - step_type: assert
+    description: 备注：该文本笔记对应的记事本排序不会变化，记事本仍然按新建记事本时间排序
+    needs_accessible_name: false
+- id: case_1634893
+  name: 新建笔记，最新新建的排在最上方
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 新建笔记，最新新建的排在最上方
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 新建笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 重复进行步骤1操作
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 默认名称显示为“文本”、“文本1”、“文本2”...，最新新建的排在最上方
+    needs_accessible_name: false
+- id: case_1634891
+  name: 新建文本笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/文本笔记详情页(#115125)
+  description: 新建文本笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键笔记列表任一笔记，选择新建笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击笔记列表“+”按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 左侧记事本列表，右键任一记事本，选择新建笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 1~3.正常新建一个文本笔记，详情页面显示输入光标，用户可以进行编辑，详情页面底端显示录音按钮
+    needs_accessible_name: false
+- id: case_1634867
+  name: 记事本中笔记数目超过100笔
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/记事本条目管理(#115129)
+  description: 记事本中笔记数目超过100笔
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 任意记事本中，新建笔记（eg：右键记事本，选择“新建笔记”）
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 重复步骤1超过100次，查看记事本列表中步骤1记事本右侧对应数目显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 数目显示为笔记的数量，无显示数目错误、截断等异常
+    needs_accessible_name: false
+- id: case_1634865
+  name: 记事本列表超出一屏
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/记事本条目管理(#115129)
+  description: 记事本列表超出一屏
+  status: active
+  reason: ''
+  steps:
+  - step_type: assert
+    description: 1. 新建记事本个数超出一屏，查看记事本列表
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 记事本列表显示正常，可上下滑动查看
+    needs_accessible_name: false
+- id: case_1634863
+  name: 记事本列表按照新建时间排序
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/记事本条目管理(#115129)
+  description: 记事本列表按照新建时间排序
+  status: active
+  reason: ''
+  steps:
+  - step_type: assert
+    description: 1. 查看记事本列表
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 新建记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 重复步骤2 ，重启应用
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 记事本列表按按新建日期由近至远顺序显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 新建记事本显示在第一位
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 重启应用，记事本还是按照日期由近至远排序
+    needs_accessible_name: false
+- id: case_1634861
+  name: 左侧头像的获取
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/记事本条目管理(#115129)
+  description: 左侧头像的获取
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 新建一个记事
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 查看左侧显示头像
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 新建多个记事本（超过一页）
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 查看记事本头像显示
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '3.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 2&4.头像来源于系统内置的10个头像，在新建记事本的时候随机选
+    needs_accessible_name: false
+  - step_type: assert
+    description: 取1个头像
+    needs_accessible_name: false
+- id: case_1634857
+  name: 记事本命名规则-清空原来的名称
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/记事本条目管理(#115129)
+  description: 记事本命名规则-清空原来的名称
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键记事本，选择重命名
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 清空记事本旧名称后，按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 记事本名称为未修改前的名称
+    needs_accessible_name: false
+- id: case_1634855
+  name: 记事本命名规则-输入特殊字符
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/记事本条目管理(#115129)
+  description: 记事本命名规则-输入特殊字符
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 默认字体大小下，重命名记事本，记事本名称含“q、y、p、g”等
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 切换字体为最大，重命名记事本，记事本名称含“q、y、p、g”等
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 1~2.记事本名称显示正常，无截断等异常
+    needs_accessible_name: false
+- id: case_1634853
+  name: 记事本命名规则-正向流程
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/记事本条目管理(#115129)
+  description: 记事本命名规则-正向流程
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键任意记事本，选择“重命名”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 输入字符
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 成功重命名
+    needs_accessible_name: false
+- id: case_1634851
+  name: 记事本命名规则-输入重复的名称
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/记事本条目管理(#115129)
+  description: 记事本命名规则-输入重复的名称
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键任意记事本，选择“重命名”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 输入记事本名称与其他记事本名称重复，保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常重命名记事本无异常
+    needs_accessible_name: false
+- id: case_1634849
+  name: 记事本命名规则-按esc退出
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/记事本条目管理(#115129)
+  description: 记事本命名规则-按esc退出
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键任意记事本，选择“重命名”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 输入字符
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按ESC键
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 取消重命名
+    needs_accessible_name: false
+- id: case_1634845
+  name: 记事本命名规则-输入空格
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/记事本条目管理(#115129)
+  description: 记事本命名规则-输入空格
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键任意记事本，选择“重命名”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 输入空格
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常重命名记事本无异常
+    needs_accessible_name: false
+- id: case_1634843
+  name: 记事本命名规则-不输入任意字符
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/记事本条目管理(#115129)
+  description: 记事本命名规则-不输入任意字符
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键任意记事本，选择“重命名”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 不输入任何字符，保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 记事本名称不变
+    needs_accessible_name: false
+- id: case_1634841
+  name: 记事本命名规则-输入中、英、数字、特殊字符
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/记事本条目管理(#115129)
+  description: 记事本命名规则-输入中、英、数字、特殊字符
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键任意记事本，选择“重命名”
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 输入字符包含中文、字母、数字、特殊符号“<”等等，保存
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 成功重命名，记事本名称显示正常
+    needs_accessible_name: false
+- id: case_1634839
+  name: 首次使用语音记事本应用，新建记事本
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/记事本条目管理(#115129)
+  description: 首次使用语音记事本应用，新建记事本
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 打开语音记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 点击“新建记事本”
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 最左侧记事本列表中，点击下端“下端新建记事本”按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 最左侧记事本列表中右键记事本，选择删除记事本，确认删除记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 重复步骤4，删除所有记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 6. 点击新建记事本按钮新建记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 正常新建记事本，记事本名称默认显示为“记事本”，系统默认帮用户创建1个文本记事项，默认名称为“文本”，这时候焦点直接在详情页，用户可以开始编辑
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 正常新建记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: '4.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '5.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 6. 正常新建记事本，记事本名称默认显示为“记事本”，系统默认帮用户创建1个文本记事项，默认名称为“文本”，这时候焦点直接在详情页，用户可以开始编辑
+    needs_accessible_name: false
+- id: case_1634837
+  name: 仅支持单个窗口开启
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/启用语音记事本(#115131)
+  description: 仅支持单个窗口开启
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 启动语音记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 再次启动语音记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 后台打开语音记事本，打开其他应用
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 再次从Launcher/桌面打开语音记事本应用
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 只支持单实例运行，不会打开2个窗口，只会把之前的一个窗口再次显示出来
+    needs_accessible_name: false
+  - step_type: assert
+    description: '3.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 语音记事本应用显示在前景，不会出现显示多个语音记事本应用窗口的现象
+    needs_accessible_name: false
+- id: case_1634835
+  name: 快捷键启动应用
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/启用语音记事本(#115131)
+  description: 快捷键启动应用
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 在控制中心--》键盘和语言--》快捷键，添加应用快捷键。
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 此时键入快捷键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 添加成功
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 可以打开应用
+    needs_accessible_name: false
+- id: case_1634833
+  name: 终端输入命令启动应用
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/启用语音记事本(#115131)
+  description: 终端输入命令启动应用
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 打开深度终端，输入deepin-voice-note
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按回车
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 成功启动语音记事本，出现主界面
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+- id: case_1634831
+  name: 验证可以正常启动应用
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本102x/启用语音记事本(#115131)
+  description: 验证可以正常启动应用
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击启动器语音记事本应用
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键启动器语音记事本，选择打开
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 右键启动器语音记事本，发送到桌面
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 双击桌面语音记事本应用
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 右键桌面语音记事本应用，选择打开
+    needs_accessible_name: false
+  - step_type: action
+    description: 6. 右键启动器语音记事本，发送到任务栏
+    needs_accessible_name: false
+  - step_type: action
+    description: 7. 点击任务栏语音记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 8. 右键任务栏语音记事本，选择打开
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '3.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '4.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '5.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '6.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '7.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 8. 1~8.正常打开语音记事本应用无异常
+    needs_accessible_name: false
+- id: case_1634829
+  name: 详情页输入不同字符组合：中文、英文、数字、Tab、空格、回车、特殊字符等等，验证在不同字体大小下的显示
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本103x/（SP3）详情页显示优化(#115133)
+  description: 详情页输入不同字符组合：中文、英文、数字、Tab、空格、回车、特殊字符等等，验证在不同字体大小下的显示
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 详情页输入不同字符组合：中文、英文、数字、Tab、空格、回车、特殊字符等等
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 切换系统字体字号（每个字体字号均需验证）
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 输入内容显示正常，无显示截断等异常
+    needs_accessible_name: false
+- id: case_1634719
+  name: 移动记事本过程中快捷键操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本104x/(1040)记事本移动(#115149)
+  description: 移动记事本过程中快捷键操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 左键单击记事本列表中任意记事本不松手，拖拽记事本移动过程中，按Delete快捷键
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 左键单击记事本列表中任意记事本不松手，拖拽记事本移动过程中，按Ctrl+N新建记事本快捷键
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 左键单击记事本列表中任意记事本不松手，拖拽记事本移动过程中，按Ctrl+B新建笔记快捷键
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 左键单击记事本列表中任意记事本不松手，拖拽记事本移动过程中，按F2重命名记事本快捷键
+    needs_accessible_name: false
+  - step_type: action
+    description: 5. 左键单击记事本列表中任意记事本不松手，拖拽记事本移动过程中，按F3重命名笔记快捷键
+    needs_accessible_name: false
+  - step_type: action
+    description: 6. 左键单击记事本列表中任意记事本不松手，拖拽记事本移动过程中，按Ctrl+P保存为MP3快捷键
+    needs_accessible_name: false
+  - step_type: action
+    description: 7. 左键单击记事本列表中任意记事本不松手，拖拽记事本移动过程中，按Ctrl+S保存为TXT快捷键
+    needs_accessible_name: false
+  - step_type: action
+    description: 8. 左键单击记事本列表中任意记事本不松手，拖拽记事本移动过程中，按Ctrl+Y保存语音快捷键
+    needs_accessible_name: false
+  - step_type: action
+    description: 9. 左键单击记事本列表中任意记事本不松手，拖拽记事本移动过程中，按Ctrl+R录音快捷键
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '2.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '3.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '4.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '5.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '6.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '7.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: '8.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 9. 1~9.屏蔽快捷键无异常
+    needs_accessible_name: false
+- id: case_1634499
+  name: 重命名笔记-通过快捷键操作
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本104x/(1040)键盘交互(#115161)
+  description: 重命名笔记-通过快捷键操作
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. Tab键切换焦点至笔记，通过上/下方向键选中指定笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Alt+M
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 通过上/下方向键，选中“重命名”，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 输入任意字符，按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 展开右键菜单
+    needs_accessible_name: false
+  - step_type: assert
+    description: '3.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 正常完成笔记重命名
+    needs_accessible_name: false
+- id: case_1625247
+  name: 关闭主界面
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本1050/标题栏(#115179)
+  description: 关闭主界面
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击工具栏右上角的“x”图标
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 退出应用
+    needs_accessible_name: false
+- id: case_1625243
+  name: 新建记事本
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本1050/记事本条目(#115181)
+  description: 新建记事本
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 点击默认空白页“新建记事本”按钮
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键步骤1记事本，删除记事本
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 按Ctrl+N
+    needs_accessible_name: false
+  - step_type: action
+    description: 4. 点击记事本列表底端“新建记事本”按钮
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 新建记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 恢复为默认空白页
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 新建记事本
+    needs_accessible_name: false
+  - step_type: assert
+    description: 4. 新建记事本
+    needs_accessible_name: false
+- id: case_1625233
+  name: 重命名记事本-正向流程
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本1050/记事本条目(#115181)
+  description: 重命名记事本-正向流程
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键任意记事本，选择“重命名”，输入字符，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按F2键，输入字符，按回车键
+    needs_accessible_name: false
+  - step_type: action
+    description: 3. 鼠标左键双击记事本，输入字符，按回车键
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 成功重命名
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 成功重命名
+    needs_accessible_name: false
+  - step_type: assert
+    description: 3. 成功重命名
+    needs_accessible_name: false
+- id: case_1624807
+  name: 删除语音笔记
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本1050/语音(#115191)
+  description: 删除语音笔记
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 右键语音笔记，删除
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 选中语音笔记，按Delete
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 删除语音笔记无提示
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 删除语音笔记无提示
+    needs_accessible_name: false
+- id: case_1624639
+  name: 全选详情编辑区内容，切换记事本、笔记，取消全选
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本1050/详情页编辑区(#115193)
+  description: 全选详情编辑区内容，切换记事本、笔记，取消全选
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. Ctrl+A全选详情编辑区内容，切换记事本、笔记
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 右键鼠标，选择“全选”，全选编辑区内容，切换记事本、笔记
+    needs_accessible_name: false
+  - step_type: assert
+    description: 1. 取消全选，显示对应记事本和笔记内容
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 取消全选，显示对应记事本和笔记内容
+    needs_accessible_name: false
+- id: case_1624611
+  name: 快捷键预览显示正常
+  module: /V25_2500（测试部专用）/B类解耦商店应用/语音记事本/语音记事本1050/快捷键(#115195)
+  description: 快捷键预览显示正常
+  status: active
+  reason: ''
+  steps:
+  - step_type: action
+    description: 1. 打开应用
+    needs_accessible_name: false
+  - step_type: action
+    description: 2. 按Ctrl+Shift+?
+    needs_accessible_name: false
+  - step_type: assert
+    description: '1.'
+    needs_accessible_name: false
+  - step_type: assert
+    description: 2. 快捷键预览界面，快捷键项显示正确，不显示Ctrl+W语音转文字、Ctrl+P保存为MP3快捷键
+    needs_accessible_name: false
