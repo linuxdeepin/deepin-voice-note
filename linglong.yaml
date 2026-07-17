@@ -3,8 +3,7 @@ package:
   name: deepin-voice.note
   version: 5.10.11
   kind: app
-  description: |
-    voice note for deepin os
+  description: voice note for deepin os
 
 runtime:
   id: org.deepin.Runtime
