@@ -10,6 +10,7 @@ Terminal=false
 TryExec=deepin-voice-note
 Type=Application
 X-Deepin-Vendor=user-custom
+X-Deepin-Singleton=true
 Keywords=deepin-voice-note
 
 # Translations:
