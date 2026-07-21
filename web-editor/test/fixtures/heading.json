@@ -1,0 +1,22 @@
+{
+  "format": "tiptap",
+  "schemaVersion": 1,
+  "content": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": { "level": 2 },
+        "content": [
+          { "type": "text", "text": "会议纪要" }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          { "type": "text", "text": "正文" }
+        ]
+      }
+    ]
+  }
+}

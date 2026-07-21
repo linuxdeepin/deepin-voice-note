@@ -1,0 +1,18 @@
+{
+  "format": "tiptap",
+  "schemaVersion": 1,
+  "content": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "image",
+        "attrs": {
+          "src": "images/photo.png",
+          "relPath": "images/photo.png",
+          "alt": "",
+          "title": null
+        }
+      }
+    ]
+  }
+}

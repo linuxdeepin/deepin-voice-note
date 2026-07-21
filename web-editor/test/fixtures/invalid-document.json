@@ -1,0 +1,10 @@
+{
+  "format": "tiptap",
+  "schemaVersion": 1,
+  "content": {
+    "type": "doc",
+    "content": [
+      { "type": "unknownNode" }
+    ]
+  }
+}

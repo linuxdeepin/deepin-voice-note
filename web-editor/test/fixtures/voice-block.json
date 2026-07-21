@@ -1,0 +1,21 @@
+{
+  "format": "tiptap",
+  "schemaVersion": 1,
+  "content": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "voiceBlock",
+        "attrs": {
+          "voiceId": "voice-uuid",
+          "voicePath": "voicenote/20260717-100000.mp3",
+          "voiceSize": 120000,
+          "createTime": "2026-07-17 10:00:00",
+          "title": "录音",
+          "text": "转写文本",
+          "translateUnfold": true
+        }
+      }
+    ]
+  }
+}

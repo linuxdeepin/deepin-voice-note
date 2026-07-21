@@ -1,0 +1,28 @@
+{
+  "format": "tiptap",
+  "schemaVersion": 1,
+  "content": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "重点内容",
+            "marks": [
+              { "type": "bold" },
+              { "type": "italic" },
+              { "type": "underline" },
+              { "type": "strike" },
+              { "type": "color", "attrs": { "color": "#ff0000" } },
+              { "type": "highlight", "attrs": { "color": "#fff2cc" } },
+              { "type": "fontFamily", "attrs": { "fontFamily": "Noto Sans CJK SC" } },
+              { "type": "fontSize", "attrs": { "fontSize": "16px" } }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
