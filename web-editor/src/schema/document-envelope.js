@@ -9,7 +9,11 @@ import {
   TIPTAP_SCHEMA_VERSION,
 } from './schema-version.js'
 
-const UNSAFE_URL_RE = /^(?:javascript|data|vbscript):/i
+const MAX_NODE_DEPTH = 100
+const URL_SCHEME_RE = /^([a-z][a-z0-9+.-]*):/i
+const URL_SCHEME_OBFUSCATION_RE = /[\u0000-\u0020\u007f\s]/g
+const URL_NETWORK_PATH_RE = /^(?:\/\/|\\\\)/
+const SAFE_IMAGE_URL_SCHEMES = new Set(['http', 'https'])
 
 export function createEmptyDoc() {
   return {
@@ -65,16 +69,23 @@ export function validateEnvelope(envelope, schema = createTiptapSchemaV1()) {
 
   walkNode(envelope.content, 'content', errors)
 
-  try {
-    schema.nodeFromJSON(envelope.content)
-  } catch (err) {
-    errors.push(error('content', 'schema-validation-failed', err.message))
+  if (!errors.some(error => error.code === 'max-node-depth-exceeded')) {
+    try {
+      schema.nodeFromJSON(envelope.content)
+    } catch (err) {
+      errors.push(error('content', 'schema-validation-failed', err.message))
+    }
   }
 
   return { ok: errors.length === 0, errors }
 }
 
-function walkNode(node, path, errors) {
+function walkNode(node, path, errors, depth = 0) {
+  if (depth > MAX_NODE_DEPTH) {
+    errors.push(error(path, 'max-node-depth-exceeded', `node depth must not exceed ${MAX_NODE_DEPTH}`))
+    return
+  }
+
   if (!node || typeof node !== 'object' || Array.isArray(node)) {
     errors.push(error(path, 'invalid-node', 'node must be an object'))
     return
@@ -101,7 +112,7 @@ function walkNode(node, path, errors) {
     const src = node.attrs?.src
     if (typeof src !== 'string' || src.length === 0) {
       errors.push(error(`${path}.attrs.src`, 'invalid-image-src', 'image src is required'))
-    } else if (UNSAFE_URL_RE.test(src.trim())) {
+    } else if (!isSafeImageSrc(src)) {
       errors.push(error(`${path}.attrs.src`, 'unsafe-image-src', 'image src uses an unsafe URL scheme'))
     }
   }
@@ -139,9 +150,24 @@ function walkNode(node, path, errors) {
       return
     }
     for (let index = 0; index < node.content.length; ++index) {
-      walkNode(node.content[index], `${path}.content[${index}]`, errors)
+      walkNode(node.content[index], `${path}.content[${index}]`, errors, depth + 1)
     }
   }
+}
+
+function isSafeImageSrc(src) {
+  const trimmed = src.trim()
+  if (trimmed.length === 0) {
+    return false
+  }
+
+  const normalized = trimmed.replace(URL_SCHEME_OBFUSCATION_RE, '')
+  if (normalized.length === 0 || URL_NETWORK_PATH_RE.test(normalized)) {
+    return false
+  }
+
+  const scheme = normalized.match(URL_SCHEME_RE)?.[1]?.toLowerCase()
+  return !scheme || SAFE_IMAGE_URL_SCHEMES.has(scheme)
 }
 
 function nonEmptyString(value) {

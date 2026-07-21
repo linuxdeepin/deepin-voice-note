@@ -135,3 +135,59 @@ test('Images reject dangerous URL schemes', () => {
   assert.equal(result.ok, false)
   assert.equal(result.errors.some(error => error.code === 'unsafe-image-src'), true)
 })
+
+test('Images reject obfuscated and non-http URL schemes', () => {
+  const unsafeSrcs = [
+    'java\tscript:alert(1)',
+    'data \n:text/html,<script>alert(1)</script>',
+    'vbscript\r:msgbox(1)',
+    'file:///etc/passwd',
+    'mailto:test@example.com',
+    '//example.com/protocol-relative.png',
+    '\\\\example.com\\share.png',
+  ]
+
+  for (const src of unsafeSrcs) {
+    const result = validateEnvelope(createEnvelope({
+      type: 'doc',
+      content: [{ type: 'image', attrs: { src } }],
+    }))
+
+    assert.equal(result.ok, false)
+    assert.equal(result.errors.some(error => error.code === 'unsafe-image-src'), true)
+  }
+})
+
+test('Images allow http, https and relative URLs', () => {
+  const safeSrcs = [
+    'https://example.com/photo.png',
+    'http://example.com/photo.png',
+    ' HTTP ://example.com/photo.png',
+    'images/photo.png',
+    './images/photo.png',
+  ]
+
+  for (const src of safeSrcs) {
+    const result = validateEnvelope(createEnvelope({
+      type: 'doc',
+      content: [{ type: 'image', attrs: { src } }],
+    }))
+
+    assert.equal(result.ok, true)
+  }
+})
+
+test('Envelope validation rejects documents beyond the maximum node depth', () => {
+  let node = { type: 'paragraph' }
+  for (let index = 0; index < 120; ++index) {
+    node = { type: 'blockquote', content: [node] }
+  }
+
+  const result = validateEnvelope(createEnvelope({
+    type: 'doc',
+    content: [node],
+  }))
+
+  assert.equal(result.ok, false)
+  assert.equal(result.errors.some(error => error.code === 'max-node-depth-exceeded'), true)
+})
