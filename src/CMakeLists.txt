@@ -29,6 +29,7 @@ else()
 endif()
 
 find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBXML2 REQUIRED libxml-2.0)
 
 # 保证 src 目录下头文件全局可见
 include_directories(src)
@@ -39,6 +40,7 @@ include_directories(./importolddata/tiptapmigration)
 include_directories(./db)
 include_directories(./handler)
 include_directories(./audio)
+include_directories(${LIBXML2_INCLUDE_DIRS})
 
 aux_source_directory(./ ALLSOURCE)
 aux_source_directory(./dbusservice ALLSOURCE)
@@ -97,6 +99,7 @@ endif()
 pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
 include_directories(${GSTREAMER_INCLUDE_DIRS})
 target_link_libraries(${BIN_NAME} PRIVATE ${GSTREAMER_LIBRARIES})
+target_link_libraries(${BIN_NAME} PRIVATE ${LIBXML2_LIBRARIES})
 
 # Add install rule
 install(TARGETS ${BIN_NAME} DESTINATION ${APP_BIN_INSTALL_DIR})

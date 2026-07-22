@@ -41,7 +41,10 @@ find_package(Qt5Test REQUIRED)
 find_package(GTest REQUIRED)
 find_package(Qt5Svg REQUIRED)
 find_package(Qt5Xml REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBXML2 REQUIRED libxml-2.0)
 include_directories(${GTEST_INCLUDE_DIRS})
+include_directories(${LIBXML2_INCLUDE_DIRS})
 include_directories(src)
 
 set(PROJECT_NAME_TEST
@@ -93,6 +96,7 @@ target_link_libraries(${PROJECT_NAME_TEST}
     Qt5::WebEngineWidgets
     ${Qt5Svg_LIBRARIES}
     ${Qt5Xml_LIBRARIES}
+    ${LIBXML2_LIBRARIES}
 )
 
 ##------------------------------ 创建'make test'指令---------------------------------------
@@ -104,4 +108,3 @@ add_custom_target(test
 
 ##'make test'命令依赖与我们的测试程序
 add_dependencies(test ${PROJECT_NAME_TEST})
-
