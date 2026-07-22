@@ -18,6 +18,7 @@ public:
     static QJsonObject makeText(const QString &text, const QJsonArray &marks = QJsonArray());
     static QJsonObject makeHardBreak();
     static QJsonObject makeHeading(int level, const QJsonArray &content = QJsonArray());
+    static QJsonObject makeBlockquote(const QJsonArray &content = QJsonArray());
     static QJsonObject makeMark(const QString &type, const QJsonObject &attrs = QJsonObject());
     static QJsonObject makeImage(const QString &src,
                                  const QString &relPath = QString(),

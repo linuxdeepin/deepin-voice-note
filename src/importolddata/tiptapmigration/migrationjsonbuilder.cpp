@@ -62,6 +62,14 @@ QJsonObject MigrationJsonBuilder::makeHeading(int level, const QJsonArray &conte
     return node;
 }
 
+QJsonObject MigrationJsonBuilder::makeBlockquote(const QJsonArray &content)
+{
+    QJsonObject node;
+    node.insert(QStringLiteral("type"), QStringLiteral("blockquote"));
+    node.insert(QStringLiteral("content"), normalizedDocContent(content));
+    return node;
+}
+
 QJsonObject MigrationJsonBuilder::makeMark(const QString &type, const QJsonObject &attrs)
 {
     QJsonObject mark;

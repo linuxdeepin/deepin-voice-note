@@ -89,10 +89,15 @@ TEST(UT_MigrationJsonBuilder, CreatesHeadingAndHardBreak)
 {
     const QJsonObject heading = MigrationJsonBuilder::makeHeading(
         2, QJsonArray { MigrationJsonBuilder::makeText(QStringLiteral("标题")) });
+    const QJsonObject blockquote = MigrationJsonBuilder::makeBlockquote(
+        arrayOf(MigrationJsonBuilder::makeParagraph(arrayOf(MigrationJsonBuilder::makeText(QStringLiteral("引用"))))));
     const QJsonObject hardBreak = MigrationJsonBuilder::makeHardBreak();
 
     expectNodeType(heading, QStringLiteral("heading"));
     EXPECT_EQ(2, attrsOf(heading).value(QStringLiteral("level")).toInt());
+    expectNodeType(blockquote, QStringLiteral("blockquote"));
+    ASSERT_EQ(1, blockquote.value(QStringLiteral("content")).toArray().size());
+    expectNodeType(blockquote.value(QStringLiteral("content")).toArray().at(0).toObject(), QStringLiteral("paragraph"));
     expectNodeType(hardBreak, QStringLiteral("hardBreak"));
 }
 
