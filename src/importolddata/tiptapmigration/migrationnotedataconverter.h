@@ -27,6 +27,8 @@ class MigrationNoteDataConverter
 public:
     static MigrationNoteDataConversionResult convertTextBlocks(const QString &metadataJson);
     static MigrationNoteDataConversionResult convertTextBlocks(const QJsonObject &metadata);
+    static MigrationNoteDataConversionResult convertBlocks(const QString &metadataJson);
+    static MigrationNoteDataConversionResult convertBlocks(const QJsonObject &metadata);
 };
 
 #endif // MIGRATIONNOTEDATACONVERTER_H

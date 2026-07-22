@@ -10,7 +10,6 @@
 #include <QDir>
 #include <QFile>
 #include <QJsonArray>
-#include <QJsonDocument>
 #include <QJsonObject>
 #include <QProcess>
 #include <QTemporaryFile>
@@ -50,6 +49,11 @@ QJsonArray paragraphContent(const QJsonObject &paragraph)
     return paragraph.value(QStringLiteral("content")).toArray();
 }
 
+QJsonObject nodeAttrs(const QJsonObject &node)
+{
+    return node.value(QStringLiteral("attrs")).toObject();
+}
+
 void expectNodeType(const QJsonObject &node, const QString &type)
 {
     EXPECT_EQ(type, node.value(QStringLiteral("type")).toString());
@@ -68,6 +72,28 @@ QString findRepoRoot()
     }
 
     return QString();
+}
+
+void expectPassesValidators(const QJsonObject &envelope)
+{
+    const MigrationJsonValidationResult validation = MigrationJsonValidator::validateEnvelope(envelope);
+    EXPECT_TRUE(validation.ok()) << (validation.errors.isEmpty() ? std::string() : validation.errors.value(0).code.toStdString());
+
+    const QString repoRoot = findRepoRoot();
+    if (repoRoot.isEmpty()) {
+        GTEST_SKIP() << "web-editor/scripts/validate-envelope.mjs not found";
+    }
+
+    QTemporaryFile envelopeFile(QDir::tempPath() + QStringLiteral("/note-data-envelope-XXXXXX.json"));
+    ASSERT_TRUE(envelopeFile.open());
+    ASSERT_NE(-1, envelopeFile.write(MigrationJsonBuilder::toCompactJson(envelope).toUtf8()));
+    ASSERT_TRUE(envelopeFile.flush());
+
+    QProcess validator;
+    validator.setWorkingDirectory(repoRoot);
+    validator.start(QStringLiteral("node"), { QStringLiteral("web-editor/scripts/validate-envelope.mjs"), envelopeFile.fileName() });
+    ASSERT_TRUE(validator.waitForFinished(30000));
+    EXPECT_EQ(0, validator.exitCode()) << validator.readAllStandardError().toStdString();
 }
 
 } // namespace
@@ -196,22 +222,128 @@ TEST(UT_MigrationNoteDataConverter, ComparesGoldenJsonAndPassesValidators)
 
     EXPECT_TRUE(result.ok());
     EXPECT_EQ(golden, MigrationJsonBuilder::toCompactJson(result.envelope));
+    expectPassesValidators(result.envelope);
+}
+
+TEST(UT_MigrationNoteDataConverter, ConvertsVoiceBlockGoldenAndPassesValidators)
+{
+    const QString metadata = QStringLiteral(
+        R"({"noteDatas":[{"type":2,"voiceId":"voice-1","voicePath":"voicenote/a.mp3","voiceSize":60000,"createTime":"2026-07-17 10:00:00","title":"录音","text":"转写文本"}]})");
+    const QString golden = QStringLiteral(
+        R"({"content":{"content":[{"attrs":{"createTime":"2026-07-17 10:00:00","text":"转写文本","title":"录音","translateUnfold":true,"voiceId":"voice-1","voicePath":"voicenote/a.mp3","voiceSize":60000},"type":"voiceBlock"}],"type":"doc"},"format":"tiptap","schemaVersion":1})");
+
+    const MigrationNoteDataConversionResult result = MigrationNoteDataConverter::convertBlocks(metadata);
+
+    EXPECT_TRUE(result.ok());
+    EXPECT_TRUE(result.warnings.isEmpty());
+    EXPECT_EQ(golden, MigrationJsonBuilder::toCompactJson(result.envelope));
+    expectPassesValidators(result.envelope);
+}
+
+TEST(UT_MigrationNoteDataConverter, ConvertsMixedTextAndVoiceBlocksPreservingOrder)
+{
+    const QString metadata = QStringLiteral(
+        R"({"noteDatas":[{"type":1,"text":"before"},{"type":2,"voiceId":"voice-2","voicePath":"voicenote/b.mp3","voiceSize":12,"title":"voice"},{"type":1,"text":"after"}]})");
+
+    const MigrationNoteDataConversionResult result = MigrationNoteDataConverter::convertBlocks(metadata);
+
+    EXPECT_TRUE(result.ok());
+    const QJsonArray content = docContent(result);
+    ASSERT_EQ(3, content.size());
+    expectNodeType(content.at(0).toObject(), QStringLiteral("paragraph"));
+    EXPECT_EQ(QStringLiteral("before"), paragraphContent(content.at(0).toObject()).at(0).toObject().value(QStringLiteral("text")).toString());
+    expectNodeType(content.at(1).toObject(), QStringLiteral("voiceBlock"));
+    EXPECT_EQ(QStringLiteral("voice-2"), nodeAttrs(content.at(1).toObject()).value(QStringLiteral("voiceId")).toString());
+    expectNodeType(content.at(2).toObject(), QStringLiteral("paragraph"));
+    EXPECT_EQ(QStringLiteral("after"), paragraphContent(content.at(2).toObject()).at(0).toObject().value(QStringLiteral("text")).toString());
+}
+
+TEST(UT_MigrationNoteDataConverter, GeneratesVoiceIdNormalizesPathAndParsesVoiceSize)
+{
+    QJsonObject voiceBlock;
+    voiceBlock.insert(QStringLiteral("type"), 2);
+    voiceBlock.insert(QStringLiteral("voicePath"), QStringLiteral("/tmp/recordings/a.mp3"));
+    voiceBlock.insert(QStringLiteral("voiceSize"), QStringLiteral("60000"));
+    voiceBlock.insert(QStringLiteral("createTime"), QStringLiteral("2026-07-17 10:00:00"));
+    voiceBlock.insert(QStringLiteral("title"), QStringLiteral("录音"));
+    const QJsonObject metadata { { QStringLiteral("noteDatas"), QJsonArray { voiceBlock } } };
+
+    const MigrationNoteDataConversionResult first = MigrationNoteDataConverter::convertBlocks(metadata);
+    const MigrationNoteDataConversionResult second = MigrationNoteDataConverter::convertBlocks(metadata);
+
+    EXPECT_TRUE(first.ok());
+    EXPECT_TRUE(hasWarningCode(first, QStringLiteral("generated-voice-id")));
+    EXPECT_TRUE(hasWarningCode(first, QStringLiteral("normalized-voice-path")));
+    const QJsonObject attrs = nodeAttrs(docContent(first).at(0).toObject());
+    EXPECT_TRUE(attrs.value(QStringLiteral("voiceId")).toString().startsWith(QStringLiteral("legacy-voice-")));
+    EXPECT_EQ(attrs.value(QStringLiteral("voiceId")).toString(), nodeAttrs(docContent(second).at(0).toObject()).value(QStringLiteral("voiceId")).toString());
+    EXPECT_EQ(QStringLiteral("voicenote/a.mp3"), attrs.value(QStringLiteral("voicePath")).toString());
+    EXPECT_EQ(60000, attrs.value(QStringLiteral("voiceSize")).toInt());
+}
+
+TEST(UT_MigrationNoteDataConverter, CoercesInvalidVoiceSizeAndStringFieldsWithWarnings)
+{
+    QJsonObject voiceBlock;
+    voiceBlock.insert(QStringLiteral("type"), 2);
+    voiceBlock.insert(QStringLiteral("voiceId"), QStringLiteral("voice-3"));
+    voiceBlock.insert(QStringLiteral("voicePath"), QStringLiteral("voicenote/c.mp3"));
+    voiceBlock.insert(QStringLiteral("voiceSize"), -10);
+    voiceBlock.insert(QStringLiteral("title"), 12);
+    voiceBlock.insert(QStringLiteral("text"), true);
+    const QJsonObject metadata { { QStringLiteral("noteDatas"), QJsonArray { voiceBlock } } };
+
+    const MigrationNoteDataConversionResult result = MigrationNoteDataConverter::convertBlocks(metadata);
+
+    EXPECT_TRUE(result.ok());
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("negative-voice-size")));
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("invalid-voice-string-field")));
+    const QJsonObject attrs = nodeAttrs(docContent(result).at(0).toObject());
+    EXPECT_EQ(0, attrs.value(QStringLiteral("voiceSize")).toInt());
+    EXPECT_TRUE(attrs.value(QStringLiteral("title")).isNull());
+    EXPECT_TRUE(attrs.value(QStringLiteral("text")).isNull());
+}
+
+TEST(UT_MigrationNoteDataConverter, SkipsVoiceBlockWithoutPathAsError)
+{
+    const QString metadata = QStringLiteral(
+        R"({"noteDatas":[{"type":1,"text":"before"},{"type":2,"voiceId":"voice-missing-path","voiceSize":1},{"type":1,"text":"after"}]})");
+
+    const MigrationNoteDataConversionResult result = MigrationNoteDataConverter::convertBlocks(metadata);
+
+    EXPECT_FALSE(result.ok());
+    EXPECT_TRUE(hasErrorCode(result, QStringLiteral("missing-voice-path")));
+    const QJsonArray content = docContent(result);
+    ASSERT_EQ(2, content.size());
+    EXPECT_EQ(QStringLiteral("before"), paragraphContent(content.at(0).toObject()).at(0).toObject().value(QStringLiteral("text")).toString());
+    EXPECT_EQ(QStringLiteral("after"), paragraphContent(content.at(1).toObject()).at(0).toObject().value(QStringLiteral("text")).toString());
     const MigrationJsonValidationResult validation = MigrationJsonValidator::validateEnvelope(result.envelope);
-    EXPECT_TRUE(validation.ok()) << validation.errors.value(0).code.toStdString();
+    EXPECT_TRUE(validation.ok()) << (validation.errors.isEmpty() ? std::string() : validation.errors.value(0).code.toStdString());
+}
 
-    const QString repoRoot = findRepoRoot();
-    if (repoRoot.isEmpty()) {
-        GTEST_SKIP() << "web-editor/scripts/validate-envelope.mjs not found";
+TEST(UT_MigrationNoteDataConverter, RejectsUnsafeVoicePaths)
+{
+    const QStringList unsafePaths {
+        QStringLiteral("voicenote/../escape.mp3"),
+        QStringLiteral("voicenote/./a.mp3"),
+        QStringLiteral("voicenote//a.mp3"),
+        QStringLiteral("/tmp/voicenote/../../etc/passwd"),
+        QStringLiteral("/tmp//recordings/a.mp3"),
+    };
+
+    for (const QString &voicePath : unsafePaths) {
+        QJsonObject voiceBlock;
+        voiceBlock.insert(QStringLiteral("type"), 2);
+        voiceBlock.insert(QStringLiteral("voiceId"), QStringLiteral("voice-unsafe"));
+        voiceBlock.insert(QStringLiteral("voicePath"), voicePath);
+        voiceBlock.insert(QStringLiteral("voiceSize"), 1);
+        const QJsonObject metadata { { QStringLiteral("noteDatas"), QJsonArray { voiceBlock } } };
+
+        const MigrationNoteDataConversionResult result = MigrationNoteDataConverter::convertBlocks(metadata);
+
+        EXPECT_FALSE(result.ok()) << voicePath.toStdString();
+        EXPECT_TRUE(hasErrorCode(result, QStringLiteral("invalid-voice-path"))) << voicePath.toStdString();
+        const QJsonArray content = docContent(result);
+        ASSERT_EQ(1, content.size()) << voicePath.toStdString();
+        expectNodeType(content.at(0).toObject(), QStringLiteral("paragraph"));
     }
-
-    QTemporaryFile envelopeFile(QDir::tempPath() + QStringLiteral("/note-data-text-envelope-XXXXXX.json"));
-    ASSERT_TRUE(envelopeFile.open());
-    ASSERT_NE(-1, envelopeFile.write(MigrationJsonBuilder::toCompactJson(result.envelope).toUtf8()));
-    ASSERT_TRUE(envelopeFile.flush());
-
-    QProcess validator;
-    validator.setWorkingDirectory(repoRoot);
-    validator.start(QStringLiteral("node"), { QStringLiteral("web-editor/scripts/validate-envelope.mjs"), envelopeFile.fileName() });
-    ASSERT_TRUE(validator.waitForFinished(30000));
-    EXPECT_EQ(0, validator.exitCode()) << validator.readAllStandardError().toStdString();
 }
