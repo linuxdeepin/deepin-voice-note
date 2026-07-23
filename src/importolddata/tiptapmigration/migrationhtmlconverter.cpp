@@ -7,8 +7,11 @@
 #include "migrationjsonbuilder.h"
 
 #include <QJsonArray>
+#include <QJsonObject>
 #include <QJsonValue>
+#include <QRegularExpression>
 #include <QSet>
+#include <QStringList>
 
 namespace {
 
@@ -60,6 +63,21 @@ const QSet<QString> &blockTags()
     return tags;
 }
 
+const QSet<QString> &supportedStyleProperties()
+{
+    static const QSet<QString> properties {
+        QStringLiteral("background-color"),
+        QStringLiteral("color"),
+        QStringLiteral("font-family"),
+        QStringLiteral("font-size"),
+        QStringLiteral("font-style"),
+        QStringLiteral("font-weight"),
+        QStringLiteral("text-decoration"),
+        QStringLiteral("text-decoration-line")
+    };
+    return properties;
+}
+
 void addIssue(QVector<MigrationHtmlConversionIssue> &issues,
               const QString &path,
               const QString &code,
@@ -74,6 +92,11 @@ void addWarning(MigrationHtmlConversionResult &result,
                 const QString &message)
 {
     addIssue(result.warnings, path, code, message);
+}
+
+QString elementPath(const MigrationHtmlNode &node)
+{
+    return QStringLiteral("/%1").arg(node.tagName.isEmpty() ? QStringLiteral("node") : node.tagName);
 }
 
 void copyParseIssues(const MigrationHtmlParseResult &parsed, MigrationHtmlConversionResult &result)
@@ -123,6 +146,11 @@ bool isHardBreakNode(const QJsonValue &value)
     return value.isObject() && value.toObject().value(QStringLiteral("type")).toString() == QStringLiteral("hardBreak");
 }
 
+QJsonArray marksOfTextNode(const QJsonObject &node)
+{
+    return node.value(QStringLiteral("marks")).toArray();
+}
+
 bool contentEndsWithSpace(const QJsonArray &content)
 {
     if (content.isEmpty() || !isTextNode(content.at(content.size() - 1))) {
@@ -132,7 +160,57 @@ bool contentEndsWithSpace(const QJsonArray &content)
     return content.at(content.size() - 1).toObject().value(QStringLiteral("text")).toString().endsWith(QLatin1Char(' '));
 }
 
-void appendTextNode(QJsonArray &content, const QString &text)
+QString markTypeOf(const QJsonValue &value)
+{
+    return value.isObject() ? value.toObject().value(QStringLiteral("type")).toString() : QString();
+}
+
+QJsonArray withoutMarkType(const QJsonArray &marks, const QString &type)
+{
+    QJsonArray filtered;
+    for (const QJsonValue &mark : marks) {
+        if (markTypeOf(mark) != type) {
+            filtered.append(mark);
+        }
+    }
+    return filtered;
+}
+
+QJsonArray withMark(QJsonArray marks, const QJsonObject &mark)
+{
+    const QString type = mark.value(QStringLiteral("type")).toString();
+    if (type.isEmpty()) {
+        return marks;
+    }
+
+    marks = withoutMarkType(marks, type);
+    marks.append(mark);
+    return marks;
+}
+
+QJsonArray withSimpleMark(const QJsonArray &marks, const QString &type)
+{
+    return withMark(marks, MigrationJsonBuilder::makeMark(type));
+}
+
+QJsonArray withoutSimpleMark(const QJsonArray &marks, const QString &type)
+{
+    return withoutMarkType(marks, type);
+}
+
+QJsonArray withAttrMark(const QJsonArray &marks,
+                        const QString &type,
+                        const QString &attrName,
+                        const QString &attrValue)
+{
+    if (attrValue.isEmpty()) {
+        return marks;
+    }
+
+    return withMark(marks, MigrationJsonBuilder::makeMark(type, QJsonObject { { attrName, attrValue } }));
+}
+
+void appendTextNode(QJsonArray &content, const QString &text, const QJsonArray &marks)
 {
     if (text.isEmpty()) {
         return;
@@ -140,15 +218,17 @@ void appendTextNode(QJsonArray &content, const QString &text)
 
     if (!content.isEmpty() && isTextNode(content.at(content.size() - 1))) {
         QJsonObject last = content.at(content.size() - 1).toObject();
-        last.insert(QStringLiteral("text"), last.value(QStringLiteral("text")).toString() + text);
-        content.replace(content.size() - 1, last);
-        return;
+        if (marksOfTextNode(last) == marks) {
+            last.insert(QStringLiteral("text"), last.value(QStringLiteral("text")).toString() + text);
+            content.replace(content.size() - 1, last);
+            return;
+        }
     }
 
-    content.append(MigrationJsonBuilder::makeText(text));
+    content.append(MigrationJsonBuilder::makeText(text, marks));
 }
 
-void appendVisibleText(QJsonArray &content, const QString &text)
+void appendVisibleText(QJsonArray &content, const QString &text, const QJsonArray &marks)
 {
     QString normalized;
     bool pendingSpace = false;
@@ -173,7 +253,7 @@ void appendVisibleText(QJsonArray &content, const QString &text)
         normalized.append(QLatin1Char(' '));
     }
 
-    appendTextNode(content, normalized);
+    appendTextNode(content, normalized, marks);
 }
 
 void trimTrailingTextSpace(QJsonArray &content)
@@ -202,24 +282,348 @@ void appendHardBreak(QJsonArray &content)
     content.append(MigrationJsonBuilder::makeHardBreak());
 }
 
-void appendInlineNode(const MigrationHtmlNode &node, QJsonArray &content, MigrationHtmlConversionResult &result);
-
-void appendInlineChildren(const MigrationHtmlNode &node, QJsonArray &content, MigrationHtmlConversionResult &result)
+QString stripImportant(QString value)
 {
-    for (const MigrationHtmlNode &child : node.children) {
-        appendInlineNode(child, content, result);
+    value = value.trimmed();
+    if (value.endsWith(QStringLiteral("!important"), Qt::CaseInsensitive)) {
+        value.chop(QStringLiteral("!important").size());
+        value = value.trimmed();
+    }
+    return value;
+}
+
+QStringList styleDeclarations(const MigrationHtmlNode &node)
+{
+    return MigrationHtmlParser::attribute(node, QStringLiteral("style")).split(QLatin1Char(';'), Qt::SkipEmptyParts);
+}
+
+void warnUnsupportedStyle(const MigrationHtmlNode &node,
+                          const QString &property,
+                          MigrationHtmlConversionResult &result)
+{
+    addWarning(result,
+               elementPath(node) + QStringLiteral(".style.%1").arg(property),
+               QStringLiteral("unsupported-html-style"),
+               QStringLiteral("HTML style '%1' is not supported by this migration step and was ignored").arg(property));
+}
+
+void warnInvalidStyleValue(const MigrationHtmlNode &node,
+                           const QString &property,
+                           MigrationHtmlConversionResult &result)
+{
+    addWarning(result,
+               elementPath(node) + QStringLiteral(".style.%1").arg(property),
+               QStringLiteral("invalid-html-style-value"),
+               QStringLiteral("HTML style '%1' has an unsupported value and was ignored").arg(property));
+}
+
+QString normalizedHexByte(int value)
+{
+    return QStringLiteral("%1").arg(value, 2, 16, QLatin1Char('0'));
+}
+
+QString normalizedColorValue(QString value)
+{
+    value = stripImportant(value).toLower();
+    value.remove(QLatin1Char(' '));
+    if (value.isEmpty()) {
+        return QString();
+    }
+
+    static const QRegularExpression shortHex(QStringLiteral("^#([0-9a-f]{3})$"));
+    const QRegularExpressionMatch shortHexMatch = shortHex.match(value);
+    if (shortHexMatch.hasMatch()) {
+        const QString digits = shortHexMatch.captured(1);
+        return QStringLiteral("#%1%1%2%2%3%3")
+            .arg(digits.at(0))
+            .arg(digits.at(1))
+            .arg(digits.at(2));
+    }
+
+    static const QRegularExpression longHex(QStringLiteral("^#[0-9a-f]{6}$"));
+    if (longHex.match(value).hasMatch()) {
+        return value;
+    }
+
+    static const QRegularExpression rgbColor(
+        QStringLiteral("^rgba?\\((\\d{1,3}),(\\d{1,3}),(\\d{1,3})(?:,(?:0|1|0?\\.\\d+))?\\)$"));
+    const QRegularExpressionMatch rgbMatch = rgbColor.match(value);
+    if (rgbMatch.hasMatch()) {
+        bool redOk = false;
+        bool greenOk = false;
+        bool blueOk = false;
+        const int red = rgbMatch.captured(1).toInt(&redOk);
+        const int green = rgbMatch.captured(2).toInt(&greenOk);
+        const int blue = rgbMatch.captured(3).toInt(&blueOk);
+        if (redOk && greenOk && blueOk && red >= 0 && red <= 255 && green >= 0 && green <= 255 && blue >= 0 && blue <= 255) {
+            return QStringLiteral("#%1%2%3")
+                .arg(normalizedHexByte(red), normalizedHexByte(green), normalizedHexByte(blue));
+        }
+    }
+
+    static const QSet<QString> namedColors {
+        QStringLiteral("black"),
+        QStringLiteral("blue"),
+        QStringLiteral("cyan"),
+        QStringLiteral("gray"),
+        QStringLiteral("green"),
+        QStringLiteral("grey"),
+        QStringLiteral("magenta"),
+        QStringLiteral("orange"),
+        QStringLiteral("purple"),
+        QStringLiteral("red"),
+        QStringLiteral("transparent"),
+        QStringLiteral("white"),
+        QStringLiteral("yellow")
+    };
+    if (namedColors.contains(value)) {
+        return value;
+    }
+
+    return QString();
+}
+
+QString normalizedFontFamily(QString value)
+{
+    value = stripImportant(value).trimmed();
+    return value.contains(QLatin1Char(';')) ? QString() : value;
+}
+
+QString normalizedFontSize(QString value)
+{
+    value = stripImportant(value).trimmed().toLower();
+    static const QRegularExpression cssSize(QStringLiteral("^\\d+(?:\\.\\d+)?(?:px|pt|em|rem|%)$"));
+    return cssSize.match(value).hasMatch() ? value : QString();
+}
+
+bool isBoldFontWeight(QString value, bool *known)
+{
+    value = stripImportant(value).trimmed().toLower();
+    *known = true;
+    if (value == QStringLiteral("bold") || value == QStringLiteral("bolder")) {
+        return true;
+    }
+    if (value == QStringLiteral("normal") || value == QStringLiteral("lighter")) {
+        return false;
+    }
+
+    bool ok = false;
+    const int numericWeight = value.toInt(&ok);
+    if (ok) {
+        return numericWeight >= 600;
+    }
+
+    *known = false;
+    return false;
+}
+
+bool isItalicFontStyle(QString value, bool *known)
+{
+    value = stripImportant(value).trimmed().toLower();
+    *known = true;
+    if (value == QStringLiteral("italic") || value == QStringLiteral("oblique")) {
+        return true;
+    }
+    if (value == QStringLiteral("normal")) {
+        return false;
+    }
+
+    *known = false;
+    return false;
+}
+
+void applyTextDecorationMarks(const MigrationHtmlNode &node,
+                              const QString &property,
+                              QString value,
+                              QJsonArray *marks,
+                              MigrationHtmlConversionResult &result)
+{
+    value = stripImportant(value).toLower();
+    const QStringList tokens = value.split(QRegularExpression(QStringLiteral("\\s+")), Qt::SkipEmptyParts);
+    if (tokens.isEmpty()) {
+        warnInvalidStyleValue(node, property, result);
+        return;
+    }
+
+    bool hasUnsupportedToken = false;
+    bool hasDecorationToken = false;
+    bool hasNoneToken = false;
+    for (const QString &token : tokens) {
+        if (token == QStringLiteral("underline")) {
+            *marks = withSimpleMark(*marks, QStringLiteral("underline"));
+            hasDecorationToken = true;
+        } else if (token == QStringLiteral("line-through")) {
+            *marks = withSimpleMark(*marks, QStringLiteral("strike"));
+            hasDecorationToken = true;
+        } else if (token == QStringLiteral("none")) {
+            hasNoneToken = true;
+        } else {
+            hasUnsupportedToken = true;
+        }
+    }
+
+    // Treat a standalone 'none' as an explicit close for inherited decoration marks.
+    if (hasNoneToken && !hasDecorationToken) {
+        *marks = withoutSimpleMark(*marks, QStringLiteral("underline"));
+        *marks = withoutSimpleMark(*marks, QStringLiteral("strike"));
+    }
+
+    if (hasUnsupportedToken) {
+        warnInvalidStyleValue(node, property, result);
     }
 }
 
-void appendInlineNode(const MigrationHtmlNode &node, QJsonArray &content, MigrationHtmlConversionResult &result)
+void warnUnsupportedStyleDeclarations(const MigrationHtmlNode &node, MigrationHtmlConversionResult &result)
+{
+    for (const QString &declaration : styleDeclarations(node)) {
+        const int colonIndex = declaration.indexOf(QLatin1Char(':'));
+        if (colonIndex <= 0) {
+            continue;
+        }
+
+        const QString property = declaration.left(colonIndex).trimmed().toLower();
+        if (!property.isEmpty() && !supportedStyleProperties().contains(property)) {
+            warnUnsupportedStyle(node, property, result);
+        }
+    }
+}
+
+void applyStyleMarks(const MigrationHtmlNode &node, QJsonArray *marks, MigrationHtmlConversionResult &result)
+{
+    for (const QString &declaration : styleDeclarations(node)) {
+        const int colonIndex = declaration.indexOf(QLatin1Char(':'));
+        if (colonIndex <= 0) {
+            continue;
+        }
+
+        const QString property = declaration.left(colonIndex).trimmed().toLower();
+        const QString value = declaration.mid(colonIndex + 1).trimmed();
+        if (property == QStringLiteral("color")) {
+            const QString color = normalizedColorValue(value);
+            if (color.isEmpty()) {
+                warnInvalidStyleValue(node, property, result);
+            } else {
+                *marks = withAttrMark(*marks, QStringLiteral("color"), QStringLiteral("color"), color);
+            }
+            continue;
+        }
+
+        if (property == QStringLiteral("background-color")) {
+            const QString color = normalizedColorValue(value);
+            if (color.isEmpty()) {
+                warnInvalidStyleValue(node, property, result);
+            } else {
+                *marks = withAttrMark(*marks, QStringLiteral("highlight"), QStringLiteral("color"), color);
+            }
+            continue;
+        }
+
+        if (property == QStringLiteral("font-family")) {
+            const QString fontFamily = normalizedFontFamily(value);
+            if (fontFamily.isEmpty()) {
+                warnInvalidStyleValue(node, property, result);
+            } else {
+                *marks = withAttrMark(*marks, QStringLiteral("fontFamily"), QStringLiteral("fontFamily"), fontFamily);
+            }
+            continue;
+        }
+
+        if (property == QStringLiteral("font-size")) {
+            const QString fontSize = normalizedFontSize(value);
+            if (fontSize.isEmpty()) {
+                warnInvalidStyleValue(node, property, result);
+            } else {
+                *marks = withAttrMark(*marks, QStringLiteral("fontSize"), QStringLiteral("fontSize"), fontSize);
+            }
+            continue;
+        }
+
+        if (property == QStringLiteral("font-weight")) {
+            bool known = false;
+            if (isBoldFontWeight(value, &known)) {
+                *marks = withSimpleMark(*marks, QStringLiteral("bold"));
+            } else if (known) {
+                *marks = withoutSimpleMark(*marks, QStringLiteral("bold"));
+            } else if (!known) {
+                warnInvalidStyleValue(node, property, result);
+            }
+            continue;
+        }
+
+        if (property == QStringLiteral("font-style")) {
+            bool known = false;
+            if (isItalicFontStyle(value, &known)) {
+                *marks = withSimpleMark(*marks, QStringLiteral("italic"));
+            } else if (known) {
+                *marks = withoutSimpleMark(*marks, QStringLiteral("italic"));
+            } else if (!known) {
+                warnInvalidStyleValue(node, property, result);
+            }
+            continue;
+        }
+
+        if (property == QStringLiteral("text-decoration") || property == QStringLiteral("text-decoration-line")) {
+            applyTextDecorationMarks(node, property, value, marks, result);
+        }
+    }
+}
+
+QJsonArray marksForElement(const MigrationHtmlNode &node,
+                           const QJsonArray &inheritedMarks,
+                           MigrationHtmlConversionResult &result)
+{
+    QJsonArray marks = inheritedMarks;
+    if (node.tagName == QStringLiteral("b") || node.tagName == QStringLiteral("strong")) {
+        marks = withSimpleMark(marks, QStringLiteral("bold"));
+    } else if (node.tagName == QStringLiteral("i") || node.tagName == QStringLiteral("em")) {
+        marks = withSimpleMark(marks, QStringLiteral("italic"));
+    } else if (node.tagName == QStringLiteral("u")) {
+        marks = withSimpleMark(marks, QStringLiteral("underline"));
+    } else if (node.tagName == QStringLiteral("s") || node.tagName == QStringLiteral("strike") || node.tagName == QStringLiteral("del")) {
+        marks = withSimpleMark(marks, QStringLiteral("strike"));
+    } else if (node.tagName == QStringLiteral("font")) {
+        const QString color = normalizedColorValue(MigrationHtmlParser::attribute(node, QStringLiteral("color")));
+        const QString face = normalizedFontFamily(MigrationHtmlParser::attribute(node, QStringLiteral("face")));
+        if (!color.isEmpty()) {
+            marks = withAttrMark(marks, QStringLiteral("color"), QStringLiteral("color"), color);
+        }
+        if (!face.isEmpty()) {
+            marks = withAttrMark(marks, QStringLiteral("fontFamily"), QStringLiteral("fontFamily"), face);
+        }
+    }
+
+    warnUnsupportedStyleDeclarations(node, result);
+    applyStyleMarks(node, &marks, result);
+    return marks;
+}
+
+void appendInlineNode(const MigrationHtmlNode &node,
+                      QJsonArray &content,
+                      const QJsonArray &marks,
+                      MigrationHtmlConversionResult &result);
+
+void appendInlineChildren(const MigrationHtmlNode &node,
+                          QJsonArray &content,
+                          const QJsonArray &marks,
+                          MigrationHtmlConversionResult &result)
+{
+    for (const MigrationHtmlNode &child : node.children) {
+        appendInlineNode(child, content, marks, result);
+    }
+}
+
+void appendInlineNode(const MigrationHtmlNode &node,
+                      QJsonArray &content,
+                      const QJsonArray &marks,
+                      MigrationHtmlConversionResult &result)
 {
     if (node.type == MigrationHtmlNodeType::Text) {
-        appendVisibleText(content, node.text);
+        appendVisibleText(content, node.text, marks);
         return;
     }
 
     if (node.type != MigrationHtmlNodeType::Element) {
-        appendInlineChildren(node, content, result);
+        appendInlineChildren(node, content, marks, result);
         return;
     }
 
@@ -236,7 +640,7 @@ void appendInlineNode(const MigrationHtmlNode &node, QJsonArray &content, Migrat
         appendHardBreak(content);
     }
 
-    appendInlineChildren(node, content, result);
+    appendInlineChildren(node, content, marksForElement(node, marks, result), result);
 }
 
 void appendParagraphIfContent(QJsonArray &inlineContent, QJsonArray &blocks)
@@ -251,7 +655,7 @@ void appendParagraphIfContent(QJsonArray &inlineContent, QJsonArray &blocks)
 QJsonArray inlineContentFrom(const MigrationHtmlNode &node, MigrationHtmlConversionResult &result)
 {
     QJsonArray content;
-    appendInlineChildren(node, content, result);
+    appendInlineChildren(node, content, marksForElement(node, QJsonArray(), result), result);
     trimTrailingTextSpace(content);
     return content;
 }
@@ -274,7 +678,7 @@ void appendBlocksFromChildren(const MigrationHtmlNode &node, QJsonArray &blocks,
             continue;
         }
 
-        appendInlineNode(child, inlineContent, result);
+        appendInlineNode(child, inlineContent, QJsonArray(), result);
     }
 
     if (!inlineContent.isEmpty()) {
