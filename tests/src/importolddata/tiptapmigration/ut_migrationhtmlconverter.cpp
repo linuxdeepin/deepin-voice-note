@@ -393,3 +393,199 @@ TEST(UT_MigrationHtmlConverter, ConvertsFontTagColorAndFace)
     EXPECT_EQ(QStringLiteral("#abcdef"), markAttrsOf(text, QStringLiteral("color")).value(QStringLiteral("color")).toString());
     EXPECT_EQ(QStringLiteral("Noto Serif"), markAttrsOf(text, QStringLiteral("fontFamily")).value(QStringLiteral("fontFamily")).toString());
 }
+
+TEST(UT_MigrationHtmlConverter, ConvertsNestedBulletAndOrderedLists)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<ul><li>One<ol><li>Two</li></ol></li>"
+                       "<li><p><strong>Three</strong></p></li></ul>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(1, blocks.size());
+    const QJsonObject bulletList = blocks.at(0).toObject();
+    EXPECT_EQ(QStringLiteral("bulletList"), nodeTypeOf(bulletList));
+
+    const QJsonArray bulletItems = nodeContentOf(bulletList);
+    ASSERT_EQ(2, bulletItems.size());
+
+    const QJsonArray firstItemContent = nodeContentOf(bulletItems.at(0).toObject());
+    ASSERT_EQ(2, firstItemContent.size());
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(firstItemContent.at(0).toObject()));
+    EXPECT_EQ(QStringLiteral("One"), textOf(nodeContentOf(firstItemContent.at(0).toObject()).at(0).toObject()));
+    EXPECT_EQ(QStringLiteral("orderedList"), nodeTypeOf(firstItemContent.at(1).toObject()));
+
+    const QJsonArray orderedItems = nodeContentOf(firstItemContent.at(1).toObject());
+    ASSERT_EQ(1, orderedItems.size());
+    const QJsonArray nestedItemContent = nodeContentOf(orderedItems.at(0).toObject());
+    ASSERT_EQ(1, nestedItemContent.size());
+    EXPECT_EQ(QStringLiteral("Two"), textOf(nodeContentOf(nestedItemContent.at(0).toObject()).at(0).toObject()));
+
+    const QJsonArray secondItemContent = nodeContentOf(bulletItems.at(1).toObject());
+    ASSERT_EQ(1, secondItemContent.size());
+    const QJsonObject strongText = nodeContentOf(secondItemContent.at(0).toObject()).at(0).toObject();
+    EXPECT_EQ(QStringLiteral("Three"), textOf(strongText));
+    EXPECT_TRUE(hasMark(strongText, QStringLiteral("bold")));
+}
+
+TEST(UT_MigrationHtmlConverter, WrapsInvalidListChildrenIntoListItems)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<ul style=\"font-weight: bold\"><span>Loose</span><li>Item</li></ul>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("downgraded-html-list-child")));
+
+    const QJsonArray items = nodeContentOf(docContentOf(result).at(0).toObject());
+    ASSERT_EQ(2, items.size());
+    const QJsonArray looseItemContent = nodeContentOf(items.at(0).toObject());
+    ASSERT_EQ(1, looseItemContent.size());
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(looseItemContent.at(0).toObject()));
+    const QJsonObject looseText = nodeContentOf(looseItemContent.at(0).toObject()).at(0).toObject();
+    EXPECT_EQ(QStringLiteral("Loose"), textOf(looseText));
+    EXPECT_TRUE(hasMark(looseText, QStringLiteral("bold")));
+}
+
+TEST(UT_MigrationHtmlConverter, AppliesListItemInlineStyleMarksToDirectText)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<ul><li style=\"font-weight: bold; color: red\">Item</li></ul>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+
+    const QJsonObject list = docContentOf(result).at(0).toObject();
+    const QJsonObject item = nodeContentOf(list).at(0).toObject();
+    const QJsonObject paragraph = nodeContentOf(item).at(0).toObject();
+    const QJsonObject text = nodeContentOf(paragraph).at(0).toObject();
+    EXPECT_EQ(QStringLiteral("Item"), textOf(text));
+    EXPECT_TRUE(hasMark(text, QStringLiteral("bold")));
+    EXPECT_EQ(QStringLiteral("red"), markAttrsOf(text, QStringLiteral("color")).value(QStringLiteral("color")).toString());
+}
+
+TEST(UT_MigrationHtmlConverter, AppliesListItemInlineStyleMarksToBlockChildText)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<ul><li style=\"font-weight: bold; color: red\"><p>Item</p></li></ul>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+
+    const QJsonObject list = docContentOf(result).at(0).toObject();
+    const QJsonObject item = nodeContentOf(list).at(0).toObject();
+    const QJsonObject paragraph = nodeContentOf(item).at(0).toObject();
+    const QJsonObject text = nodeContentOf(paragraph).at(0).toObject();
+    EXPECT_EQ(QStringLiteral("Item"), textOf(text));
+    EXPECT_TRUE(hasMark(text, QStringLiteral("bold")));
+    EXPECT_EQ(QStringLiteral("red"), markAttrsOf(text, QStringLiteral("color")).value(QStringLiteral("color")).toString());
+}
+
+TEST(UT_MigrationHtmlConverter, BlockChildStyleOverridesListItemInheritedMarks)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<ul><li style=\"font-weight: bold; color: red\">"
+                       "<p style=\"font-weight: normal; color: blue\">Plain</p></li></ul>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+
+    const QJsonObject list = docContentOf(result).at(0).toObject();
+    const QJsonObject item = nodeContentOf(list).at(0).toObject();
+    const QJsonObject paragraph = nodeContentOf(item).at(0).toObject();
+    const QJsonObject text = nodeContentOf(paragraph).at(0).toObject();
+    EXPECT_EQ(QStringLiteral("Plain"), textOf(text));
+    EXPECT_FALSE(hasMark(text, QStringLiteral("bold")));
+    EXPECT_EQ(QStringLiteral("blue"), markAttrsOf(text, QStringLiteral("color")).value(QStringLiteral("color")).toString());
+}
+
+TEST(UT_MigrationHtmlConverter, AppliesListInlineStyleMarksToDirectListItemText)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<ul style=\"font-weight: bold; color: red\"><li>Item</li></ul>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+
+    const QJsonObject list = docContentOf(result).at(0).toObject();
+    const QJsonObject item = nodeContentOf(list).at(0).toObject();
+    const QJsonObject paragraph = nodeContentOf(item).at(0).toObject();
+    const QJsonObject text = nodeContentOf(paragraph).at(0).toObject();
+    EXPECT_EQ(QStringLiteral("Item"), textOf(text));
+    EXPECT_TRUE(hasMark(text, QStringLiteral("bold")));
+    EXPECT_EQ(QStringLiteral("red"), markAttrsOf(text, QStringLiteral("color")).value(QStringLiteral("color")).toString());
+}
+
+TEST(UT_MigrationHtmlConverter, AppliesListInlineStyleMarksToBlockChildText)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<ol style=\"font-weight: bold; color: red\"><li><p>Item</p></li></ol>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+
+    const QJsonObject list = docContentOf(result).at(0).toObject();
+    EXPECT_EQ(QStringLiteral("orderedList"), nodeTypeOf(list));
+    const QJsonObject item = nodeContentOf(list).at(0).toObject();
+    const QJsonObject paragraph = nodeContentOf(item).at(0).toObject();
+    const QJsonObject text = nodeContentOf(paragraph).at(0).toObject();
+    EXPECT_EQ(QStringLiteral("Item"), textOf(text));
+    EXPECT_TRUE(hasMark(text, QStringLiteral("bold")));
+    EXPECT_EQ(QStringLiteral("red"), markAttrsOf(text, QStringLiteral("color")).value(QStringLiteral("color")).toString());
+}
+
+TEST(UT_MigrationHtmlConverter, BlockChildStyleOverridesListInheritedMarks)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<ul style=\"font-weight: bold; color: red\"><li>"
+                       "<p style=\"font-weight: normal; color: blue\">Plain</p></li></ul>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+
+    const QJsonObject list = docContentOf(result).at(0).toObject();
+    const QJsonObject item = nodeContentOf(list).at(0).toObject();
+    const QJsonObject paragraph = nodeContentOf(item).at(0).toObject();
+    const QJsonObject text = nodeContentOf(paragraph).at(0).toObject();
+    EXPECT_EQ(QStringLiteral("Plain"), textOf(text));
+    EXPECT_FALSE(hasMark(text, QStringLiteral("bold")));
+    EXPECT_EQ(QStringLiteral("blue"), markAttrsOf(text, QStringLiteral("color")).value(QStringLiteral("color")).toString());
+}
+
+TEST(UT_MigrationHtmlConverter, WarnsTextAlignOnListItem)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<ul><li style=\"text-align: center\">Item</li></ul>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    ASSERT_EQ(1, result.warnings.size());
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("downgraded-text-align")));
+
+    const QJsonObject list = docContentOf(result).at(0).toObject();
+    const QJsonObject item = nodeContentOf(list).at(0).toObject();
+    const QJsonObject paragraph = nodeContentOf(item).at(0).toObject();
+    EXPECT_FALSE(attrsOf(paragraph).contains(QStringLiteral("textAlign")));
+    EXPECT_EQ(QStringLiteral("Item"), textOf(nodeContentOf(paragraph).at(0).toObject()));
+}
+
+TEST(UT_MigrationHtmlConverter, DowngradesTextAlignBecauseSchemaV1HasNoAlignmentAttrs)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<p style=\"text-align: center\">Centered</p>"
+                       "<h2 style=\"text-align: left\">Title</h2>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    ASSERT_EQ(1, result.warnings.size());
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("downgraded-text-align")));
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(2, blocks.size());
+    EXPECT_FALSE(attrsOf(blocks.at(0).toObject()).contains(QStringLiteral("textAlign")));
+    EXPECT_EQ(QStringLiteral("Centered"), textOf(nodeContentOf(blocks.at(0).toObject()).at(0).toObject()));
+    EXPECT_FALSE(attrsOf(blocks.at(1).toObject()).contains(QStringLiteral("textAlign")));
+    EXPECT_EQ(QStringLiteral("Title"), textOf(nodeContentOf(blocks.at(1).toObject()).at(0).toObject()));
+}
