@@ -177,6 +177,77 @@ test('Images allow http, https and relative URLs', () => {
   }
 })
 
+
+test('Envelope validation accepts a list item with a paragraph before heading and image blocks', () => {
+  const result = validateEnvelope(createEnvelope({
+    type: 'doc',
+    content: [
+      {
+        type: 'bulletList',
+        content: [
+          {
+            type: 'listItem',
+            content: [
+              { type: 'paragraph' },
+              {
+                type: 'heading',
+                attrs: { level: 2 },
+                content: [{ type: 'text', text: 'before' }],
+              },
+              { type: 'image', attrs: { src: 'images/a.png' } },
+              {
+                type: 'heading',
+                attrs: { level: 2 },
+                content: [{ type: 'text', text: 'after' }],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  }))
+
+  assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2))
+})
+
+test('Envelope validation rejects image nodes inside paragraphs', () => {
+  const result = validateEnvelope(createEnvelope({
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: 'safe' },
+          { type: 'image', attrs: { src: 'images/photo.png' } },
+        ],
+      },
+    ],
+  }))
+
+  assert.equal(result.ok, false)
+  assert.equal(result.errors.some(error => error.code === 'schema-validation-failed'), true)
+})
+
+
+test('Envelope validation rejects image nodes inside headings', () => {
+  const result = validateEnvelope(createEnvelope({
+    type: 'doc',
+    content: [
+      {
+        type: 'heading',
+        attrs: { level: 2 },
+        content: [
+          { type: 'text', text: 'safe' },
+          { type: 'image', attrs: { src: 'images/photo.png' } },
+        ],
+      },
+    ],
+  }))
+
+  assert.equal(result.ok, false)
+  assert.equal(result.errors.some(error => error.code === 'schema-validation-failed'), true)
+})
+
 test('Envelope validation rejects documents beyond the maximum node depth', () => {
   let node = { type: 'paragraph' }
   for (let index = 0; index < 120; ++index) {

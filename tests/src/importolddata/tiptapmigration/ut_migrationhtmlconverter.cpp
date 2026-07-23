@@ -198,6 +198,253 @@ TEST(UT_MigrationHtmlConverter, SkipsDangerousNodesAndTheirContent)
     EXPECT_EQ(QStringLiteral("safetail"), textOf(content.at(0).toObject()));
 }
 
+
+TEST(UT_MigrationHtmlConverter, ConvertsImageUsingDataRelPathFirst)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<p><img src=\"/home/u/images/ignored.png\" data-rel-path=\"images/photo.png\" "
+                       "alt=\"preview\" title=\"Photo\"></p>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(result.warnings.isEmpty());
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(1, blocks.size());
+    const QJsonObject image = blocks.at(0).toObject();
+    EXPECT_EQ(QStringLiteral("image"), nodeTypeOf(image));
+    EXPECT_EQ(QStringLiteral("images/photo.png"), attrsOf(image).value(QStringLiteral("src")).toString());
+    EXPECT_EQ(QStringLiteral("images/photo.png"), attrsOf(image).value(QStringLiteral("relPath")).toString());
+    EXPECT_EQ(QStringLiteral("preview"), attrsOf(image).value(QStringLiteral("alt")).toString());
+    EXPECT_EQ(QStringLiteral("Photo"), attrsOf(image).value(QStringLiteral("title")).toString());
+}
+
+TEST(UT_MigrationHtmlConverter, ExtractsImageRelPathFromAbsoluteSrc)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<img src=\"/home/u/.local/share/deepin-voice-note/images/note/photo.png?cache=1\">"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(result.warnings.isEmpty());
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(1, blocks.size());
+    const QJsonObject image = blocks.at(0).toObject();
+    EXPECT_EQ(QStringLiteral("image"), nodeTypeOf(image));
+    EXPECT_EQ(QStringLiteral("images/note/photo.png"), attrsOf(image).value(QStringLiteral("src")).toString());
+    EXPECT_EQ(QStringLiteral("images/note/photo.png"), attrsOf(image).value(QStringLiteral("relPath")).toString());
+}
+
+TEST(UT_MigrationHtmlConverter, ExtractsImageRelPathFromFileUrl)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<img src=\"file:///home/u/.local/share/deepin-voice-note/images/note/photo.png#preview\">"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(result.warnings.isEmpty());
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(1, blocks.size());
+    const QJsonObject image = blocks.at(0).toObject();
+    EXPECT_EQ(QStringLiteral("image"), nodeTypeOf(image));
+    EXPECT_EQ(QStringLiteral("images/note/photo.png"), attrsOf(image).value(QStringLiteral("src")).toString());
+    EXPECT_EQ(QStringLiteral("images/note/photo.png"), attrsOf(image).value(QStringLiteral("relPath")).toString());
+}
+
+TEST(UT_MigrationHtmlConverter, RejectsUnsafeImageSrc)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<p>safe<img src=\"javascript:/images/evil.png\"></p>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("unsafe-html-image-src")));
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(1, blocks.size());
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(blocks.at(0).toObject()));
+    ASSERT_EQ(1, nodeContentOf(blocks.at(0).toObject()).size());
+    EXPECT_EQ(QStringLiteral("safe"), textOf(nodeContentOf(blocks.at(0).toObject()).at(0).toObject()));
+}
+
+TEST(UT_MigrationHtmlConverter, WarnsAndSkipsBase64ImageData)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<img src=\"data:image/png;base64,AAAA\">"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("downgraded-base64-image")));
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(1, blocks.size());
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(blocks.at(0).toObject()));
+}
+
+
+TEST(UT_MigrationHtmlConverter, SplitsMixedParagraphImageIntoBlocks)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<p>before<img src=\"images/a.png\">after</p>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(result.warnings.isEmpty());
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(3, blocks.size());
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(blocks.at(0).toObject()));
+    ASSERT_EQ(1, nodeContentOf(blocks.at(0).toObject()).size());
+    EXPECT_EQ(QStringLiteral("before"), textOf(nodeContentOf(blocks.at(0).toObject()).at(0).toObject()));
+
+    const QJsonObject image = blocks.at(1).toObject();
+    EXPECT_EQ(QStringLiteral("image"), nodeTypeOf(image));
+    EXPECT_EQ(QStringLiteral("images/a.png"), attrsOf(image).value(QStringLiteral("src")).toString());
+
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(blocks.at(2).toObject()));
+    ASSERT_EQ(1, nodeContentOf(blocks.at(2).toObject()).size());
+    EXPECT_EQ(QStringLiteral("after"), textOf(nodeContentOf(blocks.at(2).toObject()).at(0).toObject()));
+}
+
+TEST(UT_MigrationHtmlConverter, SplitsMixedListItemImageIntoBlocks)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<ul><li>before<img src=\"images/a.png\">after</li></ul>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(result.warnings.isEmpty());
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(1, blocks.size());
+    const QJsonObject list = blocks.at(0).toObject();
+    EXPECT_EQ(QStringLiteral("bulletList"), nodeTypeOf(list));
+    ASSERT_EQ(1, nodeContentOf(list).size());
+
+    const QJsonObject listItem = nodeContentOf(list).at(0).toObject();
+    EXPECT_EQ(QStringLiteral("listItem"), nodeTypeOf(listItem));
+    const QJsonArray listItemContent = nodeContentOf(listItem);
+    ASSERT_EQ(3, listItemContent.size());
+
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(listItemContent.at(0).toObject()));
+    ASSERT_EQ(1, nodeContentOf(listItemContent.at(0).toObject()).size());
+    EXPECT_EQ(QStringLiteral("before"), textOf(nodeContentOf(listItemContent.at(0).toObject()).at(0).toObject()));
+
+    const QJsonObject image = listItemContent.at(1).toObject();
+    EXPECT_EQ(QStringLiteral("image"), nodeTypeOf(image));
+    EXPECT_EQ(QStringLiteral("images/a.png"), attrsOf(image).value(QStringLiteral("src")).toString());
+
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(listItemContent.at(2).toObject()));
+    ASSERT_EQ(1, nodeContentOf(listItemContent.at(2).toObject()).size());
+    EXPECT_EQ(QStringLiteral("after"), textOf(nodeContentOf(listItemContent.at(2).toObject()).at(0).toObject()));
+}
+
+TEST(UT_MigrationHtmlConverter, KeepsListItemSchemaValidWhenImageIsFirstBlock)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<ul><li><img src=\"images/a.png\">after</li></ul>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(result.warnings.isEmpty());
+
+    const QJsonArray listItemContent = nodeContentOf(nodeContentOf(docContentOf(result).at(0).toObject()).at(0).toObject());
+    ASSERT_EQ(3, listItemContent.size());
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(listItemContent.at(0).toObject()));
+    EXPECT_TRUE(nodeContentOf(listItemContent.at(0).toObject()).isEmpty());
+    EXPECT_EQ(QStringLiteral("image"), nodeTypeOf(listItemContent.at(1).toObject()));
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(listItemContent.at(2).toObject()));
+    EXPECT_EQ(QStringLiteral("after"), textOf(nodeContentOf(listItemContent.at(2).toObject()).at(0).toObject()));
+}
+
+
+TEST(UT_MigrationHtmlConverter, KeepsListItemSchemaValidWhenHeadingContainsImage)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<ul><li><h2>before<img src=\"images/a.png\">after</h2></li></ul>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(result.warnings.isEmpty());
+
+    const QJsonArray listItemContent = nodeContentOf(nodeContentOf(docContentOf(result).at(0).toObject()).at(0).toObject());
+    ASSERT_EQ(4, listItemContent.size());
+
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(listItemContent.at(0).toObject()));
+    EXPECT_TRUE(nodeContentOf(listItemContent.at(0).toObject()).isEmpty());
+
+    const QJsonObject firstHeading = listItemContent.at(1).toObject();
+    EXPECT_EQ(QStringLiteral("heading"), nodeTypeOf(firstHeading));
+    EXPECT_EQ(2, attrsOf(firstHeading).value(QStringLiteral("level")).toInt());
+    ASSERT_EQ(1, nodeContentOf(firstHeading).size());
+    EXPECT_EQ(QStringLiteral("before"), textOf(nodeContentOf(firstHeading).at(0).toObject()));
+
+    const QJsonObject image = listItemContent.at(2).toObject();
+    EXPECT_EQ(QStringLiteral("image"), nodeTypeOf(image));
+    EXPECT_EQ(QStringLiteral("images/a.png"), attrsOf(image).value(QStringLiteral("src")).toString());
+
+    const QJsonObject secondHeading = listItemContent.at(3).toObject();
+    EXPECT_EQ(QStringLiteral("heading"), nodeTypeOf(secondHeading));
+    EXPECT_EQ(2, attrsOf(secondHeading).value(QStringLiteral("level")).toInt());
+    ASSERT_EQ(1, nodeContentOf(secondHeading).size());
+    EXPECT_EQ(QStringLiteral("after"), textOf(nodeContentOf(secondHeading).at(0).toObject()));
+}
+
+TEST(UT_MigrationHtmlConverter, SplitsMixedHeadingImageIntoHeadingAndBlocks)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<h2>before<img src=\"images/a.png\">after</h2>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(result.warnings.isEmpty());
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(3, blocks.size());
+
+    const QJsonObject firstHeading = blocks.at(0).toObject();
+    EXPECT_EQ(QStringLiteral("heading"), nodeTypeOf(firstHeading));
+    EXPECT_EQ(2, attrsOf(firstHeading).value(QStringLiteral("level")).toInt());
+    ASSERT_EQ(1, nodeContentOf(firstHeading).size());
+    EXPECT_EQ(QStringLiteral("before"), textOf(nodeContentOf(firstHeading).at(0).toObject()));
+
+    const QJsonObject image = blocks.at(1).toObject();
+    EXPECT_EQ(QStringLiteral("image"), nodeTypeOf(image));
+    EXPECT_EQ(QStringLiteral("images/a.png"), attrsOf(image).value(QStringLiteral("src")).toString());
+
+    const QJsonObject secondHeading = blocks.at(2).toObject();
+    EXPECT_EQ(QStringLiteral("heading"), nodeTypeOf(secondHeading));
+    EXPECT_EQ(2, attrsOf(secondHeading).value(QStringLiteral("level")).toInt());
+    ASSERT_EQ(1, nodeContentOf(secondHeading).size());
+    EXPECT_EQ(QStringLiteral("after"), textOf(nodeContentOf(secondHeading).at(0).toObject()));
+}
+
+TEST(UT_MigrationHtmlConverter, SplitsMixedDowngradedBlockImageIntoParagraphAndBlocks)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<section>before<img src=\"images/a.png\">after</section>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("downgraded-html-block")));
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(3, blocks.size());
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(blocks.at(0).toObject()));
+    ASSERT_EQ(1, nodeContentOf(blocks.at(0).toObject()).size());
+    EXPECT_EQ(QStringLiteral("before"), textOf(nodeContentOf(blocks.at(0).toObject()).at(0).toObject()));
+
+    const QJsonObject image = blocks.at(1).toObject();
+    EXPECT_EQ(QStringLiteral("image"), nodeTypeOf(image));
+    EXPECT_EQ(QStringLiteral("images/a.png"), attrsOf(image).value(QStringLiteral("src")).toString());
+
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(blocks.at(2).toObject()));
+    ASSERT_EQ(1, nodeContentOf(blocks.at(2).toObject()).size());
+    EXPECT_EQ(QStringLiteral("after"), textOf(nodeContentOf(blocks.at(2).toObject()).at(0).toObject()));
+}
+
 TEST(UT_MigrationHtmlConverter, ConvertsNestedTagMarksAndDeduplicates)
 {
     const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(

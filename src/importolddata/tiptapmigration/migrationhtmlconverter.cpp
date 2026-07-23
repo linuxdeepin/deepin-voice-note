@@ -143,6 +143,244 @@ bool isListItemElement(const MigrationHtmlNode &node)
     return node.type == MigrationHtmlNodeType::Element && node.tagName == QStringLiteral("li");
 }
 
+
+bool isImageElement(const MigrationHtmlNode &node)
+{
+    return node.type == MigrationHtmlNodeType::Element && node.tagName == QStringLiteral("img");
+}
+
+bool isAllowedSchemeChar(QChar character)
+{
+    return character.isLetterOrNumber()
+        || character == QLatin1Char('+')
+        || character == QLatin1Char('.')
+        || character == QLatin1Char('-');
+}
+
+QString normalizedUrlForSchemeCheck(const QString &src)
+{
+    QString normalized;
+    normalized.reserve(src.size());
+
+    const QString trimmed = src.trimmed();
+    for (const QChar character : trimmed) {
+        const ushort code = character.unicode();
+        if (code <= 0x20 || code == 0x7f || character.isSpace()) {
+            continue;
+        }
+        normalized.append(character);
+    }
+
+    return normalized;
+}
+
+bool startsWithNetworkPath(const QString &src)
+{
+    return src.startsWith(QStringLiteral("//")) || src.startsWith(QStringLiteral("\\\\"));
+}
+
+QString urlScheme(const QString &src)
+{
+    const int colonIndex = src.indexOf(QLatin1Char(':'));
+    if (colonIndex <= 0) {
+        return QString();
+    }
+
+    if (!src.at(0).isLetter()) {
+        return QString();
+    }
+
+    for (int index = 1; index < colonIndex; ++index) {
+        if (!isAllowedSchemeChar(src.at(index))) {
+            return QString();
+        }
+    }
+
+    return src.left(colonIndex).toLower();
+}
+
+bool isWindowsAbsolutePath(const QString &src)
+{
+    const QString trimmed = src.trimmed();
+    return trimmed.size() >= 3
+        && trimmed.at(0).isLetter()
+        && trimmed.at(1) == QLatin1Char(':')
+        && (trimmed.at(2) == QLatin1Char('\\') || trimmed.at(2) == QLatin1Char('/'));
+}
+
+QString withoutUrlQueryOrFragment(const QString &value)
+{
+    int cutIndex = -1;
+    const int queryIndex = value.indexOf(QLatin1Char('?'));
+    const int fragmentIndex = value.indexOf(QLatin1Char('#'));
+    if (queryIndex >= 0) {
+        cutIndex = queryIndex;
+    }
+    if (fragmentIndex >= 0 && (cutIndex < 0 || fragmentIndex < cutIndex)) {
+        cutIndex = fragmentIndex;
+    }
+
+    return cutIndex >= 0 ? value.left(cutIndex) : value;
+}
+
+QString normalizedPathSeparators(QString value)
+{
+    value.replace(QLatin1Char('\\'), QLatin1Char('/'));
+    return value;
+}
+
+QString extractImagesRelPath(const QString &value)
+{
+    QString normalized = normalizedPathSeparators(withoutUrlQueryOrFragment(value.trimmed()));
+    if (normalized.startsWith(QStringLiteral("./"))) {
+        normalized.remove(0, 2);
+    }
+
+    int index = normalized.indexOf(QStringLiteral("images/"), 0, Qt::CaseInsensitive);
+    while (index >= 0) {
+        if (index == 0 || normalized.at(index - 1) == QLatin1Char('/')) {
+            const QString relPath = normalized.mid(index);
+            return relPath.isEmpty() ? QString() : relPath;
+        }
+        index = normalized.indexOf(QStringLiteral("images/"), index + 1, Qt::CaseInsensitive);
+    }
+
+    return QString();
+}
+
+bool isSafeResolvedImageSrc(const QString &src)
+{
+    const QString normalized = normalizedUrlForSchemeCheck(src);
+    if (normalized.isEmpty() || startsWithNetworkPath(normalized)) {
+        return false;
+    }
+
+    const QString scheme = urlScheme(normalized);
+    return scheme.isEmpty()
+        || scheme == QStringLiteral("http")
+        || scheme == QStringLiteral("https");
+}
+
+struct ImageReference {
+    QString src;
+    QString relPath;
+    QString warningCode;
+    QString warningMessage;
+
+    bool valid() const { return !src.isEmpty(); }
+};
+
+ImageReference resolvedImageReference(const QString &rawValue, bool preferRelPath)
+{
+    const QString trimmed = rawValue.trimmed();
+    if (trimmed.isEmpty()) {
+        return { QString(), QString(), QStringLiteral("missing-html-image-src"), QStringLiteral("HTML image source is empty and was skipped") };
+    }
+
+    const QString normalized = normalizedUrlForSchemeCheck(trimmed);
+    if (startsWithNetworkPath(normalized)) {
+        return { QString(), QString(), QStringLiteral("unsafe-html-image-src"), QStringLiteral("HTML image source uses an unsafe URL form and was skipped") };
+    }
+
+    const QString scheme = urlScheme(normalized);
+    if (scheme == QStringLiteral("data")) {
+        return { QString(), QString(), QStringLiteral("downgraded-base64-image"), QStringLiteral("Base64 HTML image data is not embedded during migration and was skipped") };
+    }
+
+    if (!scheme.isEmpty()
+        && scheme != QStringLiteral("http")
+        && scheme != QStringLiteral("https")
+        && scheme != QStringLiteral("file")
+        && !isWindowsAbsolutePath(trimmed)) {
+        return { QString(), QString(), QStringLiteral("unsafe-html-image-src"), QStringLiteral("HTML image source uses an unsafe URL scheme and was skipped") };
+    }
+
+    if (scheme == QStringLiteral("http") || scheme == QStringLiteral("https")) {
+        return { trimmed, QString(), QString(), QString() };
+    }
+
+    const QString relPath = extractImagesRelPath(trimmed);
+    if (!relPath.isEmpty()) {
+        return { relPath, relPath, QString(), QString() };
+    }
+
+    if (scheme == QStringLiteral("file")) {
+        return { QString(), QString(), QStringLiteral("unsafe-html-image-src"), QStringLiteral("HTML file image URL has no extractable images/ path and was skipped") };
+    }
+
+    if (!isSafeResolvedImageSrc(trimmed)) {
+        return { QString(), QString(), QStringLiteral("unsafe-html-image-src"), QStringLiteral("HTML image source uses an unsafe URL scheme and was skipped") };
+    }
+
+    QString relPathAttr;
+    if (preferRelPath) {
+        relPathAttr = normalizedPathSeparators(withoutUrlQueryOrFragment(trimmed));
+        if (relPathAttr.startsWith(QStringLiteral("./"))) {
+            relPathAttr.remove(0, 2);
+        }
+    } else {
+        relPathAttr = extractImagesRelPath(trimmed);
+    }
+
+    return { trimmed, relPathAttr, QString(), QString() };
+}
+
+void warnSkippedImage(const MigrationHtmlNode &node,
+                      MigrationHtmlConversionResult &result,
+                      const QString &code,
+                      const QString &message)
+{
+    if (!code.isEmpty()) {
+        addWarning(result, elementPath(node) + QStringLiteral(".attrs.src"), code, message);
+    }
+}
+
+QJsonObject imageFromElement(const MigrationHtmlNode &node, MigrationHtmlConversionResult &result)
+{
+    ImageReference reference;
+    const QString dataRelPath = MigrationHtmlParser::attribute(node, QStringLiteral("data-rel-path"));
+    if (!dataRelPath.trimmed().isEmpty()) {
+        reference = resolvedImageReference(dataRelPath, true);
+    }
+
+    if (!reference.valid()) {
+        const QString src = MigrationHtmlParser::attribute(node, QStringLiteral("src"));
+        reference = resolvedImageReference(src, false);
+    }
+
+    if (!reference.valid()) {
+        warnSkippedImage(node, result, reference.warningCode, reference.warningMessage);
+        return QJsonObject();
+    }
+
+    return MigrationJsonBuilder::makeImage(reference.src,
+                                           reference.relPath,
+                                           MigrationHtmlParser::attribute(node, QStringLiteral("alt")),
+                                           MigrationHtmlParser::attribute(node, QStringLiteral("title")));
+}
+
+const MigrationHtmlNode *singleImageChildIfOnlyImageContent(const MigrationHtmlNode &node)
+{
+    const MigrationHtmlNode *image = nullptr;
+    for (const MigrationHtmlNode &child : node.children) {
+        if (child.type == MigrationHtmlNodeType::Text) {
+            if (!child.text.trimmed().isEmpty()) {
+                return nullptr;
+            }
+            continue;
+        }
+
+        if (isImageElement(child) && image == nullptr) {
+            image = &child;
+            continue;
+        }
+
+        return nullptr;
+    }
+
+    return image;
+}
+
 int headingLevel(const MigrationHtmlNode &node)
 {
     return node.tagName.right(1).toInt();
@@ -688,6 +926,14 @@ void appendInlineNode(const MigrationHtmlNode &node,
         return;
     }
 
+    if (isImageElement(node)) {
+        const QJsonObject image = imageFromElement(node, result);
+        if (!image.isEmpty()) {
+            content.append(image);
+        }
+        return;
+    }
+
     if (node.tagName == QStringLiteral("br")) {
         appendHardBreak(content);
         return;
@@ -709,6 +955,23 @@ void appendParagraphIfContent(QJsonArray &inlineContent, QJsonArray &blocks)
     inlineContent = QJsonArray();
 }
 
+void appendBlockWithInitialParagraph(QJsonArray &blocks,
+                                     const QJsonObject &block,
+                                     bool ensureInitialParagraphBeforeBlock)
+{
+    if (block.isEmpty()) {
+        return;
+    }
+
+    if (ensureInitialParagraphBeforeBlock
+        && blocks.isEmpty()
+        && block.value(QStringLiteral("type")).toString() != QStringLiteral("paragraph")) {
+        blocks.append(MigrationJsonBuilder::makeParagraph());
+    }
+
+    blocks.append(block);
+}
+
 QJsonArray inlineContentFrom(const MigrationHtmlNode &node,
                              MigrationHtmlConversionResult &result,
                              const QJsonArray &inheritedMarks = QJsonArray())
@@ -727,6 +990,197 @@ QJsonObject listFromElement(const MigrationHtmlNode &node,
                             MigrationHtmlConversionResult &result,
                             const QJsonArray &inheritedMarks = QJsonArray());
 
+void appendBlocksFromElement(const MigrationHtmlNode &node,
+                             QJsonArray &blocks,
+                             MigrationHtmlConversionResult &result,
+                             const QJsonArray &inheritedMarks = QJsonArray(),
+                             bool ensureInitialParagraphBeforeBlock = false);
+
+void appendImageBlock(const MigrationHtmlNode &node,
+                      QJsonArray &inlineContent,
+                      QJsonArray &blocks,
+                      MigrationHtmlConversionResult &result,
+                      bool ensureInitialParagraphBeforeBlock)
+{
+    appendParagraphIfContent(inlineContent, blocks);
+    const QJsonObject image = imageFromElement(node, result);
+    if (image.isEmpty()) {
+        return;
+    }
+
+    appendBlockWithInitialParagraph(blocks, image, ensureInitialParagraphBeforeBlock);
+}
+
+void appendInlineOrImageBlocks(const MigrationHtmlNode &node,
+                               QJsonArray &inlineContent,
+                               QJsonArray &blocks,
+                               const QJsonArray &marks,
+                               MigrationHtmlConversionResult &result,
+                               bool ensureInitialParagraphBeforeBlock)
+{
+    if (node.type == MigrationHtmlNodeType::Text) {
+        appendVisibleText(inlineContent, node.text, marks);
+        return;
+    }
+
+    if (node.type != MigrationHtmlNodeType::Element) {
+        for (const MigrationHtmlNode &child : node.children) {
+            appendInlineOrImageBlocks(child, inlineContent, blocks, marks, result, ensureInitialParagraphBeforeBlock);
+        }
+        return;
+    }
+
+    if (isDangerousElement(node)) {
+        return;
+    }
+
+    if (isImageElement(node)) {
+        appendImageBlock(node, inlineContent, blocks, result, ensureInitialParagraphBeforeBlock);
+        return;
+    }
+
+    if (node.tagName == QStringLiteral("br")) {
+        appendHardBreak(inlineContent);
+        return;
+    }
+
+    if (isBlockElement(node) && !inlineContent.isEmpty() && !isHardBreakNode(inlineContent.at(inlineContent.size() - 1))) {
+        appendHardBreak(inlineContent);
+    }
+
+    const QJsonArray childMarks = marksForElement(node, marks, result);
+    for (const MigrationHtmlNode &child : node.children) {
+        appendInlineOrImageBlocks(child, inlineContent, blocks, childMarks, result, ensureInitialParagraphBeforeBlock);
+    }
+}
+
+void appendInlineContainerAsBlocks(const MigrationHtmlNode &node,
+                                   QJsonArray &blocks,
+                                   MigrationHtmlConversionResult &result,
+                                   const QJsonArray &inheritedMarks,
+                                   bool ensureInitialParagraphBeforeBlock)
+{
+    const int initialBlockCount = blocks.size();
+    QJsonArray inlineContent;
+    const QJsonArray marks = marksForElement(node, inheritedMarks, result);
+    for (const MigrationHtmlNode &child : node.children) {
+        appendInlineOrImageBlocks(child, inlineContent, blocks, marks, result, ensureInitialParagraphBeforeBlock);
+    }
+    appendParagraphIfContent(inlineContent, blocks);
+
+    if (blocks.size() == initialBlockCount) {
+        blocks.append(MigrationJsonBuilder::makeParagraph());
+    }
+}
+
+void appendHeadingIfContent(QJsonArray &inlineContent,
+                            QJsonArray &blocks,
+                            int level,
+                            bool ensureInitialParagraphBeforeBlock)
+{
+    trimTrailingTextSpace(inlineContent);
+    if (!inlineContent.isEmpty()) {
+        appendBlockWithInitialParagraph(blocks,
+                                        MigrationJsonBuilder::makeHeading(level, inlineContent),
+                                        ensureInitialParagraphBeforeBlock);
+    }
+    inlineContent = QJsonArray();
+}
+
+void appendHeadingImageBlock(const MigrationHtmlNode &node,
+                             QJsonArray &inlineContent,
+                             QJsonArray &blocks,
+                             int level,
+                             MigrationHtmlConversionResult &result,
+                             bool ensureInitialParagraphBeforeBlock)
+{
+    appendHeadingIfContent(inlineContent, blocks, level, ensureInitialParagraphBeforeBlock);
+    const QJsonObject image = imageFromElement(node, result);
+    if (image.isEmpty()) {
+        return;
+    }
+
+    appendBlockWithInitialParagraph(blocks, image, ensureInitialParagraphBeforeBlock);
+}
+
+void appendHeadingInlineOrImageBlocks(const MigrationHtmlNode &node,
+                                      QJsonArray &inlineContent,
+                                      QJsonArray &blocks,
+                                      int level,
+                                      const QJsonArray &marks,
+                                      MigrationHtmlConversionResult &result,
+                                      bool ensureInitialParagraphBeforeBlock)
+{
+    if (node.type == MigrationHtmlNodeType::Text) {
+        appendVisibleText(inlineContent, node.text, marks);
+        return;
+    }
+
+    if (node.type != MigrationHtmlNodeType::Element) {
+        for (const MigrationHtmlNode &child : node.children) {
+            appendHeadingInlineOrImageBlocks(child, inlineContent, blocks, level, marks, result, ensureInitialParagraphBeforeBlock);
+        }
+        return;
+    }
+
+    if (isDangerousElement(node)) {
+        return;
+    }
+
+    if (isImageElement(node)) {
+        appendHeadingImageBlock(node, inlineContent, blocks, level, result, ensureInitialParagraphBeforeBlock);
+        return;
+    }
+
+    if (node.tagName == QStringLiteral("br")) {
+        appendHardBreak(inlineContent);
+        return;
+    }
+
+    if (isBlockElement(node) && !inlineContent.isEmpty() && !isHardBreakNode(inlineContent.at(inlineContent.size() - 1))) {
+        appendHardBreak(inlineContent);
+    }
+
+    const QJsonArray childMarks = marksForElement(node, marks, result);
+    for (const MigrationHtmlNode &child : node.children) {
+        appendHeadingInlineOrImageBlocks(child, inlineContent, blocks, level, childMarks, result, ensureInitialParagraphBeforeBlock);
+    }
+}
+
+void appendHeadingElementAsBlocks(const MigrationHtmlNode &node,
+                                  QJsonArray &blocks,
+                                  MigrationHtmlConversionResult &result,
+                                  const QJsonArray &inheritedMarks,
+                                  bool ensureInitialParagraphBeforeBlock)
+{
+    const int initialBlockCount = blocks.size();
+    QJsonArray inlineContent;
+    const int level = headingLevel(node);
+    const QJsonArray marks = marksForElement(node, inheritedMarks, result);
+    for (const MigrationHtmlNode &child : node.children) {
+        appendHeadingInlineOrImageBlocks(child, inlineContent, blocks, level, marks, result, ensureInitialParagraphBeforeBlock);
+    }
+    appendHeadingIfContent(inlineContent, blocks, level, ensureInitialParagraphBeforeBlock);
+
+    if (blocks.size() == initialBlockCount) {
+        appendBlockWithInitialParagraph(blocks,
+                                        MigrationJsonBuilder::makeHeading(level),
+                                        ensureInitialParagraphBeforeBlock);
+    }
+}
+
+void warnDowngradedBlock(const MigrationHtmlNode &node, MigrationHtmlConversionResult &result)
+{
+    if (node.tagName == QStringLiteral("p") || node.tagName == QStringLiteral("div")) {
+        return;
+    }
+
+    addWarning(result,
+               QStringLiteral("/%1").arg(node.tagName),
+               QStringLiteral("downgraded-html-block"),
+               QStringLiteral("HTML block <%1> was downgraded to paragraph").arg(node.tagName));
+}
+
 void appendBlocksFromChildren(const MigrationHtmlNode &node,
                               QJsonArray &blocks,
                               MigrationHtmlConversionResult &result,
@@ -738,15 +1192,20 @@ void appendBlocksFromChildren(const MigrationHtmlNode &node,
             continue;
         }
 
+        if (isImageElement(child)) {
+            appendImageBlock(child, inlineContent, blocks, result, false);
+            continue;
+        }
+
         if (isBlockElement(child)) {
             if (!inlineContent.isEmpty()) {
                 appendParagraphIfContent(inlineContent, blocks);
             }
-            blocks.append(blockFromElement(child, result, inheritedMarks));
+            appendBlocksFromElement(child, blocks, result, inheritedMarks);
             continue;
         }
 
-        appendInlineNode(child, inlineContent, inheritedMarks, result);
+        appendInlineOrImageBlocks(child, inlineContent, blocks, inheritedMarks, result, false);
     }
 
     if (!inlineContent.isEmpty()) {
@@ -758,12 +1217,7 @@ QJsonObject downgradedParagraphFromBlock(const MigrationHtmlNode &node,
                                          MigrationHtmlConversionResult &result,
                                          const QJsonArray &inheritedMarks = QJsonArray())
 {
-    if (node.tagName != QStringLiteral("p") && node.tagName != QStringLiteral("div")) {
-        addWarning(result,
-                   QStringLiteral("/%1").arg(node.tagName),
-                   QStringLiteral("downgraded-html-block"),
-                   QStringLiteral("HTML block <%1> was downgraded to paragraph").arg(node.tagName));
-    }
+    warnDowngradedBlock(node, result);
 
     return MigrationJsonBuilder::makeParagraph(inlineContentFrom(node, result, inheritedMarks));
 }
@@ -800,13 +1254,18 @@ QJsonArray listItemContentFromElement(const MigrationHtmlNode &node,
             continue;
         }
 
-        if (isBlockElement(child)) {
-            appendInlineContentAsParagraph(inlineContent, content);
-            content.append(blockFromElement(child, result, inheritedMarks));
+        if (isImageElement(child)) {
+            appendImageBlock(child, inlineContent, content, result, true);
             continue;
         }
 
-        appendInlineNode(child, inlineContent, inheritedMarks, result);
+        if (isBlockElement(child)) {
+            appendInlineContentAsParagraph(inlineContent, content);
+            appendBlocksFromElement(child, content, result, inheritedMarks, true);
+            continue;
+        }
+
+        appendInlineOrImageBlocks(child, inlineContent, content, inheritedMarks, result, true);
     }
 
     appendInlineContentAsParagraph(inlineContent, content);
@@ -827,7 +1286,9 @@ QJsonObject listItemFromInvalidListChild(const MigrationHtmlNode &node,
     }
 
     if (isBlockElement(node)) {
-        return MigrationJsonBuilder::makeListItem(QJsonArray { blockFromElement(node, result, parentMarks) });
+        QJsonArray content;
+        appendBlocksFromElement(node, content, result, parentMarks, true);
+        return MigrationJsonBuilder::makeListItem(content);
     }
 
     QJsonArray inlineContent;
@@ -875,10 +1336,80 @@ QJsonObject blockquoteFromElement(const MigrationHtmlNode &node,
     return MigrationJsonBuilder::makeBlockquote(content);
 }
 
+void appendBlocksFromElement(const MigrationHtmlNode &node,
+                             QJsonArray &blocks,
+                             MigrationHtmlConversionResult &result,
+                             const QJsonArray &inheritedMarks,
+                             bool ensureInitialParagraphBeforeBlock)
+{
+    if (isImageElement(node)) {
+        QJsonArray inlineContent;
+        appendImageBlock(node, inlineContent, blocks, result, ensureInitialParagraphBeforeBlock);
+        return;
+    }
+
+    if (node.tagName == QStringLiteral("p") || node.tagName == QStringLiteral("div")) {
+        warnTextAlignDeclarations(node, result);
+        if (const MigrationHtmlNode *image = singleImageChildIfOnlyImageContent(node)) {
+            const int initialBlockCount = blocks.size();
+            QJsonArray inlineContent;
+            appendImageBlock(*image, inlineContent, blocks, result, ensureInitialParagraphBeforeBlock);
+            if (blocks.size() == initialBlockCount) {
+                blocks.append(MigrationJsonBuilder::makeParagraph());
+            }
+            return;
+        }
+
+        appendInlineContainerAsBlocks(node, blocks, result, inheritedMarks, ensureInitialParagraphBeforeBlock);
+        return;
+    }
+
+    if (isHeadingElement(node)) {
+        warnTextAlignDeclarations(node, result);
+        appendHeadingElementAsBlocks(node, blocks, result, inheritedMarks, ensureInitialParagraphBeforeBlock);
+        return;
+    }
+
+    if (isListElement(node) || node.tagName == QStringLiteral("blockquote")) {
+        appendBlockWithInitialParagraph(blocks,
+                                        blockFromElement(node, result, inheritedMarks),
+                                        ensureInitialParagraphBeforeBlock);
+        return;
+    }
+
+    if (isListItemElement(node)) {
+        warnTextAlignDeclarations(node, result);
+        addWarning(result,
+                   elementPath(node),
+                   QStringLiteral("downgraded-orphan-list-item"),
+                   QStringLiteral("HTML list item outside a list was downgraded to paragraph"));
+        appendInlineContainerAsBlocks(node, blocks, result, inheritedMarks, ensureInitialParagraphBeforeBlock);
+        return;
+    }
+
+    warnTextAlignDeclarations(node, result);
+    warnDowngradedBlock(node, result);
+    appendInlineContainerAsBlocks(node, blocks, result, inheritedMarks, ensureInitialParagraphBeforeBlock);
+}
+
 QJsonObject blockFromElement(const MigrationHtmlNode &node,
                              MigrationHtmlConversionResult &result,
                              const QJsonArray &inheritedMarks)
 {
+    if (isImageElement(node)) {
+        return imageFromElement(node, result);
+    }
+
+    if (node.tagName == QStringLiteral("p") || node.tagName == QStringLiteral("div")) {
+        warnTextAlignDeclarations(node, result);
+        if (const MigrationHtmlNode *image = singleImageChildIfOnlyImageContent(node)) {
+            const QJsonObject imageNode = imageFromElement(*image, result);
+            if (!imageNode.isEmpty()) {
+                return imageNode;
+            }
+        }
+    }
+
     if (isHeadingElement(node)) {
         warnTextAlignDeclarations(node, result);
         return MigrationJsonBuilder::makeHeading(headingLevel(node), inlineContentFrom(node, result, inheritedMarks));
