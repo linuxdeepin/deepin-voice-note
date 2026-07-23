@@ -71,7 +71,7 @@ export function validateEnvelope(envelope, schema = createTiptapSchemaV1()) {
 
   if (!errors.some(error => error.code === 'max-node-depth-exceeded')) {
     try {
-      schema.nodeFromJSON(envelope.content)
+      schema.nodeFromJSON(envelope.content).check()
     } catch (err) {
       errors.push(error('content', 'schema-validation-failed', err.message))
     }
