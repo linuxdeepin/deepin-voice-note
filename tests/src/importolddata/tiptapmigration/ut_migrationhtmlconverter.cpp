@@ -836,3 +836,119 @@ TEST(UT_MigrationHtmlConverter, DowngradesTextAlignBecauseSchemaV1HasNoAlignment
     EXPECT_FALSE(attrsOf(blocks.at(1).toObject()).contains(QStringLiteral("textAlign")));
     EXPECT_EQ(QStringLiteral("Title"), textOf(nodeContentOf(blocks.at(1).toObject()).at(0).toObject()));
 }
+
+TEST(UT_MigrationHtmlConverter, ConvertsVoiceBoxJsonKeyToVoiceBlock)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(QStringLiteral(
+        R"(<div class="li voiceBox active hover" draggable="true"
+                jsonKey="{&quot;type&quot;:2,&quot;voiceId&quot;:&quot;voice-1&quot;,&quot;voicePath&quot;:&quot;/home/uos/.local/share/deepin/deepin-voice-note/voicenote/a.mp3&quot;,&quot;voiceSize&quot;:&quot;60000&quot;,&quot;createTime&quot;:&quot;2026-07-17 10:00:00&quot;,&quot;title&quot;:&quot;录音&quot;,&quot;text&quot;:&quot;转写文本&quot;,&quot;state&quot;:true,&quot;translateUnfold&quot;:false}">
+             <div class="voicePlayback now play voiceToText"></div>
+           </div>)"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(result.warnings.isEmpty());
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(1, blocks.size());
+    const QJsonObject voiceBlock = blocks.at(0).toObject();
+    EXPECT_EQ(QStringLiteral("voiceBlock"), nodeTypeOf(voiceBlock));
+    const QJsonObject attrs = attrsOf(voiceBlock);
+    EXPECT_EQ(QStringLiteral("voice-1"), attrs.value(QStringLiteral("voiceId")).toString());
+    EXPECT_EQ(QStringLiteral("voicenote/a.mp3"), attrs.value(QStringLiteral("voicePath")).toString());
+    EXPECT_EQ(60000, attrs.value(QStringLiteral("voiceSize")).toInt());
+    EXPECT_EQ(QStringLiteral("2026-07-17 10:00:00"), attrs.value(QStringLiteral("createTime")).toString());
+    EXPECT_EQ(QStringLiteral("录音"), attrs.value(QStringLiteral("title")).toString());
+    EXPECT_EQ(QStringLiteral("转写文本"), attrs.value(QStringLiteral("text")).toString());
+    EXPECT_FALSE(attrs.value(QStringLiteral("translateUnfold")).toBool());
+    EXPECT_FALSE(attrs.contains(QStringLiteral("state")));
+    EXPECT_FALSE(attrs.contains(QStringLiteral("translating")));
+    EXPECT_FALSE(attrs.contains(QStringLiteral("playStatus")));
+}
+
+TEST(UT_MigrationHtmlConverter, ConvertsLiVoiceBoxWithoutOrphanListWarning)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(QStringLiteral(
+        R"(<li class="voiceBox" jsonKey="{&quot;type&quot;:2,&quot;voiceId&quot;:&quot;voice-li&quot;,&quot;voicePath&quot;:&quot;voicenote/li.mp3&quot;,&quot;voiceSize&quot;:1}"></li>)"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_FALSE(hasWarningCode(result, QStringLiteral("downgraded-orphan-list-item")));
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(1, blocks.size());
+    EXPECT_EQ(QStringLiteral("voiceBlock"), nodeTypeOf(blocks.at(0).toObject()));
+}
+
+TEST(UT_MigrationHtmlConverter, KeepsNestedListItemVoiceBoxSchemaValid)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(QStringLiteral(
+        R"(<ul><li class="voiceBox" jsonKey="{&quot;type&quot;:2,&quot;voiceId&quot;:&quot;voice-nested&quot;,&quot;voicePath&quot;:&quot;voicenote/nested.mp3&quot;,&quot;voiceSize&quot;:2}"></li></ul>)"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+
+    const QJsonObject list = docContentOf(result).at(0).toObject();
+    ASSERT_EQ(1, nodeContentOf(list).size());
+    const QJsonArray itemContent = nodeContentOf(nodeContentOf(list).at(0).toObject());
+    ASSERT_EQ(2, itemContent.size());
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(itemContent.at(0).toObject()));
+    EXPECT_TRUE(nodeContentOf(itemContent.at(0).toObject()).isEmpty());
+    EXPECT_EQ(QStringLiteral("voiceBlock"), nodeTypeOf(itemContent.at(1).toObject()));
+    EXPECT_EQ(QStringLiteral("voice-nested"), attrsOf(itemContent.at(1).toObject()).value(QStringLiteral("voiceId")).toString());
+}
+
+TEST(UT_MigrationHtmlConverter, GeneratesVoiceIdNormalizesPathAndKeepsTranslateText)
+{
+    const MigrationHtmlConversionResult first = MigrationHtmlConverter::convert(QStringLiteral(
+        R"(<div class="li voiceBox" jsonKey="{&quot;type&quot;:2,&quot;voicePath&quot;:&quot;recording.mp3&quot;,&quot;voiceSize&quot;:123,&quot;title&quot;:&quot;录音&quot;}">
+             <div class="translate"><div class="translateText">转写<br>文本</div></div>
+           </div>)"));
+    const MigrationHtmlConversionResult second = MigrationHtmlConverter::convert(QStringLiteral(
+        R"(<div class="li voiceBox" jsonKey="{&quot;type&quot;:2,&quot;voicePath&quot;:&quot;recording.mp3&quot;,&quot;voiceSize&quot;:123,&quot;title&quot;:&quot;录音&quot;}">
+             <div class="translate"><div class="translateText">转写<br>文本</div></div>
+           </div>)"));
+
+    EXPECT_TRUE(first.ok());
+    expectEnvelopeValid(first);
+    EXPECT_TRUE(hasWarningCode(first, QStringLiteral("generated-voice-id")));
+    EXPECT_TRUE(hasWarningCode(first, QStringLiteral("normalized-voice-path")));
+
+    const QJsonObject attrs = attrsOf(docContentOf(first).at(0).toObject());
+    EXPECT_TRUE(attrs.value(QStringLiteral("voiceId")).toString().startsWith(QStringLiteral("legacy-voice-")));
+    EXPECT_EQ(attrs.value(QStringLiteral("voiceId")).toString(), attrsOf(docContentOf(second).at(0).toObject()).value(QStringLiteral("voiceId")).toString());
+    EXPECT_EQ(QStringLiteral("voicenote/recording.mp3"), attrs.value(QStringLiteral("voicePath")).toString());
+    EXPECT_EQ(QStringLiteral("转写 文本"), attrs.value(QStringLiteral("text")).toString());
+}
+
+TEST(UT_MigrationHtmlConverter, FallsBackToVisibleTextWhenVoiceBoxJsonKeyInvalid)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(QStringLiteral(
+        R"(<div class="li voiceBox" jsonKey="{bad-json"><div class="title">录音</div><div class="translateText">可见转写</div></div>)"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("invalid-voicebox-jsonkey")));
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(1, blocks.size());
+    const QJsonObject paragraph = blocks.at(0).toObject();
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(paragraph));
+    ASSERT_EQ(1, nodeContentOf(paragraph).size());
+    EXPECT_EQ(QStringLiteral("录音 可见转写"), textOf(nodeContentOf(paragraph).at(0).toObject()));
+}
+
+TEST(UT_MigrationHtmlConverter, FallsBackToVisibleTextWhenVoicePathIsUnsafe)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(QStringLiteral(
+        R"(<div class="li voiceBox" jsonKey="{&quot;type&quot;:2,&quot;voiceId&quot;:&quot;voice-bad&quot;,&quot;voicePath&quot;:&quot;voicenote/../escape.mp3&quot;,&quot;voiceSize&quot;:1}">保留文本</div>)"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("invalid-voice-path")));
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(1, blocks.size());
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(blocks.at(0).toObject()));
+    EXPECT_EQ(QStringLiteral("保留文本"), textOf(nodeContentOf(blocks.at(0).toObject()).at(0).toObject()));
+}

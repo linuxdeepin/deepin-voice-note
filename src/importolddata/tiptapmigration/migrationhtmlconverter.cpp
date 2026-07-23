@@ -7,13 +7,24 @@
 #include "migrationjsonbuilder.h"
 
 #include <QJsonArray>
+#include <QJsonParseError>
+#include <QJsonDocument>
+#include <QFileInfo>
+#include <QDir>
+#include <QCryptographicHash>
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QRegularExpression>
 #include <QSet>
 #include <QStringList>
 
+#include <cmath>
+
+#include <limits>
+
 namespace {
+
+constexpr int kVoiceBlockType = 2;
 
 const QSet<QString> &dangerousTags()
 {
@@ -142,6 +153,404 @@ bool isListItemElement(const MigrationHtmlNode &node)
 {
     return node.type == MigrationHtmlNodeType::Element && node.tagName == QStringLiteral("li");
 }
+
+bool isVoiceBoxElement(const MigrationHtmlNode &node)
+{
+    return node.type == MigrationHtmlNodeType::Element
+        && MigrationHtmlParser::hasClass(node, QStringLiteral("voiceBox"));
+}
+
+QString normalizedNewlines(QString text)
+{
+    text.replace(QStringLiteral("\r\n"), QStringLiteral("\n"));
+    text.replace(QLatin1Char('\r'), QLatin1Char('\n'));
+    return text;
+}
+
+QString normalizedVisibleText(const QString &text)
+{
+    QString normalized;
+    bool pendingSpace = false;
+
+    for (const QChar &character : normalizedNewlines(text)) {
+        if (character.isSpace()) {
+            pendingSpace = true;
+            continue;
+        }
+
+        if (pendingSpace && !normalized.isEmpty()) {
+            normalized.append(QLatin1Char(' '));
+        }
+
+        normalized.append(character);
+        pendingSpace = false;
+    }
+
+    return normalized.trimmed();
+}
+
+QString visibleTextOf(const MigrationHtmlNode &node)
+{
+    if (node.type == MigrationHtmlNodeType::Text) {
+        return node.text;
+    }
+
+    QString text;
+    for (const MigrationHtmlNode &child : node.children) {
+        if (isDangerousElement(child)) {
+            continue;
+        }
+        const QString childText = visibleTextOf(child);
+        if (!text.isEmpty() && !childText.isEmpty()) {
+            text.append(QLatin1Char(' '));
+        }
+        text.append(childText);
+    }
+
+    return text;
+}
+
+QString translatedTextOf(const MigrationHtmlNode &node)
+{
+    if (node.type != MigrationHtmlNodeType::Element) {
+        return QString();
+    }
+
+    if (MigrationHtmlParser::hasClass(node, QStringLiteral("translateText"))) {
+        return visibleTextOf(node);
+    }
+
+    QString text;
+    for (const MigrationHtmlNode &child : node.children) {
+        const QString childText = translatedTextOf(child);
+        if (!text.isEmpty() && !childText.isEmpty()) {
+            text.append(QLatin1Char('\n'));
+        }
+        text.append(childText);
+    }
+
+    return text;
+}
+
+
+QString normalizedVoicePathSeparators(QString path)
+{
+    path = path.trimmed();
+    path.replace(QLatin1Char('\\'), QLatin1Char('/'));
+    return path;
+}
+
+bool isUnsafePathSegment(const QString &segment)
+{
+    return segment.isEmpty()
+        || segment == QStringLiteral(".")
+        || segment == QStringLiteral("..")
+        || segment.contains(QLatin1Char(':'));
+}
+
+bool hasUnsafeInputPathSegments(const QString &path)
+{
+    const QStringList segments = path.split(QLatin1Char('/'), Qt::KeepEmptyParts);
+    for (int index = 0; index < segments.size(); ++index) {
+        if (index == 0 && segments.at(index).isEmpty() && path.startsWith(QLatin1Char('/'))) {
+            continue;
+        }
+
+        if (isUnsafePathSegment(segments.at(index))) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool isSafeVoicenoteRelativePath(const QString &path)
+{
+    if (!path.startsWith(QStringLiteral("voicenote/")) || QDir::isAbsolutePath(path)) {
+        return false;
+    }
+
+    const QStringList segments = path.split(QLatin1Char('/'), Qt::KeepEmptyParts);
+    for (const QString &segment : segments) {
+        if (isUnsafePathSegment(segment)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+
+void addVoiceBoxWarning(MigrationHtmlConversionResult &result,
+                        const MigrationHtmlNode &node,
+                        const QString &code,
+                        const QString &message,
+                        const QString &suffix = QString())
+{
+    addWarning(result,
+               elementPath(node) + suffix,
+               code,
+               message);
+}
+
+QJsonObject voiceBoxFallbackParagraph(const MigrationHtmlNode &node,
+                                      MigrationHtmlConversionResult &result,
+                                      const QString &code,
+                                      const QString &message,
+                                      const QString &suffix = QStringLiteral(".jsonKey"))
+{
+    addVoiceBoxWarning(result, node, code, message, suffix);
+
+    const QString fallbackText = normalizedVisibleText(visibleTextOf(node));
+    if (fallbackText.isEmpty()) {
+        return MigrationJsonBuilder::makeParagraph();
+    }
+
+    return MigrationJsonBuilder::makeParagraph(QJsonArray { MigrationJsonBuilder::makeText(fallbackText) });
+}
+
+QJsonObject parsedVoiceBoxJsonKey(const MigrationHtmlNode &node,
+                                  MigrationHtmlConversionResult &result,
+                                  bool *ok)
+{
+    *ok = false;
+    const QString jsonKey = MigrationHtmlParser::attribute(node, QStringLiteral("jsonKey")).trimmed();
+    if (jsonKey.isEmpty()) {
+        return voiceBoxFallbackParagraph(node,
+                                         result,
+                                         QStringLiteral("missing-voicebox-jsonkey"),
+                                         QStringLiteral("voiceBox jsonKey is missing; visible text was preserved as a paragraph"));
+    }
+
+    QJsonParseError parseError;
+    const QJsonDocument document = QJsonDocument::fromJson(jsonKey.toUtf8(), &parseError);
+    if (parseError.error != QJsonParseError::NoError || !document.isObject()) {
+        return voiceBoxFallbackParagraph(node,
+                                         result,
+                                         QStringLiteral("invalid-voicebox-jsonkey"),
+                                         QStringLiteral("voiceBox jsonKey could not be parsed; visible text was preserved as a paragraph"));
+    }
+
+    *ok = true;
+    return document.object();
+}
+
+QString stringField(const QJsonObject &block,
+                    const QString &field,
+                    const MigrationHtmlNode &node,
+                    MigrationHtmlConversionResult &result)
+{
+    const QJsonValue value = block.value(field);
+    if (value.isUndefined() || value.isNull()) {
+        return QString();
+    }
+
+    if (value.isString()) {
+        return value.toString();
+    }
+
+    addVoiceBoxWarning(result,
+                       node,
+                       QStringLiteral("invalid-voicebox-string-field"),
+                       QStringLiteral("voiceBox string field '%1' was ignored because it is not a string").arg(field),
+                       QStringLiteral(".") + field);
+    return QString();
+}
+
+QString normalizeVoicePath(const QJsonObject &block,
+                           const MigrationHtmlNode &node,
+                           MigrationHtmlConversionResult &result,
+                           bool *ok)
+{
+    *ok = false;
+    const QJsonValue value = block.value(QStringLiteral("voicePath"));
+    if (!value.isString() || value.toString().trimmed().isEmpty()) {
+        return QString();
+    }
+
+    const QString voicePath = normalizedVoicePathSeparators(value.toString());
+    const int voicenoteIndex = voicePath.indexOf(QStringLiteral("voicenote/"));
+    if (voicenoteIndex >= 0) {
+        const QString candidate = voicePath.mid(voicenoteIndex);
+        if (!isSafeVoicenoteRelativePath(candidate)) {
+            return QString();
+        }
+
+        *ok = true;
+        return candidate;
+    }
+
+    if (hasUnsafeInputPathSegments(voicePath)) {
+        return QString();
+    }
+
+    const QString fileName = QFileInfo(voicePath).fileName();
+    if (fileName.isEmpty() || isUnsafePathSegment(fileName)) {
+        return QString();
+    }
+
+    addVoiceBoxWarning(result,
+                       node,
+                       QStringLiteral("normalized-voice-path"),
+                       QStringLiteral("voicePath was normalized to voicenote/<fileName>"),
+                       QStringLiteral(".voicePath"));
+    *ok = true;
+    return QStringLiteral("voicenote/") + fileName;
+}
+
+qint64 sanitizedVoiceSize(double size,
+                          const MigrationHtmlNode &node,
+                          MigrationHtmlConversionResult &result)
+{
+    if (!std::isfinite(size)) {
+        addVoiceBoxWarning(result,
+                           node,
+                           QStringLiteral("invalid-voice-size"),
+                           QStringLiteral("voiceSize is not finite and was converted to 0"),
+                           QStringLiteral(".voiceSize"));
+        return 0;
+    }
+
+    if (size < 0) {
+        addVoiceBoxWarning(result,
+                           node,
+                           QStringLiteral("negative-voice-size"),
+                           QStringLiteral("negative voiceSize was converted to 0"),
+                           QStringLiteral(".voiceSize"));
+        return 0;
+    }
+
+    const double maxSize = static_cast<double>(std::numeric_limits<qint64>::max());
+    if (size > maxSize) {
+        addVoiceBoxWarning(result,
+                           node,
+                           QStringLiteral("oversized-voice-size"),
+                           QStringLiteral("voiceSize is too large and was clamped"),
+                           QStringLiteral(".voiceSize"));
+        return std::numeric_limits<qint64>::max();
+    }
+
+    return static_cast<qint64>(size);
+}
+
+qint64 voiceSizeFromBlock(const QJsonObject &block,
+                          const MigrationHtmlNode &node,
+                          MigrationHtmlConversionResult &result)
+{
+    const QJsonValue value = block.value(QStringLiteral("voiceSize"));
+    if (value.isUndefined() || value.isNull()) {
+        addVoiceBoxWarning(result,
+                           node,
+                           QStringLiteral("missing-voice-size"),
+                           QStringLiteral("missing voiceSize was converted to 0"),
+                           QStringLiteral(".voiceSize"));
+        return 0;
+    }
+
+    if (value.isDouble()) {
+        return sanitizedVoiceSize(value.toDouble(), node, result);
+    }
+
+    if (value.isString()) {
+        bool parsed = false;
+        const double size = value.toString().trimmed().toDouble(&parsed);
+        if (parsed) {
+            return sanitizedVoiceSize(size, node, result);
+        }
+    }
+
+    addVoiceBoxWarning(result,
+                       node,
+                       QStringLiteral("invalid-voice-size"),
+                       QStringLiteral("invalid voiceSize was converted to 0"),
+                       QStringLiteral(".voiceSize"));
+    return 0;
+}
+
+QString generatedVoiceId(const MigrationHtmlNode &node,
+                         const QString &voicePath,
+                         const QString &createTime,
+                         const QString &title)
+{
+    const QString seed = QStringLiteral("%1\n%2\n%3\n%4")
+                             .arg(elementPath(node), voicePath, createTime, title);
+    const QByteArray hash = QCryptographicHash::hash(seed.toUtf8(), QCryptographicHash::Sha1).toHex();
+    return QStringLiteral("legacy-voice-") + QString::fromLatin1(hash.left(16));
+}
+
+QString voiceIdFromBlock(const QJsonObject &block,
+                         const MigrationHtmlNode &node,
+                         const QString &voicePath,
+                         const QString &createTime,
+                         const QString &title,
+                         MigrationHtmlConversionResult &result)
+{
+    const QJsonValue value = block.value(QStringLiteral("voiceId"));
+    if (value.isString() && !value.toString().trimmed().isEmpty()) {
+        return value.toString().trimmed();
+    }
+
+    addVoiceBoxWarning(result,
+                       node,
+                       QStringLiteral("generated-voice-id"),
+                       QStringLiteral("voiceId was missing or invalid and a stable legacy id was generated"),
+                       QStringLiteral(".voiceId"));
+    return generatedVoiceId(node, voicePath, createTime, title);
+}
+
+bool translateUnfoldFromBlock(const QJsonObject &block)
+{
+    const QJsonValue value = block.value(QStringLiteral("translateUnfold"));
+    return value.isBool() ? value.toBool() : true;
+}
+
+QJsonObject voiceBlockFromElement(const MigrationHtmlNode &node,
+                                  MigrationHtmlConversionResult &result)
+{
+    bool jsonKeyOk = false;
+    const QJsonObject block = parsedVoiceBoxJsonKey(node, result, &jsonKeyOk);
+    if (!jsonKeyOk) {
+        return block;
+    }
+
+    bool voicePathOk = false;
+    const QString voicePath = normalizeVoicePath(block, node, result, &voicePathOk);
+    if (!voicePathOk) {
+        return voiceBoxFallbackParagraph(node,
+                                         result,
+                                         QStringLiteral("invalid-voice-path"),
+                                         QStringLiteral("voiceBox voicePath could not be normalized; visible text was preserved as a paragraph"),
+                                         QStringLiteral(".voicePath"));
+    }
+
+    if (block.value(QStringLiteral("type")).isDouble() && block.value(QStringLiteral("type")).toInt() != kVoiceBlockType) {
+        addVoiceBoxWarning(result,
+                           node,
+                           QStringLiteral("unexpected-voicebox-type"),
+                           QStringLiteral("voiceBox jsonKey type is not the legacy voice block type and was ignored"),
+                           QStringLiteral(".type"));
+    }
+
+    const QString createTime = stringField(block, QStringLiteral("createTime"), node, result);
+    const QString title = stringField(block, QStringLiteral("title"), node, result);
+    QString text = stringField(block, QStringLiteral("text"), node, result);
+    if (text.isEmpty()) {
+        text = normalizedVisibleText(translatedTextOf(node));
+    }
+
+    const qint64 voiceSize = voiceSizeFromBlock(block, node, result);
+    const QString voiceId = voiceIdFromBlock(block, node, voicePath, createTime, title, result);
+
+    return MigrationJsonBuilder::makeVoiceBlock(voiceId,
+                                                voicePath,
+                                                voiceSize,
+                                                createTime,
+                                                title,
+                                                text,
+                                                translateUnfoldFromBlock(block));
+}
+
 
 
 bool isImageElement(const MigrationHtmlNode &node)
@@ -926,6 +1335,15 @@ void appendInlineNode(const MigrationHtmlNode &node,
         return;
     }
 
+    if (isVoiceBoxElement(node)) {
+        appendVisibleText(content, visibleTextOf(node), marks);
+        addVoiceBoxWarning(result,
+                           node,
+                           QStringLiteral("downgraded-inline-voicebox"),
+                           QStringLiteral("inline voiceBox was downgraded to visible text"));
+        return;
+    }
+
     if (isImageElement(node)) {
         const QJsonObject image = imageFromElement(node, result);
         if (!image.isEmpty()) {
@@ -1192,6 +1610,12 @@ void appendBlocksFromChildren(const MigrationHtmlNode &node,
             continue;
         }
 
+        if (isVoiceBoxElement(child)) {
+            appendParagraphIfContent(inlineContent, blocks);
+            blocks.append(voiceBlockFromElement(child, result));
+            continue;
+        }
+
         if (isImageElement(child)) {
             appendImageBlock(child, inlineContent, blocks, result, false);
             continue;
@@ -1251,6 +1675,12 @@ QJsonArray listItemContentFromElement(const MigrationHtmlNode &node,
                 content.append(MigrationJsonBuilder::makeParagraph());
             }
             content.append(listFromElement(child, result, inheritedMarks));
+            continue;
+        }
+
+        if (isVoiceBoxElement(child)) {
+            appendInlineContentAsParagraph(inlineContent, content);
+            appendBlockWithInitialParagraph(content, voiceBlockFromElement(child, result), true);
             continue;
         }
 
@@ -1315,8 +1745,15 @@ QJsonObject listFromElement(const MigrationHtmlNode &node,
         }
 
         if (isListItemElement(child)) {
-            items.append(MigrationJsonBuilder::makeListItem(
-                listItemContentFromElement(child, result, listMarks)));
+            if (isVoiceBoxElement(child)) {
+                items.append(MigrationJsonBuilder::makeListItem(QJsonArray {
+                    MigrationJsonBuilder::makeParagraph(),
+                    voiceBlockFromElement(child, result)
+                }));
+            } else {
+                items.append(MigrationJsonBuilder::makeListItem(
+                    listItemContentFromElement(child, result, listMarks)));
+            }
         } else {
             items.append(listItemFromInvalidListChild(child, result, listMarks));
         }
@@ -1342,6 +1779,13 @@ void appendBlocksFromElement(const MigrationHtmlNode &node,
                              const QJsonArray &inheritedMarks,
                              bool ensureInitialParagraphBeforeBlock)
 {
+    if (isVoiceBoxElement(node)) {
+        appendBlockWithInitialParagraph(blocks,
+                                        voiceBlockFromElement(node, result),
+                                        ensureInitialParagraphBeforeBlock);
+        return;
+    }
+
     if (isImageElement(node)) {
         QJsonArray inlineContent;
         appendImageBlock(node, inlineContent, blocks, result, ensureInitialParagraphBeforeBlock);
@@ -1396,6 +1840,10 @@ QJsonObject blockFromElement(const MigrationHtmlNode &node,
                              MigrationHtmlConversionResult &result,
                              const QJsonArray &inheritedMarks)
 {
+    if (isVoiceBoxElement(node)) {
+        return voiceBlockFromElement(node, result);
+    }
+
     if (isImageElement(node)) {
         return imageFromElement(node, result);
     }
