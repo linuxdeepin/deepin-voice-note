@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -48,10 +48,8 @@ void GlobalEnvent::SetUp()
         folder->modifyTime = QDateTime::currentDateTime();
         folder->deleteTime = QDateTime::currentDateTime();
         folder->id = i;
-        folder->UI.icon = VNoteDataManager::instance()->getDefaultIcon(
-            0, IconsType::DefaultIcon);
-        folder->UI.grayIcon = VNoteDataManager::instance()->getDefaultIcon(
-            0, IconsType::DefaultGrayIcon);
+        folder->defaultIcon = 0;
+        folder->iconPath = defaultIconPathFmt.arg(1);
         dataManager->addFolder(folder);
 
         for (int j = 0; j < 2; j++) {

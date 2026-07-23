@@ -81,6 +81,5 @@ endif()
 
 # Unit Tests
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    # QML 改造早期屏蔽
-    # add_subdirectory(tests)
+    add_subdirectory(tests)
 endif()
