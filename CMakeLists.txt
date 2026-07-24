@@ -8,9 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif()
+# CMAKE_CXX_STANDARD 17 (set above) is the authoritative standard; the
+# previous -std=c++11 override was dead code that conflicted with it and
+# with Qt6's C++17 requirement, and has been removed.
 
 set(APP_RES_DIR "assets")
 set(APP_DESKTOP "${APP_RES_DIR}/deepin-voice-note.desktop")
