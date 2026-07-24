@@ -1,0 +1,10 @@
+[
+  {
+    "code": "generated-voice-id",
+    "path": "/div.voiceId"
+  },
+  {
+    "code": "normalized-voice-path",
+    "path": "/div.voicePath"
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "format": "tiptap",
+  "schemaVersion": 1,
+  "content": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "voiceBlock",
+        "attrs": {
+          "voiceId": "v-t",
+          "voicePath": "voicenote/t.mp3",
+          "voiceSize": 1,
+          "createTime": null,
+          "title": null,
+          "text": null,
+          "translateUnfold": true
+        }
+      }
+    ]
+  }
+}

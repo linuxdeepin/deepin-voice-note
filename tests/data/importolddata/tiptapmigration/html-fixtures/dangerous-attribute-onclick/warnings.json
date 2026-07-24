@@ -1,0 +1,6 @@
+[
+  {
+    "code": "dangerous-html-attribute",
+    "path": "onclick"
+  }
+]
