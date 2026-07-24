@@ -1,0 +1,10 @@
+[
+  {
+    "code": "dangerous-html-attribute",
+    "path": "href"
+  },
+  {
+    "code": "downgraded-html-link",
+    "path": "/a"
+  }
+]

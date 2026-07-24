@@ -1,0 +1,21 @@
+{
+  "format": "tiptap",
+  "schemaVersion": 1,
+  "content": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "voiceBlock",
+        "attrs": {
+          "voiceId": "legacy-voice-355c95652bede5f3",
+          "voicePath": "voicenote/recording.mp3",
+          "voiceSize": 123,
+          "createTime": null,
+          "title": "录音",
+          "text": null,
+          "translateUnfold": true
+        }
+      }
+    ]
+  }
+}

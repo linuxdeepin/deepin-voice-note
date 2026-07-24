@@ -135,6 +135,11 @@ add_executable(${PROJECT_NAME_TEST}
     ${APP_QRC}
     )
 
+# TTP-014: 注入脱敏 HTML fixtures 源树绝对路径，供 ut_migrationhtmlfixtures 自动发现。
+# harness 源文件由上方 GLOB_RECURSE 自动收录，新增 fixture 无需改此文件。
+target_compile_definitions(${PROJECT_NAME_TEST} PRIVATE
+    MIGRATION_HTML_FIXTURES_DIR="${CMAKE_CURRENT_LIST_DIR}/data/importolddata/tiptapmigration/html-fixtures")
+
 # 生成测试可执行程序的依赖库
 target_link_libraries(${PROJECT_NAME_TEST} gtest gtest_main -pthread)
 

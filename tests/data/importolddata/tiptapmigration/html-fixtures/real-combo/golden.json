@@ -1,0 +1,97 @@
+{
+  "format": "tiptap",
+  "schemaVersion": 1,
+  "content": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "content": [
+          {
+            "type": "text",
+            "text": "Note title"
+          }
+        ],
+        "attrs": {
+          "level": 1
+        }
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "Plain text with "
+          },
+          {
+            "type": "text",
+            "text": "bold",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "text": "."
+          }
+        ]
+      },
+      {
+        "type": "bulletList",
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "first"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "second"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "image",
+        "attrs": {
+          "src": "images/pic.png",
+          "relPath": "images/pic.png",
+          "alt": "img",
+          "title": "pic"
+        }
+      },
+      {
+        "type": "voiceBlock",
+        "attrs": {
+          "voiceId": "v-1",
+          "voicePath": "voicenote/b.mp3",
+          "voiceSize": 1000,
+          "createTime": "2026-01-01 00:00:00",
+          "title": "语音",
+          "text": "内容",
+          "translateUnfold": true
+        }
+      }
+    ]
+  }
+}
