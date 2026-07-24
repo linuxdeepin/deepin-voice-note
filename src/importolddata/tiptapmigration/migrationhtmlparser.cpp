@@ -3,6 +3,8 @@
 
 #include "migrationhtmlparser.h"
 
+#include "migrationhtmlcodes.h"
+
 #include <libxml/HTMLparser.h>
 #include <libxml/tree.h>
 
@@ -26,17 +28,6 @@ struct HtmlDocDeleter {
 };
 
 using HtmlDocPtr = std::unique_ptr<xmlDoc, HtmlDocDeleter>;
-
-const QSet<QString> &dangerousTags()
-{
-    static const QSet<QString> tags {
-        QStringLiteral("script"),
-        QStringLiteral("iframe"),
-        QStringLiteral("object"),
-        QStringLiteral("embed")
-    };
-    return tags;
-}
 
 QString xmlStringToQString(const xmlChar *value)
 {
@@ -101,39 +92,7 @@ QString childPath(const QString &parentPath, const QString &name, int index)
 
 bool isBlockElement(const QString &tagName)
 {
-    static const QSet<QString> blockTags {
-        QStringLiteral("address"),
-        QStringLiteral("article"),
-        QStringLiteral("aside"),
-        QStringLiteral("blockquote"),
-        QStringLiteral("dd"),
-        QStringLiteral("div"),
-        QStringLiteral("dl"),
-        QStringLiteral("dt"),
-        QStringLiteral("figcaption"),
-        QStringLiteral("figure"),
-        QStringLiteral("footer"),
-        QStringLiteral("h1"),
-        QStringLiteral("h2"),
-        QStringLiteral("h3"),
-        QStringLiteral("h4"),
-        QStringLiteral("h5"),
-        QStringLiteral("h6"),
-        QStringLiteral("header"),
-        QStringLiteral("hr"),
-        QStringLiteral("li"),
-        QStringLiteral("main"),
-        QStringLiteral("ol"),
-        QStringLiteral("p"),
-        QStringLiteral("pre"),
-        QStringLiteral("section"),
-        QStringLiteral("table"),
-        QStringLiteral("td"),
-        QStringLiteral("th"),
-        QStringLiteral("tr"),
-        QStringLiteral("ul")
-    };
-    return blockTags.contains(tagName);
+    return blockTags().contains(tagName);
 }
 
 void appendLineBreak(QString *plainText)
@@ -207,6 +166,19 @@ void appendPlainText(const MigrationHtmlNode &node, QString *plainText, int dept
     }
 }
 
+bool isDangerousAttribute(const QString &name, const QString &value)
+{
+    if (name.startsWith(QStringLiteral("on")) && name.size() > 2) {
+        return true;
+    }
+
+    if (name == QStringLiteral("src")) {
+        return false;
+    }
+
+    return isUnsafeUrlScheme(value);
+}
+
 MigrationHtmlNode convertNode(xmlNodePtr node,
                               const QString &path,
                               QVector<MigrationHtmlParseWarning> *warnings,
@@ -227,7 +199,7 @@ MigrationHtmlNode convertNode(xmlNodePtr node,
     if (depth > kMaxHtmlNodeDepth) {
         warnings->append(MigrationHtmlParseWarning {
             path,
-            QStringLiteral("depth-exceeded"),
+            kCodeDepthExceeded,
             QStringLiteral("HTML node depth must not exceed %1.").arg(kMaxHtmlNodeDepth)
         });
         return converted;
@@ -236,9 +208,19 @@ MigrationHtmlNode convertNode(xmlNodePtr node,
     if (dangerousTags().contains(converted.tagName)) {
         warnings->append(MigrationHtmlParseWarning {
             path,
-            QStringLiteral("dangerous-html-node"),
+            kCodeDangerousHtmlNode,
             QStringLiteral("Dangerous HTML node should be downgraded by migration converter.")
         });
+    } else {
+        for (auto it = converted.attributes.constBegin(); it != converted.attributes.constEnd(); ++it) {
+            if (isDangerousAttribute(it.key(), it.value())) {
+                warnings->append(MigrationHtmlParseWarning {
+                    path + QStringLiteral(".attrs.") + it.key(),
+                    kCodeDangerousHtmlAttribute,
+                    QStringLiteral("Dangerous HTML attribute was removed during migration.")
+                });
+            }
+        }
     }
 
     int elementIndex = 0;
@@ -278,7 +260,7 @@ xmlNodePtr firstElementChildByName(xmlNodePtr node, const QString &name)
 bool MigrationHtmlParseResult::ok() const
 {
     for (const MigrationHtmlParseWarning &warning : warnings) {
-        if (warning.code == QStringLiteral("parse-failed")) {
+        if (warning.code == kCodeParseFailed) {
             return false;
         }
     }
@@ -304,7 +286,7 @@ MigrationHtmlParseResult MigrationHtmlParser::parse(const QString &html)
     if (!doc) {
         result.warnings.append(MigrationHtmlParseWarning {
             QStringLiteral("/"),
-            QStringLiteral("parse-failed"),
+            kCodeParseFailed,
             QStringLiteral("Failed to parse legacy HTML.")
         });
         result.plainText = html;

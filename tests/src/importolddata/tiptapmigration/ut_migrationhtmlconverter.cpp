@@ -74,6 +74,29 @@ bool hasWarningCode(const MigrationHtmlConversionResult &result, const QString &
     return false;
 }
 
+int warningCount(const MigrationHtmlConversionResult &result, const QString &code)
+{
+    int count = 0;
+    for (const MigrationHtmlConversionIssue &warning : result.warnings) {
+        if (warning.code == code) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+bool hasWarningCodeWithPath(const MigrationHtmlConversionResult &result,
+                            const QString &code,
+                            const QString &pathFragment)
+{
+    for (const MigrationHtmlConversionIssue &warning : result.warnings) {
+        if (warning.code == code && warning.path.contains(pathFragment)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void expectEnvelopeValid(const MigrationHtmlConversionResult &result)
 {
     const MigrationJsonValidationResult validation = MigrationJsonValidator::validateEnvelope(result.envelope);
@@ -951,4 +974,161 @@ TEST(UT_MigrationHtmlConverter, FallsBackToVisibleTextWhenVoicePathIsUnsafe)
     ASSERT_EQ(1, blocks.size());
     EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(blocks.at(0).toObject()));
     EXPECT_EQ(QStringLiteral("保留文本"), textOf(nodeContentOf(blocks.at(0).toObject()).at(0).toObject()));
+}
+
+// --- TTP-013: G1 unknown inline element downgrade warnings ---
+
+TEST(UT_MigrationHtmlConverter, WarnsDisplayAffectingInlineMarkAndKeepsText)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<p>a<mark>m</mark>b</p>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("downgraded-inline-element")));
+
+    const QJsonArray content = nodeContentOf(docContentOf(result).at(0).toObject());
+    EXPECT_EQ(QStringLiteral("amb"), textOf(content.at(0).toObject()));
+}
+
+TEST(UT_MigrationHtmlConverter, WarnsDisplayAffectingInlineSubAndKeepsText)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<p>x<sub>y</sub>z</p>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("downgraded-inline-element")));
+
+    const QJsonArray content = nodeContentOf(docContentOf(result).at(0).toObject());
+    EXPECT_EQ(QStringLiteral("xyz"), textOf(content.at(0).toObject()));
+}
+
+TEST(UT_MigrationHtmlConverter, DoesNotWarnForTransparentSpanInline)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<p><span>s</span></p>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_FALSE(hasWarningCode(result, QStringLiteral("downgraded-inline-element")));
+
+    const QJsonArray content = nodeContentOf(docContentOf(result).at(0).toObject());
+    EXPECT_EQ(QStringLiteral("s"), textOf(content.at(0).toObject()));
+}
+
+// --- TTP-013: G2 dangerous attribute warnings (parser-level, copied into result) ---
+
+TEST(UT_MigrationHtmlConverter, WarnsDangerousEventAttributeAndKeepsText)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<p onclick=\"x\">t</p>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCodeWithPath(result, QStringLiteral("dangerous-html-attribute"), QStringLiteral(".attrs.onclick")));
+
+    const QJsonArray content = nodeContentOf(docContentOf(result).at(0).toObject());
+    EXPECT_EQ(QStringLiteral("t"), textOf(content.at(0).toObject()));
+}
+
+TEST(UT_MigrationHtmlConverter, WarnsDangerousLinkHrefAndDowngradesLink)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<a href=\"javascript:alert(1)\">t</a>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCodeWithPath(result, QStringLiteral("dangerous-html-attribute"), QStringLiteral(".attrs.href")));
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("downgraded-html-link")));
+
+    const QJsonArray content = nodeContentOf(docContentOf(result).at(0).toObject());
+    EXPECT_EQ(QStringLiteral("t"), textOf(content.at(0).toObject()));
+}
+
+TEST(UT_MigrationHtmlConverter, WarnsDangerousImageAttributeButKeepsImage)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<p><img onerror=\"x\" src=\"images/a.png\" data-rel-path=\"images/a.png\"></p>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCodeWithPath(result, QStringLiteral("dangerous-html-attribute"), QStringLiteral(".attrs.onerror")));
+    EXPECT_FALSE(hasWarningCodeWithPath(result, QStringLiteral("dangerous-html-attribute"), QStringLiteral(".attrs.src")));
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(1, blocks.size());
+    const QJsonObject image = blocks.at(0).toObject();
+    EXPECT_EQ(QStringLiteral("image"), nodeTypeOf(image));
+    EXPECT_EQ(QStringLiteral("images/a.png"), attrsOf(image).value(QStringLiteral("src")).toString());
+}
+
+// --- TTP-013: G3 hyperlink downgrade ---
+
+TEST(UT_MigrationHtmlConverter, DowngradesHyperlinkAndKeepsText)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<p><a href=\"https://e.com\">link</a>tail</p>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("downgraded-html-link")));
+    EXPECT_FALSE(hasWarningCode(result, QStringLiteral("dangerous-html-attribute")));
+
+    const QJsonArray content = nodeContentOf(docContentOf(result).at(0).toObject());
+    EXPECT_EQ(QStringLiteral("linktail"), textOf(content.at(0).toObject()));
+}
+
+// --- TTP-013: nesting consistency ---
+
+TEST(UT_MigrationHtmlConverter, WarnsDisplayAffectingInlineInsideNestedList)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<ul><li><p><mark>x</mark></p></li></ul>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("downgraded-inline-element")));
+
+    const QJsonArray items = nodeContentOf(docContentOf(result).at(0).toObject());
+    ASSERT_EQ(1, items.size());
+    const QJsonArray itemContent = nodeContentOf(items.at(0).toObject());
+    ASSERT_EQ(1, itemContent.size());
+    const QJsonArray paraContent = nodeContentOf(itemContent.at(0).toObject());
+    ASSERT_EQ(1, paraContent.size());
+    EXPECT_EQ(QStringLiteral("x"), textOf(paraContent.at(0).toObject()));
+}
+
+TEST(UT_MigrationHtmlConverter, WarnsDisplayAffectingInlineInsideBlockquote)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<blockquote><p>a<sup>b</sup></p></blockquote>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("downgraded-inline-element")));
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(1, blocks.size());
+    const QJsonObject quote = blocks.at(0).toObject();
+    EXPECT_EQ(QStringLiteral("blockquote"), nodeTypeOf(quote));
+    const QJsonArray quoteContent = nodeContentOf(quote);
+    ASSERT_EQ(1, quoteContent.size());
+    const QJsonArray paraContent = nodeContentOf(quoteContent.at(0).toObject());
+    EXPECT_EQ(QStringLiteral("ab"), textOf(paraContent.at(0).toObject()));
+}
+
+TEST(UT_MigrationHtmlConverter, DowngradesHyperlinkInsideNestedList)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<ul><li><p><a href=\"https://e.com\">link</a></p></li></ul>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("downgraded-html-link")));
+
+    const QJsonArray items = nodeContentOf(docContentOf(result).at(0).toObject());
+    const QJsonArray itemContent = nodeContentOf(items.at(0).toObject());
+    const QJsonArray paraContent = nodeContentOf(itemContent.at(0).toObject());
+    EXPECT_EQ(QStringLiteral("link"), textOf(paraContent.at(0).toObject()));
 }
