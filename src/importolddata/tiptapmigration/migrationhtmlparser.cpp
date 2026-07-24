@@ -212,14 +212,19 @@ MigrationHtmlNode convertNode(xmlNodePtr node,
             QStringLiteral("Dangerous HTML node should be downgraded by migration converter.")
         });
     } else {
+        QStringList dangerousAttrNames;
         for (auto it = converted.attributes.constBegin(); it != converted.attributes.constEnd(); ++it) {
             if (isDangerousAttribute(it.key(), it.value())) {
+                dangerousAttrNames.append(it.key());
                 warnings->append(MigrationHtmlParseWarning {
                     path + QStringLiteral(".attrs.") + it.key(),
                     kCodeDangerousHtmlAttribute,
                     QStringLiteral("Dangerous HTML attribute was removed during migration.")
                 });
             }
+        }
+        for (const QString &name : dangerousAttrNames) {
+            converted.attributes.remove(name);
         }
     }
 

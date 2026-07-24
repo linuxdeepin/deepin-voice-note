@@ -249,8 +249,13 @@ TEST(UT_MigrationHtmlParser, DoesNotWarnDangerousAttributeForCleanHtml)
 
 TEST(UT_MigrationHtmlParser, SkipsDangerousAttributeScanForDangerousTags)
 {
+    // libxml2 moves <script> to <head> (outside the parsed <body> subtree),
+    // so <script> never reaches convertNode and dangerous-html-node is NOT
+    // emitted for it — see dangerous-tags-script fixture in TTP-014. Use
+    // <iframe> instead, which reliably stays in body and triggers the
+    // dangerous-tag path, to verify attribute scanning is skipped.
     const MigrationHtmlParseResult result = MigrationHtmlParser::parse(
-        QStringLiteral("<script onclick=\"x\">alert(1)</script>"));
+        QStringLiteral("<iframe onclick=\"x\">frame</iframe><p>safe</p>"));
 
     EXPECT_TRUE(result.ok());
     EXPECT_TRUE(hasWarningCode(result, QStringLiteral("dangerous-html-node")));
