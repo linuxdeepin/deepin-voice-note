@@ -194,3 +194,65 @@ TEST(UT_MigrationHtmlParser, HandlesEmptyAndPlainTextInputs)
     EXPECT_TRUE(plain.ok());
     EXPECT_TRUE(plain.plainText.contains(QStringLiteral("plain 中文🙂")));
 }
+
+// --- TTP-013: G2 dangerous attribute detection at parse time ---
+
+TEST(UT_MigrationHtmlParser, WarnsDangerousEventAttribute)
+{
+    const MigrationHtmlParseResult result = MigrationHtmlParser::parse(
+        QStringLiteral("<p onclick=\"evil()\">text</p>"));
+
+    EXPECT_TRUE(result.ok());
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("dangerous-html-attribute")));
+    bool found = false;
+    for (const MigrationHtmlParseWarning &warning : result.warnings) {
+        if (warning.code == QStringLiteral("dangerous-html-attribute") && warning.path.contains(QStringLiteral(".attrs.onclick"))) {
+            found = true;
+        }
+    }
+    EXPECT_TRUE(found);
+}
+
+TEST(UT_MigrationHtmlParser, WarnsDangerousProtocolAttribute)
+{
+    const MigrationHtmlParseResult result = MigrationHtmlParser::parse(
+        QStringLiteral("<a href=\"javascript:alert(1)\">t</a>"));
+
+    EXPECT_TRUE(result.ok());
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("dangerous-html-attribute")));
+    bool found = false;
+    for (const MigrationHtmlParseWarning &warning : result.warnings) {
+        if (warning.code == QStringLiteral("dangerous-html-attribute") && warning.path.contains(QStringLiteral(".attrs.href"))) {
+            found = true;
+        }
+    }
+    EXPECT_TRUE(found);
+}
+
+TEST(UT_MigrationHtmlParser, DoesNotWarnDangerousAttributeForImageSrc)
+{
+    const MigrationHtmlParseResult result = MigrationHtmlParser::parse(
+        QStringLiteral("<img src=\"data:image/png;base64,AAAA\">"));
+
+    EXPECT_TRUE(result.ok());
+    EXPECT_FALSE(hasWarningCode(result, QStringLiteral("dangerous-html-attribute")));
+}
+
+TEST(UT_MigrationHtmlParser, DoesNotWarnDangerousAttributeForCleanHtml)
+{
+    const MigrationHtmlParseResult result = MigrationHtmlParser::parse(
+        QStringLiteral("<p style=\"color:red\"><a href=\"https://e.com\">link</a></p>"));
+
+    EXPECT_TRUE(result.ok());
+    EXPECT_TRUE(result.warnings.isEmpty());
+}
+
+TEST(UT_MigrationHtmlParser, SkipsDangerousAttributeScanForDangerousTags)
+{
+    const MigrationHtmlParseResult result = MigrationHtmlParser::parse(
+        QStringLiteral("<script onclick=\"x\">alert(1)</script>"));
+
+    EXPECT_TRUE(result.ok());
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("dangerous-html-node")));
+    EXPECT_FALSE(hasWarningCode(result, QStringLiteral("dangerous-html-attribute")));
+}

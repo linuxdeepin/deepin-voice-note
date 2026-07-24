@@ -6,6 +6,8 @@
 #include "migrationhtmlparser.h"
 #include "migrationjsonbuilder.h"
 
+#include "migrationhtmlcodes.h"
+
 #include <QJsonArray>
 #include <QJsonParseError>
 #include <QJsonDocument>
@@ -25,54 +27,6 @@
 namespace {
 
 constexpr int kVoiceBlockType = 2;
-
-const QSet<QString> &dangerousTags()
-{
-    static const QSet<QString> tags {
-        QStringLiteral("script"),
-        QStringLiteral("iframe"),
-        QStringLiteral("object"),
-        QStringLiteral("embed")
-    };
-    return tags;
-}
-
-const QSet<QString> &blockTags()
-{
-    static const QSet<QString> tags {
-        QStringLiteral("address"),
-        QStringLiteral("article"),
-        QStringLiteral("aside"),
-        QStringLiteral("blockquote"),
-        QStringLiteral("dd"),
-        QStringLiteral("div"),
-        QStringLiteral("dl"),
-        QStringLiteral("dt"),
-        QStringLiteral("figcaption"),
-        QStringLiteral("figure"),
-        QStringLiteral("footer"),
-        QStringLiteral("h1"),
-        QStringLiteral("h2"),
-        QStringLiteral("h3"),
-        QStringLiteral("h4"),
-        QStringLiteral("h5"),
-        QStringLiteral("h6"),
-        QStringLiteral("header"),
-        QStringLiteral("hr"),
-        QStringLiteral("li"),
-        QStringLiteral("main"),
-        QStringLiteral("ol"),
-        QStringLiteral("p"),
-        QStringLiteral("pre"),
-        QStringLiteral("section"),
-        QStringLiteral("table"),
-        QStringLiteral("td"),
-        QStringLiteral("th"),
-        QStringLiteral("tr"),
-        QStringLiteral("ul")
-    };
-    return tags;
-}
 
 const QSet<QString> &supportedStyleProperties()
 {
@@ -114,7 +68,7 @@ QString elementPath(const MigrationHtmlNode &node)
 void copyParseIssues(const MigrationHtmlParseResult &parsed, MigrationHtmlConversionResult &result)
 {
     for (const MigrationHtmlParseWarning &warning : parsed.warnings) {
-        if (warning.code == QStringLiteral("parse-failed")) {
+        if (warning.code == kCodeParseFailed) {
             addIssue(result.errors, warning.path, warning.code, warning.message);
             continue;
         }
@@ -131,6 +85,29 @@ bool isDangerousElement(const MigrationHtmlNode &node)
 bool isBlockElement(const MigrationHtmlNode &node)
 {
     return node.type == MigrationHtmlNodeType::Element && blockTags().contains(node.tagName);
+}
+
+bool isDisplayAffectingInlineTag(const QString &tagName)
+{
+    static const QSet<QString> displayAffecting {
+        QStringLiteral("mark"),
+        QStringLiteral("sub"),
+        QStringLiteral("sup"),
+        QStringLiteral("small"),
+        QStringLiteral("big"),
+        QStringLiteral("code"),
+        QStringLiteral("kbd"),
+        QStringLiteral("samp"),
+        QStringLiteral("tt"),
+        QStringLiteral("var"),
+        QStringLiteral("ins"),
+        QStringLiteral("q"),
+        QStringLiteral("bdi"),
+        QStringLiteral("bdo"),
+        QStringLiteral("abbr"),
+        QStringLiteral("cite")
+    };
+    return displayAffecting.contains(tagName);
 }
 
 bool isHeadingElement(const MigrationHtmlNode &node)
@@ -319,7 +296,7 @@ QJsonObject parsedVoiceBoxJsonKey(const MigrationHtmlNode &node,
     if (jsonKey.isEmpty()) {
         return voiceBoxFallbackParagraph(node,
                                          result,
-                                         QStringLiteral("missing-voicebox-jsonkey"),
+                                         kCodeMissingVoiceboxJsonKey,
                                          QStringLiteral("voiceBox jsonKey is missing; visible text was preserved as a paragraph"));
     }
 
@@ -328,7 +305,7 @@ QJsonObject parsedVoiceBoxJsonKey(const MigrationHtmlNode &node,
     if (parseError.error != QJsonParseError::NoError || !document.isObject()) {
         return voiceBoxFallbackParagraph(node,
                                          result,
-                                         QStringLiteral("invalid-voicebox-jsonkey"),
+                                         kCodeInvalidVoiceboxJsonKey,
                                          QStringLiteral("voiceBox jsonKey could not be parsed; visible text was preserved as a paragraph"));
     }
 
@@ -352,7 +329,7 @@ QString stringField(const QJsonObject &block,
 
     addVoiceBoxWarning(result,
                        node,
-                       QStringLiteral("invalid-voicebox-string-field"),
+                       kCodeInvalidVoiceboxStringField,
                        QStringLiteral("voiceBox string field '%1' was ignored because it is not a string").arg(field),
                        QStringLiteral(".") + field);
     return QString();
@@ -406,7 +383,7 @@ qint64 sanitizedVoiceSize(double size,
     if (!std::isfinite(size)) {
         addVoiceBoxWarning(result,
                            node,
-                           QStringLiteral("invalid-voice-size"),
+                           kCodeInvalidVoiceSize,
                            QStringLiteral("voiceSize is not finite and was converted to 0"),
                            QStringLiteral(".voiceSize"));
         return 0;
@@ -442,7 +419,7 @@ qint64 voiceSizeFromBlock(const QJsonObject &block,
     if (value.isUndefined() || value.isNull()) {
         addVoiceBoxWarning(result,
                            node,
-                           QStringLiteral("missing-voice-size"),
+                           kCodeMissingVoiceSize,
                            QStringLiteral("missing voiceSize was converted to 0"),
                            QStringLiteral(".voiceSize"));
         return 0;
@@ -462,7 +439,7 @@ qint64 voiceSizeFromBlock(const QJsonObject &block,
 
     addVoiceBoxWarning(result,
                        node,
-                       QStringLiteral("invalid-voice-size"),
+                       kCodeInvalidVoiceSize,
                        QStringLiteral("invalid voiceSize was converted to 0"),
                        QStringLiteral(".voiceSize"));
     return 0;
@@ -519,7 +496,7 @@ QJsonObject voiceBlockFromElement(const MigrationHtmlNode &node,
     if (!voicePathOk) {
         return voiceBoxFallbackParagraph(node,
                                          result,
-                                         QStringLiteral("invalid-voice-path"),
+                                         kCodeInvalidVoicePath,
                                          QStringLiteral("voiceBox voicePath could not be normalized; visible text was preserved as a paragraph"),
                                          QStringLiteral(".voicePath"));
     }
@@ -683,17 +660,17 @@ ImageReference resolvedImageReference(const QString &rawValue, bool preferRelPat
 {
     const QString trimmed = rawValue.trimmed();
     if (trimmed.isEmpty()) {
-        return { QString(), QString(), QStringLiteral("missing-html-image-src"), QStringLiteral("HTML image source is empty and was skipped") };
+        return { QString(), QString(), kCodeMissingHtmlImageSrc, QStringLiteral("HTML image source is empty and was skipped") };
     }
 
     const QString normalized = normalizedUrlForSchemeCheck(trimmed);
     if (startsWithNetworkPath(normalized)) {
-        return { QString(), QString(), QStringLiteral("unsafe-html-image-src"), QStringLiteral("HTML image source uses an unsafe URL form and was skipped") };
+        return { QString(), QString(), kCodeUnsafeHtmlImageSrc, QStringLiteral("HTML image source uses an unsafe URL form and was skipped") };
     }
 
     const QString scheme = urlScheme(normalized);
     if (scheme == QStringLiteral("data")) {
-        return { QString(), QString(), QStringLiteral("downgraded-base64-image"), QStringLiteral("Base64 HTML image data is not embedded during migration and was skipped") };
+        return { QString(), QString(), kCodeDowngradedBase64Image, QStringLiteral("Base64 HTML image data is not embedded during migration and was skipped") };
     }
 
     if (!scheme.isEmpty()
@@ -701,7 +678,7 @@ ImageReference resolvedImageReference(const QString &rawValue, bool preferRelPat
         && scheme != QStringLiteral("https")
         && scheme != QStringLiteral("file")
         && !isWindowsAbsolutePath(trimmed)) {
-        return { QString(), QString(), QStringLiteral("unsafe-html-image-src"), QStringLiteral("HTML image source uses an unsafe URL scheme and was skipped") };
+        return { QString(), QString(), kCodeUnsafeHtmlImageSrc, QStringLiteral("HTML image source uses an unsafe URL scheme and was skipped") };
     }
 
     if (scheme == QStringLiteral("http") || scheme == QStringLiteral("https")) {
@@ -714,11 +691,11 @@ ImageReference resolvedImageReference(const QString &rawValue, bool preferRelPat
     }
 
     if (scheme == QStringLiteral("file")) {
-        return { QString(), QString(), QStringLiteral("unsafe-html-image-src"), QStringLiteral("HTML file image URL has no extractable images/ path and was skipped") };
+        return { QString(), QString(), kCodeUnsafeHtmlImageSrc, QStringLiteral("HTML file image URL has no extractable images/ path and was skipped") };
     }
 
     if (!isSafeResolvedImageSrc(trimmed)) {
-        return { QString(), QString(), QStringLiteral("unsafe-html-image-src"), QStringLiteral("HTML image source uses an unsafe URL scheme and was skipped") };
+        return { QString(), QString(), kCodeUnsafeHtmlImageSrc, QStringLiteral("HTML image source uses an unsafe URL scheme and was skipped") };
     }
 
     QString relPathAttr;
@@ -962,7 +939,7 @@ void warnUnsupportedStyle(const MigrationHtmlNode &node,
 {
     addWarning(result,
                elementPath(node) + QStringLiteral(".style.%1").arg(property),
-               QStringLiteral("unsupported-html-style"),
+               kCodeUnsupportedHtmlStyle,
                QStringLiteral("HTML style '%1' is not supported by this migration step and was ignored").arg(property));
 }
 
@@ -972,7 +949,7 @@ void warnInvalidStyleValue(const MigrationHtmlNode &node,
 {
     addWarning(result,
                elementPath(node) + QStringLiteral(".style.%1").arg(property),
-               QStringLiteral("invalid-html-style-value"),
+               kCodeInvalidHtmlStyleValue,
                QStringLiteral("HTML style '%1' has an unsupported value and was ignored").arg(property));
 }
 
@@ -982,7 +959,7 @@ void warnDowngradedTextAlign(const MigrationHtmlNode &node,
 {
     addWarning(result,
                elementPath(node) + QStringLiteral(".style.text-align"),
-               QStringLiteral("downgraded-text-align"),
+               kCodeDowngradedTextAlign,
                QStringLiteral("HTML text-align '%1' is not supported by Schema V1 and was ignored").arg(value));
 }
 
@@ -990,7 +967,7 @@ void warnInvalidListChild(const MigrationHtmlNode &node, MigrationHtmlConversion
 {
     addWarning(result,
                elementPath(node),
-               QStringLiteral("downgraded-html-list-child"),
+               kCodeDowngradedHtmlListChild,
                QStringLiteral("HTML node <%1> inside a list was wrapped into a list item").arg(node.tagName));
 }
 
@@ -1339,7 +1316,7 @@ void appendInlineNode(const MigrationHtmlNode &node,
         appendVisibleText(content, visibleTextOf(node), marks);
         addVoiceBoxWarning(result,
                            node,
-                           QStringLiteral("downgraded-inline-voicebox"),
+                           kCodeDowngradedInlineVoicebox,
                            QStringLiteral("inline voiceBox was downgraded to visible text"));
         return;
     }
@@ -1357,8 +1334,24 @@ void appendInlineNode(const MigrationHtmlNode &node,
         return;
     }
 
+    if (node.tagName == QStringLiteral("a")) {
+        appendInlineChildren(node, content, marksForElement(node, marks, result), result);
+        addWarning(result,
+                   elementPath(node),
+                   kCodeDowngradedHtmlLink,
+                   QStringLiteral("HTML hyperlink was downgraded to plain text during migration"));
+        return;
+    }
+
     if (isBlockElement(node) && !content.isEmpty() && !isHardBreakNode(content.at(content.size() - 1))) {
         appendHardBreak(content);
+    }
+
+    if (!isBlockElement(node) && isDisplayAffectingInlineTag(node.tagName)) {
+        addWarning(result,
+                   elementPath(node),
+                   kCodeDowngradedInlineElement,
+                   QStringLiteral("Unknown inline HTML element was downgraded to plain text during migration"));
     }
 
     appendInlineChildren(node, content, marksForElement(node, marks, result), result);
@@ -1464,6 +1457,20 @@ void appendInlineOrImageBlocks(const MigrationHtmlNode &node,
 
     if (isBlockElement(node) && !inlineContent.isEmpty() && !isHardBreakNode(inlineContent.at(inlineContent.size() - 1))) {
         appendHardBreak(inlineContent);
+    }
+
+    if (node.tagName == QStringLiteral("a")) {
+        addWarning(result,
+                   elementPath(node),
+                   kCodeDowngradedHtmlLink,
+                   QStringLiteral("HTML hyperlink was downgraded to plain text during migration"));
+    }
+
+    if (!isBlockElement(node) && isDisplayAffectingInlineTag(node.tagName)) {
+        addWarning(result,
+                   elementPath(node),
+                   kCodeDowngradedInlineElement,
+                   QStringLiteral("Unknown inline HTML element was downgraded to plain text during migration"));
     }
 
     const QJsonArray childMarks = marksForElement(node, marks, result);
@@ -1595,7 +1602,7 @@ void warnDowngradedBlock(const MigrationHtmlNode &node, MigrationHtmlConversionR
 
     addWarning(result,
                QStringLiteral("/%1").arg(node.tagName),
-               QStringLiteral("downgraded-html-block"),
+               kCodeDowngradedHtmlBlock,
                QStringLiteral("HTML block <%1> was downgraded to paragraph").arg(node.tagName));
 }
 
@@ -1825,7 +1832,7 @@ void appendBlocksFromElement(const MigrationHtmlNode &node,
         warnTextAlignDeclarations(node, result);
         addWarning(result,
                    elementPath(node),
-                   QStringLiteral("downgraded-orphan-list-item"),
+                   kCodeDowngradedOrphanListItem,
                    QStringLiteral("HTML list item outside a list was downgraded to paragraph"));
         appendInlineContainerAsBlocks(node, blocks, result, inheritedMarks, ensureInitialParagraphBeforeBlock);
         return;
@@ -1871,7 +1878,7 @@ QJsonObject blockFromElement(const MigrationHtmlNode &node,
         warnTextAlignDeclarations(node, result);
         addWarning(result,
                    elementPath(node),
-                   QStringLiteral("downgraded-orphan-list-item"),
+                   kCodeDowngradedOrphanListItem,
                    QStringLiteral("HTML list item outside a list was downgraded to paragraph"));
         return downgradedParagraphFromBlock(node, result, inheritedMarks);
     }
