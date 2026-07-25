@@ -331,3 +331,67 @@ TEST(UT_MigrationScanner, NeedMigrateListContainsOnlyNoteIds)
     EXPECT_EQ(r.needMigrateNoteIds.size(), r.needMigrateCount);
     EXPECT_EQ(r.abnormals.size(), r.abnormalCount);
 }
+
+// --- P3: query.next() 中途失败归为 QueryFailed，不误报成功 ---
+// 真实 SQLite 难以稳定构造 next() 中途读取失败，故用子类注入 checkIterationFailure
+// 模拟 lastError 置位的中途出错场景，断言 P3 分支返回 QueryFailed + success=false。
+
+namespace {
+class IterationFailScanner : public MigrationScanner
+{
+public:
+    using MigrationScanner::MigrationScanner;
+    int failAfter = 2;
+
+protected:
+    void onRowProcessed(int processedCount) override
+    {
+        m_processed = processedCount;
+    }
+    bool checkIterationFailure(const QSqlQuery &query) const override
+    {
+        Q_UNUSED(query)
+        // 处理满 failAfter 行后模拟 next() 中途出错（lastError 无效但强制失败）。
+        return m_processed >= failAfter;
+    }
+
+private:
+    mutable int m_processed = 0;
+};
+}  // namespace
+
+TEST(UT_MigrationScanner, MidIterationFailureReportedAsQueryFailed)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString dbPath = dir.path() + QStringLiteral("/iterfail.db");
+    ASSERT_TRUE(createBulkDb(dbPath, 10));
+
+    IterationFailScanner scanner(dbPath);
+    scanner.failAfter = 2;
+    const ScanResult r = scanner.scan();
+
+    // 中途失败不得误报成功
+    EXPECT_FALSE(r.success);
+    EXPECT_EQ(r.code, ScanErrorCode::QueryFailed);
+    EXPECT_FALSE(r.message.isEmpty());
+    // P3 判定点在循环退出后；覆盖该分支返回 QueryFailed 即验证修复目标。
+    EXPECT_GT(r.totalCount, 0);
+}
+
+// --- 正常完成：checkIterationFailure 默认实现不误报失败（回归保护）---
+
+TEST(UT_MigrationScanner, NormalCompletionNotMistakenForFailure)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString dbPath = dir.path() + QStringLiteral("/ok.db");
+    ASSERT_TRUE(createFixtureDb(dbPath));
+
+    MigrationScanner scanner(dbPath);
+    const ScanResult r = scanner.scan();
+
+    EXPECT_TRUE(r.success);
+    EXPECT_EQ(r.code, ScanErrorCode::None);
+    EXPECT_EQ(r.totalCount, 7);
+}
