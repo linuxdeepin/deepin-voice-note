@@ -70,6 +70,13 @@ void MigrationScanner::onRowProcessed(int processedCount)
     Q_UNUSED(processedCount)
 }
 
+bool MigrationScanner::checkIterationFailure(const QSqlQuery &query) const
+{
+    // P3: query.next() 中途因读取错误返回 false 时，lastError() 有效且非 NoError。
+    return query.lastError().isValid()
+           && query.lastError().type() != QSqlError::NoError;
+}
+
 ScanResult MigrationScanner::scan()
 {
     ScanResult result;
@@ -160,16 +167,27 @@ ScanResult MigrationScanner::scan()
                 }
 
                 if (result.code != ScanErrorCode::Aborted) {
-                    result.success = true;
-                    result.code = ScanErrorCode::None;
-                    result.message = QStringLiteral(
-                                         "Scan completed: total=%1 needMigrate=%2 "
-                                         "alreadyTiptap=%3 abnormal=%4")
-                                         .arg(result.totalCount)
-                                         .arg(result.needMigrateCount)
-                                         .arg(result.alreadyTiptapCount)
-                                         .arg(result.abnormalCount);
-                    qInfo("MigrationScanner: %s", qPrintable(result.message));
+                    // P3: query.next() 中途因读取错误返回 false（非游标正常耗尽）时，
+                    // 经 checkIterationFailure() 判定，归为 QueryFailed 而非误报成功。
+                    if (checkIterationFailure(query)) {
+                        result.success = false;
+                        result.code = ScanErrorCode::QueryFailed;
+                        result.message = QStringLiteral(
+                                             "Scan query iteration failed: %1")
+                                             .arg(query.lastError().text());
+                        qWarning("MigrationScanner: %s", qPrintable(result.message));
+                    } else {
+                        result.success = true;
+                        result.code = ScanErrorCode::None;
+                        result.message = QStringLiteral(
+                                             "Scan completed: total=%1 needMigrate=%2 "
+                                             "alreadyTiptap=%3 abnormal=%4")
+                                             .arg(result.totalCount)
+                                             .arg(result.needMigrateCount)
+                                             .arg(result.alreadyTiptapCount)
+                                             .arg(result.abnormalCount);
+                        qInfo("MigrationScanner: %s", qPrintable(result.message));
+                    }
                 }
             }
         }
