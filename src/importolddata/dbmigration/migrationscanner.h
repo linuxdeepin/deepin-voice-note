@@ -9,6 +9,8 @@
 
 #include <atomic>
 
+class QSqlQuery;
+
 // TTP-017: 只读扫描错误码。
 // 对齐集成数据契约「扫描结果」：失败时给出可区分原因码 + 描述。
 enum class ScanErrorCode {
@@ -74,6 +76,10 @@ protected:
     // 每处理完一行后回调（默认空实现）。子类可重写以驱动协作取消或进度上报，
     // 扫描主循环在回调后的下一行检查取消标志位。
     virtual void onRowProcessed(int processedCount);
+
+    // P3: 判定 query.next() 循环退出后是否因读取错误（非游标正常耗尽）而失败。
+    // 默认实现检查 QSqlQuery::lastError()；测试子类可重写以注入中途失败。
+    virtual bool checkIterationFailure(const QSqlQuery &query) const;
 
 private:
     QString effectiveDbPath() const;
