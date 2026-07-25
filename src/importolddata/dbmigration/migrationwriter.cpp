@@ -16,6 +16,7 @@
 #include <QByteArray>
 #include <QDir>
 #include <QFileInfo>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
@@ -32,6 +33,18 @@ constexpr int kColEncrypt = 1;
 // SQLite busy 超时（毫秒），缓解与 VNoteDbManager 运行态连接的写锁竞争。
 constexpr int kBusyTimeoutMs = 5000;
 }  // namespace
+
+// 归一化 TTP-013 两类转换器 warnings（结构同构：path/code/message）为 MigrationWarning。
+template <typename Issue>
+QVector<MigrationWarning> collectWarnings(const QVector<Issue> &issues)
+{
+    QVector<MigrationWarning> warnings;
+    warnings.reserve(issues.size());
+    for (const Issue &issue : issues) {
+        warnings.append(MigrationWarning{issue.path, issue.code, issue.message});
+    }
+    return warnings;
+}
 
 MigrationWriter::MigrationWriter()
 {
@@ -67,16 +80,209 @@ QString MigrationWriter::makeConnectionName() const
         .arg(counter.fetchAndAddRelaxed(1));
 }
 
-// 归一化 TTP-013 两类转换器 warnings（结构同构：path/code/message）为 MigrationWarning。
-template <typename Issue>
-QVector<MigrationWarning> collectWarnings(const QVector<Issue> &issues)
+MigrationWriter::NoteRow MigrationWriter::readNoteRow(QSqlDatabase &db, qint32 noteId,
+                                                      qint32 folderId,
+                                                      WriteResult *result) const
 {
-    QVector<MigrationWarning> warnings;
-    warnings.reserve(issues.size());
-    for (const Issue &issue : issues) {
-        warnings.append(MigrationWarning{issue.path, issue.code, issue.message});
+    NoteRow row;
+    // 列名取自 DbVisitor::DBNote::noteColumnsName，与运行态查询同源
+    // （encrypt 实际落在 expand_filed2 列）。
+    const QStringList &cols = DbVisitor::DBNote::noteColumnsName;
+    const QString selectSql = QStringLiteral("SELECT %1, %2 FROM %3 WHERE %4=?")
+                                  .arg(cols.value(DbVisitor::DBNote::meta_data),
+                                       cols.value(DbVisitor::DBNote::encrypt),
+                                       VNoteDbManager::NOTES_TABLE_NAME,
+                                       cols.value(DbVisitor::DBNote::note_id));
+
+    QSqlQuery readQuery(db);
+    readQuery.prepare(selectSql);
+    readQuery.addBindValue(noteId);
+    if (!readQuery.exec()) {
+        result->code = WriteErrorCode::ReadFailed;
+        result->message = QStringLiteral("Failed to read note: %1")
+                              .arg(readQuery.lastError().text());
+        qWarning("MigrationWriter: note_id=%lld folder_id=%lld %s",
+                 static_cast<long long>(noteId),
+                 static_cast<long long>(folderId),
+                 qPrintable(result->message));
+        return row;
     }
-    return warnings;
+
+    if (!readQuery.next()) {
+        // 查无此行：原数据（无）保留，按 NoteNotFound 上报。
+        result->code = WriteErrorCode::NoteNotFound;
+        result->message = QStringLiteral("note_id not found");
+        qInfo("MigrationWriter: note_id=%lld folder_id=%lld not found",
+              static_cast<long long>(noteId),
+              static_cast<long long>(folderId));
+        return row;
+    }
+
+    row.found = true;
+    row.encryption = readQuery.value(kColEncrypt).toInt();
+    const QVariant metaDataVar = readQuery.value(kColMetaData);
+    // 加密还原：对齐 dbvisitor.cpp 读取语义，base64 还原后再探测/转换。
+    row.metaData = (row.encryption != 0)
+        ? QString::fromUtf8(QByteArray::fromBase64(metaDataVar.toByteArray()))
+        : metaDataVar.toString();
+    return row;
+}
+
+QJsonObject MigrationWriter::convertByFormat(LegacyFormat format,
+                                             const QString &metaDataStr,
+                                             qint32 folderId, qint32 noteId,
+                                             QVector<MigrationWarning> *warnings,
+                                             WriteResult *result) const
+{
+    QJsonObject envelope;
+    switch (format) {
+    case LegacyFormat::LegacyHtmlCode: {
+        // htmlCode 可能是 JSON {"htmlCode":...} 包封，也可能是裸 HTML。
+        QString htmlCode = metaDataStr;
+        const QJsonDocument doc = QJsonDocument::fromJson(metaDataStr.toUtf8());
+        if (doc.isObject()) {
+            const QJsonObject root = doc.object();
+            const QJsonValue code = root.value(QStringLiteral("htmlCode"));
+            if (code.isString()) {
+                htmlCode = code.toString();
+            }
+        }
+        const MigrationHtmlConversionResult converted =
+            MigrationHtmlConverter::convert(htmlCode);
+        *warnings = collectWarnings(converted.warnings);
+        if (!converted.ok()) {
+            result->warnings = *warnings;
+            result->code = WriteErrorCode::ConvertFailed;
+            result->message = QStringLiteral("html convert failed");
+            qWarning("MigrationWriter: note_id=%lld folder_id=%lld "
+                     "format=%s convert failed",
+                     static_cast<long long>(noteId),
+                     static_cast<long long>(folderId),
+                     qPrintable(LegacyFormatDetector::formatName(format)));
+            break;
+        }
+        envelope = converted.envelope;
+        break;
+    }
+    case LegacyFormat::LegacyNoteDatas: {
+        const MigrationNoteDataConversionResult converted =
+            MigrationNoteDataConverter::convertBlocks(metaDataStr);
+        *warnings = collectWarnings(converted.warnings);
+        if (!converted.ok()) {
+            result->warnings = *warnings;
+            result->code = WriteErrorCode::ConvertFailed;
+            result->message = QStringLiteral("noteDatas convert failed");
+            qWarning("MigrationWriter: note_id=%lld folder_id=%lld "
+                     "format=%s convert failed",
+                     static_cast<long long>(noteId),
+                     static_cast<long long>(folderId),
+                     qPrintable(LegacyFormatDetector::formatName(format)));
+            break;
+        }
+        envelope = converted.envelope;
+        break;
+    }
+    case LegacyFormat::ProseMirrorDoc: {
+        // R-PM1：无专用转换器，直接用 TTP-013 builder 包封已有 doc 对象。
+        const QJsonDocument doc = QJsonDocument::fromJson(metaDataStr.toUtf8());
+        envelope = MigrationJsonBuilder::makeEnvelope(doc.object());
+        break;
+    }
+    case LegacyFormat::PlainText: {
+        // R-PM1：无专用转换器，包成单段落 doc（空串→空段落）。
+        QJsonArray paragraphContent;
+        if (!metaDataStr.isEmpty()) {
+            paragraphContent.append(MigrationJsonBuilder::makeText(metaDataStr));
+        }
+        envelope = MigrationJsonBuilder::makeEnvelope(
+            MigrationJsonBuilder::makeDoc(
+                QJsonArray{MigrationJsonBuilder::makeParagraph(paragraphContent)}));
+        break;
+    }
+    default:
+        break;
+    }
+    return envelope;
+}
+
+void MigrationWriter::validateAndPersist(QSqlDatabase &db, const QJsonObject &envelope,
+                                         int encryption, qint32 noteId, qint32 folderId,
+                                         LegacyFormat format,
+                                         const QVector<MigrationWarning> &warnings,
+                                         WriteResult *result) const
+{
+    // 强制校验：写回前必须通过 C++ validator。
+    const MigrationJsonValidationResult validated =
+        MigrationJsonValidator::validateEnvelope(envelope);
+    if (!validated.ok()) {
+        result->warnings = warnings;
+        result->code = WriteErrorCode::ValidationFailed;
+        result->message =
+            QStringLiteral("envelope validation failed: %1 error(s)")
+                .arg(validated.errors.size());
+        qWarning("MigrationWriter: note_id=%lld folder_id=%lld "
+                 "format=%s validation failed",
+                 static_cast<long long>(noteId),
+                 static_cast<long long>(folderId),
+                 qPrintable(LegacyFormatDetector::formatName(format)));
+        return;
+    }
+
+    // 紧凑化（QJsonDocument::Compact）。
+    const QString compact = MigrationJsonBuilder::toCompactJson(envelope);
+    // 加密再入库：对齐 dbvisitor.cpp 写入语义，不改 expand_filed2。
+    // 绑定 QString 走 TEXT 通道（与 UpdateNoteDbVisitor 一致），
+    // 避免 QByteArray 绑定落入 BLOB 导致 detect() 读回异常。
+    const QString stored = (encryption != 0)
+        ? QString::fromUtf8(compact.toLocal8Bit().toBase64())
+        : compact;
+
+    // 单条参数化 UPDATE（单语句原子），仅 SET meta_data，
+    // 不触 modify_time 列、不触 folder 表。
+    const QStringList &cols = DbVisitor::DBNote::noteColumnsName;
+    const QString updateSql = QStringLiteral("UPDATE %1 SET %2=? WHERE %3=?")
+                                  .arg(VNoteDbManager::NOTES_TABLE_NAME,
+                                       cols.value(DbVisitor::DBNote::meta_data),
+                                       cols.value(DbVisitor::DBNote::note_id));
+    QSqlQuery writeQuery(db);
+    writeQuery.prepare(updateSql);
+    writeQuery.addBindValue(stored);
+    writeQuery.addBindValue(noteId);
+    if (!writeQuery.exec()) {
+        result->warnings = warnings;
+        result->code = WriteErrorCode::WriteFailed;
+        result->message =
+            QStringLiteral("update failed: %1").arg(writeQuery.lastError().text());
+        qWarning("MigrationWriter: note_id=%lld folder_id=%lld "
+                 "format=%s write failed",
+                 static_cast<long long>(noteId),
+                 static_cast<long long>(folderId),
+                 qPrintable(LegacyFormatDetector::formatName(format)));
+        return;
+    }
+
+    if (writeQuery.numRowsAffected() != 1) {
+        result->warnings = warnings;
+        result->code = WriteErrorCode::WriteFailed;
+        result->message =
+            QStringLiteral("update affected %1 row(s)").arg(writeQuery.numRowsAffected());
+        qWarning("MigrationWriter: note_id=%lld folder_id=%lld "
+                 "format=%s unexpected rows affected",
+                 static_cast<long long>(noteId),
+                 static_cast<long long>(folderId),
+                 qPrintable(LegacyFormatDetector::formatName(format)));
+        return;
+    }
+
+    result->warnings = warnings;
+    result->success = true;
+    result->code = WriteErrorCode::None;
+    result->originalDataPreserved = false;
+    result->message = QStringLiteral("migrated");
+    qInfo("MigrationWriter: note_id=%lld folder_id=%lld format=%s migrated",
+          static_cast<long long>(noteId),
+          static_cast<long long>(folderId),
+          qPrintable(LegacyFormatDetector::formatName(format)));
 }
 
 WriteResult MigrationWriter::writeOne(qint32 folderId, qint32 noteId)
@@ -113,43 +319,10 @@ WriteResult MigrationWriter::writeOne(qint32 folderId, qint32 noteId)
                      static_cast<long long>(folderId),
                      qPrintable(result.message));
         } else {
-            // 列名取自 DbVisitor::DBNote::noteColumnsName，与运行态查询同源
-            // （encrypt 实际落在 expand_filed2 列）。
-            const QStringList &cols = DbVisitor::DBNote::noteColumnsName;
-            const QString selectSql = QStringLiteral("SELECT %1, %2 FROM %3 WHERE %4=?")
-                                          .arg(cols.value(DbVisitor::DBNote::meta_data),
-                                               cols.value(DbVisitor::DBNote::encrypt),
-                                               VNoteDbManager::NOTES_TABLE_NAME,
-                                               cols.value(DbVisitor::DBNote::note_id));
-
-            QSqlQuery readQuery(db);
-            readQuery.prepare(selectSql);
-            readQuery.addBindValue(noteId);
-            if (!readQuery.exec()) {
-                result.code = WriteErrorCode::ReadFailed;
-                result.message = QStringLiteral("Failed to read note: %1")
-                                     .arg(readQuery.lastError().text());
-                qWarning("MigrationWriter: note_id=%lld folder_id=%lld %s",
-                         static_cast<long long>(noteId),
-                         static_cast<long long>(folderId),
-                         qPrintable(result.message));
-            } else if (!readQuery.next()) {
-                // 查无此行：原数据（无）保留，按 NoteNotFound 上报。
-                result.code = WriteErrorCode::NoteNotFound;
-                result.message = QStringLiteral("note_id not found");
-                qInfo("MigrationWriter: note_id=%lld folder_id=%lld not found",
-                      static_cast<long long>(noteId),
-                      static_cast<long long>(folderId));
-            } else {
-                const int encryption = readQuery.value(kColEncrypt).toInt();
-                const QVariant metaDataVar = readQuery.value(kColMetaData);
-                // 加密还原：对齐 dbvisitor.cpp 读取语义，base64 还原后再探测/转换。
-                const QString metaDataStr = (encryption != 0)
-                    ? QString::fromUtf8(QByteArray::fromBase64(metaDataVar.toByteArray()))
-                    : metaDataVar.toString();
-
+            const NoteRow row = readNoteRow(db, noteId, folderId, &result);
+            if (row.found) {
                 // 探测分派。
-                const LegacyFormat format = LegacyFormatDetector::detect(metaDataStr);
+                const LegacyFormat format = LegacyFormatDetector::detect(row.metaData);
 
                 if (format == LegacyFormat::TiptapEnvelope) {
                     // 已是信封（用户已编辑或前次部分迁移已写），跳过写回，避免覆盖最新内容。
@@ -171,80 +344,10 @@ WriteResult MigrationWriter::writeOne(qint32 folderId, qint32 noteId)
                              qPrintable(result.message));
                 } else {
                     // 转换分派：LegacyHtmlCode / LegacyNoteDatas / ProseMirrorDoc / PlainText。
-                    QJsonObject envelope;
                     QVector<MigrationWarning> warnings;
-
-                    switch (format) {
-                    case LegacyFormat::LegacyHtmlCode: {
-                        // htmlCode 可能是 JSON {"htmlCode":...} 包封，也可能是裸 HTML。
-                        QString htmlCode = metaDataStr;
-                        const QJsonDocument doc =
-                            QJsonDocument::fromJson(metaDataStr.toUtf8());
-                        if (doc.isObject()) {
-                            const QJsonObject root = doc.object();
-                            const QJsonValue code = root.value(QStringLiteral("htmlCode"));
-                            if (code.isString()) {
-                                htmlCode = code.toString();
-                            }
-                        }
-                        const MigrationHtmlConversionResult converted =
-                            MigrationHtmlConverter::convert(htmlCode);
-                        warnings = collectWarnings(converted.warnings);
-                        if (!converted.ok()) {
-                            result.warnings = warnings;
-                            result.code = WriteErrorCode::ConvertFailed;
-                            result.message = QStringLiteral("html convert failed");
-                            qWarning("MigrationWriter: note_id=%lld folder_id=%lld "
-                                     "format=%s convert failed",
-                                     static_cast<long long>(noteId),
-                                     static_cast<long long>(folderId),
-                                     qPrintable(LegacyFormatDetector::formatName(format)));
-                            break;
-                        }
-                        envelope = converted.envelope;
-                        break;
-                    }
-                    case LegacyFormat::LegacyNoteDatas: {
-                        const MigrationNoteDataConversionResult converted =
-                            MigrationNoteDataConverter::convertBlocks(metaDataStr);
-                        warnings = collectWarnings(converted.warnings);
-                        if (!converted.ok()) {
-                            result.warnings = warnings;
-                            result.code = WriteErrorCode::ConvertFailed;
-                            result.message = QStringLiteral("noteDatas convert failed");
-                            qWarning("MigrationWriter: note_id=%lld folder_id=%lld "
-                                     "format=%s convert failed",
-                                     static_cast<long long>(noteId),
-                                     static_cast<long long>(folderId),
-                                     qPrintable(LegacyFormatDetector::formatName(format)));
-                            break;
-                        }
-                        envelope = converted.envelope;
-                        break;
-                    }
-                    case LegacyFormat::ProseMirrorDoc: {
-                        // R-PM1：无专用转换器，直接用 TTP-013 builder 包封已有 doc 对象。
-                        const QJsonDocument doc =
-                            QJsonDocument::fromJson(metaDataStr.toUtf8());
-                        envelope = MigrationJsonBuilder::makeEnvelope(doc.object());
-                        break;
-                    }
-                    case LegacyFormat::PlainText: {
-                        // R-PM1：无专用转换器，包成单段落 doc（空串→空段落）。
-                        QJsonArray paragraphContent;
-                        if (!metaDataStr.isEmpty()) {
-                            paragraphContent.append(
-                                MigrationJsonBuilder::makeText(metaDataStr));
-                        }
-                        envelope = MigrationJsonBuilder::makeEnvelope(
-                            MigrationJsonBuilder::makeDoc(
-                                QJsonArray{MigrationJsonBuilder::makeParagraph(
-                                    paragraphContent)}));
-                        break;
-                    }
-                    default:
-                        break;
-                    }
+                    const QJsonObject envelope =
+                        convertByFormat(format, row.metaData, folderId, noteId,
+                                        &warnings, &result);
 
                     // 转换失败已组装结果，直接跳过写回。
                     if (result.code == WriteErrorCode::ConvertFailed) {
@@ -257,77 +360,8 @@ WriteResult MigrationWriter::writeOne(qint32 folderId, qint32 noteId)
                                  static_cast<long long>(noteId),
                                  static_cast<long long>(folderId));
                     } else {
-                        // 强制校验：写回前必须通过 C++ validator。
-                        const MigrationJsonValidationResult validated =
-                            MigrationJsonValidator::validateEnvelope(envelope);
-                        if (!validated.ok()) {
-                            result.warnings = warnings;
-                            result.code = WriteErrorCode::ValidationFailed;
-                            result.message = QStringLiteral(
-                                "envelope validation failed: %1 error(s)")
-                                                 .arg(validated.errors.size());
-                            qWarning("MigrationWriter: note_id=%lld folder_id=%lld "
-                                     "format=%s validation failed",
-                                     static_cast<long long>(noteId),
-                                     static_cast<long long>(folderId),
-                                     qPrintable(LegacyFormatDetector::formatName(format)));
-                        } else {
-                            // 紧凑化（QJsonDocument::Compact）。
-                            const QString compact =
-                                MigrationJsonBuilder::toCompactJson(envelope);
-                            // 加密再入库：对齐 dbvisitor.cpp 写入语义，不改 expand_filed2。
-                            // 绑定 QString 走 TEXT 通道（与 UpdateNoteDbVisitor 一致），
-                            // 避免 QByteArray 绑定落入 BLOB 导致 detect() 读回异常。
-                            const QString stored = (encryption != 0)
-                                ? QString::fromUtf8(compact.toLocal8Bit().toBase64())
-                                : compact;
-
-                            // 单条参数化 UPDATE（单语句原子），仅 SET meta_data，
-                            // 不触 modify_time 列、不触 folder 表。
-                            const QString updateSql =
-                                QStringLiteral("UPDATE %1 SET %2=? WHERE %3=?")
-                                    .arg(VNoteDbManager::NOTES_TABLE_NAME,
-                                         cols.value(DbVisitor::DBNote::meta_data),
-                                         cols.value(DbVisitor::DBNote::note_id));
-                            QSqlQuery writeQuery(db);
-                            writeQuery.prepare(updateSql);
-                            writeQuery.addBindValue(stored);
-                            writeQuery.addBindValue(noteId);
-                            if (!writeQuery.exec()) {
-                                result.warnings = warnings;
-                                result.code = WriteErrorCode::WriteFailed;
-                                result.message = QStringLiteral(
-                                    "update failed: %1")
-                                                     .arg(writeQuery.lastError().text());
-                                qWarning("MigrationWriter: note_id=%lld folder_id=%lld "
-                                         "format=%s write failed",
-                                         static_cast<long long>(noteId),
-                                         static_cast<long long>(folderId),
-                                         qPrintable(LegacyFormatDetector::formatName(format)));
-                            } else if (writeQuery.numRowsAffected() != 1) {
-                                result.warnings = warnings;
-                                result.code = WriteErrorCode::WriteFailed;
-                                result.message = QStringLiteral(
-                                    "update affected %1 row(s)")
-                                                     .arg(writeQuery.numRowsAffected());
-                                qWarning("MigrationWriter: note_id=%lld folder_id=%lld "
-                                         "format=%s unexpected rows affected",
-                                         static_cast<long long>(noteId),
-                                         static_cast<long long>(folderId),
-                                         qPrintable(LegacyFormatDetector::formatName(format)));
-                            } else {
-                                result.warnings = warnings;
-                                result.success = true;
-                                result.code = WriteErrorCode::None;
-                                result.originalDataPreserved = false;
-                                result.message = QStringLiteral("migrated");
-                                qInfo("MigrationWriter: note_id=%lld folder_id=%lld "
-                                      "format=%s migrated",
-                                      static_cast<long long>(noteId),
-                                      static_cast<long long>(folderId),
-                                      qPrintable(LegacyFormatDetector::formatName(format)));
-                            }
-                        }
+                        validateAndPersist(db, envelope, row.encryption, noteId, folderId,
+                                           format, warnings, &result);
                     }
                 }
             }

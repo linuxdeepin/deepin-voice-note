@@ -7,6 +7,12 @@
 #include <QString>
 #include <QVector>
 
+// Forward declarations — 仅头文件需要的类型，实现见 .cpp。
+class QSqlDatabase;
+class QJsonObject;
+
+enum class LegacyFormat;
+
 // TTP-018: 单条事务写回错误码。
 // 对齐集成数据契约「单条写回回报」+ GAP-2：失败时给出可区分原因码 + 描述。
 enum class WriteErrorCode {
@@ -65,9 +71,37 @@ public:
     QString dbPath() const;
 
 private:
+    // 读取单行 meta_data + encrypt 的中间结果。
+    // found=false 表示查无此行（NoteNotFound）或读取失败（ReadFailed），
+    // 此时 result->code/message 已由本方法填入。
+    struct NoteRow {
+        bool found = false;
+        int encryption = 0;     // expand_filed2 原值（用于读解密与写再加密）
+        QString metaData;       // 已按 encryption 解密还原后的 meta_data 字符串
+    };
+
     QString effectiveDbPath() const;
     // 进程级唯一 RW 连接名，避免与 VNoteDbManager 运行态连接争用。
     QString makeConnectionName() const;
+
+    // 读取单行笔记。失败时设置 result 的 ReadFailed/NoteNotFound 并日志，found=false。
+    NoteRow readNoteRow(QSqlDatabase &db, qint32 noteId, qint32 folderId,
+                        WriteResult *result) const;
+
+    // 按探测格式分派转换，产出信封并归一化 warnings。
+    // 转换失败时设置 result 的 ConvertFailed 并日志，返回空 envelope。
+    QJsonObject convertByFormat(LegacyFormat format, const QString &metaDataStr,
+                                qint32 folderId, qint32 noteId,
+                                QVector<MigrationWarning> *warnings,
+                                WriteResult *result) const;
+
+    // 信封校验 → 紧凑化 → 加密再入库 → 单条参数化 UPDATE。
+    // 成功设置 result.success；失败设置 ValidationFailed/WriteFailed 并日志。
+    void validateAndPersist(QSqlDatabase &db, const QJsonObject &envelope,
+                            int encryption, qint32 noteId, qint32 folderId,
+                            LegacyFormat format,
+                            const QVector<MigrationWarning> &warnings,
+                            WriteResult *result) const;
 
     QString m_dbPath;
 };
