@@ -268,6 +268,11 @@ ApplicationWindow {
 
     }
 
+    // TTP-021: 升级进度界面全屏覆盖层（迁移期间遮蔽主编辑界面，终态展示备份/报告路径）。
+    MigrationProgressView {
+        anchors.fill: parent
+    }
+
     Connections {
         function handleFinishedFolderLoad(foldersData) {
             for (var i = 0; i < foldersData.length; i++) {
