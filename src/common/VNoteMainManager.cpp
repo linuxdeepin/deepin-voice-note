@@ -7,6 +7,7 @@
 #include "vnoteitemoper.h"
 #include "vnotefolderoper.h"
 #include "VNoteMainManager.h"
+#include "migrationviewcontroller.h"  // TTP-021 升级进度界面控制器
 #include "jscontent.h"
 #include "webrichetextmanager.h"
 #include "setting.h"
@@ -166,10 +167,21 @@ QObject *voiceRecoder_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
     return VoiceRecoderHandler::instance();
 }
 
+QObject *migrationViewController_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    qInfo() << "migrationViewController_provider called";
+    Q_UNUSED(engine)
+    Q_UNUSED(scriptEngine)
+
+    return MigrationViewController::instance();
+}
+
 void VNoteMainManager::initQMLRegister()
 {
     qInfo() << "Initializing QML registration";
     qmlRegisterSingletonType<VNoteMainManager>("VNote", 1, 0, "VNoteMainManager", mainManager_provider);
+    // TTP-021: 升级进度界面控制器单例
+    qmlRegisterSingletonType<MigrationViewController>("VNote", 1, 0, "MigrationViewController", migrationViewController_provider);
     qmlRegisterSingletonType<JsContent>("VNote", 1, 0, "Webobj", jsContent_provider);
     // 菜单项管理
     qmlRegisterSingletonType<ActionManager>("VNote", 1, 0, "ActionManager", actionManager_provider);

@@ -22,6 +22,7 @@
         <file>gui/mainwindow/FolderListView.qml</file>
         <file>gui/mainwindow/InitialInterface.qml</file>
         <file>gui/mainwindow/ItemListView.qml</file>
+        <file>gui/mainwindow/MigrationProgressView.qml</file>
         <file>gui/mainwindow/MainWindow.qml</file>
         <file>gui/mainwindow/SelectView.qml</file>
         <file>gui/mainwindow/VNoteRightMenu.qml</file>

@@ -49,7 +49,9 @@ public:
 
     // 静态启动入口（D20/T3）：若 currentState()==Pending 或 isResumable() 则在独立
     // QThread 启动 run()（不阻塞调用线程），否则不启动。应用启动 DB 就绪后单行调用。
-    static void startIfNeeded();
+    // signalConsumer 非空时，在后台线程启动前以 Qt::QueuedConnection 把进度/阶段/
+    // 终态/中断信号连接到 consumer（TTP-021 控制器），返回编排器指针；不启动时返回 nullptr。
+    static MigrationOrchestrator *startIfNeeded(QObject *signalConsumer = nullptr);
 
     // 后台主循环：串行推进各阶段。可在任意线程同步调用（测试直接调用以确定性验证）。
     // 由 startIfNeeded() 在独立 QThread 内触发。
@@ -72,6 +74,9 @@ signals:
     void stageChanged(MigrationState stage);
     // 终态信号：finalState 为终态，reportPath 为报告路径（NotNeeded 时为空）。
     void finished(MigrationState finalState, const QString &reportPath);
+    // 终态伴生信号（TTP-021）：紧邻 finished 发出，额外携带 backupPath，供进度界面展示
+    // 备份/报告位置。不改 finished 签名以保持现有监听者兼容。NotNeeded 终态路径均为空。
+    void terminalInfo(MigrationState finalState, const QString &backupPath, const QString &reportPath);
     // 非终态退出信号：run() 因取消留中间态待续传、启动决策无操作、状态转换失败或
     // 测试模拟中断而未进入终态时发出。startIfNeeded() 据此退出后台 QThread
     // （P2：保证线程与 orchestrator 总是回收，不留空转事件循环）。
