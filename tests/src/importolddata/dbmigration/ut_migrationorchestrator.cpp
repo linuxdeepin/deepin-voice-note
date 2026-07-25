@@ -677,3 +677,73 @@ TEST(UT_MigrationOrchestrator, ShouldRunDecision)
         EXPECT_FALSE(emitted);
     }
 }
+
+// --- terminalInfo 伴生信号（TTP-021 前置改动）：紧邻 finished 发出，携带 backupPath ---
+
+TEST(UT_MigrationOrchestrator, TerminalInfoCarriedWithFinished)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString dbPath = dir.path() + QStringLiteral("/notes.db");
+    const QString statePath = dir.path() + QStringLiteral("/state/migration-state.json");
+    const QString backupDir = dir.path() + QStringLiteral("/backup");
+    const QString reportDir = dir.path() + QStringLiteral("/report");
+    ASSERT_TRUE(createDb(dbPath));
+    ASSERT_TRUE(insertNoteInto(dbPath, 1, QStringLiteral("{\"noteDatas\":[{\"type\":1,\"text\":\"a\"}]}")));
+
+    MigrationOrchestrator o(dbPath, statePath, backupDir, reportDir);
+    MigrationState terminalState = MigrationState::Pending;
+    QString terminalBackup;
+    QString terminalReport;
+    MigrationState finishedState = MigrationState::Pending;
+    QString finishedReport;
+    QObject::connect(&o, &MigrationOrchestrator::terminalInfo,
+                     [&](MigrationState s, const QString &backup, const QString &report) {
+                         terminalState = s;
+                         terminalBackup = backup;
+                         terminalReport = report;
+                     });
+    QObject::connect(&o, &MigrationOrchestrator::finished,
+                     [&](MigrationState s, const QString &p) { finishedState = s; finishedReport = p; });
+    o.run();
+
+    // terminalInfo 与 finished 携带一致的终态与报告路径。
+    EXPECT_EQ(terminalState, MigrationState::Completed);
+    EXPECT_EQ(finishedState, MigrationState::Completed);
+    EXPECT_EQ(terminalReport, finishedReport);
+    EXPECT_FALSE(terminalReport.isEmpty());
+    // Completed 终态 backupPath 非空（备份阶段已产出）。
+    EXPECT_FALSE(terminalBackup.isEmpty());
+    EXPECT_TRUE(QFile::exists(terminalBackup));
+}
+
+// --- terminalInfo：NotNeeded 终态 backupPath/reportPath 均为空 ---
+
+TEST(UT_MigrationOrchestrator, TerminalInfoNotNeededIsEmpty)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString dbPath = dir.path() + QStringLiteral("/notes.db");
+    const QString statePath = dir.path() + QStringLiteral("/state/migration-state.json");
+    const QString backupDir = dir.path() + QStringLiteral("/backup");
+    const QString reportDir = dir.path() + QStringLiteral("/report");
+    ASSERT_TRUE(createDb(dbPath));
+    // 全部已是 Tiptap 信封（已迁移）→ 扫描无需迁移 → NotNeeded。
+    ASSERT_TRUE(insertNoteInto(dbPath, 1, QStringLiteral("{\"format\":\"tiptap\",\"content\":{}}")));
+
+    MigrationOrchestrator o(dbPath, statePath, backupDir, reportDir);
+    MigrationState terminalState = MigrationState::Pending;
+    QString terminalBackup = QStringLiteral("sentinel");
+    QString terminalReport = QStringLiteral("sentinel");
+    QObject::connect(&o, &MigrationOrchestrator::terminalInfo,
+                     [&](MigrationState s, const QString &backup, const QString &report) {
+                         terminalState = s;
+                         terminalBackup = backup;
+                         terminalReport = report;
+                     });
+    o.run();
+
+    EXPECT_EQ(terminalState, MigrationState::NotNeeded);
+    EXPECT_TRUE(terminalBackup.isEmpty());
+    EXPECT_TRUE(terminalReport.isEmpty());
+}

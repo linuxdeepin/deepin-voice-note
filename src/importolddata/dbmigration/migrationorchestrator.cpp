@@ -42,18 +42,34 @@ MigrationOrchestrator::MigrationOrchestrator(const QString &dbPath, const QStrin
 
 // --- 静态启动入口 ---
 
-void MigrationOrchestrator::startIfNeeded()
+MigrationOrchestrator *MigrationOrchestrator::startIfNeeded(QObject *signalConsumer)
 {
     MigrationOrchestrator *orchestrator = new MigrationOrchestrator();
     if (!orchestrator->shouldRun()) {
         qCInfo(lcMigrationOrchestrator) << "startIfNeeded: no migration to run, state="
                                         << migrationStateToString(orchestrator->m_state.currentState());
         delete orchestrator;
-        return;
+        return nullptr;
     }
 
     QThread *thread = new QThread();
     orchestrator->moveToThread(thread);
+    // 在后台线程启动前，把进度/阶段/终态/中断信号以 Qt::QueuedConnection 连接到 consumer
+    // （TTP-021 控制器）。QueuedConnection 保证跨线程安全投递，consumer 在其所在线程处理。
+    if (signalConsumer) {
+        connect(orchestrator, SIGNAL(progressChanged(MigrationOrchestrator::ProgressSnapshot)),
+                signalConsumer, SLOT(onProgressChanged(MigrationOrchestrator::ProgressSnapshot)),
+                Qt::QueuedConnection);
+        connect(orchestrator, SIGNAL(stageChanged(MigrationState)),
+                signalConsumer, SLOT(onStageChanged(MigrationState)),
+                Qt::QueuedConnection);
+        connect(orchestrator, SIGNAL(terminalInfo(MigrationState,QString,QString)),
+                signalConsumer, SLOT(onTerminalInfo(MigrationState,QString,QString)),
+                Qt::QueuedConnection);
+        connect(orchestrator, SIGNAL(aborted()),
+                signalConsumer, SLOT(onAborted()),
+                Qt::QueuedConnection);
+    }
     connect(thread, &QThread::started, orchestrator, &MigrationOrchestrator::run);
     // 终态与非终态退出都退出线程并回收 orchestrator（P2：覆盖不发 finished 的提前返回路径）。
     connect(orchestrator, &MigrationOrchestrator::finished, thread, &QThread::quit);
@@ -64,6 +80,7 @@ void MigrationOrchestrator::startIfNeeded()
     qCInfo(lcMigrationOrchestrator) << "startIfNeeded: launching migration in background thread, state="
                                     << migrationStateToString(orchestrator->m_state.currentState());
     thread->start();
+    return orchestrator;
 }
 
 bool MigrationOrchestrator::shouldRun() const
@@ -393,6 +410,9 @@ void MigrationOrchestrator::finalize(MigrationState finalState)
     }
 
     m_finishedEmitted.store(true);
+    // TTP-021：紧邻 finished 发出终态伴生信号，额外携带 backupPath。
+    // NotNeeded 终态无备份产出，backupPath 传空以满足 TTP-021 契约（与 reportPath 一致）。
+    emit terminalInfo(finalState, finalState == MigrationState::NotNeeded ? QString() : m_backupPath, reportPath);
     emit finished(finalState, reportPath);
 }
 
