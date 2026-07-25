@@ -9,7 +9,8 @@
 #include "common/imageprovider.h"
 #include "common/vtextspeechandtrmanager.h"
 
-#include "importolddata/dbmigration/migrationorchestrator.h"  // TTP-020 后台全量迁移任务启动入口
+#include "importolddata/dbmigration/migrationorchestrator.h"  // TTP-020 后台全量迁移任务编排层
+#include "common/migrationviewcontroller.h"  // TTP-021 升级进度界面控制器
 #include "config.h"
 
 #include <QQmlApplicationEngine>
@@ -139,7 +140,8 @@ int main(int argc, char *argv[])
     qInfo() << "Note manager initialized";
 
     // TTP-020: DB 就绪后单行启动后台 Tiptap 全量迁移任务（两套状态独立，不干扰旧库升级）。
-    MigrationOrchestrator::startIfNeeded();
+    // TTP-021: 通过升级进度界面控制器启动迁移（内部拉起 TTP-020 编排器并消费进度/终态信号）。
+    MigrationViewController::instance()->start();
 
     DLogManager::registerConsoleAppender();
     DLogManager::registerFileAppender();

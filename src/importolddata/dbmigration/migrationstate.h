@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QVector>
 #include <QString>
+#include <QMetaType>
 
 // TTP-015: 迁移状态机状态集合（D1=A，不含独立 RollbackRequired）。
 // 回滚动作由 TTP-016 在 Failed 态执行，状态机本身不设回滚态。
@@ -29,6 +30,10 @@ enum class MigrationSubstage {
     ScanDone,        // 扫描已完成（续传不重扫）
     MigratingCursor  // 游标推进中
 };
+
+// 跨线程 QueuedConnection 投递 MigrationState（TTP-021 控制器在主线程消费
+// stageChanged/terminalInfo）需注册为 metatype。
+Q_DECLARE_METATYPE(MigrationState)
 
 // 变更日志条目，随状态同载体持久化（D4 单一载体）。
 struct HistoryEntry {
