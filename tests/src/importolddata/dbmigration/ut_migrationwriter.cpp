@@ -10,6 +10,7 @@
 #include <QByteArray>
 #include <QDateTime>
 #include <QFileInfo>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSqlDatabase>
@@ -413,4 +414,65 @@ TEST(UT_MigrationWriter, ReadFailedWhenMissing)
     EXPECT_FALSE(r.success);
     EXPECT_EQ(r.code, WriteErrorCode::ReadFailed);
     EXPECT_FALSE(QFileInfo::exists(dbPath));
+}
+
+// --- PlainText 转换分支（非 JSON/非 HTML 纯文本 → 单段落 doc）---
+
+TEST(UT_MigrationWriter, PlainTextConvertedToEnvelope)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString dbPath = dir.path() + QStringLiteral("/plain.db");
+    ASSERT_TRUE(createDb(dbPath));
+    // 非 JSON、非 HTML 的纯文本串，detect() 归类为 PlainText。
+    const QString metaData = QStringLiteral("hello plain text note");
+    ASSERT_TRUE(insertNoteInto(dbPath, 30, metaData));
+
+    MigrationWriter writer(dbPath);
+    const WriteResult r = writer.writeOne(0, 30);
+    EXPECT_TRUE(r.success);
+    EXPECT_EQ(r.code, WriteErrorCode::None);
+
+    const NoteRow row = readNote(dbPath, 30);
+    ASSERT_TRUE(row.found);
+    EXPECT_EQ(LegacyFormatDetector::detect(row.metaData), LegacyFormat::TiptapEnvelope);
+    // 解析信封，断言 content.doc 含一个段落，段落内文本为原文。
+    const QJsonObject envelope = QJsonDocument::fromJson(row.metaData.toUtf8()).object();
+    const QJsonObject content = envelope.value(QStringLiteral("content")).toObject();
+    ASSERT_EQ(content.value(QStringLiteral("type")).toString(), QStringLiteral("doc"));
+    const QJsonArray docContent = content.value(QStringLiteral("content")).toArray();
+    ASSERT_EQ(docContent.size(), 1);
+    const QJsonObject paragraph = docContent.at(0).toObject();
+    EXPECT_EQ(paragraph.value(QStringLiteral("type")).toString(), QStringLiteral("paragraph"));
+    const QJsonArray paragraphContent = paragraph.value(QStringLiteral("content")).toArray();
+    ASSERT_EQ(paragraphContent.size(), 1);
+    const QJsonObject textNode = paragraphContent.at(0).toObject();
+    EXPECT_EQ(textNode.value(QStringLiteral("type")).toString(), QStringLiteral("text"));
+    EXPECT_EQ(textNode.value(QStringLiteral("text")).toString(), metaData);
+}
+
+// --- LegacyHtmlCode 裸 HTML 子分支（doc.isObject()==false）---
+
+TEST(UT_MigrationWriter, BareHtmlConvertedToEnvelope)
+{
+    QTemporaryDir dir;
+    ASSERT_TRUE(dir.isValid());
+    const QString dbPath = dir.path() + QStringLiteral("/barehtml.db");
+    ASSERT_TRUE(createDb(dbPath));
+    // 裸 HTML 串（非 JSON 包封），detect() 经 looksLikeHtml 归类为 LegacyHtmlCode，
+    // 转换分支中 QJsonDocument::fromJson 解析失败、doc.isObject()==false，htmlCode 取原串。
+    const QString metaData = QStringLiteral("<p>bare html content</p>");
+    ASSERT_TRUE(insertNoteInto(dbPath, 31, metaData));
+
+    MigrationWriter writer(dbPath);
+    const WriteResult r = writer.writeOne(0, 31);
+    EXPECT_TRUE(r.success);
+    EXPECT_EQ(r.code, WriteErrorCode::None);
+
+    const NoteRow row = readNote(dbPath, 31);
+    ASSERT_TRUE(row.found);
+    EXPECT_EQ(LegacyFormatDetector::detect(row.metaData), LegacyFormat::TiptapEnvelope);
+    const QJsonObject obj = QJsonDocument::fromJson(row.metaData.toUtf8()).object();
+    EXPECT_EQ(obj.value(QStringLiteral("format")).toString(), QStringLiteral("tiptap"));
+    EXPECT_FALSE(obj.contains(QStringLiteral("htmlCode")));
 }
