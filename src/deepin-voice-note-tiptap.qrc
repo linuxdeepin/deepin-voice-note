@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="tiptap-editor.html">../web-editor/dist/tiptap-editor.html</file>
+        <file alias="tiptap-editor.js">../web-editor/dist/tiptap-editor.js</file>
+    </qresource>
+</RCC>

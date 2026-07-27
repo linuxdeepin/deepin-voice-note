@@ -477,6 +477,38 @@ Item {
             }
         }
 
+
+        // TTP-022: debug 门控的独立 Tiptap WebEngineView（不改动 Summernote webView.url）
+        Loader {
+            id: tiptapLoader
+
+            active: TiptapTemp.debugEnabled
+            anchors.fill: parent
+            visible: active
+
+            sourceComponent: Item {
+                anchors.fill: parent
+
+                WebEngineView {
+                    id: tiptapWebView
+
+                    anchors.fill: parent
+                    backgroundColor: DTK.themeType === ApplicationHelper.LightType ? "white" : "black"
+                    visible: true
+
+                    Component.onCompleted: {
+                        tiptapTempChannel.registerObject("tiptapTemp", TiptapTemp);
+                        tiptapWebView.webChannel = tiptapTempChannel;
+                        tiptapWebView.url = Qt.resolvedUrl(TiptapTemp.tiptapHtmlPath());
+                    }
+                }
+
+                WebChannel {
+                    id: tiptapTempChannel
+                }
+            }
+        }
+
         Loader {
             id: multipleChoicesLoader
 
