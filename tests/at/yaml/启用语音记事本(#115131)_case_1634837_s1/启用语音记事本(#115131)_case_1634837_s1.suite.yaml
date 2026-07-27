@@ -1,0 +1,26 @@
+name: 启用语音记事本(#115131)_case_1634837_s1_suite
+app: deepin-voice-note
+description: ''
+module: 启用语音记事本(#115131)
+tags: []
+fast_fail: false
+env_check: []
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+teardown:
+- action: session_stop
+suites:
+- id: case_1634837_s1
+  name: 打开语音记事本
+  description: ''
+  tags: []
+  steps: []
+  assert_steps:
+  - action: assert_element
+    selector:
+      name: 新建记事本
+      role: button
+  - action: assert_window_count
+    expected: 1

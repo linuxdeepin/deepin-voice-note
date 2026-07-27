@@ -1,0 +1,26 @@
+name: 压力测试(#115107)_case_1635301_s1_suite
+app: deepin-voice-note
+description: ''
+module: 压力测试(#115107)
+tags: []
+fast_fail: false
+env_check: []
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+teardown:
+- action: session_stop
+suites:
+- id: case_1635301_s1
+  name: 打开语音记事本
+  description: ''
+  tags: []
+  steps:
+  - action: keyboard_hot_key
+    key: ctrl+b
+  assert_steps:
+  - action: assert_element
+    selector:
+      name: 新建记事本
+      role: button
