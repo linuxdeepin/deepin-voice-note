@@ -157,6 +157,16 @@ QJsonObject MigrationReport::buildReportObject(const MigrationReportInput &input
         }
     }
 
+    // 续传累计计数优先：success/failed 使用从游标恢复的全量计数，保证与
+    // total/needMigrate 同为全量口径（writeResults 在续传段仅含本次明细）。
+    // cumulativeSuccess/cumulativeFail < 0 表示未提供，回退到上方重算值。
+    if (input.cumulativeSuccess >= 0) {
+        success = input.cumulativeSuccess;
+    }
+    if (input.cumulativeFail >= 0) {
+        failed = input.cumulativeFail;
+    }
+
     // --- counts ---
     QJsonObject counts;
     counts.insert(QStringLiteral("total"), input.totalCount);
@@ -184,6 +194,7 @@ QJsonObject MigrationReport::buildReportObject(const MigrationReportInput &input
     report.insert(QStringLiteral("backupPath"), input.backupPath);
     report.insert(QStringLiteral("finalState"), finalStateName(input.finalState));
     report.insert(QStringLiteral("cancelled"), input.cancelled);
+    report.insert(QStringLiteral("writeResultsScope"), input.writeResultsScope);
     return report;
 }
 

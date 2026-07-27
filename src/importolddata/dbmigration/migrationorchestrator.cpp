@@ -289,6 +289,10 @@ bool MigrationOrchestrator::doMigrating()
 {
     emitStage(MigrationState::Migrating);
 
+    // 入口 nextIndex>0 表示部分条目已在先前运行写回（不在本次 m_writeResults 内），
+    // 终态报告的 failedNoteIds/warnings/downgraded 明细仅含本次续传段。
+    m_writeResultsPartial = (m_nextIndex > 0);
+
     m_snapshot.stage = MigrationState::Migrating;
     m_snapshot.total = m_total;
     m_snapshot.processed = m_processed;
@@ -396,6 +400,13 @@ void MigrationOrchestrator::finalize(MigrationState finalState)
         input.abnormalCount = m_scanAbnormalCount;
         input.abnormalNoteIds = m_scanAbnormalNoteIds;
         input.writeResults = m_writeResults;
+        // success/failed 使用从游标恢复 + 本次段累计的全量计数，与 total/needMigrate
+        // 同为全量口径（writeResults 在续传段仅含本次明细）。
+        input.cumulativeSuccess = m_success;
+        input.cumulativeFail = m_fail;
+        input.writeResultsScope = m_writeResultsPartial
+                                      ? QStringLiteral("resumed-segment")
+                                      : QStringLiteral("full");
         input.backupPath = m_backupPath;
         input.elapsedMs = m_timer.elapsed();
         input.finalState = finalState;

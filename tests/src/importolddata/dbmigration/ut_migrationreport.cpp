@@ -140,6 +140,69 @@ TEST(UT_MigrationReport, BuildReportObjectCounts)
     EXPECT_GE(counts.value(QStringLiteral("downgraded")).toInt(), 1);
 }
 
+// --- buildReportObject 续传累计计数优先（success/failed 用全量计数）---
+
+TEST(UT_MigrationReport, BuildReportObjectUsesCumulativeCountsOnResume)
+{
+    // 模拟续传场景：全量 needMigrate=4，首段已成功 2 条，本次续传段 writeResults
+    // 仅含 2 条（1 成功 + 1 失败）。若从 writeResults 重算，success=1/failed=1，
+    // 与全量 total/needMigrate 口径不一致；传入累计计数后应使用全量值。
+    MigrationReportInput input;
+    input.totalCount = 5;
+    input.needMigrateCount = 4;
+    input.alreadyTiptapCount = 1;
+    input.abnormalCount = 0;
+    input.finalState = MigrationState::PartialCompleted;
+    input.cancelled = false;
+
+    QVector<WriteResult> results;
+    results.append(makeResult(3, true, WriteErrorCode::None));
+    results.append(makeResult(4, false, WriteErrorCode::ConvertFailed));
+    input.writeResults = results;
+
+    // 从游标恢复的全量累计计数：首段 success=2 + 本次段 success=1 = 3；
+    // 首段 fail=0 + 本次段 fail=1 = 1。
+    input.cumulativeSuccess = 3;
+    input.cumulativeFail = 1;
+    input.writeResultsScope = QStringLiteral("resumed-segment");
+
+    const QJsonObject report = MigrationReport::buildReportObject(input);
+    const QJsonObject counts = report.value(QStringLiteral("counts")).toObject();
+
+    // success/failed 使用全量累计计数，而非从续传段 writeResults 重算（1/1）。
+    EXPECT_EQ(counts.value(QStringLiteral("success")).toInt(), 3);
+    EXPECT_EQ(counts.value(QStringLiteral("failed")).toInt(), 1);
+
+    // 口径一致：needMigrate == success + failed == total - skipped
+    EXPECT_EQ(counts.value(QStringLiteral("needMigrate")).toInt(),
+              counts.value(QStringLiteral("success")).toInt()
+                  + counts.value(QStringLiteral("failed")).toInt());
+
+    // 明细范围标注：续传段明细。
+    EXPECT_EQ(report.value(QStringLiteral("writeResultsScope")).toString(),
+              QStringLiteral("resumed-segment"));
+
+    // failedNoteIds 仅含续传段失败明细（note 4），不与全量 failed 计数冲突。
+    const QJsonArray failedIds = report.value(QStringLiteral("failedNoteIds")).toArray();
+    ASSERT_EQ(failedIds.size(), 1);
+    EXPECT_EQ(failedIds.at(0).toInt(), 4);
+}
+
+// --- buildReportObject 默认回退：未提供累计计数时从 writeResults 重算 ---
+
+TEST(UT_MigrationReport, BuildReportObjectFallsBackToRecomputeWithoutCumulative)
+{
+    // cumulativeSuccess/cumulativeFail 保持默认 -1，应回退到从 writeResults 重算。
+    const MigrationReportInput input = makeSampleInput();
+    const QJsonObject report = MigrationReport::buildReportObject(input);
+
+    const QJsonObject counts = report.value(QStringLiteral("counts")).toObject();
+    EXPECT_EQ(counts.value(QStringLiteral("success")).toInt(), 3);
+    EXPECT_EQ(counts.value(QStringLiteral("failed")).toInt(), 1);
+    EXPECT_EQ(report.value(QStringLiteral("writeResultsScope")).toString(),
+              QStringLiteral("full"));
+}
+
 // --- buildReportObject failedNoteIds / abnormalNoteIds / cancelled ---
 
 TEST(UT_MigrationReport, BuildReportObjectIdsAndCancelled)

@@ -139,9 +139,13 @@ private:
 
     // 累计写回回报（含 warnings，报告用）。
     // 注意（Info）：游标 schema 不含 writeResults，故续传运行的终态报告仅含本次续传段
-    // 的 writeResults，首段已落盘写回不在内；counts.needMigrate/total 来自游标 scan 为全量，
-    // success/failed/failedNoteIds 仅反映续传段——两者口径不一致，属断点续传固有限制。
+    // 的 writeResults，首段已落盘写回不在内。报告 success/failed 改用从游标恢复的
+    // m_success/m_fail 全量累计计数（见 finalize），failedNoteIds/warnings/downgraded
+    // 等明细仅反映续传段，由 m_writeResultsPartial 标注 writeResultsScope。
     QVector<WriteResult> m_writeResults;
+    // 本次运行是否为续传 Migrating 段（入口 nextIndex>0）：true 时 writeResults 仅含
+    // 续传段明细，报告 writeResultsScope 标注为 "resumed-segment"。
+    bool m_writeResultsPartial = false;
 
     ProgressSnapshot m_snapshot;
 
