@@ -44,6 +44,18 @@ struct MigrationReportInput {
     // TTP-018 逐条写回回报（含 warnings）
     QVector<WriteResult> writeResults;
 
+    // 续传累计计数（从游标恢复 + 本次段累计）。
+    // 续传场景 writeResults 仅含本次续传段，从其重算 success/failed 会与全量
+    // total/needMigrate 口径不一致；故报告优先使用此处累计计数。
+    // 默认 -1 表示未提供，回退到从 writeResults 重算（兼容旧调用方/单测）。
+    int cumulativeSuccess = -1;
+    int cumulativeFail = -1;
+
+    // writeResults 范围标注："full"=含全部写回明细；
+    // "resumed-segment"=仅本次续传段明细（续传时 m_writeResults 不入游标，
+    // failedNoteIds/warnings/downgraded 仅反映续传段）。
+    QString writeResultsScope = QStringLiteral("full");
+
     // TTP-016 备份路径
     QString backupPath;
 

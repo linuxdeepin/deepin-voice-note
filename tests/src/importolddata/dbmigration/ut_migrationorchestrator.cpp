@@ -512,6 +512,18 @@ TEST(UT_MigrationOrchestrator, ResumeAfterInterrupt)
     EXPECT_TRUE(isTiptap(dbPath, 3));
     EXPECT_TRUE(isTiptap(dbPath, 4));
 
+    // 续传报告口径：success/failed 应为全量累计计数（4），而非仅本次续传段（2）。
+    const QJsonObject report = loadReport(reportDir);
+    const QJsonObject counts = report.value(QStringLiteral("counts")).toObject();
+    EXPECT_EQ(counts.value(QStringLiteral("success")).toInt(), 4);
+    EXPECT_EQ(counts.value(QStringLiteral("failed")).toInt(), 0);
+    EXPECT_EQ(counts.value(QStringLiteral("needMigrate")).toInt(),
+              counts.value(QStringLiteral("success")).toInt()
+                  + counts.value(QStringLiteral("failed")).toInt());
+    // 续传段明细范围标注。
+    EXPECT_EQ(report.value(QStringLiteral("writeResultsScope")).toString(),
+              QStringLiteral("resumed-segment"));
+
     MigrationStateMachine sm(statePath);
     ASSERT_TRUE(sm.load());
     EXPECT_EQ(sm.currentState(), MigrationState::Completed);
