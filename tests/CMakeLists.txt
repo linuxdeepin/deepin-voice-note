@@ -133,6 +133,7 @@ add_executable(${PROJECT_NAME_TEST}
     ${VNOTE_SRC_TEST1}
 
     ${APP_QRC}
+    ${CMAKE_CURRENT_LIST_DIR}/../src/deepin-voice-note-tiptap.qrc
     )
 
 # TTP-014: 注入脱敏 HTML fixtures 源树绝对路径，供 ut_migrationhtmlfixtures 自动发现。

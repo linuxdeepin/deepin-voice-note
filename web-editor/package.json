@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "node --test test/*.test.mjs",
+    "build": "vite build",
+    "build:test": "vite build --mode test",
     "validate-envelope": "node scripts/validate-envelope.mjs"
   },
   "dependencies": {
@@ -27,5 +29,9 @@
     "@tiptap/extension-text": "3.27.4",
     "@tiptap/extension-underline": "3.27.4",
     "@tiptap/pm": "3.27.4"
+  },
+  "devDependencies": {
+    "happy-dom": "^18.0.1",
+    "vite": "^7.1.3"
   }
 }

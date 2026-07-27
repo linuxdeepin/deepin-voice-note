@@ -14,7 +14,7 @@ endif()
 # using for linglnog
 add_definitions(-DINSTALL_LIB_PATH="${CMAKE_INSTALL_LIBDIR}")
 
-list(APPEND RESOURCES ${CMAKE_PROJECT_NAME}.qrc deepin-voice-note-web.qrc)
+list(APPEND RESOURCES ${CMAKE_PROJECT_NAME}.qrc deepin-voice-note-web.qrc deepin-voice-note-tiptap.qrc)
 
 # 检测架构并选择对应的 Qt 版本
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "mips.*")
