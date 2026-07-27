@@ -1,0 +1,24 @@
+name: _V25_2500_语音记事本_语音记事本102x_工具栏(#115117)_case_1635223_s1_suite
+app: deepin-voice-note
+description: ''
+module: _V25_2500_语音记事本_语音记事本102x_工具栏(#115117)
+tags: []
+fast_fail: false
+env_check: []
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+teardown:
+- action: session_stop
+suites:
+- id: case_1635223_s1
+  name: 打开语音记事本
+  description: ''
+  tags: []
+  steps: []
+  assert_steps:
+  - action: assert_element
+    selector:
+      name: 新建记事本
+      role: button
