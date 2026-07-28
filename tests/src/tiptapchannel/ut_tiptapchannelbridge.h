@@ -1,21 +1,20 @@
 // SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
-//
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef UT_TIPTAPTEMPBRIDGE_H
-#define UT_TIPTAPTEMPBRIDGE_H
+#ifndef UT_TIPTAPCHANNELBRIDGE_H
+#define UT_TIPTAPCHANNELBRIDGE_H
 
 #include "gtest/gtest.h"
 #include <QTest>
 #include <QObject>
 
-// TTP-022: 临时 Tiptap 通道桥接单元测试
-class UT_TiptapTempBridge : public QObject
+// 正式 TiptapChannelBridge 单元测试
+class UT_TiptapChannelBridge : public QObject
     , public ::testing::Test
 {
     Q_OBJECT
 public:
-    UT_TiptapTempBridge();
+    UT_TiptapChannelBridge();
 };
 
-#endif // UT_TIPTAPTEMPBRIDGE_H
+#endif // UT_TIPTAPCHANNELBRIDGE_H
