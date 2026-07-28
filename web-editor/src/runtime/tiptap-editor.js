@@ -11,6 +11,7 @@ import { Editor } from '@tiptap/core'
 import { createTiptapExtensions } from './tiptap-extensions.js'
 import { createEmptyDoc } from '../schema/document-envelope.js'
 import { bindTiptapChannel } from './tiptap-channel.js'
+import { createFormatToolbar } from './format-toolbar.js'
 
 // ---------------------------------------------------------------------------
 // 编辑器初始化模块（本接口不替换此模块）
@@ -29,4 +30,5 @@ function createTiptapEditor(element) {
 // ---------------------------------------------------------------------------
 
 const editor = createTiptapEditor(document.getElementById('app'))
+const toolbar = createFormatToolbar(editor, document.getElementById('toolbar-host'))
 bindTiptapChannel(editor)
