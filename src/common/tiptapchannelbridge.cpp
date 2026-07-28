@@ -11,7 +11,14 @@
 TiptapChannelBridge::TiptapChannelBridge(QObject *parent)
     : QObject(parent)
     , m_editorReady(false)
+    , m_pendingFontListValid(false)
 {
+}
+
+TiptapChannelBridge *TiptapChannelBridge::instance()
+{
+    static TiptapChannelBridge inst;
+    return &inst;
 }
 
 bool TiptapChannelBridge::debugEnabled() const
@@ -49,6 +56,14 @@ void TiptapChannelBridge::notifyEditorReady()
         emit loadEnvelopeRequested(m_pendingEnvelope);
         m_pendingEnvelope.clear();
     }
+
+    // 就绪后补发缓存的字体列表，不丢数据
+    if (m_pendingFontListValid) {
+        emit fontListProvided(m_pendingFontList, m_pendingDefaultFont);
+        m_pendingFontList.clear();
+        m_pendingDefaultFont.clear();
+        m_pendingFontListValid = false;
+    }
 }
 
 void TiptapChannelBridge::loadEnvelope(const QString &envelopeJson)
@@ -62,9 +77,32 @@ void TiptapChannelBridge::loadEnvelope(const QString &envelopeJson)
     }
 }
 
+void TiptapChannelBridge::sendFontList(const QStringList &fonts, const QString &defaultFont)
+{
+    if (m_editorReady) {
+        // 已就绪，直接下发
+        emit fontListProvided(fonts, defaultFont);
+    } else {
+        // 未就绪，缓存待发
+        m_pendingFontList = fonts;
+        m_pendingDefaultFont = defaultFont;
+        m_pendingFontListValid = true;
+    }
+}
+
 QString TiptapChannelBridge::pendingEnvelope() const
 {
     return m_pendingEnvelope;
+}
+
+QStringList TiptapChannelBridge::pendingFontList() const
+{
+    return m_pendingFontList;
+}
+
+QString TiptapChannelBridge::pendingDefaultFont() const
+{
+    return m_pendingDefaultFont;
 }
 
 bool TiptapChannelBridge::isEditorReady() const

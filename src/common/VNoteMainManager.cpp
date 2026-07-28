@@ -179,12 +179,10 @@ QObject *migrationViewController_provider(QQmlEngine *engine, QJSEngine *scriptE
 
 QObject *tiptapChannelBridge_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
 {
-    qInfo() << "tiptapChannelBridge_provider called";
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
 
-    static TiptapChannelBridge instance;
-    return &instance;
+    return TiptapChannelBridge::instance();
 }
 
 void VNoteMainManager::initQMLRegister()

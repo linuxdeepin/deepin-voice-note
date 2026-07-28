@@ -15,6 +15,7 @@
 #include "globaldef.h"
 #include "common/utils.h"
 #include "common/VNoteMainManager.h"
+#include "common/tiptapchannelbridge.h"
 
 #include <QApplication>
 #include <QCursor>
@@ -341,6 +342,11 @@ void WebEngineHandler::connectWebContent()
     connect(JsContent::instance(), &JsContent::viewPictrue, this, &WebEngineHandler::viewPicture);
     connect(JsContent::instance(), &JsContent::saveAudio, this, &WebEngineHandler::saveAudio);
     connect(JsContent::instance(), &JsContent::createNote, this, &WebEngineHandler::createNote);
+    // 字体列表宿主下发：编辑器就绪后把字体列表下发到 Tiptap 工具栏
+    connect(TiptapChannelBridge::instance(), &TiptapChannelBridge::editorReady,
+            this, [this]() {
+                TiptapChannelBridge::instance()->sendFontList(m_fontList, m_defaultFont);
+            });
     qInfo() << "Web content connection finished";
 }
 

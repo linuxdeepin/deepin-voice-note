@@ -222,3 +222,64 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_debugEnabled_001)
 
     qputenv("DVN_TIPTAP_DEBUG", "");
 }
+
+// ---------------------------------------------------------------------------
+// 字体列表下发（fontListProvided）：缓存 / 补发 / 直接下发
+// ---------------------------------------------------------------------------
+
+// 未就绪时 sendFontList 缓存，不立即下发
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_fontList_cache_beforeReady_001)
+{
+    TiptapChannelBridge bridge;
+    EXPECT_FALSE(bridge.isEditorReady());
+
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::fontListProvided);
+    QStringList fonts = {"Arial", "Noto Sans CJK SC"};
+    bridge.sendFontList(fonts, "Noto Sans CJK SC");
+
+    EXPECT_EQ(spy.count(), 0);
+    EXPECT_EQ(bridge.pendingFontList(), fonts);
+    EXPECT_EQ(bridge.pendingDefaultFont(), "Noto Sans CJK SC");
+}
+
+// 就绪后补发缓存的字体列表，不丢数据
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_fontList_replay_afterReady_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::fontListProvided);
+
+    QStringList fonts = {"Arial", "Noto Sans CJK SC"};
+    bridge.sendFontList(fonts, "Noto Sans CJK SC");
+    EXPECT_EQ(spy.count(), 0);
+
+    bridge.jsEditorReady();
+    EXPECT_EQ(spy.count(), 1);
+    auto args = spy.takeFirst();
+    EXPECT_EQ(args.at(0).toStringList(), fonts);
+    EXPECT_EQ(args.at(1).toString(), "Noto Sans CJK SC");
+    EXPECT_TRUE(bridge.pendingFontList().isEmpty());
+}
+
+// 就绪后直接下发，不缓存
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_fontList_direct_afterReady_001)
+{
+    TiptapChannelBridge bridge;
+    bridge.jsEditorReady();
+
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::fontListProvided);
+    QStringList fonts = {"Arial"};
+    bridge.sendFontList(fonts, "Arial");
+
+    EXPECT_EQ(spy.count(), 1);
+    EXPECT_EQ(spy.takeFirst().at(0).toStringList(), fonts);
+    EXPECT_TRUE(bridge.pendingFontList().isEmpty());
+}
+
+// 单例访问返回同一实例
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_instance_returnsSame_001)
+{
+    TiptapChannelBridge *a = TiptapChannelBridge::instance();
+    TiptapChannelBridge *b = TiptapChannelBridge::instance();
+    EXPECT_NE(a, nullptr);
+    EXPECT_EQ(a, b);
+}

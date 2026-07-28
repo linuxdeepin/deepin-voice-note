@@ -64,9 +64,10 @@ export function createDebounce(fn, delay) {
  * 绑定正式 QWebChannel 通道（channel.objects.tiptapChannel）。
  * @param {Editor} editor — Tiptap Editor 实例
  * @param {object} [channelFactory] — 可选，测试注入；默认使用全局 QWebChannel
+ * @param {object} [options] — 可选，{ onFontList(fonts, defaultFont) }
  * @returns {Promise<object>} resolve 为 bridge 对象
  */
-export function bindTiptapChannel(editor, channelFactory) {
+export function bindTiptapChannel(editor, channelFactory, options = {}) {
   return new Promise((resolve, reject) => {
     const createChannel = channelFactory || ((cb) => {
       new QWebChannel(qt.webChannelTransport, cb)  // eslint-disable-line no-undef
@@ -97,6 +98,13 @@ export function bindTiptapChannel(editor, channelFactory) {
         const content = envelope?.content || createEmptyDoc()
         editor.commands.setContent(content)
       })
+
+      // C++→JS：宿主下发字体列表（fontListProvided signal）
+      if (bridge.fontListProvided) {
+        bridge.fontListProvided.connect(function (fonts, defaultFont) {
+          options.onFontList?.(fonts, defaultFont)
+        })
+      }
 
       // --- 事件 2：内容变化（节流后回告，不携带摘要） ---
       const debounce = createDebounce(() => {

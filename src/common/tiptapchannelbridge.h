@@ -6,6 +6,7 @@
 #define TIPTAPCHANNELBRIDGE_H
 
 #include <QObject>
+#include <QStringList>
 
 // ============================================================================
 // 命名稳定契约：TiptapChannelBridge
@@ -24,6 +25,9 @@
 //   5. 插入语音   — signal insertVoiceBlock(voiceInfoJson)（C++→JS 下发）
 //                  signal insertVoiceBlockFailed(reason)  （JS→C++ 失败回告）
 //
+// 附加只增事件：字体列表下发（C++→JS，编辑器就绪后补发）
+//   - signal fontListProvided(fonts, defaultFont)         （C++→JS 下发）
+//
 // 适配层方法衔接宿主既有资源路径（WEB_PATH / images/ 相对路径约定），
 // 只读复用 jscontent.cpp 路径模式，不修改 JsContent 源码。
 // ============================================================================
@@ -39,6 +43,9 @@ class TiptapChannelBridge : public QObject
 
 public:
     explicit TiptapChannelBridge(QObject *parent = nullptr);
+
+    // 全局单例访问（与 QML 单例共享同一实例，供宿主侧接线）
+    static TiptapChannelBridge *instance();
 
     // --- 适配层方法（Q_INVOKABLE，供 QML / 前端调用） ---
 
@@ -68,8 +75,15 @@ public:
     // 宿主侧下发插入语音块
     Q_INVOKABLE void sendInsertVoiceBlock(const QString &voiceInfoJson);
 
+    // 宿主侧下发字体列表（未就绪时缓存，就绪后补发）
+    Q_INVOKABLE void sendFontList(const QStringList &fonts, const QString &defaultFont);
+
     // 测试辅助：获取当前缓存的待下发 envelope（未就绪时）
     Q_INVOKABLE QString pendingEnvelope() const;
+
+    // 测试辅助：获取当前缓存的待下发字体列表与默认字体（未就绪时）
+    Q_INVOKABLE QStringList pendingFontList() const;
+    Q_INVOKABLE QString pendingDefaultFont() const;
 
     // 测试辅助：是否已就绪
     Q_INVOKABLE bool isEditorReady() const;
@@ -102,6 +116,9 @@ signals:
     // C++→JS：加载 envelope（宿主下发内容到前端）
     void loadEnvelopeRequested(const QString &envelopeJson);
 
+    // C++→JS：字体列表下发（供工具栏字体下拉填充）
+    void fontListProvided(const QStringList &fonts, const QString &defaultFont);
+
 public slots:
     // JS→C++ 回告入口（Q_INVOKABLE 供前端直接调用）
     // 前端编辑器初始化完成
@@ -118,6 +135,9 @@ public slots:
 private:
     bool m_editorReady;
     QString m_pendingEnvelope;
+    QStringList m_pendingFontList;
+    QString m_pendingDefaultFont;
+    bool m_pendingFontListValid;
 };
 
 #endif // TIPTAPCHANNELBRIDGE_H

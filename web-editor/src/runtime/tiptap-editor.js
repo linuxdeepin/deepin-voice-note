@@ -31,4 +31,6 @@ function createTiptapEditor(element) {
 
 const editor = createTiptapEditor(document.getElementById('app'))
 const toolbar = createFormatToolbar(editor, document.getElementById('toolbar-host'))
-bindTiptapChannel(editor)
+bindTiptapChannel(editor, undefined, {
+  onFontList: (fonts, defaultFont) => toolbar.setFontList(fonts, defaultFont),
+})

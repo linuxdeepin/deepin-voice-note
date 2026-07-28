@@ -107,6 +107,7 @@ function createMockBridge(resourceBaseUrl = 'file:///usr/share/deepin-voice-note
     requestContent: makeConnectable('requestContent'),
     insertImage: makeConnectable('insertImage'),
     insertVoiceBlock: makeConnectable('insertVoiceBlock'),
+    fontListProvided: makeConnectable('fontListProvided'),
   }
 
   return { bridge, calls, emit }
@@ -356,6 +357,58 @@ test('bindTiptapChannel: insertVoiceBlock failed reports reason', async () => {
   // 缺少 voicePath
   emit('insertVoiceBlock', JSON.stringify({ voiceId: 'v1' }))
   assert.equal(calls.insertVoiceBlockFailed.length, 2)
+  editor.destroy()
+})
+
+// ---------------------------------------------------------------------------
+// 测试：字体列表下发
+// ---------------------------------------------------------------------------
+
+test('bindTiptapChannel: fontListProvided invokes options.onFontList', async () => {
+  const { editor } = createEditor()
+  const { bridge, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  const received = []
+  await bindTiptapChannel(editor, factory, {
+    onFontList: (fonts, defaultFont) => received.push({ fonts, defaultFont }),
+  })
+
+  emit('fontListProvided', ['Arial', 'Noto Sans CJK SC'], 'Noto Sans CJK SC')
+
+  assert.equal(received.length, 1)
+  assert.deepEqual(received[0].fonts, ['Arial', 'Noto Sans CJK SC'])
+  assert.equal(received[0].defaultFont, 'Noto Sans CJK SC')
+  editor.destroy()
+})
+
+test('bindTiptapChannel: fontListProvided does not interfere with other events', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory, { onFontList: () => {} })
+
+  // 下发字体列表不应触发内容变化/保存/加载等既有事件
+  emit('fontListProvided', ['Arial'], 'Arial')
+  assert.equal(calls.contentChanged || 0, 0)
+  assert.equal(calls.contentSaved || 0, 0)
+
+  // 既有事件仍正常工作
+  emit('requestContent')
+  assert.ok(calls.contentSaved)
+  assert.equal(calls.contentSaved.length, 1)
+  editor.destroy()
+})
+
+test('bindTiptapChannel: works without onFontList option', async () => {
+  const { editor } = createEditor()
+  const { bridge, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+  // 无 onFontList 时下发不应抛错
+  assert.doesNotThrow(() => emit('fontListProvided', ['Arial'], 'Arial'))
   editor.destroy()
 })
 
