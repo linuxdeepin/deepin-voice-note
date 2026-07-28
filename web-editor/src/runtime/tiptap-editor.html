@@ -13,11 +13,13 @@
   <title>Tiptap Editor</title>
   <style>
     html, body { margin: 0; padding: 0; height: 100%; }
-    #app { min-height: 100%; }
+    #toolbar-host { position: sticky; top: 0; z-index: 10; }
+    #app { min-height: calc(100% - 36px); }
     .ProseMirror { outline: none; min-height: 100%; }
   </style>
 </head>
 <body>
+  <div id="toolbar-host"></div>
   <div id="app"></div>
   <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
   <script type="module" src="./tiptap-editor.js"></script>
