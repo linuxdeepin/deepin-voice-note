@@ -478,11 +478,11 @@ Item {
         }
 
 
-        // TTP-022: debug 门控的独立 Tiptap WebEngineView（不改动 Summernote webView.url）
+        // debug 门控的独立 Tiptap WebEngineView（不改动 Summernote webView.url）
         Loader {
             id: tiptapLoader
 
-            active: TiptapTemp.debugEnabled
+            active: TiptapChannel.debugEnabled
             anchors.fill: parent
             visible: active
 
@@ -497,14 +497,14 @@ Item {
                     visible: true
 
                     Component.onCompleted: {
-                        tiptapTempChannel.registerObject("tiptapTemp", TiptapTemp);
-                        tiptapWebView.webChannel = tiptapTempChannel;
-                        tiptapWebView.url = Qt.resolvedUrl(TiptapTemp.tiptapHtmlPath());
+                        tiptapWebChannel.registerObject("tiptapChannel", TiptapChannel);
+                        tiptapWebView.webChannel = tiptapWebChannel;
+                        tiptapWebView.url = Qt.resolvedUrl(TiptapChannel.tiptapHtmlPath());
                     }
                 }
 
                 WebChannel {
-                    id: tiptapTempChannel
+                    id: tiptapWebChannel
                 }
             }
         }

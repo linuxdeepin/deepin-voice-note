@@ -7,8 +7,8 @@
 #include "vnoteitemoper.h"
 #include "vnotefolderoper.h"
 #include "VNoteMainManager.h"
-#include "migrationviewcontroller.h"  // TTP-021 升级进度界面控制器
-#include "tiptaptempbridge.h"  // TTP-022 临时 Tiptap 通道
+#include "migrationviewcontroller.h"  // 升级进度界面控制器
+#include "tiptapchannelbridge.h"  // 正式 Tiptap QWebChannel 通道
 #include "jscontent.h"
 #include "webrichetextmanager.h"
 #include "setting.h"
@@ -177,13 +177,13 @@ QObject *migrationViewController_provider(QQmlEngine *engine, QJSEngine *scriptE
     return MigrationViewController::instance();
 }
 
-QObject *tiptapTempBridge_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
+QObject *tiptapChannelBridge_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
 {
-    qInfo() << "tiptapTempBridge_provider called";
+    qInfo() << "tiptapChannelBridge_provider called";
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
 
-    static TiptapTempBridge instance;
+    static TiptapChannelBridge instance;
     return &instance;
 }
 
@@ -191,10 +191,10 @@ void VNoteMainManager::initQMLRegister()
 {
     qInfo() << "Initializing QML registration";
     qmlRegisterSingletonType<VNoteMainManager>("VNote", 1, 0, "VNoteMainManager", mainManager_provider);
-    // TTP-021: 升级进度界面控制器单例
+    // 升级进度界面控制器单例
     qmlRegisterSingletonType<MigrationViewController>("VNote", 1, 0, "MigrationViewController", migrationViewController_provider);
-    // TTP-022: 临时 Tiptap 通道单例（命名不稳定，TTP-023 将替换）
-    qmlRegisterSingletonType<TiptapTempBridge>("VNote", 1, 0, "TiptapTemp", tiptapTempBridge_provider);
+    // 正式 Tiptap QWebChannel 通道单例（命名稳定，后续只增不改）
+    qmlRegisterSingletonType<TiptapChannelBridge>("VNote", 1, 0, "TiptapChannel", tiptapChannelBridge_provider);
     qmlRegisterSingletonType<JsContent>("VNote", 1, 0, "Webobj", jsContent_provider);
     // 菜单项管理
     qmlRegisterSingletonType<ActionManager>("VNote", 1, 0, "ActionManager", actionManager_provider);
