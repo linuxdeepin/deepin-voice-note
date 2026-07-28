@@ -7,8 +7,8 @@ fast_fail: false
 env_check: []
 setup:
 - action: session_start
-  command: deepin-voice-note
-  wait: 3.0
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
 teardown:
 - action: session_stop
 suites:
@@ -17,6 +17,11 @@ suites:
   description: ''
   tags: []
   steps:
+  - action: element_action
+    selector:
+      name: 新建记事本
+      role: button
+    do: click
   - action: dtk_context_menu
     selector:
       name: 记事本1
