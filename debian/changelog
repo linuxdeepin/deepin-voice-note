@@ -1,3 +1,47 @@
+deepin-voice-note (6.5.63) unstable; urgency=medium
+
+  * chore: Update version to 6.5.63
+  * feat(tiptap): add font list host delivery channel
+  * feat(tiptap): add fixed top format toolbar with ten basic formats
+  * feat(tiptap): replace temp channel with formal QWebChannel interface
+  * test(at): stabilize voice note AT suite setup
+  * test(at): update voice note AT suites
+  * feat(tiptap): integrate minimal Tiptap editor load/save
+  * fix(migration): use cumulative counts in resume report
+  * feat(migration): implement upgrade progress view
+  * feat(migration): orchestrate background full migration task
+  * feat(migration): implement migration report generation and persistence
+  * refactor(migration): split MigrationWriter::writeOne and cover remaining branches
+  * feat(migration): implement single-note transactional write-back
+  * fix(migration): detect query iteration failure in scanner
+  * feat(migration): implement read-only scan and precheck
+  * feat(migration): implement database backup module
+  * feat(migration): implement migration state machine
+  * fix(migration): address CR review P1/P2/P5 for TTP-013
+  * test(migration): add desensitized real-data fixtures for HTML conversion
+  * feat(migration): degrade unknown and dangerous HTML
+  * feat(migration): convert legacy HTML voice blocks
+  * feat(migration): convert legacy HTML images
+  * test: 修复单元测试构建以适配 Qt6 和 QML 架构改造
+  * feat(migration): convert HTML alignment and lists
+  * feat(migration): convert HTML text marks
+  * feat(migration): convert basic HTML blocks
+  * feat(migration): convert noteDatas voice blocks
+  * feat(migration): convert noteDatas text blocks
+  * feat(migration): add HTML parser adapter
+  * feat(migration): add envelope validator
+  * feat(migration): add json builder
+  * fix(schema): harden envelope validation
+  * feat(migration): add legacy format detector
+  * feat(tiptap): introduce schema v1 contract
+  * ci: allow cppcheck checkout for fork pull requests
+  * fix: add X-Deepin-Singleton flag to desktop file
+  * test: add AT-SPI test cases for deepin-voice-note
+  * fix: remove yaml literal block scalar in linglong.yaml
+  * fix(vnote): keep ctrl multi-selection count in sync
+
+ -- zhanghongyuan <zhanghongyuan@uniontech.com>  Thu, 30 Jul 2026 15:21:20 +0800
+
 deepin-voice-note (6.5.62) unstable; urgency=medium
 
   * fix(vnote): use folder ids for notebook operations
