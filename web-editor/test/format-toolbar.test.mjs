@@ -262,3 +262,24 @@ test('active state syncs when selection moves into formatted text', () => {
   assert.equal(btn.getAttribute('aria-pressed'), 'false')
   editor.destroy()
 })
+
+// ---------------------------------------------------------------------------
+// 资源插入区：图片按钮
+// ---------------------------------------------------------------------------
+
+test('toolbar mounts image insert button', () => {
+  const { editor, host } = createEditorWithToolbar()
+  const btn = host.querySelector('button[data-format="insertImage"]')
+  assert.ok(btn, 'image insert button should be mounted')
+  editor.destroy()
+})
+
+test('toolbar image button triggers injected pick callback', () => {
+  const { editor, host, toolbar } = createEditorWithToolbar()
+  let picked = 0
+  toolbar.setOnPickImage(() => { picked++ })
+  const btn = host.querySelector('button[data-format="insertImage"]')
+  btn.click()
+  assert.equal(picked, 1, 'pick callback should fire on image button click')
+  editor.destroy()
+})

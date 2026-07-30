@@ -226,6 +226,16 @@ export function createFormatToolbar(editor, host) {
   )
   toolbar.appendChild(backPicker.wrapper)
 
+  // 资源插入区：图片按钮（区段顺序：富文本格式区 → 资源插入区）
+  const resourceGroup = createEl('span', { class: 'tiptap-toolbar-group', style: 'display: inline-flex; gap: 2px; margin-left: 8px; border-left: 1px solid #d0d0d0; padding-left: 8px;' })
+  const imageBtn = createEl('button', { type: 'button', 'data-format': 'insertImage', title: '插入图片' }, '图片')
+  let onPickImage = null
+  imageBtn.addEventListener('click', () => {
+    if (onPickImage) onPickImage()
+  })
+  resourceGroup.appendChild(imageBtn)
+  toolbar.appendChild(resourceGroup)
+
   // 点击外部关闭所有面板
   function onOutsideClick(event) {
     if (!toolbar.contains(event.target)) {
@@ -285,6 +295,9 @@ export function createFormatToolbar(editor, host) {
   host.appendChild(toolbar)
 
   return {
+    setOnPickImage(fn) {
+      onPickImage = typeof fn === 'function' ? fn : null
+    },
     setFontList(fonts, defaultFont) {
       fontSelect.innerHTML = ''
       fontSelect.appendChild(createEl('option', { value: '' }, '默认字体'))

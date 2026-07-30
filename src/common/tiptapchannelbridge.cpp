@@ -7,11 +7,61 @@
 #include <QResource>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QImage>
+#include <QDateTime>
+#include <QBuffer>
+#include <QByteArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QStandardPaths>
+#include <QHash>
+#include <QUrl>
+
+namespace {
+
+// 复用 web_engine_handler.cpp 的图片路径归一化逻辑：将 file:// URL、
+// images/ 相对路径或 WEB_PATH/images 绝对路径统一解析为 AppData/images 内的本地路径，
+// 校验结果必须落在 AppData/images 目录内，否则返回空串（拒绝越界路径）。
+QString normalizePicturePath(const QString &path)
+{
+    QString localPath = path;
+    const QUrl url(path);
+    if (url.isLocalFile()) {
+        localPath = url.toLocalFile();
+    }
+
+    const QString normalized = QDir::cleanPath(QDir::fromNativeSeparators(localPath));
+    QString result;
+    const QDir appDataDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+    const QString appImageRoot = QDir::cleanPath(appDataDir.filePath(QStringLiteral("images")));
+    const QString appImageRootWithSep = appImageRoot + QStringLiteral("/");
+
+    if (normalized.startsWith(QStringLiteral("images/"))) {
+        result = QDir::cleanPath(appDataDir.filePath(normalized));
+    } else if (normalized.startsWith(appImageRootWithSep)) {
+        result = normalized;
+    } else {
+        const QString webImageRoot = QDir::fromNativeSeparators(QStringLiteral(WEB_PATH) + QStringLiteral("/images/"));
+        if (normalized.startsWith(webImageRoot)) {
+            result = QDir::cleanPath(QDir(appImageRoot).filePath(normalized.mid(webImageRoot.size())));
+        }
+    }
+
+    if (!result.startsWith(appImageRootWithSep)) {
+        return QString();
+    }
+    return result;
+}
+
+} // namespace
 
 TiptapChannelBridge::TiptapChannelBridge(QObject *parent)
     : QObject(parent)
     , m_editorReady(false)
     , m_pendingFontListValid(false)
+    , m_imageSeq(0)
 {
 }
 
@@ -37,9 +87,12 @@ QString TiptapChannelBridge::tiptapHtmlPath() const
 
 QString TiptapChannelBridge::resourceBaseUrl() const
 {
-    // 适配层：返回宿主资源根路径，前端用此 + "images/xxx" 拼接绝对路径
-    // 只读复用 jscontent.cpp 的 WEB_PATH 路径约定，不改其源码
-    return QStringLiteral("file://" WEB_PATH);
+    // 用户数据（图片/语音）存储在 AppDataLocation，前端用此根 + "images/xxx" 拼接绝对路径
+    const QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (appDataPath.isEmpty()) {
+        return QString();
+    }
+    return QUrl::fromLocalFile(appDataPath).toString();
 }
 
 // ---------------------------------------------------------------------------
@@ -165,3 +218,91 @@ void TiptapChannelBridge::jsInsertVoiceBlockFailed(const QString &reason)
     qWarning() << "Tiptap insert voice block failed:" << reason;
     emit insertVoiceBlockFailed(reason);
 }
+
+// ---------------------------------------------------------------------------
+// 图片 UI 交互（不改动既有五类数据通道事件签名）
+// ---------------------------------------------------------------------------
+
+void TiptapChannelBridge::jsRequestPickImage()
+{
+    emit pickImageRequested();
+}
+
+void TiptapChannelBridge::jsRequestViewPicture(const QString &url)
+{
+    const QString localPath = normalizePicturePath(url);
+    if (localPath.isEmpty()) {
+        qWarning() << "jsRequestViewPicture: refused unsafe image path:" << url;
+        return;
+    }
+    emit viewPictureRequested(localPath);
+}
+
+void TiptapChannelBridge::jsPasteImage(const QString &dataUrl)
+{
+    // data URL 形如 data:image/png;base64,XXXX
+    const int comma = dataUrl.indexOf(QLatin1Char(','));
+    if (comma < 0) {
+        qWarning() << "jsPasteImage: invalid data url";
+        emit insertImageFailed("invalid pasted image data");
+        return;
+    }
+
+    const QString meta = dataUrl.left(comma);
+    const QByteArray base64 = dataUrl.mid(comma + 1).toUtf8();
+
+    // 解析 mime 类型
+    const int colon = meta.indexOf(QLatin1Char(':'));
+    const int semi = meta.indexOf(QLatin1Char(';'));
+    QString mime;
+    if (colon >= 0 && semi > colon) {
+        mime = meta.mid(colon + 1, semi - colon - 1);
+    } else if (colon >= 0) {
+        mime = meta.mid(colon + 1);
+    }
+
+    QString suffix;
+    if (mime == QStringLiteral("image/png")) {
+        suffix = QStringLiteral("png");
+    } else if (mime == QStringLiteral("image/jpeg")) {
+        suffix = QStringLiteral("jpg");
+    } else if (mime == QStringLiteral("image/bmp")) {
+        suffix = QStringLiteral("bmp");
+    } else {
+        qWarning() << "jsPasteImage: unsupported image format" << mime;
+        emit insertImageFailed("unsupported pasted image format");
+        return;
+    }
+
+    const QByteArray bytes = QByteArray::fromBase64(base64);
+    QImage image;
+    if (!image.loadFromData(bytes)) {
+        qWarning() << "jsPasteImage: failed to decode image";
+        emit insertImageFailed("failed to decode pasted image");
+        return;
+    }
+
+    const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+                            + QStringLiteral("/images");
+    QDir().mkdir(dirPath);
+    const QString date = QDateTime::currentDateTime().toString(QStringLiteral("yyyyMMddhhmmss"));
+    const QString fileName = QString("%1_%2.%3").arg(date).arg(++m_imageSeq).arg(suffix);
+    const QString imgPath = dirPath + QLatin1Char('/') + fileName;
+
+    static const QHash<QString, QByteArray> formatBySuffix = {
+        {QStringLiteral("png"), QByteArrayLiteral("PNG")},
+        {QStringLiteral("jpg"), QByteArrayLiteral("JPEG")},
+        {QStringLiteral("bmp"), QByteArrayLiteral("BMP")},
+    };
+    const QByteArray format = formatBySuffix.value(suffix);
+    if (!image.save(imgPath, format.constData())) {
+        qWarning() << "jsPasteImage: failed to save image to" << imgPath;
+        emit insertImageFailed("failed to save pasted image");
+        return;
+    }
+
+    QJsonObject info;
+    info.insert(QStringLiteral("relPath"), QString(QStringLiteral("images/") + fileName));
+    emit insertImage(QJsonDocument(info).toJson(QJsonDocument::Compact));
+}
+

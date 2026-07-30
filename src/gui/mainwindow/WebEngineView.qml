@@ -503,6 +503,32 @@ Item {
                     }
                 }
 
+                DropArea {
+                    anchors.fill: parent
+
+                    property bool currentDragCanDropImages: false
+
+                    onEntered: function(drag) {
+                        currentDragCanDropImages = drag.hasUrls && VNoteMainManager.canInsertImages(drag.urls);
+                        drag.accepted = currentDragCanDropImages;
+                    }
+                    onExited: {
+                        currentDragCanDropImages = false;
+                    }
+                    onPositionChanged: function(drag) {
+                        drag.accepted = currentDragCanDropImages;
+                    }
+                    onDropped: function(drop) {
+                        if (currentDragCanDropImages) {
+                            drop.accepted = true;
+                            VNoteMainManager.insertImages(drop.urls);
+                        } else {
+                            drop.accepted = false;
+                        }
+                        currentDragCanDropImages = false;
+                    }
+                }
+
                 WebChannel {
                     id: tiptapWebChannel
                 }
@@ -746,6 +772,25 @@ Item {
         }
         onStartRecording: {
             VoiceRecoderHandler.startRecoder();
+        }
+    }
+
+    Connections {
+        target: TiptapChannel
+
+        onPickImageRequested: {
+            if (!selectImgLoader.active) {
+                selectImgLoader.active = true;
+            } else {
+                selectImgLoader.item.open();
+            }
+        }
+        onViewPictureRequested: path => {
+            viewPictureLoader.path = path;
+            if (!viewPictureLoader.active)
+                viewPictureLoader.active = true;
+            else
+                viewPictureLoader.item.show();
         }
     }
 
