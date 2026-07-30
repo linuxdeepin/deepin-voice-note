@@ -1495,7 +1495,16 @@ void VNoteMainManager::insertImages(const QList<QUrl> &filePaths)
     }
     if (!paths.isEmpty()) {
         qDebug() << "Inserting" << paths.size() << "images into note";
-        JsContent::instance()->callJsInsertImages(paths);
+        if (TiptapChannelBridge::instance()->debugEnabled()) {
+            for (const QString &relPath : paths) {
+                QJsonObject imageInfo;
+                imageInfo.insert(QStringLiteral("relPath"), relPath);
+                TiptapChannelBridge::instance()->sendInsertImage(
+                    QJsonDocument(imageInfo).toJson(QJsonDocument::Compact));
+            }
+        } else {
+            JsContent::instance()->callJsInsertImages(paths);
+        }
     } else {
         qWarning() << "No valid images to insert";
     }

@@ -12,6 +12,8 @@ import {
   createEmptyDoc,
   createEnvelope,
   serializeEnvelope,
+  validateEnvelope,
+  isSafeImageSrc,
 } from '../src/schema/document-envelope.js'
 import {
   bindTiptapChannel,
@@ -65,7 +67,7 @@ function createEditor() {
 // Mock bridge：模拟 C++ TiptapChannelBridge 的 QWebChannel 对象
 // ---------------------------------------------------------------------------
 
-function createMockBridge(resourceBaseUrl = 'file:///usr/share/deepin-voice-note/web') {
+function createMockBridge(resourceBaseUrl = 'file:///home/user/.local/share/deepin-voice-note') {
   const handlers = {}
   const calls = {}
 
@@ -512,5 +514,518 @@ test('bindTiptapChannel: insertVoiceBlock reports failure when editor rejects in
   assert.ok(calls.insertVoiceBlockFailed, 'should report failure when .run() returns false')
   assert.equal(calls.insertVoiceBlockFailed.length, 1)
   assert.ok(calls.insertVoiceBlockFailed[0].includes('rejected'))
+  editor.destroy()
+})
+
+// ---------------------------------------------------------------------------
+// 测试：保存归一 / 加载解析框架（image 绝对↔相对）
+// ---------------------------------------------------------------------------
+
+const ABSOLUTE_IMAGE_SRC = 'file:///usr/share/deepin-voice-note/web/images/photo.png'
+const RELATIVE_IMAGE_PATH = 'images/photo.png'
+
+function insertImageNode(editor, src, relPath) {
+  editor.commands.insertContent({
+    type: 'image',
+    attrs: { src, relPath, alt: '', title: null },
+  })
+}
+
+test('save normalize: absolute image src replaced by relative relPath on save', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+
+  // 插入一张绝对 src + 相对 relPath 的图片（编辑区显示态）
+  insertImageNode(editor, ABSOLUTE_IMAGE_SRC, RELATIVE_IMAGE_PATH)
+
+  emit('requestContent')
+
+  assert.ok(calls.contentSaved, 'save should produce a contentSaved envelope')
+  const envelope = JSON.parse(calls.contentSaved[0])
+  const imageNode = envelope.content.content.find((n) => n.type === 'image')
+  assert.ok(imageNode, 'image node should be in saved envelope')
+  assert.equal(imageNode.attrs.src, RELATIVE_IMAGE_PATH, 'saved src must be relative relPath')
+  assert.ok(!imageNode.attrs.src.includes('file://'), 'saved src must not contain file://')
+  assert.equal(imageNode.attrs.relPath, RELATIVE_IMAGE_PATH, 'relPath preserved')
+  editor.destroy()
+})
+
+test('load resolve: relative image src expanded to absolute file:// for display', async () => {
+  const { editor } = createEditor()
+  const { bridge, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+
+  // 下发一个只含相对路径 src 的 envelope（持久态）
+  const persisted = {
+    type: 'doc',
+    content: [{
+      type: 'image',
+      attrs: { src: RELATIVE_IMAGE_PATH, relPath: RELATIVE_IMAGE_PATH, alt: '', title: null },
+    }],
+  }
+  emit('loadEnvelopeRequested', JSON.stringify(createEnvelope(persisted)))
+
+  const json = editor.getJSON()
+  const imageNode = json.content.find((n) => n.type === 'image')
+  assert.ok(imageNode, 'image node should be loaded into editor')
+  assert.ok(imageNode.attrs.src.startsWith('file:///'), 'display src must be absolute file://')
+  assert.ok(imageNode.attrs.src.includes(RELATIVE_IMAGE_PATH), 'display src must contain the relative path')
+  assert.equal(imageNode.attrs.relPath, RELATIVE_IMAGE_PATH, 'relPath unchanged by load resolve')
+  editor.destroy()
+})
+
+test('save normalize: normalized image envelope passes validateEnvelope', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+  insertImageNode(editor, ABSOLUTE_IMAGE_SRC, RELATIVE_IMAGE_PATH)
+
+  emit('requestContent')
+
+  assert.ok(calls.contentSaved, 'envelope should be saved (validation passed)')
+  const result = validateEnvelope(JSON.parse(calls.contentSaved[0]))
+  assert.equal(result.ok, true, JSON.stringify(result.errors))
+  editor.destroy()
+})
+
+test('save normalize: image with absolute file:// src and no relPath is sanitized (keeps rest)', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+
+  // 模拟丢失 relPath 的旧数据：仅绝对 file:// src，无 relPath
+  insertImageNode(editor, ABSOLUTE_IMAGE_SRC, null)
+
+  emit('requestContent')
+
+  // 校验失败的图片节点被净化后仍回告宿主，非图片内容不静默丢失
+  assert.ok(calls.contentSaved, 'unsafe image node should be sanitized, save should still report back')
+  const envelope = JSON.parse(calls.contentSaved[0])
+  const imageNode = envelope.content.content.find((n) => n.type === 'image')
+  assert.equal(imageNode, undefined, 'unsafe image node should be removed from saved envelope')
+  editor.destroy()
+})
+
+test('save → load → save roundtrip keeps image path relative', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+  insertImageNode(editor, ABSOLUTE_IMAGE_SRC, RELATIVE_IMAGE_PATH)
+
+  // 第一次保存：绝对 src 归一为相对
+  emit('requestContent')
+  const firstEnvelope = JSON.parse(calls.contentSaved[0])
+  const firstImage = firstEnvelope.content.content.find((n) => n.type === 'image')
+  assert.equal(firstImage.attrs.src, RELATIVE_IMAGE_PATH)
+
+  // 加载第一次保存的 envelope（相对 src 解析为绝对显示）
+  emit('loadEnvelopeRequested', JSON.stringify(firstEnvelope))
+  const loadedImage = editor.getJSON().content.find((n) => n.type === 'image')
+  assert.ok(loadedImage.attrs.src.startsWith('file:///'))
+
+  // 再次保存：绝对 src 再次归一为相对
+  calls.contentSaved.length = 0
+  emit('requestContent')
+  const secondEnvelope = JSON.parse(calls.contentSaved[0])
+  const secondImage = secondEnvelope.content.content.find((n) => n.type === 'image')
+  assert.equal(secondImage.attrs.src, RELATIVE_IMAGE_PATH, 'second save must also be relative')
+  assert.deepEqual(firstEnvelope, secondEnvelope, 'save output must be stable across roundtrips')
+  editor.destroy()
+})
+
+// ---------------------------------------------------------------------------
+// CR rework tests: AppData path, empty relPath, relPath validation, sanitize
+// ---------------------------------------------------------------------------
+
+test('load resolve: resolved image src must fall in AppData images dir, not WEB_PATH', async () => {
+  const { editor } = createEditor()
+  const { bridge, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+
+  const persisted = {
+    type: 'doc',
+    content: [{
+      type: 'image',
+      attrs: { src: RELATIVE_IMAGE_PATH, relPath: RELATIVE_IMAGE_PATH, alt: '', title: null },
+    }],
+  }
+  emit('loadEnvelopeRequested', JSON.stringify(createEnvelope(persisted)))
+
+  const imageNode = editor.getJSON().content.find((n) => n.type === 'image')
+  // 解析后的绝对 src 必须落在 AppData images 目录，不得指向 WEB_PATH（web 资源安装目录）
+  assert.ok(imageNode.attrs.src.startsWith('file:///'), 'resolved src must be absolute file://')
+  assert.ok(imageNode.attrs.src.includes('/images/'), 'resolved src must contain images/ dir')
+  assert.ok(!imageNode.attrs.src.includes('/web/images/'), 'resolved src must NOT be under WEB_PATH (web install dir)')
+  assert.ok(imageNode.attrs.src.includes('deepin-voice-note/images/'), 'resolved src must be under AppData root')
+  editor.destroy()
+})
+
+test('save normalize: empty-string relPath falls back to src (#3)', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+
+  // relPath 为空串时应回退到 src，不应置空导致校验失败
+  editor.commands.insertContent({
+    type: 'image',
+    attrs: { src: RELATIVE_IMAGE_PATH, relPath: '', alt: '', title: null },
+  })
+
+  emit('requestContent')
+
+  assert.ok(calls.contentSaved, 'save should succeed when relPath is empty (falls back to src)')
+  const envelope = JSON.parse(calls.contentSaved[0])
+  const imageNode = envelope.content.content.find((n) => n.type === 'image')
+  assert.ok(imageNode, 'image should survive when relPath is empty string')
+  assert.equal(imageNode.attrs.src, RELATIVE_IMAGE_PATH, 'src should fall back from empty relPath to src')
+  editor.destroy()
+})
+
+test('validateEnvelope: rejects remote relPath (#4)', () => {
+  const envelope = createEnvelope({
+    type: 'doc',
+    content: [{
+      type: 'image',
+      attrs: { src: 'images/a.png', relPath: 'https://evil.com/a.png', alt: '', title: null },
+    }],
+  })
+  const result = validateEnvelope(envelope)
+  assert.equal(result.ok, false)
+  assert.ok(result.errors.some((e) => e.code === 'unsafe-image-relpath'))
+})
+
+test('validateEnvelope: rejects absolute file:// relPath (#4)', () => {
+  const envelope = createEnvelope({
+    type: 'doc',
+    content: [{
+      type: 'image',
+      attrs: { src: 'images/a.png', relPath: 'file:///etc/passwd', alt: '', title: null },
+    }],
+  })
+  const result = validateEnvelope(envelope)
+  assert.equal(result.ok, false)
+  assert.ok(result.errors.some((e) => e.code === 'unsafe-image-relpath'))
+})
+
+test('validateEnvelope: accepts null relPath (#4 backward compat)', () => {
+  const envelope = createEnvelope({
+    type: 'doc',
+    content: [{
+      type: 'image',
+      attrs: { src: 'images/a.png', relPath: null, alt: '', title: null },
+    }],
+  })
+  const result = validateEnvelope(envelope)
+  assert.equal(result.ok, true, JSON.stringify(result.errors))
+})
+
+test('validateEnvelope: accepts valid images/ relPath (#4)', () => {
+  const envelope = createEnvelope({
+    type: 'doc',
+    content: [{
+      type: 'image',
+      attrs: { src: 'images/photo.png', relPath: 'images/photo.png', alt: '', title: null },
+    }],
+  })
+  const result = validateEnvelope(envelope)
+  assert.equal(result.ok, true, JSON.stringify(result.errors))
+})
+
+test('save sanitize: preserves non-image content when image is unsafe (#2)', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+
+  // 先插入文本，再插入一张无 relPath 的 file:// 图片
+  editor.commands.insertContent({ type: 'text', text: 'important text' })
+  insertImageNode(editor, ABSOLUTE_IMAGE_SRC, null)
+
+  emit('requestContent')
+
+  // 非法图片被净化，但文本内容保留，仍回告宿主
+  assert.ok(calls.contentSaved, 'save should still report back after sanitizing')
+  const envelope = JSON.parse(calls.contentSaved[0])
+  const hasText = JSON.stringify(envelope.content).includes('important text')
+  assert.ok(hasText, 'non-image content must be preserved after sanitize')
+  const imageNode = envelope.content.content.find((n) => n.type === 'image')
+  assert.equal(imageNode, undefined, 'unsafe image should be removed')
+  editor.destroy()
+})
+
+test('isSafeImageSrc is exported and usable externally', () => {
+  assert.equal(isSafeImageSrc('images/a.png'), true)
+  assert.equal(isSafeImageSrc('file:///x/a.png'), false)
+  assert.equal(isSafeImageSrc('https://x.com/a.png'), true)
+})
+
+// ---------------------------------------------------------------------------
+// CR rework round 2: recursive sanitize, remote relPath sanitize, traversal
+// ---------------------------------------------------------------------------
+
+test('sanitize removes unsafe image nested in list item (#1 recursion)', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+
+  // 嵌套结构：listItem 内含一张无 relPath 的 file:// 图片 + 文本
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'bulletList',
+      content: [{
+        type: 'listItem',
+        content: [{
+          type: 'paragraph',
+          content: [
+            { type: 'text', text: 'keep me' },
+            { type: 'image', attrs: { src: ABSOLUTE_IMAGE_SRC, relPath: null, alt: '', title: null } },
+          ],
+        }],
+      }],
+    }],
+  })
+
+  emit('requestContent')
+
+  // 嵌套非法图片被净化后仍回告，非图片内容保留
+  assert.ok(calls.contentSaved, 'save should report back after recursive sanitize')
+  const envelope = JSON.parse(calls.contentSaved[0])
+  const serialized = JSON.stringify(envelope.content)
+  assert.ok(serialized.includes('keep me'), 'nested non-image content must survive sanitize')
+  assert.ok(!serialized.includes('photo.png'), 'nested unsafe image must be removed')
+  editor.destroy()
+})
+
+test('sanitize removes image with remote relPath (#2)', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+
+  // 归一后 src = relPath = 远程 URL，isSafeImageSrc(http) 返回 true 但 relPath 校验失败
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'paragraph',
+      content: [
+        { type: 'text', text: 'text survives' },
+        { type: 'image', attrs: { src: 'https://evil.com/x.png', relPath: 'https://evil.com/x.png', alt: '', title: null } },
+      ],
+    }],
+  })
+
+  emit('requestContent')
+
+  assert.ok(calls.contentSaved, 'save should report back after sanitizing remote relPath')
+  const envelope = JSON.parse(calls.contentSaved[0])
+  const serialized = JSON.stringify(envelope.content)
+  assert.ok(serialized.includes('text survives'), 'non-image content must survive')
+  assert.ok(!serialized.includes('evil.com'), 'image with remote relPath must be sanitized out')
+  editor.destroy()
+})
+
+test('validateEnvelope rejects relPath with .. traversal (#3)', () => {
+  const envelope = createEnvelope({
+    type: 'doc',
+    content: [{
+      type: 'image',
+      attrs: { src: 'images/a.png', relPath: 'images/../../etc/passwd', alt: '', title: null },
+    }],
+  })
+  const result = validateEnvelope(envelope)
+  assert.equal(result.ok, false)
+  assert.ok(result.errors.some((e) => e.code === 'unsafe-image-relpath'))
+})
+
+test('validateEnvelope rejects relPath images/.. (#3)', () => {
+  const envelope = createEnvelope({
+    type: 'doc',
+    content: [{
+      type: 'image',
+      attrs: { src: 'images/a.png', relPath: 'images/..', alt: '', title: null },
+    }],
+  })
+  const result = validateEnvelope(envelope)
+  assert.equal(result.ok, false)
+  assert.ok(result.errors.some((e) => e.code === 'unsafe-image-relpath'))
+})
+
+test('validateEnvelope accepts relPath images/foo/bar.png (no traversal, #3)', () => {
+  const envelope = createEnvelope({
+    type: 'doc',
+    content: [{
+      type: 'image',
+      attrs: { src: 'images/sub/a.png', relPath: 'images/sub/a.png', alt: '', title: null },
+    }],
+  })
+  const result = validateEnvelope(envelope)
+  assert.equal(result.ok, true, JSON.stringify(result.errors))
+})
+
+test('validateEnvelope accepts relPath images/... (literal dots, not traversal)', () => {
+  // 'images/...png' 含 '...' 不是 '..' 段，不构成穿越
+  const envelope = createEnvelope({
+    type: 'doc',
+    content: [{
+      type: 'image',
+      attrs: { src: 'images/...png', relPath: 'images/...png', alt: '', title: null },
+    }],
+  })
+  const result = validateEnvelope(envelope)
+  assert.equal(result.ok, true, JSON.stringify(result.errors))
+})
+
+test('sanitize preserves non-image content alongside unsafe image (#2)', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text: 'para one' }] },
+      { type: 'image', attrs: { src: ABSOLUTE_IMAGE_SRC, relPath: null, alt: '', title: null } },
+      { type: 'paragraph', content: [{ type: 'text', text: 'para two' }] },
+    ],
+  })
+
+  emit('requestContent')
+
+  assert.ok(calls.contentSaved, 'save should report back')
+  const serialized = JSON.stringify(JSON.parse(calls.contentSaved[0]).content)
+  assert.ok(serialized.includes('para one') && serialized.includes('para two'), 'surrounding paragraphs survive')
+  assert.ok(!serialized.includes('photo.png'), 'unsafe image removed')
+  editor.destroy()
+})
+
+// ---------------------------------------------------------------------------
+// CR rework round 3: empty container after sanitize (空容器边界)
+// ---------------------------------------------------------------------------
+
+test('sanitize drops empty blockquote left by sole unsafe image, save reports back', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+
+  // blockquote 内仅含一张非法图片（file:// 无 relPath），净化后 blockquote 变空
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'blockquote',
+      content: [{ type: 'image', attrs: { src: ABSOLUTE_IMAGE_SRC, relPath: null, alt: '', title: null } }],
+    }],
+  })
+
+  emit('requestContent')
+
+  assert.ok(calls.contentSaved, 'save must report back even when a container becomes empty')
+  const serialized = JSON.stringify(JSON.parse(calls.contentSaved[0]).content)
+  assert.ok(!serialized.includes('photo.png'), 'unsafe image must be removed')
+  assert.ok(!serialized.includes('blockquote'), 'empty blockquote must be removed')
+  editor.destroy()
+})
+
+test('sanitize cascades: bulletList>listItem with only unsafe image removed', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'bulletList',
+      content: [{
+        type: 'listItem',
+        content: [{ type: 'image', attrs: { src: ABSOLUTE_IMAGE_SRC, relPath: null, alt: '', title: null } }],
+      }],
+    }],
+  })
+
+  emit('requestContent')
+
+  assert.ok(calls.contentSaved, 'save must report back after cascading container removal')
+  const serialized = JSON.stringify(JSON.parse(calls.contentSaved[0]).content)
+  assert.ok(!serialized.includes('photo.png'), 'unsafe image removed')
+  assert.ok(!serialized.includes('bulletList') && !serialized.includes('listItem'),
+    'empty list containers must be removed via cascade')
+  editor.destroy()
+})
+
+test('sanitize keeps blockquote text when image alongside is unsafe', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'blockquote',
+      content: [{
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: 'survives' },
+          { type: 'image', attrs: { src: ABSOLUTE_IMAGE_SRC, relPath: null, alt: '', title: null } },
+        ],
+      }],
+    }],
+  })
+
+  emit('requestContent')
+
+  assert.ok(calls.contentSaved, 'save must report back')
+  const serialized = JSON.stringify(JSON.parse(calls.contentSaved[0]).content)
+  assert.ok(serialized.includes('survives'), 'text in same container must survive')
+  assert.ok(!serialized.includes('photo.png'), 'unsafe image removed')
+  assert.ok(serialized.includes('blockquote'), 'blockquote with remaining text kept')
+  editor.destroy()
+})
+
+test('sanitize fills empty doc root with single empty paragraph', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  await bindTiptapChannel(editor, factory)
+
+  // 仅含一张非法图片，净化后 doc 根变空 → 补单空段落
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{ type: 'image', attrs: { src: ABSOLUTE_IMAGE_SRC, relPath: null, alt: '', title: null } }],
+  })
+
+  emit('requestContent')
+
+  assert.ok(calls.contentSaved, 'save must report back when doc root becomes empty')
+  const content = JSON.parse(calls.contentSaved[0]).content
+  assert.deepEqual(content, { type: 'doc', content: [{ type: 'paragraph' }] },
+    'empty doc root must be filled with a single empty paragraph')
   editor.destroy()
 })

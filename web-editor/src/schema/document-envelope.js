@@ -115,6 +115,11 @@ function walkNode(node, path, errors, depth = 0) {
     } else if (!isSafeImageSrc(src)) {
       errors.push(error(`${path}.attrs.src`, 'unsafe-image-src', 'image src uses an unsafe URL scheme'))
     }
+    // relPath 必须是 images/ 开头的相对路径且不含路径穿越，防止加载时越界
+    const relPath = node.attrs?.relPath
+    if (!isSafeImageRelPath(relPath)) {
+      errors.push(error(`${path}.attrs.relPath`, 'unsafe-image-relpath', 'image relPath must be an images/ relative path without traversal'))
+    }
   }
 
   if (node.type === 'voiceBlock') {
@@ -155,7 +160,22 @@ function walkNode(node, path, errors, depth = 0) {
   }
 }
 
-function isSafeImageSrc(src) {
+/**
+ * 判定 image relPath 是否安全：缺失（null/''）视为安全（向后兼容），
+ * 存在时必须为 images/ 开头的相对路径且不含 .. 路径穿越段。
+ * @param {string|null|undefined} relPath
+ * @returns {boolean}
+ */
+export function isSafeImageRelPath(relPath) {
+  if (relPath == null || relPath === '') return true
+  if (typeof relPath !== 'string') return false
+  if (!relPath.startsWith('images/')) return false
+  // 拒绝含 .. 段的路径穿越，与 C++ normalizePicturePath 的 cleanPath containment 对齐
+  if (relPath.split('/').includes('..')) return false
+  return true
+}
+
+export function isSafeImageSrc(src) {
   const trimmed = src.trim()
   if (trimmed.length === 0) {
     return false

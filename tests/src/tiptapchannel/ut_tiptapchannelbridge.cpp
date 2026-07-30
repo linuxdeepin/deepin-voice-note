@@ -85,6 +85,39 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_signal_insertVoiceBlock_00
 }
 
 // ---------------------------------------------------------------------------
+// 图片 UI 交互：工具栏图片选择请求
+// ---------------------------------------------------------------------------
+
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsRequestPickImage_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::pickImageRequested);
+    bridge.jsRequestPickImage();
+    EXPECT_EQ(spy.count(), 1);
+}
+
+// 双击查看原图：相对路径归一化后下发本地路径
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsRequestViewPicture_safe_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::viewPictureRequested);
+    bridge.jsRequestViewPicture(QStringLiteral("images/photo.png"));
+    ASSERT_EQ(spy.count(), 1);
+    EXPECT_TRUE(spy.takeFirst().at(0).toString().endsWith(QStringLiteral("images/photo.png")));
+}
+
+// 双击查看原图：远程 / 越界路径拒绝下发
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsRequestViewPicture_unsafe_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::viewPictureRequested);
+    bridge.jsRequestViewPicture(QStringLiteral("https://example.com/x.png"));
+    EXPECT_EQ(spy.count(), 0);
+    bridge.jsRequestViewPicture(QStringLiteral("/etc/passwd"));
+    EXPECT_EQ(spy.count(), 0);
+}
+
+// ---------------------------------------------------------------------------
 // 保存 envelope 合法性
 // ---------------------------------------------------------------------------
 

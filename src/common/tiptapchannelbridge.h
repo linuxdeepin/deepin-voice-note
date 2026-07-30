@@ -75,6 +75,15 @@ public:
     // 宿主侧下发插入语音块
     Q_INVOKABLE void sendInsertVoiceBlock(const QString &voiceInfoJson);
 
+    // 前端请求宿主打开图片选择对话框（工具栏图片按钮）
+    Q_INVOKABLE void jsRequestPickImage();
+
+    // 前端请求查看原图（双击图片），宿主归一化路径后下发预览
+    Q_INVOKABLE void jsRequestViewPicture(const QString &url);
+
+    // 前端粘贴剪贴板图片数据（data URL），宿主保存到 images/ 后回插
+    Q_INVOKABLE void jsPasteImage(const QString &dataUrl);
+
     // 宿主侧下发字体列表（未就绪时缓存，就绪后补发）
     Q_INVOKABLE void sendFontList(const QStringList &fonts, const QString &defaultFont);
 
@@ -119,6 +128,12 @@ signals:
     // C++→JS：字体列表下发（供工具栏字体下拉填充）
     void fontListProvided(const QStringList &fonts, const QString &defaultFont);
 
+    // C++→QML：前端请求打开图片选择对话框
+    void pickImageRequested();
+
+    // C++→QML：前端请求查看原图，携带归一化后的本地路径
+    void viewPictureRequested(const QString &localPath);
+
 public slots:
     // JS→C++ 回告入口（Q_INVOKABLE 供前端直接调用）
     // 前端编辑器初始化完成
@@ -138,6 +153,7 @@ private:
     QStringList m_pendingFontList;
     QString m_pendingDefaultFont;
     bool m_pendingFontListValid;
+    int m_imageSeq;
 };
 
 #endif // TIPTAPCHANNELBRIDGE_H
