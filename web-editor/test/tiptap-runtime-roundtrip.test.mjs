@@ -31,7 +31,9 @@ const validFixtures = [
   'formatted-text.json',
   'heading.json',
   'nested-list.json',
+  'ordered-list-start.json',
   'task-list.json',
+  'task-list-checked.json',
   'image.json',
   'voice-block.json',
 ]
