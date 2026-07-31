@@ -306,3 +306,97 @@ void TiptapChannelBridge::jsPasteImage(const QString &dataUrl)
     emit insertImage(QJsonDocument(info).toJson(QJsonDocument::Compact));
 }
 
+
+// ---------------------------------------------------------------------------
+// Voice 播放/转写入口（JS→C++）
+// ---------------------------------------------------------------------------
+
+void TiptapChannelBridge::jsRequestVoicePlayback(const QString &voiceInfoJson)
+{
+    QJsonDocument doc = QJsonDocument::fromJson(voiceInfoJson.toUtf8());
+    QJsonObject obj = doc.object();
+    QString voiceId = obj.value(QStringLiteral("voiceId")).toString();
+    bool isSame = (voiceId == m_currentVoiceId);
+    // 切换到不同语音块前，先向旧 voiceId 派发结束状态，让旧 NodeView 复位为非播放态。
+    // 2 = End（与 VoicePlayerHandler::PlayState::End 对齐，前端 NodeView 据此重置）。
+    if (!isSame && !m_currentVoiceId.isEmpty()) {
+        emit voicePlaybackStateChanged(m_currentVoiceId, 2);
+    }
+    m_currentVoiceId = voiceId;
+    emit voicePlaybackRequested(voiceInfoJson, isSame);
+}
+
+void TiptapChannelBridge::jsRequestVoicePlaybackStop()
+{
+    emit voicePlaybackStopRequested();
+}
+
+void TiptapChannelBridge::jsRequestVoiceSeek(const QString &ms)
+{
+    bool ok = false;
+    qint64 pos = ms.toLongLong(&ok);
+    if (ok) {
+        emit voicePlaybackSeekRequested(pos);
+    }
+}
+
+void TiptapChannelBridge::jsRequestVoiceToText(const QString &voiceInfoJson)
+{
+    emit voiceToTextRequested(voiceInfoJson);
+}
+
+// ---------------------------------------------------------------------------
+// Voice 播放/转写/主题信号下发（C++→JS）
+// ---------------------------------------------------------------------------
+
+void TiptapChannelBridge::emitVoicePlaybackStateChanged(const QString &voiceId, int state)
+{
+    emit voicePlaybackStateChanged(voiceId, state);
+}
+
+void TiptapChannelBridge::emitVoicePlaybackPositionChanged(const QString &voiceId, qint64 ms)
+{
+    emit voicePlaybackPositionChanged(voiceId, ms);
+}
+
+void TiptapChannelBridge::emitVoicePlaybackDurationChanged(const QString &voiceId, qint64 ms)
+{
+    emit voicePlaybackDurationChanged(voiceId, ms);
+}
+
+void TiptapChannelBridge::emitVoiceFileError(const QString &voiceId)
+{
+    emit voiceFileError(voiceId);
+}
+
+void TiptapChannelBridge::emitVoiceToTextStarted(const QString &voiceId)
+{
+    emit voiceToTextStarted(voiceId);
+}
+
+void TiptapChannelBridge::emitVoiceToTextFailed(const QString &voiceId)
+{
+    emit voiceToTextFailed(voiceId);
+}
+
+void TiptapChannelBridge::emitVoiceToTextCompleted(const QString &voiceId, const QString &text)
+{
+    emit voiceToTextCompleted(voiceId, text);
+}
+
+void TiptapChannelBridge::emitThemeProvided(const QString &theme, const QString &highlightColor,
+                                             const QString &disableHighlightColor,
+                                             const QString &backgroundColor)
+{
+    emit themeProvided(theme, highlightColor, disableHighlightColor, backgroundColor);
+}
+
+QString TiptapChannelBridge::currentVoiceId() const
+{
+    return m_currentVoiceId;
+}
+
+void TiptapChannelBridge::setCurrentVoiceId(const QString &voiceId)
+{
+    m_currentVoiceId = voiceId;
+}

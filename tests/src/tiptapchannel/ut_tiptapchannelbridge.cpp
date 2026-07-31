@@ -316,3 +316,202 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_instance_returnsSame_001)
     EXPECT_NE(a, nullptr);
     EXPECT_EQ(a, b);
 }
+
+// ---------------------------------------------------------------------------
+// Voice 播放/转写入口（JS→C++）存在性与载荷
+// ---------------------------------------------------------------------------
+
+// jsRequestVoicePlayback 解析 voiceId，置 m_currentVoiceId，并 emit voicePlaybackRequested
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsRequestVoicePlayback_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::voicePlaybackRequested);
+    QString info = "{\"voiceId\":\"voice-1\",\"voicePath\":\"voicenote/a.mp3\"}";
+    bridge.jsRequestVoicePlayback(info);
+    ASSERT_EQ(spy.count(), 1);
+    auto args = spy.takeFirst();
+    EXPECT_EQ(args.at(0).toString(), info);
+    EXPECT_FALSE(args.at(1).toBool());  // 首次播放 isSame=false
+    EXPECT_EQ(bridge.currentVoiceId(), QStringLiteral("voice-1"));
+}
+
+// 同一 voiceId 再次请求播放 → isSame=true
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsRequestVoicePlayback_isSame_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::voicePlaybackRequested);
+    QString info = "{\"voiceId\":\"voice-1\",\"voicePath\":\"voicenote/a.mp3\"}";
+    bridge.jsRequestVoicePlayback(info);  // 首次
+    bridge.jsRequestVoicePlayback(info);  // 同一 voiceId
+    ASSERT_EQ(spy.count(), 2);
+    auto secondArgs = spy.at(1);
+    EXPECT_TRUE(secondArgs.at(1).toBool());  // isSame=true
+}
+
+// 切换到不同语音块时，先向旧 voiceId 派发 End 复位，再派发新块请求
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsRequestVoicePlayback_switchResetsOld_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy reqSpy(&bridge, &TiptapChannelBridge::voicePlaybackRequested);
+    QSignalSpy stateSpy(&bridge, &TiptapChannelBridge::voicePlaybackStateChanged);
+
+    QString infoA = "{\"voiceId\":\"voice-a\",\"voicePath\":\"voicenote/a.mp3\"}";
+    QString infoB = "{\"voiceId\":\"voice-b\",\"voicePath\":\"voicenote/b.mp3\"}";
+
+    bridge.jsRequestVoicePlayback(infoA);  // 先播 A
+    ASSERT_EQ(reqSpy.count(), 1);
+    EXPECT_EQ(bridge.currentVoiceId(), QStringLiteral("voice-a"));
+    EXPECT_EQ(stateSpy.count(), 0);  // 首次播放无旧块需复位
+
+    bridge.jsRequestVoicePlayback(infoB);  // 再点 B
+    // 先向旧 voiceId 派发 End 复位旧 NodeView
+    ASSERT_EQ(stateSpy.count(), 1);
+    auto stateArgs = stateSpy.takeFirst();
+    EXPECT_EQ(stateArgs.at(0).toString(), QStringLiteral("voice-a"));
+    EXPECT_EQ(stateArgs.at(1).toInt(), 2);  // 2 = End
+    // 再派发新块播放请求
+    ASSERT_EQ(reqSpy.count(), 2);
+    EXPECT_FALSE(reqSpy.at(1).at(1).toBool());  // 切换不同块 isSame=false
+    EXPECT_EQ(bridge.currentVoiceId(), QStringLiteral("voice-b"));
+}
+
+// jsRequestVoicePlaybackStop emit voicePlaybackStopRequested
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsRequestVoicePlaybackStop_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::voicePlaybackStopRequested);
+    bridge.jsRequestVoicePlaybackStop();
+    EXPECT_EQ(spy.count(), 1);
+}
+
+// jsRequestVoiceSeek emit voicePlaybackSeekRequested
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsRequestVoiceSeek_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::voicePlaybackSeekRequested);
+    bridge.jsRequestVoiceSeek(QStringLiteral("5000"));
+    ASSERT_EQ(spy.count(), 1);
+    EXPECT_EQ(spy.takeFirst().at(0).toLongLong(), 5000);
+}
+
+// jsRequestVoiceSeek 非法值不发信号
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsRequestVoiceSeek_invalid_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::voicePlaybackSeekRequested);
+    bridge.jsRequestVoiceSeek(QStringLiteral("abc"));
+    EXPECT_EQ(spy.count(), 0);
+}
+
+// jsRequestVoiceToText emit voiceToTextRequested
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsRequestVoiceToText_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::voiceToTextRequested);
+    QString info = "{\"voiceId\":\"voice-2\",\"voicePath\":\"voicenote/b.mp3\"}";
+    bridge.jsRequestVoiceToText(info);
+    ASSERT_EQ(spy.count(), 1);
+    EXPECT_EQ(spy.takeFirst().at(0).toString(), info);
+}
+
+// ---------------------------------------------------------------------------
+// Voice 播放/转写/主题信号下发（C++→JS）存在性与载荷
+// ---------------------------------------------------------------------------
+
+// emitVoicePlaybackStateChanged
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_emitVoicePlaybackStateChanged_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::voicePlaybackStateChanged);
+    bridge.emitVoicePlaybackStateChanged(QStringLiteral("v1"), 0);
+    ASSERT_EQ(spy.count(), 1);
+    auto args = spy.takeFirst();
+    EXPECT_EQ(args.at(0).toString(), QStringLiteral("v1"));
+    EXPECT_EQ(args.at(1).toInt(), 0);
+}
+
+// emitVoicePlaybackPositionChanged
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_emitVoicePlaybackPositionChanged_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::voicePlaybackPositionChanged);
+    bridge.emitVoicePlaybackPositionChanged(QStringLiteral("v1"), 3000);
+    ASSERT_EQ(spy.count(), 1);
+    auto args = spy.takeFirst();
+    EXPECT_EQ(args.at(0).toString(), QStringLiteral("v1"));
+    EXPECT_EQ(args.at(1).toLongLong(), 3000);
+}
+
+// emitVoicePlaybackDurationChanged
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_emitVoicePlaybackDurationChanged_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::voicePlaybackDurationChanged);
+    bridge.emitVoicePlaybackDurationChanged(QStringLiteral("v1"), 12000);
+    ASSERT_EQ(spy.count(), 1);
+    EXPECT_EQ(spy.takeFirst().at(1).toLongLong(), 12000);
+}
+
+// emitVoiceFileError
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_emitVoiceFileError_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::voiceFileError);
+    bridge.emitVoiceFileError(QStringLiteral("v1"));
+    ASSERT_EQ(spy.count(), 1);
+    EXPECT_EQ(spy.takeFirst().at(0).toString(), QStringLiteral("v1"));
+}
+
+// emitVoiceToTextStarted
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_emitVoiceToTextStarted_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::voiceToTextStarted);
+    bridge.emitVoiceToTextStarted(QStringLiteral("v1"));
+    ASSERT_EQ(spy.count(), 1);
+    EXPECT_EQ(spy.takeFirst().at(0).toString(), QStringLiteral("v1"));
+}
+
+// emitVoiceToTextFailed
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_emitVoiceToTextFailed_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::voiceToTextFailed);
+    bridge.emitVoiceToTextFailed(QStringLiteral("v1"));
+    ASSERT_EQ(spy.count(), 1);
+    EXPECT_EQ(spy.takeFirst().at(0).toString(), QStringLiteral("v1"));
+}
+
+// emitVoiceToTextCompleted
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_emitVoiceToTextCompleted_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::voiceToTextCompleted);
+    bridge.emitVoiceToTextCompleted(QStringLiteral("v1"), QStringLiteral("转写结果"));
+    ASSERT_EQ(spy.count(), 1);
+    auto args = spy.takeFirst();
+    EXPECT_EQ(args.at(0).toString(), QStringLiteral("v1"));
+    EXPECT_EQ(args.at(1).toString(), QStringLiteral("转写结果"));
+}
+
+// emitThemeProvided
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_emitThemeProvided_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::themeProvided);
+    bridge.emitThemeProvided(QStringLiteral("dark"), QStringLiteral("#007AFF"),
+                             QStringLiteral("#999999"), QStringLiteral("#090A17"));
+    ASSERT_EQ(spy.count(), 1);
+    auto args = spy.takeFirst();
+    EXPECT_EQ(args.at(0).toString(), QStringLiteral("dark"));
+    EXPECT_EQ(args.at(1).toString(), QStringLiteral("#007AFF"));
+}
+
+// currentVoiceId / setCurrentVoiceId
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_currentVoiceId_001)
+{
+    TiptapChannelBridge bridge;
+    EXPECT_TRUE(bridge.currentVoiceId().isEmpty());
+    bridge.setCurrentVoiceId(QStringLiteral("voice-x"));
+    EXPECT_EQ(bridge.currentVoiceId(), QStringLiteral("voice-x"));
+}
