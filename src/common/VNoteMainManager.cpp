@@ -1877,3 +1877,75 @@ void VNoteMainManager::insertVoiceTextToNote(int noteId, const QString &voiceId,
         qWarning() << "Failed to save voice text to note:" << noteId;
     }
 }
+
+void VNoteMainManager::insertVoiceTextToTiptapNote(int noteId, const QString &voiceId, const QString &text)
+{
+    qInfo() << "insertVoiceTextToTiptapNote called, noteId:" << noteId
+            << "voiceId:" << voiceId << "text length:" << text.length();
+
+    VNoteItem *note = getNoteById(noteId);
+    if (!note) {
+        qWarning() << "Note not found:" << noteId;
+        return;
+    }
+
+    QString envelopeJson = note->htmlCode;
+    if (envelopeJson.isEmpty()) {
+        qWarning() << "Note content is empty:" << noteId;
+        return;
+    }
+
+    QJsonDocument doc = QJsonDocument::fromJson(envelopeJson.toUtf8());
+    if (!doc.isObject()) {
+        qWarning() << "Note content is not a Tiptap envelope, skip:" << noteId;
+        return;
+    }
+
+    QJsonObject envelope = doc.object();
+    if (envelope.value(QStringLiteral("format")).toString() != QStringLiteral("tiptap")) {
+        qWarning() << "Note content is not Tiptap format, skip:" << noteId;
+        return;
+    }
+
+    QJsonObject content = envelope.value(QStringLiteral("content")).toObject();
+    bool found = updateVoiceBlockText(content, voiceId, text);
+    if (!found) {
+        qWarning() << "Voice block not found in Tiptap envelope, voiceId:" << voiceId;
+        return;
+    }
+
+    envelope["content"] = content;
+    note->htmlCode = QString::fromUtf8(QJsonDocument(envelope).toJson(QJsonDocument::Compact));
+    note->modifyTime = QDateTime::currentDateTime();
+
+    VNoteItemOper noteOper(note);
+    if (noteOper.updateNote()) {
+        qInfo() << "Voice text saved to Tiptap note:" << noteId;
+        emit noteDataUpdated(noteId);
+    } else {
+        qWarning() << "Failed to save voice text to Tiptap note:" << noteId;
+    }
+}
+
+bool VNoteMainManager::updateVoiceBlockText(QJsonObject &node, const QString &voiceId, const QString &text)
+{
+    if (node.value(QStringLiteral("type")).toString() == QStringLiteral("voiceBlock")) {
+        QJsonObject attrs = node.value(QStringLiteral("attrs")).toObject();
+        if (attrs.value(QStringLiteral("voiceId")).toString() == voiceId) {
+            attrs["text"] = text;
+            node["attrs"] = attrs;
+            return true;
+        }
+    }
+
+    QJsonArray content = node.value(QStringLiteral("content")).toArray();
+    for (int i = 0; i < content.size(); ++i) {
+        QJsonObject child = content.at(i).toObject();
+        if (updateVoiceBlockText(child, voiceId, text)) {
+            content.replace(i, child);
+            node["content"] = content;
+            return true;
+        }
+    }
+    return false;
+}
