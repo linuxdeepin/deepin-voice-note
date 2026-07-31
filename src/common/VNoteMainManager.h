@@ -99,6 +99,8 @@ public:
      * @param text 转换结果文本
      */
     void insertVoiceTextToNote(int noteId, const QString &voiceId, const QString &text);
+    void insertVoiceTextToTiptapNote(int noteId, const QString &voiceId, const QString &text);
+    bool updateVoiceBlockText(QJsonObject &node, const QString &voiceId, const QString &text);
 
 signals:
     void finishedFolderLoad(const QList<QVariantMap> &foldersData);
