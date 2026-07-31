@@ -20,6 +20,12 @@ const HEADING_OPTIONS = [
   { value: '6', label: '标题 6' },
 ]
 
+const LIST_TOGGLE_BUTTONS = [
+  { format: 'bulletList', label: '无序', title: '无序列表' },
+  { format: 'orderedList', label: '有序', title: '有序列表' },
+  { format: 'taskList', label: '待办', title: '待办列表' },
+]
+
 function createEl(tag, attrs = {}, children = []) {
   const node = document.createElement(tag)
   for (const [key, value] of Object.entries(attrs)) {
@@ -42,6 +48,52 @@ function createEl(tag, attrs = {}, children = []) {
 function applyToggle(editor, format) {
   const command = `toggle${format.charAt(0).toUpperCase()}${format.slice(1)}`
   editor.chain().focus()[command]().run()
+}
+
+function applyListToggle(editor, kind) {
+  const command = `toggle${kind.charAt(0).toUpperCase()}${kind.slice(1)}`
+  editor.chain().focus()[command]().run()
+}
+
+// 缩进/反缩进：按当前节点类型分支，列表外为 no-op；顶级反缩进由原生退出列表。
+function sinkActiveListItem(editor) {
+  if (editor.isActive('taskItem')) {
+    editor.chain().focus().sinkListItem('taskItem').run()
+  } else if (editor.isActive('listItem')) {
+    editor.chain().focus().sinkListItem('listItem').run()
+  }
+}
+
+function liftActiveListItem(editor) {
+  if (editor.isActive('taskItem')) {
+    editor.chain().focus().liftListItem('taskItem').run()
+  } else if (editor.isActive('listItem')) {
+    editor.chain().focus().liftListItem('listItem').run()
+  }
+}
+
+const TASK_LIST_STYLE_ID = 'dvn-tiptap-tasklist-style'
+
+// 注入待办「已完成」主题化自包含样式：去列表符 + 已完成删除线/灰化，
+// 颜色取 --color / --highlightColor / --backgroundColor 适配深浅色。
+function injectTaskListStyles() {
+  if (document.getElementById(TASK_LIST_STYLE_ID)) return
+  const style = document.createElement('style')
+  style.id = TASK_LIST_STYLE_ID
+  style.textContent = [
+    'ul[data-type="taskList"] { list-style: none; padding-left: 1.5em; }',
+    'ul[data-type="taskList"] li[data-checked="true"] { opacity: 0.55; }',
+    'ul[data-type="taskList"] li[data-checked="true"] p {',
+    '  color: var(--color, inherit);',
+    '  text-decoration: line-through;',
+    '  text-decoration-color: var(--highlightColor, #007AFF);',
+    '}',
+    'ul[data-type="taskList"] li[data-checked="true"] > label {',
+    '  background: var(--backgroundColor, transparent);',
+    '  border-color: var(--highlightColor, #007AFF);',
+    '}',
+  ].join('\n')
+  document.head.appendChild(style)
 }
 
 function applyMarkColor(editor, markName, attrName, value) {
@@ -124,6 +176,8 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive) {
 export function createFormatToolbar(editor, host) {
   if (!editor) throw new Error('editor instance is required')
   if (!host) throw new Error('toolbar host element is required')
+
+  injectTaskListStyles()
 
   const toolbar = createEl('div', {
     class: 'tiptap-toolbar',
@@ -226,7 +280,31 @@ export function createFormatToolbar(editor, host) {
   )
   toolbar.appendChild(backPicker.wrapper)
 
-  // 资源插入区：图片按钮（区段顺序：富文本格式区 → 资源插入区）
+  // 列表/待办区（区段顺序：富文本格式区 → 列表/待办区 → 资源插入区）
+  const listGroup = createEl('span', { class: 'tiptap-toolbar-group', style: 'display: inline-flex; gap: 2px; margin-left: 8px; border-left: 1px solid #d0d0d0; padding-left: 8px;' })
+  const listButtons = {}
+  for (const { format, label, title } of LIST_TOGGLE_BUTTONS) {
+    const btn = createEl('button', { type: 'button', 'data-format': format, title }, label)
+    btn.setAttribute('aria-pressed', 'false')
+    btn.addEventListener('click', () => applyListToggle(editor, format))
+    listGroup.appendChild(btn)
+    listButtons[format] = btn
+  }
+  const indentBtn = createEl('button', { type: 'button', 'data-format': 'indentList', title: '增加缩进' }, '缩进')
+  indentBtn.disabled = true
+  indentBtn.addEventListener('click', () => sinkActiveListItem(editor))
+  listGroup.appendChild(indentBtn)
+  listButtons.indentList = indentBtn
+
+  const outdentBtn = createEl('button', { type: 'button', 'data-format': 'outdentList', title: '减少缩进' }, '反缩进')
+  outdentBtn.disabled = true
+  outdentBtn.addEventListener('click', () => liftActiveListItem(editor))
+  listGroup.appendChild(outdentBtn)
+  listButtons.outdentList = outdentBtn
+
+  toolbar.appendChild(listGroup)
+
+  // 资源插入区：图片按钮（区段顺序：富文本格式区 → 列表/待办区 → 资源插入区）
   const resourceGroup = createEl('span', { class: 'tiptap-toolbar-group', style: 'display: inline-flex; gap: 2px; margin-left: 8px; border-left: 1px solid #d0d0d0; padding-left: 8px;' })
   const imageBtn = createEl('button', { type: 'button', 'data-format': 'insertImage', title: '插入图片' }, '图片')
   let onPickImage = null
@@ -277,6 +355,17 @@ export function createFormatToolbar(editor, host) {
     const backColor = editor.getAttributes('highlight').color
     syncColorCells(forePicker.panel, foreColor)
     syncColorCells(backPicker.panel, backColor)
+
+    // 列表/待办区
+    for (const format of ['bulletList', 'orderedList', 'taskList']) {
+      const btn = listButtons[format]
+      const active = editor.isActive(format)
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false')
+      btn.classList.toggle('is-active', active)
+    }
+    const inListItem = editor.isActive('listItem') || editor.isActive('taskItem')
+    listButtons.indentList.disabled = !inListItem
+    listButtons.outdentList.disabled = !inListItem
   }
 
   function syncColorCells(panel, activeColor) {

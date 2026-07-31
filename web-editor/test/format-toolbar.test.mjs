@@ -9,7 +9,7 @@ import { Window } from 'happy-dom'
 import { Editor } from '@tiptap/core'
 import { createTiptapExtensions } from '../src/runtime/tiptap-extensions.js'
 import { createFormatToolbar } from '../src/runtime/format-toolbar.js'
-import { createEmptyDoc } from '../src/schema/document-envelope.js'
+import { createEmptyDoc, createEnvelope, validateEnvelope } from '../src/schema/document-envelope.js'
 
 function defineGlobal(name, value) {
   Object.defineProperty(globalThis, name, {
@@ -282,4 +282,222 @@ test('toolbar image button triggers injected pick callback', () => {
   btn.click()
   assert.equal(picked, 1, 'pick callback should fire on image button click')
   editor.destroy()
+})
+
+// ---------------------------------------------------------------------------
+// 列表/待办区：挂载 / toggle / 互切换丢勾选 / 缩进反缩进 / 激活态同步 / 保存恢复
+// ---------------------------------------------------------------------------
+
+function collectTypes(node, acc = new Set()) {
+  if (!node || typeof node !== 'object') return acc
+  if (node.type) acc.add(node.type)
+  if (Array.isArray(node.content)) for (const child of node.content) collectTypes(child, acc)
+  return acc
+}
+
+function findNode(node, type) {
+  if (!node || typeof node !== 'object') return null
+  if (node.type === type) return node
+  if (Array.isArray(node.content)) {
+    for (const child of node.content) {
+      const found = findNode(child, type)
+      if (found) return found
+    }
+  }
+  return null
+}
+
+function hasNestedList(node) {
+  function walk(n) {
+    if (!n || typeof n !== 'object') return false
+    if (n.type === 'listItem' || n.type === 'taskItem') {
+      if (Array.isArray(n.content)) {
+        for (const child of n.content) {
+          if (child && ['bulletList', 'orderedList', 'taskList'].includes(child.type)) return true
+        }
+      }
+    }
+    if (Array.isArray(n.content)) {
+      for (const child of n.content) {
+        if (walk(child)) return true
+      }
+    }
+    return false
+  }
+  return walk(node)
+}
+
+test('toolbar mounts list and indent buttons', () => {
+  const { editor, host } = createEditorWithToolbar()
+  for (const format of ['bulletList', 'orderedList', 'taskList', 'indentList', 'outdentList']) {
+    assert.ok(host.querySelector(`button[data-format="${format}"]`), `${format} button should be mounted`)
+  }
+  editor.destroy()
+})
+
+for (const format of ['bulletList', 'orderedList', 'taskList']) {
+  test(`${format}: toggle creates and clears list`, () => {
+    const { editor, host } = createEditorWithToolbar()
+    insertText(editor, 'item')
+    selectText(editor)
+
+    const btn = host.querySelector(`button[data-format="${format}"]`)
+    btn.click()
+    assert.ok(editor.isActive(format), `${format} should be active after toggle on`)
+
+    btn.click()
+    assert.ok(!editor.isActive(format), `${format} should be cleared after toggle off`)
+    editor.destroy()
+  })
+}
+
+test('switching task list to bullet list drops checked, back to task list defaults unchecked', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [{
+        type: 'taskItem',
+        attrs: { checked: true },
+        content: [{ type: 'paragraph', content: [{ type: 'text', text: 'done' }] }],
+      }],
+    }],
+  })
+  editor.chain().focus().setTextSelection(editor.state.doc.content.size).run()
+
+  // 切换为无序列表：checked 属 taskItem 专有属性，转 listItem 时丢弃
+  host.querySelector('button[data-format="bulletList"]').click()
+  const afterBullet = collectTypes(editor.getJSON())
+  assert.ok(afterBullet.has('bulletList'), 'should contain bulletList after switch')
+  assert.ok(!afterBullet.has('taskItem'), 'taskItem must be gone after switching to bullet list')
+
+  // 切回待办：默认未勾选
+  host.querySelector('button[data-format="taskList"]').click()
+  const afterTask = collectTypes(editor.getJSON())
+  assert.ok(afterTask.has('taskItem'), 'taskItem should reappear after switching back')
+  const taskItem = findNode(editor.getJSON(), 'taskItem')
+  assert.equal(taskItem.attrs?.checked, false, 'checked should default to false after switching back')
+  editor.destroy()
+})
+
+test('indent/outdent buttons nest and unnest bullet list items', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'bulletList',
+      content: [
+        { type: 'listItem', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'one' }] }] },
+        { type: 'listItem', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'two' }] }] },
+      ],
+    }],
+  })
+  editor.chain().focus().setTextSelection(editor.state.doc.content.size).run()
+
+  host.querySelector('button[data-format="indentList"]').click()
+  assert.ok(hasNestedList(editor.getJSON()), 'second item should nest under first after indent')
+
+  host.querySelector('button[data-format="outdentList"]').click()
+  assert.ok(!hasNestedList(editor.getJSON()), 'no nested list should remain after outdent')
+  editor.destroy()
+})
+
+test('indent/outdent buttons nest and unnest task list items', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [
+        { type: 'taskItem', attrs: { checked: false }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'a' }] }] },
+        { type: 'taskItem', attrs: { checked: false }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'b' }] }] },
+      ],
+    }],
+  })
+  editor.chain().focus().setTextSelection(editor.state.doc.content.size).run()
+
+  host.querySelector('button[data-format="indentList"]').click()
+  assert.ok(hasNestedList(editor.getJSON()), 'task item should nest after indent')
+
+  host.querySelector('button[data-format="outdentList"]').click()
+  assert.ok(!hasNestedList(editor.getJSON()), 'no nested task list should remain after outdent')
+  editor.destroy()
+})
+
+test('indent/outdent buttons disabled outside list, enabled inside', () => {
+  const { editor, host } = createEditorWithToolbar()
+  insertText(editor, 'plain')
+  selectText(editor)
+
+  const indent = host.querySelector('button[data-format="indentList"]')
+  const outdent = host.querySelector('button[data-format="outdentList"]')
+  assert.equal(indent.disabled, true, 'indent disabled in paragraph')
+  assert.equal(outdent.disabled, true, 'outdent disabled in paragraph')
+
+  host.querySelector('button[data-format="bulletList"]').click()
+  assert.equal(indent.disabled, false, 'indent enabled inside list')
+  assert.equal(outdent.disabled, false, 'outdent enabled inside list')
+  editor.destroy()
+})
+
+test('list toggle buttons reflect active state as selection moves', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'bulletList',
+      content: [{ type: 'listItem', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'x' }] }] }],
+    }],
+  })
+  editor.chain().focus().setTextSelection(editor.state.doc.content.size).run()
+
+  assert.equal(host.querySelector('button[data-format="bulletList"]').getAttribute('aria-pressed'), 'true')
+  assert.equal(host.querySelector('button[data-format="orderedList"]').getAttribute('aria-pressed'), 'false')
+  assert.equal(host.querySelector('button[data-format="taskList"]').getAttribute('aria-pressed'), 'false')
+  editor.destroy()
+})
+
+test('save and reload preserves list type, nesting, start and checked', () => {
+  const { editor } = createEditorWithToolbar()
+  const doc = {
+    type: 'doc',
+    content: [
+      {
+        type: 'bulletList',
+        content: [
+          {
+            type: 'listItem',
+            content: [
+              { type: 'paragraph', content: [{ type: 'text', text: 'top' }] },
+              {
+                type: 'orderedList',
+                attrs: { start: 3 },
+                content: [{ type: 'listItem', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'nested' }] }] }],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: 'taskList',
+        content: [
+          { type: 'taskItem', attrs: { checked: true }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'done' }] }] },
+          { type: 'taskItem', attrs: { checked: false }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'todo' }] }] },
+        ],
+      },
+    ],
+  }
+  editor.commands.setContent(doc)
+  const json1 = editor.getJSON()
+
+  const result = validateEnvelope(createEnvelope(json1))
+  assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2))
+
+  const { editor: editor2 } = createEditorWithToolbar()
+  editor2.commands.setContent(json1)
+  const json2 = editor2.getJSON()
+  assert.deepEqual(json2, json1, 'reload should preserve type/level/start/checked')
+  editor.destroy()
+  editor2.destroy()
 })
