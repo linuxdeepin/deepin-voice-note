@@ -444,14 +444,14 @@ test('parseImageInfo: missing relPath fails', () => {
   assert.ok(result.reason.includes('relPath'))
 })
 
-test('parseVoiceInfo: valid info resolves voicePath', () => {
+test('parseVoiceInfo: valid info keeps relative voicePath', () => {
   const result = parseVoiceInfo(
     JSON.stringify({ voiceId: 'v1', voicePath: 'voice/v1.wav', voiceSize: 512 }),
     'file:///base',
   )
   assert.ok(result.ok)
   assert.equal(result.attrs.voiceId, 'v1')
-  assert.ok(result.attrs.voicePath.startsWith('file:///'))
+  assert.equal(result.attrs.voicePath, 'voice/v1.wav')
   assert.equal(result.attrs.voiceSize, 512)
 })
 

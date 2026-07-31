@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test test/*.test.mjs",
+    "test": "node --import ./test/register-css-loader.mjs --test test/*.test.mjs",
     "build": "vite build",
     "build:test": "vite build --mode test",
     "validate-envelope": "node scripts/validate-envelope.mjs"

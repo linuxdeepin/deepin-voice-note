@@ -79,7 +79,7 @@ export function parseVoiceInfo(voiceInfoJson, resourceBaseUrl) {
     ok: true,
     attrs: {
       voiceId,
-      voicePath: resolveResourceUrl(resourceBaseUrl, voicePath),
+      voicePath,
       voiceSize: typeof info.voiceSize === 'number' ? info.voiceSize : 0,
       createTime: info.createTime ?? null,
       title: info.title ?? null,

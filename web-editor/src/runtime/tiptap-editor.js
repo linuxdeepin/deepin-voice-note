@@ -12,7 +12,7 @@ import { Editor } from '@tiptap/core'
 
 import { createTiptapExtensions } from './tiptap-extensions.js'
 import { createEmptyDoc } from '../schema/document-envelope.js'
-import { bindTiptapChannel } from './tiptap-channel.js'
+import { bindTiptapChannel, setVoiceBridge } from './tiptap-channel.js'
 import { createFormatToolbar } from './format-toolbar.js'
 import { setupImagePaste, setupImageViewAndMenu } from './image-interactions.js'
 
@@ -38,6 +38,8 @@ const toolbar = createFormatToolbar(editor, document.getElementById('toolbar-hos
 bindTiptapChannel(editor, undefined, {
   onFontList: (fonts, defaultFont) => toolbar.setFontList(fonts, defaultFont),
 }).then((bridge) => {
+  // 注入 voice 桥，连接 voice 运行态信号分发
+  setVoiceBridge(bridge)
   // 工具栏图片按钮 → 宿主打开文件选择
   toolbar.setOnPickImage(() => bridge.jsRequestPickImage && bridge.jsRequestPickImage())
   // 粘贴：剪贴板图片落盘往返、远程图片阻止
