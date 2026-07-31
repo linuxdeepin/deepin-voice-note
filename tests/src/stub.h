@@ -66,18 +66,24 @@
     //movabs $0x102030405060708,%r11
     //jmpq   *%r11
     #define REPLACE_FAR(t, fn, fn_stub)\
-        *fn = 0x49;\
-        *(fn + 1) = 0xbb;\
-        *(long long *)(fn + 2) = (long long)fn_stub;\
-        *(fn + 10) = 0x41;\
-        *(fn + 11) = 0xff;\
-        *(fn + 12) = 0xe3;\
+        do {\
+            *(fn) = 0x49;\
+            *(fn + 1) = 0xbb;\
+            long long target = (long long)(fn_stub);\
+            std::memcpy((fn) + 2, &target, sizeof(target));\
+            *(fn + 10) = 0x41;\
+            *(fn + 11) = 0xff;\
+            *(fn + 12) = 0xe3;\
+        } while (0);\
         //CACHEFLUSH((char *)fn, CODESIZE);
 
     //5 byte(jmp rel32)
     #define REPLACE_NEAR(t, fn, fn_stub)\
-        *fn = 0xE9;\
-        *(int *)(fn + 1) = (int)(fn_stub - fn - CODESIZE_MIN);\
+        do {\
+            *(fn) = 0xE9;\
+            int offset = (int)((fn_stub) - (fn) - CODESIZE_MIN);\
+            std::memcpy((fn) + 1, &offset, sizeof(offset));\
+        } while (0);\
         //CACHEFLUSH((char *)fn, CODESIZE);
 #endif
 

@@ -15,9 +15,6 @@
 
 DCORE_USE_NAMESPACE
 
-// TODO(renbin): 替换新接口
-QTimer *timer;
-
 /**
  * @brief VNoteA2TManager::VNoteA2TManager
  * @param parent
@@ -38,10 +35,10 @@ int VNoteA2TManager::initSession()
     qDebug() << "Initializing ASR session";
     int errorCode = 0;
 
-    timer = new QTimer;
-    timer->setSingleShot(true);
-    timer->setInterval(100000);
-    connect(timer, &QTimer::timeout, [=](){
+    m_timer = new QTimer(this);
+    m_timer->setSingleShot(true);
+    m_timer->setInterval(100000);
+    connect(m_timer, &QTimer::timeout, this, [this](){
         emit asrError(AudioOther);
         OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, false);
     });
@@ -105,7 +102,7 @@ void VNoteA2TManager::startAsr(QString filePath, qint64 fileDuration, QString sr
     } else {
         qDebug() << "ASR started successfully";
         OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, true);
-        timer->start();
+        m_timer->start();
     }
 }
 
@@ -128,9 +125,9 @@ void VNoteA2TManager::onNotify(const QString &msg)
     asrMsg asrData;
     asrJsonParser(msg, asrData);
 
-    if (timer->isActive()) {
+    if (m_timer && m_timer->isActive()) {
         qDebug() << "Stopping ASR timeout timer";
-        timer->stop();
+        m_timer->stop();
     }
     OpsStateInterface::instance()->operState(OpsStateInterface::StateVoice2Text, false);
 

@@ -8,6 +8,8 @@
 
 #include <QObject>
 
+class QTimer;
+
 struct asrMsg
 {
     QString code;
@@ -66,6 +68,9 @@ protected:
     ErrorCode getErrorCode(const asrMsg &asrData);
     // 初始化语音转写模块，初始化相关dbus连接
     int initSession();
+
+private:
+    QTimer *m_timer = nullptr;
 
 protected:
     // XunFei message code string

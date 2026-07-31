@@ -294,6 +294,13 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAsHtml()
         } else {            
             filePath = m_exportPath;
         }
+        QFileInfo fileInfo(filePath);
+        const QString dirPath = fileInfo.absolutePath();
+        if (!QDir(dirPath).exists() && !QDir().mkpath(dirPath)) {
+            qWarning() << "Failed to create export directory:" << dirPath;
+            return Savefailed; //保存失败
+        }
+
         QFile out(filePath);
         if (!out.open(QIODevice::WriteOnly | QIODevice::Text)) {
             qWarning() << "Failed to open file for writing:" << filePath;

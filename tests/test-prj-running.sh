@@ -6,12 +6,23 @@
 
 builddir=build
 reportdir=build-ut
-rm -r $builddir
-rm -r ../$builddir
-rm -r $reportdir
-rm -r ../$reportdir
-mkdir ../$builddir
-mkdir ../$reportdir
+
+# Tiptap migration UTs invoke web-editor/scripts/validate-envelope.mjs.
+# Keep node_modules out of git, but make the UT entry script prepare the
+# JavaScript dependencies declared by package-lock.json before running C++ UTs.
+repo_root=$(cd "$(dirname "$0")/.."; pwd)
+if [ -f "$repo_root/web-editor/package-lock.json" ]; then
+    if [ ! -d "$repo_root/web-editor/node_modules/@tiptap/core" ]; then
+        (cd "$repo_root/web-editor" && npm ci)
+    fi
+fi
+
+rm -rf $builddir
+rm -rf ../$builddir
+rm -rf $reportdir
+rm -rf ../$reportdir
+mkdir -p ../$builddir
+mkdir -p ../$reportdir
 cd ../$builddir
 #编译
 cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_SAFETYTEST_ARG="CMAKE_SAFETYTEST_ARG_ON" ..
