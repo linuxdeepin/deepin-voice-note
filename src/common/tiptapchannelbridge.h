@@ -81,11 +81,33 @@ public:
     // 前端请求查看原图（双击图片），宿主归一化路径后下发预览
     Q_INVOKABLE void jsRequestViewPicture(const QString &url);
 
+    // --- voice 播放/转写入口（前端 JS → C++） ---
+    // 前端请求播放语音，voiceInfoJson 含 voiceId/voicePath(相对)/voiceSize/title/createTime
+    Q_INVOKABLE void jsRequestVoicePlayback(const QString &voiceInfoJson);
+    // 前端请求停止播放
+    Q_INVOKABLE void jsRequestVoicePlaybackStop();
+    // 前端请求跳转播放进度（毫秒）
+    Q_INVOKABLE void jsRequestVoiceSeek(const QString &ms);
+    // 前端请求语音转文字
+    Q_INVOKABLE void jsRequestVoiceToText(const QString &voiceInfoJson);
+
     // 前端粘贴剪贴板图片数据（data URL），宿主保存到 images/ 后回插
     Q_INVOKABLE void jsPasteImage(const QString &dataUrl);
 
     // 宿主侧下发字体列表（未就绪时缓存，就绪后补发）
     Q_INVOKABLE void sendFontList(const QStringList &fonts, const QString &defaultFont);
+
+    // --- voice 播放/转写信号下发（C++ → JS，由宿主调用） ---
+    void emitVoicePlaybackStateChanged(const QString &voiceId, int state);
+    void emitVoicePlaybackPositionChanged(const QString &voiceId, qint64 ms);
+    void emitVoicePlaybackDurationChanged(const QString &voiceId, qint64 ms);
+    void emitVoiceFileError(const QString &voiceId);
+    void emitVoiceToTextStarted(const QString &voiceId);
+    void emitVoiceToTextFailed(const QString &voiceId);
+    void emitVoiceToTextCompleted(const QString &voiceId, const QString &text);
+    // 主题下发（深浅色 + 高亮色），前端写 CSS 变量
+    void emitThemeProvided(const QString &theme, const QString &highlightColor,
+                           const QString &disableHighlightColor, const QString &backgroundColor);
 
     // 测试辅助：获取当前缓存的待下发 envelope（未就绪时）
     Q_INVOKABLE QString pendingEnvelope() const;
@@ -96,6 +118,10 @@ public:
 
     // 测试辅助：是否已就绪
     Q_INVOKABLE bool isEditorReady() const;
+
+    // voice 运行态：当前播放的语音块唯一标识
+    QString currentVoiceId() const;
+    void setCurrentVoiceId(const QString &voiceId);
 
 signals:
     // --- 事件 1：加载就绪（JS→C++） ---
@@ -128,6 +154,30 @@ signals:
     // C++→JS：字体列表下发（供工具栏字体下拉填充）
     void fontListProvided(const QStringList &fonts, const QString &defaultFont);
 
+    // C++→JS：voice 播放状态变化（0=播放, 1=暂停, 2=结束）
+    void voicePlaybackStateChanged(const QString &voiceId, int state);
+    // C++→JS：voice 播放进度变化
+    void voicePlaybackPositionChanged(const QString &voiceId, qint64 ms);
+    // C++→JS：voice 时长变化
+    void voicePlaybackDurationChanged(const QString &voiceId, qint64 ms);
+    // C++→JS：voice 文件不可播放（缺失或损坏）
+    void voiceFileError(const QString &voiceId);
+    // C++→JS：voice 转文字开始
+    void voiceToTextStarted(const QString &voiceId);
+    // C++→JS：voice 转文字失败
+    void voiceToTextFailed(const QString &voiceId);
+    // C++→JS：voice 转文字完成
+    void voiceToTextCompleted(const QString &voiceId, const QString &text);
+    // C++→JS：主题下发
+    void themeProvided(const QString &theme, const QString &highlightColor,
+                       const QString &disableHighlightColor, const QString &backgroundColor);
+
+    // C++ 内部请求信号（WebEngineHandler 连接处理）
+    void voicePlaybackRequested(const QString &voiceInfoJson, bool isSame);
+    void voicePlaybackStopRequested();
+    void voicePlaybackSeekRequested(qint64 ms);
+    void voiceToTextRequested(const QString &voiceInfoJson);
+
     // C++→QML：前端请求打开图片选择对话框
     void pickImageRequested();
 
@@ -154,6 +204,7 @@ private:
     QString m_pendingDefaultFont;
     bool m_pendingFontListValid;
     int m_imageSeq;
+    QString m_currentVoiceId;
 };
 
 #endif // TIPTAPCHANNELBRIDGE_H

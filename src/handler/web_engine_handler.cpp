@@ -10,6 +10,7 @@
 #include "vtextspeechandtrmanager.h"
 #include "voice_player_handler.h"
 #include "voice_to_text_handler.h"
+#include "voice_to_text_task_manager.h"
 #include "voice_recoder_handler.h"
 #include "setting.h"
 #include "globaldef.h"
@@ -347,6 +348,78 @@ void WebEngineHandler::connectWebContent()
             this, [this]() {
                 TiptapChannelBridge::instance()->sendFontList(m_fontList, m_defaultFont);
             });
+    // --- Tiptap voice 播放/转写通道接线 ---
+    connect(TiptapChannelBridge::instance(), &TiptapChannelBridge::voicePlaybackRequested,
+            this, [this](const QString &voiceInfoJson, bool isSame) {
+        QVariant json = QJsonDocument::fromJson(voiceInfoJson.toUtf8()).toVariant();
+        m_voicePlayerHandler->playVoice(json, isSame);
+    });
+    connect(TiptapChannelBridge::instance(), &TiptapChannelBridge::voicePlaybackStopRequested,
+            this, [this]() {
+        m_voicePlayerHandler->onStop();
+    });
+    connect(TiptapChannelBridge::instance(), &TiptapChannelBridge::voicePlaybackSeekRequested,
+            this, [this](qint64 ms) {
+        m_voicePlayerHandler->setPlayPosition(ms);
+    });
+    connect(TiptapChannelBridge::instance(), &TiptapChannelBridge::voiceToTextRequested,
+            this, [this](const QString &voiceInfoJson) {
+        QJsonDocument doc = QJsonDocument::fromJson(voiceInfoJson.toUtf8());
+        QJsonObject obj = doc.object();
+        auto voiceBlock = QSharedPointer<VNVoiceBlock>::create();
+        voiceBlock->voiceId = obj.value(QStringLiteral("voiceId")).toString();
+        voiceBlock->voicePath = obj.value(QStringLiteral("voicePath")).toString();
+        voiceBlock->voiceSize = static_cast<qint64>(obj.value(QStringLiteral("voiceSize")).toVariant().toLongLong());
+        voiceBlock->voiceTitle = obj.value(QStringLiteral("title")).toString();
+        // 展开相对路径为绝对路径，ASR D-Bus 服务需要可定位的文件路径
+        voiceBlock->voicePath = Utils::makeVoiceAbsolute(voiceBlock->voicePath);
+        m_voiceToTextHandler->setAudioToText(voiceBlock);
+    });
+
+    // voice 播放信号映射为 voiceId 作用域桥信号
+    connect(m_voicePlayerHandler, &VoicePlayerHandler::playStatusChanged, this,
+            [this](VoicePlayerHandler::PlayState state) {
+        const QString &voiceId = TiptapChannelBridge::instance()->currentVoiceId();
+        if (!voiceId.isEmpty()) {
+            TiptapChannelBridge::instance()->emitVoicePlaybackStateChanged(voiceId, static_cast<int>(state));
+        }
+    });
+    connect(m_voicePlayerHandler, &VoicePlayerHandler::playPositionChanged, this,
+            [this](qint64 ms) {
+        const QString &voiceId = TiptapChannelBridge::instance()->currentVoiceId();
+        if (!voiceId.isEmpty()) {
+            TiptapChannelBridge::instance()->emitVoicePlaybackPositionChanged(voiceId, ms);
+        }
+    });
+    connect(m_voicePlayerHandler, &VoicePlayerHandler::playDurationChanged, this,
+            [this](qint64 ms) {
+        const QString &voiceId = TiptapChannelBridge::instance()->currentVoiceId();
+        if (!voiceId.isEmpty()) {
+            TiptapChannelBridge::instance()->emitVoicePlaybackDurationChanged(voiceId, ms);
+        }
+    });
+    connect(m_voicePlayerHandler, &VoicePlayerHandler::voiceFileError, this, [this]() {
+        const QString &voiceId = TiptapChannelBridge::instance()->currentVoiceId();
+        if (!voiceId.isEmpty()) {
+            TiptapChannelBridge::instance()->emitVoiceFileError(voiceId);
+        }
+    });
+
+    // 转写结果桥接（调试门控下路由到 TiptapChannelBridge）
+    connect(JsContent::instance(), &JsContent::callJsSetVoiceTextByPath,
+            this, [this](const QString &voiceId, const QString &text, int asrFlag) {
+        if (!TiptapChannelBridge::instance()->debugEnabled()) return;
+        if (asrFlag == JsContent::AsrFlag::Start) {
+            TiptapChannelBridge::instance()->emitVoiceToTextStarted(voiceId);
+        } else {
+            if (text.isEmpty()) {
+                TiptapChannelBridge::instance()->emitVoiceToTextFailed(voiceId);
+            } else {
+                TiptapChannelBridge::instance()->emitVoiceToTextCompleted(voiceId, text);
+            }
+        }
+    });
+
     qInfo() << "Web content connection finished";
 }
 
@@ -422,6 +495,12 @@ void WebEngineHandler::onInsertVoiceItem(const QString &voicePath, quint64 voice
     QVariant value;
     parse.makeMetaData(&data, value);
 
+    // 调试门控：Tiptap 编辑器路径，下发相对 voicePath
+    if (TiptapChannelBridge::instance()->debugEnabled()) {
+        TiptapChannelBridge::instance()->sendInsertVoiceBlock(value.toString());
+        return;
+    }
+
     // 关闭应用时，需要同步插入语音并进行后台更新
     if (OpsStateInterface::instance()->isAppQuit()) {
         qDebug() << "App is quitting, performing synchronous voice insertion";
@@ -449,6 +528,9 @@ void WebEngineHandler::onThemeChanged()
     QString backgroundColor = DGuiApplicationHelper::LightType == theme ? "#FBFCFD" : "#090A17";
     // 现在背景色主要由 qml 组件和 web 前端 css 共同实现，但在 sw 下保留兼容设置
     emit JsContent::instance()->callJsSetTheme(theme, activeHightColor, disableHightColor, backgroundColor);
+    // Tiptap 编辑器主题下发（复用取色逻辑，只增一路）
+    QString themeStr = (theme == DGuiApplicationHelper::LightType) ? QStringLiteral("light") : QStringLiteral("dark");
+    TiptapChannelBridge::instance()->emitThemeProvided(themeStr, activeHightColor, disableHightColor, backgroundColor);
     qInfo() << "Theme change handling finished";
 }
 
