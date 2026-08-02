@@ -741,8 +741,10 @@ void WebEngineHandler::processVoiceMenuRequest(QObject *request)
         // 异步操作，防止阻塞前端事件
         QTimer::singleShot(0, this, [this] {
             Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::VoicePathNoAvail);
-            // 调用 js 删除删除语音文本
-            Q_EMIT JsContent::instance()->callJsDeleteSelection();
+            // 调试态下 Tiptap 编辑器不走 Summernote JS 删除路径
+            if (!TiptapChannelBridge::instance()->debugEnabled()) {
+                Q_EMIT JsContent::instance()->callJsDeleteSelection();
+            }
         });
         return;
     }
@@ -777,8 +779,10 @@ void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *req
         // 异步操作，防止阻塞前端事件
         QTimer::singleShot(0, this, [this] {
             Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::VoicePathNoAvail);
-            // 调用 js 删除删除语音文本
-            Q_EMIT JsContent::instance()->callJsDeleteSelection();
+            // 调试态下 Tiptap 编辑器不走 Summernote JS 删除路径
+            if (!TiptapChannelBridge::instance()->debugEnabled()) {
+                Q_EMIT JsContent::instance()->callJsDeleteSelection();
+            }
         });
         return;
     }

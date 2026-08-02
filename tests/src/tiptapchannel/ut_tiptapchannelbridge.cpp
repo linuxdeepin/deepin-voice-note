@@ -515,3 +515,27 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_currentVoiceId_001)
     bridge.setCurrentVoiceId(QStringLiteral("voice-x"));
     EXPECT_EQ(bridge.currentVoiceId(), QStringLiteral("voice-x"));
 }
+
+// ---------------------------------------------------------------------------
+// 滚动位置上报（JS→C++）：jsReportScroll + scrollChanged 信号
+// ---------------------------------------------------------------------------
+
+// jsReportScroll(0) → scrollChanged(true)（已到顶部）
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsReportScroll_top_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::scrollChanged);
+    bridge.jsReportScroll(0);
+    ASSERT_EQ(spy.count(), 1);
+    EXPECT_EQ(spy.takeFirst().at(0).toBool(), true);
+}
+
+// jsReportScroll(正值) → scrollChanged(false)（未到顶部）
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsReportScroll_scrolled_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::scrollChanged);
+    bridge.jsReportScroll(150);
+    ASSERT_EQ(spy.count(), 1);
+    EXPECT_EQ(spy.takeFirst().at(0).toBool(), false);
+}
