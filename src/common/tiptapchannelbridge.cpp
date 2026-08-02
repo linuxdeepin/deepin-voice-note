@@ -306,6 +306,16 @@ void TiptapChannelBridge::jsPasteImage(const QString &dataUrl)
     emit insertImage(QJsonDocument(info).toJson(QJsonDocument::Compact));
 }
 
+// ---------------------------------------------------------------------------
+// 滚动位置上报（JS→C++）
+// ---------------------------------------------------------------------------
+
+void TiptapChannelBridge::jsReportScroll(int scrollTop)
+{
+    const bool isTop = (scrollTop <= 0);
+    emit scrollChanged(isTop);
+}
+
 
 // ---------------------------------------------------------------------------
 // Voice 播放/转写入口（JS→C++）

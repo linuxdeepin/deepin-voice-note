@@ -94,6 +94,9 @@ public:
     // 前端粘贴剪贴板图片数据（data URL），宿主保存到 images/ 后回插
     Q_INVOKABLE void jsPasteImage(const QString &dataUrl);
 
+    // 前端上报编辑器滚动位置（scrollTop），宿主据此驱动标题栏阴影状态
+    Q_INVOKABLE void jsReportScroll(int scrollTop);
+
     // 宿主侧下发字体列表（未就绪时缓存，就绪后补发）
     Q_INVOKABLE void sendFontList(const QStringList &fonts, const QString &defaultFont);
 
@@ -171,6 +174,9 @@ signals:
     // C++→JS：主题下发
     void themeProvided(const QString &theme, const QString &highlightColor,
                        const QString &disableHighlightColor, const QString &backgroundColor);
+
+    // JS→C++：滚动位置上报（isTop=true 表示已滚到顶部）
+    void scrollChanged(bool isTop);
 
     // C++ 内部请求信号（WebEngineHandler 连接处理）
     void voicePlaybackRequested(const QString &voiceInfoJson, bool isSame);

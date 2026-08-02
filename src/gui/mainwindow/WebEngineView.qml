@@ -451,7 +451,11 @@ Item {
                         messageDialogLoader.showDialog(type);
                     }
                     onTriggerWebAction: action => {
-                        webView.triggerWebAction(action);
+                        if (TiptapChannel.debugEnabled && tiptapLoader.item) {
+                            tiptapWebView.triggerWebAction(action);
+                        } else {
+                            webView.triggerWebAction(action);
+                        }
                     }
                     onViewPicture: filePath => {
                         viewPictureLoader.path = filePath;
@@ -500,6 +504,34 @@ Item {
                         tiptapWebChannel.registerObject("tiptapChannel", TiptapChannel);
                         tiptapWebView.webChannel = tiptapWebChannel;
                         tiptapWebView.url = Qt.resolvedUrl(TiptapChannel.tiptapHtmlPath());
+                    }
+
+                    onContextMenuRequested: req => {
+                        req.accepted = true;
+                        var x = req.position.x;
+                        var y = req.position.y;
+                        var probeJs = "(function(){"
+                            + "var el = document.elementFromPoint(" + x + "," + y + ");"
+                            + "if (!el) return JSON.stringify({type:2,json:''});"
+                            + "var voiceBox = el.closest ? el.closest('.voiceInfoBox') : null;"
+                            + "if (voiceBox && voiceBox.getAttribute('data-type') === 'voice-block') {"
+                            + "  var meta = voiceBox.getAttribute('data-voice-meta') || '';"
+                            + "  return JSON.stringify({type:1,json:meta});"
+                            + "}"
+                            + "var img = el.closest ? el.closest('img[data-rel-path]') : null;"
+                            + "if (img) return JSON.stringify({type:0,json:''});"
+                            + "return JSON.stringify({type:2,json:''});"
+                            + "})()";
+                        tiptapWebView.runJavaScript(probeJs, function(result) {
+                            var info = null;
+                            try { info = JSON.parse(result); } catch(e) {}
+                            if (!info) return;
+                            if (info.type === 0) {
+                                return;
+                            }
+                            handler.onSaveMenuParam(info.type, info.json);
+                            handler.onContextMenuRequested(req);
+                        });
                     }
                 }
 
@@ -807,7 +839,11 @@ Item {
             hasScroll = !isTop;
         }
         onUpdateRichTextSearch: key => {
-            webView.findText(key);
+            if (TiptapChannel.debugEnabled && tiptapLoader.item) {
+                tiptapWebView.findText(key);
+            } else {
+                webView.findText(key);
+            }
         }
     }
 
@@ -868,6 +904,29 @@ Item {
         onVoiceToTextStateChanged: isConverting => {
             if (multipleChoicesLoader.active && multipleChoicesLoader.item) {
                 multipleChoicesLoader.item.setOperationEnabled(!isConverting, !isConverting);
+            }
+        }
+    }
+
+    Connections {
+        target: Webobj
+
+        onCallJsSelectAll: {
+            if (TiptapChannel.debugEnabled && tiptapLoader.item) {
+                tiptapWebView.runJavaScript(
+                    "if(window.__dvnTiptapEditor)window.__dvnTiptapEditor.chain().selectAll().run()");
+            }
+        }
+        onCallJsDeleteSelection: {
+            if (TiptapChannel.debugEnabled && tiptapLoader.item) {
+                tiptapWebView.runJavaScript(
+                    "if(window.__dvnTiptapEditor)window.__dvnTiptapEditor.chain().deleteSelection().run()");
+            }
+        }
+        onCallJsFocusEditor: {
+            if (TiptapChannel.debugEnabled && tiptapLoader.item) {
+                tiptapWebView.runJavaScript(
+                    "if(window.__dvnTiptapEditor)window.__dvnTiptapEditor.commands.focus()");
             }
         }
     }
