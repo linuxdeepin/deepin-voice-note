@@ -3,6 +3,7 @@
 
 import { Node, mergeAttributes } from '@tiptap/core'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
+import { Slice, Fragment } from '@tiptap/pm/model'
 import voiceBlockCss from './voice-block.css?inline'
 import { getVoiceBridge, subscribeVoiceEvents } from '../runtime/tiptap-channel.js'
 
@@ -58,6 +59,26 @@ function buildVoiceInfoJson(attrs) {
   })
 }
 
+/**
+ * 由节点 attrs 构造宿主菜单可解析的 voice JSON（MetaDataParser 兼容格式）。
+ * 与 buildVoiceInfoJson 的区别：使用键 type（而非 dataType），并补齐 text/state，
+ * 供右键菜单探测脚本通过 data-voice-meta 属性读取后下发给 C++ processVoiceMenuRequest。
+ * @param {object} attrs
+ * @returns {string}
+ */
+function buildVoiceMenuJson(attrs) {
+  return JSON.stringify({
+    type: 2,
+    voiceId: attrs.voiceId,
+    voicePath: attrs.voicePath,
+    voiceSize: attrs.voiceSize,
+    title: attrs.title,
+    createTime: attrs.createTime,
+    text: attrs.text,
+    state: !!attrs.text,
+  })
+}
+
 export const VoiceBlock = Node.create({
   name: 'voiceBlock',
 
@@ -103,6 +124,7 @@ export const VoiceBlock = Node.create({
       const box = document.createElement('div')
       box.className = 'voiceInfoBox'
       box.setAttribute('data-type', 'voice-block')
+      box.setAttribute('data-voice-meta', buildVoiceMenuJson(node.attrs))
 
       const playback = document.createElement('div')
       playback.className = 'voicePlayback'
@@ -320,6 +342,7 @@ export const VoiceBlock = Node.create({
           currentNode = updatedNode
           titleEl.textContent = updatedNode.attrs.title || ''
           translateText.textContent = updatedNode.attrs.text || ''
+          box.setAttribute('data-voice-meta', buildVoiceMenuJson(updatedNode.attrs))
           refreshState()
           return true
         },
@@ -355,6 +378,42 @@ export const VoiceBlock = Node.create({
 
   addProseMirrorPlugins() {
     return [
+      new Plugin({
+        key: new PluginKey('voiceBlockCopyClear'),
+        props: {
+          transformCopied(slice) {
+            let modified = false
+            function transformFragment(fragment) {
+              const newNodes = []
+              for (let i = 0; i < fragment.childCount; i++) {
+                const node = fragment.child(i)
+                if (node.type.name === 'voiceBlock') {
+                  modified = true
+                  newNodes.push(node.type.create({
+                    ...node.attrs,
+                    text: null,
+                    voiceId: generateVoiceId(),
+                    translateUnfold: true,
+                  }, node.content, node.marks))
+                } else if (node.content && node.content.size > 0) {
+                  const newContent = transformFragment(node.content)
+                  if (newContent !== node.content) {
+                    newNodes.push(node.copy(newContent))
+                  } else {
+                    newNodes.push(node)
+                  }
+                } else {
+                  newNodes.push(node)
+                }
+              }
+              return Fragment.from(newNodes)
+            }
+            const newContent = transformFragment(slice.content)
+            if (!modified) return slice
+            return new Slice(newContent, slice.openStart, slice.openEnd)
+          },
+        },
+      }),
       new Plugin({
         key: new PluginKey('voiceBlockPasteId'),
         appendTransaction(transactions, oldState, newState) {

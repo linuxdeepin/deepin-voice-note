@@ -474,3 +474,78 @@ test('to-text completed: writes text to voiceBlock attrs', () => {
   assert.equal(voiceNode.attrs.text, '写回的转写文本')
   editor.destroy()
 })
+
+// ---------------------------------------------------------------------------
+// 复制清态：transformCopied 清 text、生成新 voiceId、重置 translateUnfold
+// ---------------------------------------------------------------------------
+
+test('copy: transformCopied clears text and generates new voiceId for voiceBlock', () => {
+  const { editor } = createEditor()
+  const { bridge } = createMockBridge()
+  setVoiceBridge(bridge)
+
+  editor.commands.insertContent({
+    type: 'voiceBlock',
+    attrs: {
+      voiceId: 'voice-copy-test',
+      voicePath: 'voicenote/test.mp3',
+      voiceSize: 5000,
+      createTime: '2026-07-17 10:00:00',
+      title: '复制测试',
+      text: '需要清除的转写文本',
+      translateUnfold: false,
+    },
+  })
+
+  // 获取文档中 voiceBlock 节点位置的 slice
+  const { doc, selection } = editor.state
+  let voicePos = -1
+  doc.descendants((node, pos) => {
+    if (node.type.name === 'voiceBlock' && voicePos < 0) voicePos = pos
+  })
+  assert.ok(voicePos >= 0, 'voiceBlock should exist')
+
+  const node = doc.nodeAt(voicePos)
+  const slice = editor.state.doc.slice(voicePos, voicePos + node.nodeSize)
+
+  // 获取 transformCopied 插件 prop
+  const transformCopied = editor.view.someProp('transformCopied', f => f)
+  assert.ok(typeof transformCopied === 'function', 'transformCopied should be registered')
+
+  const transformed = transformCopied(slice)
+  const transformedNode = transformed.content.firstChild
+  assert.ok(transformedNode, 'transformed slice should contain a node')
+  assert.equal(transformedNode.attrs.text, null, 'text should be cleared')
+  assert.notEqual(transformedNode.attrs.voiceId, 'voice-copy-test', 'voiceId should be regenerated')
+  assert.notEqual(transformedNode.attrs.voiceId, '', 'new voiceId should be non-empty')
+  assert.equal(transformedNode.attrs.translateUnfold, true, 'translateUnfold should be reset to true')
+
+  // 原文档不应被修改
+  const originalNode = editor.state.doc.nodeAt(voicePos)
+  assert.equal(originalNode.attrs.text, '需要清除的转写文本', 'original text should be unchanged')
+  assert.equal(originalNode.attrs.voiceId, 'voice-copy-test', 'original voiceId should be unchanged')
+
+  editor.destroy()
+})
+
+test('copy: transformCopied does not modify non-voiceBlock content', () => {
+  const { editor } = createEditor()
+  const { bridge } = createMockBridge()
+  setVoiceBridge(bridge)
+
+  editor.commands.insertContent({ type: 'paragraph', content: [{ type: 'text', text: '普通文本' }] })
+
+  const { doc } = editor.state
+  let paraPos = -1
+  doc.descendants((node, pos) => {
+    if (node.type.name === 'paragraph' && paraPos < 0) paraPos = pos
+  })
+  const node = doc.nodeAt(paraPos)
+  const slice = doc.slice(paraPos, paraPos + node.nodeSize)
+
+  const transformCopied = editor.view.someProp('transformCopied', f => f)
+  const transformed = transformCopied(slice)
+  assert.equal(transformed, slice, 'non-voiceBlock slice should be returned as-is')
+
+  editor.destroy()
+})

@@ -183,8 +183,8 @@ function createImageContextMenu({ onView, onDelete, x, y }) {
     position: 'fixed',
     left: `${x}px`,
     top: `${y}px`,
-    background: '#fff',
-    border: '1px solid #ccc',
+    background: 'var(--dvn-panel-bg, #fff)',
+    border: '1px solid var(--dvn-panel-border, #ccc)',
     boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
     zIndex: '1000',
     padding: '2px 0',
@@ -195,7 +195,7 @@ function createImageContextMenu({ onView, onDelete, x, y }) {
   viewItem.textContent = '查看原图'
   viewItem.setAttribute('data-action', 'view-original')
   Object.assign(viewItem.style, { padding: '6px 18px', cursor: 'pointer' })
-  viewItem.addEventListener('mouseenter', () => { viewItem.style.background = '#f0f0f0' })
+  viewItem.addEventListener('mouseenter', () => { viewItem.style.background = 'var(--dvn-hover-bg, #f0f0f0)' })
   viewItem.addEventListener('mouseleave', () => { viewItem.style.background = 'transparent' })
   viewItem.addEventListener('click', (e) => { e.stopPropagation(); onView() })
 
@@ -203,7 +203,7 @@ function createImageContextMenu({ onView, onDelete, x, y }) {
   deleteItem.textContent = '删除'
   deleteItem.setAttribute('data-action', 'delete-image')
   Object.assign(deleteItem.style, { padding: '6px 18px', cursor: 'pointer' })
-  deleteItem.addEventListener('mouseenter', () => { deleteItem.style.background = '#f0f0f0' })
+  deleteItem.addEventListener('mouseenter', () => { deleteItem.style.background = 'var(--dvn-hover-bg, #f0f0f0)' })
   deleteItem.addEventListener('mouseleave', () => { deleteItem.style.background = 'transparent' })
   deleteItem.addEventListener('click', (e) => { e.stopPropagation(); onDelete() })
 

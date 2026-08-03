@@ -169,6 +169,15 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   if (highlightColor) root.style.setProperty('--highlightColor', highlightColor)
   if (disableHighlightColor) root.style.setProperty('--color', disableHighlightColor)
   if (backgroundColor) root.style.setProperty('--backgroundColor', backgroundColor)
+
+  // 主题联动：工具栏 / 语音块 / 滚动条 / 取色板 / 图片自绘菜单
+  const isDark = theme === 'dark'
+  root.style.setProperty('--dvn-panel-bg', isDark ? '#252525' : '#ffffff')
+  root.style.setProperty('--dvn-panel-border', isDark ? '#444444' : '#cccccc')
+  root.style.setProperty('--dvn-toolbar-border', isDark ? '#3d3d3d' : '#d0d0d0')
+  root.style.setProperty('--dvn-hover-bg', isDark ? '#3d3d3d' : '#f0f0f0')
+  root.style.setProperty('--dvn-clear-btn-bg', isDark ? '#2d2d2d' : '#fafafa')
+  root.style.setProperty('--dvn-active-outline', highlightColor || '#0086cc')
 }
 
 // ---------------------------------------------------------------------------
@@ -315,6 +324,19 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
 
       editor.on('update', () => {
         debounce.trigger()
+      })
+
+      // 滚动位置上报：前端主动上报 scrollTop，宿主驱动标题栏阴影状态
+      const scrollTarget = editor.view.dom
+      scrollTarget.addEventListener('scroll', () => {
+        if (bridge.jsReportScroll) {
+          bridge.jsReportScroll(scrollTarget.scrollTop)
+        }
+      })
+      window.addEventListener('scroll', () => {
+        if (bridge.jsReportScroll) {
+          bridge.jsReportScroll(window.scrollY || document.documentElement.scrollTop)
+        }
       })
 
       // --- 事件 3：保存往返 ---

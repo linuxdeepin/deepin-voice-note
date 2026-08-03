@@ -115,7 +115,7 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive) {
   const panel = createEl('div', {
     class: 'tiptap-color-panel',
     'data-panel': kind,
-    style: 'display: none; position: absolute; top: 100%; left: 0; background: #fff; border: 1px solid #ccc; padding: 4px; z-index: 20;',
+    style: 'display: none; position: absolute; top: 100%; left: 0; background: var(--dvn-panel-bg, #fff); border: 1px solid var(--dvn-panel-border, #ccc); padding: 4px; z-index: 20;',
   })
 
   function openPanel() {
@@ -142,7 +142,7 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive) {
   })
 
   // 清除按钮
-  const clearBtn = createEl('button', { type: 'button', 'data-action': `clear-${kind}`, title: '清除颜色', style: 'grid-column: 1 / -1; margin-top: 2px; border: 1px solid #ccc; background: #fafafa;' }, '清除颜色')
+  const clearBtn = createEl('button', { type: 'button', 'data-action': `clear-${kind}`, title: '清除颜色', style: 'grid-column: 1 / -1; margin-top: 2px; border: 1px solid var(--dvn-panel-border, #ccc); background: var(--dvn-clear-btn-bg, #fafafa);' }, '清除颜色')
   clearBtn.addEventListener('click', () => {
     clear(editor)
     closePanel()
@@ -188,8 +188,8 @@ export function createFormatToolbar(editor, host) {
       'align-items: center',
       'gap: 4px',
       'padding: 6px 8px',
-      'border-bottom: 1px solid #d0d0d0',
-      'background: #fafafa',
+      'border-bottom: 1px solid var(--dvn-toolbar-border, #d0d0d0)',
+      'background: var(--dvn-clear-btn-bg, #fafafa)',
       'position: sticky',
       'top: 0',
       'z-index: 10',
@@ -281,7 +281,7 @@ export function createFormatToolbar(editor, host) {
   toolbar.appendChild(backPicker.wrapper)
 
   // 列表/待办区（区段顺序：富文本格式区 → 列表/待办区 → 资源插入区）
-  const listGroup = createEl('span', { class: 'tiptap-toolbar-group', style: 'display: inline-flex; gap: 2px; margin-left: 8px; border-left: 1px solid #d0d0d0; padding-left: 8px;' })
+  const listGroup = createEl('span', { class: 'tiptap-toolbar-group', style: 'display: inline-flex; gap: 2px; margin-left: 8px; border-left: 1px solid var(--dvn-toolbar-border, #d0d0d0); padding-left: 8px;' })
   const listButtons = {}
   for (const { format, label, title } of LIST_TOGGLE_BUTTONS) {
     const btn = createEl('button', { type: 'button', 'data-format': format, title }, label)
@@ -305,7 +305,7 @@ export function createFormatToolbar(editor, host) {
   toolbar.appendChild(listGroup)
 
   // 资源插入区：图片按钮（区段顺序：富文本格式区 → 列表/待办区 → 资源插入区）
-  const resourceGroup = createEl('span', { class: 'tiptap-toolbar-group', style: 'display: inline-flex; gap: 2px; margin-left: 8px; border-left: 1px solid #d0d0d0; padding-left: 8px;' })
+  const resourceGroup = createEl('span', { class: 'tiptap-toolbar-group', style: 'display: inline-flex; gap: 2px; margin-left: 8px; border-left: 1px solid var(--dvn-toolbar-border, #d0d0d0); padding-left: 8px;' })
   const imageBtn = createEl('button', { type: 'button', 'data-format': 'insertImage', title: '插入图片' }, '图片')
   let onPickImage = null
   imageBtn.addEventListener('click', () => {
@@ -374,7 +374,7 @@ export function createFormatToolbar(editor, host) {
       const color = cell.getAttribute('data-color')
       const isActive = activeColor && color === activeColor
       cell.setAttribute('aria-pressed', isActive ? 'true' : 'false')
-      cell.style.outline = isActive ? '2px solid #0086cc' : ''
+      cell.style.outline = isActive ? `2px solid var(--dvn-active-outline, #0086cc)` : ''
     }
   }
 

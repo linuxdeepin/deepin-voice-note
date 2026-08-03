@@ -33,6 +33,9 @@ function createTiptapEditor(element) {
 // ---------------------------------------------------------------------------
 
 const editor = createTiptapEditor(document.getElementById('app'))
+if (typeof window !== 'undefined') {
+  window.__dvnTiptapEditor = editor
+}
 const toolbar = createFormatToolbar(editor, document.getElementById('toolbar-host'))
 
 bindTiptapChannel(editor, undefined, {
