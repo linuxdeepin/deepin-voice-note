@@ -17,6 +17,9 @@ public:
     Q_INVOKABLE void startRecording();
     Q_INVOKABLE void stopRecording();
     Q_INVOKABLE void pauseRecording();
+
+    // 查询录音定时器是否处于激活状态（供测试与外部状态查询使用）
+    bool isRecordingActive() const;
 public:
     void paint(QPainter *painter);
 

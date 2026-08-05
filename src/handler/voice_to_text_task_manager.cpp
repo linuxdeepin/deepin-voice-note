@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2024-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -89,4 +89,9 @@ void VoiceToTextTaskManager::removeTask(const QString &voiceId)
     if (m_tasks.remove(voiceId) > 0) {
         qDebug() << "Removed task for voiceId:" << voiceId;
     }
+}
+
+void VoiceToTextTaskManager::clearAllTasks()
+{
+    m_tasks.clear();
 }
