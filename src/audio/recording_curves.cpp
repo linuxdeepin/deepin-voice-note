@@ -60,6 +60,11 @@ void RecordingCurves::pauseRecording()
     qInfo() << "pauseRecording finished";
 }
 
+bool RecordingCurves::isRecordingActive() const
+{
+    return m_timer && m_timer->isActive();
+}
+
 void RecordingCurves::updateCurves()
 {
     // qInfo() << "updateCurves called";

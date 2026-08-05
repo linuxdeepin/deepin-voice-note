@@ -112,7 +112,6 @@ list(REMOVE_ITEM VNOTE_SRC_TEST1
     "${CMAKE_CURRENT_LIST_DIR}/src/common/ut_utils.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/common/ut_vlcplayer.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/src/common/ut_vntaskworker.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/src/task/ut_vnmainwnddelayinittask.cpp"
 )
 
 list(REMOVE_ITEM VNOTE_SRC_TEST "${CMAKE_CURRENT_LIST_DIR}/../src/main.cpp")

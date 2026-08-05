@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2024-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -80,6 +80,11 @@ public:
      * @param voiceId 语音块唯一标识
      */
     void removeTask(const QString &voiceId);
+
+    /**
+     * @brief 清除所有任务（仅供测试环境重置单例状态）
+     */
+    void clearAllTasks();
 
 signals:
     /**
