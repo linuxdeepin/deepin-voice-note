@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -8,10 +8,12 @@
 #include "common/vnoteitem.h"
 
 #include <QApplication>
+#include <QDir>
 #include <QList>
 
 void UT_ExportNoteWorker::SetUp()
 {
+    QDir().mkpath(QStringLiteral("test"));
     VNOTE_ALL_NOTES_MAP *notes = VNoteDataManager::instance()->getAllNotesInFolder();
     if (notes && !notes->notes.isEmpty()) {
         VNOTE_ITEMS_MAP *tmp = notes->notes.first();
@@ -33,6 +35,7 @@ void UT_ExportNoteWorker::SetUp()
 void UT_ExportNoteWorker::TearDown()
 {
     delete note;
+    QDir("test").removeRecursively();
 }
 
 UT_ExportNoteWorker::UT_ExportNoteWorker()

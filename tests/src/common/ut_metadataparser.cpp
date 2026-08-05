@@ -80,7 +80,7 @@ TEST_F(UT_MetaDataParser, UT_MetaDataParser_makeMetaData_001)
     metadataparser.parse(metadata, noteData);
     metadata = "";
     metadataparser.makeMetaData(noteData, metadata);
-    EXPECT_EQ("{\"dataCount\":1,\"noteDatas\":[{\"text\":\"sdfgsgssrgstg\",\"type\":1}],\"voiceMaxId\":0}", metadata) << "htmlCode is empty";
+    EXPECT_EQ(QByteArrayLiteral("{\"dataCount\":1,\"noteDatas\":[{\"text\":\"sdfgsgssrgstg\",\"type\":1}],\"voiceMaxId\":0}"), metadata.toByteArray()) << "htmlCode is empty";
 
     noteData->htmlCode = "abc";
     metadataparser.makeMetaData(noteData, metadata);

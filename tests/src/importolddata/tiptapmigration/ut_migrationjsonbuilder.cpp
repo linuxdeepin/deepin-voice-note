@@ -196,7 +196,7 @@ TEST(UT_MigrationJsonBuilder, GeneratedEnvelopePassesSchemaValidator)
     const QString path = writeTempEnvelope(envelope);
     QProcess validator;
     validator.setWorkingDirectory(findRepoRoot());
-    validator.start(QStringLiteral("node"), { QStringLiteral("web-editor/scripts/validate-envelope.mjs"), path });
+    validator.start(QStringLiteral("node"), { QStringLiteral("--import"), QStringLiteral("./web-editor/scripts/css-inline-loader.mjs"), QStringLiteral("web-editor/scripts/validate-envelope.mjs"), path });
     ASSERT_TRUE(validator.waitForFinished(30000));
     EXPECT_EQ(0, validator.exitCode()) << validator.readAllStandardError().toStdString();
     QFile::remove(path);

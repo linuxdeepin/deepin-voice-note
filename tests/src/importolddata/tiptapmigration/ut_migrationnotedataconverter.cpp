@@ -91,7 +91,7 @@ void expectPassesValidators(const QJsonObject &envelope)
 
     QProcess validator;
     validator.setWorkingDirectory(repoRoot);
-    validator.start(QStringLiteral("node"), { QStringLiteral("web-editor/scripts/validate-envelope.mjs"), envelopeFile.fileName() });
+    validator.start(QStringLiteral("node"), { QStringLiteral("--import"), QStringLiteral("./web-editor/scripts/css-inline-loader.mjs"), QStringLiteral("web-editor/scripts/validate-envelope.mjs"), envelopeFile.fileName() });
     ASSERT_TRUE(validator.waitForFinished(30000));
     EXPECT_EQ(0, validator.exitCode()) << validator.readAllStandardError().toStdString();
 }
