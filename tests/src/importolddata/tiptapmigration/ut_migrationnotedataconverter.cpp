@@ -63,7 +63,9 @@ QString findRepoRoot()
 {
     QDir dir(QDir::currentPath());
     for (int depth = 0; depth < 8; ++depth) {
-        if (QFile::exists(dir.filePath(QStringLiteral("web-editor/scripts/validate-envelope.mjs")))) {
+        // 校验器现走 dist/validate-envelope.mjs 自包含 bundle，
+        // 不再依赖 web-editor/node_modules，以 dist 产物存在作为定位标志
+        if (QFile::exists(dir.filePath(QStringLiteral("web-editor/dist/validate-envelope.mjs")))) {
             return dir.absolutePath();
         }
         if (!dir.cdUp()) {
@@ -91,7 +93,9 @@ void expectPassesValidators(const QJsonObject &envelope)
 
     QProcess validator;
     validator.setWorkingDirectory(repoRoot);
-    validator.start(QStringLiteral("node"), { QStringLiteral("--import"), QStringLiteral("./web-editor/scripts/css-inline-loader.mjs"), QStringLiteral("web-editor/scripts/validate-envelope.mjs"), envelopeFile.fileName() });
+    // dist/validate-envelope.mjs 已把 @tiptap/* 全部 inline，
+    // 无需 --import css-inline-loader.mjs，也不要求 npm install
+    validator.start(QStringLiteral("node"), { QStringLiteral("web-editor/dist/validate-envelope.mjs"), envelopeFile.fileName() });
     ASSERT_TRUE(validator.waitForFinished(30000));
     EXPECT_EQ(0, validator.exitCode()) << validator.readAllStandardError().toStdString();
 }
