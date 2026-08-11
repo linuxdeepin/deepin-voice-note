@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "test": "node --import ./test/register-css-loader.mjs --test test/*.test.mjs",
-    "build": "vite build",
+    "build": "vite build && vite build --config vite.validate.config.js",
     "build:test": "vite build --mode test",
+    "build:validate": "vite build --config vite.validate.config.js",
     "validate-envelope": "node scripts/validate-envelope.mjs"
   },
   "dependencies": {
