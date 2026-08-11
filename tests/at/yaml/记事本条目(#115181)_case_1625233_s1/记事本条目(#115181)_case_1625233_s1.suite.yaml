@@ -28,12 +28,14 @@ suites:
       role: label
     items:
     - 重命名
+  - action: keyboard_hot_key
+    key: ctrl+a
   - action: keyboard_type
-    text: test2
+    text: 测试记事本A
   - action: keyboard_press
     key: enter
   assert_steps:
   - action: assert_element
     selector:
-      name: test2
+      name: 测试记事本A
       role: label
