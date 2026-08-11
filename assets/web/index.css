@@ -3,7 +3,7 @@ body {
     line-height: 1.72;
     font-family: 'Helvetica';
     background-color: transparent;
-    color: rgba(65, 77, 104, 1);
+    color: #000000;
     word-wrap: break-word;
 }
 
@@ -98,7 +98,7 @@ body {
 }
 
 .time {
-    color: rgba(65, 77, 104, 1);
+    color: #000000;
     font-size: 12px !important;
     line-height: 12px;
 }
@@ -134,7 +134,7 @@ body {
 
 .translate>div {
     text-align: center;
-    color: rgba(65, 77, 104, 1) !important;
+    color: #000000 !important;
 }
 
 .icon {
@@ -230,14 +230,14 @@ body {
 
 u {
     text-decoration-color: transparent !important;
-    border-bottom: 1px solid rgba(65, 77, 104, 1);
+    border-bottom: 1px solid #000000;
 }
 
 strike {
-    text-decoration-color: rgba(65, 77, 104, 1);
+    text-decoration-color: #000000;
 }
 
 strike[style="text-decoration-line: underline;"] {
     text-decoration-color: transparent !important;
-    border-bottom: 1px solid rgba(65, 77, 104, 1);
+    border-bottom: 1px solid #000000;
 }

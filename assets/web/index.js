@@ -997,9 +997,9 @@ function changeColor(flag, activeColor, disableColor, backgroundColor) {
     }, function () {
         $('.dropdown-fontsize>li>a').css('background-color', 'transparent');
         if (flag == 1) {
-            $('.dropdown-fontsize>li>a').css('color', "black");
+            $('.dropdown-fontsize>li>a').css('color', "#000000");
         } else {
-            $('.dropdown-fontsize>li>a').css('color', "rgba(197,207,224,1)");
+            $('.dropdown-fontsize>li>a').css('color', "rgba(255, 255, 255, 0.7)");
         }
     })
     $('.dropdown-fontname>li>a').hover(function (e) {
@@ -1007,16 +1007,16 @@ function changeColor(flag, activeColor, disableColor, backgroundColor) {
     }, function () {
         $('.dropdown-fontname>li>a').css('background-color', 'transparent');
         if (flag == 1) {
-            $('.dropdown-fontname>li>a').css('color', "black");
+            $('.dropdown-fontname>li>a').css('color', "#000000");
         } else {
-            $('.dropdown-fontname>li>a').css('color', "rgba(197,207,224,1)");
+            $('.dropdown-fontname>li>a').css('color', "rgba(255, 255, 255, 0.7)");
         }
     })
     $('body').css('background-color', global_themeColor)
     if (flag == 1) {
         $('#dark').remove()
-        $('.dropdown-fontsize>li>a').css('color', "black");
-        $('.dropdown-fontname>li>a').css('color', "black");
+        $('.dropdown-fontsize>li>a').css('color', "#000000");
+        $('.dropdown-fontname>li>a').css('color', "#000000");
     } else if (flag == 2 && !$('#dark').length) {
         $("head").append("<link>");
         var css = $("head").children(":last");
