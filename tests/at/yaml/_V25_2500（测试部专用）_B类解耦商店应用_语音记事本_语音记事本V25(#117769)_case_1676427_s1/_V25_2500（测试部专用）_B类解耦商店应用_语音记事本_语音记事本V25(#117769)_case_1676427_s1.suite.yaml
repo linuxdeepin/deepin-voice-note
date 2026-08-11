@@ -30,4 +30,4 @@ suites:
   - action: assert_element
     selector:
       name: 确定
-      role: push button
+      role: button
