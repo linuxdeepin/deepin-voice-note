@@ -1383,16 +1383,6 @@ void appendBlockWithInitialParagraph(QJsonArray &blocks,
     blocks.append(block);
 }
 
-QJsonArray inlineContentFrom(const MigrationHtmlNode &node,
-                             MigrationHtmlConversionResult &result,
-                             const QJsonArray &inheritedMarks = QJsonArray())
-{
-    QJsonArray content;
-    appendInlineChildren(node, content, marksForElement(node, inheritedMarks, result), result);
-    trimTrailingTextSpace(content);
-    return content;
-}
-
 QJsonObject blockFromElement(const MigrationHtmlNode &node,
                              MigrationHtmlConversionResult &result,
                              const QJsonArray &inheritedMarks = QJsonArray());
@@ -1644,15 +1634,6 @@ void appendBlocksFromChildren(const MigrationHtmlNode &node,
     }
 }
 
-QJsonObject downgradedParagraphFromBlock(const MigrationHtmlNode &node,
-                                         MigrationHtmlConversionResult &result,
-                                         const QJsonArray &inheritedMarks = QJsonArray())
-{
-    warnDowngradedBlock(node, result);
-
-    return MigrationJsonBuilder::makeParagraph(inlineContentFrom(node, result, inheritedMarks));
-}
-
 void appendInlineContentAsParagraph(QJsonArray &inlineContent, QJsonArray &blocks)
 {
     trimTrailingTextSpace(inlineContent);
@@ -1865,31 +1846,12 @@ QJsonObject blockFromElement(const MigrationHtmlNode &node,
         }
     }
 
-    if (isHeadingElement(node)) {
-        warnTextAlignDeclarations(node, result);
-        return MigrationJsonBuilder::makeHeading(headingLevel(node), inlineContentFrom(node, result, inheritedMarks));
-    }
-
     if (isListElement(node)) {
         return listFromElement(node, result, inheritedMarks);
     }
 
-    if (isListItemElement(node)) {
-        warnTextAlignDeclarations(node, result);
-        addWarning(result,
-                   elementPath(node),
-                   kCodeDowngradedOrphanListItem,
-                   QStringLiteral("HTML list item outside a list was downgraded to paragraph"));
-        return downgradedParagraphFromBlock(node, result, inheritedMarks);
-    }
-
-    if (node.tagName == QStringLiteral("blockquote")) {
-        warnTextAlignDeclarations(node, result);
-        return blockquoteFromElement(node, result, inheritedMarks);
-    }
-
     warnTextAlignDeclarations(node, result);
-    return downgradedParagraphFromBlock(node, result, inheritedMarks);
+    return blockquoteFromElement(node, result, inheritedMarks);
 }
 
 QJsonObject envelopeFromParsed(const MigrationHtmlParseResult &parsed, MigrationHtmlConversionResult &result)
