@@ -17,6 +17,7 @@ import org.deepin.dtk 1.0
  */
 ToolButton {
     id: root
+    Accessible.name: "VNoteToolButton"
 
     activeFocusOnTab: true
     display: text.length > 0 ? AbstractButton.TextBesideIcon : AbstractButton.IconOnly
@@ -24,6 +25,8 @@ ToolButton {
     hoverEnabled: enabled
 
     background: VNoteButtonBackground {
+        Accessible.name: "VNoteToolButtonBackground"
+        Accessible.role: Accessible.Panel
         button: root
     }
 

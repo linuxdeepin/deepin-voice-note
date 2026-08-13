@@ -351,6 +351,9 @@ Item {
     }
 
     MoveDialog {
+        Accessible.name: "MoveNoteDialog"
+        Accessible.role: Accessible.Dialog
+
         id: dialogWindow
 
         folderModel: moveFolderModel
@@ -375,11 +378,17 @@ Item {
     }
 
     VNoteMessageDialogLoader {
+        Accessible.name: "ItemListMessageDialog"
+        Accessible.role: Accessible.Dialog
+
         id: messageDialogLoader
 
     }
 
     DragControl {
+        Accessible.name: "ItemListDragControl"
+        Accessible.role: Accessible.Panel
+
         id: dragControl
 
     }
@@ -614,6 +623,9 @@ Item {
     }
 
     VNoteRightMenu {
+        Accessible.name: "NoteContextMenu"
+        Accessible.role: Accessible.Menu
+
         id: noteCtxMenu
 
         menuType: ActionManager.NoteCtxMenu
@@ -765,6 +777,8 @@ Item {
     }
 
     ListView {
+        Accessible.name: "NoteItemListView"
+
         id: itemListView
 
         property var contextIndex: -1
@@ -789,6 +803,8 @@ Item {
         visible: true
 
         ScrollBar.vertical: ScrollBar {
+            Accessible.name: "NoteListScrollBar"
+
             id: verticalScrollBar
 
             parent: rootItem.scrollBarParent ? rootItem.scrollBarParent : itemListView
@@ -800,6 +816,9 @@ Item {
         delegate: Rectangle {
             id: rootItemDelegate
 
+            Accessible.name: model.name
+            Accessible.description: qsTr("Note item")
+            Accessible.role: Accessible.ListItem
             property bool hovered: false
             property bool isRename: false
             property bool isSelected: selectedNoteItem.indexOf(index) !== -1

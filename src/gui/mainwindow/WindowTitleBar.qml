@@ -41,6 +41,8 @@ TitleBar {
         }
     }
     menu: TitleBarMenu {
+        Accessible.name: "TitleBarMenu"
+        Accessible.role: Accessible.Menu
         id: tMenu
 
         onOpenPrivacy: {
@@ -52,6 +54,8 @@ TitleBar {
     }
 
     VNoteComponents.VNoteToolButton {
+        Accessible.name: "NewNoteButton"
+        Accessible.role: Accessible.Button
         id: newNoteBtn
 
         anchors.left: titleBar.left
@@ -96,6 +100,8 @@ TitleBar {
     }
 
     VNoteComponents.VNoteToolButton {
+        Accessible.name: "RecordButton"
+        Accessible.role: Accessible.Button
         id: recordBtn
 
         anchors.right: insImgBtn.left
@@ -121,6 +127,8 @@ TitleBar {
     }
 
     VNoteComponents.VNoteToolButton {
+        Accessible.name: "InsertImageButton"
+        Accessible.role: Accessible.Button
         id: insImgBtn
 
         anchors.verticalCenter: titleBar.verticalCenter

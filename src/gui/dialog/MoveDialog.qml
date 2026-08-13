@@ -40,6 +40,7 @@ DialogWindow {
 
         ListView {
             id: folderList
+            Accessible.name: "FolderList"
 
             activeFocusOnTab: true
             clip: true
@@ -52,6 +53,7 @@ DialogWindow {
             onCurrentIndexChanged: dialog.index = currentIndex
 
             ScrollBar.vertical: ScrollBar {
+                Accessible.name: "FolderListScrollBar"
             }
             delegate: Rectangle {
                 id: folderItem
@@ -147,6 +149,8 @@ DialogWindow {
             Layout.topMargin: 10
 
             VNoteComponents.VNoteButton {
+                Accessible.name: "CancelButton"
+                Accessible.role: Accessible.Button
                 Layout.preferredWidth: 171
                 text: qsTr("Cancel")
 
@@ -162,6 +166,8 @@ DialogWindow {
             RecommandButton {
                 id: accpetBtn
 
+                Accessible.name: "MoveDialogOk"
+                Accessible.role: Accessible.Button
                 Layout.alignment: Qt.AlignRight
                 Layout.preferredWidth: 171
                 enabled: index !== -1
