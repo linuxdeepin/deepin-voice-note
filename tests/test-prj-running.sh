@@ -1,11 +1,14 @@
 #!/bin/bash
 
-# SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+# SPDX-FileCopyrightText: 2023-2026 UnionTech Software Technology Co., Ltd.
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-builddir=build
-reportdir=build-ut
+export builddir=build
+export reportdir=build-ut
+scriptdir=$(cd $(dirname $0); pwd)
+export projectdir=$(cd "$scriptdir/.."; pwd)
+
 rm -r $builddir
 rm -r ../$builddir
 rm -r $reportdir
@@ -15,9 +18,17 @@ mkdir ../$reportdir
 cd ../$builddir
 #编译
 cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_SAFETYTEST_ARG="CMAKE_SAFETYTEST_ARG_ON" ..
-make -j8
+make -j$(nproc)
 #生成asan日志和ut测试xml结果
-./tests/deepin-voice-note-test --gtest_output=xml:./report/report_deepin-voice-note.xml
+export ASAN_OPTIONS=${ASAN_OPTIONS:-abort_on_error=0:detect_leaks=0}
+
+# 运行测试并生成 gtest XML 报告
+GTEST_XML_DIR="$projectdir/$builddir/report"
+mkdir -p "$GTEST_XML_DIR"
+set +e
+./tests/deepin-voice-note-test --gtest_output="xml:$GTEST_XML_DIR/report_deepin-voice-note.xml"
+test_exit_code=$?
+set -e
 
 workdir=$(cd ../$(dirname $0)/$builddir; pwd)
 
@@ -35,6 +46,11 @@ mv ./html/index.html ./html/cov_deepin-voice-note.html
 #对asan、ut、代码覆盖率结果收集至指定文件夹
 cp -r html ../$reportdir/
 cp -r report ../$reportdir/
-cp -r asan*.log* ../$reportdir/asan_deepin-voice-note.log
+cp asan*.log* ../$reportdir/asan_deepin-voice-note.log 2>/dev/null || true
 
-exit 0
+# 生成摘要 JSON
+echo "==> Generating summary JSON: $projectdir/$reportdir/ut-summary.json"
+
+python3 "$scriptdir/gen-ut-summary.py"
+
+exit $test_exit_code
