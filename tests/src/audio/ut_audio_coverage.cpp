@@ -15,7 +15,12 @@
 
 #include <gtest/gtest.h>
 
+#include <QDBusInterface>
 #include <gst/gst.h>
+
+// Stub: force QDBusInterface::isValid() to return false so tests that rely on
+// the D-Bus service being absent work deterministically on any host.
+static bool stub_isValid_false() { return false; }
 
 // Free functions defined in gstreamrecorder.cpp are not declared in the header
 // (external linkage); forward declare so the test can invoke them directly.
@@ -46,10 +51,14 @@ GstElement *stub_gst_element_factory_make_null(const gchar *, const gchar *)
 
 TEST(AudioCoverageUT, AudioWatcher_defaultSourcePorts_DBusUnavailable_ReturnsEmpty)
 {
+    // Stub QDBusInterface::isValid to return false so the branch that parses
+    // ports is skipped deterministically, regardless of whether the real
+    // org.deepin.dde.Audio1 service is running on the host.
+    Stub stub;
+    stub.set(ADDR(QDBusInterface, isValid), stub_isValid_false);
+
     AudioWatcher *aw = sharedAudioWatcher();
     QList<AudioPort> ports = aw->defaultSourcePorts();
-    // Without the real org.deepin.dde.Audio1 service the QDBusInterface is
-    // invalid, so the branch that parses ports is skipped and the list is empty.
     EXPECT_TRUE(ports.isEmpty());
     SUCCEED();
 }

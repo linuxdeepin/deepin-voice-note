@@ -12,8 +12,12 @@
 
 #include <gtest/gtest.h>
 
+#include <QClipboard>
 #include <QImage>
+#include <QMimeData>
 #include <QSize>
+#include <QTest>
+#include <QTimer>
 #include <QVariant>
 #include <QWebEnginePage>
 
@@ -167,13 +171,26 @@ TEST(JsContentCoverage, jsCallSaveAudio_emitsSignal)
 TEST(JsContentCoverage, onClipChange_clipboardModeBranches)
 {
     JsContent *js = JsContent::instance();
-    // The Clipboard branch compares QApplication::clipboard()->mimeData() with
-    // the cached m_clipData; when they differ (the default after init) the
-    // callJsClipboardDataChanged signal is emitted.
+
+    // Ensure m_clipData differs from the current clipboard content so the
+    // Clipboard branch emits callJsClipboardDataChanged. Previous tests may
+    // have set m_clipData to the current clipboard via jsCallSetClipData.
+    QClipboard *clip = QApplication::clipboard();
+    const QMimeData *oldClipData = js->m_clipData;
+    // QClipboard::setMimeData takes ownership (will delete the pointer), so
+    // allocate on the heap — a stack QMimeData would be double-freed.
+    QMimeData *tmpMime = new QMimeData;
+    tmpMime->setText(QStringLiteral("ut-clip-reset"));
+    clip->setMimeData(tmpMime);        // replaces clipboard; m_clipData is now stale
+    // Note: the clipboard change triggers onClipChange via the
+    // QClipboard::changed signal, which may update m_clipData.  Reset it
+    // manually to force the next onClipChange to see a difference.
+    js->m_clipData = nullptr;
+
     bool got = false;
     auto conn = QObject::connect(js, &JsContent::callJsClipboardDataChanged, [&]() { got = true; });
 
-    js->onClipChange(QClipboard::Clipboard);  // primary branch
+    js->onClipChange(QClipboard::Clipboard);  // primary branch — now mimeData() != m_clipData
     EXPECT_TRUE(got);
 
     got = false;
@@ -181,6 +198,8 @@ TEST(JsContentCoverage, onClipChange_clipboardModeBranches)
     EXPECT_FALSE(got);
 
     QObject::disconnect(conn);
+    // Restore m_clipData so later tests are not affected.
+    js->m_clipData = oldClipData;
 }
 
 // --- callJsSynchronous inner lambda coverage ---
@@ -200,8 +219,13 @@ static void stub_runJavaScript_invokeCallback(void * /*thisPtr*/,
                                               const std::function<void(const QVariant &)> &callback)
 {
     ++g_stubCallbackInvocations;
-    // Invoking the callback runs the lambda captured inside callJsSynchronous.
-    callback(QVariant(QStringLiteral("stub-result")));
+    // Defer the callback via QTimer::singleShot so it fires AFTER the
+    // QEventLoop::exec() inside callJsSynchronous starts. A synchronous
+    // call here would invoke quit() before exec(), which resets the exit
+    // flag and causes the event loop to hang forever (Qt6.8+).
+    QTimer::singleShot(0, [callback]() {
+        callback(QVariant(QStringLiteral("stub-result")));
+    });
 }
 
 TEST(JsContentCoverage, callJsSynchronous_innerLambdaExecuted)
@@ -216,8 +240,10 @@ TEST(JsContentCoverage, callJsSynchronous_innerLambdaExecuted)
     QWebEnginePage page;
     const QVariant result = JsContent::instance()->callJsSynchronous(
         &page, QStringLiteral("1+1"));
-    // The stub synchronously invoked the lambda -> synResult was set, then
-    // synLoop.quit() fired (queued until synLoop.exec() runs).
+    // Pump the event loop so the deferred singleShot callback fires.
+    QTest::qWait(50);
+    // The stub deferred the lambda via QTimer::singleShot(0) so it fired
+    // after synLoop.exec() started → synResult was set, then synLoop.quit().
     EXPECT_GT(g_stubCallbackInvocations, 0);
     // Result returned from callJsSynchronous equals what the stub passed.
     EXPECT_EQ(QVariant(QStringLiteral("stub-result")), result);
