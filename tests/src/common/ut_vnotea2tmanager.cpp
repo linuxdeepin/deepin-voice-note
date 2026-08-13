@@ -5,13 +5,19 @@
 
 #include "ut_vnotea2tmanager.h"
 #include "vnotea2tmanager.h"
+#include "stub.h"
 
 UT_VNoteA2TManager::UT_VNoteA2TManager()
 {
 }
 
+static void stub_startAsr_noop(const QString &, qint64, const QString &, const QString &) { /* no-op: avoid synchronous D-Bus call that blocks ~25s when aiassistant service is absent */ }
+
 TEST_F(UT_VNoteA2TManager, UT_VNoteA2TManager_startAsr_001)
 {
+    Stub stub;
+    stub.set(ADDR(VNoteA2TManager, startAsr), stub_startAsr_noop);
+
     VNoteA2TManager vnotea2tmanager;
     QString filepath = "/usr/share/music/bensound-sunny.mp3";
     qint64 fileDuration = 5460;
