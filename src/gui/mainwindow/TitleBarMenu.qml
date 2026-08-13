@@ -3,6 +3,7 @@ import VNote 1.0
 import org.deepin.dtk 1.0
 
 Menu {
+    Accessible.name: "TitleBarMenu"
     signal openPrivacy
     signal openSetting
 
@@ -11,6 +12,7 @@ Menu {
     y: 0
 
     MenuItem {
+        Accessible.name: "SettingsMenuItem"
         id: settingsControl
 
         text: qsTr("Settings")
@@ -25,6 +27,7 @@ Menu {
     }
 
     MenuItem {
+        Accessible.name: "PrivacyPolicyMenuItem"
         id: privacyBtn
 
         text: qsTr("Privacy Policy")
@@ -64,6 +67,7 @@ Menu {
     }
 
     MenuItem {
+        Accessible.name: "ExitMenuItem"
         text: qsTr("Exit")
         onTriggered: {
             var win = ApplicationWindow.window;

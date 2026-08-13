@@ -287,11 +287,15 @@ Item {
     }
 
     DragControl {
+        Accessible.name: "FolderDragControl"
+        Accessible.role: Accessible.Panel
         id: dragControl
 
     }
 
     VNoteMessageDialogLoader {
+        Accessible.name: "FolderMessageDialogLoader"
+        Accessible.role: Accessible.Dialog
         id: messageDialogLoader
 
     }
@@ -374,6 +378,7 @@ Item {
     }
 
     ListView {
+        Accessible.name: "FolderListView"
         id: folderListView
 
         property var contextIndex: -1
@@ -468,6 +473,7 @@ Item {
         model: folderModel
 
         ScrollBar.vertical: ScrollBar {
+            Accessible.name: "FolderListScrollBar"
             id: verticalScrollBar
 
             parent: root.scrollBarParent ? root.scrollBarParent : folderListView
@@ -478,6 +484,9 @@ Item {
         delegate: Rectangle {
             id: rootItem
 
+            Accessible.name: model.name
+            Accessible.description: qsTr("Notebook")
+            Accessible.role: Accessible.ListItem
             property bool isHovered: false
             property bool isRename: false
             property var startMove: [-1, -1]
@@ -780,9 +789,11 @@ Item {
             }
 
             Menu {
+                Accessible.name: "FolderItemContextMenu"
                 id: folderItemContextMenu
 
                 MenuItem {
+                    Accessible.name: "RenameMenuItem"
                     text: qsTr("Rename")
 
                     onTriggered: {
@@ -791,6 +802,7 @@ Item {
                 }
 
                 MenuItem {
+                    Accessible.name: "DeleteFolderMenuItem"
                     id: deleteMenuItem
                     enabled: !root.isPlay && !root.isRecordingAudio && !root.isVoiceToText
                     text: qsTr("Delete")
@@ -810,6 +822,7 @@ Item {
                 }
 
                 MenuItem {
+                    Accessible.name: "NewNoteFromFolderMenuItem"
                     id: newNoteMenuItem
                     enabled: !root.isPlay && !root.isRecordingAudio && !root.isVoiceToText
                     text: qsTr("New Note")

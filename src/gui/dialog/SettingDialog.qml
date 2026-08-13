@@ -29,6 +29,7 @@ Settings.SettingsDialog {
         height: 60
 
         Button {
+            Accessible.name: "RestoreDefaultsButton"
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
             text: qsTr("Restore Defaults")
@@ -73,6 +74,7 @@ Settings.SettingsDialog {
                             id: column
 
                             RadioButton {
+                                Accessible.name: "InternalRadioButton"
                                 checked: Settings.SettingsOption.value === 0
                                 font: DTK.fontManager.t8
                                 height: 30
@@ -82,6 +84,7 @@ Settings.SettingsDialog {
                             }
 
                             RadioButton {
+                                Accessible.name: "MicrophoneRadioButton"
                                 checked: Settings.SettingsOption.value === 1
                                 font: DTK.fontManager.t8
                                 height: 30

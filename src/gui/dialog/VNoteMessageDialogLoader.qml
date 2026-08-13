@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2024 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -145,6 +145,7 @@ Loader {
                     width: active ? btnWidth : 0
 
                     sourceComponent: Button {
+                        Accessible.name: "CancelButton"
                         anchors.fill: parent
                         font: DTK.fontManager.t6
                         text: qsTr("Cancel")

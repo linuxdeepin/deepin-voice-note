@@ -123,6 +123,7 @@ Item {
 
         // 取消按钮（运行态可见；cancelling 时置灰）。
         Button {
+            Accessible.name: "CancelMigrationButton"
             Layout.alignment: Qt.AlignHCenter
             visible: runningActive
             enabled: !MigrationViewController.cancelling
@@ -132,6 +133,7 @@ Item {
 
         // "进入应用"放行入口（终态）。
         Button {
+            Accessible.name: "EnterAppButton"
             Layout.alignment: Qt.AlignHCenter
             visible: terminalVisible
             text: qsTr("进入应用")

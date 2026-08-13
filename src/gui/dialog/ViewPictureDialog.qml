@@ -80,6 +80,7 @@ Window {
     FloatingButton {
         id: closeBtn
 
+        Accessible.name: "ClosePictureView"
         checked: false
         z: 100
 

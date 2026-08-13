@@ -102,6 +102,9 @@ ApplicationWindow {
     }
 
     Shortcuts {
+        Accessible.name: "MainShortcuts"
+        Accessible.role: Accessible.Panel
+
         id: shortcuts
 
         enabled: rootWindow.active && !itemListView.isDragging && !folderListView.isDragging
@@ -259,6 +262,9 @@ ApplicationWindow {
     }
 
     VNoteMessageDialogLoader {
+        Accessible.name: "MainMessageDialog"
+        Accessible.role: Accessible.Dialog
+
         id: messageDialogLoader
 
     }
@@ -270,6 +276,9 @@ ApplicationWindow {
 
     // TTP-021: 升级进度界面全屏覆盖层（迁移期间遮蔽主编辑界面，终态展示备份/报告路径）。
     MigrationProgressView {
+        Accessible.name: "MigrationProgressView"
+        Accessible.role: Accessible.Panel
+
         anchors.fill: parent
     }
 
@@ -541,6 +550,9 @@ ApplicationWindow {
     }
 
     VNoteComponents.VNoteToolButton {
+        Accessible.name: "TwoColumnModeButton"
+        Accessible.role: Accessible.Button
+
         id: twoColumnModeBtn
 
         anchors {
@@ -564,6 +576,9 @@ ApplicationWindow {
 
     // 全窗级毛玻璃：左侧文件夹栏 + 笔记列表区域透明可见，列表项保持实色卡片
     VNoteComponents.SidebarBlurBackground {
+        Accessible.name: "SidebarBlurBackground"
+        Accessible.role: Accessible.Panel
+
         anchors.fill: parent
         windowControl: rootWindow
         z: 0
@@ -593,6 +608,9 @@ ApplicationWindow {
                 anchors.topMargin: 50
 
                 FolderListView {
+                    Accessible.name: "FolderListView"
+                    Accessible.role: Accessible.List
+
                     id: folderListView
 
                     Layout.fillHeight: true
@@ -649,6 +667,9 @@ ApplicationWindow {
                 }
 
                 VNoteComponents.VNoteButton {
+                    Accessible.name: "CreateFolderButton"
+                    Accessible.role: Accessible.Button
+
                     id: createFolderButton
 
                     Layout.fillWidth: true
@@ -783,6 +804,9 @@ ApplicationWindow {
                 spacing: 10
 
                 VNoteComponents.VNoteToolButton {
+                    Accessible.name: "ToolBarMoreButton"
+                    Accessible.role: Accessible.Button
+
                     Layout.alignment: Text.AlignRight
                     Layout.preferredHeight: 30
                     Layout.preferredWidth: 30
@@ -902,6 +926,9 @@ ApplicationWindow {
                 }
 
                 ItemListView {
+                    Accessible.name: "NoteItemListView"
+                    Accessible.role: Accessible.List
+
                     id: itemListView
 
                     Layout.fillHeight: true
@@ -1007,6 +1034,9 @@ ApplicationWindow {
                 anchors.fill: parent
 
                 WebEngineView {
+                    Accessible.name: "NoteContentWebView"
+                    Accessible.role: Accessible.Panel
+
                     id: webEngineView
 
                     Layout.fillHeight: true
@@ -1160,6 +1190,9 @@ ApplicationWindow {
             anchors.fill: parent
 
             InitialInterface {
+                Accessible.name: "InitialInterface"
+                Accessible.role: Accessible.Panel
+
                 id: initiaInterface
 
                 Layout.fillHeight: true

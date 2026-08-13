@@ -307,6 +307,9 @@ Item {
             }
 
             WindowTitleBar {
+                Accessible.name: "WebViewTitleBar"
+                Accessible.role: Accessible.Panel
+
                 id: title
 
                 anchors.fill: parent
@@ -348,6 +351,9 @@ Item {
             color: DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#242424"
 
             WebEngineView {
+                Accessible.name: "WebView"
+                Accessible.role: Accessible.Panel
+
                 id: webView
 
                 anchors.fill: parent
@@ -494,6 +500,9 @@ Item {
                 anchors.fill: parent
 
                 WebEngineView {
+                    Accessible.name: "TiptapWebView"
+                    Accessible.role: Accessible.Panel
+
                     id: tiptapWebView
 
                     anchors.fill: parent
@@ -575,6 +584,9 @@ Item {
             visible: false
 
             sourceComponent: MultipleChoices {
+                Accessible.name: "MultipleChoicesView"
+                Accessible.role: Accessible.Panel
+
                 anchors.fill: parent
 
                 onDeleteNote: {
@@ -605,6 +617,9 @@ Item {
     }
 
     VNoteMessageDialogLoader {
+        Accessible.name: "WebViewMessageDialog"
+        Accessible.role: Accessible.Dialog
+
         id: messageDialogLoader
 
     }
@@ -617,6 +632,9 @@ Item {
         asynchronous: true
 
         sourceComponent: ViewPictureDialog {
+            Accessible.name: "ViewPictureDialog"
+            Accessible.role: Accessible.Dialog
+
             id: viewPictureWindow
 
             filePath: path
@@ -632,6 +650,9 @@ Item {
         asynchronous: true
 
         VNoteRightMenu {
+            Accessible.name: "PictureContextMenu"
+            Accessible.role: Accessible.Menu
+
             id: picturCtxMenu
 
             menuType: ActionManager.PictureCtxMenu
@@ -658,6 +679,9 @@ Item {
         asynchronous: true
 
         VNoteRightMenu {
+            Accessible.name: "VoiceContextMenu"
+            Accessible.role: Accessible.Menu
+
             id: voiceCtxMenu
 
             menuType: ActionManager.VoiceCtxMenu
@@ -688,6 +712,9 @@ Item {
         asynchronous: true
 
         VNoteRightMenu {
+            Accessible.name: "TextContextMenu"
+            Accessible.role: Accessible.Menu
+
             id: txtCtxMenu
 
             menuType: ActionManager.TxtCtxMenu
@@ -771,6 +798,9 @@ Item {
         width: rootItem.width
 
         sourceComponent: RecordingView {
+            Accessible.name: "RecordingBar"
+            Accessible.role: Accessible.Panel
+
             id: recordingBar
 
             anchors.fill: parent

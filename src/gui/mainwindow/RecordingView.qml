@@ -72,6 +72,8 @@ FocusScope {
         spacing: 10
 
         VNoteComponents.VNoteToolButton {
+            Accessible.name: "PauseButton"
+            Accessible.role: Accessible.Button
             id: pauseBtn
 
             icon.height: iconSize
@@ -106,6 +108,8 @@ FocusScope {
         }
 
         VNoteComponents.VNoteToolButton {
+            Accessible.name: "StopButton"
+            Accessible.role: Accessible.Button
             id: stopBtn
 
             icon.height: iconSize

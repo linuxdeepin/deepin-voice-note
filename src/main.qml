@@ -1,5 +1,5 @@
 // Copyright (C) 2020 ~ 2020 Deepin Technology Co., Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -10,4 +10,6 @@ import "./gui/mainwindow"
 
 MainWindow {
     id: root
+    Accessible.name: "VoiceNoteMainWindow"
+    Accessible.role: Accessible.Window
 }

@@ -30,6 +30,8 @@ Item {
         height: 40
 
         menu: TitleBarMenu {
+            Accessible.name: "InitialInterfaceTitleBarMenu"
+            Accessible.role: Accessible.Menu
             onOpenPrivacy: {
                 VNoteMainManager.showPrivacy();
             }
@@ -68,6 +70,8 @@ Item {
         }
 
         RecommandButton {
+            Accessible.name: "CreateNotebookInitial"
+            Accessible.role: Accessible.Button
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Layout.topMargin: 10
             text: qsTr("Create Notebook")
