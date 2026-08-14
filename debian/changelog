@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.64) unstable; urgency=medium
+
+  * fix(editor): prevent virtual keyboard from opening on startup
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Fri, 14 Aug 2026 11:43:01 +0800
+
 deepin-voice-note (6.5.63) unstable; urgency=medium
 
   * chore: Update version to 6.5.63
