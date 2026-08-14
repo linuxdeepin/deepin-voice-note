@@ -303,7 +303,6 @@ function setFontList(fontList, initFont) {
 // 初始化summernote
 function initSummernote() {
     $('#summernote').summernote({
-        focus: true,
         disableDragAndDrop: true,
         lang: 'zh-CN',
         // 浮动工具栏
