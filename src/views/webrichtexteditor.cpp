@@ -709,6 +709,26 @@ void WebRichTextEditor::onShowEditToolbar(const QPoint &pos)
         //窗无口正常显示右键菜单时，菜单左上角坐标=鼠标位置，工具栏显示在右键菜单上方
         menuPoint.setY(menuPoint.y() - 45);
     }
+    //下边界保护：与 X 方向的右边界回退(:702-705)对称，保证工具栏及其字体下拉栏在编辑区
+    //可视范围内完整显示。非最大化时编辑区高度较小，右键靠近底部会导致工具栏偏下，其字体
+    //下拉栏(最大高度 300px，见 assets/web/css/bootstrapCssReset.css .dropdown-fontname)
+    //向下展开后超出可视下边界而显示不全。仅在编辑区有有效可视高度时生效，避免尺寸未知(0)
+    //时误判。
+    if (this->height() > 0) {
+        const int editToolbarHeight = 35;      //工具栏自身高度，与下方 m_editToolbarRect 一致
+        const int fontDropdownMaxHeight = 300; //字体下拉栏最大高度(assets/web/css/bootstrapCssReset.css)
+        int maxMenuY = this->height() - editToolbarHeight - fontDropdownMaxHeight;
+        if (maxMenuY < 0) {
+            //编辑区过矮，无法同时容纳工具栏与下拉栏，退化为只保证工具栏自身不溢出可视下边界
+            maxMenuY = this->height() - editToolbarHeight;
+        }
+        if (maxMenuY < 0) {
+            maxMenuY = 0;
+        }
+        if (menuPoint.y() > maxMenuY) {
+            menuPoint.setY(maxMenuY);
+        }
+    }
     //记录编辑工具栏的坐标位置
     m_editToolbarRect = QRect(menuPoint, QPoint(menuPoint.x() + 290 + 85, menuPoint.y() + 35));
     emit JsContent::instance()->calllJsShowEditToolbar(menuPoint.x(), menuPoint.y());
