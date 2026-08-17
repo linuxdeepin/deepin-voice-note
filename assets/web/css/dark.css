@@ -37,7 +37,11 @@ strike[style="text-decoration-line: underline;"] {
 }
 
 .btn-default {
-    color: rgba(197, 207, 224, 1) !important
+    color: rgba(255, 255, 255, 0.7) !important
+}
+
+.note-icon-caret {
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .dropdown-menu {
@@ -45,15 +49,15 @@ strike[style="text-decoration-line: underline;"] {
 }
 
 .colorFont {
-    color: rgba(192, 198, 212, 1) !important
+    color: rgba(255, 255, 255, 0.7) !important
 }
 
 .dropdown-fontsize li a {
-    color: rgba(192, 198, 212, 1) !important
+    color: rgba(255, 255, 255, 0.7) !important
 }
 
 .dropdown-fontname li a {
-    color: rgba(192, 198, 212, 1) !important
+    color: rgba(255, 255, 255, 0.7) !important
 }
 
 .wifi-symbol .first {
@@ -85,11 +89,11 @@ strike[style="text-decoration-line: underline;"] {
 }
 
 .dropdown-fontsize>li>a, .dropdown-fontname>li>a {
-    color: rgba(197, 207, 224, 1)
+    color: rgba(255, 255, 255, 0.7)
 }
 
 .icon-forecolor .path1 {
-    color: rgba(192, 198, 212, 1);
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .icon-backcolor .path5 {

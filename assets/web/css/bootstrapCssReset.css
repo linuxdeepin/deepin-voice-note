@@ -133,7 +133,7 @@
  }
 
  .note-icon-caret {
-     color: rgba(65, 77, 104, 1)
+     color: #000000
  }
 
  .dropdown-menu {
@@ -166,7 +166,7 @@
  }
 
  .colorFont {
-     color: rgba(65, 77, 104, 1);
+     color: #000000;
      margin: 3px;
      font-size: 12px;
  }
@@ -224,7 +224,7 @@
  }
 
  .btn-default {
-     color: rgb(83, 96, 118);
+     color: #000000;
  }
 
  .btn-default:hover {
