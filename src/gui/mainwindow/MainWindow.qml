@@ -552,6 +552,13 @@ ApplicationWindow {
         visible: !(needHideSearch && search.visible) || leftBgArea.visible
         z: 100
 
+        onPressedChanged: {
+            if (pressed) {
+                forceActiveFocus();
+                webEngineView.leaveEditorInputState();
+            }
+        }
+
         onClicked: {
             toggleTwoColumnMode();
         }

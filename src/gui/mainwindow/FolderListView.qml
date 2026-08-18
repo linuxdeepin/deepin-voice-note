@@ -345,11 +345,11 @@ Item {
             folderListView.currentIndex = 0;
             folderListView.lastCurrentIndex = 0;
             folderListView.contextIndex = 0;
+            root.forceActiveFocus();
             VNoteMainManager.createNoteInFolderId(folderData.folderId);
             if (folderListView.itemAtIndex(folderListView.currentIndex + 1)) {
                 folderListView.itemAtIndex(folderListView.currentIndex + 1).isHovered = false;
             }
-            root.forceActiveFocus();
         }
     }
 

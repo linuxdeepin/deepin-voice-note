@@ -19,6 +19,8 @@
 #include <QImage>
 #include <QDebug>
 #include <QApplication>
+#include <QGuiApplication>
+#include <QInputMethod>
 // 条件编译：Qt5 需要包含 functional 头文件
 #ifdef USE_QT5
 #include <functional>
@@ -36,6 +38,20 @@ JsContent *JsContent::instance()
     // qInfo() << "JsContent instance requested";
     static JsContent _instance;
     return &_instance;
+}
+
+void JsContent::jsCallShowInputMethod()
+{
+    if (QGuiApplication::inputMethod()) {
+        QGuiApplication::inputMethod()->show();
+    }
+}
+
+void JsContent::jsCallHideInputMethod()
+{
+    if (QGuiApplication::inputMethod()) {
+        QGuiApplication::inputMethod()->hide();
+    }
 }
 
 /**

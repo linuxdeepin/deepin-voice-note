@@ -127,6 +127,16 @@ Item {
         webView.forceActiveFocus();
     }
 
+    function leaveEditorInputState() {
+        if (!webView) {
+            Webobj.jsCallHideInputMethod();
+            return;
+        }
+        webView.runJavaScript("if (typeof blurEditor === 'function') blurEditor();", function() {
+            Webobj.jsCallHideInputMethod();
+        })
+    }
+
     function showJsContextMenu() {
         // 仅在编辑区可见时尝试弹出；是否在编辑器内由JS自行判断
         if (webVisible) {
