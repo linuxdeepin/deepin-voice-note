@@ -271,7 +271,7 @@ new QWebChannel(qt.webChannelTransport,
         webobj.callJsHideEditToolbar.connect(hideRightMenu);
         webobj.callJsClipboardDataChanged.connect(shearPlateChange);
         webobj.callJsSetVoicePlayBtnEnable.connect(playButColor);
-        webobj.callJsFocusEditor.connect(focusEditor);
+        webobj.callJsFocusEditor.connect(focusEditorWithoutInputMethod);
         webobj.callJsSetFontList.connect(setFontList);
 
         webobj.callJsVoicePlayProgressChanged.connect(updateProgressBar);
@@ -969,6 +969,83 @@ function playButColor(status) {
 function focusEditor() {
     $('#summernote').summernote('editor.focus')
 }
+
+function blurEditor() {
+    var editable = document.querySelector('.note-editable');
+    var activeElement = document.activeElement;
+
+    if (activeElement && activeElement.blur) {
+        activeElement.blur();
+    }
+    if (editable && editable.blur) {
+        editable.blur();
+    }
+}
+
+var suppressProgrammaticInputMethodTimers = [];
+
+function clearProgrammaticInputMethodSuppress() {
+    suppressProgrammaticInputMethodTimers.forEach(function (timer) {
+        window.clearTimeout(timer);
+    });
+    suppressProgrammaticInputMethodTimers = [];
+}
+
+function hideInputMethodAfterProgrammaticFocus() {
+    clearProgrammaticInputMethodSuppress();
+
+    // 第一次新建时 Qt/Chromium 拉起输入法可能晚于 editor.focus() 当前事件轮次，
+    // 这里仅针对“程序化新建聚焦”做短延迟兜底，保留原生光标，不影响用户点击后的 show。
+    [0, 80, 200].forEach(function (delay) {
+        suppressProgrammaticInputMethodTimers.push(window.setTimeout(function () {
+            if (webobj && webobj.jsCallHideInputMethod) {
+                webobj.jsCallHideInputMethod();
+            }
+        }, delay));
+    });
+}
+
+function focusEditorWithoutInputMethod() {
+    // 保留 Summernote/Chromium 原生光标，不做任何自绘；只抑制这次程序化聚焦带出的软键盘。
+    focusEditor();
+    hideInputMethodAfterProgrammaticFocus();
+}
+
+var inputMethodShowTimer = null;
+
+function shouldRequestInputMethodByUserClick(event) {
+    var nativeEvent = event.originalEvent || event;
+    if ((event.type === 'mouseup' || event.type === 'pointerup')
+        && typeof nativeEvent.button === 'number'
+        && nativeEvent.button !== 0) {
+        return false;
+    }
+
+    // 语音块、图片和其它可点击控件不属于正文输入点，避免误弹软键盘。
+    var nonTextTarget = $(event.target).closest('.voiceBox, img, button, a, input, textarea, select');
+    return nonTextTarget.length === 0;
+}
+
+function requestInputMethodByUserClick(event) {
+    if (!shouldRequestInputMethodByUserClick(event)) {
+        return;
+    }
+
+    clearProgrammaticInputMethodSuppress();
+    if (inputMethodShowTimer) {
+        window.clearTimeout(inputMethodShowTimer);
+    }
+    inputMethodShowTimer = window.setTimeout(function () {
+        inputMethodShowTimer = null;
+        if (webobj && webobj.jsCallShowInputMethod) {
+            webobj.jsCallShowInputMethod();
+        }
+    }, 0);
+}
+
+// 编辑区可能已经保持焦点；软键盘被用户收起后，再次点击不会触发新的 focus 事件，
+// 因此这里按“用户点击正文文本区域”重新请求输入法显示，不改变光标位置。
+$(document).on('pointerup mouseup touchend', '.note-editable', requestInputMethodByUserClick);
 
 //录音插入数据
 function insertVoiceItem(text) {
