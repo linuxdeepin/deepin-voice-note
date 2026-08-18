@@ -492,21 +492,47 @@ bool AudioWatcher::getDeviceEnable(AudioWatcher::AudioMode mode)
     if (m_isVirtualMachineHw && (cards.isEmpty() || cards.toLower() == "null")) {
         qInfo() << "Device enable is true (virtual machine)";
         return true;
-    } else {
-        bool hasDevice = (mode == Internal) ? m_outIsEnable : m_inIsEnable;
-        qInfo() << "Device enable for mode" << mode << ":" << hasDevice;
-        return hasDevice;
     }
+    bool hasDevice = (mode == Internal) ? hasAudioOutputDevice() : hasAudioInputDevice();
+    qInfo() << "Device enable for mode" << mode << ":" << hasDevice;
+    return hasDevice;
 }
 
-bool AudioWatcher::hasAudioOutputDevice() const
+bool AudioWatcher::hasAudioOutputDevice()
 {
-    return m_outIsEnable;
+    if (m_outIsEnable) {
+        return true;
+    }
+    // Fallback: when no enabled output port is reported in CardsWithoutUnavailable,
+    // check the default sink's own ports directly. The audio backend may not expose
+    // the port as an enabled card port, but the default sink still has available
+    // output ports.
+    for (const AudioPort &port : defaultSinkPorts()) {
+        if (port.availability != 1) { // Unknown(0) or Available(2)
+            return true;
+        }
+    }
+    return false;
 }
 
-bool AudioWatcher::hasAudioInputDevice() const
+bool AudioWatcher::hasAudioInputDevice()
 {
-    return m_inIsEnable;
+    if (m_inIsEnable) {
+        return true;
+    }
+    // Fallback: check the default source's own ports directly. A .monitor source
+    // is a loopback capture, not a real microphone, so it is excluded when device
+    // checking is enabled.
+    QString name = defaultSourceName();
+    if (name.isEmpty() || (name.endsWith(".monitor") && m_fNeedDeviceChecker)) {
+        return false;
+    }
+    for (const AudioPort &port : defaultSourcePorts()) {
+        if (port.availability != 1) { // Unknown(0) or Available(2)
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
