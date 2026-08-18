@@ -6,7 +6,7 @@
 #include "gstreamrecorder.h"
 #include <DLog>
 
-static const QString mp3Encoder = "capsfilter caps=audio/x-raw,rate=44100,channels=2 ! lamemp3enc name=enc target=1 cbr=true bitrate=192";
+static const QString mp3Encoder = "capsfilter caps=audio/x-raw,rate=44100,channels=1 ! lamemp3enc name=enc target=1 cbr=true bitrate=192";
 
 /**
  * @brief bufferProbe
@@ -392,8 +392,10 @@ void GstreamRecorder::initFormat()
 {
     //未压缩数据
     m_format.setCodec("audio/pcm");
-    //通道，采样率
-    m_format.setChannelCount(2);
+    //通道，采样率——强制单声道：audioconvert 将输入源降混为 mono，
+    //避免双孔耳机麦克风经 PulseAudio 以 2 声道（右声道静音）暴露时
+    //编码出右声道静音的 MP3，确保回放左右耳机均有声
+    m_format.setChannelCount(1);
     m_format.setSampleRate(44100);
     //lamemp3enc 编码器插件格式为S16LE
     m_format.setByteOrder(QAudioFormat::LittleEndian);
