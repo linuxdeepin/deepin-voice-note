@@ -833,6 +833,51 @@ bool UpdateNoteFolderIdDbVisitor::prepareSqls()
 }
 
 /**
+ * @brief UpdateFolderMaxNoteIdDbVisitor::UpdateFolderMaxNoteIdDbVisitor
+ * @param db
+ * @param inParam
+ * @param result
+ */
+UpdateFolderMaxNoteIdDbVisitor::UpdateFolderMaxNoteIdDbVisitor(QSqlDatabase &db, const void *inParam, void *result)
+    : DbVisitor(db, inParam, result)
+{
+}
+
+/**
+ * @brief UpdateFolderMaxNoteIdDbVisitor::prepareSqls
+ * @return true 成功
+ *
+ * 移动笔记后把记事本的 max_noteid 写回 DB，避免重启后从 DB 重新加载导致计数器回退。
+ * 参考 AddNoteDbVisitor/DelNoteDbVisitor 的 UPDATE_FOLDER_TIME 模式。
+ */
+bool UpdateFolderMaxNoteIdDbVisitor::prepareSqls()
+{
+    bool fPrepareOK = true;
+    const VNoteFolder *folder = param.newFolder;
+    if (nullptr != folder) {
+        static constexpr char const *UPDATE_FOLDER_MAXNOTEID = "UPDATE %s SET %s=%s, %s='%s' WHERE %s=%s;";
+
+        QDateTime modifyTime = QDateTime::currentDateTime();
+
+        QString updateSql;
+        updateSql.sprintf(UPDATE_FOLDER_MAXNOTEID,
+                          VNoteDbManager::FOLDER_TABLE_NAME,
+                          DBFolder::folderColumnsName[DBFolder::max_noteid].toUtf8().data(),
+                          QString("%1").arg(folder->maxNoteIdRef()).toUtf8().data(),
+                          DBFolder::folderColumnsName[DBFolder::modify_time].toUtf8().data(),
+                          modifyTime.toString(VNOTE_TIME_FMT).toUtf8().data(),
+                          DBFolder::folderColumnsName[DBFolder::folder_id].toUtf8().data(),
+                          QString("%1").arg(folder->id).toUtf8().data());
+
+        m_dbvSqls.append(updateSql);
+    } else {
+        fPrepareOK = false;
+    }
+
+    return fPrepareOK;
+}
+
+/**
  * @brief DelNoteDbVisitor::DelNoteDbVisitor
  * @param db
  * @param inParam
