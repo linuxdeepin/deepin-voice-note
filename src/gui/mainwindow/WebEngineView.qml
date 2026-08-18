@@ -376,26 +376,32 @@ Item {
                         req.accepted = true;
                         return;
                     }
-                    // 仅当菜单是文本类型时，我们才在QML层根据上下文标记(editFlags)更新状态
-                    // 这是为了精确修复Qt5下文本菜单状态不更新的问题
-                    if (handler.menuTypeFromJs === WebEngineHandler.TxtMenu) {
-                        var flags = req.editFlags
-                        ActionManager.resetCtxMenu(ActionManager.TxtCtxMenu, false) // false表示禁用全部，然后逐一启用
-                        ActionManager.enableAction(ActionManager.TxtSelectAll, (flags & 1) !== 0)
-                        ActionManager.enableAction(ActionManager.TxtCopy, (flags & 2) !== 0)
-                        ActionManager.enableAction(ActionManager.TxtCut, (flags & 4) !== 0)
-                        ActionManager.enableAction(ActionManager.TxtPaste, (flags & 8) !== 0)
-                        ActionManager.enableAction(ActionManager.TxtDelete, (flags & 16) !== 0)
-                        // 只有能复制时，才能朗读
-                        ActionManager.enableAction(ActionManager.TxtSpeech, (flags & 2) !== 0)
-                        // 只有能粘贴时，才能听写
-                        ActionManager.enableAction(ActionManager.TxtDictation, (flags & 8) !== 0)
-                    }
-
-                    // 对于所有菜单类型，都调用C++的处理器
-                    // C++将处理特殊逻辑(如解析语音路径)并最终弹出菜单
-                    handler.onContextMenuRequested(req)
-
+                    // 异步获取 JS 侧菜单类型并同步设置 menuType，再交给 C++ 处理器。
+                    // 不能直接依赖 menuType：它由 QWebChannel 异步设置的
+                    // jsCallPopupMenu 写入，首次右键时仍为默认值 MaxMenu，会导致
+                    // C++ switch 落入 default 不弹任何菜单（BUG-350743）。
+                    // 参照同文件 Tiptap 路径的已验证模式：先 runJavaScript 取类型，
+                    // 回调中 onSaveMenuParam 后再 onContextMenuRequested。
+                    webView.runJavaScript(
+                        "(function(){"
+                        + "if(typeof isRangeVoice!=='function')"
+                        + "  return JSON.stringify({type:2,json:''});"
+                        + "try{var i=isRangeVoice();"
+                        + "  return JSON.stringify({type:i.flag,json:i.info||''});}"
+                        + "catch(e){return JSON.stringify({type:2,json:''});}"
+                        + "})()",
+                        function(result) {
+                            var info = null;
+                            try { info = JSON.parse(result); } catch(e) {}
+                            if (!info) {
+                                handler.onSaveMenuParam(2, "");
+                            } else {
+                                handler.onSaveMenuParam(info.type, info.json);
+                            }
+                            // C++ 处理器根据 menuType 处理特殊逻辑（语音路径解析、
+                            // editFlags 更新等）并最终弹出菜单
+                            handler.onContextMenuRequested(req);
+                        });
                     // 阻止默认菜单弹出
                     req.accepted = true;
                 }
