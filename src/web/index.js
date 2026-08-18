@@ -967,10 +967,12 @@ function playButColor(status) {
 }
 
 function focusEditor() {
+    setEditorInputMethodEnabled(true);
     $('#summernote').summernote('editor.focus')
 }
 
 function blurEditor() {
+    setEditorInputMethodEnabled(true);
     var editable = document.querySelector('.note-editable');
     var activeElement = document.activeElement;
 
@@ -991,23 +993,42 @@ function clearProgrammaticInputMethodSuppress() {
     suppressProgrammaticInputMethodTimers = [];
 }
 
+function setEditorInputMethodEnabled(enabled) {
+    var editable = document.querySelector('.note-editable');
+    if (!editable) {
+        return;
+    }
+
+    if (enabled) {
+        editable.removeAttribute('inputmode');
+    } else {
+        // 程序化 focus 时禁用虚拟键盘请求，保留 contenteditable 的原生光标。
+        editable.setAttribute('inputmode', 'none');
+    }
+}
+
+function hideInputMethod() {
+    if (webobj && webobj.jsCallHideInputMethod) {
+        webobj.jsCallHideInputMethod();
+    }
+}
+
 function hideInputMethodAfterProgrammaticFocus() {
     clearProgrammaticInputMethodSuppress();
 
     // 第一次新建时 Qt/Chromium 拉起输入法可能晚于 editor.focus() 当前事件轮次，
     // 这里仅针对“程序化新建聚焦”做短延迟兜底，保留原生光标，不影响用户点击后的 show。
-    [0, 80, 200].forEach(function (delay) {
-        suppressProgrammaticInputMethodTimers.push(window.setTimeout(function () {
-            if (webobj && webobj.jsCallHideInputMethod) {
-                webobj.jsCallHideInputMethod();
-            }
-        }, delay));
+    [0, 60, 160].forEach(function (delay) {
+        suppressProgrammaticInputMethodTimers.push(window.setTimeout(hideInputMethod, delay));
     });
 }
 
 function focusEditorWithoutInputMethod() {
-    // 保留 Summernote/Chromium 原生光标，不做任何自绘；只抑制这次程序化聚焦带出的软键盘。
-    focusEditor();
+    // 程序化新建聚焦需要原生光标，但不能请求软键盘；inputmode=none 从源头阻止键盘闪现。
+    setEditorInputMethodEnabled(false);
+    hideInputMethod();
+    $('#summernote').summernote('editor.focus')
+    hideInputMethod();
     hideInputMethodAfterProgrammaticFocus();
 }
 
@@ -1032,6 +1053,7 @@ function requestInputMethodByUserClick(event) {
     }
 
     clearProgrammaticInputMethodSuppress();
+    setEditorInputMethodEnabled(true);
     if (inputMethodShowTimer) {
         window.clearTimeout(inputMethodShowTimer);
     }
