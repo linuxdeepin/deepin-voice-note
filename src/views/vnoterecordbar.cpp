@@ -333,9 +333,12 @@ void VNoteRecordBar::onChangeTheme()
 void VNoteRecordBar::onDeviceEnableChanged(int mode, bool enabled)
 {
     qInfo() << "通过控制中心改变默认设备 "<< mode << "（输出设备:0 输入设备:1）使能状态！enalbed:" <<enabled;
-    if (1 == mode) {
-        qInfo() << "录制按钮是否可点击？" << enabled;
-        m_recordBtn->setEnabled(enabled);
+    if (m_currentMode == mode) {
+        const auto audioMode = static_cast<AudioWatcher::AudioMode>(mode);
+        const bool available = !m_audioWatcher->getDeviceName(audioMode).isEmpty()
+                && m_audioWatcher->getDeviceEnable(audioMode);
+        qInfo() << "录制按钮是否可点击？" << available;
+        m_recordBtn->setEnabled(available);
     }
 }
 

@@ -1,4 +1,4 @@
-// Copyright (C) 2019 ~ 2019 UnionTech Software Technology Co.,Ltd.
+// Copyright (C) 2019-2026 ~ 2019 UnionTech Software Technology Co.,Ltd.
 // SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -210,11 +210,20 @@ bool GstreamRecorder::startRecord()
     if (state == GST_STATE_PLAYING) {
         return true;
     } else if (state == GST_STATE_PAUSED) {
-        gst_element_set_state(m_pipeline, GST_STATE_PLAYING);
-        return true;
-    }
-    if (gst_element_set_state(m_pipeline, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
+        if (gst_element_set_state(m_pipeline, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
+            qCritical() << "resume error";
+            return false;
+        }
+    } else if (gst_element_set_state(m_pipeline, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
         qCritical() << "start error";
+        return false;
+    }
+
+    const GstStateChangeReturn stateResult = gst_element_get_state(
+        m_pipeline, nullptr, nullptr, GST_SECOND);
+    if (stateResult == GST_STATE_CHANGE_FAILURE) {
+        qCritical() << "Unable to open audio source:" << m_currentDevice;
+        gst_element_set_state(m_pipeline, GST_STATE_NULL);
         return false;
     }
     return true;

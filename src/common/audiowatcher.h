@@ -7,6 +7,7 @@
 #define AudioWatcher_H
 
 #include <QObject>
+#include <QElapsedTimer>
 #include <QtDBus/QtDBus>
 
 #ifdef OS_BUILD_V23
@@ -247,6 +248,14 @@ private:
      * @return
      */
     AudioPort currentAuidoPort(const QList<AudioPort> &auidoPorts,AudioMode audioMode);
+
+    // 判断默认输入源能否作为麦克风使用。无端口 source 不再按物理端口判定。
+    static bool isMicrophoneSourceAvailable(const QString &sourceName,
+                                            bool hasPorts,
+                                            bool portAvailable,
+                                            bool needDeviceChecker);
+    bool isPulseSourceRecordable(const QString &sourceName);
+    void startPulseSourceProbe(const QString &sourceName);
 private:
     /**
      * @brief 音频服务dbus接口
@@ -316,6 +325,10 @@ private:
       * @brief  是否是虚拟环境
       */
     bool m_isVirtualMachineHw{false};
+    QString m_probedPulseSource;
+    bool m_probedPulseSourceRecordable{false};
+    QString m_probingPulseSource;
+    QElapsedTimer m_pulseProbeCacheTimer;
 };
 
 #endif // AudioWatcher_H

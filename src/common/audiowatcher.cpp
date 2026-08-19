@@ -7,6 +7,100 @@
 #include "globaldef.h"
 
 #include <DLog>
+#include <QElapsedTimer>
+#include <QFutureWatcher>
+#include <QThread>
+#include <QtConcurrent>
+
+#include <pulse/pulseaudio.h>
+
+namespace {
+constexpr qint64 kPulseProbeCacheDurationMs = 5000;
+
+struct PulseSourceProbe
+{
+    bool finished = false;
+    bool found = false;
+    bool monitor = false;
+    pa_source_state_t state = PA_SOURCE_INVALID_STATE;
+};
+
+void onPulseSourceInfo(pa_context *, const pa_source_info *info, int eol, void *userdata)
+{
+    auto probe = static_cast<PulseSourceProbe *>(userdata);
+    if (eol != 0) {
+        probe->finished = true;
+        return;
+    }
+
+    if (info) {
+        probe->found = true;
+        probe->monitor = info->monitor_of_sink != PA_INVALID_INDEX;
+        probe->state = info->state;
+    }
+}
+
+bool probePulseSource(const QString &sourceName)
+{
+    pa_mainloop *mainloop = pa_mainloop_new();
+    if (!mainloop) {
+        return false;
+    }
+
+    pa_context *context = pa_context_new(pa_mainloop_get_api(mainloop), "deepin-voice-note");
+    if (!context || pa_context_connect(context, nullptr, PA_CONTEXT_NOFLAGS, nullptr) < 0) {
+        if (context) {
+            pa_context_unref(context);
+        }
+        pa_mainloop_free(mainloop);
+        return false;
+    }
+
+    QElapsedTimer timer;
+    timer.start();
+    pa_context_state_t contextState = PA_CONTEXT_UNCONNECTED;
+    while (timer.elapsed() < 500) {
+        pa_mainloop_iterate(mainloop, 0, nullptr);
+        contextState = pa_context_get_state(context);
+        if (contextState == PA_CONTEXT_READY || !PA_CONTEXT_IS_GOOD(contextState)) {
+            break;
+        }
+        QThread::msleep(5);
+    }
+
+    PulseSourceProbe probe;
+    pa_operation *operation = nullptr;
+    if (contextState == PA_CONTEXT_READY) {
+        operation = pa_context_get_source_info_by_name(context,
+                                                       sourceName.toUtf8().constData(),
+                                                       onPulseSourceInfo,
+                                                       &probe);
+        timer.restart();
+        while (operation && !probe.finished && timer.elapsed() < 500) {
+            pa_mainloop_iterate(mainloop, 0, nullptr);
+            QThread::msleep(5);
+        }
+    }
+
+    if (operation) {
+        pa_operation_unref(operation);
+    }
+    pa_context_disconnect(context);
+    pa_context_unref(context);
+    pa_mainloop_free(mainloop);
+
+    const bool validState = probe.state == PA_SOURCE_RUNNING
+            || probe.state == PA_SOURCE_IDLE
+            || probe.state == PA_SOURCE_SUSPENDED;
+    const bool recordable = probe.finished && probe.found && !probe.monitor && validState;
+    qInfo() << "PulseAudio source probe:" << sourceName
+            << "found:" << probe.found
+            << "monitor:" << probe.monitor
+            << "state:" << probe.state
+            << "recordable:" << recordable;
+    return recordable;
+}
+}
 
 bool AudioWatcher::kInIsEnable  = false;
 bool AudioWatcher::kOutIsEnable = false;
@@ -432,6 +526,10 @@ void AudioWatcher::onDefaultSourceChanaged(const QDBusObjectPath &defaultSourceP
                                                  SLOT(onDBusAudioPropertyChanged(QDBusMessage))
                                                 );
         m_defaultSourcePath = newPath;
+        m_probedPulseSource.clear();
+        m_probedPulseSourceRecordable = false;
+        m_probingPulseSource.clear();
+        m_pulseProbeCacheTimer.invalidate();
         if (!newPath.isEmpty() && newPath != "/") {
             qInfo() << "Re-initializing default source D-Bus interface for path:" << newPath;
             initDefaultSourceDBusInterface();
@@ -540,16 +638,69 @@ QString AudioWatcher::getDeviceName(AudioMode mode)
             }
         }
     } else {
-        if ((m_inAudioPort.availability != 1 || !m_fNeedDeviceChecker) &&
-                (defaultSourcePorts().count() != 0 || m_isVirtualMachineHw)) {
-            //if (m_inAudioPort.availability != 1 || !m_fNeedDeviceChecker) {
-            device = defaultSourceName();
-            if (device.endsWith(".monitor") && m_fNeedDeviceChecker) {
-                device.clear();
-            }
+        const QString sourceName = defaultSourceName();
+        const bool hasPorts = !defaultSourcePorts().isEmpty();
+        const bool portAvailable = m_inAudioPort.availability != 1;
+        if (isMicrophoneSourceAvailable(sourceName,
+                                        hasPorts,
+                                        portAvailable,
+                                        m_fNeedDeviceChecker)
+                && (hasPorts || isPulseSourceRecordable(sourceName))) {
+            device = sourceName;
         }
     }
     return device;
+}
+
+bool AudioWatcher::isMicrophoneSourceAvailable(const QString &sourceName,
+                                               bool hasPorts,
+                                               bool portAvailable,
+                                               bool needDeviceChecker)
+{
+    if (sourceName.isEmpty() || sourceName.endsWith(".monitor")) {
+        return false;
+    }
+
+    // 虚拟输入源可能没有 Card/Port 元数据，不能将“无端口”当作明确禁用。
+    return !needDeviceChecker || !hasPorts || portAvailable;
+}
+
+bool AudioWatcher::isPulseSourceRecordable(const QString &sourceName)
+{
+    const bool hasCachedResult = sourceName == m_probedPulseSource;
+    if (hasCachedResult
+            && m_pulseProbeCacheTimer.isValid()
+            && m_pulseProbeCacheTimer.elapsed() < kPulseProbeCacheDurationMs) {
+        return m_probedPulseSourceRecordable;
+    }
+
+    startPulseSourceProbe(sourceName);
+    return hasCachedResult && m_probedPulseSourceRecordable;
+}
+
+void AudioWatcher::startPulseSourceProbe(const QString &sourceName)
+{
+    if (sourceName.isEmpty() || sourceName == m_probingPulseSource) {
+        return;
+    }
+
+    m_probingPulseSource = sourceName;
+    auto watcher = new QFutureWatcher<bool>(this);
+    connect(watcher, &QFutureWatcher<bool>::finished, this, [this, watcher, sourceName]() {
+        const bool recordable = watcher->result();
+        watcher->deleteLater();
+        if (m_probingPulseSource == sourceName) {
+            m_probingPulseSource.clear();
+        }
+        if (sourceName != defaultSourceName()) {
+            return;
+        }
+        m_probedPulseSource = sourceName;
+        m_probedPulseSourceRecordable = recordable;
+        m_pulseProbeCacheTimer.start();
+        emit sigDeviceEnableChanged(Micphone, recordable);
+    });
+    watcher->setFuture(QtConcurrent::run(probePulseSource, sourceName));
 }
 
 /**
@@ -579,6 +730,20 @@ bool AudioWatcher::getMute(AudioMode mode)
  */
 bool AudioWatcher::getDeviceEnable(AudioWatcher::AudioMode mode)
 {
+    if (mode == Micphone) {
+        const QString sourceName = defaultSourceName();
+        const QList<AudioPort> ports = defaultSourcePorts();
+        if (isMicrophoneSourceAvailable(sourceName,
+                                        !ports.isEmpty(),
+                                        m_inAudioPort.availability != 1,
+                                        m_fNeedDeviceChecker)
+                && ports.isEmpty()
+                && isPulseSourceRecordable(sourceName)) {
+            qInfo() << "Enable no-port PulseAudio source:" << sourceName;
+            return true;
+        }
+    }
+
     //虚拟环境的情况下是无法判断是否存在声卡的，采用(5.10.17)及以前的处理方式，默认都可用
     QString cards = m_audioDBusInterface->property("Cards").value<QString>();
     if (m_isVirtualMachineHw && (cards.isEmpty() || cards.toLower() == "null")) {
