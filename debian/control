@@ -15,6 +15,7 @@ Build-Depends:
  libdtkwidget-dev,
  libdframeworkdbus-dev,
  libgstreamer1.0-dev,
+ libpulse-dev,
  libvlc-dev,
  libvlccore-dev,
  libqt5webchannel5-dev,

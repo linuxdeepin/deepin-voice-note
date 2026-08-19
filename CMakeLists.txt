@@ -151,8 +151,10 @@ find_package(Qt5Svg REQUIRED)
 find_package(Qt5Xml REQUIRED)
 find_package(DFrameworkdbus REQUIRED)
 pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
+pkg_check_modules(PULSE REQUIRED libpulse)
 pkg_check_modules(LIBVLC REQUIRED libvlc)
 include_directories(${GSTREAMER_INCLUDE_DIRS})
+include_directories(${PULSE_INCLUDE_DIRS})
 include_directories(${LIBVLC_INCLUDE_DIRS})
 include_directories(${Qt5Gui_PRIVATE_INCLUDE_DIRS})
 include_directories(${Qt5Svg_INCLUDE_DIRS})
@@ -170,6 +172,7 @@ target_link_libraries(${APP_BIN_NAME}
     ${DtkCore_LIBRARIES}
     ${DFrameworkdbus_LIBRARIES}
     ${GSTREAMER_LIBRARIES}
+    ${PULSE_LIBRARIES}
     ${LIBVLC_LIBRARIES}
     Qt5::Core
     Qt5::Gui
