@@ -1,5 +1,5 @@
 // Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -19,6 +19,7 @@ public:
     bool modifyNoteTitle(const QString &title);
     //更新数据
     bool updateNote();
+    bool updateNoteTiptapEnvelope(const QString &envelopeJson);
     //添加记事项
     VNoteItem *addNote(VNoteItem &note);
     //获取记事项

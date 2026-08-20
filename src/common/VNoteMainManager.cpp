@@ -9,6 +9,7 @@
 #include "VNoteMainManager.h"
 #include "migrationviewcontroller.h"  // 升级进度界面控制器
 #include "tiptapchannelbridge.h"  // 正式 Tiptap QWebChannel 通道
+#include "migrationjsonbuilder.h"  // Tiptap 信封构造
 #include "jscontent.h"
 #include "webrichetextmanager.h"
 #include "setting.h"
@@ -697,6 +698,11 @@ void VNoteMainManager::doCreateNote(int folderId)
     VNoteItemOper noteOper;
     // Get default note name in the folder
     tmpNote.noteTitle = noteOper.getDefaultNoteName(tmpNote.folderId);
+
+    if (TiptapChannelBridge::instance()->debugEnabled()) {
+        tmpNote.htmlCode = "";
+        tmpNote.setMetadata(MigrationJsonBuilder::toCompactJson(MigrationJsonBuilder::makeEnvelope()));
+    }
 
     VNoteItem *newNote = noteOper.addNote(tmpNote);
     if (newNote == nullptr) {

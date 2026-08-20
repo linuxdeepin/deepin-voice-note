@@ -2,7 +2,7 @@
   SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
   SPDX-License-Identifier: GPL-3.0-or-later
 
-  TTP-022: Tiptap 运行时 HTML 入口。打包后 dist/tiptap-editor.html 自包含。
+  Tiptap 运行时 HTML 入口。打包后 dist/tiptap-editor.html 自包含。
   qwebchannel.js 由 Qt WebEngine 提供（qrc:///qtwebchannel/qwebchannel.js）。
 -->
 <!DOCTYPE html>
@@ -12,10 +12,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tiptap Editor</title>
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; }
+    html, body { margin: 0; padding: 0; height: 100%; cursor: text; }
     #toolbar-host { position: sticky; top: 0; z-index: 10; }
     #app { min-height: calc(100% - 36px); }
-    .ProseMirror { outline: none; min-height: 100%; }
+    .tiptap { min-height: 100%; }
+    .ProseMirror { box-sizing: border-box; outline: none; min-height: 100%; padding: 16px; cursor: text; }
   </style>
 </head>
 <body>
