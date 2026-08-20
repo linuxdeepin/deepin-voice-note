@@ -1,5 +1,5 @@
 // Copyright (C) 2019 ~ 2020 Uniontech Software Technology Co.,Ltd.
-// SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
+// SPDX-FileCopyrightText: 2023 - 2026 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -14,6 +14,7 @@
 #include "common/vnoteforlder.h"
 #include "common/vnotedatamanager.h"
 #include "db/dbvisitor.h"
+#include "legacyformatdetector.h"
 
 DWIDGET_USE_NAMESPACE
 
@@ -132,6 +133,37 @@ bool VNoteItemOper::updateNote()
     return isUpdateOK;
 }
 
+bool VNoteItemOper::updateNoteTiptapEnvelope(const QString &envelopeJson)
+{
+    qDebug() << "Updating note Tiptap envelope:" << (m_note ? m_note->noteTitle : "null");
+    bool isUpdateOK = true;
+
+    if (nullptr != m_note) {
+        QVariant oldMetaData = m_note->metaDataConstRef();
+        QDateTime oldModifyTime = m_note->modifyTime;
+
+        m_note->setMetadata(envelopeJson);
+        m_note->modifyTime = QDateTime::currentDateTime();
+
+        UpdateNoteDbVisitor updateNoteVisitor(
+            VNoteDbManager::instance()->getVNoteDb(), m_note, nullptr);
+
+        if (Q_UNLIKELY(!VNoteDbManager::instance()->updateData(&updateNoteVisitor))) {
+            qWarning() << "Failed to update Tiptap note:" << m_note->noteTitle;
+            m_note->setMetadata(oldMetaData);
+            m_note->modifyTime = oldModifyTime;
+            isUpdateOK = false;
+        } else {
+            qInfo() << "Successfully updated Tiptap note:" << m_note->noteTitle;
+        }
+    } else {
+        qWarning() << "Cannot update Tiptap envelope for null note";
+        isUpdateOK = false;
+    }
+
+    return isUpdateOK;
+}
+
 /**
  * @brief VNoteItemOper::addNote
  * @param note
@@ -154,7 +186,9 @@ VNoteItem *VNoteItemOper::addNote(VNoteItem &note)
     //Prepare meta data
     MetaDataParser metaParser;
     QVariant metaData;
-    metaParser.makeMetaData(&note, note.metaDataRef());
+    if (LegacyFormatDetector::detect(note.metaDataConstRef().toString()) != LegacyFormat::TiptapEnvelope) {
+        metaParser.makeMetaData(&note, note.metaDataRef());
+    }
 
     VNoteItem *newNote = new VNoteItem();
     AddNoteDbVisitor addNoteVisitor(VNoteDbManager::instance()->getVNoteDb(), &note, newNote);

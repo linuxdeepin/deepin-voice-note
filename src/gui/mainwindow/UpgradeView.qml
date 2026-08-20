@@ -9,13 +9,13 @@ import org.deepin.dtk 1.0
 
 import VNote 1.0
 
-// V-2402: 升级进度界面全屏覆盖层（回归单一 UpgradeView 身份）。
+// 升级进度界面全屏覆盖层（回归单一 UpgradeView 身份）。
 // 运行态忠实复刻老 QWidget UpgradeView 的视觉：DTK WaterProgressBar 复刻
 // DWaterProgress 水波动画 + tooltip 文案，布局对齐老 QWidget（水波居中、
 // tooltip 居中置于水波下方）。
 // 终态页布局策略：将"进入应用"按钮锚定到窗口底部可视区（位于 Flickable 之外），
 // 标题与路径信息放入按钮上方的 Flickable 中独立滚动。这样无论窗口几何如何
-// （含 V-2402 报告的小窗口场景），"进入应用"按钮始终可见且可点击，彻底消除
+// （含小窗口场景），"进入应用"按钮始终可见且可点击，彻底消除
 // 原先整页 Flickable 在小窗口下按钮被 clip 截断且不可滚动到达的困死症状。
 // 仅绑定计数/阶段/路径属性，不展示笔记正文/信封/meta_data/失败 note id 清单。
 Item {
@@ -61,7 +61,7 @@ Item {
 
     // 运行态：水波 + tooltip + 阶段 + 计数 + 取消按钮，整体居中。
     // 运行态内容高度有限（水波 80 + 文案数行 + 取消按钮），常规窗口可直接容纳，
-    // 不依赖滚动；V-2402 核心诉求在终态页，运行态布局保持居中复刻老 QWidget。
+    // 不依赖滚动；核心诉求在终态页，运行态布局保持居中复刻老 QWidget。
     ColumnLayout {
         id: runningColumn
         anchors.centerIn: parent
@@ -73,7 +73,7 @@ Item {
         // 对齐 src/gui/mainwindow/InitialInterface.qml 的 WaterProgressBar 写法：
         // 只用 value + visible（由父 runningColumn 的 visible 控制运行态显隐），
         // 不设 running——当前 DTK/QML 环境该属性不存在，设置会导致控件创建失败、
-        // 中断整个 QML 组件树加载（V-2402 r3 用户运行时实测根因）。
+        // 中断整个 QML 组件树加载（用户运行时实测根因）。
         WaterProgressBar {
             Layout.alignment: Qt.AlignHCenter
             Layout.preferredWidth: 80
@@ -112,7 +112,7 @@ Item {
         }
 
         // 取消按钮（运行态可见；cancelling 时置灰）。
-        // DTK Button（org.deepin.dtk 1.0），固定宽高保证可见可点（V-2402 r3 根因3）。
+        // DTK Button（org.deepin.dtk 1.0），固定宽高保证可见可点。
         Button {
             Layout.alignment: Qt.AlignHCenter
             width: 120
@@ -124,7 +124,7 @@ Item {
     }
 
     // 终态层：标题+路径放入 Flickable 独立滚动，"进入应用"按钮锚定窗口底部。
-    // 按钮位于 Flickable 之外，任何窗口几何下都恒可见可点（V-2402 核心诉求）。
+    // 按钮位于 Flickable 之外，任何窗口几何下都恒可见可点。
     Item {
         id: terminalLayer
         anchors.fill: parent
@@ -132,7 +132,7 @@ Item {
 
         // "进入应用"放行入口：锚定窗口底部居中，始终位于可视区内。
         // DTK RecommandButton（主操作 CTA，对齐 InitialInterface.qml 的主按钮写法），
-        // 固定宽高保证可见可点（V-2402 r3 根因3）。
+        // 固定宽高保证可见可点。
         RecommandButton {
             id: enterAppButton
             anchors.bottom: parent.bottom

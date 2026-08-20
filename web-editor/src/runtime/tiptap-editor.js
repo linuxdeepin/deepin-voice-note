@@ -38,6 +38,17 @@ if (typeof window !== 'undefined') {
 }
 const toolbar = createFormatToolbar(editor, document.getElementById('toolbar-host'))
 
+// 暴露聚焦接口：QML 侧把 WebEngineView 键盘焦点移入后调用，把光标放进 ProseMirror 编辑器
+window._dvnTiptapFocus = function () {
+  editor.commands.focus('end')
+}
+
+document.addEventListener('mousedown', function (event) {
+  if (!event.target.closest('.ProseMirror')) {
+    editor.commands.focus('end')
+  }
+})
+
 bindTiptapChannel(editor, undefined, {
   onFontList: (fonts, defaultFont) => toolbar.setFontList(fonts, defaultFont),
 }).then((bridge) => {

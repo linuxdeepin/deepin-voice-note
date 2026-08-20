@@ -7,6 +7,8 @@
 #include "metadataparser.h"
 #include "common/utils.h"
 #include "handler/voice_to_text_task_manager.h"
+#include "tiptapchannelbridge.h"
+#include "legacyformatdetector.h"
 
 #include <QTimer>
 #include <QEventLoop>
@@ -68,6 +70,16 @@ void WebRichTextManager::initConnect()
         emit scrollChange(isTop);
     });
     connect(JsContent::instance(), &JsContent::setDataFinsh, this, &WebRichTextManager::onSetDataFinsh);
+
+    connect(TiptapChannelBridge::instance(), &TiptapChannelBridge::contentChanged, this, [=](){
+        m_textChange = true;
+        m_textChangeNoteId = m_noteData ? m_noteData->noteId : -1;
+        ++m_textChangeSerial;
+        emit noteTextChanged();
+    });
+    connect(TiptapChannelBridge::instance(), &TiptapChannelBridge::contentSaved,
+            this, &WebRichTextManager::onTiptapContentSaved);
+
     qInfo() << "Connections initialized";
 }
 
@@ -80,6 +92,15 @@ void WebRichTextManager::setData(VNoteItem *data, const QString reg)
     }
     m_noteData = data;
     m_updateTimer->stop();
+
+    if (TiptapChannelBridge::instance()->debugEnabled()
+        && LegacyFormatDetector::detect(data->metaDataConstRef().toString()) == LegacyFormat::TiptapEnvelope) {
+        TiptapChannelBridge::instance()->loadEnvelope(data->metaDataConstRef().toString());
+        m_updateTimer->start();
+        emit updateSearch();
+        return;
+    }
+
     //设置富文本内容
     if (data->htmlCode.isEmpty()) {
         qDebug() << "Initializing with metadata";
@@ -194,6 +215,34 @@ void WebRichTextManager::onUpdateNoteWithResult(VNoteItem *data, const QString &
     m_updateRequestSerial = 0;
     emit finishedUpdateNote();
     qInfo() << "Note update with result finished";
+}
+
+void WebRichTextManager::onTiptapContentSaved(const QString &envelopeJson)
+{
+    qDebug() << "Saving Tiptap envelope content";
+    if (!m_noteData) {
+        qWarning() << "onTiptapContentSaved: null note data, skip";
+        m_updateInProgress = false;
+        m_updateRequestNoteId = -1;
+        m_updateRequestSerial = 0;
+        emit finishedUpdateNote();
+        return;
+    }
+    bool updateOk = VNoteItemOper(m_noteData).updateNoteTiptapEnvelope(envelopeJson);
+    if (!updateOk) {
+        qWarning() << "Failed to save Tiptap note";
+    } else {
+        qDebug() << "Tiptap note saved successfully";
+    }
+    if (updateOk && m_noteData->noteId == m_textChangeNoteId && m_updateRequestSerial == m_textChangeSerial) {
+        m_textChange = false;
+        m_textChangeNoteId = -1;
+    }
+    m_updateInProgress = false;
+    m_updateRequestNoteId = -1;
+    m_updateRequestSerial = 0;
+    emit finishedUpdateNote();
+    qInfo() << "Tiptap content saved finished";
 }
 
 void WebRichTextManager::insertVoiceItem(const QString &voicePath, qint64 voiceSize)

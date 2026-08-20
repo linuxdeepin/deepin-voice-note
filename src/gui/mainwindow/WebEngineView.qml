@@ -25,6 +25,7 @@ Item {
     property bool isVoiceToText: false
     property bool noSearchResult: false
     property bool webVisible: true
+    property bool summernoteVisible: true
     property alias titleBar: title
 
     Timer {
@@ -124,7 +125,17 @@ Item {
     }
 
     function focusWebView() {
-        webView.forceActiveFocus();
+        // Tiptap 调试模式下编辑器位于 tiptapLoader 加载的 sourceComponent，需经 tiptapLoader.item
+        // 跨 Loader 作用域访问 tiptapWebView；item 为 null（inactive/加载中）时跳过聚焦避免 TypeError。
+        // 否则保持原有 Summernote webView 聚焦逻辑。
+        if (TiptapChannel.debugEnabled) {
+            if (tiptapLoader.item) {
+                tiptapLoader.item.editor.forceActiveFocus();
+                tiptapLoader.item.editor.runJavaScript("window._dvnTiptapFocus && window._dvnTiptapFocus()");
+            }
+        } else {
+            webView.forceActiveFocus();
+        }
     }
 
     function showJsContextMenu() {
@@ -263,7 +274,7 @@ Item {
     function toggleMultCho(choices) {
         if (choices > 1) {
             webVisible = false;
-            webRect.visible = false;
+            summernoteVisible = false;
             if (!multipleChoicesLoader.active) {
                 multipleChoicesLoader.active = true;
             }
@@ -274,7 +285,7 @@ Item {
         } else {
             multipleChoicesLoader.visible = false;
             webVisible = true;
-            webRect.visible = true;
+            summernoteVisible = true;
             multipleChoicesLoader.item.visible = false;
         }
     }
@@ -282,7 +293,7 @@ Item {
     visible: true
 
     onNoSearchResultChanged: {
-        webRect.visible = !noSearchResult;
+        summernoteVisible = !noSearchResult;
     }
 
     ColumnLayout {
@@ -348,6 +359,7 @@ Item {
 
             Layout.fillHeight: true
             Layout.fillWidth: true
+            visible: summernoteVisible && !TiptapChannel.debugEnabled
             color: DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#242424"
 
             WebEngineView {
@@ -493,10 +505,12 @@ Item {
             id: tiptapLoader
 
             active: TiptapChannel.debugEnabled
-            anchors.fill: parent
             visible: active
+            Layout.fillHeight: true
+            Layout.fillWidth: true
 
             sourceComponent: Item {
+                property WebEngineView editor: tiptapWebView
                 anchors.fill: parent
 
                 WebEngineView {
@@ -513,6 +527,13 @@ Item {
                         tiptapWebChannel.registerObject("tiptapChannel", TiptapChannel);
                         tiptapWebView.webChannel = tiptapWebChannel;
                         tiptapWebView.url = Qt.resolvedUrl(TiptapChannel.tiptapHtmlPath());
+                    }
+
+                    onLoadingChanged: {
+                        if (loadRequest.status === WebEngineView.LoadSucceededStatus) {
+                            tiptapWebView.forceActiveFocus();
+                            tiptapWebView.runJavaScript("window._dvnTiptapFocus && window._dvnTiptapFocus()");
+                        }
                     }
 
                     onContextMenuRequested: req => {
@@ -861,9 +882,13 @@ Item {
 
         onNeedUpdateNote: function(noteId) {
             var requestNoteId = noteId;
-            webView.runJavaScript("getHtml()", function (result) {
-                VNoteMainManager.updateNoteWithResultForNote(requestNoteId, result);
-            });
+            if (TiptapChannel.debugEnabled) {
+                TiptapChannel.requestEditorContent();
+            } else {
+                webView.runJavaScript("getHtml()", function (result) {
+                    VNoteMainManager.updateNoteWithResultForNote(requestNoteId, result);
+                });
+            }
         }
         onScrollChange: isTop => {
             hasScroll = !isTop;

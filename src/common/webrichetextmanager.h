@@ -35,6 +35,8 @@ public slots:
 
     void onUpdateNoteWithResult(VNoteItem *data, const QString &result);
 
+    void onTiptapContentSaved(const QString &envelopeJson);
+
     void insertVoiceItem(const QString &voicePath, qint64 voiceSize);
 
 signals:
