@@ -116,16 +116,6 @@ list(REMOVE_ITEM VNOTE_SRC_TEST1
 
 list(REMOVE_ITEM VNOTE_SRC_TEST "${CMAKE_CURRENT_LIST_DIR}/../src/main.cpp")
 
-# 排除主程序 src/CMakeLists.txt 不编译的历史遗留文件
-# src 只扫描 ./importolddata/tiptapmigration，根目录下的旧升级代码未参与构建
-list(REMOVE_ITEM VNOTE_SRC_TEST
-    "${CMAKE_CURRENT_LIST_DIR}/../src/importolddata/olddataloadwokers.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/../src/importolddata/olddbvisistors.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/../src/importolddata/upgradedbutil.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/../src/importolddata/upgradeview.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/../src/importolddata/vnoteolddatamanager.cpp"
-)
-
 # 生成测试可执行程序
 add_executable(${PROJECT_NAME_TEST}
     ${VNOTE_SRC_TEST}

@@ -14,7 +14,7 @@
 // TTP-021: 升级进度界面控制器（QML 单例）。
 //
 // 消费 TTP-020 编排层信号（progressChanged/stageChanged/terminalInfo/aborted），
-// 映射为 QML 只读属性供 MigrationProgressView 绑定；提供取消入口与终态放行入口。
+// 映射为 QML 只读属性供 UpgradeView 绑定；提供取消入口与终态放行入口。
 // 仅消费信号，不跨线程调 progressSnapshot()（M1），不反向控制迁移内部逻辑。
 //
 // 生命周期：start() 由 main.cpp 在 DB 就绪后单行调用；编排器由 startIfNeeded() 返回，
