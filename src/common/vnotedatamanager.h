@@ -36,6 +36,8 @@ public:
     void reqNoteFolders();
     //加载记事项数据
     void reqNoteItems();
+    // 迁移完成后重新从数据库加载全部数据
+    void reloadAllData();
 signals:
     //记事本数据加载完成
     void noteFoldersLoaded();

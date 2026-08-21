@@ -73,6 +73,7 @@ signals:
     void backupPathChanged();
     void reportPathChanged();
     void cancellingChanged();
+    void appEntered();
 
 private:
     explicit MigrationViewController(QObject *parent = nullptr);

@@ -119,6 +119,18 @@ void VNoteMainManager::initData()
     qInfo() << "Data initialization finished";
 }
 
+void VNoteMainManager::reloadAfterMigration()
+{
+    qInfo() << "Reloading UI data after migration";
+    m_currentFolderIndex = -1;
+    m_currentNoteId = -1;
+    m_currentHasTop = 0;
+    m_noteItems.clear();
+    if (m_richTextManager)
+        m_richTextManager->initData(nullptr, QString());
+    VNoteDataManager::instance()->reloadAllData();
+}
+
 void VNoteMainManager::initConnections()
 {
     qInfo() << "Initializing connections";

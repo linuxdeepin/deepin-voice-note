@@ -79,6 +79,7 @@ public:
     Q_INVOKABLE QString getSavedTextPath();
     Q_INVOKABLE QString getSavedVoicePath();
     Q_INVOKABLE void saveUserSelectedPath(const QString &path, const SaveAsType type);
+    Q_INVOKABLE void reloadAfterMigration();
 
     /**
      * @brief 获取当前笔记 ID
