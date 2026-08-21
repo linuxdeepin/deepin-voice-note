@@ -1,6 +1,6 @@
 elements:
   新建记事本:
-    name: 新建记事本
+    name: CreateFolderButton
     role: button
   记事本1:
     name: 记事本1

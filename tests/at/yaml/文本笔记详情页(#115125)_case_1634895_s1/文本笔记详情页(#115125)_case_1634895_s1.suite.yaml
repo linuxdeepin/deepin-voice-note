@@ -17,17 +17,12 @@ suites:
   description: ''
   tags: []
   steps:
-  - action: element_action
-    selector:
-      name: 新建记事本
-      role: button
-    do: click
   - action: dtk_context_menu
     selector:
       name: 记事本1
       role: label
     items:
-    - 新建笔记
+    - NewNoteFromFolderMenuItem
   - action: keyboard_type
     text: 测试内容
   - action: keyboard_press
@@ -35,5 +30,5 @@ suites:
   assert_steps:
   - action: assert_element
     selector:
-      name: 新建记事本
+      name: CreateFolderButton
       role: button

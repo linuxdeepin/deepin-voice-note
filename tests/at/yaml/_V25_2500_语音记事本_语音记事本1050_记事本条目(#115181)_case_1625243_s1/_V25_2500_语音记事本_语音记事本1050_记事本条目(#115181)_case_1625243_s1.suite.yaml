@@ -19,7 +19,7 @@ suites:
   steps:
   - action: element_action
     selector:
-      name: 新建记事本
+      name: CreateFolderButton
       role: button
     do: click
   - action: keyboard_hot_key
@@ -27,13 +27,13 @@ suites:
   assert_steps:
   - action: assert_element
     selector:
-      name: 新建记事本
+      name: CreateFolderButton
       role: button
   - action: assert_element
     selector:
-      name: 新建记事本
+      name: CreateFolderButton
       role: button
   - action: assert_element
     selector:
-      name: 新建记事本
+      name: CreateFolderButton
       role: button
