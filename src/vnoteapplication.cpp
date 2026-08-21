@@ -25,6 +25,7 @@ VNoteApplication::VNoteApplication(int &argc, char **argv)
     : DApplication(argc, argv)
 {
     connect(DGuiApplicationHelper::instance(), &DGuiApplicationHelper::newProcessInstance, this, &VNoteApplication::onNewProcessInstance);
+    connect(qApp, &QCoreApplication::aboutToQuit, this, &VNoteApplication::onAboutToQuit);
 }
 
 /**
@@ -131,4 +132,12 @@ void VNoteApplication::handleQuitAction()
 {
     QEvent event(QEvent::Close);
     DApplication::sendEvent(mainWindow(), &event);
+}
+
+void VNoteApplication::onAboutToQuit()
+{
+    if (m_qspMainWnd) {
+        m_qspMainWnd.reset();
+        processEvents();
+    }
 }

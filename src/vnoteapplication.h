@@ -34,6 +34,10 @@ public slots:
     //进程单例处理
     void onNewProcessInstance(qint64 pid, const QStringList &arguments);
 
+private slots:
+    //应用退出前清理WebEngine等资源
+    void onAboutToQuit();
+
 protected:
     //重写标题栏退出事件
     virtual void handleQuitAction() override;
