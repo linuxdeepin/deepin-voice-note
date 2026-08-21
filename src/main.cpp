@@ -8,9 +8,10 @@
 #include "common/jscontent.h"
 #include "common/imageprovider.h"
 #include "common/vtextspeechandtrmanager.h"
+#include "common/tiptapchannelbridge.h"
 
-#include "importolddata/dbmigration/migrationorchestrator.h"  // TTP-020 后台全量迁移任务编排层
-#include "common/migrationviewcontroller.h"  // TTP-021 升级进度界面控制器
+#include "importolddata/dbmigration/migrationorchestrator.h"
+#include "common/migrationviewcontroller.h"
 #include "config.h"
 
 #include <QQmlApplicationEngine>
@@ -139,9 +140,13 @@ int main(int argc, char *argv[])
     VNoteMainManager::instance()->initNote();
     qInfo() << "Note manager initialized";
 
-    // TTP-020: DB 就绪后单行启动后台 Tiptap 全量迁移任务（两套状态独立，不干扰旧库升级）。
-    // TTP-021: 通过升级进度界面控制器启动迁移（内部拉起 TTP-020 编排器并消费进度/终态信号）。
-    MigrationViewController::instance()->start();
+    // Tiptap 数据迁移仍处于调试验证阶段，只允许在 DVN_TIPTAP_DEBUG=1 下启动。
+    // 未开启调试开关时，禁止展示迁移页、备份、扫描或写回 Summernote 数据。
+    if (TiptapChannelBridge::instance()->debugEnabled()) {
+        MigrationViewController::instance()->start();
+    } else {
+        qInfo() << "Tiptap migration skipped because DVN_TIPTAP_DEBUG is not set";
+    }
 
     DLogManager::registerConsoleAppender();
     DLogManager::registerFileAppender();

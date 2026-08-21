@@ -3,6 +3,8 @@
 
 #include "migrationviewcontroller.h"
 
+#include "tiptapchannelbridge.h"
+
 #include <QLoggingCategory>
 
 namespace {
@@ -26,6 +28,13 @@ void MigrationViewController::start()
     // 否则后台线程 emit 的进度/阶段/终态信号无法跨线程队列投递。
     qRegisterMetaType<MigrationOrchestrator::ProgressSnapshot>();
     qRegisterMetaType<MigrationState>();
+
+    if (!TiptapChannelBridge::instance()->debugEnabled()) {
+        qCInfo(lcMigrationView) << "start: Tiptap migration disabled by environment";
+        setMigrationActive(false);
+        setTerminalState(QString());
+        return;
+    }
 
     if (m_orchestrator || m_migrationActive) {
         qCInfo(lcMigrationView) << "start: migration already in progress, ignore";
