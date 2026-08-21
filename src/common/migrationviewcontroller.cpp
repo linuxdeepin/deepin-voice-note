@@ -81,6 +81,7 @@ void MigrationViewController::enterApp()
     setReportPath(QString());
     setMigrationActive(false);
     releaseOrchestrator();
+    emit appEntered();
 }
 
 void MigrationViewController::onProgressChanged(const MigrationOrchestrator::ProgressSnapshot &snapshot)

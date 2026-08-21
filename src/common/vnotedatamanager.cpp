@@ -439,7 +439,7 @@ void VNoteDataManager::reqNoteDefIcons()
 void VNoteDataManager::reqNoteFolders()
 {
     qDebug() << "Requesting note folders";
-    if (m_pNotesLoadThread == nullptr) {
+    if (m_pForldesLoadThread == nullptr) {
         m_pForldesLoadThread = new LoadFolderWorker();
         m_pForldesLoadThread->setAutoDelete(true);
 
@@ -471,6 +471,14 @@ void VNoteDataManager::reqNoteItems()
     } else {
         qDebug() << "Note items load already in progress";
     }
+}
+
+void VNoteDataManager::reloadAllData()
+{
+    qInfo() << "Reloading all note data";
+    m_fDataState = DataState::DataNotLoaded;
+    reqNoteFolders();
+    reqNoteItems();
 }
 
 /**

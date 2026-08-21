@@ -280,6 +280,22 @@ ApplicationWindow {
     }
 
     Connections {
+        target: MigrationViewController
+
+        function onAppEntered() {
+            folderListView.model.clear();
+            itemListView.model.clear();
+            itemListView.selectedNoteItem = [];
+            itemListView.selectSize = 0;
+            itemListView.changeCurrentIndex(-1);
+            label.text = "";
+            initRect.visible = false;
+            webEngineView.webVisible = false;
+            VNoteMainManager.reloadAfterMigration();
+        }
+    }
+
+    Connections {
         function handleFinishedFolderLoad(foldersData) {
             for (var i = 0; i < foldersData.length; i++) {
                 folderListView.model.append({
