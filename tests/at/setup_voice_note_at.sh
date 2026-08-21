@@ -44,8 +44,32 @@ wait_for_schema()
 
 seed_default_notebook()
 {
-    sqlite3 "${DB_PATH}" \
-        "INSERT INTO vnote_folder_tbl(category_id, folder_name, default_icon, folder_state, max_noteid) VALUES(0, '记事本1', 0, 0, 0);"
+    sqlite3 "${DB_PATH}" <<'SQL'
+INSERT INTO vnote_folder_tbl(
+    folder_id,
+    category_id,
+    folder_name,
+    default_icon,
+    folder_state,
+    max_noteid
+) VALUES(1, 0, '记事本1', 0, 0, 1);
+
+INSERT INTO vnote_items_tbl(
+    note_id,
+    folder_id,
+    note_type,
+    note_title,
+    meta_data,
+    note_state
+) VALUES(
+    1,
+    1,
+    0,
+    '文本',
+    '{"htmlCode":"<p><br></p>"}',
+    0
+);
+SQL
 }
 
 stop_app

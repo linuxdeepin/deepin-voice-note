@@ -19,11 +19,11 @@ suites:
   steps:
   - action: element_action
     selector:
-      name: 新建记事本
+      name: CreateFolderButton
       role: button
     do: click
   assert_steps:
   - action: assert_element
     selector:
-      name: 新建记事本
+      name: CreateFolderButton
       role: button

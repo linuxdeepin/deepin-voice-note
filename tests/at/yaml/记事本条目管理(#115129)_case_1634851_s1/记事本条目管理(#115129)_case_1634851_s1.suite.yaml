@@ -19,12 +19,7 @@ suites:
   steps:
   - action: element_action
     selector:
-      name: 新建记事本
-      role: button
-    do: click
-  - action: element_action
-    selector:
-      name: 新建记事本
+      name: CreateFolderButton
       role: button
     do: click
   - action: dtk_context_menu
@@ -32,7 +27,7 @@ suites:
       name: 记事本1
       role: label
     items:
-    - 重命名
+    - RenameMenuItem
   - action: keyboard_type
     text: 记事本1
   - action: keyboard_press
