@@ -691,8 +691,8 @@ void VNoteMainWindow::onVNoteSearch()
                 m_richTextEdit->searchText(m_searchKey);
             } else {
                 m_searchKey = text;
-                //重新搜索之前先更新笔记内容
-                m_richTextEdit->updateNote();
+                //G1：重新搜索之前先同步更新笔记内容，确保最新编辑进入搜索
+                m_richTextEdit->updateNoteSync();
                 //重新搜索
                 loadSearchNotes(m_searchKey);
             }
@@ -1221,8 +1221,8 @@ void VNoteMainWindow::onMenuAbout2Show()
     QAction *topAction = ActionManager::Instance()->getActionById(ActionManager::NoteTop);
 
     if (menu == ActionManager::Instance()->noteContextMenu()) {
-        //右键弹出先更新数据，避免数据不同步
-        m_richTextEdit->updateNote();
+        //G2：右键弹出先同步更新数据，避免数据不同步
+        m_richTextEdit->updateNoteSync();
 
         bool notMultipleSelected = !m_middleView->isMultipleSelected();
         ActionManager::Instance()->visibleAction(ActionManager::NoteTop, notMultipleSelected);
@@ -1904,7 +1904,8 @@ void VNoteMainWindow::release()
     if (VTextSpeechAndTrManager::Success != stopStatus) {
         qWarning() << "Stop text to speech failed with status:" << stopStatus;
     }
-    m_richTextEdit->updateNote();
+    //S1：退出路径改调同步保存，防止异步回调因事件循环停止而丢失最后一段编辑
+    m_richTextEdit->updateNoteSync();
 
     if (stateOperation->isVoice2Text()) {
         QScopedPointer<VNoteA2TManager> releaseA2TManger(m_a2tManager);

@@ -157,7 +157,7 @@ void WebRichTextEditor::initRightMenu()
 void WebRichTextEditor::initUpdateTimer()
 {
     m_updateTimer = new QTimer(this);
-    m_updateTimer->setInterval(1000);
+    m_updateTimer->setInterval(1500);
     connect(m_updateTimer, &QTimer::timeout, this, &WebRichTextEditor::updateNote);
 }
 
@@ -196,18 +196,63 @@ void WebRichTextEditor::insertVoiceItem(const QString &voicePath, qint64 voiceSi
 
 void WebRichTextEditor::updateNote()
 {
-    if (m_noteData) {
-        if (m_textChange) {
-            QVariant result = JsContent::instance()->callJsSynchronous(page(), QString("getHtml()"));
-            if (result.isValid()) {
-                m_noteData->htmlCode = result.toString();
-                VNoteItemOper noteOps(m_noteData);
+    if (m_noteData && m_textChange && !m_updateInProgress) {
+        //巨量内容下降低保存频率：跳过非紧急定时保存，每3次触发保存1次
+        //笔记切换/解绑仍走updateNoteSync确保数据不丢
+        static const int kLargeContentThreshold = 500 * 1024; //500KB
+        if (m_noteData->htmlCode.size() > kLargeContentThreshold) {
+            m_largeContentSkipCount++;
+            if (m_largeContentSkipCount < 3) {
+                return;
+            }
+            m_largeContentSkipCount = 0;
+        }
+        //异步获取HTML，避免QEventLoop::exec()同步阻塞主线程导致巨量内容下UI卡死
+        m_updateInProgress = true;
+        m_textChange = false;
+        VNoteItem *noteData = m_noteData;
+        int generation = ++m_updateGeneration;
+        page()->runJavaScript("getHtml()", [this, noteData, generation](const QVariant &result) {
+            m_updateInProgress = false;
+            //仅当代际匹配时才写入，避免笔记切换后过时回调将新笔记内容写入旧笔记
+            if (generation == m_updateGeneration && result.isValid()) {
+                noteData->htmlCode = result.toString();
+                VNoteItemOper noteOps(noteData);
                 if (!noteOps.updateNote()) {
                     qInfo() << "Save note error";
                 }
             }
-            m_textChange = false;
+        });
+        //G3：回调未触发时（页面错误/导航）的超时兜底，防止m_updateInProgress永久阻断定时器保存
+        QTimer::singleShot(5000, this, [this]() {
+            if (m_updateInProgress) {
+                m_updateInProgress = false;
+                m_textChange = true;
+            }
+        });
+    }
+}
+
+void WebRichTextEditor::updateNoteSync()
+{
+    //同步保存，用于笔记切换/解绑等需确保保存完成后再更换数据的场景
+    //S2：当异步保存进行中时也必须同步保存，否则切换笔记时m_textChange已被异步侧清零
+    //导致跳过保存，而未触发的异步回调随后将新笔记DOM内容写入旧noteData
+    if (m_noteData && (m_textChange || m_updateInProgress)) {
+        if (m_updateInProgress) {
+            //使过时的异步回调失效，防止其将切换后的新内容写入旧笔记
+            m_updateGeneration++;
+            m_updateInProgress = false;
         }
+        QVariant result = JsContent::instance()->callJsSynchronous(page(), QString("getHtml()"));
+        if (result.isValid()) {
+            m_noteData->htmlCode = result.toString();
+            VNoteItemOper noteOps(m_noteData);
+            if (!noteOps.updateNote()) {
+                qInfo() << "Save note error";
+            }
+        }
+        m_textChange = false;
     }
 }
 
@@ -224,8 +269,8 @@ void WebRichTextEditor::unboundCurrentNoteData()
 {
     //停止更新定时器
     m_updateTimer->stop();
-    //手动更新
-    updateNote();
+    //手动同步更新，确保保存完成后再解绑数据
+    updateNoteSync();
     //绑定数据设置为空
     m_noteData = nullptr;
 }
@@ -747,7 +792,7 @@ void WebRichTextEditor::setData(VNoteItem *data, const QString &reg)
     if (nullptr == data) {
         this->setVisible(false);
         //无数据时先保存之前数据
-        updateNote();
+        updateNoteSync();
         //解绑当前数据
         unboundCurrentNoteData();
         return;
@@ -758,7 +803,9 @@ void WebRichTextEditor::setData(VNoteItem *data, const QString &reg)
     m_searchKey = reg;
     if (m_noteData != data || reSet) { //笔记切换或清除搜索结果时设置笔记内容
         m_updateTimer->stop();
-        updateNote();
+        updateNoteSync();
+        //T2：切换笔记时复位巨量内容跳过计数器
+        m_largeContentSkipCount = 0;
         m_noteData = data;
         if (m_loadFinshSign) {
             if (data->htmlCode.isEmpty()) {

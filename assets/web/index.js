@@ -221,8 +221,11 @@ function initSummernote() {
 
 
 
+//防抖计时器，连续输入期间不重复通知后台置脏
+var txtChangeDebounceTimer = null;
+
 /**
- * 通知后台存储页面内容
+ * 通知后台存储页面内容（jsCallTxtChange 已加 400ms 防抖）
  * @date 2021-08-19
  * @param {any} we
  * @param {any} contents
@@ -239,7 +242,14 @@ function changeContent(we, contents, $editable) {
                 $('#summernote').summernote('airPopover.hide')
             }
         }
-        webobj.jsCallTxtChange();
+        //对 jsCallTxtChange 包一层 400ms 防抖，连续输入期间不重复置脏
+        if (txtChangeDebounceTimer) {
+            clearTimeout(txtChangeDebounceTimer);
+        }
+        txtChangeDebounceTimer = setTimeout(function () {
+            txtChangeDebounceTimer = null;
+            webobj.jsCallTxtChange();
+        }, 400);
     }
 }
 
@@ -524,11 +534,13 @@ $('body').on('click', '.voicebtn', function (e) {
 //获取整个处理后Html串,去除所有标签中临时状态
 function getHtml() {
     var $cloneCode = $('.note-editable').clone();
+    //合并多轮 find 遍历，降低单次序列化成本
     $cloneCode.find('.li').removeClass('active');
-    $cloneCode.find('.voicebtn').removeClass('pause').addClass('play');
-    $cloneCode.find('.voicebtn').removeClass('now');
-    $cloneCode.find('.wifi-circle').removeClass('first').removeClass('second').removeClass('third').removeClass('four').removeClass('fifth').removeClass('sixth').removeClass('seventh');
-    $cloneCode.find('.translate').html("")
+    //voicebtn 合并为单次遍历：移除 pause/now 临时态并恢复 play
+    $cloneCode.find('.voicebtn').removeClass('pause now').addClass('play');
+    //wifi-circle 一次性移除全部动画临时类
+    $cloneCode.find('.wifi-circle').removeClass('first second third four fifth sixth seventh');
+    $cloneCode.find('.translate').html("");
     // 确保图片保存为相对路径
     $cloneCode.find('img').each(function () {
         var $img = $(this);
@@ -570,15 +582,20 @@ function getHtml() {
         }
     });
     // 清理格式切换产生的零宽空格锚点
-    $cloneCode.find('*').addBack().contents().filter(function() {
-        if (this.nodeType === 3 && /​/.test(this.textContent)) {
-            this.textContent = this.textContent.replace(/​/g, '');
-            if (this.textContent === '') {
-                this.parentNode.removeChild(this);
+    //先检查是否含零宽空格，避免对巨量无 ZWS 内容做全节点遍历
+    var html = $cloneCode[0].innerHTML;
+    if (html.indexOf('\u200b') >= 0) {
+        $cloneCode.find('*').addBack().contents().filter(function() {
+            if (this.nodeType === 3 && /\u200b/.test(this.textContent)) {
+                this.textContent = this.textContent.replace(/\u200b/g, '');
+                if (this.textContent === '') {
+                    this.parentNode.removeChild(this);
+                }
             }
-        }
-    });
-    return $cloneCode[0].innerHTML;
+        });
+        html = $cloneCode[0].innerHTML;
+    }
+    return html;
 }
 
 //获取当前所有的语音列表
@@ -780,6 +797,11 @@ function toggleState(state) {
 function setHtml(html) {
     if (html == '<p></p>') {
         html = '<p><br></p>'
+    }
+    //T1：笔记切换时清理防抖定时器，防止挂起的jsCallTxtChange在新笔记上下文中误触发
+    if (txtChangeDebounceTimer) {
+        clearTimeout(txtChangeDebounceTimer);
+        txtChangeDebounceTimer = null;
     }
     initFinish = false;
     $('#summernote').summernote('code', html);

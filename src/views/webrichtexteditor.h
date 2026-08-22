@@ -61,6 +61,10 @@ public:
      */
     void updateNote();
     /**
+     * @brief 同步更新编辑区内容（用于笔记切换/解绑等需确保保存完成的场景）
+     */
+    void updateNoteSync();
+    /**
      * @brief 搜索当前笔记
      * @param searchKey : 搜索关键字
      */
@@ -234,6 +238,9 @@ private:
     VNoteItem *m_noteData {nullptr};
     QTimer *m_updateTimer {nullptr};
     bool m_textChange {false};
+    bool m_updateInProgress {false}; //异步保存进行中标志
+    int m_updateGeneration {0}; //异步保存代际计数器，用于使过时回调失效
+    int m_largeContentSkipCount {0}; //巨量内容下跳过非紧急保存的计数器
     QString m_searchKey {""};
     Menu m_menuType = MaxMenu;
     QVariant m_menuJson = {};
