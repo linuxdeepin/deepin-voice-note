@@ -52,7 +52,7 @@ public:
     // 读 DVN_TIPTAP_DEBUG 环境变量，便于 QA 与 GTest
     Q_INVOKABLE bool debugEnabled() const;
 
-    // 返回 Tiptap 运行时 HTML 路径（首选 qrc，install 回退 file://）
+    // 返回 Tiptap 运行时 HTML 路径（首选 file://，资源缺失时回退 qrc）
     Q_INVOKABLE QString tiptapHtmlPath() const;
 
     // 返回宿主资源根 URL（file:// + WEB_PATH 或 TIPTAP_WEB_PATH），

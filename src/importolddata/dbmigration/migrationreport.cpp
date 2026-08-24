@@ -35,6 +35,7 @@ const QSet<QString> &extraDowngradeCodes()
         kCodeDangerousHtmlAttribute,
         kCodeMissingHtmlImageSrc,
         kCodeUnsafeHtmlImageSrc,
+        kCodeFileImageOutsideImagesDir,
         QStringLiteral("skipped-non-text-block")
     };
     return codes;

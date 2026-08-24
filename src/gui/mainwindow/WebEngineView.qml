@@ -523,13 +523,15 @@ Item {
                     backgroundColor: DTK.themeType === ApplicationHelper.LightType ? "white" : "black"
                     visible: true
 
+                    settings.localContentCanAccessFileUrls: true
+
                     Component.onCompleted: {
                         tiptapWebChannel.registerObject("tiptapChannel", TiptapChannel);
                         tiptapWebView.webChannel = tiptapWebChannel;
                         tiptapWebView.url = Qt.resolvedUrl(TiptapChannel.tiptapHtmlPath());
                     }
 
-                    onLoadingChanged: {
+                    onLoadingChanged: function(loadRequest) {
                         if (loadRequest.status === WebEngineView.LoadSucceededStatus) {
                             tiptapWebView.forceActiveFocus();
                             tiptapWebView.runJavaScript("window._dvnTiptapFocus && window._dvnTiptapFocus()");

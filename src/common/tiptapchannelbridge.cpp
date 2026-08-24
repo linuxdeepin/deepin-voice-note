@@ -78,11 +78,13 @@ bool TiptapChannelBridge::debugEnabled() const
 
 QString TiptapChannelBridge::tiptapHtmlPath() const
 {
-    // 首选 qrc 资源路径；若 qrc 不存在则回退 install 目录
-    if (QResource(":/tiptap-editor.html").isValid()) {
-        return QStringLiteral("qrc:/tiptap-editor.html");
+    // Tiptap needs to resolve AppData images through file:// URLs. Loading the
+    // editor itself from file:// keeps the page in QtWebEngine's local-file path.
+    const QString filePath = QStringLiteral(TIPTAP_WEB_PATH "/tiptap-editor.html");
+    if (QFile::exists(filePath)) {
+        return QUrl::fromLocalFile(filePath).toString();
     }
-    return QStringLiteral("file://" TIPTAP_WEB_PATH "/tiptap-editor.html");
+    return QStringLiteral("qrc:/tiptap-editor.html");
 }
 
 QString TiptapChannelBridge::resourceBaseUrl() const

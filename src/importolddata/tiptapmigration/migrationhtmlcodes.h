@@ -19,6 +19,7 @@ inline const QString kCodeDowngradedInlineVoicebox = QStringLiteral("downgraded-
 inline const QString kCodeDowngradedOrphanListItem = QStringLiteral("downgraded-orphan-list-item");
 inline const QString kCodeDowngradedBase64Image = QStringLiteral("downgraded-base64-image");
 inline const QString kCodeMissingHtmlImageSrc = QStringLiteral("missing-html-image-src");
+inline const QString kCodeFileImageOutsideImagesDir = QStringLiteral("file-image-outside-images-dir");
 inline const QString kCodeUnsafeHtmlImageSrc = QStringLiteral("unsafe-html-image-src");
 inline const QString kCodeUnsupportedHtmlStyle = QStringLiteral("unsupported-html-style");
 inline const QString kCodeInvalidHtmlStyleValue = QStringLiteral("invalid-html-style-value");
