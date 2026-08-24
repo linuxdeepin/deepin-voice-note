@@ -5,8 +5,15 @@
 
 #include "webrichetextmanager.h"
 #include "vnoteitem.h"
+#include "tiptapchannelbridge.h"
 
 #include <gtest/gtest.h>
+
+#include <QDir>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QSignalSpy>
+#include <QStandardPaths>
 
 TEST(WebRichTextManagerUT, lifecycle)
 {
@@ -59,4 +66,32 @@ TEST(WebRichTextManagerUT, insertVoiceItem)
     WebRichTextManager w;
     w.insertVoiceItem("/tmp/voice-ut.wav", 1000);
     SUCCEED();
+}
+
+TEST(WebRichTextManagerUT, insertVoiceItemUsesTiptapBridgeWhenDebugEnabled)
+{
+    const QByteArray oldDebug = qgetenv("DVN_TIPTAP_DEBUG");
+    qputenv("DVN_TIPTAP_DEBUG", "1");
+
+    const QString appData = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    const QString voicePath = QDir(appData).filePath(QStringLiteral("voicenote/voice-tiptap-ut.wav"));
+
+    QSignalSpy spy(TiptapChannelBridge::instance(), &TiptapChannelBridge::insertVoiceBlock);
+    WebRichTextManager w;
+    w.insertVoiceItem(voicePath, 2345);
+
+    ASSERT_EQ(1, spy.count());
+    const QString voiceInfoJson = spy.takeFirst().at(0).toString();
+    const QJsonObject voiceInfo = QJsonDocument::fromJson(voiceInfoJson.toUtf8()).object();
+    EXPECT_EQ(2, voiceInfo.value(QStringLiteral("type")).toInt());
+    EXPECT_FALSE(voiceInfo.value(QStringLiteral("voiceId")).toString().isEmpty());
+    EXPECT_EQ(QStringLiteral("voicenote/voice-tiptap-ut.wav"), voiceInfo.value(QStringLiteral("voicePath")).toString());
+    EXPECT_EQ(2345, voiceInfo.value(QStringLiteral("voiceSize")).toInt());
+    EXPECT_FALSE(voiceInfo.value(QStringLiteral("title")).toString().isEmpty());
+
+    if (oldDebug.isEmpty()) {
+        qunsetenv("DVN_TIPTAP_DEBUG");
+    } else {
+        qputenv("DVN_TIPTAP_DEBUG", oldDebug);
+    }
 }

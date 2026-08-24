@@ -7,6 +7,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { Window } from 'happy-dom'
 import { Editor } from '@tiptap/core'
+import { NodeSelection } from '@tiptap/pm/state'
 import { createTiptapExtensions } from '../src/runtime/tiptap-extensions.js'
 import {
   createEmptyDoc,
@@ -321,7 +322,7 @@ test('bindTiptapChannel: insertImage failed reports reason', async () => {
   editor.destroy()
 })
 
-test('bindTiptapChannel: insertVoiceBlock success inserts voiceBlock node', async () => {
+test('bindTiptapChannel: insertVoiceBlock success inserts voiceBlock node with legacy spacing', async () => {
   const { editor } = createEditor()
   const { bridge, calls, emit } = createMockBridge()
   const factory = createMockChannelFactory(bridge)
@@ -335,11 +336,78 @@ test('bindTiptapChannel: insertVoiceBlock success inserts voiceBlock node', asyn
   }))
 
   const json = editor.getJSON()
+  assert.deepEqual(json.content.map(n => n.type), ['paragraph', 'voiceBlock', 'paragraph'])
   const voiceNode = json.content.find(n => n.type === 'voiceBlock')
   assert.ok(voiceNode, 'voiceBlock node should be inserted')
   assert.equal(voiceNode.attrs.voiceId, 'v1')
   assert.ok(voiceNode.attrs.voicePath.includes('voice/v1.wav'))
   assert.equal(voiceNode.attrs.voiceSize, 1024)
+  assert.equal(editor.state.selection.from, 4)
+  assert.equal(editor.state.selection.to, 4)
+  assert.equal(calls.insertVoiceBlockFailed, undefined)
+  editor.destroy()
+})
+
+test('bindTiptapChannel: insertVoiceBlock keeps one empty paragraph between voice blocks and moves cursor after insertion', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'voiceBlock', attrs: { voiceId: 'v1', voicePath: 'voice/v1.wav', voiceSize: 1000 } },
+      { type: 'paragraph' },
+    ],
+  })
+  editor.commands.setTextSelection(2)
+
+  await bindTiptapChannel(editor, factory)
+
+  emit('insertVoiceBlock', JSON.stringify({
+    voiceId: 'v2',
+    voicePath: 'voice/v2.wav',
+    voiceSize: 1024,
+  }))
+
+  const json = editor.getJSON()
+  assert.deepEqual(json.content.map(n => n.type), ['voiceBlock', 'paragraph', 'voiceBlock', 'paragraph'])
+  assert.equal(json.content[0].attrs.voiceId, 'v1')
+  assert.equal(json.content[2].attrs.voiceId, 'v2')
+  assert.equal(editor.state.selection.from, 5)
+  assert.equal(editor.state.selection.to, 5)
+  assert.equal(calls.insertVoiceBlockFailed, undefined)
+  editor.destroy()
+})
+
+test('bindTiptapChannel: insertVoiceBlock appends after selected voiceBlock without replacing it', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'voiceBlock', attrs: { voiceId: 'v1', voicePath: 'voice/v1.wav', voiceSize: 1000 } },
+      { type: 'paragraph' },
+    ],
+  })
+  editor.view.dispatch(editor.state.tr.setSelection(NodeSelection.create(editor.state.doc, 0)))
+
+  await bindTiptapChannel(editor, factory)
+
+  emit('insertVoiceBlock', JSON.stringify({
+    voiceId: 'v2',
+    voicePath: 'voice/v2.wav',
+    voiceSize: 1024,
+  }))
+
+  const json = editor.getJSON()
+  assert.deepEqual(json.content.map(n => n.type), ['voiceBlock', 'paragraph', 'voiceBlock', 'paragraph'])
+  assert.equal(json.content[0].attrs.voiceId, 'v1')
+  assert.equal(json.content[2].attrs.voiceId, 'v2')
+  assert.equal(editor.state.selection.from, 5)
+  assert.equal(editor.state.selection.to, 5)
   assert.equal(calls.insertVoiceBlockFailed, undefined)
   editor.destroy()
 })

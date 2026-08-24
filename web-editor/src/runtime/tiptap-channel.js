@@ -197,6 +197,76 @@ function colorWithAlpha(color, alpha, fallback) {
   return fallback
 }
 
+
+function isEmptyParagraphNode(node) {
+  return !!node && node.type?.name === 'paragraph' && node.content.size === 0
+}
+
+function findInsertedVoiceBlockPosition(editor, voiceId) {
+  let found = null
+  editor.state.doc.descendants((node, pos) => {
+    if (node.type?.name === 'voiceBlock' && node.attrs?.voiceId === voiceId) {
+      found = { pos, node }
+      return false
+    }
+    return true
+  })
+  return found
+}
+
+function resolveVoiceInsertPosition(editor) {
+  const { selection } = editor.state
+
+  // Legacy Summernote inserts a newly recorded voice after the active voice box
+  // instead of replacing it.  Tiptap uses a NodeSelection for selected atom
+  // nodes, so move the insertion point into the following blank paragraph when
+  // one already exists; inserting the legacy triplet there preserves exactly one
+  // empty line between two voice blocks.
+  if (selection.node?.type?.name === 'voiceBlock') {
+    const $after = selection.$to
+    const nextNode = $after.nodeAfter
+    if (isEmptyParagraphNode(nextNode)) {
+      return selection.to + 1
+    }
+    return selection.to
+  }
+
+  return null
+}
+
+function moveCursorAfterVoiceBlock(editor, voiceId) {
+  const found = findInsertedVoiceBlockPosition(editor, voiceId)
+  if (!found) return false
+
+  const paragraphStart = found.pos + found.node.nodeSize
+  const nextNode = editor.state.doc.resolve(paragraphStart).nodeAfter
+  if (!isEmptyParagraphNode(nextNode)) return false
+
+  return editor.chain()
+    .focus(paragraphStart + 1)
+    .setTextSelection(paragraphStart + 1)
+    .run()
+}
+
+function insertVoiceBlockWithLegacySpacing(editor, attrs) {
+  const content = [
+    { type: 'paragraph' },
+    { type: 'voiceBlock', attrs },
+    { type: 'paragraph' },
+  ]
+  const insertPosition = resolveVoiceInsertPosition(editor)
+  const chain = editor.chain().focus()
+  const inserted = insertPosition == null
+    ? chain.insertContent(content).run()
+    : chain.insertContentAt(insertPosition, content).run()
+
+  if (inserted) {
+    moveCursorAfterVoiceBlock(editor, attrs.voiceId)
+  }
+
+  return inserted
+}
+
 function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColor) {
   const root = document.documentElement
   if (highlightColor) root.style.setProperty('--highlightColor', highlightColor)
@@ -421,10 +491,7 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
       bridge.insertVoiceBlock.connect(function (voiceInfoJson) {
         const result = parseVoiceInfo(voiceInfoJson, resourceBaseUrl)
         if (result.ok) {
-          const inserted = editor.chain().focus().insertContent({
-            type: 'voiceBlock',
-            attrs: result.attrs,
-          }).run()
+          const inserted = insertVoiceBlockWithLegacySpacing(editor, result.attrs)
           if (!inserted) {
             bridge.jsInsertVoiceBlockFailed('editor rejected voiceBlock node insertion')
           }
