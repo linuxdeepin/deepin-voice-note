@@ -691,7 +691,7 @@ ImageReference resolvedImageReference(const QString &rawValue, bool preferRelPat
     }
 
     if (scheme == QStringLiteral("file")) {
-        return { QString(), QString(), kCodeUnsafeHtmlImageSrc, QStringLiteral("HTML file image URL has no extractable images/ path and was skipped") };
+        return { QString(), QString(), kCodeFileImageOutsideImagesDir, QStringLiteral("HTML file image URL has no images/ path segment and was skipped; manual relocation needed") };
     }
 
     if (!isSafeResolvedImageSrc(trimmed)) {

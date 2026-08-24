@@ -5,6 +5,7 @@
 #include "tiptapchannelbridge.h"
 
 #include <QResource>
+#include <QFile>
 #include <QSignalSpy>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -229,15 +230,15 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_resourceBaseUrl_001)
     EXPECT_TRUE(url.startsWith("file://")) << url.toStdString();
 }
 
-// tiptapHtmlPath 返回 qrc 或 file:// 路径
+// tiptapHtmlPath 优先返回 file://，文件不存在时回退 qrc
 TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_tiptapHtmlPath_001)
 {
     TiptapChannelBridge bridge;
     QString path = bridge.tiptapHtmlPath();
-    if (QResource(":/tiptap-editor.html").isValid()) {
-        EXPECT_TRUE(path.startsWith("qrc:")) << path.toStdString();
-    } else {
+    if (QFile::exists(QStringLiteral(TIPTAP_WEB_PATH "/tiptap-editor.html"))) {
         EXPECT_TRUE(path.startsWith("file://")) << path.toStdString();
+    } else {
+        EXPECT_TRUE(path.startsWith("qrc:")) << path.toStdString();
     }
     EXPECT_TRUE(path.contains("tiptap-editor.html")) << path.toStdString();
 }
