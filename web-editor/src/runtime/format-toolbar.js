@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { FORE_COLORS, BACK_COLORS, FONT_SIZES, toPxSize } from './format-palette.js'
+import { canIndentActiveListItem, canOutdentActiveListItem, liftActiveListItem, sinkActiveListItem } from './list-behavior.js'
 
 const TOGGLE_BUTTONS = [
   { format: 'bold', label: 'B', title: '粗体' },
@@ -54,24 +55,6 @@ function applyListToggle(editor, kind) {
   const command = `toggle${kind.charAt(0).toUpperCase()}${kind.slice(1)}`
   editor.chain().focus()[command]().run()
 }
-
-// 缩进/反缩进：按当前节点类型分支，列表外为 no-op；顶级反缩进由原生退出列表。
-function sinkActiveListItem(editor) {
-  if (editor.isActive('taskItem')) {
-    editor.chain().focus().sinkListItem('taskItem').run()
-  } else if (editor.isActive('listItem')) {
-    editor.chain().focus().sinkListItem('listItem').run()
-  }
-}
-
-function liftActiveListItem(editor) {
-  if (editor.isActive('taskItem')) {
-    editor.chain().focus().liftListItem('taskItem').run()
-  } else if (editor.isActive('listItem')) {
-    editor.chain().focus().liftListItem('listItem').run()
-  }
-}
-
 const TASK_LIST_STYLE_ID = 'dvn-tiptap-tasklist-style'
 
 // 注入待办「已完成」主题化自包含样式：去列表符 + 已完成删除线/灰化，
@@ -81,7 +64,12 @@ function injectTaskListStyles() {
   const style = document.createElement('style')
   style.id = TASK_LIST_STYLE_ID
   style.textContent = [
-    'ul[data-type="taskList"] { list-style: none; padding-left: 1.5em; }',
+    'ul[data-type="taskList"] { list-style: none; padding-left: 0; }',
+    'ul[data-type="taskList"] li { display: flex; align-items: flex-start; gap: 6px; }',
+    'ul[data-type="taskList"] li > label { display: inline-flex; align-items: center; flex: 0 0 auto; height: 1.72em; margin: 0; }',
+    'ul[data-type="taskList"] li > label > input[type="checkbox"] { margin: 0; }',
+    'ul[data-type="taskList"] li > div { flex: 1 1 auto; min-width: 0; }',
+    'ul[data-type="taskList"] li > div > p { margin: 0; }',
     'ul[data-type="taskList"] li[data-checked="true"] { opacity: 0.55; }',
     'ul[data-type="taskList"] li[data-checked="true"] p {',
     '  color: var(--color, inherit);',
@@ -372,9 +360,8 @@ export function createFormatToolbar(editor, host) {
       btn.setAttribute('aria-pressed', active ? 'true' : 'false')
       btn.classList.toggle('is-active', active)
     }
-    const inListItem = editor.isActive('listItem') || editor.isActive('taskItem')
-    listButtons.indentList.disabled = !inListItem
-    listButtons.outdentList.disabled = !inListItem
+    listButtons.indentList.disabled = !canIndentActiveListItem(editor)
+    listButtons.outdentList.disabled = !canOutdentActiveListItem(editor)
   }
 
   function syncColorCells(panel, activeColor) {
