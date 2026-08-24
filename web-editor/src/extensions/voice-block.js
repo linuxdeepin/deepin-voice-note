@@ -38,9 +38,20 @@ function generateVoiceId() {
 function formatTime(ms) {
   if (typeof ms !== 'number' || ms < 0) ms = 0
   const totalSeconds = Math.floor(ms / 1000)
-  const minutes = Math.floor(totalSeconds / 60)
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
   const seconds = totalSeconds % 60
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
+/**
+ * 旧语音块显示到分钟，日期分隔符使用 /。
+ * @param {string|null|undefined} value
+ * @returns {string}
+ */
+function formatCreateTime(value) {
+  if (typeof value !== 'string' || value.length === 0) return ''
+  return value.slice(0, 16).replace(/-/g, '/')
 }
 
 /**
@@ -50,7 +61,7 @@ function formatTime(ms) {
  */
 function buildVoiceInfoJson(attrs) {
   return JSON.stringify({
-    dataType: 2,
+    type: 2,
     voiceId: attrs.voiceId,
     voicePath: attrs.voicePath,
     voiceSize: attrs.voiceSize,
@@ -121,10 +132,16 @@ export const VoiceBlock = Node.create({
       let destroyed = false
 
       // --- 构建 DOM ---
+      const wrapper = document.createElement('div')
+      wrapper.className = 'voiceBox'
+      wrapper.setAttribute('data-type', 'voice-block')
+      wrapper.setAttribute('data-voice-meta', buildVoiceMenuJson(node.attrs))
+
       const box = document.createElement('div')
       box.className = 'voiceInfoBox'
       box.setAttribute('data-type', 'voice-block')
       box.setAttribute('data-voice-meta', buildVoiceMenuJson(node.attrs))
+      wrapper.appendChild(box)
 
       const playback = document.createElement('div')
       playback.className = 'voicePlayback'
@@ -132,14 +149,21 @@ export const VoiceBlock = Node.create({
 
       const left = document.createElement('div')
       left.className = 'left'
+
       const voiceBtn = document.createElement('div')
       voiceBtn.className = 'voiceBtn'
-      const titleEl = document.createElement('span')
+
+      const titleEl = document.createElement('div')
       titleEl.className = 'title'
       titleEl.textContent = node.attrs.title || ''
+
       left.appendChild(voiceBtn)
       left.appendChild(titleEl)
       playback.appendChild(left)
+
+      const createTimeEl = document.createElement('div')
+      createTimeEl.className = 'createTime'
+      createTimeEl.textContent = formatCreateTime(node.attrs.createTime)
 
       const progressBar = document.createElement('input')
       progressBar.type = 'range'
@@ -153,10 +177,10 @@ export const VoiceBlock = Node.create({
       right.className = 'right'
       const timeField = document.createElement('div')
       timeField.className = 'timeField'
-      const timePassed = document.createElement('span')
+      const timePassed = document.createElement('div')
       timePassed.className = 'timePassed'
-      timePassed.textContent = '00:00'
-      const timeTotal = document.createElement('span')
+      timePassed.textContent = '00:00/'
+      const timeTotal = document.createElement('div')
       timeTotal.className = 'timeTotal'
       timeTotal.textContent = formatTime(duration)
       timeField.appendChild(timePassed)
@@ -169,7 +193,7 @@ export const VoiceBlock = Node.create({
       toTextIcon.className = 'voiceToTextIcon'
       const translatingLabel = document.createElement('span')
       translatingLabel.className = 'translatingLabel'
-      translatingLabel.textContent = '转写中'
+      translatingLabel.textContent = '正在转为文字'
       toTextLabel.appendChild(toTextIcon)
       toTextLabel.appendChild(translatingLabel)
       right.appendChild(toTextLabel)
@@ -179,11 +203,15 @@ export const VoiceBlock = Node.create({
       toTextTrigger.textContent = '转文字'
       right.appendChild(toTextTrigger)
 
+      const closePlaybackBarBtn = document.createElement('div')
+      closePlaybackBarBtn.className = 'closePlaybackBarBtn'
+      right.appendChild(closePlaybackBarBtn)
+
       playback.appendChild(right)
 
       // 转写结果区
       const translate = document.createElement('div')
-      translate.className = 'translate'
+      translate.className = 'voiceTranscript translate'
       const translateHeader = document.createElement('div')
       translateHeader.className = 'translateHeader'
       const translateIcon = document.createElement('div')
@@ -200,6 +228,8 @@ export const VoiceBlock = Node.create({
 
       const translateText = document.createElement('div')
       translateText.className = 'translateText'
+      translateText.setAttribute('draggable', 'false')
+      translateText.setAttribute('contenteditable', 'false')
       translateText.textContent = node.attrs.text || ''
       translate.appendChild(translateText)
       box.appendChild(translate)
@@ -213,6 +243,8 @@ export const VoiceBlock = Node.create({
 
         const hasText = !!(currentNode.attrs.text && currentNode.attrs.text.length > 0)
         box.classList.toggle('containText', hasText)
+        toTextTrigger.style.display = 'none'
+        createTimeEl.style.display = (playing || paused || translating) ? 'none' : ''
 
         const unfold = currentNode.attrs.translateUnfold !== false
         translateHeader.classList.toggle('unfold', unfold)
@@ -221,7 +253,7 @@ export const VoiceBlock = Node.create({
         // 进度
         const pct = duration > 0 ? Math.min((progress / duration) * 100, 100) : 0
         progressBar.style.setProperty('--progressValue', pct + '%')
-        timePassed.textContent = formatTime(progress)
+        timePassed.textContent = formatTime(progress) + '/'
         timeTotal.textContent = formatTime(duration)
         progressBar.max = Math.max(duration, 1)
         progressBar.value = Math.min(progress, progressBar.max)
@@ -245,6 +277,17 @@ export const VoiceBlock = Node.create({
         }
       }
 
+      function onClosePlaybackClick() {
+        const bridge = getVoiceBridge()
+        if (bridge && bridge.jsRequestVoicePlaybackStop) {
+          bridge.jsRequestVoicePlaybackStop()
+        }
+        playing = false
+        paused = false
+        progress = 0
+        refreshState()
+      }
+
       function onFoldToggle() {
         const pos = getPos()
         if (pos == null || pos < 0) return
@@ -254,9 +297,53 @@ export const VoiceBlock = Node.create({
         }))
       }
 
+      let restoreVoiceDrag = null
+      function restoreWrapperDrag() {
+        if (!restoreVoiceDrag) return
+        restoreVoiceDrag()
+        restoreVoiceDrag = null
+      }
+
+      function onTranslateTextPointerDown(event) {
+        // The voiceBlock node is draggable as a whole.  When the user starts in
+        // transcript text, keep the event inside the DOM so the browser can make
+        // a normal text selection instead of ProseMirror dragging the atom node.
+        event.stopPropagation()
+        restoreWrapperDrag()
+
+        const previousDraggable = wrapper.getAttribute('draggable')
+        wrapper.setAttribute('draggable', 'false')
+        restoreVoiceDrag = () => {
+          if (previousDraggable === null) {
+            wrapper.removeAttribute('draggable')
+          } else {
+            wrapper.setAttribute('draggable', previousDraggable)
+          }
+          document.removeEventListener('mouseup', restoreWrapperDrag, true)
+          document.removeEventListener('pointerup', restoreWrapperDrag, true)
+          document.removeEventListener('touchend', restoreWrapperDrag, true)
+          document.removeEventListener('dragend', restoreWrapperDrag, true)
+        }
+
+        document.addEventListener('mouseup', restoreWrapperDrag, true)
+        document.addEventListener('pointerup', restoreWrapperDrag, true)
+        document.addEventListener('touchend', restoreWrapperDrag, true)
+        document.addEventListener('dragend', restoreWrapperDrag, true)
+      }
+
+      function onTranslateTextDragStart(event) {
+        event.stopPropagation()
+        event.preventDefault()
+      }
+
       voiceBtn.addEventListener('click', onVoiceBtnClick)
       toTextTrigger.addEventListener('click', onToTextTriggerClick)
+      closePlaybackBarBtn.addEventListener('click', onClosePlaybackClick)
       foldBtn.addEventListener('click', onFoldToggle)
+      translateText.addEventListener('mousedown', onTranslateTextPointerDown)
+      translateText.addEventListener('pointerdown', onTranslateTextPointerDown)
+      translateText.addEventListener('touchstart', onTranslateTextPointerDown)
+      translateText.addEventListener('dragstart', onTranslateTextDragStart)
       translateHeader.addEventListener('click', (e) => {
         // 折叠/展开头部点击切换
         if (e.target === foldBtn) return
@@ -336,12 +423,14 @@ export const VoiceBlock = Node.create({
       refreshState()
 
       return {
-        dom: box,
+        dom: wrapper,
         update(updatedNode) {
           if (updatedNode.type.name !== 'voiceBlock') return false
           currentNode = updatedNode
           titleEl.textContent = updatedNode.attrs.title || ''
+          createTimeEl.textContent = formatCreateTime(updatedNode.attrs.createTime)
           translateText.textContent = updatedNode.attrs.text || ''
+          wrapper.setAttribute('data-voice-meta', buildVoiceMenuJson(updatedNode.attrs))
           box.setAttribute('data-voice-meta', buildVoiceMenuJson(updatedNode.attrs))
           refreshState()
           return true
@@ -349,7 +438,7 @@ export const VoiceBlock = Node.create({
         stopEvent(event) {
           const target = event.target
           if (target instanceof HTMLElement) {
-            if (target.closest('.voiceBtn, .progressBar, .voiceToTextTrigger, .foldBtn, .translateHeader, .translateText')) {
+            if (target.closest('.voiceBtn, .progressBar, .voiceToTextTrigger, .closePlaybackBarBtn, .foldBtn, .translateHeader, .translateText')) {
               return true
             }
           }
@@ -359,10 +448,10 @@ export const VoiceBlock = Node.create({
           return true
         },
         selectNode() {
-          box.classList.add('ProseMirror-selectednode')
+          wrapper.classList.add('ProseMirror-selectednode', 'active')
         },
         deselectNode() {
-          box.classList.remove('ProseMirror-selectednode')
+          wrapper.classList.remove('ProseMirror-selectednode', 'active')
         },
         destroy() {
           if (destroyed) return
@@ -370,18 +459,54 @@ export const VoiceBlock = Node.create({
           unsubscribe()
           voiceBtn.removeEventListener('click', onVoiceBtnClick)
           toTextTrigger.removeEventListener('click', onToTextTriggerClick)
+          closePlaybackBarBtn.removeEventListener('click', onClosePlaybackClick)
           foldBtn.removeEventListener('click', onFoldToggle)
+          translateText.removeEventListener('mousedown', onTranslateTextPointerDown)
+          translateText.removeEventListener('pointerdown', onTranslateTextPointerDown)
+          translateText.removeEventListener('touchstart', onTranslateTextPointerDown)
+          translateText.removeEventListener('dragstart', onTranslateTextDragStart)
+          restoreWrapperDrag()
         },
       }
     }
   },
 
   addProseMirrorPlugins() {
+    let internalVoiceDrag = false
+    const resetInternalVoiceDrag = () => {
+      internalVoiceDrag = false
+    }
+
     return [
       new Plugin({
         key: new PluginKey('voiceBlockCopyClear'),
         props: {
+          handleDOMEvents: {
+            dragstart(view, event) {
+              const target = event.target
+              if (target instanceof HTMLElement
+                && target.closest('.voiceBox')
+                && !target.closest('.translateText')) {
+                internalVoiceDrag = true
+              }
+              return false
+            },
+            drop() {
+              resetInternalVoiceDrag()
+              return false
+            },
+            dragend() {
+              resetInternalVoiceDrag()
+              return false
+            },
+            copy() {
+              resetInternalVoiceDrag()
+              return false
+            },
+          },
           transformCopied(slice) {
+            if (internalVoiceDrag) return slice
+
             let modified = false
             function transformFragment(fragment) {
               const newNodes = []

@@ -16,7 +16,9 @@
     #toolbar-host { position: sticky; top: 0; z-index: 10; }
     #app { min-height: calc(100% - 36px); }
     .tiptap { min-height: 100%; }
-    .ProseMirror { box-sizing: border-box; outline: none; min-height: 100%; padding: 16px; cursor: text; }
+    /* Match legacy summernote .note-editable geometry for migration display fidelity. */
+    .ProseMirror { box-sizing: border-box; outline: none; min-height: 100%; padding: 20px 20px 50px 30px; cursor: text; font-family: Helvetica, sans-serif; font-size: 14px; line-height: 1.72; color: rgba(0, 0, 0, 1); word-wrap: break-word; }
+    .ProseMirror p { margin: 0; min-height: 1.72em; }
   </style>
 </head>
 <body>

@@ -164,11 +164,49 @@ function dispatchVoice(voiceId, handlerName, ...args) {
   }
 }
 
+function colorWithAlpha(color, alpha, fallback) {
+  if (typeof color !== 'string' || color.trim().length === 0) return fallback
+  const value = color.trim()
+  const clampedAlpha = Math.max(0, Math.min(1, alpha))
+
+  const shortHex = value.match(/^#([0-9a-fA-F]{3})$/)
+  if (shortHex) {
+    const [r, g, b] = shortHex[1].split('').map((ch) => parseInt(ch + ch, 16))
+    return `rgba(${r}, ${g}, ${b}, ${clampedAlpha})`
+  }
+
+  const longHex = value.match(/^#([0-9a-fA-F]{6})$/)
+  if (longHex) {
+    const hex = longHex[1]
+    const r = parseInt(hex.slice(0, 2), 16)
+    const g = parseInt(hex.slice(2, 4), 16)
+    const b = parseInt(hex.slice(4, 6), 16)
+    return `rgba(${r}, ${g}, ${b}, ${clampedAlpha})`
+  }
+
+  const rgb = value.match(/^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/i)
+  if (rgb) {
+    return `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, ${clampedAlpha})`
+  }
+
+  const rgba = value.match(/^rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(?:0|1|0?\.\d+)\s*\)$/i)
+  if (rgba) {
+    return `rgba(${rgba[1]}, ${rgba[2]}, ${rgba[3]}, ${clampedAlpha})`
+  }
+
+  return fallback
+}
+
 function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColor) {
   const root = document.documentElement
   if (highlightColor) root.style.setProperty('--highlightColor', highlightColor)
   if (disableHighlightColor) root.style.setProperty('--color', disableHighlightColor)
   if (backgroundColor) root.style.setProperty('--backgroundColor', backgroundColor)
+
+  const activeBaseColor = highlightColor || '#0081ff'
+  root.style.setProperty('--dvn-active-bg', colorWithAlpha(activeBaseColor, 0.5, 'rgba(0, 129, 255, 0.5)'))
+  root.style.setProperty('--dvn-transcript-selection-bg', colorWithAlpha(activeBaseColor, 0.4, 'rgba(0, 129, 255, 0.4)'))
+  root.style.setProperty('--dvn-active-selection-bg', colorWithAlpha(activeBaseColor, 0.6, 'rgba(0, 129, 255, 0.6)'))
 
   // 主题联动：工具栏 / 语音块 / 滚动条 / 取色板 / 图片自绘菜单
   const isDark = theme === 'dark'
@@ -178,6 +216,11 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-hover-bg', isDark ? '#3d3d3d' : '#f0f0f0')
   root.style.setProperty('--dvn-clear-btn-bg', isDark ? '#2d2d2d' : '#fafafa')
   root.style.setProperty('--dvn-active-outline', highlightColor || '#0086cc')
+  root.style.setProperty('--dvn-voice-bg', isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)')
+  root.style.setProperty('--dvn-voice-title', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(0, 26, 46, 1)')
+  root.style.setProperty('--dvn-voice-text', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(65, 77, 104, 1)')
+  root.style.setProperty('--dvn-voice-subtitle', isDark ? 'rgba(109, 124, 136, 1)' : 'rgba(138, 161, 180, 1)')
+  root.style.setProperty('--dvn-voice-divider', isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)')
 }
 
 // ---------------------------------------------------------------------------

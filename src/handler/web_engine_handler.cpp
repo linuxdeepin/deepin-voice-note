@@ -351,8 +351,7 @@ void WebEngineHandler::connectWebContent()
     // --- Tiptap voice 播放/转写通道接线 ---
     connect(TiptapChannelBridge::instance(), &TiptapChannelBridge::voicePlaybackRequested,
             this, [this](const QString &voiceInfoJson, bool isSame) {
-        QVariant json = QJsonDocument::fromJson(voiceInfoJson.toUtf8()).toVariant();
-        m_voicePlayerHandler->playVoice(json, isSame);
+        m_voicePlayerHandler->playVoice(voiceInfoJson, isSame);
     });
     connect(TiptapChannelBridge::instance(), &TiptapChannelBridge::voicePlaybackStopRequested,
             this, [this]() {

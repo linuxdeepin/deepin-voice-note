@@ -767,6 +767,32 @@ const MigrationHtmlNode *singleImageChildIfOnlyImageContent(const MigrationHtmlN
     return image;
 }
 
+// Summernote uses <p><br></p> / <div><br></div> as an empty paragraph placeholder.
+// Persist it as an empty paragraph instead of paragraph + hardBreak; otherwise
+// ProseMirror renders both the explicit hardBreak and its trailingBreak, creating
+// one extra visible blank line between adjacent voice blocks.
+bool isSingleBrPlaceholderContent(const MigrationHtmlNode &node)
+{
+    bool hasBr = false;
+    for (const MigrationHtmlNode &child : node.children) {
+        if (child.type == MigrationHtmlNodeType::Text) {
+            if (!child.text.trimmed().isEmpty()) {
+                return false;
+            }
+            continue;
+        }
+
+        if (child.type == MigrationHtmlNodeType::Element && child.tagName == QStringLiteral("br") && !hasBr) {
+            hasBr = true;
+            continue;
+        }
+
+        return false;
+    }
+
+    return hasBr;
+}
+
 int headingLevel(const MigrationHtmlNode &node)
 {
     return node.tagName.right(1).toInt();
@@ -1801,6 +1827,13 @@ void appendBlocksFromElement(const MigrationHtmlNode &node,
 
     if (node.tagName == QStringLiteral("p") || node.tagName == QStringLiteral("div")) {
         warnTextAlignDeclarations(node, result);
+        if (isSingleBrPlaceholderContent(node)) {
+            appendBlockWithInitialParagraph(blocks,
+                                            MigrationJsonBuilder::makeParagraph(),
+                                            ensureInitialParagraphBeforeBlock);
+            return;
+        }
+
         if (const MigrationHtmlNode *image = singleImageChildIfOnlyImageContent(node)) {
             const int initialBlockCount = blocks.size();
             QJsonArray inlineContent;
@@ -1857,6 +1890,10 @@ QJsonObject blockFromElement(const MigrationHtmlNode &node,
 
     if (node.tagName == QStringLiteral("p") || node.tagName == QStringLiteral("div")) {
         warnTextAlignDeclarations(node, result);
+        if (isSingleBrPlaceholderContent(node)) {
+            return MigrationJsonBuilder::makeParagraph();
+        }
+
         if (const MigrationHtmlNode *image = singleImageChildIfOnlyImageContent(node)) {
             const QJsonObject imageNode = imageFromElement(*image, result);
             if (!imageNode.isEmpty()) {
