@@ -15,6 +15,7 @@ import { createEmptyDoc } from '../schema/document-envelope.js'
 import { bindTiptapChannel, setVoiceBridge } from './tiptap-channel.js'
 import { createFormatToolbar } from './format-toolbar.js'
 import { setupImagePaste, setupImageViewAndMenu } from './image-interactions.js'
+import { shouldFocusEditorOnDocumentMouseDown } from './focus-behavior.js'
 
 // ---------------------------------------------------------------------------
 // 编辑器初始化模块（本接口不替换此模块）
@@ -64,7 +65,7 @@ window._dvnTiptapFocus = function () {
 }
 
 document.addEventListener('mousedown', function (event) {
-  if (!event.target.closest('.ProseMirror')) {
+  if (shouldFocusEditorOnDocumentMouseDown(event.target)) {
     editor.commands.focus('end')
   }
 })
