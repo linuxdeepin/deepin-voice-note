@@ -13,8 +13,8 @@ function OrderedMap(content) {
 OrderedMap.prototype = {
   constructor: OrderedMap,
   find: function(key) {
-    for (var i = 0; i < this.content.length; i += 2)
-      if (this.content[i] === key) return i;
+    for (var i2 = 0; i2 < this.content.length; i2 += 2)
+      if (this.content[i2] === key) return i2;
     return -1;
   },
   // :: (string) → ?any
@@ -73,33 +73,33 @@ OrderedMap.prototype = {
   // Call the given function for each key/value pair in the map, in
   // order.
   forEach: function(f) {
-    for (var i = 0; i < this.content.length; i += 2)
-      f(this.content[i], this.content[i + 1]);
+    for (var i2 = 0; i2 < this.content.length; i2 += 2)
+      f(this.content[i2], this.content[i2 + 1]);
   },
   // :: (union<Object, OrderedMap>) → OrderedMap
   // Create a new map by prepending the keys in this map that don't
   // appear in `map` before the keys in `map`.
-  prepend: function(map) {
-    map = OrderedMap.from(map);
-    if (!map.size) return this;
-    return new OrderedMap(map.content.concat(this.subtract(map).content));
+  prepend: function(map2) {
+    map2 = OrderedMap.from(map2);
+    if (!map2.size) return this;
+    return new OrderedMap(map2.content.concat(this.subtract(map2).content));
   },
   // :: (union<Object, OrderedMap>) → OrderedMap
   // Create a new map by appending the keys in this map that don't
   // appear in `map` after the keys in `map`.
-  append: function(map) {
-    map = OrderedMap.from(map);
-    if (!map.size) return this;
-    return new OrderedMap(this.subtract(map).content.concat(map.content));
+  append: function(map2) {
+    map2 = OrderedMap.from(map2);
+    if (!map2.size) return this;
+    return new OrderedMap(this.subtract(map2).content.concat(map2.content));
   },
   // :: (union<Object, OrderedMap>) → OrderedMap
   // Create a map containing all the keys in this map that don't
   // appear in `map`.
-  subtract: function(map) {
+  subtract: function(map2) {
     var result = this;
-    map = OrderedMap.from(map);
-    for (var i = 0; i < map.content.length; i += 2)
-      result = result.remove(map.content[i]);
+    map2 = OrderedMap.from(map2);
+    for (var i2 = 0; i2 < map2.content.length; i2 += 2)
+      result = result.remove(map2.content[i2]);
     return result;
   },
   // :: () → Object
@@ -124,10 +124,10 @@ OrderedMap.from = function(value) {
   return new OrderedMap(content);
 };
 function findDiffStart(a, b, pos) {
-  for (let i = 0; ; i++) {
-    if (i == a.childCount || i == b.childCount)
+  for (let i2 = 0; ; i2++) {
+    if (i2 == a.childCount || i2 == b.childCount)
       return a.childCount == b.childCount ? null : pos;
-    let childA = a.child(i), childB = b.child(i);
+    let childA = a.child(i2), childB = b.child(i2);
     if (childA == childB) {
       pos += childA.nodeSize;
       continue;
@@ -199,20 +199,20 @@ class Fragment {
     this.content = content;
     this.size = size || 0;
     if (size == null)
-      for (let i = 0; i < content.length; i++)
-        this.size += content[i].nodeSize;
+      for (let i2 = 0; i2 < content.length; i2++)
+        this.size += content[i2].nodeSize;
   }
   /**
   Invoke a callback for all descendant nodes between the given two
   positions (relative to start of this fragment). Doesn't descend
   into a node when the callback returns `false`.
   */
-  nodesBetween(from, to, f, nodeStart = 0, parent) {
-    for (let i = 0, pos = 0; pos < to; i++) {
-      let child = this.content[i], end = pos + child.nodeSize;
-      if (end > from && f(child, nodeStart + pos, parent || null, i) !== false && child.content.size) {
+  nodesBetween(from2, to, f, nodeStart = 0, parent) {
+    for (let i2 = 0, pos = 0; pos < to; i2++) {
+      let child = this.content[i2], end = pos + child.nodeSize;
+      if (end > from2 && f(child, nodeStart + pos, parent || null, i2) !== false && child.content.size) {
         let start = pos + 1;
-        child.nodesBetween(Math.max(0, from - start), Math.min(child.content.size, to - start), f, nodeStart + start);
+        child.nodesBetween(Math.max(0, from2 - start), Math.min(child.content.size, to - start), f, nodeStart + start);
       }
       pos = end;
     }
@@ -229,10 +229,10 @@ class Fragment {
   Extract the text between `from` and `to`. See the same method on
   [`Node`](https://prosemirror.net/docs/ref/#model.Node.textBetween).
   */
-  textBetween(from, to, blockSeparator, leafText) {
+  textBetween(from2, to, blockSeparator, leafText) {
     let text = "", first2 = true;
-    this.nodesBetween(from, to, (node, pos) => {
-      let nodeText = node.isText ? node.text.slice(Math.max(from, pos) - pos, to - pos) : !node.isLeaf ? "" : leafText ? typeof leafText === "function" ? leafText(node) : leafText : node.type.spec.leafText ? node.type.spec.leafText(node) : "";
+    this.nodesBetween(from2, to, (node, pos) => {
+      let nodeText = node.isText ? node.text.slice(Math.max(from2, pos) - pos, to - pos) : !node.isLeaf ? "" : leafText ? typeof leafText === "function" ? leafText(node) : leafText : node.type.spec.leafText ? node.type.spec.leafText(node) : "";
       if (node.isBlock && (node.isLeaf && nodeText || node.isTextblock) && blockSeparator) {
         if (first2)
           first2 = false;
@@ -252,31 +252,31 @@ class Fragment {
       return this;
     if (!this.size)
       return other;
-    let last = this.lastChild, first2 = other.firstChild, content = this.content.slice(), i = 0;
+    let last = this.lastChild, first2 = other.firstChild, content = this.content.slice(), i2 = 0;
     if (last.isText && last.sameMarkup(first2)) {
       content[content.length - 1] = last.withText(last.text + first2.text);
-      i = 1;
+      i2 = 1;
     }
-    for (; i < other.content.length; i++)
-      content.push(other.content[i]);
+    for (; i2 < other.content.length; i2++)
+      content.push(other.content[i2]);
     return new Fragment(content, this.size + other.size);
   }
   /**
   Cut out the sub-fragment between the two given positions.
   */
-  cut(from, to = this.size) {
-    if (from == 0 && to == this.size)
+  cut(from2, to = this.size) {
+    if (from2 == 0 && to == this.size)
       return this;
     let result = [], size = 0;
-    if (to > from)
-      for (let i = 0, pos = 0; pos < to; i++) {
-        let child = this.content[i], end = pos + child.nodeSize;
-        if (end > from) {
-          if (pos < from || end > to) {
+    if (to > from2)
+      for (let i2 = 0, pos = 0; pos < to; i2++) {
+        let child = this.content[i2], end = pos + child.nodeSize;
+        if (end > from2) {
+          if (pos < from2 || end > to) {
             if (child.isText)
-              child = child.cut(Math.max(0, from - pos), Math.min(child.text.length, to - pos));
+              child = child.cut(Math.max(0, from2 - pos), Math.min(child.text.length, to - pos));
             else
-              child = child.cut(Math.max(0, from - pos - 1), Math.min(child.content.size, to - pos - 1));
+              child = child.cut(Math.max(0, from2 - pos - 1), Math.min(child.content.size, to - pos - 1));
           }
           result.push(child);
           size += child.nodeSize;
@@ -288,12 +288,12 @@ class Fragment {
   /**
   @internal
   */
-  cutByIndex(from, to) {
-    if (from == to)
+  cutByIndex(from2, to) {
+    if (from2 == to)
       return Fragment.empty;
-    if (from == 0 && to == this.content.length)
+    if (from2 == 0 && to == this.content.length)
       return this;
-    return new Fragment(this.content.slice(from, to));
+    return new Fragment(this.content.slice(from2, to));
   }
   /**
   Create a new fragment in which the node at the given index is
@@ -328,8 +328,8 @@ class Fragment {
   eq(other) {
     if (this.content.length != other.content.length)
       return false;
-    for (let i = 0; i < this.content.length; i++)
-      if (!this.content[i].eq(other.content[i]))
+    for (let i2 = 0; i2 < this.content.length; i2++)
+      if (!this.content[i2].eq(other.content[i2]))
         return false;
     return true;
   }
@@ -372,9 +372,9 @@ class Fragment {
   into this parent node, and its index.
   */
   forEach(f) {
-    for (let i = 0, p = 0; i < this.content.length; i++) {
-      let child = this.content[i];
-      f(child, p, i);
+    for (let i2 = 0, p = 0; i2 < this.content.length; i2++) {
+      let child = this.content[i2];
+      f(child, p, i2);
       p += child.nodeSize;
     }
   }
@@ -406,12 +406,12 @@ class Fragment {
       return retIndex(this.content.length, pos);
     if (pos > this.size || pos < 0)
       throw new RangeError(`Position ${pos} outside of fragment (${this})`);
-    for (let i = 0, curPos = 0; ; i++) {
-      let cur = this.child(i), end = curPos + cur.nodeSize;
+    for (let i2 = 0, curPos = 0; ; i2++) {
+      let cur = this.child(i2), end = curPos + cur.nodeSize;
       if (end >= pos) {
         if (end == pos)
-          return retIndex(i + 1, end);
-        return retIndex(i, curPos);
+          return retIndex(i2 + 1, end);
+        return retIndex(i2, curPos);
       }
       curPos = end;
     }
@@ -452,12 +452,12 @@ class Fragment {
     if (!array.length)
       return Fragment.empty;
     let joined, size = 0;
-    for (let i = 0; i < array.length; i++) {
-      let node = array[i];
+    for (let i2 = 0; i2 < array.length; i2++) {
+      let node = array[i2];
       size += node.nodeSize;
-      if (i && node.isText && array[i - 1].sameMarkup(node)) {
+      if (i2 && node.isText && array[i2 - 1].sameMarkup(node)) {
         if (!joined)
-          joined = array.slice(0, i);
+          joined = array.slice(0, i2);
         joined[joined.length - 1] = node.withText(joined[joined.length - 1].text + node.text);
       } else if (joined) {
         joined.push(node);
@@ -501,8 +501,8 @@ function compareDeep(a, b) {
   if (array) {
     if (a.length != b.length)
       return false;
-    for (let i = 0; i < a.length; i++)
-      if (!compareDeep(a[i], b[i]))
+    for (let i2 = 0; i2 < a.length; i2++)
+      if (!compareDeep(a[i2], b[i2]))
         return false;
   } else {
     for (let p in a)
@@ -531,19 +531,19 @@ let Mark$1 = class Mark {
   */
   addToSet(set) {
     let copy2, placed = false;
-    for (let i = 0; i < set.length; i++) {
-      let other = set[i];
+    for (let i2 = 0; i2 < set.length; i2++) {
+      let other = set[i2];
       if (this.eq(other))
         return set;
       if (this.type.excludes(other.type)) {
         if (!copy2)
-          copy2 = set.slice(0, i);
+          copy2 = set.slice(0, i2);
       } else if (other.type.excludes(this.type)) {
         return set;
       } else {
         if (!placed && other.type.rank > this.type.rank) {
           if (!copy2)
-            copy2 = set.slice(0, i);
+            copy2 = set.slice(0, i2);
           copy2.push(this);
           placed = true;
         }
@@ -562,17 +562,17 @@ let Mark$1 = class Mark {
   mark is not in the set, the set itself is returned.
   */
   removeFromSet(set) {
-    for (let i = 0; i < set.length; i++)
-      if (this.eq(set[i]))
-        return set.slice(0, i).concat(set.slice(i + 1));
+    for (let i2 = 0; i2 < set.length; i2++)
+      if (this.eq(set[i2]))
+        return set.slice(0, i2).concat(set.slice(i2 + 1));
     return set;
   }
   /**
   Test whether this mark is in the given set of marks.
   */
   isInSet(set) {
-    for (let i = 0; i < set.length; i++)
-      if (this.eq(set[i]))
+    for (let i2 = 0; i2 < set.length; i2++)
+      if (this.eq(set[i2]))
         return true;
     return false;
   }
@@ -615,8 +615,8 @@ let Mark$1 = class Mark {
       return true;
     if (a.length != b.length)
       return false;
-    for (let i = 0; i < a.length; i++)
-      if (!a[i].eq(b[i]))
+    for (let i2 = 0; i2 < a.length; i2++)
+      if (!a[i2].eq(b[i2]))
         return false;
     return true;
   }
@@ -671,8 +671,8 @@ class Slice {
   /**
   @internal
   */
-  removeBetween(from, to) {
-    return new Slice(removeRange(this.content, from + this.openStart, to + this.openStart), this.openStart, this.openEnd);
+  removeBetween(from2, to) {
+    return new Slice(removeRange(this.content, from2 + this.openStart, to + this.openStart), this.openStart, this.openEnd);
   }
   /**
   Tests whether this slice is equal to another slice.
@@ -724,17 +724,17 @@ class Slice {
   }
 }
 Slice.empty = new Slice(Fragment.empty, 0, 0);
-function removeRange(content, from, to) {
-  let { index, offset } = content.findIndex(from), child = content.maybeChild(index);
+function removeRange(content, from2, to) {
+  let { index, offset } = content.findIndex(from2), child = content.maybeChild(index);
   let { index: indexTo, offset: offsetTo } = content.findIndex(to);
-  if (offset == from || child.isText) {
+  if (offset == from2 || child.isText) {
     if (offsetTo != to && !content.child(indexTo).isText)
       throw new RangeError("Removing non-flat range");
-    return content.cut(0, from).append(content.cut(to));
+    return content.cut(0, from2).append(content.cut(to));
   }
   if (index != indexTo)
     throw new RangeError("Removing non-flat range");
-  return content.replaceChild(index, child.copy(removeRange(child.content, from - offset - 1, to - offset - 1)));
+  return content.replaceChild(index, child.copy(removeRange(child.content, from2 - offset - 1, to - offset - 1)));
 }
 function insertInto(content, dist, insert, openStart, openEnd, parent) {
   let { index, offset } = content.findIndex(dist), child = content.maybeChild(index);
@@ -746,25 +746,25 @@ function insertInto(content, dist, insert, openStart, openEnd, parent) {
   let inner = insertInto(child.content, dist - offset - 1, insert, index == 0 ? openStart - 1 : 0, index == content.childCount - 1 ? openEnd - 1 : 0, child);
   return inner && content.replaceChild(index, child.copy(inner));
 }
-function replace($from, $to, slice) {
-  if (slice.openStart > $from.depth)
+function replace($from, $to, slice2) {
+  if (slice2.openStart > $from.depth)
     throw new ReplaceError("Inserted content deeper than insertion position");
-  if ($from.depth - slice.openStart != $to.depth - slice.openEnd)
+  if ($from.depth - slice2.openStart != $to.depth - slice2.openEnd)
     throw new ReplaceError("Inconsistent open depths");
-  return replaceOuter($from, $to, slice, 0);
+  return replaceOuter($from, $to, slice2, 0);
 }
-function replaceOuter($from, $to, slice, depth) {
+function replaceOuter($from, $to, slice2, depth) {
   let index = $from.index(depth), node = $from.node(depth);
-  if (index == $to.index(depth) && depth < $from.depth - slice.openStart) {
-    let inner = replaceOuter($from, $to, slice, depth + 1);
+  if (index == $to.index(depth) && depth < $from.depth - slice2.openStart) {
+    let inner = replaceOuter($from, $to, slice2, depth + 1);
     return node.copy(node.content.replaceChild(index, inner));
-  } else if (!slice.content.size) {
+  } else if (!slice2.content.size) {
     return close(node, replaceTwoWay($from, $to, depth));
-  } else if (!slice.openStart && !slice.openEnd && $from.depth == depth && $to.depth == depth) {
+  } else if (!slice2.openStart && !slice2.openEnd && $from.depth == depth && $to.depth == depth) {
     let parent = $from.parent, content = parent.content;
-    return close(parent, content.cut(0, $from.parentOffset).append(slice.content).append(content.cut($to.parentOffset)));
+    return close(parent, content.cut(0, $from.parentOffset).append(slice2.content).append(content.cut($to.parentOffset)));
   } else {
-    let { start, end } = prepareSliceForReplace(slice, $from);
+    let { start, end } = prepareSliceForReplace(slice2, $from);
     return close(node, replaceThreeWay($from, start, end, $to, depth));
   }
 }
@@ -796,8 +796,8 @@ function addRange($start, $end, depth, target) {
       startIndex++;
     }
   }
-  for (let i = startIndex; i < endIndex; i++)
-    addNode(node.child(i), target);
+  for (let i2 = startIndex; i2 < endIndex; i2++)
+    addNode(node.child(i2), target);
   if ($end && $end.depth == depth && $end.textOffset)
     addNode($end.nodeBefore, target);
 }
@@ -834,14 +834,14 @@ function replaceTwoWay($from, $to, depth) {
   addRange($to, null, depth, content);
   return new Fragment(content);
 }
-function prepareSliceForReplace(slice, $along) {
-  let extra = $along.depth - slice.openStart, parent = $along.node(extra);
-  let node = parent.copy(slice.content);
-  for (let i = extra - 1; i >= 0; i--)
-    node = $along.node(i).copy(Fragment.from(node));
+function prepareSliceForReplace(slice2, $along) {
+  let extra = $along.depth - slice2.openStart, parent = $along.node(extra);
+  let node = parent.copy(slice2.content);
+  for (let i2 = extra - 1; i2 >= 0; i2--)
+    node = $along.node(i2).copy(Fragment.from(node));
   return {
-    start: node.resolveNoCache(slice.openStart + extra),
-    end: node.resolveNoCache(node.content.size - slice.openEnd - extra)
+    start: node.resolveNoCache(slice2.openStart + extra),
+    end: node.resolveNoCache(node.content.size - slice2.openEnd - extra)
   };
 }
 class ResolvedPos {
@@ -977,8 +977,8 @@ class ResolvedPos {
   posAtIndex(index, depth) {
     depth = this.resolveDepth(depth);
     let node = this.path[depth * 3], pos = depth == 0 ? 0 : this.path[depth * 3 - 1] + 1;
-    for (let i = 0; i < index; i++)
-      pos += node.child(i).nodeSize;
+    for (let i2 = 0; i2 < index; i2++)
+      pos += node.child(i2).nodeSize;
     return pos;
   }
   /**
@@ -1000,9 +1000,9 @@ class ResolvedPos {
       other = tmp;
     }
     let marks = main.marks;
-    for (var i = 0; i < marks.length; i++)
-      if (marks[i].type.spec.inclusive === false && (!other || !marks[i].isInSet(other.marks)))
-        marks = marks[i--].removeFromSet(marks);
+    for (var i2 = 0; i2 < marks.length; i2++)
+      if (marks[i2].type.spec.inclusive === false && (!other || !marks[i2].isInSet(other.marks)))
+        marks = marks[i2--].removeFromSet(marks);
     return marks;
   }
   /**
@@ -1018,9 +1018,9 @@ class ResolvedPos {
     if (!after || !after.isInline)
       return null;
     let marks = after.marks, next = $end.parent.maybeChild($end.index());
-    for (var i = 0; i < marks.length; i++)
-      if (marks[i].type.spec.inclusive === false && (!next || !marks[i].isInSet(next.marks)))
-        marks = marks[i--].removeFromSet(marks);
+    for (var i2 = 0; i2 < marks.length; i2++)
+      if (marks[i2].type.spec.inclusive === false && (!next || !marks[i2].isInSet(next.marks)))
+        marks = marks[i2--].removeFromSet(marks);
     return marks;
   }
   /**
@@ -1073,8 +1073,8 @@ class ResolvedPos {
   */
   toString() {
     let str = "";
-    for (let i = 1; i <= this.depth; i++)
-      str += (str ? "/" : "") + this.node(i).type.name + "_" + this.index(i - 1);
+    for (let i2 = 1; i2 <= this.depth; i2++)
+      str += (str ? "/" : "") + this.node(i2).type.name + "_" + this.index(i2 - 1);
     return str + ":" + this.parentOffset;
   }
   /**
@@ -1105,8 +1105,8 @@ class ResolvedPos {
   static resolveCached(doc, pos) {
     let cache = resolveCache.get(doc);
     if (cache) {
-      for (let i = 0; i < cache.elts.length; i++) {
-        let elt = cache.elts[i];
+      for (let i2 = 0; i2 < cache.elts.length; i2++) {
+        let elt = cache.elts[i2];
         if (elt.pos == pos)
           return elt;
       }
@@ -1231,8 +1231,8 @@ class Node {
   recursed over. The last parameter can be used to specify a
   starting position to count from.
   */
-  nodesBetween(from, to, f, startPos = 0) {
-    this.content.nodesBetween(from, to, f, startPos, this);
+  nodesBetween(from2, to, f, startPos = 0) {
+    this.content.nodesBetween(from2, to, f, startPos, this);
   }
   /**
   Call the given callback for every descendant node. Doesn't
@@ -1255,8 +1255,8 @@ class Node {
   inserted for every non-text leaf node encountered, otherwise
   [`leafText`](https://prosemirror.net/docs/ref/#model.NodeSpec.leafText) will be used.
   */
-  textBetween(from, to, blockSeparator, leafText) {
-    return this.content.textBetween(from, to, blockSeparator, leafText);
+  textBetween(from2, to, blockSeparator, leafText) {
+    return this.content.textBetween(from2, to, blockSeparator, leafText);
   }
   /**
   Returns this node's first child, or `null` if there are no
@@ -1313,19 +1313,19 @@ class Node {
   given positions. If `to` is not given, it defaults to the end of
   the node.
   */
-  cut(from, to = this.content.size) {
-    if (from == 0 && to == this.content.size)
+  cut(from2, to = this.content.size) {
+    if (from2 == 0 && to == this.content.size)
       return this;
-    return this.copy(this.content.cut(from, to));
+    return this.copy(this.content.cut(from2, to));
   }
   /**
   Cut out the part of the document between the given positions, and
   return it as a `Slice` object.
   */
-  slice(from, to = this.content.size, includeParents = false) {
-    if (from == to)
+  slice(from2, to = this.content.size, includeParents = false) {
+    if (from2 == to)
       return Slice.empty;
-    let $from = this.resolve(from), $to = this.resolve(to);
+    let $from = this.resolve(from2), $to = this.resolve(to);
     let depth = includeParents ? 0 : $from.sharedDepth(to);
     let start = $from.start(depth), node = $from.node(depth);
     let content = node.content.cut($from.pos - start, $to.pos - start);
@@ -1339,8 +1339,8 @@ class Node {
   into. If any of this is violated, an error of type
   [`ReplaceError`](https://prosemirror.net/docs/ref/#model.ReplaceError) is thrown.
   */
-  replace(from, to, slice) {
-    return replace(this.resolve(from), this.resolve(to), slice);
+  replace(from2, to, slice2) {
+    return replace(this.resolve(from2), this.resolve(to), slice2);
   }
   /**
   Find the node directly after the given position.
@@ -1396,10 +1396,10 @@ class Node {
   Test whether a given mark or mark type occurs in this document
   between the two given positions.
   */
-  rangeHasMark(from, to, type) {
+  rangeHasMark(from2, to, type) {
     let found2 = false;
-    if (to > from)
-      this.nodesBetween(from, to, (node) => {
+    if (to > from2)
+      this.nodesBetween(from2, to, (node) => {
         if (type.isInSet(node.marks))
           found2 = true;
         return !found2;
@@ -1482,13 +1482,13 @@ class Node {
   can optionally pass `start` and `end` indices into the
   replacement fragment.
   */
-  canReplace(from, to, replacement = Fragment.empty, start = 0, end = replacement.childCount) {
-    let one = this.contentMatchAt(from).matchFragment(replacement, start, end);
+  canReplace(from2, to, replacement = Fragment.empty, start = 0, end = replacement.childCount) {
+    let one = this.contentMatchAt(from2).matchFragment(replacement, start, end);
     let two = one && one.matchFragment(this.content, to);
     if (!two || !two.validEnd)
       return false;
-    for (let i = start; i < end; i++)
-      if (!this.type.allowsMarks(replacement.child(i).marks))
+    for (let i2 = start; i2 < end; i2++)
+      if (!this.type.allowsMarks(replacement.child(i2).marks))
         return false;
     return true;
   }
@@ -1496,10 +1496,10 @@ class Node {
   Test whether replacing the range `from` to `to` (by index) with
   a node of the given type would leave the node's content valid.
   */
-  canReplaceWith(from, to, type, marks) {
+  canReplaceWith(from2, to, type, marks) {
     if (marks && !this.type.allowsMarks(marks))
       return false;
-    let start = this.contentMatchAt(from).matchType(type);
+    let start = this.contentMatchAt(from2).matchType(type);
     let end = start && start.matchFragment(this.content, to);
     return end ? end.validEnd : false;
   }
@@ -1523,8 +1523,8 @@ class Node {
     this.type.checkContent(this.content);
     this.type.checkAttrs(this.attrs);
     let copy2 = Mark$1.none;
-    for (let i = 0; i < this.marks.length; i++) {
-      let mark = this.marks[i];
+    for (let i2 = 0; i2 < this.marks.length; i2++) {
+      let mark = this.marks[i2];
       mark.type.checkAttrs(mark.attrs);
       copy2 = mark.addToSet(copy2);
     }
@@ -1589,8 +1589,8 @@ class TextNode extends Node {
   get textContent() {
     return this.text;
   }
-  textBetween(from, to) {
-    return this.text.slice(from, to);
+  textBetween(from2, to) {
+    return this.text.slice(from2, to);
   }
   get nodeSize() {
     return this.text.length;
@@ -1603,23 +1603,23 @@ class TextNode extends Node {
       return this;
     return new TextNode(this.type, this.attrs, text, this.marks);
   }
-  cut(from = 0, to = this.text.length) {
-    if (from == 0 && to == this.text.length)
+  cut(from2 = 0, to = this.text.length) {
+    if (from2 == 0 && to == this.text.length)
       return this;
-    return this.withText(this.text.slice(from, to));
+    return this.withText(this.text.slice(from2, to));
   }
   eq(other) {
     return this.sameMarkup(other) && this.text == other.text;
   }
   toJSON() {
-    let base = super.toJSON();
-    base.text = this.text;
-    return base;
+    let base2 = super.toJSON();
+    base2.text = this.text;
+    return base2;
   }
 }
 function wrapMarks(marks, str) {
-  for (let i = marks.length - 1; i >= 0; i--)
-    str = marks[i].type.name + "(" + str + ")";
+  for (let i2 = marks.length - 1; i2 >= 0; i2--)
+    str = marks[i2].type.name + "(" + str + ")";
   return str;
 }
 class ContentMatch {
@@ -1650,9 +1650,9 @@ class ContentMatch {
   successful.
   */
   matchType(type) {
-    for (let i = 0; i < this.next.length; i++)
-      if (this.next[i].type == type)
-        return this.next[i].next;
+    for (let i2 = 0; i2 < this.next.length; i2++)
+      if (this.next[i2].type == type)
+        return this.next[i2].next;
     return null;
   }
   /**
@@ -1661,8 +1661,8 @@ class ContentMatch {
   */
   matchFragment(frag, start = 0, end = frag.childCount) {
     let cur = this;
-    for (let i = start; cur && i < end; i++)
-      cur = cur.matchType(frag.child(i).type);
+    for (let i2 = start; cur && i2 < end; i2++)
+      cur = cur.matchType(frag.child(i2).type);
     return cur;
   }
   /**
@@ -1676,8 +1676,8 @@ class ContentMatch {
   be generated.
   */
   get defaultType() {
-    for (let i = 0; i < this.next.length; i++) {
-      let { type } = this.next[i];
+    for (let i2 = 0; i2 < this.next.length; i2++) {
+      let { type } = this.next[i2];
       if (!(type.isText || type.hasRequiredAttrs()))
         return type;
     }
@@ -1687,9 +1687,9 @@ class ContentMatch {
   @internal
   */
   compatible(other) {
-    for (let i = 0; i < this.next.length; i++)
+    for (let i2 = 0; i2 < this.next.length; i2++)
       for (let j = 0; j < other.next.length; j++)
-        if (this.next[i].type == other.next[j].type)
+        if (this.next[i2].type == other.next[j].type)
           return true;
     return false;
   }
@@ -1707,8 +1707,8 @@ class ContentMatch {
       let finished = match.matchFragment(after, startIndex);
       if (finished && (!toEnd || finished.validEnd))
         return Fragment.from(types.map((tp) => tp.createAndFill()));
-      for (let i = 0; i < match.next.length; i++) {
-        let { type, next } = match.next[i];
+      for (let i2 = 0; i2 < match.next.length; i2++) {
+        let { type, next } = match.next[i2];
         if (!(type.isText || type.hasRequiredAttrs()) && seen.indexOf(next) == -1) {
           seen.push(next);
           let found2 = search(next, types.concat(type));
@@ -1727,9 +1727,9 @@ class ContentMatch {
   exists.
   */
   findWrapping(target) {
-    for (let i = 0; i < this.wrapCache.length; i += 2)
-      if (this.wrapCache[i] == target)
-        return this.wrapCache[i + 1];
+    for (let i2 = 0; i2 < this.wrapCache.length; i2 += 2)
+      if (this.wrapCache[i2] == target)
+        return this.wrapCache[i2 + 1];
     let computed = this.computeWrapping(target);
     this.wrapCache.push(target, computed);
     return computed;
@@ -1747,8 +1747,8 @@ class ContentMatch {
           result.push(obj.type);
         return result.reverse();
       }
-      for (let i = 0; i < match.next.length; i++) {
-        let { type, next } = match.next[i];
+      for (let i2 = 0; i2 < match.next.length; i2++) {
+        let { type, next } = match.next[i2];
         if (!type.isLeaf && !type.hasRequiredAttrs() && !(type.name in seen) && (!current.type || next.validEnd)) {
           active.push({ match: type.contentMatch, type, via: current });
           seen[type.name] = true;
@@ -1780,15 +1780,15 @@ class ContentMatch {
     let seen = [];
     function scan(m) {
       seen.push(m);
-      for (let i = 0; i < m.next.length; i++)
-        if (seen.indexOf(m.next[i].next) == -1)
-          scan(m.next[i].next);
+      for (let i2 = 0; i2 < m.next.length; i2++)
+        if (seen.indexOf(m.next[i2].next) == -1)
+          scan(m.next[i2].next);
     }
     scan(this);
-    return seen.map((m, i) => {
-      let out = i + (m.validEnd ? "*" : " ") + " ";
-      for (let i2 = 0; i2 < m.next.length; i2++)
-        out += (i2 ? ", " : "") + m.next[i2].type.name + "->" + seen.indexOf(m.next[i2].next);
+    return seen.map((m, i2) => {
+      let out = i2 + (m.validEnd ? "*" : " ") + " ";
+      for (let i3 = 0; i3 < m.next.length; i3++)
+        out += (i3 ? ", " : "") + m.next[i3].type.name + "->" + seen.indexOf(m.next[i3].next);
       return out;
     }).join("\n");
   }
@@ -1906,39 +1906,39 @@ function nfa(expr) {
   function node() {
     return nfa2.push([]) - 1;
   }
-  function edge(from, to, term) {
+  function edge(from2, to, term) {
     let edge2 = { term, to };
-    nfa2[from].push(edge2);
+    nfa2[from2].push(edge2);
     return edge2;
   }
   function connect(edges, to) {
     edges.forEach((edge2) => edge2.to = to);
   }
-  function compile(expr2, from) {
+  function compile(expr2, from2) {
     if (expr2.type == "choice") {
-      return expr2.exprs.reduce((out, expr3) => out.concat(compile(expr3, from)), []);
+      return expr2.exprs.reduce((out, expr3) => out.concat(compile(expr3, from2)), []);
     } else if (expr2.type == "seq") {
-      for (let i = 0; ; i++) {
-        let next = compile(expr2.exprs[i], from);
-        if (i == expr2.exprs.length - 1)
+      for (let i2 = 0; ; i2++) {
+        let next = compile(expr2.exprs[i2], from2);
+        if (i2 == expr2.exprs.length - 1)
           return next;
-        connect(next, from = node());
+        connect(next, from2 = node());
       }
     } else if (expr2.type == "star") {
       let loop = node();
-      edge(from, loop);
+      edge(from2, loop);
       connect(compile(expr2.expr, loop), loop);
       return [edge(loop)];
     } else if (expr2.type == "plus") {
       let loop = node();
-      connect(compile(expr2.expr, from), loop);
+      connect(compile(expr2.expr, from2), loop);
       connect(compile(expr2.expr, loop), loop);
       return [edge(loop)];
     } else if (expr2.type == "opt") {
-      return [edge(from)].concat(compile(expr2.expr, from));
+      return [edge(from2)].concat(compile(expr2.expr, from2));
     } else if (expr2.type == "range") {
-      let cur = from;
-      for (let i = 0; i < expr2.min; i++) {
+      let cur = from2;
+      for (let i2 = 0; i2 < expr2.min; i2++) {
         let next = node();
         connect(compile(expr2.expr, cur), next);
         cur = next;
@@ -1946,7 +1946,7 @@ function nfa(expr) {
       if (expr2.max == -1) {
         connect(compile(expr2.expr, cur), cur);
       } else {
-        for (let i = expr2.min; i < expr2.max; i++) {
+        for (let i2 = expr2.min; i2 < expr2.max; i2++) {
           let next = node();
           edge(cur, next);
           connect(compile(expr2.expr, cur), next);
@@ -1955,7 +1955,7 @@ function nfa(expr) {
       }
       return [edge(cur)];
     } else if (expr2.type == "name") {
-      return [edge(from, void 0, expr2.value)];
+      return [edge(from2, void 0, expr2.value)];
     } else {
       throw new Error("Unknown expr type");
     }
@@ -1973,8 +1973,8 @@ function nullFrom(nfa2, node) {
     if (edges.length == 1 && !edges[0].term)
       return scan(edges[0].to);
     result.push(node2);
-    for (let i = 0; i < edges.length; i++) {
-      let { term, to } = edges[i];
+    for (let i2 = 0; i2 < edges.length; i2++) {
+      let { term, to } = edges[i2];
       if (!term && result.indexOf(to) == -1)
         scan(to);
     }
@@ -1990,9 +1990,9 @@ function dfa(nfa2) {
         if (!term)
           return;
         let set;
-        for (let i = 0; i < out.length; i++)
-          if (out[i][0] == term)
-            set = out[i][1];
+        for (let i2 = 0; i2 < out.length; i2++)
+          if (out[i2][0] == term)
+            set = out[i2][1];
         nullFrom(nfa2, to).forEach((node2) => {
           if (!set)
             out.push([term, set = []]);
@@ -2002,16 +2002,16 @@ function dfa(nfa2) {
       });
     });
     let state = labeled[states.join(",")] = new ContentMatch(states.indexOf(nfa2.length - 1) > -1);
-    for (let i = 0; i < out.length; i++) {
-      let states2 = out[i][1].sort(cmp);
-      state.next.push({ type: out[i][0], next: labeled[states2.join(",")] || explore(states2) });
+    for (let i2 = 0; i2 < out.length; i2++) {
+      let states2 = out[i2][1].sort(cmp);
+      state.next.push({ type: out[i2][0], next: labeled[states2.join(",")] || explore(states2) });
     }
     return state;
   }
 }
 function checkForDeadEnds(match, stream) {
-  for (let i = 0, work = [match]; i < work.length; i++) {
-    let state = work[i], dead = !state.validEnd, nodes = [];
+  for (let i2 = 0, work = [match]; i2 < work.length; i2++) {
+    let state = work[i2], dead = !state.validEnd, nodes = [];
     for (let j = 0; j < state.next.length; j++) {
       let { type, next } = state.next[j];
       nodes.push(type.name);
@@ -2200,8 +2200,8 @@ class NodeType {
     let result = this.contentMatch.matchFragment(content);
     if (!result || !result.validEnd)
       return false;
-    for (let i = 0; i < content.childCount; i++)
-      if (!this.allowsMarks(content.child(i).marks))
+    for (let i2 = 0; i2 < content.childCount; i2++)
+      if (!this.allowsMarks(content.child(i2).marks))
         return false;
     return true;
   }
@@ -2232,8 +2232,8 @@ class NodeType {
   allowsMarks(marks) {
     if (this.markSet == null)
       return true;
-    for (let i = 0; i < marks.length; i++)
-      if (!this.allowsMarkType(marks[i].type))
+    for (let i2 = 0; i2 < marks.length; i2++)
+      if (!this.allowsMarkType(marks[i2].type))
         return false;
     return true;
   }
@@ -2244,12 +2244,12 @@ class NodeType {
     if (this.markSet == null)
       return marks;
     let copy2;
-    for (let i = 0; i < marks.length; i++) {
-      if (!this.allowsMarkType(marks[i].type)) {
+    for (let i2 = 0; i2 < marks.length; i2++) {
+      if (!this.allowsMarkType(marks[i2].type)) {
         if (!copy2)
-          copy2 = marks.slice(0, i);
+          copy2 = marks.slice(0, i2);
       } else if (copy2) {
-        copy2.push(marks[i]);
+        copy2.push(marks[i2]);
       }
     }
     return !copy2 ? marks : copy2.length ? copy2 : Mark$1.none;
@@ -2325,10 +2325,10 @@ class MarkType {
   without it is returned. Otherwise, the input set is returned.
   */
   removeFromSet(set) {
-    for (var i = 0; i < set.length; i++)
-      if (set[i].type == this) {
-        set = set.slice(0, i).concat(set.slice(i + 1));
-        i--;
+    for (var i2 = 0; i2 < set.length; i2++)
+      if (set[i2].type == this) {
+        set = set.slice(0, i2).concat(set.slice(i2 + 1));
+        i2--;
       }
     return set;
   }
@@ -2336,9 +2336,9 @@ class MarkType {
   Tests whether there is a mark of this type in the given set.
   */
   isInSet(set) {
-    for (let i = 0; i < set.length; i++)
-      if (set[i].type == this)
-        return set[i];
+    for (let i2 = 0; i2 < set.length; i2++)
+      if (set[i2].type == this)
+        return set[i2];
   }
   /**
   @internal
@@ -2434,8 +2434,8 @@ class Schema {
 }
 function gatherMarks(schema, marks) {
   let found2 = [];
-  for (let i = 0; i < marks.length; i++) {
-    let name = marks[i], mark = schema.marks[name], ok = mark;
+  for (let i2 = 0; i2 < marks.length; i2++) {
+    let name = marks[i2], mark = schema.marks[name], ok = mark;
     if (mark) {
       found2.push(mark);
     } else {
@@ -2446,7 +2446,7 @@ function gatherMarks(schema, marks) {
       }
     }
     if (!ok)
-      throw new SyntaxError("Unknown mark type: '" + marks[i] + "'");
+      throw new SyntaxError("Unknown mark type: '" + marks[i2] + "'");
   }
   return found2;
 }
@@ -2509,8 +2509,8 @@ let DOMParser$1 = class DOMParser2 {
   @internal
   */
   matchTag(dom, context, after) {
-    for (let i = after ? this.tags.indexOf(after) + 1 : 0; i < this.tags.length; i++) {
-      let rule = this.tags[i];
+    for (let i2 = after ? this.tags.indexOf(after) + 1 : 0; i2 < this.tags.length; i2++) {
+      let rule = this.tags[i2];
       if (matches(dom, rule.tag) && (rule.namespace === void 0 || dom.namespaceURI == rule.namespace) && (!rule.context || context.matchesContext(rule.context))) {
         if (rule.getAttrs) {
           let result = rule.getAttrs(dom);
@@ -2526,8 +2526,8 @@ let DOMParser$1 = class DOMParser2 {
   @internal
   */
   matchStyle(prop, value, context, after) {
-    for (let i = after ? this.styles.indexOf(after) + 1 : 0; i < this.styles.length; i++) {
-      let rule = this.styles[i], style = rule.style;
+    for (let i2 = after ? this.styles.indexOf(after) + 1 : 0; i2 < this.styles.length; i2++) {
+      let rule = this.styles[i2], style = rule.style;
       if (style.indexOf(prop) != 0 || rule.context && !context.matchesContext(rule.context) || // Test that the style string either precisely matches the prop,
       // or has an '=' sign after the prop, followed by the given
       // value.
@@ -2548,13 +2548,13 @@ let DOMParser$1 = class DOMParser2 {
   static schemaRules(schema) {
     let result = [];
     function insert(rule) {
-      let priority = rule.priority == null ? 50 : rule.priority, i = 0;
-      for (; i < result.length; i++) {
-        let next = result[i], nextPriority = next.priority == null ? 50 : next.priority;
+      let priority = rule.priority == null ? 50 : rule.priority, i2 = 0;
+      for (; i2 < result.length; i2++) {
+        let next = result[i2], nextPriority = next.priority == null ? 50 : next.priority;
         if (nextPriority < priority)
           break;
       }
-      result.splice(i, 0, rule);
+      result.splice(i2, 0, rule);
     }
     for (let name in schema.marks) {
       let rules = schema.marks[name].spec.parseDOM;
@@ -2630,10 +2630,10 @@ const ignoreTags = {
 };
 const listTags = { ol: true, ul: true };
 const OPT_PRESERVE_WS = 1, OPT_PRESERVE_WS_FULL = 2, OPT_OPEN_LEFT = 4;
-function wsOptionsFor(type, preserveWhitespace, base) {
+function wsOptionsFor(type, preserveWhitespace, base2) {
   if (preserveWhitespace != null)
     return (preserveWhitespace ? OPT_PRESERVE_WS : 0) | (preserveWhitespace === "full" ? OPT_PRESERVE_WS_FULL : 0);
-  return type && type.whitespace == "pre" ? OPT_PRESERVE_WS | OPT_PRESERVE_WS_FULL : base & ~OPT_OPEN_LEFT;
+  return type && type.whitespace == "pre" ? OPT_PRESERVE_WS | OPT_PRESERVE_WS_FULL : base2 & ~OPT_OPEN_LEFT;
 }
 class NodeContext {
   constructor(type, attrs, marks, solid, match, options) {
@@ -2737,11 +2737,11 @@ class ParseContext {
         value = value.replace(/\r\n?/g, "\n");
       } else if (schema.linebreakReplacement && /[\r\n]/.test(value) && this.top.findWrapping(schema.linebreakReplacement.create())) {
         let lines = value.split(/\r?\n|\r/);
-        for (let i = 0; i < lines.length; i++) {
-          if (i)
+        for (let i2 = 0; i2 < lines.length; i2++) {
+          if (i2)
             this.insertNode(schema.linebreakReplacement.create(), marks, true);
-          if (lines[i])
-            this.insertNode(schema.text(lines[i]), marks, !/\S/.test(lines[i]));
+          if (lines[i2])
+            this.insertNode(schema.text(lines[i2]), marks, !/\S/.test(lines[i2]));
         }
         value = "";
       } else {
@@ -2814,8 +2814,8 @@ class ParseContext {
   readStyles(dom, marks) {
     let styles = dom.style;
     if (styles && styles.length)
-      for (let i = 0; i < this.parser.matchedStyles.length; i++) {
-        let name = this.parser.matchedStyles[i], value = styles.getPropertyValue(name);
+      for (let i2 = 0; i2 < this.parser.matchedStyles.length; i2++) {
+        let name = this.parser.matchedStyles[i2], value = styles.getPropertyValue(name);
         if (value)
           for (let after = void 0; ; ) {
             let rule = this.parser.matchStyle(name, value, this, after);
@@ -2912,8 +2912,8 @@ class ParseContext {
     if (!route)
       return null;
     this.sync(sync);
-    for (let i = 0; i < route.length; i++)
-      marks = this.enterInner(route[i], null, marks, false);
+    for (let i2 = 0; i2 < route.length; i2++)
+      marks = this.enterInner(route[i2], null, marks, false);
     return marks;
   }
   // Try to insert the given node, adjusting the context when needed.
@@ -2969,10 +2969,10 @@ class ParseContext {
   // Make sure all nodes above this.open are finished and added to
   // their parents
   closeExtra(openEnd = false) {
-    let i = this.nodes.length - 1;
-    if (i > this.open) {
-      for (; i > this.open; i--)
-        this.nodes[i - 1].content.push(this.nodes[i].finish(openEnd));
+    let i2 = this.nodes.length - 1;
+    if (i2 > this.open) {
+      for (; i2 > this.open; i2--)
+        this.nodes[i2 - 1].content.push(this.nodes[i2].finish(openEnd));
       this.nodes.length = this.open + 1;
     }
   }
@@ -2982,12 +2982,12 @@ class ParseContext {
     return this.nodes[0].finish(!!(this.isOpen || this.options.topOpen));
   }
   sync(to) {
-    for (let i = this.open; i >= 0; i--) {
-      if (this.nodes[i] == to) {
-        this.open = i;
+    for (let i2 = this.open; i2 >= 0; i2--) {
+      if (this.nodes[i2] == to) {
+        this.open = i2;
         return true;
       } else if (this.localPreserveWS) {
-        this.nodes[i].options |= OPT_PRESERVE_WS;
+        this.nodes[i2].options |= OPT_PRESERVE_WS;
       }
     }
     return false;
@@ -2995,44 +2995,44 @@ class ParseContext {
   get currentPos() {
     this.closeExtra();
     let pos = 0;
-    for (let i = this.open; i >= 0; i--) {
-      let content = this.nodes[i].content;
+    for (let i2 = this.open; i2 >= 0; i2--) {
+      let content = this.nodes[i2].content;
       for (let j = content.length - 1; j >= 0; j--)
         pos += content[j].nodeSize;
-      if (i)
+      if (i2)
         pos++;
     }
     return pos;
   }
   findAtPoint(parent, offset) {
     if (this.find)
-      for (let i = 0; i < this.find.length; i++) {
-        if (this.find[i].node == parent && this.find[i].offset == offset)
-          this.find[i].pos = this.currentPos;
+      for (let i2 = 0; i2 < this.find.length; i2++) {
+        if (this.find[i2].node == parent && this.find[i2].offset == offset)
+          this.find[i2].pos = this.currentPos;
       }
   }
   findInside(parent) {
     if (this.find)
-      for (let i = 0; i < this.find.length; i++) {
-        if (this.find[i].pos == null && parent.nodeType == 1 && parent.contains(this.find[i].node))
-          this.find[i].pos = this.currentPos;
+      for (let i2 = 0; i2 < this.find.length; i2++) {
+        if (this.find[i2].pos == null && parent.nodeType == 1 && parent.contains(this.find[i2].node))
+          this.find[i2].pos = this.currentPos;
       }
   }
   findAround(parent, content, before) {
     if (parent != content && this.find)
-      for (let i = 0; i < this.find.length; i++) {
-        if (this.find[i].pos == null && parent.nodeType == 1 && parent.contains(this.find[i].node)) {
-          let pos = content.compareDocumentPosition(this.find[i].node);
+      for (let i2 = 0; i2 < this.find.length; i2++) {
+        if (this.find[i2].pos == null && parent.nodeType == 1 && parent.contains(this.find[i2].node)) {
+          let pos = content.compareDocumentPosition(this.find[i2].node);
           if (pos & (before ? 2 : 4))
-            this.find[i].pos = this.currentPos;
+            this.find[i2].pos = this.currentPos;
         }
       }
   }
   findInText(textNode) {
     if (this.find)
-      for (let i = 0; i < this.find.length; i++) {
-        if (this.find[i].node == textNode)
-          this.find[i].pos = this.currentPos - (textNode.nodeValue.length - this.find[i].offset);
+      for (let i2 = 0; i2 < this.find.length; i2++) {
+        if (this.find[i2].node == textNode)
+          this.find[i2].pos = this.currentPos - (textNode.nodeValue.length - this.find[i2].offset);
       }
   }
   // Determines whether the given context string matches this context.
@@ -3043,14 +3043,14 @@ class ParseContext {
     let option = this.options.context;
     let useRoot = !this.isOpen && (!option || option.parent.type == this.nodes[0].type);
     let minDepth = -(option ? option.depth + 1 : 0) + (useRoot ? 0 : 1);
-    let match = (i, depth) => {
-      for (; i >= 0; i--) {
-        let part = parts[i];
+    let match = (i2, depth) => {
+      for (; i2 >= 0; i2--) {
+        let part = parts[i2];
         if (part == "") {
-          if (i == parts.length - 1 || i == 0)
+          if (i2 == parts.length - 1 || i2 == 0)
             continue;
           for (; depth >= minDepth; depth--)
-            if (match(i - 1, depth))
+            if (match(i2 - 1, depth))
               return true;
           return false;
         } else {
@@ -3109,8 +3109,8 @@ function markMayApply(markType, nodeType) {
       continue;
     let seen = [], scan = (match) => {
       seen.push(match);
-      for (let i = 0; i < match.edgeCount; i++) {
-        let { type, next } = match.edge(i);
+      for (let i2 = 0; i2 < match.edgeCount; i2++) {
+        let { type, next } = match.edge(i2);
         if (type == nodeType)
           return true;
         if (seen.indexOf(next) < 0 && scan(next))
@@ -3189,8 +3189,8 @@ class StepMap {
   recover(value) {
     let diff = 0, index = recoverIndex(value);
     if (!this.inverted)
-      for (let i = 0; i < index; i++)
-        diff += this.ranges[i * 3 + 2] - this.ranges[i * 3 + 1];
+      for (let i2 = 0; i2 < index; i2++)
+        diff += this.ranges[i2 * 3 + 2] - this.ranges[i2 * 3 + 1];
     return this.ranges[index * 3] + diff + recoverOffset(value);
   }
   mapResult(pos, assoc = 1) {
@@ -3204,17 +3204,17 @@ class StepMap {
   */
   _map(pos, assoc, simple) {
     let diff = 0, oldIndex = this.inverted ? 2 : 1, newIndex = this.inverted ? 1 : 2;
-    for (let i = 0; i < this.ranges.length; i += 3) {
-      let start = this.ranges[i] - (this.inverted ? diff : 0);
+    for (let i2 = 0; i2 < this.ranges.length; i2 += 3) {
+      let start = this.ranges[i2] - (this.inverted ? diff : 0);
       if (start > pos)
         break;
-      let oldSize = this.ranges[i + oldIndex], newSize = this.ranges[i + newIndex], end = start + oldSize;
+      let oldSize = this.ranges[i2 + oldIndex], newSize = this.ranges[i2 + newIndex], end = start + oldSize;
       if (pos <= end) {
         let side = !oldSize ? assoc : pos == start ? -1 : pos == end ? 1 : assoc;
         let result = start + diff + (side < 0 ? 0 : newSize);
         if (simple)
           return result;
-        let recover = pos == (assoc < 0 ? start : end) ? null : makeRecover(i / 3, pos - start);
+        let recover = pos == (assoc < 0 ? start : end) ? null : makeRecover(i2 / 3, pos - start);
         let del = pos == start ? DEL_AFTER : pos == end ? DEL_BEFORE : DEL_ACROSS;
         if (assoc < 0 ? pos != start : pos != end)
           del |= DEL_SIDE;
@@ -3230,14 +3230,14 @@ class StepMap {
   touches(pos, recover) {
     let diff = 0, index = recoverIndex(recover);
     let oldIndex = this.inverted ? 2 : 1, newIndex = this.inverted ? 1 : 2;
-    for (let i = 0; i < this.ranges.length; i += 3) {
-      let start = this.ranges[i] - (this.inverted ? diff : 0);
+    for (let i2 = 0; i2 < this.ranges.length; i2 += 3) {
+      let start = this.ranges[i2] - (this.inverted ? diff : 0);
       if (start > pos)
         break;
-      let oldSize = this.ranges[i + oldIndex], end = start + oldSize;
-      if (pos <= end && i == index * 3)
+      let oldSize = this.ranges[i2 + oldIndex], end = start + oldSize;
+      if (pos <= end && i2 == index * 3)
         return true;
-      diff += this.ranges[i + newIndex] - oldSize;
+      diff += this.ranges[i2 + newIndex] - oldSize;
     }
     return false;
   }
@@ -3247,9 +3247,9 @@ class StepMap {
   */
   forEach(f) {
     let oldIndex = this.inverted ? 2 : 1, newIndex = this.inverted ? 1 : 2;
-    for (let i = 0, diff = 0; i < this.ranges.length; i += 3) {
-      let start = this.ranges[i], oldStart = start - (this.inverted ? diff : 0), newStart = start + (this.inverted ? 0 : diff);
-      let oldSize = this.ranges[i + oldIndex], newSize = this.ranges[i + newIndex];
+    for (let i2 = 0, diff = 0; i2 < this.ranges.length; i2 += 3) {
+      let start = this.ranges[i2], oldStart = start - (this.inverted ? diff : 0), newStart = start + (this.inverted ? 0 : diff);
+      let oldSize = this.ranges[i2 + oldIndex], newSize = this.ranges[i2 + newIndex];
       f(oldStart, oldStart + oldSize, newStart, newStart + newSize);
       diff += newSize - oldSize;
     }
@@ -3281,9 +3281,9 @@ class Mapping {
   /**
   Create a new mapping with the given position maps.
   */
-  constructor(maps, mirror, from = 0, to = maps ? maps.length : 0) {
+  constructor(maps, mirror, from2 = 0, to = maps ? maps.length : 0) {
     this.mirror = mirror;
-    this.from = from;
+    this.from = from2;
     this.to = to;
     this._maps = maps || [];
     this.ownData = !(maps || mirror);
@@ -3297,21 +3297,21 @@ class Mapping {
   /**
   Create a mapping that maps only through a part of this one.
   */
-  slice(from = 0, to = this.maps.length) {
-    return new Mapping(this._maps, this.mirror, from, to);
+  slice(from2 = 0, to = this.maps.length) {
+    return new Mapping(this._maps, this.mirror, from2, to);
   }
   /**
   Add a step map to the end of this mapping. If `mirrors` is
   given, it should be the index of the step map that is the mirror
   image of this one.
   */
-  appendMap(map, mirrors) {
+  appendMap(map2, mirrors) {
     if (!this.ownData) {
       this._maps = this._maps.slice();
       this.mirror = this.mirror && this.mirror.slice();
       this.ownData = true;
     }
-    this.to = this._maps.push(map);
+    this.to = this._maps.push(map2);
     if (mirrors != null)
       this.setMirror(this._maps.length - 1, mirrors);
   }
@@ -3320,9 +3320,9 @@ class Mapping {
   mirroring information).
   */
   appendMapping(mapping) {
-    for (let i = 0, startSize = this._maps.length; i < mapping._maps.length; i++) {
-      let mirr = mapping.getMirror(i);
-      this.appendMap(mapping._maps[i], mirr != null && mirr < i ? startSize + mirr : void 0);
+    for (let i2 = 0, startSize = this._maps.length; i2 < mapping._maps.length; i2++) {
+      let mirr = mapping.getMirror(i2);
+      this.appendMap(mapping._maps[i2], mirr != null && mirr < i2 ? startSize + mirr : void 0);
     }
   }
   /**
@@ -3332,9 +3332,9 @@ class Mapping {
   */
   getMirror(n) {
     if (this.mirror) {
-      for (let i = 0; i < this.mirror.length; i++)
-        if (this.mirror[i] == n)
-          return this.mirror[i + (i % 2 ? -1 : 1)];
+      for (let i2 = 0; i2 < this.mirror.length; i2++)
+        if (this.mirror[i2] == n)
+          return this.mirror[i2 + (i2 % 2 ? -1 : 1)];
     }
   }
   /**
@@ -3349,9 +3349,9 @@ class Mapping {
   Append the inverse of the given mapping to this one.
   */
   appendMappingInverted(mapping) {
-    for (let i = mapping.maps.length - 1, totalSize = this._maps.length + mapping._maps.length; i >= 0; i--) {
-      let mirr = mapping.getMirror(i);
-      this.appendMap(mapping._maps[i].invert(), mirr != null && mirr > i ? totalSize - mirr - 1 : void 0);
+    for (let i2 = mapping.maps.length - 1, totalSize = this._maps.length + mapping._maps.length; i2 >= 0; i2--) {
+      let mirr = mapping.getMirror(i2);
+      this.appendMap(mapping._maps[i2].invert(), mirr != null && mirr > i2 ? totalSize - mirr - 1 : void 0);
     }
   }
   /**
@@ -3368,8 +3368,8 @@ class Mapping {
   map(pos, assoc = 1) {
     if (this.mirror)
       return this._map(pos, assoc, true);
-    for (let i = this.from; i < this.to; i++)
-      pos = this._maps[i].map(pos, assoc);
+    for (let i2 = this.from; i2 < this.to; i2++)
+      pos = this._maps[i2].map(pos, assoc);
     return pos;
   }
   /**
@@ -3384,12 +3384,12 @@ class Mapping {
   */
   _map(pos, assoc, simple) {
     let delInfo = 0;
-    for (let i = this.from; i < this.to; i++) {
-      let map = this._maps[i], result = map.mapResult(pos, assoc);
+    for (let i2 = this.from; i2 < this.to; i2++) {
+      let map2 = this._maps[i2], result = map2.mapResult(pos, assoc);
       if (result.recover != null) {
-        let corr = this.getMirror(i);
-        if (corr != null && corr > i && corr < this.to) {
-          i = corr;
+        let corr = this.getMirror(i2);
+        if (corr != null && corr > i2 && corr < this.to) {
+          i2 = corr;
           pos = this._maps[corr].recover(result.recover);
           continue;
         }
@@ -3469,9 +3469,9 @@ class StepResult {
   arguments. Create a successful result if it succeeds, and a
   failed one if it throws a `ReplaceError`.
   */
-  static fromReplace(doc, from, to, slice) {
+  static fromReplace(doc, from2, to, slice2) {
     try {
-      return StepResult.ok(doc.replace(from, to, slice));
+      return StepResult.ok(doc.replace(from2, to, slice2));
     } catch (e) {
       if (e instanceof ReplaceError)
         return StepResult.fail(e.message);
@@ -3481,12 +3481,12 @@ class StepResult {
 }
 function mapFragment(fragment, f, parent) {
   let mapped = [];
-  for (let i = 0; i < fragment.childCount; i++) {
-    let child = fragment.child(i);
+  for (let i2 = 0; i2 < fragment.childCount; i2++) {
+    let child = fragment.child(i2);
     if (child.content.size)
       child = child.copy(mapFragment(child.content, f, child));
     if (child.isInline)
-      child = f(child, parent, i);
+      child = f(child, parent, i2);
     mapped.push(child);
   }
   return Fragment.fromArray(mapped);
@@ -3495,30 +3495,30 @@ class AddMarkStep extends Step {
   /**
   Create a mark step.
   */
-  constructor(from, to, mark) {
+  constructor(from2, to, mark) {
     super();
-    this.from = from;
+    this.from = from2;
     this.to = to;
     this.mark = mark;
   }
   apply(doc) {
     let oldSlice = doc.slice(this.from, this.to), $from = doc.resolve(this.from);
     let parent = $from.node($from.sharedDepth(this.to));
-    let slice = new Slice(mapFragment(oldSlice.content, (node, parent2) => {
+    let slice2 = new Slice(mapFragment(oldSlice.content, (node, parent2) => {
       if (!node.isAtom || !parent2.type.allowsMarkType(this.mark.type))
         return node;
       return node.mark(this.mark.addToSet(node.marks));
     }, parent), oldSlice.openStart, oldSlice.openEnd);
-    return StepResult.fromReplace(doc, this.from, this.to, slice);
+    return StepResult.fromReplace(doc, this.from, this.to, slice2);
   }
   invert() {
     return new RemoveMarkStep(this.from, this.to, this.mark);
   }
   map(mapping) {
-    let from = mapping.mapResult(this.from, 1), to = mapping.mapResult(this.to, -1);
-    if (from.deleted && to.deleted || from.pos >= to.pos)
+    let from2 = mapping.mapResult(this.from, 1), to = mapping.mapResult(this.to, -1);
+    if (from2.deleted && to.deleted || from2.pos >= to.pos)
       return null;
-    return new AddMarkStep(from.pos, to.pos, this.mark);
+    return new AddMarkStep(from2.pos, to.pos, this.mark);
   }
   merge(other) {
     if (other instanceof AddMarkStep && other.mark.eq(this.mark) && this.from <= other.to && this.to >= other.from)
@@ -3547,27 +3547,27 @@ class RemoveMarkStep extends Step {
   /**
   Create a mark-removing step.
   */
-  constructor(from, to, mark) {
+  constructor(from2, to, mark) {
     super();
-    this.from = from;
+    this.from = from2;
     this.to = to;
     this.mark = mark;
   }
   apply(doc) {
     let oldSlice = doc.slice(this.from, this.to);
-    let slice = new Slice(mapFragment(oldSlice.content, (node) => {
+    let slice2 = new Slice(mapFragment(oldSlice.content, (node) => {
       return node.mark(this.mark.removeFromSet(node.marks));
     }, doc), oldSlice.openStart, oldSlice.openEnd);
-    return StepResult.fromReplace(doc, this.from, this.to, slice);
+    return StepResult.fromReplace(doc, this.from, this.to, slice2);
   }
   invert() {
     return new AddMarkStep(this.from, this.to, this.mark);
   }
   map(mapping) {
-    let from = mapping.mapResult(this.from, 1), to = mapping.mapResult(this.to, -1);
-    if (from.deleted && to.deleted || from.pos >= to.pos)
+    let from2 = mapping.mapResult(this.from, 1), to = mapping.mapResult(this.to, -1);
+    if (from2.deleted && to.deleted || from2.pos >= to.pos)
       return null;
-    return new RemoveMarkStep(from.pos, to.pos, this.mark);
+    return new RemoveMarkStep(from2.pos, to.pos, this.mark);
   }
   merge(other) {
     if (other instanceof RemoveMarkStep && other.mark.eq(this.mark) && this.from <= other.to && this.to >= other.from)
@@ -3613,9 +3613,9 @@ class AddNodeMarkStep extends Step {
     if (node) {
       let newSet = this.mark.addToSet(node.marks);
       if (newSet.length == node.marks.length) {
-        for (let i = 0; i < node.marks.length; i++)
-          if (!node.marks[i].isInSet(newSet))
-            return new AddNodeMarkStep(this.pos, node.marks[i]);
+        for (let i2 = 0; i2 < node.marks.length; i2++)
+          if (!node.marks[i2].isInSet(newSet))
+            return new AddNodeMarkStep(this.pos, node.marks[i2]);
         return new AddNodeMarkStep(this.pos, this.mark);
       }
     }
@@ -3687,11 +3687,11 @@ class ReplaceStep extends Step {
   tokens (this is to guard against rebased replace steps
   overwriting something they weren't supposed to).
   */
-  constructor(from, to, slice, structure = false) {
+  constructor(from2, to, slice2, structure = false) {
     super();
-    this.from = from;
+    this.from = from2;
     this.to = to;
-    this.slice = slice;
+    this.slice = slice2;
     this.structure = structure;
   }
   apply(doc) {
@@ -3707,20 +3707,20 @@ class ReplaceStep extends Step {
   }
   map(mapping) {
     let to = mapping.mapResult(this.to, -1);
-    let from = this.from == this.to && ReplaceStep.MAP_BIAS < 0 ? to : mapping.mapResult(this.from, 1);
-    if (from.deletedAcross && to.deletedAcross)
+    let from2 = this.from == this.to && ReplaceStep.MAP_BIAS < 0 ? to : mapping.mapResult(this.from, 1);
+    if (from2.deletedAcross && to.deletedAcross)
       return null;
-    return new ReplaceStep(from.pos, Math.max(from.pos, to.pos), this.slice, this.structure);
+    return new ReplaceStep(from2.pos, Math.max(from2.pos, to.pos), this.slice, this.structure);
   }
   merge(other) {
     if (!(other instanceof ReplaceStep) || other.structure || this.structure)
       return null;
     if (this.from + this.slice.size == other.from && !this.slice.openEnd && !other.slice.openStart) {
-      let slice = this.slice.size + other.slice.size == 0 ? Slice.empty : new Slice(this.slice.content.append(other.slice.content), this.slice.openStart, other.slice.openEnd);
-      return new ReplaceStep(this.from, this.to + (other.to - other.from), slice, this.structure);
+      let slice2 = this.slice.size + other.slice.size == 0 ? Slice.empty : new Slice(this.slice.content.append(other.slice.content), this.slice.openStart, other.slice.openEnd);
+      return new ReplaceStep(this.from, this.to + (other.to - other.from), slice2, this.structure);
     } else if (other.to == this.from && !this.slice.openStart && !other.slice.openEnd) {
-      let slice = this.slice.size + other.slice.size == 0 ? Slice.empty : new Slice(other.slice.content.append(this.slice.content), other.slice.openStart, this.slice.openEnd);
-      return new ReplaceStep(other.from, this.to, slice, this.structure);
+      let slice2 = this.slice.size + other.slice.size == 0 ? Slice.empty : new Slice(other.slice.content.append(this.slice.content), other.slice.openStart, this.slice.openEnd);
+      return new ReplaceStep(other.from, this.to, slice2, this.structure);
     } else {
       return null;
     }
@@ -3751,13 +3751,13 @@ class ReplaceAroundStep extends Step {
   of the gap should be moved. `structure` has the same meaning as
   it has in the [`ReplaceStep`](https://prosemirror.net/docs/ref/#transform.ReplaceStep) class.
   */
-  constructor(from, to, gapFrom, gapTo, slice, insert, structure = false) {
+  constructor(from2, to, gapFrom, gapTo, slice2, insert, structure = false) {
     super();
-    this.from = from;
+    this.from = from2;
     this.to = to;
     this.gapFrom = gapFrom;
     this.gapTo = gapTo;
-    this.slice = slice;
+    this.slice = slice2;
     this.insert = insert;
     this.structure = structure;
   }
@@ -3787,12 +3787,12 @@ class ReplaceAroundStep extends Step {
     return new ReplaceAroundStep(this.from, this.from + this.slice.size + gap, this.from + this.insert, this.from + this.insert + gap, doc.slice(this.from, this.to).removeBetween(this.gapFrom - this.from, this.gapTo - this.from), this.gapFrom - this.from, this.structure);
   }
   map(mapping) {
-    let from = mapping.mapResult(this.from, 1), to = mapping.mapResult(this.to, -1);
-    let gapFrom = this.from == this.gapFrom ? from.pos : mapping.map(this.gapFrom, -1);
+    let from2 = mapping.mapResult(this.from, 1), to = mapping.mapResult(this.to, -1);
+    let gapFrom = this.from == this.gapFrom ? from2.pos : mapping.map(this.gapFrom, -1);
     let gapTo = this.to == this.gapTo ? to.pos : mapping.map(this.gapTo, 1);
-    if (from.deletedAcross && to.deletedAcross || gapFrom < from.pos || gapTo > to.pos)
+    if (from2.deletedAcross && to.deletedAcross || gapFrom < from2.pos || gapTo > to.pos)
       return null;
-    return new ReplaceAroundStep(from.pos, to.pos, gapFrom, gapTo, this.slice, this.insert, this.structure);
+    return new ReplaceAroundStep(from2.pos, to.pos, gapFrom, gapTo, this.slice, this.insert, this.structure);
   }
   toJSON() {
     let json = {
@@ -3819,8 +3819,8 @@ class ReplaceAroundStep extends Step {
   }
 }
 Step.jsonID("replaceAround", ReplaceAroundStep);
-function contentBetween(doc, from, to) {
-  let $from = doc.resolve(from), dist = to - from, depth = $from.depth;
+function contentBetween(doc, from2, to) {
+  let $from = doc.resolve(from2), dist = to - from2, depth = $from.depth;
   while (dist > 0 && depth > 0 && $from.indexAfter(depth) == $from.node(depth).childCount) {
     depth--;
     dist--;
@@ -3836,22 +3836,22 @@ function contentBetween(doc, from, to) {
   }
   return false;
 }
-function addMark(tr, from, to, mark) {
+function addMark(tr, from2, to, mark) {
   let removed = [], added = [];
   let removing, adding;
-  tr.doc.nodesBetween(from, to, (node, pos, parent) => {
+  tr.doc.nodesBetween(from2, to, (node, pos, parent) => {
     if (!node.isInline)
       return;
     let marks = node.marks;
     if (!mark.isInSet(marks) && parent.type.allowsMarkType(mark.type)) {
-      let start = Math.max(pos, from), end = Math.min(pos + node.nodeSize, to);
+      let start = Math.max(pos, from2), end = Math.min(pos + node.nodeSize, to);
       let newSet = mark.addToSet(marks);
-      for (let i = 0; i < marks.length; i++) {
-        if (!marks[i].isInSet(newSet)) {
-          if (removing && removing.to == start && removing.mark.eq(marks[i]))
+      for (let i2 = 0; i2 < marks.length; i2++) {
+        if (!marks[i2].isInSet(newSet)) {
+          if (removing && removing.to == start && removing.mark.eq(marks[i2]))
             removing.to = end;
           else
-            removed.push(removing = new RemoveMarkStep(start, end, marks[i]));
+            removed.push(removing = new RemoveMarkStep(start, end, marks[i2]));
         }
       }
       if (adding && adding.to == start)
@@ -3863,9 +3863,9 @@ function addMark(tr, from, to, mark) {
   removed.forEach((s) => tr.step(s));
   added.forEach((s) => tr.step(s));
 }
-function removeMark(tr, from, to, mark) {
+function removeMark(tr, from2, to, mark) {
   let matched = [], step = 0;
-  tr.doc.nodesBetween(from, to, (node, pos) => {
+  tr.doc.nodesBetween(from2, to, (node, pos) => {
     if (!node.isInline)
       return;
     step++;
@@ -3884,8 +3884,8 @@ function removeMark(tr, from, to, mark) {
     }
     if (toRemove && toRemove.length) {
       let end = Math.min(pos + node.nodeSize, to);
-      for (let i = 0; i < toRemove.length; i++) {
-        let style = toRemove[i], found2;
+      for (let i2 = 0; i2 < toRemove.length; i2++) {
+        let style = toRemove[i2], found2;
         for (let j = 0; j < matched.length; j++) {
           let m = matched[j];
           if (m.step == step - 1 && style.eq(matched[j].style))
@@ -3895,7 +3895,7 @@ function removeMark(tr, from, to, mark) {
           found2.to = end;
           found2.step = step;
         } else {
-          matched.push({ style, from: Math.max(pos, from), to: end, step });
+          matched.push({ style, from: Math.max(pos, from2), to: end, step });
         }
       }
     }
@@ -3905,8 +3905,8 @@ function removeMark(tr, from, to, mark) {
 function clearIncompatible(tr, pos, parentType, match = parentType.contentMatch, clearNewlines = true) {
   let node = tr.doc.nodeAt(pos);
   let replSteps = [], cur = pos + 1;
-  for (let i = 0; i < node.childCount; i++) {
-    let child = node.child(i), end = cur + child.nodeSize;
+  for (let i2 = 0; i2 < node.childCount; i2++) {
+    let child = node.child(i2), end = cur + child.nodeSize;
     let allowed = match.matchType(child.type);
     if (!allowed) {
       replSteps.push(new ReplaceStep(cur, end, Slice.empty));
@@ -3916,11 +3916,11 @@ function clearIncompatible(tr, pos, parentType, match = parentType.contentMatch,
         if (!parentType.allowsMarkType(child.marks[j].type))
           tr.step(new RemoveMarkStep(cur, end, child.marks[j]));
       if (clearNewlines && child.isText && parentType.whitespace != "pre") {
-        let m, newline = /\r?\n|\r/g, slice;
+        let m, newline = /\r?\n|\r/g, slice2;
         while (m = newline.exec(child.text)) {
-          if (!slice)
-            slice = new Slice(Fragment.from(parentType.schema.text(" ", parentType.allowedMarks(child.marks))), 0, 0);
-          replSteps.push(new ReplaceStep(cur + m.index, cur + m.index + m[0].length, slice));
+          if (!slice2)
+            slice2 = new Slice(Fragment.from(parentType.schema.text(" ", parentType.allowedMarks(child.marks))), 0, 0);
+          replSteps.push(new ReplaceStep(cur + m.index, cur + m.index + m[0].length, slice2));
         }
       }
     }
@@ -3930,8 +3930,8 @@ function clearIncompatible(tr, pos, parentType, match = parentType.contentMatch,
     let fill = match.fillBefore(Fragment.empty, true);
     tr.replace(cur, cur, new Slice(fill, 0, 0));
   }
-  for (let i = replSteps.length - 1; i >= 0; i--)
-    tr.step(replSteps[i]);
+  for (let i2 = replSteps.length - 1; i2 >= 0; i2--)
+    tr.step(replSteps[i2]);
 }
 function canCut(node, start, end) {
   return (start == 0 || node.canReplace(start, node.childCount)) && (end == node.childCount || node.canReplace(0, end));
@@ -4003,30 +4003,30 @@ function findWrappingInside(range, type) {
     return null;
   let lastType = inside.length ? inside[inside.length - 1] : type;
   let innerMatch = lastType.contentMatch;
-  for (let i = startIndex; innerMatch && i < endIndex; i++)
-    innerMatch = innerMatch.matchType(parent.child(i).type);
+  for (let i2 = startIndex; innerMatch && i2 < endIndex; i2++)
+    innerMatch = innerMatch.matchType(parent.child(i2).type);
   if (!innerMatch || !innerMatch.validEnd)
     return null;
   return inside;
 }
 function wrap(tr, range, wrappers) {
   let content = Fragment.empty;
-  for (let i = wrappers.length - 1; i >= 0; i--) {
+  for (let i2 = wrappers.length - 1; i2 >= 0; i2--) {
     if (content.size) {
-      let match = wrappers[i].type.contentMatch.matchFragment(content);
+      let match = wrappers[i2].type.contentMatch.matchFragment(content);
       if (!match || !match.validEnd)
         throw new RangeError("Wrapper type given to Transform.wrap does not form valid content of its parent wrapper");
     }
-    content = Fragment.from(wrappers[i].type.create(wrappers[i].attrs, content));
+    content = Fragment.from(wrappers[i2].type.create(wrappers[i2].attrs, content));
   }
   let start = range.start, end = range.end;
   tr.step(new ReplaceAroundStep(start, end, start, end, new Slice(content, 0, 0), wrappers.length, true));
 }
-function setBlockType$1(tr, from, to, type, attrs) {
+function setBlockType$1(tr, from2, to, type, attrs) {
   if (!type.isTextblock)
     throw new RangeError("Type given to setBlockType should be a textblock");
   let mapFrom = tr.steps.length;
-  tr.doc.nodesBetween(from, to, (node, pos) => {
+  tr.doc.nodesBetween(from2, to, (node, pos) => {
     let attrsHere = typeof attrs == "function" ? attrs(node) : attrs;
     if (node.isTextblock && !node.hasMarkup(type, attrsHere) && canChangeType(tr.doc, tr.mapping.slice(mapFrom).map(pos), type)) {
       let convertNewlines = null;
@@ -4086,31 +4086,31 @@ function setNodeMarkup(tr, pos, type, attrs, marks) {
   tr.step(new ReplaceAroundStep(pos, pos + node.nodeSize, pos + 1, pos + node.nodeSize - 1, new Slice(Fragment.from(newNode), 0, 0), 1, true));
 }
 function canSplit(doc, pos, depth = 1, typesAfter) {
-  let $pos = doc.resolve(pos), base = $pos.depth - depth;
+  let $pos = doc.resolve(pos), base2 = $pos.depth - depth;
   let innerType = typesAfter && typesAfter[typesAfter.length - 1] || $pos.parent;
-  if (base < 0 || $pos.parent.type.spec.isolating || !$pos.parent.canReplace($pos.index(), $pos.parent.childCount) || !innerType.type.validContent($pos.parent.content.cutByIndex($pos.index(), $pos.parent.childCount)))
+  if (base2 < 0 || $pos.parent.type.spec.isolating || !$pos.parent.canReplace($pos.index(), $pos.parent.childCount) || !innerType.type.validContent($pos.parent.content.cutByIndex($pos.index(), $pos.parent.childCount)))
     return false;
-  for (let d = $pos.depth - 1, i = depth - 2; d > base; d--, i--) {
+  for (let d = $pos.depth - 1, i2 = depth - 2; d > base2; d--, i2--) {
     let node = $pos.node(d), index2 = $pos.index(d);
     if (node.type.spec.isolating)
       return false;
     let rest = node.content.cutByIndex(index2, node.childCount);
-    let overrideChild = typesAfter && typesAfter[i + 1];
+    let overrideChild = typesAfter && typesAfter[i2 + 1];
     if (overrideChild)
       rest = rest.replaceChild(0, overrideChild.type.create(overrideChild.attrs));
-    let after = typesAfter && typesAfter[i] || node;
+    let after = typesAfter && typesAfter[i2] || node;
     if (!node.canReplace(index2 + 1, node.childCount) || !after.type.validContent(rest))
       return false;
   }
-  let index = $pos.indexAfter(base);
+  let index = $pos.indexAfter(base2);
   let baseType = typesAfter && typesAfter[0];
-  return $pos.node(base).canReplaceWith(index, index, baseType ? baseType.type : $pos.node(base + 1).type);
+  return $pos.node(base2).canReplaceWith(index, index, baseType ? baseType.type : $pos.node(base2 + 1).type);
 }
 function split(tr, pos, depth = 1, typesAfter) {
   let $pos = tr.doc.resolve(pos), before = Fragment.empty, after = Fragment.empty;
-  for (let d = $pos.depth, e = $pos.depth - depth, i = depth - 1; d > e; d--, i--) {
+  for (let d = $pos.depth, e = $pos.depth - depth, i2 = depth - 1; d > e; d--, i2--) {
     before = Fragment.from($pos.node(d).copy(before));
-    let typeAfter = typesAfter && typesAfter[i];
+    let typeAfter = typesAfter && typesAfter[i2];
     after = Fragment.from(typeAfter ? typeAfter.type.create(typeAfter.attrs, after) : $pos.node(d).copy(after));
   }
   tr.step(new ReplaceStep(pos, pos, new Slice(before.append(after), depth, depth), true));
@@ -4124,8 +4124,8 @@ function canAppendWithSubstitutedLinebreaks(a, b) {
     a.type.compatibleContent(b.type);
   let match = a.contentMatchAt(a.childCount);
   let { linebreakReplacement } = a.type.schema;
-  for (let i = 0; i < b.childCount; i++) {
-    let child = b.child(i);
+  for (let i2 = 0; i2 < b.childCount; i2++) {
+    let child = b.child(i2);
     let type = child.type == linebreakReplacement ? a.type.schema.nodes.text : child.type;
     match = match.matchType(type);
     if (!match)
@@ -4209,16 +4209,16 @@ function insertPoint(doc, pos, nodeType) {
     }
   return null;
 }
-function replaceStep(doc, from, to = from, slice = Slice.empty) {
-  if (from == to && !slice.size)
+function replaceStep(doc, from2, to = from2, slice2 = Slice.empty) {
+  if (from2 == to && !slice2.size)
     return null;
-  let $from = doc.resolve(from), $to = doc.resolve(to);
-  if (fitsTrivially($from, $to, slice))
-    return new ReplaceStep(from, to, slice);
-  return new Fitter($from, $to, slice).fit();
+  let $from = doc.resolve(from2), $to = doc.resolve(to);
+  if (fitsTrivially($from, $to, slice2))
+    return new ReplaceStep(from2, to, slice2);
+  return new Fitter($from, $to, slice2).fit();
 }
-function fitsTrivially($from, $to, slice) {
-  return !slice.openStart && !slice.openEnd && $from.start() == $to.start() && $from.parent.canReplace($from.index(), $to.index(), slice.content);
+function fitsTrivially($from, $to, slice2) {
+  return !slice2.openStart && !slice2.openEnd && $from.start() == $to.start() && $from.parent.canReplace($from.index(), $to.index(), slice2.content);
 }
 class Fitter {
   constructor($from, $to, unplaced) {
@@ -4227,15 +4227,15 @@ class Fitter {
     this.unplaced = unplaced;
     this.frontier = [];
     this.placed = Fragment.empty;
-    for (let i = 0; i <= $from.depth; i++) {
-      let node = $from.node(i);
+    for (let i2 = 0; i2 <= $from.depth; i2++) {
+      let node = $from.node(i2);
       this.frontier.push({
         type: node.type,
-        match: node.contentMatchAt($from.indexAfter(i))
+        match: node.contentMatchAt($from.indexAfter(i2))
       });
     }
-    for (let i = $from.depth; i > 0; i--)
-      this.placed = Fragment.from($from.node(i).copy(this.placed));
+    for (let i2 = $from.depth; i2 > 0; i2--)
+      this.placed = Fragment.from($from.node(i2).copy(this.placed));
   }
   get depth() {
     return this.frontier.length - 1;
@@ -4258,11 +4258,11 @@ class Fitter {
       openStart--;
       openEnd--;
     }
-    let slice = new Slice(content, openStart, openEnd);
+    let slice2 = new Slice(content, openStart, openEnd);
     if (moveInline > -1)
-      return new ReplaceAroundStep($from.pos, moveInline, this.$to.pos, this.$to.end(), slice, placedSize);
-    if (slice.size || $from.pos != this.$to.pos)
-      return new ReplaceStep($from.pos, $to.pos, slice);
+      return new ReplaceAroundStep($from.pos, moveInline, this.$to.pos, this.$to.end(), slice2, placedSize);
+    if (slice2.size || $from.pos != this.$to.pos)
+      return new ReplaceStep($from.pos, $to.pos, slice2);
     return null;
   }
   // Find a position on the start spine of `this.unplaced` that has
@@ -4327,18 +4327,18 @@ class Fitter {
     while (this.depth > frontierDepth)
       this.closeFrontierNode();
     if (wrap2)
-      for (let i = 0; i < wrap2.length; i++)
-        this.openFrontierNode(wrap2[i]);
-    let slice = this.unplaced, fragment = parent ? parent.content : slice.content;
-    let openStart = slice.openStart - sliceDepth;
+      for (let i2 = 0; i2 < wrap2.length; i2++)
+        this.openFrontierNode(wrap2[i2]);
+    let slice2 = this.unplaced, fragment = parent ? parent.content : slice2.content;
+    let openStart = slice2.openStart - sliceDepth;
     let taken = 0, add = [];
     let { match, type } = this.frontier[frontierDepth];
     if (inject) {
-      for (let i = 0; i < inject.childCount; i++)
-        add.push(inject.child(i));
+      for (let i2 = 0; i2 < inject.childCount; i2++)
+        add.push(inject.child(i2));
       match = match.matchFragment(inject);
     }
-    let openEndCount = fragment.size + sliceDepth - (slice.content.size - slice.openEnd);
+    let openEndCount = fragment.size + sliceDepth - (slice2.content.size - slice2.openEnd);
     while (taken < fragment.childCount) {
       let next = fragment.child(taken), matches2 = match.matchType(next.type);
       if (!matches2)
@@ -4356,12 +4356,12 @@ class Fitter {
     this.frontier[frontierDepth].match = match;
     if (toEnd && openEndCount < 0 && parent && parent.type == this.frontier[this.depth].type && this.frontier.length > 1)
       this.closeFrontierNode();
-    for (let i = 0, cur = fragment; i < openEndCount; i++) {
+    for (let i2 = 0, cur = fragment; i2 < openEndCount; i2++) {
       let node = cur.lastChild;
       this.frontier.push({ type: node.type, match: node.contentMatchAt(node.childCount) });
       cur = node.content;
     }
-    this.unplaced = !toEnd ? new Slice(dropFromFragment(slice.content, sliceDepth, taken), slice.openStart, slice.openEnd) : sliceDepth == 0 ? Slice.empty : new Slice(dropFromFragment(slice.content, sliceDepth - 1, 1), sliceDepth - 1, openEndCount < 0 ? slice.openEnd : sliceDepth - 1);
+    this.unplaced = !toEnd ? new Slice(dropFromFragment(slice2.content, sliceDepth, taken), slice2.openStart, slice2.openEnd) : sliceDepth == 0 ? Slice.empty : new Slice(dropFromFragment(slice2.content, sliceDepth - 1, 1), sliceDepth - 1, openEndCount < 0 ? slice2.openEnd : sliceDepth - 1);
   }
   mustMoveInline() {
     if (!this.$to.parent.isTextblock)
@@ -4375,19 +4375,19 @@ class Fitter {
     return after;
   }
   findCloseLevel($to) {
-    scan: for (let i = Math.min(this.depth, $to.depth); i >= 0; i--) {
-      let { match, type } = this.frontier[i];
-      let dropInner = i < $to.depth && $to.end(i + 1) == $to.pos + ($to.depth - (i + 1));
-      let fit = contentAfterFits($to, i, type, match, dropInner);
+    scan: for (let i2 = Math.min(this.depth, $to.depth); i2 >= 0; i2--) {
+      let { match, type } = this.frontier[i2];
+      let dropInner = i2 < $to.depth && $to.end(i2 + 1) == $to.pos + ($to.depth - (i2 + 1));
+      let fit = contentAfterFits($to, i2, type, match, dropInner);
       if (!fit)
         continue;
-      for (let d = i - 1; d >= 0; d--) {
+      for (let d = i2 - 1; d >= 0; d--) {
         let { match: match2, type: type2 } = this.frontier[d];
         let matches2 = contentAfterFits($to, d, type2, match2, true);
         if (!matches2 || matches2.childCount)
           continue scan;
       }
-      return { depth: i, fit, move: dropInner ? $to.doc.resolve($to.after(i + 1)) : $to };
+      return { depth: i2, fit, move: dropInner ? $to.doc.resolve($to.after(i2 + 1)) : $to };
     }
   }
   close($to) {
@@ -4429,7 +4429,7 @@ function addToFragment(fragment, depth, content) {
   return fragment.replaceChild(fragment.childCount - 1, fragment.lastChild.copy(addToFragment(fragment.lastChild.content, depth - 1, content)));
 }
 function contentAt(fragment, depth) {
-  for (let i = 0; i < depth; i++)
+  for (let i2 = 0; i2 < depth; i2++)
     fragment = fragment.firstChild.content;
   return fragment;
 }
@@ -4454,20 +4454,20 @@ function contentAfterFits($to, depth, type, match, open) {
   return fit && !invalidMarks(type, node.content, index) ? fit : null;
 }
 function invalidMarks(type, fragment, start) {
-  for (let i = start; i < fragment.childCount; i++)
-    if (!type.allowsMarks(fragment.child(i).marks))
+  for (let i2 = start; i2 < fragment.childCount; i2++)
+    if (!type.allowsMarks(fragment.child(i2).marks))
       return true;
   return false;
 }
 function definesContent(type) {
   return type.spec.defining || type.spec.definingForContent;
 }
-function replaceRange(tr, from, to, slice) {
-  if (!slice.size)
-    return tr.deleteRange(from, to);
-  let $from = tr.doc.resolve(from), $to = tr.doc.resolve(to);
-  if (fitsTrivially($from, $to, slice))
-    return tr.step(new ReplaceStep(from, to, slice));
+function replaceRange(tr, from2, to, slice2) {
+  if (!slice2.size)
+    return tr.deleteRange(from2, to);
+  let $from = tr.doc.resolve(from2), $to = tr.doc.resolve(to);
+  if (fitsTrivially($from, $to, slice2))
+    return tr.step(new ReplaceStep(from2, to, slice2));
   let targetDepths = coveredDepths($from, $to);
   if (targetDepths[targetDepths.length - 1] == 0)
     targetDepths.pop();
@@ -4483,11 +4483,11 @@ function replaceRange(tr, from, to, slice) {
       targetDepths.splice(1, 0, -d);
   }
   let preferredTargetIndex = targetDepths.indexOf(preferredTarget);
-  let leftNodes = [], preferredDepth = slice.openStart;
-  for (let content = slice.content, i = 0; ; i++) {
+  let leftNodes = [], preferredDepth = slice2.openStart;
+  for (let content = slice2.content, i2 = 0; ; i2++) {
     let node = content.firstChild;
     leftNodes.push(node);
-    if (i == slice.openStart)
+    if (i2 == slice2.openStart)
       break;
     content = node.content;
   }
@@ -4498,31 +4498,31 @@ function replaceRange(tr, from, to, slice) {
     else if (def || !leftNode.type.isTextblock)
       break;
   }
-  for (let j = slice.openStart; j >= 0; j--) {
-    let openDepth = (j + preferredDepth + 1) % (slice.openStart + 1);
+  for (let j = slice2.openStart; j >= 0; j--) {
+    let openDepth = (j + preferredDepth + 1) % (slice2.openStart + 1);
     let insert = leftNodes[openDepth];
     if (!insert)
       continue;
-    for (let i = 0; i < targetDepths.length; i++) {
-      let targetDepth = targetDepths[(i + preferredTargetIndex) % targetDepths.length], expand = true;
+    for (let i2 = 0; i2 < targetDepths.length; i2++) {
+      let targetDepth = targetDepths[(i2 + preferredTargetIndex) % targetDepths.length], expand = true;
       if (targetDepth < 0) {
         expand = false;
         targetDepth = -targetDepth;
       }
       let parent = $from.node(targetDepth - 1), index = $from.index(targetDepth - 1);
       if (parent.canReplaceWith(index, index, insert.type, insert.marks))
-        return tr.replace($from.before(targetDepth), expand ? $to.after(targetDepth) : to, new Slice(closeFragment(slice.content, 0, slice.openStart, openDepth), openDepth, slice.openEnd));
+        return tr.replace($from.before(targetDepth), expand ? $to.after(targetDepth) : to, new Slice(closeFragment(slice2.content, 0, slice2.openStart, openDepth), openDepth, slice2.openEnd));
     }
   }
   let startSteps = tr.steps.length;
-  for (let i = targetDepths.length - 1; i >= 0; i--) {
-    tr.replace(from, to, slice);
+  for (let i2 = targetDepths.length - 1; i2 >= 0; i2--) {
+    tr.replace(from2, to, slice2);
     if (tr.steps.length > startSteps)
       break;
-    let depth = targetDepths[i];
+    let depth = targetDepths[i2];
     if (depth < 0)
       continue;
-    from = $from.before(depth);
+    from2 = $from.before(depth);
     to = $to.after(depth);
   }
 }
@@ -4538,16 +4538,16 @@ function closeFragment(fragment, depth, oldOpen, newOpen, parent) {
   }
   return fragment;
 }
-function replaceRangeWith(tr, from, to, node) {
-  if (!node.isInline && from == to && tr.doc.resolve(from).parent.content.size) {
-    let point = insertPoint(tr.doc, from, node.type);
+function replaceRangeWith(tr, from2, to, node) {
+  if (!node.isInline && from2 == to && tr.doc.resolve(from2).parent.content.size) {
+    let point = insertPoint(tr.doc, from2, node.type);
     if (point != null)
-      from = to = point;
+      from2 = to = point;
   }
-  tr.replaceRange(from, to, new Slice(Fragment.from(node), 0, 0));
+  tr.replaceRange(from2, to, new Slice(Fragment.from(node), 0, 0));
 }
-function deleteRange$1(tr, from, to) {
-  let $from = tr.doc.resolve(from), $to = tr.doc.resolve(to);
+function deleteRange$1(tr, from2, to) {
+  let $from = tr.doc.resolve(from2), $to = tr.doc.resolve(to);
   if ($from.parent.isTextblock && $to.parent.isTextblock && $from.start() != $to.start() && $from.parentOffset == 0 && $to.parentOffset == 0) {
     let shared = $from.sharedDepth(to), isolated = false;
     for (let d = $from.depth; d > shared; d--)
@@ -4557,27 +4557,27 @@ function deleteRange$1(tr, from, to) {
       if ($to.node(d).type.spec.isolating)
         isolated = true;
     if (!isolated) {
-      for (let d = $from.depth; d > 0 && from == $from.start(d); d--)
-        from = $from.before(d);
+      for (let d = $from.depth; d > 0 && from2 == $from.start(d); d--)
+        from2 = $from.before(d);
       for (let d = $to.depth; d > 0 && to == $to.start(d); d--)
         to = $to.before(d);
-      $from = tr.doc.resolve(from);
+      $from = tr.doc.resolve(from2);
       $to = tr.doc.resolve(to);
     }
   }
   let covered = coveredDepths($from, $to);
-  for (let i = 0; i < covered.length; i++) {
-    let depth = covered[i], last = i == covered.length - 1;
+  for (let i2 = 0; i2 < covered.length; i2++) {
+    let depth = covered[i2], last = i2 == covered.length - 1;
     if (last && depth == 0 || $from.node(depth).type.contentMatch.validEnd)
       return tr.delete($from.start(depth), $to.end(depth));
     if (depth > 0 && (last || $from.node(depth - 1).canReplace($from.index(depth - 1), $to.indexAfter(depth - 1))))
       return tr.delete($from.before(depth), $to.after(depth));
   }
   for (let d = 1; d <= $from.depth && d <= $to.depth; d++) {
-    if (from - $from.start(d) == $from.depth - d && to > $from.end(d) && $to.end(d) - to != $to.depth - d && $from.start(d - 1) == $to.start(d - 1) && $from.node(d - 1).canReplace($from.index(d - 1), $to.index(d - 1)))
+    if (from2 - $from.start(d) == $from.depth - d && to > $from.end(d) && $to.end(d) - to != $to.depth - d && $from.start(d - 1) == $to.start(d - 1) && $from.node(d - 1).canReplace($from.index(d - 1), $to.index(d - 1)))
       return tr.delete($from.before(d), to);
   }
-  tr.delete(from, to);
+  tr.delete(from2, to);
 }
 function coveredDepths($from, $to) {
   let result = [], minDepth = Math.min($from.depth, $to.depth);
@@ -4727,19 +4727,19 @@ class Transform {
   that add/remove marks without replacing the underlying content.
   */
   changedRange() {
-    let from = 1e9, to = -1e9;
-    for (let i = 0; i < this.mapping.maps.length; i++) {
-      let map = this.mapping.maps[i];
-      if (i) {
-        from = map.map(from, 1);
-        to = map.map(to, -1);
+    let from2 = 1e9, to = -1e9;
+    for (let i2 = 0; i2 < this.mapping.maps.length; i2++) {
+      let map2 = this.mapping.maps[i2];
+      if (i2) {
+        from2 = map2.map(from2, 1);
+        to = map2.map(to, -1);
       }
-      map.forEach((_f, _t, fromB, toB) => {
-        from = Math.min(from, fromB);
+      map2.forEach((_f, _t, fromB, toB) => {
+        from2 = Math.min(from2, fromB);
         to = Math.max(to, toB);
       });
     }
-    return from == 1e9 ? null : { from, to };
+    return from2 == 1e9 ? null : { from: from2, to };
   }
   /**
   @internal
@@ -4754,8 +4754,8 @@ class Transform {
   Replace the part of the document between `from` and `to` with the
   given `slice`.
   */
-  replace(from, to = from, slice = Slice.empty) {
-    let step = replaceStep(this.doc, from, to, slice);
+  replace(from2, to = from2, slice2 = Slice.empty) {
+    let step = replaceStep(this.doc, from2, to, slice2);
     if (step)
       this.step(step);
     return this;
@@ -4764,14 +4764,14 @@ class Transform {
   Replace the given range with the given content, which may be a
   fragment, node, or array of nodes.
   */
-  replaceWith(from, to, content) {
-    return this.replace(from, to, new Slice(Fragment.from(content), 0, 0));
+  replaceWith(from2, to, content) {
+    return this.replace(from2, to, new Slice(Fragment.from(content), 0, 0));
   }
   /**
   Delete the content between the given positions.
   */
-  delete(from, to) {
-    return this.replace(from, to, Slice.empty);
+  delete(from2, to) {
+    return this.replace(from2, to, Slice.empty);
   }
   /**
   Insert the given content at the given position.
@@ -4798,8 +4798,8 @@ class Transform {
   range, and is useful in situations where you need more precise
   control over what happens.
   */
-  replaceRange(from, to, slice) {
-    replaceRange(this, from, to, slice);
+  replaceRange(from2, to, slice2) {
+    replaceRange(this, from2, to, slice2);
     return this;
   }
   /**
@@ -4811,16 +4811,16 @@ class Transform {
   completely covers a parent node, this method may completely replace
   that parent node.
   */
-  replaceRangeWith(from, to, node) {
-    replaceRangeWith(this, from, to, node);
+  replaceRangeWith(from2, to, node) {
+    replaceRangeWith(this, from2, to, node);
     return this;
   }
   /**
   Delete the given range, expanding it to cover fully covered
   parent nodes until a valid replace is found.
   */
-  deleteRange(from, to) {
-    deleteRange$1(this, from, to);
+  deleteRange(from2, to) {
+    deleteRange$1(this, from2, to);
     return this;
   }
   /**
@@ -4855,8 +4855,8 @@ class Transform {
   Set the type of all textblocks (partly) between `from` and `to` to
   the given node type with the given attributes.
   */
-  setBlockType(from, to = from, type, attrs = null) {
-    setBlockType$1(this, from, to, type, attrs);
+  setBlockType(from2, to = from2, type, attrs = null) {
+    setBlockType$1(this, from2, to, type, attrs);
     return this;
   }
   /**
@@ -4907,8 +4907,8 @@ class Transform {
         steps.push(new RemoveNodeMarkStep(pos, found2));
         set = found2.removeFromSet(set);
       }
-      for (let i = steps.length - 1; i >= 0; i--)
-        this.step(steps[i]);
+      for (let i2 = steps.length - 1; i2 >= 0; i2--)
+        this.step(steps[i2]);
     }
     return this;
   }
@@ -4926,8 +4926,8 @@ class Transform {
   /**
   Add the given mark to the inline content between `from` and `to`.
   */
-  addMark(from, to, mark) {
-    addMark(this, from, to, mark);
+  addMark(from2, to, mark) {
+    addMark(this, from2, to, mark);
     return this;
   }
   /**
@@ -4936,8 +4936,8 @@ class Transform {
   a mark type, remove all marks of that type. When it is null,
   remove all marks of any type.
   */
-  removeMark(from, to, mark) {
-    removeMark(this, from, to, mark);
+  removeMark(from2, to, mark) {
+    removeMark(this, from2, to, mark);
     return this;
   }
   /**
@@ -5004,8 +5004,8 @@ class Selection {
   */
   get empty() {
     let ranges = this.ranges;
-    for (let i = 0; i < ranges.length; i++)
-      if (ranges[i].$from.pos != ranges[i].$to.pos)
+    for (let i2 = 0; i2 < ranges.length; i2++)
+      if (ranges[i2].$from.pos != ranges[i2].$to.pos)
         return false;
     return true;
   }
@@ -5021,15 +5021,15 @@ class Selection {
   */
   replace(tr, content = Slice.empty) {
     let lastNode = content.content.lastChild, lastParent = null;
-    for (let i = 0; i < content.openEnd; i++) {
+    for (let i2 = 0; i2 < content.openEnd; i2++) {
       lastParent = lastNode;
       lastNode = lastNode.lastChild;
     }
     let mapFrom = tr.steps.length, ranges = this.ranges;
-    for (let i = 0; i < ranges.length; i++) {
-      let { $from, $to } = ranges[i], mapping = tr.mapping.slice(mapFrom);
-      tr.replaceRange(mapping.map($from.pos), mapping.map($to.pos), i ? Slice.empty : content);
-      if (i == 0)
+    for (let i2 = 0; i2 < ranges.length; i2++) {
+      let { $from, $to } = ranges[i2], mapping = tr.mapping.slice(mapFrom);
+      tr.replaceRange(mapping.map($from.pos), mapping.map($to.pos), i2 ? Slice.empty : content);
+      if (i2 == 0)
         selectionToInsertionEnd$1(tr, mapFrom, (lastNode ? lastNode.isInline : lastParent && lastParent.isTextblock) ? -1 : 1);
     }
   }
@@ -5039,13 +5039,13 @@ class Selection {
   */
   replaceWith(tr, node) {
     let mapFrom = tr.steps.length, ranges = this.ranges;
-    for (let i = 0; i < ranges.length; i++) {
-      let { $from, $to } = ranges[i], mapping = tr.mapping.slice(mapFrom);
-      let from = mapping.map($from.pos), to = mapping.map($to.pos);
-      if (i) {
-        tr.deleteRange(from, to);
+    for (let i2 = 0; i2 < ranges.length; i2++) {
+      let { $from, $to } = ranges[i2], mapping = tr.mapping.slice(mapFrom);
+      let from2 = mapping.map($from.pos), to = mapping.map($to.pos);
+      if (i2) {
+        tr.deleteRange(from2, to);
       } else {
-        tr.replaceRangeWith(from, to, node);
+        tr.replaceRangeWith(from2, to, node);
         selectionToInsertionEnd$1(tr, mapFrom, node.isInline ? -1 : 1);
       }
     }
@@ -5287,8 +5287,8 @@ class NodeSelection extends Selection {
   /**
   Create a node selection from non-resolved positions.
   */
-  static create(doc, from) {
-    return new NodeSelection(doc.resolve(from));
+  static create(doc, from2) {
+    return new NodeSelection(doc.resolve(from2));
   }
   /**
   Determines whether the given node may be selected as a node
@@ -5363,8 +5363,8 @@ const AllBookmark = {
 function findSelectionIn(doc, node, pos, index, dir, text = false) {
   if (node.inlineContent)
     return TextSelection.create(doc, pos);
-  for (let i = index - (dir > 0 ? 0 : 1); dir > 0 ? i < node.childCount : i >= 0; i += dir) {
-    let child = node.child(i);
+  for (let i2 = index - (dir > 0 ? 0 : 1); dir > 0 ? i2 < node.childCount : i2 >= 0; i2 += dir) {
+    let child = node.child(i2);
     if (!child.isAtom) {
       let inner = findSelectionIn(doc, child, pos + dir, dir < 0 ? child.childCount : 0, dir, text);
       if (inner)
@@ -5383,8 +5383,8 @@ function selectionToInsertionEnd$1(tr, startLen, bias) {
   let step = tr.steps[last];
   if (!(step instanceof ReplaceStep || step instanceof ReplaceAroundStep))
     return;
-  let map = tr.mapping.maps[last], end;
-  map.forEach((_from, _to, _newFrom, newTo) => {
+  let map2 = tr.mapping.maps[last], end;
+  map2.forEach((_from, _to, _newFrom, newTo) => {
     if (end == null)
       end = newTo;
   });
@@ -5612,10 +5612,10 @@ const selectNodeBackward$1 = (state, dispatch, view) => {
 };
 function findCutBefore($pos) {
   if (!$pos.parent.type.spec.isolating)
-    for (let i = $pos.depth - 1; i >= 0; i--) {
-      if ($pos.index(i) > 0)
-        return $pos.doc.resolve($pos.before(i + 1));
-      if ($pos.node(i).type.spec.isolating)
+    for (let i2 = $pos.depth - 1; i2 >= 0; i2--) {
+      if ($pos.index(i2) > 0)
+        return $pos.doc.resolve($pos.before(i2 + 1));
+      if ($pos.node(i2).type.spec.isolating)
         break;
     }
   return null;
@@ -5672,10 +5672,10 @@ const selectNodeForward$1 = (state, dispatch, view) => {
 };
 function findCutAfter($pos) {
   if (!$pos.parent.type.spec.isolating)
-    for (let i = $pos.depth - 1; i >= 0; i--) {
-      let parent = $pos.node(i);
-      if ($pos.index(i) + 1 < parent.childCount)
-        return $pos.doc.resolve($pos.after(i + 1));
+    for (let i2 = $pos.depth - 1; i2 >= 0; i2--) {
+      let parent = $pos.node(i2);
+      if ($pos.index(i2) + 1 < parent.childCount)
+        return $pos.doc.resolve($pos.after(i2 + 1));
       if (parent.type.spec.isolating)
         break;
     }
@@ -5733,8 +5733,8 @@ const newlineInCode$1 = (state, dispatch) => {
   return true;
 };
 function defaultBlockAt$1(match) {
-  for (let i = 0; i < match.edgeCount; i++) {
-    let { type } = match.edge(i);
+  for (let i2 = 0; i2 < match.edgeCount; i2++) {
+    let { type } = match.edge(i2);
     if (type.isTextblock && !type.hasRequiredAttrs())
       return type;
   }
@@ -5874,8 +5874,8 @@ function deleteBarrier(state, $cut, dispatch, dir) {
   if (canDelAfter && (conn = (match = before.contentMatchAt(before.childCount)).findWrapping(after.type)) && match.matchType(conn[0] || after.type).validEnd) {
     if (dispatch) {
       let end = $cut.pos + after.nodeSize, wrap2 = Fragment.empty;
-      for (let i = conn.length - 1; i >= 0; i--)
-        wrap2 = Fragment.from(conn[i].create(null, wrap2));
+      for (let i2 = conn.length - 1; i2 >= 0; i2--)
+        wrap2 = Fragment.from(conn[i2].create(null, wrap2));
       wrap2 = Fragment.from(before.copy(wrap2));
       let tr = state.tr.step(new ReplaceAroundStep($cut.pos - 1, end, $cut.pos, end, new Slice(wrap2, 1, 0), conn.length, true));
       let $joinAt = tr.doc.resolve(end + 2 * conn.length);
@@ -5906,8 +5906,8 @@ function deleteBarrier(state, $cut, dispatch, dir) {
     if (at.canReplace(at.childCount, at.childCount, afterText.content)) {
       if (dispatch) {
         let end = Fragment.empty;
-        for (let i = wrap2.length - 1; i >= 0; i--)
-          end = Fragment.from(wrap2[i].copy(end));
+        for (let i2 = wrap2.length - 1; i2 >= 0; i2--)
+          end = Fragment.from(wrap2[i2].copy(end));
         let tr = state.tr.step(new ReplaceAroundStep($cut.pos - wrap2.length, $cut.pos + after.nodeSize, $cut.pos + afterDepth, $cut.pos + after.nodeSize - afterDepth, new Slice(end, wrap2.length, 0), 0, true));
         dispatch(tr.scrollIntoView());
       }
@@ -5948,9 +5948,9 @@ function wrapIn$1(nodeType, attrs = null) {
 function setBlockType(nodeType, attrs = null) {
   return function(state, dispatch) {
     let applicable = false;
-    for (let i = 0; i < state.selection.ranges.length && !applicable; i++) {
-      let { $from: { pos: from }, $to: { pos: to } } = state.selection.ranges[i];
-      state.doc.nodesBetween(from, to, (node, pos) => {
+    for (let i2 = 0; i2 < state.selection.ranges.length && !applicable; i2++) {
+      let { $from: { pos: from2 }, $to: { pos: to } } = state.selection.ranges[i2];
+      state.doc.nodesBetween(from2, to, (node, pos) => {
         if (applicable)
           return false;
         if (!node.isTextblock || node.hasMarkup(nodeType, attrs))
@@ -5967,9 +5967,9 @@ function setBlockType(nodeType, attrs = null) {
       return false;
     if (dispatch) {
       let tr = state.tr;
-      for (let i = 0; i < state.selection.ranges.length; i++) {
-        let { $from: { pos: from }, $to: { pos: to } } = state.selection.ranges[i];
-        tr.setBlockType(from, to, nodeType, attrs);
+      for (let i2 = 0; i2 < state.selection.ranges.length; i2++) {
+        let { $from: { pos: from2 }, $to: { pos: to } } = state.selection.ranges[i2];
+        tr.setBlockType(from2, to, nodeType, attrs);
       }
       dispatch(tr.scrollIntoView());
     }
@@ -5978,8 +5978,8 @@ function setBlockType(nodeType, attrs = null) {
 }
 function chainCommands(...commands) {
   return function(state, dispatch, view) {
-    for (let i = 0; i < commands.length; i++)
-      if (commands[i](state, dispatch, view))
+    for (let i2 = 0; i2 < commands.length; i2++)
+      if (commands[i2](state, dispatch, view))
         return true;
     return false;
   };
@@ -6024,21 +6024,21 @@ function wrapRangeInList(tr, range, listType, attrs = null) {
 }
 function doWrapInList(tr, range, wrappers, joinBefore, listType) {
   let content = Fragment.empty;
-  for (let i = wrappers.length - 1; i >= 0; i--)
-    content = Fragment.from(wrappers[i].type.create(wrappers[i].attrs, content));
+  for (let i2 = wrappers.length - 1; i2 >= 0; i2--)
+    content = Fragment.from(wrappers[i2].type.create(wrappers[i2].attrs, content));
   tr.step(new ReplaceAroundStep(range.start - (joinBefore ? 2 : 0), range.end, range.start, range.end, new Slice(content, 0, 0), wrappers.length, true));
   let found2 = 0;
-  for (let i = 0; i < wrappers.length; i++)
-    if (wrappers[i].type == listType)
-      found2 = i + 1;
+  for (let i2 = 0; i2 < wrappers.length; i2++)
+    if (wrappers[i2].type == listType)
+      found2 = i2 + 1;
   let splitDepth = wrappers.length - found2;
   let splitPos = range.start + wrappers.length - (joinBefore ? 2 : 0), parent = range.parent;
-  for (let i = range.startIndex, e = range.endIndex, first2 = true; i < e; i++, first2 = false) {
+  for (let i2 = range.startIndex, e = range.endIndex, first2 = true; i2 < e; i2++, first2 = false) {
     if (!first2 && canSplit(tr.doc, splitPos, splitDepth)) {
       tr.split(splitPos, splitDepth);
       splitPos += 2 * splitDepth;
     }
-    splitPos += parent.child(i).nodeSize;
+    splitPos += parent.child(i2).nodeSize;
   }
   return tr;
 }
@@ -6074,8 +6074,8 @@ function liftToOuterList(state, dispatch, itemType, range) {
 }
 function liftOutOfList(state, dispatch, range) {
   let tr = state.tr, list = range.parent;
-  for (let pos = range.end, i = range.endIndex - 1, e = range.startIndex; i > e; i--) {
-    pos -= list.child(i).nodeSize;
+  for (let pos = range.end, i2 = range.endIndex - 1, e = range.startIndex; i2 > e; i2--) {
+    pos -= list.child(i2).nodeSize;
     tr.delete(pos - 1, pos + 1);
   }
   let $start = tr.doc.resolve(range.start), item = $start.nodeAfter;
@@ -6105,11 +6105,188 @@ function sinkListItem$1(itemType) {
     if (dispatch) {
       let nestedBefore = nodeBefore.lastChild && nodeBefore.lastChild.type == parent.type;
       let inner = Fragment.from(nestedBefore ? itemType.create() : null);
-      let slice = new Slice(Fragment.from(itemType.create(null, Fragment.from(parent.type.create(null, inner)))), nestedBefore ? 3 : 1, 0);
+      let slice2 = new Slice(Fragment.from(itemType.create(null, Fragment.from(parent.type.create(null, inner)))), nestedBefore ? 3 : 1, 0);
       let before = range.start, after = range.end;
-      dispatch(state.tr.step(new ReplaceAroundStep(before - (nestedBefore ? 3 : 1), after, before, after, slice, 1, true)).scrollIntoView());
+      dispatch(state.tr.step(new ReplaceAroundStep(before - (nestedBefore ? 3 : 1), after, before, after, slice2, 1, true)).scrollIntoView());
     }
     return true;
+  };
+}
+var base = {
+  8: "Backspace",
+  9: "Tab",
+  10: "Enter",
+  12: "NumLock",
+  13: "Enter",
+  16: "Shift",
+  17: "Control",
+  18: "Alt",
+  20: "CapsLock",
+  27: "Escape",
+  32: " ",
+  33: "PageUp",
+  34: "PageDown",
+  35: "End",
+  36: "Home",
+  37: "ArrowLeft",
+  38: "ArrowUp",
+  39: "ArrowRight",
+  40: "ArrowDown",
+  44: "PrintScreen",
+  45: "Insert",
+  46: "Delete",
+  59: ";",
+  61: "=",
+  91: "Meta",
+  92: "Meta",
+  106: "*",
+  107: "+",
+  108: ",",
+  109: "-",
+  110: ".",
+  111: "/",
+  144: "NumLock",
+  145: "ScrollLock",
+  160: "Shift",
+  161: "Shift",
+  162: "Control",
+  163: "Control",
+  164: "Alt",
+  165: "Alt",
+  173: "-",
+  186: ";",
+  187: "=",
+  188: ",",
+  189: "-",
+  190: ".",
+  191: "/",
+  192: "`",
+  219: "[",
+  220: "\\",
+  221: "]",
+  222: "'"
+};
+var shift = {
+  48: ")",
+  49: "!",
+  50: "@",
+  51: "#",
+  52: "$",
+  53: "%",
+  54: "^",
+  55: "&",
+  56: "*",
+  57: "(",
+  59: ":",
+  61: "+",
+  173: "_",
+  186: ":",
+  187: "+",
+  188: "<",
+  189: "_",
+  190: ">",
+  191: "?",
+  192: "~",
+  219: "{",
+  220: "|",
+  221: "}",
+  222: '"'
+};
+var mac$1 = typeof navigator != "undefined" && /Mac/.test(navigator.platform);
+var ie = typeof navigator != "undefined" && /MSIE \d|Trident\/(?:[7-9]|\d{2,})\..*rv:(\d+)/.exec(navigator.userAgent);
+for (var i = 0; i < 10; i++) base[48 + i] = base[96 + i] = String(i);
+for (var i = 1; i <= 24; i++) base[i + 111] = "F" + i;
+for (var i = 65; i <= 90; i++) {
+  base[i] = String.fromCharCode(i + 32);
+  shift[i] = String.fromCharCode(i);
+}
+for (var code in base) if (!shift.hasOwnProperty(code)) shift[code] = base[code];
+function keyName(event) {
+  var ignoreKey = mac$1 && event.metaKey && event.shiftKey && !event.ctrlKey && !event.altKey || ie && event.shiftKey && event.key && event.key.length == 1 || event.key == "Unidentified";
+  var name = !ignoreKey && event.key || (event.shiftKey ? shift : base)[event.keyCode] || event.key || "Unidentified";
+  if (name == "Esc") name = "Escape";
+  if (name == "Del") name = "Delete";
+  if (name == "Left") name = "ArrowLeft";
+  if (name == "Up") name = "ArrowUp";
+  if (name == "Right") name = "ArrowRight";
+  if (name == "Down") name = "ArrowDown";
+  return name;
+}
+const mac = typeof navigator != "undefined" && /Mac|iP(hone|[oa]d)/.test(navigator.platform);
+const windows = typeof navigator != "undefined" && /Win/.test(navigator.platform);
+function normalizeKeyName$1(name) {
+  let parts = name.split(/-(?!$)/), result = parts[parts.length - 1];
+  if (result == "Space")
+    result = " ";
+  let alt, ctrl, shift2, meta;
+  for (let i2 = 0; i2 < parts.length - 1; i2++) {
+    let mod = parts[i2];
+    if (/^(cmd|meta|m)$/i.test(mod))
+      meta = true;
+    else if (/^a(lt)?$/i.test(mod))
+      alt = true;
+    else if (/^(c|ctrl|control)$/i.test(mod))
+      ctrl = true;
+    else if (/^s(hift)?$/i.test(mod))
+      shift2 = true;
+    else if (/^mod$/i.test(mod)) {
+      if (mac)
+        meta = true;
+      else
+        ctrl = true;
+    } else
+      throw new Error("Unrecognized modifier name: " + mod);
+  }
+  if (alt)
+    result = "Alt-" + result;
+  if (ctrl)
+    result = "Ctrl-" + result;
+  if (meta)
+    result = "Meta-" + result;
+  if (shift2)
+    result = "Shift-" + result;
+  return result;
+}
+function normalize(map2) {
+  let copy2 = /* @__PURE__ */ Object.create(null);
+  for (let prop in map2)
+    copy2[normalizeKeyName$1(prop)] = map2[prop];
+  return copy2;
+}
+function modifiers(name, event, shift2 = true) {
+  if (event.altKey)
+    name = "Alt-" + name;
+  if (event.ctrlKey)
+    name = "Ctrl-" + name;
+  if (event.metaKey)
+    name = "Meta-" + name;
+  if (shift2 && event.shiftKey)
+    name = "Shift-" + name;
+  return name;
+}
+function keymap(bindings) {
+  return new Plugin({ props: { handleKeyDown: keydownHandler(bindings) } });
+}
+function keydownHandler(bindings) {
+  let map2 = normalize(bindings);
+  return function(view, event) {
+    let name = keyName(event), baseName, direct = map2[modifiers(name, event)];
+    if (direct && direct(view.state, view.dispatch, view))
+      return true;
+    if (name.length == 1 && name != " ") {
+      if (event.shiftKey) {
+        let noShift = map2[modifiers(name, event, false)];
+        if (noShift && noShift(view.state, view.dispatch, view))
+          return true;
+      }
+      if ((event.altKey || event.metaKey || event.ctrlKey) && // Ctrl-Alt may be used for AltGr on Windows
+      !(windows && event.ctrlKey && event.altKey) && (baseName = base[event.keyCode]) && baseName != name) {
+        let fromCode = map2[modifiers(baseName, event)];
+        if (fromCode && fromCode(view.state, view.dispatch, view))
+          return true;
+      }
+    }
+    return false;
   };
 }
 var __defProp$1 = Object.defineProperty;
@@ -6383,9 +6560,9 @@ var deleteCurrentNode = () => ({ tr, dispatch }) => {
     const node = $pos.node(depth);
     if (node.type === currentNode.type) {
       if (dispatch) {
-        const from = $pos.before(depth);
+        const from2 = $pos.before(depth);
         const to = $pos.after(depth);
-        tr.delete(from, to).scrollIntoView();
+        tr.delete(from2, to).scrollIntoView();
       }
       return true;
     }
@@ -6410,9 +6587,9 @@ var deleteNode = (typeOrName) => ({ tr, state, dispatch }) => {
     const node = $pos.node(depth);
     if (node.type === type) {
       if (dispatch) {
-        const from = $pos.before(depth);
+        const from2 = $pos.before(depth);
         const to = $pos.after(depth);
-        tr.delete(from, to).scrollIntoView();
+        tr.delete(from2, to).scrollIntoView();
       }
       return true;
     }
@@ -6420,9 +6597,9 @@ var deleteNode = (typeOrName) => ({ tr, state, dispatch }) => {
   return false;
 };
 var deleteRange = (range) => ({ tr, dispatch }) => {
-  const { from, to } = range;
+  const { from: from2, to } = range;
   if (dispatch) {
-    tr.delete(from, to);
+    tr.delete(from2, to);
   }
   return true;
 };
@@ -6447,9 +6624,9 @@ var expandSelectionForSide = ($pos, schema, side) => {
   return side === "left" ? $pos.start() - 1 : $pos.end() + 1;
 };
 var expandSelectionForInlineText = ($from, $to, schema) => {
-  const from = expandSelectionForSide($from, schema, "left");
+  const from2 = expandSelectionForSide($from, schema, "left");
   const to = expandSelectionForSide($to, schema, "right");
-  return { from, to };
+  return { from: from2, to };
 };
 var deleteSelection = () => ({ state, dispatch }) => {
   if (state.selection.empty) {
@@ -6463,8 +6640,8 @@ var deleteSelection = () => ({ state, dispatch }) => {
       const mapping = tr.mapping.slice(mapFrom);
       const $from = tr.doc.resolve(mapping.map(range.$from.pos));
       const $to = tr.doc.resolve(mapping.map(range.$to.pos));
-      const { from, to } = expandSelectionForInlineText($from, $to, state.schema);
-      tr.deleteRange(from, to);
+      const { from: from2, to } = expandSelectionForInlineText($from, $to, state.schema);
+      tr.deleteRange(from2, to);
     });
     tr.scrollIntoView();
     dispatch(tr);
@@ -6559,10 +6736,10 @@ function getMarkType(nameOrType, schema) {
 var extendMarkRange = (typeOrName, attributes) => ({ tr, state, dispatch }) => {
   const type = getMarkType(typeOrName, state.schema);
   const { doc, selection } = tr;
-  const { $from, from, to } = selection;
+  const { $from, from: from2, to } = selection;
   if (dispatch) {
     const range = getMarkRange($from, type, attributes);
-    if (range && range.from <= from && range.to >= to) {
+    if (range && range.from <= from2 && range.to >= to) {
       const newSelection = TextSelection.create(doc, range.from, range.to);
       tr.setSelection(newSelection);
     }
@@ -6571,8 +6748,8 @@ var extendMarkRange = (typeOrName, attributes) => ({ tr, state, dispatch }) => {
 };
 var first = (commands) => (props) => {
   const items = typeof commands === "function" ? commands(props) : commands;
-  for (let i = 0; i < items.length; i += 1) {
-    if (items[i](props)) {
+  for (let i2 = 0; i2 < items.length; i2 += 1) {
+    if (items[i2](props)) {
       return true;
     }
   }
@@ -6680,8 +6857,8 @@ var insertContent = (value, options) => ({ tr, commands }) => {
 };
 var removeWhitespaces = (node) => {
   const children = node.childNodes;
-  for (let i = children.length - 1; i >= 0; i -= 1) {
-    const child = children[i];
+  for (let i2 = children.length - 1; i2 >= 0; i2 -= 1) {
+    const child = children[i2];
     if (child.nodeType === 3 && child.nodeValue && /^(\n\s\s|\n)$/.test(child.nodeValue)) {
       node.removeChild(child);
     } else if (child.nodeType === 1) {
@@ -6790,9 +6967,9 @@ function selectionToInsertionEnd(tr, startLen, bias) {
   if (!(step instanceof ReplaceStep || step instanceof ReplaceAroundStep)) {
     return;
   }
-  const map = tr.mapping.maps[last];
+  const map2 = tr.mapping.maps[last];
   let end = 0;
-  map.forEach((_from, _to, _newFrom, newTo) => {
+  map2.forEach((_from, _to, _newFrom, newTo) => {
     if (end === 0) {
       end = newTo;
     }
@@ -6847,7 +7024,7 @@ var insertContentAt = (position, value, options) => ({ tr, dispatch, editor }) =
       emitContentError(e);
       return false;
     }
-    let { from, to } = typeof position === "number" ? { from: position, to: position } : { from: position.from, to: position.to };
+    let { from: from2, to } = typeof position === "number" ? { from: position, to: position } : { from: position.from, to: position.to };
     let isOnlyTextContent = true;
     let isOnlyBlockContent = true;
     const nodes = isFragment(content) ? content : [content];
@@ -6856,11 +7033,11 @@ var insertContentAt = (position, value, options) => ({ tr, dispatch, editor }) =
       isOnlyTextContent = isOnlyTextContent ? node.isText && node.marks.length === 0 : false;
       isOnlyBlockContent = isOnlyBlockContent ? node.isBlock : false;
     });
-    if (from === to && isOnlyBlockContent) {
-      const { parent } = tr.doc.resolve(from);
+    if (from2 === to && isOnlyBlockContent) {
+      const { parent } = tr.doc.resolve(from2);
       const isEmptyTextBlock = parent.isTextblock && !parent.type.spec.code && !parent.childCount;
       if (isEmptyTextBlock) {
-        from -= 1;
+        from2 -= 1;
         to += 1;
       }
     }
@@ -6881,27 +7058,27 @@ var insertContentAt = (position, value, options) => ({ tr, dispatch, editor }) =
       } else {
         newContent = value;
       }
-      tr.insertText(newContent, from, to);
+      tr.insertText(newContent, from2, to);
     } else {
       newContent = content;
-      const $from = tr.doc.resolve(from);
+      const $from = tr.doc.resolve(from2);
       const $fromNode = $from.node();
       const fromSelectionAtStart = $from.parentOffset === 0;
       const isTextSelection2 = $fromNode.isText || $fromNode.isTextblock;
       const hasContent = $fromNode.content.size > 0;
       if (fromSelectionAtStart && isTextSelection2 && hasContent && isOnlyBlockContent) {
-        from = Math.max(0, from - 1);
+        from2 = Math.max(0, from2 - 1);
       }
-      tr.replaceWith(from, to, newContent);
+      tr.replaceWith(from2, to, newContent);
     }
     if (options.updateSelection) {
       selectionToInsertionEnd(tr, tr.steps.length - 1, -1);
     }
     if (options.applyInputRules) {
-      tr.setMeta("applyInputRules", { from, text: newContent });
+      tr.setMeta("applyInputRules", { from: from2, text: newContent });
     }
     if (options.applyPasteRules) {
-      tr.setMeta("applyPasteRules", { from, text: newContent });
+      tr.setMeta("applyPasteRules", { from: from2, text: newContent });
     }
   }
   return true;
@@ -6965,10 +7142,10 @@ function normalizeKeyName(name) {
   }
   let alt;
   let ctrl;
-  let shift;
+  let shift2;
   let meta;
-  for (let i = 0; i < parts.length - 1; i += 1) {
-    const mod = parts[i];
+  for (let i2 = 0; i2 < parts.length - 1; i2 += 1) {
+    const mod = parts[i2];
     if (/^(cmd|meta|m)$/i.test(mod)) {
       meta = true;
     } else if (/^a(lt)?$/i.test(mod)) {
@@ -6976,7 +7153,7 @@ function normalizeKeyName(name) {
     } else if (/^(c|ctrl|control)$/i.test(mod)) {
       ctrl = true;
     } else if (/^s(hift)?$/i.test(mod)) {
-      shift = true;
+      shift2 = true;
     } else if (/^mod$/i.test(mod)) {
       if (isiOS() || isMacOS()) {
         meta = true;
@@ -6996,7 +7173,7 @@ function normalizeKeyName(name) {
   if (meta) {
     result = `Meta-${result}`;
   }
-  if (shift) {
+  if (shift2) {
     result = `Shift-${result}`;
   }
   return result;
@@ -7025,14 +7202,14 @@ var keyboardShortcut = (name) => ({ editor, view, tr, dispatch }) => {
   return true;
 };
 function isNodeActive(state, typeOrName, attributes = {}) {
-  const { from, to, empty } = state.selection;
+  const { from: from2, to, empty } = state.selection;
   const type = typeOrName ? getNodeType(typeOrName, state.schema) : null;
   const nodeRanges = [];
-  state.doc.nodesBetween(from, to, (node, pos) => {
+  state.doc.nodesBetween(from2, to, (node, pos) => {
     if (node.isText) {
       return;
     }
-    const relativeFrom = Math.max(from, pos);
+    const relativeFrom = Math.max(from2, pos);
     const relativeTo = Math.min(to, pos + node.nodeSize);
     nodeRanges.push({
       node,
@@ -7040,7 +7217,7 @@ function isNodeActive(state, typeOrName, attributes = {}) {
       to: relativeTo
     });
   });
-  const selectionRange = to - from;
+  const selectionRange = to - from2;
   const matchedNodeRanges = nodeRanges.filter((nodeRange) => {
     if (!type) {
       return true;
@@ -7188,7 +7365,7 @@ var setContent = (content, { errorOnInvalidContent, emitUpdate = true, parseOpti
 };
 function getMarkAttributes(state, typeOrName) {
   const type = getMarkType(typeOrName, state.schema);
-  const { from, to, empty } = state.selection;
+  const { from: from2, to, empty } = state.selection;
   const marks = [];
   if (empty) {
     if (state.storedMarks) {
@@ -7196,7 +7373,7 @@ function getMarkAttributes(state, typeOrName) {
     }
     marks.push(...state.selection.$head.marks());
   } else {
-    state.doc.nodesBetween(from, to, (node) => {
+    state.doc.nodesBetween(from2, to, (node) => {
       marks.push(...node.marks);
     });
   }
@@ -7216,8 +7393,8 @@ function combineTransactionSteps(oldDoc, transactions) {
   return transform;
 }
 function defaultBlockAt(match) {
-  for (let i = 0; i < match.edgeCount; i += 1) {
-    const { type } = match.edge(i);
+  for (let i2 = 0; i2 < match.edgeCount; i2 += 1) {
+    const { type } = match.edge(i2);
     if (type.isTextblock && !type.hasRequiredAttrs()) {
       return type;
     }
@@ -7225,13 +7402,13 @@ function defaultBlockAt(match) {
   return null;
 }
 function findParentNodeClosestToPos($pos, predicate) {
-  for (let i = $pos.depth; i > 0; i -= 1) {
-    const node = $pos.node(i);
+  for (let i2 = $pos.depth; i2 > 0; i2 -= 1) {
+    const node = $pos.node(i2);
     if (predicate(node)) {
       return {
-        pos: i > 0 ? $pos.before(i) : 0,
-        start: $pos.start(i),
-        depth: i,
+        pos: i2 > 0 ? $pos.before(i2) : 0,
+        start: $pos.start(i2),
+        depth: i2,
         node
       };
     }
@@ -7395,8 +7572,8 @@ function splitStyleDeclarations(styles) {
   let inDoubleQuote = false;
   let parenDepth = 0;
   const length = styles.length;
-  for (let i = 0; i < length; i += 1) {
-    const char = styles[i];
+  for (let i2 = 0; i2 < length; i2 += 1) {
+    const char = styles[i2];
     if (char === "'" && !inDoubleQuote) {
       inSingleQuote = !inSingleQuote;
       current += char;
@@ -7435,8 +7612,8 @@ function parseStyleEntries(styles) {
   const pairs = [];
   const declarations = splitStyleDeclarations(styles || "");
   const numDeclarations = declarations.length;
-  for (let i = 0; i < numDeclarations; i += 1) {
-    const declaration = declarations[i];
+  for (let i2 = 0; i2 < numDeclarations; i2 += 1) {
+    const declaration = declarations[i2];
     const firstColonIndex = declaration.indexOf(":");
     if (firstColonIndex === -1) {
       continue;
@@ -7739,12 +7916,12 @@ function getSchema(extensions, editor) {
   return getSchemaByResolvedExtensions(resolvedExtensions, editor);
 }
 function getTextBetween(startNode, range, options) {
-  const { from, to } = range;
+  const { from: from2, to } = range;
   const { blockSeparator = "\n\n", textSerializers = {} } = options || {};
   let text = "";
-  startNode.nodesBetween(from, to, (node, pos, parent, index) => {
+  startNode.nodesBetween(from2, to, (node, pos, parent, index) => {
     var _a;
-    if (node.isBlock && pos > from) {
+    if (node.isBlock && pos > from2) {
       text += blockSeparator;
     }
     const textSerializer = textSerializers == null ? void 0 : textSerializers[node.type.name];
@@ -7761,7 +7938,7 @@ function getTextBetween(startNode, range, options) {
       return false;
     }
     if (node.isText) {
-      text += (_a = node == null ? void 0 : node.text) == null ? void 0 : _a.slice(Math.max(from, pos) - pos, to - pos);
+      text += (_a = node == null ? void 0 : node.text) == null ? void 0 : _a.slice(Math.max(from2, pos) - pos, to - pos);
     }
   });
   return text;
@@ -7781,7 +7958,7 @@ function removeDuplicates(array, by = JSON.stringify) {
 function simplifyChangedRanges(changes) {
   const uniqueChanges = removeDuplicates(changes);
   return uniqueChanges.length === 1 ? uniqueChanges : uniqueChanges.filter((change, index) => {
-    const rest = uniqueChanges.filter((_, i) => i !== index);
+    const rest = uniqueChanges.filter((_, i2) => i2 !== index);
     return !rest.some((otherChange) => {
       return change.oldRange.from >= otherChange.oldRange.from && change.oldRange.to <= otherChange.oldRange.to && change.newRange.from >= otherChange.newRange.from && change.newRange.to <= otherChange.newRange.to;
     });
@@ -7793,18 +7970,18 @@ function getChangedRanges(transform) {
   mapping.maps.forEach((stepMap, index) => {
     const ranges = [];
     if (!stepMap.ranges.length) {
-      const { from, to } = steps[index];
-      if (from === void 0 || to === void 0) {
+      const { from: from2, to } = steps[index];
+      if (from2 === void 0 || to === void 0) {
         return;
       }
-      ranges.push({ from, to });
+      ranges.push({ from: from2, to });
     } else {
-      stepMap.forEach((from, to) => {
-        ranges.push({ from, to });
+      stepMap.forEach((from2, to) => {
+        ranges.push({ from: from2, to });
       });
     }
-    ranges.forEach(({ from, to }) => {
-      const newStart = mapping.slice(index).map(from, -1);
+    ranges.forEach(({ from: from2, to }) => {
+      const newStart = mapping.slice(index).map(from2, -1);
       const newEnd = mapping.slice(index).map(to);
       const oldStart = mapping.invert().map(newStart, -1);
       const oldEnd = mapping.invert().map(newEnd);
@@ -7822,11 +7999,11 @@ function getChangedRanges(transform) {
   });
   return simplifyChangedRanges(changes);
 }
-function getMarksBetween(from, to, doc) {
+function getMarksBetween(from2, to, doc) {
   const marks = [];
-  if (from === to) {
-    doc.resolve(from).marks().forEach((mark) => {
-      const $pos = doc.resolve(from);
+  if (from2 === to) {
+    doc.resolve(from2).marks().forEach((mark) => {
+      const $pos = doc.resolve(from2);
       const range = getMarkRange($pos, mark.type);
       if (!range) {
         return;
@@ -7837,7 +8014,7 @@ function getMarksBetween(from, to, doc) {
       });
     });
   } else {
-    doc.nodesBetween(from, to, (node, pos) => {
+    doc.nodesBetween(from2, to, (node, pos) => {
       if (!node || (node == null ? void 0 : node.nodeSize) === void 0) {
         return;
       }
@@ -7893,16 +8070,16 @@ function isMarkActive(state, typeOrName, attributes = {}) {
   let selectionRange = 0;
   const markRanges = [];
   ranges.forEach(({ $from, $to }) => {
-    const from = $from.pos;
+    const from2 = $from.pos;
     const to = $to.pos;
-    state.doc.nodesBetween(from, to, (node, pos) => {
+    state.doc.nodesBetween(from2, to, (node, pos) => {
       if (type && node.inlineContent && !node.type.allowsMarkType(type)) {
         return false;
       }
       if (!node.isText && !node.marks.length) {
         return;
       }
-      const relativeFrom = Math.max(from, pos);
+      const relativeFrom = Math.max(from2, pos);
       const relativeTo = Math.min(to, pos + node.nodeSize);
       const range2 = relativeTo - relativeFrom;
       selectionRange += range2;
@@ -8055,10 +8232,10 @@ var setMark = (typeOrName, attributes = {}) => ({ tr, state, dispatch }) => {
       );
     } else {
       ranges.forEach((range) => {
-        const from = range.$from.pos;
+        const from2 = range.$from.pos;
         const to = range.$to.pos;
-        state.doc.nodesBetween(from, to, (node, pos) => {
-          const trimmedFrom = Math.max(pos, from);
+        state.doc.nodesBetween(from2, to, (node, pos) => {
+          const trimmedFrom = Math.max(pos, from2);
           const trimmedTo = Math.min(pos + node.nodeSize, to);
           const someHasMark = node.marks.find((mark) => mark.type === type);
           if (someHasMark) {
@@ -8110,28 +8287,28 @@ var setNode = (typeOrName, attributes = {}) => ({ state, dispatch, chain }) => {
 var setNodeSelection = (position) => ({ tr, dispatch }) => {
   if (dispatch) {
     const { doc } = tr;
-    const from = minMax(position, 0, doc.content.size);
-    const selection = NodeSelection.create(doc, from);
+    const from2 = minMax(position, 0, doc.content.size);
+    const selection = NodeSelection.create(doc, from2);
     tr.setSelection(selection);
   }
   return true;
 };
 var setTextDirection = (direction, position) => ({ tr, state, dispatch }) => {
   const { selection } = state;
-  let from;
+  let from2;
   let to;
   if (typeof position === "number") {
-    from = position;
+    from2 = position;
     to = position;
   } else if (position && "from" in position && "to" in position) {
-    from = position.from;
+    from2 = position.from;
     to = position.to;
   } else {
-    from = selection.from;
+    from2 = selection.from;
     to = selection.to;
   }
   if (dispatch) {
-    tr.doc.nodesBetween(from, to, (node, pos) => {
+    tr.doc.nodesBetween(from2, to, (node, pos) => {
       if (node.isText) {
         return;
       }
@@ -8146,10 +8323,10 @@ var setTextDirection = (direction, position) => ({ tr, state, dispatch }) => {
 var setTextSelection = (position) => ({ tr, dispatch }) => {
   if (dispatch) {
     const { doc } = tr;
-    const { from, to } = typeof position === "number" ? { from: position, to: position } : position;
+    const { from: from2, to } = typeof position === "number" ? { from: position, to: position } : position;
     const minPos = TextSelection.atStart(doc).from;
     const maxPos = TextSelection.atEnd(doc).to;
-    const resolvedFrom = minMax(from, minPos, maxPos);
+    const resolvedFrom = minMax(from2, minPos, maxPos);
     const resolvedEnd = minMax(to, minPos, maxPos);
     const selection = TextSelection.create(doc, resolvedFrom, resolvedEnd);
     tr.setSelection(selection);
@@ -8464,8 +8641,8 @@ var toggleWrap = (typeOrName, attributes = {}) => ({ state, commands }) => {
 };
 var undoInputRule = () => ({ state, dispatch }) => {
   const plugins = state.plugins;
-  for (let i = 0; i < plugins.length; i += 1) {
-    const plugin = plugins[i];
+  for (let i2 = 0; i2 < plugins.length; i2 += 1) {
+    const plugin = plugins[i2];
     let undoable;
     if (plugin.spec.isInputRules && (undoable = plugin.getState(state))) {
       if (dispatch) {
@@ -8516,14 +8693,14 @@ var unsetMark = (typeOrName, options = {}) => ({ tr, state, dispatch }) => {
     return true;
   }
   if (empty && extendEmptyMarkRange) {
-    let { from, to } = selection;
+    let { from: from2, to } = selection;
     const attrs = (_a = $from.marks().find((mark) => mark.type === type)) == null ? void 0 : _a.attrs;
     const range = getMarkRange($from, type, attrs);
     if (range) {
-      from = range.from;
+      from2 = range.from;
       to = range.to;
     }
-    tr.removeMark(from, to, type);
+    tr.removeMark(from2, to, type);
   } else {
     ranges.forEach((range) => {
       tr.removeMark(range.$from.pos, range.$to.pos, type);
@@ -8534,20 +8711,20 @@ var unsetMark = (typeOrName, options = {}) => ({ tr, state, dispatch }) => {
 };
 var unsetTextDirection = (position) => ({ tr, state, dispatch }) => {
   const { selection } = state;
-  let from;
+  let from2;
   let to;
   if (typeof position === "number") {
-    from = position;
+    from2 = position;
     to = position;
   } else if (position && "from" in position && "to" in position) {
-    from = position.from;
+    from2 = position.from;
     to = position.to;
   } else {
-    from = selection.from;
+    from2 = selection.from;
     to = selection.to;
   }
   if (dispatch) {
-    tr.doc.nodesBetween(from, to, (node, pos) => {
+    tr.doc.nodesBetween(from2, to, (node, pos) => {
       if (node.isText) {
         return;
       }
@@ -8576,32 +8753,32 @@ var updateAttributes = (typeOrName, attributes = {}) => ({ tr, state, dispatch }
   }
   let canUpdate = false;
   tr.selection.ranges.forEach((range) => {
-    const from = range.$from.pos;
+    const from2 = range.$from.pos;
     const to = range.$to.pos;
     let lastPos;
     let lastNode;
     let trimmedFrom;
     let trimmedTo;
     if (tr.selection.empty) {
-      state.doc.nodesBetween(from, to, (node, pos) => {
+      state.doc.nodesBetween(from2, to, (node, pos) => {
         if (nodeType && nodeType === node.type) {
           canUpdate = true;
-          trimmedFrom = Math.max(pos, from);
+          trimmedFrom = Math.max(pos, from2);
           trimmedTo = Math.min(pos + node.nodeSize, to);
           lastPos = pos;
           lastNode = node;
         }
       });
     } else {
-      state.doc.nodesBetween(from, to, (node, pos) => {
-        if (pos < from && nodeType && nodeType === node.type) {
+      state.doc.nodesBetween(from2, to, (node, pos) => {
+        if (pos < from2 && nodeType && nodeType === node.type) {
           canUpdate = true;
-          trimmedFrom = Math.max(pos, from);
+          trimmedFrom = Math.max(pos, from2);
           trimmedTo = Math.min(pos + node.nodeSize, to);
           lastPos = pos;
           lastNode = node;
         }
-        if (pos >= from && pos <= to) {
+        if (pos >= from2 && pos <= to) {
           if (nodeType && nodeType === node.type) {
             canUpdate = true;
             if (dispatch) {
@@ -8616,7 +8793,7 @@ var updateAttributes = (typeOrName, attributes = {}) => ({ tr, state, dispatch }
               if (markType === mark.type) {
                 canUpdate = true;
                 if (dispatch) {
-                  const trimmedFrom2 = Math.max(pos, from);
+                  const trimmedFrom2 = Math.max(pos, from2);
                   const trimmedTo2 = Math.min(pos + node.nodeSize, to);
                   tr.addMark(
                     trimmedFrom2,
@@ -8673,8 +8850,8 @@ function getStyleProperty(element, propertyName) {
   }
   const decls = styleAttr.split(";").map((decl) => decl.trim()).filter(Boolean);
   const target = propertyName.toLowerCase();
-  for (let i = decls.length - 1; i >= 0; i -= 1) {
-    const decl = decls[i];
+  for (let i2 = decls.length - 1; i2 >= 0; i2 -= 1) {
+    const decl = decls[i2];
     const colonIndex = decl.indexOf(":");
     if (colonIndex === -1) {
       continue;
@@ -9078,16 +9255,16 @@ function parseIndentedBlocks(src, config, lexer) {
   const lines = src.split("\n");
   const items = [];
   let totalRaw = "";
-  let i = 0;
+  let i2 = 0;
   const baseIndentSize = config.baseIndentSize || 2;
-  while (i < lines.length) {
-    const currentLine = lines[i];
+  while (i2 < lines.length) {
+    const currentLine = lines[i2];
     const itemMatch = currentLine.match(config.itemPattern);
     if (!itemMatch) {
       if (items.length > 0) {
         break;
       } else if (currentLine.trim() === "") {
-        i += 1;
+        i2 += 1;
         totalRaw = `${totalRaw}${currentLine}
 `;
         continue;
@@ -9100,21 +9277,21 @@ function parseIndentedBlocks(src, config, lexer) {
     totalRaw = `${totalRaw}${currentLine}
 `;
     const itemContent = [mainContent];
-    i += 1;
-    while (i < lines.length) {
-      const nextLine = lines[i];
+    i2 += 1;
+    while (i2 < lines.length) {
+      const nextLine = lines[i2];
       if (nextLine.trim() === "") {
-        const nextNonEmptyIndex = lines.slice(i + 1).findIndex((l) => l.trim() !== "");
+        const nextNonEmptyIndex = lines.slice(i2 + 1).findIndex((l) => l.trim() !== "");
         if (nextNonEmptyIndex === -1) {
           break;
         }
-        const nextNonEmpty = lines[i + 1 + nextNonEmptyIndex];
+        const nextNonEmpty = lines[i2 + 1 + nextNonEmptyIndex];
         const nextIndent2 = ((_b = (_a = nextNonEmpty.match(/^(\s*)/)) == null ? void 0 : _a[1]) == null ? void 0 : _b.length) || 0;
         if (nextIndent2 > indentLevel) {
           itemContent.push(nextLine);
           totalRaw = `${totalRaw}${nextLine}
 `;
-          i += 1;
+          i2 += 1;
           continue;
         } else {
           break;
@@ -9125,7 +9302,7 @@ function parseIndentedBlocks(src, config, lexer) {
         itemContent.push(nextLine);
         totalRaw = `${totalRaw}${nextLine}
 `;
-        i += 1;
+        i2 += 1;
       } else {
         break;
       }
@@ -9392,15 +9569,15 @@ var Delete = Extension.create({
           nextTransaction.before.nodesBetween(
             change.oldRange.from,
             change.oldRange.to,
-            (node, from) => {
-              const to = from + node.nodeSize - 2;
-              const isFullyWithinRange = change.oldRange.from <= from && to <= change.oldRange.to;
+            (node, from2) => {
+              const to = from2 + node.nodeSize - 2;
+              const isFullyWithinRange = change.oldRange.from <= from2 && to <= change.oldRange.to;
               this.editor.emit("delete", {
                 type: "node",
                 node,
-                from,
+                from: from2,
                 to,
-                newFrom: nextTransaction.mapping.map(from),
+                newFrom: nextTransaction.mapping.map(from2),
                 newTo: nextTransaction.mapping.map(to),
                 deletedRange: change.oldRange,
                 newRange: change.newRange,
@@ -9458,11 +9635,11 @@ var Drop = Extension.create({
       new Plugin({
         key: new PluginKey("tiptapDrop"),
         props: {
-          handleDrop: (_, e, slice, moved) => {
+          handleDrop: (_, e, slice2, moved) => {
             this.editor.emit("drop", {
               editor: this.editor,
               event: e,
-              slice,
+              slice: slice2,
               moved
             });
           }
@@ -9596,10 +9773,10 @@ var Keymap = Extension.create({
           if (!docChanges || ignoreTr) {
             return;
           }
-          const { empty, from, to } = oldState.selection;
+          const { empty, from: from2, to } = oldState.selection;
           const allFrom = Selection.atStart(oldState.doc).from;
           const allEnd = Selection.atEnd(oldState.doc).to;
-          const allWasSelected = from === allFrom && to === allEnd;
+          const allWasSelected = from2 === allFrom && to === allEnd;
           if (empty || !allWasSelected) {
             return;
           }
@@ -9633,11 +9810,11 @@ var Paste = Extension.create({
       new Plugin({
         key: new PluginKey("tiptapPaste"),
         props: {
-          handlePaste: (_view, e, slice) => {
+          handlePaste: (_view, e, slice2) => {
             this.editor.emit("paste", {
               editor: this.editor,
               event: e,
-              slice
+              slice: slice2
             });
           }
         }
@@ -11103,9 +11280,9 @@ function areOrderedListMarkersSequential(markers) {
   if (firstStart < 1) {
     return false;
   }
-  for (let i = 0; i < markers.length; i++) {
-    const expected = startToMarker(firstType, firstStart + i);
-    if (markers[i] !== expected) {
+  for (let i2 = 0; i2 < markers.length; i2++) {
+    const expected = startToMarker(firstType, firstStart + i2);
+    if (markers[i2] !== expected) {
       return false;
     }
   }
@@ -13306,6 +13483,553 @@ const voiceBlockCss = `/* SPDX-FileCopyrightText: 2026 UnionTech Software Techno
     color: inherit;
 }
 `;
+var GOOD_LEAF_SIZE = 200;
+var RopeSequence = function RopeSequence2() {
+};
+RopeSequence.prototype.append = function append(other) {
+  if (!other.length) {
+    return this;
+  }
+  other = RopeSequence.from(other);
+  return !this.length && other || other.length < GOOD_LEAF_SIZE && this.leafAppend(other) || this.length < GOOD_LEAF_SIZE && other.leafPrepend(this) || this.appendInner(other);
+};
+RopeSequence.prototype.prepend = function prepend(other) {
+  if (!other.length) {
+    return this;
+  }
+  return RopeSequence.from(other).append(this);
+};
+RopeSequence.prototype.appendInner = function appendInner(other) {
+  return new Append(this, other);
+};
+RopeSequence.prototype.slice = function slice(from2, to) {
+  if (from2 === void 0) from2 = 0;
+  if (to === void 0) to = this.length;
+  if (from2 >= to) {
+    return RopeSequence.empty;
+  }
+  return this.sliceInner(Math.max(0, from2), Math.min(this.length, to));
+};
+RopeSequence.prototype.get = function get(i2) {
+  if (i2 < 0 || i2 >= this.length) {
+    return void 0;
+  }
+  return this.getInner(i2);
+};
+RopeSequence.prototype.forEach = function forEach2(f, from2, to) {
+  if (from2 === void 0) from2 = 0;
+  if (to === void 0) to = this.length;
+  if (from2 <= to) {
+    this.forEachInner(f, from2, to, 0);
+  } else {
+    this.forEachInvertedInner(f, from2, to, 0);
+  }
+};
+RopeSequence.prototype.map = function map(f, from2, to) {
+  if (from2 === void 0) from2 = 0;
+  if (to === void 0) to = this.length;
+  var result = [];
+  this.forEach(function(elt, i2) {
+    return result.push(f(elt, i2));
+  }, from2, to);
+  return result;
+};
+RopeSequence.from = function from(values) {
+  if (values instanceof RopeSequence) {
+    return values;
+  }
+  return values && values.length ? new Leaf(values) : RopeSequence.empty;
+};
+var Leaf = /* @__PURE__ */ (function(RopeSequence3) {
+  function Leaf2(values) {
+    RopeSequence3.call(this);
+    this.values = values;
+  }
+  if (RopeSequence3) Leaf2.__proto__ = RopeSequence3;
+  Leaf2.prototype = Object.create(RopeSequence3 && RopeSequence3.prototype);
+  Leaf2.prototype.constructor = Leaf2;
+  var prototypeAccessors = { length: { configurable: true }, depth: { configurable: true } };
+  Leaf2.prototype.flatten = function flatten() {
+    return this.values;
+  };
+  Leaf2.prototype.sliceInner = function sliceInner(from2, to) {
+    if (from2 == 0 && to == this.length) {
+      return this;
+    }
+    return new Leaf2(this.values.slice(from2, to));
+  };
+  Leaf2.prototype.getInner = function getInner(i2) {
+    return this.values[i2];
+  };
+  Leaf2.prototype.forEachInner = function forEachInner(f, from2, to, start) {
+    for (var i2 = from2; i2 < to; i2++) {
+      if (f(this.values[i2], start + i2) === false) {
+        return false;
+      }
+    }
+  };
+  Leaf2.prototype.forEachInvertedInner = function forEachInvertedInner(f, from2, to, start) {
+    for (var i2 = from2 - 1; i2 >= to; i2--) {
+      if (f(this.values[i2], start + i2) === false) {
+        return false;
+      }
+    }
+  };
+  Leaf2.prototype.leafAppend = function leafAppend(other) {
+    if (this.length + other.length <= GOOD_LEAF_SIZE) {
+      return new Leaf2(this.values.concat(other.flatten()));
+    }
+  };
+  Leaf2.prototype.leafPrepend = function leafPrepend(other) {
+    if (this.length + other.length <= GOOD_LEAF_SIZE) {
+      return new Leaf2(other.flatten().concat(this.values));
+    }
+  };
+  prototypeAccessors.length.get = function() {
+    return this.values.length;
+  };
+  prototypeAccessors.depth.get = function() {
+    return 0;
+  };
+  Object.defineProperties(Leaf2.prototype, prototypeAccessors);
+  return Leaf2;
+})(RopeSequence);
+RopeSequence.empty = new Leaf([]);
+var Append = /* @__PURE__ */ (function(RopeSequence3) {
+  function Append2(left, right) {
+    RopeSequence3.call(this);
+    this.left = left;
+    this.right = right;
+    this.length = left.length + right.length;
+    this.depth = Math.max(left.depth, right.depth) + 1;
+  }
+  if (RopeSequence3) Append2.__proto__ = RopeSequence3;
+  Append2.prototype = Object.create(RopeSequence3 && RopeSequence3.prototype);
+  Append2.prototype.constructor = Append2;
+  Append2.prototype.flatten = function flatten() {
+    return this.left.flatten().concat(this.right.flatten());
+  };
+  Append2.prototype.getInner = function getInner(i2) {
+    return i2 < this.left.length ? this.left.get(i2) : this.right.get(i2 - this.left.length);
+  };
+  Append2.prototype.forEachInner = function forEachInner(f, from2, to, start) {
+    var leftLen = this.left.length;
+    if (from2 < leftLen && this.left.forEachInner(f, from2, Math.min(to, leftLen), start) === false) {
+      return false;
+    }
+    if (to > leftLen && this.right.forEachInner(f, Math.max(from2 - leftLen, 0), Math.min(this.length, to) - leftLen, start + leftLen) === false) {
+      return false;
+    }
+  };
+  Append2.prototype.forEachInvertedInner = function forEachInvertedInner(f, from2, to, start) {
+    var leftLen = this.left.length;
+    if (from2 > leftLen && this.right.forEachInvertedInner(f, from2 - leftLen, Math.max(to, leftLen) - leftLen, start + leftLen) === false) {
+      return false;
+    }
+    if (to < leftLen && this.left.forEachInvertedInner(f, Math.min(from2, leftLen), to, start) === false) {
+      return false;
+    }
+  };
+  Append2.prototype.sliceInner = function sliceInner(from2, to) {
+    if (from2 == 0 && to == this.length) {
+      return this;
+    }
+    var leftLen = this.left.length;
+    if (to <= leftLen) {
+      return this.left.slice(from2, to);
+    }
+    if (from2 >= leftLen) {
+      return this.right.slice(from2 - leftLen, to - leftLen);
+    }
+    return this.left.slice(from2, leftLen).append(this.right.slice(0, to - leftLen));
+  };
+  Append2.prototype.leafAppend = function leafAppend(other) {
+    var inner = this.right.leafAppend(other);
+    if (inner) {
+      return new Append2(this.left, inner);
+    }
+  };
+  Append2.prototype.leafPrepend = function leafPrepend(other) {
+    var inner = this.left.leafPrepend(other);
+    if (inner) {
+      return new Append2(inner, this.right);
+    }
+  };
+  Append2.prototype.appendInner = function appendInner2(other) {
+    if (this.left.depth >= Math.max(this.right.depth, other.depth) + 1) {
+      return new Append2(this.left, new Append2(this.right, other));
+    }
+    return new Append2(this, other);
+  };
+  return Append2;
+})(RopeSequence);
+const max_empty_items = 500;
+class Branch {
+  constructor(items, eventCount) {
+    this.items = items;
+    this.eventCount = eventCount;
+  }
+  // Pop the latest event off the branch's history and apply it
+  // to a document transform.
+  popEvent(state, preserveItems) {
+    if (this.eventCount == 0)
+      return null;
+    let end = this.items.length;
+    for (; ; end--) {
+      let next = this.items.get(end - 1);
+      if (next.selection) {
+        --end;
+        break;
+      }
+    }
+    let remap, mapFrom;
+    if (preserveItems) {
+      remap = this.remapping(end, this.items.length);
+      mapFrom = remap.maps.length;
+    }
+    let transform = state.tr;
+    let selection, remaining;
+    let addAfter = [], addBefore = [];
+    this.items.forEach((item, i2) => {
+      if (!item.step) {
+        if (!remap) {
+          remap = this.remapping(end, i2 + 1);
+          mapFrom = remap.maps.length;
+        }
+        mapFrom--;
+        addBefore.push(item);
+        return;
+      }
+      if (remap) {
+        addBefore.push(new Item(item.map));
+        let step = item.step.map(remap.slice(mapFrom)), map2;
+        if (step && transform.maybeStep(step).doc) {
+          map2 = transform.mapping.maps[transform.mapping.maps.length - 1];
+          addAfter.push(new Item(map2, void 0, void 0, addAfter.length + addBefore.length));
+        }
+        mapFrom--;
+        if (map2)
+          remap.appendMap(map2, mapFrom);
+      } else {
+        transform.maybeStep(item.step);
+      }
+      if (item.selection) {
+        selection = remap ? item.selection.map(remap.slice(mapFrom)) : item.selection;
+        remaining = new Branch(this.items.slice(0, end).append(addBefore.reverse().concat(addAfter)), this.eventCount - 1);
+        return false;
+      }
+    }, this.items.length, 0);
+    return { remaining, transform, selection };
+  }
+  // Create a new branch with the given transform added.
+  addTransform(transform, selection, histOptions, preserveItems) {
+    let newItems = [], eventCount = this.eventCount;
+    let oldItems = this.items, lastItem = !preserveItems && oldItems.length ? oldItems.get(oldItems.length - 1) : null;
+    for (let i2 = 0; i2 < transform.steps.length; i2++) {
+      let step = transform.steps[i2].invert(transform.docs[i2]);
+      let item = new Item(transform.mapping.maps[i2], step, selection), merged;
+      if (merged = lastItem && lastItem.merge(item)) {
+        item = merged;
+        if (i2)
+          newItems.pop();
+        else
+          oldItems = oldItems.slice(0, oldItems.length - 1);
+      }
+      newItems.push(item);
+      if (selection) {
+        eventCount++;
+        selection = void 0;
+      }
+      if (!preserveItems)
+        lastItem = item;
+    }
+    let overflow = eventCount - histOptions.depth;
+    if (overflow > DEPTH_OVERFLOW) {
+      oldItems = cutOffEvents(oldItems, overflow);
+      eventCount -= overflow;
+    }
+    return new Branch(oldItems.append(newItems), eventCount);
+  }
+  remapping(from2, to) {
+    let maps = new Mapping();
+    this.items.forEach((item, i2) => {
+      let mirrorPos = item.mirrorOffset != null && i2 - item.mirrorOffset >= from2 ? maps.maps.length - item.mirrorOffset : void 0;
+      maps.appendMap(item.map, mirrorPos);
+    }, from2, to);
+    return maps;
+  }
+  addMaps(array) {
+    if (this.eventCount == 0)
+      return this;
+    return new Branch(this.items.append(array.map((map2) => new Item(map2))), this.eventCount);
+  }
+  // When the collab module receives remote changes, the history has
+  // to know about those, so that it can adjust the steps that were
+  // rebased on top of the remote changes, and include the position
+  // maps for the remote changes in its array of items.
+  rebased(rebasedTransform, rebasedCount) {
+    if (!this.eventCount)
+      return this;
+    let rebasedItems = [], start = Math.max(0, this.items.length - rebasedCount);
+    let mapping = rebasedTransform.mapping;
+    let newUntil = rebasedTransform.steps.length;
+    let eventCount = this.eventCount;
+    this.items.forEach((item) => {
+      if (item.selection)
+        eventCount--;
+    }, start);
+    let iRebased = rebasedCount;
+    this.items.forEach((item) => {
+      let pos = mapping.getMirror(--iRebased);
+      if (pos == null)
+        return;
+      newUntil = Math.min(newUntil, pos);
+      let map2 = mapping.maps[pos];
+      if (item.step) {
+        let step = rebasedTransform.steps[pos].invert(rebasedTransform.docs[pos]);
+        let selection = item.selection && item.selection.map(mapping.slice(iRebased + 1, pos));
+        if (selection)
+          eventCount++;
+        rebasedItems.push(new Item(map2, step, selection));
+      } else {
+        rebasedItems.push(new Item(map2));
+      }
+    }, start);
+    let newMaps = [];
+    for (let i2 = rebasedCount; i2 < newUntil; i2++)
+      newMaps.push(new Item(mapping.maps[i2]));
+    let items = this.items.slice(0, start).append(newMaps).append(rebasedItems);
+    let branch = new Branch(items, eventCount);
+    if (branch.emptyItemCount() > max_empty_items)
+      branch = branch.compress(this.items.length - rebasedItems.length);
+    return branch;
+  }
+  emptyItemCount() {
+    let count = 0;
+    this.items.forEach((item) => {
+      if (!item.step)
+        count++;
+    });
+    return count;
+  }
+  // Compressing a branch means rewriting it to push the air (map-only
+  // items) out. During collaboration, these naturally accumulate
+  // because each remote change adds one. The `upto` argument is used
+  // to ensure that only the items below a given level are compressed,
+  // because `rebased` relies on a clean, untouched set of items in
+  // order to associate old items with rebased steps.
+  compress(upto = this.items.length) {
+    let remap = this.remapping(0, upto), mapFrom = remap.maps.length;
+    let items = [], events = 0;
+    this.items.forEach((item, i2) => {
+      if (i2 >= upto) {
+        items.push(item);
+        if (item.selection)
+          events++;
+      } else if (item.step) {
+        let step = item.step.map(remap.slice(mapFrom)), map2 = step && step.getMap();
+        mapFrom--;
+        if (map2)
+          remap.appendMap(map2, mapFrom);
+        if (step) {
+          let selection = item.selection && item.selection.map(remap.slice(mapFrom));
+          if (selection)
+            events++;
+          let newItem = new Item(map2.invert(), step, selection), merged, last = items.length - 1;
+          if (merged = items.length && items[last].merge(newItem))
+            items[last] = merged;
+          else
+            items.push(newItem);
+        }
+      } else if (item.map) {
+        mapFrom--;
+      }
+    }, this.items.length, 0);
+    return new Branch(RopeSequence.from(items.reverse()), events);
+  }
+}
+Branch.empty = new Branch(RopeSequence.empty, 0);
+function cutOffEvents(items, n) {
+  let cutPoint;
+  items.forEach((item, i2) => {
+    if (item.selection && n-- == 0) {
+      cutPoint = i2;
+      return false;
+    }
+  });
+  return items.slice(cutPoint);
+}
+class Item {
+  constructor(map2, step, selection, mirrorOffset) {
+    this.map = map2;
+    this.step = step;
+    this.selection = selection;
+    this.mirrorOffset = mirrorOffset;
+  }
+  merge(other) {
+    if (this.step && other.step && !other.selection) {
+      let step = other.step.merge(this.step);
+      if (step)
+        return new Item(step.getMap().invert(), step, this.selection);
+    }
+  }
+}
+class HistoryState {
+  constructor(done, undone, prevRanges, prevTime, prevComposition) {
+    this.done = done;
+    this.undone = undone;
+    this.prevRanges = prevRanges;
+    this.prevTime = prevTime;
+    this.prevComposition = prevComposition;
+  }
+}
+const DEPTH_OVERFLOW = 20;
+function applyTransaction(history2, state, tr, options) {
+  let historyTr = tr.getMeta(historyKey), rebased;
+  if (historyTr)
+    return historyTr.historyState;
+  if (tr.getMeta(closeHistoryKey))
+    history2 = new HistoryState(history2.done, history2.undone, null, 0, -1);
+  let appended = tr.getMeta("appendedTransaction");
+  if (tr.steps.length == 0) {
+    return history2;
+  } else if (appended && appended.getMeta(historyKey)) {
+    if (appended.getMeta(historyKey).redo)
+      return new HistoryState(history2.done.addTransform(tr, void 0, options, mustPreserveItems(state)), history2.undone, rangesFor(tr.mapping.maps), history2.prevTime, history2.prevComposition);
+    else
+      return new HistoryState(history2.done, history2.undone.addTransform(tr, void 0, options, mustPreserveItems(state)), null, history2.prevTime, history2.prevComposition);
+  } else if (tr.getMeta("addToHistory") !== false && !(appended && appended.getMeta("addToHistory") === false)) {
+    let composition = tr.getMeta("composition");
+    let newGroup = history2.prevTime == 0 || !appended && history2.prevComposition != composition && (history2.prevTime < (tr.time || 0) - options.newGroupDelay || !isAdjacentTo(tr, history2.prevRanges));
+    let prevRanges = appended ? mapRanges(history2.prevRanges, tr.mapping) : rangesFor(tr.mapping.maps);
+    return new HistoryState(history2.done.addTransform(tr, newGroup ? state.selection.getBookmark() : void 0, options, mustPreserveItems(state)), Branch.empty, prevRanges, tr.time, composition == null ? history2.prevComposition : composition);
+  } else if (rebased = tr.getMeta("rebased")) {
+    return new HistoryState(history2.done.rebased(tr, rebased), history2.undone.rebased(tr, rebased), mapRanges(history2.prevRanges, tr.mapping), history2.prevTime, history2.prevComposition);
+  } else {
+    return new HistoryState(history2.done.addMaps(tr.mapping.maps), history2.undone.addMaps(tr.mapping.maps), mapRanges(history2.prevRanges, tr.mapping), history2.prevTime, history2.prevComposition);
+  }
+}
+function isAdjacentTo(transform, prevRanges) {
+  if (!prevRanges)
+    return false;
+  if (!transform.docChanged)
+    return true;
+  let adjacent = false;
+  transform.mapping.maps[0].forEach((start, end) => {
+    for (let i2 = 0; i2 < prevRanges.length; i2 += 2)
+      if (start <= prevRanges[i2 + 1] && end >= prevRanges[i2])
+        adjacent = true;
+  });
+  return adjacent;
+}
+function rangesFor(maps) {
+  let result = [];
+  for (let i2 = maps.length - 1; i2 >= 0 && result.length == 0; i2--)
+    maps[i2].forEach((_from, _to, from2, to) => result.push(from2, to));
+  return result;
+}
+function mapRanges(ranges, mapping) {
+  if (!ranges)
+    return null;
+  let result = [];
+  for (let i2 = 0; i2 < ranges.length; i2 += 2) {
+    let from2 = mapping.map(ranges[i2], 1), to = mapping.map(ranges[i2 + 1], -1);
+    if (from2 <= to)
+      result.push(from2, to);
+  }
+  return result;
+}
+function histTransaction(history2, state, redo2) {
+  let preserveItems = mustPreserveItems(state);
+  let histOptions = historyKey.get(state).spec.config;
+  let pop = (redo2 ? history2.undone : history2.done).popEvent(state, preserveItems);
+  if (!pop)
+    return null;
+  let selection = pop.selection.resolve(pop.transform.doc);
+  let added = (redo2 ? history2.done : history2.undone).addTransform(pop.transform, state.selection.getBookmark(), histOptions, preserveItems);
+  let newHist = new HistoryState(redo2 ? added : pop.remaining, redo2 ? pop.remaining : added, null, 0, -1);
+  return pop.transform.setSelection(selection).setMeta(historyKey, { redo: redo2, historyState: newHist });
+}
+let cachedPreserveItems = false, cachedPreserveItemsPlugins = null;
+function mustPreserveItems(state) {
+  let plugins = state.plugins;
+  if (cachedPreserveItemsPlugins != plugins) {
+    cachedPreserveItems = false;
+    cachedPreserveItemsPlugins = plugins;
+    for (let i2 = 0; i2 < plugins.length; i2++)
+      if (plugins[i2].spec.historyPreserveItems) {
+        cachedPreserveItems = true;
+        break;
+      }
+  }
+  return cachedPreserveItems;
+}
+const historyKey = new PluginKey("history");
+const closeHistoryKey = new PluginKey("closeHistory");
+function history(config = {}) {
+  config = {
+    depth: config.depth || 100,
+    newGroupDelay: config.newGroupDelay || 500
+  };
+  return new Plugin({
+    key: historyKey,
+    state: {
+      init() {
+        return new HistoryState(Branch.empty, Branch.empty, null, 0, -1);
+      },
+      apply(tr, hist, state) {
+        return applyTransaction(hist, state, tr, config);
+      }
+    },
+    config,
+    props: {
+      handleDOMEvents: {
+        beforeinput(view, e) {
+          let inputType = e.inputType;
+          let command2 = inputType == "historyUndo" ? undo : inputType == "historyRedo" ? redo : null;
+          if (!command2 || !view.editable)
+            return false;
+          e.preventDefault();
+          return command2(view.state, view.dispatch);
+        }
+      }
+    }
+  });
+}
+function buildCommand(redo2, scroll) {
+  return (state, dispatch) => {
+    let hist = historyKey.getState(state);
+    if (!hist || (redo2 ? hist.undone : hist.done).eventCount == 0)
+      return false;
+    if (dispatch) {
+      let tr = histTransaction(hist, state, redo2);
+      if (tr)
+        dispatch(scroll ? tr.scrollIntoView() : tr);
+    }
+    return true;
+  };
+}
+const undo = buildCommand(false, true);
+const redo = buildCommand(true, true);
+Extension.create({
+  name: "undoRedo",
+  addCommands() {
+    return {
+      undo: () => ({ state, dispatch }) => undo(state, dispatch),
+      redo: () => ({ state, dispatch }) => redo(state, dispatch)
+    };
+  },
+  addProseMirrorPlugins() {
+    return [
+      history(),
+      keymap({
+        "Mod-z": undo,
+        "Shift-Mod-z": redo,
+        "Mod-y": redo
+      })
+    ];
+  }
+});
 const voiceSubscribers = /* @__PURE__ */ new Map();
 function subscribeVoiceEvents(voiceId, handlers) {
   if (!voiceSubscribers.has(voiceId)) {
@@ -13343,8 +14067,8 @@ function createEmptyParagraph(schema) {
   return schema.nodes.paragraph.create();
 }
 function fragmentHasVoiceBlock(fragment) {
-  for (let i = 0; i < fragment.childCount; i++) {
-    const node = fragment.child(i);
+  for (let i2 = 0; i2 < fragment.childCount; i2++) {
+    const node = fragment.child(i2);
     if (node.type.name === "voiceBlock") return true;
     if (node.content && node.content.size > 0 && fragmentHasVoiceBlock(node.content)) return true;
   }
@@ -13425,16 +14149,16 @@ function normalizePastedVoiceFragment(fragment, schema) {
   function normalizeNestedVoiceFragment(nestedFragment) {
     let changed = false;
     const nestedNodes = [];
-    for (let i = 0; i < nestedFragment.childCount; i++) {
-      const child = nestedFragment.child(i);
+    for (let i2 = 0; i2 < nestedFragment.childCount; i2++) {
+      const child = nestedFragment.child(i2);
       const transformed = transformNode(child);
       if (transformed !== child) changed = true;
       nestedNodes.push(transformed);
     }
     return changed ? Fragment.from(nestedNodes) : nestedFragment;
   }
-  for (let i = 0; i < fragment.childCount; i++) {
-    const original = fragment.child(i);
+  for (let i2 = 0; i2 < fragment.childCount; i2++) {
+    const original = fragment.child(i2);
     const node = transformNode(original);
     if (node.type.name === "voiceBlock") {
       const prev = nodes[nodes.length - 1];
@@ -13442,7 +14166,7 @@ function normalizePastedVoiceFragment(fragment, schema) {
         nodes.push(createEmptyParagraph(schema));
       }
       nodes.push(node);
-      const nextOriginal = i + 1 < fragment.childCount ? fragment.child(i + 1) : null;
+      const nextOriginal = i2 + 1 < fragment.childCount ? fragment.child(i2 + 1) : null;
       if (!isEmptyParagraphNode(nextOriginal)) {
         nodes.push(createEmptyParagraph(schema));
       }
@@ -13481,10 +14205,10 @@ function cursorPositionAfterVoiceBlock(doc, found2) {
   if (!isEmptyParagraphNode(nextNode)) return null;
   return paragraphStart + 1;
 }
-function insertPastedVoiceBlockSlice(view, slice) {
-  if (!fragmentHasVoiceBlock(slice.content)) return false;
+function insertPastedVoiceBlockSlice(view, slice2) {
+  if (!fragmentHasVoiceBlock(slice2.content)) return false;
   const { state } = view;
-  const { fragment, voiceIds } = normalizePastedVoiceFragment(slice.content, state.schema);
+  const { fragment, voiceIds } = normalizePastedVoiceFragment(slice2.content, state.schema);
   const insertRange = resolveVoicePasteInsertRange(state);
   let tr = state.tr;
   if (insertRange == null) {
@@ -13847,9 +14571,9 @@ const VoiceBlock = Node3.create({
       new Plugin({
         key: new PluginKey("voiceBlockCopyClear"),
         props: {
-          handlePaste(view, event, slice) {
+          handlePaste(view, event, slice2) {
             const clipboardVoiceNode = createVoiceBlockFromClipboard(view.state.schema, event.clipboardData);
-            const voiceSlice = clipboardVoiceNode ? new Slice(Fragment.from(clipboardVoiceNode), 0, 0) : slice;
+            const voiceSlice = clipboardVoiceNode ? new Slice(Fragment.from(clipboardVoiceNode), 0, 0) : slice2;
             const handled = insertPastedVoiceBlockSlice(view, voiceSlice);
             if (handled) {
               event.preventDefault();
@@ -13877,13 +14601,13 @@ const VoiceBlock = Node3.create({
               return false;
             }
           },
-          transformCopied(slice) {
-            if (internalVoiceDrag) return slice;
+          transformCopied(slice2) {
+            if (internalVoiceDrag) return slice2;
             let modified = false;
             function transformFragment(fragment) {
               const newNodes = [];
-              for (let i = 0; i < fragment.childCount; i++) {
-                const node = fragment.child(i);
+              for (let i2 = 0; i2 < fragment.childCount; i2++) {
+                const node = fragment.child(i2);
                 if (node.type.name === "voiceBlock") {
                   modified = true;
                   newNodes.push(node.type.create({
@@ -13905,9 +14629,9 @@ const VoiceBlock = Node3.create({
               }
               return Fragment.from(newNodes);
             }
-            const newContent = transformFragment(slice.content);
-            if (!modified) return slice;
-            return new Slice(newContent, slice.openStart, slice.openEnd);
+            const newContent = transformFragment(slice2.content);
+            if (!modified) return slice2;
+            return new Slice(newContent, slice2.openStart, slice2.openEnd);
           }
         }
       }),
@@ -14120,8 +14844,8 @@ function isSafeImageSrc(src) {
 function nonEmptyString(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
-function error(path, code, message) {
-  return { path, code, message };
+function error(path, code2, message) {
+  return { path, code: code2, message };
 }
 const input = process.argv[2] ? fs.readFileSync(process.argv[2], "utf8") : fs.readFileSync(0, "utf8");
 try {

@@ -56,6 +56,12 @@ if (typeof window !== 'undefined') {
     if (pos == null || pos < 0) return false
     return editor.chain().focus().setNodeSelection(pos).run()
   }
+  window.__dvnTiptapUndo = function () {
+    return editor.chain().focus().undo().run()
+  }
+  window.__dvnTiptapRedo = function () {
+    return editor.chain().focus().redo().run()
+  }
 }
 const toolbar = createFormatToolbar(editor, document.getElementById('toolbar-host'))
 

@@ -20,6 +20,7 @@ import {
   isSafeImageRelPath,
 } from '../schema/document-envelope.js'
 import { parseImageInfo, parseVoiceInfo, resolveResourceUrl } from './tiptap-adapter.js'
+import { replaceEditorContentWithoutHistory } from './undo-redo.js'
 
 const CONTENT_CHANGE_DEBOUNCE_MS = 200
 
@@ -420,7 +421,7 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
         }
         const content = envelope?.content || createEmptyDoc()
         const resolved = walkResolve(content, loadResolvers)
-        editor.commands.setContent(resolved)
+        replaceEditorContentWithoutHistory(editor, resolved)
       })
 
       // C++→JS：宿主下发字体列表（fontListProvided signal）

@@ -27,6 +27,7 @@ import { FontSizeMark } from '../extensions/font-size-mark.js'
 import { ImageBlock } from '../extensions/image-block.js'
 import { VoiceBlock } from '../extensions/voice-block.js'
 import { ListNestingGuard } from './list-nesting-guard.js'
+import { UndoRedo } from './undo-redo.js'
 
 export function createTiptapExtensions() {
   return [
@@ -51,6 +52,7 @@ export function createTiptapExtensions() {
     Highlight.configure({ multicolor: true }),
     FontFamilyMark,
     FontSizeMark,
+    UndoRedo,
     ListNestingGuard,
   ]
 }
