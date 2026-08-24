@@ -327,11 +327,75 @@ function hasNestedList(node) {
   return walk(node)
 }
 
+function maxListItemDepth(node, depth = 0) {
+  if (!node || typeof node !== 'object') return depth
+  const currentDepth = node.type === 'listItem' || node.type === 'taskItem' ? depth + 1 : depth
+  let maxDepth = currentDepth
+  if (Array.isArray(node.content)) {
+    for (const child of node.content) {
+      maxDepth = Math.max(maxDepth, maxListItemDepth(child, currentDepth))
+    }
+  }
+  return maxDepth
+}
+
+function findTextEndPosition(editor, text) {
+  let found = null
+  editor.state.doc.descendants((node, pos) => {
+    if (node.isText && node.text === text) {
+      found = pos + node.nodeSize
+      return false
+    }
+    return true
+  })
+  if (found == null) throw new Error(`text not found: ${text}`)
+  return found
+}
+
+function threeLevelListDoc(itemType = 'listItem', listType = 'bulletList') {
+  const attrs = itemType === 'taskItem' ? { checked: false } : undefined
+  const item = (text, extra = []) => ({
+    type: itemType,
+    ...(attrs ? { attrs } : {}),
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text }] },
+      ...extra,
+    ],
+  })
+  return {
+    type: 'doc',
+    content: [{
+      type: listType,
+      content: [
+        item('root', [{
+          type: listType,
+          content: [item('child', [{
+            type: listType,
+            content: [item('three'), item('four')],
+          }])],
+        }]),
+      ],
+    }],
+  }
+}
+
 test('toolbar mounts list and indent buttons', () => {
   const { editor, host } = createEditorWithToolbar()
   for (const format of ['bulletList', 'orderedList', 'taskList', 'indentList', 'outdentList']) {
     assert.ok(host.querySelector(`button[data-format="${format}"]`), `${format} button should be mounted`)
   }
+  editor.destroy()
+})
+
+test('task list style keeps checkbox and text on the same row', () => {
+  const { editor } = createEditorWithToolbar()
+  const style = document.getElementById('dvn-tiptap-tasklist-style')
+  assert.ok(style, 'task list style should be injected')
+  assert.match(style.textContent, /ul\[data-type="taskList"\] \{ list-style: none; padding-left: 0;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] li \{ display: flex;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] li > label \{ display: inline-flex; align-items: center;[^}]*height: 1\.72em;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] li > label > input\[type="checkbox"\] \{ margin: 0;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] li > div > p \{ margin: 0;/)
   editor.destroy()
 })
 
@@ -456,6 +520,73 @@ test('indent/outdent buttons nest and unnest task list items', () => {
 
   host.querySelector('button[data-format="outdentList"]').click()
   assert.ok(!hasNestedList(editor.getJSON()), 'no nested task list should remain after outdent')
+  editor.destroy()
+})
+
+test('list indentation is capped at three levels for toolbar and Tab', () => {
+  const { editor, host, window } = createEditorWithToolbar()
+  editor.commands.setContent(threeLevelListDoc('listItem', 'bulletList'))
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'four')).run()
+
+  const indent = host.querySelector('button[data-format="indentList"]')
+  assert.equal(maxListItemDepth(editor.getJSON()), 3)
+  assert.equal(indent.disabled, true, 'indent disabled at the third list level')
+
+  indent.click()
+  assert.equal(maxListItemDepth(editor.getJSON()), 3, 'toolbar indent must not create fourth level')
+
+  const event = new window.KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true })
+  editor.view.dom.dispatchEvent(event)
+  assert.equal(maxListItemDepth(editor.getJSON()), 3, 'Tab must not create fourth level')
+  editor.destroy()
+})
+
+test('task list indentation is capped at three levels', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent(threeLevelListDoc('taskItem', 'taskList'))
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'four')).run()
+
+  const indent = host.querySelector('button[data-format="indentList"]')
+  assert.equal(maxListItemDepth(editor.getJSON()), 3)
+  assert.equal(indent.disabled, true, 'indent disabled at the third task level')
+
+  indent.click()
+  assert.equal(maxListItemDepth(editor.getJSON()), 3, 'task indent must not create fourth level')
+  editor.destroy()
+})
+
+test('task parent and child checked states stay independent', () => {
+  const { editor, window } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [{
+        type: 'taskItem',
+        attrs: { checked: false },
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'parent' }] },
+          {
+            type: 'taskList',
+            content: [{
+              type: 'taskItem',
+              attrs: { checked: false },
+              content: [{ type: 'paragraph', content: [{ type: 'text', text: 'child' }] }],
+            }],
+          },
+        ],
+      }],
+    }],
+  })
+
+  const checkbox = editor.view.dom.querySelector('input[type="checkbox"]')
+  checkbox.checked = true
+  checkbox.dispatchEvent(new window.Event('change', { bubbles: true }))
+
+  const parent = findNode(editor.getJSON(), 'taskItem')
+  const child = findNode(parent.content.find(node => node.type === 'taskList'), 'taskItem')
+  assert.equal(parent.attrs.checked, true, 'parent checkbox toggles parent item')
+  assert.equal(child.attrs.checked, false, 'child checkbox state must not be changed by parent')
   editor.destroy()
 })
 
