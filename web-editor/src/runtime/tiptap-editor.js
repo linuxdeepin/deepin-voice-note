@@ -56,6 +56,13 @@ if (typeof window !== 'undefined') {
     if (pos == null || pos < 0) return false
     return editor.chain().focus().setNodeSelection(pos).run()
   }
+  window.__dvnTiptapSelectImageFromElement = function (element) {
+    const img = element && element.closest ? element.closest('img[data-rel-path]') : null
+    if (!img || !document.contains(img)) return false
+    const pos = editor.view.posAtDOM(img, 0)
+    if (pos == null || pos < 0) return false
+    return editor.chain().focus().setNodeSelection(pos).run()
+  }
   window.__dvnTiptapUndo = function () {
     return editor.chain().focus().undo().run()
   }

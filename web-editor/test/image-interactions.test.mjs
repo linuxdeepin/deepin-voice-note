@@ -4,6 +4,7 @@
 // 图片粘贴决策单测：剪贴板图片落盘 / 远程图片阻止 / 笔记内默认保留 attrs
 
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import test, { before } from 'node:test'
 import { Window } from 'happy-dom'
 import {
@@ -208,6 +209,39 @@ function setupEditorWithImage() {
   return { editor, img, bridge, viewCalls, destroy }
 }
 
+
+test('image insertion and click expose theme-color selected overlay', () => {
+  const { editor, img, destroy } = setupEditorWithImage()
+  assert.ok(img, 'image element should be rendered')
+
+  Object.defineProperty(img, 'getBoundingClientRect', {
+    configurable: true,
+    value: () => ({ left: 10, top: 20, width: 120, height: 80, right: 130, bottom: 100 }),
+  })
+
+  // Tiptap/ProseMirror selects inserted atom images with NodeSelection; the
+  // runtime renders the same simple theme-color cover as a browser image selection.
+  assert.ok(img.classList.contains('ProseMirror-selectednode'), 'inserted image should be node-selected')
+  const style = document.getElementById('dvn-tiptap-image-block-style')
+  assert.ok(style, 'image selection style should be injected')
+  const imageBlockCss = readFileSync(new URL('../src/extensions/image-block.css', import.meta.url), 'utf8')
+  assert.match(imageBlockCss, /dvn-image-selection/)
+  assert.match(imageBlockCss, /--dvn-active-selection-bg/)
+  assert.doesNotMatch(imageBlockCss, /control-holder|control-sizing|dvn-image-selection-bg/)
+
+  img.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }))
+  const overlay = document.querySelector('[data-testid="tiptap-image-selection"]')
+  assert.ok(overlay, 'image selection overlay should be mounted')
+  assert.equal(overlay.style.display, 'block')
+  assert.equal(overlay.style.left, '10px')
+  assert.equal(overlay.style.top, '20px')
+  assert.equal(overlay.style.width, '120px')
+  assert.equal(overlay.style.height, '80px')
+  assert.ok(img.classList.contains('ProseMirror-selectednode'), 'clicked image should stay node-selected')
+  destroy()
+  editor.destroy()
+})
+
 test('dblclick on image requests view original with img src', () => {
   const { editor, img, viewCalls, destroy } = setupEditorWithImage()
   assert.ok(img, 'image element should be rendered')
@@ -218,29 +252,15 @@ test('dblclick on image requests view original with img src', () => {
   editor.destroy()
 })
 
-test('contextmenu on image shows menu with view and delete actions', () => {
+test('contextmenu on image selects node and leaves host picture menu available', () => {
   const { editor, img, viewCalls, destroy } = setupEditorWithImage()
-  img.dispatchEvent(new Event('contextmenu', { bubbles: true, cancelable: true }))
+  const event = new Event('contextmenu', { bubbles: true, cancelable: true })
+  img.dispatchEvent(event)
 
-  const menu = document.querySelector('[data-testid="tiptap-image-menu"]')
-  assert.ok(menu, 'context menu should be mounted')
-
-  // 查看原图
-  menu.querySelector('[data-action="view-original"]').click()
-  assert.equal(viewCalls.length, 1)
-  assert.equal(viewCalls[0], img.getAttribute('src'))
-  destroy()
-  editor.destroy()
-})
-
-test('contextmenu delete action removes the image node', () => {
-  const { editor, img, destroy } = setupEditorWithImage()
-  img.dispatchEvent(new Event('contextmenu', { bubbles: true, cancelable: true }))
-
-  const menu = document.querySelector('[data-testid="tiptap-image-menu"]')
-  menu.querySelector('[data-action="delete-image"]').click()
-
-  assert.ok(!editor.getJSON().content.find((n) => n.type === 'image'), 'image should be deleted')
+  assert.equal(event.defaultPrevented, false, 'contextmenu should not be swallowed by a web menu')
+  assert.equal(viewCalls.length, 0, 'contextmenu should not trigger view-original directly')
+  assert.equal(document.querySelector('[data-testid="tiptap-image-menu"]'), null, 'web image menu should not be mounted')
+  assert.equal(editor.state.selection.node?.type?.name, 'image', 'image should be selected for host menu actions')
   destroy()
   editor.destroy()
 })
@@ -296,58 +316,3 @@ test('setupImagePaste destroy restores default paste (not permanently blocked)',
   editor.destroy()
 })
 
-// ---------------------------------------------------------------------------
-// 主题变量消费：图片自绘菜单使用 CSS 变量
-// ---------------------------------------------------------------------------
-
-test('image context menu uses CSS variables for theme-aware styling', () => {
-  const window = new Window()
-  defineGlobal('window', window)
-  defineGlobal('document', window.document)
-  defineGlobal('navigator', window.navigator)
-  defineGlobal('Node', window.Node)
-  defineGlobal('Element', window.Element)
-  defineGlobal('HTMLElement', window.HTMLElement)
-  defineGlobal('DocumentFragment', window.DocumentFragment)
-  defineGlobal('Event', window.Event)
-  defineGlobal('CustomEvent', window.CustomEvent)
-  defineGlobal('MutationObserver', window.MutationObserver)
-  defineGlobal('getComputedStyle', window.getComputedStyle.bind(window))
-  defineGlobal('requestAnimationFrame', (cb) => setTimeout(cb, 0))
-  defineGlobal('cancelAnimationFrame', (id) => clearTimeout(id))
-
-  // 设置主题 CSS 变量
-  document.documentElement.style.setProperty('--dvn-panel-bg', '#252525')
-  document.documentElement.style.setProperty('--dvn-panel-border', '#444444')
-  document.documentElement.style.setProperty('--dvn-hover-bg', '#3d3d3d')
-
-  const element = document.createElement('div')
-  document.body.appendChild(element)
-  const editor = new Editor({
-    element,
-    extensions: createTiptapExtensions(),
-    content: createEmptyDoc(),
-  })
-  editor.commands.insertContent({
-    type: 'image',
-    attrs: { src: 'file:///usr/share/x/images/photo.png', relPath: 'images/photo.png', alt: '', title: null },
-  })
-
-  const bridge = { jsRequestViewPicture() {} }
-  const destroy = setupImageViewAndMenu(editor, bridge)
-
-  const img = editor.view.dom.querySelector('img[data-rel-path]')
-  img.dispatchEvent(new Event('contextmenu', { bubbles: true, cancelable: true }))
-
-  const menu = document.querySelector('[data-testid="tiptap-image-menu"]')
-  assert.ok(menu, 'context menu should be mounted')
-  // happy-dom 不完全解析 var()，检查 cssText 中包含 CSS 变量引用
-  const styleText = menu.style.cssText || menu.getAttribute('style') || ''
-  assert.ok(
-    styleText.includes('--dvn-panel'),
-    'menu style should reference dvn CSS variables'
-  )
-
-  destroy()
-  editor.destroy()
-})
