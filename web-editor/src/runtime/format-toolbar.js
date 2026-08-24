@@ -196,6 +196,15 @@ export function createFormatToolbar(editor, host) {
     ].join(';'),
   })
 
+  function keepEditorSelection(event) {
+    const control = event.target.closest?.('button')
+    if (control && toolbar.contains(control) && !control.disabled) {
+      event.preventDefault()
+    }
+  }
+  toolbar.addEventListener('pointerdown', keepEditorSelection)
+  toolbar.addEventListener('mousedown', keepEditorSelection)
+
   const buttons = {}
 
   // 开关式按钮组
