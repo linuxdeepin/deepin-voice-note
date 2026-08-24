@@ -335,6 +335,40 @@ test('toolbar mounts list and indent buttons', () => {
   editor.destroy()
 })
 
+test('toolbar buttons keep editor selection on pointerdown and mousedown', () => {
+  const { editor, host, window } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text: 'one' }] },
+      { type: 'paragraph', content: [{ type: 'text', text: 'two' }] },
+      { type: 'paragraph', content: [{ type: 'text', text: 'three' }] },
+    ],
+  })
+  editor.chain().focus().setTextSelection({ from: 1, to: 15 }).run()
+
+  const button = host.querySelector('button[data-format="bulletList"]')
+  const pointerEvent = new window.PointerEvent('pointerdown', { bubbles: true, cancelable: true })
+  button.dispatchEvent(pointerEvent)
+  assert.equal(pointerEvent.defaultPrevented, true)
+
+  const mouseEvent = new window.MouseEvent('mousedown', { bubbles: true, cancelable: true })
+  button.dispatchEvent(mouseEvent)
+  assert.equal(mouseEvent.defaultPrevented, true)
+
+  assert.deepEqual(
+    { from: editor.state.selection.from, to: editor.state.selection.to },
+    { from: 1, to: 15 },
+    'toolbar pointer/mouse down must not collapse the editor selection',
+  )
+  button.click()
+
+  const list = findNode(editor.getJSON(), 'bulletList')
+  assert.equal(list.content.length, 3)
+  assert.deepEqual(list.content.map(item => item.content[0].content[0].text), ['one', 'two', 'three'])
+  editor.destroy()
+})
+
 for (const format of ['bulletList', 'orderedList', 'taskList']) {
   test(`${format}: toggle creates and clears list`, () => {
     const { editor, host } = createEditorWithToolbar()
