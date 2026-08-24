@@ -8,6 +8,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { Window } from 'happy-dom'
 import { Editor } from '@tiptap/core'
+import { NodeSelection } from '@tiptap/pm/state'
 import { createTiptapExtensions } from '../src/runtime/tiptap-extensions.js'
 import { createEmptyDoc, createEnvelope, serializeEnvelope, validateEnvelope } from '../src/schema/document-envelope.js'
 import {
@@ -85,6 +86,68 @@ function createMockBridge(resourceBaseUrl = 'file:///home/user/.local/share/deep
   }
   return { bridge, calls, emit }
 }
+
+
+test('selection: selected voiceBlock gets legacy active visual class', () => {
+  const { editor } = createEditor()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'voiceBlock',
+      attrs: { voiceId: 'select-v1', voicePath: 'voicenote/select.wav', voiceSize: 1 },
+    }],
+  })
+
+  let voicePos = -1
+  editor.state.doc.descendants((node, pos) => {
+    if (node.type.name === 'voiceBlock' && voicePos < 0) voicePos = pos
+  })
+  assert.ok(voicePos >= 0, 'voiceBlock should exist')
+
+  editor.view.dispatch(editor.state.tr.setSelection(NodeSelection.create(editor.state.doc, voicePos)))
+
+  const voiceBox = editor.view.dom.querySelector('.voiceBox')
+  assert.ok(voiceBox.classList.contains('ProseMirror-selectednode'))
+  assert.ok(voiceBox.classList.contains('active'))
+
+  editor.destroy()
+})
+
+test('transcript text: pointer selection does not start whole voiceBlock drag', () => {
+  const { editor, window } = createEditor()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'voiceBlock',
+      attrs: {
+        voiceId: 'copy-v1',
+        voicePath: 'voicenote/copy.wav',
+        voiceSize: 1,
+        text: '可单独复制的转写文本',
+        translateUnfold: true,
+      },
+    }],
+  })
+
+  const voiceBox = editor.view.dom.querySelector('.voiceBox')
+  const translateText = editor.view.dom.querySelector('.translateText')
+  assert.ok(voiceBox, 'voiceBox should render')
+  assert.ok(translateText, 'translateText should render')
+  assert.equal(translateText.getAttribute('draggable'), 'false')
+  assert.equal(translateText.getAttribute('contenteditable'), 'false')
+
+  translateText.dispatchEvent(new window.MouseEvent('mousedown', { bubbles: true, cancelable: true }))
+  assert.equal(voiceBox.getAttribute('draggable'), 'false', 'wrapper drag is disabled while selecting transcript text')
+
+  document.dispatchEvent(new window.MouseEvent('mouseup', { bubbles: true, cancelable: true }))
+  assert.equal(voiceBox.getAttribute('draggable'), null, 'wrapper drag state is restored after selection gesture')
+
+  const dragStart = new window.Event('dragstart', { bubbles: true, cancelable: true })
+  translateText.dispatchEvent(dragStart)
+  assert.equal(dragStart.defaultPrevented, true, 'transcript dragstart should not drag the whole voiceBlock')
+
+  editor.destroy()
+})
 
 // ---------------------------------------------------------------------------
 // 信号分发：subscribeVoiceEvents → dispatchVoice
@@ -189,6 +252,9 @@ test('themeProvided writes CSS variables on document root', () => {
   assert.equal(document.documentElement.style.getPropertyValue('--highlightColor'), '#007AFF')
   assert.equal(document.documentElement.style.getPropertyValue('--color'), '#999999')
   assert.equal(document.documentElement.style.getPropertyValue('--backgroundColor'), '#090A17')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-active-bg'), 'rgba(0, 122, 255, 0.5)')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-transcript-selection-bg'), 'rgba(0, 122, 255, 0.4)')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-active-selection-bg'), 'rgba(0, 122, 255, 0.6)')
 })
 
 test('themeProvided: light theme variables', () => {
@@ -199,6 +265,8 @@ test('themeProvided: light theme variables', () => {
   emit('themeProvided', 'light', '#0058DE', '#cccccc', '#FBFCFD')
   assert.equal(document.documentElement.style.getPropertyValue('--highlightColor'), '#0058DE')
   assert.equal(document.documentElement.style.getPropertyValue('--backgroundColor'), '#FBFCFD')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-active-bg'), 'rgba(0, 88, 222, 0.5)')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-transcript-selection-bg'), 'rgba(0, 88, 222, 0.4)')
 })
 
 // ---------------------------------------------------------------------------
@@ -478,6 +546,54 @@ test('to-text completed: writes text to voiceBlock attrs', () => {
 // ---------------------------------------------------------------------------
 // 复制清态：transformCopied 清 text、生成新 voiceId、重置 translateUnfold
 // ---------------------------------------------------------------------------
+
+test('drag: internal voiceBlock drag preserves text and voiceId in copied slice', () => {
+  const { editor, window } = createEditor()
+  const { bridge } = createMockBridge()
+  setVoiceBridge(bridge)
+
+  editor.commands.insertContent({
+    type: 'voiceBlock',
+    attrs: {
+      voiceId: 'voice-drag-test',
+      voicePath: 'voicenote/drag.mp3',
+      voiceSize: 5000,
+      createTime: '2026-07-17 10:00:00',
+      title: '拖拽测试',
+      text: '拖拽后应保留的转写文本',
+      translateUnfold: false,
+    },
+  })
+
+  let voicePos = -1
+  editor.state.doc.descendants((node, pos) => {
+    if (node.type.name === 'voiceBlock' && voicePos < 0) voicePos = pos
+  })
+  assert.ok(voicePos >= 0, 'voiceBlock should exist')
+
+  const node = editor.state.doc.nodeAt(voicePos)
+  const slice = editor.state.doc.slice(voicePos, voicePos + node.nodeSize)
+  const voiceBox = editor.view.dom.querySelector('.voiceBox')
+  assert.ok(voiceBox, 'voiceBox should render')
+
+  voiceBox.dispatchEvent(new window.Event('dragstart', { bubbles: true, cancelable: true }))
+
+  const transformCopied = editor.view.someProp('transformCopied', f => f)
+  const transformed = transformCopied(slice)
+  assert.equal(transformed, slice, 'internal drag should keep original slice')
+  assert.equal(transformed.content.firstChild.attrs.text, '拖拽后应保留的转写文本')
+  assert.equal(transformed.content.firstChild.attrs.voiceId, 'voice-drag-test')
+  assert.equal(transformed.content.firstChild.attrs.translateUnfold, false)
+
+  editor.view.dom.dispatchEvent(new window.Event('dragend', { bubbles: true, cancelable: true }))
+
+  const copiedAfterDragEnd = transformCopied(slice)
+  assert.notEqual(copiedAfterDragEnd, slice, 'after dragend, normal copy should clear voice metadata again')
+  assert.equal(copiedAfterDragEnd.content.firstChild.attrs.text, null)
+  assert.notEqual(copiedAfterDragEnd.content.firstChild.attrs.voiceId, 'voice-drag-test')
+
+  editor.destroy()
+})
 
 test('copy: transformCopied clears text and generates new voiceId for voiceBlock', () => {
   const { editor } = createEditor()

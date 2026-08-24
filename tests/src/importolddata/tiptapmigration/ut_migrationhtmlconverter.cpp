@@ -889,6 +889,40 @@ TEST(UT_MigrationHtmlConverter, ConvertsVoiceBoxJsonKeyToVoiceBlock)
     EXPECT_FALSE(attrs.contains(QStringLiteral("playStatus")));
 }
 
+TEST(UT_MigrationHtmlConverter, ConvertsSummernotePlaceholderParagraphBetweenVoiceBlocksToSingleEmptyParagraph)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(QStringLiteral(
+        R"(<div class="li voiceBox" jsonKey="{&quot;type&quot;:2,&quot;voiceId&quot;:&quot;voice-1&quot;,&quot;voicePath&quot;:&quot;voicenote/a.mp3&quot;,&quot;voiceSize&quot;:1}"></div>
+           <p><br></p>
+           <div class="li voiceBox" jsonKey="{&quot;type&quot;:2,&quot;voiceId&quot;:&quot;voice-2&quot;,&quot;voicePath&quot;:&quot;voicenote/b.mp3&quot;,&quot;voiceSize&quot;:2}"></div>)"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(3, blocks.size());
+    EXPECT_EQ(QStringLiteral("voiceBlock"), nodeTypeOf(blocks.at(0).toObject()));
+    EXPECT_EQ(QStringLiteral("paragraph"), nodeTypeOf(blocks.at(1).toObject()));
+    EXPECT_TRUE(nodeContentOf(blocks.at(1).toObject()).isEmpty());
+    EXPECT_EQ(QStringLiteral("voiceBlock"), nodeTypeOf(blocks.at(2).toObject()));
+}
+
+TEST(UT_MigrationHtmlConverter, KeepsHardBreakWhenParagraphHasVisibleText)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(QStringLiteral("<p>Hello<br>World</p>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_EQ(1, blocks.size());
+    const QJsonArray content = nodeContentOf(blocks.at(0).toObject());
+    ASSERT_EQ(3, content.size());
+    EXPECT_EQ(QStringLiteral("Hello"), textOf(content.at(0).toObject()));
+    EXPECT_EQ(QStringLiteral("hardBreak"), nodeTypeOf(content.at(1).toObject()));
+    EXPECT_EQ(QStringLiteral("World"), textOf(content.at(2).toObject()));
+}
+
 TEST(UT_MigrationHtmlConverter, ConvertsLiVoiceBoxWithoutOrphanListWarning)
 {
     const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(QStringLiteral(
