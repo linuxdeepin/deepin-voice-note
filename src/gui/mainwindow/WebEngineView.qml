@@ -470,7 +470,15 @@ Item {
                     }
                     onTriggerWebAction: action => {
                         if (TiptapChannel.debugEnabled && tiptapLoader.item) {
-                            tiptapWebView.triggerWebAction(action);
+                            // QWebEnginePage::WebAction: Undo=7, Redo=8 in both Qt5 and Qt6.
+                            // Tiptap/ProseMirror maintains its own history stack, so do not use native WebAction undo/redo.
+                            if (action === 7) {
+                                tiptapWebView.runJavaScript("window.__dvnTiptapUndo && window.__dvnTiptapUndo()");
+                            } else if (action === 8) {
+                                tiptapWebView.runJavaScript("window.__dvnTiptapRedo && window.__dvnTiptapRedo()");
+                            } else {
+                                tiptapWebView.triggerWebAction(action);
+                            }
                         } else {
                             webView.triggerWebAction(action);
                         }
