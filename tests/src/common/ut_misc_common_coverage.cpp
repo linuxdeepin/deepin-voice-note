@@ -50,6 +50,9 @@ static MigrationOrchestrator *stub_startIfNeeded_returnsNull(QObject * /*consume
 
 TEST(MigrationViewControllerCoverage, start_withNullOrchestrator_rollBackCleanly)
 {
+    const QByteArray oldDebugEnv = qgetenv("DVN_TIPTAP_DEBUG");
+    qputenv("DVN_TIPTAP_DEBUG", "1");
+
     Stub stub;
     stub.set(ADDR(MigrationOrchestrator, startIfNeeded),
              stub_startIfNeeded_returnsNull);
@@ -68,6 +71,8 @@ TEST(MigrationViewControllerCoverage, start_withNullOrchestrator_rollBackCleanly
     ctrl->start();
     // After rollback migrationActive must be false.
     EXPECT_FALSE(ctrl->m_migrationActive);
+
+    qputenv("DVN_TIPTAP_DEBUG", oldDebugEnv);
 }
 
 // ============================================================================
