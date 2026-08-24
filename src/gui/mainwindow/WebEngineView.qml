@@ -547,20 +547,39 @@ Item {
                         var sy = String(Math.round(rawY));
                         tiptapWebView.runJavaScript(
                             "(function(){"
+                            + "function flags(canSelectAll,canCopy,canCut,canPaste,canDelete){return {canSelectAll:!!canSelectAll,canCopy:!!canCopy,canCut:!!canCut,canPaste:!!canPaste,canDelete:!!canDelete,canSpeech:!!canCopy,canDictation:!!canPaste};}"
+                            + "function selectionTouches(target){var sel=window.getSelection();if(!sel||sel.rangeCount===0||sel.isCollapsed||!sel.toString())return false;for(var i=0;i<sel.rangeCount;i++){var r=sel.getRangeAt(i);if(r.intersectsNode){try{if(r.intersectsNode(target))return true;}catch(e){}}else{var cr=document.createRange();cr.selectNodeContents(target);if(r.compareBoundaryPoints(Range.END_TO_START,cr)<0&&r.compareBoundaryPoints(Range.START_TO_END,cr)>0)return true;}}return false;}"
                             + "var el=document.elementFromPoint(" + sx + "," + sy + ");"
-                            + "if(!el) return JSON.stringify({type:2,json:''});"
+                            + "window.__dvnTiptapContextTranscript=null;"
+                            + "if(!el) return JSON.stringify({type:2,json:'',flags:flags(true,false,false,true,false)});"
+                            + "var transcript=el.closest?el.closest('.translateText'):null;"
+                            + "if(transcript){window.__dvnTiptapContextTranscript=transcript;var canCopy=selectionTouches(transcript);return JSON.stringify({type:2,json:'',flags:flags(true,canCopy,false,false,false),transcript:true});}"
                             + "var vb=el.closest?el.closest('.voiceInfoBox'):null;"
-                            + "if(vb&&vb.getAttribute('data-type')==='voice-block'){"
-                            + "return JSON.stringify({type:1,json:vb.getAttribute('data-voice-meta')||''});}"
+                            + "if(vb&&vb.getAttribute('data-type')==='voice-block'){if(window.__dvnTiptapSelectVoiceBlockFromElement)window.__dvnTiptapSelectVoiceBlockFromElement(vb);return JSON.stringify({type:1,json:vb.getAttribute('data-voice-meta')||''});}"
                             + "var img=el.closest?el.closest('img[data-rel-path]'):null;"
                             + "if(img) return JSON.stringify({type:0,json:''});"
-                            + "return JSON.stringify({type:2,json:''});"
+                            + "var sel=window.getSelection();var hasSelection=!!(sel&&sel.rangeCount>0&&!sel.isCollapsed&&sel.toString());var inEditor=!!(el.closest&&el.closest('.ProseMirror'));"
+                            + "return JSON.stringify({type:2,json:'',flags:flags(inEditor,hasSelection,hasSelection&&inEditor,inEditor,hasSelection&&inEditor)});"
                             + "})()",
                             function(result) {
                                 var info = null;
                                 try { info = JSON.parse(result); } catch(e) {}
                                 if (!info) return;
                                 if (info.type === 0) return;
+                                if (info.type === 2) {
+                                    ActionManager.resetCtxMenu(ActionManager.TxtCtxMenu, false);
+                                    ActionManager.visibleAction(ActionManager.TxtStopreading, false);
+                                    var flags = info.flags || {};
+                                    ActionManager.enableAction(ActionManager.TxtSelectAll, !!flags.canSelectAll);
+                                    ActionManager.enableAction(ActionManager.TxtCopy, !!flags.canCopy);
+                                    ActionManager.enableAction(ActionManager.TxtCut, !!flags.canCut);
+                                    ActionManager.enableAction(ActionManager.TxtPaste, !!flags.canPaste);
+                                    ActionManager.enableAction(ActionManager.TxtDelete, !!flags.canDelete);
+                                    ActionManager.enableAction(ActionManager.TxtSpeech, !!flags.canSpeech);
+                                    ActionManager.enableAction(ActionManager.TxtDictation, !!flags.canDictation);
+                                    txtCtxMenu.popup(Qt.point(rawX, rawY));
+                                    return;
+                                }
                                 handler.onSaveMenuParam(info.type, info.json);
                                 handler.onContextMenuRequested(req);
                             });
@@ -971,7 +990,8 @@ Item {
         onCallJsSelectAll: {
             if (TiptapChannel.debugEnabled && tiptapLoader.item) {
                 tiptapWebView.runJavaScript(
-                    "if(window.__dvnTiptapEditor)window.__dvnTiptapEditor.chain().selectAll().run()");
+                    "if(window.__dvnTiptapSelectContextAll)window.__dvnTiptapSelectContextAll();" +
+                    "else if(window.__dvnTiptapEditor)window.__dvnTiptapEditor.chain().selectAll().run();");
             }
         }
         onCallJsDeleteSelection: {
