@@ -19,6 +19,7 @@ import {
 import {
   bindTiptapChannel,
   createDebounce,
+  normalizeListItemTrailingHardBreaks,
 } from '../src/runtime/tiptap-channel.js'
 import { parseImageInfo, parseVoiceInfo } from '../src/runtime/tiptap-adapter.js'
 
@@ -1096,4 +1097,54 @@ test('sanitize fills empty doc root with single empty paragraph', async () => {
   assert.deepEqual(content, { type: 'doc', content: [{ type: 'paragraph' }] },
     'empty doc root must be filled with a single empty paragraph')
   editor.destroy()
+})
+
+
+test('normalizeListItemTrailingHardBreaks removes only trailing list paragraph hardBreaks', () => {
+  const doc = {
+    type: 'doc',
+    content: [
+      {
+        type: 'bulletList',
+        content: [
+          {
+            type: 'listItem',
+            content: [{
+              type: 'paragraph',
+              content: [
+                { type: 'text', text: '列表项' },
+                { type: 'hardBreak' },
+              ],
+            }],
+          },
+        ],
+      },
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'hardBreak' },
+        ],
+      },
+      {
+        type: 'paragraph',
+        content: [
+          { type: 'text', text: '普通段落' },
+          { type: 'hardBreak' },
+        ],
+      },
+    ],
+  }
+
+  const normalized = normalizeListItemTrailingHardBreaks(doc)
+
+  assert.deepEqual(normalized.content[0].content[0].content[0].content, [
+    { type: 'text', text: '列表项' },
+  ])
+  assert.equal('content' in normalized.content[1], false)
+  assert.deepEqual(normalized.content[2].content, [
+    { type: 'text', text: '普通段落' },
+    { type: 'hardBreak' },
+  ])
+  assert.equal(doc.content[0].content[0].content[0].content.length, 2)
+  assert.equal(doc.content[1].content.length, 1)
 })

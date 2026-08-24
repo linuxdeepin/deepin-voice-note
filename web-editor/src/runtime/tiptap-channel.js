@@ -68,6 +68,56 @@ function walkResolve(doc, table) {
   return walkApply(doc, table)
 }
 
+function isHardBreakJsonNode(node) {
+  return node?.type === 'hardBreak'
+}
+
+function trimTrailingHardBreakNodes(content) {
+  while (content.length > 0 && isHardBreakJsonNode(content[content.length - 1])) {
+    content.pop()
+  }
+}
+
+function isOnlyHardBreakContent(content) {
+  return Array.isArray(content) && content.length > 0 && content.every(isHardBreakJsonNode)
+}
+
+function normalizeHardBreakOnlyParagraph(node) {
+  if (node?.type === 'paragraph' && isOnlyHardBreakContent(node.content)) {
+    delete node.content
+  }
+}
+
+function normalizeListItemNode(node) {
+  if (!Array.isArray(node.content)) return
+  for (const block of node.content) {
+    if (block?.type === 'paragraph' && Array.isArray(block.content)) {
+      trimTrailingHardBreakNodes(block.content)
+      if (block.content.length === 0) {
+        delete block.content
+      }
+    }
+  }
+}
+
+export function normalizeListItemTrailingHardBreaks(doc) {
+  const clone = cloneValue(doc || createEmptyDoc())
+
+  function visit(node) {
+    if (!node || typeof node !== 'object') return
+    normalizeHardBreakOnlyParagraph(node)
+    if (node.type === 'listItem') {
+      normalizeListItemNode(node)
+    }
+    if (Array.isArray(node.content)) {
+      for (const child of node.content) visit(child)
+    }
+  }
+
+  visit(clone)
+  return clone
+}
+
 // ---------------------------------------------------------------------------
 // Voice 运行态桥注册表
 // ---------------------------------------------------------------------------
@@ -418,7 +468,7 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
         } catch {
           envelope = createEnvelope(createEmptyDoc())
         }
-        const content = envelope?.content || createEmptyDoc()
+        const content = normalizeListItemTrailingHardBreaks(envelope?.content || createEmptyDoc())
         const resolved = walkResolve(content, loadResolvers)
         editor.commands.setContent(resolved)
       })
@@ -454,7 +504,7 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
 
       // --- 事件 3：保存往返 ---
       bridge.requestContent.connect(function () {
-        const normalized = walkNormalize(editor.getJSON(), saveNormalizers)
+        const normalized = normalizeListItemTrailingHardBreaks(walkNormalize(editor.getJSON(), saveNormalizers))
         const envelope = createEnvelope(normalized)
         const result = validateEnvelope(envelope)
         if (result.ok) {
