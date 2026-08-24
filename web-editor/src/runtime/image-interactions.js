@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 // 图片交互模块：粘贴策略与图片 DOM 事件委托。
+
+import imageBlockCss from '../extensions/image-block.css?inline'
+
 // 不为 image 节点实现 NodeView，通过 ProseMirror editorProps 与 editor.view.dom
 // 上的委托式事件监听完成交互，改动面最小。
 
@@ -156,7 +159,7 @@ export function setupImagePaste(editor, bridge) {
 }
 
 // ---------------------------------------------------------------------------
-// 图片 DOM 事件委托：单击选中、双击查看原图、右键菜单（查看原图 / 删除）
+// 图片 DOM 事件委托：单击选中、双击查看原图、右键交给宿主菜单
 // ---------------------------------------------------------------------------
 
 function findImageTarget(dom, target) {
@@ -172,76 +175,85 @@ function findImageTarget(dom, target) {
 
 function selectImageNode(editor, img) {
   const pos = editor.view.posAtDOM(img, 0)
-  if (pos == null || pos < 0) return
-  editor.chain().setNodeSelection(pos).run()
+  if (pos == null || pos < 0) return false
+  return editor.chain().focus().setNodeSelection(pos).run()
 }
 
-function createImageContextMenu({ onView, onDelete, x, y }) {
-  const menu = document.createElement('div')
-  menu.setAttribute('data-testid', 'tiptap-image-menu')
-  Object.assign(menu.style, {
-    position: 'fixed',
-    left: `${x}px`,
-    top: `${y}px`,
-    background: 'var(--dvn-panel-bg, #fff)',
-    border: '1px solid var(--dvn-panel-border, #ccc)',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-    zIndex: '1000',
-    padding: '2px 0',
-    fontSize: '14px',
-  })
 
-  const viewItem = document.createElement('div')
-  viewItem.textContent = '查看原图'
-  viewItem.setAttribute('data-action', 'view-original')
-  Object.assign(viewItem.style, { padding: '6px 18px', cursor: 'pointer' })
-  viewItem.addEventListener('mouseenter', () => { viewItem.style.background = 'var(--dvn-hover-bg, #f0f0f0)' })
-  viewItem.addEventListener('mouseleave', () => { viewItem.style.background = 'transparent' })
-  viewItem.addEventListener('click', (e) => { e.stopPropagation(); onView() })
+function ensureImageSelectionStyles() {
+  if (typeof document === 'undefined') return
+  if (document.getElementById('dvn-tiptap-image-block-style')) return
+  const style = document.createElement('style')
+  style.id = 'dvn-tiptap-image-block-style'
+  style.textContent = imageBlockCss
+  document.head.appendChild(style)
+}
 
-  const deleteItem = document.createElement('div')
-  deleteItem.textContent = '删除'
-  deleteItem.setAttribute('data-action', 'delete-image')
-  Object.assign(deleteItem.style, { padding: '6px 18px', cursor: 'pointer' })
-  deleteItem.addEventListener('mouseenter', () => { deleteItem.style.background = 'var(--dvn-hover-bg, #f0f0f0)' })
-  deleteItem.addEventListener('mouseleave', () => { deleteItem.style.background = 'transparent' })
-  deleteItem.addEventListener('click', (e) => { e.stopPropagation(); onDelete() })
+function createImageSelectionOverlay() {
+  ensureImageSelectionStyles()
+  const overlay = document.createElement('div')
+  overlay.className = 'dvn-image-selection'
+  overlay.setAttribute('data-testid', 'tiptap-image-selection')
+  document.body.appendChild(overlay)
+  return overlay
+}
 
-  menu.appendChild(viewItem)
-  menu.appendChild(deleteItem)
-  return menu
+function selectedImageElement(editor) {
+  const { selection } = editor.state
+  if (selection.node?.type?.name !== 'image') return null
+  const dom = editor.view.nodeDOM(selection.from)
+  if (dom?.tagName === 'IMG') return dom
+  return dom?.querySelector?.('img') || null
+}
+
+function updateImageSelectionOverlay(editor, overlay) {
+  const img = selectedImageElement(editor)
+  if (!img || !document.contains(img)) {
+    overlay.style.display = 'none'
+    return
+  }
+
+  const rect = img.getBoundingClientRect()
+  if (rect.width <= 0 || rect.height <= 0) {
+    overlay.style.display = 'none'
+    return
+  }
+
+  overlay.style.display = 'block'
+  overlay.style.left = `${Math.round(rect.left + window.scrollX)}px`
+  overlay.style.top = `${Math.round(rect.top + window.scrollY)}px`
+  overlay.style.width = `${Math.round(rect.width)}px`
+  overlay.style.height = `${Math.round(rect.height)}px`
 }
 
 /**
- * 注册图片查看原图与右键菜单交互：绑定到 editor.view.dom 上的委托式监听。
+ * 注册图片查看原图、选中态与右键菜单入口。
+ *
+ * 注意：右键菜单必须继续走宿主 PictureCtxMenu，与 Summernote 的
+ * webobj.jsCallPopupMenu(0, img.src) 保持一致；这里不再自绘网页菜单。
  * @param {Editor} editor
  * @param {object} bridge — QWebChannel bridge（需 jsRequestViewPicture 方法）
- * @returns {() => void} 销毁函数，移除监听与菜单
+ * @returns {() => void} 销毁函数，移除监听与遮罩
  */
 export function setupImageViewAndMenu(editor, bridge) {
   if (!editor || !bridge) return () => {}
   const dom = editor.view.dom
-  let menuEl = null
-
-  function closeMenu() {
-    if (menuEl && menuEl.parentNode) menuEl.parentNode.removeChild(menuEl)
-    menuEl = null
-    document.removeEventListener('click', onOutsideClick)
-  }
-
-  function onOutsideClick(event) {
-    if (menuEl && !menuEl.contains(event.target)) closeMenu()
-  }
+  const overlay = createImageSelectionOverlay()
 
   function viewOriginal(img) {
     const src = img.getAttribute('src') || ''
     if (src && bridge.jsRequestViewPicture) bridge.jsRequestViewPicture(src)
   }
 
+  function syncOverlay() {
+    updateImageSelectionOverlay(editor, overlay)
+  }
+
   function onClick(event) {
     const img = findImageTarget(dom, event.target)
     if (img) {
       selectImageNode(editor, img)
+      syncOverlay()
     }
   }
 
@@ -249,6 +261,8 @@ export function setupImageViewAndMenu(editor, bridge) {
     const img = findImageTarget(dom, event.target)
     if (img) {
       event.preventDefault()
+      selectImageNode(editor, img)
+      syncOverlay()
       viewOriginal(img)
     }
   }
@@ -256,27 +270,27 @@ export function setupImageViewAndMenu(editor, bridge) {
   function onContextMenu(event) {
     const img = findImageTarget(dom, event.target)
     if (!img) return
-    event.preventDefault()
     selectImageNode(editor, img)
-    closeMenu()
-    menuEl = createImageContextMenu({
-      onView: () => { viewOriginal(img); closeMenu() },
-      onDelete: () => { editor.chain().deleteSelection().run(); closeMenu() },
-      x: event.clientX,
-      y: event.clientY,
-    })
-    document.body.appendChild(menuEl)
-    setTimeout(() => document.addEventListener('click', onOutsideClick), 0)
+    syncOverlay()
+    // 不 preventDefault：让 Qt WebEngine 继续产生 contextMenuRequested，
+    // QML 侧会按图片类型弹出应用统一 PictureCtxMenu。
   }
 
   dom.addEventListener('click', onClick)
   dom.addEventListener('dblclick', onDblClick)
   dom.addEventListener('contextmenu', onContextMenu)
+  editor.on('transaction', syncOverlay)
+  window.addEventListener('scroll', syncOverlay, true)
+  window.addEventListener('resize', syncOverlay)
+  syncOverlay()
 
   return function destroy() {
     dom.removeEventListener('click', onClick)
     dom.removeEventListener('dblclick', onDblClick)
     dom.removeEventListener('contextmenu', onContextMenu)
-    closeMenu()
+    editor.off('transaction', syncOverlay)
+    window.removeEventListener('scroll', syncOverlay, true)
+    window.removeEventListener('resize', syncOverlay)
+    if (overlay.parentNode) overlay.parentNode.removeChild(overlay)
   }
 }

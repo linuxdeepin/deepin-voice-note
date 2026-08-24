@@ -565,7 +565,7 @@ Item {
                             + "var vb=el.closest?el.closest('.voiceInfoBox'):null;"
                             + "if(vb&&vb.getAttribute('data-type')==='voice-block'){if(window.__dvnTiptapSelectVoiceBlockFromElement)window.__dvnTiptapSelectVoiceBlockFromElement(vb);return JSON.stringify({type:1,json:vb.getAttribute('data-voice-meta')||''});}"
                             + "var img=el.closest?el.closest('img[data-rel-path]'):null;"
-                            + "if(img) return JSON.stringify({type:0,json:''});"
+                            + "if(img){if(window.__dvnTiptapSelectImageFromElement)window.__dvnTiptapSelectImageFromElement(img);return JSON.stringify({type:0,json:img.getAttribute('src')||img.getAttribute('data-rel-path')||''});}"
                             + "var sel=window.getSelection();var hasSelection=!!(sel&&sel.rangeCount>0&&!sel.isCollapsed&&sel.toString());var inEditor=!!(el.closest&&el.closest('.ProseMirror'));"
                             + "return JSON.stringify({type:2,json:'',flags:flags(inEditor,hasSelection,hasSelection&&inEditor,inEditor,hasSelection&&inEditor)});"
                             + "})()",
@@ -573,7 +573,11 @@ Item {
                                 var info = null;
                                 try { info = JSON.parse(result); } catch(e) {}
                                 if (!info) return;
-                                if (info.type === 0) return;
+                                if (info.type === 0) {
+                                    handler.onSaveMenuParam(info.type, info.json);
+                                    handler.onContextMenuRequested(req);
+                                    return;
+                                }
                                 if (info.type === 2) {
                                     ActionManager.resetCtxMenu(ActionManager.TxtCtxMenu, false);
                                     ActionManager.visibleAction(ActionManager.TxtStopreading, false);

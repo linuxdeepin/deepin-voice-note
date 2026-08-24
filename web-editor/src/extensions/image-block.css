@@ -1,0 +1,12 @@
+/* SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
+   SPDX-License-Identifier: GPL-3.0-or-later */
+
+/* Match Summernote/browser image selection: a simple theme-color overlay. */
+.dvn-image-selection {
+    position: absolute;
+    display: none;
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 9;
+    background: var(--dvn-active-selection-bg, rgba(0, 129, 255, 0.6));
+}
