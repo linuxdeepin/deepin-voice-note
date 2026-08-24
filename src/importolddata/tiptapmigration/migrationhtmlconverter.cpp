@@ -939,6 +939,20 @@ void trimTrailingTextSpace(QJsonArray &content)
     content.replace(content.size() - 1, last);
 }
 
+void trimTrailingHardBreaks(QJsonArray &content)
+{
+    while (!content.isEmpty() && isHardBreakNode(content.at(content.size() - 1))) {
+        content.removeAt(content.size() - 1);
+    }
+}
+
+void trimTrailingListItemBreaks(QJsonArray &content)
+{
+    trimTrailingTextSpace(content);
+    trimTrailingHardBreaks(content);
+    trimTrailingTextSpace(content);
+}
+
 void appendHardBreak(QJsonArray &content)
 {
     content.append(MigrationJsonBuilder::makeHardBreak());
@@ -1383,10 +1397,27 @@ void appendInlineNode(const MigrationHtmlNode &node,
     appendInlineChildren(node, content, marksForElement(node, marks, result), result);
 }
 
+bool containsOnlyHardBreaks(const QJsonArray &content)
+{
+    if (content.isEmpty()) {
+        return false;
+    }
+
+    for (const QJsonValue &value : content) {
+        if (!isHardBreakNode(value)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void appendParagraphIfContent(QJsonArray &inlineContent, QJsonArray &blocks)
 {
     trimTrailingTextSpace(inlineContent);
-    if (!inlineContent.isEmpty()) {
+    if (containsOnlyHardBreaks(inlineContent)) {
+        blocks.append(MigrationJsonBuilder::makeParagraph());
+    } else if (!inlineContent.isEmpty()) {
         blocks.append(MigrationJsonBuilder::makeParagraph(inlineContent));
     }
     inlineContent = QJsonArray();
@@ -1681,7 +1712,7 @@ QJsonObject downgradedParagraphFromBlock(const MigrationHtmlNode &node,
 
 void appendInlineContentAsParagraph(QJsonArray &inlineContent, QJsonArray &blocks)
 {
-    trimTrailingTextSpace(inlineContent);
+    trimTrailingListItemBreaks(inlineContent);
     if (!inlineContent.isEmpty()) {
         blocks.append(MigrationJsonBuilder::makeParagraph(inlineContent));
     }
@@ -1756,7 +1787,7 @@ QJsonObject listItemFromInvalidListChild(const MigrationHtmlNode &node,
 
     QJsonArray inlineContent;
     appendInlineNode(node, inlineContent, parentMarks, result);
-    trimTrailingTextSpace(inlineContent);
+    trimTrailingListItemBreaks(inlineContent);
     return MigrationJsonBuilder::makeListItem(QJsonArray { MigrationJsonBuilder::makeParagraph(inlineContent) });
 }
 

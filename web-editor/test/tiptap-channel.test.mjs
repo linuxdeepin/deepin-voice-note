@@ -18,7 +18,7 @@ import {
 } from '../src/schema/document-envelope.js'
 import {
   bindTiptapChannel,
-  createDebounce,
+  createDebounce
 } from '../src/runtime/tiptap-channel.js'
 import { parseImageInfo, parseVoiceInfo } from '../src/runtime/tiptap-adapter.js'
 
@@ -206,6 +206,45 @@ test('bindTiptapChannel: requestContent → contentSaved roundtrip', async () =>
   assert.equal(envelope.format, 'tiptap')
   assert.equal(envelope.schemaVersion, 1)
   assert.equal(envelope.content.type, 'doc')
+  editor.destroy()
+})
+
+
+test('bindTiptapChannel: load and save preserve user trailing hardBreaks in list items', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+  const content = {
+    type: 'doc',
+    content: [{
+      type: 'bulletList',
+      content: [{
+        type: 'listItem',
+        content: [{
+          type: 'paragraph',
+          content: [
+            { type: 'text', text: '列表项' },
+            { type: 'hardBreak' },
+          ],
+        }],
+      }],
+    }],
+  }
+
+  await bindTiptapChannel(editor, factory)
+  emit('loadEnvelopeRequested', serializeEnvelope(createEnvelope(content)))
+
+  assert.deepEqual(editor.getJSON().content[0].content[0].content[0].content, [
+    { type: 'text', text: '列表项' },
+    { type: 'hardBreak' },
+  ])
+
+  emit('requestContent')
+  const saved = JSON.parse(calls.contentSaved[0]).content
+  assert.deepEqual(saved.content[0].content[0].content[0].content, [
+    { type: 'text', text: '列表项' },
+    { type: 'hardBreak' },
+  ])
   editor.destroy()
 })
 
