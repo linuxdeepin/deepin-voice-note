@@ -2456,7 +2456,7 @@ function isTagRule(rule) {
 function isStyleRule(rule) {
   return rule.style != null;
 }
-class DOMParser {
+let DOMParser$1 = class DOMParser2 {
   /**
   Create a parser that targets the given schema, using the given
   parsing rules.
@@ -2582,9 +2582,9 @@ class DOMParser {
   [priority](https://prosemirror.net/docs/ref/#model.GenericParseRule.priority).
   */
   static fromSchema(schema) {
-    return schema.cached.domParser || (schema.cached.domParser = new DOMParser(schema, DOMParser.schemaRules(schema)));
+    return schema.cached.domParser || (schema.cached.domParser = new DOMParser2(schema, DOMParser2.schemaRules(schema)));
   }
-}
+};
 const blockTags = {
   address: true,
   article: true,
@@ -6757,12 +6757,12 @@ function createNodeFromContent(content, schema, options) {
         })
       });
       if (options.slice) {
-        DOMParser.fromSchema(contentCheckSchema).parseSlice(
+        DOMParser$1.fromSchema(contentCheckSchema).parseSlice(
           elementFromString(content),
           options.parseOptions
         );
       } else {
-        DOMParser.fromSchema(contentCheckSchema).parse(
+        DOMParser$1.fromSchema(contentCheckSchema).parse(
           elementFromString(content),
           options.parseOptions
         );
@@ -6773,7 +6773,7 @@ function createNodeFromContent(content, schema, options) {
         });
       }
     }
-    const parser = DOMParser.fromSchema(schema);
+    const parser = DOMParser$1.fromSchema(schema);
     if (options.slice) {
       return parser.parseSlice(elementFromString(content), options.parseOptions).content;
     }
@@ -13320,6 +13320,7 @@ function subscribeVoiceEvents(voiceId, handlers) {
     }
   };
 }
+const VOICE_BLOCK_CLIPBOARD_MIME = "application/x-deepin-voice-note-voice-block";
 if (typeof document !== "undefined") {
   const style = document.createElement("style");
   style.textContent = voiceBlockCss;
@@ -13334,6 +13335,172 @@ function generateVoiceId() {
     const v = c === "x" ? r : r & 3 | 8;
     return v.toString(16);
   });
+}
+function isEmptyParagraphNode(node) {
+  return !!node && node.type?.name === "paragraph" && node.content.size === 0;
+}
+function createEmptyParagraph(schema) {
+  return schema.nodes.paragraph.create();
+}
+function fragmentHasVoiceBlock(fragment) {
+  for (let i = 0; i < fragment.childCount; i++) {
+    const node = fragment.child(i);
+    if (node.type.name === "voiceBlock") return true;
+    if (node.content && node.content.size > 0 && fragmentHasVoiceBlock(node.content)) return true;
+  }
+  return false;
+}
+function cloneVoiceBlockForPaste(node) {
+  return node.type.create({
+    ...node.attrs,
+    text: null,
+    voiceId: generateVoiceId(),
+    translateUnfold: true
+  }, node.content, node.marks);
+}
+function decodeBase64Utf8(value) {
+  const binary = atob(value);
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+function parseClipboardVoiceInfo(clipboardData) {
+  if (!clipboardData) return null;
+  const customData = clipboardData.getData?.(VOICE_BLOCK_CLIPBOARD_MIME);
+  if (customData) {
+    try {
+      return JSON.parse(customData);
+    } catch (error2) {
+      console.warn("[tiptap] invalid voice clipboard json:", error2);
+    }
+  }
+  const html = clipboardData.getData?.("text/html");
+  if (!html) return null;
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const encoded = doc.querySelector("[data-dvn-voice-block]")?.getAttribute("data-dvn-voice-block");
+  if (encoded) {
+    try {
+      return JSON.parse(decodeBase64Utf8(encoded));
+    } catch (error2) {
+      console.warn("[tiptap] invalid voice clipboard html:", error2);
+    }
+  }
+  const meta = doc.querySelector("[data-voice-meta]")?.getAttribute("data-voice-meta");
+  if (meta) {
+    try {
+      return JSON.parse(meta);
+    } catch (error2) {
+      console.warn("[tiptap] invalid voice meta clipboard html:", error2);
+    }
+  }
+  return null;
+}
+function createVoiceBlockFromClipboard(schema, clipboardData) {
+  const voiceInfo = parseClipboardVoiceInfo(clipboardData);
+  if (!voiceInfo || !voiceInfo.voiceId || !voiceInfo.voicePath) return null;
+  return schema.nodes.voiceBlock.create({
+    voiceId: String(voiceInfo.voiceId),
+    voicePath: String(voiceInfo.voicePath),
+    voiceSize: Number(voiceInfo.voiceSize) || 0,
+    createTime: voiceInfo.createTime ?? null,
+    title: voiceInfo.title ?? null,
+    text: voiceInfo.text ?? null,
+    translateUnfold: voiceInfo.translateUnfold !== false
+  });
+}
+function normalizePastedVoiceFragment(fragment, schema) {
+  const nodes = [];
+  const voiceIds = [];
+  function transformNode(node) {
+    if (node.type.name === "voiceBlock") {
+      const voiceNode = cloneVoiceBlockForPaste(node);
+      voiceIds.push(voiceNode.attrs.voiceId);
+      return voiceNode;
+    }
+    if (node.content && node.content.size > 0) {
+      const transformedContent = normalizeNestedVoiceFragment(node.content);
+      if (transformedContent !== node.content) return node.copy(transformedContent);
+    }
+    return node;
+  }
+  function normalizeNestedVoiceFragment(nestedFragment) {
+    let changed = false;
+    const nestedNodes = [];
+    for (let i = 0; i < nestedFragment.childCount; i++) {
+      const child = nestedFragment.child(i);
+      const transformed = transformNode(child);
+      if (transformed !== child) changed = true;
+      nestedNodes.push(transformed);
+    }
+    return changed ? Fragment.from(nestedNodes) : nestedFragment;
+  }
+  for (let i = 0; i < fragment.childCount; i++) {
+    const original = fragment.child(i);
+    const node = transformNode(original);
+    if (node.type.name === "voiceBlock") {
+      const prev = nodes[nodes.length - 1];
+      if (!isEmptyParagraphNode(prev)) {
+        nodes.push(createEmptyParagraph(schema));
+      }
+      nodes.push(node);
+      const nextOriginal = i + 1 < fragment.childCount ? fragment.child(i + 1) : null;
+      if (!isEmptyParagraphNode(nextOriginal)) {
+        nodes.push(createEmptyParagraph(schema));
+      }
+    } else {
+      nodes.push(node);
+    }
+  }
+  return { fragment: Fragment.from(nodes), voiceIds };
+}
+function resolveVoicePasteInsertRange(state) {
+  const { selection } = state;
+  if (selection.node?.type?.name === "voiceBlock") {
+    const nextNode = selection.$to.nodeAfter;
+    if (isEmptyParagraphNode(nextNode)) {
+      return { from: selection.to, to: selection.to + nextNode.nodeSize };
+    }
+    return { from: selection.to, to: selection.to };
+  }
+  return null;
+}
+function findLastVoiceBlockById(doc, voiceIds) {
+  const idSet = new Set(voiceIds);
+  let found2 = null;
+  doc.descendants((node, pos) => {
+    if (node.type.name === "voiceBlock" && idSet.has(node.attrs.voiceId)) {
+      found2 = { node, pos };
+    }
+    return true;
+  });
+  return found2;
+}
+function cursorPositionAfterVoiceBlock(doc, found2) {
+  if (!found2) return null;
+  const paragraphStart = found2.pos + found2.node.nodeSize;
+  const nextNode = doc.resolve(paragraphStart).nodeAfter;
+  if (!isEmptyParagraphNode(nextNode)) return null;
+  return paragraphStart + 1;
+}
+function insertPastedVoiceBlockSlice(view, slice) {
+  if (!fragmentHasVoiceBlock(slice.content)) return false;
+  const { state } = view;
+  const { fragment, voiceIds } = normalizePastedVoiceFragment(slice.content, state.schema);
+  const insertRange = resolveVoicePasteInsertRange(state);
+  let tr = state.tr;
+  if (insertRange == null) {
+    tr = tr.replaceSelection(new Slice(fragment, 0, 0));
+  } else if (insertRange.from === insertRange.to) {
+    tr = tr.insert(insertRange.from, fragment);
+  } else {
+    tr = tr.replaceWith(insertRange.from, insertRange.to, fragment);
+  }
+  tr = tr.setMeta("paste", true);
+  const cursorPos = cursorPositionAfterVoiceBlock(tr.doc, findLastVoiceBlockById(tr.doc, voiceIds));
+  if (cursorPos != null) {
+    tr = tr.setSelection(TextSelection.create(tr.doc, cursorPos));
+  }
+  view.dispatch(tr.scrollIntoView());
+  return true;
 }
 function formatTime(ms) {
   if (typeof ms !== "number" || ms < 0) ms = 0;
@@ -13680,6 +13847,15 @@ const VoiceBlock = Node3.create({
       new Plugin({
         key: new PluginKey("voiceBlockCopyClear"),
         props: {
+          handlePaste(view, event, slice) {
+            const clipboardVoiceNode = createVoiceBlockFromClipboard(view.state.schema, event.clipboardData);
+            const voiceSlice = clipboardVoiceNode ? new Slice(Fragment.from(clipboardVoiceNode), 0, 0) : slice;
+            const handled = insertPastedVoiceBlockSlice(view, voiceSlice);
+            if (handled) {
+              event.preventDefault();
+            }
+            return handled;
+          },
           handleDOMEvents: {
             dragstart(view, event) {
               const target = event.target;

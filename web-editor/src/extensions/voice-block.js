@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { Node, mergeAttributes } from '@tiptap/core'
-import { Plugin, PluginKey } from '@tiptap/pm/state'
+import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state'
 import { Slice, Fragment } from '@tiptap/pm/model'
 import voiceBlockCss from './voice-block.css?inline'
 import { getVoiceBridge, subscribeVoiceEvents } from '../runtime/tiptap-channel.js'
+
+const VOICE_BLOCK_CLIPBOARD_MIME = 'application/x-deepin-voice-note-voice-block'
 
 // Inject self-contained styles at runtime (no external CSS link needed)
 if (typeof document !== 'undefined') {
@@ -28,6 +30,200 @@ function generateVoiceId() {
     const v = c === 'x' ? r : (r & 0x3 | 0x8)
     return v.toString(16)
   })
+}
+
+
+function isEmptyParagraphNode(node) {
+  return !!node && node.type?.name === 'paragraph' && node.content.size === 0
+}
+
+function createEmptyParagraph(schema) {
+  return schema.nodes.paragraph.create()
+}
+
+function fragmentHasVoiceBlock(fragment) {
+  for (let i = 0; i < fragment.childCount; i++) {
+    const node = fragment.child(i)
+    if (node.type.name === 'voiceBlock') return true
+    if (node.content && node.content.size > 0 && fragmentHasVoiceBlock(node.content)) return true
+  }
+  return false
+}
+
+function cloneVoiceBlockForPaste(node) {
+  return node.type.create({
+    ...node.attrs,
+    text: null,
+    voiceId: generateVoiceId(),
+    translateUnfold: true,
+  }, node.content, node.marks)
+}
+
+function decodeBase64Utf8(value) {
+  const binary = atob(value)
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0))
+  return new TextDecoder().decode(bytes)
+}
+
+function parseClipboardVoiceInfo(clipboardData) {
+  if (!clipboardData) return null
+
+  const customData = clipboardData.getData?.(VOICE_BLOCK_CLIPBOARD_MIME)
+  if (customData) {
+    try {
+      return JSON.parse(customData)
+    } catch (error) {
+      console.warn('[tiptap] invalid voice clipboard json:', error)
+    }
+  }
+
+  const html = clipboardData.getData?.('text/html')
+  if (!html) return null
+
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  const encoded = doc.querySelector('[data-dvn-voice-block]')?.getAttribute('data-dvn-voice-block')
+  if (encoded) {
+    try {
+      return JSON.parse(decodeBase64Utf8(encoded))
+    } catch (error) {
+      console.warn('[tiptap] invalid voice clipboard html:', error)
+    }
+  }
+
+  const meta = doc.querySelector('[data-voice-meta]')?.getAttribute('data-voice-meta')
+  if (meta) {
+    try {
+      return JSON.parse(meta)
+    } catch (error) {
+      console.warn('[tiptap] invalid voice meta clipboard html:', error)
+    }
+  }
+
+  return null
+}
+
+function createVoiceBlockFromClipboard(schema, clipboardData) {
+  const voiceInfo = parseClipboardVoiceInfo(clipboardData)
+  if (!voiceInfo || !voiceInfo.voiceId || !voiceInfo.voicePath) return null
+
+  return schema.nodes.voiceBlock.create({
+    voiceId: String(voiceInfo.voiceId),
+    voicePath: String(voiceInfo.voicePath),
+    voiceSize: Number(voiceInfo.voiceSize) || 0,
+    createTime: voiceInfo.createTime ?? null,
+    title: voiceInfo.title ?? null,
+    text: voiceInfo.text ?? null,
+    translateUnfold: voiceInfo.translateUnfold !== false,
+  })
+}
+
+function normalizePastedVoiceFragment(fragment, schema) {
+  const nodes = []
+  const voiceIds = []
+
+  function transformNode(node) {
+    if (node.type.name === 'voiceBlock') {
+      const voiceNode = cloneVoiceBlockForPaste(node)
+      voiceIds.push(voiceNode.attrs.voiceId)
+      return voiceNode
+    }
+    if (node.content && node.content.size > 0) {
+      const transformedContent = normalizeNestedVoiceFragment(node.content)
+      if (transformedContent !== node.content) return node.copy(transformedContent)
+    }
+    return node
+  }
+
+  function normalizeNestedVoiceFragment(nestedFragment) {
+    let changed = false
+    const nestedNodes = []
+    for (let i = 0; i < nestedFragment.childCount; i++) {
+      const child = nestedFragment.child(i)
+      const transformed = transformNode(child)
+      if (transformed !== child) changed = true
+      nestedNodes.push(transformed)
+    }
+    return changed ? Fragment.from(nestedNodes) : nestedFragment
+  }
+
+  for (let i = 0; i < fragment.childCount; i++) {
+    const original = fragment.child(i)
+    const node = transformNode(original)
+
+    if (node.type.name === 'voiceBlock') {
+      const prev = nodes[nodes.length - 1]
+      if (!isEmptyParagraphNode(prev)) {
+        nodes.push(createEmptyParagraph(schema))
+      }
+      nodes.push(node)
+      const nextOriginal = i + 1 < fragment.childCount ? fragment.child(i + 1) : null
+      if (!isEmptyParagraphNode(nextOriginal)) {
+        nodes.push(createEmptyParagraph(schema))
+      }
+    } else {
+      nodes.push(node)
+    }
+  }
+
+  return { fragment: Fragment.from(nodes), voiceIds }
+}
+
+function resolveVoicePasteInsertRange(state) {
+  const { selection } = state
+  if (selection.node?.type?.name === 'voiceBlock') {
+    const nextNode = selection.$to.nodeAfter
+    if (isEmptyParagraphNode(nextNode)) {
+      return { from: selection.to, to: selection.to + nextNode.nodeSize }
+    }
+    return { from: selection.to, to: selection.to }
+  }
+  return null
+}
+
+function findLastVoiceBlockById(doc, voiceIds) {
+  const idSet = new Set(voiceIds)
+  let found = null
+  doc.descendants((node, pos) => {
+    if (node.type.name === 'voiceBlock' && idSet.has(node.attrs.voiceId)) {
+      found = { node, pos }
+    }
+    return true
+  })
+  return found
+}
+
+function cursorPositionAfterVoiceBlock(doc, found) {
+  if (!found) return null
+  const paragraphStart = found.pos + found.node.nodeSize
+  const nextNode = doc.resolve(paragraphStart).nodeAfter
+  if (!isEmptyParagraphNode(nextNode)) return null
+  return paragraphStart + 1
+}
+
+function insertPastedVoiceBlockSlice(view, slice) {
+  if (!fragmentHasVoiceBlock(slice.content)) return false
+
+  const { state } = view
+  const { fragment, voiceIds } = normalizePastedVoiceFragment(slice.content, state.schema)
+  const insertRange = resolveVoicePasteInsertRange(state)
+  let tr = state.tr
+
+  if (insertRange == null) {
+    tr = tr.replaceSelection(new Slice(fragment, 0, 0))
+  } else if (insertRange.from === insertRange.to) {
+    tr = tr.insert(insertRange.from, fragment)
+  } else {
+    tr = tr.replaceWith(insertRange.from, insertRange.to, fragment)
+  }
+
+  tr = tr.setMeta('paste', true)
+  const cursorPos = cursorPositionAfterVoiceBlock(tr.doc, findLastVoiceBlockById(tr.doc, voiceIds))
+  if (cursorPos != null) {
+    tr = tr.setSelection(TextSelection.create(tr.doc, cursorPos))
+  }
+
+  view.dispatch(tr.scrollIntoView())
+  return true
 }
 
 /**
@@ -481,6 +677,17 @@ export const VoiceBlock = Node.create({
       new Plugin({
         key: new PluginKey('voiceBlockCopyClear'),
         props: {
+          handlePaste(view, event, slice) {
+            const clipboardVoiceNode = createVoiceBlockFromClipboard(view.state.schema, event.clipboardData)
+            const voiceSlice = clipboardVoiceNode
+              ? new Slice(Fragment.from(clipboardVoiceNode), 0, 0)
+              : slice
+            const handled = insertPastedVoiceBlockSlice(view, voiceSlice)
+            if (handled) {
+              event.preventDefault()
+            }
+            return handled
+          },
           handleDOMEvents: {
             dragstart(view, event) {
               const target = event.target

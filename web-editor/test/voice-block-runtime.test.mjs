@@ -9,6 +9,7 @@ import test from 'node:test'
 import { Window } from 'happy-dom'
 import { Editor } from '@tiptap/core'
 import { NodeSelection } from '@tiptap/pm/state'
+import { Fragment, Slice } from '@tiptap/pm/model'
 import { createTiptapExtensions } from '../src/runtime/tiptap-extensions.js'
 import { createEmptyDoc, createEnvelope, serializeEnvelope, validateEnvelope } from '../src/schema/document-envelope.js'
 import {
@@ -385,6 +386,116 @@ test('paste: duplicate voiceBlock gets new voiceId', () => {
   assert.equal(voiceNodes[0].attrs.voiceId, 'original-id')
   assert.notEqual(voiceNodes[1].attrs.voiceId, 'original-id')
   assert.ok(voiceNodes[1].attrs.voiceId.length > 0)
+  editor.destroy()
+})
+
+
+function createVoicePasteSlice(editor, attrs = {}) {
+  const voiceNode = editor.state.schema.nodes.voiceBlock.create({
+    voiceId: 'copied-id',
+    voicePath: 'voicenote/copied.mp3',
+    voiceSize: 3000,
+    createTime: '2026-07-17 10:00:00',
+    title: '复制语音',
+    text: '复制时应清除的转写文本',
+    translateUnfold: false,
+    ...attrs,
+  })
+  return new Slice(Fragment.from(voiceNode), 0, 0)
+}
+
+function pasteVoiceSlice(editor, slice) {
+  const handlePaste = editor.view.someProp('handlePaste', f => f)
+  assert.ok(typeof handlePaste === 'function', 'handlePaste should be registered')
+  let prevented = false
+  const handled = handlePaste(editor.view, { preventDefault() { prevented = true } }, slice)
+  assert.equal(handled, true)
+  assert.equal(prevented, true)
+}
+
+test('paste: copied voiceBlock keeps legacy spacing and moves cursor after pasted block', () => {
+  const { editor } = createEditor()
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'voiceBlock', attrs: { voiceId: 'original-id', voicePath: 'voicenote/original.mp3', voiceSize: 1000 } },
+      { type: 'paragraph' },
+    ],
+  })
+  editor.commands.setTextSelection(2)
+
+  pasteVoiceSlice(editor, createVoicePasteSlice(editor))
+
+  const json = editor.getJSON()
+  assert.deepEqual(json.content.map(n => n.type), ['voiceBlock', 'paragraph', 'voiceBlock', 'paragraph'])
+  assert.equal(json.content[0].attrs.voiceId, 'original-id')
+  assert.notEqual(json.content[2].attrs.voiceId, 'copied-id')
+  assert.equal(json.content[2].attrs.text, null)
+  assert.equal(json.content[2].attrs.translateUnfold, true)
+  assert.equal(editor.state.selection.from, 5)
+  assert.equal(editor.state.selection.to, 5)
+  editor.destroy()
+})
+
+test('paste: copied voiceBlock appends after selected voiceBlock instead of replacing it', () => {
+  const { editor } = createEditor()
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'voiceBlock', attrs: { voiceId: 'original-id', voicePath: 'voicenote/original.mp3', voiceSize: 1000 } },
+      { type: 'paragraph' },
+    ],
+  })
+  editor.view.dispatch(editor.state.tr.setSelection(NodeSelection.create(editor.state.doc, 0)))
+
+  pasteVoiceSlice(editor, createVoicePasteSlice(editor))
+
+  const json = editor.getJSON()
+  assert.deepEqual(json.content.map(n => n.type), ['voiceBlock', 'paragraph', 'voiceBlock', 'paragraph'])
+  assert.equal(json.content[0].attrs.voiceId, 'original-id')
+  assert.notEqual(json.content[2].attrs.voiceId, 'copied-id')
+  assert.equal(editor.state.selection.from, 5)
+  assert.equal(editor.state.selection.to, 5)
+  editor.destroy()
+})
+
+
+test('paste: custom clipboard voice json inserts voiceBlock with legacy spacing', () => {
+  const { editor } = createEditor()
+  const handlePaste = editor.view.someProp('handlePaste', f => f)
+  assert.ok(typeof handlePaste === 'function', 'handlePaste should be registered')
+
+  const clipboardJson = JSON.stringify({
+    type: 2,
+    voiceId: 'clipboard-id',
+    voicePath: 'voicenote/clipboard.mp3',
+    voiceSize: 4321,
+    title: '剪贴板语音',
+    text: '复制时带来的转写应在粘贴时清除',
+    translateUnfold: false,
+  })
+  let prevented = false
+  const handled = handlePaste(editor.view, {
+    preventDefault() { prevented = true },
+    clipboardData: {
+      getData(type) {
+        return type === 'application/x-deepin-voice-note-voice-block' ? clipboardJson : ''
+      },
+    },
+  }, new Slice(Fragment.empty, 0, 0))
+
+  assert.equal(handled, true)
+  assert.equal(prevented, true)
+  const json = editor.getJSON()
+  assert.deepEqual(json.content.map(n => n.type), ['paragraph', 'voiceBlock', 'paragraph'])
+  assert.notEqual(json.content[1].attrs.voiceId, 'clipboard-id')
+  assert.equal(json.content[1].attrs.voicePath, 'voicenote/clipboard.mp3')
+  assert.equal(json.content[1].attrs.voiceSize, 4321)
+  assert.equal(json.content[1].attrs.text, null)
+  assert.equal(json.content[1].attrs.translateUnfold, true)
+  assert.equal(editor.state.selection.from, 4)
   editor.destroy()
 })
 

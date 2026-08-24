@@ -36,6 +36,7 @@
 #include <QMimeData>
 #include <QUuid>
 #include <QUrl>
+#include <QRegularExpression>
 // 条件编译：QWebEngineContextMenuRequest 只在 Qt6 中存在
 #ifndef USE_QT5
 #include <QWebEngineContextMenuRequest>
@@ -73,6 +74,103 @@ const QString DEEPIN_DAEMON_APPEARANCE_INTERFACE = isV20() ? APPEARANCE_INTERFAC
 DGUI_USE_NAMESPACE
 
 namespace {
+
+constexpr const char *kTiptapVoiceBlockMime = "application/x-deepin-voice-note-voice-block";
+
+bool copyTiptapVoiceBlockToClipboard(const QVariant &menuJson)
+{
+    const QString voiceInfoJson = menuJson.toString();
+    if (voiceInfoJson.isEmpty()) {
+        qWarning() << "Cannot copy Tiptap voice block: empty menu json";
+        return false;
+    }
+
+    QJsonParseError parseError;
+    const QJsonObject voiceInfo = QJsonDocument::fromJson(voiceInfoJson.toUtf8(), &parseError).object();
+    if (parseError.error != QJsonParseError::NoError
+        || voiceInfo.value(QStringLiteral("voiceId")).toString().isEmpty()
+        || voiceInfo.value(QStringLiteral("voicePath")).toString().isEmpty()) {
+        qWarning() << "Cannot copy Tiptap voice block: invalid menu json" << parseError.errorString();
+        return false;
+    }
+
+    auto *mimeData = new QMimeData;
+    const QByteArray jsonUtf8 = voiceInfoJson.toUtf8();
+    mimeData->setData(kTiptapVoiceBlockMime, jsonUtf8);
+    mimeData->setHtml(QStringLiteral("<div data-dvn-voice-block=\"%1\"></div>")
+                          .arg(QString::fromLatin1(jsonUtf8.toBase64())));
+
+    const QString title = voiceInfo.value(QStringLiteral("title")).toString();
+    mimeData->setText(title.isEmpty() ? QStringLiteral("voice") : title);
+
+    QApplication::clipboard()->setMimeData(mimeData);
+    qInfo() << "Tiptap voice block copied to clipboard, voiceId:"
+            << voiceInfo.value(QStringLiteral("voiceId")).toString();
+    return true;
+}
+
+bool hasTiptapVoiceBlockClipboard()
+{
+    const QMimeData *mimeData = QApplication::clipboard()->mimeData();
+    if (!mimeData) {
+        return false;
+    }
+    if (mimeData->hasFormat(kTiptapVoiceBlockMime)) {
+        return true;
+    }
+    return mimeData->hasHtml() && mimeData->html().contains(QStringLiteral("data-dvn-voice-block"));
+}
+
+QString tiptapVoiceBlockClipboardJson()
+{
+    const QMimeData *mimeData = QApplication::clipboard()->mimeData();
+    if (!mimeData) {
+        return QString();
+    }
+
+    if (mimeData->hasFormat(kTiptapVoiceBlockMime)) {
+        return QString::fromUtf8(mimeData->data(kTiptapVoiceBlockMime));
+    }
+
+    if (!mimeData->hasHtml()) {
+        return QString();
+    }
+
+    const QRegularExpression re(QStringLiteral("data-dvn-voice-block=\\\"([^\\\"]+)\\\""));
+    const QRegularExpressionMatch match = re.match(mimeData->html());
+    if (!match.hasMatch()) {
+        return QString();
+    }
+
+    return QString::fromUtf8(QByteArray::fromBase64(match.captured(1).toLatin1()));
+}
+
+bool pasteTiptapVoiceBlockFromClipboard()
+{
+    const QString clipboardJson = tiptapVoiceBlockClipboardJson();
+    if (clipboardJson.isEmpty()) {
+        qWarning() << "Cannot paste Tiptap voice block: clipboard json is empty";
+        return false;
+    }
+
+    QJsonParseError parseError;
+    QJsonObject voiceInfo = QJsonDocument::fromJson(clipboardJson.toUtf8(), &parseError).object();
+    if (parseError.error != QJsonParseError::NoError
+        || voiceInfo.value(QStringLiteral("voicePath")).toString().isEmpty()) {
+        qWarning() << "Cannot paste Tiptap voice block: invalid clipboard json" << parseError.errorString();
+        return false;
+    }
+
+    voiceInfo.insert(QStringLiteral("voiceId"), QUuid::createUuid().toString(QUuid::WithoutBraces));
+    voiceInfo.remove(QStringLiteral("text"));
+    voiceInfo.insert(QStringLiteral("translateUnfold"), true);
+
+    TiptapChannelBridge::instance()->sendInsertVoiceBlock(
+        QString::fromUtf8(QJsonDocument(voiceInfo).toJson(QJsonDocument::Compact)));
+    qInfo() << "Tiptap voice block paste requested from clipboard, voiceId:"
+            << voiceInfo.value(QStringLiteral("voiceId")).toString();
+    return true;
+}
 
 QString normalizePicturePath(const QString &path)
 {
@@ -574,6 +672,16 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
             Q_EMIT JsContent::instance()->callJsSelectAll();
             break;
         case ActionManager::VoiceCopy:
+            if (TiptapChannelBridge::instance()->debugEnabled() && copyTiptapVoiceBlockToClipboard(menuJson)) {
+                break;
+            }
+            // 非 Tiptap 调试模式或复制失败时继续调用 web 端原生复制事件
+#ifdef USE_QT5
+            Q_EMIT triggerWebAction((int)QWebEnginePage::Copy);
+#else
+            Q_EMIT triggerWebAction(QWebEnginePage::Copy);
+#endif
+            break;
         case ActionManager::PictureCopy:
         case ActionManager::TxtCopy:
             // 直接调用web端的复制事件
@@ -597,7 +705,7 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
         case ActionManager::PicturePaste:
         case ActionManager::TxtPaste:
             // 粘贴事件，从剪贴板获取数据
-            onPaste(isVoicePaste());
+            onPaste(isVoicePaste() || (TiptapChannelBridge::instance()->debugEnabled() && hasTiptapVoiceBlockClipboard()));
             break;
         case ActionManager::PictureView: {
             // 查看图片
@@ -678,6 +786,13 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
 void WebEngineHandler::onPaste(bool isVoice)
 {
     qDebug() << "Paste operation requested, isVoice:" << isVoice;
+    if (TiptapChannelBridge::instance()->debugEnabled() && hasTiptapVoiceBlockClipboard()) {
+        if (pasteTiptapVoiceBlockFromClipboard()) {
+            qInfo() << "Tiptap voice block paste handled directly";
+            return;
+        }
+    }
+
     if (isVoice) {
         qInfo() << "Paste operation requested, isVoice is true";
 #ifdef USE_QT5

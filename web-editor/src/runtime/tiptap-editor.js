@@ -35,6 +35,26 @@ function createTiptapEditor(element) {
 const editor = createTiptapEditor(document.getElementById('app'))
 if (typeof window !== 'undefined') {
   window.__dvnTiptapEditor = editor
+  window.__dvnTiptapContextTranscript = null
+  window.__dvnTiptapSelectContextAll = function () {
+    const transcript = window.__dvnTiptapContextTranscript
+    if (transcript && document.contains(transcript)) {
+      const range = document.createRange()
+      range.selectNodeContents(transcript)
+      const selection = window.getSelection()
+      selection.removeAllRanges()
+      selection.addRange(range)
+      return true
+    }
+    return editor.chain().selectAll().run()
+  }
+  window.__dvnTiptapSelectVoiceBlockFromElement = function (element) {
+    const voiceBox = element && element.closest ? element.closest('.voiceBox') : null
+    if (!voiceBox || !document.contains(voiceBox)) return false
+    const pos = editor.view.posAtDOM(voiceBox, 0)
+    if (pos == null || pos < 0) return false
+    return editor.chain().focus().setNodeSelection(pos).run()
+  }
 }
 const toolbar = createFormatToolbar(editor, document.getElementById('toolbar-host'))
 
