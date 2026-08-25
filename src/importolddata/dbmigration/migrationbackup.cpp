@@ -14,6 +14,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QStandardPaths>
+#include <QVariant>
 
 #include <cerrno>       // errno
 #include <cstdio>       // std::rename

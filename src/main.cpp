@@ -27,13 +27,6 @@
 #include <QCommandLineParser>
 #include <QTimer>
 
-// 条件编译：根据 Qt 版本包含不同的 WebEngine 头文件
-#ifdef USE_QT5
-#include <QtWebEngine/QtWebEngine>
-#else
-#include <QtWebEngineQuick/qtwebenginequickglobal.h>
-#endif
-
 #include <DApplication>
 #include <DGuiApplicationHelper>
 #include <DLog>
@@ -108,21 +101,16 @@ int main(int argc, char *argv[])
     qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "7777");
     VNoteMainManager::instance()->initQMLRegister();
     
-    // 条件编译：根据 Qt 版本使用不同的 WebEngine 初始化方法
-#ifdef USE_QT5
-    QtWebEngine::initialize();
-#else
-    QtWebEngineQuick::initialize();
-#endif
-    
     ImageProvider *imageProvider = ImageProvider::instance();
-    qInfo() << "QML and WebEngine initialized successfully";
+    qInfo() << "QML types initialized successfully";
 
     app->loadTranslator();
     app->setApplicationDisplayName(QObject::tr("deepin-voice-note"));
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     engine.addImageProvider("Provider", imageProvider);
+    engine.rootContext()->setContextProperty(
+        "hasExistingFolders", VNoteMainManager::hasExistingFolders());
     QObject::connect(
         &engine,
         &QQmlApplicationEngine::objectCreated,
@@ -137,9 +125,6 @@ int main(int argc, char *argv[])
     engine.load(url);
     qInfo() << "QML engine loaded successfully";
 
-    VNoteMainManager::instance()->initNote();
-    qInfo() << "Note manager initialized";
-
     // Tiptap 数据迁移仍处于调试验证阶段，只允许在 DVN_TIPTAP_DEBUG=1 下启动。
     // 未开启调试开关时，禁止展示迁移页、备份、扫描或写回 Summernote 数据。
     if (TiptapChannelBridge::instance()->debugEnabled()) {
@@ -152,8 +137,5 @@ int main(int argc, char *argv[])
     DLogManager::registerFileAppender();
     qInfo() << "Log system initialized";
 
-    VTextSpeechAndTrManager::instance()->checkUosAiExists();
-    qInfo() << "UOS AI check completed";
-    
     return app->exec();
 }

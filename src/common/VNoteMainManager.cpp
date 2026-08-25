@@ -24,11 +24,14 @@
 #include "handler/voice_to_text_task_manager.h"
 #include "audio/recording_curves.h"
 #include "dbus/VoiceNoteDBusService.h"
+#include "db/vnotedbmanager.h"
 
 #include <QThreadPool>
 #include <QQmlApplicationEngine>
 // 条件编译：根据 Qt 版本包含不同的 WebEngine 头文件
-#ifndef USE_QT5
+#ifdef USE_QT5
+#include <QtWebEngine/QtWebEngine>
+#else
 #include <QtWebEngineQuick/qtwebenginequickglobal.h>
 #endif
 #include <QStringList>
@@ -45,6 +48,8 @@
 #include <QImageReader>
 #include <QTimer>
 #include <QSet>
+#include <QSqlQuery>
+#include <QSqlError>
 
 #include <DSysInfo>
 
@@ -90,6 +95,41 @@ VNoteMainManager *VNoteMainManager::instance()
     qInfo() << "VNoteMainManager instance requested";
     static VNoteMainManager instance;
     return &instance;
+}
+
+bool VNoteMainManager::hasExistingFolders()
+{
+    QSqlQuery query(VNoteDbManager::instance()->getVNoteDb());
+    if (!query.exec(QStringLiteral("SELECT 1 FROM %1 LIMIT 1")
+                    .arg(VNoteDbManager::FOLDER_TABLE_NAME))) {
+        qWarning() << "Failed to check existing folders:" << query.lastError().text();
+        return false;
+    }
+
+    return query.next();
+}
+
+void VNoteMainManager::prepareWorkspace()
+{
+    if (m_webEngineInitialized)
+        return;
+
+#ifdef USE_QT5
+    QtWebEngine::initialize();
+#else
+    QtWebEngineQuick::initialize();
+#endif
+    m_webEngineInitialized = true;
+}
+
+void VNoteMainManager::start()
+{
+    if (m_initialized)
+        return;
+
+    m_initialized = true;
+    initNote();
+    VTextSpeechAndTrManager::instance()->checkUosAiExists();
 }
 
 void VNoteMainManager::initNote()
@@ -247,6 +287,7 @@ void VNoteMainManager::onVNoteFoldersLoaded()
     //     pFileCleanupWorker->setAutoDelete(true);
     //     pFileCleanupWorker->setObjectName("FileCleanupWorker");
     //     QThreadPool::globalInstance()->start(pFileCleanupWorker);
+    emit initialDataReady();
     qInfo() << "VNote folders loaded handling finished";
 }
 
