@@ -81,6 +81,23 @@ test('toolbar is always visible once mounted', () => {
 })
 
 
+test('toolbar icons use imported assets or sanitized SVG nodes', () => {
+  const { host, editor } = createEditorWithToolbar()
+  const toolbar = host.querySelector('[data-testid="format-toolbar"]')
+  for (const format of ['bulletList', 'orderedList', 'taskList', 'insertVoice', 'insertImage']) {
+    const button = toolbar.querySelector(`button[data-format="${format}"]`)
+    assert.ok(button, `${format} button should exist`)
+    const icon = button.querySelector('.tiptap-icon')
+    assert.ok(icon, `${format} should render an icon node`)
+    assert.ok(icon.querySelector('svg, img'), `${format} should render an icon node`)
+    assert.equal(icon.querySelector('script'), null, `${format} must not render scripts`)
+    assert.equal(icon.querySelector('foreignObject'), null, `${format} must not render foreign objects`)
+  }
+
+  editor.destroy()
+})
+
+
 test('toolbar overflow moves buttons dynamically by available width', () => {
   const { host, editor, window } = createEditorWithToolbar()
   const toolbar = host.querySelector('[data-testid="format-toolbar"]')
@@ -103,6 +120,13 @@ test('toolbar overflow moves buttons dynamically by available width', () => {
   window.dispatchEvent(new window.Event('resize'))
   let overflowCount = toolbar.querySelectorAll('.tiptap-overflow-panel [data-format]').length
   assert.ok(overflowCount > 0, 'narrow width should move trailing buttons into more panel')
+  const listOverflowStates = ['bulletList', 'orderedList', 'taskList'].map((format) => Boolean(
+    toolbar.querySelector(`button[data-format="${format}"]`)?.closest('.tiptap-overflow-panel'),
+  ))
+  assert.equal(new Set(listOverflowStates).size, 1, 'list and task buttons should overflow as one semantic group')
+  const moreButton = toolbar.querySelector('button[data-format="more"]')
+  assert.ok(moreButton, 'more button should exist when the toolbar overflows')
+  assert.ok(moreButton.querySelector('img'), 'more should render an image asset')
 
   hostWidth = 360
   window.dispatchEvent(new window.Event('resize'))

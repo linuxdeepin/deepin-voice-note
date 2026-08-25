@@ -2,5 +2,12 @@
     <qresource prefix="/">
         <file alias="tiptap-editor.html">../web-editor/dist/tiptap-editor.html</file>
         <file alias="tiptap-editor.js">../web-editor/dist/tiptap-editor.js</file>
+        <file alias="icons/bullet-dot.svg">../web-editor/dist/icons/bullet-dot.svg</file>
+        <file alias="icons/bullet-number.svg">../web-editor/dist/icons/bullet-number.svg</file>
+        <file alias="icons/image.svg">../web-editor/dist/icons/image.svg</file>
+        <file alias="icons/mic.svg">../web-editor/dist/icons/mic.svg</file>
+        <file alias="icons/marker.svg">../web-editor/dist/icons/marker.svg</file>
+        <file alias="icons/more.svg">../web-editor/dist/icons/more.svg</file>
+        <file alias="icons/task.svg">../web-editor/dist/icons/task.svg</file>
     </qresource>
 </RCC>
