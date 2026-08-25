@@ -6,6 +6,12 @@ import Image from '@tiptap/extension-image'
 export const ImageBlock = Image.extend({
   name: 'image',
 
+  addOptions() {
+    return {
+      ...this.parent?.(),
+      inline: true,
+    }
+  },
   addAttributes() {
     return {
       ...this.parent?.(),

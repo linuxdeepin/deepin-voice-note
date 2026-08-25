@@ -20,6 +20,7 @@ import {
   isSafeImageRelPath,
 } from '../schema/document-envelope.js'
 import { parseImageInfo, parseVoiceInfo, resolveResourceUrl } from './tiptap-adapter.js'
+import { TextSelection } from '@tiptap/pm/state'
 import { replaceEditorContentWithoutHistory } from './undo-redo.js'
 
 const CONTENT_CHANGE_DEBOUNCE_MS = 200
@@ -165,6 +166,67 @@ function dispatchVoice(voiceId, handlerName, ...args) {
   }
 }
 
+function setCursorAfterInlineImage(tr, paragraphStart, imageNodeSize = 1) {
+  return tr.setSelection(TextSelection.create(tr.doc, paragraphStart + 1 + imageNodeSize)).scrollIntoView()
+}
+
+function isCursorAfterSoleImageInParagraph(selection) {
+  if (!selection.empty) return false
+  const $from = selection.$from
+  if ($from.parent.type.name !== 'paragraph') return false
+  if ($from.parent.childCount !== 1) return false
+  const onlyChild = $from.parent.child(0)
+  return onlyChild.type.name === 'image' && $from.parentOffset === onlyChild.nodeSize
+}
+
+export function wrapTopLevelImagesInParagraphs(doc) {
+  if (!doc || doc.type !== 'doc' || !Array.isArray(doc.content)) return doc
+  let changed = false
+  const content = doc.content.map((node) => {
+    if (node?.type !== 'image') return node
+    changed = true
+    return { type: 'paragraph', content: [node] }
+  })
+  return changed ? { ...doc, content } : doc
+}
+
+export function insertImageWithLegacyFlow(editor, attrs) {
+  // Summernote stores pasted images as <p><img>...</p> and then selects the
+  // range after the img.  Keep the caret in the same paragraph after the image,
+  // but start a new paragraph when repeatedly inserting images so images do not
+  // collapse onto the same visual line.
+  try {
+    const { state } = editor
+    const { selection, schema } = state
+    const image = schema.nodes.image.create(attrs)
+    let tr = state.tr
+
+    if (isCursorAfterSoleImageInParagraph(selection)) {
+      const insertPos = selection.$from.after(selection.$from.depth)
+      const paragraph = schema.nodes.paragraph.create(null, image)
+      tr = tr.insert(insertPos, paragraph)
+      tr = setCursorAfterInlineImage(tr, insertPos, image.nodeSize)
+    } else if (selection.empty && selection.$from.parent.type.name === 'paragraph' && selection.$from.parent.content.size === 0) {
+      const paragraphStart = selection.$from.before(selection.$from.depth)
+      const paragraphEnd = selection.$from.after(selection.$from.depth)
+      const paragraph = schema.nodes.paragraph.create(null, image)
+      tr = tr.replaceWith(paragraphStart, paragraphEnd, paragraph)
+      tr = setCursorAfterInlineImage(tr, paragraphStart, image.nodeSize)
+    } else {
+      const insertFrom = selection.from
+      tr = tr.replaceSelectionWith(image, false)
+      tr = tr.setSelection(TextSelection.create(tr.doc, insertFrom + image.nodeSize)).scrollIntoView()
+    }
+
+    editor.view.dispatch(tr)
+    editor.view.focus()
+    return true
+  } catch (err) {
+    console.error('[tiptap] insert image failed:', err)
+    return false
+  }
+}
+
 function colorWithAlpha(color, alpha, fallback) {
   if (typeof color !== 'string' || color.trim().length === 0) return fallback
   const value = color.trim()
@@ -282,8 +344,15 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   // 主题联动：工具栏 / 语音块 / 滚动条 / 取色板 / 图片自绘菜单
   const isDark = theme === 'dark'
   root.style.setProperty('--dvn-panel-bg', isDark ? '#252525' : '#ffffff')
+  root.style.setProperty('--dvn-toolbar-bg', isDark ? 'rgba(42, 42, 42, 1)' : 'rgba(245, 245, 245, 1)')
+  root.style.setProperty('--dvn-toolbar-border-soft', isDark ? 'rgba(0, 0, 0, 0.30)' : 'rgba(0, 0, 0, 0.04)')
   root.style.setProperty('--dvn-panel-border', isDark ? '#444444' : '#cccccc')
   root.style.setProperty('--dvn-toolbar-border', isDark ? '#3d3d3d' : '#d0d0d0')
+  root.style.setProperty('--dvn-toolbar-fg', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(63, 63, 63, 1)')
+  root.style.setProperty('--dvn-toolbar-separator', isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)')
+  root.style.setProperty('--dvn-scrollbar-thumb', isDark ? 'rgba(255, 255, 255, 0.20)' : 'rgba(0, 0, 0, 0.30)')
+  root.style.setProperty('--dvn-scrollbar-thumb-hover', isDark ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.50)')
+  root.style.setProperty('--dvn-scrollbar-thumb-active', isDark ? 'rgba(255, 255, 255, 0.30)' : 'rgba(0, 0, 0, 0.40)')
   root.style.setProperty('--dvn-hover-bg', isDark ? '#3d3d3d' : '#f0f0f0')
   root.style.setProperty('--dvn-clear-btn-bg', isDark ? '#2d2d2d' : '#fafafa')
   root.style.setProperty('--dvn-active-outline', highlightColor || '#0086cc')
@@ -408,9 +477,6 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
       }))
       // voiceBlock 不注册写绝对路径的 load resolver —— 运行态由 NodeView 自行解析。
 
-      // --- 事件 1：加载就绪 ---
-      bridge.jsEditorReady()
-
       // C++→JS：加载 envelope（loadEnvelopeRequested signal）
       bridge.loadEnvelopeRequested.connect(function (json) {
         let envelope
@@ -419,7 +485,7 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
         } catch {
           envelope = createEnvelope(createEmptyDoc())
         }
-        const content = envelope?.content || createEmptyDoc()
+        const content = wrapTopLevelImagesInParagraphs(envelope?.content || createEmptyDoc())
         const resolved = walkResolve(content, loadResolvers)
         replaceEditorContentWithoutHistory(editor, resolved)
       })
@@ -476,10 +542,7 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
       bridge.insertImage.connect(function (imageInfoJson) {
         const result = parseImageInfo(imageInfoJson, resourceBaseUrl)
         if (result.ok) {
-          const inserted = editor.chain().focus().insertContent({
-            type: 'image',
-            attrs: result.attrs,
-          }).run()
+          const inserted = insertImageWithLegacyFlow(editor, result.attrs)
           if (!inserted) {
             bridge.jsInsertImageFailed('editor rejected image node insertion')
           }
@@ -500,6 +563,10 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
           bridge.jsInsertVoiceBlockFailed(result.reason)
         }
       })
+
+      // 所有 C++→JS 信号先 connect 完成，再通知 C++ editorReady。
+      // 否则 C++ 在 editorReady 回调里立即下发字体列表/内容时，前端可能还没绑定 signal。
+      bridge.jsEditorReady()
 
       resolve(bridge)
     })

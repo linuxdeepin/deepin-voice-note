@@ -230,6 +230,11 @@ void TiptapChannelBridge::jsRequestPickImage()
     emit pickImageRequested();
 }
 
+void TiptapChannelBridge::jsRequestRecordVoice()
+{
+    emit recordVoiceRequested();
+}
+
 void TiptapChannelBridge::jsRequestViewPicture(const QString &url)
 {
     const QString localPath = normalizePicturePath(url);

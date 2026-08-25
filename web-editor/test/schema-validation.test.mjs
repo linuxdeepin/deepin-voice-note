@@ -180,7 +180,7 @@ test('Images allow http, https and relative URLs', () => {
 })
 
 
-test('Envelope validation accepts a list item with a paragraph before heading and image blocks', () => {
+test('Envelope validation accepts a list item with paragraph-contained image', () => {
   const result = validateEnvelope(createEnvelope({
     type: 'doc',
     content: [
@@ -196,7 +196,10 @@ test('Envelope validation accepts a list item with a paragraph before heading an
                 attrs: { level: 2 },
                 content: [{ type: 'text', text: 'before' }],
               },
-              { type: 'image', attrs: { src: 'images/a.png' } },
+              {
+                type: 'paragraph',
+                content: [{ type: 'image', attrs: { src: 'images/a.png' } }],
+              },
               {
                 type: 'heading',
                 attrs: { level: 2 },
@@ -212,7 +215,7 @@ test('Envelope validation accepts a list item with a paragraph before heading an
   assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2))
 })
 
-test('Envelope validation rejects image nodes inside paragraphs', () => {
+test('Envelope validation accepts image nodes inside paragraphs', () => {
   const result = validateEnvelope(createEnvelope({
     type: 'doc',
     content: [
@@ -226,12 +229,11 @@ test('Envelope validation rejects image nodes inside paragraphs', () => {
     ],
   }))
 
-  assert.equal(result.ok, false)
-  assert.equal(result.errors.some(error => error.code === 'schema-validation-failed'), true)
+  assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2))
 })
 
 
-test('Envelope validation rejects image nodes inside headings', () => {
+test('Envelope validation accepts image nodes inside headings', () => {
   const result = validateEnvelope(createEnvelope({
     type: 'doc',
     content: [
@@ -246,8 +248,7 @@ test('Envelope validation rejects image nodes inside headings', () => {
     ],
   }))
 
-  assert.equal(result.ok, false)
-  assert.equal(result.errors.some(error => error.code === 'schema-validation-failed'), true)
+  assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2))
 })
 
 test('Envelope validation rejects documents beyond the maximum node depth', () => {

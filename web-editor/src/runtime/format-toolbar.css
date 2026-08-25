@@ -1,0 +1,248 @@
+/* SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
+   SPDX-License-Identifier: GPL-3.0-or-later */
+
+.tiptap-toolbar {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0;
+    width: max-content;
+    max-width: calc(100% - 20px);
+    min-height: 40px;
+    box-sizing: border-box;
+    margin: 0 0 0 10px;
+    padding: 4px 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    color: var(--dvn-toolbar-fg, #3f3f3f);
+    overflow: visible;
+    position: relative;
+    font-family: "Source Han Sans SC", "Noto Sans CJK SC", Helvetica, Arial, sans-serif;
+    user-select: none;
+}
+
+.tiptap-toolbar::-webkit-scrollbar {
+    display: none;
+}
+
+.tiptap-toolbar-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tiptap-toolbar-separator {
+    width: 1px;
+    height: 20px;
+    margin: 0 5px;
+    background: var(--dvn-toolbar-separator, rgba(0, 0, 0, 0.08));
+}
+
+.tiptap-toolbar button,
+.tiptap-toolbar select {
+    height: 30px;
+    box-sizing: border-box;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    outline: none;
+    font-size: 14px;
+}
+
+.tiptap-toolbar button {
+    min-width: 30px;
+    padding: 0 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.tiptap-toolbar button:hover,
+.tiptap-toolbar select:hover,
+.tiptap-toolbar button.is-active,
+.tiptap-toolbar button[aria-pressed="true"] {
+    background: var(--dvn-hover-bg, rgba(0, 0, 0, 0.06));
+}
+
+.tiptap-toolbar button:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.tiptap-toolbar select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 0 18px 0 5px;
+    cursor: pointer;
+    background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position: calc(100% - 10px) 13px, calc(100% - 6px) 13px;
+    background-size: 4px 4px, 4px 4px;
+    background-repeat: no-repeat;
+}
+
+.tiptap-toolbar select[data-control="heading"] {
+    width: 58px;
+}
+
+.tiptap-toolbar select[data-control="fontFamily"] {
+    width: 74px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tiptap-toolbar select[data-control="fontSize"] {
+    width: 40px;
+}
+
+.tiptap-format-bold {
+    font-weight: 700;
+    font-size: 24px !important;
+}
+
+.tiptap-format-italic {
+    font-style: italic;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 24px !important;
+}
+
+.tiptap-format-underline {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    font-size: 23px !important;
+}
+
+.tiptap-format-strike {
+    text-decoration: line-through;
+    font-size: 23px !important;
+}
+
+.tiptap-color-picker {
+    position: relative;
+    display: inline-flex;
+}
+
+.tiptap-color-button {
+    gap: 2px;
+}
+
+.tiptap-color-icon {
+    position: relative;
+    min-width: 18px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.tiptap-color-icon::after {
+    content: '';
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 1px;
+    height: 3px;
+    background: var(--dvn-current-fore-color, #e91e63);
+}
+
+.tiptap-color-button[data-format="backColor"] .tiptap-color-icon::after {
+    background: var(--dvn-current-back-color, #0081ff);
+}
+
+.tiptap-color-arrow {
+    font-size: 12px;
+    line-height: 1;
+    margin-left: 1px;
+}
+
+.tiptap-color-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    grid-template-columns: repeat(8, 18px);
+    gap: 2px;
+    background: var(--dvn-panel-bg, #fff);
+    border: 1px solid var(--dvn-panel-border, #ccc);
+    padding: 6px;
+    z-index: 20;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+.tiptap-color-panel button[data-color] {
+    width: 18px;
+    min-width: 18px;
+    height: 18px;
+    border: 1px solid #ddd;
+    border-radius: 0;
+    padding: 0;
+}
+
+.tiptap-color-panel button[data-action] {
+    grid-column: 1 / -1;
+    width: 100%;
+    height: 24px;
+    min-width: 0;
+    margin-top: 2px;
+    border: 1px solid var(--dvn-panel-border, #ccc);
+    background: var(--dvn-clear-btn-bg, #fafafa);
+    font-size: 12px;
+}
+
+.tiptap-icon {
+    width: 22px;
+    height: 22px;
+    display: inline-block;
+    fill: currentColor;
+    stroke: currentColor;
+}
+
+
+.tiptap-more-button {
+    min-width: 30px !important;
+    width: 30px !important;
+    height: 30px !important;
+    margin-left: 0;
+    border-radius: var(--dvn-menu-item-radius, 6px) !important;
+    background: var(--dvn-hover-bg, rgba(0, 0, 0, 0.06)) !important;
+    color: var(--highlightColor, #007AFF) !important;
+    font-size: 16px !important;
+    letter-spacing: 1px;
+}
+
+.tiptap-overflow-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 30;
+    align-items: center;
+    gap: 4px;
+    min-height: 40px;
+    box-sizing: border-box;
+    padding: 4px 6px;
+    border: 1px solid var(--dvn-toolbar-border-soft, rgba(0, 0, 0, 0.04));
+    border-radius: var(--dvn-menu-radius, 12px);
+    background: var(--dvn-toolbar-bg, rgba(245, 245, 245, 1));
+    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.10);
+    white-space: nowrap;
+}
+
+.tiptap-overflow-panel.is-open {
+    display: flex;
+}
+
+.tiptap-overflow-panel .tiptap-toolbar-separator {
+    margin: 0 7px;
+}
+
+.tiptap-hidden-command {
+    display: none !important;
+}
