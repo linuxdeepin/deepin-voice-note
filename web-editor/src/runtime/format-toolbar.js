@@ -2,9 +2,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import toolbarCss from './format-toolbar.css?inline'
-import bulletDotIconSvg from './icons/bullet-dot.svg?raw'
-import bulletNumberIconSvg from './icons/bullet-number.svg?raw'
-import moreIconSvg from './icons/more.svg?raw'
+import bulletDotIconUrl from './icons/bullet-dot.svg?url'
+import bulletNumberIconUrl from './icons/bullet-number.svg?url'
+import moreIconUrl from './icons/more.svg?url'
+import micIconUrl from './icons/mic.svg?url'
+import imageIconUrl from './icons/image.svg?url'
+import markerIconUrl from './icons/marker.svg?url'
+import taskListIconUrl from './icons/task.svg?url'
 import { FORE_COLORS, BACK_COLORS, FONT_SIZES, toPxSize } from './format-palette.js'
 import { canIndentActiveListItem, canOutdentActiveListItem, liftActiveListItem, sinkActiveListItem } from './list-behavior.js'
 
@@ -43,18 +47,69 @@ function injectToolbarStyles() {
   document.head.appendChild(style)
 }
 
+const ICON_ASSET_URLS = Object.freeze({
+  bulletList: bulletDotIconUrl,
+  orderedList: bulletNumberIconUrl,
+  more: moreIconUrl,
+  mic: micIconUrl,
+  image: imageIconUrl,
+  marker: markerIconUrl,
+  taskList: taskListIconUrl,
+})
+
+const INLINE_ICON_SOURCES = Object.freeze({
+  taskList: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" fill="none" stroke-width="2"/><path d="M7 12.5l3 3L17 8" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  mic: '<svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="12" rx="4" fill="currentColor" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8" fill="none" stroke-width="2" stroke-linecap="round"/></svg>',
+  image: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" ry="2" fill="none" stroke-width="2"/><circle cx="8" cy="10" r="2" stroke="none"/><path d="M5 18l5.5-5.5 3.5 3.5 2-2 3 4" fill="none" stroke-width="2" stroke-linejoin="round"/></svg>',
+  marker: '<svg viewBox="0 0 24 24"><path d="M15.5 3.5l5 5-9 9H6.5l0-5 9-9z" fill="currentColor" stroke="none"/><path d="M4 20h16" fill="none" stroke-width="2" stroke-linecap="round"/></svg>',
+})
+
+// SVG resources are compiled into the bundle, but they still need to be
+// attached as DOM nodes instead of being injected as an HTML string.
+function parseSvgSource(source) {
+  if (typeof source !== 'string' || source.length === 0) return null
+  const Parser = document.defaultView?.DOMParser || globalThis.DOMParser
+  if (typeof Parser !== 'function') return null
+
+  const parsed = new Parser().parseFromString(source, 'image/svg+xml')
+  const root = parsed?.documentElement
+  if (!root || root.localName !== 'svg') return null
+
+  const svg = document.importNode(root, true)
+  // The toolbar icons are local static resources. Keep the parser boundary
+  // defensive in case an asset is accidentally replaced with active content.
+  for (const element of [svg, ...svg.querySelectorAll('*')]) {
+    if (element.localName === 'script' || element.localName === 'foreignObject') {
+      element.remove()
+      continue
+    }
+    for (const attribute of [...element.attributes]) {
+      if (/^on/i.test(attribute.name)
+        || attribute.name === 'href'
+        || attribute.name === 'xlink:href') {
+        element.removeAttribute(attribute.name)
+      }
+    }
+  }
+  return svg
+}
+
 function createSvgIcon(name) {
   const span = createEl('span', { class: 'tiptap-icon', 'aria-hidden': 'true' })
-  const icons = {
-    bulletList: bulletDotIconSvg,
-    orderedList: bulletNumberIconSvg,
-    taskList: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" fill="none" stroke-width="2"/><path d="M7 12.5l3 3L17 8" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    mic: '<svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="12" rx="4" fill="currentColor" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8" fill="none" stroke-width="2" stroke-linecap="round"/></svg>',
-    image: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" ry="2" fill="none" stroke-width="2"/><circle cx="8" cy="10" r="2" stroke="none"/><path d="M5 18l5.5-5.5 3.5 3.5 2-2 3 4" fill="none" stroke-width="2" stroke-linejoin="round"/></svg>',
-    marker: '<svg viewBox="0 0 24 24"><path d="M15.5 3.5l5 5-9 9H6.5l0-5 9-9z" fill="currentColor" stroke="none"/><path d="M4 20h16" fill="none" stroke-width="2" stroke-linecap="round"/></svg>',
-    more: moreIconSvg,
+  const assetUrl = ICON_ASSET_URLS[name]
+  if (assetUrl) {
+    const image = createEl('img', {
+      src: assetUrl,
+      alt: '',
+      draggable: 'false',
+      'aria-hidden': 'true',
+    })
+    span.appendChild(image)
+    return span
   }
-  span.innerHTML = icons[name] || ''
+
+  const svg = parseSvgSource(INLINE_ICON_SOURCES[name])
+  if (svg) span.appendChild(svg)
   return span
 }
 
@@ -402,6 +457,12 @@ export function createFormatToolbar(editor, host) {
     { group: 'resource', node: imageBtn },
   ]
   const overflowSet = new Set()
+  // Keep list actions and resource actions together. They are the primary
+  // editing/insertion controls; folding image/voice first makes those actions
+  // appear to be missing even though their buttons are still in the overflow.
+  const listUnits = overflowUnits.filter((unit) => unit.group === 'list')
+  const resourceUnits = overflowUnits.filter((unit) => unit.group === 'resource')
+  const overflowCandidates = overflowUnits.filter((unit) => unit.group !== 'list' && unit.group !== 'resource')
 
   function removeAllChildren(node) {
     while (node.firstChild) node.removeChild(node.firstChild)
@@ -492,11 +553,23 @@ export function createFormatToolbar(editor, host) {
     renderOverflowLayout()
     if (measuredToolbarWidth() <= maxToolbarWidth + 1) return
 
-    // 从右向左逐个按钮迁移到更多浮层，直到主栏能放下为止。
-    for (let index = overflowUnits.length - 1; index >= 0; index--) {
-      overflowSet.add(overflowUnits[index])
+    // 先折叠普通格式和颜色按钮，尽量让列表和插入控件留在主栏。
+    for (let index = overflowCandidates.length - 1; index >= 0; index--) {
+      overflowSet.add(overflowCandidates[index])
       renderOverflowLayout()
       if (measuredToolbarWidth() <= maxToolbarWidth + 1) break
+    }
+
+    // 仍然不足时，先整体折叠录音/图片控件，再整体折叠列表控件。
+    // 这样不会出现图片、语音或待办按钮单独消失的情况。
+    if (measuredToolbarWidth() > maxToolbarWidth + 1) {
+      for (const unit of resourceUnits) overflowSet.add(unit)
+      renderOverflowLayout()
+    }
+
+    if (measuredToolbarWidth() > maxToolbarWidth + 1) {
+      for (const unit of listUnits) overflowSet.add(unit)
+      renderOverflowLayout()
     }
   }
 
@@ -599,7 +672,7 @@ export function createFormatToolbar(editor, host) {
       onRecordVoice = typeof fn === 'function' ? fn : null
     },
     setFontList(fonts, defaultFont) {
-      fontSelect.innerHTML = ''
+      fontSelect.replaceChildren()
       const normalized = Array.isArray(fonts)
         ? fonts.filter((name, index, array) => typeof name === 'string' && name.trim() && array.indexOf(name) === index)
         : []

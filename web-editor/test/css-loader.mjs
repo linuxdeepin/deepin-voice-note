@@ -15,6 +15,13 @@ export async function load(url, context, nextLoad) {
       shortCircuit: true,
     }
   }
+  if (url.endsWith('?url')) {
+    return {
+      format: 'module',
+      source: `export default ${JSON.stringify(new URL(url.slice(0, -4)).href)}`,
+      shortCircuit: true,
+    }
+  }
   if (url.split('?')[0].endsWith('.css')) {
     return {
       format: 'module',

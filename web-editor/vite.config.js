@@ -40,13 +40,16 @@ export default defineConfig({
     outDir: resolve(__dirname, 'dist'),
     emptyOutDir: true,
     cssCodeSplit: false,
-    assetsInlineLimit: 100000000,
+    // Keep toolbar SVGs as external files. Qt WebEngine does not reliably
+    // render SVG data URLs used by <img>; external paths also let designers
+    // replace the asset without touching JavaScript.
+    assetsInlineLimit: 0,
     rollupOptions: {
       input: resolve(__dirname, 'src/runtime/tiptap-editor.html'),
       output: {
         entryFileNames: 'tiptap-editor.js',
         chunkFileNames: 'tiptap-editor.js',
-        assetFileNames: 'tiptap-editor.[ext]',
+        assetFileNames: 'icons/[name][extname]',
         inlineDynamicImports: true,
       },
     },
