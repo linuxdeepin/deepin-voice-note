@@ -12,12 +12,16 @@ import "../" as VNoteComponents
 import "../dialog"
 import org.deepin.dtk 1.0
 
-ApplicationWindow {
+Item {
     id: rootWindow
 
+    anchors.fill: parent
+
+    property bool active: Window.window ? Window.window.active : false
     property int createFolderBtnHeight: 30
     property bool isRecording: webEngineView.isRecording
     property bool isRecordingAudio: false
+    property bool layoutInitialized: false
     property bool isVoiceToText: false
     property int leftAreaMaxWidth: 300
     property int leftAreaMinWidth: 125
@@ -53,43 +57,19 @@ ApplicationWindow {
         }
     }
 
-    DWindow.alphaBufferSize: 8
-    DWindow.enabled: true
-    color: "transparent"
-    flags: Qt.Window | Qt.WindowMinMaxButtonsHint | Qt.WindowCloseButtonHint | Qt.WindowTitleHint
-    height: 681
-    minimumHeight: windowMiniHeight
-    minimumWidth: windowMiniWidth
-    visible: true
-    width: 1096
+    function stopAndClose() {
+        webEngineView.stopAndClose();
+    }
 
     Component.onCompleted: {
-        x = Screen.width / 2 - width / 2;
-        y = Screen.height / 2 - height / 2;
-        checkAndCreateDataPath();
+        Qt.callLater(function() {
+            layoutInitialized = true;
+        });
     }
-    onClosing: function(close) {
-        close.accepted = false;
-        if (isRecording) {
-            close.accepted = false;
-            messageDialogLoader.showDialog(VNoteMessageDialogHandler.AbortRecord, ret => {
-                if (ret) {
-                    webEngineView.stopAndClose();
-                    VNoteMainManager.forceExit(true);
-                }
-            });
-        } else {
-            if (VNoteMainManager.isVoiceToText()) {
-                messageDialogLoader.showDialog(VNoteMessageDialogHandler.AborteAsr, ret => {
-                    if (ret) {
-                        VNoteMainManager.forceExit();
-                    }
-                });
-            } else
-                VNoteMainManager.forceExit();
-        }
-    }
+
     onWidthChanged: {
+        if (!layoutInitialized)
+            return;
         if (rightBgArea.width < rightAreaMinWidth) {
             var reduce = rightAreaMinWidth - rightBgArea.width;
             if (middleBgArea.width - reduce >= middleAreaMinWidth - rightDragHandle.width) {
@@ -567,7 +547,7 @@ ApplicationWindow {
     // 全窗级毛玻璃：左侧文件夹栏 + 笔记列表区域透明可见，列表项保持实色卡片
     VNoteComponents.SidebarBlurBackground {
         anchors.fill: parent
-        windowControl: rootWindow
+        windowControl: Window.window
         z: 0
     }
 

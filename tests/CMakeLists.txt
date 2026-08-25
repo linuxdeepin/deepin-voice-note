@@ -37,7 +37,9 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -z relro -z now -z noexecstack -pie")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fstack-protector-all")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -fstack-protector-all")
 
+add_definitions(-DUSE_QT5)
 find_package(Qt5Test REQUIRED)
+find_package(Qt5 5.15 REQUIRED COMPONENTS WebEngine)
 find_package(GTest REQUIRED)
 find_package(Qt5Svg REQUIRED)
 find_package(Qt5Xml REQUIRED)
@@ -90,6 +92,7 @@ target_link_libraries(${PROJECT_NAME_TEST}
     Qt5::Multimedia
     Qt5::Test
     Qt5::WebChannel
+    Qt5::WebEngine
     Qt5::WebEngineWidgets
     ${Qt5Svg_LIBRARIES}
     ${Qt5Xml_LIBRARIES}
