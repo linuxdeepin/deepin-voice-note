@@ -58,7 +58,12 @@ function insertText(editor, text) {
 }
 
 // 选中首个段落内的全部文本（跳过文档边界位置 0），对 mark 与块级 toggle 均可用
+function markEditorFocused(editor) {
+  editor.isFocused = true
+}
+
 function selectText(editor) {
+  markEditorFocused(editor)
   const size = editor.state.doc.content.size
   editor.chain().focus().setTextSelection({ from: 1, to: Math.max(1, size - 1) }).run()
 }
@@ -274,10 +279,10 @@ test('setFontList populates the font family dropdown', () => {
 })
 
 // ---------------------------------------------------------------------------
-// 激活态随光标同步
+// 激活态随显式选区同步
 // ---------------------------------------------------------------------------
 
-test('active state syncs when selection moves into formatted text', () => {
+test('active state syncs when explicit selection moves into formatted text', () => {
   const { editor, host } = createEditorWithToolbar()
   editor.commands.setContent({
     type: 'doc',
@@ -292,12 +297,14 @@ test('active state syncs when selection moves into formatted text', () => {
 
   const btn = host.querySelector('button[data-format="bold"]')
 
-  // 光标进入加粗文本：按钮高亮
-  editor.chain().focus().setTextSelection(3).run()
+  // 显式选中加粗文本：按钮高亮
+  markEditorFocused(editor)
+  editor.chain().focus().setTextSelection(findTextRange(editor, 'bold')).run()
   assert.equal(btn.getAttribute('aria-pressed'), 'true')
 
-  // 光标进入普通文本：按钮取消高亮
-  editor.chain().focus().setTextSelection(7).run()
+  // 显式选中普通文本：按钮取消高亮
+  markEditorFocused(editor)
+  editor.chain().focus().setTextSelection(findTextRange(editor, 'plain')).run()
   assert.equal(btn.getAttribute('aria-pressed'), 'false')
   editor.destroy()
 })
@@ -391,6 +398,19 @@ function findTextEndPosition(editor, text) {
   return found
 }
 
+function findTextRange(editor, text) {
+  let found = null
+  editor.state.doc.descendants((node, pos) => {
+    if (node.isText && node.text === text) {
+      found = { from: pos, to: pos + node.nodeSize }
+      return false
+    }
+    return true
+  })
+  if (found == null) throw new Error(`text not found: ${text}`)
+  return found
+}
+
 function threeLevelListDoc(itemType = 'listItem', listType = 'bulletList') {
   const attrs = itemType === 'taskItem' ? { checked: false } : undefined
   const item = (text, extra = []) => ({
@@ -448,6 +468,7 @@ test('toolbar buttons keep editor selection on pointerdown and mousedown', () =>
       { type: 'paragraph', content: [{ type: 'text', text: 'three' }] },
     ],
   })
+  markEditorFocused(editor)
   editor.chain().focus().setTextSelection({ from: 1, to: 15 }).run()
 
   const button = host.querySelector('button[data-format="bulletList"]')
@@ -501,6 +522,7 @@ test('switching task list to bullet list drops checked, back to task list defaul
       }],
     }],
   })
+  markEditorFocused(editor)
   editor.chain().focus().setTextSelection(editor.state.doc.content.size).run()
 
   // 切换为无序列表：checked 属 taskItem 专有属性，转 listItem 时丢弃
@@ -530,6 +552,7 @@ test('indent/outdent buttons nest and unnest bullet list items', () => {
       ],
     }],
   })
+  markEditorFocused(editor)
   editor.chain().focus().setTextSelection(editor.state.doc.content.size).run()
 
   host.querySelector('button[data-format="indentList"]').click()
@@ -552,6 +575,7 @@ test('indent/outdent buttons nest and unnest task list items', () => {
       ],
     }],
   })
+  markEditorFocused(editor)
   editor.chain().focus().setTextSelection(editor.state.doc.content.size).run()
 
   host.querySelector('button[data-format="indentList"]').click()
@@ -565,6 +589,7 @@ test('indent/outdent buttons nest and unnest task list items', () => {
 test('list indentation is capped at three levels for toolbar and Tab', () => {
   const { editor, host, window } = createEditorWithToolbar()
   editor.commands.setContent(threeLevelListDoc('listItem', 'bulletList'))
+  markEditorFocused(editor)
   editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'four')).run()
 
   const indent = host.querySelector('button[data-format="indentList"]')
@@ -583,6 +608,7 @@ test('list indentation is capped at three levels for toolbar and Tab', () => {
 test('task list indentation is capped at three levels', () => {
   const { editor, host } = createEditorWithToolbar()
   editor.commands.setContent(threeLevelListDoc('taskItem', 'taskList'))
+  markEditorFocused(editor)
   editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'four')).run()
 
   const indent = host.querySelector('button[data-format="indentList"]')
@@ -645,6 +671,40 @@ test('indent/outdent buttons disabled outside list, enabled inside', () => {
   editor.destroy()
 })
 
+test('list toggle buttons are not active before editor receives focus', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'orderedList',
+      content: [{ type: 'listItem', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'x' }] }] }],
+    }],
+  })
+
+  assert.equal(host.querySelector('button[data-format="bulletList"]').getAttribute('aria-pressed'), 'false')
+  assert.equal(host.querySelector('button[data-format="orderedList"]').getAttribute('aria-pressed'), 'false')
+  assert.equal(host.querySelector('button[data-format="taskList"]').getAttribute('aria-pressed'), 'false')
+  editor.destroy()
+})
+
+test('list toggle buttons are not active for a collapsed cursor inside a list', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'orderedList',
+      content: [{ type: 'listItem', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'x' }] }] }],
+    }],
+  })
+  markEditorFocused(editor)
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'x')).run()
+
+  assert.equal(host.querySelector('button[data-format="bulletList"]').getAttribute('aria-pressed'), 'false')
+  assert.equal(host.querySelector('button[data-format="orderedList"]').getAttribute('aria-pressed'), 'false')
+  assert.equal(host.querySelector('button[data-format="taskList"]').getAttribute('aria-pressed'), 'false')
+  editor.destroy()
+})
+
 test('list toggle buttons reflect active state as selection moves', () => {
   const { editor, host } = createEditorWithToolbar()
   editor.commands.setContent({
@@ -654,7 +714,8 @@ test('list toggle buttons reflect active state as selection moves', () => {
       content: [{ type: 'listItem', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'x' }] }] }],
     }],
   })
-  editor.chain().focus().setTextSelection(editor.state.doc.content.size).run()
+  markEditorFocused(editor)
+  editor.chain().focus().setTextSelection(findTextRange(editor, 'x')).run()
 
   assert.equal(host.querySelector('button[data-format="bulletList"]').getAttribute('aria-pressed'), 'true')
   assert.equal(host.querySelector('button[data-format="orderedList"]').getAttribute('aria-pressed'), 'false')

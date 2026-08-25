@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import toolbarCss from './format-toolbar.css?inline'
+import bulletDotIconSvg from './icons/bullet-dot.svg?raw'
+import bulletNumberIconSvg from './icons/bullet-number.svg?raw'
+import moreIconSvg from './icons/more.svg?raw'
 import { FORE_COLORS, BACK_COLORS, FONT_SIZES, toPxSize } from './format-palette.js'
 import { canIndentActiveListItem, canOutdentActiveListItem, liftActiveListItem, sinkActiveListItem } from './list-behavior.js'
 
@@ -43,12 +46,13 @@ function injectToolbarStyles() {
 function createSvgIcon(name) {
   const span = createEl('span', { class: 'tiptap-icon', 'aria-hidden': 'true' })
   const icons = {
-    bulletList: '<svg viewBox="0 0 24 24"><circle cx="5" cy="6" r="1.8"/><circle cx="5" cy="12" r="1.8"/><circle cx="5" cy="18" r="1.8"/><path d="M10 6h10M10 12h10M10 18h10" stroke-width="2" stroke-linecap="round" fill="none"/></svg>',
-    orderedList: '<svg viewBox="0 0 24 24"><text x="3" y="8" font-size="6" font-family="Arial" fill="currentColor">1</text><text x="3" y="15" font-size="6" font-family="Arial" fill="currentColor">2</text><text x="3" y="22" font-size="6" font-family="Arial" fill="currentColor">3</text><path d="M11 6h9M11 13h9M11 20h9" stroke-width="2" stroke-linecap="round" fill="none"/></svg>',
+    bulletList: bulletDotIconSvg,
+    orderedList: bulletNumberIconSvg,
     taskList: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" fill="none" stroke-width="2"/><path d="M7 12.5l3 3L17 8" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     mic: '<svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="12" rx="4" fill="currentColor" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8" fill="none" stroke-width="2" stroke-linecap="round"/></svg>',
     image: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" ry="2" fill="none" stroke-width="2"/><circle cx="8" cy="10" r="2" stroke="none"/><path d="M5 18l5.5-5.5 3.5 3.5 2-2 3 4" fill="none" stroke-width="2" stroke-linejoin="round"/></svg>',
     marker: '<svg viewBox="0 0 24 24"><path d="M15.5 3.5l5 5-9 9H6.5l0-5 9-9z" fill="currentColor" stroke="none"/><path d="M4 20h16" fill="none" stroke-width="2" stroke-linecap="round"/></svg>',
+    more: moreIconSvg,
   }
   span.innerHTML = icons[name] || ''
   return span
@@ -366,7 +370,7 @@ export function createFormatToolbar(editor, host) {
     format: 'more',
     title: '更多格式',
     className: 'tiptap-more-button',
-    children: createEl('span', { 'aria-hidden': 'true' }, '•••'),
+    children: createSvgIcon('more'),
   })
   moreBtn.setAttribute('aria-haspopup', 'true')
   moreBtn.setAttribute('aria-expanded', 'false')
@@ -512,47 +516,56 @@ export function createFormatToolbar(editor, host) {
   document.addEventListener('click', onOutsideClick)
 
   // 激活态同步
+  function setPressed(btn, active) {
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false')
+    btn.classList.toggle('is-active', active)
+  }
+
   function syncActiveStates() {
+    // 工具栏按钮高亮只表达当前显式选区的格式。
+    // 页面加载/普通光标停留时 Tiptap 也会保留内部 selection，不能仅因光标所在位置或文档中存在
+    // 列表/代办就把对应按钮显示为选中态；这与 Summernote 顶部工具栏反馈保持一致。
+    const hasEditorContext = Boolean(editor.isFocused)
+    const hasSelectionContext = hasEditorContext && !editor.state.selection.empty
+
     for (const format of ['bold', 'italic', 'underline', 'strike', 'blockquote']) {
       const btn = buttons[format]
-      const active = editor.isActive(format)
-      btn.setAttribute('aria-pressed', active ? 'true' : 'false')
-      btn.classList.toggle('is-active', active)
+      setPressed(btn, hasSelectionContext && editor.isActive(format))
     }
 
     // 标题
     let activeLevel = 'p'
-    for (let level = 1; level <= 6; level++) {
-      if (editor.isActive('heading', { level })) {
-        activeLevel = String(level)
-        break
+    if (hasSelectionContext) {
+      for (let level = 1; level <= 6; level++) {
+        if (editor.isActive('heading', { level })) {
+          activeLevel = String(level)
+          break
+        }
       }
     }
     headingSelect.value = activeLevel
 
     // 字体
-    const fontFamily = editor.getAttributes('fontFamily').fontFamily
+    const fontFamily = hasSelectionContext ? editor.getAttributes('fontFamily').fontFamily : ''
     fontSelect.value = fontFamily || ''
 
     // 字号
-    const fontSize = editor.getAttributes('fontSize').fontSize
+    const fontSize = hasSelectionContext ? editor.getAttributes('fontSize').fontSize : ''
     sizeSelect.value = fontSize ? String(parseInt(fontSize, 10)) : ''
 
     // 颜色选中态
-    const foreColor = editor.getAttributes('color').color
-    const backColor = editor.getAttributes('highlight').color
+    const foreColor = hasSelectionContext ? editor.getAttributes('color').color : ''
+    const backColor = hasSelectionContext ? editor.getAttributes('highlight').color : ''
     syncColorCells(forePicker.panel, foreColor)
     syncColorCells(backPicker.panel, backColor)
 
     // 列表/待办区
     for (const format of ['bulletList', 'orderedList', 'taskList']) {
       const btn = listButtons[format]
-      const active = editor.isActive(format)
-      btn.setAttribute('aria-pressed', active ? 'true' : 'false')
-      btn.classList.toggle('is-active', active)
+      setPressed(btn, hasSelectionContext && editor.isActive(format))
     }
-    listButtons.indentList.disabled = !canIndentActiveListItem(editor)
-    listButtons.outdentList.disabled = !canOutdentActiveListItem(editor)
+    listButtons.indentList.disabled = !hasEditorContext || !canIndentActiveListItem(editor)
+    listButtons.outdentList.disabled = !hasEditorContext || !canOutdentActiveListItem(editor)
   }
 
   function syncColorCells(panel, activeColor) {
@@ -566,6 +579,8 @@ export function createFormatToolbar(editor, host) {
   }
 
   editor.on('transaction', syncActiveStates)
+  editor.on('focus', syncActiveStates)
+  editor.on('blur', syncActiveStates)
   syncActiveStates()
 
   host.appendChild(toolbar)
@@ -613,6 +628,9 @@ export function createFormatToolbar(editor, host) {
     destroy() {
       document.removeEventListener('click', onOutsideClick)
       window.removeEventListener('resize', updateOverflowMode)
+      editor.off?.('transaction', syncActiveStates)
+      editor.off?.('focus', syncActiveStates)
+      editor.off?.('blur', syncActiveStates)
       resizeObserver?.disconnect()
     },
   }
