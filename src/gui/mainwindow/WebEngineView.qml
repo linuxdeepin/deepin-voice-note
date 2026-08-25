@@ -901,6 +901,13 @@ Item {
                 selectImgLoader.item.open();
             }
         }
+        onRecordVoiceRequested: {
+            if (VNoteMainManager.isInSearchMode() || !title.recorderBtnEnable || !title.imageBtnEnable || title.isPlaying) {
+                return;
+            }
+            startRecording();
+            VoiceRecoderHandler.startRecoder();
+        }
         onViewPictureRequested: path => {
             viewPictureLoader.path = path;
             if (!viewPictureLoader.active)

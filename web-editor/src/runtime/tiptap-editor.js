@@ -29,10 +29,26 @@ function createTiptapEditor(element) {
   })
 }
 
+
+function setupTransientScrollbar() {
+  let scrollHideTimer = 0
+  const showScrollbar = () => {
+    document.body.classList.add('dvn-scrolling')
+    if (scrollHideTimer) window.clearTimeout(scrollHideTimer)
+    scrollHideTimer = window.setTimeout(() => {
+      document.body.classList.remove('dvn-scrolling')
+      scrollHideTimer = 0
+    }, 1500)
+  }
+  document.body.addEventListener('scroll', showScrollbar, { passive: true })
+  window.addEventListener('scroll', showScrollbar, { passive: true })
+}
+
 // ---------------------------------------------------------------------------
 // 启动
 // ---------------------------------------------------------------------------
 
+setupTransientScrollbar()
 const editor = createTiptapEditor(document.getElementById('app'))
 if (typeof window !== 'undefined') {
   window.__dvnTiptapEditor = editor
@@ -90,6 +106,10 @@ bindTiptapChannel(editor, undefined, {
   setVoiceBridge(bridge)
   // 工具栏图片按钮 → 宿主打开文件选择
   toolbar.setOnPickImage(() => bridge.jsRequestPickImage && bridge.jsRequestPickImage())
+  // 工具栏麦克风按钮 → 宿主录音入口
+  if (toolbar.setOnRecordVoice) {
+    toolbar.setOnRecordVoice(() => bridge.jsRequestRecordVoice && bridge.jsRequestRecordVoice())
+  }
   // 粘贴：剪贴板图片落盘往返、远程图片阻止
   setupImagePaste(editor, bridge)
   // 双击查看原图、右键菜单（查看原图 / 删除）

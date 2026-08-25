@@ -13155,6 +13155,12 @@ var Image = Node3.create({
 var index_default = Image;
 const ImageBlock = index_default.extend({
   name: "image",
+  addOptions() {
+    return {
+      ...this.parent?.(),
+      inline: true
+    };
+  },
   addAttributes() {
     return {
       ...this.parent?.(),
@@ -14745,12 +14751,22 @@ function validateEnvelope(envelope, schema = createTiptapSchemaV1()) {
   walkNode(envelope.content, "content", errors);
   if (!errors.some((error2) => error2.code === "max-node-depth-exceeded")) {
     try {
-      schema.nodeFromJSON(envelope.content).check();
+      schema.nodeFromJSON(wrapTopLevelImagesForSchema(envelope.content)).check();
     } catch (err) {
       errors.push(error("content", "schema-validation-failed", err.message));
     }
   }
   return { ok: errors.length === 0, errors };
+}
+function wrapTopLevelImagesForSchema(doc) {
+  if (!doc || doc.type !== "doc" || !Array.isArray(doc.content)) return doc;
+  let changed = false;
+  const content = doc.content.map((node) => {
+    if (node?.type !== "image") return node;
+    changed = true;
+    return { type: "paragraph", content: [node] };
+  });
+  return changed ? { ...doc, content } : doc;
 }
 function walkNode(node, path, errors, depth = 0) {
   if (depth > MAX_NODE_DEPTH) {

@@ -3,6 +3,7 @@
 
 // 图片交互模块：粘贴策略与图片 DOM 事件委托。
 
+import { TextSelection } from '@tiptap/pm/state'
 import imageBlockCss from '../extensions/image-block.css?inline'
 
 // 不为 image 节点实现 NodeView，通过 ProseMirror editorProps 与 editor.view.dom
@@ -173,10 +174,131 @@ function findImageTarget(dom, target) {
   return null
 }
 
-function selectImageNode(editor, img) {
+function imagePosFromElement(editor, img) {
   const pos = editor.view.posAtDOM(img, 0)
-  if (pos == null || pos < 0) return false
+  return pos == null || pos < 0 ? null : pos
+}
+
+function selectImageNode(editor, img) {
+  const pos = imagePosFromElement(editor, img)
+  if (pos == null) return false
   return editor.chain().focus().setNodeSelection(pos).run()
+}
+
+function cursorAfterImage(editor, imagePos) {
+  const imageNode = editor.state.doc.nodeAt(imagePos)
+  if (!imageNode || imageNode.type.name !== 'image') return null
+  const afterImage = imagePos + imageNode.nodeSize
+  const $after = editor.state.doc.resolve(afterImage)
+  if ($after.parent.inlineContent) return afterImage
+  const nextNode = $after.nodeAfter
+  return nextNode?.isTextblock ? afterImage + 1 : null
+}
+
+function dispatchTextCursor(editor, pos) {
+  const tr = editor.state.tr.setSelection(TextSelection.create(editor.state.doc, pos)).scrollIntoView()
+  editor.view.dispatch(tr)
+  editor.view.focus()
+  return true
+}
+
+function setTextCursorAfterImagePos(editor, imagePos) {
+  const imageNode = editor.state.doc.nodeAt(imagePos)
+  if (!imageNode || imageNode.type.name !== 'image') return false
+
+  const afterImage = imagePos + imageNode.nodeSize
+  let tr = editor.state.tr
+  let cursorPos = cursorAfterImage(editor, imagePos)
+
+  // Compatibility for old top-level image nodes: create a following paragraph
+  // if the image is not already inside inline paragraph content.
+  if (cursorPos == null) {
+    const paragraph = editor.state.schema.nodes.paragraph?.create()
+    if (!paragraph) return false
+    tr = tr.insert(afterImage, paragraph)
+    cursorPos = afterImage + 1
+  }
+
+  tr = tr.setSelection(TextSelection.create(tr.doc, cursorPos)).scrollIntoView()
+  editor.view.dispatch(tr)
+  editor.view.focus()
+  return true
+}
+
+function setTextCursorAfterImageElement(editor, img) {
+  const pos = imagePosFromElement(editor, img)
+  return pos == null ? false : setTextCursorAfterImagePos(editor, pos)
+}
+
+function hasInlineContentAfterImage(editor, imagePos) {
+  const imageNode = editor.state.doc.nodeAt(imagePos)
+  if (!imageNode || imageNode.type.name !== 'image') return false
+  const afterImage = imagePos + imageNode.nodeSize
+  const $after = editor.state.doc.resolve(afterImage)
+  return $after.parent.inlineContent && $after.parentOffset < $after.parent.content.size
+}
+
+function shouldHandleTrailingCaretClick(editor, img) {
+  const pos = imagePosFromElement(editor, img)
+  if (pos == null) return false
+  // If text or another inline node already exists after the image, normal
+  // ProseMirror hit testing must place the caret inside that content.  Only
+  // synthesize a caret for the empty right side of a bare image paragraph.
+  return !hasInlineContentAfterImage(editor, pos)
+}
+
+function soleImageCursorPosInParagraph(doc, paragraphPos) {
+  const paragraph = doc.nodeAt(paragraphPos)
+  if (!paragraph || paragraph.type.name !== 'paragraph') return null
+  if (paragraph.childCount !== 1) return null
+  const child = paragraph.child(0)
+  if (child.type.name !== 'image') return null
+  // paragraphPos points before the paragraph node. +1 enters paragraph content,
+  // +child.nodeSize places the caret after the inline image.
+  return paragraphPos + 1 + child.nodeSize
+}
+
+function adjacentBlockPos($pos, direction) {
+  const textblockDepth = $pos.depth
+  if (textblockDepth <= 0) return null
+  const blockPos = direction > 0 ? $pos.after(textblockDepth) : $pos.before(textblockDepth)
+  const $blockBoundary = $pos.doc.resolve(blockPos)
+  const node = direction > 0 ? $blockBoundary.nodeAfter : $blockBoundary.nodeBefore
+  if (!node) return null
+  return direction > 0 ? blockPos : blockPos - node.nodeSize
+}
+
+function moveVerticalToAdjacentBareImageParagraph(editor, direction) {
+  const { selection, doc } = editor.state
+  if (!selection.empty) return false
+  const $from = selection.$from
+  if (!$from.parent.isTextblock) return false
+
+  const paragraphPos = adjacentBlockPos($from, direction)
+  if (paragraphPos == null) return false
+  const cursorPos = soleImageCursorPosInParagraph(doc, paragraphPos)
+  if (cursorPos == null) return false
+  return dispatchTextCursor(editor, cursorPos)
+}
+
+function findImageForTrailingCaretClick(dom, event) {
+  if (!event || event.clientX == null || event.clientY == null) return null
+  const imgs = dom.querySelectorAll('img[data-rel-path]')
+  let candidate = null
+  let candidateDistance = Number.POSITIVE_INFINITY
+  for (const img of imgs) {
+    const rect = img.getBoundingClientRect()
+    if (rect.width <= 0 || rect.height <= 0) continue
+    const sameLine = event.clientY >= rect.top && event.clientY <= rect.bottom
+    const afterImage = event.clientX > rect.right
+    if (!sameLine || !afterImage) continue
+    const distance = event.clientX - rect.right
+    if (distance < candidateDistance) {
+      candidate = img
+      candidateDistance = distance
+    }
+  }
+  return candidate
 }
 
 
@@ -249,12 +371,37 @@ export function setupImageViewAndMenu(editor, bridge) {
     updateImageSelectionOverlay(editor, overlay)
   }
 
+  function onMouseDown(event) {
+    if (findImageTarget(dom, event.target)) return
+    const img = findImageForTrailingCaretClick(dom, event)
+    if (!img || !shouldHandleTrailingCaretClick(editor, img)) return
+    event.preventDefault()
+    if (setTextCursorAfterImageElement(editor, img)) syncOverlay()
+  }
+
   function onClick(event) {
     const img = findImageTarget(dom, event.target)
     if (img) {
       selectImageNode(editor, img)
       syncOverlay()
     }
+  }
+
+  function onKeyDown(event) {
+    if (['ArrowDown', 'ArrowUp'].includes(event.key)) {
+      const direction = event.key === 'ArrowDown' ? 1 : -1
+      if (moveVerticalToAdjacentBareImageParagraph(editor, direction)) {
+        event.preventDefault()
+        syncOverlay()
+        return
+      }
+    }
+
+    if (!['ArrowRight', 'ArrowDown', 'End'].includes(event.key)) return
+    const { selection } = editor.state
+    if (selection.node?.type?.name !== 'image') return
+    event.preventDefault()
+    if (setTextCursorAfterImagePos(editor, selection.from)) syncOverlay()
   }
 
   function onDblClick(event) {
@@ -276,7 +423,9 @@ export function setupImageViewAndMenu(editor, bridge) {
     // QML 侧会按图片类型弹出应用统一 PictureCtxMenu。
   }
 
+  dom.addEventListener('mousedown', onMouseDown)
   dom.addEventListener('click', onClick)
+  dom.addEventListener('keydown', onKeyDown)
   dom.addEventListener('dblclick', onDblClick)
   dom.addEventListener('contextmenu', onContextMenu)
   editor.on('transaction', syncOverlay)
@@ -285,7 +434,9 @@ export function setupImageViewAndMenu(editor, bridge) {
   syncOverlay()
 
   return function destroy() {
+    dom.removeEventListener('mousedown', onMouseDown)
     dom.removeEventListener('click', onClick)
+    dom.removeEventListener('keydown', onKeyDown)
     dom.removeEventListener('dblclick', onDblClick)
     dom.removeEventListener('contextmenu', onContextMenu)
     editor.off('transaction', syncOverlay)

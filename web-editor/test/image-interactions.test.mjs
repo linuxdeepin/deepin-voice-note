@@ -169,6 +169,7 @@ test('hasRemoteImageInHtml: true when any remote src present', () => {
 // ---------------------------------------------------------------------------
 
 import { Editor } from '@tiptap/core'
+import { NodeSelection } from '@tiptap/pm/state'
 import { createTiptapExtensions } from '../src/runtime/tiptap-extensions.js'
 import { createEmptyDoc } from '../src/schema/document-envelope.js'
 import { setupImageViewAndMenu } from '../src/runtime/image-interactions.js'
@@ -184,6 +185,8 @@ function setupEditorWithImage() {
   defineGlobal('DocumentFragment', window.DocumentFragment)
   defineGlobal('Event', window.Event)
   defineGlobal('CustomEvent', window.CustomEvent)
+  defineGlobal('MouseEvent', window.MouseEvent)
+  defineGlobal('KeyboardEvent', window.KeyboardEvent)
   defineGlobal('MutationObserver', window.MutationObserver)
   defineGlobal('getComputedStyle', window.getComputedStyle.bind(window))
   defineGlobal('requestAnimationFrame', (cb) => setTimeout(cb, 0))
@@ -219,9 +222,8 @@ test('image insertion and click expose theme-color selected overlay', () => {
     value: () => ({ left: 10, top: 20, width: 120, height: 80, right: 130, bottom: 100 }),
   })
 
-  // Tiptap/ProseMirror selects inserted atom images with NodeSelection; the
-  // runtime renders the same simple theme-color cover as a browser image selection.
-  assert.ok(img.classList.contains('ProseMirror-selectednode'), 'inserted image should be node-selected')
+  // Inline images keep the caret after insertion; clicking the image still shows
+  // the same simple theme-color cover as a browser image selection.
   const style = document.getElementById('dvn-tiptap-image-block-style')
   assert.ok(style, 'image selection style should be injected')
   const imageBlockCss = readFileSync(new URL('../src/extensions/image-block.css', import.meta.url), 'utf8')
@@ -238,6 +240,143 @@ test('image insertion and click expose theme-color selected overlay', () => {
   assert.equal(overlay.style.width, '120px')
   assert.equal(overlay.style.height, '80px')
   assert.ok(img.classList.contains('ProseMirror-selectednode'), 'clicked image should stay node-selected')
+  destroy()
+  editor.destroy()
+})
+
+
+test('mousedown on the right side of an image moves caret after the image', () => {
+  const { editor, img, destroy } = setupEditorWithImage()
+  assert.ok(img, 'image element should be rendered')
+
+  Object.defineProperty(img, 'getBoundingClientRect', {
+    configurable: true,
+    value: () => ({ left: 10, top: 20, width: 120, height: 80, right: 130, bottom: 100 }),
+  })
+
+  const event = new MouseEvent('mousedown', {
+    bubbles: true,
+    cancelable: true,
+    clientX: 150,
+    clientY: 40,
+  })
+  editor.view.dom.dispatchEvent(event)
+
+  assert.equal(event.defaultPrevented, true, 'runtime should replace default image node selection')
+  assert.equal(editor.state.selection.constructor.name, 'TextSelection')
+  assert.equal(editor.state.selection.from, 2, 'caret should be in the paragraph after image')
+  assert.deepEqual(editor.getJSON().content.map(node => node.type), ['paragraph'])
+  assert.equal(editor.getJSON().content[0].content[0].type, 'image')
+  destroy()
+  editor.destroy()
+})
+
+test('ArrowRight from selected image moves caret after the image', () => {
+  const { editor, destroy } = setupEditorWithImage()
+  editor.view.dispatch(editor.state.tr.setSelection(NodeSelection.create(editor.state.doc, 1)))
+
+  const event = new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true })
+  editor.view.dom.dispatchEvent(event)
+
+  assert.equal(event.defaultPrevented, true)
+  assert.equal(editor.state.selection.constructor.name, 'TextSelection')
+  assert.equal(editor.state.selection.from, 2, 'caret should be in the paragraph after image')
+  assert.deepEqual(editor.getJSON().content.map(node => node.type), ['paragraph'])
+  assert.equal(editor.getJSON().content[0].content[0].type, 'image')
+  destroy()
+  editor.destroy()
+})
+
+test('ArrowDown is not intercepted when adjacent line is normal text', () => {
+  const { editor, destroy } = setupEditorWithImage()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text: 'first' }] },
+      { type: 'paragraph', content: [{ type: 'text', text: 'second' }] },
+    ],
+  })
+  editor.commands.setTextSelection(3)
+
+  const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true })
+  editor.view.dom.dispatchEvent(event)
+
+  assert.equal(event.defaultPrevented, false, 'normal text navigation must be left to ProseMirror/browser')
+  destroy()
+  editor.destroy()
+})
+
+test('ArrowDown from text line moves caret to adjacent bare image paragraph', () => {
+  const { editor, destroy } = setupEditorWithImage()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text: 'first' }] },
+      { type: 'paragraph', content: [{ type: 'image', attrs: { src: 'file:///x/a.png', relPath: 'images/a.png', alt: '', title: null } }] },
+      { type: 'paragraph', content: [
+        { type: 'image', attrs: { src: 'file:///x/b.png', relPath: 'images/b.png', alt: '', title: null } },
+        { type: 'text', text: 'third' },
+      ] },
+    ],
+  })
+  editor.commands.setTextSelection(3)
+
+  const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true })
+  editor.view.dom.dispatchEvent(event)
+
+  assert.equal(event.defaultPrevented, true)
+  assert.equal(editor.state.selection.constructor.name, 'TextSelection')
+  assert.equal(editor.state.selection.from, 9, 'caret should land after image in the second line, not third-line text')
+  destroy()
+  editor.destroy()
+})
+
+test('ArrowUp from text line moves caret to adjacent bare image paragraph', () => {
+  const { editor, destroy } = setupEditorWithImage()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text: 'first' }] },
+      { type: 'paragraph', content: [{ type: 'image', attrs: { src: 'file:///x/a.png', relPath: 'images/a.png', alt: '', title: null } }] },
+      { type: 'paragraph', content: [
+        { type: 'image', attrs: { src: 'file:///x/b.png', relPath: 'images/b.png', alt: '', title: null } },
+        { type: 'text', text: 'third' },
+      ] },
+    ],
+  })
+  editor.commands.setTextSelection(11)
+
+  const event = new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true })
+  editor.view.dom.dispatchEvent(event)
+
+  assert.equal(event.defaultPrevented, true)
+  assert.equal(editor.state.selection.constructor.name, 'TextSelection')
+  assert.equal(editor.state.selection.from, 9, 'caret should land after image in the second line')
+  destroy()
+  editor.destroy()
+})
+
+test('mousedown on text after image is not intercepted by trailing image caret helper', () => {
+  const { editor, img, destroy } = setupEditorWithImage()
+  assert.ok(img, 'image element should be rendered')
+
+  editor.commands.insertContent({ type: 'text', text: 'abc' })
+  Object.defineProperty(img, 'getBoundingClientRect', {
+    configurable: true,
+    value: () => ({ left: 10, top: 20, width: 120, height: 80, right: 130, bottom: 100 }),
+  })
+
+  const event = new MouseEvent('mousedown', {
+    bubbles: true,
+    cancelable: true,
+    clientX: 150,
+    clientY: 40,
+  })
+  editor.view.dom.dispatchEvent(event)
+
+  assert.equal(event.defaultPrevented, false, 'text after image should use normal ProseMirror caret hit testing')
+  assert.equal(editor.state.selection.constructor.name, 'TextSelection')
+  assert.equal(editor.getJSON().content[0].content[1].text, 'abc')
   destroy()
   editor.destroy()
 })
@@ -290,6 +429,8 @@ test('setupImagePaste destroy restores default paste (not permanently blocked)',
   defineGlobal('DocumentFragment', window.DocumentFragment)
   defineGlobal('Event', window.Event)
   defineGlobal('CustomEvent', window.CustomEvent)
+  defineGlobal('MouseEvent', window.MouseEvent)
+  defineGlobal('KeyboardEvent', window.KeyboardEvent)
   defineGlobal('MutationObserver', window.MutationObserver)
   defineGlobal('getComputedStyle', window.getComputedStyle.bind(window))
   defineGlobal('requestAnimationFrame', (cb) => setTimeout(cb, 0))

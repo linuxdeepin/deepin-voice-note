@@ -75,6 +75,43 @@ test('toolbar is always visible once mounted', () => {
   editor.destroy()
 })
 
+
+test('toolbar overflow moves buttons dynamically by available width', () => {
+  const { host, editor, window } = createEditorWithToolbar()
+  const toolbar = host.querySelector('[data-testid="format-toolbar"]')
+  let hostWidth = 300
+
+  Object.defineProperty(host, 'clientWidth', {
+    configurable: true,
+    get: () => hostWidth,
+  })
+  Object.defineProperty(toolbar, 'scrollWidth', {
+    configurable: true,
+    get: () => {
+      const mainControls = Array.from(toolbar.querySelectorAll('[data-format]'))
+        .filter((node) => !node.closest('.tiptap-overflow-panel'))
+        .filter((node) => node.getAttribute('data-format') !== 'blockquote')
+      return 100 + mainControls.length * 30
+    },
+  })
+
+  window.dispatchEvent(new window.Event('resize'))
+  let overflowCount = toolbar.querySelectorAll('.tiptap-overflow-panel [data-format]').length
+  assert.ok(overflowCount > 0, 'narrow width should move trailing buttons into more panel')
+
+  hostWidth = 360
+  window.dispatchEvent(new window.Event('resize'))
+  const widerOverflowCount = toolbar.querySelectorAll('.tiptap-overflow-panel [data-format]').length
+  assert.ok(widerOverflowCount > 0, 'medium width should still keep some buttons overflowed')
+  assert.ok(widerOverflowCount < overflowCount, 'wider width should overflow fewer buttons')
+
+  hostWidth = 900
+  window.dispatchEvent(new window.Event('resize'))
+  assert.equal(toolbar.querySelectorAll('.tiptap-overflow-panel [data-format]').length, 0)
+  assert.equal(toolbar.querySelector('[data-format="more"]'), null, 'wide width should restore all buttons to main toolbar')
+  editor.destroy()
+})
+
 // ---------------------------------------------------------------------------
 // 开关式格式：粗体 / 斜体 / 下划线 / 删除线 / 引用
 // ---------------------------------------------------------------------------
@@ -226,10 +263,12 @@ test('setFontList populates the font family dropdown', () => {
 
   toolbar.setFontList(['Arial', 'Helvetica', 'Noto Sans CJK SC'], 'Helvetica')
   const options = select.querySelectorAll('option')
-  assert.equal(options.length, 4, 'should have default option + 3 fonts')
+  assert.equal(options.length, 4, 'should keep a default display option + host fonts')
+  assert.equal(options[0].value, '')
+  assert.equal(options[0].textContent, 'Helvetica')
+  assert.equal(options[0].selected, true, 'no explicit font mark should display default font')
   assert.equal(options[1].value, 'Arial')
   assert.equal(options[2].value, 'Helvetica')
-  assert.equal(options[2].selected, true, 'default font should be selected')
   assert.equal(options[3].value, 'Noto Sans CJK SC')
   editor.destroy()
 })

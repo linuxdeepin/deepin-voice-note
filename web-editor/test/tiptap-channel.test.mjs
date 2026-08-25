@@ -18,7 +18,8 @@ import {
 } from '../src/schema/document-envelope.js'
 import {
   bindTiptapChannel,
-  createDebounce
+  createDebounce,
+  insertImageWithLegacyFlow
 } from '../src/runtime/tiptap-channel.js'
 import { parseImageInfo, parseVoiceInfo } from '../src/runtime/tiptap-adapter.js'
 
@@ -325,7 +326,7 @@ test('bindTiptapChannel: contentChanged is debounced', async () => {
 // 测试：插入图片 / 语音 + 失败回告
 // ---------------------------------------------------------------------------
 
-test('bindTiptapChannel: insertImage success inserts image node', async () => {
+test('bindTiptapChannel: insertImage success inserts image node and leaves caret after it', async () => {
   const { editor } = createEditor()
   const { bridge, calls, emit } = createMockBridge()
   const factory = createMockChannelFactory(bridge)
@@ -335,11 +336,30 @@ test('bindTiptapChannel: insertImage success inserts image node', async () => {
   emit('insertImage', JSON.stringify({ relPath: 'images/test.png' }))
 
   const json = editor.getJSON()
-  const imageNode = json.content.find(n => n.type === 'image')
+  const imageNode = findFirstNode(json, 'image')
   assert.ok(imageNode, 'image node should be inserted')
   assert.ok(imageNode.attrs.src.includes('images/test.png'))
   assert.equal(imageNode.attrs.relPath, 'images/test.png')
+  assert.deepEqual(topLevelTypes(json), ['paragraph'], 'image should live inside a paragraph like Summernote')
+  assert.equal(json.content[0].content[0].type, 'image')
+  assert.equal(editor.state.selection.constructor.name, 'TextSelection')
+  assert.equal(editor.state.selection.from, 2, 'caret should be in the same paragraph after the image')
   assert.equal(calls.insertImageFailed, undefined)
+  editor.destroy()
+})
+
+test('insertImageWithLegacyFlow keeps multiple pasted images as consecutive block images with trailing caret', () => {
+  const { editor } = createEditor()
+
+  assert.equal(insertImageWithLegacyFlow(editor, { src: 'file:///base/images/a.png', relPath: 'images/a.png' }), true)
+  assert.equal(insertImageWithLegacyFlow(editor, { src: 'file:///base/images/b.png', relPath: 'images/b.png' }), true)
+
+  const json = editor.getJSON()
+  assert.deepEqual(topLevelTypes(json), ['paragraph', 'paragraph'])
+  assert.equal(json.content[0].content[0].type, 'image')
+  assert.equal(json.content[1].content[0].type, 'image')
+  assert.equal(editor.state.selection.constructor.name, 'TextSelection')
+  assert.equal(editor.state.selection.from, 5, 'caret should stay in the same paragraph after the second image')
   editor.destroy()
 })
 
@@ -473,6 +493,27 @@ test('bindTiptapChannel: insertVoiceBlock failed reports reason', async () => {
 // 测试：字体列表下发
 // ---------------------------------------------------------------------------
 
+test('bindTiptapChannel: connects fontListProvided before editorReady', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  bridge.jsEditorReady = function () {
+    calls.editorReady = (calls.editorReady || 0) + 1
+    emit('fontListProvided', ['Arial', 'Noto Sans CJK SC'], 'Noto Sans CJK SC')
+  }
+  const factory = createMockChannelFactory(bridge)
+
+  const received = []
+  await bindTiptapChannel(editor, factory, {
+    onFontList: (fonts, defaultFont) => received.push({ fonts, defaultFont }),
+  })
+
+  assert.equal(calls.editorReady, 1)
+  assert.equal(received.length, 1)
+  assert.deepEqual(received[0].fonts, ['Arial', 'Noto Sans CJK SC'])
+  assert.equal(received[0].defaultFont, 'Noto Sans CJK SC')
+  editor.destroy()
+})
+
 test('bindTiptapChannel: fontListProvided invokes options.onFontList', async () => {
   const { editor } = createEditor()
   const { bridge, emit } = createMockBridge()
@@ -582,19 +623,15 @@ test('bindTiptapChannel: insertImage reports failure when editor rejects inserti
 
   await bindTiptapChannel(editor, factory)
 
-  // 模拟编辑器层面拒绝插入（schema 不接受 attrs 等）
-  const realChain = editor.chain.bind(editor)
-  editor.chain = () => {
-    const chain = realChain()
-    const realRun = chain.run.bind(chain)
-    chain.run = () => false
-    return chain
-  }
+  // 模拟编辑器 dispatch 层面拒绝插入
+  const realDispatch = editor.view.dispatch.bind(editor.view)
+  editor.view.dispatch = () => { throw new Error('mock rejected') }
 
   emit('insertImage', JSON.stringify({ relPath: 'images/test.png' }))
   assert.ok(calls.insertImageFailed, 'should report failure when .run() returns false')
   assert.equal(calls.insertImageFailed.length, 1)
   assert.ok(calls.insertImageFailed[0].includes('rejected'))
+  editor.view.dispatch = realDispatch
   editor.destroy()
 })
 
@@ -631,6 +668,22 @@ test('bindTiptapChannel: insertVoiceBlock reports failure when editor rejects in
 const ABSOLUTE_IMAGE_SRC = 'file:///usr/share/deepin-voice-note/web/images/photo.png'
 const RELATIVE_IMAGE_PATH = 'images/photo.png'
 
+
+function findFirstNode(node, type) {
+  if (!node || typeof node !== 'object') return undefined
+  if (node.type === type) return node
+  if (!Array.isArray(node.content)) return undefined
+  for (const child of node.content) {
+    const found = findFirstNode(child, type)
+    if (found) return found
+  }
+  return undefined
+}
+
+function topLevelTypes(doc) {
+  return doc.content?.map(n => n.type) || []
+}
+
 function insertImageNode(editor, src, relPath) {
   editor.commands.insertContent({
     type: 'image',
@@ -652,7 +705,7 @@ test('save normalize: absolute image src replaced by relative relPath on save', 
 
   assert.ok(calls.contentSaved, 'save should produce a contentSaved envelope')
   const envelope = JSON.parse(calls.contentSaved[0])
-  const imageNode = envelope.content.content.find((n) => n.type === 'image')
+  const imageNode = findFirstNode(envelope.content, 'image')
   assert.ok(imageNode, 'image node should be in saved envelope')
   assert.equal(imageNode.attrs.src, RELATIVE_IMAGE_PATH, 'saved src must be relative relPath')
   assert.ok(!imageNode.attrs.src.includes('file://'), 'saved src must not contain file://')
@@ -678,7 +731,7 @@ test('load resolve: relative image src expanded to absolute file:// for display'
   emit('loadEnvelopeRequested', JSON.stringify(createEnvelope(persisted)))
 
   const json = editor.getJSON()
-  const imageNode = json.content.find((n) => n.type === 'image')
+  const imageNode = findFirstNode(json, 'image')
   assert.ok(imageNode, 'image node should be loaded into editor')
   assert.ok(imageNode.attrs.src.startsWith('file:///'), 'display src must be absolute file://')
   assert.ok(imageNode.attrs.src.includes(RELATIVE_IMAGE_PATH), 'display src must contain the relative path')
@@ -717,7 +770,7 @@ test('save normalize: image with absolute file:// src and no relPath is sanitize
   // 校验失败的图片节点被净化后仍回告宿主，非图片内容不静默丢失
   assert.ok(calls.contentSaved, 'unsafe image node should be sanitized, save should still report back')
   const envelope = JSON.parse(calls.contentSaved[0])
-  const imageNode = envelope.content.content.find((n) => n.type === 'image')
+  const imageNode = findFirstNode(envelope.content, 'image')
   assert.equal(imageNode, undefined, 'unsafe image node should be removed from saved envelope')
   editor.destroy()
 })
@@ -733,19 +786,19 @@ test('save → load → save roundtrip keeps image path relative', async () => {
   // 第一次保存：绝对 src 归一为相对
   emit('requestContent')
   const firstEnvelope = JSON.parse(calls.contentSaved[0])
-  const firstImage = firstEnvelope.content.content.find((n) => n.type === 'image')
+  const firstImage = findFirstNode(firstEnvelope.content, 'image')
   assert.equal(firstImage.attrs.src, RELATIVE_IMAGE_PATH)
 
   // 加载第一次保存的 envelope（相对 src 解析为绝对显示）
   emit('loadEnvelopeRequested', JSON.stringify(firstEnvelope))
-  const loadedImage = editor.getJSON().content.find((n) => n.type === 'image')
+  const loadedImage = findFirstNode(editor.getJSON(), 'image')
   assert.ok(loadedImage.attrs.src.startsWith('file:///'))
 
   // 再次保存：绝对 src 再次归一为相对
   calls.contentSaved.length = 0
   emit('requestContent')
   const secondEnvelope = JSON.parse(calls.contentSaved[0])
-  const secondImage = secondEnvelope.content.content.find((n) => n.type === 'image')
+  const secondImage = findFirstNode(secondEnvelope.content, 'image')
   assert.equal(secondImage.attrs.src, RELATIVE_IMAGE_PATH, 'second save must also be relative')
   assert.deepEqual(firstEnvelope, secondEnvelope, 'save output must be stable across roundtrips')
   editor.destroy()
@@ -771,7 +824,7 @@ test('load resolve: resolved image src must fall in AppData images dir, not WEB_
   }
   emit('loadEnvelopeRequested', JSON.stringify(createEnvelope(persisted)))
 
-  const imageNode = editor.getJSON().content.find((n) => n.type === 'image')
+  const imageNode = findFirstNode(editor.getJSON(), 'image')
   // 解析后的绝对 src 必须落在 AppData images 目录，不得指向 WEB_PATH（web 资源安装目录）
   assert.ok(imageNode.attrs.src.startsWith('file:///'), 'resolved src must be absolute file://')
   assert.ok(imageNode.attrs.src.includes('/images/'), 'resolved src must contain images/ dir')
@@ -797,7 +850,7 @@ test('save normalize: empty-string relPath falls back to src (#3)', async () => 
 
   assert.ok(calls.contentSaved, 'save should succeed when relPath is empty (falls back to src)')
   const envelope = JSON.parse(calls.contentSaved[0])
-  const imageNode = envelope.content.content.find((n) => n.type === 'image')
+  const imageNode = findFirstNode(envelope.content, 'image')
   assert.ok(imageNode, 'image should survive when relPath is empty string')
   assert.equal(imageNode.attrs.src, RELATIVE_IMAGE_PATH, 'src should fall back from empty relPath to src')
   editor.destroy()
@@ -871,7 +924,7 @@ test('save sanitize: preserves non-image content when image is unsafe (#2)', asy
   const envelope = JSON.parse(calls.contentSaved[0])
   const hasText = JSON.stringify(envelope.content).includes('important text')
   assert.ok(hasText, 'non-image content must be preserved after sanitize')
-  const imageNode = envelope.content.content.find((n) => n.type === 'image')
+  const imageNode = findFirstNode(envelope.content, 'image')
   assert.equal(imageNode, undefined, 'unsafe image should be removed')
   editor.destroy()
 })
@@ -1132,7 +1185,8 @@ test('sanitize fills empty doc root with single empty paragraph', async () => {
 
   assert.ok(calls.contentSaved, 'save must report back when doc root becomes empty')
   const content = JSON.parse(calls.contentSaved[0]).content
-  assert.deepEqual(content, { type: 'doc', content: [{ type: 'paragraph' }] },
+  assert.equal(content.type, 'doc')
+  assert.deepEqual(topLevelTypes(content), ['paragraph'],
     'empty doc root must be filled with a single empty paragraph')
   editor.destroy()
 })

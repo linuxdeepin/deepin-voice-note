@@ -78,6 +78,9 @@ public:
     // 前端请求宿主打开图片选择对话框（工具栏图片按钮）
     Q_INVOKABLE void jsRequestPickImage();
 
+    // 前端请求开始录音（工具栏麦克风按钮）
+    Q_INVOKABLE void jsRequestRecordVoice();
+
     // 前端请求查看原图（双击图片），宿主归一化路径后下发预览
     Q_INVOKABLE void jsRequestViewPicture(const QString &url);
 
@@ -186,6 +189,9 @@ signals:
 
     // C++→QML：前端请求打开图片选择对话框
     void pickImageRequested();
+
+    // C++→QML：前端请求开始录音
+    void recordVoiceRequested();
 
     // C++→QML：前端请求查看原图，携带归一化后的本地路径
     void viewPictureRequested(const QString &localPath);

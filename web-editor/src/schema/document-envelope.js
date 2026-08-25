@@ -71,13 +71,25 @@ export function validateEnvelope(envelope, schema = createTiptapSchemaV1()) {
 
   if (!errors.some(error => error.code === 'max-node-depth-exceeded')) {
     try {
-      schema.nodeFromJSON(envelope.content).check()
+      schema.nodeFromJSON(wrapTopLevelImagesForSchema(envelope.content)).check()
     } catch (err) {
       errors.push(error('content', 'schema-validation-failed', err.message))
     }
   }
 
   return { ok: errors.length === 0, errors }
+}
+
+
+function wrapTopLevelImagesForSchema(doc) {
+  if (!doc || doc.type !== 'doc' || !Array.isArray(doc.content)) return doc
+  let changed = false
+  const content = doc.content.map((node) => {
+    if (node?.type !== 'image') return node
+    changed = true
+    return { type: 'paragraph', content: [node] }
+  })
+  return changed ? { ...doc, content } : doc
 }
 
 function walkNode(node, path, errors, depth = 0) {
