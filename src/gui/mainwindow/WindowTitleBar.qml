@@ -11,7 +11,6 @@ import "../" as VNoteComponents
 TitleBar {
     id: titleBar
 
-    property bool imageBtnEnable: true
     property bool isInitialInterface: true
     property bool isPlaying: false
     property bool isRecording: false
@@ -19,12 +18,9 @@ TitleBar {
     property bool isSearching: false
     property bool isVoiceToText: false
     property bool recorderBtnEnable: true
-    property bool recordingHover: false
-    property bool recordBtnEnabled: recordBtn.enabled
+    property bool recordBtnEnabled: recorderBtnEnable && !isPlaying && !isSearching && !isRecordingAudio && !isVoiceToText
 
     signal createNote
-    signal insertImage
-    signal startRecording
     signal titleOpenSetting
 
     enableInWindowBlendBlur: false
@@ -63,7 +59,7 @@ TitleBar {
         anchors.verticalCenter: titleBar.verticalCenter
         enabled: !isPlaying && !isSearching && !isRecordingAudio && !isVoiceToText
         hoverEnabled: !isInitialInterface
-        visible: recordBtn.x > x + width
+        visible: !isInitialInterface
         icon.height: 16
         icon.name: "new_note"
         icon.width: 16
@@ -80,74 +76,5 @@ TitleBar {
         }
     }
 
-    Rectangle {
-        id: maskRect
 
-        anchors.fill: recordBtn
-        color: "transparent"
-        visible: !recordBtn.enabled
-
-        MouseArea {
-            hoverEnabled: true
-
-            onEntered: {
-                recordingHover = true;
-            }
-            onExited: {
-                recordingHover = false;
-            }
-        }
-    }
-
-    VNoteComponents.VNoteToolButton {
-        Accessible.name: "RecordButton"
-        Accessible.role: Accessible.Button
-        id: recordBtn
-
-        anchors.right: insImgBtn.left
-        anchors.rightMargin: 6
-        anchors.verticalCenter: titleBar.verticalCenter
-        enabled: recorderBtnEnable && imageBtnEnable && !isPlaying && !isSearching
-        hoverEnabled: !isInitialInterface
-        icon.height: 16
-        icon.name: "record"
-        icon.width: 16
-        height: 30
-        width: 30
-
-        onClicked: {
-            startRecording();
-            isRecording = true;
-        }
-
-        ToolTip {
-            text: recordBtn.enabled ? qsTr("Start recording") : qsTr("No recording device detected")
-            visible: (recordBtn.hovered || recordingHover) && !isRecording && !isPlaying && !isInitialInterface
-        }
-    }
-
-    VNoteComponents.VNoteToolButton {
-        Accessible.name: "InsertImageButton"
-        Accessible.role: Accessible.Button
-        id: insImgBtn
-
-        anchors.verticalCenter: titleBar.verticalCenter
-        enabled: imageBtnEnable
-        hoverEnabled: !isInitialInterface
-        icon.height: 16
-        icon.name: "img"
-        icon.width: 16
-        height: 30
-        width: 30
-        x: titleBar.__includedAreaX - recordBtn.width - 10
-
-        onClicked: {
-            insertImage();
-        }
-
-        ToolTip {
-            text: qsTr("Insert picture")
-            visible: insImgBtn.hovered
-        }
-    }
 }

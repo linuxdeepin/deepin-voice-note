@@ -34,6 +34,7 @@
 }
 
 .tiptap-toolbar-separator {
+    flex: 0 0 1px;
     width: 1px;
     height: 20px;
     margin: 0 5px;
@@ -66,6 +67,12 @@
 .tiptap-toolbar button.is-active,
 .tiptap-toolbar button[aria-pressed="true"] {
     background: var(--dvn-hover-bg, rgba(0, 0, 0, 0.06));
+}
+
+/* 选中态只改变图标颜色，按钮外框仍沿用普通 hover/check 背景。 */
+.tiptap-toolbar button.is-active .tiptap-icon--asset,
+.tiptap-toolbar button[aria-pressed="true"] .tiptap-icon--asset {
+    color: var(--highlightColor, #0081ff);
 }
 
 .tiptap-toolbar button:disabled {
@@ -149,11 +156,11 @@
     right: 2px;
     bottom: 1px;
     height: 3px;
-    background: var(--dvn-current-fore-color, #e91e63);
+    background: var(--dvn-current-color, #000000);
 }
 
 .tiptap-color-button[data-format="backColor"] .tiptap-color-icon::after {
-    background: var(--dvn-current-back-color, #0081ff);
+    background: var(--dvn-current-color, #0081ff);
 }
 
 .tiptap-color-icon > .tiptap-icon {
@@ -229,6 +236,38 @@
     object-fit: contain;
     user-select: none;
     -webkit-user-drag: none;
+}
+
+/* 外部 SVG 不响应 currentColor，激活态通过同一工程资源的 mask 重绘主题色。 */
+.tiptap-icon--asset {
+    position: relative;
+}
+
+.tiptap-icon--asset::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: currentColor;
+    -webkit-mask-image: var(--tiptap-icon-mask);
+    mask-image: var(--tiptap-icon-mask);
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tiptap-toolbar button.is-active .tiptap-icon--asset::after,
+.tiptap-toolbar button[aria-pressed="true"] .tiptap-icon--asset::after {
+    opacity: 1;
+}
+
+.tiptap-toolbar button.is-active .tiptap-icon--asset > img,
+.tiptap-toolbar button[aria-pressed="true"] .tiptap-icon--asset > img {
+    opacity: 0;
 }
 
 /* New insertion icons use a 24px viewBox; keep their original visual size

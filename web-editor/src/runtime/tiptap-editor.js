@@ -87,6 +87,32 @@ if (typeof window !== 'undefined') {
   }
 }
 const toolbar = createFormatToolbar(editor, document.getElementById('toolbar-host'))
+let tiptapBridge = null
+let pendingPickImage = false
+let pendingRecordVoice = false
+
+// 工具栏可能先于 QWebChannel 完成绑定就已经可见。先缓存用户操作，
+// 避免首次点击在 bridge 尚未就绪时被静默丢弃。
+toolbar.setOnPickImage(() => {
+  if (tiptapBridge?.jsRequestPickImage) {
+    tiptapBridge.jsRequestPickImage()
+  } else {
+    pendingPickImage = true
+  }
+})
+toolbar.setOnRecordVoice(() => {
+  if (tiptapBridge?.jsRequestRecordVoice) {
+    tiptapBridge.jsRequestRecordVoice()
+  } else {
+    pendingRecordVoice = true
+  }
+})
+
+if (typeof window !== 'undefined') {
+  window.__dvnTiptapSetResourceButtonsEnabled = function (voiceEnabled, imageEnabled) {
+    toolbar.setResourceButtonsEnabled(Boolean(voiceEnabled), Boolean(imageEnabled))
+  }
+}
 
 // 暴露聚焦接口：QML 侧把 WebEngineView 键盘焦点移入后调用，把光标放进 ProseMirror 编辑器
 window._dvnTiptapFocus = function () {
@@ -102,13 +128,17 @@ document.addEventListener('mousedown', function (event) {
 bindTiptapChannel(editor, undefined, {
   onFontList: (fonts, defaultFont) => toolbar.setFontList(fonts, defaultFont),
 }).then((bridge) => {
+  tiptapBridge = bridge
   // 注入 voice 桥，连接 voice 运行态信号分发
   setVoiceBridge(bridge)
-  // 工具栏图片按钮 → 宿主打开文件选择
-  toolbar.setOnPickImage(() => bridge.jsRequestPickImage && bridge.jsRequestPickImage())
-  // 工具栏麦克风按钮 → 宿主录音入口
-  if (toolbar.setOnRecordVoice) {
-    toolbar.setOnRecordVoice(() => bridge.jsRequestRecordVoice && bridge.jsRequestRecordVoice())
+  // bridge 就绪后补发绑定完成前缓存的首次点击。
+  if (pendingPickImage) {
+    pendingPickImage = false
+    bridge.jsRequestPickImage?.()
+  }
+  if (pendingRecordVoice) {
+    pendingRecordVoice = false
+    bridge.jsRequestRecordVoice?.()
   }
   // 粘贴：剪贴板图片落盘往返、远程图片阻止
   setupImagePaste(editor, bridge)

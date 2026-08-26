@@ -124,6 +124,38 @@ Item {
         webView.triggerWebAction(5);
     }
 
+    // 工具栏中的资源按钮不再由标题栏直接承载，需要把宿主侧运行态
+    // 同步到 Tiptap DOM，保持与原 Summernote 入口一致。
+    function syncTiptapResourceButtons() {
+        if (!TiptapChannel.debugEnabled || !tiptapLoader.item) {
+            return;
+        }
+
+        var tiptapView = tiptapLoader.item.editor;
+        if (!tiptapView) {
+            return;
+        }
+
+        var voiceEnabled = webVisible
+                && !isRecordingAudio
+                && !isVoiceToText
+                && !title.isPlaying
+                && !title.isSearching
+                && title.recorderBtnEnable
+                && !VNoteMainManager.isInSearchMode();
+        // Summernote 的图片入口原本只受 imageBtnEnable(webVisible) 控制。
+        var imageEnabled = webVisible;
+        var script = "window.__dvnTiptapSetResourceButtonsEnabled && "
+                + "window.__dvnTiptapSetResourceButtonsEnabled("
+                + (voiceEnabled ? "true" : "false") + ","
+                + (imageEnabled ? "true" : "false") + ");";
+        tiptapView.runJavaScript(script);
+    }
+
+    onIsRecordingAudioChanged: syncTiptapResourceButtons()
+    onIsVoiceToTextChanged: syncTiptapResourceButtons()
+    onWebVisibleChanged: syncTiptapResourceButtons()
+
     function focusWebView() {
         // Tiptap 调试模式下编辑器位于 tiptapLoader 加载的 sourceComponent，需经 tiptapLoader.item
         // 跨 Loader 作用域访问 tiptapWebView；item 为 null（inactive/加载中）时跳过聚焦避免 TypeError。
@@ -324,7 +356,6 @@ Item {
                 id: title
 
                 anchors.fill: parent
-                imageBtnEnable: webVisible
                 isInitialInterface: initialVisible
                 isRecordingAudio: rootItem.isRecordingAudio
                 isVoiceToText: rootItem.isVoiceToText
@@ -455,6 +486,7 @@ Item {
                     onPlayingVoice: isPlay => {
                         playStateChange(isPlay);
                         title.isPlaying = isPlay;
+                        rootItem.syncTiptapResourceButtons();
                     }
                     onPopupToast: (message, msgId) => {
                         DTK.sendMessage(webView, message, "icon_warning", 4000, msgId);
@@ -543,6 +575,7 @@ Item {
                         if (loadRequest.status === WebEngineView.LoadSucceededStatus) {
                             tiptapWebView.forceActiveFocus();
                             tiptapWebView.runJavaScript("window._dvnTiptapFocus && window._dvnTiptapFocus()");
+                            rootItem.syncTiptapResourceButtons();
                         }
                     }
 
@@ -879,22 +912,18 @@ Item {
                 VNoteMainManager.createNote();
             }
         }
-        onInsertImage: {
-            if (!selectImgLoader.active) {
-                selectImgLoader.active = true;
-            } else {
-                selectImgLoader.item.open();
-            }
-        }
-        onStartRecording: {
-            VoiceRecoderHandler.startRecoder();
-        }
+        onIsPlayingChanged: rootItem.syncTiptapResourceButtons()
+        onIsSearchingChanged: rootItem.syncTiptapResourceButtons()
+        onRecorderBtnEnableChanged: rootItem.syncTiptapResourceButtons()
     }
 
     Connections {
         target: TiptapChannel
 
         onPickImageRequested: {
+            if (!webVisible || VNoteMainManager.isInSearchMode()) {
+                return;
+            }
             if (!selectImgLoader.active) {
                 selectImgLoader.active = true;
             } else {
@@ -902,7 +931,7 @@ Item {
             }
         }
         onRecordVoiceRequested: {
-            if (VNoteMainManager.isInSearchMode() || !title.recorderBtnEnable || !title.imageBtnEnable || title.isPlaying) {
+            if (VNoteMainManager.isInSearchMode() || !title.recordBtnEnabled || !webVisible) {
                 return;
             }
             startRecording();
@@ -955,6 +984,7 @@ Item {
             if (currentType === VoiceRecoderHandler.Idle) {
                 isRecording = false;
                 title.recorderBtnEnable = true;
+                rootItem.syncTiptapResourceButtons();
                 title.isRecording = false;
                 
                 // 完全关闭录音界面

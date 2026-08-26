@@ -74,6 +74,11 @@ function createSvgIcon(name) {
   const assetUrl = ICON_ASSET_URLS[name]
   if (!assetUrl) return span
 
+  // 外部 SVG 作为 img 时不会继承按钮的 currentColor。保留 img 作为正常态，
+  // 同时记录资源地址，让 CSS 在激活态用 mask 以主题色重绘图标。
+  span.classList.add('tiptap-icon--asset')
+  span.style.setProperty('--tiptap-icon-mask', `url("${assetUrl}")`)
+
   const image = createEl('img', {
     src: assetUrl,
     alt: '',
@@ -200,6 +205,11 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive) {
     }
   }
 
+  function setCurrentColor(color) {
+    // 颜色指示条跟随当前显式选区；无颜色时恢复 Summernote 的默认值。
+    toggle.style.setProperty('--dvn-current-color', color || (kind === 'foreColor' ? '#000000' : '#0081ff'))
+  }
+
   toggle.addEventListener('click', (event) => {
     event.stopPropagation()
     togglePanel()
@@ -234,7 +244,8 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive) {
   wrapper.appendChild(toggle)
   wrapper.appendChild(panel)
 
-  return { wrapper, toggle, panel, openPanel, closePanel, readActive }
+  setCurrentColor('')
+  return { wrapper, toggle, panel, openPanel, closePanel, setCurrentColor, readActive }
 }
 
 export function createFormatToolbar(editor, host) {
@@ -392,6 +403,11 @@ export function createFormatToolbar(editor, host) {
   })
   resourceGroup.appendChild(imageBtn)
   toolbar.appendChild(resourceGroup)
+
+  function setResourceButtonsEnabled(voiceEnabled = true, imageEnabled = true) {
+    voiceBtn.disabled = !voiceEnabled
+    imageBtn.disabled = !imageEnabled
+  }
 
   const moreSeparator = createSeparator()
   moreSeparator.classList.add('tiptap-more-separator')
@@ -586,6 +602,8 @@ export function createFormatToolbar(editor, host) {
     // 颜色选中态
     const foreColor = hasSelectionContext ? editor.getAttributes('color').color : ''
     const backColor = hasSelectionContext ? editor.getAttributes('highlight').color : ''
+    forePicker.setCurrentColor(foreColor)
+    backPicker.setCurrentColor(backColor)
     syncColorCells(forePicker.panel, foreColor)
     syncColorCells(backPicker.panel, backColor)
 
@@ -628,6 +646,7 @@ export function createFormatToolbar(editor, host) {
     setOnRecordVoice(fn) {
       onRecordVoice = typeof fn === 'function' ? fn : null
     },
+    setResourceButtonsEnabled,
     setFontList(fonts, defaultFont) {
       fontSelect.replaceChildren()
       const normalized = Array.isArray(fonts)

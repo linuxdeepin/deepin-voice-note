@@ -212,6 +212,7 @@ public slots:
 private:
     bool m_editorReady;
     QString m_pendingEnvelope;
+    QStringList m_pendingInsertImages;
     QStringList m_pendingFontList;
     QString m_pendingDefaultFont;
     bool m_pendingFontListValid;

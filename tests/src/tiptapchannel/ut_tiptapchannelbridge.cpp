@@ -61,6 +61,7 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_signal_contentSaved_001)
 TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_signal_insertImage_001)
 {
     TiptapChannelBridge bridge;
+    bridge.jsEditorReady();
     QSignalSpy insertSpy(&bridge, &TiptapChannelBridge::insertImage);
     bridge.sendInsertImage("{\"relPath\":\"images/test.png\"}");
     EXPECT_EQ(insertSpy.count(), 1);
@@ -201,6 +202,21 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_replay_afterReady_001)
     EXPECT_EQ(loadSpy.takeFirst().at(0).toString(), envelope);
     EXPECT_TRUE(bridge.pendingEnvelope().isEmpty());
     EXPECT_TRUE(bridge.isEditorReady());
+}
+
+// 图片在 editorReady 前下发时缓存，避免 QWebChannel 尚未 connect 时丢失
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_insertImage_cache_beforeReady_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy insertSpy(&bridge, &TiptapChannelBridge::insertImage);
+    const QString image = "{\"relPath\":\"images/test.png\"}";
+
+    bridge.sendInsertImage(image);
+    EXPECT_EQ(insertSpy.count(), 0);
+
+    bridge.jsEditorReady();
+    ASSERT_EQ(insertSpy.count(), 1);
+    EXPECT_EQ(insertSpy.takeFirst().at(0).toString(), image);
 }
 
 // 就绪后直接下发，不缓存
