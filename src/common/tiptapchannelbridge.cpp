@@ -119,6 +119,14 @@ void TiptapChannelBridge::notifyEditorReady()
         m_pendingDefaultFont.clear();
         m_pendingFontListValid = false;
     }
+
+    // 工具栏在 QWebChannel 完成绑定前即可被点击；图片复制完成后若此时
+    // 编辑器尚未 ready，不能直接 emit，否则 QWebChannel 信号会丢失。
+    const QStringList pendingImages = m_pendingInsertImages;
+    m_pendingInsertImages.clear();
+    for (const QString &imageInfoJson : pendingImages) {
+        emit insertImage(imageInfoJson);
+    }
 }
 
 void TiptapChannelBridge::loadEnvelope(const QString &envelopeJson)
@@ -180,6 +188,11 @@ void TiptapChannelBridge::requestEditorContent()
 
 void TiptapChannelBridge::sendInsertImage(const QString &imageInfoJson)
 {
+    if (!m_editorReady) {
+        m_pendingInsertImages.append(imageInfoJson);
+        qInfo() << "Queueing image insertion until Tiptap editor is ready";
+        return;
+    }
     emit insertImage(imageInfoJson);
 }
 

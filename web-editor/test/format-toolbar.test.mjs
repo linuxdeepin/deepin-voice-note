@@ -80,6 +80,17 @@ test('toolbar is always visible once mounted', () => {
   editor.destroy()
 })
 
+test('toolbar group separators are rendered on initial mount', () => {
+  const { host, editor } = createEditorWithToolbar()
+  const toolbar = host.querySelector('[data-testid="format-toolbar"]')
+  assert.equal(
+    toolbar.querySelectorAll('.tiptap-toolbar-separator').length,
+    4,
+    'all main toolbar group separators should be present before a resize',
+  )
+  editor.destroy()
+})
+
 
 test('toolbar icons use imported assets or sanitized SVG nodes', () => {
   const { host, editor } = createEditorWithToolbar()
@@ -207,6 +218,10 @@ test('foreColor panel applies and clears text color', () => {
 
   cell.click()
   assert.ok(editor.isActive('color', { color: '#e50000' }))
+  assert.equal(
+    host.querySelector('button[data-format="foreColor"]').style.getPropertyValue('--dvn-current-color'),
+    '#e50000',
+  )
 
   const clear = panel.querySelector('button[data-action="clear-foreColor"]')
   clear.click()
@@ -217,6 +232,15 @@ test('foreColor panel applies and clears text color', () => {
 // ---------------------------------------------------------------------------
 // 背景色面板
 // ---------------------------------------------------------------------------
+
+test('backColor keeps its default indicator color', () => {
+  const { editor, host } = createEditorWithToolbar()
+  assert.equal(
+    host.querySelector('button[data-format="backColor"]').style.getPropertyValue('--dvn-current-color'),
+    '#0081ff',
+  )
+  editor.destroy()
+})
 
 test('backColor panel applies and clears highlight', () => {
   const { editor, host } = createEditorWithToolbar()
@@ -233,6 +257,10 @@ test('backColor panel applies and clears highlight', () => {
   const color = target.getAttribute('data-color')
   target.click()
   assert.ok(editor.isActive('highlight', { color }))
+  assert.equal(
+    host.querySelector('button[data-format="backColor"]').style.getPropertyValue('--dvn-current-color'),
+    color,
+  )
 
   const clear = panel.querySelector('button[data-action="clear-backColor"]')
   clear.click()
@@ -355,6 +383,25 @@ test('toolbar image button triggers injected pick callback', () => {
   const btn = host.querySelector('button[data-format="insertImage"]')
   btn.click()
   assert.equal(picked, 1, 'pick callback should fire on image button click')
+  editor.destroy()
+})
+
+test('resource buttons follow host enabled state', () => {
+  const { editor, host, toolbar } = createEditorWithToolbar()
+  const voiceBtn = host.querySelector('button[data-format="insertVoice"]')
+  const imageBtn = host.querySelector('button[data-format="insertImage"]')
+
+  toolbar.setResourceButtonsEnabled(false, false)
+  assert.equal(voiceBtn.disabled, true)
+  assert.equal(imageBtn.disabled, true)
+
+  toolbar.setResourceButtonsEnabled(true, false)
+  assert.equal(voiceBtn.disabled, false)
+  assert.equal(imageBtn.disabled, true)
+
+  toolbar.setResourceButtonsEnabled(true, true)
+  assert.equal(voiceBtn.disabled, false)
+  assert.equal(imageBtn.disabled, false)
   editor.destroy()
 })
 

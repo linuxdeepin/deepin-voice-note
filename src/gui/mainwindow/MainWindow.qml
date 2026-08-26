@@ -93,7 +93,7 @@ Item {
             var shouldBlock = (isRecordingAudio || webEngineView.titleBar.isPlaying || itemListView.isSearch || itemListView.isSearching || webEngineView.titleBar.isSearching || isVoiceToText);
             return shouldBlock;
         }
-        // 与右上录音按钮同条件：按钮不可用或正在播放时禁用 Ctrl+R
+        // 与工具栏录音入口同条件：录音不可用或正在播放时禁用 Ctrl+R
         blockRecordingKey: isRecordingAudio
                            || webEngineView.titleBar.isPlaying
                            || !webEngineView.titleBar.recordBtnEnabled
