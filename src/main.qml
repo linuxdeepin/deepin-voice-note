@@ -81,6 +81,13 @@ ApplicationWindow {
             initialInterface.visible = false;
             VNoteMainManager.start();
         }
+        onStatusChanged: {
+            if (status === Loader.Error) {
+                console.error("Failed to load workspace:", source);
+                workspaceLoader.active = false;
+                initialInterface.loadFinished(false);
+            }
+        }
     }
 
     InitialInterface {
