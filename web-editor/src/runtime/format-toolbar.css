@@ -156,10 +156,22 @@
     background: var(--dvn-current-back-color, #0081ff);
 }
 
+.tiptap-color-icon > .tiptap-icon {
+    width: 16px;
+    height: 17px;
+}
+
 .tiptap-color-arrow {
-    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     line-height: 1;
     margin-left: 1px;
+}
+
+.tiptap-color-arrow > .tiptap-icon {
+    width: 12px;
+    height: 12px;
 }
 
 .tiptap-color-panel {
@@ -197,8 +209,8 @@
 }
 
 .tiptap-icon {
-    width: 22px;
-    height: 22px;
+    width: 16px;
+    height: 16px;
     display: inline-block;
     fill: currentColor;
     stroke: currentColor;
@@ -217,6 +229,13 @@
     object-fit: contain;
     user-select: none;
     -webkit-user-drag: none;
+}
+
+/* New insertion icons use a 24px viewBox; keep their original visual size
+   while the reused Summernote toolbar assets stay at 16px. */
+.tiptap-resource-group .tiptap-icon {
+    width: 22px;
+    height: 22px;
 }
 
 

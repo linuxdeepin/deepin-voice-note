@@ -2,21 +2,27 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import toolbarCss from './format-toolbar.css?inline'
-import bulletDotIconUrl from './icons/bullet-dot.svg?url'
-import bulletNumberIconUrl from './icons/bullet-number.svg?url'
+import boldIconUrl from '../../../src/web/css/createfont/svg/bold.svg?url'
+import italicIconUrl from '../../../src/web/css/createfont/svg/Italic.svg?url'
+import underlineIconUrl from '../../../src/web/css/createfont/svg/underline.svg?url'
+import strikeIconUrl from '../../../src/web/css/createfont/svg/Strikethrough.svg?url'
+import bulletDotIconUrl from '../../../src/web/css/createfont/svg/bullet_dot.svg?url'
+import bulletNumberIconUrl from '../../../src/web/css/createfont/svg/bullet_number.svg?url'
+import markerIconUrl from '../../../src/web/css/createfont/svg/marker.svg?url'
+import textColorIconUrl from '../../../src/web/css/createfont/svg/text_color.svg?url'
+import arrowIconUrl from '../../../src/web/css/createfont/svg/richtext_arrow.svg?url'
 import moreIconUrl from './icons/more.svg?url'
 import micIconUrl from './icons/mic.svg?url'
 import imageIconUrl from './icons/image.svg?url'
-import markerIconUrl from './icons/marker.svg?url'
 import taskListIconUrl from './icons/task.svg?url'
 import { FORE_COLORS, BACK_COLORS, FONT_SIZES, toPxSize } from './format-palette.js'
 import { canIndentActiveListItem, canOutdentActiveListItem, liftActiveListItem, sinkActiveListItem } from './list-behavior.js'
 
 const TOGGLE_BUTTONS = [
-  { format: 'bold', label: 'B', title: '粗体', className: 'tiptap-format-bold' },
-  { format: 'italic', label: 'I', title: '斜体', className: 'tiptap-format-italic' },
-  { format: 'underline', label: 'U', title: '下划线', className: 'tiptap-format-underline' },
-  { format: 'strike', label: 'S', title: '删除线', className: 'tiptap-format-strike' },
+  { format: 'bold', icon: 'bold', title: '粗体', className: 'tiptap-format-bold' },
+  { format: 'italic', icon: 'italic', title: '斜体', className: 'tiptap-format-italic' },
+  { format: 'underline', icon: 'underline', title: '下划线', className: 'tiptap-format-underline' },
+  { format: 'strike', icon: 'strike', title: '删除线', className: 'tiptap-format-strike' },
 ]
 
 const HEADING_OPTIONS = [
@@ -48,68 +54,33 @@ function injectToolbarStyles() {
 }
 
 const ICON_ASSET_URLS = Object.freeze({
+  bold: boldIconUrl,
+  italic: italicIconUrl,
+  underline: underlineIconUrl,
+  strike: strikeIconUrl,
   bulletList: bulletDotIconUrl,
   orderedList: bulletNumberIconUrl,
+  marker: markerIconUrl,
+  textColor: textColorIconUrl,
+  richtextArrow: arrowIconUrl,
   more: moreIconUrl,
   mic: micIconUrl,
   image: imageIconUrl,
-  marker: markerIconUrl,
   taskList: taskListIconUrl,
 })
-
-const INLINE_ICON_SOURCES = Object.freeze({
-  taskList: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" fill="none" stroke-width="2"/><path d="M7 12.5l3 3L17 8" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  mic: '<svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="12" rx="4" fill="currentColor" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8" fill="none" stroke-width="2" stroke-linecap="round"/></svg>',
-  image: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" ry="2" fill="none" stroke-width="2"/><circle cx="8" cy="10" r="2" stroke="none"/><path d="M5 18l5.5-5.5 3.5 3.5 2-2 3 4" fill="none" stroke-width="2" stroke-linejoin="round"/></svg>',
-  marker: '<svg viewBox="0 0 24 24"><path d="M15.5 3.5l5 5-9 9H6.5l0-5 9-9z" fill="currentColor" stroke="none"/><path d="M4 20h16" fill="none" stroke-width="2" stroke-linecap="round"/></svg>',
-})
-
-// SVG resources are compiled into the bundle, but they still need to be
-// attached as DOM nodes instead of being injected as an HTML string.
-function parseSvgSource(source) {
-  if (typeof source !== 'string' || source.length === 0) return null
-  const Parser = document.defaultView?.DOMParser || globalThis.DOMParser
-  if (typeof Parser !== 'function') return null
-
-  const parsed = new Parser().parseFromString(source, 'image/svg+xml')
-  const root = parsed?.documentElement
-  if (!root || root.localName !== 'svg') return null
-
-  const svg = document.importNode(root, true)
-  // The toolbar icons are local static resources. Keep the parser boundary
-  // defensive in case an asset is accidentally replaced with active content.
-  for (const element of [svg, ...svg.querySelectorAll('*')]) {
-    if (element.localName === 'script' || element.localName === 'foreignObject') {
-      element.remove()
-      continue
-    }
-    for (const attribute of [...element.attributes]) {
-      if (/^on/i.test(attribute.name)
-        || attribute.name === 'href'
-        || attribute.name === 'xlink:href') {
-        element.removeAttribute(attribute.name)
-      }
-    }
-  }
-  return svg
-}
 
 function createSvgIcon(name) {
   const span = createEl('span', { class: 'tiptap-icon', 'aria-hidden': 'true' })
   const assetUrl = ICON_ASSET_URLS[name]
-  if (assetUrl) {
-    const image = createEl('img', {
-      src: assetUrl,
-      alt: '',
-      draggable: 'false',
-      'aria-hidden': 'true',
-    })
-    span.appendChild(image)
-    return span
-  }
+  if (!assetUrl) return span
 
-  const svg = parseSvgSource(INLINE_ICON_SOURCES[name])
-  if (svg) span.appendChild(svg)
+  const image = createEl('img', {
+    src: assetUrl,
+    alt: '',
+    draggable: 'false',
+    'aria-hidden': 'true',
+  })
+  span.appendChild(image)
   return span
 }
 
@@ -191,15 +162,18 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive) {
   // kind: 'foreColor' | 'backColor'
   const wrapper = createEl('span', { class: 'tiptap-color-picker' })
 
-  const icon = kind === 'foreColor'
-    ? createEl('span', { class: 'tiptap-color-icon' }, 'A')
-    : createEl('span', { class: 'tiptap-color-icon' }, createSvgIcon('marker'))
+  const icon = createEl('span', { class: 'tiptap-color-icon' }, [
+    createSvgIcon(kind === 'foreColor' ? 'textColor' : 'marker'),
+  ])
+  const arrow = createEl('span', { class: 'tiptap-color-arrow', 'aria-hidden': 'true' }, [
+    createSvgIcon('richtextArrow'),
+  ])
   const toggle = createEl('button', {
     type: 'button',
     class: 'tiptap-color-button',
     'data-format': kind,
     title: kind === 'foreColor' ? '文字颜色' : '背景颜色',
-  }, [icon, createEl('span', { class: 'tiptap-color-arrow', 'aria-hidden': 'true' }, '⌄')])
+  }, [icon, arrow])
   toggle.setAttribute('aria-haspopup', 'true')
   toggle.setAttribute('aria-expanded', 'false')
 
@@ -335,8 +309,8 @@ export function createFormatToolbar(editor, host) {
 
   // 开关式按钮区：粗体 / 斜体 / 下划线 / 删除线
   const toggleGroup = createEl('span', { class: 'tiptap-toolbar-group tiptap-toggle-group' })
-  for (const { format, label, title, className } of TOGGLE_BUTTONS) {
-    const btn = createToolbarButton({ format, title, className, children: label })
+  for (const { format, icon, title, className } of TOGGLE_BUTTONS) {
+    const btn = createToolbarButton({ format, title, className, children: createSvgIcon(icon) })
     btn.setAttribute('aria-pressed', 'false')
     btn.addEventListener('click', () => applyToggle(editor, format))
     toggleGroup.appendChild(btn)
@@ -457,12 +431,6 @@ export function createFormatToolbar(editor, host) {
     { group: 'resource', node: imageBtn },
   ]
   const overflowSet = new Set()
-  // Keep list actions and resource actions together. They are the primary
-  // editing/insertion controls; folding image/voice first makes those actions
-  // appear to be missing even though their buttons are still in the overflow.
-  const listUnits = overflowUnits.filter((unit) => unit.group === 'list')
-  const resourceUnits = overflowUnits.filter((unit) => unit.group === 'resource')
-  const overflowCandidates = overflowUnits.filter((unit) => unit.group !== 'list' && unit.group !== 'resource')
 
   function removeAllChildren(node) {
     while (node.firstChild) node.removeChild(node.firstChild)
@@ -553,23 +521,12 @@ export function createFormatToolbar(editor, host) {
     renderOverflowLayout()
     if (measuredToolbarWidth() <= maxToolbarWidth + 1) return
 
-    // 先折叠普通格式和颜色按钮，尽量让列表和插入控件留在主栏。
-    for (let index = overflowCandidates.length - 1; index >= 0; index--) {
-      overflowSet.add(overflowCandidates[index])
+    // 只从末尾向前折叠，保持主工具栏始终是原始按钮顺序的连续前缀。
+    // 不能为了保留某个按钮而折叠中间按钮，否则会造成工具栏顺序断裂。
+    for (let index = overflowUnits.length - 1; index >= 0; index--) {
+      overflowSet.add(overflowUnits[index])
       renderOverflowLayout()
       if (measuredToolbarWidth() <= maxToolbarWidth + 1) break
-    }
-
-    // 仍然不足时，先整体折叠录音/图片控件，再整体折叠列表控件。
-    // 这样不会出现图片、语音或待办按钮单独消失的情况。
-    if (measuredToolbarWidth() > maxToolbarWidth + 1) {
-      for (const unit of resourceUnits) overflowSet.add(unit)
-      renderOverflowLayout()
-    }
-
-    if (measuredToolbarWidth() > maxToolbarWidth + 1) {
-      for (const unit of listUnits) overflowSet.add(unit)
-      renderOverflowLayout()
     }
   }
 

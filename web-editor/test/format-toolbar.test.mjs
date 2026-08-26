@@ -120,10 +120,14 @@ test('toolbar overflow moves buttons dynamically by available width', () => {
   window.dispatchEvent(new window.Event('resize'))
   let overflowCount = toolbar.querySelectorAll('.tiptap-overflow-panel [data-format]').length
   assert.ok(overflowCount > 0, 'narrow width should move trailing buttons into more panel')
-  const listOverflowStates = ['bulletList', 'orderedList', 'taskList'].map((format) => Boolean(
-    toolbar.querySelector(`button[data-format="${format}"]`)?.closest('.tiptap-overflow-panel'),
-  ))
-  assert.equal(new Set(listOverflowStates).size, 1, 'list and task buttons should overflow as one semantic group')
+  const overflowOrder = ['bold', 'italic', 'underline', 'strike', 'foreColor', 'backColor', 'bulletList', 'orderedList', 'taskList', 'insertVoice', 'insertImage']
+  let reachedOverflow = false
+  for (const format of overflowOrder) {
+    const button = toolbar.querySelector(`button[data-format=\"${format}\"]`)
+    const inOverflow = Boolean(button?.closest('.tiptap-overflow-panel'))
+    if (inOverflow) reachedOverflow = true
+    if (reachedOverflow) assert.equal(inOverflow, true, `${format} should remain in the overflow suffix`)
+  }
   const moreButton = toolbar.querySelector('button[data-format="more"]')
   assert.ok(moreButton, 'more button should exist when the toolbar overflows')
   assert.ok(moreButton.querySelector('img'), 'more should render an image asset')
