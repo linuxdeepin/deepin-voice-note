@@ -154,7 +154,7 @@ Item {
             itemListView.renameCurrentItem();
         }
         onShowShortCutView: {
-            VNoteMainManager.preViewShortcut(Qt.point(rootWindow.x + rootWindow.width / 2, rootWindow.y + rootWindow.height / 2));
+            VNoteMainManager.preViewShortcut(Qt.point((Window.window ? Window.window.x : 0) + rootWindow.width / 2, (Window.window ? Window.window.y : 0) + rootWindow.height / 2));
         }
         onStartRecording: {
             if (initRect.visible) {
