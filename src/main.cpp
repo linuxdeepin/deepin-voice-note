@@ -95,7 +95,9 @@ int main(int argc, char *argv[])
     app->setApplicationVersion(VERSION);
     qInfo() << "Application initialized with version:" << VERSION;
 
+#ifndef NDEBUG
     qputenv("QTWEBENGINE_REMOTE_DEBUGGING", "7777");
+#endif
     VNoteMainManager::instance()->initQMLRegister();
     
     ImageProvider *imageProvider = ImageProvider::instance();
