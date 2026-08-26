@@ -1,3 +1,13 @@
+deepin-voice-note (6.5.66) unstable; urgency=medium
+
+  * fix(startup): enable WebEngine debugging only for debug builds
+  * fix(startup): handle workspace loading fallback and shortcut position
+  * perf(startup): defer workspace initialization for empty notebooks
+  * chore: Sync by https://github.com/linuxdeepin/.github/commit/a300f8523d4876677112edab6a0772f7ad112976
+  * fix(editor): prevent keyboard flash on initial note creation
+
+ -- Wang Yu <wangyu@uniontech.com>  Wed, 26 Aug 2026 17:14:55 +0800
+
 deepin-voice-note (6.5.65) unstable; urgency=medium
 
   * fix(editor): align virtual keyboard behavior for new notes
