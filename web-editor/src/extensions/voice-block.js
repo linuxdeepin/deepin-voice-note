@@ -5,6 +5,9 @@ import { Node, mergeAttributes } from '@tiptap/core'
 import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state'
 import { Slice, Fragment } from '@tiptap/pm/model'
 import voiceBlockCss from './voice-block.css?inline'
+import playingPauseIconUrl from '../../../src/web/img/audio_file_playing_pause/Normal.svg?url'
+import playingPlayIconUrl from '../../../src/web/img/audio_file_playing_play/Normal.svg?url'
+import closePlaybackIconUrl from '../../../src/web/img/playbar_pause_close/Normal.svg?url'
 import { getVoiceBridge, subscribeVoiceEvents } from '../runtime/tiptap-channel.js'
 
 const VOICE_BLOCK_CLIPBOARD_MIME = 'application/x-deepin-voice-note-voice-block'
@@ -13,6 +16,9 @@ const VOICE_BLOCK_CLIPBOARD_MIME = 'application/x-deepin-voice-note-voice-block'
 if (typeof document !== 'undefined') {
   const style = document.createElement('style')
   style.textContent = voiceBlockCss
+    .replaceAll('__PLAYING_PAUSE_ICON__', playingPauseIconUrl)
+    .replaceAll('__PLAYING_PLAY_ICON__', playingPlayIconUrl)
+    .replaceAll('__CLOSE_PLAYBACK_ICON__', closePlaybackIconUrl)
   document.head.appendChild(style)
 }
 

@@ -14,7 +14,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 const spdxBanner = [
   '/*!',
   ' * SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.',
-  ' * SPDX-License-Identifier: GPL-3.0-or-later',
+  ' * SPDX-License-Identifier' + ': GPL-3.0-or-later',
   ' *',
   ' * Bundled runtime: @tiptap/* and ProseMirror (MIT).',
   ' */',

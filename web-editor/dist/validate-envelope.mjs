@@ -13254,13 +13254,13 @@ const voiceBlockCss = `/* SPDX-FileCopyrightText: 2026 UnionTech Software Techno
 }
 
 .voicePlayback.play .voiceBtn {
-    -webkit-mask: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 6h3v12H8V6zm5 0h3v12h-3V6z'/%3E%3C/svg%3E") no-repeat center/cover;
-    mask: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 6h3v12H8V6zm5 0h3v12h-3V6z'/%3E%3C/svg%3E") no-repeat center/cover;
+    -webkit-mask: url("__PLAYING_PAUSE_ICON__") no-repeat center/cover;
+    mask: url("__PLAYING_PAUSE_ICON__") no-repeat center/cover;
 }
 
 .voicePlayback.pause .voiceBtn {
-    -webkit-mask: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9 7.2v9.6c0 .8.9 1.2 1.5.8l6.2-4.8c.5-.4.5-1.2 0-1.6l-6.2-4.8C9.9 6 9 6.4 9 7.2z'/%3E%3C/svg%3E") no-repeat center/cover;
-    mask: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9 7.2v9.6c0 .8.9 1.2 1.5.8l6.2-4.8c.5-.4.5-1.2 0-1.6l-6.2-4.8C9.9 6 9 6.4 9 7.2z'/%3E%3C/svg%3E") no-repeat center/cover;
+    -webkit-mask: url("__PLAYING_PLAY_ICON__") no-repeat center/cover;
+    mask: url("__PLAYING_PLAY_ICON__") no-repeat center/cover;
 }
 
 .voicePlayback.unplayable .voiceBtn {
@@ -13374,11 +13374,13 @@ const voiceBlockCss = `/* SPDX-FileCopyrightText: 2026 UnionTech Software Techno
 .voicePlayback .closePlaybackBarBtn {
     display: none;
     margin-left: 10px;
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
     cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg width='16px' height='16px' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0.7'%3E%3Cg fill='%23000000' fill-rule='nonzero'%3E%3Cg transform='translate(3.5, 3.5)'%3E%3Cpolygon points='9 0.75 5.24925 4.49925 9 8.25 8.25 9 4.49925 5.24925 0.75 9 0 8.25 3.74925 4.49925 0 0.75 0.75 0 4.49925 3.74925 8.25 0'/%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    background-size: 16px 16px;
+    background-image: url("__CLOSE_PLAYBACK_ICON__");
+    background-color: transparent;
+    background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -13489,6 +13491,9 @@ const voiceBlockCss = `/* SPDX-FileCopyrightText: 2026 UnionTech Software Techno
     color: inherit;
 }
 `;
+const playingPauseIconUrl = "data:image/svg+xml,%3c?xml%20version='1.0'%20encoding='UTF-8'?%3e%3csvg%20width='24px'%20height='24px'%20viewBox='0%200%2024%2024'%20version='1.1'%20xmlns='http://www.w3.org/2000/svg'%20xmlns:xlink='http://www.w3.org/1999/xlink'%3e%3ctitle%3eD/audio_file_playing_pause/Normal%3c/title%3e%3cg%20id='D/audio_file_playing_pause/Normal'%20stroke='none'%20stroke-width='1'%20fill='none'%20fill-rule='evenodd'%3e%3cg%20id='ICON/audio/file/normal'%20fill='%23000000'%20fill-rule='nonzero'%3e%3cpath%20d='M12,0%20C18.627417,0%2024,5.372583%2024,12%20C24,18.627417%2018.627417,24%2012,24%20C5.372583,24%200,18.627417%200,12%20C0,5.372583%205.372583,0%2012,0%20Z%20M12,1%20C5.92486775,1%201,5.92486775%201,12%20C1,18.0751322%205.92486775,23%2012,23%20C18.0751322,23%2023,18.0751322%2023,12%20C23,5.92486775%2018.0751322,1%2012,1%20Z%20M9.33333333,7%20C9.70152317,7%2010,7.29847683%2010,7.66666667%20L10,16.3333333%20C10,16.7015232%209.70152317,17%209.33333333,17%20L8.66666667,17%20C8.29847683,17%208,16.7015232%208,16.3333333%20L8,7.66666667%20C8,7.29847683%208.29847683,7%208.66666667,7%20L9.33333333,7%20Z%20M15.3333333,7%20C15.7015232,7%2016,7.29847683%2016,7.66666667%20L16,16.3333333%20C16,16.7015232%2015.7015232,17%2015.3333333,17%20L14.6666667,17%20C14.2984768,17%2014,16.7015232%2014,16.3333333%20L14,7.66666667%20C14,7.29847683%2014.2984768,7%2014.6666667,7%20L15.3333333,7%20Z'%20id='形状结合'%3e%3c/path%3e%3c/g%3e%3c/g%3e%3c/svg%3e";
+const playingPlayIconUrl = "data:image/svg+xml,%3c?xml%20version='1.0'%20encoding='UTF-8'?%3e%3csvg%20width='24px'%20height='24px'%20viewBox='0%200%2024%2024'%20version='1.1'%20xmlns='http://www.w3.org/2000/svg'%20xmlns:xlink='http://www.w3.org/1999/xlink'%3e%3ctitle%3eD/audio_file_playing_play/Normal%3c/title%3e%3cg%20id='D/audio_file_playing_play/Normal'%20stroke='none'%20stroke-width='1'%20fill='none'%20fill-rule='evenodd'%3e%3cg%20id='ICON/audio/file/normal'%20fill='%23000000'%20fill-rule='nonzero'%3e%3cpath%20d='M12,0%20C18.627417,0%2024,5.372583%2024,12%20C24,18.627417%2018.627417,24%2012,24%20C5.372583,24%200,18.627417%200,12%20C0,5.372583%205.372583,0%2012,0%20Z%20M12,1%20C5.92486775,1%201,5.92486775%201,12%20C1,18.0751322%205.92486775,23%2012,23%20C18.0751322,23%2023,18.0751322%2023,12%20C23,5.92486775%2018.0751322,1%2012,1%20Z%20M9,8.64330786%20C9,7.19749521%209.8732078,6.58879434%2010.9503642,7.29356059%20L16.1934598,10.7240344%20C17.2670757,11.4264842%2017.2706162,12.5714525%2016.1934598,13.2762188%20L10.9503642,16.7066926%20C9.87674829,17.4091424%209,16.8071564%209,15.3569453%20Z'%20id='形状结合'%3e%3c/path%3e%3c/g%3e%3c/g%3e%3c/svg%3e";
+const closePlaybackIconUrl = "data:image/svg+xml,%3c?xml%20version='1.0'%20encoding='UTF-8'?%3e%3csvg%20width='16px'%20height='16px'%20viewBox='0%200%2016%2016'%20version='1.1'%20xmlns='http://www.w3.org/2000/svg'%20xmlns:xlink='http://www.w3.org/1999/xlink'%3e%3ctitle%3eD/playbar_pause_close/Normal%3c/title%3e%3cg%20id='D/playbar_pause_close/Normal'%20stroke='none'%20stroke-width='1'%20fill='none'%20fill-rule='evenodd'%20fill-opacity='0.7'%3e%3cg%20id='DTK/按钮/工具按钮/IconButton-Light'%20fill='%23000000'%20fill-rule='nonzero'%3e%3cg%20id='ICON'%20transform='translate(3.5,%203.5)'%3e%3cpolygon%20id='路径'%20points='9%200.75%205.24925%204.49925%209%208.25%208.25%209%204.49925%205.24925%200.75%209%200%208.25%203.74925%204.49925%208.38429373e-14%200.75%200.75%202.56239089e-13%204.49925%203.74925%208.25%200'%3e%3c/polygon%3e%3c/g%3e%3c/g%3e%3c/g%3e%3c/svg%3e";
 var GOOD_LEAF_SIZE = 200;
 var RopeSequence = function RopeSequence2() {
 };
@@ -14053,7 +14058,7 @@ function subscribeVoiceEvents(voiceId, handlers) {
 const VOICE_BLOCK_CLIPBOARD_MIME = "application/x-deepin-voice-note-voice-block";
 if (typeof document !== "undefined") {
   const style = document.createElement("style");
-  style.textContent = voiceBlockCss;
+  style.textContent = voiceBlockCss.replaceAll("__PLAYING_PAUSE_ICON__", playingPauseIconUrl).replaceAll("__PLAYING_PLAY_ICON__", playingPlayIconUrl).replaceAll("__CLOSE_PLAYBACK_ICON__", closePlaybackIconUrl);
   document.head.appendChild(style);
 }
 function generateVoiceId() {

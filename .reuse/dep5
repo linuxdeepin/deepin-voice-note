@@ -53,6 +53,11 @@ Files: translations/*
 Copyright: UnionTech Software Technology Co., Ltd.
 License: LGPL-3.0-or-later
 
+# Tiptap web editor assets
+Files: web-editor/dist/icons/* web-editor/src/runtime/icons/*
+Copyright: None
+License: LGPL-3.0-or-later
+
 # src
 Files: src/*.h src/*.cpp  src/*.c  src/*.hpp src/*.qml src/*.js
 Copyright: UnionTech Software Technology Co., Ltd.

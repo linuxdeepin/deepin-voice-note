@@ -2,12 +2,21 @@
     <qresource prefix="/">
         <file alias="tiptap-editor.html">../web-editor/dist/tiptap-editor.html</file>
         <file alias="tiptap-editor.js">../web-editor/dist/tiptap-editor.js</file>
-        <file alias="icons/bullet-dot.svg">../web-editor/dist/icons/bullet-dot.svg</file>
-        <file alias="icons/bullet-number.svg">../web-editor/dist/icons/bullet-number.svg</file>
+        <file alias="icons/Italic.svg">../web-editor/dist/icons/Italic.svg</file>
+        <file alias="icons/Strikethrough.svg">../web-editor/dist/icons/Strikethrough.svg</file>
+        <file alias="icons/bold.svg">../web-editor/dist/icons/bold.svg</file>
+        <file alias="icons/bullet_dot.svg">../web-editor/dist/icons/bullet_dot.svg</file>
+        <file alias="icons/bullet_number.svg">../web-editor/dist/icons/bullet_number.svg</file>
         <file alias="icons/image.svg">../web-editor/dist/icons/image.svg</file>
-        <file alias="icons/mic.svg">../web-editor/dist/icons/mic.svg</file>
         <file alias="icons/marker.svg">../web-editor/dist/icons/marker.svg</file>
+        <file alias="icons/mic.svg">../web-editor/dist/icons/mic.svg</file>
         <file alias="icons/more.svg">../web-editor/dist/icons/more.svg</file>
+        <file alias="icons/audio-file-playing-pause.svg">../web-editor/dist/icons/audio-file-playing-pause.svg</file>
+        <file alias="icons/audio-file-playing-play.svg">../web-editor/dist/icons/audio-file-playing-play.svg</file>
+        <file alias="icons/playbar-pause-close.svg">../web-editor/dist/icons/playbar-pause-close.svg</file>
+        <file alias="icons/richtext_arrow.svg">../web-editor/dist/icons/richtext_arrow.svg</file>
         <file alias="icons/task.svg">../web-editor/dist/icons/task.svg</file>
+        <file alias="icons/text_color.svg">../web-editor/dist/icons/text_color.svg</file>
+        <file alias="icons/underline.svg">../web-editor/dist/icons/underline.svg</file>
     </qresource>
 </RCC>

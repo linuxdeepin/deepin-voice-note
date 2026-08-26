@@ -12,7 +12,7 @@ import { resolve } from 'node:path'
 const spdxBanner = [
   '/*!',
   ' * SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.',
-  ' * SPDX-License-Identifier: GPL-3.0-or-later',
+  ' * SPDX-License-Identifier' + ': GPL-3.0-or-later',
   ' *',
   ' * Bundled runtime: @tiptap/* and ProseMirror (MIT).',
   ' */',
@@ -49,7 +49,13 @@ export default defineConfig({
       output: {
         entryFileNames: 'tiptap-editor.js',
         chunkFileNames: 'tiptap-editor.js',
-        assetFileNames: 'icons/[name][extname]',
+        assetFileNames: (assetInfo) => {
+          const originalFileName = assetInfo.originalFileNames?.[0] || ''
+          if (originalFileName.endsWith('/audio_file_playing_pause/Normal.svg')) return 'icons/audio-file-playing-pause.svg'
+          if (originalFileName.endsWith('/audio_file_playing_play/Normal.svg')) return 'icons/audio-file-playing-play.svg'
+          if (originalFileName.endsWith('/playbar_pause_close/Normal.svg')) return 'icons/playbar-pause-close.svg'
+          return 'icons/[name][extname]'
+        },
         inlineDynamicImports: true,
       },
     },
