@@ -15,10 +15,15 @@
     html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
     body { margin: 0; padding: 0; width: 100%; height: 100%; cursor: text; overflow-x: hidden; overflow-y: auto; background-color: var(--dvn-editor-bg, #ffffff); color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); }
     #toolbar-host { position: sticky; top: 0; z-index: 10; min-height: 48px; box-sizing: border-box; display: flex; align-items: center; background: var(--dvn-panel-bg, #fbfbfd); border-bottom: 1px solid var(--dvn-toolbar-border, rgba(0, 0, 0, 0.08)); overflow: visible; }
-    #app { width: 100%; min-height: calc(100% - 48px); box-sizing: border-box; overflow: visible; }
+    #note-title-host { min-height: 68px; box-sizing: border-box; display: flex; align-items: flex-start; padding: 13px 20px 4px 30px; background: var(--dvn-editor-bg, #ffffff); }
+    #note-title-input { width: 100%; min-width: 0; box-sizing: border-box; border: 0; outline: none; padding: 0; background: transparent; color: var(--dvn-title-fg, rgba(0, 0, 0, 0.30)); caret-color: var(--highlightColor, #0086cc); font: 600 24px/1.4 var(--dvn-editor-default-font, Helvetica), sans-serif; }
+    #note-title-input.is-custom { color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); }
+    #note-title-input::selection { background: var(--dvn-active-selection-bg, rgba(98, 80, 192, 0.35)); }
+    #app { width: 100%; min-height: calc(100% - 100px); box-sizing: border-box; overflow: visible; }
     .tiptap { width: 100%; min-height: 100%; box-sizing: border-box; overflow: visible; }
     /* Match legacy summernote .note-editable geometry for migration display fidelity. */
-    .ProseMirror { box-sizing: border-box; outline: none; width: 100%; min-height: 100%; overflow: visible; padding: 20px 20px 50px 30px; cursor: text; font-family: var(--dvn-editor-default-font, Helvetica), sans-serif; font-size: 14px; line-height: 1.72; color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); word-wrap: break-word; }
+    .ProseMirror { box-sizing: border-box; outline: none; width: 100%; min-height: 100%; overflow: visible; padding: 0 20px 50px 30px; cursor: text; font-family: var(--dvn-editor-default-font, Helvetica), sans-serif; font-size: 14px; line-height: 1.72; color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); word-wrap: break-word; }
+    #app.is-empty .ProseMirror::before { content: '请输入正文'; display: block; height: 0; color: var(--dvn-placeholder-fg, rgba(0, 0, 0, 0.25)); pointer-events: none; }
     .ProseMirror p { margin: 0; min-height: 1.72em; }
     /* Match legacy Summernote list spacing from saved note CSS.
        Browser defaults indent lists too far and can make migrated long lines
@@ -69,6 +74,9 @@
 </head>
 <body>
   <div id="toolbar-host"></div>
+  <div id="note-title-host">
+    <input id="note-title-input" type="text" maxlength="24" autocomplete="off" spellcheck="false" aria-label="Note title" />
+  </div>
   <div id="app"></div>
   <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
 </body>

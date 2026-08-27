@@ -259,14 +259,12 @@ QString VNoteItemOper::getDefaultNoteName(qint64 folderId)
     qDebug() << "Getting default note name for folder:" << folderId;
     VNoteFolder *folder = VNoteDataManager::instance()->getFolder(folderId);
 
-    QString defaultNoteName = DApplication::translate("DefaultName", "Text");
-
-    if (nullptr != folder && folder->maxNoteIdRef() != 0) {
-        defaultNoteName += QString("%1").arg(folder->maxNoteIdRef());
-        qDebug() << "Generated default note name:" << defaultNoteName;
-    } else {
-        qDebug() << "Using base default note name:" << defaultNoteName;
-    }
+    // maxNoteId is incremented by addNote(), so the next title uses the
+    // number that will be assigned to this new note.
+    QString defaultNoteName = QStringLiteral("未命名文本");
+    const int nextNoteNumber = folder ? folder->maxNoteIdRef() + 1 : 1;
+    defaultNoteName += QString::number(nextNoteNumber);
+    qDebug() << "Generated default note name:" << defaultNoteName;
 
     return defaultNoteName;
 }

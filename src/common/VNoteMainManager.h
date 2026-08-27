@@ -123,6 +123,7 @@ signals:
     void scrollChange(const bool &isTop);
     void updateEditNote(const int &noteId, const QString &time);
     void noteTitleChanged(const int &noteId, const QString &newTitle);
+    void currentNoteChanged(const int &noteId, const QString &title);
     void saveVoiceStateChanged(bool enabled);
     void voiceToTextStateChanged(bool isConverting);
     /**

@@ -12,6 +12,7 @@ test('document mousedown focus helper ignores editor and toolbar clicks', () => 
   const document = window.document
   document.body.innerHTML = `
     <div class="tiptap-toolbar"><button id="toolbarButton">无序</button></div>
+    <div id="note-title-host"><input id="note-title-input" /></div>
     <div class="ProseMirror"><p id="editorText">text</p></div>
     <div id="outside"></div>
   `
@@ -19,6 +20,8 @@ test('document mousedown focus helper ignores editor and toolbar clicks', () => 
   assert.equal(shouldFocusEditorOnDocumentMouseDown(document.getElementById('toolbarButton')), false)
   assert.equal(shouldFocusEditorOnDocumentMouseDown(document.querySelector('.tiptap-toolbar')), false)
   assert.equal(shouldFocusEditorOnDocumentMouseDown(document.getElementById('editorText')), false)
+  assert.equal(shouldFocusEditorOnDocumentMouseDown(document.getElementById('note-title-input')), false)
+  assert.equal(shouldFocusEditorOnDocumentMouseDown(document.getElementById('note-title-host')), false)
   assert.equal(shouldFocusEditorOnDocumentMouseDown(document.getElementById('outside')), true)
   assert.equal(shouldFocusEditorOnDocumentMouseDown(document.body), true)
 })

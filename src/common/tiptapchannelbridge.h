@@ -40,6 +40,8 @@ class TiptapChannelBridge : public QObject
     Q_PROPERTY(QString resourceBaseUrl READ resourceBaseUrl CONSTANT)
     // debug 门控
     Q_PROPERTY(bool debugEnabled READ debugEnabled CONSTANT)
+    Q_PROPERTY(int currentNoteId READ currentNoteId NOTIFY currentNoteChanged)
+    Q_PROPERTY(QString currentNoteTitle READ currentNoteTitle NOTIFY currentNoteChanged)
 
 public:
     explicit TiptapChannelBridge(QObject *parent = nullptr);
@@ -80,6 +82,11 @@ public:
 
     // 前端请求开始录音（工具栏麦克风按钮）
     Q_INVOKABLE void jsRequestRecordVoice();
+
+    // 工作区标题读写（标题显示在编辑器页面中，但不属于正文文档）
+    Q_INVOKABLE int currentNoteId() const;
+    Q_INVOKABLE QString currentNoteTitle() const;
+    Q_INVOKABLE void renameCurrentNote(const QString &title);
 
     // 前端请求查看原图（双击图片），宿主归一化路径后下发预览
     Q_INVOKABLE void jsRequestViewPicture(const QString &url);
@@ -177,6 +184,8 @@ signals:
     // C++→JS：主题下发
     void themeProvided(const QString &theme, const QString &highlightColor,
                        const QString &disableHighlightColor, const QString &backgroundColor);
+    // C++→JS：当前笔记标题变化
+    void currentNoteChanged(int noteId, const QString &title);
 
     // JS→C++：滚动位置上报（isTop=true 表示已滚到顶部）
     void scrollChanged(bool isTop);

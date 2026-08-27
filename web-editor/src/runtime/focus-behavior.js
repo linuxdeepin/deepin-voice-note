@@ -8,5 +8,8 @@ function closestElement(target, selector) {
 }
 
 export function shouldFocusEditorOnDocumentMouseDown(target) {
-  return !closestElement(target, '.ProseMirror') && !closestElement(target, '.tiptap-toolbar')
+  return !closestElement(target, '.ProseMirror')
+    && !closestElement(target, '.tiptap-toolbar')
+    && !closestElement(target, '#note-title-input')
+    && !closestElement(target, '#note-title-host')
 }
