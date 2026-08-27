@@ -1,4 +1,4 @@
-// Copyright (C) 2020 ~ 2020 Deepin Technology Co., Ltd.
+// Copyright (C) 2020 ~ 2026 Deepin Technology Co., Ltd.
 // SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -92,6 +92,8 @@ ApplicationWindow {
 
     InitialInterface {
         id: initialInterface
+        Accessible.name: "InitialInterface"
+        Accessible.role: Accessible.Pane
 
         anchors.fill: parent
         visible: !workspaceLoader.active
@@ -109,6 +111,8 @@ ApplicationWindow {
 
     VNoteMessageDialogLoader {
         id: messageDialogLoader
+        Accessible.name: "MessageDialogLoader"
+        Accessible.role: Accessible.Dialog
     }
 
     Loader {
