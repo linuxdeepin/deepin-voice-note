@@ -53,6 +53,184 @@
     font-size: 14px;
 }
 
+.tiptap-select-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    height: 30px;
+}
+
+.tiptap-native-select {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.tiptap-select-button {
+    position: relative;
+    width: 100%;
+    min-width: 0 !important;
+    padding: 0 18px 0 5px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start !important;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tiptap-select-label {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tiptap-select-button::after {
+    content: '';
+    position: absolute;
+    right: 5px;
+    top: 13px;
+    width: 0;
+    height: 0;
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
+    border-top: 4px solid currentColor;
+}
+
+.tiptap-select-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    display: none;
+    flex-direction: column;
+    min-width: 90px;
+    max-height: 360px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: var(--dvn-menu-padding, 8px 6px);
+    box-sizing: border-box;
+    z-index: 30;
+    background: var(--dvn-menu-bg, var(--dvn-panel-bg, rgba(238, 238, 238, 1)));
+    border: 1px solid var(--dvn-panel-border, #cccccc);
+    border-radius: var(--dvn-menu-radius, 12px);
+    box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.20);
+}
+
+.tiptap-select-menu::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tiptap-select-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tiptap-select-menu::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background: var(--dvn-scrollbar-thumb, rgba(0, 0, 0, 0.30));
+}
+
+.tiptap-select-menu::-webkit-scrollbar-thumb:hover {
+    background: var(--dvn-scrollbar-thumb-hover, rgba(0, 0, 0, 0.50));
+}
+
+.tiptap-select-wrap.is-open .tiptap-select-menu {
+    display: flex;
+}
+
+.tiptap-select-option {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0;
+    height: var(--dvn-menu-item-height, 30px) !important;
+    flex: 0 0 var(--dvn-menu-item-height, 30px);
+    padding: 0 10px !important;
+    border: 0 !important;
+    border-radius: var(--dvn-menu-item-radius, 6px) !important;
+    background: transparent !important;
+    color: var(--dvn-menu-item-fg, var(--dvn-toolbar-fg, #000000)) !important;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: var(--dvn-menu-item-height, 30px);
+    text-align: left;
+    justify-content: flex-start !important;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.tiptap-select-check {
+    display: inline-block;
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    color: #ffffff;
+    background-color: currentColor;
+    -webkit-mask: var(--tiptap-select-check-mask) center / 16px 16px no-repeat;
+    mask: var(--tiptap-select-check-mask) center / 16px 16px no-repeat;
+    visibility: hidden;
+}
+
+.tiptap-select-option[aria-selected="true"] .tiptap-select-check {
+    visibility: visible;
+}
+
+.tiptap-select-option-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tiptap-select-option:hover,
+.tiptap-select-option:focus-visible,
+.tiptap-select-option[aria-selected="true"] {
+    background-color: var(--highlightColor, #0081ff) !important;
+    color: #ffffff !important;
+    outline: none;
+}
+
+.tiptap-select-heading {
+    width: 58px;
+}
+
+.tiptap-select-fontFamily {
+    width: 74px;
+}
+
+.tiptap-select-fontSize {
+    width: 40px;
+}
+
+.tiptap-select-fontFamily .tiptap-select-menu {
+    width: 275px;
+    min-width: 275px;
+}
+
+.tiptap-select-fontFamily .tiptap-select-option {
+    font-size: 14px;
+}
+
+.tiptap-select-fontSize .tiptap-select-menu {
+    min-width: 58px;
+}
+
+.tiptap-select-heading .tiptap-select-option {
+    height: auto !important;
+    min-height: var(--dvn-menu-item-height, 30px);
+    flex-basis: auto;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+    line-height: 1.2;
+}
+
 .tiptap-toolbar button {
     min-width: 30px;
     padding: 0 3px;
