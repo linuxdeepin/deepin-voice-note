@@ -248,6 +248,28 @@ test('heading dropdown applies and clears heading levels', () => {
   editor.destroy()
 })
 
+test('style dropdowns close each other and expose a scrollable custom menu', () => {
+  const { editor, host } = createEditorWithToolbar()
+  const heading = host.querySelector('.tiptap-select-heading')
+  const font = host.querySelector('.tiptap-select-fontFamily')
+  const size = host.querySelector('.tiptap-select-fontSize')
+  assert.ok(heading && font && size)
+
+  heading.querySelector('.tiptap-select-button').click()
+  assert.equal(heading.classList.contains('is-open'), true)
+  assert.equal(font.classList.contains('is-open'), false)
+
+  font.querySelector('.tiptap-select-button').click()
+  assert.equal(heading.classList.contains('is-open'), false)
+  assert.equal(font.classList.contains('is-open'), true)
+  assert.ok(font.querySelector('.tiptap-select-menu'))
+
+  size.querySelector('.tiptap-select-button').click()
+  assert.equal(font.classList.contains('is-open'), false)
+  assert.equal(size.classList.contains('is-open'), true)
+  editor.destroy()
+})
+
 // ---------------------------------------------------------------------------
 // 文字颜色面板
 // ---------------------------------------------------------------------------

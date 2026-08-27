@@ -5,6 +5,7 @@
         <file alias="icons/Italic.svg">../web-editor/dist/icons/Italic.svg</file>
         <file alias="icons/Strikethrough.svg">../web-editor/dist/icons/Strikethrough.svg</file>
         <file alias="icons/bold.svg">../web-editor/dist/icons/bold.svg</file>
+        <file alias="icons/check.svg">../web-editor/dist/icons/check.svg</file>
         <file alias="icons/bullet_dot.svg">../web-editor/dist/icons/bullet_dot.svg</file>
         <file alias="icons/bullet_number.svg">../web-editor/dist/icons/bullet_number.svg</file>
         <file alias="icons/image.svg">../web-editor/dist/icons/image.svg</file>

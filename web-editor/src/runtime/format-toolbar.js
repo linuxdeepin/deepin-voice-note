@@ -15,6 +15,7 @@ import moreIconUrl from './icons/more.svg?url'
 import micIconUrl from './icons/mic.svg?url'
 import imageIconUrl from './icons/image.svg?url'
 import taskListIconUrl from './icons/task.svg?url'
+import checkIconUrl from './icons/check.svg?url'
 import { FORE_COLORS, BACK_COLORS, FONT_SIZES, toPxSize } from './format-palette.js'
 import { canIndentActiveListItem, canOutdentActiveListItem, liftActiveListItem, sinkActiveListItem } from './list-behavior.js'
 
@@ -26,13 +27,13 @@ const TOGGLE_BUTTONS = [
 ]
 
 const HEADING_OPTIONS = [
-  { value: 'p', label: '标题' },
-  { value: '1', label: '标题 1' },
-  { value: '2', label: '标题 2' },
-  { value: '3', label: '标题 3' },
-  { value: '4', label: '标题 4' },
-  { value: '5', label: '标题 5' },
-  { value: '6', label: '标题 6' },
+  { value: 'p', label: '标题', style: { fontSize: '14px' } },
+  { value: '1', label: '标题 1', style: { fontSize: '28px', lineHeight: '1.2' } },
+  { value: '2', label: '标题 2', style: { fontSize: '21px', lineHeight: '1.2' } },
+  { value: '3', label: '标题 3', style: { fontSize: '16px', lineHeight: '1.2' } },
+  { value: '4', label: '标题 4', style: { fontSize: '14px', lineHeight: '1.2' } },
+  { value: '5', label: '标题 5', style: { fontSize: '12px', lineHeight: '1.2' } },
+  { value: '6', label: '标题 6', style: { fontSize: '10px', lineHeight: '1.2' } },
 ]
 
 const LIST_TOGGLE_BUTTONS = [
@@ -248,6 +249,114 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive) {
   return { wrapper, toggle, panel, openPanel, closePanel, setCurrentColor, readActive }
 }
 
+function createStyledSelect({ control, title, options, onChange, onOpen }) {
+  const wrapper = createEl('span', {
+    class: `tiptap-select-wrap tiptap-select-${control}`,
+    'data-control': control,
+  })
+  const select = createEl('select', {
+    class: 'tiptap-native-select',
+    'data-control': control,
+    title,
+    'aria-label': title,
+  })
+  const button = createEl('button', {
+    type: 'button',
+    class: 'tiptap-select-button',
+    'aria-haspopup': 'listbox',
+    'aria-expanded': 'false',
+    'aria-label': title,
+  })
+  const menu = createEl('div', {
+    class: 'tiptap-select-menu',
+    role: 'listbox',
+    'data-control': control,
+  })
+  const label = createEl('span', { class: 'tiptap-select-label' })
+  button.appendChild(label)
+  let currentOptions = []
+
+  function close() {
+    wrapper.classList.remove('is-open')
+    button.setAttribute('aria-expanded', 'false')
+  }
+
+  function sync() {
+    const selected = currentOptions.find((option) => option.value === select.value) || currentOptions[0]
+    label.textContent = selected?.label || ''
+    for (const item of menu.querySelectorAll('.tiptap-select-option')) {
+      const active = item.getAttribute('data-value') === select.value
+      item.setAttribute('aria-selected', active ? 'true' : 'false')
+    }
+  }
+
+  function setOptions(nextOptions) {
+    currentOptions = Array.isArray(nextOptions) ? nextOptions : []
+    select.replaceChildren()
+    menu.replaceChildren()
+    for (const option of currentOptions) {
+      const nativeOption = createEl('option', { value: option.value }, option.label)
+      select.appendChild(nativeOption)
+
+      const check = createEl('span', { class: 'tiptap-select-check', 'aria-hidden': 'true' })
+      check.style.setProperty('--tiptap-select-check-mask', `url("${checkIconUrl}")`)
+      const item = createEl('button', {
+        type: 'button',
+        class: 'tiptap-select-option',
+        role: 'option',
+        'data-value': option.value,
+        'aria-selected': 'false',
+      }, [
+        check,
+        createEl('span', { class: 'tiptap-select-option-label' }, option.label),
+      ])
+      if (option.style && typeof option.style === 'object') {
+        Object.assign(item.style, option.style)
+      }
+      item.addEventListener('click', (event) => {
+        event.stopPropagation()
+        select.value = option.value
+        select.dispatchEvent(new Event('change', { bubbles: true }))
+        close()
+      })
+      menu.appendChild(item)
+    }
+    if (!currentOptions.some((option) => option.value === select.value)) {
+      select.value = currentOptions[0]?.value || ''
+    }
+    sync()
+  }
+
+  button.addEventListener('click', (event) => {
+    event.stopPropagation()
+    const open = !wrapper.classList.contains('is-open')
+    if (open) onOpen?.(wrapper)
+    wrapper.classList.toggle('is-open', open)
+    button.setAttribute('aria-expanded', open ? 'true' : 'false')
+  })
+  select.addEventListener('change', () => {
+    sync()
+    onChange?.(select.value)
+  })
+
+  wrapper.appendChild(select)
+  wrapper.appendChild(button)
+  wrapper.appendChild(menu)
+  setOptions(options)
+  return {
+    wrapper,
+    select,
+    button,
+    menu,
+    close,
+    setOptions,
+    setValue(value) {
+      select.value = value
+      sync()
+    },
+  }
+}
+
 export function createFormatToolbar(editor, host) {
   if (!editor) throw new Error('editor instance is required')
   if (!host) throw new Error('toolbar host element is required')
@@ -274,46 +383,62 @@ export function createFormatToolbar(editor, host) {
   // 样式区：标题 / 字体 / 字号
   const styleGroup = createEl('span', { class: 'tiptap-toolbar-group tiptap-style-group' })
 
-  const headingSelect = createEl('select', { 'data-control': 'heading', title: '标题', 'aria-label': '标题' })
-  for (const { value, label } of HEADING_OPTIONS) {
-    headingSelect.appendChild(createEl('option', { value }, label))
-  }
-  headingSelect.addEventListener('change', () => {
-    const value = headingSelect.value
-    if (value === 'p') {
-      editor.chain().focus().setParagraph().run()
-    } else {
-      editor.chain().focus().toggleHeading({ level: Number(value) }).run()
-    }
-  })
-  styleGroup.appendChild(headingSelect)
+  let closeStyleSelects = () => {}
 
-  const fontSelect = createEl('select', { 'data-control': 'fontFamily', title: '字体', 'aria-label': '字体' })
-  fontSelect.appendChild(createEl('option', { value: '' }, '字体'))
-  fontSelect.addEventListener('change', () => {
-    const value = fontSelect.value
-    if (!value) {
-      clearMarkColor(editor, 'fontFamily')
-    } else {
-      applyMarkColor(editor, 'fontFamily', 'fontFamily', value)
-    }
+  const headingControl = createStyledSelect({
+    control: 'heading',
+    title: '标题',
+    onOpen: (current) => closeStyleSelects(current),
+    options: HEADING_OPTIONS.map(({ value, label, style }) => ({ value, label, style })),
+    onChange(value) {
+      if (value === 'p') {
+        editor.chain().focus().setParagraph().run()
+      } else {
+        editor.chain().focus().toggleHeading({ level: Number(value) }).run()
+      }
+    },
   })
-  styleGroup.appendChild(fontSelect)
+  styleGroup.appendChild(headingControl.wrapper)
 
-  const sizeSelect = createEl('select', { 'data-control': 'fontSize', title: '字号', 'aria-label': '字号' })
-  sizeSelect.appendChild(createEl('option', { value: '' }, '14'))
-  for (const size of FONT_SIZES) {
-    sizeSelect.appendChild(createEl('option', { value: size }, size))
-  }
-  sizeSelect.addEventListener('change', () => {
-    const value = sizeSelect.value
-    if (!value) {
-      clearMarkColor(editor, 'fontSize')
-    } else {
-      applyMarkColor(editor, 'fontSize', 'fontSize', toPxSize(value))
-    }
+  const fontControl = createStyledSelect({
+    control: 'fontFamily',
+    title: '字体',
+    onOpen: (current) => closeStyleSelects(current),
+    options: [{ value: '', label: '字体' }],
+    onChange(value) {
+      if (!value) {
+        clearMarkColor(editor, 'fontFamily')
+      } else {
+        applyMarkColor(editor, 'fontFamily', 'fontFamily', value)
+      }
+    },
   })
-  styleGroup.appendChild(sizeSelect)
+  styleGroup.appendChild(fontControl.wrapper)
+
+  const sizeControl = createStyledSelect({
+    control: 'fontSize',
+    title: '字号',
+    onOpen: (current) => closeStyleSelects(current),
+    options: [
+      { value: '', label: '14', style: { fontSize: '14px' } },
+      ...FONT_SIZES.map((size) => ({ value: size, label: size, style: { fontSize: `${size}px` } })),
+    ],
+    onChange(value) {
+      if (!value) {
+        clearMarkColor(editor, 'fontSize')
+      } else {
+        applyMarkColor(editor, 'fontSize', 'fontSize', toPxSize(value))
+      }
+    },
+  })
+  styleGroup.appendChild(sizeControl.wrapper)
+
+  const styleControls = [headingControl, fontControl, sizeControl]
+  closeStyleSelects = (except) => {
+    for (const control of styleControls) {
+      if (control.wrapper !== except) control.close()
+    }
+  }
   toolbar.appendChild(styleGroup)
   const styleToggleSeparator = createSeparator()
   toolbar.appendChild(styleToggleSeparator)
@@ -468,6 +593,9 @@ export function createFormatToolbar(editor, host) {
     moreBtn.setAttribute('aria-expanded', open ? 'true' : 'false')
     forePicker.closePanel()
     backPicker.closePanel()
+    headingControl.close()
+    fontControl.close()
+    sizeControl.close()
   }
 
   function unitsInGroup(group, inOverflow) {
@@ -562,6 +690,9 @@ export function createFormatToolbar(editor, host) {
     if (!toolbar.contains(event.target)) {
       forePicker.closePanel()
       backPicker.closePanel()
+      headingControl.close()
+      fontControl.close()
+      sizeControl.close()
       closeOverflowPanel()
     }
   }
@@ -595,15 +726,15 @@ export function createFormatToolbar(editor, host) {
         }
       }
     }
-    headingSelect.value = activeLevel
+    headingControl.setValue(activeLevel)
 
     // 字体
     const fontFamily = hasSelectionContext ? editor.getAttributes('fontFamily').fontFamily : ''
-    fontSelect.value = fontFamily || ''
+    fontControl.setValue(fontFamily || '')
 
     // 字号
     const fontSize = hasSelectionContext ? editor.getAttributes('fontSize').fontSize : ''
-    sizeSelect.value = fontSize ? String(parseInt(fontSize, 10)) : ''
+    sizeControl.setValue(fontSize ? String(parseInt(fontSize, 10)) : '')
 
     // 颜色选中态
     const foreColor = hasSelectionContext ? editor.getAttributes('color').color : ''
@@ -654,7 +785,6 @@ export function createFormatToolbar(editor, host) {
     },
     setResourceButtonsEnabled,
     setFontList(fonts, defaultFont) {
-      fontSelect.replaceChildren()
       const normalized = Array.isArray(fonts)
         ? fonts.filter((name, index, array) => typeof name === 'string' && name.trim() && array.indexOf(name) === index)
         : []
@@ -668,16 +798,13 @@ export function createFormatToolbar(editor, host) {
         document.documentElement.style.setProperty('--dvn-editor-default-font', effectiveDefaultFont)
       }
 
-      // 与 Summernote 保持一致：没有显式 fontFamily mark 时，按钮仍显示系统默认字体。
-      // 因此保留 value="" 的默认项；syncActiveStates() 在无 mark 时会回到该项。
-      fontSelect.appendChild(createEl('option', { value: '' }, effectiveDefaultFont || '字体'))
-
-      for (const name of list) {
-        const option = createEl('option', { value: name }, name)
-        fontSelect.appendChild(option)
-      }
+      // 与 Summernote 保持一致：下拉项按各自字体渲染；默认项仍代表当前系统字体。
+      fontControl.setOptions([
+        { value: '', label: effectiveDefaultFont || '字体', style: effectiveDefaultFont ? { fontFamily: effectiveDefaultFont } : {} },
+        ...list.map((name) => ({ value: name, label: name, style: { fontFamily: name } })),
+      ])
       const currentFont = editor.getAttributes('fontFamily').fontFamily
-      fontSelect.value = currentFont && list.includes(currentFont) ? currentFont : ''
+      fontControl.setValue(currentFont && list.includes(currentFont) ? currentFont : '')
       updateOverflowMode()
     },
     destroy() {
@@ -686,6 +813,9 @@ export function createFormatToolbar(editor, host) {
       editor.off?.('transaction', syncActiveStates)
       editor.off?.('focus', syncActiveStates)
       editor.off?.('blur', syncActiveStates)
+      headingControl.close()
+      fontControl.close()
+      sizeControl.close()
       resizeObserver?.disconnect()
     },
   }
