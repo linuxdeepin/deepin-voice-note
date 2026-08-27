@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "tiptapchannelbridge.h"
+#include "VNoteMainManager.h"
 
 #include <QResource>
 #include <QCoreApplication>
@@ -246,6 +247,22 @@ void TiptapChannelBridge::jsRequestPickImage()
 void TiptapChannelBridge::jsRequestRecordVoice()
 {
     emit recordVoiceRequested();
+}
+
+int TiptapChannelBridge::currentNoteId() const
+{
+    return VNoteMainManager::instance()->currentNoteId();
+}
+
+QString TiptapChannelBridge::currentNoteTitle() const
+{
+    const int noteId = currentNoteId();
+    return VNoteMainManager::instance()->getNotePlainTitle(noteId);
+}
+
+void TiptapChannelBridge::renameCurrentNote(const QString &title)
+{
+    VNoteMainManager::instance()->renameNote(currentNoteId(), title);
 }
 
 void TiptapChannelBridge::jsRequestViewPicture(const QString &url)

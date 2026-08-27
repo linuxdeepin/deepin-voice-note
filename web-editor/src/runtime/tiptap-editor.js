@@ -50,6 +50,16 @@ function setupTransientScrollbar() {
 
 setupTransientScrollbar()
 const editor = createTiptapEditor(document.getElementById('app'))
+const appElement = document.getElementById('app')
+function syncEditorEmptyState() {
+  appElement.classList.toggle('is-empty', editor.isEmpty)
+}
+editor.on('create', syncEditorEmptyState)
+editor.on('update', syncEditorEmptyState)
+// setContent(..., { emitUpdate: false }) is used when loading a note.
+// It still changes the ProseMirror transaction state, so sync here as well;
+// otherwise the empty placeholder can remain visible over loaded/typed text.
+editor.on('transaction', syncEditorEmptyState)
 if (typeof window !== 'undefined') {
   window.__dvnTiptapEditor = editor
   window.__dvnTiptapContextTranscript = null
@@ -86,10 +96,65 @@ if (typeof window !== 'undefined') {
     return editor.chain().focus().redo().run()
   }
 }
+syncEditorEmptyState()
 const toolbar = createFormatToolbar(editor, document.getElementById('toolbar-host'))
+const titleInput = document.getElementById('note-title-input')
 let tiptapBridge = null
 let pendingPickImage = false
 let pendingRecordVoice = false
+let currentTitleNoteId = -1
+let savedTitle = ''
+let titleSyncing = false
+
+function normalizeNoteTitle(value) {
+  return String(value ?? '').trim().slice(0, 24)
+}
+
+function isGeneratedNoteTitle(value) {
+  return /^未命名文本\d+$/.test(String(value ?? ''))
+}
+
+function syncNoteTitleStyle(value) {
+  titleInput.classList.toggle('is-custom', Boolean(value) && !isGeneratedNoteTitle(value))
+}
+
+function setNoteTitle(value) {
+  titleSyncing = true
+  titleInput.value = value
+  syncNoteTitleStyle(value)
+  titleSyncing = false
+}
+
+function loadNoteTitle(noteId, title) {
+  currentTitleNoteId = Number(noteId)
+  savedTitle = normalizeNoteTitle(title)
+  setNoteTitle(savedTitle)
+}
+
+function commitNoteTitle() {
+  if (titleSyncing || currentTitleNoteId <= 0) return
+  const normalized = normalizeNoteTitle(titleInput.value)
+  if (!normalized || normalized === savedTitle) {
+    setNoteTitle(savedTitle)
+    return
+  }
+  tiptapBridge?.renameCurrentNote?.(normalized)
+  savedTitle = normalized
+  setNoteTitle(savedTitle)
+}
+
+titleInput.addEventListener('input', () => {
+  if (titleInput.value.length > 24) titleInput.value = titleInput.value.slice(0, 24)
+  syncNoteTitleStyle(titleInput.value.trim())
+})
+titleInput.addEventListener('blur', commitNoteTitle)
+titleInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault()
+    commitNoteTitle()
+    titleInput.blur()
+  }
+})
 
 // 工具栏可能先于 QWebChannel 完成绑定就已经可见。先缓存用户操作，
 // 避免首次点击在 bridge 尚未就绪时被静默丢弃。
@@ -129,6 +194,10 @@ bindTiptapChannel(editor, undefined, {
   onFontList: (fonts, defaultFont) => toolbar.setFontList(fonts, defaultFont),
 }).then((bridge) => {
   tiptapBridge = bridge
+  loadNoteTitle(bridge.currentNoteId, bridge.currentNoteTitle)
+  if (bridge.currentNoteChanged?.connect) {
+    bridge.currentNoteChanged.connect((noteId, title) => loadNoteTitle(noteId, title))
+  }
   // 注入 voice 桥，连接 voice 运行态信号分发
   setVoiceBridge(bridge)
   // bridge 就绪后补发绑定完成前缓存的首次点击。

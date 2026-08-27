@@ -181,6 +181,8 @@ void VNoteMainManager::initConnections()
     connect(m_richTextManager, &WebRichTextManager::updateSearch, this, &VNoteMainManager::updateSearch);
     connect(m_richTextManager, &WebRichTextManager::scrollChange, this, &VNoteMainManager::scrollChange);
     connect(TiptapChannelBridge::instance(), &TiptapChannelBridge::scrollChanged, this, &VNoteMainManager::scrollChange);
+    connect(this, &VNoteMainManager::currentNoteChanged,
+            TiptapChannelBridge::instance(), &TiptapChannelBridge::currentNoteChanged);
     connect(m_richTextManager, &WebRichTextManager::finishedUpdateNote, this, &VNoteMainManager::onRichTextSaveFinished);
     connect(VoiceRecoderHandler::instance(), &VoiceRecoderHandler::finishedRecod, this, &VNoteMainManager::insertVoice);
     qInfo() << "Connections initialized";
@@ -549,9 +551,11 @@ void VNoteMainManager::doSwitchNote(int noteId)
         qWarning() << "vNoteChanged resolved to null note, skipping initData";
         // 清空编辑区避免残留
         m_richTextManager->initData(nullptr, "");
+        emit currentNoteChanged(-1, QString());
         return;
     }
     m_richTextManager->initData(data, "");
+    emit currentNoteChanged(m_currentNoteId, data->noteTitle);
     qDebug() << "Note change completed";
 }
 
@@ -767,6 +771,7 @@ void VNoteMainManager::doCreateNote(int folderId)
     if (isCurrentFolder) {
         m_currentNoteId = newNote->noteId;
         m_noteItems.append(newNote);
+        emit currentNoteChanged(m_currentNoteId, newNote->noteTitle);
     }
 
     QVariantMap data;
@@ -1371,9 +1376,12 @@ void VNoteMainManager::renameNote(const int &index, const QString &newName)
                 }
             } else {
                 qDebug() << "Playing audio, skip reloading to preserve play state";
-                // 更新标题
                 item->noteTitle = newName;
-                emit noteTitleChanged(index, newName);
+            }
+            // 标题变更统一通知列表和工作区，避免工作区标题只在播放状态下刷新。
+            emit noteTitleChanged(index, newName);
+            if (index == m_currentNoteId) {
+                emit currentNoteChanged(index, newName);
             }
         } else {
             qWarning() << "Failed to rename note";
