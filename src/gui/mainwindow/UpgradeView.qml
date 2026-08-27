@@ -114,6 +114,9 @@ Item {
         // 取消按钮（运行态可见；cancelling 时置灰）。
         // DTK Button（org.deepin.dtk 1.0），固定宽高保证可见可点。
         Button {
+            Accessible.name: "UpgradeView_Button"
+            Accessible.role: Accessible.Button
+
             Layout.alignment: Qt.AlignHCenter
             width: 120
             height: 36
@@ -163,6 +166,9 @@ Item {
             interactive: contentHeight > height
 
             ScrollBar.vertical: ScrollBar {
+                Accessible.name: "UpgradeView_ScrollBar"
+                Accessible.role: Accessible.ScrollBar
+
                 policy: terminalFlickable.contentHeight > terminalFlickable.height
                         ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
             }
