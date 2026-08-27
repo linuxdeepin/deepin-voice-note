@@ -51,6 +51,12 @@ export default defineConfig({
         chunkFileNames: 'tiptap-editor.js',
         assetFileNames: (assetInfo) => {
           const originalFileName = assetInfo.originalFileNames?.[0] || ''
+          if (originalFileName.endsWith('/audio_file_play/Normal/Light.svg')) return 'icons/audio-file-play-normal-light.svg'
+          if (originalFileName.endsWith('/audio_file_play/Hover/Light.svg')) return 'icons/audio-file-play-hover-light.svg'
+          if (originalFileName.endsWith('/audio_file_play/Pressed/Light.svg')) return 'icons/audio-file-play-pressed-light.svg'
+          if (originalFileName.endsWith('/audio_file_play/Normal/Dark.svg')) return 'icons/audio-file-play-normal-dark.svg'
+          if (originalFileName.endsWith('/audio_file_play/Hover/Dark.svg')) return 'icons/audio-file-play-hover-dark.svg'
+          if (originalFileName.endsWith('/audio_file_play/Pressed/Dark.svg')) return 'icons/audio-file-play-pressed-dark.svg'
           if (originalFileName.endsWith('/audio_file_playing_pause/Normal.svg')) return 'icons/audio-file-playing-pause.svg'
           if (originalFileName.endsWith('/audio_file_playing_play/Normal.svg')) return 'icons/audio-file-playing-play.svg'
           if (originalFileName.endsWith('/playbar_pause_close/Normal.svg')) return 'icons/playbar-pause-close.svg'

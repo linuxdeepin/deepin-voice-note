@@ -21,6 +21,7 @@
 #include <QApplication>
 #include <QCursor>
 #include <QDBusInterface>
+#include <QBuffer>
 #include <QDBusPendingReply>
 #include <QKeyEvent>
 #include <QJsonDocument>
@@ -445,6 +446,9 @@ void WebEngineHandler::connectWebContent()
     connect(TiptapChannelBridge::instance(), &TiptapChannelBridge::editorReady,
             this, [this]() {
                 TiptapChannelBridge::instance()->sendFontList(m_fontList, m_defaultFont);
+                // 主题信号可能早于 Tiptap QWebChannel 建立而发出；编辑器
+                // ready 后主动补发一次，保证首次打开时深浅色样式正确。
+                onThemeChanged();
             });
     // --- Tiptap voice 播放/转写通道接线 ---
     connect(TiptapChannelBridge::instance(), &TiptapChannelBridge::voicePlaybackRequested,
@@ -806,17 +810,44 @@ void WebEngineHandler::onPaste(bool isVoice)
     // 获取剪贴板信息
     QClipboard *clipboard = QApplication::clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
-    
-    // 存在文件url
-    if (mimeData->hasUrls()) {
+
+    // Tiptap 不使用 JsContent 的 Summernote 插入信号。文件图片通过
+    // VNoteMainManager 复用 Tiptap 图片下发链路；位图剪贴板则编码为
+    // data URL，交给 TiptapChannelBridge::jsPasteImage 统一落盘。
+    if (TiptapChannelBridge::instance()->debugEnabled() && mimeData) {
+        if (mimeData->hasUrls()) {
+            qInfo() << "Tiptap paste: mimeData has urls";
+            VNoteMainManager::instance()->insertImages(mimeData->urls());
+            return;
+        }
+        if (mimeData->hasImage()) {
+            const QImage image = qvariant_cast<QImage>(mimeData->imageData());
+            if (!image.isNull()) {
+                QByteArray imageBytes;
+                QBuffer buffer(&imageBytes);
+                if (buffer.open(QIODevice::WriteOnly) && image.save(&buffer, "PNG")) {
+                    const QString dataUrl = QStringLiteral("data:image/png;base64,")
+                            + QString::fromLatin1(imageBytes.toBase64());
+                    TiptapChannelBridge::instance()->jsPasteImage(dataUrl);
+                    qInfo() << "Tiptap paste: clipboard image routed to Tiptap";
+                    return;
+                }
+            }
+            qWarning() << "Tiptap paste: clipboard image is invalid";
+            return;
+        }
+    }
+
+    // Summernote 路径：存在文件 URL 或位图时由 JsContent 负责落盘。
+    if (mimeData && mimeData->hasUrls()) {
         qInfo() << "mimeData has urls";
         QStringList paths;
-        for (auto url : mimeData->urls()) {
+        for (const auto &url : mimeData->urls()) {
             paths.push_back(url.path());
         }
         qDebug() << "Pasting URLs:" << paths;
         JsContent::instance()->insertImages(paths);
-    } else if (mimeData->hasImage()) {
+    } else if (mimeData && mimeData->hasImage()) {
         qDebug() << "Pasting image from clipboard";
         JsContent::instance()->insertImages(qvariant_cast<QImage>(mimeData->imageData()));
     } else {

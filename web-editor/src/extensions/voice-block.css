@@ -62,15 +62,28 @@
     background-repeat: no-repeat;
     background-position: center;
     background-color: transparent;
-    background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='12' fill='white'/%3E%3Cpath d='M10.9504 7.29356C9.87321 6.58879 9 7.1975 9 8.64331V15.3569C9 16.8072 9.87675 17.4091 10.9504 16.7067L16.1935 13.2762C17.2706 12.5715 17.2671 11.4265 16.1935 10.724L10.9504 7.29356Z' fill='%230058DE'/%3E%3C/svg%3E");
+    background-image: var(--dvn-voice-play-normal-icon);
 }
 
 .voicePlayback .voiceBtn:hover {
-    background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='12' fill='white'/%3E%3Cpath d='M10.9504 7.29356C9.87321 6.58879 9 7.1975 9 8.64331V15.3569C9 16.8072 9.87675 17.4091 10.9504 16.7067L16.1935 13.2762C17.2706 12.5715 17.2671 11.4265 16.1935 10.724L10.9504 7.29356Z' fill='%230058DE'/%3E%3Ccircle cx='12' cy='12' r='12' fill='white' fill-opacity='.2'/%3E%3C/svg%3E");
+    background-image: var(--dvn-voice-play-hover-icon);
 }
 
 .voicePlayback .voiceBtn:active {
-    background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='12' r='12' fill='white'/%3E%3Cpath d='M10.9504 7.29356C9.87321 6.58879 9 7.1975 9 8.64331V15.3569C9 16.8072 9.87675 17.4091 10.9504 16.7067L16.1935 13.2762C17.2706 12.5715 17.2671 11.4265 16.1935 10.724L10.9504 7.29356Z' fill='%230058DE'/%3E%3Ccircle cx='12' cy='12' r='12' fill='black' fill-opacity='.2'/%3E%3C/svg%3E");
+    background-image: var(--dvn-voice-play-pressed-icon);
+}
+
+/* Use the project playback assets and switch them with the document theme. */
+:root {
+    --dvn-voice-play-normal-icon: url("__PLAY_NORMAL_LIGHT_ICON__");
+    --dvn-voice-play-hover-icon: url("__PLAY_HOVER_LIGHT_ICON__");
+    --dvn-voice-play-pressed-icon: url("__PLAY_PRESSED_LIGHT_ICON__");
+}
+
+:root[data-dvn-theme="dark"] {
+    --dvn-voice-play-normal-icon: url("__PLAY_NORMAL_DARK_ICON__");
+    --dvn-voice-play-hover-icon: url("__PLAY_HOVER_DARK_ICON__");
+    --dvn-voice-play-pressed-icon: url("__PLAY_PRESSED_DARK_ICON__");
 }
 
 .voicePlayback.play .voiceBtn,
@@ -204,11 +217,12 @@
     height: 16px;
     flex: 0 0 16px;
     cursor: pointer;
-    background-image: url("__CLOSE_PLAYBACK_ICON__");
-    background-color: transparent;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+    /* The source SVG is the light-theme black icon. Use it as a mask so the
+       close control follows the current theme foreground color. */
+    background-image: none;
+    background-color: var(--dvn-voice-text, rgba(65, 77, 104, 1));
+    -webkit-mask: url("__CLOSE_PLAYBACK_ICON__") no-repeat center/contain;
+    mask: url("__CLOSE_PLAYBACK_ICON__") no-repeat center/contain;
 }
 
 .voicePlayback .progressBar,

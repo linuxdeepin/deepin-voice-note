@@ -94,9 +94,7 @@ Item {
             return shouldBlock;
         }
         // 与工具栏录音入口同条件：录音不可用或正在播放时禁用 Ctrl+R
-        blockRecordingKey: isRecordingAudio
-                           || webEngineView.titleBar.isPlaying
-                           || !webEngineView.titleBar.recordBtnEnabled
+        blockRecordingKey: !webEngineView.recordingAvailable
         initialOnlyCreateFolder: initRect.visible
         isDragging: itemListView.isDragging || folderListView.isDragging
 
@@ -164,8 +162,9 @@ Item {
                 console.log("No notes available, cannot start recording");
                 return;
             }
-            webEngineView.startRecording();
-            VoiceRecoderHandler.startRecoder();
+            if (webEngineView.startRecording()) {
+                VoiceRecoderHandler.startRecoder();
+            }
         }
         onSaveNote: {
             // 检查是否有笔记可以保存

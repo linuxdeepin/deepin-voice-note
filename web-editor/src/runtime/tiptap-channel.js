@@ -343,12 +343,15 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
 
   // 主题联动：工具栏 / 语音块 / 滚动条 / 取色板 / 图片自绘菜单
   const isDark = theme === 'dark'
+  root.dataset.dvnTheme = isDark ? 'dark' : 'light'
+  root.style.setProperty('--dvn-editor-bg', isDark ? '#242424' : '#FBFCFD')
   root.style.setProperty('--dvn-panel-bg', isDark ? '#252525' : '#ffffff')
   root.style.setProperty('--dvn-toolbar-bg', isDark ? 'rgba(42, 42, 42, 1)' : 'rgba(245, 245, 245, 1)')
   root.style.setProperty('--dvn-toolbar-border-soft', isDark ? 'rgba(0, 0, 0, 0.30)' : 'rgba(0, 0, 0, 0.04)')
   root.style.setProperty('--dvn-panel-border', isDark ? '#444444' : '#cccccc')
   root.style.setProperty('--dvn-toolbar-border', isDark ? '#3d3d3d' : '#d0d0d0')
   root.style.setProperty('--dvn-toolbar-fg', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(63, 63, 63, 1)')
+  root.style.setProperty('--dvn-editor-fg', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(0, 0, 0, 1)')
   root.style.setProperty('--dvn-toolbar-separator', isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)')
   root.style.setProperty('--dvn-scrollbar-thumb', isDark ? 'rgba(255, 255, 255, 0.20)' : 'rgba(0, 0, 0, 0.30)')
   root.style.setProperty('--dvn-scrollbar-thumb-hover', isDark ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.50)')
@@ -356,6 +359,7 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-hover-bg', isDark ? '#3d3d3d' : '#f0f0f0')
   root.style.setProperty('--dvn-clear-btn-bg', isDark ? '#2d2d2d' : '#fafafa')
   root.style.setProperty('--dvn-active-outline', highlightColor || '#0086cc')
+  // Summernote 深色主题在 #242424 画布上使用白色 5% 的语音块背景。
   root.style.setProperty('--dvn-voice-bg', isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)')
   root.style.setProperty('--dvn-voice-title', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(0, 26, 46, 1)')
   root.style.setProperty('--dvn-voice-text', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(65, 77, 104, 1)')

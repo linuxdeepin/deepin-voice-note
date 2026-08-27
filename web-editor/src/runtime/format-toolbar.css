@@ -7,7 +7,7 @@
     align-items: center;
     gap: 0;
     width: max-content;
-    max-width: calc(100% - 20px);
+    max-width: calc(100% - 10px);
     min-height: 40px;
     box-sizing: border-box;
     margin: 0 0 0 10px;
@@ -279,6 +279,7 @@
 
 
 .tiptap-more-button {
+    position: relative;
     min-width: 30px !important;
     width: 30px !important;
     height: 30px !important;
@@ -287,6 +288,38 @@
     color: inherit !important;
     font-size: 16px !important;
     letter-spacing: 0;
+}
+
+/* Native title tooltips are misplaced by QtWebEngine for this sticky toolbar.
+   Anchor the hint to the more button itself, matching the Summernote tooltip. */
+.tiptap-more-button[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    z-index: 50;
+    padding: 4px 8px;
+    border: 1px solid var(--dvn-tooltip-border, rgba(0, 0, 0, 0.08));
+    border-radius: 8px;
+    background: var(--dvn-tooltip-bg, rgba(245, 245, 245, 0.98));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    color: var(--dvn-tooltip-fg, #3f3f3f);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 20px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -2px);
+    transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease;
+}
+
+.tiptap-more-button[data-tooltip]:hover::after,
+.tiptap-more-button[data-tooltip]:focus-visible::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
 }
 
 .tiptap-more-button[aria-expanded="true"] {

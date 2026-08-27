@@ -45,7 +45,26 @@ void VoiceRecoderHandler::startRecoder()
         qDebug() << "Cannot start recording while in search mode";
         return;
     }
-    
+
+    // QML 入口会提前拦截这些状态，D-Bus/其他宿主入口也必须遵守同一规则。
+    if (OpsStateInterface::instance()->isPlaying()
+        || OpsStateInterface::instance()->isVoice2Text()) {
+        qWarning() << "Cannot start recording while playing or converting voice to text";
+        return;
+    }
+
+    if (m_type != RecoderType::Idle) {
+        qWarning() << "Cannot start recording while recorder is active, state:" << m_type;
+        return;
+    }
+
+    if (!isRecordDeviceEnabled()) {
+        qWarning() << "Cannot start recording without an enabled audio device";
+        emit updateRecordBtnState(false);
+        emit recoderStateChange(RecoderType::Idle);
+        return;
+    }
+
     qDebug() << "Starting voice recorder";
     if (!checkVolume()) {
         qDebug() << "Volume check passed, confirming start";
@@ -238,8 +257,13 @@ void VoiceRecoderHandler::confirmStartRecoder()
     bool ret = m_audioRecoder->startRecord();
     if (!ret) {
         qWarning() << "Failed to start recording";
+        // startRecord 失败时 m_type 仍为 Idle，不能依赖 stopRecoder()
+        // 发送 Idle 信号，否则 QML 侧的录音界面和按钮会残留在禁用状态。
+        m_audioRecoder->stopRecord();
         m_type = RecoderType::Idle;
-        stopRecoder();
+        OpsStateInterface::instance()->operState(OpsStateInterface::StateRecording, false);
+        emit recoderStateChange(m_type);
+        emit updateRecordBtnState(isRecordDeviceEnabled());
     } else {
         qInfo() << "Recording started successfully";
         m_type = RecoderType::Recording;
@@ -267,7 +291,10 @@ void VoiceRecoderHandler::onAudioDeviceChange(int mode)
             updateRecordBtnState(false);
             updateWave(0.0);
         } else {
-            bool isEnable = m_audioWatcher->getDeviceEnable(static_cast<AudioWatcher::AudioMode>(m_currentMode));
+            // AudioWatcher 的 enable 缓存可能在设备刚插入、DBus 状态
+            // 尚未完成刷新时短暂为 false；当前设备名存在即说明录音音源
+            // 已经可用，统一通过 isRecordDeviceEnabled() 判断。
+            bool isEnable = isRecordDeviceEnabled();
             qDebug() << "Device enabled state:" << isEnable;
             
             // 如果正在录音，需要完全停止录音并通知UI关闭界面
@@ -339,4 +366,22 @@ bool VoiceRecoderHandler::hasAudioInputDevice()
 {
     qDebug() << "Checking audio input device availability using AudioWatcher";
     return m_audioWatcher ? m_audioWatcher->hasAudioInputDevice() : false;
+}
+
+bool VoiceRecoderHandler::isRecordDeviceEnabled() const
+{
+    if (!m_audioWatcher) {
+        return false;
+    }
+
+    const auto mode = static_cast<AudioWatcher::AudioMode>(m_currentMode);
+    if (m_audioWatcher->getDeviceEnable(mode)) {
+        return true;
+    }
+
+    // 设备刚插入时 CardsWithoutUnavailable 的缓存更新可能晚于默认
+    // source 的更新。只要当前录音设备能够解析出有效名称，就不能在
+    // UI 和录音入口中提前判定为不可用。后续 DBus 状态同步仍会负责
+    // 在设备真正移除/禁用时发送 false。
+    return !m_audioWatcher->getDeviceName(mode).isEmpty();
 }

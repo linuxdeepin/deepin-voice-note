@@ -5,6 +5,12 @@ import { Node, mergeAttributes } from '@tiptap/core'
 import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state'
 import { Slice, Fragment } from '@tiptap/pm/model'
 import voiceBlockCss from './voice-block.css?inline'
+import playNormalLightIconUrl from '../../../src/web/img/audio_file_play/Normal/Light.svg?url'
+import playHoverLightIconUrl from '../../../src/web/img/audio_file_play/Hover/Light.svg?url'
+import playPressedLightIconUrl from '../../../src/web/img/audio_file_play/Pressed/Light.svg?url'
+import playNormalDarkIconUrl from '../../../src/web/img/audio_file_play/Normal/Dark.svg?url'
+import playHoverDarkIconUrl from '../../../src/web/img/audio_file_play/Hover/Dark.svg?url'
+import playPressedDarkIconUrl from '../../../src/web/img/audio_file_play/Pressed/Dark.svg?url'
 import playingPauseIconUrl from '../../../src/web/img/audio_file_playing_pause/Normal.svg?url'
 import playingPlayIconUrl from '../../../src/web/img/audio_file_playing_play/Normal.svg?url'
 import closePlaybackIconUrl from '../../../src/web/img/playbar_pause_close/Normal.svg?url'
@@ -16,6 +22,12 @@ const VOICE_BLOCK_CLIPBOARD_MIME = 'application/x-deepin-voice-note-voice-block'
 if (typeof document !== 'undefined') {
   const style = document.createElement('style')
   style.textContent = voiceBlockCss
+    .replaceAll('__PLAY_NORMAL_LIGHT_ICON__', playNormalLightIconUrl)
+    .replaceAll('__PLAY_HOVER_LIGHT_ICON__', playHoverLightIconUrl)
+    .replaceAll('__PLAY_PRESSED_LIGHT_ICON__', playPressedLightIconUrl)
+    .replaceAll('__PLAY_NORMAL_DARK_ICON__', playNormalDarkIconUrl)
+    .replaceAll('__PLAY_HOVER_DARK_ICON__', playHoverDarkIconUrl)
+    .replaceAll('__PLAY_PRESSED_DARK_ICON__', playPressedDarkIconUrl)
     .replaceAll('__PLAYING_PAUSE_ICON__', playingPauseIconUrl)
     .replaceAll('__PLAYING_PLAY_ICON__', playingPlayIconUrl)
     .replaceAll('__CLOSE_PLAYBACK_ICON__', closePlaybackIconUrl)
