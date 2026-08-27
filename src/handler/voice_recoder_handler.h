@@ -35,6 +35,8 @@ public:
     Q_INVOKABLE void confirmStartRecoder();
     Q_INVOKABLE bool hasAudioOutputDevice();
     Q_INVOKABLE bool hasAudioInputDevice();
+    // 当前录音音源是否可用，供 QML 在连接信号前初始化录音入口状态。
+    Q_INVOKABLE bool isRecordDeviceEnabled() const;
 
 public slots:
     void onDeviceEnableChanged(int mode, bool enabled);

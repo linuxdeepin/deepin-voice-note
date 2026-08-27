@@ -109,6 +109,52 @@ test('toolbar icons use imported assets or sanitized SVG nodes', () => {
 })
 
 
+test('toolbar keeps the right side available when measuring normal width', () => {
+  const { host, editor, window } = createEditorWithToolbar()
+  const toolbar = host.querySelector('[data-testid="format-toolbar"]')
+  let hostWidth = 610
+
+  Object.defineProperty(host, 'clientWidth', {
+    configurable: true,
+    get: () => hostWidth,
+  })
+  Object.defineProperty(toolbar, 'scrollWidth', {
+    configurable: true,
+    get: () => 600,
+  })
+
+  window.dispatchEvent(new window.Event('resize'))
+  assert.equal(toolbar.querySelector('[data-format="more"]'), null)
+  assert.equal(toolbar.querySelector('[data-format="insertVoice"]')?.closest('.tiptap-overflow-panel'), null)
+  assert.equal(toolbar.querySelector('[data-format="insertImage"]')?.closest('.tiptap-overflow-panel'), null)
+
+  hostWidth = 600
+  window.dispatchEvent(new window.Event('resize'))
+  assert.ok(toolbar.querySelector('[data-format="more"]'))
+  editor.destroy()
+})
+
+test('more button anchors its tooltip to the button instead of native title', () => {
+  const { host, editor, window } = createEditorWithToolbar()
+  const toolbar = host.querySelector('[data-testid="format-toolbar"]')
+  Object.defineProperty(host, 'clientWidth', {
+    configurable: true,
+    get: () => 600,
+  })
+  Object.defineProperty(toolbar, 'scrollWidth', {
+    configurable: true,
+    get: () => 700,
+  })
+  window.dispatchEvent(new window.Event('resize'))
+
+  const moreButton = host.querySelector('button[data-format="more"]')
+  assert.ok(moreButton)
+  assert.equal(moreButton.getAttribute('title'), null)
+  assert.equal(moreButton.getAttribute('data-tooltip'), '更多格式')
+  assert.equal(moreButton.getAttribute('aria-label'), '更多格式')
+  editor.destroy()
+})
+
 test('toolbar overflow moves buttons dynamically by available width', () => {
   const { host, editor, window } = createEditorWithToolbar()
   const toolbar = host.querySelector('[data-testid="format-toolbar"]')

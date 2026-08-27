@@ -11,6 +11,12 @@
         <file alias="icons/marker.svg">../web-editor/dist/icons/marker.svg</file>
         <file alias="icons/mic.svg">../web-editor/dist/icons/mic.svg</file>
         <file alias="icons/more.svg">../web-editor/dist/icons/more.svg</file>
+        <file alias="icons/audio-file-play-normal-light.svg">../web-editor/dist/icons/audio-file-play-normal-light.svg</file>
+        <file alias="icons/audio-file-play-hover-light.svg">../web-editor/dist/icons/audio-file-play-hover-light.svg</file>
+        <file alias="icons/audio-file-play-pressed-light.svg">../web-editor/dist/icons/audio-file-play-pressed-light.svg</file>
+        <file alias="icons/audio-file-play-normal-dark.svg">../web-editor/dist/icons/audio-file-play-normal-dark.svg</file>
+        <file alias="icons/audio-file-play-hover-dark.svg">../web-editor/dist/icons/audio-file-play-hover-dark.svg</file>
+        <file alias="icons/audio-file-play-pressed-dark.svg">../web-editor/dist/icons/audio-file-play-pressed-dark.svg</file>
         <file alias="icons/audio-file-playing-pause.svg">../web-editor/dist/icons/audio-file-playing-pause.svg</file>
         <file alias="icons/audio-file-playing-play.svg">../web-editor/dist/icons/audio-file-playing-play.svg</file>
         <file alias="icons/playbar-pause-close.svg">../web-editor/dist/icons/playbar-pause-close.svg</file>

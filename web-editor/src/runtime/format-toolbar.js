@@ -43,7 +43,7 @@ const LIST_TOGGLE_BUTTONS = [
 
 
 const TOOLBAR_STYLE_ID = 'dvn-tiptap-format-toolbar-style'
-const TOOLBAR_HORIZONTAL_MARGIN = 10
+const TOOLBAR_LEFT_MARGIN = 10
 
 function injectToolbarStyles() {
   if (document.getElementById(TOOLBAR_STYLE_ID)) return
@@ -417,6 +417,11 @@ export function createFormatToolbar(editor, host) {
     className: 'tiptap-more-button',
     children: createSvgIcon('more'),
   })
+  // QtWebEngine 的原生 title tooltip 在 sticky 工具栏中会以页面左侧
+  // 为参考定位。改用按钮自身锚定的 CSS tooltip，避免提示浮到错误位置。
+  moreBtn.removeAttribute('title')
+  moreBtn.setAttribute('data-tooltip', '更多格式')
+  moreBtn.setAttribute('aria-label', '更多格式')
   moreBtn.setAttribute('aria-haspopup', 'true')
   moreBtn.setAttribute('aria-expanded', 'false')
   const overflowPanel = createEl('div', { class: 'tiptap-overflow-panel', role: 'group', 'aria-label': '更多格式' })
@@ -529,9 +534,10 @@ export function createFormatToolbar(editor, host) {
   function updateOverflowMode() {
     const hostWidth = host.clientWidth || document.documentElement.clientWidth || window.innerWidth || 0
     if (!hostWidth) return
-    // 顶部工具栏跟随宿主宽度；左右各保留 10px。
+    // 顶部工具栏只在左侧保留 10px，与宿主实际布局一致；右侧不再额外
+    // 扣除 10px，避免正常窗口下因这段虚拟边距过早把末尾资源按钮折叠。
     // Summernote 的 385px 只用于 airPopover 定位参考，不能限制当前常驻顶部工具栏。
-    const maxToolbarWidth = Math.max(0, hostWidth - TOOLBAR_HORIZONTAL_MARGIN * 2)
+    const maxToolbarWidth = Math.max(0, hostWidth - TOOLBAR_LEFT_MARGIN)
 
     overflowSet.clear()
     renderOverflowLayout()

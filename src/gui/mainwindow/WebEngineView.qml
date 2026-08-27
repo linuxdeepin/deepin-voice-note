@@ -27,6 +27,13 @@ Item {
     property bool webVisible: true
     property bool summernoteVisible: true
     property alias titleBar: title
+    // 所有录音入口共用这一组条件，避免工具栏、标题栏和 Ctrl+R
+    // 在搜索、播放、转写、录音或没有可用音源时出现不一致。
+    readonly property bool recordingAvailable:
+        !initialVisible
+        && webVisible
+        && title.recordBtnEnabled
+        && !VNoteMainManager.isInSearchMode()
 
     Timer {
         id: txtMenuToolbarTimer
@@ -136,13 +143,7 @@ Item {
             return;
         }
 
-        var voiceEnabled = webVisible
-                && !isRecordingAudio
-                && !isVoiceToText
-                && !title.isPlaying
-                && !title.isSearching
-                && title.recorderBtnEnable
-                && !VNoteMainManager.isInSearchMode();
+        var voiceEnabled = rootItem.recordingAvailable;
         // Summernote 的图片入口原本只受 imageBtnEnable(webVisible) 控制。
         var imageEnabled = webVisible;
         var script = "window.__dvnTiptapSetResourceButtonsEnabled && "
@@ -155,6 +156,15 @@ Item {
     onIsRecordingAudioChanged: syncTiptapResourceButtons()
     onIsVoiceToTextChanged: syncTiptapResourceButtons()
     onWebVisibleChanged: syncTiptapResourceButtons()
+    onInitialVisibleChanged: syncTiptapResourceButtons()
+
+    Component.onCompleted: {
+        // changeMode() 可能早于 QML Connections 建立，不能只依赖
+        // updateRecordBtnState 信号初始化录音按钮。设备已插入时以当前
+        // 可解析的录音设备为准，避免被尚未刷新的缓存误判为不可用。
+        title.recorderBtnEnable = VoiceRecoderHandler.isRecordDeviceEnabled();
+        syncTiptapResourceButtons();
+    }
 
     function focusWebView() {
         // Tiptap 调试模式下编辑器位于 tiptapLoader 加载的 sourceComponent，需经 tiptapLoader.item
@@ -269,18 +279,34 @@ Item {
     }
 
     function startRecording() {
-        if (VNoteMainManager.isInSearchMode()) {
-            console.log("Cannot show recording UI while in search mode");
-            return;
+        if (!recordingAvailable) {
+            console.log("Cannot start recording: recording is unavailable");
+            return false;
         }
-        
+
         if (!recorderViewLoader.active) {
             recorderViewLoader.active = true;
-        } else {
+        } else if (recorderViewLoader.item) {
             recorderViewLoader.item.visible = true;
         }
         isRecording = true;
         title.recorderBtnEnable = false;
+        syncTiptapResourceButtons();
+        return true;
+    }
+
+    function resetRecordingUi() {
+        isRecording = false;
+        title.isRecording = false;
+        title.recorderBtnEnable = VoiceRecoderHandler.isRecordDeviceEnabled();
+        if (recorderViewLoader.active && recorderViewLoader.item) {
+            recorderViewLoader.item.visible = false;
+            recorderViewLoader.item.time = "00:00:00";
+        }
+        Qt.callLater(function() {
+            recorderViewLoader.active = false;
+        });
+        syncTiptapResourceButtons();
     }
 
     function stopAndClose() {
@@ -586,6 +612,9 @@ Item {
                         if (isNaN(rawX) || isNaN(rawY)) return;
                         var sx = String(Math.round(rawX));
                         var sy = String(Math.round(rawY));
+                        // Qt WebEngine 已经根据系统剪贴板计算了 CanPaste；
+                        // Tiptap 文本菜单不能仅以“位于编辑器内”判定可粘贴。
+                        var nativeEditFlags = Number(req.editFlags);
                         tiptapWebView.runJavaScript(
                             "(function(){"
                             + "function flags(canSelectAll,canCopy,canCut,canPaste,canDelete){return {canSelectAll:!!canSelectAll,canCopy:!!canCopy,canCut:!!canCut,canPaste:!!canPaste,canDelete:!!canDelete,canSpeech:!!canCopy,canDictation:!!canPaste};}"
@@ -615,6 +644,12 @@ Item {
                                     ActionManager.resetCtxMenu(ActionManager.TxtCtxMenu, false);
                                     ActionManager.visibleAction(ActionManager.TxtStopreading, false);
                                     var flags = info.flags || {};
+                                    // 普通文本菜单使用 Qt 的实际剪贴板状态；
+                                    // 转写文本仍保持只读语义，只允许选择/复制。
+                                    if (!info.transcript && Number.isFinite(nativeEditFlags)) {
+                                        flags.canPaste = (nativeEditFlags & 8) !== 0;
+                                        flags.canDictation = flags.canPaste;
+                                    }
                                     ActionManager.enableAction(ActionManager.TxtSelectAll, !!flags.canSelectAll);
                                     ActionManager.enableAction(ActionManager.TxtCopy, !!flags.canCopy);
                                     ActionManager.enableAction(ActionManager.TxtCut, !!flags.canCut);
@@ -871,10 +906,7 @@ Item {
         }
 
         function onStopRecording() {
-            isRecording = false;
             VoiceRecoderHandler.stopRecoder();
-            title.recorderBtnEnable = true;
-            title.isRecording = false;
         }
 
         active: false
@@ -920,6 +952,13 @@ Item {
     Connections {
         target: TiptapChannel
 
+        onVoicePlaybackStateChanged: function(voiceId, state) {
+            // 与 Summernote 的 WebEngineHandler::onPlayingVoice 保持一致：
+            // 播放和暂停都属于“正在占用播放状态”，只有结束才恢复录音。
+            title.isPlaying = (state !== 2);
+            rootItem.syncTiptapResourceButtons();
+        }
+
         onPickImageRequested: {
             if (!webVisible || VNoteMainManager.isInSearchMode()) {
                 return;
@@ -934,8 +973,9 @@ Item {
             if (VNoteMainManager.isInSearchMode() || !title.recordBtnEnabled || !webVisible) {
                 return;
             }
-            startRecording();
-            VoiceRecoderHandler.startRecoder();
+            if (startRecording()) {
+                VoiceRecoderHandler.startRecoder();
+            }
         }
         onViewPictureRequested: path => {
             viewPictureLoader.path = path;
@@ -982,24 +1022,13 @@ Item {
             
             // 当录音状态变为Idle时，完全关闭录音界面并重置状态
             if (currentType === VoiceRecoderHandler.Idle) {
-                isRecording = false;
-                title.recorderBtnEnable = true;
-                rootItem.syncTiptapResourceButtons();
-                title.isRecording = false;
-                
-                // 完全关闭录音界面
-                if (recorderViewLoader.active && recorderViewLoader.item) {
-                    recorderViewLoader.item.visible = false;
-                    recorderViewLoader.item.time = "00:00:00";
-                }
-                // 延迟销毁Loader以确保动画完成
-                Qt.callLater(function() {
-                    recorderViewLoader.active = false;
-                });
+                // 停止、启动失败以及设备热插拔都统一走同一套 UI 恢复逻辑。
+                rootItem.resetRecordingUi();
             }
         }
         onUpdateRecordBtnState: {
             title.recorderBtnEnable = enable;
+            rootItem.syncTiptapResourceButtons();
         }
         onUpdateRecorderTime: {
             recorderViewLoader.item.time = time;
@@ -1008,12 +1037,13 @@ Item {
             if (isLow) {
                 messageDialogLoader.showDialog(VNoteMessageDialogHandler.VolumeTooLow, ret => {
                     if (ret) {
-                        startRecording();
+                        // 录音界面在低音量确认前已经展示，确认时只启动后端，
+                        // 不要再次创建/定位录音界面。
                         VoiceRecoderHandler.confirmStartRecoder();
+                    } else {
+                        rootItem.resetRecordingUi();
                     }
                 });
-            } else {
-                startRecording();
             }
         }
     }
