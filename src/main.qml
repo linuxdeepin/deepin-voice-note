@@ -119,6 +119,17 @@ ApplicationWindow {
         id: settingDlgLoader
     }
 
+    // 迁移期间只覆盖主窗口内容区，保留原有 titlebar 区域。
+    UpgradeView {
+        Accessible.name: "MainWindow_UpgradeView"
+        Accessible.role: Accessible.Pane
+
+        id: migrationView
+
+        anchors.fill: parent
+        titleBarHeight: workspaceLoader.active ? 50 : 40
+    }
+
     Connections {
         target: VNoteMainManager
 

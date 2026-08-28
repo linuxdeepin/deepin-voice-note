@@ -254,14 +254,6 @@ Item {
 
     }
 
-    // 升级进度界面全屏覆盖层（单一 UpgradeView，迁移期间遮蔽主编辑界面，终态展示备份/报告路径）。
-    UpgradeView {
-        anchors.fill: parent
-
-        Accessible.name: "MainWindow_UpgradeView"
-        Accessible.role: Accessible.Pane
-    }
-
     Connections {
         target: MigrationViewController
 
