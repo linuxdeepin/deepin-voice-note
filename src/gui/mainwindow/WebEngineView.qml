@@ -571,7 +571,9 @@ Item {
             id: tiptapLoader
 
             active: TiptapChannel.debugEnabled
-            visible: active
+            // 搜索无结果时由 noSearchRect 占据编辑区，Tiptap 不应继续参与布局，
+            // 否则会被 ColumnLayout 排到无结果区域下方，导致工具栏出现在底部。
+            visible: active && !noSearchResult
             Layout.fillHeight: true
             Layout.fillWidth: true
 
@@ -939,11 +941,6 @@ Item {
     Connections {
         target: title
 
-        onCreateNote: {
-            if (!initialVisible && !rootItem.isVoiceToText) {
-                VNoteMainManager.createNote();
-            }
-        }
         onIsPlayingChanged: rootItem.syncTiptapResourceButtons()
         onIsSearchingChanged: rootItem.syncTiptapResourceButtons()
         onRecorderBtnEnableChanged: rootItem.syncTiptapResourceButtons()
