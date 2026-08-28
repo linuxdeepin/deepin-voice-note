@@ -20,7 +20,6 @@ TitleBar {
     property bool recorderBtnEnable: true
     property bool recordBtnEnabled: recorderBtnEnable && !isPlaying && !isSearching && !isRecordingAudio && !isVoiceToText
 
-    signal createNote
     signal titleOpenSetting
 
     enableInWindowBlendBlur: false
@@ -48,33 +47,5 @@ TitleBar {
             titleBar.titleOpenSetting();
         }
     }
-
-    VNoteComponents.VNoteToolButton {
-        Accessible.name: "NewNoteButton"
-        Accessible.role: Accessible.Button
-        id: newNoteBtn
-
-        anchors.left: titleBar.left
-        anchors.leftMargin: 10
-        anchors.verticalCenter: titleBar.verticalCenter
-        enabled: !isPlaying && !isSearching && !isRecordingAudio && !isVoiceToText
-        hoverEnabled: !isInitialInterface
-        visible: !isInitialInterface
-        icon.height: 16
-        icon.name: "new_note"
-        icon.width: 16
-        height: 30
-        width: 30
-
-        onClicked: {
-            createNote();
-        }
-
-        ToolTip {
-            text: qsTr("Create Note")
-            visible: newNoteBtn.hovered
-        }
-    }
-
 
 }

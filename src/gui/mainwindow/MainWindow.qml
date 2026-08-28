@@ -41,6 +41,22 @@ Item {
         return twoColumnModeBtn.x + twoColumnModeBtn.width + 8 - middleColumnLayout.anchors.leftMargin;
     }
 
+    function createNoteFromWorkspace() {
+        if (initRect.visible) {
+            console.warn("Cannot create note on initial page");
+            return;
+        }
+        if (isRecordingAudio || folderListView.isPlay || webEngineView.titleBar.isPlaying) {
+            console.log("Cannot create note while recording or playing audio");
+            return;
+        }
+        if (isVoiceToText) {
+            console.log("Cannot create note while voice to text is in progress");
+            return;
+        }
+        VNoteMainManager.createNote();
+    }
+
     function toggleTwoColumnMode() {
         if (hideLeftArea.running) {
             hideLeftArea.stop();
@@ -115,22 +131,7 @@ Item {
             VNoteMainManager.vNoteCreateFolder();
         }
         onCreateNote: {
-            // 初始页面可见时，屏蔽 Ctrl+B
-            if (initRect.visible) {
-                console.warn("Cannot create note on initial page");
-                return;
-            }
-            // 录音时不允许创建笔记
-            if (isRecordingAudio || folderListView.isPlay) {
-                console.log("Cannot create note while recording or playing audio");
-                return;
-            }
-            // 语音转文字时不允许创建笔记，避免转文字结果丢失
-            if (isVoiceToText) {
-                console.log("Cannot create note while voice to text is in progress");
-                return;
-            }
-            VNoteMainManager.createNote();
+            createNoteFromWorkspace();
         }
 
         onRenameFolder: {
@@ -484,14 +485,12 @@ Item {
             VNoteMainManager.vNoteChanged(modelItem.noteId);
         }
         onNoSearchResult: {
-            label.visible = false;
             webEngineView.webVisible = false;
             webEngineView.noSearchResult = true;
             webEngineView.titleBar.isSearching = true;
             itemListView.isSearching = true;
         }
         onSearchFinished: {
-            label.visible = false;
             webEngineView.webVisible = true;
             webEngineView.noSearchResult = false;
             webEngineView.titleBar.isSearching = true;
@@ -834,7 +833,6 @@ Item {
                             itemListView.searchLoader.item.visible = false;
                         }
                         itemListView.view.visible = true;
-                        label.visible = true;
                         itemListView.isSearch = false;
                         itemListView.isSearching = false;
                         // 退出搜索时，只有当前记事本有笔记时才显示富文本编辑器
@@ -889,7 +887,6 @@ Item {
                                 itemListView.searchLoader.item.visible = false;
                             }
                             itemListView.view.visible = true;
-                            label.visible = true;
                             itemListView.isSearch = false;
                             itemListView.isSearching = false;
                             // 清空搜索文本时，只有当前记事本有笔记时才显示富文本编辑器
@@ -909,15 +906,59 @@ Item {
                     }
                 }
 
-                Label {
-                    id: label
+                RowLayout {
+                    id: noteListHeader
 
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 18
+                    Layout.preferredHeight: 30
                     Layout.topMargin: 5
-                    color: DTK.themeType === ApplicationHelper.LightType ? "#BB000000" : "#BBFFFFFF"
-                    font.pixelSize: 16
-                    text: ""
+                    spacing: 0
+                    visible: !initRect.visible
+                             && !webEngineView.noSearchResult
+                             && !itemListView.isSearch
+                             && !itemListView.isSearching
+                             && !webEngineView.titleBar.isSearching
+
+                    Label {
+                        id: label
+
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 18
+                        color: DTK.themeType === ApplicationHelper.LightType ? "#BB000000" : "#BBFFFFFF"
+                        font.pixelSize: 16
+                        text: ""
+                    }
+
+                    VNoteComponents.VNoteToolButton {
+                        Accessible.name: "NewNoteButton"
+                        Accessible.role: Accessible.Button
+
+                        id: newNoteBtn
+
+                        Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                        Layout.preferredHeight: 30
+                        Layout.preferredWidth: 30
+                        Layout.rightMargin: 10
+                        enabled: !rootWindow.isRecordingAudio
+                                  && !folderListView.isPlay
+                                  && !webEngineView.titleBar.isPlaying
+                                  && !webEngineView.titleBar.isSearching
+                                  && !rootWindow.isVoiceToText
+                        icon.height: 16
+                        icon.name: "new_note"
+                        icon.width: 16
+                        height: 30
+                        width: 30
+
+                        onClicked: {
+                            rootWindow.createNoteFromWorkspace();
+                        }
+
+                        ToolTip {
+                            text: qsTr("Create Note")
+                            visible: newNoteBtn.hovered
+                        }
+                    }
                 }
 
                 ItemListView {
