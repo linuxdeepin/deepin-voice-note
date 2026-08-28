@@ -6,6 +6,7 @@
 #include "tiptapchannelbridge.h"
 
 #include <QLoggingCategory>
+#include <QTimer>
 
 namespace {
 Q_LOGGING_CATEGORY(lcMigrationView, "voice_note_migration_view")
@@ -54,17 +55,26 @@ void MigrationViewController::start()
         return;
     }
 
-    // 展示进度界面并拉起后台编排器；startIfNeeded 内部在后台线程启动前以
-    // Qt::QueuedConnection 把进度/阶段/终态/中断信号连接到本控制器。
+    // 先通知界面进入迁移态，再把后台任务投递到下一轮事件循环。
+    // 如果这里立即启动迁移，空数据库或少量数据可能在 UpgradeView 首次绘制前
+    // 就完成，导致原始迁移页面完全看不到。
     setMigrationActive(true);
-    MigrationOrchestrator *orchestrator = MigrationOrchestrator::startIfNeeded(this);
-    if (!orchestrator) {
-        // 状态在判定与启动之间变化（磁盘异常边界）：回退为不放行展示。
-        qCWarning(lcMigrationView) << "start: startIfNeeded returned null, hide overlay";
-        setMigrationActive(false);
-        return;
-    }
-    m_orchestrator = orchestrator;
+    QTimer::singleShot(0, this, [this]() {
+        if (!m_migrationActive || m_orchestrator) {
+            return;
+        }
+
+        // startIfNeeded 内部在后台线程启动前以 Qt::QueuedConnection 把进度/阶段/终态/
+        // 中断信号连接到本控制器。此时 UpgradeView 已经有机会完成首帧绘制。
+        MigrationOrchestrator *orchestrator = MigrationOrchestrator::startIfNeeded(this);
+        if (!orchestrator) {
+            // 状态在判定与启动之间变化（磁盘异常边界）：回退为不放行展示。
+            qCWarning(lcMigrationView) << "start: startIfNeeded returned null, hide overlay";
+            setMigrationActive(false);
+            return;
+        }
+        m_orchestrator = orchestrator;
+    });
 }
 
 void MigrationViewController::requestCancel()
