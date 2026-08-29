@@ -127,8 +127,51 @@ Item {
     signal saveAudio
     signal saveNote
 
+    // QWebEnginePage::WebAction values are stable across Qt5/Qt6 here:
+    // Copy=5, Undo=7, Redo=8.  Keep Tiptap routing in one place so both
+    // global shortcuts and context-menu actions target the active editor.
+    function triggerTiptapWebAction(action, preferContextTranscript) {
+        var tiptapView = tiptapLoader.item ? tiptapLoader.item.editor : null;
+        if (!tiptapView) {
+            return;
+        }
+
+        var webAction = Number(action);
+        if (webAction === 7) {
+            tiptapView.runJavaScript("window.__dvnTiptapUndo && window.__dvnTiptapUndo()");
+            return;
+        }
+        if (webAction === 8) {
+            tiptapView.runJavaScript("window.__dvnTiptapRedo && window.__dvnTiptapRedo()");
+            return;
+        }
+        if (webAction === 5) {
+            // 语音转写文本位于 atom NodeView 内部，优先使用专用复制通道；
+            // 快捷键只使用当前 DOM 选区/近期选区缓存，避免误用历史右键上下文；
+            // 右键菜单 fallback 则允许使用当前 context transcript。
+            var transcriptCopyScript = preferContextTranscript
+                    ? "window.__dvnTiptapGetContextTranscriptCopyText ? window.__dvnTiptapGetContextTranscriptCopyText() : ''"
+                    : "window.__dvnTiptapGetShortcutTranscriptCopyText ? window.__dvnTiptapGetShortcutTranscriptCopyText() : ''";
+            tiptapView.runJavaScript(
+                transcriptCopyScript,
+                function(text) {
+                    if (typeof text === "string" && text.length > 0) {
+                        TiptapChannel.jsCopyPlainTextToClipboard(text);
+                    } else {
+                        tiptapView.triggerWebAction(action);
+                    }
+                });
+            return;
+        }
+        tiptapView.triggerWebAction(action);
+    }
+
     function copy() {
-        webView.triggerWebAction(5);
+        if (TiptapChannel.debugEnabled && tiptapLoader.item) {
+            triggerTiptapWebAction(5, false);
+        } else {
+            webView.triggerWebAction(5);
+        }
     }
 
     // 工具栏中的资源按钮不再由标题栏直接承载，需要把宿主侧运行态
@@ -528,15 +571,7 @@ Item {
                     }
                     onTriggerWebAction: action => {
                         if (TiptapChannel.debugEnabled && tiptapLoader.item) {
-                            // QWebEnginePage::WebAction: Undo=7, Redo=8 in both Qt5 and Qt6.
-                            // Tiptap/ProseMirror maintains its own history stack, so do not use native WebAction undo/redo.
-                            if (action === 7) {
-                                tiptapWebView.runJavaScript("window.__dvnTiptapUndo && window.__dvnTiptapUndo()");
-                            } else if (action === 8) {
-                                tiptapWebView.runJavaScript("window.__dvnTiptapRedo && window.__dvnTiptapRedo()");
-                            } else {
-                                tiptapWebView.triggerWebAction(action);
-                            }
+                            triggerTiptapWebAction(action, true);
                         } else {
                             webView.triggerWebAction(action);
                         }
@@ -620,12 +655,15 @@ Item {
                         tiptapWebView.runJavaScript(
                             "(function(){"
                             + "function flags(canSelectAll,canCopy,canCut,canPaste,canDelete){return {canSelectAll:!!canSelectAll,canCopy:!!canCopy,canCut:!!canCut,canPaste:!!canPaste,canDelete:!!canDelete,canSpeech:!!canCopy,canDictation:!!canPaste};}"
-                            + "function selectionTouches(target){var sel=window.getSelection();if(!sel||sel.rangeCount===0||sel.isCollapsed||!sel.toString())return false;for(var i=0;i<sel.rangeCount;i++){var r=sel.getRangeAt(i);if(r.intersectsNode){try{if(r.intersectsNode(target))return true;}catch(e){}}else{var cr=document.createRange();cr.selectNodeContents(target);if(r.compareBoundaryPoints(Range.END_TO_START,cr)<0&&r.compareBoundaryPoints(Range.START_TO_END,cr)>0)return true;}}return false;}"
+                            + "function selectionTouches(target){var sel=window.getSelection();if(!sel||sel.rangeCount===0||sel.isCollapsed||!sel.toString())return false;for(var i=0;i<sel.rangeCount;i++){var r=sel.getRangeAt(i);if(r.intersectsNode){try{if(r.intersectsNode(target))return true;}catch(e){}}else{var cr=document.createRange();cr.selectNodeContents(target);if(r.compareBoundaryPoints(Range.END_TO_START,cr)>0&&r.compareBoundaryPoints(Range.START_TO_END,cr)<0)return true;}}return false;}"
                             + "var el=document.elementFromPoint(" + sx + "," + sy + ");"
-                            + "window.__dvnTiptapContextTranscript=null;"
-                            + "if(!el) return JSON.stringify({type:2,json:'',flags:flags(true,false,false,true,false)});"
+                            + "var capturedTranscript=(window.__dvnTiptapContextTranscript&&document.contains(window.__dvnTiptapContextTranscript))?window.__dvnTiptapContextTranscript:null;"
+                            + "if(!el&&capturedTranscript){var copyText0=window.__dvnTiptapGetContextTranscriptCopyText?window.__dvnTiptapGetContextTranscriptCopyText():'';return JSON.stringify({type:2,json:'__tiptap_transcript_text:'+copyText0,flags:flags(true,!!copyText0,false,false,false),transcript:true});}"
+                            + "if(!el){window.__dvnTiptapContextTranscript=null;return JSON.stringify({type:2,json:'',flags:flags(true,false,false,true,false)});}"
                             + "var transcript=el.closest?el.closest('.translateText'):null;"
-                            + "if(transcript){window.__dvnTiptapContextTranscript=transcript;var canCopy=selectionTouches(transcript);return JSON.stringify({type:2,json:'',flags:flags(true,canCopy,false,false,false),transcript:true});}"
+                            + "if(!transcript) transcript=capturedTranscript;"
+                            + "if(transcript){window.__dvnTiptapContextTranscript=transcript;var copyText=window.__dvnTiptapGetContextTranscriptCopyText?window.__dvnTiptapGetContextTranscriptCopyText():'';var canCopy=selectionTouches(transcript)||!!copyText;return JSON.stringify({type:2,json:'__tiptap_transcript_text:'+copyText,flags:flags(true,canCopy,false,false,false),transcript:true});}"
+                            + "window.__dvnTiptapContextTranscript=null;"
                             + "var vb=el.closest?el.closest('.voiceInfoBox'):null;"
                             + "if(vb&&vb.getAttribute('data-type')==='voice-block'){if(window.__dvnTiptapSelectVoiceBlockFromElement)window.__dvnTiptapSelectVoiceBlockFromElement(vb);return JSON.stringify({type:1,json:vb.getAttribute('data-voice-meta')||''});}"
                             + "var img=el.closest?el.closest('img[data-rel-path]'):null;"
@@ -643,6 +681,7 @@ Item {
                                     return;
                                 }
                                 if (info.type === 2) {
+                                    handler.onSaveMenuParam(info.type, info.json || "");
                                     ActionManager.resetCtxMenu(ActionManager.TxtCtxMenu, false);
                                     ActionManager.visibleAction(ActionManager.TxtStopreading, false);
                                     var flags = info.flags || {};
@@ -1000,8 +1039,12 @@ Item {
             hasScroll = !isTop;
         }
         onUpdateRichTextSearch: key => {
-            if (TiptapChannel.debugEnabled && tiptapLoader.item) {
-                tiptapWebView.findText(key);
+            if (TiptapChannel.debugEnabled) {
+                if (key && key.length > 0) {
+                    TiptapChannel.setSearchQuery(key);
+                } else {
+                    TiptapChannel.clearSearchQuery();
+                }
             } else {
                 webView.findText(key);
             }

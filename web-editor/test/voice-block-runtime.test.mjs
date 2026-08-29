@@ -11,6 +11,8 @@ import { Editor } from '@tiptap/core'
 import { NodeSelection } from '@tiptap/pm/state'
 import { Fragment, Slice } from '@tiptap/pm/model'
 import { createTiptapExtensions } from '../src/runtime/tiptap-extensions.js'
+import { setTiptapSearchQuery } from '../src/runtime/search-extension.js'
+import { currentTranscriptCopyText, writeTranscriptCopyEvent, copyTranscriptTextViaBridge, updateTranscriptSelectionCache, installTranscriptCopyHandler } from '../src/runtime/transcript-copy.js'
 import { createEmptyDoc, createEnvelope, serializeEnvelope, validateEnvelope } from '../src/schema/document-envelope.js'
 import {
   bindTiptapChannel,
@@ -33,6 +35,7 @@ function setupDom() {
   defineGlobal('Element', window.Element)
   defineGlobal('HTMLElement', window.HTMLElement)
   defineGlobal('DocumentFragment', window.DocumentFragment)
+  defineGlobal('Range', window.Range)
   defineGlobal('Event', window.Event)
   defineGlobal('CustomEvent', window.CustomEvent)
   defineGlobal('MutationObserver', window.MutationObserver)
@@ -135,7 +138,8 @@ test('transcript text: pointer selection does not start whole voiceBlock drag', 
   assert.ok(voiceBox, 'voiceBox should render')
   assert.ok(translateText, 'translateText should render')
   assert.equal(translateText.getAttribute('draggable'), 'false')
-  assert.equal(translateText.getAttribute('contenteditable'), 'false')
+  assert.equal(translateText.getAttribute('contenteditable'), 'true')
+  assert.equal(translateText.getAttribute('aria-readonly'), 'true')
 
   translateText.dispatchEvent(new window.MouseEvent('mousedown', { bubbles: true, cancelable: true }))
   assert.equal(voiceBox.getAttribute('draggable'), 'false', 'wrapper drag is disabled while selecting transcript text')
@@ -146,6 +150,285 @@ test('transcript text: pointer selection does not start whole voiceBlock drag', 
   const dragStart = new window.Event('dragstart', { bubbles: true, cancelable: true })
   translateText.dispatchEvent(dragStart)
   assert.equal(dragStart.defaultPrevented, true, 'transcript dragstart should not drag the whole voiceBlock')
+
+  editor.destroy()
+})
+
+
+test('transcript text: editable island is guarded as read-only but allows copy shortcut', () => {
+  const { editor, window } = createEditor()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'voiceBlock',
+      attrs: {
+        voiceId: 'readonly-v1',
+        voicePath: 'voicenote/readonly.wav',
+        voiceSize: 1,
+        text: '只读但可复制',
+        translateUnfold: true,
+      },
+    }],
+  })
+
+  const voiceBox = editor.view.dom.querySelector('.voiceBox')
+  const translateText = editor.view.dom.querySelector('.translateText')
+  assert.equal(voiceBox.getAttribute('contenteditable'), 'true', 'voiceBlock root must not be a non-editable ancestor of transcript selection')
+  assert.equal(translateText.getAttribute('contenteditable'), 'true')
+  assert.equal(translateText.getAttribute('aria-readonly'), 'true')
+
+  const wrapperBeforeInput = new window.InputEvent('beforeinput', { bubbles: true, cancelable: true, inputType: 'insertText', data: 'x' })
+  voiceBox.dispatchEvent(wrapperBeforeInput)
+  assert.equal(wrapperBeforeInput.defaultPrevented, true, 'voiceBlock editable wrapper is guarded as read-only')
+
+  const beforeInput = new window.InputEvent('beforeinput', { bubbles: true, cancelable: true, inputType: 'insertText', data: 'x' })
+  translateText.dispatchEvent(beforeInput)
+  assert.equal(beforeInput.defaultPrevented, true, 'typing into transcript must be blocked')
+
+  const normalKey = new window.KeyboardEvent('keydown', { key: 'x', bubbles: true, cancelable: true })
+  translateText.dispatchEvent(normalKey)
+  assert.equal(normalKey.defaultPrevented, true, 'printable key must be blocked')
+
+  const copyKey = new window.KeyboardEvent('keydown', { key: 'c', ctrlKey: true, bubbles: true, cancelable: true })
+  translateText.dispatchEvent(copyKey)
+  assert.equal(copyKey.defaultPrevented, false, 'copy shortcut must remain native')
+
+  const selectAll = new window.KeyboardEvent('keydown', { key: 'a', ctrlKey: true, bubbles: true, cancelable: true })
+  translateText.dispatchEvent(selectAll)
+  assert.equal(selectAll.defaultPrevented, true, 'Ctrl+A is handled inside transcript')
+  assert.equal(window.getSelection().toString(), '只读但可复制')
+
+  const paste = new window.Event('paste', { bubbles: true, cancelable: true })
+  translateText.dispatchEvent(paste)
+  assert.equal(paste.defaultPrevented, true, 'paste into transcript must be blocked')
+
+  editor.destroy()
+})
+
+
+test('transcript copy: context helper returns DOM selection inside voiceBlock atom', () => {
+  const { editor } = createEditor()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'voiceBlock',
+      attrs: {
+        voiceId: 'copy-dom-v1',
+        voicePath: 'voicenote/copy-dom.wav',
+        voiceSize: 1,
+        text: '可单独复制的转写文本',
+        translateUnfold: true,
+      },
+    }],
+  })
+
+  const translateText = editor.view.dom.querySelector('.translateText')
+  assert.ok(translateText, 'translateText should render')
+
+  const textNode = translateText.firstChild
+  const range = document.createRange()
+  range.setStart(textNode, 1)
+  range.setEnd(textNode, 6)
+  const selection = window.getSelection()
+  selection.removeAllRanges()
+  selection.addRange(range)
+  window.__dvnTiptapContextTranscript = translateText
+
+  assert.equal(currentTranscriptCopyText(), '单独复制的')
+
+  const copied = {}
+  const event = new Event('copy', { bubbles: true, cancelable: true })
+  Object.defineProperty(event, 'clipboardData', {
+    value: { setData(type, value) { copied[type] = value } },
+    configurable: true,
+  })
+  assert.equal(writeTranscriptCopyEvent(event), true)
+  assert.equal(event.defaultPrevented, true)
+  assert.equal(copied['text/plain'], '单独复制的')
+  assert.equal(copied['text/html'], '单独复制的')
+
+  editor.destroy()
+  window.__dvnTiptapContextTranscript = null
+})
+
+test('transcript copy: search-highlighted transcript copies plain text only', () => {
+  const { editor } = createEditor()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'voiceBlock',
+      attrs: {
+        voiceId: 'copy-search-v1',
+        voicePath: 'voicenote/copy-search.wav',
+        voiceSize: 1,
+        text: '复制高亮后的转写文本',
+        translateUnfold: false,
+      },
+    }],
+  })
+
+  assert.equal(setTiptapSearchQuery(editor, '高亮'), true)
+  const translateText = editor.view.dom.querySelector('.translateText')
+  assert.ok(translateText, 'translateText should render')
+  assert.ok(translateText.querySelector('.dvn-search-match'), 'search hit should be rendered inside transcript')
+
+  const range = document.createRange()
+  range.selectNodeContents(translateText)
+  const selection = window.getSelection()
+  selection.removeAllRanges()
+  selection.addRange(range)
+  window.__dvnTiptapContextTranscript = translateText
+
+  assert.equal(currentTranscriptCopyText(), '复制高亮后的转写文本')
+
+  const bridgeCalls = []
+  assert.equal(copyTranscriptTextViaBridge({ jsCopyPlainTextToClipboard: (text) => bridgeCalls.push(text) }), true)
+  assert.deepEqual(bridgeCalls, ['复制高亮后的转写文本'])
+
+  editor.destroy()
+  window.__dvnTiptapContextTranscript = null
+})
+
+
+test('transcript copy: context menu can use cached text after Qt collapses selection', () => {
+  const { editor } = createEditor()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'voiceBlock',
+      attrs: {
+        voiceId: 'copy-cache-v1',
+        voicePath: 'voicenote/copy-cache.wav',
+        voiceSize: 1,
+        text: '右键菜单打开前已经选中的转写文本',
+        translateUnfold: true,
+      },
+    }],
+  })
+
+  const translateText = editor.view.dom.querySelector('.translateText')
+  const textNode = translateText.firstChild
+  const selectedRange = document.createRange()
+  selectedRange.setStart(textNode, 7)
+  selectedRange.setEnd(textNode, 12)
+  const selection = window.getSelection()
+  selection.removeAllRanges()
+  selection.addRange(selectedRange)
+  assert.equal(updateTranscriptSelectionCache(), true)
+
+  // Simulate QtWebEngine/native menu changing the live DOM selection before
+  // the QML action callback executes.  The explicit context transcript should
+  // still recover the last valid selected text for that same transcript only.
+  const collapsed = document.createRange()
+  collapsed.setStart(textNode, 0)
+  collapsed.setEnd(textNode, 0)
+  selection.removeAllRanges()
+  selection.addRange(collapsed)
+  window.__dvnTiptapContextTranscript = translateText
+
+  assert.equal(currentTranscriptCopyText({ useContext: true, allowCachedContext: true }), '已经选中的')
+  assert.equal(currentTranscriptCopyText(), '')
+
+  editor.destroy()
+  window.__dvnTiptapContextTranscript = null
+})
+
+
+test('transcript copy: context menu falls back to whole transcript without selection', () => {
+  const { editor } = createEditor()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'voiceBlock',
+      attrs: {
+        voiceId: 'copy-whole-v1',
+        voicePath: 'voicenote/copy-whole.wav',
+        voiceSize: 1,
+        text: '没有选区时复制整段转写',
+        translateUnfold: true,
+      },
+    }],
+  })
+
+  const translateText = editor.view.dom.querySelector('.translateText')
+  const selection = window.getSelection()
+  selection.removeAllRanges()
+  window.__dvnTiptapContextTranscript = translateText
+
+  assert.equal(currentTranscriptCopyText({ useContext: true, allowWholeContext: true }), '没有选区时复制整段转写')
+  assert.equal(currentTranscriptCopyText(), '')
+
+  const bridgeCalls = []
+  assert.equal(copyTranscriptTextViaBridge({ jsCopyPlainTextToClipboard: (text) => bridgeCalls.push(text) }), true)
+  assert.deepEqual(bridgeCalls, ['没有选区时复制整段转写'])
+
+  editor.destroy()
+  window.__dvnTiptapContextTranscript = null
+})
+
+
+test('transcript copy: contextmenu listener records transcript target before QML probe', () => {
+  const { editor, window } = createEditor()
+  const uninstall = installTranscriptCopyHandler()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'voiceBlock',
+      attrs: {
+        voiceId: 'copy-context-event-v1',
+        voicePath: 'voicenote/copy-context-event.wav',
+        voiceSize: 1,
+        text: '右键事件缓存整段转写',
+        translateUnfold: true,
+      },
+    }],
+  })
+
+  const translateText = editor.view.dom.querySelector('.translateText')
+  translateText.dispatchEvent(new window.MouseEvent('contextmenu', { bubbles: true, cancelable: true }))
+
+  assert.equal(window.__dvnTiptapContextTranscript, translateText)
+  assert.equal(currentTranscriptCopyText({ useContext: true, allowWholeContext: true }), '右键事件缓存整段转写')
+
+  uninstall()
+  editor.destroy()
+  window.__dvnTiptapContextTranscript = null
+})
+
+
+test('transcript copy: shortcut can use recent cached selection without context', () => {
+  const { editor } = createEditor()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'voiceBlock',
+      attrs: {
+        voiceId: 'copy-shortcut-cache-v1',
+        voicePath: 'voicenote/copy-shortcut-cache.wav',
+        voiceSize: 1,
+        text: '快捷键复制缓存转写',
+        translateUnfold: true,
+      },
+    }],
+  })
+
+  const translateText = editor.view.dom.querySelector('.translateText')
+  const textNode = translateText.firstChild
+  const range = document.createRange()
+  range.setStart(textNode, 3)
+  range.setEnd(textNode, 7)
+  const selection = window.getSelection()
+  selection.removeAllRanges()
+  selection.addRange(range)
+  assert.equal(updateTranscriptSelectionCache(), true)
+
+  // Simulate the global QML Shortcut path where no context-menu element was
+  // recorded and the live DOM selection is no longer usable by callback time.
+  selection.removeAllRanges()
+  window.__dvnTiptapContextTranscript = null
+
+  assert.equal(currentTranscriptCopyText({ allowCachedRecent: true }), '复制缓存')
+  assert.equal(currentTranscriptCopyText(), '')
 
   editor.destroy()
 })

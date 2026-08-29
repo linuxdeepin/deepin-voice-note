@@ -44,6 +44,7 @@
 #endif
 #include <QFileDialog>
 #include <QStandardPaths>
+#include <cstring>
 // 条件编译：根据 Qt 版本包含不同的音频设备头文件
 #ifdef USE_QT5
 #include <QAudioDeviceInfo>
@@ -77,6 +78,36 @@ DGUI_USE_NAMESPACE
 namespace {
 
 constexpr const char *kTiptapVoiceBlockMime = "application/x-deepin-voice-note-voice-block";
+constexpr const char *kTiptapTranscriptTextPrefix = "__tiptap_transcript_text:";
+
+bool copyPlainTextToClipboard(const QString &text)
+{
+    if (text.isEmpty()) {
+        return false;
+    }
+
+    auto *mimeData = new QMimeData;
+    mimeData->setText(text);
+    QApplication::clipboard()->setMimeData(mimeData);
+    return true;
+}
+
+bool copyTiptapTranscriptTextToClipboard(const QVariant &menuJson)
+{
+    const QString value = menuJson.toString();
+    if (!value.startsWith(QString::fromLatin1(kTiptapTranscriptTextPrefix))) {
+        return false;
+    }
+
+    const QString text = value.mid(int(strlen(kTiptapTranscriptTextPrefix)));
+    if (!copyPlainTextToClipboard(text)) {
+        qWarning() << "Cannot copy Tiptap transcript: empty text";
+        return false;
+    }
+
+    qInfo() << "Tiptap transcript text copied to clipboard, length:" << text.length();
+    return true;
+}
 
 bool copyTiptapVoiceBlockToClipboard(const QVariant &menuJson)
 {
@@ -688,6 +719,11 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
             break;
         case ActionManager::PictureCopy:
         case ActionManager::TxtCopy:
+            if (kind == ActionManager::TxtCopy
+                && TiptapChannelBridge::instance()->debugEnabled()
+                && copyTiptapTranscriptTextToClipboard(menuJson)) {
+                break;
+            }
             // 直接调用web端的复制事件
 #ifdef USE_QT5
             Q_EMIT triggerWebAction((int)QWebEnginePage::Copy);
