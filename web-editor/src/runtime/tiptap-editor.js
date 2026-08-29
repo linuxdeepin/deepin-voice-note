@@ -17,6 +17,7 @@ import { createFormatToolbar } from './format-toolbar.js'
 import { setupImagePaste, setupImageViewAndMenu } from './image-interactions.js'
 import { shouldFocusEditorOnDocumentMouseDown } from './focus-behavior.js'
 import { setTiptapSearchQuery, clearTiptapSearch } from './search-extension.js'
+import { currentTranscriptCopyText, copyTranscriptTextViaBridge, installTranscriptCopyHandler } from './transcript-copy.js'
 
 // ---------------------------------------------------------------------------
 // 编辑器初始化模块（本接口不替换此模块）
@@ -50,8 +51,10 @@ function setupTransientScrollbar() {
 // ---------------------------------------------------------------------------
 
 setupTransientScrollbar()
+installTranscriptCopyHandler()
 const editor = createTiptapEditor(document.getElementById('app'))
 const appElement = document.getElementById('app')
+let tiptapBridge = null
 function syncEditorEmptyState() {
   appElement.classList.toggle('is-empty', editor.isEmpty)
 }
@@ -64,6 +67,15 @@ editor.on('transaction', syncEditorEmptyState)
 if (typeof window !== 'undefined') {
   window.__dvnTiptapEditor = editor
   window.__dvnTiptapContextTranscript = null
+  window.__dvnTiptapGetContextTranscriptCopyText = function () {
+    return currentTranscriptCopyText({ useContext: true, allowCachedContext: true, allowWholeContext: true, allowCachedRecent: true })
+  }
+  window.__dvnTiptapGetShortcutTranscriptCopyText = function () {
+    return currentTranscriptCopyText({ useContext: false, allowCachedRecent: true })
+  }
+  window.__dvnTiptapCopyContextTranscript = function () {
+    return copyTranscriptTextViaBridge(tiptapBridge)
+  }
   window.__dvnTiptapSelectContextAll = function () {
     const transcript = window.__dvnTiptapContextTranscript
     if (transcript && document.contains(transcript)) {
@@ -106,7 +118,6 @@ if (typeof window !== 'undefined') {
 syncEditorEmptyState()
 const toolbar = createFormatToolbar(editor, document.getElementById('toolbar-host'))
 const titleInput = document.getElementById('note-title-input')
-let tiptapBridge = null
 let pendingPickImage = false
 let pendingRecordVoice = false
 let currentTitleNoteId = -1
