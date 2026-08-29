@@ -28,6 +28,7 @@ import { ImageBlock } from '../extensions/image-block.js'
 import { VoiceBlock } from '../extensions/voice-block.js'
 import { ListNestingGuard } from './list-nesting-guard.js'
 import { UndoRedo } from './undo-redo.js'
+import { SearchExtension } from './search-extension.js'
 
 export function createTiptapExtensions() {
   return [
@@ -53,6 +54,7 @@ export function createTiptapExtensions() {
     FontFamilyMark,
     FontSizeMark,
     UndoRedo,
+    SearchExtension,
     ListNestingGuard,
   ]
 }
