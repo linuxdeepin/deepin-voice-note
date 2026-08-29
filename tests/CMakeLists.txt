@@ -80,6 +80,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/importolddata/tiptapmigration)
 include_directories(${CMAKE_SOURCE_DIR}/src/db)
 include_directories(${CMAKE_SOURCE_DIR}/src/task)
 include_directories(${CMAKE_SOURCE_DIR}/src/handler)
+include_directories(${CMAKE_SOURCE_DIR}/src/search)
 include_directories(${CMAKE_SOURCE_DIR}/src/audio)
 include_directories(src)
 
