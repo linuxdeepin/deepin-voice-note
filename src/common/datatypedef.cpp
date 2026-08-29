@@ -78,7 +78,7 @@ VNOTE_DATAS::~VNOTE_DATAS()
  * @brief VNOTE_DATAS::dataConstRef
  * @return 记事项数据
  */
-const VNOTE_DATA_VECTOR &VNOTE_DATAS::dataConstRef()
+const VNOTE_DATA_VECTOR &VNOTE_DATAS::dataConstRef() const
 {
     return datas;
 }
