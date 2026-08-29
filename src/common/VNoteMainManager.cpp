@@ -25,6 +25,8 @@
 #include "audio/recording_curves.h"
 #include "dbus/VoiceNoteDBusService.h"
 #include "db/vnotedbmanager.h"
+#include "search/notesearchservice.h"
+#include "search/searchdocument.h"
 
 #include <QThreadPool>
 #include <QQmlApplicationEngine>
@@ -48,6 +50,7 @@
 #include <QImageReader>
 #include <QTimer>
 #include <QSet>
+#include <QHash>
 #include <QSqlQuery>
 #include <QSqlError>
 
@@ -82,6 +85,29 @@ QVariantMap folderCountsForIds(const QSet<int> &folderIds)
     noteAll->lock.unlock();
     return counts;
 }
+QHash<int, VNoteItem *> buildAllNotesLookup(VNOTE_ALL_NOTES_MAP *noteAll)
+{
+    QHash<int, VNoteItem *> lookup;
+    if (!noteAll)
+        return lookup;
+
+    noteAll->lock.lockForRead();
+    for (auto folderIt = noteAll->notes.constBegin(); folderIt != noteAll->notes.constEnd(); ++folderIt) {
+        VNOTE_ITEMS_MAP *folderNotes = folderIt.value();
+        if (!folderNotes)
+            continue;
+        folderNotes->lock.lockForRead();
+        for (auto noteIt = folderNotes->folderNotes.constBegin(); noteIt != folderNotes->folderNotes.constEnd(); ++noteIt) {
+            VNoteItem *note = noteIt.value();
+            if (note)
+                lookup.insert(note->noteId, note);
+        }
+        folderNotes->lock.unlock();
+    }
+    noteAll->lock.unlock();
+    return lookup;
+}
+
 }
 
 VNoteMainManager::VNoteMainManager()
@@ -168,6 +194,7 @@ void VNoteMainManager::reloadAfterMigration()
     m_noteItems.clear();
     if (m_richTextManager)
         m_richTextManager->initData(nullptr, QString());
+    NoteSearchService::instance()->clearIndex();
     VNoteDataManager::instance()->reloadAllData();
 }
 
@@ -919,9 +946,30 @@ VNoteItem *VNoteMainManager::getNoteById(const int &id)
 {
     qInfo() << "Getting note by ID:" << id;
     foreach (auto item, m_noteItems) {
-        if (item->noteId == id)
+        if (item && item->noteId == id)
             return item;
     }
+
+    VNOTE_ALL_NOTES_MAP *noteAll = VNoteDataManager::instance()->getAllNotesInFolder();
+    if (!noteAll)
+        return nullptr;
+
+    noteAll->lock.lockForRead();
+    for (auto folderIt = noteAll->notes.constBegin(); folderIt != noteAll->notes.constEnd(); ++folderIt) {
+        VNOTE_ITEMS_MAP *folderNotes = folderIt.value();
+        if (!folderNotes)
+            continue;
+
+        folderNotes->lock.lockForRead();
+        auto noteIt = folderNotes->folderNotes.constFind(id);
+        VNoteItem *note = noteIt != folderNotes->folderNotes.constEnd() ? noteIt.value() : nullptr;
+        folderNotes->lock.unlock();
+        if (note) {
+            noteAll->lock.unlock();
+            return note;
+        }
+    }
+    noteAll->lock.unlock();
     return nullptr;
 }
 
@@ -976,6 +1024,7 @@ bool VNoteMainManager::deleteNote(const QList<int> &index)
             // 在删除前先保存folderId，避免删除后访问已释放内存
             int folderId = noteData->folderId;
             qWarning() << "Deleting note from folder ID:" << folderId;
+            NoteSearchService::instance()->removeNote(noteData->noteId);
             VNoteItemOper noteOper(noteData);
             noteOper.deleteNote();
             folderIdToDeletedCount[folderId] += 1;
@@ -1202,6 +1251,7 @@ void VNoteMainManager::updateSearch()
         return;
     }
     qDebug() << "Updating search with text:" << m_searchText;
+    TiptapChannelBridge::instance()->setSearchQuery(m_searchText);
     emit updateRichTextSearch(m_searchText);
     qInfo() << "Search update finished";
 }
@@ -1379,6 +1429,7 @@ void VNoteMainManager::renameNote(const int &index, const QString &newName)
                 item->noteTitle = newName;
             }
             // 标题变更统一通知列表和工作区，避免工作区标题只在播放状态下刷新。
+            NoteSearchService::instance()->updateNote(item);
             emit noteTitleChanged(index, newName);
             if (index == m_currentNoteId) {
                 emit currentNoteChanged(index, newName);
@@ -1438,43 +1489,52 @@ void VNoteMainManager::updateNoteWithResultForNote(int noteId, const QString &re
 int VNoteMainManager::loadSearchNotes(const QString &key)
 {
     qInfo() << "Loading search notes for key:" << key;
-    if (key.isEmpty()) {
+    if (key.trimmed().isEmpty()) {
         qWarning() << "Empty search key";
         return -1;
     }
-    qDebug() << "Loading search notes for key:" << key;
+
     VNOTE_ALL_NOTES_MAP *noteAll = VNoteDataManager::instance()->getAllNotesInFolder();
     QList<QVariantMap> notesDataList;
     m_noteItems.clear();
-    if (noteAll) {
-        qInfo() << "noteAll is not nullptr";
-        noteAll->lock.lockForRead();
-        for (auto &foldeNotes : noteAll->notes) {
-            for (auto note : foldeNotes->folderNotes) {
-                if (note->search(key)) {
-                    QVariantMap data;
-                    data.insert(NOTE_NAME_KEY, Utils::createRichText(note->noteTitle, key));
-                    data.insert(NOTE_TIME_KEY, Utils::convertDateTime(note->modifyTime));
-                    data.insert(NOTE_ISTOP_KEY, QString::number(note->isTop));
-                    data.insert(NOTE_ID_KEY, note->noteId);
-                    VNoteFolder *folder = getFloderById(note->folderId);
-                    data.insert(NOTE_FOLDER_NAME_KEY, folder->name);
-                    data.insert(NOTE_FOLDER_ICON_KEY, QString::number(folder->defaultIcon));
-                    notesDataList.append(data);
-                    m_noteItems.append(note);
-                }
-            }
+
+    const QList<SearchResult> results = NoteSearchService::instance()->search(noteAll, key);
+    const QHash<int, VNoteItem *> allNotes = buildAllNotesLookup(noteAll);
+    for (const SearchResult &result : results) {
+        VNoteItem *note = allNotes.value(result.noteId, nullptr);
+        if (!note) {
+            continue;
         }
-        noteAll->lock.unlock();
-        if (notesDataList.size() == 0) {
-            qDebug() << "No search results found";
-            emit noSearchResult();
+        QVariantMap data;
+        data.insert(NOTE_NAME_KEY, result.highlightedTitle.isEmpty()
+                                      ? Utils::createRichText(note->noteTitle, key)
+                                      : result.highlightedTitle);
+        data.insert(QStringLiteral("plainTitle"), result.titlePlain);
+        data.insert(QStringLiteral("snippet"), result.snippet);
+        data.insert(QStringLiteral("matchedField"), searchFieldName(result.bestField));
+        data.insert(QStringLiteral("score"), result.score);
+        data.insert(NOTE_TIME_KEY, Utils::convertDateTime(note->modifyTime));
+        data.insert(NOTE_ISTOP_KEY, QString::number(note->isTop));
+        data.insert(NOTE_ID_KEY, note->noteId);
+        VNoteFolder *folder = getFloderById(note->folderId);
+        if (folder) {
+            data.insert(NOTE_FOLDER_NAME_KEY, folder->name);
+            data.insert(NOTE_FOLDER_ICON_KEY, QString::number(folder->defaultIcon));
         } else {
-            qInfo() << "notesDataList is not empty";
-            //TODO:有搜索结果
-            emit searchFinished(notesDataList, key);
+            data.insert(NOTE_FOLDER_NAME_KEY, QString());
+            data.insert(NOTE_FOLDER_ICON_KEY, QStringLiteral("0"));
         }
+        notesDataList.append(data);
+        m_noteItems.append(note);
     }
+
+    if (notesDataList.isEmpty()) {
+        qDebug() << "No search results found";
+        emit noSearchResult();
+    } else {
+        emit searchFinished(notesDataList, key);
+    }
+
     qInfo() << "Search notes loading finished, count:" << notesDataList.size();
     return notesDataList.size();
 }
@@ -1619,6 +1679,7 @@ void VNoteMainManager::clearSearch()
 {
     qInfo() << "Clearing search";
     m_searchText = "";
+    TiptapChannelBridge::instance()->clearSearchQuery();
     // 发出信号清除搜索高亮
     emit updateRichTextSearch("");
     qInfo() << "Search cleared";

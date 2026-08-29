@@ -434,10 +434,23 @@ bool Utils::isWayland()
 
 QString Utils::createRichText(const QString &title, const QString &key)
 {
-    QString highLightText = "<span style=\"color: #0058de;\">" + key + "</span>";
-    QString editTitle(title);
-    QString newText = editTitle.replace(key, highLightText);
-    return newText;
+    if (key.isEmpty()) {
+        return title.toHtmlEscaped();
+    }
+
+    QString html;
+    int pos = 0;
+    int match = title.indexOf(key, pos, Qt::CaseInsensitive);
+    while (match >= 0) {
+        html += title.mid(pos, match - pos).toHtmlEscaped();
+        html += QStringLiteral("<span style=\"color: #0058de;\">")
+            + title.mid(match, key.size()).toHtmlEscaped()
+            + QStringLiteral("</span>");
+        pos = match + key.size();
+        match = title.indexOf(key, pos, Qt::CaseInsensitive);
+    }
+    html += title.mid(pos).toHtmlEscaped();
+    return html;
 }
 
 QString Utils::stripHtmlTags(const QString &htmlText)
