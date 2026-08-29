@@ -22,6 +22,21 @@ stop_app()
     killall -q "${APP_NAME}" 2>/dev/null || true
 }
 
+clean_qml_cache()
+{
+    # AT 每次安装/切换新包后，旧 QML 磁盘缓存可能继续引用旧组件名，
+    # 导致 QML 引擎加载失败并被 youqu 误报为“应用程序未启动”。
+    # 清理当前应用缓存并禁用本次进程的 QML disk cache，保证读取最新 qrc 资源。
+    local cache_dir="${HOME}/.cache/deepin/${APP_NAME}/qmlcache"
+
+    if [[ -d "${cache_dir}" ]]; then
+        echo "Clean QML cache: ${cache_dir}"
+        rm -rf -- "${cache_dir}"
+    fi
+
+    export QML_DISABLE_DISK_CACHE=1
+}
+
 wait_for_schema()
 {
     local table_count
@@ -62,6 +77,7 @@ if [[ ! -f "${FIXTURE_DB}" ]]; then
 fi
 
 stop_app
+clean_qml_cache
 rm -rf -- "${DATA_DIR}" "${CONFIG_DIR}"
 mkdir -p -- "${DATA_DIR}" "${CONFIG_DIR}"
 
