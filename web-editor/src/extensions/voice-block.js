@@ -16,6 +16,7 @@ import playingPlayIconUrl from '../../../src/web/img/audio_file_playing_play/Nor
 import closePlaybackIconUrl from '../../../src/web/img/playbar_pause_close/Normal.svg?url'
 import { getVoiceBridge, subscribeVoiceEvents } from '../runtime/tiptap-channel.js'
 import { subscribeSearchState, renderHighlightedText, textMatchesQuery } from '../runtime/search-state.js'
+import { updateTranscriptSelectionCache } from '../runtime/transcript-copy.js'
 
 const VOICE_BLOCK_CLIPBOARD_MIME = 'application/x-deepin-voice-note-voice-block'
 
@@ -353,6 +354,16 @@ export const VoiceBlock = Node.create({
       wrapper.className = 'voiceBox'
       wrapper.setAttribute('data-type', 'voice-block')
       wrapper.setAttribute('data-voice-meta', buildVoiceMenuJson(node.attrs))
+      // ProseMirror marks atom NodeViews without contentDOM as
+      // contenteditable=false unless the root already declares the attribute.
+      // That non-editable ancestor is exactly what broke WebEngine text
+      // selection/copy for Summernote voice transcripts historically.  Keep
+      // the voice block as an atomic document node, but expose a guarded
+      // read-only editable island so browser/QtWebEngine selection semantics
+      // can work normally inside .translateText.
+      wrapper.setAttribute('contenteditable', 'true')
+      wrapper.setAttribute('aria-readonly', 'true')
+      wrapper.setAttribute('spellcheck', 'false')
 
       const box = document.createElement('div')
       box.className = 'voiceInfoBox'
@@ -369,9 +380,11 @@ export const VoiceBlock = Node.create({
 
       const voiceBtn = document.createElement('div')
       voiceBtn.className = 'voiceBtn'
+      voiceBtn.setAttribute('contenteditable', 'false')
 
       const titleEl = document.createElement('div')
       titleEl.className = 'title'
+      titleEl.setAttribute('contenteditable', 'false')
       titleEl.textContent = node.attrs.title || ''
 
       left.appendChild(voiceBtn)
@@ -383,6 +396,7 @@ export const VoiceBlock = Node.create({
       createTimeEl.textContent = formatCreateTime(node.attrs.createTime)
 
       const progressBar = document.createElement('input')
+      progressBar.setAttribute('contenteditable', 'false')
       progressBar.type = 'range'
       progressBar.className = 'progressBar'
       progressBar.min = 0
@@ -394,6 +408,7 @@ export const VoiceBlock = Node.create({
       right.className = 'right'
       const timeField = document.createElement('div')
       timeField.className = 'timeField'
+      timeField.setAttribute('contenteditable', 'false')
       const timePassed = document.createElement('div')
       timePassed.className = 'timePassed'
       timePassed.textContent = '00:00/'
@@ -406,6 +421,7 @@ export const VoiceBlock = Node.create({
 
       const toTextLabel = document.createElement('div')
       toTextLabel.className = 'voiceToTextLabel'
+      toTextLabel.setAttribute('contenteditable', 'false')
       const toTextIcon = document.createElement('div')
       toTextIcon.className = 'voiceToTextIcon'
       const translatingLabel = document.createElement('span')
@@ -417,11 +433,13 @@ export const VoiceBlock = Node.create({
 
       const toTextTrigger = document.createElement('div')
       toTextTrigger.className = 'voiceToTextTrigger'
+      toTextTrigger.setAttribute('contenteditable', 'false')
       toTextTrigger.textContent = '转文字'
       right.appendChild(toTextTrigger)
 
       const closePlaybackBarBtn = document.createElement('div')
       closePlaybackBarBtn.className = 'closePlaybackBarBtn'
+      closePlaybackBarBtn.setAttribute('contenteditable', 'false')
       right.appendChild(closePlaybackBarBtn)
 
       playback.appendChild(right)
@@ -431,6 +449,7 @@ export const VoiceBlock = Node.create({
       translate.className = 'voiceTranscript translate'
       const translateHeader = document.createElement('div')
       translateHeader.className = 'translateHeader'
+      translateHeader.setAttribute('contenteditable', 'false')
       const translateIcon = document.createElement('div')
       translateIcon.className = 'translateIcon'
       const translateLabel = document.createElement('span')
@@ -445,8 +464,16 @@ export const VoiceBlock = Node.create({
 
       const translateText = document.createElement('div')
       translateText.className = 'translateText'
+      translateText.setAttribute('data-dvn-transcript', 'true')
       translateText.setAttribute('draggable', 'false')
-      translateText.setAttribute('contenteditable', 'false')
+      // ProseMirror marks the whole atom NodeView as contenteditable=false.
+      // Make the transcript an inner selectable island for QtWebEngine native
+      // copy, while JS event guards below keep it logically read-only.
+      translateText.setAttribute('contenteditable', 'true')
+      translateText.setAttribute('aria-readonly', 'true')
+      translateText.setAttribute('role', 'textbox')
+      translateText.setAttribute('tabindex', '0')
+      translateText.setAttribute('spellcheck', 'false')
       renderTranscriptText()
       translate.appendChild(translateText)
       box.appendChild(translate)
@@ -566,6 +593,117 @@ export const VoiceBlock = Node.create({
         event.stopPropagation()
         event.preventDefault()
       }
+      function isCopyShortcut(event) {
+        return (event.ctrlKey || event.metaKey) && !event.altKey && String(event.key).toLowerCase() === 'c'
+      }
+
+      function isSelectAllShortcut(event) {
+        return (event.ctrlKey || event.metaKey) && !event.altKey && String(event.key).toLowerCase() === 'a'
+      }
+
+      function selectWholeTranscript() {
+        const range = document.createRange()
+        range.selectNodeContents(translateText)
+        const selection = window.getSelection?.()
+        if (!selection) return false
+        selection.removeAllRanges()
+        selection.addRange(range)
+        updateTranscriptSelectionCache(selection)
+        return true
+      }
+
+      function onTranslateTextBeforeInput(event) {
+        event.preventDefault()
+      }
+
+      function onTranslateTextInput(event) {
+        // Defensive repair for old WebEngine paths where an editing event slips
+        // past beforeinput/keydown.  The source of truth remains attrs.text.
+        event.preventDefault?.()
+        renderTranscriptText()
+      }
+
+      function onTranslateTextClipboardMutatingEvent(event) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+
+      function onVoiceBoxBeforeInput(event) {
+        // The wrapper is contenteditable only to remove the non-editable
+        // ancestor around transcript text.  It must never become an editable
+        // source of truth; attrs remain authoritative.
+        event.preventDefault()
+      }
+
+      function onVoiceBoxInput(event) {
+        event.preventDefault?.()
+        renderTranscriptText()
+      }
+
+      function onVoiceBoxKeyDown(event) {
+        if (event.target instanceof HTMLElement && event.target.closest('.translateText')) {
+          return
+        }
+        if (isCopyShortcut(event)) {
+          return
+        }
+        if (isSelectAllShortcut(event)) {
+          event.preventDefault()
+          event.stopPropagation()
+          return
+        }
+        const key = String(event.key || '')
+        const navigationKeys = new Set([
+          'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+          'Home', 'End', 'PageUp', 'PageDown', 'Shift', 'Control', 'Meta', 'Alt',
+          'Escape', 'Tab',
+        ])
+        if (navigationKeys.has(key)) return
+        if (key.length === 1 || key === 'Backspace' || key === 'Delete' || key === 'Enter') {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+      }
+
+      function onTranslateTextKeyDown(event) {
+        if (isCopyShortcut(event)) {
+          updateTranscriptSelectionCache()
+          return
+        }
+        if (isSelectAllShortcut(event)) {
+          event.preventDefault()
+          event.stopPropagation()
+          selectWholeTranscript()
+          return
+        }
+
+        // Keep navigation/selection keys usable.  Block keys that would mutate
+        // the contenteditable island or create undo state in the WebEngine.
+        const key = String(event.key || '')
+        const navigationKeys = new Set([
+          'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+          'Home', 'End', 'PageUp', 'PageDown', 'Shift', 'Control', 'Meta', 'Alt',
+          'Escape', 'Tab',
+        ])
+        if (navigationKeys.has(key)) return
+
+        if (key.length === 1 || key === 'Backspace' || key === 'Delete' || key === 'Enter') {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+      }
+
+      function onTranslateTextSelectionEnd() {
+        updateTranscriptSelectionCache()
+      }
+
+
+      wrapper.addEventListener('beforeinput', onVoiceBoxBeforeInput)
+      wrapper.addEventListener('input', onVoiceBoxInput)
+      wrapper.addEventListener('keydown', onVoiceBoxKeyDown)
+      wrapper.addEventListener('paste', onTranslateTextClipboardMutatingEvent)
+      wrapper.addEventListener('cut', onTranslateTextClipboardMutatingEvent)
+      wrapper.addEventListener('drop', onTranslateTextClipboardMutatingEvent)
       voiceBtn.addEventListener('click', onVoiceBtnClick)
       toTextTrigger.addEventListener('click', onToTextTriggerClick)
       closePlaybackBarBtn.addEventListener('click', onClosePlaybackClick)
@@ -574,6 +712,14 @@ export const VoiceBlock = Node.create({
       translateText.addEventListener('pointerdown', onTranslateTextPointerDown)
       translateText.addEventListener('touchstart', onTranslateTextPointerDown)
       translateText.addEventListener('dragstart', onTranslateTextDragStart)
+      translateText.addEventListener('beforeinput', onTranslateTextBeforeInput)
+      translateText.addEventListener('input', onTranslateTextInput)
+      translateText.addEventListener('paste', onTranslateTextClipboardMutatingEvent)
+      translateText.addEventListener('cut', onTranslateTextClipboardMutatingEvent)
+      translateText.addEventListener('drop', onTranslateTextClipboardMutatingEvent)
+      translateText.addEventListener('keydown', onTranslateTextKeyDown)
+      translateText.addEventListener('mouseup', onTranslateTextSelectionEnd)
+      translateText.addEventListener('keyup', onTranslateTextSelectionEnd)
       translateHeader.addEventListener('click', (e) => {
         // 折叠/展开头部点击切换
         if (e.target === foldBtn) return
@@ -693,6 +839,12 @@ export const VoiceBlock = Node.create({
           destroyed = true
           unsubscribe()
           unsubscribeSearch()
+          wrapper.removeEventListener('beforeinput', onVoiceBoxBeforeInput)
+          wrapper.removeEventListener('input', onVoiceBoxInput)
+          wrapper.removeEventListener('keydown', onVoiceBoxKeyDown)
+          wrapper.removeEventListener('paste', onTranslateTextClipboardMutatingEvent)
+          wrapper.removeEventListener('cut', onTranslateTextClipboardMutatingEvent)
+          wrapper.removeEventListener('drop', onTranslateTextClipboardMutatingEvent)
           voiceBtn.removeEventListener('click', onVoiceBtnClick)
           toTextTrigger.removeEventListener('click', onToTextTriggerClick)
           closePlaybackBarBtn.removeEventListener('click', onClosePlaybackClick)
@@ -701,6 +853,14 @@ export const VoiceBlock = Node.create({
           translateText.removeEventListener('pointerdown', onTranslateTextPointerDown)
           translateText.removeEventListener('touchstart', onTranslateTextPointerDown)
           translateText.removeEventListener('dragstart', onTranslateTextDragStart)
+          translateText.removeEventListener('beforeinput', onTranslateTextBeforeInput)
+          translateText.removeEventListener('input', onTranslateTextInput)
+          translateText.removeEventListener('paste', onTranslateTextClipboardMutatingEvent)
+          translateText.removeEventListener('cut', onTranslateTextClipboardMutatingEvent)
+          translateText.removeEventListener('drop', onTranslateTextClipboardMutatingEvent)
+          translateText.removeEventListener('keydown', onTranslateTextKeyDown)
+          translateText.removeEventListener('mouseup', onTranslateTextSelectionEnd)
+          translateText.removeEventListener('keyup', onTranslateTextSelectionEnd)
           restoreWrapperDrag()
         },
       }
