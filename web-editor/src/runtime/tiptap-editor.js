@@ -16,6 +16,7 @@ import { bindTiptapChannel, setVoiceBridge } from './tiptap-channel.js'
 import { createFormatToolbar } from './format-toolbar.js'
 import { setupImagePaste, setupImageViewAndMenu } from './image-interactions.js'
 import { shouldFocusEditorOnDocumentMouseDown } from './focus-behavior.js'
+import { setTiptapSearchQuery, clearTiptapSearch } from './search-extension.js'
 
 // ---------------------------------------------------------------------------
 // 编辑器初始化模块（本接口不替换此模块）
@@ -94,6 +95,12 @@ if (typeof window !== 'undefined') {
   }
   window.__dvnTiptapRedo = function () {
     return editor.chain().focus().redo().run()
+  }
+  window.__dvnTiptapSetSearchQuery = function (query) {
+    return setTiptapSearchQuery(editor, query)
+  }
+  window.__dvnTiptapClearSearch = function () {
+    return clearTiptapSearch(editor)
   }
 }
 syncEditorEmptyState()

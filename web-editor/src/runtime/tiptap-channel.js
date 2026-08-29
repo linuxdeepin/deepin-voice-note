@@ -22,6 +22,7 @@ import {
 import { parseImageInfo, parseVoiceInfo, resolveResourceUrl } from './tiptap-adapter.js'
 import { TextSelection } from '@tiptap/pm/state'
 import { replaceEditorContentWithoutHistory } from './undo-redo.js'
+import { setTiptapSearchQuery, clearTiptapSearch } from './search-extension.js'
 
 const CONTENT_CHANGE_DEBOUNCE_MS = 200
 
@@ -494,7 +495,25 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
         const content = wrapTopLevelImagesInParagraphs(envelope?.content || createEmptyDoc())
         const resolved = walkResolve(content, loadResolvers)
         replaceEditorContentWithoutHistory(editor, resolved)
+        if (bridge.currentSearchQuery) {
+          setTiptapSearchQuery(editor, bridge.currentSearchQuery)
+        }
       })
+
+      // C++→JS：搜索 query 同步（Native 搜索框 → Tiptap 运行态高亮）
+      if (bridge.searchQueryChanged?.connect) {
+        bridge.searchQueryChanged.connect(function (query) {
+          setTiptapSearchQuery(editor, query)
+        })
+      }
+      if (bridge.searchCleared?.connect) {
+        bridge.searchCleared.connect(function () {
+          clearTiptapSearch(editor)
+        })
+      }
+      if (bridge.currentSearchQuery) {
+        setTiptapSearchQuery(editor, bridge.currentSearchQuery)
+      }
 
       // C++→JS：宿主下发字体列表（fontListProvided signal）
       if (bridge.fontListProvided) {
