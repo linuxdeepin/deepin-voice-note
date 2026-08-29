@@ -127,7 +127,7 @@ struct VNoteBlock {
     //释放资源，语音时用于删除文件
     virtual void releaseSpecificData() = 0;
     //获取数据类型
-    qint32 getType();
+    qint32 getType() const;
 
     qint32 blockType {InValid};
     /*

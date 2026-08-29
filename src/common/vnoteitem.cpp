@@ -450,7 +450,7 @@ VNoteBlock::~VNoteBlock()
  * @brief VNoteBlock::getType
  * @return 数据类型
  */
-qint32 VNoteBlock::getType()
+qint32 VNoteBlock::getType() const
 {
     // qInfo() << "Getting block type:" << blockType;
     return blockType;

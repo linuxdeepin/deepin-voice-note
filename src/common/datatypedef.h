@@ -64,7 +64,7 @@ struct VNOTE_ALL_NOTES_MAP {
 struct VNOTE_DATAS {
     ~VNOTE_DATAS();
 
-    const VNOTE_DATA_VECTOR &dataConstRef();
+    const VNOTE_DATA_VECTOR &dataConstRef() const;
 
 protected:
     //新建数据块
