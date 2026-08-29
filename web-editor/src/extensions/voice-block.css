@@ -6,6 +6,8 @@
     box-sizing: border-box;
     margin-top: 10px;
     margin-bottom: 10px;
+    -webkit-user-modify: read-only;
+    outline: none;
 }
 
 
@@ -324,6 +326,8 @@
     -webkit-user-select: text;
     -webkit-user-drag: none;
     user-drag: none;
+    -webkit-user-modify: read-only;
+    outline: none;
 }
 
 .voiceInfoBox .translateText::selection {
