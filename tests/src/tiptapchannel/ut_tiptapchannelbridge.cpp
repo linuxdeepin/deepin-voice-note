@@ -7,6 +7,8 @@
 #include <QResource>
 #include <QFile>
 #include <QSignalSpy>
+#include <QApplication>
+#include <QClipboard>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -96,6 +98,15 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsRequestPickImage_001)
     QSignalSpy spy(&bridge, &TiptapChannelBridge::pickImageRequested);
     bridge.jsRequestPickImage();
     EXPECT_EQ(spy.count(), 1);
+}
+
+
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_jsCopyPlainTextToClipboard_001)
+{
+    TiptapChannelBridge bridge;
+    bridge.jsCopyPlainTextToClipboard(QStringLiteral("转写复制文本"));
+    ASSERT_NE(QApplication::clipboard(), nullptr);
+    EXPECT_EQ(QApplication::clipboard()->text(), QStringLiteral("转写复制文本"));
 }
 
 // 双击查看原图：相对路径归一化后下发本地路径
