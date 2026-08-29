@@ -10,6 +10,7 @@ import QtQuick.Window 2.15
 import org.deepin.dtk 1.0
 import VNote 1.0
 
+// 迁移升级覆盖层，避免与旧 QWidget UpgradeView 类型名冲突。
 // 使用 DTK Declarative 原生 WaterProgressBar 复刻原始 QWidget UpgradeView。
 // 页面只覆盖 titlebar 下方的 central widget 区域。
 Item {

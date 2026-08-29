@@ -120,7 +120,7 @@ ApplicationWindow {
     }
 
     // 迁移期间只覆盖主窗口内容区，保留原有 titlebar 区域。
-    UpgradeView {
+    MigrationUpgradeView {
         Accessible.name: "MainWindow_UpgradeView"
         Accessible.role: Accessible.Pane
 
