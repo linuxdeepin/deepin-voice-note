@@ -5,6 +5,8 @@
 
 #include "vnoteitem.h"
 #include "common/utils.h"
+#include "search/searchdocumentextractor.h"
+#include "search/searchtextnormalizer.h"
 
 #include <DLog>
 #include <DGuiApplicationHelper>
@@ -101,35 +103,21 @@ void VNoteItem::delNoteData()
 bool VNoteItem::search(const QString &keyword)
 {
     qDebug() << "Searching for keyword:" << keyword << "in note ID:" << noteId;
-    bool fContainKeyword = false;
+    const QString normalizedKeyword = SearchTextNormalizer::normalize(keyword);
+    if (normalizedKeyword.isEmpty()) {
+        return false;
+    }
 
-    //If title contain keyword,don't
-    //need search data anymore.
-    if (noteTitle.contains(keyword, Qt::CaseInsensitive)) {
-        qDebug() << "Keyword found in note title";
-        fContainKeyword = true;
-    } else {
-        if (!htmlCode.isEmpty()) { //富文本内容查找
-            qDebug() << "Searching in rich text content";
-            QTextDocument doc;
-            doc.setHtml(htmlCode);
-            fContainKeyword = doc.toPlainText().contains(keyword, Qt::CaseInsensitive);
-            qDebug() << "Rich text search result:" << fContainKeyword;
-        } else {
-            qDebug() << "Searching in data blocks";
-            //Need search data blocks in note
-            for (auto it : datas.datas) {
-                if (it->blockText.contains(keyword, Qt::CaseInsensitive)) {
-                    qDebug() << "Keyword found in block type:" << it->getType();
-                    fContainKeyword = true;
-                    break;
-                }
-            }
+    const SearchDocument document = SearchDocumentExtractor::extract(this);
+    for (const SearchSegment &segment : document.segments) {
+        if (SearchTextNormalizer::normalize(segment.text).contains(normalizedKeyword)) {
+            qInfo() << "Search finished, result: true";
+            return true;
         }
     }
 
-    qInfo() << "Search finished, result:" << fContainKeyword;
-    return fContainKeyword;
+    qInfo() << "Search finished, result: false";
+    return false;
 }
 
 //bool VNoteItem::makeMetaData()
