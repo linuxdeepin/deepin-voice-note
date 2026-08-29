@@ -19,8 +19,10 @@
 #include <gtest/gtest.h>
 
 #include <QBuffer>
+#include <QEventLoop>
 #include <QImage>
 #include <QObject>
+#include <QTimer>
 #include <QVariant>
 
 #include <vlc/vlc.h>
@@ -69,7 +71,15 @@ TEST(MigrationViewControllerCoverage, start_withNullOrchestrator_rollBackCleanly
     ctrl->m_migrationActive = false;
     ctrl->m_orchestrator = nullptr;           // ensure early-return not taken
     ctrl->start();
-    // After rollback migrationActive must be false.
+
+    // start() schedules MigrationOrchestrator::startIfNeeded via
+    // QTimer::singleShot(0), so wait one event-loop turn before checking the
+    // rollback state.
+    QEventLoop loop;
+    QTimer::singleShot(0, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    // After queued rollback migrationActive must be false.
     EXPECT_FALSE(ctrl->m_migrationActive);
 
     qputenv("DVN_TIPTAP_DEBUG", oldDebugEnv);
