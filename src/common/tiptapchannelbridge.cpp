@@ -7,6 +7,8 @@
 
 #include <QResource>
 #include <QCoreApplication>
+#include <QApplication>
+#include <QClipboard>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
@@ -19,6 +21,7 @@
 #include <QStandardPaths>
 #include <QHash>
 #include <QUrl>
+#include <QMimeData>
 
 namespace {
 
@@ -305,6 +308,24 @@ void TiptapChannelBridge::jsRequestViewPicture(const QString &url)
         return;
     }
     emit viewPictureRequested(localPath);
+}
+
+void TiptapChannelBridge::jsCopyPlainTextToClipboard(const QString &text)
+{
+    if (text.isEmpty()) {
+        return;
+    }
+
+    QClipboard *clipboard = QApplication::clipboard();
+    if (!clipboard) {
+        qWarning() << "Tiptap copy plain text: clipboard is unavailable";
+        return;
+    }
+
+    auto *mimeData = new QMimeData;
+    mimeData->setText(text);
+    clipboard->setMimeData(mimeData);
+    qInfo() << "Tiptap copied plain text to clipboard, length:" << text.length();
 }
 
 void TiptapChannelBridge::jsPasteImage(const QString &dataUrl)

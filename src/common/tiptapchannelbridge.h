@@ -111,6 +111,9 @@ public:
     // 前端粘贴剪贴板图片数据（data URL），宿主保存到 images/ 后回插
     Q_INVOKABLE void jsPasteImage(const QString &dataUrl);
 
+    // 前端复制只读 DOM 文本（如 voiceBlock 转写文本）到系统剪贴板。
+    // 这类文本不在 ProseMirror 文档可编辑 selection 中，不能依赖 WebAction Copy。
+    Q_INVOKABLE void jsCopyPlainTextToClipboard(const QString &text);
 
     // 前端上报编辑器滚动位置（scrollTop），宿主据此驱动标题栏阴影状态
     Q_INVOKABLE void jsReportScroll(int scrollTop);
