@@ -42,6 +42,7 @@ class TiptapChannelBridge : public QObject
     Q_PROPERTY(bool debugEnabled READ debugEnabled CONSTANT)
     Q_PROPERTY(int currentNoteId READ currentNoteId NOTIFY currentNoteChanged)
     Q_PROPERTY(QString currentNoteTitle READ currentNoteTitle NOTIFY currentNoteChanged)
+    Q_PROPERTY(QString currentSearchQuery READ currentSearchQuery NOTIFY searchQueryChanged)
 
 public:
     explicit TiptapChannelBridge(QObject *parent = nullptr);
@@ -83,6 +84,12 @@ public:
     // 前端请求开始录音（工具栏麦克风按钮）
     Q_INVOKABLE void jsRequestRecordVoice();
 
+    // 搜索状态桥接：Native 搜索框同步到 Tiptap 编辑器运行态高亮。
+    // 搜索高亮不修改文档、不触发保存、不进入 undo/redo。
+    Q_INVOKABLE QString currentSearchQuery() const;
+    Q_INVOKABLE void setSearchQuery(const QString &query);
+    Q_INVOKABLE void clearSearchQuery();
+
     // 工作区标题读写（标题显示在编辑器页面中，但不属于正文文档）
     Q_INVOKABLE int currentNoteId() const;
     Q_INVOKABLE QString currentNoteTitle() const;
@@ -103,6 +110,7 @@ public:
 
     // 前端粘贴剪贴板图片数据（data URL），宿主保存到 images/ 后回插
     Q_INVOKABLE void jsPasteImage(const QString &dataUrl);
+
 
     // 前端上报编辑器滚动位置（scrollTop），宿主据此驱动标题栏阴影状态
     Q_INVOKABLE void jsReportScroll(int scrollTop);
@@ -186,6 +194,9 @@ signals:
                        const QString &disableHighlightColor, const QString &backgroundColor);
     // C++→JS：当前笔记标题变化
     void currentNoteChanged(int noteId, const QString &title);
+    // C++→JS：搜索 query 变化/清空。
+    void searchQueryChanged(const QString &query);
+    void searchCleared();
 
     // JS→C++：滚动位置上报（isTop=true 表示已滚到顶部）
     void scrollChanged(bool isTop);
@@ -227,6 +238,7 @@ private:
     bool m_pendingFontListValid;
     int m_imageSeq;
     QString m_currentVoiceId;
+    QString m_currentSearchQuery;
 };
 
 #endif // TIPTAPCHANNELBRIDGE_H

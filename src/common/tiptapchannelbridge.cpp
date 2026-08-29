@@ -128,6 +128,10 @@ void TiptapChannelBridge::notifyEditorReady()
     for (const QString &imageInfoJson : pendingImages) {
         emit insertImage(imageInfoJson);
     }
+
+    if (!m_currentSearchQuery.isEmpty()) {
+        emit searchQueryChanged(m_currentSearchQuery);
+    }
 }
 
 void TiptapChannelBridge::loadEnvelope(const QString &envelopeJson)
@@ -247,6 +251,34 @@ void TiptapChannelBridge::jsRequestPickImage()
 void TiptapChannelBridge::jsRequestRecordVoice()
 {
     emit recordVoiceRequested();
+}
+
+QString TiptapChannelBridge::currentSearchQuery() const
+{
+    return m_currentSearchQuery;
+}
+
+void TiptapChannelBridge::setSearchQuery(const QString &query)
+{
+    const QString normalized = query.trimmed();
+    if (m_currentSearchQuery == normalized) {
+        if (m_editorReady && !normalized.isEmpty()) {
+            emit searchQueryChanged(normalized);
+        }
+        return;
+    }
+
+    m_currentSearchQuery = normalized;
+    if (m_currentSearchQuery.isEmpty()) {
+        emit searchCleared();
+    } else {
+        emit searchQueryChanged(m_currentSearchQuery);
+    }
+}
+
+void TiptapChannelBridge::clearSearchQuery()
+{
+    setSearchQuery(QString());
 }
 
 int TiptapChannelBridge::currentNoteId() const
