@@ -438,12 +438,16 @@ QString Utils::createRichText(const QString &title, const QString &key)
         return title.toHtmlEscaped();
     }
 
+    const DPalette palette = DGuiApplicationHelper::instance()->applicationPalette();
+    const QString highlightColor = palette.color(DPalette::Active, DPalette::Highlight).name();
+    const QString highlightOpen = QStringLiteral("<span style=\"color: %1;\">").arg(highlightColor);
+
     QString html;
     int pos = 0;
     int match = title.indexOf(key, pos, Qt::CaseInsensitive);
     while (match >= 0) {
         html += title.mid(pos, match - pos).toHtmlEscaped();
-        html += QStringLiteral("<span style=\"color: #0058de;\">")
+        html += highlightOpen
             + title.mid(match, key.size()).toHtmlEscaped()
             + QStringLiteral("</span>");
         pos = match + key.size();

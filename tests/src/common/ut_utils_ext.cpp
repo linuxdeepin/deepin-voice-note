@@ -148,7 +148,9 @@ TEST(UtilsExt, filteredFileName)
 TEST(UtilsExt, richTextAndHtml)
 {
     QString rt = Utils::createRichText("title key", "key");
-    EXPECT_NE(-1, rt.indexOf("<span style=\"color: #0058de;\">key</span>"));
+    EXPECT_NE(-1, rt.indexOf("<span style=\"color: "));
+    EXPECT_NE(-1, rt.indexOf("key</span>"));
+    EXPECT_EQ("title key", Utils::stripHtmlTags(rt));
     EXPECT_EQ("hello", Utils::stripHtmlTags("<b>hello</b>"));
 }
 
