@@ -9,6 +9,7 @@
 #include "common/metadataparser.h"
 #include "common/setting.h"
 #include "common/utils.h"
+#include "common/tiptapdocumentexporter.h"
 
 #include <DLog>
 
@@ -144,7 +145,11 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportText()
                 return Savefailed; //保存失败
             }
             //富文本数据需要转换为纯文本
-            if (!noteData->htmlCode.isEmpty()) {
+            const QString meta = noteData->metaDataConstRef().toString();
+            if (TiptapDocumentExporter::isTiptapEnvelope(meta)) {
+                qDebug() << "Converting Tiptap envelope to plain text";
+                out.write(TiptapDocumentExporter::toPlainText(meta).toUtf8());
+            } else if (!noteData->htmlCode.isEmpty()) {
                 qDebug() << "Converting HTML content to plain text";
                 QTextDocument doc;
                 doc.setHtml(noteData->htmlCode);
@@ -186,7 +191,18 @@ ExportNoteWorker::ExportError ExportNoteWorker::exportAllVoice()
                 qDebug() << "Skipping note without voice content";
                 continue;
             }
-            if (noteData->htmlCode.isEmpty()) {
+            const QString meta = noteData->metaDataConstRef().toString();
+            if (TiptapDocumentExporter::isTiptapEnvelope(meta)) {
+                qDebug() << "Processing Tiptap note voice blocks";
+                for (const QString &voiceJson : TiptapDocumentExporter::voiceJsons(meta)) {
+                    error = exportOneVoice(voiceJson);
+                    //某一个保存失败则后续的不再进行保存操作
+                    if (Savefailed == error) {
+                        qWarning() << "Failed to export Tiptap voice block from JSON";
+                        return error;
+                    }
+                }
+            } else if (noteData->htmlCode.isEmpty()) {
                 qDebug() << "Processing plain text note voice blocks";
                 for (auto it : noteData->datas.datas) {
                     error = exportOneVoice(it);
