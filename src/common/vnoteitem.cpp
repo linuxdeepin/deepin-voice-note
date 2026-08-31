@@ -7,6 +7,7 @@
 #include "common/utils.h"
 #include "search/searchdocumentextractor.h"
 #include "search/searchtextnormalizer.h"
+#include "tiptapdocumentexporter.h"
 
 #include <DLog>
 #include <DGuiApplicationHelper>
@@ -260,6 +261,13 @@ void VNoteItem::delBlock(VNoteBlock *block)
 bool VNoteItem::haveVoice() const
 {
     qDebug() << "Checking for voice content in note ID:" << noteId;
+    const QString meta = metaDataConstRef().toString();
+    if (TiptapDocumentExporter::isTiptapEnvelope(meta)) {
+        const bool hasVoice = TiptapDocumentExporter::hasVoice(meta);
+        qInfo() << "Tiptap voice content check finished, result:" << hasVoice;
+        return hasVoice;
+    }
+
     if (htmlCode.isEmpty()) {
         bool hasVoice = datas.voiceBlocks.size() > 0;
         qInfo() << "Voice content check finished, result:" << hasVoice;
@@ -280,6 +288,13 @@ bool VNoteItem::haveVoice() const
 bool VNoteItem::haveText() const
 {
     qDebug() << "Checking for text content in note ID:" << noteId;
+    const QString meta = metaDataConstRef().toString();
+    if (TiptapDocumentExporter::isTiptapEnvelope(meta)) {
+        const bool hasText = TiptapDocumentExporter::hasText(meta);
+        qDebug() << "Tiptap format - Has text/exportable content:" << hasText;
+        return hasText;
+    }
+
     if (!htmlCode.isEmpty()) { //富文本文本内容判断
         bool hasText = (htmlCode != "<p><br></p>");
         qDebug() << "Rich text format - Has text:" << hasText;
@@ -304,6 +319,13 @@ bool VNoteItem::haveText() const
 qint32 VNoteItem::voiceCount() const
 {
     qDebug() << "Getting voice count for note ID:" << noteId;
+    const QString meta = metaDataConstRef().toString();
+    if (TiptapDocumentExporter::isTiptapEnvelope(meta)) {
+        const qint32 count = TiptapDocumentExporter::voiceJsons(meta).size();
+        qInfo() << "Tiptap voice count retrieval finished, count:" << count;
+        return count;
+    }
+
     //老版本
     if (htmlCode.isEmpty()) {
         qint32 count = datas.voiceBlocks.size();
@@ -324,6 +346,13 @@ qint32 VNoteItem::voiceCount() const
 QStringList VNoteItem::getVoiceJsons() const
 {
     qDebug() << "Getting voice JSONs for note ID:" << noteId;
+    const QString meta = metaDataConstRef().toString();
+    if (TiptapDocumentExporter::isTiptapEnvelope(meta)) {
+        const QStringList list = TiptapDocumentExporter::voiceJsons(meta);
+        qDebug() << "Found" << list.size() << "Tiptap voice JSONs";
+        return list;
+    }
+
     QRegularExpression rx("<div.+jsonkey.+>");
     QRegularExpression rxJson("\\{.*\\}");
     QStringList list;
@@ -348,6 +377,11 @@ QStringList VNoteItem::getVoiceJsons() const
 QString VNoteItem::getFullHtml() const
 {
     qDebug() << "Generating full HTML for note ID:" << noteId;
+    const QString meta = metaDataConstRef().toString();
+    if (TiptapDocumentExporter::isTiptapEnvelope(meta)) {
+        return TiptapDocumentExporter::toHtml(meta);
+    }
+
     //html字符串
     QString html = htmlHead;
 
