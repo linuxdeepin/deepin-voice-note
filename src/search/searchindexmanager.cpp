@@ -6,6 +6,7 @@
 
 #include "searchdocumentextractor.h"
 #include "searchtextnormalizer.h"
+#include "utils.h"
 #include "vnoteitem.h"
 
 #include <QCollator>
@@ -219,23 +220,7 @@ int SearchIndexManager::fieldWeight(SearchField field)
 
 QString SearchIndexManager::highlightedHtml(const QString &text, const QString &query)
 {
-    if (query.isEmpty() || text.isEmpty()) {
-        return text.toHtmlEscaped();
-    }
-
-    QString html;
-    int pos = 0;
-    int match = text.indexOf(query, pos, Qt::CaseInsensitive);
-    while (match >= 0) {
-        html += text.mid(pos, match - pos).toHtmlEscaped();
-        html += QStringLiteral("<span style=\"color: #0058de;\">")
-            + text.mid(match, query.size()).toHtmlEscaped()
-            + QStringLiteral("</span>");
-        pos = match + query.size();
-        match = text.indexOf(query, pos, Qt::CaseInsensitive);
-    }
-    html += text.mid(pos).toHtmlEscaped();
-    return html;
+    return Utils::createRichText(text, query);
 }
 
 QString SearchIndexManager::snippetHtml(const QString &text, const QString &query)
