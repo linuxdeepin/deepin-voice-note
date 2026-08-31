@@ -152,7 +152,8 @@ bool VoiceRecoderHandler::checkVolume()
     return (volume - 0.2 < 0.0) ? true : false;
 }
 
-// 通过脚本获取默认音源输入信息。只有获取的是所给的降噪字段的时候才使用，其他依然走dbus的方式
+// 通过 pactl 获取 PulseAudio/PipeWire 当前默认输入源。
+// 返回有效非 monitor source 时可作为 D-Bus 异常场景的兜底；降噪源 echo-cancel-source 优先使用。
 QString VoiceRecoderHandler::tryGetMicNameFromPactl() const
 {
     qInfo() << "Attempting to get default source via 'pactl get-default-source'";
@@ -186,8 +187,8 @@ QString VoiceRecoderHandler::tryGetMicNameFromPactl() const
         return QString();
     }
 
-    if (commandOutput.isEmpty()) {
-        qWarning() << "'pactl get-default-source' returned empty output.";
+    if (commandOutput.isEmpty() || commandOutput == "null") {
+        qWarning() << "'pactl get-default-source' returned invalid output:" << commandOutput;
         return QString();
     }
 
@@ -204,22 +205,28 @@ QString VoiceRecoderHandler::tryGetMicNameFromPactl() const
 QString VoiceRecoderHandler::getDefaultMicDeviceName() const
 {
     qInfo() << "Getting default mic device name";
-    QString defaultName;
 
-    // 只有当m_currentMode是麦克风模式时，才尝试使用pactl获取默认音源
-    if (static_cast<AudioWatcher::AudioMode>(m_currentMode) == AudioWatcher::Micphone) {
-        defaultName = tryGetMicNameFromPactl();
-        if (defaultName == "echo-cancel-source") {
-            // 如果pactl获取到有效且非降噪字段，则使用它
-            qInfo() << "Default mic device name retrieval finished";
-            return defaultName;
-        }
+    const auto mode = static_cast<AudioWatcher::AudioMode>(m_currentMode);
+    if (mode != AudioWatcher::Micphone) {
+        QString deviceName = m_audioWatcher->getDeviceName(mode);
+        qInfo() << "Default mic device name retrieval finished";
+        return deviceName;
     }
 
-    // 否则，回退到使用m_audioWatcher获取设备名称
-    defaultName = m_audioWatcher->getDeviceName(static_cast<AudioWatcher::AudioMode>(m_currentMode));
-    qInfo() << "Default mic device name retrieval finished";
-    return defaultName;
+    const QString pactlName = tryGetMicNameFromPactl();
+    if (pactlName == "echo-cancel-source") {
+        qInfo() << "Default mic device name retrieval finished";
+        return pactlName;
+    }
+
+    QString dbusName = m_audioWatcher->getDeviceName(mode);
+    if (!dbusName.isEmpty()) {
+        qInfo() << "Default mic device name retrieval finished";
+        return dbusName;
+    }
+
+    qInfo() << "Default mic device name retrieval finished with pactl fallback";
+    return pactlName;
 }
 
 void VoiceRecoderHandler::confirmStartRecoder()
