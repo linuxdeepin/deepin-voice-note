@@ -1,0 +1,43 @@
+name: 启用语音记事本_suite
+app: deepin-voice-note
+module: 启用语音记事本
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+suites:
+- id: suite_启用语音记事本_001_s1
+  name: 验证可以正常启动应用
+  description: ''
+  steps: []
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+- id: suite_启用语音记事本_002_s1
+  name: 终端输入命令启动应用
+  description: ''
+  steps: []
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+- id: suite_启用语音记事本_004_s1
+  name: 仅支持单个窗口开启
+  description: ''
+  steps: []
+  assert_steps:
+  - step_type: assert
+    action: assert_window_count
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+teardown:
+- action: session_stop

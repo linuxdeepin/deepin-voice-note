@@ -1,0 +1,103 @@
+name: 记事本条目_suite
+app: deepin-voice-note
+module: 记事本条目
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+suites:
+- id: suite_记事本条目_001_s1
+  name: 新建记事本-空白页与列表按钮及快捷键
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: model.name
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: action
+    action: keyboard_hot_key
+    key: ctrl+n
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+- id: suite_记事本条目_002_s1
+  name: 重命名记事本-右键菜单F2与双击正向流程
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: model.name
+    items:
+    - 重命名
+    wait: 1.0
+  - step_type: action
+    action: keyboard_type
+    text: 记事本A
+  - step_type: action
+    action: keyboard_press
+    key: Enter
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: F2
+    wait: 1.0
+  - step_type: action
+    action: keyboard_type
+    text: 记事本B
+  - step_type: action
+    action: keyboard_press
+    key: Enter
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: model.name
+    do: double_click
+    wait: 1.0
+  - step_type: action
+    action: keyboard_type
+    text: 记事本C
+  - step_type: action
+    action: keyboard_press
+    key: Enter
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+teardown:
+- action: session_stop

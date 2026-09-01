@@ -1,22 +1,112 @@
 elements:
-  新建记事本:
+  VoiceNoteMainWindow:
+    name: VoiceNoteMainWindow
+  NewNoteButton:
+    name: NewNoteButton
+  NoteItemListView:
+    name: NoteItemListView
+  NoteRightMenu:
+    name: NoteRightMenu
+  MainShortcuts:
+    name: MainShortcuts
+  NoteContentWebView:
+    name: NoteContentWebView
+  TiptapWebView:
+    name: TiptapWebView
+  NoteListScrollBar:
+    name: NoteListScrollBar
+  FolderListView:
+    name: FolderListView
+  RecordingBar:
+    name: RecordingBar
+  model.name:
+    name: model.name
+  CreateFolderButton:
     name: CreateFolderButton
-    role: button
-  记事本1:
-    name: 记事本1
-    role: label
-  重命名:
-    name: 重命名
+  FolderListScrollBar:
+    name: FolderListScrollBar
+  ToolBarMoreButton:
+    name: ToolBarMoreButton
+  TitleBarMenu:
+    name: TitleBarMenu
+  SettingsMenuItem:
+    name: SettingsMenuItem
+  PrivacyPolicyMenuItem:
+    name: PrivacyPolicyMenuItem
+  ExitMenuItem:
+    name: ExitMenuItem
+  CtxSubMenu:
+    name: CtxSubMenu
+  InternalRadioButton:
+    name: InternalRadioButton
+  MicrophoneRadioButton:
+    name: MicrophoneRadioButton
+  RestoreDefaultsButton:
+    name: RestoreDefaultsButton
+  FolderItemContextMenu:
+    name: FolderItemContextMenu
+  RenameMenuItem:
+    name: RenameMenuItem
+  FolderMessageDialogLoader:
+    name: FolderMessageDialogLoader
+  CancelButton:
+    name: CancelButton
+  FolderList:
+    name: FolderList
+  MainMessageDialog:
+    name: MainMessageDialog
+  ItemListMessageDialog:
+    name: ItemListMessageDialog
+  MultipleChoicesView:
+    name: MultipleChoicesView
+  MoveButton:
+    name: MoveButton
+  SaveNoteButton:
+    name: SaveNoteButton
+  SaveVoiceButton:
+    name: SaveVoiceButton
+  DeleteButton:
+    name: DeleteButton
+  VNoteButton:
+    name: VNoteButton
+  PauseButton:
+    name: PauseButton
+  StopButton:
+    name: StopButton
+  TwoColumnModeButton:
+    name: TwoColumnModeButton
+  InitialInterface:
+    name: InitialInterface
+  VNoteToolButton:
+    name: VNoteToolButton
+    role: push button
+  VNoteToolButtonBackground:
+    name: VNoteToolButtonBackground
+    role: ''
+  DeleteFolderMenuItem:
+    name: DeleteFolderMenuItem
     role: menu item
-  删除:
-    name: 删除
+  NewNoteFromFolderMenuItem:
+    name: NewNoteFromFolderMenuItem
     role: menu item
-  新建笔记:
-    name: 新建笔记
+  SidebarBlurBackground:
+    name: SidebarBlurBackground
+    role: ''
+  ActionManager.actionTextmenuId:
+    name: ActionManager.actionTextmenuId
     role: menu item
-  确定:
-    name: 确定
-    role: button
-  取 消:
-    name: 取 消
-    role: button
+  WebViewTitleBar:
+    name: WebViewTitleBar
+    role: ''
+  WebView:
+    name: WebView
+    role: ''
+  WebViewMessageDialog:
+    name: WebViewMessageDialog
+    role: ''
+  MessageDialogLoader:
+    name: MessageDialogLoader
+    role: ''
+  MainWindow_UpgradeView:
+    name: MainWindow_UpgradeView
+    role: ''
