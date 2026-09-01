@@ -18,6 +18,7 @@
 #include "actionmanager.h"
 #include "utils.h"
 #include "vtextspeechandtrmanager.h"
+#include "uosaicapabilitymanager.h"
 #include "handler/web_engine_handler.h"
 #include "handler/vnote_message_dialog_handler.h"
 #include "handler/voice_recoder_handler.h"
@@ -196,6 +197,11 @@ void VNoteMainManager::reloadAfterMigration()
         m_richTextManager->initData(nullptr, QString());
     NoteSearchService::instance()->clearIndex();
     VNoteDataManager::instance()->reloadAllData();
+}
+
+bool VNoteMainManager::openUosAiInAppStore()
+{
+    return UosAiCapabilityManager::instance()->openUosAiInAppStore();
 }
 
 void VNoteMainManager::initConnections()
