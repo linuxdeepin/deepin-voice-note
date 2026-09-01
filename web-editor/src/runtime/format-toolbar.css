@@ -515,11 +515,11 @@
     opacity: 0;
 }
 
-/* New insertion icons use a 24px viewBox; keep their original visual size
-   while the reused Summernote toolbar assets stay at 16px. */
+/* Resource insertion icons are part of the same toolbar icon system as the
+   migrated Summernote buttons, so keep them at 16px and theme them via currentColor. */
 .tiptap-resource-group .tiptap-icon {
-    width: 22px;
-    height: 22px;
+    width: 16px;
+    height: 16px;
 }
 
 
