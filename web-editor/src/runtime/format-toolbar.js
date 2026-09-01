@@ -658,10 +658,32 @@ export function createFormatToolbar(editor, host) {
     moreBtn.setAttribute('aria-expanded', 'false')
   }
 
+  function clampOverflowPanelToViewport() {
+    if (!overflowPanel.classList.contains('is-open')) return
+
+    const margin = 6
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth || host.clientWidth || 0
+    if (!viewportWidth) return
+
+    overflowPanel.style.maxWidth = `${Math.max(0, viewportWidth - margin * 2)}px`
+
+    const buttonRect = moreBtn.getBoundingClientRect()
+    const panelRect = overflowPanel.getBoundingClientRect()
+    const panelWidth = Math.min(panelRect.width || 0, Math.max(0, viewportWidth - margin * 2))
+    const left = Math.max(margin, Math.min(buttonRect.right - panelWidth, viewportWidth - panelWidth - margin))
+    const top = Math.max(margin, buttonRect.bottom + 6)
+
+    overflowPanel.style.left = `${Math.round(left)}px`
+    overflowPanel.style.top = `${Math.round(top)}px`
+  }
+
   function toggleOverflowPanel() {
     const open = !overflowPanel.classList.contains('is-open')
     overflowPanel.classList.toggle('is-open', open)
     moreBtn.setAttribute('aria-expanded', open ? 'true' : 'false')
+    if (open) {
+      window.requestAnimationFrame(clampOverflowPanelToViewport)
+    }
     forePicker.closePanel()
     backPicker.closePanel()
     headingControl.close()
@@ -731,6 +753,7 @@ export function createFormatToolbar(editor, host) {
   }
 
   function updateOverflowMode() {
+    closeOverflowPanel()
     const hostWidth = host.clientWidth || document.documentElement.clientWidth || window.innerWidth || 0
     if (!hostWidth) return
     // 顶部工具栏只在左侧保留 10px，与宿主实际布局一致；右侧不再额外
@@ -854,6 +877,7 @@ export function createFormatToolbar(editor, host) {
     : null
   resizeObserver?.observe(host)
   window.addEventListener('resize', updateOverflowMode)
+  window.addEventListener('scroll', clampOverflowPanelToViewport, true)
 
   return {
     setOnPickImage(fn) {
