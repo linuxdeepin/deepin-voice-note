@@ -21,6 +21,7 @@ public:
 
     Q_SIGNAL void audioLengthLimit();
     Q_SIGNAL void noNetworkConnection();
+    Q_SIGNAL void uosAiUpdateRequired();
 
 private:
     void onA2TStart();

@@ -264,6 +264,9 @@ WebEngineHandler::WebEngineHandler(QObject *parent)
     connect(m_voiceToTextHandler, &VoiceToTextHandler::noNetworkConnection, this, [this]() {
             Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::NoNetwork);
     });
+    connect(m_voiceToTextHandler, &VoiceToTextHandler::uosAiUpdateRequired, this, [this]() {
+        Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::UpdateUosAi);
+    });
     connect(m_voicePlayerHandler, &VoicePlayerHandler::playStatusChanged, this, [=](VoicePlayerHandler::PlayState state){
         if (state == VoicePlayerHandler::PlayState::End) {
             Q_EMIT playingVoice(false);
@@ -803,6 +806,11 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
         case ActionManager::TxtDictation: {
             auto status = VTextSpeechAndTrManager::instance()->onSpeechToText();
             if (VTextSpeechAndTrManager::Success != status) {
+                if (VTextSpeechAndTrManager::instance()->isUosAiUpdateRequired(status)) {
+                    Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::UpdateUosAi);
+                    break;
+                }
+
                 QString errString = VTextSpeechAndTrManager::instance()->errorString(status);
                 if (!errString.isEmpty()) {
                     Q_EMIT popupToast(errString, status);

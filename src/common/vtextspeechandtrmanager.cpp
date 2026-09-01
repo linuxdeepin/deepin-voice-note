@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "vtextspeechandtrmanager.h"
+#include "uosaicapabilitymanager.h"
 #include "../handler/voice_recoder_handler.h"
 
 #include <mutex>
@@ -233,6 +234,12 @@ VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::onSpeechToText()
         return status();
     }
 
+    auto capability = UosAiCapabilityManager::instance()->checkCapability(UosAiCapabilityManager::SpeechToText);
+    if (UosAiCapabilityManager::Available != capability) {
+        qWarning() << "Speech-to-text operation failed: UOS AI capability unavailable" << capability;
+        return UosAiUnsupported;
+    }
+
     if (!getSpeechToTextEnable()) {
         qWarning() << "Speech-to-text operation failed: No input device";
         return NoInputDevice;
@@ -276,6 +283,8 @@ QString VTextSpeechAndTrManager::errorString(Status status)
     switch (status) {
         case NotInstalled:
             return QObject::tr("Please install 'UOS AI' from the App Store before using");
+        case UosAiUnsupported:
+            return QObject::tr("Please update UOS AI from the App Store before using");
         case NoInputDevice:
             return QObject::tr("No audio input device detected. Please check and try again");
         case NoOutputDevice:
@@ -284,6 +293,11 @@ QString VTextSpeechAndTrManager::errorString(Status status)
             // Unknown error
             return {};
     }
+}
+
+bool VTextSpeechAndTrManager::isUosAiUpdateRequired(Status status) const
+{
+    return status == NotInstalled || status == UosAiUnsupported;
 }
 
 VTextSpeechAndTrManager::Status VTextSpeechAndTrManager::checkValid()
