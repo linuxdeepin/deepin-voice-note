@@ -795,15 +795,35 @@ Item {
         }
     }
 
-    Rectangle {
-        id: line
+    Item {
+        id: toolbarSeparatorOverlay
 
-        color: hasScroll ? (DTK.themeType === ApplicationHelper.LightType ? "#14000000" : "#66000000") : DTK.themeType === ApplicationHelper.LightType ? "white" : "#242424"
-        height: 1 / Screen.devicePixelRatio
-        width: webRect.width
-        y: 50
-        // 当富文本不可见时隐藏分隔线，避免显示白色缝隙
-        visible: webVisible
+        // QtWebEngine 的滚动条槽不属于 DOM 内容绘制区，Web 里的 border/伪元素
+        // 不能可靠覆盖最右侧滚动条区域。工具栏上下分割线统一由 QML 宿主
+        // 叠加绘制，宽度直接覆盖整个富文本容器，避免右侧断线。
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: titleBarHost.height + 48
+        visible: webVisible && TiptapChannel.debugEnabled
+        z: 2000
+
+        readonly property color separatorColor: DTK.themeType === ApplicationHelper.LightType ? "#14000000" : "#1FFFFFFF"
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            y: titleBarHost.height
+            color: toolbarSeparatorOverlay.separatorColor
+            height: 1 / Screen.devicePixelRatio
+        }
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            y: titleBarHost.height + 48 - height
+            color: toolbarSeparatorOverlay.separatorColor
+            height: 1 / Screen.devicePixelRatio
+        }
     }
 
     VNoteMessageDialogLoader {
