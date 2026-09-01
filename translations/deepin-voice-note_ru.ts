@@ -542,7 +542,7 @@
     <message>
         <location filename="../tests/src/common/ut_utils.cpp" line="33"/>
         <source>2 mins ago</source>
-        <translation type="unfinished"/>
+        <translation>2 минуты назад</translation>
     </message>
 </context>
 <context>
