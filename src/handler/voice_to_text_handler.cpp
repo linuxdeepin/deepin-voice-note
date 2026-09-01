@@ -11,6 +11,7 @@
 #include "globaldef.h"
 #include "common/vnoteitem.h"
 #include "common/vnotea2tmanager.h"
+#include "common/uosaicapabilitymanager.h"
 #include "common/jscontent.h"
 #include "common/VNoteMainManager.h"
 #include "common/tiptapchannelbridge.h"
@@ -35,6 +36,13 @@ void VoiceToTextHandler::setAudioToText(const QSharedPointer<VNVoiceBlock> &voic
     m_voiceBlock = voiceBlock;
     if (!m_voiceBlock) {
         qWarning() << "Voice block is null";
+        return;
+    }
+
+    auto capability = UosAiCapabilityManager::instance()->checkCapability(UosAiCapabilityManager::AudioToText);
+    if (UosAiCapabilityManager::instance()->isUpdateRequired(capability)) {
+        qWarning() << "Audio-to-text operation failed: UOS AI capability unavailable" << capability;
+        Q_EMIT uosAiUpdateRequired();
         return;
     }
 
