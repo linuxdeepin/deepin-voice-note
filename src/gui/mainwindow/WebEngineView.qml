@@ -174,6 +174,24 @@ Item {
         }
     }
 
+    Timer {
+        id: resourceButtonSyncTimer
+        interval: 0
+        repeat: false
+        onTriggered: rootItem.syncTiptapResourceButtons()
+    }
+
+    // Tiptap 工具栏资源按钮由 Web DOM 承载，状态来源却分散在宿主侧
+    // 录音、播放、搜索、设备可用性等绑定里。统一走 0ms Timer 合并同步，
+    // 让 QML 绑定（尤其 title.recordBtnEnabled 的派生值）先稳定下来，
+    // 避免停止录音时先同步到 disabled，后续派生状态变为 enabled 却没有再刷 DOM。
+    function scheduleTiptapResourceButtonsSync() {
+        if (!TiptapChannel.debugEnabled) {
+            return;
+        }
+        resourceButtonSyncTimer.restart();
+    }
+
     // 工具栏中的资源按钮不再由标题栏直接承载，需要把宿主侧运行态
     // 同步到 Tiptap DOM，保持与原 Summernote 入口一致。
     function syncTiptapResourceButtons() {
@@ -196,17 +214,18 @@ Item {
         tiptapView.runJavaScript(script);
     }
 
-    onIsRecordingAudioChanged: syncTiptapResourceButtons()
-    onIsVoiceToTextChanged: syncTiptapResourceButtons()
-    onWebVisibleChanged: syncTiptapResourceButtons()
-    onInitialVisibleChanged: syncTiptapResourceButtons()
+    onRecordingAvailableChanged: scheduleTiptapResourceButtonsSync()
+    onIsRecordingAudioChanged: scheduleTiptapResourceButtonsSync()
+    onIsVoiceToTextChanged: scheduleTiptapResourceButtonsSync()
+    onWebVisibleChanged: scheduleTiptapResourceButtonsSync()
+    onInitialVisibleChanged: scheduleTiptapResourceButtonsSync()
 
     Component.onCompleted: {
         // changeMode() 可能早于 QML Connections 建立，不能只依赖
         // updateRecordBtnState 信号初始化录音按钮。设备已插入时以当前
         // 可解析的录音设备为准，避免被尚未刷新的缓存误判为不可用。
         title.recorderBtnEnable = VoiceRecoderHandler.isRecordDeviceEnabled();
-        syncTiptapResourceButtons();
+        scheduleTiptapResourceButtonsSync();
     }
 
     function focusWebView() {
@@ -334,7 +353,7 @@ Item {
         }
         isRecording = true;
         title.recorderBtnEnable = false;
-        syncTiptapResourceButtons();
+        scheduleTiptapResourceButtonsSync();
         return true;
     }
 
@@ -348,8 +367,9 @@ Item {
         }
         Qt.callLater(function() {
             recorderViewLoader.active = false;
+            rootItem.scheduleTiptapResourceButtonsSync();
         });
-        syncTiptapResourceButtons();
+        scheduleTiptapResourceButtonsSync();
     }
 
     function stopAndClose() {
@@ -555,7 +575,7 @@ Item {
                     onPlayingVoice: isPlay => {
                         playStateChange(isPlay);
                         title.isPlaying = isPlay;
-                        rootItem.syncTiptapResourceButtons();
+                        rootItem.scheduleTiptapResourceButtonsSync();
                     }
                     onPopupToast: (message, msgId) => {
                         DTK.sendMessage(webView, message, "icon_warning", 4000, msgId);
@@ -645,7 +665,7 @@ Item {
                         if (loadRequest.status === WebEngineView.LoadSucceededStatus) {
                             tiptapWebView.forceActiveFocus();
                             tiptapWebView.runJavaScript("window._dvnTiptapFocus && window._dvnTiptapFocus()");
-                            rootItem.syncTiptapResourceButtons();
+                            rootItem.scheduleTiptapResourceButtonsSync();
                         }
                     }
 
@@ -987,9 +1007,12 @@ Item {
     Connections {
         target: title
 
-        onIsPlayingChanged: rootItem.syncTiptapResourceButtons()
-        onIsSearchingChanged: rootItem.syncTiptapResourceButtons()
-        onRecorderBtnEnableChanged: rootItem.syncTiptapResourceButtons()
+        onIsPlayingChanged: rootItem.scheduleTiptapResourceButtonsSync()
+        onIsSearchingChanged: rootItem.scheduleTiptapResourceButtonsSync()
+        onIsRecordingAudioChanged: rootItem.scheduleTiptapResourceButtonsSync()
+        onIsVoiceToTextChanged: rootItem.scheduleTiptapResourceButtonsSync()
+        onRecorderBtnEnableChanged: rootItem.scheduleTiptapResourceButtonsSync()
+        onRecordBtnEnabledChanged: rootItem.scheduleTiptapResourceButtonsSync()
     }
 
     Connections {
@@ -999,7 +1022,7 @@ Item {
             // 与 Summernote 的 WebEngineHandler::onPlayingVoice 保持一致：
             // 播放和暂停都属于“正在占用播放状态”，只有结束才恢复录音。
             title.isPlaying = (state !== 2);
-            rootItem.syncTiptapResourceButtons();
+            rootItem.scheduleTiptapResourceButtonsSync();
         }
 
         onPickImageRequested: {
@@ -1061,24 +1084,27 @@ Item {
     Connections {
         target: VoiceRecoderHandler
 
-        onRecoderStateChange: {
-            var currentType = VoiceRecoderHandler.getRecoderType();
+        onRecoderStateChange: function(type) {
+            var currentType = type;
             if (recorderViewLoader.item) {
                 recorderViewLoader.item.isRecording = (currentType === VoiceRecoderHandler.Recording);
             }
-            
+
             // 当录音状态变为Idle时，完全关闭录音界面并重置状态
             if (currentType === VoiceRecoderHandler.Idle) {
                 // 停止、启动失败以及设备热插拔都统一走同一套 UI 恢复逻辑。
                 rootItem.resetRecordingUi();
             }
+            rootItem.scheduleTiptapResourceButtonsSync();
         }
-        onUpdateRecordBtnState: {
+        onUpdateRecordBtnState: function(enable) {
             title.recorderBtnEnable = enable;
-            rootItem.syncTiptapResourceButtons();
+            rootItem.scheduleTiptapResourceButtonsSync();
         }
-        onUpdateRecorderTime: {
-            recorderViewLoader.item.time = time;
+        onUpdateRecorderTime: function(time) {
+            if (recorderViewLoader.item) {
+                recorderViewLoader.item.time = time;
+            }
         }
         onVolumeTooLow: isLow => {
             if (isLow) {
