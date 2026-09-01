@@ -634,21 +634,19 @@ export function createFormatToolbar(editor, host) {
   }
   const groupOrder = ['toggle', 'color', 'list', 'resource']
   const orderedToolbarUnits = [
-    { group: 'toggle', node: buttons.bold, priority: 70 },
-    { group: 'toggle', node: buttons.italic, priority: 65 },
-    { group: 'toggle', node: buttons.underline, priority: 60 },
-    { group: 'toggle', node: buttons.strike, priority: 55 },
-    { group: 'color', node: forePicker.wrapper, priority: 50 },
-    { group: 'color', node: backPicker.wrapper, priority: 45 },
-    { group: 'list', node: listButtons.bulletList, priority: 40 },
-    { group: 'list', node: listButtons.orderedList, priority: 35 },
-    { group: 'list', node: listButtons.taskList, priority: 30 },
-    // 资源插入是语音记事本的核心动作，紧凑布局时应晚于普通格式按钮折叠。
-    { group: 'resource', node: voiceBtn, priority: 90 },
-    { group: 'resource', node: imageBtn, priority: 85 },
+    { group: 'toggle', node: buttons.bold },
+    { group: 'toggle', node: buttons.italic },
+    { group: 'toggle', node: buttons.underline },
+    { group: 'toggle', node: buttons.strike },
+    { group: 'color', node: forePicker.wrapper },
+    { group: 'color', node: backPicker.wrapper },
+    { group: 'list', node: listButtons.bulletList },
+    { group: 'list', node: listButtons.orderedList },
+    { group: 'list', node: listButtons.taskList },
+    { group: 'resource', node: voiceBtn },
+    { group: 'resource', node: imageBtn },
   ]
-  const overflowPriorityUnits = [...orderedToolbarUnits]
-    .sort((left, right) => left.priority - right.priority)
+  const overflowCollapseUnits = [...orderedToolbarUnits].reverse()
   const overflowSet = new Set()
 
   function removeAllChildren(node) {
@@ -744,10 +742,9 @@ export function createFormatToolbar(editor, host) {
     renderOverflowLayout()
     if (measuredToolbarWidth() <= maxToolbarWidth + 1) return
 
-    // 按语义优先级折叠，而不是简单从末尾折叠。这样在极窄布局下，
-    // 更低频的格式项先进“更多”，语音/图片这类核心资源入口尽量保持常驻；
+    // Summernote 工具栏按视觉顺序从后往前折叠，不能跳过末尾资源区去隐藏中间按钮。
     // 渲染时仍使用 orderedToolbarUnits，保证主工具栏与更多面板内的视觉顺序稳定。
-    for (const unit of overflowPriorityUnits) {
+    for (const unit of overflowCollapseUnits) {
       overflowSet.add(unit)
       renderOverflowLayout()
       if (measuredToolbarWidth() <= maxToolbarWidth + 1) break

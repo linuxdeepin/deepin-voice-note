@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <rect x="8" y="3" width="8" height="12" rx="4" fill="#3f3f3f"/>
-  <path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8" fill="none" stroke="#3f3f3f" stroke-width="2" stroke-linecap="round"/>
+<!-- SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
+     SPDX-License-Identifier: GPL-3.0-or-later -->
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="6" y="2" width="4" height="8" rx="2" fill="currentColor"/>
+  <path d="M3.5 7.5a4.5 4.5 0 0 0 9 0M8 12v2M5.5 14h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
 </svg>

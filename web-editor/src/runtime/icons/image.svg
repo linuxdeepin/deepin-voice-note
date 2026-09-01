@@ -1,5 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="#3f3f3f" stroke-width="2"/>
-  <circle cx="8" cy="10" r="2" fill="#3f3f3f"/>
-  <path d="M5 18l5.5-5.5 3.5 3.5 2-2 3 4" fill="none" stroke="#3f3f3f" stroke-width="2" stroke-linejoin="round"/>
+<!-- SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
+     SPDX-License-Identifier: GPL-3.0-or-later -->
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2.5" y="3.5" width="11" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+  <circle cx="5.75" cy="6.25" r="1.25" fill="currentColor"/>
+  <path d="M3.25 12l3.5-3.5 2.25 2.25 1.35-1.35L13 12" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
 </svg>
