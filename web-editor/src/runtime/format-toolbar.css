@@ -15,6 +15,7 @@
     gap: 0;
     width: max-content;
     max-width: calc(100% - 10px);
+    flex-shrink: 0;
     min-height: 40px;
     box-sizing: border-box;
     margin: 0 0 0 10px;
@@ -578,9 +579,10 @@
 
 .tiptap-overflow-panel {
     display: none;
-    position: absolute;
-    top: calc(100% + 6px);
-    right: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: auto;
     z-index: 30;
     align-items: center;
     gap: 4px;
@@ -591,6 +593,9 @@
     border-radius: var(--dvn-menu-radius, 12px);
     background: var(--dvn-toolbar-bg, rgba(245, 245, 245, 1));
     box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.10);
+    max-width: calc(100vw - 12px);
+    overflow-x: auto;
+    overflow-y: hidden;
     white-space: nowrap;
 }
 
