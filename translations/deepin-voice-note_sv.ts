@@ -663,7 +663,7 @@ Alla anteckningar i den kommer att raderas</translation>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="119"/>
         <source>The clipped recordings and converted text will not be pasted. Do you want to continue?</source>
-        <translation>Klippda inspelningar och konverterad text klistras inte in. Vill du fortsätta?</translation>
+        <translation>Klippta inspelningar och konverterad text klistras inte in. Vill du fortsätta?</translation>
     </message>
     <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="123"/>
