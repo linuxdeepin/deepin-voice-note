@@ -24,17 +24,17 @@ Item {
     property bool layoutInitialized: false
     property bool isVoiceToText: false
     property int leftAreaMaxWidth: 300
-    property int leftAreaMinWidth: 125
+    property int leftAreaMinWidth: 100
     property int leftViewWidth: 220
-    property int middleAreaMinWidth: 175
+    property int middleAreaMinWidth: 195
     property int middleViewWidth: 260
     property bool needHideSearch: false
-    property int rightAreaMinWidth: 380
+    property int rightAreaMinWidth: 390
     property int tmpLeftAreaWidth: 220
     property int tmpWebViewWidth: 0
     property int tmprightDragX: 0
     property int windowMiniHeight: 300
-    property int windowMiniWidth: 685
+    property int windowMiniWidth: 690
 
     function collapsedSearchOffset() {
         // offect 是 ColumnLayout 内的 leftMargin，需要减去 ColumnLayout 本身的 leftMargin
