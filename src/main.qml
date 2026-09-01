@@ -27,7 +27,7 @@ ApplicationWindow {
     flags: Qt.Window | Qt.WindowMinMaxButtonsHint | Qt.WindowCloseButtonHint | Qt.WindowTitleHint
     height: 681
     minimumHeight: 300
-    minimumWidth: 685
+    minimumWidth: 690
     visible: true
     width: 1096
 
