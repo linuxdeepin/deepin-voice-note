@@ -567,7 +567,14 @@ Item {
                     }
                     onRequestMessageDialog: type => {
                         // 触发创建提示对话框
-                        messageDialogLoader.showDialog(type);
+                        if (type === VNoteMessageDialogHandler.UpdateUosAi) {
+                            messageDialogLoader.showDialog(type, ret => {
+                                if (ret)
+                                    VNoteMainManager.openUosAiInAppStore();
+                            });
+                        } else {
+                            messageDialogLoader.showDialog(type);
+                        }
                     }
                     onTriggerWebAction: action => {
                         if (TiptapChannel.debugEnabled && tiptapLoader.item) {

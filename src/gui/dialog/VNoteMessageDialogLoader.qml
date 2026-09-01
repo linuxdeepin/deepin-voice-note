@@ -40,27 +40,20 @@ Loader {
         id: dialog
 
         readonly property int btnHeight: 30
-        readonly property int btnWidth: 167
+        readonly property bool isUpdateUosAiDialog: loader.messageType === VNoteMessageDialogHandler.UpdateUosAi
+        readonly property int btnWidth: isUpdateUosAiDialog ? 171 : 167
+        readonly property int dialogContentHeight: isUpdateUosAiDialog ? 164 : 158
 
         flags: Qt.Window | Qt.WindowCloseButtonHint
-        height: 158
-        maximumHeight: 158
+        height: dialogContentHeight
+        icon: "dialog-warning"
+        maximumHeight: dialogContentHeight
         maximumWidth: 360
-        minimumHeight: 158
+        minimumHeight: dialogContentHeight
         minimumWidth: 360
         modality: Qt.ApplicationModal
         visible: false
         width: 360
-
-        header: DialogTitleBar {
-            enableInWindowBlendBlur: false
-
-            // 仅保留默认状态，否则 hover 上会有变化效果
-            icon {
-                mode: DTK.NormalState
-                name: "icon_warning"
-            }
-        }
 
         Component.onCompleted: {
             show();
@@ -101,9 +94,10 @@ Loader {
             ColumnLayout {
                 Layout.alignment: Qt.AlignCenter
                 Layout.fillWidth: true
-                Layout.maximumHeight: 58
-                Layout.minimumHeight: 58
-                Layout.preferredHeight: 58
+                Layout.maximumHeight: dialog.isUpdateUosAiDialog ? 64 : 58
+                Layout.minimumHeight: dialog.isUpdateUosAiDialog ? 64 : 58
+                Layout.preferredHeight: dialog.isUpdateUosAiDialog ? 64 : 58
+                spacing: dialog.isUpdateUosAiDialog ? 8 : 0
 
                 Label {
                     id: notifyText
@@ -115,22 +109,41 @@ Loader {
 
                     Layout.alignment: Qt.AlignCenter
                     Layout.fillWidth: true
+                    Layout.leftMargin: dialog.isUpdateUosAiDialog ? 20 : 0
+                    Layout.preferredHeight: dialog.isUpdateUosAiDialog ? 18 : implicitHeight
+                    Layout.rightMargin: dialog.isUpdateUosAiDialog ? 20 : 0
                     color: ColorSelector.textColor
+                    elide: Text.ElideNone
                     font: DTK.fontManager.t6
                     horizontalAlignment: Text.AlignHCenter
+                    maximumLineCount: dialog.isUpdateUosAiDialog ? 1 : 2
                     text: handler.mainMessage
+                    verticalAlignment: Text.AlignVCenter
                     wrapMode: Text.Wrap
                 }
 
                 Label {
                     id: messageText
 
+                    property Palette textColor: Palette {
+                        normal: Qt.rgba(0, 0, 0, dialog.isUpdateUosAiDialog ? 0.7 : 1)
+                        normalDark: Qt.rgba(1, 1, 1, dialog.isUpdateUosAiDialog ? 0.7 : 1)
+                    }
+
                     Layout.alignment: Qt.AlignHCenter
-                    Layout.fillHeight: visible
+                    Layout.fillHeight: visible && !dialog.isUpdateUosAiDialog
+                    Layout.preferredHeight: dialog.isUpdateUosAiDialog ? 34 : implicitHeight
+                    Layout.preferredWidth: dialog.isUpdateUosAiDialog ? 302 : dialog.width
+                    color: dialog.isUpdateUosAiDialog ? ColorSelector.textColor : DTK.palette.windowText
+                    elide: Text.ElideNone
                     font: DTK.fontManager.t7
+                    horizontalAlignment: Text.AlignHCenter
+                    maximumLineCount: dialog.isUpdateUosAiDialog ? 2 : 3
                     text: handler.detailMessage
+                    verticalAlignment: Text.AlignVCenter
                     visible: handler.detailMessage.length
-                    width: dialog.width
+                    wrapMode: Text.Wrap
+                    width: dialog.isUpdateUosAiDialog ? 302 : dialog.width
                 }
             }
 
@@ -148,7 +161,7 @@ Loader {
                         Accessible.name: "CancelButton"
                         anchors.fill: parent
                         font: DTK.fontManager.t6
-                        text: qsTr("Cancel")
+                        text: handler.cancelText
 
                         onClicked: {
                             dialog.close();
@@ -179,9 +192,10 @@ Loader {
                     width: active ? btnWidth : 0
 
                     sourceComponent: RecommandButton {
+                        Accessible.name: dialog.isUpdateUosAiDialog ? "UpdateUosAiButton" : "ConfirmButton"
                         anchors.fill: parent
                         font: DTK.fontManager.t6
-                        text: qsTr("Confirm")
+                        text: handler.confirmText
 
                         onClicked: {
                             result = true;
