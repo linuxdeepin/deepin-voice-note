@@ -1,0 +1,46 @@
+name: 快捷键使用_suite
+app: deepin-voice-note
+module: 快捷键使用
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+suites:
+- id: suite_快捷键使用_001_s1
+  name: 空语音记录下Ctrl+Y快捷键禁用无异常
+  description: ''
+  steps:
+  - step_type: action
+    action: keyboard_hot_key
+    key: ctrl+y
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+- id: suite_快捷键使用_003_s1
+  name: 空白页Delete快捷键无作用无异常
+  description: ''
+  steps:
+  - step_type: action
+    action: keyboard_press
+    value: Delete
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+teardown:
+- action: session_stop

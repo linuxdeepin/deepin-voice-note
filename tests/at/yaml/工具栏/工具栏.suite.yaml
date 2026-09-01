@@ -1,0 +1,24 @@
+name: 工具栏_suite
+app: deepin-voice-note
+module: 工具栏
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+suites:
+- id: suite_工具栏_006_s1
+  name: 工具栏-关闭主界面
+  description: ''
+  steps:
+  - step_type: action
+    action: keyboard_hot_key
+    key: alt+F4
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_process_not_running
+teardown:
+- action: session_stop
