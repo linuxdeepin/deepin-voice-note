@@ -9,6 +9,10 @@ import { Window } from 'happy-dom'
 import { Editor } from '@tiptap/core'
 import { createTiptapExtensions } from '../src/runtime/tiptap-extensions.js'
 import { createFormatToolbar } from '../src/runtime/format-toolbar.js'
+import { FORE_COLORS, BACK_COLORS, DARK_FORE_COLORS, DARK_BACK_COLORS } from '../src/runtime/format-palette.js'
+import toolbarCss from '../src/runtime/format-toolbar.css?raw'
+import tiptapEditorHtml from '../src/runtime/tiptap-editor.html?raw'
+import { syncEmptyPlaceholderState } from '../src/runtime/empty-placeholder-state.js'
 import { createEmptyDoc, createEnvelope, validateEnvelope } from '../src/schema/document-envelope.js'
 
 function defineGlobal(name, value) {
@@ -50,7 +54,7 @@ function createEditorWithToolbar() {
   host.id = 'toolbar-host'
   document.body.appendChild(host)
   const toolbar = createFormatToolbar(editor, host)
-  return { editor, host, toolbar, window }
+  return { editor, host, toolbar, window, appElement: element }
 }
 
 function insertText(editor, text) {
@@ -92,7 +96,7 @@ test('toolbar group separators are rendered on initial mount', () => {
 })
 
 
-test('toolbar icons use imported assets or sanitized SVG nodes', () => {
+test('toolbar icons use imported assets or sanitized SVG nodes and follow theme color', () => {
   const { host, editor } = createEditorWithToolbar()
   const toolbar = host.querySelector('[data-testid="format-toolbar"]')
   for (const format of ['bulletList', 'orderedList', 'taskList', 'insertVoice', 'insertImage']) {
@@ -105,14 +109,19 @@ test('toolbar icons use imported assets or sanitized SVG nodes', () => {
     assert.equal(icon.querySelector('foreignObject'), null, `${format} must not render foreign objects`)
   }
 
+  assert.match(toolbarCss, /\.tiptap-icon--asset::after \{[\s\S]*background-color: currentColor;/)
+  assert.match(toolbarCss, /\.tiptap-icon--asset::after \{[\s\S]*opacity: 1;/)
+  assert.match(toolbarCss, /\.tiptap-icon--asset > img \{[\s\S]*opacity: 0;/)
+  assert.match(toolbarCss, /\.tiptap-toolbar button\.is-active \.tiptap-icon--asset,[\s\S]*color: var\(--highlightColor/)
+
   editor.destroy()
 })
 
 
-test('toolbar keeps the right side available when measuring normal width', () => {
+test('toolbar keeps every tool visible at the default 616px editor pane width', () => {
   const { host, editor, window } = createEditorWithToolbar()
   const toolbar = host.querySelector('[data-testid="format-toolbar"]')
-  let hostWidth = 610
+  let hostWidth = 616
 
   Object.defineProperty(host, 'clientWidth', {
     configurable: true,
@@ -120,15 +129,20 @@ test('toolbar keeps the right side available when measuring normal width', () =>
   })
   Object.defineProperty(toolbar, 'scrollWidth', {
     configurable: true,
-    get: () => 600,
+    get: () => 606,
   })
 
   window.dispatchEvent(new window.Event('resize'))
   assert.equal(toolbar.querySelector('[data-format="more"]'), null)
-  assert.equal(toolbar.querySelector('[data-format="insertVoice"]')?.closest('.tiptap-overflow-panel'), null)
-  assert.equal(toolbar.querySelector('[data-format="insertImage"]')?.closest('.tiptap-overflow-panel'), null)
+  for (const format of ['bold', 'italic', 'underline', 'strike', 'foreColor', 'backColor', 'bulletList', 'orderedList', 'taskList', 'insertVoice', 'insertImage']) {
+    assert.equal(
+      toolbar.querySelector(`[data-format="${format}"]`)?.closest('.tiptap-overflow-panel'),
+      null,
+      `${format} should remain visible at the default pane width`,
+    )
+  }
 
-  hostWidth = 600
+  hostWidth = 614
   window.dispatchEvent(new window.Event('resize'))
   assert.ok(toolbar.querySelector('[data-format="more"]'))
   editor.destroy()
@@ -176,14 +190,14 @@ test('toolbar overflow moves buttons dynamically by available width', () => {
 
   window.dispatchEvent(new window.Event('resize'))
   let overflowCount = toolbar.querySelectorAll('.tiptap-overflow-panel [data-format]').length
-  assert.ok(overflowCount > 0, 'narrow width should move trailing buttons into more panel')
-  const overflowOrder = ['bold', 'italic', 'underline', 'strike', 'foreColor', 'backColor', 'bulletList', 'orderedList', 'taskList', 'insertVoice', 'insertImage']
-  let reachedOverflow = false
-  for (const format of overflowOrder) {
+  assert.ok(overflowCount > 0, 'narrow width should move lower-priority buttons into more panel')
+  for (const format of ['taskList', 'orderedList', 'bulletList']) {
     const button = toolbar.querySelector(`button[data-format=\"${format}\"]`)
-    const inOverflow = Boolean(button?.closest('.tiptap-overflow-panel'))
-    if (inOverflow) reachedOverflow = true
-    if (reachedOverflow) assert.equal(inOverflow, true, `${format} should remain in the overflow suffix`)
+    assert.equal(Boolean(button?.closest('.tiptap-overflow-panel')), true, `${format} should overflow before resource actions`)
+  }
+  for (const format of ['insertVoice', 'insertImage']) {
+    const button = toolbar.querySelector(`button[data-format=\"${format}\"]`)
+    assert.equal(Boolean(button?.closest('.tiptap-overflow-panel')), false, `${format} should stay in the main toolbar while lower-priority formats overflow`)
   }
   const moreButton = toolbar.querySelector('button[data-format="more"]')
   assert.ok(moreButton, 'more button should exist when the toolbar overflows')
@@ -248,6 +262,60 @@ test('heading dropdown applies and clears heading levels', () => {
   editor.destroy()
 })
 
+test('heading dropdown reflects collapsed cursor heading context', () => {
+  const { editor, host } = createEditorWithToolbar()
+  markEditorFocused(editor)
+  const select = host.querySelector('select[data-control="heading"]')
+  const label = host.querySelector('.tiptap-select-heading .tiptap-select-label')
+  assert.ok(select && label)
+
+  select.value = '1'
+  select.dispatchEvent(new Event('change'))
+
+  assert.ok(editor.isActive('heading', { level: 1 }))
+  assert.equal(select.value, '1')
+  assert.equal(label.textContent, '标题1')
+  assert.equal(
+    host.querySelector('.tiptap-select-heading .tiptap-select-option[data-value="1"]')?.getAttribute('aria-selected'),
+    'true',
+  )
+  assert.equal(
+    host.querySelector('.tiptap-select-heading .tiptap-select-option[data-value="p"]')?.getAttribute('aria-selected'),
+    'false',
+  )
+  editor.destroy()
+})
+
+test('empty heading keeps the body placeholder on the active heading line', () => {
+  const { editor, host, appElement } = createEditorWithToolbar()
+  const select = host.querySelector('select[data-control="heading"]')
+  assert.ok(select)
+
+  syncEmptyPlaceholderState(editor, appElement)
+  assert.equal(appElement.classList.contains('is-empty'), true)
+  assert.equal(appElement.dataset.emptyBlock, 'paragraph')
+  assert.equal(appElement.dataset.emptyHeadingLevel, '')
+
+  select.value = '1'
+  select.dispatchEvent(new Event('change'))
+  syncEmptyPlaceholderState(editor, appElement)
+
+  assert.equal(editor.view.dom.firstElementChild?.tagName, 'H1')
+  assert.equal(appElement.classList.contains('is-empty'), true)
+  assert.equal(appElement.dataset.emptyBlock, 'heading')
+  assert.equal(appElement.dataset.emptyHeadingLevel, '1')
+  assert.match(tiptapEditorHtml, /#app\.is-empty\[data-empty-heading-level="1"\] \.ProseMirror::before/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror h1, \.ProseMirror h2/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror::selection, \.ProseMirror ::selection \{ background: var\(--dvn-active-selection-bg/)
+  assert.match(tiptapEditorHtml, /color: var\(--dvn-selection-fg, #ffffff\)/)
+  assert.doesNotMatch(tiptapEditorHtml, /dvn-editor-empty-node/)
+
+  insertText(editor, 'hello')
+  syncEmptyPlaceholderState(editor, appElement)
+  assert.equal(appElement.classList.contains('is-empty'), false)
+  editor.destroy()
+})
+
 test('style dropdowns close each other and expose a scrollable custom menu', () => {
   const { editor, host } = createEditorWithToolbar()
   const heading = host.querySelector('.tiptap-select-heading')
@@ -270,30 +338,54 @@ test('style dropdowns close each other and expose a scrollable custom menu', () 
   editor.destroy()
 })
 
+test('heading dropdown follows the Sketch menu labels and type scale hooks', () => {
+  const { editor, host } = createEditorWithToolbar()
+  const heading = host.querySelector('.tiptap-select-heading')
+  assert.ok(heading)
+
+  const labels = Array.from(heading.querySelectorAll('.tiptap-select-option-label'))
+    .map((node) => node.textContent)
+  assert.deepEqual(labels, ['正文', '标题1', '标题2', '标题3', '标题4', '标题5', '标题6'])
+
+  const selected = heading.querySelector('.tiptap-select-option[data-value="p"]')
+  assert.equal(selected?.getAttribute('aria-selected'), 'true')
+  assert.equal(heading.querySelector('.tiptap-select-label')?.textContent, '正文')
+  assert.match(toolbarCss, /\.tiptap-select-heading \.tiptap-select-menu \{[\s\S]*width: 184px;/)
+  assert.doesNotMatch(toolbarCss, /dvn-heading-menu-bg/, 'heading dropdown must share the themed menu background with other dropdowns')
+  assert.doesNotMatch(toolbarCss, /dvn-heading-menu-border/, 'heading dropdown must share the themed menu border with other dropdowns')
+  assert.match(toolbarCss, /\.tiptap-select-menu \{[\s\S]*background: var\(--dvn-menu-bg, var\(--dvn-panel-bg/)
+  assert.match(toolbarCss, /\.tiptap-select-heading \.tiptap-select-option\[data-value="1"\] \{[\s\S]*--dvn-heading-option-font-size: 24px;/)
+  assert.match(toolbarCss, /\.tiptap-select-heading \.tiptap-select-option\[data-value="2"\] \{[\s\S]*--dvn-heading-option-font-size: 21px;/)
+  editor.destroy()
+})
+
 // ---------------------------------------------------------------------------
 // 文字颜色面板
 // ---------------------------------------------------------------------------
 
-test('foreColor panel applies and clears text color', () => {
+test('foreColor panel matches Summernote light palette and applies text color', () => {
   const { editor, host } = createEditorWithToolbar()
   insertText(editor, 'colored')
   selectText(editor)
 
   const panel = host.querySelector('[data-panel="foreColor"]')
   assert.ok(panel)
-  const cell = panel.querySelector('button[data-color="#e50000"]')
+  const cells = Array.from(panel.querySelectorAll('button[data-color]'))
+  assert.deepEqual(cells.map((cell) => cell.getAttribute('data-color')), FORE_COLORS.flat())
+  assert.equal(panel.querySelector('button[data-action]'), null, 'Summernote palette has no extra clear row')
+  assert.match(toolbarCss, /\.tiptap-color-panel \{[\s\S]*grid-template-columns: repeat\(5, 22px\);/)
+  assert.match(toolbarCss, /\.tiptap-color-panel button\[data-color\] \{[\s\S]*border-radius: 8px;/)
+
+  const color = 'rgb(205, 35, 62)'
+  const cell = cells.find((node) => node.getAttribute('data-color') === color)
   assert.ok(cell)
 
   cell.click()
-  assert.ok(editor.isActive('color', { color: '#e50000' }))
+  assert.ok(editor.isActive('color', { color }))
   assert.equal(
     host.querySelector('button[data-format="foreColor"]').style.getPropertyValue('--dvn-current-color'),
-    '#e50000',
+    color,
   )
-
-  const clear = panel.querySelector('button[data-action="clear-foreColor"]')
-  clear.click()
-  assert.ok(!editor.isActive('color'))
   editor.destroy()
 })
 
@@ -301,28 +393,29 @@ test('foreColor panel applies and clears text color', () => {
 // 背景色面板
 // ---------------------------------------------------------------------------
 
-test('backColor keeps its default indicator color', () => {
+test('backColor keeps the Summernote default transparent indicator', () => {
   const { editor, host } = createEditorWithToolbar()
   assert.equal(
     host.querySelector('button[data-format="backColor"]').style.getPropertyValue('--dvn-current-color'),
-    '#0081ff',
+    'transparent',
   )
   editor.destroy()
 })
 
-test('backColor panel applies and clears highlight', () => {
+test('backColor panel matches Summernote light palette and clears via transparent cell', () => {
   const { editor, host } = createEditorWithToolbar()
   insertText(editor, 'highlighted')
   selectText(editor)
 
   const panel = host.querySelector('[data-panel="backColor"]')
   assert.ok(panel)
-  const cell = panel.querySelector('button[data-color="#fff2cc"]')
-  // fallback to first non-transparent cell if exact value absent
-  const target = cell || [...panel.querySelectorAll('button[data-color]')].find(c => c.getAttribute('data-color') !== 'transparent')
+  const cells = Array.from(panel.querySelectorAll('button[data-color]'))
+  assert.deepEqual(cells.map((cell) => cell.getAttribute('data-color')), BACK_COLORS.flat())
+
+  const color = 'rgba(255, 215, 0, 0.2)'
+  const target = cells.find((cell) => cell.getAttribute('data-color') === color)
   assert.ok(target)
 
-  const color = target.getAttribute('data-color')
   target.click()
   assert.ok(editor.isActive('highlight', { color }))
   assert.equal(
@@ -330,9 +423,65 @@ test('backColor panel applies and clears highlight', () => {
     color,
   )
 
-  const clear = panel.querySelector('button[data-action="clear-backColor"]')
-  clear.click()
+  const transparent = panel.querySelector('button[data-color="transparent"]')
+  assert.ok(transparent)
+  transparent.click()
   assert.ok(!editor.isActive('highlight'))
+  editor.destroy()
+})
+
+test('color panels share dropdown theme and switch palettes in dark mode', () => {
+  const { editor, host, window } = createEditorWithToolbar()
+  const forePanel = host.querySelector('[data-panel="foreColor"]')
+  const backPanel = host.querySelector('[data-panel="backColor"]')
+  assert.ok(forePanel && backPanel)
+
+  assert.match(toolbarCss, /\.tiptap-color-panel \{[\s\S]*background: var\(--dvn-menu-bg, var\(--dvn-panel-bg/)
+  assert.match(toolbarCss, /\.tiptap-color-panel \{[\s\S]*border: 1px solid var\(--dvn-panel-border/)
+  assert.match(toolbarCss, /\.tiptap-color-panel button\[data-color\] \{[\s\S]*var\(--dvn-color-chip-border/)
+  assert.doesNotMatch(toolbarCss, /dvn-color-panel-bg/, 'color panels must not keep a light-only panel background token')
+
+  document.documentElement.dataset.dvnTheme = 'dark'
+  window.dispatchEvent(new window.CustomEvent('dvn-theme-applied', { detail: { theme: 'dark' } }))
+
+  assert.deepEqual(
+    Array.from(forePanel.querySelectorAll('button[data-color]')).map((cell) => cell.getAttribute('data-color')),
+    DARK_FORE_COLORS.flat(),
+  )
+  assert.deepEqual(
+    Array.from(backPanel.querySelectorAll('button[data-color]')).map((cell) => cell.getAttribute('data-color')),
+    DARK_BACK_COLORS.flat(),
+  )
+  editor.destroy()
+})
+
+test('foreColor reflects collapsed cursor color context', () => {
+  const { editor, host } = createEditorWithToolbar()
+  markEditorFocused(editor)
+
+  const color = 'rgb(1, 100, 255)'
+  const panel = host.querySelector('[data-panel="foreColor"]')
+  const cell = panel.querySelector(`button[data-color="${color}"]`)
+  assert.ok(cell)
+  cell.click()
+
+  assert.equal(host.querySelector('button[data-format="foreColor"]').style.getPropertyValue('--dvn-current-color'), color)
+  assert.equal(cell.getAttribute('aria-pressed'), 'true')
+  editor.destroy()
+})
+
+test('backColor reflects collapsed cursor highlight context', () => {
+  const { editor, host } = createEditorWithToolbar()
+  markEditorFocused(editor)
+
+  const color = 'rgba(130, 178, 255, 0.2)'
+  const panel = host.querySelector('[data-panel="backColor"]')
+  const cell = panel.querySelector(`button[data-color="${color}"]`)
+  assert.ok(cell)
+  cell.click()
+
+  assert.equal(host.querySelector('button[data-format="backColor"]').style.getPropertyValue('--dvn-current-color'), color)
+  assert.equal(cell.getAttribute('aria-pressed'), 'true')
   editor.destroy()
 })
 
@@ -360,6 +509,23 @@ test('fontFamily dropdown applies and clears font family', () => {
   editor.destroy()
 })
 
+test('fontFamily dropdown reflects collapsed cursor font context', () => {
+  const { editor, host, toolbar } = createEditorWithToolbar()
+  markEditorFocused(editor)
+  toolbar.setFontList(['Arial', 'Noto Sans CJK SC'], 'Noto Sans CJK SC')
+  const select = host.querySelector('select[data-control="fontFamily"]')
+  const label = host.querySelector('.tiptap-select-fontFamily .tiptap-select-label')
+  assert.ok(select && label)
+
+  select.value = 'Arial'
+  select.dispatchEvent(new Event('change'))
+
+  assert.ok(editor.isActive('fontFamily', { fontFamily: 'Arial' }))
+  assert.equal(select.value, 'Arial')
+  assert.equal(label.textContent, 'Arial')
+  editor.destroy()
+})
+
 // ---------------------------------------------------------------------------
 // 字号下拉
 // ---------------------------------------------------------------------------
@@ -379,6 +545,25 @@ test('fontSize dropdown applies and clears font size', () => {
   select.value = ''
   select.dispatchEvent(new Event('change'))
   assert.ok(!editor.isActive('fontSize'))
+  editor.destroy()
+})
+
+test('fontSize dropdown reflects collapsed cursor size context without scaling menu items', () => {
+  const { editor, host } = createEditorWithToolbar()
+  markEditorFocused(editor)
+  const select = host.querySelector('select[data-control="fontSize"]')
+  const label = host.querySelector('.tiptap-select-fontSize .tiptap-select-label')
+  assert.ok(select && label)
+
+  select.value = '24'
+  select.dispatchEvent(new Event('change'))
+
+  assert.ok(editor.isActive('fontSize', { fontSize: '24px' }))
+  assert.equal(select.value, '24')
+  assert.equal(label.textContent, '24')
+  for (const option of host.querySelectorAll('.tiptap-select-fontSize .tiptap-select-option')) {
+    assert.equal(option.style.fontSize, '', 'font size menu items should keep a uniform menu type scale')
+  }
   editor.destroy()
 })
 

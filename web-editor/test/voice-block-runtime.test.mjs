@@ -539,9 +539,12 @@ test('themeProvided writes CSS variables on document root', () => {
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-active-bg'), 'rgba(0, 122, 255, 0.5)')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-transcript-selection-bg'), 'rgba(0, 122, 255, 0.4)')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-active-selection-bg'), 'rgba(0, 122, 255, 0.6)')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-selection-fg'), '#ffffff')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-editor-fg'), 'rgba(192, 198, 212, 1)')
   assert.equal(document.documentElement.dataset.dvnTheme, 'dark')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-editor-bg'), '#242424')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-color-chip-border'), 'rgba(255, 255, 255, 0.18)')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-color-transparent-line'), 'rgba(255, 255, 255, 0.32)')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-voice-bg'), 'rgba(255, 255, 255, 0.05)')
 })
 
@@ -556,6 +559,9 @@ test('themeProvided: light theme variables', () => {
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-active-bg'), 'rgba(0, 88, 222, 0.5)')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-editor-fg'), 'rgba(0, 0, 0, 1)')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-transcript-selection-bg'), 'rgba(0, 88, 222, 0.4)')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-selection-fg'), '#ffffff')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-color-chip-border'), 'rgba(0, 0, 0, 0.20)')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-color-transparent-line'), 'rgba(0, 0, 0, 0.25)')
 })
 
 // ---------------------------------------------------------------------------

@@ -3,6 +3,13 @@
 
 .tiptap-toolbar {
     display: flex;
+    /* 616px 默认右侧编辑区：宿主左边距 10px，工具栏内容预算约 606px。
+       以下密度 token 保留 30px 控件热区，仅压缩间距，保证设计稿中的全量按钮常驻一行。 */
+    --dvn-toolbar-group-gap: 2px;
+    --dvn-toolbar-separator-margin: 3px;
+    --dvn-toolbar-select-arrow-padding: 16px;
+    --dvn-toolbar-select-arrow-right: 4px;
+    --dvn-toolbar-color-button-gap: 1px;
     flex-wrap: nowrap;
     align-items: center;
     gap: 0;
@@ -30,14 +37,14 @@
 .tiptap-toolbar-group {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--dvn-toolbar-group-gap);
 }
 
 .tiptap-toolbar-separator {
     flex: 0 0 1px;
     width: 1px;
     height: 20px;
-    margin: 0 5px;
+    margin: 0 var(--dvn-toolbar-separator-margin);
     background: var(--dvn-toolbar-separator, rgba(0, 0, 0, 0.08));
 }
 
@@ -73,7 +80,7 @@
     position: relative;
     width: 100%;
     min-width: 0 !important;
-    padding: 0 18px 0 5px !important;
+    padding: 0 var(--dvn-toolbar-select-arrow-padding) 0 5px !important;
     display: inline-flex;
     align-items: center;
     justify-content: flex-start !important;
@@ -96,7 +103,7 @@
 .tiptap-select-button::after {
     content: '';
     position: absolute;
-    right: 5px;
+    right: var(--dvn-toolbar-select-arrow-right);
     top: 13px;
     width: 0;
     height: 0;
@@ -222,13 +229,51 @@
     min-width: 58px;
 }
 
+.tiptap-select-heading .tiptap-select-menu {
+    width: 184px;
+    min-width: 184px;
+    padding: 4px 6px;
+}
+
 .tiptap-select-heading .tiptap-select-option {
-    height: auto !important;
-    min-height: var(--dvn-menu-item-height, 30px);
-    flex-basis: auto;
-    padding-top: 3px !important;
-    padding-bottom: 3px !important;
+    --dvn-heading-option-height: 30px;
+    --dvn-heading-option-font-size: 14px;
+    --dvn-heading-option-font-weight: 700;
+    height: var(--dvn-heading-option-height) !important;
+    min-height: var(--dvn-heading-option-height);
+    flex: 0 0 var(--dvn-heading-option-height);
+    padding: 0 10px !important;
+    font-size: var(--dvn-heading-option-font-size);
+    font-weight: var(--dvn-heading-option-font-weight);
     line-height: 1.2;
+}
+
+.tiptap-select-heading .tiptap-select-option[data-value="p"] {
+    --dvn-heading-option-font-size: 14px;
+    --dvn-heading-option-font-weight: 400;
+}
+
+.tiptap-select-heading .tiptap-select-option[data-value="1"] {
+    --dvn-heading-option-height: 42px;
+    --dvn-heading-option-font-size: 24px;
+}
+
+.tiptap-select-heading .tiptap-select-option[data-value="2"] {
+    --dvn-heading-option-height: 40px;
+    --dvn-heading-option-font-size: 21px;
+}
+
+.tiptap-select-heading .tiptap-select-option[data-value="3"] {
+    --dvn-heading-option-height: 34px;
+    --dvn-heading-option-font-size: 16px;
+}
+
+.tiptap-select-heading .tiptap-select-option[data-value="5"] {
+    --dvn-heading-option-font-size: 12px;
+}
+
+.tiptap-select-heading .tiptap-select-option[data-value="6"] {
+    --dvn-heading-option-font-size: 10px;
 }
 
 .tiptap-toolbar button {
@@ -312,7 +357,7 @@
 }
 
 .tiptap-color-button {
-    gap: 2px;
+    gap: var(--dvn-toolbar-color-button-gap);
 }
 
 .tiptap-color-icon {
@@ -351,7 +396,7 @@
     align-items: center;
     justify-content: center;
     line-height: 1;
-    margin-left: 1px;
+    margin-left: 0;
 }
 
 .tiptap-color-arrow > .tiptap-icon {
@@ -363,34 +408,61 @@
     display: none;
     position: absolute;
     top: calc(100% + 4px);
-    left: 0;
-    grid-template-columns: repeat(8, 18px);
-    gap: 2px;
-    background: var(--dvn-panel-bg, #fff);
-    border: 1px solid var(--dvn-panel-border, #ccc);
-    padding: 6px;
+    left: -12px;
+    grid-template-columns: repeat(5, 22px);
+    grid-auto-rows: 22px;
+    justify-content: center;
+    column-gap: 4px;
+    row-gap: 10px;
+    width: 153px;
+    box-sizing: border-box;
+    padding: 10px 10px;
     z-index: 20;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    background: var(--dvn-menu-bg, var(--dvn-panel-bg, rgba(238, 238, 238, 1)));
+    border: 1px solid var(--dvn-panel-border, rgba(255, 255, 255, 0.1));
+    border-radius: var(--vn-menu-radius, var(--dvn-menu-radius, 12px));
+    box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.20);
 }
 
 .tiptap-color-panel button[data-color] {
-    width: 18px;
-    min-width: 18px;
-    height: 18px;
-    border: 1px solid #ddd;
-    border-radius: 0;
+    position: relative;
+    width: 22px;
+    min-width: 22px;
+    height: 22px;
+    min-height: 22px;
     padding: 0;
+    margin: 0;
+    border: 1px solid var(--dvn-color-chip-border, rgba(0, 0, 0, 0.20));
+    border-radius: 8px;
+    box-shadow: none;
+    transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
 }
 
-.tiptap-color-panel button[data-action] {
-    grid-column: 1 / -1;
-    width: 100%;
-    height: 24px;
-    min-width: 0;
-    margin-top: 2px;
-    border: 1px solid var(--dvn-panel-border, #ccc);
-    background: var(--dvn-clear-btn-bg, #fafafa);
-    font-size: 12px;
+.tiptap-color-panel button[data-color]:hover,
+.tiptap-color-panel button[data-color]:focus-visible,
+.tiptap-color-panel button[data-color][aria-pressed="true"] {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 1.5px var(--highlightColor, #0883fb);
+    outline: none;
+    transform: scale(1.08);
+    z-index: 1;
+}
+
+.tiptap-color-panel button[data-color="transparent"] {
+    background: #ffffff !important;
+    overflow: hidden;
+}
+
+.tiptap-color-panel button[data-color="transparent"]::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 110%;
+    height: 1px;
+    background-color: var(--dvn-color-transparent-line, rgba(0, 0, 0, 0.25));
+    transform: translate(-50%, -50%) rotate(135deg);
+    pointer-events: none;
 }
 
 .tiptap-icon {
@@ -416,7 +488,8 @@
     -webkit-user-drag: none;
 }
 
-/* 外部 SVG 不响应 currentColor，激活态通过同一工程资源的 mask 重绘主题色。 */
+/* 外部 SVG 作为 img 时不会继承 currentColor；统一用同一资源的 mask 渲染，
+   让普通态/hover/选中态都跟随工具栏主题色，暗色模式不再残留黑色图标。 */
 .tiptap-icon--asset {
     position: relative;
 }
@@ -434,17 +507,11 @@
     mask-repeat: no-repeat;
     -webkit-mask-size: contain;
     mask-size: contain;
-    opacity: 0;
+    opacity: 1;
     pointer-events: none;
 }
 
-.tiptap-toolbar button.is-active .tiptap-icon--asset::after,
-.tiptap-toolbar button[aria-pressed="true"] .tiptap-icon--asset::after {
-    opacity: 1;
-}
-
-.tiptap-toolbar button.is-active .tiptap-icon--asset > img,
-.tiptap-toolbar button[aria-pressed="true"] .tiptap-icon--asset > img {
+.tiptap-icon--asset > img {
     opacity: 0;
 }
 
@@ -532,7 +599,7 @@
 }
 
 .tiptap-overflow-panel .tiptap-toolbar-separator {
-    margin: 0 7px;
+    margin: 0 5px;
 }
 
 .tiptap-hidden-command {

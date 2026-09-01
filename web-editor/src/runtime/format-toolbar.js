@@ -16,7 +16,7 @@ import micIconUrl from './icons/mic.svg?url'
 import imageIconUrl from './icons/image.svg?url'
 import taskListIconUrl from './icons/task.svg?url'
 import checkIconUrl from './icons/check.svg?url'
-import { FORE_COLORS, BACK_COLORS, FONT_SIZES, toPxSize } from './format-palette.js'
+import { FORE_COLORS, BACK_COLORS, FONT_SIZES, colorPaletteForTheme, toPxSize } from './format-palette.js'
 import { canIndentActiveListItem, canOutdentActiveListItem, liftActiveListItem, sinkActiveListItem } from './list-behavior.js'
 
 const TOGGLE_BUTTONS = [
@@ -27,13 +27,13 @@ const TOGGLE_BUTTONS = [
 ]
 
 const HEADING_OPTIONS = [
-  { value: 'p', label: '标题', style: { fontSize: '14px' } },
-  { value: '1', label: '标题 1', style: { fontSize: '28px', lineHeight: '1.2' } },
-  { value: '2', label: '标题 2', style: { fontSize: '21px', lineHeight: '1.2' } },
-  { value: '3', label: '标题 3', style: { fontSize: '16px', lineHeight: '1.2' } },
-  { value: '4', label: '标题 4', style: { fontSize: '14px', lineHeight: '1.2' } },
-  { value: '5', label: '标题 5', style: { fontSize: '12px', lineHeight: '1.2' } },
-  { value: '6', label: '标题 6', style: { fontSize: '10px', lineHeight: '1.2' } },
+  { value: 'p', label: '正文' },
+  { value: '1', label: '标题1' },
+  { value: '2', label: '标题2' },
+  { value: '3', label: '标题3' },
+  { value: '4', label: '标题4' },
+  { value: '5', label: '标题5' },
+  { value: '6', label: '标题6' },
 ]
 
 const LIST_TOGGLE_BUTTONS = [
@@ -45,6 +45,42 @@ const LIST_TOGGLE_BUTTONS = [
 
 const TOOLBAR_STYLE_ID = 'dvn-tiptap-format-toolbar-style'
 const TOOLBAR_LEFT_MARGIN = 10
+const DEFAULT_FORE_COLOR = 'var(--dvn-editor-fg, rgb(65, 77, 104))'
+const DEFAULT_BACK_COLOR = 'transparent'
+
+function normalizeCssColor(value) {
+  if (!value) return ''
+  const color = String(value).trim().toLowerCase().replace(/\s*,\s*/g, ', ')
+  if (!color) return ''
+  if (color === 'transparent') return 'transparent'
+
+  const rgbaMatch = color.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([0-9.]+))?\s*\)$/)
+  if (rgbaMatch) {
+    const [, r, g, b, alpha] = rgbaMatch
+    const a = alpha == null ? 1 : Number(alpha)
+    if (a === 0) return 'transparent'
+    if (a !== 1) return `rgba(${Number(r)}, ${Number(g)}, ${Number(b)}, ${String(a)})`
+    return rgbToHex(Number(r), Number(g), Number(b))
+  }
+
+  const hexMatch = color.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i)
+  if (hexMatch) {
+    const hex = hexMatch[1].length === 3
+      ? hexMatch[1].split('').map((part) => part + part).join('')
+      : hexMatch[1]
+    return `#${hex.toLowerCase()}`
+  }
+
+  return color
+}
+
+function rgbToHex(r, g, b) {
+  return `#${[r, g, b].map((part) => Math.max(0, Math.min(255, part)).toString(16).padStart(2, '0')).join('')}`
+}
+
+function sameCssColor(left, right) {
+  return normalizeCssColor(left) === normalizeCssColor(right)
+}
 
 function injectToolbarStyles() {
   if (document.getElementById(TOOLBAR_STYLE_ID)) return
@@ -75,8 +111,8 @@ function createSvgIcon(name) {
   const assetUrl = ICON_ASSET_URLS[name]
   if (!assetUrl) return span
 
-  // 外部 SVG 作为 img 时不会继承按钮的 currentColor。保留 img 作为正常态，
-  // 同时记录资源地址，让 CSS 在激活态用 mask 以主题色重绘图标。
+  // 外部 SVG 作为 img 时不会继承按钮的 currentColor。保留 img 作为资源/fallback，
+  // 同时记录资源地址，让 CSS 用 mask 统一按当前主题色重绘图标。
   span.classList.add('tiptap-icon--asset')
   span.style.setProperty('--tiptap-icon-mask', `url("${assetUrl}")`)
 
@@ -164,7 +200,7 @@ function clearMarkColor(editor, markName) {
   editor.chain().focus().unsetMark(markName).run()
 }
 
-function buildColorPicker(editor, kind, colors, apply, clear, readActive) {
+function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen) {
   // kind: 'foreColor' | 'backColor'
   const wrapper = createEl('span', { class: 'tiptap-color-picker' })
 
@@ -186,9 +222,12 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive) {
   const panel = createEl('div', {
     class: 'tiptap-color-panel',
     'data-panel': kind,
+    role: 'menu',
+    'aria-label': kind === 'foreColor' ? '文字颜色' : '背景颜色',
   })
 
   function openPanel() {
+    onOpen?.()
     panel.style.display = 'grid'
     toggle.setAttribute('aria-expanded', 'true')
   }
@@ -207,8 +246,8 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive) {
   }
 
   function setCurrentColor(color) {
-    // 颜色指示条跟随当前显式选区；无颜色时恢复 Summernote 的默认值。
-    toggle.style.setProperty('--dvn-current-color', color || (kind === 'foreColor' ? '#000000' : '#0081ff'))
+    // 颜色指示条跟随当前输入上下文；无颜色时恢复 Summernote 的默认值。
+    toggle.style.setProperty('--dvn-current-color', color || (kind === 'foreColor' ? DEFAULT_FORE_COLOR : DEFAULT_BACK_COLOR))
   }
 
   toggle.addEventListener('click', (event) => {
@@ -216,37 +255,45 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive) {
     togglePanel()
   })
 
-  // 清除按钮
-  const clearBtn = createEl('button', { type: 'button', 'data-action': `clear-${kind}`, title: '清除颜色' }, '清除颜色')
-  clearBtn.addEventListener('click', () => {
-    clear(editor)
-    closePanel()
-  })
-  panel.appendChild(clearBtn)
-
-  // 颜色网格
-  for (const row of colors) {
-    for (const color of row) {
-      const cell = createEl('button', {
-        type: 'button',
-        'data-color': color,
-        'data-kind': kind,
-        title: color,
-        style: `background: ${color};`,
-      })
-      cell.addEventListener('click', () => {
-        apply(editor, color)
-        closePanel()
-      })
-      panel.appendChild(cell)
+  function appendColorCells(nextColors) {
+    // 颜色网格。背景色第一个 transparent 色块与 Summernote 一致，用于清除背景色，
+    // 不写入运行态 highlight mark，避免导出/保存时留下无意义的透明背景字段。
+    panel.replaceChildren()
+    for (const row of nextColors) {
+      for (const color of row) {
+        const cell = createEl('button', {
+          type: 'button',
+          'data-color': color,
+          'data-kind': kind,
+          title: color === 'transparent' ? '透明' : color,
+          role: 'menuitemradio',
+          'aria-label': color === 'transparent' ? '透明' : color,
+          'aria-pressed': 'false',
+          style: `background: ${color};`,
+        })
+        cell.addEventListener('click', () => {
+          if (color === 'transparent') {
+            clear(editor)
+          } else {
+            apply(editor, color)
+          }
+          closePanel()
+        })
+        panel.appendChild(cell)
+      }
     }
+  }
+
+  function setColors(nextColors) {
+    appendColorCells(Array.isArray(nextColors) ? nextColors : [])
   }
 
   wrapper.appendChild(toggle)
   wrapper.appendChild(panel)
 
+  setColors(colors)
   setCurrentColor('')
-  return { wrapper, toggle, panel, openPanel, closePanel, setCurrentColor, readActive }
+  return { wrapper, toggle, panel, openPanel, closePanel, setCurrentColor, setColors, readActive }
 }
 
 function createStyledSelect({ control, title, options, onChange, onOpen }) {
@@ -357,6 +404,10 @@ function createStyledSelect({ control, title, options, onChange, onOpen }) {
   }
 }
 
+function currentToolbarTheme() {
+  return document.documentElement.dataset.dvnTheme === 'dark' ? 'dark' : 'light'
+}
+
 export function createFormatToolbar(editor, host) {
   if (!editor) throw new Error('editor instance is required')
   if (!host) throw new Error('toolbar host element is required')
@@ -389,7 +440,7 @@ export function createFormatToolbar(editor, host) {
     control: 'heading',
     title: '标题',
     onOpen: (current) => closeStyleSelects(current),
-    options: HEADING_OPTIONS.map(({ value, label, style }) => ({ value, label, style })),
+    options: HEADING_OPTIONS.map(({ value, label }) => ({ value, label })),
     onChange(value) {
       if (value === 'p') {
         editor.chain().focus().setParagraph().run()
@@ -420,8 +471,8 @@ export function createFormatToolbar(editor, host) {
     title: '字号',
     onOpen: (current) => closeStyleSelects(current),
     options: [
-      { value: '', label: '14', style: { fontSize: '14px' } },
-      ...FONT_SIZES.map((size) => ({ value: size, label: size, style: { fontSize: `${size}px` } })),
+      { value: '', label: '14' },
+      ...FONT_SIZES.map((size) => ({ value: size, label: size })),
     ],
     onChange(value) {
       if (!value) {
@@ -471,6 +522,12 @@ export function createFormatToolbar(editor, host) {
     (editor, color) => applyMarkColor(editor, 'color', 'color', color),
     (editor) => clearMarkColor(editor, 'color'),
     () => editor.getAttributes('color').color,
+    () => {
+      backPicker.closePanel()
+      headingControl.close()
+      fontControl.close()
+      sizeControl.close()
+    },
   )
   colorGroup.appendChild(forePicker.wrapper)
 
@@ -481,8 +538,21 @@ export function createFormatToolbar(editor, host) {
     (editor, color) => applyHighlight(editor, color),
     (editor) => clearHighlight(editor),
     () => editor.getAttributes('highlight').color,
+    () => {
+      forePicker.closePanel()
+      headingControl.close()
+      fontControl.close()
+      sizeControl.close()
+    },
   )
   colorGroup.appendChild(backPicker.wrapper)
+
+  function syncColorPalettesForTheme(theme = currentToolbarTheme()) {
+    forePicker.setColors(colorPaletteForTheme('foreColor', theme))
+    backPicker.setColors(colorPaletteForTheme('backColor', theme))
+  }
+
+  syncColorPalettesForTheme()
   toolbar.appendChild(colorGroup)
   const colorListSeparator = createSeparator()
   toolbar.appendChild(colorListSeparator)
@@ -563,19 +633,22 @@ export function createFormatToolbar(editor, host) {
     resource: resourceGroup,
   }
   const groupOrder = ['toggle', 'color', 'list', 'resource']
-  const overflowUnits = [
-    { group: 'toggle', node: buttons.bold },
-    { group: 'toggle', node: buttons.italic },
-    { group: 'toggle', node: buttons.underline },
-    { group: 'toggle', node: buttons.strike },
-    { group: 'color', node: forePicker.wrapper },
-    { group: 'color', node: backPicker.wrapper },
-    { group: 'list', node: listButtons.bulletList },
-    { group: 'list', node: listButtons.orderedList },
-    { group: 'list', node: listButtons.taskList },
-    { group: 'resource', node: voiceBtn },
-    { group: 'resource', node: imageBtn },
+  const orderedToolbarUnits = [
+    { group: 'toggle', node: buttons.bold, priority: 70 },
+    { group: 'toggle', node: buttons.italic, priority: 65 },
+    { group: 'toggle', node: buttons.underline, priority: 60 },
+    { group: 'toggle', node: buttons.strike, priority: 55 },
+    { group: 'color', node: forePicker.wrapper, priority: 50 },
+    { group: 'color', node: backPicker.wrapper, priority: 45 },
+    { group: 'list', node: listButtons.bulletList, priority: 40 },
+    { group: 'list', node: listButtons.orderedList, priority: 35 },
+    { group: 'list', node: listButtons.taskList, priority: 30 },
+    // 资源插入是语音记事本的核心动作，紧凑布局时应晚于普通格式按钮折叠。
+    { group: 'resource', node: voiceBtn, priority: 90 },
+    { group: 'resource', node: imageBtn, priority: 85 },
   ]
+  const overflowPriorityUnits = [...orderedToolbarUnits]
+    .sort((left, right) => left.priority - right.priority)
   const overflowSet = new Set()
 
   function removeAllChildren(node) {
@@ -599,7 +672,7 @@ export function createFormatToolbar(editor, host) {
   }
 
   function unitsInGroup(group, inOverflow) {
-    return overflowUnits.filter((unit) => unit.group === group && overflowSet.has(unit) === inOverflow)
+    return orderedToolbarUnits.filter((unit) => unit.group === group && overflowSet.has(unit) === inOverflow)
   }
 
   function appendGroupWithSeparator(parent, separator, group, units) {
@@ -620,7 +693,7 @@ export function createFormatToolbar(editor, host) {
 
     toolbar.appendChild(styleGroup)
 
-    for (const unit of overflowUnits) {
+    for (const unit of orderedToolbarUnits) {
       const target = overflowSet.has(unit) ? overflowGroups[unit.group] : mainGroups[unit.group]
       target.appendChild(unit.node)
     }
@@ -671,10 +744,11 @@ export function createFormatToolbar(editor, host) {
     renderOverflowLayout()
     if (measuredToolbarWidth() <= maxToolbarWidth + 1) return
 
-    // 只从末尾向前折叠，保持主工具栏始终是原始按钮顺序的连续前缀。
-    // 不能为了保留某个按钮而折叠中间按钮，否则会造成工具栏顺序断裂。
-    for (let index = overflowUnits.length - 1; index >= 0; index--) {
-      overflowSet.add(overflowUnits[index])
+    // 按语义优先级折叠，而不是简单从末尾折叠。这样在极窄布局下，
+    // 更低频的格式项先进“更多”，语音/图片这类核心资源入口尽量保持常驻；
+    // 渲染时仍使用 orderedToolbarUnits，保证主工具栏与更多面板内的视觉顺序稳定。
+    for (const unit of overflowPriorityUnits) {
+      overflowSet.add(unit)
       renderOverflowLayout()
       if (measuredToolbarWidth() <= maxToolbarWidth + 1) break
     }
@@ -698,6 +772,12 @@ export function createFormatToolbar(editor, host) {
   }
   document.addEventListener('click', onOutsideClick)
 
+  function onThemeApplied(event) {
+    syncColorPalettesForTheme(event?.detail?.theme)
+    syncActiveStates()
+  }
+  window.addEventListener('dvn-theme-applied', onThemeApplied)
+
   // 激活态同步
   function setPressed(btn, active) {
     btn.setAttribute('aria-pressed', active ? 'true' : 'false')
@@ -716,9 +796,11 @@ export function createFormatToolbar(editor, host) {
       setPressed(btn, hasSelectionContext && editor.isActive(format))
     }
 
-    // 标题
+    // 标题下拉表达“当前输入位置的块级样式”。即使是空标题/折叠光标，
+    // 用户下一步输入的内容也会按该标题级别落盘，因此这里必须跟随光标上下文，
+    // 不能像列表按钮那样只在显式选区时反馈。
     let activeLevel = 'p'
-    if (hasSelectionContext) {
+    if (hasEditorContext) {
       for (let level = 1; level <= 6; level++) {
         if (editor.isActive('heading', { level })) {
           activeLevel = String(level)
@@ -728,17 +810,18 @@ export function createFormatToolbar(editor, host) {
     }
     headingControl.setValue(activeLevel)
 
-    // 字体
-    const fontFamily = hasSelectionContext ? editor.getAttributes('fontFamily').fontFamily : ''
+    // 字体/字号下拉同样表达当前输入上下文。选择字体或字号后，即使还没有
+    // 输入文字，stored mark 也会影响下一次输入；工具栏必须立即反馈，避免误以为修改失败。
+    const fontFamily = hasEditorContext ? editor.getAttributes('fontFamily').fontFamily : ''
     fontControl.setValue(fontFamily || '')
 
-    // 字号
-    const fontSize = hasSelectionContext ? editor.getAttributes('fontSize').fontSize : ''
+    const fontSize = hasEditorContext ? editor.getAttributes('fontSize').fontSize : ''
     sizeControl.setValue(fontSize ? String(parseInt(fontSize, 10)) : '')
 
-    // 颜色选中态
-    const foreColor = hasSelectionContext ? editor.getAttributes('color').color : ''
-    const backColor = hasSelectionContext ? editor.getAttributes('highlight').color : ''
+    // 颜色按钮与颜色面板同样表达当前输入上下文；折叠光标下选择颜色后，
+    // stored mark 会影响下一次输入，当前色必须立即更新。
+    const foreColor = hasEditorContext ? editor.getAttributes('color').color : ''
+    const backColor = hasEditorContext ? editor.getAttributes('highlight').color : ''
     forePicker.setCurrentColor(foreColor)
     backPicker.setCurrentColor(backColor)
     syncColorCells(forePicker.panel, foreColor)
@@ -757,9 +840,8 @@ export function createFormatToolbar(editor, host) {
     const cells = panel.querySelectorAll('button[data-color]')
     for (const cell of cells) {
       const color = cell.getAttribute('data-color')
-      const isActive = activeColor && color === activeColor
+      const isActive = Boolean(activeColor) && sameCssColor(color, activeColor)
       cell.setAttribute('aria-pressed', isActive ? 'true' : 'false')
-      cell.style.outline = isActive ? `2px solid var(--dvn-active-outline, #0086cc)` : ''
     }
   }
 
@@ -810,6 +892,7 @@ export function createFormatToolbar(editor, host) {
     destroy() {
       document.removeEventListener('click', onOutsideClick)
       window.removeEventListener('resize', updateOverflowMode)
+      window.removeEventListener('dvn-theme-applied', onThemeApplied)
       editor.off?.('transaction', syncActiveStates)
       editor.off?.('focus', syncActiveStates)
       editor.off?.('blur', syncActiveStates)
