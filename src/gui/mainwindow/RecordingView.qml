@@ -29,8 +29,12 @@ FocusScope {
     visible: false
 
     onVisibleChanged: {
-        curves.startRecording();
-        pauseBtn.forceActiveFocus();
+        if (visible) {
+            curves.startRecording();
+            pauseBtn.forceActiveFocus();
+        } else {
+            curves.stopRecording();
+        }
     }
 
     Rectangle {
@@ -148,7 +152,7 @@ FocusScope {
     Connections {
         target: VoiceRecoderHandler
 
-        onUpdateWave: {
+        onUpdateWave: function(max) {
             curves.updateVolume(max);
         }
     }

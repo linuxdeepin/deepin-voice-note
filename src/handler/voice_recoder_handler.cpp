@@ -86,7 +86,11 @@ void VoiceRecoderHandler::stopRecoder()
         emit finishedRecod(m_recordPath, m_recordMsec);
         m_type = RecoderType::Idle;
         OpsStateInterface::instance()->operState(OpsStateInterface::StateRecording, false);
-        emit recoderStateChange(m_type); 
+        emit recoderStateChange(m_type);
+        // 录音结束后由状态源重新广播录音入口可用性。此前只有 QML
+        // 本地重置 title.recorderBtnEnable，容易在 MainWindow.isRecordingAudio
+        // 绑定尚未落到子组件时把 Tiptap 按钮同步成 disabled 后不再恢复。
+        emit updateRecordBtnState(isRecordDeviceEnabled());
         updateWave(0.0);
     } else {
         qDebug() << "Recorder already idle";
