@@ -16,6 +16,8 @@ class VNoteMessageDialogHandler : public QObject
     Q_PROPERTY(QString mainMessage READ mainMessage NOTIFY mainMessageChanged FINAL)
     Q_PROPERTY(QString detailMessage READ detailMessage NOTIFY detailMessageChanged FINAL)
     Q_PROPERTY(QString warnConfirm READ warnConfirm NOTIFY warnConfirmChanged FINAL)
+    Q_PROPERTY(QString confirmText READ confirmText NOTIFY confirmTextChanged FINAL)
+    Q_PROPERTY(QString cancelText READ cancelText NOTIFY cancelTextChanged FINAL)
     Q_PROPERTY(bool singleButton READ singleButton NOTIFY singleButtonChanged FINAL)
 
 public:
@@ -32,6 +34,7 @@ public:
         NoPermission,      // 无权限
         VoicePathNoAvail,  // 语音路径无效
         NoNetwork,
+        UpdateUosAi,
     };
     Q_ENUM(MessageType)
 
@@ -54,6 +57,12 @@ public:
     QString warnConfirm() const;
     Q_SIGNAL void warnConfirmChanged();
 
+    QString confirmText() const;
+    Q_SIGNAL void confirmTextChanged();
+
+    QString cancelText() const;
+    Q_SIGNAL void cancelTextChanged();
+
     bool singleButton() const;
     Q_SIGNAL void singleButtonChanged();
 
@@ -62,6 +71,8 @@ private:
     QString initMainMessage() const;
     QString initDetailMessage() const;
     QString initWarnConfirm() const;
+    QString initConfirmText() const;
+    QString initCancelText() const;
     bool initSingleButton() const;
 
 private:
@@ -70,6 +81,8 @@ private:
     QString m_mainMessage;
     QString m_detailMessage;
     QString m_warnConfirm;
+    QString m_confirmText;
+    QString m_cancelText;
     bool m_singleButton { false };
 };
 

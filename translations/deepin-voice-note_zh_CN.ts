@@ -309,6 +309,11 @@
         <translation>请前往应用商店安装“UOS AI”后再使用</translation>
     </message>
     <message>
+        <location filename="../src/common/vtextspeechandtrmanager.cpp" line="287"/>
+        <source>Please update UOS AI from the App Store before using</source>
+        <translation>请前往应用商店更新“小U同学”后再使用</translation>
+    </message>
+    <message>
         <location filename="../src/common/vtextspeechandtrmanager.cpp" line="280"/>
         <source>No audio input device detected. Please check and try again</source>
         <translation>未检测到音频输入设备，请检查后重试</translation>
@@ -613,6 +618,16 @@
         <translation>当前网络状态差，语音转写失败，请确保网络畅通</translation>
     </message>
     <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="174"/>
+        <source>Please update UOS AI</source>
+        <translation>请更新小U同学版本</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="190"/>
+        <source>Speech dictation and speech-to-text depend on the new UOS AI client. Please update UOS AI in the App Store and try again.</source>
+        <translation>语音听写、语音转文字功能依赖新版本小U同学客户端，请前往商店更新小U同学后重试</translation>
+    </message>
+    <message>
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="159"/>
         <source>All notes in it will be deleted</source>
         <translation>包含的所有笔记将被删除</translation>
@@ -621,6 +636,21 @@
         <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="174"/>
         <source>Delete</source>
         <translation>删除</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="219"/>
+        <source>Update</source>
+        <translation>前往更新</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="225"/>
+        <source>Confirm</source>
+        <translation>确 定</translation>
+    </message>
+    <message>
+        <location filename="../src/handler/vnote_message_dialog_handler.cpp" line="230"/>
+        <source>Cancel</source>
+        <translation>取 消</translation>
     </message>
 </context>
 <context>

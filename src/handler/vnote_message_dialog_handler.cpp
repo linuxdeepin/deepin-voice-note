@@ -6,6 +6,19 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QLocale>
+
+namespace {
+QString translateWithChineseFallback(const char *sourceText, const QString &chineseText)
+{
+    const QString translated = QApplication::translate("VNoteMessageDialogHandler", sourceText);
+    if (translated == QLatin1String(sourceText) && QLocale().language() == QLocale::Chinese) {
+        return chineseText;
+    }
+
+    return translated;
+}
+}
 
 /**
    @class VNoteMessageDialogHandler
@@ -79,6 +92,16 @@ QString VNoteMessageDialogHandler::warnConfirm() const
     return m_warnConfirm;
 }
 
+QString VNoteMessageDialogHandler::confirmText() const
+{
+    return m_confirmText;
+}
+
+QString VNoteMessageDialogHandler::cancelText() const
+{
+    return m_cancelText;
+}
+
 bool VNoteMessageDialogHandler::singleButton() const
 {
     // qInfo() << "Getting single button flag:" << m_singleButton;
@@ -96,6 +119,12 @@ void VNoteMessageDialogHandler::initMessage()
 
     m_warnConfirm = initWarnConfirm();
     Q_EMIT warnConfirmChanged();
+
+    m_confirmText = initConfirmText();
+    Q_EMIT confirmTextChanged();
+
+    m_cancelText = initCancelText();
+    Q_EMIT cancelTextChanged();
 
     const bool singleBtn = initSingleButton();
     if (singleBtn != m_singleButton) {
@@ -143,6 +172,8 @@ QString VNoteMessageDialogHandler::initMainMessage() const
             return QApplication::translate("VNoteMessageDialogHandler", "The voice note has been deleted");
         case NoNetwork:
             return QApplication::translate("VNoteMessageDialogHandler", "The voice conversion failed due to the poor network connection, please have a check");
+        case UpdateUosAi:
+            return translateWithChineseFallback("Please update UOS AI", QStringLiteral("请更新小U同学版本"));
         default:
             break;
     }
@@ -157,6 +188,11 @@ QString VNoteMessageDialogHandler::initDetailMessage() const
     switch (m_messageType) {
         case DeleteFolder:
             return QApplication::translate("VNoteMessageDialogHandler", "All notes in it will be deleted");
+        case UpdateUosAi:
+            return translateWithChineseFallback(
+                "Speech dictation and speech-to-text depend on the new UOS AI client. "
+                "Please update UOS AI in the App Store and try again.",
+                QStringLiteral("语音听写、语音转文字功能依赖新版本小U同学客户端，请前往商店更新小U同学后重试"));
         default:
             break;
     }
@@ -178,6 +214,20 @@ QString VNoteMessageDialogHandler::initWarnConfirm() const
 
     qInfo() << "type is not DeleteNote or DeleteFolder";
     return {};
+}
+
+QString VNoteMessageDialogHandler::initConfirmText() const
+{
+    if (UpdateUosAi == m_messageType) {
+        return translateWithChineseFallback("Update", QStringLiteral("前往更新"));
+    }
+
+    return QApplication::translate("VNoteMessageDialogHandler", "Confirm");
+}
+
+QString VNoteMessageDialogHandler::initCancelText() const
+{
+    return QApplication::translate("VNoteMessageDialogHandler", "Cancel");
 }
 
 bool VNoteMessageDialogHandler::initSingleButton() const
