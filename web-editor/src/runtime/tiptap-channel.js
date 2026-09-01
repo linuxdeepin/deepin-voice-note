@@ -341,6 +341,7 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-active-bg', colorWithAlpha(activeBaseColor, 0.5, 'rgba(0, 129, 255, 0.5)'))
   root.style.setProperty('--dvn-transcript-selection-bg', colorWithAlpha(activeBaseColor, 0.4, 'rgba(0, 129, 255, 0.4)'))
   root.style.setProperty('--dvn-active-selection-bg', colorWithAlpha(activeBaseColor, 0.6, 'rgba(0, 129, 255, 0.6)'))
+  root.style.setProperty('--dvn-selection-fg', '#ffffff')
 
   // 主题联动：工具栏 / 语音块 / 滚动条 / 取色板 / 图片自绘菜单
   const isDark = theme === 'dark'
@@ -361,6 +362,8 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-scrollbar-thumb-active', isDark ? 'rgba(255, 255, 255, 0.30)' : 'rgba(0, 0, 0, 0.40)')
   root.style.setProperty('--dvn-hover-bg', isDark ? '#3d3d3d' : '#f0f0f0')
   root.style.setProperty('--dvn-clear-btn-bg', isDark ? '#2d2d2d' : '#fafafa')
+  root.style.setProperty('--dvn-color-chip-border', isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.20)')
+  root.style.setProperty('--dvn-color-transparent-line', isDark ? 'rgba(255, 255, 255, 0.32)' : 'rgba(0, 0, 0, 0.25)')
   root.style.setProperty('--dvn-active-outline', highlightColor || '#0086cc')
   // Summernote 深色主题在 #242424 画布上使用白色 5% 的语音块背景。
   root.style.setProperty('--dvn-voice-bg', isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)')
@@ -368,6 +371,11 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-voice-text', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(65, 77, 104, 1)')
   root.style.setProperty('--dvn-voice-subtitle', isDark ? 'rgba(109, 124, 136, 1)' : 'rgba(138, 161, 180, 1)')
   root.style.setProperty('--dvn-voice-divider', isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)')
+  const themeEvent = typeof CustomEvent === 'function'
+    ? new CustomEvent('dvn-theme-applied', { detail: { theme: root.dataset.dvnTheme } })
+    : null
+  if (themeEvent) window.dispatchEvent(themeEvent)
+
 }
 
 // ---------------------------------------------------------------------------

@@ -18,6 +18,7 @@ import { setupImagePaste, setupImageViewAndMenu } from './image-interactions.js'
 import { shouldFocusEditorOnDocumentMouseDown } from './focus-behavior.js'
 import { setTiptapSearchQuery, clearTiptapSearch } from './search-extension.js'
 import { currentTranscriptCopyText, copyTranscriptTextViaBridge, installTranscriptCopyHandler } from './transcript-copy.js'
+import { installEmptyPlaceholderState } from './empty-placeholder-state.js'
 
 // ---------------------------------------------------------------------------
 // 编辑器初始化模块（本接口不替换此模块）
@@ -52,18 +53,10 @@ function setupTransientScrollbar() {
 
 setupTransientScrollbar()
 installTranscriptCopyHandler()
-const editor = createTiptapEditor(document.getElementById('app'))
 const appElement = document.getElementById('app')
+const editor = createTiptapEditor(appElement)
+installEmptyPlaceholderState(editor, appElement)
 let tiptapBridge = null
-function syncEditorEmptyState() {
-  appElement.classList.toggle('is-empty', editor.isEmpty)
-}
-editor.on('create', syncEditorEmptyState)
-editor.on('update', syncEditorEmptyState)
-// setContent(..., { emitUpdate: false }) is used when loading a note.
-// It still changes the ProseMirror transaction state, so sync here as well;
-// otherwise the empty placeholder can remain visible over loaded/typed text.
-editor.on('transaction', syncEditorEmptyState)
 if (typeof window !== 'undefined') {
   window.__dvnTiptapEditor = editor
   window.__dvnTiptapContextTranscript = null
@@ -115,7 +108,6 @@ if (typeof window !== 'undefined') {
     return clearTiptapSearch(editor)
   }
 }
-syncEditorEmptyState()
 const toolbar = createFormatToolbar(editor, document.getElementById('toolbar-host'))
 const titleInput = document.getElementById('note-title-input')
 let pendingPickImage = false
