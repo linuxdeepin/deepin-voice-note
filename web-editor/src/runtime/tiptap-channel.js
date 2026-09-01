@@ -351,7 +351,7 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-toolbar-bg', isDark ? 'rgba(42, 42, 42, 1)' : 'rgba(245, 245, 245, 1)')
   root.style.setProperty('--dvn-toolbar-border-soft', isDark ? 'rgba(0, 0, 0, 0.30)' : 'rgba(0, 0, 0, 0.04)')
   root.style.setProperty('--dvn-panel-border', isDark ? '#444444' : '#cccccc')
-  root.style.setProperty('--dvn-toolbar-border', isDark ? '#3d3d3d' : '#d0d0d0')
+  root.style.setProperty('--dvn-toolbar-border', isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)')
   root.style.setProperty('--dvn-toolbar-fg', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(63, 63, 63, 1)')
   root.style.setProperty('--dvn-editor-fg', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(0, 0, 0, 1)')
   root.style.setProperty('--dvn-title-fg', isDark ? 'rgba(192, 198, 212, 1)' : 'rgba(0, 0, 0, 0.30)')
