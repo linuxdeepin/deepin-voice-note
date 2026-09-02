@@ -12,14 +12,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tiptap Editor</title>
   <style>
-    html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
-    body { margin: 0; padding: 0; width: 100%; height: 100%; cursor: text; overflow-x: hidden; overflow-y: auto; background-color: var(--dvn-editor-bg, #ffffff); color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); }
-    #toolbar-host { position: sticky; top: 0; z-index: 10; min-height: 48px; box-sizing: border-box; display: flex; align-items: center; background: var(--dvn-panel-bg, #fbfbfd); overflow: visible; }
-    #note-title-host { min-height: 68px; box-sizing: border-box; display: flex; align-items: flex-start; padding: 13px 20px 4px 30px; background: var(--dvn-editor-bg, #ffffff); }
+    html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; --dvn-editor-content-zoom: 1; }
+    body { margin: 0; padding: 0; width: 100%; height: 100%; cursor: text; overflow: hidden; background-color: var(--dvn-editor-bg, #ffffff); color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); --dvn-toolbar-host-height: 48px; }
+    #toolbar-host { position: relative; z-index: 10; height: var(--dvn-toolbar-host-height); min-height: var(--dvn-toolbar-host-height); box-sizing: border-box; display: flex; align-items: center; background: var(--dvn-panel-bg, #fbfbfd); overflow: visible; }
+    #content-scroll { position: absolute; left: 0; right: 0; top: var(--dvn-toolbar-host-height); bottom: 0; overflow-x: hidden; overflow-y: auto; background: var(--dvn-editor-bg, #ffffff); cursor: text; }
+    #note-title-host { min-height: 68px; box-sizing: border-box; display: flex; align-items: flex-start; padding: 13px 20px 4px 30px; background: var(--dvn-editor-bg, #ffffff); transform-origin: left top; }
     #note-title-input { width: 100%; min-width: 0; box-sizing: border-box; border: 0; outline: none; padding: 0; background: transparent; color: var(--dvn-title-fg, rgba(0, 0, 0, 0.30)); caret-color: var(--highlightColor, #0086cc); font: 600 24px/1.4 var(--dvn-editor-default-font, Helvetica), sans-serif; }
     #note-title-input.is-custom { color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); }
     #note-title-input::selection { background: var(--dvn-active-selection-bg, rgba(98, 80, 192, 0.35)); }
-    #app { width: 100%; min-height: calc(100% - 100px); box-sizing: border-box; overflow: visible; }
+    #app { width: 100%; min-height: calc(100% - 68px); box-sizing: border-box; overflow: visible; transform-origin: left top; }
     .tiptap { width: 100%; min-height: 100%; box-sizing: border-box; overflow: visible; }
     /* Match legacy summernote .note-editable geometry for migration display fidelity. */
     .ProseMirror { box-sizing: border-box; outline: none; width: 100%; min-height: 100%; overflow: visible; padding: 0 20px 50px 30px; cursor: text; font-family: var(--dvn-editor-default-font, Helvetica), sans-serif; font-size: 14px; line-height: 1.72; color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); word-wrap: break-word; }
@@ -50,13 +51,13 @@
     .ProseMirror img { box-sizing: border-box; padding: 4px !important; max-width: 100% !important; }
 
     /* Match legacy Summernote scrollbar: transparent track, 10px thumb, transient visibility while scrolling. */
-    body::-webkit-scrollbar-track {
+    #content-scroll::-webkit-scrollbar-track {
       -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
       background-color: rgba(0, 0, 0, 0);
     }
-    body::-webkit-scrollbar { width: 10px; height: 10px; }
-    body::-webkit-scrollbar:horizontal { height: 10px; }
-    body::-webkit-scrollbar-thumb {
+    #content-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
+    #content-scroll::-webkit-scrollbar:horizontal { height: 10px; }
+    #content-scroll::-webkit-scrollbar-thumb {
       border-radius: 5px;
       border-style: dashed;
       border-color: transparent;
@@ -64,22 +65,22 @@
       background-clip: padding-box;
       background-color: transparent;
     }
-    body.dvn-scrolling::-webkit-scrollbar-thumb {
+    #content-scroll.dvn-scrolling::-webkit-scrollbar-thumb {
       background-color: var(--dvn-scrollbar-thumb, rgba(0, 0, 0, 0.30));
     }
-    body::-webkit-scrollbar-thumb:hover {
+    #content-scroll::-webkit-scrollbar-thumb:hover {
       border-width: 1px;
       background-color: var(--dvn-scrollbar-thumb-hover, rgba(0, 0, 0, 0.50));
       border-radius: 5px;
       border-color: rgba(0, 0, 0, 0.05);
     }
-    body::-webkit-scrollbar-thumb:active {
+    #content-scroll::-webkit-scrollbar-thumb:active {
       border-width: 1px;
       background-color: var(--dvn-scrollbar-thumb-active, rgba(0, 0, 0, 0.40));
       border-radius: 5px;
       border-color: rgba(0, 0, 0, 0.05);
     }
-    body::-webkit-scrollbar-corner {
+    #content-scroll::-webkit-scrollbar-corner {
       background: transparent;
       opacity: 0;
       display: none;
@@ -89,10 +90,12 @@
 </head>
 <body>
   <div id="toolbar-host"></div>
-  <div id="note-title-host">
-    <input id="note-title-input" type="text" maxlength="24" autocomplete="off" spellcheck="false" aria-label="Note title" />
+  <div id="content-scroll">
+    <div id="note-title-host">
+      <input id="note-title-input" type="text" maxlength="24" autocomplete="off" spellcheck="false" aria-label="Note title" />
+    </div>
+    <div id="app"></div>
   </div>
-  <div id="app"></div>
   <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
 </body>
 </html>
