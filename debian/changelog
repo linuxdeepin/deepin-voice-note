@@ -1,3 +1,9 @@
+deepin-voice-note (6.5.67) unstable; urgency=medium
+
+  * fix(audio): correct microphone availability detection
+
+ -- dengzhongyuan <dengzhongyuan@uniontech.com>  Wed, 02 Sep 2026 16:20:19 +0800
+
 deepin-voice-note (6.5.66) unstable; urgency=medium
 
   * fix(startup): enable WebEngine debugging only for debug builds
