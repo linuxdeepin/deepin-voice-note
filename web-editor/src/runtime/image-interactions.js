@@ -6,8 +6,8 @@
 import { TextSelection } from '@tiptap/pm/state'
 import imageBlockCss from '../extensions/image-block.css?inline'
 
-// 不为 image 节点实现 NodeView，通过 ProseMirror editorProps 与 editor.view.dom
-// 上的委托式事件监听完成交互，改动面最小。
+// 不为 image 节点实现 NodeView。图片粘贴策略、选中态与上下文菜单
+// 统一收敛在运行时交互层，避免节点视图承载过多宿主耦合。
 
 /**
  * 判定单个图片 src 是否为远程地址（应阻止）。
@@ -123,9 +123,10 @@ export function readImageItemAsDataUrl(imageItem) {
  * 注册粘贴处理：剪贴板图片落盘往返、远程图片阻止、笔记内默认保留 attrs。
  * @param {Editor} editor
  * @param {object} bridge — QWebChannel bridge（需 jsPasteImage 方法）
+ * @param {object} [options] — 可选，{ captureInsertionSelection }
  * @returns {() => void} 销毁函数，移除 handlePaste 处理
  */
-export function setupImagePaste(editor, bridge) {
+export function setupImagePaste(editor, bridge, options = {}) {
   if (!editor || !bridge) return () => {}
 
   // 保存原有的 handlePaste，destroy 时恢复，避免永久关闭默认粘贴
@@ -138,6 +139,7 @@ export function setupImagePaste(editor, bridge) {
         const decision = analyzePaste(event.clipboardData)
         if (decision.action === 'saveImage') {
           event.preventDefault()
+          options.captureInsertionSelection?.()
           readImageItemAsDataUrl(decision.imageItem)
             .then(({ dataUrl }) => {
               if (bridge.jsPasteImage) bridge.jsPasteImage(dataUrl)
@@ -195,6 +197,13 @@ function cursorAfterImage(editor, imagePos) {
   return nextNode?.isTextblock ? afterImage + 1 : null
 }
 
+function cursorBeforeImage(editor, imagePos) {
+  const imageNode = editor.state.doc.nodeAt(imagePos)
+  if (!imageNode || imageNode.type.name !== 'image') return null
+  const $before = editor.state.doc.resolve(imagePos)
+  return $before.parent.inlineContent ? imagePos : null
+}
+
 function dispatchTextCursor(editor, pos) {
   const tr = editor.state.tr.setSelection(TextSelection.create(editor.state.doc, pos)).scrollIntoView()
   editor.view.dispatch(tr)
@@ -225,9 +234,19 @@ function setTextCursorAfterImagePos(editor, imagePos) {
   return true
 }
 
+function setTextCursorBeforeImagePos(editor, imagePos) {
+  const cursorPos = cursorBeforeImage(editor, imagePos)
+  if (cursorPos == null) return false
+  return dispatchTextCursor(editor, cursorPos)
+}
+
 function setTextCursorAfterImageElement(editor, img) {
   const pos = imagePosFromElement(editor, img)
   return pos == null ? false : setTextCursorAfterImagePos(editor, pos)
+}
+
+function isTrailingHardBreak(node) {
+  return node?.type?.name === 'hardBreak'
 }
 
 function hasInlineContentAfterImage(editor, imagePos) {
@@ -235,7 +254,9 @@ function hasInlineContentAfterImage(editor, imagePos) {
   if (!imageNode || imageNode.type.name !== 'image') return false
   const afterImage = imagePos + imageNode.nodeSize
   const $after = editor.state.doc.resolve(afterImage)
-  return $after.parent.inlineContent && $after.parentOffset < $after.parent.content.size
+  if (!$after.parent.inlineContent || $after.parentOffset >= $after.parent.content.size) return false
+  const next = $after.parent.childAfter($after.parentOffset).node
+  return !isTrailingHardBreak(next)
 }
 
 function shouldHandleTrailingCaretClick(editor, img) {
@@ -247,15 +268,41 @@ function shouldHandleTrailingCaretClick(editor, img) {
   return !hasInlineContentAfterImage(editor, pos)
 }
 
-function soleImageCursorPosInParagraph(doc, paragraphPos) {
+function bareImageParagraphInfo(doc, paragraphPos) {
   const paragraph = doc.nodeAt(paragraphPos)
   if (!paragraph || paragraph.type.name !== 'paragraph') return null
-  if (paragraph.childCount !== 1) return null
+  if (paragraph.childCount < 1 || paragraph.childCount > 2) return null
   const child = paragraph.child(0)
   if (child.type.name !== 'image') return null
-  // paragraphPos points before the paragraph node. +1 enters paragraph content,
-  // +child.nodeSize places the caret after the inline image.
-  return paragraphPos + 1 + child.nodeSize
+  if (paragraph.childCount === 2 && !isTrailingHardBreak(paragraph.child(1))) return null
+  const beforePos = paragraphPos + 1
+  // paragraphPos points before the paragraph node. +1 enters paragraph content;
+  // +child.nodeSize places the caret after the inline image and before an
+  // optional legacy trailing hardBreak.
+  return {
+    image: child,
+    imagePos: beforePos,
+    beforePos,
+    afterPos: beforePos + child.nodeSize,
+  }
+}
+
+function soleImageCursorPosInParagraph(doc, paragraphPos, side = 'after') {
+  const info = bareImageParagraphInfo(doc, paragraphPos)
+  if (!info) return null
+  return side === 'before' ? info.beforePos : info.afterPos
+}
+
+function currentBareImageCursor(selection) {
+  if (!selection.empty) return null
+  const $from = selection.$from
+  if ($from.parent.type.name !== 'paragraph') return null
+  const paragraphPos = $from.before($from.depth)
+  const info = bareImageParagraphInfo($from.doc, paragraphPos)
+  if (!info) return null
+  if ($from.parentOffset <= 0) return { ...info, paragraphPos, side: 'before' }
+  if ($from.parentOffset >= info.image.nodeSize) return { ...info, paragraphPos, side: 'after' }
+  return null
 }
 
 function adjacentBlockPos($pos, direction) {
@@ -276,9 +323,88 @@ function moveVerticalToAdjacentBareImageParagraph(editor, direction) {
 
   const paragraphPos = adjacentBlockPos($from, direction)
   if (paragraphPos == null) return false
-  const cursorPos = soleImageCursorPosInParagraph(doc, paragraphPos)
+  // Browser vertical navigation loses the before/after side on pure image
+  // lines in WebEngine.  Preserve the current side when moving image-line to
+  // image-line; text lines keep the legacy default of landing after the image.
+  const side = currentBareImageCursor(selection)?.side || 'after'
+  const cursorPos = soleImageCursorPosInParagraph(doc, paragraphPos, side)
   if (cursorPos == null) return false
   return dispatchTextCursor(editor, cursorPos)
+}
+
+function moveHorizontalAroundBareImageParagraph(editor, direction) {
+  const current = currentBareImageCursor(editor.state.selection)
+  if (!current) return false
+
+  if (direction > 0) {
+    if (current.side === 'before') {
+      return dispatchTextCursor(editor, current.afterPos)
+    }
+    const nextParagraphPos = adjacentBlockPos(editor.state.doc.resolve(current.afterPos), 1)
+    const nextBefore = nextParagraphPos == null
+      ? null
+      : soleImageCursorPosInParagraph(editor.state.doc, nextParagraphPos, 'before')
+    return nextBefore == null ? false : dispatchTextCursor(editor, nextBefore)
+  }
+
+  if (current.side === 'after') {
+    return dispatchTextCursor(editor, current.beforePos)
+  }
+  const prevParagraphPos = adjacentBlockPos(editor.state.doc.resolve(current.beforePos), -1)
+  const prevAfter = prevParagraphPos == null
+    ? null
+    : soleImageCursorPosInParagraph(editor.state.doc, prevParagraphPos, 'after')
+  return prevAfter == null ? false : dispatchTextCursor(editor, prevAfter)
+}
+
+function editorContentBounds(dom) {
+  let rect = null
+  try {
+    rect = dom.getBoundingClientRect()
+  } catch (_) {
+    rect = null
+  }
+  if (!rect || rect.width <= 0) return null
+
+  let paddingLeft = 0
+  let paddingRight = 0
+  try {
+    const style = window.getComputedStyle(dom)
+    paddingLeft = Number.parseFloat(style.paddingLeft) || 0
+    paddingRight = Number.parseFloat(style.paddingRight) || 0
+  } catch (_) {
+    paddingLeft = 0
+    paddingRight = 0
+  }
+
+  return {
+    left: rect.left + paddingLeft,
+    right: rect.right - paddingRight,
+    outerLeft: rect.left,
+    outerRight: rect.right,
+  }
+}
+
+function imageRowBounds(dom, img) {
+  const rect = img.getBoundingClientRect()
+  const paragraph = img.parentElement?.tagName === 'P' ? img.parentElement : null
+  const rowRect = paragraph?.getBoundingClientRect?.() || rect
+  const editorBounds = editorContentBounds(dom)
+
+  const rowTop = rowRect.height > 0 ? rowRect.top : rect.top
+  const rowBottom = rowRect.height > 0 ? rowRect.bottom : rect.bottom
+  const hasRowWidth = rowRect.width > 0
+  const contentLeft = editorBounds?.left ?? (hasRowWidth ? rowRect.left : Number.NEGATIVE_INFINITY)
+  const contentRight = editorBounds?.right ?? (hasRowWidth ? rowRect.right : Number.POSITIVE_INFINITY)
+
+  return {
+    image: rect,
+    top: Math.min(rowTop, rect.top),
+    bottom: Math.max(rowBottom, rect.bottom),
+    left: Math.min(rowRect.left, contentLeft),
+    right: Math.max(rowRect.right, contentRight),
+    editorRight: editorBounds?.outerRight ?? contentRight,
+  }
 }
 
 function findImageForTrailingCaretClick(dom, event) {
@@ -287,12 +413,24 @@ function findImageForTrailingCaretClick(dom, event) {
   let candidate = null
   let candidateDistance = Number.POSITIVE_INFINITY
   for (const img of imgs) {
-    const rect = img.getBoundingClientRect()
+    const bounds = imageRowBounds(dom, img)
+    const rect = bounds.image
     if (rect.width <= 0 || rect.height <= 0) continue
-    const sameLine = event.clientY >= rect.top && event.clientY <= rect.bottom
-    const afterImage = event.clientX > rect.right
-    if (!sameLine || !afterImage) continue
-    const distance = event.clientX - rect.right
+
+    const sameLine = event.clientY >= bounds.top && event.clientY <= bounds.bottom
+    // 图片接近内容区满宽时，真正的“行尾”落在编辑器右内边距里，
+    // 不属于 p 的 DOM rect。把这段 padding 也纳入命中，否则拖拽/插入
+    // 产生的纯图片段落看起来有尾部空白但 WebEngine 不给 after-image 光标。
+    const afterImage = event.clientX > rect.right && event.clientX <= bounds.editorRight
+    const paragraphTail = event.clientY > rect.bottom
+      && event.clientY <= bounds.bottom
+      && event.clientX >= bounds.left
+      && event.clientX <= bounds.editorRight
+    if ((!sameLine || !afterImage) && !paragraphTail) continue
+
+    const distance = paragraphTail
+      ? Math.max(0, event.clientY - rect.bottom)
+      : Math.max(0, event.clientX - rect.right)
     if (distance < candidateDistance) {
       candidate = img
       candidateDistance = distance
@@ -300,7 +438,6 @@ function findImageForTrailingCaretClick(dom, event) {
   }
   return candidate
 }
-
 
 function ensureImageSelectionStyles() {
   if (typeof document === 'undefined') return
@@ -376,6 +513,7 @@ export function setupImageViewAndMenu(editor, bridge) {
     const img = findImageForTrailingCaretClick(dom, event)
     if (!img || !shouldHandleTrailingCaretClick(editor, img)) return
     event.preventDefault()
+    event.stopPropagation()
     if (setTextCursorAfterImageElement(editor, img)) syncOverlay()
   }
 
@@ -397,10 +535,23 @@ export function setupImageViewAndMenu(editor, bridge) {
       }
     }
 
-    if (!['ArrowRight', 'ArrowDown', 'End'].includes(event.key)) return
+    if (['ArrowRight', 'ArrowLeft'].includes(event.key)) {
+      const direction = event.key === 'ArrowRight' ? 1 : -1
+      if (moveHorizontalAroundBareImageParagraph(editor, direction)) {
+        event.preventDefault()
+        syncOverlay()
+        return
+      }
+    }
+
+    if (!['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'End', 'Home'].includes(event.key)) return
     const { selection } = editor.state
     if (selection.node?.type?.name !== 'image') return
     event.preventDefault()
+    if (['ArrowLeft', 'ArrowUp', 'Home'].includes(event.key)) {
+      if (setTextCursorBeforeImagePos(editor, selection.from)) syncOverlay()
+      return
+    }
     if (setTextCursorAfterImagePos(editor, selection.from)) syncOverlay()
   }
 
@@ -423,7 +574,7 @@ export function setupImageViewAndMenu(editor, bridge) {
     // QML 侧会按图片类型弹出应用统一 PictureCtxMenu。
   }
 
-  dom.addEventListener('mousedown', onMouseDown)
+  dom.addEventListener('mousedown', onMouseDown, true)
   dom.addEventListener('click', onClick)
   dom.addEventListener('keydown', onKeyDown)
   dom.addEventListener('dblclick', onDblClick)
@@ -434,7 +585,7 @@ export function setupImageViewAndMenu(editor, bridge) {
   syncOverlay()
 
   return function destroy() {
-    dom.removeEventListener('mousedown', onMouseDown)
+    dom.removeEventListener('mousedown', onMouseDown, true)
     dom.removeEventListener('click', onClick)
     dom.removeEventListener('keydown', onKeyDown)
     dom.removeEventListener('dblclick', onDblClick)
