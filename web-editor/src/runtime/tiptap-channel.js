@@ -656,18 +656,14 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
         debounce.trigger()
       })
 
-      // 滚动位置上报：前端主动上报 scrollTop，宿主驱动标题栏阴影状态
-      const scrollTarget = editor.view.dom
+      // 滚动位置上报：工具栏固定在滚动容器外，只上报正文滚动容器位置，
+      // 避免 window/body 滚动导致 sticky toolbar 重绘闪烁。
+      const scrollTarget = document.getElementById('content-scroll') || document.scrollingElement || document.documentElement
       scrollTarget.addEventListener('scroll', () => {
         if (bridge.jsReportScroll) {
-          bridge.jsReportScroll(scrollTarget.scrollTop)
+          bridge.jsReportScroll(scrollTarget.scrollTop || 0)
         }
-      })
-      window.addEventListener('scroll', () => {
-        if (bridge.jsReportScroll) {
-          bridge.jsReportScroll(window.scrollY || document.documentElement.scrollTop)
-        }
-      })
+      }, { passive: true })
 
       // --- 事件 3：保存往返 ---
       bridge.requestContent.connect(function () {

@@ -137,6 +137,31 @@ Item {
             });
     }
 
+    function consumeTiptapNativeZoomFactor(tiptapView) {
+        if (!tiptapView || !TiptapChannel.debugEnabled) {
+            return;
+        }
+        var factor = Number(tiptapView.zoomFactor);
+        if (!isFinite(factor) || Math.abs(factor - 1.0) < 0.001) {
+            return;
+        }
+
+        // 工具栏是应用 chrome，不参与正文缩放。若 QtWebEngine 仍触发
+        // 整页 zoom，将本次 factor 转给 Tiptap 正文缩放并立即复位 WebEngine。
+        var safeFactor = Math.max(0.1, Math.min(10.0, factor));
+        tiptapView.runJavaScript(
+            "window.__dvnTiptapApplyNativeZoomFactor"
+            + "&& window.__dvnTiptapApplyNativeZoomFactor(" + safeFactor + ");");
+        tiptapView.dvnResettingNativeZoom = true;
+        tiptapView.zoomFactor = 1.0;
+        Qt.callLater(function() {
+            if (tiptapView) {
+                tiptapView.dvnResettingNativeZoom = false;
+            }
+            rootItem.scheduleTiptapToolbarSeparatorSync();
+        });
+    }
+
     function clearTiptapInsertionSelection() {
         var tiptapView = tiptapLoader.item ? tiptapLoader.item.editor : null;
         if (tiptapView) {
@@ -744,6 +769,8 @@ Item {
 
                     id: tiptapWebView
 
+                    property bool dvnResettingNativeZoom: false
+
                     anchors.fill: parent
                     backgroundColor: DTK.themeType === ApplicationHelper.LightType ? "white" : "black"
                     visible: true
@@ -758,6 +785,11 @@ Item {
 
                     onLoadingChanged: function(loadRequest) {
                         if (loadRequest.status === WebEngineView.LoadSucceededStatus) {
+                            if (Math.abs(tiptapWebView.zoomFactor - 1.0) >= 0.001) {
+                                tiptapWebView.dvnResettingNativeZoom = true;
+                                tiptapWebView.zoomFactor = 1.0;
+                                Qt.callLater(function() { tiptapWebView.dvnResettingNativeZoom = false; });
+                            }
                             tiptapWebView.forceActiveFocus();
                             tiptapWebView.runJavaScript("window._dvnTiptapFocus && window._dvnTiptapFocus()");
                             rootItem.scheduleTiptapResourceButtonsSync();
@@ -767,7 +799,13 @@ Item {
 
                     onWidthChanged: rootItem.scheduleTiptapToolbarSeparatorSync()
                     onHeightChanged: rootItem.scheduleTiptapToolbarSeparatorSync()
-                    onZoomFactorChanged: rootItem.scheduleTiptapToolbarSeparatorSync()
+                    onZoomFactorChanged: {
+                        if (tiptapWebView.dvnResettingNativeZoom) {
+                            rootItem.scheduleTiptapToolbarSeparatorSync();
+                        } else {
+                            rootItem.consumeTiptapNativeZoomFactor(tiptapWebView);
+                        }
+                    }
 
                     onContextMenuRequested: req => {
                         req.accepted = true;

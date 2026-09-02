@@ -34,18 +34,79 @@ function createTiptapEditor(element) {
 }
 
 
+function contentScrollElement() {
+  return document.getElementById('content-scroll') || document.scrollingElement || document.documentElement
+}
+
 function setupTransientScrollbar() {
   let scrollHideTimer = 0
+  const scrollTarget = contentScrollElement()
   const showScrollbar = () => {
-    document.body.classList.add('dvn-scrolling')
+    scrollTarget.classList.add('dvn-scrolling')
     if (scrollHideTimer) window.clearTimeout(scrollHideTimer)
     scrollHideTimer = window.setTimeout(() => {
-      document.body.classList.remove('dvn-scrolling')
+      scrollTarget.classList.remove('dvn-scrolling')
       scrollHideTimer = 0
     }, 1500)
   }
-  document.body.addEventListener('scroll', showScrollbar, { passive: true })
-  window.addEventListener('scroll', showScrollbar, { passive: true })
+  scrollTarget.addEventListener('scroll', showScrollbar, { passive: true })
+}
+
+
+// ---------------------------------------------------------------------------
+// 正文缩放：工具栏是应用 chrome，必须固定，不参与富文本缩放。
+// QtWebEngine 的整页 zoom 会把工具栏一起放大；Tiptap 侧改为只缩放
+// 标题和正文内容区，工具栏/分割线仍保持 48px/30px 设计体系。
+// ---------------------------------------------------------------------------
+
+const CONTENT_ZOOM_MIN = 0.5
+const CONTENT_ZOOM_MAX = 3
+const CONTENT_ZOOM_STEP = 1.1
+let editorContentZoom = 1
+
+function clampEditorContentZoom(value) {
+  const zoom = Number(value)
+  if (!Number.isFinite(zoom) || zoom <= 0) return editorContentZoom
+  return Math.max(CONTENT_ZOOM_MIN, Math.min(CONTENT_ZOOM_MAX, zoom))
+}
+
+function applyEditorContentZoom(value) {
+  editorContentZoom = clampEditorContentZoom(value)
+  const normalized = Math.round(editorContentZoom * 1000) / 1000
+  const widthPercent = `${100 / normalized}%`
+  document.documentElement.style.setProperty('--dvn-editor-content-zoom', String(normalized))
+  for (const element of [document.getElementById('note-title-host'), appElement]) {
+    if (!element) continue
+    element.style.zoom = String(normalized)
+    element.style.width = normalized === 1 ? '' : widthPercent
+  }
+  document.documentElement.dataset.dvnEditorContentZoom = String(normalized)
+  window.dispatchEvent(new CustomEvent('dvn-tiptap-content-zoom-changed', { detail: { zoom: normalized } }))
+  return normalized
+}
+
+function multiplyEditorContentZoom(factor) {
+  const multiplier = Number(factor)
+  if (!Number.isFinite(multiplier) || multiplier <= 0) return editorContentZoom
+  return applyEditorContentZoom(editorContentZoom * multiplier)
+}
+
+function installEditorContentZoomShortcuts() {
+  window.addEventListener('keydown', (event) => {
+    if (!(event.ctrlKey || event.metaKey) || event.altKey) return
+    const key = event.key
+    if (key !== '+' && key !== '=' && key !== '-' && key !== '_' && key !== '0') return
+
+    event.preventDefault()
+    event.stopPropagation()
+    if (key === '0') {
+      applyEditorContentZoom(1)
+    } else if (key === '-' || key === '_') {
+      multiplyEditorContentZoom(1 / CONTENT_ZOOM_STEP)
+    } else {
+      multiplyEditorContentZoom(CONTENT_ZOOM_STEP)
+    }
+  }, true)
 }
 
 // ---------------------------------------------------------------------------
@@ -116,7 +177,18 @@ if (typeof window !== 'undefined') {
     resourceInsertionSelection.clear()
     return true
   }
+  window.__dvnTiptapSetContentZoom = function (zoom) {
+    return applyEditorContentZoom(zoom)
+  }
+  window.__dvnTiptapApplyNativeZoomFactor = function (factor) {
+    return multiplyEditorContentZoom(factor)
+  }
+  window.__dvnTiptapGetContentZoom = function () {
+    return editorContentZoom
+  }
 }
+installEditorContentZoomShortcuts()
+applyEditorContentZoom(1)
 const toolbar = createFormatToolbar(editor, document.getElementById('toolbar-host'))
 const titleInput = document.getElementById('note-title-input')
 let pendingPickImage = false
