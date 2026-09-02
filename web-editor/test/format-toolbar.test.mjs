@@ -172,7 +172,7 @@ test('more button anchors its tooltip to the button instead of native title', ()
 test('toolbar overflow moves buttons dynamically by available width', () => {
   const { host, editor, window } = createEditorWithToolbar()
   const toolbar = host.querySelector('[data-testid="format-toolbar"]')
-  let hostWidth = 300
+  let hostWidth = 380
 
   Object.defineProperty(host, 'clientWidth', {
     configurable: true,
@@ -190,20 +190,26 @@ test('toolbar overflow moves buttons dynamically by available width', () => {
 
   window.dispatchEvent(new window.Event('resize'))
   let overflowCount = toolbar.querySelectorAll('.tiptap-overflow-panel [data-format]').length
-  assert.ok(overflowCount > 0, 'narrow width should move lower-priority buttons into more panel')
-  for (const format of ['taskList', 'orderedList', 'bulletList']) {
-    const button = toolbar.querySelector(`button[data-format=\"${format}\"]`)
-    assert.equal(Boolean(button?.closest('.tiptap-overflow-panel')), true, `${format} should overflow before resource actions`)
+  assert.ok(overflowCount > 0, 'narrow width should move trailing buttons into more panel')
+  const visualOrder = ['bold', 'italic', 'underline', 'strike', 'foreColor', 'backColor', 'bulletList', 'orderedList', 'taskList', 'insertVoice', 'insertImage']
+  let enteredOverflowSuffix = false
+  for (const format of visualOrder) {
+    const control = toolbar.querySelector(`[data-format=\"${format}\"]`)
+    const inOverflow = Boolean(control?.closest('.tiptap-overflow-panel'))
+    if (inOverflow) enteredOverflowSuffix = true
+    if (enteredOverflowSuffix) {
+      assert.equal(inOverflow, true, `${format} should be part of one reverse-order overflow suffix`)
+    }
   }
-  for (const format of ['insertVoice', 'insertImage']) {
-    const button = toolbar.querySelector(`button[data-format=\"${format}\"]`)
-    assert.equal(Boolean(button?.closest('.tiptap-overflow-panel')), false, `${format} should stay in the main toolbar while lower-priority formats overflow`)
+  for (const format of ['insertImage', 'insertVoice']) {
+    const control = toolbar.querySelector(`[data-format=\"${format}\"]`)
+    assert.equal(Boolean(control?.closest('.tiptap-overflow-panel')), true, `${format} should overflow before earlier toolbar actions`)
   }
   const moreButton = toolbar.querySelector('button[data-format="more"]')
   assert.ok(moreButton, 'more button should exist when the toolbar overflows')
   assert.ok(moreButton.querySelector('img'), 'more should render an image asset')
 
-  hostWidth = 360
+  hostWidth = 410
   window.dispatchEvent(new window.Event('resize'))
   const widerOverflowCount = toolbar.querySelectorAll('.tiptap-overflow-panel [data-format]').length
   assert.ok(widerOverflowCount > 0, 'medium width should still keep some buttons overflowed')

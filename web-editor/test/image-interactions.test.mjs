@@ -187,6 +187,7 @@ function setupEditorWithImage() {
   defineGlobal('CustomEvent', window.CustomEvent)
   defineGlobal('MouseEvent', window.MouseEvent)
   defineGlobal('KeyboardEvent', window.KeyboardEvent)
+  defineGlobal('FileReader', window.FileReader)
   defineGlobal('MutationObserver', window.MutationObserver)
   defineGlobal('getComputedStyle', window.getComputedStyle.bind(window))
   defineGlobal('requestAnimationFrame', (cb) => setTimeout(cb, 0))
@@ -267,6 +268,58 @@ test('mousedown on the right side of an image moves caret after the image', () =
   assert.equal(editor.state.selection.from, 2, 'caret should be in the paragraph after image')
   assert.deepEqual(editor.getJSON().content.map(node => node.type), ['paragraph'])
   assert.equal(editor.getJSON().content[0].content[0].type, 'image')
+  destroy()
+  editor.destroy()
+})
+
+test('mousedown in editor right padding of a full-width image moves caret after image', () => {
+  const { editor, img, destroy } = setupEditorWithImage()
+  assert.ok(img, 'image element should be rendered')
+
+  editor.view.dom.style.paddingLeft = '30px'
+  editor.view.dom.style.paddingRight = '20px'
+  editor.view.dom.getBoundingClientRect = () => ({ left: 0, right: 320, top: 0, bottom: 200, width: 320, height: 200 })
+  const paragraph = img.closest('p')
+  paragraph.getBoundingClientRect = () => ({ left: 30, right: 300, top: 20, bottom: 100, width: 270, height: 80 })
+  img.getBoundingClientRect = () => ({ left: 30, right: 300, top: 20, bottom: 100, width: 270, height: 80 })
+
+  const event = new MouseEvent('mousedown', {
+    bubbles: true,
+    cancelable: true,
+    clientX: 315,
+    clientY: 40,
+  })
+  editor.view.dom.dispatchEvent(event)
+
+  assert.equal(event.defaultPrevented, true, 'runtime should treat editor right padding as the image-line tail')
+  assert.equal(editor.state.selection.constructor.name, 'TextSelection')
+  assert.equal(editor.state.selection.from, 2, 'caret should be after the full-width image')
+  destroy()
+  editor.destroy()
+})
+
+test('mousedown on the right side of an image ignores trailing hardBreak', () => {
+  const { editor, destroy } = setupEditorWithImage()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'paragraph',
+      content: [
+        { type: 'image', attrs: { src: 'file:///usr/share/x/images/photo.png', relPath: 'images/photo.png', alt: '', title: null } },
+        { type: 'hardBreak' },
+      ],
+    }],
+  })
+  const img = editor.view.dom.querySelector('img[data-rel-path]')
+  assert.ok(img, 'image element should be rendered')
+  img.getBoundingClientRect = () => ({ left: 0, right: 100, top: 0, bottom: 40, width: 100, height: 40 })
+
+  const event = new MouseEvent('mousedown', { clientX: 120, clientY: 20, bubbles: true, cancelable: true })
+  editor.view.dom.dispatchEvent(event)
+
+  assert.equal(event.defaultPrevented, true, 'runtime should treat trailing hardBreak as empty image-line tail')
+  assert.equal(editor.state.selection.constructor.name, 'TextSelection')
+  assert.equal(editor.state.selection.from, 2, 'caret should be after image and before hardBreak')
   destroy()
   editor.destroy()
 })
@@ -356,6 +409,67 @@ test('ArrowUp from text line moves caret to adjacent bare image paragraph', () =
   editor.destroy()
 })
 
+test('ArrowUp and ArrowDown preserve caret side between consecutive image paragraphs', () => {
+  const { editor, destroy } = setupEditorWithImage()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'image', attrs: { src: 'file:///x/a.png', relPath: 'images/a.png', alt: '', title: null } }] },
+      { type: 'paragraph', content: [{ type: 'image', attrs: { src: 'file:///x/b.png', relPath: 'images/b.png', alt: '', title: null } }] },
+    ],
+  })
+
+  editor.commands.setTextSelection(1)
+  const downFromBefore = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true })
+  editor.view.dom.dispatchEvent(downFromBefore)
+  assert.equal(downFromBefore.defaultPrevented, true)
+  assert.equal(editor.state.selection.from, 4, 'before first image + ArrowDown should land before second image')
+
+  editor.commands.setTextSelection(5)
+  const upFromAfter = new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true })
+  editor.view.dom.dispatchEvent(upFromAfter)
+  assert.equal(upFromAfter.defaultPrevented, true)
+  assert.equal(editor.state.selection.from, 2, 'after second image + ArrowUp should land after first image')
+
+  destroy()
+  editor.destroy()
+})
+
+test('ArrowLeft and ArrowRight walk predictable before/after image positions', () => {
+  const { editor, destroy } = setupEditorWithImage()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [
+      { type: 'paragraph', content: [{ type: 'image', attrs: { src: 'file:///x/a.png', relPath: 'images/a.png', alt: '', title: null } }] },
+      { type: 'paragraph', content: [{ type: 'image', attrs: { src: 'file:///x/b.png', relPath: 'images/b.png', alt: '', title: null } }] },
+    ],
+  })
+
+  editor.commands.setTextSelection(1)
+  const rightInsideLine = new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true })
+  editor.view.dom.dispatchEvent(rightInsideLine)
+  assert.equal(rightInsideLine.defaultPrevented, true)
+  assert.equal(editor.state.selection.from, 2, 'ArrowRight before image should move after the same image')
+
+  const rightToNextLine = new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true })
+  editor.view.dom.dispatchEvent(rightToNextLine)
+  assert.equal(rightToNextLine.defaultPrevented, true)
+  assert.equal(editor.state.selection.from, 4, 'ArrowRight after image should move before the next image line')
+
+  const leftToPreviousLine = new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true })
+  editor.view.dom.dispatchEvent(leftToPreviousLine)
+  assert.equal(leftToPreviousLine.defaultPrevented, true)
+  assert.equal(editor.state.selection.from, 2, 'ArrowLeft before image should move after the previous image line')
+
+  const leftInsideLine = new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true })
+  editor.view.dom.dispatchEvent(leftInsideLine)
+  assert.equal(leftInsideLine.defaultPrevented, true)
+  assert.equal(editor.state.selection.from, 1, 'ArrowLeft after image should move before the same image')
+
+  destroy()
+  editor.destroy()
+})
+
 test('mousedown on text after image is not intercepted by trailing image caret helper', () => {
   const { editor, img, destroy } = setupEditorWithImage()
   assert.ok(img, 'image element should be rendered')
@@ -431,6 +545,7 @@ test('setupImagePaste destroy restores default paste (not permanently blocked)',
   defineGlobal('CustomEvent', window.CustomEvent)
   defineGlobal('MouseEvent', window.MouseEvent)
   defineGlobal('KeyboardEvent', window.KeyboardEvent)
+  defineGlobal('FileReader', window.FileReader)
   defineGlobal('MutationObserver', window.MutationObserver)
   defineGlobal('getComputedStyle', window.getComputedStyle.bind(window))
   defineGlobal('requestAnimationFrame', (cb) => setTimeout(cb, 0))
@@ -457,3 +572,57 @@ test('setupImagePaste destroy restores default paste (not permanently blocked)',
   editor.destroy()
 })
 
+
+
+test('setupImagePaste captures selection before async image roundtrip', () => {
+  const window = new Window()
+  defineGlobal('window', window)
+  defineGlobal('document', window.document)
+  defineGlobal('navigator', window.navigator)
+  defineGlobal('Node', window.Node)
+  defineGlobal('Element', window.Element)
+  defineGlobal('HTMLElement', window.HTMLElement)
+  defineGlobal('DocumentFragment', window.DocumentFragment)
+  defineGlobal('Event', window.Event)
+  defineGlobal('CustomEvent', window.CustomEvent)
+  defineGlobal('MouseEvent', window.MouseEvent)
+  defineGlobal('KeyboardEvent', window.KeyboardEvent)
+  defineGlobal('FileReader', window.FileReader)
+  defineGlobal('MutationObserver', window.MutationObserver)
+  defineGlobal('getComputedStyle', window.getComputedStyle.bind(window))
+  defineGlobal('requestAnimationFrame', (cb) => setTimeout(cb, 0))
+  defineGlobal('cancelAnimationFrame', (id) => clearTimeout(id))
+
+  const element = document.createElement('div')
+  document.body.appendChild(element)
+  const editor = new Editor({
+    element,
+    extensions: createTiptapExtensions(),
+    content: createEmptyDoc(),
+  })
+
+  let captures = 0
+  const bridge = { jsPasteImage() {}, jsRequestViewPicture() {} }
+  const destroy = setupImagePaste(editor, bridge, {
+    captureInsertionSelection: () => { captures += 1 },
+  })
+
+  const event = {
+    clipboardData: clipboard({
+      items: [{
+        kind: 'file',
+        type: 'image/png',
+        getAsFile: () => new window.File(['x'], 'pasted.png', { type: 'image/png' }),
+      }],
+    }),
+    preventDefault() { this.defaultPrevented = true },
+    defaultPrevented: false,
+  }
+
+  assert.equal(editor.view.props.handlePaste(editor.view, event), true)
+  assert.equal(event.defaultPrevented, true)
+  assert.equal(captures, 1)
+
+  destroy()
+  editor.destroy()
+})

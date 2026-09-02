@@ -44,6 +44,13 @@ Item {
         onTriggered: rootItem.passTxtMenuToToolbar(txtCtxMenu, retryCount)
     }
 
+    Timer {
+        id: tiptapToolbarSeparatorSyncTimer
+        interval: 16
+        repeat: false
+        onTriggered: rootItem.syncTiptapToolbarSeparators()
+    }
+
     // 累加可见子项 implicitHeight/height（来自 DTK 布局，不用硬编码行高）
     function txtMenuItemsHeight(menu) {
         var sum = 0;
@@ -88,6 +95,91 @@ Item {
     function toJsInt(value) {
         var n = Math.round(Number(value));
         return isFinite(n) ? n : 0;
+    }
+
+    function resetTiptapToolbarSeparatorGeometry() {
+        toolbarSeparatorOverlay.toolbarTopY = titleBarHost.height;
+        toolbarSeparatorOverlay.toolbarBottomY = titleBarHost.height + toolbarSeparatorOverlay.defaultToolbarHeight;
+    }
+
+    function scheduleTiptapToolbarSeparatorSync() {
+        if (!TiptapChannel.debugEnabled || !webVisible || noSearchResult) {
+            resetTiptapToolbarSeparatorGeometry();
+            return;
+        }
+        tiptapToolbarSeparatorSyncTimer.restart();
+    }
+
+    function syncTiptapToolbarSeparators() {
+        var tiptapView = tiptapLoader.item ? tiptapLoader.item.editor : null;
+        if (!tiptapView || !TiptapChannel.debugEnabled || !webVisible || noSearchResult) {
+            resetTiptapToolbarSeparatorGeometry();
+            return;
+        }
+
+        tiptapView.runJavaScript(
+            "(function(){var el=document.getElementById('toolbar-host');"
+            + "if(!el)return null;var r=el.getBoundingClientRect();"
+            + "return {top:r.top,bottom:r.bottom};})()",
+            function(rect) {
+                if (!rect || rect.top === undefined || rect.bottom === undefined) {
+                    resetTiptapToolbarSeparatorGeometry();
+                    return;
+                }
+                var top = Number(rect.top);
+                var bottom = Number(rect.bottom);
+                if (!isFinite(top) || !isFinite(bottom) || bottom <= top) {
+                    resetTiptapToolbarSeparatorGeometry();
+                    return;
+                }
+                toolbarSeparatorOverlay.toolbarTopY = tiptapLoader.y + top;
+                toolbarSeparatorOverlay.toolbarBottomY = tiptapLoader.y + bottom;
+            });
+    }
+
+    function clearTiptapInsertionSelection() {
+        var tiptapView = tiptapLoader.item ? tiptapLoader.item.editor : null;
+        if (tiptapView) {
+            tiptapView.runJavaScript(
+                "window.__dvnTiptapClearInsertionSelection"
+                + "&& window.__dvnTiptapClearInsertionSelection();");
+        }
+    }
+
+    function stableUrlList(urls) {
+        var copied = [];
+        if (!urls) {
+            return copied;
+        }
+        for (var i = 0; i < urls.length; ++i) {
+            copied.push(urls[i]);
+        }
+        return copied;
+    }
+
+    function insertImagesAtTiptapClientPoint(urls, x, y) {
+        // DropEvent 是临时事件对象，runJavaScript callback 异步触发时
+        // drop.urls 可能已经失效；必须先复制成稳定列表再进入回调。
+        var imageUrls = stableUrlList(urls);
+        if (imageUrls.length === 0) {
+            return;
+        }
+
+        var tiptapView = tiptapLoader.item ? tiptapLoader.item.editor : null;
+        if (!tiptapView) {
+            VNoteMainManager.insertImages(imageUrls);
+            return;
+        }
+
+        var safeX = toJsInt(x);
+        var safeY = toJsInt(y);
+        tiptapView.runJavaScript(
+            "(function(){return !!(window.__dvnTiptapCaptureInsertionPointFromClient"
+            + "&& window.__dvnTiptapCaptureInsertionPointFromClient("
+            + safeX + "," + safeY + "));})()",
+            function() {
+                VNoteMainManager.insertImages(imageUrls);
+            });
     }
 
     function passTxtMenuToToolbar(menu, retryCount) {
@@ -638,6 +730,9 @@ Item {
             visible: active && !noSearchResult
             Layout.fillHeight: true
             Layout.fillWidth: true
+            onWidthChanged: rootItem.scheduleTiptapToolbarSeparatorSync()
+            onHeightChanged: rootItem.scheduleTiptapToolbarSeparatorSync()
+            onYChanged: rootItem.scheduleTiptapToolbarSeparatorSync()
 
             sourceComponent: Item {
                 property WebEngineView editor: tiptapWebView
@@ -666,8 +761,13 @@ Item {
                             tiptapWebView.forceActiveFocus();
                             tiptapWebView.runJavaScript("window._dvnTiptapFocus && window._dvnTiptapFocus()");
                             rootItem.scheduleTiptapResourceButtonsSync();
+                            rootItem.scheduleTiptapToolbarSeparatorSync();
                         }
                     }
+
+                    onWidthChanged: rootItem.scheduleTiptapToolbarSeparatorSync()
+                    onHeightChanged: rootItem.scheduleTiptapToolbarSeparatorSync()
+                    onZoomFactorChanged: rootItem.scheduleTiptapToolbarSeparatorSync()
 
                     onContextMenuRequested: req => {
                         req.accepted = true;
@@ -752,7 +852,7 @@ Item {
                     onDropped: function(drop) {
                         if (currentDragCanDropImages) {
                             drop.accepted = true;
-                            VNoteMainManager.insertImages(drop.urls);
+                            rootItem.insertImagesAtTiptapClientPoint(drop.urls, drop.x, drop.y);
                         } else {
                             drop.accepted = false;
                         }
@@ -803,16 +903,19 @@ Item {
         // 叠加绘制，宽度直接覆盖整个富文本容器，避免右侧断线。
         anchors.left: parent.left
         anchors.right: parent.right
-        height: titleBarHost.height + 48
-        visible: webVisible && TiptapChannel.debugEnabled
+        height: Math.max(toolbarBottomY, toolbarTopY)
+        visible: webVisible && TiptapChannel.debugEnabled && !noSearchResult
         z: 2000
 
+        readonly property real defaultToolbarHeight: 48
+        property real toolbarTopY: titleBarHost.height
+        property real toolbarBottomY: titleBarHost.height + defaultToolbarHeight
         readonly property color separatorColor: DTK.themeType === ApplicationHelper.LightType ? "#14000000" : "#1FFFFFFF"
 
         Rectangle {
             anchors.left: parent.left
             anchors.right: parent.right
-            y: titleBarHost.height
+            y: toolbarSeparatorOverlay.toolbarTopY
             color: toolbarSeparatorOverlay.separatorColor
             height: 1 / Screen.devicePixelRatio
         }
@@ -820,7 +923,7 @@ Item {
         Rectangle {
             anchors.left: parent.left
             anchors.right: parent.right
-            y: titleBarHost.height + 48 - height
+            y: toolbarSeparatorOverlay.toolbarBottomY - height
             color: toolbarSeparatorOverlay.separatorColor
             height: 1 / Screen.devicePixelRatio
         }
@@ -980,7 +1083,12 @@ Item {
             onAccepted: {
                 if (fileDialog.files.length > 0) {
                     VNoteMainManager.insertImages(fileDialog.files);
+                } else {
+                    rootItem.clearTiptapInsertionSelection();
                 }
+            }
+            onRejected: {
+                rootItem.clearTiptapInsertionSelection();
             }
         }
     }
@@ -1047,6 +1155,7 @@ Item {
 
         onPickImageRequested: {
             if (!webVisible || VNoteMainManager.isInSearchMode()) {
+                rootItem.clearTiptapInsertionSelection();
                 return;
             }
             if (!selectImgLoader.active) {
