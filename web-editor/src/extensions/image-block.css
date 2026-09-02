@@ -10,3 +10,34 @@
     z-index: 9;
     background: var(--dvn-active-selection-bg, rgba(0, 129, 255, 0.6));
 }
+
+/*
+ * ProseMirror adds an internal separator img and a trailing br after a leaf
+ * inline node at the end of a paragraph.  For a paragraph whose real content is
+ * only one note image, those runtime DOM fillers must not create an extra
+ * visible blank row between consecutive images.  Use pure CSS so copy/save DOM
+ * paths are not polluted by runtime helper nodes or class mutations.
+ */
+.ProseMirror p:has(> img[data-rel-path]:first-child + img.ProseMirror-separator + br.ProseMirror-trailingBreak:last-child) {
+    min-height: 0;
+    line-height: 0;
+}
+
+.ProseMirror p:has(> img[data-rel-path]:first-child + img.ProseMirror-separator + br.ProseMirror-trailingBreak:last-child) > img[data-rel-path] {
+    vertical-align: top;
+}
+
+.ProseMirror p > img.ProseMirror-separator {
+    width: 0 !important;
+    height: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    vertical-align: top !important;
+}
+
+.ProseMirror p:has(> img[data-rel-path]:first-child + img.ProseMirror-separator + br.ProseMirror-trailingBreak:last-child) > br.ProseMirror-trailingBreak {
+    line-height: 0;
+}

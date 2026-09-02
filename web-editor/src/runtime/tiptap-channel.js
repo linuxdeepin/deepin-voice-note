@@ -167,29 +167,136 @@ function dispatchVoice(voiceId, handlerName, ...args) {
   }
 }
 
+function imageParagraph(schema, image) {
+  // Tiptap/ProseMirror already renders a non-document trailingBreak for a
+  // paragraph that ends with an inline leaf node.  Persisting an extra
+  // hardBreak would make two visual line breaks (<img><br><br>) and creates an
+  // empty row between consecutive images.  Keep the document model identical to
+  // Summernote's semantic content: one inline image in one paragraph, caret just
+  // after the image.
+  return schema.nodes.paragraph.create(null, image)
+}
+
+function isTrailingHardBreak(node) {
+  return node?.type?.name === 'hardBreak'
+}
+
 function setCursorAfterInlineImage(tr, paragraphStart, imageNodeSize = 1) {
   return tr.setSelection(TextSelection.create(tr.doc, paragraphStart + 1 + imageNodeSize)).scrollIntoView()
 }
 
-function isCursorAfterSoleImageInParagraph(selection) {
-  if (!selection.empty) return false
-  const $from = selection.$from
-  if ($from.parent.type.name !== 'paragraph') return false
-  if ($from.parent.childCount !== 1) return false
-  const onlyChild = $from.parent.child(0)
-  return onlyChild.type.name === 'image' && $from.parentOffset === onlyChild.nodeSize
+function cursorAfterImage(doc, imagePos) {
+  const imageNode = doc.nodeAt(imagePos)
+  if (!imageNode || imageNode.type.name !== 'image') return null
+  const afterImage = imagePos + imageNode.nodeSize
+  const $after = doc.resolve(afterImage)
+  if ($after.parent.inlineContent) return afterImage
+  const nextNode = $after.nodeAfter
+  return nextNode?.isTextblock ? afterImage + 1 : null
 }
 
-export function wrapTopLevelImagesInParagraphs(doc) {
+function syncCursorAfterImage(editor, imagePos, { guardUserMove = true } = {}) {
+  const { state } = editor
+  const imageNode = state.doc.nodeAt(imagePos)
+  if (!imageNode || imageNode.type.name !== 'image') return false
+
+  const cursorPos = cursorAfterImage(state.doc, imagePos)
+  if (cursorPos == null) return false
+
+  const { selection } = state
+  const isExpectedCursor = selection.empty && selection.from === cursorPos
+  if (guardUserMove && !isExpectedCursor) return false
+
+  const tr = state.tr.setSelection(TextSelection.create(state.doc, cursorPos)).scrollIntoView()
+  editor.view.dispatch(tr)
+  editor.view.focus()
+  return true
+}
+
+function scheduleCursorAfterImageSync(editor, imagePos) {
+  const sync = () => syncCursorAfterImage(editor, imagePos)
+  if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+    window.requestAnimationFrame(() => window.requestAnimationFrame(sync))
+  } else {
+    setTimeout(sync, 0)
+  }
+}
+
+function bareImageParagraphSelection(selection) {
+  if (!selection.empty) return null
+  const $from = selection.$from
+  if ($from.parent.type.name !== 'paragraph') return null
+  if ($from.parent.childCount < 1 || $from.parent.childCount > 2) return null
+  const firstChild = $from.parent.child(0)
+  if (firstChild.type.name !== 'image') return null
+  if ($from.parent.childCount === 2 && !isTrailingHardBreak($from.parent.child(1))) return null
+
+  const paragraphStart = $from.before($from.depth)
+  const paragraphEnd = $from.after($from.depth)
+  if ($from.parentOffset <= 0) {
+    return { side: 'before', paragraphStart, paragraphEnd, image: firstChild }
+  }
+  if ($from.parentOffset >= firstChild.nodeSize) {
+    return { side: 'after', paragraphStart, paragraphEnd, image: firstChild }
+  }
+  return null
+}
+
+function selectedBareImageParagraph(selection) {
+  if (selection.node?.type?.name !== 'image') return null
+  const $from = selection.$from
+  if ($from.parent.type.name !== 'paragraph') return null
+  if ($from.parent.childCount < 1 || $from.parent.childCount > 2) return null
+  if ($from.parent.child(0).type.name !== 'image') return null
+  if ($from.parent.childCount === 2 && !isTrailingHardBreak($from.parent.child(1))) return null
+  return {
+    side: 'after',
+    paragraphStart: $from.before($from.depth),
+    paragraphEnd: $from.after($from.depth),
+    image: selection.node,
+  }
+}
+
+function isParagraphImageSeparator(node) {
+  return node?.type === 'hardBreak'
+}
+
+function imageOnlyParagraphImages(node) {
+  if (node?.type !== 'paragraph' || !Array.isArray(node.content)) return null
+  const meaningful = node.content.filter((child) => !isParagraphImageSeparator(child))
+  if (meaningful.length === 0) return null
+  if (!meaningful.every((child) => child?.type === 'image')) return null
+  return meaningful
+}
+
+export function normalizeImageParagraphLayout(doc) {
   if (!doc || doc.type !== 'doc' || !Array.isArray(doc.content)) return doc
   let changed = false
-  const content = doc.content.map((node) => {
-    if (node?.type !== 'image') return node
-    changed = true
-    return { type: 'paragraph', content: [node] }
-  })
+  const content = []
+
+  for (const node of doc.content) {
+    if (node?.type === 'image') {
+      changed = true
+      content.push({ type: 'paragraph', content: [node] })
+      continue
+    }
+
+    const images = imageOnlyParagraphImages(node)
+    if (images && (images.length > 1 || images.length !== node.content.length)) {
+      changed = true
+      for (const image of images) {
+        content.push({ ...node, content: [image] })
+      }
+      continue
+    }
+
+    content.push(node)
+  }
+
   return changed ? { ...doc, content } : doc
 }
+
+export const wrapTopLevelImagesInParagraphs = normalizeImageParagraphLayout
 
 export function insertImageWithLegacyFlow(editor, attrs) {
   // Summernote stores pasted images as <p><img>...</p> and then selects the
@@ -201,26 +308,35 @@ export function insertImageWithLegacyFlow(editor, attrs) {
     const { selection, schema } = state
     const image = schema.nodes.image.create(attrs)
     let tr = state.tr
+    let insertedImagePos = null
 
-    if (isCursorAfterSoleImageInParagraph(selection)) {
-      const insertPos = selection.$from.after(selection.$from.depth)
-      const paragraph = schema.nodes.paragraph.create(null, image)
+    const imageParagraphSelection = bareImageParagraphSelection(selection) || selectedBareImageParagraph(selection)
+
+    if (imageParagraphSelection) {
+      const insertPos = imageParagraphSelection.side === 'before'
+        ? imageParagraphSelection.paragraphStart
+        : imageParagraphSelection.paragraphEnd
+      const paragraph = imageParagraph(schema, image)
+      insertedImagePos = insertPos + 1
       tr = tr.insert(insertPos, paragraph)
       tr = setCursorAfterInlineImage(tr, insertPos, image.nodeSize)
     } else if (selection.empty && selection.$from.parent.type.name === 'paragraph' && selection.$from.parent.content.size === 0) {
       const paragraphStart = selection.$from.before(selection.$from.depth)
       const paragraphEnd = selection.$from.after(selection.$from.depth)
-      const paragraph = schema.nodes.paragraph.create(null, image)
+      const paragraph = imageParagraph(schema, image)
+      insertedImagePos = paragraphStart + 1
       tr = tr.replaceWith(paragraphStart, paragraphEnd, paragraph)
       tr = setCursorAfterInlineImage(tr, paragraphStart, image.nodeSize)
     } else {
       const insertFrom = selection.from
+      insertedImagePos = insertFrom
       tr = tr.replaceSelectionWith(image, false)
       tr = tr.setSelection(TextSelection.create(tr.doc, insertFrom + image.nodeSize)).scrollIntoView()
     }
 
     editor.view.dispatch(tr)
-    editor.view.focus()
+    syncCursorAfterImage(editor, insertedImagePos, { guardUserMove: false })
+    scheduleCursorAfterImageSync(editor, insertedImagePos)
     return true
   } catch (err) {
     console.error('[tiptap] insert image failed:', err)
@@ -457,7 +573,7 @@ function makeVoicePathRelative(voicePath, resourceBaseUrl) {
  * 绑定正式 QWebChannel 通道（channel.objects.tiptapChannel）。
  * @param {Editor} editor — Tiptap Editor 实例
  * @param {object} [channelFactory] — 可选，测试注入；默认使用全局 QWebChannel
- * @param {object} [options] — 可选，{ onFontList(fonts, defaultFont) }
+ * @param {object} [options] — 可选，{ onFontList, beforeInsertImage, clearResourceInsertionSelection }
  * @returns {Promise<object>} resolve 为 bridge 对象
  */
 export function bindTiptapChannel(editor, channelFactory, options = {}) {
@@ -500,8 +616,9 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
         } catch {
           envelope = createEnvelope(createEmptyDoc())
         }
-        const content = wrapTopLevelImagesInParagraphs(envelope?.content || createEmptyDoc())
+        const content = normalizeImageParagraphLayout(envelope?.content || createEmptyDoc())
         const resolved = walkResolve(content, loadResolvers)
+        options.clearResourceInsertionSelection?.()
         replaceEditorContentWithoutHistory(editor, resolved)
         if (bridge.currentSearchQuery) {
           setTiptapSearchQuery(editor, bridge.currentSearchQuery)
@@ -554,7 +671,7 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
 
       // --- 事件 3：保存往返 ---
       bridge.requestContent.connect(function () {
-        const normalized = walkNormalize(editor.getJSON(), saveNormalizers)
+        const normalized = normalizeImageParagraphLayout(walkNormalize(editor.getJSON(), saveNormalizers))
         const envelope = createEnvelope(normalized)
         const result = validateEnvelope(envelope)
         if (result.ok) {
@@ -575,6 +692,7 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
       bridge.insertImage.connect(function (imageInfoJson) {
         const result = parseImageInfo(imageInfoJson, resourceBaseUrl)
         if (result.ok) {
+          options.beforeInsertImage?.()
           const inserted = insertImageWithLegacyFlow(editor, result.attrs)
           if (!inserted) {
             bridge.jsInsertImageFailed('editor rejected image node insertion')

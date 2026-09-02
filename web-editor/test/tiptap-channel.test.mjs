@@ -19,7 +19,8 @@ import {
 import {
   bindTiptapChannel,
   createDebounce,
-  insertImageWithLegacyFlow
+  insertImageWithLegacyFlow,
+  normalizeImageParagraphLayout
 } from '../src/runtime/tiptap-channel.js'
 import { parseImageInfo, parseVoiceInfo } from '../src/runtime/tiptap-adapter.js'
 
@@ -342,13 +343,60 @@ test('bindTiptapChannel: insertImage success inserts image node and leaves caret
   assert.equal(imageNode.attrs.relPath, 'images/test.png')
   assert.deepEqual(topLevelTypes(json), ['paragraph'], 'image should live inside a paragraph like Summernote')
   assert.equal(json.content[0].content[0].type, 'image')
+  assert.equal(json.content[0].content.length, 1, 'document should not persist runtime-only trailing breaks')
   assert.equal(editor.state.selection.constructor.name, 'TextSelection')
   assert.equal(editor.state.selection.from, 2, 'caret should be in the same paragraph after the image')
   assert.equal(calls.insertImageFailed, undefined)
   editor.destroy()
 })
 
-test('insertImageWithLegacyFlow keeps multiple pasted images as consecutive block images with trailing caret', () => {
+
+test('bindTiptapChannel: insertImage restores captured selection before insertion', async () => {
+  const { editor } = createEditor()
+  const { bridge, calls, emit } = createMockBridge()
+  const factory = createMockChannelFactory(bridge)
+
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{ type: 'paragraph', content: [{ type: 'text', text: 'abc' }] }],
+  })
+  let capturedSelection = null
+  editor.commands.setTextSelection(2)
+  capturedSelection = editor.state.selection
+  editor.commands.setTextSelection(4)
+
+  await bindTiptapChannel(editor, factory, {
+    beforeInsertImage: () => {
+      editor.view.dispatch(editor.state.tr.setSelection(capturedSelection))
+    },
+  })
+
+  emit('insertImage', JSON.stringify({ relPath: 'images/test.png' }))
+
+  const nodes = editor.getJSON().content[0].content
+  assert.equal(nodes[0].text, 'a')
+  assert.equal(nodes[1].type, 'image')
+  assert.equal(nodes[2].text, 'bc')
+  assert.equal(calls.insertImageFailed, undefined)
+  editor.destroy()
+})
+
+
+
+test('insertImageWithLegacyFlow does not steal explicit image selection after insertion', async () => {
+  const { editor } = createEditor()
+
+  assert.equal(insertImageWithLegacyFlow(editor, { src: 'file:///base/images/a.png', relPath: 'images/a.png' }), true)
+  editor.view.dispatch(editor.state.tr.setSelection(NodeSelection.create(editor.state.doc, 1)))
+
+  await new Promise(resolve => setTimeout(resolve, 20))
+  assert.equal(editor.state.selection.constructor.name, 'NodeSelection')
+  assert.equal(editor.state.selection.from, 1, 'selected image must remain selected so copy can work')
+
+  editor.destroy()
+})
+
+test('insertImageWithLegacyFlow keeps multiple pasted images as consecutive image paragraphs without blank rows', () => {
   const { editor } = createEditor()
 
   assert.equal(insertImageWithLegacyFlow(editor, { src: 'file:///base/images/a.png', relPath: 'images/a.png' }), true)
@@ -357,9 +405,11 @@ test('insertImageWithLegacyFlow keeps multiple pasted images as consecutive bloc
   const json = editor.getJSON()
   assert.deepEqual(topLevelTypes(json), ['paragraph', 'paragraph'])
   assert.equal(json.content[0].content[0].type, 'image')
+  assert.equal(json.content[0].content.length, 1, 'first image paragraph must not carry an extra hardBreak')
   assert.equal(json.content[1].content[0].type, 'image')
+  assert.equal(json.content[1].content.length, 1, 'second image paragraph must not carry an extra hardBreak')
   assert.equal(editor.state.selection.constructor.name, 'TextSelection')
-  assert.equal(editor.state.selection.from, 5, 'caret should stay in the same paragraph after the second image')
+  assert.equal(editor.state.selection.from, 5, 'caret should stay after the second image')
   editor.destroy()
 })
 
@@ -1189,4 +1239,80 @@ test('sanitize fills empty doc root with single empty paragraph', async () => {
   assert.deepEqual(topLevelTypes(content), ['paragraph'],
     'empty doc root must be filled with a single empty paragraph')
   editor.destroy()
+})
+
+
+test('insert image before a bare image paragraph creates a separate paragraph', () => {
+  const { editor } = createEditor()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'paragraph',
+      content: [{ type: 'image', attrs: { src: 'file:///base/images/a.png', relPath: 'images/a.png', alt: '', title: null } }],
+    }],
+  })
+
+  editor.commands.setTextSelection(1)
+  assert.equal(insertImageWithLegacyFlow(editor, { src: 'file:///base/images/b.png', relPath: 'images/b.png' }), true)
+
+  const content = editor.getJSON().content
+  assert.deepEqual(content.map(node => node.content.map(child => child.type)), [['image'], ['image']])
+  assert.equal(content[0].content[0].attrs.relPath, 'images/b.png')
+  assert.equal(content[1].content[0].attrs.relPath, 'images/a.png')
+  assert.equal(editor.state.selection.from, 2, 'caret stays after the newly inserted image')
+  editor.destroy()
+})
+
+test('insert image after a selected bare image paragraph appends instead of replacing', () => {
+  const { editor } = createEditor()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'paragraph',
+      content: [{ type: 'image', attrs: { src: 'file:///base/images/a.png', relPath: 'images/a.png', alt: '', title: null } }],
+    }],
+  })
+
+  editor.commands.setNodeSelection(1)
+  assert.equal(insertImageWithLegacyFlow(editor, { src: 'file:///base/images/b.png', relPath: 'images/b.png' }), true)
+
+  const content = editor.getJSON().content
+  assert.deepEqual(content.map(node => node.content.map(child => child.type)), [['image'], ['image']])
+  assert.equal(content[0].content[0].attrs.relPath, 'images/a.png')
+  assert.equal(content[1].content[0].attrs.relPath, 'images/b.png')
+  assert.equal(editor.state.selection.from, 5, 'caret stays after appended image')
+  editor.destroy()
+})
+
+
+test('normalize image paragraph layout splits image-only paragraphs and drops legacy breaks', () => {
+  const doc = {
+    type: 'doc',
+    content: [{
+      type: 'paragraph',
+      content: [
+        { type: 'image', attrs: { relPath: 'images/a.png', src: 'images/a.png' } },
+        { type: 'image', attrs: { relPath: 'images/b.png', src: 'images/b.png' } },
+        { type: 'hardBreak' },
+      ],
+    }],
+  }
+
+  const normalized = normalizeImageParagraphLayout(doc)
+  assert.deepEqual(normalized.content.map(node => node.content.map(child => child.type)), [['image'], ['image']])
+})
+
+test('normalize image paragraph layout preserves mixed text/image paragraphs', () => {
+  const doc = {
+    type: 'doc',
+    content: [{
+      type: 'paragraph',
+      content: [
+        { type: 'text', text: 'a' },
+        { type: 'image', attrs: { relPath: 'images/a.png', src: 'images/a.png' } },
+      ],
+    }],
+  }
+
+  assert.equal(normalizeImageParagraphLayout(doc), doc)
 })

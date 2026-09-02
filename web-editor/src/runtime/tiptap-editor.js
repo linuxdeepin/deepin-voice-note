@@ -19,6 +19,7 @@ import { shouldFocusEditorOnDocumentMouseDown } from './focus-behavior.js'
 import { setTiptapSearchQuery, clearTiptapSearch } from './search-extension.js'
 import { currentTranscriptCopyText, copyTranscriptTextViaBridge, installTranscriptCopyHandler } from './transcript-copy.js'
 import { installEmptyPlaceholderState } from './empty-placeholder-state.js'
+import { createResourceInsertionSelection } from './resource-insertion-selection.js'
 
 // ---------------------------------------------------------------------------
 // 编辑器初始化模块（本接口不替换此模块）
@@ -55,6 +56,7 @@ setupTransientScrollbar()
 installTranscriptCopyHandler()
 const appElement = document.getElementById('app')
 const editor = createTiptapEditor(appElement)
+const resourceInsertionSelection = createResourceInsertionSelection(editor)
 installEmptyPlaceholderState(editor, appElement)
 let tiptapBridge = null
 if (typeof window !== 'undefined') {
@@ -106,6 +108,13 @@ if (typeof window !== 'undefined') {
   }
   window.__dvnTiptapClearSearch = function () {
     return clearTiptapSearch(editor)
+  }
+  window.__dvnTiptapCaptureInsertionPointFromClient = function (left, top) {
+    return resourceInsertionSelection.captureAtClientPoint(left, top)
+  }
+  window.__dvnTiptapClearInsertionSelection = function () {
+    resourceInsertionSelection.clear()
+    return true
   }
 }
 const toolbar = createFormatToolbar(editor, document.getElementById('toolbar-host'))
@@ -169,6 +178,7 @@ titleInput.addEventListener('keydown', (event) => {
 // 工具栏可能先于 QWebChannel 完成绑定就已经可见。先缓存用户操作，
 // 避免首次点击在 bridge 尚未就绪时被静默丢弃。
 toolbar.setOnPickImage(() => {
+  resourceInsertionSelection.capture()
   if (tiptapBridge?.jsRequestPickImage) {
     tiptapBridge.jsRequestPickImage()
   } else {
@@ -202,6 +212,8 @@ document.addEventListener('mousedown', function (event) {
 
 bindTiptapChannel(editor, undefined, {
   onFontList: (fonts, defaultFont) => toolbar.setFontList(fonts, defaultFont),
+  beforeInsertImage: () => resourceInsertionSelection.restoreAndConsume(),
+  clearResourceInsertionSelection: () => resourceInsertionSelection.clear(),
 }).then((bridge) => {
   tiptapBridge = bridge
   loadNoteTitle(bridge.currentNoteId, bridge.currentNoteTitle)
@@ -220,7 +232,9 @@ bindTiptapChannel(editor, undefined, {
     bridge.jsRequestRecordVoice?.()
   }
   // 粘贴：剪贴板图片落盘往返、远程图片阻止
-  setupImagePaste(editor, bridge)
+  setupImagePaste(editor, bridge, {
+    captureInsertionSelection: () => resourceInsertionSelection.capture(),
+  })
   // 双击查看原图、右键菜单（查看原图 / 删除）
   setupImageViewAndMenu(editor, bridge)
 })
