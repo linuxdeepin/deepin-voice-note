@@ -270,18 +270,50 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_tiptapHtmlPath_001)
     EXPECT_TRUE(path.contains("tiptap-editor.html")) << path.toStdString();
 }
 
-// debugEnabled 环境变量门控
-TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_debugEnabled_001)
+// Tiptap 默认启用，显式环境变量可临时回退 Summernote。
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_tiptapEnabled_001)
 {
-    qputenv("DVN_TIPTAP_DEBUG", "");
-    TiptapChannelBridge bridge1;
-    EXPECT_FALSE(bridge1.debugEnabled());
+    const bool hadDisable = qEnvironmentVariableIsSet("DVN_TIPTAP_DISABLE");
+    const bool hadLegacy = qEnvironmentVariableIsSet("DVN_SUMMERNOTE_LEGACY");
+    const bool hadDebug = qEnvironmentVariableIsSet("DVN_TIPTAP_DEBUG");
+    const QByteArray oldDisable = qgetenv("DVN_TIPTAP_DISABLE");
+    const QByteArray oldLegacy = qgetenv("DVN_SUMMERNOTE_LEGACY");
+    const QByteArray oldDebug = qgetenv("DVN_TIPTAP_DEBUG");
+
+    auto restoreEnv = [&]() {
+        hadDisable ? qputenv("DVN_TIPTAP_DISABLE", oldDisable) : qunsetenv("DVN_TIPTAP_DISABLE");
+        hadLegacy ? qputenv("DVN_SUMMERNOTE_LEGACY", oldLegacy) : qunsetenv("DVN_SUMMERNOTE_LEGACY");
+        hadDebug ? qputenv("DVN_TIPTAP_DEBUG", oldDebug) : qunsetenv("DVN_TIPTAP_DEBUG");
+    };
+
+    qunsetenv("DVN_TIPTAP_DISABLE");
+    qunsetenv("DVN_SUMMERNOTE_LEGACY");
+    qunsetenv("DVN_TIPTAP_DEBUG");
+
+    TiptapChannelBridge defaultBridge;
+    EXPECT_TRUE(defaultBridge.tiptapEnabled());
+    EXPECT_TRUE(defaultBridge.debugEnabled());
+
+    qputenv("DVN_TIPTAP_DISABLE", "1");
+    TiptapChannelBridge disabledBridge;
+    EXPECT_FALSE(disabledBridge.tiptapEnabled());
+    EXPECT_FALSE(disabledBridge.debugEnabled());
+
+    qputenv("DVN_TIPTAP_DISABLE", "0");
+    qputenv("DVN_SUMMERNOTE_LEGACY", "true");
+    TiptapChannelBridge legacyBridge;
+    EXPECT_FALSE(legacyBridge.tiptapEnabled());
+
+    qputenv("DVN_SUMMERNOTE_LEGACY", "0");
+    qputenv("DVN_TIPTAP_DEBUG", "0");
+    TiptapChannelBridge legacyDebugBridge;
+    EXPECT_FALSE(legacyDebugBridge.tiptapEnabled());
 
     qputenv("DVN_TIPTAP_DEBUG", "1");
-    TiptapChannelBridge bridge2;
-    EXPECT_TRUE(bridge2.debugEnabled());
+    TiptapChannelBridge explicitBridge;
+    EXPECT_TRUE(explicitBridge.tiptapEnabled());
 
-    qputenv("DVN_TIPTAP_DEBUG", "");
+    restoreEnv();
 }
 
 // ---------------------------------------------------------------------------
@@ -522,10 +554,12 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_emitVoiceToTextCompleted_0
     EXPECT_EQ(args.at(1).toString(), QStringLiteral("转写结果"));
 }
 
-// emitThemeProvided
+// emitThemeProvided：编辑器 ready 后立即下发主题。
 TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_emitThemeProvided_001)
 {
     TiptapChannelBridge bridge;
+    bridge.jsEditorReady();
+
     QSignalSpy spy(&bridge, &TiptapChannelBridge::themeProvided);
     bridge.emitThemeProvided(QStringLiteral("dark"), QStringLiteral("#007AFF"),
                              QStringLiteral("#999999"), QStringLiteral("#090A17"));
@@ -533,6 +567,25 @@ TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_emitThemeProvided_001)
     auto args = spy.takeFirst();
     EXPECT_EQ(args.at(0).toString(), QStringLiteral("dark"));
     EXPECT_EQ(args.at(1).toString(), QStringLiteral("#007AFF"));
+}
+
+// emitThemeProvided：ready 前缓存主题，ready 后补发，避免首次暗色主题信号丢失。
+TEST_F(UT_TiptapChannelBridge, UT_TiptapChannelBridge_emitThemeProvided_cacheBeforeReady_001)
+{
+    TiptapChannelBridge bridge;
+    QSignalSpy spy(&bridge, &TiptapChannelBridge::themeProvided);
+
+    bridge.emitThemeProvided(QStringLiteral("dark"), QStringLiteral("#007AFF"),
+                             QStringLiteral("#999999"), QStringLiteral("#090A17"));
+    EXPECT_EQ(spy.count(), 0);
+
+    bridge.jsEditorReady();
+    ASSERT_EQ(spy.count(), 1);
+    auto args = spy.takeFirst();
+    EXPECT_EQ(args.at(0).toString(), QStringLiteral("dark"));
+    EXPECT_EQ(args.at(1).toString(), QStringLiteral("#007AFF"));
+    EXPECT_EQ(args.at(2).toString(), QStringLiteral("#999999"));
+    EXPECT_EQ(args.at(3).toString(), QStringLiteral("#090A17"));
 }
 
 // currentVoiceId / setCurrentVoiceId

@@ -25,6 +25,17 @@
 
 namespace {
 
+bool isTruthyEnvValue(const QByteArray &value)
+{
+    const QByteArray normalized = value.trimmed().toLower();
+    return normalized == "1" || normalized == "true" || normalized == "yes" || normalized == "on";
+}
+
+bool isFalsyEnvValue(const QByteArray &value)
+{
+    const QByteArray normalized = value.trimmed().toLower();
+    return normalized == "0" || normalized == "false" || normalized == "no" || normalized == "off";
+}
 // 复用 web_engine_handler.cpp 的图片路径归一化逻辑：将 file:// URL、
 // images/ 相对路径或 WEB_PATH/images 绝对路径统一解析为 AppData/images 内的本地路径，
 // 校验结果必须落在 AppData/images 目录内，否则返回空串（拒绝越界路径）。
@@ -75,9 +86,31 @@ TiptapChannelBridge *TiptapChannelBridge::instance()
     return &inst;
 }
 
+bool TiptapChannelBridge::tiptapEnabled() const
+{
+    // Tiptap 已切为默认编辑器。保留显式回退开关，方便定位线上问题，
+    // 但不再要求 DVN_TIPTAP_DEBUG=1 才进入 Tiptap 流程。
+    if (qEnvironmentVariableIsSet("DVN_TIPTAP_DISABLE")
+        && isTruthyEnvValue(qgetenv("DVN_TIPTAP_DISABLE"))) {
+        return false;
+    }
+
+    if (qEnvironmentVariableIsSet("DVN_SUMMERNOTE_LEGACY")
+        && isTruthyEnvValue(qgetenv("DVN_SUMMERNOTE_LEGACY"))) {
+        return false;
+    }
+
+    if (qEnvironmentVariableIsSet("DVN_TIPTAP_DEBUG")
+        && isFalsyEnvValue(qgetenv("DVN_TIPTAP_DEBUG"))) {
+        return false;
+    }
+
+    return true;
+}
+
 bool TiptapChannelBridge::debugEnabled() const
 {
-    return !qgetenv("DVN_TIPTAP_DEBUG").isEmpty();
+    return tiptapEnabled();
 }
 
 QString TiptapChannelBridge::tiptapHtmlPath() const
@@ -108,6 +141,14 @@ QString TiptapChannelBridge::resourceBaseUrl() const
 void TiptapChannelBridge::notifyEditorReady()
 {
     m_editorReady = true;
+
+    // 主题信号可能在 QWebChannel 绑定前已由宿主侧发出。前端会先绑定
+    // themeProvided 再调用 jsEditorReady，因此这里先补发缓存主题；随后
+    // editorReady 回调里若重新采集当前系统主题，会再用最新值覆盖。
+    if (m_hasTheme) {
+        emit themeProvided(m_lastTheme, m_lastHighlightColor, m_lastDisableHighlightColor, m_lastBackgroundColor);
+    }
+
     emit editorReady();
 
     // 就绪后补发缓存的 envelope，不丢数据
@@ -488,7 +529,15 @@ void TiptapChannelBridge::emitThemeProvided(const QString &theme, const QString 
                                              const QString &disableHighlightColor,
                                              const QString &backgroundColor)
 {
-    emit themeProvided(theme, highlightColor, disableHighlightColor, backgroundColor);
+    m_lastTheme = theme;
+    m_lastHighlightColor = highlightColor;
+    m_lastDisableHighlightColor = disableHighlightColor;
+    m_lastBackgroundColor = backgroundColor;
+    m_hasTheme = true;
+
+    if (m_editorReady) {
+        emit themeProvided(theme, highlightColor, disableHighlightColor, backgroundColor);
+    }
 }
 
 QString TiptapChannelBridge::currentVoiceId() const

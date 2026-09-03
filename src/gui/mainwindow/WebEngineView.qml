@@ -103,7 +103,7 @@ Item {
     }
 
     function scheduleTiptapToolbarSeparatorSync() {
-        if (!TiptapChannel.debugEnabled || !webVisible || noSearchResult) {
+        if (!TiptapChannel.tiptapEnabled || !webVisible || noSearchResult) {
             resetTiptapToolbarSeparatorGeometry();
             return;
         }
@@ -112,7 +112,7 @@ Item {
 
     function syncTiptapToolbarSeparators() {
         var tiptapView = tiptapLoader.item ? tiptapLoader.item.editor : null;
-        if (!tiptapView || !TiptapChannel.debugEnabled || !webVisible || noSearchResult) {
+        if (!tiptapView || !TiptapChannel.tiptapEnabled || !webVisible || noSearchResult) {
             resetTiptapToolbarSeparatorGeometry();
             return;
         }
@@ -138,7 +138,7 @@ Item {
     }
 
     function consumeTiptapNativeZoomFactor(tiptapView) {
-        if (!tiptapView || !TiptapChannel.debugEnabled) {
+        if (!tiptapView || !TiptapChannel.tiptapEnabled) {
             return;
         }
         var factor = Number(tiptapView.zoomFactor);
@@ -284,7 +284,7 @@ Item {
     }
 
     function copy() {
-        if (TiptapChannel.debugEnabled && tiptapLoader.item) {
+        if (TiptapChannel.tiptapEnabled && tiptapLoader.item) {
             triggerTiptapWebAction(5, false);
         } else {
             webView.triggerWebAction(5);
@@ -303,7 +303,7 @@ Item {
     // 让 QML 绑定（尤其 title.recordBtnEnabled 的派生值）先稳定下来，
     // 避免停止录音时先同步到 disabled，后续派生状态变为 enabled 却没有再刷 DOM。
     function scheduleTiptapResourceButtonsSync() {
-        if (!TiptapChannel.debugEnabled) {
+        if (!TiptapChannel.tiptapEnabled) {
             return;
         }
         resourceButtonSyncTimer.restart();
@@ -312,7 +312,7 @@ Item {
     // 工具栏中的资源按钮不再由标题栏直接承载，需要把宿主侧运行态
     // 同步到 Tiptap DOM，保持与原 Summernote 入口一致。
     function syncTiptapResourceButtons() {
-        if (!TiptapChannel.debugEnabled || !tiptapLoader.item) {
+        if (!TiptapChannel.tiptapEnabled || !tiptapLoader.item) {
             return;
         }
 
@@ -346,10 +346,10 @@ Item {
     }
 
     function focusWebView() {
-        // Tiptap 调试模式下编辑器位于 tiptapLoader 加载的 sourceComponent，需经 tiptapLoader.item
+        // Tiptap 模式下编辑器位于 tiptapLoader 加载的 sourceComponent，需经 tiptapLoader.item
         // 跨 Loader 作用域访问 tiptapWebView；item 为 null（inactive/加载中）时跳过聚焦避免 TypeError。
         // 否则保持原有 Summernote webView 聚焦逻辑。
-        if (TiptapChannel.debugEnabled) {
+        if (TiptapChannel.tiptapEnabled) {
             if (tiptapLoader.item) {
                 tiptapLoader.item.editor.forceActiveFocus();
                 tiptapLoader.item.editor.runJavaScript("window._dvnTiptapFocus && window._dvnTiptapFocus()");
@@ -596,7 +596,7 @@ Item {
 
             Layout.fillHeight: true
             Layout.fillWidth: true
-            visible: summernoteVisible && !TiptapChannel.debugEnabled
+            visible: summernoteVisible && !TiptapChannel.tiptapEnabled
             color: DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#242424"
 
             WebEngineView {
@@ -611,13 +611,15 @@ Item {
                 visible: webVisible
 
                 Component.onCompleted: {
-                    noteWebChannel.registerObject("webobj", Webobj);
-                    // console.log("registerObject ret: " + ret)
-                    webView.webChannel = noteWebChannel;
-                    webView.url = Qt.resolvedUrl(Webobj.webPath());
+                    if (!TiptapChannel.tiptapEnabled) {
+                        noteWebChannel.registerObject("webobj", Webobj);
+                        // console.log("registerObject ret: " + ret)
+                        webView.webChannel = noteWebChannel;
+                        webView.url = Qt.resolvedUrl(Webobj.webPath());
 
-                    // 隐藏浮动工具栏
-                    Webobj.calllJsShowEditToolbar(0, 0);
+                        // 隐藏浮动工具栏
+                        Webobj.calllJsShowEditToolbar(0, 0);
+                    }
                 }
                 onContextMenuRequested: req => {
                     // 初始页可见或编辑器不可见时，屏蔽右键菜单
@@ -714,7 +716,7 @@ Item {
                         }
                     }
                     onTriggerWebAction: action => {
-                        if (TiptapChannel.debugEnabled && tiptapLoader.item) {
+                        if (TiptapChannel.tiptapEnabled && tiptapLoader.item) {
                             triggerTiptapWebAction(action, true);
                         } else {
                             webView.triggerWebAction(action);
@@ -745,11 +747,11 @@ Item {
         }
 
 
-        // debug 门控的独立 Tiptap WebEngineView（不改动 Summernote webView.url）
+        // Tiptap 默认富文本 WebEngineView
         Loader {
             id: tiptapLoader
 
-            active: TiptapChannel.debugEnabled
+            active: TiptapChannel.tiptapEnabled
             // 搜索无结果时由 noSearchRect 占据编辑区，Tiptap 不应继续参与布局，
             // 否则会被 ColumnLayout 排到无结果区域下方，导致工具栏出现在底部。
             visible: active && !noSearchResult
@@ -792,6 +794,7 @@ Item {
                             }
                             tiptapWebView.forceActiveFocus();
                             tiptapWebView.runJavaScript("window._dvnTiptapFocus && window._dvnTiptapFocus()");
+                            handler.onThemeChanged();
                             rootItem.scheduleTiptapResourceButtonsSync();
                             rootItem.scheduleTiptapToolbarSeparatorSync();
                         }
@@ -942,7 +945,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         height: Math.max(toolbarBottomY, toolbarTopY)
-        visible: webVisible && TiptapChannel.debugEnabled && !noSearchResult
+        visible: webVisible && TiptapChannel.tiptapEnabled && !noSearchResult
         z: 2000
 
         readonly property real defaultToolbarHeight: 48
@@ -1085,9 +1088,11 @@ Item {
 
             onClosed: {
                 txtMenuToolbarTimer.stop();
-                // 菜单关闭不隐藏工具栏，仅解除定位锁定（b80965d 原始行为）
-                webView.runJavaScript(
-                    "if(typeof restoreAirPopoverTooltipPlacement === 'function') restoreAirPopoverTooltipPlacement();");
+                // 菜单关闭不隐藏工具栏，仅解除 Summernote 定位锁定（b80965d 原始行为）
+                if (!TiptapChannel.tiptapEnabled) {
+                    webView.runJavaScript(
+                        "if(typeof restoreAirPopoverTooltipPlacement === 'function') restoreAirPopoverTooltipPlacement();");
+                }
             }
 
             Connections {
@@ -1224,7 +1229,7 @@ Item {
 
         onNeedUpdateNote: function(noteId) {
             var requestNoteId = noteId;
-            if (TiptapChannel.debugEnabled) {
+            if (TiptapChannel.tiptapEnabled) {
                 TiptapChannel.requestEditorContent();
             } else {
                 webView.runJavaScript("getHtml()", function (result) {
@@ -1236,7 +1241,7 @@ Item {
             hasScroll = !isTop;
         }
         onUpdateRichTextSearch: key => {
-            if (TiptapChannel.debugEnabled) {
+            if (TiptapChannel.tiptapEnabled) {
                 if (key && key.length > 0) {
                     TiptapChannel.setSearchQuery(key);
                 } else {
@@ -1307,20 +1312,20 @@ Item {
         target: Webobj
 
         onCallJsSelectAll: {
-            if (TiptapChannel.debugEnabled && tiptapLoader.item) {
+            if (TiptapChannel.tiptapEnabled && tiptapLoader.item) {
                 tiptapWebView.runJavaScript(
                     "if(window.__dvnTiptapSelectContextAll)window.__dvnTiptapSelectContextAll();" +
                     "else if(window.__dvnTiptapEditor)window.__dvnTiptapEditor.chain().selectAll().run();");
             }
         }
         onCallJsDeleteSelection: {
-            if (TiptapChannel.debugEnabled && tiptapLoader.item) {
+            if (TiptapChannel.tiptapEnabled && tiptapLoader.item) {
                 tiptapWebView.runJavaScript(
                     "if(window.__dvnTiptapEditor)window.__dvnTiptapEditor.chain().deleteSelection().run()");
             }
         }
         onCallJsFocusEditor: {
-            if (TiptapChannel.debugEnabled && tiptapLoader.item) {
+            if (TiptapChannel.tiptapEnabled && tiptapLoader.item) {
                 tiptapWebView.runJavaScript(
                     "if(window.__dvnTiptapEditor)window.__dvnTiptapEditor.commands.focus()");
             }

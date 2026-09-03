@@ -80,6 +80,17 @@ let voiceBridge = null
 
 // voiceSubscribers: voiceId -> Set<handlers>
 const voiceSubscribers = new Map()
+const themeConnectedBridges = new WeakSet()
+
+function connectThemeSignal(bridge) {
+  if (!bridge || themeConnectedBridges.has(bridge)) return
+  if (bridge.themeProvided?.connect) {
+    bridge.themeProvided.connect(function (theme, highlightColor, disableHighlightColor, backgroundColor) {
+      applyTheme(theme, highlightColor, disableHighlightColor, backgroundColor)
+    })
+    themeConnectedBridges.add(bridge)
+  }
+}
 
 /**
  * 注入 voice 桥对象，连接 C++→JS 的 voice 信号并按 voiceId 分发。
@@ -88,6 +99,7 @@ const voiceSubscribers = new Map()
  */
 export function setVoiceBridge(bridge) {
   voiceBridge = bridge
+  connectThemeSignal(bridge)
 
   // 连接 C++→JS 的 voice 信号（防御性，信号在后续提交中添加）。
   // 每个信号携带 voiceId，用于按 voiceId 分发到对应 NodeView。
@@ -99,7 +111,6 @@ export function setVoiceBridge(bridge) {
     'voiceToTextStarted',
     'voiceToTextFailed',
     'voiceToTextCompleted',
-    'themeProvided',
   ]
   for (const sig of signals) {
     if (bridge?.[sig]?.connect) {
@@ -110,11 +121,6 @@ export function setVoiceBridge(bridge) {
 
 function connectVoiceSignal(bridge, signalName) {
   bridge[signalName].connect((...args) => {
-    // voiceId 是每个信号的第一个参数（themeProvided 除外）
-    if (signalName === 'themeProvided') {
-      applyTheme(...args)
-      return
-    }
     const voiceId = args[0]
     const eventMap = {
       voicePlaybackStateChanged: 'onPlaybackStateChanged',
@@ -646,6 +652,11 @@ export function bindTiptapChannel(editor, channelFactory, options = {}) {
           options.onFontList?.(fonts, defaultFont)
         })
       }
+
+      // C++→JS：主题同步必须在 jsEditorReady() 之前绑定。
+      // 宿主会在 editorReady 回调里立即补发当前主题，若这里后绑，
+      // 首次打开暗色主题会丢失信号并停留在 HTML 默认浅色。
+      connectThemeSignal(bridge)
 
       // --- 事件 2：内容变化（节流后回告，不携带摘要） ---
       const debounce = createDebounce(() => {

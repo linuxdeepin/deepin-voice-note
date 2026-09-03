@@ -133,17 +133,17 @@ void VoiceToTextHandler::onA2TSuccess(const QString &text)
 
     // 检查当前笔记是否是发起转换的笔记
     int currentNoteId = VNoteMainManager::instance()->currentNoteId();
-    bool isDebug = TiptapChannelBridge::instance()->debugEnabled();
+    bool isTiptapEnabled = TiptapChannelBridge::instance()->tiptapEnabled();
 
     if (currentNoteId == m_originalNoteId) {
-        if (isDebug) {
+        if (isTiptapEnabled) {
             // Tiptap 路径：仍在原始笔记，通过桥信号通知前端更新语音块
             TiptapChannelBridge::instance()->emitVoiceToTextCompleted(m_originalVoiceId, text);
         } else {
             // Summernote 路径：通过 voiceId 精确定位语音块更新 UI
             Q_EMIT JsContent::instance()->callJsSetVoiceTextByPath(m_originalVoiceId, text, JsContent::AsrFlag::End);
         }
-    } else if (isDebug) {
+    } else if (isTiptapEnabled) {
         // Tiptap 路径：已切换笔记，写回 Tiptap JSON 信封并通知前端
         qInfo() << "Note switched during conversion, saving result to original note:"
                 << m_originalNoteId << "current note:" << currentNoteId;

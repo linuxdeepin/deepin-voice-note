@@ -38,7 +38,8 @@ class TiptapChannelBridge : public QObject
 
     // 适配层属性：宿主资源根路径（供前端拼接 images/ 等相对路径）
     Q_PROPERTY(QString resourceBaseUrl READ resourceBaseUrl CONSTANT)
-    // debug 门控
+    // Tiptap 默认启用；保留 debugEnabled 作为兼容旧 QML/测试的别名。
+    Q_PROPERTY(bool tiptapEnabled READ tiptapEnabled CONSTANT)
     Q_PROPERTY(bool debugEnabled READ debugEnabled CONSTANT)
     Q_PROPERTY(int currentNoteId READ currentNoteId NOTIFY currentNoteChanged)
     Q_PROPERTY(QString currentNoteTitle READ currentNoteTitle NOTIFY currentNoteChanged)
@@ -52,7 +53,10 @@ public:
 
     // --- 适配层方法（Q_INVOKABLE，供 QML / 前端调用） ---
 
-    // 读 DVN_TIPTAP_DEBUG 环境变量，便于 QA 与 GTest
+    // Tiptap 正式启用开关：默认开启；可通过 DVN_TIPTAP_DISABLE=1
+    // 或 DVN_TIPTAP_DEBUG=0 临时回退 Summernote 便于定位问题。
+    Q_INVOKABLE bool tiptapEnabled() const;
+    // 兼容旧调用，语义等同 tiptapEnabled()。
     Q_INVOKABLE bool debugEnabled() const;
 
     // 返回 Tiptap 运行时 HTML 路径（首选 file://，资源缺失时回退 qrc）
@@ -242,6 +246,11 @@ private:
     int m_imageSeq;
     QString m_currentVoiceId;
     QString m_currentSearchQuery;
+    QString m_lastTheme;
+    QString m_lastHighlightColor;
+    QString m_lastDisableHighlightColor;
+    QString m_lastBackgroundColor;
+    bool m_hasTheme { false };
 };
 
 #endif // TIPTAPCHANNELBRIDGE_H

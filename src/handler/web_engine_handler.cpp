@@ -540,10 +540,10 @@ void WebEngineHandler::connectWebContent()
         }
     });
 
-    // 转写结果桥接（调试门控下路由到 TiptapChannelBridge）
+    // 转写结果桥接（Tiptap 模式下路由到 TiptapChannelBridge）
     connect(JsContent::instance(), &JsContent::callJsSetVoiceTextByPath,
             this, [this](const QString &voiceId, const QString &text, int asrFlag) {
-        if (!TiptapChannelBridge::instance()->debugEnabled()) return;
+        if (!TiptapChannelBridge::instance()->tiptapEnabled()) return;
         if (asrFlag == JsContent::AsrFlag::Start) {
             TiptapChannelBridge::instance()->emitVoiceToTextStarted(voiceId);
         } else {
@@ -630,8 +630,8 @@ void WebEngineHandler::onInsertVoiceItem(const QString &voicePath, quint64 voice
     QVariant value;
     parse.makeMetaData(&data, value);
 
-    // 调试门控：Tiptap 编辑器路径，下发相对 voicePath
-    if (TiptapChannelBridge::instance()->debugEnabled()) {
+    // Tiptap 编辑器路径，下发相对 voicePath
+    if (TiptapChannelBridge::instance()->tiptapEnabled()) {
         TiptapChannelBridge::instance()->sendInsertVoiceBlock(value.toString());
         return;
     }
@@ -710,10 +710,10 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
             Q_EMIT JsContent::instance()->callJsSelectAll();
             break;
         case ActionManager::VoiceCopy:
-            if (TiptapChannelBridge::instance()->debugEnabled() && copyTiptapVoiceBlockToClipboard(menuJson)) {
+            if (TiptapChannelBridge::instance()->tiptapEnabled() && copyTiptapVoiceBlockToClipboard(menuJson)) {
                 break;
             }
-            // 非 Tiptap 调试模式或复制失败时继续调用 web 端原生复制事件
+            // 非 Tiptap 模式或复制失败时继续调用 web 端原生复制事件
 #ifdef USE_QT5
             Q_EMIT triggerWebAction((int)QWebEnginePage::Copy);
 #else
@@ -723,7 +723,7 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
         case ActionManager::PictureCopy:
         case ActionManager::TxtCopy:
             if (kind == ActionManager::TxtCopy
-                && TiptapChannelBridge::instance()->debugEnabled()
+                && TiptapChannelBridge::instance()->tiptapEnabled()
                 && copyTiptapTranscriptTextToClipboard(menuJson)) {
                 break;
             }
@@ -748,7 +748,7 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
         case ActionManager::PicturePaste:
         case ActionManager::TxtPaste:
             // 粘贴事件，从剪贴板获取数据
-            onPaste(isVoicePaste() || (TiptapChannelBridge::instance()->debugEnabled() && hasTiptapVoiceBlockClipboard()));
+            onPaste(isVoicePaste() || (TiptapChannelBridge::instance()->tiptapEnabled() && hasTiptapVoiceBlockClipboard()));
             break;
         case ActionManager::PictureView: {
             // 查看图片
@@ -834,7 +834,7 @@ void WebEngineHandler::onMenuClicked(ActionManager::ActionKind kind)
 void WebEngineHandler::onPaste(bool isVoice)
 {
     qDebug() << "Paste operation requested, isVoice:" << isVoice;
-    if (TiptapChannelBridge::instance()->debugEnabled() && hasTiptapVoiceBlockClipboard()) {
+    if (TiptapChannelBridge::instance()->tiptapEnabled() && hasTiptapVoiceBlockClipboard()) {
         if (pasteTiptapVoiceBlockFromClipboard()) {
             qInfo() << "Tiptap voice block paste handled directly";
             return;
@@ -858,7 +858,7 @@ void WebEngineHandler::onPaste(bool isVoice)
     // Tiptap 不使用 JsContent 的 Summernote 插入信号。文件图片通过
     // VNoteMainManager 复用 Tiptap 图片下发链路；位图剪贴板则编码为
     // data URL，交给 TiptapChannelBridge::jsPasteImage 统一落盘。
-    if (TiptapChannelBridge::instance()->debugEnabled() && mimeData) {
+    if (TiptapChannelBridge::instance()->tiptapEnabled() && mimeData) {
         if (mimeData->hasUrls()) {
             qInfo() << "Tiptap paste: mimeData has urls";
             VNoteMainManager::instance()->insertImages(mimeData->urls());
@@ -930,8 +930,8 @@ void WebEngineHandler::processVoiceMenuRequest(QObject *request)
         // 异步操作，防止阻塞前端事件
         QTimer::singleShot(0, this, [this] {
             Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::VoicePathNoAvail);
-            // 调试态下 Tiptap 编辑器不走 Summernote JS 删除路径
-            if (!TiptapChannelBridge::instance()->debugEnabled()) {
+            // Tiptap 模式下不走 Summernote JS 删除路径
+            if (!TiptapChannelBridge::instance()->tiptapEnabled()) {
                 Q_EMIT JsContent::instance()->callJsDeleteSelection();
             }
         });
@@ -968,8 +968,8 @@ void WebEngineHandler::processVoiceMenuRequest(QWebEngineContextMenuRequest *req
         // 异步操作，防止阻塞前端事件
         QTimer::singleShot(0, this, [this] {
             Q_EMIT requestMessageDialog(VNoteMessageDialogHandler::VoicePathNoAvail);
-            // 调试态下 Tiptap 编辑器不走 Summernote JS 删除路径
-            if (!TiptapChannelBridge::instance()->debugEnabled()) {
+            // Tiptap 模式下不走 Summernote JS 删除路径
+            if (!TiptapChannelBridge::instance()->tiptapEnabled()) {
                 Q_EMIT JsContent::instance()->callJsDeleteSelection();
             }
         });

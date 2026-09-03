@@ -68,7 +68,7 @@ TEST(WebRichTextManagerUT, insertVoiceItem)
     SUCCEED();
 }
 
-TEST(WebRichTextManagerUT, insertVoiceItemUsesTiptapBridgeWhenDebugEnabled)
+TEST(WebRichTextManagerUT, insertVoiceItemUsesTiptapBridgeWhenTiptapEnabled)
 {
     const QByteArray oldDebug = qgetenv("DVN_TIPTAP_DEBUG");
     qputenv("DVN_TIPTAP_DEBUG", "1");
