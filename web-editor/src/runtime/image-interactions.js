@@ -177,7 +177,8 @@ function findImageTarget(dom, target) {
 }
 
 function imagePosFromElement(editor, img) {
-  const pos = editor.view.posAtDOM(img, 0)
+  const nodeDom = img?.closest?.('[data-dvn-image-node]') || img
+  const pos = editor.view.posAtDOM(nodeDom, 0)
   return pos == null || pos < 0 ? null : pos
 }
 
@@ -387,7 +388,7 @@ function editorContentBounds(dom) {
 
 function imageRowBounds(dom, img) {
   const rect = img.getBoundingClientRect()
-  const paragraph = img.parentElement?.tagName === 'P' ? img.parentElement : null
+  const paragraph = img.closest?.('p') || (img.parentElement?.tagName === 'P' ? img.parentElement : null)
   const rowRect = paragraph?.getBoundingClientRect?.() || rect
   const editorBounds = editorContentBounds(dom)
 
@@ -448,41 +449,9 @@ function ensureImageSelectionStyles() {
   document.head.appendChild(style)
 }
 
-function createImageSelectionOverlay() {
-  ensureImageSelectionStyles()
-  const overlay = document.createElement('div')
-  overlay.className = 'dvn-image-selection'
-  overlay.setAttribute('data-testid', 'tiptap-image-selection')
-  document.body.appendChild(overlay)
-  return overlay
-}
-
-function selectedImageElement(editor) {
-  const { selection } = editor.state
-  if (selection.node?.type?.name !== 'image') return null
-  const dom = editor.view.nodeDOM(selection.from)
-  if (dom?.tagName === 'IMG') return dom
-  return dom?.querySelector?.('img') || null
-}
-
-function updateImageSelectionOverlay(editor, overlay) {
-  const img = selectedImageElement(editor)
-  if (!img || !document.contains(img)) {
-    overlay.style.display = 'none'
-    return
-  }
-
-  const rect = img.getBoundingClientRect()
-  if (rect.width <= 0 || rect.height <= 0) {
-    overlay.style.display = 'none'
-    return
-  }
-
-  overlay.style.display = 'block'
-  overlay.style.left = `${Math.round(rect.left + window.scrollX)}px`
-  overlay.style.top = `${Math.round(rect.top + window.scrollY)}px`
-  overlay.style.width = `${Math.round(rect.width)}px`
-  overlay.style.height = `${Math.round(rect.height)}px`
+function syncImageSelectionState() {
+  // 图片选中高亮已经由 ImageBlock NodeView 绑定到图片节点自身。
+  // 这里保留同步入口，避免事件处理分支为了选中态再散落特殊判断。
 }
 
 /**
@@ -497,7 +466,7 @@ function updateImageSelectionOverlay(editor, overlay) {
 export function setupImageViewAndMenu(editor, bridge) {
   if (!editor || !bridge) return () => {}
   const dom = editor.view.dom
-  const overlay = createImageSelectionOverlay()
+  ensureImageSelectionStyles()
 
   function viewOriginal(img) {
     const src = img.getAttribute('src') || ''
@@ -505,7 +474,7 @@ export function setupImageViewAndMenu(editor, bridge) {
   }
 
   function syncOverlay() {
-    updateImageSelectionOverlay(editor, overlay)
+    syncImageSelectionState()
   }
 
   function onMouseDown(event) {
@@ -579,20 +548,11 @@ export function setupImageViewAndMenu(editor, bridge) {
   dom.addEventListener('keydown', onKeyDown)
   dom.addEventListener('dblclick', onDblClick)
   dom.addEventListener('contextmenu', onContextMenu)
-  editor.on('transaction', syncOverlay)
-  window.addEventListener('scroll', syncOverlay, true)
-  window.addEventListener('resize', syncOverlay)
-  syncOverlay()
-
   return function destroy() {
     dom.removeEventListener('mousedown', onMouseDown, true)
     dom.removeEventListener('click', onClick)
     dom.removeEventListener('keydown', onKeyDown)
     dom.removeEventListener('dblclick', onDblClick)
     dom.removeEventListener('contextmenu', onContextMenu)
-    editor.off('transaction', syncOverlay)
-    window.removeEventListener('scroll', syncOverlay, true)
-    window.removeEventListener('resize', syncOverlay)
-    if (overlay.parentNode) overlay.parentNode.removeChild(overlay)
   }
 }

@@ -1,14 +1,43 @@
 /* SPDX-FileCopyrightText: 2026 UnionTech Software Technology Co., Ltd.
    SPDX-License-Identifier: GPL-3.0-or-later */
 
-/* Match Summernote/browser image selection: a simple theme-color overlay. */
-.dvn-image-selection {
+/*
+ * 图片选中态绑定在图片节点自身上，而不是在 body/content-scroll 外面
+ * 另画一个坐标浮层。这样正文缩放、滚动、布局变化后，高亮天然跟随
+ * 当前图片的实际可视区域，不需要手工换算 left/top/width/height。
+ */
+.dvn-image-node {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    line-height: 0;
+    vertical-align: top;
+}
+
+.dvn-image-node > img[data-rel-path] {
+    box-sizing: border-box;
+    display: block;
+    padding: 4px !important;
+    max-width: 100% !important;
+}
+
+.dvn-image-node.ProseMirror-selectednode,
+.dvn-image-node > img.ProseMirror-selectednode {
+    outline: none !important;
+}
+
+.dvn-image-node-selection {
     position: absolute;
     display: none;
+    inset: 0;
     box-sizing: border-box;
     pointer-events: none;
-    z-index: 9;
     background: var(--dvn-active-selection-bg, rgba(0, 129, 255, 0.6));
+}
+
+.dvn-image-node.ProseMirror-selectednode > .dvn-image-node-selection,
+.dvn-image-node.dvn-image-node-selected > .dvn-image-node-selection {
+    display: block;
 }
 
 /*
@@ -18,11 +47,12 @@
  * visible blank row between consecutive images.  Use pure CSS so copy/save DOM
  * paths are not polluted by runtime helper nodes or class mutations.
  */
+.ProseMirror p:has(> .dvn-image-node:first-child + img.ProseMirror-separator + br.ProseMirror-trailingBreak:last-child),
 .ProseMirror p:has(> img[data-rel-path]:first-child + img.ProseMirror-separator + br.ProseMirror-trailingBreak:last-child) {
     min-height: 0;
-    line-height: 0;
 }
 
+.ProseMirror p:has(> .dvn-image-node:first-child + img.ProseMirror-separator + br.ProseMirror-trailingBreak:last-child) > .dvn-image-node,
 .ProseMirror p:has(> img[data-rel-path]:first-child + img.ProseMirror-separator + br.ProseMirror-trailingBreak:last-child) > img[data-rel-path] {
     vertical-align: top;
 }
@@ -38,6 +68,12 @@
     vertical-align: top !important;
 }
 
+.ProseMirror p:has(> .dvn-image-node:first-child + img.ProseMirror-separator + br.ProseMirror-trailingBreak:last-child) > br.ProseMirror-trailingBreak,
 .ProseMirror p:has(> img[data-rel-path]:first-child + img.ProseMirror-separator + br.ProseMirror-trailingBreak:last-child) > br.ProseMirror-trailingBreak {
+    display: inline-block;
+    width: 0;
+    height: 0;
     line-height: 0;
+    font-size: 0;
+    overflow: hidden;
 }
