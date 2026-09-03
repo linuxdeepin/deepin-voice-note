@@ -306,7 +306,7 @@ TEST(WebEngineHandlerCoverageUT, ConnectWebContent_VoiceFileError)
 
 // L410 lambda: callJsSetVoiceTextByPath(voiceId, text, asrFlag).
 // All three branches (Start / End+empty -> Failed / End+text -> Completed)
-// require the debug gate (DVN_TIPTAP_DEBUG) to be open.
+// require the Tiptap bridge to be enabled.
 TEST(WebEngineHandlerCoverageUT, ConnectWebContent_CallJsSetVoiceTextByPath)
 {
     qputenv("DVN_TIPTAP_DEBUG", "1");

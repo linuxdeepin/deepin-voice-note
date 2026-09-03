@@ -94,7 +94,7 @@ void WebRichTextManager::setData(VNoteItem *data, const QString reg)
     m_noteData = data;
     m_updateTimer->stop();
 
-    if (TiptapChannelBridge::instance()->debugEnabled()
+    if (TiptapChannelBridge::instance()->tiptapEnabled()
         && LegacyFormatDetector::detect(data->metaDataConstRef().toString()) == LegacyFormat::TiptapEnvelope) {
         TiptapChannelBridge::instance()->loadEnvelope(data->metaDataConstRef().toString());
         m_updateTimer->start();
@@ -269,7 +269,7 @@ void WebRichTextManager::insertVoiceItem(const QString &voicePath, qint64 voiceS
     parse.makeMetaData(&data, value);
 
     const QString voiceInfoJson = value.toString();
-    if (TiptapChannelBridge::instance()->debugEnabled()) {
+    if (TiptapChannelBridge::instance()->tiptapEnabled()) {
         TiptapChannelBridge::instance()->sendInsertVoiceBlock(voiceInfoJson);
         qDebug() << "Tiptap voice block insert requested successfully, voiceId:" << data.ptrVoice->voiceId;
         return;

@@ -127,12 +127,12 @@ int main(int argc, char *argv[])
     engine.load(url);
     qInfo() << "QML engine loaded successfully";
 
-    // Tiptap 数据迁移仍处于调试验证阶段，只允许在 DVN_TIPTAP_DEBUG=1 下启动。
-    // 未开启调试开关时，禁止展示迁移页、备份、扫描或写回 Summernote 数据。
-    if (TiptapChannelBridge::instance()->debugEnabled()) {
+    // Tiptap 已作为默认富文本编辑器，默认执行存量 Summernote 数据迁移。
+    // 如需临时回退旧编辑器，可显式设置 DVN_TIPTAP_DISABLE=1。
+    if (TiptapChannelBridge::instance()->tiptapEnabled()) {
         MigrationViewController::instance()->start();
     } else {
-        qInfo() << "Tiptap migration skipped because DVN_TIPTAP_DEBUG is not set";
+        qInfo() << "Tiptap migration skipped because Tiptap is disabled by environment";
     }
 
     DLogManager::registerConsoleAppender();

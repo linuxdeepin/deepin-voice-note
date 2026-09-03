@@ -30,7 +30,7 @@ void MigrationViewController::start()
     qRegisterMetaType<MigrationOrchestrator::ProgressSnapshot>();
     qRegisterMetaType<MigrationState>();
 
-    if (!TiptapChannelBridge::instance()->debugEnabled()) {
+    if (!TiptapChannelBridge::instance()->tiptapEnabled()) {
         qCInfo(lcMigrationView) << "start: Tiptap migration disabled by environment";
         setMigrationActive(false);
         setTerminalState(QString());

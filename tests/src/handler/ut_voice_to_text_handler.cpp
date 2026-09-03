@@ -14,8 +14,8 @@
 
 static bool stub_net_false() { return false; }
 static bool stub_net_true() { return true; }
-static bool stub_debug_true() { return true; }
-static bool stub_debug_false() { return false; }
+static bool stub_tiptap_true() { return true; }
+static bool stub_tiptap_false() { return false; }
 static void stub_startAsr(const QString &, qint64) { /* no-op: avoid real ASR */ }
 
 TEST(VoiceToTextHandlerUT, setAudio_nullBlock)
@@ -69,29 +69,29 @@ TEST(VoiceToTextHandlerUT, a2tCallbacks)
     h.onA2TStart();
     h.onA2TError(1);
 
-    // success, same note, debug false (Summernote path)
+    // success, same note, Tiptap disabled (Summernote path)
     {
         Stub s;
-        s.set(ADDR(TiptapChannelBridge, debugEnabled), stub_debug_false);
+        s.set(ADDR(TiptapChannelBridge, tiptapEnabled), stub_tiptap_false);
         h.onA2TSuccess("hello");
     }
-    // success, same note, debug true (Tiptap path)
+    // success, same note, Tiptap enabled (Tiptap path)
     {
         Stub s;
-        s.set(ADDR(TiptapChannelBridge, debugEnabled), stub_debug_true);
+        s.set(ADDR(TiptapChannelBridge, tiptapEnabled), stub_tiptap_true);
         h.onA2TSuccess("hello");
     }
-    // success, switched note (originalNoteId != currentNoteId), debug true
+    // success, switched note (originalNoteId != currentNoteId), Tiptap enabled
     {
         Stub s;
-        s.set(ADDR(TiptapChannelBridge, debugEnabled), stub_debug_true);
+        s.set(ADDR(TiptapChannelBridge, tiptapEnabled), stub_tiptap_true);
         h.m_originalNoteId = 999;
         h.onA2TSuccess("hello");
     }
-    // success, switched note, debug false
+    // success, switched note, Tiptap disabled
     {
         Stub s;
-        s.set(ADDR(TiptapChannelBridge, debugEnabled), stub_debug_false);
+        s.set(ADDR(TiptapChannelBridge, tiptapEnabled), stub_tiptap_false);
         h.m_originalNoteId = 999;
         h.onA2TSuccess("hello");
     }

@@ -789,7 +789,7 @@ void VNoteMainManager::doCreateNote(int folderId)
     // Get default note name in the folder
     tmpNote.noteTitle = noteOper.getDefaultNoteName(tmpNote.folderId);
 
-    if (TiptapChannelBridge::instance()->debugEnabled()) {
+    if (TiptapChannelBridge::instance()->tiptapEnabled()) {
         tmpNote.htmlCode = "";
         tmpNote.setMetadata(MigrationJsonBuilder::toCompactJson(MigrationJsonBuilder::makeEnvelope()));
     }
@@ -1629,7 +1629,7 @@ void VNoteMainManager::insertImages(const QList<QUrl> &filePaths)
     }
     if (!paths.isEmpty()) {
         qDebug() << "Inserting" << paths.size() << "images into note";
-        if (TiptapChannelBridge::instance()->debugEnabled()) {
+        if (TiptapChannelBridge::instance()->tiptapEnabled()) {
             for (const QString &relPath : paths) {
                 QJsonObject imageInfo;
                 imageInfo.insert(QStringLiteral("relPath"), relPath);
