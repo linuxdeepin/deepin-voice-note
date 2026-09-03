@@ -214,37 +214,60 @@ function setupEditorWithImage() {
 }
 
 
-test('image insertion and click expose theme-color selected overlay', () => {
+test('image insertion and click expose theme-color selected overlay bound to image node', () => {
   const { editor, img, destroy } = setupEditorWithImage()
   assert.ok(img, 'image element should be rendered')
 
-  Object.defineProperty(img, 'getBoundingClientRect', {
-    configurable: true,
-    value: () => ({ left: 10, top: 20, width: 120, height: 80, right: 130, bottom: 100 }),
-  })
-
-  // Inline images keep the caret after insertion; clicking the image still shows
-  // the same simple theme-color cover as a browser image selection.
+  // The selected cover must be part of the image node itself, not a manually
+  // positioned global overlay.  This makes the cover follow the current visual
+  // image box through zoom, scroll and relayout without coordinate conversion.
   const style = document.getElementById('dvn-tiptap-image-block-style')
   assert.ok(style, 'image selection style should be injected')
   const imageBlockCss = readFileSync(new URL('../src/extensions/image-block.css', import.meta.url), 'utf8')
-  assert.match(imageBlockCss, /dvn-image-selection/)
+  assert.match(imageBlockCss, /dvn-image-node-selection/)
   assert.match(imageBlockCss, /--dvn-active-selection-bg/)
   assert.doesNotMatch(imageBlockCss, /control-holder|control-sizing|dvn-image-selection-bg/)
+  assert.doesNotMatch(
+    imageBlockCss,
+    /p:has\([^{}]+\)\s*\{[^}]*line-height:\s*0/s,
+    'pure image paragraph must keep normal line-height so typing after image still creates text',
+  )
+
+  const wrapper = img.closest('[data-dvn-image-node]')
+  assert.ok(wrapper, 'image should be rendered by the image node view')
+  const overlay = wrapper.querySelector('[data-testid="tiptap-image-selection"]')
+  assert.ok(overlay, 'image selection overlay should be mounted inside the image node')
+  assert.equal(overlay.parentNode, wrapper)
 
   img.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }))
-  const overlay = document.querySelector('[data-testid="tiptap-image-selection"]')
-  assert.ok(overlay, 'image selection overlay should be mounted')
-  assert.equal(overlay.style.display, 'block')
-  assert.equal(overlay.style.left, '10px')
-  assert.equal(overlay.style.top, '20px')
-  assert.equal(overlay.style.width, '120px')
-  assert.equal(overlay.style.height, '80px')
-  assert.ok(img.classList.contains('ProseMirror-selectednode'), 'clicked image should stay node-selected')
+  assert.equal(editor.state.selection.node?.type?.name, 'image')
+  assert.ok(wrapper.classList.contains('dvn-image-node-selected'), 'clicked image node should expose selected state')
   destroy()
   editor.destroy()
 })
 
+
+test('image selection overlay is node-bound and does not store stale zoom geometry', () => {
+  const { editor, img, destroy } = setupEditorWithImage()
+  assert.ok(img, 'image element should be rendered')
+
+  const wrapper = img.closest('[data-dvn-image-node]')
+  const overlay = wrapper?.querySelector('[data-testid="tiptap-image-selection"]')
+  assert.ok(wrapper, 'image wrapper should exist')
+  assert.ok(overlay, 'node-bound selection overlay should exist')
+
+  img.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }))
+  window.dispatchEvent(new CustomEvent('dvn-tiptap-content-zoom-changed', { detail: { zoom: 1.5 } }))
+
+  assert.equal(overlay.parentNode, wrapper)
+  assert.equal(overlay.style.left, '', 'node-bound overlay should not cache viewport left')
+  assert.equal(overlay.style.top, '', 'node-bound overlay should not cache viewport top')
+  assert.equal(overlay.style.width, '', 'node-bound overlay should not cache viewport width')
+  assert.equal(overlay.style.height, '', 'node-bound overlay should not cache viewport height')
+  assert.ok(wrapper.classList.contains('dvn-image-node-selected'))
+  destroy()
+  editor.destroy()
+})
 
 test('mousedown on the right side of an image moves caret after the image', () => {
   const { editor, img, destroy } = setupEditorWithImage()
@@ -268,6 +291,33 @@ test('mousedown on the right side of an image moves caret after the image', () =
   assert.equal(editor.state.selection.from, 2, 'caret should be in the paragraph after image')
   assert.deepEqual(editor.getJSON().content.map(node => node.type), ['paragraph'])
   assert.equal(editor.getJSON().content[0].content[0].type, 'image')
+  destroy()
+  editor.destroy()
+})
+
+test('typing after a clicked image keeps text after the image in the same paragraph', () => {
+  const { editor, img, destroy } = setupEditorWithImage()
+  assert.ok(img, 'image element should be rendered')
+
+  Object.defineProperty(img, 'getBoundingClientRect', {
+    configurable: true,
+    value: () => ({ left: 10, top: 20, width: 120, height: 80, right: 130, bottom: 100 }),
+  })
+
+  const event = new MouseEvent('mousedown', {
+    bubbles: true,
+    cancelable: true,
+    clientX: 150,
+    clientY: 40,
+  })
+  editor.view.dom.dispatchEvent(event)
+  editor.commands.insertContent('hello')
+
+  const doc = editor.getJSON()
+  assert.equal(doc.content.length, 1, 'text typed after an image must not create a new paragraph')
+  assert.equal(doc.content[0].type, 'paragraph')
+  assert.deepEqual(doc.content[0].content.map(node => node.type), ['image', 'text'])
+  assert.equal(doc.content[0].content[1].text, 'hello')
   destroy()
   editor.destroy()
 })

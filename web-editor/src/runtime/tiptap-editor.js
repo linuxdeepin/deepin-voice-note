@@ -154,7 +154,8 @@ if (typeof window !== 'undefined') {
   window.__dvnTiptapSelectImageFromElement = function (element) {
     const img = element && element.closest ? element.closest('img[data-rel-path]') : null
     if (!img || !document.contains(img)) return false
-    const pos = editor.view.posAtDOM(img, 0)
+    const nodeDom = img.closest('[data-dvn-image-node]') || img
+    const pos = editor.view.posAtDOM(nodeDom, 0)
     if (pos == null || pos < 0) return false
     return editor.chain().focus().setNodeSelection(pos).run()
   }

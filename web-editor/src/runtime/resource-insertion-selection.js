@@ -42,8 +42,9 @@ function bareImageCursorFromDomImage(editor, img, side) {
   if (!editor?.view || !img) return null
 
   let imagePos = null
+  const nodeDom = img.closest?.('[data-dvn-image-node]') || img
   try {
-    imagePos = editor.view.posAtDOM(img, 0)
+    imagePos = editor.view.posAtDOM(nodeDom, 0)
   } catch (err) {
     console.warn('[tiptap] resolve drop image DOM position failed:', err)
     return null
@@ -91,7 +92,7 @@ function selectionNearBareImageLine(editor, left, top) {
   for (const img of images) {
     const rect = img.getBoundingClientRect()
     if (rect.width <= 0 || rect.height <= 0) continue
-    const paragraph = img.parentElement?.tagName === 'P' ? img.parentElement : null
+    const paragraph = img.closest?.('p') || (img.parentElement?.tagName === 'P' ? img.parentElement : null)
     const rowRect = paragraph?.getBoundingClientRect?.() || rect
     const rowTop = Math.min(rowRect.height > 0 ? rowRect.top : rect.top, rect.top)
     const rowBottom = Math.max(rowRect.height > 0 ? rowRect.bottom : rect.bottom, rect.bottom)
