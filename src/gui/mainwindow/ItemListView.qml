@@ -387,7 +387,7 @@ Item {
 
     DragControl {
         Accessible.name: "ItemListDragControl"
-        Accessible.role: Accessible.Panel
+        Accessible.role: Accessible.Pane
 
         id: dragControl
 
@@ -624,7 +624,7 @@ Item {
 
     VNoteRightMenu {
         Accessible.name: "NoteContextMenu"
-        Accessible.role: Accessible.Menu
+        Accessible.role: Accessible.PopupMenu
 
         id: noteCtxMenu
 

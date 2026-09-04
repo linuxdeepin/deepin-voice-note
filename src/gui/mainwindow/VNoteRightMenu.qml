@@ -9,7 +9,6 @@ import org.deepin.dtk 1.0
 
 // 动态创建不同类型的右键菜单
 Menu {
-    Accessible.name: "NoteRightMenu"
     id: rightMenu
 
     // 菜单类型 ActionManager::MenuType
@@ -138,7 +137,6 @@ Menu {
         id: menuCreator
 
         Menu {
-            Accessible.name: "CtxSubMenu"
             property int menuId: 0
 
             height: visible ? implicitHeight : 0
@@ -149,7 +147,9 @@ Menu {
         id: menuItemCreator
 
         MenuItem {
-            Accessible.name: ActionManager.actionText(menuId)
+            id: menuItem
+            Accessible.name: ActionManager.actionText(menuItem.menuId)
+            Accessible.onPressAction: menuItem.triggered()
             property int menuId: 0
 
             height: visible ? implicitHeight : 0

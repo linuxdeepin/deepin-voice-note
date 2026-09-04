@@ -14,6 +14,8 @@ import org.deepin.dtk 1.0
 
 Item {
     id: rootWindow
+    Accessible.name: "VoiceNoteMainWindow"
+    Accessible.role: Accessible.Pane
 
     anchors.fill: parent
 
@@ -99,7 +101,7 @@ Item {
 
     Shortcuts {
         Accessible.name: "MainShortcuts"
-        Accessible.role: Accessible.Panel
+        Accessible.role: Accessible.Pane
 
         id: shortcuts
 
@@ -537,6 +539,7 @@ Item {
 
     VNoteComponents.VNoteToolButton {
         Accessible.name: "TwoColumnModeButton"
+        Accessible.ignored: false
         Accessible.role: Accessible.Button
 
         id: twoColumnModeBtn
@@ -563,7 +566,7 @@ Item {
     // 全窗级毛玻璃：左侧文件夹栏 + 笔记列表区域透明可见，列表项保持实色卡片
     VNoteComponents.SidebarBlurBackground {
         Accessible.name: "SidebarBlurBackground"
-        Accessible.role: Accessible.Panel
+        Accessible.role: Accessible.Pane
 
         anchors.fill: parent
         windowControl: Window.window
@@ -791,6 +794,7 @@ Item {
 
                 VNoteComponents.VNoteToolButton {
                     Accessible.name: "ToolBarMoreButton"
+                    Accessible.ignored: false
                     Accessible.role: Accessible.Button
 
                     Layout.alignment: Text.AlignRight
@@ -923,6 +927,7 @@ Item {
 
                     VNoteComponents.VNoteToolButton {
                         Accessible.name: "NewNoteButton"
+                        Accessible.ignored: false
                         Accessible.role: Accessible.Button
 
                         id: newNoteBtn
@@ -1063,7 +1068,7 @@ Item {
 
                 WebEngineView {
                     Accessible.name: "NoteContentWebView"
-                    Accessible.role: Accessible.Panel
+                    Accessible.role: Accessible.Pane
 
                     id: webEngineView
 
@@ -1219,7 +1224,7 @@ Item {
 
             InitialInterface {
                 Accessible.name: "InitialInterface"
-                Accessible.role: Accessible.Panel
+                Accessible.role: Accessible.Pane
 
                 id: initiaInterface
 

@@ -77,6 +77,7 @@ FocusScope {
 
         VNoteComponents.VNoteToolButton {
             Accessible.name: "PauseButton"
+            Accessible.ignored: false
             Accessible.role: Accessible.Button
             id: pauseBtn
 
@@ -113,6 +114,7 @@ FocusScope {
 
         VNoteComponents.VNoteToolButton {
             Accessible.name: "StopButton"
+            Accessible.ignored: false
             Accessible.role: Accessible.Button
             id: stopBtn
 

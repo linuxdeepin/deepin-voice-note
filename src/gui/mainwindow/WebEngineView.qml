@@ -557,7 +557,7 @@ Item {
 
             WindowTitleBar {
                 Accessible.name: "WebViewTitleBar"
-                Accessible.role: Accessible.Panel
+                Accessible.role: Accessible.Pane
 
                 id: title
 
@@ -600,8 +600,7 @@ Item {
             color: DTK.themeType === ApplicationHelper.LightType ? "#FFFFFF" : "#242424"
 
             WebEngineView {
-                Accessible.name: "WebView"
-                Accessible.role: Accessible.Panel
+                Accessible.ignored: true
 
                 id: webView
 
@@ -762,12 +761,13 @@ Item {
             onYChanged: rootItem.scheduleTiptapToolbarSeparatorSync()
 
             sourceComponent: Item {
+                Accessible.name: "TiptapWebView"
+                Accessible.role: Accessible.Pane
                 property WebEngineView editor: tiptapWebView
                 anchors.fill: parent
 
                 WebEngineView {
-                    Accessible.name: "TiptapWebView"
-                    Accessible.role: Accessible.Panel
+                    Accessible.ignored: true
 
                     id: tiptapWebView
 
@@ -916,7 +916,7 @@ Item {
 
             sourceComponent: MultipleChoices {
                 Accessible.name: "MultipleChoicesView"
-                Accessible.role: Accessible.Panel
+                Accessible.role: Accessible.Pane
 
                 anchors.fill: parent
 
@@ -1005,7 +1005,7 @@ Item {
 
         VNoteRightMenu {
             Accessible.name: "PictureContextMenu"
-            Accessible.role: Accessible.Menu
+            Accessible.role: Accessible.PopupMenu
 
             id: picturCtxMenu
 
@@ -1034,7 +1034,7 @@ Item {
 
         VNoteRightMenu {
             Accessible.name: "VoiceContextMenu"
-            Accessible.role: Accessible.Menu
+            Accessible.role: Accessible.PopupMenu
 
             id: voiceCtxMenu
 
@@ -1067,7 +1067,7 @@ Item {
 
         VNoteRightMenu {
             Accessible.name: "TextContextMenu"
-            Accessible.role: Accessible.Menu
+            Accessible.role: Accessible.PopupMenu
 
             id: txtCtxMenu
 
@@ -1157,7 +1157,7 @@ Item {
 
         sourceComponent: RecordingView {
             Accessible.name: "RecordingBar"
-            Accessible.role: Accessible.Panel
+            Accessible.role: Accessible.Pane
 
             id: recordingBar
 

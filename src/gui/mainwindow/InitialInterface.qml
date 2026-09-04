@@ -31,7 +31,7 @@ Item {
 
         menu: TitleBarMenu {
             Accessible.name: "InitialInterfaceTitleBarMenu"
-            Accessible.role: Accessible.Menu
+            Accessible.role: Accessible.PopupMenu
             onOpenPrivacy: {
                 VNoteMainManager.showPrivacy();
             }

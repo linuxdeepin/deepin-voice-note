@@ -17,7 +17,9 @@ import org.deepin.dtk 1.0
  */
 ToolButton {
     id: root
-    Accessible.name: "VNoteToolButton"
+    // Base component template is not a runtime locator; concrete instances
+    // provide their own Accessible.name and opt back into accessibility.
+    Accessible.ignored: true
 
     activeFocusOnTab: true
     display: text.length > 0 ? AbstractButton.TextBesideIcon : AbstractButton.IconOnly
@@ -26,7 +28,7 @@ ToolButton {
 
     background: VNoteButtonBackground {
         Accessible.name: "VNoteToolButtonBackground"
-        Accessible.role: Accessible.Panel
+        Accessible.role: Accessible.Pane
         button: root
     }
 
