@@ -37,7 +37,7 @@ TitleBar {
     }
     menu: TitleBarMenu {
         Accessible.name: "TitleBarMenu"
-        Accessible.role: Accessible.Menu
+        Accessible.role: Accessible.PopupMenu
         id: tMenu
 
         onOpenPrivacy: {

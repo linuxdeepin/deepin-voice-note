@@ -4,6 +4,7 @@ import org.deepin.dtk 1.0
 
 Menu {
     Accessible.name: "TitleBarMenu"
+    Accessible.role: Accessible.PopupMenu
     signal openPrivacy
     signal openSetting
 
@@ -13,6 +14,7 @@ Menu {
 
     MenuItem {
         Accessible.name: "SettingsMenuItem"
+        Accessible.onPressAction: settingsControl.triggered()
         id: settingsControl
 
         text: qsTr("Settings")
@@ -28,6 +30,7 @@ Menu {
 
     MenuItem {
         Accessible.name: "PrivacyPolicyMenuItem"
+        Accessible.onPressAction: privacyBtn.triggered()
         id: privacyBtn
 
         text: qsTr("Privacy Policy")
@@ -68,6 +71,8 @@ Menu {
 
     MenuItem {
         Accessible.name: "ExitMenuItem"
+        Accessible.onPressAction: exitControl.triggered()
+        id: exitControl
         text: qsTr("Exit")
         onTriggered: {
             var win = ApplicationWindow.window;

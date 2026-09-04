@@ -15,9 +15,6 @@ import org.deepin.dtk 1.0
 ApplicationWindow {
     id: rootWindow
 
-    Accessible.name: "VoiceNoteMainWindow"
-    Accessible.role: Accessible.Window
-
     property bool workspaceActive: workspaceLoader.active
     property bool createFirstNotebook: false
     property bool isRecording: workspaceLoader.item ? workspaceLoader.item.isRecording : false

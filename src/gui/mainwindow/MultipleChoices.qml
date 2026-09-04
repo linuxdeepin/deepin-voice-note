@@ -67,6 +67,7 @@ Item {
 
                     VNoteComponents.VNoteToolButton {
                         Accessible.name: "MoveButton"
+                        Accessible.ignored: false
                         Accessible.role: Accessible.Button
                         icon.name: "move_note"
                         implicitHeight: 40
@@ -81,6 +82,7 @@ Item {
 
                     VNoteComponents.VNoteToolButton {
                         Accessible.name: "SaveNoteButton"
+                        Accessible.ignored: false
                         Accessible.role: Accessible.Button
                         icon.name: "save_note"
                         implicitHeight: 40
@@ -96,6 +98,7 @@ Item {
 
                     VNoteComponents.VNoteToolButton {
                         Accessible.name: "SaveVoiceButton"
+                        Accessible.ignored: false
                         Accessible.role: Accessible.Button
                         icon.name: "save_audio"
                         implicitHeight: 40
@@ -112,6 +115,7 @@ Item {
 
                     VNoteComponents.VNoteToolButton {
                         Accessible.name: "DeleteButton"
+                        Accessible.ignored: false
                         Accessible.role: Accessible.Button
                         icon.name: "delete"
                         implicitHeight: 40

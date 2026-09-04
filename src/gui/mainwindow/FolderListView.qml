@@ -288,7 +288,7 @@ Item {
 
     DragControl {
         Accessible.name: "FolderDragControl"
-        Accessible.role: Accessible.Panel
+        Accessible.role: Accessible.Pane
         id: dragControl
 
     }
