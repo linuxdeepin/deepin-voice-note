@@ -14,6 +14,7 @@ Build-Depends:
  qt6-multimedia-dev [!mipsel !mips64el] | qtmultimedia5-dev [mipsel mips64el],
  qt6-l10n-tools [!mipsel !mips64el],
  pkg-config,
+ libxml2-dev,
  libsqlite3-dev,
  libglib2.0-dev,
  libdtk6core-dev [!mipsel !mips64el] | libdtkcore-dev [mipsel mips64el],
