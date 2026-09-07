@@ -80,7 +80,7 @@ install(FILES ${APP_CONFIG} DESTINATION share/deepin-voice-note)
 install(FILES ${APP_LOGO} DESTINATION  ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps/)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/src/web    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/deepin-voice-note)
 # TTP-022: 安装 Tiptap 运行时打包产物
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/web-editor/dist    DESTINATION ${CMAKE_INSTALL_PREFIX}/share/deepin-voice-note/tiptap)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/web-editor/dist/   DESTINATION ${CMAKE_INSTALL_PREFIX}/share/deepin-voice-note/tiptap)
 install(FILES ${CMAKE_SOURCE_DIR}/assets/org.deepin.voicenote.service DESTINATION share/dbus-1/services)
 if (${CMAKE_SYSTEM_PROCESSOR} MATCHES "sw_64")
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/sw/deepin-voice-note     DESTINATION share/deepin-manual/manual-assets/application/)
