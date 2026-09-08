@@ -1,0 +1,112 @@
+unreachable:
+  - name: model.name
+    reason: |
+      动态绑定名称（model.name），含 "."，cover.py 过滤为噪声。
+      ItemListView 中 Rectangle 的 Accessible.name 绑定模型数据，无法静态定位。
+  - name: ActionManager.actionTextmenuItem.menuId
+    reason: |
+      动态拼接名称（含 "."），cover.py 过滤为噪声。
+      VNoteRightMenu.qml 中 MenuItem 的 Accessible.name 由 ActionManager 动态生成，无法静态定位。
+  - name: VNoteButton
+    reason: |
+      通用按钮组件（gui/VNoteButton.qml），非场景1直接交互控件。
+      场景1仅验证 Tiptap 默认启动与主编辑区可用，不涉及通用按钮组件本身。
+  - name: VNoteToolButtonBackground
+    reason: |
+      通用工具按钮背景（gui/VNoteToolButton.qml），非场景1直接交互控件。
+  - name: FolderList
+    reason: |
+      MoveDialog 中的文件夹列表，属于移动对话框内部控件，不在场景1范围内。
+  - name: FolderListScrollBar
+    reason: |
+      文件夹列表滚动条，附属控件，不在场景1范围内。
+  - name: CancelButton
+    reason: |
+      对话框取消按钮，属于消息对话框内部控件，不在场景1范围内。
+  - name: RestoreDefaultsButton
+    reason: |
+      设置对话框中的恢复默认按钮，不在场景1范围内。
+  - name: InternalRadioButton
+    reason: |
+      设置对话框中的单选按钮，不在场景1范围内。
+  - name: MicrophoneRadioButton
+    reason: |
+      设置对话框中的单选按钮，不在场景1范围内。
+  - name: FolderMessageDialogLoader
+    reason: |
+      文件夹列表的消息对话框加载器，不在场景1范围内。
+  - name: FolderItemContextMenu
+    reason: |
+      文件夹右键菜单，属于上下文操作，不在场景1范围内。
+  - name: RenameMenuItem
+    reason: |
+      右键菜单重命名项，属于上下文操作，不在场景1范围内。
+  - name: DeleteFolderMenuItem
+    reason: |
+      右键菜单删除文件夹项，属于上下文操作，不在场景1范围内。
+  - name: NewNoteFromFolderMenuItem
+    reason: |
+      右键菜单新建笔记项，属于上下文操作，不在场景1范围内。
+  - name: ItemListMessageDialog
+    reason: |
+      笔记列表的消息对话框，不在场景1范围内。
+  - name: NoteListScrollBar
+    reason: |
+      笔记列表滚动条，附属控件，不在场景1范围内。
+  - name: MainShortcuts
+    reason: |
+      全局快捷键处理器，非可视交互控件，不在场景1范围内。
+  - name: MainMessageDialog
+    reason: |
+      主窗口消息对话框，不在场景1范围内。
+  - name: TwoColumnModeButton
+    reason: |
+      双列模式切换按钮，属于视图模式操作，不在场景1范围内。
+  - name: ToolBarMoreButton
+    reason: |
+      工具栏更多按钮，属于工具栏操作，不在场景1范围内。
+  - name: MoveButton
+    reason: |
+      多选视图中的移动按钮，不在场景1范围内。
+  - name: SaveNoteButton
+    reason: |
+      多选视图中的保存笔记按钮，不在场景1范围内。
+  - name: SaveVoiceButton
+    reason: |
+      多选视图中的保存语音按钮，不在场景1范围内。
+  - name: DeleteButton
+    reason: |
+      多选视图中的删除按钮，不在场景1范围内。
+  - name: PauseButton
+    reason: |
+      录音视图暂停按钮，属于录音功能，不在场景1范围内。
+  - name: StopButton
+    reason: |
+      录音视图停止按钮，属于录音功能，不在场景1范围内。
+  - name: TitleBarMenu
+    reason: |
+      标题栏菜单，属于菜单操作，不在场景1范围内。
+  - name: SettingsMenuItem
+    reason: |
+      标题栏菜单设置项，属于菜单操作，不在场景1范围内。
+  - name: PrivacyPolicyMenuItem
+    reason: |
+      标题栏菜单隐私政策项，属于菜单操作，不在场景1范围内。
+  - name: ExitMenuItem
+    reason: |
+      标题栏菜单退出项，属于菜单操作，不在场景1范围内。
+  - name: MultipleChoicesView
+    reason: |
+      多选操作视图，属于批量操作功能，不在场景1范围内。
+  - name: WebViewMessageDialog
+    reason: |
+      WebEngineView 消息对话框，不在场景1范围内。
+  - name: RecordingBar
+    reason: |
+      录音视图，属于录音功能，不在场景1范围内。
+  - name: MessageDialogLoader
+    reason: |
+      主窗口消息对话框加载器，不在场景1范围内。
+  - name: MainWindow_UpgradeView
+    reason: |
+      迁移升级视图，属于数据迁移功能，不在场景1范围内。

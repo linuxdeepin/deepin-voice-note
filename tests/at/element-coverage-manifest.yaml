@@ -1,0 +1,53 @@
+scan_total: 46
+total: 10
+elements:
+  VoiceNoteMainWindow:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: Item
+    name_source: accessible
+  InitialInterface:
+    role: ''
+    source: main.qml
+    type: InitialInterface
+    name_source: accessible
+  CreateFolderButton:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: VNoteButton
+    name_source: accessible
+  SidebarBlurBackground:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: SidebarBlurBackground
+    name_source: accessible
+  FolderListView:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: FolderListView
+    name_source: accessible
+  NoteItemListView:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: ItemListView
+    name_source: accessible
+  NewNoteButton:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: VNoteToolButton
+    name_source: accessible
+  TiptapWebView:
+    role: ''
+    source: gui/mainwindow/WebEngineView.qml
+    type: Item
+    name_source: accessible
+  NoteContentWebView:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: WebEngineView
+    name_source: accessible
+  WebViewTitleBar:
+    role: ''
+    source: gui/mainwindow/WebEngineView.qml
+    type: WindowTitleBar
+    name_source: accessible

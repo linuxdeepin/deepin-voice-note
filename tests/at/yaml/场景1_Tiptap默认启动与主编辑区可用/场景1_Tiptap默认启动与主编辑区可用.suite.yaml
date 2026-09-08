@@ -1,0 +1,118 @@
+name: 场景1_Tiptap默认启动与主编辑区可用_suite
+app: deepin-voice-note
+module: 场景1_Tiptap默认启动与主编辑区可用
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+suites:
+- id: suite_场景1_001
+  name: 启动应用验证主窗口
+  description: 验证应用启动后主窗口可见，初始界面展示创建文件夹入口
+  steps: []
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: InitialInterface
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: SidebarBlurBackground
+- id: suite_场景1_002
+  name: 创建文件夹后验证笔记列表
+  description: 创建文件夹后验证文件夹列表与笔记列表可见
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: keyboard_type
+    text: 测试文件夹
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+- id: suite_场景1_003
+  name: 新建笔记验证TiptapWebView与详情页编辑区
+  description: 新建笔记后验证TiptapWebView可访问、详情页编辑区与标题栏可见
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: keyboard_type
+    text: 测试文件夹
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: WebViewTitleBar
+- id: suite_场景1_004
+  name: 新建笔记后编辑区仍可用
+  description: 连续新建两条笔记，验证每次新建后TiptapWebView编辑区仍可访问
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: keyboard_type
+    text: 测试文件夹
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+teardown:
+- action: session_stop
