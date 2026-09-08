@@ -7,8 +7,6 @@
        以下密度 token 保留 30px 控件热区，仅压缩间距，保证设计稿中的全量按钮常驻一行。 */
     --dvn-toolbar-group-gap: 2px;
     --dvn-toolbar-separator-margin: 3px;
-    --dvn-toolbar-select-arrow-padding: 16px;
-    --dvn-toolbar-select-arrow-right: 4px;
     --dvn-toolbar-color-button-gap: 1px;
     flex-wrap: nowrap;
     align-items: center;
@@ -81,10 +79,11 @@
     position: relative;
     width: 100%;
     min-width: 0 !important;
-    padding: 0 var(--dvn-toolbar-select-arrow-padding) 0 5px !important;
+    padding: 0 4px 0 6px !important;
     display: inline-flex;
     align-items: center;
     justify-content: flex-start !important;
+    gap: 4px;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -95,22 +94,16 @@
     display: block;
     min-width: 0;
     max-width: 100%;
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.tiptap-select-button::after {
-    content: '';
-    position: absolute;
-    right: var(--dvn-toolbar-select-arrow-right);
-    top: 13px;
-    width: 0;
-    height: 0;
-    border-left: 3px solid transparent;
-    border-right: 3px solid transparent;
-    border-top: 4px solid currentColor;
+.tiptap-select-arrow {
+    flex: 0 0 12px;
+    width: 12px;
+    height: 12px;
 }
 
 .tiptap-select-menu {
@@ -284,6 +277,26 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+}
+
+
+/* Sketch：DTK/按钮/组合按钮/透明背景-文字左对齐-Light
+   外层 74/40px，内容左 6px、文字与 12px 箭头间距 4px、字号 12px。 */
+.tiptap-toolbar .tiptap-select-button {
+    padding: 0 4px 0 6px !important;
+    gap: 4px;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.tiptap-toolbar .tiptap-select-label {
+    line-height: 16px;
+}
+
+.tiptap-toolbar .tiptap-select-button .tiptap-select-arrow {
+    flex: 0 0 12px;
+    width: 12px;
+    height: 12px;
 }
 
 .tiptap-toolbar button:hover,
