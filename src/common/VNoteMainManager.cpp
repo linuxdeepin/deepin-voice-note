@@ -668,8 +668,7 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
 
             std::sort(notesDataList.begin(), notesDataList.end(), NoteCompare());
         }
-        int selectIndex = 0;
-        bool noteFound = false;
+        int selectIndex = -1;
         if (!notesDataList.isEmpty()) {
             qInfo() << "notesDataList is not empty";
             bool foundPreferredNote = false;
@@ -690,6 +689,9 @@ int VNoteMainManager::loadNotes(VNoteFolder *folder)
             }
         } else {
             m_currentNoteId = -1;
+            if (m_richTextManager)
+                m_richTextManager->initData(nullptr, QString());
+            emit currentNoteChanged(-1, QString());
         }
         emit updateNotes(notesDataList, selectIndex);
     }
@@ -993,7 +995,6 @@ VNoteItem *VNoteMainManager::deleteNoteById(const int &id)
 
 bool VNoteMainManager::deleteNote(const QList<int> &index)
 {
-    // 删除之前清空JS详情页内容
     qDebug() << "Deleting" << index.size() << "notes";
     // 录音或播放中禁止删除
     if (VoiceRecoderHandler::instance()->getRecoderType() == VoiceRecoderHandler::Recording
@@ -1008,45 +1009,74 @@ bool VNoteMainManager::deleteNote(const QList<int> &index)
         }
     }
 
-    m_richTextManager->clearJSContent();
-    QList<VNoteItem *> noteDataList;
+    struct DeleteTarget {
+        VNoteItem *note {nullptr};
+        int noteId {-1};
+        int folderId {-1};
+        bool isTop {false};
+    };
+
+    QList<DeleteTarget> deleteTargets;
     for (int i = 0; i < index.size(); i++) {
         VNoteItem *note = getNoteById(index.at(i));
         if (!note) {
             qWarning() << "Failed to get note by ID for deletion:" << index.at(i);
             continue;
         }
-        noteDataList.append(note);
-        if (note->isTop)
-            m_currentHasTop--;
-        m_noteItems.removeOne(note);
+        deleteTargets.append(DeleteTarget{note, note->noteId, static_cast<int>(note->folderId), note->isTop != 0});
     }
 
-    if (noteDataList.size()) {
-        qWarning() << "Processing deletion of" << noteDataList.size() << "notes";
-        // track deleted count per folder id for UI sync (e.g. search mode)
-        QMap<int, int> folderIdToDeletedCount;
-        for (auto noteData : noteDataList) {
-            // 在删除前先保存folderId，避免删除后访问已释放内存
-            int folderId = noteData->folderId;
-            qWarning() << "Deleting note from folder ID:" << folderId;
-            NoteSearchService::instance()->removeNote(noteData->noteId);
-            VNoteItemOper noteOper(noteData);
-            noteOper.deleteNote();
-            folderIdToDeletedCount[folderId] += 1;
-        }
-        // Convert QMap to QVariantMap for QML compatibility
-        QVariantMap variantMap;
-        for (auto it = folderIdToDeletedCount.begin(); it != folderIdToDeletedCount.end(); ++it) {
-            variantMap[QString::number(it.key())] = it.value();
-            qWarning() << "Folder ID" << it.key() << "deleted count:" << it.value();
-        }
-        qWarning() << "Emitting notesDeleted signal with" << variantMap.size() << "folders";
-        emit notesDeleted(variantMap);
-    } else {
+    if (deleteTargets.isEmpty()) {
         qWarning() << "No notes to delete";
         return false;
     }
+
+    qWarning() << "Processing deletion of" << deleteTargets.size() << "notes";
+    // track deleted count per folder id for UI sync (e.g. search mode)
+    QMap<int, int> folderIdToDeletedCount;
+    bool deletedCurrentNote = false;
+    int deletedCount = 0;
+    for (const DeleteTarget &target : std::as_const(deleteTargets)) {
+        qWarning() << "Deleting note from folder ID:" << target.folderId;
+        VNoteItemOper noteOper(target.note);
+        if (!noteOper.deleteNote()) {
+            qWarning() << "Failed to delete note from storage, note ID:" << target.noteId;
+            continue;
+        }
+
+        NoteSearchService::instance()->removeNote(target.noteId);
+        m_noteItems.removeOne(target.note);
+        if (target.isTop)
+            m_currentHasTop--;
+        folderIdToDeletedCount[target.folderId] += 1;
+        deletedCurrentNote = deletedCurrentNote || (target.noteId == m_currentNoteId);
+        ++deletedCount;
+    }
+
+    if (deletedCount == 0) {
+        qWarning() << "No notes were deleted successfully";
+        return false;
+    }
+
+    // 删除当前笔记后，先让后端当前态失效并清空编辑器，再通知 QML 更新列表。
+    // 只依赖 QML 隐藏 WebEngine 会让 Tiptap Web 页面保留上一条内容，
+    // 在删除当前文件夹最后一条笔记时会显示已删除笔记的标题/正文。
+    if (deletedCurrentNote) {
+        m_currentNoteId = -1;
+        if (m_richTextManager)
+            m_richTextManager->initData(nullptr, QString());
+        emit currentNoteChanged(-1, QString());
+    }
+
+    // Convert QMap to QVariantMap for QML compatibility
+    QVariantMap variantMap;
+    for (auto it = folderIdToDeletedCount.begin(); it != folderIdToDeletedCount.end(); ++it) {
+        variantMap[QString::number(it.key())] = it.value();
+        qWarning() << "Folder ID" << it.key() << "deleted count:" << it.value();
+    }
+    qWarning() << "Emitting notesDeleted signal with" << variantMap.size() << "folders";
+    emit notesDeleted(variantMap);
+
     qInfo() << "Note deletion finished";
     return true;
 }

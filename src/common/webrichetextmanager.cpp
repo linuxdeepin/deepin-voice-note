@@ -5,6 +5,7 @@
 #include "jscontent.h"
 #include "db/vnoteitemoper.h"
 #include "metadataparser.h"
+#include "migrationjsonbuilder.h"
 #include "common/utils.h"
 #include "handler/voice_to_text_task_manager.h"
 #include "tiptapchannelbridge.h"
@@ -18,6 +19,15 @@
 #include <QDir>
 #include <QUrl>
 #include <QUuid>
+
+namespace {
+
+QString emptyTiptapEnvelopeJson()
+{
+    return MigrationJsonBuilder::toCompactJson(MigrationJsonBuilder::makeEnvelope());
+}
+
+} // namespace
 
 
 WebRichTextManager::WebRichTextManager(QObject *parent)
@@ -39,6 +49,11 @@ void WebRichTextManager::initData(VNoteItem *data, const QString reg, bool focus
     if (!data) {
         qWarning() << "initData called with null data, clearing JS content";
         m_noteData = nullptr;
+        m_textChange = false;
+        m_textChangeNoteId = -1;
+        m_updateInProgress = false;
+        m_updateRequestNoteId = -1;
+        m_updateRequestSerial = 0;
         if (m_updateTimer) m_updateTimer->stop();
         clearJSContent();
         return;
@@ -303,6 +318,9 @@ void WebRichTextManager::onLoadFinsh()
 void WebRichTextManager::clearJSContent()
 {
     qDebug() << "Clearing JS content";
+    if (TiptapChannelBridge::instance()->tiptapEnabled()) {
+        TiptapChannelBridge::instance()->loadEnvelope(emptyTiptapEnvelopeJson());
+    }
     emit JsContent::instance()->callJsSetHtml("");
 
     // 开启100ms事件循环，保证js页面内容被刷新
