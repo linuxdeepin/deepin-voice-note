@@ -20,7 +20,7 @@ runtime: org.deepin.runtime.webengine/6.7.0
 
 build: |
   apt -y install --download-only libdtk6gui-dev libdtk6widget-dev qt6-svg-dev qt6-tools-dev qt6-tools-dev-tools qt6-base-dev qt6-base-dev-tools qt6-base-private-dev qt6-l10n-tools qt6-webengine-dev qt6-5compat-dev
-  apt -y install --download-only libsqlite3-dev libglib2.0-dev libvlc-dev libvlccore-dev libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev libffmpegthumbnailer-dev libdmr-dev
+  apt -y install --download-only libxml2-dev libsqlite3-dev libglib2.0-dev libvlc-dev libvlccore-dev libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev libffmpegthumbnailer-dev libdmr-dev
   apt -y install --download-only gstreamer1.0-plugins-good gstreamer1.0-pulseaudio
 
   bash ./install_dep /var/cache/apt/archives "$PREFIX"
