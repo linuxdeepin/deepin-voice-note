@@ -15,6 +15,10 @@
     html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; --dvn-editor-content-zoom: 1; }
     body { margin: 0; padding: 0; width: 100%; height: 100%; cursor: text; overflow: hidden; background-color: var(--dvn-editor-bg, #ffffff); color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); --dvn-toolbar-host-height: 48px; }
     #toolbar-host { position: relative; z-index: 10; height: var(--dvn-toolbar-host-height); min-height: var(--dvn-toolbar-host-height); box-sizing: border-box; display: flex; align-items: center; background: var(--dvn-panel-bg, #fbfbfd); overflow: visible; }
+    #toolbar-host::before, #toolbar-host::after { content: ""; position: absolute; left: 0; right: 0; height: 1px; pointer-events: none; background: var(--dvn-toolbar-separator, rgba(0, 0, 0, 0.08)); z-index: 0; }
+    #toolbar-host::before { top: 0; }
+    #toolbar-host::after { bottom: 0; }
+    #toolbar-host > .tiptap-toolbar { position: relative; z-index: 1; }
     #content-scroll { position: absolute; left: 0; right: 0; top: var(--dvn-toolbar-host-height); bottom: 0; overflow-x: hidden; overflow-y: auto; background: var(--dvn-editor-bg, #ffffff); cursor: text; }
     #note-title-host { min-height: 68px; box-sizing: border-box; display: flex; align-items: flex-start; padding: 13px 20px 4px 30px; background: var(--dvn-editor-bg, #ffffff); transform-origin: left top; }
     #note-title-input { width: 100%; min-width: 0; box-sizing: border-box; border: 0; outline: none; padding: 0; background: transparent; color: var(--dvn-title-fg, rgba(0, 0, 0, 0.30)); caret-color: var(--highlightColor, #0086cc); font: 600 24px/1.4 var(--dvn-editor-default-font, Helvetica), sans-serif; }

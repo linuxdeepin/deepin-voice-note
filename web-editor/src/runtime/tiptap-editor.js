@@ -109,12 +109,27 @@ function installEditorContentZoomShortcuts() {
   }, true)
 }
 
+function installEditorContentZoomWheel() {
+  window.addEventListener('wheel', (event) => {
+    if (!(event.ctrlKey || event.metaKey) || event.altKey) return
+
+    // Ctrl+滚轮在 QtWebEngine 默认会触发整页 zoom，导致工具栏、分割线和
+    // 下拉框一起缩放/闪动。这里直接截断浏览器默认行为，只把缩放应用到
+    // note-title-host 与正文 appElement，保证 toolbar-host 始终是固定 chrome。
+    event.preventDefault()
+    event.stopPropagation()
+    if (event.deltaY === 0) return
+    multiplyEditorContentZoom(event.deltaY < 0 ? CONTENT_ZOOM_STEP : 1 / CONTENT_ZOOM_STEP)
+  }, { capture: true, passive: false })
+}
+
 // ---------------------------------------------------------------------------
 // 启动
 // ---------------------------------------------------------------------------
 
 setupTransientScrollbar()
 installTranscriptCopyHandler()
+installEditorContentZoomWheel()
 const appElement = document.getElementById('app')
 const editor = createTiptapEditor(appElement)
 const resourceInsertionSelection = createResourceInsertionSelection(editor)

@@ -44,12 +44,6 @@ Item {
         onTriggered: rootItem.passTxtMenuToToolbar(txtCtxMenu, retryCount)
     }
 
-    Timer {
-        id: tiptapToolbarSeparatorSyncTimer
-        interval: 16
-        repeat: false
-        onTriggered: rootItem.syncTiptapToolbarSeparators()
-    }
 
     // 累加可见子项 implicitHeight/height（来自 DTK 布局，不用硬编码行高）
     function txtMenuItemsHeight(menu) {
@@ -97,46 +91,6 @@ Item {
         return isFinite(n) ? n : 0;
     }
 
-    function resetTiptapToolbarSeparatorGeometry() {
-        toolbarSeparatorOverlay.toolbarTopY = titleBarHost.height;
-        toolbarSeparatorOverlay.toolbarBottomY = titleBarHost.height + toolbarSeparatorOverlay.defaultToolbarHeight;
-    }
-
-    function scheduleTiptapToolbarSeparatorSync() {
-        if (!TiptapChannel.tiptapEnabled || !webVisible || noSearchResult) {
-            resetTiptapToolbarSeparatorGeometry();
-            return;
-        }
-        tiptapToolbarSeparatorSyncTimer.restart();
-    }
-
-    function syncTiptapToolbarSeparators() {
-        var tiptapView = tiptapLoader.item ? tiptapLoader.item.editor : null;
-        if (!tiptapView || !TiptapChannel.tiptapEnabled || !webVisible || noSearchResult) {
-            resetTiptapToolbarSeparatorGeometry();
-            return;
-        }
-
-        tiptapView.runJavaScript(
-            "(function(){var el=document.getElementById('toolbar-host');"
-            + "if(!el)return null;var r=el.getBoundingClientRect();"
-            + "return {top:r.top,bottom:r.bottom};})()",
-            function(rect) {
-                if (!rect || rect.top === undefined || rect.bottom === undefined) {
-                    resetTiptapToolbarSeparatorGeometry();
-                    return;
-                }
-                var top = Number(rect.top);
-                var bottom = Number(rect.bottom);
-                if (!isFinite(top) || !isFinite(bottom) || bottom <= top) {
-                    resetTiptapToolbarSeparatorGeometry();
-                    return;
-                }
-                toolbarSeparatorOverlay.toolbarTopY = tiptapLoader.y + top;
-                toolbarSeparatorOverlay.toolbarBottomY = tiptapLoader.y + bottom;
-            });
-    }
-
     function consumeTiptapNativeZoomFactor(tiptapView) {
         if (!tiptapView || !TiptapChannel.tiptapEnabled) {
             return;
@@ -158,7 +112,6 @@ Item {
             if (tiptapView) {
                 tiptapView.dvnResettingNativeZoom = false;
             }
-            rootItem.scheduleTiptapToolbarSeparatorSync();
         });
     }
 
@@ -756,9 +709,6 @@ Item {
             visible: active && !noSearchResult
             Layout.fillHeight: true
             Layout.fillWidth: true
-            onWidthChanged: rootItem.scheduleTiptapToolbarSeparatorSync()
-            onHeightChanged: rootItem.scheduleTiptapToolbarSeparatorSync()
-            onYChanged: rootItem.scheduleTiptapToolbarSeparatorSync()
 
             sourceComponent: Item {
                 Accessible.name: "TiptapWebView"
@@ -796,15 +746,11 @@ Item {
                             tiptapWebView.runJavaScript("window._dvnTiptapFocus && window._dvnTiptapFocus()");
                             handler.onThemeChanged();
                             rootItem.scheduleTiptapResourceButtonsSync();
-                            rootItem.scheduleTiptapToolbarSeparatorSync();
                         }
                     }
 
-                    onWidthChanged: rootItem.scheduleTiptapToolbarSeparatorSync()
-                    onHeightChanged: rootItem.scheduleTiptapToolbarSeparatorSync()
-                    onZoomFactorChanged: {
+                                    onZoomFactorChanged: {
                         if (tiptapWebView.dvnResettingNativeZoom) {
-                            rootItem.scheduleTiptapToolbarSeparatorSync();
                         } else {
                             rootItem.consumeTiptapNativeZoomFactor(tiptapWebView);
                         }
@@ -933,40 +879,6 @@ Item {
                     rootItem.saveNote();
                 }
             }
-        }
-    }
-
-    Item {
-        id: toolbarSeparatorOverlay
-
-        // QtWebEngine 的滚动条槽不属于 DOM 内容绘制区，Web 里的 border/伪元素
-        // 不能可靠覆盖最右侧滚动条区域。工具栏上下分割线统一由 QML 宿主
-        // 叠加绘制，宽度直接覆盖整个富文本容器，避免右侧断线。
-        anchors.left: parent.left
-        anchors.right: parent.right
-        height: Math.max(toolbarBottomY, toolbarTopY)
-        visible: webVisible && TiptapChannel.tiptapEnabled && !noSearchResult
-        z: 2000
-
-        readonly property real defaultToolbarHeight: 48
-        property real toolbarTopY: titleBarHost.height
-        property real toolbarBottomY: titleBarHost.height + defaultToolbarHeight
-        readonly property color separatorColor: DTK.themeType === ApplicationHelper.LightType ? "#14000000" : "#1FFFFFFF"
-
-        Rectangle {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            y: toolbarSeparatorOverlay.toolbarTopY
-            color: toolbarSeparatorOverlay.separatorColor
-            height: 1 / Screen.devicePixelRatio
-        }
-
-        Rectangle {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            y: toolbarSeparatorOverlay.toolbarBottomY - height
-            color: toolbarSeparatorOverlay.separatorColor
-            height: 1 / Screen.devicePixelRatio
         }
     }
 
