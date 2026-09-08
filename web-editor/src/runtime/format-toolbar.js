@@ -320,7 +320,10 @@ function createStyledSelect({ control, title, options, onChange, onOpen }) {
     'data-control': control,
   })
   const label = createEl('span', { class: 'tiptap-select-label' })
+  const arrow = createSvgIcon('richtextArrow')
+  arrow.classList.add('tiptap-select-arrow')
   button.appendChild(label)
+  button.appendChild(arrow)
   let currentOptions = []
 
   function close() {
