@@ -24,7 +24,7 @@ Item {
     property bool isRecordingAudio: false
     property bool isVoiceToText: false
     property bool noSearchResult: false
-    property bool webVisible: true
+    property bool webVisible: false
     property bool summernoteVisible: true
     property alias titleBar: title
     // 所有录音入口共用这一组条件，避免工具栏、标题栏和 Ctrl+R
@@ -775,7 +775,7 @@ Item {
 
                     anchors.fill: parent
                     backgroundColor: DTK.themeType === ApplicationHelper.LightType ? "white" : "black"
-                    visible: true
+                    visible: rootItem.webVisible
 
                     settings.localContentCanAccessFileUrls: true
 

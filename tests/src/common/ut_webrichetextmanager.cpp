@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 
 #include <QDir>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSignalSpy>
@@ -31,9 +32,62 @@ TEST(WebRichTextManagerUT, lifecycle)
 TEST(WebRichTextManagerUT, initDataNull)
 {
     WebRichTextManager w;
+    w.m_textChange = true;
+    w.m_textChangeNoteId = 42;
+    w.m_updateInProgress = true;
+    w.m_updateRequestNoteId = 42;
+    w.m_updateRequestSerial = 7;
+
     w.initData(nullptr, "");      // null -> clearJSContent path
+
     EXPECT_EQ(nullptr, w.m_noteData);
-    SUCCEED();
+    EXPECT_FALSE(w.hasPendingTextChange());
+    EXPECT_EQ(-1, w.pendingTextChangeNoteId());
+    EXPECT_FALSE(w.m_updateInProgress);
+    EXPECT_EQ(-1, w.m_updateRequestNoteId);
+    EXPECT_EQ(0U, w.m_updateRequestSerial);
+}
+
+
+TEST(WebRichTextManagerUT, clearJSContentLoadsEmptyTiptapEnvelope)
+{
+    const QByteArray oldDisable = qgetenv("DVN_TIPTAP_DISABLE");
+    const QByteArray oldLegacy = qgetenv("DVN_SUMMERNOTE_LEGACY");
+    const QByteArray oldDebug = qgetenv("DVN_TIPTAP_DEBUG");
+    qunsetenv("DVN_TIPTAP_DISABLE");
+    qunsetenv("DVN_SUMMERNOTE_LEGACY");
+    qunsetenv("DVN_TIPTAP_DEBUG");
+
+    TiptapChannelBridge *bridge = TiptapChannelBridge::instance();
+    bridge->notifyEditorReady();
+    QSignalSpy spy(bridge, &TiptapChannelBridge::loadEnvelopeRequested);
+
+    WebRichTextManager w;
+    w.clearJSContent();
+
+    ASSERT_GE(spy.count(), 1);
+    const QString envelopeJson = spy.takeLast().at(0).toString();
+    const QJsonObject envelope = QJsonDocument::fromJson(envelopeJson.toUtf8()).object();
+    EXPECT_EQ(QStringLiteral("tiptap"), envelope.value(QStringLiteral("format")).toString());
+    EXPECT_EQ(1, envelope.value(QStringLiteral("schemaVersion")).toInt());
+    const QJsonObject content = envelope.value(QStringLiteral("content")).toObject();
+    EXPECT_EQ(QStringLiteral("doc"), content.value(QStringLiteral("type")).toString());
+    const QJsonArray nodes = content.value(QStringLiteral("content")).toArray();
+    ASSERT_EQ(1, nodes.size());
+    EXPECT_EQ(QStringLiteral("paragraph"), nodes.at(0).toObject().value(QStringLiteral("type")).toString());
+
+    if (oldDisable.isEmpty())
+        qunsetenv("DVN_TIPTAP_DISABLE");
+    else
+        qputenv("DVN_TIPTAP_DISABLE", oldDisable);
+    if (oldLegacy.isEmpty())
+        qunsetenv("DVN_SUMMERNOTE_LEGACY");
+    else
+        qputenv("DVN_SUMMERNOTE_LEGACY", oldLegacy);
+    if (oldDebug.isEmpty())
+        qunsetenv("DVN_TIPTAP_DEBUG");
+    else
+        qputenv("DVN_TIPTAP_DEBUG", oldDebug);
 }
 
 TEST(WebRichTextManagerUT, initDataWithNote)

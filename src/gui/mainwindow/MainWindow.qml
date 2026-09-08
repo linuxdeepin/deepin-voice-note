@@ -497,6 +497,13 @@ Item {
         }
         onUpdateNotes: {
             handleUpdateNoteList(notesData);
+            if (notesData.length === 0 || selectIndex < 0) {
+                itemListView.selectedNoteItem = [];
+                itemListView.selectSize = 0;
+                itemListView.changeCurrentIndex(-1);
+                webEngineView.webVisible = false;
+                return;
+            }
             itemListView.selectedNoteItem = [selectIndex];
             itemListView.selectSize = 1;
             itemListView.changeCurrentIndex(selectIndex);
