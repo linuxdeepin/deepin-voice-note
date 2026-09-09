@@ -266,9 +266,6 @@
     --dvn-heading-option-font-size: 12px;
 }
 
-.tiptap-select-heading .tiptap-select-option[data-value="6"] {
-    --dvn-heading-option-font-size: 10px;
-}
 
 .tiptap-toolbar button {
     min-width: 30px;

@@ -351,7 +351,7 @@ test('heading dropdown follows the Sketch menu labels and type scale hooks', () 
 
   const labels = Array.from(heading.querySelectorAll('.tiptap-select-option-label'))
     .map((node) => node.textContent)
-  assert.deepEqual(labels, ['正文', '标题1', '标题2', '标题3', '标题4', '标题5', '标题6'])
+  assert.deepEqual(labels, ['正文', '标题1', '标题2', '标题3', '标题4', '标题5'])
 
   const selected = heading.querySelector('.tiptap-select-option[data-value="p"]')
   assert.equal(selected?.getAttribute('aria-selected'), 'true')
@@ -368,6 +368,7 @@ test('heading dropdown follows the Sketch menu labels and type scale hooks', () 
   assert.match(toolbarCss, /\.tiptap-select-menu \{[\s\S]*background: var\(--dvn-menu-bg, var\(--dvn-panel-bg/)
   assert.match(toolbarCss, /\.tiptap-select-heading \.tiptap-select-option\[data-value="1"\] \{[\s\S]*--dvn-heading-option-font-size: 24px;/)
   assert.match(toolbarCss, /\.tiptap-select-heading \.tiptap-select-option\[data-value="2"\] \{[\s\S]*--dvn-heading-option-font-size: 21px;/)
+  assert.equal(host.querySelector('.tiptap-select-option[data-value="6"]'), null, 'heading dropdown should not expose title 6')
   editor.destroy()
 })
 
@@ -693,6 +694,15 @@ function findNode(node, type) {
   return null
 }
 
+function collectTaskCheckedStates(node, acc = []) {
+  if (!node || typeof node !== 'object') return acc
+  if (node.type === 'taskItem') acc.push(Boolean(node.attrs?.checked))
+  if (Array.isArray(node.content)) {
+    for (const child of node.content) collectTaskCheckedStates(child, acc)
+  }
+  return acc
+}
+
 function hasNestedList(node) {
   function walk(n) {
     if (!n || typeof n !== 'object') return false
@@ -725,11 +735,109 @@ function maxListItemDepth(node, depth = 0) {
   return maxDepth
 }
 
+function maxListItemVisualDepth(node, structuralDepth = 0) {
+  if (!node || typeof node !== 'object') return structuralDepth
+  const isListItem = node.type === 'listItem' || node.type === 'taskItem'
+  const currentStructuralDepth = isListItem ? structuralDepth + 1 : structuralDepth
+  const currentVisualDepth = isListItem
+    ? currentStructuralDepth + (Number(node.attrs?.dvnIndentLevel) || 0)
+    : currentStructuralDepth
+  let maxDepth = currentVisualDepth
+  if (Array.isArray(node.content)) {
+    for (const child of node.content) {
+      maxDepth = Math.max(maxDepth, maxListItemVisualDepth(child, currentStructuralDepth))
+    }
+  }
+  return maxDepth
+}
+
+function listItemDepthForText(node, text, structuralDepth = 0, visualDepth = 0) {
+  if (!node || typeof node !== 'object') return null
+  const isListItem = node.type === 'listItem' || node.type === 'taskItem'
+  const currentStructuralDepth = isListItem ? structuralDepth + 1 : structuralDepth
+  const currentVisualDepth = isListItem
+    ? Math.min(3, currentStructuralDepth + (Number(node.attrs?.dvnIndentLevel) || 0))
+    : visualDepth
+  if (node.type === 'text' && node.text === text) return currentVisualDepth
+  if (Array.isArray(node.content)) {
+    for (const child of node.content) {
+      const found = listItemDepthForText(child, text, currentStructuralDepth, currentVisualDepth)
+      if (found != null) return found
+    }
+  }
+  return null
+}
+
+function listTypeForText(node, text, currentListType = null) {
+  if (!node || typeof node !== 'object') return null
+  const nextListType = ['bulletList', 'orderedList', 'taskList'].includes(node.type)
+    ? node.type
+    : currentListType
+  if (node.type === 'text' && node.text === text) return nextListType
+  if (Array.isArray(node.content)) {
+    for (const child of node.content) {
+      const found = listTypeForText(child, text, nextListType)
+      if (found != null) return found
+    }
+  }
+  return null
+}
+
+function listItemTypeForText(node, text, currentItemType = null) {
+  if (!node || typeof node !== 'object') return null
+  const nextItemType = node.type === 'listItem' || node.type === 'taskItem'
+    ? node.type
+    : currentItemType
+  if (node.type === 'text' && node.text === text) return nextItemType
+  if (Array.isArray(node.content)) {
+    for (const child of node.content) {
+      const found = listItemTypeForText(child, text, nextItemType)
+      if (found != null) return found
+    }
+  }
+  return null
+}
+
+function textOrder(node, acc = []) {
+  if (!node || typeof node !== 'object') return acc
+  if (node.type === 'text') acc.push(node.text)
+  if (Array.isArray(node.content)) {
+    for (const child of node.content) textOrder(child, acc)
+  }
+  return acc
+}
+
+function listItemForListType(listType, text, extra = []) {
+  const itemType = listType === 'taskList' ? 'taskItem' : 'listItem'
+  const attrs = itemType === 'taskItem' ? { checked: false } : undefined
+  return {
+    type: itemType,
+    ...(attrs ? { attrs } : {}),
+    content: [
+      { type: 'paragraph', content: [{ type: 'text', text }] },
+      ...extra,
+    ],
+  }
+}
+
 function findTextEndPosition(editor, text) {
   let found = null
   editor.state.doc.descendants((node, pos) => {
     if (node.isText && node.text === text) {
       found = pos + node.nodeSize
+      return false
+    }
+    return true
+  })
+  if (found == null) throw new Error(`text not found: ${text}`)
+  return found
+}
+
+function findTextOffsetPosition(editor, text, offset) {
+  let found = null
+  editor.state.doc.descendants((node, pos) => {
+    if (node.isText && node.text === text) {
+      found = pos + Math.max(0, Math.min(node.text.length, offset))
       return false
     }
     return true
@@ -749,6 +857,25 @@ function findTextRange(editor, text) {
   })
   if (found == null) throw new Error(`text not found: ${text}`)
   return found
+}
+
+function pressKey(editor, window, key, options = {}) {
+  const event = new window.KeyboardEvent('keydown', {
+    key,
+    bubbles: true,
+    cancelable: true,
+    ...options,
+  })
+  editor.view.dom.dispatchEvent(event)
+  return event
+}
+
+function pressTab(editor, window, shiftKey = false) {
+  return pressKey(editor, window, 'Tab', { shiftKey })
+}
+
+function pressEnter(editor, window) {
+  return pressKey(editor, window, 'Enter')
 }
 
 function threeLevelListDoc(itemType = 'listItem', listType = 'bulletList') {
@@ -791,10 +918,24 @@ test('task list style keeps checkbox and text on the same row', () => {
   const style = document.getElementById('dvn-tiptap-tasklist-style')
   assert.ok(style, 'task list style should be injected')
   assert.match(style.textContent, /ul\[data-type="taskList"\] \{ list-style: none; padding-left: 0;/)
-  assert.match(style.textContent, /ul\[data-type="taskList"\] li \{ display: flex;/)
-  assert.match(style.textContent, /ul\[data-type="taskList"\] li > label \{ display: inline-flex; align-items: center;[^}]*height: 1\.72em;/)
-  assert.match(style.textContent, /ul\[data-type="taskList"\] li > label > input\[type="checkbox"\] \{ margin: 0;/)
-  assert.match(style.textContent, /ul\[data-type="taskList"\] li > div > p \{ margin: 0;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] ul\[data-type="taskList"\] \{ padding-left: 20px;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] > li > div > ul\[data-type="taskList"\] \{ margin-left: -20px;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] > li > div > ul\[data-type="taskList"\] > li > div > ul\[data-type="taskList"\] > li > div > ul\[data-type="taskList"\] \{ padding-left: 0;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] > li\[data-dvn-indent-level="1"\] > div > ul\[data-type="taskList"\] \{ margin-left: -40px;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] > li\[data-dvn-indent-level="2"\] > div > ul\[data-type="taskList"\] \{ margin-left: -60px;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] > li \{ display: flex; align-items: flex-start; gap: 0;/)
+  assert.equal(/ul\[data-type="taskList"\] li \{ display: flex/.test(style.textContent), false, 'task list row style must not hide markers of nested bullet/ordered lists')
+  assert.match(style.textContent, /ul\[data-type="taskList"\] > li > label \{ display: inline-flex; align-items: center; justify-content: center;[^}]*flex: 0 0 20px; width: 20px;[^}]*height: 1\.72em;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] > li > label > input\[type="checkbox"\] \{ margin: 0;/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror ul:not\(\[data-type="taskList"\]\) \{ list-style-type: disc; \}/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror li\[data-dvn-indent-level="1"\] \{ margin-left: 20px; \}/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror li\[data-dvn-indent-level="2"\] \{ margin-left: 40px; \}/)
+  assert.match(tiptapEditorHtml, /li\[data-dvn-indent-level="1"\] > ul,[\s\S]*margin-left: -20px;/)
+  assert.match(tiptapEditorHtml, /li\[data-dvn-indent-level="2"\] > ul,[\s\S]*margin-left: -40px;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] > li > div > p \{ margin: 0;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] > li\[data-checked="true"\] > div > p:first-child \{ opacity: 0\.55;/)
+  assert.equal(style.textContent.includes('text-decoration: line-through'), false, 'checked task text should not render a strikethrough')
+  assert.equal(style.textContent.includes('color: var(--color'), false, 'checked task text should not switch to theme color')
   editor.destroy()
 })
 
@@ -880,6 +1021,221 @@ test('switching task list to bullet list drops checked, back to task list defaul
   editor.destroy()
 })
 
+
+for (const parentListType of ['bulletList', 'orderedList', 'taskList']) {
+  for (const targetListType of ['bulletList', 'orderedList', 'taskList']) {
+    if (parentListType === targetListType) continue
+
+    test(`nested ${parentListType} can be switched to nested ${targetListType} without leaving parent list`, () => {
+      const { editor, host } = createEditorWithToolbar()
+      editor.commands.setContent({
+        type: 'doc',
+        content: [{
+          type: parentListType,
+          content: [listItemForListType(parentListType, 'root', [{
+            type: parentListType,
+            content: [listItemForListType(parentListType, 'child')],
+          }])],
+        }],
+      })
+      markEditorFocused(editor)
+      editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'child')).run()
+
+      host.querySelector(`button[data-format="${targetListType}"]`).click()
+      const json = editor.getJSON()
+      assert.equal(listTypeForText(json, 'root'), parentListType, 'parent list type must be preserved')
+      assert.equal(listTypeForText(json, 'child'), targetListType, 'nested list type should switch in place')
+      assert.equal(listItemDepthForText(json, 'root'), 1)
+      assert.equal(listItemDepthForText(json, 'child'), 2)
+      assert.equal(
+        listItemTypeForText(json, 'child'),
+        targetListType === 'taskList' ? 'taskItem' : 'listItem',
+        'nested list item node should match the target list type',
+      )
+      assert.ok(maxListItemVisualDepth(json) <= 3, 'mixed nesting must still stay within three visual levels')
+      editor.destroy()
+    })
+  }
+}
+
+
+test('switching list type changes only the active sibling item', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [
+        listItemForListType('taskList', 'first'),
+        listItemForListType('taskList', 'second'),
+      ],
+    }],
+  })
+  markEditorFocused(editor)
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'second')).run()
+
+  host.querySelector('button[data-format="bulletList"]').click()
+  const json = editor.getJSON()
+  assert.equal(listTypeForText(json, 'first'), 'taskList', 'previous sibling must stay task list')
+  assert.equal(listTypeForText(json, 'second'), 'bulletList', 'active sibling should switch to bullet list')
+  assert.equal(listItemTypeForText(json, 'first'), 'taskItem')
+  assert.equal(listItemTypeForText(json, 'second'), 'listItem')
+  assert.equal(listItemDepthForText(json, 'first'), 1)
+  assert.equal(listItemDepthForText(json, 'second'), 1)
+  editor.destroy()
+})
+
+
+test('switching current list item type preserves caret position', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [
+        listItemForListType('taskList', 'first'),
+        listItemForListType('taskList', 'second'),
+      ],
+    }],
+  })
+  markEditorFocused(editor)
+  editor.chain().focus().setTextSelection(findTextOffsetPosition(editor, 'second', 3)).run()
+
+  host.querySelector('button[data-format="bulletList"]').click()
+  editor.commands.insertContent('X')
+  const json = editor.getJSON()
+  assert.equal(listTypeForText(json, 'secXond'), 'bulletList')
+  assert.equal(listTypeForText(json, 'first'), 'taskList')
+  assert.match(editor.getText(), /first\s+secXond/, 'text should be inserted at the original caret offset')
+  editor.destroy()
+})
+
+test('Shift+Tab after switching nested task item to bullet keeps it as a first-level bullet item', () => {
+  const { editor, host, window } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [listItemForListType('taskList', 'DCSad', [{
+        type: 'taskList',
+        content: [listItemForListType('taskList', '打')],
+      }])],
+    }],
+  })
+  markEditorFocused(editor)
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, '打')).run()
+  host.querySelector('button[data-format="bulletList"]').click()
+  assert.equal(listTypeForText(editor.getJSON(), '打'), 'bulletList', 'child should become a nested bullet list item')
+  assert.equal(listItemDepthForText(editor.getJSON(), '打'), 2)
+
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, '打')).run()
+  pressTab(editor, window, true)
+  const json = editor.getJSON()
+  assert.equal(listTypeForText(json, 'DCSad'), 'taskList', 'parent should remain a task item')
+  assert.equal(listTypeForText(json, '打'), 'bulletList', 'outdented child should remain a bullet list item')
+  assert.equal(listItemDepthForText(json, 'DCSad'), 1)
+  assert.equal(listItemDepthForText(json, '打'), 1, 'outdented child should become first-level list item instead of plain text')
+  editor.destroy()
+})
+
+for (const parentListType of ['bulletList', 'orderedList', 'taskList']) {
+  for (const targetListType of ['bulletList', 'orderedList', 'taskList']) {
+    if (parentListType === targetListType) continue
+
+    test(`Shift+Tab after switching nested ${parentListType} item to ${targetListType} keeps the target list type`, () => {
+      const { editor, host, window } = createEditorWithToolbar()
+      editor.commands.setContent({
+        type: 'doc',
+        content: [{
+          type: parentListType,
+          content: [listItemForListType(parentListType, 'parent', [{
+            type: parentListType,
+            content: [listItemForListType(parentListType, 'child')],
+          }])],
+        }],
+      })
+      markEditorFocused(editor)
+      editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'child')).run()
+      host.querySelector(`button[data-format="${targetListType}"]`).click()
+      assert.equal(listTypeForText(editor.getJSON(), 'child'), targetListType, 'current child should switch in place before outdent')
+      assert.equal(listItemDepthForText(editor.getJSON(), 'child'), 2)
+
+      editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'child')).run()
+      pressTab(editor, window, true)
+      const json = editor.getJSON()
+      assert.deepEqual(textOrder(json), ['parent', 'child'], 'outdent must preserve document order')
+      assert.equal(listTypeForText(json, 'parent'), parentListType, 'parent should keep its original list type')
+      assert.equal(listTypeForText(json, 'child'), targetListType, 'outdented child should keep the switched list type')
+      assert.equal(listItemDepthForText(json, 'parent'), 1)
+      assert.equal(listItemDepthForText(json, 'child'), 1, 'outdented child should be a first-level list item, not plain text')
+      assert.equal(collectTypes(json).has(targetListType === 'taskList' ? 'taskItem' : 'listItem'), true)
+      editor.destroy()
+    })
+  }
+}
+
+test('Shift+Tab in a mixed nested list preserves order and keeps following siblings under the lifted item', () => {
+  const { editor, window } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [
+        listItemForListType('taskList', 'root', [{
+          type: 'bulletList',
+          content: [
+            listItemForListType('bulletList', 'before'),
+            listItemForListType('bulletList', 'active'),
+            listItemForListType('bulletList', 'after'),
+          ],
+        }]),
+        listItemForListType('taskList', 'next root'),
+      ],
+    }],
+  })
+  markEditorFocused(editor)
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'active')).run()
+  pressTab(editor, window, true)
+  const json = editor.getJSON()
+
+  assert.deepEqual(textOrder(json), ['root', 'before', 'active', 'after', 'next root'], 'outdent must not reorder the active item after its following sibling')
+  assert.equal(listTypeForText(json, 'root'), 'taskList')
+  assert.equal(listTypeForText(json, 'before'), 'bulletList')
+  assert.equal(listTypeForText(json, 'active'), 'bulletList')
+  assert.equal(listTypeForText(json, 'after'), 'bulletList')
+  assert.equal(listTypeForText(json, 'next root'), 'taskList')
+  assert.equal(listItemDepthForText(json, 'root'), 1)
+  assert.equal(listItemDepthForText(json, 'before'), 2)
+  assert.equal(listItemDepthForText(json, 'active'), 1)
+  assert.equal(listItemDepthForText(json, 'after'), 2, 'following sibling should remain one level below the lifted active item')
+  assert.equal(listItemDepthForText(json, 'next root'), 1)
+  editor.destroy()
+})
+
+test('switching current list item type preserves Chinese caret position', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [
+        listItemForListType('taskList', '第一行'),
+        listItemForListType('taskList', '你好世界'),
+      ],
+    }],
+  })
+  markEditorFocused(editor)
+  editor.chain().focus().setTextSelection(findTextOffsetPosition(editor, '你好世界', 2)).run()
+
+  host.querySelector('button[data-format="orderedList"]').click()
+  editor.commands.insertContent('X')
+  const json = editor.getJSON()
+  assert.equal(listTypeForText(json, '你好X世界'), 'orderedList')
+  assert.equal(listTypeForText(json, '第一行'), 'taskList')
+  assert.match(editor.getText(), /第一行\s+你好X世界/, 'Chinese text should be inserted at the original caret offset')
+  editor.destroy()
+})
+
 test('indent/outdent buttons nest and unnest bullet list items', () => {
   const { editor, host } = createEditorWithToolbar()
   editor.commands.setContent({
@@ -902,6 +1258,276 @@ test('indent/outdent buttons nest and unnest bullet list items', () => {
   assert.ok(!hasNestedList(editor.getJSON()), 'no nested list should remain after outdent')
   editor.destroy()
 })
+
+for (const { name, listType, itemType, attrs } of [
+  { name: 'bullet list', listType: 'bulletList', itemType: 'listItem' },
+  { name: 'ordered list', listType: 'orderedList', itemType: 'listItem' },
+  { name: 'task list', listType: 'taskList', itemType: 'taskItem', attrs: { checked: false } },
+]) {
+  test(`indent button follows real sink capability for ${name}`, () => {
+    const { editor, host } = createEditorWithToolbar()
+    const item = (text) => ({
+      type: itemType,
+      ...(attrs ? { attrs } : {}),
+      content: [{ type: 'paragraph', content: [{ type: 'text', text }] }],
+    })
+    editor.commands.setContent({
+      type: 'doc',
+      content: [{
+        type: listType,
+        content: [item('one'), item('two')],
+      }],
+    })
+    markEditorFocused(editor)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'one')).run()
+    const indent = host.querySelector('button[data-format="indentList"]')
+    assert.equal(indent.disabled, true, `${name} first item cannot be indented`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'two')).run()
+    assert.equal(indent.disabled, false, `${name} item with a previous sibling can be indented`)
+    editor.destroy()
+  })
+}
+
+for (const { name, listType, itemType, attrs } of [
+  { name: 'bullet list', listType: 'bulletList', itemType: 'listItem' },
+  { name: 'ordered list', listType: 'orderedList', itemType: 'listItem' },
+  { name: 'task list', listType: 'taskList', itemType: 'taskItem', attrs: { checked: false } },
+]) {
+  test(`the second ${name} item can be indented twice with Tab`, () => {
+    const { editor, window } = createEditorWithToolbar()
+    const item = (text) => ({
+      type: itemType,
+      ...(attrs ? { attrs } : {}),
+      content: [{ type: 'paragraph', content: [{ type: 'text', text }] }],
+    })
+    editor.commands.setContent({
+      type: 'doc',
+      content: [{
+        type: listType,
+        content: [item('one'), item('two')],
+      }],
+    })
+    markEditorFocused(editor)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'two')).run()
+    pressTab(editor, window)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'two'), 2, `${name} second item should become second level`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'two')).run()
+    pressTab(editor, window)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'two'), 3, `${name} second item should become third level after another Tab`)
+
+    editor.commands.insertContent(' typed')
+    assert.equal(editor.getText().includes('two typed'), true, `${name} item should still accept text after second Tab`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'two typed')).run()
+    pressTab(editor, window)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'two typed'), 3, `${name} second item should remain capped at third level`)
+    editor.destroy()
+  })
+}
+
+for (const { name, listType, itemType, attrs } of [
+  { name: 'bullet list', listType: 'bulletList', itemType: 'listItem' },
+  { name: 'ordered list', listType: 'orderedList', itemType: 'listItem' },
+  { name: 'task list', listType: 'taskList', itemType: 'taskItem', attrs: { checked: false } },
+]) {
+  test(`Enter keeps native sibling insertion and Tab still caps ${name} at three levels`, () => {
+    const { editor, window } = createEditorWithToolbar()
+    const item = (text) => ({
+      type: itemType,
+      ...(attrs ? { attrs } : {}),
+      content: [{ type: 'paragraph', content: [{ type: 'text', text }] }],
+    })
+    editor.commands.setContent({
+      type: 'doc',
+      content: [{
+        type: listType,
+        content: [item('one'), item('two')],
+      }],
+    })
+    markEditorFocused(editor)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'two')).run()
+    pressTab(editor, window)
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'two')).run()
+    pressTab(editor, window)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'two'), 3)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'one')).run()
+    pressEnter(editor, window)
+    editor.commands.insertContent('new')
+    assert.match(editor.getText(), /one\s+new\s+two/, `${name} new item should stay directly after the first item`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'new')).run()
+    pressTab(editor, window)
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'new')).run()
+    pressTab(editor, window)
+
+    assert.equal(listItemDepthForText(editor.getJSON(), 'new'), 3, `${name} new item should reach third level`)
+    assert.ok(maxListItemVisualDepth(editor.getJSON()) <= 3, `${name} must never render deeper than third level`)
+    editor.destroy()
+  })
+}
+
+for (const { name, listType, itemType, attrs } of [
+  { name: 'bullet list', listType: 'bulletList', itemType: 'listItem' },
+  { name: 'ordered list', listType: 'orderedList', itemType: 'listItem' },
+  { name: 'task list', listType: 'taskList', itemType: 'taskItem', attrs: { checked: false } },
+]) {
+  test(`Shift+Tab outdents only the active item in a four-item third-level ${name}`, () => {
+    const { editor, window } = createEditorWithToolbar()
+    const item = (text, extra = []) => ({
+      type: itemType,
+      ...(attrs ? { attrs } : {}),
+      content: [
+        { type: 'paragraph', content: [{ type: 'text', text }] },
+        ...extra,
+      ],
+    })
+    editor.commands.setContent({
+      type: 'doc',
+      content: [{
+        type: listType,
+        content: [item('one', [{
+          type: listType,
+          content: [item('two', [{
+            type: listType,
+            content: [item('a'), item('b'), item('c'), item('d')],
+          }])],
+        }])],
+      }],
+    })
+    markEditorFocused(editor)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'c')).run()
+    pressTab(editor, window, true)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'a'), 3)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'b'), 3)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'c'), 2)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'd'), 3, `${name} following sibling should stay third level after one outdent`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'c')).run()
+    pressTab(editor, window, true)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'c'), 1)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'd'), 3, `${name} following sibling should not be pulled to second level`)
+    assert.ok(maxListItemVisualDepth(editor.getJSON()) <= 3, `${name} outdent should keep visual depth capped`)
+    editor.destroy()
+  })
+}
+
+for (const { name, listType, itemType, attrs } of [
+  { name: 'bullet list', listType: 'bulletList', itemType: 'listItem' },
+  { name: 'ordered list', listType: 'orderedList', itemType: 'listItem' },
+  { name: 'task list', listType: 'taskList', itemType: 'taskItem', attrs: { checked: false } },
+]) {
+  test(`level-one ${name} item never exits the list via Shift+Tab`, () => {
+    const { editor, window } = createEditorWithToolbar()
+    const item = (text, extra = []) => ({
+      type: itemType,
+      ...(attrs ? { attrs } : {}),
+      content: [
+        { type: 'paragraph', content: [{ type: 'text', text }] },
+        ...extra,
+      ],
+    })
+    editor.commands.setContent({
+      type: 'doc',
+      content: [{
+        type: listType,
+        content: [item('one', [{
+          type: listType,
+          content: [item('two', [{
+            type: listType,
+            content: [item('a'), item('b')],
+          }])],
+        }])],
+      }],
+    })
+    markEditorFocused(editor)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'a')).run()
+    pressTab(editor, window, true)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'a'), 2, `${name} active item should move from third to second level`)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'b'), 3, `${name} following item should stay third level after first outdent`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'a')).run()
+    pressTab(editor, window, true)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'a'), 1, `${name} active item should move from second to first level`)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'b'), 3, `${name} following item should stay third level after second outdent`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'a')).run()
+    pressTab(editor, window, true)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'a'), 1, `${name} active item should stay first level on top-level outdent`)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'b'), 3, `${name} following item should stay third level after ignored top-level outdent`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'b')).run()
+    pressTab(editor, window, true)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'b'), 2, `${name} preserved item should still support Shift+Tab`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'b')).run()
+    pressTab(editor, window)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'b'), 3, `${name} preserved item should support Tab back to third level`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'b')).run()
+    pressTab(editor, window, true)
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'b')).run()
+    pressTab(editor, window, true)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'b'), 1, `${name} preserved item should support Shift+Tab back to first level`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'b')).run()
+    pressTab(editor, window)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'b'), 2, `${name} preserved first-level item should support Tab again`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'b')).run()
+    pressTab(editor, window)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'b'), 3, `${name} preserved item should support two Tabs back to third level`)
+    assert.ok(maxListItemVisualDepth(editor.getJSON()) <= 3, `${name} preserved item must stay capped at third level`)
+    editor.destroy()
+  })
+}
+
+for (const { name, listType, itemType, attrs } of [
+  { name: 'bullet list', listType: 'bulletList', itemType: 'listItem' },
+  { name: 'ordered list', listType: 'orderedList', itemType: 'listItem' },
+  { name: 'task list', listType: 'taskList', itemType: 'taskItem', attrs: { checked: false } },
+]) {
+  test(`Tab creates up to three nesting levels for ${name}`, () => {
+    const { editor, window } = createEditorWithToolbar()
+    const item = (text) => ({
+      type: itemType,
+      ...(attrs ? { attrs } : {}),
+      content: [{ type: 'paragraph', content: [{ type: 'text', text }] }],
+    })
+    editor.commands.setContent({
+      type: 'doc',
+      content: [{
+        type: listType,
+        content: [item('one'), item('two'), item('three')],
+      }],
+    })
+    markEditorFocused(editor)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'two')).run()
+    pressTab(editor, window)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'two'), 2, `${name} Tab should create second level`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'three')).run()
+    pressTab(editor, window)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'three'), 2, `${name} first Tab on third item should keep second level`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'three')).run()
+    pressTab(editor, window)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'three'), 3, `${name} second Tab on third item should create third level`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'three')).run()
+    pressTab(editor, window)
+    assert.equal(listItemDepthForText(editor.getJSON(), 'three'), 3, `${name} Tab must not create fourth level`)
+    editor.destroy()
+  })
+}
 
 test('indent/outdent buttons nest and unnest task list items', () => {
   const { editor, host } = createEditorWithToolbar()
@@ -939,9 +1565,23 @@ test('list indentation is capped at three levels for toolbar and Tab', () => {
   indent.click()
   assert.equal(maxListItemDepth(editor.getJSON()), 3, 'toolbar indent must not create fourth level')
 
-  const event = new window.KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true })
-  editor.view.dom.dispatchEvent(event)
+  pressTab(editor, window)
   assert.equal(maxListItemDepth(editor.getJSON()), 3, 'Tab must not create fourth level')
+  editor.destroy()
+})
+
+test('ordered list indentation is capped at three levels', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent(threeLevelListDoc('listItem', 'orderedList'))
+  markEditorFocused(editor)
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'four')).run()
+
+  const indent = host.querySelector('button[data-format="indentList"]')
+  assert.equal(maxListItemDepth(editor.getJSON()), 3)
+  assert.equal(indent.disabled, true, 'indent disabled at the third ordered list level')
+
+  indent.click()
+  assert.equal(maxListItemDepth(editor.getJSON()), 3, 'ordered list indent must not create fourth level')
   editor.destroy()
 })
 
@@ -960,7 +1600,187 @@ test('task list indentation is capped at three levels', () => {
   editor.destroy()
 })
 
-test('task parent and child checked states stay independent', () => {
+test('task parent checkbox cascades checked state to nested children', () => {
+  const { editor, window } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [{
+        type: 'taskItem',
+        attrs: { checked: false },
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'parent' }] },
+          {
+            type: 'taskList',
+            content: [
+              { type: 'taskItem', attrs: { checked: false }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'child one' }] }] },
+              { type: 'taskItem', attrs: { checked: false }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'child two' }] }] },
+            ],
+          },
+        ],
+      }],
+    }],
+  })
+
+  const parentCheckbox = editor.view.dom.querySelector('input[type="checkbox"]')
+  parentCheckbox.checked = true
+  parentCheckbox.dispatchEvent(new window.Event('change', { bubbles: true }))
+
+  const afterChecked = collectTaskCheckedStates(editor.getJSON())
+  assert.deepEqual(afterChecked, [true, true, true], 'checking parent should check all nested children')
+
+  parentCheckbox.checked = false
+  parentCheckbox.dispatchEvent(new window.Event('change', { bubbles: true }))
+
+  const afterUnchecked = collectTaskCheckedStates(editor.getJSON())
+  assert.deepEqual(afterUnchecked, [false, false, false], 'unchecking parent should uncheck all nested children')
+  editor.destroy()
+})
+
+test('task children update parent only when all children are checked', () => {
+  const { editor, window } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [{
+        type: 'taskItem',
+        attrs: { checked: false },
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'parent' }] },
+          {
+            type: 'taskList',
+            content: [
+              { type: 'taskItem', attrs: { checked: false }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'child one' }] }] },
+              { type: 'taskItem', attrs: { checked: false }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'child two' }] }] },
+            ],
+          },
+        ],
+      }],
+    }],
+  })
+
+  const checkboxes = editor.view.dom.querySelectorAll('input[type="checkbox"]')
+  checkboxes[1].checked = true
+  checkboxes[1].dispatchEvent(new window.Event('change', { bubbles: true }))
+
+  assert.deepEqual(collectTaskCheckedStates(editor.getJSON()), [false, true, false], 'partial children should keep parent unchecked')
+  assert.equal(checkboxes[0].indeterminate, false, 'parent should not render an indeterminate state')
+  assert.equal(checkboxes[0].closest('li').dataset.indeterminate, undefined, 'parent should not expose mixed DOM state')
+
+  checkboxes[2].checked = true
+  checkboxes[2].dispatchEvent(new window.Event('change', { bubbles: true }))
+
+  assert.deepEqual(collectTaskCheckedStates(editor.getJSON()), [true, true, true], 'all checked children should check parent automatically')
+  assert.equal(checkboxes[0].indeterminate, false, 'full checked parent should not use indeterminate state')
+  assert.equal(checkboxes[0].closest('li').dataset.indeterminate, undefined, 'full checked parent should not expose mixed DOM state')
+  editor.destroy()
+})
+
+test('visual-indented task children update their Shift+Tab-created parent when all are checked', () => {
+  const { editor, window } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [{
+        type: 'taskItem',
+        attrs: { checked: false, dvnIndentLevel: 0 },
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'top' }] },
+          {
+            type: 'taskList',
+            content: [
+              { type: 'taskItem', attrs: { checked: false, dvnIndentLevel: 0 }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'parent' }] }] },
+              { type: 'taskItem', attrs: { checked: false, dvnIndentLevel: 1 }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'child one' }] }] },
+              { type: 'taskItem', attrs: { checked: false, dvnIndentLevel: 1 }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'child two' }] }] },
+              { type: 'taskItem', attrs: { checked: false, dvnIndentLevel: 0 }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'sibling' }] }] },
+            ],
+          },
+        ],
+      }],
+    }],
+  })
+
+  let checkboxes = editor.view.dom.querySelectorAll('input[type="checkbox"]')
+  checkboxes[2].checked = true
+  checkboxes[2].dispatchEvent(new window.Event('change', { bubbles: true }))
+  assert.deepEqual(
+    collectTaskCheckedStates(editor.getJSON()),
+    [false, false, true, false, false],
+    'checking only one visual-indented child should keep the visual parent unchecked',
+  )
+
+  checkboxes = editor.view.dom.querySelectorAll('input[type="checkbox"]')
+  checkboxes[3].checked = true
+  checkboxes[3].dispatchEvent(new window.Event('change', { bubbles: true }))
+  assert.deepEqual(
+    collectTaskCheckedStates(editor.getJSON()),
+    [false, true, true, true, false],
+    'checking every visual-indented child should check the Shift+Tab-created visual parent only',
+  )
+  editor.destroy()
+})
+
+test('user-created third-level task siblings cascade to the second-level parent after Shift+Tab', () => {
+  const { editor, window } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'taskList',
+      content: [
+        { type: 'taskItem', attrs: { checked: false }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'top' }] }] },
+        { type: 'taskItem', attrs: { checked: false }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'parent' }] }] },
+      ],
+    }],
+  })
+  markEditorFocused(editor)
+
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'parent')).run()
+  pressTab(editor, window)
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'parent')).run()
+  pressTab(editor, window)
+  assert.equal(listItemDepthForText(editor.getJSON(), 'parent'), 3)
+
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'parent')).run()
+  pressEnter(editor, window)
+  editor.commands.insertContent('child one')
+  assert.equal(listItemDepthForText(editor.getJSON(), 'child one'), 3)
+
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'parent')).run()
+  pressTab(editor, window, true)
+  assert.equal(listItemDepthForText(editor.getJSON(), 'parent'), 2, 'Shift+Tab should make the previous third-level task a second-level visual parent')
+  assert.equal(listItemDepthForText(editor.getJSON(), 'child one'), 3, 'existing following task should remain third-level under the new visual parent')
+
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'child one')).run()
+  pressEnter(editor, window)
+  editor.commands.insertContent('child two')
+  assert.equal(listItemDepthForText(editor.getJSON(), 'child two'), 3)
+
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'child two')).run()
+  pressEnter(editor, window)
+  editor.commands.insertContent('sibling')
+  editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'sibling')).run()
+  pressTab(editor, window, true)
+  assert.equal(listItemDepthForText(editor.getJSON(), 'sibling'), 2, 'following second-level sibling keeps the top task unchecked')
+
+  let checkboxes = editor.view.dom.querySelectorAll('input[type="checkbox"]')
+  checkboxes[2].checked = true
+  checkboxes[2].dispatchEvent(new window.Event('change', { bubbles: true }))
+  checkboxes = editor.view.dom.querySelectorAll('input[type="checkbox"]')
+  checkboxes[3].checked = true
+  checkboxes[3].dispatchEvent(new window.Event('change', { bubbles: true }))
+
+  assert.deepEqual(
+    collectTaskCheckedStates(editor.getJSON()),
+    [false, true, true, true, false],
+    'the second-level parent should be checked after all of its generated third-level children are checked',
+  )
+  editor.destroy()
+})
+
+test('task completion bubbles upward only after every child level is complete', () => {
   const { editor, window } = createEditorWithToolbar()
   editor.commands.setContent({
     type: 'doc',
@@ -976,7 +1796,16 @@ test('task parent and child checked states stay independent', () => {
             content: [{
               type: 'taskItem',
               attrs: { checked: false },
-              content: [{ type: 'paragraph', content: [{ type: 'text', text: 'child' }] }],
+              content: [
+                { type: 'paragraph', content: [{ type: 'text', text: 'child' }] },
+                {
+                  type: 'taskList',
+                  content: [
+                    { type: 'taskItem', attrs: { checked: false }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'grandchild one' }] }] },
+                    { type: 'taskItem', attrs: { checked: false }, content: [{ type: 'paragraph', content: [{ type: 'text', text: 'grandchild two' }] }] },
+                  ],
+                },
+              ],
             }],
           },
         ],
@@ -984,18 +1813,18 @@ test('task parent and child checked states stay independent', () => {
     }],
   })
 
-  const checkbox = editor.view.dom.querySelector('input[type="checkbox"]')
-  checkbox.checked = true
-  checkbox.dispatchEvent(new window.Event('change', { bubbles: true }))
+  const checkboxes = editor.view.dom.querySelectorAll('input[type="checkbox"]')
+  checkboxes[2].checked = true
+  checkboxes[2].dispatchEvent(new window.Event('change', { bubbles: true }))
+  assert.deepEqual(collectTaskCheckedStates(editor.getJSON()), [false, false, true, false], 'one completed grandchild should not complete child or parent')
 
-  const parent = findNode(editor.getJSON(), 'taskItem')
-  const child = findNode(parent.content.find(node => node.type === 'taskList'), 'taskItem')
-  assert.equal(parent.attrs.checked, true, 'parent checkbox toggles parent item')
-  assert.equal(child.attrs.checked, false, 'child checkbox state must not be changed by parent')
+  checkboxes[3].checked = true
+  checkboxes[3].dispatchEvent(new window.Event('change', { bubbles: true }))
+  assert.deepEqual(collectTaskCheckedStates(editor.getJSON()), [true, true, true, true], 'parent should complete only after the whole child subtree is complete')
   editor.destroy()
 })
 
-test('indent/outdent buttons disabled outside list, enabled inside', () => {
+test('indent button follows real sink capability inside lists', () => {
   const { editor, host } = createEditorWithToolbar()
   insertText(editor, 'plain')
   selectText(editor)
@@ -1006,8 +1835,8 @@ test('indent/outdent buttons disabled outside list, enabled inside', () => {
   assert.equal(outdent.disabled, true, 'outdent disabled in paragraph')
 
   host.querySelector('button[data-format="bulletList"]').click()
-  assert.equal(indent.disabled, false, 'indent enabled inside list')
-  assert.equal(outdent.disabled, false, 'outdent enabled inside list')
+  assert.equal(indent.disabled, true, 'single list item has no previous sibling to indent under')
+  assert.equal(outdent.disabled, true, 'outdent disabled at first list level because Shift+Tab no longer exits lists')
   editor.destroy()
 })
 
