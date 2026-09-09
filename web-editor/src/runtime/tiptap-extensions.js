@@ -27,6 +27,7 @@ import { FontSizeMark } from '../extensions/font-size-mark.js'
 import { ImageBlock } from '../extensions/image-block.js'
 import { VoiceBlock } from '../extensions/voice-block.js'
 import { ListNestingGuard } from './list-nesting-guard.js'
+import { TaskListCascade } from './task-list-cascade.js'
 import { UndoRedo } from './undo-redo.js'
 import { SearchExtension } from './search-extension.js'
 
@@ -55,6 +56,7 @@ export function createTiptapExtensions() {
     FontSizeMark,
     UndoRedo,
     SearchExtension,
+    TaskListCascade,
     ListNestingGuard,
   ]
 }

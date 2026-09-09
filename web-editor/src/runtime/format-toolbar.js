@@ -17,7 +17,7 @@ import imageIconUrl from './icons/image.svg?url'
 import taskListIconUrl from './icons/task.svg?url'
 import checkIconUrl from './icons/check.svg?url'
 import { FORE_COLORS, BACK_COLORS, FONT_SIZES, colorPaletteForTheme, toPxSize } from './format-palette.js'
-import { canIndentActiveListItem, canOutdentActiveListItem, liftActiveListItem, sinkActiveListItem } from './list-behavior.js'
+import { activeListType, canIndentActiveListItem, canOutdentActiveListItem, liftActiveListItem, sinkActiveListItem, switchActiveListType } from './list-behavior.js'
 
 const TOGGLE_BUTTONS = [
   { format: 'bold', icon: 'bold', title: '粗体', className: 'tiptap-format-bold' },
@@ -33,7 +33,6 @@ const HEADING_OPTIONS = [
   { value: '3', label: '标题3' },
   { value: '4', label: '标题4' },
   { value: '5', label: '标题5' },
-  { value: '6', label: '标题6' },
 ]
 
 const LIST_TOGGLE_BUTTONS = [
@@ -160,31 +159,33 @@ function applyToggle(editor, format) {
 }
 
 function applyListToggle(editor, kind) {
+  if (switchActiveListType(editor, kind)) return
+
   const command = `toggle${kind.charAt(0).toUpperCase()}${kind.slice(1)}`
   editor.chain().focus()[command]().run()
 }
 const TASK_LIST_STYLE_ID = 'dvn-tiptap-tasklist-style'
 
-// 注入待办「已完成」主题化自包含样式：去列表符 + 已完成删除线/灰化，
-// 颜色取 --color / --highlightColor / --backgroundColor 适配深浅色。
+// 注入待办列表主题化自包含样式：去列表符 + 已完成内容弱化。
+// 已完成态不改正文颜色、不加删除线，避免文字变成主题色。
 function injectTaskListStyles() {
   if (document.getElementById(TASK_LIST_STYLE_ID)) return
   const style = document.createElement('style')
   style.id = TASK_LIST_STYLE_ID
   style.textContent = [
     'ul[data-type="taskList"] { list-style: none; padding-left: 0; }',
-    'ul[data-type="taskList"] li { display: flex; align-items: flex-start; gap: 6px; }',
-    'ul[data-type="taskList"] li > label { display: inline-flex; align-items: center; flex: 0 0 auto; height: 1.72em; margin: 0; }',
-    'ul[data-type="taskList"] li > label > input[type="checkbox"] { margin: 0; }',
-    'ul[data-type="taskList"] li > div { flex: 1 1 auto; min-width: 0; }',
-    'ul[data-type="taskList"] li > div > p { margin: 0; }',
-    'ul[data-type="taskList"] li[data-checked="true"] { opacity: 0.55; }',
-    'ul[data-type="taskList"] li[data-checked="true"] p {',
-    '  color: var(--color, inherit);',
-    '  text-decoration: line-through;',
-    '  text-decoration-color: var(--highlightColor, #007AFF);',
-    '}',
-    'ul[data-type="taskList"] li[data-checked="true"] > label {',
+    'ul[data-type="taskList"] ul[data-type="taskList"] { padding-left: 20px; }',
+    'ul[data-type="taskList"] > li > div > ul[data-type="taskList"] { margin-left: -20px; }',
+    'ul[data-type="taskList"] > li > div > ul[data-type="taskList"] > li > div > ul[data-type="taskList"] > li > div > ul[data-type="taskList"] { padding-left: 0; }',
+    'ul[data-type="taskList"] > li[data-dvn-indent-level="1"] > div > ul[data-type="taskList"] { margin-left: -40px; }',
+    'ul[data-type="taskList"] > li[data-dvn-indent-level="2"] > div > ul[data-type="taskList"] { margin-left: -60px; }',
+    'ul[data-type="taskList"] > li { display: flex; align-items: flex-start; gap: 0; }',
+    'ul[data-type="taskList"] > li > label { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 20px; width: 20px; height: 1.72em; margin: 0; }',
+    'ul[data-type="taskList"] > li > label > input[type="checkbox"] { margin: 0; }',
+    'ul[data-type="taskList"] > li > div { flex: 1 1 auto; min-width: 0; }',
+    'ul[data-type="taskList"] > li > div > p { margin: 0; }',
+    'ul[data-type="taskList"] > li[data-checked="true"] > div > p:first-child { opacity: 0.55; }',
+    'ul[data-type="taskList"] > li[data-checked="true"] > label {',
     '  background: var(--backgroundColor, transparent);',
     '  border-color: var(--highlightColor, #007AFF);',
     '}',
@@ -824,7 +825,7 @@ export function createFormatToolbar(editor, host) {
     // 不能像列表按钮那样只在显式选区时反馈。
     let activeLevel = 'p'
     if (hasEditorContext) {
-      for (let level = 1; level <= 6; level++) {
+      for (let level = 1; level <= 5; level++) {
         if (editor.isActive('heading', { level })) {
           activeLevel = String(level)
           break
@@ -851,9 +852,10 @@ export function createFormatToolbar(editor, host) {
     syncColorCells(backPicker.panel, backColor)
 
     // 列表/待办区
+    const currentListType = hasSelectionContext ? activeListType(editor) : null
     for (const format of ['bulletList', 'orderedList', 'taskList']) {
       const btn = listButtons[format]
-      setPressed(btn, hasSelectionContext && editor.isActive(format))
+      setPressed(btn, currentListType === format)
     }
     listButtons.indentList.disabled = !hasEditorContext || !canIndentActiveListItem(editor)
     listButtons.outdentList.disabled = !hasEditorContext || !canOutdentActiveListItem(editor)
