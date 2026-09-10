@@ -925,8 +925,10 @@ test('task list style keeps checkbox and text on the same row', () => {
   assert.match(style.textContent, /ul\[data-type="taskList"\] > li\[data-dvn-indent-level="2"\] > div > ul\[data-type="taskList"\] \{ margin-left: -60px;/)
   assert.match(style.textContent, /ul\[data-type="taskList"\] > li \{ display: flex; align-items: flex-start; gap: 0;/)
   assert.equal(/ul\[data-type="taskList"\] li \{ display: flex/.test(style.textContent), false, 'task list row style must not hide markers of nested bullet/ordered lists')
-  assert.match(style.textContent, /ul\[data-type="taskList"\] > li > label \{ display: inline-flex; align-items: center; justify-content: center;[^}]*flex: 0 0 20px; width: 20px;[^}]*height: 1\.72em;/)
-  assert.match(style.textContent, /ul\[data-type="taskList"\] > li > label > input\[type="checkbox"\] \{ margin: 0;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] > li > label \{ display: inline-flex; align-items: center; justify-content: center;[^}]*flex: 0 0 20px; width: 20px;[^}]*height: 1\.72em; margin: 0; background: transparent;/)
+  assert.match(style.textContent, /ul\[data-type="taskList"\] > li > label > input\[type="checkbox"\] \{ margin: 0; accent-color: var\(--highlightColor, #007AFF\);/)
+  assert.equal(/ul\[data-type="taskList"\] > li\[data-checked="true"\] > label/.test(style.textContent), false, 'checked task label must not paint a dark background around checkbox')
+  assert.equal(style.textContent.includes('background: var(--backgroundColor'), false, 'task checkbox wrapper must not reuse editor background in dark mode')
   assert.match(tiptapEditorHtml, /\.ProseMirror ul:not\(\[data-type="taskList"\]\) \{ list-style-type: disc; \}/)
   assert.match(tiptapEditorHtml, /\.ProseMirror li\[data-dvn-indent-level="1"\] \{ margin-left: 20px; \}/)
   assert.match(tiptapEditorHtml, /\.ProseMirror li\[data-dvn-indent-level="2"\] \{ margin-left: 40px; \}/)
@@ -1058,6 +1060,76 @@ for (const parentListType of ['bulletList', 'orderedList', 'taskList']) {
   }
 }
 
+
+for (const { sourceListType, targetListType } of [
+  { sourceListType: 'orderedList', targetListType: 'taskList' },
+  { sourceListType: 'bulletList', targetListType: 'orderedList' },
+  { sourceListType: 'taskList', targetListType: 'bulletList' },
+]) {
+  test(`selected ${sourceListType} block converts every item to ${targetListType}`, () => {
+    const { editor, host } = createEditorWithToolbar()
+    editor.commands.setContent({
+      type: 'doc',
+      content: [{
+        type: sourceListType,
+        content: [
+          listItemForListType(sourceListType, 'one'),
+          listItemForListType(sourceListType, 'two'),
+          listItemForListType(sourceListType, 'three'),
+        ],
+      }],
+    })
+    markEditorFocused(editor)
+    editor.chain().focus().setTextSelection({ from: 1, to: editor.state.doc.content.size - 1 }).run()
+
+    host.querySelector(`button[data-format="${targetListType}"]`).click()
+    const json = editor.getJSON()
+    for (const text of ['one', 'two', 'three']) {
+      assert.equal(listTypeForText(json, text), targetListType, `${text} should switch to ${targetListType}`)
+      assert.equal(
+        listItemTypeForText(json, text),
+        targetListType === 'taskList' ? 'taskItem' : 'listItem',
+        `${text} item node should match ${targetListType}`,
+      )
+      assert.equal(listItemDepthForText(json, text), 1, `${text} should stay first-level`)
+    }
+    editor.destroy()
+  })
+}
+
+test('selected nested list block converts recursively without flattening children', () => {
+  const { editor, host } = createEditorWithToolbar()
+  editor.commands.setContent({
+    type: 'doc',
+    content: [{
+      type: 'bulletList',
+      content: [
+        listItemForListType('bulletList', 'root', [{
+          type: 'bulletList',
+          content: [listItemForListType('bulletList', 'child')],
+        }]),
+        listItemForListType('bulletList', 'sibling'),
+      ],
+    }],
+  })
+  markEditorFocused(editor)
+  editor.chain().focus().setTextSelection({ from: 1, to: editor.state.doc.content.size - 1 }).run()
+
+  host.querySelector('button[data-format="taskList"]').click()
+  const json = editor.getJSON()
+  assert.deepEqual(textOrder(json), ['root', 'child', 'sibling'], 'selected nested conversion must keep text order')
+  assert.equal(listTypeForText(json, 'root'), 'taskList')
+  assert.equal(listTypeForText(json, 'child'), 'taskList')
+  assert.equal(listTypeForText(json, 'sibling'), 'taskList')
+  assert.equal(listItemTypeForText(json, 'root'), 'taskItem')
+  assert.equal(listItemTypeForText(json, 'child'), 'taskItem')
+  assert.equal(listItemTypeForText(json, 'sibling'), 'taskItem')
+  assert.equal(listItemDepthForText(json, 'root'), 1)
+  assert.equal(listItemDepthForText(json, 'child'), 2, 'nested child should remain nested after conversion')
+  assert.equal(listItemDepthForText(json, 'sibling'), 1)
+  assert.ok(maxListItemVisualDepth(json) <= 3)
+  editor.destroy()
+})
 
 test('switching list type changes only the active sibling item', () => {
   const { editor, host } = createEditorWithToolbar()

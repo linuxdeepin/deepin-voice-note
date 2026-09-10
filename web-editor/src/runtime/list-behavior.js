@@ -133,6 +133,87 @@ function createListOfType(editor, typeName, items, previousAttrs = {}, marks = [
   return listNodeType.create(listAttrsForType(typeName, previousAttrs), items, marks)
 }
 
+function convertListNodeToType(editor, node, targetListType) {
+  const targetItemTypeName = targetListType === 'taskList' ? 'taskItem' : 'listItem'
+
+  if (LIST_TYPES.has(node.type.name)) {
+    const children = []
+    for (let index = 0; index < node.childCount; index += 1) {
+      children.push(convertListNodeToType(editor, node.child(index), targetListType))
+    }
+    return editor.schema.nodes[targetListType].create(
+      listAttrsForType(targetListType, node.attrs),
+      children,
+      node.marks,
+    )
+  }
+
+  if (LIST_ITEM_TYPES.has(node.type.name)) {
+    const children = []
+    for (let index = 0; index < node.childCount; index += 1) {
+      const child = node.child(index)
+      children.push(LIST_TYPES.has(child.type.name)
+        ? convertListNodeToType(editor, child, targetListType)
+        : child)
+    }
+    return editor.schema.nodes[targetItemTypeName].create(
+      itemAttrsForType(targetItemTypeName, node.attrs),
+      children,
+      node.marks,
+    )
+  }
+
+  return node
+}
+
+function textContentRangeOfNode(pos, node) {
+  let from = null
+  let to = null
+
+  node.descendants((child, relativePos) => {
+    if (!child.isText) return true
+
+    const childFrom = pos + 1 + relativePos
+    const childTo = childFrom + child.nodeSize
+    from = from == null ? childFrom : Math.min(from, childFrom)
+    to = to == null ? childTo : Math.max(to, childTo)
+    return true
+  })
+
+  return from == null ? null : { from, to }
+}
+
+function selectionFullyCoversNode(selection, pos, node) {
+  const textRange = textContentRangeOfNode(pos, node)
+  if (!textRange) return selection.from <= pos + 1 && selection.to >= pos + node.nodeSize - 1
+  return selection.from <= textRange.from && selection.to >= textRange.to
+}
+
+export function switchSelectedListType(editor, targetListType) {
+  const { selection, doc } = editor.state
+  if (selection.empty || !LIST_TYPES.has(targetListType)) return false
+
+  const selectedLists = []
+  doc.descendants((node, pos) => {
+    if (!LIST_TYPES.has(node.type.name)) return true
+    if (!selectionFullyCoversNode(selection, pos, node)) return true
+
+    selectedLists.push({ node, pos })
+    return false
+  })
+
+  if (!selectedLists.length) return false
+  if (selectedLists.every(({ node }) => node.type.name === targetListType)) return false
+
+  let tr = editor.state.tr
+  for (const { node, pos } of selectedLists.sort((left, right) => right.pos - left.pos)) {
+    tr = tr.replaceWith(pos, pos + node.nodeSize, convertListNodeToType(editor, node, targetListType))
+  }
+
+  editor.view.dispatch(tr.scrollIntoView())
+  return true
+}
+
 
 function listItemSelectionOffset(info, pos = null) {
   const value = pos ?? info?.pos ?? 0
