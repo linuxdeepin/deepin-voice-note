@@ -861,10 +861,15 @@ export function createFormatToolbar(editor, host) {
   }
 
   function syncColorCells(panel, activeColor) {
-    const cells = panel.querySelectorAll('button[data-color]')
-    for (const cell of cells) {
+    const cells = Array.from(panel.querySelectorAll('button[data-color]'))
+    const hasActiveColor = Boolean(activeColor)
+    for (const [index, cell] of cells.entries()) {
       const color = cell.getAttribute('data-color')
-      const isActive = Boolean(activeColor) && sameCssColor(color, activeColor)
+      // When the current context has no explicit color, keep the first palette
+      // item selected as the default option.  This matches the palette's
+      // visual default without applying a mark to the document.
+      const isDefault = !hasActiveColor && index === 0
+      const isActive = (hasActiveColor && sameCssColor(color, activeColor)) || isDefault
       cell.setAttribute('aria-pressed', isActive ? 'true' : 'false')
     }
   }
