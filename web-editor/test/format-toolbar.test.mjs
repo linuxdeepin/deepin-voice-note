@@ -112,6 +112,8 @@ test('toolbar icons use imported assets or sanitized SVG nodes and follow theme 
   assert.match(toolbarCss, /\.tiptap-icon--asset::after \{[\s\S]*background-color: currentColor;/)
   assert.match(toolbarCss, /\.tiptap-icon--asset::after \{[\s\S]*opacity: 1;/)
   assert.match(toolbarCss, /\.tiptap-icon--asset > img \{[\s\S]*opacity: 0;/)
+  assert.equal(toolbar.querySelector('button[data-format="insertImage"] .tiptap-icon--asset') != null, true, 'insert image icon should follow the themed mask pipeline like voice')
+  assert.equal(toolbar.querySelector('button[data-format="insertImage"] .tiptap-icon--raw-asset'), null, 'insert image icon should not bypass dark theme recoloring')
   assert.match(toolbarCss, /\.tiptap-toolbar button\.is-active \.tiptap-icon--asset,[\s\S]*color: var\(--highlightColor/)
 
   editor.destroy()
@@ -145,6 +147,33 @@ test('toolbar keeps every tool visible at the default 616px editor pane width', 
   hostWidth = 614
   window.dispatchEvent(new window.Event('resize'))
   assert.ok(toolbar.querySelector('[data-format="more"]'))
+  editor.destroy()
+})
+
+test('open dropdown triggers use the active icon state', () => {
+  const { host, editor } = createEditorWithToolbar()
+
+  const headingButton = host.querySelector('.tiptap-select-heading .tiptap-select-button')
+  const fontButton = host.querySelector('.tiptap-select-fontFamily .tiptap-select-button')
+  const foreColorButton = host.querySelector('button[data-format="foreColor"]')
+  assert.ok(headingButton && fontButton && foreColorButton)
+
+  headingButton.click()
+  assert.equal(headingButton.getAttribute('aria-expanded'), 'true')
+  assert.equal(headingButton.closest('.tiptap-select-wrap').classList.contains('is-open'), true)
+
+  fontButton.click()
+  assert.equal(fontButton.getAttribute('aria-expanded'), 'true')
+  assert.equal(fontButton.closest('.tiptap-select-wrap').classList.contains('is-open'), true)
+  assert.equal(headingButton.getAttribute('aria-expanded'), 'false')
+
+  foreColorButton.click()
+  assert.equal(foreColorButton.getAttribute('aria-expanded'), 'true')
+
+  assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-select-wrap\.is-open \.tiptap-select-button,[\s\S]*background: var\(--dvn-hover-bg/)
+  assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-color-button\[aria-expanded="true"\][\s\S]*background: var\(--dvn-hover-bg/)
+  assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-select-wrap\.is-open \.tiptap-select-button \.tiptap-icon--asset,[\s\S]*color: var\(--highlightColor/)
+  assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-color-button\[aria-expanded="true"\] \.tiptap-icon--asset[\s\S]*color: var\(--highlightColor/)
   editor.destroy()
 })
 
@@ -219,6 +248,47 @@ test('toolbar overflow moves buttons dynamically by available width', () => {
   window.dispatchEvent(new window.Event('resize'))
   assert.equal(toolbar.querySelectorAll('.tiptap-overflow-panel [data-format]').length, 0)
   assert.equal(toolbar.querySelector('[data-format="more"]'), null, 'wide width should restore all buttons to main toolbar')
+  editor.destroy()
+})
+
+test('color palettes remain usable when their controls are folded into the more menu', () => {
+  const { host, editor, window } = createEditorWithToolbar()
+  const toolbar = host.querySelector('[data-testid="format-toolbar"]')
+
+  Object.defineProperty(host, 'clientWidth', {
+    configurable: true,
+    get: () => 380,
+  })
+  Object.defineProperty(toolbar, 'scrollWidth', {
+    configurable: true,
+    get: () => 700,
+  })
+  window.dispatchEvent(new window.Event('resize'))
+
+  const moreButton = toolbar.querySelector('button[data-format="more"]')
+  const overflowPanel = toolbar.querySelector('.tiptap-overflow-panel')
+  assert.ok(moreButton, 'more button should be present for a folded toolbar')
+  assert.ok(overflowPanel, 'folded toolbar should render an overflow panel')
+
+  moreButton.click()
+  assert.equal(overflowPanel.classList.contains('is-open'), true)
+
+  const foreButton = overflowPanel.querySelector('button[data-format="foreColor"]')
+  const backButton = overflowPanel.querySelector('button[data-format="backColor"]')
+  const forePanel = overflowPanel.querySelector('[data-panel="foreColor"]')
+  const backPanel = overflowPanel.querySelector('[data-panel="backColor"]')
+  assert.ok(foreButton && backButton && forePanel && backPanel, 'color controls should move together into the more menu')
+
+  foreButton.click()
+  assert.equal(forePanel.style.display, 'grid')
+  assert.equal(backPanel.style.display, 'none')
+
+  backButton.click()
+  assert.equal(backPanel.style.display, 'grid')
+  assert.equal(forePanel.style.display, 'none')
+
+  // The overflow popover must not clip a palette positioned below its trigger.
+  assert.match(toolbarCss, /\.tiptap-overflow-panel \{[\s\S]*overflow: visible;/)
   editor.destroy()
 })
 
@@ -465,6 +535,18 @@ test('color panels share dropdown theme and switch palettes in dark mode', () =>
     Array.from(backPanel.querySelectorAll('button[data-color]')).map((cell) => cell.getAttribute('data-color')),
     DARK_BACK_COLORS.flat(),
   )
+  editor.destroy()
+})
+
+test('color palettes select their first color by default', () => {
+  const { editor, host } = createEditorWithToolbar()
+  const forePanel = host.querySelector('[data-panel="foreColor"]')
+  const backPanel = host.querySelector('[data-panel="backColor"]')
+
+  assert.equal(forePanel.querySelector('button[data-color]:first-child').getAttribute('aria-pressed'), 'true')
+  assert.equal(backPanel.querySelector('button[data-color]:first-child').getAttribute('aria-pressed'), 'true')
+  assert.equal(forePanel.querySelectorAll('button[data-color][aria-pressed="true"]').length, 1)
+  assert.equal(backPanel.querySelectorAll('button[data-color][aria-pressed="true"]').length, 1)
   editor.destroy()
 })
 
@@ -991,6 +1073,36 @@ for (const format of ['bulletList', 'orderedList', 'taskList']) {
     editor.destroy()
   })
 }
+
+test('active level-one list button cancels only the current item', () => {
+  for (const { listType, name } of [
+    { listType: 'bulletList', name: 'bullet' },
+    { listType: 'orderedList', name: 'ordered' },
+    { listType: 'taskList', name: 'task' },
+  ]) {
+    const { editor, host } = createEditorWithToolbar()
+    editor.commands.setContent({
+      type: 'doc',
+      content: [{
+        type: listType,
+        content: [
+          listItemForListType(listType, 'first'),
+          listItemForListType(listType, 'second'),
+        ],
+      }],
+    })
+    markEditorFocused(editor)
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'second')).run()
+
+    host.querySelector(`button[data-format="${listType}"]`).click()
+    const json = editor.getJSON()
+    assert.equal(listTypeForText(json, 'first'), listType, `${name} sibling should remain a list item`)
+    assert.equal(listTypeForText(json, 'second'), null, `${name} active item should become plain text`)
+    assert.equal(listItemTypeForText(json, 'second'), null, `${name} active item should no longer be a list item`)
+    assert.deepEqual(textOrder(json), ['first', 'second'], `${name} cancellation must preserve text order`)
+    editor.destroy()
+  }
+})
 
 test('switching task list to bullet list drops checked, back to task list defaults unchecked', () => {
   const { editor, host } = createEditorWithToolbar()

@@ -299,13 +299,17 @@
 .tiptap-toolbar button:hover,
 .tiptap-toolbar select:hover,
 .tiptap-toolbar button.is-active,
-.tiptap-toolbar button[aria-pressed="true"] {
+.tiptap-toolbar button[aria-pressed="true"],
+.tiptap-toolbar .tiptap-select-wrap.is-open .tiptap-select-button,
+.tiptap-toolbar .tiptap-color-button[aria-expanded="true"] {
     background: var(--dvn-hover-bg, rgba(0, 0, 0, 0.06));
 }
 
-/* 选中态只改变图标颜色，按钮外框仍沿用普通 hover/check 背景。 */
+/* 选中/菜单展开态只改变图标颜色，按钮外框仍沿用普通 hover/check 背景。 */
 .tiptap-toolbar button.is-active .tiptap-icon--asset,
-.tiptap-toolbar button[aria-pressed="true"] .tiptap-icon--asset {
+.tiptap-toolbar button[aria-pressed="true"] .tiptap-icon--asset,
+.tiptap-toolbar .tiptap-select-wrap.is-open .tiptap-select-button .tiptap-icon--asset,
+.tiptap-toolbar .tiptap-color-button[aria-expanded="true"] .tiptap-icon--asset {
     color: var(--highlightColor, #0081ff);
 }
 
@@ -604,8 +608,15 @@
     background: var(--dvn-toolbar-bg, rgba(245, 245, 245, 1));
     box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.10);
     max-width: calc(100vw - 12px);
-    overflow-x: auto;
-    overflow-y: hidden;
+    /*
+     * The color palettes are absolutely positioned below their trigger.  The
+     * overflow toolbar is itself a fixed popover, so clipping its vertical
+     * overflow hides the palettes as soon as a color button is folded into
+     * the “more” menu.  Keep the popover content visible in both directions;
+     * its width is already constrained by max-width and the palette is
+     * clamped by the viewport positioning logic.
+     */
+    overflow: visible;
     white-space: nowrap;
 }
 
