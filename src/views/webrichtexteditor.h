@@ -1,4 +1,4 @@
-// Copyright (C) 2019 ~ 2019 UnionTech Software Technology Co.,Ltd.
+// Copyright (C) 2019 - 2026 UnionTech Software Technology Co.,Ltd.
 // SPDX-FileCopyrightText: 2023 UnionTech Software Technology Co., Ltd.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -241,6 +241,7 @@ private:
     QRect m_editToolbarRect; //编辑工具栏坐标
     QPoint m_mouseClickPos {-1, -1}; //鼠标点击位置
     bool m_setFocus {false}; //是否设置焦点
+    bool m_isMouseSelecting {false}; //是否正在编辑区拖拽选中文本
     //右键菜单
     VNoteRightMenu *m_pictureRightMenu {nullptr}; //图片右键菜单
     VNoteRightMenu *m_voiceRightMenu {nullptr}; //语音右键菜单
