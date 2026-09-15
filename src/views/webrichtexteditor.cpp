@@ -535,17 +535,30 @@ void WebRichTextEditor::viewPicture(const QString &filePath)
 
 void WebRichTextEditor::onPaste(bool isVoicePaste)
 {
-    //语音插件复制不经过系统剪切板,粘贴无法通过剪切板内容判断，直接调用前端粘贴事件
-    if (isVoicePaste) {
-        return page()->triggerAction(QWebEnginePage::Paste);
-    }
     //获取剪贴板信息
     QClipboard *clipboard = QApplication::clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
 
+    //语音插件复制不经过系统剪切板,粘贴无法通过剪切板内容判断，直接调用前端粘贴事件
+    if (isVoicePaste) {
+        //防御性检查：语音数据通常不经过系统剪贴板，但此处兜底拦截剪贴板中可能存在的大文本
+        if (mimeData->text().length() > MAX_NOTE_CONTENT_LEN) {
+            VNoteMessageDialog contentTooLong(VNoteMessageDialog::ContentTooLong);
+            contentTooLong.exec();
+            return;
+        }
+        return page()->triggerAction(QWebEnginePage::Paste);
+    }
+
     //识别语音类数据
     auto html = mimeData->html();
     if (html.contains(QRegularExpression("<div class=\"[^\"]*voiceBox"))) {
+        //统一使用纯文本长度计量，保证所有粘贴路径的阈值校验一致
+        if (mimeData->text().length() > MAX_NOTE_CONTENT_LEN) {
+            VNoteMessageDialog contentTooLong(VNoteMessageDialog::ContentTooLong);
+            contentTooLong.exec();
+            return;
+        }
         JsContent::instance()->callJsPasteHtml(html);
         return;
     }
@@ -560,6 +573,11 @@ void WebRichTextEditor::onPaste(bool isVoicePaste)
     } else if (mimeData->hasImage()) {
         JsContent::instance()->insertImages(qvariant_cast<QImage>(mimeData->imageData()));
     } else {
+        if (mimeData->text().length() > MAX_NOTE_CONTENT_LEN) {
+            VNoteMessageDialog contentTooLong(VNoteMessageDialog::ContentTooLong);
+            contentTooLong.exec();
+            return;
+        }
         //无图片文件，直接调用web端的粘贴事件
         page()->triggerAction(QWebEnginePage::Paste);
     }

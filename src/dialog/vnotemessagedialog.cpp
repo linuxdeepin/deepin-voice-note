@@ -155,6 +155,10 @@ void VNoteMessageDialog::initMessage()
         setIconPixmap(QIcon::fromTheme("dialog-warning").pixmap(QSize(32, 32))); //设置图标
         setSingleButton(); //单按钮
     } break;
+    case ContentTooLong: {
+        m_pMessage->setText(DApplication::translate("VNoteMessageDialog", "The pasted content is too long and may cause the application to freeze. It has not been pasted."));
+        setSingleButton();
+    } break;
     }
 }
 
