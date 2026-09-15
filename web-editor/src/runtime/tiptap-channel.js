@@ -483,6 +483,8 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-scrollbar-thumb-hover', isDark ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.50)')
   root.style.setProperty('--dvn-scrollbar-thumb-active', isDark ? 'rgba(255, 255, 255, 0.30)' : 'rgba(0, 0, 0, 0.40)')
   root.style.setProperty('--dvn-hover-bg', isDark ? '#3d3d3d' : '#f0f0f0')
+  root.style.setProperty('--dvn-press-bg', isDark ? '#4a4a4a' : '#e5e5e5')
+  root.style.setProperty('--dvn-toolbar-hover-fg', isDark ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.85)')
   root.style.setProperty('--dvn-clear-btn-bg', isDark ? '#2d2d2d' : '#fafafa')
   root.style.setProperty('--dvn-color-chip-border', isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.20)')
   root.style.setProperty('--dvn-color-transparent-line', isDark ? 'rgba(255, 255, 255, 0.32)' : 'rgba(0, 0, 0, 0.25)')

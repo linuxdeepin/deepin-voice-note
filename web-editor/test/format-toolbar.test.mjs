@@ -112,13 +112,28 @@ test('toolbar icons use imported assets or sanitized SVG nodes and follow theme 
   assert.match(toolbarCss, /\.tiptap-icon--asset::after \{[\s\S]*background-color: currentColor;/)
   assert.match(toolbarCss, /\.tiptap-icon--asset::after \{[\s\S]*opacity: 1;/)
   assert.match(toolbarCss, /\.tiptap-icon--asset > img \{[\s\S]*opacity: 0;/)
+  assert.match(toolbarCss, /\.tiptap-toolbar button:hover:not\(:disabled\):not\(:active\):not\(\.is-pressing\):not\(\.is-active\):not\(\[aria-pressed="true"\]\):not\(\[aria-expanded="true"\]\) \.tiptap-icon \{[\s\S]*color: var\(--dvn-toolbar-hover-fg/, 'toolbar icons should darken on hover')
+  assert.match(toolbarCss, /\.tiptap-toolbar button:active:not\(:disabled\),\n\.tiptap-toolbar button\.is-pressing:not\(:disabled\)[\s\S]*background: var\(--dvn-press-bg/, 'toolbar pressed state should use DTK-like press background')
+  assert.match(toolbarCss, /\.tiptap-toolbar button\.is-pressing:not\(:disabled\) \.tiptap-icon,[\s\S]*color: var\(--highlightColor/, 'toolbar pressed state should reuse check icon color')
   assert.equal(toolbar.querySelector('button[data-format="insertImage"] .tiptap-icon--asset') != null, true, 'insert image icon should follow the themed mask pipeline like voice')
   assert.equal(toolbar.querySelector('button[data-format="insertImage"] .tiptap-icon--raw-asset'), null, 'insert image icon should not bypass dark theme recoloring')
-  assert.match(toolbarCss, /\.tiptap-toolbar button\.is-active \.tiptap-icon--asset,[\s\S]*color: var\(--highlightColor/)
+  assert.match(toolbarCss, /\.tiptap-toolbar button\.is-active \.tiptap-icon,[\s\S]*color: var\(--highlightColor/)
 
   editor.destroy()
 })
 
+test('toolbar button keeps a pressed visual class until pointer release', () => {
+  const { host, editor, window } = createEditorWithToolbar()
+  const button = host.querySelector('button[data-format="bold"]')
+  assert.ok(button)
+
+  button.dispatchEvent(new window.Event('pointerdown', { bubbles: true, cancelable: true }))
+  assert.equal(button.classList.contains('is-pressing'), true)
+
+  window.dispatchEvent(new window.Event('pointerup', { bubbles: true, cancelable: true }))
+  assert.equal(button.classList.contains('is-pressing'), false)
+  editor.destroy()
+})
 
 test('toolbar keeps every tool visible at the default 616px editor pane width', () => {
   const { host, editor, window } = createEditorWithToolbar()
@@ -172,8 +187,9 @@ test('open dropdown triggers use the active icon state', () => {
 
   assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-select-wrap\.is-open \.tiptap-select-button,[\s\S]*background: var\(--dvn-hover-bg/)
   assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-color-button\[aria-expanded="true"\][\s\S]*background: var\(--dvn-hover-bg/)
-  assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-select-wrap\.is-open \.tiptap-select-button \.tiptap-icon--asset,[\s\S]*color: var\(--highlightColor/)
-  assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-color-button\[aria-expanded="true"\] \.tiptap-icon--asset[\s\S]*color: var\(--highlightColor/)
+  assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-select-wrap\.is-open \.tiptap-select-button \.tiptap-icon,[\s\S]*color: var\(--highlightColor/)
+  assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-color-button\[aria-expanded="true"\] \.tiptap-icon[\s\S]*color: var\(--highlightColor/)
+  assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-more-button\[aria-expanded="true"\] \.tiptap-icon,[\s\S]*color: var\(--highlightColor/)
   editor.destroy()
 })
 
@@ -251,6 +267,34 @@ test('toolbar overflow moves buttons dynamically by available width', () => {
   editor.destroy()
 })
 
+test('more button highlights only while the more panel is opened', () => {
+  const { host, editor, window } = createEditorWithToolbar()
+  const toolbar = host.querySelector('[data-testid="format-toolbar"]')
+
+  Object.defineProperty(host, 'clientWidth', {
+    configurable: true,
+    get: () => 380,
+  })
+  Object.defineProperty(toolbar, 'scrollWidth', {
+    configurable: true,
+    get: () => 700,
+  })
+  window.dispatchEvent(new window.Event('resize'))
+
+  const moreButton = toolbar.querySelector('button[data-format="more"]')
+  const overflowPanel = toolbar.querySelector('.tiptap-overflow-panel')
+  assert.ok(moreButton && overflowPanel)
+
+  assert.equal(moreButton.getAttribute('aria-expanded'), 'false')
+  assert.equal(moreButton.classList.contains('has-active-overflow'), false)
+
+  moreButton.click()
+  assert.equal(moreButton.getAttribute('aria-expanded'), 'true')
+  assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-more-button\[aria-expanded="true"\] \.tiptap-icon,[\s\S]*color: var\(--highlightColor/)
+  assert.doesNotMatch(toolbarCss, /has-active-overflow/, 'folded active tools should not force the more button into an active state')
+  editor.destroy()
+})
+
 test('color palettes remain usable when their controls are folded into the more menu', () => {
   const { host, editor, window } = createEditorWithToolbar()
   const toolbar = host.querySelector('[data-testid="format-toolbar"]')
@@ -312,6 +356,83 @@ for (const format of ['bold', 'italic', 'underline', 'strike', 'blockquote']) {
     btn.click()
     assert.equal(btn.getAttribute('aria-pressed'), 'false')
     assert.ok(!editor.isActive(format), `${format} should be cleared after toggle off`)
+    editor.destroy()
+  })
+}
+
+for (const format of ['bold', 'italic', 'underline', 'strike']) {
+  test(`${format}: collapsed cursor can pre-activate formatting for new input`, () => {
+    const { editor, host } = createEditorWithToolbar()
+    markEditorFocused(editor)
+
+    const btn = host.querySelector(`button[data-format="${format}"]`)
+    assert.ok(btn)
+
+    btn.click()
+    assert.equal(btn.getAttribute('aria-pressed'), 'true')
+    assert.ok(editor.isActive(format), `${format} should be active before typing`)
+
+    insertText(editor, 'typed')
+    assert.ok(textHasMark(editor, 'typed', format), `${format} should apply to newly typed text`)
+
+    btn.click()
+    assert.equal(btn.getAttribute('aria-pressed'), 'false')
+    assert.ok(!editor.isActive(format), `${format} should be cleared for following input`)
+    editor.destroy()
+  })
+
+  test(`${format}: manual pre-activation persists across rows and lists`, () => {
+    const { editor, host } = createEditorWithToolbar()
+    editor.commands.setContent({
+      type: 'doc',
+      content: [
+        { type: 'paragraph', content: [{ type: 'text', text: 'first' }] },
+        { type: 'paragraph', content: [{ type: 'text', text: 'second' }] },
+      ],
+    })
+    markEditorFocused(editor)
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'first')).run()
+
+    const btn = host.querySelector(`button[data-format="${format}"]`)
+    btn.click()
+    assert.equal(btn.getAttribute('aria-pressed'), 'true')
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'second')).run()
+    assert.equal(btn.getAttribute('aria-pressed'), 'true', `${format} should stay active after moving to another row`)
+    insertText(editor, `-${format}`)
+    assert.ok(textHasMark(editor, `-${format}`, format), `${format} should be applied after moving to another row`)
+
+    host.querySelector('button[data-format="bulletList"]').click()
+    assert.equal(btn.getAttribute('aria-pressed'), 'true', `${format} should stay active after switching list type`)
+    insertText(editor, `-list-${format}`)
+    assert.ok(textHasMark(editor, `-list-${format}`, format), `${format} should be applied inside the switched list`)
+    editor.destroy()
+  })
+
+  test(`${format}: manual activation from selected text persists for following input`, () => {
+    const { editor, host } = createEditorWithToolbar()
+    editor.commands.setContent({
+      type: 'doc',
+      content: [
+        { type: 'paragraph', content: [{ type: 'text', text: 'first' }] },
+        { type: 'paragraph', content: [{ type: 'text', text: 'second' }] },
+      ],
+    })
+    markEditorFocused(editor)
+    editor.chain().focus().setTextSelection(findTextRange(editor, 'first')).run()
+
+    const btn = host.querySelector(`button[data-format="${format}"]`)
+    btn.click()
+    assert.equal(btn.getAttribute('aria-pressed'), 'true')
+    assert.ok(textHasMark(editor, 'first', format), `${format} should apply to selected text`)
+
+    editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'second')).run()
+    assert.equal(btn.getAttribute('aria-pressed'), 'true', `${format} should stay active after leaving the selection`)
+    insertText(editor, `-selected-${format}`)
+    assert.ok(textHasMark(editor, `-selected-${format}`, format), `${format} should apply to following input after selected text`)
+
+    host.querySelector('button[data-format="orderedList"]').click()
+    assert.equal(btn.getAttribute('aria-pressed'), 'true', `${format} should stay active after selected-text flow switches list type`)
     editor.destroy()
   })
 }
@@ -436,6 +557,11 @@ test('heading dropdown follows the Sketch menu labels and type scale hooks', () 
   assert.doesNotMatch(toolbarCss, /dvn-heading-menu-bg/, 'heading dropdown must share the themed menu background with other dropdowns')
   assert.doesNotMatch(toolbarCss, /dvn-heading-menu-border/, 'heading dropdown must share the themed menu border with other dropdowns')
   assert.match(toolbarCss, /\.tiptap-select-menu \{[\s\S]*background: var\(--dvn-menu-bg, var\(--dvn-panel-bg/)
+  assert.match(toolbarCss, /\.tiptap-select-menu \{[\s\S]*scrollbar-width: none;/, 'select menus should remain scrollable without a visible scrollbar gutter')
+  assert.match(toolbarCss, /\.tiptap-select-menu::-webkit-scrollbar \{[\s\S]*width: 0;/, 'select menus should hide webkit scrollbar width')
+  assert.match(toolbarCss, /\.tiptap-select-check \{[\s\S]*color: inherit;/, 'selected option check should follow the normal/hover text color')
+  assert.doesNotMatch(toolbarCss, /\.tiptap-select-option\[aria-selected="true"\][^{]*\{[^}]*background-color: var\(--highlightColor/, 'selected dropdown rows should not keep hover highlight')
+  assert.doesNotMatch(toolbarCss, /\.tiptap-select-option:hover,\n\.tiptap-select-option:focus-visible,\n\.tiptap-select-option\[aria-selected="true"\]/, 'hover highlight must not be tied to selected state')
   assert.match(toolbarCss, /\.tiptap-select-heading \.tiptap-select-option\[data-value="1"\] \{[\s\S]*--dvn-heading-option-font-size: 24px;/)
   assert.match(toolbarCss, /\.tiptap-select-heading \.tiptap-select-option\[data-value="2"\] \{[\s\S]*--dvn-heading-option-font-size: 21px;/)
   assert.equal(host.querySelector('.tiptap-select-option[data-value="6"]'), null, 'heading dropdown should not expose title 6')
@@ -900,6 +1026,30 @@ function listItemForListType(listType, text, extra = []) {
       ...extra,
     ],
   }
+}
+
+
+function textHasMark(editor, text, markName) {
+  let found = false
+  editor.state.doc.descendants((node) => {
+    if (node.isText && node.text?.includes(text)) {
+      found = node.marks.some((mark) => mark.type.name === markName)
+      return false
+    }
+    return true
+  })
+  if (!found) {
+    let exists = false
+    editor.state.doc.descendants((node) => {
+      if (node.isText && node.text?.includes(text)) {
+        exists = true
+        return false
+      }
+      return true
+    })
+    if (!exists) throw new Error(`text not found: ${text}`)
+  }
+  return found
 }
 
 function findTextEndPosition(editor, text) {
@@ -2040,7 +2190,7 @@ test('list toggle buttons are not active before editor receives focus', () => {
   editor.destroy()
 })
 
-test('list toggle buttons are not active for a collapsed cursor inside a list', () => {
+test('list toggle buttons show active state for a collapsed cursor inside a list', () => {
   const { editor, host } = createEditorWithToolbar()
   editor.commands.setContent({
     type: 'doc',
@@ -2053,9 +2203,24 @@ test('list toggle buttons are not active for a collapsed cursor inside a list', 
   editor.chain().focus().setTextSelection(findTextEndPosition(editor, 'x')).run()
 
   assert.equal(host.querySelector('button[data-format="bulletList"]').getAttribute('aria-pressed'), 'false')
-  assert.equal(host.querySelector('button[data-format="orderedList"]').getAttribute('aria-pressed'), 'false')
+  assert.equal(host.querySelector('button[data-format="orderedList"]').getAttribute('aria-pressed'), 'true')
   assert.equal(host.querySelector('button[data-format="taskList"]').getAttribute('aria-pressed'), 'false')
   editor.destroy()
+})
+
+test('clicking a list toggle immediately shows its active state', () => {
+  for (const format of ['bulletList', 'orderedList', 'taskList']) {
+    const { editor, host } = createEditorWithToolbar()
+    markEditorFocused(editor)
+
+    host.querySelector(`button[data-format="${format}"]`).click()
+
+    assert.equal(host.querySelector(`button[data-format="${format}"]`).getAttribute('aria-pressed'), 'true')
+    for (const other of ['bulletList', 'orderedList', 'taskList'].filter((item) => item !== format)) {
+      assert.equal(host.querySelector(`button[data-format="${other}"]`).getAttribute('aria-pressed'), 'false')
+    }
+    editor.destroy()
+  }
 })
 
 test('list toggle buttons reflect active state as selection moves', () => {

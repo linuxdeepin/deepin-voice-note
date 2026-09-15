@@ -26,6 +26,9 @@ const TOGGLE_BUTTONS = [
   { format: 'strike', icon: 'strike', title: '删除线', className: 'tiptap-format-strike' },
 ]
 
+const PERSISTENT_INLINE_FORMATS = new Set(['bold', 'italic', 'underline', 'strike'])
+const TOOLBAR_PRESS_CLEAR_EVENTS = ['pointerup', 'pointercancel', 'pointerleave', 'blur']
+
 const HEADING_OPTIONS = [
   { value: 'p', label: '正文' },
   { value: '1', label: '标题1' },
@@ -494,6 +497,59 @@ export function createFormatToolbar(editor, host) {
     }
   }
   toolbar.appendChild(styleGroup)
+
+  // 折叠光标下的手动开关需要像 Summernote 一样作为“待输入格式”保持，
+  // 不能因为切换行、切换列表项导致 Tiptap 临时 storedMarks 被清空后按钮失焦。
+  const persistentInlineFormats = new Map()
+  let applyingPersistentInlineFormats = false
+
+  function applyStoredInlineFormat(format, active) {
+    const chain = editor.chain().focus()
+    if (active) {
+      return chain.setMark(format).run()
+    }
+    return chain.unsetMark(format).run()
+  }
+
+  function applyPersistentInlineFormats() {
+    if (applyingPersistentInlineFormats || !editor.isFocused || !editor.state.selection.empty || persistentInlineFormats.size === 0) return
+
+    let chain = editor.chain().focus()
+    let needRun = false
+    for (const [format, active] of persistentInlineFormats) {
+      const currentlyActive = editor.isActive(format)
+      if (active && !currentlyActive) {
+        chain = chain.setMark(format)
+        needRun = true
+      } else if (!active && currentlyActive) {
+        chain = chain.unsetMark(format)
+        needRun = true
+      }
+    }
+    if (!needRun) return
+
+    applyingPersistentInlineFormats = true
+    try {
+      chain.run()
+    } finally {
+      applyingPersistentInlineFormats = false
+    }
+  }
+
+  function applyToolbarToggle(format) {
+    if (!PERSISTENT_INLINE_FORMATS.has(format)) {
+      applyToggle(editor, format)
+      return
+    }
+
+    const current = persistentInlineFormats.has(format)
+      ? persistentInlineFormats.get(format)
+      : editor.isActive(format)
+    const nextActive = !current
+    persistentInlineFormats.set(format, nextActive)
+    applyStoredInlineFormat(format, nextActive)
+    syncActiveStates()
+  }
   const styleToggleSeparator = createSeparator()
   toolbar.appendChild(styleToggleSeparator)
 
@@ -502,7 +558,7 @@ export function createFormatToolbar(editor, host) {
   for (const { format, icon, title, className } of TOGGLE_BUTTONS) {
     const btn = createToolbarButton({ format, title, className, children: createSvgIcon(icon) })
     btn.setAttribute('aria-pressed', 'false')
-    btn.addEventListener('click', () => applyToggle(editor, format))
+    btn.addEventListener('click', () => applyToolbarToggle(format))
     toggleGroup.appendChild(btn)
     buttons[format] = btn
   }
@@ -651,6 +707,27 @@ export function createFormatToolbar(editor, host) {
   ]
   const overflowCollapseUnits = [...orderedToolbarUnits].reverse()
   const overflowSet = new Set()
+  let pressingButton = null
+
+  function clearPressingButton() {
+    pressingButton?.classList.remove('is-pressing')
+    pressingButton = null
+  }
+
+  function onToolbarPointerDown(event) {
+    const button = event.target?.closest?.('button')
+    if (!button || !toolbar.contains(button) || button.disabled) return
+    clearPressingButton()
+    pressingButton = button
+    button.classList.add('is-pressing')
+  }
+
+  toolbar.addEventListener('pointerdown', onToolbarPointerDown, true)
+  for (const eventName of TOOLBAR_PRESS_CLEAR_EVENTS) {
+    toolbar.addEventListener(eventName, clearPressingButton, true)
+  }
+  window.addEventListener('pointerup', clearPressingButton, true)
+  window.addEventListener('pointercancel', clearPressingButton, true)
 
   function removeAllChildren(node) {
     while (node.firstChild) node.removeChild(node.firstChild)
@@ -808,16 +885,20 @@ export function createFormatToolbar(editor, host) {
   }
 
   function syncActiveStates() {
-    // 工具栏按钮高亮只表达当前显式选区的格式。
-    // 页面加载/普通光标停留时 Tiptap 也会保留内部 selection，不能仅因光标所在位置或文档中存在
-    // 列表/代办就把对应按钮显示为选中态；这与 Summernote 顶部工具栏反馈保持一致。
+    // 开关式格式按钮表达当前输入位置的格式上下文。折叠光标下点击
+    // 加粗/斜体/下划线/删除线会写入待输入格式，后续输入应直接带格式；
+    // 该手动状态需要跨行/跨列表项保持，直到用户再次点击关闭。
     const hasEditorContext = Boolean(editor.isFocused)
-    const hasSelectionContext = hasEditorContext && !editor.state.selection.empty
+    applyPersistentInlineFormats()
 
-    for (const format of ['bold', 'italic', 'underline', 'strike', 'blockquote']) {
+    for (const format of ['bold', 'italic', 'underline', 'strike']) {
       const btn = buttons[format]
-      setPressed(btn, hasSelectionContext && editor.isActive(format))
+      const persistentActive = persistentInlineFormats.has(format)
+        ? persistentInlineFormats.get(format)
+        : editor.isActive(format)
+      setPressed(btn, hasEditorContext && persistentActive)
     }
+    setPressed(buttons.blockquote, hasEditorContext && editor.isActive('blockquote'))
 
     // 标题下拉表达“当前输入位置的块级样式”。即使是空标题/折叠光标，
     // 用户下一步输入的内容也会按该标题级别落盘，因此这里必须跟随光标上下文，
@@ -850,8 +931,10 @@ export function createFormatToolbar(editor, host) {
     syncColorCells(forePicker.panel, foreColor)
     syncColorCells(backPicker.panel, backColor)
 
-    // 列表/待办区
-    const currentListType = hasSelectionContext ? activeListType(editor) : null
+    // 列表/待办按钮表达当前输入位置的列表类型。用户点击序列号/序列点后
+    // 会生成折叠光标所在的列表上下文，按钮需要立即进入 active 状态。
+    // 仍保留焦点门禁，避免页面加载时仅因历史文档中存在列表而误高亮。
+    const currentListType = hasEditorContext ? activeListType(editor) : null
     for (const format of ['bulletList', 'orderedList', 'taskList']) {
       const btn = listButtons[format]
       setPressed(btn, currentListType === format)
@@ -923,6 +1006,13 @@ export function createFormatToolbar(editor, host) {
       document.removeEventListener('click', onOutsideClick)
       window.removeEventListener('resize', updateOverflowMode)
       window.removeEventListener('dvn-theme-applied', onThemeApplied)
+      toolbar.removeEventListener('pointerdown', onToolbarPointerDown, true)
+      for (const eventName of TOOLBAR_PRESS_CLEAR_EVENTS) {
+        toolbar.removeEventListener(eventName, clearPressingButton, true)
+      }
+      window.removeEventListener('pointerup', clearPressingButton, true)
+      window.removeEventListener('pointercancel', clearPressingButton, true)
+      clearPressingButton()
       editor.off?.('transaction', syncActiveStates)
       editor.off?.('focus', syncActiveStates)
       editor.off?.('blur', syncActiveStates)

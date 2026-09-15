@@ -116,6 +116,8 @@
     max-height: 360px;
     overflow-x: hidden;
     overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     padding: var(--dvn-menu-padding, 8px 6px);
     box-sizing: border-box;
     z-index: 30;
@@ -126,20 +128,8 @@
 }
 
 .tiptap-select-menu::-webkit-scrollbar {
-    width: 8px;
-}
-
-.tiptap-select-menu::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.tiptap-select-menu::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    background: var(--dvn-scrollbar-thumb, rgba(0, 0, 0, 0.30));
-}
-
-.tiptap-select-menu::-webkit-scrollbar-thumb:hover {
-    background: var(--dvn-scrollbar-thumb-hover, rgba(0, 0, 0, 0.50));
+    width: 0;
+    height: 0;
 }
 
 .tiptap-select-wrap.is-open .tiptap-select-menu {
@@ -172,7 +162,7 @@
     width: 16px;
     height: 16px;
     margin-right: 6px;
-    color: #ffffff;
+    color: inherit;
     background-color: currentColor;
     -webkit-mask: var(--tiptap-select-check-mask) center / 16px 16px no-repeat;
     mask: var(--tiptap-select-check-mask) center / 16px 16px no-repeat;
@@ -191,8 +181,7 @@
 }
 
 .tiptap-select-option:hover,
-.tiptap-select-option:focus-visible,
-.tiptap-select-option[aria-selected="true"] {
+.tiptap-select-option:focus-visible {
     background-color: var(--highlightColor, #0081ff) !important;
     color: #ffffff !important;
     outline: none;
@@ -305,11 +294,24 @@
     background: var(--dvn-hover-bg, rgba(0, 0, 0, 0.06));
 }
 
-/* 选中/菜单展开态只改变图标颜色，按钮外框仍沿用普通 hover/check 背景。 */
-.tiptap-toolbar button.is-active .tiptap-icon--asset,
-.tiptap-toolbar button[aria-pressed="true"] .tiptap-icon--asset,
-.tiptap-toolbar .tiptap-select-wrap.is-open .tiptap-select-button .tiptap-icon--asset,
-.tiptap-toolbar .tiptap-color-button[aria-expanded="true"] .tiptap-icon--asset {
+.tiptap-toolbar button:active:not(:disabled),
+.tiptap-toolbar button.is-pressing:not(:disabled) {
+    background: var(--dvn-press-bg, rgba(0, 0, 0, 0.10));
+}
+
+/* hover 只作用于普通态；已选中/展开/press 的按钮必须保持 check/active 的主题色。 */
+.tiptap-toolbar button:hover:not(:disabled):not(:active):not(.is-pressing):not(.is-active):not([aria-pressed="true"]):not([aria-expanded="true"]) .tiptap-icon {
+    color: var(--dvn-toolbar-hover-fg, #000000);
+}
+
+/* press 长按态与 check/active 一致：按下即临时呈现选中样式。 */
+.tiptap-toolbar button:active:not(:disabled) .tiptap-icon,
+.tiptap-toolbar button.is-pressing:not(:disabled) .tiptap-icon,
+.tiptap-toolbar button.is-active .tiptap-icon,
+.tiptap-toolbar button[aria-pressed="true"] .tiptap-icon,
+.tiptap-toolbar .tiptap-more-button[aria-expanded="true"] .tiptap-icon,
+.tiptap-toolbar .tiptap-select-wrap.is-open .tiptap-select-button .tiptap-icon,
+.tiptap-toolbar .tiptap-color-button[aria-expanded="true"] .tiptap-icon {
     color: var(--highlightColor, #0081ff);
 }
 
