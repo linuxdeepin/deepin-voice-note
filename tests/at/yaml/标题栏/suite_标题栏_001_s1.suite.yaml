@@ -1,0 +1,22 @@
+name: suite_标题栏_001_s1_suite
+app: deepin-voice-note
+module: 标题栏
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_标题栏_001_s1
+  name: 标题栏-关闭主界面退出应用
+  description: ''
+  steps:
+  - step_type: action
+    action: keyboard_hot_key
+    key: alt+F4
+  assert_steps:
+  - step_type: assert
+    action: assert_process_not_running
+    command: deepin-voice-note
+    wait: 3.0

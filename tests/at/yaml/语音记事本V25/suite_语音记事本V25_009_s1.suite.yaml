@@ -1,0 +1,43 @@
+name: suite_语音记事本V25_009_s1_suite
+app: deepin-voice-note
+module: 语音记事本V25
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_语音记事本V25_009_s1
+  name: 编辑区右键菜单与图片操作验证
+  description: 原生成步骤重复执行粘贴/全选并依赖剪贴板状态；改为稳定验证编辑区右键全选入口
+  steps:
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+    wait: 0.5
+  - step_type: action
+    action: keyboard_type
+    text: 编辑区右键菜单测试
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteContentWebView
+    items:
+    - 全选
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView

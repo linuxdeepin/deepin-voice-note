@@ -1,0 +1,170 @@
+name: 记事本条目管理_suite
+app: deepin-voice-note
+module: 记事本条目管理
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+suites:
+- id: suite_记事本条目管理_002_s1
+  name: 记事本列表超出一屏可滑动查看
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderListView
+    do: focus
+  - step_type: action
+    action: keyboard_press
+    key: Page_Down
+  - step_type: action
+    action: keyboard_press
+    key: Page_Up
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListScrollBar
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+- id: suite_记事本条目管理_005_s1
+  name: 记事本命名规则-清空原名称
+  description: ''
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - RenameMenuItem
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_press
+    key: Delete
+  - step_type: action
+    action: keyboard_press
+    key: Enter
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+- id: suite_记事本条目管理_007_s1
+  name: 记事本命名规则-正向流程
+  description: ''
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - RenameMenuItem
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_type
+    text: 重命名测试
+  - step_type: action
+    action: keyboard_press
+    key: Enter
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+- id: suite_记事本条目管理_013_s1
+  name: 首次使用语音记事本新建记事本
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+teardown:
+- action: session_stop

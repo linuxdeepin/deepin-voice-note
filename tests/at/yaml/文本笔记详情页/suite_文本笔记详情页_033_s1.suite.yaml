@@ -1,0 +1,58 @@
+name: suite_文本笔记详情页_033_s1_suite
+app: deepin-voice-note
+module: 文本笔记详情页
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_文本笔记详情页_033_s1
+  name: 新建笔记超过一页上下滑动查看
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteListScrollBar

@@ -1,0 +1,112 @@
+name: suite_语音记事本V25_005_s1_suite
+app: deepin-voice-note
+module: 语音记事本V25
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_语音记事本V25_005_s1
+  name: 编辑区键盘文本操作与撤销重做
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: keyboard_type
+    text: 测试文本内容
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+C
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+V
+  - step_type: action
+    action: keyboard_type
+    text: 删除测试
+  - step_type: action
+    action: keyboard_press
+    key: Delete
+  - step_type: action
+    action: keyboard_type
+    text: 选中删除测试
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_press
+    key: Delete
+  - step_type: action
+    action: keyboard_type
+    text: 退格测试
+  - step_type: action
+    action: keyboard_press
+    key: BackSpace
+  - step_type: action
+    action: keyboard_type
+    text: 选中退格测试
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_press
+    key: BackSpace
+  - step_type: action
+    action: keyboard_type
+    text: 撤销重做测试
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Z
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Shift+Z
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView

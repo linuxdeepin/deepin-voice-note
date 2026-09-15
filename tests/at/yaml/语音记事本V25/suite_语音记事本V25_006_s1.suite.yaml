@@ -1,0 +1,178 @@
+name: suite_语音记事本V25_006_s1_suite
+app: deepin-voice-note
+module: 语音记事本V25
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_语音记事本V25_006_s1
+  name: 录音功能与键盘焦点操作验证
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: PauseButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: PauseButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: PauseButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: StopButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: StopButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: keyboard_press
+    key: Tab
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: keyboard_press
+    key: Tab
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: keyboard_press
+    key: Tab
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: StopButton
+    do: click
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Z
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Shift+Z
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RecordingBar
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: PauseButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: StopButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RecordingBar
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RecordingBar
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RecordingBar
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: PauseButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RecordingBar
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RecordingBar
+  skip: requires audio input/output device; current environment reports Current Audio
+    Cards is Empty

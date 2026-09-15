@@ -1,0 +1,27 @@
+name: suite_补充覆盖_004_s1_suite
+app: deepin-voice-note
+module: 补充覆盖
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+suites:
+- id: suite_补充覆盖_004_s1
+  name: 消息对话框加载器验证
+  description: 验证主窗口消息对话框加载器和WebView消息对话框加载器存在
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+      role: button
+    do: focus
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MessageDialogLoader
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: WebViewMessageDialog

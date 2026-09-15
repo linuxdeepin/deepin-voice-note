@@ -1,0 +1,23 @@
+# Unreachable AT-SPI elements - manual exemptions from 100% coverage gate
+# Each entry: name + reason (human-confirmed, not a bypass for real coverage)
+
+unreachable:
+  - name: "ActionManager.actionTextmenuId"
+    reason: >
+      Scan artifact. The accessible name "NoteRightMenu" is set on the menu root
+      (VNoteRightMenu.qml:12). "ActionManager.actionTextmenuId" is a dynamic
+      property reference (ActionManager.actionText(actionId)), not a real
+      Accessible.name. Name contains '.' which is filtered by cover.py noise filter.
+
+  - name: "model.name"
+    reason: >
+      Dynamic name. Accessible.name: model.name (ItemListView.qml:819) uses model
+      data as the accessible name, which the static scanner cannot resolve. At
+      runtime, each note item gets its actual title as the accessible name, not
+      the literal string "model.name". Name contains '.' (noise filter).
+
+  - name: "MainWindow_UpgradeView"
+    reason: >
+      Conditionally rendered. MigrationUpgradeView (main.qml:123) is only shown
+      when a data migration from V20 to V25 is required. This state cannot be
+      triggered in a standard test environment without pre-existing V20 data.

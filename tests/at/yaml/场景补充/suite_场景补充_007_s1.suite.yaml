@@ -1,0 +1,43 @@
+name: suite_场景补充_007_s1_suite
+app: deepin-voice-note
+module: 场景补充
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_场景补充_007_s1
+  name: 搜索状态快捷键禁用与搜索退出
+  description: 覆盖xlsx搜索结果界面快捷键限制场景：搜索状态下执行Ctrl+N和F2不应破坏搜索/主界面，Esc退出后应用仍可用
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py 文本'
+    wait: 1.0
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+N
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: F2
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView

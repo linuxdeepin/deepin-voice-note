@@ -1,0 +1,32 @@
+name: suite_补充覆盖_001_s1_suite
+app: deepin-voice-note
+module: 补充覆盖
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+suites:
+- id: suite_补充覆盖_001_s1
+  name: 文件夹右键菜单项验证
+  description: 打开文件夹列表右键菜单并选择新建笔记，验证菜单操作后主界面列表仍可用
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: 记事本1
+      role: label
+    items:
+    - NewNoteFromFolderMenuItem
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NewNoteButton
+      role: button
+teardown:
+- action: session_stop

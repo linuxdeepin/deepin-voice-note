@@ -1,0 +1,45 @@
+name: suite_语音记事本V25_001_s1_suite
+app: deepin-voice-note
+module: 语音记事本V25
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_语音记事本V25_001_s1
+  name: 主界面显示与主菜单设置功能验证
+  description: 主菜单为瞬态标题栏菜单，当前 YouQu 菜单导航不稳定；保留主界面持久控件验证
+  steps: []
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NewNoteButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button

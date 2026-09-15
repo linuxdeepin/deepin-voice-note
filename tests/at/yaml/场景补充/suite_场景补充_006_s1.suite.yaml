@@ -1,0 +1,35 @@
+name: suite_场景补充_006_s1_suite
+app: deepin-voice-note
+module: 场景补充
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_场景补充_006_s1
+  name: 搜索无匹配结果后退出搜索恢复编辑区
+  description: 覆盖xlsx搜索不匹配与退出搜索场景：输入不存在关键字触发搜索，Esc退出后验证主界面、笔记列表、编辑区仍可用
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py NotExistKeyword987654'
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView

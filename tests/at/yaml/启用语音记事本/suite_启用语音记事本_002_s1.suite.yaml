@@ -1,0 +1,20 @@
+name: suite_启用语音记事本_002_s1_suite
+app: deepin-voice-note
+module: 启用语音记事本
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_启用语音记事本_002_s1
+  name: 终端输入命令启动应用
+  description: ''
+  steps: []
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button

@@ -1,0 +1,54 @@
+name: suite_详情页编辑区_001_s1_suite
+app: deepin-voice-note
+module: 详情页编辑区
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_详情页编辑区_001_s1
+  name: 全选编辑区内容并切换记事本笔记取消全选
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteContentWebView
+    do: focus
+  - step_type: action
+    action: keyboard_hot_key
+    selector:
+      name: NoteContentWebView
+    key: ctrl+a
+  - step_type: action
+    action: element_action
+    selector:
+      name: 文本
+      role: list item
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteContentWebView
+    do: focus
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteContentWebView
+    items:
+    - 全选
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: FolderListView
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView

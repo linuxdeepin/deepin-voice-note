@@ -1,0 +1,54 @@
+name: 详情页编辑区_suite
+app: deepin-voice-note
+module: 详情页编辑区
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+suites:
+- id: suite_详情页编辑区_001_s1
+  name: 全选编辑区内容并切换记事本笔记取消全选
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+  - step_type: action
+    action: keyboard_hot_key
+    selector:
+      name: TiptapWebView
+    key: ctrl+a
+  - step_type: action
+    action: element_action
+    selector:
+      name: model.name
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 全选
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderListView
+    do: click
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+teardown:
+- action: session_stop

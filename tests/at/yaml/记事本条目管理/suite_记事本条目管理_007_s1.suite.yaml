@@ -1,0 +1,40 @@
+name: suite_记事本条目管理_007_s1_suite
+app: deepin-voice-note
+module: 记事本条目管理
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_记事本条目管理_007_s1
+  name: 记事本命名规则-正向流程
+  description: ''
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: 记事本1
+      role: label
+    items:
+    - RenameMenuItem
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_type
+    text: 重命名测试
+  - step_type: action
+    action: keyboard_press
+    key: Enter
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView

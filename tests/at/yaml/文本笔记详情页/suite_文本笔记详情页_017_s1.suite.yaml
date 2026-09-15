@@ -1,0 +1,53 @@
+name: suite_文本笔记详情页_017_s1_suite
+app: deepin-voice-note
+module: 文本笔记详情页
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_文本笔记详情页_017_s1
+  name: 更改保存路径保存为TXT
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+  - step_type: action
+    action: keyboard_type
+    text: 保存路径测试内容
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为TXT
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/vnote_custom_path.txt
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/vnote_custom_path.txt
+  skip: requires nested QML context-menu selection (保存笔记 -> 保存为TXT); current YouQu
+    menu navigator times out on this submenu

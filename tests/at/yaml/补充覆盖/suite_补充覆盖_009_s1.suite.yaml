@@ -1,0 +1,29 @@
+name: suite_补充覆盖_009_s1_suite
+app: deepin-voice-note
+module: 补充覆盖
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_补充覆盖_009_s1
+  name: 多选工具栏保存语音控件验证
+  description: 来源xlsx用例1676415「保存语音」；验证多选工具栏中的保存语音入口具备AT-SPI名称
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteItemListView
+    do: focus
+    wait: 0.3
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: SaveVoiceButton

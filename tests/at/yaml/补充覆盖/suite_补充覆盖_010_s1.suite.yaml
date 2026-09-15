@@ -1,0 +1,37 @@
+name: suite_补充覆盖_010_s1_suite
+app: deepin-voice-note
+module: 补充覆盖
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_补充覆盖_010_s1
+  name: 主界面弹窗加载器与升级遮罩控件验证
+  description: 补充覆盖关闭/删除/升级等流程依赖的弹窗加载器与升级遮罩AT-SPI节点
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderListView
+    do: focus
+    wait: 0.3
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MainMessageDialog
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderMessageDialogLoader
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: ItemListMessageDialog
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MainWindow_UpgradeView

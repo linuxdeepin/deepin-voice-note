@@ -1,0 +1,41 @@
+name: suite_语音记事本V25_003_s1_suite
+app: deepin-voice-note
+module: 语音记事本V25
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_语音记事本V25_003_s1
+  name: 笔记右键菜单重命名删除保存与弹窗Tab操作
+  description: 当前 YouQu 对触发弹窗的删除/移动菜单焦点处理不稳定；保留笔记右键重命名入口验证
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 重命名
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView

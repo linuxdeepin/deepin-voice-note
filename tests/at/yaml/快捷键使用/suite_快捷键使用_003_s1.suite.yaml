@@ -1,0 +1,30 @@
+name: suite_快捷键使用_003_s1_suite
+app: deepin-voice-note
+module: 快捷键使用
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_快捷键使用_003_s1
+  name: 空白页Delete快捷键无作用无异常
+  description: ''
+  steps:
+  - step_type: action
+    action: keyboard_press
+    value: Delete
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button

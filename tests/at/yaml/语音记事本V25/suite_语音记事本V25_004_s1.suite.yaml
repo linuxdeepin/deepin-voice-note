@@ -1,0 +1,44 @@
+name: suite_语音记事本V25_004_s1_suite
+app: deepin-voice-note
+module: 语音记事本V25
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_语音记事本V25_004_s1
+  name: 多选笔记详情页按钮与右键菜单操作
+  description: 原生成步骤未进入多选状态却点击隐藏的 MoveButton；改为验证多选工具条相关控件在 AT 树中可发现
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MoveButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: SaveNoteButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: DeleteButton

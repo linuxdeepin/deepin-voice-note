@@ -1,0 +1,31 @@
+name: suite_场景补充_003_s1_suite
+app: deepin-voice-note
+module: 场景补充
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_场景补充_003_s1
+  name: 主菜单设置弹窗入口与设置项验证
+  description: 覆盖xlsx主菜单设置场景：打开标题栏主菜单，进入设置弹窗，验证声音来源与恢复默认按钮等控件
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/titlebar_menu_press.py --select SettingsMenuItem'
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RestoreDefaultsButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: InternalRadioButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MicrophoneRadioButton
