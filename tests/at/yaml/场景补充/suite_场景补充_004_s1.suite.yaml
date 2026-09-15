@@ -1,0 +1,77 @@
+name: suite_场景补充_004_s1_suite
+app: deepin-voice-note
+module: 场景补充
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_场景补充_004_s1
+  name: 记事本与文本笔记重命名异常输入覆盖
+  description: 覆盖xlsx命名规则场景：空格、特殊字符、Esc取消等异常输入；使用F2进入重命名避免QML右键菜单导航不稳定
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderListView
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: F2
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+    wait: 0.2
+  - step_type: action
+    action: keyboard_type
+    text: "   "
+    wait: 0.2
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteItemListView
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: F2
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+    wait: 0.2
+  - step_type: action
+    action: keyboard_type
+    text: 特殊字符_!@#￥%……&*()
+    wait: 0.2
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView

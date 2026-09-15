@@ -1,0 +1,421 @@
+name: 场景补充_suite
+app: deepin-voice-note
+module: 场景补充
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_场景补充_001_s1
+  name: 搜索关键字匹配笔记标题与详情页内容
+  description: 覆盖xlsx搜索场景：搜索关键字匹配文本笔记、详情页内容、Enter触发搜索、Esc退出搜索；不依赖固定坐标
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+    wait: 0.3
+  - step_type: action
+    action: keyboard_type
+    text: 搜索覆盖关键字Alpha123
+    wait: 0.5
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py Alpha123'
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+- id: suite_场景补充_002_s1
+  name: Tiptap富文本常用快捷键格式化
+  description: 覆盖xlsx富文本工具场景：加粗、斜体、下划线、删除线、有序/无序列表等键盘入口，验证编辑器替换后快捷键链路不退化
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+    wait: 0.3
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+B
+    wait: 0.2
+  - step_type: action
+    action: keyboard_type
+    text: 加粗文本
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+B
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+I
+    wait: 0.2
+  - step_type: action
+    action: keyboard_type
+    text: 斜体文本
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+I
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+U
+    wait: 0.2
+  - step_type: action
+    action: keyboard_type
+    text: 下划线文本
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+U
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Shift+X
+    wait: 0.2
+  - step_type: action
+    action: keyboard_type
+    text: 删除线文本
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Shift+X
+    wait: 0.2
+  - step_type: action
+    action: keyboard_type
+    text: '
+
+      1. 有序列表文本
+
+      - 无序列表文本'
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Z
+    wait: 0.3
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Shift+Z
+    wait: 0.3
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+- id: suite_场景补充_003_s1
+  name: 主菜单设置弹窗入口与设置项验证
+  description: 覆盖xlsx主菜单设置场景：打开标题栏主菜单，进入设置弹窗，验证声音来源与恢复默认按钮等控件
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/titlebar_menu_press.py --select SettingsMenuItem'
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RestoreDefaultsButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: InternalRadioButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MicrophoneRadioButton
+- id: suite_场景补充_004_s1
+  name: 记事本与文本笔记重命名异常输入覆盖
+  description: 覆盖xlsx命名规则场景：空格、特殊字符、Esc取消等异常输入；使用F2进入重命名避免QML右键菜单导航不稳定
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderListView
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: F2
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+    wait: 0.2
+  - step_type: action
+    action: keyboard_type
+    text: '   '
+    wait: 0.2
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteItemListView
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: F2
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+    wait: 0.2
+  - step_type: action
+    action: keyboard_type
+    text: 特殊字符_!@#￥%……&*()
+    wait: 0.2
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+- id: suite_场景补充_005_s1
+  name: 多选笔记Shift选择与批量操作工具条
+  description: 覆盖xlsx多选场景：Shift选择多条笔记后展示批量移动、保存笔记、删除等详情页工具条入口
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MoveButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: SaveNoteButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: DeleteButton
+- id: suite_场景补充_006_s1
+  name: 搜索无匹配结果后退出搜索恢复编辑区
+  description: 覆盖xlsx搜索不匹配与退出搜索场景：输入不存在关键字触发搜索，Esc退出后验证主界面、笔记列表、编辑区仍可用
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py NotExistKeyword987654'
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+- id: suite_场景补充_007_s1
+  name: 搜索状态快捷键禁用与搜索退出
+  description: 覆盖xlsx搜索结果界面快捷键限制场景：搜索状态下执行Ctrl+N和F2不应破坏搜索/主界面，Esc退出后应用仍可用
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py 文本'
+    wait: 1.0
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+N
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: F2
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+- id: suite_场景补充_008_s1
+  name: Tiptap选中文本格式快捷键与撤销重做
+  description: 覆盖xlsx选中文本设置格式场景：选中文本后执行加粗、斜体、下划线、删除线快捷键，并执行撤销重做验证编辑区可用
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+    wait: 0.3
+  - step_type: action
+    action: keyboard_type
+    text: 选中文本格式化测试
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+B
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+I
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+U
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Shift+X
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Z
+    wait: 0.3
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Shift+Z
+    wait: 0.3
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+- id: suite_场景补充_009_s1
+  name: 主界面列表收起展开与窗口快捷键稳定性
+  description: 覆盖xlsx列表收起展开、最大化/默认窗口切换、最小化类窗口操作场景；验证操作后主界面仍可用
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: TwoColumnModeButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: TwoColumnModeButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    key: Alt+F10
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    key: Alt+F10
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    key: Alt+F9
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+- id: suite_场景补充_010_s1
+  name: 主菜单退出应用
+  description: 覆盖xlsx主菜单退出场景：通过标题栏主菜单触发退出，验证进程结束
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/titlebar_menu_press.py --select ExitMenuItem'
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_process_not_running
+    process: deepin-voice-note

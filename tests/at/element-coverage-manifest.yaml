@@ -1,0 +1,253 @@
+scan_total: 50
+total: 50
+elements:
+  VNoteButton:
+    role: push button
+    source: gui/VNoteButton.qml
+    type: Button
+    name_source: accessible
+  VNoteToolButton:
+    role: push button
+    source: gui/VNoteToolButton.qml
+    type: ToolButton
+    name_source: accessible
+  VNoteToolButtonBackground:
+    role: ''
+    source: gui/VNoteToolButton.qml
+    type: VNoteButtonBackground
+    name_source: accessible
+  FolderList:
+    role: list
+    source: gui/dialog/MoveDialog.qml
+    type: ListView
+    name_source: accessible
+  FolderListScrollBar:
+    role: scroll bar
+    source: gui/mainwindow/FolderListView.qml
+    type: ScrollBar
+    name_source: accessible
+  CancelButton:
+    role: push button
+    source: gui/dialog/VNoteMessageDialogLoader.qml
+    type: Button
+    name_source: accessible
+  RestoreDefaultsButton:
+    role: push button
+    source: gui/dialog/SettingDialog.qml
+    type: Button
+    name_source: accessible
+  InternalRadioButton:
+    role: radio button
+    source: gui/dialog/SettingDialog.qml
+    type: RadioButton
+    name_source: accessible
+  MicrophoneRadioButton:
+    role: radio button
+    source: gui/dialog/SettingDialog.qml
+    type: RadioButton
+    name_source: accessible
+  FolderMessageDialogLoader:
+    role: ''
+    source: gui/mainwindow/FolderListView.qml
+    type: VNoteMessageDialogLoader
+    name_source: accessible
+  FolderListView:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: FolderListView
+    name_source: accessible
+  model.name:
+    role: ''
+    source: gui/mainwindow/ItemListView.qml
+    type: Rectangle
+    name_source: accessible
+  FolderItemContextMenu:
+    role: menu
+    source: gui/mainwindow/FolderListView.qml
+    type: Menu
+    name_source: accessible
+  RenameMenuItem:
+    role: menu item
+    source: gui/mainwindow/FolderListView.qml
+    type: MenuItem
+    name_source: accessible
+  DeleteFolderMenuItem:
+    role: menu item
+    source: gui/mainwindow/FolderListView.qml
+    type: MenuItem
+    name_source: accessible
+  NewNoteFromFolderMenuItem:
+    role: menu item
+    source: gui/mainwindow/FolderListView.qml
+    type: MenuItem
+    name_source: accessible
+  ItemListMessageDialog:
+    role: ''
+    source: gui/mainwindow/ItemListView.qml
+    type: VNoteMessageDialogLoader
+    name_source: accessible
+  NoteItemListView:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: ItemListView
+    name_source: accessible
+  NoteListScrollBar:
+    role: scroll bar
+    source: gui/mainwindow/ItemListView.qml
+    type: ScrollBar
+    name_source: accessible
+  MainShortcuts:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: Shortcuts
+    name_source: accessible
+  MainMessageDialog:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: VNoteMessageDialogLoader
+    name_source: accessible
+  TwoColumnModeButton:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: VNoteToolButton
+    name_source: accessible
+  SidebarBlurBackground:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: SidebarBlurBackground
+    name_source: accessible
+  CreateFolderButton:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: VNoteButton
+    name_source: accessible
+  ToolBarMoreButton:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: VNoteToolButton
+    name_source: accessible
+  NewNoteButton:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: VNoteToolButton
+    name_source: accessible
+  NoteContentWebView:
+    role: ''
+    source: gui/mainwindow/MainWindow.qml
+    type: WebEngineView
+    name_source: accessible
+  InitialInterface:
+    role: ''
+    source: main.qml
+    type: InitialInterface
+    name_source: accessible
+  MoveButton:
+    role: ''
+    source: gui/mainwindow/MultipleChoices.qml
+    type: VNoteToolButton
+    name_source: accessible
+  SaveNoteButton:
+    role: ''
+    source: gui/mainwindow/MultipleChoices.qml
+    type: VNoteToolButton
+    name_source: accessible
+  SaveVoiceButton:
+    role: ''
+    source: gui/mainwindow/MultipleChoices.qml
+    type: VNoteToolButton
+    name_source: accessible
+  DeleteButton:
+    role: ''
+    source: gui/mainwindow/MultipleChoices.qml
+    type: VNoteToolButton
+    name_source: accessible
+  PauseButton:
+    role: ''
+    source: gui/mainwindow/RecordingView.qml
+    type: VNoteToolButton
+    name_source: accessible
+  StopButton:
+    role: ''
+    source: gui/mainwindow/RecordingView.qml
+    type: VNoteToolButton
+    name_source: accessible
+  TitleBarMenu:
+    role: menu
+    source: gui/mainwindow/TitleBarMenu.qml
+    type: Menu
+    name_source: accessible
+  SettingsMenuItem:
+    role: menu item
+    source: gui/mainwindow/TitleBarMenu.qml
+    type: MenuItem
+    name_source: accessible
+  PrivacyPolicyMenuItem:
+    role: menu item
+    source: gui/mainwindow/TitleBarMenu.qml
+    type: MenuItem
+    name_source: accessible
+  ExitMenuItem:
+    role: menu item
+    source: gui/mainwindow/TitleBarMenu.qml
+    type: MenuItem
+    name_source: accessible
+  NoteRightMenu:
+    role: menu
+    source: gui/mainwindow/VNoteRightMenu.qml
+    type: Menu
+    name_source: accessible
+  CtxSubMenu:
+    role: menu
+    source: gui/mainwindow/VNoteRightMenu.qml
+    type: Menu
+    name_source: accessible
+  ActionManager.actionTextmenuId:
+    role: menu item
+    source: gui/mainwindow/VNoteRightMenu.qml
+    type: MenuItem
+    name_source: accessible
+  WebViewTitleBar:
+    role: ''
+    source: gui/mainwindow/WebEngineView.qml
+    type: WindowTitleBar
+    name_source: accessible
+  WebView:
+    role: ''
+    source: gui/mainwindow/WebEngineView.qml
+    type: WebEngineView
+    name_source: accessible
+  TiptapWebView:
+    role: ''
+    source: gui/mainwindow/WebEngineView.qml
+    type: WebEngineView
+    name_source: accessible
+  MultipleChoicesView:
+    role: ''
+    source: gui/mainwindow/WebEngineView.qml
+    type: MultipleChoices
+    name_source: accessible
+  WebViewMessageDialog:
+    role: ''
+    source: gui/mainwindow/WebEngineView.qml
+    type: VNoteMessageDialogLoader
+    name_source: accessible
+  RecordingBar:
+    role: ''
+    source: gui/mainwindow/WebEngineView.qml
+    type: RecordingView
+    name_source: accessible
+  VoiceNoteMainWindow:
+    role: ''
+    source: main.qml
+    type: ApplicationWindow
+    name_source: accessible
+  MessageDialogLoader:
+    role: ''
+    source: main.qml
+    type: VNoteMessageDialogLoader
+    name_source: accessible
+  MainWindow_UpgradeView:
+    role: ''
+    source: main.qml
+    type: MigrationUpgradeView
+    name_source: accessible

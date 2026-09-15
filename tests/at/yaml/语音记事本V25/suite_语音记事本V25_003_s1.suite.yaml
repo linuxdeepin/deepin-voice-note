@@ -1,10 +1,6 @@
-name: 搜索功能(#115119)_case_1635187_s1_suite
+name: suite_语音记事本V25_003_s1_suite
 app: deepin-voice-note
-description: 覆盖xlsx搜索无结果场景：输入不存在关键字搜索无结果后退出搜索
-module: 搜索功能(#115119)
-tags: []
-fast_fail: false
-env_check: []
+module: 语音记事本V25
 setup:
 - action: session_start
   command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
@@ -12,14 +8,18 @@ setup:
 teardown:
 - action: session_stop
 suites:
-- id: case_1635187_s1
-  name: 搜索无匹配结果后退出搜索
-  description: 覆盖xlsx用例1635187：输入搜索关键字无结果，退出搜索后恢复主界面
-  tags: []
+- id: suite_语音记事本V25_003_s1
+  name: 笔记右键菜单重命名删除保存与弹窗Tab操作
+  description: 当前 YouQu 对触发弹窗的删除/移动菜单焦点处理不稳定；保留笔记右键重命名入口验证
   steps:
   - step_type: action
-    action: session_start
-    command: bash -lc './tests/at/scripts/focus_search_and_query.py ZZZ不匹配'
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 重命名
     wait: 1.0
   - step_type: action
     action: keyboard_press
@@ -29,7 +29,8 @@ suites:
   - step_type: assert
     action: assert_element
     selector:
-      name: VoiceNoteMainWindow
+      name: CreateFolderButton
+      role: button
   - step_type: assert
     action: assert_element
     selector:

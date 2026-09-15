@@ -1,0 +1,31 @@
+name: suite_补充覆盖_002_s1_suite
+app: deepin-voice-note
+module: 补充覆盖
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+suites:
+- id: suite_补充覆盖_002_s1
+  name: 主窗口持久控件验证
+  description: 验证侧边栏背景、工具按钮及其背景控件存在
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+      role: button
+    do: focus
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: SidebarBlurBackground
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: ToolBarMoreButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VNoteToolButtonBackground

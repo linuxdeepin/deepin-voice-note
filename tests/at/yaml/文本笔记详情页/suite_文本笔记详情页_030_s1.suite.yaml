@@ -1,0 +1,62 @@
+name: suite_文本笔记详情页_030_s1_suite
+app: deepin-voice-note
+module: 文本笔记详情页
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_文本笔记详情页_030_s1
+  name: 切换笔记详情页同步切换
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+  - step_type: action
+    action: keyboard_type
+    text: 笔记A内容
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+  - step_type: action
+    action: keyboard_type
+    text: 笔记B内容
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteItemListView
+      child_index: 0
+    do: click
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView

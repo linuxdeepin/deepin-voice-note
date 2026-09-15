@@ -1,6 +1,6 @@
 name: 搜索功能(#115119)_case_1635179_s1_suite
 app: deepin-voice-note
-description: ''
+description: 覆盖xlsx搜索特殊字符场景：输入~!@#$%^&*.<>?/等特殊字符搜索，验证无异常
 module: 搜索功能(#115119)
 tags: []
 fast_fail: false
@@ -13,22 +13,28 @@ teardown:
 - action: session_stop
 suites:
 - id: case_1635179_s1
-  name: 打开语音记事本
-  description: ''
+  name: 搜索框输入特殊字符搜索无异常
+  description: 覆盖xlsx用例1635179：搜索框输入特殊字符进行搜索
   tags: []
   steps:
-  - action: dtk_context_menu
-    selector:
-      name: 记事本1
-      role: label
-    items:
-    - NewNoteFromFolderMenuItem
-  - action: keyboard_type
-    text: '@#$%'
-  - action: keyboard_press
-    key: return
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py ~!@#$%^&*.<>?/'
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
   assert_steps:
-  - action: assert_element
+  - step_type: assert
+    action: assert_element
     selector:
-      name: CreateFolderButton
-      role: button
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView

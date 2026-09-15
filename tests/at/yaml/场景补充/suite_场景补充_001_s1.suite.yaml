@@ -1,0 +1,50 @@
+name: suite_场景补充_001_s1_suite
+app: deepin-voice-note
+module: 场景补充
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_场景补充_001_s1
+  name: 搜索关键字匹配笔记标题与详情页内容
+  description: 覆盖xlsx搜索场景：搜索关键字匹配文本笔记、详情页内容、Enter触发搜索、Esc退出搜索；不依赖固定坐标
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+    wait: 0.3
+  - step_type: action
+    action: keyboard_type
+    text: 搜索覆盖关键字Alpha123
+    wait: 0.5
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py Alpha123'
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView

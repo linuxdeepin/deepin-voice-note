@@ -1,10 +1,6 @@
-name: 搜索功能(#115119)_case_1635187_s1_suite
+name: suite_场景补充_007_s1_suite
 app: deepin-voice-note
-description: 覆盖xlsx搜索无结果场景：输入不存在关键字搜索无结果后退出搜索
-module: 搜索功能(#115119)
-tags: []
-fast_fail: false
-env_check: []
+module: 场景补充
 setup:
 - action: session_start
   command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
@@ -12,15 +8,22 @@ setup:
 teardown:
 - action: session_stop
 suites:
-- id: case_1635187_s1
-  name: 搜索无匹配结果后退出搜索
-  description: 覆盖xlsx用例1635187：输入搜索关键字无结果，退出搜索后恢复主界面
-  tags: []
+- id: suite_场景补充_007_s1
+  name: 搜索状态快捷键禁用与搜索退出
+  description: 覆盖xlsx搜索结果界面快捷键限制场景：搜索状态下执行Ctrl+N和F2不应破坏搜索/主界面，Esc退出后应用仍可用
   steps:
   - step_type: action
     action: session_start
-    command: bash -lc './tests/at/scripts/focus_search_and_query.py ZZZ不匹配'
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py 文本'
     wait: 1.0
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+N
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: F2
+    wait: 0.5
   - step_type: action
     action: keyboard_press
     key: Escape

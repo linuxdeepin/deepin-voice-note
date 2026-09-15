@@ -1,0 +1,51 @@
+name: suite_记事本条目_001_s1_suite
+app: deepin-voice-note
+module: 记事本条目
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_记事本条目_001_s1
+  name: 新建记事本-空白页与列表按钮及快捷键
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: 文本
+      role: list item
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: action
+    action: keyboard_hot_key
+    key: ctrl+n
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView

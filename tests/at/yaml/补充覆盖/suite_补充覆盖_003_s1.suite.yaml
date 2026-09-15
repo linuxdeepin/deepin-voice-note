@@ -1,0 +1,27 @@
+name: suite_补充覆盖_003_s1_suite
+app: deepin-voice-note
+module: 补充覆盖
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+suites:
+- id: suite_补充覆盖_003_s1
+  name: 笔记详情页WebView区域验证
+  description: 新建笔记后验证WebView及其标题栏控件存在
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 2.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: WebViewTitleBar

@@ -1,0 +1,69 @@
+name: suite_记事本条目管理_002_s1_suite
+app: deepin-voice-note
+module: 记事本条目管理
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_记事本条目管理_002_s1
+  name: 记事本列表超出一屏可滑动查看
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderListView
+    do: focus
+  - step_type: action
+    action: keyboard_press
+    key: Page_Down
+  - step_type: action
+    action: keyboard_press
+    key: Page_Up
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListScrollBar
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
