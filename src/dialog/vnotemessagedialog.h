@@ -31,6 +31,7 @@ public:
         SaveFailed, //保存失败
         NoPermission, //无权限
         VoicePathNoAvail, //语音路径无效
+        ContentTooLong, //内容过长
     };
 
 protected:
