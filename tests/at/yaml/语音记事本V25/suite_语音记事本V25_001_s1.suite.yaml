@@ -38,8 +38,3 @@ suites:
     action: assert_element
     selector:
       name: NewNoteButton
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: CreateFolderButton
-      role: button

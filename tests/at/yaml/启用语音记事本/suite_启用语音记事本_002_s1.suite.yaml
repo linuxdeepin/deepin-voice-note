@@ -9,12 +9,29 @@ teardown:
 - action: session_stop
 suites:
 - id: suite_启用语音记事本_002_s1
-  name: 终端输入命令启动应用
-  description: ''
-  steps: []
+  name: 终端命令启动应用后验证UI可用与新建记事本
+  description: 覆盖xlsx启动场景：终端启动应用后验证主界面控件可交互、新建记事本功能正常
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+N
+    wait: 0.5
   assert_steps:
   - step_type: assert
     action: assert_element
     selector:
-      name: CreateFolderButton
-      role: button
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView

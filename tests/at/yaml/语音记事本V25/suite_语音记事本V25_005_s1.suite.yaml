@@ -78,35 +78,3 @@ suites:
     action: assert_element
     selector:
       name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView

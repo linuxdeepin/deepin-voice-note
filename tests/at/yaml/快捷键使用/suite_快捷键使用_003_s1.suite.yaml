@@ -10,21 +10,26 @@ teardown:
 suites:
 - id: suite_快捷键使用_003_s1
   name: 空白页Delete快捷键无作用无异常
-  description: ''
+  description: 覆盖xlsx用例1635263：空白页按Delete键无任何作用，应用无闪退等异常
   steps:
   - step_type: action
-    action: keyboard_press
-    value: Delete
-  assert_steps:
-  - step_type: assert
-    action: assert_element
+    action: element_action
     selector:
-      name: CreateFolderButton
-      role: button
+      name: NewNoteButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: Delete
+    wait: 0.5
+  assert_steps:
   - step_type: assert
     action: assert_process_running
   - step_type: assert
     action: assert_element
     selector:
-      name: CreateFolderButton
-      role: button
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView

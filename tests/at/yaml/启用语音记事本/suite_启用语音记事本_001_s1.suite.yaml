@@ -9,14 +9,33 @@ teardown:
 - action: session_stop
 suites:
 - id: suite_启用语音记事本_001_s1
-  name: 验证可以正常启动应用
-  description: ''
-  steps: []
+  name: 验证可以正常启动应用并交互主界面控件
+  description: 覆盖xlsx启动场景：应用启动后验证主窗口可见、主要控件可交互
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.5
   assert_steps:
   - step_type: assert
     action: assert_process_running
   - step_type: assert
     action: assert_element
     selector:
-      name: CreateFolderButton
-      role: button
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView

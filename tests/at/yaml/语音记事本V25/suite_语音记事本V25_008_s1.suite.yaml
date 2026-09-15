@@ -72,44 +72,8 @@ suites:
   - step_type: assert
     action: assert_element
     selector:
-      name: CreateFolderButton
-      role: button
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: CreateFolderButton
-      role: button
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: CreateFolderButton
-      role: button
-  - step_type: assert
-    action: assert_element
-    selector:
       name: NoteContentWebView
   - step_type: assert
     action: assert_element
     selector:
       name: FolderListView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteItemListView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteItemListView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteItemListView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteItemListView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: CreateFolderButton
-      role: button

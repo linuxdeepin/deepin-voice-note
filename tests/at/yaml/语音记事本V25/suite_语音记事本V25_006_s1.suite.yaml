@@ -126,53 +126,5 @@ suites:
     action: assert_element
     selector:
       name: StopButton
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: RecordingBar
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: RecordingBar
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: RecordingBar
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: PauseButton
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: RecordingBar
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: RecordingBar
   skip: requires audio input/output device; current environment reports Current Audio
     Cards is Empty

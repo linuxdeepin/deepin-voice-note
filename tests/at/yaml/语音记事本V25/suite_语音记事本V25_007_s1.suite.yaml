@@ -134,54 +134,6 @@ suites:
   - step_type: assert
     action: assert_element
     selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteItemListView
-  - step_type: assert
-    action: assert_element
-    selector:
       name: CancelButton
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteItemListView
   skip: requires audio input/output device; current environment reports Current Audio
     Cards is Empty

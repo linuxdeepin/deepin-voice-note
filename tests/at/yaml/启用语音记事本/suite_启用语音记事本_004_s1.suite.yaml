@@ -9,13 +9,19 @@ teardown:
 - action: session_stop
 suites:
 - id: suite_启用语音记事本_004_s1
-  name: 仅支持单个窗口开启
-  description: ''
-  steps: []
+  name: 仅支持单个窗口开启验证
+  description: 覆盖xlsx单实例场景：尝试二次启动应用，验证仍只有一个窗口
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc 'deepin-voice-note &'
+    wait: 2.0
   assert_steps:
-  - action: assert_process_running
+  - step_type: assert
+    action: assert_window_count
+    selector:
+      name: VoiceNoteMainWindow
   - step_type: assert
     action: assert_element
     selector:
-      name: CreateFolderButton
-      role: button
+      name: VoiceNoteMainWindow
