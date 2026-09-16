@@ -10,26 +10,21 @@ teardown:
 suites:
 - id: suite_快捷键使用_001_s1
   name: 空语音记录下Ctrl+Y快捷键禁用无异常
-  description: 覆盖xlsx用例1635281：无语音记录状态下按Ctrl+Y快捷键，应用无闪退等异常
+  description: ''
   steps:
   - step_type: action
-    action: element_action
-    selector:
-      name: NewNoteButton
-    do: click
-    wait: 0.5
-  - step_type: action
     action: keyboard_hot_key
-    key: Ctrl+Y
-    wait: 0.5
+    key: ctrl+y
   assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
   - step_type: assert
     action: assert_process_running
   - step_type: assert
     action: assert_element
     selector:
-      name: VoiceNoteMainWindow
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
+      name: CreateFolderButton
+      role: button

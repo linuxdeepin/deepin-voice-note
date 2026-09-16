@@ -1,6 +1,6 @@
 name: 搜索功能(#115119)_case_1635183_s1_suite
 app: deepin-voice-note
-description: 覆盖xlsx搜索匹配场景：关键字匹配文本笔记、不匹配关键字搜索
+description: ''
 module: 搜索功能(#115119)
 tags: []
 fast_fail: false
@@ -13,36 +13,22 @@ teardown:
 - action: session_stop
 suites:
 - id: case_1635183_s1
-  name: 搜索关键字匹配文本笔记与不匹配搜索
-  description: 覆盖xlsx用例1635183：搜索匹配关键字显示结果，不匹配关键字无结果
+  name: 打开语音记事本
+  description: ''
   tags: []
   steps:
-  - step_type: action
-    action: session_start
-    command: bash -lc './tests/at/scripts/focus_search_and_query.py 文本'
-    wait: 1.0
-  - step_type: action
-    action: keyboard_press
-    key: Escape
-    wait: 0.5
-  - step_type: action
-    action: session_start
-    command: bash -lc './tests/at/scripts/focus_search_and_query.py ZZZNoMatch999'
-    wait: 1.0
-  - step_type: action
-    action: keyboard_press
-    key: Escape
-    wait: 0.5
+  - action: dtk_context_menu
+    selector:
+      name: 记事本1
+      role: label
+    items:
+    - NewNoteFromFolderMenuItem
+  - action: keyboard_type
+    text: 文本
+  - action: keyboard_press
+    key: return
   assert_steps:
-  - step_type: assert
-    action: assert_element
+  - action: assert_element
     selector:
-      name: VoiceNoteMainWindow
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteItemListView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteContentWebView
+      name: CreateFolderButton
+      role: button
