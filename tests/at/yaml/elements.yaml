@@ -167,3 +167,12 @@ elements:
   笔记右键菜单:
     name: NoteContextMenu
     role: popup menu
+  MoveNoteDialog:
+    name: MoveNoteDialog
+    role: dialog
+  MoveDialogOk:
+    name: MoveDialogOk
+    role: button
+  删除确认按钮:
+    name: 删除
+    role: button

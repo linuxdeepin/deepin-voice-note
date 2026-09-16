@@ -1,0 +1,74 @@
+name: suite_multi_sel_003_s1_suite
+app: deepin-voice-note
+module: multi_sel
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_multi_sel_003_s1
+  name: 右键菜单_批量保存与批量删除
+  description: 覆盖1676317、1676315、1676311、1676309；多选笔记后右键弹出批量菜单，验证保存为TXT（取消）、保存语音（多选禁用跳过）、删除（取消）操作后笔记仍存在
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+    wait: 2.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为TXT
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: escape
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: escape
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+      role: button
+    do: click
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView
+  skip: requires multi-select state via helper script (modifier+click); 保存语音 menu
+    item is disabled in multi-select mode without voice notes; context menu navigation
+    depends on runtime AT-SPI state

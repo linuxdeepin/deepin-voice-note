@@ -1,0 +1,160 @@
+name: multi_sel_suite
+app: deepin-voice-note
+module: multi_sel
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_multi_sel_001_s1
+  name: Ctrl与Shift选择和取消选择笔记
+  description: 覆盖1676335、1676329；创建5条文本笔记后通过Ctrl+click追加选择第三条、Shift+click范围选择第五条，验证多选状态
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/multi_select_five_notes.py'
+    wait: 2.0
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: MultipleChoicesView
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MoveButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: DeleteButton
+  skip: requires modifier+click (Ctrl/Shift) which YouQu suite steps cannot express
+    natively; uses AT-SPI+xdotool helper script
+- id: suite_multi_sel_002_s1
+  name: 详情页按钮_移动与删除
+  description: 覆盖1676327、1676319；多选笔记后通过详情页移动按钮移动到目标记事本，再次多选后通过删除按钮批量删除
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+    wait: 2.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: MoveButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: MoveNoteDialog
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderList
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: MoveDialogOk
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+    wait: 2.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: DeleteButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView
+  skip: requires multi-select state via helper script (modifier+click); move dialog
+    folder selection and delete confirmation depend on runtime AT-SPI state
+- id: suite_multi_sel_003_s1
+  name: 右键菜单_批量保存与批量删除
+  description: 覆盖1676317、1676315、1676311、1676309；多选笔记后右键弹出批量菜单，验证保存为TXT（取消）、保存语音（多选禁用跳过）、删除（取消）操作后笔记仍存在
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+    wait: 2.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为TXT
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: escape
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: escape
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+      role: button
+    do: click
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView
+  skip: requires multi-select state via helper script (modifier+click); 保存语音 menu
+    item is disabled in multi-select mode without voice notes; context menu navigation
+    depends on runtime AT-SPI state

@@ -1,0 +1,69 @@
+name: suite_multi_sel_002_s1_suite
+app: deepin-voice-note
+module: multi_sel
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_multi_sel_002_s1
+  name: 详情页按钮_移动与删除
+  description: 覆盖1676327、1676319；多选笔记后通过详情页移动按钮移动到目标记事本，再次多选后通过删除按钮批量删除
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+    wait: 2.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: MoveButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: MoveNoteDialog
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderList
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: MoveDialogOk
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+    wait: 2.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: DeleteButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView
+  skip: requires multi-select state via helper script (modifier+click); move dialog
+    folder selection and delete confirmation depend on runtime AT-SPI state

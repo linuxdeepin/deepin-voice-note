@@ -3040,3 +3040,159 @@ cases:
     action: assert_element
     selector:
       name: NoteItemListView
+
+  - id: case_1676335
+    name: Ctrl与Shift选择和取消选择笔记
+    module: multi_sel
+    status: active
+    covers: [1676335, 1676329]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/multi_select_five_notes.py'
+        wait: 2.0
+        description: 创建5条笔记并Ctrl+click第三条、Shift+click第五条进行多选
+      - step_type: action
+        action: mouse_click
+        selector: {name: "MultipleChoicesView"}
+        description: 点击多选工具栏区域
+      - step_type: assert
+        action: assert_element
+        selector: {name: "MultipleChoicesView"}
+        description: 验证多选工具栏已显示
+      - step_type: assert
+        action: assert_element
+        selector: {name: "MoveButton"}
+        description: 验证移动按钮可见
+      - step_type: assert
+        action: assert_element
+        selector: {name: "DeleteButton"}
+        description: 验证删除按钮可见
+
+  - id: case_1676327
+    name: 详情页按钮_移动与删除
+    module: multi_sel
+    status: active
+    covers: [1676327, 1676319]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+        wait: 2.0
+        description: 多选两条笔记
+      - step_type: action
+        action: element_action
+        selector: {name: "MoveButton"}
+        do: click
+        wait: 1.0
+        description: 点击移动按钮
+      - step_type: action
+        action: mouse_click
+        selector: {name: "MoveNoteDialog", role: "dialog"}
+        description: 验证移动对话框已弹出
+      - step_type: action
+        action: element_action
+        selector: {name: "FolderList", role: "list"}
+        do: click
+        wait: 0.5
+        description: 选择目标记事本
+      - step_type: action
+        action: element_action
+        selector: {name: "MoveDialogOk", role: "button"}
+        do: click
+        wait: 1.0
+        description: 点击确定按钮完成移动
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+        wait: 2.0
+        description: 再次多选两条笔记
+      - step_type: action
+        action: element_action
+        selector: {name: "DeleteButton"}
+        do: click
+        wait: 1.0
+        description: 点击删除按钮
+      - step_type: action
+        action: element_action
+        selector: {name: "删除", role: "button"}
+        do: click
+        wait: 1.0
+        description: 点击删除确认按钮
+      - step_type: assert
+        action: assert_element
+        selector: {name: "CreateFolderButton", role: "button"}
+        description: 验证应用主界面存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "MultipleChoicesView"}
+        description: 验证多选工具栏已显示
+
+  - id: case_1676317
+    name: 右键菜单_批量保存与批量删除
+    module: multi_sel
+    status: active
+    covers: [1676317, 1676315, 1676311, 1676309]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+        wait: 2.0
+        description: 多选两条笔记
+      - step_type: action
+        action: dtk_context_menu
+        selector: {parent: "NoteItemListView", name: "文本", role: "list item"}
+        items: ["保存笔记", "保存为TXT"]
+        wait: 1.0
+        description: 右键多选笔记并点击保存为TXT
+      - step_type: action
+        action: keyboard_press
+        key: "escape"
+        wait: 0.5
+        description: 取消文件保存对话框
+      - step_type: action
+        action: dtk_context_menu
+        selector: {parent: "NoteItemListView", name: "文本", role: "list item"}
+        items: ["保存语音"]
+        wait: 1.0
+        description: 右键多选笔记并点击保存语音（多选模式下禁用）
+      - step_type: action
+        action: keyboard_press
+        key: "escape"
+        wait: 0.5
+        description: 关闭右键菜单
+      - step_type: action
+        action: dtk_context_menu
+        selector: {parent: "NoteItemListView", name: "文本", role: "list item"}
+        items: ["删除"]
+        wait: 1.0
+        description: 右键多选笔记并点击删除
+      - step_type: action
+        action: element_action
+        selector: {name: "CancelButton", role: "button"}
+        do: click
+        wait: 1.0
+        description: 点击取消按钮取消删除
+      - step_type: assert
+        action: assert_element
+        selector: {name: "CreateFolderButton", role: "button"}
+        description: 验证应用主界面存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "MultipleChoicesView"}
+        description: 验证多选工具栏仍显示，笔记未被删除

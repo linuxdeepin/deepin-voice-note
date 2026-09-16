@@ -1,5 +1,5 @@
 scan_total: 50
-total: 52
+total: 55
 elements:
   VNoteButton:
     role: push button
@@ -261,3 +261,18 @@ elements:
     source: gui/mainwindow/ItemListView.qml
     type: VNoteRightMenu
     name_source: accessible
+  MoveNoteDialog:
+    role: dialog
+    source: gui/mainwindow/ItemListView.qml
+    type: MoveDialog
+    name_source: accessible
+  MoveDialogOk:
+    role: button
+    source: gui/dialog/MoveDialog.qml
+    type: Button
+    name_source: accessible
+  删除确认按钮:
+    role: button
+    source: gui/dialog/VNoteMessageDialogLoader.qml
+    type: WarningButton
+    name_source: text
