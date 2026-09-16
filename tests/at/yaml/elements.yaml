@@ -173,6 +173,6 @@ elements:
   MoveDialogOk:
     name: MoveDialogOk
     role: button
-  删除确认按钮:
+  删除:
     name: 删除
-    role: button
+    role: push button

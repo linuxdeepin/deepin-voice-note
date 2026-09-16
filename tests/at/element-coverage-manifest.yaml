@@ -271,8 +271,8 @@ elements:
     source: gui/dialog/MoveDialog.qml
     type: Button
     name_source: accessible
-  删除确认按钮:
-    role: button
+  删除:
+    role: push button
     source: gui/dialog/VNoteMessageDialogLoader.qml
     type: WarningButton
     name_source: text

@@ -1,0 +1,58 @@
+name: suite_base_flow_001_s1_suite
+app: deepin-voice-note
+module: base_flow
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_base_flow_001_s1
+  name: 冒烟_基础功能_打开新建记事本新建笔记录音播放
+  description: 覆盖1884375；基础冒烟流程：新建记事本→新建笔记→录音→完成→播放语音笔记
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: keyboard_hot_key
+    key: ctrl+r
+    selector:
+      name: MainShortcuts
+    wait: 1.0
+    note: 录音按钮位于TiptapWebView内部DOM，无AT-SPI accessible name，使用Ctrl+R快捷键触发录音
+  - step_type: action
+    action: element_action
+    selector:
+      name: StopButton
+    do: click
+    wait: 2.0
+    note: 点击完成按钮停止录音，生成语音笔记
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+    wait: 1.0
+    note: 点击语音笔记播放按钮（WebEngineView内部DOM元素.voicebtn.play，无AT-SPI accessible name）
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView

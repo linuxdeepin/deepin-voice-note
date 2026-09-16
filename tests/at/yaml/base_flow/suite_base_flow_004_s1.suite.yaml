@@ -1,0 +1,98 @@
+name: suite_base_flow_004_s1_suite
+app: deepin-voice-note
+module: base_flow
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_base_flow_004_s1
+  name: 长列表_记事本与笔记可滚动浏览
+  description: 覆盖1634901、1634865；记事本列表和笔记列表超出一屏后可上下滚动浏览，顶部和底部条目均可定位
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderListView
+    do: focus
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: Page_Down
+    selector:
+      name: FolderListView
+    wait: 0.5
+    note: 滚动记事本列表到底部
+  - step_type: action
+    action: keyboard_press
+    key: End
+    selector:
+      name: FolderListView
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: Page_Up
+    selector:
+      name: FolderListView
+    wait: 0.5
+    note: 滚动记事本列表到顶部
+  - step_type: action
+    action: keyboard_press
+    key: Home
+    selector:
+      name: FolderListView
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteItemListView
+    do: focus
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: Page_Down
+    selector:
+      name: NoteItemListView
+    wait: 0.5
+    note: 滚动笔记列表到底部
+  - step_type: action
+    action: keyboard_press
+    key: End
+    selector:
+      name: NoteItemListView
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: Page_Up
+    selector:
+      name: NoteItemListView
+    wait: 0.5
+    note: 滚动笔记列表到顶部
+  - step_type: action
+    action: keyboard_press
+    key: Home
+    selector:
+      name: NoteItemListView
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListScrollBar
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteListScrollBar

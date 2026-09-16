@@ -1,0 +1,836 @@
+name: suite_base_flow_003_s1_suite
+app: deepin-voice-note
+module: base_flow
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_base_flow_003_s1
+  name: 压力_连续新建删除_记事本与文本笔记
+  description: 覆盖1635299、1635301；连续新建20个记事本并删除、连续新建20个文本笔记并删除，验证无崩溃且数量恢复
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+    note: 连续新建20个记事本（第1个）
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+    note: 连续删除20个记事本（第1个）- 右键菜单选择删除
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+    note: 确认删除（WarningButton文本为删除，无显式Accessible.name）
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+    note: 连续新建20个文本笔记（第1个）
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+    note: 连续删除20个文本笔记（第1个）- 右键菜单选择删除
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+    note: 确认删除（WarningButton文本为删除）
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NewNoteButton
