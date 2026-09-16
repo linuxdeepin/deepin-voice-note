@@ -1,0 +1,55 @@
+name: edit_img(#edit_img)_case_1634975_s1_suite
+app: deepin-voice-note
+description: '编辑区右键菜单_选中文本剪切复制删除（覆盖1634975、1634973、1634971）'
+module: edit_img(#edit_img)
+tags: []
+fast_fail: false
+env_check: []
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: case_1634975_s1
+  name: 编辑区右键菜单_选中文本剪切复制删除
+  description: '全选文本后右键复制、剪切，输入新文本后右键删除'
+  tags: []
+  steps:
+  - action: element_action
+    selector:
+      name: TiptapWebView
+      role: pane
+    do: click
+  - action: keyboard_hot_key
+    key: ctrl+a
+  - action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+      role: pane
+    items:
+    - 复制
+  - action: keyboard_hot_key
+    key: ctrl+a
+  - action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+      role: pane
+    items:
+    - 剪切
+  - action: keyboard_type
+    text: edit_menu_002
+  - action: keyboard_hot_key
+    key: ctrl+a
+  - action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+      role: pane
+    items:
+    - 删除
+  assert_steps:
+  - action: assert_element
+    selector:
+      name: TiptapWebView
+      role: pane

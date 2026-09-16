@@ -1,0 +1,59 @@
+name: edit_img(#edit_img)_case_1676227_s1_suite
+app: deepin-voice-note
+description: '图片右键菜单_复制剪切删除保存（覆盖1676227、1676225、1676223、1676221）'
+module: edit_img(#edit_img)
+tags: []
+fast_fail: false
+env_check: []
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: case_1676227_s1
+  name: 图片右键菜单_复制剪切删除保存
+  description: '右键图片复制、剪切、粘贴、保存为、删除操作'
+  tags: []
+  steps:
+  - action: element_action
+    selector:
+      name: TiptapWebView
+      role: pane
+    do: click
+  - action: dtk_context_menu
+    selector:
+      name: PictureContextMenu
+      role: popup menu
+    items:
+    - 复制
+  - action: dtk_context_menu
+    selector:
+      name: PictureContextMenu
+      role: popup menu
+    items:
+    - 剪切
+  - action: keyboard_hot_key
+    key: ctrl+v
+  - action: dtk_context_menu
+    selector:
+      name: PictureContextMenu
+      role: popup menu
+    items:
+    - 保存为
+  - action: keyboard_type
+    text: /tmp/voice-note-image.png
+  - action: keyboard_press
+    key: return
+  - action: dtk_context_menu
+    selector:
+      name: PictureContextMenu
+      role: popup menu
+    items:
+    - 删除
+  assert_steps:
+  - action: assert_element
+    selector:
+      name: TiptapWebView
+      role: pane
