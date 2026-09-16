@@ -1,0 +1,70 @@
+name: suite_save_exp_001_s1_suite
+app: deepin-voice-note
+module: save_exp
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_save_exp_001_s1
+  name: 详情页_保存为TXT与HTML
+  description: 覆盖1676345、1676347、1634939、1634933；右键笔记通过保存笔记子菜单保存为TXT和HTML格式，验证文件生成
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+  - step_type: action
+    action: keyboard_type
+    text: 详情页保存测试内容
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为TXT
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/detail_note.txt
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为HTML
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/detail_note.html
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/detail_note.txt
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/detail_note.html
+  skip: requires nested QML context-menu selection (保存笔记 -> 保存为TXT/HTML); current YouQu
+    menu navigator times out on submenu navigation

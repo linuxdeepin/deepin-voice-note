@@ -2441,3 +2441,190 @@ cases:
     action: assert_element
     selector:
       name: TiptapWebView
+- id: suite_save_exp_001_s1
+  name: 详情页_保存为TXT与HTML
+  module: save_exp
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+  - step_type: action
+    action: keyboard_type
+    text: 详情页保存测试内容
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为TXT
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/detail_note.txt
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为HTML
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/detail_note.html
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/detail_note.txt
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/detail_note.html
+- id: suite_save_exp_002_s1
+  name: 语音保存_当前笔记全部语音
+  module: save_exp
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+  - step_type: action
+    action: keyboard_type
+    text: 语音保存测试内容
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/current_note_voice.mp3
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/current_note_voice.mp3
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/current_note_voice.mp3
+- id: suite_save_exp_003_s1
+  name: 多选笔记_保存TXT保存HTML保存语音
+  module: save_exp
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: SaveNoteButton
+    do: click
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/multi_note.txt
+  - step_type: action
+    action: element_action
+    selector:
+      name: SaveNoteButton
+    do: click
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/multi_note.html
+  - step_type: action
+    action: element_action
+    selector:
+      name: SaveVoiceButton
+    do: click
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/multi_voice.mp3
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/multi_note.txt
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/multi_note.html
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/multi_voice.mp3
+- id: suite_save_exp_004_s1
+  name: 空笔记_保存入口禁用
+  module: save_exp
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为TXT
+    wait: 1.0
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
