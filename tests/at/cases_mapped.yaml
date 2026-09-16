@@ -2291,3 +2291,18 @@ cases:
     action: assert_element
     selector:
       name: NoteContentWebView
+- id: suite_privacy_001_s1
+  name: 隐私政策_打开外链
+  module: privacy
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/titlebar_menu_press.py --select PrivacyPolicyMenuItem'
+    wait: 3.0
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
