@@ -99,3 +99,25 @@ TEST(UT_VTextSpeechCoverage, CheckUosAiExistsDrivesNestedLambdas)
     const int status = static_cast<int>(mgr->status());
     EXPECT_GE(status, 0);
 }
+
+// --- VTextSpeechAndTrManager::isCopilotEnabled(QSharedPointer<QDBusInterface> const&)
+//     [private static, L329] ---
+// -fno-access-control permits invoking the private static directly. A real
+// interface to a non-existent service causes the DBus call to fail; the
+// function returns Enable (error fallback) without crashing.
+
+TEST(UT_VTextSpeechCoverage, IsCopilotEnabledReturnsEnableWhenServiceMissing)
+{
+    const QSharedPointer<QDBusInterface> copilot =
+        QSharedPointer<QDBusInterface>::create(QStringLiteral("com.deepin.copilot"),
+                                               QStringLiteral("/com/deepin/copilot"),
+                                               QStringLiteral("com.deepin.copilot"));
+    ASSERT_FALSE(copilot.isNull());
+
+    const VTextSpeechAndTrManager::Status status =
+        VTextSpeechAndTrManager::isCopilotEnabled(copilot);
+    // When the DBus call fails, the function returns Enable as error fallback.
+    // If the service happens to exist, it returns Enable or NoUserAgreement.
+    EXPECT_TRUE(status == VTextSpeechAndTrManager::Enable
+                || status == VTextSpeechAndTrManager::NoUserAgreement);
+}

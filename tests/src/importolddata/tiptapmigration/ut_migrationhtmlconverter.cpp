@@ -1166,3 +1166,51 @@ TEST(UT_MigrationHtmlConverter, DowngradesHyperlinkInsideNestedList)
     const QJsonArray paraContent = nodeContentOf(itemContent.at(0).toObject());
     EXPECT_EQ(QStringLiteral("link"), textOf(paraContent.at(0).toObject()));
 }
+
+// --- downgradedParagraphFromBlock + inlineContentFrom (anonymous-namespace) ---
+// These functions are triggered when an unrecognized block element (e.g.
+// <section>, <article>) appears as a child of another block element.  The
+// parent block processes its children via blockFromElement, which falls
+// through to downgradedParagraphFromBlock for unknown tags.  That function in
+// turn calls inlineContentFrom to extract inline content.
+
+TEST(UT_MigrationHtmlConverter, DowngradesUnknownBlockNestedInBlockquote)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<blockquote><section>nested text</section></blockquote>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("downgraded-html-block")));
+
+    const QJsonArray blocks = docContentOf(result);
+    ASSERT_GE(blocks.size(), 1);
+    const QJsonObject quote = blocks.at(0).toObject();
+    EXPECT_EQ(QStringLiteral("blockquote"), nodeTypeOf(quote));
+}
+
+TEST(UT_MigrationHtmlConverter, DowngradesUnknownBlockArticleNestedInBlockquote)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<blockquote><article>article text</article></blockquote>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("downgraded-html-block")));
+
+    const QJsonArray blocks = docContentOf(result);
+    EXPECT_GE(blocks.size(), 1);
+}
+
+TEST(UT_MigrationHtmlConverter, DowngradesUnknownBlockNestedInListItem)
+{
+    const MigrationHtmlConversionResult result = MigrationHtmlConverter::convert(
+        QStringLiteral("<ul><li><aside>aside text</aside></li></ul>"));
+
+    EXPECT_TRUE(result.ok());
+    expectEnvelopeValid(result);
+    EXPECT_TRUE(hasWarningCode(result, QStringLiteral("downgraded-html-block")));
+
+    const QJsonArray blocks = docContentOf(result);
+    EXPECT_GE(blocks.size(), 1);
+}

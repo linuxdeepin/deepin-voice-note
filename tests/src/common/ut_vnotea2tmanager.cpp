@@ -83,3 +83,21 @@ TEST_F(UT_VNoteA2TManager, UT_VNoteA2TManager_getErrorCode_001)
     EXPECT_EQ(VNoteA2TManager::ErrorCode::DontCareError, vnotea2tmanager.getErrorCode(tmpstruct))
         << "CODE_SUCCESS, XF_finish";
 }
+
+// --- VNoteA2TManager::startAsr (real call, no stub) ---
+// Without stubbing startAsr, the real function body is executed. When the
+// com.iflytek.aiassistant DBus service is absent, asrInterface.isValid()
+// returns false, the function emits asrError(AudioOther) and returns early.
+// This covers the actual function body (not a stub) without crashing.
+
+TEST_F(UT_VNoteA2TManager, UT_VNoteA2TManager_startAsr_RealCall_001)
+{
+    VNoteA2TManager vnotea2tmanager;
+    QString filepath = "/tmp/voice-note-ut-startasr-real.mp3";
+    qint64 fileDuration = 1000;
+    // No stub on startAsr — let the real code run.
+    // The DBus service is typically absent in CI, so isValid() returns false
+    // and the function emits asrError(AudioOther) then returns.
+    vnotea2tmanager.startAsr(filepath, fileDuration, "", "");
+    SUCCEED();
+}

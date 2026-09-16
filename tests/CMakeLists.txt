@@ -116,6 +116,11 @@ list(REMOVE_ITEM VNOTE_SRC_TEST1
 )
 
 list(REMOVE_ITEM VNOTE_SRC_TEST "${CMAKE_CURRENT_LIST_DIR}/../src/main.cpp")
+# Exclude migrationhtmlconverter.cpp from the source glob so it can be
+# #include'd directly in ut_migrationhtmlconverter_internal.cpp, granting
+# access to anonymous-namespace functions (inlineContentFrom,
+# downgradedParagraphFromBlock) for unit testing.
+list(REMOVE_ITEM VNOTE_SRC_TEST "${CMAKE_CURRENT_LIST_DIR}/../src/importolddata/tiptapmigration/migrationhtmlconverter.cpp")
 
 # 生成测试可执行程序
 add_executable(${PROJECT_NAME_TEST}
