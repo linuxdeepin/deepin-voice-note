@@ -1,0 +1,54 @@
+name: suite_search_ops_004_s1_suite
+app: deepin-voice-note
+module: search_ops
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_search_ops_004_s1
+  name: 搜索结果_不显示录音入口
+  description: 覆盖1635185；搜索结果页不显示录音按钮和新建语音记事入口，验证搜索结果页无录音入口
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+    wait: 0.3
+  - step_type: action
+    action: keyboard_type
+    text: search_no_record_001
+    wait: 0.5
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py search_no_record_001'
+    wait: 1.0
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+    wait: 0.3
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  skip: requires negative assertion (assert_element_not_found) for "录音" button and
+    "新建语音记事" entry which YouQu framework does not support; search box lacks Accessible.name
+    and uses AT-SPI helper script

@@ -1,0 +1,78 @@
+name: suite_search_ops_002_s1_suite
+app: deepin-voice-note
+module: search_ops
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_search_ops_002_s1
+  name: 搜索结果_删除匹配项
+  description: 覆盖1635203、1635191；搜索结果页右键笔记删除单条后结果数量减少，删除所有后搜索结果页显示无结果
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+    wait: 0.3
+  - step_type: action
+    action: keyboard_type
+    text: search_delete_001
+    wait: 0.5
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py search_delete_001'
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  skip: requires pre-existing notes containing "search_delete_001" in search results;
+    "删除所有文本笔记" menu item does not exist in source (NoteCtxMenu only has "删除");
+    search box lacks Accessible.name and uses AT-SPI helper script; delete confirmation
+    dialog and result count verification depend on runtime AT-SPI state

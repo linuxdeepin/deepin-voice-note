@@ -1,0 +1,249 @@
+name: search_ops_suite
+app: deepin-voice-note
+module: search_ops
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_search_ops_001_s1
+  name: 关键字搜索_匹配记事本与空结果
+  description: 覆盖1676375、1676373、1635179；搜索匹配关键字显示结果、搜索不匹配关键字显示无结果、特殊字符搜索不崩溃
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+    wait: 0.3
+  - step_type: action
+    action: keyboard_type
+    text: search_book_001
+    wait: 0.5
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py search_book_001'
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py search_none_001'
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py "~!@#￥%……&*()"'
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  skip: search box (SearchEdit, object_name "search") lacks Accessible.name; uses AT-SPI+xdotool
+    helper script (focus_search_and_query.py) to focus, type query and press Enter;
+    special character search and no-result state verification depend on runtime AT-SPI
+    inspection
+- id: suite_search_ops_002_s1
+  name: 搜索结果_删除匹配项
+  description: 覆盖1635203、1635191；搜索结果页右键笔记删除单条后结果数量减少，删除所有后搜索结果页显示无结果
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+    wait: 0.3
+  - step_type: action
+    action: keyboard_type
+    text: search_delete_001
+    wait: 0.5
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py search_delete_001'
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  skip: requires pre-existing notes containing "search_delete_001" in search results;
+    "删除所有文本笔记" menu item does not exist in source (NoteCtxMenu only has "删除");
+    search box lacks Accessible.name and uses AT-SPI helper script; delete confirmation
+    dialog and result count verification depend on runtime AT-SPI state
+- id: suite_search_ops_003_s1
+  name: 搜索结果_保存TXT和保存语音
+  description: 覆盖1635195、1635193；搜索结果页右键笔记通过保存笔记子菜单保存为TXT，通过保存语音菜单保存语音文件
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+    wait: 0.3
+  - step_type: action
+    action: keyboard_type
+    text: search_save_001
+    wait: 0.5
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py search_save_001'
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为TXT
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/search_result_note.txt
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/search_result_voice.mp3
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/search_result_note.txt
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/search_result_voice.mp3
+  skip: requires pre-existing note with both text and voice content in search results;
+    保存语音 requires audio input device for voice note creation; nested QML context-menu
+    submenu (保存笔记 -> 保存为TXT) navigation may time out; search box lacks Accessible.name
+    and uses AT-SPI helper script
+- id: suite_search_ops_004_s1
+  name: 搜索结果_不显示录音入口
+  description: 覆盖1635185；搜索结果页不显示录音按钮和新建语音记事入口，验证搜索结果页无录音入口
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+    wait: 0.3
+  - step_type: action
+    action: keyboard_type
+    text: search_no_record_001
+    wait: 0.5
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/focus_search_and_query.py search_no_record_001'
+    wait: 1.0
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+    wait: 0.3
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  skip: requires negative assertion (assert_element_not_found) for "录音" button and
+    "新建语音记事" entry which YouQu framework does not support; search box lacks Accessible.name
+    and uses AT-SPI helper script

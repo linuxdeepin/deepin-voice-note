@@ -4205,3 +4205,256 @@ cases:
     action: assert_element
     selector:
       name: NoteListScrollBar
+  - id: case_1676375
+    name: 关键字搜索_匹配记事本与空结果
+    module: search_ops
+    status: active
+    covers: [1676375, 1676373, 1635179]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {name: "NewNoteButton"}
+        do: click
+        wait: 0.5
+        description: 新建笔记
+      - step_type: action
+        action: mouse_click
+        selector: {name: "NoteContentWebView"}
+        wait: 0.3
+        description: 点击编辑区获取焦点
+      - step_type: action
+        action: keyboard_type
+        text: "search_book_001"
+        wait: 0.5
+        description: 输入笔记内容
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/focus_search_and_query.py search_book_001'
+        wait: 1.0
+        description: 搜索匹配关键字search_book_001
+      - step_type: action
+        action: keyboard_press
+        key: "Escape"
+        wait: 0.5
+        description: 退出搜索
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/focus_search_and_query.py search_none_001'
+        wait: 1.0
+        description: 搜索不匹配关键字search_none_001
+      - step_type: action
+        action: keyboard_press
+        key: "Escape"
+        wait: 0.5
+        description: 退出搜索
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/focus_search_and_query.py "~!@#￥%……&*()"'
+        wait: 1.0
+        description: 搜索特殊字符不崩溃
+      - step_type: action
+        action: keyboard_press
+        key: "Escape"
+        wait: 0.5
+        description: 退出搜索
+      - step_type: assert
+        action: assert_element
+        selector: {name: "VoiceNoteMainWindow"}
+        description: 验证主窗口存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "NoteItemListView"}
+        description: 验证笔记列表存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "NoteContentWebView"}
+        description: 验证编辑区存在
+
+  - id: case_1635203
+    name: 搜索结果_删除匹配项
+    module: search_ops
+    status: active
+    covers: [1635203, 1635191]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {name: "NewNoteButton"}
+        do: click
+        wait: 0.5
+        description: 新建笔记
+      - step_type: action
+        action: mouse_click
+        selector: {name: "NoteContentWebView"}
+        wait: 0.3
+        description: 点击编辑区获取焦点
+      - step_type: action
+        action: keyboard_type
+        text: "search_delete_001"
+        wait: 0.5
+        description: 输入笔记内容
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/focus_search_and_query.py search_delete_001'
+        wait: 1.0
+        description: 搜索关键字search_delete_001
+      - step_type: action
+        action: dtk_context_menu
+        selector: {parent: "NoteItemListView", name: "文本", role: "list item"}
+        items: ["删除"]
+        wait: 1.0
+        description: 右键搜索结果第一条笔记并点击删除
+      - step_type: action
+        action: element_action
+        selector: {name: "删除", role: "button"}
+        do: click
+        wait: 1.0
+        description: 点击删除确认按钮
+      - step_type: action
+        action: dtk_context_menu
+        selector: {parent: "NoteItemListView", name: "文本", role: "list item"}
+        items: ["删除"]
+        wait: 1.0
+        description: 右键搜索结果第一条笔记并点击删除
+      - step_type: action
+        action: element_action
+        selector: {name: "删除", role: "button"}
+        do: click
+        wait: 1.0
+        description: 点击删除确认按钮删除最后一条
+      - step_type: assert
+        action: assert_element
+        selector: {name: "VoiceNoteMainWindow"}
+        description: 验证主窗口存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "NoteItemListView"}
+        description: 验证笔记列表存在
+
+  - id: case_1635195
+    name: 搜索结果_保存TXT和保存语音
+    module: search_ops
+    status: active
+    covers: [1635195, 1635193]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {name: "NewNoteButton"}
+        do: click
+        wait: 0.5
+        description: 新建笔记
+      - step_type: action
+        action: mouse_click
+        selector: {name: "NoteContentWebView"}
+        wait: 0.3
+        description: 点击编辑区获取焦点
+      - step_type: action
+        action: keyboard_type
+        text: "search_save_001"
+        wait: 0.5
+        description: 输入笔记内容
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/focus_search_and_query.py search_save_001'
+        wait: 1.0
+        description: 搜索关键字search_save_001
+      - step_type: action
+        action: dtk_context_menu
+        selector: {parent: "NoteItemListView", name: "文本", role: "list item"}
+        items: ["保存笔记", "保存为TXT"]
+        wait: 1.0
+        description: 右键搜索结果笔记并点击保存为TXT
+      - step_type: action
+        action: file_dialog_select
+        path: /tmp/search_result_note.txt
+        description: 在文件保存对话框输入路径
+      - step_type: action
+        action: dtk_context_menu
+        selector: {parent: "NoteItemListView", name: "文本", role: "list item"}
+        items: ["保存语音"]
+        wait: 1.0
+        description: 右键搜索结果笔记并点击保存语音
+      - step_type: action
+        action: file_dialog_select
+        path: /tmp/search_result_voice.mp3
+        description: 在文件保存对话框输入路径
+      - step_type: assert
+        action: assert_element
+        selector: {name: "VoiceNoteMainWindow"}
+        description: 验证主窗口存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "NoteContentWebView"}
+        description: 验证编辑区存在
+      - step_type: assert
+        action: assert_file_exists
+        path: /tmp/search_result_note.txt
+        description: 验证TXT文件已生成
+      - step_type: assert
+        action: assert_file_exists
+        path: /tmp/search_result_voice.mp3
+        description: 验证语音文件已生成
+
+  - id: case_1635185
+    name: 搜索结果_不显示录音入口
+    module: search_ops
+    status: active
+    covers: [1635185]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {name: "NewNoteButton"}
+        do: click
+        wait: 0.5
+        description: 新建笔记
+      - step_type: action
+        action: mouse_click
+        selector: {name: "NoteContentWebView"}
+        wait: 0.3
+        description: 点击编辑区获取焦点
+      - step_type: action
+        action: keyboard_type
+        text: "search_no_record_001"
+        wait: 0.5
+        description: 输入笔记内容
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/focus_search_and_query.py search_no_record_001'
+        wait: 1.0
+        description: 搜索关键字search_no_record_001
+      - step_type: action
+        action: mouse_click
+        selector: {name: "NoteContentWebView"}
+        wait: 0.3
+        description: 点击搜索结果页内容区域
+      - step_type: assert
+        action: assert_element
+        selector: {name: "VoiceNoteMainWindow"}
+        description: 验证主窗口存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "NoteItemListView"}
+        description: 验证笔记列表存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "NoteContentWebView"}
+        description: 验证编辑区存在
