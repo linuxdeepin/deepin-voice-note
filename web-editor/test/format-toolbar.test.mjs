@@ -170,8 +170,8 @@ test('open dropdown triggers use the active icon state', () => {
 
   const headingButton = host.querySelector('.tiptap-select-heading .tiptap-select-button')
   const fontButton = host.querySelector('.tiptap-select-fontFamily .tiptap-select-button')
-  const foreColorButton = host.querySelector('button[data-format="foreColor"]')
-  assert.ok(headingButton && fontButton && foreColorButton)
+  const foreColorMenuButton = host.querySelector('button[data-color-menu="foreColor"]')
+  assert.ok(headingButton && fontButton && foreColorMenuButton)
 
   headingButton.click()
   assert.equal(headingButton.getAttribute('aria-expanded'), 'true')
@@ -182,14 +182,45 @@ test('open dropdown triggers use the active icon state', () => {
   assert.equal(fontButton.closest('.tiptap-select-wrap').classList.contains('is-open'), true)
   assert.equal(headingButton.getAttribute('aria-expanded'), 'false')
 
-  foreColorButton.click()
-  assert.equal(foreColorButton.getAttribute('aria-expanded'), 'true')
+  foreColorMenuButton.click()
+  assert.equal(foreColorMenuButton.getAttribute('aria-expanded'), 'true')
 
   assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-select-wrap\.is-open \.tiptap-select-button,[\s\S]*background: var\(--dvn-hover-bg/)
-  assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-color-button\[aria-expanded="true"\][\s\S]*background: var\(--dvn-hover-bg/)
+  assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-color-menu-button\[aria-expanded="true"\][\s\S]*background: var\(--dvn-hover-bg/)
   assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-select-wrap\.is-open \.tiptap-select-button \.tiptap-icon,[\s\S]*color: var\(--highlightColor/)
-  assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-color-button\[aria-expanded="true"\] \.tiptap-icon[\s\S]*color: var\(--highlightColor/)
+  assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-color-menu-button\[aria-expanded="true"\] \.tiptap-icon[\s\S]*color: var\(--highlightColor/)
   assert.match(toolbarCss, /\.tiptap-toolbar \.tiptap-more-button\[aria-expanded="true"\] \.tiptap-icon,[\s\S]*color: var\(--highlightColor/)
+  editor.destroy()
+})
+
+test('color controls split current color apply and more color menu actions', () => {
+  const { host, editor } = createEditorWithToolbar()
+  insertText(editor, 'colored')
+  selectText(editor)
+
+  const applyButton = host.querySelector('button[data-format="foreColor"]')
+  const menuButton = host.querySelector('button[data-color-menu="foreColor"]')
+  const panel = host.querySelector('[data-panel="foreColor"]')
+  assert.ok(applyButton && menuButton && panel)
+  assert.equal(applyButton.querySelector('.tiptap-color-icon') != null, true)
+  assert.equal(applyButton.querySelector('.tiptap-color-arrow'), null)
+  assert.equal(menuButton.querySelector('.tiptap-color-arrow') != null, true)
+
+  applyButton.click()
+  assert.notEqual(panel.style.display, 'grid', 'current color button should not open the palette')
+
+  menuButton.click()
+  assert.equal(panel.style.display, 'grid', 'arrow button should open the palette')
+
+  const color = 'rgb(205, 35, 62)'
+  panel.querySelector(`button[data-color="${color}"]`).click()
+  assert.ok(editor.isActive('color', { color }))
+
+  menuButton.click()
+  assert.equal(panel.style.display, 'grid')
+  applyButton.click()
+  assert.notEqual(panel.style.display, 'grid', 'current color button should apply color and close the palette')
+  assert.ok(editor.isActive('color', { color }))
   editor.destroy()
 })
 
@@ -317,8 +348,8 @@ test('color palettes remain usable when their controls are folded into the more 
   moreButton.click()
   assert.equal(overflowPanel.classList.contains('is-open'), true)
 
-  const foreButton = overflowPanel.querySelector('button[data-format="foreColor"]')
-  const backButton = overflowPanel.querySelector('button[data-format="backColor"]')
+  const foreButton = overflowPanel.querySelector('button[data-color-menu="foreColor"]')
+  const backButton = overflowPanel.querySelector('button[data-color-menu="backColor"]')
   const forePanel = overflowPanel.querySelector('[data-panel="foreColor"]')
   const backPanel = overflowPanel.querySelector('[data-panel="backColor"]')
   assert.ok(foreButton && backButton && forePanel && backPanel, 'color controls should move together into the more menu')

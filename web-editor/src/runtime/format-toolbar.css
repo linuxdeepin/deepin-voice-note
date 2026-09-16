@@ -290,7 +290,7 @@
 .tiptap-toolbar button.is-active,
 .tiptap-toolbar button[aria-pressed="true"],
 .tiptap-toolbar .tiptap-select-wrap.is-open .tiptap-select-button,
-.tiptap-toolbar .tiptap-color-button[aria-expanded="true"] {
+.tiptap-toolbar .tiptap-color-menu-button[aria-expanded="true"] {
     background: var(--dvn-hover-bg, rgba(0, 0, 0, 0.06));
 }
 
@@ -311,7 +311,7 @@
 .tiptap-toolbar button[aria-pressed="true"] .tiptap-icon,
 .tiptap-toolbar .tiptap-more-button[aria-expanded="true"] .tiptap-icon,
 .tiptap-toolbar .tiptap-select-wrap.is-open .tiptap-select-button .tiptap-icon,
-.tiptap-toolbar .tiptap-color-button[aria-expanded="true"] .tiptap-icon {
+.tiptap-toolbar .tiptap-color-menu-button[aria-expanded="true"] .tiptap-icon {
     color: var(--highlightColor, #0081ff);
 }
 
@@ -371,10 +371,20 @@
 .tiptap-color-picker {
     position: relative;
     display: inline-flex;
+    align-items: center;
+    gap: 0;
 }
 
 .tiptap-color-button {
-    gap: var(--dvn-toolbar-color-button-gap);
+    width: 30px;
+    min-width: 30px;
+    padding: 0 !important;
+}
+
+.tiptap-color-menu-button {
+    width: 12px;
+    min-width: 12px !important;
+    padding: 0 !important;
 }
 
 .tiptap-color-icon {
