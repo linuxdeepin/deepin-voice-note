@@ -271,3 +271,41 @@ TEST(AudioCoverageUT, RecordingCurves_updateCurves_ManyCalls_PhaseResetsWithinBo
     EXPECT_LE(curves.m_phase, 170 * M_PI);
     SUCCEED();
 }
+
+// --- AudioWatcher::defaultSinkMute / defaultSinkVolume / defaultSourceMute /
+//     defaultSourceVolume ---
+// These four public getters return default values when the D-Bus interface is
+// unavailable. Calling them on the shared instance (with or without DBus)
+// exercises the function body without crashing.
+
+TEST(AudioCoverageUT, AudioWatcher_defaultSinkMute_ReturnsBoolNoCrash)
+{
+    AudioWatcher *aw = sharedAudioWatcher();
+    bool val = aw->defaultSinkMute();
+    (void)val;
+    SUCCEED();
+}
+
+TEST(AudioCoverageUT, AudioWatcher_defaultSinkVolume_ReturnsDoubleNoCrash)
+{
+    AudioWatcher *aw = sharedAudioWatcher();
+    double val = aw->defaultSinkVolume();
+    (void)val;
+    SUCCEED();
+}
+
+TEST(AudioCoverageUT, AudioWatcher_defaultSourceMute_ReturnsBoolNoCrash)
+{
+    AudioWatcher *aw = sharedAudioWatcher();
+    bool val = aw->defaultSourceMute();
+    (void)val;
+    SUCCEED();
+}
+
+TEST(AudioCoverageUT, AudioWatcher_defaultSourceVolume_ReturnsDoubleNoCrash)
+{
+    AudioWatcher *aw = sharedAudioWatcher();
+    double val = aw->defaultSourceVolume();
+    (void)val;
+    SUCCEED();
+}
