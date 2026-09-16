@@ -1,0 +1,66 @@
+name: suite_play_voice_002_s1_suite
+app: deepin-voice-note
+module: play_voice
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_play_voice_002_s1
+  name: 右键菜单_保存复制剪切删除
+  description: 覆盖1676287、1676285、1676279、1676277、1635101、1624807；语音笔记右键菜单复制、剪切、粘贴、保存为MP3和删除操作
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 复制
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 剪切
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 粘贴
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 保存为MP3
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/voice_item.mp3
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 删除
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/voice_item.mp3
+  skip: >-
+    语音笔记右键菜单（VoiceContextMenu）通过 dtk_context_menu 在 TiptapWebView 上触发，
+    菜单项包括复制、剪切、粘贴、保存为MP3、删除。前置条件需要语音笔记存在，需音频输入设备。

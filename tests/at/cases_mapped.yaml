@@ -2628,3 +2628,181 @@ cases:
     action: assert_element
     selector:
       name: NoteContentWebView
+- id: suite_play_voice_001_s1
+  name: 播放暂停与Space快捷键
+  module: play_voice
+  steps:
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+  - step_type: action
+    action: keyboard_press
+    key: space
+    selector:
+      name: TiptapWebView
+  - step_type: action
+    action: keyboard_press
+    key: space
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+- id: suite_play_voice_002_s1
+  name: 右键菜单_保存复制剪切删除
+  module: play_voice
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 复制
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 剪切
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 粘贴
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 保存为MP3
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/voice_item.mp3
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/voice_item.mp3
+- id: suite_play_voice_003_s1
+  name: 播放中_保存删除编辑
+  module: play_voice
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+  - step_type: action
+    action: keyboard_type
+    text: play_edit_001
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+- id: suite_play_voice_004_s1
+  name: 切换播放对象与右键其他记事本
+  module: play_voice
+  steps:
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 重命名
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+- id: suite_play_voice_005_s1
+  name: 语音笔记显示_节点存在
+  module: play_voice
+  steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceContextMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContextMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView

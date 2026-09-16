@@ -1,0 +1,53 @@
+name: suite_play_voice_001_s1_suite
+app: deepin-voice-note
+module: play_voice
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_play_voice_001_s1
+  name: 播放暂停与Space快捷键
+  description: 覆盖1676407、1676291、1676289、1635057；语音笔记播放/暂停按钮切换及Space快捷键切换播放暂停状态
+  steps:
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+    note: 点击语音笔记播放按钮（WebEngineView内部DOM元素.voicebtn.play，无AT-SPI accessible name）
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+    note: 点击暂停按钮（WebEngineView内部DOM元素.voicebtn.pause，无AT-SPI accessible name）
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+    note: 再次点击播放按钮
+  - step_type: action
+    action: keyboard_press
+    key: space
+    selector:
+      name: TiptapWebView
+  - step_type: action
+    action: keyboard_press
+    key: space
+    selector:
+      name: TiptapWebView
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  skip: >-
+    播放/暂停按钮是 WebEngineView 内部 DOM 元素（.voicebtn.play / .voicebtn.pause），
+    无 AT-SPI accessible name，无法通过 selector 精确点击。Space 快捷键由
+    WebEngineView 内部 JS 处理（src/web/index.js keyCode==32），可通过
+    keyboard_press:space 在 TiptapWebView 上触发。前置条件需要语音笔记存在，
+    需音频输入设备。

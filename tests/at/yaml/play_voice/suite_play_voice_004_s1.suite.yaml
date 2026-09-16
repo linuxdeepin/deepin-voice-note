@@ -1,0 +1,49 @@
+name: suite_play_voice_004_s1_suite
+app: deepin-voice-note
+module: play_voice
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_play_voice_004_s1
+  name: 切换播放对象与右键其他记事本
+  description: 覆盖1635081、1635071；播放过程中切换播放对象，右键其他记事本验证菜单状态
+  steps:
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+    note: 点击另一条语音笔记播放按钮（WebEngineView内部DOM元素，无AT-SPI accessible name）
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 重命名
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    note: 关闭右键菜单
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  skip: >-
+    点击另一条语音笔记播放按钮是 WebEngineView 内部 DOM 元素（.voicebtn.play），
+    无 AT-SPI accessible name，无法精确点击。右键其他记事本通过 NoteContextMenu
+    （dtk_context_menu on NoteItemListView list item）触发。前置条件需要多条语音笔记
+    和多个记事本，需音频输入设备。

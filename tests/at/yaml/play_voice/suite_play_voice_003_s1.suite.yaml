@@ -1,0 +1,65 @@
+name: suite_play_voice_003_s1_suite
+app: deepin-voice-note
+module: play_voice
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_play_voice_003_s1
+  name: 播放中_保存删除编辑
+  description: 覆盖1635089、1635087、1635083；播放过程中保存语音、取消删除语音笔记、编辑当前文本笔记
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    note: 取消文件保存对话框
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+    note: 取消删除确认对话框
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+    note: 点击正文编辑区
+  - step_type: action
+    action: keyboard_type
+    text: play_edit_001
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  skip: >-
+    右键当前文本笔记通过 NoteContextMenu（dtk_context_menu on NoteItemListView list item）
+    触发"保存语音"菜单项；右键语音笔记通过 VoiceContextMenu（dtk_context_menu on
+    TiptapWebView）触发"删除"菜单项。删除确认对话框取消按钮通过 CancelButton selector 点击。
+    前置条件需要语音笔记存在且正在播放，需音频输入设备。

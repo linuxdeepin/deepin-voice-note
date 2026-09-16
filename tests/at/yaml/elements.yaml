@@ -110,3 +110,7 @@ elements:
   MainWindow_UpgradeView:
     name: MainWindow_UpgradeView
     role: ''
+  VoiceContextMenu:
+    name: VoiceContextMenu
+  NoteContextMenu:
+    name: NoteContextMenu

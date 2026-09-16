@@ -1,5 +1,5 @@
 scan_total: 50
-total: 50
+total: 52
 elements:
   VNoteButton:
     role: push button
@@ -250,4 +250,14 @@ elements:
     role: ''
     source: main.qml
     type: MigrationUpgradeView
+    name_source: accessible
+  VoiceContextMenu:
+    role: menu
+    source: gui/mainwindow/WebEngineView.qml
+    type: VNoteRightMenu
+    name_source: accessible
+  NoteContextMenu:
+    role: menu
+    source: gui/mainwindow/ItemListView.qml
+    type: VNoteRightMenu
     name_source: accessible
