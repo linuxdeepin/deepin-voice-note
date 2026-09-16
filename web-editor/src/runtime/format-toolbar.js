@@ -206,6 +206,8 @@ function clearMarkColor(editor, markName) {
 function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen) {
   // kind: 'foreColor' | 'backColor'
   const wrapper = createEl('span', { class: 'tiptap-color-picker' })
+  const title = kind === 'foreColor' ? '文字颜色' : '背景颜色'
+  let currentColor = ''
 
   const icon = createEl('span', { class: 'tiptap-color-icon' }, [
     createSvgIcon(kind === 'foreColor' ? 'textColor' : 'marker'),
@@ -213,14 +215,22 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
   const arrow = createEl('span', { class: 'tiptap-color-arrow', 'aria-hidden': 'true' }, [
     createSvgIcon('richtextArrow'),
   ])
-  const toggle = createEl('button', {
+  const applyButton = createEl('button', {
     type: 'button',
-    class: 'tiptap-color-button',
+    class: 'tiptap-color-button tiptap-color-apply-button',
     'data-format': kind,
-    title: kind === 'foreColor' ? '文字颜色' : '背景颜色',
-  }, [icon, arrow])
-  toggle.setAttribute('aria-haspopup', 'true')
-  toggle.setAttribute('aria-expanded', 'false')
+    title,
+    'aria-label': title,
+  }, [icon])
+  const menuButton = createEl('button', {
+    type: 'button',
+    class: 'tiptap-color-menu-button',
+    'data-color-menu': kind,
+    title: '更多颜色',
+    'aria-label': '更多颜色',
+  }, [arrow])
+  menuButton.setAttribute('aria-haspopup', 'true')
+  menuButton.setAttribute('aria-expanded', 'false')
 
   const panel = createEl('div', {
     class: 'tiptap-color-panel',
@@ -232,12 +242,14 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
   function openPanel() {
     onOpen?.()
     panel.style.display = 'grid'
-    toggle.setAttribute('aria-expanded', 'true')
+    wrapper.classList.add('is-open')
+    menuButton.setAttribute('aria-expanded', 'true')
   }
 
   function closePanel() {
     panel.style.display = 'none'
-    toggle.setAttribute('aria-expanded', 'false')
+    wrapper.classList.remove('is-open')
+    menuButton.setAttribute('aria-expanded', 'false')
   }
 
   function togglePanel() {
@@ -250,10 +262,21 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
 
   function setCurrentColor(color) {
     // 颜色指示条跟随当前输入上下文；无颜色时恢复 Summernote 的默认值。
-    toggle.style.setProperty('--dvn-current-color', color || (kind === 'foreColor' ? DEFAULT_FORE_COLOR : DEFAULT_BACK_COLOR))
+    currentColor = color || ''
+    applyButton.style.setProperty('--dvn-current-color', currentColor || (kind === 'foreColor' ? DEFAULT_FORE_COLOR : DEFAULT_BACK_COLOR))
   }
 
-  toggle.addEventListener('click', (event) => {
+  applyButton.addEventListener('click', (event) => {
+    event.stopPropagation()
+    if (!currentColor || currentColor === 'transparent') {
+      clear(editor)
+    } else {
+      apply(editor, currentColor)
+    }
+    closePanel()
+  })
+
+  menuButton.addEventListener('click', (event) => {
     event.stopPropagation()
     togglePanel()
   })
@@ -291,12 +314,13 @@ function buildColorPicker(editor, kind, colors, apply, clear, readActive, onOpen
     appendColorCells(Array.isArray(nextColors) ? nextColors : [])
   }
 
-  wrapper.appendChild(toggle)
+  wrapper.appendChild(applyButton)
+  wrapper.appendChild(menuButton)
   wrapper.appendChild(panel)
 
   setColors(colors)
   setCurrentColor('')
-  return { wrapper, toggle, panel, openPanel, closePanel, setCurrentColor, setColors, readActive }
+  return { wrapper, toggle: menuButton, applyButton, menuButton, panel, openPanel, closePanel, setCurrentColor, setColors, readActive }
 }
 
 function createStyledSelect({ control, title, options, onChange, onOpen }) {
