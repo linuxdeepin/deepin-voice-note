@@ -110,7 +110,60 @@ elements:
   MainWindow_UpgradeView:
     name: MainWindow_UpgradeView
     role: ''
-  VoiceContextMenu:
+  确定按钮:
+    name: 确定
+    role: button
+  取消按钮:
+    name: 取 消
+    role: button
+  编辑区:
+    name: TiptapWebView
+    role: pane
+  文本右键菜单:
+    name: TextContextMenu
+    role: popup menu
+  图片右键菜单:
+    name: PictureContextMenu
+    role: popup menu
+  语音右键菜单:
     name: VoiceContextMenu
-  NoteContextMenu:
+    role: popup menu
+  复制:
+    name: 复制
+    role: menu item
+  剪切:
+    name: 剪切
+    role: menu item
+  粘贴:
+    name: 粘贴
+    role: menu item
+  全选:
+    name: 全选
+    role: menu item
+  查看:
+    name: 查看
+    role: menu item
+  保存为:
+    name: 保存为
+    role: menu item
+  保存为MP3:
+    name: 保存为MP3
+    role: menu item
+  语音转文字:
+    name: 语音转文字
+    role: menu item
+  语音朗读:
+    name: 语音朗读
+    role: menu item
+  停止朗读:
+    name: 停止朗读
+    role: menu item
+  语音听写:
+    name: 语音听写
+    role: menu item
+  笔记内容区:
+    name: NoteContentWebView
+    role: pane
+  笔记右键菜单:
     name: NoteContextMenu
+    role: popup menu

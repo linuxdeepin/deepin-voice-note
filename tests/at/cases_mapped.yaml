@@ -2628,6 +2628,240 @@ cases:
     action: assert_element
     selector:
       name: NoteContentWebView
+# ============================================================
+# [edit_img] 编辑区右键菜单、图片、只读转写文案（批次 edit_img）
+# ============================================================
+  - id: case_1676219
+    name: 编辑区右键菜单_空白与未选中文本菜单
+    module: edit_img
+    status: active
+    covers: [1676219, 1676217, 1873449]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "TiptapWebView"}
+        do: click
+        description: 点击正文编辑区
+      - step_type: action
+        action: mouse_right_click
+        selector: {role: "pane", name: "TiptapWebView"}
+        description: 右键正文编辑区空白处
+      - step_type: assert
+        action: assert_element
+        selector: {role: "popup menu", name: "TextContextMenu"}
+        description: 验证文本右键菜单弹出
+      - step_type: assert
+        action: assert_not_exists
+        selector: {role: "menu item", name: "文本翻译"}
+        description: 验证菜单中不存在"文本翻译"
+      - step_type: action
+        action: keyboard_press
+        key: "escape"
+        description: 关闭右键菜单
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "TiptapWebView"}
+        do: click
+        description: 点击正文编辑区
+      - step_type: action
+        action: mouse_right_click
+        selector: {role: "pane", name: "TiptapWebView"}
+        description: 再次右键正文编辑区
+      - step_type: assert
+        action: assert_element
+        selector: {role: "popup menu", name: "TextContextMenu"}
+        description: 验证菜单再次弹出
+      - step_type: action
+        action: keyboard_press
+        key: "escape"
+        description: 关闭右键菜单
+
+  - id: case_1634975
+    name: 编辑区右键菜单_选中文本剪切复制删除
+    module: edit_img
+    status: active
+    covers: [1634975, 1634973, 1634971]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "TiptapWebView"}
+        do: click
+        description: 点击正文编辑区
+      - step_type: action
+        action: keyboard_hot_key
+        key: "ctrl+a"
+        description: 全选正文文本
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "pane", name: "TiptapWebView"}
+        items: ["复制"]
+        description: 右键编辑区并点击"复制"
+      - step_type: action
+        action: keyboard_hot_key
+        key: "ctrl+a"
+        description: 再次全选正文文本
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "pane", name: "TiptapWebView"}
+        items: ["剪切"]
+        description: 右键编辑区并点击"剪切"
+      - step_type: action
+        action: keyboard_type
+        text: "edit_menu_002"
+        description: 输入新文本
+      - step_type: action
+        action: keyboard_hot_key
+        key: "ctrl+a"
+        description: 全选新输入的文本
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "pane", name: "TiptapWebView"}
+        items: ["删除"]
+        description: 右键编辑区并点击"删除"
+
+  - id: case_1676377
+    name: 图片插入图片_粘贴与焦点位置
+    module: edit_img
+    status: active
+    covers: [1676377, 1676231, 1676229]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "TiptapWebView"}
+        do: click
+        description: 点击正文编辑区
+      - step_type: action
+        action: keyboard_type
+        text: "image_before"
+        description: 输入图片前文本
+      - step_type: action
+        action: keyboard_hot_key
+        key: "ctrl+v"
+        description: 粘贴剪贴板中的测试图片
+      - step_type: action
+        action: keyboard_type
+        text: "image_after"
+        description: 输入图片后文本
+      - step_type: action
+        action: session_stop
+        description: 关闭应用
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 重启应用
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "NoteContentWebView"}
+        do: click
+        description: 打开当前文本笔记
+
+  - id: case_1676227
+    name: 图片右键菜单_复制剪切删除保存
+    module: edit_img
+    status: active
+    covers: [1676227, 1676225, 1676223, 1676221]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "TiptapWebView"}
+        do: click
+        description: 点击正文编辑区
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "popup menu", name: "PictureContextMenu"}
+        items: ["复制"]
+        description: 右键图片并点击"复制"
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "popup menu", name: "PictureContextMenu"}
+        items: ["剪切"]
+        description: 右键图片并点击"剪切"
+      - step_type: action
+        action: keyboard_hot_key
+        key: "ctrl+v"
+        description: 粘贴图片
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "popup menu", name: "PictureContextMenu"}
+        items: ["保存为"]
+        description: 右键图片并点击"保存为"
+      - step_type: action
+        action: keyboard_type
+        text: "/tmp/voice-note-image.png"
+        description: 在文件保存对话框输入路径
+      - step_type: action
+        action: keyboard_press
+        key: "return"
+        description: 点击保存按钮
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "popup menu", name: "PictureContextMenu"}
+        items: ["删除"]
+        description: 右键图片并点击"删除"
+
+  - id: case_1676439
+    name: 语音转写转写文案_只读且可复制
+    module: edit_img
+    status: active
+    covers: [1676439, 1680885, 1679613]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "TiptapWebView"}
+        do: click
+        description: 点击语音转写文案区域
+      - step_type: action
+        action: keyboard_type
+        text: "edit_try_001"
+        description: 输入文本（转写文案只读，不应变更内容）
+      - step_type: assert
+        action: assert_element
+        selector: {role: "pane", name: "TiptapWebView"}
+        description: 验证转写文案区域存在且内容未变更
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "popup menu", name: "VoiceContextMenu"}
+        items: ["复制"]
+        description: 右键语音转写文案区域并点击"复制"
+      - step_type: action
+        action: keyboard_press
+        key: "escape"
+        description: 关闭菜单
+      - step_type: action
+        action: keyboard_press
+        key: "escape"
+        description: 折叠转写文案
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "TiptapWebView"}
+        do: click
+        description: 点击展开转写文案
 - id: suite_play_voice_001_s1
   name: 播放暂停与Space快捷键
   module: play_voice

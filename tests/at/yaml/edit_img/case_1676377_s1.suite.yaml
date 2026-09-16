@@ -1,0 +1,44 @@
+name: edit_img(#edit_img)_case_1676377_s1_suite
+app: deepin-voice-note
+description: '图片插入图片_粘贴与焦点位置（覆盖1676377、1676231、1676229）'
+module: edit_img(#edit_img)
+tags: []
+fast_fail: false
+env_check: []
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: case_1676377_s1
+  name: 图片插入图片_粘贴与焦点位置
+  description: '点击编辑区输入文本，粘贴图片，继续输入文本，重启后验证图片和文本持久化'
+  tags: []
+  steps:
+  - action: element_action
+    selector:
+      name: TiptapWebView
+      role: pane
+    do: click
+  - action: keyboard_type
+    text: image_before
+  - action: keyboard_hot_key
+    key: ctrl+v
+  - action: keyboard_type
+    text: image_after
+  - action: session_stop
+  - action: session_start
+    command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+    wait: 6.0
+  - action: element_action
+    selector:
+      name: NoteContentWebView
+      role: pane
+    do: click
+  assert_steps:
+  - action: assert_element
+    selector:
+      name: TiptapWebView
+      role: pane
