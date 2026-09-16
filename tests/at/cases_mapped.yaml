@@ -2306,3 +2306,138 @@ cases:
     action: assert_element
     selector:
       name: VoiceNoteMainWindow
+- id: suite_voice_ai_001_s1
+  name: 语音朗读_选中文本朗读与重复朗读
+  module: voice_ai
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    selector:
+      name: TiptapWebView
+    key: ctrl+a
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 语音朗读
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 语音朗读
+    wait: 1.0
+  - step_type: action
+    action: keyboard_hot_key
+    selector:
+      name: TiptapWebView
+    key: Alt+M
+    wait: 1.0
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+- id: suite_voice_ai_002_s1
+  name: 语音听写_AI唤起首次与快捷键
+  module: voice_ai
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 语音听写
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    selector:
+      name: TiptapWebView
+    key: Alt+M
+    wait: 1.0
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+- id: suite_voice_ai_003_s1
+  name: 语音转文字_转写网络正常
+  module: voice_ai
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 语音转文字
+    wait: 2.0
+  - step_type: action
+    action: keyboard_type
+    selector:
+      name: TiptapWebView
+    text: edit_try_002
+    wait: 0.5
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+- id: suite_voice_ai_004_s1
+  name: 语音转文字_转写文案折叠展开
+  module: voice_ai
+  status: unsupported
+  reason: 转写文案折叠/展开按钮是WebEngineView内部DOM元素（.nBtn CSS class），无Accessible.name或objectName，AT-SPI无法定位；需通过JS注入或坐标点击方式实现，超出AT-SPI测试框架能力范围
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+    wait: 0.5
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView

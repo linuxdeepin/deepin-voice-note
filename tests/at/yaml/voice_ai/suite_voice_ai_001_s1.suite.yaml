@@ -1,0 +1,60 @@
+name: suite_voice_ai_001_s1_suite
+app: deepin-voice-note
+module: voice_ai
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_voice_ai_001_s1
+  name: 语音朗读_选中文本朗读与重复朗读
+  description: 覆盖xlsx用例1873475、1873467、1873451、1676463「语音朗读」；选中正文文本后通过右键菜单触发语音朗读，重复触发验证不崩溃，并通过快捷键触发朗读流程
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    selector:
+      name: TiptapWebView
+    key: ctrl+a
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 语音朗读
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 语音朗读
+    wait: 1.0
+  - step_type: action
+    action: keyboard_hot_key
+    selector:
+      name: TiptapWebView
+    key: Alt+M
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note

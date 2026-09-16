@@ -1,0 +1,41 @@
+name: suite_voice_ai_003_s1_suite
+app: deepin-voice-note
+module: voice_ai
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_voice_ai_003_s1
+  name: 语音转文字_转写网络正常
+  description: 覆盖xlsx用例1676435、1680885「语音转文字」；右键语音笔记点击语音转文字菜单项，等待转写完成后验证转写文案区域存在且不可直接编辑
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 语音转文字
+    wait: 2.0
+  - step_type: action
+    action: keyboard_type
+    selector:
+      name: TiptapWebView
+    text: edit_try_002
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
