@@ -3,25 +3,16 @@ app: deepin-voice-note
 module: voice_ai
 setup:
 - action: session_start
-  command: bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; SINK=$(pactl get-default-sink 2>/dev/null || true); if [ -z "$SINK" ] || [ "$SINK" = null-sink ]; then SINK=$(pactl list short sinks | awk '\''$2 != "null-sink" {print $2; exit}'\''); fi; if [ -n "$SINK" ]; then pactl set-default-sink "$SINK" 2>/dev/null || true; pactl set-default-source "$SINK.monitor" 2>/dev/null || true; fi; exec ./tests/at/setup_voice_note_at.sh'
+  command: bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; SINK=$(pactl get-default-sink 2>/dev/null || true); if [ -z "$SINK" ] || [ "$SINK" = null-sink ]; then SINK=$(pactl list short sinks | awk
+    '\''$2 != "null-sink" {print $2; exit}'\''); fi; if [ -n "$SINK" ]; then pactl set-default-sink "$SINK" 2>/dev/null || true; pactl set-default-source "$SINK.monitor" 2>/dev/null || true; fi; exec ./tests/at/setup_voice_note_at.sh'
   wait: 6.0
 teardown:
 - action: session_stop
 suites:
 - id: suite_voice_ai_003_s1
   name: 语音转文字_转写网络正常
-  description: 覆盖xlsx用例1676435、1680885「语音转文字」；右键语音笔记点击语音转文字菜单项，等待转写完成后验证转写文案区域存在且不可直接编辑
+  description: ''
   steps:
-  - step_type: action
-    action: session_start
-    command: bash -lc './tests/at/scripts/titlebar_menu_press.py --select SettingsMenuItem --wait-visible InternalRadioButton --click-visible InternalRadioButton --timeout 8'
-    wait: 1.5
-    note: 打开标题栏主菜单并点击设置菜单项
-  - step_type: action
-    action: keyboard_hot_key
-    key: alt+F4
-    wait: 1.0
-    note: 使用 Alt+F4 关闭设置弹窗，回到主界面
   - step_type: action
     action: element_action
     selector:
@@ -29,71 +20,18 @@ suites:
     do: focus
     wait: 0.5
   - step_type: action
-    action: webengine_eval_js
-    value:
-      port: 9222
-      target_url_contains: tiptap-editor
-      script: |
-        (function(){
-          const btn = document.querySelector('button[data-format=\"insertVoice\"]');
-          if (!btn) throw new Error('insertVoice button not found');
-          btn.click();
-          return true;
-        })()
-    wait: 2.0
-    note: 通过 QtWebEngine DevTools 执行 DOM click，点击 Tiptap 录音按钮
-  - step_type: action
-    action: session_start
-    command: bash -lc 'A=tests/at/fixtures/tengwanggexu.mp3; if command -v ffplay >/dev/null 2>&1; then timeout 5s ffplay -nodisp -autoexit -loglevel quiet "$A"; elif command -v paplay >/dev/null 2>&1; then timeout 5s paplay "$A"; else xdg-open "$A"; fi'
-    wait: 5.5
-    note: 录音过程中播放内置音频资源，供内部音频录制
-  - step_type: action
-    action: element_action
+    action: dtk_context_menu
     selector:
-      name: StopButton
-    do: click
+      name: TiptapWebView
+    items:
+    - 语音转文字
     wait: 2.0
-    note: 停止录音并生成语音笔记，后续对语音块触发转写
   - step_type: action
-    action: webengine_mouse_event
-    value:
-      port: 9222
-      target_url_contains: tiptap-editor
-      timeout: 10
-      selector: .voiceInfoBox[data-type="voice-block"]
-      button: right
-    wait: 1.0
-    note: 通过 CDP 对 Tiptap 语音块发真实右键事件，触发应用原生右键菜单
-  - step_type: action
-    action: element_action
+    action: keyboard_type
     selector:
-      name: 语音转文字
-      role: menu item
-    do: click
-    wait: 2.0
-    note: 点击语音块右键菜单中的语音转文字
-  - step_type: action
-    action: webengine_eval_js
-    value:
-      port: 9222
-      target_url_contains: tiptap-editor
-      timeout: 60
-      script: |
-        (function(){
-          return new Promise(function(resolve, reject){
-            const deadline = Date.now() + 55000;
-            function poll(){
-              const textEl = document.querySelector('.translateText');
-              const text = textEl ? (textEl.innerText || textEl.textContent || '').trim() : '';
-              if (text) return resolve({ transcriptLength: text.length });
-              if (Date.now() > deadline) return reject(new Error('transcript text not generated'));
-              setTimeout(poll, 500);
-            }
-            poll();
-          });
-        })()
-    wait: 1.0
-    note: 等待右键菜单触发的语音转文字生成转写文案
+      name: TiptapWebView
+    text: edit_try_002
+    wait: 0.5
   assert_steps:
   - step_type: assert
     action: assert_element

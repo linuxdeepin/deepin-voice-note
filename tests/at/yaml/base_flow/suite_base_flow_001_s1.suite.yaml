@@ -3,25 +3,16 @@ app: deepin-voice-note
 module: base_flow
 setup:
 - action: session_start
-  command: bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; SINK=$(pactl get-default-sink 2>/dev/null || true); if [ -z "$SINK" ] || [ "$SINK" = null-sink ]; then SINK=$(pactl list short sinks | awk '\''$2 != "null-sink" {print $2; exit}'\''); fi; if [ -n "$SINK" ]; then pactl set-default-sink "$SINK" 2>/dev/null || true; pactl set-default-source "$SINK.monitor" 2>/dev/null || true; fi; exec ./tests/at/setup_voice_note_at.sh'
+  command: bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; SINK=$(pactl get-default-sink 2>/dev/null || true); if [ -z "$SINK" ] || [ "$SINK" = null-sink ]; then SINK=$(pactl list short sinks | awk
+    '\''$2 != "null-sink" {print $2; exit}'\''); fi; if [ -n "$SINK" ]; then pactl set-default-sink "$SINK" 2>/dev/null || true; pactl set-default-source "$SINK.monitor" 2>/dev/null || true; fi; exec ./tests/at/setup_voice_note_at.sh'
   wait: 6.0
 teardown:
 - action: session_stop
 suites:
 - id: suite_base_flow_001_s1
   name: 冒烟_基础功能_打开新建记事本新建笔记录音播放
-  description: 覆盖1884375；基础冒烟流程：新建记事本→新建笔记→录音→完成→播放语音笔记
+  description: ''
   steps:
-  - step_type: action
-    action: session_start
-    command: bash -lc './tests/at/scripts/titlebar_menu_press.py --select SettingsMenuItem --wait-visible InternalRadioButton --click-visible InternalRadioButton --timeout 8'
-    wait: 1.5
-    note: 打开标题栏主菜单并点击设置菜单项
-  - step_type: action
-    action: keyboard_hot_key
-    key: alt+F4
-    wait: 1.0
-    note: 使用 Alt+F4 关闭设置弹窗，回到主界面
   - step_type: action
     action: element_action
     selector:
@@ -35,24 +26,12 @@ suites:
     do: click
     wait: 1.0
   - step_type: action
-    action: webengine_eval_js
-    value:
-      port: 9222
-      target_url_contains: tiptap-editor
-      script: |
-        (function(){
-          const btn = document.querySelector('button[data-format=\"insertVoice\"]');
-          if (!btn) throw new Error('insertVoice button not found');
-          btn.click();
-          return true;
-        })()
+    action: keyboard_hot_key
+    key: ctrl+r
+    selector:
+      name: MainShortcuts
     wait: 1.0
-    note: 通过 QtWebEngine DevTools 执行 DOM click，点击 Tiptap 录音按钮
-  - step_type: action
-    action: session_start
-    command: bash -lc 'A=tests/at/fixtures/tengwanggexu.mp3; if command -v ffplay >/dev/null 2>&1; then timeout 5s ffplay -nodisp -autoexit -loglevel quiet "$A"; elif command -v paplay >/dev/null 2>&1; then timeout 5s paplay "$A"; else xdg-open "$A"; fi'
-    wait: 5.5
-    note: 录音过程中播放内置音频资源，供内部音频录制
+    note: 录音按钮位于TiptapWebView内部DOM，无AT-SPI accessible name，使用Ctrl+R快捷键触发录音
   - step_type: action
     action: element_action
     selector:

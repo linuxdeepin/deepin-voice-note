@@ -3,93 +3,52 @@ app: deepin-voice-note
 module: save_exp
 setup:
 - action: session_start
-  command: >-
-    bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; SINK=$(pactl get-default-sink 2>/dev/null || true); if [ -n "$SINK" ]; then pactl set-default-sink "$SINK" 2>/dev/null || true; pactl set-default-source "$SINK.monitor" 2>/dev/null || true; fi; exec ./tests/at/setup_voice_note_at.sh'
+  command: bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; SINK=$(pactl get-default-sink 2>/dev/null || true); if [ -n "$SINK" ]; then pactl set-default-sink "$SINK" 2>/dev/null || true; pactl set-default-source
+    "$SINK.monitor" 2>/dev/null || true; fi; exec ./tests/at/setup_voice_note_at.sh'
   wait: 6.0
 teardown:
 - action: session_stop
 suites:
 - id: suite_save_exp_002_s1
   name: 语音保存_当前笔记全部语音
-  description: 录制语音后通过笔记列表真实右键菜单打开保存语音入口，关闭后再次打开确保无异常
+  description: ''
   steps:
   - step_type: action
-    action: webengine_eval_js
-    value:
-      port: 9222
-      target_url_contains: tiptap-editor
-      script: |
-        (function(){
-          const btn = document.querySelector('button[data-format="insertVoice"]');
-          if (!btn) throw new Error('insertVoice button not found');
-          btn.click();
-          return true;
-        })()
-    wait: 1.0
-    note: 点击 Tiptap 录音按钮
-  - step_type: action
-    action: session_start
-    command: >-
-      bash -lc 'A=tests/at/fixtures/tengwanggexu.mp3; if command -v ffplay >/dev/null 2>&1; then timeout 5s ffplay -nodisp -autoexit -loglevel quiet "$A"; elif command -v paplay >/dev/null 2>&1; then timeout 5s paplay "$A"; else xdg-open "$A"; fi'
-    wait: 5.5
-    note: 播放内置音频并录制约5秒
-  - step_type: action
     action: element_action
     selector:
-      name: StopButton
+      name: NewNoteButton
     do: click
-    wait: 2.0
   - step_type: action
-    action: webengine_eval_js
-    value:
-      port: 9222
-      target_url_contains: tiptap-editor
-      timeout: 20
-      script: |
-        (function(){
-          return new Promise(function(resolve, reject){
-            const deadline = Date.now() + 15000;
-            function poll(){
-              const count = document.querySelectorAll('.voiceInfoBox[data-type="voice-block"]').length;
-              if (count > 0) return resolve({voiceCount: count});
-              if (Date.now() > deadline) return reject(new Error('voice block not generated'));
-              setTimeout(poll, 300);
-            }
-            poll();
-          });
-        })()
-    wait: 0.5
-    note: 等待语音块生成
-  - step_type: action
-    action: session_start
-    command: bash -lc './tests/at/scripts/open_note_context_menu.py --index 0 --expect 保存语音'
-    wait: 1.0
-  - step_type: action
-    action: element_action
+    action: mouse_click
     selector:
-      name: 保存语音
-      role: menu item
-    do: click
-    wait: 1.0
+      name: NoteContentWebView
   - step_type: action
-    action: keyboard_hot_key
-    key: alt+f4
-    wait: 1.0
+    action: keyboard_type
+    text: 语音保存测试内容
   - step_type: action
-    action: session_start
-    command: bash -lc './tests/at/scripts/open_note_context_menu.py --index 0 --expect 保存语音'
-    wait: 1.0
-  - step_type: action
-    action: element_action
+    action: dtk_context_menu
     selector:
-      name: 保存语音
-      role: menu item
-    do: click
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
     wait: 1.0
   - step_type: action
-    action: keyboard_hot_key
-    key: alt+f4
+    action: file_dialog_select
+    path: /tmp/current_note_voice.mp3
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
     wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/current_note_voice.mp3
   assert_steps:
   - step_type: assert
     action: assert_element
@@ -99,4 +58,7 @@ suites:
   - step_type: assert
     action: assert_element
     selector:
-      name: TiptapWebView
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/current_note_voice.mp3

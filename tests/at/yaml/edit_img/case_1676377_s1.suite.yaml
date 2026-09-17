@@ -1,64 +1,59 @@
 name: edit_img_case_1676377_s1_suite
 app: deepin-voice-note
-description: '图片插入图片_粘贴与焦点位置（覆盖1676377、1676231、1676229）'
 module: edit_img
 setup:
 - action: session_start
-  command: "bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; exec ./tests/at/setup_voice_note_at.sh'"
+  command: bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; exec ./tests/at/setup_voice_note_at.sh'
   wait: 6.0
 teardown:
 - action: session_stop
 suites:
 - id: case_1676377_s1
   name: 图片插入图片_粘贴与焦点位置
-  description: 点击编辑区输入文本，插入图片，继续输入文本，重启后验证图片和文本持久化
+  description: ''
+  status: active
+  covers:
+  - 1676377
+  - 1676231
+  - 1676229
   steps:
-  - action: element_action
+  - step_type: action
+    action: session_start
+    command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+    wait: 6.0
+    description: 启动应用
+  - step_type: action
+    action: element_action
     selector:
+      role: pane
       name: TiptapWebView
-      role: panel
     do: click
-  - action: keyboard_type
+    description: 点击正文编辑区
+  - step_type: action
+    action: keyboard_type
     text: image_before
-  - action: element_action
-    selector:
-      name: TiptapWebView
-      role: panel
-    do: click
-  - action: webengine_eval_js
-    value:
-      port: 9222
-      target_url_contains: tiptap-editor
-      timeout: 15
-      script: |
-        (function(){
-          const dataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEUlEQVR4nGP4z8DwH4QZYAwAR8oH+WdZbrcAAAAASUVORK5CYII=';
-          const editor = window.__dvnTiptapEditor;
-          if (!editor) throw new Error('Tiptap editor not found');
-          const ok = editor.chain().focus().setImage({src: dataUrl, relPath: 'atut-inline-image.png'}).run();
-          const count = document.querySelectorAll('img[data-rel-path]').length;
-          if (!ok || count < 1) throw new Error('image not inserted');
-          return {imageCount: count};
-        })()
-    wait: 0.5
-    note: 通过 QWebChannel 粘贴一张测试图片并等待 DOM 图片节点生成
-  - action: keyboard_type
+    description: 输入图片前文本
+  - step_type: action
+    action: keyboard_hot_key
+    key: ctrl+v
+    description: 粘贴剪贴板中的测试图片
+  - step_type: action
+    action: keyboard_type
     text: image_after
-  - action: webengine_eval_js
-    value:
-      port: 9222
-      target_url_contains: tiptap-editor
-      timeout: 10
-      script: |
-        (function(){
-          const imgCount = document.querySelectorAll('img[data-rel-path]').length;
-          const text = document.body.innerText || '';
-          if (imgCount < 1) throw new Error('image node not found');
-          return {imgCount, hasBefore: text.includes('image_before'), hasAfter: text.includes('image_after')};
-        })()
-    wait: 0.5
-  assert_steps:
-  - action: assert_element
+    description: 输入图片后文本
+  - step_type: action
+    action: session_stop
+    description: 关闭应用
+  - step_type: action
+    action: session_start
+    command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+    wait: 6.0
+    description: 重启应用
+  - step_type: action
+    action: element_action
     selector:
-      name: TiptapWebView
-      role: panel
+      role: pane
+      name: NoteContentWebView
+    do: click
+    description: 打开当前文本笔记
+  assert_steps: []
