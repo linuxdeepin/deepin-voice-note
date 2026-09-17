@@ -14,7 +14,7 @@ suites:
   steps:
   - step_type: action
     action: session_start
-    command: bash -lc './tests/at/scripts/titlebar_menu_press.py --select SettingsMenuItem'
+    command: bash -lc './tests/at/scripts/titlebar_menu_press.py --select SettingsMenuItem --wait-visible RestoreDefaultsButton --timeout 8'
     wait: 3.0
   assert_steps:
   - step_type: assert

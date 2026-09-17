@@ -76,11 +76,25 @@ def _find_app(app_name: str):
     raise RuntimeError(f"application not found: {app_name}")
 
 
-def _find_by_name(root, name: str):
+def _find_by_name(root, name: str, visible: bool = False):
     for node in _walk(root):
-        if _name(node) == name:
+        if _name(node) == name and (not visible or _visible_extents(node) is not None):
             return node
-    raise RuntimeError(f"AT-SPI node not found by name: {name}")
+    suffix = " visible" if visible else ""
+    raise RuntimeError(f"AT-SPI{suffix} node not found by name: {name}")
+
+
+def _wait_for_name(root, name: str, timeout: float, visible: bool = False):
+    deadline = time.time() + timeout
+    last_error = None
+    while time.time() < deadline:
+        try:
+            return _find_by_name(root, name, visible=visible)
+        except RuntimeError as exc:
+            last_error = exc
+            time.sleep(0.1)
+    suffix = " visible" if visible else ""
+    raise last_error or RuntimeError(f"AT-SPI{suffix} node not found by name: {name}")
 
 
 def _visible_note_items(app):
@@ -121,6 +135,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--app", default="deepin-voice-note")
     parser.add_argument("--index", type=int, default=0)
+    parser.add_argument("--expect", help="visible menu item name expected after right click")
     parser.add_argument("--timeout", type=float, default=10.0)
     args = parser.parse_args()
 
@@ -137,7 +152,18 @@ def main() -> int:
         last_count = len(items)
         if len(items) > args.index:
             _right_click_center(items[args.index])
-            return 0
+            if not args.expect:
+                return 0
+            try:
+                app = _find_app(args.app)
+                _wait_for_name(app, args.expect, 1.5, visible=True)
+                return 0
+            except RuntimeError:
+                # The note menu updates its enabled/visible actions asynchronously
+                # after checkNoteVoice/checkNoteText. Retry the same real right click
+                # until the expected concrete menu item is visible.
+                time.sleep(0.2)
+                continue
         time.sleep(0.2)
     raise RuntimeError(f"need visible note item at index {args.index}, got {last_count}")
 

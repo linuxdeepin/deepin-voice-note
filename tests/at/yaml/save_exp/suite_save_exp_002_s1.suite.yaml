@@ -62,7 +62,7 @@ suites:
     note: 等待语音块生成
   - step_type: action
     action: session_start
-    command: bash -lc './tests/at/scripts/open_note_context_menu.py --index 0'
+    command: bash -lc './tests/at/scripts/open_note_context_menu.py --index 0 --expect 保存语音'
     wait: 1.0
   - step_type: action
     action: element_action
@@ -77,7 +77,7 @@ suites:
     wait: 1.0
   - step_type: action
     action: session_start
-    command: bash -lc './tests/at/scripts/open_note_context_menu.py --index 0'
+    command: bash -lc './tests/at/scripts/open_note_context_menu.py --index 0 --expect 保存语音'
     wait: 1.0
   - step_type: action
     action: element_action

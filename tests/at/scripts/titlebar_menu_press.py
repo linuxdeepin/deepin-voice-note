@@ -58,12 +58,18 @@ def _role(node) -> str:
         return ""
 
 
-def _visible(node) -> bool:
+def _visible_extents(node):
     try:
         ext = node.get_extents(Atspi.CoordType.SCREEN)
-        return ext.width > 0 and ext.height > 0
     except Exception:
-        return False
+        return None
+    if ext.width <= 0 or ext.height <= 0:
+        return None
+    return ext
+
+
+def _visible(node) -> bool:
+    return _visible_extents(node) is not None
 
 
 def _find_app(app_name: str):
@@ -74,11 +80,12 @@ def _find_app(app_name: str):
     raise RuntimeError(f"application not found: {app_name}")
 
 
-def _find_by_name(root, name: str):
+def _find_by_name(root, name: str, visible: bool = False):
     for node in _walk(root):
-        if _name(node) == name:
+        if _name(node) == name and (not visible or _visible(node)):
             return node
-    raise RuntimeError(f"AT-SPI node not found by name: {name}")
+    suffix = " visible" if visible else ""
+    raise RuntimeError(f"AT-SPI{suffix} node not found by name: {name}")
 
 
 def _press(node) -> None:
@@ -100,25 +107,29 @@ def _press(node) -> None:
     node.do_action(0)
 
 
-def _wait_for_name(root, name: str, timeout: float):
+def _wait_for_name(root, name: str, timeout: float, visible: bool = False):
     deadline = time.time() + timeout
     last_error = None
     while time.time() < deadline:
         try:
-            return _find_by_name(root, name)
+            return _find_by_name(root, name, visible=visible)
         except RuntimeError as exc:
             last_error = exc
             time.sleep(0.1)
-    raise last_error or RuntimeError(f"AT-SPI node not found by name: {name}")
+    suffix = " visible" if visible else ""
+    raise last_error or RuntimeError(f"AT-SPI{suffix} node not found by name: {name}")
 
 
 def open_titlebar_menu(app_name: str, timeout: float):
     app = _find_app(app_name)
-    titlebar = _wait_for_name(app, "WebViewTitleBar", timeout)
+    titlebar = _wait_for_name(app, "WebViewTitleBar", timeout, visible=True)
     buttons = [n for n in _walk(titlebar) if _role(n) == "button" and _visible(n)]
     if not buttons:
         raise RuntimeError("no visible button under WebViewTitleBar")
     _press(buttons[0])
+    # QML Menu items can remain in the AT-SPI tree after a previous menu closes.
+    # Treat the menu as opened only when the concrete item is visible.
+    _wait_for_name(app, "SettingsMenuItem", timeout, visible=True)
     return app
 
 
@@ -126,6 +137,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--app", default="deepin-voice-note")
     parser.add_argument("--select", help="accessible name of menu item to press after opening")
+    parser.add_argument("--wait-visible", help="accessible name that must become visible after selection")
     parser.add_argument("--timeout", type=float, default=5.0)
     args = parser.parse_args()
 
@@ -138,7 +150,7 @@ def main() -> int:
     # TitleBarMenu is a QML Menu root and is not exposed stably by AT-SPI.
     # Wait for a concrete menu item instead.
     wait_name = args.select or "SettingsMenuItem"
-    item = _wait_for_name(app, wait_name, args.timeout)
+    item = _wait_for_name(app, wait_name, args.timeout, visible=True)
     if args.select:
         try:
             _press(item)
@@ -149,6 +161,9 @@ def main() -> int:
             if args.select == "ExitMenuItem" and "no longer exists" in str(exc):
                 return 0
             raise
+        if args.wait_visible:
+            app = _find_app(args.app)
+            _wait_for_name(app, args.wait_visible, args.timeout, visible=True)
     return 0
 
 
