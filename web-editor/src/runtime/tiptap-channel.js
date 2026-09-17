@@ -463,6 +463,7 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-active-bg', colorWithAlpha(activeBaseColor, 0.5, 'rgba(0, 129, 255, 0.5)'))
   root.style.setProperty('--dvn-transcript-selection-bg', colorWithAlpha(activeBaseColor, 0.4, 'rgba(0, 129, 255, 0.4)'))
   root.style.setProperty('--dvn-active-selection-bg', colorWithAlpha(activeBaseColor, 0.6, 'rgba(0, 129, 255, 0.6)'))
+  root.style.setProperty('--dvn-text-selection-bg', activeBaseColor)
   root.style.setProperty('--dvn-selection-fg', '#ffffff')
 
   // 主题联动：工具栏 / 语音块 / 滚动条 / 取色板 / 图片自绘菜单

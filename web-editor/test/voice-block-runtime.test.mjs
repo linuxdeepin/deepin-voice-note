@@ -11,6 +11,7 @@ import { Editor } from '@tiptap/core'
 import { NodeSelection } from '@tiptap/pm/state'
 import { Fragment, Slice } from '@tiptap/pm/model'
 import { createTiptapExtensions } from '../src/runtime/tiptap-extensions.js'
+import voiceBlockCss from '../src/extensions/voice-block.css?raw'
 import { setTiptapSearchQuery } from '../src/runtime/search-extension.js'
 import { currentTranscriptCopyText, writeTranscriptCopyEvent, copyTranscriptTextViaBridge, updateTranscriptSelectionCache, installTranscriptCopyHandler } from '../src/runtime/transcript-copy.js'
 import { createEmptyDoc, createEnvelope, serializeEnvelope, validateEnvelope } from '../src/schema/document-envelope.js'
@@ -538,6 +539,7 @@ test('themeProvided writes CSS variables on document root', () => {
   assert.equal(document.documentElement.style.getPropertyValue('--backgroundColor'), '#090A17')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-active-bg'), 'rgba(0, 122, 255, 0.5)')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-transcript-selection-bg'), 'rgba(0, 122, 255, 0.4)')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-text-selection-bg'), '#007AFF')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-active-selection-bg'), 'rgba(0, 122, 255, 0.6)')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-selection-fg'), '#ffffff')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-editor-fg'), 'rgba(192, 198, 212, 1)')
@@ -563,9 +565,36 @@ test('themeProvided: light theme variables', () => {
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-press-bg'), '#e5e5e5')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-toolbar-hover-fg'), 'rgba(0, 0, 0, 0.85)')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-transcript-selection-bg'), 'rgba(0, 88, 222, 0.4)')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-text-selection-bg'), '#0058DE')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-selection-fg'), '#ffffff')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-color-chip-border'), 'rgba(0, 0, 0, 0.20)')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-color-transparent-line'), 'rgba(0, 0, 0, 0.25)')
+})
+
+test('voice block active state uses active background and white foreground', () => {
+  assert.match(
+    voiceBlockCss,
+    /\.voiceBox\.ProseMirror-selectednode \.voiceInfoBox,[\s\S]*\.voiceBox\.active \.voiceInfoBox \{[\s\S]*background: var\(--dvn-text-selection-bg, var\(--highlightColor, #0081ff\)\);[\s\S]*color: var\(--dvn-selection-fg, #ffffff\);/,
+  )
+  assert.match(
+    voiceBlockCss,
+    /\.voiceBox\.ProseMirror-selectednode \.voicePlayback \.title,[\s\S]*\.voiceBox\.active \.translateText \{[\s\S]*color: var\(--dvn-selection-fg, #ffffff\);/,
+  )
+  assert.match(
+    voiceBlockCss,
+    /\.voiceBox\.ProseMirror-selectednode \.voicePlayback\.play \.voiceBtn,[\s\S]*\.voiceBox\.active \.translateHeader \.foldBtn \{[\s\S]*background-color: var\(--dvn-selection-fg, #ffffff\);/,
+  )
+})
+
+test('voice transcript selection uses text selection background and white foreground', () => {
+  assert.match(
+    voiceBlockCss,
+    /\.voiceBox\.ProseMirror-selectednode \.translateText::selection,[\s\S]*background: var\(--dvn-text-selection-bg, var\(--highlightColor, #0081ff\)\) !important;[\s\S]*color: var\(--dvn-selection-fg, #ffffff\);/,
+  )
+  assert.match(
+    voiceBlockCss,
+    /\.voiceInfoBox \.translateText::selection \{[\s\S]*background: var\(--dvn-text-selection-bg, var\(--highlightColor, #0081ff\)\) !important;[\s\S]*color: var\(--dvn-selection-fg, #ffffff\);/,
+  )
 })
 
 // ---------------------------------------------------------------------------

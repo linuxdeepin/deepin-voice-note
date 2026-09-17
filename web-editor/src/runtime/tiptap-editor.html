@@ -23,12 +23,12 @@
     #note-title-host { min-height: var(--dvn-title-host-height, 68px); box-sizing: border-box; display: flex; align-items: flex-start; padding: 13px 20px 4px 30px; background: var(--dvn-editor-bg, #ffffff); transform-origin: left top; }
     #note-title-input { display: block; width: 100%; min-width: 0; min-height: 34px; height: auto; box-sizing: border-box; border: 0; outline: none; padding: 0; resize: none; overflow: hidden; background: transparent; color: var(--dvn-title-fg, rgba(0, 0, 0, 0.30)); caret-color: var(--highlightColor, #0086cc); font: 600 24px/1.4 var(--dvn-editor-default-font, Helvetica), sans-serif; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
     #note-title-input.is-custom { color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); }
-    #note-title-input::selection { background: var(--dvn-active-selection-bg, rgba(98, 80, 192, 0.35)); }
+    #note-title-input::selection { background: var(--dvn-text-selection-bg, var(--highlightColor, #0081ff)); color: var(--dvn-selection-fg, #ffffff); }
     #app { width: 100%; min-height: calc(100% - var(--dvn-title-host-height, 68px)); box-sizing: border-box; overflow: visible; transform-origin: left top; }
     .tiptap { width: 100%; min-height: 100%; box-sizing: border-box; overflow: visible; }
     /* Match legacy summernote .note-editable geometry for migration display fidelity. */
     .ProseMirror { box-sizing: border-box; outline: none; width: 100%; min-height: 100%; overflow: visible; padding: 0 20px 50px 30px; cursor: text; font-family: var(--dvn-editor-default-font, Helvetica), sans-serif; font-size: 14px; line-height: 1.72; color: var(--dvn-editor-fg, rgba(0, 0, 0, 1)); word-wrap: break-word; }
-    .ProseMirror::selection, .ProseMirror ::selection { background: var(--dvn-active-selection-bg, rgba(0, 129, 255, 0.6)); color: var(--dvn-selection-fg, #ffffff); }
+    .ProseMirror::selection, .ProseMirror ::selection { background: var(--dvn-text-selection-bg, var(--highlightColor, #0081ff)); color: var(--dvn-selection-fg, #ffffff); }
     #app.is-empty .ProseMirror::before { content: '请输入正文'; display: block; height: 0; color: var(--dvn-placeholder-fg, rgba(0, 0, 0, 0.25)); pointer-events: none; }
     #app.is-empty[data-empty-block="heading"] .ProseMirror::before { font-weight: 700; line-height: 1.2; }
     #app.is-empty[data-empty-heading-level="1"] .ProseMirror::before { font-size: 28px; }

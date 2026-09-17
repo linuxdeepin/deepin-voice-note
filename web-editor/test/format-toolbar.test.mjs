@@ -534,7 +534,7 @@ test('empty heading keeps the body placeholder on the active heading line', () =
   assert.equal(appElement.dataset.emptyHeadingLevel, '1')
   assert.match(tiptapEditorHtml, /#app\.is-empty\[data-empty-heading-level="1"\] \.ProseMirror::before/)
   assert.match(tiptapEditorHtml, /\.ProseMirror h1, \.ProseMirror h2/)
-  assert.match(tiptapEditorHtml, /\.ProseMirror::selection, \.ProseMirror ::selection \{ background: var\(--dvn-active-selection-bg/)
+  assert.match(tiptapEditorHtml, /\.ProseMirror::selection, \.ProseMirror ::selection \{ background: var\(--dvn-text-selection-bg/)
   assert.match(tiptapEditorHtml, /color: var\(--dvn-selection-fg, #ffffff\)/)
   assert.doesNotMatch(tiptapEditorHtml, /dvn-editor-empty-node/)
 
@@ -633,6 +633,13 @@ test('note title wraps within editor width instead of horizontal clipping', () =
   assert.match(tiptapEditorHtml, /<textarea id="note-title-input"[^>]*maxlength="24"[^>]*rows="1"/)
   assert.match(tiptapEditorHtml, /#note-title-input \{[\s\S]*resize: none;[\s\S]*overflow: hidden;[\s\S]*overflow-wrap: anywhere;/)
   assert.match(tiptapEditorHtml, /#app \{[\s\S]*min-height: calc\(100% - var\(--dvn-title-host-height, 68px\)\)/)
+})
+
+test('note title selection uses text selection background and white foreground', () => {
+  assert.match(
+    tiptapEditorHtml,
+    /#note-title-input::selection \{[\s\S]*background: var\(--dvn-text-selection-bg, var\(--highlightColor, #0081ff\)\);[\s\S]*color: var\(--dvn-selection-fg, #ffffff\);/,
+  )
 })
 
 // ---------------------------------------------------------------------------
