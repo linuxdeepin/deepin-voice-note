@@ -12,7 +12,7 @@ test('document mousedown focus helper ignores editor and toolbar clicks', () => 
   const document = window.document
   document.body.innerHTML = `
     <div class="tiptap-toolbar"><button id="toolbarButton">无序</button></div>
-    <div id="note-title-host"><input id="note-title-input" /></div>
+    <div id="note-title-host"><textarea id="note-title-input"></textarea></div>
     <div class="ProseMirror"><p id="editorText">text</p></div>
     <div id="outside"></div>
   `

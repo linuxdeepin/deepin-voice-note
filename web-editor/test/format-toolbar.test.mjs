@@ -629,6 +629,12 @@ test('foreColor panel matches Summernote light palette and applies text color', 
   editor.destroy()
 })
 
+test('note title wraps within editor width instead of horizontal clipping', () => {
+  assert.match(tiptapEditorHtml, /<textarea id="note-title-input"[^>]*maxlength="24"[^>]*rows="1"/)
+  assert.match(tiptapEditorHtml, /#note-title-input \{[\s\S]*resize: none;[\s\S]*overflow: hidden;[\s\S]*overflow-wrap: anywhere;/)
+  assert.match(tiptapEditorHtml, /#app \{[\s\S]*min-height: calc\(100% - var\(--dvn-title-host-height, 68px\)\)/)
+})
+
 // ---------------------------------------------------------------------------
 // 背景色面板
 // ---------------------------------------------------------------------------
