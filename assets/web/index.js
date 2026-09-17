@@ -281,6 +281,11 @@ $('body').on('click', '.li', function (e) {
     $(this).addClass('active');
 })
 
+// 禁止拖拽录音选区，避免显示标题、日期和时长的文本拖拽影像
+$('body').on('dragstart', '.voiceBox, .voiceBox *', function (e) {
+    e.preventDefault();
+})
+
 $('body').on('click', '.translate', function (e) {
     // 阻止冒泡
     e.stopPropagation();
@@ -1350,5 +1355,4 @@ function setSelectColorButton($dom) {
     $dom.parents('.note-color-palette').find('.note-color-btn').removeClass('selectColor')
     $dom.addClass('selectColor')
 }
-
 
