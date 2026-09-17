@@ -94,7 +94,12 @@ void VNoteA2TManager::startAsr(QString filePath, qint64 fileDuration, QString sr
     }
 
     qDebug() << "Calling D-Bus startAsr with parameters:" << param;
-    QDBusMessage retMessage = asrInterface.call(QLatin1String("startAsr"), param);
+    QDBusMessage retMessage = asrInterface.call(QDBus::BlockWithGui, QLatin1String("startAsr"), param);
+    if (retMessage.arguments().isEmpty()) {
+        qWarning() << "ASR start failed: empty reply from D-Bus, error:" << retMessage.errorMessage();
+        emit asrError(AudioOther);
+        return;
+    }
     QString retStr = retMessage.arguments().at(0).value<QString>();
 
     if (retStr != CODE_SUCCESS) {
