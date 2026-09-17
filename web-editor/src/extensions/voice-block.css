@@ -13,13 +13,45 @@
 
 .voiceBox.ProseMirror-selectednode .voiceInfoBox,
 .voiceBox.active .voiceInfoBox {
-    background: var(--dvn-active-bg, rgba(0, 129, 255, 0.5));
+    background: var(--dvn-text-selection-bg, var(--highlightColor, #0081ff));
+    color: var(--dvn-selection-fg, #ffffff);
+}
+
+.voiceBox.ProseMirror-selectednode .voicePlayback .title,
+.voiceBox.ProseMirror-selectednode .voicePlayback .createTime,
+.voiceBox.ProseMirror-selectednode .voicePlayback .timeField,
+.voiceBox.ProseMirror-selectednode .translateHeader .translateLabel,
+.voiceBox.ProseMirror-selectednode .translateText,
+.voiceBox.active .voicePlayback .title,
+.voiceBox.active .voicePlayback .createTime,
+.voiceBox.active .voicePlayback .timeField,
+.voiceBox.active .translateHeader .translateLabel,
+.voiceBox.active .translateText {
+    color: var(--dvn-selection-fg, #ffffff);
+}
+
+.voiceBox.ProseMirror-selectednode .voicePlayback.play .voiceBtn,
+.voiceBox.ProseMirror-selectednode .voicePlayback.pause .voiceBtn,
+.voiceBox.ProseMirror-selectednode .voiceToTextLabel .voiceToTextIcon,
+.voiceBox.ProseMirror-selectednode .translateHeader .translateIcon,
+.voiceBox.ProseMirror-selectednode .translateHeader .foldBtn,
+.voiceBox.active .voicePlayback.play .voiceBtn,
+.voiceBox.active .voicePlayback.pause .voiceBtn,
+.voiceBox.active .voiceToTextLabel .voiceToTextIcon,
+.voiceBox.active .translateHeader .translateIcon,
+.voiceBox.active .translateHeader .foldBtn {
+    background-color: var(--dvn-selection-fg, #ffffff);
+}
+
+.voiceBox.ProseMirror-selectednode .voiceInfoBox.containText .translate,
+.voiceBox.active .voiceInfoBox.containText .translate {
+    border-top-color: rgba(255, 255, 255, 0.25);
 }
 
 .voiceBox.ProseMirror-selectednode .translateText::selection,
 .voiceBox.active .translateText::selection {
-    background: var(--dvn-active-selection-bg, rgba(0, 129, 255, 0.6)) !important;
-    color: inherit;
+    background: var(--dvn-text-selection-bg, var(--highlightColor, #0081ff)) !important;
+    color: var(--dvn-selection-fg, #ffffff);
 }
 
 .voiceInfoBox {
@@ -331,6 +363,6 @@
 }
 
 .voiceInfoBox .translateText::selection {
-    background: var(--dvn-transcript-selection-bg, rgba(0, 129, 255, 0.4)) !important;
-    color: inherit;
+    background: var(--dvn-text-selection-bg, var(--highlightColor, #0081ff)) !important;
+    color: var(--dvn-selection-fg, #ffffff);
 }

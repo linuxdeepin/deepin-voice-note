@@ -15615,13 +15615,45 @@ const voiceBlockCss = `/* SPDX-FileCopyrightText: 2026 UnionTech Software Techno
 
 .voiceBox.ProseMirror-selectednode .voiceInfoBox,
 .voiceBox.active .voiceInfoBox {
-    background: var(--dvn-active-bg, rgba(0, 129, 255, 0.5));
+    background: var(--dvn-text-selection-bg, var(--highlightColor, #0081ff));
+    color: var(--dvn-selection-fg, #ffffff);
+}
+
+.voiceBox.ProseMirror-selectednode .voicePlayback .title,
+.voiceBox.ProseMirror-selectednode .voicePlayback .createTime,
+.voiceBox.ProseMirror-selectednode .voicePlayback .timeField,
+.voiceBox.ProseMirror-selectednode .translateHeader .translateLabel,
+.voiceBox.ProseMirror-selectednode .translateText,
+.voiceBox.active .voicePlayback .title,
+.voiceBox.active .voicePlayback .createTime,
+.voiceBox.active .voicePlayback .timeField,
+.voiceBox.active .translateHeader .translateLabel,
+.voiceBox.active .translateText {
+    color: var(--dvn-selection-fg, #ffffff);
+}
+
+.voiceBox.ProseMirror-selectednode .voicePlayback.play .voiceBtn,
+.voiceBox.ProseMirror-selectednode .voicePlayback.pause .voiceBtn,
+.voiceBox.ProseMirror-selectednode .voiceToTextLabel .voiceToTextIcon,
+.voiceBox.ProseMirror-selectednode .translateHeader .translateIcon,
+.voiceBox.ProseMirror-selectednode .translateHeader .foldBtn,
+.voiceBox.active .voicePlayback.play .voiceBtn,
+.voiceBox.active .voicePlayback.pause .voiceBtn,
+.voiceBox.active .voiceToTextLabel .voiceToTextIcon,
+.voiceBox.active .translateHeader .translateIcon,
+.voiceBox.active .translateHeader .foldBtn {
+    background-color: var(--dvn-selection-fg, #ffffff);
+}
+
+.voiceBox.ProseMirror-selectednode .voiceInfoBox.containText .translate,
+.voiceBox.active .voiceInfoBox.containText .translate {
+    border-top-color: rgba(255, 255, 255, 0.25);
 }
 
 .voiceBox.ProseMirror-selectednode .translateText::selection,
 .voiceBox.active .translateText::selection {
-    background: var(--dvn-active-selection-bg, rgba(0, 129, 255, 0.6)) !important;
-    color: inherit;
+    background: var(--dvn-text-selection-bg, var(--highlightColor, #0081ff)) !important;
+    color: var(--dvn-selection-fg, #ffffff);
 }
 
 .voiceInfoBox {
@@ -15933,8 +15965,8 @@ const voiceBlockCss = `/* SPDX-FileCopyrightText: 2026 UnionTech Software Techno
 }
 
 .voiceInfoBox .translateText::selection {
-    background: var(--dvn-transcript-selection-bg, rgba(0, 129, 255, 0.4)) !important;
-    color: inherit;
+    background: var(--dvn-text-selection-bg, var(--highlightColor, #0081ff)) !important;
+    color: var(--dvn-selection-fg, #ffffff);
 }
 `;
 const playNormalLightIconUrl = "data:image/svg+xml,%3c?xml%20version='1.0'%20encoding='UTF-8'?%3e%3csvg%20width='24px'%20height='24px'%20viewBox='0%200%2024%2024'%20version='1.1'%20xmlns='http://www.w3.org/2000/svg'%20xmlns:xlink='http://www.w3.org/1999/xlink'%3e%3ctitle%3eD/audio_file_play/Normal/Light%3c/title%3e%3cg%20id='D/audio_file_play/Normal/Light'%20stroke='none'%20stroke-width='1'%20fill='none'%20fill-rule='evenodd'%3e%3cg%20id='ICON/audio/file/normal'%3e%3cpath%20d='M12,0%20C18.627417,0%2024,5.372583%2024,12%20C24,18.627417%2018.627417,24%2012,24%20C5.372583,24%200,18.627417%200,12%20C0,5.372583%205.372583,0%2012,0%20Z'%20id='路径'%20fill='%23FFFFFF'%3e%3c/path%3e%3cpath%20d='M10.9503642,7.29356059%20C9.8732078,6.58879434%209,7.19749521%209,8.64330786%20L9,15.3569453%20C9,16.8071564%209.87674829,17.4091424%2010.9503642,16.7066926%20L16.1934598,13.2762188%20C17.2706162,12.5714525%2017.2670757,11.4264842%2016.1934598,10.7240344%20L10.9503642,7.29356059%20Z'%20id='play'%20fill='%230058DE'%3e%3c/path%3e%3c/g%3e%3c/g%3e%3c/svg%3e";
