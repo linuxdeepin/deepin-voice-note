@@ -69,6 +69,13 @@
 //20 minutes
 #define MAX_A2T_AUDIO_LEN_MS (20 * 60 * 1000)
 
+//Note content max length limit (in characters)
+//Prevents UI freeze when pasting extremely large text into the editor
+#define MAX_NOTE_CONTENT_LEN 100000
+//Threshold rationale: Chromium in QWebEngineView begins to lag when rendering
+//rich text beyond ~100K characters. 100K chars approximates a 50+ page document,
+//covering normal note-taking use cases while preventing multi-MB paste freezes.
+
 //Limit shortcut key response time
 //to 300ms
 #define MIN_STKEY_RESP_TIME 300
