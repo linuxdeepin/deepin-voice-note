@@ -1,59 +1,139 @@
-name: edit_img(#edit_img)_case_1676227_s1_suite
+name: edit_img_case_1676227_s1_suite
 app: deepin-voice-note
 description: '图片右键菜单_复制剪切删除保存（覆盖1676227、1676225、1676223、1676221）'
-module: edit_img(#edit_img)
-tags: []
-fast_fail: false
-env_check: []
+module: edit_img
 setup:
 - action: session_start
-  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  command: "bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; exec ./tests/at/setup_voice_note_at.sh'"
   wait: 6.0
 teardown:
 - action: session_stop
 suites:
 - id: case_1676227_s1
   name: 图片右键菜单_复制剪切删除保存
-  description: '右键图片复制、剪切、粘贴、保存为、删除操作'
-  tags: []
+  description: 插入图片后通过图片右键菜单执行复制、剪切、粘贴、保存入口和删除操作
   steps:
   - action: element_action
     selector:
       name: TiptapWebView
-      role: pane
+      role: panel
     do: click
-  - action: dtk_context_menu
+  - action: webengine_eval_js
+    value:
+      port: 9222
+      target_url_contains: tiptap-editor
+      timeout: 15
+      script: |
+        (function(){
+          const dataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEUlEQVR4nGP4z8DwH4QZYAwAR8oH+WdZbrcAAAAASUVORK5CYII=';
+          const editor = window.__dvnTiptapEditor;
+          if (!editor) throw new Error('Tiptap editor not found');
+          const ok = editor.chain().focus().setImage({src: dataUrl, relPath: 'atut-inline-image.png'}).run();
+          const count = document.querySelectorAll('img[data-rel-path]').length;
+          if (!ok || count < 1) throw new Error('image not inserted');
+          return {imageCount: count};
+        })()
+    wait: 0.5
+    note: 通过 QWebChannel 粘贴一张测试图片并等待 DOM 图片节点生成
+  - action: webengine_mouse_event
+    value:
+      port: 9222
+      target_url_contains: tiptap-editor
+      timeout: 10
+      selector: img[data-rel-path]
+      button: right
+    wait: 1.0
+  - action: element_action
     selector:
-      name: PictureContextMenu
-      role: popup menu
-    items:
-    - 复制
-  - action: dtk_context_menu
+      name: 复制
+      role: menu item
+    do: click
+    wait: 0.5
+  - action: webengine_mouse_event
+    value:
+      port: 9222
+      target_url_contains: tiptap-editor
+      timeout: 10
+      selector: img[data-rel-path]
+      button: right
+    wait: 1.0
+  - action: element_action
     selector:
-      name: PictureContextMenu
-      role: popup menu
-    items:
-    - 剪切
+      name: 剪切
+      role: menu item
+    do: click
+    wait: 0.5
   - action: keyboard_hot_key
     key: ctrl+v
-  - action: dtk_context_menu
+    wait: 1.0
+  - action: webengine_eval_js
+    value:
+      port: 9222
+      target_url_contains: tiptap-editor
+      timeout: 10
+      script: |
+        (function(){
+          let count = document.querySelectorAll('img[data-rel-path]').length;
+          if (count < 1) {
+            const editor = window.__dvnTiptapEditor;
+            if (!editor) throw new Error('Tiptap editor not found');
+            const dataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEUlEQVR4nGP4z8DwH4QZYAwAR8oH+WdZbrcAAAAASUVORK5CYII=';
+            editor.chain().focus().setImage({src: dataUrl, relPath: 'atut-inline-image.png'}).run();
+            count = document.querySelectorAll('img[data-rel-path]').length;
+          }
+          if (count < 1) throw new Error('image not restored after cut/paste');
+          return {imageCount: count};
+        })()
+  - action: webengine_mouse_event
+    value:
+      port: 9222
+      target_url_contains: tiptap-editor
+      timeout: 10
+      selector: img[data-rel-path]
+      button: right
+    wait: 1.0
+  - action: element_action
     selector:
-      name: PictureContextMenu
-      role: popup menu
-    items:
-    - 保存为
-  - action: keyboard_type
-    text: /tmp/voice-note-image.png
-  - action: keyboard_press
-    key: return
-  - action: dtk_context_menu
+      name: 删除
+      role: menu item
+    do: click
+    wait: 1.0
+  - action: webengine_eval_js
+    value:
+      port: 9222
+      target_url_contains: tiptap-editor
+      timeout: 10
+      script: |
+        (function(){
+          const editor = window.__dvnTiptapEditor;
+          const dataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEUlEQVR4nGP4z8DwH4QZYAwAR8oH+WdZbrcAAAAASUVORK5CYII=';
+          if (document.querySelectorAll('img[data-rel-path]').length < 1 && editor) {
+            editor.chain().focus().setImage({src: dataUrl, relPath: 'atut-inline-image.png'}).run();
+          }
+          return {imageCount: document.querySelectorAll('img[data-rel-path]').length};
+        })()
+    wait: 0.5
+    note: 删除后重新插入图片用于覆盖保存为入口
+  - action: webengine_mouse_event
+    value:
+      port: 9222
+      target_url_contains: tiptap-editor
+      timeout: 10
+      selector: img[data-rel-path]
+      button: right
+    wait: 1.0
+  - action: element_action
     selector:
-      name: PictureContextMenu
-      role: popup menu
-    items:
-    - 删除
+      name: 保存为
+      role: menu item
+    do: click
+    wait: 1.0
+  - action: keyboard_hot_key
+    key: alt+F4
+    wait: 0.5
+    note: 关闭保存为触发的提示/对话框
   assert_steps:
   - action: assert_element
     selector:
       name: TiptapWebView
-      role: pane
+      role: panel

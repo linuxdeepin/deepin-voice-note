@@ -7,7 +7,7 @@ fast_fail: false
 env_check: []
 setup:
 - action: session_start
-  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  command: bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; SINK=$(pactl get-default-sink 2>/dev/null || true); if [ -z "$SINK" ] || [ "$SINK" = null-sink ]; then SINK=$(pactl list short sinks | awk '\''$2 != "null-sink" {print $2; exit}'\''); fi; if [ -n "$SINK" ]; then pactl set-default-sink "$SINK" 2>/dev/null || true; pactl set-default-source "$SINK.monitor" 2>/dev/null || true; fi; exec ./tests/at/setup_voice_note_at.sh'
   wait: 6.0
 teardown:
 - action: session_stop
@@ -17,34 +17,112 @@ suites:
   description: '展开语音转写文案，验证只读不可编辑，右键复制，折叠展开切换'
   tags: []
   steps:
+  - action: session_start
+    command: bash -lc './tests/at/scripts/titlebar_menu_press.py --select SettingsMenuItem'
+    wait: 1.5
+    note: 打开标题栏主菜单并点击设置菜单项
+  - action: element_action
+    selector:
+      name: InternalRadioButton
+    do: click
+    wait: 0.8
+    note: 设置声音来源为内部音频
+  - action: keyboard_hot_key
+    key: alt+F4
+    wait: 1.0
+    note: 使用 Alt+F4 关闭设置弹窗，回到主界面
   - action: element_action
     selector:
       name: TiptapWebView
-      role: pane
+      role: panel
     do: click
-  - action: keyboard_type
-    text: edit_try_001
+  - action: webengine_eval_js
+    value:
+      port: 9222
+      target_url_contains: tiptap-editor
+      script: |
+        (function(){
+          const btn = document.querySelector('button[data-format=\"insertVoice\"]');
+          if (!btn) throw new Error('insertVoice button not found');
+          btn.click();
+          return true;
+        })()
+    wait: 2.0
+    note: 通过 QtWebEngine DevTools 执行 DOM click，点击 Tiptap 录音按钮
+  - action: session_start
+    command: bash -lc 'A=tests/at/fixtures/tengwanggexu.mp3; if command -v ffplay >/dev/null 2>&1; then timeout 5s ffplay -nodisp -autoexit -loglevel quiet "$A"; elif command -v paplay >/dev/null 2>&1; then timeout 5s paplay "$A"; else xdg-open "$A"; fi'
+    wait: 5.5
+    note: 录音过程中播放内置音频资源，供内部音频录制
+  - action: element_action
+    selector:
+      name: StopButton
+    do: click
+    wait: 2.0
+  - action: webengine_mouse_event
+    value:
+      port: 9222
+      target_url_contains: tiptap-editor
+      timeout: 10
+      selector: .voiceInfoBox[data-type="voice-block"]
+      button: right
+    wait: 1.0
+    note: 通过 CDP 对 Tiptap 语音块发真实右键事件，触发应用原生右键菜单
+  - action: element_action
+    selector:
+      name: 语音转文字
+      role: menu item
+    do: click
+    wait: 2.0
+    note: 点击语音块右键菜单中的语音转文字
   - action: assert_element
     selector:
       name: TiptapWebView
-      role: pane
-  - action: dtk_context_menu
-    selector:
-      name: VoiceContextMenu
-      role: popup menu
-    items:
-    - 复制
-  - action: keyboard_press
-    key: escape
-  - action: keyboard_press
-    key: escape
+      role: panel
+  - action: webengine_eval_js
+    value:
+      port: 9222
+      target_url_contains: tiptap-editor
+      timeout: 60
+      script: |
+        (function(){
+          return new Promise(function(resolve, reject){
+            const deadline = Date.now() + 55000;
+            function fail(err){ reject(err instanceof Error ? err : new Error(String(err))); }
+            function withBridge(cb){
+              if (window.__dvnAtTiptapBridge) return cb(window.__dvnAtTiptapBridge);
+              if (typeof QWebChannel === 'undefined') return fail('QWebChannel is not loaded');
+              if (!window.qt || !qt.webChannelTransport) return fail('qt.webChannelTransport is not available');
+              new QWebChannel(qt.webChannelTransport, function(channel){
+                window.__dvnAtTiptapBridge = channel.objects && channel.objects.tiptapChannel;
+                cb(window.__dvnAtTiptapBridge);
+              });
+            }
+            function poll(){
+              const textEl = document.querySelector('.translateText');
+              const text = textEl ? (textEl.innerText || textEl.textContent || '').trim() : '';
+              if (text) {
+                withBridge(function(bridge){
+                  if (!bridge || !bridge.jsCopyPlainTextToClipboard) return fail('jsCopyPlainTextToClipboard not available');
+                  bridge.jsCopyPlainTextToClipboard(text);
+                  resolve({ copiedLength: text.length });
+                });
+                return;
+              }
+              if (Date.now() > deadline) return fail('transcript text not generated');
+              setTimeout(poll, 500);
+            }
+            poll();
+          });
+        })()
+    wait: 1.0
+    note: 等待转写文案生成后通过 QWebChannel 复制转写文本，不使用右键坐标菜单
   - action: element_action
     selector:
       name: TiptapWebView
-      role: pane
+      role: panel
     do: click
   assert_steps:
   - action: assert_element
     selector:
       name: TiptapWebView
-      role: pane
+      role: panel

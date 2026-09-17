@@ -15,7 +15,7 @@ suites:
   - step_type: action
     action: session_start
     command: bash -lc './tests/at/scripts/titlebar_menu_press.py --select SettingsMenuItem'
-    wait: 1.0
+    wait: 3.0
   assert_steps:
   - step_type: assert
     action: assert_element

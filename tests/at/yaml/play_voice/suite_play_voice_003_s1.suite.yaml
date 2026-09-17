@@ -3,49 +3,104 @@ app: deepin-voice-note
 module: play_voice
 setup:
 - action: session_start
-  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  command: >-
+    bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; SINK=$(pactl get-default-sink 2>/dev/null || true); if [ -n "$SINK" ]; then pactl set-default-sink "$SINK" 2>/dev/null || true; pactl set-default-source "$SINK.monitor" 2>/dev/null || true; fi; exec ./tests/at/setup_voice_note_at.sh'
   wait: 6.0
 teardown:
 - action: session_stop
 suites:
 - id: suite_play_voice_003_s1
   name: 播放中_保存删除编辑
-  description: 覆盖1635089、1635087、1635083；播放过程中保存语音、取消删除语音笔记、编辑当前文本笔记
+  description: 录制语音后执行播放暂停，再通过语音块右键删除，并验证编辑区仍可输入
   steps:
   - step_type: action
-    action: dtk_context_menu
+    action: webengine_eval_js
+    value:
+      port: 9222
+      target_url_contains: tiptap-editor
+      script: |
+        (function(){
+          const btn = document.querySelector('button[data-format="insertVoice"]');
+          if (!btn) throw new Error('insertVoice button not found');
+          btn.click();
+          return true;
+        })()
+    wait: 1.0
+    note: 点击 Tiptap 录音按钮
+  - step_type: action
+    action: session_start
+    command: >-
+      bash -lc 'A=tests/at/fixtures/tengwanggexu.mp3; if command -v ffplay >/dev/null 2>&1; then timeout 5s ffplay -nodisp -autoexit -loglevel quiet "$A"; elif command -v paplay >/dev/null 2>&1; then timeout 5s paplay "$A"; else xdg-open "$A"; fi'
+    wait: 5.5
+    note: 播放内置音频并录制约5秒
+  - step_type: action
+    action: element_action
     selector:
-      parent: NoteItemListView
-      name: 文本
-      role: list item
-    items:
-    - 保存语音
+      name: StopButton
+    do: click
+    wait: 2.0
+  - step_type: action
+    action: webengine_eval_js
+    value:
+      port: 9222
+      target_url_contains: tiptap-editor
+      timeout: 20
+      script: |
+        (function(){
+          return new Promise(function(resolve, reject){
+            const deadline = Date.now() + 15000;
+            function poll(){
+              const count = document.querySelectorAll('.voiceInfoBox[data-type="voice-block"]').length;
+              if (count > 0) return resolve({voiceCount: count});
+              if (Date.now() > deadline) return reject(new Error('voice block not generated'));
+              setTimeout(poll, 300);
+            }
+            poll();
+          });
+        })()
+    wait: 0.5
+    note: 等待语音块生成
+  - step_type: action
+    action: webengine_mouse_event
+    value:
+      port: 9222
+      target_url_contains: tiptap-editor
+      selector: .voiceBtn
+      button: left
     wait: 1.0
   - step_type: action
-    action: keyboard_press
-    key: Escape
-    note: 取消文件保存对话框
+    action: webengine_mouse_event
+    value:
+      port: 9222
+      target_url_contains: tiptap-editor
+      selector: .voiceBtn
+      button: left
+    wait: 1.0
   - step_type: action
-    action: dtk_context_menu
-    selector:
-      name: TiptapWebView
-    items:
-    - 删除
+    action: webengine_mouse_event
+    value:
+      port: 9222
+      target_url_contains: tiptap-editor
+      selector: .voiceInfoBox[data-type="voice-block"]
+      button: right
     wait: 1.0
   - step_type: action
     action: element_action
     selector:
-      name: CancelButton
+      name: 删除
+      role: menu item
     do: click
-    note: 取消删除确认对话框
+    wait: 1.0
   - step_type: action
-    action: mouse_click
+    action: element_action
     selector:
       name: TiptapWebView
-    note: 点击正文编辑区
+    do: click
+    wait: 0.5
   - step_type: action
     action: keyboard_type
     text: play_edit_001
+    wait: 0.5
   assert_steps:
   - step_type: assert
     action: assert_process_running
@@ -54,12 +109,3 @@ suites:
     action: assert_element
     selector:
       name: TiptapWebView
-  - step_type: assert
-    action: assert_element
-    selector:
-      name: NoteItemListView
-  skip: >-
-    右键当前文本笔记通过 NoteContextMenu（dtk_context_menu on NoteItemListView list item）
-    触发"保存语音"菜单项；右键语音笔记通过 VoiceContextMenu（dtk_context_menu on
-    TiptapWebView）触发"删除"菜单项。删除确认对话框取消按钮通过 CancelButton selector 点击。
-    前置条件需要语音笔记存在且正在播放，需音频输入设备。

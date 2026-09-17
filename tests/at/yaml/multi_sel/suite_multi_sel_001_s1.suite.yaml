@@ -16,10 +16,6 @@ suites:
     action: session_start
     command: bash -lc './tests/at/scripts/multi_select_five_notes.py'
     wait: 2.0
-  - step_type: action
-    action: mouse_click
-    selector:
-      name: MultipleChoicesView
   assert_steps:
   - step_type: assert
     action: assert_element
@@ -33,5 +29,3 @@ suites:
     action: assert_element
     selector:
       name: DeleteButton
-  skip: requires modifier+click (Ctrl/Shift) which YouQu suite steps cannot express
-    natively; uses AT-SPI+xdotool helper script

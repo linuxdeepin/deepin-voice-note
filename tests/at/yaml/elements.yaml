@@ -118,7 +118,7 @@ elements:
     role: button
   编辑区:
     name: TiptapWebView
-    role: pane
+    role: panel
   文本右键菜单:
     name: TextContextMenu
     role: popup menu
@@ -163,7 +163,7 @@ elements:
     role: menu item
   笔记内容区:
     name: NoteContentWebView
-    role: pane
+    role: panel
   笔记右键菜单:
     name: NoteContextMenu
     role: popup menu

@@ -20,14 +20,14 @@ suites:
   - action: element_action
     selector:
       name: TiptapWebView
-      role: pane
+      role: panel
     do: click
   - action: keyboard_hot_key
     key: ctrl+a
   - action: dtk_context_menu
     selector:
       name: TiptapWebView
-      role: pane
+      role: panel
     items:
     - 复制
   - action: keyboard_hot_key
@@ -35,7 +35,7 @@ suites:
   - action: dtk_context_menu
     selector:
       name: TiptapWebView
-      role: pane
+      role: panel
     items:
     - 剪切
   - action: keyboard_type
@@ -45,11 +45,11 @@ suites:
   - action: dtk_context_menu
     selector:
       name: TiptapWebView
-      role: pane
+      role: panel
     items:
     - 删除
   assert_steps:
   - action: assert_element
     selector:
       name: TiptapWebView
-      role: pane
+      role: panel

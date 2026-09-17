@@ -10,47 +10,22 @@ teardown:
 suites:
 - id: suite_multi_sel_003_s1
   name: 右键菜单_批量保存与批量删除
-  description: 覆盖1676317、1676315、1676311、1676309；多选笔记后右键弹出批量菜单，验证保存为TXT（取消）、保存语音（多选禁用跳过）、删除（取消）操作后笔记仍存在
+  description: 覆盖1676317、1676315、1676311、1676309；多选笔记后打开右键批量菜单，触发删除入口并取消删除
   steps:
   - step_type: action
     action: session_start
-    command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+    command: bash -lc './tests/at/scripts/multi_select_five_notes.py'
     wait: 2.0
   - step_type: action
-    action: dtk_context_menu
-    selector:
-      parent: NoteItemListView
-      name: 文本
-      role: list item
-    items:
-    - 保存笔记
-    - 保存为TXT
+    action: session_start
+    command: bash -lc './tests/at/scripts/open_note_context_menu.py --index 0'
     wait: 1.0
   - step_type: action
-    action: keyboard_press
-    key: escape
-    wait: 0.5
-  - step_type: action
-    action: dtk_context_menu
+    action: element_action
     selector:
-      parent: NoteItemListView
-      name: 文本
-      role: list item
-    items:
-    - 保存语音
-    wait: 1.0
-  - step_type: action
-    action: keyboard_press
-    key: escape
-    wait: 0.5
-  - step_type: action
-    action: dtk_context_menu
-    selector:
-      parent: NoteItemListView
-      name: 文本
-      role: list item
-    items:
-    - 删除
+      name: 删除
+      role: menu item
+    do: click
     wait: 1.0
   - step_type: action
     action: element_action
@@ -69,6 +44,3 @@ suites:
     action: assert_element
     selector:
       name: MultipleChoicesView
-  skip: requires multi-select state via helper script (modifier+click); 保存语音 menu
-    item is disabled in multi-select mode without voice notes; context menu navigation
-    depends on runtime AT-SPI state

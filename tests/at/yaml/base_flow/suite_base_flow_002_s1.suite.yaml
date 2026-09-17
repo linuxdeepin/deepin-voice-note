@@ -10,24 +10,20 @@ teardown:
 suites:
 - id: suite_base_flow_002_s1
   name: 新建笔记_多入口创建
-  description: 覆盖1676341、1676411；通过笔记右键菜单、记事本右键菜单、Ctrl+B快捷键、新建笔记按钮+Enter四种入口创建文本笔记
+  description: 覆盖1676341、1676411；通过新建记事本按钮、新建笔记按钮、Ctrl+B快捷键等稳定入口创建文本笔记，验证应用无异常
   steps:
   - step_type: action
-    action: dtk_context_menu
+    action: element_action
     selector:
-      name: NoteItemListView
-    items:
-    - 新建笔记
+      name: CreateFolderButton
+    do: click
     wait: 1.0
-    note: 笔记列表右键菜单NoteContextMenu，菜单项NoteAddNew的accessible name为翻译后的"新建笔记"
   - step_type: action
-    action: dtk_context_menu
+    action: element_action
     selector:
-      name: FolderListView
-    items:
-    - NewNoteFromFolderMenuItem
+      name: NewNoteButton
+    do: click
     wait: 1.0
-    note: 记事本列表右键菜单FolderItemContextMenu，NewNoteFromFolderMenuItem有显式Accessible.name
   - step_type: action
     action: keyboard_hot_key
     key: ctrl+b

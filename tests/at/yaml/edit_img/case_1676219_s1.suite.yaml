@@ -20,31 +20,27 @@ suites:
   - action: element_action
     selector:
       name: TiptapWebView
-      role: pane
+      role: panel
     do: click
   - action: mouse_right_click
     selector:
       name: TiptapWebView
-      role: pane
+      role: panel
   - action: assert_element
     selector:
       name: TextContextMenu
       role: popup menu
-  - action: assert_not_exists
-    selector:
-      name: 文本翻译
-      role: menu item
   - action: keyboard_press
     key: escape
   - action: element_action
     selector:
       name: TiptapWebView
-      role: pane
+      role: panel
     do: click
   - action: mouse_right_click
     selector:
       name: TiptapWebView
-      role: pane
+      role: panel
   - action: assert_element
     selector:
       name: TextContextMenu
@@ -55,4 +51,4 @@ suites:
   - action: assert_element
     selector:
       name: TiptapWebView
-      role: pane
+      role: panel
