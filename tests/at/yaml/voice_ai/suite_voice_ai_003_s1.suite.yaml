@@ -14,16 +14,9 @@ suites:
   steps:
   - step_type: action
     action: session_start
-    command: bash -lc './tests/at/scripts/titlebar_menu_press.py --select SettingsMenuItem --wait-visible InternalRadioButton --timeout 8'
+    command: bash -lc './tests/at/scripts/titlebar_menu_press.py --select SettingsMenuItem --wait-visible InternalRadioButton --click-visible InternalRadioButton --timeout 8'
     wait: 1.5
     note: 打开标题栏主菜单并点击设置菜单项
-  - step_type: action
-    action: element_action
-    selector:
-      name: InternalRadioButton
-    do: click
-    wait: 0.8
-    note: 设置声音来源为内部音频
   - step_type: action
     action: keyboard_hot_key
     key: alt+F4

@@ -138,6 +138,7 @@ def main() -> int:
     parser.add_argument("--app", default="deepin-voice-note")
     parser.add_argument("--select", help="accessible name of menu item to press after opening")
     parser.add_argument("--wait-visible", help="accessible name that must become visible after selection")
+    parser.add_argument("--click-visible", help="visible accessible name to press after selection")
     parser.add_argument("--timeout", type=float, default=5.0)
     args = parser.parse_args()
 
@@ -164,6 +165,10 @@ def main() -> int:
         if args.wait_visible:
             app = _find_app(args.app)
             _wait_for_name(app, args.wait_visible, args.timeout, visible=True)
+        if args.click_visible:
+            app = _find_app(args.app)
+            target = _wait_for_name(app, args.click_visible, args.timeout, visible=True)
+            _press(target)
     return 0
 
 
