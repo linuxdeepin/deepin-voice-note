@@ -1,0 +1,42 @@
+name: suite_voice_ai_003_s1_suite
+app: deepin-voice-note
+module: voice_ai
+setup:
+- action: session_start
+  command: bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; SINK=$(pactl get-default-sink 2>/dev/null || true); if [ -z "$SINK" ] || [ "$SINK" = null-sink ]; then SINK=$(pactl list short sinks | awk
+    '\''$2 != "null-sink" {print $2; exit}'\''); fi; if [ -n "$SINK" ]; then pactl set-default-sink "$SINK" 2>/dev/null || true; pactl set-default-source "$SINK.monitor" 2>/dev/null || true; fi; exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_voice_ai_003_s1
+  name: 语音转文字_转写网络正常
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 语音转文字
+    wait: 2.0
+  - step_type: action
+    action: keyboard_type
+    selector:
+      name: TiptapWebView
+    text: edit_try_002
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note

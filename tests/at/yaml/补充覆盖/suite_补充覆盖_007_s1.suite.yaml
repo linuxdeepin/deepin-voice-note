@@ -1,0 +1,46 @@
+name: suite_补充覆盖_007_s1_suite
+app: deepin-voice-note
+module: 补充覆盖
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_补充覆盖_007_s1
+  name: 记事本右键菜单可访问控件验证
+  description: 来源xlsx用例1625233「新建记事本」和1625233/1625243记事本右键操作；打开记事本右键菜单并验证菜单控件
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: 记事本1
+      role: label
+    do: right_click
+    wait: 0.8
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderItemContextMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RenameMenuItem
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: DeleteFolderMenuItem
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NewNoteFromFolderMenuItem
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.3
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView

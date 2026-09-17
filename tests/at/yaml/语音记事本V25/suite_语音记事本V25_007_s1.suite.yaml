@@ -1,0 +1,187 @@
+name: suite_语音记事本V25_007_s1_suite
+app: deepin-voice-note
+module: 语音记事本V25
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_语音记事本V25_007_s1
+  name: 语音播放与右键菜单操作验证
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: StopButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: keyboard_press
+    key: space
+  - step_type: action
+    action: keyboard_press
+    key: space
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: 文本
+      role: list item
+    items:
+    - 播放
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: 文本
+      role: list item
+    items:
+    - 保存为MP3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: 文本
+      role: list item
+    items:
+    - 复制
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteContentWebView
+    do: click
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+V
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: 文本
+      role: list item
+    items:
+    - 剪切
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteContentWebView
+    do: click
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+V
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: keyboard_press
+    key: Tab
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: keyboard_press
+    key: Tab
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CancelButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  skip: requires audio input/output device; current environment reports Current Audio
+    Cards is Empty

@@ -1,0 +1,38 @@
+name: suite_play_voice_005_s1_suite
+app: deepin-voice-note
+module: play_voice
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_play_voice_005_s1
+  name: 语音笔记显示_节点存在
+  description: 覆盖1676293、1635053；验证语音笔记详情区和笔记列表等稳定AT-SPI节点存在
+  steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  note: >-
+    语音笔记播放按钮是 WebEngineView 内部 DOM 元素（.voicebtn.play），无 AT-SPI
+    accessible name，无法通过 assert_element 定位。TiptapWebView 是语音笔记条目的
+    AT-SPI 容器节点，语音/笔记右键菜单为瞬态菜单，未打开时不作为常驻节点断言。

@@ -1,0 +1,57 @@
+name: suite_play_voice_003_s1_suite
+app: deepin-voice-note
+module: play_voice
+setup:
+- action: session_start
+  command: bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; SINK=$(pactl get-default-sink 2>/dev/null || true); if [ -n "$SINK" ]; then pactl set-default-sink "$SINK" 2>/dev/null || true; pactl set-default-source
+    "$SINK.monitor" 2>/dev/null || true; fi; exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_play_voice_003_s1
+  name: 播放中_保存删除编辑
+  description: ''
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+  - step_type: action
+    action: keyboard_type
+    text: play_edit_001
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView

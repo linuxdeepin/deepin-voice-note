@@ -1,2687 +1,4460 @@
-# ============================================================
-# cases_mapped.yaml - deepin-voice-note AT-SPI语义映射用例
-# ============================================================
-#
-# === 格式范例 ===
-#
-# 本文件为 youqu at generate 的输入文件，每个 case 包含:
-#
-#   id:               用例原始ID
-#   name:             用例名称
-#   module:           所属模块
-#   status:           active | unsupported
-#   reason:           当 status=unsupported 时填写原因
-#   needs_accessible_name: true/false，标记需要 QML 元素添加 accessible name
-#
-#   steps:            步骤列表
-#     - step_type:    action | assert
-#       action:       session_start | session_stop | element_action |
-#                       dtk_main_menu | dtk_context_menu |
-#                       keyboard_press | keyboard_hot_key | keyboard_type |
-#                       mouse_click | mouse_right_click | mouse_double_click |
-#                       assert_element | assert_window | assert_not_exists |
-#                       assert_window_count | assert_process_running |
-#                       assert_process_not_running
-#       selector:     AT-SPI 元素选择器 {role, name, ref}
-#       items:        菜单项列表 (dtk_main_menu / dtk_context_menu)
-#       key:          按键 (keyboard_press: "enter"; keyboard_hot_key: "ctrl+n")
-#       text:         输入文本 (keyboard_type，必须是真实输入数据)
-#       command:      启动命令 (session_start)
-#       wait:         等待时间 (session_start: 3.0)
-#       assertion:    断言类型 (assert_window)
-#       description:   步骤描述
-#
-#   AT元素引用:
-#     Runtime:  n0(主窗口), n3(新建记事本按钮), n6(记事本项),
-#               n16(已选择X个笔记), n23(空状态提示),
-#               n24(空状态新建记事本), n26(移动弹窗), n27(移动笔记标题),
-#               n31(取消按钮), n32(确定按钮), n34(空对话框)
-#     Static:   sidebarToggleBtn, newNoteBtn, recordBtn, insImgBtn,
-#               searchBtn, searchEdit, pauseBtn, stopBtn,
-#               multiSelectMoveBtn, multiSelectSaveNoteBtn,
-#               multiSelectSaveVoiceBtn, multiSelectDeleteBtn,
-#               noteListItem, editorWebEngine
-# ============================================================
-
-metadata:
-  app: deepin-voice-note
-  exec: deepin-voice-note
-  source: cases_raw.yaml
-  generated_at: '2026-07-17T12:00:00'
-  description: AT-SPI语义映射用例，供youqu at generate使用
-  total_cases: 248
-  active_cases: 32
-  unsupported_cases: 216
-  non_gui_cases: 18 (见 cases_non_gui.yaml)
-
+version: '1.0'
 cases:
+- id: suite_1040_键盘交互_001_s1
+  name: 重命名笔记-通过快捷键操作
+  module: 1040_键盘交互
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: keyboard_press
+    key: Tab
+  - step_type: action
+    action: keyboard_press
+    key: Down
+  - step_type: action
+    action: keyboard_hot_key
+    key: Alt+M
+  - step_type: action
+    action: keyboard_press
+    key: Down
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: keyboard_type
+    text: 快捷键重命名测试
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteRightMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+- id: suite_启用语音记事本_001_s1
+  name: 验证可以正常启动应用
+  module: 启用语音记事本
+  steps:
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+- id: suite_启用语音记事本_002_s1
+  name: 终端输入命令启动应用
+  module: 启用语音记事本
+  steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+- id: suite_启用语音记事本_004_s1
+  name: 仅支持单个窗口开启
+  module: 启用语音记事本
+  steps:
+  - step_type: assert
+    action: assert_window_count
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+- id: suite_工具栏_006_s1
+  name: 工具栏-关闭主界面
+  module: 工具栏
+  steps:
+  - step_type: action
+    action: keyboard_hot_key
+    key: alt+F4
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_process_not_running
+- id: suite_快捷键_001_s1
+  name: 快捷键预览显示Ctrl+Shift+问号触发
+  module: 快捷键
+  steps:
+  - step_type: action
+    action: keyboard_hot_key
+    key: ctrl+shift+?
+    wait: 2.0
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MainShortcuts
+- id: suite_快捷键使用_001_s1
+  name: 空语音记录下Ctrl+Y快捷键禁用无异常
+  module: 快捷键使用
+  steps:
+  - step_type: action
+    action: keyboard_hot_key
+    key: ctrl+y
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+- id: suite_快捷键使用_003_s1
+  name: 空白页Delete快捷键无作用无异常
+  module: 快捷键使用
+  steps:
+  - step_type: action
+    action: keyboard_press
+    value: Delete
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+- id: suite_文本笔记详情页_001_s1
+  name: 详情页右键全选复制剪切粘贴删除文本操作
+  module: 文本笔记详情页
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: click
+  - step_type: action
+    action: keyboard_type
+    text: 测试文本内容
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 全选
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 复制
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 剪切
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 粘贴
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 删除
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+- id: suite_文本笔记详情页_008_s1
+  name: 点击文本区域编辑文字增删剪切复制粘贴清空
+  module: 文本笔记详情页
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: click
+  - step_type: action
+    action: keyboard_type
+    text: 编辑测试文字
+  - step_type: action
+    action: keyboard_press
+    key: BackSpace
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+X
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+V
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+C
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+V
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_press
+    key: Delete
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+- id: suite_文本笔记详情页_009_s1
+  name: 详情页输入内容键入空格Tab
+  module: 文本笔记详情页
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: click
+  - step_type: action
+    action: keyboard_type
+    text: 任意内容
+  - step_type: action
+    action: keyboard_press
+    key: Space
+  - step_type: action
+    action: keyboard_type
+    text: 空格后内容
+  - step_type: action
+    action: keyboard_press
+    key: Tab
+  - step_type: action
+    action: keyboard_type
+    text: Tab后内容
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+- id: suite_文本笔记详情页_011_s1
+  name: 详情页输入含中英数字特殊字符内容
+  module: 文本笔记详情页
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: click
+  - step_type: action
+    action: keyboard_type
+    text: 中文abc123<>&%$#@!
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+- id: suite_文本笔记详情页_017_s1
+  name: 更改保存路径保存为TXT
+  module: 文本笔记详情页
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: click
+  - step_type: action
+    action: keyboard_type
+    text: 保存路径测试内容
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 保存为TXT
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/vnote_custom_path.txt
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/vnote_custom_path.txt
+- id: suite_文本笔记详情页_018_s1
+  name: 默认保存至桌面保存为TXT
+  module: 文本笔记详情页
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: click
+  - step_type: action
+    action: keyboard_type
+    text: 默认保存测试内容
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 保存为TXT
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/vnote_default_save.txt
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 保存为TXT
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/vnote_default_save.txt
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/vnote_default_save.txt
+- id: suite_文本笔记详情页_020_s1
+  name: 重命名文本笔记清空输入框
+  module: 文本笔记详情页
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 重命名
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_press
+    key: Delete
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+- id: suite_文本笔记详情页_022_s1
+  name: 重命名文本笔记正向流程
+  module: 文本笔记详情页
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 重命名
+  - step_type: action
+    action: keyboard_type
+    text: 重命名测试
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+- id: suite_文本笔记详情页_027_s1
+  name: 重命名文本笔记不输入任何字符
+  module: 文本笔记详情页
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 重命名
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+- id: suite_文本笔记详情页_030_s1
+  name: 切换笔记详情页同步切换
+  module: 文本笔记详情页
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: click
+  - step_type: action
+    action: keyboard_type
+    text: 笔记A内容
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: click
+  - step_type: action
+    action: keyboard_type
+    text: 笔记B内容
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteItemListView
+      child_index: 0
+    do: click
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+- id: suite_文本笔记详情页_033_s1
+  name: 新建笔记超过一页上下滑动查看
+  module: 文本笔记详情页
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteListScrollBar
+- id: suite_文本笔记详情页_038_s1
+  name: 新建文本笔记多种入口验证
+  module: 文本笔记详情页
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 新建笔记
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - 新建笔记
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RecordingBar
+- id: suite_标题栏_001_s1
+  name: 标题栏-关闭主界面退出应用
+  module: 标题栏
+  steps:
+  - step_type: action
+    action: keyboard_hot_key
+    key: alt+F4
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+    wait: 3.0
+  - step_type: assert
+    action: assert_process_not_running
+    command: deepin-voice-note
+    wait: 3.0
+- id: suite_记事本条目_001_s1
+  name: 新建记事本-空白页与列表按钮及快捷键
+  module: 记事本条目
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: model.name
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: action
+    action: keyboard_hot_key
+    key: ctrl+n
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 1.0
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+- id: suite_记事本条目_002_s1
+  name: 重命名记事本-右键菜单F2与双击正向流程
+  module: 记事本条目
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: model.name
+    items:
+    - 重命名
+    wait: 1.0
+  - step_type: action
+    action: keyboard_type
+    text: 记事本A
+  - step_type: action
+    action: keyboard_press
+    key: Enter
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: F2
+    wait: 1.0
+  - step_type: action
+    action: keyboard_type
+    text: 记事本B
+  - step_type: action
+    action: keyboard_press
+    key: Enter
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: model.name
+    do: double_click
+    wait: 1.0
+  - step_type: action
+    action: keyboard_type
+    text: 记事本C
+  - step_type: action
+    action: keyboard_press
+    key: Enter
+    wait: 1.0
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+- id: suite_记事本条目管理_002_s1
+  name: 记事本列表超出一屏可滑动查看
+  module: 记事本条目管理
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderListView
+    do: focus
+  - step_type: action
+    action: keyboard_press
+    key: Page_Down
+  - step_type: action
+    action: keyboard_press
+    key: Page_Up
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListScrollBar
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+- id: suite_记事本条目管理_005_s1
+  name: 记事本命名规则-清空原名称
+  module: 记事本条目管理
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - RenameMenuItem
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_press
+    key: Delete
+  - step_type: action
+    action: keyboard_press
+    key: Enter
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+- id: suite_记事本条目管理_007_s1
+  name: 记事本命名规则-正向流程
+  module: 记事本条目管理
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - RenameMenuItem
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_type
+    text: 重命名测试
+  - step_type: action
+    action: keyboard_press
+    key: Enter
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+- id: suite_记事本条目管理_013_s1
+  name: 首次使用语音记事本新建记事本
+  module: 记事本条目管理
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+- id: suite_详情页编辑区_001_s1
+  name: 全选编辑区内容并切换记事本笔记取消全选
+  module: 详情页编辑区
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+  - step_type: action
+    action: keyboard_hot_key
+    selector:
+      name: TiptapWebView
+    key: ctrl+a
+  - step_type: action
+    action: element_action
+    selector:
+      name: model.name
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 全选
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderListView
+    do: click
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+- id: suite_语音记事本V25_001_s1
+  name: 主界面显示与主菜单设置功能验证
+  module: 语音记事本V25
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: ToolBarMoreButton
+    do: click
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+  - step_type: action
+    action: dtk_main_menu
+    selector:
+      name: ToolBarMoreButton
+    items:
+    - 主题
+  - step_type: action
+    action: dtk_main_menu
+    selector:
+      name: ToolBarMoreButton
+    items:
+    - 主题
+    - 浅色主题
+  - step_type: action
+    action: dtk_main_menu
+    selector:
+      name: ToolBarMoreButton
+    items:
+    - 设置
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NewNoteButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: ToolBarMoreButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TitleBarMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: SettingsMenuItem
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: PrivacyPolicyMenuItem
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: ExitMenuItem
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CtxSubMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: InternalRadioButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MicrophoneRadioButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RestoreDefaultsButton
+- id: suite_语音记事本V25_002_s1
+  name: 记事本与笔记管理快捷键右键菜单操作
+  module: 语音记事本V25
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: keyboard_hot_key
+    key: Tab
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: keyboard_hot_key
+    key: Tab
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderListView
+    do: click
+  - step_type: action
+    action: keyboard_hot_key
+    key: Alt+M
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - 重命名
+  - step_type: action
+    action: keyboard_type
+    text: 测试记事本
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderListView
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - 删除
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - 新建笔记
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteItemListView
+    do: click
+  - step_type: action
+    action: keyboard_hot_key
+    key: Alt+M
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 置顶
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 移动
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderList
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 新建笔记
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+S
+  - step_type: action
+    action: file_dialog_cancel
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Y
+  - step_type: action
+    action: file_dialog_cancel
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderItemContextMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RenameMenuItem
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderMessageDialogLoader
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CancelButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteRightMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderList
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CancelButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CancelButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+- id: suite_语音记事本V25_003_s1
+  name: 笔记右键菜单重命名删除保存与弹窗Tab操作
+  module: 语音记事本V25
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 新建笔记
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+B
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 重命名
+  - step_type: action
+    action: keyboard_type
+    text: 测试笔记
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+  - step_type: action
+    action: keyboard_hot_key
+    key: Tab
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 保存笔记
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 保存为HTML
+  - step_type: action
+    action: file_dialog_cancel
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 保存笔记
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 保存为TXT
+  - step_type: action
+    action: file_dialog_cancel
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 保存语音
+  - step_type: action
+    action: file_dialog_cancel
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 移动
+  - step_type: action
+    action: keyboard_hot_key
+    key: Tab
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MainMessageDialog
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CancelButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MainMessageDialog
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CancelButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: ItemListMessageDialog
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderList
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderList
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CancelButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+- id: suite_语音记事本V25_004_s1
+  name: 多选笔记详情页按钮与右键菜单操作
+  module: 语音记事本V25
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteItemListView
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: MoveButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: SaveNoteButton
+    do: click
+  - step_type: action
+    action: file_dialog_cancel
+  - step_type: action
+    action: element_action
+    selector:
+      name: SaveNoteButton
+    do: click
+  - step_type: action
+    action: file_dialog_cancel
+  - step_type: action
+    action: element_action
+    selector:
+      name: SaveVoiceButton
+    do: click
+  - step_type: action
+    action: file_dialog_cancel
+  - step_type: action
+    action: element_action
+    selector:
+      name: DeleteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 移动
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 保存笔记
+  - step_type: action
+    action: file_dialog_cancel
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 保存笔记
+  - step_type: action
+    action: file_dialog_cancel
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 保存语音
+  - step_type: action
+    action: file_dialog_cancel
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MoveButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderList
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CancelButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: SaveNoteButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: SaveVoiceButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: DeleteButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CancelButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderList
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CancelButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView
+- id: suite_语音记事本V25_005_s1
+  name: 编辑区键盘文本操作与撤销重做
+  module: 语音记事本V25
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: keyboard_type
+    text: 测试文本内容
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+C
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+V
+  - step_type: action
+    action: keyboard_type
+    text: 删除测试
+  - step_type: action
+    action: keyboard_press
+    key: Delete
+  - step_type: action
+    action: keyboard_type
+    text: 选中删除测试
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_press
+    key: Delete
+  - step_type: action
+    action: keyboard_type
+    text: 退格测试
+  - step_type: action
+    action: keyboard_press
+    key: BackSpace
+  - step_type: action
+    action: keyboard_type
+    text: 选中退格测试
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_press
+    key: BackSpace
+  - step_type: action
+    action: keyboard_type
+    text: 撤销重做测试
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Z
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Shift+Z
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+- id: suite_语音记事本V25_006_s1
+  name: 录音功能与键盘焦点操作验证
+  module: 语音记事本V25
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: PauseButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: PauseButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: PauseButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: StopButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: StopButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: keyboard_press
+    key: Tab
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: keyboard_press
+    key: Tab
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: keyboard_press
+    key: Tab
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: StopButton
+    do: click
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Z
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Shift+Z
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RecordingBar
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: PauseButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: StopButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RecordingBar
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RecordingBar
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RecordingBar
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: PauseButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RecordingBar
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: RecordingBar
+- id: suite_语音记事本V25_007_s1
+  name: 语音播放与右键菜单操作验证
+  module: 语音记事本V25
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: StopButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: keyboard_press
+    key: space
+  - step_type: action
+    action: keyboard_press
+    key: space
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 播放
+    - 保存为MP3
+    - 复制
+    - 剪切
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 保存为MP3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 复制
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteContentWebView
+    do: click
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+V
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 剪切
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteContentWebView
+    do: click
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+V
+  - step_type: action
+    action: element_action
+    selector:
+      name: VNoteButton
+    do: click
+  - step_type: action
+    action: keyboard_press
+    key: Tab
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: keyboard_press
+    key: Tab
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteRightMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CancelButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+- id: suite_语音记事本V25_008_s1
+  name: 窗口操作与置顶笔记验证
+  module: 语音记事本V25
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: VoiceNoteMainWindow
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VoiceNoteMainWindow
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: VoiceNoteMainWindow
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: TwoColumnModeButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: TwoColumnModeButton
+    do: click
+  - step_type: action
+    action: keyboard_press
+    key: Tab
+  - step_type: action
+    action: keyboard_hot_key
+    key: Alt+M
+  - step_type: action
+    action: keyboard_press
+    key: Down
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: keyboard_hot_key
+    key: Alt+M
+  - step_type: action
+    action: keyboard_press
+    key: Down
+  - step_type: action
+    action: keyboard_press
+    key: Return
+  - step_type: action
+    action: element_action
+    selector:
+      name: VoiceNoteMainWindow
+    do: click
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteRightMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+- id: suite_语音记事本V25_009_s1
+  name: 编辑区右键菜单与图片操作验证
+  module: 语音记事本V25
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteContentWebView
+    items:
+    - 粘贴
+    - 全选
+    - 另存为
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteContentWebView
+    items:
+    - 粘贴
+    - 全选
+    - 另存为
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteContentWebView
+    do: click
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+V
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteContentWebView
+    items:
+    - 删除
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+V
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteContentWebView
+    items:
+    - 复制
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteContentWebView
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteContentWebView
+    items:
+    - 粘贴
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteContentWebView
+    items:
+    - 剪切
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteContentWebView
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteContentWebView
+    items:
+    - 粘贴
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteContentWebView
+    items:
+    - 另存为
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+V
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Z
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Shift+Z
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CancelButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+- id: suite_语音记事本_001_s1
+  name: 语音记事本基本功能验证-打开新建记事本新建笔记
+  module: 语音记事本
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: InitialInterface
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+- id: suite_privacy_001_s1
+  name: 隐私政策_打开外链
+  module: privacy
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/titlebar_menu_press.py --select PrivacyPolicyMenuItem'
+    wait: 3.0
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+- id: suite_voice_ai_001_s1
+  name: 语音朗读_选中文本朗读与重复朗读
+  module: voice_ai
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    selector:
+      name: TiptapWebView
+    key: ctrl+a
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 语音朗读
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 语音朗读
+    wait: 1.0
+  - step_type: action
+    action: keyboard_hot_key
+    selector:
+      name: TiptapWebView
+    key: Alt+M
+    wait: 1.0
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+- id: suite_voice_ai_002_s1
+  name: 语音听写_AI唤起首次与快捷键
+  module: voice_ai
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 语音听写
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    selector:
+      name: TiptapWebView
+    key: Alt+M
+    wait: 1.0
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+- id: suite_voice_ai_003_s1
+  name: 语音转文字_转写网络正常
+  module: voice_ai
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 语音转文字
+    wait: 2.0
+  - step_type: action
+    action: keyboard_type
+    selector:
+      name: TiptapWebView
+    text: edit_try_002
+    wait: 0.5
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+- id: suite_voice_ai_004_s1
+  name: 语音转文字_转写文案折叠展开
+  module: voice_ai
+  status: unsupported
+  reason: 转写文案折叠/展开按钮是WebEngineView内部DOM元素（.nBtn CSS class），无Accessible.name或objectName，AT-SPI无法定位；需通过JS注入或坐标点击方式实现，超出AT-SPI测试框架能力范围
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+    wait: 0.5
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+- id: suite_save_exp_001_s1
+  name: 详情页_保存为TXT与HTML
+  module: save_exp
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+  - step_type: action
+    action: keyboard_type
+    text: 详情页保存测试内容
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为TXT
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/detail_note.txt
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为HTML
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/detail_note.html
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/detail_note.txt
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/detail_note.html
+- id: suite_save_exp_002_s1
+  name: 语音保存_当前笔记全部语音
+  module: save_exp
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+  - step_type: action
+    action: keyboard_type
+    text: 语音保存测试内容
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/current_note_voice.mp3
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/current_note_voice.mp3
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/current_note_voice.mp3
+- id: suite_save_exp_003_s1
+  name: 多选笔记_保存TXT保存HTML保存语音
+  module: save_exp
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: SaveNoteButton
+    do: click
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/multi_note.txt
+  - step_type: action
+    action: element_action
+    selector:
+      name: SaveNoteButton
+    do: click
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/multi_note.html
+  - step_type: action
+    action: element_action
+    selector:
+      name: SaveVoiceButton
+    do: click
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/multi_voice.mp3
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/multi_note.txt
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/multi_note.html
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/multi_voice.mp3
+- id: suite_save_exp_004_s1
+  name: 空笔记_保存入口禁用
+  module: save_exp
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为TXT
+    wait: 1.0
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
 # ============================================================
-# [S01] 启动与退出
+# [edit_img] 编辑区右键菜单、图片、只读转写文案（批次 edit_img）
 # ============================================================
-  - id: case_1634837
-    name: 仅支持单个窗口开启
-    module: 启动与退出
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+n"
-        description: 再次启动应用(Ctrl+N新建记事本)
-      - step_type: assert
-        action: assert_window_count
-        app: deepin-voice-note
-        expected: 1
-        description: 验证只显示一个窗口
-
-  - id: case_1634839
-    name: 首次使用新建记事本
-    module: 启动与退出
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: element_action
-        selector: {role: "button", name: "新建记事本"}
-        description: 点击空状态"新建记事本"按钮
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证正常新建记事本
-      - step_type: action
-        action: element_action
-        selector: {role: "button", name: "新建记事本"}
-        description: 点击左侧底部"新建记事本"按钮
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证正常新建第二个记事本
-
-# ============================================================
-# [S02] 主菜单
-# ============================================================
-  - id: case_1676365
-    name: 主菜单布局
-    module: 主菜单
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "alt"
-        description: 按Alt打开主菜单
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证主菜单包含设置、隐私政策、主题、帮助、关于、退出
-
-  - id: case_1676457
-    name: 主题切换
-    module: 主菜单
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_main_menu
-        items: ["主题", "浅色"]
-        description: 切换浅色主题
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证成功切换为浅色主题
-      - step_type: action
-        action: dtk_main_menu
-        items: ["主题", "深色"]
-        description: 切换深色主题
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证成功切换为深色主题
-      - step_type: action
-        action: dtk_main_menu
-        items: ["主题", "跟随系统"]
-        description: 切换跟随系统
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证成功切换为跟随系统
-
-  - id: case_1676455
-    name: 帮助
-    module: 主菜单
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_press
-        key: "f1"
-        description: 按F1打开帮助
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证正常唤出帮助手册
-
-  - id: case_1676453
-    name: 关于
-    module: 主菜单
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_main_menu
-        items: ["关于"]
-        description: 打开关于
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证出现语音记事本关于界面
-
-  - id: case_1676451
-    name: 退出
-    module: 主菜单
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_main_menu
-        items: ["退出"]
-        description: 通过主菜单退出
-      - step_type: assert
-        action: assert_process_not_running
-        app: deepin-voice-note
-        description: 验证退出应用
-
-# ============================================================
-# [S03] 记事本管理
-# ============================================================
-  - id: case_1625243
-    name: 新建记事本
-    module: 记事本管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: element_action
-        selector: {role: "button", name: "新建记事本"}
-        description: 点击新建记事本按钮
-      - step_type: assert
-        action: assert_element
-        selector: {role: "label", name: "记事本1"}
-        description: 验证成功新建记事本
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+n"
-        description: Ctrl+N新建
-      - step_type: assert
-        action: assert_element
-        selector: {role: "label", name: "记事本2"}
-        description: 验证成功新建第二个记事本
-
-  - id: case_1625233
-    name: 重命名记事本-正向流程
-    module: 记事本管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {role: "label", name: "记事本1"}
-        items: ["重命名"]
-        description: 右键记事本选择重命名
-      - step_type: action
-        action: keyboard_type
-        text: "测试记事本A"
-        description: 输入新名称
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车确认
-      - step_type: assert
-        action: assert_element
-        selector: {role: "label", name: "测试记事本A"}
-        description: 验证成功重命名
-
-  - id: case_1676429
-    name: 重命名记事本-快捷键操作
-    module: 记事本管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "alt+m"
-        description: Alt+M打开记事本右键菜单
-      - step_type: action
-        action: keyboard_press
-        key: "down"
-        description: 选中重命名
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: action
-        action: keyboard_type
-        text: "快捷键重命名"
-        description: 输入新名称
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车确认
-      - step_type: assert
-        action: assert_element
-        selector: {role: "label", name: "快捷键重命名"}
-        description: 验证正常完成重命名
-
-  - id: case_1634853
-    name: 记事本命名规则-正向流程
-    module: 记事本管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {role: "label", name: "记事本1"}
-        items: ["重命名"]
-        description: 右键记事本选择重命名
-      - step_type: action
-        action: keyboard_type
-        text: "正常命名"
-        description: 输入名称
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车确认
-      - step_type: assert
-        action: assert_element
-        selector: {role: "label", name: "正常命名"}
-        description: 验证成功重命名
-
-  - id: case_1634857
-    name: 记事本命名规则-清空名称
-    module: 记事本管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {role: "label", name: "记事本1"}
-        items: ["重命名"]
-        description: 右键记事本选择重命名
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+a"
-        description: 全选名称
-      - step_type: action
-        action: keyboard_press
-        key: "delete"
-        description: 删除清空
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_element
-        selector: {role: "label", name: "记事本1"}
-        description: 验证名称恢复为修改前
-
-  - id: case_1634843
-    name: 记事本命名规则-不输入字符
-    module: 记事本管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {role: "label", name: "记事本1"}
-        items: ["重命名"]
-        description: 右键记事本选择重命名
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 不输入直接按回车
-      - step_type: assert
-        action: assert_element
-        selector: {role: "label", name: "记事本1"}
-        description: 验证名称不变
-
-  - id: case_1634845
-    name: 记事本命名规则-输入空格
-    module: 记事本管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {role: "label", name: "记事本1"}
-        items: ["重命名"]
-        description: 右键记事本选择重命名
-      - step_type: action
-        action: keyboard_type
-        text: " "
-        description: 输入空格
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_element
-        selector: {role: "label", name: "记事本1"}
-        description: 验证正常重命名
-
-  - id: case_1634841
-    name: 记事本命名规则-混合字符
-    module: 记事本管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {role: "label", name: "记事本1"}
-        items: ["重命名"]
-        description: 右键记事本选择重命名
-      - step_type: action
-        action: keyboard_type
-        text: "测试abc123"
-        description: 输入混合字符
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_element
-        selector: {role: "label", name: "测试abc123"}
-        description: 验证成功重命名
-
-  - id: case_1634849
-    name: 记事本命名规则-ESC取消
-    module: 记事本管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {role: "label", name: "记事本1"}
-        items: ["重命名"]
-        description: 右键记事本选择重命名
-      - step_type: action
-        action: keyboard_type
-        text: "取消测试"
-        description: 输入字符
-      - step_type: action
-        action: keyboard_press
-        key: "escape"
-        description: 按ESC取消
-      - step_type: assert
-        action: assert_element
-        selector: {role: "label", name: "记事本1"}
-        description: 验证取消重命名
-
-  - id: case_1634851
-    name: 记事本命名规则-重复名称
-    module: 记事本管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {role: "label", name: "记事本1"}
-        items: ["重命名"]
-        description: 右键记事本选择重命名
-      - step_type: action
-        action: keyboard_type
-        text: "记事本1"
-        description: 输入重复名称
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证正常重命名无异常
-
-  - id: case_1634855
-    name: 记事本命名规则-特殊字符qypg
-    module: 记事本管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {role: "label", name: "记事本1"}
-        items: ["重命名"]
-        description: 右键记事本选择重命名
-      - step_type: action
-        action: keyboard_type
-        text: "名称qypg测试"
-        description: 输入含qypg的名称
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_element
-        selector: {role: "label", name: "名称qypg测试"}
-        description: 验证名称显示正常无截断
-
-  - id: case_1676427
-    name: 删除记事本-快捷键操作
-    module: 记事本管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "alt+m"
-        description: Alt+M打开记事本右键菜单
-      - step_type: action
-        action: keyboard_press
-        key: "down"
-        description: 选中删除
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_element
-        selector: {role: "dialog", name: ""}
-        description: 验证弹出删除确认提示框
-
-  - id: case_1676425
-    name: 通过记事本右键菜单新建笔记
-    module: 记事本管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {role: "label", name: "记事本1"}
-        items: ["新建笔记"]
-        description: 右键记事本选择新建笔记
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证正常新建笔记
-
-  - id: case_1634863
-    name: 记事本列表按新建时间排序
-    module: 记事本管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: element_action
-        selector: {role: "button", name: "新建记事本"}
-        description: 新建记事本
-      - step_type: assert
-        action: assert_element
-        selector: {role: "label", name: "记事本1"}
-        description: 验证新建记事本显示在第一位
-
-# ============================================================
-# [S04] 笔记管理
-# ============================================================
-  - id: case_1634891
-    name: 新建文本笔记
-    module: 笔记管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {role: "label", name: "记事本1"}
-        items: ["新建笔记"]
-        description: 右键记事本新建笔记
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证正常新建文本笔记
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+b"
-        description: Ctrl+B新建笔记
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证正常新建文本笔记
-
-  - id: case_1634923
-    name: 重命名文本笔记-正向流程
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {ref: noteListItem}
-        items: ["重命名"]
-        description: 右键笔记选择重命名
-      - step_type: action
-        action: keyboard_type
-        text: "重命名笔记"
-        description: 输入新名称
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车确认
-      - step_type: assert
-        action: assert_element
-        selector: {ref: noteListItem}
-        description: 验证成功重命名
-
-  - id: case_1676351
-    name: 重命名文本笔记-多种方式
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {ref: noteListItem}
-        items: ["重命名"]
-        description: 右键笔记选择重命名
-      - step_type: action
-        action: keyboard_type
-        text: "F3重命名测试"
-        description: 输入新名称
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车确认
-      - step_type: assert
-        action: assert_element
-        selector: {ref: noteListItem}
-        description: 验证成功重命名
-
-  - id: case_1634499
-    name: 重命名笔记-快捷键操作
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_press
-        key: "f3"
-        description: F3重命名笔记
-      - step_type: action
-        action: keyboard_type
-        text: "快捷键笔记名"
-        description: 输入新名称
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_element
-        selector: {ref: noteListItem}
-        description: 验证正常完成笔记重命名
-
-  - id: case_1634927
-    name: 重命名文本笔记-清空输入框
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {ref: noteListItem}
-        items: ["重命名"]
-        description: 右键笔记选择重命名
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+a"
-        description: 全选
-      - step_type: action
-        action: keyboard_press
-        key: "delete"
-        description: 删除清空
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_element
-        selector: {ref: noteListItem}
-        description: 验证笔记名称为修改前
-
-  - id: case_1634913
-    name: 重命名文本笔记-不输入字符
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {ref: noteListItem}
-        items: ["重命名"]
-        description: 右键笔记选择重命名
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 直接按回车
-      - step_type: assert
-        action: assert_element
-        selector: {ref: noteListItem}
-        description: 验证笔记名称不变
-
-  - id: case_1634915
-    name: 重命名文本笔记-输入空格
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {ref: noteListItem}
-        items: ["重命名"]
-        description: 右键笔记选择重命名
-      - step_type: action
-        action: keyboard_type
-        text: " "
-        description: 输入空格
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_element
-        selector: {ref: noteListItem}
-        description: 验证正常重命名
-
-  - id: case_1634911
-    name: 重命名文本笔记-混合字符
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {ref: noteListItem}
-        items: ["重命名"]
-        description: 右键笔记选择重命名
-      - step_type: action
-        action: keyboard_type
-        text: "笔记abc123"
-        description: 输入混合字符
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_element
-        selector: {ref: noteListItem}
-        description: 验证成功重命名
-
-  - id: case_1634919
-    name: 重命名文本笔记-ESC取消
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {ref: noteListItem}
-        items: ["重命名"]
-        description: 右键笔记选择重命名
-      - step_type: action
-        action: keyboard_type
-        text: "取消测试"
-        description: 输入字符
-      - step_type: action
-        action: keyboard_press
-        key: "escape"
-        description: 按ESC
-      - step_type: assert
-        action: assert_element
-        selector: {ref: noteListItem}
-        description: 验证取消重命名
-
-  - id: case_1634921
-    name: 重命名文本笔记-重复名称
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {ref: noteListItem}
-        items: ["重命名"]
-        description: 右键笔记选择重命名
-      - step_type: action
-        action: keyboard_type
-        text: "文本1"
-        description: 输入重复名称
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证正常重命名无异常
-
-  - id: case_1634917
-    name: 重命名文本笔记-超过64位字符
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {ref: noteListItem}
-        items: ["重命名"]
-        description: 右键笔记选择重命名
-      - step_type: action
-        action: keyboard_type
-        text: "超过六十四位的笔记名称测试超过六十四位限制验证超过六十四位"
-        description: 输入超过64位字符
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_element
-        selector: {ref: noteListItem}
-        description: 验证限制输入64位字符
-
-  - id: case_1634925
-    name: 重命名文本笔记-特殊字符qypg
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {ref: noteListItem}
-        items: ["重命名"]
-        description: 右键笔记选择重命名
-      - step_type: action
-        action: keyboard_type
-        text: "笔记qypg名称"
-        description: 输入含qypg的名称
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_element
-        selector: {ref: noteListItem}
-        description: 验证名称显示正常
-
-  - id: case_1676349
-    name: 删除文本笔记
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_context_menu
-        selector: {ref: noteListItem}
-        items: ["删除"]
-        description: 右键笔记选择删除
-      - step_type: assert
-        action: assert_element
-        selector: {role: "dialog", name: ""}
-        description: 验证弹出删除确认提示框
-
-  - id: case_1676419
-    name: 删除笔记-快捷键操作
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "alt+m"
-        description: Alt+M打开右键菜单
-      - step_type: action
-        action: keyboard_press
-        key: "down"
-        description: 选中删除
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_element
-        selector: {role: "dialog", name: ""}
-        description: 验证弹出删除确认提示框
-
-  - id: case_1676465
-    name: 置顶/取消置顶笔记
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "alt+m"
-        description: Alt+M打开右键菜单
-      - step_type: action
-        action: keyboard_press
-        key: "down"
-        description: 选中置顶
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证成功置顶
-      - step_type: action
-        action: keyboard_hot_key
-        key: "alt+m"
-        description: Alt+M再次打开右键菜单
-      - step_type: action
-        action: keyboard_press
-        key: "down"
-        description: 选中取消置顶
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证成功取消置顶
-
-  - id: case_1676413
-    name: 通过笔记右键菜单新建笔记
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "alt+m"
-        description: Alt+M打开右键菜单
-      - step_type: action
-        action: keyboard_press
-        key: "down"
-        description: 选中新建笔记
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证新建笔记
-
-  - id: case_1676415
-    name: 保存语音(快捷键)
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "alt+m"
-        description: Alt+M打开右键菜单
-      - step_type: action
-        action: keyboard_press
-        key: "down"
-        description: 选中保存语音
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_element
-        selector: {role: "dialog", name: ""}
-        description: 验证弹出保存窗口
-
-  - id: case_1676417
-    name: 保存为TXT(快捷键)
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "alt+m"
-        description: Alt+M打开右键菜单
-      - step_type: action
-        action: keyboard_press
-        key: "down"
-        description: 选中保存笔记
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_element
-        selector: {role: "dialog", name: ""}
-        description: 验证弹出保存窗口
-
-  - id: case_1676421
-    name: 移动笔记
-    module: 笔记管理
-    status: active
-    needs_accessible_name: true
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "alt+m"
-        description: Alt+M打开右键菜单
-      - step_type: action
-        action: keyboard_press
-        key: "down"
-        description: 选中移动
-      - step_type: action
-        action: keyboard_press
-        key: "enter"
-        description: 按回车
-      - step_type: assert
-        action: assert_element
-        selector: {role: "dialog", name: ""}
-        description: 验证打开移动选择弹窗
-      - step_type: action
-        action: element_action
-        selector: {role: "button", name: "确定"}
-        description: 点击确定
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证正常移动笔记
-
-  - id: case_1676403
-    name: 删除弹窗Tab键操作
-    module: 笔记管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_press
-        key: "tab"
-        description: Tab切换焦点
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证焦点按X关闭->取消->确定顺序切换
-
-  - id: case_1676395
-    name: 移动弹窗Tab键操作
-    module: 笔记管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_press
-        key: "tab"
-        description: Tab切换焦点
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证焦点按X关闭->记事本列表->取消->确定顺序切换
-
-  - id: case_1676401
-    name: 音量低提示窗Tab键操作
-    module: 笔记管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_press
-        key: "tab"
-        description: Tab切换焦点
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证焦点按X关闭->取消->确定顺序切换
-
-  - id: case_1676399
-    name: 录音中关闭应用提示窗Tab键操作
-    module: 笔记管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_press
-        key: "tab"
-        description: Tab切换焦点
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证焦点按X关闭->取消->确定顺序切换
-
-  - id: case_1676397
-    name: 语音转文字中关闭应用提示窗Tab键操作
-    module: 笔记管理
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_press
-        key: "tab"
-        description: Tab切换焦点
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证焦点按X关闭->取消->确定顺序切换
-
-# ============================================================
-# [S05] 快捷键验证
-# ============================================================
-  - id: case_1635259
-    name: 快捷键功能验证
-    module: 快捷键验证
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_press
-        key: "f1"
-        description: 按F1
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证打开帮助
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+shift+/"
-        description: Ctrl+Shift+/
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证快捷键预览显示
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+n"
-        description: Ctrl+N
-      - step_type: assert
-        action: assert_element
-        selector: {role: "label", name: "记事本1"}
-        description: 验证新建记事本
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+b"
-        description: Ctrl+B
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证新建笔记
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+r"
-        description: Ctrl+R
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证开始录音
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+s"
-        description: Ctrl+S
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证保存为TXT
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+y"
-        description: Ctrl+Y
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证保存语音
-
-  - id: case_1624611
-    name: 快捷键预览显示正常
-    module: 快捷键验证
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+shift+/"
-        description: Ctrl+Shift+/
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证快捷键预览界面显示正确
-
-  - id: case_1635281
-    name: 录音中无法使用Ctrl+Y
-    module: 快捷键验证
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+r"
-        description: 先开始录音
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+y"
-        description: 录音中按Ctrl+Y
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证快捷键禁用，无闪退
-
-  - id: case_1635279
-    name: 无语音记录无法使用Ctrl+Y
-    module: 快捷键验证
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+y"
-        description: 无语音时按Ctrl+Y
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证快捷键禁用，无闪退
-
-  - id: case_1635277
-    name: 无文字记录使用Ctrl+S
-    module: 快捷键验证
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+s"
-        description: 无文字时按Ctrl+S
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证快捷键禁用，无闪退
-
-  - id: case_1635271
-    name: 搜索结果界面无法使用F2
-    module: 快捷键验证
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_press
-        key: "f2"
-        description: 搜索状态按F2
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证F2禁用
-
-  - id: case_1635265
-    name: 录音转文字回放中使用Delete
-    module: 快捷键验证
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_press
-        key: "delete"
-        description: 转写中按Delete
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证Delete无反应
-
-  - id: case_1635263
-    name: 空白页使用Delete
-    module: 快捷键验证
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_press
-        key: "delete"
-        description: 空白页按Delete
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证无任何作用，无闪退
-
-  - id: case_1635261
-    name: 录音等状态下无法Ctrl+N
-    module: 快捷键验证
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+r"
-        description: 先开始录音
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+n"
-        description: 录音中按Ctrl+N
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证无法新建，无闪退
-
-  - id: case_1635037
-    name: 录音中退出应用
-    module: 快捷键验证
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: keyboard_hot_key
-        key: "ctrl+r"
-        description: 先开始录音
-      - step_type: action
-        action: dtk_main_menu
-        items: ["退出"]
-        description: 录音中通过主菜单退出
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证提示正在录音中，选择终止后退出
-
-  - id: case_1676398
-    name: 语音转文字中关闭应用
-    module: 快捷键验证
-    status: active
-    steps:
-      - step_type: action
-        action: session_start
-        command: deepin-voice-note
-        wait: 3.0
-        description: 启动应用
-      - step_type: action
-        action: dtk_main_menu
-        items: ["退出"]
-        description: 转文字中通过主菜单退出
-      - step_type: assert
-        action: assert_window
-        assertion: "window_exists"
-        description: 验证提示正在转写中
-
-# ============================================================
-# Unsupported cases
-# ============================================================
-  - id: case_1676573
-    name: 主界面显示
-    module: 主菜单
-    status: unsupported
-    reason: "QML应用大部分标题栏控件无AT-SPI名称，无法验证UI布局"
-
-  - id: case_1676449
-    name: 最小化
-    module: 启动与退出
-    status: unsupported
-    reason: "最小化按钮无AT-SPI名称，恢复需Dock交互"
-
-  - id: case_1676447
-    name: 最大化
-    module: 启动与退出
-    status: unsupported
-    reason: "最大化按钮无AT-SPI名称"
-
-  - id: case_1676445
-    name: 关闭主界面
-    module: 启动与退出
-    status: unsupported
-    reason: "关闭按钮无AT-SPI名称(可通过dtk_main_menu退出替代)"
-
-  - id: case_1635223
-    name: 关闭主界面(102x)
-    module: 启动与退出
-    status: unsupported
-    reason: "与case_1676445重复"
-
-  - id: case_1625247
-    name: 关闭主界面(1050)
-    module: 启动与退出
-    status: unsupported
-    reason: "与case_1676445重复"
-
-  - id: case_1676379
-    name: 收起/展开记事本列表
-    module: 记事本管理
-    status: unsupported
-    reason: "sidebarToggleBtn无AT-SPI名称(needs_accessible_name)"
-
-  - id: case_1676363
-    name: 设置
-    module: 主菜单
-    status: unsupported
-    reason: "设置弹窗中单选按钮(settingDialogInternal/settingDialogMicrophone)无AT-SPI名称"
-
-  - id: case_1676361
-    name: 隐私政策
-    module: 主菜单
-    status: unsupported
-    reason: "需切换系统语言验证中英文URL，且涉及浏览器跳转"
-
-  - id: case_1676409
-    name: 焦点在录音按钮按回车录音
-    module: 笔记管理
-    status: unsupported
-    reason: "recordBtn/pauseBtn/stopBtn均无AT-SPI名称"
-
-  - id: case_1676299
-    name: 录音过程中暂停录音
-    module: 笔记管理
-    status: unsupported
-    reason: "录音悬浮栏按钮无AT-SPI名称"
-
-  - id: case_1676297
-    name: 录音被暂停后完成录音
-    module: 笔记管理
-    status: unsupported
-    reason: "录音悬浮栏按钮无AT-SPI名称"
-
-  - id: case_1676295
-    name: 录音进行过程中完成录音
-    module: 笔记管理
-    status: unsupported
-    reason: "录音悬浮栏按钮无AT-SPI名称"
-
-  - id: case_1676293
-    name: 语音笔记显示
-    module: 笔记管理
-    status: unsupported
-    reason: "纯视觉检查，语音笔记在QtWebEngine中"
-
-  - id: case_1676291
-    name: 播放/暂停播放录音
-    module: 笔记管理
-    status: unsupported
-    reason: "播放/暂停按钮在QtWebEngine中无AT-SPI节点"
-
-  - id: case_1676289
-    name: 播放/暂停播放-Space快捷键
-    module: 快捷键验证
-    status: unsupported
-    reason: "播放插件无AT-SPI名称，Space需焦点在播放插件上"
-
-  - id: case_1676287
-    name: 语音右键菜单
-    module: 笔记管理
-    status: unsupported
-    reason: "语音笔记在QtWebEngine中，右键定位不可靠"
-
-  - id: case_1676285
-    name: 保存为MP3
-    module: 笔记管理
-    status: unsupported
-    reason: "语音笔记在QtWebEngine中，右键定位不可靠"
-
-  - id: case_1676279
-    name: 复制语音笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "语音笔记在QtWebEngine中"
-
-  - id: case_1676277
-    name: 剪切语音笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "语音笔记在QtWebEngine中"
-
-  - id: case_1676275
-    name: 悬浮气泡工具栏
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏为QML组件，所有按钮无AT-SPI名称"
-
-  - id: case_1676273
-    name: 取消选中文本悬浮工具栏消失
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏无AT-SPI名称"
-
-  - id: case_1676271
-    name: hover效果
-    module: 笔记管理
-    status: unsupported
-    reason: "hover效果为视觉检查，无法AT-SPI验证"
-
-  - id: case_1676463
-    name: 语音朗读-快捷键操作
-    module: 快捷键验证
-    status: unsupported
-    reason: "依赖UOS AI外部应用，editorWebEngine无AT-SPI名称"
-
-  - id: case_1676459
-    name: 语音听写-快捷键操作
-    module: 快捷键验证
-    status: unsupported
-    reason: "依赖UOS AI，editorWebEngine无AT-SPI名称"
-
-  - id: case_1676441
-    name: 删除语音同步删除转写文案
-    module: 笔记管理
-    status: unsupported
-    reason: "语音笔记在QtWebEngine中"
-
-  - id: case_1676439
-    name: 转写文案不支持编辑
-    module: 笔记管理
-    status: unsupported
-    reason: "转写文案在QtWebEngine中"
-
-  - id: case_1676435
-    name: 网络正常语音转文字
-    module: 笔记管理
-    status: unsupported
-    reason: "依赖网络AI服务，editorWebEngine无AT-SPI名称"
-
-  - id: case_1676433
-    name: 左侧头像
-    module: 记事本管理
-    status: unsupported
-    reason: "头像为QML渲染元素，无AT-SPI节点"
-
-  - id: case_1676431
-    name: 多选批量移动(拖拽)
-    module: 笔记管理
-    status: unsupported
-    reason: "拖拽操作无法通过AT-SPI执行"
-
-  - id: case_1676423
-    name: 焦点在新建记事本按钮回车
-    module: 记事本管理
-    status: unsupported
-    reason: "newNoteBtn无AT-SPI名称，Tab定位不可靠"
-
-  - id: case_1676411
-    name: 焦点在新建笔记按钮回车
-    module: 笔记管理
-    status: unsupported
-    reason: "newNoteBtn无AT-SPI名称"
-
-  - id: case_1676407
-    name: 播放插件操作
-    module: 笔记管理
-    status: unsupported
-    reason: "播放插件无AT-SPI名称"
-
-  - id: case_1676405
-    name: 详情页文本编辑(Alt+M)
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称，Alt+M右键定位不可靠"
-
-  - id: case_1676393
-    name: Delete键删除光标后文本
-    module: 快捷键验证
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称，无法定位焦点"
-
-  - id: case_1676391
-    name: 选中内容按Delete删除
-    module: 快捷键验证
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
-
-  - id: case_1676389
-    name: Backspace删除光标前文本
-    module: 快捷键验证
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
-
-  - id: case_1676387
-    name: 选中内容按Backspace删除
-    module: 快捷键验证
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
-
-  - id: case_1676377
-    name: 插入图片
-    module: 笔记管理
-    status: unsupported
-    reason: "insImgBtn无AT-SPI名称"
-
-  - id: case_1676375
-    name: 搜索仅匹配记事本
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit搜索框无AT-SPI名称"
-
-  - id: case_1676373
-    name: 搜索不匹配文本和详情页
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit搜索框无AT-SPI名称"
-
-  - id: case_1676371
-    name: 搜索匹配文本笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit搜索框无AT-SPI名称"
-
-  - id: case_1676369
-    name: 搜索匹配详情页文本
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit搜索框无AT-SPI名称"
-
-  - id: case_1676355
-    name: 记事本不超过一屏拖拽排序
-    module: 记事本管理
-    status: unsupported
-    reason: "拖拽操作无法通过AT-SPI执行"
-
-  - id: case_1676353
-    name: 记事本超过一屏拖拽排序
-    module: 记事本管理
-    status: unsupported
-    reason: "拖拽操作无法通过AT-SPI执行"
-
-  - id: case_1676337
-    name: 鼠标移动笔记至其他记事本
-    module: 笔记管理
-    status: unsupported
-    reason: "拖拽操作无法通过AT-SPI执行"
-
-  - id: case_1676335
-    name: Ctrl多选笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称，Ctrl+Click不可靠"
-
-  - id: case_1676333
-    name: Ctrl取消选中
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1676331
-    name: Shift范围选笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1676329
-    name: Shift已选范围重选
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1676327
-    name: 多选状态点击移动
-    module: 笔记管理
-    status: unsupported
-    reason: "笔记列表项无AT-SPI名称"
-
-  - id: case_1676325
-    name: 多选状态保存为HTML
-    module: 笔记管理
-    status: unsupported
-    reason: "笔记列表项无AT-SPI名称"
-
-  - id: case_1676323
-    name: 多选状态保存为TXT
-    module: 笔记管理
-    status: unsupported
-    reason: "笔记列表项无AT-SPI名称"
-
-  - id: case_1676321
-    name: 多选状态保存语音
-    module: 笔记管理
-    status: unsupported
-    reason: "笔记列表项无AT-SPI名称"
-
-  - id: case_1676319
-    name: 多选状态删除
-    module: 笔记管理
-    status: unsupported
-    reason: "笔记列表项无AT-SPI名称"
-
-  - id: case_1676317
-    name: 多选右键移动
-    module: 笔记管理
-    status: unsupported
-    reason: "笔记列表项无AT-SPI名称"
-
-  - id: case_1676315
-    name: 多选右键删除
-    module: 笔记管理
-    status: unsupported
-    reason: "笔记列表项无AT-SPI名称"
-
-  - id: case_1676313
-    name: 多选右键保存为HTML
-    module: 笔记管理
-    status: unsupported
-    reason: "笔记列表项无AT-SPI名称"
-
-  - id: case_1676311
-    name: 多选右键保存为TXT
-    module: 笔记管理
-    status: unsupported
-    reason: "笔记列表项无AT-SPI名称"
-
-  - id: case_1676309
-    name: 多选右键保存语音
-    module: 笔记管理
-    status: unsupported
-    reason: "笔记列表项无AT-SPI名称"
-
-  - id: case_1676307
-    name: 多选拖拽移动
-    module: 笔记管理
-    status: unsupported
-    reason: "拖拽操作无法通过AT-SPI执行"
-
-  - id: case_1676303
-    name: 录音按钮固定显示
-    module: 笔记管理
-    status: unsupported
-    reason: "纯视觉检查，recordBtn无AT-SPI名称"
-
-  - id: case_1676301
-    name: 录音过程中界面布局
-    module: 笔记管理
-    status: unsupported
-    reason: "录音悬浮栏无AT-SPI节点，纯视觉检查"
-
-  - id: case_1676269
-    name: 加粗/取消加粗
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676267
-    name: 光标加粗/取消
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676263
-    name: 斜体
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676261
-    name: 下划线
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676259
-    name: 光标下划线
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676257
-    name: 删除线
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676255
-    name: 光标删除线
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676253
-    name: 设置字号
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676251
-    name: 光标设置字号
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676249
-    name: 设置字体颜色
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676247
-    name: 光标设置字体颜色
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676245
-    name: 设置背景色
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676243
-    name: 光标设置背景色
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676241
-    name: 有序列表
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676239
-    name: 光标有序列表
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676237
-    name: 无序列表
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676235
-    name: 光标无序列表
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏按钮无AT-SPI名称"
-
-  - id: case_1676233
-    name: 拖拽图片至编辑区
-    module: 笔记管理
-    status: unsupported
-    reason: "拖拽操作无法通过AT-SPI执行"
-
-  - id: case_1676231
-    name: 粘贴图片至编辑区
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
-
-  - id: case_1676229
-    name: 查看导入图片
-    module: 笔记管理
-    status: unsupported
-    reason: "图片在QtWebEngine中"
-
-  - id: case_1676227
-    name: 删除图片
-    module: 笔记管理
-    status: unsupported
-    reason: "图片在QtWebEngine中"
-
-  - id: case_1676225
-    name: 复制图片
-    module: 笔记管理
-    status: unsupported
-    reason: "图片在QtWebEngine中"
-
-  - id: case_1676223
-    name: 剪切图片
-    module: 笔记管理
-    status: unsupported
-    reason: "图片在QtWebEngine中"
-
-  - id: case_1676221
-    name: 另存为图片
-    module: 笔记管理
-    status: unsupported
-    reason: "图片在QtWebEngine中"
-
   - id: case_1676219
-    name: 编辑区空白右键菜单
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
-
-  - id: case_1676217
-    name: 不选中内容右键菜单
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
-
-  - id: case_1676215
-    name: 撤销重做-文本编辑
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
-
-  - id: case_1676213
-    name: 撤销重做-图片操作
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
-
-  - id: case_1676211
-    name: 撤销重做-录音操作
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
-
-  - id: case_1676209
-    name: 设置字体
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏无AT-SPI名称"
-
-  - id: case_1676207
-    name: 无字体设置字体
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏无AT-SPI名称"
-
-  - id: case_1676347
-    name: 保存为HTML
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1676345
-    name: 保存为TXT
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1676343
-    name: 保存语音
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1676338
-    name: 鼠标移动笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "拖拽操作无法通过AT-SPI执行"
-
-  - id: case_1671115
-    name: 文本工具状态
-    module: 笔记管理
-    status: unsupported
-    reason: "悬浮工具栏无AT-SPI名称"
-
-  - id: case_1679637
-    name: 网络异常语音转文字
-    module: 笔记管理
-    status: unsupported
-    reason: "需控制网络状态，依赖AI服务"
-
-  - id: case_1679613
-    name: 语音转文字折叠
-    module: 笔记管理
-    status: unsupported
-    reason: "转写文案折叠按钮在QtWebEngine中"
-
-  - id: case_1676579
-    name: 语音文件显示
-    module: 笔记管理
-    status: unsupported
-    reason: "纯视觉检查"
-
-  - id: case_1873475
-    name: 语音朗读-全选文字
-    module: 快捷键验证
-    status: unsupported
-    reason: "依赖UOS AI外部应用"
-
-  - id: case_1873469
-    name: 语音听写-首次唤醒AI
-    module: 快捷键验证
-    status: unsupported
-    reason: "依赖UOS AI外部应用"
-
-  - id: case_1873467
-    name: 语音朗读-首次唤醒AI
-    module: 快捷键验证
-    status: unsupported
-    reason: "依赖UOS AI外部应用"
-
-  - id: case_1873455
-    name: 重复选择语音朗读
-    module: 快捷键验证
-    status: unsupported
-    reason: "依赖UOS AI外部应用"
-
-  - id: case_1873451
-    name: 语音朗读-音频设备缺失
-    module: 快捷键验证
-    status: unsupported
-    reason: "需物理移除音频设备"
-
-  - id: case_1873449
-    name: 去掉文本翻译
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
-
-  - id: case_1635209
-    name: 调整窗口大小搜索框不变
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit无AT-SPI名称"
-
-  - id: case_1635203
-    name: 搜索结果界面删除所有匹配项
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit无AT-SPI名称"
-
-  - id: case_1635197
-    name: 搜索结果右键新建笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit无AT-SPI名称"
-
-  - id: case_1635195
-    name: 搜索结果右键保存语音
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit无AT-SPI名称"
-
-  - id: case_1635193
-    name: 搜索结果右键保存为TXT
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit无AT-SPI名称"
-
-  - id: case_1635191
-    name: 搜索结果右键删除笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit无AT-SPI名称"
-
-  - id: case_1635189
-    name: 搜索结果右键重命名
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit无AT-SPI名称"
-
-  - id: case_1635187
-    name: 搜索结果右键记事本
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit无AT-SPI名称"
-
-  - id: case_1635185
-    name: 搜索结果添加语音
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit无AT-SPI名称"
-
-  - id: case_1635183
-    name: 搜索范围验证
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit无AT-SPI名称"
-
-  - id: case_1635181
-    name: 搜索框Enter搜索
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit无AT-SPI名称"
-
-  - id: case_1635179
-    name: 输入特殊字符搜索
-    module: 笔记管理
-    status: unsupported
-    reason: "searchEdit无AT-SPI名称"
-
-  - id: case_1635101
-    name: 保存为MP3(102x)
-    module: 笔记管理
-    status: unsupported
-    reason: "语音笔记在QtWebEngine中"
-
-  - id: case_1635089
-    name: 播放中保存MP3
-    module: 笔记管理
-    status: unsupported
-    reason: "语音笔记在QtWebEngine中"
-
-  - id: case_1635087
-    name: 播放中删除语音
-    module: 笔记管理
-    status: unsupported
-    reason: "语音笔记在QtWebEngine中"
-
-  - id: case_1635085
-    name: 播放中窗口操作
-    module: 笔记管理
-    status: unsupported
-    reason: "窗口操作按钮无AT-SPI名称"
-
-  - id: case_1635083
-    name: 播放中编辑文本
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
-
-  - id: case_1635081
-    name: 播放中切换播放
-    module: 笔记管理
-    status: unsupported
-    reason: "播放按钮在QtWebEngine中"
-
-  - id: case_1635079
-    name: 播放中右键当前笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1635077
-    name: 播放中右键其他笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1635075
-    name: 播放中新建笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "newNoteBtn无AT-SPI名称"
-
-  - id: case_1635073
-    name: 播放中右键当前记事本
-    module: 笔记管理
-    status: unsupported
-    reason: "播放中记事本区域受限"
-
-  - id: case_1635071
-    name: 播放中右键其他记事本
-    module: 笔记管理
-    status: unsupported
-    reason: "播放中记事本区域受限"
-
-  - id: case_1635069
-    name: 播放中新建记事本
-    module: 笔记管理
-    status: unsupported
-    reason: "播放中记事本区域受限"
-
-  - id: case_1635067
-    name: 播放中切换记事本
-    module: 笔记管理
-    status: unsupported
-    reason: "播放中记事本区域受限"
-
-  - id: case_1635063
-    name: 点击进度条改变进度
-    module: 笔记管理
-    status: unsupported
-    reason: "进度条无AT-SPI节点"
-
-  - id: case_1635061
-    name: 拖动进度条
-    module: 笔记管理
-    status: unsupported
-    reason: "进度条无AT-SPI节点"
-
-  - id: case_1635059
-    name: 左右拖动进度条
-    module: 笔记管理
-    status: unsupported
-    reason: "进度条无AT-SPI节点"
-
-  - id: case_1635057
-    name: 播放/暂停(102x)
-    module: 笔记管理
-    status: unsupported
-    reason: "播放按钮在QtWebEngine中"
-
-  - id: case_1635055
-    name: 语音笔记时间显示
-    module: 笔记管理
-    status: unsupported
-    reason: "纯视觉检查"
-
-  - id: case_1635053
-    name: 语音笔记显示(102x)
-    module: 笔记管理
-    status: unsupported
-    reason: "纯视觉检查"
-
-  - id: case_1635051
-    name: 录音中强制关机等
-    module: 笔记管理
-    status: unsupported
-    reason: "涉及系统级电源操作"
-
-  - id: case_1635045
-    name: 录音设备异常
-    module: 笔记管理
-    status: unsupported
-    reason: "需物理设备操作"
-
-  - id: case_1635035
-    name: 录音中窗口操作
-    module: 笔记管理
-    status: unsupported
-    reason: "窗口按钮无AT-SPI名称"
-
-  - id: case_1635033
-    name: 录音中编辑文本
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
-
-  - id: case_1635031
-    name: 录音中语音转文字
-    module: 笔记管理
-    status: unsupported
-    reason: "依赖AI服务"
-
-  - id: case_1635029
-    name: 录音中保存为MP3
-    module: 笔记管理
-    status: unsupported
-    reason: "语音笔记在QtWebEngine中"
-
-  - id: case_1635027
-    name: 录音中删除语音笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "语音笔记在QtWebEngine中"
-
-  - id: case_1635025
-    name: 录音中右键当前笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1635023
-    name: 录音中右键其他笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1635021
-    name: 录音中新建笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "newNoteBtn无AT-SPI名称"
-
-  - id: case_1635011
-    name: 录音中播放录音
-    module: 笔记管理
-    status: unsupported
-    reason: "播放按钮在QtWebEngine中"
-
-  - id: case_1635003
-    name: 录音时长分钟级
-    module: 笔记管理
-    status: unsupported
-    reason: "录音悬浮栏无AT-SPI节点"
-
-  - id: case_1635001
-    name: 录音时长小时级
-    module: 笔记管理
-    status: unsupported
-    reason: "录音悬浮栏无AT-SPI节点"
-
-  - id: case_1634999
-    name: 录音完成(102x)
-    module: 笔记管理
-    status: unsupported
-    reason: "与case_1676295重复，录音悬浮栏无AT-SPI名称"
-
-  - id: case_1634997
-    name: 暂停后完成录音(102x)
-    module: 笔记管理
-    status: unsupported
-    reason: "与case_1676297重复"
-
-  - id: case_1634995
-    name: 暂停录音(102x)
-    module: 笔记管理
-    status: unsupported
-    reason: "与case_1676299重复"
-
-  - id: case_1634993
-    name: 录音界面布局(102x)
-    module: 笔记管理
-    status: unsupported
-    reason: "录音悬浮栏无AT-SPI节点"
-
-  - id: case_1634991
-    name: 录音按钮固定显示(102x)
-    module: 笔记管理
-    status: unsupported
-    reason: "纯视觉检查"
-
-  - id: case_1634977
-    name: 详情页右键全选复制等
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
+    name: 编辑区右键菜单_空白与未选中文本菜单
+    module: edit_img
+    status: active
+    covers: [1676219, 1676217, 1873449]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "TiptapWebView"}
+        do: click
+        description: 点击正文编辑区
+      - step_type: action
+        action: mouse_right_click
+        selector: {role: "pane", name: "TiptapWebView"}
+        description: 右键正文编辑区空白处
+      - step_type: assert
+        action: assert_element
+        selector: {role: "popup menu", name: "TextContextMenu"}
+        description: 验证文本右键菜单弹出
+      - step_type: assert
+        action: assert_not_exists
+        selector: {role: "menu item", name: "文本翻译"}
+        description: 验证菜单中不存在"文本翻译"
+      - step_type: action
+        action: keyboard_press
+        key: "escape"
+        description: 关闭右键菜单
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "TiptapWebView"}
+        do: click
+        description: 点击正文编辑区
+      - step_type: action
+        action: mouse_right_click
+        selector: {role: "pane", name: "TiptapWebView"}
+        description: 再次右键正文编辑区
+      - step_type: assert
+        action: assert_element
+        selector: {role: "popup menu", name: "TextContextMenu"}
+        description: 验证菜单再次弹出
+      - step_type: action
+        action: keyboard_press
+        key: "escape"
+        description: 关闭右键菜单
 
   - id: case_1634975
-    name: 详情页右键语音笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "语音笔记在QtWebEngine中"
+    name: 编辑区右键菜单_选中文本剪切复制删除
+    module: edit_img
+    status: active
+    covers: [1634975, 1634973, 1634971]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "TiptapWebView"}
+        do: click
+        description: 点击正文编辑区
+      - step_type: action
+        action: keyboard_hot_key
+        key: "ctrl+a"
+        description: 全选正文文本
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "pane", name: "TiptapWebView"}
+        items: ["复制"]
+        description: 右键编辑区并点击"复制"
+      - step_type: action
+        action: keyboard_hot_key
+        key: "ctrl+a"
+        description: 再次全选正文文本
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "pane", name: "TiptapWebView"}
+        items: ["剪切"]
+        description: 右键编辑区并点击"剪切"
+      - step_type: action
+        action: keyboard_type
+        text: "edit_menu_002"
+        description: 输入新文本
+      - step_type: action
+        action: keyboard_hot_key
+        key: "ctrl+a"
+        description: 全选新输入的文本
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "pane", name: "TiptapWebView"}
+        items: ["删除"]
+        description: 右键编辑区并点击"删除"
 
-  - id: case_1634973
-    name: 详情页右键全选剪切删除
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
+  - id: case_1676377
+    name: 图片插入图片_粘贴与焦点位置
+    module: edit_img
+    status: active
+    covers: [1676377, 1676231, 1676229]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "TiptapWebView"}
+        do: click
+        description: 点击正文编辑区
+      - step_type: action
+        action: keyboard_type
+        text: "image_before"
+        description: 输入图片前文本
+      - step_type: action
+        action: keyboard_hot_key
+        key: "ctrl+v"
+        description: 粘贴剪贴板中的测试图片
+      - step_type: action
+        action: keyboard_type
+        text: "image_after"
+        description: 输入图片后文本
+      - step_type: action
+        action: session_stop
+        description: 关闭应用
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 重启应用
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "NoteContentWebView"}
+        do: click
+        description: 打开当前文本笔记
 
-  - id: case_1634971
-    name: 详情页右键全选剪切等
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
+  - id: case_1676227
+    name: 图片右键菜单_复制剪切删除保存
+    module: edit_img
+    status: active
+    covers: [1676227, 1676225, 1676223, 1676221]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "TiptapWebView"}
+        do: click
+        description: 点击正文编辑区
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "popup menu", name: "PictureContextMenu"}
+        items: ["复制"]
+        description: 右键图片并点击"复制"
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "popup menu", name: "PictureContextMenu"}
+        items: ["剪切"]
+        description: 右键图片并点击"剪切"
+      - step_type: action
+        action: keyboard_hot_key
+        key: "ctrl+v"
+        description: 粘贴图片
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "popup menu", name: "PictureContextMenu"}
+        items: ["保存为"]
+        description: 右键图片并点击"保存为"
+      - step_type: action
+        action: keyboard_type
+        text: "/tmp/voice-note-image.png"
+        description: 在文件保存对话框输入路径
+      - step_type: action
+        action: keyboard_press
+        key: "return"
+        description: 点击保存按钮
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "popup menu", name: "PictureContextMenu"}
+        items: ["删除"]
+        description: 右键图片并点击"删除"
 
-  - id: case_1634969
-    name: 空白页右键菜单
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
+  - id: case_1676439
+    name: 语音转写转写文案_只读且可复制
+    module: edit_img
+    status: active
+    covers: [1676439, 1680885, 1679613]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "TiptapWebView"}
+        do: click
+        description: 点击语音转写文案区域
+      - step_type: action
+        action: keyboard_type
+        text: "edit_try_001"
+        description: 输入文本（转写文案只读，不应变更内容）
+      - step_type: assert
+        action: assert_element
+        selector: {role: "pane", name: "TiptapWebView"}
+        description: 验证转写文案区域存在且内容未变更
+      - step_type: action
+        action: dtk_context_menu
+        selector: {role: "popup menu", name: "VoiceContextMenu"}
+        items: ["复制"]
+        description: 右键语音转写文案区域并点击"复制"
+      - step_type: action
+        action: keyboard_press
+        key: "escape"
+        description: 关闭菜单
+      - step_type: action
+        action: keyboard_press
+        key: "escape"
+        description: 折叠转写文案
+      - step_type: action
+        action: element_action
+        selector: {role: "pane", name: "TiptapWebView"}
+        do: click
+        description: 点击展开转写文案
+- id: suite_play_voice_001_s1
+  name: 播放暂停与Space快捷键
+  module: play_voice
+  steps:
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+  - step_type: action
+    action: keyboard_press
+    key: space
+    selector:
+      name: TiptapWebView
+  - step_type: action
+    action: keyboard_press
+    key: space
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+- id: suite_play_voice_002_s1
+  name: 右键菜单_保存复制剪切删除
+  module: play_voice
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 复制
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 剪切
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 粘贴
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 保存为MP3
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/voice_item.mp3
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/voice_item.mp3
+- id: suite_play_voice_003_s1
+  name: 播放中_保存删除编辑
+  module: play_voice
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+  - step_type: action
+    action: keyboard_type
+    text: play_edit_001
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+- id: suite_play_voice_004_s1
+  name: 切换播放对象与右键其他记事本
+  module: play_voice
+  steps:
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 重命名
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+  - step_type: assert
+    action: assert_process_running
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+- id: suite_play_voice_005_s1
+  name: 语音笔记显示_节点存在
+  module: play_voice
+  steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceContextMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContextMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
 
-  - id: case_1634963
-    name: 输入文字中切换窗口
-    module: 笔记管理
-    status: unsupported
-    reason: "窗口按钮无AT-SPI名称"
+  - id: case_1676335
+    name: Ctrl与Shift选择和取消选择笔记
+    module: multi_sel
+    status: active
+    covers: [1676335, 1676329]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/multi_select_five_notes.py'
+        wait: 2.0
+        description: 创建5条笔记并Ctrl+click第三条、Shift+click第五条进行多选
+      - step_type: action
+        action: mouse_click
+        selector: {name: "MultipleChoicesView"}
+        description: 点击多选工具栏区域
+      - step_type: assert
+        action: assert_element
+        selector: {name: "MultipleChoicesView"}
+        description: 验证多选工具栏已显示
+      - step_type: assert
+        action: assert_element
+        selector: {name: "MoveButton"}
+        description: 验证移动按钮可见
+      - step_type: assert
+        action: assert_element
+        selector: {name: "DeleteButton"}
+        description: 验证删除按钮可见
 
-  - id: case_1634961
-    name: 调整窗口查看详情页
-    module: 笔记管理
-    status: unsupported
-    reason: "窗口按钮无AT-SPI名称"
+  - id: case_1676327
+    name: 详情页按钮_移动与删除
+    module: multi_sel
+    status: active
+    covers: [1676327, 1676319]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+        wait: 2.0
+        description: 多选两条笔记
+      - step_type: action
+        action: element_action
+        selector: {name: "MoveButton"}
+        do: click
+        wait: 1.0
+        description: 点击移动按钮
+      - step_type: action
+        action: mouse_click
+        selector: {name: "MoveNoteDialog", role: "dialog"}
+        description: 验证移动对话框已弹出
+      - step_type: action
+        action: element_action
+        selector: {name: "FolderList", role: "list"}
+        do: click
+        wait: 0.5
+        description: 选择目标记事本
+      - step_type: action
+        action: element_action
+        selector: {name: "MoveDialogOk", role: "button"}
+        do: click
+        wait: 1.0
+        description: 点击确定按钮完成移动
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+        wait: 2.0
+        description: 再次多选两条笔记
+      - step_type: action
+        action: element_action
+        selector: {name: "DeleteButton"}
+        do: click
+        wait: 1.0
+        description: 点击删除按钮
+      - step_type: action
+        action: element_action
+        selector: {name: "删除", role: "button"}
+        do: click
+        wait: 1.0
+        description: 点击删除确认按钮
+      - step_type: assert
+        action: assert_element
+        selector: {name: "CreateFolderButton", role: "button"}
+        description: 验证应用主界面存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "MultipleChoicesView"}
+        description: 验证多选工具栏已显示
 
-  - id: case_1634959
-    name: 编辑文字内容
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
+  - id: case_1676317
+    name: 右键菜单_批量保存与批量删除
+    module: multi_sel
+    status: active
+    covers: [1676317, 1676315, 1676311, 1676309]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+        wait: 2.0
+        description: 多选两条笔记
+      - step_type: action
+        action: dtk_context_menu
+        selector: {parent: "NoteItemListView", name: "文本", role: "list item"}
+        items: ["保存笔记", "保存为TXT"]
+        wait: 1.0
+        description: 右键多选笔记并点击保存为TXT
+      - step_type: action
+        action: keyboard_press
+        key: "escape"
+        wait: 0.5
+        description: 取消文件保存对话框
+      - step_type: action
+        action: dtk_context_menu
+        selector: {parent: "NoteItemListView", name: "文本", role: "list item"}
+        items: ["保存语音"]
+        wait: 1.0
+        description: 右键多选笔记并点击保存语音（多选模式下禁用）
+      - step_type: action
+        action: keyboard_press
+        key: "escape"
+        wait: 0.5
+        description: 关闭右键菜单
+      - step_type: action
+        action: dtk_context_menu
+        selector: {parent: "NoteItemListView", name: "文本", role: "list item"}
+        items: ["删除"]
+        wait: 1.0
+        description: 右键多选笔记并点击删除
+      - step_type: action
+        action: element_action
+        selector: {name: "CancelButton", role: "button"}
+        do: click
+        wait: 1.0
+        description: 点击取消按钮取消删除
+      - step_type: assert
+        action: assert_element
+        selector: {name: "CreateFolderButton", role: "button"}
+        description: 验证应用主界面存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "MultipleChoicesView"}
+        description: 验证多选工具栏仍显示，笔记未被删除
 
-  - id: case_1634957
-    name: 输入空格Tab
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
+- id: suite_base_flow_001_s1
+  name: 冒烟_基础功能_打开新建记事本新建笔记录音播放
+  module: base_flow
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: keyboard_hot_key
+    key: ctrl+r
+    selector:
+      name: MainShortcuts
+    wait: 1.0
+    note: 录音按钮位于TiptapWebView内部DOM，无AT-SPI accessible name，使用Ctrl+R快捷键触发录音
+  - step_type: action
+    action: element_action
+    selector:
+      name: StopButton
+    do: click
+    wait: 2.0
+    note: 点击完成按钮停止录音，生成语音笔记
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+    wait: 1.0
+    note: 点击语音笔记播放按钮（WebEngineView内部DOM元素.voicebtn.play，无AT-SPI accessible name）
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+- id: suite_base_flow_002_s1
+  name: 新建笔记_多入口创建
+  module: base_flow
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 新建笔记
+    wait: 1.0
+    note: 笔记列表右键菜单NoteContextMenu，菜单项NoteAddNew的accessible name为翻译后的"新建笔记"
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - NewNoteFromFolderMenuItem
+    wait: 1.0
+    note: 记事本列表右键菜单FolderItemContextMenu，NewNoteFromFolderMenuItem有显式Accessible.name
+  - step_type: action
+    action: keyboard_hot_key
+    key: ctrl+b
+    selector:
+      name: MainShortcuts
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: focus
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: Return
+    selector:
+      name: NewNoteButton
+    wait: 1.0
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NewNoteButton
+- id: suite_base_flow_003_s1
+  name: 压力_连续新建删除_记事本与文本笔记
+  module: base_flow
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+    note: 连续新建20个记事本（第1个）
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+    note: 连续删除20个记事本（第1个）- 右键菜单选择删除
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+    note: 确认删除（WarningButton文本为删除，无显式Accessible.name）
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+    note: 连续新建20个文本笔记（第1个）
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.3
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+    note: 连续删除20个文本笔记（第1个）- 右键菜单选择删除
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+    note: 确认删除（WarningButton文本为删除）
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: NoteItemListView
+    items:
+    - 删除
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: button
+    do: click
+    wait: 0.5
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NewNoteButton
+- id: suite_base_flow_004_s1
+  name: 长列表_记事本与笔记可滚动浏览
+  module: base_flow
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderListView
+    do: focus
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: Page_Down
+    selector:
+      name: FolderListView
+    wait: 0.5
+    note: 滚动记事本列表到底部
+  - step_type: action
+    action: keyboard_press
+    key: End
+    selector:
+      name: FolderListView
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: Page_Up
+    selector:
+      name: FolderListView
+    wait: 0.5
+    note: 滚动记事本列表到顶部
+  - step_type: action
+    action: keyboard_press
+    key: Home
+    selector:
+      name: FolderListView
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: NoteItemListView
+    do: focus
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: Page_Down
+    selector:
+      name: NoteItemListView
+    wait: 0.5
+    note: 滚动笔记列表到底部
+  - step_type: action
+    action: keyboard_press
+    key: End
+    selector:
+      name: NoteItemListView
+    wait: 0.5
+  - step_type: action
+    action: keyboard_press
+    key: Page_Up
+    selector:
+      name: NoteItemListView
+    wait: 0.5
+    note: 滚动笔记列表到顶部
+  - step_type: action
+    action: keyboard_press
+    key: Home
+    selector:
+      name: NoteItemListView
+    wait: 0.5
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListScrollBar
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteListScrollBar
+  - id: case_1676375
+    name: 关键字搜索_匹配记事本与空结果
+    module: search_ops
+    status: active
+    covers: [1676375, 1676373, 1635179]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {name: "NewNoteButton"}
+        do: click
+        wait: 0.5
+        description: 新建笔记
+      - step_type: action
+        action: mouse_click
+        selector: {name: "NoteContentWebView"}
+        wait: 0.3
+        description: 点击编辑区获取焦点
+      - step_type: action
+        action: keyboard_type
+        text: "search_book_001"
+        wait: 0.5
+        description: 输入笔记内容
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/focus_search_and_query.py search_book_001'
+        wait: 1.0
+        description: 搜索匹配关键字search_book_001
+      - step_type: action
+        action: keyboard_press
+        key: "Escape"
+        wait: 0.5
+        description: 退出搜索
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/focus_search_and_query.py search_none_001'
+        wait: 1.0
+        description: 搜索不匹配关键字search_none_001
+      - step_type: action
+        action: keyboard_press
+        key: "Escape"
+        wait: 0.5
+        description: 退出搜索
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/focus_search_and_query.py "~!@#￥%……&*()"'
+        wait: 1.0
+        description: 搜索特殊字符不崩溃
+      - step_type: action
+        action: keyboard_press
+        key: "Escape"
+        wait: 0.5
+        description: 退出搜索
+      - step_type: assert
+        action: assert_element
+        selector: {name: "VoiceNoteMainWindow"}
+        description: 验证主窗口存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "NoteItemListView"}
+        description: 验证笔记列表存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "NoteContentWebView"}
+        description: 验证编辑区存在
 
-  - id: case_1634955
-    name: 输入回车
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
+  - id: case_1635203
+    name: 搜索结果_删除匹配项
+    module: search_ops
+    status: active
+    covers: [1635203, 1635191]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {name: "NewNoteButton"}
+        do: click
+        wait: 0.5
+        description: 新建笔记
+      - step_type: action
+        action: mouse_click
+        selector: {name: "NoteContentWebView"}
+        wait: 0.3
+        description: 点击编辑区获取焦点
+      - step_type: action
+        action: keyboard_type
+        text: "search_delete_001"
+        wait: 0.5
+        description: 输入笔记内容
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/focus_search_and_query.py search_delete_001'
+        wait: 1.0
+        description: 搜索关键字search_delete_001
+      - step_type: action
+        action: dtk_context_menu
+        selector: {parent: "NoteItemListView", name: "文本", role: "list item"}
+        items: ["删除"]
+        wait: 1.0
+        description: 右键搜索结果第一条笔记并点击删除
+      - step_type: action
+        action: element_action
+        selector: {name: "删除", role: "button"}
+        do: click
+        wait: 1.0
+        description: 点击删除确认按钮
+      - step_type: action
+        action: dtk_context_menu
+        selector: {parent: "NoteItemListView", name: "文本", role: "list item"}
+        items: ["删除"]
+        wait: 1.0
+        description: 右键搜索结果第一条笔记并点击删除
+      - step_type: action
+        action: element_action
+        selector: {name: "删除", role: "button"}
+        do: click
+        wait: 1.0
+        description: 点击删除确认按钮删除最后一条
+      - step_type: assert
+        action: assert_element
+        selector: {name: "VoiceNoteMainWindow"}
+        description: 验证主窗口存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "NoteItemListView"}
+        description: 验证笔记列表存在
 
-  - id: case_1634953
-    name: 输入混合字符
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
+  - id: case_1635195
+    name: 搜索结果_保存TXT和保存语音
+    module: search_ops
+    status: active
+    covers: [1635195, 1635193]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {name: "NewNoteButton"}
+        do: click
+        wait: 0.5
+        description: 新建笔记
+      - step_type: action
+        action: mouse_click
+        selector: {name: "NoteContentWebView"}
+        wait: 0.3
+        description: 点击编辑区获取焦点
+      - step_type: action
+        action: keyboard_type
+        text: "search_save_001"
+        wait: 0.5
+        description: 输入笔记内容
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/focus_search_and_query.py search_save_001'
+        wait: 1.0
+        description: 搜索关键字search_save_001
+      - step_type: action
+        action: dtk_context_menu
+        selector: {parent: "NoteItemListView", name: "文本", role: "list item"}
+        items: ["保存笔记", "保存为TXT"]
+        wait: 1.0
+        description: 右键搜索结果笔记并点击保存为TXT
+      - step_type: action
+        action: file_dialog_select
+        path: /tmp/search_result_note.txt
+        description: 在文件保存对话框输入路径
+      - step_type: action
+        action: dtk_context_menu
+        selector: {parent: "NoteItemListView", name: "文本", role: "list item"}
+        items: ["保存语音"]
+        wait: 1.0
+        description: 右键搜索结果笔记并点击保存语音
+      - step_type: action
+        action: file_dialog_select
+        path: /tmp/search_result_voice.mp3
+        description: 在文件保存对话框输入路径
+      - step_type: assert
+        action: assert_element
+        selector: {name: "VoiceNoteMainWindow"}
+        description: 验证主窗口存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "NoteContentWebView"}
+        description: 验证编辑区存在
+      - step_type: assert
+        action: assert_file_exists
+        path: /tmp/search_result_note.txt
+        description: 验证TXT文件已生成
+      - step_type: assert
+        action: assert_file_exists
+        path: /tmp/search_result_voice.mp3
+        description: 验证语音文件已生成
 
-  - id: case_1634949
-    name: 修改保存路径保存语音
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1634947
-    name: 右键保存语音(覆盖)
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1634945
-    name: 右键保存语音
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1634939
-    name: 更改保存路径保存TXT
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1634933
-    name: 默认保存至桌面
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1634931
-    name: 文本为空保存为TXT
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1634918
-    name: 超过64位字符
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1634909
-    name: 笔记列表时间显示
-    module: 笔记管理
-    status: unsupported
-    reason: "纯视觉检查"
-
-  - id: case_1634907
-    name: 切换笔记详情页同步
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1634905
-    name: 重启应用默认选中第一条
-    module: 笔记管理
-    status: unsupported
-    reason: "需重启应用，noteListItem无AT-SPI名称"
-
-  - id: case_1634903
-    name: 切换记事本默认选中第一条
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1634901
-    name: 新建笔记超过一页
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
-
-  - id: case_1634899
-    name: 删除语音记录笔记排序
-    module: 笔记管理
-    status: unsupported
-    reason: "语音笔记在QtWebEngine中"
-
-  - id: case_1634897
-    name: 录音保存笔记排序
-    module: 笔记管理
-    status: unsupported
-    reason: "recordBtn无AT-SPI名称"
-
-  - id: case_1634895
-    name: 编辑文字笔记排序
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
-
-  - id: case_1634893
-    name: 新建笔记排序
-    module: 笔记管理
-    status: unsupported
-    reason: "newNoteBtn无AT-SPI名称"
-
-  - id: case_1634867
-    name: 笔记超过100笔
-    module: 笔记管理
-    status: unsupported
-    reason: "纯视觉/压力测试，noteListItem无AT-SPI名称"
-
-  - id: case_1634865
-    name: 记事本列表超出一屏
-    module: 记事本管理
-    status: unsupported
-    reason: "QML列表滚动无法AT-SPI执行"
-
-  - id: case_1634861
-    name: 左侧头像(102x)
-    module: 记事本管理
-    status: unsupported
-    reason: "头像为QML渲染元素，无AT-SPI节点"
-
-  - id: case_1634719
-    name: 移动记事本过程中快捷键
-    module: 记事本管理
-    status: unsupported
-    reason: "拖拽操作无法通过AT-SPI执行"
-
-  - id: case_1624807
-    name: 删除语音笔记
-    module: 笔记管理
-    status: unsupported
-    reason: "语音笔记在QtWebEngine中"
-
-  - id: case_1624639
-    name: 全选切换笔记取消全选
-    module: 笔记管理
-    status: unsupported
-    reason: "editorWebEngine无AT-SPI名称"
-
-  - id: case_1670885
-    name: 语音转文字编辑
-    module: 笔记管理
-    status: unsupported
-    reason: "转写文案在QtWebEngine中"
-
-  - id: case_1634946
-    name: 右键保存语音(无覆盖)
-    module: 笔记管理
-    status: unsupported
-    reason: "noteListItem无AT-SPI名称"
+  - id: case_1635185
+    name: 搜索结果_不显示录音入口
+    module: search_ops
+    status: active
+    covers: [1635185]
+    steps:
+      - step_type: action
+        action: session_start
+        command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+        wait: 6.0
+        description: 启动应用
+      - step_type: action
+        action: element_action
+        selector: {name: "NewNoteButton"}
+        do: click
+        wait: 0.5
+        description: 新建笔记
+      - step_type: action
+        action: mouse_click
+        selector: {name: "NoteContentWebView"}
+        wait: 0.3
+        description: 点击编辑区获取焦点
+      - step_type: action
+        action: keyboard_type
+        text: "search_no_record_001"
+        wait: 0.5
+        description: 输入笔记内容
+      - step_type: action
+        action: session_start
+        command: bash -lc './tests/at/scripts/focus_search_and_query.py search_no_record_001'
+        wait: 1.0
+        description: 搜索关键字search_no_record_001
+      - step_type: action
+        action: mouse_click
+        selector: {name: "NoteContentWebView"}
+        wait: 0.3
+        description: 点击搜索结果页内容区域
+      - step_type: assert
+        action: assert_element
+        selector: {name: "VoiceNoteMainWindow"}
+        description: 验证主窗口存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "NoteItemListView"}
+        description: 验证笔记列表存在
+      - step_type: assert
+        action: assert_element
+        selector: {name: "NoteContentWebView"}
+        description: 验证编辑区存在

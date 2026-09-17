@@ -1,0 +1,77 @@
+name: edit_img_case_1676227_s1_suite
+app: deepin-voice-note
+module: edit_img
+setup:
+- action: session_start
+  command: bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: case_1676227_s1
+  name: 图片右键菜单_复制剪切删除保存
+  description: ''
+  status: active
+  covers:
+  - 1676227
+  - 1676225
+  - 1676223
+  - 1676221
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+    wait: 6.0
+    description: 启动应用
+  - step_type: action
+    action: element_action
+    selector:
+      role: pane
+      name: TiptapWebView
+    do: click
+    description: 点击正文编辑区
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      role: popup menu
+      name: PictureContextMenu
+    items:
+    - 复制
+    description: 右键图片并点击"复制"
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      role: popup menu
+      name: PictureContextMenu
+    items:
+    - 剪切
+    description: 右键图片并点击"剪切"
+  - step_type: action
+    action: keyboard_hot_key
+    key: ctrl+v
+    description: 粘贴图片
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      role: popup menu
+      name: PictureContextMenu
+    items:
+    - 保存为
+    description: 右键图片并点击"保存为"
+  - step_type: action
+    action: keyboard_type
+    text: /tmp/voice-note-image.png
+    description: 在文件保存对话框输入路径
+  - step_type: action
+    action: keyboard_press
+    key: return
+    description: 点击保存按钮
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      role: popup menu
+      name: PictureContextMenu
+    items:
+    - 删除
+    description: 右键图片并点击"删除"
+  assert_steps: []

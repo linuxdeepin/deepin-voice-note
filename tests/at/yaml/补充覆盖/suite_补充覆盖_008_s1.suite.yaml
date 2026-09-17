@@ -1,0 +1,44 @@
+name: suite_补充覆盖_008_s1_suite
+app: deepin-voice-note
+module: 补充覆盖
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_补充覆盖_008_s1
+  name: 移动笔记弹窗文件夹列表控件验证
+  description: 来源xlsx用例1676421「V25 语音记事本-移动笔记」；打开移动笔记弹窗并验证目标记事本列表
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+      role: button
+    do: click
+    wait: 0.8
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: 记事本1
+      role: label
+    wait: 0.8
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: 文本
+      role: list item
+    items:
+    - 移动
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderList
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CancelButton

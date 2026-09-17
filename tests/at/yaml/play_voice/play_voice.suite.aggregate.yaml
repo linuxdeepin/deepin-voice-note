@@ -1,0 +1,248 @@
+name: play_voice_suite
+app: deepin-voice-note
+module: play_voice
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_play_voice_001_s1
+  name: 播放暂停与Space快捷键
+  description: 覆盖1676407、1676291、1676289、1635057；语音笔记播放/暂停按钮切换及Space快捷键切换播放暂停状态
+  steps:
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+    note: 点击语音笔记播放按钮（WebEngineView内部DOM元素.voicebtn.play，无AT-SPI accessible name）
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+    note: 点击暂停按钮（WebEngineView内部DOM元素.voicebtn.pause，无AT-SPI accessible name）
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+    note: 再次点击播放按钮
+  - step_type: action
+    action: keyboard_press
+    key: space
+    selector:
+      name: TiptapWebView
+  - step_type: action
+    action: keyboard_press
+    key: space
+    selector:
+      name: TiptapWebView
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  skip: >-
+    播放/暂停按钮是 WebEngineView 内部 DOM 元素（.voicebtn.play / .voicebtn.pause），
+    无 AT-SPI accessible name，无法通过 selector 精确点击。Space 快捷键由
+    WebEngineView 内部 JS 处理（src/web/index.js keyCode==32），可通过
+    keyboard_press:space 在 TiptapWebView 上触发。前置条件需要语音笔记存在，
+    需音频输入设备。
+- id: suite_play_voice_002_s1
+  name: 右键菜单_保存复制剪切删除
+  description: 覆盖1676287、1676285、1676279、1676277、1635101、1624807；语音笔记右键菜单复制、剪切、粘贴、保存为MP3和删除操作
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 复制
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 剪切
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 粘贴
+    wait: 1.0
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 保存为MP3
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/voice_item.mp3
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 删除
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/voice_item.mp3
+  skip: >-
+    语音笔记右键菜单（VoiceContextMenu）通过 dtk_context_menu 在 TiptapWebView 上触发，
+    菜单项包括复制、剪切、粘贴、保存为MP3、删除。前置条件需要语音笔记存在，需音频输入设备。
+- id: suite_play_voice_003_s1
+  name: 播放中_保存删除编辑
+  description: 覆盖1635089、1635087、1635083；播放过程中保存语音、取消删除语音笔记、编辑当前文本笔记
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    note: 取消文件保存对话框
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: TiptapWebView
+    items:
+    - 删除
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+    do: click
+    note: 取消删除确认对话框
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+    note: 点击正文编辑区
+  - step_type: action
+    action: keyboard_type
+    text: play_edit_001
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  skip: >-
+    右键当前文本笔记通过 NoteContextMenu（dtk_context_menu on NoteItemListView list item）
+    触发"保存语音"菜单项；右键语音笔记通过 VoiceContextMenu（dtk_context_menu on
+    TiptapWebView）触发"删除"菜单项。删除确认对话框取消按钮通过 CancelButton selector 点击。
+    前置条件需要语音笔记存在且正在播放，需音频输入设备。
+- id: suite_play_voice_004_s1
+  name: 切换播放对象与右键其他记事本
+  description: 覆盖1635081、1635071；播放过程中切换播放对象，右键其他记事本验证菜单状态
+  steps:
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: TiptapWebView
+    note: 点击另一条语音笔记播放按钮（WebEngineView内部DOM元素，无AT-SPI accessible name）
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 重命名
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    note: 关闭右键菜单
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  skip: >-
+    点击另一条语音笔记播放按钮是 WebEngineView 内部 DOM 元素（.voicebtn.play），
+    无 AT-SPI accessible name，无法精确点击。右键其他记事本通过 NoteContextMenu
+    （dtk_context_menu on NoteItemListView list item）触发。前置条件需要多条语音笔记
+    和多个记事本，需音频输入设备。
+- id: suite_play_voice_005_s1
+  name: 语音笔记显示_节点存在
+  description: 覆盖1676293、1635053；验证语音笔记条目、播放按钮入口和右键菜单入口均可被AT-SPI定位
+  steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceContextMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContextMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceContextMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContextMenu
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  note: >-
+    语音笔记播放按钮是 WebEngineView 内部 DOM 元素（.voicebtn.play），无 AT-SPI
+    accessible name，无法通过 assert_element 定位。TiptapWebView 是语音笔记条目的
+    AT-SPI 容器节点，VoiceContextMenu 是语音右键菜单入口（WebEngineView.qml:1036），
+    NoteContextMenu 是笔记右键菜单入口（ItemListView.qml:626）。

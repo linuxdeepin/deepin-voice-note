@@ -1,0 +1,45 @@
+name: 语音记事本_suite
+app: deepin-voice-note
+module: 语音记事本
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+suites:
+- id: suite_语音记事本_001_s1
+  name: 语音记事本基本功能验证-打开新建记事本新建笔记
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: CreateFolderButton
+    do: click
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: InitialInterface
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+teardown:
+- action: session_stop

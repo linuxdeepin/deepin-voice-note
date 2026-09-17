@@ -1,0 +1,46 @@
+name: suite_场景补充_009_s1_suite
+app: deepin-voice-note
+module: 场景补充
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_场景补充_009_s1
+  name: 主界面列表收起展开与窗口快捷键稳定性
+  description: 覆盖xlsx列表收起展开、最大化/默认窗口切换、最小化类窗口操作场景；验证操作后主界面仍可用
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: TwoColumnModeButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: element_action
+    selector:
+      name: TwoColumnModeButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    key: Alt+F10
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    key: Alt+F10
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    key: Alt+F9
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow

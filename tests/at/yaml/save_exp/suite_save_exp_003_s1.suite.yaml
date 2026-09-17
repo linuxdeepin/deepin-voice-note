@@ -1,0 +1,63 @@
+name: suite_save_exp_003_s1_suite
+app: deepin-voice-note
+module: save_exp
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_save_exp_003_s1
+  name: 多选笔记_保存TXT保存HTML保存语音
+  description: 覆盖1676325、1676323、1676321、1676313；多选状态下通过工具栏保存笔记/保存语音按钮分别保存TXT、HTML和语音文件
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: SaveNoteButton
+    do: click
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/multi_note.txt
+  - step_type: action
+    action: element_action
+    selector:
+      name: SaveNoteButton
+    do: click
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/multi_note.html
+  - step_type: action
+    action: element_action
+    selector:
+      name: SaveVoiceButton
+    do: click
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/multi_voice.mp3
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/multi_note.txt
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/multi_note.html
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/multi_voice.mp3
+  skip: requires multi-select state with voice notes; select_two_notes_for_multiselect.py
+    needs audio device for voice note creation

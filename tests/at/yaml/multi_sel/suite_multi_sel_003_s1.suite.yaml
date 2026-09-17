@@ -1,0 +1,46 @@
+name: suite_multi_sel_003_s1_suite
+app: deepin-voice-note
+module: multi_sel
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_multi_sel_003_s1
+  name: 右键菜单_批量保存与批量删除
+  description: 覆盖1676317、1676315、1676311、1676309；多选笔记后打开右键批量菜单，触发删除入口并取消删除
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/multi_select_five_notes.py'
+    wait: 2.0
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/open_note_context_menu.py --index 0 --expect 删除'
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: 删除
+      role: menu item
+    do: click
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: CancelButton
+      role: button
+    do: click
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView

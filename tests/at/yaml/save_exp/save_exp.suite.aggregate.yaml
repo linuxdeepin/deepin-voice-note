@@ -1,0 +1,209 @@
+name: save_exp_suite
+app: deepin-voice-note
+module: save_exp
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_save_exp_001_s1
+  name: 详情页_保存为TXT与HTML
+  description: 覆盖1676345、1676347、1634939、1634933；右键笔记通过保存笔记子菜单保存为TXT和HTML格式，验证文件生成
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+  - step_type: action
+    action: keyboard_type
+    text: 详情页保存测试内容
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为TXT
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/detail_note.txt
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为HTML
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/detail_note.html
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/detail_note.txt
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/detail_note.html
+  skip: requires nested QML context-menu selection (保存笔记 -> 保存为TXT/HTML); current YouQu
+    menu navigator times out on submenu navigation
+- id: suite_save_exp_002_s1
+  name: 语音保存_当前笔记全部语音
+  description: 覆盖1676343、1634949、1634947、1634945；右键笔记通过保存语音菜单保存语音文件，重复保存覆盖无异常
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+  - step_type: action
+    action: keyboard_type
+    text: 语音保存测试内容
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/current_note_voice.mp3
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存语音
+    wait: 1.0
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/current_note_voice.mp3
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/current_note_voice.mp3
+  skip: requires audio input device for voice note creation; current environment reports
+    no audio device available
+- id: suite_save_exp_003_s1
+  name: 多选笔记_保存TXT保存HTML保存语音
+  description: 覆盖1676325、1676323、1676321、1676313；多选状态下通过工具栏保存笔记/保存语音按钮分别保存TXT、HTML和语音文件
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/select_two_notes_for_multiselect.py'
+    wait: 1.0
+  - step_type: action
+    action: element_action
+    selector:
+      name: SaveNoteButton
+    do: click
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/multi_note.txt
+  - step_type: action
+    action: element_action
+    selector:
+      name: SaveNoteButton
+    do: click
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/multi_note.html
+  - step_type: action
+    action: element_action
+    selector:
+      name: SaveVoiceButton
+    do: click
+  - step_type: action
+    action: file_dialog_select
+    path: /tmp/multi_voice.mp3
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/multi_note.txt
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/multi_note.html
+  - step_type: assert
+    action: assert_file_exists
+    path: /tmp/multi_voice.mp3
+  skip: requires multi-select state with voice notes; select_two_notes_for_multiselect.py
+    needs audio device for voice note creation
+- id: suite_save_exp_004_s1
+  name: 空笔记_保存入口禁用
+  description: 覆盖1634931；空笔记正文时右键保存为TXT菜单项应禁用，不弹出文件保存对话框
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为TXT
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  skip: requires verifying disabled state of transient QML submenu item (保存为TXT);
+    current YouQu framework cannot assert disabled state on dynamic context menu items

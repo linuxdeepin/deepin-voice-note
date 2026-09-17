@@ -1,0 +1,41 @@
+name: suite_save_exp_004_s1_suite
+app: deepin-voice-note
+module: save_exp
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_save_exp_004_s1
+  name: 空笔记_保存入口禁用
+  description: 覆盖1634931；空笔记正文时右键保存为TXT菜单项应禁用，不弹出文件保存对话框
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 保存笔记
+    - 保存为TXT
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  skip: requires verifying disabled state of transient QML submenu item (保存为TXT);
+    current YouQu framework cannot assert disabled state on dynamic context menu items

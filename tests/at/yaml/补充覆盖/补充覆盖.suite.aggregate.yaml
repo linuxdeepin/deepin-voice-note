@@ -1,0 +1,95 @@
+name: 补充覆盖_suite
+app: deepin-voice-note
+module: 补充覆盖
+setup:
+- action: session_start
+  command: deepin-voice-note
+  wait: 3.0
+suites:
+- id: suite_补充覆盖_001_s1
+  name: 文件夹右键菜单项验证
+  description: 打开文件夹列表右键菜单，验证删除和新建笔记菜单项存在
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: FolderListView
+    do: focus
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: FolderListView
+    items:
+    - DeleteFolderMenuItem
+    - NewNoteFromFolderMenuItem
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: DeleteFolderMenuItem
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NewNoteFromFolderMenuItem
+
+- id: suite_补充覆盖_002_s1
+  name: 主窗口持久控件验证
+  description: 验证侧边栏背景、工具按钮及其背景控件存在
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: VoiceNoteMainWindow
+    do: focus
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: SidebarBlurBackground
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VNoteToolButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VNoteToolButtonBackground
+
+- id: suite_补充覆盖_003_s1
+  name: 笔记详情页WebView区域验证
+  description: 新建笔记后验证WebView及其标题栏控件存在
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 2.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: WebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: WebViewTitleBar
+
+- id: suite_补充覆盖_004_s1
+  name: 消息对话框加载器验证
+  description: 验证主窗口消息对话框加载器和WebView消息对话框加载器存在
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: VoiceNoteMainWindow
+    do: focus
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MessageDialogLoader
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: WebViewMessageDialog

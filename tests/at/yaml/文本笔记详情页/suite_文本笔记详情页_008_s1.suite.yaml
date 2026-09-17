@@ -1,0 +1,64 @@
+name: suite_文本笔记详情页_008_s1_suite
+app: deepin-voice-note
+module: 文本笔记详情页
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_文本笔记详情页_008_s1
+  name: 点击文本区域编辑文字增删剪切复制粘贴清空
+  description: ''
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+  - step_type: action
+    action: keyboard_type
+    text: 编辑测试文字
+  - step_type: action
+    action: keyboard_press
+    key: BackSpace
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+X
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+V
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+C
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+V
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+A
+  - step_type: action
+    action: keyboard_press
+    key: Delete
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView

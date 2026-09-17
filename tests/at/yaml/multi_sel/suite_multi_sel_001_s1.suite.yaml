@@ -1,0 +1,31 @@
+name: suite_multi_sel_001_s1_suite
+app: deepin-voice-note
+module: multi_sel
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_multi_sel_001_s1
+  name: Ctrl与Shift选择和取消选择笔记
+  description: 覆盖1676335、1676329；创建5条文本笔记后通过Ctrl+click追加选择第三条、Shift+click范围选择第五条，验证多选状态
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/multi_select_five_notes.py'
+    wait: 2.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MoveButton
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: DeleteButton

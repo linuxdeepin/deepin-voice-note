@@ -1,0 +1,27 @@
+name: suite_voice_ai_004_s1_suite
+app: deepin-voice-note
+module: voice_ai
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_voice_ai_004_s1
+  name: 语音转文字_转写文案折叠展开
+  description: 覆盖xlsx用例1679613「转写文案折叠展开」；转写文案的折叠/展开按钮为WebEngineView内部DOM元素（.nBtn class），无AT-SPI accessible name，无法通过AT-SPI定位器操作
+  status: unsupported
+  reason: 转写文案折叠/展开按钮是WebEngineView内部DOM元素（.nBtn CSS class），无Accessible.name或objectName，AT-SPI无法定位；需通过JS注入或坐标点击方式实现，超出AT-SPI测试框架能力范围
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: TiptapWebView
+    do: focus
+    wait: 0.5
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView

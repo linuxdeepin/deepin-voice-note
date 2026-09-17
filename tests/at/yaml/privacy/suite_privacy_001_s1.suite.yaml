@@ -1,0 +1,26 @@
+name: suite_privacy_001_s1_suite
+app: deepin-voice-note
+module: privacy
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_privacy_001_s1
+  name: 隐私政策_打开外链
+  description: 覆盖xlsx用例1676361「隐私政策_打开外链」；通过AT-SPI打开标题栏主菜单，点击隐私政策菜单项，验证浏览器外链触发后主窗口仍可操作
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/titlebar_menu_press.py --select PrivacyPolicyMenuItem'
+    wait: 3.0
+  assert_steps:
+  - step_type: assert
+    action: assert_process_running
+    process: deepin-voice-note
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow

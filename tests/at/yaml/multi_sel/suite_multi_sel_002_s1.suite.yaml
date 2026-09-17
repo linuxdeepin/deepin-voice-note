@@ -1,0 +1,33 @@
+name: suite_multi_sel_002_s1_suite
+app: deepin-voice-note
+module: multi_sel
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_multi_sel_002_s1
+  name: 详情页按钮_移动与删除
+  description: 覆盖1676327、1676319；多选笔记后验证详情页移动按钮可见，确认多选工具条状态可用
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc './tests/at/scripts/multi_select_five_notes.py'
+    wait: 2.0
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MoveButton
+      role: button
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: MultipleChoicesView

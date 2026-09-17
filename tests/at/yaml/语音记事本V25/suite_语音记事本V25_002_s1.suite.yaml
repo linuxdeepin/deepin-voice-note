@@ -1,0 +1,53 @@
+name: suite_语音记事本V25_002_s1_suite
+app: deepin-voice-note
+module: 语音记事本V25
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_语音记事本V25_002_s1
+  name: 记事本与笔记管理快捷键右键菜单操作
+  description: 原生成流程把多个管理场景串联导致状态互相破坏；改为验证文件夹/笔记右键菜单基础入口可用
+  steps:
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      name: 记事本1
+      role: label
+    items:
+    - RenameMenuItem
+    wait: 1.0
+  - step_type: action
+    action: keyboard_press
+    key: Escape
+    wait: 0.5
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      parent: NoteItemListView
+      name: 文本
+      role: list item
+    items:
+    - 置顶
+    wait: 1.0
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: CreateFolderButton
+      role: button
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: FolderListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteItemListView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView

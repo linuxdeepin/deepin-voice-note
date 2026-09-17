@@ -1,0 +1,98 @@
+name: suite_场景补充_002_s1_suite
+app: deepin-voice-note
+module: 场景补充
+setup:
+- action: session_start
+  command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: suite_场景补充_002_s1
+  name: Tiptap富文本常用快捷键格式化
+  description: 覆盖xlsx富文本工具场景：加粗、斜体、下划线、删除线、有序/无序列表等键盘入口，验证编辑器替换后快捷键链路不退化
+  steps:
+  - step_type: action
+    action: element_action
+    selector:
+      name: NewNoteButton
+    do: click
+    wait: 0.5
+  - step_type: action
+    action: mouse_click
+    selector:
+      name: NoteContentWebView
+    wait: 0.3
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+B
+    wait: 0.2
+  - step_type: action
+    action: keyboard_type
+    text: 加粗文本
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+B
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+I
+    wait: 0.2
+  - step_type: action
+    action: keyboard_type
+    text: 斜体文本
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+I
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+U
+    wait: 0.2
+  - step_type: action
+    action: keyboard_type
+    text: 下划线文本
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+U
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Shift+X
+    wait: 0.2
+  - step_type: action
+    action: keyboard_type
+    text: 删除线文本
+    wait: 0.2
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Shift+X
+    wait: 0.2
+  - step_type: action
+    action: keyboard_type
+    text: "\n1. 有序列表文本\n- 无序列表文本"
+    wait: 0.5
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Z
+    wait: 0.3
+  - step_type: action
+    action: keyboard_hot_key
+    key: Ctrl+Shift+Z
+    wait: 0.3
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: VoiceNoteMainWindow
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: NoteContentWebView
+  - step_type: assert
+    action: assert_element
+    selector:
+      name: TiptapWebView

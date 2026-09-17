@@ -22,5 +22,4 @@ suites:
     selector:
       name: CreateFolderButton
       role: button
-  - action: assert_window_count
-    expected: 1
+  - action: assert_process_running

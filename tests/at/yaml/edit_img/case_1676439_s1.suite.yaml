@@ -1,0 +1,66 @@
+name: edit_img(#edit_img)_case_1676439_s1_suite
+app: deepin-voice-note
+module: edit_img
+setup:
+- action: session_start
+  command: bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; SINK=$(pactl get-default-sink 2>/dev/null || true); if [ -z "$SINK" ] || [ "$SINK" = null-sink ]; then SINK=$(pactl list short sinks | awk
+    '\''$2 != "null-sink" {print $2; exit}'\''); fi; if [ -n "$SINK" ]; then pactl set-default-sink "$SINK" 2>/dev/null || true; pactl set-default-source "$SINK.monitor" 2>/dev/null || true; fi; exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: case_1676439_s1
+  name: 语音转写转写文案_只读且可复制
+  description: ''
+  status: active
+  covers:
+  - 1676439
+  - 1680885
+  - 1679613
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+    wait: 6.0
+    description: 启动应用
+  - step_type: action
+    action: element_action
+    selector:
+      role: pane
+      name: TiptapWebView
+    do: click
+    description: 点击语音转写文案区域
+  - step_type: action
+    action: keyboard_type
+    text: edit_try_001
+    description: 输入文本（转写文案只读，不应变更内容）
+  - step_type: action
+    action: dtk_context_menu
+    selector:
+      role: popup menu
+      name: VoiceContextMenu
+    items:
+    - 复制
+    description: 右键语音转写文案区域并点击"复制"
+  - step_type: action
+    action: keyboard_press
+    key: escape
+    description: 关闭菜单
+  - step_type: action
+    action: keyboard_press
+    key: escape
+    description: 折叠转写文案
+  - step_type: action
+    action: element_action
+    selector:
+      role: pane
+      name: TiptapWebView
+    do: click
+    description: 点击展开转写文案
+  assert_steps:
+  - step_type: assert
+    action: assert_element
+    selector:
+      role: pane
+      name: TiptapWebView
+    description: 验证转写文案区域存在且内容未变更

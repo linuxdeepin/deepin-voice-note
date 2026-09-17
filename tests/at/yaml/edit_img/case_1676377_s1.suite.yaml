@@ -1,0 +1,59 @@
+name: edit_img_case_1676377_s1_suite
+app: deepin-voice-note
+module: edit_img
+setup:
+- action: session_start
+  command: bash -lc 'export QTWEBENGINE_REMOTE_DEBUGGING=9222; exec ./tests/at/setup_voice_note_at.sh'
+  wait: 6.0
+teardown:
+- action: session_stop
+suites:
+- id: case_1676377_s1
+  name: 图片插入图片_粘贴与焦点位置
+  description: ''
+  status: active
+  covers:
+  - 1676377
+  - 1676231
+  - 1676229
+  steps:
+  - step_type: action
+    action: session_start
+    command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+    wait: 6.0
+    description: 启动应用
+  - step_type: action
+    action: element_action
+    selector:
+      role: pane
+      name: TiptapWebView
+    do: click
+    description: 点击正文编辑区
+  - step_type: action
+    action: keyboard_type
+    text: image_before
+    description: 输入图片前文本
+  - step_type: action
+    action: keyboard_hot_key
+    key: ctrl+v
+    description: 粘贴剪贴板中的测试图片
+  - step_type: action
+    action: keyboard_type
+    text: image_after
+    description: 输入图片后文本
+  - step_type: action
+    action: session_stop
+    description: 关闭应用
+  - step_type: action
+    action: session_start
+    command: bash -lc 'exec ./tests/at/setup_voice_note_at.sh'
+    wait: 6.0
+    description: 重启应用
+  - step_type: action
+    action: element_action
+    selector:
+      role: pane
+      name: NoteContentWebView
+    do: click
+    description: 打开当前文本笔记
+  assert_steps: []
