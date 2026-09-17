@@ -214,7 +214,24 @@ let savedTitle = ''
 let titleSyncing = false
 
 function normalizeNoteTitle(value) {
-  return String(value ?? '').trim().slice(0, 24)
+  return String(value ?? '').replace(/[\r\n]+/g, ' ').trim().slice(0, 24)
+}
+
+function sanitizeTitleInputValue(value) {
+  return String(value ?? '').replace(/[\r\n]+/g, ' ').slice(0, 24)
+}
+
+function updateTitleLayout() {
+  if (!titleInput) return
+  titleInput.style.height = 'auto'
+  const titleInputHeight = Math.max(34, titleInput.scrollHeight || 0)
+  titleInput.style.height = `${titleInputHeight}px`
+
+  // 不能直接读取 note-title-host.scrollHeight：它受 --dvn-title-host-height
+  // 旧值的 min-height 影响，窗口变宽后会导致标题区无法回缩。这里按
+  // 固定上下内边距 13px + 4px 与文本高度计算真实标题区高度。
+  const titleHeight = Math.max(68, Math.ceil(titleInputHeight + 17))
+  document.documentElement.style.setProperty('--dvn-title-host-height', `${titleHeight}px`)
 }
 
 function isGeneratedNoteTitle(value) {
@@ -229,6 +246,7 @@ function setNoteTitle(value) {
   titleSyncing = true
   titleInput.value = value
   syncNoteTitleStyle(value)
+  updateTitleLayout()
   titleSyncing = false
 }
 
@@ -251,8 +269,10 @@ function commitNoteTitle() {
 }
 
 titleInput.addEventListener('input', () => {
-  if (titleInput.value.length > 24) titleInput.value = titleInput.value.slice(0, 24)
+  const sanitized = sanitizeTitleInputValue(titleInput.value)
+  if (titleInput.value !== sanitized) titleInput.value = sanitized
   syncNoteTitleStyle(titleInput.value.trim())
+  updateTitleLayout()
 })
 titleInput.addEventListener('blur', commitNoteTitle)
 titleInput.addEventListener('keydown', (event) => {
@@ -262,6 +282,9 @@ titleInput.addEventListener('keydown', (event) => {
     titleInput.blur()
   }
 })
+window.addEventListener('resize', updateTitleLayout)
+window.addEventListener('dvn-tiptap-content-zoom-changed', updateTitleLayout)
+updateTitleLayout()
 
 // 工具栏可能先于 QWebChannel 完成绑定就已经可见。先缓存用户操作，
 // 避免首次点击在 bridge 尚未就绪时被静默丢弃。
