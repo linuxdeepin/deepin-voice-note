@@ -38,6 +38,7 @@ const QStringList kSupportedMarks = {
     QStringLiteral("highlight"),
     QStringLiteral("fontFamily"),
     QStringLiteral("fontSize"),
+    QStringLiteral("fontWeight"),
 };
 
 void addError(MigrationJsonValidationResult &result,

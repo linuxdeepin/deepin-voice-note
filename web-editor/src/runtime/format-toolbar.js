@@ -475,7 +475,17 @@ export function createFormatToolbar(editor, host) {
       if (value === 'p') {
         editor.chain().focus().setParagraph().run()
       } else {
-        editor.chain().focus().toggleHeading({ level: Number(value) }).run()
+        // 选择标题后，标题自身的默认粗体就是当前视觉状态；必须先清掉
+        // 手动粗体开关遗留状态，否则切换标题等级的事务同步会重新写入
+        // fontWeight: normal，导致标题看起来不再自动加粗。
+        persistentInlineFormats.delete('bold')
+        editor
+          .chain()
+          .focus()
+          .unsetMark('fontWeight', { extendEmptyMarkRange: true })
+          .toggleHeading({ level: Number(value) })
+          .run()
+        syncActiveStates()
       }
     },
   })
@@ -527,8 +537,27 @@ export function createFormatToolbar(editor, host) {
   const persistentInlineFormats = new Map()
   let applyingPersistentInlineFormats = false
 
+  function isInlineFormatActive(format) {
+    if (format === 'bold') {
+      if (editor.isActive('fontWeight', { fontWeight: 'normal' })) return false
+      return editor.isActive('bold') || editor.isActive('heading')
+    }
+    return editor.isActive(format)
+  }
+
   function applyStoredInlineFormat(format, active) {
-    const chain = editor.chain().focus()
+    let chain = editor.chain().focus()
+    if (format === 'bold' && editor.isActive('heading')) {
+      // 标题在块级样式上天然表现为粗体。用户在标题文本上关闭“粗体”
+      // 时，不能把标题降级成正文，而是给所选文本/后续输入加 normal
+      // 字重 mark；再次开启时移除该 mark，恢复标题默认粗体。
+      chain = chain.unsetMark('bold')
+      if (active) {
+        return chain.unsetMark('fontWeight').run()
+      }
+      return chain.setMark('fontWeight', { fontWeight: 'normal' }).run()
+    }
+
     if (active) {
       return chain.setMark(format).run()
     }
@@ -538,25 +567,17 @@ export function createFormatToolbar(editor, host) {
   function applyPersistentInlineFormats() {
     if (applyingPersistentInlineFormats || !editor.isFocused || !editor.state.selection.empty || persistentInlineFormats.size === 0) return
 
-    let chain = editor.chain().focus()
-    let needRun = false
     for (const [format, active] of persistentInlineFormats) {
-      const currentlyActive = editor.isActive(format)
-      if (active && !currentlyActive) {
-        chain = chain.setMark(format)
-        needRun = true
-      } else if (!active && currentlyActive) {
-        chain = chain.unsetMark(format)
-        needRun = true
-      }
-    }
-    if (!needRun) return
+      const currentlyActive = isInlineFormatActive(format)
+      if (active === currentlyActive) continue
 
-    applyingPersistentInlineFormats = true
-    try {
-      chain.run()
-    } finally {
-      applyingPersistentInlineFormats = false
+      applyingPersistentInlineFormats = true
+      try {
+        applyStoredInlineFormat(format, active)
+      } finally {
+        applyingPersistentInlineFormats = false
+      }
+      return
     }
   }
 
@@ -568,7 +589,7 @@ export function createFormatToolbar(editor, host) {
 
     const current = persistentInlineFormats.has(format)
       ? persistentInlineFormats.get(format)
-      : editor.isActive(format)
+      : isInlineFormatActive(format)
     const nextActive = !current
     persistentInlineFormats.set(format, nextActive)
     applyStoredInlineFormat(format, nextActive)
@@ -919,7 +940,7 @@ export function createFormatToolbar(editor, host) {
       const btn = buttons[format]
       const persistentActive = persistentInlineFormats.has(format)
         ? persistentInlineFormats.get(format)
-        : editor.isActive(format)
+        : isInlineFormatActive(format)
       setPressed(btn, hasEditorContext && persistentActive)
     }
     setPressed(buttons.blockquote, hasEditorContext && editor.isActive('blockquote'))

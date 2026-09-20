@@ -58,9 +58,14 @@ QJsonObject imageNode(const QString &src)
 
 TEST(UT_MigrationJsonValidator, AcceptsBuilderGeneratedEnvelope)
 {
-    const QJsonObject paragraph = MigrationJsonBuilder::makeParagraph(
-        arrayOf(MigrationJsonBuilder::makeText(QStringLiteral("重点内容"),
-                                               QJsonArray { MigrationJsonBuilder::makeMark(QStringLiteral("bold")) })));
+    QJsonObject weightAttrs;
+    weightAttrs.insert(QStringLiteral("fontWeight"), QStringLiteral("normal"));
+    const QJsonObject paragraph = MigrationJsonBuilder::makeParagraph(QJsonArray {
+        MigrationJsonBuilder::makeText(QStringLiteral("重点内容"),
+                                       QJsonArray { MigrationJsonBuilder::makeMark(QStringLiteral("bold")) }),
+        MigrationJsonBuilder::makeText(QStringLiteral("标题取消粗体"),
+                                       QJsonArray { MigrationJsonBuilder::makeMark(QStringLiteral("fontWeight"), weightAttrs) }),
+    });
     const QJsonObject image = MigrationJsonBuilder::makeImage(QStringLiteral("images/photo.png"),
                                                               QStringLiteral("images/photo.png"));
     const QJsonObject voiceBlock = MigrationJsonBuilder::makeVoiceBlock(

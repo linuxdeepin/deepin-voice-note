@@ -51,6 +51,23 @@ test('Schema V1 exposes the frozen node and mark names', () => {
   assert.deepEqual(Object.keys(schema.marks).sort(), [...SCHEMA_V1_MARKS].sort())
 })
 
+test('Schema V1 accepts fontWeight mark for heading bold overrides', () => {
+  const result = validateEnvelope(createEnvelope({
+    type: 'doc',
+    content: [{
+      type: 'heading',
+      attrs: { level: 2 },
+      content: [{
+        type: 'text',
+        text: 'Normal title text',
+        marks: [{ type: 'fontWeight', attrs: { fontWeight: 'normal' } }],
+      }],
+    }],
+  }))
+
+  assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2))
+})
+
 test('Envelope helpers create and serialize a valid empty document', () => {
   const envelope = createEnvelope()
   const serialized = serializeEnvelope(envelope)

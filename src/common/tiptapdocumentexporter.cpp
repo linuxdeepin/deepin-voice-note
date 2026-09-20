@@ -398,6 +398,10 @@ QString markOpenHtml(const QJsonObject &mark)
         const QString size = safeCssValue(textValue(attrs, QStringLiteral("fontSize")));
         return size.isEmpty() ? QString() : QStringLiteral("<span style=\"font-size:%1\">").arg(htmlAttr(size));
     }
+    if (type == QStringLiteral("fontWeight")) {
+        const QString weight = safeCssValue(textValue(attrs, QStringLiteral("fontWeight")));
+        return weight.isEmpty() ? QString() : QStringLiteral("<span style=\"font-weight:%1\">").arg(htmlAttr(weight));
+    }
     return QString();
 }
 
@@ -408,7 +412,7 @@ QString markCloseHtml(const QJsonObject &mark)
     if (type == QStringLiteral("italic")) return QStringLiteral("</em>");
     if (type == QStringLiteral("underline")) return QStringLiteral("</u>");
     if (type == QStringLiteral("strike")) return QStringLiteral("</s>");
-    if (type == QStringLiteral("color") || type == QStringLiteral("fontFamily") || type == QStringLiteral("fontSize")) return QStringLiteral("</span>");
+    if (type == QStringLiteral("color") || type == QStringLiteral("fontFamily") || type == QStringLiteral("fontSize") || type == QStringLiteral("fontWeight")) return QStringLiteral("</span>");
     if (type == QStringLiteral("highlight")) return QStringLiteral("</mark>");
     return QString();
 }
