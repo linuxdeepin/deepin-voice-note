@@ -322,7 +322,11 @@ void TiptapChannelBridge::setSearchQuery(const QString &query)
 
 void TiptapChannelBridge::clearSearchQuery()
 {
-    setSearchQuery(QString());
+    // 清除操作必须是幂等的。即使桥接层已经记录为空，前端仍可能
+    // 保留旧的运行态 decoration（例如编辑器切换或 WebEngine 重载期间），
+    // 因此每次清除都主动通知前端移除搜索高亮。
+    m_currentSearchQuery.clear();
+    emit searchCleared();
 }
 
 int TiptapChannelBridge::currentNoteId() const

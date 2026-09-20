@@ -10,10 +10,8 @@ if (typeof document !== 'undefined' && !document.getElementById('dvn-search-styl
   const style = document.createElement('style')
   style.id = 'dvn-search-style'
   style.textContent = `
-    .dvn-search-match { background: var(--dvn-search-match-bg, rgba(255, 214, 0, 0.55)); border-radius: 2px; }
-    .dvn-search-current { background: var(--dvn-search-current-bg, rgba(255, 150, 0, 0.75)); }
-    .dvn-search-voice-match .voiceInfoBox { outline: 2px solid var(--dvn-search-match-outline, rgba(255, 214, 0, 0.75)); outline-offset: 1px; }
-    .dvn-search-current-voice .voiceInfoBox { outline-color: var(--dvn-search-current-outline, rgba(255, 150, 0, 0.95)); }
+    .dvn-search-match { background: var(--dvn-search-match-bg, #0081ff); color: var(--dvn-search-match-fg, #ffffff); border-radius: 2px; }
+    .dvn-search-current { background: var(--dvn-search-current-bg, #0081ff); }
   `
   document.head.appendChild(style)
 }
@@ -73,20 +71,10 @@ function buildSearchState(doc, query, currentIndex = 0) {
     }
 
     if (node.type?.name === 'voiceBlock') {
-      const voiceId = node.attrs?.voiceId
-      const titleMatched = normalize(node.attrs?.title).includes(normalize(normalizedQuery))
-      const transcriptMatched = normalize(node.attrs?.text).includes(normalize(normalizedQuery))
-      if (voiceId && (titleMatched || transcriptMatched)) {
-        const index = matches.length
-        matchedVoiceIds.add(voiceId)
-        if (transcriptMatched) matchedVoiceTranscriptIds.add(voiceId)
-        matches.push({ type: 'voiceBlock', from: pos, to: pos + node.nodeSize, voiceId })
-        decorations.push(Decoration.node(pos, pos + node.nodeSize, {
-          class: index === currentIndex
-            ? 'dvn-search-voice-match dvn-search-current-voice'
-            : 'dvn-search-voice-match',
-        }))
-      }
+      // Voice blocks are atomic widgets. Their playback title, timestamp and
+      // transcript are all display-only widget text and must not be searched.
+      // Returning false also prevents any future child content from entering
+      // the normal text-search traversal.
       return false
     }
     return true
@@ -112,8 +100,8 @@ function scrollCurrentIntoView(editor) {
   const state = searchPluginKey.getState(editor.state)
   if (!state?.query || state.matches.length === 0) return
   window.requestAnimationFrame(() => {
-    const current = editor.view.dom.querySelector('.dvn-search-current, .dvn-search-current-voice')
-      || editor.view.dom.querySelector('.dvn-search-match, .dvn-search-voice-match')
+    const current = editor.view.dom.querySelector('.dvn-search-current')
+      || editor.view.dom.querySelector('.dvn-search-match')
     current?.scrollIntoView?.({ block: 'center', inline: 'nearest' })
   })
 }

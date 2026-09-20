@@ -67,35 +67,60 @@ test('search extension highlights only document text without changing JSON', () 
   editor.destroy()
 })
 
-test('search extension highlights voice transcript at runtime and restores folded state', () => {
+test('normal body text remains searchable while voice blocks are excluded', () => {
   const editor = createEditor()
   editor.commands.setContent({
     type: 'doc',
     content: [{
+      type: 'paragraph',
+      content: [{ type: 'text', text: '正文关键词可以被搜索' }],
+    }, {
       type: 'voiceBlock',
       attrs: {
         voiceId: 'voice-search-js',
         voicePath: 'voicenote/search.wav',
         voiceSize: 1000,
-        title: '会议录音',
-        text: '这是一段可以搜索的转写内容',
+        title: '20260920 13.42.36',
+        text: '语音转写关键词也不应该被搜索',
         translateUnfold: false,
       },
     }],
   })
 
   const translateText = editor.view.dom.querySelector('.translateText')
+  const voiceInfoBox = editor.view.dom.querySelector('.voiceInfoBox')
   assert.ok(translateText, 'voice transcript should render')
-  assert.equal(translateText.style.display, 'none', 'folded transcript is hidden before search')
+  assert.ok(voiceInfoBox, 'voice playback box should render')
+  assert.equal(translateText.style.display, 'none', 'folded transcript remains hidden')
 
-  setTiptapSearchQuery(editor, '搜索')
-  const state = searchPluginKey.getState(editor.state)
-  assert.equal(state.matchedVoiceTranscriptIds.has('voice-search-js'), true)
-  assert.notEqual(translateText.style.display, 'none', 'matched folded transcript is shown at runtime')
-  assert.ok(translateText.querySelector('.dvn-search-match'), 'matched transcript text is highlighted')
+  // Ordinary note text must keep the normal inline search highlight.
+  setTiptapSearchQuery(editor, '正文关键词')
+  let state = searchPluginKey.getState(editor.state)
+  assert.equal(state.matches.length, 1)
+  const bodyMatch = editor.view.dom.querySelector('.dvn-search-match')
+  assert.ok(bodyMatch, 'ordinary body text should still be highlighted')
+  assert.equal(bodyMatch.textContent, '正文关键词')
 
+  // Nothing rendered by the voice block is searchable: not its bar metadata
+  // and not its transcript.
+  for (const query of ['20260920', '语音转写关键词']) {
+    setTiptapSearchQuery(editor, query)
+    state = searchPluginKey.getState(editor.state)
+    assert.equal(state.matches.length, 0, `voice block must not match query: ${query}`)
+    assert.equal(state.matchedVoiceIds.size, 0)
+    assert.equal(state.matchedVoiceTranscriptIds.size, 0)
+    assert.equal(translateText.querySelector('.dvn-search-match'), null)
+    assert.equal(translateText.querySelector('.dvn-search-current'), null)
+    assert.equal(voiceInfoBox.classList.contains('dvn-search-voice-match'), false)
+    assert.equal(voiceInfoBox.style.outline, '', 'search must not add an outline to the voice bar')
+    assert.equal(translateText.style.display, 'none', 'search must not unfold voice transcript')
+  }
+
+  // Clearing remains effective for ordinary body highlights.
+  setTiptapSearchQuery(editor, '正文关键词')
+  assert.ok(editor.view.dom.querySelector('.dvn-search-match'))
   clearTiptapSearch(editor)
-  assert.equal(translateText.style.display, 'none', 'clearing search restores folded transcript visibility')
-  assert.equal(translateText.querySelector('.dvn-search-match'), null)
+  assert.equal(editor.view.dom.querySelector('.dvn-search-match'), null)
+  assert.equal(translateText.style.display, 'none')
   editor.destroy()
 })

@@ -25,7 +25,7 @@ QString tiptapEnvelopeWithVoice()
                     "voiceId":"voice-search-1",
                     "voicePath":"voicenote/search.wav",
                     "voiceSize":1000,
-                    "title":"会议录音",
+                    "title":"20260920 13.42.36",
                     "text":"这是一段语音转文字搜索内容",
                     "translateUnfold":false
                 }}
@@ -54,7 +54,7 @@ TEST(SearchTextNormalizer, FoldsCaseWidthAndWhitespace)
               QStringLiteral("abc def"));
 }
 
-TEST(TiptapDocumentExtractor, ExtractsBodyAndVoiceTranscript)
+TEST(TiptapDocumentExtractor, ExtractsBodyButExcludesVoiceBlock)
 {
     VNoteItem note = makeNote(10, QStringLiteral("搜索标题"), tiptapEnvelopeWithVoice());
     const SearchDocument document = SearchDocumentExtractor::extract(&note);
@@ -66,10 +66,23 @@ TEST(TiptapDocumentExtractor, ExtractsBodyAndVoiceTranscript)
 
     EXPECT_TRUE(corpus.contains(QStringLiteral("项目搜索设计")));
     EXPECT_TRUE(corpus.contains(QStringLiteral("Tiptap 正文内容")));
-    EXPECT_TRUE(corpus.contains(QStringLiteral("会议录音")));
-    EXPECT_TRUE(corpus.contains(QStringLiteral("语音转文字搜索内容")));
+    EXPECT_FALSE(corpus.contains(QStringLiteral("20260920")));
+    EXPECT_FALSE(corpus.contains(QStringLiteral("语音转文字搜索内容")));
 }
 
+
+TEST(LegacyHtmlExtractor, ExcludesVoiceWidgetDisplayText)
+{
+    VNoteItem note = makeNote(15, QStringLiteral("旧版语音"), QString());
+    note.htmlCode = QStringLiteral(
+        R"html(<p>普通正文关键词</p><div class="li voiceBox"><div class="voiceInfoBox"><div class="voicePlayback"><div class="title">20260920 13.42.36</div><div class="timeTotal">00:02</div></div><div class="translateText">语音转写关键词</div></div></div><p>正文结尾</p>)html");
+
+    SearchIndexManager index;
+    index.updateNote(&note);
+    ASSERT_EQ(index.search(QStringLiteral("普通正文关键词")).size(), 1);
+    EXPECT_TRUE(index.search(QStringLiteral("20260920")).isEmpty());
+    EXPECT_TRUE(index.search(QStringLiteral("语音转写关键词")).isEmpty());
+}
 
 TEST(TiptapDocumentExtractor, JoinsMarkedTextNodesWithinBlock)
 {
@@ -89,7 +102,7 @@ TEST(TiptapDocumentExtractor, JoinsMarkedTextNodesWithinBlock)
     EXPECT_EQ(results.first().noteId, 14);
 }
 
-TEST(SearchIndexManager, SearchesTiptapBodyAndVoiceTranscript)
+TEST(SearchIndexManager, SearchesTiptapBodyButExcludesVoiceBlock)
 {
     VNoteItem note = makeNote(11, QStringLiteral("架构标题"), tiptapEnvelopeWithVoice());
     SearchIndexManager index;
@@ -100,10 +113,8 @@ TEST(SearchIndexManager, SearchesTiptapBodyAndVoiceTranscript)
     EXPECT_EQ(bodyResults.first().noteId, 11);
     EXPECT_EQ(bodyResults.first().bestField, SearchField::Body);
 
-    QList<SearchResult> voiceResults = index.search(QStringLiteral("转文字搜索"));
-    ASSERT_EQ(voiceResults.size(), 1);
-    EXPECT_EQ(voiceResults.first().noteId, 11);
-    EXPECT_EQ(voiceResults.first().bestField, SearchField::VoiceTranscript);
+    EXPECT_TRUE(index.search(QStringLiteral("转文字搜索")).isEmpty());
+    EXPECT_TRUE(index.search(QStringLiteral("20260920")).isEmpty());
 }
 
 TEST(SearchIndexManager, UpdatesChangedNoteAndRemovesOldNgrams)
@@ -111,7 +122,7 @@ TEST(SearchIndexManager, UpdatesChangedNoteAndRemovesOldNgrams)
     VNoteItem note = makeNote(12, QStringLiteral("旧标题"), tiptapEnvelopeWithVoice());
     SearchIndexManager index;
     index.updateNote(&note);
-    ASSERT_EQ(index.search(QStringLiteral("语音转文字搜索")).size(), 1);
+    EXPECT_TRUE(index.search(QStringLiteral("语音转文字搜索")).isEmpty());
 
     note.modifyTime = note.modifyTime.addSecs(1);
     note.setMetadata(QStringLiteral(R"json({
@@ -128,7 +139,7 @@ TEST(SearchIndexManager, UpdatesChangedNoteAndRemovesOldNgrams)
 TEST(VNoteItemSearchCompatibility, DelegatesToUnifiedExtractor)
 {
     VNoteItem note = makeNote(13, QStringLiteral("兼容入口"), tiptapEnvelopeWithVoice());
-    EXPECT_TRUE(note.search(QStringLiteral("语音转文字搜索")));
+    EXPECT_FALSE(note.search(QStringLiteral("语音转文字搜索")));
     EXPECT_TRUE(note.search(QStringLiteral("tiptap 正文")));
     EXPECT_FALSE(note.search(QStringLiteral("不存在的关键字")));
 }
