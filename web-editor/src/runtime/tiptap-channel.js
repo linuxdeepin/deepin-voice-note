@@ -465,6 +465,13 @@ function applyTheme(theme, highlightColor, disableHighlightColor, backgroundColo
   root.style.setProperty('--dvn-active-selection-bg', colorWithAlpha(activeBaseColor, 0.6, 'rgba(0, 129, 255, 0.6)'))
   root.style.setProperty('--dvn-text-selection-bg', activeBaseColor)
   root.style.setProperty('--dvn-selection-fg', '#ffffff')
+  // 搜索高亮直接使用主题的 Active Highlight。不能再叠加透明度，
+  // 否则颜色会与 Summernote/编辑器正常主题色不一致，在浅色背景上
+  // 尤其容易被显示成更浅的颜色。普通命中和当前命中使用同一主题色，
+  // 避免搜索结果出现不符合主题的深浅差异。
+  root.style.setProperty('--dvn-search-match-bg', activeBaseColor)
+  root.style.setProperty('--dvn-search-current-bg', activeBaseColor)
+  root.style.setProperty('--dvn-search-match-fg', '#ffffff')
 
   // 主题联动：工具栏 / 语音块 / 滚动条 / 取色板 / 图片自绘菜单
   const isDark = theme === 'dark'

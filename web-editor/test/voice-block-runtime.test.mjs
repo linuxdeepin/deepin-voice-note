@@ -12,7 +12,6 @@ import { NodeSelection } from '@tiptap/pm/state'
 import { Fragment, Slice } from '@tiptap/pm/model'
 import { createTiptapExtensions } from '../src/runtime/tiptap-extensions.js'
 import voiceBlockCss from '../src/extensions/voice-block.css?raw'
-import { setTiptapSearchQuery } from '../src/runtime/search-extension.js'
 import { currentTranscriptCopyText, writeTranscriptCopyEvent, copyTranscriptTextViaBridge, updateTranscriptSelectionCache, installTranscriptCopyHandler } from '../src/runtime/transcript-copy.js'
 import { createEmptyDoc, createEnvelope, serializeEnvelope, validateEnvelope } from '../src/schema/document-envelope.js'
 import {
@@ -252,7 +251,7 @@ test('transcript copy: context helper returns DOM selection inside voiceBlock at
   window.__dvnTiptapContextTranscript = null
 })
 
-test('transcript copy: search-highlighted transcript copies plain text only', () => {
+test('transcript copy: voice-block text stays plain text', () => {
   const { editor } = createEditor()
   editor.commands.setContent({
     type: 'doc',
@@ -268,10 +267,9 @@ test('transcript copy: search-highlighted transcript copies plain text only', ()
     }],
   })
 
-  assert.equal(setTiptapSearchQuery(editor, '高亮'), true)
   const translateText = editor.view.dom.querySelector('.translateText')
   assert.ok(translateText, 'translateText should render')
-  assert.ok(translateText.querySelector('.dvn-search-match'), 'search hit should be rendered inside transcript')
+  assert.equal(translateText.querySelector('.dvn-search-match'), null)
 
   const range = document.createRange()
   range.selectNodeContents(translateText)
@@ -542,6 +540,9 @@ test('themeProvided writes CSS variables on document root', () => {
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-text-selection-bg'), '#007AFF')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-active-selection-bg'), 'rgba(0, 122, 255, 0.6)')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-selection-fg'), '#ffffff')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-search-match-bg'), '#007AFF')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-search-current-bg'), '#007AFF')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-search-match-fg'), '#ffffff')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-editor-fg'), 'rgba(192, 198, 212, 1)')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-press-bg'), '#4a4a4a')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-toolbar-hover-fg'), 'rgba(255, 255, 255, 0.95)')
@@ -567,6 +568,9 @@ test('themeProvided: light theme variables', () => {
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-transcript-selection-bg'), 'rgba(0, 88, 222, 0.4)')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-text-selection-bg'), '#0058DE')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-selection-fg'), '#ffffff')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-search-match-bg'), '#0058DE')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-search-current-bg'), '#0058DE')
+  assert.equal(document.documentElement.style.getPropertyValue('--dvn-search-match-fg'), '#ffffff')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-color-chip-border'), 'rgba(0, 0, 0, 0.20)')
   assert.equal(document.documentElement.style.getPropertyValue('--dvn-color-transparent-line'), 'rgba(0, 0, 0, 0.25)')
 })

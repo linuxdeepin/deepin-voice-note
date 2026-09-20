@@ -15,7 +15,6 @@ import playingPauseIconUrl from '../../../src/web/img/audio_file_playing_pause/N
 import playingPlayIconUrl from '../../../src/web/img/audio_file_playing_play/Normal.svg?url'
 import closePlaybackIconUrl from '../../../src/web/img/playbar_pause_close/Normal.svg?url'
 import { getVoiceBridge, subscribeVoiceEvents } from '../runtime/tiptap-channel.js'
-import { subscribeSearchState, renderHighlightedText, textMatchesQuery } from '../runtime/search-state.js'
 import { updateTranscriptSelectionCache } from '../runtime/transcript-copy.js'
 
 const VOICE_BLOCK_CLIPBOARD_MIME = 'application/x-deepin-voice-note-voice-block'
@@ -346,8 +345,6 @@ export const VoiceBlock = Node.create({
       let unplayable = false
       let currentNode = node
       let destroyed = false
-      let activeSearchQuery = ''
-      let transcriptMatchedBySearch = false
 
       // --- 构建 DOM ---
       const wrapper = document.createElement('div')
@@ -479,12 +476,10 @@ export const VoiceBlock = Node.create({
       box.appendChild(translate)
 
       function renderTranscriptText() {
-        const text = currentNode.attrs.text || ''
-        if (transcriptMatchedBySearch) {
-          renderHighlightedText(translateText, text, activeSearchQuery)
-        } else {
-          translateText.textContent = text
-        }
+        // A voice block is a read-only widget. None of its displayed text is
+        // part of the editor search index, so always render the transcript as
+        // plain text without search spans.
+        translateText.textContent = currentNode.attrs.text || ''
       }
 
       // --- 初始状态渲染 ---
@@ -495,17 +490,13 @@ export const VoiceBlock = Node.create({
         playback.classList.toggle('unplayable', unplayable)
 
         const hasText = !!(currentNode.attrs.text && currentNode.attrs.text.length > 0)
-        const voiceId = currentNode.attrs.voiceId
-        const voiceMatchedBySearch = !!activeSearchQuery && textMatchesQuery(currentNode.attrs.title, activeSearchQuery)
-        transcriptMatchedBySearch = !!activeSearchQuery && textMatchesQuery(currentNode.attrs.text, activeSearchQuery)
-        box.classList.toggle('dvn-search-voice-attrs-match', voiceMatchedBySearch || transcriptMatchedBySearch)
         box.classList.toggle('containText', hasText)
         toTextTrigger.style.display = 'none'
         createTimeEl.style.display = (playing || paused || translating) ? 'none' : ''
 
         const unfold = currentNode.attrs.translateUnfold !== false
         translateHeader.classList.toggle('unfold', unfold)
-        translateText.style.display = (hasText && (unfold || transcriptMatchedBySearch)) ? '' : 'none'
+        translateText.style.display = (hasText && unfold) ? '' : 'none'
         renderTranscriptText()
 
         // 进度
@@ -796,11 +787,6 @@ export const VoiceBlock = Node.create({
         },
       })
 
-      const unsubscribeSearch = subscribeSearchState((state) => {
-        activeSearchQuery = state?.query || ''
-        refreshState()
-      })
-
       refreshState()
 
       return {
@@ -838,7 +824,6 @@ export const VoiceBlock = Node.create({
           if (destroyed) return
           destroyed = true
           unsubscribe()
-          unsubscribeSearch()
           wrapper.removeEventListener('beforeinput', onVoiceBoxBeforeInput)
           wrapper.removeEventListener('input', onVoiceBoxInput)
           wrapper.removeEventListener('keydown', onVoiceBoxKeyDown)

@@ -10,6 +10,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QRegularExpression>
 #include <QTextDocument>
 #include <QSet>
 
@@ -47,6 +48,77 @@ QString plainTextFromHtml(const QString &html)
     return doc.toPlainText();
 }
 
+bool hasCssClass(const QString &attributes, const QString &className)
+{
+    static const QRegularExpression classExpression(
+        QStringLiteral(R"REGEX((?:^|\s)class\s*=\s*[\"']([^\"']*)[\"'])REGEX"),
+        QRegularExpression::CaseInsensitiveOption);
+    const QRegularExpressionMatch match = classExpression.match(attributes);
+    if (!match.hasMatch()) {
+        return false;
+    }
+    return match.captured(1).split(QRegularExpression(QStringLiteral(R"REGEX(\s+)REGEX")),
+                                   Qt::SkipEmptyParts)
+        .contains(className);
+}
+
+QString stripLegacyVoiceBlocks(const QString &html)
+{
+    // Legacy HTML stores the complete audio widget, including its playback
+    // title/time and transcript, under a .voiceBox root. QTextDocument would
+    // otherwise turn all of those display strings into searchable plain text.
+    static const QRegularExpression tagExpression(
+        QStringLiteral(R"REGEX(<\s*(/?)\s*([A-Za-z][A-Za-z0-9:-]*)([^>]*)>)REGEX"),
+        QRegularExpression::CaseInsensitiveOption);
+
+    QString result;
+    result.reserve(html.size());
+    QStringList skippedTags;
+    qsizetype cursor = 0;
+    QRegularExpressionMatchIterator iterator = tagExpression.globalMatch(html);
+    while (iterator.hasNext()) {
+        const QRegularExpressionMatch match = iterator.next();
+        const qsizetype start = match.capturedStart();
+        const qsizetype end = match.capturedEnd();
+        const bool closing = !match.captured(1).isEmpty();
+        const QString tagName = match.captured(2).toLower();
+        const QString attributes = match.captured(3);
+        const bool selfClosing = attributes.trimmed().endsWith(QLatin1Char('/'))
+            || tagName == QLatin1String("br")
+            || tagName == QLatin1String("img")
+            || tagName == QLatin1String("hr")
+            || tagName == QLatin1String("input");
+
+        if (skippedTags.isEmpty()) {
+            result += html.mid(cursor, start - cursor);
+            if (!closing && hasCssClass(attributes, QStringLiteral("voiceBox"))) {
+                if (!selfClosing) {
+                    skippedTags.append(tagName);
+                }
+            } else {
+                result += html.mid(start, end - start);
+            }
+        } else if (closing) {
+            // HTML from old notes is simple but may contain nested tags. Pop
+            // the skipped subtree only when its matching tag is closed.
+            for (qsizetype i = skippedTags.size() - 1; i >= 0; --i) {
+                if (skippedTags.at(i) == tagName) {
+                    skippedTags.resize(i);
+                    break;
+                }
+            }
+        } else if (!selfClosing) {
+            skippedTags.append(tagName);
+        }
+        cursor = end;
+    }
+
+    if (skippedTags.isEmpty()) {
+        result += html.mid(cursor);
+    }
+    return result;
+}
+
 bool isTiptapTextBlock(const QString &type)
 {
     static const QSet<QString> blockTypes = {
@@ -73,13 +145,8 @@ QString collectTiptapInlineText(const QJsonObject &node, SearchDocument *documen
     }
 
     if (type == QLatin1String("voiceBlock")) {
-        const QString voiceId = attrs.value(QStringLiteral("voiceId")).toString();
-        appendSegment(document, SearchField::VoiceTitle,
-                      attrs.value(QStringLiteral("title")).toString(),
-                      QStringLiteral("voice"), voiceId);
-        appendSegment(document, SearchField::VoiceTranscript,
-                      attrs.value(QStringLiteral("text")).toString(),
-                      QStringLiteral("voice"), voiceId);
+        // voiceBlock is a display-only audio widget. Its title, timestamp and
+        // transcript must not participate in note search.
         return QString();
     }
 
@@ -191,7 +258,8 @@ public:
                 html = meta;
             }
         }
-        appendSegment(&document, SearchField::Body, plainTextFromHtml(html),
+        const QString searchableHtml = stripLegacyVoiceBlocks(html);
+        appendSegment(&document, SearchField::Body, plainTextFromHtml(searchableHtml),
                       QStringLiteral("legacy-html"));
         return document;
     }
@@ -217,14 +285,12 @@ public:
                 continue;
             }
             if (block->getType() == VNoteBlock::Voice) {
-                appendSegment(&document, SearchField::VoiceTranscript, block->blockText,
-                              QStringLiteral("legacy-voice"), block->ptrVoice->voiceId);
-                appendSegment(&document, SearchField::VoiceTitle, block->ptrVoice->voiceTitle,
-                              QStringLiteral("legacy-voice"), block->ptrVoice->voiceId);
-            } else {
-                appendSegment(&document, SearchField::Body, block->blockText,
-                              QStringLiteral("legacy-block"));
+                // Legacy voice blocks follow the same rule as Tiptap voiceBlock:
+                // no playback metadata or transcript text is searchable.
+                continue;
             }
+            appendSegment(&document, SearchField::Body, block->blockText,
+                          QStringLiteral("legacy-block"));
         }
         return document;
     }
